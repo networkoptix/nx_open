@@ -87,7 +87,7 @@ QString pluginStatus(const PluginInfo& plugin)
 
         case PluginInfo::Status::notLoadedBecauseOptional:
             return notLoadedMessage(ServerSettingsDialogStore::tr(
-                "plugin is optional and isn't in the white list"));
+                "plugin is optional and is not in the white list"));
 
         default:
             NX_ASSERT(false);

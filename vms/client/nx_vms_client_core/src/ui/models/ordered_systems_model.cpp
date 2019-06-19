@@ -13,6 +13,7 @@ namespace {
 using namespace nx::vms::client::core;
 
 static const QSet<int> kSortingRoles = {
+    QnSystemsModel::SearchRoleId,
     QnSystemsModel::SystemNameRoleId,
     QnSystemsModel::SystemIdRoleId,
     QnSystemsModel::LocalIdRoleId,

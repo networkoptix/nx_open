@@ -12,6 +12,8 @@
 #include "utils.h"
 #include "device_agent.h"
 #include "stub_analytics_plugin_ini.h"
+#include "objects/vehicles.h"
+#include "objects/human_face.h"
 
 namespace nx {
 namespace vms_server_plugins {

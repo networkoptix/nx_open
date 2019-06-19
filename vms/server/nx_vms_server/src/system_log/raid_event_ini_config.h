@@ -6,7 +6,7 @@ namespace system_log {
 
 struct RaidEventIniConfig: public nx::kit::IniConfig
 {
-    RaidEventIniConfig(): IniConfig("server_raid_event.ini") { reload(); }
+    RaidEventIniConfig(): IniConfig("vms_server_raid_event.ini") { reload(); }
 
     NX_INI_STRING(
         "Application",
@@ -17,15 +17,6 @@ struct RaidEventIniConfig: public nx::kit::IniConfig
         "MR_MONITOR",
         providerName,
         "The name of the event provider to receive notifications from.");
-
-    NX_INI_INT(
-        3,
-        maxLevel,
-        "All events with the level higher then maxLevel are ignored.");
-
-    QString getLogName() const;
-    QString getProviderName() const;
-    int getMaxLevel() const;
 };
 
 inline RaidEventIniConfig& ini()

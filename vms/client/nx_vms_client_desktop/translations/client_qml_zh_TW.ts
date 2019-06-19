@@ -12,8 +12,8 @@
       <translation>攝影機分析功能將只在觀看影像時有作用. 請啟用錄影來使其全時運作.</translation>
     </message>
     <message>
-      <source>This is the default built-in functionality</source>
-      <translation type="unfinished">This is the default built-in functionality</translation>
+      <source>This is the built-in functionality</source>
+      <translation type="unfinished">This is the built-in functionality</translation>
     </message>
   </context>
   <context>

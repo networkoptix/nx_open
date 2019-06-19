@@ -987,12 +987,11 @@ MediaServerProcess::MediaServerProcess(int argc, char* argv[], bool serviceMode)
     m_platform->setUpdatePeriodMs(
         isStatisticsDisabled ? 0 : QnGlobalMonitor::kDefaultUpdatePeridMs);
 
-    const QString raidEventLogName = system_log::ini().getLogName();
-    const QString raidEventProviderName = system_log::ini().getProviderName();
-    const int raidEventMaxLevel = system_log::ini().getMaxLevel();
+    const QString raidEventLogName = system_log::ini().logName;
+    const QString raidEventProviderName = system_log::ini().providerName;
 
     m_raidEventLogReader.reset(new RaidEventLogReader(
-        raidEventLogName, raidEventProviderName, raidEventMaxLevel));
+        raidEventLogName, raidEventProviderName));
     m_enableMultipleInstances = settings->settings().enableMultipleInstances();
 }
 
@@ -3730,6 +3729,9 @@ void MediaServerProcess::stopObjects()
     safeDisconnect(commonModule()->resourceDiscoveryManager(), this);
     safeDisconnect(serverModule()->normalStorageManager(), this);
     safeDisconnect(serverModule()->backupStorageManager(), this);
+    m_raidEventLogReader->unsubscribe();
+    safeDisconnect(m_raidEventLogReader.get(), this);
+
     safeDisconnect(commonModule(), this);
     safeDisconnect(commonModule()->runtimeInfoManager(), this);
     if (m_ec2Connection)
@@ -4141,6 +4143,11 @@ void MediaServerProcess::connectSignals()
         m_cloudIntegrationManager->cloudManagerGroup().connectionManager.setProxyVia(
             nx::network::SocketAddress(nx::network::HostAddress::localhost, m_universalTcpListener->getPort()));
     });
+
+    connect(m_raidEventLogReader.get(), &RaidEventLogReader::eventOccurred, this,
+        &MediaServerProcess::at_storageManager_raidStorageFailure);
+    m_raidEventLogReader->subscribe();
+
 }
 
 void MediaServerProcess::setUpDataFromSettings()
@@ -4338,9 +4345,16 @@ void MediaServerProcess::startObjects()
     else
     {
         const int64_t dbBackupPeriodMS = serverModule()->settings().dbBackupPeriodMS().count();
-        initialBackupDbPeriodMs = std::max<int64_t>(
-            *lastDbBackupTimestamp + dbBackupPeriodMS - qnSyncTime->currentMSecsSinceEpoch(),
-            0LL);
+        const int64_t nowMs = qnSyncTime->currentMSecsSinceEpoch();
+        if (*lastDbBackupTimestamp >= nowMs) //< Last backup was performed in the future.
+        {
+            initialBackupDbPeriodMs = dbBackupPeriodMS;
+        }
+        else
+        {
+            initialBackupDbPeriodMs =
+                std::max<int64_t>(*lastDbBackupTimestamp + dbBackupPeriodMS - nowMs, 0LL);
+        }
     }
     m_createDbBackupTimer->start(initialBackupDbPeriodMs);
 
@@ -4829,10 +4843,6 @@ void MediaServerProcess::at_appStarted()
     QDir stateDirectory;
     stateDirectory.mkpath(dataLocation + QLatin1String("/state"));
     serverModule()->fileDeletor()->init(dataLocation + QLatin1String("/state")); // constructor got root folder for temp files
-
-    connect(m_raidEventLogReader.get(), &RaidEventLogReader::eventOccurred, this,
-        &MediaServerProcess::at_storageManager_raidStorageFailure);
-    m_raidEventLogReader->subscribe();
 };
 
 void MediaServerProcess::at_runtimeInfoChanged(const QnPeerRuntimeInfo& runtimeInfo)

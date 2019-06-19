@@ -324,23 +324,38 @@ bool ApplauncherProcess::installZipAsync(
     const std::shared_ptr<InstallZipTaskAsync>& request,
     Response* const response)
 {
+    bool canStartInstallation = false;
     if (!m_process.isEmpty())
     {
         // It is ok if we are already installing the same file and version.
         if (m_process.equals(request->version, request->zipFileName))
         {
-            NX_INFO(this, "Already installing version %1 from file %2",
+            NX_INFO(this, "installZipAsync() - already installing version %1 from file %2",
                 request->version, request->zipFileName);
             response->result = ResultType::ok;
         }
+        else if (
+            m_process.result.wait_for(std::chrono::milliseconds(1)) == std::future_status::ready)
+        {
+            auto result = m_process.result.get();
+            NX_VERBOSE(this, "installZipAsync() - previous installation just ended, result=%1",
+                result);
+            canStartInstallation = true;
+        }
         else
         {
-            NX_ERROR(this, "Installer is busy with another task",
-                request->version, request->zipFileName);
+            NX_ERROR(this, "installZipAsync() - can not start installing version %1 from %2: "
+                    "already installing from %3", request->version, request->zipFileName,
+                    m_process.getFile());
             response->result = ResultType::busy;
         }
     }
     else
+    {
+        canStartInstallation = true;
+    }
+
+    if (canStartInstallation)
     {
         NX_VERBOSE(this, "Starting async installation for version %1 from file %2",
             request->version, request->zipFileName);
@@ -374,7 +389,7 @@ bool ApplauncherProcess::checkInstallationProgress(
         {
             response->result = m_process.result.get();
             NX_DEBUG(this,
-                "checkInstallationProgress() - completed installation right now, result=%1",
+                "checkInstallationProgress() - complete, result=%1",
                 response->result);
         }
         else
@@ -382,7 +397,7 @@ bool ApplauncherProcess::checkInstallationProgress(
             QString fileName = m_process.getFile();
             response->result = ResultType::unpackingZip;
             NX_DEBUG(this,
-                "checkInstallationProgress() - still installaing %1", fileName);
+                "checkInstallationProgress() - still installing %1", fileName);
         }
 
         response->total = m_installationManager->getBytesTotal();

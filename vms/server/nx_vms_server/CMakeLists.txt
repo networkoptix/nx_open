@@ -113,7 +113,7 @@ if(LINUX)
 endif()
 
 if(WINDOWS)
-    target_link_libraries(nx_vms_server PRIVATE Wldap32.dll Iphlpapi.dll Crypt32.lib)
+    target_link_libraries(nx_vms_server PRIVATE Wldap32.dll Iphlpapi.dll Crypt32.lib Wevtapi.lib)
 endif()
 
 if(withTests)

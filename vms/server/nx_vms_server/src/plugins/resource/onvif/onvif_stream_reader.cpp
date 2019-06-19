@@ -468,7 +468,53 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateVideoEncoder(
     if (!isCameraControlRequired)
         return CameraDiagnostics::NoErrorResult(); //< Do not update video encoder configuration.
 
-    if (m_onvifRes->getMedia2Url().isEmpty())
+    bool isMedia2Supported = !m_onvifRes->getMedia2Url().isEmpty();
+    if (isMedia2Supported)
+    {
+        // Use old Media2 interface.
+        Media2::VideoEncoderConfigurations veConfigurations(m_onvifRes);
+        veConfigurations.receiveBySoap();
+        if (!veConfigurations)
+        {
+            //LOG.
+            if (veConfigurations.innerWrapper().lastErrorIsNotAuthenticated())
+                return CameraDiagnostics::NotAuthorisedResult(veConfigurations.endpoint());
+            else
+                isMedia2Supported = false;
+        }
+        else
+        {
+            // The pointer currentVEConfig points to the object that is valid until
+            // veConfigurations destructor is called.
+            onvifXsd__VideoEncoder2Configuration* currentVEConfig = selectVideoEncoder2Config(
+                veConfigurations.get()->Configurations, isPrimary);
+
+            if (!currentVEConfig)
+                return CameraDiagnostics::RequestFailedResult("selectVideoEncoder2Config", QString());
+
+            outInfo->videoEncoderConfigurationToken = currentVEConfig->token;
+
+            auto streamIndex = isPrimary
+                ? nx::vms::api::StreamIndex::primary
+                : nx::vms::api::StreamIndex::secondary;
+            m_onvifRes->updateVideoEncoder2(*currentVEConfig, streamIndex, params);
+
+            int triesLeft = m_onvifRes->getMaxOnvifRequestTries();
+            CameraDiagnostics::Result result = CameraDiagnostics::UnknownErrorResult();
+
+            while ((result.errorCode != CameraDiagnostics::ErrorCode::noError) && --triesLeft >= 0)
+            {
+                result = m_onvifRes->sendVideoEncoder2ToCameraEx(*currentVEConfig, streamIndex, params);
+                if (result.errorCode != CameraDiagnostics::ErrorCode::noError)
+                    msleep(300);
+            }
+
+            return result;
+        }
+    }
+
+    // isMedia2Supported could have been changed in the previous if
+    if (!isMedia2Supported)
     {
         // Use old Media1 interface.
         Media::VideoEncoderConfigurations veConfigurations(m_onvifRes);
@@ -523,47 +569,9 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateVideoEncoder(
 
         return result;
     }
-    else
-    {
-        // Use old Media2 interface.
-        Media2::VideoEncoderConfigurations veConfigurations(m_onvifRes);
-        veConfigurations.receiveBySoap();
-        if (!veConfigurations)
-        {
-            //LOG.
-            if (veConfigurations.innerWrapper().lastErrorIsNotAuthenticated())
-                return CameraDiagnostics::NotAuthorisedResult(veConfigurations.endpoint());
-            else
-                return veConfigurations.requestFailedResult();
-        }
 
-        // The pointer currentVEConfig points to the object that is valid until
-        // veConfigurations destructor is called.
-        onvifXsd__VideoEncoder2Configuration* currentVEConfig = selectVideoEncoder2Config(
-            veConfigurations.get()->Configurations, isPrimary);
-
-        if (!currentVEConfig)
-            return CameraDiagnostics::RequestFailedResult("selectVideoEncoder2Config", QString());
-
-        outInfo->videoEncoderConfigurationToken = currentVEConfig->token;
-
-        auto streamIndex = isPrimary
-            ? nx::vms::api::StreamIndex::primary
-            : nx::vms::api::StreamIndex::secondary;
-        m_onvifRes->updateVideoEncoder2(*currentVEConfig, streamIndex, params);
-
-        int triesLeft = m_onvifRes->getMaxOnvifRequestTries();
-        CameraDiagnostics::Result result = CameraDiagnostics::UnknownErrorResult();
-
-        while ((result.errorCode != CameraDiagnostics::ErrorCode::noError) && --triesLeft >= 0)
-        {
-            result = m_onvifRes->sendVideoEncoder2ToCameraEx(*currentVEConfig, streamIndex, params);
-            if (result.errorCode != CameraDiagnostics::ErrorCode::noError)
-                msleep(300);
-        }
-
-        return result;
-    }
+    // This code is never reached, it's written to eliminate compiler warning/error.
+    return CameraDiagnostics::NoErrorResult();
 }
 
 onvifXsd__VideoEncoderConfiguration* QnOnvifStreamReader::selectVideoEncoderConfig(

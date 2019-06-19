@@ -33,8 +33,8 @@ bool matchAdditionData(
 
     BinaryRecordEx* recordEx = (BinaryRecordEx*)data;
     const auto& analyticsFilter = static_cast<const AnalyticsArchive::AnalyticsFilter&>(filter);
-    return matchIntInList(recordEx->objectType, analyticsFilter.objectTypes)
-        && matchIntInList(recordEx->attributesHash, analyticsFilter.allAttributesHash);
+    return matchIntInList(recordEx->objectType(), analyticsFilter.objectTypes)
+        && matchIntInList(recordEx->attributesHash(), analyticsFilter.allAttributesHash);
 }
 
 QnTimePeriodList AnalyticsArchive::matchPeriod(const AnalyticsFilter& filter)
@@ -55,7 +55,7 @@ AnalyticsArchive::MatchObjectsResult  AnalyticsArchive::matchObjects(
             if (isMatched)
             {
                 BinaryRecordEx* recordEx = (BinaryRecordEx*)data;
-                result.data.push_back({recordEx->objectsGroupId, timestampMs});
+                result.data.push_back({recordEx->objectsGroupId(), timestampMs});
             }
             return isMatched;
     };
@@ -98,9 +98,9 @@ bool AnalyticsArchive::saveToArchive(
     packet->m_duration = std::chrono::microseconds(kAggregationInterval).count();
 
     BinaryRecordEx* recordEx = (BinaryRecordEx*)(packet->data() + QnMetaDataV1::kMotionDataBufferSize);
-    recordEx->objectsGroupId = objectsGroupId;
-    recordEx->objectType = objectType;
-    recordEx->attributesHash = allAttributesHash;
+    recordEx->setObjectsGroupId(objectsGroupId);
+    recordEx->setObjectType(objectType);
+    recordEx->setAttributesHash(allAttributesHash);
 
     for (const auto& rect: data)
         packet->addMotion(rect);

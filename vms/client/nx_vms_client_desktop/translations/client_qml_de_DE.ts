@@ -13,7 +13,7 @@
     </message>
     <message>
       <source>This is the built-in functionality</source>
-      <translation type="unfinished">This is the built-in functionality</translation>
+      <translation>Dies ist die integrierte Funktionalität</translation>
     </message>
   </context>
   <context>
