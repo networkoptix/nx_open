@@ -8,7 +8,7 @@ function(nx_unpack_customization_package source_directory target_directory)
     execute_process(
         COMMAND ${PYTHON_EXECUTABLE}
             ${build_utils_dir}/customization/pack2.py unpack
-            ${source_directory}
+            ${source_directory}/package.zip
             ${target_directory}
     )
 endfunction()
