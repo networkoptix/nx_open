@@ -144,6 +144,12 @@ protected:
         startMediator();
     }
 
+    void whenRestartMediator()
+    {
+        m_mediator.reset();
+        startMediator();
+    }
+
     void thenConnectionToMediatorIsReestablished()
     {
         waitForPeerToRegisterOnMediator();
@@ -205,6 +211,11 @@ protected:
         return mediatorAddressPromise.get_future().get();
     }
 
+    void addMediatorArg(const std::string& arg)
+    {
+        m_mediatorArgs.push_back(arg);
+    }
+
 private:
     using Mediator = nx::utils::test::ModuleLauncher<MediatorProcessPublic>;
 
@@ -217,6 +228,7 @@ private:
     std::unique_ptr<nx::network::TCPServerSocket> m_malfunctioningServer;
     std::unique_ptr<nx::network::cloud::CloudServerSocket> m_cloudServerSocket;
     CloudModuleListGenerator m_cloudModuleListGenerator;
+    std::vector<std::string> m_mediatorArgs;
 
     virtual void SetUp() override
     {
@@ -231,6 +243,8 @@ private:
         mediator->addArg("--http/addrToListenList=127.0.0.1:0");
         mediator->addArg("--stun/addrToListenList=127.0.0.1:0");
         mediator->addArg("-general/dataDir", testDataDir().toStdString().c_str());
+        for (const auto& arg: m_mediatorArgs)
+            mediator->addArg(arg.c_str());
         ASSERT_TRUE(mediator->startAndWaitUntilStarted());
 
         m_mediator = std::move(mediator);
@@ -551,6 +565,15 @@ TEST_F(
 {
     givenPeerConnectedToMediator();
     assertMediatorUdpHostMatchesThatInCloudModulesXml();
+}
+
+TEST_F(MediatorConnectorAndStunOverHttpEndpoint, DISABLED_reconnects_to_mediator)
+{
+    addMediatorArg("--stun/keepAliveOptions={10ms, 10ms, 10}");
+
+    givenPeerConnectedToMediator();
+    whenRestartMediator();
+    thenConnectionToMediatorIsReestablished();
 }
 
 } // namespace test
