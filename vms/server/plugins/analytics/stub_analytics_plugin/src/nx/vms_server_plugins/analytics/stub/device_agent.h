@@ -99,8 +99,8 @@ private:
 
     struct DeviceAgentSettings
     {
-        std::atomic<bool> generateObjects{true};
         std::atomic<bool> generateEvents{true};
+        std::atomic<bool> generateObjects{true};
         std::atomic<int> generateObjectsEveryNFrames{1};
         std::atomic<int> numberOfObjectsToGenerate{1};
         std::atomic<bool> generatePreviewPacket{true};

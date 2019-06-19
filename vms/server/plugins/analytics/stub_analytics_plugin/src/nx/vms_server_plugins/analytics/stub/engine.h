@@ -71,14 +71,14 @@ private:
     PixelFormat m_pixelFormat = PixelFormat::yuv420;
 };
 
-static const std::string kGenerateEventsSetting{"generateEvents"};
-static const std::string kGenerateObjectsSetting{"generateObjects"};
-static const std::string kGenerateObjectsEveryNFramesSetting{"generateObjectsEveryNFrames"};
-static const std::string kNumberOfObjectsToGenerateSetting{"numberOfObjectsToGenerate"};
-static const std::string kGeneratePreviewPacketSetting{"generatePreviewPacket"};
-static const std::string kThrowPluginEventsFromEngineSetting{"throwPluginEventsFromDeviceAgent"};
-static const std::string kThrowPluginEventsFromDeviceAgentSetting{
-    "throwPluginEventsFromDeviceAgent"};
+const std::string kGenerateEventsSetting{"generateEvents"};
+const std::string kGenerateObjectsSetting{"generateObjects"};
+const std::string kGenerateObjectsEveryNFramesSetting{"generateObjectsEveryNFrames"};
+const std::string kNumberOfObjectsToGenerateSetting{"numberOfObjectsToGenerate"};
+const std::string kGeneratePreviewPacketSetting{"generatePreviewPacket"};
+const std::string kThrowPluginEventsFromDeviceAgentSetting{"throwPluginEventsFromDeviceAgent"};
+
+const std::string kThrowPluginEventsFromEngineSetting{"throwPluginEventsFromDeviceAgent"};
 
 } // namespace stub
 } // namespace analytics
