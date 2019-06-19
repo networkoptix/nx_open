@@ -5,6 +5,7 @@
 #include <functional>
 #include <iostream>
 #include <vector>
+#include <mutex>
 
 #if !defined(NX_KIT_API)
     #define NX_KIT_API
@@ -95,8 +96,10 @@ public:
 
     virtual ~IniConfig();
 
-    IniConfig(const IniConfig& /*other*/) = delete; //< Disable the copy constructor.
-    IniConfig& operator=(const IniConfig& /*other*/) = delete; //< Disable the assignment operator.
+    IniConfig(const IniConfig&) = delete;
+    IniConfig(IniConfig&&) = delete;
+    IniConfig& operator=(const IniConfig&) = delete;
+    IniConfig& operator=(IniConfig&&) = delete;
 
     const char* iniFile() const; /**< @return Stored copy of the string supplied to the ctor. */
     const char* iniFilePath() const; /**< @return iniFilesDir() + iniFile(). */
@@ -104,44 +107,7 @@ public:
     /** Reload values from .ini file, logging the values first time, or if changed. */
     void reload();
 
-    /**
-     * Allows to tweak ini config values for a duration defined by this object life time. Rereading
-     * the values is disabled while at least 1 Tweaks instanse exists.
-     *
-     * Usage:
-     * ```
-     * {
-     *     Tweaks tweaks;
-     *     tweaks.set(&ini().parameter, value);
-     *     // The value will be altered up to the end of this scope.
-     * }
-     * ```
-     */
-    class NX_KIT_API Tweaks
-    {
-    public:
-        Tweaks();
-        ~Tweaks();
-
-        Tweaks(const Tweaks&) = delete;
-        Tweaks(Tweaks&&) = delete;
-        Tweaks& operator=(const Tweaks&) = delete;
-        Tweaks& operator=(Tweaks&&) = delete;
-
-        template<typename T>
-        void set(const T* field, T newValue)
-        {
-            const auto oldValue = *field;
-            T* const mutableField = const_cast<T*>(field);
-            m_guards->push_back([=]() { *mutableField = oldValue; });
-            *mutableField = newValue;
-        }
-
-    private:
-        // Need pointer to vector here to prevent MSVC warning
-        // 'std::vector needs to have dll-interface to be used by clients of class 'X<T> warning'.
-        std::vector<std::function<void()>>* m_guards = nullptr;
-    };
+    class Tweaks;
 
 protected:
     #define NX_INI_FLAG(DEFAULT, PARAM, DESCRIPTION) \
@@ -159,7 +125,7 @@ protected:
     #define NX_INI_DOUBLE(DEFAULT, PARAM, DESCRIPTION) \
         const double PARAM = regDoubleParam(&PARAM, DEFAULT, #PARAM, DESCRIPTION)
 
-protected: // Used by macros.
+protected: // Used by the above macros.
     bool regBoolParam(const bool* pValue, bool defaultValue,
         const char* paramName, const char* description);
 
@@ -178,6 +144,79 @@ protected: // Used by macros.
 private:
     class Impl;
     Impl* const d;
+};
+
+//-------------------------------------------------------------------------------------------------
+
+/**
+ * Allows to tweak IniConfig values for the duration defined by this object life time.
+ * Re-reading the values is disabled while at least one Tweaks instance exists. Intended for tests.
+ *
+ * Usage:
+ * ```
+ * {
+ *     IniConfig::Tweaks tweaks;
+ *     tweaks.set(&ini().parameter, value);
+ *     // The value will be altered up to the end of this scope.
+ * }
+ * ```
+ */
+class NX_KIT_API IniConfig::Tweaks
+{
+public:
+    Tweaks()
+    {
+        const std::lock_guard<std::mutex> lock(*m_mutexHolder.mutex);
+
+        if (++tweaksInstanceCount != 0)
+        {
+            originalValueOfIsEnabled = isEnabled();
+            setEnabled(false);
+        }
+    }
+
+    ~Tweaks()
+    {
+        for (const auto& guard: *m_guards)
+            guard();
+
+        {
+            const std::lock_guard<std::mutex> lock(*m_mutexHolder.mutex);
+
+            if (--tweaksInstanceCount == 0)
+                setEnabled(originalValueOfIsEnabled);
+        }
+
+        delete m_guards;
+    }
+
+    Tweaks(const Tweaks&) = delete;
+    Tweaks(Tweaks&&) = delete;
+    Tweaks& operator=(const Tweaks&) = delete;
+    Tweaks& operator=(Tweaks&&) = delete;
+
+    template<typename T>
+    void set(const T* field, T newValue)
+    {
+        const auto oldValue = *field;
+        T* const mutableField = const_cast<T*>(field);
+        m_guards->push_back([=]() { *mutableField = oldValue; });
+        *mutableField = newValue;
+    }
+
+private:
+    struct MutexHolder
+    {
+        std::mutex* const mutex = new std::mutex();
+        ~MutexHolder() { delete mutex; }
+    };
+
+    static MutexHolder m_mutexHolder;
+    static int tweaksInstanceCount;
+    static bool originalValueOfIsEnabled;
+
+    std::vector<std::function<void()>>* const m_guards =
+        new std::vector<std::function<void()>>();
 };
 
 } // namespace kit
