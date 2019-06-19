@@ -25,7 +25,7 @@
                 {{plugin.company.companyName}}
             </header>
 
-            <nx-section *ngIf="plugin.company.companyInfo || plugin.company.companyLogo || plugin.company.companyWeb">
+            <nx-section *ngIf="plugin.company.companyInfo || plugin.company.companyLogo || plugin.company.companyWeb || plugin.information && plugin.information.logo">
                 <div class="card--body-logo mb-2" *ngIf="plugin.company.companyLogo"
                      [style.backgroundImage]="'url(' + plugin.company.companyLogo + ')'"
                      [style.maxWidth]="'100%'">
