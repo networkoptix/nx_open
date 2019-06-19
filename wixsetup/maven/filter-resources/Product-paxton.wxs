@@ -13,8 +13,6 @@
         <?endif?>
 
         <WixVariable Id="WixUILicenseRtf" Value="License.rtf" />
-        <WixVariable Id="WixUIBannerBmp" Value="paxton\logo_493x58.bmp" />
-        <WixVariable Id="WixUIDialogBmp" Value="paxton\logo_493x312.bmp" />
 
         <Icon Id="logo.ico" SourceFile="$(var.CustomizationDir)/icons/all/favicon.ico"/>
 
