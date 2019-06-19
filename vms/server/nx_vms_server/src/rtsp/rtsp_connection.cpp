@@ -1358,8 +1358,6 @@ nx::network::rtsp::StatusCodeValue QnRtspConnectionProcessor::composeSetParamete
     if (!d->mediaRes)
         return nx::network::http::StatusCode::notFound;
 
-    createDataProvider();
-
     QList<QByteArray> parameters = d->requestBody.split('\n');
     for(const QByteArray& parameter: parameters)
     {
@@ -1370,6 +1368,8 @@ nx::network::rtsp::StatusCodeValue QnRtspConnectionProcessor::composeSetParamete
 
         if (normParam.startsWith("x-media-quality"))
         {
+            createDataProvider(); //< Ensure current unsent data are removed.
+
             QString q = vals[1].trimmed();
             d->quality = QnLexical::deserialized<MediaQuality>(q, MEDIA_Quality_High);
 
@@ -1411,7 +1411,8 @@ nx::network::rtsp::StatusCodeValue QnRtspConnectionProcessor::composeSetParamete
 
             if (d->archiveDP)
                 d->archiveDP->setStreamDataFilter(filter);
-            d->dataProcessor->setStreamDataFilter(filter);
+            if (d->dataProcessor)
+                d->dataProcessor->setStreamDataFilter(filter);
             return nx::network::http::StatusCode::ok;
         }
         else if (normParam.startsWith(Qn::RTSP_DATA_FILTER_HEADER_NAME))
@@ -1420,7 +1421,8 @@ nx::network::rtsp::StatusCodeValue QnRtspConnectionProcessor::composeSetParamete
             StreamDataFilters filter = QnLexical::deserialized<StreamDataFilters>(value);
             if (d->archiveDP)
                 d->archiveDP->setStreamDataFilter(filter);
-            d->dataProcessor->setStreamDataFilter(filter);
+            if (d->dataProcessor)
+                d->dataProcessor->setStreamDataFilter(filter);
             return nx::network::http::StatusCode::ok;
         }
     }

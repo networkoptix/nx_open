@@ -231,15 +231,6 @@ void WebSocket::sendAsync(const nx::Buffer& buffer, IoCompletionHandler handler)
     post(
         [this, buffer, handler = std::move(handler)]() mutable
         {
-            if (m_failed)
-            {
-                NX_DEBUG(
-                    this,
-                    "sendAsync called after connection has been terminated. Ignoring.");
-                handler(SystemError::connectionAbort, 0);
-                return;
-            }
-
             nx::Buffer writeBuffer;
             if (m_sendMode == SendMode::singleMessage)
             {
@@ -271,6 +262,15 @@ void WebSocket::sendCloseAsync()
 
 void WebSocket::sendMessage(const nx::Buffer& message, int writeSize, IoCompletionHandler handler)
 {
+    NX_VERBOSE(this, "SendMessage: IsFailed: %1, Write size: %2", m_failed, writeSize);
+    if (m_failed)
+    {
+        NX_DEBUG(
+            this,
+            "sendMessage() called after connection has been terminated. Ignoring.");
+        return;
+    }
+
     m_writeQueue.emplace(std::move(handler), message);
     if (m_writeQueue.size() == 1)
     {
@@ -402,8 +402,8 @@ void WebSocket::frameEnded()
     if (m_parser.frameType() == FrameType::close)
     {
         NX_DEBUG(this, "Received close request, responding and terminating.");
-        m_failed = true;
         sendControlResponse(FrameType::close);
+        m_failed = true;
         return;
     }
 
@@ -422,14 +422,6 @@ void WebSocket::frameEnded()
 
 void WebSocket::sendControlResponse(FrameType type)
 {
-    if (m_failed)
-    {
-        NX_DEBUG(
-            this,
-            "sendControlResponse called after connection has been terminated. Ignoring.");
-        return;
-    }
-
     nx::Buffer responseFrame;
     m_serializer.prepareMessage(m_controlBuffer, type, &responseFrame);
     m_controlBuffer.resize(0);
@@ -449,14 +441,6 @@ void WebSocket::sendControlResponse(FrameType type)
 
 void WebSocket::sendControlRequest(FrameType type)
 {
-    if (m_failed)
-    {
-        NX_DEBUG(
-            this,
-            "sendControlRequest called after connection has been terminated. Ignoring.");
-        return;
-    }
-
     nx::Buffer requestFrame;
     m_serializer.prepareMessage("", type, &requestFrame);
 
