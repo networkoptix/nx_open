@@ -148,6 +148,11 @@ public:
         errorCode(errorCode),
         progress(progress)
     {}
+
+    friend inline uint qHash(nx::update::Status::ErrorCode key, uint seed)
+    {
+        return ::qHash(static_cast<uint>(key), seed);
+    }
 };
 
 #define UpdateStatus_Fields (serverId)(code)(errorCode)(progress)(message)

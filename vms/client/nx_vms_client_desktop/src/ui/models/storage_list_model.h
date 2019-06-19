@@ -104,7 +104,6 @@ private:
     QSet<QnUuid> m_checkedStorages;
     std::array<QnStorageScanData, static_cast<int>(QnServerStoragesPool::Count)> m_rebuildStatus;
     QnUuid m_metadataStorageId;
-    bool m_keepMetadata;
 
     bool m_readOnly;
     QBrush m_linkBrush;

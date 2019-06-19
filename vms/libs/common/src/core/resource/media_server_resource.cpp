@@ -503,8 +503,13 @@ QnUuid QnMediaServerResource::metadataStorageId() const
 
 void QnMediaServerResource::setMetadataStorageId(const QnUuid& value)
 {
-    QnMediaServerUserAttributesPool::ScopedLock lk(commonModule()->mediaServerUserAttributesPool(), getId());
-    (*lk)->metadataStorageId = value;
+    {
+        QnMediaServerUserAttributesPool::ScopedLock lk(commonModule()->mediaServerUserAttributesPool(), getId());
+        if ((*lk)->metadataStorageId == value)
+            return;
+        (*lk)->metadataStorageId = value;
+    }
+    emit metadataStorageIdChanged(::toSharedPointer(this));
 }
 
 QnServerBackupSchedule QnMediaServerResource::getBackupSchedule() const
