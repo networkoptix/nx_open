@@ -12,7 +12,10 @@ class QtBasedTimer: public AbstractTimer
 {
     // Cannot use Q_OBJECT because in anonymous namespace.
 public:
-    QtBasedTimer(QObject* parent = nullptr): AbstractTimer(parent) {}
+    QtBasedTimer(QObject* parent = nullptr): AbstractTimer(parent)
+    {
+        connect(&m_timer, &QTimer::timeout, this, &AbstractTimer::timeout);
+    }
 
     virtual milliseconds interval() const override
     {

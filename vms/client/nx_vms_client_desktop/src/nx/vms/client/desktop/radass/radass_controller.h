@@ -7,10 +7,9 @@
 #include "radass_fwd.h"
 #include "utils/abstract_timers.h"
 
-class QnCamDisplay;
-class QnArchiveStreamReader;
-
 namespace nx::vms::client::desktop {
+
+class AbstractVideoDisplay;
 
 class RadassController: public Connective<QObject>
 {
@@ -19,25 +18,26 @@ class RadassController: public Connective<QObject>
 
 public:
     explicit RadassController(QObject* parent = nullptr);
+    // Constructor for making RAD ASS tests with dummy timers.
     explicit RadassController(TimerFactoryPtr timerFactory, QObject* parent = nullptr);
     virtual ~RadassController() override;
 
-    void registerConsumer(QnCamDisplay* display);
-    void unregisterConsumer(QnCamDisplay* display);
+    void registerConsumer(AbstractVideoDisplay* display);
+    void unregisterConsumer(AbstractVideoDisplay* display);
     int consumerCount() const;
 
-    RadassMode mode(QnCamDisplay* display) const;
-    void setMode(QnCamDisplay* display, RadassMode mode);
+    RadassMode mode(AbstractVideoDisplay* display) const;
+    void setMode(AbstractVideoDisplay* display, RadassMode mode);
 
 signals:
     void performanceCanBeImproved();
 
-public slots:
+public:
     /** Inform controller that not enough data or CPU for stream */
-    void onSlowStream(QnArchiveStreamReader* reader);
+    void onSlowStream(AbstractVideoDisplay* display);
 
     /** Inform controller that no more problem with stream */
-    void streamBackToNormal(QnArchiveStreamReader* reader);
+    void streamBackToNormal(AbstractVideoDisplay* display);
 
 private:
     void onTimer();
