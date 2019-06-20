@@ -2,6 +2,7 @@
 
 #include <QtQml/QtQml>
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QWidget>
 
 #include <QtSingleApplication>
 
