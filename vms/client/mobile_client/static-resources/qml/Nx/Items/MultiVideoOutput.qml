@@ -120,7 +120,7 @@ Item
 
             function updateSourceRect()
             {
-                if (index === 0 && __sourceSize.width <= 0.0)
+                if (index === 0)
                     __sourceSize = Qt.size(sourceRect.width, sourceRect.height)
             }
         }
