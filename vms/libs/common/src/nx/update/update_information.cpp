@@ -190,15 +190,15 @@ bool isPackageNewerForVariant(
     const QList<Variant>& packageVariants,
     const QList<Variant>& otherPackageVariants)
 {
-    const auto itOther = std::find_if(otherPackageVariants.begin(), otherPackageVariants.end(),
-        [&variant](const Variant& v) { return v.name == variant; });
-    if (itOther == otherPackageVariants.end())
-        return false;
-
     const auto it = std::find_if(packageVariants.begin(), packageVariants.end(),
         [&variant](const Variant& v) { return v.name == variant; });
     if (it == packageVariants.end())
         return false;
+
+    const auto itOther = std::find_if(otherPackageVariants.begin(), otherPackageVariants.end(),
+        [&variant](const Variant& v) { return v.name == variant; });
+    if (itOther == otherPackageVariants.end())
+        return true;
 
     return utils::SoftwareVersion(it->minimumVersion)
         >= utils::SoftwareVersion(itOther->minimumVersion);

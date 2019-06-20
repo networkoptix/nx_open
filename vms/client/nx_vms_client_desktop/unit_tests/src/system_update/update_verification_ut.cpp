@@ -415,4 +415,83 @@ TEST_F(UpdateVerificationTest, emptyOsVersionAndVersionedPackage)
     ASSERT_EQ(result, nx::update::FindPackageResult::osVersionNotSupported);
 }
 
+TEST_F(UpdateVerificationTest, preferPackageForCertainVariant)
+{
+    const auto& info = QJson::deserialized<nx::update::Information>(
+        R"({
+            "packages": [
+                {
+                    "component": "server",
+                    "platform": "linux_x64",
+                    "file": "universal.zip"
+                },
+                {
+                    "component": "server",
+                    "platform": "linux_x64",
+                    "variants": [{ "name": "ubuntu" }],
+                    "file": "ubuntu.zip"
+                }
+            ]
+        })");
+    const auto& sysInfo = api::SystemInformationNew{"linux_x64", "ubuntu", {}};
+    auto [result, package] = nx::update::findPackageForVariant(info, false, sysInfo);
+    ASSERT_EQ(result, nx::update::FindPackageResult::ok);
+    ASSERT_EQ(package->file, "ubuntu.zip");
+}
+
+TEST_F(UpdateVerificationTest, preferVersionedVariant)
+{
+    const auto& info = QJson::deserialized<nx::update::Information>(
+        R"({
+            "packages": [
+                {
+                    "component": "server",
+                    "platform": "linux_x64",
+                    "variants": [{ "name": "ubuntu" }],
+                    "file": "ubuntu.zip"
+                },
+                {
+                    "component": "server",
+                    "platform": "linux_x64",
+                    "variants": [{ "name": "ubuntu", "minimumVersion": "16.04" }],
+                    "file": "ubuntu_16.04.zip"
+                }
+            ]
+        })");
+    const auto& sysInfo = api::SystemInformationNew::fromLegacySystemInformation(OS::ubuntu16());
+    auto [result, package] = nx::update::findPackageForVariant(info, false, sysInfo);
+    ASSERT_EQ(result, nx::update::FindPackageResult::ok);
+    ASSERT_EQ(package->file, "ubuntu_16.04.zip");
+}
+
+TEST_F(UpdateVerificationTest, aSyntheticTest)
+{
+    const auto& info = QJson::deserialized<nx::update::Information>(
+        R"({
+            "packages": [
+                {
+                    "component": "server",
+                    "platform": "linux_x64",
+                    "file": "universal.zip"
+                },
+                {
+                    "component": "server",
+                    "platform": "linux_x64",
+                    "variants": [{ "name": "ubuntu" }],
+                    "file": "ubuntu.zip"
+                },
+                {
+                    "component": "server",
+                    "platform": "linux_x64",
+                    "variants": [{ "name": "ubuntu", "minimumVersion": "18.04" }],
+                    "file": "ubuntu_18.04.zip"
+                }
+            ]
+        })");
+    const auto& sysInfo = api::SystemInformationNew::fromLegacySystemInformation(OS::ubuntu14());
+    auto [result, package] = nx::update::findPackageForVariant(info, false, sysInfo);
+    ASSERT_EQ(result, nx::update::FindPackageResult::ok);
+    ASSERT_EQ(package->file, "ubuntu.zip");
+}
+
 } // namespace nx::vms::client::desktop
