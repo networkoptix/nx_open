@@ -76,7 +76,6 @@
 #include <network/system_helpers.h>
 
 #include <nx_ec/ec_api.h>
-#include <nx_ec/ec_proto_version.h>
 #include <nx/vms/api/data/user_data.h>
 #include <nx_ec/managers/abstract_user_manager.h>
 #include <nx_ec/managers/abstract_layout_manager.h>

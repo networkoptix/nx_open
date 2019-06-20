@@ -19,7 +19,7 @@
 #include <core/resource_management/server_additional_addresses_dictionary.h>
 #include <core/resource_management/resource_pool.h>
 #include <network/networkoptixmodulerevealcommon.h>
-#include <nx_ec/ec_proto_version.h>
+#include <nx/vms/api/protocol_version.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <rest/server/json_rest_result.h>
 #include <utils/common/app_info.h>
@@ -587,7 +587,7 @@ nx::vms::api::ModuleInformation QnMediaServerResource::getModuleInformation() co
     moduleInformation.name = getName();
     moduleInformation.protoVersion = getProperty(protoVersionPropertyName).toInt();
     if (moduleInformation.protoVersion == 0)
-        moduleInformation.protoVersion = nx_ec::EC2_PROTO_VERSION;
+        moduleInformation.protoVersion = nx::vms::api::protocolVersion();
 
     if (hasProperty(safeModePropertyName))
     {

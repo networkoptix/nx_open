@@ -8,13 +8,13 @@
 #include <nx/network/app_info.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/socket_global.h>
+#include <nx/vms/api/protocol_version.h>
 
-#include <nx_ec/ec_proto_version.h>
 #include <utils/common/app_info.h>
 
 QnConnectionInfo::QnConnectionInfo():
     allowSslConnections(false),
-    nxClusterProtoVersion(nx_ec::INITIAL_EC2_PROTO_VERSION),
+    nxClusterProtoVersion(nx::vms::api::kInitialProtocolVersion),
     ecDbReadOnly(false),
     newSystem(false),
     cloudHost(nx::network::SocketGlobals::cloud().cloudHost()),

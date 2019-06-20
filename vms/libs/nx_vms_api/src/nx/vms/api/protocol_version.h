@@ -9,4 +9,11 @@ namespace nx::vms::api {
  */
 NX_VMS_API int protocolVersion();
 
+/**
+ * Servers with no proto version support have this version.
+ *
+ * THIS VALUE MUST NOT BE CHANGED!
+ */
+static constexpr int kInitialProtocolVersion = 1000;
+
 } // namespace nx::vms::api
