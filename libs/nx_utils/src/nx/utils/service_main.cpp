@@ -1,23 +1,25 @@
-#ifdef _WIN32
-    #include <windows.h>
+#include "service_main.h"
+
+#if defined(_WIN32)
+#include <windows.h>
 #else
-    #include <sys/types.h>
-    #include <signal.h>
+#include <sys/types.h>
+#include <signal.h>
 #endif
 
 #include <nx/utils/crash_dump/systemexcept.h>
 
-#include "cloud_db_service_public.h"
+namespace nx::utils::detail {
 
-static nx::cloud::db::CloudDbServicePublic* serviceInstance = NULL;
+static Service* serviceInstance = nullptr;
 
-void stopServer( int /*signal*/ )
+void stopServer(int /*signal*/)
 {
-    if( serviceInstance )
+    if (serviceInstance)
         serviceInstance->pleaseStop();
 }
 
-#ifdef _WIN32
+#if defined(_WIN32)
 BOOL WINAPI stopServer_WIN(DWORD dwCtrlType)
 {
     //NOTE this handler is called by a different thread (not main)
@@ -26,9 +28,9 @@ BOOL WINAPI stopServer_WIN(DWORD dwCtrlType)
 }
 #endif
 
-int libCloudDBMain(int argc, char* argv[])
+void installProcessHandlers()
 {
-#ifdef _WIN32
+#if defined(_WIN32)
     win32_exception::installGlobalUnhandledExceptionHandler();
 
     SetConsoleCtrlHandler(stopServer_WIN, TRUE);
@@ -36,18 +38,21 @@ int libCloudDBMain(int argc, char* argv[])
     signal(SIGINT, stopServer);
     signal(SIGTERM, stopServer);
 #endif
+}
 
-    nx::cloud::db::CloudDbServicePublic service(argc, argv);
-    serviceInstance = &service;
-    const int result = service.exec();
-
-#ifdef _WIN32
+void uninstallProcessHandlers()
+{
+#if defined(_WIN32)
     SetConsoleCtrlHandler(stopServer_WIN, FALSE);
 #else
     signal(SIGINT, SIG_DFL);
     signal(SIGTERM, SIG_DFL);
 #endif
-
-    serviceInstance = NULL;
-    return result;
 }
+
+void registerServiceInstance(Service* service)
+{
+    serviceInstance = service;
+}
+
+} // namespace nx::utils::detail
