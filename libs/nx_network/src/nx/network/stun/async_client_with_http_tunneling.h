@@ -44,6 +44,7 @@ public:
     virtual void addOnReconnectedHandler(
         ReconnectHandler handler,
         void* client = nullptr) override;
+
     virtual void setOnConnectionClosedHandler(
         OnConnectionClosedHandler onConnectionClosedHandler) override;
 
@@ -76,14 +77,14 @@ private:
     struct HandlerContext
     {
         IndicationHandler handler;
-        void* client;
+        void* client = nullptr;
     };
 
     struct RequestContext
     {
         Message request;
         RequestHandler handler;
-        void* clientId = nullptr;
+        void* client = nullptr;
     };
 
     Settings m_settings;
@@ -110,10 +111,13 @@ private:
     void connectInternal(
         const QnMutexLockerBase& /*lock*/,
         ConnectHandler handler);
+
     void applyConnectionSettings();
+
     void createStunClient(
         const QnMutexLockerBase& /*lock*/,
         std::unique_ptr<AbstractStreamSocket> connection);
+
     void dispatchIndication(nx::network::stun::Message indication);
     void sendPendingRequests();
 
@@ -129,6 +133,9 @@ private:
         SystemError::ErrorCode sysErrorCode,
         nx::network::stun::Message response,
         int requestId);
+
+    template<typename Dictionary> void cancelUserHandlers(
+        Dictionary& dictionary, void* client);
 
     void onStunConnectionClosed(SystemError::ErrorCode closeReason);
     void scheduleReconnect();

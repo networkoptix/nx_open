@@ -105,12 +105,12 @@ configureV4L2()
 
     if ! grep -q "repeat_sequence_header" "$file"
     then
-        sed -i "s/exit 0/${repeat_command[*]} # repeat sps pps every I frame\n\nexit 0/" "$file"
+        sed -i '/"exit 0"/!s/exit 0/${repeat_command[*]} # repeat sps pps every I frame\n\nexit 0/' "$file"
     fi
 
     if ! grep -q "h264_i_frame_period" "$file"
     then
-        sed -i "s/exit 0/${i_frame_command[*]} # set I frame interval\n\nexit 0/" "$file"
+        sed -i '/"exit 0"/!s/exit 0/${i_frame_command[*]} # set I frame interval\n\nexit 0/' "$file"
     fi
 }
 
