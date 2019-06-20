@@ -60,7 +60,7 @@ protected:
     virtual bool processData(const QnAbstractDataPacketPtr& data) override;
 
 private:
-    bool startAnalyticsUnsafe(const const nx::sdk::Ptr<nx::sdk::IStringMap>& settings);
+    bool startAnalyticsUnsafe(const nx::sdk::Ptr<nx::sdk::IStringMap>& settings);
     void stopAnalyticsUnsafe();
 
     nx::sdk::Ptr<DeviceAgent> createDeviceAgent();
