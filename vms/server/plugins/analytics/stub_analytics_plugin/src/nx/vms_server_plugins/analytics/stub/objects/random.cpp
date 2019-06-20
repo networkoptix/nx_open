@@ -1,7 +1,10 @@
 #include "random.h"
 
+#include <limits>
 #include <vector>
 #include <functional>
+
+#include <nx/kit/debug.h>
 
 namespace nx {
 namespace vms_server_plugins {
@@ -10,8 +13,8 @@ namespace stub {
 
 float randomFloat(float min, float max)
 {
-    if (max <= min)
-        return NAN;
+    if (!NX_KIT_ASSERT(min < max))
+        return std::numeric_limits<float>::quiet_NaN();
     return  min + (float) rand() / ((float) RAND_MAX / (max - min));
 }
 

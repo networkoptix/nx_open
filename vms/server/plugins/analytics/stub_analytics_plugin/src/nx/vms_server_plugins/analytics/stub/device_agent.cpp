@@ -623,7 +623,7 @@ void DeviceAgent::parseSettings()
             using namespace nx::kit::utils;
             int result = 0;
             const auto parameterValueString = getParamValue(parameterName);
-            if (const bool success = fromString(parameterValueString, &result))
+            if (fromString(parameterValueString, &result))
             {
                 *target = result;
             }
