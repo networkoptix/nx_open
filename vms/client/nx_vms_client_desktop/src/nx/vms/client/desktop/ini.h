@@ -165,6 +165,11 @@ struct Ini: nx::kit::IniConfig
         "Enable tracing of GDI object allocation.");
     NX_INI_INT(5000, gdiTraceLimit, 
         "Number of GDI handles in use which triggers report creation.");
+
+    NX_INI_STRING("", runtimeModificationOverride,
+        "Override detected OS modification value (e.g. \"ubuntu\").");
+    NX_INI_STRING("", runtimeOsVersionOverride,
+        "Override detected OS version value (e.g. \"16.04\").");
 };
 
 inline Ini& ini()

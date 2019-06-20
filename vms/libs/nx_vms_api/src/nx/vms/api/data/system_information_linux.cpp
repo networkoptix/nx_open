@@ -59,11 +59,15 @@ QString SystemInformation::currentSystemRuntime()
 
 QString SystemInformation::runtimeModification()
 {
+    if (!runtimeModificationOverride.isEmpty())
+        return runtimeModificationOverride;
     return osReleaseContentsValueByKey(osReleaseContents(), "ID");
 }
 
 QString SystemInformation::runtimeOsVersion()
 {
+    if (!runtimeOsVersionOverride.isEmpty())
+        return runtimeOsVersionOverride;
     return osReleaseContentsValueByKey(osReleaseContents(), "VERSION_ID");
 }
 

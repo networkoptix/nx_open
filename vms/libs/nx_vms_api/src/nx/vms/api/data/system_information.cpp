@@ -19,6 +19,9 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (eq)(hash)(ubjson)(json),
     _Fields)
 
+QString SystemInformation::runtimeOsVersionOverride;
+QString SystemInformation::runtimeModificationOverride;
+
 SystemInformation::SystemInformation(
     const QString& platform,
     const QString& arch,
@@ -128,13 +131,13 @@ QString toString(const SystemInformationNew& systemInformation)
 
 QString nx::vms::api::SystemInformation::runtimeModification()
 {
-    return QString();
+    return runtimeModificationOverride;
 }
 
 QString nx::vms::api::SystemInformation::runtimeOsVersion()
 {
     // #TODO #dkargin implement
-    return QString();
+    return runtimeOsVersionOverride;
 }
 
 QString nx::vms::api::SystemInformation::currentSystemRuntime()
@@ -145,25 +148,25 @@ QString nx::vms::api::SystemInformation::currentSystemRuntime()
     if (sysctl(mibMem, 2, osrelease, &size, NULL, 0) != -1)
         return QString::fromStdString(osrelease);
 
-    return QLatin1String("OSX without KERN_OSRELEASE");
+    return "OSX without KERN_OSRELEASE";
 }
 
 #elif !defined(Q_OS_LINUX) && !defined(Q_OS_WIN)
 
 QString nx::vms::api::SystemInformation::runtimeModification()
 {
-    return QString();
+    return runtimeModificationOverride;
 }
 
 QString nx::vms::api::SystemInformation::runtimeOsVersion()
 {
     // #TODO #dkargin implement
-    return QString();
+    return runtimeOsVersionOverride;
 }
 
 QString nx::vms::api::SystemInformation::currentSystemRuntime()
 {
-    return QLatin1String("Unknown");
+    return "Unknown";
 }
 
 #endif // defined(Q_OS_OSX)

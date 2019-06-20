@@ -38,6 +38,11 @@ public:
     static Q_INVOKABLE QString runtimeOsVersion();
     static Q_INVOKABLE QString runtimeModification();
     static Q_INVOKABLE QString currentSystemRuntime();
+
+    // These variable allows to override values returned by runtimeOsVersion() and
+    // runtimeModification() for test reasons.
+    static QString runtimeOsVersionOverride;
+    static QString runtimeModificationOverride;
 };
 #define SystemInformation_Fields \
     (arch)(platform)(modification)(version)

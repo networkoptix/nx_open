@@ -383,6 +383,10 @@ void QnClientModule::initSingletons()
     const auto brand = ini().developerMode ? QString() : QnAppInfo::productNameShort();
     const auto customization = ini().developerMode ? QString() : QnAppInfo::customizationName();
 
+    // This must be done before QnCommonModule instantiation.
+    vms::api::SystemInformation::runtimeModificationOverride = ini().runtimeModificationOverride;
+    vms::api::SystemInformation::runtimeOsVersionOverride = ini().runtimeOsVersionOverride;
+
     m_staticCommon.reset(new QnStaticCommonModule(
         clientPeerType,
         brand,

@@ -4537,6 +4537,11 @@ void MediaServerProcess::run()
     if (m_serviceMode)
         initializeLogging(serverSettings.get());
 
+    // This must be done before QnCommonModule instantiation.
+    nx::vms::api::SystemInformation::runtimeModificationOverride =
+        ini().runtimeModificationOverride;
+    nx::vms::api::SystemInformation::runtimeOsVersionOverride = ini().runtimeOsVersionOverride;
+
     std::shared_ptr<QnMediaServerModule> serverModule(new QnMediaServerModule(
         &m_cmdLineArguments,
         std::move(serverSettings)));
