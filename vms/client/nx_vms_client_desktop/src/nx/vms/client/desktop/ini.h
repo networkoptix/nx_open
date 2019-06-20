@@ -128,7 +128,7 @@ struct Ini: nx::kit::IniConfig
         "Background updates check will use this changeset instead of \"latest\".");
     NX_INI_INT(0, massSystemUpdateWaitForServerOnlineSecOverride,
         "Time to wait until Server goes online in seconds. Default value is used when set to 0.");
-    NX_INI_INT(0, tilePreviewLoadDelayOverrideMs,
+    NX_INI_INT(150, tilePreviewLoadDelayOverrideMs,
         "Tiles in the Right Panel will request previews only after this period (in milliseconds)\n"
         "after appearing. 0 means default value (100 ms).");
     NX_INI_INT(750, tilePreviewLoadIntervalMs,
