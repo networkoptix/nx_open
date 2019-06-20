@@ -202,7 +202,8 @@ bool verifyUpdateContents(
     // We will try to set it to false when we check servers and clients.
     contents.alreadyInstalled = true;
 
-    if (clientData.currentVersion != targetVersion
+    if ((clientData.currentVersion < targetVersion
+         || (clientData.currentVersion > targetVersion && clientData.compatibilityMode))
         && clientData.installedVersions.find(targetVersion) == clientData.installedVersions.end())
     {
         contents.alreadyInstalled = false;
@@ -214,6 +215,7 @@ bool verifyUpdateContents(
         {
             case update::FindPackageResult::ok:
                 contents.clientPackage = *package;
+                contents.peersWithUpdate.insert(clientData.clientId);
                 break;
 
             case update::FindPackageResult::osVersionNotSupported:
@@ -267,6 +269,7 @@ bool verifyUpdateContents(
             {
                 case update::FindPackageResult::ok:
                     package = foundPackage;
+                    serverPackages[serverSysInfo] = package;
                     break;
 
                 case update::FindPackageResult::osVersionNotSupported:
@@ -301,6 +304,7 @@ bool verifyUpdateContents(
         if (serverVersion < targetVersion && server->isOnline())
         {
             contents.alreadyInstalled = false;
+            contents.peersWithUpdate.insert(id);
             package->targets.insert(id);
 
             auto hasInternet = server->getServerFlags().testFlag(nx::vms::api::SF_HasPublicIP);
