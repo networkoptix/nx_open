@@ -78,6 +78,7 @@ QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc, char** arg
     addParserParam(commandLineParser, &result.fullScreenDisabled,   "--no-fullscreen");
     addParserParam(commandLineParser, &result.skipMediaFolderScan,  "--skip-media-folder-scan");
     addParserParam(commandLineParser, &result.engineVersion,        "--override-version");
+    addParserParam(commandLineParser, &result.vmsProtocolVersion,   "--override-protocol-version");
     addParserParam(commandLineParser, &result.showFullInfo,         "--show-full-info");
     addParserParam(commandLineParser, &result.exportedMode,         "--exported");
     addParserParam(commandLineParser, &result.hiDpiDisabled,        "--no-hidpi");

@@ -288,6 +288,8 @@
 #include <nx/utils/file_system.h>
 #include <nx/network/url/url_builder.h>
 
+#include <nx/vms/api/protocol_version.h>
+
 #include "nx/vms/server/system/nx1/info.h"
 #include <atomic>
 
@@ -4540,6 +4542,13 @@ void MediaServerProcess::run()
     nx::vms::api::SystemInformation::runtimeModificationOverride =
         ini().runtimeModificationOverride;
     nx::vms::api::SystemInformation::runtimeOsVersionOverride = ini().runtimeOsVersionOverride;
+
+    if (m_cmdLineArguments.vmsProtocolVersion > 0)
+    {
+        nx::vms::api::protocolVersionOverride = m_cmdLineArguments.vmsProtocolVersion;
+        NX_WARNING(this, "Starting with overridden protocol version: %1",
+            m_cmdLineArguments.vmsProtocolVersion);
+    }
 
     std::shared_ptr<QnMediaServerModule> serverModule(new QnMediaServerModule(
         &m_cmdLineArguments,
