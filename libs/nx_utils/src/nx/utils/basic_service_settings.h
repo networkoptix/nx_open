@@ -29,6 +29,7 @@ private:
     QnSettings m_settings;
     bool m_showHelp = false;
     utils::log::Settings m_logging;
+    QString m_moduleName;
 };
 
 } // namespace nx::utils

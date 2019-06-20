@@ -16,7 +16,8 @@ BasicServiceSettings::BasicServiceSettings(
     m_settings(
         organizationName,
         applicationName,
-        moduleName)
+        moduleName),
+    m_moduleName(moduleName)
 {
 }
 
@@ -49,7 +50,7 @@ QString BasicServiceSettings::dataDir() const
 
 #if defined(Q_OS_LINUX)
     QString defVarDirName = QString("/opt/%1/%2/var")
-        .arg(nx::utils::AppInfo::linuxOrganizationName()).arg(kModuleName);
+        .arg(nx::utils::AppInfo::linuxOrganizationName()).arg(m_moduleName);
     QString varDirName = settings().value("varDir", defVarDirName).toString();
     return varDirName;
 #else
