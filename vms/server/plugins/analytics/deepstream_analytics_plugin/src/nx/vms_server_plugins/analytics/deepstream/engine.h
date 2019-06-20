@@ -12,7 +12,6 @@
 #include <nx/sdk/analytics/i_engine.h>
 #include <nx/sdk/analytics/i_device_agent.h>
 #include <nx/sdk/analytics/helpers/plugin.h>
-#include <nx/sdk/i_time_utility_provider.h>
 
 #include <nx/vms_server_plugins/analytics/deepstream/default/object_class_description.h>
 
@@ -61,7 +60,6 @@ private:
     nx::sdk::analytics::Plugin* const m_plugin;
     mutable std::vector<ObjectClassDescription> m_objectClassDescritions;
     mutable std::string m_manifest;
-    nx::sdk::Ptr<nx::sdk::ITimeUtilityProvider> m_timeUtilityProvider;
     nx::sdk::analytics::IDeviceAgent* m_deviceAgent = nullptr;
 };
 

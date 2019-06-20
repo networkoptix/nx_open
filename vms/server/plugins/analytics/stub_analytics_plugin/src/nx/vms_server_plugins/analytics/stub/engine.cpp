@@ -7,7 +7,6 @@
 
 #include <nx/sdk/i_device_info.h>
 #include <nx/sdk/helpers/uuid_helper.h>
-#include <nx/sdk/i_plugin_home_dir_utility_provider.h>
 
 #include "utils.h"
 #include "device_agent.h"
@@ -89,11 +88,10 @@ IDeviceAgent* Engine::obtainDeviceAgent(
 
 void Engine::obtainPluginHomeDir()
 {
-    if (const auto pluginHomeDirUtilityProvider =
-        queryInterfacePtr<IPluginHomeDirUtilityProvider>(plugin()->utilityProvider()))
-    {
-        m_pluginHomeDir = toPtr(pluginHomeDirUtilityProvider->homeDir(plugin()))->str();
-    }
+    const auto utilityProvider = plugin()->utilityProvider();
+    NX_KIT_ASSERT(utilityProvider);
+
+    m_pluginHomeDir = toPtr(utilityProvider->homeDir(plugin()))->str();
 
     if (m_pluginHomeDir.empty())
         NX_PRINT << "Plugin home dir: absent";

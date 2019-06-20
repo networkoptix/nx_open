@@ -3,10 +3,11 @@
 #pragma once
 
 #include <nx/sdk/interface.h>
-#include <nx/sdk/i_utility_provider.h>
 
 namespace nx {
 namespace sdk {
+
+class IUtilityProvider;
 
 /**
  * The main interface that any VMS Plugin implements. The plugin's dynamic library should export

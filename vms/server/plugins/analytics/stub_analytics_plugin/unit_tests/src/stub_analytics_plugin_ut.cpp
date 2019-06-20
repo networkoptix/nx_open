@@ -12,8 +12,10 @@
 #include <nx/sdk/helpers/ptr.h>
 #include <nx/sdk/helpers/string_map.h>
 #include <nx/sdk/helpers/device_info.h>
+#include <nx/sdk/helpers/string.h>
 #include <nx/sdk/analytics/helpers/metadata_types.h>
 #include <nx/sdk/uuid.h>
+#include <nx/sdk/i_utility_provider.h>
 
 #include <nx/sdk/analytics/i_consuming_device_agent.h>
 #include <nx/sdk/analytics/i_uncompressed_video_frame.h>
@@ -276,6 +278,29 @@ private:
     const std::vector<char> m_data = std::vector<char>(width() * height(), /*dummy*/ 42);
 };
 
+class UtilityProvider: public RefCountable<IUtilityProvider>
+{
+public:
+    UtilityProvider(const nx::sdk::IPlugin* const expectedPlugin):
+        m_expectedPlugin(expectedPlugin)
+    {
+    }
+
+    virtual int64_t vmsSystemTimeSinceEpochMs() const override
+    {
+        return 0;
+    }
+
+    virtual const nx::sdk::IString* homeDir(const nx::sdk::IPlugin* plugin) const override
+    {
+        ASSERT_EQ(m_expectedPlugin, plugin);
+        return new nx::sdk::String();
+    }
+
+private:
+    const nx::sdk::IPlugin* const m_expectedPlugin;
+};
+
 TEST(stub_analytics_plugin, test)
 {
     // These handlers should be destroyed after the Plugin, Engine and DeviceAgent objects.
@@ -290,6 +315,9 @@ TEST(stub_analytics_plugin, test)
     ASSERT_TRUE(queryInterfacePtr<nx::sdk::IPlugin>(pluginObject));
     const auto plugin = queryInterfacePtr<nx::sdk::analytics::IPlugin>(pluginObject);
     ASSERT_TRUE(plugin);
+
+    const auto utilityProvider = makePtr<UtilityProvider>(plugin.get());
+    plugin->setUtilityProvider(utilityProvider.get());
 
     const auto engine = toPtr(plugin->createEngine(&error));
     ASSERT_EQ(Error::noError, error);
