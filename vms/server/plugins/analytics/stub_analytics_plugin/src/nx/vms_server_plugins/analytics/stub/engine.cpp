@@ -23,11 +23,16 @@ namespace stub {
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 
+using namespace std::chrono;
+using namespace std::literals::chrono_literals;
+
 Engine::Engine(nx::sdk::analytics::Plugin* plugin):
     nx::sdk::analytics::Engine(plugin, NX_DEBUG_ENABLE_OUTPUT)
 {
     obtainPluginHomeDir();
     initCapabilities();
+
+    m_pluginEventThread = std::make_unique<std::thread>([this]() { generatePluginEvents(); });
 }
 
 Engine::~Engine()
@@ -37,39 +42,40 @@ Engine::~Engine()
         m_terminated = true;
         m_pluginEventGenerationLoopCondition.notify_all();
     }
-    if (m_thread)
-        m_thread->join();
+    if (m_pluginEventThread)
+        m_pluginEventThread->join();
 }
 
 void Engine::generatePluginEvents()
 {
-    while (!m_terminated && m_needToThrowPluginEvents)
+    while (!m_terminated)
     {
-        using namespace std::chrono_literals;
+        if (m_needToThrowPluginEvents)
+        {
+            pushPluginEvent(
+                IPluginEvent::Level::info,
+                "Info message from Engine",
+                "Info message description");
 
-        pushPluginEvent(
-            IPluginEvent::Level::info,
-            "Info message from Engine",
-            "Info message description");
+            pushPluginEvent(
+                IPluginEvent::Level::warning,
+                "Warning message from Engine",
+                "Warning message description");
 
-        pushPluginEvent(
-            IPluginEvent::Level::warning,
-            "Warning message from Engine",
-            "Warning message description");
-
-        pushPluginEvent(
-            IPluginEvent::Level::error,
-            "Error message from Engine",
-            "Error message description");
-
+            pushPluginEvent(
+                IPluginEvent::Level::error,
+                "Error message from Engine",
+                "Error message description");
+        }
         // Sleep until the next event pack needs to be generated, or the thread is ordered to
         // terminate (hence condition variable instead of sleep()). Return value (whether the
         // timeout has occurred) and spurious wake-ups are ignored.
         {
             std::unique_lock<std::mutex> lock(m_pluginEventGenerationLoopMutex);
-            if (m_terminated || !m_needToThrowPluginEvents)
+            if (m_terminated)
                 break;
-            static const std::chrono::seconds kEventGenerationPeriod{7};
+
+            static const seconds kEventGenerationPeriod{7};
             m_pluginEventGenerationLoopCondition.wait_for(lock, kEventGenerationPeriod);
         }
     }
@@ -232,40 +238,74 @@ std::string Engine::manifest() const
                 "type": "GroupBox",
                 "caption": "Real Stub DeviceAgent settings",
                 "items": [
-                     {
-                        "type": "CheckBox",
-                        "name": ")json" + kGenerateObjectsSetting + R"json(",
-                        "caption": "Generate objects",
-                        "defaultValue": true,
-                        "value": true
+                    {
+                        "type": "GroupBox",
+                        "caption": "Object generation settings",
+                        "items": [
+                            {
+                                "type": "CheckBox",
+                                "name": ")json" + kGenerateCarsSetting + R"json(",
+                                "caption": "Generate cars",
+                                "defaultValue": true,
+                                "value": true
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": ")json" + kGenerateTrucksSetting + R"json(",
+                                "caption": "Generate trucks",
+                                "defaultValue": true,
+                                "value": true
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": ")json" + kGeneratePedestriansSetting + R"json(",
+                                "caption": "Generate pedestrians",
+                                "defaultValue": true,
+                                "value": true
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": ")json" + kGenerateHumanFacesSetting + R"json(",
+                                "caption": "Generate human faces",
+                                "defaultValue": true,
+                                "value": true
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": ")json" + kGenerateBicyclesSetting + R"json(",
+                                "caption": "Generate bicycles",
+                                "defaultValue": true,
+                                "value": true
+                            },
+                            {
+                                "type": "SpinBox",
+                                "name": ")json" + kNumberOfObjectsToGenerateSetting + R"json(",
+                                "caption": "Number of objects to generate",
+                                "defaultValue": 1,
+                                "minValue": 1,
+                                "maxValue": 100000
+                            },
+                            {
+                                "type": "SpinBox",
+                                "name": ")json" + kGenerateObjectsEveryNFramesSetting + R"json(",
+                                "caption": "Generate objects every N frames",
+                                "defaultValue": 1,
+                                "minValue": 1,
+                                "maxValue": 100000
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": ")json" + kGeneratePreviewPacketSetting + R"json(",
+                                "caption": "Generate preview packet",
+                                "defaultValue": true,
+                                "value": true
+                            }
+                        ]
                     },
                     {
                         "type": "CheckBox",
                         "name": ")json" + kGenerateEventsSetting + R"json(",
                         "caption": "Generate events",
-                        "defaultValue": true,
-                        "value": true
-                    },
-                    {
-                        "type": "SpinBox",
-                        "name": ")json" + kGenerateObjectsEveryNFramesSetting + R"json(",
-                        "caption": "Generate objects every N frames",
-                        "defaultValue": 1,
-                        "minValue": 1,
-                        "maxValue": 100000
-                    },
-                    {
-                        "type": "SpinBox",
-                        "name": ")json" + kNumberOfObjectsToGenerateSetting + R"json(",
-                        "caption": "Number of objects to generate",
-                        "defaultValue": 1,
-                        "minValue": 1,
-                        "maxValue": 100000
-                    },
-                    {
-                        "type": "CheckBox",
-                        "name": ")json" + kGeneratePreviewPacketSetting + R"json(",
-                        "caption": "Generate preview packet",
                         "defaultValue": true,
                         "value": true
                     },
@@ -330,19 +370,16 @@ std::string Engine::manifest() const
 void Engine::settingsReceived()
 {
     m_needToThrowPluginEvents = toBool(getParamValue(kThrowPluginEventsFromEngineSetting));
-    if (m_needToThrowPluginEvents && !m_thread)
+    if (m_needToThrowPluginEvents && !m_pluginEventThread)
     {
-        NX_PRINT << __func__ << "(): Starting plugin event generation thread";
+        NX_PRINT << __func__ << "(): Starting plugin event generation";
         m_needToThrowPluginEvents = true;
-        m_thread.reset(new std::thread([this]() { generatePluginEvents(); }));
     }
-    else if (!m_needToThrowPluginEvents && m_thread)
+    else if (!m_needToThrowPluginEvents && m_pluginEventThread)
     {
-        NX_PRINT << __func__ << "(): Stopping plugin event generation thread";
+        NX_PRINT << __func__ << "(): Stopping plugin event generation";
         m_needToThrowPluginEvents = false;
         m_pluginEventGenerationLoopCondition.notify_all();
-        m_thread->join();
-        m_thread.reset();
     }
 }
 

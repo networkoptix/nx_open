@@ -3,11 +3,6 @@
 #include <vector>
 #include <functional>
 
-#include "bicycle.h"
-#include "vehicles.h"
-#include "pedestrian.h"
-#include "human_face.h"
-
 namespace nx {
 namespace vms_server_plugins {
 namespace analytics {
@@ -25,17 +20,13 @@ Vector2D randomTrajectory()
     return Vector2D(randomFloat(-1, 1), randomFloat(-1, 1)).normalized();
 }
 
-std::unique_ptr<AbstractObject> randomObject()
+std::unique_ptr<AbstractObject> RandomObjectGenerator::generate() const
 {
-    static const std::vector<std::function<std::unique_ptr<AbstractObject>()>> kObjectFuncs = {
-        [](){ return std::make_unique<Bicycle>(); },
-        [](){ return std::make_unique<Car>(); },
-        [](){ return std::make_unique<Truck>(); },
-        [](){ return std::make_unique<Pedestrian>(); },
-        [](){ return std::make_unique<HumanFace>(); }
-    };
+    std::unique_lock<std::mutex> lock(m_mutex);
+    if (m_registry.empty())
+        return nullptr;
 
-    return kObjectFuncs[rand() % kObjectFuncs.size()]();
+    return m_registry[rand() % m_registry.size()].factory();
 }
 
 } // namespace stub
