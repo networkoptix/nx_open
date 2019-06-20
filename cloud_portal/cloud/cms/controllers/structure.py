@@ -120,7 +120,10 @@ def process_zip(file_descriptor, user, product, update_structure, update_content
         if name:
             data = zip_file.read(name)
             cms_structure = json.loads(data)
-            update_from_object(cms_structure, product.product_type)
+            if type(cms_structure) == list and len(cms_structure) > 1:
+                log_messages.warning('warning', 'You can only update one product_type at a time. '
+                                                'Only the first product type from structure.json was used.')
+            update_from_object(cms_structure[0], product.product_type)
             log_messages.append(('success', f'Updated from json using {name}'))
         else:
             log_messages.append(('warning', 'Not found structure.json file'))
