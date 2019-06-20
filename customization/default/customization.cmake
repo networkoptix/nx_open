@@ -7,7 +7,8 @@ set(compatibleCustomizations "default_cn" "default_zh_CN")
 
 # Components Namings
 set(display.product.name "Nx Witness")
-set(display.mobile.name "Nx Mobile")
+set(display_mobile_name "Nx Mobile")
+set(mobile_bundle_name "NxMobile")
 set(product.name "HD Witness")
 set(product.name.short "hdwitness")
 set(product.appName "hdwitness")
@@ -26,9 +27,7 @@ set(defaultWebPages
 set(companyUrl "http://networkoptix.com")
 set(productUrl "http://networkoptix.com/nxwitness-overview")
 set(supportUrl "http://support.networkoptix.com")
-set(supportEmail "support@networkoptix.com")
-set(supportPhone "")
-set(licenseEmail "support@networkoptix.com")
+set(licenseEmail "https://support.networkoptix.com/hc/en-us/requests/new?ticket_form_id=316807")
 
 set(installer.name "nxwitness")
 set(android.packageName "com.networkoptix.nxwitness")
@@ -43,12 +42,21 @@ set(customization.clientBundleUpgradeCode "{4505af3c-b20c-4ae9-b5c4-c1fddbc5db34
 set(customization.serverBundleUpgradeCode "{4904f26d-6146-45f4-be37-80a31c15872d}")
 set(customization.fullBundleUpgradeCode "{2c83e785-23e4-4b70-be6c-ed49fa329bb5}")
 
+# NxTool section
 set(nxtool.company.name "Nx")
+set(nxtool.productId "{be19c0da-73f6-4ea7-9ad6-9dfd86d9e35e}")
+set(nxtool.productUpgradeCode "{cc740987-5070-4750-b853-327417176031}")
 set(nxtool.bundleUpgradeCode "{222b19dc-f75f-4096-9cf2-807e309ce06b}")
 
 set(deb.customization.company.name "networkoptix")
 
 # Paxton section
+set(paxtonLibraryName "NetworkOptix.NxWitness")
+set(paxtonProductId "{234bf98e-b18c-4798-9cb5-a0e90269ef9f}")
+set(paxtonProductUpgradeCode "{44777db8-96b1-4b09-9746-6d0390288c84}")
+set(paxtonBundleUpgradeCode "{f72abad4-21ca-4c1f-845e-fe437f2859e4}")
+
+# Paxton compatibility section
 set(paxton.className "NxWitness")
 set(paxton.classId "{930BF2FA-8BEB-4975-A04E-7FD63A4825AB}")
 set(paxton.interfaceId "{5C0BD575-9376-4CF0-B34F-044AC58BD8AB}")
