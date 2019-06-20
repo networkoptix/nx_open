@@ -32,11 +32,13 @@ public:
         SendMode sendMode = SendMode::singleMessage,
         ReceiveMode receiveMode = ReceiveMode::message,
         Role role = Role::undefined,
-        FrameType frameType= FrameType::binary);
+        FrameType frameType= FrameType::binary,
+        network::websocket::CompressionType compressionType = CompressionType::none);
 
     WebSocket(
         std::unique_ptr<AbstractStreamSocket> streamSocket,
-        FrameType frameType);
+        FrameType frameType,
+        network::websocket::CompressionType compressionType);
 
     ~WebSocket();
 
@@ -107,6 +109,7 @@ private:
     nx::utils::ObjectDestructionFlag m_destructionFlag;
     bool m_failed = false;
     FrameType m_frameType;
+    network::websocket::CompressionType m_compressionType;
     bool m_readingCeased = false;
     bool m_pingPongDisabled = false;
 

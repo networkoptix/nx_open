@@ -32,6 +32,12 @@ enum FrameType
     pong = 0xa
 };
 
+enum CompressionType
+{
+    none = 0x0,
+    perMessageInflate = 0x1,
+};
+
 QString frameTypeString(FrameType type);
 
 enum class Error

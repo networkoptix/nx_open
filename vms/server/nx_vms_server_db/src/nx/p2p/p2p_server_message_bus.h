@@ -27,7 +27,6 @@ public:
         ec2::ConnectionLockGuard connectionLockGuard,
         P2pTransportPtr p2pTransport,
         const QUrlQuery& requestUrlQuery,
-        const QString& encoding,
         const Qn::UserAccessData& userAccessData,
         std::function<void()> onConnectionClosedCallback);
 

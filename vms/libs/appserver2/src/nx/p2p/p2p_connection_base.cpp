@@ -311,11 +311,14 @@ void ConnectionBase::onHttpClientDone()
     websocket::FrameType frameType = remotePeer.dataFormat == Qn::JsonFormat
         ? websocket::FrameType::text
         : websocket::FrameType::binary;
+
+    auto compressionType = websocket::compressionType(m_httpClient->response()->headers);
+
     if (useWebsocketMode)
     {
         auto socket = m_httpClient->takeSocket();
         socket->setNonBlockingMode(true);
-        m_p2pTransport.reset(new P2PWebsocketTransport(std::move(socket), frameType));
+        m_p2pTransport.reset(new P2PWebsocketTransport(std::move(socket), frameType, compressionType));
     }
     else
     {
@@ -453,9 +456,6 @@ void ConnectionBase::sendMessage(const nx::Buffer& data)
             dataWithSequence.append(data);
             m_dataToSend.push_back(dataWithSequence);
 #else
-        if (m_useCompression)
-            m_dataToSend.push_back(qCompress(data));
-        else
             m_dataToSend.push_back(data);
 #endif
 
@@ -506,17 +506,7 @@ void ConnectionBase::onNewMessageRead(SystemError::ErrorCode errorCode, size_t b
         return; //< connection closed
     }
 
-    if (errorCode != SystemError::noError)
-    {
-        setState(State::Error);
-        return;
-    }
-
-    auto data = m_readBuffer;
-    if (m_useCompression)
-        data = qUncompress(m_readBuffer);
-
-    if (!handleMessage(data))
+    if (errorCode != SystemError::noError || !handleMessage(m_readBuffer))
     {
         setState(State::Error);
         return;
@@ -580,21 +570,6 @@ void ConnectionBase::bindToAioThread(nx::network::aio::AbstractAioThread* aioThr
         m_p2pTransport->bindToAioThread(aioThread);
 }
 
-bool ConnectionBase::isCompressionSupportedForPeer(
-    const vms::api::PeerDataEx& remotePeer, const QString& acceptEncoding)
-{
-    if (remotePeer.peerType == nx::vms::api::PeerType::desktopClient && remotePeer.dataFormat == Qn::JsonFormat)
-        return false; //< Workaround for old mobile clients. It not fill peerType correctly, but ask json format.
-
-    if (!acceptEncoding.contains("gzip"))
-        return false;
-    return  remotePeer.protoVersion >= 4002 || remotePeer.dataFormat == Qn::JsonFormat;
-}
-
-void ConnectionBase::setUseCompression(bool value)
-{
-    m_useCompression = value;
-}
 
 } // namespace p2p
 } // namespace nx

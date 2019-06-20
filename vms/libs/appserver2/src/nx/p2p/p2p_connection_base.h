@@ -106,10 +106,6 @@ public:
 
     QString idForToStringFromPtr() const;
 
-    void setUseCompression(bool value);
-    bool isCompressionSupportedForPeer(
-        const vms::api::PeerDataEx& remotePeer, const QString& acceptEncoding);
-
 signals:
     void gotMessage(QWeakPointer<ConnectionBase> connection, nx::p2p::MessageType messageType, const QByteArray& payload);
     void stateChanged(QWeakPointer<ConnectionBase> connection, ConnectionBase::State state);
@@ -175,7 +171,6 @@ private:
     std::multimap<QString, QString> m_remoteQueryParams;
     QByteArray m_connectionGuid;
     size_t m_startedClassId = 0;
-    bool m_useCompression = false;
 };
 
 QString toString(ConnectionBase::State value);

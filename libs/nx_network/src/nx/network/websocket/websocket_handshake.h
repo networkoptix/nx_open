@@ -24,6 +24,8 @@ NX_NETWORK_API void addClientHeaders(nx::network::http::AsyncClient* request, co
 
 NX_NETWORK_API Error validateResponse(const nx::network::http::Request& request, const nx::network::http::Response& response);
 
+NX_NETWORK_API CompressionType compressionType(const nx::network::http::HttpHeaders& headers);
+
 } // namespace websocket
 } // namespace network
 } // namespace nx

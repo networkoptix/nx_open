@@ -6,6 +6,7 @@
 #include <nx/network/http/server/abstract_http_request_handler.h>
 #include <nx/network/http/server/http_server_connection.h>
 #include <nx/vms/api/data/peer_data.h>
+#include <nx/network/websocket/websocket_common_types.h>
 
 namespace nx::clusterdb::engine {
 
@@ -46,7 +47,7 @@ private:
         vms::api::PeerDataEx remotePeerInfo,
         const std::string& systemId,
         const std::string& userAgent,
-        const std::string& compressionType);
+        nx::network::websocket::CompressionType compressionType);
 };
 
 } // namespace nx::clusterdb::engine::transport

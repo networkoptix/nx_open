@@ -1,6 +1,7 @@
 #include "websocket.h"
 
 #include <nx/utils/std/future.h>
+#include <nx/utils/gzip/gzip_compressor.h>
 
 namespace nx {
 namespace network {
@@ -15,7 +16,8 @@ WebSocket::WebSocket(
     SendMode sendMode,
     ReceiveMode receiveMode,
     Role role,
-    FrameType frameType)
+    FrameType frameType,
+    network::websocket::CompressionType compressionType)
     :
     m_socket(std::move(streamSocket)),
     m_parser(role, this),
@@ -28,7 +30,8 @@ WebSocket::WebSocket(
     m_frameType(
         frameType == FrameType::binary || frameType == FrameType::text
             ? frameType
-            : FrameType::binary)
+            : FrameType::binary),
+    m_compressionType(compressionType)
 {
     m_socket->setRecvTimeout(0);
     m_socket->setSendTimeout(0);
@@ -40,14 +43,16 @@ WebSocket::WebSocket(
 
 WebSocket::WebSocket(
     std::unique_ptr<AbstractStreamSocket> streamSocket,
-    FrameType frameType)
+    FrameType frameType,
+    network::websocket::CompressionType compressionType)
     :
     WebSocket(
         std::move(streamSocket),
         SendMode::singleMessage,
         ReceiveMode::message,
         Role::undefined,
-        frameType)
+        frameType,
+        compressionType)
 {
 }
 
@@ -120,7 +125,10 @@ void WebSocket::onRead(SystemError::ErrorCode error, size_t transferred)
 
     if (m_incomingMessageQueue.size() != 0 && m_userReadContext)
     {
-        const auto incomingMessage = m_incomingMessageQueue.popFront();
+        auto incomingMessage = m_incomingMessageQueue.popFront();
+        if (m_compressionType == CompressionType::perMessageInflate)
+            incomingMessage = nx::utils::bstream::gzip::Compressor::uncompressData(incomingMessage);
+
         *(m_userReadContext->bufferPtr) = incomingMessage;
         utils::ObjectDestructionFlag::Watcher watcher(&m_destructionFlag);
         callOnReadhandler(SystemError::noError, incomingMessage.size());
@@ -200,7 +208,10 @@ void WebSocket::readSomeAsync(nx::Buffer* const buffer, IoCompletionHandler hand
 
             if (m_incomingMessageQueue.size() != 0)
             {
-                const auto incomingMessage = m_incomingMessageQueue.popFront();
+                auto incomingMessage = m_incomingMessageQueue.popFront();
+                if (m_compressionType == CompressionType::perMessageInflate)
+                    incomingMessage = nx::utils::bstream::gzip::Compressor::uncompressData(incomingMessage);
+
                 *buffer = incomingMessage;
 
                 utils::ObjectDestructionFlag::Watcher watcher(&m_destructionFlag);
@@ -229,11 +240,13 @@ void WebSocket::readSomeAsync(nx::Buffer* const buffer, IoCompletionHandler hand
 void WebSocket::sendAsync(const nx::Buffer& buffer, IoCompletionHandler handler)
 {
     post(
-        [this, buffer, handler = std::move(handler)]() mutable
+        [this, buffer = buffer, handler = std::move(handler)]() mutable
         {
             nx::Buffer writeBuffer;
             if (m_sendMode == SendMode::singleMessage)
             {
+                if (m_compressionType == CompressionType::perMessageInflate)
+                    buffer = nx::utils::bstream::gzip::Compressor::compressData(buffer, false);
                 m_serializer.prepareMessage(buffer, m_frameType, &writeBuffer);
             }
             else

@@ -11,7 +11,8 @@ class P2PWebsocketTransport : public IP2PTransport
 public:
     P2PWebsocketTransport(
         std::unique_ptr<network::AbstractStreamSocket> socket,
-        network::websocket::FrameType frameType);
+        network::websocket::FrameType frameType,
+        network::websocket::CompressionType compressionType);
 
     virtual void readSomeAsync(
         nx::Buffer* const buffer,
