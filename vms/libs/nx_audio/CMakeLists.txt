@@ -1,4 +1,13 @@
-nx_add_target(nx_audio LIBRARY PUBLIC_LIBS common nx_utils)
+if (IOS)
+    set(mac_sources src/nx/audio/ios_audio_utils.mm)
+endif()
+
+nx_add_target(nx_audio LIBRARY
+    ADDITIONAL_SOURCES
+        ${mac_sources}
+    PUBLIC_LIBS
+        common
+        nx_utils)
 
 if(APPLE)
     find_library(OpenAL_LIBRARY OpenAL)
