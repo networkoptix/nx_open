@@ -3,6 +3,7 @@
 #include <chrono>
 #include <deque>
 
+#include <nx/fusion/model_functions_fwd.h>
 #include <nx/utils/std/optional.h>
 #include <nx/utils/thread/mutex.h>
 
@@ -13,32 +14,35 @@ namespace nx::sql {
 struct NX_SQL_API QueryExecutionInfo
 {
     std::optional<DBResult> result;
-    std::chrono::milliseconds waitForExecutionDuration;
+    std::chrono::milliseconds waitForExecutionDuration = std::chrono::milliseconds::zero();
     std::optional<std::chrono::milliseconds> executionDuration;
-
-    QueryExecutionInfo();
 };
 
 struct NX_SQL_API DurationStatistics
 {
-    std::chrono::milliseconds min;
-    std::chrono::milliseconds max;
-    std::chrono::milliseconds average;
-
-    DurationStatistics();
+    std::chrono::milliseconds min = std::chrono::milliseconds::max();
+    std::chrono::milliseconds max = std::chrono::milliseconds::min();
+    std::chrono::milliseconds average = std::chrono::milliseconds::zero();
 };
+
+#define DurationStatistics_sql_Fields (min)(max)(average)
+QN_FUSION_DECLARE_FUNCTIONS(DurationStatistics, (json), NX_SQL_API)
 
 struct NX_SQL_API QueryStatistics
 {
     std::chrono::milliseconds statisticalPeriod;
-    int requestsSucceeded;
-    int requestsFailed;
-    int requestsCancelled;
+    int requestsSucceeded = 0;
+    int requestsFailed = 0;
+    int requestsCancelled = 0;
     DurationStatistics requestExecutionTimes;
     DurationStatistics waitingForExecutionTimes;
-
-    QueryStatistics();
 };
+
+#define QueryStatistics_sql_Fields (statisticalPeriod)(requestsSucceeded)(requestsFailed) \
+    (requestsCancelled)(requestExecutionTimes)(waitingForExecutionTimes)
+QN_FUSION_DECLARE_FUNCTIONS(QueryStatistics, (json), NX_SQL_API)
+
+//-------------------------------------------------------------------------------------------------
 
 class NX_SQL_API StatisticsCollector
 {
@@ -55,10 +59,10 @@ public:
 private:
     struct DurationStatisticsCalculationContext
     {
-        DurationStatistics* result;
-        std::chrono::milliseconds currentSum;
-        std::size_t count;
-        bool recalcMinMax;
+        DurationStatistics* result = nullptr;
+        std::chrono::milliseconds currentSum = std::chrono::milliseconds::zero();
+        std::size_t count = 0;
+        bool recalcMinMax = false;
 
         DurationStatisticsCalculationContext(DurationStatistics* result);
     };

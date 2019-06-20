@@ -104,11 +104,11 @@ private:
 
     DataSourceContextPtr prepareDataSourceContext(
         QnSecurityCamResourcePtr cameraResource,
-        QnVideoCameraPtr camera,
+        nx::vms::server::VideoCameraPtr camera,
         const StreamingChunkCacheKey& transcodeParams);
     AbstractOnDemandDataProviderPtr createLiveMediaDataProvider(
         const VideoCameraLocker& /*locker*/,
-        QnVideoCameraPtr camera,
+        nx::vms::server::VideoCameraPtr camera,
         const StreamingChunkCacheKey& transcodeParams);
     AbstractOnDemandDataProviderPtr createArchiveReader(
         QnSecurityCamResourcePtr cameraResource,

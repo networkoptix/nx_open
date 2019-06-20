@@ -9,17 +9,18 @@ QnMediaCyclicBuffer::QnMediaCyclicBuffer(size_type bufferSize, int align):
     m_offset(0),
     m_align(align)
 {
-    if (bufferSize > 0) {
-        NX_ASSERT(bufferSize >= align);
+    if (bufferSize > 0)
+    {
+        NX_CRITICAL(bufferSize >= align);
         m_buffer = (value_type*) qMallocAligned(bufferSize, align);
-        NX_ASSERT(m_buffer, "not enough memory");
+        NX_CRITICAL(m_buffer, "Not enough memory");
     }
 }
 
 bool QnMediaCyclicBuffer::resize(size_type size)
 {
     value_type* buffer = (value_type*)qMallocAligned(size, m_align);
-    NX_ASSERT(buffer, "not enough memory");
+    NX_ASSERT(buffer, "Not enough memory");
 
     if (buffer != nullptr)
     {
@@ -43,7 +44,7 @@ void QnMediaCyclicBuffer::push_back(const value_type* data, size_type size)
 
 void QnMediaCyclicBuffer::insert(size_type pos, const value_type* data, size_type size)
 {
-    NX_ASSERT(pos + size <= m_maxSize);
+    NX_CRITICAL(pos + size <= m_maxSize);
     size_type updPos = (m_offset + pos) % m_maxSize;
     int copySize = qMin(m_maxSize - updPos, size);
     memcpy(m_buffer + updPos, data, copySize);
@@ -55,7 +56,7 @@ void QnMediaCyclicBuffer::insert(size_type pos, const value_type* data, size_typ
 
 void QnMediaCyclicBuffer::pop_front(size_type size)
 {
-    NX_ASSERT(m_size >= size);
+    NX_CRITICAL(m_size >= size);
 
     m_size -= size;
     m_offset += size;
@@ -67,7 +68,7 @@ const QnMediaCyclicBuffer::value_type* QnMediaCyclicBuffer::unfragmentedData(siz
 {
     if (size == -1)
         size = m_size;
-    NX_ASSERT(pos + size <= m_size);
+    NX_CRITICAL(pos + size <= m_size);
     size_type reqPos = (m_offset + pos) % m_maxSize;
     if (reqPos + size > m_maxSize) {
         reallocateBuffer();
@@ -80,7 +81,7 @@ std::vector<QnMediaCyclicBuffer::Range> QnMediaCyclicBuffer::fragmentedData(size
 {
     if (size == -1)
         size = m_size;
-    NX_ASSERT(pos + size <= m_size);
+    NX_CRITICAL(pos + size <= m_size);
 
     std::vector<QnMediaCyclicBuffer::Range> result;
     if (m_size == 0 || size == 0)

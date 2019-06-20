@@ -17,6 +17,8 @@ struct NX_DISCOVERY_CLIENT_API NodeInfo
     std::vector<std::string> urls;
     /* The object under "info" key */
     std::string infoJson;
+
+    std::string toString() const;
 };
 
 #define NodeInfo_Fields (nodeId)(urls)(infoJson)
@@ -30,20 +32,20 @@ struct NX_DISCOVERY_CLIENT_API Node
     using time_point = std::chrono::system_clock::time_point;
 
     std::string nodeId;
+    /* The public ip address of this node as reported by the discovery service */
+    std::string publicIpAddress;
     std::vector<std::string> urls;
     time_point expirationTime;
-    /* The object under "info" key */
+    /* A string containing discovery client specific json */
     std::string infoJson;
+    /* A two letter string indicating the iso 1366 country code */
+    std::string countryCode;
 
-    bool operator==(const Node& right) const
-    {
-        return nodeId == right.nodeId;
-    }
+    bool operator==(const Node& right) const;
 
-    bool operator<(const Node& right)const
-    {
-        return nodeId < right.nodeId;
-    }
+    bool operator<(const Node& right)const;
+
+    std::string toString() const;
 };
 
 //-------------------------------------------------------------------------------------------------

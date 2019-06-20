@@ -4,12 +4,14 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
 
+#include <nx/vms/api/data/tran_state_data.h>
+
 #include "../../command_descriptor.h"
 
 namespace nx::clusterdb::engine::transport {
 
-constexpr static const std::chrono::seconds kTcpKeepAliveTimeout = std::chrono::seconds(5);
-constexpr static const int kKeepAliveProbeCount = 3;
+static constexpr std::chrono::seconds kTcpKeepAliveTimeout = std::chrono::seconds(5);
+static constexpr int kKeepAliveProbeCount = 3;
 
 CommonHttpConnection::CommonHttpConnection(
     const ProtocolVersionRange& protocolVersionRange,
@@ -93,7 +95,8 @@ CommonHttpConnection::CommonHttpConnection(
 
 CommonHttpConnection::~CommonHttpConnection()
 {
-    stopWhileInAioThread();
+    if (isInSelfAioThread())
+        stopWhileInAioThread();
 }
 
 void CommonHttpConnection::bindToAioThread(
@@ -109,13 +112,21 @@ void CommonHttpConnection::stopWhileInAioThread()
 {
     base_type::stopWhileInAioThread();
 
+    if (!m_closed)
+        forwardStateChangedEvent(::ec2::QnTransactionTransportBase::Closed);
+
     m_baseTransactionTransport->stopWhileInAioThread();
     m_inactivityTimer.reset();
 }
 
 void CommonHttpConnection::start()
 {
-    m_baseTransactionTransport->startListening();
+    post(
+        [this]()
+        {
+            m_baseTransactionTransport->processExtraData();
+            m_baseTransactionTransport->startListening();
+        });
 }
 
 network::SocketAddress CommonHttpConnection::remotePeerEndpoint() const
@@ -175,6 +186,7 @@ void CommonHttpConnection::setOutgoingConnection(
     std::unique_ptr<network::AbstractCommunicatingSocket> socket)
 {
     m_baseTransactionTransport->setOutgoingConnection(std::move(socket));
+    m_baseTransactionTransport->monitorConnectionForClosure();
 }
 
 nx::vms::api::PeerData CommonHttpConnection::localPeer() const
@@ -240,6 +252,7 @@ void CommonHttpConnection::forwardTransactionToProcessor(
     }
     m_prevReceivedTransportSequence = transportHeader.sequence;
 
+    NX_ASSERT(m_gotTransactionEventHandler);
     if (!m_gotTransactionEventHandler)
         return;
 

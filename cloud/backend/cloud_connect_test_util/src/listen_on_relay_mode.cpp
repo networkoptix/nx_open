@@ -16,8 +16,8 @@ static void runServer(const ListenOnRelaySettings& settings)
 {
     TestHttpServerOnProxy testHttpServerOnProxy(settings);
 
-    std::cout << "Listening as " << settings.listeningPeerHostName()
-        << " on relay " << settings.baseRelayUrl().toStdString() << std::endl;
+    std::cout << "Listening as " << settings.listeningPeerHostName
+        << " on relay " << settings.baseRelayUrl.toStdString() << std::endl;
 
     waitForExitCommand();
 }
@@ -29,26 +29,16 @@ static void runServer(const ListenOnRelaySettings& settings)
 ListenOnRelaySettings::ListenOnRelaySettings(
     const nx::utils::ArgumentParser& args)
     :
-    m_listeningPeerHostName(
+    listeningPeerHostName(
         QnUuid::createUuid().toSimpleByteArray().toStdString())
 {
     if (auto relayUrl = args.get("relay-url"))
-        m_baseRelayUrl = nx::utils::Url(*relayUrl);
+        baseRelayUrl = nx::utils::Url(*relayUrl);
     else
         throw std::invalid_argument("Missing required attribute \"relay-url\"");
 
     if (auto hostName = args.get("listening-peer-host-name"))
-        m_listeningPeerHostName = hostName->toStdString();
-}
-
-nx::utils::Url ListenOnRelaySettings::baseRelayUrl() const
-{
-    return m_baseRelayUrl;
-}
-
-std::string ListenOnRelaySettings::listeningPeerHostName() const
-{
-    return m_listeningPeerHostName;
+        listeningPeerHostName = hostName->toStdString();
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -76,10 +66,8 @@ int runInListenOnRelayMode(const nx::utils::ArgumentParser& args)
 TestHttpServerOnProxy::TestHttpServerOnProxy(
     const ListenOnRelaySettings& settings)
 {
-    using namespace std::placeholders;
-
-    auto url = settings.baseRelayUrl();
-    url.setUserName(settings.listeningPeerHostName().c_str());
+    auto url = settings.baseRelayUrl;
+    url.setUserName(settings.listeningPeerHostName.c_str());
 
     auto acceptor =
         std::make_unique<nx::network::cloud::relay::ConnectionAcceptor>(url);

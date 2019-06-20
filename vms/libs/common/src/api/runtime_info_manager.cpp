@@ -23,6 +23,8 @@ void QnRuntimeInfoManager::setMessageProcessor(QnCommonMessageProcessor* message
         connect(messageProcessor, &QnCommonMessageProcessor::runtimeInfoChanged, this,
             [this](const nx::vms::api::RuntimeData &runtimeData)
             {
+                NX_DEBUG(this, "Remote peer info update: id %1, type %2",
+                    runtimeData.peer.id, runtimeData.peer.peerType);
                 QnPeerRuntimeInfo info(runtimeData);
                 m_items->addOrUpdateItem(info);
             });
@@ -30,12 +32,14 @@ void QnRuntimeInfoManager::setMessageProcessor(QnCommonMessageProcessor* message
         connect(messageProcessor, &QnCommonMessageProcessor::runtimeInfoRemoved, this,
             [this](const nx::vms::api::IdData& peerId)
             {
+                NX_DEBUG(this, "Remote peer info removed: id %1", peerId.id);
                 m_items->removeItem(peerId.id);
             });
 
         connect(messageProcessor, &QnCommonMessageProcessor::remotePeerLost, this,
             [this](QnUuid peer, nx::vms::api::PeerType peerType)
             {
+                NX_DEBUG(this, "Remote peer lost: id %1, type %2", peer, peerType);
                 m_items->removeItem(peer);
             });
 

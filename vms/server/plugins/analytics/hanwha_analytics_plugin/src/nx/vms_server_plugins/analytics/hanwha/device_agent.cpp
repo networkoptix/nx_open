@@ -51,7 +51,7 @@ Error DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes)
     return startFetchingMetadata(metadataTypes);
 }
 
-void DeviceAgent::setSettings(const IStringMap* settings)
+void DeviceAgent::setSettings(const IStringMap* /*settings*/)
 {
     // There are no DeviceAgent settings for this plugin.
 }

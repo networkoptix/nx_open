@@ -69,6 +69,7 @@ public:
 signals:
     void stateChanged();
     void licenseStatusChanged();
+    void analyticsSupportChanged();
 
 private:
     void updateIsPlayingLive();

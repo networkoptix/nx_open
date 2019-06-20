@@ -333,6 +333,34 @@ INSTANTIATE_TYPED_TEST_CASE_P(UdtSocketStream, StreamSocketAcceptance, UdtSocket
 
 //-------------------------------------------------------------------------------------------------
 
+struct UdtSocketV6TypeSet
+{
+    class ClientSocket:
+        public UdtStreamSocket
+    {
+    public:
+        ClientSocket(): UdtStreamSocket(AF_INET6) {}
+    };
+
+    class ServerSocket:
+        public UdtStreamServerSocket
+    {
+    public:
+        ServerSocket(): UdtStreamServerSocket(AF_INET6) {}
+    };
+
+    static const SocketAddress serverEndpointForConnectShutdown;
+};
+
+// Any endpoint that does not have UDT server socket on it is fine.
+// TODO: #ak Allocate UDP socket and use that socket's port.
+const SocketAddress UdtSocketV6TypeSet::serverEndpointForConnectShutdown =
+    SocketAddress(HostAddress::localhost, 45431);
+
+INSTANTIATE_TYPED_TEST_CASE_P(UdtSocketV6Stream, StreamSocketAcceptance, UdtSocketV6TypeSet);
+
+//-------------------------------------------------------------------------------------------------
+
 #if 0
 struct UdtStreamSocketFactory
 {

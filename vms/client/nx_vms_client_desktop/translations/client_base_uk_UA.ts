@@ -2646,17 +2646,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnConnectToCurrentSystemTool</name>
-    <message>
-      <source>Configuring Server</source>
-      <translation>Налаштування сервера</translation>
-    </message>
-    <message>
-      <source>Updating Server</source>
-      <translation>Оновлення серверу</translation>
-    </message>
-  </context>
-  <context>
     <name>QnConnectionDiagnosticsHelper</name>
     <message>
       <source>You are trying to connect to incompatible Server.</source>
@@ -3291,6 +3280,14 @@ to %1</source>
     <message>
       <source>Folder already added</source>
       <translation>Папка вже додана</translation>
+    </message>
+    <message>
+      <source>None</source>
+      <translation>Ні</translation>
+    </message>
+    <message>
+      <source>Auto (%1)</source>
+      <translation>Авто (%1)</translation>
     </message>
   </context>
   <context>
@@ -5278,222 +5275,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnServerUpdatesModel</name>
-    <message>
-      <source>Server</source>
-      <translation>Сервер</translation>
-    </message>
-    <message>
-      <source>Status</source>
-      <translation>Статус</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnServerUpdatesWidget</name>
-    <message>
-      <source>Select Update File...</source>
-      <translation>Виберіть файл оновлень...</translation>
-    </message>
-    <message>
-      <source>Release notes</source>
-      <translation>Список змін</translation>
-    </message>
-    <message>
-      <source>You will have to update the client manually using an installer.</source>
-      <translation>Необхідно оновити клієнт вручну, використовуючи інсталятор.</translation>
-    </message>
-    <message>
-      <source>Cannot update from this file.</source>
-      <translation>Неможливо оновитися з цього файлу.</translation>
-    </message>
-    <message>
-      <source>Latest Available Update</source>
-      <translation>Останнє доступне оновлення</translation>
-    </message>
-    <message>
-      <source>Download the Latest Version Update File</source>
-      <translation>Завантажте останню версію файлу</translation>
-    </message>
-    <message>
-      <source>Selected Version</source>
-      <translation>Обрана версія</translation>
-    </message>
-    <message>
-      <source>Download Update File</source>
-      <translation>Завантажити файл оновлення</translation>
-    </message>
-    <message>
-      <source>Browse for Update File...</source>
-      <translation>Знайти файл оновлення...</translation>
-    </message>
-    <message>
-      <source>Selected Update File</source>
-      <translation>Вибраний файл оновлення</translation>
-    </message>
-    <message>
-      <source>Download in External Browser</source>
-      <translation>Завантажити в зовнішньому браузері</translation>
-    </message>
-    <message>
-      <source>Copy Link to Clipboard</source>
-      <translation>Копіювати посилання у буфер</translation>
-    </message>
-    <message>
-      <source>Unable to check updates on the Internet.</source>
-      <translation>Не вдається перевірити оновлення в Інтернеті.</translation>
-    </message>
-    <message>
-      <source>Unknown build number.</source>
-      <translation>Невідомий номер збірки.</translation>
-    </message>
-    <message>
-      <source>Downgrade to an earlier version is prohibited.</source>
-      <translation>Оновлення до більш ранньої версії не підтримується.</translation>
-    </message>
-    <message>
-      <source>Updates for one or more servers were not found.</source>
-      <translation>Оновлення для одного або декількох серверів не знайдено.</translation>
-    </message>
-    <message>
-      <source>Client update was not found.</source>
-      <translation>Оновлення клієнта не знайдено.</translation>
-    </message>
-    <message>
-      <source>Unable to extract update file. No free space left on the disk.</source>
-      <translation>Не вдалося витягти файл оновлення. Немає вільного місця на диску.</translation>
-    </message>
-    <message>
-      <source>Update Finished...</source>
-      <translation>Оновлення завершено...</translation>
-    </message>
-    <message>
-      <source>Checking for updates...</source>
-      <translation>Перевірка оновлень...</translation>
-    </message>
-    <message>
-      <source>Downloading updates...</source>
-      <translation>Завантаження оновлень...</translation>
-    </message>
-    <message>
-      <source>Installing client update...</source>
-      <translation>Встановлення оновлення клієнта...</translation>
-    </message>
-    <message>
-      <source>Installing updates to incompatible servers...</source>
-      <translation>Установка оновлень на несумісні сервери...</translation>
-    </message>
-    <message>
-      <source>Pushing updates to servers...</source>
-      <translation>Відправка оновлень на сервера...</translation>
-    </message>
-    <message>
-      <source>Installing updates...</source>
-      <translation>Встановлення оновлень...</translation>
-    </message>
-    <message>
-      <source>Specific Build...</source>
-      <translation>Вказати номер збірки...</translation>
-    </message>
-    <message>
-      <source>Update to Specific Build</source>
-      <translation>Оновити до зазначеної збірки</translation>
-    </message>
-    <message>
-      <source>Update System</source>
-      <translation>Оновити систему</translation>
-    </message>
-    <message>
-      <source>System update in process</source>
-      <translation>Виконується оновлення системи</translation>
-    </message>
-    <message>
-      <source>Cancel Update</source>
-      <translation>Скасувати оновлення</translation>
-    </message>
-    <message>
-      <source>Continue in Background</source>
-      <translation>Продовжити у фоновому режимі</translation>
-    </message>
-    <message numerus="yes">
-      <source>Not enough free space at %n Servers:</source>
-      <translation>
-        <numerusform>Недостатньо вільного місця на %n сервері:</numerusform>
-        <numerusform>Недостатньо вільного місця на %n серверах:</numerusform>
-        <numerusform>Недостатньо вільного місця на %n серверах:</numerusform>
-        <numerusform>Недостатньо вільного місця на %n серверах:</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Attempt to update may fail or cause Server malfunction.</source>
-      <translation>Спроба оновлення може виявитися невдалою або привести до некоректної роботи сервера.</translation>
-    </message>
-    <message>
-      <source>Force Update</source>
-      <translation>Все одно оновити</translation>
-    </message>
-    <message>
-      <source>Server update completed</source>
-      <translation>Оновлення сервера завершено</translation>
-    </message>
-    <message>
-      <source>Update completed</source>
-      <translation>Оновлення завершено</translation>
-    </message>
-    <message>
-      <source>Update canceled</source>
-      <translation>Оновлення скасоване</translation>
-    </message>
-    <message>
-      <source>All Servers already updated</source>
-      <translation>Всі сервери вже оновлені</translation>
-    </message>
-    <message>
-      <source>Update failed</source>
-      <translation>Оновлення провалено</translation>
-    </message>
-    <message>
-      <source>Please update %1 manually using an installation package.</source>
-      <translation>Будь ласка, оновіть %1 вручну за допомогою інсталятора.</translation>
-    </message>
-    <message>
-      <source>%1 will be restarted to the updated version.</source>
-      <translation>%1 буде перезапущено до оновленої версії.</translation>
-    </message>
-    <message>
-      <source>Update cannot be canceled at this stage</source>
-      <translation>Неможливо скасувати оновлення на цьому етапі</translation>
-    </message>
-    <message>
-      <source>Please wait until it is finished.</source>
-      <translation>Будь ласка, дочекайтеся завершення.</translation>
-    </message>
-    <message>
-      <source>All components in your System are up to date.</source>
-      <translation>Ваша система складається з компонентів нової версії.</translation>
-    </message>
-    <message>
-      <source>All components in your System are up to this version.</source>
-      <translation>Всі компоненти в вашій системі оновлені до цієї версії.</translation>
-    </message>
-    <message>
-      <source>Incompatible %1 instance. To update disconnect System from %1 first.</source>
-      <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation>Несумісний компонент %1. Для оновлення спочатку відключіть систему від %1.</translation>
-    </message>
-    <message>
-      <source>Update Files</source>
-      <translation>Файли оновлень</translation>
-    </message>
-    <message>
-      <source>Validating the update...</source>
-      <translation>Перевірка оновлення...</translation>
-    </message>
-    <message>
-      <source>Checking for free space...</source>
-      <translation>Перевірка вільного простору...</translation>
-    </message>
-  </context>
-  <context>
     <name>QnSessionAwareTabbedDialog</name>
     <message>
       <source>Unsaved changes:</source>
@@ -6176,10 +5957,6 @@ to %1</source>
       <translation>Виконується синхронізація віддаленого архіву</translation>
     </message>
     <message>
-      <source>Error occured during remote archive synchronization</source>
-      <translation>Помилка при синхронізації віддаленого архіву</translation>
-    </message>
-    <message>
       <source>Remote archive synchronization has been started for the following device:</source>
       <translation>Віддалена синхронізація архіву була розпочата для наступного пристрою:</translation>
     </message>
@@ -6229,17 +6006,13 @@ to %1</source>
       <source>The System is running in safe mode.</source>
       <translation>Система працює в безпечному режимі.</translation>
     </message>
+    <message>
+      <source>Error occurred during remote archive synchronization</source>
+      <translation>Помилка при синхронізації віддаленого архіву</translation>
+    </message>
   </context>
   <context>
     <name>QnSystemSettingsWidget</name>
-    <message>
-      <source>Enable devices and servers auto discovery</source>
-      <translation>Включити автовизначення пристроїв і серверів</translation>
-    </message>
-    <message>
-      <source>Enable cameras and servers auto discovery</source>
-      <translation>Включити автовизначення камер і серверів</translation>
-    </message>
     <message>
       <source>Allow System to optimize device settings</source>
       <translation>Дозволити системі оптимізувати настройки пристроїв</translation>
@@ -6255,6 +6028,22 @@ to %1</source>
     <message>
       <source>Does not include any personal information and is completely anonymous.</source>
       <translation>Не містить ніякої особистої інформації і є повністю анонімним.</translation>
+    </message>
+    <message>
+      <source>Failover server measures may still request camera status updates regardless of this setting.</source>
+      <translation>Файловер серверу може вимагати оновлення статусу камери незалежно від цього налаштування.</translation>
+    </message>
+    <message>
+      <source>Enable devices and servers autodiscovery and automated device status check</source>
+      <translation>Увімкнути автоматичне виявлення пристроїв і серверів і автоматичну перевірку стану пристрою</translation>
+    </message>
+    <message>
+      <source>Enable cameras and servers autodiscovery and automated camera status check</source>
+      <translation>Увімкніть автоматичне виявлення камер і серверів і автоматичну перевірку стану камери</translation>
+    </message>
+    <message>
+      <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
+      <translation>Коли ця функція ввімкнена, система постійно виявляє нові камери і сервери і надсилає запити до камер для оновлення статусів.</translation>
     </message>
   </context>
   <context>
@@ -6338,94 +6127,6 @@ to %1</source>
     <message>
       <source>Hold to Speak</source>
       <translation>Натисніть і говоріть</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnUpdateResult</name>
-    <message>
-      <source>Update has been successfully finished.</source>
-      <translation>Оновлення було успішно завершено.</translation>
-    </message>
-    <message>
-      <source>Update has been cancelled.</source>
-      <translation>Оновлення скасоване.</translation>
-    </message>
-    <message>
-      <source>Another user has already started an update.</source>
-      <translation>Хтось уже запустив процес оновлення.</translation>
-    </message>
-    <message>
-      <source>All servers are already updated.</source>
-      <translation>Всі сервери вже оновлені.</translation>
-    </message>
-    <message>
-      <source>Could not download updates.</source>
-      <translation>Не вдається завантажити оновлення.</translation>
-    </message>
-    <message>
-      <source>No free space left on the disk.</source>
-      <translation>Мало вільного місця на диску.</translation>
-    </message>
-    <message>
-      <source>Could not push updates to servers.</source>
-      <translation>Неможливо перенести оновлення на сервера.</translation>
-    </message>
-    <message numerus="yes">
-      <source>The problem is caused by %n servers:</source>
-      <translation>
-        <numerusform>Проблема викликана через %n сервер:</numerusform>
-        <numerusform>Проблема викликана через %n сервери:</numerusform>
-        <numerusform>Проблема викликана через %n серверів:</numerusform>
-        <numerusform>Проблема викликана через %n серверів:</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>No free space left on %n servers:</source>
-      <translation>
-        <numerusform>Немає вільного місця на сервері %n:</numerusform>
-        <numerusform>Немає вільного місця на серверах %n:</numerusform>
-        <numerusform>Немає вільного місця на серверах %n:</numerusform>
-        <numerusform>Немає вільного місця на серверах %n:</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n servers are not responding:</source>
-      <translation>
-        <numerusform>%n сервер не відповідає:</numerusform>
-        <numerusform>%n серверів не відповідють:</numerusform>
-        <numerusform>%n серверів не відповідють:</numerusform>
-        <numerusform>%n серверів не відповідють:</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n servers have gone offline:</source>
-      <translation>
-        <numerusform>%n сервер виключено:</numerusform>
-        <numerusform>%n сервери виключені:</numerusform>
-        <numerusform>%n сервери виключені:</numerusform>
-        <numerusform>%n сервери виключені:</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Authentication failed for %n servers:</source>
-      <translation>
-        <numerusform>Автентифікація не виконана для серверу %n:</numerusform>
-        <numerusform>Автентифікація не виконана для серверів %n:</numerusform>
-        <numerusform>Автентифікація не виконана для серверів %n:</numerusform>
-        <numerusform>Автентифікація не виконана для серверів %n:</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Could not install an update to the client.</source>
-      <translation>Не вдається встановити оновлення на клієнт.</translation>
-    </message>
-    <message>
-      <source>Could not install updates on one or more servers.</source>
-      <translation>Не вдалося встановити оновлення на одному або декількох серверах.</translation>
-    </message>
-    <message>
-      <source>Update has been cancelled silently.</source>
-      <translation>Оновлення скасоване.</translation>
     </message>
   </context>
   <context>
@@ -6885,25 +6586,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnWorkbenchContext</name>
-    <message>
-      <source>Please review and agree to the %1 in order to proceed</source>
-      <translation>Щоб продовжити, перегляньте та погодьтеся з номером %1</translation>
-    </message>
-    <message>
-      <source>To use the software you must agree with the end user license agreement</source>
-      <translation>Для використання програмного забезпечення ви повинні прийняти ліцензійну угоду кінцевого користувача</translation>
-    </message>
-    <message>
-      <source>I Agree</source>
-      <translation>Я згоден</translation>
-    </message>
-    <message>
-      <source>I Do Not Agree</source>
-      <translation>Я не згідний</translation>
-    </message>
-  </context>
-  <context>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
     <message>
       <source>Systems will be merged shortly</source>
@@ -6912,10 +6594,6 @@ to %1</source>
     <message>
       <source>Servers from the other System will appear in the resource tree.</source>
       <translation>Сервери з іншої системи будуть відображатися в дереві ресурсів.</translation>
-    </message>
-    <message>
-      <source>Failed to update Server</source>
-      <translation>Не вдалося оновити сервер</translation>
     </message>
     <message>
       <source>Total amount of licenses will decrease</source>
@@ -7092,29 +6770,6 @@ to %1</source>
     <message>
       <source>JPEG Image</source>
       <translation>Зображення JPEG</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnWorkbenchUpdateWatcher</name>
-    <message>
-      <source>Release Notes</source>
-      <translation>Зауваження до релізу</translation>
-    </message>
-    <message>
-      <source>%1 version available</source>
-      <translation>Доступна версія %1</translation>
-    </message>
-    <message>
-      <source>Major issues have been fixed. Update is strongly recommended.</source>
-      <translation>Оновлення рекомендується для встановлення. Були виправлені критичні помилки.</translation>
-    </message>
-    <message>
-      <source>Update...</source>
-      <translation>Оновлення...</translation>
-    </message>
-    <message>
-      <source>Do not notify again about this update</source>
-      <translation>Не повідомляти більше про це оновлення</translation>
     </message>
   </context>
   <context>
@@ -7641,6 +7296,17 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>SessionExpiredDialog</name>
+    <message>
+      <source>Your session has expired</source>
+      <translation>Час сесії минув</translation>
+    </message>
+    <message>
+      <source>Session duration limit can be changed by the system administrators</source>
+      <translation>Межа тривалості сеансу може бути змінена системними адміністраторами</translation>
+    </message>
+  </context>
+  <context>
     <name>StreamQualityStrings</name>
     <message>
       <source>Lowest</source>
@@ -7846,6 +7512,14 @@ to %1</source>
       <source>Show Only with &quot;Objects&quot; Tab</source>
       <translation>Показати лише за допомогою вкладки &quot;Об'єкт&quot; Tab</translation>
     </message>
+    <message>
+      <source>Show</source>
+      <translation>Показати</translation>
+    </message>
+    <message>
+      <source>Do Not Show</source>
+      <translation>Не показувати</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::AnalyticsSearchListModel::Private</name>
@@ -8000,10 +7674,6 @@ to %1</source>
       <translation>Оригінальне</translation>
     </message>
     <message>
-      <source>Server will not change any cameras settings, it will receive and use camera stream as-is. </source>
-      <translation>Сервер не буде змінювати налаштування камер, він буде отримувати і використовувати потік з камери як є. </translation>
-    </message>
-    <message>
       <source>Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</source>
       <translation>Допомагає вирішити проблеми з якістю зображення на деяких камерах; для інших це призведе до значного збільшення бітрейту.</translation>
     </message>
@@ -8029,6 +7699,14 @@ to %1</source>
         <numerusform>Цей ідентифікатор вже використовується для наступних %n камер:</numerusform>
         <numerusform>Цей ідентифікатор вже використовується для наступних %n камер:</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>UDP Multicast</source>
+      <translation>UDP Multicast</translation>
+    </message>
+    <message>
+      <source>Server will not change any cameras settings, it will receive and use camera stream as-is.</source>
+      <translation>Сервер не буде змінювати налаштування камер, він буде отримувати і використовувати потік з камери як є.</translation>
     </message>
   </context>
   <context>
@@ -8310,16 +7988,16 @@ to %1</source>
       <translation>Неправильний пакет оновлення.</translation>
     </message>
     <message>
-      <source>Not enough space on disk to install client update.</source>
+      <source>Internal error.</source>
+      <translation>Внутрішня помилка.</translation>
+    </message>
+    <message>
+      <source>Not enough space on disk to install the client update.</source>
       <translation>Недостатньо місця на диску для встановлення оновлення клієнта.</translation>
     </message>
     <message>
-      <source>Install package has been lost.</source>
+      <source>Installation package has been lost.</source>
       <translation>Інсталяційний пакет було втрачено.</translation>
-    </message>
-    <message>
-      <source>Internal error.</source>
-      <translation>Внутрішня помилка.</translation>
     </message>
   </context>
   <context>
@@ -8351,6 +8029,17 @@ to %1</source>
       <source>Pasted</source>
       <comment>from Clipboard</comment>
       <translation>Вставлено</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ConnectToCurrentSystemTool</name>
+    <message>
+      <source>Configuring Server</source>
+      <translation>Налаштування сервера</translation>
+    </message>
+    <message>
+      <source>Updating Server</source>
+      <translation>Оновлення серверу</translation>
     </message>
   </context>
   <context>
@@ -8475,6 +8164,17 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::EulaDialog</name>
+    <message>
+      <source>Please review and agree to the %1 in order to proceed</source>
+      <translation>Щоб продовжити, перегляньте та погодьтеся з номером %1</translation>
+    </message>
+    <message>
+      <source>To use the software you must agree with the end user license agreement</source>
+      <translation>Для використання програмного забезпечення ви повинні прийняти ліцензійну угоду кінцевого користувача</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::EventPanel::Private</name>
     <message>
       <source>Notifications</source>
@@ -8544,10 +8244,6 @@ to %1</source>
       <source>No events</source>
       <translation>Немає подій</translation>
     </message>
-    <message>
-      <source>No events occured</source>
-      <translation>Не відбулося ніяких подій</translation>
-    </message>
     <message numerus="yes">
       <source>%n events</source>
       <translation>
@@ -8560,6 +8256,10 @@ to %1</source>
     <message>
       <source>unnamed analytics engine</source>
       <translation>неназваний движок аналітики</translation>
+    </message>
+    <message>
+      <source>No events occurred</source>
+      <translation>Не відбулося ніяких подій</translation>
     </message>
   </context>
   <context>
@@ -9066,26 +8766,6 @@ to %1</source>
       <translation>Деякі сервери знаходяться поза мережею і не будуть оновлюватися. Пропустити їх?</translation>
     </message>
     <message>
-      <source>Ready to install client updates</source>
-      <translation>Готовий до встановлення оновлень клієнтів</translation>
-    </message>
-    <message>
-      <source>Install now</source>
-      <translation>Встановити зараз</translation>
-    </message>
-    <message>
-      <source>Later</source>
-      <translation>Пізніше</translation>
-    </message>
-    <message>
-      <source>Updates downloaded</source>
-      <translation>Оновлення завантажено</translation>
-    </message>
-    <message>
-      <source>Failed to download update packages</source>
-      <translation>Не вдалося завантажити пакети оновлень</translation>
-    </message>
-    <message>
       <source>Please make sure there is enough free storage space and network connection is stable.</source>
       <translation>Переконайтеся, що вільного місця для зберігання достатньо, а мережеве з'єднання стабільне.</translation>
     </message>
@@ -9100,10 +8780,6 @@ to %1</source>
     <message>
       <source>Cancel Update</source>
       <translation>Скасувати оновлення</translation>
-    </message>
-    <message>
-      <source>Failed to download update packages to some servers</source>
-      <translation>Не вдалося завантажити пакети оновлення для деяких серверів</translation>
     </message>
     <message>
       <source>Please make sure they have enough free storage space and stable network connection.</source>
@@ -9254,6 +8930,18 @@ to %1</source>
       <source>There are no online servers to update.</source>
       <translation>Немає серверів для оновлення, які знаходяться онлайн.</translation>
     </message>
+    <message>
+      <source>Some servers haven&apos;t completed update process. Finish it anyway?</source>
+      <translation>Деякі сервери &apos;не завершили процес оновлення. Закінчити його все одно?</translation>
+    </message>
+    <message>
+      <source>Cancel update and delete all downloaded data?</source>
+      <translation>Скасувати оновлення та видалити всі завантажені дані?</translation>
+    </message>
+    <message>
+      <source>Failed to download update packages to some components</source>
+      <translation>Не вдалося завантажити пакети оновлення для деяких компонентів</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::MultipleLayoutSelectionDialog</name>
@@ -9281,6 +8969,26 @@ to %1</source>
       <source>Acknowledge</source>
       <translation>Підтвердити</translation>
     </message>
+    <message>
+      <source>Generic Event</source>
+      <translation>Загальні події</translation>
+    </message>
+    <message>
+      <source>Unknown Plugin Event</source>
+      <translation>Невідомий плагін події</translation>
+    </message>
+    <message>
+      <source>Device was disconnected</source>
+      <translation>Пристрій було відключено</translation>
+    </message>
+    <message>
+      <source>Camera was disconnected</source>
+      <translation>Камера була відключена</translation>
+    </message>
+    <message>
+      <source>I/O Module was disconnected</source>
+      <translation>Модуль вводу-виводу був відключений</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::NotificationListWidget::Private</name>
@@ -9300,10 +9008,6 @@ to %1</source>
       <translation>Жоден із вибраних користувачів не має доступу до обраної розкладки. Дія не буде працювати.</translation>
     </message>
     <message>
-      <source>Local layouts can only be shown to their owners. </source>
-      <translation>Місцеві розкладки можуть бути показані лише їх власникам. </translation>
-    </message>
-    <message>
       <source>Select layout...</source>
       <translation>Виберіть макет...</translation>
     </message>
@@ -9318,6 +9022,45 @@ to %1</source>
     <message>
       <source>None of selected user roles contain users. Action will not work.</source>
       <translation>Жодна з вибраних ролей не містить користувачів. Дія не спрацює.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::PeerStateTracker</name>
+    <message>
+      <source>The server is taking too long to respond</source>
+      <translation>Сервер надто довго реагує</translation>
+    </message>
+    <message>
+      <source>No update task</source>
+      <translation>Немає завдання для оновлення</translation>
+    </message>
+    <message>
+      <source>Ready to download update</source>
+      <translation>Готовий до завантаження оновлення</translation>
+    </message>
+    <message>
+      <source>Downloading update</source>
+      <translation>Завантажується оновлення</translation>
+    </message>
+    <message>
+      <source>Ready to restart to the new version</source>
+      <translation>Готовий до запуску нової версії</translation>
+    </message>
+    <message>
+      <source>Installing update</source>
+      <translation>Встановлення оновлення</translation>
+    </message>
+    <message>
+      <source>Installed</source>
+      <translation>Встановлено</translation>
+    </message>
+    <message>
+      <source>Failed to download update</source>
+      <translation>Не вдалося завантажити оновлення</translation>
+    </message>
+    <message>
+      <source>Failed to install update</source>
+      <translation>Не вдалося інсталювати оновлення</translation>
     </message>
   </context>
   <context>
@@ -9464,16 +9207,16 @@ to %1</source>
       <translation>Відстежує і реєструє всі дії користувача.</translation>
     </message>
     <message>
-      <source>User will be automatically logged out after this period of time.</source>
-      <translation>Користувач автоматично вийде з системи після закінчення цього періоду часу.</translation>
-    </message>
-    <message>
       <source>minutes</source>
       <translation>хвилина</translation>
     </message>
     <message>
       <source>hours</source>
       <translation>година</translation>
+    </message>
+    <message>
+      <source>Users will be automatically logged out if their session exceeds the specified duration.</source>
+      <translation>Користувачі будуть автоматично виключені, якщо їхня сесія перевищить вказану тривалість.</translation>
     </message>
   </context>
   <context>
@@ -9494,13 +9237,13 @@ to %1</source>
       <source>Downloaded</source>
       <translation>Завантажене</translation>
     </message>
+    <message>
+      <source>Waiting for server to respond...</source>
+      <translation>Очікування відповіді сервера...</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerUpdatesModel</name>
-    <message>
-      <source>Current Version</source>
-      <translation>Поточна версія</translation>
-    </message>
     <message>
       <source>Status</source>
       <translation>Статус</translation>
@@ -9520,6 +9263,10 @@ to %1</source>
     <message>
       <source>Component</source>
       <translation>Компонент</translation>
+    </message>
+    <message>
+      <source>Installed Version</source>
+      <translation>Встановлена версія</translation>
     </message>
   </context>
   <context>
@@ -9829,12 +9576,62 @@ to %1</source>
       <source>Starting export...</source>
       <translation>Початок експорту...</translation>
     </message>
+    <message>
+      <source>Saving layout</source>
+      <translation>Зберегти макет</translation>
+    </message>
+    <message>
+      <source>Stop Saving</source>
+      <translation>Зупинити збереження</translation>
+    </message>
+    <message>
+      <source>Saving failed</source>
+      <translation>Помилка збереження</translation>
+    </message>
+    <message>
+      <source>Starting saving...</source>
+      <translation>Початок збереження...</translation>
+    </message>
+    <message>
+      <source>We are preparing files for the export process. Please wait for a few seconds.</source>
+      <translation>Ми готуємо файли для процесу експорту. Зачекайте кілька секунд.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::WorkbenchUpdateWatcher</name>
+    <message>
+      <source>%1 version available</source>
+      <translation>Доступна версія %1</translation>
+    </message>
+    <message>
+      <source>Release Notes</source>
+      <translation>Зауваження до релізу</translation>
+    </message>
+    <message>
+      <source>Major issues have been fixed. Update is strongly recommended.</source>
+      <translation>Оновлення рекомендується для встановлення. Були виправлені критичні помилки.</translation>
+    </message>
+    <message>
+      <source>Update...</source>
+      <translation>Оновлення...</translation>
+    </message>
+    <message>
+      <source>Do not notify again about this update</source>
+      <translation>Не повідомляти більше про це оновлення</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::detail::BaseInputField</name>
     <message>
       <source>multiple values</source>
       <translation>декілька значень</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::integrations::entropix::ReconstructResolutionIntegration</name>
+    <message>
+      <source>Reconstruct Resolution</source>
+      <translation>Відновити роздільну здатність</translation>
     </message>
   </context>
   <context>

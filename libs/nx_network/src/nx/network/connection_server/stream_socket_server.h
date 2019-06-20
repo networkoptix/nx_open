@@ -37,19 +37,23 @@ public:
         ConnectionType* connection) = 0;
 };
 
+//-------------------------------------------------------------------------------------------------
+
 template<class ConnectionType>
 class StreamServerConnectionHolder:
-    public StreamConnectionHolder<ConnectionType>
+    public StreamConnectionHolder<ConnectionType>,
+    public AbstractStatisticsProvider
 {
 public:
-    StreamServerConnectionHolder():
-        m_connectionsBeingClosedCount(0)
-    {
-    }
-
     virtual ~StreamServerConnectionHolder()
     {
         closeAllConnections();
+    }
+
+    virtual Statistics statistics() const override
+    {
+        return m_statisticsCalculator.statistics(
+            static_cast<int>(this->connectionCount()));
     }
 
     virtual void closeConnection(
@@ -57,6 +61,7 @@ public:
         ConnectionType* connection) override
     {
         QnMutexLocker lk(&m_mutex);
+
         auto connectionIter = m_connections.find(connection);
         if (connectionIter == m_connections.end())
             return;
@@ -82,6 +87,8 @@ public:
 
     void saveConnection(std::shared_ptr<ConnectionType> connection)
     {
+        m_statisticsCalculator.connectionAccepted();
+
         QnMutexLocker lk(&m_mutex);
 
         connection->registerCloseHandler(
@@ -116,13 +123,43 @@ public:
             m_cond.wait(lk.mutex());
     }
 
+protected:
+    detail::StatisticsCalculator& statisticsCalculator()
+    {
+        return m_statisticsCalculator;
+    }
+
 private:
     mutable QnMutex m_mutex;
     QnWaitCondition m_cond;
-    int m_connectionsBeingClosedCount;
+    int m_connectionsBeingClosedCount = 0;
     //TODO #ak this map types seems strange. Replace with std::set?
     std::map<ConnectionType*, std::shared_ptr<ConnectionType>> m_connections;
+    detail::StatisticsCalculator m_statisticsCalculator;
 };
+
+//-------------------------------------------------------------------------------------------------
+
+template<class ConnectionType>
+class MessageStreamServerConnectionHolder:
+    public StreamServerConnectionHolder<ConnectionType>
+{
+    using base_type = StreamServerConnectionHolder<ConnectionType>;
+
+public:
+    virtual void closeConnection(
+        SystemError::ErrorCode closeReason,
+        ConnectionType* connection) override
+    {
+        this->statisticsCalculator().saveConnectionStatistics(
+            connection->lifeDuration(),
+            connection->messagesReceivedCount());
+
+        base_type::closeConnection(closeReason, connection);
+    }
+};
+
+//-------------------------------------------------------------------------------------------------
 
 template<typename Connection>
 struct MessageSender
@@ -147,6 +184,8 @@ private:
     typename Connection::MessageType m_message;
 };
 
+//-------------------------------------------------------------------------------------------------
+
 // TODO: #ak It seems to make sense to decouple
 //   StreamSocketServer & StreamServerConnectionHolder responsibility.
 
@@ -156,11 +195,10 @@ private:
  */
 template<class CustomServerType, class ConnectionType>
 class StreamSocketServer:
-    public StreamServerConnectionHolder<ConnectionType>,
-    public aio::BasicPollable,
-    public AbstractStatisticsProvider
+    public MessageStreamServerConnectionHolder<ConnectionType>,
+    public aio::BasicPollable
 {
-    using base_type = StreamServerConnectionHolder<ConnectionType>;
+    using base_type = MessageStreamServerConnectionHolder<ConnectionType>;
     using self_type = StreamSocketServer<CustomServerType, ConnectionType>;
 
 public:
@@ -249,12 +287,6 @@ public:
         m_keepAliveOptions = std::move(options);
     }
 
-    virtual Statistics statistics() const override
-    {
-        return m_statisticsCalculator.statistics(
-            static_cast<int>(this->connectionCount()));
-    }
-
 protected:
     virtual std::shared_ptr<ConnectionType> createConnection(
         std::unique_ptr<AbstractStreamSocket> streamSocket) = 0;
@@ -263,17 +295,6 @@ protected:
     {
         m_acceptor.reset();
         m_serverSocket = nullptr;
-    }
-
-    virtual void closeConnection(
-        SystemError::ErrorCode closeReason,
-        ConnectionType* connection) override
-    {
-        m_statisticsCalculator.saveConnectionStatistics(
-            connection->lifeDuration(),
-            connection->messagesReceivedCount());
-
-        base_type::closeConnection(closeReason, connection);
     }
 
 private:
@@ -286,7 +307,6 @@ private:
     std::unique_ptr<AbstractStreamSocketAcceptor> m_acceptor;
     std::optional<std::chrono::milliseconds> m_connectionInactivityTimeout;
     std::optional<KeepAliveOptions> m_keepAliveOptions;
-    detail::StatisticsCalculator m_statisticsCalculator;
 
     StreamSocketServer(StreamSocketServer&);
     StreamSocketServer& operator=(const StreamSocketServer&);
@@ -318,8 +338,6 @@ private:
                 .arg(SystemError::toString(errorCode)));
             return;
         }
-
-        m_statisticsCalculator.connectionAccepted();
 
         if (m_keepAliveOptions)
         {

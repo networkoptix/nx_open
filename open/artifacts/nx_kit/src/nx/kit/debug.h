@@ -128,6 +128,12 @@ NX_KIT_API std::ostream*& stream();
         __VA_ARGS__, NX_KIT_DEBUG_DETAIL_ASSERT2, NX_KIT_DEBUG_DETAIL_ASSERT1, \
         /* Helps to generate a reasonable compiler error. */ args_required)(__VA_ARGS__))
 
+/**
+ * Debug feature. Crashes the process. On Windows, copies message to a local variable on the stack,
+ * so that it is included into the mini-dump.
+ */
+NX_KIT_API void intentionallyCrash(const char* message);
+
 //-------------------------------------------------------------------------------------------------
 // Print info
 

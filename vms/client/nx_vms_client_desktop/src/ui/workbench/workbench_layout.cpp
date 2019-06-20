@@ -2,6 +2,8 @@
 
 #include <limits>
 
+#include <boost/algorithm/cxx11/all_of.hpp>
+
 #include <QtWidgets/QGraphicsWidget>
 
 #include <common/common_module.h>

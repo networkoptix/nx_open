@@ -17,6 +17,7 @@ public:
         const QnRequestParams &params,
         QnJsonRestResult &result,
         const QnRestConnectionProcessor*) override;
+
 private:
     QnStorageResourcePtr getOrCreateStorage(const QString& storageUrl) const;
 };

@@ -25,10 +25,10 @@ HostSystemPasswordSynchronizer::HostSystemPasswordSynchronizer(QnMediaServerModu
     nx::vms::server::ServerModuleAware(serverModule)
 {
     Qn::directConnect(
-        resourcePool(), &QnResourcePool::resourceAdded,
+        this->serverModule()->resourcePool(), &QnResourcePool::resourceAdded,
         this, &HostSystemPasswordSynchronizer::at_resourceFound);
 
-    if (QnUserResourcePtr admin = resourcePool()->getAdministrator())
+    if (QnUserResourcePtr admin = this->serverModule()->resourcePool()->getAdministrator())
         setAdmin(admin);
 }
 
@@ -42,7 +42,7 @@ void HostSystemPasswordSynchronizer::syncLocalHostRootPasswordWithAdminIfNeeded(
 {
 #ifdef __linux__
     QnMutexLocker lk(&m_mutex);
-    if (QnAppInfo::isBpi() || QnAppInfo::isNx1())
+    if (QnAppInfo::isNx1())
     {
         //#5785 changing root password on nx1 only if DB is located on HDD
         QList<QnPlatformMonitor::PartitionSpace> partitions =

@@ -111,7 +111,8 @@ namespace ec2
         //!User is disabled
         disabled_user_unauthorized,
         //!Login is locked for next few minutes after a series of unsuccessful attempts
-        userLockedOut
+        userLockedOut,
+        badRequest,
     };
 
     QString toString(ErrorCode errorCode);

@@ -11,15 +11,12 @@
 #include "connector.h"
 #include "dao/rdb/structure_updater.h"
 #include "http_server.h"
-#include "incoming_transaction_dispatcher.h"
-#include "outgoing_transaction_dispatcher.h"
+#include "incoming_command_dispatcher.h"
+#include "outgoing_command_dispatcher.h"
 #include "outgoing_command_filter.h"
 #include "statistics/provider.h"
-#include "transaction_log.h"
+#include "command_log.h"
 #include "discovery_manager.h"
-#include "transport/common_http/acceptor.h"
-#include "transport/p2p_http/acceptor.h"
-#include "transport/p2p_websocket/acceptor.h"
 #include "transport/transport_manager.h"
 
 namespace nx::clusterdb::engine {
@@ -37,8 +34,10 @@ public:
         const std::string& applicationId,
         const SynchronizationSettings& settings,
         const ProtocolVersionRange& supportedProtocolRange,
-        nx::sql::AsyncSqlQueryExecutor* const dbManager);
+        nx::sql::AbstractAsyncSqlQueryExecutor* const dbManager);
     ~SynchronizationEngine();
+
+    void pleaseStopSync();
 
     OutgoingCommandDispatcher& outgoingTransactionDispatcher();
     const OutgoingCommandDispatcher& outgoingTransactionDispatcher() const;
@@ -53,6 +52,7 @@ public:
     const ConnectionManager& connectionManager() const;
 
     Connector& connector();
+    transport::TransportManager& transportManager();
 
     const statistics::Provider& statisticsProvider() const;
 
@@ -62,6 +62,7 @@ public:
      */
     void setOutgoingCommandFilter(
         const OutgoingCommandFilterConfiguration& configuration);
+    OutgoingCommandFilter& outgoingCommandFilter();
 
     void subscribeToSystemDeletedNotification(
         nx::utils::Subscription<std::string>& subscription);
@@ -87,9 +88,7 @@ private:
     ConnectionManager m_connectionManager;
     transport::TransportManager m_transportManager;
     Connector m_connector;
-    transport::CommonHttpAcceptor m_httpTransportAcceptor;
-    transport::p2p::websocket::Acceptor m_webSocketAcceptor;
-    transport::p2p::http::Acceptor m_p2pHttpAcceptor;
+    std::vector<std::unique_ptr<transport::AbstractAcceptor>> m_transportAcceptors;
     statistics::Provider m_statisticsProvider;
     nx::utils::SubscriptionId m_systemDeletedSubscriptionId;
     nx::utils::Counter m_startedAsyncCallsCounter;

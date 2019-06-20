@@ -82,8 +82,7 @@ Item
 
         interactive:
             rootItem.interactive
-            && !mouseArea.doubleTapScaleMode
-            && (mouseArea.doubleTapDownPos ? false : true)
+            && !controller.scaling
             && rootItem.allowCompositeEvents
 
         Item

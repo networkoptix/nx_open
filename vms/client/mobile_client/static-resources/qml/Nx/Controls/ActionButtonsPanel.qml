@@ -233,7 +233,12 @@ Item
         function tryDeactivateTrigger(index, keepHintOpened)
         {
             if (isProlonged(index))
-                triggersController.deactivateTrigger()
+            {
+                if (getType(index) == ActionButtonsModel.TwoWayAudioButton)
+                    control.twoWayAudioButtonReleased()
+                else
+                    triggersController.deactivateTrigger()
+            }
 
             if (!keepHintOpened)
                 hintControl.hide()

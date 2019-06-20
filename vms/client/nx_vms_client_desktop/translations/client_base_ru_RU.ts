@@ -2570,7 +2570,7 @@ to %1</source>
     </message>
     <message>
       <source>Too many attempts. Try again in a minute.</source>
-      <translation type="unfinished">Too many attempts. Try again in a minute.</translation>
+      <translation>Слишком много попыток. Повторите позже.</translation>
     </message>
   </context>
   <context>
@@ -2644,17 +2644,6 @@ to %1</source>
     <message>
       <source>Internal server error. Please try again later.</source>
       <translation type="unfinished">Internal server error. Please try again later.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnConnectToCurrentSystemTool</name>
-    <message>
-      <source>Configuring Server</source>
-      <translation>Настройка сервера</translation>
-    </message>
-    <message>
-      <source>Updating Server</source>
-      <translation>Обновление сервера</translation>
     </message>
   </context>
   <context>
@@ -2804,7 +2793,7 @@ to %1</source>
     </message>
     <message>
       <source>Too many attempts. Try again in a minute.</source>
-      <translation type="unfinished">Too many attempts. Try again in a minute.</translation>
+      <translation>Слишком много попыток. Повторите позже.</translation>
     </message>
     <message>
       <source>Download &amp;&amp; Install</source>
@@ -3035,7 +3024,7 @@ to %1</source>
     </message>
     <message>
       <source>Too many attempts. Try again in a minute.</source>
-      <translation type="unfinished">Too many attempts. Try again in a minute.</translation>
+      <translation>Слишком много попыток. Повторите позже.</translation>
     </message>
   </context>
   <context>
@@ -3292,6 +3281,14 @@ to %1</source>
     <message>
       <source>Folder already added</source>
       <translation>Папка уже добавлена</translation>
+    </message>
+    <message>
+      <source>None</source>
+      <translation>Нет</translation>
+    </message>
+    <message>
+      <source>Auto (%1)</source>
+      <translation type="unfinished">Auto (%1)</translation>
     </message>
   </context>
   <context>
@@ -5279,222 +5276,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnServerUpdatesModel</name>
-    <message>
-      <source>Server</source>
-      <translation>Сервер</translation>
-    </message>
-    <message>
-      <source>Status</source>
-      <translation>Статус</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnServerUpdatesWidget</name>
-    <message>
-      <source>Select Update File...</source>
-      <translation>Выберите файл обновлений...</translation>
-    </message>
-    <message>
-      <source>Release notes</source>
-      <translation>Что нового</translation>
-    </message>
-    <message>
-      <source>You will have to update the client manually using an installer.</source>
-      <translation>Необходимо обновить клиент вручную, используя инсталлятор.</translation>
-    </message>
-    <message>
-      <source>Cannot update from this file.</source>
-      <translation>Невозможно обновиться из этого файла.</translation>
-    </message>
-    <message>
-      <source>Latest Available Update</source>
-      <translation>Последнее доступное обновление</translation>
-    </message>
-    <message>
-      <source>Download the Latest Version Update File</source>
-      <translation>Загрузить файл обновления на последнюю версию</translation>
-    </message>
-    <message>
-      <source>Selected Version</source>
-      <translation>Выбранная версия</translation>
-    </message>
-    <message>
-      <source>Download Update File</source>
-      <translation>Загрузить файл обновления</translation>
-    </message>
-    <message>
-      <source>Browse for Update File...</source>
-      <translation>Найти файл обновления...</translation>
-    </message>
-    <message>
-      <source>Selected Update File</source>
-      <translation>Выбранный файл обновления</translation>
-    </message>
-    <message>
-      <source>Download in External Browser</source>
-      <translation>Скачать во внешнем браузере</translation>
-    </message>
-    <message>
-      <source>Copy Link to Clipboard</source>
-      <translation>Копировать ссылку в буфер обмена</translation>
-    </message>
-    <message>
-      <source>Unable to check updates on the Internet.</source>
-      <translation>Не удаётся проверить обновления в Интернете.</translation>
-    </message>
-    <message>
-      <source>Unknown build number.</source>
-      <translation>Неизвестный номер сборки.</translation>
-    </message>
-    <message>
-      <source>Downgrade to an earlier version is prohibited.</source>
-      <translation>Обновление до более ранней версии не поддерживается.</translation>
-    </message>
-    <message>
-      <source>Updates for one or more servers were not found.</source>
-      <translation>Обновления для одного или нескольких серверов не найдены.</translation>
-    </message>
-    <message>
-      <source>Client update was not found.</source>
-      <translation>Обновление клиента не найдено.</translation>
-    </message>
-    <message>
-      <source>Unable to extract update file. No free space left on the disk.</source>
-      <translation>Не удалось извлечь файл обновления. Нет свободного места на диске.</translation>
-    </message>
-    <message>
-      <source>Update Finished...</source>
-      <translation>Обновление завершено...</translation>
-    </message>
-    <message>
-      <source>Checking for updates...</source>
-      <translation>Проверка обновлений...</translation>
-    </message>
-    <message>
-      <source>Downloading updates...</source>
-      <translation>Загрузка обновлений...</translation>
-    </message>
-    <message>
-      <source>Installing client update...</source>
-      <translation>Установка обновления клиента...</translation>
-    </message>
-    <message>
-      <source>Installing updates to incompatible servers...</source>
-      <translation>Установка обновлений на несовместимые серверы...</translation>
-    </message>
-    <message>
-      <source>Pushing updates to servers...</source>
-      <translation>Отправка обновлений на сервера...</translation>
-    </message>
-    <message>
-      <source>Installing updates...</source>
-      <translation>Установка обновлений...</translation>
-    </message>
-    <message>
-      <source>Specific Build...</source>
-      <translation>Указать номер сборки...</translation>
-    </message>
-    <message>
-      <source>Update to Specific Build</source>
-      <translation>Обновить до указанной сборки</translation>
-    </message>
-    <message>
-      <source>Update System</source>
-      <translation>Обновить систему</translation>
-    </message>
-    <message>
-      <source>System update in process</source>
-      <translation>Выполняется обновление системы</translation>
-    </message>
-    <message>
-      <source>Cancel Update</source>
-      <translation>Отменить обновление</translation>
-    </message>
-    <message>
-      <source>Continue in Background</source>
-      <translation>Продолжить в фоновом режиме</translation>
-    </message>
-    <message numerus="yes">
-      <source>Not enough free space at %n Servers:</source>
-      <translation>
-        <numerusform>Not enough free space at %n Server:</numerusform>
-        <numerusform>Недостаточно свободного места на %n серверах:</numerusform>
-        <numerusform>Недостаточно свободного места на %n серверах:</numerusform>
-        <numerusform>Not enough free space at %n Server:</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Attempt to update may fail or cause Server malfunction.</source>
-      <translation>Попытка обновления может оказаться неудачной или привести к некорректной работе сервера.</translation>
-    </message>
-    <message>
-      <source>Force Update</source>
-      <translation>Все равно обновить</translation>
-    </message>
-    <message>
-      <source>Server update completed</source>
-      <translation>Обновление сервера завершено</translation>
-    </message>
-    <message>
-      <source>Update completed</source>
-      <translation>Обновление завершено</translation>
-    </message>
-    <message>
-      <source>Update canceled</source>
-      <translation>Обновление приостановлено</translation>
-    </message>
-    <message>
-      <source>All Servers already updated</source>
-      <translation>Все сервера уже обновлены</translation>
-    </message>
-    <message>
-      <source>Update failed</source>
-      <translation>Обновление не удалось</translation>
-    </message>
-    <message>
-      <source>Please update %1 manually using an installation package.</source>
-      <translation>Обновите %1 вручную, используя инсталлятор.</translation>
-    </message>
-    <message>
-      <source>%1 will be restarted to the updated version.</source>
-      <translation>%1 будет перезапущен на обновленную версию.</translation>
-    </message>
-    <message>
-      <source>Update cannot be canceled at this stage</source>
-      <translation>Невозможно отменить обновление на этом этапе</translation>
-    </message>
-    <message>
-      <source>Please wait until it is finished.</source>
-      <translation>Пожалуйста, дождитесь завершения.</translation>
-    </message>
-    <message>
-      <source>All components in your System are up to date.</source>
-      <translation>Ваша система состоит из компонентов новейшей версии.</translation>
-    </message>
-    <message>
-      <source>All components in your System are up to this version.</source>
-      <translation>Все компоненты в вашей системе обновлены до этой версии.</translation>
-    </message>
-    <message>
-      <source>Incompatible %1 instance. To update disconnect System from %1 first.</source>
-      <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation>Несовместимый компонент %1. Для обновления сначала отключите систему от %1.</translation>
-    </message>
-    <message>
-      <source>Update Files</source>
-      <translation>Файлы обновлений</translation>
-    </message>
-    <message>
-      <source>Validating the update...</source>
-      <translation>Проверка обновления...</translation>
-    </message>
-    <message>
-      <source>Checking for free space...</source>
-      <translation>Проверка свободного места...</translation>
-    </message>
-  </context>
-  <context>
     <name>QnSessionAwareTabbedDialog</name>
     <message>
       <source>Unsaved changes:</source>
@@ -6177,10 +5958,6 @@ to %1</source>
       <translation>Выполняется синхронизация удаленного архива</translation>
     </message>
     <message>
-      <source>Error occured during remote archive synchronization</source>
-      <translation>Ошибка при синхронизации удаленного архива</translation>
-    </message>
-    <message>
       <source>Remote archive synchronization has been started for the following device:</source>
       <translation>Синхронизация удаленного архива была запущена для следующего устройства:</translation>
     </message>
@@ -6230,17 +6007,13 @@ to %1</source>
       <source>The System is running in safe mode.</source>
       <translation type="unfinished">The System is running in safe mode.</translation>
     </message>
+    <message>
+      <source>Error occurred during remote archive synchronization</source>
+      <translation type="unfinished">Error occurred during remote archive synchronization</translation>
+    </message>
   </context>
   <context>
     <name>QnSystemSettingsWidget</name>
-    <message>
-      <source>Enable devices and servers auto discovery</source>
-      <translation>Включить автообнаружение устройств и серверов</translation>
-    </message>
-    <message>
-      <source>Enable cameras and servers auto discovery</source>
-      <translation>Включить автообнаружение камер и серверов</translation>
-    </message>
     <message>
       <source>Allow System to optimize device settings</source>
       <translation>Разрешить системе оптимизировать настройки устройств</translation>
@@ -6256,6 +6029,22 @@ to %1</source>
     <message>
       <source>Does not include any personal information and is completely anonymous.</source>
       <translation>Не содержит никакой личной информации и является полностью анонимным.</translation>
+    </message>
+    <message>
+      <source>Failover server measures may still request camera status updates regardless of this setting.</source>
+      <translation type="unfinished">Failover server measures may still request camera status updates regardless of this setting.</translation>
+    </message>
+    <message>
+      <source>Enable devices and servers autodiscovery and automated device status check</source>
+      <translation type="unfinished">Enable devices and servers autodiscovery and automated device status check</translation>
+    </message>
+    <message>
+      <source>Enable cameras and servers autodiscovery and automated camera status check</source>
+      <translation type="unfinished">Enable cameras and servers autodiscovery and automated camera status check</translation>
+    </message>
+    <message>
+      <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
+      <translation type="unfinished">When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</translation>
     </message>
   </context>
   <context>
@@ -6339,94 +6128,6 @@ to %1</source>
     <message>
       <source>Hold to Speak</source>
       <translation>Нажмите и говорите</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnUpdateResult</name>
-    <message>
-      <source>Update has been successfully finished.</source>
-      <translation>Обновление успешно завершено.</translation>
-    </message>
-    <message>
-      <source>Update has been cancelled.</source>
-      <translation>Обновление было отменено.</translation>
-    </message>
-    <message>
-      <source>Another user has already started an update.</source>
-      <translation>Кто-то уже запустил процесс обновления.</translation>
-    </message>
-    <message>
-      <source>All servers are already updated.</source>
-      <translation>Все сервера уже обновлены.</translation>
-    </message>
-    <message>
-      <source>Could not download updates.</source>
-      <translation>Не удаётся скачать обновления.</translation>
-    </message>
-    <message>
-      <source>No free space left on the disk.</source>
-      <translation>Не достаточно свободного места на диске.</translation>
-    </message>
-    <message>
-      <source>Could not push updates to servers.</source>
-      <translation>Не возможно переместить обновления на сервера.</translation>
-    </message>
-    <message numerus="yes">
-      <source>The problem is caused by %n servers:</source>
-      <translation type="unfinished">
-        <numerusform>The problem is caused by %n server:</numerusform>
-        <numerusform>Проблема вызвана %n серверами:</numerusform>
-        <numerusform>Проблема вызвана %n серверами:</numerusform>
-        <numerusform>The problem is caused by %n server:</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>No free space left on %n servers:</source>
-      <translation type="unfinished">
-        <numerusform>No free space left on %n server:</numerusform>
-        <numerusform>Не осталось места на жестких дисках %n серверов:</numerusform>
-        <numerusform>Не осталось места на жестких дисках %n серверов:</numerusform>
-        <numerusform>No free space left on %n server:</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n servers are not responding:</source>
-      <translation type="unfinished">
-        <numerusform>%n server is not responding:</numerusform>
-        <numerusform>%n сервера не отвечает:</numerusform>
-        <numerusform>%n серверов не отвечает:</numerusform>
-        <numerusform>%n server is not responding:</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n servers have gone offline:</source>
-      <translation type="unfinished">
-        <numerusform>%n server has gone offline:</numerusform>
-        <numerusform>%n сервера вышло из сети:</numerusform>
-        <numerusform>%n серверов вышло из сети:</numerusform>
-        <numerusform>%n server has gone offline:</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Authentication failed for %n servers:</source>
-      <translation type="unfinished">
-        <numerusform>Authentication failed for %n server:</numerusform>
-        <numerusform>Ошибка аутентификации на %n серверах:</numerusform>
-        <numerusform>Ошибка аутентификации на %n серверах:</numerusform>
-        <numerusform>Authentication failed for %n server:</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Could not install an update to the client.</source>
-      <translation>Не получается установить обновления на клиент.</translation>
-    </message>
-    <message>
-      <source>Could not install updates on one or more servers.</source>
-      <translation>Не получается установить обновления на один или более серверов.</translation>
-    </message>
-    <message>
-      <source>Update has been cancelled silently.</source>
-      <translation type="unfinished">Update has been cancelled silently.</translation>
     </message>
   </context>
   <context>
@@ -6886,25 +6587,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnWorkbenchContext</name>
-    <message>
-      <source>Please review and agree to the %1 in order to proceed</source>
-      <translation type="unfinished">Please review and agree to the %1 in order to proceed</translation>
-    </message>
-    <message>
-      <source>To use the software you must agree with the end user license agreement</source>
-      <translation type="unfinished">To use the software you must agree with the end user license agreement</translation>
-    </message>
-    <message>
-      <source>I Agree</source>
-      <translation type="unfinished">I Agree</translation>
-    </message>
-    <message>
-      <source>I Do Not Agree</source>
-      <translation type="unfinished">I Do Not Agree</translation>
-    </message>
-  </context>
-  <context>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
     <message>
       <source>Systems will be merged shortly</source>
@@ -6913,10 +6595,6 @@ to %1</source>
     <message>
       <source>Servers from the other System will appear in the resource tree.</source>
       <translation>Серверы с другой системы будут отображаться в дереве ресурсов.</translation>
-    </message>
-    <message>
-      <source>Failed to update Server</source>
-      <translation>Не удалось обновить сервер</translation>
     </message>
     <message>
       <source>Total amount of licenses will decrease</source>
@@ -7093,29 +6771,6 @@ to %1</source>
     <message>
       <source>JPEG Image</source>
       <translation type="unfinished">JPEG Image</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnWorkbenchUpdateWatcher</name>
-    <message>
-      <source>Release Notes</source>
-      <translation>Заметки к релизу</translation>
-    </message>
-    <message>
-      <source>%1 version available</source>
-      <translation>Доступна версия %1</translation>
-    </message>
-    <message>
-      <source>Major issues have been fixed. Update is strongly recommended.</source>
-      <translation>Обновление рекомендуется у установке. Были исправлены критические ошибки.</translation>
-    </message>
-    <message>
-      <source>Update...</source>
-      <translation>Обновление...</translation>
-    </message>
-    <message>
-      <source>Do not notify again about this update</source>
-      <translation>Не уведомлять больше об этом обновлении</translation>
     </message>
   </context>
   <context>
@@ -7642,6 +7297,17 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>SessionExpiredDialog</name>
+    <message>
+      <source>Your session has expired</source>
+      <translation type="unfinished">Your session has expired</translation>
+    </message>
+    <message>
+      <source>Session duration limit can be changed by the system administrators</source>
+      <translation type="unfinished">Session duration limit can be changed by the system administrators</translation>
+    </message>
+  </context>
+  <context>
     <name>StreamQualityStrings</name>
     <message>
       <source>Lowest</source>
@@ -7665,41 +7331,41 @@ to %1</source>
     </message>
     <message>
       <source>Preset</source>
-      <translation type="unfinished">Preset</translation>
+      <translation>Предустановленное</translation>
     </message>
     <message>
       <source>Undefined</source>
-      <translation type="unfinished">Undefined</translation>
+      <translation>Неопределено</translation>
     </message>
     <message>
       <source>Lst</source>
       <extracomment>Short for &apos;Lowest&apos;</extracomment>
-      <translation type="unfinished">Lst</translation>
+      <translation>Наих</translation>
     </message>
     <message>
       <source>Lo</source>
       <extracomment>Short for &apos;Low&apos;</extracomment>
-      <translation type="unfinished">Lo</translation>
+      <translation>Низк</translation>
     </message>
     <message>
       <source>Me</source>
       <extracomment>Short for &apos;Medium&apos;</extracomment>
-      <translation type="unfinished">Me</translation>
+      <translation>Средн</translation>
     </message>
     <message>
       <source>Hi</source>
       <extracomment>Short for &apos;High&apos;</extracomment>
-      <translation type="unfinished">Hi</translation>
+      <translation>Выс</translation>
     </message>
     <message>
       <source>Bst</source>
       <extracomment>Short for &apos;Best&apos;</extracomment>
-      <translation type="unfinished">Bst</translation>
+      <translation>Лучш</translation>
     </message>
     <message>
       <source>Ps</source>
       <extracomment>Short for &apos;Preset&apos;</extracomment>
-      <translation type="unfinished">Ps</translation>
+      <translation>Пред</translation>
     </message>
   </context>
   <context>
@@ -7846,6 +7512,14 @@ to %1</source>
     <message>
       <source>Show Only with &quot;Objects&quot; Tab</source>
       <translation type="unfinished">Show Only with &quot;Objects&quot; Tab</translation>
+    </message>
+    <message>
+      <source>Show</source>
+      <translation>Показать</translation>
+    </message>
+    <message>
+      <source>Do Not Show</source>
+      <translation type="unfinished">Do Not Show</translation>
     </message>
   </context>
   <context>
@@ -8001,10 +7675,6 @@ to %1</source>
       <translation>Оригинальное</translation>
     </message>
     <message>
-      <source>Server will not change any cameras settings, it will receive and use camera stream as-is. </source>
-      <translation type="unfinished">Server will not change any cameras settings, it will receive and use camera stream as-is. </translation>
-    </message>
-    <message>
       <source>Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</source>
       <translation>Помогает устранить проблемы с качеством изображения на некоторых камерах; для других это приведет к значительному увеличению битрейта.</translation>
     </message>
@@ -8024,27 +7694,35 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>This ID is already used on the following %n cameras:</source>
-      <translation type="unfinished">
-        <numerusform>This ID is already used on the following %n cameras:</numerusform>
-        <numerusform>This ID is already used on the following %n cameras:</numerusform>
-        <numerusform>This ID is already used on the following %n cameras:</numerusform>
-        <numerusform>This ID is already used on the following %n cameras:</numerusform>
+      <translation>
+        <numerusform>Этот идентификатор уже используется для следующих %n камер:</numerusform>
+        <numerusform>Этот идентификатор уже используется для следующих %n камер:</numerusform>
+        <numerusform>Этот идентификатор уже используется для следующих %n камер:</numerusform>
+        <numerusform>Этот идентификатор уже используется для следующих %n камер:</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>UDP Multicast</source>
+      <translation type="unfinished">UDP Multicast</translation>
+    </message>
+    <message>
+      <source>Server will not change any cameras settings, it will receive and use camera stream as-is.</source>
+      <translation>Сервер не будет изменять настройки камер, он будет получать и использовать поток с камеры как есть.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraInfoWidget</name>
     <message>
       <source>Device Rules</source>
-      <translation type="unfinished">Device Rules</translation>
+      <translation>Правила для устройства</translation>
     </message>
     <message>
       <source>Camera Rules</source>
-      <translation type="unfinished">Camera Rules</translation>
+      <translation>Правила для камеры</translation>
     </message>
     <message>
       <source>I/O Module Rules</source>
-      <translation type="unfinished">I/O Module Rules</translation>
+      <translation>Правила для модуля ввода-вывода</translation>
     </message>
     <message>
       <source>More Info</source>
@@ -8161,11 +7839,11 @@ to %1</source>
     </message>
     <message>
       <source>Motion</source>
-      <translation type="unfinished">Motion</translation>
+      <translation>Движение</translation>
     </message>
     <message>
       <source>Fisheye</source>
-      <translation type="unfinished">Fisheye</translation>
+      <translation>Рыбий глаз</translation>
     </message>
     <message>
       <source>Advanced</source>
@@ -8181,7 +7859,7 @@ to %1</source>
     </message>
     <message>
       <source>Expert</source>
-      <translation type="unfinished">Expert</translation>
+      <translation>Экспертные</translation>
     </message>
     <message numerus="yes">
       <source>Changes to the following %n devices are not saved:</source>
@@ -8311,16 +7989,16 @@ to %1</source>
       <translation type="unfinished">Broken update package.</translation>
     </message>
     <message>
-      <source>Not enough space on disk to install client update.</source>
-      <translation type="unfinished">Not enough space on disk to install client update.</translation>
-    </message>
-    <message>
-      <source>Install package has been lost.</source>
-      <translation type="unfinished">Install package has been lost.</translation>
-    </message>
-    <message>
       <source>Internal error.</source>
       <translation>Внутренняя ошибка.</translation>
+    </message>
+    <message>
+      <source>Not enough space on disk to install the client update.</source>
+      <translation type="unfinished">Not enough space on disk to install the client update.</translation>
+    </message>
+    <message>
+      <source>Installation package has been lost.</source>
+      <translation type="unfinished">Installation package has been lost.</translation>
     </message>
   </context>
   <context>
@@ -8352,6 +8030,17 @@ to %1</source>
       <source>Pasted</source>
       <comment>from Clipboard</comment>
       <translation>Вставлено</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ConnectToCurrentSystemTool</name>
+    <message>
+      <source>Configuring Server</source>
+      <translation>Настройка сервера</translation>
+    </message>
+    <message>
+      <source>Updating Server</source>
+      <translation>Обновление сервера</translation>
     </message>
   </context>
   <context>
@@ -8410,7 +8099,7 @@ to %1</source>
     </message>
     <message>
       <source>Scan</source>
-      <translation type="unfinished">Scan</translation>
+      <translation>Сканировать</translation>
     </message>
     <message>
       <source>Search</source>
@@ -8430,7 +8119,7 @@ to %1</source>
     </message>
     <message>
       <source>Finished</source>
-      <translation type="unfinished">Finished</translation>
+      <translation>Завершено</translation>
     </message>
     <message>
       <source>Aborted</source>
@@ -8476,6 +8165,17 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::EulaDialog</name>
+    <message>
+      <source>Please review and agree to the %1 in order to proceed</source>
+      <translation type="unfinished">Please review and agree to the %1 in order to proceed</translation>
+    </message>
+    <message>
+      <source>To use the software you must agree with the end user license agreement</source>
+      <translation type="unfinished">To use the software you must agree with the end user license agreement</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::EventPanel::Private</name>
     <message>
       <source>Notifications</source>
@@ -8485,7 +8185,7 @@ to %1</source>
     <message>
       <source>Motion</source>
       <comment>Motion tab title</comment>
-      <translation type="unfinished">Motion</translation>
+      <translation>Движение</translation>
     </message>
     <message>
       <source>Bookmarks</source>
@@ -8495,7 +8195,7 @@ to %1</source>
     <message>
       <source>Events</source>
       <comment>Events tab title</comment>
-      <translation type="unfinished">Events</translation>
+      <translation>События</translation>
     </message>
     <message>
       <source>Objects</source>
@@ -8545,10 +8245,6 @@ to %1</source>
       <source>No events</source>
       <translation>Нет событий</translation>
     </message>
-    <message>
-      <source>No events occured</source>
-      <translation type="unfinished">No events occured</translation>
-    </message>
     <message numerus="yes">
       <source>%n events</source>
       <translation type="unfinished">
@@ -8561,6 +8257,10 @@ to %1</source>
     <message>
       <source>unnamed analytics engine</source>
       <translation type="unfinished">unnamed analytics engine</translation>
+    </message>
+    <message>
+      <source>No events occurred</source>
+      <translation type="unfinished">No events occurred</translation>
     </message>
   </context>
   <context>
@@ -8788,7 +8488,7 @@ to %1</source>
     <name>nx::vms::client::desktop::FoundDevicesModel</name>
     <message>
       <source>Brand</source>
-      <translation type="unfinished">Brand</translation>
+      <translation>Брэнд</translation>
     </message>
     <message>
       <source>Model</source>
@@ -8960,7 +8660,7 @@ to %1</source>
     <name>nx::vms::client::desktop::MotionSearchListModel::Private</name>
     <message>
       <source>Motion</source>
-      <translation type="unfinished">Motion</translation>
+      <translation>Движение</translation>
     </message>
     <message>
       <source>deleted camera</source>
@@ -9067,26 +8767,6 @@ to %1</source>
       <translation type="unfinished">Some servers are offline and will not be updated. Skip them?</translation>
     </message>
     <message>
-      <source>Ready to install client updates</source>
-      <translation type="unfinished">Ready to install client updates</translation>
-    </message>
-    <message>
-      <source>Install now</source>
-      <translation type="unfinished">Install now</translation>
-    </message>
-    <message>
-      <source>Later</source>
-      <translation type="unfinished">Later</translation>
-    </message>
-    <message>
-      <source>Updates downloaded</source>
-      <translation type="unfinished">Updates downloaded</translation>
-    </message>
-    <message>
-      <source>Failed to download update packages</source>
-      <translation>Не удалось загрузить пакеты обновления</translation>
-    </message>
-    <message>
       <source>Please make sure there is enough free storage space and network connection is stable.</source>
       <translation>Убедитесь, что у них достаточно свободного места для хранения и стабильное сетевое подключение.</translation>
     </message>
@@ -9101,10 +8781,6 @@ to %1</source>
     <message>
       <source>Cancel Update</source>
       <translation>Отменить обновление</translation>
-    </message>
-    <message>
-      <source>Failed to download update packages to some servers</source>
-      <translation>Не удалось загрузить пакеты обновления на некоторые серверы</translation>
     </message>
     <message>
       <source>Please make sure they have enough free storage space and stable network connection.</source>
@@ -9255,6 +8931,18 @@ to %1</source>
       <source>There are no online servers to update.</source>
       <translation type="unfinished">There are no online servers to update.</translation>
     </message>
+    <message>
+      <source>Some servers haven&apos;t completed update process. Finish it anyway?</source>
+      <translation type="unfinished">Some servers haven&apos;t completed update process. Finish it anyway?</translation>
+    </message>
+    <message>
+      <source>Cancel update and delete all downloaded data?</source>
+      <translation type="unfinished">Cancel update and delete all downloaded data?</translation>
+    </message>
+    <message>
+      <source>Failed to download update packages to some components</source>
+      <translation type="unfinished">Failed to download update packages to some components</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::MultipleLayoutSelectionDialog</name>
@@ -9282,6 +8970,26 @@ to %1</source>
       <source>Acknowledge</source>
       <translation>Подтвердить</translation>
     </message>
+    <message>
+      <source>Generic Event</source>
+      <translation>Произвольное событие</translation>
+    </message>
+    <message>
+      <source>Unknown Plugin Event</source>
+      <translation type="unfinished">Unknown Plugin Event</translation>
+    </message>
+    <message>
+      <source>Device was disconnected</source>
+      <translation type="unfinished">Device was disconnected</translation>
+    </message>
+    <message>
+      <source>Camera was disconnected</source>
+      <translation type="unfinished">Camera was disconnected</translation>
+    </message>
+    <message>
+      <source>I/O Module was disconnected</source>
+      <translation type="unfinished">I/O Module was disconnected</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::NotificationListWidget::Private</name>
@@ -9301,16 +9009,12 @@ to %1</source>
       <translation>Ни один из выбранных пользователей не имеет доступа к выбранной раскладке. Действие не будет работать.</translation>
     </message>
     <message>
-      <source>Local layouts can only be shown to their owners. </source>
-      <translation>Локальные раскладки могут отображаться только их владельцам. </translation>
-    </message>
-    <message>
       <source>Select layout...</source>
       <translation>Выберите раскладку...</translation>
     </message>
     <message>
       <source>Select some single user in &quot;Show to&quot; line to display his local layouts in this list</source>
-      <translation type="unfinished">Select some single user in &quot;Show to&quot; line to display his local layouts in this list</translation>
+      <translation>Выберите одного пользователя в строке &quot;Показать&quot; чтобы отобразить его локальные раскладки в этом списке</translation>
     </message>
     <message>
       <source>Local layouts can only be shown to their owners.</source>
@@ -9319,6 +9023,45 @@ to %1</source>
     <message>
       <source>None of selected user roles contain users. Action will not work.</source>
       <translation type="unfinished">None of selected user roles contain users. Action will not work.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::PeerStateTracker</name>
+    <message>
+      <source>The server is taking too long to respond</source>
+      <translation type="unfinished">The server is taking too long to respond</translation>
+    </message>
+    <message>
+      <source>No update task</source>
+      <translation type="unfinished">No update task</translation>
+    </message>
+    <message>
+      <source>Ready to download update</source>
+      <translation type="unfinished">Ready to download update</translation>
+    </message>
+    <message>
+      <source>Downloading update</source>
+      <translation type="unfinished">Downloading update</translation>
+    </message>
+    <message>
+      <source>Ready to restart to the new version</source>
+      <translation type="unfinished">Ready to restart to the new version</translation>
+    </message>
+    <message>
+      <source>Installing update</source>
+      <translation type="unfinished">Installing update</translation>
+    </message>
+    <message>
+      <source>Installed</source>
+      <translation type="unfinished">Installed</translation>
+    </message>
+    <message>
+      <source>Failed to download update</source>
+      <translation type="unfinished">Failed to download update</translation>
+    </message>
+    <message>
+      <source>Failed to install update</source>
+      <translation type="unfinished">Failed to install update</translation>
     </message>
   </context>
   <context>
@@ -9465,16 +9208,16 @@ to %1</source>
       <translation>Отслеживает и регистрирует все действия пользователя.</translation>
     </message>
     <message>
-      <source>User will be automatically logged out after this period of time.</source>
-      <translation type="unfinished">User will be automatically logged out after this period of time.</translation>
-    </message>
-    <message>
       <source>minutes</source>
       <translation>минуты</translation>
     </message>
     <message>
       <source>hours</source>
       <translation>часа</translation>
+    </message>
+    <message>
+      <source>Users will be automatically logged out if their session exceeds the specified duration.</source>
+      <translation type="unfinished">Users will be automatically logged out if their session exceeds the specified duration.</translation>
     </message>
   </context>
   <context>
@@ -9495,13 +9238,13 @@ to %1</source>
       <source>Downloaded</source>
       <translation type="unfinished">Downloaded</translation>
     </message>
+    <message>
+      <source>Waiting for server to respond...</source>
+      <translation type="unfinished">Waiting for server to respond...</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerUpdatesModel</name>
-    <message>
-      <source>Current Version</source>
-      <translation>Текущая версия</translation>
-    </message>
     <message>
       <source>Status</source>
       <translation>Статус</translation>
@@ -9522,12 +9265,16 @@ to %1</source>
       <source>Component</source>
       <translation type="unfinished">Component</translation>
     </message>
+    <message>
+      <source>Installed Version</source>
+      <translation type="unfinished">Installed Version</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::SimpleMotionSearchListModel</name>
     <message>
       <source>Motion</source>
-      <translation type="unfinished">Motion</translation>
+      <translation>Движение</translation>
     </message>
     <message>
       <source>Bookmark it...</source>
@@ -9830,12 +9577,62 @@ to %1</source>
       <source>Starting export...</source>
       <translation type="unfinished">Starting export...</translation>
     </message>
+    <message>
+      <source>Saving layout</source>
+      <translation type="unfinished">Saving layout</translation>
+    </message>
+    <message>
+      <source>Stop Saving</source>
+      <translation type="unfinished">Stop Saving</translation>
+    </message>
+    <message>
+      <source>Saving failed</source>
+      <translation type="unfinished">Saving failed</translation>
+    </message>
+    <message>
+      <source>Starting saving...</source>
+      <translation type="unfinished">Starting saving...</translation>
+    </message>
+    <message>
+      <source>We are preparing files for the export process. Please wait for a few seconds.</source>
+      <translation type="unfinished">We are preparing files for the export process. Please wait for a few seconds.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::WorkbenchUpdateWatcher</name>
+    <message>
+      <source>%1 version available</source>
+      <translation>Доступна версия %1</translation>
+    </message>
+    <message>
+      <source>Release Notes</source>
+      <translation>Заметки к релизу</translation>
+    </message>
+    <message>
+      <source>Major issues have been fixed. Update is strongly recommended.</source>
+      <translation>Обновление рекомендуется у установке. Были исправлены критические ошибки.</translation>
+    </message>
+    <message>
+      <source>Update...</source>
+      <translation>Обновление...</translation>
+    </message>
+    <message>
+      <source>Do not notify again about this update</source>
+      <translation>Не уведомлять больше об этом обновлении</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::detail::BaseInputField</name>
     <message>
       <source>multiple values</source>
       <translation>несколько значений</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::integrations::entropix::ReconstructResolutionIntegration</name>
+    <message>
+      <source>Reconstruct Resolution</source>
+      <translation type="unfinished">Reconstruct Resolution</translation>
     </message>
   </context>
   <context>

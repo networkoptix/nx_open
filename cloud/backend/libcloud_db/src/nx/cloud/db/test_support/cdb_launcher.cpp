@@ -947,7 +947,7 @@ api::ResultCode CdbLauncher::getTransactionLog(
     const std::string& accountEmail,
     const std::string& accountPassword,
     const std::string& systemId,
-    ::ec2::ApiTransactionDataList* const transactions)
+    nx::clusterdb::engine::CommandDataList* const transactions)
 {
     const auto requestUrl = nx::network::url::Builder()
         .setScheme(nx::network::http::kUrlSchemeName).setEndpoint(endpoint())
@@ -969,7 +969,7 @@ api::ResultCode CdbLauncher::getTransactionLog(
     while (!httpClient.eof())
         msgBody += httpClient.fetchMessageBodyBuffer();
 
-    *transactions = QJson::deserialized<::ec2::ApiTransactionDataList>(msgBody);
+    *transactions = QJson::deserialized<nx::clusterdb::engine::CommandDataList>(msgBody);
 
     return api::ResultCode::ok;
 }

@@ -121,6 +121,7 @@ NX_DEFINE_RESPONSE_TRAITS(DeviceIO, GetDigitalInputs)
 NX_DEFINE_RESPONSE_TRAITS_IRREGULAR(DeviceIO, GetRelayOutputs, _onvifDevice__GetRelayOutputs, _onvifDevice__GetRelayOutputsResponse)
 NX_DEFINE_RESPONSE_TRAITS(DeviceIO, SetRelayOutputSettings)
 
+NX_DEFINE_RESPONSE_TRAITS(Media, GetVideoEncoderConfiguration)
 NX_DEFINE_RESPONSE_TRAITS(Media, GetVideoEncoderConfigurations)
 NX_DEFINE_RESPONSE_TRAITS(Media, GetVideoEncoderConfigurationOptions)
 NX_DEFINE_RESPONSE_TRAITS(Media, SetVideoEncoderConfiguration)
@@ -503,6 +504,12 @@ int MediaSoapWrapper::setVideoSourceConfiguration(SetVideoSrcConfigReq& request,
 {
     beforeMethodInvocation<SetVideoSrcConfigReq>();
     return m_bindingProxy.SetVideoSourceConfiguration(m_endpoint, NULL, &request, response);
+}
+
+int MediaSoapWrapper::getAudioEncoderConfiguration(AudioConfigReq& request, AudioConfigResp& response)
+{
+    beforeMethodInvocation<AudioConfigReq>();
+    return m_bindingProxy.GetAudioEncoderConfiguration(m_endpoint, NULL, &request, response);
 }
 
 int MediaSoapWrapper::getAudioEncoderConfigurations(AudioConfigsReq& request, AudioConfigsResp& response)

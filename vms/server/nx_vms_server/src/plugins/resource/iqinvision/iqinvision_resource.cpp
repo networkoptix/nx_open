@@ -45,7 +45,8 @@ CameraDiagnostics::Result QnPlIqResource::initializeCameraDriver()
         default:
             return CameraDiagnostics::UnknownErrorResult();
     }
-
+    if (isRtp())
+        setCameraCapability(Qn::CameraTimeCapability, true);
     saveProperties();
 
     return CameraDiagnostics::NoErrorResult();

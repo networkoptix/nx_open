@@ -13,6 +13,12 @@ ServerAlivenessTester::ServerAlivenessTester(
 {
 }
 
+ServerAlivenessTester::~ServerAlivenessTester()
+{
+    if (isInSelfAioThread())
+        cancelProbe();
+}
+
 void ServerAlivenessTester::probe(ProbeResultHandler handler)
 {
     nx::network::stun::Message probe(
@@ -33,7 +39,7 @@ void ServerAlivenessTester::probe(ProbeResultHandler handler)
 
 void ServerAlivenessTester::cancelProbe()
 {
-    m_client->cancelHandlers(this, []() {});
+    m_client->cancelHandlersSync(this);
 }
 
 void ServerAlivenessTester::processResponse(

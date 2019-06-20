@@ -6,7 +6,8 @@
 
 class QnCommonModule;
 struct QnAuthSession;
-struct QnJsonRestResult;
+namespace nx::network::rest { struct JsonResult; }
+using QnJsonRestResult = nx::network::rest::JsonResult;
 struct SetupLocalSystemData;
 
 namespace nx {

@@ -10,6 +10,8 @@
 #include <QtGui/QFontMetrics>
 #include <QtGui/QGuiApplication>
 
+#include <nx/utils/log/assert.h>
+
 #include "hashed_font.h"
 #include <utils/common/hash.h>
 

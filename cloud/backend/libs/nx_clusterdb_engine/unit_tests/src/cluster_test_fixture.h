@@ -2,6 +2,7 @@
 
 #include <atomic>
 #include <memory>
+#include <vector>
 
 #include <gtest/gtest.h>
 
@@ -27,8 +28,16 @@ public:
     nx::utils::Url baseApiUrl() const;
 
     void connectTo(const Peer& other);
+    bool isConnectedTo(const Peer& other) const;
+    void disconnectFrom(const Peer& other);
+
     Customer addRandomData();
+    
+    void addRandomDataAsync(
+        nx::utils::MoveOnlyFunc<void(ResultCode, Customer)> completionHandler);
+    
     bool hasData(const std::vector<Customer>& data);
+    
     Customer modifyRandomly(const Customer& data);
 
     void setOutgoingCommandFilter(const OutgoingCommandFilterConfiguration& filter);
@@ -48,9 +57,14 @@ class ClusterTestFixture:
 public:
     ClusterTestFixture();
 
+    /**
+     * Propagated to every peer to select connector type to use.
+     */
+    void setConnectorTypeKey(const std::string& key);
+
     std::string clusterId() const;
 
-    void addPeer(bool startAndWaitUntilStarted = true);
+    Peer& addPeer(std::vector<std::pair<const char*, const char*>> args = {});
     Peer& peer(int index);
     const Peer& peer(int index) const;
     int peerCount() const;
@@ -59,6 +73,7 @@ public:
     bool peersAreSynchronized(std::vector<int> ids) const;
 
 private:
+    std::string m_connectorTypeKey;
     const std::string m_clusterId;
     std::vector<std::unique_ptr<Peer>> m_peers;
     std::atomic<int> m_peerCounter{0};

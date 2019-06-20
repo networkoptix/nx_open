@@ -55,21 +55,10 @@ void QnEventLogMultiserverRequestData::loadFromParams(
         : kNoLimit;
 }
 
-void QnEventLogMultiserverRequestData::loadFromParams(
-    QnResourcePool* resourcePool,
-    const QnRequestParams& params)
-{
-    QnRequestParamList paramList;
-    for (auto iter = params.cbegin(); iter != params.cend(); ++iter)
-        paramList.insert(iter.key(), iter.value());
-
-    loadFromParams(resourcePool, paramList);
-}
-
 QnRequestParamList QnEventLogMultiserverRequestData::toParams() const
 {
     QnRequestParamList result = QnMultiserverRequestData::toParams();
-    result.insert(filter.toParams());
+    result.unite(filter.toParams());
 
     if (order != kDefaultOrder)
         result.insert(kSortOrderParam, QnLexical::serialized(order));

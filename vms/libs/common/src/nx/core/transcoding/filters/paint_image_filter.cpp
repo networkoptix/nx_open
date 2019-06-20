@@ -20,7 +20,6 @@ PaintImageFilter::~PaintImageFilter()
 
 CLVideoDecoderOutputPtr PaintImageFilter::updateImage(const CLVideoDecoderOutputPtr& frame)
 {
-    m_painter->updateSourceSize(QSize(frame->width, frame->height)); //< Does nothing if no size change.
     return m_painter->drawTo(frame);
 }
 

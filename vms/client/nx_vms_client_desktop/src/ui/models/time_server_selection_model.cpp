@@ -156,7 +156,7 @@ void QnTimeServerSelectionModel::updateTimeOffset()
             for (const auto& record: data.data)
             {
                 // Store received value to use it later.
-                const auto offset = record.timeSinceEpochMs - syncTime;
+                const auto offset = record.osTime.count() - syncTime;
                 m_serverOffsetCache[record.serverId] = offset;
 
                 // Check if the server is already online.

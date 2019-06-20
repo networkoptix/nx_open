@@ -43,14 +43,14 @@
         "confirmDisconnectFromCloudAction": "Desconectar",
         "disconnectedFromCloudSuccess": "Sistema fue desconectado de {{CLOUD_NAME}} con éxito",
         "disconnectedFromCloudError": "No se puede desconectar el Sistema",
-        "confirmDisconnectFromSystem": "Separar servidor del sistema actual",
+        "confirmDisconnectFromSystem": "Detach server from current System",
         "confirmDisconnectFromSystemAction": "Separar",
-        "disconnectedFromSystemSuccess": "El servidor fue separado del sistema con éxito",
-        "disconnectedFromSystemError": "No se puede desconectar el servidor",
+        "disconnectedFromSystemSuccess": "Server was detached from the System successfully",
+        "disconnectedFromSystemError": "Cannot disconnect the server",
         "connectedSuccess": "Sistema fue conectado con éxito",
         "createLocalOwnerTitle": "Crear administrador local",
         "confirmChangePassword": "Cambiar contraseña de admin",
-        "confirmChangePasswordTitle": "¿Cambiar contraseña del sistema? afectará al usuario 'admin' y la contraseña de root para algunos servidores",
+        "confirmChangePasswordTitle": "Change System password? It will affect user 'admin' and the root password for some servers",
         "confirmChangePasswordAction": "Guardar nueva contraseña",
         "nx1ControlHint": "Aplicación de cliente se ha iniciado. Utilizar un teclado/ratón o una aplicación móvil para controlarla."
     },
@@ -68,7 +68,7 @@
         "cloudConnectRelayingEnabled": "Habilitar retransmisión para conexión a la nube",
         "cloudConnectUdpHolePunchingEnabled": "Habilitar la perforación de orificios UDP para conectarse a la nube",
         "cloudHost": "Cloud host",
-        "cloudSystemID": "Identificación del sistema en la nube",
+        "cloudSystemID": "Cloud System id",
         "disabledVendors": "Proveedores desahabilitados",
         "ec2AliveUpdateIntervalSec": "Intervalo de actualización activa del sistema (segundos)",
         "ec2ConnectionKeepAliveTimeoutSec": "Mantener viva la conexión (segundos)",
@@ -119,15 +119,13 @@
         "upnpPortMappingEnabled": "Mapeo de puerto UPNP habilitado",
         "useTextEmailFormat": "Enviar correos electrónicos de texto plano",
         "useWindowsEmailLineFeed": "Usa el salto de línea de Windows en los correos",
-        "hanwhaChunkReaderMessageBodyTimeoutSeconds": "Hanwha: Chunk message body timeout",
-        "hanwhaChunkReaderResponseTimeoutSeconds": "Hanwha: Chunk response timeout",
-        "showHanwhaAlternativePtzControlsOnTile": "Hanwha: Show alternative PTZ controls on tile",
         "trafficEncryptionForced": "Force traffic encryption",
         "videoTrafficEncryptionForced": "Force video traffic encryption",
         "updateStatus": "Update status",
         "watermarkSettings": "Watermark settings",
-        "maxWebMTranscoders": "Cantidad máxima de conexiones WEBM para el servidor. Chrome abre 2 conexiones a la vez, luego cierra la primera. Por lo tanto, se recomienda establecer valor >=2 a este parámetro.",
-        "maxEventLogRecords": "Máximo registro de eventos para mantener en la base de datos. La cantidad real de registros no eliminados puede ser hasta un 20% mayor que el valor especificado."
+        "maxWebMTranscoders": "Max amount of WEBM connections for the server. Chrome opens 2 connections at once, then close the first one. So, it is recommended to set value >=2 to this parameter.",
+        "maxEventLogRecords": "Maximum event log records to keep into the database. Real amount of undeleted records may be up to 20% higher than the specified value.",
+        "forceLiveCacheForPrimaryStream": "Whether to cache some frames for the primary stream. Values: \"yes\" - always enabled (may use a lot of RAM), \"no\" - always disabled except when required by the playback (e.g. HLS), \"auto\" - similar to \"no\", but turned on when improves the user experience (e.g. when some Analytics plugin is working on the camera)."
     },
     "info": {
         "tabs": {
@@ -142,14 +140,14 @@
         "incorrectRemotePassword": "Nombre de usuario o contraseña son incorrectos.",
         "incompatibleVersion": "Sistema es inalcanzable, no existe o tiene versión incompatible.",
         "wrongUrl": "No se puede conectar al servidor especificado.",
-        "newSystemError": "No se pueden fusionar los sistemas. El sistema remoto no está configurado.",
-        "safeMode": "No se pueden fusionar los sistemas. El sistema remoto está en modo seguro.",
-        "configError": "No se pueden fusionar los sistemas. Tal vez uno de los sistemas está en modo seguro.",
-        "cloudError": "No se pueden fusionar los sistemas. El sistema dependiente está conectado a la nube. Necesitas desconectarlo primero.",
-        "cloudBothError": "No se pueden fusionar los sistemas. Ambos sistemas están conectados a la nube. Necesitas desconectar uno primero.",
-        "cloudHostConflict": "No se pueden fusionar los sistemas porque los servidores se construyen con hosts de nube diferentes",
+        "newSystemError": "Cannot merge Systems. Remote System is not configured.",
+        "safeMode": "Cannot merge Systems. Remote System is in safe mode.",
+        "configError": "Cannot merge Systems. Maybe one of Systems is in safe mode.",
+        "cloudError": "Cannot merge Systems. Dependent System is connected to cloud. You need to disconnect it first.",
+        "cloudBothError": "Cannot merge Systems. Both Systems are connected to cloud. You need to disconnect one first.",
+        "cloudHostConflict": "Cannot merge Systems, because servers are built with different cloud hosts",
         "licenceError": "¡Advertencia! Estás a punto de unir sistemas con licencias Starter. Sólo una licencia Starter está permitida por sistema, por lo que la segunda licencia se desactivará. ¿De todos modos desea fusionar?",
-        "duplicateServersError": "No se pueden combinar los sistemas porque tienen al menos 1 servidor con la misma ID. Por favor, quite este servidor y vuelva a intentarlo.",
+        "duplicateServersError": "Cannot merge Systems, because they have at least 1 server with the same ID. Please remove this server and try again.",
         "connectionFailed": "Error de conexión: ",
         "unknownError": "Error desconocido",
         "mergeFailed": "Error en la combinación",
@@ -191,5 +189,52 @@
     },
     "pageTitles": {
         "default": "{{PRODUCT_NAME}} interfaz web"
+    },
+    "common": {
+        "voiceCommands": {
+            "search": "find + [text for searchbar]",
+            "pause": "pausa",
+            "help": "help | show commands",
+            "collapse all servers": "colapsar todos los servidores",
+            "collapse server": "collapse server + [server name]",
+            "play": "reproducir",
+            "clear search": "borrar búsqueda",
+            "live": "go to live | show me live",
+            "expand all servers": "expandir todos los servidores",
+            "stop listening": "detener escucha",
+            "expand server": "expand server + [server name]",
+            "view": "vista + [nombre de la cámara]"
+        },
+        "systemOffline": "Sistema está desconectado",
+        "cameraLinks": {
+            "copyToClipboard": "copiar a portapapeles",
+            "highStream": "Corriente de alta",
+            "copyDefaultText": "copiar",
+            "unknown": "Uesconocido",
+            "lowStream": "Corriente de baja",
+            "transcoding": "Transcodificación",
+            "copyActiveText": "copiado al portapapeles"
+        },
+        "searchCamPlaceholder": "Búsqueda",
+        "cameraStates": {
+            "noFormat": "Este navegador no admite reproducción de video desde esta cámara.",
+            "ieWin10": "Utilice navegadores Microsoft Edge o Google Chrome.",
+            "iosVideoTooLarge": "iOS no soporta video más grande que el fullHD (2MP: 1920 x 1080).",
+            "unauthorized": "Autenticación necesaria",
+            "ubuntuNX": "Este navegador no admite vídeo de servidores basados ​​en ARM. Por favor, utilice el navegador Chromium en su lugar.",
+            "ieNoWebm": "Por favor, instale <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> para Internet Explorer.",
+            "flashOrWebmRequired": "<a href='https://get.adobe.com/flashplayer/' target='_blank'>instale Adobe Flash</a> or<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> para reproducir vídeo en Internet Explorer.",
+            "noArmSupport": "Este navegador o dispositivo no admite la reproducción de vídeo desde servidores basados ​​en ARM.",
+            "error": "Error",
+            "offline": "Desconectado",
+            "noData": "No hay datos",
+            "flashRequired": "Por favor, instale <a href='https://get.adobe.com/flashplayer/' target='_blank'>instalar Adobe Flash</a> para reproducir videos."
+        },
+        "chromeCastWarning": "Chromecast consume muchos recursos y puede causar problemas en tu servidor.",
+        "resolution": {
+            "high": "Elevado",
+            "auto": "Auto",
+            "low": "Bajo"
+        }
     }
 }

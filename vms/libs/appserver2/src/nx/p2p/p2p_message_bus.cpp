@@ -256,6 +256,12 @@ void MessageBus::createOutgoingConnections(
                 continue;
             }
 
+            if (remoteConnection.unauthorizedTimer.isValid() &&
+                !remoteConnection.unauthorizedTimer.hasExpired(m_intervals.unauthorizedConnectTimeout))
+            {
+                continue;
+            }
+
             {
                 // This check is redundant (can be ommited). But it reduce network race condition time.
                 // So, it reduce frequency of in/out conflict and network traffic a bit.
@@ -506,6 +512,11 @@ void MessageBus::at_stateChanged(
 
             break;
         case Connection::State::Unauthorized:
+            for (auto& removeUrlInfo: m_remoteUrls)
+            {
+                if (removeUrlInfo.peerId == remoteId)
+                    removeUrlInfo.unauthorizedTimer.restart();
+            }
         case Connection::State::Error:
         {
             removeConnectionUnsafe(weakRef);
@@ -926,7 +937,7 @@ void MessageBus::processRuntimeInfo(
     if (localPeer().isServer() && !isSubscribedTo(connection->remotePeer()))
         return; // Ignore deprecated transaction.
 
-    PersistentIdData peerId(tran.peerID, tran.params.peer.persistentId);
+    PersistentIdData peerId(tran.params.peer);
 
     if (m_lastRuntimeInfo[peerId] == tran.params)
         return; //< Already processed. Ignore same transaction.

@@ -55,7 +55,7 @@ void MaintenanceManager::getTransactionLog(
     data::SystemId systemId,
     std::function<void(
         api::Result,
-        ::ec2::ApiTransactionDataList)> completionHandler)
+        nx::clusterdb::engine::CommandDataList)> completionHandler)
 {
     using namespace std::placeholders;
 
@@ -94,10 +94,10 @@ void MaintenanceManager::onTransactionLogRead(
     const std::string& systemId,
     clusterdb::engine::ResultCode ec2ResultCode,
     std::vector<clusterdb::engine::dao::TransactionLogRecord> serializedTransactions,
-    vms::api::TranState /*readedUpTo*/,
+    nx::clusterdb::engine::NodeState /*readedUpTo*/,
     std::function<void(
         api::Result,
-        ::ec2::ApiTransactionDataList)> completionHandler)
+        nx::clusterdb::engine::CommandDataList)> completionHandler)
 {
     api::ResultCode resultCode = ec2ResultToResult(ec2ResultCode);
 
@@ -109,13 +109,13 @@ void MaintenanceManager::onTransactionLogRead(
     {
         return completionHandler(
             resultCode,
-            ::ec2::ApiTransactionDataList());
+            nx::clusterdb::engine::CommandDataList());
     }
 
-    ::ec2::ApiTransactionDataList outData;
+    nx::clusterdb::engine::CommandDataList outData;
     for (const auto& transactionContext: serializedTransactions)
     {
-        ::ec2::ApiTransactionData tran(m_moduleGuid);
+        nx::clusterdb::engine::CommandData tran(m_moduleGuid);
         tran.tranGuid = QnUuid::fromStringSafe(transactionContext.hash);
         nx::Buffer serializedTransaction =
             transactionContext.serializer->serialize(Qn::UbjsonFormat, nx_ec::EC2_PROTO_VERSION);
@@ -133,7 +133,7 @@ void MaintenanceManager::onTransactionLogRead(
                     .arg(systemId).arg(transactionContext.hash));
             return completionHandler(
                 api::ResultCode::invalidFormat,
-                ::ec2::ApiTransactionDataList());
+                nx::clusterdb::engine::CommandDataList());
         }
     }
 

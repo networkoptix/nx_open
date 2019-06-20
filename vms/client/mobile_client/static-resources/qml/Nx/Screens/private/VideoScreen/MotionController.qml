@@ -2,11 +2,12 @@ import QtQuick 2.6
 import Nx 1.0
 import Nx.Core.Items 1.0
 import nx.client.core 1.0
-import "utils.js" as Utils
+
 Item
 {
     id: controller
 
+    property int dragThreshold: 10
     property bool allowDrawing: true
     property int cameraRotation: 0
     property Item viewport: null
@@ -19,14 +20,8 @@ Item
     readonly property bool drawingRoi: allowDrawing && d.toBool(
         d.customInitialPoint && d.selectionRoi && d.selectionRoi.expandingFinished)
 
-    signal requestDrawing()
+    signal requestUnallowedDrawing()
     signal emptyRoiCleared()
-
-    onAllowDrawingChanged:
-    {
-        if (allowDrawing && d.customInitialPoint && d.selectionRoi)
-            Utils.executeLater(function() { d.selectionRoi.start() }, this)
-    }
 
     function clearCustomRoi()
     {
@@ -57,22 +52,23 @@ Item
             rect ? d.toRelative(Qt.vector2d(rect.right, rect.bottom)) : undefined)
     }
 
-    function handleLongPressed()
-    {
-        if (!controller.allowDrawing)
-            controller.requestDrawing()
-    }
-
     function handlePositionChanged(pos)
     {
+        if (!Utils.nearPositions(pos, unallowedDrawingTimer.initialPos, controller.dragThreshold))
+            unallowedDrawingTimer.stop()
+
+        if (!controller.allowDrawing)
+            return
+
         var relativePos = d.toRelative(pos)
         if (drawingRoi)
         {
             d.customSecondPoint = relativePos
             d.selectionRoi.endPoint = Qt.binding(function() { return d.fromRelative(relativePos) })
-            d.selectionRoi.singlePoint = d.nearPositions(d.customFirstPoint, d.customSecondPoint)
+            d.selectionRoi.singlePoint =
+                Utils.nearPositions(d.customFirstPoint, d.customSecondPoint, d.kMaxDistance)
         }
-        else if (!d.nearPositions(d.customInitialPoint, relativePos))
+        else if (!Utils.nearPositions(d.customInitialPoint, relativePos, d.kMaxDistance))
         {
             handleCancelled()
         }
@@ -83,10 +79,17 @@ Item
         if (pressFilterTimer.running)
             return // We don't allow to start long tap after fast clicks (double click, for example).
 
+        if (!controller.allowDrawing)
+        {
+            unallowedDrawingTimer.restart()
+            unallowedDrawingTimer.initialPos = pos
+            return
+        }
+
+        unallowedDrawingTimer.stop()
         pressFilterTimer.restart()
         var relativePos = d.toRelative(pos)
         d.customInitialPoint = relativePos
-        pressAndHoldTimer.restart()
 
         d.selectionRoi = d.customRoi == firstRoi
             ? secondRoi
@@ -95,8 +98,7 @@ Item
         d.selectionRoi.startPoint = Qt.binding(function() { return d.fromRelative(relativePos) })
         d.selectionRoi.endPoint = Qt.binding(function() { return d.fromRelative(relativePos) })
         d.selectionRoi.singlePoint = true
-        if (allowDrawing)
-            d.selectionRoi.start()
+        d.selectionRoi.start()
     }
 
     function handleReleased()
@@ -155,16 +157,22 @@ Item
 
     Timer
     {
-        id: pressAndHoldTimer
+        id: unallowedDrawingTimer
+
+        property point initialPos
 
         interval: 600
-        onTriggered: controller.handleLongPressed()
+        onTriggered:
+        {
+            if (!motionSearchMode)
+                controller.requestUnallowedDrawing()
+        }
     }
 
     Timer
     {
         id: pressFilterTimer
-        interval: pressAndHoldTimer.interval
+        interval: unallowedDrawingTimer.interval
     }
 
     onMotionSearchModeChanged:
@@ -184,20 +192,13 @@ Item
     {
         if (drawingRoi)
         {
-            // We use motion MotionRoi::expandingFinished to determine if drawing is in process.
-            // Since it's value depends on MotionRoi state, we have to use executeLater to
-            // break direct dependencies and avoid binding loop.
-            Utils.executeLater(
-                function()
-                {
-                    d.customFirstPoint = d.customInitialPoint
-                    d.customSecondPoint = d.customInitialPoint
-                    d.selectionRoi.show()
-                    if (d.customRoi)
-                        d.customRoi.hide()
+            d.customFirstPoint = d.customInitialPoint
+            d.customSecondPoint = d.customInitialPoint
+            d.selectionRoi.show()
+            if (d.customRoi)
+                d.customRoi.hide()
 
-                    makeShortVibration()
-                }, this)
+            makeShortVibration()
         }
         else
         {
@@ -216,6 +217,7 @@ Item
         property MotionRoi selectionRoi: null
         property MotionRoi customRoi: null
 
+        readonly property real kMaxDistance: 0.05
         readonly property color lineColor: ColorTheme.contrast1
         readonly property color shadowColor: ColorTheme.transparent(ColorTheme.base1, 0.2)
         readonly property bool hasFinishedCustomRoi: toBool(
@@ -238,16 +240,6 @@ Item
             return relative
                 ? Qt.point(relative.x * controller.width, relative.y * controller.height)
                 : Qt.point(0, 0)
-        }
-
-        function nearPositions(first, second)
-        {
-            if (!first || !second)
-                return false
-
-            var firstVector = Qt.vector2d(first.x, first.y)
-            var secondVector = Qt.vector2d(second.x, second.y)
-            return firstVector.minus(secondVector).length() < 0.03
         }
 
         function getMotionFilter(first, second)
@@ -326,7 +318,7 @@ Item
                 d.selectionRoi.hide()
                 d.selectionRoi = null
             }
-            pressAndHoldTimer.stop()
+            unallowedDrawingTimer.stop()
         }
 
         function setRoiPoints(first, second)

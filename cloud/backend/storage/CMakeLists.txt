@@ -1,0 +1,3 @@
+add_subdirectory(nx_cloud_storage_client)
+add_subdirectory(nx_cloud_storage_service)
+add_subdirectory(storage_service)

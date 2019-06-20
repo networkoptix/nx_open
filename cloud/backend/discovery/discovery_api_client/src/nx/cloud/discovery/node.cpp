@@ -16,6 +16,29 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
 
 //-------------------------------------------------------------------------------------------------
 
+std::string NodeInfo::toString() const
+{
+    return QJson::serialized(*this).constData();
+}
+
+
+bool Node::operator==(const Node& right) const
+{
+    return nodeId == right.nodeId;
+}
+
+bool Node::operator<(const Node& right) const
+{
+    return nodeId < right.nodeId;
+}
+
+std::string Node::toString() const
+{
+    return NodeSerialization::serialized(*this).constData();
+}
+
+//-------------------------------------------------------------------------------------------------
+
 QDateTime toDateTime(const Node::time_point& timePoint)
 {
     QDateTime dt;
@@ -31,9 +54,11 @@ namespace NodeSerialization {
 namespace {
 
 static constexpr char kNodeId[] = "nodeId";
+static constexpr char kPublicIpAddress[] = "publicIpAddress";
 static constexpr char kUrls[] = "urls";
 static constexpr char kExpirationTime[] = "expirationTime";
 static constexpr char kInfoJson[] = "infoJson";
+static constexpr char kCountryCode[] = "countryCode";
 
 QString toString(const Node::time_point& expirationTime)
 {
@@ -65,9 +90,11 @@ QJsonObject toJsonObject(const Node& node)
 {
     return QJsonObject({
         {kNodeId, node.nodeId.c_str()},
+        {kPublicIpAddress, node.publicIpAddress.c_str()},
         {kUrls, toJsonArray(node.urls)},
         {kExpirationTime, toString(node.expirationTime)},
-        {kInfoJson, node.infoJson.c_str()} });
+        {kInfoJson, node.infoJson.c_str()},
+        {kCountryCode, node.countryCode.c_str()} });
 }
 
 Node toNode(const QVariantMap& map, const Node& defaultValue, bool* ok = nullptr)
@@ -76,31 +103,41 @@ Node toNode(const QVariantMap& map, const Node& defaultValue, bool* ok = nullptr
         *ok = false;
 
     Node node;
+    QVariantMap::const_iterator it;
 
-    auto it = map.find(kNodeId);
-    if (it == map.end())
+    const auto contains =
+        [&map, &it](const char* value)
+        {
+            it = map.find(value);
+            return it != map.end();
+        };
+
+    if (!contains(kNodeId))
         return defaultValue;
     node.nodeId = it->toString().toStdString();
 
-    it = map.find(kUrls);
-    if (it == map.end())
+    if (!contains(kPublicIpAddress))
         return defaultValue;
-    if (!it->canConvert(QVariant::StringList))
+    node.publicIpAddress = it->toString().toStdString();
+
+    if (!contains(kUrls) || !it->canConvert(QVariant::StringList))
         return defaultValue;
     node.urls = toVector(it->toStringList());
 
-    it = map.find(kExpirationTime);
-    if (it == map.end())
+    if (!contains(kExpirationTime))
         return defaultValue;
     QDateTime dt = nx::network::http::parseDate(it->toByteArray());
     if (!dt.isValid())
         return defaultValue;
     node.expirationTime = toTimePoint(dt);
 
-    it = map.find(kInfoJson);
-    if (it == map.end())
+    if (!contains(kInfoJson))
         return defaultValue;
     node.infoJson = it->toString().toStdString();
+
+    if (!contains(kCountryCode))
+        return defaultValue;
+    node.countryCode = it->toString().toStdString();
 
     if (ok)
         *ok = true;

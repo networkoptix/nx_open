@@ -33,7 +33,7 @@ UDPHolePunchingConnectionInitiationFsm::UDPHolePunchingConnectionInitiationFsm(
     m_serverPeerConnectionMethods(api::ConnectionMethod::all),
     m_originatingPeerCloudConnectVersion(api::CloudConnectVersion::initial),
     m_findRelayInstanceFunc(
-        &AbstractRelayClusterClient::findRelayInstancePeerIsListeningOn)
+        &AbstractRelayClusterClient::findRelayInstanceForClient)
 {
     auto serverConnectionStrongRef = m_serverConnectionWeakRef.lock();
     if (!serverConnectionStrongRef)
@@ -77,6 +77,8 @@ void UDPHolePunchingConnectionInitiationFsm::onConnectRequest(
         [this, requestSourceDescriptor,
             request = std::move(request), connectResponseSender]()
         {
+            m_clientEndpoint = requestSourceDescriptor.sourceAddress;
+
             processConnectRequest(
                 requestSourceDescriptor,
                 std::move(request),
@@ -181,7 +183,7 @@ void UDPHolePunchingConnectionInitiationFsm::processTcpConnectRequest(
     findRelayInstance(
         [this, connectResponseSender = std::move(connectResponseSender)](
             nx::cloud::relay::api::ResultCode resultCode,
-            QUrl relayInstanceUrl)
+            nx::utils::Url relayInstanceUrl)
         {
             auto connectResponse = prepareConnectResponse(
                 api::ConnectionAckRequest(),
@@ -281,8 +283,8 @@ nx::network::stun::Message
         stun::Header(
             stun::MessageClass::indication,
             stun::extension::indications::connectionRequested));
-    connectionRequestedEvent.serialize(&indication);
     connectionRequestedEvent.cloudConnectVersion = connectRequest.cloudConnectVersion;
+    connectionRequestedEvent.serialize(&indication);
 
     return indication;
 }
@@ -294,7 +296,7 @@ void UDPHolePunchingConnectionInitiationFsm::noConnectionAckOnTime()
 
     m_timer.pleaseStopSync();
 
-    if (initiateCloudConnect(api::ConnectionAckRequest()))
+    if (initiateCloudConnect(api::ConnectionAckRequest{}))
     {
         NX_VERBOSE(this, "Proceeding without connection ack from listening peer");
         return;
@@ -383,10 +385,10 @@ void UDPHolePunchingConnectionInitiationFsm::initiateRelayInstanceSearch()
 {
     m_state = State::resolvingServersRelayInstance;
 
-    auto completionHander = 
+    auto completionHander =
         [this](
             nx::cloud::relay::api::ResultCode resultCode,
-            QUrl relayInstanceUrl)
+            nx::utils::Url relayInstanceUrl)
         {
             onRelayInstanceSearchCompletion(
                 resultCode == nx::cloud::relay::api::ResultCode::ok
@@ -400,7 +402,7 @@ void UDPHolePunchingConnectionInitiationFsm::initiateRelayInstanceSearch()
 void UDPHolePunchingConnectionInitiationFsm::findRelayInstance(
     RelayInstanceSearchCompletionHandler handler)
 {
-    auto sharedHandler = 
+    auto sharedHandler =
         std::make_shared<RelayInstanceSearchCompletionHandler>(std::move(handler));
 
     m_findRelayInstanceFunc.invokeWithTimeout(
@@ -416,10 +418,11 @@ void UDPHolePunchingConnectionInitiationFsm::findRelayInstance(
             nx::utils::swapAndCall(
                 *sharedHandler,
                 nx::cloud::relay::api::ResultCode::timedOut,
-                QUrl());
+                nx::utils::Url());
         },
         m_relayClusterClient,
-        m_serverPeerHostName.toStdString());
+        m_serverPeerHostName.toStdString(),
+        m_clientEndpoint.address);
 }
 
 void UDPHolePunchingConnectionInitiationFsm::finishConnect()
@@ -447,7 +450,7 @@ void UDPHolePunchingConnectionInitiationFsm::finishConnect()
 }
 
 void UDPHolePunchingConnectionInitiationFsm::onRelayInstanceSearchCompletion(
-    std::optional<QUrl> relayInstanceUrl)
+    std::optional<nx::utils::Url> relayInstanceUrl)
 {
     if (relayInstanceUrl)
     {
@@ -475,7 +478,7 @@ void UDPHolePunchingConnectionInitiationFsm::onRelayInstanceSearchCompletion(
 api::ConnectResponse UDPHolePunchingConnectionInitiationFsm::prepareConnectResponse(
     const api::ConnectionAckRequest& connectionAckRequest,
     std::list<network::SocketAddress> tcpEndpoints,
-    std::optional<QUrl> relayInstanceUrl)
+    std::optional <nx::utils::Url> relayInstanceUrl)
 {
     api::ConnectResponse connectResponse;
     connectResponse.params = m_settings.connectionParameters();

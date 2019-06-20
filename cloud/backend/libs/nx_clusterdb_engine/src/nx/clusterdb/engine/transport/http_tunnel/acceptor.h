@@ -7,7 +7,8 @@
 
 #include <nx/vms/api/data/peer_data.h>
 
-#include "../abstract_transaction_transport.h"
+#include "../abstract_acceptor.h"
+#include "../abstract_command_transport.h"
 
 namespace nx::clusterdb::engine {
 
@@ -18,36 +19,37 @@ class CommandLog;
 
 } // namespace nx::clusterdb::engine
 
-namespace nx::clusterdb::engine::transport {
+namespace nx::clusterdb::engine::transport::http_tunnel {
 
 namespace detail {
 
 struct ConnectRequestContext
 {
-    std::string systemId;
+    std::string clusterId;
     ConnectionRequestAttributes attributes;
     std::string userAgent;
 };
 
 } // namespace detail
 
-class HttpTunnelTransportAcceptor:
+class Acceptor:
+    public AbstractAcceptor,
     private network::http::tunneling::TunnelAuthorizer<detail::ConnectRequestContext>
 {
     using base_type =
         network::http::tunneling::TunnelAuthorizer<detail::ConnectRequestContext>;
 
 public:
-    HttpTunnelTransportAcceptor(
+    Acceptor(
         const QnUuid& peerId,
         const ProtocolVersionRange& protocolVersionRange,
         CommandLog* transactionLog,
         ConnectionManager* connectionManager,
         const OutgoingCommandFilter& outgoingCommandFilter);
 
-    void registerHandlers(
+    virtual void registerHandlers(
         const std::string& rootPath,
-        nx::network::http::server::rest::MessageDispatcher* messageDispatcher);
+        nx::network::http::server::rest::MessageDispatcher* messageDispatcher) override;
 
 private:
     const QnUuid m_peerId;
@@ -67,4 +69,4 @@ private:
         detail::ConnectRequestContext connectRequestContext);
 };
 
-} // namespace nx::clusterdb::engine::transport
+} // namespace nx::clusterdb::engine::transport::http_tunnel

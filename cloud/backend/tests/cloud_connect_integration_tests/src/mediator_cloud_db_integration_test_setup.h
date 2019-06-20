@@ -13,6 +13,7 @@ class MediatorCloudDbIntegrationTestSetup
 {
 public:
     MediatorCloudDbIntegrationTestSetup();
+    ~MediatorCloudDbIntegrationTestSetup();
 
     bool startCdb();
     bool startMediator();

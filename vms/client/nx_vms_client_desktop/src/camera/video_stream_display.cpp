@@ -25,6 +25,8 @@ extern "C" {
 #include "ui/graphics/opengl/gl_functions.h"
 #include "ui/graphics/items/resource/resource_widget_renderer.h"
 #include <decoders/video/ffmpeg_video_decoder.h>
+#include <client/client_module.h>
+#include <nx/vms/client/desktop/utils/video_cache.h>
 
 using namespace std::chrono;
 
@@ -470,8 +472,10 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
     if (!dec || m_decoderData.compressionType != data->compressionType)
     {
         static QAtomicInt swDecoderCount = 0;
+        DecoderConfig config = DecoderConfig::fromMediaResource(m_resource);
+        config.allowMtDecoding = qnSettings->allowMtDecoding();
         dec = new QnFfmpegVideoDecoder(
-            DecoderConfig::fromMediaResource(m_resource),
+            config,
             data->compressionType, data, /*mtDecoding*/ enableFrameQueue, &swDecoderCount);
         if (dec == nullptr)
         {
@@ -768,6 +772,8 @@ bool QnVideoStreamDisplay::processDecodedFrame(
 {
     if (!outFrame->data[0] && !outFrame->picData)
         return false;
+
+    qnClientModule->videoCache()->add(m_resource->toResource()->getId(), outFrame);
 
     if (enableFrameQueue)
     {

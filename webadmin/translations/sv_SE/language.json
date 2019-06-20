@@ -8,7 +8,7 @@
     "setup": {
         "createAccount": "skapa konto",
         "errorNoHDD": "Denna enhet är avsedd att fungera med en hårddisk installerad. <br> Vänligen stäng av enheten och installera en hårddisk.",
-        "errorNoNetwork": "Den här enheten behöver nätverksanslutning för att fungera.<br>Anslut den till det lokala nätverket eller Internet"
+        "errorNoNetwork": "Denna enhet behöver nätverksanslutning för att fungera. <br>                Vänligen anslut den till det lokala nätverket eller Internet"
     },
     "passwordRequirements": {
         "minLengthMessage": "Lösenordet måste innehålla minst 8 tecken",
@@ -119,15 +119,13 @@
         "upnpPortMappingEnabled": "UPNP-portmappning aktiverad",
         "useTextEmailFormat": "Skicka oformaterad text i email",
         "useWindowsEmailLineFeed": "Använd Windows radmatning i e-postmeddelanden",
-        "hanwhaChunkReaderMessageBodyTimeoutSeconds": "Hanwha: Chunk message body timeout",
-        "hanwhaChunkReaderResponseTimeoutSeconds": "Hanwha: Chunk response timeout",
-        "showHanwhaAlternativePtzControlsOnTile": "Hanwha: Show alternative PTZ controls on tile",
         "trafficEncryptionForced": "Force traffic encryption",
         "videoTrafficEncryptionForced": "Force video traffic encryption",
         "updateStatus": "Update status",
         "watermarkSettings": "Watermark settings",
         "maxWebMTranscoders": "Max amount of WEBM connections for the server. Chrome opens 2 connections at once, then close the first one. So, it is recommended to set value >=2 to this parameter.",
-        "maxEventLogRecords": "Maximum event log records to keep into the database. Real amount of undeleted records may be up to 20% higher than the specified value."
+        "maxEventLogRecords": "Maximum event log records to keep into the database. Real amount of undeleted records may be up to 20% higher than the specified value.",
+        "forceLiveCacheForPrimaryStream": "Whether to cache some frames for the primary stream. Values: \"yes\" - always enabled (may use a lot of RAM), \"no\" - always disabled except when required by the playback (e.g. HLS), \"auto\" - similar to \"no\", but turned on when improves the user experience (e.g. when some Analytics plugin is working on the camera)."
     },
     "info": {
         "tabs": {
@@ -191,5 +189,52 @@
     },
     "pageTitles": {
         "default": "{{PRODUCT_NAME}} webbgränssnitt"
+    },
+    "common": {
+        "voiceCommands": {
+            "search": "find + [text for searchbar]",
+            "pause": "pausa",
+            "help": "help | show commands",
+            "collapse all servers": "kollapsa alla servrar",
+            "collapse server": "collapse server + [server name]",
+            "play": "spela",
+            "clear search": "rensa sökningen",
+            "live": "go to live | show me live",
+            "expand all servers": "expandera alla servrar",
+            "stop listening": "sluta lyssna",
+            "expand server": "expand server + [server name]",
+            "view": "view + [camera name]"
+        },
+        "systemOffline": "System Offline",
+        "cameraLinks": {
+            "copyToClipboard": "kopiera till urklipp",
+            "highStream": "Högupplöst ström",
+            "copyDefaultText": "kopiera",
+            "unknown": "Okänd",
+            "lowStream": "Lågupplöst ström",
+            "transcoding": "Omkodning",
+            "copyActiveText": "kopierat till Urklipp"
+        },
+        "searchCamPlaceholder": "Sök",
+        "cameraStates": {
+            "noFormat": "Den här webbläsaren stöder inte videouppspelning från den här kameran.",
+            "ieWin10": "Vänligen använd Microsoft Edge eller Google Chrome-webbläsare.",
+            "iosVideoTooLarge": "iOS stöder inte video större än fullHD (2MP: 1920x1080).",
+            "unauthorized": "Autentisering krävs",
+            "ubuntuNX": "Den här webbläsaren stöder inte video från ARM-baserade servrar. Vänligen använd Chrome-webbläsaren istället.",
+            "ieNoWebm": "Var god installera <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> för Internet Explorer.",
+            "flashOrWebmRequired": "Var god <a href='https://get.adobe.com/flashplayer/' target='_blank'>installera Adobe Flash</a> eller<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> för att spela video i Internet Explorer.",
+            "noArmSupport": "Denna webbläsare eller enhet stöder inte videouppspelning från ARM-baserade servrar.",
+            "error": "Fel",
+            "offline": "Offline",
+            "noData": "Data saknas",
+            "flashRequired": "Var god <a href='https://get.adobe.com/flashplayer/' target='_blank'>installera Adobe Flash</a> för att spela upp videor."
+        },
+        "chromeCastWarning": "Chromecast är resursintensiv och kan orsaka problem på din server.",
+        "resolution": {
+            "high": "Hög",
+            "auto": "Auto",
+            "low": "Låg"
+        }
     }
 }

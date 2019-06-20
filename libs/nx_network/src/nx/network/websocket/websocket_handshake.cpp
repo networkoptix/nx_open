@@ -151,7 +151,7 @@ void addClientHeaders(nx::network::http::AsyncClient* request, const nx::Buffer&
 {
     nx::network::http::HttpHeaders headers;
     addClientHeaders(&headers, protocolName);
-    request->setAdditionalHeaders(std::move(headers));
+    request->addRequestHeaders(std::move(headers));
 }
 
 Error validateResponse(const nx::network::http::Request& request, const nx::network::http::Response& response)

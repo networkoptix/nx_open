@@ -67,8 +67,8 @@ void sendInstallRequest(
                 {
                     NX_WARNING(
                         typeid(QnInstallUpdateRestHandler),
-                        lm("installUpdate request to server %1 failed with http code")
-                        .args(server->getId(), httpStatusCode));
+                        "installUpdate request to server %1 failed with http status %2",
+                        server->getId(), nx::network::http::StatusCode::toString(httpStatusCode));
                 }
 
                 context->executeGuarded([context]() { context->requestProcessed(); });

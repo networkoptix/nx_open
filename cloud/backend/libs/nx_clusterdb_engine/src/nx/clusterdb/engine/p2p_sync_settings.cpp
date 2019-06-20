@@ -1,40 +1,72 @@
 #include "p2p_sync_settings.h"
 
 #include <nx/utils/deprecated_settings.h>
+#include <nx/utils/timer_manager.h>
 #include <nx/utils/uuid.h>
 
 namespace nx::clusterdb::engine {
 
 namespace {
 
-static constexpr char kNodeId[] = "p2pDb/nodeId";
+static constexpr char kNodeId[] = "nodeId";
 
-static constexpr char kClusterId[] = "p2pDb/clusterId";
+static constexpr char kClusterId[] = "clusterId";
 
 static constexpr char kMaxConcurrentConnectionsFromSystem[] =
-    "p2pDb/maxConcurrentConnectionsFromSystem";
+    "maxConcurrentConnectionsFromSystem";
 static constexpr int kMaxConcurrentConnectionsFromSystemDefault = 2;
+
+static constexpr char kNodeConnectRetryTimeout[] = "nodeConnectRetryTimeout";
+static constexpr std::chrono::seconds kDefaultNodeConnectRetryTimeout = std::chrono::seconds(7);
+
+static constexpr char kGroupCommandsUnderDbTransaction[] = "groupCommandsUnderDbTransaction";
+static constexpr bool kDefaultGroupCommandsUnderDbTransaction = false;
 
 } // namespace
 
 SynchronizationSettings::SynchronizationSettings():
     nodeId(QnUuid::createUuid().toStdString()),
     maxConcurrentConnectionsFromSystem(
-        kMaxConcurrentConnectionsFromSystemDefault)
+        kMaxConcurrentConnectionsFromSystemDefault),
+    nodeConnectRetryTimeout(kDefaultNodeConnectRetryTimeout)
 {
 }
 
-void SynchronizationSettings::load(const QnSettings& settings)
+void SynchronizationSettings::load(const QnSettings& settings, std::string groupName)
 {
-    clusterId = settings.value(kClusterId, clusterId.c_str()).toString().toStdString();
+    while (!groupName.empty() && groupName.back() == '/')
+        groupName.pop_back();
 
-    nodeId = settings.value(kNodeId, nodeId.c_str()).toString().toStdString();
+    QString settingsTemplate = groupName.empty() ? "%1%2" : "%1/%2";
 
-    maxConcurrentConnectionsFromSystem = settings.value(
-        kMaxConcurrentConnectionsFromSystem,
-        kMaxConcurrentConnectionsFromSystemDefault).toInt();
+    clusterId = settings.value(
+        lm(settingsTemplate).arg(groupName).arg(kClusterId),
+        clusterId.c_str()).toString().toStdString();
 
-    discovery.load(settings);
+    nodeId = settings.value(
+        lm(settingsTemplate).arg(groupName).arg(kNodeId),
+        nodeId.c_str()).toString().toStdString();
+
+    if (clusterId.empty())
+    {
+        maxConcurrentConnectionsFromSystem = settings.value(
+            lm(settingsTemplate).arg(groupName).arg(kMaxConcurrentConnectionsFromSystem),
+            kMaxConcurrentConnectionsFromSystemDefault).toInt();
+    }
+    else
+    {
+        maxConcurrentConnectionsFromSystem = std::numeric_limits<int>::max();
+    }
+
+    nodeConnectRetryTimeout = nx::utils::parseTimerDuration(settings.value(
+        lm(settingsTemplate).arg(groupName).arg(kNodeConnectRetryTimeout)).toString(),
+        kDefaultNodeConnectRetryTimeout);
+
+    discovery.load(settings, groupName.empty() ? "discovery" : groupName + "/discovery");
+
+    groupCommandsUnderDbTransaction = settings.value(
+        lm(settingsTemplate).args(groupName, kGroupCommandsUnderDbTransaction),
+        kDefaultGroupCommandsUnderDbTransaction ? "true" : "false").toString() == "true";
 }
 
 } // namespace nx::clusterdb::engine

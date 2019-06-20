@@ -73,9 +73,9 @@ private:
 private:
     TimeOffsetPtr m_primaryOffset;
     TimeOffset m_localOffset; //< used in case when no rtcp reports
-    std::chrono::milliseconds m_resyncThreshold{1000};
-    std::chrono::milliseconds m_streamsSyncThreshold{5000};
-    std::chrono::milliseconds m_forceCameraTimeThreshold{10000};
+    std::chrono::milliseconds m_resyncThreshold;
+    std::chrono::milliseconds m_streamsSyncThreshold;
+    std::chrono::milliseconds m_forceCameraTimeThreshold;
     TimePolicy m_timePolicy = TimePolicy::bindCameraTimeToLocalTime;
     std::string m_resourceId;
     RptTimeLinearizer m_linearizer;

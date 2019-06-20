@@ -75,28 +75,15 @@ public:
 
     void addNodeContext(const nx::utils::Url& discoveryServiceUrl)
     {
-        const auto discoveryServiceUrlArg = lm("--discovery/discoveryServiceUrl=%1")
-            .arg(discoveryServiceUrl.toString());
-
-        // 2 milliseconds padding for testing purposes
-        const auto roundTripPaddingArg = lm("--discovery/roundTripPadding=%1")
-            .arg(QString::number(2));
-
-        const auto registrationErrorDelayArg = lm("--discovery/registrationErrorDelay=%1")
-            .arg(100);
-
-        const auto onlineNodesRequestDelayArg = lm("--discovery/onlineNodesRequestDelay=%1")
-            .arg(QString::number(2));
-
-        m_fixture.addPeer(/*startAndWaitUntilStarted*/ false);
-        Peer& peer = m_fixture.peer(m_fixture.peerCount() - 1);
-
-        peer.process().addArg(discoveryServiceUrlArg.toUtf8().constData());
-        peer.process().addArg(roundTripPaddingArg.toUtf8().constData());
-        peer.process().addArg(registrationErrorDelayArg.toUtf8().constData());
-        peer.process().addArg(onlineNodesRequestDelayArg.toUtf8().constData());
-
-        ASSERT_TRUE(peer.process().startAndWaitUntilStarted());
+        Peer& peer = m_fixture.addPeer({
+            {"-p2pDb/discovery/enabled", "true"},
+            {"-p2pDb/discovery/discoveryServiceUrl",
+                discoveryServiceUrl.toStdString().c_str()},
+            {"-p2pDb/discovery/roundTripPadding", "2ms"},
+            {"-p2pDb/discovery/registrationErrorDelay", "10ms"},
+            {"-p2pDb/discovery/onlineNodesRequestDelay", "2ms"},
+            {"-p2pDb/nodeConnectRetryTimeout", "100ms"}
+        });
 
         m_nodes.emplace_back(peer);
     }
@@ -119,8 +106,7 @@ class DiscoveryManager: public testing::Test
 protected:
     void SetUp() override
     {
-        m_server = std::make_unique<nx::cloud::discovery::test::DiscoveryServer>(
-            m_fixture.clusterId());
+        m_server = std::make_unique<nx::cloud::discovery::test::DiscoveryServer>();
 
         ASSERT_TRUE(m_server->bindAndListen());
     }
@@ -187,11 +173,16 @@ protected:
 
     void andSyncEnginesAreConnected()
     {
+        // Checking that one node is explicitely connected to another one.
+
         auto& a = m_fixture.nodeContext(0);
         auto& b = m_fixture.nodeContext(1);
 
-        waitForSyncEngineConnection(a, b);
-        waitForSyncEngineConnection(b, a);
+        while (!a.peer().isConnectedTo(b.peer())
+            && !b.peer().isConnectedTo(a.peer()))
+        {
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        }
     }
 
     void andSyncEnginesAreSynchronized()
@@ -219,25 +210,6 @@ private:
         {
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
             onlineNodes = a.discoveryClient()->onlineNodes();
-        }
-    }
-
-    void waitForSyncEngineConnection(
-        DiscoveryTestFixture::NodeContext& a,
-        DiscoveryTestFixture::NodeContext& b)
-    {
-        // Verify that the sync engine of "b" is in the list of connections of "a"
-        const auto bIsEqual =
-            [&b](const engine::SystemConnectionInfo& other)
-            {
-                return b.endpoint() == other.peerEndpoint;
-            };
-
-        auto connections = a.syncEngine().connectionManager().getConnections();
-        while (std::find_if(connections.begin(), connections.end(), bIsEqual) == connections.end())
-        {
-            std::this_thread::sleep_for(std::chrono::milliseconds(10));
-            connections = a.syncEngine().connectionManager().getConnections();
         }
     }
 

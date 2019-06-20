@@ -23,10 +23,20 @@
 #include <core/resource/param.h>
 #include <core/resource_management/resource_properties.h>
 
+#include <nx/vms/api/types/rtp_types.h>
+
 #include "onvif/soapMediaBindingProxy.h"
 #include "onvif_resource.h"
 
 static const int MAX_CAHCE_URL_TIME = 1000 * 15;
+
+static onvifXsd__StreamType streamTypeFromRtpTransport(nx::vms::api::RtpTransportType rtpTransport)
+{
+    if (rtpTransport == nx::vms::api::RtpTransportType::multicast)
+        return onvifXsd__StreamType::RTP_Multicast;
+
+    return onvifXsd__StreamType::RTP_Unicast;
+}
 
 struct CameraInfoParams
 {
@@ -80,6 +90,20 @@ CameraDiagnostics::Result QnOnvifStreamReader::openStreamInternal(
 
     preStreamConfigureHook();
     executePreConfigurationRequests();
+
+    if (m_onvifRes->preferredRtpTransport() == nx::vms::api::RtpTransportType::multicast)
+    {
+        const auto result = m_onvifRes->ensureMulticastIsEnabled(toStreamIndex(getRole()));
+        if (!result)
+        {
+            NX_DEBUG(this,
+                "Device [%1] has incorrect multicast parameters "
+                "and the Server is unable to fix them",
+                m_onvifRes);
+
+            return result;
+        }
+    }
 
     QString streamUrl;
     CameraDiagnostics::Result result = updateCameraAndFetchStreamUrl(
@@ -187,6 +211,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::updateCameraAndFetchStreamUrl(
     result = fetchUpdateVideoEncoder(&info, isPrimary, isCameraControlRequired, params);
     if (!result)
         return result;
+
     info.videoSourceToken = m_onvifRes->videoSourceToken();
     info.videoSourceConfigurationToken = m_onvifRes->videoSourceConfigurationToken();
 
@@ -352,7 +377,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchStreamUrl(MediaSoapWrapper& 
 
     request.StreamSetup = &streamSetup;
     request.StreamSetup->Transport = &transport;
-    request.StreamSetup->Stream = onvifXsd__StreamType::RTP_Unicast;
+    request.StreamSetup->Stream = streamTypeFromRtpTransport(m_onvifRes->preferredRtpTransport());
     request.StreamSetup->Transport->Tunnel = 0;
     request.StreamSetup->Transport->Protocol = onvifXsd__TransportProtocol::RTSP;
     request.ProfileToken = profileToken;

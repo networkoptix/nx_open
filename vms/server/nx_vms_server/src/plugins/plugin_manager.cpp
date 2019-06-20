@@ -16,7 +16,7 @@
 #include <nx/sdk/analytics/i_plugin.h>
 #include <nx/vms/server/plugins/utility_provider.h>
 
-#include "plugins_ini.h"
+#include "vms_server_plugins_ini.h"
 
 using namespace nx::sdk;
 
@@ -36,8 +36,11 @@ PluginManager::PluginManager(QObject* parent):
 
 PluginManager::~PluginManager()
 {
-    for (auto& qtPlugin: m_qtPlugins)
-        qtPlugin->unload();
+}
+
+void PluginManager::unloadPlugins()
+{
+    m_nxPlugins.clear();
 }
 
 /**

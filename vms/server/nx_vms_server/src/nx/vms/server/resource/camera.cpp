@@ -1,5 +1,7 @@
 #include "camera.h"
 
+#include <camera/camera_pool.h>
+#include <camera/video_camera.h>
 #include <core/ptz/abstract_ptz_controller.h>
 #include <core/resource/camera_advanced_param.h>
 #include <core/resource_management/resource_data_pool.h>
@@ -17,6 +19,8 @@
 #include <media_server/media_server_module.h>
 #include <nx/streaming/archive_stream_reader.h>
 #include <plugins/utils/multisensor_data_provider.h>
+#include <nx/vms/server/ptz/server_ptz_controller_pool.h>
+#include <nx/vms/server/resource/multicast_parameters.h>
 
 static const std::set<QString> kSupportedCodecs = {"MJPEG", "H264", "H265"};
 
@@ -35,7 +39,24 @@ Camera::Camera(QnMediaServerModule* serverModule):
     m_lastInitTime.invalidate();
 
     connect(this, &Camera::groupIdChanged, [this]() { reinitAsync(); });
-    connect(this, &QnResource::initializedChanged, [this]() { fixInputPortMonitoring(); });
+    connect(this, &QnResource::initializedChanged, [this]()
+    {
+        QnMutexLocker lk(&m_initMutex);
+        fixInputPortMonitoring();
+    });
+
+    connect(this, &Camera::propertyChanged,
+    [this](const QnResourcePtr& /*resource*/, const QString& key)
+    {
+        if (key == ResourcePropertyKey::kUserPreferredPtzPresetType
+            || key == ResourcePropertyKey::kDefaultPreferredPtzPresetType
+            || key == ResourcePropertyKey::kPtzCapabilitiesAddedByUser
+            || key == ResourcePropertyKey::kPtzCapabilitiesUserIsAllowedToModify)
+        {
+            handlePtzConfigurationChange(key);
+            return;
+        }
+    });
 
     const auto updateIoCache =
         [this](const QnResourcePtr&, const QString& id, bool value, qint64 timestamp)
@@ -379,6 +400,9 @@ float Camera::getResolutionAspectRatio(const QSize& resolution)
 
 CameraDiagnostics::Result Camera::initInternal()
 {
+    // This property is for debug purpose only.
+    setProperty("driverClass", toString(typeid(*this)));
+
     auto resData = resourceData();
     auto timeoutSec = resData.value<int>(ResourceDataKey::kUnauthorizedTimeoutSec);
     auto credentials = getAuth();
@@ -399,11 +423,10 @@ CameraDiagnostics::Result Camera::initInternal()
         ResourceDataKey::kMediaTraits,
         nx::media::CameraTraits());
 
-    setCameraCapability(Qn::CameraTimeCapability, true);
-
     if (commonModule()->isNeedToStop())
         return CameraDiagnostics::ServerTerminatedResult();
 
+    NX_VERBOSE(this, "Initialising camera driver");
     const auto driverResult = initializeCameraDriver();
     if (driverResult.errorCode != CameraDiagnostics::ErrorCode::noError)
         return driverResult;
@@ -420,7 +443,8 @@ void Camera::initializationDone()
     fixInputPortMonitoring();
 }
 
-StreamCapabilityMap Camera::getStreamCapabilityMapFromDriver(nx::vms::api::StreamIndex streamIndex)
+StreamCapabilityMap Camera::getStreamCapabilityMapFromDriver(
+    nx::vms::api::StreamIndex /*streamIndex*/)
 {
     // Implementation may be overloaded in a driver.
     return StreamCapabilityMap();
@@ -442,6 +466,25 @@ void Camera::startInputPortStatesMonitoring()
 
 void Camera::stopInputPortStatesMonitoring()
 {
+}
+
+void Camera::reopenStream(nx::vms::api::StreamIndex streamIndex)
+{
+    auto camera = serverModule()->videoCameraPool()->getVideoCamera(toSharedPointer(this));
+    if (!camera)
+        return;
+
+    QnLiveStreamProviderPtr reader;
+    if (streamIndex == nx::vms::api::StreamIndex::primary)
+        reader = camera->getPrimaryReader();
+    else if (streamIndex == nx::vms::api::StreamIndex::secondary)
+        reader = camera->getSecondaryReader();
+
+    if (reader && reader->isRunning())
+    {
+        NX_DEBUG(this, "Camera [%1], reopen reader: %2", getId(), streamIndex);
+        reader->pleaseReopenStream();
+    }
 }
 
 CameraDiagnostics::Result Camera::initializeAdvancedParametersProviders()
@@ -716,6 +759,18 @@ void Camera::fixInputPortMonitoring()
     }
 }
 
+void Camera::handlePtzConfigurationChange(const QString &key)
+{
+    // We don't need to restart if there is no PTZ.
+    if (this->serverModule()->ptzControllerPool()->controller(toSharedPointer()) == nullptr)
+        return;
+
+    if (!isInitialized() || isInitializationInProgress())
+        return;
+    NX_DEBUG(this, "PTZ property [%1] changed, starting reinitialization", key);
+    reinitAsync();
+}
+
 QnTimePeriodList Camera::getDtsTimePeriods(
     qint64 /*startTimeMs*/,
     qint64 /*endTimeMs*/,
@@ -725,6 +780,63 @@ QnTimePeriodList Camera::getDtsTimePeriods(
     Qt::SortOrder /*sortOrder*/)
 {
     return QnTimePeriodList();
+}
+
+/* static */
+bool Camera::fixMulticastParametersIfNeeded(
+    nx::vms::server::resource::MulticastParameters* inOutMulticastParameters,
+    nx::vms::api::StreamIndex streamIndex)
+{
+    static const QString kDefaultPrimaryStreamMulticastAddress{"239.0.0.10"};
+    static const QString kDefaultSecondaryStreamMulticastAddress{"239.0.0.11"};
+    static constexpr int kDefaultPrimaryStreamMulticastPort{2048};
+    static constexpr int kDefaultSecondaryStreamMulticastPort{2050};
+    static constexpr int kDefaultMulticastTtl{ 1 };
+
+    if (!NX_ASSERT(inOutMulticastParameters, "Multicast parameters must be non-null"))
+        return false;
+
+    bool somethingIsFixed = false;
+    auto& address = inOutMulticastParameters->address;
+    if (!address || !QHostAddress(QString::fromStdString(*address)).isMulticast())
+    {
+        const auto defaultAddress = streamIndex == nx::vms::api::StreamIndex::primary
+            ? kDefaultPrimaryStreamMulticastAddress
+            : kDefaultSecondaryStreamMulticastAddress;
+
+        NX_DEBUG(NX_SCOPE_TAG, "Fixing multicast streaming address for stream %1: %2 -> %3",
+            streamIndex, (address ? *address : ""), defaultAddress);
+
+        address = defaultAddress.toStdString();
+        somethingIsFixed = true;
+    }
+
+    auto& port = inOutMulticastParameters->port;
+    int portNumber = port ? *port : 0;
+    if (portNumber <= 1024 || portNumber > 65535)
+    {
+        const auto defaultPort = streamIndex == nx::vms::api::StreamIndex::primary
+            ? kDefaultPrimaryStreamMulticastPort
+            : kDefaultSecondaryStreamMulticastPort;
+
+        NX_DEBUG(NX_SCOPE_TAG, "Fixing multicast port for stream %1: %2 -> %3",
+            streamIndex, portNumber, defaultPort);
+
+        port = defaultPort;
+        somethingIsFixed = true;
+    }
+
+    auto& ttl = inOutMulticastParameters->ttl;
+    if (!ttl || ttl <= 0)
+    {
+        NX_DEBUG(NX_SCOPE_TAG, "Fixing multicast ttl for stream %1: %2 -> %3",
+            streamIndex, (ttl ? *ttl : 0), kDefaultMulticastTtl);
+
+        ttl = kDefaultMulticastTtl;
+        somethingIsFixed = true;
+    }
+
+    return somethingIsFixed;
 }
 
 } // namespace resource

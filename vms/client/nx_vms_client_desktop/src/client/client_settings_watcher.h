@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QtCore/QObject>
+
 class QnClientSettingsWatcher: public QObject
 {
     using base_type = QObject;

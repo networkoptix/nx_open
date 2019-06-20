@@ -28,6 +28,10 @@ class NX_NETWORK_API AsyncClientWithHttpTunneling:
 
 public:
     AsyncClientWithHttpTunneling(Settings settings = Settings());
+    virtual ~AsyncClientWithHttpTunneling();
+
+    AsyncClientWithHttpTunneling(const AsyncClientWithHttpTunneling&) = delete;
+    AsyncClientWithHttpTunneling(AsyncClientWithHttpTunneling&&) = delete;
 
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
 
@@ -65,6 +69,8 @@ public:
     virtual void cancelHandlers(
         void* client,
         utils::MoveOnlyFunc<void()> handler) override;
+
+    virtual void cancelHandlersSync(void* client) override;
 
     virtual void setKeepAliveOptions(KeepAliveOptions options) override;
 

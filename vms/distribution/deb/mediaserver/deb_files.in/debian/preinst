@@ -25,10 +25,6 @@ errmsg()
 
 check_cloud_host()
 {
-    # Here we check cloud instances conflict during upgrade. This check is basically done by the
-    # pre-remove script, however we check it here again because old versions may have not the check
-    # in the pre-remove script.
-
     # At this stage we don't have the config helper.
     [ -f "$CONFIG_FILE" ] || return 0
 
@@ -41,17 +37,15 @@ check_cloud_host()
         -a "$INSTALLED_CLOUD_HOST" != "$CLOUD_HOST" ]
     then
         echo >&2
-        echo "This package is for another instance of $CLOUD_NAME! Exiting..." >&2
+        echo "This package is for another instance of $CLOUD_NAME!"
+        echo "Please unlink the system from $CLOUD_NAME first."
+        echo "Exiting..." >&2
         echo >&2
         exit 1
     fi
 }
 
-case "$1" in
-    upgrade|abort-upgrade)
-        check_cloud_host
-        ;;
-esac
+[ "$1" = "upgrade" ] && check_cloud_host
 
 db_get $COMPANY_NAME-mediaserver/accepted-$license
 if [ "$RET" = "true" ]; then

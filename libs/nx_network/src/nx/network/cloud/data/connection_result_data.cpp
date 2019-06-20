@@ -46,9 +46,7 @@ std::string toString(NatTraversalResultCode code)
 //-------------------------------------------------------------------------------------------------
 
 ConnectionResultRequest::ConnectionResultRequest():
-    StunRequestData(kMethod),
-    resultCode(NatTraversalResultCode::ok),
-    sysErrorCode(SystemError::noError)
+    StunRequestData(kMethod)
 {
 }
 
@@ -58,18 +56,17 @@ void ConnectionResultRequest::serializeAttributes(nx::network::stun::Message* co
     message->newAttribute<attrs::UdpHolePunchingResultCodeAttr>(
         static_cast<int>(resultCode));
     message->newAttribute<attrs::SystemErrorCodeAttr>(sysErrorCode);
+    message->newAttribute<attrs::ConnectTypeAttr>(connectType);
 }
 
 bool ConnectionResultRequest::parseAttributes(const nx::network::stun::Message& message)
 {
-    return
-        readEnumAttributeValue<attrs::UdpHolePunchingResultCodeAttr>(
-            message, &resultCode) &&
-        readEnumAttributeValue<attrs::SystemErrorCodeAttr>(
-            message, &sysErrorCode) &&
-        readStringAttributeValue<attrs::ConnectionId>(
-            message,
-            &connectSessionId);
+    // connectType is optional for backward compatibility.
+    readEnumAttributeValue<attrs::ConnectTypeAttr>(message, &connectType);
+    
+    return readEnumAttributeValue<attrs::UdpHolePunchingResultCodeAttr>(message, &resultCode)
+        && readEnumAttributeValue<attrs::SystemErrorCodeAttr>(message, &sysErrorCode)
+        && readStringAttributeValue<attrs::ConnectionId>(message, &connectSessionId);
 }
 
 } // namespace api

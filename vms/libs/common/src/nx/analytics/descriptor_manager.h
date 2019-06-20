@@ -42,6 +42,9 @@ public:
         const nx::vms::api::analytics::DeviceAgentManifest& manifest);
 
 private:
+    void commit();
+
+private:
     PluginDescriptorManager m_pluginDescriptorManager;
     EngineDescriptorManager m_engineDescriptorManager;
     GroupDescriptorManager m_groupDescriptorManager;

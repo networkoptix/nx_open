@@ -4,6 +4,7 @@
 #include <cstring>
 #include <memory>
 
+#include <QtCore/QLocale>
 #include <QtCore/QString>
 
 #include <nx/network/socket_common.h>
@@ -25,14 +26,14 @@ namespace {
 QDateTime parseRfc1123Date(const QByteArray& date)
 {
     static constexpr char kRfc1123Template[] = "ddd, dd MMM yyyy hh:mm:ss";
-    return QDateTime::fromString(date, kRfc1123Template);
+    return QLocale(QLocale::C).toDateTime(date, kRfc1123Template);
 }
 
 // Sunday, 06-Nov-94 08:49:37 GMT (RFC 850, obsoleted by RFC 1036)
 QDateTime parseRfc850Date(const QByteArray& date)
 {
     static constexpr char kRfc850Template[] = "dddd, dd-MMM-yy hh:mm:ss";
-    return QDateTime::fromString(date, kRfc850Template);
+    return QLocale(QLocale::C).toDateTime(date, kRfc850Template);
 }
 
 // Sun Nov  6 08:49:37 1994  (ANSI C's asctime() format)
@@ -42,7 +43,9 @@ QDateTime parseAnsiCDate(const QByteArray& date)
     // Non padded if the day of the month is >= 10, and padded if day of the month is < 10
     static constexpr char kAnsiCTemplate[]       = "ddd MMM d hh:mm:ss yyyy";
     static constexpr char kAnsiCTemplatePadded[] = "ddd MMM  d hh:mm:ss yyyy";
-    return QDateTime::fromString(date, date[8] == ' ' ? kAnsiCTemplatePadded : kAnsiCTemplate);
+    return QLocale(QLocale::C).toDateTime(
+        date,
+        date[8] == ' ' ? kAnsiCTemplatePadded : kAnsiCTemplate);
 }
 
 } //namespace
@@ -1915,20 +1918,25 @@ const StringType ContentType::NAME(kContentType);
 const StringType ContentType::kAny("*/*");
 const StringType ContentType::kDefaultCharset("utf-8");
 
-const ContentType ContentType::kPlain("text/plain");
-const ContentType ContentType::kHtml("text/html");
+// TODO: Apply default charset (UTF-8) to every text based content types when it's not specified.
+// Currenlt UTF-8 is explicitly specified for texts only because some browsers may fail otherwise.
+const ContentType ContentType::kPlain("text/plain; charset=utf-8");
+const ContentType ContentType::kHtml("text/html; charset=utf-8");
+const ContentType ContentType::kXml("application/xml");
+const ContentType ContentType::kForm("application/x-www-form-urlencoded");
 const ContentType ContentType::kJson("application/json");
+const ContentType ContentType::kUbjson("application/ubjson");
+const ContentType ContentType::kBinary("application/octet-stream");
 
 ContentType::ContentType(const StringType& headerValue)
 {
     const auto records = headerValue.split(';');
-    value = records[0];
-    charset = kDefaultCharset;
+    value = records[0].toLower();
     for (int i = 1; i < records.count(); ++i)
     {
         const auto parts = records[i].trimmed().split('=');
         if (parts[0] == "charset" && parts.size() == 2)
-            charset = parts[1];
+            charset = parts[1].toLower();
     }
 }
 
@@ -1940,6 +1948,18 @@ StringType ContentType::toString() const
 
     return result;
 }
+
+bool ContentType::operator==(const ContentType& rhs) const
+{
+    if (value != rhs.value)
+        return false;
+
+    if (charset.isEmpty() || rhs.charset.isEmpty())
+        return true;
+
+    return charset == rhs.charset;
+}
+
 
 } // namespace header
 

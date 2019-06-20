@@ -9,7 +9,7 @@ Rectangle
     property real maxWidth: 200
     property alias verticalPadding: textItem.topPadding
     property alias horizontalPadding: textItem.leftPadding
-
+    readonly property alias text: textItem.text
     implicitWidth: textItem.width
     implicitHeight: textItem.height
 
@@ -33,6 +33,12 @@ Rectangle
             hideTimer.stop()
     }
 
+    function hide()
+    {
+        hideTimer.stop()
+        showText("")
+    }
+
     Text
     {
         id: textItem
@@ -43,7 +49,7 @@ Rectangle
         anchors.centerIn: parent
 
         readonly property real textSpace:
-            fontMetrics.boundingRect(text).width + leftPadding + rightPadding + 1
+            fontMetrics.advanceWidth(text) + leftPadding + rightPadding
 
         FontMetrics
         {
@@ -69,7 +75,7 @@ Rectangle
         NumberAnimation
         {
             id: opacityAnimator
-            duration: 500
+            duration: 100
             easing.type: Easing.Linear
         }
     }
@@ -83,8 +89,8 @@ Rectangle
             id: hideTimer
 
             repeat: false
-            interval: 7000
-            onTriggered: control.showText("")
+            interval: 3000 + opacityAnimator.duration * 2
+            onTriggered: control.hide()
         }
     }
 

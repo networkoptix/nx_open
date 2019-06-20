@@ -106,7 +106,7 @@ std::vector<Filter> toEffectiveFilters(
 }
 
 Logger toLoggerInfo(
-    const std::shared_ptr<AbstractLogger>& logger,
+    const AbstractLogger* logger,
     const std::set<nx::utils::log::Filter>& effectiveFilters,
     int id)
 {

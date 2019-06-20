@@ -1,5 +1,6 @@
 #include "async_client.h"
 
+#include <nx/network/socket_global.h>
 #include <nx/network/url/url_parse_helper.h>
 
 #include <nx/utils/log/log.h>
@@ -15,6 +16,8 @@ AsyncClient::AsyncClient(Settings timeouts):
     m_settings(timeouts),
     m_reconnectTimer(std::make_unique<nx::network::RetryTimer>(m_settings.reconnectPolicy))
 {
+    ++SocketGlobals::instance().debugCounters().stunClientConnectionCount;
+
     bindToAioThread(getAioThread());
 }
 
@@ -30,6 +33,11 @@ AsyncClient::AsyncClient(
         bindToAioThread(tcpConnection->getAioThread());
         initializeMessagePipeline(std::move(tcpConnection));
     }
+}
+
+AsyncClient::~AsyncClient()
+{
+    --SocketGlobals::instance().debugCounters().stunClientConnectionCount;
 }
 
 void AsyncClient::bindToAioThread(network::aio::AbstractAioThread* aioThread)
@@ -188,17 +196,29 @@ void AsyncClient::cancelHandlers(void* client, utils::MoveOnlyFunc<void()> handl
     dispatch(
         [this, client, handler = std::move(handler)]()
         {
-            QnMutexLocker lock(&m_mutex);
-
-            removeByClient(&m_requestQueue, client);
-            removeByClient(&m_indicationHandlers, client);
-            m_reconnectHandlers.erase(client);
-            removeByClient(&m_requestsInProgress, client);
-            NX_VERBOSE(this, lm("Cancel requests from %1").arg(client));
-
-            lock.unlock();
+            cancelHandlersSync(client);
             handler();
         });
+}
+
+void AsyncClient::cancelHandlersSync(void* client)
+{
+    if (isInSelfAioThread())
+    {
+        QnMutexLocker lock(&m_mutex);
+
+        removeByClient(&m_requestQueue, client);
+        removeByClient(&m_indicationHandlers, client);
+        m_reconnectHandlers.erase(client);
+        removeByClient(&m_requestsInProgress, client);
+        NX_VERBOSE(this, lm("Cancel requests from %1").arg(client));
+    }
+    else
+    {
+        std::promise<void> done;
+        cancelHandlers(client, [&done]() { done.set_value(); });
+        done.get_future().wait();
+    }
 }
 
 void AsyncClient::setKeepAliveOptions(KeepAliveOptions options)

@@ -1,5 +1,7 @@
 #include "websocket.h"
 
+#include <nx/network/socket_global.h>
+
 #include <nx/utils/std/future.h>
 
 namespace nx {
@@ -30,6 +32,8 @@ WebSocket::WebSocket(
             ? frameType
             : FrameType::binary)
 {
+    ++SocketGlobals::instance().debugCounters().websocketConnectionCount;
+
     m_socket->setRecvTimeout(0);
     m_socket->setSendTimeout(0);
     aio::AbstractAsyncChannel::bindToAioThread(m_socket->getAioThread());
@@ -53,6 +57,8 @@ WebSocket::WebSocket(
 WebSocket::~WebSocket()
 {
     pleaseStopSync();
+
+    --SocketGlobals::instance().debugCounters().websocketConnectionCount;
 }
 
 void WebSocket::start()

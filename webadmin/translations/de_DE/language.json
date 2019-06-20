@@ -119,15 +119,13 @@
         "upnpPortMappingEnabled": "UPNP-Port-Mapping aktiviert",
         "useTextEmailFormat": "Nur-Text-Emails senden",
         "useWindowsEmailLineFeed": "Windows-Zeilenumbruch in Emails verwenden",
-        "hanwhaChunkReaderMessageBodyTimeoutSeconds": "Hanwha: Timeout für den Inhalt einer Chunk-Message",
-        "hanwhaChunkReaderResponseTimeoutSeconds": "Hanwha: Chunkantwort-Timeout",
-        "showHanwhaAlternativePtzControlsOnTile": "Hanwha: Alternative PTZ-Steuerung auf der Kachel anzeigen",
         "trafficEncryptionForced": "Trafficverschlüsselung erzwingen",
         "videoTrafficEncryptionForced": "Videotrafficverschlüsselung erzwingen",
         "updateStatus": "Update-Status",
         "watermarkSettings": "Wasserzeicheneinstellungen",
         "maxWebMTranscoders": "Maximale Anzahl von WEBM-Verbindungen für den Server. Chrome öffnet 2 Verbindungen auf einmal und schließt dann die erste. Es wird daher empfohlen, den Wert >=2 auf diesen Parameter zu setzen.",
-        "maxEventLogRecords": "Maximale Ereignisprotokollaufzeichnungen, die in der Datenbank gespeichert werden sollen. Die tatsächliche Anzahl der nicht gelöschten Datensätze kann bis zu 20% höher sein als der angegebene Wert."
+        "maxEventLogRecords": "Maximale Ereignisprotokollaufzeichnungen, die in der Datenbank gespeichert werden sollen. Die tatsächliche Anzahl der nicht gelöschten Datensätze kann bis zu 20% höher sein als der angegebene Wert.",
+        "forceLiveCacheForPrimaryStream": "Gibt an, ob einige Frames für den primären Stream zwischengespeichert werden sollen. Werte: \"Ja\" - immer aktiviert (verwendet möglicherweise viel RAM), \"Nein\" - immer deaktiviert, außer wenn dies für die Wiedergabe erforderlich ist (z. B. HLS), \"Auto\" - ähnlich wie \"Nein\", wird aber eingeschaltet, wenn die Benutzerfreundlichkeit verbessert wird (z.B. wenn einige Analytics-Plugins an der Kamera arbeiten)."
     },
     "info": {
         "tabs": {
@@ -191,5 +189,52 @@
     },
     "pageTitles": {
         "default": "{{PRODUCT_NAME}} Benutzeroberfläche"
+    },
+    "common": {
+        "voiceCommands": {
+            "search": "finden + [text für suchleiste]",
+            "pause": "pause",
+            "help": "hilfe | befehle anzeigen",
+            "collapse all servers": "alle server zusammenklappen",
+            "collapse server": "server zusammenklappen + [Servername]",
+            "play": "abspielen",
+            "clear search": "suche zurücksetzen",
+            "live": "live gehen | live anzeigen",
+            "expand all servers": "alle Server erweitern",
+            "stop listening": "abhören stoppen",
+            "expand server": "server erweitern + [Servername]",
+            "view": "ansicht + [kameraname]"
+        },
+        "systemOffline": "System offline",
+        "cameraLinks": {
+            "copyToClipboard": "in zwischenablage kopieren",
+            "highStream": "Hoher Stream",
+            "copyDefaultText": "kopieren",
+            "unknown": "Unbekannt",
+            "lowStream": "Niedriger Stream",
+            "transcoding": "Umkodierung",
+            "copyActiveText": "in die zwischenablage kopiert"
+        },
+        "searchCamPlaceholder": "Suche",
+        "cameraStates": {
+            "noFormat": "Dieser Browser unterstützt keine Videowiedergabe von dieser Kamera.",
+            "ieWin10": "Bitte benutzen Sie Microsoft Edge oder Google Chrome Browser.",
+            "iosVideoTooLarge": "iOS unterstützt Videos größer als FullHD (2MP: 1920 x 1080) nicht.",
+            "unauthorized": "Authentifizierung erforderlich",
+            "ubuntuNX": "Dieser Browser unterstützt keine Videos von ARM-basierten Servern. Bitte, verwenden Sie den Browser Chromium.",
+            "ieNoWebm": "Installieren Sie bitte <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM Codec</a> für den Internet Explorer.",
+            "flashOrWebmRequired": "Installieren Sie bitte <a href='https://get.adobe.com/flashplayer/' target='_blank'>Adobe Flash</a> oder<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'> WebM Codec</a>, um Videos im Internet Explorer abzuspielen.",
+            "noArmSupport": "Dieser Browser bzw. dieses Gerät unterstützt keine Videowiedergabe von ARM-basierten Servern.",
+            "error": "Fehler",
+            "offline": "Offline",
+            "noData": "Keine Daten",
+            "flashRequired": "Installieren Sie bitte <a href='https://get.adobe.com/flashplayer/' target='_blank'>Adobe Flash</a>, um Videos abzuspielen."
+        },
+        "chromeCastWarning": "Chromecast ist ressourcenintensiv und kann Probleme auf Ihrem Server verursachen.",
+        "resolution": {
+            "high": "Hoch",
+            "auto": "Auto",
+            "low": "Niedrig"
+        }
     }
 }

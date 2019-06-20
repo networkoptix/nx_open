@@ -403,10 +403,7 @@ protected:
         };
 
         waitForPredicateBecomeTrue(
-            [this, dataIsReady]()
-            {
-                return dataIsReady();
-            },
+            [dataIsReady]() { return dataIsReady(); },
             "thenFistTaskShouldFire");
 
         auto user1Tasks = user1->tasks();

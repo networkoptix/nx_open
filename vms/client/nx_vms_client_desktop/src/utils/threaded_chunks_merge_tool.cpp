@@ -28,6 +28,8 @@ void QnThreadedChunksMergeTool::run() {
 
 QnThreadedChunksMergeTool::~QnThreadedChunksMergeTool()
 {
+    // It should help us to track a strange crash on exit.
+    NX_VERBOSE(this, "~QnThreadedChunksMergeTool");
     stop();
 }
 

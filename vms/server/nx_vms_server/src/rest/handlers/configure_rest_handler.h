@@ -1,26 +1,35 @@
 #pragma once
 
-#include <rest/server/json_rest_handler.h>
 #include <core/resource_access/user_access_data.h>
+#include <nx/network/rest/handler.h>
 #include <nx/vms/server/server_module_aware.h>
 
-namespace ec2 {
-    class AbstractTransactionMessageBus;
-}
-
+namespace ec2 { class AbstractTransactionMessageBus; }
 struct ConfigureSystemData;
 
-class QnConfigureRestHandler:
-    public QnJsonRestHandler,
-    public /*mixin*/ nx::vms::server::ServerModuleAware
-{
-    Q_OBJECT
-public:
-    QnConfigureRestHandler(QnMediaServerModule* serverModule);
+namespace nx::vms::server {
 
-    virtual int executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*) override;
-    virtual int executePost(const QString &path, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result, const QnRestConnectionProcessor*) override;
+class ConfigureRestHandler:
+    public nx::network::rest::Handler,
+    public /*mixin*/ ServerModuleAware
+{
+public:
+    ConfigureRestHandler(QnMediaServerModule* serverModule);
+
+protected:
+    virtual nx::network::rest::Response executeGet(
+        const nx::network::rest::Request& request) override;
+
+    virtual nx::network::rest::Response executePost(
+        const nx::network::rest::Request& request) override;
+
 private:
-    int execute(const ConfigureSystemData& data, QnJsonRestResult &result, const QnRestConnectionProcessor* owner);
+    nx::network::http::StatusCode::Value execute(
+        const ConfigureSystemData& data,
+        nx::network::rest::JsonResult& result,
+        const QnRestConnectionProcessor* owner);
+
     int changePort(const QnRestConnectionProcessor* owner, int port);
 };
+
+} // namespace nx::vms::server

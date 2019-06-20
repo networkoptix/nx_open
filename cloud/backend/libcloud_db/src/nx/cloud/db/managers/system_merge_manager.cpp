@@ -16,7 +16,7 @@ SystemMergeManager::SystemMergeManager(
     AbstractSystemManager* systemManager,
     const AbstractSystemHealthInfoProvider& systemHealthInfoProvider,
     AbstractVmsGateway* vmsGateway,
-    nx::sql::AsyncSqlQueryExecutor* queryExecutor)
+    nx::sql::AbstractAsyncSqlQueryExecutor* queryExecutor)
     :
     m_systemManager(systemManager),
     m_systemHealthInfoProvider(systemHealthInfoProvider),

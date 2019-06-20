@@ -99,7 +99,8 @@ private:
 
     void issueConnectRequestToMediator();
 
-    std::unique_ptr<hpm::api::MediatorClientUdpConnection> prepareForUdpHolePunching();
+    std::tuple<SystemError::ErrorCode, std::unique_ptr<hpm::api::MediatorClientUdpConnection>>
+        prepareForUdpHolePunching();
 
     void onConnectResponse(
         nx::hpm::api::ResultCode resultCode,

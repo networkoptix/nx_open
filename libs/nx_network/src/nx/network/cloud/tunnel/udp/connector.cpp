@@ -21,7 +21,7 @@ using namespace nx::hpm;
 TunnelConnector::TunnelConnector(
     AddressEntry targetHostAddress,
     std::string connectSessionId,
-    std::unique_ptr<nx::network::UDPSocket> udpSocket)
+    std::unique_ptr<AbstractDatagramSocket> udpSocket)
 :
     m_targetHostAddress(std::move(targetHostAddress)),
     m_connectSessionId(std::move(connectSessionId)),
@@ -253,7 +253,7 @@ std::unique_ptr<RendezvousConnectorWithVerification>
         rendezvousConnector = std::make_unique<RendezvousConnectorWithVerification>(
             m_connectSessionId,
             std::move(endpoint),
-            std::move(m_udpSocket)); //< Moving system socket handler from m_mediatorUdpClient to udt connection.
+            std::exchange(m_udpSocket, nullptr)); //< Moving system socket handler from m_mediatorUdpClient to udt connection.
         m_udpSocket.reset();
     }
     else

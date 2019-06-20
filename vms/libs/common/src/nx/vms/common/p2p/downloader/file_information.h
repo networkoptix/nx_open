@@ -60,12 +60,9 @@ public:
     QString absoluteDirectoryPath;
 
     // Calculates a progress for download, [0..100].
-    float calculateDownloadProgress() const;
+    int calculateDownloadProgress() const;
     // Calculates total number of bytes downloaded.
-    int calculateDownloadedBytes() const;
-    QString key() const;
-    static QString keyFromFileName(const QString& fileName);
-
+    qint64 calculateDownloadedBytes() const;
 };
 
 #define FileInformation_Fields \

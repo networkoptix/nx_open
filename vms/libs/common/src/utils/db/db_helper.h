@@ -226,7 +226,8 @@ public:
     }
 
     template <typename Container, typename Value>
-    static void insertToContainer(Container& container, const Value& value, decltype(&Container::insert))
+    static void insertToContainer(
+		Container& container, const Value& value, decltype(Container::insert(value)))
     {
         container.insert(value);
     }

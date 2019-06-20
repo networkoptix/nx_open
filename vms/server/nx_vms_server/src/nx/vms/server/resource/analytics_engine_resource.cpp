@@ -1,7 +1,7 @@
 #include "analytics_engine_resource.h"
 
 #include <media_server/media_server_module.h>
-#include <plugins/plugins_ini.h>
+#include <plugins/vms_server_plugins_ini.h>
 
 #include <nx/vms/server/sdk_support/utils.h>
 #include <nx/vms/server/analytics/debug_helpers.h>

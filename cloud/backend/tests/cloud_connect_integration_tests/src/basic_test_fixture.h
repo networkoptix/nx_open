@@ -10,13 +10,16 @@
 #include <nx/network/cloud/cloud_server_socket.h>
 #include <nx/network/http/http_types.h>
 #include <nx/network/http/test_http_server.h>
+#include <nx/network/stream_proxy.h>
 #include <nx/network/stun/async_client.h>
 #include <nx/utils/std/optional.h>
+#include <nx/utils/test_support/test_with_temporary_directory.h>
 #include <nx/utils/thread/sync_queue.h>
 
-#include <nx/cloud/relay/model/abstract_remote_relay_peer_pool.h>
-#include <nx/cloud/relay/test_support/traffic_relay_launcher.h>
-#include <nx/cloud/mediator/test_support/mediator_functional_test.h>
+#include <nx/cloud/relay/model/remote_relay_peer_pool.h>
+#include <nx/cloud/relay/test_support/traffic_relay_cluster.h>
+#include <nx/cloud/relay/settings.h>
+#include <nx/cloud/mediator/test_support/mediator_cluster.h>
 
 namespace nx {
 namespace network {
@@ -43,27 +46,16 @@ enum class MediatorApiProtocol
     http
 };
 
-using Relay = nx::cloud::relay::test::Launcher;
-using RelayPtr = std::unique_ptr<Relay>;
-
-using RelayPtrList = std::vector<RelayPtr>;
-
 class BasicTestFixture;
 
 class MemoryRemoteRelayPeerPool:
-    public nx::cloud::relay::model::AbstractRemoteRelayPeerPool
+    public nx::cloud::relay::model::RemoteRelayPeerPool
 {
+    using base_type = nx::cloud::relay::model::RemoteRelayPeerPool;
 public:
-    MemoryRemoteRelayPeerPool(BasicTestFixture* relayTest):
-        m_relayTest(relayTest)
-    {}
-
-    virtual bool connectToDb() override;
-    virtual bool isConnected() const override;
-
-    virtual void findRelayByDomain(
-        const std::string& /*domainName*/,
-        nx::utils::MoveOnlyFunc<void(std::string /*relay hostname/ip*/)> handler) const override;
+    MemoryRemoteRelayPeerPool(
+        const nx::cloud::relay::conf::Settings& settings,
+        BasicTestFixture* relayTest);
 
     virtual void addPeer(
         const std::string& domainName,
@@ -73,14 +65,53 @@ public:
         const std::string& domainName,
         nx::utils::MoveOnlyFunc<void(bool /*result*/)> handler) override;
 
-    virtual void setNodeId(const std::string& /*nodeId*/) override {}
-
 private:
     BasicTestFixture* m_relayTest;
 };
 
-class BasicTestFixture
+//-------------------------------------------------------------------------------------------------
+
+
+class MediatorConnectorCluster
 {
+public:
+    struct Context
+    {
+        nx::hpm::MediatorInstance& mediator;
+        nx::hpm::api::MediatorConnector connector;
+
+        Context(
+            nx::hpm::MediatorInstance& mediator,
+            const QString& cloudHost);
+
+        Context(const Context&) = delete;
+        Context& operator =(const Context&) = delete;
+    };
+
+public:
+    MediatorConnectorCluster(const nx::utils::Url& discoveryServiceUrl);
+    Context& addContext(const std::vector<const char*> args = {},
+        int flags = nx::hpm::MediatorFunctionalTest::MediatorTestFlags::allFlags,
+        const QString& testDir = QString(),
+        const QString& cloudHost = QString());
+
+    Context& context(int index);
+
+    nx::hpm::test::MediatorCluster& cluster();
+    const nx::hpm::test::MediatorCluster& cluster() const;
+
+private:
+    nx::hpm::test::MediatorCluster m_cluster;
+    std::vector<std::unique_ptr<Context>> m_mediators;
+};
+
+//-------------------------------------------------------------------------------------------------
+
+class BasicTestFixture:
+    public nx::utils::test::TestWithTemporaryDirectory
+{
+    using base_type = nx::utils::test::TestWithTemporaryDirectory;
+
 public:
     enum Flag
     {
@@ -96,7 +127,7 @@ public:
      * @param flags Bitset of BasicTestFixture::Flag values.
      */
     void setInitFlags(int flags);
-    network::SocketAddress relayInstanceEndpoint(RelayPtrList::size_type index) const;
+    network::SocketAddress relayInstanceEndpoint(int index) const;
 
     void addRelayStartupArgument(
         const std::string& name,
@@ -105,27 +136,79 @@ public:
 protected:
     void SetUp();
 
-    void startServer();
-    void stopServer();
-    nx::utils::Url relayUrl(int relayNum = 0) const;
-    void restartMediator();
+    nx::cloud::discovery::test::DiscoveryServer& discoveryServer();
 
-    void assertConnectionCanBeEstablished();
+    /**
+     * Mediator.
+     */
+
+    void addMediator();
+    int mediatorCount() const;
+    void startMediator(int index = 0);
+    void restartMediator(int index = 0);
+    const nx::hpm::test::MediatorCluster& mediatorCluster() const;
+    nx::hpm::MediatorInstance& mediator(int index = 0);
+    MediatorConnectorCluster::Context& mediatorContext(int index = 0);
+    void setMediatorApiProtocol(MediatorApiProtocol mediatorApiProtocol);
+    void configureProxyBeforeMediator();
+    void blockDownTrafficThroughExistingConnectionsToMediator();
+
+    /**
+     * Module URL provider.
+     */
+
+    void startCloudModulesXmlProvider();
+    void registerServicesInModuleProvider();
+
+    /**
+     * Relay.
+     */
+
+    void setRelayCount(int count);
+    void startRelays();
+    void startRelay(int index);
+    nx::cloud::relay::test::TrafficRelay& trafficRelay(int index = 0);
+    nx::utils::Url relayUrl(int relayNum = 0) const;
+    std::string relayClusterId() const;
+    int relayClusterSize() const;
+
+    /**
+     * Listening server.
+     */
+
+    /**
+     * Starts the server on mediator(mediatorIndex).
+     */
+    void startServer(int mediatorIndex = 0);
+    void stopServer();
+    std::string serverSocketCloudAddress() const;
+    const hpm::api::SystemCredentials& cloudSystemCredentials() const;
+    void setRemotePeerName(const std::string& peerName);
+
+    /**
+     * Stops all Cloud services launched with corresponding functions.
+     */
+    void stopCloud();
+
+    /**
+     * Starts Cloud services as before invokation of stopCloud().
+     */
+    void startCloud();
+
+    /**
+     * Validation functions.
+     */
+
+    void assertCloudConnectionCanBeEstablished();
+    void waitUntilCloudConnectionCanBeEstablished();
+    SystemError::ErrorCode tryEstablishCloudConnection();
 
     void startExchangingFixedData();
     void assertDataHasBeenExchangedCorrectly();
 
-    nx::hpm::MediatorFunctionalTest& mediator();
-    nx::cloud::relay::test::Launcher& trafficRelay();
-    std::string serverSocketCloudAddress() const;
-    const hpm::api::SystemCredentials& cloudSystemCredentials() const;
-
-    void waitUntilServerIsRegisteredOnMediator();
+    nx::hpm::MediatorEndpoint waitUntilServerIsRegisteredOnMediator();
     void waitUntilServerIsRegisteredOnTrafficRelay();
     void waitUntilServerIsUnRegisteredOnTrafficRelay();
-
-    void setRemotePeerName(const std::string& peerName);
-    void setMediatorApiProtocol(MediatorApiProtocol mediatorApiProtocol);
 
     const std::unique_ptr<network::AbstractStreamSocket>& clientSocket();
 
@@ -150,9 +233,19 @@ private:
         std::string value;
     };
 
+    struct ProxyContext
+    {
+        nx::network::SocketAddress endpoint;
+        nx::network::StreamProxy proxy;
+        std::atomic<int> lastConnectionNumber{0};
+        std::atomic<int> blockedConnectionNumber{-1};
+    };
+
     QnMutex m_mutex;
     const nx::network::http::BufferType m_staticMsgBody;
-    nx::hpm::MediatorFunctionalTest m_mediator;
+    nx::cloud::discovery::test::DiscoveryServer m_discoveryServer;
+    std::string m_discoveryServiceUrl;
+    std::unique_ptr<MediatorConnectorCluster> m_mediatorCluster;
     hpm::api::SystemCredentials m_cloudSystemCredentials;
     std::unique_ptr<nx::network::http::TestHttpServer> m_httpServer;
     nx::network::http::TestHttpServer m_cloudModulesXmlProvider;
@@ -168,21 +261,22 @@ private:
     nx::network::http::BufferType m_expectedMsgBody;
     std::unique_ptr<network::AbstractStreamSocket> m_clientSocket;
 
-    RelayPtrList m_relays;
+    std::unique_ptr<ProxyContext> m_proxyBeforeMediator;
+
+    std::unique_ptr<nx::cloud::relay::test::TrafficRelayCluster> m_relayCluster;
     int m_relayCount;
     std::optional<std::chrono::seconds> m_disconnectedPeerTimeout;
 
     void initializeCloudModulesXmlWithDirectStunPort();
     void initializeCloudModulesXmlWithStunOverHttp();
-    void startHttpServer();
+    void startHttpServer(nx::hpm::api::MediatorConnector* connector);
     void onHttpRequestDone(
         std::list<std::unique_ptr<nx::network::http::AsyncClient>>::iterator clientIter);
-    void startRelays();
-    void startRelay(int index);
     void waitForServerStatusOnRelay(ServerRelayStatus status);
 
     virtual void peerAdded(const std::string& /*serverName*/) {}
     virtual void peerRemoved(const std::string& /*serverName*/) {}
+
     void setUpRemoteRelayPeerPoolFactoryFunc();
     void setUpPublicIpFactoryFunc();
 };

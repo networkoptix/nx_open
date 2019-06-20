@@ -179,7 +179,7 @@ class CloudSession(object):
         log.info('Sleeping 60 seconds')
         time.sleep(60)
 
-    def wait_for_message(self, queue, tries=3, seconds_per_try=20):
+    def wait_for_message(self, queue, tries=6, seconds_per_try=20):
         for i in range(tries):
             for message in queue.receive_messages(WaitTimeSeconds=seconds_per_try):
                 try:

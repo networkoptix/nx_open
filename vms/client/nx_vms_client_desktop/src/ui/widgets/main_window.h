@@ -64,6 +64,9 @@ public:
 
     void updateDecorationsState();
 
+    bool isWorkbenchVisible() const;
+    bool isWelcomeScreenVisible() const;
+
     /**
      * Handle key press.
      * @returns true if key was handled.
@@ -107,6 +110,8 @@ private:
 
     std::pair<int, bool> calculateHelpTopic() const;
     void updateHelpTopic();
+
+    bool isFullScreenMode() const;
 
 private:
     /* Note that destruction order is important here, so we use scoped pointers. */

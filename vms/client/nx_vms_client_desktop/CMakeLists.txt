@@ -35,6 +35,7 @@ nx_add_target(nx_vms_client_desktop LIBRARY ${library_type}
         "${CMAKE_CURRENT_LIST_DIR}/skins/${defaultSkin}"
         "${customization_dir}/nx_client_desktop/resources"
         "${customization_dir}/icons/all/logo.png"
+        "${customization_dir}/icons/all/videowall.ico"
         "${customization_dir}/license.html"
         "${CMAKE_CURRENT_BINARY_DIR}/globals.json"
         "${nov_file_launcher_executable}"
@@ -53,6 +54,7 @@ nx_add_target(nx_vms_client_desktop LIBRARY ${library_type}
         vms_gateway_core
         nx_vms_applauncher_api
         qtsingleapplication
+        qthttpserver
         nx_kit
     MACOS_ARG_MAX_WORKAROUND
 )
@@ -60,6 +62,8 @@ nx_add_target(nx_vms_client_desktop LIBRARY ${library_type}
 target_compile_definitions(nx_vms_client_desktop
     PRIVATE NX_VMS_CLIENT_DESKTOP_API=${API_EXPORT_MACRO}
     INTERFACE NX_VMS_CLIENT_DESKTOP_API=${API_IMPORT_MACRO})
+
+nx_force_include(nx_vms_client_desktop ${CMAKE_SOURCE_DIR}/libs/nx_utils/src/nx/utils/literal.h)
 
 if(WINDOWS)
     add_dependencies(nx_vms_client_desktop nov_file_launcher)

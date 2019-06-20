@@ -144,9 +144,36 @@ TEST_F(QnWorkbenchAccessControllerTest, checkExportedLayouts)
 
     /* Exported layouts can be edited when we are not logged in. */
     Qn::Permissions desired = Qn::FullLayoutPermissions;
-    /* But their name is fixed. */
-    Qn::Permissions forbidden = Qn::RemovePermission;
+
+    // Now it is decided to (theoretically) allow removing of layout files.
+    // Qn::Permissions forbidden = Qn::RemovePermission;
+    Qn::Permissions forbidden = Qn::NoPermissions;
     desired &= ~forbidden;
+
+    checkPermissions(layout, desired, forbidden);
+
+    /* Result is the same even for live users... */
+    loginAs(GlobalPermission::liveViewerPermissions);
+    checkPermissions(layout, desired, forbidden);
+
+    /* ...even in safe mode. */
+    commonModule()->setReadOnly(true);
+    checkPermissions(layout, desired, forbidden);
+}
+
+/** Fix permissions for exported layouts (files). */
+TEST_F(QnWorkbenchAccessControllerTest, checkEncryptedExportedLayouts)
+{
+    auto layout = createLayout(Qn::exported_layout);
+    layout->setUrl("path/to/file");
+    layout.dynamicCast<QnFileLayoutResource>()->setIsEncrypted(true);
+    resourcePool()->addResource(layout);
+
+    ASSERT_TRUE(layout->isFile());
+
+    // Encrypted layouts cannot be edited, only (theoretically) removed or (theoretically) renamed.
+    Qn::Permissions desired = Qn::ReadPermission | Qn::RemovePermission | Qn::WriteNamePermission;
+    Qn::Permissions forbidden = ~desired;
 
     checkPermissions(layout, desired, forbidden);
 
@@ -169,7 +196,9 @@ TEST_F(QnWorkbenchAccessControllerTest, checkExportedLayoutsLocked)
     ASSERT_TRUE(layout->isFile());
 
     Qn::Permissions desired = Qn::FullLayoutPermissions;
-    Qn::Permissions forbidden = Qn::AddRemoveItemsPermission | Qn::RemovePermission;
+    // Now it is decided to (theoretically) allow removing of layout files.
+    // Qn::Permissions forbidden = Qn::RemovePermission | Qn::AddRemoveItemsPermission;
+    Qn::Permissions forbidden = Qn::AddRemoveItemsPermission;
     desired &= ~forbidden;
 
     checkPermissions(layout, desired, forbidden);

@@ -156,6 +156,7 @@ public:
     boost::optional<int> bypassChannel() const;
 
     CameraDiagnostics::Result enableAudioInput();
+    CameraDiagnostics::Result ensureMulticastEnabled(Qn::ConnectionRole role);
 
 protected:
     virtual CameraDiagnostics::Result initializeCameraDriver() override;
@@ -163,6 +164,7 @@ protected:
     virtual QnAbstractPtzController* createPtzControllerInternal() const override;
     virtual QnAbstractArchiveDelegate* createArchiveDelegate() override;
     virtual bool allowRtspVideoLayout() const override { return false; }
+    virtual std::vector<Camera::AdvancedParametersProvider*> advancedParametersProviders() override;
 
 private:
     CameraDiagnostics::Result initDevice();
@@ -200,6 +202,9 @@ private:
     CameraDiagnostics::Result fetchPtzLimits(QnPtzLimits* outPtzLimits);
 
     CameraDiagnostics::Result fetchCodecInfo(HanwhaCodecInfo* outCodecInfo);
+    CameraDiagnostics::Result enableMulticast(
+        int profileNumber,
+        const nx::vms::server::resource::MulticastParameters& multicastParameters);
 
     void cleanUpOnProxiedDeviceChange();
 
@@ -272,8 +277,6 @@ private:
         const QnCameraAdvancedParameter& parameter,
         const HanwhaAdavancedParameterInfo& parameterInfo,
         const QString& str) const;
-
-    void reopenStreams(bool reopenPrimary, bool reopenSecondary);
 
     int suggestBitrate(
         const HanwhaCodecLimits& limits,

@@ -17,7 +17,7 @@ EmbeddedDatabase::EmbeddedDatabase(
     m_syncEngine(
         kApplicationId,
         settings.synchronizationSettings,
-        nx::clusterdb::engine::ProtocolVersionRange(1, 1),
+        nx::clusterdb::engine::ProtocolVersionRange::any,
         queryExecutor),
     m_database(&m_syncEngine, queryExecutor, settings.synchronizationSettings.clusterId)
 {
@@ -26,6 +26,11 @@ EmbeddedDatabase::EmbeddedDatabase(
 Database& EmbeddedDatabase::database()
 {
     return m_database;
+}
+
+nx::clusterdb::engine::SynchronizationEngine & EmbeddedDatabase::synchronizationEngine()
+{
+    return m_syncEngine;
 }
 
 } // namespace nx::clusterdb::map

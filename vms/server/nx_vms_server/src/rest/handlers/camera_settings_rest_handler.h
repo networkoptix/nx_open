@@ -34,7 +34,7 @@
 
 class QnCachingCameraAdvancedParamsReader;
 
-struct QnCameraSettingsRestHandlerPostBody; //< Private - made public for Fusion.
+struct QnCameraAdvancedParamsPostBody;
 
 class QnCameraSettingsRestHandler: public Connective<QnJsonRestHandler>
 {
@@ -60,7 +60,7 @@ public:
 
 private:
     using StatusCode = nx::network::http::StatusCode::Value;
-    using PostBody = QnCameraSettingsRestHandlerPostBody;
+    using PostBody = QnCameraAdvancedParamsPostBody;
 
     StatusCode obtainCameraFromRequestParams(
         const QnRequestParams& requestParams,

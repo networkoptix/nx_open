@@ -1,23 +1,27 @@
 #include "settings.h"
 
+#include <nx/utils/timer_manager.h>
 #include <nx/utils/deprecated_settings.h>
 
 namespace nx::cloud::discovery {
 
 namespace {
 
-static const QLatin1String kDiscoveryServiceUrl("discovery/discoveryServiceUrl");
-static const QLatin1String kDefaultDiscoveryServiceUrl("https://discovery.nxvms.com");
+static constexpr char kDiscoveryEnabled[] = "enabled";
+static constexpr char kDefaultDiscoveryEnabled[] = "false";
 
-static const QLatin1String kRoundTripPadding("discovery/roundTripPadding");
+static constexpr char kDiscoveryServiceUrl[] = "discoveryServiceUrl";
+static constexpr char kDefaultDiscoveryServiceUrl[] = "https://discovery.vmsproxy.com";
+
+static constexpr char kRoundTripPadding[] = "roundTripPadding";
 static const std::chrono::milliseconds kDefaultRoundTripPadding =
     std::chrono::seconds(3);
 
-static const QLatin1String kRegistrationErrorDelay("discovery/registrationErrorDelay");
+static constexpr char kRegistrationErrorDelay[] = "registrationErrorDelay";
 static const std::chrono::milliseconds kDefaultRegistrationErrorDelay =
     std::chrono::minutes(1);
 
-static const QLatin1String kOnlineNodesRequestDelay("discovery/onlineNodesRequestDelay");
+static constexpr char kOnlineNodesRequestDelay[] = "onlineNodesRequestDelay";
 static const std::chrono::milliseconds kDefaultOnlineNodesRequestDelay =
     std::chrono::seconds(30);
 
@@ -31,24 +35,32 @@ Settings::Settings():
 {
 }
 
-void Settings::load(const QnSettings& settings)
+void Settings::load(const QnSettings& settings, std::string groupName)
 {
-    discoveryServiceUrl =
-        settings.value(kDiscoveryServiceUrl, kDefaultDiscoveryServiceUrl).toString();
+    while (!groupName.empty() && groupName.back() == '/')
+        groupName.pop_back();
 
-    // On Linux, count() returns a long, which is unsupported by QVariant constructors
-    // int is supported though.
-    roundTripPadding = std::chrono::milliseconds(settings.value(
-        kRoundTripPadding,
-        (int)kDefaultRoundTripPadding.count()).toInt());
+    QString settingsTemplate = groupName.empty() ? "%1%2" : "%1/%2";
 
-    registrationErrorDelay = std::chrono::milliseconds(settings.value(
-        kRegistrationErrorDelay,
-        (int)kDefaultRegistrationErrorDelay.count()).toInt());
+    enabled = settings.value(
+        lm(settingsTemplate).arg(groupName).arg(kDiscoveryEnabled),
+        kDefaultDiscoveryEnabled).toString() == "true";
 
-    onlineNodesRequestDelay = std::chrono::milliseconds(settings.value(
-        kOnlineNodesRequestDelay,
-        (int)kDefaultOnlineNodesRequestDelay.count()).toInt());
+    discoveryServiceUrl = settings.value(
+        lm(settingsTemplate).arg(groupName).arg(kDiscoveryServiceUrl),
+        kDefaultDiscoveryServiceUrl).toString();
+
+    roundTripPadding = nx::utils::parseTimerDuration(
+        settings.value(lm(settingsTemplate).arg(groupName).arg(kRoundTripPadding)).toString(),
+        kDefaultRoundTripPadding);
+
+    registrationErrorDelay = nx::utils::parseTimerDuration(
+        settings.value(lm(settingsTemplate).arg(groupName).arg(kRegistrationErrorDelay)).toString(),
+        kDefaultRegistrationErrorDelay);
+
+    onlineNodesRequestDelay = nx::utils::parseTimerDuration(
+        settings.value(lm(settingsTemplate).arg(groupName).arg(kOnlineNodesRequestDelay)).toString(),
+        kDefaultOnlineNodesRequestDelay);
 }
 
 } // namespace nx::cloud::discovery

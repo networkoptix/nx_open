@@ -151,7 +151,60 @@ private:
 
 //-------------------------------------------------------------------------------------------------
 
+class AbstractFetchNextRecordFromCursorTask
+{
+public:
+    virtual ~AbstractFetchNextRecordFromCursorTask() = default;
+
+    virtual QnUuid cursorId() const = 0;
+    virtual void fetchNextRecordFrom(AbstractCursorHandler* cursorHandler) = 0;
+    virtual void reportError(DBResult resultCode) = 0;
+    virtual void reportRecord() = 0;
+};
+
 template<typename Record>
+class FetchNextRecordFromCursorTask:
+    public AbstractFetchNextRecordFromCursorTask
+{
+public:
+    FetchNextRecordFromCursorTask(
+        QnUuid cursorId,
+        nx::utils::MoveOnlyFunc<void(DBResult, Record)> completionHandler)
+        :
+        m_cursorId(std::move(cursorId)),
+        m_completionHandler(std::move(completionHandler))
+    {
+    }
+
+    virtual QnUuid cursorId() const override
+    {
+        return m_cursorId;
+    }
+
+    virtual void fetchNextRecordFrom(AbstractCursorHandler* cursorHandler) override
+    {
+        auto typedCursorHandler = static_cast<CursorHandler<Record>*>(cursorHandler);
+        m_record = typedCursorHandler->fetchNextRecord();
+    }
+
+    virtual void reportRecord() override
+    {
+        auto record = std::move(*m_record);
+        m_record = std::nullopt;
+        m_completionHandler(DBResult::ok, std::move(record));
+    }
+
+    virtual void reportError(DBResult resultCode) override
+    {
+        m_completionHandler(resultCode, Record());
+    }
+
+private:
+    const QnUuid m_cursorId;
+    nx::utils::MoveOnlyFunc<void(DBResult, Record)> m_completionHandler;
+    std::optional<Record> m_record;
+};
+
 class FetchCursorDataExecutor:
     public BasicCursorOperationExecutor
 {
@@ -160,19 +213,17 @@ class FetchCursorDataExecutor:
 public:
     FetchCursorDataExecutor(
         CursorHandlerPool* cursorContextPool,
-        QnUuid cursorId,
-        nx::utils::MoveOnlyFunc<void(DBResult, Record)> completionHandler)
+        std::unique_ptr<AbstractFetchNextRecordFromCursorTask> task)
         :
         base_type(cursorContextPool),
-        m_cursorId(cursorId),
-        m_completionHandler(std::move(completionHandler))
+        m_task(std::move(task))
     {
     }
 
     virtual void reportErrorWithoutExecution(DBResult errorCode) override
     {
-        cursorContextPool()->remove(m_cursorId);
-        m_completionHandler(errorCode, Record());
+        cursorContextPool()->remove(m_task->cursorId());
+        m_task->reportError(errorCode);
     }
 
     virtual void setExternalTransaction(Transaction* /*transaction*/) override
@@ -182,32 +233,30 @@ public:
 protected:
     virtual void executeCursor(AbstractDbConnection* const /*connection*/) override
     {
-        auto cursorHandler = cursorContextPool()->cursorHander(m_cursorId);
+        auto cursorHandler = cursorContextPool()->cursorHander(m_task->cursorId());
         if (!cursorHandler)
         {
-            m_completionHandler(DBResult::notFound, Record());
+            m_task->reportError(DBResult::notFound);
             // Unknown cursor id is not a reason to close connection, so reporting ok.
             return;
         }
 
-        auto typedCursorHandler = static_cast<CursorHandler<Record>*>(cursorHandler);
         try
         {
-            auto record = typedCursorHandler->fetchNextRecord();
-            m_completionHandler(DBResult::ok, std::move(record));
+            m_task->fetchNextRecordFrom(cursorHandler);
+            m_task->reportRecord();
         }
         catch (const Exception& e)
         {
-            cursorContextPool()->remove(m_cursorId);
-            m_completionHandler(e.dbResult(), Record());
+            cursorContextPool()->remove(m_task->cursorId());
+            m_task->reportError(e.dbResult());
             if (e.dbResult() != DBResult::endOfData) //< End of cursor data is not an error actually.
                 throw;
         }
     }
 
 private:
-    QnUuid m_cursorId;
-    nx::utils::MoveOnlyFunc<void(DBResult, Record)> m_completionHandler;
+    std::unique_ptr<AbstractFetchNextRecordFromCursorTask> m_task;
 };
 
 //-------------------------------------------------------------------------------------------------

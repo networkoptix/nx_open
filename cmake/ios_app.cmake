@@ -108,6 +108,9 @@ function(setup_ios_application target)
 
     set(app_dir "$<TARGET_FILE_DIR:${target}>")
 
+    add_custom_command(TARGET ${target} PRE_BUILD
+        COMMAND ${CMAKE_COMMAND} -E remove_directory ${app_dir}
+    )
     add_custom_command(TARGET ${target} PRE_LINK
         COMMAND ${PYTHON_EXECUTABLE} "${PROJECT_SOURCE_DIR}/build_utils/python/qmldeploy.py"
             --qt-root ${QT_DIR} --qml-root "${APP_QML_ROOT}"

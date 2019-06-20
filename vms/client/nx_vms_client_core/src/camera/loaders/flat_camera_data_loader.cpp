@@ -52,9 +52,8 @@ QnFlatCameraDataLoader::~QnFlatCameraDataLoader()
     trace(lit("Deleting loader"));
 }
 
-int QnFlatCameraDataLoader::load(const QString &filter, const qint64 resolutionMs) {
-    Q_UNUSED(resolutionMs);
-
+int QnFlatCameraDataLoader::load(const QString &filter, const qint64 resolutionMs)
+{
     if (filter != m_filter)
     {
         trace(lit("Updating filter from %1 to %2").arg(m_filter).arg(filter));
@@ -89,7 +88,7 @@ int QnFlatCameraDataLoader::load(const QString &filter, const qint64 resolutionM
 
     m_loading.clear(); /* Just in case. */
     m_loading.startTimeMs = startTimeMs;
-    m_loading.handle = sendRequest(startTimeMs);
+    m_loading.handle = sendRequest(startTimeMs, resolutionMs);
     trace(lit("Loading period since %1 (%2), request %3").arg(startTimeMs).arg(dt(startTimeMs)).arg(m_loading.handle));
     return m_loading.handle;
 }
@@ -110,7 +109,7 @@ void QnFlatCameraDataLoader::updateServer(const QnMediaServerResourcePtr& server
     m_server = server;
 }
 
-int QnFlatCameraDataLoader::sendRequest(qint64 startTimeMs)
+int QnFlatCameraDataLoader::sendRequest(qint64 startTimeMs, qint64 resolutionMs)
 {
     if (!m_server)
     {
@@ -131,6 +130,7 @@ int QnFlatCameraDataLoader::sendRequest(qint64 startTimeMs)
     requestData.endTimeMs = DATETIME_NOW,   /* Always load data to the end. */
     requestData.filter = m_filter;
     requestData.periodsType = m_dataType;
+    requestData.detailLevel = std::chrono::milliseconds(resolutionMs);
 
     return connection->recordedTimePeriods(requestData, this, SLOT(at_timePeriodsReceived(int, const MultiServerPeriodDataList &, int)));
 }

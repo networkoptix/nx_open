@@ -25,15 +25,14 @@ public:
     virtual ~QnProgressiveDownloadingConsumer();
 
     QnFfmpegTranscoder* getTranscoder();
-    int getVideoStreamResolution() const;
 protected:
     virtual void run() override;
     virtual void onTimer( const quint64& timerID ) override;
 private:
     static QByteArray getMimeType(const QByteArray& streamingFormat);
-    void updateCodecByFormat(const QByteArray& streamingFormat);
     void sendMediaEventErrorResponse(Qn::MediaStreamEvent mediaEvent);
     void sendJsonResponse(const QString& errorString);
+    QByteArray buildSignature();
 private:
     Q_DECLARE_PRIVATE(QnProgressiveDownloadingConsumer);
 };

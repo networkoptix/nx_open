@@ -35,6 +35,11 @@ public:
         m_delegate->handshakeAsync(std::move(handler));
     }
 
+    virtual std::string serverName() const override
+    {
+        return m_delegate->serverName();
+    }
+
 private:
     std::unique_ptr<Delegate> m_delegate;
 };

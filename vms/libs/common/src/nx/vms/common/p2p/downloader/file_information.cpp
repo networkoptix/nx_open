@@ -18,29 +18,20 @@ bool FileInformation::isValid() const
     return !name.isEmpty();
 }
 
-float FileInformation::calculateDownloadProgress() const
+int FileInformation::calculateDownloadProgress() const
 {
     int size = downloadedChunks.size();
-    if (!size)
+    if (size <= 0)
         return 0;
+
     int done = downloadedChunks.count(true);
-    return 100.0*done / size;
+    return 100 * done / size;
 }
 
-int FileInformation::calculateDownloadedBytes() const
+qint64 FileInformation::calculateDownloadedBytes() const
 {
     int done = downloadedChunks.count(true);
     return done * chunkSize;
-}
-
-QString FileInformation::key() const
-{
-    return keyFromFileName(name);
-}
-
-QString FileInformation::keyFromFileName(const QString& fileName)
-{
-    return QFileInfo(fileName).fileName();
 }
 
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(FileInformation, Status)

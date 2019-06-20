@@ -11,6 +11,11 @@ class QnSettings;
 
 namespace nx::clusterdb::engine {
 
+struct Api
+{
+    std::string baseHttpPath;
+};
+
 class NX_DATA_SYNC_ENGINE_API Settings:
     public nx::utils::BasicServiceSettings
 {
@@ -28,7 +33,7 @@ public:
     const SynchronizationSettings& synchronization() const;
     const nx::sql::ConnectionOptions& db() const;
     const nx::network::http::server::Settings& http() const;
-    const nx::cloud::discovery::Settings& discovery() const;
+    const Api& api() const;
 
 protected:
     virtual void loadSettings() override;
@@ -38,7 +43,9 @@ private:
     SynchronizationSettings m_syncSettings;
     nx::sql::ConnectionOptions m_db;
     nx::network::http::server::Settings m_http;
-    nx::cloud::discovery::Settings m_discovery;
+    Api m_api;
+
+    void loadApi();
 };
 
 } // namespace nx::clusterdb::engine

@@ -193,7 +193,7 @@ private:
     std::atomic<qint64> m_lastFrameTimeUs;
     std::atomic<qint64> m_lastDisplayedTimeUs;
     MultiSensorHelper m_awaitingFramesMask;
-    int m_emptyPacketCounter;
+    int m_eofPacketCounter;
     std::atomic<bool> m_audioEnabled;
     std::atomic<bool> m_needToResetAudio;
     std::atomic<bool> m_allowOverlay;

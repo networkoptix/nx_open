@@ -97,7 +97,7 @@ private:
 
         QN_DECLARE_RW_PROPERTY(QString,
             logLevel, setLogLevel,
-            LogLevel, lit("none"))
+            LogLevel, "none")
 
         // Deprecated properties
         QN_DECLARE_RW_PROPERTY(QString,                     lastUsedSessionId,          setLastUsedSessionId,       LastUsedSessionId,          QString())

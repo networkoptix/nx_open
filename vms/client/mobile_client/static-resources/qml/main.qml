@@ -94,6 +94,7 @@ ApplicationWindow
 
     Component.onCompleted:
     {
+        updateCustomMargins()
         androidBarPositionWorkaround.tryUpdateBarPosition()
 
         if (autoLoginEnabled)

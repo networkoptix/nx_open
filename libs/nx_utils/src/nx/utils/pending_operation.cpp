@@ -62,7 +62,7 @@ void PendingOperation::requestOperation()
 void PendingOperation::fire()
 {
     m_requested = false;
-    m_timer->stop();
+    m_timer->start();
 
     if (m_callback)
         m_callback();

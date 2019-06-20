@@ -3,6 +3,9 @@
 #include <string>
 
 #include <nx/utils/move_only_func.h>
+#include <nx/utils/url.h>
+
+namespace nx::network::http::server::rest { class MessageDispatcher; }
 
 namespace nx {
 namespace cloud {
@@ -36,7 +39,13 @@ public:
         const std::string& domainName,
         nx::utils::MoveOnlyFunc<void(bool /*result*/)> handler) = 0;
 
-    virtual void setNodeId(const std::string& nodeId) = 0;
+    virtual void setPublicUrl(const nx::utils::Url& publicUrl) = 0;
+
+    virtual void registerHttpApi(
+        nx::network::http::server::rest::MessageDispatcher* /*messageDispatcher*/) = 0;
+
+    virtual void pleaseStopSync() = 0;
+
 };
 
 } // namespace model

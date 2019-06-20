@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QtCore/QMetaType>
+#include <QtCore/QHash>
 
 namespace nx::vms::client::desktop {
 

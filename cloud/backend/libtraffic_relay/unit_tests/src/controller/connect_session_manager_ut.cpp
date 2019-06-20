@@ -65,7 +65,12 @@ public:
         return handler(true);
     }
 
-    virtual void setNodeId(const std::string& /*nodeId*/) override {}
+    virtual void setPublicUrl(const nx::utils::Url& /*publicUrl*/) override {}
+
+    virtual void registerHttpApi(
+        nx::network::http::server::rest::MessageDispatcher* /*messageDispatcher*/) override {}
+
+    virtual void pleaseStopSync() override {}
 };
 
 class TrafficRelayStub:
@@ -141,6 +146,7 @@ public:
     {
         nx::utils::to_lower(&m_peerName);
 
+        addArg("-listeningPeerDb/connectionRetryDelay", "1ms");
         addArg("-listeningPeer/maxPreemptiveConnectionCount", "7");
         addArg("-listeningPeer/recommendedPreemptiveConnectionCount", "4");
         addArg("-listeningPeer/internalTimerPeriod", "1ms");

@@ -2560,17 +2560,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnConnectToCurrentSystemTool</name>
-    <message>
-      <source>Configuring Server</source>
-      <translation>設定伺服器</translation>
-    </message>
-    <message>
-      <source>Updating Server</source>
-      <translation>更新伺服器</translation>
-    </message>
-  </context>
-  <context>
     <name>QnConnectionDiagnosticsHelper</name>
     <message>
       <source>You are trying to connect to incompatible Server.</source>
@@ -3184,6 +3173,14 @@ to %1</source>
     <message>
       <source>Folder already added</source>
       <translation>資料夾已新增</translation>
+    </message>
+    <message>
+      <source>None</source>
+      <translation>無</translation>
+    </message>
+    <message>
+      <source>Auto (%1)</source>
+      <translation type="unfinished">Auto (%1)</translation>
     </message>
   </context>
   <context>
@@ -5096,219 +5093,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnServerUpdatesModel</name>
-    <message>
-      <source>Server</source>
-      <translation>伺服器</translation>
-    </message>
-    <message>
-      <source>Status</source>
-      <translation>狀態</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnServerUpdatesWidget</name>
-    <message>
-      <source>Select Update File...</source>
-      <translation>選擇更新檔案...</translation>
-    </message>
-    <message>
-      <source>Release notes</source>
-      <translation>更新說明</translation>
-    </message>
-    <message>
-      <source>You will have to update the client manually using an installer.</source>
-      <translation>您必須手動更新客戶端.</translation>
-    </message>
-    <message>
-      <source>Cannot update from this file.</source>
-      <translation>無法用此檔案做更新.</translation>
-    </message>
-    <message>
-      <source>Latest Available Update</source>
-      <translation>最新的可用更新</translation>
-    </message>
-    <message>
-      <source>Download the Latest Version Update File</source>
-      <translation>下載最新版本的更新檔</translation>
-    </message>
-    <message>
-      <source>Selected Version</source>
-      <translation>所選的版本</translation>
-    </message>
-    <message>
-      <source>Download Update File</source>
-      <translation>下載更新檔</translation>
-    </message>
-    <message>
-      <source>Browse for Update File...</source>
-      <translation>瀏覽更新檔...</translation>
-    </message>
-    <message>
-      <source>Selected Update File</source>
-      <translation>所選的更新檔</translation>
-    </message>
-    <message>
-      <source>Download in External Browser</source>
-      <translation>在外部瀏覽器中下載</translation>
-    </message>
-    <message>
-      <source>Copy Link to Clipboard</source>
-      <translation>複製連結至剪貼板</translation>
-    </message>
-    <message>
-      <source>Unable to check updates on the Internet.</source>
-      <translation>無法使用網際網路檢查更新.</translation>
-    </message>
-    <message>
-      <source>Unknown build number.</source>
-      <translation>未知的版號.</translation>
-    </message>
-    <message>
-      <source>Downgrade to an earlier version is prohibited.</source>
-      <translation>禁止降級到以前的版本.</translation>
-    </message>
-    <message>
-      <source>Updates for one or more servers were not found.</source>
-      <translation>未找到一個或多個伺服器的更新.</translation>
-    </message>
-    <message>
-      <source>Client update was not found.</source>
-      <translation>找不到用戶端的更新.</translation>
-    </message>
-    <message>
-      <source>Unable to extract update file. No free space left on the disk.</source>
-      <translation>無法解壓縮更新檔. 硬碟無可用空間.</translation>
-    </message>
-    <message>
-      <source>Update Finished...</source>
-      <translation>更新完成...</translation>
-    </message>
-    <message>
-      <source>Checking for updates...</source>
-      <translation>正在檢查更新⋯⋯</translation>
-    </message>
-    <message>
-      <source>Downloading updates...</source>
-      <translation>正在下載更新...</translation>
-    </message>
-    <message>
-      <source>Installing client update...</source>
-      <translation>正在安裝用戶端的更新...</translation>
-    </message>
-    <message>
-      <source>Installing updates to incompatible servers...</source>
-      <translation>正在更新不相容的伺服器...</translation>
-    </message>
-    <message>
-      <source>Pushing updates to servers...</source>
-      <translation>將更新推送到伺服器...</translation>
-    </message>
-    <message>
-      <source>Installing updates...</source>
-      <translation>進行更新中...</translation>
-    </message>
-    <message>
-      <source>Specific Build...</source>
-      <translation>特定的版本...</translation>
-    </message>
-    <message>
-      <source>Update to Specific Build</source>
-      <translation>更新到特定的版本</translation>
-    </message>
-    <message>
-      <source>Update System</source>
-      <translation>更新系統</translation>
-    </message>
-    <message>
-      <source>System update in process</source>
-      <translation>系統更新中</translation>
-    </message>
-    <message>
-      <source>Cancel Update</source>
-      <translation>取消更新</translation>
-    </message>
-    <message>
-      <source>Continue in Background</source>
-      <translation>在背景執行</translation>
-    </message>
-    <message numerus="yes">
-      <source>Not enough free space at %n Servers:</source>
-      <translation>
-        <numerusform>在 %n 伺服器上沒有足夠的可用空間:</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Attempt to update may fail or cause Server malfunction.</source>
-      <translation>嘗試更新可能會失敗或導致伺服器發生故障.</translation>
-    </message>
-    <message>
-      <source>Force Update</source>
-      <translation>強制更新</translation>
-    </message>
-    <message>
-      <source>Server update completed</source>
-      <translation>伺服器更新已完成</translation>
-    </message>
-    <message>
-      <source>Update completed</source>
-      <translation>更新完成。</translation>
-    </message>
-    <message>
-      <source>Update canceled</source>
-      <translation>更新已取消</translation>
-    </message>
-    <message>
-      <source>All Servers already updated</source>
-      <translation>已更新所有伺服器</translation>
-    </message>
-    <message>
-      <source>Update failed</source>
-      <translation>更新失敗</translation>
-    </message>
-    <message>
-      <source>Please update %1 manually using an installation package.</source>
-      <translation>請使用安裝包手動更新 %1.</translation>
-    </message>
-    <message>
-      <source>%1 will be restarted to the updated version.</source>
-      <translation>%1 將重新啟動到更新的版本.</translation>
-    </message>
-    <message>
-      <source>Update cannot be canceled at this stage</source>
-      <translation>在這個階段不能取消更新</translation>
-    </message>
-    <message>
-      <source>Please wait until it is finished.</source>
-      <translation>請等它完成.</translation>
-    </message>
-    <message>
-      <source>All components in your System are up to date.</source>
-      <translation>系統所有元件皆已是最新.</translation>
-    </message>
-    <message>
-      <source>All components in your System are up to this version.</source>
-      <translation>系統所有元件皆已是最新版本.</translation>
-    </message>
-    <message>
-      <source>Incompatible %1 instance. To update disconnect System from %1 first.</source>
-      <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation>不相容 %1 案例. 先從 %1 更新斷線系統.</translation>
-    </message>
-    <message>
-      <source>Update Files</source>
-      <translation>更新檔案</translation>
-    </message>
-    <message>
-      <source>Validating the update...</source>
-      <translation>正在驗證更新...</translation>
-    </message>
-    <message>
-      <source>Checking for free space...</source>
-      <translation>正在檢查可用的儲存空間...</translation>
-    </message>
-  </context>
-  <context>
     <name>QnSessionAwareTabbedDialog</name>
     <message>
       <source>Unsaved changes:</source>
@@ -5988,10 +5772,6 @@ to %1</source>
       <translation>遠端錄影備份進行中</translation>
     </message>
     <message>
-      <source>Error occured during remote archive synchronization</source>
-      <translation>遠端錄影備份過程中發生錯誤</translation>
-    </message>
-    <message>
       <source>Remote archive synchronization has been started for the following device:</source>
       <translation>下列設備已開始遠端錄影備份</translation>
     </message>
@@ -6041,17 +5821,13 @@ to %1</source>
       <source>The System is running in safe mode.</source>
       <translation type="unfinished">The System is running in safe mode.</translation>
     </message>
+    <message>
+      <source>Error occurred during remote archive synchronization</source>
+      <translation type="unfinished">Error occurred during remote archive synchronization</translation>
+    </message>
   </context>
   <context>
     <name>QnSystemSettingsWidget</name>
-    <message>
-      <source>Enable devices and servers auto discovery</source>
-      <translation>啟用裝置與伺服器自動搜尋</translation>
-    </message>
-    <message>
-      <source>Enable cameras and servers auto discovery</source>
-      <translation>啟用攝影機與伺服器自動搜尋</translation>
-    </message>
     <message>
       <source>Allow System to optimize device settings</source>
       <translation>允許系統優化裝置設定</translation>
@@ -6067,6 +5843,22 @@ to %1</source>
     <message>
       <source>Does not include any personal information and is completely anonymous.</source>
       <translation>不包含任何個人資訊, 並且完全匿名</translation>
+    </message>
+    <message>
+      <source>Failover server measures may still request camera status updates regardless of this setting.</source>
+      <translation type="unfinished">Failover server measures may still request camera status updates regardless of this setting.</translation>
+    </message>
+    <message>
+      <source>Enable devices and servers autodiscovery and automated device status check</source>
+      <translation type="unfinished">Enable devices and servers autodiscovery and automated device status check</translation>
+    </message>
+    <message>
+      <source>Enable cameras and servers autodiscovery and automated camera status check</source>
+      <translation type="unfinished">Enable cameras and servers autodiscovery and automated camera status check</translation>
+    </message>
+    <message>
+      <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
+      <translation type="unfinished">When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</translation>
     </message>
   </context>
   <context>
@@ -6150,79 +5942,6 @@ to %1</source>
     <message>
       <source>Hold to Speak</source>
       <translation>按住以發話</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnUpdateResult</name>
-    <message>
-      <source>Update has been successfully finished.</source>
-      <translation>更新已成功完成.</translation>
-    </message>
-    <message>
-      <source>Update has been cancelled.</source>
-      <translation>更新已被取消.</translation>
-    </message>
-    <message>
-      <source>Another user has already started an update.</source>
-      <translation>已有人開始進行更新.</translation>
-    </message>
-    <message>
-      <source>All servers are already updated.</source>
-      <translation>所有伺服器已準備更新.</translation>
-    </message>
-    <message>
-      <source>Could not download updates.</source>
-      <translation>無法下載更新.</translation>
-    </message>
-    <message>
-      <source>No free space left on the disk.</source>
-      <translation>硬碟已無多餘空間.</translation>
-    </message>
-    <message>
-      <source>Could not push updates to servers.</source>
-      <translation>無法將伺更新檔上傳至伺服器.</translation>
-    </message>
-    <message numerus="yes">
-      <source>The problem is caused by %n servers:</source>
-      <translation>
-        <numerusform>此問題源自 %n 台伺服器:</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>No free space left on %n servers:</source>
-      <translation>
-        <numerusform>已無剩餘空間在 %n 台伺服器:</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n servers are not responding:</source>
-      <translation>
-        <numerusform>%n 台伺服器無回應:</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n servers have gone offline:</source>
-      <translation>
-        <numerusform>%n 台伺服器已斷線:</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Authentication failed for %n servers:</source>
-      <translation>
-        <numerusform>%n 個伺服器驗證失敗:</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Could not install an update to the client.</source>
-      <translation>無法將更新檔安裝至客戶端.</translation>
-    </message>
-    <message>
-      <source>Could not install updates on one or more servers.</source>
-      <translation>無法將更新檔安裝至一或多台伺服器.</translation>
-    </message>
-    <message>
-      <source>Update has been cancelled silently.</source>
-      <translation type="unfinished">Update has been cancelled silently.</translation>
     </message>
   </context>
   <context>
@@ -6673,25 +6392,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnWorkbenchContext</name>
-    <message>
-      <source>Please review and agree to the %1 in order to proceed</source>
-      <translation type="unfinished">Please review and agree to the %1 in order to proceed</translation>
-    </message>
-    <message>
-      <source>To use the software you must agree with the end user license agreement</source>
-      <translation type="unfinished">To use the software you must agree with the end user license agreement</translation>
-    </message>
-    <message>
-      <source>I Agree</source>
-      <translation type="unfinished">I Agree</translation>
-    </message>
-    <message>
-      <source>I Do Not Agree</source>
-      <translation type="unfinished">I Do Not Agree</translation>
-    </message>
-  </context>
-  <context>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
     <message>
       <source>Systems will be merged shortly</source>
@@ -6700,10 +6400,6 @@ to %1</source>
     <message>
       <source>Servers from the other System will appear in the resource tree.</source>
       <translation>其它系統的伺服器將顯示在資源列表.</translation>
-    </message>
-    <message>
-      <source>Failed to update Server</source>
-      <translation>更新伺服器失敗</translation>
     </message>
     <message>
       <source>Total amount of licenses will decrease</source>
@@ -6871,29 +6567,6 @@ to %1</source>
     <message>
       <source>JPEG Image</source>
       <translation type="unfinished">JPEG Image</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnWorkbenchUpdateWatcher</name>
-    <message>
-      <source>Release Notes</source>
-      <translation>更新說明</translation>
-    </message>
-    <message>
-      <source>%1 version available</source>
-      <translation>%1 可用版本</translation>
-    </message>
-    <message>
-      <source>Major issues have been fixed. Update is strongly recommended.</source>
-      <translation>主要問題已得到修復. 強烈建議更新.</translation>
-    </message>
-    <message>
-      <source>Update...</source>
-      <translation>更新...</translation>
-    </message>
-    <message>
-      <source>Do not notify again about this update</source>
-      <translation>不要再次通知更新</translation>
     </message>
   </context>
   <context>
@@ -7330,6 +7003,17 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>SessionExpiredDialog</name>
+    <message>
+      <source>Your session has expired</source>
+      <translation type="unfinished">Your session has expired</translation>
+    </message>
+    <message>
+      <source>Session duration limit can be changed by the system administrators</source>
+      <translation type="unfinished">Session duration limit can be changed by the system administrators</translation>
+    </message>
+  </context>
+  <context>
     <name>StreamQualityStrings</name>
     <message>
       <source>Lowest</source>
@@ -7532,6 +7216,14 @@ to %1</source>
       <source>Show Only with &quot;Objects&quot; Tab</source>
       <translation type="unfinished">Show Only with &quot;Objects&quot; Tab</translation>
     </message>
+    <message>
+      <source>Show</source>
+      <translation>顯示</translation>
+    </message>
+    <message>
+      <source>Do Not Show</source>
+      <translation type="unfinished">Do Not Show</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::AnalyticsSearchListModel::Private</name>
@@ -7680,10 +7372,6 @@ to %1</source>
       <translation>原生</translation>
     </message>
     <message>
-      <source>Server will not change any cameras settings, it will receive and use camera stream as-is. </source>
-      <translation>伺服器不更動任何攝影機串流設定, 將直接使用攝影機所提供之串流並保留串流原始設定 </translation>
-    </message>
-    <message>
       <source>Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</source>
       <translation>有助於修正一些攝影機的圖像質量問題; 但對於其他攝影機會導致明顯增加的位元速率。</translation>
     </message>
@@ -7706,6 +7394,14 @@ to %1</source>
       <translation>
         <numerusform>此ID已被以下 %n 支攝影機使用:</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>UDP Multicast</source>
+      <translation type="unfinished">UDP Multicast</translation>
+    </message>
+    <message>
+      <source>Server will not change any cameras settings, it will receive and use camera stream as-is.</source>
+      <translation>伺服器不更動任何攝影機串流設定, 將直接使用攝影機所提供之串流並保留串流原始設定。</translation>
     </message>
   </context>
   <context>
@@ -7966,16 +7662,16 @@ to %1</source>
       <translation type="unfinished">Broken update package.</translation>
     </message>
     <message>
-      <source>Not enough space on disk to install client update.</source>
-      <translation type="unfinished">Not enough space on disk to install client update.</translation>
-    </message>
-    <message>
-      <source>Install package has been lost.</source>
-      <translation type="unfinished">Install package has been lost.</translation>
-    </message>
-    <message>
       <source>Internal error.</source>
       <translation>內部錯誤.</translation>
+    </message>
+    <message>
+      <source>Not enough space on disk to install the client update.</source>
+      <translation type="unfinished">Not enough space on disk to install the client update.</translation>
+    </message>
+    <message>
+      <source>Installation package has been lost.</source>
+      <translation type="unfinished">Installation package has been lost.</translation>
     </message>
   </context>
   <context>
@@ -8007,6 +7703,17 @@ to %1</source>
       <source>Pasted</source>
       <comment>from Clipboard</comment>
       <translation>貼上</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ConnectToCurrentSystemTool</name>
+    <message>
+      <source>Configuring Server</source>
+      <translation>設定伺服器</translation>
+    </message>
+    <message>
+      <source>Updating Server</source>
+      <translation>更新伺服器</translation>
     </message>
   </context>
   <context>
@@ -8122,6 +7829,17 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::EulaDialog</name>
+    <message>
+      <source>Please review and agree to the %1 in order to proceed</source>
+      <translation type="unfinished">Please review and agree to the %1 in order to proceed</translation>
+    </message>
+    <message>
+      <source>To use the software you must agree with the end user license agreement</source>
+      <translation type="unfinished">To use the software you must agree with the end user license agreement</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::EventPanel::Private</name>
     <message>
       <source>Notifications</source>
@@ -8191,10 +7909,6 @@ to %1</source>
       <source>No events</source>
       <translation>沒有事件</translation>
     </message>
-    <message>
-      <source>No events occured</source>
-      <translation>沒有發生事件</translation>
-    </message>
     <message numerus="yes">
       <source>%n events</source>
       <translation>
@@ -8204,6 +7918,10 @@ to %1</source>
     <message>
       <source>unnamed analytics engine</source>
       <translation type="unfinished">unnamed analytics engine</translation>
+    </message>
+    <message>
+      <source>No events occurred</source>
+      <translation type="unfinished">No events occurred</translation>
     </message>
   </context>
   <context>
@@ -8701,26 +8419,6 @@ to %1</source>
       <translation>某些伺服器處於離線狀態，不會更新。請問決定忽略？</translation>
     </message>
     <message>
-      <source>Ready to install client updates</source>
-      <translation type="unfinished">Ready to install client updates</translation>
-    </message>
-    <message>
-      <source>Install now</source>
-      <translation>立即安裝</translation>
-    </message>
-    <message>
-      <source>Later</source>
-      <translation>稍後</translation>
-    </message>
-    <message>
-      <source>Updates downloaded</source>
-      <translation>下載更新</translation>
-    </message>
-    <message>
-      <source>Failed to download update packages</source>
-      <translation>下載更新時發生錯誤。</translation>
-    </message>
-    <message>
       <source>Please make sure there is enough free storage space and network connection is stable.</source>
       <translation>請確認磁碟剩餘空間足夠並保持網路連線穩定</translation>
     </message>
@@ -8735,10 +8433,6 @@ to %1</source>
     <message>
       <source>Cancel Update</source>
       <translation>取消更新</translation>
-    </message>
-    <message>
-      <source>Failed to download update packages to some servers</source>
-      <translation>更新套件無法下載至所有伺服器</translation>
     </message>
     <message>
       <source>Please make sure they have enough free storage space and stable network connection.</source>
@@ -8886,6 +8580,18 @@ to %1</source>
       <source>There are no online servers to update.</source>
       <translation type="unfinished">There are no online servers to update.</translation>
     </message>
+    <message>
+      <source>Some servers haven&apos;t completed update process. Finish it anyway?</source>
+      <translation type="unfinished">Some servers haven&apos;t completed update process. Finish it anyway?</translation>
+    </message>
+    <message>
+      <source>Cancel update and delete all downloaded data?</source>
+      <translation type="unfinished">Cancel update and delete all downloaded data?</translation>
+    </message>
+    <message>
+      <source>Failed to download update packages to some components</source>
+      <translation type="unfinished">Failed to download update packages to some components</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::MultipleLayoutSelectionDialog</name>
@@ -8910,6 +8616,26 @@ to %1</source>
       <source>Acknowledge</source>
       <translation>確認</translation>
     </message>
+    <message>
+      <source>Generic Event</source>
+      <translation>通用事件</translation>
+    </message>
+    <message>
+      <source>Unknown Plugin Event</source>
+      <translation type="unfinished">Unknown Plugin Event</translation>
+    </message>
+    <message>
+      <source>Device was disconnected</source>
+      <translation type="unfinished">Device was disconnected</translation>
+    </message>
+    <message>
+      <source>Camera was disconnected</source>
+      <translation type="unfinished">Camera was disconnected</translation>
+    </message>
+    <message>
+      <source>I/O Module was disconnected</source>
+      <translation type="unfinished">I/O Module was disconnected</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::NotificationListWidget::Private</name>
@@ -8929,10 +8655,6 @@ to %1</source>
       <translation>所有使用者對所選佈局均不具有存取權限。佈局操作將無法正常執行。</translation>
     </message>
     <message>
-      <source>Local layouts can only be shown to their owners. </source>
-      <translation>本地佈局僅對其所有者顯示。 </translation>
-    </message>
-    <message>
       <source>Select layout...</source>
       <translation>選擇佈局</translation>
     </message>
@@ -8947,6 +8669,45 @@ to %1</source>
     <message>
       <source>None of selected user roles contain users. Action will not work.</source>
       <translation type="unfinished">None of selected user roles contain users. Action will not work.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::PeerStateTracker</name>
+    <message>
+      <source>The server is taking too long to respond</source>
+      <translation type="unfinished">The server is taking too long to respond</translation>
+    </message>
+    <message>
+      <source>No update task</source>
+      <translation type="unfinished">No update task</translation>
+    </message>
+    <message>
+      <source>Ready to download update</source>
+      <translation type="unfinished">Ready to download update</translation>
+    </message>
+    <message>
+      <source>Downloading update</source>
+      <translation type="unfinished">Downloading update</translation>
+    </message>
+    <message>
+      <source>Ready to restart to the new version</source>
+      <translation type="unfinished">Ready to restart to the new version</translation>
+    </message>
+    <message>
+      <source>Installing update</source>
+      <translation type="unfinished">Installing update</translation>
+    </message>
+    <message>
+      <source>Installed</source>
+      <translation type="unfinished">Installed</translation>
+    </message>
+    <message>
+      <source>Failed to download update</source>
+      <translation type="unfinished">Failed to download update</translation>
+    </message>
+    <message>
+      <source>Failed to install update</source>
+      <translation type="unfinished">Failed to install update</translation>
     </message>
   </context>
   <context>
@@ -9090,16 +8851,16 @@ to %1</source>
       <translation>追蹤和記錄所有使用者操作</translation>
     </message>
     <message>
-      <source>User will be automatically logged out after this period of time.</source>
-      <translation type="unfinished">User will be automatically logged out after this period of time.</translation>
-    </message>
-    <message>
       <source>minutes</source>
       <translation>分</translation>
     </message>
     <message>
       <source>hours</source>
       <translation>小時</translation>
+    </message>
+    <message>
+      <source>Users will be automatically logged out if their session exceeds the specified duration.</source>
+      <translation type="unfinished">Users will be automatically logged out if their session exceeds the specified duration.</translation>
     </message>
   </context>
   <context>
@@ -9120,13 +8881,13 @@ to %1</source>
       <source>Downloaded</source>
       <translation>已下載</translation>
     </message>
+    <message>
+      <source>Waiting for server to respond...</source>
+      <translation type="unfinished">Waiting for server to respond...</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerUpdatesModel</name>
-    <message>
-      <source>Current Version</source>
-      <translation>目前版本</translation>
-    </message>
     <message>
       <source>Status</source>
       <translation>狀態</translation>
@@ -9146,6 +8907,10 @@ to %1</source>
     <message>
       <source>Component</source>
       <translation type="unfinished">Component</translation>
+    </message>
+    <message>
+      <source>Installed Version</source>
+      <translation type="unfinished">Installed Version</translation>
     </message>
   </context>
   <context>
@@ -9440,12 +9205,62 @@ to %1</source>
       <source>Starting export...</source>
       <translation type="unfinished">Starting export...</translation>
     </message>
+    <message>
+      <source>Saving layout</source>
+      <translation type="unfinished">Saving layout</translation>
+    </message>
+    <message>
+      <source>Stop Saving</source>
+      <translation type="unfinished">Stop Saving</translation>
+    </message>
+    <message>
+      <source>Saving failed</source>
+      <translation type="unfinished">Saving failed</translation>
+    </message>
+    <message>
+      <source>Starting saving...</source>
+      <translation type="unfinished">Starting saving...</translation>
+    </message>
+    <message>
+      <source>We are preparing files for the export process. Please wait for a few seconds.</source>
+      <translation type="unfinished">We are preparing files for the export process. Please wait for a few seconds.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::WorkbenchUpdateWatcher</name>
+    <message>
+      <source>%1 version available</source>
+      <translation>%1 可用版本</translation>
+    </message>
+    <message>
+      <source>Release Notes</source>
+      <translation>更新說明</translation>
+    </message>
+    <message>
+      <source>Major issues have been fixed. Update is strongly recommended.</source>
+      <translation>主要問題已得到修復. 強烈建議更新.</translation>
+    </message>
+    <message>
+      <source>Update...</source>
+      <translation>更新...</translation>
+    </message>
+    <message>
+      <source>Do not notify again about this update</source>
+      <translation>不要再次通知更新</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::detail::BaseInputField</name>
     <message>
       <source>multiple values</source>
       <translation>多重數值</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::integrations::entropix::ReconstructResolutionIntegration</name>
+    <message>
+      <source>Reconstruct Resolution</source>
+      <translation type="unfinished">Reconstruct Resolution</translation>
     </message>
   </context>
   <context>

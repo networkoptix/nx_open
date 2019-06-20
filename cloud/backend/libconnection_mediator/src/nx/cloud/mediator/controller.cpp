@@ -1,5 +1,6 @@
 #include "controller.h"
 
+#include "geo_ip/resolver_factory.h"
 #include "relay/relay_cluster_client_factory.h"
 
 namespace nx {
@@ -16,8 +17,10 @@ Controller::Controller(const conf::Settings& settings):
             settings.cloudDB().startTimeout)
         : nullptr),
     m_mediaserverEndpointTester(m_cloudDataProvider.get()),
-    m_relayClusterClient(RelayClusterClientFactory::instance().create(settings)),
-    m_listeningPeerPool(settings.listeningPeer()),
+    m_geoIpResolver(geo_ip::ResolverFactory::instance().create(settings)),
+    m_relayClusterClient(RelayClusterClientFactory::instance().create(settings, m_geoIpResolver.get())),
+    m_listeningPeerDb(settings),
+    m_listeningPeerPool(settings.listeningPeer(), &m_listeningPeerDb),
     m_listeningPeerRegistrator(
         settings,
         m_cloudDataProvider.get(),
@@ -61,6 +64,11 @@ const PeerRegistrator& Controller::listeningPeerRegistrator() const
     return m_listeningPeerRegistrator;
 }
 
+AbstractCloudDataProvider& Controller::cloudDataProvider()
+{
+    return *m_cloudDataProvider;
+}
+
 HolePunchingProcessor& Controller::cloudConnectProcessor()
 {
     return m_cloudConnectProcessor;
@@ -76,14 +84,35 @@ const nx::cloud::discovery::RegisteredPeerPool& Controller::discoveredPeerPool()
     return m_discoveredPeerPool;
 }
 
+ListeningPeerDb& Controller::listeningPeerDb()
+{
+    return m_listeningPeerDb;
+}
+
+const ListeningPeerDb& Controller::listeningPeerDb() const
+{
+    return m_listeningPeerDb;
+}
+
 const stats::StatsManager& Controller::statisticsManager() const
 {
     return m_statsManager;
 }
 
+nx::geo_ip::AbstractResolver& Controller::geoIpResolver()
+{
+    return *m_geoIpResolver;
+}
+
+bool Controller::doMandatoryInitialization()
+{
+    return m_listeningPeerDb.initialize();
+}
+
 void Controller::stop()
 {
     m_cloudConnectProcessor.stop();
+    m_listeningPeerDb.stop();
 }
 
 } // namespace hpm

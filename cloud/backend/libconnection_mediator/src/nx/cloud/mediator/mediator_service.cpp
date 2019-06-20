@@ -17,6 +17,7 @@
 #include "libconnection_mediator_app_info.h"
 #include "settings.h"
 #include "statistics/statistics_provider.h"
+#include "statistics/geo_ip_statistics.h"
 #include "statistics/stats_manager.h"
 #include "view.h"
 
@@ -63,6 +64,11 @@ const Controller& MediatorProcess::controller() const
     return *m_controller;
 }
 
+ListeningPeerDb& MediatorProcess::listeningPeerDb()
+{
+    return m_controller->listeningPeerDb();
+}
+
 std::unique_ptr<nx::utils::AbstractServiceSettings> MediatorProcess::createSettings()
 {
     return std::make_unique<conf::Settings>();
@@ -72,11 +78,14 @@ int MediatorProcess::serviceMain(const nx::utils::AbstractServiceSettings& abstr
 {
     const conf::Settings& settings = static_cast<const conf::Settings&>(abstractSettings);
 
-    nx::utils::TimerManager timerManager;
-
     NX_INFO(this, lm("Initializating controller"));
 
     Controller controller(settings);
+    while (!controller.doMandatoryInitialization())
+    {
+        NX_INFO(this, lm("Retrying controller initialization after delay"));
+        std::this_thread::sleep_for(settings.listeningPeerDb().connectionRetryDelay);
+    }
     m_controller = &controller;
 
     NX_INFO(this, lm("Initializating view"));
@@ -87,7 +96,10 @@ int MediatorProcess::serviceMain(const nx::utils::AbstractServiceSettings& abstr
     stats::Provider statisticsProvider(
         controller.statisticsManager(),
         view.httpServer().server(),
-        view.stunServer().server());
+        view.stunServer().statisticsProvider(),
+        stats::geo_ip::StatisticsProvider(
+            &controller.geoIpResolver(),
+            &controller.listeningPeerPool()));
     view.httpServer().registerStatisticsApiHandlers(statisticsProvider);
 
     NX_INFO(this, lm("Initializating view"));
@@ -105,6 +117,8 @@ int MediatorProcess::serviceMain(const nx::utils::AbstractServiceSettings& abstr
 
     NX_INFO(this, lm("Initialization completed. Running..."));
 
+    registerThisInstanceNameInCluster(settings);
+
     const int result = runMainLoop();
 
     view.stop();
@@ -114,6 +128,34 @@ int MediatorProcess::serviceMain(const nx::utils::AbstractServiceSettings& abstr
         .arg(QnLibConnectionMediatorAppInfo::applicationDisplayName()));
 
     return result;
+}
+
+void MediatorProcess::registerThisInstanceNameInCluster(const conf::Settings& settings)
+{
+    const auto assignPort =
+        [](const std::vector<network::SocketAddress>& endpoints, int* outPort)
+        {
+            *outPort = endpoints.empty() ? MediatorEndpoint::kPortUnused : endpoints.front().port;
+        };
+
+    if (settings.server().name.empty())
+    {
+        NX_INFO(this, "Server name is empty, discovery is not enabled.");
+        return;
+    }
+
+    MediatorEndpoint endpoint;
+    endpoint.domainName = settings.server().name;
+    assignPort(httpEndpoints(), &endpoint.httpPort);
+    assignPort(httpsEndpoints(), &endpoint.httpsPort);
+    assignPort(stunUdpEndpoints(), &endpoint.stunUdpPort);
+
+    if (settings.listeningPeerDb().map.synchronizationSettings.discovery.enabled)
+    {
+        m_controller->listeningPeerDb().startDiscovery(
+            endpoint,
+            &m_view->httpServer().messageDispatcher());
+    }
 }
 
 } // namespace hpm

@@ -15,7 +15,7 @@ namespace usb_cam {
 class CameraManager;
 class StreamReader;
 
-class MediaEncoder: public nxcip::CameraMediaEncoder2
+class MediaEncoder: public nxcip::CameraMediaEncoder5
 {
 public:
      MediaEncoder(
@@ -27,15 +27,30 @@ public:
     virtual int addRef() const override;
     virtual int releaseRef() const override;
 
+    // nxcip::CameraMediaEncoder
     virtual int getMediaUrl( char* urlBuf ) const override;
     virtual int getMaxBitrate( int* maxBitrate ) const override;
     virtual int setResolution( const nxcip::Resolution& resolution ) override;
     virtual int setFps( const float& fps, float* selectedFps ) override;
     virtual int setBitrate( int bitrateKbps, int* selectedBitrateKbps ) override;
+    virtual int getResolutionList(nxcip::ResolutionInfo* infoList, int* infoListCount) const override;
 
+    // nxcip::CameraMediaEncoder2
     virtual nxcip::StreamReader* getLiveStreamReader() override;
     virtual int getAudioFormat( nxcip::AudioFormat* audioFormat ) const override;
-    virtual int getResolutionList(nxcip::ResolutionInfo* infoList, int* infoListCount) const override;
+
+    // nxcip::CameraMediaEncoder3
+    virtual int getConfiguredLiveStreamReader(
+        nxcip::LiveStreamConfig* config, nxcip::StreamReader** reader) override;
+    virtual int getVideoFormat(
+        nxcip::CompressionType* codec, nxcip::PixelFormat* pixelFormat) const override;
+
+    // nxcip::CameraMediaEncoder4
+    virtual int setMediaUrl(const char url[nxcip::MAX_TEXT_LEN]) override;
+
+    // nxcip::CameraMediaEncoder5
+    virtual const char* audioExtradata() const override;
+    virtual int audioExtradataSize() const override;
 
 protected:
     nxpt::CommonRefManager m_refManager;

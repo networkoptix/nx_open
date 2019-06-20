@@ -158,7 +158,7 @@ template<std::size_t N>
 QString toString(const std::bitset<N>& value)
 {
     std::ostringstream result;
-    result << "bitset(" << value << ")";
+    result << "0b" << value;
     return QString::fromStdString(result.str());
 }
 

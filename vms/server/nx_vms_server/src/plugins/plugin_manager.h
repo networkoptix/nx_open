@@ -76,6 +76,8 @@ public:
      */
     void loadPlugins(const QSettings* settings);
 
+
+    void unloadPlugins();
 signals:
     /** Emitted just after new plugin has been loaded. */
     void pluginLoaded();
@@ -98,7 +100,6 @@ private:
 
 private:
     const nx::sdk::Ptr<nx::sdk::IUtilityProvider> m_utilityProvider;
-    QList<QSharedPointer<QPluginLoader>> m_qtPlugins;
 
     // For compatibility with the old-SDK-based plugins, we store pointers to the base interface
     // rather than nx::sdk::IPlugin.

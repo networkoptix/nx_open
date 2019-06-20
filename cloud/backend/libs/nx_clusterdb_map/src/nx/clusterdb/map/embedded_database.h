@@ -20,6 +20,8 @@ public:
 
     Database& database();
 
+    nx::clusterdb::engine::SynchronizationEngine& synchronizationEngine();
+
 private:
     nx::clusterdb::engine::SynchronizationEngine m_syncEngine;
     Database m_database;

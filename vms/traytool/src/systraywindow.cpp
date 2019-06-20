@@ -1,3 +1,7 @@
+#include "systraywindow.h"
+
+#include <chrono>
+
 #include <QtCore/QSettings>
 #include <QtCore/QThreadPool>
 #include <QtCore/QProcess>
@@ -8,75 +12,33 @@
 #include <QtGui/QDesktopServices>
 #include <QtWidgets/QMessageBox>
 
-#include "systraywindow.h"
+#include <shlobj.h>
 
-#include <utils/common/app_info.h>
 #include <network/system_helpers.h>
 #include <traytool_app_info.h>
 
-#include <shlobj.h>
+#include <nx/utils/app_info.h>
 
-#pragma comment(lib, "Shell32.lib") /* For IsUserAnAdmin. */
-#pragma comment(lib, "AdvApi32.lib") /* For ControlService and other handle-related functions. */
-
-
-#define USE_SINGLE_STREAMING_PORT
-
-static const QString MEDIA_SERVER_NAME(QnAppInfo::organizationName() + lit(" Media Server"));
-
-static const int MESSAGE_DURATION = 3 * 1000;
-static const int DEFAUT_PROXY_PORT = 7009;
+using namespace std::chrono;
 
 namespace {
-    const int findServicesTimeoutMs = 10000;
-    const int updateStatusMs = 500;
-}
 
-bool MyIsUserAnAdmin()
+static constexpr milliseconds kMessageDurationMs = 3s;
+static constexpr milliseconds kFindServicesTimeoutMs = 10s;
+static constexpr milliseconds kUpdateStatusMs = 500ms;
+
+static const QString kStartMediaServerId = "startMediaServer";
+static const QString kStopMediaServerId = "stopMediaServer";
+
+} // namespace
+
+QnSystrayWindow::QnSystrayWindow():
+    m_mediaServerSettings(
+        QSettings::SystemScope,
+        nx::utils::AppInfo::organizationName(),
+        QnTraytoolAppInfo::mediaServerRegistryKey())
 {
-   bool isAdmin = false;
-
-   DWORD bytesUsed = 0;
-
-   TOKEN_ELEVATION_TYPE tokenElevationType;
-
-   HANDLE m_hToken;
-   if (OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &m_hToken) == FALSE)
-   {
-       return false;
-   }
-
-   if (::GetTokenInformation(m_hToken, TokenElevationType, &tokenElevationType, sizeof(tokenElevationType), &bytesUsed) == FALSE)
-   {
-       if (m_hToken)
-           CloseHandle(m_hToken);
-       return IsUserAnAdmin();
-   }
-
-   isAdmin = tokenElevationType == TokenElevationTypeFull || tokenElevationType == TokenElevationTypeDefault && IsUserAnAdmin();
-
-   if (m_hToken)
-       CloseHandle(m_hToken);
-
-   return isAdmin;
-}
-
-QnSystrayWindow::QnSystrayWindow()
-    : m_mediaServerSettings(QSettings::SystemScope, qApp->organizationName(), MEDIA_SERVER_NAME)
-{
-    m_mediaServerHandle = 0;
-
-    m_mediaServerServiceName = QnAppInfo::customizationName() + lit("MediaServer");
-
-    m_mediaServerStartAction = 0;
-    m_mediaServerStopAction = 0;
-    m_mediaServerWebAction = 0;
-
-    m_scManager = 0;
-    m_firstTimeToolTipError = true;
-    m_needStartMediaServer = false;
-
-    m_prevMediaServerStatus = -1;
+    m_mediaServerServiceName = nx::utils::AppInfo::customizationName() + "MediaServer";
     m_lastMessageTimer.restart();
 
     createActions();
@@ -86,18 +48,18 @@ QnSystrayWindow::QnSystrayWindow()
 
     setWindowTitle(QnTraytoolAppInfo::applicationName());
 
-    QTimer* findServicesTimer = new QTimer(this);
+    const auto findServicesTimer = new QTimer(this);
     connect(findServicesTimer, &QTimer::timeout, this, &QnSystrayWindow::findServiceInfo);
-    findServicesTimer->start(findServicesTimeoutMs);
+    findServicesTimer->start(kFindServicesTimeoutMs.count());
 
-    QTimer* updateStatusTimer = new QTimer(this);
+    const auto updateStatusTimer = new QTimer(this);
     connect(updateStatusTimer, &QTimer::timeout, this, &QnSystrayWindow::updateServiceInfo);
-    updateStatusTimer->start(updateStatusMs);
+    updateStatusTimer->start(kUpdateStatusMs.count());
 }
 
 void QnSystrayWindow::handleMessage(const QString& message)
 {
-    if (message == lit("quit"))
+    if (message == "quit")
         qApp->quit();
 }
 
@@ -109,59 +71,84 @@ QnSystrayWindow::~QnSystrayWindow()
         CloseServiceHandle(m_scManager);
 }
 
-void QnSystrayWindow::executeAction(const QString &actionName)
+void QnSystrayWindow::executeAction(const QString& actionName)
 {
-    QAction* action = actionByName(actionName);
-    if (action && action->isEnabled())
-        action->activate(QAction::Trigger);
+    if (actionName == kStartMediaServerId)
+        at_mediaServerStartAction();
+    else if (actionName == kStopMediaServerId)
+        at_mediaServerStopAction();
 }
 
-void QnSystrayWindow::findServiceInfo() {
-    if (m_scManager == NULL)
+void QnSystrayWindow::findServiceInfo()
+{
+    if (!m_scManager)
         m_scManager = OpenSCManager(NULL, NULL, SC_MANAGER_ALL_ACCESS);
 
-    if (m_scManager == NULL)
+    if (!m_scManager)
         m_scManager = OpenSCManager(NULL, NULL, SC_MANAGER_CONNECT);
 
-    if (m_scManager == NULL)
+    if (!m_scManager)
     {
-        int error = GetLastError();
-        QString errorText;
-        switch (error)
+        if (!m_errorDisplayedOnce)
         {
-            case ERROR_ACCESS_DENIED:
-                errorText = tr("Access denied.");
-                break;
-            case ERROR_DATABASE_DOES_NOT_EXIST:
-                errorText = tr("Specified database does not exist.");
-                break;
-            case ERROR_INVALID_PARAMETER:
-                errorText = tr("Specified parameter is invalid.");
-                break;
+            const int error = GetLastError();
+            QString errorText;
+            switch (error)
+            {
+                case ERROR_ACCESS_DENIED:
+                    errorText = tr("Access denied.");
+                    break;
+                case ERROR_DATABASE_DOES_NOT_EXIST:
+                    errorText = tr("Specified database does not exist.");
+                    break;
+                case ERROR_INVALID_PARAMETER:
+                    errorText = tr("Specified parameter is invalid.");
+                    break;
+                default:
+                    errorText = tr("Unknown error: %1").arg(error);
+                    break;
+            }
+
+            showMessage(
+                tr("Could not access installed services"),
+                tr("An error has occurred while trying to access installed services:")
+                    + '\n'
+                    + errorText,
+                QSystemTrayIcon::Critical);
+            m_errorDisplayedOnce = true;
         }
-        if (m_firstTimeToolTipError) {
-            showMessage(tr("Could not access installed services"),
-                tr("An error has occurred while trying to access installed services:") + lit("\n %1").arg(errorText), QSystemTrayIcon::Critical);
-            m_firstTimeToolTipError = false;
-        }
+
         return;
     }
 
-    if (m_mediaServerHandle == 0)
-        m_mediaServerHandle = OpenService(m_scManager, (LPCWSTR) m_mediaServerServiceName.data(), SERVICE_ALL_ACCESS);
-    if (m_mediaServerHandle == 0)
-        m_mediaServerHandle = OpenService(m_scManager, (LPCWSTR) m_mediaServerServiceName.data(), SERVICE_QUERY_STATUS);
-
-    if (!isServerInstalled() && m_firstTimeToolTipError)
+    if (!m_mediaServerHandle)
     {
-        showMessage(QnTraytoolAppInfo::applicationName(), tr("No %1 services installed").arg(QnAppInfo::organizationName()));
-        m_firstTimeToolTipError = false;
+        m_mediaServerHandle = OpenService(
+            m_scManager,
+            (LPCWSTR)m_mediaServerServiceName.data(),
+            SERVICE_ALL_ACCESS);
+    }
+
+    if (!m_mediaServerHandle)
+    {
+        m_mediaServerHandle = OpenService(
+            m_scManager,
+            (LPCWSTR)m_mediaServerServiceName.data(),
+            SERVICE_QUERY_STATUS);
+    }
+
+    if (!isServerInstalled() && !m_errorDisplayedOnce)
+    {
+        showMessage(
+            QnTraytoolAppInfo::applicationName(),
+            tr("No %1 services installed").arg(nx::utils::AppInfo::organizationName()));
+        m_errorDisplayedOnce = true;
     }
 
     updateActions();
 }
 
-void QnSystrayWindow::closeEvent(QCloseEvent *event)
+void QnSystrayWindow::closeEvent(QCloseEvent* event)
 {
     if (m_trayIcon->isVisible())
     {
@@ -186,39 +173,58 @@ void QnSystrayWindow::iconActivated(QSystemTrayIcon::ActivationReason reason)
     }
 }
 
-void QnSystrayWindow::showMessage(const QString &title, const QString &msg, QSystemTrayIcon::MessageIcon icon)
+void QnSystrayWindow::showMessage(
+    const QString& title,
+    const QString& msg,
+    QSystemTrayIcon::MessageIcon icon)
 {
-    if (m_lastMessageTimer.elapsed() >= 1000) {
-        m_trayIcon->showMessage(title, msg, icon, MESSAGE_DURATION);
+    if (m_lastMessageTimer.elapsed() >= 1000)
+    {
+        m_trayIcon->showMessage(title, msg, icon, kMessageDurationMs.count());
         m_lastMessageTimer.restart();
     }
-    else {
+    else
+    {
         m_delayedMessages << DelayedMessage(title, msg, icon);
-        QTimer::singleShot(1500, this, SLOT(onDelayedMessage()));
+        QTimer::singleShot(1500, this, &QnSystrayWindow::onDelayedMessage);
     }
 }
 
-void QnSystrayWindow::onDelayedMessage() {
-    if (!m_delayedMessages.isEmpty()) {
+void QnSystrayWindow::onDelayedMessage()
+{
+    if (!m_delayedMessages.isEmpty())
+    {
         DelayedMessage msg = m_delayedMessages.dequeue();
         showMessage(msg.title, msg.msg, msg.icon);
     }
 }
 
-void QnSystrayWindow::updateServiceInfo() {
+void QnSystrayWindow::updateServiceInfo()
+{
     if (!isServerInstalled())
         return;
 
-    GetServiceInfoAsyncTask *mediaServerTask = new GetServiceInfoAsyncTask(m_mediaServerHandle);
-    connect(mediaServerTask, SIGNAL(finished(quint64)), this, SLOT(mediaServerInfoUpdated(quint64)), Qt::QueuedConnection);
+    const auto mediaServerTask = new GetServiceInfoAsyncTask(m_mediaServerHandle);
+    connect(
+        mediaServerTask,
+        &GetServiceInfoAsyncTask::finished,
+        this,
+        &QnSystrayWindow::mediaServerInfoUpdated,
+        Qt::QueuedConnection);
     QThreadPool::globalInstance()->start(mediaServerTask);
 }
 
-void QnSystrayWindow::mediaServerInfoUpdated(quint64 status) {
+void QnSystrayWindow::mediaServerInfoUpdated(quint64 status)
+{
     if (!isServerInstalled())
         return;
 
-    updateServiceInfoInternal(m_mediaServerHandle, status, m_mediaServerStartAction, m_mediaServerStopAction);
+    updateServiceInfoInternal(
+        m_mediaServerHandle,
+        status,
+        m_mediaServerStartAction,
+        m_mediaServerStopAction);
+
     if (status == SERVICE_STOPPED)
     {
         if (m_needStartMediaServer)
@@ -227,103 +233,112 @@ void QnSystrayWindow::mediaServerInfoUpdated(quint64 status) {
             StartService(m_mediaServerHandle, 0, 0);
         }
 
-        if (m_prevMediaServerStatus >= 0 && m_prevMediaServerStatus != SERVICE_STOPPED && !m_needStartMediaServer) {
+        if (m_prevMediaServerStatus >= 0 && m_prevMediaServerStatus != SERVICE_STOPPED && !
+            m_needStartMediaServer)
+        {
             showMessage(QnTraytoolAppInfo::applicationName(), tr("Server has been stopped"));
         }
     }
     else if (status == SERVICE_RUNNING)
     {
-        if (m_prevMediaServerStatus >= 0 && m_prevMediaServerStatus != SERVICE_RUNNING) {
+        if (m_prevMediaServerStatus >= 0 && m_prevMediaServerStatus != SERVICE_RUNNING)
+        {
             showMessage(QnTraytoolAppInfo::applicationName(), tr("Server has been started"));
         }
     }
     m_prevMediaServerStatus = status;
 }
 
-void QnSystrayWindow::updateServiceInfoInternal(SC_HANDLE handle, DWORD status, QAction *startAction, QAction *stopAction)
+void QnSystrayWindow::updateServiceInfoInternal(
+    SC_HANDLE handle,
+    DWORD status,
+    QAction* startAction,
+    QAction* stopAction)
 {
-    if (!handle) {
+    if (!handle)
+    {
         stopAction->setVisible(false);
         startAction->setVisible(false);
         return;
     }
 
-    QAction *action = NULL;
+    QAction* action = nullptr;
     QString suffix;
 
-    switch(status) {
-    case SERVICE_STOPPED:
-        stopAction->setVisible(false);
-        startAction->setVisible(true);
-        startAction->setEnabled(true);
+    switch (status)
+    {
+        case SERVICE_STOPPED:
+            stopAction->setVisible(false);
+            startAction->setVisible(true);
+            startAction->setEnabled(true);
+            action = startAction;
+            suffix = tr("stopped");
+            break;
 
-        action = startAction;
-        suffix = tr("stopped");
-        break;
-    case SERVICE_START_PENDING:
-        stopAction->setVisible(false);
-        startAction->setVisible(true);
-        startAction->setEnabled(false);
+        case SERVICE_START_PENDING:
+            stopAction->setVisible(false);
+            startAction->setVisible(true);
+            startAction->setEnabled(false);
+            action = startAction;
+            suffix = tr("starting");
+            break;
 
-        action = startAction;
-        suffix = tr("starting");
-        break;
-    case SERVICE_STOP_PENDING:
-        stopAction->setVisible(true);
-        stopAction->setEnabled(false);
-        startAction->setVisible(false);
+        case SERVICE_STOP_PENDING:
+            stopAction->setVisible(true);
+            stopAction->setEnabled(false);
+            startAction->setVisible(false);
+            action = stopAction;
+            suffix = tr("stopping");
+            break;
 
-        action = stopAction;
-        suffix = tr("stopping");
-        break;
-    case SERVICE_RUNNING:
-        stopAction->setVisible(true);
-        stopAction->setEnabled(true);
-        startAction->setVisible(false);
+        case SERVICE_RUNNING:
+            stopAction->setVisible(true);
+            stopAction->setEnabled(true);
+            startAction->setVisible(false);
+            action = stopAction;
+            suffix = tr("started");
+            break;
 
-        action = stopAction;
-        suffix = tr("started");
-        break;
-    case SERVICE_CONTINUE_PENDING:
-        stopAction->setVisible(true);
-        stopAction->setEnabled(false);
-        startAction->setVisible(false);
+        case SERVICE_CONTINUE_PENDING:
+            stopAction->setVisible(true);
+            stopAction->setEnabled(false);
+            startAction->setVisible(false);
+            action = stopAction;
+            suffix = tr("resuming");
+            break;
 
-        action = stopAction;
-        suffix = tr("resuming");
-        break;
-    case SERVICE_PAUSED:
-        stopAction->setVisible(false);
-        startAction->setVisible(true);
-        startAction->setEnabled(true);
+        case SERVICE_PAUSED:
+            stopAction->setVisible(false);
+            startAction->setVisible(true);
+            startAction->setEnabled(true);
+            action = startAction;
+            suffix = tr("paused");
+            break;
 
-        action = startAction;
-        suffix = tr("paused");
-        break;
-    case SERVICE_PAUSE_PENDING:
-        stopAction->setVisible(false);
-        startAction->setVisible(true);
-        startAction->setEnabled(false);
+        case SERVICE_PAUSE_PENDING:
+            stopAction->setVisible(false);
+            startAction->setVisible(true);
+            startAction->setEnabled(false);
+            action = startAction;
+            suffix = tr("pausing");
+            break;
 
-        action = startAction;
-        suffix = tr("pausing");
-        break;
-    default:
-        break;
+        default:
+            break;
     }
 
-    if(action)
+    if (action)
     {
-        const char *originalTitlePropertyName = "qn_orignalTitle";
-        QString title = action->property(originalTitlePropertyName).toString();
-        if(title.isEmpty())
+        static const char* kOriginalTitlePropertyName = "qn_orignalTitle";
+        QString title = action->property(kOriginalTitlePropertyName).toString();
+        if (title.isEmpty())
         {
             title = action->text();
-            action->setProperty(originalTitlePropertyName, title);
+            action->setProperty(kOriginalTitlePropertyName, title);
         }
 
         if (!suffix.isEmpty())
-            title = lit("%1 (%2)").arg(title).arg(suffix);
+            title = QString("%1 (%2)").arg(title).arg(suffix);
         action->setText(title);
     }
 }
@@ -342,13 +357,27 @@ void QnSystrayWindow::at_mediaServerStopAction()
     if (!isServerInstalled())
         return;
 
-    if (QMessageBox::question(0, QnTraytoolAppInfo::applicationName(), tr("Server will be stopped. Continue?"), QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
-        StopServiceAsyncTask *stopTask = new StopServiceAsyncTask(m_mediaServerHandle);
-        connect(stopTask, SIGNAL(finished()), this, SLOT(updateServiceInfo()), Qt::QueuedConnection);
-        QThreadPool::globalInstance()->start(stopTask);
-        updateServiceInfoInternal(m_mediaServerHandle, SERVICE_STOP_PENDING, m_mediaServerStartAction, m_mediaServerStopAction);
-    }
+    if (QMessageBox::question(
+        nullptr,
+        QnTraytoolAppInfo::applicationName(),
+        tr("Server will be stopped. Continue?"),
+        QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
+    {
+        const auto stopTask = new StopServiceAsyncTask(m_mediaServerHandle);
+        connect(
+            stopTask,
+            &StopServiceAsyncTask::finished,
+            this,
+            &QnSystrayWindow::updateServiceInfo,
+            Qt::QueuedConnection);
 
+        QThreadPool::globalInstance()->start(stopTask);
+        updateServiceInfoInternal(
+            m_mediaServerHandle,
+            SERVICE_STOP_PENDING,
+            m_mediaServerStartAction,
+            m_mediaServerStopAction);
+    }
 }
 
 void QnSystrayWindow::at_mediaServerWebAction()
@@ -356,38 +385,71 @@ void QnSystrayWindow::at_mediaServerWebAction()
     if (!isServerInstalled())
         return;
 
-    int port = m_mediaServerSettings.value(lit("port")).toInt();
+    int port = m_mediaServerSettings.value("port").toInt();
     if (port == 0)
         port = helpers::kDefaultConnectionPort; // Should never get there, but better than 0.
 
-    QString serverAdminUrl = QString(lit("http://localhost:%1/static/index.html")).arg(port);
+    QString serverAdminUrl = QString("http://localhost:%1/static/index.html").arg(port);
     QDesktopServices::openUrl(QUrl(serverAdminUrl));
 }
 
-QnElevationChecker::QnElevationChecker(QObject* parent, QString actionName, QObject* target, const char* slot):
+QnElevationChecker::QnElevationChecker(const QString& actionId, QObject* parent):
     QObject(parent),
-    m_actionName(actionName),
-    m_target(target),
-    m_slot(slot),
-    m_rightWarnShowed(false)
+    m_actionId(actionId)
 {
-    connect(this, SIGNAL(elevationCheckPassed()), target, slot);
+}
+
+bool QnElevationChecker::isUserAnAdmin()
+{
+    bool isAdmin = false;
+
+    DWORD bytesUsed = 0;
+
+    TOKEN_ELEVATION_TYPE tokenElevationType;
+
+    HANDLE m_hToken;
+    if (OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &m_hToken) == FALSE)
+    {
+        return false;
+    }
+
+    if (::GetTokenInformation(
+        m_hToken,
+        TokenElevationType,
+        &tokenElevationType,
+        sizeof(tokenElevationType),
+        &bytesUsed) == FALSE)
+    {
+        if (m_hToken)
+            CloseHandle(m_hToken);
+        return IsUserAnAdmin();
+    }
+
+    isAdmin = tokenElevationType == TokenElevationTypeFull || tokenElevationType ==
+        TokenElevationTypeDefault && IsUserAnAdmin();
+
+    if (m_hToken)
+        CloseHandle(m_hToken);
+
+    return isAdmin;
 }
 
 
-void QnElevationChecker::triggered()
+void QnElevationChecker::trigger()
 {
-    if (MyIsUserAnAdmin())
+    if (isUserAnAdmin())
     {
         emit elevationCheckPassed();
     }
-    else if (qApp->arguments().size() > 1 && !m_rightWarnShowed)
+    else if (qApp->arguments().size() > 1 && !m_errorDisplayedOnce)
     {
-        // already elevated, but not admin. Prevent recursion calls here
-        QnSystrayWindow *systray = static_cast<QnSystrayWindow*> (parent());
-        // TODO: #TR uac must be enabled? why? maybe disabled?
-        systray->showMessage(tr("Insufficient rights to manage services."), tr("UAC must be enabled to request privileges for non-admin users."), QSystemTrayIcon::Warning);
-        m_rightWarnShowed = true;
+        // Already elevated, but not admin. Prevent recursion calls here
+        const auto systray = static_cast<QnSystrayWindow*>(parent());
+        systray->showMessage(
+            tr("Insufficient rights to manage services."),
+            tr("UAC must be enabled to request privileges for non-admin users."),
+            QSystemTrayIcon::Warning);
+        m_errorDisplayedOnce = true;
     }
     else
     {
@@ -397,7 +459,7 @@ void QnElevationChecker::triggered()
         int size = qApp->arguments()[0].toWCharArray(name);
         name[size] = 0;
 
-        size = m_actionName.toWCharArray(args);
+        size = m_actionId.toWCharArray(args);
         args[size] = 0;
 
         SHELLEXECUTEINFO shExecInfo;
@@ -418,42 +480,50 @@ void QnElevationChecker::triggered()
     }
 }
 
-void QnSystrayWindow::connectElevatedAction(QAction* source, const char* signal, QObject* target, const char* slot)
+void QnSystrayWindow::createActions()
 {
-    QnElevationChecker* checker = new QnElevationChecker(this, nameByAction(source), target, slot);
-    connect(source, signal, checker, SLOT(triggered()));
-}
-
-void QnSystrayWindow::createActions() {
     m_quitAction = new QAction(tr("&Quit"), this);
-    connect(m_quitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
+    connect(m_quitAction, &QAction::triggered, qApp, &QApplication::quit);
 
     m_showMediaServerLogAction = new QAction(tr("Show Server Log"), this);
-    m_showMediaServerLogAction->setObjectName(lit("showMediaServerLog"));
-    m_actions.push_back(m_showMediaServerLogAction);
-    connectElevatedAction(m_showMediaServerLogAction, SIGNAL(triggered()), this, SLOT(onShowMediaServerLogAction()));
 
-    m_mediaServerStartAction = new QAction(QString(tr("Start Server")), this);
-    m_mediaServerStartAction->setObjectName(lit("startMediaServer"));
-    m_actions.push_back(m_mediaServerStartAction);
-    connectElevatedAction(m_mediaServerStartAction, SIGNAL(triggered()), this, SLOT(at_mediaServerStartAction()));
-    m_mediaServerStartAction->setVisible(false);
+    connect(
+        m_showMediaServerLogAction,
+        &QAction::triggered,
+        this,
+        &QnSystrayWindow::onShowMediaServerLogAction);
 
-    m_mediaServerStopAction = new QAction(QString(tr("Stop Server")), this);
-    m_mediaServerStopAction->setObjectName(lit("stopMediaServer"));
-    m_actions.push_back(m_mediaServerStopAction);
-    connectElevatedAction(m_mediaServerStopAction, SIGNAL(triggered()), this, SLOT(at_mediaServerStopAction()));
-    m_mediaServerStopAction->setVisible(false);
+    {
+        m_mediaServerStartAction = new QAction(QString(tr("Start Server")), this);
+        const auto checker = new QnElevationChecker(kStartMediaServerId, this);
+        connect(m_mediaServerStartAction, &QAction::triggered, checker,
+            &QnElevationChecker::trigger);
+        connect(checker, &QnElevationChecker::elevationCheckPassed, this,
+            &QnSystrayWindow::at_mediaServerStartAction);
+    }
+
+    {
+        m_mediaServerStopAction = new QAction(QString(tr("Stop Server")), this);
+        const auto checker = new QnElevationChecker(kStopMediaServerId, this);
+        connect(m_mediaServerStopAction, &QAction::triggered, checker,
+            &QnElevationChecker::trigger);
+        connect(checker, &QnElevationChecker::elevationCheckPassed, this,
+            &QnSystrayWindow::at_mediaServerStopAction);
+        m_mediaServerStopAction->setVisible(false);
+    }
 
     m_mediaServerWebAction = new QAction(QString(tr("Server Web Page")), this);
-    m_mediaServerWebAction->setObjectName(lit("startMediaServer"));
-    m_actions.push_back(m_mediaServerWebAction);
-    QObject::connect(m_mediaServerWebAction, SIGNAL(triggered()), this, SLOT(at_mediaServerWebAction()));
+    connect(
+        m_mediaServerWebAction,
+        &QAction::triggered,
+        this,
+        &QnSystrayWindow::at_mediaServerWebAction);
 
     updateActions();
 }
 
-void QnSystrayWindow::updateActions() {
+void QnSystrayWindow::updateActions()
+{
     m_showMediaServerLogAction->setEnabled(isServerInstalled());
     m_mediaServerWebAction->setEnabled(isServerInstalled());
 }
@@ -467,22 +537,9 @@ void QnSystrayWindow::onShowMediaServerLogAction()
     QProcess::startDetached(lit("notepad ") + logFileName);
 };
 
-QAction* QnSystrayWindow::actionByName(const QString &name)
-{
-    foreach(QAction *action, m_actions)
-       if (action->objectName() == name)
-           return action;
-    return NULL;
-}
-
-QString QnSystrayWindow::nameByAction(QAction* action)
-{
-    return action->objectName();
-}
-
 void QnSystrayWindow::createTrayIcon()
 {
-    QMenu* trayIconMenu = new QMenu(this);
+    auto trayIconMenu = new QMenu(this);
 
     trayIconMenu->addAction(m_mediaServerWebAction);
 
@@ -507,6 +564,12 @@ bool QnSystrayWindow::isServerInstalled() const
     return m_mediaServerHandle != 0;
 }
 
-QnSystrayWindow::DelayedMessage::DelayedMessage(const QString &title, const QString &msg, QSystemTrayIcon::MessageIcon icon):
-    title(title), msg(msg), icon(icon)
-{}
+QnSystrayWindow::DelayedMessage::DelayedMessage(
+    const QString& title,
+    const QString& msg,
+    QSystemTrayIcon::MessageIcon icon):
+    title(title),
+    msg(msg),
+    icon(icon)
+{
+}

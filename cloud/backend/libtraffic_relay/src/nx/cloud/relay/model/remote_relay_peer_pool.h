@@ -1,5 +1,7 @@
 #pragma once
 
+#include "abstract_remote_relay_peer_pool.h"
+
 #include <memory>
 #include <string>
 #include <utility>
@@ -9,19 +11,17 @@
 #include <nx/utils/thread/cf/cfuture.h>
 #include <nx/utils/thread/mutex.h>
 
-#include "abstract_remote_relay_peer_pool.h"
+#include <nx/clusterdb/map/embedded_database.h>
+#include <nx/sql/async_sql_query_executor.h>
+#include <nx/network/http/server/rest/http_server_rest_message_dispatcher.h>
+
+#include "nx/cloud/relay/settings.h"
 
 namespace nx {
 
-namespace cassandra {
-class AbstractAsyncConnection;
-class Query;
-} // namespace cassandra
+namespace cloud::relay{
 
-namespace cloud {
-namespace relay {
-
-namespace conf { class Settings; }
+class AbstractRelaySelector;
 
 namespace model {
 
@@ -30,17 +30,26 @@ class RemoteRelayPeerPool:
 {
 public:
     RemoteRelayPeerPool(const conf::Settings& settings);
-    ~RemoteRelayPeerPool();
+    virtual ~RemoteRelayPeerPool();
 
-    virtual bool connectToDb() override;
-    virtual bool isConnected() const override;
     /**
-     * @return cf::future<Relay instance endpoint that has peer domainName listening>.
+      * NOTE: Can be blocking. But, must return eventually.
+      */
+    virtual bool connectToDb() override;
+
+    virtual bool isConnected() const override;
+
+    /**
+     * @return empty string in case of any error.
+     * @param domainName "serverId.systemId" or just "systemId"
      */
     virtual void findRelayByDomain(
         const std::string& domainName,
         nx::utils::MoveOnlyFunc<void(std::string /*relay hostname/ip*/)> handler) const override;
 
+    /**
+     * Associates domainName with the url given to setPublicUrl().
+     */
     virtual void addPeer(
         const std::string& domainName,
         nx::utils::MoveOnlyFunc<void(bool /*result*/)> handler) override;
@@ -49,37 +58,36 @@ public:
         const std::string& domainName,
         nx::utils::MoveOnlyFunc<void(bool /*result*/)> handler) override;
 
-    virtual void setNodeId(const std::string& nodeId) override;
+    virtual void setPublicUrl(const nx::utils::Url& publicUrl) override;
 
-protected:
-    cassandra::AbstractAsyncConnection* getConnection();
+    virtual void registerHttpApi(
+        nx::network::http::server::rest::MessageDispatcher* messageDispatcher) override;
+
+    virtual void pleaseStopSync() override;
 
 private:
-    enum class UpdateType
-    {
-        add,
-        remove
-    };
+    void startDiscovery();
+    std::string toInternalStorageFormat(const std::string& peerDomain) const;
 
-    const conf::Settings& m_settings;
-    std::unique_ptr<cassandra::AbstractAsyncConnection> m_cassConnection;
-    bool m_dbReady = false;
-    mutable QnMutex m_mutex;
-    std::string m_nodeId;
+private:
+    const conf::ListeningPeerDb& m_settings;
+    std::unique_ptr<nx::sql::AsyncSqlQueryExecutor> m_queryExecutor;
+    std::unique_ptr<nx::clusterdb::map::EmbeddedDatabase> m_map;
+    std::unique_ptr<AbstractRelaySelector> m_relaySelector;
 
-    void prepareDbStructure();
-    std::string whereStringForFind(const std::string& domainName) const;
-    bool bindUpdateParameters(
-        cassandra::Query* query,
-        const std::string& domainName,
-        UpdateType updateType) const;
+    std::string m_baseApiPath;
+    nx::network::http::server::rest::MessageDispatcher* m_messageDispatcher = nullptr;
+    bool m_httpApiRegistered = false;
+
+    std::string m_domainName;
+    nx::utils::Url m_syncEngineUrl;
 };
 
 //-------------------------------------------------------------------------------------------------
 
 using RemoteRelayPeerPoolFactoryFunc =
-    std::unique_ptr<model::AbstractRemoteRelayPeerPool>(
-        const conf::Settings&);
+std::unique_ptr<model::AbstractRemoteRelayPeerPool>(
+    const conf::Settings&);
 
 class RemoteRelayPeerPoolFactory:
     public nx::utils::BasicFactory<RemoteRelayPeerPoolFactoryFunc>
@@ -97,6 +105,5 @@ private:
 };
 
 } // namespace model
-} // namespace relay
-} // namespace cloud
+} // namespace cloud::relay
 } // namespace nx

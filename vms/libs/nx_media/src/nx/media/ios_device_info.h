@@ -2,10 +2,7 @@
 
 #include <QtCore/QString>
 
-#if defined (Q_OS_IOS)
-
-namespace nx {
-namespace media {
+namespace nx::media {
 
 struct IosDeviceInformation
 {
@@ -28,11 +25,12 @@ struct IosDeviceInformation
     Type type = Type::unknown;
     int majorVersion = 0;
     int minorVersion = 0;
+
+    bool operator==(const IosDeviceInformation& other) const;
+
+    static IosDeviceInformation currentInformation();
 };
 
 IosDeviceInformation iosDeviceInformation();
 
-} // namespace media
-} // namespace nx
-
-#endif // if defined (Q_OS_IOS)
+} // namespace nx::media

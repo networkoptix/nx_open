@@ -70,6 +70,10 @@ public:
     nx::String destinationHostFullName;
     ConnectionParameters params;
     CloudConnectVersion cloudConnectVersion;
+    /**
+     * Set if connect request failed, but the server was found at another mediator address.
+     */
+    std::optional<network::SocketAddress> alternateMediatorEndpointStunUdp;
 
     ConnectResponse();
     virtual void serializeAttributes(nx::network::stun::Message* const message) override;
@@ -78,7 +82,7 @@ public:
 
 #define ConnectResponse_Fields \
     (forwardedTcpEndpointList)(udpEndpointList)(trafficRelayUrl) \
-    (destinationHostFullName)(params)(cloudConnectVersion)
+    (destinationHostFullName)(params)(cloudConnectVersion)(alternateMediatorEndpointStunUdp)
 
 QN_FUSION_DECLARE_FUNCTIONS(ConnectResponse, (json), NX_NETWORK_API)
 

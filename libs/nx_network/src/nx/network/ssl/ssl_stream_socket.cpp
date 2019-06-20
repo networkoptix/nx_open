@@ -1,5 +1,7 @@
 #include "ssl_stream_socket.h"
 
+#include <nx/network/socket_global.h>
+
 #include "../aio/async_channel_adapter.h"
 
 namespace nx {
@@ -85,6 +87,8 @@ StreamSocket::StreamSocket(
     m_delegate(std::move(delegate)),
     m_proxyConverter(nullptr)
 {
+    ++nx::network::SocketGlobals::instance().debugCounters().sslSocketCount;
+
     if (isServerSide)
         m_sslPipeline = std::make_unique<ssl::AcceptingPipeline>();
     else
@@ -104,6 +108,7 @@ StreamSocket::StreamSocket(
 
 StreamSocket::~StreamSocket()
 {
+    --nx::network::SocketGlobals::instance().debugCounters().sslSocketCount;
 }
 
 void StreamSocket::pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler)
@@ -146,28 +151,30 @@ void StreamSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
 }
 
 bool StreamSocket::connect(
-    const SocketAddress& remoteSocketAddress,
+    const SocketAddress& endpoint,
     std::chrono::milliseconds timeout)
 {
-    if (!base_type::connect(remoteSocketAddress, timeout))
+    if (!base_type::connect(endpoint, timeout))
         return false;
 
     switchToSyncModeIfNeeded();
+    m_sslPipeline->setServerName(endpoint.address.toStdString());
     return m_sslPipeline->performHandshake();
 }
 
 void StreamSocket::connectAsync(
-    const SocketAddress& address,
+    const SocketAddress& endpoint,
     nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
 {
     base_type::connectAsync(
-        address,
-        [this, handler = std::move(handler)](
+        endpoint,
+        [this, endpoint, handler = std::move(handler)](
             SystemError::ErrorCode connectResultCode) mutable
         {
             if (connectResultCode != SystemError::noError)
                 return handler(connectResultCode);
 
+            m_sslPipeline->setServerName(endpoint.address.toStdString());
             handshakeAsync(std::move(handler));
         });
 }
@@ -238,6 +245,11 @@ void StreamSocket::handshakeAsync(
 
             doHandshake();
         });
+}
+
+std::string StreamSocket::serverName() const
+{
+    return m_sslPipeline->serverNameFromClientHello();
 }
 
 void StreamSocket::cancelIoInAioThread(nx::network::aio::EventType eventType)

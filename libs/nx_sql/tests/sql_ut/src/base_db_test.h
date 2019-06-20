@@ -11,6 +11,8 @@
 #include <nx/utils/test_support/test_with_temporary_directory.h>
 #include <nx/utils/test_support/utils.h>
 
+#include <module_name.h>
+
 namespace nx::sql::test {
 
 // TODO: #ak Fix weird class names in this file.
@@ -20,13 +22,13 @@ class BasicFixture:
     public nx::utils::test::TestWithTemporaryDirectory
 {
 public:
-    BasicFixture();
+    BasicFixture(const std::string& testModuleName);
     ~BasicFixture();
 
 protected:
     virtual void initializeQueryExecutor(const ConnectionOptions& connectionOptions) = 0;
     virtual void closeDatabase() = 0;
-    virtual AsyncSqlQueryExecutor& asyncSqlQueryExecutor() = 0;
+    virtual AbstractAsyncSqlQueryExecutor& asyncSqlQueryExecutor() = 0;
 
     ConnectionOptions& connectionOptions();
     const ConnectionOptions& connectionOptions() const;
@@ -100,10 +102,15 @@ private:
 class BaseDbTest:
     public BasicFixture
 {
+    using base_type = BasicFixture;
+
+public:
+    using base_type::base_type;
+
 protected:
     virtual void initializeQueryExecutor(const ConnectionOptions& connectionOptions) override;
     virtual void closeDatabase() override;
-    virtual AsyncSqlQueryExecutor& asyncSqlQueryExecutor() override;
+    virtual AbstractAsyncSqlQueryExecutor& asyncSqlQueryExecutor() override;
 
 private:
     std::unique_ptr<InstanceController> m_dbInstanceController;
@@ -114,10 +121,15 @@ private:
 class FixtureWithQueryExecutorOnly:
     public BasicFixture
 {
+    using base_type = BasicFixture;
+
+public:
+    using base_type::base_type;
+
 protected:
     virtual void initializeQueryExecutor(const ConnectionOptions& connectionOptions) override;
     virtual void closeDatabase() override;
-    virtual AsyncSqlQueryExecutor& asyncSqlQueryExecutor() override;
+    virtual AbstractAsyncSqlQueryExecutor& asyncSqlQueryExecutor() override;
 
 private:
     std::unique_ptr<AsyncSqlQueryExecutor> m_queryExecutor;

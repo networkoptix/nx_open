@@ -1,31 +1,24 @@
-#ifndef SETTIME_REST_HANDLER_H
-#define SETTIME_REST_HANDLER_H
+#pragma once
 
-#include "rest/server/json_rest_handler.h"
+#include <nx/network/rest/handler.h>
+
+namespace nx::vms::server {
 
 struct SetTimeData;
 
-class QnSetTimeRestHandler : public QnJsonRestHandler
+class SetTimeRestHandler: public nx::network::rest::Handler
 {
-    Q_OBJECT
-public:
-    virtual int executePost(
-        const QString& path,
-        const QnRequestParams& params,
-        const QByteArray &body,
-        QnJsonRestResult &result,
-        const QnRestConnectionProcessor* owner) override;
+protected:
+    virtual nx::network::rest::Response executeGet(
+        const nx::network::rest::Request& request) override;
 
-    virtual int executeGet(
-        const QString& path,
-        const QnRequestParams& params,
-        QnJsonRestResult& result,
-        const QnRestConnectionProcessor* owner) override;
+    virtual nx::network::rest::Response executePost(
+        const nx::network::rest::Request& request) override;
+
 private:
-    int execute(
+    nx::network::rest::Response execute(
         const SetTimeData& data,
-        const QnRestConnectionProcessor* owner,
-        QnJsonRestResult& result);
+        const QnRestConnectionProcessor* owner);
 };
 
-#endif // SETTIME_REST_HANDLER_H
+} // namespace nx::vms::server

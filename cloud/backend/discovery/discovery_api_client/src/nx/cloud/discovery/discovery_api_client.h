@@ -40,8 +40,20 @@ public:
 
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
 
-    /** Starts the process of registering node in the discovery service. */
+    /**
+     * calls startRegistration() and startGetOnlineNodes();
+     */
     void start();
+
+    /**
+     * Starts and repeats registering this node in the cluster.
+     */
+    void startRegistration();
+
+    /**
+     * Starts and repeatedly requests the lists of online nodes in the same cluster as this node.
+     */
+    void startGetOnlineNodes();
 
     /**
      * This information is sent to the discovery node ASAP.

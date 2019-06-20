@@ -31,7 +31,11 @@ add_definitions(
     -DENABLE_SENDMAIL
     -DENABLE_DATA_PROVIDERS
     -DBOOST_BIND_NO_PLACEHOLDERS
+    -D_SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING
 )
+
+set(enableSpeechSynthesizer "true")
+set(isEdgeServer "false")
 
 if(WINDOWS)
     add_definitions(
@@ -46,15 +50,10 @@ if(ANDROID OR IOS)
     )
 endif()
 
-if(box MATCHES "isd")
+if(box MATCHES "isd|edge1")
     set(enableAllVendors OFF)
-    remove_definitions(-DENABLE_MOTION_DETECTION)
-    add_definitions(-DEDGE_SERVER)
-endif()
-
-if(box MATCHES "edge1")
-    set(enableAllVendors OFF)
-    add_definitions(-DEDGE_SERVER)
+    set(isEdgeServer "true")
+    set(enableSpeechSynthesizer "false")
 endif()
 
 if(WINDOWS)
@@ -163,14 +162,16 @@ if(UNIX)
 endif()
 
 if(LINUX)
-    if(NOT "${arch}" MATCHES "arm|aarch64")
+    if("${arch}" STREQUAL "x86" OR "${arch}" STREQUAL "x64")
         add_compile_options(-msse2)
     endif()
+
     add_compile_options(
         -Wno-unknown-pragmas
         -Wno-ignored-qualifiers
         -fstack-protector-all #< TODO: Use -fstask-protector-strong when supported.
     )
+
     set(CMAKE_SKIP_BUILD_RPATH ON)
     set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
     set(CMAKE_INSTALL_RPATH "$ORIGIN/../lib")
@@ -208,7 +209,7 @@ if(qml_debug)
 endif()
 
 set(strip_binaries ON)
-if(targetDevice MATCHES "bpi|bananapi|rpi|edge1"
+if(targetDevice MATCHES "bpi|linux_arm32|edge1"
     OR targetDevice STREQUAL "linux-x64"
     OR targetDevice STREQUAL "linux-x86"
     OR (targetDevice STREQUAL "" AND platform STREQUAL "linux")

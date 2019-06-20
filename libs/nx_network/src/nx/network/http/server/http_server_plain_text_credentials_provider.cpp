@@ -22,19 +22,19 @@ void PlainTextCredentialsProvider::getPasswordByUserName(
         }
         else
         {
-            result = PlainTextPasswordLookupResultBuilder::build(it->second);
+            result = PasswordLookupResult{
+                PasswordLookupResult::Code::ok,
+                it->second.authToken};
         }
     }
 
     completionHandler(std::move(result));
 }
 
-void PlainTextCredentialsProvider::addCredentials(
-    const nx::String& userName,
-    const nx::String& password)
+void PlainTextCredentialsProvider::addCredentials(const Credentials& credentials)
 {
     QnMutexLocker lock(&m_mutex);
-    m_credentials.emplace(userName, password);
+    m_credentials.emplace(credentials.username.toUtf8(), credentials);
 }
 
 } // namespace server

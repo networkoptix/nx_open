@@ -197,8 +197,8 @@ void QnStreamRecorder::updateSignatureAttr(StreamRecorderContext* context)
     QByteArray signPlaceholder = signPattern;
 
     NX_ASSERT(signPattern.indexOf(placeholder) >= 0, "Sign magic must be present in metadata");
-    signPattern.replace(QnSignHelper::getSignMagic(),
-        QnSignHelper::getSignFromDigest(getSignature()));
+    signPattern.replace(
+        QnSignHelper::getSignMagic(), QnSignHelper::getSignFromDigest(getSignature()));
 
     metadata.signature = QnSignHelper::makeSignature(signPattern);
 
@@ -684,7 +684,7 @@ void QnStreamRecorder::writeData(const QnConstAbstractMediaDataPtr& md, int stre
 
         if (ret < 0)
         {
-            NX_WARNING(this, "AV packet write error");
+            NX_WARNING(this, "AV packet write error %1", QnFfmpegHelper::getErrorStr(ret));
         }
         else
         {

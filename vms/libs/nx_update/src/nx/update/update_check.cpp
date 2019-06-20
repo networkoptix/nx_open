@@ -69,12 +69,13 @@ static InformationError makeHttpRequest(
         url,
         [&]()
         {
-            if (httpClient->state() != nx::network::http::AsyncClient::State::sDone)
+            auto state = httpClient->state();
+            if (state != nx::network::http::AsyncClient::State::sDone)
             {
                 error = InformationError::networkError;
-                NX_WARNING(
-                    typeid(Information),
-                    lm("Failed to get update info from the internet, url: %1").args(url));
+                auto code = SystemError::toString(httpClient->lastSysErrorCode());
+                NX_WARNING(typeid(Information),
+                    "Failed to get update info from the internet, url: %1, code=%2", url, code);
                 readyPomise.set_value();
                 return;
             }
@@ -85,7 +86,7 @@ static InformationError makeHttpRequest(
                 error = InformationError::httpError;
                 NX_WARNING(
                     typeid(Information),
-                    lm("Http client http error: %1, url: %2").args(statusCode, url));
+                    lm("Http client error: %1, url: %2").args(statusCode, url));
             }
 
             readyPomise.set_value();
@@ -114,7 +115,8 @@ static InformationError findCustomizationInfo(
     result->releaseNotesUrl = customizationInfo->release_notes;
     result->releaseDeliveryDays = customizationInfo->release_delivery;
     result->releaseDateMs = customizationInfo->release_date;
-    result->description = customizationInfo->description;
+    // As of 4.0 we do not use description from customization info.
+    //result->description = customizationInfo->description;
     return InformationError::noError;
 }
 
@@ -220,7 +222,6 @@ static InformationError parseLegacyPackages(
 static InformationError parseHeader(
     const QJsonObject& topLevelObject,
     const QString& baseUpdateUrl,
-    bool isLegacyData,
     Information* result)
 {
     if (!QJson::deserialize(topLevelObject, "version", &result->version))
@@ -246,15 +247,7 @@ static InformationError parseHeader(
         NX_WARNING(typeid(Information)) << "no eula data at" << baseUpdateUrl;
     }
 
-    QString description;
-    // Legacy updates: e take update's description from the root updates.json and
-    // override it by description in updates.json.
-    // New updates: we take description only from packages.json.
-    if ((QJson::deserialize(topLevelObject, "description", &description) && !description.isEmpty())
-        || !isLegacyData)
-    {
-        result->description = description;
-    }
+    QJson::deserialize(topLevelObject, "description", &result->description);
     return InformationError::noError;
 }
 
@@ -269,7 +262,7 @@ static InformationError parseAndExtractInformation(
     if (parseError.error != QJsonParseError::ParseError::NoError || topLevelObject.isEmpty())
         return InformationError::jsonError;
 
-    auto error = parseHeader(topLevelObject, baseUpdateUrl, /*isLegacyData=*/false, result);
+    auto error = parseHeader(topLevelObject, baseUpdateUrl, result);
     if (error != InformationError::noError)
         return error;
 
@@ -291,7 +284,7 @@ static InformationError parseAndExtractLegacyInformation(
     if (parseError.error != QJsonParseError::ParseError::NoError || topLevelObject.isEmpty())
         return InformationError::jsonError;
 
-    auto error = parseHeader(topLevelObject, baseUpdateUrl, /*isLegacyData=*/true, result);
+    auto error = parseHeader(topLevelObject, baseUpdateUrl, result);
     if (error != InformationError::noError)
         return error;
 
@@ -520,6 +513,10 @@ static FindPackageResult findPackage(
     QString* outMessage)
 {
     update::Information updateInformation;
+    NX_DEBUG(
+        nx::utils::log::Tag(QString("UpdateCheck")),
+        lm("update::findPackage: serialized update information is empty %1")
+            .args(serializedUpdateInformation.isEmpty()));
     const auto deserializeResult = fromByteArray(serializedUpdateInformation,
         &updateInformation, outMessage);
     if (deserializeResult != FindPackageResult::ok)

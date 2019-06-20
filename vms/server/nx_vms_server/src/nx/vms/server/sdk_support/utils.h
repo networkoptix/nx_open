@@ -11,6 +11,7 @@
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/member_detector.h>
+#include <nx/utils/debug_helpers/debug_helpers.h>
 
 #include <nx/sdk/analytics/i_uncompressed_video_frame.h>
 
@@ -26,31 +27,33 @@
 
 #include <nx/vms/server/sdk_support/loggers.h>
 
+#include <analytics/db/analytics_db_types.h>
+
 #include <nx/sdk/i_string_map.h>
 #include <nx/sdk/i_plugin_event.h>
 #include <nx/sdk/helpers/device_info.h>
 #include <nx/sdk/helpers/ptr.h>
 #include <plugins/settings.h>
-#include <plugins/plugins_ini.h>
+#include <plugins/vms_server_plugins_ini.h>
 
 class QnMediaServerModule;
 
-namespace nx::vms::server::analytics {
-
-class SdkObjectFactory;
-
-} // namespace nx::vms::server::analytics
+namespace nx::vms::server::analytics { class SdkObjectFactory; }
 
 namespace nx::vms::server::sdk_support {
 
-namespace detail {
+nx::vms::api::analytics::PixelFormat fromSdkPixelFormat(
+    nx::sdk::analytics::IUncompressedVideoFrame::PixelFormat sdkPixelFormat);
 
-NX_UTILS_DECLARE_FIELD_DETECTOR(hasGroupId, groupId, std::set<QString>);
-NX_UTILS_DECLARE_FIELD_DETECTOR(hasPaths, paths,
-    std::set<nx::vms::api::analytics::DescriptorScope>);
-NX_UTILS_DECLARE_FIELD_DETECTOR_SIMPLE(hasItem, item);
+std::optional<nx::sdk::analytics::IUncompressedVideoFrame::PixelFormat> toSdkPixelFormat(
+    nx::vms::api::analytics::PixelFormat pixelFormat);
 
-} // namespace detail
+/** @return Converted value, or, on error, AV_PIX_FMT_NONE, after failing an assertion. */
+AVPixelFormat sdkToAvPixelFormat(
+    nx::sdk::analytics::IUncompressedVideoFrame::PixelFormat sdkPixelFormat);
+
+std::optional<nx::sdk::analytics::IUncompressedVideoFrame::PixelFormat> avPixelFormatToSdk(
+    AVPixelFormat avPixelFormat);
 
 template<typename Manifest>
 std::optional<Manifest> loadManifestFromFile(const QString& filename)
@@ -66,10 +69,10 @@ std::optional<Manifest> loadManifestFromFile(const QString& filename)
                 .args(message, filename);
         };
 
-    if (!NX_ASSERT(pluginsIni().analyticsDeviceAgentSettingsPath[0]))
+    if (!NX_ASSERT(pluginsIni().analyticsManifestSubstitutePath[0]))
         return std::nullopt;
 
-    const QDir dir(analytics::debug_helpers::debugFilesDirectoryPath(
+    const QDir dir(nx::utils::debug_helpers::debugFilesDirectoryPath(
         pluginsIni().analyticsManifestSubstitutePath));
 
     const QString fileData = analytics::debug_helpers::loadStringFromFile(
@@ -214,9 +217,17 @@ std::optional<nx::sdk::analytics::IUncompressedVideoFrame::PixelFormat>
         const nx::vms::api::analytics::EngineManifest& manifest,
         const QString& engineLogLabel);
 
-resource::AnalyticsEngineResourceList toServerEngineList(
-    const nx::vms::common::AnalyticsEngineResourceList engineList);
-
 nx::vms::api::EventLevel fromSdkPluginEventLevel(nx::sdk::IPluginEvent::Level level);
+
+nx::sdk::Ptr<nx::sdk::analytics::ITimestampedObjectMetadata> createTimestampedObjectMetadata(
+    const nx::analytics::db::DetectedObject& detectedObject,
+    const nx::analytics::db::ObjectPosition& objectPosition);
+
+nx::sdk::Ptr<nx::sdk::IList<nx::sdk::analytics::ITimestampedObjectMetadata>> createObjectTrack(
+    const nx::analytics::db::DetectedObject& detectedObject);
+
+nx::sdk::Ptr<nx::sdk::analytics::IUncompressedVideoFrame> createUncompressedVideoFrame(
+    const CLVideoDecoderOutputPtr& frame,
+    nx::vms::api::analytics::PixelFormat pixelFormat);
 
 } // namespace nx::vms::server::sdk_support

@@ -295,7 +295,7 @@ bool QnServerDb::open()
     }
     else
     {
-        qWarning() << "Cannot initialize sqlLite database. Actions log is not created.";
+        NX_WARNING(this, "Cannot create sqlLite database %1", fileName);
         return false;
     }
 
@@ -937,8 +937,8 @@ vms::event::ActionDataList QnServerDb::getActions(
             || actionData.actionType == vms::api::ActionType::fullscreenCameraAction
             )
         {
-            QnNetworkResourcePtr camRes =
-                resourcePool()->getResourceById<QnNetworkResource>(actionData.eventParams.eventResourceId);
+            QnNetworkResourcePtr camRes = serverModule()->resourcePool()
+                ->getResourceById<QnNetworkResource>(actionData.eventParams.eventResourceId);
             if (camRes)
             {
                 if (QnStorageManager::isArchiveTimeExists(
@@ -1006,7 +1006,7 @@ void QnServerDb::getAndSerializeActions(const QnEventLogRequestData& request,
         {
             QnUuid eventResId = QnUuid::fromRfc4122(actionsQuery.value(eventResIdx).toByteArray());
             QnNetworkResourcePtr camRes =
-                resourcePool()->getResourceById<QnNetworkResource>(eventResId);
+                serverModule()->resourcePool()->getResourceById<QnNetworkResource>(eventResId);
             if (camRes)
             {
                 if (QnStorageManager::isArchiveTimeExists(

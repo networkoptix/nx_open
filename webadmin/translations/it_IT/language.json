@@ -119,15 +119,13 @@
         "upnpPortMappingEnabled": "Funzione UPNP abilitata",
         "useTextEmailFormat": "Invia e-mail di testo",
         "useWindowsEmailLineFeed": "Utilizza la riga di Windows nei messaggi di posta elettronica",
-        "hanwhaChunkReaderMessageBodyTimeoutSeconds": "Hanwha: Chunk message body timeout",
-        "hanwhaChunkReaderResponseTimeoutSeconds": "Hanwha: Chunk response timeout",
-        "showHanwhaAlternativePtzControlsOnTile": "Hanwha: Show alternative PTZ controls on tile",
         "trafficEncryptionForced": "Force traffic encryption",
         "videoTrafficEncryptionForced": "Force video traffic encryption",
         "updateStatus": "Update status",
         "watermarkSettings": "Watermark settings",
         "maxWebMTranscoders": "Quantità massima di connessioni WEBM per il server. Chrome apre due connessioni contemporaneamente, quindi chiude la prima. Pertanto, si consiglia di impostare il valore> = 2 su questo parametro.",
-        "maxEventLogRecords": "Numero massimo di record del registro degli eventi da conservare nel database. La quantità reale di record non eliminati può essere maggiore del 20% rispetto al valore specificato."
+        "maxEventLogRecords": "Numero massimo di record del registro degli eventi da conservare nel database. La quantità reale di record non eliminati può essere maggiore del 20% rispetto al valore specificato.",
+        "forceLiveCacheForPrimaryStream": "Indica se memorizzare nella cache alcuni frame per lo stream principale. Valori: \"sì\" - sempre abilitato (può utilizzare molta RAM), \"no\" - sempre disabilitato tranne quando richiesto dalla riproduzione (ad es. HLS), \"auto\" - simile a \"no\", ma attivo quando si migliora l'esperienza dell'utente (ad esempio quando alcuni plug-in di Analytics funzionano sulla videocamera)."
     },
     "info": {
         "tabs": {
@@ -191,5 +189,52 @@
     },
     "pageTitles": {
         "default": "{{PRODUCT_NAME}} interfaccia web"
+    },
+    "common": {
+        "voiceCommands": {
+            "search": "find + [text for searchbar]",
+            "pause": "pausa",
+            "help": "help | show commands",
+            "collapse all servers": "comprimi tutti i server",
+            "collapse server": "collapse server + [server name]",
+            "play": "riproduci",
+            "clear search": "cancella ricerca",
+            "live": "go to live | show me live",
+            "expand all servers": "espandere tutti i server",
+            "stop listening": "interrompere l'ascolto",
+            "expand server": "expand server + [server name]",
+            "view": "view + [camera name]"
+        },
+        "systemOffline": "Il sistema è offline",
+        "cameraLinks": {
+            "copyToClipboard": "copia negli appunti",
+            "highStream": "Flusso Primario",
+            "copyDefaultText": "copia",
+            "unknown": "Sconosciuto",
+            "lowStream": "Flusso secondario",
+            "transcoding": "Transcodifica",
+            "copyActiveText": "copiato negli appunti"
+        },
+        "searchCamPlaceholder": "Ricerca",
+        "cameraStates": {
+            "noFormat": "Questo browser non supporta la riproduzione di video da questa telecamera.",
+            "ieWin10": "Si prega di utilizzare i browser Microsoft Edge o Google Chrome.",
+            "iosVideoTooLarge": "iOS non supporta video più grandi di FullHD (2MP: 1920x1080).",
+            "unauthorized": "Autenticazione richiesta",
+            "ubuntuNX": "Questo browser non supporta i video da server basati su ARM. Per favore, utilizzare il browser Chromium.",
+            "ieNoWebm": "Si prega di installare <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>il codec WebM </a> per Internet Explorer.",
+            "flashOrWebmRequired": "Si prega di <a href='https://get.adobe.com/flashplayer/' target='_blank'>installare Adobe Flash</a> o<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>codec WebM</a> per la riproduzione di video in Internet Explorer.",
+            "noArmSupport": "Questo browser o dispositivo non supporta la riproduzione di video da server basati su ARM.",
+            "error": "Errore",
+            "offline": "Offiline",
+            "noData": "Nessun dato",
+            "flashRequired": "Si prega di <a href='https://get.adobe.com/flashplayer/' target='_blank'>installare Adobe Flash</a> per la riproduzione di video."
+        },
+        "chromeCastWarning": "Chromecast richiede molte risorse e potrebbe causare problemi al suo server.",
+        "resolution": {
+            "high": "Alta",
+            "auto": "Automatico",
+            "low": "Basso"
+        }
     }
 }

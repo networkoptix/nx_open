@@ -34,7 +34,7 @@ ServerUpdatesModel::ServerUpdatesModel(
 
     connect(m_tracker.get(), &PeerStateTracker::itemAdded,
         this, &ServerUpdatesModel::atItemAdded);
-    connect(m_tracker.get(), &PeerStateTracker::itemRemoved,
+    connect(m_tracker.get(), &PeerStateTracker::itemToBeRemoved,
         this, &ServerUpdatesModel::atItemRemoved);
     connect(m_tracker.get(), &PeerStateTracker::itemChanged,
         this, &ServerUpdatesModel::atItemChanged);
@@ -64,7 +64,7 @@ QVariant ServerUpdatesModel::headerData(int section, Qt::Orientation orientation
             case NameColumn:
                 return tr("Component");
             case VersionColumn:
-                return tr("Current Version");
+                return tr("Installed Version");
             case ProgressColumn:
                 return tr("Status");
             case StatusMessageColumn:
@@ -126,7 +126,8 @@ QVariant ServerUpdatesModel::data(const QModelIndex& index, int role) const
             {
                 case NameColumn:
                     if (item->component == UpdateItem::Component::server)
-                        return QnResourceDisplayInfo(server).toString(qnSettings->extraInfoInTree());
+                        return QnResourceDisplayInfo(server).toString(
+                            Qn::ResourceInfoLevel::RI_NameOnly);
                     else
                         return QString(tr("Client"));
                 case VersionColumn:
@@ -147,6 +148,9 @@ QVariant ServerUpdatesModel::data(const QModelIndex& index, int role) const
     {
         switch (role)
         {
+            case Qn::ResourceRole:
+                return QVariant::fromValue<QnResourcePtr>(server);
+
             case Qt::DecorationRole:
                 if (column == NameColumn)
                     return qnResIconCache->icon(server);
@@ -262,7 +266,11 @@ bool SortedPeerUpdatesModel::lessThan(const QModelIndex& leftIndex, const QModel
         return left < right;
 
     if (left->offline != right->offline)
-        return !left->offline;
+    {
+        if (!left->offline)
+            return true;
+        return left->state != nx::update::Status::Code::offline;
+    }
 
     QString lname = leftIndex.data(Qt::DisplayRole).toString();
     QString rname = rightIndex.data(Qt::DisplayRole).toString();

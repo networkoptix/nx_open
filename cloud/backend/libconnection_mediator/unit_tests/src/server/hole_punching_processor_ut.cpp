@@ -9,6 +9,7 @@
 #include <nx/utils/thread/sync_queue.h>
 #include <nx/utils/uuid.h>
 
+#include <nx/cloud/mediator/listening_peer_db.h>
 #include <nx/cloud/mediator/relay/relay_cluster_client.h>
 #include <nx/cloud/mediator/server/hole_punching_processor.h>
 #include <nx/cloud/mediator/settings.h>
@@ -67,8 +68,6 @@ protected:
 
 TEST_F(FtHolePunchingProcessor, generic_tests)
 {
-    const std::chrono::milliseconds kMaxConnectResponseWaitTimeout(15000);
-
     using namespace nx::hpm;
 
     const auto server1 = addRandomServer(m_system, boost::none, hpm::ServerTweak::noBindEndpoint);
@@ -390,7 +389,8 @@ class HolePunchingProcessor:
 
 public:
     HolePunchingProcessor():
-        m_listeningPeerPool(m_settings.listeningPeer()),
+        m_listeningPeerDb(m_settings),
+        m_listeningPeerPool(m_settings.listeningPeer(), &m_listeningPeerDb),
         m_relayClusterClient(m_settings),
         m_holePunchingProcessor(
             m_settings,
@@ -415,7 +415,8 @@ protected:
         m_relayUrl = "http://relay.host/relay/path?relay.query";
         std::array<const char*, 2U> args{
             "-trafficRelay/url",
-            m_relayUrl.constData()};
+            m_relayUrl.constData(),
+        };
 
         m_settings.load(args.size(), args.data());
     }
@@ -504,6 +505,7 @@ private:
 
     conf::Settings m_settings;
     TestCloudDataProvider m_cloudData;
+    ListeningPeerDb m_listeningPeerDb;
     ListeningPeerPool m_listeningPeerPool;
     DummyStatisticsCollector m_statisticsCollector;
     RelayClusterClient m_relayClusterClient;

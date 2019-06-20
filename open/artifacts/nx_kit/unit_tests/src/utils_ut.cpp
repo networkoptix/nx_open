@@ -9,6 +9,31 @@ namespace kit {
 namespace utils {
 namespace test {
 
+TEST(utils, getProcessCmdLineArgs)
+{
+    const auto& args = getProcessCmdLineArgs();
+
+    ASSERT_FALSE(args.empty());
+    ASSERT_TRUE(args[0].find("nx_kit_ut") != std::string::npos);
+
+    std::cerr << "Process has " << args.size() << " arg(s):" << std::endl;
+    for (const auto& arg: args)
+        std::cerr << nx::kit::utils::toString(arg) << std::endl;
+}
+
+TEST(utils, baseName)
+{
+    ASSERT_STREQ("", baseName(""));
+    ASSERT_STREQ("", baseName("/"));
+    ASSERT_STREQ("bar", baseName("/foo/bar"));
+    ASSERT_STREQ("bar", baseName("foo/bar"));
+
+    #if defined(_WIN32)
+        ASSERT_STREQ("bar", baseName("d:bar"));
+        ASSERT_STREQ("bar", baseName("X:\\bar"));
+    #endif
+}
+
 TEST(utils, alignUp)
 {
     ASSERT_EQ(0U, alignUp(0, 0));

@@ -7,6 +7,7 @@
 #include <core/resource_access/resource_access_manager.h>
 #include <nx_ec/access_helpers.h>
 #include <rest/server/json_rest_result.h>
+#include <audit/audit_manager.h>
 
 namespace nx {
 namespace vms {
@@ -71,6 +72,7 @@ nx::network::http::StatusCode::Value SystemSettingsProcessor::updateSettings(
 
             setting->setSerializedValue(paramIter.value());
             dirty = true;
+            auditManager()->notifySettingsChanged(authSession, setting->key());
         }
 
         if (readAllowed)

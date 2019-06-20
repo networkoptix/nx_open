@@ -6,6 +6,7 @@
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/random.h>
 #include <nx/utils/std/cpp14.h>
+#include <nx/utils/string.h>
 
 namespace nx {
 namespace network {
@@ -194,6 +195,7 @@ class SslPipeline:
 {
 public:
     SslPipeline():
+        m_serverName(nx::utils::generateRandomName(7)),
         m_clientPipeline(nullptr),
         m_serverPipeline(nullptr)
     {
@@ -286,6 +288,11 @@ protected:
         ASSERT_TRUE(m_serverPipeline->eof());
     }
 
+    void thenServerNameIsReceivedByAcceptingSide()
+    {
+        ASSERT_EQ(m_serverName, m_serverPipeline->serverNameFromClientHello());
+    }
+
     void setTransferWindowSize(std::size_t windowSize)
     {
         m_pipeline->setTransferWindowSize(windowSize);
@@ -295,6 +302,7 @@ protected:
     {
         auto pipeline = std::make_unique<ConnectingPipeline>();
         m_clientPipeline = pipeline.get();
+        m_clientPipeline->setServerName(m_serverName);
         return std::move(pipeline);
     }
 
@@ -316,6 +324,7 @@ protected:
     }
 
 private:
+    const std::string m_serverName;
     QByteArray m_inputData;
     QByteArray m_encodedData;
     QByteArray m_outputData;
@@ -383,6 +392,13 @@ TEST_F(SslPipeline, shutdown)
     thenBothSidesReportEof();
 }
 
+TEST_F(SslPipeline, ClientHello_contains_serverName)
+{
+    givenEncodeDecodePipeline();
+    whenDataIsTransferredThroughPipeline();
+    thenServerNameIsReceivedByAcceptingSide();
+}
+
 //TEST_F(SslPipeline, incompatible_algorithm)
 
 class SslPipelineThirstyFlags:
@@ -430,7 +446,7 @@ protected:
         ASSERT_TRUE(one->isWriteThirsty());
 
         ASSERT_GT(another->read(buf.data(), buf.size()), 0);
-        
+
         // NOTE: SSL pipeline cannot recover from write errors.
         ASSERT_LT(one->write(buf.data(), buf.size()), 0);
     }

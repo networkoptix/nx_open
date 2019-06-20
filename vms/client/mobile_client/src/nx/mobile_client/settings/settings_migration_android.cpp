@@ -18,9 +18,9 @@ QnMigratedSessionList getMigratedSessions(bool *success)
     if (success)
         *success = false;
 
-    QString uriString = lit("content://") +
+    QString uriString = QString("content://") +
         QnMobileClientAppInfo::oldAndroidAppId() +
-                        lit(".LogonEntries/#HereWillBeDragonsRazRazRaz111!!!");
+                        QString(".LogonEntries/#HereWillBeDragonsRazRazRaz111!!!");
 
     QAndroidJniObject uri = QAndroidJniObject::callStaticObjectMethod(
                 "android/net/Uri", "parse",

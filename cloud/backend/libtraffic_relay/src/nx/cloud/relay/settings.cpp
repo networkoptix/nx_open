@@ -67,21 +67,21 @@ static constexpr std::chrono::seconds kDefaultConnectSessionIdleTimeout =
     std::chrono::minutes(10);
 
 //-------------------------------------------------------------------------------------------------
-// ConnectingPeer
 
-static const QString kCassandraHost("cassandra/host");
-static const QString kDefaultCassandraHost;
+namespace listening_peer_db {
 
-static const QString kDelayBeforeRetryingInitialConnect(
-    "cassandra/delayBeforeRetryingInitialConnect");
-static constexpr std::chrono::seconds kDefaultDelayBeforeRetryingInitialConnect =
-    std::chrono::seconds(10);
+static constexpr char kGroupName[] = "listeningPeerDb";
+static constexpr char kConnectionRetryDelay[] = "connectionRetryDelay";
+static const std::chrono::milliseconds kDefaultConnectionRetryDelay = std::chrono::seconds(10);
+
+} // namespace listening_peer_db
+
 
 } // namespace
 
 //-------------------------------------------------------------------------------------------------
 
-static const QString kModuleName = lit("traffic_relay");
+static const QString kModuleName = "traffic_relay";
 
 Http::Http():
     tcpBacklogSize(kDefaultHttpTcpBacklogSize),
@@ -98,11 +98,6 @@ ConnectingPeer::ConnectingPeer():
 
 Proxy::Proxy():
     unusedAliasExpirationPeriod(kDefaultProxyUnusedAliasExpirationPeriod)
-{
-}
-
-CassandraConnection::CassandraConnection():
-    delayBeforeRetryingInitialConnect(kDefaultDelayBeforeRetryingInitialConnect)
 {
 }
 
@@ -170,9 +165,9 @@ const Proxy& Settings::proxy() const
     return m_proxy;
 }
 
-const CassandraConnection& Settings::cassandraConnection() const
+const ListeningPeerDb& Settings::listeningPeerDb() const
 {
-    return m_cassandraConnection;
+    return m_listeningPeerDb;
 }
 
 void Settings::loadSettings()
@@ -183,7 +178,7 @@ void Settings::loadSettings()
     loadHttps();
     m_listeningPeer.load(settings());
     loadConnectingPeer();
-    loadCassandraHost();
+    loadListeningPeerDb();
 }
 
 void Settings::loadServer()
@@ -263,16 +258,29 @@ void Settings::loadConnectingPeer()
             kDefaultConnectSessionIdleTimeout);
 }
 
-void Settings::loadCassandraHost()
+ListeningPeerDb::ListeningPeerDb():
+    enabled(false),
+    connectionRetryDelay(listening_peer_db::kDefaultConnectionRetryDelay)
 {
-    using namespace std::chrono;
+}
 
-    m_cassandraConnection.host =
-        settings().value(kCassandraHost, kDefaultCassandraHost).toString().toStdString();
-    m_cassandraConnection.delayBeforeRetryingInitialConnect =
-        nx::utils::parseTimerDuration(
-            settings().value(kDelayBeforeRetryingInitialConnect).toString(),
-            kDefaultDelayBeforeRetryingInitialConnect);
+void Settings::loadListeningPeerDb()
+{
+    if (!settings().containsGroup(listening_peer_db::kGroupName))
+        return;
+
+    std::string groupName = listening_peer_db::kGroupName;
+
+    m_listeningPeerDb.enabled = true;
+
+    m_listeningPeerDb.connectionRetryDelay = nx::utils::parseTimerDuration(
+        settings().value(lm("%1/%2")
+            .arg(listening_peer_db::kGroupName)
+            .arg(listening_peer_db::kConnectionRetryDelay)).toString(),
+        listening_peer_db::kDefaultConnectionRetryDelay);
+
+    m_listeningPeerDb.sql.loadFromSettings(settings(), lm("%1/sql").arg(groupName));
+    m_listeningPeerDb.map.load(settings(), lm("%1/cluster").arg(groupName).toStdString());
 }
 
 } // namespace conf

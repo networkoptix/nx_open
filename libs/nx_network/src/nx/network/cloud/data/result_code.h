@@ -23,6 +23,7 @@ enum class ResultCode
     noReplyFromServer,
     badTransport,
     interrupted,
+    tryAlternate,
 };
 
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ResultCode)

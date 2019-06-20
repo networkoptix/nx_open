@@ -1,6 +1,7 @@
 #pragma once
 
-#include <memory> // for shared_ptr
+#include <memory>
+#include <chrono>
 
 #include <QtCore/QAbstractTableModel>
 
@@ -20,6 +21,9 @@ using StatusCode = nx::update::Status::Code;
  */
 struct UpdateItem
 {
+    using Clock = std::chrono::steady_clock;
+    using TimePoint = std::chrono::time_point<Clock>;
+
     enum class Component
     {
         server,
@@ -44,15 +48,31 @@ struct UpdateItem
     bool offline = false;
     bool skipped = false;
     bool installed = false;
-    bool changedProtocol = false;
+    /** Protocol version for this peer. */
+    int protocol = 0;
     bool installing = false;
     bool storeUpdates = true;
+    /**
+     * Actual status can become unknown when we just issue update command. We should wait for
+     * another response from /ec2/updateStatus to get relevant state.
+     */
+    bool statusUnknown = false;
+    /** The last time we've seen this peer online. */
+    TimePoint lastOnlineTime;
+    /** The last time we've got status update for this item. */
+    TimePoint lastStatusTime;
     /** Row in the table. */
     int row = -1;
 };
 
 using UpdateItemPtr = std::shared_ptr<UpdateItem>;
 
+/**
+ * PeerStateTracker integrates keeps state for all the peers participating in system update.
+ *
+ * ServerUpdatesModel uses it as a data source, by subscribing to itemChanged/itemAdded/... events.
+ * ServerUpdateTool passes mediaserver responses here.
+ */
 class PeerStateTracker:
     public Connective<QObject>,
     public QnWorkbenchContextAware
@@ -90,7 +110,12 @@ public:
 
     nx::utils::SoftwareVersion lowestInstalledVersion();
     void setUpdateTarget(const nx::utils::SoftwareVersion& version);
-    void setUpdateStatus(const std::map<QnUuid, nx::update::Status>& statusAll);
+    /**
+     * Update internal data using response from mediaservers.
+     * It will return number if peers with changed data.
+     */
+    int setUpdateStatus(const std::map<QnUuid, nx::update::Status>& statusAll);
+    void markStatusUnknown(const QSet<QnUuid>& targets);
     /**
      * Forcing update for mediaserver versions.
      * We have used direct api call to get this module information.
@@ -112,21 +137,63 @@ public:
     /** Clear update check errors for all the peers. */
     void clearVerificationErrors();
 
+    /** Checks if any peer has verification error. */
     bool hasVerificationErrors() const;
+
     bool hasStatusErrors() const;
 
 public:
-    std::map<QnUuid, nx::update::Status::Code> getAllPeerStates() const;
-    std::map<QnUuid, QnMediaServerResourcePtr> getActiveServers() const;
+    std::map<QnUuid, nx::update::Status::Code> allPeerStates() const;
+    std::map<QnUuid, QnMediaServerResourcePtr> activeServers() const;
 
-    QList<UpdateItemPtr> getAllItems() const;
-    QSet<QnUuid> getAllPeers() const;
-    QSet<QnUuid> getServersInState(StatusCode state) const;
-    QSet<QnUuid> getLegacyServers() const;
-    QSet<QnUuid> getOfflineServers() const;
-    QSet<QnUuid> getPeersInstalling() const;
-    QSet<QnUuid> getPeersCompleteInstall() const;
-    QSet<QnUuid> getServersWithChangedProtocol() const;
+    QList<UpdateItemPtr> allItems() const;
+    QSet<QnUuid> allPeers() const;
+    QSet<QnUuid> peersInState(StatusCode state) const;
+    QSet<QnUuid> legacyServers() const;
+    QSet<QnUuid> offlineServers() const;
+    QSet<QnUuid> offlineNotTooLong() const;
+    QSet<QnUuid> peersInstalling() const;
+    QSet<QnUuid> peersCompleteInstall() const;
+    QSet<QnUuid> serversWithChangedProtocol() const;
+    QSet<QnUuid> peersWithUnknownStatus() const;
+
+    /**
+     * Process unknown or offline states. It will change item states.
+     */
+    void processUnknownStates();
+
+    /**
+     * Processing for task sets. These functions are called every 1sec from
+     * MultiServerUpdatesWidget.
+     * These functions should only affect task sets and do not change state for each item.
+     */
+    void processDownloadTaskSet();
+    void processInstallTaskSet();
+
+    void skipFailedPeers();
+
+    /**
+     * Getters for task sets.
+     * Task sets are relevant to current update action, like 'downloading' or 'installing'.
+     */
+
+    /** Get a set of peers that completed current action. */
+    QSet<QnUuid> peersComplete() const;
+    /** Get a set of peers that are currently active. */
+    QSet<QnUuid> peersActive() const;
+    /** Get a set of peers that are participating in current action. */
+    QSet<QnUuid> peersIssued() const;
+    /** Get a set of peers that have failed current action. */
+    QSet<QnUuid> peersFailed() const;
+
+    /**
+     * We call it every time we start or stop next task, like ready->downloading,
+     * readyToInstall->installing or when we cancel current action.
+     * It will reset all internal task sets.
+     */
+    void setTask(const QSet<QnUuid>& targets);
+
+    void setTaskError(const QSet<QnUuid>& targets, const QString& error);
 
 public:
     /**
@@ -136,8 +203,23 @@ public:
     void atClientupdateStateChanged(int state, int percentComplete);
 
 signals:
+    /**
+     * Called after UpdateItem is already added to the list.
+     */
     void itemAdded(UpdateItemPtr item);
     void itemChanged(UpdateItemPtr item);
+    void itemOnlineStatusChanged(UpdateItemPtr item);
+
+    /**
+     * Called right before UpdateItem is removed from the list.
+     * Such order is necessary for any QAbstractItemModel: it should complete its actions before
+     * actual number of items changes.
+     */
+    void itemToBeRemoved(UpdateItemPtr item);
+
+    /**
+     * Called after UpdateItem has been removed from the list.
+     */
     void itemRemoved(UpdateItemPtr item);
 
 protected:
@@ -168,6 +250,24 @@ private:
     std::map<QnUuid, QnMediaServerResourcePtr> m_activeServers;
 
     mutable QnMutex m_dataLock;
+
+    /**
+     * This sets are changed every time we are initiating some update action.
+     * Set of peers that are currently active.
+     */
+    QSet<QnUuid> m_peersActive;
+    /** Set of peers that are used for the current task. */
+    QSet<QnUuid> m_peersIssued;
+    /** A set of peers that have completed current task. */
+    QSet<QnUuid> m_peersComplete;
+    /** A set of peers that have failed current task. */
+    QSet<QnUuid> m_peersFailed;
+
+    /**
+     * Time for server to become online. We will remove this server from the task set after
+     * this time expires.
+     */
+    UpdateItem::Clock::duration m_timeForServerToReturn;
 };
 
 } // namespace nx::vms::client::desktop

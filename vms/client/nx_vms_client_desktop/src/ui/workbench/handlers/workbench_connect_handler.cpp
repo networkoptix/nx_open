@@ -1,6 +1,8 @@
 
 #include "workbench_connect_handler.h"
 
+#include <QtCore/QTimer>
+
 #include <QtNetwork/QHostInfo>
 
 #include <QtWidgets/QAction>
@@ -51,6 +53,7 @@
 #include <platform/hardware_information.h>
 
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/integrations/integrations.h>
 
 #include <ui/dialogs/login_dialog.h>
 #include <ui/dialogs/reconnect_info_dialog.h>
@@ -97,6 +100,7 @@
 #include <watchers/cloud_status_watcher.h>
 #include <nx_ec/dummy_handler.h>
 #include <nx/vms/client/desktop/videowall/utils.h>
+#include <nx/vms/client/desktop/ui/dialogs/session_expired_dialog.h>
 
 #include <nx/vms/client/desktop/ini.h>
 
@@ -214,6 +218,12 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject* parent):
     connect(qnClientMessageProcessor, &QnClientMessageProcessor::initialResourcesReceived, this,
         &QnWorkbenchConnectHandler::at_messageProcessor_initialResourcesReceived);
 
+    // The initialResourcesReceived signal may never be emitted if the server has issues.
+    // Avoid infinite UI "Loading..." state by forcibly dropping the connections after a timeout.
+    const auto connectTimeout = ini().connectTimeoutMs;
+    if (connectTimeout > 0)
+        setupConnectTimeoutTimer(std::chrono::milliseconds(connectTimeout));
+
     auto userWatcher = context()->instance<QnWorkbenchUserWatcher>();
     connect(userWatcher, &QnWorkbenchUserWatcher::userChanged, this,
         [this](const QnUserResourcePtr &user)
@@ -310,6 +320,45 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject* parent):
         [resourceModeAction]() { resourceModeAction->setChecked(true); });
 
     //m_clientUpdateTool.reset(new nx::vms::client::desktop::ClientUpdateTool(this));
+}
+
+void QnWorkbenchConnectHandler::setupConnectTimeoutTimer(std::chrono::milliseconds timeout)
+{
+    auto connectTimeoutTimer = new QTimer(this);
+
+    connectTimeoutTimer->setSingleShot(true);
+    connectTimeoutTimer->setInterval(timeout);
+
+    connect(this, &QnWorkbenchConnectHandler::stateChanged, this,
+        [connectTimeoutTimer](LogicalState logicalValue, PhysicalState /*physicalValue*/)
+        {
+            switch (logicalValue)
+            {
+                case LogicalState::connected:
+                case LogicalState::disconnected:
+                    connectTimeoutTimer->stop();
+                    return;
+                case LogicalState::connecting:
+                case LogicalState::connecting_to_target:
+                    if (!connectTimeoutTimer->isActive())
+                        connectTimeoutTimer->start();
+                    return;
+                default:
+                    return;
+            }
+        });
+
+    connect(connectTimeoutTimer, &QTimer::timeout, this,
+        [this]
+        {
+            disconnectFromServer(DisconnectFlag::Force);
+            // Just display the error message.
+            QnConnectionDiagnosticsHelper::validateConnection(
+                {},
+                ec2::ErrorCode::serverError,
+                mainWindowWidget(),
+                commonModule()->engineVersion());
+        });
 }
 
 QnWorkbenchConnectHandler::~QnWorkbenchConnectHandler()
@@ -511,6 +560,8 @@ void QnWorkbenchConnectHandler::establishConnection(ec2::AbstractECConnectionPtr
         connectionInfo.effectiveUserName.isEmpty()
         ? url.userName()
         : connectionInfo.effectiveUserName);
+
+    integrations::connectionEstablished(connection);
 }
 
 void QnWorkbenchConnectHandler::storeConnectionRecord(
@@ -603,6 +654,8 @@ void QnWorkbenchConnectHandler::showWarnMessagesOnce()
     auto watcher = context()->instance<QnWorkbenchVersionMismatchWatcher>();
     if (watcher->hasMismatches())
         menu()->trigger(action::VersionMismatchMessageAction);
+
+    menu()->triggerIfPossible(action::ConfirmAnalyticsStorageAction);
 
     context()->instance<QnWorkbenchLicenseNotifier>()->checkLicenses();
 }
@@ -1007,6 +1060,12 @@ bool QnWorkbenchConnectHandler::disconnectFromServer(DisconnectFlags flags)
     if (!force)
         qnGlobalSettings->synchronizeNow();
 
+    if (flags.testFlag(SessionTimeout))
+    {
+        executeDelayedParented([this]() { SessionExpiredDialog::exec(context()->mainWindowWidget()); },
+            this);
+    }
+
     if (isErrorReason && mainWindow()->welcomeScreen())
         mainWindow()->welcomeScreen()->openConnectingTile();
 
@@ -1162,13 +1221,15 @@ void QnWorkbenchConnectHandler::testConnectionToServer(
 
 bool QnWorkbenchConnectHandler::tryToRestoreConnection()
 {
+    using nx::vms::client::core::ReconnectHelper;
+
     nx::utils::Url currentUrl = commonModule()->currentUrl();
     NX_ASSERT(!currentUrl.isEmpty());
     if (currentUrl.isEmpty())
         return false;
 
     if (!m_reconnectHelper)
-        m_reconnectHelper.reset(new nx::vms::client::core::ReconnectHelper());
+        m_reconnectHelper.reset(new ReconnectHelper(qnSettings->stickReconnectToServer()));
 
     if (m_reconnectHelper->servers().isEmpty())
     {

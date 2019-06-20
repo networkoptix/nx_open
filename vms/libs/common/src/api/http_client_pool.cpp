@@ -1,9 +1,6 @@
 #include "http_client_pool.h"
 
 namespace {
-    static const std::chrono::minutes kRequestSendTimeout(1);
-    static const std::chrono::minutes kResponseReadTimeout(1);
-    static const std::chrono::minutes kMessageBodyReadTimeout(10);
     static const int kDefaultPoolSize = 8;
     static const int kHttpDisconnectTimeout(60 * 1000);
 
@@ -116,6 +113,19 @@ int ClientPool::size() const
     return result;
 }
 
+
+void ClientPool::setDefaultTimeouts(
+    std::chrono::milliseconds request,
+    std::chrono::milliseconds response,
+    std::chrono::milliseconds messageBody)
+{
+    QnMutexLocker lock(&m_mutex);
+    NX_ASSERT(m_connectionPool.empty());
+    m_defaultRequestTimeout = request;
+    m_defaultResponseTimeout = response;
+    m_defaultMessageBodyTimeout = messageBody;
+}
+
 void ClientPool::sendRequestUnsafe(const Request& request, AsyncHttpClientPtr httpClient)
 {
     if (request.timeout)
@@ -125,8 +135,8 @@ void ClientPool::sendRequestUnsafe(const Request& request, AsyncHttpClientPtr ht
     }
     else
     {
-        httpClient->setResponseReadTimeoutMs(httpTimeoutMs(kResponseReadTimeout));
-        httpClient->setMessageBodyReadTimeoutMs(httpTimeoutMs(kMessageBodyReadTimeout));
+        httpClient->setResponseReadTimeoutMs(httpTimeoutMs(m_defaultResponseTimeout));
+        httpClient->setMessageBodyReadTimeoutMs(httpTimeoutMs(m_defaultMessageBodyTimeout));
     }
 
     httpClient->setAdditionalHeaders(request.headers);
@@ -223,9 +233,9 @@ AsyncHttpClientPtr ClientPool::createHttpConnection()
 
     //setting appropriate timeouts
     using namespace std::chrono;
-    result->setSendTimeoutMs(httpTimeoutMs(kRequestSendTimeout));
-    result->setResponseReadTimeoutMs(httpTimeoutMs(kResponseReadTimeout));
-    result->setMessageBodyReadTimeoutMs(httpTimeoutMs(kMessageBodyReadTimeout));
+    result->setSendTimeoutMs(httpTimeoutMs(m_defaultRequestTimeout));
+    result->setResponseReadTimeoutMs(httpTimeoutMs(m_defaultResponseTimeout));
+    result->setMessageBodyReadTimeoutMs(httpTimeoutMs(m_defaultMessageBodyTimeout));
 
     connect(
         result.get(), &nx::network::http::AsyncHttpClient::done,

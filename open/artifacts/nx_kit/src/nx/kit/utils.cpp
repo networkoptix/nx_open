@@ -1,8 +1,84 @@
 #include "utils.h"
 
+#include <vector>
+#include <string>
+#include <algorithm>
+
+#if defined(_WIN32)
+    #define NOMINMAX //< Needed to prevent windows.h define macros min() and max().
+    #include <windows.h>
+    #include <codecvt>
+#elif defined(__APPLE__)
+    #include <nx/kit/apple_utils.h>
+#else
+    #include <fstream>
+#endif
+
 namespace nx {
 namespace kit {
 namespace utils {
+
+std::string baseName(std::string path)
+{
+    #if defined(_WIN32)
+        const std::string pathWithoutDrive = (path.size() >= 2
+             && ((path[0] >= 'a' && path[0] <= 'z') || (path[0] >= 'A' && path[0] <= 'Z'))
+             && path[1] == ':')
+                 ? path.substr(2)
+                 : path;
+
+        const size_t slashPos = pathWithoutDrive.rfind('/');
+        const size_t backslashPos = pathWithoutDrive.rfind('\\');
+
+        if (slashPos == std::string::npos && backslashPos == std::string::npos)
+            return pathWithoutDrive;
+
+        const size_t lastPathSeparator = (slashPos == std::string::npos)
+            ? backslashPos
+            : (backslashPos == std::string::npos)
+                ? slashPos
+                : std::max(slashPos, backslashPos);
+
+        return pathWithoutDrive.substr(lastPathSeparator + 1);
+    #else
+        const size_t slashPos = path.rfind('/');
+        return (slashPos == std::string::npos) ? path : path.substr(slashPos + 1);
+    #endif
+}
+
+const std::vector<std::string>& getProcessCmdLineArgs()
+{
+    static std::vector<std::string> args;
+
+    if (!args.empty())
+        return args;
+
+    #if defined(_WIN32)
+        int argc;
+        LPWSTR* const argv = CommandLineToArgvW(GetCommandLineW(), &argc);
+        if (!argv || argc == 0)
+        {
+            args = std::vector<std::string>{""};
+            return args;
+        }
+
+        for (int i = 0; i < argc; ++i)
+        {
+            args.push_back(
+                std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t>().to_bytes(argv[i]));
+        }
+        LocalFree(argv);
+    #elif defined(__APPLE__)
+        args = nx::kit::apple_utils::getProcessCmdLineArgs();
+    #else //< Assuming Linux-like OS.
+        std::ifstream inputStream("/proc/self/cmdline");
+        std::string arg;
+        while (std::getline(inputStream, arg, '\0'))
+            args.push_back(arg);
+    #endif
+
+    return args;
+}
 
 std::string toString(std::string s)
 {

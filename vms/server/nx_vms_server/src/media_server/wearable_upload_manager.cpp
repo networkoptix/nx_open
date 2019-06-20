@@ -40,7 +40,7 @@ QnWearableStorageStats QnWearableUploadManager::storageStats() const
     Downloader* downloader = serverModule()->findInstance<Downloader>();
     NX_ASSERT(downloader);
 
-    QStorageInfo info(downloader->filePath(lit(".")));
+    QStorageInfo info(downloader->downloadsDirectory());
 
     QString volumeRoot = info.rootPath();
     QnStorageResourcePtr storage = serverModule()->normalStorageManager()->getStorageByVolume(volumeRoot);

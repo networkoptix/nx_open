@@ -28,17 +28,13 @@ public:
 };
 
 InternetOnlyPeerManager::InternetOnlyPeerManager():
+    AbstractPeerManager(Capabilities(FileInfo | DownloadChunk)),
     d(new Private())
 {
 }
 
 InternetOnlyPeerManager::~InternetOnlyPeerManager()
 {
-}
-
-QnUuid InternetOnlyPeerManager::selfId() const
-{
-    return {};
 }
 
 QString InternetOnlyPeerManager::peerString(const QnUuid& peerId) const
@@ -48,12 +44,12 @@ QString InternetOnlyPeerManager::peerString(const QnUuid& peerId) const
 
 QList<QnUuid> InternetOnlyPeerManager::getAllPeers() const
 {
-    return {};
+    return {QnUuid()};
 }
 
 QList<QnUuid> InternetOnlyPeerManager::peers() const
 {
-    return {};
+    return {QnUuid()};
 }
 
 int InternetOnlyPeerManager::distanceTo(const QnUuid& /*peerId*/) const
@@ -61,18 +57,40 @@ int InternetOnlyPeerManager::distanceTo(const QnUuid& /*peerId*/) const
     return 0;
 }
 
-bool InternetOnlyPeerManager::hasInternetConnection(const QnUuid& peerId) const
-{
-    // TODO: Actually check Internet connection.
-    return peerId.isNull();
-}
-
 rest::Handle InternetOnlyPeerManager::requestFileInfo(
-    const QnUuid& /*peerId*/,
-    const QString& /*fileName*/,
-    AbstractPeerManager::FileInfoCallback /*callback*/)
+    const QnUuid& peerId,
+    const QString& fileName,
+    AbstractPeerManager::FileInfoCallback callback)
 {
-    return -1;
+    if (!peerId.isNull() || !callback)
+        return -1;
+
+    const auto requestId = d->nextRequestId;
+
+    {
+        NX_MUTEX_LOCKER lock(&d->mutex);
+        d->requestClients[requestId] = nullptr;
+    }
+
+    ++d->nextRequestId;
+
+    std::async(std::launch::async,
+        [this, fileName, callback, requestId, thread = thread()]()
+        {
+            {
+                NX_MUTEX_LOCKER lock(&d->mutex);
+                if (d->requestClients.remove(requestId) == 0)
+                    return;
+            }
+
+            executeInThread(thread,
+                [fileName, callback, requestId]()
+                {
+                    callback(true, requestId, FileInformation(fileName));
+                });
+        });
+
+    return requestId;
 }
 
 rest::Handle InternetOnlyPeerManager::requestChecksums(
@@ -84,15 +102,6 @@ rest::Handle InternetOnlyPeerManager::requestChecksums(
 }
 
 rest::Handle InternetOnlyPeerManager::downloadChunk(
-    const QnUuid& /*peerId*/,
-    const QString& /*fileName*/,
-    int /*chunkIndex*/,
-    AbstractPeerManager::ChunkCallback /*callback*/)
-{
-    return -1;
-}
-
-rest::Handle InternetOnlyPeerManager::downloadChunkFromInternet(
     const QnUuid& peerId,
     const QString& /*fileName*/,
     const utils::Url& url,
@@ -156,23 +165,8 @@ void InternetOnlyPeerManager::cancelRequest(const QnUuid& peerId, rest::Handle h
         return;
 
     NX_MUTEX_LOCKER lock(&d->mutex);
-    auto httpClient = d->requestClients.take(handle);
-    httpClient->pleaseStopSync();
-}
-
-bool InternetOnlyPeerManager::hasAccessToTheUrl(const QString& url) const
-{
-    if (url.isEmpty())
-        return false;
-
-    return Downloader::validate(url, /* onlyConnectionCheck */ true, /* expectedSize */ 0);
-}
-
-AbstractPeerManager* InternetOnlyPeerManagerFactory::createPeerManager(
-    FileInformation::PeerSelectionPolicy /*peerPolicy*/,
-    const QList<QnUuid>& /*additionalPeers*/)
-{
-    return new InternetOnlyPeerManager();
+    if (auto httpClient = d->requestClients.take(handle))
+        httpClient->pleaseStopSync();
 }
 
 } // namespace nx::vms::common::p2p::downloader

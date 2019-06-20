@@ -439,7 +439,7 @@ namespace nxcip
     class CameraMediaEncoder3: public CameraMediaEncoder2
     {
     public:
-        //!Returns configured stream reader, providing live data stream
+        //!Returns configured stream reader, providing live data stream. Required method!
         /*!
             \a BaseCameraManager::nativeMediaStreamCapability should be present.
 
@@ -452,7 +452,7 @@ namespace nxcip
         */
         virtual int getConfiguredLiveStreamReader(LiveStreamConfig * config, StreamReader ** reader) = 0;
 
-        //!Returns video format
+        //!Returns video format. Optional method.
         /*!
             \param[out] codec
             \param[out] pixelFormat
@@ -469,6 +469,18 @@ namespace nxcip
     public:
         /** This function is used in case of camera has customMediaStreamCapability */
         virtual int setMediaUrl(const char url[nxcip::MAX_TEXT_LEN]) = 0;
+    };
+
+    // {95d69238-7a07-462f-9364-971dd58b315e}
+    static const nxpl::NX_GUID IID_CameraMediaEncoder5 = { { 0x95, 0xd6, 0x92 ,0x38, 0x7a, 0x07, 0x46, 0x2f, 0x93, 0x64, 0x97, 0x1d ,0xd5 ,0x8b ,0x31, 0x5e } };
+    class CameraMediaEncoder5: public CameraMediaEncoder4
+    {
+    public:
+        //! Returns pointer to audio extra data.
+        virtual const char* audioExtradata() const = 0;
+
+        //! Returns size of audio extra data in bytes.
+        virtual int audioExtradataSize() const = 0;
     };
 
     class CameraPtzManager;

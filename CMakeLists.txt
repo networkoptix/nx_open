@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10.0 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.12.0 FATAL_ERROR)
 
 include(cmake/option.cmake)
 include(cmake/default_target.cmake)
@@ -7,6 +7,7 @@ set(customization "default" CACHE STRING "Product customization")
 nx_option(beta "Is this build is beta build" ON)
 set(buildNumber "0" CACHE STRING "Build number")
 
+# Remember to reset the in-version protocol number when updating the project version
 set(releaseVersion 4.0.0)
 
 nx_option(developerBuild
@@ -69,7 +70,7 @@ endif()
 set(releaseVersion.short ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR})
 set(releaseVersion.full ${releaseVersion}.${buildNumber})
 
-set(mobileClientVersion 18.5)
+set(mobileClientVersion 19.1)
 set(mobileClientVersion.full ${mobileClientVersion}.${buildNumber})
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -91,9 +92,10 @@ include(utils)
 include(find_sources)
 include(moc_utils)
 include(qrc_utils)
+include(cpp_utils)
 include(precompiled_header)
 include(strip_target)
-include(ec_protocol)
+include(vms_protocol_version)
 
 set(customization_dir "${PROJECT_SOURCE_DIR}/customization/${customization}")
 

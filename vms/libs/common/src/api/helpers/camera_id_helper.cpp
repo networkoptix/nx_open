@@ -17,7 +17,8 @@ void findAllCamerasByFlexibleIds(
 {
     QStringList allFlexibleIds;
     for (const auto& idParamName: flexibleIdParamNames)
-        allFlexibleIds.append(params.allValues(idParamName));
+        allFlexibleIds.append(params.values(idParamName));
+
     if (allFlexibleIds.isEmpty()) // No params found.
     {
         NX_WARNING(typeid(FunctionsTag), lit("Bad request: No 'cameraId' params specified"));

@@ -33,14 +33,6 @@ struct ApiDateTimeData
 };
 #define ApiDateTimeData_Fields (timeSinceEpochMs)(timeZoneId)(timeZoneOffsetMs)
 
-struct ApiServerDateTimeData: public ApiDateTimeData
-{
-    QnUuid serverId;
-};
-#define ApiServerDateTimeData_Fields ApiDateTimeData_Fields (serverId)
-
-using ApiMultiserverServerDateTimeDataList = std::vector<ApiServerDateTimeData>;
-
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (QnTimeReply)(ApiDateTimeData)(ApiServerDateTimeData)(SyncTimeData),
+    (QnTimeReply)(ApiDateTimeData)(SyncTimeData),
     (json)(ubjson)(xml)(csv_record)(metatype))

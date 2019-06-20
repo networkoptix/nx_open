@@ -2,6 +2,8 @@
 
 #if defined(ENABLE_DATA_PROVIDERS)
 
+#include <QtCore/QRect>
+
 #include <core/resource/resource_fwd.h>
 
 #include <transcoding/timestamp_params.h>
