@@ -138,6 +138,8 @@ struct Ini: nx::kit::IniConfig
     NX_INI_INT(0, clientWebServerPort,
         "Enables web server to remotely control the Nx Client operation; port should be in range\n"
         "1..65535 (typically 7012) to enable; 0 means disabled.");
+    NX_INI_STRING("", clientWebServerHost,
+        "Listen address for mediaserver. It should contain a valid ip address.\n");
     NX_INI_INT(1000, storeFrameTimePoints,
         "Number of frame timestamps stored by the Client. Used in Functional Tests for fps\n"
         "measurement.");
