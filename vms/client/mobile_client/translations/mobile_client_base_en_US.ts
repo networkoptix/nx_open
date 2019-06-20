@@ -5,14 +5,14 @@
     <name>QnLayoutsModelUnsorted</name>
     <message>
         <source>All Cameras</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>nx::client::mobile::ActionButtonsModel</name>
     <message>
         <source>Press and hold to speak</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 </TS>

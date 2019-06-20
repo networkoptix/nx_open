@@ -1288,6 +1288,10 @@
       <translation>Bilinmeyen Bir Durum Oluştu</translation>
     </message>
     <message>
+      <source>Multiple %1 events have occured</source>
+      <translation>Birden çok %1 etkinliği meydana geldi</translation>
+    </message>
+    <message>
       <source>Event: %1</source>
       <translation>Durum: %1</translation>
     </message>
@@ -1373,6 +1377,10 @@
     <message>
       <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
       <translation>Kamerayla Bağlantı (ikincil akış) Beklenmedik Bir Şekilde Kapandı.</translation>
+    </message>
+    <message>
+      <source>RTP packet loss detected, prev seq.=%1 next seq.=%2.</source>
+      <translation>RTP Veri Kaybı Algılandı. prev seq.=%1 next seq.=%2.</translation>
     </message>
     <message>
       <source>RTP packet loss detected.</source>
@@ -1564,10 +1572,6 @@
     <message>
       <source>Camera time is back to normal</source>
       <translation>Kamera saati normale döndü</translation>
-    </message>
-    <message>
-      <source>Multiple %1 events have occurred</source>
-      <translation>Birden fazla %1 etkinliği gerçekleşti</translation>
     </message>
   </context>
   <context>

@@ -46,7 +46,7 @@ void MediatorAddressPublisher::setRetryInterval(std::chrono::milliseconds interv
 }
 
 void MediatorAddressPublisher::updateAddresses(
-    std::list<SocketAddress> addresses,
+    std::vector<SocketAddress> addresses,
     utils::MoveOnlyFunc<void(nx::hpm::api::ResultCode)> updateHandler)
 {
     m_mediatorConnection->dispatch(

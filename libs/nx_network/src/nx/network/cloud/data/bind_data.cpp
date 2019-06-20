@@ -4,7 +4,7 @@ namespace nx {
 namespace hpm {
 namespace api {
 
-BindRequest::BindRequest(std::list<network::SocketAddress> _publicEndpoints):
+BindRequest::BindRequest(std::vector<network::SocketAddress> _publicEndpoints):
     StunRequestData(kMethod),
     publicEndpoints(std::move(_publicEndpoints))
 {

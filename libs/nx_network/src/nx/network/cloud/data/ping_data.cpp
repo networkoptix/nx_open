@@ -4,12 +4,7 @@ namespace nx {
 namespace hpm {
 namespace api {
 
-PingRequest::PingRequest():
-    PingRequest(std::list<network::SocketAddress>())
-{
-}
-
-PingRequest::PingRequest(std::list<network::SocketAddress> _endpoints):
+PingRequest::PingRequest(std::vector<network::SocketAddress> _endpoints):
     StunRequestData(kMethod),
     endpoints(std::move(_endpoints))
 {

@@ -79,7 +79,8 @@ void QnMobileClientMetaTypes::registerQmlTypes() {
     qmlRegisterType<QnCameraChunkProvider>("com.networkoptix.qml", 1, 0, "QnCameraChunkProvider");
     qmlRegisterType<QnCloudStatusWatcher>("com.networkoptix.qml", 1, 0, "QnCloudStatusWatcher");
     qmlRegisterType<QnCloudSystemInformationWatcher>("com.networkoptix.qml", 1, 0, "QnCloudSystemInformationWatcher");
-    qmlRegisterType<nx::vms::client::core::UserWatcher>("com.networkoptix.qml", 1, 0, "nx::vms::client::core::UserWatcher");
+    qmlRegisterType<nx::vms::client::core::UserWatcher>("com.networkoptix.qml", 1, 0, "UserWatcher");
+
 
 
     qmlRegisterType<QnActiveCameraThumbnailLoader>("com.networkoptix.qml", 1, 0, "QnActiveCameraThumbnailLoader");

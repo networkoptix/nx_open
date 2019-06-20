@@ -363,6 +363,37 @@ PageBase
         }
     }
 
+    Image
+    {
+        id: controlsShadowGradient
+
+        property real customHeight:
+        {
+            if (d.ptzMode || ptzPanel.moveOnTapMode)
+                return getNavigationBarHeight()
+
+            return videoNavigation.buttonsPanelHeight + getNavigationBarHeight()
+        }
+
+        x: -mainWindow.leftPadding
+        width: mainWindow.width
+        height: 96 + customHeight
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: videoScreen.height - mainWindow.height
+
+        visible: opacity > 0
+        source: lp("/images/timeline_gradient.png")
+
+        opacity:
+        {
+            var visiblePtzControls = d.ptzMode && d.uiVisible
+            if (visiblePtzControls || ptzPanel.moveOnTapMode)
+                return 1
+
+            return d.ptzMode ? d.uiOpacity : videoNavigation.opacity
+        }
+    }
+
     Item
     {
         id: content
@@ -416,37 +447,6 @@ PageBase
                         onClicked: toggleUi()
                     }
                 }
-            }
-        }
-
-        Image
-        {
-            id: controlsShadowGradient
-
-            property real customHeight:
-            {
-                if (d.ptzMode || ptzPanel.moveOnTapMode)
-                    return getNavigationBarHeight()
-
-                return videoNavigation.buttonsPanelHeight + getNavigationBarHeight()
-            }
-
-            x: -mainWindow.leftPadding
-            width: mainWindow.width
-            height: 96 + customHeight
-            anchors.bottom: parent.bottom
-            anchors.bottomMargin: videoScreen.height - mainWindow.height
-
-            visible: opacity > 0
-            source: lp("/images/timeline_gradient.png")
-
-            opacity:
-            {
-                var visiblePtzControls = d.ptzMode && d.uiVisible
-                if (visiblePtzControls || ptzPanel.moveOnTapMode)
-                    return 1
-
-                return d.ptzMode ? d.uiOpacity : videoNavigation.opacity
             }
         }
 

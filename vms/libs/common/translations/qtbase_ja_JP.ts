@@ -16,11 +16,11 @@
     </message>
     <message>
       <source>Hide %1</source>
-      <translation>%1 を隠す</translation>
+      <translation>%1 を非表示</translation>
     </message>
     <message>
       <source>Hide Others</source>
-      <translation>ほかを隠す</translation>
+      <translation>他を非表示</translation>
     </message>
     <message>
       <source>Show All</source>
@@ -28,7 +28,7 @@
     </message>
     <message>
       <source>Preferences...</source>
-      <translation>設定...</translation>
+      <translation>環境設定...</translation>
     </message>
     <message>
       <source>Quit %1</source>
@@ -78,7 +78,7 @@
     </message>
     <message>
       <source>Toggle</source>
-      <translation>トグル</translation>
+      <translation>切り替え</translation>
     </message>
     <message>
       <source>Scroll Left</source>
@@ -118,15 +118,15 @@
     </message>
     <message>
       <source>Shows the menu</source>
-      <translation>メニューを表示する</translation>
+      <translation>メニューを表示</translation>
     </message>
     <message>
       <source>Sets the focus</source>
-      <translation>フォーカスをセットする</translation>
+      <translation>フォーカスをセット</translation>
     </message>
     <message>
       <source>Toggles the state</source>
-      <translation>状態を反転させる</translation>
+      <translation>状態を切り替える。</translation>
     </message>
     <message>
       <source>Scrolls to the left</source>
@@ -307,7 +307,7 @@ Press ESC to cancel</source>
     </message>
     <message>
       <source>Open the combo box selection popup</source>
-      <translation>コンボボックスの選択用ポップアップを開く</translation>
+      <translation>コンボボックス選択ポップアップを開く</translation>
     </message>
   </context>
   <context>
@@ -775,7 +775,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>file to open is a directory</source>
-      <translation>ディレクトリを開こうとしました</translation>
+      <translation>開くファイルはディレクトリです</translation>
     </message>
   </context>
   <context>
@@ -790,7 +790,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Unsupported image format</source>
-      <translation>サポートされていない画像形式です</translation>
+      <translation>サポートされていないイメージ形式です</translation>
     </message>
     <message>
       <source>Unable to read image data</source>
@@ -809,7 +809,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Device is not set</source>
-      <translation>デバイスがセットされていません</translation>
+      <translation>デバイスが設定されていません</translation>
     </message>
     <message>
       <source>Device not writable</source>
@@ -817,7 +817,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Unsupported image format</source>
-      <translation>サポートされていない画像形式です</translation>
+      <translation>サポートされていないイメージ形式です</translation>
     </message>
   </context>
   <context>
@@ -878,7 +878,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Hide Details...</source>
-      <translation>詳細を隠す...</translation>
+      <translation>詳細の非表示</translation>
     </message>
     <message>
       <source>OK</source>
