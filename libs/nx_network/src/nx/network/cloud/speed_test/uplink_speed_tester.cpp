@@ -1,0 +1,223 @@
+#include "uplink_speed_tester.h"
+
+#include <nx/network/http/buffer_source.h>
+#include <nx/network/url/url_builder.h>
+
+#include "http_api_paths.h"
+
+namespace nx::network::cloud::speed_test {
+
+using namespace std::chrono;
+using namespace nx::hpm::api;
+
+namespace {
+
+static const milliseconds kTestDuration = seconds(3);
+
+} // namespace
+
+UplinkSpeedTester::~UplinkSpeedTester()
+{
+	pleaseStopSync();
+}
+
+void UplinkSpeedTester::bindToAioThread(aio::AbstractAioThread* aioThread)
+{
+    base_type::bindToAioThread(aioThread);
+	if (m_httpClient)
+		m_httpClient->bindToAioThread(aioThread);
+	if (m_bandwidthTester)
+		m_bandwidthTester->bindToAioThread(aioThread);
+}
+
+void UplinkSpeedTester::stopWhileInAioThread()
+{
+	m_httpClient.reset();
+	m_bandwidthTester.reset();
+}
+
+void UplinkSpeedTester::start(const nx::utils::Url& speedTestUrl, CompletionHandler handler)
+{
+	dispatch(
+		[this, speedTestUrl, handler = std::move(handler)]() mutable
+		{
+			m_url = speedTestUrl;
+			m_handler = std::move(handler);
+			m_httpClient = std::make_unique<network::http::AsyncClient>();
+			startPingTest();
+		}
+	);
+}
+
+void UplinkSpeedTester::startBandwidthTest(const microseconds& pingTime)
+{
+	m_bandwidthTester =
+		std::make_unique<UplinkBandwidthTester>(m_url, kTestDuration, pingTime);
+	m_bandwidthTester->doBandwidthTest(
+		[this](SystemError::ErrorCode errorCode, BytesPerSecond bandwidth)
+		{
+			if (errorCode != SystemError::noError)
+				return emitTestResult(errorCode, std::nullopt);
+
+			m_result.bandwidth = bandwidth;
+			emitTestResult(SystemError::noError, m_result);
+		});
+}
+
+void UplinkSpeedTester::setupPingTest()
+{
+	m_httpClient->setOnDone(
+		[this]()
+		{
+			if (m_httpClient->failed())
+			{
+				m_httpClient->setOnResponseReceived(nullptr);
+				auto errorCode = m_httpClient->lastSysErrorCode();
+				return emitTestResult(errorCode, std::nullopt);
+				m_httpClient.reset();
+			}
+		});
+
+    m_httpClient->setOnResponseReceived(
+        [this]
+        {
+            auto now = localNow();
+
+            ++m_testContext.totalRoundTrips;
+            auto roundTripTime = now - m_testContext.requestSentTime;
+            m_testContext.totalRoundTripTime += roundTripTime;
+
+            if (now - m_testContext.startTime < kTestDuration
+				&& m_testContext.totalRoundTrips < m_testContext.kMaxPingRequests)
+            {
+                sendPing();
+            }
+            else
+            {
+                m_result.pingTime =
+					m_testContext.totalRoundTripTime / m_testContext.totalRoundTrips;
+
+				startBandwidthTest(m_result.pingTime);
+
+				m_httpClient.reset();
+            }
+        });
+}
+
+void UplinkSpeedTester::startPingTest()
+{
+    setupPingTest();
+	m_testContext.startTime = localNow();
+    sendPing();
+}
+
+void UplinkSpeedTester::sendPing()
+{
+    m_httpClient->doGet(url::Builder(m_url).setPath(http::kApiPath));
+    m_testContext.requestSentTime = localNow();
+}
+
+void UplinkSpeedTester::emitTestResult(
+    SystemError::ErrorCode errorCode,
+    std::optional<ConnectionSpeed> result)
+{
+	QString resultStr = result
+		? lm("{pingTime: %1, bandwidth: %2Bps}").args(result->pingTime, result->bandwidth)
+		: "none";
+
+	NX_VERBOSE(this, "Test complete, reporting system error: '%1' and speed test result: %2",
+		SystemError::toString(errorCode), resultStr);
+
+    if (m_handler)
+		nx::utils::swapAndCall(m_handler, errorCode, std::move(result));
+}
+
+//-------------------------------------------------------------------------------------------------
+// ScheduledUplinkSpeedTester
+
+ScheduledUplinkSpeedTester::ScheduledUplinkSpeedTester(
+    const std::set<std::chrono::milliseconds>& testSchedule):
+	m_testSchedule(testSchedule)
+{
+}
+
+ScheduledUplinkSpeedTester::~ScheduledUplinkSpeedTester()
+{
+	pleaseStopSync();
+}
+
+void ScheduledUplinkSpeedTester::bindToAioThread(aio::AbstractAioThread* aioThread)
+{
+    base_type::bindToAioThread(aioThread);
+	if (m_timer)
+		m_timer->bindToAioThread(aioThread);
+	if (m_speedTester)
+		m_speedTester->bindToAioThread(aioThread);
+}
+
+void ScheduledUplinkSpeedTester::stopWhileInAioThread()
+{
+	m_timer.reset();
+	m_speedTester.reset();
+}
+
+void ScheduledUplinkSpeedTester::start(
+	const nx::utils::Url& speedTestUrl,
+	CompletionHandler handler)
+{
+	dispatch(
+		[this, speedTestUrl, handler = std::move(handler)]() mutable
+		{
+			m_url = speedTestUrl;
+			m_handler = std::move(handler);
+			m_timer = std::make_unique<nx::network::aio::Timer>();
+			scheduleNextTest(waitTimeBeforeNextTest());
+		});
+}
+
+std::chrono::milliseconds ScheduledUplinkSpeedTester::waitTimeBeforeNextTest() const
+{
+    static const milliseconds kOneDay = hours(24);
+
+    auto now = localNow();
+    std::optional<milliseconds> startTime;
+    for (auto it = m_testSchedule.begin(); it != m_testSchedule.end(); ++it)
+    {
+        if (now < *it)
+        {
+            startTime = *it;
+            break;
+        }
+    }
+
+    // If startTime is empty, we are later in the day than anything in m_testSchedule, so take the
+    // earliest start time and shift it back 24 hours.
+    if (!startTime)
+        startTime = *m_testSchedule.begin() + kOneDay;
+
+	return *startTime - now;
+}
+
+void ScheduledUplinkSpeedTester::scheduleNextTest(const milliseconds& wait)
+{
+	NX_VERBOSE(this, "The next test is scheduled in %1", wait);
+
+    m_timer->start(
+		wait,
+		[this]()
+		{
+			m_speedTester = std::make_unique<UplinkSpeedTester>();
+			m_speedTester->start(
+				m_url,
+				[this](SystemError::ErrorCode errorCode, std::optional<ConnectionSpeed> result)
+				{
+					m_handler(errorCode, std::move(result));
+
+					scheduleNextTest(waitTimeBeforeNextTest());
+
+					m_speedTester.reset();
+				});
+		});
+}
+
+} // namespace nx::network::cloud::speed_test

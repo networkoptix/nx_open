@@ -1,0 +1,223 @@
+#include "uplink_bandwidth_tester.h"
+
+#include <nx/network/system_socket.h>
+#include <nx/network/url/url_builder.h>
+
+#include "http_api_paths.h"
+
+namespace nx::network::cloud::speed_test {
+
+using namespace nx::network::http;
+using namespace std::chrono;
+
+namespace {
+
+static int ipVersion(const nx::utils::Url& url)
+{
+    return HostAddress(url.host()).isPureIpV6() ? AF_INET6 : SocketFactory::tcpClientIpVersion();
+}
+
+static QByteArray makePayload()
+{
+	static constexpr char kSpeedTest[] = "SPEEDTEST";
+	static constexpr int kPayloadSizeBytes = 10000000;
+
+	QByteArray payload;
+	payload.reserve(kPayloadSizeBytes);
+
+	while (payload.size() + sizeof(kSpeedTest) <= kPayloadSizeBytes)
+		payload += kSpeedTest;
+
+	return payload;
+}
+
+} // namespace
+
+milliseconds localNow()
+{
+	return milliseconds(QTime::currentTime().msecsSinceStartOfDay());
+}
+
+UplinkBandwidthTester::UplinkBandwidthTester(
+	const nx::utils::Url& url,
+	const std::chrono::milliseconds& testDuration,
+	const std::chrono::microseconds& pingTime)
+	:
+	m_url(url),
+	m_testDuration(testDuration),
+	m_pingTime(pingTime)
+{
+	m_url.setPath({});
+}
+
+UplinkBandwidthTester::~UplinkBandwidthTester()
+{
+	pleaseStopSync();
+}
+
+void UplinkBandwidthTester::bindToAioThread(aio::AbstractAioThread* aioThread)
+{
+	base_type::bindToAioThread(aioThread);
+	if (m_pipeline)
+		m_pipeline->bindToAioThread(aioThread);
+	if (m_tcpSocket)
+		m_tcpSocket->bindToAioThread(aioThread);
+}
+
+void UplinkBandwidthTester::stopWhileInAioThread()
+{
+	m_pipeline.reset();
+	m_tcpSocket.reset();
+}
+
+void UplinkBandwidthTester::doBandwidthTest(BandwidthCompletionHandler handler)
+{
+	dispatch(
+		[this, handler = std::move(handler)]() mutable
+		{
+			m_handler = std::move(handler);
+			m_tcpSocket = std::make_unique<network::TCPSocket>(ipVersion(m_url));
+			m_tcpSocket->bindToAioThread(getAioThread());
+			m_tcpSocket->setNonBlockingMode(true);
+			m_tcpSocket->connectAsync(
+				network::url::getEndpoint(m_url),
+				[this](SystemError::ErrorCode errorCode) {
+					using namespace std::placeholders;
+
+					if (errorCode != SystemError::noError)
+						return testFailed(errorCode);
+
+					m_pipeline = std::make_unique<network::http::AsyncMessagePipeline>(
+						std::exchange(m_tcpSocket, nullptr));
+
+					m_pipeline->setMessageHandler(
+						std::bind(&UplinkBandwidthTester::onMessageReceived, this, _1));
+
+					m_pipeline->registerCloseHandler(
+						std::bind(&UplinkBandwidthTester::testFailed, this, _1));
+
+					m_pipeline->startReadingConnection();
+
+					m_testContext = TestContext();
+					m_testContext.payload = makePayload();
+					m_testContext.startTime = localNow();
+
+					sendRequest();
+				});
+		});
+}
+
+std::pair<int, nx::Buffer> UplinkBandwidthTester::makeRequest()
+{
+	++m_testContext.sequence;
+
+	Request request;
+	insertOrReplaceHeader(
+		&request.headers,
+		HttpHeader("Date", formatDateTime(QDateTime::currentDateTime())));
+    insertOrReplaceHeader(&request.headers, HttpHeader("User-Agent", userAgentString()));
+    insertOrReplaceHeader(
+        &request.headers,
+		HttpHeader("Host", url::getEndpoint(m_url).toString().toUtf8()));
+    insertOrReplaceHeader(&request.headers, HttpHeader("Content-Type", "text/plain"));
+	insertOrReplaceHeader(
+		&request.headers,
+		HttpHeader("Content-Length", std::to_string(m_testContext.payload.size()).c_str()));
+	insertOrReplaceHeader(
+		&request.headers,
+		HttpHeader("X-Test-Sequence", std::to_string(m_testContext.sequence).c_str()));
+
+	request.requestLine.method = Method::post;
+	request.requestLine.url.setPath(http::kApiPath);
+	request.requestLine.version = http_1_1;
+
+	// Adding payload to the request before serializing results in a double copy of the payload:
+	// Once to the request, and again into the buffer.
+	return std::make_pair(
+		m_testContext.sequence,
+		request.serialized().append(m_testContext.payload));
+}
+
+std::optional<int> UplinkBandwidthTester::parseSequence(const network::http::Message& message)
+{
+	if (!message.response)
+	{
+		NX_VERBOSE(this, "Received message doesn't contain a Response");
+		return std::nullopt;
+	}
+
+	auto it = message.headers().find("X-Test-Sequence");
+	if (it == message.headers().end())
+	{
+		NX_VERBOSE(this, "Received message doesn't contain 'X-Test-Sequence' header");
+		return std::nullopt;
+	}
+
+	return it->second.toInt();
+}
+
+void UplinkBandwidthTester::onMessageReceived(network::http::Message message)
+{
+	auto sequence = parseSequence(message);
+	if (!sequence)
+		return testFailed(SystemError::invalidData);
+
+	auto receivedTime = localNow();
+
+	// Received first message sent
+	if (*sequence == 0)
+		m_testContext.adjustedStartTime = receivedTime - m_pingTime;
+
+	if (m_testContext.stoppedSendingNewMessages && *sequence == m_testContext.sequence)
+	{
+		if (*sequence == 0)
+			return testFailed(SystemError::invalidData);
+
+		testComplete(receivedTime - m_pingTime);
+	}
+}
+
+void UplinkBandwidthTester::sendRequest()
+{
+	if (m_testContext.stoppedSendingNewMessages)
+		return;
+
+	if (localNow() - m_testContext.startTime >= m_testDuration)
+	{
+		m_testContext.stoppedSendingNewMessages = true;
+		return;
+	}
+
+	auto [sequence, buffer] = makeRequest();
+	m_testContext.totalBytesSent += buffer.size();
+
+    m_pipeline->sendData(
+		std::move(buffer),
+		[this](SystemError::ErrorCode errorCode)
+		{
+			if (errorCode != SystemError::noError)
+				return testFailed(errorCode);
+
+			sendRequest();
+		});
+}
+
+void UplinkBandwidthTester::testComplete(const microseconds& endTime)
+{
+	if (m_handler)
+		nx::utils::swapAndCall(m_handler, SystemError::noError, calculateBandwidth(endTime));
+}
+
+void UplinkBandwidthTester::testFailed(SystemError::ErrorCode errorCode)
+{
+	if (m_handler)
+		nx::utils::swapAndCall(m_handler, errorCode, 0);
+}
+
+BytesPerSecond UplinkBandwidthTester::calculateBandwidth(const microseconds& endTime)
+{
+	const auto testDuration = endTime - m_testContext.adjustedStartTime;
+	return m_testContext.totalBytesSent / (int) duration_cast<seconds>(testDuration).count();
+}
+
+} // namespace nx::network::cloud::speed_test
