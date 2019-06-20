@@ -6,10 +6,12 @@
 #include <QtQml/QQmlError>
 #include <QtQuickWidgets/QQuickWidget>
 
-#include <nx/utils/log/log.h>
 #include <ui/graphics/opengl/gl_functions.h>
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_context.h>
+
+#include <nx/utils/log/log.h>
+#include <nx/vms/client/desktop/ui/scene/resource_icon_provider.h>
 
 namespace nx::vms::client::desktop {
 namespace ui {
@@ -38,6 +40,8 @@ MainWindow::MainWindow(QQmlEngine* engine, QnWorkbenchContext* context, QWidget*
     QnWorkbenchContextAware(context),
     d(new Private(this))
 {
+    engine->addImageProvider("resource", new ResourceIconProvider());
+
     d->sceneWidget = new QQuickWidget(engine, this);
 
     d->sceneWidget->rootContext()->setContextProperty(lit("workbench"), workbench());
