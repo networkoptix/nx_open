@@ -94,10 +94,7 @@ installV4L2()
 
 configureV4L2()
 {
-    # Commands need to be inserted before the exit 0 call at the end of /etc/rc.local, but it 
-    # occurs twice: once at the end (the one we care about) and once in the comments in quotes at
-    # the top of the file. Replace the commented one with a unique string temporarily to make
-    # stream editing easier. If it doesn't exist in quotes then this won't change anything.
+    # Commands need to be inserted before the exit 0 call at the end of /etc/rc.local.
 
     local -r file="/etc/rc.local"
     local -r repeat_command=( v4l2-ctl --set-ctrl repeat_sequence_header=1 )
@@ -105,12 +102,17 @@ configureV4L2()
 
     if ! grep -q "repeat_sequence_header" "$file"
     then
-        sed -i '/"exit 0"/!s/exit 0/${repeat_command[*]} # repeat sps pps every I frame\n\nexit 0/' "$file"
+        # This command searching the last one exit 0 pattern and paste the repeat_command
+        # before the exit 0 line. This option is needed for repeating PPS and SPS every I-frame.
+        sed -i "/exit 0$/i ${repeat_command[*]}" "$file"
     fi
 
     if ! grep -q "h264_i_frame_period" "$file"
     then
-        sed -i '/"exit 0"/!s/exit 0/${i_frame_command[*]} # set I frame interval\n\nexit 0/' "$file"
+        # This command searching the last one exit 0 pattern and paste the i_frame_command
+        # before the exit 0 line. This option is needed for setting the I-frame period
+        # equal to 15.
+        sed -i "/exit 0$/i ${i_frame_command[*]}" "$file"
     fi
 }
 
