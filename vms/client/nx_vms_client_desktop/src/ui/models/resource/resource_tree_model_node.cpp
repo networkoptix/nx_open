@@ -1212,7 +1212,7 @@ int QnResourceTreeModelNode::calculateIconKey() const
         case NodeType::resource:
         case NodeType::edge:
         case NodeType::sharedLayout:
-            return m_resource ? qnResIconCache->key(m_resource) : 0;
+            return m_resource ? int(qnResIconCache->key(m_resource)) : 0;
 
         case NodeType::layoutItem:
         case NodeType::sharedResource:
