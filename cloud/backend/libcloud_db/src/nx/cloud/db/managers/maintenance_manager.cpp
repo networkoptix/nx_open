@@ -5,7 +5,7 @@
 #include <nx/cloud/db/managers/managers_types.h>
 #include <nx/clusterdb/engine/synchronization_engine.h>
 
-#include <nx_ec/ec_proto_version.h>
+#include <nx/vms/api/protocol_version.h>
 
 namespace nx::cloud::db {
 
@@ -119,7 +119,7 @@ void MaintenanceManager::onTransactionLogRead(
         ::ec2::ApiTransactionData tran(m_moduleGuid);
         tran.tranGuid = QnUuid::fromStringSafe(transactionContext.hash);
         nx::Buffer serializedTransaction =
-            transactionContext.serializer->serialize(Qn::UbjsonFormat, nx_ec::EC2_PROTO_VERSION);
+            transactionContext.serializer->serialize(Qn::UbjsonFormat, nx::vms::api::protocolVersion());
         tran.dataSize = serializedTransaction.size();
         QnUbjsonReader<nx::Buffer> stream(&serializedTransaction);
         if (QnUbjson::deserialize(&stream, &tran.tran))

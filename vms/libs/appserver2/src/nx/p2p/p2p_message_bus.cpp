@@ -8,7 +8,6 @@
 #include <transaction/ubjson_transaction_serializer.h>
 #include <transaction/json_transaction_serializer.h>
 #include <api/global_settings.h>
-#include <nx_ec/ec_proto_version.h>
 #include <utils/math/math.h>
 #include <api/runtime_info_manager.h>
 
@@ -18,6 +17,7 @@
 #include <nx/network/url/url_parse_helper.h>
 #include <nx/utils/std/cmath.h>
 #include <nx/utils/random.h>
+#include <nx/vms/api/protocol_version.h>
 #include <nx/vms/api/data/update_sequence_data.h>
 
 namespace nx {
@@ -429,7 +429,7 @@ vms::api::PeerDataEx MessageBus::localPeerEx() const
     result.identityTime = commonModule()->systemIdentityTime();
     result.aliveUpdateIntervalMs = std::chrono::duration_cast<std::chrono::milliseconds>
         (commonModule()->globalSettings()->aliveUpdateInterval()).count();
-    result.protoVersion = nx_ec::EC2_PROTO_VERSION;
+    result.protoVersion = nx::vms::api::protocolVersion();
     result.dataFormat =
         m_localPeerType == PeerType::mobileClient ?  Qn::JsonFormat : Qn::UbjsonFormat;
     return result;

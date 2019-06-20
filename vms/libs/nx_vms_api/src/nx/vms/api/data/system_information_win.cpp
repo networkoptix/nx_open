@@ -69,6 +69,11 @@ QString SystemInformation::currentSystemRuntime()
     return name;
 }
 
+QString SystemInformation::runtimeModification()
+{
+    return QString();
+}
+
 QString SystemInformation::runtimeOsVersion()
 {
     OSVERSIONINFOEXW osvi;

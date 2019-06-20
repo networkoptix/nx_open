@@ -40,8 +40,10 @@ QString toString(InformationError error)
     return result;
 }
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(nx::update::Package, (ubjson)(json)(datastream)(eq), Package_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(nx::update::Information, (ubjson)(json)(datastream)(eq), Information_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
+    (Variant)(Package)(Information)(PackageInformation),
+    (ubjson)(json)(datastream)(eq),
+    _Fields)
 
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(nx::update::Status, Code)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(nx::update::Status, ErrorCode)
@@ -55,6 +57,34 @@ bool Package::isServer() const
 bool Package::isClient() const
 {
     return component == kClientComponent;
+}
+
+bool Package::isCompatibleTo(
+    const vms::api::SystemInformationNew& systemInformation,
+    bool ignoreVersion) const
+{
+    return isPackageCompatibleTo(platform, variants, systemInformation, ignoreVersion);
+}
+
+bool Package::isNewerThan(const QString& variant, const Package& other) const
+{
+    return isPackageNewerForVariant(variant, variants, other.variants);
+}
+
+bool PackageInformation::isServer() const
+{
+    return component == kServerComponent;
+}
+
+bool PackageInformation::isClient() const
+{
+    return component == kClientComponent;
+}
+
+bool PackageInformation::isCompatibleTo(
+    const vms::api::SystemInformationNew& systemInformation) const
+{
+    return isPackageCompatibleTo(platform, variants, systemInformation);
 }
 
 void UpdateContents::resetVerification()
@@ -114,6 +144,64 @@ bool UpdateContents::preferOtherUpdate(const UpdateContents& other) const
     }
 
     return other.getVersion() > getVersion();
+}
+
+bool isPackageCompatibleTo(
+    const QString& packagePlatform,
+    const QList<Variant>& packageVariants,
+    const vms::api::SystemInformationNew& systemInformation,
+    bool ignoreVersion)
+{
+    if (packagePlatform != systemInformation.platform)
+        return false;
+
+    if (packageVariants.isEmpty())
+        return true;
+
+    const utils::SoftwareVersion currentVersion(systemInformation.variantVersion);
+
+    for (const Variant& variant: packageVariants)
+    {
+        if (variant.name != systemInformation.variant)
+            continue;
+
+        if (ignoreVersion)
+            return true;
+
+        if (!variant.minimumVersion.isEmpty()
+            && utils::SoftwareVersion(variant.minimumVersion) > currentVersion)
+        {
+            return false;
+        }
+        if (!variant.maximumVersion.isEmpty()
+            && utils::SoftwareVersion(variant.maximumVersion) < currentVersion)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    return false;
+}
+
+bool isPackageNewerForVariant(
+    const QString& variant,
+    const QList<Variant>& packageVariants,
+    const QList<Variant>& otherPackageVariants)
+{
+    const auto it = std::find_if(packageVariants.begin(), packageVariants.end(),
+        [&variant](const Variant& v) { return v.name == variant; });
+    if (it == packageVariants.end())
+        return false;
+
+    const auto itOther = std::find_if(otherPackageVariants.begin(), otherPackageVariants.end(),
+        [&variant](const Variant& v) { return v.name == variant; });
+    if (itOther == otherPackageVariants.end())
+        return true;
+
+    return utils::SoftwareVersion(it->minimumVersion)
+        >= utils::SoftwareVersion(itOther->minimumVersion);
 }
 
 } // namespace nx::update

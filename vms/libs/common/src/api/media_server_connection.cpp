@@ -1179,43 +1179,6 @@ int QnMediaServerConnection::getStorageStatusAsync(
         params, QN_STRINGIZE_TYPE(QnStorageStatusReply), target, slot);
 }
 
-int QnMediaServerConnection::installUpdate(
-    const QString& updateId, bool delayed, QObject* target, const char* slot)
-{
-    QnRequestParamList params;
-    params << QnRequestParam("updateId", updateId);
-    params << QnRequestParam("delayed", delayed);
-
-    return sendAsyncGetRequestLogged(InstallUpdateObject,
-        params, QN_STRINGIZE_TYPE(QnUploadUpdateReply), target, slot);
-}
-
-int QnMediaServerConnection::installUpdateUnauthenticated(
-    const QString& updateId, bool delayed, QObject* target, const char* slot)
-{
-    QnRequestParamList params;
-    params << QnRequestParam("updateId", updateId);
-    params << QnRequestParam("delayed", delayed);
-
-    return sendAsyncGetRequestLogged(InstallUpdateUnauthenticatedObject,
-        params, QN_STRINGIZE_TYPE(QnUploadUpdateReply), target, slot);
-}
-
-int QnMediaServerConnection::uploadUpdateChunk(
-    const QString& updateId, const QByteArray& data, qint64 offset, QObject* target,
-    const char* slot)
-{
-    QnRequestParamList params;
-    params << QnRequestParam("updateId", updateId);
-    params << QnRequestParam("offset", offset);
-
-    nx::network::http::HttpHeaders headers;
-    headers.emplace(nx::network::http::header::kContentType, "text/xml");
-
-    return sendAsyncPostRequestLogged(InstallUpdateObject,
-        std::move(headers), params, data, QN_STRINGIZE_TYPE(QnUploadUpdateReply), target, slot);
-}
-
 int QnMediaServerConnection::restart(QObject* target, const char* slot)
 {
     return sendAsyncGetRequestLogged(Restart, QnRequestParamList(), nullptr, target, slot);

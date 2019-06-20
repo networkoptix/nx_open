@@ -76,7 +76,6 @@
 #include <network/system_helpers.h>
 
 #include <nx_ec/ec_api.h>
-#include <nx_ec/ec_proto_version.h>
 #include <nx/vms/api/data/user_data.h>
 #include <nx_ec/managers/abstract_user_manager.h>
 #include <nx_ec/managers/abstract_layout_manager.h>
@@ -138,7 +137,6 @@
 #include <rest/handlers/activate_license_rest_handler.h>
 #include <rest/handlers/test_email_rest_handler.h>
 #include <rest/handlers/test_ldap_rest_handler.h>
-#include <rest/handlers/update_rest_handler.h>
 #include <rest/handlers/update_information_rest_handler.h>
 #include <rest/handlers/start_update_rest_handler.h>
 #include <rest/handlers/finish_update_rest_handler.h>
@@ -289,6 +287,8 @@
 #include <providers/speech_synthesis_data_provider.h>
 #include <nx/utils/file_system.h>
 #include <nx/network/url/url_builder.h>
+
+#include <nx/vms/api/protocol_version.h>
 
 #include "nx/vms/server/system/nx1/info.h"
 #include <atomic>
@@ -4538,6 +4538,18 @@ void MediaServerProcess::run()
     if (m_serviceMode)
         initializeLogging(serverSettings.get());
 
+    // This must be done before QnCommonModule instantiation.
+    nx::vms::api::SystemInformation::runtimeModificationOverride =
+        ini().runtimeModificationOverride;
+    nx::vms::api::SystemInformation::runtimeOsVersionOverride = ini().runtimeOsVersionOverride;
+
+    if (m_cmdLineArguments.vmsProtocolVersion > 0)
+    {
+        nx::vms::api::protocolVersionOverride = m_cmdLineArguments.vmsProtocolVersion;
+        NX_WARNING(this, "Starting with overridden protocol version: %1",
+            m_cmdLineArguments.vmsProtocolVersion);
+    }
+
     std::shared_ptr<QnMediaServerModule> serverModule(new QnMediaServerModule(
         &m_cmdLineArguments,
         std::move(serverSettings)));
@@ -4652,8 +4664,6 @@ void MediaServerProcess::run()
 
     if (needToStop())
         return;
-
-    serverModule->serverUpdateTool()->removeUpdateFiles(m_mediaServer->getVersion().toString());
 
     serverModule->resourcePool()->threadPool()->setMaxThreadCount(
         serverModule->settings().resourceInitThreadsCount());

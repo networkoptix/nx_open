@@ -169,7 +169,11 @@ bool EulaDialog::acceptEulaHtml(const QString& html, int version, QWidget* paren
         {
             qnSettings->setAcceptedEulaVersion(version);
             // Preventing qnSettings from being lost. Client can be closed/restarted soon.
-            qnSettings->save();
+            if (!qnSettings->save())
+            {
+                NX_ERROR(NX_SCOPE_TAG, "acceptEulaHtml(%1) - failed to save new EULA version. "
+                    "Client config is unaccessable. Try to check file permissions.", version);
+            }
         }
         return true;
     }

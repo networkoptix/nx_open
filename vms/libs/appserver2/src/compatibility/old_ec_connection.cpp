@@ -85,11 +85,6 @@ AbstractStoredFileManagerPtr OldEcConnection::getStoredFileManager(const Qn::Use
     return AbstractStoredFileManagerPtr();
 }
 
-AbstractUpdatesManagerPtr OldEcConnection::getUpdatesManager(const Qn::UserAccessData &)
-{
-    return AbstractUpdatesManagerPtr();
-}
-
 AbstractMiscManagerPtr OldEcConnection::getMiscManager(const Qn::UserAccessData &)
 {
     return AbstractMiscManagerPtr();
@@ -163,11 +158,6 @@ AbstractDiscoveryNotificationManagerPtr OldEcConnection::discoveryNotificationMa
 AbstractMiscNotificationManagerPtr OldEcConnection::miscNotificationManager()
 {
     return AbstractMiscNotificationManagerPtr();
-}
-
-AbstractUpdatesNotificationManagerPtr OldEcConnection::updatesNotificationManager()
-{
-    return AbstractUpdatesNotificationManagerPtr();
 }
 
 AbstractStoredFileNotificationManagerPtr OldEcConnection::storedFileNotificationManager()

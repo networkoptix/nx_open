@@ -3,7 +3,7 @@
 #include <nx/utils/std/algorithm.h>
 #include <nx/utils/test_support/utils.h>
 
-#include <nx_ec/ec_proto_version.h>
+#include <nx/vms/api/protocol_version.h>
 
 #include "mserver_cloud_synchronization_connection_fixture.h"
 
@@ -43,7 +43,7 @@ protected:
     }
 
 private:
-    int m_ec2ProtocolVersion = nx_ec::EC2_PROTO_VERSION;
+    int m_ec2ProtocolVersion = nx::vms::api::protocolVersion();
 
     std::vector<api::SystemCapabilityFlag> fetchSystemCapabilities()
     {
