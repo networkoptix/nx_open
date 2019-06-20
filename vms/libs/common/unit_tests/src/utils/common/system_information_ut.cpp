@@ -55,7 +55,6 @@ TEST( SystemInformation, FromString )
 
         EXPECT_GT( parsedInfo.arch.length(),            0 );
         EXPECT_GT( parsedInfo.platform.length(),        0 );
-        EXPECT_GT( parsedInfo.modification.length(),    0 );
 
         EXPECT_EQ( parsedInfo.arch,         curInfo.arch );
         EXPECT_EQ( parsedInfo.platform,     curInfo.platform );
