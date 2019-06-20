@@ -139,6 +139,8 @@
 
 #include <nx/vms/client/desktop/ini.h>
 
+#include <nx/vms/api/protocol_version.h>
+
 using namespace nx;
 using namespace nx::vms::client::desktop;
 
@@ -382,6 +384,17 @@ void QnClientModule::initSingletons()
         : nx::vms::api::PeerType::videowallClient;
     const auto brand = ini().developerMode ? QString() : QnAppInfo::productNameShort();
     const auto customization = ini().developerMode ? QString() : QnAppInfo::customizationName();
+
+    // This must be done before QnCommonModule instantiation.
+    vms::api::SystemInformation::runtimeModificationOverride = ini().runtimeModificationOverride;
+    vms::api::SystemInformation::runtimeOsVersionOverride = ini().runtimeOsVersionOverride;
+
+    if (m_startupParameters.vmsProtocolVersion > 0)
+    {
+        vms::api::protocolVersionOverride = m_startupParameters.vmsProtocolVersion;
+        NX_WARNING(this, "Starting with overridden protocol version: %1",
+            m_startupParameters.vmsProtocolVersion);
+    }
 
     m_staticCommon.reset(new QnStaticCommonModule(
         clientPeerType,

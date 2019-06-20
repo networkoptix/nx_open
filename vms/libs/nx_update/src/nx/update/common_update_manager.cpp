@@ -490,6 +490,7 @@ bool CommonUpdateManager::statusAppropriateForDownload(
         case update::FindPackageResult::ok:
             return canDownloadFile(*outPackage, outStatus);
         case update::FindPackageResult::otherError:
+        case update::FindPackageResult::osVersionNotSupported:
             *outStatus = update::Status(
                 commonModule()->moduleGUID(),
                 update::Status::Code::error,

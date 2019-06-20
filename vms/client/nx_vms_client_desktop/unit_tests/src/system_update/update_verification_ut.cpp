@@ -21,63 +21,60 @@ namespace {
 
 const QString packageRawData = R"(
 {
-  "version": "4.0.0.28524",
-  "cloudHost": "nxvms.com",
-  "releaseNotesUrl": "http://www.networkoptix.com/all-nx-witness-release-notes",
-  "description": "",
-  "eulaLink": "eula-1.html",
-  "eulaVersion": 1,
-  "packages": [
-    {
-      "component": "server",
-      "arch": "x64",
-      "platform": "windows",
-      "variant": "winxp",
-      "file": "nxwitness-server_update-4.0.0.28524-win64-beta-prod.zip",
-      "size": 89479542,
-      "md5": "88d9abcaae8ddf076fa1fe9cc829016a"
-    },
-    {
-      "component": "client",
-      "arch": "x64",
-      "platform": "windows",
-      "variant": "winxp",
-      "file": "nxwitness-client_update-4.0.0.28524-win64-beta-prod.zip",
-      "size": 99609610,
-      "md5": "bd823350defd778c9990b908d90f92aa"
-    }
-  ]
+    "version": "4.0.0.28524",
+    "cloudHost": "nxvms.com",
+    "releaseNotesUrl": "http://www.networkoptix.com/all-nx-witness-release-notes",
+    "description": "",
+    "eulaLink": "eula-1.html",
+    "eulaVersion": 1,
+    "packages": [
+        {
+            "component": "server",
+            "platform": "windows_x64",
+            "file": "nxwitness-server_update-4.0.0.28524-win64-beta-prod.zip",
+            "size": 89479542,
+            "md5": "88d9abcaae8ddf076fa1fe9cc829016a"
+        },
+        {
+            "component": "client",
+            "platform": "windows_x64",
+            "file": "nxwitness-client_update-4.0.0.28524-win64-beta-prod.zip",
+            "size": 99609610,
+            "md5": "bd823350defd778c9990b908d90f92aa"
+        }
+    ]
 })";
 
 const QString packagesForSystemSupportTest = R"(
 {
-  "version": "4.0.0.29069",
-  "cloudHost": "cloud-test.hdw.mx",
-  "releaseNotesUrl": "http://www.networkoptix.com/all-nx-witness-release-notes",
-  "description": "",
-  "eulaLink": "eula-1.html",
-  "eulaVersion": 1,
-  "packages": [
-    {
-      "component": "server",
-      "arch": "x64",
-      "platform": "linux",
-      "variant": "ubuntu",
-      "variantVersion": "18.04",
-      "file": "nxwitness-server_update-4.0.0.29069-linux64-beta-test.zip",
-      "size": 121216913,
-      "md5": "a26a03ea0b5e88e272437def2555b379"
-    },
-    {
-      "component": "client",
-      "arch": "x64",
-      "platform": "windows",
-      "variant": "winxp",
-      "file": "nxwitness-client_update-4.0.0.29069-win64-beta-test.zip",
-      "size": 96953959,
-      "md5": "aedf0b757dc806a1980858ecfcb805f3"
-    }
-  ]
+    "version": "4.0.0.29069",
+    "cloudHost": "cloud-test.hdw.mx",
+    "releaseNotesUrl": "http://www.networkoptix.com/all-nx-witness-release-notes",
+    "description": "",
+    "eulaLink": "eula-1.html",
+    "eulaVersion": 1,
+    "packages": [
+        {
+            "component": "server",
+            "platform": "linux_x64",
+            "variants": [
+                {
+                    "name": "ubuntu",
+                    "minimumVersion": "18.04"
+                }
+            ],
+            "file": "nxwitness-server_update-4.0.0.29069-linux64-beta-test.zip",
+            "size": 121216913,
+            "md5": "a26a03ea0b5e88e272437def2555b379"
+        },
+        {
+            "component": "client",
+            "platform": "windows_x64",
+            "file": "nxwitness-client_update-4.0.0.29069-win64-beta-test.zip",
+            "size": 96953959,
+            "md5": "aedf0b757dc806a1980858ecfcb805f3"
+        }
+    ]
 })";
 
 struct OS
@@ -313,6 +310,7 @@ TEST_F(UpdateVerificationTest, testForkedVersion)
     makeServer(nx::utils::SoftwareVersion("4.0.0.28525"));
     verifyUpdateContents(nullptr, contents, getAllServers(), clientData);
     EXPECT_EQ(contents.error, nx::update::InformationError::incompatibleVersion);
+    removeAllServers();
 }
 
 TEST_F(UpdateVerificationTest, packagesForSystemSupportTest)
@@ -341,8 +339,159 @@ TEST_F(UpdateVerificationTest, packagesForSystemSupportTest)
 
     auto report = MultiServerUpdatesWidget::calculateUpdateVersionReport(
         contents, clientData.clientId);
-    EXPECT_TRUE(report.statusHighlight == MultiServerUpdatesWidget::VersionReport::HighlightMode::red);
+    EXPECT_EQ(report.statusHighlight, MultiServerUpdatesWidget::VersionReport::HighlightMode::red);
     removeAllServers();
+}
+
+TEST_F(UpdateVerificationTest, bestVariantVersionSelection)
+{
+    const auto& info = QJson::deserialized<nx::update::Information>(
+        R"({
+            "packages": [
+                {
+                    "component": "server",
+                    "platform": "linux_x64",
+                    "variants": [{ "name": "ubuntu", "minimumVersion": "14.04" }],
+                    "file": "ubuntu_14.04.zip"
+                },
+                {
+                    "component": "server",
+                    "platform": "linux_x64",
+                    "variants": [{ "name": "ubuntu", "minimumVersion": "16.04" }],
+                    "file": "ubuntu_16.04.zip"
+                },
+                {
+                    "component": "server",
+                    "platform": "linux_x64",
+                    "variants": [{ "name": "ubuntu", "minimumVersion": "18.04" }],
+                    "file": "ubuntu_18.04.zip"
+                }
+            ]
+        })");
+    const auto& sysInfo = api::SystemInformationNew::fromLegacySystemInformation(OS::ubuntu16());
+    auto [result, package] = nx::update::findPackageForVariant(info, false, sysInfo);
+    ASSERT_EQ(result, nx::update::FindPackageResult::ok);
+    ASSERT_EQ(package->file, "ubuntu_16.04.zip");
+}
+
+TEST_F(UpdateVerificationTest, variantVersionBoundaries)
+{
+    const auto& info = QJson::deserialized<nx::update::Information>(
+        R"({
+            "packages": [
+                {
+                    "component": "server",
+                    "platform": "linux_x64",
+                    "variants": [
+                        {
+                            "name": "ubuntu",
+                            "minimumVersion": "14.04",
+                            "maximumVersion": "16.04"
+                        }],
+                    "file": "ubuntu.zip"
+                }
+            ]
+        })");
+    const auto& sysInfo = api::SystemInformationNew::fromLegacySystemInformation(OS::ubuntu18());
+    auto [result, package] = nx::update::findPackageForVariant(info, false, sysInfo);
+    ASSERT_EQ(result, nx::update::FindPackageResult::osVersionNotSupported);
+}
+
+TEST_F(UpdateVerificationTest, emptyOsVersionAndVersionedPackage)
+{
+    const auto& info = QJson::deserialized<nx::update::Information>(
+        R"({
+            "packages": [
+                {
+                    "component": "server",
+                    "platform": "linux_x64",
+                    "variants": [{ "name": "ubuntu", "minimumVersion": "14.04" }],
+                    "file": "ubuntu.zip"
+                }
+            ]
+        })");
+    const auto& sysInfo = api::SystemInformationNew{"linux_x64", "ubuntu", {}};
+    auto [result, package] = nx::update::findPackageForVariant(info, false, sysInfo);
+    ASSERT_EQ(result, nx::update::FindPackageResult::osVersionNotSupported);
+}
+
+TEST_F(UpdateVerificationTest, preferPackageForCertainVariant)
+{
+    const auto& info = QJson::deserialized<nx::update::Information>(
+        R"({
+            "packages": [
+                {
+                    "component": "server",
+                    "platform": "linux_x64",
+                    "file": "universal.zip"
+                },
+                {
+                    "component": "server",
+                    "platform": "linux_x64",
+                    "variants": [{ "name": "ubuntu" }],
+                    "file": "ubuntu.zip"
+                }
+            ]
+        })");
+    const auto& sysInfo = api::SystemInformationNew{"linux_x64", "ubuntu", {}};
+    auto [result, package] = nx::update::findPackageForVariant(info, false, sysInfo);
+    ASSERT_EQ(result, nx::update::FindPackageResult::ok);
+    ASSERT_EQ(package->file, "ubuntu.zip");
+}
+
+TEST_F(UpdateVerificationTest, preferVersionedVariant)
+{
+    const auto& info = QJson::deserialized<nx::update::Information>(
+        R"({
+            "packages": [
+                {
+                    "component": "server",
+                    "platform": "linux_x64",
+                    "variants": [{ "name": "ubuntu" }],
+                    "file": "ubuntu.zip"
+                },
+                {
+                    "component": "server",
+                    "platform": "linux_x64",
+                    "variants": [{ "name": "ubuntu", "minimumVersion": "16.04" }],
+                    "file": "ubuntu_16.04.zip"
+                }
+            ]
+        })");
+    const auto& sysInfo = api::SystemInformationNew::fromLegacySystemInformation(OS::ubuntu16());
+    auto [result, package] = nx::update::findPackageForVariant(info, false, sysInfo);
+    ASSERT_EQ(result, nx::update::FindPackageResult::ok);
+    ASSERT_EQ(package->file, "ubuntu_16.04.zip");
+}
+
+TEST_F(UpdateVerificationTest, aSyntheticTest)
+{
+    const auto& info = QJson::deserialized<nx::update::Information>(
+        R"({
+            "packages": [
+                {
+                    "component": "server",
+                    "platform": "linux_x64",
+                    "file": "universal.zip"
+                },
+                {
+                    "component": "server",
+                    "platform": "linux_x64",
+                    "variants": [{ "name": "ubuntu" }],
+                    "file": "ubuntu.zip"
+                },
+                {
+                    "component": "server",
+                    "platform": "linux_x64",
+                    "variants": [{ "name": "ubuntu", "minimumVersion": "18.04" }],
+                    "file": "ubuntu_18.04.zip"
+                }
+            ]
+        })");
+    const auto& sysInfo = api::SystemInformationNew::fromLegacySystemInformation(OS::ubuntu14());
+    auto [result, package] = nx::update::findPackageForVariant(info, false, sysInfo);
+    ASSERT_EQ(result, nx::update::FindPackageResult::ok);
+    ASSERT_EQ(package->file, "ubuntu.zip");
 }
 
 } // namespace nx::vms::client::desktop

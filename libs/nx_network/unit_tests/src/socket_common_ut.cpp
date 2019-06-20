@@ -260,6 +260,34 @@ TEST_F(SocketAddress, endpoint_with_ipv6)
     assertEndpointIsParsedAsExpected("[::ffff:12.34.56.78]:777", "::ffff:12.34.56.78", 777);
 }
 
+//-------------------------------------------------------------------------------------------------
+
+TEST(KeepAliveOptions, parse)
+{
+    using namespace std::chrono;
+
+    ASSERT_EQ(
+        KeepAliveOptions(seconds(11), seconds(131), 12),
+        KeepAliveOptions::fromString("{11, 131, 12}"));
+
+    ASSERT_EQ(
+        KeepAliveOptions(milliseconds(11), milliseconds(131), 12),
+        KeepAliveOptions::fromString("{11ms, 131ms, 12}"));
+}
+
+TEST(KeepAliveOptions, toString)
+{
+    using namespace std::chrono;
+
+    ASSERT_EQ(
+        "{11,131,12}",
+        KeepAliveOptions(seconds(11), seconds(131), 12).toString().toStdString());
+
+    ASSERT_EQ(
+        "{11ms,131ms,12}",
+        KeepAliveOptions(milliseconds(11), milliseconds(131), 12).toString().toStdString());
+}
+
 } // namespace test
 } // namespace network
 } // namespace nx

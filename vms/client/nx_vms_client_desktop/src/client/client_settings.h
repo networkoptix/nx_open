@@ -166,7 +166,7 @@ public:
     virtual ~QnClientSettings();
 
     void load();
-    void save();
+    bool save();
 
     /**
      * @brief isWritable    Check if settings storage is available for writing.

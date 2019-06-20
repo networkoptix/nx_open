@@ -233,10 +233,6 @@ to view more bookmarks</source>
       <translation>비디어월 화면 저장</translation>
     </message>
     <message>
-      <source>Drop Resources</source>
-      <translation>리스소 삭제</translation>
-    </message>
-    <message>
       <source>Start Screen Recording</source>
       <translation>화면녹화 시작</translation>
     </message>
@@ -8464,10 +8460,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>업데이트 다운로드 중...</translation>
     </message>
     <message>
-      <source>Pushing updates...</source>
-      <translation type="unfinished">Pushing updates...</translation>
-    </message>
-    <message>
       <source>Upload</source>
       <translation type="unfinished">Upload</translation>
     </message>
@@ -8620,6 +8612,18 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
       <translation type="unfinished">OS version of the client is no longer supported. Please update its OS to a supported version.</translation>
+    </message>
+    <message>
+      <source>Failed to start update</source>
+      <translation type="unfinished">Failed to start update</translation>
+    </message>
+    <message>
+      <source>Starting update to ...</source>
+      <translation type="unfinished">Starting update to ...</translation>
+    </message>
+    <message>
+      <source>Some servers have no package available</source>
+      <translation type="unfinished">Some servers have no package available</translation>
     </message>
   </context>
   <context>
@@ -8961,6 +8965,54 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Vendor</source>
       <translation>수요자</translation>
+    </message>
+    <message>
+      <source>no error</source>
+      <translation type="unfinished">no error</translation>
+    </message>
+    <message>
+      <source>library file cannot be loaded</source>
+      <translation type="unfinished">library file cannot be loaded</translation>
+    </message>
+    <message>
+      <source>invalid or incompatible plugin library</source>
+      <translation type="unfinished">invalid or incompatible plugin library</translation>
+    </message>
+    <message>
+      <source>plugin library failed to initialize</source>
+      <translation type="unfinished">plugin library failed to initialize</translation>
+    </message>
+    <message>
+      <source>plugin returned bad manifest</source>
+      <translation type="unfinished">plugin returned bad manifest</translation>
+    </message>
+    <message>
+      <source>plugin API version is no longer supported</source>
+      <translation type="unfinished">plugin API version is no longer supported</translation>
+    </message>
+    <message>
+      <source>unknown error</source>
+      <translation type="unfinished">unknown error</translation>
+    </message>
+    <message>
+      <source>Not loaded</source>
+      <translation type="unfinished">Not loaded</translation>
+    </message>
+    <message>
+      <source>Loaded</source>
+      <translation type="unfinished">Loaded</translation>
+    </message>
+    <message>
+      <source>plugin is in the black list</source>
+      <translation type="unfinished">plugin is in the black list</translation>
+    </message>
+    <message>
+      <source>Status</source>
+      <translation type="unfinished">Status</translation>
+    </message>
+    <message>
+      <source>plugin is optional and is not in the white list</source>
+      <translation type="unfinished">plugin is optional and is not in the white list</translation>
     </message>
   </context>
   <context>

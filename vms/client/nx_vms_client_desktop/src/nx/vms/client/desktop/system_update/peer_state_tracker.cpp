@@ -1,6 +1,5 @@
 #include "peer_state_tracker.h"
 
-#include <nx_ec/ec_proto_version.h>
 #include <api/global_settings.h>
 #include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
@@ -9,6 +8,7 @@
 #include <nx/utils/app_info.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/api/protocol_version.h>
 #include <ui/workbench/workbench_context.h>
 #include "client_update_tool.h"
 
@@ -565,7 +565,7 @@ QSet<QnUuid> PeerStateTracker::peersCompleteInstall() const
 
 QSet<QnUuid> PeerStateTracker::serversWithChangedProtocol() const
 {
-    int protocol = nx_ec::EC2_PROTO_VERSION;
+    int protocol = nx::vms::api::protocolVersion();
     QnMutexLocker locker(&m_dataLock);
     QSet<QnUuid> result;
     for (const auto& item: m_items)
@@ -585,6 +585,27 @@ QSet<QnUuid> PeerStateTracker::peersWithUnknownStatus() const
     for (const auto& item: m_items)
     {
         if (item->statusUnknown && !item->offline)
+            result.insert(item->id);
+    }
+    return result;
+}
+
+QSet<QnUuid> PeerStateTracker::peersWithDownloaderError() const
+{
+    QSet<UpdateItem::ErrorCode> errorTypes =
+    {
+        UpdateItem::ErrorCode::downloadFailed,
+        UpdateItem::ErrorCode::internalDownloaderError,
+        UpdateItem::ErrorCode::noFreeSpaceToDownload,
+        UpdateItem::ErrorCode::noFreeSpaceToExtract,
+    };
+    QSet<QnUuid> result;
+    QnMutexLocker locker(&m_dataLock);
+    for (const auto& item: m_items)
+    {
+        if (item->state != StatusCode::error)
+            continue;
+        if (errorTypes.contains(item->errorCode))
             result.insert(item->id);
     }
     return result;
@@ -1074,7 +1095,7 @@ UpdateItemPtr PeerStateTracker::addItemForClient()
     item->id = getClientPeerId();
     item->component = UpdateItem::Component::client;
     item->row = m_items.size();
-    item->protocol = nx_ec::EC2_PROTO_VERSION;
+    item->protocol = nx::vms::api::protocolVersion();
     m_clientItem = item;
     m_items.push_back(item);
     updateClientData();

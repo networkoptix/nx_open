@@ -15,7 +15,12 @@ ServerUpdateInstaller::ServerUpdateInstaller(QnMediaServerModule* serverModule):
 
 QString ServerUpdateInstaller::dataDirectoryPath() const
 {
-     return QDir::temp().absolutePath();
+    return QDir::temp().absolutePath();
+}
+
+QString ServerUpdateInstaller::component() const
+{
+    return QStringLiteral("server");
 }
 
 bool ServerUpdateInstaller::initializeUpdateLog(const QString& targetVersion, QString* logFileName) const

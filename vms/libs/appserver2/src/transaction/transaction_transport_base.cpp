@@ -21,13 +21,13 @@
 
 #include <nx/cloud/db/api/ec2_request_paths.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
-#include <nx_ec/ec_proto_version.h>
 
 #include <transaction/json_transaction_serializer.h>
 #include <transaction/ubjson_transaction_serializer.h>
 #include <transaction/transaction_transport_header.h>
 
 #include <nx/vms/api/types/connection_types.h>
+#include <nx/vms/api/protocol_version.h>
 
 //#define USE_SINGLE_TWO_WAY_CONNECTION
 //!if not defined, ubjson is used
@@ -108,8 +108,8 @@ QnTransactionTransportBase::QnTransactionTransportBase(
     m_keepAliveProbeCount(keepAliveProbeCount),
     m_idleConnectionTimeout(tcpKeepAliveTimeout * keepAliveProbeCount),
     m_timer(std::make_unique<nx::network::aio::Timer>()),
-    m_remotePeerEcProtoVersion(nx_ec::INITIAL_EC2_PROTO_VERSION),
-    m_localPeerProtocolVersion(nx_ec::EC2_PROTO_VERSION)
+    m_remotePeerEcProtoVersion(nx::vms::api::kInitialProtocolVersion),
+    m_localPeerProtocolVersion(nx::vms::api::protocolVersion())
 {
     bindToAioThread(aioThread ? aioThread : getAioThread());
 
@@ -170,7 +170,7 @@ QnTransactionTransportBase::QnTransactionTransportBase(
 
     m_remotePeerEcProtoVersion =
         ec2ProtoVersionIter == request.headers.end()
-        ? nx_ec::INITIAL_EC2_PROTO_VERSION
+        ? nx::vms::api::kInitialProtocolVersion
         : ec2ProtoVersionIter->second.toInt();
 
     //TODO #ak use binary filter stream for serializing transactions
@@ -1272,7 +1272,7 @@ void QnTransactionTransportBase::at_responseReceived(
 
     m_remotePeerEcProtoVersion =
         ec2ProtoVersionIter == client->response()->headers.end()
-        ? nx_ec::INITIAL_EC2_PROTO_VERSION
+        ? nx::vms::api::kInitialProtocolVersion
         : ec2ProtoVersionIter->second.toInt();
 
     if (!m_localPeer.isMobileClient())

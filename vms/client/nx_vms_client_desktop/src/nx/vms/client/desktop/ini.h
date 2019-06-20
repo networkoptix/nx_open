@@ -128,7 +128,7 @@ struct Ini: nx::kit::IniConfig
         "Background updates check will use this changeset instead of \"latest\".");
     NX_INI_INT(0, massSystemUpdateWaitForServerOnlineSecOverride,
         "Time to wait until Server goes online in seconds. Default value is used when set to 0.");
-    NX_INI_INT(0, tilePreviewLoadDelayOverrideMs,
+    NX_INI_INT(150, tilePreviewLoadDelayOverrideMs,
         "Tiles in the Right Panel will request previews only after this period (in milliseconds)\n"
         "after appearing. 0 means default value (100 ms).");
     NX_INI_INT(750, tilePreviewLoadIntervalMs,
@@ -138,6 +138,8 @@ struct Ini: nx::kit::IniConfig
     NX_INI_INT(0, clientWebServerPort,
         "Enables web server to remotely control the Nx Client operation; port should be in range\n"
         "1..65535 (typically 7012) to enable; 0 means disabled.");
+    NX_INI_STRING("", clientWebServerHost,
+        "Listen address for local web server. It should contain a valid ip address.\n");
     NX_INI_INT(1000, storeFrameTimePoints,
         "Number of frame timestamps stored by the Client. Used in Functional Tests for fps\n"
         "measurement.");
@@ -165,6 +167,11 @@ struct Ini: nx::kit::IniConfig
         "Enable tracing of GDI object allocation.");
     NX_INI_INT(5000, gdiTraceLimit, 
         "Number of GDI handles in use which triggers report creation.");
+
+    NX_INI_STRING("", runtimeModificationOverride,
+        "Override detected OS modification value (e.g. \"ubuntu\").");
+    NX_INI_STRING("", runtimeOsVersionOverride,
+        "Override detected OS version value (e.g. \"16.04\").");
 };
 
 inline Ini& ini()

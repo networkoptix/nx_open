@@ -3,7 +3,7 @@
 #include <QtCore/QUrlQuery>
 
 #include <api/global_settings.h>
-#include <nx_ec/ec_proto_version.h>
+#include <nx/vms/api/protocol_version.h>
 
 #include "network/tcp_connection_priv.h"
 #include <database/db_manager.h>
@@ -58,7 +58,7 @@ vms::api::PeerDataEx ConnectionProcessor::localPeer(const vms::api::PeerDataEx& 
     localPeer.identityTime = commonModule()->systemIdentityTime();
     localPeer.aliveUpdateIntervalMs = std::chrono::duration_cast<std::chrono::milliseconds>(
         commonModule()->globalSettings()->aliveUpdateInterval()).count();
-    localPeer.protoVersion = nx_ec::EC2_PROTO_VERSION;
+    localPeer.protoVersion = nx::vms::api::protocolVersion();
     localPeer.connectionGuid = remotePeer.connectionGuid;
     return localPeer;
 }
@@ -91,14 +91,14 @@ bool ConnectionProcessor::isPeerCompatible(const vms::api::PeerDataEx& remotePee
     }
     if (remotePeer.dataFormat == Qn::UbjsonFormat)
     {
-        if (nx_ec::EC2_PROTO_VERSION != remotePeer.protoVersion)
+        if (nx::vms::api::protocolVersion() != remotePeer.protoVersion)
         {
             NX_WARNING(this,
                 lm("Reject incoming P2P connection using UBJSON "
                     "from peer %1 because of different EC2 proto version. "
                     "Local peer version: %2, remote peer version: %3")
                 .arg(d->socket->getForeignAddress().address.toString())
-                .arg(nx_ec::EC2_PROTO_VERSION)
+                .arg(nx::vms::api::protocolVersion())
                 .arg(remotePeer.protoVersion));
             return false;
         }

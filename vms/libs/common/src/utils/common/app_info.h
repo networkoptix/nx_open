@@ -4,7 +4,6 @@
 #include <QtCore/QString>
 #include <QtCore/QStringList>
 
-#include <nx/vms/api/protocol_version.h>
 #include <nx/vms/api/data/system_information.h>
 
 class QnAppInfo: public QObject
@@ -13,11 +12,6 @@ class QnAppInfo: public QObject
 
 public:
     QnAppInfo(QObject* parent = nullptr);
-
-    static Q_INVOKABLE int ec2ProtoVersion()
-    {
-        return nx::vms::api::protocolVersion();
-    }
 
     static Q_INVOKABLE QString organizationName();
     static Q_INVOKABLE QString linuxOrganizationName();
@@ -76,4 +70,5 @@ public:
     static Q_INVOKABLE bool isWindows();
 
     static Q_INVOKABLE nx::vms::api::SystemInformation currentSystemInformation();
+    static Q_INVOKABLE nx::vms::api::SystemInformationNew currentSystemInformationNew();
 };

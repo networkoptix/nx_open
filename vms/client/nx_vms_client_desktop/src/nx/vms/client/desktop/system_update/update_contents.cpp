@@ -74,30 +74,7 @@ bool checkCloudHost(QnCommonModule* commonModule, nx::utils::SoftwareVersion tar
     return serversLinkedToCloud.isEmpty();
 }
 
-nx::update::Package* findPackageForOsVariant(
-    const QList<nx::update::Package*>& packages,
-    const QString& component,
-    const QString& variantVersion)
-{
-    nx::utils::SoftwareVersion version{variantVersion};
-    for (auto& package: packages)
-    {
-        if (package == nullptr)
-            continue;
-
-        if (component != package->component)
-            continue;
-
-        if (package->variantVersion.isEmpty())
-            return package;
-
-        if (nx::utils::SoftwareVersion(package->variantVersion) < version)
-            return package;
-    }
-    return nullptr;
-}
-
-QString UpdateStrings::getReportForUnsupportedServer(const nx::vms::api::SystemInformation& info)
+QString UpdateStrings::getReportForUnsupportedOs(const nx::vms::api::SystemInformation& info)
 {
     QString platform;
     QString version = info.version;
@@ -152,7 +129,9 @@ QString UpdateStrings::getReportForUnsupportedServer(const nx::vms::api::SystemI
     }
 }
 
-bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateContents& contents,
+bool verifyUpdateContents(
+    QnCommonModule* commonModule,
+    nx::update::UpdateContents& contents,
     const std::map<QnUuid, QnMediaServerResourcePtr>& activeServers,
     const ClientVerificationData& clientData)
 {
@@ -220,80 +199,43 @@ bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateConten
         contents.eulaPath = contents.info.eulaLink;
     }
 
-    /**
-     * Maps system information to a set of packages. We use this cache to find and check
-     * if a specific OS variant is supported.
-     */
-    using PackageCache = std::map<nx::vms::api::SystemInformation, QList<nx::update::Package*>,
-        nx::update::SystemInformationComparator>;
-    PackageCache serverPackageCache;
-    PackageCache clientPackageCache;
+    // We will try to set it to false when we check servers and clients.
+    contents.alreadyInstalled = true;
 
-    for (auto& package: info.packages)
+    if ((clientData.currentVersion < targetVersion
+         || (clientData.currentVersion > targetVersion && clientData.compatibilityMode))
+        && clientData.installedVersions.find(targetVersion) == clientData.installedVersions.end())
     {
-        nx::vms::api::SystemInformation info;
-        info.arch = package.arch;
-        info.modification = package.variant;
-        info.platform = package.platform;
+        contents.alreadyInstalled = false;
 
-        auto& cache = package.isClient()
-            ? clientPackageCache
-            : serverPackageCache;
-
-        if (!cache.count(info))
-            cache.emplace(info, QList<nx::update::Package*>());
-        auto& record = cache[info];
-        record.append(&package);
-    }
-
-    // We will try to set it to false when we check servers and clients
-    bool alreadyInstalled = true;
-
-    if (!clientData.clientId.isNull())
-    {
-        if (clientData.currentVersion != targetVersion
-            && clientData.installedVersions.count(targetVersion) == 0)
-            alreadyInstalled = false;
-
-        auto it = clientPackageCache.find(clientData.systemInfo);
-        if (it == clientPackageCache.end())
+        const auto& clientSysInfo =
+            vms::api::SystemInformationNew::fromLegacySystemInformation(clientData.systemInfo);
+        auto [result, package] = update::findPackageForVariant(info, true, clientSysInfo);
+        switch (result)
         {
-            NX_ERROR(typeid(UpdateContents)) << "verifyUpdateManifest("
-                << contents.info.version << ") client arch"
-                << clientData.systemInfo.arch
-                << "platform" << clientData.systemInfo.platform
-                << "variant" << clientData.systemInfo.modification
-                << "is missing its update package";
-            contents.missingUpdate.insert(clientData.clientId);
-        }
-        else
-        {
-            auto& packageVariants = it->second;
-
-            auto package = findPackageForOsVariant(
-                packageVariants, nx::update::kComponentClient, clientData.systemInfo.version);
-
-            if (!package)
-            {
-                NX_ERROR(typeid(UpdateContents))
-                    << "verifyUpdateManifest(" << contents.info.version
-                    << ") current client OS version is unsupported";
-                QString message = UpdateStrings::getReportForUnsupportedServer(clientData.systemInfo);
-                contents.unsuportedSystemsReport.insert(clientData.clientId, message);
-            }
-            else if (clientData.currentVersion < targetVersion || clientData.compatibilityMode)
-            {
+            case update::FindPackageResult::ok:
                 contents.clientPackage = *package;
                 contents.peersWithUpdate.insert(clientData.clientId);
-            }
-            else
-            {
-                NX_DEBUG(typeid(UpdateContents))
-                    << "verifyUpdateManifest(" << contents.info.version
-                    << ") client version =" << targetVersion << "will participate in this update";
-            }
+                break;
+
+            case update::FindPackageResult::osVersionNotSupported:
+                NX_ERROR(NX_SCOPE_TAG, "verifyUpdateManifest(%1) OS version is not supported: %2",
+                    contents.info.version, toString(clientSysInfo));
+                contents.unsuportedSystemsReport.insert(
+                    clientData.clientId,
+                    UpdateStrings::getReportForUnsupportedOs(clientData.systemInfo));
+                break;
+
+            case update::FindPackageResult::otherError:
+            default:
+                NX_ERROR(NX_SCOPE_TAG, "verifyUpdateManifest(%1) Update package is missing for %2",
+                    contents.info.version, toString(clientSysInfo));
+                contents.missingUpdate.insert(clientData.clientId);
+                break;
         }
     }
+
+    QHash<api::SystemInformationNew, update::Package*> serverPackages;
 
     QSet<QnUuid> allServers;
 
@@ -305,70 +247,70 @@ bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateConten
 
     // TODO: Should reverse this verification: get all platform configurations and find packages for them.
     // Checking if all servers have update packages.
-    for (auto record: activeServers)
+    for (auto& [id, server]: activeServers)
     {
-        auto server = record.second;
         bool isOurServer = !server->hasFlags(Qn::fake_server)
             || helpers::serverBelongsToCurrentSystem(server);
         if (!isOurServer)
             continue;
 
-        auto serverInfo = server->getSystemInfo();
+        allServers.insert(id);
 
-        auto it = serverPackageCache.find(serverInfo);
-        if (it == serverPackageCache.end())
-        {
-            NX_ERROR(typeid(UpdateContents)) << "verifyUpdateManifest("
-                << contents.info.version << ") server"
-                << server->getId()
-                << "arch" << serverInfo.arch
-                << "platform" << serverInfo.platform
-                << "variant" << serverInfo.modification
-                << "is missing its update package";
-            contents.missingUpdate.insert(server->getId());
-            continue;
-        }
+        const auto& serverSysInfo =
+            api::SystemInformationNew::fromLegacySystemInformation(server->getSystemInfo());
 
-        auto& packageVariants = it->second;
-
-        auto package = findPackageForOsVariant(packageVariants, nx::update::kComponentServer, serverInfo.version);
-
+        update::Package* package = serverPackages[serverSysInfo];
         if (!package)
         {
-            NX_ERROR(typeid(UpdateContents))
-                << "verifyUpdateManifest(" << contents.info.version << ") server"
-                << server->getId() << " has unsupported os =" << serverInfo.modification
-                << "osversion =" << serverInfo.version;
-            QString message = UpdateStrings::getReportForUnsupportedServer(serverInfo);
-            contents.unsuportedSystemsReport.insert(server->getId(), message);
+            auto [result, foundPackage] = update::findPackageForVariant(
+                info, false, serverSysInfo);
+
+            switch (result)
+            {
+                case update::FindPackageResult::ok:
+                    package = foundPackage;
+                    serverPackages[serverSysInfo] = package;
+                    break;
+
+                case update::FindPackageResult::osVersionNotSupported:
+                    NX_ERROR(NX_SCOPE_TAG,
+                        "verifyUpdateManifest(%1) OS version is not supported: %2",
+                        contents.info.version, toString(serverSysInfo));
+                    contents.unsuportedSystemsReport.insert(
+                        id, UpdateStrings::getReportForUnsupportedOs(server->getSystemInfo()));
+                    continue;
+
+                case update::FindPackageResult::otherError:
+                default:
+                    NX_ERROR(NX_SCOPE_TAG,
+                        "verifyUpdateManifest(%1) Update package is missing for %2",
+                        contents.info.version,
+                        toString(serverSysInfo));
+                    contents.missingUpdate.insert(id);
+                    continue;
+            }
         }
 
-        nx::utils::SoftwareVersion serverVersion = server->getVersion();
+        const nx::utils::SoftwareVersion serverVersion = server->getVersion();
         // Prohibiting updates to previous version.
         if (serverVersion > targetVersion)
         {
-            NX_WARNING(typeid(UpdateContents)) << "verifyUpdateManifest("
-                << contents.info.version << ") server"
-                << server->getId()
-                << "ver" << serverVersion.toString()
-                << "has a newer version";
-            serversWithNewerVersion.insert(server->getId());
-        }
-        else if (serverVersion != targetVersion && server->isOnline())
-        {
-            alreadyInstalled = false;
+            NX_WARNING(NX_SCOPE_TAG, "verifyUpdateManifest(%1) Server %2 has a newer version %3",
+                contents.info.version, id, serverVersion);
+            serversWithNewerVersion.insert(id);
+            continue;
         }
 
-        if (package && serverVersion < targetVersion)
+        if (serverVersion < targetVersion && server->isOnline())
         {
-            package->targets.insert(server->getId());
-            contents.peersWithUpdate.insert(server->getId());
+            contents.alreadyInstalled = false;
+            contents.peersWithUpdate.insert(id);
+            package->targets.insert(id);
+
             auto hasInternet = server->getServerFlags().testFlag(nx::vms::api::SF_HasPublicIP);
             if (!hasInternet)
                 manualPackages.insert(package);
         }
-
-        allServers << record.first;
     }
 
     for (auto package: manualPackages)
@@ -379,7 +321,6 @@ bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateConten
     else
         contents.ignorePeers = serversWithNewerVersion;
 
-    contents.alreadyInstalled = alreadyInstalled;
     if (commonModule)
     {
         contents.cloudIsCompatible = checkCloudHost(
@@ -445,7 +386,8 @@ bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateConten
         NX_WARNING(typeid(UpdateContents))
             << "verifyUpdateManifest(" << contents.info.version
             << ") - detected some servers can not download update packages:"
-            << contents.info.version, files.join(",");
+            << contents.info.version
+            << files.join(",");
     }
 
     return contents.isValidToInstall();
