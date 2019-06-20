@@ -1,0 +1,80 @@
+<h1>Product Type: {{type}}</h1>
+<table style="border-spacing: 15px;">
+    <tr>
+        <td >Can Preview:</td>
+        <td >{{can_preview}}</td>
+    </tr>
+    <tr>
+        <td >Single Customization:</td>
+        <td >{{single_customization}}</td>
+    </tr>
+</table>
+<h1>Pages (Contexts)</h1>
+{{#contexts}}
+    <h2>{{#label}}{{label}}{{/label}}{{^label}}{{name}}{{/label}}</h2>
+    <table style="border-spacing: 15px;">
+        {{#name}}
+        <tr>
+            <td>Name (Tag):</td>
+            <td>{{name}}</td>
+        </tr>
+        {{/name}}
+        {{#file_path}}
+        <tr>
+            <td>File path:</td>
+            <td>{{file_path}}</td>
+        </tr>
+        {{/file_path}}
+
+        {{#description}}
+        <tr>
+            <td>Description:</td>
+            <td>{{{description}}}</td>
+        </tr>
+        {{/description}}
+        {{#url}}
+        <tr>
+            <td>Url:</td>
+            <td>{{url}}</td>
+        </tr>
+        {{/url}}
+        {{#translatable}}
+        <tr>
+            <td>Translatable:</td>
+            <td>{{translatable}}</td>
+        </tr>
+        {{/translatable}}
+    </table>
+    <div class="table-wrap">
+        <table class="relative-table wrapped confluenceTable stickyTableHeaders" style="width: 100%" role="grid">
+            <colgroup>
+                <col style="width: 5.23845%">
+                <col style="width: 3.16209%">
+                <col style="width: 3.01875%">
+                <col style="width: 5.4923%">
+                <col style="width: 10.9987%">
+                <col style="width: 10.4722%">
+            </colgroup>
+            <tr>
+                <th class="confluenceTh"></th>
+                <th class="confluenceTh">Label</th>
+                <th class="confluenceTh">Name (Tag)</th>
+                <th class="confluenceTh">Type</th>
+                <th class="confluenceTh">Description</th>
+                <th class="confluenceTh">Default Value</th>
+                <th class="confluenceTh">Settings</th>
+            </tr>
+            {{#values}}
+            <tr>
+                <td class="confluenceTd">{{index}}</td>
+                <td class="confluenceTd">{{label}}</td>
+                <td class="confluenceTd">{{name}}</td>
+                <td class="confluenceTd">{{type}}</td>
+                <td class="confluenceTd" style="width: 300px">{{{description}}}</td>
+                <td class="confluenceTd">{{{value}}}</td>
+                <td class="confluenceTd">{{{nice_meta}}}</td>
+            </tr>
+            {{/values}}
+        </table>
+    </div>
+{{/contexts}}

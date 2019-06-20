@@ -11,7 +11,6 @@ class CreateAccountSerializer(serializers.Serializer):  # ModelSerializer
     language = serializers.CharField(required=True, allow_blank=False, max_length=7)
     first_name = serializers.CharField(required=True, allow_blank=False, max_length=255)
     last_name = serializers.CharField(required=True, allow_blank=False, max_length=255)
-    subscribe = serializers.BooleanField(required=False)
 
     code = serializers.CharField(required=False, max_length=255)
 
@@ -49,9 +48,11 @@ class CreateAccountSerializer(serializers.Serializer):  # ModelSerializer
 class AccountSerializer(serializers.ModelSerializer):  # ModelSerializer
     class Meta:
         model = Account
-        fields = ('email', 'first_name', 'last_name', 'subscribe', 'language', 'is_staff', 'is_superuser', 'permissions')
+        fields = ('email', 'first_name', 'last_name', 'language', 'is_staff', 'is_superuser',
+                  'permissions')
+
 
 class AccountUpdateSerializer(serializers.ModelSerializer):  # ModelSerializer
     class Meta:
         model = Account
-        fields = ('first_name', 'last_name', 'subscribe', 'language')
+        fields = ('first_name', 'last_name', 'language')

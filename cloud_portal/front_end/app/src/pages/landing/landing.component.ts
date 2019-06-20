@@ -1,7 +1,7 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { Router }                    from '@angular/router';
 import { NxConfigService }           from '../../services/nx-config';
 import { NxDialogsService }          from '../../dialogs/dialogs.service';
+import { Title }                     from '@angular/platform-browser';
 
 @Component({
     selector   : 'landing-component',
@@ -16,13 +16,14 @@ export class NxLandingComponent implements OnInit {
 
     private setupDefaults() {
         this.CONFIG = this.config.getConfig();
+        this.title.setTitle(this.CONFIG.cloudName);
     }
 
     constructor(private config: NxConfigService,
                 private dialogs: NxDialogsService,
                 @Inject('account') private account: any,
                 @Inject('authorizationCheckService') private authorizationService: any,
-                private router: Router) {
+                private title: Title) {
 
         this.setupDefaults();
     }

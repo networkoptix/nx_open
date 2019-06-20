@@ -1,28 +1,38 @@
 {
   "language": "ko_KR",
   "language_name": "한국어",
-  "productName": "%PRODUCT_NAME%",
+  "cloudName": "%CLOUD_NAME%",
+  "vmsName": "%VMS_NAME%",
   "clientProtocol": "%CLIENT_PROTOCOL%:",
   "dialogs": {
-    "okButton": "승인",
+    "okButton": "확인",
     "cancelButton": "취소",
-    "loginTitle": "%PRODUCT_NAME%에 로그인",
+    "loginTitle": "Log in to %CLOUD_NAME%",
     "loginButton": "로그인",
     "logoutAuthorisedTitle": "이미 로그인 되어 있습니다",
     "logoutAuthorisedContinueButton": "계속",
     "logoutAuthorisedLogoutButton": "로그 아웃",
     "messageFailed": "Message has failed to send.",
-    "messageSent": "Message has been sent."
+    "messageSent": "Message has been sent.",
+    "noClientDetectedTitle": "시스템이 성공적으로 %VMS_NAME% 에서 분리 되었습니다",
+    "download": "%VMS_NAME% 다운로드"
   },
-  "messageType": {
-    "ipvd_feedback": "Feedback about {{product}}",
-    "sales_inquiry": "Inquiry for {{product}}",
-    "request_support": "Request Support for {{product}}",
-    "unknown": "Unknown Message Type"
+  "messageDialog": {
+    "title": {
+      "integration": "Email for {{product}}",
+      "ipvd_feedback_page": "Feedback for cameras page",
+      "ipvd_feedback_device": "Feedback about {{product}}"
+    },
+    "topic": {
+      "ipvd_feedback_page": "Feedback for cameras page",
+      "ipvd_feedback_device": "Feedback about {{product}}",
+      "contact_sales": "Contact sales for {{product}}",
+      "contact_support": "Contact support for {{product}}"
+    }
   },
   "pageTitles": {
-    "template": "{{title}} %PRODUCT_NAME%",
-    "default": "%PRODUCT_NAME%",
+    "template": "{{title}} %CLOUD_NAME%",
+    "default": "%CLOUD_NAME%",
     "registerSuccess": "에 오신 것을 환영합니다",
     "register": "에 계정 만들기",
     "changePassword": "패스워드 변경 -",
@@ -46,7 +56,8 @@
   },
   "systemStatuses": {
     "activated": "활성화 됨",
-    "merging": "merging",
+    "incompatible": "호환 되지 않음",
+    "merging": "합치기",
     "notActivated": "활성화되지 않음",
     "online": "온라인",
     "offline": "오프라인",
@@ -124,12 +135,12 @@
     "cantChangePasswordPrefix": "패스워드를 저장할 수 없습니다.",
     "cantActivatePrefix": "계정을 활성화 할 수 없습니다.",
     "cantSendConfirmationPrefix": "확인 이메일을 보낼 수 없습니다.",
-    "cloudInvalidResponse": "Cloud DB에서 예기치 않은 응답을 반환했습니다.",
     "notAuthorized": "잘못된 암호",
     "brokenAccount": "계정에 예기치 않은 문제가 있습니다. <a href=\"/restore_password\">계정 복원</a>",
     "wrongParameters": "양식의 일부 매개 변수가 잘못되었습니다.",
     "wrongCode": "계정이 이미 활성화되었거나 확인 코드가 잘못되었습니다.",
     "wrongCodeRestore": "확인 코드가 이미 사용되었거나 잘못되었습니다.",
+    "wrongAuthCode": "Code is expired or incorrect",
     "forbidden": "이 작업을 수행 할 수있는 권한이 없습니다.",
     "accountNotActivated": "이 계정은 아직 활성화되지 않았습니다. <a href=\"/activate\"> 활성화 링크 다시 보내기 </a>",
     "accountBlocked": "계정은 차단되었습니다. 몇 분 후에 다시 시도하십시오.",
@@ -147,13 +158,20 @@
     "lostConnection": "{{systemName}} 연결이 끊어졌습니다.",
     "thisSystem": "시스템",
     "oldSafariNotSupported": "10 이전의 Safari 버전은 지원되지 않습니다.",
-    "DUPLICATE_MEDIASERVER_FOUND": "Duplicate servers were found on one of the systems.<br>Remove old servers from each system that you are trying to merge and try again.",
-    "mergedSystemIsOffline": "One of the systems being merged is offline. Make sure they are online and try again.",
-    "INCOMPATIBLE": "Versions for systems are incompatible. To fix this problem make sure the systems have the same version."
+    "DUPLICATE_MEDIASERVER_FOUND": "일부 서버 목록은 두 시스템 모두에 존재하는 것으로 - 선택된 서버와 현재 서버의 목록에 있습니다.<br>각 시스템에서 오프라인 및 호환되지 않는 서버를 제거하고 다시 시도하십시오.",
+    "mergedSystemIsOffline": "시스템 <strong>{{failedSystem}}</strong> 가 오프라인입니다.",
+    "INCOMPATIBLE": "시스템들는 다른 소프트웨어 버전이 입니다. 둘다 <a href=\"/download\">최신 빌드</a> 로 업데이트 하십시요.",
+    "FAIL": "시스템 <strong>{{failedSystem}}</strong>에 현재 연결할 수 없습니다.<br> 조금 있다 다시 시도 하거나 <a href=\"%SUPPORT_LINK%\" target=\"_blank\">지원</a> 에 문의하십시요.",
+    "unknownMergeError": "Unknown error. You can try to refresh the page and repeat attempt. If the problem persists – please contact <a href=\"%SUPPORT_LINK%\" target=\"_blank\">support</a>."
+  },
+  "merging": {
+    "mergeFailedTitle": "시스템 머지 실패",
+    "commonText": "시스템 <strong>{{primarySystem}}</strong> 및 <strong>{{secondarySystem}}</strong>를 머지 하는데 실패 했습니다."
   },
   "passwordRequirements": {
     "good": "좋음",
     "fair": "보통",
+    "fairMessage": "숫자, 대 / 소문자 및 특수 문자를 사용하여 패스워드를 더 강하게 만듭니다.",
     "minLength": "너무 짧음",
     "minLengthMessage": "비밀번호는 최소 8자 이상 포함되어야 합니다.",
     "required": "부적합",
@@ -185,7 +203,7 @@
     "confirmRenameTitle": "시스템 이름",
     "confirmRenameAction": "저장",
     "successRename": "시스템 이름 저장",
-    "confirmDisconnectTitle": "%PRODUCT_NAME%에서 시스템을 분리하실래요?",
+    "confirmDisconnectTitle": "Disconnect System from %CLOUD_NAME%?",
     "confirmDisconnectAction": "연결 끊기",
     "confirmUnshareFromMe": "이 시스템을 당신의 계정과의 연결을 해제하려고합니다. 더 이상이 시스템에 액세스 할 수 없습니다. 확실합니까?",
     "confirmUnshareFromMeTitle": "시스템 연결을 끊으시겠습니까?",
@@ -193,11 +211,13 @@
     "confirmUnshare": "이 사용자는 시스템에 액세스 할 수 없게 됩니다. 확실합니까?",
     "confirmUnshareTitle": "사용자 삭제?",
     "confirmUnshareAction": "삭제",
-    "successDisconnected": "시스템이 성공적으로 %PRODUCT_NAME%에서 분리 되었습니다.",
+    "successDisconnected": "System is successfully disconnected from %CLOUD_NAME%",
     "successDeleted": "시스템 {{systemName}} 이 (가) 귀하의 계정에서 성공적으로 삭제되었습니다.",
-    "successMerge": "System merge completed",
+    "mergeFailed": "시스템 머지에 실패했습니다.",
+    "mergeStart": "시스템이 머지를 시작했습니다.",
+    "mergeSuccess": "System merge completed",
     "permissionsRemoved": "권한이 {{email}} 에서 제거 되었습니다.",
-    "unknownName": "Unknown Name for System (Caused by cloud merge)"
+    "unknownName": "시스템의 알 수없는 이름 (클라우드 머지로 인해 발생)"
   },
   "account": {
     "accountSavedSuccess": "계정이 성공적으로 저장되었습니다.",
@@ -206,72 +226,6 @@
     "changePassword": "패스워드 변경",
     "newPasswordLabel": "새 패스워드",
     "saveChanges": "저장"
-  },
-  "downloads": {
-    "noClientDetectedTitle": "시스템이 성공적으로 %VMS_NAME% 에서 분리 되었습니다",
-    "action": "%VMS_NAME% 다운로드",
-    "mobile": {
-      "ios": {
-        "link": "%IOS_APPLICATION_LINK%"
-      },
-      "android": {
-        "link": "%ANDROID_APPLICATION_LINK%"
-      }
-    },
-    "groups": {
-      "windows": {
-        "label": "Windows",
-        "supported": "7, 8, 8.1, 10, Server 2008, Server 2012"
-      },
-      "mac": {
-        "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
-      },
-      "linux": {
-        "label": "Ubuntu Linux",
-        "shortLabel": "Ubuntu",
-        "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
-      },
-      "macos": {
-        "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
-      },
-      "ios": {
-        "label": "iOS",
-        "shortLabel": "iOS"
-      },
-      "android": {
-        "label": "안드로이드",
-        "shortLabel": "안드로이드"
-      },
-      "arm": {
-        "label": "ARM",
-        "shortLabel": "ARM",
-        "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
-      }
-    },
-    "platforms": {
-      "win64": "x64",
-      "win86": "x86",
-      "linux64": "x64",
-      "linux86": "x86",
-      "mac": "X"
-    },
-    "appTypes": {
-      "client": "클라이언트만",
-      "server": "서버 만",
-      "bundle": "클라이언트와 서버",
-      "servertool": "구성 도구"
-    },
-    "releasesTypes": {
-      "beta": "베타",
-      "betas": "베타들",
-      "rc": "릴리스 후보",
-      "release": "릴리스",
-      "releases": "릴리스",
-      "patch": "패치",
-      "patches": "패치들"
-    }
   },
   "activeActions": {
     "sendConfirm": "활성화 링크 재전송",
@@ -299,6 +253,7 @@
     },
     "systemOffline": "시스템 오프라인",
     "systemHasNoCameras": "카메라 없음",
+    "systemUnreachable": "SYSTEM IS UNREACHABLE",
     "cameraStates": {
       "offline": "오프라인",
       "error": "오류",
@@ -334,5 +289,10 @@
       "stop listening": "듣기 중지",
       "help": "도움말 | 명령 표시"
     }
+  },
+  "recommendSupport": {
+    "a_recommend": "와 상담 하는 것을 제안 합니다.",
+    "b_support": "지원",
+    "c_proceeding": "계속하기 전에."
   }
 }

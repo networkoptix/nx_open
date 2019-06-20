@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 
-import { SandboxModule } from './sandbox/sandbox.module';
-import { CampageModule } from './campage/campage.module';
+import { SandboxModule }     from './sandbox/sandbox.module';
+import { IpvdModule }        from './ipvd/ipvd.module';
 import { Angular2CsvModule } from 'angular2-csv';
 
 import { MainModule }                from './main/main.module';
@@ -18,6 +18,9 @@ import { IntegrationsModule }     from './integration/integrations.module';
 import { IntegrationsListModule } from './integration/list/list.module';
 import { LandingModule }          from './landing/landing.module';
 
+import { NxOverviewModule }  from './integration/details/overview/overview.module';
+import { NxSetupModule }     from './integration/details/setup/setup.module';
+
 @NgModule({
     imports        : [
         SandboxModule,
@@ -32,9 +35,11 @@ import { LandingModule }          from './landing/landing.module';
         IntegrationsListModule,
         ContentModule,          // TODO: Remove it after test
         RightMenuModule,        // TODO: Remove it after test
-        CampageModule,
+        IpvdModule,
         Angular2CsvModule,
         LandingModule,
+        NxOverviewModule,
+        NxSetupModule,
     ],
     declarations   : [],
     entryComponents: [],
@@ -52,7 +57,7 @@ import { LandingModule }          from './landing/landing.module';
         IntegrationsListModule,
         ContentModule,          // TODO: Remove it after test
         RightMenuModule,        // TODO: Remove it after test
-        CampageModule,
+        IpvdModule,
         Angular2CsvModule,
         LandingModule,
     ]

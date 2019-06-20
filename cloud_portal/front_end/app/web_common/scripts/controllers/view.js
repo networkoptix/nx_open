@@ -356,23 +356,23 @@
                         
                         if ($scope.positionProvider) {
                             $scope.positionProvider.playing = play;
-                            
-                            if (!play) {
-                                $timeout(function () {
-                                    $scope.positionProvider.liveMode = $scope.positionProvider.isArchiveEmpty(); // Do it async
-                                });
-                            }
                         }
                     }
                 };
                 
+                var self = $scope;
+                $scope.$watch('positionProvider.isReady', function (ready) {
+                    if (ready && !self.positionProvider.playing) {
+                        self.positionProvider.liveMode = self.positionProvider.isArchiveEmpty();
+                    }
+                });
+                
                 $scope.switchPosition = function (val) {
-                    
                     //var playing = $scope.positionProvider.checkPlayingDate(val);
                     
                     //if(playing === false) {
                     $scope.crashCount = 0;
-                    updateVideoSource(val);//We have nothing more to do with it.
+                    updateVideoSource(val);// We have nothing more to do with it.
                     /*}else{
                         $scope.playerAPI.seekTime(playing); // Jump to buffered video
                     }*/
@@ -611,14 +611,14 @@
                 };
                 
                 
-                systemAPI.checkPermissions(CONFIG.globalViewArchivePermission).then(function (result) {
+                systemAPI.checkPermissions(CONFIG.globalViewArchivePermission).then(function(result) {
                     $scope.canViewArchive = result;
-                    return $scope.camerasProvider.requestResources();
-                }).then(function () {
                     // instead of requesting gettime once - we request it for all servers to know each timezone
                     return $scope.camerasProvider.getServerTimes();
-                }).then(function () {
-                    if (!isActive('embed') && $scope.activeCamera.id !== $scope.storage.cameraId) {
+                }).then(function() {
+                    return $scope.camerasProvider.requestResources();
+                }).then(function() {
+                    if (!isActive('embed') && (!$scope.activeCamera || $scope.activeCamera.id !== $scope.storage.cameraId)) {
                         $scope.activeCamera = $scope.camerasProvider.getCamera($scope.storage.cameraId);
                     }
                     $scope.ready = true;

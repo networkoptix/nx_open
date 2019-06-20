@@ -13,7 +13,7 @@
     </h1>
 
     <form name="registerForm" class="form-horizontal" ng-if="!register.success && !registerSuccess" ng-init="setRegisterForm(this)" novalidate autocomplete="off">
-        <h1 ng-if="!session.fromClient">Create account</h1>
+        <h1 ng-if="!session.fromClient">Criar conta</h1>
 
         <!-- special hack to prevent autocompletion -->
         <input type="text" style="display:none">
@@ -62,7 +62,7 @@
             <div class="col-md-4">
                 <div><span class="help-block input-error" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.required">O e-mail é obrigatório</span></div>
                 <div><span class="help-block input-error" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email">Por favor, introduza um email válido</span></div>
-                <div><span class="help-block input-error" ng-if="registerForm.registerEmail.$error.alreadyExists">Este e-mail já foi registado em %PRODUCT_NAME%</span></div>
+                <div><span class="help-block input-error" ng-if="registerForm.registerEmail.$error.alreadyExists">This Email has been already registered in %CLOUD_NAME%</span></div>
             </div>
         </div>
 

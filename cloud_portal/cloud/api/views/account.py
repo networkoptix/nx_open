@@ -1,13 +1,14 @@
+import base64
+import django
+import time
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.serializers import ValidationError
-import django
-import base64
 from django.utils import timezone
 
 from api.controllers.cloud_api import Account
-from api.account_backend import AccountBackend, AccountManager, get_ip
+from api.account_backend import AccountManager, get_ip
 from api.helpers.exceptions import handle_exceptions, APIRequestException, APINotAuthorisedException, \
     APIInternalException, APINotFoundException, api_success, ErrorCodes, require_params, kill_session
 from api.views.account_serializers import AccountSerializer, CreateAccountSerializer, AccountUpdateSerializer
@@ -20,6 +21,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 @api_view(['POST'])
 @permission_classes((AllowAny, ))
 @handle_exceptions
@@ -31,9 +33,9 @@ def register(request):
     data['language'] = lang
     data['IP'] = get_ip(request)
 
-    account = models.Account.objects.filter(email=data['email'])
-    if not (account.exists() and not account[0].is_active):
-        AccountBackend.check_email_in_portal(data['email'], False)  # Check if account is in Cloud_db
+    account = models.Account.objects.filter(email=data['email']).first()
+    if not (account and not account.is_active):
+        AccountManager.check_email_in_portal(data['email'], False)  # Check if account is in Cloud_db
     else:
         AccountManager().register_cloud_invite_user(data['email'], data['password'], data)
         logger.debug('/api/account/register completed')
@@ -69,8 +71,8 @@ def login(request):
             request.session.pop('account_blocked', None)
             raise APINotAuthorisedException("Account is blocked", ErrorCodes.account_blocked)
         # try to find user in the DB
-        if not AccountBackend.is_email_in_portal(email):
-            raise APINotFoundException("User not in cloud portal", )  # user not found here
+        if not AccountManager.is_email_in_portal(email):
+            raise APINotFoundException("User not in cloud portal")  # user not found here
         raise APINotAuthorisedException("Password is invalid")
 
     if 'remember' not in request.data or not request.data['remember']:
@@ -85,6 +87,7 @@ def login(request):
 
     request.session['login'] = email
     request.session['password'] = password
+    request.session['time'] = time.time()
     if 'timezone' in request.data:
         request.session['timezone'] = request.data['timezone']
     serializer = AccountSerializer(user, many=False)
@@ -133,7 +136,7 @@ def index(request):
 def auth_key(request):
     data = Account.create_temporary_credentials(request.session['login'], request.session['password'], 'short')
 
-    key = base64.b64encode(data['login'] + ':' + data['password'])
+    key = base64.b64encode((data['login'] + ':' + data['password']).encode('utf-8'))
     return api_success({'auth_key': key})
 
 
@@ -169,8 +172,8 @@ def activate(request):
         code = request.data['code']
 
         tmp_pass, email = Account.extract_temp_credentials(code)
-        account_query = models.Account.objects.filter(email=email)
-        if account_query.exists() and account_query.first().activated_date:
+        account_query = models.Account.objects.filter(email=email).first()
+        if account_query and account_query.activated_date:
             raise APIRequestException('Account has already been activated', ErrorCodes.account_activated)
 
         user_data = Account.activate(code)
@@ -179,7 +182,7 @@ def activate(request):
             raise APIInternalException('No email from cloud_db', ErrorCodes.cloud_invalid_response)
 
         email = user_data['email'].lower()
-        if not AccountBackend.is_email_in_portal(email):
+        if not AccountManager.is_email_in_portal(email):
             raise APIInternalException('No email in portal_db', ErrorCodes.portal_critical_error)
 
         user = models.Account.objects.get(email=email)
@@ -234,14 +237,14 @@ def check_code_in_portal(request):
     require_params(request, ('code',))
     code = request.data['code']
     (temp_password, email) = Account.extract_temp_credentials(code)
-    email_exists = AccountBackend.is_email_in_portal(email)
+    email_exists = AccountManager.is_email_in_portal(email)
     return api_success({'emailExists': email_exists})
 
 
 class AccountAutocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
         # Don't forget to filter out results depending on the visitor !
-        if not self.request.user.is_authenticated() or not self.request.user.is_superuser:
+        if not self.request.user.is_superuser:
             return models.Account.objects.none()
 
         qs = models.Account.objects.all()

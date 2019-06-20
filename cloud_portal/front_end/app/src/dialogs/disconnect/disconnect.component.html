@@ -1,6 +1,6 @@
 <form #disconnectForm="ngForm" name="disconnectForm" novalidate>
     <div class="modal-header">
-        <h1 class="modal-title" translate>Disconnect System from %PRODUCT_NAME%?</h1>
+        <h1 class="modal-title" translate>Disconnect System from %CLOUD_NAME%?</h1>
         <button type="button" class="close"
                 data-dismiss="modal" aria-label="Close"
                 (click)="activeModal.close()" *ngIf="closable">
@@ -21,10 +21,10 @@
                    name="password" type="password"
                    required nxFocusMe>
             <div *ngIf="password.invalid && password.touched && !wrongPassword">
-                <label class="input-error" translate>Password is required</label>
+                <div class="input-error" translate>Password is required</div>
             </div>
             <div *ngIf="password.invalid && wrongPassword">
-                <label class="input-error" translate>Wrong password</label>
+                <div class="input-error" translate>Wrong password</div>
             </div>
         </div>
     </div>

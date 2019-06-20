@@ -1,16 +1,17 @@
-
 <div class="card card-condensed" ng-if="system.isMine">
     <div class="card-body">
         <h2 class="mb-3">Twój system</h2>
         <p>
             <button ng-disabled="currentlyMerging && !isMaster" class="btn btn-default" ng-click="rename()">Zmień nazwę systemu</button>
         </p>
-        <p>
-            <button ng-disabled="currentlyMerging" class="btn btn-default" ng-if="canMerge || debugMode" ng-click="mergeSystems()">Złącz z innym systemem</button>
+        <p ng-if="systems.length > 1 && system.canMerge || configCanMerge || debugMode || betaMode">
+            <button class="btn btn-default"
+                    ng-disabled="(currentlyMerging || !system.isOnline || !system.isAvailable) && !(debugMode || betaMode)"
+                    ng-click="mergeSystems()">Złącz z innym systemem</button>
         </p>
         <hr />
-        <button ng-disabled="currentlyMerging" class="btn btn-default" ng-click="disconnect()">Odłącz od
-            <span class="product-name">&nbsp;%PRODUCT_NAME%</span></button>
+        <button ng-disabled="currentlyMerging" class="btn btn-default" ng-click="disconnect()">Disconnect from
+            <span class="product-name">&nbsp;%CLOUD_NAME%</span></button>
     </div>
 </div>
 <div class="card card-condensed" ng-if="!system.isMine">
@@ -35,23 +36,29 @@
             <placeholder class="preloader-small" preloader="true"></placeholder>
         </div>
         <br>
-        <div><strong>{{mergeTargetSystem.name}}</strong>
+        <div ng-if="mergeTargetSystem.name" >
+            <div><strong>{{mergeTargetSystem.name}}</strong>
             jest w trakcie złączania z tym systemem</div>
-        <hr />
-        <div class="merge-info-text">W zależności od rozmiaru bazy danych może to potrwać do kilku godzin</div>
+            <hr />
+            <div class="merge-info-text light-text">W zależności od rozmiaru bazy danych może to potrwać do kilku godzin</div>
+        </div>
+        <div ng-if="!mergeTargetSystem.name">Finalizowanie łączenia systemów</div>
     </div>
     <div class="card-body" ng-if="!isMaster || !system.isMine">
         <div class="float-left position-relative">
             <placeholder class="preloader-small" preloader="true"></placeholder>
         </div>
         <br>
-        <div>Ten system jest w trakcie złączania z <strong>{{mergeTargetSystem.name}}</strong></div>
-        <hr />
-        <div class="merge-info-text">
-            <p>W zależności od rozmiaru bazy danych może to potrwać do kilku godzin.</p>
-            <p>W trakcie złączania systemów można logować się do nich i odtwarzać wideo, ale nie można zmieniać ich konfiguracji. </p>
-            <p>Po złączeniu systemów wszyscy użytkownicy i kamery z tego systemu będą również dostępne
-                w systemie "<span class="merge-system-name">{{mergeTargetSystem.name}}</span>", a ten poprzedni zostanie usunięty.</p>
+        <div ng-if="mergeTargetSystem.name">
+            <div>Ten system jest w trakcie złączania z <strong>{{mergeTargetSystem.name}}</strong></div>
+            <hr />
+            <div class="merge-info-text light-text">
+                <p>W zależności od rozmiaru bazy danych może to potrwać do kilku godzin.</p>
+                <p>W trakcie złączania systemów można logować się do nich i odtwarzać wideo, ale nie można zmieniać ich konfiguracji. </p>
+                <p>Po złączeniu systemów wszyscy użytkownicy i kamery z tego systemu będą również dostępne
+                w systemie <strong>{{mergeTargetSystem.name}}</strong>, a ten poprzedni zostanie usunięty.</p>
+            </div>
         </div>
+        <div ng-if="!mergeTargetSystem.name">Finalizowanie łączenia systemów</div>
     </div>
 </div>

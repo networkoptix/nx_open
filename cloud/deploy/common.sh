@@ -1,4 +1,4 @@
-MODULES=(cloud_db cloud_portal cloud_portal_nginx connection_mediator traffic_relay nxcloud_host_agent)
+MODULES=(cloud_db cloud_portal cloud_portal_nginx connection_mediator traffic_relay)
 
 case $(uname -s) in
     Linux)

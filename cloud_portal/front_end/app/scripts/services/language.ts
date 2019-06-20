@@ -61,6 +61,7 @@ import * as angular from 'angular';
                         brokenAccount: '',
                         wrongParameters: '',
                         wrongCode: '',
+                        wrongAuthCode: '',
                         wrongCodeRestore: '',
                         forbidden: '',
                         accountNotActivated: '',

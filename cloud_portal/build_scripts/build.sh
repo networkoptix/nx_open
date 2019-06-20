@@ -54,7 +54,7 @@ else
 fi
 
 echo "pip install requirements"
-[ ! -d "env" ] && virtualenv env
+[ ! -d "env" ] && virtualenv env -p python3.7
 . ./env/bin/activate
 pip install -r build_scripts/requirements.txt
 
@@ -87,6 +87,20 @@ done
 
 cp ../cloud/cloud/cloud_portal.yaml $TARGET_DIR/_source
 
+BAN_LIST="nx\ |nxvms"
+echo "Checking files for mentions of nx with the following patterns: ${BAN_LIST}"
+branding=$(grep -Ei "$BAN_LIST" -rl --exclude-dir=fonts --exclude={\*.{swf,png,gif},{commonPasswordsList,downloads}.json} ${TARGET_DIR}/_source) || true
+if [[ -z ${branding} ]]
+then
+    echo "No mentions were found"
+else
+    echo -e "\nError found mentions of Nx in the following files:"
+    for mention in ${branding}
+    do
+        echo ${mention}
+    done
+    echo -e "\nPlease notify Boris and Web Team!"
+    exit 1
+fi
 
 echo "Cloud portal build is finished"
-# say "Cloud portal build is finished"

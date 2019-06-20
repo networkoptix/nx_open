@@ -7,6 +7,7 @@ import { NxConfigService }           from '../../../services/nx-config';
 import { NxRibbonService }           from '../../../components/ribbon/ribbon.service';
 import { TranslateService }          from '@ngx-translate/core';
 import { NxLanguageProviderService } from '../../../services/nx-language-provider';
+import { IntegrationService }        from '../integration.service';
 
 @Component({
     selector   : 'integrations-list-component',
@@ -18,7 +19,6 @@ export class NxIntegrationsListComponent implements OnDestroy, OnChanges {
 
     @Input() list;
 
-    defaultLogo: string;
     config: any;
     lang: any;
 
@@ -32,6 +32,7 @@ export class NxIntegrationsListComponent implements OnDestroy, OnChanges {
     }
 
     constructor(private configService: NxConfigService,
+                private integrations: IntegrationService,
                 private ribbonService: NxRibbonService,
                 private language: NxLanguageProviderService,
                 private translate: TranslateService) {
@@ -39,46 +40,22 @@ export class NxIntegrationsListComponent implements OnDestroy, OnChanges {
         this.setupDefaults();
     }
 
-    getPlatformIconsFor(plugin) {
-
-        this.defaultLogo = this.config.icons.default;
-
-        const platformIcons = [];
-
-        this.config.icons.platforms.forEach(icon => {
-            const platform = plugin.information.platforms.find(platform => {
-                // 32 or 64 bit? ... it doesn't matter :)
-                return platform.toLowerCase().indexOf(icon.name) > -1;
-            });
-
-            if (platform) {
-                platformIcons.push({ name: platform, src: icon.src });
-            }
-        });
-
-        return platformIcons;
-    }
-
-    setPlugunLogo(plugin) {
-        plugin.information.logo = plugin.information.logo || this.defaultLogo;
-    }
-
     ngOnDestroy() {
         this.ribbonService.hide();
     }
 
     ngOnChanges(changes: SimpleChanges) {
-        let haveInReview = false;
+        let haveInReviewOrDraft = false;
         if (changes.list.currentValue) {
             // inject platform icons info
-            changes.list.currentValue.forEach(plugin => {
-                plugin.information.platforms.icons = this.getPlatformIconsFor(plugin);
-                this.setPlugunLogo(plugin);
-
-                haveInReview = haveInReview || plugin.pending;
+            changes.list.currentValue.some(plugin => {
+                if (plugin.pending || plugin.draft) {
+                    haveInReviewOrDraft = true;
+                    return true;
+                }
             });
 
-            if (haveInReview) {
+            if (haveInReviewOrDraft) {
                 this.ribbonService.show(
                         this.lang[this.translate.currentLang].integration.previewRibbonText,
                         this.lang[this.translate.currentLang].integration.backToEditText,

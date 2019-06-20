@@ -17,7 +17,7 @@ def detect_language_by_request(request):
     default_language, languages = get_languages()
 
     # 1. Try account value - top priority
-    if request.user.is_authenticated():
+    if request.user.is_authenticated:
         lang = request.user.language
 
     # 2. try session valie

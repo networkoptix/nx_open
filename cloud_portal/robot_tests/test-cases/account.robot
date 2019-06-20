@@ -1,12 +1,13 @@
 *** Settings ***
 Resource          ../resource.robot
+Suite Setup       Open Browser and go to URL    ${url}
 Test Setup        Restart
 Test Teardown     Run Keyword If Test Failed    Reset DB and Open New Browser On Failure
-Suite Setup       Open Browser and go to URL    ${url}
 Suite Teardown    Close Browser
 *** Variables ***
 ${password}    ${BASE PASSWORD}
 ${url}         ${ENV}
+${CZECH ALERT}    Váš účet byl úspěšně uložen
 ${FIRST NAME IS REQUIRED}      //span[@ng-if='accountForm.firstName.$touched && accountForm.firstName.$error.required' and contains(text(),"${FIRST NAME IS REQUIRED TEXT}")]
 ${LAST NAME IS REQUIRED}       //span[@ng-if='accountForm.lastName.$touched && accountForm.lastName.$error.required' and contains(text(),"${LAST NAME IS REQUIRED TEXT}")]
 
@@ -109,7 +110,7 @@ First name is required
     Validate Log In
     Verify In Account Page
     Input Text    ${ACCOUNT FIRST NAME}    ${EMPTY}
-    Click Button    ${ACCOUNT SAVE}
+    Click Element    ${ACCOUNT LAST NAME}
     Wait Until Element Is Visible    ${ACCOUNT FIRST NAME}/parent::div/parent::div[contains(@class, "has-error")]
     Element Should Be Visible    ${FIRST NAME IS REQUIRED}
 
@@ -120,7 +121,7 @@ Last name is required
     Validate Log In
     Verify In Account Page
     Input Text    ${ACCOUNT LAST NAME}    ${EMPTY}
-    Click Button    ${ACCOUNT SAVE}
+    Click Element    ${ACCOUNT FIRST NAME}
     Wait Until Element Is Visible    ${ACCOUNT LAST NAME}/parent::div/parent::div[contains(@class, "has-error")]
     Element Should Be Visible    ${LAST NAME IS REQUIRED}
 
@@ -131,7 +132,7 @@ SPACE for first name is not valid
     Validate Log In
     Verify In Account Page
     Input Text    ${ACCOUNT FIRST NAME}    ${SPACE}
-    Click Button    ${ACCOUNT SAVE}
+    Click Element    ${ACCOUNT LAST NAME}
     Wait Until Element Is Visible    ${ACCOUNT FIRST NAME}/parent::div/parent::div[contains(@class, "has-error")]
     Element Should Be Visible    ${FIRST NAME IS REQUIRED}
 
@@ -143,7 +144,7 @@ SPACE for last name is not valid
     Verify In Account Page
     Input Text    ${ACCOUNT FIRST NAME}    Mark
     Input Text    ${ACCOUNT LAST NAME}    ${SPACE}
-    Click Button    ${ACCOUNT SAVE}
+    Click Element    ${ACCOUNT FIRST NAME}
     Wait Until Element Is Visible    ${ACCOUNT LAST NAME}/parent::div/parent::div[contains(@class, "has-error")]
     Element Should Be Visible    ${LAST NAME IS REQUIRED}
 
@@ -174,11 +175,12 @@ Should respond to tab and go in the correct order
     Press Key    ${ACCOUNT LANGUAGE DROPDOWN}    ${TAB}
     Element Should Be Focused    //form[@name="accountForm"]//a//span[1]/..
     Press Key    //form[@name="accountForm"]//a//span[1]/..    ${ENTER}
+    Element Should Be Visible    ${ACCOUNT LANGUAGE DROPDOWN}/span[@lang="cs_CZ"]
     Press Key    ${ACCOUNT LANGUAGE DROPDOWN}    ${TAB}
     Element Should Be Focused    ${ACCOUNT SAVE}
     Press Key    ${ACCOUNT SAVE}    ${ENTER}
     Sleep    2    #wait for the language to change
-    Check For Alert    Your account is successfully saved
+    Check For Alert    ${CZECH ALERT}
 
 Langauge is changeable on the account page
     [tags]    C41574

@@ -21,8 +21,8 @@
         <label class="col-sm-2 control-label" for="{{param.name}}">
             {{param.name}}
             <small>{{param.type}}</small>
-            <small ng-if="param.optional=='false'">(required)</small>
-            <small ng-if="param.proprietary">(proprietary)</small>
+            <small ng-if="param.optional=='false'">(필수)</small>
+            <small ng-if="param.proprietary">(독점적)</small>
         </label>
         <div class="col-sm-10">
             <p class="form-control-static" ng-if="param.description.xml"
@@ -67,8 +67,8 @@
         <label class="col-sm-2 control-label" for="{{param.name}}">
             {{param.name}}
             <small>{{param.type}}</small>
-            <small ng-if="!param.optional">(required)</small>
-            <small ng-if="param.proprietary">(proprietary)</small>
+            <small ng-if="!param.optional">(필수)</small>
+            <small ng-if="param.proprietary">(독점적)</small>
         </label>
         <div class="col-sm-10">
             <div ng-switch on="param.formType">

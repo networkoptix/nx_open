@@ -1,5 +1,24 @@
+@import '../../../../styles/theme_palette';
+@import '../../../../styles/theme_variables';
+@import '../../../styles/mixins';
+
 .menu-level-2 {
-    color        : green;
-    padding-left : 10px;
+    background-color : $light5;
+    font-family      : $font-family-medium;
+    font-size        : $font-size-base;
+    color            : $dark9;
+    border-radius    : 0;
+    text-decoration  : none;
+    padding-left     : rem(12px);
+    display          : block;
+    
+    &:hover {
+        background-color : $light6;
+    }
+    
+    &.selected {
+        background-color : $light16 !important;
+        color            : $light1;
+    }
 }
 

@@ -57,6 +57,8 @@ require('./services/authorizationCheckService.ts');
 require('./services/location-proxy.ts');
 
 //Controllers
+require('./controllers/startPage.js');
+require('./controllers/404.js');
 require('./controllers/account.js');
 require('./controllers/activateRestore.js');
 require('./controllers/debug.js');

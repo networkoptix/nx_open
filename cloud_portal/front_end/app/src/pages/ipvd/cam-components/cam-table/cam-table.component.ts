@@ -1,0 +1,377 @@
+import {
+    Component, Input, Output, EventEmitter,
+    OnChanges, SimpleChanges,
+    OnInit, ViewEncapsulation, Inject, PLATFORM_ID
+} from '@angular/core';
+
+import { NxConfigService }       from '../../../../services/nx-config';
+import { TranslateService }      from '@ngx-translate/core';
+import { NxUriService }          from '../../../../services/uri.service';
+import { NxUtilsService }        from '../../../../services/utils.service';
+import { Router }                from '@angular/router';
+
+interface Params {
+    [key: string]: any;
+}
+
+@Component({
+    selector     : 'nx-cam-table',
+    templateUrl  : './cam-table.component.html',
+    styleUrls    : ['./cam-table.component.scss'],
+    encapsulation: ViewEncapsulation.None
+})
+export class CamTableComponent implements OnChanges, OnInit {
+
+    // @Input() headers: string[];
+    @Input() elements: any[];
+    @Input() allowedParameters: string[];
+    @Input() activeCamera: any;
+    @Input() params: any = {};
+
+    @Output() public onRowClick: EventEmitter<any> = new EventEmitter<any>();
+
+    public selectedHeader;
+    public showHeaders;
+
+    private _elements: any[];
+    private selectedCamera;
+    private sortOrderASC: boolean;
+    private results;
+    private cameraHeaders;
+    private paramsShown;
+    private lang;
+    private debug: boolean;
+
+    offset: number;
+    currentPage: number;
+    pageSize: number;
+    totalItems: number;
+    pager: any = {};
+    pagedItems: any[];
+    pagerMaxSize: number;
+    CONFIG: any = {};
+
+    // Options for the Excel export
+    public csvFilename: any;
+    public csvCameraData: any[];
+    public csvOptions = {
+        fieldSeparator  : ',',
+        quoteStrings    : '"',
+        decimalseparator: '.',
+        showLabels      : true,
+        headers         : ['Vendor', 'Model', 'Max Resolution', 'Max FPS', 'Codec', '2-Way Audio', 'Advanced PTZ', 'Fisheye', 'Motion', 'I/O'],
+        showTitle       : true,
+        title           : 'Camera List',
+        useBom          : false,
+        removeNewLines  : true
+    };
+
+    constructor(private router: Router,
+                private translate: TranslateService,
+                private uri: NxUriService,
+                config: NxConfigService,
+                @Inject(PLATFORM_ID) private platformId: object) {
+
+        this.lang = this.translate.translations[this.translate.currentLang];
+        this.CONFIG = config.getConfig();
+
+        this.sortOrderASC = true;
+        this._elements = this.elements;
+
+        this.paramsShown = 6;
+        this.cameraHeaders = [
+            this.lang.ipvd.vendor,
+            this.lang.ipvd.model,
+            this.lang.ipvd.hardwareType,
+            this.lang.ipvd.maxResolution,
+            this.lang.ipvd.maxFps,
+            this.lang.ipvd.primaryCodec,
+            this.lang.ipvd.isAudioSupported,
+            this.lang.ipvd.isPtzSupported,
+            this.lang.ipvd.isFisheye,
+            this.lang.ipvd.isMdSupported,
+            this.lang.ipvd.isIoSupported,
+            this.lang.ipvd.count
+        ];
+
+        this.pagedItems = [];
+        this.pagerMaxSize = this.CONFIG.ipvd.pagerMaxSize;
+        this.currentPage = 1;
+        this.pageSize = this.CONFIG.layout.tableLarge.rows;
+    }
+
+    toggleHeaderSort(param) {
+        let filter;
+        for (const [key, value] of Object.entries(this.lang.ipvd)) {
+            if (value === param) {
+                filter = key;
+                break;
+            }
+        }
+
+        this.sortOrderASC = (this.lang.ipvd[filter] === this.selectedHeader) ? !this.sortOrderASC : true;
+        this.toggleSort(filter, false /* reset camera and page params in uri */);
+
+        const queryParams: Params = {};
+
+        queryParams.page = undefined;
+        queryParams.sortBy = filter;
+        queryParams.sortBy += (this.sortOrderASC) ? ',ASC' : ',DESC';
+
+        this.uri.updateURI('/ipvd', queryParams);
+    }
+
+    toggleSort(param, keepURI) {
+        let byParam;
+
+        if (param === 'maxResolution') {
+            byParam = NxUtilsService.byParam((elm) => {
+                return elm.resolutionArea;
+            }, !this.sortOrderASC);
+
+        } else if (param === 'maxFps') {
+            byParam = NxUtilsService.byParam((elm) => {
+                return elm[param];
+            }, !this.sortOrderASC);
+
+        } else if (param === 'isFisheye' ||
+                param === 'isMdSupported' ||
+                param === 'isIoSupported') {
+
+            byParam = NxUtilsService.byParam((elm) => {
+                if (elm[param]) {
+                    return 0;
+                }
+                if (elm[param] === false) {
+                    return 2;
+                }
+                if (elm[param] === null) {
+                    return 3;
+                }
+            }, this.sortOrderASC);
+
+        } else if (param === 'isPtzSupported') {
+            byParam = NxUtilsService.byParam((elm) => {
+                if (elm.isAptzSupported) {
+                    return 0;
+                }
+                if (elm.isPtzSupported) {
+                    return 1;
+                }
+                if (elm.isPtzSupported === false) {
+                    return 2;
+                }
+                if (elm.isPtzSupported === null) {
+                    return 3;
+                }
+            }, this.sortOrderASC);
+
+        } else if (param === 'isAudioSupported') {
+            byParam = NxUtilsService.byParam((elm) => {
+                if (elm.isAudioSupported === null) {
+                    return 3;
+                }
+                if (elm.isAudioSupported === false) {
+                    return 2;
+                }
+                if (elm.isTwAudioSupported) {
+                    return 0;
+                }
+                if (elm.isAudioSupported) {
+                    return 1;
+                }
+            }, this.sortOrderASC);
+
+        } else {
+            byParam = NxUtilsService.byParam((elm) => {
+                return (typeof elm[param] === 'string') ? elm[param].toLowerCase() : elm[param];
+            }, this.sortOrderASC);
+        }
+
+        this._elements.sort(byParam);
+
+        if (!keepURI) {
+            this.setPage(1, keepURI);
+        }
+
+        this.selectedHeader = this.cameraHeaders.find(x => {
+            return x === this.lang.ipvd[param];
+        });
+    }
+
+    filterAllowedParams() {
+        // filter 'service' params
+        const serviceParams = ['count', 'resolutionArea'];
+        this.allowedParameters = this.allowedParameters.filter((el) => !serviceParams.includes(el));
+        this.cameraHeaders = this.cameraHeaders.filter((el) => !serviceParams.includes(el.toLowerCase()));
+    }
+
+    showParametersFor(item) {
+        const showParameters = [...this.allowedParameters];
+        // adjust PTZ and Audio params
+        let idxToBeRemoved;
+        let param;
+
+        param = (item.isAptzSupported) ? 'isPtzSupported' : 'isAptzSupported';
+        idxToBeRemoved = showParameters.indexOf(param);
+        showParameters.splice(idxToBeRemoved, 1);
+
+        param = (item.isTwAudioSupported) ? 'isAudioSupported' : 'isTwAudioSupported';
+        idxToBeRemoved = showParameters.indexOf(param);
+        showParameters.splice(idxToBeRemoved, 1);
+
+        return showParameters;
+    }
+
+    private sortElements(keepURI) {
+        let sortByColumn;
+        if (this.params.sortBy) {
+            const sortBy = this.params.sortBy.split(',');
+            this.sortOrderASC = (sortBy[1] === 'ASC');
+            sortByColumn = sortBy[0];
+        } else {
+            // If sort by popularity is set in CMS or default sorting 'Vendor-Model'
+            sortByColumn = (this.CONFIG.ipvd.sortSupportedDevicesByPopularity) ? 'count' : 'sortKey';
+        }
+
+        this.toggleSort(sortByColumn, keepURI);
+
+        let pageNum;
+        if (this.params && this.params.page) {
+            pageNum = +this.params.page;
+        } else {
+            pageNum = 1;
+        }
+
+        this.setPage(pageNum, true);
+    }
+
+    ngOnChanges(changes: SimpleChanges) {
+        if (changes.elements) {
+            this.sortOrderASC = !this.CONFIG.ipvd.sortSupportedDevicesByPopularity;
+            this._elements = changes.elements.currentValue;
+            this.results = this._elements.length;
+
+            this.sortElements(true /* keep uri params */);
+            this.csvCameraData = this.getCsvData();
+
+            this.setPage(this.currentPage, true);
+        }
+
+        if (changes.activeCamera) {
+            if (!changes.activeCamera.currentValue) {
+                this.selectedCamera = undefined;
+            } else {
+                this.selectedCamera = changes.activeCamera.currentValue.sortKey;
+            }
+        }
+
+        if (changes.params) {
+            this.debug = true;
+
+            if (this.params.debug === undefined) {
+                this.debug = false;
+                this.filterAllowedParams();
+            }
+
+            this.showHeaders = this.cameraHeaders;
+
+            if (!changes.params.firstChange &&
+                    changes.params.currentValue.page === changes.params.previousValue.page &&
+                    changes.params.currentValue.camera === changes.params.previousValue.camera) {
+                // Params changed - reset the pagination
+                this.setPage(1, true);
+
+            } else if (changes.params.currentValue.page) {
+                this.setPage(+changes.params.currentValue.page, true);
+            }
+
+            if (this.params.sortBy) {
+                const sortBy = this.params.sortBy.split(',');
+                const direction = (sortBy[1] === 'ASC');
+                const column = this.cameraHeaders.find(x => {
+                    return x === this.lang.ipvd[sortBy[0]];
+                });
+
+                if (this.sortOrderASC === direction && column === this.selectedHeader) {
+                    return; // do not sort if sorted
+                }
+
+                this.sortOrderASC = direction;
+                this.toggleSort(sortBy[0], true);
+
+                if (this.params.page) {
+                    this.setPage(+this.params.page, true);
+                } else {
+                    this.setPage(1, true);
+                }
+            }
+
+            if (this.params.camera) {
+                const row = this.pagedItems.findIndex((camera) => {
+                    return camera.model === this.params.camera;
+                });
+
+                const camera = this.pagedItems.find((camera) => {
+                    return camera.model === this.params.camera;
+                });
+
+                this.setClickedRow(camera);
+            }
+        }
+    }
+
+    ngOnInit() {
+        this.results = this._elements.length;
+        this.csvFilename = Date.now();
+        this.csvCameraData = this.getCsvData();
+    }
+
+    setClickedRow(element) {
+        if (element) {
+            this.selectedCamera = element.sortKey;
+            this.onRowClick.emit(element);
+        } else {
+            this.selectedCamera = undefined;
+        }
+    }
+
+    setPage(page: number, keep?: boolean) {
+        this.currentPage = page;
+
+        const pageParam = (this.currentPage === 1) ? undefined : this.currentPage;
+        // preserve window offset
+        this.uri.pageOffset = window.pageYOffset;
+
+        const startIndex = (this.currentPage - 1) * this.pageSize;
+        const endIndex = startIndex + this.pageSize;
+        this.pagedItems = this._elements.slice(startIndex, endIndex);
+
+        if (this.params && this.params.page != pageParam) { // this.params.page is string - no strict comparison
+            const queryParams: Params = {};
+            queryParams.page = (this.currentPage === 1) ? undefined : this.currentPage;
+
+            this.uri.updateURI('/ipvd', queryParams);
+        }
+    }
+
+    getCsvData() {
+        return this._elements.map(camera => ({
+                    'Vendor'        : camera.vendor,
+                    'Model'         : camera.model,
+                    'Max Resolution': camera.maxResolution,
+                    'Max FPS'       : camera.maxFps,
+                    'Codec'         : camera.primaryCodec,
+                    '2-Way Audio'   : NxUtilsService.yesNo(camera.isTwAudioSupported),
+                    'Advanced PTZ'  : NxUtilsService.yesNo(camera.isAptzSupported),
+                    'Fisheye'       : NxUtilsService.yesNo(camera.isFisheye),
+                    'Motion'        : NxUtilsService.yesNo(camera.isMdSupported),
+                    'I/O'           : NxUtilsService.yesNo(camera.isIoSupported)
+                })
+        );
+    }
+
+    isBoolean(x: any): boolean {
+        return !(typeof x === 'string' || typeof x === 'number');
+    }
+}
