@@ -83,7 +83,8 @@ bool DirectorWebserver::start()
         return false;
     }
 
-    if (!m_server->start(m_port, m_address))
+    m_server->start(m_port, m_address);
+    if (!m_active)
         NX_ERROR(this, "start() - failed to start director at a \"%1:%2\"", m_address, m_port);
     else
         NX_INFO(this, "start() - listening to \"%1:%2\"", m_address, m_port);
