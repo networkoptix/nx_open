@@ -122,15 +122,19 @@ CompressionType compressionType(const nx::network::http::HttpHeaders& headers)
     {
         if (extensionHeaderItr->second.indexOf(kCompressionAllowed) >= 0)
         {
-            auto acceptEncodingHeaderItr = headers.find(kExtension);
-            if (acceptEncodingHeaderItr != headers.end())
+            auto encodingHeaderItr = headers.find("Accept-Encoding");
+            if (encodingHeaderItr != headers.end())
             {
-                for (auto encoding: acceptEncodingHeaderItr->second.split(','))
+                for (auto encoding: encodingHeaderItr->second.split(','))
                 {
                     encoding = encoding.trimmed().toLower();
                     if (encoding == "gzip" || encoding == "deflate")
                         return CompressionType::perMessageInflate;
                 }
+            }
+            else
+            {
+                return CompressionType::perMessageInflate;
             }
         }
     }
