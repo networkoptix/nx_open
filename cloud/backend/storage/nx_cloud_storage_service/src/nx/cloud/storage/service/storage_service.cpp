@@ -26,7 +26,7 @@ std::unique_ptr<utils::AbstractServiceSettings> StorageService::createSettings()
     return std::make_unique<Settings>();
 }
 
-int StorageService::serviceMain(const utils::AbstractServiceSettings& settings)
+int StorageService::serviceMain(const utils::AbstractServiceSettings& /*settings*/)
 {
     // TODO
     return runMainLoop();
