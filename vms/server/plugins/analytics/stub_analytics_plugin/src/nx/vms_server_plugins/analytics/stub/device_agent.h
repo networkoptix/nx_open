@@ -14,7 +14,7 @@
 #include <nx/sdk/analytics/helpers/pixel_format.h>
 
 #include "engine.h"
-#include "objects/abstract_object.h"
+#include "objects/random.h"
 
 namespace nx {
 namespace vms_server_plugins {
@@ -72,39 +72,74 @@ private:
 
     void stopFetchingMetadata();
 
+    void processEvents();
+
     void processPluginEvents();
 
-    void setObjectCount();
+    void setObjectCount(int objectCount);
 
     void parseSettings();
 
+    template<typename ObjectType>
+    void setIsObjectTypeGenerationNeeded(bool isObjectTypeGenerationNeeded)
+    {
+        if (isObjectTypeGenerationNeeded)
+        {
+            m_objectGenerator.registerObjectFactory<ObjectType>(
+                []() { return std::make_unique<ObjectType>(); });
+        }
+        else
+        {
+            m_objectGenerator.unregisterObjectFactory<ObjectType>();
+        }
+    }
+
+    void updateObjectGenerationParameters();
+
+    void updateEventGenerationParameters();
+
 private:
+    std::atomic<bool> m_terminated{ false };
+
     std::unique_ptr<std::thread> m_pluginEventThread;
     std::mutex m_pluginEventGenerationLoopMutex;
     std::condition_variable m_pluginEventGenerationLoopCondition;
-    std::atomic<bool> m_terminated{false};
     std::atomic<bool> m_needToThrowPluginEvents{false};
 
     std::unique_ptr<std::thread> m_eventThread;
-    std::condition_variable m_eventGenerationLoopCondition;
     std::mutex m_eventGenerationLoopMutex;
-    std::atomic<bool> m_stopping{false};
+    std::condition_variable m_eventGenerationLoopCondition;
+    std::atomic<bool> m_eventsNeeded{false};
 
-    bool m_previewAttributesGenerated = false;
     int m_frameCounter = 0;
-    int m_objectCounter = 0;
-    std::vector<std::unique_ptr<AbstractObject>> m_objects;
     std::string m_eventTypeId;
     int64_t m_lastVideoFrameTimestampUs = 0;
 
     struct DeviceAgentSettings
     {
-        std::atomic<bool> generateObjects{true};
         std::atomic<bool> generateEvents{true};
+
+        std::atomic<bool> generateCars{true};
+        std::atomic<bool> generateTrucks{true};
+        std::atomic<bool> generatePedestrians{true};
+        std::atomic<bool> generateHumanFaces{true};
+        std::atomic<bool> generateBicycles{true};
+
         std::atomic<int> generateObjectsEveryNFrames{1};
         std::atomic<int> numberOfObjectsToGenerate{1};
-        std::atomic<bool> generatePreviewPacket{true};
+
+        std::atomic<bool> generatePreviews{true};
+
         std::atomic<bool> throwPluginEvents{false};
+
+        bool needToGenerateObjects()
+        {
+            return generateCars
+                || generateTrucks
+                || generatePedestrians
+                || generateHumanFaces
+                || generateBicycles;
+        }
     };
 
     DeviceAgentSettings m_deviceAgentSettings;
@@ -116,6 +151,39 @@ private:
     };
 
     EventContext m_eventContext;
+
+    struct ObjectContext
+    {
+        ObjectContext() = default;
+        ObjectContext(std::unique_ptr<AbstractObject> object):
+            object(std::move(object))
+        {
+        }
+
+        ObjectContext& operator=(std::unique_ptr<AbstractObject>&& otherObject)
+        {
+            reset();
+            object = std::move(otherObject);
+            return *this;
+        }
+
+        std::unique_ptr<AbstractObject> object;
+        bool isPreviewGenerated = false;
+        int frameCounter = 0;
+
+        void reset()
+        {
+            object.reset();
+            isPreviewGenerated = false;
+            frameCounter = 0;
+        }
+
+        bool operator!() const { return !object; }
+    };
+
+    std::mutex m_objectGenerationMutex;
+    RandomObjectGenerator m_objectGenerator;
+    std::vector<ObjectContext> m_objectContexts;
 };
 
 const std::string kLineCrossingEventType = "nx.stub.lineCrossing";
