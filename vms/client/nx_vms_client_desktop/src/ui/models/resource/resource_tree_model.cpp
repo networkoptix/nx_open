@@ -693,11 +693,14 @@ QVariant QnResourceTreeModel::headerData(int section, Qt::Orientation orientatio
 QHash<int,QByteArray> QnResourceTreeModel::roleNames() const
 {
     QHash<int, QByteArray> roles = base_type::roleNames();
-    roles.insert(Qn::ResourceRole,              "resource");
-    roles.insert(Qn::ResourceFlagsRole,         "flags");
-    roles.insert(Qn::ItemUuidRole,              "uuid");
-    roles.insert(Qn::ResourceStatusRole,        "status");
-    roles.insert(Qn::NodeTypeRole,              "nodeType");
+    roles.insert(Qn::ResourceRole, "resource");
+    roles.insert(Qn::ResourceFlagsRole, "flags");
+    roles.insert(Qn::ItemUuidRole, "uuid");
+    roles.insert(Qn::ResourceStatusRole, "status");
+    roles.insert(Qn::NodeTypeRole, "nodeType");
+    roles.insert(Qn::ResourceIconKeyRole, "iconKey");
+    roles.insert(Qn::ExtraResourceInfoRole, "extraInfo");
+    roles.insert(Qn::SeparatorRole, "separator");
     return roles;
 }
 

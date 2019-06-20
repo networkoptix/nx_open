@@ -65,17 +65,17 @@ void QnResourceTreeModelRecorderNode::removeChildInternal(const QnResourceTreeMo
     }
 }
 
-QIcon QnResourceTreeModelRecorderNode::calculateIcon() const
+int QnResourceTreeModelRecorderNode::calculateIconKey() const
 {
     if (!children().empty())
     {
         const auto camera = child(0)->resource().dynamicCast<QnVirtualCameraResource>();
         NX_ASSERT(camera);
         if (camera && camera->isMultiSensorCamera())
-            return qnResIconCache->icon(QnResourceIconCache::MultisensorCamera);
+            return QnResourceIconCache::MultisensorCamera;
     }
 
-    return qnResIconCache->icon(QnResourceIconCache::Recorder);
+    return QnResourceIconCache::Recorder;
 }
 
 CameraExtraStatus QnResourceTreeModelRecorderNode::calculateCameraExtraStatus() const

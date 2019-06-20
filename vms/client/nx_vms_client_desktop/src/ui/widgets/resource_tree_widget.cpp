@@ -19,7 +19,7 @@
 
 #include <ui/delegates/resource_item_delegate.h>
 #include <ui/models/resource/resource_tree_model.h>
-#include <ui/models/resource_search_proxy_model.h>
+#include <ui/models/resource_tree_sort_proxy_model.h>
 #include <ui/models/resource/resource_compare_helper.h>
 #include <nx/vms/client/desktop/resource_views/data/node_type.h>
 
@@ -43,82 +43,6 @@
 // -------------------------------------------------------------------------- //
 
 using namespace nx::vms::client::desktop;
-
-class QnResourceTreeSortProxyModel: public QnResourceSearchProxyModel
-{
-    typedef QnResourceSearchProxyModel base_type;
-
-public:
-    QnResourceTreeSortProxyModel(QObject* parent = nullptr):
-        base_type(parent)
-    {
-    }
-
-    virtual bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole) override
-    {
-        if (index.column() == Qn::CheckColumn && role == Qt::CheckStateRole)
-        {
-            // TODO: #vkutin #GDM #common Maybe move these signals to QnResourceTreeModel
-            emit beforeRecursiveOperation();
-            base_type::setData(index, value, Qt::CheckStateRole);
-            emit afterRecursiveOperation();
-            return true;
-        }
-
-        return base_type::setData(index, value, role);
-    }
-
-    Qt::DropActions supportedDropActions() const override
-    {
-        return sourceModel()->supportedDropActions();
-    }
-
-private:
-    /**
-     * Helper function to list nodes in the correct order.
-     * Root nodes are strictly ordered, but there is one type of node which is inserted in between:
-     * videowall nodes, which are pinned between Layouts and WebPages. Also if the system has one
-     * server, ServersNode is not displayed, so server/edge node must be displayed on it's place.
-     */
-    static qreal nodeOrder(const QModelIndex& index)
-    {
-        using NodeType = ResourceTreeNodeType;
-
-        const auto order = [](NodeType t) { return static_cast<qreal>(t); };
-
-        const auto nodeType = index.data(Qn::NodeTypeRole).value<NodeType>();
-
-        if (nodeType == NodeType::edge)
-            return order(NodeType::servers);
-
-        if (nodeType != NodeType::resource)
-            return order(nodeType);
-
-        const auto resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
-        const bool isVideoWall = resource->hasFlags(Qn::videowall);
-        if (isVideoWall)
-            return 0.5 * (order(NodeType::layouts) + order(NodeType::webPages));
-
-        const bool isServer = resource->hasFlags(Qn::server);
-        if (isServer)
-            return order(NodeType::servers);
-
-        return order(nodeType);
-    }
-
-
-protected:
-    virtual bool lessThan(const QModelIndex& left, const QModelIndex& right) const override
-    {
-        qreal leftOrder = nodeOrder(left);
-        qreal rightOrder = nodeOrder(right);
-        if (!qFuzzyEquals(leftOrder, rightOrder))
-            return leftOrder < rightOrder;
-
-        return resourceLessThan(left, right);
-    }
-};
-
 
 // -------------------------------------------------------------------------- //
 // QnResourceTreeWidget
