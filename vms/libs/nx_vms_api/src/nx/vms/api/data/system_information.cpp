@@ -69,7 +69,13 @@ SystemInformationNew SystemInformationNew::fromLegacySystemInformation(
         return {"macos", {}, info.version};
 
     const QString arch = info.arch == "arm" ? "arm32" : info.arch;
-    return {info.platform + L'_' + arch, info.modification, info.version};
+    const QString platform = info.platform + L'_' + arch;
+
+    static QSet<QString> kObsoleteModifications{"winxp", "rpi", "bananapi"};
+    const QString modification =
+        kObsoleteModifications.contains(info.modification) ? QString() : info.modification;
+
+    return {platform, modification, info.version};
 
 }
 
