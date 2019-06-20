@@ -8,7 +8,7 @@ import nx.vms.client.desktop 1.0
  * A tree view.
  *
  * To control which items are hoverable/selectable, the delegate must have "selectable" property.
- * 
+ *
  * Mouse click selection is implemented.
  */
 Item
@@ -82,7 +82,7 @@ Item
 
                     if (toggle)
                         model.expanded = !model.expanded
-                    else
+                    else if (selectable)
                         listView.currentIndex = index
                 }
             }
