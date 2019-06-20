@@ -18,7 +18,7 @@ static const nx::Buffer kVersion = "Sec-WebSocket-Version";
 static const nx::Buffer kProtocol = "Sec-WebSocket-Protocol";
 static const nx::Buffer kAccept = "Sec-WebSocket-Accept";
 static const nx::Buffer kExtension = "Sec-WebSocket-Extensions";
-static const nx::Buffer kZipExtensionName = "permessage-deflate";
+static const nx::Buffer kCompressionAllowed = "permessage-deflate";
 
 static const nx::Buffer kVersionNum = "13";
 static const nx::Buffer kMagic = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
@@ -120,8 +120,19 @@ CompressionType compressionType(const nx::network::http::HttpHeaders& headers)
     auto extensionHeaderItr = headers.find(kExtension);
     if (extensionHeaderItr != headers.cend())
     {
-        if (extensionHeaderItr->second.indexOf(kZipExtensionName) >= 0)
-            return CompressionType::perMessageInflate;
+        if (extensionHeaderItr->second.indexOf(kCompressionAllowed) >= 0)
+        {
+            auto acceptEncodingHeaderItr = headers.find(kExtension);
+            if (acceptEncodingHeaderItr != headers.end())
+            {
+                for (auto encoding: acceptEncodingHeaderItr->second.split(','))
+                {
+                    encoding = encoding.trimmed().toLower();
+                    if (encoding == "gzip" || encoding == "deflate")
+                        return CompressionType::perMessageInflate;
+                }
+            }
+        }
     }
     return CompressionType::none;
 }
@@ -150,7 +161,7 @@ Error validateRequest(const nx::network::http::Request& request, nx::network::ht
 
     auto extensionHeaderItr = request.headers.find(kExtension);
     if (compressionType(request.headers) == CompressionType::perMessageInflate)
-        response->headers.emplace(kExtension, kZipExtensionName);
+        response->headers.emplace(kExtension, kCompressionAllowed);
 
     return Error::noError;
 }
@@ -162,7 +173,7 @@ void addClientHeaders(nx::network::http::HttpHeaders* headers, const nx::Buffer&
     headers->emplace(kKey, makeClientKey());
     headers->emplace(kVersion, kVersionNum);
     headers->emplace(kProtocol, protocolName);
-    headers->emplace(kExtension, kZipExtensionName);
+    headers->emplace(kExtension, kCompressionAllowed);
 }
 
 void addClientHeaders(nx::network::http::AsyncClient* request, const nx::Buffer& protocolName)
