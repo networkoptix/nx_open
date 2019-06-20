@@ -18,6 +18,7 @@ if(withClouds)
     add_subdirectory(traffic_relay)
     add_subdirectory(time_server)
     add_subdirectory(cloud_connect_test_util)
+    add_subdirectory(storage)
 
     if(withTests)
         add_subdirectory(tests)
