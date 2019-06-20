@@ -69,6 +69,8 @@ Control
             anchors.top: titlePanel.bottom
             anchors.bottom: timelinePanel.top
             anchors.right: resourcesPanelResizer.dragging ? resourcesPanelResizer.left : undefined
+
+            contentItem: ResourceTree {}
         }
 
         // ----------------------------------------------------------------------------------------
