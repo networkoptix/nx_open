@@ -13,6 +13,10 @@
 #endif
 #include <nx/utils/log/log.h>
 
+#if defined (Q_OS_IOS)
+#include <nx/audio/ios_audio_utils.h>
+#endif
+
 #ifdef OPENAL_STATIC
 extern "C" {
 void alc_init(void);
@@ -41,27 +45,6 @@ struct ALCdevice_struct
     ALuint       UpdateSize;
     ALuint       NumUpdates;
 };
-
-// After 11.4 iOS version we have problems with low volume level.
-// Looks like it is because of a lot of fixes related to the audio
-// are made in 11.4. As we haven't been able to find out what is
-// wrong/changed, it is decided to make this workaround.
-void fixVolumeLevel()
-{
-    if (!QnAppInfo::isIos())
-        return;
-
-    if (nx::utils::SoftwareVersion(QSysInfo::productVersion()) < nx::utils::SoftwareVersion(11, 4))
-        return;
-
-
-    const auto& deviceInfo = nx::utils::IosDeviceInformation::currentInformation();
-    const bool isIPhone6 = deviceInfo.majorVersion == nx::utils::IosDeviceInformation::iPhone6;
-    static const int kTimesGain = isIPhone6
-        ? 4 //< Prevents volume overload in iPhone 6.
-        : 64;
-    alListenerf(AL_GAIN, kTimesGain);
-}
 
 } // unnamed namespace
 
@@ -94,6 +77,10 @@ int AudioDevice::internalBufferInSamples(ALCdevice* device)
 
 AudioDevice *AudioDevice::instance()
 {
+#if defined (Q_OS_IOS)
+    forceSpeakersUsage();
+#endif
+
     static AudioDevice audioDevice;
     return &audioDevice;
 }
@@ -135,8 +122,6 @@ AudioDevice::AudioDevice(QObject* parent):
 
     alcMakeContextCurrent(m_context);
     alListener3f(AL_POSITION, 0.0f, 0.0f, 0.0f);
-
-    fixVolumeLevel();
 
     const QByteArray renderer = static_cast<const char*>(alGetString(AL_RENDERER));
     const QByteArray extensions = static_cast<const char*>(alGetString(AL_EXTENSIONS));
