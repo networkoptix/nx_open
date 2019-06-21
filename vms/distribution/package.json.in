@@ -3,6 +3,6 @@
     "component": "@component@",
     "cloudHost" : "@cloud_host@",
     "platform": "@platform@",
-    "variants": "[@variants@]",
+    "variants": [@variants@],
     "installScript": "@install_script@"
 }
