@@ -359,7 +359,7 @@ void LinearizationListModel::Private::sourceRowsInserted(
         q->endInsertRows();
     }
 
-    if (node != m_rootNode && m_sourceModel->rowCount(sourceParent) == count)
+    if (node && node != m_rootNode && m_sourceModel->rowCount(sourceParent) == count)
     {
         const auto parent = index(node);
         if (NX_ASSERT(parent.isValid()))

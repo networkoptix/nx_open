@@ -40,7 +40,7 @@
 #include <ui/style/skin.h>
 
 #include <nx/vms/client/desktop/resource_properties/camera/camera_settings_tab.h>
-#include <nx/vms/client/desktop/resource_views/data/node_type.h>
+#include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 
 #include <utils/common/event_processors.h>
 
@@ -927,7 +927,7 @@ void QnAuditLogDialog::at_customContextMenuRequested(const QPoint&)
         if (resource)
         {
             action::Parameters parameters(resource);
-            parameters.setArgument(Qn::NodeTypeRole, ResourceTreeNodeType::resource);
+            parameters.setArgument(Qn::NodeTypeRole, ResourceTree::NodeType::resource);
 
             menu.reset(manager->newMenu(action::TreeScope, nullptr, parameters));
             foreach(QAction* action, menu->actions())

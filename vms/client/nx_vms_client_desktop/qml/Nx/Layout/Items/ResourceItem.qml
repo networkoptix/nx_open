@@ -221,6 +221,11 @@ Item
         item: mouseArea
         target: contentItem
 
+        onMousePress:
+        {
+            flickableView.currentItem = resourceItemControl
+        }
+
         onStarted:
         {
             contentGeometryAnimation.stop()

@@ -3,23 +3,24 @@
 #include <ui/style/resource_icon_cache.h>
 #include <ui/style/skin.h>
 
+#include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/ui/scene/models/resource_tree_model_adapter.h>
 
 namespace nx::vms::client::desktop {
 
 namespace {
 
-QIcon::Mode iconMode(ResourceTreeModelAdapter::ItemState itemState)
+QIcon::Mode iconMode(ResourceTree::ItemState itemState)
 {
     switch (itemState)
     {
-        case ResourceTreeModelAdapter::ItemState::normal:
+        case ResourceTree::ItemState::normal:
             return QIcon::Normal;
 
-        case ResourceTreeModelAdapter::ItemState::selected:
+        case ResourceTree::ItemState::selected:
             return QIcon::Selected;
 
-        case ResourceTreeModelAdapter::ItemState::accented:
+        case ResourceTree::ItemState::accented:
             return QIcon::Active;
 
         default:
@@ -38,8 +39,9 @@ QPixmap ResourceIconProvider::requestPixmap(
     if (key == 0)
         return {};
 
-    using ItemState = ResourceTreeModelAdapter::ItemState;
-    const auto state = path.empty() ? ItemState::normal: ItemState(path.takeFirst().toInt());
+    const auto state = path.empty()
+        ? ResourceTree::ItemState::normal
+        : ResourceTree::ItemState(path.takeFirst().toInt());
 
     return QnSkin::maximumSizePixmap(
         qnResIconCache->icon(QnResourceIconCache::Key(key)),

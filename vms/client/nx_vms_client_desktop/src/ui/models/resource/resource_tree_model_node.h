@@ -13,7 +13,7 @@
 #include <nx/vms/client/desktop/resource_views/data/camera_extra_status.h>
 
 #include <ui/models/resource/resource_tree_model_fwd.h>
-#include <nx/vms/client/desktop/resource_views/data/node_type.h>
+#include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 
 #include <ui/workbench/workbench_context_aware.h>
 
@@ -30,7 +30,7 @@ class QnResourceTreeModelNode:
     using base_type = Connective<QObject>;
 
 public:
-    using NodeType = nx::vms::client::desktop::ResourceTreeNodeType;
+    using NodeType = nx::vms::client::desktop::ResourceTree::NodeType;
     enum State
     {
         Normal,     /**< Normal node. */

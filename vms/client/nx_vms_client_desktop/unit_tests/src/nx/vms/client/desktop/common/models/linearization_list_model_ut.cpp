@@ -364,6 +364,7 @@ TEST_F(LinearizationListModelTest, sourceRowsInserted)
 
     sourceModel->item(1)->insertRows(0, {new QStandardItem("x0"), new QStandardItem("x1")});
     sourceModel->item(2)->child(1)->insertRow(3, new QStandardItem("113"));
+    sourceModel->item(4)->child(0)->appendRow(new QStandardItem("300"));
 
     ASSERT_EQ(dataChanges, QList<DataChange>({{{LLM::HasChildrenRole}, "1"}}));
 
@@ -376,15 +377,15 @@ TEST_F(LinearizationListModelTest, sourceRowsInserted)
 
     ASSERT_EQ(itemData<QString>(Qt::DisplayRole), QStringList(
         {"0", "00", "01", "x", "x0", "x1", "1", "10", "11",
-            "110", "111", "112", "113", "114", "12", "2", "3", "30", "31"}));
+            "110", "111", "112", "113", "114", "12", "2", "3", "30", "300", "31"}));
     ASSERT_EQ(itemData<int>(LLM::LevelRole), QList<int>(
-        {0, 1, 1, 0, 1, 1, 0, 1, 1, 2, 2, 2, 2, 2, 1, 0, 0, 1, 1}));
+        {0, 1, 1, 0, 1, 1, 0, 1, 1, 2, 2, 2, 2, 2, 1, 0, 0, 1, 2, 1}));
     ASSERT_EQ(itemData<bool>(LLM::HasChildrenRole), QList<bool>(
         {true, false, false, true, false, false, true, false, true,
-            false, false, false, false, false, false, true, true, false, false}));
+            false, false, false, false, false, false, true, true, true, false, false}));
     ASSERT_EQ(itemData<bool>(LLM::ExpandedRole), QList<bool>(
         {true, false, false, true, false, false, true, false, true,
-            false, false, false, false, false, false, false, true, false, false }));
+            false, false, false, false, false, false, false, true, true, false, false }));
 
     ASSERT_EQ(dataChanges, QList<DataChange>({{{LLM::HasChildrenRole}, "15"}}));
 }

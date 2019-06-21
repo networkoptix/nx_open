@@ -41,7 +41,7 @@
 #include <api/global_settings.h>
 
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <nx/vms/client/desktop/resource_views/data/node_type.h>
+#include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/utils/wearable_manager.h>
 #include <nx/vms/client/desktop/utils/wearable_state.h>
 #include <ui/delegates/resource_tree_model_custom_column_delegate.h>
@@ -86,32 +86,32 @@ bool intersects(const QStringList &l, const QStringList &r)
 }
 
 /** Set of top-level node types */
-QList<ResourceTreeNodeType> rootNodeTypes()
+QList<ResourceTree::NodeType> rootNodeTypes()
 {
-    static QList<ResourceTreeNodeType> result;
+    static QList<ResourceTree::NodeType> result;
     if (result.isEmpty())
     {
         result
-            << ResourceTreeNodeType::currentSystem
-            << ResourceTreeNodeType::currentUser
-            << ResourceTreeNodeType::separator
-            << ResourceTreeNodeType::users
-            << ResourceTreeNodeType::servers
-            << ResourceTreeNodeType::filteredServers
-            << ResourceTreeNodeType::filteredCameras
-            << ResourceTreeNodeType::filteredVideowalls
-            << ResourceTreeNodeType::filteredUsers
-            << ResourceTreeNodeType::filteredLayouts
-            << ResourceTreeNodeType::userResources
-            << ResourceTreeNodeType::layouts
-            << ResourceTreeNodeType::layoutTours
-            << ResourceTreeNodeType::webPages
-            << ResourceTreeNodeType::analyticsEngines
-            << ResourceTreeNodeType::localResources
-            << ResourceTreeNodeType::localSeparator
-            << ResourceTreeNodeType::otherSystems
-            << ResourceTreeNodeType::root
-            << ResourceTreeNodeType::bastard;
+            << ResourceTree::NodeType::currentSystem
+            << ResourceTree::NodeType::currentUser
+            << ResourceTree::NodeType::separator
+            << ResourceTree::NodeType::users
+            << ResourceTree::NodeType::servers
+            << ResourceTree::NodeType::filteredServers
+            << ResourceTree::NodeType::filteredCameras
+            << ResourceTree::NodeType::filteredVideowalls
+            << ResourceTree::NodeType::filteredUsers
+            << ResourceTree::NodeType::filteredLayouts
+            << ResourceTree::NodeType::userResources
+            << ResourceTree::NodeType::layouts
+            << ResourceTree::NodeType::layoutTours
+            << ResourceTree::NodeType::webPages
+            << ResourceTree::NodeType::analyticsEngines
+            << ResourceTree::NodeType::localResources
+            << ResourceTree::NodeType::localSeparator
+            << ResourceTree::NodeType::otherSystems
+            << ResourceTree::NodeType::root
+            << ResourceTree::NodeType::bastard;
     }
     return result;
 }
@@ -544,7 +544,7 @@ void QnResourceTreeModel::updateNodeResource(const QnResourceTreeModelNodePtr& n
         m_nodesByResource[resource].push_back(node);
 }
 
-ResourceTreeNodeType QnResourceTreeModel::rootNodeTypeForScope() const
+ResourceTree::NodeType QnResourceTreeModel::rootNodeTypeForScope() const
 {
     switch (m_scope)
     {
@@ -700,7 +700,6 @@ QHash<int,QByteArray> QnResourceTreeModel::roleNames() const
     roles.insert(Qn::NodeTypeRole, "nodeType");
     roles.insert(Qn::ResourceIconKeyRole, "iconKey");
     roles.insert(Qn::ExtraResourceInfoRole, "extraInfo");
-    roles.insert(Qn::SeparatorRole, "separator");
     return roles;
 }
 
@@ -734,7 +733,7 @@ QMimeData* QnResourceTreeModel::mimeData(const QModelIndexList& indexes) const
 
         switch (node->type())
         {
-            case ResourceTreeNodeType::recorder:
+            case ResourceTree::NodeType::recorder:
             {
                 for (auto child: node->children())
                 {
@@ -743,11 +742,11 @@ QMimeData* QnResourceTreeModel::mimeData(const QModelIndexList& indexes) const
                 }
                 break;
             }
-            case ResourceTreeNodeType::videoWallItem:
-            case ResourceTreeNodeType::layoutTour:
+            case ResourceTree::NodeType::videoWallItem:
+            case ResourceTree::NodeType::layoutTour:
                 entities << node->uuid();
                 break;
-            case ResourceTreeNodeType::layoutItem:
+            case ResourceTree::NodeType::layoutItem:
                 pureTreeResourcesOnly = false;
                 break;
             default:
@@ -793,7 +792,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::dropNode(const QMimeData* mimeDa
     // There are some drag&drop behaviours, that require to move up through the tree
 
     // Dropping into an item is the same as dropping into a layout.
-    if (node->type() == ResourceTreeNodeType::layoutItem)
+    if (node->type() == ResourceTree::NodeType::layoutItem)
     {
         node = node->parent();
         if (!check(node, Qn::layout))
@@ -801,10 +800,10 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::dropNode(const QMimeData* mimeDa
     }
 
     // Dropping into accessible layouts is the same as dropping into a user.
-    if (node->type() == ResourceTreeNodeType::sharedLayouts)
+    if (node->type() == ResourceTree::NodeType::sharedLayouts)
     {
         node = node->parent();
-        if (node->type() != ResourceTreeNodeType::role && !check(node, Qn::user))
+        if (node->type() != ResourceTree::NodeType::role && !check(node, Qn::user))
             return {};
     }
 
@@ -817,18 +816,18 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::dropNode(const QMimeData* mimeDa
     }
 
     // Dropping something into a group of resources.
-    // Dropping at a group of cameras -> ResourceTreeNodeType::sharedResources
-    // Dropping at a group of layouts -> ResourceTreeNodeType::sharedLayouts
+    // Dropping at a group of cameras -> ResourceTree::NodeType::sharedResources
+    // Dropping at a group of layouts -> ResourceTree::NodeType::sharedLayouts
     // In both cases we expect that parent node is user or user role.
-    if (node->type() == ResourceTreeNodeType::sharedResources
-        || node->type() == ResourceTreeNodeType::sharedLayouts)
+    if (node->type() == ResourceTree::NodeType::sharedResources
+        || node->type() == ResourceTree::NodeType::sharedLayouts)
     {
         node = node->parent();
         if (!node)
             return {};
         auto parentType = node->type();
-        if (parentType != ResourceTreeNodeType::role
-            && parentType != ResourceTreeNodeType::resource)
+        if (parentType != ResourceTree::NodeType::role
+            && parentType != ResourceTree::NodeType::resource)
         {
             return {};
         }
@@ -889,7 +888,7 @@ bool QnResourceTreeModel::dropMimeData(const QMimeData* mimeData, Qt::DropAction
     resourcePool()->addNewResources(data.resources());
 
     // Drop on videowall is handled in videowall.
-    if (node->type() == ResourceTreeNodeType::videoWallItem)
+    if (node->type() == ResourceTree::NodeType::videoWallItem)
     {
         const auto videoWallItems = resourcePool()->getVideoWallItemsByUuid(data.entities());
 
@@ -905,7 +904,7 @@ bool QnResourceTreeModel::dropMimeData(const QMimeData* mimeData, Qt::DropAction
         parameters.setArgument(Qn::VideoWallItemGuidRole, node->uuid());
         menu()->trigger(action::DropOnVideoWallItemAction, parameters);
     }
-    else if (node->type() == ResourceTreeNodeType::role)
+    else if (node->type() == ResourceTree::NodeType::role)
     {
         auto layoutsToShare = data.resources().filtered<QnLayoutResource>(
             [](const QnLayoutResourcePtr& layout)
@@ -1085,7 +1084,7 @@ void QnResourceTreeModel::at_resPool_resourceRemoved(const QnResourcePtr& resour
         if (node->resource() != resource)
             continue;
 
-        if (node->type() == ResourceTreeNodeType::videoWallItem)
+        if (node->type() == ResourceTree::NodeType::videoWallItem)
             updateNodeResource(node, QnResourcePtr());
         else
             nodesToDelete << node;
@@ -1107,7 +1106,7 @@ void QnResourceTreeModel::rebuildTree()
     // TODO: #vkutin #gdm Implement "model reset" logic for the tree.
     // Currently it's not handled, "rows inserted/removed" is handled instead.
 
-    m_rootNodes[ResourceTreeNodeType::currentUser]->setResource(context()->user());
+    m_rootNodes[ResourceTree::NodeType::currentUser]->setResource(context()->user());
 
     // Force re-create camera nodes for edge servers.
     for (const auto& resource: commonModule()->resourcePool()->getAllServers(Qn::AnyStatus))
@@ -1234,7 +1233,7 @@ void QnResourceTreeModel::updateSystemHasManyServers()
         }
     }
 
-    updateNodeParent(m_rootNodes[ResourceTreeNodeType::servers]);
+    updateNodeParent(m_rootNodes[ResourceTree::NodeType::servers]);
 }
 
 void QnResourceTreeModel::at_snapshotManager_flagsChanged(const QnLayoutResourcePtr &layout)
@@ -1257,7 +1256,7 @@ void QnResourceTreeModel::at_resource_parentIdChanged(const QnResourcePtr &resou
         if (auto camera = resource.dynamicCast<QnVirtualCameraResource>())
         {
             auto server = camera->getParentServer();
-            bool wasEdge = (node->type() == ResourceTreeNodeType::edge);
+            bool wasEdge = (node->type() == ResourceTree::NodeType::edge);
             bool mustBeEdge = QnMediaServerResource::isHiddenServer(server);
             if (wasEdge != mustBeEdge)
             {
@@ -1280,7 +1279,7 @@ void QnResourceTreeModel::at_resource_parentIdChanged(const QnResourcePtr &resou
 void QnResourceTreeModel::at_videoWall_itemAdded(const QnVideoWallResourcePtr& videoWall, const QnVideoWallItem& item)
 {
     auto parentNode = ensureResourceNode(videoWall);
-    auto node = ensureItemNode(parentNode, item.uuid, ResourceTreeNodeType::videoWallItem);
+    auto node = ensureItemNode(parentNode, item.uuid, ResourceTree::NodeType::videoWallItem);
 
     QnResourcePtr resource;
     if (!item.layout.isNull())
@@ -1303,7 +1302,7 @@ void QnResourceTreeModel::at_videoWall_itemRemoved(const QnVideoWallResourcePtr&
 void QnResourceTreeModel::at_videoWall_matrixAddedOrChanged(const QnVideoWallResourcePtr& videoWall, const QnVideoWallMatrix& matrix)
 {
     auto parentNode = ensureResourceNode(videoWall);
-    auto node = ensureItemNode(parentNode, matrix.uuid, ResourceTreeNodeType::videoWallMatrix);
+    auto node = ensureItemNode(parentNode, matrix.uuid, ResourceTree::NodeType::videoWallMatrix);
     node->update(); // TODO: #GDM what for?
 }
 
@@ -1337,12 +1336,12 @@ void QnResourceTreeModel::at_server_redundancyChanged(const QnResourcePtr& resou
 
 void QnResourceTreeModel::at_systemNameChanged()
 {
-    m_rootNodes[ResourceTreeNodeType::currentSystem]->update();
+    m_rootNodes[ResourceTree::NodeType::currentSystem]->update();
 }
 
 void QnResourceTreeModel::at_autoDiscoveryEnabledChanged()
 {
-    m_rootNodes[ResourceTreeNodeType::otherSystems]->update();
+    m_rootNodes[ResourceTree::NodeType::otherSystems]->update();
 }
 
 void QnResourceTreeModel::at_wearableManager_stateChanged(const WearableState& state)

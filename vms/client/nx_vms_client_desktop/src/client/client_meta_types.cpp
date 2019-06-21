@@ -31,7 +31,7 @@
 #include <nx/vms/client/desktop/common/models/linearization_list_model.h>
 #include <nx/vms/client/desktop/utils/server_file_cache.h>
 #include <nx/vms/client/desktop/export/settings/export_media_persistent_settings.h>
-#include <nx/vms/client/desktop/resource_views/data/node_type.h>
+#include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/utils/upload_state.h>
 #include <nx/vms/client/desktop/utils/wearable_payload.h>
 #include <nx/vms/client/desktop/utils/wearable_state.h>
@@ -41,6 +41,7 @@
 #include <api/server_rest_connection.h>
 
 #include <nx/vms/client/desktop/resource_properties/camera/widgets/motion_regions_item.h>
+#include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/ui/common/recording_status_helper.h>
 #include <nx/vms/client/desktop/ui/common/focus_frame_item.h>
@@ -77,7 +78,7 @@ void QnClientMetaTypes::initialize()
 
     qRegisterMetaTypeStreamOperators<QList<QUrl>>();
 
-    qRegisterMetaType<ResourceTreeNodeType>();
+    qRegisterMetaType<ResourceTree::NodeType>();
     qRegisterMetaType<Qn::ItemRole>();
     qRegisterMetaType<Qn::ItemDataRole>();
     qRegisterMetaType<QnThumbnail>();
@@ -181,6 +182,7 @@ void QnClientMetaTypes::registerQmlTypes()
     LayoutModel::registerQmlType();
     LinearizationListModel::registerQmlType();
     ResourceTreeModelAdapter::registerQmlType();
+    ResourceTree::registerQmlType();
 
     qmlRegisterUncreatableType<QnWorkbench>("nx.client.desktop", 1, 0, "Workbench",
         lit("Cannot create instance of Workbench."));

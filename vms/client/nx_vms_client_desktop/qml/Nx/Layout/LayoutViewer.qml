@@ -13,8 +13,27 @@ Control
     id: layoutViewer
 
     property var layout: null
+    readonly property Item currentItem: flickableView.currentItem
+    readonly property var currentResource: getResource(currentItem)
 
     background: Rectangle { color: ColorTheme.window }
+
+    function getResource(resourceItem)
+    {
+        return resourceItem && resourceItem.layoutItemData && resourceItem.layoutItemData.resource
+    }
+
+    function containsResource(resource)
+    {
+        if (resource)
+        {
+            for (var i = 0; i < repeater.count; ++i)
+                if (getResource(repeater.itemAt(i).contentItem) === resource)
+                    return true
+        }
+
+        return false
+    }
 
     contentItem: FlickableView
     {
@@ -161,13 +180,30 @@ Control
                 {
                     Positioners.Grid.geometry: model.itemData.geometry
 
+                    readonly property Item contentItem: resourceItem
                     ResourceItem
                     {
+                        id: resourceItem
                         anchors.centerIn: parent
                         width: parent.width * (1 - gridLayout.cellSpacingFactor)
                         height: parent.height * (1 - gridLayout.cellSpacingFactor)
                         layoutItemData: model.itemData
                     }
+                }
+
+                onItemAdded:
+                {
+                    if (!flickableView.currentItem)
+                        flickableView.currentItem = item.contentItem
+                }
+
+                onItemRemoved:
+                {
+                    if (flickableView.currentItem !== item.contentItem || count === 0)
+                        return
+
+                    var next = (index < count) ? index : (index - 1)
+                    flickableView.currentItem = itemAt(next).contentItem
                 }
             }
         }

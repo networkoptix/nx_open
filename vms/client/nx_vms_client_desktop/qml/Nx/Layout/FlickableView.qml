@@ -25,6 +25,7 @@ Item
     property bool alignToCenterWhenUnzoomed: false
 
     property Item zoomedItem: null
+    property Item currentItem: null
 
     signal clicked(int x, int y, int button)
     signal doubleClicked(int x, int y, int button)

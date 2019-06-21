@@ -39,25 +39,25 @@ using namespace nx::vms::client::desktop::ui;
 namespace {
 
 /* Set of node types, that are require children to be visible. */
-bool nodeRequiresChildren(ResourceTreeNodeType nodeType)
+bool nodeRequiresChildren(ResourceTree::NodeType nodeType)
 {
     switch (nodeType)
     {
-        case ResourceTreeNodeType::otherSystems:
-        case ResourceTreeNodeType::servers:
-        case ResourceTreeNodeType::filteredServers:
-        case ResourceTreeNodeType::filteredCameras:
-        case ResourceTreeNodeType::filteredLayouts:
-        case ResourceTreeNodeType::filteredUsers:
-        case ResourceTreeNodeType::filteredVideowalls:
-        case ResourceTreeNodeType::userResources:
-        case ResourceTreeNodeType::recorder:
-        case ResourceTreeNodeType::localSystem:
-        case ResourceTreeNodeType::roleUsers:
-        case ResourceTreeNodeType::layouts:
-        case ResourceTreeNodeType::sharedResources:
-        case ResourceTreeNodeType::sharedLayouts:
-        case ResourceTreeNodeType::layoutTours:
+        case ResourceTree::NodeType::otherSystems:
+        case ResourceTree::NodeType::servers:
+        case ResourceTree::NodeType::filteredServers:
+        case ResourceTree::NodeType::filteredCameras:
+        case ResourceTree::NodeType::filteredLayouts:
+        case ResourceTree::NodeType::filteredUsers:
+        case ResourceTree::NodeType::filteredVideowalls:
+        case ResourceTree::NodeType::userResources:
+        case ResourceTree::NodeType::recorder:
+        case ResourceTree::NodeType::localSystem:
+        case ResourceTree::NodeType::roleUsers:
+        case ResourceTree::NodeType::layouts:
+        case ResourceTree::NodeType::sharedResources:
+        case ResourceTree::NodeType::sharedLayouts:
+        case ResourceTree::NodeType::layoutTours:
             return true;
         default:
             return false;
@@ -430,7 +430,7 @@ void QnResourceTreeModelNode::deinitialize()
     m_initialized = false;
 }
 
-ResourceTreeNodeType QnResourceTreeModelNode::type() const
+ResourceTree::NodeType QnResourceTreeModelNode::type() const
 {
     return m_type;
 }
@@ -854,9 +854,6 @@ QVariant QnResourceTreeModelNode::data(int role, int column) const
 
         case Qn::ExtraResourceInfoRole:
             return QnResourceDisplayInfo(m_resource).extraInfo();
-
-        case Qn::SeparatorRole:
-            return m_type == NodeType::separator || m_type == NodeType::localSeparator;
 
         default:
             break;

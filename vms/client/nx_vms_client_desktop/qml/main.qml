@@ -70,7 +70,10 @@ Control
             anchors.bottom: timelinePanel.top
             anchors.right: resourcesPanelResizer.dragging ? resourcesPanelResizer.left : undefined
 
-            contentItem: ResourceTree {}
+            contentItem: ResourceTree
+            {
+                scene: mainWindowRoot.contentItem
+            }
         }
 
         // ----------------------------------------------------------------------------------------
