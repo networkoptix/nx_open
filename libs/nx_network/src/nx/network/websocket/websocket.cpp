@@ -43,6 +43,7 @@ WebSocket::WebSocket(
 
 WebSocket::WebSocket(
     std::unique_ptr<AbstractStreamSocket> streamSocket,
+    Role role,
     FrameType frameType,
     network::websocket::CompressionType compressionType)
     :
@@ -50,7 +51,7 @@ WebSocket::WebSocket(
         std::move(streamSocket),
         SendMode::singleMessage,
         ReceiveMode::message,
-        Role::undefined,
+        role,
         frameType,
         compressionType)
 {

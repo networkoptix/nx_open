@@ -18,8 +18,7 @@ enum class PayloadType
 enum class Role
 {
     client,
-    server,
-    undefined
+    server
 };
 
 enum FrameType

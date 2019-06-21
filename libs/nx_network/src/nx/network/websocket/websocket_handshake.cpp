@@ -73,7 +73,9 @@ static Error validateRequestHeaders(const nx::network::http::HttpHeaders& header
     return Error::noError;
 }
 
-static Error validateResponseHeaders(const nx::network::http::HttpHeaders& headers, const nx::network::http::Request& request)
+static Error validateResponseHeaders(
+    const nx::network::http::HttpHeaders& headers,
+    const nx::network::http::Request& request)
 {
     if (validateHeaders(headers) != Error::noError)
         return Error::handshakeError;
@@ -113,35 +115,22 @@ nx::Buffer makeAcceptKey(const nx::Buffer& requestKey)
     return hash.result().toBase64();
 }
 
-}
+} // namespace detail
 
 CompressionType compressionType(const nx::network::http::HttpHeaders& headers)
 {
     auto extensionHeaderItr = headers.find(kExtension);
-    if (extensionHeaderItr != headers.cend())
+    if (extensionHeaderItr != headers.cend()
+        && extensionHeaderItr->second.contains(kCompressionAllowed))
     {
-        if (extensionHeaderItr->second.indexOf(kCompressionAllowed) >= 0)
-        {
-            auto encodingHeaderItr = headers.find("Accept-Encoding");
-            if (encodingHeaderItr != headers.end())
-            {
-                for (auto encoding: encodingHeaderItr->second.split(','))
-                {
-                    encoding = encoding.trimmed().toLower();
-                    if (encoding == "gzip" || encoding == "deflate")
-                        return CompressionType::perMessageInflate;
-                }
-            }
-            else
-            {
-                return CompressionType::perMessageInflate;
-            }
-        }
+        return CompressionType::perMessageInflate;
     }
     return CompressionType::none;
 }
 
-Error validateRequest(const nx::network::http::Request& request, nx::network::http::Response* response)
+Error validateRequest(
+    const nx::network::http::Request& request,
+    nx::network::http::Response* response)
 {
     Error result = validateRequestLine(request.requestLine);
     if (result != Error::noError)
@@ -163,31 +152,39 @@ Error validateRequest(const nx::network::http::Request& request, nx::network::ht
     if (websocketProtocolIt != request.headers.cend())
         response->headers.emplace(kProtocol, websocketProtocolIt->second);
 
-    auto extensionHeaderItr = request.headers.find(kExtension);
-    if (compressionType(request.headers) == CompressionType::perMessageInflate)
+    if (compressionType(request.headers) != CompressionType::none)
         response->headers.emplace(kExtension, kCompressionAllowed);
 
     return Error::noError;
 }
 
-void addClientHeaders(nx::network::http::HttpHeaders* headers, const nx::Buffer& protocolName)
+void addClientHeaders(
+    nx::network::http::HttpHeaders* headers,
+    const nx::Buffer& protocolName,
+    CompressionType compressionType)
 {
     headers->emplace(kUpgrade, kWebsocketProtocolName);
     headers->emplace(kConnection, kUpgrade);
     headers->emplace(kKey, makeClientKey());
     headers->emplace(kVersion, kVersionNum);
     headers->emplace(kProtocol, protocolName);
-    headers->emplace(kExtension, kCompressionAllowed);
+    if (compressionType != CompressionType::none)
+        headers->emplace(kExtension, kCompressionAllowed);
 }
 
-void addClientHeaders(nx::network::http::AsyncClient* request, const nx::Buffer& protocolName)
+void addClientHeaders(
+    nx::network::http::AsyncClient* request,
+    const nx::Buffer& protocolName,
+    CompressionType compressionType)
 {
     nx::network::http::HttpHeaders headers;
-    addClientHeaders(&headers, protocolName);
+    addClientHeaders(&headers, protocolName, compressionType);
     request->setAdditionalHeaders(std::move(headers));
 }
 
-Error validateResponse(const nx::network::http::Request& request, const nx::network::http::Response& response)
+Error validateResponse(
+    const nx::network::http::Request& request,
+    const nx::network::http::Response& response)
 {
     if (response.statusLine.statusCode != nx::network::http::StatusCode::switchingProtocols)
         return Error::handshakeError;

@@ -29,14 +29,15 @@ public:
      */
     WebSocket(
         std::unique_ptr<AbstractStreamSocket> streamSocket,
-        SendMode sendMode = SendMode::singleMessage,
-        ReceiveMode receiveMode = ReceiveMode::message,
-        Role role = Role::undefined,
-        FrameType frameType= FrameType::binary,
-        network::websocket::CompressionType compressionType = CompressionType::none);
+        SendMode sendMode,
+        ReceiveMode receiveMode,
+        Role role,
+        FrameType frameType,
+        network::websocket::CompressionType compressionType);
 
     WebSocket(
         std::unique_ptr<AbstractStreamSocket> streamSocket,
+        Role role,
         FrameType frameType,
         network::websocket::CompressionType compressionType);
 

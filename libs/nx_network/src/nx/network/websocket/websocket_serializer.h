@@ -10,7 +10,7 @@ namespace websocket {
 class NX_NETWORK_API Serializer
 {
 public:
-    Serializer(bool masked, unsigned mask = 0);
+    Serializer(bool masked, CompressionType compressionType, unsigned mask = 0);
 
     void prepareMessage(
         const nx::Buffer& payload,
@@ -28,11 +28,12 @@ public:
         FrameType type, bool fin, char* out, int outLen);
 
 private:
-    void setMasked(bool masked, unsigned mask = 0);
-
-private:
     bool m_masked;
+    CompressionType m_compressionType;
     unsigned m_mask;
+
+    void setMasked(bool masked, unsigned mask = 0);
+    int fillHeader(char* data, bool fin, int opCode, int payloadLenType, int payloadLen);
 };
 
 
