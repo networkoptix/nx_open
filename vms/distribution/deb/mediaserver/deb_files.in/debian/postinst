@@ -289,4 +289,3 @@ sleep 1
 echo Started service $(ps aux | grep "mediaserver-bin -e" | grep -v grep)
 
 displayCompleteSetupHint $PORT
-
