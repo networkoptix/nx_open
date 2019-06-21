@@ -18,25 +18,21 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((InstallationInfo), (json), _Fields)
  */
 static QString readFileIfExists(const QString& filename)
 {
-    QString result;
     QFile file(filename);
 
     if (!file.exists())
     {
         NX_DEBUG(kLogTag, "File %1 does not exist", filename);
-        return result;
+        return QString();
     }
 
     if (!file.open(QFile::ReadOnly | QFile::Text))
     {
         NX_ERROR(kLogTag, "Unable to open file %1", filename);
-        return result;
+        return QString();
     }
 
-    result = QTextStream(&file).readAll();
-    file.close();
-
-    return result;
+    return QTextStream(&file).readAll();
 }
 
 static void loadInstallationInfo(InstallationInfo* installationInfo)
