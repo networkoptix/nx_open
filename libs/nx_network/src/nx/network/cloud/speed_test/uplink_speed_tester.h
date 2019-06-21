@@ -52,7 +52,6 @@ private:
     std::unique_ptr<UplinkBandwidthTester> m_bandwidthTester;
     PingTestContext m_testContext;
 
-	nx::hpm::api::ConnectionSpeed m_result;
     CompletionHandler m_handler;
 };
 
