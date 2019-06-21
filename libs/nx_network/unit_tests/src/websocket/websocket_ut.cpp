@@ -251,7 +251,7 @@ std::string ConnectedSocketsSupplier::lastError()
 //-------------------------------------------------------------------------------------------------
 
 class WebSocket:
-    public ::testing::Test
+    public ::testing::TestWithParam<CompressionType>
 {
 protected:
     WebSocket():
@@ -283,14 +283,19 @@ protected:
             new TestWebSocket(
                 m_socketsSupplier.clientSocket(),
                 clientSendMode,
-                clientReceiveMode));
+                clientReceiveMode,
+                Role::undefined,
+                FrameType::binary,
+                GetParam()));
 
         serverWebSocket.reset(
             new TestWebSocket(
                 m_socketsSupplier.serverSocket(),
                 serverSendMode,
                 serverReceiveMode,
-                serverRole));
+                serverRole,
+                FrameType::binary,
+                GetParam()));
 
         clientWebSocket->bindToAioThread(serverWebSocket->getAioThread());
         clientWebSocket->setAliveTimeout(clientTimeout);
@@ -668,7 +673,7 @@ protected:
     const std::chrono::milliseconds kShortTimeout = std::chrono::milliseconds(3000);
 };
 
-TEST_F(WebSocket, MultipleMessages_twoWay)
+TEST_P(WebSocket, MultipleMessages_twoWay)
 {
     givenClientTestDataPrepared(1 * 1024 * 1024);
     givenServerTestDataPrepared(2 * 1024 * 1024);
@@ -682,7 +687,7 @@ TEST_F(WebSocket, MultipleMessages_twoWay)
     readyFuture.wait();
 }
 
-TEST_F(WebSocket, MultipleMessages_ReceiveModeFrame_twoWay)
+TEST_P(WebSocket, MultipleMessages_ReceiveModeFrame_twoWay)
 {
     givenClientTestDataPrepared(1 * 1024 * 1024);
     givenServerTestDataPrepared(2 * 1024 * 1024);
@@ -696,7 +701,7 @@ TEST_F(WebSocket, MultipleMessages_ReceiveModeFrame_twoWay)
     thenTransferFinishedSuccessfully();
 }
 
-TEST_F(WebSocket, MultipleMessagesFromClient_ServerResponds)
+TEST_P(WebSocket, MultipleMessagesFromClient_ServerResponds)
 {
     givenClientTestDataPrepared(1 * 1024 * 1024);
     givenServerTestDataPrepared(2 * 1024 * 1024);
@@ -711,6 +716,10 @@ TEST_F(WebSocket, MultipleMessagesFromClient_ServerResponds)
     readyFuture.wait();
 }
 
+INSTANTIATE_TEST_CASE_P(
+    Websockets_differentCompressionModes,
+    WebSocket,
+    ::testing::Values(CompressionType::none, CompressionType::perMessageInflate));
 
 cf::future<cf::unit> websocketTestReader(std::unique_ptr<TestWebSocket>& socket, int iterations)
 {
@@ -797,7 +806,7 @@ cf::future<cf::unit> websocketTestWriter(
         });
 }
 
-TEST_F(WebSocket, Wrappers)
+TEST_P(WebSocket, Wrappers)
 {
     givenClientTestDataPrepared(1 * 1024 * 1024);
     givenClientModes(SendMode::singleMessage, ReceiveMode::message);
@@ -1007,7 +1016,7 @@ TEST_F(WebSocket_PingPong, Close)
     ASSERT_FALSE(serverWebSocket);
 }
 
-TEST_F(WebSocket, SendMultiFrame_ReceiveSingleMessage)
+TEST_P(WebSocket, SendMultiFrame_ReceiveSingleMessage)
 {
     givenClientModes(SendMode::multiFrameMessage, ReceiveMode::frame);
     givenServerModes(SendMode::multiFrameMessage, ReceiveMode::message);
@@ -1061,7 +1070,7 @@ TEST_F(WebSocket, SendMultiFrame_ReceiveSingleMessage)
     ASSERT_GE(sentMessageCount, receivedMessageCount);
 }
 
-TEST_F(WebSocket, SendMultiFrame_ReceiveFrame)
+TEST_P(WebSocket, SendMultiFrame_ReceiveFrame)
 {
     givenClientModes(SendMode::multiFrameMessage, ReceiveMode::frame);
     givenServerModes(SendMode::multiFrameMessage, ReceiveMode::frame);
@@ -1119,7 +1128,7 @@ TEST_F(WebSocket, SendMultiFrame_ReceiveFrame)
     ASSERT_EQ(receivedFrameCount, kTotalMessageCount*kMessageFrameCount);
 }
 
-TEST_F(WebSocket, SendMultiFrame_ReceiveStream)
+TEST_P(WebSocket, SendMultiFrame_ReceiveStream)
 {
     givenClientModes(SendMode::multiFrameMessage, ReceiveMode::frame);
     givenServerModes(SendMode::multiFrameMessage, ReceiveMode::stream);
@@ -1173,7 +1182,7 @@ TEST_F(WebSocket, SendMultiFrame_ReceiveStream)
     ASSERT_TRUE(true);
 }
 
-TEST_F(WebSocket, SendMessage_ReceiveStream)
+TEST_P(WebSocket, SendMessage_ReceiveStream)
 {
     givenClientModes(SendMode::singleMessage, ReceiveMode::frame);
     givenServerModes(SendMode::multiFrameMessage, ReceiveMode::stream);
@@ -1251,7 +1260,7 @@ TEST_F(WebSocket_PingPong, UnexpectedClose_deleteFromCb_receive)
     ASSERT_FALSE(serverWebSocket);
 }
 
-TEST_F(WebSocket, UnexpectedClose_deleteFromCb_ParseError)
+TEST_P(WebSocket, UnexpectedClose_deleteFromCb_ParseError)
 {
     givenClientModes(SendMode::singleMessage, ReceiveMode::message);
     givenServerModes(SendMode::singleMessage, ReceiveMode::message);
@@ -1303,7 +1312,7 @@ TEST_F(WebSocket, UnexpectedClose_deleteFromCb_ParseError)
     ASSERT_TRUE(!serverWebSocket);
 }
 
-TEST_F(WebSocket, UnexpectedClose_ReadReturnedZero)
+TEST_P(WebSocket, UnexpectedClose_ReadReturnedZero)
 {
     givenClientModes(SendMode::singleMessage, ReceiveMode::message);
     givenServerModes(SendMode::singleMessage, ReceiveMode::message);
@@ -1357,7 +1366,7 @@ TEST_F(WebSocket, UnexpectedClose_ReadReturnedZero)
     ASSERT_TRUE(!serverWebSocket);
 }
 
-TEST_F(WebSocket, imcomingMessagesQueueOverflow)
+TEST_P(WebSocket, imcomingMessagesQueueOverflow)
 {
     givenClientModes(SendMode::singleMessage, ReceiveMode::message);
     givenServerModes(SendMode::singleMessage, ReceiveMode::message);
