@@ -907,7 +907,7 @@
     <message>
       <location/>
       <source>Edit Streams...</source>
-      <translation type="unfinished">Edit Streams...</translation>
+      <translation>Chỉnh sửa luồng...</translation>
     </message>
   </context>
   <context>
@@ -1630,7 +1630,7 @@
     <message>
       <location/>
       <source>Select some single user in &quot;Show to&quot; line to display his local layouts in this list</source>
-      <translation type="unfinished">Select some single user in &quot;Show to&quot; line to display his local layouts in this list</translation>
+      <translation>Chọn một số người dùng trong &quot;Hiển thị đến&quot; dòng để hiển thị bố cục trong danh sách này</translation>
     </message>
   </context>
   <context>
@@ -1673,7 +1673,7 @@
     <message>
       <location/>
       <source>Search Timeout (s)</source>
-      <translation type="unfinished">Search Timeout (s)</translation>
+      <translation>Thời gian chờ tìm kiếm</translation>
     </message>
     <message>
       <location/>

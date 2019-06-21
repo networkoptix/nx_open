@@ -701,7 +701,7 @@ Do you want to delete it anyway?</source>
     <message>
       <source>Type</source>
       <comment>All other platforms</comment>
-      <translation>Skriv</translation>
+      <translation>Type</translation>
     </message>
     <message>
       <source>Date Modified</source>

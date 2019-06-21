@@ -54,7 +54,7 @@ struct RestResultWithData: public RestResultWithDataBase
     RestResultWithData& operator=(const RestResultWithData&) = delete;
     RestResultWithData& operator=(RestResultWithData&&) = default;
 
-    QnRestResult::Error error;
+    QnRestResult::Error error = QnRestResult::NoError;
     QString errorString;
     T data;
 };
@@ -435,6 +435,7 @@ public:
 
     Handle updateActionStart(
         const nx::update::Information& info,
+        std::function<void(Handle, bool)>&& callback,
         QThread* targetThread = nullptr);
 
     /** Get information for a current update. It requests /ec2/updateInformation. */

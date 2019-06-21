@@ -226,6 +226,8 @@ NotificationsWorkbenchPanel::NotificationsWorkbenchPanel(
 
 NotificationsWorkbenchPanel::~NotificationsWorkbenchPanel()
 {
+    if (m_eventPanelContainer)
+        m_eventPanelContainer->setWidget(nullptr);
 }
 
 bool NotificationsWorkbenchPanel::isPinned() const

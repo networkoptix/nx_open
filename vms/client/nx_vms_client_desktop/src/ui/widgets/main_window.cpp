@@ -162,11 +162,16 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     m_titleBar(new QnMainWindowTitleBarWidget(this, context))
 {
     QnHiDpiWorkarounds::init();
+
 #ifdef Q_OS_MACX
-    // TODO: #ivigasin check the neccesarity of this line. In Maveric fullscreen animation works fine without it.
-    // But with this line Mac OS shows white background in place of QGraphicsView when application enters or
-    // exits fullscreen mode.
-//    mac_initFullScreen((void*)winId(), (void*)this);
+    // Workaround prevents hangs on moving to the fullscreen mode in and out.
+    setFullscreenTransitionHandler(this,
+        [this](bool inProgress)
+        {
+            setUpdatesEnabled(!inProgress);
+            if (!inProgress)
+                repaint();
+        });
 
     // Since we have patch qt563_macos_window_level.patch we have to discard hidesOnDeactivate
     // flag for main window. Otherwise, each time it looses focus it becomes hidden.

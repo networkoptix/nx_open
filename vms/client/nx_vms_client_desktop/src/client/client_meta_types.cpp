@@ -28,6 +28,7 @@
 #include <utils/color_space/image_correction.h>
 #include <nx/fusion/model_functions.h>
 #include <utils/ping_utility.h>
+#include <nx/vms/client/desktop/common/models/linearization_list_model.h>
 #include <nx/vms/client/desktop/utils/server_file_cache.h>
 #include <nx/vms/client/desktop/export/settings/export_media_persistent_settings.h>
 #include <nx/vms/client/desktop/resource_views/data/node_type.h>
@@ -45,6 +46,7 @@
 #include <nx/vms/client/desktop/ui/common/focus_frame_item.h>
 #include <nx/vms/client/desktop/ui/common/global_tool_tip.h>
 #include <nx/vms/client/desktop/ui/scene/models/layout_model.h>
+#include <nx/vms/client/desktop/ui/scene/models/resource_tree_model_adapter.h>
 #include <nx/vms/client/desktop/ui/scene/instruments/instrument.h>
 #include <nx/vms/client/desktop/utils/cursor_manager.h>
 
@@ -177,6 +179,8 @@ void QnClientMetaTypes::registerQmlTypes()
 {
     qmlRegisterType<ColorTheme>("Nx", 1, 0, "ColorThemeBase");
     LayoutModel::registerQmlType();
+    LinearizationListModel::registerQmlType();
+    ResourceTreeModelAdapter::registerQmlType();
 
     qmlRegisterUncreatableType<QnWorkbench>("nx.client.desktop", 1, 0, "Workbench",
         lit("Cannot create instance of Workbench."));

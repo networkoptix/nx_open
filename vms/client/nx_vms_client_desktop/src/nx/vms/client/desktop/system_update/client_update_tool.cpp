@@ -24,19 +24,14 @@ bool requestInstalledVersions(QList<nx::utils::SoftwareVersion>* versions)
     // Try to run applauncher if it is not running.
     if (!checkOnline())
         return false;
-
-    const auto result = getInstalledVersions(versions);
-    if (result == ResultType::ok)
-        return true;
-
-    static const int kMaxTries = 5;
-    for (int i = 0; i < kMaxTries; ++i)
+    int kMaxTries = 5;
+    do
     {
-        QThread::msleep(100);
-        qApp->processEvents();
         if (getInstalledVersions(versions) == ResultType::ok)
             return true;
-    }
+        std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    } while (--kMaxTries > 0);
+
     return false;
 }
 
@@ -187,7 +182,7 @@ void ClientUpdateTool::atRemoteUpdateInformation(
 {
     auto systemInfo = QnAppInfo::currentSystemInformation();
     QString errorMessage;
-    // Update is allowed if either target version has the same cloud host or
+    // Update is allowed if either target version has the sam_installedVersionsFutureme cloud host or
     // there are no servers linked to the cloud in the system.
     QString cloudUrl = nx::network::SocketGlobals::cloud().cloudHost();
 

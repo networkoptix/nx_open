@@ -1,0 +1,88 @@
+#include "resource_tree_model_adapter.h"
+
+#include <QtQml/QtQml>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QWidget>
+
+#include <QtSingleApplication>
+
+#include <client/client_globals.h>
+#include <client/client_module.h>
+#include <core/resource/camera_resource.h>
+#include <ui/models/resource/resource_tree_model.h>
+
+#include <nx/vms/client/desktop/utils/wearable_manager.h>
+#include <nx/vms/client/desktop/utils/wearable_state.h>
+
+namespace nx::vms::client::desktop {
+
+ResourceTreeModelAdapter::ResourceTreeModelAdapter(QObject* parent): base_type(parent)
+{
+    // TODO: #vkutin This is a hack, refactor the context awareness mechanic of the source model.
+    const auto contextAwareParent = static_cast<QtSingleApplication*>(qApp)->activationWindow();
+
+    const auto model = new QnResourceTreeModel(QnResourceTreeModel::FullScope, contextAwareParent);
+
+    setSourceModel(model);
+    model->setParent(this);
+
+    setDynamicSortFilter(true);
+    setFilterCaseSensitivity(Qt::CaseInsensitive);
+    setFilterKeyColumn(Qn::NameColumn);
+    setSortRole(Qt::DisplayRole);
+    setSortCaseSensitivity(Qt::CaseInsensitive);
+    sort(Qn::NameColumn);
+}
+
+QVariant ResourceTreeModelAdapter::data(const QModelIndex& index, int role) const
+{
+    switch (role)
+    {
+        case Qn::ExtraResourceInfoRole:
+        {
+            static const QString kCustomExtInfoTemplate = //< "- %1" with en-dash
+                QString::fromWCharArray(L"\x2013 %1");
+
+            const auto resource = base_type::data(index, Qn::ResourceRole).value<QnResourcePtr>();
+            const auto nodeType = base_type::data(
+                index, Qn::NodeTypeRole).value<ResourceTreeNodeType>();
+
+            if ((nodeType == ResourceTreeNodeType::layoutItem
+                    || nodeType == ResourceTreeNodeType::sharedResource)
+                && resource->hasFlags(Qn::server) && !resource->hasFlags(Qn::fake))
+            {
+                return kCustomExtInfoTemplate.arg(tr("Health Monitor"));
+            }
+
+            const auto extraInfo = base_type::data(index, role).toString();
+            if (extraInfo.isEmpty())
+                return {};
+
+            if (resource->hasFlags(Qn::user))
+                return kCustomExtInfoTemplate.arg(extraInfo);
+
+            if (resource->hasFlags(Qn::wearable_camera))
+            {
+                const auto camera = resource.dynamicCast<QnSecurityCamResource>();
+                const auto state = qnClientModule->wearableManager()->state(camera);
+                if (state.isRunning())
+                    return kCustomExtInfoTemplate.arg(QString::number(state.progress()) + lit("%"));
+            }
+
+            return extraInfo;
+        }
+
+        case Qn::ResourceRole:
+            return QVariant::fromValue(base_type::data(index, role).value<QnResourcePtr>().get());
+
+        default:
+            return base_type::data(index, role);
+    }
+}
+
+void ResourceTreeModelAdapter::registerQmlType()
+{
+    qmlRegisterType<ResourceTreeModelAdapter>("nx.vms.client.desktop", 1, 0, "ResourceTreeModel");
+}
+
+} // nx::vms::client::desktop

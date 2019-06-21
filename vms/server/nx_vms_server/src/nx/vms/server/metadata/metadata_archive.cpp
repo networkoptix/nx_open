@@ -77,9 +77,15 @@ void MetadataArchive::fillFileNames(qint64 datetimeMs, QFile* metadataFile, QFil
     QDateTime datetime = QDateTime::fromMSecsSinceEpoch(datetimeMs);
     QString fileName = getFilePrefix(datetime.date());
     if (metadataFile)
+    {
+        metadataFile->close();
         metadataFile->setFileName(fileName + QString("%1_detailed_data").arg(m_filePrefix) + getChannelPrefix() + ".bin");
+    }
     if (indexFile)
+    {
+        indexFile->close();
         indexFile->setFileName(fileName + QString("%1_detailed_index").arg(m_filePrefix) + getChannelPrefix() + ".bin");
+    }
 }
 
 bool MetadataArchive::saveToArchiveInternal(const QnAbstractCompressedMetadataPtr& data)
@@ -96,8 +102,6 @@ bool MetadataArchive::saveToArchiveInternal(const QnAbstractCompressedMetadataPt
         dateBounds(timestamp, m_firstTime, m_lastDateForCurrentFile);
 
         //QString fileName = getFilePrefix(datetime);
-        m_detailedMetadataFile.close();
-        m_detailedIndexFile.close();
         fillFileNames(timestamp, &m_detailedMetadataFile, &m_detailedIndexFile);
 
         auto dirName = getFilePrefix(QDateTime::fromMSecsSinceEpoch(timestamp).date());

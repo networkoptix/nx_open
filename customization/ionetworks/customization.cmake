@@ -1,3 +1,5 @@
+set(compatibleCustomizations "ionetworks_cn")
+
 # Components Namings
 set(product.name "EZ Pro")
 set(display.product.name "EZ Pro")

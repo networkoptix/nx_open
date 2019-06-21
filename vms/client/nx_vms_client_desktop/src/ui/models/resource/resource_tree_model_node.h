@@ -104,13 +104,12 @@ protected:
     QnResourceTreeModelNode(QnResourceTreeModel* model, NodeType type, const QnUuid& uuid);
 
     void setName(const QString& name);
-    void setIcon(const QIcon& icon);
 
     bool isInitialized() const;
 
     QnResourceTreeModel* model() const;
 
-    virtual QIcon calculateIcon() const;
+    virtual int calculateIconKey() const;
     virtual nx::vms::client::desktop::CameraExtraStatus calculateCameraExtraStatus() const;
 
     virtual void addChildInternal(const QnResourceTreeModelNodePtr& child);
@@ -182,7 +181,7 @@ private:
     /** Resource flags. */
     Qn::ResourceFlags m_flags;
 
-    /** Display name of this node */
+    /** Display name of this node. */
     QString m_displayName;
 
     /** Name of this node. */
@@ -194,8 +193,8 @@ private:
     // Extra status for cameras and recorders.
     nx::vms::client::desktop::CameraExtraStatus m_cameraExtraStatus;
 
-    /** Icon of this node. */
-    QIcon m_icon;
+    /** Icon key of this node. */
+    int m_iconKey = 0;
 
     /** Whether this resource is modified. */
     bool m_modified;

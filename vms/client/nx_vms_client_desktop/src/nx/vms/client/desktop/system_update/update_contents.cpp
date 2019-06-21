@@ -251,7 +251,8 @@ bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateConten
 
     if (!clientData.clientId.isNull())
     {
-        if (clientData.currentVersion != contents.getVersion())
+        if (clientData.currentVersion != targetVersion
+            && clientData.installedVersions.count(targetVersion) == 0)
             alreadyInstalled = false;
 
         auto it = clientPackageCache.find(clientData.systemInfo);
@@ -280,9 +281,16 @@ bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateConten
                 QString message = UpdateStrings::getReportForUnsupportedServer(clientData.systemInfo);
                 contents.unsuportedSystemsReport.insert(clientData.clientId, message);
             }
-            else
+            else if (clientData.currentVersion < targetVersion || clientData.compatibilityMode)
             {
                 contents.clientPackage = *package;
+                contents.peersWithUpdate.insert(clientData.clientId);
+            }
+            else
+            {
+                NX_DEBUG(typeid(UpdateContents))
+                    << "verifyUpdateManifest(" << contents.info.version
+                    << ") client version =" << targetVersion << "will participate in this update";
             }
         }
     }
@@ -346,7 +354,7 @@ bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateConten
                 << "has a newer version";
             serversWithNewerVersion.insert(server->getId());
         }
-        else if (serverVersion != targetVersion)
+        else if (serverVersion != targetVersion && server->isOnline())
         {
             alreadyInstalled = false;
         }
@@ -354,7 +362,7 @@ bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateConten
         if (package && serverVersion < targetVersion)
         {
             package->targets.insert(server->getId());
-            contents.serversWithUpdate.insert(server->getId());
+            contents.peersWithUpdate.insert(server->getId());
             auto hasInternet = server->getServerFlags().testFlag(nx::vms::api::SF_HasPublicIP);
             if (!hasInternet)
                 manualPackages.insert(package);
@@ -366,7 +374,7 @@ bool verifyUpdateContents(QnCommonModule* commonModule, nx::update::UpdateConten
     for (auto package: manualPackages)
         contents.manualPackages.push_back(*package);
 
-    if (contents.serversWithUpdate.empty())
+    if (contents.peersWithUpdate.empty())
         contents.invalidVersion.unite(serversWithNewerVersion);
     else
         contents.ignorePeers = serversWithNewerVersion;

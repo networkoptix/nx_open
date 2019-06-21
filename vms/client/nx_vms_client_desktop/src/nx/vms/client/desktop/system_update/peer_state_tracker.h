@@ -185,6 +185,7 @@ public:
     QSet<QnUuid> peersCompleteInstall() const;
     QSet<QnUuid> serversWithChangedProtocol() const;
     QSet<QnUuid> peersWithUnknownStatus() const;
+    QSet<QnUuid> peersWithDownloaderError() const;
 
     /**
      * Process unknown or offline states. It will change item states.

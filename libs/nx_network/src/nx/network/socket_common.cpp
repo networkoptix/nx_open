@@ -3,6 +3,7 @@
 #include <cstring>
 
 #include <nx/fusion/model_functions.h>
+#include <nx/utils/timer_manager.h>
 #include <nx/utils/url.h>
 
 #include "socket_global.h"
@@ -601,9 +602,26 @@ QString KeepAliveOptions::toString() const
 {
     using namespace std::chrono;
 
-    // TODO: Use JSON serrialization instead?
-    return lm("{ %1, %2, %3 }").arg(duration_cast<seconds>(inactivityPeriodBeforeFirstProbe).count())
-        .arg(duration_cast<seconds>(probeSendPeriod).count()).arg(probeCount);
+    static constexpr int kMillisPerSec = 1000;
+
+    // Preserving existing behavior: if seconds are stored, then not adding a suffix.
+
+    QString result;
+    result += "{";
+    if (inactivityPeriodBeforeFirstProbe.count() % kMillisPerSec == 0)
+        result += QString::number(duration_cast<seconds>(inactivityPeriodBeforeFirstProbe).count());
+    else
+        result += QString::number(inactivityPeriodBeforeFirstProbe.count()) + "ms";
+    result += ",";
+    if (probeSendPeriod.count() % kMillisPerSec == 0)
+        result += QString::number(duration_cast<seconds>(probeSendPeriod).count());
+    else
+        result += QString::number(probeSendPeriod.count()) + "ms";
+    result += ",";
+    result += QString::number(probeCount);
+    result += "}";
+
+    return result;
 }
 
 void KeepAliveOptions::resetUnsupportedFieldsToSystemDefault()
@@ -628,9 +646,9 @@ std::optional<KeepAliveOptions> KeepAliveOptions::fromString(const QString& stri
 
     KeepAliveOptions options;
     options.inactivityPeriodBeforeFirstProbe =
-        std::chrono::seconds((size_t)split[0].trimmed().toUInt());
+        nx::utils::parseTimerDuration(split[0].trimmed().toString());
     options.probeSendPeriod =
-        std::chrono::seconds((size_t)split[1].trimmed().toUInt());
+        nx::utils::parseTimerDuration(split[1].trimmed().toString());
     options.probeCount = split[2].trimmed().toInt();
     return options;
 }
