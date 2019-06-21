@@ -21,7 +21,7 @@ public:
 
     int rowCount() const;
 
-    int sourceRowsCount() const;
+    int acceptedRowCount() const;
 
     int filterRole() const;
     void setFilterRole(int value);
@@ -64,18 +64,19 @@ private:
 
     void handleResetSourceModel();
 
-    void updateSourceRowsCount();
+    void updateAcceptedRowCount();
 
 private:
     void insertSourceRow(int sourceRow);
 
     void removeSourceRow(int sourceRow);
 
-    bool isFilteredOut(int sourceRow) const;
+    bool filterOut(int sourceRow);
 
     bool isFilteredByWildcard(int sourceRow) const;
 
     using RowsList = QList<int>;
+    using RowsSet = QSet<int>;
     int indexToInsert(int sourceRow, const RowsList& list);
 
     void shiftMappedRows(int fromSourceRow, int difference);
@@ -85,13 +86,14 @@ private:
 
     const LessPred m_lessPred;
     RowsList m_mapped;
+    RowsSet m_rejectedRows;
     QnSortFilterListModel::RolesSet m_triggeringRoles;
 
     int m_filterRole = -1;
     Qt::CaseSensitivity m_filterCaseSensiticity = Qt::CaseSensitive;
     QString m_filterWildcard;
 
-    int m_sourceRowsCount = 0;
+    int m_acceptedRowCount = 0;
 };
 
 QnSortFilterListModelPrivate::QnSortFilterListModelPrivate(QnSortFilterListModel* parent):
@@ -114,6 +116,7 @@ void QnSortFilterListModelPrivate::resetTargetModel()
     Q_Q(QnSortFilterListModel);
     q->beginResetModel();
     m_mapped.clear();
+    m_rejectedRows.clear();
     q->endResetModel();
 }
 
@@ -136,10 +139,12 @@ void QnSortFilterListModelPrivate::refresh()
     RowsList forRemove;
     RowsList forAdd;
 
+    m_rejectedRows.clear();
+
     for (int sourceRow = 0; sourceRow != sourceSize; ++sourceRow)
     {
         const int currentIndex = m_mapped.indexOf(sourceRow);
-        const bool shouldBeFilteredOut = isFilteredOut(sourceRow);
+        const bool shouldBeFilteredOut = filterOut(sourceRow);
         const bool currentFilteredOut = (currentIndex == -1);
 
         if (shouldBeFilteredOut != currentFilteredOut)
@@ -174,6 +179,8 @@ void QnSortFilterListModelPrivate::refresh()
 
     for (const auto rowForRemove: forRemove)
         removeSourceRow(rowForRemove);
+
+    updateAcceptedRowCount();
 }
 
 int QnSortFilterListModelPrivate::rowCount() const
@@ -181,9 +188,9 @@ int QnSortFilterListModelPrivate::rowCount() const
     return m_mapped.size();
 }
 
-int QnSortFilterListModelPrivate::sourceRowsCount() const
+int QnSortFilterListModelPrivate::acceptedRowCount() const
 {
-    return m_sourceRowsCount;
+    return m_acceptedRowCount;
 }
 
 int QnSortFilterListModelPrivate::filterRole() const
@@ -228,10 +235,16 @@ void QnSortFilterListModelPrivate::setFilterWildcard(const QString& value)
     refresh();
 }
 
-bool QnSortFilterListModelPrivate::isFilteredOut(int sourceRow) const
+bool QnSortFilterListModelPrivate::filterOut(int sourceRow)
 {
-    Q_Q(const QnSortFilterListModel);
-    return isFilteredByWildcard(sourceRow) || !q->filterAcceptsRow(sourceRow, QModelIndex());
+    Q_Q(QnSortFilterListModel);
+    const bool isRowRejected = !q->filterAcceptsRow(sourceRow, QModelIndex());
+    if (isRowRejected)
+    {
+        m_rejectedRows.insert(sourceRow);
+        updateAcceptedRowCount();
+    }
+    return isRowRejected || isFilteredByWildcard(sourceRow);
 }
 
 bool QnSortFilterListModelPrivate::isFilteredByWildcard(int sourceRow) const
@@ -253,7 +266,7 @@ int QnSortFilterListModelPrivate::indexToInsert(int sourceRow, const RowsList& m
 
 void QnSortFilterListModelPrivate::insertSourceRow(int sourceRow)
 {
-    if (isFilteredOut(sourceRow))
+    if (filterOut(sourceRow))
         return;
 
     const auto mappedIndex = m_mapped.indexOf(sourceRow);
@@ -272,11 +285,14 @@ void QnSortFilterListModelPrivate::insertSourceRow(int sourceRow)
 
 void QnSortFilterListModelPrivate::removeSourceRow(int sourceRow)
 {
-    const auto mappedIndex = m_mapped.indexOf(sourceRow);
-    if (mappedIndex == -1)
-        return; //< Row is filtered out.
-
     Q_Q(QnSortFilterListModel);
+    const auto mappedIndex = m_mapped.indexOf(sourceRow);
+    if (mappedIndex == -1) //< Row is filtered out.
+    {
+        m_rejectedRows.remove(sourceRow);
+        updateAcceptedRowCount();
+        return;
+    }
     q->beginRemoveRows(QModelIndex(), mappedIndex, mappedIndex);
     m_mapped.removeAt(mappedIndex);
     q->endRemoveRows();
@@ -289,6 +305,20 @@ void QnSortFilterListModelPrivate::shiftMappedRows(int minSourceRow, int differe
         if (row >= minSourceRow)
             row += difference;
     }
+
+    RowsSet shifted;
+    QMutableSetIterator<int> i(m_rejectedRows);
+    while (i.hasNext())
+    {
+        int row = i.next();
+        if (row >= minSourceRow)
+        {
+            shifted.insert(row + difference);
+            i.remove();
+        }
+    }
+    m_rejectedRows += shifted;
+    updateAcceptedRowCount();
 }
 
 void QnSortFilterListModelPrivate::handleSourceRowsInserted(
@@ -296,7 +326,7 @@ void QnSortFilterListModelPrivate::handleSourceRowsInserted(
     int first,
     int last)
 {
-    updateSourceRowsCount();
+    updateAcceptedRowCount();
 
     NX_ASSERT(!parent.isValid(), "QnSortFilterProxyModel works only with flat lists models");
     if (parent.isValid())
@@ -331,7 +361,7 @@ void QnSortFilterListModelPrivate::handleSourceRowsRemoved(
     int first,
     int last)
 {
-    updateSourceRowsCount();
+    updateAcceptedRowCount();
 
     NX_ASSERT(!parent.isValid(), "QnSortFilterProxyModel works only with flat lists models");
     if (parent.isValid())
@@ -397,7 +427,7 @@ void QnSortFilterListModelPrivate::handleSourceDataChanged(
         bool allRemoved = true;
         for(int sourceRow = topLeft.row(); sourceRow <= bottomRight.row(); ++sourceRow)
         {
-            if (isFilteredOut(sourceRow))
+            if (filterOut(sourceRow))
                 removeSourceRow(sourceRow);
             else
                 allRemoved = false;
@@ -413,20 +443,21 @@ void QnSortFilterListModelPrivate::handleSourceDataChanged(
 void QnSortFilterListModelPrivate::handleResetSourceModel()
 {
     resetTargetModel();
-    updateSourceRowsCount();
+    updateAcceptedRowCount();
     refresh();
 }
 
-void QnSortFilterListModelPrivate::updateSourceRowsCount()
+void QnSortFilterListModelPrivate::updateAcceptedRowCount()
 {
     Q_Q(QnSortFilterListModel);
     const auto source = q->sourceModel();
-    const auto newCount = source ? source->rowCount() : 0;
-    if (m_sourceRowsCount == newCount)
+    const auto sourceRowCount = source ? source->rowCount() : 0;
+    const auto newAcceptedRowCount = sourceRowCount - m_rejectedRows.size();
+    if (m_acceptedRowCount == newAcceptedRowCount)
         return;
 
-    m_sourceRowsCount = newCount;
-    emit q->sourceRowsCountChanged();
+    m_acceptedRowCount = newAcceptedRowCount;
+    emit q->acceptedRowCountChanged();
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -472,7 +503,7 @@ void QnSortFilterListModel::setSourceModel(QAbstractItemModel* model)
     connect(model, &QAbstractListModel::modelReset,
         d, &QnSortFilterListModelPrivate::handleResetSourceModel);
 
-    d->updateSourceRowsCount();
+    d->updateAcceptedRowCount();
     // TODO: #ynikitenkov Make filling of model with data in reset model mode.
     d->refresh();
 }
@@ -489,10 +520,10 @@ void QnSortFilterListModel::forceUpdate()
     d->refresh();
 }
 
-int QnSortFilterListModel::sourceRowsCount() const
+int QnSortFilterListModel::acceptedRowCount() const
 {
     Q_D(const QnSortFilterListModel);
-    return d->sourceRowsCount();
+    return d->acceptedRowCount();
 }
 
 int QnSortFilterListModel::filterRole() const
