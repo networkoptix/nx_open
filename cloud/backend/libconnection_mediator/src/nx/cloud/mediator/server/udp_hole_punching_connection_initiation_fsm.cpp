@@ -566,6 +566,8 @@ const char* UDPHolePunchingConnectionInitiationFsm::toString(State state)
             return "init";
         case State::waitingServerPeerUDPAddress:
             return "waitingServerPeerUDPAddress";
+        case State::resolvingServersRelayInstance:
+            return "resolvingServersRelayInstance";
         case State::waitingConnectionResult:
             return "waitingConnectionResult";
         case State::fini:
