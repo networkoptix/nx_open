@@ -5,7 +5,6 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:xsd="http://www.w3.org/2001/XMLSchema"
     xmlns:chan="http://schemas.microsoft.com/ws/2005/02/duplex"
-    xmlns:wsa5="http://www.w3.org/2005/08/addressing"
     xmlns:wsdd="http://schemas.xmlsoap.org/ws/2005/04/discovery"
     xmlns:c14n="http://www.w3.org/2001/10/xml-exc-c14n#"
     xmlns:ds="http://www.w3.org/2000/09/xmldsig#"
@@ -15,30 +14,19 @@
     xmlns:xenc="http://www.w3.org/2001/04/xmlenc#"
     xmlns:wsc="http://docs.oasis-open.org/ws-sx/ws-secureconversation/200512"
     xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"
-    xmlns:onvifPacs="http://www.onvif.org/ver10/pacs"
+    xmlns:wsdd5="http://tempuri.org/wsdd5.xsd"
+    xmlns:wsa5="http://www.w3.org/2005/08/addressing"
     xmlns:xmime="http://tempuri.org/xmime.xsd"
     xmlns:xop="http://www.w3.org/2004/08/xop/include"
-    xmlns:onvifXsd="http://www.onvif.org/ver10/schema"
-    xmlns:oasisWsrf="http://docs.oasis-open.org/wsrf/bf-2"
-    xmlns:oasisWsnT1="http://docs.oasis-open.org/wsn/t-1"
-    xmlns:oasisWsrfR2="http://docs.oasis-open.org/wsrf/r-2"
-    xmlns:onvifAccessControl="http://www.onvif.org/ver10/accesscontrol/wsdl"
-    xmlns:onvifAccessRules="http://www.onvif.org/ver10/accessrules/wsdl"
-    xmlns:onvifActionEngine="http://www.onvif.org/ver10/actionengine/wsdl"
-    xmlns:onvifAdvancedSecurity-assb="http://www.onvif.org/ver10/advancedsecurity/wsdl/AdvancedSecurityServiceBinding"
-    xmlns:onvifAdvancedSecurity-db="http://www.onvif.org/ver10/advancedsecurity/wsdl/Dot1XBinding"
-    xmlns:onvifAdvancedSecurity-kb="http://www.onvif.org/ver10/advancedsecurity/wsdl/KeystoreBinding"
-    xmlns:onvifAdvancedSecurity-tsb="http://www.onvif.org/ver10/advancedsecurity/wsdl/TLSServerBinding"
-    xmlns:onvifAdvancedSecurity="http://www.onvif.org/ver10/advancedsecurity/wsdl"
+    xmlns:tt="http://www.onvif.org/ver10/schema"
+    xmlns:wsrfbf="http://docs.oasis-open.org/wsrf/bf-2"
+    xmlns:wstop="http://docs.oasis-open.org/wsn/t-1"
+    xmlns:wsrfr="http://docs.oasis-open.org/wsrf/r-2"
     xmlns:onvifAnalytics-aeb="http://www.onvif.org/ver20/analytics/wsdl/AnalyticsEngineBinding"
     xmlns:onvifAnalytics-reb="http://www.onvif.org/ver20/analytics/wsdl/RuleEngineBinding"
     xmlns:onvifAnalytics="http://www.onvif.org/ver20/analytics/wsdl"
-    xmlns:onvifAnalyticsDevice="http://www.onvif.org/ver10/analyticsdevice/wsdl"
-    xmlns:onvifCredential="http://www.onvif.org/ver10/credential/wsdl"
     xmlns:onvifDevice="http://www.onvif.org/ver10/device/wsdl"
     xmlns:onvifDeviceIO="http://www.onvif.org/ver10/deviceIO/wsdl"
-    xmlns:onvifDisplay="http://www.onvif.org/ver10/display/wsdl"
-    xmlns:onvifDoorControl="http://www.onvif.org/ver10/doorcontrol/wsdl"
     xmlns:onvifEvents-cpb="http://www.onvif.org/ver10/events/wsdl/CreatePullPointBinding"
     xmlns:onvifEvents-eb="http://www.onvif.org/ver10/events/wsdl/EventBinding"
     xmlns:onvifEvents-ncb="http://www.onvif.org/ver10/events/wsdl/NotificationConsumerBinding"
@@ -47,7 +35,7 @@
     xmlns:onvifEvents="http://www.onvif.org/ver10/events/wsdl"
     xmlns:onvifEvents-pps="http://www.onvif.org/ver10/events/wsdl/PullPointSubscriptionBinding"
     xmlns:onvifEvents-psmb="http://www.onvif.org/ver10/events/wsdl/PausableSubscriptionManagerBinding"
-    xmlns:oasisWsnB2="http://docs.oasis-open.org/wsn/b-2"
+    xmlns:wsnt="http://docs.oasis-open.org/wsn/b-2"
     xmlns:onvifEvents-smb="http://www.onvif.org/ver10/events/wsdl/SubscriptionManagerBinding"
     xmlns:onvifImg="http://www.onvif.org/ver20/imaging/wsdl"
     xmlns:onvifMedia="http://www.onvif.org/ver10/media/wsdl"
@@ -55,112 +43,114 @@
     xmlns:onvifNetwork-dlb="http://www.onvif.org/ver10/network/wsdl/DiscoveryLookupBinding"
     xmlns:onvifNetwork-rdb="http://www.onvif.org/ver10/network/wsdl/RemoteDiscoveryBinding"
     xmlns:onvifNetwork="http://www.onvif.org/ver10/network/wsdl"
-    xmlns:onvifProvisioning="http://www.onvif.org/ver10/provisioning/wsdl"
-    xmlns:onvifPtz="http://www.onvif.org/ver20/ptz/wsdl"
-    xmlns:onvifReceiver="http://www.onvif.org/ver10/receiver/wsdl"
-    xmlns:onvifRecording="http://www.onvif.org/ver10/recording/wsdl"
-    xmlns:onvifReplay="http://www.onvif.org/ver10/replay/wsdl"
-    xmlns:onvifScedule="http://www.onvif.org/ver10/schedule/wsdl"
-    xmlns:onvifSearch="http://www.onvif.org/ver10/search/wsdl"
-    xmlns:onvifThermal="http://www.onvif.org/ver10/thermal/wsdl">
+    xmlns:onvifPtz="http://www.onvif.org/ver20/ptz/wsdl">
  <!-- struct SOAP_ENV__Header *soap::header -->
  <SOAP-ENV:Header>
  </SOAP-ENV:Header>
  <SOAP-ENV:Body>
   <!-- __onvifAnalytics_aeb__GetSupportedAnalyticsModules(..., _onvifAnalytics__GetSupportedAnalyticsModulesResponse &onvifAnalytics__GetSupportedAnalyticsModulesResponse) -->
   <onvifAnalytics:GetSupportedAnalyticsModulesResponse>
-   <!-- onvifXsd__SupportedAnalyticsModules *SupportedAnalyticsModules -->
+   <!-- tt__SupportedAnalyticsModules *SupportedAnalyticsModules -->
    <onvifAnalytics:SupportedAnalyticsModules>
     <!-- std::vector<std::string> AnalyticsModuleContentSchemaLocation -->
     <!-- a repetition of 0 or more of the following -->
-    <onvifXsd:AnalyticsModuleContentSchemaLocation>http://www.example.com/schema/anyURI</onvifXsd:AnalyticsModuleContentSchemaLocation>
-    <!-- std::vector<onvifXsd__ConfigDescription *> AnalyticsModuleDescription -->
+    <tt:AnalyticsModuleContentSchemaLocation>http://www.example.com/schema/anyURI</tt:AnalyticsModuleContentSchemaLocation>
+    <!-- std::vector<tt__ConfigDescription *> AnalyticsModuleDescription -->
     <!-- a repetition of 0 or more of the following -->
-    <onvifXsd:AnalyticsModuleDescription Name="xsd:string" fixed="false" maxInstances="0">
-     <!-- onvifXsd__ItemListDescription *Parameters -->
-     <onvifXsd:Parameters>
-      <!-- std::vector<_onvifXsd__ItemListDescription_SimpleItemDescription> SimpleItemDescription -->
+    <tt:AnalyticsModuleDescription Name="xsd:string" fixed="false" maxInstances="0">
+     <!-- tt__ItemListDescription *Parameters -->
+     <tt:Parameters>
+      <!-- std::vector<_tt__ItemListDescription_SimpleItemDescription> SimpleItemDescription -->
       <!-- a repetition of 0 or more of the following -->
-      <onvifXsd:SimpleItemDescription Name="" Type="xsd:string">
-      </onvifXsd:SimpleItemDescription>
-      <!-- std::vector<_onvifXsd__ItemListDescription_ElementItemDescription> ElementItemDescription -->
+      <tt:SimpleItemDescription Name="" Type="xsd:string">
+      </tt:SimpleItemDescription>
+      <!-- std::vector<_tt__ItemListDescription_ElementItemDescription> ElementItemDescription -->
       <!-- a repetition of 0 or more of the following -->
-      <onvifXsd:ElementItemDescription Name="" Type="xsd:string">
-      </onvifXsd:ElementItemDescription>
-      <!-- onvifXsd__ItemListDescriptionExtension *Extension -->
-      <onvifXsd:Extension>
+      <tt:ElementItemDescription Name="" Type="xsd:string">
+      </tt:ElementItemDescription>
+      <!-- tt__ItemListDescriptionExtension *Extension -->
+      <tt:Extension>
        <!-- std::vector<struct soap_dom_element> __any -->
        <!-- a repetition of 0 or more of the following -->
 
-      </onvifXsd:Extension>
-     </onvifXsd:Parameters>
-     <!-- std::vector<_onvifXsd__ConfigDescription_Messages> Messages -->
+      </tt:Extension>
+     </tt:Parameters>
+     <!-- std::vector<_tt__ConfigDescription_Messages> Messages -->
      <!-- a repetition of 0 or more of the following -->
-     <onvifXsd:Messages IsProperty="false">
-      <!-- onvifXsd__ItemListDescription *Source -->
-      <onvifXsd:Source>
-       <!-- std::vector<_onvifXsd__ItemListDescription_SimpleItemDescription> SimpleItemDescription -->
+     <tt:Messages IsProperty="false">
+      <!-- tt__ItemListDescription *Source -->
+      <tt:Source>
+       <!-- std::vector<_tt__ItemListDescription_SimpleItemDescription> SimpleItemDescription -->
        <!-- a repetition of 0 or more of the following -->
-       <onvifXsd:SimpleItemDescription Name="" Type="xsd:string">
-       </onvifXsd:SimpleItemDescription>
-       <!-- std::vector<_onvifXsd__ItemListDescription_ElementItemDescription> ElementItemDescription -->
+       <tt:SimpleItemDescription Name="" Type="xsd:string">
+       </tt:SimpleItemDescription>
+       <!-- std::vector<_tt__ItemListDescription_ElementItemDescription> ElementItemDescription -->
        <!-- a repetition of 0 or more of the following -->
-       <onvifXsd:ElementItemDescription Name="" Type="xsd:string">
-       </onvifXsd:ElementItemDescription>
-       <!-- onvifXsd__ItemListDescriptionExtension *Extension -->
-       <onvifXsd:Extension>
-       </onvifXsd:Extension>
-      </onvifXsd:Source>
-      <!-- onvifXsd__ItemListDescription *Key -->
-      <onvifXsd:Key>
-       <!-- std::vector<_onvifXsd__ItemListDescription_SimpleItemDescription> SimpleItemDescription -->
+       <tt:ElementItemDescription Name="" Type="xsd:string">
+       </tt:ElementItemDescription>
+       <!-- tt__ItemListDescriptionExtension *Extension -->
+       <tt:Extension>
+        <!-- std::vector<struct soap_dom_element> __any -->
+        <!-- a repetition of 0 or more of the following -->
+
+       </tt:Extension>
+      </tt:Source>
+      <!-- tt__ItemListDescription *Key -->
+      <tt:Key>
+       <!-- std::vector<_tt__ItemListDescription_SimpleItemDescription> SimpleItemDescription -->
        <!-- a repetition of 0 or more of the following -->
-       <onvifXsd:SimpleItemDescription Name="" Type="xsd:string">
-       </onvifXsd:SimpleItemDescription>
-       <!-- std::vector<_onvifXsd__ItemListDescription_ElementItemDescription> ElementItemDescription -->
+       <tt:SimpleItemDescription Name="" Type="xsd:string">
+       </tt:SimpleItemDescription>
+       <!-- std::vector<_tt__ItemListDescription_ElementItemDescription> ElementItemDescription -->
        <!-- a repetition of 0 or more of the following -->
-       <onvifXsd:ElementItemDescription Name="" Type="xsd:string">
-       </onvifXsd:ElementItemDescription>
-       <!-- onvifXsd__ItemListDescriptionExtension *Extension -->
-       <onvifXsd:Extension>
-       </onvifXsd:Extension>
-      </onvifXsd:Key>
-      <!-- onvifXsd__ItemListDescription *Data -->
-      <onvifXsd:Data>
-       <!-- std::vector<_onvifXsd__ItemListDescription_SimpleItemDescription> SimpleItemDescription -->
+       <tt:ElementItemDescription Name="" Type="xsd:string">
+       </tt:ElementItemDescription>
+       <!-- tt__ItemListDescriptionExtension *Extension -->
+       <tt:Extension>
+        <!-- std::vector<struct soap_dom_element> __any -->
+        <!-- a repetition of 0 or more of the following -->
+
+       </tt:Extension>
+      </tt:Key>
+      <!-- tt__ItemListDescription *Data -->
+      <tt:Data>
+       <!-- std::vector<_tt__ItemListDescription_SimpleItemDescription> SimpleItemDescription -->
        <!-- a repetition of 0 or more of the following -->
-       <onvifXsd:SimpleItemDescription Name="" Type="xsd:string">
-       </onvifXsd:SimpleItemDescription>
-       <!-- std::vector<_onvifXsd__ItemListDescription_ElementItemDescription> ElementItemDescription -->
+       <tt:SimpleItemDescription Name="" Type="xsd:string">
+       </tt:SimpleItemDescription>
+       <!-- std::vector<_tt__ItemListDescription_ElementItemDescription> ElementItemDescription -->
        <!-- a repetition of 0 or more of the following -->
-       <onvifXsd:ElementItemDescription Name="" Type="xsd:string">
-       </onvifXsd:ElementItemDescription>
-       <!-- onvifXsd__ItemListDescriptionExtension *Extension -->
-       <onvifXsd:Extension>
-       </onvifXsd:Extension>
-      </onvifXsd:Data>
-      <!-- onvifXsd__MessageDescriptionExtension *Extension -->
-      <onvifXsd:Extension>
+       <tt:ElementItemDescription Name="" Type="xsd:string">
+       </tt:ElementItemDescription>
+       <!-- tt__ItemListDescriptionExtension *Extension -->
+       <tt:Extension>
+        <!-- std::vector<struct soap_dom_element> __any -->
+        <!-- a repetition of 0 or more of the following -->
+
+       </tt:Extension>
+      </tt:Data>
+      <!-- tt__MessageDescriptionExtension *Extension -->
+      <tt:Extension>
        <!-- std::vector<struct soap_dom_element> __any -->
        <!-- a repetition of 0 or more of the following -->
 
-      </onvifXsd:Extension>
+      </tt:Extension>
       <!-- std::string ParentTopic -->
-      <onvifXsd:ParentTopic></onvifXsd:ParentTopic>
-     </onvifXsd:Messages>
-     <!-- onvifXsd__ConfigDescriptionExtension *Extension -->
-     <onvifXsd:Extension>
+      <tt:ParentTopic></tt:ParentTopic>
+     </tt:Messages>
+     <!-- tt__ConfigDescriptionExtension *Extension -->
+     <tt:Extension>
       <!-- std::vector<struct soap_dom_element> __any -->
       <!-- a repetition of 0 or more of the following -->
 
-     </onvifXsd:Extension>
-    </onvifXsd:AnalyticsModuleDescription>
-    <!-- onvifXsd__SupportedAnalyticsModulesExtension *Extension -->
-    <onvifXsd:Extension>
+     </tt:Extension>
+    </tt:AnalyticsModuleDescription>
+    <!-- tt__SupportedAnalyticsModulesExtension *Extension -->
+    <tt:Extension>
      <!-- std::vector<struct soap_dom_element> __any -->
      <!-- a repetition of 0 or more of the following -->
 
-    </onvifXsd:Extension>
+    </tt:Extension>
    </onvifAnalytics:SupportedAnalyticsModules>
   </onvifAnalytics:GetSupportedAnalyticsModulesResponse>
  </SOAP-ENV:Body>

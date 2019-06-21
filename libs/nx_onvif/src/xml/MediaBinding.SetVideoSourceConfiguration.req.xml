@@ -5,7 +5,6 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:xsd="http://www.w3.org/2001/XMLSchema"
     xmlns:chan="http://schemas.microsoft.com/ws/2005/02/duplex"
-    xmlns:wsa5="http://www.w3.org/2005/08/addressing"
     xmlns:wsdd="http://schemas.xmlsoap.org/ws/2005/04/discovery"
     xmlns:c14n="http://www.w3.org/2001/10/xml-exc-c14n#"
     xmlns:ds="http://www.w3.org/2000/09/xmldsig#"
@@ -15,30 +14,19 @@
     xmlns:xenc="http://www.w3.org/2001/04/xmlenc#"
     xmlns:wsc="http://docs.oasis-open.org/ws-sx/ws-secureconversation/200512"
     xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"
-    xmlns:onvifPacs="http://www.onvif.org/ver10/pacs"
+    xmlns:wsdd5="http://tempuri.org/wsdd5.xsd"
+    xmlns:wsa5="http://www.w3.org/2005/08/addressing"
     xmlns:xmime="http://tempuri.org/xmime.xsd"
     xmlns:xop="http://www.w3.org/2004/08/xop/include"
-    xmlns:onvifXsd="http://www.onvif.org/ver10/schema"
-    xmlns:oasisWsrf="http://docs.oasis-open.org/wsrf/bf-2"
-    xmlns:oasisWsnT1="http://docs.oasis-open.org/wsn/t-1"
-    xmlns:oasisWsrfR2="http://docs.oasis-open.org/wsrf/r-2"
-    xmlns:onvifAccessControl="http://www.onvif.org/ver10/accesscontrol/wsdl"
-    xmlns:onvifAccessRules="http://www.onvif.org/ver10/accessrules/wsdl"
-    xmlns:onvifActionEngine="http://www.onvif.org/ver10/actionengine/wsdl"
-    xmlns:onvifAdvancedSecurity-assb="http://www.onvif.org/ver10/advancedsecurity/wsdl/AdvancedSecurityServiceBinding"
-    xmlns:onvifAdvancedSecurity-db="http://www.onvif.org/ver10/advancedsecurity/wsdl/Dot1XBinding"
-    xmlns:onvifAdvancedSecurity-kb="http://www.onvif.org/ver10/advancedsecurity/wsdl/KeystoreBinding"
-    xmlns:onvifAdvancedSecurity-tsb="http://www.onvif.org/ver10/advancedsecurity/wsdl/TLSServerBinding"
-    xmlns:onvifAdvancedSecurity="http://www.onvif.org/ver10/advancedsecurity/wsdl"
+    xmlns:tt="http://www.onvif.org/ver10/schema"
+    xmlns:wsrfbf="http://docs.oasis-open.org/wsrf/bf-2"
+    xmlns:wstop="http://docs.oasis-open.org/wsn/t-1"
+    xmlns:wsrfr="http://docs.oasis-open.org/wsrf/r-2"
     xmlns:onvifAnalytics-aeb="http://www.onvif.org/ver20/analytics/wsdl/AnalyticsEngineBinding"
     xmlns:onvifAnalytics-reb="http://www.onvif.org/ver20/analytics/wsdl/RuleEngineBinding"
     xmlns:onvifAnalytics="http://www.onvif.org/ver20/analytics/wsdl"
-    xmlns:onvifAnalyticsDevice="http://www.onvif.org/ver10/analyticsdevice/wsdl"
-    xmlns:onvifCredential="http://www.onvif.org/ver10/credential/wsdl"
     xmlns:onvifDevice="http://www.onvif.org/ver10/device/wsdl"
     xmlns:onvifDeviceIO="http://www.onvif.org/ver10/deviceIO/wsdl"
-    xmlns:onvifDisplay="http://www.onvif.org/ver10/display/wsdl"
-    xmlns:onvifDoorControl="http://www.onvif.org/ver10/doorcontrol/wsdl"
     xmlns:onvifEvents-cpb="http://www.onvif.org/ver10/events/wsdl/CreatePullPointBinding"
     xmlns:onvifEvents-eb="http://www.onvif.org/ver10/events/wsdl/EventBinding"
     xmlns:onvifEvents-ncb="http://www.onvif.org/ver10/events/wsdl/NotificationConsumerBinding"
@@ -47,7 +35,7 @@
     xmlns:onvifEvents="http://www.onvif.org/ver10/events/wsdl"
     xmlns:onvifEvents-pps="http://www.onvif.org/ver10/events/wsdl/PullPointSubscriptionBinding"
     xmlns:onvifEvents-psmb="http://www.onvif.org/ver10/events/wsdl/PausableSubscriptionManagerBinding"
-    xmlns:oasisWsnB2="http://docs.oasis-open.org/wsn/b-2"
+    xmlns:wsnt="http://docs.oasis-open.org/wsn/b-2"
     xmlns:onvifEvents-smb="http://www.onvif.org/ver10/events/wsdl/SubscriptionManagerBinding"
     xmlns:onvifImg="http://www.onvif.org/ver20/imaging/wsdl"
     xmlns:onvifMedia="http://www.onvif.org/ver10/media/wsdl"
@@ -55,14 +43,7 @@
     xmlns:onvifNetwork-dlb="http://www.onvif.org/ver10/network/wsdl/DiscoveryLookupBinding"
     xmlns:onvifNetwork-rdb="http://www.onvif.org/ver10/network/wsdl/RemoteDiscoveryBinding"
     xmlns:onvifNetwork="http://www.onvif.org/ver10/network/wsdl"
-    xmlns:onvifProvisioning="http://www.onvif.org/ver10/provisioning/wsdl"
-    xmlns:onvifPtz="http://www.onvif.org/ver20/ptz/wsdl"
-    xmlns:onvifReceiver="http://www.onvif.org/ver10/receiver/wsdl"
-    xmlns:onvifRecording="http://www.onvif.org/ver10/recording/wsdl"
-    xmlns:onvifReplay="http://www.onvif.org/ver10/replay/wsdl"
-    xmlns:onvifScedule="http://www.onvif.org/ver10/schedule/wsdl"
-    xmlns:onvifSearch="http://www.onvif.org/ver10/search/wsdl"
-    xmlns:onvifThermal="http://www.onvif.org/ver10/thermal/wsdl">
+    xmlns:onvifPtz="http://www.onvif.org/ver20/ptz/wsdl">
  <!-- struct SOAP_ENV__Header *soap::header -->
  <SOAP-ENV:Header>
  </SOAP-ENV:Header>
@@ -70,61 +51,69 @@
   <!-- __onvifMedia__SetVideoSourceConfiguration(..., _onvifMedia__SetVideoSourceConfiguration *onvifMedia__SetVideoSourceConfiguration, ...) -->
    <!-- _onvifMedia__SetVideoSourceConfiguration *onvifMedia__SetVideoSourceConfiguration -->
    <onvifMedia:SetVideoSourceConfiguration>
-    <!-- onvifXsd__VideoSourceConfiguration *Configuration -->
+    <!-- tt__VideoSourceConfiguration *Configuration -->
     <onvifMedia:Configuration ViewMode="" token="">
      <!-- std::string Name -->
-     <onvifXsd:Name></onvifXsd:Name>
+     <tt:Name></tt:Name>
      <!-- int UseCount -->
-     <onvifXsd:UseCount>0</onvifXsd:UseCount>
+     <tt:UseCount>0</tt:UseCount>
      <!-- std::string SourceToken -->
-     <onvifXsd:SourceToken></onvifXsd:SourceToken>
-     <!-- onvifXsd__IntRectangle *Bounds -->
-     <onvifXsd:Bounds x="0" y="0" width="0" height="0">
-     </onvifXsd:Bounds>
+     <tt:SourceToken></tt:SourceToken>
+     <!-- tt__IntRectangle *Bounds -->
+     <tt:Bounds x="0" y="0" width="0" height="0">
+     </tt:Bounds>
      <!-- std::vector<struct soap_dom_element> __any -->
      <!-- a repetition of 0 or more of the following -->
 
-     <!-- onvifXsd__VideoSourceConfigurationExtension *Extension -->
-     <onvifXsd:Extension>
-      <!-- onvifXsd__Rotate *Rotate -->
-      <onvifXsd:Rotate>
-       <!-- onvifXsd__RotateMode Mode -->
-       <onvifXsd:Mode>OFF</onvifXsd:Mode>
+     <!-- tt__VideoSourceConfigurationExtension *Extension -->
+     <tt:Extension>
+      <!-- tt__Rotate *Rotate -->
+      <tt:Rotate>
+       <!-- tt__RotateMode Mode -->
+       <tt:Mode>OFF</tt:Mode>
        <!-- int *Degree -->
-       <onvifXsd:Degree>0</onvifXsd:Degree>
-       <!-- onvifXsd__RotateExtension *Extension -->
-       <onvifXsd:Extension>
-       </onvifXsd:Extension>
-      </onvifXsd:Rotate>
-      <!-- onvifXsd__VideoSourceConfigurationExtension2 *Extension -->
-      <onvifXsd:Extension>
-       <!-- std::vector<onvifXsd__LensDescription *> LensDescription -->
+       <tt:Degree>0</tt:Degree>
+       <!-- tt__RotateExtension *Extension -->
+       <tt:Extension>
+        <!-- std::vector<struct soap_dom_element> __any -->
+        <!-- a repetition of 0 or more of the following -->
+
+       </tt:Extension>
+      </tt:Rotate>
+      <!-- tt__VideoSourceConfigurationExtension2 *Extension -->
+      <tt:Extension>
+       <!-- std::vector<tt__LensDescription *> LensDescription -->
        <!-- a repetition of 0 or more of the following -->
-       <onvifXsd:LensDescription FocalLength="0.0">
-        <!-- onvifXsd__LensOffset *Offset -->
-        <onvifXsd:Offset x="0.0" y="0.0">
-        </onvifXsd:Offset>
-        <!-- std::vector<onvifXsd__LensProjection *> Projection -->
+       <tt:LensDescription FocalLength="0.0">
+        <!-- tt__LensOffset *Offset -->
+        <tt:Offset x="0.0" y="0.0">
+        </tt:Offset>
+        <!-- std::vector<tt__LensProjection *> Projection -->
         <!-- a repetition of 1 or more of the following -->
-        <onvifXsd:Projection>
+        <tt:Projection>
          <!-- float Angle -->
-         <onvifXsd:Angle>0.0</onvifXsd:Angle>
+         <tt:Angle>0.0</tt:Angle>
          <!-- float Radius -->
-         <onvifXsd:Radius>0.0</onvifXsd:Radius>
-        </onvifXsd:Projection>
+         <tt:Radius>0.0</tt:Radius>
+        </tt:Projection>
         <!-- float XFactor -->
-        <onvifXsd:XFactor>0.0</onvifXsd:XFactor>
-       </onvifXsd:LensDescription>
-       <!-- onvifXsd__SceneOrientation *SceneOrientation -->
-       <onvifXsd:SceneOrientation>
-        <!-- onvifXsd__SceneOrientationMode Mode -->
-        <onvifXsd:Mode>MANUAL</onvifXsd:Mode>
-       </onvifXsd:SceneOrientation>
+        <tt:XFactor>0.0</tt:XFactor>
+        <!-- std::vector<struct soap_dom_element> __any -->
+        <!-- a repetition of 0 or more of the following -->
+
+       </tt:LensDescription>
+       <!-- tt__SceneOrientation *SceneOrientation -->
+       <tt:SceneOrientation>
+        <!-- tt__SceneOrientationMode Mode -->
+        <tt:Mode>MANUAL</tt:Mode>
+        <!-- std::string *Orientation -->
+        <tt:Orientation></tt:Orientation>
+       </tt:SceneOrientation>
        <!-- std::vector<struct soap_dom_element> __any -->
        <!-- a repetition of 0 or more of the following -->
 
-      </onvifXsd:Extension>
-     </onvifXsd:Extension>
+      </tt:Extension>
+     </tt:Extension>
     </onvifMedia:Configuration>
     <!-- bool ForcePersistence -->
     <onvifMedia:ForcePersistence>false</onvifMedia:ForcePersistence>

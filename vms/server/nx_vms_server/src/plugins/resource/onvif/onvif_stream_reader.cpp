@@ -30,12 +30,12 @@
 
 static const int MAX_CAHCE_URL_TIME = 1000 * 15;
 
-static onvifXsd__StreamType streamTypeFromRtpTransport(nx::vms::api::RtpTransportType rtpTransport)
+static tt__StreamType streamTypeFromRtpTransport(nx::vms::api::RtpTransportType rtpTransport)
 {
     if (rtpTransport == nx::vms::api::RtpTransportType::multicast)
-        return onvifXsd__StreamType::RTP_Multicast;
+        return tt__StreamType::RTP_Multicast;
 
-    return onvifXsd__StreamType::RTP_Unicast;
+    return tt__StreamType::RTP_Unicast;
 }
 
 struct CameraInfoParams
@@ -293,7 +293,7 @@ QnAbstractMediaDataPtr QnOnvifStreamReader::getNextData()
     return rez;
 }
 
-void QnOnvifStreamReader::printProfile(const onvifXsd__Profile& profile, bool isPrimary) const
+void QnOnvifStreamReader::printProfile(const tt__Profile& profile, bool isPrimary) const
 {
     #if defined(PL_ONVIF_DEBUG)
         qDebug() << "ONVIF device (UniqueId: "
@@ -394,14 +394,14 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchStreamUrl(MediaSoapWrapper& 
 
     StreamUriResp response;
     StreamUriReq request;
-    onvifXsd__StreamSetup streamSetup;
-    onvifXsd__Transport transport;
+    tt__StreamSetup streamSetup;
+    tt__Transport transport;
 
     request.StreamSetup = &streamSetup;
     request.StreamSetup->Transport = &transport;
     request.StreamSetup->Stream = streamTypeFromRtpTransport(m_onvifRes->preferredRtpTransport());
     request.StreamSetup->Transport->Tunnel = 0;
-    request.StreamSetup->Transport->Protocol = onvifXsd__TransportProtocol::RTSP;
+    request.StreamSetup->Transport->Protocol = tt__TransportProtocol::RTSP;
     request.ProfileToken = profileToken;
 
     int soapRes = soapWrapper.getStreamUri(request, response);
@@ -484,7 +484,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateVideoEncoder(
 
         // The pointer currentVEConfig points to the object that is valid until
         // veConfigurations destructor is called.
-        onvifXsd__VideoEncoderConfiguration* currentVEConfig = selectVideoEncoderConfig(
+        tt__VideoEncoderConfiguration* currentVEConfig = selectVideoEncoderConfig(
             veConfigurations.get()->Configurations, isPrimary);
 
         if (!currentVEConfig)
@@ -539,7 +539,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateVideoEncoder(
 
         // The pointer currentVEConfig points to the object that is valid until
         // veConfigurations destructor is called.
-        onvifXsd__VideoEncoder2Configuration* currentVEConfig = selectVideoEncoder2Config(
+        tt__VideoEncoder2Configuration* currentVEConfig = selectVideoEncoder2Config(
             veConfigurations.get()->Configurations, isPrimary);
 
         if (!currentVEConfig)
@@ -566,8 +566,8 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateVideoEncoder(
     }
 }
 
-onvifXsd__VideoEncoderConfiguration* QnOnvifStreamReader::selectVideoEncoderConfig(
-    std::vector<onvifXsd__VideoEncoderConfiguration *>& configs, bool isPrimary) const
+tt__VideoEncoderConfiguration* QnOnvifStreamReader::selectVideoEncoderConfig(
+    std::vector<tt__VideoEncoderConfiguration *>& configs, bool isPrimary) const
 {
     const std::string videoEncoderToken = isPrimary
         ? m_onvifRes->primaryVideoCapabilities().videoEncoderToken
@@ -575,7 +575,7 @@ onvifXsd__VideoEncoderConfiguration* QnOnvifStreamReader::selectVideoEncoderConf
 
     for (auto itr = configs.begin(); itr != configs.end(); ++itr)
     {
-        onvifXsd__VideoEncoderConfiguration* conf = *itr;
+        tt__VideoEncoderConfiguration* conf = *itr;
         if (conf && videoEncoderToken == conf->token)
             return conf;
     }
@@ -583,8 +583,8 @@ onvifXsd__VideoEncoderConfiguration* QnOnvifStreamReader::selectVideoEncoderConf
     return nullptr;
 }
 
-onvifXsd__VideoEncoder2Configuration* QnOnvifStreamReader::selectVideoEncoder2Config(
-    std::vector<onvifXsd__VideoEncoder2Configuration *>& configs, bool isPrimary) const
+tt__VideoEncoder2Configuration* QnOnvifStreamReader::selectVideoEncoder2Config(
+    std::vector<tt__VideoEncoder2Configuration *>& configs, bool isPrimary) const
 {
     const std::string videoEncoderToken = isPrimary
         ? m_onvifRes->primaryVideoCapabilities().videoEncoderToken
@@ -592,7 +592,7 @@ onvifXsd__VideoEncoder2Configuration* QnOnvifStreamReader::selectVideoEncoder2Co
 
     for (auto itr = configs.begin(); itr != configs.end(); ++itr)
     {
-        onvifXsd__VideoEncoder2Configuration* conf = *itr;
+        tt__VideoEncoder2Configuration* conf = *itr;
         if (conf && videoEncoderToken == conf->token)
             return conf;
     }
@@ -620,7 +620,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateProfile(
         return profiles.requestFailedResult();
     }
 
-    onvifXsd__Profile* profile = selectExistingProfile(
+    tt__Profile* profile = selectExistingProfile(
         profiles.get()->Profiles, isPrimary, info);
     if (profile)
     {
@@ -668,8 +668,8 @@ CameraDiagnostics::Result QnOnvifStreamReader::createNewProfile(
     return CameraDiagnostics::NoErrorResult();
 }
 
-onvifXsd__Profile* QnOnvifStreamReader::selectExistingProfile(
-    std::vector<onvifXsd__Profile *>& profiles, bool isPrimary, CameraInfoParams& info) const
+tt__Profile* QnOnvifStreamReader::selectExistingProfile(
+    std::vector<tt__Profile *>& profiles, bool isPrimary, CameraInfoParams& info) const
 {
     QStringList availableProfiles;
     QString noProfileName = isPrimary ? QLatin1String(NETOPTIX_PRIMARY_NAME) : QLatin1String(NETOPTIX_SECONDARY_NAME);
@@ -677,7 +677,7 @@ onvifXsd__Profile* QnOnvifStreamReader::selectExistingProfile(
 
     for (auto iter = profiles.begin(); iter != profiles.end(); ++iter)
     {
-        onvifXsd__Profile* profile = *iter;
+        tt__Profile* profile = *iter;
         if (profile->token.empty())
             continue;
         else if (profile->Name == noProfileName.toStdString())
@@ -702,7 +702,7 @@ onvifXsd__Profile* QnOnvifStreamReader::selectExistingProfile(
 
     for (auto iter = profiles.begin(); iter != profiles.end(); ++iter)
     {
-        onvifXsd__Profile* profile = *iter;
+        tt__Profile* profile = *iter;
         if (!profile || !availableProfiles.contains(QString::fromStdString(profile->token)))
             continue;
         bool vSourceMatched = profile->VideoSourceConfiguration
@@ -722,7 +722,7 @@ onvifXsd__Profile* QnOnvifStreamReader::selectExistingProfile(
     QString reqProfileToken = availableProfiles[profileIndex];
     for (auto iter = profiles.begin(); iter != profiles.end(); ++iter)
     {
-        onvifXsd__Profile* profile = *iter;
+        tt__Profile* profile = *iter;
         if (profile->token == reqProfileToken.toStdString())
             return profile;
     }
@@ -776,7 +776,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::bindTwoWayAudioToProfile(
 }
 
 CameraDiagnostics::Result QnOnvifStreamReader::sendProfileToCamera(
-    CameraInfoParams& info, onvifXsd__Profile* profile) const
+    CameraInfoParams& info, tt__Profile* profile) const
 {
     if (!profile)
         return CameraDiagnostics::NoErrorResult();
@@ -955,7 +955,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateAudioEncoder(
         return aeConfigurations.requestFailedResult();
     }
 
-    onvifXsd__AudioEncoderConfiguration* currentAEConfig = selectAudioEncoderConfig(
+    tt__AudioEncoderConfiguration* currentAEConfig = selectAudioEncoderConfig(
         aeConfigurations.get()->Configurations, isPrimary);
     if (!currentAEConfig)
         return CameraDiagnostics::RequestFailedResult("selectAudioEncoderConfig", QString());
@@ -969,8 +969,8 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateAudioEncoder(
     return sendAudioEncoderToCamera(*currentAEConfig);
 }
 
-onvifXsd__AudioEncoderConfiguration* QnOnvifStreamReader::selectAudioEncoderConfig(
-    std::vector<onvifXsd__AudioEncoderConfiguration *>& configs, bool /*isPrimary*/) const
+tt__AudioEncoderConfiguration* QnOnvifStreamReader::selectAudioEncoderConfig(
+    std::vector<tt__AudioEncoderConfiguration *>& configs, bool /*isPrimary*/) const
 {
     std::string id = m_onvifRes->audioEncoderConfigurationToken();
     if (id.empty())
@@ -1000,16 +1000,16 @@ void QnOnvifStreamReader::updateAudioEncoder(AudioEncoder& encoder) const
     switch (codec)
     {
         case QnPlOnvifResource::G711:
-            encoder.Encoding = onvifXsd__AudioEncoding::G711; // = 0
+            encoder.Encoding = tt__AudioEncoding::G711; // = 0
             break;
         case QnPlOnvifResource::G726:
-            encoder.Encoding = onvifXsd__AudioEncoding::G726; // = 1
+            encoder.Encoding = tt__AudioEncoding::G726; // = 1
             break;
         case QnPlOnvifResource::AAC:
-            encoder.Encoding = onvifXsd__AudioEncoding::AAC; // = 2
+            encoder.Encoding = tt__AudioEncoding::AAC; // = 2
             break;
         case QnPlOnvifResource::AMR:
-            encoder.Encoding = onvifXsd__AudioEncoding::AMR; // = 3
+            encoder.Encoding = tt__AudioEncoding::AMR; // = 3
             break;
         default:
             #if defined(PL_ONVIF_DEBUG)
@@ -1031,7 +1031,7 @@ void QnOnvifStreamReader::updateAudioEncoder(AudioEncoder& encoder) const
 }
 
 CameraDiagnostics::Result QnOnvifStreamReader::sendAudioEncoderToCamera(
-    onvifXsd__AudioEncoderConfiguration& encoderConfig) const
+    tt__AudioEncoderConfiguration& encoderConfig) const
 {
     Media::AudioEncoderConfigurationSetter setter(m_onvifRes);
     Media::AudioEncoderConfigurationSetter::Request request;

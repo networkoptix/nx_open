@@ -5,7 +5,6 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:xsd="http://www.w3.org/2001/XMLSchema"
     xmlns:chan="http://schemas.microsoft.com/ws/2005/02/duplex"
-    xmlns:wsa5="http://www.w3.org/2005/08/addressing"
     xmlns:wsdd="http://schemas.xmlsoap.org/ws/2005/04/discovery"
     xmlns:c14n="http://www.w3.org/2001/10/xml-exc-c14n#"
     xmlns:ds="http://www.w3.org/2000/09/xmldsig#"
@@ -15,30 +14,19 @@
     xmlns:xenc="http://www.w3.org/2001/04/xmlenc#"
     xmlns:wsc="http://docs.oasis-open.org/ws-sx/ws-secureconversation/200512"
     xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"
-    xmlns:onvifPacs="http://www.onvif.org/ver10/pacs"
+    xmlns:wsdd5="http://tempuri.org/wsdd5.xsd"
+    xmlns:wsa5="http://www.w3.org/2005/08/addressing"
     xmlns:xmime="http://tempuri.org/xmime.xsd"
     xmlns:xop="http://www.w3.org/2004/08/xop/include"
-    xmlns:onvifXsd="http://www.onvif.org/ver10/schema"
-    xmlns:oasisWsrf="http://docs.oasis-open.org/wsrf/bf-2"
-    xmlns:oasisWsnT1="http://docs.oasis-open.org/wsn/t-1"
-    xmlns:oasisWsrfR2="http://docs.oasis-open.org/wsrf/r-2"
-    xmlns:onvifAccessControl="http://www.onvif.org/ver10/accesscontrol/wsdl"
-    xmlns:onvifAccessRules="http://www.onvif.org/ver10/accessrules/wsdl"
-    xmlns:onvifActionEngine="http://www.onvif.org/ver10/actionengine/wsdl"
-    xmlns:onvifAdvancedSecurity-assb="http://www.onvif.org/ver10/advancedsecurity/wsdl/AdvancedSecurityServiceBinding"
-    xmlns:onvifAdvancedSecurity-db="http://www.onvif.org/ver10/advancedsecurity/wsdl/Dot1XBinding"
-    xmlns:onvifAdvancedSecurity-kb="http://www.onvif.org/ver10/advancedsecurity/wsdl/KeystoreBinding"
-    xmlns:onvifAdvancedSecurity-tsb="http://www.onvif.org/ver10/advancedsecurity/wsdl/TLSServerBinding"
-    xmlns:onvifAdvancedSecurity="http://www.onvif.org/ver10/advancedsecurity/wsdl"
+    xmlns:tt="http://www.onvif.org/ver10/schema"
+    xmlns:wsrfbf="http://docs.oasis-open.org/wsrf/bf-2"
+    xmlns:wstop="http://docs.oasis-open.org/wsn/t-1"
+    xmlns:wsrfr="http://docs.oasis-open.org/wsrf/r-2"
     xmlns:onvifAnalytics-aeb="http://www.onvif.org/ver20/analytics/wsdl/AnalyticsEngineBinding"
     xmlns:onvifAnalytics-reb="http://www.onvif.org/ver20/analytics/wsdl/RuleEngineBinding"
     xmlns:onvifAnalytics="http://www.onvif.org/ver20/analytics/wsdl"
-    xmlns:onvifAnalyticsDevice="http://www.onvif.org/ver10/analyticsdevice/wsdl"
-    xmlns:onvifCredential="http://www.onvif.org/ver10/credential/wsdl"
     xmlns:onvifDevice="http://www.onvif.org/ver10/device/wsdl"
     xmlns:onvifDeviceIO="http://www.onvif.org/ver10/deviceIO/wsdl"
-    xmlns:onvifDisplay="http://www.onvif.org/ver10/display/wsdl"
-    xmlns:onvifDoorControl="http://www.onvif.org/ver10/doorcontrol/wsdl"
     xmlns:onvifEvents-cpb="http://www.onvif.org/ver10/events/wsdl/CreatePullPointBinding"
     xmlns:onvifEvents-eb="http://www.onvif.org/ver10/events/wsdl/EventBinding"
     xmlns:onvifEvents-ncb="http://www.onvif.org/ver10/events/wsdl/NotificationConsumerBinding"
@@ -47,7 +35,7 @@
     xmlns:onvifEvents="http://www.onvif.org/ver10/events/wsdl"
     xmlns:onvifEvents-pps="http://www.onvif.org/ver10/events/wsdl/PullPointSubscriptionBinding"
     xmlns:onvifEvents-psmb="http://www.onvif.org/ver10/events/wsdl/PausableSubscriptionManagerBinding"
-    xmlns:oasisWsnB2="http://docs.oasis-open.org/wsn/b-2"
+    xmlns:wsnt="http://docs.oasis-open.org/wsn/b-2"
     xmlns:onvifEvents-smb="http://www.onvif.org/ver10/events/wsdl/SubscriptionManagerBinding"
     xmlns:onvifImg="http://www.onvif.org/ver20/imaging/wsdl"
     xmlns:onvifMedia="http://www.onvif.org/ver10/media/wsdl"
@@ -55,283 +43,291 @@
     xmlns:onvifNetwork-dlb="http://www.onvif.org/ver10/network/wsdl/DiscoveryLookupBinding"
     xmlns:onvifNetwork-rdb="http://www.onvif.org/ver10/network/wsdl/RemoteDiscoveryBinding"
     xmlns:onvifNetwork="http://www.onvif.org/ver10/network/wsdl"
-    xmlns:onvifProvisioning="http://www.onvif.org/ver10/provisioning/wsdl"
-    xmlns:onvifPtz="http://www.onvif.org/ver20/ptz/wsdl"
-    xmlns:onvifReceiver="http://www.onvif.org/ver10/receiver/wsdl"
-    xmlns:onvifRecording="http://www.onvif.org/ver10/recording/wsdl"
-    xmlns:onvifReplay="http://www.onvif.org/ver10/replay/wsdl"
-    xmlns:onvifScedule="http://www.onvif.org/ver10/schedule/wsdl"
-    xmlns:onvifSearch="http://www.onvif.org/ver10/search/wsdl"
-    xmlns:onvifThermal="http://www.onvif.org/ver10/thermal/wsdl">
+    xmlns:onvifPtz="http://www.onvif.org/ver20/ptz/wsdl">
  <!-- struct SOAP_ENV__Header *soap::header -->
  <SOAP-ENV:Header>
  </SOAP-ENV:Header>
  <SOAP-ENV:Body>
   <!-- __onvifImg__GetOptions(..., _onvifImg__GetOptionsResponse &onvifImg__GetOptionsResponse) -->
   <onvifImg:GetOptionsResponse>
-   <!-- onvifXsd__ImagingOptions20 *ImagingOptions -->
+   <!-- tt__ImagingOptions20 *ImagingOptions -->
    <onvifImg:ImagingOptions>
-    <!-- onvifXsd__BacklightCompensationOptions20 *BacklightCompensation -->
-    <onvifXsd:BacklightCompensation>
-     <!-- std::vector<onvifXsd__BacklightCompensationMode> Mode -->
+    <!-- tt__BacklightCompensationOptions20 *BacklightCompensation -->
+    <tt:BacklightCompensation>
+     <!-- std::vector<tt__BacklightCompensationMode> Mode -->
      <!-- a repetition of 1 or more of the following -->
-     <onvifXsd:Mode>OFF</onvifXsd:Mode>
-     <!-- onvifXsd__FloatRange *Level -->
-     <onvifXsd:Level>
+     <tt:Mode>OFF</tt:Mode>
+     <!-- tt__FloatRange *Level -->
+     <tt:Level>
       <!-- float Min -->
-      <onvifXsd:Min>0.0</onvifXsd:Min>
+      <tt:Min>0.0</tt:Min>
       <!-- float Max -->
-      <onvifXsd:Max>0.0</onvifXsd:Max>
-     </onvifXsd:Level>
-    </onvifXsd:BacklightCompensation>
-    <!-- onvifXsd__FloatRange *Brightness -->
-    <onvifXsd:Brightness>
+      <tt:Max>0.0</tt:Max>
+     </tt:Level>
+    </tt:BacklightCompensation>
+    <!-- tt__FloatRange *Brightness -->
+    <tt:Brightness>
      <!-- float Min -->
-     <onvifXsd:Min>0.0</onvifXsd:Min>
+     <tt:Min>0.0</tt:Min>
      <!-- float Max -->
-     <onvifXsd:Max>0.0</onvifXsd:Max>
-    </onvifXsd:Brightness>
-    <!-- onvifXsd__FloatRange *ColorSaturation -->
-    <onvifXsd:ColorSaturation>
+     <tt:Max>0.0</tt:Max>
+    </tt:Brightness>
+    <!-- tt__FloatRange *ColorSaturation -->
+    <tt:ColorSaturation>
      <!-- float Min -->
-     <onvifXsd:Min>0.0</onvifXsd:Min>
+     <tt:Min>0.0</tt:Min>
      <!-- float Max -->
-     <onvifXsd:Max>0.0</onvifXsd:Max>
-    </onvifXsd:ColorSaturation>
-    <!-- onvifXsd__FloatRange *Contrast -->
-    <onvifXsd:Contrast>
+     <tt:Max>0.0</tt:Max>
+    </tt:ColorSaturation>
+    <!-- tt__FloatRange *Contrast -->
+    <tt:Contrast>
      <!-- float Min -->
-     <onvifXsd:Min>0.0</onvifXsd:Min>
+     <tt:Min>0.0</tt:Min>
      <!-- float Max -->
-     <onvifXsd:Max>0.0</onvifXsd:Max>
-    </onvifXsd:Contrast>
-    <!-- onvifXsd__ExposureOptions20 *Exposure -->
-    <onvifXsd:Exposure>
-     <!-- std::vector<onvifXsd__ExposureMode> Mode -->
+     <tt:Max>0.0</tt:Max>
+    </tt:Contrast>
+    <!-- tt__ExposureOptions20 *Exposure -->
+    <tt:Exposure>
+     <!-- std::vector<tt__ExposureMode> Mode -->
      <!-- a repetition of 1 or more of the following -->
-     <onvifXsd:Mode>AUTO</onvifXsd:Mode>
-     <!-- std::vector<onvifXsd__ExposurePriority> Priority -->
+     <tt:Mode>AUTO</tt:Mode>
+     <!-- std::vector<tt__ExposurePriority> Priority -->
      <!-- a repetition of 0 or more of the following -->
-     <onvifXsd:Priority>LowNoise</onvifXsd:Priority>
-     <!-- onvifXsd__FloatRange *MinExposureTime -->
-     <onvifXsd:MinExposureTime>
+     <tt:Priority>LowNoise</tt:Priority>
+     <!-- tt__FloatRange *MinExposureTime -->
+     <tt:MinExposureTime>
       <!-- float Min -->
-      <onvifXsd:Min>0.0</onvifXsd:Min>
+      <tt:Min>0.0</tt:Min>
       <!-- float Max -->
-      <onvifXsd:Max>0.0</onvifXsd:Max>
-     </onvifXsd:MinExposureTime>
-     <!-- onvifXsd__FloatRange *MaxExposureTime -->
-     <onvifXsd:MaxExposureTime>
+      <tt:Max>0.0</tt:Max>
+     </tt:MinExposureTime>
+     <!-- tt__FloatRange *MaxExposureTime -->
+     <tt:MaxExposureTime>
       <!-- float Min -->
-      <onvifXsd:Min>0.0</onvifXsd:Min>
+      <tt:Min>0.0</tt:Min>
       <!-- float Max -->
-      <onvifXsd:Max>0.0</onvifXsd:Max>
-     </onvifXsd:MaxExposureTime>
-     <!-- onvifXsd__FloatRange *MinGain -->
-     <onvifXsd:MinGain>
+      <tt:Max>0.0</tt:Max>
+     </tt:MaxExposureTime>
+     <!-- tt__FloatRange *MinGain -->
+     <tt:MinGain>
       <!-- float Min -->
-      <onvifXsd:Min>0.0</onvifXsd:Min>
+      <tt:Min>0.0</tt:Min>
       <!-- float Max -->
-      <onvifXsd:Max>0.0</onvifXsd:Max>
-     </onvifXsd:MinGain>
-     <!-- onvifXsd__FloatRange *MaxGain -->
-     <onvifXsd:MaxGain>
+      <tt:Max>0.0</tt:Max>
+     </tt:MinGain>
+     <!-- tt__FloatRange *MaxGain -->
+     <tt:MaxGain>
       <!-- float Min -->
-      <onvifXsd:Min>0.0</onvifXsd:Min>
+      <tt:Min>0.0</tt:Min>
       <!-- float Max -->
-      <onvifXsd:Max>0.0</onvifXsd:Max>
-     </onvifXsd:MaxGain>
-     <!-- onvifXsd__FloatRange *MinIris -->
-     <onvifXsd:MinIris>
+      <tt:Max>0.0</tt:Max>
+     </tt:MaxGain>
+     <!-- tt__FloatRange *MinIris -->
+     <tt:MinIris>
       <!-- float Min -->
-      <onvifXsd:Min>0.0</onvifXsd:Min>
+      <tt:Min>0.0</tt:Min>
       <!-- float Max -->
-      <onvifXsd:Max>0.0</onvifXsd:Max>
-     </onvifXsd:MinIris>
-     <!-- onvifXsd__FloatRange *MaxIris -->
-     <onvifXsd:MaxIris>
+      <tt:Max>0.0</tt:Max>
+     </tt:MinIris>
+     <!-- tt__FloatRange *MaxIris -->
+     <tt:MaxIris>
       <!-- float Min -->
-      <onvifXsd:Min>0.0</onvifXsd:Min>
+      <tt:Min>0.0</tt:Min>
       <!-- float Max -->
-      <onvifXsd:Max>0.0</onvifXsd:Max>
-     </onvifXsd:MaxIris>
-     <!-- onvifXsd__FloatRange *ExposureTime -->
-     <onvifXsd:ExposureTime>
+      <tt:Max>0.0</tt:Max>
+     </tt:MaxIris>
+     <!-- tt__FloatRange *ExposureTime -->
+     <tt:ExposureTime>
       <!-- float Min -->
-      <onvifXsd:Min>0.0</onvifXsd:Min>
+      <tt:Min>0.0</tt:Min>
       <!-- float Max -->
-      <onvifXsd:Max>0.0</onvifXsd:Max>
-     </onvifXsd:ExposureTime>
-     <!-- onvifXsd__FloatRange *Gain -->
-     <onvifXsd:Gain>
+      <tt:Max>0.0</tt:Max>
+     </tt:ExposureTime>
+     <!-- tt__FloatRange *Gain -->
+     <tt:Gain>
       <!-- float Min -->
-      <onvifXsd:Min>0.0</onvifXsd:Min>
+      <tt:Min>0.0</tt:Min>
       <!-- float Max -->
-      <onvifXsd:Max>0.0</onvifXsd:Max>
-     </onvifXsd:Gain>
-     <!-- onvifXsd__FloatRange *Iris -->
-     <onvifXsd:Iris>
+      <tt:Max>0.0</tt:Max>
+     </tt:Gain>
+     <!-- tt__FloatRange *Iris -->
+     <tt:Iris>
       <!-- float Min -->
-      <onvifXsd:Min>0.0</onvifXsd:Min>
+      <tt:Min>0.0</tt:Min>
       <!-- float Max -->
-      <onvifXsd:Max>0.0</onvifXsd:Max>
-     </onvifXsd:Iris>
-    </onvifXsd:Exposure>
-    <!-- onvifXsd__FocusOptions20 *Focus -->
-    <onvifXsd:Focus>
-     <!-- std::vector<onvifXsd__AutoFocusMode> AutoFocusModes -->
+      <tt:Max>0.0</tt:Max>
+     </tt:Iris>
+    </tt:Exposure>
+    <!-- tt__FocusOptions20 *Focus -->
+    <tt:Focus>
+     <!-- std::vector<tt__AutoFocusMode> AutoFocusModes -->
      <!-- a repetition of 0 or more of the following -->
-     <onvifXsd:AutoFocusModes>AUTO</onvifXsd:AutoFocusModes>
-     <!-- onvifXsd__FloatRange *DefaultSpeed -->
-     <onvifXsd:DefaultSpeed>
+     <tt:AutoFocusModes>AUTO</tt:AutoFocusModes>
+     <!-- tt__FloatRange *DefaultSpeed -->
+     <tt:DefaultSpeed>
       <!-- float Min -->
-      <onvifXsd:Min>0.0</onvifXsd:Min>
+      <tt:Min>0.0</tt:Min>
       <!-- float Max -->
-      <onvifXsd:Max>0.0</onvifXsd:Max>
-     </onvifXsd:DefaultSpeed>
-     <!-- onvifXsd__FloatRange *NearLimit -->
-     <onvifXsd:NearLimit>
+      <tt:Max>0.0</tt:Max>
+     </tt:DefaultSpeed>
+     <!-- tt__FloatRange *NearLimit -->
+     <tt:NearLimit>
       <!-- float Min -->
-      <onvifXsd:Min>0.0</onvifXsd:Min>
+      <tt:Min>0.0</tt:Min>
       <!-- float Max -->
-      <onvifXsd:Max>0.0</onvifXsd:Max>
-     </onvifXsd:NearLimit>
-     <!-- onvifXsd__FloatRange *FarLimit -->
-     <onvifXsd:FarLimit>
+      <tt:Max>0.0</tt:Max>
+     </tt:NearLimit>
+     <!-- tt__FloatRange *FarLimit -->
+     <tt:FarLimit>
       <!-- float Min -->
-      <onvifXsd:Min>0.0</onvifXsd:Min>
+      <tt:Min>0.0</tt:Min>
       <!-- float Max -->
-      <onvifXsd:Max>0.0</onvifXsd:Max>
-     </onvifXsd:FarLimit>
-     <!-- onvifXsd__FocusOptions20Extension *Extension -->
-     <onvifXsd:Extension>
+      <tt:Max>0.0</tt:Max>
+     </tt:FarLimit>
+     <!-- tt__FocusOptions20Extension *Extension -->
+     <tt:Extension>
       <!-- std::vector<struct soap_dom_element> __any -->
       <!-- a repetition of 0 or more of the following -->
 
-     </onvifXsd:Extension>
-    </onvifXsd:Focus>
-    <!-- std::vector<onvifXsd__IrCutFilterMode> IrCutFilterModes -->
+     </tt:Extension>
+    </tt:Focus>
+    <!-- std::vector<tt__IrCutFilterMode> IrCutFilterModes -->
     <!-- a repetition of 0 or more of the following -->
-    <onvifXsd:IrCutFilterModes>ON</onvifXsd:IrCutFilterModes>
-    <!-- onvifXsd__FloatRange *Sharpness -->
-    <onvifXsd:Sharpness>
+    <tt:IrCutFilterModes>ON</tt:IrCutFilterModes>
+    <!-- tt__FloatRange *Sharpness -->
+    <tt:Sharpness>
      <!-- float Min -->
-     <onvifXsd:Min>0.0</onvifXsd:Min>
+     <tt:Min>0.0</tt:Min>
      <!-- float Max -->
-     <onvifXsd:Max>0.0</onvifXsd:Max>
-    </onvifXsd:Sharpness>
-    <!-- onvifXsd__WideDynamicRangeOptions20 *WideDynamicRange -->
-    <onvifXsd:WideDynamicRange>
-     <!-- std::vector<onvifXsd__WideDynamicMode> Mode -->
+     <tt:Max>0.0</tt:Max>
+    </tt:Sharpness>
+    <!-- tt__WideDynamicRangeOptions20 *WideDynamicRange -->
+    <tt:WideDynamicRange>
+     <!-- std::vector<tt__WideDynamicMode> Mode -->
      <!-- a repetition of 1 or more of the following -->
-     <onvifXsd:Mode>OFF</onvifXsd:Mode>
-     <!-- onvifXsd__FloatRange *Level -->
-     <onvifXsd:Level>
+     <tt:Mode>OFF</tt:Mode>
+     <!-- tt__FloatRange *Level -->
+     <tt:Level>
       <!-- float Min -->
-      <onvifXsd:Min>0.0</onvifXsd:Min>
+      <tt:Min>0.0</tt:Min>
       <!-- float Max -->
-      <onvifXsd:Max>0.0</onvifXsd:Max>
-     </onvifXsd:Level>
-    </onvifXsd:WideDynamicRange>
-    <!-- onvifXsd__WhiteBalanceOptions20 *WhiteBalance -->
-    <onvifXsd:WhiteBalance>
-     <!-- std::vector<onvifXsd__WhiteBalanceMode> Mode -->
+      <tt:Max>0.0</tt:Max>
+     </tt:Level>
+    </tt:WideDynamicRange>
+    <!-- tt__WhiteBalanceOptions20 *WhiteBalance -->
+    <tt:WhiteBalance>
+     <!-- std::vector<tt__WhiteBalanceMode> Mode -->
      <!-- a repetition of 1 or more of the following -->
-     <onvifXsd:Mode>AUTO</onvifXsd:Mode>
-     <!-- onvifXsd__FloatRange *YrGain -->
-     <onvifXsd:YrGain>
+     <tt:Mode>AUTO</tt:Mode>
+     <!-- tt__FloatRange *YrGain -->
+     <tt:YrGain>
       <!-- float Min -->
-      <onvifXsd:Min>0.0</onvifXsd:Min>
+      <tt:Min>0.0</tt:Min>
       <!-- float Max -->
-      <onvifXsd:Max>0.0</onvifXsd:Max>
-     </onvifXsd:YrGain>
-     <!-- onvifXsd__FloatRange *YbGain -->
-     <onvifXsd:YbGain>
+      <tt:Max>0.0</tt:Max>
+     </tt:YrGain>
+     <!-- tt__FloatRange *YbGain -->
+     <tt:YbGain>
       <!-- float Min -->
-      <onvifXsd:Min>0.0</onvifXsd:Min>
+      <tt:Min>0.0</tt:Min>
       <!-- float Max -->
-      <onvifXsd:Max>0.0</onvifXsd:Max>
-     </onvifXsd:YbGain>
-     <!-- onvifXsd__WhiteBalanceOptions20Extension *Extension -->
-     <onvifXsd:Extension>
+      <tt:Max>0.0</tt:Max>
+     </tt:YbGain>
+     <!-- tt__WhiteBalanceOptions20Extension *Extension -->
+     <tt:Extension>
       <!-- std::vector<struct soap_dom_element> __any -->
       <!-- a repetition of 0 or more of the following -->
 
-     </onvifXsd:Extension>
-    </onvifXsd:WhiteBalance>
-    <!-- onvifXsd__ImagingOptions20Extension *Extension -->
-    <onvifXsd:Extension>
+     </tt:Extension>
+    </tt:WhiteBalance>
+    <!-- tt__ImagingOptions20Extension *Extension -->
+    <tt:Extension>
      <!-- std::vector<struct soap_dom_element> __any -->
      <!-- a repetition of 0 or more of the following -->
 
-     <!-- onvifXsd__ImageStabilizationOptions *ImageStabilization -->
-     <onvifXsd:ImageStabilization>
-      <!-- std::vector<onvifXsd__ImageStabilizationMode> Mode -->
+     <!-- tt__ImageStabilizationOptions *ImageStabilization -->
+     <tt:ImageStabilization>
+      <!-- std::vector<tt__ImageStabilizationMode> Mode -->
       <!-- a repetition of 1 or more of the following -->
-      <onvifXsd:Mode>OFF</onvifXsd:Mode>
-      <!-- onvifXsd__FloatRange *Level -->
-      <onvifXsd:Level>
+      <tt:Mode>OFF</tt:Mode>
+      <!-- tt__FloatRange *Level -->
+      <tt:Level>
        <!-- float Min -->
-       <onvifXsd:Min>0.0</onvifXsd:Min>
+       <tt:Min>0.0</tt:Min>
        <!-- float Max -->
-       <onvifXsd:Max>0.0</onvifXsd:Max>
-      </onvifXsd:Level>
-      <!-- onvifXsd__ImageStabilizationOptionsExtension *Extension -->
-      <onvifXsd:Extension>
+       <tt:Max>0.0</tt:Max>
+      </tt:Level>
+      <!-- tt__ImageStabilizationOptionsExtension *Extension -->
+      <tt:Extension>
        <!-- std::vector<struct soap_dom_element> __any -->
        <!-- a repetition of 0 or more of the following -->
 
-      </onvifXsd:Extension>
-     </onvifXsd:ImageStabilization>
-     <!-- onvifXsd__ImagingOptions20Extension2 *Extension -->
-     <onvifXsd:Extension>
-      <!-- onvifXsd__IrCutFilterAutoAdjustmentOptions *IrCutFilterAutoAdjustment -->
-      <onvifXsd:IrCutFilterAutoAdjustment>
+      </tt:Extension>
+     </tt:ImageStabilization>
+     <!-- tt__ImagingOptions20Extension2 *Extension -->
+     <tt:Extension>
+      <!-- tt__IrCutFilterAutoAdjustmentOptions *IrCutFilterAutoAdjustment -->
+      <tt:IrCutFilterAutoAdjustment>
        <!-- std::vector<std::string> BoundaryType -->
        <!-- a repetition of 1 or more of the following -->
-       <onvifXsd:BoundaryType></onvifXsd:BoundaryType>
+       <tt:BoundaryType></tt:BoundaryType>
        <!-- bool *BoundaryOffset -->
-       <onvifXsd:BoundaryOffset>false</onvifXsd:BoundaryOffset>
-       <!-- onvifXsd__DurationRange *ResponseTimeRange -->
-       <onvifXsd:ResponseTimeRange>
+       <tt:BoundaryOffset>false</tt:BoundaryOffset>
+       <!-- tt__DurationRange *ResponseTimeRange -->
+       <tt:ResponseTimeRange>
         <!-- LONG64 Min -->
-        <onvifXsd:Min>PT0S</onvifXsd:Min>
+        <tt:Min>PT0S</tt:Min>
         <!-- LONG64 Max -->
-        <onvifXsd:Max>PT0S</onvifXsd:Max>
-       </onvifXsd:ResponseTimeRange>
-       <!-- onvifXsd__IrCutFilterAutoAdjustmentOptionsExtension *Extension -->
-       <onvifXsd:Extension>
-       </onvifXsd:Extension>
-      </onvifXsd:IrCutFilterAutoAdjustment>
-      <!-- onvifXsd__ImagingOptions20Extension3 *Extension -->
-      <onvifXsd:Extension>
-       <!-- onvifXsd__ToneCompensationOptions *ToneCompensationOptions -->
-       <onvifXsd:ToneCompensationOptions>
+        <tt:Max>PT0S</tt:Max>
+       </tt:ResponseTimeRange>
+       <!-- tt__IrCutFilterAutoAdjustmentOptionsExtension *Extension -->
+       <tt:Extension>
+        <!-- std::vector<struct soap_dom_element> __any -->
+        <!-- a repetition of 0 or more of the following -->
+
+       </tt:Extension>
+      </tt:IrCutFilterAutoAdjustment>
+      <!-- tt__ImagingOptions20Extension3 *Extension -->
+      <tt:Extension>
+       <!-- tt__ToneCompensationOptions *ToneCompensationOptions -->
+       <tt:ToneCompensationOptions>
         <!-- std::vector<std::string> Mode -->
         <!-- a repetition of 1 or more of the following -->
-        <onvifXsd:Mode></onvifXsd:Mode>
+        <tt:Mode></tt:Mode>
         <!-- bool Level -->
-        <onvifXsd:Level>false</onvifXsd:Level>
-       </onvifXsd:ToneCompensationOptions>
-       <!-- onvifXsd__DefoggingOptions *DefoggingOptions -->
-       <onvifXsd:DefoggingOptions>
+        <tt:Level>false</tt:Level>
+        <!-- std::vector<struct soap_dom_element> __any -->
+        <!-- a repetition of 0 or more of the following -->
+
+       </tt:ToneCompensationOptions>
+       <!-- tt__DefoggingOptions *DefoggingOptions -->
+       <tt:DefoggingOptions>
         <!-- std::vector<std::string> Mode -->
         <!-- a repetition of 1 or more of the following -->
-        <onvifXsd:Mode></onvifXsd:Mode>
+        <tt:Mode></tt:Mode>
         <!-- bool Level -->
-        <onvifXsd:Level>false</onvifXsd:Level>
-       </onvifXsd:DefoggingOptions>
-       <!-- onvifXsd__NoiseReductionOptions *NoiseReductionOptions -->
-       <onvifXsd:NoiseReductionOptions>
+        <tt:Level>false</tt:Level>
+        <!-- std::vector<struct soap_dom_element> __any -->
+        <!-- a repetition of 0 or more of the following -->
+
+       </tt:DefoggingOptions>
+       <!-- tt__NoiseReductionOptions *NoiseReductionOptions -->
+       <tt:NoiseReductionOptions>
         <!-- bool Level -->
-        <onvifXsd:Level>false</onvifXsd:Level>
-       </onvifXsd:NoiseReductionOptions>
-       <!-- onvifXsd__ImagingOptions20Extension4 *Extension -->
-       <onvifXsd:Extension>
-       </onvifXsd:Extension>
-      </onvifXsd:Extension>
-     </onvifXsd:Extension>
-    </onvifXsd:Extension>
+        <tt:Level>false</tt:Level>
+        <!-- std::vector<struct soap_dom_element> __any -->
+        <!-- a repetition of 0 or more of the following -->
+
+       </tt:NoiseReductionOptions>
+       <!-- tt__ImagingOptions20Extension4 *Extension -->
+       <tt:Extension>
+        <!-- std::vector<struct soap_dom_element> __any -->
+        <!-- a repetition of 0 or more of the following -->
+
+       </tt:Extension>
+      </tt:Extension>
+     </tt:Extension>
+    </tt:Extension>
    </onvifImg:ImagingOptions>
   </onvifImg:GetOptionsResponse>
  </SOAP-ENV:Body>
