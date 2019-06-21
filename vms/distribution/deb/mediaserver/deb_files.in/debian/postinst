@@ -283,13 +283,10 @@ startServer()
     service $COMPANY_NAME-mediaserver start
 }
 
-if startServer
-then
-    sleep 1
-    echo Started service $(ps aux | grep "mediaserver-bin -e" | grep -v grep)
-else
-    # We do not fail installation process because in this case dpkg makes a package hard to remove.
-    echo "WARNING: Unable to start service" 1>&2
-fi
+startServer || exit $?
+
+sleep 1
+echo Started service $(ps aux | grep "mediaserver-bin -e" | grep -v grep)
 
 displayCompleteSetupHint $PORT
+
