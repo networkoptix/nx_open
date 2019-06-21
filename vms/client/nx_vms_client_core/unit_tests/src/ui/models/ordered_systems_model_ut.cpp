@@ -42,7 +42,6 @@ void PrintTo(const SystemInfo& val, ::std::ostream* os)
 // A mock class for QnSystemsModel that implements Qt list model.
 class MockSystemsModel: public QAbstractListModel
 {
-    Q_OBJECT
     using base_type = QAbstractListModel;
 
 public:
@@ -142,7 +141,7 @@ class MockSystemsWeightsManager
 public:
     QnWeightsDataHash weights() const { return m_weights; }
 
-    qreal unknownSystemsWeight() const { return 0.0; };
+    qreal unknownSystemsWeight() const { return 0.0; }
 
     void setWeight(const QnUuid& localSystemId, qreal weight, qint64 lastConnectedMs = 0)
     {
@@ -162,7 +161,6 @@ private:
 // QnForgottenSystemsManager.
 class SystemSortFilterListModel: public QnSystemSortFilterListModel
 {
-    Q_OBJECT
     using base_type = QnSystemSortFilterListModel;
 
 public:
@@ -505,5 +503,3 @@ TEST_F(OrderedSystemsModelDataTest, addSystem)
 
 } // namespace test
 } // namespace nx::vms::client::core
-
-#include "ordered_systems_model_ut.moc"
