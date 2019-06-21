@@ -77,7 +77,7 @@ QnOnvifImagingProxy::~QnOnvifImagingProxy()
 
 void QnOnvifImagingProxy::initParameters(QnCameraAdvancedParams &parameters) {
 
-    typedef onvifXsd__FloatRange floatRange;
+    typedef tt__FloatRange floatRange;
 
     loadRanges();
 
@@ -290,7 +290,7 @@ CameraDiagnostics::Result QnOnvifImagingProxy::loadValues(QnCameraAdvancedParamV
         && (m_values->ImagingSettings->Exposure->Priority == nullptr))
     {
         auto soap = m_valsSoapWrapper->soap();
-        m_values->ImagingSettings->Exposure->Priority = soap_new_onvifXsd__ExposurePriority(soap);
+        m_values->ImagingSettings->Exposure->Priority = soap_new_tt__ExposurePriority(soap);
     }
 
     for (auto iter = m_supportedOperations.cbegin(); iter != m_supportedOperations.cend(); ++iter)
