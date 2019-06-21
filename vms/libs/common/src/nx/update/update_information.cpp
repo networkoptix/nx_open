@@ -123,7 +123,7 @@ bool UpdateContents::isValidToInstall() const
 
 bool UpdateContents::isEmpty() const
 {
-    return info.packages.empty();
+    return info.packages.empty() || info.version.isEmpty();
 }
 
 bool UpdateContents::preferOtherUpdate(const UpdateContents& other) const
