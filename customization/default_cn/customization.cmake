@@ -7,7 +7,6 @@ set(display.product.name "Nx Witness")
 set(product.name.short "hdwitness_all_cn")
 set(company.name "Network Optix")
 set(product.appName "hdwitness")
-set(display.mobile.name "Nx Mobile")
 set(uri.protocol "nx-vms")
 set(liteDeviceName "nx1")
 
@@ -23,8 +22,6 @@ set(cloudName "Nx Cloud")
 set(companyUrl "http://networkoptix.com")
 set(productUrl "http://networkoptix.com/nxwitness-overview")
 set(supportUrl "http://support.networkoptix.com")
-set(supportEmail "support@networkoptix.com")
-set(supportPhone "")
 set(licenseEmail "support@networkoptix.com")
 
 set(installer.name "nxwitness_cn")
@@ -47,11 +44,11 @@ set(freeLicenseCount "4")
 set(freeLicenseKey "0000-0000-0000-0020")
 
 # Installer Customizations
-set(installer.language "zh_TW")
+set(installer.language "zh_TW") #< 3.2 release compatibility.
+set(installerLanguage "zh_TW")
 set(installer.cultures "zh-tw")
 
 # Localization
 set(help.language "chinese")
 set(translations zh_TW zh_CN)
 set(defaultTranslation zh_TW)
-
