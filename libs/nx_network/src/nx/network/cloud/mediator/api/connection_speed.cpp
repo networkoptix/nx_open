@@ -2,15 +2,11 @@
 
 #include <nx/fusion/model_functions.h>
 
-namespace nx {
-namespace hpm {
-namespace api {
+namespace nx::hpm::api {
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-	(ConnectionSpeed),
+	(ConnectionSpeed)(PeerConnectionSpeed),
 	(json),
-	_Fields);
+	_Fields)
 
-} // namespace api
-} // namespace hpm
-} // namespace nx
+} // namespace nx::hpm::api

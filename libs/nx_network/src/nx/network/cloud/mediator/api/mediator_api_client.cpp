@@ -45,6 +45,16 @@ void Client::initiateConnection(
         request);
 }
 
+void Client::reportUplinkSpeed(
+	const PeerConnectionSpeed& connectionSpeed,
+	nx::utils::MoveOnlyFunc<void(ResultCode)> completionHandler)
+{
+	base_type::template makeAsyncCall<void>(
+		kConnectionSpeedUplinkPath,
+		std::move(completionHandler),
+		connectionSpeed);
+}
+
 Client::ResultCode Client::systemErrorCodeToResultCode(
     SystemError::ErrorCode systemErrorCode)
 {

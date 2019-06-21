@@ -4,21 +4,28 @@
 
 #include <nx/fusion/model_functions_fwd.h>
 
-namespace nx {
-namespace hpm {
-namespace api {
+namespace nx::hpm::api {
 
 using BytesPerSecond = int;
 
-struct ConnectionSpeed
+struct NX_NETWORK_API ConnectionSpeed
 {
 	std::chrono::microseconds pingTime;
 	BytesPerSecond bandwidth;
 };
 
 #define ConnectionSpeed_Fields (pingTime)(bandwidth)
-QN_FUSION_DECLARE_FUNCTIONS(ConnectionSpeed, (json), NX_NETWORK_API)
 
-} // namespace api
-} // namespace hpm
-} // namespace nx
+struct NX_NETWORK_API PeerConnectionSpeed
+{
+	std::string serverId;
+	std::string systemId;
+	ConnectionSpeed connectionSpeed;
+};
+
+#define PeerConnectionSpeed_Fields (serverId)(systemId)(connectionSpeed)
+
+QN_FUSION_DECLARE_FUNCTIONS(nx::hpm::api::ConnectionSpeed, (json), NX_NETWORK_API)
+QN_FUSION_DECLARE_FUNCTIONS(nx::hpm::api::PeerConnectionSpeed, (json), NX_NETWORK_API)
+
+} // namespace nx::hpm::api
