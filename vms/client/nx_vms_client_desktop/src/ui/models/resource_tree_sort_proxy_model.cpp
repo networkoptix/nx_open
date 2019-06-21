@@ -4,7 +4,7 @@
 #include <core/resource/resource.h>
 
 #include <nx/utils/math/fuzzy.h>
-#include <nx/vms/client/desktop/resource_views/data/node_type.h>
+#include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 
 QnResourceTreeSortProxyModel::QnResourceTreeSortProxyModel(QObject* parent):
     base_type(parent)
@@ -36,7 +36,7 @@ Qt::DropActions QnResourceTreeSortProxyModel::supportedDropActions() const
 
 qreal QnResourceTreeSortProxyModel::nodeOrder(const QModelIndex& index)
 {
-    using NodeType = nx::vms::client::desktop::ResourceTreeNodeType;
+    using NodeType = nx::vms::client::desktop::ResourceTree::NodeType;
 
     const auto order = [](NodeType t) { return static_cast<qreal>(t); };
 

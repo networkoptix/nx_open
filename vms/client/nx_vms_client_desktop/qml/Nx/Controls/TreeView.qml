@@ -29,7 +29,11 @@ Item
 
         anchors.fill: parent
 
-        model: LinearizationListModel { sourceModel: treeView.model }
+        model: LinearizationListModel
+        {
+            id: linearizationListModel
+            sourceModel: treeView.model
+        }
 
         delegate: Item
         {
@@ -95,9 +99,10 @@ Item
                 id: delegateLoader
 
                 readonly property var model: modelData
-                readonly property ListView view: listView
                 readonly property bool isCurrentItem: isCurrent
                 readonly property real itemIndent: x
+                readonly property var modelIndex:
+                    linearizationListModel.mapToSource(linearizationListModel.index(index, 0))
 
                 sourceComponent: treeView.delegate
 

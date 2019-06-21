@@ -12,14 +12,6 @@ class ResourceTreeModelAdapter: public QnResourceTreeSortProxyModel
 public:
     ResourceTreeModelAdapter(QObject* parent = nullptr);
 
-    enum class ItemState
-    {
-        normal,
-        selected,
-        accented
-    };
-    Q_ENUM(ItemState)
-
     virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
 
     static void registerQmlType();

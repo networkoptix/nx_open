@@ -50,7 +50,7 @@ namespace Qn
         FirstItemDataRole = Qt::UserRole,
 
         /* Tree-based. */
-        NodeTypeRole,  /**< Role for node type, see <tt>ResourceTreeNodeType</tt>. */
+        NodeTypeRole,  /**< Role for node type, see <tt>ResourceTree::NodeType</tt>. */
         ResourceTreeScopeRole, //< Role for ResourceTreeScope.
 
         /* Resource-based. */
@@ -248,7 +248,6 @@ namespace Qn
         RaiseSelectionRole,                         /**< Role for raising a single-selected item (bool). */
 
         ExtraResourceInfoRole,                      /**< Role for extra resource information in the tree (QString). */
-        SeparatorRole,                              /**< Item is a separator (bool). */
 
         // Model notification roles. Do not necessarily pass any data but implement
         // item-related view-to-model notifications via setData which can be proxied.

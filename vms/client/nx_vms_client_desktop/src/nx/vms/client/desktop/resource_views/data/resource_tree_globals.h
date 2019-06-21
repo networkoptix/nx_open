@@ -4,11 +4,14 @@
 #include <QtCore/QHash>
 
 namespace nx::vms::client::desktop {
+namespace ResourceTree {
+
+Q_NAMESPACE
 
 /**
  * Type of a node in resource tree. Ordered as it should be displayed.
  */
-enum class ResourceTreeNodeType
+    enum class NodeType
 {
     // Single-occurrence nodes.
 
@@ -99,14 +102,24 @@ enum class ResourceTreeNodeType
     // Local system but the current.
     localSystem,
 };
+Q_ENUM_NS(NodeType);
 
-inline uint qHash(ResourceTreeNodeType value, uint seed)
+inline uint qHash(NodeType value, uint seed)
 {
     return ::qHash(static_cast<int>(value), seed);
 }
 
-bool isSeparatorNode(ResourceTreeNodeType t);
+enum class ItemState
+{
+    normal,
+    selected,
+    accented
+};
+Q_ENUM_NS(ItemState);
 
+bool isSeparatorNode(NodeType nodeType);
+
+void registerQmlType();
+
+} // namespace ResourceTree
 } // namespace nx::vms::client::desktop
-
-Q_DECLARE_METATYPE(nx::vms::client::desktop::ResourceTreeNodeType)

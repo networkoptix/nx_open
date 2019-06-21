@@ -16,7 +16,7 @@
 #include <nx/vms/client/desktop/ui/actions/action_types.h>
 #include <nx/vms/client/desktop/ui/actions/action_parameter_types.h>
 
-#include <nx/vms/client/desktop/resource_views/data/node_type.h>
+#include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 
 class QnWorkbenchContext;
 
@@ -606,10 +606,10 @@ ConditionWrapper hasFlags(Qn::ResourceFlags flags, MatchMode matchMode);
 /** Target resources have the video stream. */
 ConditionWrapper hasVideo(MatchMode matchMode, bool value = true);
 
-ConditionWrapper treeNodeType(QSet<ResourceTreeNodeType> types);
-inline ConditionWrapper treeNodeType(ResourceTreeNodeType type)
+ConditionWrapper treeNodeType(QSet<ResourceTree::NodeType> types);
+inline ConditionWrapper treeNodeType(ResourceTree::NodeType type)
 {
-    return treeNodeType(QSet<ResourceTreeNodeType>{type});
+    return treeNodeType(QSet<ResourceTree::NodeType>{type});
 }
 
 /** Visible in layout tour preview mode only. */

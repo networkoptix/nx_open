@@ -21,7 +21,7 @@
 #include <ui/models/resource/resource_tree_model.h>
 #include <ui/models/resource_tree_sort_proxy_model.h>
 #include <ui/models/resource/resource_compare_helper.h>
-#include <nx/vms/client/desktop/resource_views/data/node_type.h>
+#include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 
 #include <ui/style/noptix_style.h>
 #include <ui/style/helper.h>

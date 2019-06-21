@@ -45,10 +45,10 @@ QVariant ResourceTreeModelAdapter::data(const QModelIndex& index, int role) cons
 
             const auto resource = base_type::data(index, Qn::ResourceRole).value<QnResourcePtr>();
             const auto nodeType = base_type::data(
-                index, Qn::NodeTypeRole).value<ResourceTreeNodeType>();
+                index, Qn::NodeTypeRole).value<ResourceTree::NodeType>();
 
-            if ((nodeType == ResourceTreeNodeType::layoutItem
-                    || nodeType == ResourceTreeNodeType::sharedResource)
+            if ((nodeType == ResourceTree::NodeType::layoutItem
+                    || nodeType == ResourceTree::NodeType::sharedResource)
                 && resource->hasFlags(Qn::server) && !resource->hasFlags(Qn::fake))
             {
                 return kCustomExtInfoTemplate.arg(tr("Health Monitor"));
@@ -73,7 +73,14 @@ QVariant ResourceTreeModelAdapter::data(const QModelIndex& index, int role) cons
         }
 
         case Qn::ResourceRole:
-            return QVariant::fromValue(base_type::data(index, role).value<QnResourcePtr>().get());
+        {
+            const auto resource = base_type::data(index, role).value<QnResourcePtr>();
+            if (!resource)
+                return {};
+
+            QQmlEngine::setObjectOwnership(resource.get(), QQmlEngine::CppOwnership);
+            return QVariant::fromValue(resource.get());
+        }
 
         default:
             return base_type::data(index, role);

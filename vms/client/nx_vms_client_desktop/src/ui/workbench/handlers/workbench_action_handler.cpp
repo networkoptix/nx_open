@@ -71,7 +71,7 @@
 #include <nx/vms/client/desktop/ui/messages/videowall_messages.h>
 #include <nx/vms/client/desktop/ui/messages/local_files_messages.h>
 #include <nx/vms/client/desktop/resource_views/functional_delegate_utilities.h>
-#include <nx/vms/client/desktop/resource_views/data/node_type.h>
+#include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 
 #include <nx/network/http/http_types.h>
 #include <nx/network/socket_global.h>
@@ -2051,7 +2051,7 @@ bool ActionHandler::validateResourceName(const QnResourcePtr& resource, const QS
 
 void ActionHandler::at_renameAction_triggered()
 {
-    using NodeType = ResourceTreeNodeType;
+    using NodeType = ResourceTree::NodeType;
 
     const auto parameters = menu()->currentParameters(sender());
 
