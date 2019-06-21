@@ -102,8 +102,8 @@ checkNewSystem()
     local -r c="[0-9a-z]"
     local -r localSystemIdRegex="\\{$c{8}-$c{4}-$c{4}-$c{4}-$c{12}\\}"
     # Find `"localSystemId": "{xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}"` pattern in the JSON
-    # response and assign the match to the variable. If no matching was found, assign an empty
-    # string to it.
+    # response and assign the match to the variable. If no match was found, assign an empty string
+    # to it.
     local -r localSystemIdDefinition=$(
         echo "$response" | grep -E -o "\"localSystemId\":\s*\"$localSystemIdRegex\""
     )
