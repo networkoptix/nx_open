@@ -13,7 +13,7 @@ class QnSortFilterListModel: public QAbstractProxyModel
     Q_OBJECT
     using base_type = QAbstractProxyModel;
 
-    Q_PROPERTY(int sourceRowsCount READ sourceRowsCount NOTIFY sourceRowsCountChanged)
+    Q_PROPERTY(int acceptedRowCount READ acceptedRowCount NOTIFY acceptedRowCountChanged)
     Q_PROPERTY(int filterRole READ filterRole WRITE setFilterRole NOTIFY filterRoleChanged)
     Q_PROPERTY(int filterCaseSensitivity READ filterCaseSensitivity
         WRITE setFilterCaseSensitivity NOTIFY filterCaseSensitivityChanged)
@@ -32,7 +32,8 @@ public:
     virtual void forceUpdate();
 
 public: //< Properties
-    int sourceRowsCount() const;
+    /** Number of rows accepted by `filterAcceptsRow` only, wildcard accepts are not counted. */
+    int acceptedRowCount() const;
 
     int filterRole() const;
     void setFilterRole(int value);
@@ -53,7 +54,7 @@ public:
         const QModelIndex& sourceParent) const;
 
 public: // overrides section
-    virtual void setSourceModel(QAbstractItemModel* model);
+    virtual void setSourceModel(QAbstractItemModel* model) override;
 
     virtual QModelIndex mapToSource(const QModelIndex& proxyIndex) const override;
     virtual QModelIndex mapFromSource(const QModelIndex& sourceIndex) const override;
@@ -71,7 +72,7 @@ public: // overrides section
     virtual bool removeRows(int row, int count, const QModelIndex& parent = QModelIndex()) override;
 
 signals:
-    void sourceRowsCountChanged();
+    void acceptedRowCountChanged();
     void filterRoleChanged();
     void filterCaseSensitivityChanged();
     void filterWildcardChanged();

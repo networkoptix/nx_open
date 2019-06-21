@@ -1,5 +1,7 @@
 #include <gtest/gtest.h>
 
+// TODO: Enable this after making server report its variantVersion.
+#if 0
 #include <common/common_module.h>
 #include <common/static_common_module.h>
 
@@ -495,3 +497,5 @@ TEST_F(UpdateVerificationTest, aSyntheticTest)
 }
 
 } // namespace nx::vms::client::desktop
+
+#endif

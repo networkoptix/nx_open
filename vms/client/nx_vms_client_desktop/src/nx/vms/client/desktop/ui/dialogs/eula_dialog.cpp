@@ -162,6 +162,9 @@ bool EulaDialog::acceptEulaHtml(const QString& html, int version, QWidget* paren
     eulaDialog.setTitle(eulaHeader);
     eulaDialog.setEulaHtml(html);
 
+    // This log line gives a clue to CI team when they start the client inside headless VM. They
+    // wonder why the client seems to be hanging. But client just wants EULA to be accepted.
+    NX_INFO(NX_SCOPE_TAG, "acceptEulaHtml(%1) - waiting for EULA to be accepted", version);
     if (eulaDialog.exec() == QDialog::DialogCode::Accepted)
     {
         auto oldVersion = qnSettings->acceptedEulaVersion();
