@@ -48,7 +48,7 @@ set(freeLicenseCount "4")
 set(freeLicenseKey "0000-0000-0000-0026")
 
 # Installer Customizations
-set(installer.language "ja_JP")
+set(installerLanguage "ja_JP")
 set(installer.cultures "ja-jp")
 
 # Localization

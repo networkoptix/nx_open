@@ -44,7 +44,6 @@ set(freeLicenseCount "4")
 set(freeLicenseKey "0000-0000-0000-0020")
 
 # Installer Customizations
-set(installer.language "zh_TW") #< 3.2 release compatibility.
 set(installerLanguage "zh_TW")
 set(installer.cultures "zh-tw")
 

@@ -52,7 +52,7 @@ set(enable_hanwha false)
 set(dynamic.customization false)
 
 # Localization
-set(installer.language "en_US")
+set(installerLanguage "en_US")
 set(installer.cultures "en-us")
 set(translations
     en_US
