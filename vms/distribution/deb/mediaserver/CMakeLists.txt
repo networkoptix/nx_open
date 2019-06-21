@@ -4,7 +4,7 @@ set(depends
     testcamera
 )
 
-set(deb_dependencies
+set(deb_dependencies_list
     "zlib1g (>= 1:1.1.4)"
     "debconf (>= 0.5) | debconf-2.0"
     "python"
@@ -17,9 +17,9 @@ set(deb_dependencies
 )
 
 if(withDesktopClient)
-    # For platforms with desktop clients Server uses the same Qt as Client. Because of this, on
+    # For platforms with Desktop Clients, Server uses the same Qt as Client. Because of this, on
     # such platforms Server has these "strange" dependencies:
-    list(APPEND deb_dependencies
+    list(APPEND deb_dependencies_list
         "libxrender1"
         "libgl1-mesa-glx"
         "libxfixes3"
@@ -31,7 +31,7 @@ if(withDesktopClient)
     )
 endif()
 
-list(JOIN deb_dependencies ", " deb.dependencies) #< Make a comma-separated list.
+list(JOIN deb_dependencies_list ", " deb_dependencies)
 
 if(withRootTool)
     list(APPEND depends root_tool)

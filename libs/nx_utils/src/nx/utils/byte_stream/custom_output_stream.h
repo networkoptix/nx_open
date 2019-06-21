@@ -72,6 +72,30 @@ std::shared_ptr<FilterWithFunc<Func>> makeFilterWithFunc(Func func)
     return std::make_shared<FilterWithFunc<Func>>(std::move(func));
 }
 
+//-------------------------------------------------------------------------------------------------
+
+/**
+ * Convenience function to simplify some usages.
+ * E.g., to uncompress some buffer:
+ * <pre><code>
+ *   auto result = runBytesThroughFilter<gzip::Uncompressor>(compressedData);
+ * </code></pre>
+ */
+template<typename Filter>
+QByteArray runBytesThroughFilter(const QByteArray& data)
+{
+    QByteArray result;
+
+    auto saveResultFilter = makeCustomOutputStream(
+        [&result](const auto& data) { result += data; });
+
+    Filter filter(saveResultFilter);
+    filter.processData(data);
+    filter.flush();
+
+    return result;
+}
+
 } // namespace bstream
 } // namespace utils
 } // namespace nx
