@@ -42,7 +42,7 @@ public:
     template<typename ObjectType>
     void registerObjectFactory(ObjectFactory objectFactory)
     {
-        std::unique_lock<std::mutex> lock(m_mutex);
+        std::lock_guard<std::mutex> lock(m_mutex);
 
         auto it = std::find_if(
             m_registry.begin(),
@@ -61,7 +61,7 @@ public:
     template<typename ObjectType>
     void unregisterObjectFactory()
     {
-        std::unique_lock<std::mutex> lock(m_mutex);
+        std::lock_guard<std::mutex> lock(m_mutex);
 
         auto it = std::find_if(
             m_registry.cbegin(),

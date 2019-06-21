@@ -150,8 +150,6 @@ private:
         QString statusMessage);
 
 private:
-    const nx::sdk::Ptr<nx::sdk::IUtilityProvider> m_utilityProvider;
-
     struct PluginContext
     {
         PluginInfoPtr pluginInfo;

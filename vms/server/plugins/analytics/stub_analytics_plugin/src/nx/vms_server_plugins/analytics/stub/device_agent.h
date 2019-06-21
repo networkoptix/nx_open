@@ -117,6 +117,15 @@ private:
 
     struct DeviceAgentSettings
     {
+        bool needToGenerateObjects()
+        {
+            return generateCars
+                || generateTrucks
+                || generatePedestrians
+                || generateHumanFaces
+                || generateBicycles;
+        }
+
         std::atomic<bool> generateEvents{true};
 
         std::atomic<bool> generateCars{true};
@@ -131,15 +140,6 @@ private:
         std::atomic<bool> generatePreviews{true};
 
         std::atomic<bool> throwPluginEvents{false};
-
-        bool needToGenerateObjects()
-        {
-            return generateCars
-                || generateTrucks
-                || generatePedestrians
-                || generateHumanFaces
-                || generateBicycles;
-        }
     };
 
     DeviceAgentSettings m_deviceAgentSettings;
@@ -167,10 +167,6 @@ private:
             return *this;
         }
 
-        std::unique_ptr<AbstractObject> object;
-        bool isPreviewGenerated = false;
-        int frameCounter = 0;
-
         void reset()
         {
             object.reset();
@@ -179,6 +175,10 @@ private:
         }
 
         bool operator!() const { return !object; }
+
+        std::unique_ptr<AbstractObject> object;
+        bool isPreviewGenerated = false;
+        int frameCounter = 0;
     };
 
     std::mutex m_objectGenerationMutex;
