@@ -59,20 +59,24 @@ A commercial use license is available from Genivia, Inc., contact@genivia.com
 #endif
 
 SOAP_FMAC3 void SOAP_FMAC4 soap_default_xsd__duration(struct soap *soap, LONG64 *a)
-{ (void)soap; /* appease -Wall -Werror */
+{
+  (void)soap; /* appease -Wall -Werror */
   *a = 0;
 }
 
 SOAP_FMAC3 const char * SOAP_FMAC4 soap_xsd__duration2s(struct soap *soap, LONG64 a)
-{ LONG64 d;
+{
+  LONG64 d;
   int k, h, m, s, f;
   if (a < 0)
-  { soap_strcpy(soap->tmpbuf, sizeof(soap->tmpbuf), "-P");
+  {
+    soap_strcpy(soap->tmpbuf, sizeof(soap->tmpbuf), "-P");
     k = 2;
     a = -a;
   }
   else
-  { soap_strcpy(soap->tmpbuf, sizeof(soap->tmpbuf), "P");
+  {
+    soap_strcpy(soap->tmpbuf, sizeof(soap->tmpbuf), "P");
     k = 1;
   }
   f = a % 1000;
@@ -86,12 +90,67 @@ SOAP_FMAC3 const char * SOAP_FMAC4 soap_xsd__duration2s(struct soap *soap, LONG6
   if (d)
     (SOAP_SNPRINTF(soap->tmpbuf + k, sizeof(soap->tmpbuf) - k, 21), SOAP_LONG_FORMAT "D", d);
   if (h || m || s || f)
-  { if (d)
+  {
+    if (d)
       k = strlen(soap->tmpbuf);
+    /********************************************
+    The beginning of the patch.
+    Generates short representation of duration (instead of full)
+    e.g. "PT1S" instead of "PT00H00M01S"
+    The problem is detected during VMS-14113 issue investigation.
+    ********************************************/
+    #if 0
+    // old code:
     if (f)
       (SOAP_SNPRINTF(soap->tmpbuf + k, sizeof(soap->tmpbuf) - k, 14), "T%02dH%02dM%02d.%03dS", h, m, s, f);
     else
       (SOAP_SNPRINTF(soap->tmpbuf + k, sizeof(soap->tmpbuf) - k, 10), "T%02dH%02dM%02dS", h, m, s);
+    #else
+    //new code:
+    if (!soap->workarounds.use_short_duration_representation)
+    {
+      if (f)
+        (SOAP_SNPRINTF(soap->tmpbuf + k, sizeof(soap->tmpbuf) - k, 14), "T%02dH%02dM%02d.%03dS", h, m, s, f);
+      else
+        (SOAP_SNPRINTF(soap->tmpbuf + k, sizeof(soap->tmpbuf) - k, 10), "T%02dH%02dM%02dS", h, m, s);
+    }
+    else
+    {
+        (SOAP_SNPRINTF(soap->tmpbuf + k, sizeof(soap->tmpbuf) - k, 1), "T");
+        k += 1;
+
+        if (h)
+        {
+            (SOAP_SNPRINTF(soap->tmpbuf + k, sizeof(soap->tmpbuf) - k, 3), "%02dH", h);
+            k += 3;
+        }
+
+        if (m || h)
+        {
+            (SOAP_SNPRINTF(soap->tmpbuf + k, sizeof(soap->tmpbuf) - k, 3), "%02dM", m);
+            k += 3;
+        }
+
+        if (( m || h) || (s >= 10)) //< 2 digits for seconds
+        {
+            (SOAP_SNPRINTF(soap->tmpbuf + k, sizeof(soap->tmpbuf) - k, 2), "%02d", s);
+            k += 2;
+        }
+        else //< one digit for seconds
+        {
+            (SOAP_SNPRINTF(soap->tmpbuf + k, sizeof(soap->tmpbuf) - k, 1), "%d", s);
+            k += 1;
+        }
+
+        if (f)
+            (SOAP_SNPRINTF(soap->tmpbuf + k, sizeof(soap->tmpbuf) - k, 5), ".%03dS", f);
+        else
+            (SOAP_SNPRINTF(soap->tmpbuf + k, sizeof(soap->tmpbuf) - k, 1), "S");
+    }
+    #endif
+    /********************************************
+    The end of the patch.
+    ********************************************/
   }
   else if (!d)
     soap_strcpy(soap->tmpbuf + k, sizeof(soap->tmpbuf) - k, "T0S");
@@ -99,19 +158,23 @@ SOAP_FMAC3 const char * SOAP_FMAC4 soap_xsd__duration2s(struct soap *soap, LONG6
 }
 
 SOAP_FMAC3 int SOAP_FMAC4 soap_out_xsd__duration(struct soap *soap, const char *tag, int id, const LONG64 *a, const char *type)
-{ if (soap_element_begin_out(soap, tag, soap_embedded_id(soap, id, a, SOAP_TYPE_xsd__duration), type)
+{
+  if (soap_element_begin_out(soap, tag, soap_embedded_id(soap, id, a, SOAP_TYPE_xsd__duration), type)
    || soap_string_out(soap, soap_xsd__duration2s(soap, *a), 0))
     return soap->error;
   return soap_element_end_out(soap, tag);
 }
 
 SOAP_FMAC3 int SOAP_FMAC4 soap_s2xsd__duration(struct soap *soap, const char *s, LONG64 *a)
-{ LONG64 sign = 1, Y = 0, M = 0, D = 0, H = 0, N = 0, S = 0;
-  float f = 0;
+{
+  LONG64 sign = 1, Y = 0, M = 0, D = 0, H = 0, N = 0, S = 0;
+  float f = 0.0;
   *a = 0;
   if (s)
-  { if (*s == '-')
-    { sign = -1;
+  {
+    if (*s == '-')
+    {
+      sign = -1;
       s++;
     }
     if (*s != 'P' && *s != 'p')
@@ -119,10 +182,12 @@ SOAP_FMAC3 int SOAP_FMAC4 soap_s2xsd__duration(struct soap *soap, const char *s,
     s++;
     /* date part */
     while (s && *s)
-    { char *r = NULL;
+    {
+      char *r = NULL;
       LONG64 n;
       if (*s == 'T' || *s == 't')
-      { s++;
+      {
+        s++;
     break;
       }
       n = soap_strtol(s, &r, 10);
@@ -130,7 +195,8 @@ SOAP_FMAC3 int SOAP_FMAC4 soap_s2xsd__duration(struct soap *soap, const char *s,
     return soap->error = SOAP_TYPE;
       s = r;
       switch (*s)
-      { case 'Y':
+      {
+        case 'Y':
         case 'y':
       Y = n;
       break;
@@ -149,14 +215,16 @@ SOAP_FMAC3 int SOAP_FMAC4 soap_s2xsd__duration(struct soap *soap, const char *s,
     }
     /* time part */
     while (s && *s)
-    { char *r = NULL;
+    {
+      char *r = NULL;
       LONG64 n;
       n = soap_strtol(s, &r, 10);
       if (!r)
     return soap->error = SOAP_TYPE;
       s = r;
       switch (*s)
-      { case 'H':
+      {
+        case 'H':
         case 'h':
       H = n;
       break;
@@ -166,19 +234,7 @@ SOAP_FMAC3 int SOAP_FMAC4 soap_s2xsd__duration(struct soap *soap, const char *s,
       break;
     case '.':
       S = n;
-#if defined(WITH_C_LOCALE) && defined(HAVE_STRTOD_L)
-# ifdef WIN32
-          f = (float)_strtod_l(s, NULL, SOAP_LOCALE(soap));
-# else
-          f = (float)strtod_l(s, NULL, SOAP_LOCALE(soap));
-# endif
-#elif defined(HAVE_STRTOD)
-          f = (float)strtod(s, NULL);
-#elif defined(WITH_C_LOCALE) && defined(HAVE_STRTOF_L)
-          f = strtof_l((char*)s, NULL, SOAP_LOCALE(soap));
-#elif defined(HAVE_STRTOF)
-          f = strtof((char*)s, NULL);
-#endif
+          (void)soap_s2float(soap, s, &f);
       s = NULL;
       continue;
     case 'S':
@@ -197,12 +253,14 @@ SOAP_FMAC3 int SOAP_FMAC4 soap_s2xsd__duration(struct soap *soap, const char *s,
 }
 
 SOAP_FMAC3 LONG64 * SOAP_FMAC4 soap_in_xsd__duration(struct soap *soap, const char *tag, LONG64 *a, const char *type)
-{ if (soap_element_begin_in(soap, tag, 0, NULL))
+{
+  if (soap_element_begin_in(soap, tag, 0, NULL))
     return NULL;
   if (*soap->type
    && soap_match_att(soap, soap->type, type)
    && soap_match_att(soap, soap->type, ":duration"))
-  { soap->error = SOAP_TYPE;
+  {
+    soap->error = SOAP_TYPE;
     soap_revert(soap);
     return NULL;
   }
@@ -210,24 +268,9 @@ SOAP_FMAC3 LONG64 * SOAP_FMAC4 soap_in_xsd__duration(struct soap *soap, const ch
   if (*soap->href)
     a = (LONG64*)soap_id_forward(soap, soap->href, a, 0, SOAP_TYPE_xsd__duration, 0, sizeof(LONG64), 0, NULL, NULL);
   else if (a)
-  { if (soap_s2xsd__duration(soap, soap_value(soap), a))
-      /********************************************
-      Beginning of a patch.
-      Allows to treat an empty XML element as an element with a zero time duration value.
-      This is done to support buggy devices that send incorrect XMLs
-      (that are not validated against a schema).
-      The problem is detected during VMS-10856 issue investigation.
-      ********************************************/
-      //return NULL;
-      {
-          *a = 0;
-          if (soap->body && soap_element_end_in(soap, tag))
-              return NULL;
-          return a;
-      }
-      /********************************************
-      Ending of a patch.
-      ********************************************/
+  {
+    if (soap_s2xsd__duration(soap, soap_value(soap), a))
+      return NULL;
   }
   if (soap->body && soap_element_end_in(soap, tag))
     return NULL;

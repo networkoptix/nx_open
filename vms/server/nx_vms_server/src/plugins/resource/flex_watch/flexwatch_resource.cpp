@@ -8,7 +8,7 @@ QnFlexWatchResource::QnFlexWatchResource(QnMediaServerModule* serverModule):
     QnPlOnvifResource(serverModule)
 {
     // TODO: #Elric set vendor here
-    m_tmpH264Conf = new onvifXsd__H264Configuration;
+    m_tmpH264Conf = new tt__H264Configuration;
 }
 
 QnFlexWatchResource::~QnFlexWatchResource()
@@ -41,11 +41,11 @@ CameraDiagnostics::Result QnFlexWatchResource::fetchUpdateVideoEncoder()
     bool needReboot = false;
     for (uint i = 0; i < response.Configurations.size(); ++i)
     {
-        if (response.Configurations[i]->Encoding != onvifXsd__VideoEncoding::H264)
+        if (response.Configurations[i]->Encoding != tt__VideoEncoding::H264)
         {
             needReboot = true;
 
-            response.Configurations[i]->Encoding = onvifXsd__VideoEncoding::H264;
+            response.Configurations[i]->Encoding = tt__VideoEncoding::H264;
             VideoEncoder* encoder = response.Configurations[i];
             if (encoder->H264 == 0)
                 encoder->H264 = m_tmpH264Conf;

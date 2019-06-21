@@ -253,7 +253,9 @@ SOAP_FMAC1 int SOAP_FMAC2 soap_wsse_fault(struct soap *soap, enum wsse__Faultcod
 SOAP_FMAC1 int SOAP_FMAC2 soap_wsse(struct soap *soap, struct soap_plugin *p, void *arg);
 
 SOAP_FMAC1 void SOAP_FMAC2 soap_wsse_rand_nonce(char *nonce, size_t noncelen);
-SOAP_FMAC1 int SOAP_FMAC2 soap_psha1(struct soap *soap, const char hmac_key[16], const char *secret, size_t secretlen, char *psha1, size_t psha1len);
+SOAP_FMAC1 int SOAP_FMAC2 soap_pmd5(struct soap *soap, const char *hmac_key, size_t hmac_key_len, const char *secret, size_t secretlen, char *pmd5, size_t pmd5len);
+SOAP_FMAC1 int SOAP_FMAC2 soap_psha1(struct soap *soap, const char *hmac_key, size_t hmac_key_len, const char *secret, size_t secretlen, char *psha1, size_t psha1len);
+SOAP_FMAC1 int SOAP_FMAC2 soap_psha256(struct soap *soap, const char *hmac_key, size_t hmac_key_len, const char *secret, size_t secretlen, char *psha256, size_t psha256len);
 
 SOAP_FMAC1 int SOAP_FMAC2 soap_wsse_sign(struct soap *soap, int alg, const void *key, int keylen);
 SOAP_FMAC1 int SOAP_FMAC2 soap_wsse_sign_body(struct soap *soap, int alg, const void *key, int keylen);

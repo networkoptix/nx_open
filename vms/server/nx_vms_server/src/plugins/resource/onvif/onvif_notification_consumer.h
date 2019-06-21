@@ -24,7 +24,7 @@ public:
     //!Implementation of NotificationConsumerBindingService::copy
     virtual NotificationConsumerBindingService* copy() override;
     //!Implementation of NotificationConsumerBindingService::Notify
-    virtual int Notify(_oasisWsnB2__Notify* oasisWsnB2__Notify) override;
+    virtual int Notify(_wsnt__Notify* wsnt__Notify) override;
 
     //!Pass notifications from address \a notificationProducerAddress to \a resource
     void registerResource(
