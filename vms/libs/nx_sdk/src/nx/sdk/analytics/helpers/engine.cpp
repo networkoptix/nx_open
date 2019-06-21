@@ -12,7 +12,7 @@
 #include <nx/sdk/helpers/ptr.h>
 #include <nx/sdk/helpers/string_map.h>
 #include <nx/sdk/helpers/string.h>
-#include <nx/sdk/helpers/plugin_event.h>
+#include <nx/sdk/helpers/plugin_diagnostic_event.h>
 #include <nx/sdk/analytics/i_plugin.h>
 
 namespace nx {
@@ -66,8 +66,8 @@ std::string Engine::getParamValue(const std::string& paramName)
     return m_settings[paramName];
 }
 
-void Engine::pushPluginEvent(
-    IPluginEvent::Level level,
+void Engine::pushPluginDiagnosticEvent(
+    IPluginDiagnosticEvent::Level level,
     std::string caption,
     std::string description)
 {
@@ -79,9 +79,9 @@ void Engine::pushPluginEvent(
         return;
     }
 
-    const auto event = makePtr<PluginEvent>(
+    const auto event = makePtr<PluginDiagnosticEvent>(
         level, std::move(caption), std::move(description));
-    m_handler->handlePluginEvent(event.get());
+    m_handler->handlePluginDiagnosticEvent(event.get());
 }
 
 Engine::~Engine()

@@ -4,7 +4,7 @@
 #include <media_server/media_server_module.h>
 
 #include <nx/vms/event/events/events_fwd.h>
-#include <nx/vms/event/events/plugin_event.h>
+#include <nx/vms/event/events/plugin_diagnostic_event.h>
 
 #include <nx/vms/server/resource/analytics_engine_resource.h>
 #include <nx/vms/server/sdk_support/utils.h>
@@ -21,23 +21,25 @@ EngineHandler::EngineHandler(
     ServerModuleAware(serverModule),
     m_engineResourceId(std::move(engineResourceId))
 {
-    connect(this, &EngineHandler::pluginEventTriggered,
-        serverModule->eventConnector(), &event::EventConnector::at_pluginEvent,
+    connect(this, &EngineHandler::pluginDiagnosticEventTriggered,
+        serverModule->eventConnector(), &event::EventConnector::at_pluginDiagnosticEvent,
         Qt::QueuedConnection);
 }
 
-void EngineHandler::handlePluginEvent(nx::sdk::IPluginEvent* sdkPluginEvent)
+void EngineHandler::handlePluginDiagnosticEvent(
+    nx::sdk::IPluginDiagnosticEvent* sdkPluginDiagnosticEvent)
 {
-    nx::vms::event::PluginEventPtr pluginEvent(
-        new PluginEvent(
+    nx::vms::event::PluginDiagnosticEventPtr pluginDiagnosticEvent(
+        new PluginDiagnosticEvent(
             qnSyncTime->currentUSecsSinceEpoch(),
             m_engineResourceId,
-            sdkPluginEvent->caption(),
-            sdkPluginEvent->description(),
-            nx::vms::server::sdk_support::fromSdkPluginEventLevel(sdkPluginEvent->level()),
+            sdkPluginDiagnosticEvent->caption(),
+            sdkPluginDiagnosticEvent->description(),
+            nx::vms::server::sdk_support::fromPluginDiagnosticEventLevel(
+                sdkPluginDiagnosticEvent->level()),
             QnSecurityCamResourcePtr()));
 
-    emit pluginEventTriggered(pluginEvent);
+    emit pluginDiagnosticEventTriggered(pluginDiagnosticEvent);
 }
 
 } // namespace nx::vms::server::analytics

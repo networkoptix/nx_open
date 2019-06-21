@@ -24,7 +24,7 @@ QnAbstractBusinessParamsWidget* QnBusinessEventWidgetFactory::createWidget(
             return new QnCustomBusinessEventWidget(parent);
         case vms::api::EventType::analyticsSdkEvent:
             return new AnalyticsSdkEventWidget(parent);
-        case vms::api::EventType::pluginEvent:
+        case vms::api::EventType::pluginDiagnosticEvent:
             return new PluginEventWidget(parent);
         default:
             return new QnEmptyBusinessEventWidget(parent);

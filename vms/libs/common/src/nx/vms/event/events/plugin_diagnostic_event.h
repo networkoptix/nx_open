@@ -9,12 +9,12 @@ namespace nx::vms::event {
 
 using namespace nx::vms::common;
 
-class PluginEvent: public InstantEvent
+class PluginDiagnosticEvent: public InstantEvent
 {
     using base_type = InstantEvent;
 
 public:
-    explicit PluginEvent(
+    explicit PluginDiagnosticEvent(
         qint64 timeStamp,
         const QnUuid& engineResourceId,
         const QString& caption,
@@ -34,4 +34,4 @@ private:
 
 } // namespace nx::vms::event
 
-Q_DECLARE_METATYPE(nx::vms::event::PluginEventPtr);
+Q_DECLARE_METATYPE(nx::vms::event::PluginDiagnosticEventPtr);

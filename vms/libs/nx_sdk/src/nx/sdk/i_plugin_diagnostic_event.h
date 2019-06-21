@@ -11,10 +11,10 @@ namespace sdk {
  * VMS Event which can be triggered by a Plugin to inform the System about some issue or status
  * change.
  */
-class IPluginEvent: public nx::sdk::Interface<IPluginEvent>
+class IPluginDiagnosticEvent: public nx::sdk::Interface<IPluginDiagnosticEvent>
 {
 public:
-    static auto interfaceId() { return InterfaceId("nx::sdk::IPluginEvent"); }
+    static auto interfaceId() { return InterfaceId("nx::sdk::IPluginDiagnosticEvent"); }
 
     enum class Level
     {

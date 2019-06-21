@@ -31,38 +31,39 @@ Engine::Engine(nx::sdk::analytics::Plugin* plugin):
     obtainPluginHomeDir();
     initCapabilities();
 
-    m_pluginEventThread = std::make_unique<std::thread>([this]() { generatePluginEvents(); });
+    m_pluginDiagnosticEventThread =
+        std::make_unique<std::thread>([this]() { generatePluginDiagnosticEvents(); });
 }
 
 Engine::~Engine()
 {
     {
-        std::unique_lock<std::mutex> lock(m_pluginEventGenerationLoopMutex);
+        std::unique_lock<std::mutex> lock(m_pluginDiagnosticEventGenerationLoopMutex);
         m_terminated = true;
-        m_pluginEventGenerationLoopCondition.notify_all();
+        m_pluginDiagnosticEventGenerationLoopCondition.notify_all();
     }
-    if (m_pluginEventThread)
-        m_pluginEventThread->join();
+    if (m_pluginDiagnosticEventThread)
+        m_pluginDiagnosticEventThread->join();
 }
 
-void Engine::generatePluginEvents()
+void Engine::generatePluginDiagnosticEvents()
 {
     while (!m_terminated)
     {
-        if (m_needToThrowPluginEvents)
+        if (m_needToThrowPluginDiagnosticEvents)
         {
-            pushPluginEvent(
-                IPluginEvent::Level::info,
+            pushPluginDiagnosticEvent(
+                IPluginDiagnosticEvent::Level::info,
                 "Info message from Engine",
                 "Info message description");
 
-            pushPluginEvent(
-                IPluginEvent::Level::warning,
+            pushPluginDiagnosticEvent(
+                IPluginDiagnosticEvent::Level::warning,
                 "Warning message from Engine",
                 "Warning message description");
 
-            pushPluginEvent(
-                IPluginEvent::Level::error,
+            pushPluginDiagnosticEvent(
+                IPluginDiagnosticEvent::Level::error,
                 "Error message from Engine",
                 "Error message description");
         }
@@ -70,12 +71,12 @@ void Engine::generatePluginEvents()
         // terminate (hence condition variable instead of sleep()). Return value (whether the
         // timeout has occurred) and spurious wake-ups are ignored.
         {
-            std::unique_lock<std::mutex> lock(m_pluginEventGenerationLoopMutex);
+            std::unique_lock<std::mutex> lock(m_pluginDiagnosticEventGenerationLoopMutex);
             if (m_terminated)
                 break;
 
             static const seconds kEventGenerationPeriod{7};
-            m_pluginEventGenerationLoopCondition.wait_for(lock, kEventGenerationPeriod);
+            m_pluginDiagnosticEventGenerationLoopCondition.wait_for(lock, kEventGenerationPeriod);
         }
     }
 }
@@ -309,7 +310,8 @@ std::string Engine::manifest() const
                     },
                     {
                         "type": "CheckBox",
-                        "name": ")json" + kThrowPluginEventsFromDeviceAgentSetting + R"json(",
+                        "name": ")json"
+                        + kThrowPluginDiagnosticEventsFromDeviceAgentSetting + R"json(",
                         "caption": "Throw plugin events from the DeviceAgent",
                         "defaultValue": false,
                         "value": false
@@ -367,17 +369,19 @@ std::string Engine::manifest() const
 
 void Engine::settingsReceived()
 {
-    m_needToThrowPluginEvents = toBool(getParamValue(kThrowPluginEventsFromEngineSetting));
-    if (m_needToThrowPluginEvents && !m_pluginEventThread)
+    m_needToThrowPluginDiagnosticEvents = toBool(
+        getParamValue(kThrowPluginDiagnosticEventsFromEngineSetting));
+
+    if (m_needToThrowPluginDiagnosticEvents && !m_pluginDiagnosticEventThread)
     {
         NX_PRINT << __func__ << "(): Starting plugin event generation";
-        m_needToThrowPluginEvents = true;
+        m_needToThrowPluginDiagnosticEvents = true;
     }
-    else if (!m_needToThrowPluginEvents && m_pluginEventThread)
+    else if (!m_needToThrowPluginDiagnosticEvents && m_pluginDiagnosticEventThread)
     {
         NX_PRINT << __func__ << "(): Stopping plugin event generation";
-        m_needToThrowPluginEvents = false;
-        m_pluginEventGenerationLoopCondition.notify_all();
+        m_needToThrowPluginDiagnosticEvents = false;
+        m_pluginDiagnosticEventGenerationLoopCondition.notify_all();
     }
 }
 
@@ -537,7 +541,7 @@ static const std::string kPluginManifest = R"json(
                 "items": [
                     {
                         "type": "CheckBox",
-                        "name": ")json" + kThrowPluginEventsFromEngineSetting + R"json(",
+                        "name": ")json" + kThrowPluginDiagnosticEventsFromEngineSetting + R"json(",
                         "caption": "Throw plugin events from the Engine",
                         "defaultValue": false,
                         "value": false

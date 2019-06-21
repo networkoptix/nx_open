@@ -239,7 +239,7 @@ public:
         ASSERT_TRUE(metadata->timestampUs() >= 0);
     }
 
-    virtual void handlePluginEvent(IPluginEvent* event) override
+    virtual void handlePluginDiagnosticEvent(IPluginDiagnosticEvent* event) override
     {
         NX_PRINT << "DeviceAgentHandler: Received plugin event: "
             << "level " << (int) event->level() << ", "
@@ -251,7 +251,7 @@ public:
 class EngineHandler: public nx::sdk::RefCountable<IEngine::IHandler>
 {
 public:
-    virtual void handlePluginEvent(IPluginEvent* event) override
+    virtual void handlePluginDiagnosticEvent(IPluginDiagnosticEvent* event) override
     {
         NX_PRINT << "EngineHandler: Received plugin event: "
             << "level " << (int) event->level() << ", "

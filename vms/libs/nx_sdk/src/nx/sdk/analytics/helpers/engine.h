@@ -82,11 +82,11 @@ protected:
     }
 
     /**
-     * Sends a PluginEvent to the Server. Can be called from any thread, but if called before
+     * Sends a PluginDiagnosticEvent to the Server. Can be called from any thread, but if called before
      * settingsReceived() was called, will be ignored in case setHandler() was not called yet.
      */
-    void pushPluginEvent(
-        nx::sdk::IPluginEvent::Level level,
+    void pushPluginDiagnosticEvent(
+        nx::sdk::IPluginDiagnosticEvent::Level level,
         std::string caption,
         std::string description);
 

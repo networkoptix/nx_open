@@ -30,7 +30,7 @@
 #include <analytics/db/analytics_db_types.h>
 
 #include <nx/sdk/i_string_map.h>
-#include <nx/sdk/i_plugin_event.h>
+#include <nx/sdk/i_plugin_diagnostic_event.h>
 #include <nx/sdk/helpers/device_info.h>
 #include <nx/sdk/helpers/ptr.h>
 #include <plugins/settings.h>
@@ -213,7 +213,8 @@ std::optional<nx::sdk::analytics::IUncompressedVideoFrame::PixelFormat>
         const nx::vms::api::analytics::EngineManifest& manifest,
         const QString& engineLogLabel);
 
-nx::vms::api::EventLevel fromSdkPluginEventLevel(nx::sdk::IPluginEvent::Level level);
+nx::vms::api::EventLevel fromPluginDiagnosticEventLevel(
+    nx::sdk::IPluginDiagnosticEvent::Level level);
 
 nx::sdk::Ptr<nx::sdk::analytics::ITimestampedObjectMetadata> createTimestampedObjectMetadata(
     const nx::analytics::db::DetectedObject& detectedObject,

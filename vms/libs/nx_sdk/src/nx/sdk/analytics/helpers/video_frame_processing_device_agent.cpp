@@ -11,7 +11,7 @@
 #include <nx/sdk/helpers/string.h>
 #include <nx/sdk/helpers/to_string.h>
 #include <nx/sdk/analytics/helpers/engine.h>
-#include <nx/sdk/helpers/plugin_event.h>
+#include <nx/sdk/helpers/plugin_diagnostic_event.h>
 #include <nx/sdk/analytics/i_plugin.h>
 #include <nx/sdk/analytics/i_object_metadata_packet.h>
 #include <nx/sdk/analytics/i_event_metadata_packet.h>
@@ -196,8 +196,8 @@ void VideoFrameProcessingDeviceAgent::pushMetadataPacket(
     metadataPacket->releaseRef();
 }
 
-void VideoFrameProcessingDeviceAgent::pushPluginEvent(
-    IPluginEvent::Level level,
+void VideoFrameProcessingDeviceAgent::pushPluginDiagnosticEvent(
+    IPluginDiagnosticEvent::Level level,
     std::string caption,
     std::string description)
 {
@@ -209,9 +209,9 @@ void VideoFrameProcessingDeviceAgent::pushPluginEvent(
         return;
     }
 
-    const auto event = makePtr<PluginEvent>(
+    const auto event = makePtr<PluginDiagnosticEvent>(
         level, caption, description);
-    m_handler->handlePluginEvent(event.get());
+    m_handler->handlePluginDiagnosticEvent(event.get());
 }
 
 // TODO: Consider making a template with param type, checked according to the manifest.

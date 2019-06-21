@@ -6,7 +6,7 @@
 #include <nx/sdk/error.h>
 #include <nx/sdk/i_string_map.h>
 #include <nx/sdk/i_string.h>
-#include <nx/sdk/i_plugin_event.h>
+#include <nx/sdk/i_plugin_diagnostic_event.h>
 #include <nx/sdk/analytics/i_metadata_types.h>
 #include <nx/sdk/analytics/i_metadata_packet.h>
 
@@ -42,7 +42,7 @@ public:
 
         virtual ~IHandler() = default;
         virtual void handleMetadata(IMetadataPacket* metadataPacket) = 0;
-        virtual void handlePluginEvent(IPluginEvent* event) = 0;
+        virtual void handlePluginDiagnosticEvent(IPluginDiagnosticEvent* event) = 0;
     };
 
     /** @return Parent Engine. */

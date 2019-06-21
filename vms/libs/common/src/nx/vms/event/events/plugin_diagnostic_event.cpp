@@ -1,4 +1,4 @@
-#include "plugin_event.h"
+#include "plugin_diagnostic_event.h"
 
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/string.h>
@@ -10,7 +10,7 @@ namespace nx {
 namespace vms {
 namespace event {
 
-PluginEvent::PluginEvent(
+PluginDiagnosticEvent::PluginDiagnosticEvent(
     qint64 timeStamp,
     const QnUuid& engineResourceId,
     const QString& caption,
@@ -18,7 +18,7 @@ PluginEvent::PluginEvent(
     nx::vms::api::EventLevel level,
     const QnSecurityCamResourcePtr& device)
     :
-    base_type(EventType::pluginEvent, QnResourcePtr(), timeStamp),
+    base_type(EventType::pluginDiagnosticEvent, QnResourcePtr(), timeStamp),
     m_resourceId(engineResourceId),
     m_caption(caption),
     m_description(description)
@@ -28,7 +28,7 @@ PluginEvent::PluginEvent(
         m_metadata.cameraRefs.push_back(device->getId().toString());
 }
 
-bool PluginEvent::checkEventParams(const EventParameters& params) const
+bool PluginDiagnosticEvent::checkEventParams(const EventParameters& params) const
 {
     const auto ruleLevels =
         QnLexical::deserialized<nx::vms::api::EventLevels>(params.inputPortId);
@@ -56,7 +56,7 @@ bool PluginEvent::checkEventParams(const EventParameters& params) const
         && checkForKeywords(m_description, params.description);
 }
 
-EventParameters PluginEvent::getRuntimeParams() const
+EventParameters PluginDiagnosticEvent::getRuntimeParams() const
 {
     EventParameters params = base_type::getRuntimeParams();
     params.eventResourceId = m_resourceId;

@@ -73,7 +73,7 @@ private:
 
     void processEvents();
 
-    void processPluginEvents();
+    void processPluginDiagnosticEvents();
 
     void setObjectCount(int objectCount);
 
@@ -100,10 +100,10 @@ private:
 private:
     std::atomic<bool> m_terminated{false};
 
-    std::unique_ptr<std::thread> m_pluginEventThread;
-    std::mutex m_pluginEventGenerationLoopMutex;
-    std::condition_variable m_pluginEventGenerationLoopCondition;
-    std::atomic<bool> m_needToThrowPluginEvents{false};
+    std::unique_ptr<std::thread> m_pluginDiagnosticEventThread;
+    std::mutex m_pluginDiagnosticEventGenerationLoopMutex;
+    std::condition_variable m_pluginDiagnosticEventGenerationLoopCondition;
+    std::atomic<bool> m_needToThrowPluginDiagnosticEvents{false};
 
     std::unique_ptr<std::thread> m_eventThread;
     std::mutex m_eventGenerationLoopMutex;
@@ -138,7 +138,7 @@ private:
 
         std::atomic<bool> generatePreviews{true};
 
-        std::atomic<bool> throwPluginEvents{false};
+        std::atomic<bool> throwPluginDiagnosticEvents{false};
     };
 
     DeviceAgentSettings m_deviceAgentSettings;

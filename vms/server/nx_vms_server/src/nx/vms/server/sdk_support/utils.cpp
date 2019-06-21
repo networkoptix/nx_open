@@ -7,7 +7,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/file_system.h>
 
-#include <nx/sdk/i_plugin_event.h>
+#include <nx/sdk/i_plugin_diagnostic_event.h>
 #include <nx/sdk/i_attribute.h>
 #include <nx/sdk/analytics/helpers/pixel_format.h>
 #include <nx/sdk/analytics/helpers/object_track_info.h>
@@ -290,18 +290,18 @@ std::optional<IUncompressedVideoFrame::PixelFormat>
     return pixelFormat;
 }
 
-nx::vms::api::EventLevel fromSdkPluginEventLevel(IPluginEvent::Level level)
+nx::vms::api::EventLevel fromPluginDiagnosticEventLevel(IPluginDiagnosticEvent::Level level)
 {
     using namespace nx::sdk;
     using namespace nx::vms::api;
 
     switch (level)
     {
-        case IPluginEvent::Level::info:
+        case IPluginDiagnosticEvent::Level::info:
             return EventLevel::InfoEventLevel;
-        case IPluginEvent::Level::warning:
+        case IPluginDiagnosticEvent::Level::warning:
             return EventLevel::WarningEventLevel;
-        case IPluginEvent::Level::error:
+        case IPluginDiagnosticEvent::Level::error:
             return EventLevel::ErrorEventLevel;
         default:
             NX_ASSERT(false, "Wrong plugin event level");

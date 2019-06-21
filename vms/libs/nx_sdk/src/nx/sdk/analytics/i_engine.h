@@ -6,7 +6,7 @@
 
 #include <nx/sdk/i_device_info.h>
 #include <nx/sdk/i_string.h>
-#include <nx/sdk/i_plugin_event.h>
+#include <nx/sdk/i_plugin_diagnostic_event.h>
 
 #include "i_device_agent.h"
 #include "i_engine_info.h"
@@ -41,7 +41,7 @@ public:
         static auto interfaceId() { return InterfaceId("nx::sdk::analytics::IEngine::IHandler"); }
 
         virtual ~IHandler() = default;
-        virtual void handlePluginEvent(IPluginEvent* event) = 0;
+        virtual void handlePluginDiagnosticEvent(IPluginDiagnosticEvent* event) = 0;
     };
 
     /** @return Parent Plugin. */

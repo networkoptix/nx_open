@@ -98,21 +98,23 @@ static const std::vector<EventDescriptor> kEventsToFire = {
 DeviceAgent::DeviceAgent(Engine* engine, const nx::sdk::IDeviceInfo* deviceInfo):
     VideoFrameProcessingDeviceAgent(engine, deviceInfo, NX_DEBUG_ENABLE_OUTPUT)
 {
-    m_pluginEventThread = std::make_unique<std::thread>([this]() { processPluginEvents(); });
+    m_pluginDiagnosticEventThread =
+        std::make_unique<std::thread>([this]() { processPluginDiagnosticEvents(); });
+
     m_eventThread = std::make_unique<std::thread>([this]() { processEvents(); });
 }
 
 DeviceAgent::~DeviceAgent()
 {
     {
-        std::unique_lock<std::mutex> lock(m_pluginEventGenerationLoopMutex);
+        std::unique_lock<std::mutex> lock(m_pluginDiagnosticEventGenerationLoopMutex);
         m_terminated = true;
-        m_pluginEventGenerationLoopCondition.notify_all();
+        m_pluginDiagnosticEventGenerationLoopCondition.notify_all();
         m_eventGenerationLoopCondition.notify_all();
     }
 
-    if (m_pluginEventThread)
-        m_pluginEventThread->join();
+    if (m_pluginDiagnosticEventThread)
+        m_pluginDiagnosticEventThread->join();
 
     if (m_eventThread)
         m_eventThread->join();
@@ -292,38 +294,39 @@ void DeviceAgent::processEvents()
     }
 }
 
-void DeviceAgent::processPluginEvents()
+void DeviceAgent::processPluginDiagnosticEvents()
 {
     while (!m_terminated)
     {
-        if (m_needToThrowPluginEvents)
+        if (m_needToThrowPluginDiagnosticEvents)
         {
-            pushPluginEvent(
-                IPluginEvent::Level::info,
+            pushPluginDiagnosticEvent(
+                IPluginDiagnosticEvent::Level::info,
                 "Info message from DeviceAgent",
                 "Info message description");
 
-            pushPluginEvent(
-                IPluginEvent::Level::warning,
+            pushPluginDiagnosticEvent(
+                IPluginDiagnosticEvent::Level::warning,
                 "Warning message from DeviceAgent",
                 "Warning message description");
 
-            pushPluginEvent(
-                IPluginEvent::Level::error,
+            pushPluginDiagnosticEvent(
+                IPluginDiagnosticEvent::Level::error,
                 "Error message from DeviceAgent",
                 "Error message description");
         }
 
         {
-            std::unique_lock<std::mutex> lock(m_pluginEventGenerationLoopMutex);
+            std::unique_lock<std::mutex> lock(m_pluginDiagnosticEventGenerationLoopMutex);
             if (m_terminated)
                 break;
 
             // Sleep until the next event needs to be generated, or the thread is ordered to
             // terminate (hence condition variable instead of sleep()). Return value (whether
             // the timeout has occurred) and spurious wake-ups are ignored.
-            static const seconds kPluginEventGenerationPeriod{5};
-            m_pluginEventGenerationLoopCondition.wait_for(lock, kPluginEventGenerationPeriod);
+            static const seconds kPluginDiagnosticEventGenerationPeriod{5};
+            m_pluginDiagnosticEventGenerationLoopCondition.wait_for(
+                lock, kPluginDiagnosticEventGenerationPeriod);
         }
     }
 }
@@ -643,8 +646,8 @@ void DeviceAgent::parseSettings()
     m_deviceAgentSettings.generateHumanFaces = toBool(getParamValue(kGenerateHumanFacesSetting));
     m_deviceAgentSettings.generateBicycles = toBool(getParamValue(kGenerateBicyclesSetting));
     m_deviceAgentSettings.generatePreviews = toBool(getParamValue(kGeneratePreviewPacketSetting));
-    m_deviceAgentSettings.throwPluginEvents = toBool(
-        getParamValue(kThrowPluginEventsFromDeviceAgentSetting));
+    m_deviceAgentSettings.throwPluginDiagnosticEvents = toBool(
+        getParamValue(kThrowPluginDiagnosticEventsFromDeviceAgentSetting));
 
     assignIntegerSetting(
         kGenerateObjectsEveryNFramesSetting,
@@ -667,16 +670,16 @@ void DeviceAgent::updateObjectGenerationParameters()
 
 void DeviceAgent::updateEventGenerationParameters()
 {
-    if (m_deviceAgentSettings.throwPluginEvents)
+    if (m_deviceAgentSettings.throwPluginDiagnosticEvents)
     {
         NX_PRINT << __func__ << "(): Starting plugin event generation";
-        m_needToThrowPluginEvents = true;
+        m_needToThrowPluginDiagnosticEvents = true;
     }
     else
     {
         NX_PRINT << __func__ << "(): Stopping plugin event generation";
-        m_needToThrowPluginEvents = false;
-        m_pluginEventGenerationLoopCondition.notify_all();
+        m_needToThrowPluginDiagnosticEvents = false;
+        m_pluginDiagnosticEventGenerationLoopCondition.notify_all();
     }
 }
 

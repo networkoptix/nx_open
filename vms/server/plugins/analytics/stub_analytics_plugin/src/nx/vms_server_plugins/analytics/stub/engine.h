@@ -55,15 +55,14 @@ protected:
 private:
     void obtainPluginHomeDir();
     void initCapabilities();
-    void generatePluginEvents();
+    void generatePluginDiagnosticEvents();
 
 private:
-    mutable std::mutex m_pluginEventGenerationLoopMutex;
-    mutable std::condition_variable m_pluginEventGenerationLoopCondition;
-
-    std::unique_ptr<std::thread> m_pluginEventThread;
+    mutable std::mutex m_pluginDiagnosticEventGenerationLoopMutex;
+    mutable std::condition_variable m_pluginDiagnosticEventGenerationLoopCondition;
+    std::unique_ptr<std::thread> m_pluginDiagnosticEventThread;
     std::atomic<bool> m_terminated{false};
-    std::atomic<bool> m_needToThrowPluginEvents{false};
+    std::atomic<bool> m_needToThrowPluginDiagnosticEvents{false};
 
     std::string m_pluginHomeDir; /**< Can be empty. */
     std::string m_capabilities;
@@ -81,9 +80,11 @@ const std::string kGenerateBicyclesSetting{"generateBicycles"};
 const std::string kGenerateObjectsEveryNFramesSetting{"generateObjectsEveryNFrames"};
 const std::string kNumberOfObjectsToGenerateSetting{"numberOfObjectsToGenerate"};
 const std::string kGeneratePreviewPacketSetting{"generatePreviewPacket"};
-const std::string kThrowPluginEventsFromDeviceAgentSetting{"throwPluginEventsFromDeviceAgent"};
+const std::string kThrowPluginDiagnosticEventsFromDeviceAgentSetting{
+    "throwPluginDiagnosticEventsFromDeviceAgent"};
 
-const std::string kThrowPluginEventsFromEngineSetting{"throwPluginEventsFromDeviceAgent"};
+const std::string kThrowPluginDiagnosticEventsFromEngineSetting{
+    "throwPluginDiagnosticEventsFromDeviceAgent"};
 
 } // namespace stub
 } // namespace analytics
