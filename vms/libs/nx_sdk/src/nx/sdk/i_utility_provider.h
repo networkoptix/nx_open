@@ -33,7 +33,7 @@ public:
     /**
      * @return Absolute path to the plugin's home directory, or an empty string if it is absent.
      */
-    virtual const IString* homeDir(const nx::sdk::IPlugin* plugin) const = 0;
+    virtual const IString* homeDir() const = 0;
 };
 
 } // namespace sdk

@@ -20,15 +20,9 @@ int64_t UtilityProvider::vmsSystemTimeSinceEpochMs() const
     return qnSyncTime->currentMSecsSinceEpoch();
 }
 
-const nx::sdk::IString* UtilityProvider::homeDir(const nx::sdk::IPlugin* plugin) const
+const nx::sdk::IString* UtilityProvider::homeDir() const
 {
-    if (!plugin)
-    {
-        NX_ERROR(this, "Plugin called homeDir(nullptr)");
-        return new nx::sdk::String("");
-    }
-
-    if (const auto pluginInfo = m_pluginManager->pluginInfo(plugin))
+    if (const auto pluginInfo = m_pluginManager->pluginInfo(m_plugin))
         return new nx::sdk::String(pluginInfo->homeDir.toStdString());
 
     return new nx::sdk::String(""); //< The error is already logged.

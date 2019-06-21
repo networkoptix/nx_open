@@ -91,7 +91,7 @@ void Engine::obtainPluginHomeDir()
     const auto utilityProvider = plugin()->utilityProvider();
     NX_KIT_ASSERT(utilityProvider);
 
-    m_pluginHomeDir = toPtr(utilityProvider->homeDir(plugin()))->str();
+    m_pluginHomeDir = toPtr(utilityProvider->homeDir())->str();
 
     if (m_pluginHomeDir.empty())
         NX_PRINT << "Plugin home dir: absent";
