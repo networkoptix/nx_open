@@ -91,8 +91,6 @@ void PullPointSubscriptionBindingProxy::PullPointSubscriptionBindingProxy_init(s
         { "SOAP-ENC", "http://www.w3.org/2003/05/soap-encoding", "http://schemas.xmlsoap.org/soap/encoding/", NULL },
         { "xsi", "http://www.w3.org/2001/XMLSchema-instance", "http://www.w3.org/*/XMLSchema-instance", NULL },
         { "xsd", "http://www.w3.org/2001/XMLSchema", "http://www.w3.org/*/XMLSchema", NULL },
-        { "chan", "http://schemas.microsoft.com/ws/2005/02/duplex", NULL, NULL },
-        { "wsdd", "http://schemas.xmlsoap.org/ws/2005/04/discovery", NULL, NULL },
         { "c14n", "http://www.w3.org/2001/10/xml-exc-c14n#", NULL, NULL },
         { "ds", "http://www.w3.org/2000/09/xmldsig#", NULL, NULL },
         { "saml1", "urn:oasis:names:tc:SAML:1.0:assertion", NULL, NULL },
@@ -101,6 +99,8 @@ void PullPointSubscriptionBindingProxy::PullPointSubscriptionBindingProxy_init(s
         { "xenc", "http://www.w3.org/2001/04/xmlenc#", NULL, NULL },
         { "wsc", "http://docs.oasis-open.org/ws-sx/ws-secureconversation/200512", "http://schemas.xmlsoap.org/ws/2005/02/sc", NULL },
         { "wsse", "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", "http://docs.oasis-open.org/wss/oasis-wss-wssecurity-secext-1.1.xsd", NULL },
+        { "chan", "http://schemas.microsoft.com/ws/2005/02/duplex", NULL, NULL },
+        { "wsdd", "http://schemas.xmlsoap.org/ws/2005/04/discovery", NULL, NULL },
         { "wsdd5", "http://tempuri.org/wsdd5.xsd", NULL, NULL },
         { "wsa5", "http://www.w3.org/2005/08/addressing", "http://schemas.xmlsoap.org/ws/2004/08/addressing", NULL },
         { "xmime", "http://tempuri.org/xmime.xsd", NULL, NULL },
@@ -179,9 +179,11 @@ void PullPointSubscriptionBindingProxy::soap_noheader()
     this->soap->header = NULL;
 }
 
-void PullPointSubscriptionBindingProxy::soap_header(char *wsa5__MessageID, struct wsa5__RelatesToType *wsa5__RelatesTo, struct wsa5__EndpointReferenceType *wsa5__From, struct wsa5__EndpointReferenceType *wsa5__ReplyTo, struct wsa5__EndpointReferenceType *wsa5__FaultTo, char *wsa5__To, char *wsa5__Action, struct chan__ChannelInstanceType *chan__ChannelInstance, struct wsdd__AppSequenceType *wsdd__AppSequence, struct _wsse__Security *wsse__Security, char *SubscriptionId)
+void PullPointSubscriptionBindingProxy::soap_header(struct _wsse__Security *wsse__Security, char *SubscriptionId, char *wsa5__MessageID, struct wsa5__RelatesToType *wsa5__RelatesTo, struct wsa5__EndpointReferenceType *wsa5__From, struct wsa5__EndpointReferenceType *wsa5__ReplyTo, struct wsa5__EndpointReferenceType *wsa5__FaultTo, char *wsa5__To, char *wsa5__Action, struct chan__ChannelInstanceType *chan__ChannelInstance, struct wsdd__AppSequenceType *wsdd__AppSequence)
 {
     ::soap_header(this->soap);
+    this->soap->header->wsse__Security = wsse__Security;
+    this->soap->header->SubscriptionId = SubscriptionId;
     this->soap->header->wsa5__MessageID = wsa5__MessageID;
     this->soap->header->wsa5__RelatesTo = wsa5__RelatesTo;
     this->soap->header->wsa5__From = wsa5__From;
@@ -191,8 +193,6 @@ void PullPointSubscriptionBindingProxy::soap_header(char *wsa5__MessageID, struc
     this->soap->header->wsa5__Action = wsa5__Action;
     this->soap->header->chan__ChannelInstance = chan__ChannelInstance;
     this->soap->header->wsdd__AppSequence = wsdd__AppSequence;
-    this->soap->header->wsse__Security = wsse__Security;
-    this->soap->header->SubscriptionId = SubscriptionId;
 }
 
 ::SOAP_ENV__Header *PullPointSubscriptionBindingProxy::soap_header()

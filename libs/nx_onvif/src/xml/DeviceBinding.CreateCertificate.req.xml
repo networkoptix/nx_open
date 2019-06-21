@@ -4,8 +4,6 @@
     xmlns:SOAP-ENC="http://www.w3.org/2003/05/soap-encoding"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    xmlns:chan="http://schemas.microsoft.com/ws/2005/02/duplex"
-    xmlns:wsdd="http://schemas.xmlsoap.org/ws/2005/04/discovery"
     xmlns:c14n="http://www.w3.org/2001/10/xml-exc-c14n#"
     xmlns:ds="http://www.w3.org/2000/09/xmldsig#"
     xmlns:saml1="urn:oasis:names:tc:SAML:1.0:assertion"
@@ -14,6 +12,8 @@
     xmlns:xenc="http://www.w3.org/2001/04/xmlenc#"
     xmlns:wsc="http://docs.oasis-open.org/ws-sx/ws-secureconversation/200512"
     xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"
+    xmlns:chan="http://schemas.microsoft.com/ws/2005/02/duplex"
+    xmlns:wsdd="http://schemas.xmlsoap.org/ws/2005/04/discovery"
     xmlns:wsdd5="http://tempuri.org/wsdd5.xsd"
     xmlns:wsa5="http://www.w3.org/2005/08/addressing"
     xmlns:xmime="http://tempuri.org/xmime.xsd"
@@ -56,9 +56,9 @@
     <!-- std::string *Subject -->
     <onvifDevice:Subject></onvifDevice:Subject>
     <!-- time_t *ValidNotBefore -->
-    <onvifDevice:ValidNotBefore>2019-06-21T01:03:22Z</onvifDevice:ValidNotBefore>
+    <onvifDevice:ValidNotBefore>2019-06-21T20:00:51Z</onvifDevice:ValidNotBefore>
     <!-- time_t *ValidNotAfter -->
-    <onvifDevice:ValidNotAfter>2019-06-21T01:03:22Z</onvifDevice:ValidNotAfter>
+    <onvifDevice:ValidNotAfter>2019-06-21T20:00:51Z</onvifDevice:ValidNotAfter>
    </onvifDevice:CreateCertificate>
  </SOAP-ENV:Body>
 </SOAP-ENV:Envelope>
