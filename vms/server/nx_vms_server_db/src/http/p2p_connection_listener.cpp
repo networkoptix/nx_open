@@ -361,7 +361,9 @@ void ConnectionProcessor::run()
 
     if (useWebSocket)
     {
-        p2pTransport = std::make_unique<P2PWebsocketTransport>(std::move(d->socket), dataFormat, compressionType);
+        p2pTransport = std::make_unique<P2PWebsocketTransport>(
+            std::move(d->socket), nx::network::websocket::Role::server, dataFormat,
+            compressionType);
         p2pTransport->start();
 
         messageBus->gotConnectionFromRemotePeer(
