@@ -117,14 +117,10 @@ private:
     virtual void stopWhileInAioThread() override;
 
     /** Parser handler implementation */
-    virtual void frameStarted(FrameType type, bool fin) override;
-    virtual void framePayload(const char* data, int len) override;
-    virtual void frameEnded() override;
-    virtual void messageEnded() override;
+    virtual void gotFrame(FrameType type, const nx::Buffer& data, bool fin) override;
     virtual void handleError(Error err) override;
 
     /** Own helper functions*/
-    bool isDataFrame() const;
     void sendMessage(const nx::Buffer& message, int writeSize, IoCompletionHandler handler);
     void sendControlResponse(FrameType type);
     void sendControlRequest(FrameType type);

@@ -1,7 +1,9 @@
-#include <cstdint>
+#include "websocket_serializer.h"
 #include <nx/utils/random.h>
 #include <nx/network/socket_common.h>
-#include "websocket_serializer.h"
+#include <nx/utils/gzip/gzip_compressor.h>
+
+#include <cstdint>
 
 namespace nx {
 namespace network {
@@ -30,47 +32,46 @@ static int payloadLenTypeByLen(int64_t len)
 
 } // namespace <anonymous>
 
-Serializer::Serializer(bool masked, CompressionType compressionType, unsigned mask):
-    m_compressionType(compressionType)
+Serializer::Serializer(bool masked, unsigned mask)
 {
     setMasked(masked, mask);
 }
 
-void Serializer::prepareMessage(const nx::Buffer& payload, FrameType type, nx::Buffer* outBuffer)
+nx::Buffer Serializer::prepareMessage(
+    nx::Buffer payload, FrameType type, CompressionType compressionType)
 {
-    prepareFrame(payload, type, true, outBuffer);
+    return prepareFrame(payload, type, compressionType, /*fin*/true, /*first*/true);
 }
 
-int Serializer::prepareFrame(
-    const char* payload, int payloadLen, FrameType type, bool fin, char* out, int outLen)
+nx::Buffer Serializer::prepareFrame(
+    nx::Buffer payload, FrameType type, CompressionType compressionType, bool fin, bool first)
 {
-    int payloadLenType = payloadLenTypeByLen(payloadLen);
-    int neededOutLen = payloadLen + calcHeaderSize(m_masked, payloadLenType);
-    if (outLen < neededOutLen)
-        return neededOutLen;
+    if (isDataFrame(type))
+    {
+        switch (compressionType)
+        {
+            case CompressionType::none:
+                break;
+            case CompressionType::perMessageDeflate:
+                payload =
+                    nx::utils::bstream::gzip::Compressor::compressData(std::move(payload), false);
+                break;
+        }
+    }
 
-    if (!payload)
-        return -1;
-
-    int headerOffset = fillHeader(out, fin, type, payloadLenType, payloadLen);
-    memcpy(out + headerOffset, payload, payloadLen);
+    nx::Buffer header;
+    int payloadLenType = payloadLenTypeByLen(payload.size());
+    header.resize(calcHeaderSize(m_masked, payloadLenType));
+    header.fill(0);
+    fillHeader(header.data(), fin, first, type, compressionType, payloadLenType, payload.size());
 
     if (m_masked)
     {
-        for (int i = 0; i < payloadLen; i++)
-            out[i + headerOffset] = out[i + headerOffset] ^ ((unsigned char*) (&m_mask))[i % 4];
+        for (int i = 0; i < payload.size(); i++)
+            payload[i] = payload[i] ^ ((unsigned char*) (&m_mask))[i % 4];
     }
 
-    return neededOutLen;
-}
-
-void Serializer::prepareFrame(
-    const nx::Buffer& payload, FrameType type, bool fin, nx::Buffer* outBuffer)
-{
-    outBuffer->resize(prepareFrame(nullptr, payload.size(), type, fin, nullptr, 0));
-    outBuffer->fill(0);
-    prepareFrame(
-        payload.constData(), payload.size(), type, fin, outBuffer->data(), outBuffer->size());
+    return header + payload;
 }
 
 void Serializer::setMasked(bool masked, unsigned mask)
@@ -82,13 +83,23 @@ void Serializer::setMasked(bool masked, unsigned mask)
         m_mask = nx::utils::random::number<unsigned>(1, std::numeric_limits<unsigned>::max());
 }
 
-int Serializer::fillHeader(char* data, bool fin, int opCode, int payloadLenType, int payloadLen)
+int Serializer::fillHeader(
+    char* data, bool fin, bool first, FrameType opCode, CompressionType compressionType,
+    int payloadLenType, int payloadLen)
 {
     char* pdata = data;
 
     *pdata = static_cast<uint8_t>(fin) << 7;
-    firstByte |= static_cast<int>(m_compressionType == CompressionType::perMessageInflate) << 6;
-    firstByte |= opCode & 0xf;
+    switch (compressionType)
+    {
+        case CompressionType::none:
+            break;
+        case CompressionType::perMessageDeflate:
+            *pdata |= static_cast<int>(isDataFrame(opCode) && first) << 6;
+            break;
+    }
+
+    *pdata |= opCode & 0xf;
     pdata++;
 
     *pdata |= static_cast<int>(m_masked) << 7;

@@ -10,30 +10,21 @@ namespace websocket {
 class NX_NETWORK_API Serializer
 {
 public:
-    Serializer(bool masked, CompressionType compressionType, unsigned mask = 0);
+    Serializer(bool masked, unsigned mask = 0);
 
-    void prepareMessage(
-        const nx::Buffer& payload,
-        FrameType type,
-        nx::Buffer* outBuffer);
+    nx::Buffer prepareMessage(nx::Buffer payload, FrameType type, CompressionType compressionType);
 
-    void prepareFrame(
-        const nx::Buffer& payload,
-        FrameType type,
-        bool fin,
-        nx::Buffer* outBuffer);
-
-    int prepareFrame(
-        const char* payload, int payloadLen,
-        FrameType type, bool fin, char* out, int outLen);
+    nx::Buffer prepareFrame(
+        nx::Buffer payload, FrameType type, CompressionType compressionType, bool fin, bool first);
 
 private:
     bool m_masked;
-    CompressionType m_compressionType;
     unsigned m_mask;
 
     void setMasked(bool masked, unsigned mask = 0);
-    int fillHeader(char* data, bool fin, int opCode, int payloadLenType, int payloadLen);
+    int fillHeader(
+        char* data, bool fin, bool first, FrameType opCode,  CompressionType compressionType,
+        int payloadLenType, int payloadLen);
 };
 
 

@@ -123,7 +123,7 @@ CompressionType compressionType(const nx::network::http::HttpHeaders& headers)
     if (extensionHeaderItr != headers.cend()
         && extensionHeaderItr->second.contains(kCompressionAllowed))
     {
-        return CompressionType::perMessageInflate;
+        return CompressionType::perMessageDeflate;
     }
     return CompressionType::none;
 }

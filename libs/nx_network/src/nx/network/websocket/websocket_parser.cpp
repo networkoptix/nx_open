@@ -1,15 +1,18 @@
+#include "websocket_parser.h"
+#include <nx/network/socket_common.h>
+#include <nx/utils/gzip/gzip_compressor.h>
+
 #include <algorithm>
 #include <cstdint>
-#include <nx/network/socket_common.h>
-#include "websocket_parser.h"
 
 namespace nx {
 namespace network {
 namespace websocket {
 
-Parser::Parser(Role role, ParserHandler* handler):
+Parser::Parser(Role role, ParserHandler* handler, CompressionType compressionType):
     m_role(role),
-    m_handler(handler)
+    m_handler(handler),
+    m_compressionType(compressionType)
 {
 }
 
@@ -39,24 +42,19 @@ Parser::ParseState Parser::processPayload(char* data, int len)
             m_maskPos++;
         }
     }
-    m_handler->framePayload(data, outLen);
+    m_frameBuffer.append(data, outLen);
     m_payloadLen -= outLen;
     m_pos += outLen;
     if (m_payloadLen == 0)
     {
-        m_handler->frameEnded();
-        if (m_fin)
-            m_handler->messageEnded();
+        handleFrame();
         return ParseState::readingHeaderFixedPart;
     }
     return ParseState::readingPayload;
 }
 
 void Parser::processPart(
-    char* data,
-    int len,
-    int neededLen,
-    ParseState (Parser::*processFunc)(char* data))
+    char* data, int len, int neededLen, ParseState (Parser::*processFunc)(char* data))
 {
     switch (bufferDataIfNeeded(data, len, neededLen))
     {
@@ -118,23 +116,49 @@ Parser::ParseState Parser::readHeaderFixed(char* data)
 {
     m_opCode = (FrameType)(*data & 0x0F);
     m_fin = (*data >> 7) & 0x01;
-    data++;
+    bool psv1 = ((*data >> 6) & 0x01) ? CompressionType::perMessageDeflate : CompressionType::none;
 
+    if (m_firstFrame
+        && m_compressionType == CompressionType::perMessageDeflate
+        && isDataFrame(m_opCode))
+    {
+        NX_ASSERT(psv1);
+        if (psv1)
+            m_doUncompress = true;
+    }
+
+    data++;
     m_masked = (*data >> 7) & 0x01;
+
     if (!m_masked && m_role == Role::server)
         m_handler->handleError(Error::noMaskBit);
 
     m_payloadLen = (unsigned char)(*data & (~0x80));
     m_headerExtLen = (m_payloadLen <= 125 ? 0 : m_payloadLen == 126 ? 2 : 8) + (m_masked ? 4 : 0);
-    m_handler->frameStarted(m_opCode, m_fin);
     if (m_headerExtLen == 0 && m_payloadLen == 0)
     {
-        m_handler->frameEnded();
-        if (m_fin)
-            m_handler->messageEnded();
+        handleFrame();
         return ParseState::readingHeaderFixedPart;
     }
     return m_headerExtLen == 0 ? ParseState::readingPayload: ParseState::readingHeaderExtension;
+}
+
+void Parser::handleFrame()
+{
+    if (m_compressionType == CompressionType::perMessageDeflate && m_doUncompress)
+        m_frameBuffer = nx::utils::bstream::gzip::Compressor::uncompressData(m_frameBuffer);
+
+    m_handler->gotFrame(m_firstFrame ? m_opCode : FrameType::continuation, m_frameBuffer, m_fin);
+    m_frameBuffer.clear();
+
+    if (m_firstFrame)
+        m_firstFrame = false;
+
+    if (m_fin)
+    {
+        m_firstFrame = true;
+        m_doUncompress = false;
+    }
 }
 
 Parser::ParseState Parser::readHeaderExtension(char* data)
@@ -158,9 +182,7 @@ Parser::ParseState Parser::readHeaderExtension(char* data)
 
     if (m_payloadLen == 0)
     {
-        m_handler->frameEnded();
-        if (m_fin)
-            m_handler->messageEnded();
+        handleFrame();
         return ParseState::readingHeaderFixedPart;
     }
 
