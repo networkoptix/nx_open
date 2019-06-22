@@ -1158,58 +1158,6 @@ TEST_P(WebSocket_PingPong, UnexpectedClose_deleteFromCb_receive)
     ASSERT_FALSE(serverWebSocket);
 }
 
-//TEST_P(WebSocket, UnexpectedClose_deleteFromCb_ParseError)
-//{
-//    givenClientModes(SendMode::singleMessage, ReceiveMode::message);
-//    givenServerModes(SendMode::singleMessage, ReceiveMode::message);
-//    givenClientTestDataPrepared(1684*1024 + 17);
-//    serverRole = Role::server;
-//    givenServerClientWebSockets();
-//
-//    int sentMessageCount = 0;
-//    const int kTotalMessageCount = 100;
-//
-//    clientSendCb =
-//        [&](SystemError::ErrorCode ecode, size_t)
-//        {
-//            if (ecode != SystemError::noError)
-//            {
-//                resetClientSocket();
-//                try { readyPromise.set_value(); } catch (...) {}
-//                return;
-//            }
-//            sentMessageCount++;
-//            if (sentMessageCount >= kTotalMessageCount)
-//            {
-//                readyPromise.set_value();
-//                return;
-//            }
-//            clientWebSocket->sendAsync(clientSendBuf, clientSendCb);
-//        };
-//
-//    serverReadCb =
-//        [&](SystemError::ErrorCode ecode, size_t)
-//        {
-//            if (ecode != SystemError::noError)
-//            {
-//                resetServerSocket();
-//                try { readyPromise.set_value(); } catch (...) {}
-//                return;
-//            }
-//            serverReadBuf.clear();
-//            serverWebSocket->readSomeAsync(&serverReadBuf, serverReadCb);
-//        };
-//
-//    whenReadWriteScheduled();
-//    std::this_thread::sleep_for(std::chrono::milliseconds(20));
-//
-//    readyFuture.wait();
-//    waitForClientSocketDestroyed();
-//    waitForServerSocketDestroyed();
-//
-//    ASSERT_TRUE(!serverWebSocket);
-//}
-
 TEST_P(WebSocket, UnexpectedClose_ReadReturnedZero)
 {
     givenClientModes(SendMode::singleMessage, ReceiveMode::message);
