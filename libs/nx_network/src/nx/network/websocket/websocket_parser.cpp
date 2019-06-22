@@ -145,7 +145,7 @@ Parser::ParseState Parser::readHeaderFixed(char* data)
 
 void Parser::handleFrame()
 {
-    if (m_compressionType == CompressionType::perMessageDeflate && m_doUncompress)
+    if ((m_compressionType == CompressionType::perMessageDeflate) && m_doUncompress)
         m_frameBuffer = nx::utils::bstream::gzip::Compressor::uncompressData(m_frameBuffer);
 
     m_handler->gotFrame(m_firstFrame ? m_opCode : FrameType::continuation, m_frameBuffer, m_fin);

@@ -19,7 +19,6 @@ public:
 
 namespace {
 
-unsigned char kShortTextMessageFinNoMask[] = { 0x81, 0x5, 'h', 'e', 'l', 'l', 'o' };
 using ::testing::_;
 using ::testing::AtLeast;
 
@@ -40,7 +39,7 @@ static nx::Buffer prepareMessage(
             opCode = FrameType::continuation;
 
         result += serializer.prepareFrame(
-            payload, type, compressionType, i == frameCount - 1, i == 0);
+            payload, opCode, compressionType, i == frameCount - 1, i == 0);
     }
 
     return result;
@@ -87,7 +86,7 @@ protected:
                 .Times(frameCount - 2);
         }
 
-        size_t messageOffset = 0;
+        int messageOffset = 0;
         auto message = prepareMessage(m_defaultPayload, frameCount, type, masked, mask, GetParam());
 
         for (int i = 0; ; ++i)

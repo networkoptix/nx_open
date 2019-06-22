@@ -386,7 +386,9 @@ void WebSocket::gotFrame(FrameType type, const nx::Buffer& data, bool fin)
             sendControlResponse(FrameType::close);
             m_failed = true;
             break;
-
+        default:
+            NX_ASSERT(false);
+            break;
     }
 }
 
