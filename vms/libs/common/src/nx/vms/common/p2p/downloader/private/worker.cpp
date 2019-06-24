@@ -207,8 +207,11 @@ void Worker::sleep()
     NX_VERBOSE(m_logTag, "Start waiting.");
 
     std::unique_lock<std::mutex> lk(m_sleepMutex);
-    m_sleeping = true;
-    m_sleepCondition.wait_for(lk, delay(), [this]() { return !m_sleeping; });
+    if (!m_needStop)
+    {
+        m_sleeping = true;
+        m_sleepCondition.wait_for(lk, delay(), [this]() { return !m_sleeping; });
+    }
     m_sleeping = false;
 
     NX_VERBOSE(m_logTag, "Waking...");

@@ -1,0 +1,8 @@
+{
+    "version" : "@version@",
+    "component": "@component@",
+    "cloudHost" : "@cloud_host@",
+    "platform": "@platform@",
+    "variants": [@variants@],
+    "installScript": "@install_script@"
+}

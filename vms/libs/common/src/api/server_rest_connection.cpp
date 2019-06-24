@@ -43,8 +43,6 @@ using namespace nx;
 
 namespace {
 
-static const size_t ResponseReadTimeoutMs = 15 * 1000;
-static const size_t TcpConnectTimeoutMs = 5 * 1000;
 static const nx::network::http::StringType kJsonContentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
 
 void trace(const QString& serverId, int handle, const QString& message)
@@ -829,13 +827,20 @@ Handle ServerConnection::lookupDetectedObjects(
 
 Handle ServerConnection::updateActionStart(
     const nx::update::Information& info,
-    Result<UpdateInformationData>::type callback,
+    std::function<void (Handle, bool)>&& callback,
     QThread* targetThread)
 {
+    auto internalCallback =
+        [callback = std::move(callback)](
+            bool success, rest::Handle handle, EmptyResponseType /*response*/)
+        {
+            if (callback)
+                callback(handle, success);
+        };
     const auto contentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
     auto request = QJson::serialized(info);
-    return executePost(
-        "/ec2/startUpdate", QnRequestParamList(), contentType, request, callback, targetThread);
+    return executePost<EmptyResponseType>("/ec2/startUpdate", QnRequestParamList(), contentType,
+        request, internalCallback, targetThread);
 }
 
 Handle ServerConnection::getUpdateInfo(

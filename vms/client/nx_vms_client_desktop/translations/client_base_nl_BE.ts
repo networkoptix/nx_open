@@ -233,10 +233,6 @@ to view more bookmarks</source>
       <translation>Video Wall weergave opslaan</translation>
     </message>
     <message>
-      <source>Drop Resources</source>
-      <translation>Verwijder apparaten</translation>
-    </message>
-    <message>
       <source>Start Screen Recording</source>
       <translation>Start de schermopname</translation>
     </message>
@@ -8580,10 +8576,6 @@ Als u analysegegevens naar een andere opslaglocatie wilt verplaatsen, neemt u co
       <translation>Updates aan het downloaden...</translation>
     </message>
     <message>
-      <source>Pushing updates...</source>
-      <translation>Updates verzenden...</translation>
-    </message>
-    <message>
       <source>Upload</source>
       <translation>Uploaden</translation>
     </message>
@@ -8737,6 +8729,18 @@ Als u analysegegevens naar een andere opslaglocatie wilt verplaatsen, neemt u co
     <message>
       <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
       <translation type="unfinished">OS version of the client is no longer supported. Please update its OS to a supported version.</translation>
+    </message>
+    <message>
+      <source>Failed to start update</source>
+      <translation type="unfinished">Failed to start update</translation>
+    </message>
+    <message>
+      <source>Starting update to ...</source>
+      <translation type="unfinished">Starting update to ...</translation>
+    </message>
+    <message>
+      <source>Some servers have no package available</source>
+      <translation type="unfinished">Some servers have no package available</translation>
     </message>
   </context>
   <context>
@@ -9080,6 +9084,54 @@ Als u analysegegevens naar een andere opslaglocatie wilt verplaatsen, neemt u co
     <message>
       <source>Vendor</source>
       <translation>Fabrikant</translation>
+    </message>
+    <message>
+      <source>no error</source>
+      <translation type="unfinished">no error</translation>
+    </message>
+    <message>
+      <source>library file cannot be loaded</source>
+      <translation type="unfinished">library file cannot be loaded</translation>
+    </message>
+    <message>
+      <source>invalid or incompatible plugin library</source>
+      <translation type="unfinished">invalid or incompatible plugin library</translation>
+    </message>
+    <message>
+      <source>plugin library failed to initialize</source>
+      <translation type="unfinished">plugin library failed to initialize</translation>
+    </message>
+    <message>
+      <source>plugin returned bad manifest</source>
+      <translation type="unfinished">plugin returned bad manifest</translation>
+    </message>
+    <message>
+      <source>plugin API version is no longer supported</source>
+      <translation type="unfinished">plugin API version is no longer supported</translation>
+    </message>
+    <message>
+      <source>unknown error</source>
+      <translation type="unfinished">unknown error</translation>
+    </message>
+    <message>
+      <source>Not loaded</source>
+      <translation type="unfinished">Not loaded</translation>
+    </message>
+    <message>
+      <source>Loaded</source>
+      <translation type="unfinished">Loaded</translation>
+    </message>
+    <message>
+      <source>plugin is in the black list</source>
+      <translation type="unfinished">plugin is in the black list</translation>
+    </message>
+    <message>
+      <source>Status</source>
+      <translation type="unfinished">Status</translation>
+    </message>
+    <message>
+      <source>plugin is optional and is not in the white list</source>
+      <translation type="unfinished">plugin is optional and is not in the white list</translation>
     </message>
   </context>
   <context>

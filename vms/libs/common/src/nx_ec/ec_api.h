@@ -533,84 +533,6 @@ protected:
         impl::ListDirectoryHandlerPtr handler) = 0;
 };
 
-class AbstractUpdatesNotificationManager: public QObject
-{
-Q_OBJECT
-public:
-signals :
-    void updateChunkReceived(const QString& updateId, const QByteArray& data, qint64 offset);
-    void updateUploadProgress(const QString& updateId, const QnUuid& peerId, int chunks);
-    void updateInstallationRequested(const QString& updateId);
-};
-
-typedef std::shared_ptr<AbstractUpdatesNotificationManager> AbstractUpdatesNotificationManagerPtr;
-
-class AbstractUpdatesManager
-{
-public:
-    enum ReplyCode
-    {
-        NoError = -1,
-        UnknownError = -2,
-        NoFreeSpace = -3
-    };
-
-    virtual ~AbstractUpdatesManager()
-    {
-    }
-
-    template<class TargetType, class HandlerType>
-    int sendUpdatePackageChunk(
-        const QString& updateId,
-        const QByteArray& data,
-        qint64 offset,
-        const nx::vms::api::PeerSet& peers,
-        TargetType* target,
-        HandlerType handler)
-    {
-        return sendUpdatePackageChunk(
-            updateId,
-            data,
-            offset,
-            peers,
-            std::static_pointer_cast<impl::SimpleHandler>(
-                std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(
-                    target,
-                    handler)));
-    }
-
-    template<class TargetType, class HandlerType>
-    int sendUpdateUploadResponce(
-        const QString& updateId,
-        const QnUuid& peerId,
-        int chunks,
-        TargetType* target,
-        HandlerType handler)
-    {
-        return sendUpdateUploadResponce(
-            updateId,
-            peerId,
-            chunks,
-            std::static_pointer_cast<impl::SimpleHandler>(
-                std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(
-                    target,
-                    handler)));
-    }
-
-protected:
-    virtual int sendUpdatePackageChunk(
-        const QString& updateId,
-        const QByteArray& data,
-        qint64 offset,
-        const nx::vms::api::PeerSet& peers,
-        impl::SimpleHandlerPtr handler) = 0;
-    virtual int sendUpdateUploadResponce(
-        const QString& updateId,
-        const QnUuid& peerId,
-        int chunks,
-        impl::SimpleHandlerPtr handler) = 0;
-};
-
 class AbstractDiscoveryNotificationManager: public QObject
 {
     Q_OBJECT
@@ -1020,8 +942,6 @@ public:
         const Qn::UserAccessData& userAccessData) = 0;
     virtual AbstractStoredFileManagerPtr getStoredFileManager(
         const Qn::UserAccessData& userAccessData) = 0;
-    virtual AbstractUpdatesManagerPtr getUpdatesManager(
-        const Qn::UserAccessData& userAccessData) = 0;
     virtual AbstractMiscManagerPtr getMiscManager(
         const Qn::UserAccessData& userAccessData) = 0;
     virtual AbstractDiscoveryManagerPtr getDiscoveryManager(
@@ -1038,7 +958,6 @@ public:
     virtual AbstractLayoutTourNotificationManagerPtr layoutTourNotificationManager() = 0;
     virtual AbstractVideowallNotificationManagerPtr videowallNotificationManager() = 0;
     virtual AbstractStoredFileNotificationManagerPtr storedFileNotificationManager() = 0;
-    virtual AbstractUpdatesNotificationManagerPtr updatesNotificationManager() = 0;
     virtual AbstractMiscNotificationManagerPtr miscNotificationManager() = 0;
     virtual AbstractDiscoveryNotificationManagerPtr discoveryNotificationManager() = 0;
     virtual AbstractWebPageNotificationManagerPtr webPageNotificationManager() = 0;

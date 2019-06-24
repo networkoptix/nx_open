@@ -19,10 +19,10 @@ namespace nx::vms::client::desktop {
 
 struct UpdateStrings
 {
-    Q_DECLARE_TR_FUNCTIONS(UpdateStrings);
+    Q_DECLARE_TR_FUNCTIONS(UpdateStrings)
 
 public:
-    static QString getReportForUnsupportedServer(const nx::vms::api::SystemInformation& info);
+    static QString getReportForUnsupportedOs(const nx::vms::api::SystemInformation& info);
 };
 
 /**
@@ -47,6 +47,9 @@ struct ClientVerificationData
     nx::utils::SoftwareVersion currentVersion;
     /** Peer id for a client. Verification will ignore client if clientId is null. */
     QnUuid clientId;
+
+    /** Client needs this update for compatibility mode. */
+    bool compatibilityMode = false;
 
     /** Fills in systemInfo and currentVersion. */
     void fillDefault();

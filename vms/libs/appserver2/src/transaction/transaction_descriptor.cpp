@@ -318,15 +318,6 @@ struct LicenseNotificationManagerHelper
     }
 };
 
-struct UpdateNotificationManagerHelper
-{
-    template<typename Param>
-    void operator ()(const QnTransaction<Param> &tran, const NotificationParams &notificationParams)
-    {
-        notificationParams.updatesNotificationManager->triggerNotification(tran, notificationParams.source);
-    }
-};
-
 struct DiscoveryNotificationManagerHelper
 {
     template<typename Param>

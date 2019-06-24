@@ -12,7 +12,7 @@
 #include <utils/common/app_info.h>
 #include <nx/utils/concurrent.h>
 #include <network/http_connection_listener.h>
-#include <nx_ec/ec_proto_version.h>
+#include <nx/vms/api/protocol_version.h>
 #include <nx/vms/api/data/access_rights_data.h>
 #include <nx/vms/api/data/discovery_data.h>
 #include <nx/vms/api/data/user_role_data.h>
@@ -1675,13 +1675,6 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     // AbstractStoredFileManager::deleteStoredFile
     regUpdate<StoredFilePath>(p, ApiCommand::removeStoredFile);
 
-    // AbstractUpdatesManager::uploadUpdate
-    regUpdate<UpdateUploadData>(p, ApiCommand::uploadUpdate);
-    // AbstractUpdatesManager::uploadUpdateResponce
-    regUpdate<UpdateUploadResponseData>(p, ApiCommand::uploadUpdateResponce);
-    // AbstractUpdatesManager::installUpdate
-    regUpdate<UpdateInstallData>(p, ApiCommand::installUpdate);
-
     // AbstractDiscoveryManager::discoveredServerChanged
     regUpdate<DiscoveredServerData>(p, ApiCommand::discoveredServerChanged);
     // AbstractDiscoveryManager::discoveredServersList
@@ -1942,7 +1935,7 @@ ErrorCode LocalConnectionFactory::fillConnectionInfo(
     connectionInfo->box = QnAppInfo::armBox();
 #endif
     connectionInfo->allowSslConnections = m_sslEnabled;
-    connectionInfo->nxClusterProtoVersion = nx_ec::EC2_PROTO_VERSION;
+    connectionInfo->nxClusterProtoVersion = nx::vms::api::protocolVersion();
     connectionInfo->ecDbReadOnly = m_ecDbReadOnly;
     connectionInfo->newSystem = commonModule()->globalSettings()->isNewSystem();
     connectionInfo->p2pMode = m_p2pMode;

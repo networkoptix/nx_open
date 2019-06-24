@@ -233,10 +233,6 @@ to view more bookmarks</source>
       <translation>Videowand-Ansicht speichern</translation>
     </message>
     <message>
-      <source>Drop Resources</source>
-      <translation>Ressourcen ablegen</translation>
-    </message>
-    <message>
       <source>Start Screen Recording</source>
       <translation>Bildschirmaufnahme starten</translation>
     </message>
@@ -8580,10 +8576,6 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
       <translation>Herunterladen von Updates...</translation>
     </message>
     <message>
-      <source>Pushing updates...</source>
-      <translation>Updates vorantreiben...</translation>
-    </message>
-    <message>
       <source>Upload</source>
       <translation>Hochladen</translation>
     </message>
@@ -8732,11 +8724,23 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     </message>
     <message>
       <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
-      <translation type="unfinished">OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</translation>
+      <translation>Betriebssystemversionen einiger Komponenten werden nicht mehr unterstützt. Bitte entfernen Sie sie aus dem System oder aktualisieren Sie ihr Betriebssystem auf eine unterstützte Version.</translation>
     </message>
     <message>
       <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
-      <translation type="unfinished">OS version of the client is no longer supported. Please update its OS to a supported version.</translation>
+      <translation>Die Betriebssystemversion des Clients wird nicht mehr unterstützt. Bitte aktualisieren Sie das Betriebssystem auf eine unterstützte Version.</translation>
+    </message>
+    <message>
+      <source>Failed to start update</source>
+      <translation>Update konnte nicht gestartet werden</translation>
+    </message>
+    <message>
+      <source>Starting update to ...</source>
+      <translation>Update wird gestartet auf ...</translation>
+    </message>
+    <message>
+      <source>Some servers have no package available</source>
+      <translation>Einige Server haben kein Paket zur Verfügung</translation>
     </message>
   </context>
   <context>
@@ -8910,7 +8914,7 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     </message>
     <message>
       <source>Update package is not found.</source>
-      <translation type="unfinished">Update package is not found.</translation>
+      <translation>Updatepaket wurde nicht gefunden.</translation>
     </message>
   </context>
   <context>
@@ -9080,6 +9084,54 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     <message>
       <source>Vendor</source>
       <translation>Hersteller</translation>
+    </message>
+    <message>
+      <source>no error</source>
+      <translation>kein Fehler</translation>
+    </message>
+    <message>
+      <source>library file cannot be loaded</source>
+      <translation>Bibliotheksdatei kann nicht geladen werden</translation>
+    </message>
+    <message>
+      <source>invalid or incompatible plugin library</source>
+      <translation>ungültige oder inkompatible Plugin-Bibliothek</translation>
+    </message>
+    <message>
+      <source>plugin library failed to initialize</source>
+      <translation>Plugin-Bibliothek konnte nicht initialisiert werden</translation>
+    </message>
+    <message>
+      <source>plugin returned bad manifest</source>
+      <translation>Das Plugin hat ein schlechtes Manifest zurückgegeben</translation>
+    </message>
+    <message>
+      <source>plugin API version is no longer supported</source>
+      <translation>Plugin-API-Version wird nicht mehr unterstützt</translation>
+    </message>
+    <message>
+      <source>unknown error</source>
+      <translation>unbekannter Fehler</translation>
+    </message>
+    <message>
+      <source>Not loaded</source>
+      <translation>Nicht geladen</translation>
+    </message>
+    <message>
+      <source>Loaded</source>
+      <translation>Geladen</translation>
+    </message>
+    <message>
+      <source>plugin is in the black list</source>
+      <translation>Plugin ist auf der Blacklist</translation>
+    </message>
+    <message>
+      <source>Status</source>
+      <translation>Status</translation>
+    </message>
+    <message>
+      <source>plugin is optional and is not in the white list</source>
+      <translation>Plugin ist optional und nicht in der Whitelist</translation>
     </message>
   </context>
   <context>

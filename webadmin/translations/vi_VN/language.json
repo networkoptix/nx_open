@@ -118,7 +118,7 @@
         "updateNotificationsEnabled": "Đã bật thông báo cập nhật",
         "upnpPortMappingEnabled": "Ánh xạ cổng UPNP được kích hoạt",
         "useTextEmailFormat": "Gửi email văn bản thuần túy",
-        "useWindowsEmailLineFeed": "Use Windows line feed in emails",
+        "useWindowsEmailLineFeed": "Sử dụng nguồn cấp dữ liệu Windows trong email",
         "trafficEncryptionForced": "Force traffic encryption",
         "videoTrafficEncryptionForced": "Force video traffic encryption",
         "updateStatus": "Update status",

@@ -32,9 +32,7 @@ static QStringList stringToListViaComma(const QString& s)
     return list;
 }
 
-PluginManager::PluginManager(QObject* parent):
-    QObject(parent),
-    m_utilityProvider(new nx::vms::server::plugins::UtilityProvider(this))
+PluginManager::PluginManager(QObject* parent): QObject(parent)
 {
 }
 
@@ -411,8 +409,8 @@ bool PluginManager::loadNxPluginForOldSdk(
         pluginInfo->name = plugin2->name();
         pluginInfo->statusMessage = lm(kPluginLoadedMessageFormat).arg("nxpl::Plugin2");
         pluginInfo->mainInterface = PluginInfo::MainInterface::nxpl_Plugin2;
-        plugin2->setPluginContainer(
-            reinterpret_cast<nxpl::PluginInterface*>(m_utilityProvider.get()));
+        plugin2->setPluginContainer(reinterpret_cast<nxpl::PluginInterface*>(
+            makePtr<nx::vms::server::plugins::UtilityProvider>(this, /*plugin*/ nullptr).get()));
     }
 
     m_nxPlugins.push_back({pluginInfo, toPtr(reinterpret_cast<IRefCountable*>(plugin))});
@@ -562,7 +560,8 @@ bool PluginManager::loadNxPluginForNewSdk(
         }
     }
 
-    plugin->setUtilityProvider(m_utilityProvider.get());
+    plugin->setUtilityProvider(
+        makePtr<nx::vms::server::plugins::UtilityProvider>(this, plugin.get()).get());
     m_nxPlugins.push_back({pluginInfo, plugin});
     return true;
 }

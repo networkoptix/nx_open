@@ -241,7 +241,7 @@ signals:
     void moduleInformationReceived(const QList<nx::vms::api::ModuleInformation>& moduleInformation);
 
     /** Called when /ec2/startUpdate request is complete. */
-    void startUpdateComplete(bool success, const nx::update::Information& info);
+    void startUpdateComplete(bool success);
     /** Called when /ec2/cancelUpdate request is complete. */
     void cancelUpdateComplete(bool success);
     /** Called when /ec2/finishUpdate request is complete. */

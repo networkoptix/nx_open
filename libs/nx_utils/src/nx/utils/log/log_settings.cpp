@@ -83,14 +83,31 @@ Settings::Settings(QSettings* settings)
         logger.level.primary = Level::none;
 
         settings->beginGroup(group);
-        for (const auto& levelKey: settings->childKeys())
+        for (const QString& levelKey: settings->childKeys())
         {
-            const auto level = levelFromString(levelKey);
-            const auto value = settings->value(levelKey).toString();
-            if (value == '*')
-                logger.level.primary = level;
-            else
-                logger.level.filters[Filter(value)] = level;
+            const Level level = levelFromString(levelKey);
+            const QVariant& value = settings->value(levelKey);
+
+            switch (value.type())
+            {
+                case QVariant::String:
+                {
+                    const QString& valueString = value.toString().trimmed();
+                    if (valueString == L'*')
+                        logger.level.primary = level;
+                    else
+                        logger.level.filters[Filter(valueString)] = level;
+                    break;
+                }
+                case QVariant::StringList:
+                {
+                    for (const QString& valueString: value.toStringList())
+                        logger.level.filters[Filter(valueString.trimmed())] = level;
+                    break;
+                }
+                default:
+                    break;
+            }
         }
         settings->endGroup();
 

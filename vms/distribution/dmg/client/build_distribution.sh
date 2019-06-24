@@ -124,9 +124,10 @@ buildDistribution()
         -ov "$RAW_DMG"
 
     mv update.json "$SRC/"
+    cp package.json "$SRC/"
 
     (cd "$SRC"
-        zip -y -r "../$UPDATE_ZIP" *.app update.json
+        zip -y -r "../$UPDATE_ZIP" *.app update.json package.json
     )
 
     setDmgIcon

@@ -7,6 +7,7 @@
 
 #include <QtGui/QOpenGLContext>
 #include <QtGui/QOpenGLFunctions>
+#include <QtGui/QOffscreenSurface>
 #include <QtWidgets/QOpenGLWidget>
 
 #include <utils/common/warnings.h>
@@ -27,67 +28,71 @@ enum
 
 bool warnOnInvalidCalls = false;
 
-} // namespace
+//--------------------------------------------------------------------------------------------------
 
-/**
- * A global object that contains state that is shared between all OpenGL functions
- * instances.
- */
-class QnGlFunctionsGlobal
+class StaticOpenGLInfo
 {
 public:
-    QnGlFunctionsGlobal():
-        m_initialized(false),
-        m_maxTextureSize(DefaultMaxTextureSize)
-    {}
+    static StaticOpenGLInfo& instance();
 
-    GLint maxTextureSize() const {
-        return m_maxTextureSize;
-    }
+    const QnGlFunctions::OpenGLInfo& info() const;
+    GLint maxTextureSize() const;
 
-    void initialize(QOpenGLWidget* glWidget)
-    {
-        QnMutexLocker locker( &m_mutex );
-        if(m_initialized)
-            return;
-
-        if(!QOpenGLContext::currentContext())
-        {
-            if(!glWidget)
-            {
-                NX_ASSERT(false, "Can't get any OpenGL context!");
-                return;
-            }
-
-            glWidget->makeCurrent();
-        }
-
-        m_initialized = true;
-        locker.unlock();
-
-        GLint maxTextureSize = -1;
-        const auto context = glWidget->context();
-        const auto functions = context->functions();
-        functions->glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTextureSize);
-        m_maxTextureSize = nx::utils::AppInfo::isLinux()
-            ? std::min<GLint>(maxTextureSize, LinuxMaxTextureSize)
-            : maxTextureSize;
-    }
-
-    // This function is for MacOS workaround for wrong max texture size of Intel HD3000
-    void overrideMaxTextureSize(GLint maxTextureSize)
-    {
-        m_maxTextureSize = maxTextureSize;
-    }
+    void overrideMaxTextureSize(GLint value);
 
 private:
-    QnMutex m_mutex;
-    bool m_initialized;
-    GLint m_maxTextureSize;
+    StaticOpenGLInfo();
+
+private:
+    QnGlFunctions::OpenGLInfo m_info;
+    GLint m_maxTextureSize = DefaultMaxTextureSize;
 };
 
-Q_GLOBAL_STATIC(QnGlFunctionsGlobal, qn_glFunctionsGlobal)
+StaticOpenGLInfo& StaticOpenGLInfo::instance()
+{
+    static StaticOpenGLInfo result;
+    return result;
+}
 
+StaticOpenGLInfo::StaticOpenGLInfo()
+{
+    QOffscreenSurface surface;
+    surface.create();
+
+    QOpenGLContext context;
+    context.create();
+    context.makeCurrent(&surface);
+
+    const auto functions = context.functions();
+
+    QnGlFunctions::OpenGLInfo result;
+    m_info.version = (const char*)functions->glGetString(GL_VERSION);
+    m_info.vendor = (const char*)context.functions()->glGetString(GL_VENDOR);
+    m_info.renderer = (const char*)context.functions()->glGetString(GL_RENDERER);
+
+    GLint maxTextureSize = -1;
+    functions->glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTextureSize);
+    m_maxTextureSize = nx::utils::AppInfo::isLinux()
+        ? std::min<GLint>(maxTextureSize, LinuxMaxTextureSize)
+        : maxTextureSize;
+}
+
+const QnGlFunctions::OpenGLInfo& StaticOpenGLInfo::info() const
+{
+    return m_info;
+}
+
+GLint StaticOpenGLInfo::maxTextureSize() const
+{
+    return m_maxTextureSize;
+}
+
+void StaticOpenGLInfo::overrideMaxTextureSize(GLint value)
+{
+    m_maxTextureSize = value;
+}
+
+} // namespace
 
 // -------------------------------------------------------------------------- //
 // QnGlFunctionsPrivate
@@ -102,20 +107,9 @@ public:
         m_glWidget(glWidget),
         m_features(0)
     {
-        qn_glFunctionsGlobal()->initialize(glWidget);
-
-        m_openGLInfo.version = getGLString(GL_VERSION);
-        m_openGLInfo.vendor = getGLString(GL_VENDOR);
-        m_openGLInfo.renderer = getGLString(GL_RENDERER);
-
-        {
-			QnMutexLocker lock(&m_mutex);
-			m_openGLInfoCache = m_openGLInfo;
-		}
-
-        m_openGLInfoCache = m_openGLInfo;
-        if (m_openGLInfo.vendor.contains(lit("Tungsten Graphics")) &&
-			m_openGLInfo.renderer.contains(lit("Gallium 0.1, Poulsbo on EMGD")))
+        const auto& info = StaticOpenGLInfo::instance().info();
+        if (info.vendor.contains(lit("Tungsten Graphics"))
+            && info.renderer.contains(lit("Gallium 0.1, Poulsbo on EMGD")))
 		{
             m_features |= QnGlFunctions::ShadersBroken; /* Shaders are declared but don't work. */
 		}
@@ -123,10 +117,10 @@ public:
 #ifdef Q_OS_MACX
         /* Intel HD 3000 driver handles textures with size > 4096 incorrectly (see bug #3141).
          * To fix that we have to override maximum texture size to 4096 for this graphics adapter. */
-        if (m_openGLInfo.vendor.contains(lit("Intel")) &&
-            QRegExp(QLatin1String(".*Intel.+3000.*")).exactMatch(m_openGLInfo.renderer))
+        if (info.vendor.contains(lit("Intel"))
+            && QRegExp(QLatin1String(".*Intel.+3000.*")).exactMatch(info.renderer))
         {
-            qn_glFunctionsGlobal()->overrideMaxTextureSize(4096);
+            StaticOpenGLInfo::instance().overrideMaxTextureSize(4096);
         }
 #endif
 
@@ -146,17 +140,6 @@ public:
         return m_features;
     }
 
-	const QnGlFunctions::OpenGLInfo& openGLInfo() const
-	{
-		return m_openGLInfo;
-	}
-
-	static const QnGlFunctions::OpenGLInfo openGLCachedInfo()
-	{
-		QnMutexLocker lock(&m_mutex);
-		return m_openGLInfoCache;
-	}
-
     QOpenGLWidget* glWidget() const
     {
         return m_glWidget;
@@ -171,15 +154,7 @@ private:
 
     QOpenGLWidget* const m_glWidget;
     QnGlFunctions::Features m_features;
-	QnGlFunctions::OpenGLInfo m_openGLInfo;
-
-	static QnMutex m_mutex;
-	static QnGlFunctions::OpenGLInfo m_openGLInfoCache;
 };
-
-// static
-QnMutex QnGlFunctionsPrivate::m_mutex;
-QnGlFunctions::OpenGLInfo QnGlFunctionsPrivate::m_openGLInfoCache;
 
 typedef QnGlContextData<QnGlFunctionsPrivate, QnGlContextDataForwardingFactory<QnGlFunctionsPrivate> > QnGlFunctionsPrivateStorage;
 Q_GLOBAL_STATIC(QnGlFunctionsPrivateStorage, qn_glFunctionsPrivateStorage);
@@ -216,12 +191,12 @@ QnGlFunctions::Features QnGlFunctions::features() const
 
 const QnGlFunctions::OpenGLInfo& QnGlFunctions::openGLInfo() const
 {
-	return d->openGLInfo();
+    return StaticOpenGLInfo::instance().info();
 }
 
 QnGlFunctions::OpenGLInfo QnGlFunctions::openGLCachedInfo()
 {
-	return QnGlFunctionsPrivate::openGLCachedInfo();
+    return StaticOpenGLInfo::instance().info();
 }
 
 void QnGlFunctions::setWarningsEnabled(bool enable)
@@ -279,12 +254,6 @@ GLint QnGlFunctions::estimatedInteger(GLenum target)
         return 0;
     }
 
-    QnGlFunctionsGlobal *global = qn_glFunctionsGlobal();
-    if(global) {
-        return global->maxTextureSize();
-    } else {
-        /* We may get called when application is shutting down. */
-        return DefaultMaxTextureSize;
-    }
+    return StaticOpenGLInfo::instance().maxTextureSize();
 }
 

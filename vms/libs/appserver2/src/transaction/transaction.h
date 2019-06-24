@@ -1032,39 +1032,6 @@ APPLY(1003, removeLicense, nx::vms::api::LicenseData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(1200, uploadUpdate, nx::vms::api::UpdateUploadData, \
-                       false, \
-                       true, \
-                       InvalidGetHashHelper(), \
-                       UpdateNotificationManagerHelper(), \
-                       AdminOnlyAccess(), /* save permission checker */ \
-                       AdminOnlyAccess(), /* read permission checker */ \
-                       InvalidFilterFunc(), /* Filter save func */ \
-                       InvalidFilterFunc(), /* Filter read func */ \
-                       AdminOnlyAccessOut(), /* Check remote peer rights for outgoing transaction */ \
-                       RegularTransactionType()) /* regular transaction type */ \
-APPLY(1201, uploadUpdateResponce, nx::vms::api::UpdateUploadResponseData, \
-                       false, \
-                       true, \
-                       InvalidGetHashHelper(), \
-                       UpdateNotificationManagerHelper(), \
-                       AdminOnlyAccess(), /* save permission checker */ \
-                       AdminOnlyAccess(), /* read permission checker */ \
-                       InvalidFilterFunc(), /* Filter save func */ \
-                       InvalidFilterFunc(), /* Filter read func */ \
-                       AdminOnlyAccessOut(), /* Check remote peer rights for outgoing transaction */ \
-                       RegularTransactionType()) /* regular transaction type */ \
-APPLY(1202, installUpdate, nx::vms::api::UpdateInstallData, \
-                       false, \
-                       true, \
-                       InvalidGetHashHelper(), \
-                       UpdateNotificationManagerHelper(), \
-                       AdminOnlyAccess(), /* save permission checker */ \
-                       AdminOnlyAccess(), /* read permission checker */ \
-                       InvalidFilterFunc(), /* Filter save func */ \
-                       InvalidFilterFunc(), /* Filter read func */ \
-                       AdminOnlyAccessOut(), /* Check remote peer rights for outgoing transaction */ \
-                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(1301, discoveredServerChanged, nx::vms::api::DiscoveredServerData, \
                        false, \
                        false, \

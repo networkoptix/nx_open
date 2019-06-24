@@ -50,7 +50,6 @@
 #include <media_server/mserver_status_watcher.h>
 #include <media_server/resource_status_watcher.h>
 #include <media_server/server_connector.h>
-#include <media_server/server_update_tool.h>
 #include <streaming/audio_streamer_pool.h>
 #include <media_server_process_aux.h>
 #include <nx/vms/server/command_line_parameters.h>

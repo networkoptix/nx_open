@@ -7,9 +7,11 @@
 
 namespace nx::vms::api {
 
+NX_VMS_API int protocolVersionOverride = 0;
+
 int protocolVersion()
 {
-    return ${vmsProtocolVersion};
+    return protocolVersionOverride > 0 ? protocolVersionOverride : ${vmsProtocolVersion};
 }
 
 } // namespace nx::vms::api
