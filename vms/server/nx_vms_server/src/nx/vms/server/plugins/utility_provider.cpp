@@ -1,12 +1,19 @@
 #include "utility_provider.h"
 
 #include <nx/sdk/uuid.h>
+#include <nx/sdk/helpers/string.h>
+#include <nx/utils/log/assert.h>
 #include <plugins/plugin_container_api.h> //< for IID_TimeProvider
 #include <utils/common/synctime.h>
-#include <nx/sdk/helpers/string.h>
 #include <plugins/plugin_manager.h>
 
 namespace nx::vms::server::plugins {
+
+UtilityProvider::UtilityProvider(PluginManager* pluginManager, const sdk::IPlugin* plugin):
+    m_pluginManager(pluginManager), m_plugin(plugin)
+{
+    NX_ASSERT(pluginManager);
+}
 
 nx::sdk::IRefCountable* UtilityProvider::queryInterface(InterfaceId id)
 {

@@ -11,11 +11,7 @@ namespace nx::vms::server::plugins {
 class UtilityProvider: public nx::sdk::RefCountable<nx::sdk::IUtilityProvider>
 {
 public:
-    UtilityProvider(PluginManager* pluginManager, const nx::sdk::IPlugin* plugin):
-        m_pluginManager(pluginManager), m_plugin(plugin)
-    {
-        NX_ASSERT(pluginManager);
-    }
+    UtilityProvider(PluginManager* pluginManager, const nx::sdk::IPlugin* plugin);
 
     virtual IRefCountable* queryInterface(InterfaceId id) override;
 
