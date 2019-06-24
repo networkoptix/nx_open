@@ -181,7 +181,7 @@ void CrashReporter::scanAndReportByTimer(QSettings* settings)
 {
     if (nx::utils::AppInfo::applicationVersion().endsWith(lit(".0")))
     {
-        NX_INFO(this, lm("Sending is disabled for developer builds (buildNumber=0)"));
+        NX_INFO(this, "Crash reports sending is disabled for developer builds (buildNumber=0)");
         return;
     }
 
