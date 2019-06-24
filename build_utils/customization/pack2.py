@@ -36,7 +36,7 @@ def iterate_over_dict(dictionary, path):
 def copy_if_different(source, target):
     try:
         os.makedirs(target.parent.as_posix())
-    except WindowsError:
+    except Exception:
         pass
 
     if target.exists() and cmp(source.as_posix(), target.as_posix()):
@@ -65,7 +65,7 @@ def unpack(package_path, output_path):
     unpacked_package_path = output_path / '_package_'
     try:
         os.makedirs(unpacked_package_path.as_posix())
-    except WindowsError:
+    except Exception:
         pass
 
     with zipfile.ZipFile(package_path.as_posix(), "r") as zip:
