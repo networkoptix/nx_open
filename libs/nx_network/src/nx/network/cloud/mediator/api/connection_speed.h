@@ -6,12 +6,11 @@
 
 namespace nx::hpm::api {
 
-using BytesPerSecond = int;
-
 struct NX_NETWORK_API ConnectionSpeed
 {
 	std::chrono::microseconds pingTime;
-	BytesPerSecond bandwidth;
+	//Bandwidth in bytes per second
+	int bandwidth;
 };
 
 #define ConnectionSpeed_Fields (pingTime)(bandwidth)

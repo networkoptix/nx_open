@@ -20,7 +20,7 @@ static int ipVersion(const nx::utils::Url& url)
 static QByteArray makePayload()
 {
 	static constexpr char kSpeedTest[] = "SPEEDTEST";
-	static constexpr int kPayloadSizeBytes = 10000000;
+	static constexpr int kPayloadSizeBytes = 1000 * 1000;
 
 	QByteArray payload;
 	payload.reserve(kPayloadSizeBytes);
@@ -205,7 +205,13 @@ void UplinkBandwidthTester::sendRequest()
 void UplinkBandwidthTester::testComplete(const microseconds& endTime)
 {
 	if (m_handler)
-		nx::utils::swapAndCall(m_handler, SystemError::noError, calculateBandwidth(endTime));
+	{
+		auto [errorCode, bandwidth] = calculateBandwidth(endTime);
+		if (errorCode != SystemError::noError)
+			testFailed(errorCode);
+		else
+			nx::utils::swapAndCall(m_handler, SystemError::noError, bandwidth);
+	}
 }
 
 void UplinkBandwidthTester::testFailed(SystemError::ErrorCode errorCode)
@@ -214,10 +220,18 @@ void UplinkBandwidthTester::testFailed(SystemError::ErrorCode errorCode)
 		nx::utils::swapAndCall(m_handler, errorCode, 0);
 }
 
-BytesPerSecond UplinkBandwidthTester::calculateBandwidth(const microseconds& endTime)
+std::pair<SystemError::ErrorCode, int> UplinkBandwidthTester::calculateBandwidth(
+	const microseconds& endTime)
 {
-	const auto testDuration = endTime - m_testContext.adjustedStartTime;
-	return m_testContext.totalBytesSent / (int) duration_cast<seconds>(testDuration).count();
+	const int testDurationSeconds =
+		(int) duration_cast<seconds>(endTime - m_testContext.adjustedStartTime).count();
+
+	if (testDurationSeconds == 0)
+		return std::make_pair(SystemError::invalidData, 0);
+
+	return std::make_pair(
+		SystemError::noError,
+		m_testContext.totalBytesSent / testDurationSeconds);
 }
 
 } // namespace nx::network::cloud::speed_test

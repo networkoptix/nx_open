@@ -55,6 +55,9 @@ private:
     CompletionHandler m_handler;
 };
 
+//-------------------------------------------------------------------------------------------------
+// ScheduledUplinkSpeedTester
+
 class NX_NETWORK_API ScheduledUplinkSpeedTester: public aio::BasicPollable
 {
     using base_type = aio::BasicPollable;

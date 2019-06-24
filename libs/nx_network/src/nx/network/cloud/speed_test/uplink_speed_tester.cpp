@@ -54,7 +54,7 @@ void UplinkSpeedTester::startBandwidthTest(const microseconds& pingTime)
 	m_bandwidthTester =
 		std::make_unique<UplinkBandwidthTester>(m_url, kTestDuration, pingTime);
 	m_bandwidthTester->doBandwidthTest(
-		[this, pingTime](SystemError::ErrorCode errorCode, BytesPerSecond bandwidth)
+		[this, pingTime](SystemError::ErrorCode errorCode, int bandwidth)
 		{
 			if (errorCode != SystemError::noError)
 				return emitTestResult(errorCode, std::nullopt);

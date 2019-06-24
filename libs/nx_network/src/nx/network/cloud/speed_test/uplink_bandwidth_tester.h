@@ -10,9 +10,8 @@ namespace nx::network::cloud::speed_test {
 
 NX_NETWORK_API std::chrono::milliseconds localNow();
 
-using BytesPerSecond = int;
 using BandwidthCompletionHandler =
-	nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode, BytesPerSecond)>;
+	nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode, int /*bytesPerSecond*/)>;
 
 class NX_NETWORK_API UplinkBandwidthTester:
 	public network::aio::BasicPollable
@@ -41,7 +40,7 @@ private:
 	void testComplete(const std::chrono::microseconds& endTime);
 	void testFailed(SystemError::ErrorCode errorCode);
 
-	BytesPerSecond calculateBandwidth(const std::chrono::microseconds& endTime);
+	std::pair<SystemError::ErrorCode, int> calculateBandwidth(const std::chrono::microseconds& endTime);
 
 private:
 	struct TestContext
