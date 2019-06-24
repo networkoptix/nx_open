@@ -60,6 +60,8 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
 
 namespace {
 
+const vms::api::SoftwareVersion kPackagesJsonAppearedVersion(4, 0);
+
 static InformationError makeHttpRequest(
     nx::network::http::AsyncClient* httpClient,
     const QString& url)
@@ -275,6 +277,9 @@ static InformationError parseAndExtractInformation(
     if (error != InformationError::noError)
         return error;
 
+    if (vms::api::SoftwareVersion(result->version) < kPackagesJsonAppearedVersion)
+        return InformationError::incompatibleParser;
+
     error = parsePackages(topLevelObject, baseUpdateUrl, publicationKey, result);
     if (error != InformationError::noError)
         return error;
@@ -296,6 +301,9 @@ static InformationError parseAndExtractLegacyInformation(
     auto error = parseHeader(topLevelObject, baseUpdateUrl, result);
     if (error != InformationError::noError)
         return error;
+
+    if (vms::api::SoftwareVersion(result->version) >= kPackagesJsonAppearedVersion)
+        return InformationError::incompatibleParser;
 
     error = parseLegacyPackages(topLevelObject, baseUpdateUrl, publicationKey, result);
     if (error != InformationError::noError)
@@ -346,21 +354,20 @@ static InformationError fillUpdateInformation(
     }
 
     auto baseUpdateUrl = customizationInfo.updates_prefix + "/" + publicationKey;
-    error = makeHttpRequest(httpClient, baseUpdateUrl + "/packages.json");
 
+    error = makeHttpRequest(httpClient, baseUpdateUrl + "/packages.json");
     if (error == InformationError::noError)
     {
-        return parseAndExtractInformation(
+        error = parseAndExtractInformation(
             httpClient->fetchMessageBodyBuffer(),
             baseUpdateUrl,
             publicationKey,
             result);
+        if (error != InformationError::incompatibleParser)
+            return error;
     }
 
-    // Falling back to previous protocol with update.json
-    if (error == InformationError::httpError)
-        error = makeHttpRequest(httpClient, baseUpdateUrl + "/update.json");
-
+    error = makeHttpRequest(httpClient, baseUpdateUrl + "/update.json");
     if (error == InformationError::noError)
     {
         return parseAndExtractLegacyInformation(

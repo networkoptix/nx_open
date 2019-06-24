@@ -100,10 +100,13 @@ bool QnAppInfo::isWindows()
 
 nx::vms::api::SystemInformation QnAppInfo::currentSystemInformation()
 {
+    const QString modification = (armBox() == "bpi" || armBox() == "edge1")
+        ? armBox()
+        : nx::vms::api::SystemInformation::runtimeModification();
     return nx::vms::api::SystemInformation(
         applicationPlatform(),
         applicationArch(),
-        nx::vms::api::SystemInformation::runtimeModification(),
+        modification,
         nx::vms::api::SystemInformation::runtimeOsVersion());
 }
 

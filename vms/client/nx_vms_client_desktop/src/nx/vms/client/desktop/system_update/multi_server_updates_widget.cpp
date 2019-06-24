@@ -608,6 +608,9 @@ MultiServerUpdatesWidget::VersionReport MultiServerUpdatesWidget::calculateUpdat
                     report.statusMessages << tr("Unable to check updates on the internet");
                 }
                 break;
+            case Error::incompatibleParser:
+                NX_ERROR(NX_SCOPE_TAG, "A proper update description file is not found.");
+                [[fallthrough]];
             case Error::jsonError:
                 if (source == SourceType::file)
                     report.statusMessages << tr("Cannot update from the selected file");
