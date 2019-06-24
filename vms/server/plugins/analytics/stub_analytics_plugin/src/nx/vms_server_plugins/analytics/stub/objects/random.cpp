@@ -25,7 +25,7 @@ Vector2D randomTrajectory()
 
 std::unique_ptr<AbstractObject> RandomObjectGenerator::generate() const
 {
-    std::unique_lock<std::mutex> lock(m_mutex);
+    std::lock_guard<std::mutex> lock(m_mutex);
     if (m_registry.empty())
         return nullptr;
 

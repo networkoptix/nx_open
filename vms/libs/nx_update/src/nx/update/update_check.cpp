@@ -562,7 +562,8 @@ std::pair<FindPackageResult, const Package*> findPackageForVariant(
         if (isClient != (package.component == kComponentClient))
             continue;
 
-        if (package.isCompatibleTo(systemInformation))
+        // TODO: Enable version checking after making server report its variantVersion.
+        if (package.isCompatibleTo(systemInformation, true))
         {
             if (!bestPackage
                 || package.isNewerThan(systemInformation.variant, *bestPackage))

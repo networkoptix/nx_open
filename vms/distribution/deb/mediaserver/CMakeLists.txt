@@ -46,6 +46,7 @@ nx_configure_directory(
 set(variants "{ \"name\": \"ubuntu\", \"minimumVersion\": \"16.04\" }")
 if(targetDevice STREQUAL "linux_arm32")
     string(PREPEND variants "{ \"name\": \"debian\", \"minimumVersion\": \"9\" }, ")
+    string(APPEND variants ", { \"name\": \"raspbian\", \"minimumVersion\": \"9\" }")
 endif()
 
 nx_generate_package_json(${CMAKE_CURRENT_BINARY_DIR}/package.json

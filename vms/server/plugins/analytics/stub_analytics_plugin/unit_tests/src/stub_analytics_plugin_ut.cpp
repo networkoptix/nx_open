@@ -281,24 +281,8 @@ private:
 class UtilityProvider: public RefCountable<IUtilityProvider>
 {
 public:
-    UtilityProvider(const nx::sdk::IPlugin* const expectedPlugin):
-        m_expectedPlugin(expectedPlugin)
-    {
-    }
-
-    virtual int64_t vmsSystemTimeSinceEpochMs() const override
-    {
-        return 0;
-    }
-
-    virtual const nx::sdk::IString* homeDir(const nx::sdk::IPlugin* plugin) const override
-    {
-        ASSERT_EQ(m_expectedPlugin, plugin);
-        return new nx::sdk::String();
-    }
-
-private:
-    const nx::sdk::IPlugin* const m_expectedPlugin;
+    virtual int64_t vmsSystemTimeSinceEpochMs() const override { return 0; }
+    virtual const nx::sdk::IString* homeDir() const override { return new nx::sdk::String(); }
 };
 
 TEST(stub_analytics_plugin, test)
@@ -316,7 +300,7 @@ TEST(stub_analytics_plugin, test)
     const auto plugin = queryInterfacePtr<nx::sdk::analytics::IPlugin>(pluginObject);
     ASSERT_TRUE(plugin);
 
-    const auto utilityProvider = makePtr<UtilityProvider>(plugin.get());
+    const auto utilityProvider = makePtr<UtilityProvider>();
     plugin->setUtilityProvider(utilityProvider.get());
 
     const auto engine = toPtr(plugin->createEngine(&error));

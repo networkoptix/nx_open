@@ -35,7 +35,7 @@ QString osReleaseContentsValueByKey(
         return defaultValue;
 
     const QRegularExpression re(
-        QString("%1\\s*=\\s*(.+)").arg(key), QRegularExpression::CaseInsensitiveOption);
+        QString("^%1\\s*=\\s*(.+)$").arg(key), QRegularExpression::CaseInsensitiveOption);
 
     QTextStream stream(osReleaseContents);
     while (!stream.atEnd())
