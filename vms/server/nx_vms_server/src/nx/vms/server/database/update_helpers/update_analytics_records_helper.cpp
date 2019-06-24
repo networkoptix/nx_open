@@ -1,5 +1,6 @@
 #include "update_analytics_records_helper.h"
 
+#include <QtCore/QFile>
 #include <QtSql/QSqlQuery>
 
 #include <nx/utils/log/log.h>
