@@ -223,7 +223,7 @@ nx::utils::SharedGuardPtr QnSearchBookmarksModelPrivate::startUpdateOperation()
 
     q->beginResetModel();
     const auto guard = nx::utils::makeSharedGuard(
-        [this, q]() { q->endResetModel(); });
+        [q]() { q->endResetModel(); });
 
     m_updatingWeakGuard = UpdatingOperationWeakGuard(guard);
     return guard;
@@ -237,7 +237,7 @@ void QnSearchBookmarksModelPrivate::applyFilter()
     m_query->setFilter(m_filter);
     m_query->setCameras(m_cameras.toSet());
     m_query->executeRemoteAsync(
-        [this, endUpdateOperationGuard](bool success, const QnCameraBookmarkList& bookmarks)
+        [this, endUpdateOperationGuard](bool success, int /*requestId*/, const QnCameraBookmarkList& bookmarks)
         {
             if (m_updatingWeakGuard.lock().get() != endUpdateOperationGuard.get())
                 return; //< Operation was cancelled

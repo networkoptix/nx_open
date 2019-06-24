@@ -28,14 +28,14 @@ public:
     /// @param cameras          Set of target cameras.
     /// @param filter           Filter parameters.
     /// @param callback         Callback for receiving bookmarks data.
-    void getBookmarksAsync(const QnVirtualCameraResourceSet &cameras, const QnCameraBookmarkSearchFilter &filter, BookmarksCallbackType callback);
+    //void getBookmarksAsync(const QnVirtualCameraResourceSet &cameras, const QnCameraBookmarkSearchFilter &filter, BookmarksCallbackType callback);
 
     /// @brief                  Asynchronously gathers bookmarks using specified filter.
     /// @param cameras          Set of target cameras.
     /// @param filter           Filter parameters.
     /// @param callback         Callback for receiving bookmarks data.
     /// @returns                Internal id of the request.
-    int getBookmarksAsync(const QnVirtualCameraResourceSet &cameras, const QnCameraBookmarkSearchFilter &filter, BookmarksInternalCallbackType callback);
+    int getBookmarksAsync(const QnVirtualCameraResourceSet &cameras, const QnCameraBookmarkSearchFilter &filter, BookmarksCallbackType callback);
 
     /// @brief                  Add the bookmark to the camera.
     /// @param bookmark         Target bookmark.
@@ -79,6 +79,8 @@ public:
     /// @param query            Target query.
     /// @param callback         Callback for receiving bookmarks data.
     void executeQueryRemoteAsync(const QnCameraBookmarksQueryPtr &query, BookmarksCallbackType callback);
+
+    int getBookmarkTagsAsync(int maxTags, BookmarkTagsCallbackType callback);
 
 signals:
     /* TODO: #dklychkov #2.6 #bookmarks Implement notification transactions bor bookmarks which will call these signals. */

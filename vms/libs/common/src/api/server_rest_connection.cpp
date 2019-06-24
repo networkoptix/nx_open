@@ -1031,15 +1031,45 @@ Handle ServerConnection::setDeviceAnalyticsSettings(
         targetThread);
 }
 
-Handle ServerConnection::ptzCommand(
+Handle ServerConnection::postJsonResult(
+    const QString& action,
     const QnRequestParamList& params,
     const nx::Buffer& body,
     std::function<void(bool, Handle, const QnJsonRestResult& response)>&& callback,
     QThread* targetThread)
 {
-    // [](bool, Handle, const QByteArray& response) {}
     const auto contentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
-    return executePost<QnJsonRestResult>("/api/ptz",
+    return executePost<QnJsonRestResult>(action,
+        params,
+        contentType, body,
+        callback,
+        targetThread);
+}
+
+Handle ServerConnection::postEmptyResult(
+    const QString& action,
+    const QnRequestParamList& params,
+    const nx::Buffer& body,
+    PostCallback&& callback,
+    QThread* targetThread)
+{
+    const auto contentType = Qn::serializationFormatToHttpContentType(Qn::UbjsonFormat);
+    return executePost<EmptyResponseType>(action,
+        params,
+        contentType, body,
+        callback,
+        targetThread);
+}
+
+Handle ServerConnection::postUbJsonResult(
+    const QString& action,
+    const QnRequestParamList& params,
+    const nx::Buffer& body,
+    std::function<void(bool, Handle, const QnUbjsonRestResult& response)>&& callback,
+    QThread* targetThread)
+{
+    const auto contentType = Qn::serializationFormatToHttpContentType(Qn::UbjsonFormat);
+    return executePost<QnUbjsonRestResult>(action,
         params,
         contentType, body,
         callback,

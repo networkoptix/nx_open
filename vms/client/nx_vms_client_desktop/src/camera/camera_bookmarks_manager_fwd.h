@@ -7,9 +7,10 @@ class QnCameraBookmarksQuery;
 class QnCameraBookmarksManager;
 class QnCameraBookmarksManagerPrivate;
 
-typedef std::function<void (bool success)> OperationCallbackType;
-typedef std::function<void (bool success, const QnCameraBookmarkList &bookmarks)> BookmarksCallbackType;
-typedef std::function<void (bool success, const QnCameraBookmarkList &bookmarks, int requestId)> BookmarksInternalCallbackType;
+using OperationCallbackType = std::function<void (bool success)>;
+//typedef std::function<void (bool success, const QnCameraBookmarkList &bookmarks)> BookmarksCallbackType;
+using BookmarksCallbackType = std::function<void (bool success, int requestId, const QnCameraBookmarkList &bookmarks)>;
+using BookmarkTagsCallbackType = std::function<void (bool, int requestId, QnCameraBookmarkTagList)>;
 
 typedef QnSharedResourcePointer<QnCameraBookmarksQuery> QnCameraBookmarksQueryPtr;
 typedef QWeakPointer<QnCameraBookmarksQuery> QnCameraBookmarksQueryWeakPtr;
