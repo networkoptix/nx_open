@@ -268,6 +268,7 @@ void WebSocket::sendMessage(const nx::Buffer& message, int writeSize, IoCompleti
         NX_DEBUG(
             this,
             "sendMessage() called after connection has been terminated. Ignoring.");
+        handler(SystemError::connectionAbort, 0);
         return;
     }
 
@@ -427,8 +428,7 @@ void WebSocket::sendControlResponse(FrameType type)
     m_controlBuffer.resize(0);
 
     sendMessage(
-        responseFrame,
-        responseFrame.size(),
+        responseFrame, responseFrame.size(),
         [this, type](SystemError::ErrorCode error, size_t /*transferred*/)
         {
             NX_VERBOSE(
@@ -445,8 +445,7 @@ void WebSocket::sendControlRequest(FrameType type)
     m_serializer.prepareMessage("", type, &requestFrame);
 
     sendMessage(
-        requestFrame,
-        requestFrame.size(),
+        requestFrame, requestFrame.size(),
         [this, type](SystemError::ErrorCode error, size_t /*transferred*/)
         {
             NX_VERBOSE(
