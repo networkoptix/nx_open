@@ -94,8 +94,7 @@ include(qrc_utils)
 include(precompiled_header)
 include(strip_target)
 include(ec_protocol)
-
-set(customization_dir "${PROJECT_SOURCE_DIR}/customization/${customization}")
+include(customization_package)
 
 include(customization/default-values.cmake)
 include(${customization_dir}/customization.cmake)
