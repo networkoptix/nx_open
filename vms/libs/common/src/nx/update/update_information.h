@@ -124,6 +124,11 @@ enum class InformationError
     notFoundError,
     /** Error when client tried to contact mediaserver for update verification. */
     serverConnectionError,
+    /**
+     * Error when there's an attempt to parse packages.json for a version < 4.0 or an attempt to
+     * parse update.json for a version >= 4.0.
+     */
+    incompatibleParser,
     noNewVersion,
 };
 
