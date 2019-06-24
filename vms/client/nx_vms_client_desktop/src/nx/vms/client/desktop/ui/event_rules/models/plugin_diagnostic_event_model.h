@@ -7,7 +7,7 @@
 namespace nx::vms::client::desktop {
 namespace ui {
 
-class PluginEventModel: public QStandardItemModel
+class PluginDiagnosticEventModel: public QStandardItemModel
 {
     Q_OBJECT
 

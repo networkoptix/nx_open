@@ -5,7 +5,7 @@
 #include <ui/widgets/business/software_trigger_business_event_widget.h>
 #include <ui/widgets/business/custom_business_event_widget.h>
 #include <nx/vms/client/desktop/ui/event_rules/widgets/analytics_sdk_event_widget.h>
-#include <nx/vms/client/desktop/ui/event_rules/widgets/plugin_event_widget.h>
+#include <nx/vms/client/desktop/ui/event_rules/widgets/plugin_diagnostic_event_widget.h>
 
 using namespace nx;
 using namespace nx::vms::client::desktop::ui;
@@ -25,7 +25,7 @@ QnAbstractBusinessParamsWidget* QnBusinessEventWidgetFactory::createWidget(
         case vms::api::EventType::analyticsSdkEvent:
             return new AnalyticsSdkEventWidget(parent);
         case vms::api::EventType::pluginDiagnosticEvent:
-            return new PluginEventWidget(parent);
+            return new PluginDiagnosticEventWidget(parent);
         default:
             return new QnEmptyBusinessEventWidget(parent);
     }

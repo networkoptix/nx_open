@@ -1,5 +1,5 @@
-#include "plugin_event_widget.h"
-#include "ui_plugin_event_widget.h"
+#include "plugin_diagnostic_event_widget.h"
+#include "ui_plugin_diagnostic_event_widget.h"
 
 #include <QtCore/QSortFilterProxyModel>
 
@@ -8,7 +8,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
 
-#include <nx/vms/client/desktop/ui/event_rules/models/plugin_event_model.h>
+#include <nx/vms/client/desktop/ui/event_rules/models/plugin_diagnostic_event_model.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 
 #include <ui/workaround/widgets_signals_workaround.h>
@@ -20,33 +20,33 @@
 namespace nx::vms::client::desktop {
 namespace ui {
 
-PluginEventWidget::PluginEventWidget(QWidget* parent):
+PluginDiagnosticEventWidget::PluginDiagnosticEventWidget(QWidget* parent):
     base_type(parent),
-    ui(new Ui::PluginEventWidget),
-    m_pluginEventModel(new PluginEventModel(this))
+    ui(new Ui::PluginDiagnosticEventWidget),
+    m_pluginDiagnosticEventModel(new PluginDiagnosticEventModel(this))
 {
     ui->setupUi(this);
 
     auto sortModel = new QSortFilterProxyModel(this);
     sortModel->setDynamicSortFilter(true);
-    sortModel->setSourceModel(m_pluginEventModel);
+    sortModel->setSourceModel(m_pluginDiagnosticEventModel);
     ui->pirComboBox->setModel(sortModel);
 
     connect(ui->pirComboBox, QnComboboxCurrentIndexChanged, this,
-        &PluginEventWidget::paramsChanged);
+        &PluginDiagnosticEventWidget::paramsChanged);
     connect(ui->captionEdit, &QLineEdit::textChanged, this,
-        &PluginEventWidget::paramsChanged);
+        &PluginDiagnosticEventWidget::paramsChanged);
     connect(ui->descriptionEdit, &QLineEdit::textChanged, this,
-        &PluginEventWidget::paramsChanged);
+        &PluginDiagnosticEventWidget::paramsChanged);
     connect(ui->cbError, &QCheckBox::toggled, this,
-        &PluginEventWidget::paramsChanged);
+        &PluginDiagnosticEventWidget::paramsChanged);
     connect(ui->cbWarning, &QCheckBox::toggled, this,
-        &PluginEventWidget::paramsChanged);
+        &PluginDiagnosticEventWidget::paramsChanged);
     connect(ui->cbInfo, &QCheckBox::toggled, this,
-        &PluginEventWidget::paramsChanged);
+        &PluginDiagnosticEventWidget::paramsChanged);
 
     //ui->pirLabel->addHintLine(tr("Choose plugin instance from the list"));
-    //setHelpTopic(ui->pluginEventTypeLabel, Qn::EventsActions_VideoAnalytics_Help);
+    //setHelpTopic(ui->pluginDiagnosticEventTypeLabel, Qn::EventsActions_VideoAnalytics_Help);
 
     ui->captionLabel->addHintLine(tr("Event will trigger only if there are matches in the caption "
         "with any of the entered keywords."));
@@ -61,10 +61,10 @@ PluginEventWidget::PluginEventWidget(QWidget* parent):
     //setHelpTopic(ui->descriptionLabel, Qn::EventsActions_VideoAnalytics_Help);
 }
 
-PluginEventWidget::~PluginEventWidget() {
+PluginDiagnosticEventWidget::~PluginDiagnosticEventWidget() {
 }
 
-void PluginEventWidget::updateTabOrder(QWidget* before, QWidget* after)
+void PluginDiagnosticEventWidget::updateTabOrder(QWidget* before, QWidget* after)
 {
     setTabOrder(before, ui->pirComboBox);
     setTabOrder(ui->pirComboBox, ui->captionEdit);
@@ -75,7 +75,7 @@ void PluginEventWidget::updateTabOrder(QWidget* before, QWidget* after)
     setTabOrder(ui->cbInfo, after);
 }
 
-void PluginEventWidget::at_model_dataChanged(Fields fields)
+void PluginDiagnosticEventWidget::at_model_dataChanged(Fields fields)
 {
     if (!model() || m_updating)
         return;
@@ -83,7 +83,7 @@ void PluginEventWidget::at_model_dataChanged(Fields fields)
     QScopedValueRollback<bool> guard(m_updating, true);
 
     if (fields.testFlag(Field::eventResources))
-        updatePluginEventTypesModel();
+        updatePluginDiagnosticEventTypesModel();
 
     if (fields.testFlag(Field::eventParams))
     {
@@ -106,7 +106,7 @@ void PluginEventWidget::at_model_dataChanged(Fields fields)
         updateSelectedEventType();
 }
 
-void PluginEventWidget::paramsChanged()
+void PluginDiagnosticEventWidget::paramsChanged()
 {
     if (!model() || m_updating)
         return;
@@ -115,26 +115,26 @@ void PluginEventWidget::paramsChanged()
     model()->setEventParams(createEventParameters());
 }
 
-void PluginEventWidget::updatePluginEventTypesModel()
+void PluginDiagnosticEventWidget::updatePluginDiagnosticEventTypesModel()
 {
     const auto cameras = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
         model()->eventResources());
 
-    m_pluginEventModel->filterByCameras(
+    m_pluginDiagnosticEventModel->filterByCameras(
         resourcePool()->getResources<nx::vms::common::AnalyticsEngineResource>(),
         cameras);
 
-    ui->pirComboBox->setEnabled(m_pluginEventModel->isValid());
+    ui->pirComboBox->setEnabled(m_pluginDiagnosticEventModel->isValid());
     ui->pirComboBox->model()->sort(0);
 }
 
-void PluginEventWidget::updateSelectedEventType()
+void PluginDiagnosticEventWidget::updateSelectedEventType()
 {
     QnUuid pluginId = model()->eventParams().eventResourceId;
 
     if (pluginId.isNull())
     {
-        pluginId = ui->pirComboBox->itemData(0, PluginEventModel::PluginIdRole).value<QnUuid>();
+        pluginId = ui->pirComboBox->itemData(0, PluginDiagnosticEventModel::PluginIdRole).value<QnUuid>();
 
         model()->setEventParams(createEventParameters());
     }
@@ -143,7 +143,7 @@ void PluginEventWidget::updateSelectedEventType()
 
     auto items = pluginListModel->match(
         pluginListModel->index(0, 0),
-        PluginEventModel::PluginIdRole,
+        PluginDiagnosticEventModel::PluginIdRole,
         /*value*/ qVariantFromValue(pluginId),
         /*hits*/ 1,
         Qt::MatchExactly | Qt::MatchRecursive);
@@ -152,11 +152,11 @@ void PluginEventWidget::updateSelectedEventType()
         ui->pirComboBox->setCurrentIndex(items.front());
 }
 
-nx::vms::event::EventParameters PluginEventWidget::createEventParameters()
+nx::vms::event::EventParameters PluginDiagnosticEventWidget::createEventParameters()
 {
     auto eventParams = model()->eventParams();
 
-    eventParams.eventResourceId = ui->pirComboBox->currentData(PluginEventModel::PluginIdRole).value<QnUuid>();
+    eventParams.eventResourceId = ui->pirComboBox->currentData(PluginDiagnosticEventModel::PluginIdRole).value<QnUuid>();
     eventParams.caption = ui->captionEdit->text();
     eventParams.description = ui->descriptionEdit->text();
 

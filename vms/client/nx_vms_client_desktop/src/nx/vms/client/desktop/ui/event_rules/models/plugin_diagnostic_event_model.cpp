@@ -1,4 +1,4 @@
-#include "plugin_event_model.h"
+#include "plugin_diagnostic_event_model.h"
 
 #include <core/resource/camera_resource.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
@@ -6,7 +6,7 @@
 namespace nx::vms::client::desktop {
 namespace ui {
 
-void PluginEventModel::filterByCameras(
+void PluginDiagnosticEventModel::filterByCameras(
     nx::vms::common::AnalyticsEngineResourceList engines,
     const QnVirtualCameraResourceList& cameras)
 {
@@ -46,7 +46,7 @@ void PluginEventModel::filterByCameras(
     endResetModel();
 }
 
-bool PluginEventModel::isValid() const
+bool PluginDiagnosticEventModel::isValid() const
 {
     return rowCount() > 0;
 }

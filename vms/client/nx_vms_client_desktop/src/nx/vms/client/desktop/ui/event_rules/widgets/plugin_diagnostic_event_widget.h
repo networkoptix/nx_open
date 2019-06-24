@@ -2,21 +2,21 @@
 
 #include <ui/widgets/business/abstract_business_params_widget.h>
 
-namespace Ui { class PluginEventWidget; }
+namespace Ui { class PluginDiagnosticEventWidget; }
 
 namespace nx::vms::client::desktop {
 namespace ui {
 
-class PluginEventModel;
+class PluginDiagnosticEventModel;
 
-class PluginEventWidget: public QnAbstractBusinessParamsWidget
+class PluginDiagnosticEventWidget: public QnAbstractBusinessParamsWidget
 {
     Q_OBJECT
     typedef QnAbstractBusinessParamsWidget base_type;
 
 public:
-    explicit PluginEventWidget(QWidget* parent = nullptr);
-    virtual ~PluginEventWidget() override;
+    explicit PluginDiagnosticEventWidget(QWidget* parent = nullptr);
+    virtual ~PluginDiagnosticEventWidget() override;
 
     virtual void updateTabOrder(QWidget* before, QWidget* after) override;
 
@@ -27,13 +27,13 @@ private slots:
     void paramsChanged();
 
 private:
-    void updatePluginEventTypesModel();
+    void updatePluginDiagnosticEventTypesModel();
     void updateSelectedEventType();
     nx::vms::event::EventParameters createEventParameters();
 
 private:
-    QScopedPointer<Ui::PluginEventWidget> ui;
-    PluginEventModel* m_pluginEventModel;
+    QScopedPointer<Ui::PluginDiagnosticEventWidget> ui;
+    PluginDiagnosticEventModel* m_pluginDiagnosticEventModel;
 
 };
 
