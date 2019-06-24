@@ -93,7 +93,7 @@ Settings::Settings(QSettings* settings)
                 case QVariant::String:
                 {
                     const QString& valueString = value.toString().trimmed();
-                    if (value == L'*')
+                    if (valueString == L'*')
                         logger.level.primary = level;
                     else
                         logger.level.filters[Filter(valueString)] = level;
