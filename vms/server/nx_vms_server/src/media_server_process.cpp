@@ -4562,7 +4562,8 @@ void MediaServerProcess::loadResourceParamsData()
 
 void MediaServerProcess::initMetricsController()
 {
-    m_metricsController = std::make_unique<nx::vms::utils::metrics::Controller>();
+    m_metricsController = std::make_unique<nx::vms::utils::metrics::Controller>(
+        [](){ return (uint64_t) qnSyncTime->currentMSecsSinceEpoch() / 1000; });
 
     m_metricsController->registerGroup(
         "servers",

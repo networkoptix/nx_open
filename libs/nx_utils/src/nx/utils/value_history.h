@@ -101,10 +101,10 @@ std::vector<TimedValue<Value>> ValueHistory<Value>::last(std::chrono::millisecon
     auto bound = m_values.begin();
     if (length != std::chrono::milliseconds::zero() && bound != m_values.end())
     {
-        const auto deadline = monotonicTime() - m_length;
-        bound++;
-        while (bound != m_values.end() && bound->time < deadline)
-            bound++;
+        const auto deadline = monotonicTime() - length;
+        decltype(bound) next;
+        while ((next = std::next(bound)) != m_values.end() && next->time < deadline)
+            bound = next;
     }
 
     std::vector<TimedValue<Value>> values;

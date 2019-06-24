@@ -4,6 +4,17 @@
 
 namespace nx::vms::utils::metrics {
 
+static uint64_t pcSecsSinceEpoch()
+{
+    return (uint64_t) nx::utils::timeSinceEpoch().count();
+}
+
+Controller::Controller(nx::utils::MoveOnlyFunc<uint64_t()> currentSecsSinceEpoch):
+    m_currentSecsSinceEpoch(
+        currentSecsSinceEpoch ? std::move(currentSecsSinceEpoch) : &pcSecsSinceEpoch)
+{
+}
+
 void Controller::registerGroup(QString name, std::unique_ptr<AbstractResourceProvider> resourceProvider)
 {
     NX_MUTEX_LOCKER locker(&m_mutex);
@@ -74,23 +85,6 @@ api::metrics::SystemValues Controller::values(
     return systemValues;
 }
 
-static Value makeTimeLine(DataBase::Access access, std::chrono::milliseconds timeLine)
-{
-    const auto timedValues = access->last(timeLine);
-    const auto now = std::chrono::steady_clock::now();
-    const auto timeSinseEpochS =
-        std::chrono::system_clock::now().time_since_epoch() / std::chrono::seconds(1);
-
-    QJsonObject values;
-    for (const auto& [value, time]: timedValues)
-    {
-        const auto delayS = std::chrono::duration_cast<std::chrono::seconds>(now - time).count();
-        values[QString::number(timeSinseEpochS - delayS)] = value;
-    }
-
-    return values;
-}
-
 void Controller::loadGroupValuesUnlocked(
     std::map<QString /*id*/, api::metrics::ParameterGroupValues>* group,
     DataBase::Access groupAccess,
@@ -107,6 +101,21 @@ void Controller::loadGroupValuesUnlocked(
         else
             loadGroupValuesUnlocked(&parameter.group, access, manifest.group, timeLine);
     }
+}
+
+Value Controller::makeTimeLine(DataBase::Access access, std::chrono::milliseconds timeLine) const
+{
+    const auto timedValues = access->last(timeLine);
+    const auto now = nx::utils::monotonicTime();
+    const auto timeSinseEpochS = m_currentSecsSinceEpoch();
+    QJsonObject values;
+    for (const auto& [value, time]: timedValues)
+    {
+        const auto delayS = std::chrono::duration_cast<std::chrono::seconds>(now - time).count();
+        values[QString::number(timeSinseEpochS - delayS)] = value;
+    }
+
+    return values;
 }
 
 static Value calculate(DataBase::Access access, const QStringList& formula)

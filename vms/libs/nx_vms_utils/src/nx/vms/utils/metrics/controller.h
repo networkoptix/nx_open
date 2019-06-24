@@ -7,6 +7,8 @@ namespace nx::vms::utils::metrics {
 class NX_VMS_UTILS_API Controller
 {
 public:
+    Controller(nx::utils::MoveOnlyFunc<uint64_t()> currentSecsSinceEpoch = nullptr);
+
     void registerGroup(QString group, std::unique_ptr<AbstractResourceProvider> resourceProvider);
     void startMonitoring();
 
@@ -27,6 +29,8 @@ private:
         const std::vector<api::metrics::ParameterGroupManifest>& manifests,
         std::optional<std::chrono::milliseconds> timeLine) const;
 
+    Value makeTimeLine(DataBase::Access access, std::chrono::milliseconds timeLine) const;
+
     void applyRulesUnlocked(
         std::map<QString /*id*/, api::metrics::ParameterGroupValues>* group,
         DataBase::Access dataBaseAccess,
@@ -37,6 +41,8 @@ private:
         const std::map<QString /*id*/, api::metrics::ParameterGroupRules>& rules) const;
 
 private:
+    const nx::utils::MoveOnlyFunc<uint64_t()> m_currentSecsSinceEpoch;
+
     // TODO: Should not be mutable as soon as DataBase supports separate read/write access.
     mutable DataBase m_dataBase;
 

@@ -30,6 +30,10 @@ TEST(ValueHistoryTest, main)
     history.update(40);
     EXPECT_EQ(40, history.current());
     EXPECT_EQ(2, history.last().size());
+
+    timeShift.applyRelativeShift(std::chrono::hours(1));
+    EXPECT_EQ(40, history.current());
+    EXPECT_EQ(1, history.last(std::chrono::minutes(1)).size());
 }
 
 TEST(TreeValueHistoryTest, main)
