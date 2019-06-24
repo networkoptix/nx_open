@@ -2790,7 +2790,7 @@ bool QnPlOnvifResource::fixMulticastParametersIfNeeded(
     {
         NX_ASSERT(false, "Multicast parameters must be non-null");
         return false;
-    }   
+    }
 
     bool somethingIsFixed = false;
     auto& address = inOutMulticastParameters->address;
@@ -4043,6 +4043,7 @@ void QnPlOnvifResource::setRelayOutputStateNonSafe(
 #ifdef SIMULATE_RELAY_PORT_MOMOSTABLE_MODE
     if ((autoResetTimeoutMS > 0) && active)
     {
+        QnMutexLocker lk(&m_ioPortMutex);
         //adding task to reset port state
         using namespace std::placeholders;
         const quint64 timerID = nx::utils::TimerManager::instance()->addTimer(
