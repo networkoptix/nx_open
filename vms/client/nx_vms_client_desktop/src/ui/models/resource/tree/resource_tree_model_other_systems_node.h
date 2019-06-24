@@ -25,7 +25,7 @@ public:
     virtual void deinitialize() override;
 
 protected:
-    virtual QIcon calculateIcon() const override;
+    virtual int calculateIconKey() const override;
 
 private:
     void handleSystemDiscovered(const QnSystemDescriptionPtr& system);

@@ -147,14 +147,15 @@ static constexpr qreal kEMappingRaisedWidgetViewportPercentage = 0.33;
 /** The amount of z-space that one layer occupies. */
 const qreal layerZSize = 10000000.0;
 
-/** The amount that is added to maximal Z value each time a move to front
- * operation is performed. */
+/**
+ * The amount that is added to maximal Z value each time a move to frontoperation is performed.
+ */
 const qreal zStep = 1.0;
 
-/** How often splashes should be painted on items when notification appears.  */
+/** How often splashes should be painted on items when notification appears. */
 const int splashPeriodMs = 500;
 
-/** How long splashes should be painted on items when notification appears.  */
+/** How long splashes should be painted on items when notification appears. */
 const int splashTotalLengthMs = 1000;
 
 /** Viewport lower size boundary, in scene coordinates. */
@@ -281,7 +282,7 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
              * after some delay, because some OS make resize call before move widget to correct
              * position while expanding it to fullscreen. #gdm
              */
-            executeDelayedParented([this]() { fitInView(false); }, 0, this);
+            executeLater([this]() { fitInView(false); }, this);
         });
 
     connect(m_widgetActivityInstrument, SIGNAL(activityStopped()), this, SLOT(at_widgetActivityInstrument_activityStopped()));

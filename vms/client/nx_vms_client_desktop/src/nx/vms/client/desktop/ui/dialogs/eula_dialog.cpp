@@ -164,7 +164,13 @@ bool EulaDialog::acceptEulaHtml(const QString& html, int version, QWidget* paren
 
     if (eulaDialog.exec() == QDialog::DialogCode::Accepted)
     {
-        qnSettings->setAcceptedEulaVersion(version);
+        auto oldVersion = qnSettings->acceptedEulaVersion();
+        if (oldVersion < version)
+        {
+            qnSettings->setAcceptedEulaVersion(version);
+            // Preventing qnSettings from being lost. Client can be closed/restarted soon.
+            qnSettings->save();
+        }
         return true;
     }
     return false;

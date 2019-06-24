@@ -41,6 +41,11 @@ Item
             if (engineId === currentEngineId)
                 settingsView.setValues(store.settingsValues(engineId))
         }
+
+        onAnalyticsEnginesChanged:
+        {
+            activateEngine(null)
+        }
     }
 
     function activateEngine(engineId)

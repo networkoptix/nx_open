@@ -1,5 +1,7 @@
 #include "object_detection_metadata.h"
 
+#include <QtCore/QRegularExpression>
+
 #include <nx/kit/debug.h>
 
 #include <nx/fusion/model_functions.h>

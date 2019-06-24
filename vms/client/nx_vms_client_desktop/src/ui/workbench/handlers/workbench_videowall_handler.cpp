@@ -80,7 +80,7 @@
 
 #include <nx/vms/client/desktop/ui/messages/resources_messages.h>
 #include <nx/vms/client/desktop/ui/messages/videowall_messages.h>
-#include <nx/vms/client/desktop/resource_views/data/node_type.h>
+#include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 
 #include <nx/fusion/serialization/json.h>
 #include <nx/fusion/serialization/json_functions.h>
@@ -1674,7 +1674,7 @@ void QnWorkbenchVideoWallHandler::at_delayedOpenVideoWallItemAction_triggered()
 
 void QnWorkbenchVideoWallHandler::at_renameAction_triggered()
 {
-    using NodeType = ResourceTreeNodeType;
+    using NodeType = ResourceTree::NodeType;
 
     const auto parameters = menu()->currentParameters(sender());
 

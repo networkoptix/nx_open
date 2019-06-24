@@ -1,5 +1,6 @@
 #include "notifications_workbench_panel.h"
 
+#include <QtCore/QModelIndex>
 #include <QtCore/QTimer>
 
 #include <QtWidgets/QAction>
@@ -225,6 +226,8 @@ NotificationsWorkbenchPanel::NotificationsWorkbenchPanel(
 
 NotificationsWorkbenchPanel::~NotificationsWorkbenchPanel()
 {
+    if (m_eventPanelContainer)
+        m_eventPanelContainer->setWidget(nullptr);
 }
 
 bool NotificationsWorkbenchPanel::isPinned() const

@@ -298,4 +298,13 @@ DROP TABLE time_period_full;
 
 )sql";
 
+//-------------------------------------------------------------------------------------------------
+static constexpr char kDropObjectSearchFromDb[] =
+R"sql(
+
+DROP INDEX idx_object_search_box_timestamp;
+DROP TABLE object_search;
+
+)sql";
+
 } // namespace nx::analytics::db

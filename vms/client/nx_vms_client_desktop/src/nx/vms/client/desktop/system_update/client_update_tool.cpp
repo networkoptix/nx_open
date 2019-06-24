@@ -24,19 +24,14 @@ bool requestInstalledVersions(QList<nx::utils::SoftwareVersion>* versions)
     // Try to run applauncher if it is not running.
     if (!checkOnline())
         return false;
-
-    const auto result = getInstalledVersions(versions);
-    if (result == ResultType::ok)
-        return true;
-
-    static const int kMaxTries = 5;
-    for (int i = 0; i < kMaxTries; ++i)
+    int kMaxTries = 5;
+    do
     {
-        QThread::msleep(100);
-        qApp->processEvents();
         if (getInstalledVersions(versions) == ResultType::ok)
             return true;
-    }
+        std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    } while (--kMaxTries > 0);
+
     return false;
 }
 
@@ -89,11 +84,22 @@ ClientUpdateTool::ClientUpdateTool(QObject *parent):
 
 ClientUpdateTool::~ClientUpdateTool()
 {
+    NX_VERBOSE(this, "~ClientUpdateTool() enter");
+
+    // Making sure attached thread is complete
+    m_state = exiting;
+    if (m_applauncherTask.valid())
+        m_applauncherTask.get();
+
     // Forcing downloader to be destroyed before serverConnection.
-    m_downloader->disconnect(this);
-    m_downloader.reset();
+    if (m_downloader)
+    {
+        m_downloader->disconnect(this);
+        m_downloader.reset();
+    }
 
     m_serverConnection.reset();
+    NX_VERBOSE(this, "~ClientUpdateTool() done");
 }
 
 void ClientUpdateTool::setState(State newState)
@@ -176,7 +182,7 @@ void ClientUpdateTool::atRemoteUpdateInformation(
 {
     auto systemInfo = QnAppInfo::currentSystemInformation();
     QString errorMessage;
-    // Update is allowed if either target version has the same cloud host or
+    // Update is allowed if either target version has the sam_installedVersionsFutureme cloud host or
     // there are no servers linked to the cloud in the system.
     QString cloudUrl = nx::network::SocketGlobals::cloud().cloudHost();
 
@@ -347,8 +353,8 @@ void ClientUpdateTool::atDownloaderStatusChanged(const FileInformation& fileInfo
             setError(tr("Update package is corrupted"));
             break;
         case FileInformation::Status::downloading:
-            m_progress = fileInformation.calculateDownloadProgress();
-            emit updateStateChanged(int(State::downloading), m_progress);
+            emit updateStateChanged(int(State::downloading),
+                fileInformation.calculateDownloadProgress());
             break;
         default:
             // Nothing to do here
@@ -394,13 +400,6 @@ void ClientUpdateTool::atExtractFilesFinished(int code)
     }
     NX_VERBOSE(this) << "at_extractFilesFinished() done unpacking file" << error;
     setState(State::readyInstall);
-}
-
-int ClientUpdateTool::getDownloadProgress() const
-{
-    if (m_state == State::readyInstall)
-        return 100;
-    return std::min(m_progress, 100);
 }
 
 bool ClientUpdateTool::isDownloadComplete() const
@@ -489,13 +488,12 @@ bool ClientUpdateTool::installUpdateAsync()
                 "Started client installation from file %2. Waiting for completion", absolutePath);
 
             // Checking state if installation, until it goes to Result::ok
-            constexpr int kMaxTries = 10;
+            constexpr int kMaxTries = 60;
             for (int retries = 0; retries < kMaxTries; ++retries)
             {
-                const ResultType result = applauncher::api::checkInstallationProgress();
+                applauncher::api::InstallationProgress progress;
+                const ResultType result = applauncher::api::checkInstallationProgress(progress);
                 QString message = applauncherErrorToString(result);
-                NX_VERBOSE(NX_SCOPE_TAG,
-                    "checkInstallationProgress returned %1", message);
 
                 switch (result)
                 {
@@ -505,16 +503,32 @@ bool ClientUpdateTool::installUpdateAsync()
                     case ResultType::notEnoughSpace:
                     case ResultType::notFound:
                     case ResultType::ok:
+                        NX_VERBOSE(NX_SCOPE_TAG,
+                            "checkInstallationProgress returned %1. Exiting", message);
                         return result;
                     case ResultType::unpackingZip:
+                        NX_VERBOSE(NX_SCOPE_TAG, "checkInstallationProgress() %1 of %2 unpacked",
+                            progress.extracted, progress.total);
                         break;
                     case ResultType::otherError:
                     case ResultType::connectError:
                     case ResultType::ioError:
                     default:
-                        NX_ERROR(NX_SCOPE_TAG, "failed to check zip installation status: %1", message);
+                        NX_ERROR(NX_SCOPE_TAG, "checkInstallationProgress() failed to check zip "
+                            "installation status: %1", message);
                         break;
                 }
+
+                // We can spend a lot of time in this cycle. So we should be able to exit
+                // as early as possible.
+                if (!tool || tool->m_state != installing)
+                {
+                    NX_ERROR(NX_SCOPE_TAG, "checkInstallationProgress() is interrupted. Exiting");
+                    break;
+                }
+
+                int percent = progress.total != 0 ? 100 * progress.extracted / progress.total : 0;
+                emit tool->updateStateChanged(tool->m_state, percent);
                 std::this_thread::sleep_for(std::chrono::seconds(2));
             }
 
@@ -538,6 +552,7 @@ bool ClientUpdateTool::isInstallComplete() const
         case State::readyRestart:
         case State::complete:
         case State::initial:
+        case State::exiting:
         // Though actual install is not successful, no further progress is possible.
         case State::error:
         case State::applauncherError:
@@ -619,7 +634,6 @@ void ClientUpdateTool::resetState()
     m_state = State::initial;
     m_lastError = "";
     m_updateFile = "";
-    m_progress = 0;
     m_updateVersion = nx::utils::SoftwareVersion();
     m_clientPackage = nx::update::Package();
     m_remoteUpdateContents = UpdateContents();
@@ -666,6 +680,8 @@ QString ClientUpdateTool::toString(State state)
             return "ReadyRestart";
         case State::complete:
             return "Complete";
+        case State::exiting:
+            return "Exiting";
         case State::error:
             return "Error";
         case State::applauncherError:

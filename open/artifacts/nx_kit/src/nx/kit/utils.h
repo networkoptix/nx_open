@@ -1,3 +1,5 @@
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+
 #pragma once
 
 /**@file
@@ -45,7 +47,7 @@ inline bool isAsciiPrintable(int c)
 NX_KIT_API std::string baseName(std::string path);
 
 /**
- * @return Process name, without .exe in Windows. 
+ * @return Process name, without .exe in Windows.
  */
 NX_KIT_API std::string getProcessName();
 
@@ -67,11 +69,15 @@ std::string format(const std::string& formatStr, Args... args)
     return result;
 }
 
+NX_KIT_API bool fromString(const std::string& s, int* value);
+NX_KIT_API bool fromString(const std::string& s, double* value);
+NX_KIT_API bool fromString(const std::string& s, float* value);
+
 //-------------------------------------------------------------------------------------------------
 // OS support.
 
 /**
- * @return Command line arguments of the proccess, cached after the first call. If arguments are
+ * @return Command line arguments of the process, cached after the first call. If arguments are
  *     not available, then returns a single empty string.
  */
 NX_KIT_API const std::vector<std::string>& getProcessCmdLineArgs();

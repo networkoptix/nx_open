@@ -5,6 +5,8 @@
 #include <core/resource_management/resource_pool.h>
 #include <client_core/connection_context_aware.h>
 
+#include <utils/common/connective.h>
+
 using namespace nx::vms::common;
 
 namespace nx::vms::client::desktop {
@@ -28,7 +30,7 @@ AnalyticsEnginesWatcher::AnalyticsEngineInfo engineInfoFromResource(
 
 } // namespace
 
-class AnalyticsEnginesWatcher::Private: public QObject, public QnConnectionContextAware
+class AnalyticsEnginesWatcher::Private: public Connective<QObject>, public QnConnectionContextAware
 {
     AnalyticsEnginesWatcher* const q = nullptr;
 
@@ -37,6 +39,7 @@ public:
     void at_resourceAdded(const QnResourcePtr& resource);
     void at_resourceRemoved(const QnResourcePtr& resource);
     void at_engineNameChanged(const QnResourcePtr& resource);
+    void at_engineManifestChanged(const AnalyticsEngineResourcePtr& engine);
     void at_pluginPropertyChanged(const QnResourcePtr& resource, const QString& key);
 
 public:
@@ -63,13 +66,15 @@ void AnalyticsEnginesWatcher::Private::at_resourceAdded(const QnResourcePtr& res
 
         engines[info.id] = info;
 
-        connect(engine.data(), &QnResource::nameChanged, this, &Private::at_engineNameChanged);
+        connect(engine, &QnResource::nameChanged, this, &Private::at_engineNameChanged);
+        connect(engine, &AnalyticsEngineResource::manifestChanged,
+            this, &Private::at_engineManifestChanged);
 
         emit q->engineAdded(info.id, info);
     }
     else if (const auto& plugin = resource.dynamicCast<AnalyticsPluginResource>())
     {
-        connect(plugin.data(), &QnResource::propertyChanged,
+        connect(plugin, &QnResource::propertyChanged,
             this, &Private::at_pluginPropertyChanged);
     }
 }
@@ -92,6 +97,16 @@ void AnalyticsEnginesWatcher::Private::at_engineNameChanged(const QnResourcePtr&
 
     it->name = resource->getName();
     emit q->engineNameChanged(it->id, it->name);
+}
+
+void AnalyticsEnginesWatcher::Private::at_engineManifestChanged(
+    const AnalyticsEngineResourcePtr& engine)
+{
+    const auto it = engines.find(engine->getId());
+    if (it == engines.end())
+        return;
+
+    it->isDeviceDependent = engine->isDeviceDependent();
 }
 
 void AnalyticsEnginesWatcher::Private::at_pluginPropertyChanged(

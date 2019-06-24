@@ -100,7 +100,7 @@ struct ResourceValues
     QString parent;
     std::map<QString /*id*/, ParameterGroupValues> values;
 };
-#define ResourceValues_Fields (name)(values)
+#define ResourceValues_Fields (name)(parent)(values)
 QN_FUSION_DECLARE_FUNCTIONS(ResourceValues, (json), NX_VMS_API)
 
 using ResourceGroupValues =

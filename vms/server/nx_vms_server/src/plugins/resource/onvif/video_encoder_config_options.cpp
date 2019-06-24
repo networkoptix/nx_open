@@ -17,23 +17,23 @@ static const std::vector<std::pair<std::string, SupportedVideoEncoding>>
         { "H265", SupportedVideoEncoding::H265 }
     };
 
-static const std::vector<std::pair<std::string, onvifXsd__H264Profile>>
+static const std::vector<std::pair<std::string, tt__H264Profile>>
     kH264ProfileOnvifMap = {
-        { "Baseline", onvifXsd__H264Profile::Baseline },
-        { "Main", onvifXsd__H264Profile::Main },
-        { "Extended", onvifXsd__H264Profile::Extended },
-        { "High", onvifXsd__H264Profile::High }
+        { "Baseline", tt__H264Profile::Baseline },
+        { "Main", tt__H264Profile::Main },
+        { "Extended", tt__H264Profile::Extended },
+        { "High", tt__H264Profile::High }
     };
 
-static const std::vector<std::pair<std::string, onvifXsd__VideoEncodingProfiles>>
+static const std::vector<std::pair<std::string, tt__VideoEncodingProfiles>>
     kVideoEncoderProfilesOnvifMap = {
-        { "Simple", onvifXsd__VideoEncodingProfiles::Simple }, //< MPEG4 SP
-        { "AdvancedSimple", onvifXsd__VideoEncodingProfiles::AdvancedSimple }, //< MPEG4 ASP
-        { "Baseline", onvifXsd__VideoEncodingProfiles::Baseline }, //< H264 Baseline
-        { "Main", onvifXsd__VideoEncodingProfiles::Main }, //< H264 Main, H265 Main
-        { "Main10", onvifXsd__VideoEncodingProfiles::Main10 }, //< H265 Main 10
-        { "Extended", onvifXsd__VideoEncodingProfiles::Extended }, //< H264 Extended
-        { "High", onvifXsd__VideoEncodingProfiles::High } //< H264 High
+        { "Simple", tt__VideoEncodingProfiles::Simple }, //< MPEG4 SP
+        { "AdvancedSimple", tt__VideoEncodingProfiles::AdvancedSimple }, //< MPEG4 ASP
+        { "Baseline", tt__VideoEncodingProfiles::Baseline }, //< H264 Baseline
+        { "Main", tt__VideoEncodingProfiles::Main }, //< H264 Main, H265 Main
+        { "Main10", tt__VideoEncodingProfiles::Main10 }, //< H265 Main 10
+        { "Extended", tt__VideoEncodingProfiles::Extended }, //< H264 Extended
+        { "High", tt__VideoEncodingProfiles::High } //< H264 High
     };
 
 } //namespace
@@ -78,7 +78,7 @@ std::string supportedVideoCodecFlavorToVmsString(SupportedVideoEncoding codec)
     return std::string();
 }
 
-std::optional<onvifXsd__H264Profile> h264ProfileFromOnvifString(const std::string& name)
+std::optional<tt__H264Profile> h264ProfileFromOnvifString(const std::string& name)
 {
     for (const auto& pair : kH264ProfileOnvifMap)
     {
@@ -88,18 +88,18 @@ std::optional<onvifXsd__H264Profile> h264ProfileFromOnvifString(const std::strin
     return std::nullopt;
 }
 
-std::string h264ProfileToOnvifString(onvifXsd__H264Profile profile)
+std::string h264ProfileToOnvifString(tt__H264Profile profile)
 {
     for (const auto& pair : kH264ProfileOnvifMap)
     {
         if (pair.second == profile)
             return pair.first;
     }
-    NX_ASSERT(0); //< unexpected onvifXsd__VideoEncodingProfiles value
+    NX_ASSERT(0); //< unexpected tt__VideoEncodingProfiles value
     return std::string();
 }
 
-std::optional<onvifXsd__VideoEncodingProfiles> videoEncodingProfilesFromOnvifString(const std::string& name)
+std::optional<tt__VideoEncodingProfiles> videoEncodingProfilesFromOnvifString(const std::string& name)
 {
     for (const auto& pair: kVideoEncoderProfilesOnvifMap)
     {
@@ -109,25 +109,25 @@ std::optional<onvifXsd__VideoEncodingProfiles> videoEncodingProfilesFromOnvifStr
     return std::nullopt;
 }
 
-std::string videoEncodingProfilesToString(onvifXsd__VideoEncodingProfiles profile)
+std::string videoEncodingProfilesToString(tt__VideoEncodingProfiles profile)
 {
     for (const auto& pair : kVideoEncoderProfilesOnvifMap)
     {
         if (pair.second == profile)
             return pair.first;
     }
-    NX_ASSERT(0); //< unexpected onvifXsd__VideoEncodingProfiles value
+    NX_ASSERT(0); //< unexpected tt__VideoEncodingProfiles value
     return std::string();
 }
 
-VideoEncoderConfigOptions::VideoEncoderConfigOptions(const onvifXsd__JpegOptions& options)
+VideoEncoderConfigOptions::VideoEncoderConfigOptions(const tt__JpegOptions& options)
 {
     mediaWebserviseVersion = 1;
     encoder = SupportedVideoEncoding::JPEG;
-    // qualityRange: onvifXsd__JpegOptions contains no such information
-    // bitrateRange: onvifXsd__JpegOptions contains no such information
-    // ConstantBitRateSupported: onvifXsd__JpegOptions contains no such information
-    // govLengthRange: : onvifXsd__JpegOptions contains no such information
+    // qualityRange: tt__JpegOptions contains no such information
+    // bitrateRange: tt__JpegOptions contains no such information
+    // ConstantBitRateSupported: tt__JpegOptions contains no such information
+    // govLengthRange: : tt__JpegOptions contains no such information
     for (const auto resolution : options.ResolutionsAvailable)
     {
         if (resolution)
@@ -139,17 +139,17 @@ VideoEncoderConfigOptions::VideoEncoderConfigOptions(const onvifXsd__JpegOptions
         frameRates.push_back(options.FrameRateRange->Min);
         frameRates.push_back(options.FrameRateRange->Max);
     }
-    // onvifXsd__JpegOptions::EncodingIntervalRange is ignored
+    // tt__JpegOptions::EncodingIntervalRange is ignored
 }
 
-VideoEncoderConfigOptions::VideoEncoderConfigOptions(const onvifXsd__Mpeg4Options& options)
+VideoEncoderConfigOptions::VideoEncoderConfigOptions(const tt__Mpeg4Options& options)
 {
     NX_ASSERT(0); //< Mgeg4 is not supported.
     mediaWebserviseVersion = 1;
     //encoder = SupportedVideoEncoding::MPEG4;
-    // qualityRange: onvifXsd__Mpeg4Options contains no such information
-    // bitrateRange: onvifXsd__Mpeg4Options contains no such information
-    // ConstantBitRateSupported: onvifXsd__Mpeg4Options contains no such information
+    // qualityRange: tt__Mpeg4Options contains no such information
+    // bitrateRange: tt__Mpeg4Options contains no such information
+    // ConstantBitRateSupported: tt__Mpeg4Options contains no such information
 
     if (options.GovLengthRange)
         govLengthRange = Range<int>(options.GovLengthRange->Min, options.GovLengthRange->Max);
@@ -166,29 +166,29 @@ VideoEncoderConfigOptions::VideoEncoderConfigOptions(const onvifXsd__Mpeg4Option
         frameRates.push_back(options.FrameRateRange->Max);
     }
 
-    for (onvifXsd__Mpeg4Profile profile: options.Mpeg4ProfilesSupported)
+    for (tt__Mpeg4Profile profile: options.Mpeg4ProfilesSupported)
     {
         switch (profile)
         {
-            case onvifXsd__Mpeg4Profile::SP:
-                encoderProfiles.push_back(onvifXsd__VideoEncodingProfiles::Simple);
+            case tt__Mpeg4Profile::SP:
+                encoderProfiles.push_back(tt__VideoEncodingProfiles::Simple);
                 break;
-            case onvifXsd__Mpeg4Profile::ASP:
-                encoderProfiles.push_back(onvifXsd__VideoEncodingProfiles::AdvancedSimple);
+            case tt__Mpeg4Profile::ASP:
+                encoderProfiles.push_back(tt__VideoEncodingProfiles::AdvancedSimple);
                 break;
         }
     }
 
-    // onvifXsd__Mpeg4Options::EncodingIntervalRange is ignored
+    // tt__Mpeg4Options::EncodingIntervalRange is ignored
 }
 
-VideoEncoderConfigOptions::VideoEncoderConfigOptions(const onvifXsd__H264Options& options)
+VideoEncoderConfigOptions::VideoEncoderConfigOptions(const tt__H264Options& options)
 {
     mediaWebserviseVersion = 1;
     encoder = SupportedVideoEncoding::H264;
-    // qualityRange: onvifXsd__Mpeg4Options contains no such information
-    // bitrateRange: onvifXsd__Mpeg4Options contains no such information
-    // ConstantBitRateSupported: onvifXsd__Mpeg4Options contains no such information
+    // qualityRange: tt__Mpeg4Options contains no such information
+    // bitrateRange: tt__Mpeg4Options contains no such information
+    // ConstantBitRateSupported: tt__Mpeg4Options contains no such information
 
     if (options.GovLengthRange)
         govLengthRange = Range<int>(options.GovLengthRange->Min, options.GovLengthRange->Max);
@@ -205,28 +205,28 @@ VideoEncoderConfigOptions::VideoEncoderConfigOptions(const onvifXsd__H264Options
         frameRates.push_back(options.FrameRateRange->Max);
     }
 
-    for (onvifXsd__H264Profile profile : options.H264ProfilesSupported)
+    for (tt__H264Profile profile : options.H264ProfilesSupported)
     {
         switch (profile)
         {
-        case onvifXsd__H264Profile::Baseline:
-            encoderProfiles.push_back(onvifXsd__VideoEncodingProfiles::Baseline);
+        case tt__H264Profile::Baseline:
+            encoderProfiles.push_back(tt__VideoEncodingProfiles::Baseline);
             break;
-        case onvifXsd__H264Profile::Main:
-            encoderProfiles.push_back(onvifXsd__VideoEncodingProfiles::Main);
+        case tt__H264Profile::Main:
+            encoderProfiles.push_back(tt__VideoEncodingProfiles::Main);
             break;
-        case onvifXsd__H264Profile::Extended:
-            encoderProfiles.push_back(onvifXsd__VideoEncodingProfiles::Extended);
+        case tt__H264Profile::Extended:
+            encoderProfiles.push_back(tt__VideoEncodingProfiles::Extended);
             break;
-        case onvifXsd__H264Profile::High:
-            encoderProfiles.push_back(onvifXsd__VideoEncodingProfiles::High);
+        case tt__H264Profile::High:
+            encoderProfiles.push_back(tt__VideoEncodingProfiles::High);
             break;
         }
     }
 }
 
 VideoEncoderConfigOptions::VideoEncoderConfigOptions(
-    const onvifXsd__VideoEncoder2ConfigurationOptions& options)
+    const tt__VideoEncoder2ConfigurationOptions& options)
 {
     mediaWebserviseVersion = 2;
 
@@ -283,7 +283,7 @@ VideoEncoderConfigOptions::VideoEncoderConfigOptions(
         for (const auto& item : ProfilesStringList)
         {
             bool ok = false;
-            std::optional<onvifXsd__VideoEncodingProfiles> profile =
+            std::optional<tt__VideoEncodingProfiles> profile =
                 videoEncodingProfilesFromOnvifString(item.toStdString());
             if (profile)
                 encoderProfiles.push_back(*profile);

@@ -2,7 +2,10 @@
 
 #include <chrono>
 
+#include <nx/client/core/watchers/server_time_watcher.h>
+
 #include <translation/datetime_formatter.h>
+#include <ui/workbench/workbench_context.h>
 #include <utils/common/synctime.h>
 
 #include <nx/utils/datetime.h>
@@ -74,11 +77,13 @@ QString AbstractEventListModel::timestampText(microseconds timestamp) const
         return QString();
 
     const auto timestampMs = duration_cast<milliseconds>(timestamp).count();
-    const auto dateTime = QDateTime::fromMSecsSinceEpoch(timestampMs);
+
+    const auto timeWatcher = context()->instance<nx::vms::client::core::ServerTimeWatcher>();
+    const QDateTime dateTime = timeWatcher->displayTime(timestampMs);
+
     if (qnSyncTime->currentDateTime().date() != dateTime.date())
         return datetime::toString(dateTime.date());
-    else
-        return datetime::toString(dateTime.time());
+    return datetime::toString(dateTime.time());
 }
 
 bool AbstractEventListModel::defaultAction(const QModelIndex& /*index*/)

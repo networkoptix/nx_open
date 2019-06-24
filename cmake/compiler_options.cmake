@@ -134,6 +134,10 @@ if(WINDOWS)
 
     if(CMAKE_BUILD_TYPE STREQUAL "Debug")
         add_compile_options(/wd4250)
+
+        # Avoid unnamed objects with custom construction and destruction. Suppressing this warning
+        # as it is displayed very frequently in common places, e.g. in `QObject::connect` calls.
+        add_compile_options(/wd26444)
     endif()
 
     set(_extra_linker_flags "/LARGEADDRESSAWARE /OPT:NOREF /ignore:4221")

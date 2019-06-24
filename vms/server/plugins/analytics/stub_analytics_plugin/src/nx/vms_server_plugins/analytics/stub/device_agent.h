@@ -1,3 +1,5 @@
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+
 #pragma once
 
 #include <thread>
@@ -12,6 +14,7 @@
 #include <nx/sdk/analytics/helpers/pixel_format.h>
 
 #include "engine.h"
+#include "objects/abstract_object.h"
 
 namespace nx {
 namespace vms_server_plugins {
@@ -71,13 +74,16 @@ private:
 
     void processPluginEvents();
 
-    void generateObjectIds();
+    void setObjectCount();
+
+    void parseSettings();
 
 private:
     std::unique_ptr<std::thread> m_pluginEventThread;
     std::mutex m_pluginEventGenerationLoopMutex;
     std::condition_variable m_pluginEventGenerationLoopCondition;
-    bool m_terminated = false;
+    std::atomic<bool> m_terminated{false};
+    std::atomic<bool> m_needToThrowPluginEvents{false};
 
     std::unique_ptr<std::thread> m_eventThread;
     std::condition_variable m_eventGenerationLoopCondition;
@@ -87,12 +93,21 @@ private:
     bool m_previewAttributesGenerated = false;
     int m_frameCounter = 0;
     int m_objectCounter = 0;
-    int m_currentObjectIndex = -1;
-    std::vector<nx::sdk::Uuid> m_objectIds;
+    std::vector<std::unique_ptr<AbstractObject>> m_objects;
     std::string m_eventTypeId;
-    std::string m_objectTypeId;
-    int m_currentObjectTypeIndex = 0;
     int64_t m_lastVideoFrameTimestampUs = 0;
+
+    struct DeviceAgentSettings
+    {
+        std::atomic<bool> generateObjects{true};
+        std::atomic<bool> generateEvents{true};
+        std::atomic<int> generateObjectsEveryNFrames{1};
+        std::atomic<int> numberOfObjectsToGenerate{1};
+        std::atomic<bool> generatePreviewPacket{true};
+        std::atomic<bool> throwPluginEvents{false};
+    };
+
+    DeviceAgentSettings m_deviceAgentSettings;
 
     struct EventContext
     {
@@ -110,11 +125,6 @@ const std::string kIntrusionEventType = "nx.stub.intrusion";
 const std::string kGunshotEventType = "nx.stub.gunshot";
 const std::string kSuspiciousNoiseEventType = "nx.stub.suspiciousNoise";
 const std::string kSoundRelatedEventGroup = "nx.stub.soundRelatedEvent";
-const std::string kCarObjectType = "nx.stub.car";
-const std::string kHumanFaceObjectType = "nx.stub.humanFace";
-const std::string kTruckObjectType = "nx.stub.truck";
-const std::string kPedestrianObjectType = "nx.stub.pedestrian";
-const std::string kBicycleObjectType = "nx.stub.bicycle";
 
 } // namespace stub
 } // namespace analytics

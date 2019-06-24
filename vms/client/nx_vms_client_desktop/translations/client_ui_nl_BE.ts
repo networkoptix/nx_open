@@ -2651,11 +2651,6 @@
     </message>
     <message>
       <location/>
-      <source>Filter TEST</source>
-      <translation>Filter TEST</translation>
-    </message>
-    <message>
-      <location/>
       <source>Nothing found</source>
       <translation>Niets gevonden</translation>
     </message>
@@ -3094,7 +3089,7 @@
     <message>
       <location/>
       <source>Analytics data can occupy tens of gigabytes of storage space. We recommend to choose other location for it instead of the system partition.</source>
-      <translation type="unfinished">Analytics data can occupy tens of gigabytes of storage space. We recommend to choose other location for it instead of the system partition.</translation>
+      <translation>Analytics-gegevens kunnen tientallen gigabytes aan opslagruimte innemen. We raden aan om een andere locatie te kiezen in plaats van de systeempartitie.</translation>
     </message>
   </context>
   <context>

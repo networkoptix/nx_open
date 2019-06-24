@@ -233,10 +233,6 @@ to view more bookmarks</source>
       <translation>Videowand-Ansicht speichern</translation>
     </message>
     <message>
-      <source>Drop Resources</source>
-      <translation>Ressourcen ablegen</translation>
-    </message>
-    <message>
       <source>Start Screen Recording</source>
       <translation>Bildschirmaufnahme starten</translation>
     </message>
@@ -8580,10 +8576,6 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
       <translation>Herunterladen von Updates...</translation>
     </message>
     <message>
-      <source>Pushing updates...</source>
-      <translation>Updates vorantreiben...</translation>
-    </message>
-    <message>
       <source>Upload</source>
       <translation>Hochladen</translation>
     </message>
@@ -8728,7 +8720,27 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     </message>
     <message>
       <source>Failed to download update packages to some components</source>
-      <translation type="unfinished">Failed to download update packages to some components</translation>
+      <translation>Aktualisierungspakete für einige Komponenten konnten nicht heruntergeladen werden</translation>
+    </message>
+    <message>
+      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
+      <translation>Betriebssystemversionen einiger Komponenten werden nicht mehr unterstützt. Bitte entfernen Sie sie aus dem System oder aktualisieren Sie ihr Betriebssystem auf eine unterstützte Version.</translation>
+    </message>
+    <message>
+      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
+      <translation>Die Betriebssystemversion des Clients wird nicht mehr unterstützt. Bitte aktualisieren Sie das Betriebssystem auf eine unterstützte Version.</translation>
+    </message>
+    <message>
+      <source>Failed to start update</source>
+      <translation type="unfinished">Failed to start update</translation>
+    </message>
+    <message>
+      <source>Starting update to ...</source>
+      <translation type="unfinished">Starting update to ...</translation>
+    </message>
+    <message>
+      <source>Some servers have no package available</source>
+      <translation type="unfinished">Some servers have no package available</translation>
     </message>
   </context>
   <context>
@@ -8853,10 +8865,6 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
       <translation>Warten auf Peer-Daten</translation>
     </message>
     <message>
-      <source>Update package can&apos;t be not found.</source>
-      <translation>Das Aktualisierungspaket kann nicht gefunden werden.</translation>
-    </message>
-    <message>
       <source>There is not enough space to download update files.</source>
       <translation>Es ist nicht genügend Speicherplatz zum Herunterladen der Aktualisierungsdateien vorhanden.</translation>
     </message>
@@ -8903,6 +8911,10 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     <message>
       <source>Ready to install update</source>
       <translation>Bereit zum Installieren des Updates</translation>
+    </message>
+    <message>
+      <source>Update package is not found.</source>
+      <translation>Updatepaket wurde nicht gefunden.</translation>
     </message>
   </context>
   <context>
@@ -9072,6 +9084,54 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     <message>
       <source>Vendor</source>
       <translation>Hersteller</translation>
+    </message>
+    <message>
+      <source>no error</source>
+      <translation type="unfinished">no error</translation>
+    </message>
+    <message>
+      <source>library file cannot be loaded</source>
+      <translation type="unfinished">library file cannot be loaded</translation>
+    </message>
+    <message>
+      <source>invalid or incompatible plugin library</source>
+      <translation type="unfinished">invalid or incompatible plugin library</translation>
+    </message>
+    <message>
+      <source>plugin library failed to initialize</source>
+      <translation type="unfinished">plugin library failed to initialize</translation>
+    </message>
+    <message>
+      <source>plugin returned bad manifest</source>
+      <translation type="unfinished">plugin returned bad manifest</translation>
+    </message>
+    <message>
+      <source>plugin API version is no longer supported</source>
+      <translation type="unfinished">plugin API version is no longer supported</translation>
+    </message>
+    <message>
+      <source>unknown error</source>
+      <translation type="unfinished">unknown error</translation>
+    </message>
+    <message>
+      <source>Not loaded</source>
+      <translation type="unfinished">Not loaded</translation>
+    </message>
+    <message>
+      <source>Loaded</source>
+      <translation type="unfinished">Loaded</translation>
+    </message>
+    <message>
+      <source>plugin is in the black list</source>
+      <translation type="unfinished">plugin is in the black list</translation>
+    </message>
+    <message>
+      <source>Status</source>
+      <translation type="unfinished">Status</translation>
+    </message>
+    <message>
+      <source>plugin is optional and is not in the white list</source>
+      <translation type="unfinished">plugin is optional and is not in the white list</translation>
     </message>
   </context>
   <context>
@@ -9841,17 +9901,14 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     </message>
     <message>
       <source>Confirm storage location to store analytics data on &apos;%1&apos;</source>
-      <translation type="unfinished">Confirm storage location to store analytics data on &apos;%1&apos;</translation>
+      <translation>Bestätigen Sie den Speicherort, um die Analysedaten auf &apos;%1&apos; zu speichern</translation>
     </message>
     <message>
       <source>Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
 Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
 By default analytics data will be stored in mediaserver&apos;s installation directory.
 You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</source>
-      <translation type="unfinished">Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
-Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
-By default analytics data will be stored in mediaserver&apos;s installation directory.
-You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</translation>
+      <translation>Die Analysedatenbank sollte auf einem lokalen Speicher gespeichert werden und kann bis zu hundert Gigabyte belegen. Sobald der Standort für die Speicherung von Analysedaten ausgewählt wurde, können diese nicht mehr so einfach geändert werden, ohne dass die Daten verloren gehen. Wir empfehlen, den Standort sorgfältig zu wählen und keine Systempartition zu verwenden, um schwere Systemfehler zu vermeiden. Standardmäßig werden die Analysedaten im Installationsverzeichnis des Mediaservers gespeichert. Sie können den Speicherort auf der Registerkarte &quot;Speichermanagement&quot; im Dialogfeld Servereinstellungen ändern.</translation>
     </message>
   </context>
   <context>

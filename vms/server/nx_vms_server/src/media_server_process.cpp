@@ -294,6 +294,10 @@
 #include "nx/vms/server/system/nx1/info.h"
 #include <atomic>
 
+#include <nx/vms/server/metrics/camera_provider.h>
+#include <nx/vms/server/metrics/rest_handlers.h>
+#include <nx/vms/server/metrics/server_provider.h>
+
 using namespace nx::vms::server;
 
 // This constant is used while checking for compatibility.
@@ -984,12 +988,11 @@ MediaServerProcess::MediaServerProcess(int argc, char* argv[], bool serviceMode)
     m_platform->setUpdatePeriodMs(
         isStatisticsDisabled ? 0 : QnGlobalMonitor::kDefaultUpdatePeridMs);
 
-    const QString raidEventLogName = system_log::ini().getLogName();
-    const QString raidEventProviderName = system_log::ini().getProviderName();
-    const int raidEventMaxLevel = system_log::ini().getMaxLevel();
+    const QString raidEventLogName = system_log::ini().logName;
+    const QString raidEventProviderName = system_log::ini().providerName;
 
     m_raidEventLogReader.reset(new RaidEventLogReader(
-        raidEventLogName, raidEventProviderName, raidEventMaxLevel));
+        raidEventLogName, raidEventProviderName));
     m_enableMultipleInstances = settings->settings().enableMultipleInstances();
 }
 
@@ -2149,20 +2152,21 @@ void MediaServerProcess::registerRestHandlers(
      * message body with content type "application/json". Example of such object can be seen in
      * the result of GET /api/iflist function. </p>
      * %permissions Owner.
-     * %param:string name Interface name.
-     * %param:string ipAddr IP address with dot-separated decimal components.
-     * %param:string netMask Network mask with dot-separated decimal components.
-     * %param:string  mac MAC address with colon-separated upper-case hex components.
-     * %param:string gateway IP address of the gateway with dot-separated decimal components. Can
-     *     be empty.
-     * %param:boolean dhcp
-     *     %value false DHCP is not used, IP address and other parameters should be specified in
-     *         the respective JSON fields.
-     *     %value true IP address and other parameters assigned via DHCP, the respective JSON
-     *         fields can be empty.
-     * %param:object extraParams JSON object with data in the internal format.
-     * %param:string dns_servers Space-separated list of IP addresses with dot-separated decimal
-     *     components.
+     * %param:array interfaces List of network interfaces settings
+     *     %param:string interfaces[].name  Interface name.
+     *     %param:string interfaces[].ipAddr IP address with dot-separated decimal components.
+     *     %param:string interfaces[].netMask Network mask with dot-separated decimal components.
+     *     %param:string interfaces[].mac MAC address with colon-separated upper-case hex components.
+     *     %param:string interfaces[].gateway IP address of the gateway with dot-separated decimal components. Can
+     *         be empty.
+     *     %param:boolean interfaces[].dhcp
+     *         %value false DHCP is not used, IP address and other parameters should be specified in
+     *             the respective JSON fields.
+     *         %value true IP address and other parameters assigned via DHCP, the respective JSON
+     *             fields can be empty.
+     *     %param:object interfaces[].extraParams JSON object with data in the internal format.
+     *     %param:string interfaces[].dns_servers Space-separated list of IP addresses with dot-separated decimal
+     *         components.
      */
     reg("api/ifconfig", new QnIfConfigRestHandler(), kAdmin);
 
@@ -2769,14 +2773,38 @@ void MediaServerProcess::registerRestHandlers(
      *     %param:string error Error code, "0" means no error.
      *     %param:string errorString Error message in English, or an empty string.
      *     %param:array reply List of JSON objects with the following structure:
-     *         %param reply[].name Name of the plugin.
-     *         %param reply[].description Description of the plugin.
-     *         %param reply[].vendor Vendor of the plugin.
-     *         %param reply[].version Version of the plugin.
-     *         %param reply[].libraryName Absolute path to the plugin library.
-     *         %param reply[].optionality Indicates whether plugin is optional or not.
-     *         %param reply[].status Status of the plugin after a loading attempt.
-     *         %param reply[].statusMessage Message with details about the plugin loading attempt.
+     *         %param reply[].name Name of the plugin from its manifest.
+     *         %param reply[].description Description of the plugin from its manifest.
+     *         %param reply[].vendor Vendor of the plugin from its manifest.
+     *         %param reply[].version Version of the plugin from its manifest.
+     *         %param reply[].libraryFilename Absolute path to the plugin dynamic library.
+     *         %param reply[].homeDir Absolute path to the plugin's dedicated directory where its
+     *             dynamic library resides together with its possible dependencies, or an empty
+     *             string if the plugin resides in a common directory with other plugins.
+     *         %param reply[].optionality Whether the plugin resides in "plugins_optional" folder
+     *             or in the regular "plugins" folder.
+     *         %param reply[].status Status of the plugin after the plugin loading attempt.
+     *         %param reply[].statusMessage Message in English with details about the plugin
+     *             loading attempt.
+     *         %param reply[].errorCode If the plugin status is "notLoadedBecauseOfError",
+     *             describes the error.
+     *             %value undefined No error.
+     *             %value cannotLoadLibrary OS cannot load the library file.
+     *             %value invalidLibrary The library does not seem to be a valid Nx Plugin library,
+     *                 e.g. no expected entry point functions found.
+     *             %value libraryFailure The plugin library failed to initialize, e.g. its entry
+     *                 point function returned an error.
+     *             %value badManifest The plugin has returned a bad manifest, e.g. null, empty,
+     *                 non-json, or json with an unexpected structure.
+     *             %value unsupportedVersion The plugin API version is no longer supported.
+     *         %param reply[].highestSupportedInterface The latest Interface type that the Plugin
+     *             object supports via queryInterface().
+     *             %value undefined
+     *             %value nxpl_PluginInterface Base interface for the old 3.2 SDK.
+     *             %value nxpl_Plugin Old 3.2 SDK plugin supporting roSettings.
+     *             %value nxpl_Plugin2 Old 3.2 SDK plugin supporting pluginContainer.
+     *             %value nx_sdk_IPlugin Base interface for the new 4.0 SDK.
+     *             %value nx_sdk_analytics_IPlugin New 4.0 SDK Analytics plugin.
      */
     reg("api/pluginInfo",
         new nx::vms::server::rest::PluginInfoHandler(serverModule()));
@@ -2875,6 +2903,26 @@ void MediaServerProcess::registerRestHandlers(
         nx::network::http::Method::options,
         QnRestProcessorPool::kAnyPath,
         new OptionsRequestHandler());
+
+
+    reg("api/metrics/", new nx::vms::server::metrics::LocalRestHandler(
+        m_metricsController.get()));
+
+    /**%apidoc GET /ec2/metrics/rules
+     * %return:object Metric rules, which are currently in use in the system. See metrics.md
+     * for details.
+     *
+     * %apidoc GET /ec2/metrics/manifest
+     * %param:string noRules Do not include parameters fron rules.
+     * %return:object Metrics parameter manifest. See metrics.md for details.
+     *
+     * %apidoc GET /ec2/metrics/values
+     * %param:string noRules Do not include parameters fron rules.
+     * %param:string timeLine Return values with timestamps instead of just values, ignores noRules.
+     * %return:object Metrics parameter values according to manifest. See metrics.md for details.
+     */
+    reg("ec2/metrics/", new nx::vms::server::metrics::SystemRestHandler(
+        m_metricsController.get(), serverModule()->resourcePool()));
 }
 
 void MediaServerProcess::reg(
@@ -3700,6 +3748,9 @@ void MediaServerProcess::stopObjects()
     safeDisconnect(commonModule()->resourceDiscoveryManager(), this);
     safeDisconnect(serverModule()->normalStorageManager(), this);
     safeDisconnect(serverModule()->backupStorageManager(), this);
+    m_raidEventLogReader->unsubscribe();
+    safeDisconnect(m_raidEventLogReader.get(), this);
+
     safeDisconnect(commonModule(), this);
     safeDisconnect(commonModule()->runtimeInfoManager(), this);
     if (m_ec2Connection)
@@ -3777,6 +3828,7 @@ void MediaServerProcess::stopObjects()
     m_autoRequestForwarder.reset();
     m_audioStreamerPool.reset();
     m_upnpPortMapper.reset();
+    m_metricsController.reset();
 
     stopAsync();
 }
@@ -4110,6 +4162,11 @@ void MediaServerProcess::connectSignals()
         m_cloudIntegrationManager->cloudManagerGroup().connectionManager.setProxyVia(
             nx::network::SocketAddress(nx::network::HostAddress::localhost, m_universalTcpListener->getPort()));
     });
+
+    connect(m_raidEventLogReader.get(), &RaidEventLogReader::eventOccurred, this,
+        &MediaServerProcess::at_storageManager_raidStorageFailure);
+    m_raidEventLogReader->subscribe();
+
 }
 
 void MediaServerProcess::setUpDataFromSettings()
@@ -4307,9 +4364,16 @@ void MediaServerProcess::startObjects()
     else
     {
         const int64_t dbBackupPeriodMS = serverModule()->settings().dbBackupPeriodMS().count();
-        initialBackupDbPeriodMs = std::max<int64_t>(
-            *lastDbBackupTimestamp + dbBackupPeriodMS - qnSyncTime->currentMSecsSinceEpoch(),
-            0LL);
+        const int64_t nowMs = qnSyncTime->currentMSecsSinceEpoch();
+        if (*lastDbBackupTimestamp >= nowMs) //< Last backup was performed in the future.
+        {
+            initialBackupDbPeriodMs = dbBackupPeriodMS;
+        }
+        else
+        {
+            initialBackupDbPeriodMs =
+                std::max<int64_t>(*lastDbBackupTimestamp + dbBackupPeriodMS - nowMs, 0LL);
+        }
     }
     m_createDbBackupTimer->start(initialBackupDbPeriodMs);
 
@@ -4515,6 +4579,52 @@ void MediaServerProcess::loadResourceParamsData()
     }
 }
 
+void MediaServerProcess::initMetricsController()
+{
+    m_metricsController = std::make_unique<nx::vms::utils::metrics::Controller>(
+        [](){ return (uint64_t) qnSyncTime->currentMSecsSinceEpoch() / 1000; });
+
+    m_metricsController->registerGroup(
+        "servers",
+        std::make_unique<nx::vms::server::metrics::ServerProvider>(serverModule()));
+
+    m_metricsController->registerGroup(
+        "cameras",
+        std::make_unique<nx::vms::server::metrics::CameraProvider>(serverModule()->resourcePool()));
+
+    // TODO: Should be moved into a resource file.
+    static const QByteArray kRules(R"json({
+        "cameras": {
+            "status": { "alarms": { "warning": "Unauthorized", "error": "Offline" } },
+            "statusChanges": {
+                "name": "status changes in last hour",
+                "calculate": "count status",
+                "insert": "after status",
+                "alarms": { "warning": 1, "error": 2 }
+            },
+            "packetLossCount": { "alarms": { "warning": 1, "error": 5 } },
+            "conflictCount": { "alarms": { "warning": 1, "error": 2 } },
+            "primaryStream": {
+                "group": {
+                    "fpsDrop": {
+                        "name": "fps drop",
+                        "calculate": "minus targetFps actualFps",
+                        "insert": "after actualFps",
+                        "alarms": { "warning": 2 }
+                    },
+                    "bitrate": { "alarms": { "warning": "0" } }
+                }
+            }
+        }
+    })json");
+
+    nx::vms::api::metrics::SystemRules rules;
+    NX_CRITICAL(QJson::deserialize(kRules, &rules));
+    m_metricsController->setRules(std::move(rules));
+
+    m_metricsController->startMonitoring();
+}
+
 void MediaServerProcess::updateRootPassword()
 {
     // TODO: Root password for Nx1 should be updated in case of cloud owner.
@@ -4631,6 +4741,8 @@ void MediaServerProcess::run()
     loadPlugins();
 
     initResourceTypes();
+
+    initMetricsController();
 
     if (needToStop())
         return;
@@ -4751,10 +4863,6 @@ void MediaServerProcess::at_appStarted()
     QDir stateDirectory;
     stateDirectory.mkpath(dataLocation + QLatin1String("/state"));
     serverModule()->fileDeletor()->init(dataLocation + QLatin1String("/state")); // constructor got root folder for temp files
-
-    connect(m_raidEventLogReader.get(), &RaidEventLogReader::eventOccurred, this,
-        &MediaServerProcess::at_storageManager_raidStorageFailure);
-    m_raidEventLogReader->subscribe();
 };
 
 void MediaServerProcess::at_runtimeInfoChanged(const QnPeerRuntimeInfo& runtimeInfo)

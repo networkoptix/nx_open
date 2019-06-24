@@ -10,7 +10,7 @@ namespace nx::vms::server::resource {
 
 namespace {
 
-onvifXsd__VideoEncoderConfiguration* getVideoEncoderConfigurationViaMedia1(
+tt__VideoEncoderConfiguration* getVideoEncoderConfigurationViaMedia1(
     std::string token, Media::VideoEncoderConfiguration* request)
 {
     _onvifMedia__GetVideoEncoderConfiguration videoEncoderConfigurationRequest;
@@ -22,7 +22,7 @@ onvifXsd__VideoEncoderConfiguration* getVideoEncoderConfigurationViaMedia1(
     return request->get()->Configuration;
 }
 
-onvifXsd__VideoEncoder2Configuration* getVideoEncoderConfigurationViaMedia2(
+tt__VideoEncoder2Configuration* getVideoEncoderConfigurationViaMedia2(
     std::string token, Media2::VideoEncoderConfigurations* request)
 {
     onvifMedia2__GetConfiguration videoEncoderConfigurationRequest2;
@@ -38,7 +38,7 @@ onvifXsd__VideoEncoder2Configuration* getVideoEncoderConfigurationViaMedia2(
     return response->Configurations[0];
 }
 
-onvifXsd__AudioEncoderConfiguration* getAudioEncoderConfiguration(
+tt__AudioEncoderConfiguration* getAudioEncoderConfiguration(
     std::string token, MediaSoapWrapper* soapWrapper)
 {
     AudioConfigResp response;
@@ -125,7 +125,7 @@ MulticastParameters getMulticastParametersViaMedia2(std::string token, QnPlOnvif
 }
 
 bool setVideoEncoderConfigurationViaMedia1(
-    onvifXsd__VideoEncoderConfiguration* configuration,
+    tt__VideoEncoderConfiguration* configuration,
     QnPlOnvifResource* resource)
 {
     Media::VideoEncoderConfigurationSetter media(resource);
@@ -135,7 +135,7 @@ bool setVideoEncoderConfigurationViaMedia1(
 }
 
 bool setVideoEncoderConfigurationViaMedia2(
-    onvifXsd__VideoEncoder2Configuration* configuration,
+    tt__VideoEncoder2Configuration* configuration,
     QnPlOnvifResource* resource)
 {
     Media2::VideoEncoderConfigurationSetter media2(resource);
@@ -145,7 +145,7 @@ bool setVideoEncoderConfigurationViaMedia2(
 }
 
 bool setAudioEncoderConfiguration(
-    onvifXsd__AudioEncoderConfiguration* configuration, MediaSoapWrapper* soapWrapper)
+    tt__AudioEncoderConfiguration* configuration, MediaSoapWrapper* soapWrapper)
 {
     SetAudioConfigResp response;
     SetAudioConfigReq request;

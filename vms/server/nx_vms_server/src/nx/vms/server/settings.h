@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QtCore/QStandardPaths>
+
 #include <nx/utils/settings.h>
 #include <network/multicodec_rtp_reader.h>
 #include <network/system_helpers.h>
@@ -368,6 +370,10 @@ public:
             return value;
         }
     };
+
+    Option<int> retryCountToMakeCameraOffline{ this, "retryCountToMakeCameraOffline", 3,
+        "How many discovery loops should pass before mark missed camera offline"
+        };
 
 #if defined(__arm__)
     static constexpr qint64 kDefaultMinStorageSpace = 100 * 1024 * 1024; //< 100MB

@@ -2,20 +2,22 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QList>
-#include <QtCore/QPluginLoader>
-#include <QSharedPointer>
 #include <QtCore/QString>
 #include <QtCore/QSettings>
+#include <QtCore/QLibrary>
 
-#include <nx/utils/singleton.h>
 #include <nx/utils/thread/mutex.h>
 
+#include <nx/sdk/i_plugin.h>
 #include <nx/sdk/helpers/ptr.h>
 #include <plugins/plugin_api.h>
 #include <nx/vms/server/plugins/utility_provider.h>
 #include <plugins/settings.h>
 
 #include <nx/vms/api/data/analytics_data.h>
+
+class QDir;
+class QFileInfo;
 
 /**
  * Loads custom application plugins and provides plugin management methods. Plugins are looked for
@@ -89,12 +91,20 @@ public:
 
     void unloadPlugins();
 
-    nx::vms::api::PluginInfoList pluginInformation() const;
+    nx::vms::api::PluginInfoList pluginInfoList() const;
+
+    /** @return Null if not found. */
+    std::shared_ptr<const nx::vms::api::PluginInfo> pluginInfo(
+        const nx::sdk::IPlugin* plugin) const;
+
 signals:
     /** Emitted just after new plugin has been loaded. */
     void pluginLoaded();
 
 private:
+    using PluginInfo = nx::vms::api::PluginInfo;
+    using PluginInfoPtr = std::shared_ptr<PluginInfo>;
+
     void loadNonOptionalPluginsIfNeeded(
         const QString& binPath, const nx::plugins::SettingsHolder& settingsHolder);
 
@@ -104,31 +114,47 @@ private:
     void loadPluginsFromDir(
         const nx::plugins::SettingsHolder& settingsHolder,
         const QDir& dirToSearchIn,
-        nx::vms::api::PluginInfo::Optionality pluginLoadingType,
-        std::function<bool(const QFileInfo& pluginFileInfo)> allowPlugin);
+        PluginInfo::Optionality pluginLoadingType,
+        std::function<bool(const QFileInfo& pluginFileInfo, PluginInfoPtr pluginInfo)>
+            allowPlugin);
 
     bool loadNxPlugin(
         const nx::plugins::SettingsHolder& settingsHolder,
-        const QString& linkedLibsDirectory,
+        const QString& pluginHomeDir,
         const QString& libFilename,
         const QString& libName,
-        nx::vms::api::PluginInfo pluginInfo);
+        PluginInfoPtr pluginInfo);
+
+    bool loadNxPluginForOldSdk(
+        const nxpl::Plugin::EntryPointFunc entryPointFunc,
+        const nx::plugins::SettingsHolder& settingsHolder,
+        const QString& libFilename,
+        const QString& libName,
+        PluginInfoPtr pluginInfo);
+
+    bool loadNxPluginForNewSdk(
+        const nx::sdk::IPlugin::EntryPointFunc entryPointFunc,
+        const QString& libFilename,
+        const QString& libName,
+        PluginInfoPtr pluginInfo);
 
     std::unique_ptr<QLibrary> loadPluginLibrary(
-        const QString& linkedLibsDir, const QString& libFilename);
+        const QString& pluginHomeDir,
+        const QString& libFilename,
+        PluginInfoPtr pluginInfo);
 
-    void storeInfoAboutLoadingError(
-        nx::vms::api::PluginInfo,
-        nx::vms::api::PluginInfo::Status loadingStatus,
+    void storePluginInfo(
+        PluginInfoPtr pluginInfo,
+        PluginInfo::Status loadingStatus,
+        PluginInfo::Error errorCode,
         QString statusMessage);
 
 private:
     const nx::sdk::Ptr<nx::sdk::IUtilityProvider> m_utilityProvider;
 
-
     struct PluginContext
     {
-        nx::vms::api::PluginInfo pluginInformation;
+        PluginInfoPtr pluginInfo;
 
         // For compatibility with the old-SDK-based plugins, we store pointers to the base interface
         // rather than nx::sdk::IPlugin.
@@ -136,7 +162,7 @@ private:
     };
 
     std::vector<PluginContext> m_nxPlugins;
-    mutable std::vector<nx::vms::api::PluginInfo> m_cachedPluginInfo;
+    mutable std::vector<PluginInfo> m_cachedPluginInfo;
 
     mutable QnMutex m_mutex;
 };

@@ -151,9 +151,10 @@ common::metadata::DetectionMetadataPacketPtr generateRandomPacket(
 QRectF generateRandomRectf()
 {
     QRectF rect;
+    // NOTE: Leaving some space to the right & down so that the rect is not empty.
     rect.setTopLeft(QPointF(
-        nx::utils::random::number<float>(0, 1),
-        nx::utils::random::number<float>(0, 1)));
+        nx::utils::random::number<float>(0, 0.95),
+        nx::utils::random::number<float>(0, 0.95)));
     rect.setWidth(nx::utils::random::number<float>(0, 1 - rect.topLeft().x()));
     rect.setHeight(nx::utils::random::number<float>(0, 1 - rect.topLeft().y()));
     return rect;

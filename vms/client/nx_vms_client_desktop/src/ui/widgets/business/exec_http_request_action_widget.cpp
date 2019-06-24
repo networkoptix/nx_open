@@ -1,6 +1,8 @@
 #include "exec_http_request_action_widget.h"
 #include "ui_exec_http_request_action_widget.h"
 
+#include <QtCore/QScopedValueRollback>
+
 #include <nx/vms/event/action_parameters.h>
 
 #include <nx/network/http/http_async_client.h>

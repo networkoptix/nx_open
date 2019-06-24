@@ -43,8 +43,6 @@ using namespace nx;
 
 namespace {
 
-static const size_t ResponseReadTimeoutMs = 15 * 1000;
-static const size_t TcpConnectTimeoutMs = 5 * 1000;
 
 void trace(const QString& serverId, int handle, const QString& message)
 {
@@ -817,16 +815,21 @@ Handle ServerConnection::lookupDetectedObjects(
 }
 
 Handle ServerConnection::updateActionStart(
-    const nx::update::Information& info, QThread* targetThread)
+    const nx::update::Information& info,
+    std::function<void (Handle, bool)>&& callback,
+    QThread* targetThread)
 {
-    auto callback =
-        [](bool /*success*/, rest::Handle /*handle*/, EmptyResponseType /*response*/)
+    auto internalCallback =
+        [callback = std::move(callback)](
+            bool success, rest::Handle handle, EmptyResponseType /*response*/)
         {
+            if (callback)
+                callback(handle, success);
         };
     const auto contentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
     auto request = QJson::serialized(info);
-    return executePost<EmptyResponseType>(
-        "/ec2/startUpdate", QnRequestParamList(), contentType, request, callback, targetThread);
+    return executePost<EmptyResponseType>("/ec2/startUpdate", QnRequestParamList(), contentType,
+        request, internalCallback, targetThread);
 }
 
 Handle ServerConnection::getUpdateInfo(
@@ -1043,6 +1046,11 @@ Handle ServerConnection::ptzCommand(
         targetThread);
 }
 
+Handle ServerConnection::getPluginInformation(GetCallback callback, QThread* targetThread)
+{
+    return executeGet("/api/pluginInfo", {}, callback, targetThread);
+}
+
 Handle ServerConnection::debug(
     const QString& action, const QString& value, PostCallback callback, QThread* targetThread)
 {
@@ -1251,11 +1259,10 @@ void invoke(Callback<ResultType> callback,
     if (targetThread)
     {
          auto ptr = std::make_shared<ResultType>(std::move(result));
-         executeDelayed([callback, success, id, ptr]() mutable
+         executeLaterInThread([callback, success, id, ptr]() mutable
              {
                  callback(success, id, std::move(*ptr));
              },
-             0,
              targetThread);
     }
     else
@@ -1285,12 +1292,11 @@ void invoke(ServerConnection::Result<QByteArray>::type callback,
     if (targetThread)
     {
         auto ptr = std::make_shared<QByteArray>(result);
-        executeDelayed(
+        executeLaterInThread(
             [callback, headers, success, id, ptr]() mutable
             {
                 callback(success, id, std::move(*ptr), headers);
             },
-            0,
             targetThread);
     }
     else

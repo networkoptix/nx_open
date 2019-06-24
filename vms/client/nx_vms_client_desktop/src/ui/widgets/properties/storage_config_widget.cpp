@@ -121,15 +121,24 @@ namespace
             bool hovered = m_hoverTracker && m_hoverTracker->hoveredIndex() == index;
             bool beingEdited = m_editedRow == index.row();
 
+            bool hoveredRow = m_hoverTracker && m_hoverTracker->hoveredIndex().row() == index.row();
+            bool hasActiveAction = index.column() == QnStorageListModel::ActionsColumn
+                && index.data(Qn::ItemMouseCursorRole).toInt() == Qt::PointingHandCursor;
+                // TODO: add a separate data role for such cases?
+
+            // Hide actions when their row is not hovered.
+            if (hasActiveAction && !hoveredRow)
+                return;
+
             auto storage = index.data(Qn::StorageInfoDataRole).value<QnStorageModelInfo>();
 
             /* Set disabled style for unchecked rows: */
             if (!index.sibling(index.row(), QnStorageListModel::CheckBoxColumn).data(Qt::CheckStateRole).toBool())
                 opt.state &= ~QStyle::State_Enabled;
 
-            /* Set proper color for links: */
-            if (index.column() == QnStorageListModel::ActionsColumn && !opt.text.isEmpty())
-                opt.palette.setColor(QPalette::Text, style::linkColor(opt.palette, hovered));
+            // Set proper color for actions when they are hovered.
+            if (hasActiveAction && hovered)
+                opt.palette.setColor(QPalette::Text, opt.palette.color(QPalette::ButtonText));
 
             /* Set warning color for inaccessible storages: */
             if (index.column() == QnStorageListModel::StoragePoolColumn && !storage.isOnline)
@@ -181,6 +190,31 @@ namespace
         int m_editedRow;
     };
 
+    class ColumnResizer: public QObject
+    {
+    public:
+        using QObject::QObject;
+
+    protected:
+        bool eventFilter(QObject* object, QEvent* event)
+        {
+            auto view = qobject_cast<nx::vms::client::desktop::TreeView *>(object);
+
+            if (view && event->type() == QEvent::Resize)
+            {
+                int occupiedWidth = 0;
+                for (int i = 1; i < view->model()->columnCount(); ++i)
+                    occupiedWidth += view->sizeHintForColumn(i);
+
+                int urlWidth = view->sizeHintForColumn(QnStorageListModel::UrlColumn);
+                view->setColumnWidth(QnStorageListModel::UrlColumn,
+                    qMin(urlWidth, view->width() - occupiedWidth));
+            }
+
+            return false;
+        }
+    };
+
     QnVirtualCameraResourceList getCurrentSelectedCameras(QnResourcePool* resourcePool)
     {
         const auto isSelectedForBackup = [](const QnVirtualCameraResourcePtr& camera)
@@ -211,6 +245,7 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent) :
     ui(new Ui::StorageConfigWidget()),
     m_server(),
     m_model(new QnStorageListModel()),
+    m_columnResizer(new ColumnResizer(this)),
     m_updateStatusTimer(new QTimer(this)),
     m_updateLabelsTimer(new QTimer(this)),
     m_storagePoolMenu(new QMenu(this)),
@@ -273,8 +308,10 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent) :
     ui->storageView->sortByColumn(0, Qt::AscendingOrder);
     ui->storageView->header()->setStretchLastSection(false);
     ui->storageView->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
-    ui->storageView->header()->setSectionResizeMode(QnStorageListModel::UrlColumn, QHeaderView::Stretch);
+    ui->storageView->header()->setSectionResizeMode(QnStorageListModel::UrlColumn, QHeaderView::Fixed);
+    ui->storageView->header()->setSectionResizeMode(QnStorageListModel::SeparatorColumn, QHeaderView::Stretch);
     ui->storageView->setMouseTracking(true);
+    ui->storageView->installEventFilter(m_columnResizer.data());
 
     auto itemClicked = [this, itemDelegate](const QModelIndex& index)
     {
@@ -558,88 +595,7 @@ void QnStorageConfigWidget::at_storageView_clicked(const QModelIndex& index)
             if (record.id != m_model->metadataStorageId())
             {
                 const auto storageId = record.id;
-
-                const auto updateServerSettings =
-                    [this](
-                        const nx::vms::api::MetadataStorageChangePolicy policy,
-                        const QnUuid &storageId)
-                    {
-                        qnGlobalSettings->setMetadataStorageChangePolicy(policy);
-                        qnGlobalSettings->synchronizeNow();
-
-                        qnResourcesChangesManager->saveServer(m_server,
-                            [storageId](const QnMediaServerResourcePtr &server)
-                            {
-                                server->setMetadataStorageId(storageId);
-                            });
-                    };
-
-                if (nx::analytics::hasActiveObjectEngines(commonModule(), m_server->getId()))
-                {
-                    // Metadata storage has been changed, we need to do something with database.
-
-                    QnMessageBox msgBox(
-                        QnMessageBoxIcon::Question,
-                        tr("What to do with current analytics data?"),
-                        tr("Current analytics data will not be automatically moved to another location"
-                            " and will become unaccessible. You can keep it and manually move later,"
-                            " or delete permanently."
-                            "\n"
-                            "If you intended to move analytics data to another storage location,"
-                            " please contact support before proceeding."),
-                        QDialogButtonBox::StandardButtons(),
-                        QDialogButtonBox::NoButton,
-                        this);
-
-                    const auto deleteButton = msgBox.addButton(tr("Delete"),
-                        QDialogButtonBox::ButtonRole::AcceptRole, Qn::ButtonAccent::Warning);
-                    const auto keepButton = msgBox.addButton(tr("Keep"),
-                        QDialogButtonBox::ButtonRole::AcceptRole, Qn::ButtonAccent::NoAccent);
-
-                    // This dialog uses non-standard layout, so we can't use ButtonRole::CancelRole.
-                    const auto cancelButton = msgBox.addButton(tr("Cancel"),
-                        QDialogButtonBox::ButtonRole::AcceptRole, Qn::ButtonAccent::NoAccent);
-
-                    cancelButton->setFocus();
-
-                    // Since we don't have a button with CancelRole, we need to set it manually.
-                    msgBox.setEscapeButton(cancelButton);
-
-                    msgBox.exec();
-
-                    if (msgBox.clickedButton() == deleteButton)
-                    {
-                        updateServerSettings(
-                            nx::vms::api::MetadataStorageChangePolicy::remove,
-                            storageId);
-
-                        m_model->setMetadataStorageId(storageId);
-                        updateWarnings();
-                    }
-
-                    if (msgBox.clickedButton() == keepButton)
-                    {
-                        updateServerSettings(
-                            nx::vms::api::MetadataStorageChangePolicy::keep,
-                            storageId);
-
-                        m_model->setMetadataStorageId(storageId);
-                        updateWarnings();
-                    }
-
-                    // If the cancel button has been clicked, do nothing...
-                }
-                else
-                {
-                    // We don't have analytics database jet, so just assign a new storage.
-
-                    updateServerSettings(
-                        nx::vms::api::MetadataStorageChangePolicy::keep, //< Just to be sure...
-                        storageId);
-
-                    m_model->setMetadataStorageId(storageId);
-                    updateWarnings();
-                }
+                confirmNewMetadataStorage(storageId);
             }
         }
     }
@@ -657,10 +613,7 @@ void QnStorageConfigWidget::setServer(const QnMediaServerResourcePtr& server)
         return;
 
     if (m_server)
-    {
-        disconnect(m_server, &QnMediaServerResource::backupScheduleChanged, this, nullptr);
-        disconnect(m_server, &QnMediaServerResource::metadataStorageIdChanged, this, nullptr);
-    }
+        m_server->disconnect(this);
 
     m_server = server;
     m_model->setServer(server);
@@ -676,13 +629,12 @@ void QnStorageConfigWidget::setServer(const QnMediaServerResourcePtr& server)
                 emit hasChangesChanged();
             });
 
-        m_model->setMetadataStorageId(m_server->metadataStorageId());
         connect(m_server, &QnMediaServerResource::metadataStorageIdChanged, this,
             [this]()
             {
                 m_model->setMetadataStorageId(m_server->metadataStorageId());
-                emit hasChangesChanged();
-            });
+                // Now metadata storage is changed instantly, so we don't fire hasChangedChanged().
+        });
     }
 }
 
@@ -1041,6 +993,86 @@ void QnStorageConfigWidget::updateBackupUi(const QnBackupStatusData& reply, int 
             ui->backupPages->setCurrentWidget(ui->backupInformationPage);
         }
     }
+}
+
+void QnStorageConfigWidget::confirmNewMetadataStorage(const QnUuid& storageId)
+{
+    const auto updateServerSettings =
+        [this](
+            const nx::vms::api::MetadataStorageChangePolicy policy,
+            const QnUuid& storageId)
+        {
+            qnGlobalSettings->setMetadataStorageChangePolicy(policy);
+            qnGlobalSettings->synchronizeNow();
+
+            qnResourcesChangesManager->saveServer(m_server,
+                [storageId](const QnMediaServerResourcePtr& server)
+                {
+                    server->setMetadataStorageId(storageId);
+                });
+        };
+
+    if (nx::analytics::hasActiveObjectEngines(commonModule(), m_server->getId()))
+    {
+        // Metadata storage has been changed, we need to do something with database.
+
+        QnMessageBox msgBox(
+            QnMessageBoxIcon::Question,
+            tr("What to do with current analytics data?"),
+            tr("Current analytics data will not be automatically moved to another location"
+                " and will become unaccessible. You can keep it and manually move later,"
+                " or delete permanently."
+                "\n"
+                "If you intended to move analytics data to another storage location,"
+                " please contact support before proceeding."),
+            QDialogButtonBox::StandardButtons(),
+            QDialogButtonBox::NoButton,
+            this);
+
+        const auto deleteButton = msgBox.addButton(tr("Delete"),
+            QDialogButtonBox::ButtonRole::AcceptRole, Qn::ButtonAccent::Warning);
+        const auto keepButton = msgBox.addButton(tr("Keep"),
+            QDialogButtonBox::ButtonRole::AcceptRole, Qn::ButtonAccent::NoAccent);
+
+        // This dialog uses non-standard layout, so we can't use ButtonRole::CancelRole.
+        const auto cancelButton = msgBox.addButton(tr("Cancel"),
+            QDialogButtonBox::ButtonRole::AcceptRole, Qn::ButtonAccent::NoAccent);
+
+        cancelButton->setFocus();
+
+        // Since we don't have a button with CancelRole, we need to set it manually.
+        msgBox.setEscapeButton(cancelButton);
+
+        msgBox.exec();
+
+        if (msgBox.clickedButton() == deleteButton)
+        {
+            updateServerSettings(
+                nx::vms::api::MetadataStorageChangePolicy::remove,
+                storageId);
+            updateWarnings();
+        }
+
+        if (msgBox.clickedButton() == keepButton)
+        {
+            updateServerSettings(
+                nx::vms::api::MetadataStorageChangePolicy::keep,
+                storageId);
+            updateWarnings();
+        }
+
+        // If the cancel button has been clicked, do nothing...
+    }
+    else
+    {
+        // We don't have analytics database yet, so just assign a new storage.
+
+        updateServerSettings(
+            nx::vms::api::MetadataStorageChangePolicy::keep, //< Just to be sure...
+            storageId);
+        updateWarnings();
+    }
+
 }
 
 void QnStorageConfigWidget::updateWarnings()

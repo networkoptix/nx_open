@@ -3,6 +3,7 @@
 #include <functional>
 
 #include <QtCore/QElapsedTimer>
+#include <QtCore/QTimer>
 
 #include <client_core/connection_context_aware.h>
 

@@ -209,6 +209,8 @@ public:
 
 TEST_F(UpdateVerificationTest, testAlreadyInstalled)
 {
+    // This test uses cases from VMS-13236. It also relates to VMS-13811, when we should show
+    // 'The latest version' after we have completed update just now.
     nx::update::UpdateContents contents;
     contents.sourceType = nx::update::UpdateSourceType::internetSpecific;
     ASSERT_TRUE(QJson::deserialize<nx::update::Information>(packageRawData, &contents.info));
@@ -231,6 +233,7 @@ TEST_F(UpdateVerificationTest, testAlreadyInstalled)
             contents, clientData.clientId);
         EXPECT_TRUE(report.hasLatestVersion);
     }
+    contents.resetVerification();
     removeAllServers();
 
     // Update to 4.0.0.28524
@@ -239,13 +242,15 @@ TEST_F(UpdateVerificationTest, testAlreadyInstalled)
     // Showing page 'This version is already installed'.
     makeServer(nx::utils::SoftwareVersion("4.0.0.28524"));
     clientData = makeClientData(nx::utils::SoftwareVersion("4.0.0.28525"));
+    clientData.installedVersions.insert(nx::utils::SoftwareVersion("4.0.0.28524"));
     verifyUpdateContents(nullptr, contents, getAllServers(), clientData);
-    EXPECT_EQ(contents.error, nx::update::InformationError::incompatibleVersion);
+    EXPECT_EQ(contents.error, nx::update::InformationError::noError);
     {
         const auto report = MultiServerUpdatesWidget::calculateUpdateVersionReport(
             contents, clientData.clientId);
         EXPECT_TRUE(report.hasLatestVersion);
     }
+    contents.resetVerification();
     removeAllServers();
 
     // Update to 4.0.0.28524
@@ -255,7 +260,7 @@ TEST_F(UpdateVerificationTest, testAlreadyInstalled)
     // Showing page 'This version is already installed', even when we have offline server with
     // lower version.
     makeServer(nx::utils::SoftwareVersion("4.0.0.28524"));
-    makeServer(nx::utils::SoftwareVersion("4.0.0.28523"), false);
+    makeServer(nx::utils::SoftwareVersion("4.0.0.28523"), /*online=*/false);
     clientData = makeClientData(nx::utils::SoftwareVersion("4.0.0.28524"));
     verifyUpdateContents(nullptr, contents, getAllServers(), clientData);
     EXPECT_EQ(contents.alreadyInstalled, true);
@@ -264,6 +269,50 @@ TEST_F(UpdateVerificationTest, testAlreadyInstalled)
         EXPECT_TRUE(report.hasLatestVersion);
     }
     removeAllServers();
+}
+
+TEST_F(UpdateVerificationTest, testForkedVersion)
+{
+    /**
+     * According to VMS-7768, verification should ignore servers newer than target update version
+     * There can be a situation when system can contain several servers with lower version and
+     * several servers with higher version. We should not prevent servers with lower version to
+     * be updated.
+     */
+    nx::update::UpdateContents contents;
+    contents.sourceType = nx::update::UpdateSourceType::internetSpecific;
+    ASSERT_TRUE(QJson::deserialize<nx::update::Information>(packageRawData, &contents.info));
+    ASSERT_FALSE(contents.isEmpty());
+    EXPECT_EQ(contents.getVersion(), nx::utils::SoftwareVersion("4.0.0.28524"));
+
+    // Update to 4.0.0.28524
+    // client = 4.0.0.28523
+    // server1 = 4.0.0.28523
+    // server2 = 4.0.0.28525
+    ClientVerificationData clientData = makeClientData(nx::utils::SoftwareVersion("4.0.0.28523"));
+    makeServer(nx::utils::SoftwareVersion("4.0.0.28523"));
+    makeServer(nx::utils::SoftwareVersion("4.0.0.28525"));
+
+    verifyUpdateContents(nullptr, contents, getAllServers(), clientData);
+    EXPECT_EQ(contents.error, nx::update::InformationError::noError);
+    removeAllServers();
+    contents.resetVerification();
+
+    // Both servers are newer, but the client is older.
+    // It should be fine to start update only for a client.
+    makeServer(nx::utils::SoftwareVersion("4.0.0.28525"));
+    makeServer(nx::utils::SoftwareVersion("4.0.0.28525"));
+    verifyUpdateContents(nullptr, contents, getAllServers(), clientData);
+    EXPECT_EQ(contents.error, nx::update::InformationError::noError);
+    removeAllServers();
+    contents.resetVerification();
+
+    // Both servers and a client are newer.
+    clientData = makeClientData(nx::utils::SoftwareVersion("4.0.0.28525"));
+    makeServer(nx::utils::SoftwareVersion("4.0.0.28525"));
+    makeServer(nx::utils::SoftwareVersion("4.0.0.28525"));
+    verifyUpdateContents(nullptr, contents, getAllServers(), clientData);
+    EXPECT_EQ(contents.error, nx::update::InformationError::incompatibleVersion);
 }
 
 TEST_F(UpdateVerificationTest, packagesForSystemSupportTest)
@@ -293,6 +342,7 @@ TEST_F(UpdateVerificationTest, packagesForSystemSupportTest)
     auto report = MultiServerUpdatesWidget::calculateUpdateVersionReport(
         contents, clientData.clientId);
     EXPECT_TRUE(report.statusHighlight == MultiServerUpdatesWidget::VersionReport::HighlightMode::red);
+    removeAllServers();
 }
 
 } // namespace nx::vms::client::desktop

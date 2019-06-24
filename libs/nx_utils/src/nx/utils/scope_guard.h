@@ -60,6 +60,13 @@ public:
         m_callback = boost::none;
     }
 
+    boost::optional<Callback> eject()
+    {
+        boost::optional<Callback> callback;
+        std::swap(m_callback, callback);
+        return callback;
+    }
+
     explicit operator bool() const
     {
         return static_cast<bool>(m_callback);

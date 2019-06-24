@@ -1,9 +1,9 @@
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+
 # Network Optix Open Source Components
 
 ---------------------------------------------------------------------------------------------------
 ## Introduction
-
-Copyright 2019-present, Network Optix, Inc. (http://www.networkoptix.com/). All rights reserved.
 
 This repository contains **Network Optix Open Source Components** - the source code and specifications
 that Network Optix, Inc. is publishing as Open Source Software. It is licensed under the terms of

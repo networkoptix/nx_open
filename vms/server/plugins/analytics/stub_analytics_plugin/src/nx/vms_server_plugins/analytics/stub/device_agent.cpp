@@ -1,3 +1,5 @@
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+
 #include "device_agent.h"
 
 #include <iostream>
@@ -15,8 +17,14 @@
 
 #define NX_PRINT_PREFIX (this->logUtils.printPrefix)
 #include <nx/kit/debug.h>
+#include <nx/kit/utils.h>
 
+#include "utils.h"
 #include "stub_analytics_plugin_ini.h"
+#include "objects/vehicles.h"
+#include "objects/pedestrian.h"
+#include "objects/bicycle.h"
+#include "objects/random.h"
 
 namespace nx {
 namespace vms_server_plugins {
@@ -87,7 +95,7 @@ static const std::vector<EventDescriptor> kEventsToFire = {
 DeviceAgent::DeviceAgent(Engine* engine, const nx::sdk::IDeviceInfo* deviceInfo):
     VideoFrameProcessingDeviceAgent(engine, deviceInfo, NX_DEBUG_ENABLE_OUTPUT)
 {
-    generateObjectIds();
+    setObjectCount();
 }
 
 DeviceAgent::~DeviceAgent()
@@ -95,6 +103,7 @@ DeviceAgent::~DeviceAgent()
     {
         std::unique_lock<std::mutex> lock(m_pluginEventGenerationLoopMutex);
         m_terminated = true;
+        m_needToThrowPluginEvents = false;
     }
     m_pluginEventGenerationLoopCondition.notify_all();
     if (m_pluginEventThread)
@@ -156,14 +165,21 @@ std::string DeviceAgent::manifest() const
 
 void DeviceAgent::settingsReceived()
 {
-    if (ini().throwPluginEventsFromDeviceAgent && !m_pluginEventThread)
+    parseSettings();
+
+    if (m_deviceAgentSettings.throwPluginEvents && !m_pluginEventThread)
     {
         NX_PRINT << __func__ << "(): Starting plugin event generation thread";
+        m_needToThrowPluginEvents = true;
         m_pluginEventThread = std::make_unique<std::thread>([this]() { processPluginEvents(); });
     }
-    else
+    else if (!m_deviceAgentSettings.throwPluginEvents && m_pluginEventThread)
     {
-        NX_PRINT << __func__ << "()";
+        NX_PRINT << __func__ << "(): Stopping plugin event generation thread";
+        m_needToThrowPluginEvents = false;
+        m_pluginEventGenerationLoopCondition.notify_all();
+        m_pluginEventThread->join();
+        m_pluginEventThread.reset();
     }
 }
 
@@ -215,7 +231,7 @@ bool DeviceAgent::pullMetadataPackets(std::vector<IMetadataPacket*>* metadataPac
     NX_OUTPUT << __func__ << "() BEGIN";
 
     const char* logMessage = "";
-    if (ini().generateObjects)
+    if (m_deviceAgentSettings.generateObjects)
     {
         const std::vector<IMetadataPacket*> result = cookSomeObjects();
         if (!result.empty())
@@ -256,7 +272,7 @@ Error DeviceAgent::startFetchingMetadata(const IMetadataTypes* /*metadataTypes*/
 
     m_eventTypeId = kLineCrossingEventType; //< First event to produce.
 
-    if (ini().generateEvents)
+    if (m_deviceAgentSettings.generateEvents)
     {
         auto metadataDigger =
             [this]()
@@ -302,7 +318,7 @@ void DeviceAgent::stopFetchingMetadata()
 
 void DeviceAgent::processPluginEvents()
 {
-    while (!m_terminated)
+    while (!m_terminated && m_needToThrowPluginEvents)
     {
         using namespace std::chrono_literals;
 
@@ -326,7 +342,7 @@ void DeviceAgent::processPluginEvents()
         // the timeout has occurred) and spurious wake-ups are ignored.
         {
             std::unique_lock<std::mutex> lock(m_pluginEventGenerationLoopMutex);
-            if (m_terminated)
+            if (m_terminated || !m_needToThrowPluginEvents)
                 break;
             static const std::chrono::seconds kPluginEventGenerationPeriod{5};
             m_pluginEventGenerationLoopCondition.wait_for(lock, kPluginEventGenerationPeriod);
@@ -345,49 +361,15 @@ IStringMap* DeviceAgent::pluginSideSettings() const
 //-------------------------------------------------------------------------------------------------
 // private
 
-static IObjectMetadata* makeObjectMetadata(
-    const std::string& objectTypeId,
-    const Uuid& objectId,
-    double offset,
-    int64_t lastVideoFrameTimestampUs,
-    int objectIndex)
+static IObjectMetadata* makeObjectMetadata(const AbstractObject* object)
 {
     auto objectMetadata = new ObjectMetadata();
-    objectMetadata->setTypeId(objectTypeId);
-    objectMetadata->setId(objectId);
-    objectMetadata->setBoundingBox(
-		Rect((float) offset, (float) offset + 0.05F * (float) objectIndex, 0.25F, 0.25F));
-
-    const std::map<std::string, std::vector<nx::sdk::Ptr<Attribute>>> kObjectAttributes = {
-        {kCarObjectType, {
-            nx::sdk::makePtr<Attribute>(IAttribute::Type::string, "Brand", "Tesla"),
-            nx::sdk::makePtr<Attribute>(IAttribute::Type::string, "Model", "X"),
-            nx::sdk::makePtr<Attribute>(IAttribute::Type::string, "Color", "Pink"),
-        }},
-        {kHumanFaceObjectType, {
-            nx::sdk::makePtr<Attribute>(IAttribute::Type::string, "Sex", "Female"),
-            nx::sdk::makePtr<Attribute>(IAttribute::Type::string, "Hair color", "Red"),
-            nx::sdk::makePtr<Attribute>(IAttribute::Type::string, "Age", "29"),
-            nx::sdk::makePtr<Attribute>(IAttribute::Type::string, "Name", "Triss"),
-
-        }},
-        {kTruckObjectType, {
-            nx::sdk::makePtr<Attribute>(IAttribute::Type::string, "Length", "12 m"),
-        }},
-        {kPedestrianObjectType, {
-            nx::sdk::makePtr<Attribute>(
-                IAttribute::Type::string,
-                "Direction",
-                "Towards the camera"),
-            nx::sdk::makePtr<Attribute>(IAttribute::Type::string, "Clothes color", "White"),
-        }},
-        {kBicycleObjectType, {
-            nx::sdk::makePtr<Attribute>(IAttribute::Type::string, "Type", "Mountain bike"),
-        }},
-    };
-
-    objectMetadata->addAttributes(kObjectAttributes.at(objectTypeId));
-
+    objectMetadata->setTypeId(object->typeId());
+    objectMetadata->setId(object->id());
+    const auto position = object->position();
+    const auto size = object->size();
+    objectMetadata->setBoundingBox(Rect(position.x, position.y, size.width, size.height));
+    objectMetadata->addAttributes(object->attributes());
     return objectMetadata;
 }
 
@@ -402,17 +384,15 @@ static IObjectTrackBestShotPacket* makeObjectTrackBestShotPacket(
         Rect(offset, offset, 0.1F, 0.1F));
 }
 
-void DeviceAgent::generateObjectIds()
+void DeviceAgent::setObjectCount()
 {
-    int objectCount = ini().objectCount;
+    int objectCount = m_deviceAgentSettings.numberOfObjectsToGenerate;
     if (objectCount < 1)
     {
         NX_OUTPUT << "Invalid value for objectCount in .ini; assuming 1.";
         objectCount = 1;
     }
-    m_objectIds.resize(objectCount);
-    for (auto& objectId: m_objectIds)
-        objectId = UuidHelper::randomUuid();
+    m_objects.resize(objectCount);
 }
 
 IMetadataPacket* DeviceAgent::cookSomeEvents()
@@ -477,7 +457,7 @@ std::vector<IMetadataPacket*> DeviceAgent::cookSomeObjects()
     if (m_lastVideoFrameTimestampUs == 0)
         return {};
 
-    if (m_frameCounter % ini().generateObjectsEveryNFrames != 0)
+    if (m_frameCounter % m_deviceAgentSettings.generateObjectsEveryNFrames != 0)
         return {};
 
     float dt = m_objectCounter / 32.0F;
@@ -485,23 +465,14 @@ std::vector<IMetadataPacket*> DeviceAgent::cookSomeObjects()
     double intPart;
     dt = (float) modf(dt, &intPart) * 0.75F;
     const int sequentialNumber = static_cast<int>(intPart);
-    static const std::vector<std::string> kObjectTypes = {
-        kCarObjectType,
-        kHumanFaceObjectType,
-        kTruckObjectType,
-        kPedestrianObjectType,
-        kBicycleObjectType,
-    };
 
-    if (m_currentObjectIndex != sequentialNumber)
+    for (auto& object: m_objects)
     {
-        generateObjectIds();
-        m_currentObjectIndex = sequentialNumber;
-        m_objectTypeId = kObjectTypes.at(m_currentObjectTypeIndex);
-        ++m_currentObjectTypeIndex;
-
-        if (m_currentObjectTypeIndex == (int) kObjectTypes.size())
-            m_currentObjectTypeIndex = 0;
+        if (!object)
+            object = randomObject();
+        object->update();
+        if (!object->inBounds())
+            object.reset();
     }
 
     bool generatePreviewPacket = false;
@@ -509,7 +480,9 @@ std::vector<IMetadataPacket*> DeviceAgent::cookSomeObjects()
     {
         m_previewAttributesGenerated = false;
     }
-    else if (dt > 0.5 && !m_previewAttributesGenerated && ini().generatePreviewPacket)
+    else if (dt > 0.5
+        && !m_previewAttributesGenerated
+        && m_deviceAgentSettings.generatePreviewPacket)
     {
         m_previewAttributesGenerated = true;
         generatePreviewPacket = true;
@@ -517,26 +490,24 @@ std::vector<IMetadataPacket*> DeviceAgent::cookSomeObjects()
 
     auto objectMetadataPacket = new ObjectMetadataPacket();
 
-    for (int i = 0; i < (int) m_objectIds.size(); ++i)
+    for (const auto& object: m_objects)
     {
-        auto objectMetadata = toPtr(makeObjectMetadata(
-            m_objectTypeId,
-            m_objectIds[i],
-            dt,
-            m_lastVideoFrameTimestampUs,
-            i));
+        if (!object)
+            continue;
+
+        auto objectMetadata = toPtr(makeObjectMetadata(object.get()));
 
         objectMetadataPacket->addItem(objectMetadata.get());
 
         if (generatePreviewPacket)
         {
-            auto bestShotMetadataPacket = makeObjectTrackBestShotPacket(
-                m_objectIds[i],
+            if (const auto bestShotMetadataPacket = makeObjectTrackBestShotPacket(
+                object->id(),
                 m_lastVideoFrameTimestampUs,
-                dt);
-
-            if (bestShotMetadataPacket)
+                dt))
+            {
                 result.push_back(bestShotMetadataPacket);
+            }
         }
     }
 
@@ -667,6 +638,44 @@ void DeviceAgent::dumpSomeFrameBytes(
                 plane, dumpOffset, dumpOffset + dumpSize - 1, frame->dataSize(plane)).c_str(),
             frame->data(plane) + dumpOffset, dumpSize);
     }
+}
+
+void DeviceAgent::parseSettings()
+{
+    auto assignIntegerSetting =
+        [this](const std::string& parameterName, std::atomic<int>* target)
+        {
+            using namespace nx::kit::utils;
+
+            int result = 0;
+            const auto parameterValueString = getParamValue(parameterName);
+            if (const bool success = fromString(parameterValueString, &result))
+            {
+                *target = result;
+            }
+            else
+            {
+                NX_PRINT << "Received an incorrect setting value for '"
+                    << parameterName << "' "
+                    << parameterValueString
+                    << ". Expected an integer";
+            }
+        };
+
+    m_deviceAgentSettings.generateEvents = toBool(getParamValue(kGenerateEventsSetting));
+    m_deviceAgentSettings.generateObjects = toBool(getParamValue(kGenerateObjectsSetting));
+    assignIntegerSetting(
+        kGenerateObjectsEveryNFramesSetting,
+        &m_deviceAgentSettings.generateObjectsEveryNFrames);
+
+    assignIntegerSetting(
+        kNumberOfObjectsToGenerateSetting,
+        &m_deviceAgentSettings.numberOfObjectsToGenerate);
+
+    m_deviceAgentSettings.generatePreviewPacket =
+        toBool(getParamValue(kGeneratePreviewPacketSetting));
+    m_deviceAgentSettings.throwPluginEvents =
+        toBool(getParamValue(kThrowPluginEventsFromDeviceAgentSetting));
 }
 
 } // namespace stub

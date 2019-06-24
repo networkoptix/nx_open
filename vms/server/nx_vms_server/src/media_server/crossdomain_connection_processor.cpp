@@ -1,5 +1,7 @@
 #include "crossdomain_connection_processor.h"
 
+#include <QtCore/QFile>
+
 #include <api/global_settings.h>
 #include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>

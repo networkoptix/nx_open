@@ -138,6 +138,8 @@ void EventsStorage::createLookupCursor(
     auto objectSearcher = std::make_shared<ObjectSearcher>(
         m_deviceDao,
         m_objectTypeDao,
+        &m_attributesDao,
+        m_analyticsArchiveDirectory.get(),
         std::move(filter));
 
     m_dbController->queryExecutor().createCursor<DetectedObject>(
@@ -185,6 +187,8 @@ void EventsStorage::lookup(
             ObjectSearcher objectSearcher(
                 m_deviceDao,
                 m_objectTypeDao,
+                &m_attributesDao,
+                m_analyticsArchiveDirectory.get(),
                 std::move(filter));
             *result = objectSearcher.lookup(queryContext);
             return nx::sql::DBResult::ok;
@@ -324,7 +328,7 @@ bool EventsStorage::readMaximumEventTimestamp()
             [](nx::sql::QueryContext* queryContext)
             {
                 auto query = queryContext->connection()->createQuery();
-                query->prepare("SELECT max(timestamp_seconds_utc) * 1000 FROM object_search");
+                query->prepare("SELECT max(track_end_ms) FROM object");
                 query->exec();
                 if (query->next())
                     return std::chrono::milliseconds(query->value(0).toLongLong());
@@ -348,7 +352,7 @@ bool EventsStorage::readMinimumEventTimestamp(std::chrono::milliseconds* outResu
             [](nx::sql::QueryContext* queryContext)
         {
             auto query = queryContext->connection()->createQuery();
-            query->prepare("SELECT min(timestamp_seconds_utc) * 1000 FROM object_search");
+            query->prepare("SELECT min(track_start_ms) FROM object");
             query->exec();
             if (query->next())
                 return std::chrono::milliseconds(query->value(0).toLongLong());
@@ -503,9 +507,14 @@ void EventsStorage::scheduleDataCleanup(
     m_dbController->queryExecutor().executeUpdate(
         [this, deviceId, oldestDataToKeepTimestamp](nx::sql::QueryContext* queryContext)
         {
+            // Device id NULL means clean for all devices.
+            const auto internalId = m_deviceDao.deviceIdFromGuid(deviceId);
+            if (internalId == -1 && !deviceId.isNull())
+                return nx::sql::DBResult::ok; //< Not found in the database.
+
             Cleaner cleaner(
                 &m_attributesDao,
-                m_deviceDao.deviceIdFromGuid(deviceId),
+                internalId,
                 oldestDataToKeepTimestamp);
 
             if (cleaner.clean(queryContext) == Cleaner::Result::incomplete)

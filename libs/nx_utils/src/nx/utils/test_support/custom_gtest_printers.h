@@ -5,6 +5,7 @@
 
 #include <QtCore/QByteArray>
 #include <QtCore/QString>
+#include <QtCore/QSize>
 #include <QtCore/QUrl>
 
 #include "../std/filesystem.h"

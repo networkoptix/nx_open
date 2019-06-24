@@ -1,3 +1,5 @@
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+
 #pragma once
 
 #include <string>
@@ -110,7 +112,7 @@ protected:
      * @return Param value, or an empty string if such param does not exist, having logged the
      *     error.
      */
-    std::string getParamValue(const char* paramName);
+    std::string getParamValue(const std::string& paramName);
 
     virtual Error setNeededMetadataTypes(const IMetadataTypes* metadataTypes) override = 0;
 

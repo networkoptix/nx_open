@@ -14,7 +14,7 @@ public:
     virtual void removeChildInternal(const QnResourceTreeModelNodePtr& child);
 
 protected:
-    virtual QIcon calculateIcon() const override;
+    virtual int calculateIconKey() const override;
     virtual nx::vms::client::desktop::CameraExtraStatus calculateCameraExtraStatus() const override;
 
 private:

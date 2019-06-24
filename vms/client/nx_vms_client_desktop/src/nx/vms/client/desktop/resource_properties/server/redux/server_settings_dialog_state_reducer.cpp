@@ -2,6 +2,8 @@
 
 #include <core/resource/media_server_resource.h>
 
+#include <nx/utils/string.h>
+
 namespace nx::vms::client::desktop {
 
 using State = ServerSettingsDialogState;
@@ -9,15 +11,15 @@ using Server = QnMediaServerResourcePtr;
 
 namespace {
 
-int pluginIndex(const State& state, const QString& libraryName)
+int pluginIndex(const State& state, const QString& libraryFilename)
 {
-    if (libraryName.isEmpty())
+    if (libraryFilename.isEmpty())
         return -1;
 
     const auto iter = std::find_if(state.plugins.modules.cbegin(), state.plugins.modules.cend(),
-        [libraryName](const nx::vms::api::PluginInfo& data)
+        [libraryFilename](const nx::vms::api::PluginInfo& data)
         {
-            return data.libraryName == libraryName;
+            return data.libraryFilename == libraryFilename;
         });
 
     return iter != state.plugins.modules.cend()
@@ -43,12 +45,42 @@ State ServerSettingsDialogStateReducer::setOnline(State state, bool value)
 State ServerSettingsDialogStateReducer::setPluginModules(
     State state, const nx::vms::api::PluginInfoList& value)
 {
+    using PluginInfo = nx::vms::api::PluginInfo;
+
     const auto currentLibraryName = state.plugins.current > 0
-        ? state.plugins.modules[state.plugins.current].libraryName
+        ? state.plugins.modules[state.plugins.current].libraryFilename
         : QString();
 
-    state.plugins.modules = value;
-    // TODO: #vkutin Filter out invalid results to make libraryName an unique key?
+    state.plugins.modules.clear();
+
+    // Ensure uniqueness of libraryFilename.
+    QSet<QString> usedNames;
+    for (const auto& plugin: value)
+    {
+        if (!NX_ASSERT(!usedNames.contains(plugin.libraryFilename)))
+            continue;
+
+        usedNames.insert(plugin.libraryFilename);
+        state.plugins.modules.push_back(plugin);
+    }
+
+    // Sort plugins by loaded state, then by name.
+    std::sort(state.plugins.modules.begin(), state.plugins.modules.end(),
+        [](const PluginInfo& l, const PluginInfo& r)
+        {
+            if (l.status == PluginInfo::Status::loaded && r.status != PluginInfo::Status::loaded)
+                return true;
+            if (r.status == PluginInfo::Status::loaded && l.status != PluginInfo::Status::loaded)
+                return false;
+
+            const int code = nx::utils::naturalStringCompare(l.name, r.name, Qt::CaseInsensitive);
+            if (code < 0)
+                return true;
+            if (code > 0)
+                return false;
+
+            return l.libraryFilename < r.libraryFilename;
+        });
 
     state.plugins.current = pluginIndex(state, currentLibraryName);
     if (state.plugins.current < 0 && !state.plugins.modules.empty())
@@ -58,9 +90,9 @@ State ServerSettingsDialogStateReducer::setPluginModules(
 }
 
 State ServerSettingsDialogStateReducer::selectCurrentPlugin(
-    State state, const QString& libraryName)
+    State state, const QString& libraryFilename)
 {
-    state.plugins.current = pluginIndex(state, libraryName);
+    state.plugins.current = pluginIndex(state, libraryFilename);
     return state;
 }
 
