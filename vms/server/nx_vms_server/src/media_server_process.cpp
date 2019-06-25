@@ -4787,6 +4787,7 @@ protected:
             return 0;
 
         int res = application()->exec();
+        qnStaticCommon->instance<QnLongRunnablePool>()->stopAll();
 
         m_main.reset();
 
