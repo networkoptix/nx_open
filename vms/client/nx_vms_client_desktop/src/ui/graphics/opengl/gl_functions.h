@@ -50,7 +50,7 @@ public:
 	/**
 	 * \brief                           Set of OpenGL plain-text params.
 	 */
-	struct OpenGLInfo { QString version, vendor, renderer; };
+	struct OpenGLInfo { QString version, vendor, renderer, extensions; };
 
 	/**
      * \returns                         Actual \class OpenGLInfo setting.
