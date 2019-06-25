@@ -492,6 +492,7 @@ void QnResourceBrowserWidget::setupAutoExpandPolicy()
                             resourcePool()->getResources<QnMediaServerResource>().count();
                         return serverCount <= kMaxAutoExpandedServers;
                     }
+                    break;
                 }
                 case NodeType::servers:
                 case NodeType::userResources:
