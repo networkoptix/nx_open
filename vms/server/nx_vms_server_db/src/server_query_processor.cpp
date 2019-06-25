@@ -78,13 +78,14 @@ detail::ServerQueryProcessor ServerQueryProcessorAccess::getAccess(
 
 namespace detail {
 
-void TransactionExecutor::pleaseStop()
+void TransactionExecutor::stop()
 {
-    QnLongRunnable::pleaseStop();
     {
         QnMutexLocker lock(&m_mutex);
+        pleaseStop();
         m_waitCondition.wakeOne();
     }
+    QnLongRunnable::stop();
 }
 
 void TransactionExecutor::enqueData(Command command)
@@ -110,10 +111,6 @@ void TransactionExecutor::run()
                 m_waitCondition.wait(&m_mutex);
             std::swap(m_commandQueue, queue);
         }
-
-        if (needToStop())
-            return;
-
         QElapsedTimer timer;
         timer.restart();
 
