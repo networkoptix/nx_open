@@ -48,6 +48,12 @@ def copy_if_different(source, target):
     else:
         logging.info('Copying %s to %s', source, target)
         copy2(source.as_posix(), target.as_posix())
+    if not target.exists():
+        logging.critical('File %s cannot be written', target)
+        sys.exit(1)
+    if not cmp(source.as_posix(), target.as_posix()):
+        logging.critical('File %s integrity check failed', target)
+        sys.exit(1)
 
 
 def pack(customization_path, output_path):

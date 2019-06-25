@@ -11,7 +11,12 @@ function(nx_unpack_customization_package source_directory target_directory log_f
             ${source_directory}/package.zip
             ${target_directory}
             -l ${log_file}
+        RESULT_VARIABLE unpack_result
     )
+
+    if(NOT unpack_result STREQUAL "0")
+        message(FATAL_ERROR "error: Customization unpacking failed. See ${log_file} for details.")
+    endif()
 endfunction()
 
 nx_rdep_add_package(any/customization_pack-${customization}
