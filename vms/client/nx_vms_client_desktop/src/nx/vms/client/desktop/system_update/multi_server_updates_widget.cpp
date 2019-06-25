@@ -2051,7 +2051,7 @@ void MultiServerUpdatesWidget::syncUpdateCheckToUi()
         // httpError corresponds to 'Build not found'
         && m_updateInfo.error != nx::update::InformationError::httpError;
 
-    ui->manualDownloadButton->setVisible(showButton);
+    ui->manualDownloadButton->setVisible(showButton || ini().alwaysShowGetUpdateFileButton);
 
     syncVersionReport(m_updateReport);
     m_updateLocalStateChanged = false;

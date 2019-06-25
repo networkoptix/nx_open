@@ -168,6 +168,8 @@ struct Ini: nx::kit::IniConfig
     NX_INI_INT(5000, gdiTraceLimit, 
         "Number of GDI handles in use which triggers report creation.");
 
+    NX_INI_FLAG(0, alwaysShowGetUpdateFileButton, "Always show Get Update File button.");
+
     NX_INI_STRING("", currentOsVariantOverride,
         "Override detected OS variant value (e.g. \"ubuntu\").");
     NX_INI_STRING("", currentOsVariantVersionOverride,
