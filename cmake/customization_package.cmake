@@ -23,7 +23,10 @@ nx_rdep_add_package(any/customization_pack-${customization}
     PATH_VARIABLE customization_package_directory)
 
 set(customization_dir "${CMAKE_BINARY_DIR}/customization/${customization}")
+set(customization_unpack_log_file "${CMAKE_BINARY_DIR}/build_logs/unpack-${customization}.log")
 nx_unpack_customization_package(
     ${customization_package_directory}
     ${customization_dir}
-    ${CMAKE_BINARY_DIR}/build_logs/unpack-${customization}.log)
+    ${customization_unpack_log_file})
+
+nx_store_known_file(${customization_unpack_log_file})
