@@ -168,10 +168,10 @@ struct Ini: nx::kit::IniConfig
     NX_INI_INT(5000, gdiTraceLimit, 
         "Number of GDI handles in use which triggers report creation.");
 
-    NX_INI_STRING("", runtimeModificationOverride,
-        "Override detected OS modification value (e.g. \"ubuntu\").");
-    NX_INI_STRING("", runtimeOsVersionOverride,
-        "Override detected OS version value (e.g. \"16.04\").");
+    NX_INI_STRING("", currentOsVariantOverride,
+        "Override detected OS variant value (e.g. \"ubuntu\").");
+    NX_INI_STRING("", currentOsVariantVersionOverride,
+        "Override detected OS variant version value (e.g. \"16.04\").");
 };
 
 inline Ini& ini()

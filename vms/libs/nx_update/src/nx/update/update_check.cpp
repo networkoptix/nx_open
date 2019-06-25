@@ -146,6 +146,29 @@ static InformationError parsePackages(
     return InformationError::noError;
 }
 
+static utils::OsInfo osInfoFromLegacySystemInformation(
+    const QString& platform, const QString& arch, const QString& modification)
+{
+    if (modification == "bpi")
+        return {"nx1"};
+    if (modification == "edge1")
+        return {modification};
+
+    if (platform == "macosx")
+        return {"macos"};
+    if (platform == "ios")
+        return {platform};
+
+    const QString newArch = arch == "arm" ? "arm32" : arch;
+    const QString newPlatform = platform + L'_' + newArch;
+
+    static QSet<QString> kAllowedModifications{"ubuntu"};
+    const QString variant =
+        kAllowedModifications.contains(modification) ? modification : QString();
+
+    return {newPlatform, variant};
+}
+
 static InformationError parseLegacyPackages(
     const QJsonObject topLevelObject,
     const QString& baseUpdateUrl,
@@ -191,16 +214,14 @@ static InformationError parseLegacyPackages(
                         return InformationError::jsonError;
 
                     package.component = component;
-                    const auto& newInfo =
-                        vms::api::SystemInformationNew::fromLegacySystemInformation(
-                            vms::api::SystemInformation(
-                                itOs.key(),
-                                archAndVariant[0],
-                                archAndVariant.size() == 2 ? archAndVariant[1] : QString()));
-                    package.platform = newInfo.platform;
+                    const auto& osInfo = osInfoFromLegacySystemInformation(
+                        itOs.key(),
+                        archAndVariant[0],
+                        archAndVariant.size() == 2 ? archAndVariant[1] : QString());
+                    package.platform = osInfo.platform;
                     // Old update.json didn't contain variant version.
-                    if (!newInfo.variant.isEmpty())
-                        package.variants.append(Variant(newInfo.variant));
+                    if (!osInfo.variant.isEmpty())
+                        package.variants.append(Variant(osInfo.variant));
                     output.append(package);
                 }
             }
@@ -437,7 +458,7 @@ static void setErrorMessage (const QString& message, QString* outMessage)
 static FindPackageResult findPackage(
     const QnUuid& moduleGuid,
     const nx::vms::api::SoftwareVersion& engineVersion,
-    const vms::api::SystemInformation& systemInformation,
+    const utils::OsInfo& osInfo,
     const nx::update::Information& updateInformation,
     bool isClient,
     const QString& cloudHost,
@@ -487,13 +508,11 @@ static FindPackageResult findPackage(
         return FindPackageResult::otherError;
     }
 
-    const auto& sysInfo =
-        vms::api::SystemInformationNew::fromLegacySystemInformation(systemInformation);
-    auto [result, package] = findPackageForVariant(updateInformation, isClient, sysInfo);
+    auto [result, package] = findPackageForVariant(updateInformation, isClient, osInfo);
     if (result != FindPackageResult::ok)
     {
         setErrorMessage(
-            QString("Failed to find a suitable update package for %1").arg(toString(sysInfo)),
+            QString("Failed to find a suitable update package for %1").arg(toString(osInfo)),
             outMessage);
         return result;
     }
@@ -505,7 +524,7 @@ static FindPackageResult findPackage(
 static FindPackageResult findPackage(
     const QnUuid& moduleGuid,
     const nx::vms::api::SoftwareVersion& engineVersion,
-    const vms::api::SystemInformation& systemInformation,
+    const utils::OsInfo& osInfo,
     const QByteArray& serializedUpdateInformation,
     bool isClient,
     const QString& cloudHost,
@@ -522,7 +541,7 @@ static FindPackageResult findPackage(
         &updateInformation, outMessage);
     if (deserializeResult != FindPackageResult::ok)
         return deserializeResult;
-    return findPackage(moduleGuid, engineVersion, systemInformation, updateInformation, isClient,
+    return findPackage(moduleGuid, engineVersion, osInfo, updateInformation, isClient,
         cloudHost, boundToCloud, outPackage, outMessage);
 }
 
@@ -559,7 +578,7 @@ FindPackageResult fromByteArray(
 std::pair<FindPackageResult, const Package*> findPackageForVariant(
     const nx::update::Information& updateInformation,
     bool isClient,
-    const vms::api::SystemInformationNew& systemInformation)
+    const utils::OsInfo& osInfo)
 {
     bool variantFound = false;
     const Package* bestPackage = nullptr;
@@ -569,16 +588,12 @@ std::pair<FindPackageResult, const Package*> findPackageForVariant(
         if (isClient != (package.component == kComponentClient))
             continue;
 
-        // TODO: Enable version checking after making server report its variantVersion.
-        if (package.isCompatibleTo(systemInformation, true))
+        if (package.isCompatibleTo(osInfo))
         {
-            if (!bestPackage
-                || package.isNewerThan(systemInformation.variant, *bestPackage))
-            {
+            if (!bestPackage || package.isNewerThan(osInfo.variant, *bestPackage))
                 bestPackage = &package;
-            }
         }
-        else if (package.isCompatibleTo(systemInformation, true))
+        else if (package.isCompatibleTo(osInfo, true))
         {
             variantFound = true;
         }
@@ -594,10 +609,10 @@ std::pair<FindPackageResult, const Package*> findPackageForVariant(
 std::pair<FindPackageResult, Package*> findPackageForVariant(
     Information& updateInformation,
     bool isClient,
-    const vms::api::SystemInformationNew& systemInformation)
+    const utils::OsInfo& osInfo)
 {
     auto [code, package] = findPackageForVariant(
-        const_cast<const Information&>(updateInformation), isClient, systemInformation);
+        const_cast<const Information&>(updateInformation), isClient, osInfo);
     return {code, const_cast<Package*>(package)};
 }
 
@@ -609,7 +624,7 @@ FindPackageResult findPackage(
     return findPackage(
         commonModule.moduleGUID(),
         commonModule.engineVersion(),
-        QnAppInfo::currentSystemInformation(),
+        utils::OsInfo::current(),
         commonModule.globalSettings()->targetUpdateInformation(),
         commonModule.runtimeInfoManager()->localInfo().data.peer.isClient(),
         nx::network::SocketGlobals::cloud().cloudHost(),
@@ -627,7 +642,7 @@ FindPackageResult findPackage(
     return findPackage(
         commonModule.moduleGUID(),
         commonModule.engineVersion(),
-        QnAppInfo::currentSystemInformation(),
+        utils::OsInfo::current(),
         updateInformation,
         commonModule.runtimeInfoManager()->localInfo().data.peer.isClient(),
         nx::network::SocketGlobals::cloud().cloudHost(),

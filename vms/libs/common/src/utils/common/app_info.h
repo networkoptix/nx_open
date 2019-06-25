@@ -70,5 +70,4 @@ public:
     static Q_INVOKABLE bool isWindows();
 
     static Q_INVOKABLE nx::vms::api::SystemInformation currentSystemInformation();
-    static Q_INVOKABLE nx::vms::api::SystemInformationNew currentSystemInformationNew();
 };

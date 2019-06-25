@@ -57,7 +57,7 @@ public:
         for (const auto& server: q->commonModule()->resourcePool()->getAllServers(Qn::Online))
         {
             if (const auto& id = server->getId(); id != selfId)
-                result.append(PeerInformation{id, server->getSystemInfo()});
+                result.append(PeerInformation{id, server->getOsInfo()});
         }
 
         for (const auto& id: directConnectionByServerId.keys())
@@ -65,7 +65,7 @@ public:
             if (!std::any_of(result.begin(), result.end(),
                 [&id](const PeerInformation& info) { return info.id == id; }))
             {
-                result.append(PeerInformation{id, nx::vms::api::SystemInformation()});
+                result.append(PeerInformation{id, {}});
             }
         }
 

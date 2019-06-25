@@ -35,7 +35,6 @@
 #include <nx/client/core/utils/operation_manager.h>
 #include <nx/client/core/two_way_audio/two_way_audio_mode_controller.h>
 #include <nx/vms/api/data/software_version.h>
-#include <nx/vms/api/data/system_information.h>
 
 #include <nx/fusion/model_functions.h>
 
@@ -100,8 +99,6 @@ void initializeMetaTypes()
         "Nx.Utils", 1, 0, "Url", QLatin1String("Cannot create an instance of Url."));
     qmlRegisterUncreatableType<nx::vms::api::SoftwareVersion>(
         "Nx", 1, 0, "SoftwareVersion", QLatin1String("Cannot create an instance of SoftwareVersion."));
-    qmlRegisterUncreatableType<nx::vms::api::SystemInformation>(
-        "Nx", 1, 0, "SystemInformation", QLatin1String("Cannot create an instance of SystemInformation."));
 
     FrameSection::registedQmlType();
     Geometry::registerQmlType();

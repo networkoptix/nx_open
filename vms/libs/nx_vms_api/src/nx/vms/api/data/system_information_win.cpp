@@ -69,20 +69,4 @@ QString SystemInformation::currentSystemRuntime()
     return name;
 }
 
-QString SystemInformation::runtimeModification()
-{
-    return QString();
-}
-
-QString SystemInformation::runtimeOsVersion()
-{
-    OSVERSIONINFOEXW osvi;
-    if (!winVersion(&osvi))
-        return QLatin1String("0");
-
-    return QString::number(osvi.dwMajorVersion) + "." +
-        QString::number(osvi.dwMinorVersion) + "." +
-        QString::number(osvi.dwBuildNumber);
-}
-
 } // namespace nx::vms::api

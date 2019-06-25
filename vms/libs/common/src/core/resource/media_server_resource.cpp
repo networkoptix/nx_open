@@ -461,7 +461,6 @@ void QnMediaServerResource::updateInternal(const QnResourcePtr &other, Qn::Notif
         m_version = localOther->m_version;
         m_serverFlags = localOther->m_serverFlags;
         m_netAddrList = localOther->m_netAddrList;
-        m_systemInfo = localOther->m_systemInfo;
         m_authKey = localOther->m_authKey;
 
     }
@@ -556,16 +555,16 @@ void QnMediaServerResource::setVersion(const nx::utils::SoftwareVersion& version
     emit versionChanged(::toSharedPointer(this));
 }
 
-nx::vms::api::SystemInformation QnMediaServerResource::getSystemInfo() const
+utils::OsInfo QnMediaServerResource::getOsInfo() const
 {
-    QnMutexLocker lock(&m_mutex);
-    return m_systemInfo;
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    return m_osInfo;
 }
 
-void QnMediaServerResource::setSystemInfo(const nx::vms::api::SystemInformation& systemInfo)
+void QnMediaServerResource::setOsInfo(const utils::OsInfo& osInfo)
 {
-    QnMutexLocker lock(&m_mutex);
-    m_systemInfo = systemInfo;
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    m_osInfo = osInfo;
 }
 
 nx::vms::api::ModuleInformation QnMediaServerResource::getModuleInformation() const
@@ -606,7 +605,7 @@ nx::vms::api::ModuleInformation QnMediaServerResource::getModuleInformation() co
     moduleInformation.id = getId();
     moduleInformation.port = getPort();
     moduleInformation.version = getVersion();
-    moduleInformation.systemInformation = getSystemInfo();
+    moduleInformation.osInfo = getOsInfo();
     moduleInformation.serverFlags = getServerFlags();
 
     return moduleInformation;

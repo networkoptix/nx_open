@@ -348,16 +348,15 @@ private:
     {
         update::Package result;
 
-        const auto sysInfo = nx::vms::api::SystemInformationNew::fromLegacySystemInformation(
-            QnAppInfo::currentSystemInformation());
+        const auto& osInfo = nx::utils::OsInfo::current();
 
         result.component = "server";
 
         QString updateFileFullPath;
         result.file = createUpdateZip(dataDir, &result.md5, &result.size, &updateFileFullPath);
         result.url = serveUpdateFile(updateFileFullPath);
-        result.platform = sysInfo.platform;
-        result.variants.append({sysInfo.variant, sysInfo.variantVersion});
+        result.platform = osInfo.platform;
+        result.variants.append({osInfo.variant, osInfo.variantVersion});
 
         return result;
     }
@@ -374,30 +373,15 @@ private:
     {
         const auto updateFilesPath = dataDir + kUpdateFilesPathPostfix;
         QDir().mkpath(updateFilesPath);
-        const QByteArray updateJsonContent =
-            QString(
-R"JSON({
-    "version" : "4.0.0.1",
-    "platform" : "%1",
-    "arch" : "%2",
-    "modification" : "%3",
-    "cloudHost" : "%4",
-    "executable" : "install"
-}
-)JSON"
-            ).arg(QnAppInfo::applicationPlatform())
-                .arg(QnAppInfo::applicationArch())
-                .arg(QnAppInfo::applicationPlatformModification())
-                .arg(nx::network::SocketGlobals::cloud().cloudHost()).toLocal8Bit();
 
-        const auto& sysInfo = QnAppInfo::currentSystemInformationNew();
+        const auto& osInfo = nx::utils::OsInfo::current();
 
         update::PackageInformation packageInfo;
         packageInfo.version = "4.0.0.1";
         packageInfo.component = "server";
         packageInfo.cloudHost = nx::network::SocketGlobals::cloud().cloudHost();
-        packageInfo.platform = sysInfo.platform;
-        packageInfo.variants.append({sysInfo.variant, sysInfo.variantVersion});
+        packageInfo.platform = osInfo.platform;
+        packageInfo.variants.append({osInfo.variant, osInfo.variantVersion});
         packageInfo.installScript = "install";
         const QByteArray& packageInfoJsonContent = QJson::serialized(packageInfo);
 
@@ -405,7 +389,6 @@ R"JSON({
         const QString zipFilePath = updateFilesPath + zipFileName;
 
         QList<ZipContext> zipContextList = {
-            ZipContext("update.json", updateJsonContent),
             ZipContext("package.json", packageInfoJsonContent),
             ZipContext("install", "hello")
         };
