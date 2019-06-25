@@ -16,7 +16,6 @@ ListView
     boundsBehavior: Flickable.StopAtBounds
     interactive: false
     currentIndex: -1
-    clip: true
 
     Rectangle
     {
