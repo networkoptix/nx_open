@@ -22,7 +22,7 @@ class QnResourceTreeModelNodeManager;
 class QnResourceTreeModelLayoutNodeManager;
 namespace nx::vms::client::desktop { struct WearableState; }
 
-class QnResourceTreeModel:
+class NX_VMS_CLIENT_DESKTOP_API QnResourceTreeModel:
     public Connective<QAbstractItemModel>,
     public QnWorkbenchContextAware
 {
