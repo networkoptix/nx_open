@@ -12,14 +12,26 @@ namespace nx::utils {
 QString OsInfo::currentVariantOverride;
 QString OsInfo::currentVariantVersionOverride;
 
-QString OsInfo::toString() const
+QJsonObject OsInfo::toJson() const
 {
-    const QJsonObject obj{
+    return QJsonObject{
         {"platform", platform},
         {"variant", variant},
         {"variantVersion", variantVersion}
     };
-    return QString::fromLatin1(QJsonDocument(obj).toJson(QJsonDocument::Compact));
+}
+
+OsInfo OsInfo::fromJson(const QJsonObject& obj)
+{
+    return OsInfo{
+        obj["platform"].toString(),
+        obj["variant"].toString(),
+        obj["variantVersion"].toString()};
+}
+
+QString OsInfo::toString() const
+{
+    return QString::fromLatin1(QJsonDocument(toJson()).toJson(QJsonDocument::Compact));
 }
 
 OsInfo OsInfo::fromString(const QString& str)
@@ -28,10 +40,7 @@ OsInfo OsInfo::fromString(const QString& str)
     if (obj.isEmpty())
         return {};
 
-    return OsInfo{
-        obj["platform"].toString(),
-        obj["variant"].toString(),
-                obj["variantVersion"].toString()};
+    return fromJson(obj);
 }
 
 bool OsInfo::operator==(const OsInfo& other) const
