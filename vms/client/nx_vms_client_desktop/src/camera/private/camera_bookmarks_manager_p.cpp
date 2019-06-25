@@ -14,8 +14,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 
-#include <nx/fusion/serialization/json.h>
-#include <nx/fusion/serialization/ubjson.h>
+#include <nx/fusion/model_functions.h>
 
 #include <utils/common/delayed.h>
 #include <utils/common/synctime.h>
@@ -64,23 +63,23 @@ bool checkBookmarkForQuery(const QnCameraBookmarksQueryPtr &query, const QnCamer
     return query->filter().checkBookmark(bookmark);
 }
 
-template<class ResponseType> QnCameraBookmarksManagerPrivate::UbJsonCallback makeUbjsonResponseWrapper(
-    std::function<void (bool success, rest::Handle handle, const ResponseType& response)> internalCallback)
+template<class ResponseType>
+std::function<void (bool, rest::Handle, QByteArray, nx::network::http::HttpHeaders)> makeUbjsonResponseWrapper(
+    std::function<void (bool, int, const ResponseType&)> internalCallback)
 {
-    return [internalCallback](bool success, rest::Handle handle, const QnUbjsonRestResult& response)
-    {
-        if (success)
+    return [internalCallback](bool success, rest::Handle handle, QByteArray response,
+        nx::network::http::HttpHeaders /*headers*/)
         {
-            bool deserialized = false;
-            auto bookmarks = QnUbjson::deserialized<ResponseType>(response.reply, ResponseType(), &deserialized);
-            if (deserialized)
-                internalCallback(success, handle, bookmarks);
-            else
-                internalCallback(false, handle, {});
-        }
-        if (!success)
-            internalCallback(success, handle, {});
-    };
+            if (success)
+            {
+                bool parsed = false;
+                ResponseType reply = QnUbjson::deserialized(response, ResponseType(), &parsed);
+                if (parsed)
+                    internalCallback(true, handle, reply);
+            }
+            if (!success)
+                internalCallback(success, handle, {});
+        };
 }
 
 }
@@ -243,16 +242,16 @@ int QnCameraBookmarksManagerPrivate::sendPostRequest(rest::QnConnectionPtr conne
 int QnCameraBookmarksManagerPrivate::sendGetRequest(rest::QnConnectionPtr connection,
     const QString& path,
     QnMultiserverRequestData &request,
-    UbJsonCallback callback)
+    RawResponseType callback)
 {
     if (!connection)
     {
-        executeCallbackDelayed(callback);
+        executeDelayedParented([callback]() { callback(false, kInvalidRequestId, {}, {}); }, this);
         return kInvalidRequestId;
     }
 
     request.format = Qn::SerializationFormat::UbjsonFormat;
-    return connection->getUbJsonResult(path, request.toParams(), callback, thread());
+    return connection->getRawResult(path, request.toParams(), callback, thread());
 }
 
 int QnCameraBookmarksManagerPrivate::getBookmarksAsync(
@@ -266,7 +265,7 @@ int QnCameraBookmarksManagerPrivate::getBookmarksAsync(
     requestData.format = Qn::SerializationFormat::UbjsonFormat;
     auto connection = getDefaultConnection();
     return sendGetRequest(connection, "/ec2/bookmarks", requestData,
-        makeUbjsonResponseWrapper<QnCameraBookmarkList>(callback));
+        makeUbjsonResponseWrapper(callback));
 }
 
 int QnCameraBookmarksManagerPrivate::getBookmarkTagsAsync(
@@ -277,7 +276,7 @@ int QnCameraBookmarksManagerPrivate::getBookmarkTagsAsync(
     requestData.format = Qn::SerializationFormat::UbjsonFormat;
     auto connection = getDefaultConnection();
     return sendGetRequest(connection, "/ec2/bookmarks/tags", requestData,
-        makeUbjsonResponseWrapper<QnCameraBookmarkTagList>(callback));
+        makeUbjsonResponseWrapper(callback));
 }
 
 void QnCameraBookmarksManagerPrivate::addCameraBookmark(
@@ -334,7 +333,9 @@ void QnCameraBookmarksManagerPrivate::addCameraBookmarkInternal(
     addUpdatePendingBookmark(bookmark);
 }
 
-void QnCameraBookmarksManagerPrivate::updateCameraBookmark(const QnCameraBookmark &bookmark, OperationCallbackType callback)
+void QnCameraBookmarksManagerPrivate::updateCameraBookmark(
+    const QnCameraBookmark &bookmark,
+    OperationCallbackType callback)
 {
     NX_ASSERT(bookmark.isValid(), "Invalid bookmark must not be added");
     if (!bookmark.isValid())
@@ -345,18 +346,22 @@ void QnCameraBookmarksManagerPrivate::updateCameraBookmark(const QnCameraBookmar
     QnUpdateBookmarkRequestData request(bookmark);
     auto connection = getDefaultConnection();
     int handle = sendPostRequest(connection, "/ec2/bookmarks/update", request);
-    m_operations[handle] = OperationInfo(OperationInfo::OperationType::Update, bookmark.guid, callback);
+    m_operations[handle] = OperationInfo(
+        OperationInfo::OperationType::Update, bookmark.guid, callback);
 
     addUpdatePendingBookmark(bookmark);
 }
 
-void QnCameraBookmarksManagerPrivate::deleteCameraBookmark(const QnUuid &bookmarkId, OperationCallbackType callback)
+void QnCameraBookmarksManagerPrivate::deleteCameraBookmark(
+    const QnUuid &bookmarkId,
+    OperationCallbackType callback)
 {
     setEnabled(true); // Forcefully enable on modifying operation
     QnDeleteBookmarkRequestData request(bookmarkId);
     auto connection = getDefaultConnection();
     int handle = sendPostRequest(connection, "/ec2/bookmarks/delete", request);
-    m_operations[handle] = OperationInfo(OperationInfo::OperationType::Delete, bookmarkId, callback);
+    m_operations[handle] = OperationInfo(
+        OperationInfo::OperationType::Delete, bookmarkId, callback);
 
     addRemovePendingBookmark(bookmarkId);
 }
@@ -390,7 +395,8 @@ bool QnCameraBookmarksManagerPrivate::isQueryUpdateRequired(const QUuid &queryId
         case QueryInfo::QueryState::Invalid:
             return true;
         case QueryInfo::QueryState::Queued:
-            return !info.requestTimer.isValid() || info.requestTimer.hasExpired(minimimumRequestTimeoutMs) || !query->isValid();
+            return !info.requestTimer.isValid()
+                || info.requestTimer.hasExpired(minimimumRequestTimeoutMs) || !query->isValid();
         case QueryInfo::QueryState::Requested:
         case QueryInfo::QueryState::Actual:
             return false;
@@ -454,7 +460,8 @@ QnCameraBookmarkList QnCameraBookmarksManagerPrivate::cachedBookmarks(const QnCa
     return QnCameraBookmarkList();
 }
 
-void QnCameraBookmarksManagerPrivate::executeQueryRemoteAsync(const QnCameraBookmarksQueryPtr &query, BookmarksCallbackType callback)
+void QnCameraBookmarksManagerPrivate::executeQueryRemoteAsync(
+    const QnCameraBookmarksQueryPtr &query, BookmarksCallbackType callback)
 {
     NX_ASSERT(query, "Interface does not allow query to be null");
     if (!query)
@@ -520,7 +527,8 @@ void QnCameraBookmarksManagerPrivate::updateQueryAsync(const QUuid &queryId)
     info.state = QueryInfo::QueryState::Queued;
 }
 
-void QnCameraBookmarksManagerPrivate::updateQueryCache(const QUuid &queryId, const QnCameraBookmarkList &bookmarks)
+void QnCameraBookmarksManagerPrivate::updateQueryCache(
+    const QUuid &queryId, const QnCameraBookmarkList &bookmarks)
 {
     QN_LOG_TIME(Q_FUNC_INFO);
 

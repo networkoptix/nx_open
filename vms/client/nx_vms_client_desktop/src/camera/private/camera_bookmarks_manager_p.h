@@ -32,6 +32,7 @@ public:
 
     using UbJsonCallback = std::function<void (bool success, int handle, const QnUbjsonRestResult& response)>;
     using EmptyResponseCallback = std::function<void (bool success, int handle)>;
+    using RawResponseType = std::function<void (bool, rest::Handle, QByteArray, nx::network::http::HttpHeaders)>;
 
     bool isEnabled() const;
     void setEnabled(bool value);
@@ -133,14 +134,13 @@ private:
         const QnUuid& eventRuleId,
         OperationCallbackType callback = OperationCallbackType());
 
-    void executeCallbackDelayed(UbJsonCallback callback);
     void executeCallbackDelayed(BookmarksCallbackType callback);
 
     int sendPostRequest(rest::QnConnectionPtr connection,
         const QString& path, QnMultiserverRequestData& request);
 
     int sendGetRequest(rest::QnConnectionPtr connection,
-        const QString& path, QnMultiserverRequestData& request, UbJsonCallback callback);
+        const QString& path, QnMultiserverRequestData& request, RawResponseType callback);
 
 
     void onBookmarkCommandResponse(bool status, int handle);

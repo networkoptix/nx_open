@@ -1061,6 +1061,24 @@ Handle ServerConnection::postEmptyResult(
         targetThread);
 }
 
+Handle ServerConnection::getUbJsonResult(
+    const QString& path,
+    const QnRequestParamList& params,
+    std::function<void(bool, Handle, QnUbjsonRestResult response)>&& callback,
+    QThread* targetThread)
+{
+    return executeGet(path, params, callback, targetThread);
+}
+
+Handle ServerConnection::getRawResult(
+    const QString& path,
+    const QnRequestParamList& params,
+    std::function<void(bool, Handle, QByteArray, nx::network::http::HttpHeaders)> callback,
+    QThread* targetThread)
+{
+    return executeGet(path, params, callback, targetThread);
+}
+
 Handle ServerConnection::postUbJsonResult(
     const QString& action,
     const QnRequestParamList& params,
@@ -1147,29 +1165,6 @@ T parseMessageBody(
             break;
     }
     return T();
-}
-
-/** Response deserialization for pure QJsonObject. */
-template<>
-QJsonValue parseMessageBody<QJsonValue>(
-    const Qn::SerializationFormat& format,
-    const nx::network::http::BufferType& msgBody,
-    bool* success)
-{
-    QJsonValue result;
-    switch (format)
-    {
-        case Qn::JsonFormat:
-            if (QJsonDetail::deserialize_json(msgBody, &result) && success)
-                *success = true;
-            return result;
-        default:
-            if (success)
-                *success = false;
-            NX_ASSERT(0, "Unsupported data format");
-            break;
-    }
-    return QJsonObject();
 }
 
 template<typename CallbackType>
@@ -1374,6 +1369,9 @@ Handle ServerConnection::executeRequest(
     return sendRequest(request);
 }
 
+// This is a specialization for request with QByteArray in response. Its callback is a bit different
+// from regular Result<SomeType>::type. Result<QByteArray>::type has 4 arguments:
+// `(bool success, Handle requestId, QByteArray result, nx::network::http::HttpHeaders& headers)`
 Handle ServerConnection::executeRequest(
     const nx::network::http::ClientPool::Request& request,
     Result<QByteArray>::type callback,
@@ -1474,14 +1472,15 @@ QnUuid ServerConnection::getServerId() const
     return m_serverId;
 }
 
-std::pair<QString, QString> ServerConnection::getRequestCredentials(
-    const QnMediaServerResourcePtr& targetServer) const
+std::pair<QString, QString> getRequestCredentials(
+    std::shared_ptr<ec2::AbstractECConnection> connection,
+    const QnMediaServerResourcePtr& targetServer)
 {
     using namespace nx::vms::api;
     const auto localPeerType = qnStaticCommon->localPeerType();
     if (PeerData::isClient(localPeerType))
     {
-        const auto ecUrl = commonModule()->ec2Connection()->connectionInfo().ecUrl;
+        const auto ecUrl = connection->connectionInfo().ecUrl;
         return std::make_pair(ecUrl.userName(), ecUrl.password());
     }
 
@@ -1519,7 +1518,7 @@ nx::network::http::ClientPool::Request ServerConnection::prepareRequest(
     request.contentType = contentType;
     request.messageBody = messageBody;
 
-    const auto [user, password] =  getRequestCredentials(server);
+    const auto [user, password] =  getRequestCredentials(connection, server);
 
     auto videoWallGuid = commonModule()->videowallGuid();
     if (!videoWallGuid.isNull())

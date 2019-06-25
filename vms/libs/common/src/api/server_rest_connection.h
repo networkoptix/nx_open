@@ -543,7 +543,13 @@ public:
     Handle getUbJsonResult(
         const QString& action,
         const QnRequestParamList& params,
-        std::function<void(bool, Handle, const QnUbjsonRestResult& response)>&& callback,
+        std::function<void(bool, Handle, QnUbjsonRestResult response)>&& callback,
+        QThread* targetThread = nullptr);
+
+    Handle getRawResult(
+        const QString& action,
+        const QnRequestParamList& params,
+        std::function<void(bool, Handle, QByteArray, nx::network::http::HttpHeaders)> callback,
         QThread* targetThread = nullptr);
 
     /**
@@ -614,8 +620,6 @@ private:
     QnMediaServerResourcePtr getServerWithInternetAccess() const;
 
     void trace(int handle, const QString& message) const;
-    std::pair<QString, QString> getRequestCredentials(
-        const QnMediaServerResourcePtr& targetServer) const;
 
 private:
     QnUuid m_serverId;

@@ -104,7 +104,10 @@ private:
 };
 
 
-
+/**
+ * This one is needed for QnMediaServerConnection.
+ * It should be removed when all methods from QnMediaServerConnection are moved to rest::ServerConnection.
+ */
 class QnAbstractConnection: public Connective<QObject>, public /*mixin*/ QnCommonModuleAware
 {
     Q_OBJECT
