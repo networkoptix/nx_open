@@ -52,12 +52,19 @@ Item
         {
             Item
             {
+                id: treeItem
+
                 property bool selectable: !delegateLoader.item
                     || delegateLoader.item.selectable === undefined
                     || delegateLoader.item.selectable
 
                 width: parent.width
                 implicitHeight: Math.max(button.implicitHeight, delegateLoader.implicitHeight)
+
+                readonly property var modelData: model
+                readonly property var modelIndex: linearizationListModel.index(index, 0)
+                readonly property bool isCurrent: ListView.isCurrentItem
+                readonly property bool isSelected: selectionHighlight.visible
 
                 Rectangle
                 {
@@ -100,6 +107,7 @@ Item
 
                 MouseArea
                 {
+                    id: mouseArea
                     anchors.fill: parent
 
                     onDoubleClicked:
@@ -127,7 +135,6 @@ Item
 
                         if (selectable)
                         {
-                            var modelIndex = linearizationListModel.index(index, undefined)
                             if (!modelIndex.valid)
                                 return
 
@@ -146,27 +153,48 @@ Item
 
                                 selectionModel.select(selection, ItemSelectionModel.SelectCurrent)
                             }
-                            else
+                            else if (!isSelected)
                             {
                                 selectionModel.setCurrentIndex(
                                     modelIndex, ItemSelectionModel.ClearAndSelect)
                             }
+                            else
+                            {
+                                reselectOnRelease = true
+                            }
                         }
                     }
-                }
 
-                readonly property var modelData: model
-                readonly property bool isCurrent: ListView.isCurrentItem
+                    onReleased:
+                    {
+                        if (!reselectOnRelease)
+                            return
+
+                        reselectOnRelease = false
+
+                        if (modelIndex.valid && !drag.active)
+                        {
+                            selectionModel.setCurrentIndex(
+                                modelIndex, ItemSelectionModel.ClearAndSelect)
+                        }
+                    }
+
+                    property bool reselectOnRelease: false
+                }
 
                 Loader
                 {
                     id: delegateLoader
 
-                    readonly property var model: modelData
-                    readonly property bool isCurrentItem: isCurrent
+                    readonly property var model: treeItem.modelData
+
+                    readonly property var modelIndex: linearizationListModel.mapToSource(
+                        treeItem.modelIndex)
+
+                    readonly property bool isCurrent: treeItem.isCurrent
+                    readonly property bool isSelected: treeItem.isSelected
+
                     readonly property real itemIndent: x
-                    readonly property var modelIndex:
-                        linearizationListModel.mapToSource(linearizationListModel.index(index, 0))
 
                     sourceComponent: treeView.delegate
 
