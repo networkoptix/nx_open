@@ -11,6 +11,7 @@
 
 #include <core/resource/security_cam_resource.h>
 #include <nx/vms/server/event/event_connector.h>
+#include <nx/vms/server/sdk_support/utils.h>
 #include <analytics/common/object_detection_metadata.h>
 #include <core/dataconsumer/abstract_data_receptor.h>
 #include <media_server/media_server_module.h>
@@ -56,7 +57,7 @@ void MetadataHandler::handleMetadata(IMetadataPacket* metadataPacket)
 {
     if (metadataPacket == nullptr)
     {
-        NX_VERBOSE(this) << "WARNING: Received null metadata packet; ignoring";
+        NX_VERBOSE(this, "%1(): Received null metadata packet; ignoring", __func__);
         return;
     }
 
@@ -74,7 +75,7 @@ void MetadataHandler::handleMetadata(IMetadataPacket* metadataPacket)
     }
 
     if (const auto objectTrackBestShotPacket =
-            queryInterfacePtr<IObjectTrackBestShotPacket>(metadataPacket))
+        queryInterfacePtr<IObjectTrackBestShotPacket>(metadataPacket))
     {
         handleObjectTrackBestShotPacket(objectTrackBestShotPacket);
         handled = true;
@@ -122,11 +123,8 @@ void MetadataHandler::handleObjectMetadataPacket(
         const auto box = item->boundingBox();
         object.boundingBox = QRectF(box.x, box.y, box.width, box.height);
 
-        NX_VERBOSE(this)
-            << __func__
-            << lm("(): x %1, y %2, width %3, height %4, typeId %5, id %6")
-                   .args(
-                       box.x, box.y, box.width, box.height, object.objectTypeId, object.objectId);
+        NX_VERBOSE(this, "%1(): x %2, y %3, width %4, height %5, typeId %6, id %7",
+            __func__, box.x, box.y, box.width, box.height, object.objectTypeId, object.objectId);
 
         for (int i = 0; i < item->attributeCount(); ++i)
         {
@@ -135,13 +133,13 @@ void MetadataHandler::handleObjectMetadataPacket(
             attribute.value = QString::fromStdString(item->attribute(i)->value());
             object.labels.push_back(attribute);
 
-            NX_VERBOSE(this) << __func__ << "(): Attribute:" << attribute.name << attribute.value;
+            NX_VERBOSE(this, "%1(): Attribute: %2 %3", __func__, attribute.name, attribute.value);
         }
         data.objects.push_back(std::move(object));
     }
 
     if (data.objects.empty())
-        NX_VERBOSE(this) << __func__ << "(): WARNING: ObjectsMetadataPacket is empty";
+        NX_VERBOSE(this, "%1(): WARNING: ObjectsMetadataPacket is empty", __func__);
 
     data.timestampUsec = objectMetadataPacket->timestampUs();
     data.durationUsec = objectMetadataPacket->durationUs();
@@ -165,10 +163,13 @@ void MetadataHandler::handleObjectTrackBestShotPacket(
 {
     nx::common::metadata::DetectionMetadataPacket bestShotPacket;
     bestShotPacket.timestampUsec = objectTrackBestShotPacket->timestampUs();
-    if (bestShotPacket.timestampUsec <= 0)
+    if (bestShotPacket.timestampUsec < 0)
     {
-        NX_WARNING(
-            this, "Invalid ObjectTrackBestShotPacket timestamp: %1", bestShotPacket.timestampUsec);
+        NX_WARNING(this,
+            "Invalid ObjectTrackBestShotPacket timestamp: %1, ignoring packet",
+            bestShotPacket.timestampUsec);
+
+        return;
     }
 
     bestShotPacket.durationUsec = 0;
@@ -186,7 +187,8 @@ void MetadataHandler::handleObjectTrackBestShotPacket(
     if (m_metadataSink)
         m_metadataSink->putData(nx::common::metadata::toMetadataPacket(bestShotPacket));
 
-	// TODO: #dmishin pass best shots to the metadata logger.
+    if (nx::analytics::loggingIni().isLoggingEnabled())
+        m_metadataLogger.pushObjectMetadata(bestShotPacket);
 }
 
 void MetadataHandler::handleEventMetadata(
@@ -195,7 +197,7 @@ void MetadataHandler::handleEventMetadata(
     auto eventState = nx::vms::api::EventState::undefined;
 
     const auto eventTypeId = eventMetadata->typeId();
-    NX_VERBOSE(this) << __func__ << lm("(): typeId %1").args(eventTypeId);
+    NX_VERBOSE(this, "%1(): typeId %2", __func__, eventTypeId);
 
     auto descriptor = eventTypeDescriptor(eventTypeId);
     if (!descriptor)
@@ -214,7 +216,7 @@ void MetadataHandler::handleEventMetadata(
 
         if (isDuplicate)
         {
-            NX_VERBOSE(this) << __func__ << "(): Ignoring duplicate event";
+            NX_VERBOSE(this, "%1(): Ignoring duplicate event", __func__);
             return;
         }
     }
@@ -227,12 +229,12 @@ void MetadataHandler::handleEventMetadata(
         eventState,
         eventMetadata->caption(),
         eventMetadata->description(),
-        eventMetadata->auxiliaryData(),
+        nx::vms::server::sdk_support::attributesMap(eventMetadata),
         timestampUsec);
 
     if (m_resource->captureEvent(sdkEvent))
     {
-        NX_VERBOSE(this) << __func__ << lm("(): Capturing event");
+        NX_VERBOSE(this, "%1(): Capturing event", __func__);
         return;
     }
 

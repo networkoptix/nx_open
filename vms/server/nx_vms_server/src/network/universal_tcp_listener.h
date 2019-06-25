@@ -23,7 +23,9 @@ class CloudConnectionManager;
 class QnUniversalTcpListener:
     public QnHttpConnectionListener
 {
+    using base_type = QnHttpConnectionListener;
 public:
+
     QnUniversalTcpListener(
         QnCommonModule* commonModule,
         const QHostAddress& address,
@@ -55,14 +57,13 @@ public:
 protected:
     virtual QnTCPConnectionProcessor* createRequestProcessor(
         std::unique_ptr<nx::network::AbstractStreamSocket> clientSocket) override;
-    virtual nx::network::AbstractStreamServerSocket* createAndPrepareSocket(
+    virtual std::unique_ptr<nx::network::AbstractStreamServerSocket> createAndPrepareSocket(
         bool sslNeeded,
         const nx::network::SocketAddress& localAddress) override;
-    virtual void destroyServerSocket(nx::network::AbstractStreamServerSocket* serverSocket) override;
+    virtual void destroyServerSocket() override;
 private:
     std::unique_ptr<nx::vms::server::Authenticator> m_authenticator;
     nx::network::MultipleServerSocket* m_multipleServerSocket = nullptr;
-    std::unique_ptr<nx::network::AbstractStreamServerSocket> m_serverSocket;
     QnMutex m_mutex;
     bool m_boundToCloud;
     nx::hpm::api::SystemCredentials m_cloudCredentials;

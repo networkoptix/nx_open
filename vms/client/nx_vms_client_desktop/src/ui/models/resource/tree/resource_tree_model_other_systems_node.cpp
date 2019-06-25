@@ -64,9 +64,9 @@ void QnResourceTreeModelOtherSystemsNode::deinitialize()
     base_type::deinitialize();
 }
 
-QIcon QnResourceTreeModelOtherSystemsNode::calculateIcon() const
+int QnResourceTreeModelOtherSystemsNode::calculateIconKey() const
 {
-    return qnResIconCache->icon(QnResourceIconCache::OtherSystems);
+    return QnResourceIconCache::OtherSystems;
 }
 
 void QnResourceTreeModelOtherSystemsNode::handleSystemDiscovered(const QnSystemDescriptionPtr& system)

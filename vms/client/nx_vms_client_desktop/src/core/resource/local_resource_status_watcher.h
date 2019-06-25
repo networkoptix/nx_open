@@ -1,5 +1,7 @@
 #pragma once
 
+#include <future>
+
 #include "core/resource_management/resource_searcher.h"
 #include <common/common_globals.h>
 

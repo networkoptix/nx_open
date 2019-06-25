@@ -34,11 +34,9 @@ class QnMediaServerConnection: public QnAbstractConnection
 public:
     QnMediaServerConnection(
         QnCommonModule* commonModule,
-        const QnMediaServerResourcePtr& mserver,
+        const QnMediaServerResourcePtr& server,
         const QnUuid& videowallGuid = QnUuid(),
         bool enableOfflineRequests = false);
-
-    virtual ~QnMediaServerConnection();
 
     int getTimePeriodsAsync(
         const QnVirtualCameraResourcePtr& camera,
@@ -97,157 +95,6 @@ public:
     int addCameraAsync(
         const QnManualResourceSearchList& cameras, const QString& username,
         const QString& password, QObject* target, const char* slot);
-
-    int ptzContinuousMoveAsync(
-        const QnNetworkResourcePtr& camera,
-        const nx::core::ptz::Vector& speed,
-        const nx::core::ptz::Options& options,
-        const QnUuid& sequenceId,
-        int sequenceNumber,
-        QObject* target,
-        const char* slot);
-
-    int ptzContinuousFocusAsync(
-        const QnNetworkResourcePtr& camera,
-        qreal speed,
-        const nx::core::ptz::Options& options,
-        QObject* target,
-        const char* slot);
-
-    int ptzAbsoluteMoveAsync(
-        const QnNetworkResourcePtr& camera,
-        Qn::PtzCoordinateSpace space,
-        const nx::core::ptz::Vector& position,
-        qreal speed,
-        const nx::core::ptz::Options& options,
-        const QnUuid& sequenceId,
-        int sequenceNumber,
-        QObject* target,
-        const char* slot);
-
-    int ptzViewportMoveAsync(
-        const QnNetworkResourcePtr& camera,
-        qreal aspectRatio,
-        const QRectF& viewport,
-        qreal speed,
-        const nx::core::ptz::Options& options,
-        const QnUuid& sequenceId,
-        int sequenceNumber,
-        QObject* target,
-        const char* slot);
-
-    int ptzRelativeMoveAsync(
-        const QnNetworkResourcePtr& camera,
-        const nx::core::ptz::Vector& direction,
-        const nx::core::ptz::Options& options,
-        const QnUuid& sequenceId,
-        int sequenceNumber,
-        QObject* target,
-        const char* slot);
-
-    int ptzRelativeFocusAsync(
-        const QnNetworkResourcePtr& camera,
-        qreal direction,
-        const nx::core::ptz::Options& options,
-        QObject* target,
-        const char* slot);
-
-    int ptzGetPositionAsync(
-        const QnNetworkResourcePtr& camera,
-        Qn::PtzCoordinateSpace space,
-        const nx::core::ptz::Options& options,
-        QObject* target,
-        const char* slot);
-
-    int ptzCreatePresetAsync(
-        const QnNetworkResourcePtr& camera,
-        const QnPtzPreset& preset,
-        QObject* target,
-        const char* slot);
-
-    int ptzUpdatePresetAsync(
-        const QnNetworkResourcePtr& camera,
-        const QnPtzPreset& preset,
-        QObject* target,
-        const char* slot);
-
-    int ptzRemovePresetAsync(
-        const QnNetworkResourcePtr& camera,
-        const QString& presetId,
-        QObject* target,
-        const char* slot);
-
-    int ptzActivatePresetAsync(
-        const QnNetworkResourcePtr& camera,
-        const QString& presetId,
-        qreal speed,
-        QObject* target,
-        const char* slot);
-
-    int ptzGetPresetsAsync(
-        const QnNetworkResourcePtr& camera,
-        QObject* target,
-        const char* slot);
-
-    int ptzCreateTourAsync(
-        const QnNetworkResourcePtr& camera,
-        const QnPtzTour& tour,
-        QObject* target,
-        const char* slot);
-
-    int ptzRemoveTourAsync(
-        const QnNetworkResourcePtr& camera,
-        const QString& tourId,
-        QObject* target,
-        const char* slot);
-
-    int ptzActivateTourAsync(
-        const QnNetworkResourcePtr& camera,
-        const QString& tourId,
-        QObject* target,
-        const char* slot);
-
-    int ptzGetToursAsync(
-        const QnNetworkResourcePtr& camera,
-        QObject* target,
-        const char* slot);
-
-    int ptzGetActiveObjectAsync(
-        const QnNetworkResourcePtr& camera,
-        QObject* target,
-        const char* slot);
-
-    int ptzUpdateHomeObjectAsync(
-        const QnNetworkResourcePtr& camera,
-        const QnPtzObject& homePosition,
-        QObject* target,
-        const char* slot);
-
-    int ptzGetHomeObjectAsync(
-        const QnNetworkResourcePtr& camera,
-        QObject* target,
-        const char* slot);
-
-    int ptzGetAuxiliaryTraitsAsync(
-        const QnNetworkResourcePtr& camera,
-        const nx::core::ptz::Options& options,
-        QObject* target,
-        const char* slot);
-
-    int ptzRunAuxiliaryCommandAsync(
-        const QnNetworkResourcePtr& camera,
-        const QnPtzAuxiliaryTrait& trait,
-        const QString& data,
-        const nx::core::ptz::Options& options,
-        QObject* target,
-        const char* slot);
-
-    int ptzGetDataAsync(
-        const QnNetworkResourcePtr& camera,
-        Qn::PtzDataFields query,
-        const nx::core::ptz::Options& options,
-        QObject* target,
-        const char* slot);
 
     /**
      * @param fastRequest Request information about existing storages only. Getting full info may
@@ -329,6 +176,7 @@ public:
         const QnGetBookmarkTagsRequestData& request, QObject* target, const char* slot);
 
 protected:
+    virtual nx::utils::Url url() const override;
     virtual QnAbstractReplyProcessor* newReplyProcessor(int object, const QString& serverId) override;
     virtual bool isReady() const override;
 
@@ -361,9 +209,7 @@ protected:
     void trace(int handle, int obj, const QString& message = QString());
 
 private:
-    void addOldVersionPtzParams(const QnNetworkResourcePtr& camera, QnRequestParamList& params);
-
-private:
+    QWeakPointer<QnMediaServerResource> m_server;
     nx::vms::api::SoftwareVersion m_serverVersion;
     QString m_serverId; // for debug purposes so storing in string to avoid conversions
     QString m_proxyAddr;

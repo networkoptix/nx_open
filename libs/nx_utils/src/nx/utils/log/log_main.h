@@ -52,7 +52,7 @@ public:
 
     std::pair<Level, bool /*isOnLimit*/> nextLevel()
     {
-        if (m_level > Level::warning)
+        if (m_level > Level::info)
             return {m_level, /*isOnLimit*/ false};
 
         const auto limit = (uint32_t) ini().logLevelReducerPassLimit;
@@ -211,7 +211,6 @@ private:
  * Deprecated usage:
  *     NX_ERROR(this) << "Unexpected value" << value;
  */
-#define NX_ALWAYS(...) NX_UTILS_LOG(nx::utils::log::Level::always, __VA_ARGS__)
 #define NX_ERROR(...) NX_UTILS_LOG(nx::utils::log::Level::error, __VA_ARGS__)
 #define NX_WARNING(...) NX_UTILS_LOG(nx::utils::log::Level::warning, __VA_ARGS__)
 #define NX_INFO(...) NX_UTILS_LOG(nx::utils::log::Level::info, __VA_ARGS__)

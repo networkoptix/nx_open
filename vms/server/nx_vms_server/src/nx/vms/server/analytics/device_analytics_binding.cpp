@@ -228,7 +228,7 @@ void DeviceAnalyticsBinding::setSettings(const QVariantMap& settings)
 bool DeviceAnalyticsBinding::setSettingsInternal(const QVariantMap& settingsFromUser)
 {
     Ptr<IStringMap> effectiveSettings;
-    if (pluginsIni().analyticsDeviceAgentSettingsPath[0] != '\0')
+    if (pluginsIni().analyticsSettingsSubstitutePath[0] != '\0')
     {
         NX_WARNING(this, "Trying to load settings for the DeviceAgent from the file. "
             "Device: %1 (%2), Engine: %3 (%4)",
@@ -237,7 +237,8 @@ bool DeviceAnalyticsBinding::setSettingsInternal(const QVariantMap& settingsFrom
             m_engine->getName(),
             m_engine->getId());
 
-        effectiveSettings = debug_helpers::loadDeviceAgentSettingsFromFile(m_device, m_engine);
+        effectiveSettings = debug_helpers::loadDeviceAgentSettingsFromFile(
+            m_device, m_engine, pluginsIni().analyticsSettingsSubstitutePath);
     }
 
     if (!effectiveSettings)
@@ -362,12 +363,12 @@ Ptr<DeviceAnalyticsBinding::DeviceAgent> DeviceAnalyticsBinding::createDeviceAge
     return deviceAgent;
 }
 
-std::unique_ptr<DeviceAgentHandler> DeviceAnalyticsBinding::createHandler()
+nx::sdk::Ptr<DeviceAgentHandler> DeviceAnalyticsBinding::createHandler()
 {
     if (!NX_ASSERT(m_engine, "No analytics engine is set"))
         return nullptr;
 
-    auto handler = std::make_unique<DeviceAgentHandler>(
+    auto handler = nx::sdk::makePtr<DeviceAgentHandler>(
         serverModule(), m_engine->getId(), m_device);
     handler->setMetadataSink(m_metadataSink.get());
 
@@ -476,7 +477,7 @@ std::unique_ptr<sdk_support::AbstractManifestLogger> DeviceAnalyticsBinding::mak
         "and engine {:engine}: {:error}").arg(manifestType);
 
     return std::make_unique<sdk_support::ManifestLogger>(
-        typeid(this), //< Using the same tag for all instances.
+        typeid(*this), //< Using the same tag for all instances.
         messageTemplate,
         m_device,
         m_engine);

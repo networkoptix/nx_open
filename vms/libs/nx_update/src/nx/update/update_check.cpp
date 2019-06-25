@@ -133,7 +133,7 @@ static InformationError parsePackages(
     for (const auto& p: packages)
     {
         Package newPackage = p;
-        newPackage.file = "updates/" + publicationKey + '/' + p.file;
+        newPackage.file = updateFilePathForDownloader(publicationKey, p.file);
         newPackage.url = baseUpdateUrl + "/" + p.file;
         result->packages.append(newPackage);
     }
@@ -210,7 +210,7 @@ static InformationError parseLegacyPackages(
     for (const auto& p: packages)
     {
         Package newPackage = p;
-        newPackage.file = "updates/" + publicationKey + '/' + p.file;
+        newPackage.file = updateFilePathForDownloader(publicationKey, p.file);
         newPackage.url = baseUpdateUrl + "/" + p.file;
         result->packages.append(newPackage);
     }
@@ -663,7 +663,22 @@ std::future<UpdateContents> checkSpecificChangeset(
                     });
             }
             return result;
-        });
+    });
+}
+
+QString rootUpdatesDirectoryForDownloader()
+{
+    return QStringLiteral("updates/");
+}
+
+QString updatesDirectoryForDownloader(const QString& publicationKey)
+{
+    return rootUpdatesDirectoryForDownloader() + publicationKey + L'/';
+}
+
+QString updateFilePathForDownloader(const QString& publicationKey, const QString& fileName)
+{
+    return updatesDirectoryForDownloader(publicationKey) + fileName;
 }
 
 } // namespace nx::update

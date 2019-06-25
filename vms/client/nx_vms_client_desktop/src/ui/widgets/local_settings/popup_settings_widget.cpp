@@ -1,6 +1,8 @@
 #include "popup_settings_widget.h"
 #include "ui_popup_settings_widget.h"
 
+#include <QtCore/QScopedValueRollback>
+
 #include <client/client_settings.h>
 
 #include <core/resource/resource.h>

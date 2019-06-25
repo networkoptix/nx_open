@@ -5,6 +5,23 @@ Config.helpLinks.push({
     target: "new" // new|frame
 });
 
+Config.helpLinks.push({
+    urls: [
+        {
+            url: "https://apps.apple.com/us/app/piko-vms/id1458431603",
+            button: "iOS Client",
+            class:'appstore'
+        },
+        {
+			url: "https://play.google.com/store/apps/details?id=com.pikovms.piko",
+			title: "Android Client",
+			target: "new" // new|frame
+        }
+    ],
+    title: "Mobile Apps",
+    target: "new" // new|frame
+});
+
 Config.allowDebugMode = false;
 //Config.webclientEnabled = false; // Uncomment this string to disable web client
 Config.productName = 'Piko';

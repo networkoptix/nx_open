@@ -47,6 +47,7 @@ shared_vms_components = [
     'shared_icu_libraries',
     'shared_ucrt_libraries',
     'shared_vcrt_libraries',
+    'shared_external_resources',
     'vox',
     'MyExitDialog',
     'UpgradeDlg',

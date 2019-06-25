@@ -138,6 +138,7 @@ void QnSearchTask::start()
         nx::utils::Url url(m_url);
         url.setUserInfo(QString());
 
+        NX_VERBOSE(this, lm("Starting camera manual search: [%1]").arg(checker->manufacturer()));
         auto seqResults = checker->checkHostAddr(url, authenticator, true);
         NX_VERBOSE(this, "Got %1 resources from searcher %2", seqResults.size(), checker);
 

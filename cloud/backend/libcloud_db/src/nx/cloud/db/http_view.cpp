@@ -73,7 +73,7 @@ void HttpView::bind()
     const auto& httpAddrToListenList = m_settings.endpointsToListen();
     if (httpAddrToListenList.empty())
     {
-        NX_ALWAYS(this, "No HTTP address to listen");
+        NX_ERROR(this, "No HTTP address to listen");
         throw std::runtime_error("No HTTP address to listen");
     }
 
@@ -86,7 +86,7 @@ void HttpView::listen()
     if (!m_multiAddressHttpServer.listen(m_settings.http().tcpBacklogSize))
         throw std::system_error(SystemError::getLastOSErrorCode(), std::system_category());
 
-    NX_ALWAYS(this, "HTTP server is listening on %1",
+    NX_INFO(this, "HTTP server is listening on %1",
         containerString(m_multiAddressHttpServer.endpoints()));
 }
 

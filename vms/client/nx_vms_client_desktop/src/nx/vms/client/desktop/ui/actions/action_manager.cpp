@@ -1,6 +1,7 @@
 #include "action_manager.h"
 
 #include <QtCore/QEvent>
+#include <QtCore/QScopedValueRollback>
 
 #include <QtWidgets/QAction>
 #include <QtWidgets/QMenu>

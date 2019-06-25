@@ -1,3 +1,5 @@
+## Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+
 cmake_minimum_required(VERSION 3.3.2)
 project(stub_analytics_plugin)
 
@@ -9,7 +11,7 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 set(CMAKE_SKIP_BUILD_RPATH ON)
 set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
-set(CMAKE_INSTALL_RPATH "$ORIGIN:$ORIGIN/../lib")
+set(CMAKE_INSTALL_RPATH "$ORIGIN")
 
 enable_testing()
 

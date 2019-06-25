@@ -116,10 +116,8 @@ public:
         const QnResourcePtr& targetRes = QnResourcePtr());
     virtual ~QnAbstractConnection();
 
-    nx::utils::Url url() const;
-    void setUrl(const nx::utils::Url &url);
-
 protected:
+    virtual nx::utils::Url url() const = 0;
     virtual QnAbstractReplyProcessor *newReplyProcessor(int object, const QString& serverId) = 0;
 
     QnLexicalSerializer *serializer() const;
@@ -212,7 +210,6 @@ private:
     static bool connectProcessor(QnAbstractReplyProcessor *sender, const char *signal, QObject *receiver, const char *method, Qt::ConnectionType connectionType = Qt::AutoConnection);
 
 private:
-    nx::utils::Url m_url;
     QScopedPointer<QnLexicalSerializer> m_serializer;
     nx::network::http::HttpHeaders m_extraHeaders;
     QnRequestParamList m_extraQueryParameters;

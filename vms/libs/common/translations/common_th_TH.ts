@@ -111,11 +111,6 @@
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>ระบบคลาวด์มีเจ้าของแตกต่างกัน ไม่อนุญาตการรวม</translation>
     </message>
-    <message>
-      <source>Cloud systems have different owners. Merge is not allowed.</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Cloud systems have different owners. Merge is not allowed.</translation>
-    </message>
   </context>
   <context>
     <name>QObject</name>
@@ -1509,14 +1504,6 @@
       <translation>เปิดในหน้าต่างใหม่</translation>
     </message>
     <message>
-      <source>Plugin Event</source>
-      <translation>เหตุการณ์ปลั๊กอิน</translation>
-    </message>
-    <message>
-      <source>Unknown plugin event</source>
-      <translation>เหตุการณ์ปลั๊กอินที่ไม่รู้จัก</translation>
-    </message>
-    <message>
       <source>Failed to force using camera time, it lags too much, system time will be used</source>
       <translation>ล้มเหลวในการบังคับใช้เวลาของกล้องมันล่าช้ามากเกินไปเวลาของระบบจะถูกใช้</translation>
     </message>
@@ -1526,7 +1513,35 @@
     </message>
     <message>
       <source>Multiple %1 events have occurred</source>
-      <translation type="unfinished">Multiple %1 events have occurred</translation>
+      <translation>มีเหตุการณ์ %1 เหตุการณ์เกิดขึ้นหลายรายการ</translation>
+    </message>
+    <message>
+      <source>Multicast address conflict detected. Address %1 is already in use by %2 on %3 stream</source>
+      <translation type="unfinished">Multicast address conflict detected. Address %1 is already in use by %2 on %3 stream</translation>
+    </message>
+    <message>
+      <source>Network address %1 is not a multicast address</source>
+      <translation type="unfinished">Network address %1 is not a multicast address</translation>
+    </message>
+    <message>
+      <source>Analytics storage &quot;%1&quot; is offline.</source>
+      <translation type="unfinished">Analytics storage &quot;%1&quot; is offline.</translation>
+    </message>
+    <message>
+      <source>Analytics storage &quot;%1&quot; is almost full.</source>
+      <translation type="unfinished">Analytics storage &quot;%1&quot; is almost full.</translation>
+    </message>
+    <message>
+      <source>Plugin Diagnostic Event</source>
+      <translation type="unfinished">Plugin Diagnostic Event</translation>
+    </message>
+    <message>
+      <source>Unknown Plugin Diagnostic Event</source>
+      <translation type="unfinished">Unknown Plugin Diagnostic Event</translation>
+    </message>
+    <message>
+      <source>RAID error. %1.</source>
+      <translation type="unfinished">RAID error. %1.</translation>
     </message>
   </context>
   <context>

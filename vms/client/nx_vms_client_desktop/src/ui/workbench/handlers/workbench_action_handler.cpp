@@ -22,6 +22,7 @@
 #include <api/network_proxy_factory.h>
 #include <api/global_settings.h>
 #include <api/server_rest_connection.h>
+#include <api/media_server_connection.h>
 
 #include <nx/vms/event/action_parameters.h>
 
@@ -70,7 +71,7 @@
 #include <nx/vms/client/desktop/ui/messages/videowall_messages.h>
 #include <nx/vms/client/desktop/ui/messages/local_files_messages.h>
 #include <nx/vms/client/desktop/resource_views/functional_delegate_utilities.h>
-#include <nx/vms/client/desktop/resource_views/data/node_type.h>
+#include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 
 #include <nx/network/http/http_types.h>
 #include <nx/network/socket_global.h>
@@ -530,7 +531,6 @@ void ActionHandler::openResourcesInNewWindow(const QnResourceList &resources)
 void ActionHandler::openNewWindow(const QStringList &args) {
     QStringList arguments = args;
     arguments << lit("--no-single-application");
-    arguments << lit("--no-version-mismatch-check");
 
     if (context()->user())
     {
@@ -544,9 +544,6 @@ void ActionHandler::openNewWindow(const QStringList &args) {
         int screen = context()->instance<QnScreenManager>()->nextFreeScreen();
         arguments << QnStartupParameters::kScreenKey << QString::number(screen);
     }
-
-    if (qnRuntime->isDevMode())
-        arguments << lit("--dev-mode-key=razrazraz");
 
 #ifdef Q_OS_MACX
     mac_startDetached(qApp->applicationFilePath(), arguments);
@@ -2054,7 +2051,7 @@ bool ActionHandler::validateResourceName(const QnResourcePtr& resource, const QS
 
 void ActionHandler::at_renameAction_triggered()
 {
-    using NodeType = ResourceTreeNodeType;
+    using NodeType = ResourceTree::NodeType;
 
     const auto parameters = menu()->currentParameters(sender());
 
@@ -2563,17 +2560,21 @@ void ActionHandler::confirmAnalyticsStorageLocation()
         if (server->metadataStorageId().isNull()
             && nx::analytics::hasActiveObjectEngines(commonModule(), server->getId()))
         {
+            const auto name = server->getName();
             QnMessageBox msgBox(
                 QnMessageBoxIcon::Warning,
-                tr("Confirm storage location to store analytics data"),
+                tr("Confirm storage location to store analytics data on '%1'").arg(name),
                 tr("Analytics database should be stored on a local storage"
                     " and can occupy up to hundred gigabytes."
-                    "\n\n"
+                    "\n"
                     "Once location to store analytics data is selected,"
                     " it cannot be easily changed without loosing exitsing data. "
                     "We recommed to choose location carefully and not to use"
                     " system partition to avoid severe system malfunction."
-                    "\n\n"
+                    "\n"
+                    "By default analytics data will be stored"
+                    " in mediaserver's installation directory."
+                    "\n"
                     "You can change storage location in the \"Storage Management\""
                     " tab in the Server Settings dialog."
                 ),
@@ -2605,14 +2606,14 @@ void ActionHandler::at_queueAppRestartAction_triggered()
 
     auto tryToRestartClient = [this]
         {
-            using namespace applauncher::api;
+            using namespace nx::vms::applauncher::api;
 
             /* Try to run applauncher if it is not running. */
             if (!checkOnline())
                 return false;
 
             const auto result = restartClient();
-            if (result == ResultType::Value::ok)
+            if (result == ResultType::ok)
                 return true;
 
             static const int kMaxTries = 5;
@@ -2721,7 +2722,7 @@ void ActionHandler::at_nonceReceived(QnAsyncHttpClientReply *reply)
         targetUrl = qnClientModule->networkProxyFactory()->urlToResource(targetUrl, request.server);
 
         auto gateway = nx::cloud::gateway::VmsGatewayEmbeddable::instance();
-        targetUrl = nx::utils::Url(lit("http://%1/%2:%3:%4%5?%6")
+        targetUrl = nx::utils::Url(lit("https://%1/%2:%3:%4%5?%6")
             .arg(gateway->endpoint().toString()).arg(targetUrl.scheme())
             .arg(targetUrl.host()).arg(targetUrl.port())
             .arg(targetUrl.path()).arg(targetUrl.query()));

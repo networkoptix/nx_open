@@ -6,11 +6,12 @@
 #include <nx/utils/uuid.h>
 
 namespace nx::vms_server_plugins::analytics::axis {
+
 namespace {
 
 using namespace nx::vms_server_plugins::analytics::axis;
 
-QString ignoreNamespace(const QString& tag)
+static QString withoutNamespace(const QString& tag)
 {
     // "ns:tag" -> "tag"
     // "tag" -> "tag"
@@ -18,7 +19,7 @@ QString ignoreNamespace(const QString& tag)
     return parts.back();
 }
 
-QString ignoreNamespaces(const QString& tags)
+static QString withoutNamespaces(const QString& tags)
 {
     // "ns1:tag1/ns2:tag2.tag3" -> "tag1/tag2/tag3"
     // "tag1/ns2:tag2" -> "tag1/tag2"
@@ -26,7 +27,7 @@ QString ignoreNamespaces(const QString& tags)
     QStringList shortParts;
     for (const auto& part: fullParts)
     {
-        shortParts << ignoreNamespace(part);
+        shortParts << withoutNamespace(part);
     }
     return shortParts.join('/');
 }
@@ -39,13 +40,13 @@ EventType::EventType(const nx::axis::SupportedEventType& supportedEventType)
     if (name.simplified().isEmpty())
     {
         name = supportedEventType.fullName().c_str();
-        name = ignoreNamespaces(name);
+        name = withoutNamespaces(name);
     }
 
-    id = supportedEventType.fullName().c_str();
-    id = ignoreNamespaces(id);
-    id.replace(QChar('/'), QChar('-'));
-    id = QString("nx.axis.") + id;
+    const QString eventFullNameWithoutNamespaces =
+        withoutNamespaces(QString::fromStdString(supportedEventType.fullName()));
+
+    id = "nx.axis." + QnUuid::fromArbitraryData(eventFullNameWithoutNamespaces).toString();
 
     flags = (supportedEventType.stateful)
         ? nx::vms::api::analytics::EventTypeFlag::stateDependent

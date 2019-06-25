@@ -44,30 +44,6 @@ function(nx_add_target name type)
         list(INSERT resources 0 "${CMAKE_CURRENT_SOURCE_DIR}/static-resources")
     endif()
 
-    if(IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/translations")
-        file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/qm/translations")
-        file(GLOB ts_files "${CMAKE_CURRENT_SOURCE_DIR}/translations/*.ts")
-
-        set_source_files_properties(${ts_files}
-            PROPERTIES OUTPUT_LOCATION "${CMAKE_CURRENT_BINARY_DIR}/qm/translations")
-
-        qt5_add_translation(qm_files ${ts_files})
-
-        set(needed_qm_files)
-        foreach(qm_file ${qm_files})
-            foreach(lang ${translations})
-                if(qm_file MATCHES "${lang}\\.qm$")
-                    list(APPEND needed_qm_files ${qm_file})
-                    break()
-                endif()
-            endforeach()
-        endforeach()
-
-        list(APPEND resources ${needed_qm_files})
-        set_source_files_properties(${needed_qm_files}
-            PROPERTIES RESOURCE_BASE_DIR "${CMAKE_CURRENT_BINARY_DIR}/qm")
-    endif()
-
     if(resources)
         nx_generate_qrc(
             ${CMAKE_CURRENT_BINARY_DIR}/${name}.qrc
@@ -183,6 +159,41 @@ function(nx_add_target name type)
     if(NX_PRIVATE_LIBS)
         target_link_libraries(${name} PRIVATE ${NX_PRIVATE_LIBS})
     endif()
+
+    if(IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/translations")
+        set(translations_target ${name}_translations)
+
+        file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/qm/translations")
+        file(GLOB ts_files "${CMAKE_CURRENT_SOURCE_DIR}/translations/*.ts")
+
+        set_source_files_properties(${ts_files}
+            PROPERTIES OUTPUT_LOCATION "${CMAKE_CURRENT_BINARY_DIR}/qm/translations")
+
+        qt5_add_translation(qm_files ${ts_files})
+
+        set(needed_qm_files)
+        foreach(qm_file ${qm_files})
+            foreach(lang ${translations})
+                if(qm_file MATCHES "${lang}\\.qm$")
+                    list(APPEND needed_qm_files ${qm_file})
+                    break()
+                endif()
+            endforeach()
+        endforeach()
+
+        #list(APPEND resources ${needed_qm_files})
+        set_source_files_properties(${needed_qm_files}
+            PROPERTIES RESOURCE_BASE_DIR "${CMAKE_CURRENT_BINARY_DIR}/qm")
+
+        nx_add_external_resources_target(${translations_target}
+            ${needed_qm_files}
+         OUTPUT
+            ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${translations_target}.dat
+        )
+
+        add_dependencies(${name} ${translations_target})
+    endif()
+
 endfunction()
 
 function(nx_exclude_sources_from_target target pattern)

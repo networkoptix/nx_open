@@ -2,6 +2,7 @@
 
 #include <future>
 #include <set>
+#include <map>
 
 #include <QtCore/QCoreApplication>
 #include <QtCore/QDir>
@@ -47,6 +48,9 @@ struct ClientVerificationData
     /** Peer id for a client. Verification will ignore client if clientId is null. */
     QnUuid clientId;
 
+    /** Client needs this update for compatibility mode. */
+    bool compatibilityMode = false;
+
     /** Fills in systemInfo and currentVersion. */
     void fillDefault();
 };
@@ -65,7 +69,7 @@ struct ClientVerificationData
 NX_VMS_CLIENT_DESKTOP_API bool verifyUpdateContents(
     QnCommonModule* commonModule,
     nx::update::UpdateContents& contents,
-    std::map<QnUuid, QnMediaServerResourcePtr> servers,
+    const std::map<QnUuid, QnMediaServerResourcePtr>& servers,
     const ClientVerificationData& clientData);
 
 } // namespace nx::vms::client::desktop

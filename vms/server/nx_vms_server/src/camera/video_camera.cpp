@@ -44,7 +44,7 @@ static const int CAMERA_PULLING_STOP_TIMEOUT = 1000 * 3;
 
 static QString mediaQualityToStreamName(MediaQuality mediaQuality)
 {
-    switch(mediaQuality)
+    switch (mediaQuality)
     {
         case MEDIA_Quality_High: return "primary";
         case MEDIA_Quality_Low: return "secondary";
@@ -54,13 +54,15 @@ static QString mediaQualityToStreamName(MediaQuality mediaQuality)
 
 static milliseconds minimalLiveCacheSizeByQuality(MediaQuality mediaQuality)
 {
-    switch(mediaQuality)
+    switch (mediaQuality)
     {
         case MEDIA_Quality_High:
             return milliseconds(ini().liveStreamCacheForPrimaryStreamMinSizeMs);
         case MEDIA_Quality_Low:
             return milliseconds(ini().liveStreamCacheForSecondaryStreamMinSizeMs);
-        default: return milliseconds::zero();
+        default:
+            NX_ASSERT(false, lm("Unexpected media quality: %1").args(mediaQuality));
+            return milliseconds::zero();
     }
 }
 
@@ -234,6 +236,30 @@ QnLiveStreamProviderPtr VideoCamera::readerByQuality(MediaQuality streamQuality)
         return m_primaryReader;
 
     return QnLiveStreamProviderPtr();
+}
+
+void VideoCamera::resetCachesIfNeeded(MediaQuality streamQuality)
+{
+    if (!m_liveCache[streamQuality] || isSomeActivity())
+        return;
+
+    QnLiveStreamProviderPtr reader = readerByQuality(streamQuality);
+    if (!reader)
+        return;
+
+    auto& timer = m_liveCacheValidityTimers[streamQuality];
+    if (!timer.isValid())
+        timer.restart();
+
+    if (timer.hasExpired(minimalLiveCacheSizeByQuality(streamQuality)))
+    {
+        NX_INFO(this, "Resetting live cache for %1 stream",
+            mediaQualityToStreamName(streamQuality));
+
+        reader->removeDataProcessor(m_liveCache[streamQuality].get());
+        m_hlsLivePlaylistManager[streamQuality].reset();
+        m_liveCache[streamQuality].reset();
+    }
 }
 
 VideoCamera::ForceLiveCacheForPrimaryStream
@@ -432,41 +458,16 @@ void VideoCamera::stopIfNoActivity()
     if( (m_liveCache[MEDIA_Quality_High] || m_liveCache[MEDIA_Quality_Low])     //has live cache ever been started?
         &&
         (!m_liveCache[MEDIA_Quality_High] ||                                    //has hi quality live cache been started?
-            (m_hlsLivePlaylistManager[MEDIA_Quality_High] &&           //no one uses playlist
+            (m_hlsLivePlaylistManager[MEDIA_Quality_High].unique() &&           //no one uses playlist
              m_hlsLivePlaylistManager[MEDIA_Quality_High]->inactivityPeriod() > m_hiStreamHlsInactivityPeriodMS &&  //checking inactivity timer
              m_liveCache[MEDIA_Quality_High]->inactivityPeriod() > m_hiStreamHlsInactivityPeriodMS))
         &&
         (!m_liveCache[MEDIA_Quality_Low] ||
-            (m_hlsLivePlaylistManager[MEDIA_Quality_Low] &&
+            (m_hlsLivePlaylistManager[MEDIA_Quality_Low].unique() &&
              m_hlsLivePlaylistManager[MEDIA_Quality_Low]->inactivityPeriod() > m_loStreamHlsInactivityPeriodMS &&
              m_liveCache[MEDIA_Quality_Low]->inactivityPeriod() > m_loStreamHlsInactivityPeriodMS)) )
     {
         m_cameraUsers.remove(this);
-
-        auto resetCachesIfNeeded =
-            [this](MediaQuality streamQuality)
-            {
-                if (!m_liveCache[streamQuality] || isSomeActivity())
-                    return;
-
-                QnLiveStreamProviderPtr reader = readerByQuality(streamQuality);
-                if (!reader)
-                    return;
-
-                auto& timer = m_liveCacheValidityTimers[streamQuality];
-                if (!timer.isValid())
-                    timer.restart();
-
-                if (timer.hasExpired(minimalLiveCacheSizeByQuality(streamQuality)))
-                {
-                    NX_DEBUG(this, "Resetting live cache for %1 stream",
-                         mediaQualityToStreamName(streamQuality));
-
-                    reader->removeDataProcessor(m_liveCache[streamQuality].get());
-                    m_hlsLivePlaylistManager[streamQuality].reset();
-                    m_liveCache[streamQuality].reset();
-                }
-            };
 
         resetCachesIfNeeded(MediaQuality::MEDIA_Quality_Low);
         resetCachesIfNeeded(MediaQuality::MEDIA_Quality_High);

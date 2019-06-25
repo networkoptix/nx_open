@@ -1,14 +1,15 @@
 #include "system_non_client_area_remover_win.h"
-#include "gdi_win.h"
 
-#include <Windowsx.h>
+#include <Windows.h>
+#include <windowsx.h>
+#include "gdi_win.h"
 
 #include <array>
 
 #include <QtCore/QAbstractNativeEventFilter>
-#include <QtGui/QGuiApplication>
 #include <QtCore/QHash>
 #include <QtCore/QSet>
+#include <QtGui/QGuiApplication>
 #include <QtGui/private/qhighdpiscaling_p.h>
 #include <QtWidgets/QWidget>
 

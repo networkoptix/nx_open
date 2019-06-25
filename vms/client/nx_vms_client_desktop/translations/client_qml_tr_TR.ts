@@ -11,6 +11,10 @@
       <source>Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</source>
       <translation>Kamera analitikleri sadece kamera görüntülenirken çalışır. Sürekli çalışması için kaydı etkinleştirin.</translation>
     </message>
+    <message>
+      <source>This is the built-in functionality</source>
+      <translation>Bu gömülü bir işlevdir</translation>
+    </message>
   </context>
   <context>
     <name>EmptyTilesPlaceholder</name>
@@ -65,6 +69,17 @@
     </message>
   </context>
   <context>
+    <name>PluginsInformation</name>
+    <message>
+      <source>No plugins installed</source>
+      <translation>Yüklenen eklenti bulunmamaktadır</translation>
+    </message>
+    <message>
+      <source>Server is offline</source>
+      <translation>Sunucu Çevrimdışı</translation>
+    </message>
+  </context>
+  <context>
     <name>SystemTile</name>
     <message>
       <source>INCOMPATIBLE</source>
@@ -85,6 +100,14 @@
     <message>
       <source>New Server</source>
       <translation>Yeni Sunucu</translation>
+    </message>
+    <message>
+      <source>Edit</source>
+      <translation>Düzenle</translation>
+    </message>
+    <message>
+      <source>Hide</source>
+      <translation>Gizle</translation>
     </message>
   </context>
   <context>

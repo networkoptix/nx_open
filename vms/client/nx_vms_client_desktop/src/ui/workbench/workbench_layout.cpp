@@ -248,6 +248,11 @@ void QnWorkbenchLayout::notifyTitleChanged()
     emit titleChanged();
 }
 
+bool QnWorkbenchLayout::canAutoAdjustAspectRatio()
+{
+    return items().size() == 1 && !resource()->hasBackground() &&  !hasCellAspectRatio();
+}
+
 void QnWorkbenchLayout::addItem(QnWorkbenchItem* item)
 {
     NX_ASSERT(item && item->resource());

@@ -27,7 +27,6 @@ extern "C"
 #include <nx/utils/string.h>
 
 #include <network/tcp_connection_priv.h>
-#include <nx/network/rtsp/rtsp_types.h>
 #include <nx/streaming/abstract_archive_delegate.h>
 #include <camera/camera_pool.h>
 #include <recorder/recording_manager.h>
@@ -41,6 +40,7 @@ extern "C"
 #include <rtsp/rtsp_ffmpeg_encoder.h>
 #include <rtsp/rtp_universal_encoder.h>
 #include <rtsp/rtsp_utils.h>
+#include <rtsp/stream_params.h>
 #include <utils/common/synctime.h>
 #include <network/tcp_listener.h>
 #include <media_server/settings.h>
@@ -204,23 +204,12 @@ public:
         }
     }
 
-    void applyUrlParams(const nx::rtsp::UrlParams& params)
-    {
-        if (params.codec)
-            transcodeParams.codecId = params.codec.value();
-        if (params.resolution)
-            transcodeParams.resolution = params.resolution.value();
-        if (params.position)
-            startTime = params.position.value();
-        if (params.quality)
-            quality = params.quality.value();
-    }
-
     ~QnRtspConnectionProcessorPrivate()
     {
         deleteDP();
     }
 
+    nx::rtsp::StreamParams params;
     QnLiveStreamProviderPtr liveDpHi;
     QnLiveStreamProviderPtr liveDpLow;
     QSharedPointer<QnArchiveStreamReader> archiveDP;
@@ -349,24 +338,6 @@ bool QnRtspConnectionProcessor::parseRequestParams()
             std::chrono::duration_cast<std::chrono::seconds>(kDefaultRtspTimeout).count();
         d->socket->setRecvTimeout(d->sessionTimeOut * 1500);
     }
-    processRangeHeader();
-
-    QString resolutionStr = nx::network::http::getHeaderValue(d->request.headers, "x-resolution");
-    if (!resolutionStr.isEmpty())
-    {
-        auto resolution = nx::rtsp::parseResolution(resolutionStr);
-        if (!resolution.isValid())
-        {
-            d->response.messageBody = "Invalid resolution specified: ";
-            d->response.messageBody.append(resolutionStr);
-            return false;
-        }
-        d->transcodeParams.resolution = resolution;
-    }
-
-    QString qualityStr = nx::network::http::getHeaderValue(d->request.headers, "x-media-quality");
-    if (!qualityStr.isEmpty())
-        d->quality = QnLexical::deserialized<MediaQuality>(qualityStr, MEDIA_Quality_High);
 
     d->qualityFastSwitch = true;
     d->clientRequest.clear();
@@ -600,12 +571,9 @@ AbstractRtspEncoderPtr QnRtspConnectionProcessor::createRtpEncoder(
         rotation = res->getProperty(QnMediaResource::rotationKey()).toInt();
 
     QnUniversalRtpEncoder::Config config;
-    config.transcoderConfig.decoderConfig = DecoderConfig::fromResource(res);
     config.absoluteRtcpTimestamps = d->serverModule->settings().absoluteRtcpTimestamps();
     config.useRealTimeOptimization = d->serverModule->settings().ffmpegRealTimeOptimization();
-    QString require = nx::network::http::getHeaderValue(d->request.headers, "Require");
-    if (require.toLower().contains("onvif-replay"))
-        config.addOnvifHeaderExtension = true;
+    config.addOnvifHeaderExtension = d->params.onvifReplay();
     if (urlQuery.hasQueryItem("multiple_payload_types"))
         config.useMultipleSdpPayloadTypes = true;
 
@@ -780,7 +748,7 @@ nx::network::rtsp::StatusCodeValue QnRtspConnectionProcessor::composeDescribe()
             }
         }
         if (encoder == 0)
-            return nx::network::http::StatusCode::notFound;
+            return nx::network::http::StatusCode::unsupportedMediaType;
 
         sdp << encoder->getSdpMedia(i < numVideo, i);
         RtspServerTrackInfoPtr trackInfo(new RtspServerTrackInfo());
@@ -913,21 +881,6 @@ qint64 QnRtspConnectionProcessor::getRtspTime()
         return d->dataProcessor->getDisplayedTime();
     else
         return AV_NOPTS_VALUE;
-}
-
-void QnRtspConnectionProcessor::processRangeHeader()
-{
-    Q_D(QnRtspConnectionProcessor);
-    const auto rangeStr = nx::network::http::getHeaderValue(d->request.headers, "Range");
-    if (!rangeStr.isEmpty())
-    {
-        QnVirtualCameraResourcePtr cameraResource = qSharedPointerDynamicCast<QnVirtualCameraResource>(d->mediaRes);
-        if (!nx::network::rtsp::parseRangeHeader(rangeStr, &d->startTime, &d->endTime))
-            d->startTime = DATETIME_NOW;
-
-        if (rangeStr.startsWith("npt=") && d->startTime == 0)
-            d->startTime = DATETIME_NOW; //< VLC/ffmpeg sends position 0 as a default value. Interpret it as Live position.
-    }
 }
 
 void QnRtspConnectionProcessor::at_camera_resourceChanged(const QnResourcePtr & /*resource*/)
@@ -1111,7 +1064,8 @@ QnRtspFfmpegEncoder* QnRtspConnectionProcessor::createRtspFfmpegEncoder(bool isV
 {
     Q_D(const QnRtspConnectionProcessor);
 
-    QnRtspFfmpegEncoder* result = new QnRtspFfmpegEncoder(DecoderConfig::fromMediaResource(d->mediaRes), commonModule()->metrics());
+    QnRtspFfmpegEncoder* result = new QnRtspFfmpegEncoder(
+        DecoderConfig(), commonModule()->metrics());
     if (isVideo && !d->transcodeParams.empty())
         result->setDstResolution(d->transcodeParams.resolution, d->transcodeParams.codecId);
     return result;
@@ -1157,7 +1111,7 @@ void QnRtspConnectionProcessor::createPredefinedTracks(QnConstResourceVideoLayou
 
     RtspServerTrackInfoPtr aTrack(new RtspServerTrackInfo());
     aTrack->setEncoder(AbstractRtspEncoderPtr(new QnRtspFfmpegEncoder(
-        DecoderConfig::fromMediaResource(d->mediaRes),
+        DecoderConfig(),
         commonModule()->metrics())));
     aTrack->clientPort = trackNum*2;
     aTrack->clientRtcpPort = trackNum*2+1;
@@ -1404,8 +1358,6 @@ nx::network::rtsp::StatusCodeValue QnRtspConnectionProcessor::composeSetParamete
     if (!d->mediaRes)
         return nx::network::http::StatusCode::notFound;
 
-    createDataProvider();
-
     QList<QByteArray> parameters = d->requestBody.split('\n');
     for(const QByteArray& parameter: parameters)
     {
@@ -1416,6 +1368,8 @@ nx::network::rtsp::StatusCodeValue QnRtspConnectionProcessor::composeSetParamete
 
         if (normParam.startsWith("x-media-quality"))
         {
+            createDataProvider(); //< Ensure current unsent data are removed.
+
             QString q = vals[1].trimmed();
             d->quality = QnLexical::deserialized<MediaQuality>(q, MEDIA_Quality_High);
 
@@ -1457,7 +1411,8 @@ nx::network::rtsp::StatusCodeValue QnRtspConnectionProcessor::composeSetParamete
 
             if (d->archiveDP)
                 d->archiveDP->setStreamDataFilter(filter);
-            d->dataProcessor->setStreamDataFilter(filter);
+            if (d->dataProcessor)
+                d->dataProcessor->setStreamDataFilter(filter);
             return nx::network::http::StatusCode::ok;
         }
         else if (normParam.startsWith(Qn::RTSP_DATA_FILTER_HEADER_NAME))
@@ -1466,7 +1421,8 @@ nx::network::rtsp::StatusCodeValue QnRtspConnectionProcessor::composeSetParamete
             StreamDataFilters filter = QnLexical::deserialized<StreamDataFilters>(value);
             if (d->archiveDP)
                 d->archiveDP->setStreamDataFilter(filter);
-            d->dataProcessor->setStreamDataFilter(filter);
+            if (d->dataProcessor)
+                d->dataProcessor->setStreamDataFilter(filter);
             return nx::network::http::StatusCode::ok;
         }
     }
@@ -1495,32 +1451,6 @@ nx::network::rtsp::StatusCodeValue QnRtspConnectionProcessor::composeGetParamete
     }
 
     return nx::network::http::StatusCode::ok;
-}
-
-bool QnRtspConnectionProcessor::applyUrlParams()
-{
-    Q_D(QnRtspConnectionProcessor);
-
-    nx::rtsp::UrlParams params;
-    if (!params.parse(QUrlQuery(d->request.requestLine.url.query())))
-    {
-        d->errorMessage = params.getParseError();
-        return false;
-    }
-    d->applyUrlParams(params);
-
-    // Set codec if resolution confugired
-    if (d->transcodeParams.resolution.isValid() && d->transcodeParams.codecId == AV_CODEC_ID_NONE)
-    {
-        QString defaultCodec = commonModule()->globalSettings()->defaultVideoCodec();
-        d->transcodeParams.codecId = findVideoEncoder(defaultCodec);
-        if (d->transcodeParams.codecId == AV_CODEC_ID_NONE)
-        {
-            d->errorMessage = QString("Default video codec not found: [%1]").arg(defaultCodec);
-            return false;
-        }
-    }
-    return true;
 }
 
 bool QnRtspConnectionProcessor::processRequest()
@@ -1553,17 +1483,20 @@ bool QnRtspConnectionProcessor::processRequest()
         d->dataProcessor->pauseNetwork();
 
     QString method = d->request.requestLine.method;
-    if (method == "DESCRIBE" || (method == "PLAY" && d->useProprietaryFormat))
+    if (!d->params.parseRequest(d->request, commonModule()->globalSettings()->defaultVideoCodec()))
     {
-        if (!applyUrlParams())
-        {
-            NX_DEBUG(this, "Request parsing failed: [%1], [%2]",
-                d->request.requestLine.toString().trimmed(), d->errorMessage);
-            d->response.messageBody = d->errorMessage.toUtf8();
-            sendResponse(nx::network::http::StatusCode::badRequest, QByteArray());
-            return false;
-        }
+        NX_DEBUG(this, "Request parsing failed: [%1], [%2]",
+            d->request.requestLine.toString().trimmed(), d->params.getParseError());
+        d->response.messageBody = d->params.getParseError().toUtf8();
+        sendResponse(nx::network::http::StatusCode::badRequest, QByteArray());
     }
+    d->transcodeParams.codecId = d->params.videoCodec();
+    if (d->transcodeParams.codecId == AV_CODEC_ID_H263)
+        d->transcodeParams.codecId = AV_CODEC_ID_H263P; //< force using h263p codec
+    d->transcodeParams.resolution = d->params.resolution();
+    d->quality = d->params.quality();
+    d->startTime = d->params.position();
+    d->endTime = d->params.endPosition();
 
     if (method != "OPTIONS" && d->sessionId.isEmpty())
         generateSessionId();

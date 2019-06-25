@@ -1,5 +1,7 @@
 #include "applauncher_utils.h"
 
+#include <thread>
+
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QDesktopWidget>
 
@@ -13,23 +15,22 @@
 
 #include <nx/utils/log/log.h>
 
-namespace applauncher {
-namespace api {
+namespace nx::vms::applauncher::api {
 
 namespace {
 
-} // namespace
-
 static const int kZipInstallationTimeoutMs = 30000;
 
-ResultType::Value isVersionInstalled(
+} // namespace
+
+ResultType isVersionInstalled(
     const nx::utils::SoftwareVersion& version,
     bool* const installed)
 {
     IsVersionInstalledRequest request;
     request.version = version;
     IsVersionInstalledResponse response;
-    ResultType::Value result = sendCommandToApplauncher(request, &response);
+    ResultType result = sendCommandToApplauncher(request, &response);
     if (result != ResultType::ok)
         return result;
     if (response.result != ResultType::ok)
@@ -38,7 +39,7 @@ ResultType::Value isVersionInstalled(
     return ResultType::ok;
 }
 
-ResultType::Value restartClient(
+ResultType restartClient(
     nx::utils::SoftwareVersion version,
     const QString& auth)
 {
@@ -54,13 +55,13 @@ ResultType::Value restartClient(
 
     Response response;
 
-    const ResultType::Value result = sendCommandToApplauncher(
+    const ResultType result = sendCommandToApplauncher(
         StartApplicationTask(version, arguments),
         &response);
     return result != ResultType::ok ? result : response.result;
 }
 
-ResultType::Value installZip(
+ResultType installZip(
     const nx::utils::SoftwareVersion& version,
     const QString& zipFileName)
 {
@@ -76,23 +77,58 @@ ResultType::Value installZip(
     return response.result;
 }
 
-ResultType::Value scheduleProcessKill(qint64 processID, quint32 timeoutMillis)
+ResultType installZipAsync(
+    const nx::utils::SoftwareVersion& version,
+    const QString& zipFileName)
 {
-    AddProcessKillTimerRequest request;
-    request.processID = processID;
-    request.timeoutMillis = timeoutMillis;
-    AddProcessKillTimerResponse response;
-    ResultType::Value result = sendCommandToApplauncher(request, &response);
-    if (result != ResultType::ok)
-        return result;
-    return response.result;
+    InstallZipTaskAsync request;
+    request.version = version;
+    request.zipFileName = zipFileName;
+    Response response;
+
+    ResultType result = ResultType::otherError;
+    static const int kMaxTries = 5;
+
+    int retries = 0;
+    for (; retries < kMaxTries; retries++)
+    {
+        result = sendCommandToApplauncher(request, &response);
+        if (result == ResultType::ok)
+            result = response.result;
+
+        switch (result)
+        {
+            case ResultType::alreadyInstalled:
+            case ResultType::otherError:
+            case ResultType::versionNotInstalled:
+            case ResultType::invalidVersionFormat:
+            case ResultType::notEnoughSpace:
+            case ResultType::notFound:
+            case ResultType::busy:
+            case ResultType::ok:
+                return result;
+            case ResultType::connectError:
+            case ResultType::ioError:
+            default:
+                break;
+        }
+
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+    }
+
+    if (retries == kMaxTries && result != ResultType::ok)
+        NX_ERROR(NX_SCOPE_TAG, "installZipAsync got error %1 after %2 retries", result, retries);
+
+    return result;
 }
 
-ResultType::Value quitApplauncher()
+ResultType checkInstallationProgress(InstallationProgress& progress)
 {
-    QuitTask task;
-    Response response;
-    ResultType::Value result = sendCommandToApplauncher(task, &response);
+    InstallZipCheckStatus request;
+    InstallZipCheckStatusResponse response;
+    const auto result = sendCommandToApplauncher(request, &response);
+    progress.total = response.total;
+    progress.extracted = response.extracted;
     if (result != ResultType::ok)
         return result;
     if (response.result != ResultType::ok)
@@ -100,11 +136,35 @@ ResultType::Value quitApplauncher()
     return response.result;
 }
 
-ResultType::Value getInstalledVersions(QList<nx::utils::SoftwareVersion>* versions)
+ResultType scheduleProcessKill(qint64 processId, quint32 timeoutMillis)
+{
+    AddProcessKillTimerRequest request;
+    request.processId = processId;
+    request.timeoutMillis = timeoutMillis;
+    AddProcessKillTimerResponse response;
+    ResultType result = sendCommandToApplauncher(request, &response);
+    if (result != ResultType::ok)
+        return result;
+    return response.result;
+}
+
+ResultType quitApplauncher()
+{
+    QuitTask task;
+    Response response;
+    ResultType result = sendCommandToApplauncher(task, &response);
+    if (result != ResultType::ok)
+        return result;
+    if (response.result != ResultType::ok)
+        return response.result;
+    return response.result;
+}
+
+ResultType getInstalledVersions(QList<nx::utils::SoftwareVersion>* versions)
 {
     GetInstalledVersionsRequest request;
     GetInstalledVersionsResponse response;
-    ResultType::Value result = sendCommandToApplauncher(request, &response);
+    ResultType result = sendCommandToApplauncher(request, &response);
     if (result != ResultType::ok)
         return result;
 
@@ -127,5 +187,4 @@ bool checkOnline(bool runWhenOffline)
         && nx::vms::client::SelfUpdater::runMinilaucher());
 }
 
-} // namespace api
-} // namespace applauncher
+} // namespace nx::vms::applauncher::api

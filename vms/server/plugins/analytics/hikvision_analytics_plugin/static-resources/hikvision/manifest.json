@@ -67,7 +67,7 @@
             "flags": "stateDependent"
         },
         {
-            "id": "nx.hikvision.LineDetect,linedetection",
+            "id": "nx.hikvision.LineDetect",
             "name": "Virtual line crossing",
             "internalName": "LineDetect,linedetection",
             "description": "Virtual line #%1 was crossed",
@@ -100,7 +100,7 @@
             "flags": "stateDependent"
         },
         {
-            "id": "nx.hikvision.Tamper,shelteralarm",
+            "id": "nx.hikvision.Tamper",
             "name": "Tampering detection",
             "internalName": "Tamper,shelteralarm",
             "description": "Tampering %1",
@@ -118,7 +118,7 @@
             "flags": "stateDependent"
         },
         {
-            "id": "nx.hikvision.Motion,VMD",
+            "id": "nx.hikvision.Motion",
             "name": "Motion detection",
             "internalName": "Motion,VMD",
             "description": "Motion %1%2",
@@ -167,7 +167,7 @@
             "internalName": "BlackList",
             "description": "Black list",
             "dependedEvent": "lpr,otherlist",
-            "groupId": "{E5500F45-39AA-4A31-868C-33B5E1E880C3}"
+            "groupId": "nx.hikvision.LPR"
         },
         {
             "id": "nx.hikvision.WhiteList",
@@ -175,7 +175,7 @@
             "internalName": "WhiteList",
             "description": "White list",
             "dependedEvent": "lpr,otherlist",
-            "groupId": "{E5500F45-39AA-4A31-868C-33B5E1E880C3}"
+            "groupId": "nx.hikvision.LPR"
         },
         {
             "id": "nx.hikvision.otherlist",
@@ -183,7 +183,7 @@
             "internalName": "otherlist",
             "description": "Other list",
             "dependedEvent": "lpr",
-            "groupId": "{E5500F45-39AA-4A31-868C-33B5E1E880C3}"
+            "groupId": "nx.hikvision.LPR"
         },
         {
             "id": "nx.hikvision.Vehicle",
@@ -195,7 +195,7 @@
     ],
     "groups": [
         {
-            "id": "{E5500F45-39AA-4A31-868C-33B5E1E880C3}",
+            "id": "nx.hikvision.LPR",
             "name": "LPR"
         }
     ]

@@ -33,8 +33,8 @@ bool QnAbstractYv12ToRgbShaderProgram::link()
 
 // ============================= QnYv12ToRgbShaderProgram ==================
 
-QnYv12ToRgbShaderProgram::QnYv12ToRgbShaderProgram(QObject *parent): 
-    QnAbstractYv12ToRgbShaderProgram(parent) 
+QnYv12ToRgbShaderProgram::QnYv12ToRgbShaderProgram(QObject *parent):
+    QnAbstractYv12ToRgbShaderProgram(parent)
 {
 
     QByteArray shader(QN_SHADER_SOURCE(
@@ -50,7 +50,7 @@ QnYv12ToRgbShaderProgram::QnYv12ToRgbShaderProgram(QObject *parent):
         1.0,  1.772,  0.0,   -0.886,
         0.0,  0.0,    0.0,    opacity);
 
-    void main() 
+    void main()
     {
         // do color transformation yuv->RGB
         gl_FragColor = vec4(texture2D(yTexture, vTexCoord).p,
@@ -81,7 +81,7 @@ bool QnYv12ToRgbWithGammaShaderProgram::link()
     return rez;
 }
 
-QnYv12ToRgbWithGammaShaderProgram::QnYv12ToRgbWithGammaShaderProgram(QObject *parent, bool final): 
+QnYv12ToRgbWithGammaShaderProgram::QnYv12ToRgbWithGammaShaderProgram(QObject *parent, bool final):
     QnAbstractYv12ToRgbShaderProgram(parent),
     m_gammaStr(lit("y"))
 {
@@ -164,11 +164,11 @@ QString QnFisheyeRectilinearProgram::getShaderText()
     float kx =  2.0*tan(dstFov/2.0);
 
     // avoid function call for better shader compatibility
-    vec3 xVect  = vec3(sin(xShift + PI/2.0), cos(xShift + PI/2.0), 0.0) * kx; 
+    vec3 xVect  = vec3(sin(xShift + PI/2.0), cos(xShift + PI/2.0), 0.0) * kx;
     vec3 yVect  = vec3(cos(-yShift + PI/2.0) * sin(xShift), cos(-yShift + PI/2.0)*cos(xShift), sin(-yShift + PI/2.0)) * kx / xStretch;
     vec3 center = vec3(cos(-yShift) * sin(xShift), cos(-yShift)*cos(xShift), sin(-yShift));
 
-    mat3 to3d = mat3(xVect.x,   yVect.x,    center.x,    
+    mat3 to3d = mat3(xVect.x,   yVect.x,    center.x,
         xVect.y,   yVect.y,    center.y,
         xVect.z,   yVect.z,    center.z); // avoid transpose it is required glsl 1.2
 
@@ -179,7 +179,7 @@ QString QnFisheyeRectilinearProgram::getShaderText()
     vec2 xy4 = vec2(maxX * xCenter, maxY * yCenter);
 
 
-    void main() 
+    void main()
     {
         vec3 pos3d = vec3(vTexCoord * xy1 + xy2, 1.0) * to3d; // point on the surface
 
@@ -196,7 +196,7 @@ QString QnFisheyeRectilinearProgram::getShaderText()
             texture2D(uTexture, pos).p,
             texture2D(vTexture, pos).p,
             1.0) * colorTransform;
-        else 
+        else
             gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
     }
     ));
@@ -257,7 +257,7 @@ QString QnFisheyeEquirectangularHProgram::getShaderText()
     vec2 xy3 = vec2(maxX / PI * radius*2.0,  maxY / PI * radius*2.0*aspectRatio);
     vec2 xy4 = vec2(maxX * xCenter, maxY * yCenter);
 
-    void main() 
+    void main()
     {
         vec2 pos = vTexCoord * xy1 + xy2;
 
@@ -288,7 +288,7 @@ QString QnFisheyeEquirectangularHProgram::getShaderText()
             texture2D(uTexture, pos).p,
             texture2D(vTexture, pos).p,
             1.0) * colorTransform;
-        else 
+        else
             gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
     }
     ));
@@ -296,7 +296,7 @@ QString QnFisheyeEquirectangularHProgram::getShaderText()
 #ifdef QT_OPENGL_ES_2
     shader =  QN_SHADER_SOURCE(precision mediump float;) + shader;
 #endif
-    
+
     return QString(QLatin1String(shader)).arg(gammaStr());
 }
 
@@ -349,7 +349,7 @@ QString QnFisheyeEquirectangularVProgram::getShaderText()
     vec2 xy3 = vec2(maxX / PI * radius*2.0,  maxY / PI * radius*2.0*aspectRatio);
     vec2 xy4 = vec2(maxX * xCenter, maxY * yCenter);
 
-    void main() 
+    void main()
     {
         vec2 pos = vTexCoord * xy1 + xy2;
 
@@ -380,7 +380,7 @@ QString QnFisheyeEquirectangularVProgram::getShaderText()
             texture2D(uTexture, pos).p,
             texture2D(vTexture, pos).p,
             1.0) * colorTransform;
-        else 
+        else
             gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
     }
     ));
@@ -395,7 +395,7 @@ QString QnFisheyeEquirectangularVProgram::getShaderText()
 // ------------------------- QnAbstractRGBAShaderProgram ------------------------------
 
 QnAbstractRGBAShaderProgram::QnAbstractRGBAShaderProgram(QObject *parent, bool final):
-    QnGLShaderProgram(parent) 
+    QnGLShaderProgram(parent)
 {
     Q_UNUSED(final)
     addShaderFromSourceCode(QOpenGLShader::Vertex, QN_SHADER_SOURCE(
@@ -456,11 +456,11 @@ QString QnFisheyeRGBRectilinearProgram::getShaderText()
     float kx =  2.0*tan(dstFov/2.0);
 
     // avoid function call for better shader compatibility
-    vec3 xVect  = vec3(sin(xShift + PI/2.0), cos(xShift + PI/2.0), 0.0) * kx; 
+    vec3 xVect  = vec3(sin(xShift + PI/2.0), cos(xShift + PI/2.0), 0.0) * kx;
     vec3 yVect  = vec3(cos(-yShift + PI/2.0) * sin(xShift), cos(-yShift + PI/2.0)*cos(xShift), sin(-yShift + PI/2.0)) * kx / xStretch;
     vec3 center = vec3(cos(-yShift) * sin(xShift), cos(-yShift)*cos(xShift), sin(-yShift));
 
-    mat3 to3d = mat3(xVect.x,   yVect.x,    center.x,    
+    mat3 to3d = mat3(xVect.x,   yVect.x,    center.x,
         xVect.y,   yVect.y,    center.y,
         xVect.z,   yVect.z,    center.z); // avoid transpose it is required glsl 1.2
 
@@ -471,7 +471,7 @@ QString QnFisheyeRGBRectilinearProgram::getShaderText()
     vec2 xy4 = vec2(maxX * xCenter, maxY * yCenter);
 
 
-    void main() 
+    void main()
     {
         vec3 pos3d = vec3(vTexCoord * xy1 + xy2, 1.0) * to3d; // point on the surface
 
@@ -483,7 +483,7 @@ QString QnFisheyeRGBRectilinearProgram::getShaderText()
 
         if (all(bvec4(pos.x >= 0.0, pos.y >= 0.0, pos.x <= maxX, pos.y <= maxY)))
             gl_FragColor = texture2D(rgbaTexture, pos);
-        else 
+        else
             gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
     }
     ));
@@ -535,7 +535,7 @@ QString QnFisheyeRGBEquirectangularHProgram::getShaderText()
     vec2 xy3 = vec2(maxX / PI * radius*2.0,  maxY / PI * radius*2.0*aspectRatio);
     vec2 xy4 = vec2(maxX * xCenter, maxY * yCenter);
 
-    void main() 
+    void main()
     {
         vec2 pos = vTexCoord * xy1 + xy2;
 
@@ -561,7 +561,7 @@ QString QnFisheyeRGBEquirectangularHProgram::getShaderText()
 
         if (all(bvec4(pos.x >= 0.0, pos.y >= 0.0, pos.x <= maxX, pos.y <= maxY)))
             gl_FragColor = texture2D(rgbaTexture, pos);
-        else 
+        else
             gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
     }
     ));
@@ -613,7 +613,7 @@ QString QnFisheyeRGBEquirectangularVProgram::getShaderText()
     vec2 xy3 = vec2(maxX / PI * radius*2.0,  maxY / PI * radius*2.0*aspectRatio);
     vec2 xy4 = vec2(maxX * xCenter, maxY * yCenter);
 
-    void main() 
+    void main()
     {
         vec2 pos = vTexCoord * xy1 + xy2;
 
@@ -639,7 +639,7 @@ QString QnFisheyeRGBEquirectangularVProgram::getShaderText()
 
         if (all(bvec4(pos.x >= 0.0, pos.y >= 0.0, pos.x <= maxX, pos.y <= maxY)))
             gl_FragColor = texture2D(rgbaTexture, pos);
-        else 
+        else
             gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
     }
     ));
@@ -662,7 +662,7 @@ bool QnYv12ToRgbaShaderProgram::link()
 }
 
 QnYv12ToRgbaShaderProgram::QnYv12ToRgbaShaderProgram(QObject *parent):
-    QnAbstractYv12ToRgbShaderProgram(parent) 
+    QnAbstractYv12ToRgbShaderProgram(parent)
 {
     QByteArray shader(QN_SHADER_SOURCE(
     varying vec2 vTexCoord;

@@ -90,6 +90,8 @@
 #include <core/resource_management/mserver_resource_discovery_manager.h>
 #include "server_connector.h"
 #include "resource_status_watcher.h"
+#include <core/resource/media_server_resource.h>
+#include <nx/network/url/url_builder.h>
 
 using namespace nx;
 using namespace nx::vms::server;
@@ -227,7 +229,7 @@ QnMediaServerModule::QnMediaServerModule(
     m_context.reset(new UniquePtrContext());
 
     m_analyticsEventsStorage =
-        nx::analytics::db::EventsStorageFactory::instance().create();
+        nx::analytics::db::EventsStorageFactory::instance().create(this);
 
     m_context->normalStorageManager.reset(
         new QnStorageManager(
@@ -275,8 +277,8 @@ QnMediaServerModule::QnMediaServerModule(
     m_archiveIntegrityWatcher = store(new nx::vms::server::ServerArchiveIntegrityWatcher(this));
     m_updateManager = store(new nx::vms::server::ServerUpdateManager(this));
     m_serverUpdateTool = store(new QnServerUpdateTool(this));
-    auto dataDir = settings().dataDir();
-    m_motionHelper = store(new QnMotionHelper(settings().dataDir(), this));
+    auto dataDir = closeDirPath(settings().dataDir()) + QString("record_catalog");
+    m_motionHelper = store(new QnMotionHelper(dataDir, this));
 
     m_resourceCommandProcessor.reset(new QnResourceCommandProcessor());
 
@@ -325,30 +327,22 @@ QDir QnMediaServerModule::downloadsDirectory() const
 {
     static const QString kDownloads("downloads");
     QDir dir(settings().dataDir());
-    const auto downloadsPath = dir.absoluteFilePath(kDownloads);
+    const auto downloadsDir = QDir(dir.absoluteFilePath(kDownloads));
+    if (downloadsDir.exists())
+        return downloadsDir;
+
     if (!dir.mkdir(kDownloads))
     {
-        auto err = strerror(errno);
-        const auto basePath = dir.absolutePath();
-
-        if (!dir.exists())
-        {
-            NX_ERROR(this, "downloadsDirectory() - failed to create directory %1 for downloads. "
-                "Base dir=%2 does not exists as well, err=%3", downloadsPath, basePath, err);
-        }
-        else
-        {
-            NX_ERROR(this, "downloadsDirectory() - failed to create directory %1 for downloads. "
-                "Base dir=%2, err=%3", downloadsPath, basePath, err);
-        }
+        NX_ERROR(this, "%1() - failed to create directory %2, base dir %3: %4",
+            __func__, downloadsDir.absolutePath(),
+            dir.exists() ? "exists" : "does not exist", strerror(errno));
     }
     else
     {
-        NX_VERBOSE(this, "downloadsDirectory() - created directory %1 for downloads.",
-            downloadsPath);
+        NX_VERBOSE(this, "%1() - created directory %2", __func__, downloadsDir.absolutePath());
     }
 
-    return downloadsPath;
+    return downloadsDir;
 }
 
 void QnMediaServerModule::stopStorages()
@@ -696,4 +690,16 @@ nx::vms::server::network::MulticastAddressRegistry*
 QnStoragePluginFactory* QnMediaServerModule::storagePluginFactory() const
 {
     return m_commonModule->storagePluginFactory();
+}
+
+QString QnMediaServerModule::metadataDatabaseDir() const
+{
+    auto server = resourcePool()->getResourceById<QnMediaServerResource>(commonModule()->moduleGUID());
+    const auto defaultDir = nx::network::url::normalizePath(settings().dataDir());
+    if (!server)
+        return defaultDir;
+    auto storageResource = resourcePool()->getResourceById<QnStorageResource>(
+        server->metadataStorageId());
+    const auto pathBase = storageResource ? storageResource->getPath() : defaultDir;
+    return closeDirPath(pathBase);
 }

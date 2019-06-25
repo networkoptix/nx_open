@@ -21,8 +21,6 @@ set(licenseEmail "https://support.networkoptix.com/hc/en-us/requests/new?ticket_
 
 set(defaultWebPages "")
 
-# Custom Installer (if needed). If not leave "default"
-
 set(customization.upgradeCode "{8dd355cd-c0b7-4cb3-bfc3-f4f3fa8d3643}")
 set(customization.clientUpgradeCode "{dc45b79c-0477-4ec8-abdd-474fbe075659}")
 set(customization.clientBundleUpgradeCode "{e98dde15-4b2c-4012-8fd0-5a008b1b822f}")

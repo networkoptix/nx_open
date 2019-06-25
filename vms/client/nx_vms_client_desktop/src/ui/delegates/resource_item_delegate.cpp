@@ -25,7 +25,7 @@
 #include <client/client_module.h>
 
 #include <nx/vms/client/desktop/resource_views/data/camera_extra_status.h>
-#include <nx/vms/client/desktop/resource_views/data/node_type.h>
+#include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 
 #include <ui/style/skin.h>
 #include <ui/style/globals.h>
@@ -357,7 +357,7 @@ void QnResourceItemDelegate::initStyleOption(QStyleOptionViewItem* option, const
     if (option->icon.isNull())
         option->decorationSize = defaultDecorationSize;
 
-    const auto nodeType = index.data(Qn::NodeTypeRole).value<ResourceTreeNodeType>();
+    const auto nodeType = index.data(Qn::NodeTypeRole).value<ResourceTree::NodeType>();
     if (isSeparatorNode(nodeType))
         option->features = QStyleOptionViewItem::None;
     else
@@ -454,12 +454,12 @@ QnResourceItemDelegate::ItemState QnResourceItemDelegate::itemState(const QModel
     if (!workbench())
         return ItemState::normal;
 
-    const auto nodeType = index.data(Qn::NodeTypeRole).value<ResourceTreeNodeType>();
+    const auto nodeType = index.data(Qn::NodeTypeRole).value<ResourceTree::NodeType>();
 
     switch (nodeType)
     {
-        case ResourceTreeNodeType::currentSystem:
-        case ResourceTreeNodeType::currentUser:
+        case ResourceTree::NodeType::currentSystem:
+        case ResourceTree::NodeType::currentUser:
             return ItemState::selected;
 
         /*
@@ -471,10 +471,10 @@ QnResourceItemDelegate::ItemState QnResourceItemDelegate::itemState(const QModel
          * Videowall is Selected when we are in videowall review or control mode.
         */
 
-        case ResourceTreeNodeType::resource:
-        case ResourceTreeNodeType::sharedLayout:
-        case ResourceTreeNodeType::edge:
-        case ResourceTreeNodeType::sharedResource:
+        case ResourceTree::NodeType::resource:
+        case ResourceTree::NodeType::sharedLayout:
+        case ResourceTree::NodeType::edge:
+        case ResourceTree::NodeType::sharedResource:
         {
             QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
             NX_ASSERT(resource);
@@ -490,16 +490,16 @@ QnResourceItemDelegate::ItemState QnResourceItemDelegate::itemState(const QModel
             return itemStateForMediaResource(index);
         }
 
-        case ResourceTreeNodeType::recorder:
+        case ResourceTree::NodeType::recorder:
             return itemStateForRecorder(index);
 
-        case ResourceTreeNodeType::layoutItem:
+        case ResourceTree::NodeType::layoutItem:
             return itemStateForLayoutItem(index);
 
-        case ResourceTreeNodeType::videoWallItem:
+        case ResourceTree::NodeType::videoWallItem:
             return itemStateForVideoWallItem(index);
 
-        case ResourceTreeNodeType::layoutTour:
+        case ResourceTree::NodeType::layoutTour:
             return itemStateForLayoutTour(index);
 
         default:
@@ -695,13 +695,13 @@ void QnResourceItemDelegate::getDisplayInfo(const QModelIndex& index, QString& b
     if (infoLevel == Qn::RI_NameOnly)
         return;
 
-    const auto nodeType = index.data(Qn::NodeTypeRole).value<ResourceTreeNodeType>();
+    const auto nodeType = index.data(Qn::NodeTypeRole).value<ResourceTree::NodeType>();
 
-    if (nodeType == ResourceTreeNodeType::videoWallItem)
+    if (nodeType == ResourceTree::NodeType::videoWallItem)
     {
         // skip videowall screens
     }
-    else if (nodeType == ResourceTreeNodeType::recorder)
+    else if (nodeType == ResourceTree::NodeType::recorder)
     {
         auto firstChild = index.model()->index(0, 0, index);
         if (!firstChild.isValid()) /* This can happen in rows deleting */
@@ -714,8 +714,8 @@ void QnResourceItemDelegate::getDisplayInfo(const QModelIndex& index, QString& b
         if (!resource)
             return;
 
-        if ((nodeType == ResourceTreeNodeType::layoutItem
-                || nodeType == ResourceTreeNodeType::sharedResource)
+        if ((nodeType == ResourceTree::NodeType::layoutItem
+                || nodeType == ResourceTree::NodeType::sharedResource)
             && resource->hasFlags(Qn::server)
             && !resource->hasFlags(Qn::fake))
         {

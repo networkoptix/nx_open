@@ -19,8 +19,9 @@ class RdepSyncher:
 
         self._exported_paths = {}
         self._synched_package_dirs = []
+        self._include_ignored_dirs = []
 
-    def sync(self, package, path_variable=None, optional=False):
+    def sync(self, package, path_variable=None, optional=False, do_not_include=False):
         target, pack = posixpath.split(package)
 
         self.rdep.targets = [target] if target else [self.rdep_target]
@@ -47,6 +48,8 @@ class RdepSyncher:
         self._synched_package_dirs.append(path)
         if path_variable:
             self._exported_paths[path_variable] = path
+        if do_not_include:
+            self._include_ignored_dirs.append(path)
 
         return True
 
@@ -68,6 +71,9 @@ class RdepSyncher:
 
             f.write("\n# Includes.\n")
             for path in self._synched_package_dirs:
+                if path in self._include_ignored_dirs:
+                    continue
+
                 cmake_files = glob.glob(os.path.join(path, "*.cmake"))
                 if cmake_files and len(cmake_files) == 1:
                     f.write("include(\"{}\")\n".format(cmake_files[0].replace("\\", "/")))

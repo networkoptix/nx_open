@@ -1,3 +1,5 @@
+#include <fstream>
+
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
@@ -110,6 +112,8 @@ public:
 
     ~DbAsyncSqlQueryExecutor()
     {
+        closeDatabase();
+
         detail::RequestExecutorFactory::instance().setCustomFunc(
             std::move(m_requestExecutorFactoryBak));
     }
@@ -134,6 +138,12 @@ protected:
         generatedData.push_back(Company{"NetworkOptix", 2010});
 
         return generatedData;
+    }
+
+    void whenInitializeDbWithInaccessibleFilePath()
+    {
+        connectionOptions().dbName += "/raz-raz-raz.sqlite";
+        m_lastDbOpenResult = initializeQueryExecutor(connectionOptions());
     }
 
     void whenIssueMultipleReads()
@@ -202,6 +212,11 @@ protected:
                 return DBResult::ok;
             },
             nullptr);
+    }
+
+    void thenDbInitializationFailed()
+    {
+        ASSERT_FALSE(m_lastDbOpenResult);
     }
 
     void thenEveryQuerySucceeded()
@@ -293,6 +308,7 @@ private:
     std::atomic<int> m_maxNumberOfConcurrentDataModificationRequests = 0;
     std::atomic<int> m_concurrentDataModificationRequests = 0;
     detail::RequestExecutorFactory::Function m_requestExecutorFactoryBak;
+    bool m_lastDbOpenResult = false;
 
     void emulateQueryError(DBResult dbResultToEmulate)
     {
@@ -437,6 +453,12 @@ TEST_F(DbAsyncSqlQueryExecutor, many_recoverable_errors_in_a_row_cause_reconnect
     ASSERT_EQ(2U, companies.size());
 
     closeDatabase();
+}
+
+TEST_F(DbAsyncSqlQueryExecutor, initial_error_to_open_a_connection_is_reported)
+{
+    whenInitializeDbWithInaccessibleFilePath();
+    thenDbInitializationFailed();
 }
 
 //-------------------------------------------------------------------------------------------------

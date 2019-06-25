@@ -50,9 +50,6 @@ public:
         const QString& customError) override;
 
 private:
-    QString buildLogString(const QString& error) const;
-
-private:
     nx::utils::log::Tag m_logTag;
     QString m_messageTemplate;
     QnVirtualCameraResourcePtr m_device;
@@ -74,9 +71,6 @@ public:
         const QString& manifestStr,
         nx::sdk::Error error,
         const QString& customError) override;
-
-private:
-    QString buildLogString(const QString& error) const;
 
 private:
     nx::utils::log::Tag m_logTag;

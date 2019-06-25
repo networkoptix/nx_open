@@ -24,14 +24,15 @@ protected:
     {
         test_support::MediaserverWithStorageFixture::SetUp();
         m_server->addSetting("appserverPassword", "admin");
-        test_support::createTestLogger({ utils::log::Filter(typeid(ServerArchiveIntegrityWatcher)) }, &m_logBuffer);
+        test_support::createTestLogger(
+            { nx::utils::log::Filter(typeid(ServerArchiveIntegrityWatcher)) }, &m_logBuffer);
     }
 
     virtual void TearDown() override
     {
         m_archiveReader->stop();
         m_archiveReader->removeDataProcessor(this);
-        utils::log::removeLoggers({ utils::log::Filter(typeid(ServerArchiveIntegrityWatcher)) });
+        nx::utils::log::removeLoggers({ nx::utils::log::Filter(typeid(ServerArchiveIntegrityWatcher)) });
         nx::utils::log::lockConfiguration();
     }
 
@@ -183,7 +184,7 @@ private:
     int64_t m_archiveStartTime;
     int64_t m_archiveEndTime;
     int64_t m_timeGap = 0;
-    utils::log::Buffer* m_logBuffer = nullptr;
+    nx::utils::log::Buffer* m_logBuffer = nullptr;
 
     void onArchiveIntegrityBreached(const QnStorageResourcePtr& /*storage*/)
     {

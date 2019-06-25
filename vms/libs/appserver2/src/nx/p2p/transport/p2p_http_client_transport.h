@@ -73,7 +73,6 @@ private:
     void startReading();
     void reportStartResult();
 	void stopOrResumeReaderWhileInAioThread();
-
     virtual void stopWhileInAioThread() override;
 };
 

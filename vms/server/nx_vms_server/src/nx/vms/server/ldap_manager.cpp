@@ -12,6 +12,7 @@
 #include <Windows.h>
 #include <winldap.h>
 
+#define QSTOSTR(s) s.toStdWString()
 #define QSTOCW(s) (const PWCHAR)(s.utf16())
 
 #define FROM_WCHAR_ARRAY QString::fromWCharArray
@@ -21,6 +22,8 @@
 
 #define LDAP_DEPRECATED 1
 #include <ldap.h>
+
+#define QSTOSTR(s) s.toStdString()
 #define QSTOCW(s) s.toUtf8().constData()
 #define LdapGetLastError() errno
 #define FROM_WCHAR_ARRAY QString::fromUtf8
@@ -278,7 +281,7 @@ LdapSession::~LdapSession()
 
 bool LdapSession::connect()
 {
-    NX_DEBUG(this, lm("Connect to %1").arg(m_settings));
+    NX_DEBUG(this, lm("Connecting to %1").arg(m_settings));
     QUrl uri = m_settings.uri;
 
 #if defined Q_OS_WIN
@@ -364,7 +367,8 @@ bool LdapSession::fetchUsers(QnLdapUsers& users, const QString& customFilter)
 {
     NX_VERBOSE(this, lm("Fetching users with filter '%1'").arg(customFilter));
 
-    LDAP_RESULT rc = ldap_simple_bind_s(m_ld, QSTOCW(m_settings.adminDn), QSTOCW(m_settings.adminPassword));
+    LDAP_RESULT rc =
+        ldap_simple_bind_s(m_ld, QSTOCW(m_settings.adminDn), QSTOCW(m_settings.adminPassword));
     if (rc != LDAP_SUCCESS)
     {
         m_lastErrorCode = rc;
@@ -418,6 +422,11 @@ bool LdapSession::fetchUsers(QnLdapUsers& users, const QString& customFilter)
             cleanUpControls();
         });
 
+    auto uidAttr = QSTOSTR(m_dType->UidAttr());
+    auto nameAttr = QSTOSTR(m_dType->FullNameAttr());
+    auto mailAttr = QSTOSTR(MAIL);
+    PWCHAR attrs[] = {uidAttr.data(), nameAttr.data(), mailAttr.data(), NULL};
+
     do
     {
         cleanUpControls();
@@ -436,7 +445,7 @@ bool LdapSession::fetchUsers(QnLdapUsers& users, const QString& customFilter)
             /* base */ QSTOCW(m_settings.searchBase),
             /* scope */ LDAP_SCOPE_SUBTREE,
             /* filter */ filter.isEmpty() ? 0 : QSTOCW(filter),
-            /* attrs */ NULL,
+            /* attrs */ attrs,
             /* attrsonly */ 0,
             /* serverctrls */ serverControls,
             /* clientctrls */ NULL,
@@ -486,6 +495,7 @@ bool LdapSession::fetchUsers(QnLdapUsers& users, const QString& customFilter)
                 ldap_memfree(dn);
             }
         }
+        NX_VERBOSE(this, "Fetched page with %1 users", users.size());
     } while (cookie && cookie->bv_val != NULL && (strlen(cookie->bv_val) > 0));
 
     NX_VERBOSE(this, lm("Fetched %1 user(s)%2").args(
@@ -608,13 +618,13 @@ LdapResult LdapManager::fetchUsers(QnLdapUsers& users, const QnLdapSettings& set
     LdapSession session(settings);
     if (!session.connect())
     {
-        NX_WARNING(this, lm("connect: %1").arg(session.lastErrorString()));
+        NX_WARNING(this, lm("LDAP connect failed: %1").arg(session.lastErrorString()));
         return translateErrorCode(session.lastErrorCode());
     }
 
     if (!session.fetchUsers(users))
     {
-        NX_WARNING(this, lm("fetchUsers: %1").arg(session.lastErrorString()));
+        NX_WARNING(this, lm("Users fetch failed: %1").arg(session.lastErrorString()));
         return translateErrorCode(session.lastErrorCode());
     }
 

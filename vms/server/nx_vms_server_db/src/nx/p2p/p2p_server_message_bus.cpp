@@ -861,13 +861,13 @@ bool ServerMessageBus::validateRemotePeerData(const vms::api::PeerDataEx& remote
             "current peer. Restarting and resync database with remote peer")
             .arg(remotePeer.id.toString()));
 
-        executeDelayed(
+        executeLaterInThread(
             [this, remotePeer]()
             {
                 stop();
                 commonModule()->setSystemIdentityTime(remotePeer.identityTime, remotePeer.id);
             },
-            0, qApp->thread());
+            qApp->thread());
 
         return false;
     }

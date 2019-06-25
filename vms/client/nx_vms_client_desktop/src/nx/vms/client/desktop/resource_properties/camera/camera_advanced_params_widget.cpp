@@ -4,11 +4,14 @@
 
 #include <api/media_server_connection.h>
 
+#include <core/ptz/remote_ptz_controller.h>
 #include <core/resource/param.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 
 #include <utils/xml/camera_advanced_param_reader.h>
+
+
 
 namespace {
 
@@ -51,8 +54,7 @@ CameraAdvancedParamsWidget::CameraAdvancedParamsWidget(QWidget* parent /*= NULL*
     m_advancedParamsReader(new QnCachingCameraAdvancedParamsReader()),
     m_cameraAvailable(false),
     m_paramRequestHandle(0),
-    m_state(State::Init),
-    m_ptzSequenceId(QnUuid::createUuid())
+    m_state(State::Init)
 {
     ui->setupUi(this);
 
@@ -95,6 +97,8 @@ void CameraAdvancedParamsWidget::setCamera(const QnVirtualCameraResourcePtr &cam
                     initialize(); //< Re-init state if key parameter changed.
             });
     }
+
+    m_ptzController.reset(new QnRemotePtzController(camera));
 
     /* Initialize state */
     initialize();
@@ -205,12 +209,11 @@ void CameraAdvancedParamsWidget::sendCustomParameterCommand(
     const auto serverConnection = getServerConnection();
     if (!serverConnection)
         return;
+    if (!m_ptzController)
+        return;
 
     bool ok = false;
 
-    m_ptzSequenceNumber++;
-
-    auto slot = SLOT(at_ptzCommandProcessed(int, const QVariant &, int));
     nx::core::ptz::Options options{nx::core::ptz::Type::configurational};
 
     if(parameter.writeCmd == lit("custom_zoom"))
@@ -222,8 +225,7 @@ void CameraAdvancedParamsWidget::sendCustomParameterCommand(
         {
             speed.zoom = val * 0.01;
             qDebug() << "Sending custom_zoom(" << val << ")";
-            serverConnection->ptzContinuousMoveAsync(
-                m_camera, speed, options, m_ptzSequenceId, m_ptzSequenceNumber, this, slot);
+            m_ptzController->continuousMove(speed, options);
         }
     }
     else if (parameter.writeCmd == lit("custom_ptr"))
@@ -245,14 +247,8 @@ void CameraAdvancedParamsWidget::sendCustomParameterCommand(
 
         qDebug() << "Sending custom_ptr(pan=" << speed.pan << ", tilt=" << speed.tilt << ", rot=" << speed.rotation << ")";
 
-        serverConnection->ptzContinuousMoveAsync(
-            m_camera,
-            speed,
-            options,
-            m_ptzSequenceId,
-            m_ptzSequenceNumber,
-            this,
-            slot);
+        // TODO: We should use PTZ controller instead.
+        m_ptzController->continuousMove(speed, options);
     }
     else if (parameter.writeCmd == lit("custom_focus"))
     {
@@ -261,8 +257,8 @@ void CameraAdvancedParamsWidget::sendCustomParameterCommand(
         if (ok)
         {
             speed *= 0.01;
-            serverConnection->ptzContinuousFocusAsync(m_camera, speed, options, this, slot);
             qDebug() << "Sending custom_focus(" << speed << ")";
+            m_ptzController->continuousFocus(speed, options);
         }
     }
 

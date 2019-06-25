@@ -847,6 +847,8 @@ bool OnvifResourceSearcherWsdd::sendProbe( const nx::network::QnInterfaceAndAddr
     // (possibly,  char* instead of const char* in soap_header declaration, is a gsoap bug)
     // So const_cast should be safety
     ctx->soapWsddProxy.soap_header(
+        /*wsse__Security*/ nullptr,
+        /*subscriptionID*/ nullptr,
         messageID,
         /*wsa5__RelatesTo*/ nullptr,
         /*wsa5__From*/ nullptr,
@@ -855,9 +857,7 @@ bool OnvifResourceSearcherWsdd::sendProbe( const nx::network::QnInterfaceAndAddr
         /*wsa5__To*/ const_cast<char*>(WSDD_ADDRESS),
         const_cast<char*>(WSDD_ACTION),
         /*chan__ChannelInstance*/ nullptr,
-        /*wsdd__AppSequence*/ nullptr,
-        /*wsse__Security*/ nullptr,
-        /*subscriptionID*/ nullptr);
+        /*wsdd__AppSequence*/ nullptr);
 
     QString targetAddr = QString::fromLatin1(WSDD_GSOAP_MULTICAST_ADDRESS);
     int soapRes = ctx->soapWsddProxy.send_Probe(targetAddr.toLatin1().data(), NULL, &ctx->wsddProbe);

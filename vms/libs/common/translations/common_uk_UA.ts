@@ -1642,14 +1642,6 @@
       <translation>Відкрити розкладку</translation>
     </message>
     <message>
-      <source>Plugin Event</source>
-      <translation>Плагін події</translation>
-    </message>
-    <message>
-      <source>Unknown plugin event</source>
-      <translation>Невідомий плагін події</translation>
-    </message>
-    <message>
       <source>Failed to force using camera time, it lags too much, system time will be used</source>
       <translation>Не вдалося застосувати час камери, затримка занадто висока, буде використано системний час</translation>
     </message>
@@ -1660,6 +1652,34 @@
     <message>
       <source>Multiple %1 events have occurred</source>
       <translation>Сталося кілька подій %1</translation>
+    </message>
+    <message>
+      <source>Multicast address conflict detected. Address %1 is already in use by %2 on %3 stream</source>
+      <translation>Виявлено конфлікт адреси мультикасту. Адреса %1 вже використовується від %2 до потоку %3</translation>
+    </message>
+    <message>
+      <source>Network address %1 is not a multicast address</source>
+      <translation>Мережева адреса %1 не є адресою мультикасту</translation>
+    </message>
+    <message>
+      <source>Analytics storage &quot;%1&quot; is offline.</source>
+      <translation>Analytics storage &quot;%1&quot; офлайн.</translation>
+    </message>
+    <message>
+      <source>Analytics storage &quot;%1&quot; is almost full.</source>
+      <translation>Analytics storage &quot;%1&quot; майже заповнена.</translation>
+    </message>
+    <message>
+      <source>Plugin Diagnostic Event</source>
+      <translation>Діагностична подія плагіна</translation>
+    </message>
+    <message>
+      <source>Unknown Plugin Diagnostic Event</source>
+      <translation>Невідома подія діагностики плагіна</translation>
+    </message>
+    <message>
+      <source>RAID error. %1.</source>
+      <translation>Помилка RAID. %1.</translation>
     </message>
   </context>
   <context>

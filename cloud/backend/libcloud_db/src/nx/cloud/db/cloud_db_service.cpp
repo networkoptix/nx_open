@@ -68,11 +68,11 @@ int CloudDbService::serviceMain(const utils::AbstractServiceSettings& abstractSe
     view.listen();
     NX_INFO(this, lm("Listening on %1").container(view.endpoints()));
 
-    NX_ALWAYS(this, "%1 has been started", QnLibCloudDbAppInfo::applicationDisplayName());
+    NX_INFO(this, "%1 has been started", QnLibCloudDbAppInfo::applicationDisplayName());
 
     const auto result = runMainLoop();
 
-    NX_ALWAYS(this, "Stopping...");
+    NX_INFO(this, "Stopping...");
 
     return result;
 }

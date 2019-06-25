@@ -39,3 +39,7 @@ else()
 endif()
 
 set(apple_team_id "L6FE34GJWM")
+
+if(eulaVersionOverride)
+    set(eulaVersion ${eulaVersionOverride})
+endif()

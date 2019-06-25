@@ -153,6 +153,11 @@ void QnMediaResource::clearCustomAspectRatio()
     this->toResource()->setProperty(::customAspectRatioKey, QString());
 }
 
+qreal QnMediaResource::defaultRotation() const
+{
+    return toResource()->getProperty(rotationKey()).toInt();
+}
+
 Ptz::Capabilities QnMediaResource::getPtzCapabilities(core_ptz::Type ptzType) const
 {
     switch (ptzType)

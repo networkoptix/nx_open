@@ -81,6 +81,8 @@ const QString kNameStatisticsReportLastNumber(lit("statisticsReportLastNumber"))
 const QString kNameStatisticsReportTimeCycle(lit("statisticsReportTimeCycle"));
 const QString kNameStatisticsReportUpdateDelay(lit("statisticsReportUpdateDelay"));
 const QString kNameLocalSystemId(lit("localSystemId"));
+const QString kNameLastMergeMasterId(lit("lastMergeMasterId"));
+const QString kNameLastMergeSlaveId(lit("lastMergeSlaveId"));
 const QString kNameSystemName(lit("systemName"));
 const QString kNameStatisticsReportServerApi(lit("statisticsReportServerApi"));
 const QString kNameSettingsUrlParam(lit("clientStatisticsSettingsUrl"));
@@ -232,6 +234,16 @@ public:
     QnUuid localSystemId() const;
     void setLocalSystemId(const QnUuid& value);
 
+    /**
+     *
+     * Last merge operation id. It set same value for master and slave hosts during merge
+     */
+    QnUuid lastMergeMasterId() const;
+    void setLastMergeMasterId(const QnUuid& value);
+
+    QnUuid lastMergeSlaveId() const;
+    void setLastMergeSlaveId(const QnUuid& value);
+
     QString clientStatisticsSettingsUrl() const;
 
     QString statisticsReportServerApi() const;
@@ -370,6 +382,10 @@ public:
     nx::vms::api::MetadataStorageChangePolicy metadataStorageChangePolicy() const;
     void setMetadataStorageChangePolicy(nx::vms::api::MetadataStorageChangePolicy value);
 
+
+    QString licenseServerUrl() const;
+    void setLicenseServerUrl(const QString& value);
+
 signals:
     void initialized();
 
@@ -454,6 +470,8 @@ private:
     QnResourcePropertyAdaptor<QString>* m_statisticsReportUpdateDelayAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* m_upnpPortMappingEnabledAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* m_localSystemIdAdaptor = nullptr;
+    QnResourcePropertyAdaptor<QString>* m_lastMergeMasterIdAdaptor = nullptr;
+    QnResourcePropertyAdaptor<QString>* m_lastMergeSlaveIdAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* m_statisticsReportServerApiAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* m_clientStatisticsSettingsUrlAdaptor = nullptr;
 
@@ -528,6 +546,7 @@ private:
     QnResourcePropertyAdaptor<QString>* m_lowQualityScreenVideoCodecAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* m_forceLiveCacheForPrimaryStreamAdaptor = nullptr;
     QnResourcePropertyAdaptor<nx::vms::api::MetadataStorageChangePolicy>* m_metadataStorageChangePolicyAdaptor = nullptr;
+    QnResourcePropertyAdaptor<QString>* m_licenseServerUrlAdaptor = nullptr;
 
     AdaptorList m_allAdaptors;
 

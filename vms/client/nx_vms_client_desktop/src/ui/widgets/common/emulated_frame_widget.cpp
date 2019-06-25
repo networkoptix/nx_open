@@ -1,5 +1,9 @@
 #include "emulated_frame_widget.h"
 
+#if defined(Q_OS_WIN)
+#include <Windows.h>
+#endif
+
 #include <QtGui/QWindow>
 #include <QtGui/QMouseEvent>
 #include <QtGui/QScreen>
@@ -141,5 +145,3 @@ void QnEmulatedFrameWidget::showNormal() {
     base_type::showNormal();
     m_dragProcessor->setHandler(this);
 }
-
-

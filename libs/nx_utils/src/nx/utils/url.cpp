@@ -358,7 +358,7 @@ void Url::setHost(const QString &host, QUrl::ParsingMode mode)
 {
     QUrl newUrl;
     newUrl.setHost(host);
-    if (newUrl.isValid() && !newUrl.isEmpty())
+    if (newUrl.isValid() || host.isEmpty())
     {
         m_ipV6ScopeId = boost::none;
         m_url.setHost(host);

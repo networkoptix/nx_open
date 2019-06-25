@@ -1,3 +1,5 @@
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+
 #pragma once
 
 #include <nx/kit/ini_config.h>
@@ -19,25 +21,9 @@ struct Ini: public nx::kit::IniConfig
 
     NX_INI_FLAG(1, enableOutput, "");
     NX_INI_STRING("", needUncompressedVideoFrames, needUncompressedVideoFramesDescription.c_str());
-    NX_INI_FLAG(1, generateObjects, "");
-    NX_INI_FLAG(1, generateEvents, "");
-    NX_INI_INT(1, generateObjectsEveryNFrames, "");
-    NX_INI_INT(1, objectCount, "Number of simultaneosly shown objects.");
-    NX_INI_FLAG(1, generatePreviewAttributes, "");
     NX_INI_FLAG(0, deviceDependent, "Respective capability in the manifest.");
-
-    NX_INI_FLAG(0, throwPluginEventsFromEngine,
-        "Periodically throw plugin events from Engine to Server.");
-
-    NX_INI_FLAG(0, throwPluginEventsFromDeviceAgent,
-        "Periodically throw plugin events from DeviceAgent to Server.");
-
     NX_INI_INT(-1, crashDeviceAgentOnFrameN,
         "If >= 0, intentionally crash DeviceAgent on processing a frame with this index.");
-
-    NX_INI_FLAG(0, useOldStylePreviewAttributes,
-        "If true then the plugin will generate 'nx.sys.preiew*' attributes. Otherwise the plugin\n"
-        "will generate best shot metadata packets");
 };
 
 inline Ini& ini()

@@ -1,11 +1,13 @@
 #include "translation_manager.h"
 
 #include <QtCore/QDir>
-#include <QtCore/QTranslator>
 #include <QtCore/QCoreApplication>
+#include <QtCore/QTranslator>
 
 #include <utils/common/app_info.h>
 #include <utils/common/warnings.h>
+
+#include <nx/vms/utils/external_resources.h>
 
 #include <nx/utils/log/assert.h>
 
@@ -45,6 +47,8 @@ QnTranslationManager::QnTranslationManager(QObject *parent):
     addPrefix(kDefaultPrefix);
     addPrefix("qtbase");
     addSearchPath(kDefaultSearchPath);
+
+    nx::vms::utils::registerExternalResourcesByMask("*_translations.dat");
 }
 
 QnTranslationManager::~QnTranslationManager()

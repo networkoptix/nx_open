@@ -108,4 +108,8 @@ std::future<UpdateContents> checkSpecificChangeset(
     const QString& build,
     UpdateCheckCallback&& callback = {});
 
+QString rootUpdatesDirectoryForDownloader();
+QString updatesDirectoryForDownloader(const QString& publicationKey);
+QString updateFilePathForDownloader(const QString& publicationKey, const QString& fileName);
+
 } // namespace nx::update

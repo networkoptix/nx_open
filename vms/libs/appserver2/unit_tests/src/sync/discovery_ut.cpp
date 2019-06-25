@@ -41,7 +41,7 @@ protected:
         module->commonModule()->updateRunningInstanceGuid();
         ASSERT_TRUE(module);
         initServerData(module);
-        NX_ALWAYS(this, lm("Server %1 started at %2").args(
+        NX_INFO(this, lm("Server %1 started at %2").args(
             module->commonModule()->moduleGUID(), server->moduleInstance()->endpoint()));
 
         const auto discoveryManager = module->commonModule()->moduleDiscoveryManager();
@@ -135,7 +135,7 @@ protected:
             if (const auto module = discoveryManager->getModule(server.first))
             {
                 ++totalDiscoveryLinks;
-                NX_ALWAYS(this, lm("Module %1 discovered %2 with endpoint %3").args(
+                NX_INFO(this, lm("Module %1 discovered %2 with endpoint %3").args(
                     searcher->moduleGUID(), module->id, module->endpoint));
 
                 EXPECT_EQ(module->id.toString(), server.first.toString());

@@ -29,10 +29,15 @@ struct Package
     QString md5;
     qint64 size = 0;
 
-    /** List of targets that should receive this package. */
-    QList<QnUuid> targets;
+    /**
+     * A set of targets that should receive this package.
+     * This set is used by client to keep track of package uploads.
+     */
+    QSet<QnUuid> targets;
 
     bool isValid() const { return !file.isEmpty(); }
+    bool isServer() const;
+    bool isClient() const;
 };
 
 #define Package_Fields (component)(arch)(platform)(variant)(variantVersion)(file)(url)(size)(md5)
@@ -78,6 +83,8 @@ enum class InformationError
     incompatibleVersion,
     incompatibleCloudHost,
     notFoundError,
+    /** Error when client tried to contact mediaserver for update verification. */
+    serverConnectionError,
     noNewVersion,
 };
 
@@ -108,6 +115,7 @@ public:
 
     enum class ErrorCode
     {
+        noError = 0,
         updatePackageNotFound,
         noFreeSpaceToDownload,
         noFreeSpaceToExtract,
@@ -118,7 +126,7 @@ public:
         internalDownloaderError,
         internalError,
         unknownError,
-        noError,
+        applauncherError,
     };
     Q_ENUM(ErrorCode)
 
@@ -140,6 +148,11 @@ public:
         errorCode(errorCode),
         progress(progress)
     {}
+
+    friend inline uint qHash(nx::update::Status::ErrorCode key, uint seed)
+    {
+        return ::qHash(static_cast<uint>(key), seed);
+    }
 };
 
 #define UpdateStatus_Fields (serverId)(code)(errorCode)(progress)(message)
@@ -200,8 +213,8 @@ struct UpdateContents
     QSet<QnUuid> invalidVersion;
     /** A set of peers to be ignored during this update. */
     QSet<QnUuid> ignorePeers;
-    /** A set of servers with update packages verified. */
-    QSet<QnUuid> serversWithUpdate;
+    /** A set of peers with update packages verified. */
+    QSet<QnUuid> peersWithUpdate;
     /**
      * Maps a server id, which OS is no longer supported to an error message.
      * The message is displayed to the user.
@@ -215,15 +228,6 @@ struct UpdateContents
     QStringList filesToUpload;
 
     using SystemInformation = nx::vms::api::SystemInformation;
-
-    using PackageCache =
-        std::map<SystemInformation, QList<nx::update::Package>, SystemInformationComparator>;
-    /**
-     * Maps system information to a set of packages. We use this cache to find and check
-     * if a specific OS variant is supported.
-     */
-    PackageCache serverPackageCache;
-    PackageCache clientPackageCache;
 
     /** Information for the clent update. */
     nx::update::Package clientPackage;
@@ -240,6 +244,9 @@ struct UpdateContents
     bool packagesGenerated = false;
     /** We have already installed this version. Widget will show appropriate status.*/
     bool alreadyInstalled = false;
+
+    /** Resets data from verification. */
+    void resetVerification();
 
     nx::utils::SoftwareVersion getVersion() const;
 

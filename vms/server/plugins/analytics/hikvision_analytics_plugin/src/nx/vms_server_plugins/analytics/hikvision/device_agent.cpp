@@ -41,7 +41,8 @@ IStringMap* DeviceAgent::pluginSideSettings() const
 
 Error DeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
 {
-    m_handler = handler;
+    handler->addRef();
+    m_handler.reset(handler);
     return Error::noError;
 }
 
@@ -81,7 +82,6 @@ Error DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTypes)
                 eventMetadata->setDescription(hikvisionEvent.description.toStdString());
                 eventMetadata->setIsActive(hikvisionEvent.isActive);
                 eventMetadata->setConfidence(1.0);
-                //eventMetadata->setAuxiliaryData(hikvisionEvent.fullEventName.toStdString());
 
                 packet->setTimestampUs(
                     duration_cast<microseconds>(system_clock::now().time_since_epoch()).count());
@@ -96,9 +96,12 @@ Error DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTypes)
     NX_ASSERT(m_engine);
     std::vector<QString> eventTypes;
 
-    const auto eventTypeList = metadataTypes->eventTypeIds();
-    for (int i = 0; i < eventTypeList->count(); ++i)
-        eventTypes.push_back(eventTypeList->at(i));
+    nx::sdk::Ptr<const nx::sdk::IStringList> eventTypeIdList(metadataTypes->eventTypeIds());
+    if (!NX_ASSERT(eventTypeIdList, "Event type id list is nullptr"))
+        return Error::unknownError;
+
+    for (int i = 0; i < eventTypeIdList->count(); ++i)
+        eventTypes.push_back(eventTypeIdList->at(i));
 
     m_monitor =
         std::make_unique<HikvisionMetadataMonitor>(

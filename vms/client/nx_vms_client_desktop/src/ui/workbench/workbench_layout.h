@@ -126,6 +126,11 @@ public:
     void notifyTitleChanged();
 
     /**
+     * @returns true if the layout has no specific Cell Aspect Ratio and it can be adjusted.
+     */
+    bool canAutoAdjustAspectRatio();
+
+    /**
      * @param item Item to check.
      * @param geometry New position.
      * @param[out] disposition Disposition of free and occupied cells in the target region.

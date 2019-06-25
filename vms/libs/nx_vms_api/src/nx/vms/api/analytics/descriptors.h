@@ -15,6 +15,7 @@ struct DescriptorScope
 {
     QnUuid engineId;
     QString groupId;
+    QString provider;
 
     bool operator<(const DescriptorScope& other) const
     {
@@ -24,13 +25,19 @@ struct DescriptorScope
         return engineId < other.engineId;
     }
 };
-#define nx_vms_api_analytics_DescriptorScope_Fields (engineId)(groupId)
+#define nx_vms_api_analytics_DescriptorScope_Fields (engineId)(groupId)(provider)
 
 template<typename T, typename = void>
 struct hasGroupId: std::false_type {};
 
 template<typename T>
 struct hasGroupId<T, std::void_t<decltype(std::declval<T>().groupId)>>: std::true_type {};
+
+template<typename T, typename = void>
+struct hasProvider: std::false_type {};
+
+template<typename T>
+struct hasProvider<T, std::void_t<decltype(std::declval<T>().provider)>>: std::true_type {};
 
 template<typename T>
 DescriptorScope scopeFromItem(QnUuid engineId, T item)
@@ -39,6 +46,9 @@ DescriptorScope scopeFromItem(QnUuid engineId, T item)
     scope.engineId = std::move(engineId);
     if constexpr (hasGroupId<T>::value)
         scope.groupId = std::move(item.groupId);
+
+    if constexpr (hasProvider<T>::value)
+        scope.provider = std::move(item.provider);
 
     return scope;
 }
@@ -101,18 +111,25 @@ struct EngineDescriptor
     QnUuid id;
     QString name;
     QString pluginId;
+    EngineManifest::Capabilities capabilities;
 
     EngineDescriptor() = default;
-    EngineDescriptor(QnUuid id, QString name, QString pluginId):
+    EngineDescriptor(
+        QnUuid id,
+        QString name,
+        QString pluginId,
+        const EngineManifest& engineManifest)
+        :
         id(std::move(id)),
         name(std::move(name)),
-        pluginId(std::move(pluginId))
+        pluginId(std::move(pluginId)),
+        capabilities(engineManifest.capabilities)
     {
     }
 
     QnUuid getId() const { return id; }
 };
-#define nx_vms_api_analytics_EngineDescriptor_Fields (id)(name)(pluginId)
+#define nx_vms_api_analytics_EngineDescriptor_Fields (id)(name)(pluginId)(capabilities)
 
 struct GroupDescriptor: BaseScopedDescriptor
 {

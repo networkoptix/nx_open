@@ -131,7 +131,7 @@ Ptz::Capabilities QnOnvifPtzController::initMove()
 
     if (!nodeResponse.PTZNode || !nodeResponse.PTZNode->SupportedPTZSpaces)
         return Ptz::NoPtzCapabilities;
-    onvifXsd__PTZSpaces *spaces = nodeResponse.PTZNode->SupportedPTZSpaces;
+    tt__PTZSpaces *spaces = nodeResponse.PTZNode->SupportedPTZSpaces;
 
     Ptz::Capabilities nodeCapabilities = Ptz::NoPtzCapabilities;
     if(!spaces->ContinuousPanTiltVelocitySpace.empty() && spaces->ContinuousPanTiltVelocitySpace[0]) {
@@ -224,7 +224,7 @@ bool QnOnvifPtzController::readBuiltinPresets()
         return false;
     }
     m_presetNameByToken.clear();
-    for(onvifXsd__PTZPreset* preset: response.Preset)
+    for(tt__PTZPreset* preset: response.Preset)
     {
         if (!preset || !preset->token)
         {
@@ -265,7 +265,7 @@ Ptz::Capabilities QnOnvifPtzController::initContinuousFocus() {
 
     if(!moveOptionsResponse.MoveOptions || !moveOptionsResponse.MoveOptions->Continuous || !moveOptionsResponse.MoveOptions->Continuous->Speed)
         return Ptz::NoPtzCapabilities;
-    onvifXsd__FloatRange *speedLimits = moveOptionsResponse.MoveOptions->Continuous->Speed;
+    tt__FloatRange *speedLimits = moveOptionsResponse.MoveOptions->Continuous->Speed;
 
     m_focusSpeedLimits.min = speedLimits->Min;
     m_focusSpeedLimits.max = speedLimits->Max;
@@ -326,14 +326,14 @@ bool QnOnvifPtzController::moveInternal(const nx::core::ptz::Vector& speedVector
     ptz.soap()->float_format = m_floatFormat;
     ptz.soap()->double_format = m_doubleFormat;
 
-    onvifXsd__Vector2D onvifPanTiltSpeed;
+    tt__Vector2D onvifPanTiltSpeed;
     onvifPanTiltSpeed.x = normalizeSpeed(speedVector.pan, m_panSpeedLimits);
     onvifPanTiltSpeed.y = normalizeSpeed(speedVector.tilt, m_tiltSpeedLimits);
 
-    onvifXsd__Vector1D onvifZoomSpeed;
+    tt__Vector1D onvifZoomSpeed;
     onvifZoomSpeed.x = normalizeSpeed(speedVector.zoom, m_zoomSpeedLimits);
 
-    onvifXsd__PTZSpeed onvifSpeed;
+    tt__PTZSpeed onvifSpeed;
     onvifSpeed.PanTilt = &onvifPanTiltSpeed;
     onvifSpeed.Zoom = &onvifZoomSpeed;
 
@@ -398,10 +398,10 @@ bool QnOnvifPtzController::continuousFocus(
     imaging.soap()->float_format = m_floatFormat;
     imaging.soap()->double_format = m_doubleFormat;
 
-    onvifXsd__ContinuousFocus onvifContinuousFocus;
+    tt__ContinuousFocus onvifContinuousFocus;
     onvifContinuousFocus.Speed = normalizeSpeed(speed, m_focusSpeedLimits);
 
-    onvifXsd__FocusMove onvifFocus;
+    tt__FocusMove onvifFocus;
     onvifFocus.Continuous = &onvifContinuousFocus;
 
     _onvifImg__Move request;
@@ -446,14 +446,14 @@ bool QnOnvifPtzController::absoluteMove(
     ptz.soap()->float_format = m_floatFormat;
     ptz.soap()->double_format = m_doubleFormat;
 
-    onvifXsd__Vector2D onvifPanTilt;
+    tt__Vector2D onvifPanTilt;
     onvifPanTilt.x = position.pan;
     onvifPanTilt.y = position.tilt;
 
-    onvifXsd__Vector1D onvifZoom;
+    tt__Vector1D onvifZoom;
     onvifZoom.x = position.zoom;
 
-    onvifXsd__PTZVector onvifPosition;
+    tt__PTZVector onvifPosition;
     onvifPosition.PanTilt = &onvifPanTilt;
     onvifPosition.Zoom = &onvifZoom;
 
@@ -461,9 +461,9 @@ bool QnOnvifPtzController::absoluteMove(
     request.ProfileToken = m_resource->ptzProfileToken();
     request.Position = &onvifPosition;
 
-    onvifXsd__Vector2D onvifPanTiltSpeed;
-    onvifXsd__Vector1D onvifZoomSpeed;
-    onvifXsd__PTZSpeed onvifSpeed;
+    tt__Vector2D onvifPanTiltSpeed;
+    tt__Vector1D onvifZoomSpeed;
+    tt__PTZSpeed onvifSpeed;
     if (!m_speedBroken)
     {
         // TODO: #Elric #PTZ do we need to adjust speed to speed limits here?
@@ -511,14 +511,14 @@ bool QnOnvifPtzController::relativeMove(
     ptz.soap()->float_format = m_floatFormat;
     ptz.soap()->double_format = m_doubleFormat;
 
-    onvifXsd__Vector2D panTilt;
+    tt__Vector2D panTilt;
     panTilt.x = relativeMovementVector.pan;
     panTilt.y = relativeMovementVector.tilt;
 
-    onvifXsd__Vector1D zoom;
+    tt__Vector1D zoom;
     zoom.x = relativeMovementVector.zoom;
 
-    onvifXsd__PTZVector translation;
+    tt__PTZVector translation;
     translation.PanTilt = &panTilt;
     translation.Zoom = &zoom;
 
@@ -741,14 +741,14 @@ bool QnOnvifPtzController::activatePreset(const QString &presetId, qreal speed)
     ptz.soap()->float_format = m_floatFormat;
     ptz.soap()->double_format = m_doubleFormat;
 
-    onvifXsd__Vector2D onvifPanTiltSpeed;
+    tt__Vector2D onvifPanTiltSpeed;
     onvifPanTiltSpeed.x = speed; // TODO: #Elric #PTZ do we need to adjust speed to speed limits here?
     onvifPanTiltSpeed.y = speed;
 
-    onvifXsd__Vector1D onvifZoomSpeed;
+    tt__Vector1D onvifZoomSpeed;
     onvifZoomSpeed.x = speed;
 
-    onvifXsd__PTZSpeed onvifSpeed;
+    tt__PTZSpeed onvifSpeed;
     onvifSpeed.PanTilt = &onvifPanTiltSpeed;
     onvifSpeed.Zoom = &onvifZoomSpeed;
 
@@ -759,14 +759,14 @@ bool QnOnvifPtzController::activatePreset(const QString &presetId, qreal speed)
     if (!m_speedBroken)
     {
         // TODO: #Elric #PTZ do we need to adjust speed to speed limits here?
-        onvifXsd__Vector2D onvifPanTiltSpeed;
+        tt__Vector2D onvifPanTiltSpeed;
         onvifPanTiltSpeed.x = speed;
         onvifPanTiltSpeed.y = speed;
 
-        onvifXsd__Vector1D onvifZoomSpeed;
+        tt__Vector1D onvifZoomSpeed;
         onvifZoomSpeed.x = speed;
 
-        onvifXsd__PTZSpeed onvifSpeed;
+        tt__PTZSpeed onvifSpeed;
         onvifSpeed.PanTilt = &onvifPanTiltSpeed;
         onvifSpeed.Zoom = &onvifZoomSpeed;
 

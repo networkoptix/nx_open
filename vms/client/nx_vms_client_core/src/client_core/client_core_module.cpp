@@ -94,7 +94,7 @@ QnDataProviderFactory* QnClientCoreModule::dataProviderFactory() const
     return m_resourceDataProviderFactory.data();
 }
 
-QQmlEngine*QnClientCoreModule::mainQmlEngine()
+QQmlEngine* QnClientCoreModule::mainQmlEngine()
 {
     return m_qmlEngine;
 }

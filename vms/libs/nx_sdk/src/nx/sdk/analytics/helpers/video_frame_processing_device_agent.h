@@ -1,3 +1,5 @@
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+
 #pragma once
 
 #include <string>
@@ -7,6 +9,7 @@
 
 #include <nx/sdk/helpers/ref_countable.h>
 #include <nx/sdk/helpers/log_utils.h>
+#include <nx/sdk/helpers/ptr.h>
 
 #include <nx/sdk/analytics/i_engine.h>
 #include <nx/sdk/analytics/i_consuming_device_agent.h>
@@ -109,7 +112,7 @@ protected:
      * @return Param value, or an empty string if such param does not exist, having logged the
      *     error.
      */
-    std::string getParamValue(const char* paramName);
+    std::string getParamValue(const std::string& paramName);
 
     virtual Error setNeededMetadataTypes(const IMetadataTypes* metadataTypes) override = 0;
 
@@ -142,13 +145,16 @@ public:
 
 private:
     void assertEngineCasted(void* engine) const;
+    void logMetadataPacketIfNeeded(
+        const IMetadataPacket* metadataPacket,
+        const std::string& packetIndexName) const;
     void processMetadataPackets(const std::vector<IMetadataPacket*>& metadataPackets);
     void processMetadataPacket(IMetadataPacket* metadataPacket, int packetIndex /*= -1*/);
 
 private:
     mutable std::mutex m_mutex;
     IEngine* const m_engine;
-    IDeviceAgent::IHandler* m_handler = nullptr;
+    nx::sdk::Ptr<IDeviceAgent::IHandler> m_handler;
     std::map<std::string, std::string> m_settings;
 };
 

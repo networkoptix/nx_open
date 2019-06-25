@@ -11,7 +11,7 @@
 #include <set>
 #include <vector>
 
-#include <QtOpenGL/QGLContext>
+#include <QtWidgets/QOpenGLWidget>
 #include <nx/utils/thread/mutex.h>
 #include <QSharedPointer>
 #include <nx/utils/thread/wait_condition.h>
@@ -19,21 +19,13 @@
 #include <nx/streaming/media_data_packet.h> /* For QnMetaDataV1Ptr. */
 #include <utils/common/safepool.h>
 #include <nx/utils/thread/stoppable.h>
-#include <ui/graphics/opengl/gl_fence.h>
 #include <utils/media/frame_info.h>
 
-//#define GL_COPY_AGGREGATION
-#ifdef GL_COPY_AGGREGATION
-#include "aggregationsurface.h"
-#define UPLOAD_TO_GL_IN_GUI_THREAD
-#endif
 #include "utils/color_space/image_correction.h"
 
-
-class AsyncPicDataUploader;
+class QSurface;
 class CLVideoDecoderOutput;
 class DecodedPictureToOpenGLUploaderPrivate;
-class DecodedPictureToOpenGLUploadThread;
 class QnGlRendererTexture;
 class QnGlRendererTexturePack;
 class AVPacketUploader;
@@ -63,7 +55,6 @@ public:
     class UploadedPicture
     {
         friend class DecodedPictureToOpenGLUploader;
-        friend class AsyncPicDataUploader;
 
     public:
         AVPixelFormat colorFormat() const;
@@ -88,10 +79,6 @@ public:
         QnGlRendererTexture* texture( int index ) const;
         GLuint pboID( int index ) const;
         int flags() const;
-#ifdef GL_COPY_AGGREGATION
-        void setAggregationSurfaceRect( const QSharedPointer<AggregationSurfaceRect>& surfaceRect );
-        const QSharedPointer<AggregationSurfaceRect>& aggregationSurfaceRect() const;
-#endif
         void processImage(
             quint8* yPlane,
             int width,
@@ -119,7 +106,6 @@ public:
         std::vector<PBOData> m_pbo;
         bool m_skippingForbidden;
         int m_flags;
-        GLFence m_glFence;
         ImageCorrectionResult m_imgCorrection;
         QRectF m_displayedRect;
         QnGlRendererTexturePack* m_texturePack;
@@ -158,7 +144,7 @@ public:
         \note If \a asyncDepth is 0 then it is possible that getUploadedPicture() will return NULL (if the only gl buffer is currently used for uploading)
     */
     DecodedPictureToOpenGLUploader(
-        const QGLContext* const mainContext,
+        QOpenGLWidget* glWidget,
         unsigned int asyncDepth = 1 );
     virtual ~DecodedPictureToOpenGLUploader();
 
@@ -213,12 +199,10 @@ public:
     void setYV12ToRgbShaderUsed( bool yv12SharedUsed );
     void setNV12ToRgbShaderUsed( bool nv12SharedUsed );
 
-    //!This method is called by asynchronous uploader when upload is done
-    void pictureDataUploadSucceeded( AsyncPicDataUploader* const uploader, UploadedPicture* const picture );
+    //!This method is called when upload is done
+    void pictureDataUploadSucceeded(UploadedPicture* const picture);
     //!This method is called by asynchronous uploader when upload has failed
-    void pictureDataUploadFailed( AsyncPicDataUploader* const uploader, UploadedPicture* const picture );
-    //!Uploader calles this method, if picture uploading has been cancelled from outside
-    void pictureDataUploadCancelled( AsyncPicDataUploader* const uploader );
+    void pictureDataUploadFailed(UploadedPicture* const picture);
 
     void setImageCorrection(const nx::vms::api::ImageCorrectionData& value);
     nx::vms::api::ImageCorrectionData getImageCorrection() const;
@@ -241,16 +225,6 @@ public:
         uint8_t* planes[],
         int lineSizes[],
         bool isVideoMemory );
-#ifdef GL_COPY_AGGREGATION
-    bool uploadDataToGlWithAggregation(
-        DecodedPictureToOpenGLUploader::UploadedPicture* const emptyPictureBuf,
-        const AVPixelFormat format,
-        const unsigned int width,
-        const unsigned int height,
-        uint8_t* planes[],
-        int lineSizes[],
-        bool /*isVideoMemory*/ );
-#endif
 private:
     friend class QnGlRendererTexture;
     friend class DecodedPicturesDeleter;
@@ -270,14 +244,12 @@ private:
     mutable std::deque<UploadedPicture*> m_picturesBeingRendered;
     mutable std::deque<AVPacketUploader*> m_framesWaitingUploadInGUIThread;
     bool m_terminated;
-    mutable std::deque<AsyncPicDataUploader*> m_unusedAsyncUploaders;
-    std::deque<AsyncPicDataUploader*> m_usedAsyncUploaders;
-    QSharedPointer<DecodedPictureToOpenGLUploadThread> m_uploadThread;
     quint8* m_rgbaBuf;
     int m_fileNumber;
     bool m_hardwareDecoderUsed;
-    bool m_asyncUploadUsed;
-    QGLContext* m_initializedCtx;
+
+    QOpenGLContext* m_initializedContext = nullptr;
+    QSurface* m_initializedSurface = nullptr;
 
     nx::vms::api::ImageCorrectionData m_imageCorrection;
 

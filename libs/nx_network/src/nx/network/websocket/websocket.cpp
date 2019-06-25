@@ -8,8 +8,7 @@ namespace nx {
 namespace network {
 namespace websocket {
 
-static const auto kAliveTimeout = std::chrono::seconds(100);
-static const auto kDefaultPingTimeoutMultiplier = 0.5;
+static const auto kAliveTimeout = std::chrono::seconds(10);
 static const auto kBufferSize = 4096;
 static const auto kMaxIncomingMessageQueueSize = 1000;
 
@@ -26,6 +25,7 @@ WebSocket::WebSocket(
     m_sendMode(sendMode),
     m_receiveMode(receiveMode),
     m_pingTimer(new nx::network::aio::Timer),
+    m_pongTimer(new nx::network::aio::Timer),
     m_aliveTimeout(kAliveTimeout),
     m_frameType(
         frameType == FrameType::binary || frameType == FrameType::text
@@ -38,6 +38,7 @@ WebSocket::WebSocket(
     m_socket->setSendTimeout(0);
     aio::AbstractAsyncChannel::bindToAioThread(m_socket->getAioThread());
     m_pingTimer->bindToAioThread(m_socket->getAioThread());
+    m_pongTimer->bindToAioThread(m_socket->getAioThread());
     m_readBuffer.reserve(kBufferSize);
 }
 
@@ -63,7 +64,7 @@ WebSocket::~WebSocket()
 
 void WebSocket::start()
 {
-    m_pingTimer->start( pingTimeout(), [this]() { onPingTimer(); });
+    m_pingTimer->start(m_aliveTimeout, [this]() { onPingTimer(); });
     m_socket->readSomeAsync(
         &m_readBuffer,
         [this](SystemError::ErrorCode error, size_t transferred)
@@ -74,11 +75,23 @@ void WebSocket::start()
 
 void WebSocket::onPingTimer()
 {
-    sendControlRequest(FrameType::ping);
-    m_pingTimer->start(pingTimeout(), [this]() { onPingTimer(); });
+    m_pongTimer->start(
+        m_aliveTimeout,
+        [this]()
+        {
+            nx::utils::InterruptionFlag::Watcher watcher(&m_destructionFlag);
+            onRead(SystemError::timedOut, 0);
+            if (!watcher.interrupted())
+                onWrite(SystemError::timedOut, 0);
+        });
+
+    if (!m_pingPongDisabled)
+        sendControlRequest(FrameType::ping);
+
+    m_pingTimer->start(m_aliveTimeout, [this]() { onPingTimer(); });
 }
 
-void WebSocket::onRead(SystemError::ErrorCode ecode, size_t transferred)
+void WebSocket::onRead(SystemError::ErrorCode error, size_t transferred)
 {
     if (m_failed)
     {
@@ -86,7 +99,14 @@ void WebSocket::onRead(SystemError::ErrorCode ecode, size_t transferred)
         return;
     }
 
-    if (ecode != SystemError::noError || transferred == 0)
+    if (error != SystemError::noError)
+    {
+        m_failed = true;
+        callOnReadhandler(error, 0);
+        return;
+    }
+
+    if (transferred == 0)
     {
         m_failed = true;
         callOnReadhandler(SystemError::connectionAbort, 0);
@@ -100,6 +120,7 @@ void WebSocket::onRead(SystemError::ErrorCode ecode, size_t transferred)
         return;
     }
 
+    m_pongTimer->cancelSync();
     m_readBuffer.resize(0);
     m_readBuffer.reserve(kBufferSize);
 
@@ -131,6 +152,11 @@ void WebSocket::onRead(SystemError::ErrorCode ecode, size_t transferred)
         });
 }
 
+void WebSocket::disablePingPong()
+{
+    m_pingPongDisabled = true;
+}
+
 void WebSocket::callOnReadhandler(SystemError::ErrorCode error, size_t transferred)
 {
     if (m_userReadContext)
@@ -145,17 +171,13 @@ void WebSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
     AbstractAsyncChannel::bindToAioThread(aioThread);
     m_socket->bindToAioThread(aioThread);
     m_pingTimer->bindToAioThread(aioThread);
-}
-
-std::chrono::milliseconds WebSocket::pingTimeout() const
-{
-    auto timeoutMs = (int64_t)(m_aliveTimeout.count() * kDefaultPingTimeoutMultiplier);
-    return std::chrono::milliseconds(timeoutMs);
+    m_pongTimer->bindToAioThread(aioThread);
 }
 
 void WebSocket::stopWhileInAioThread()
 {
     m_pingTimer.reset();
+    m_pongTimer.reset();
     m_socket.reset();
 }
 
@@ -215,15 +237,6 @@ void WebSocket::sendAsync(const nx::Buffer& buffer, IoCompletionHandler handler)
     post(
         [this, buffer, handler = std::move(handler)]() mutable
         {
-            if (m_failed)
-            {
-                NX_DEBUG(
-                    this,
-                    "sendAsync called after connection has been terminated. Ignoring.");
-                handler(SystemError::connectionAbort, 0);
-                return;
-            }
-
             nx::Buffer writeBuffer;
             if (m_sendMode == SendMode::singleMessage)
             {
@@ -255,6 +268,15 @@ void WebSocket::sendCloseAsync()
 
 void WebSocket::sendMessage(const nx::Buffer& message, int writeSize, IoCompletionHandler handler)
 {
+    NX_VERBOSE(this, "SendMessage: IsFailed: %1, Write size: %2", m_failed, writeSize);
+    if (m_failed)
+    {
+        NX_DEBUG(
+            this,
+            "sendMessage() called after connection has been terminated. Ignoring.");
+        return;
+    }
+
     m_writeQueue.emplace(std::move(handler), message);
     if (m_writeQueue.size() == 1)
     {
@@ -281,7 +303,18 @@ void WebSocket::onWrite(SystemError::ErrorCode error, size_t transferred)
         return;
     }
 
-    if (error != SystemError::noError || transferred == 0)
+    if (error != SystemError::noError)
+    {
+        m_failed = true;
+        while (!m_writeQueue.empty())
+        {
+            utils::InterruptionFlag::Watcher watcher(&m_destructionFlag);
+            callOnWriteHandler(error, 0);
+            if (watcher.interrupted())
+                return;
+        }
+    }
+    else if (transferred == 0)
     {
         m_failed = true;
         while (!m_writeQueue.empty())
@@ -321,6 +354,7 @@ void WebSocket::callOnWriteHandler(SystemError::ErrorCode error, size_t transfer
 void WebSocket::cancelIoInAioThread(nx::network::aio::EventType eventType)
 {
     m_pingTimer->cancelSync();
+    m_pongTimer->cancelSync();
     m_socket->cancelIOSync(eventType);
 }
 
@@ -359,7 +393,8 @@ void WebSocket::frameEnded()
     if (m_parser.frameType() == FrameType::ping)
     {
         NX_VERBOSE(this, "Ping received.");
-        sendControlResponse(FrameType::pong);
+        if (!m_pingPongDisabled)
+            sendControlResponse(FrameType::pong);
         return;
     }
 
@@ -373,8 +408,8 @@ void WebSocket::frameEnded()
     if (m_parser.frameType() == FrameType::close)
     {
         NX_DEBUG(this, "Received close request, responding and terminating.");
-        m_failed = true;
         sendControlResponse(FrameType::close);
+        m_failed = true;
         return;
     }
 

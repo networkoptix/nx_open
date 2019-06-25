@@ -444,7 +444,7 @@ void QnCloudStatusWatcher::updateSystems()
                     d->updateStatusFromResultCode(result);
                 };
 
-            executeDelayed(handler, 0, guard->thread());
+            executeLaterInThread(handler, guard->thread());
         }
     );
 }
@@ -687,7 +687,7 @@ void QnCloudStatusWatcherPrivate::updateCurrentAccount()
                     if (guard)
                         callback(result, accountData);
                 };
-            executeDelayed(timerCallback, 0, thread);
+            executeLaterInThread(timerCallback, thread);
         };
 
     cloudConnection->accountManager()->getAccount(completionHandler);
@@ -736,7 +736,7 @@ void QnCloudStatusWatcherPrivate::createTemporaryCredentials()
                     if (guard)
                         callback(result, credentials);
                 };
-            executeDelayed(timerCallback, 0, thread);
+            executeLaterInThread(timerCallback, thread);
         };
 
     cloudConnection->accountManager()->createTemporaryCredentials(params, completionHandler);
@@ -792,7 +792,7 @@ void QnCloudStatusWatcherPrivate::prolongTemporaryCredentials()
                     if (guard)
                         callback(result);
                 };
-            executeDelayed(timerCallback, 0, thread);
+            executeLaterInThread(timerCallback, thread);
         };
 
     temporaryConnection->ping(completionHandler);

@@ -1288,10 +1288,6 @@
       <translation>Si è verificato un evento sconosciuto</translation>
     </message>
     <message>
-      <source>Multiple %1 events have occured</source>
-      <translation>Si sono verificati più eventi %1</translation>
-    </message>
-    <message>
       <source>Event: %1</source>
       <translation>Evento: %1</translation>
     </message>
@@ -1377,10 +1373,6 @@
     <message>
       <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
       <translation>La connessione alla telecamera (flusso secondario) è stata chiusa in modo imprevisto.</translation>
-    </message>
-    <message>
-      <source>RTP packet loss detected, prev seq.=%1 next seq.=%2.</source>
-      <translation>Rilevata perdita di pacchetti RTP, prev seq. =%1 seq successivo =%2.</translation>
     </message>
     <message>
       <source>RTP packet loss detected.</source>
@@ -1558,20 +1550,44 @@
       <translation>Apri il layout</translation>
     </message>
     <message>
-      <source>Plugin Event</source>
-      <translation>Evento Plugin</translation>
-    </message>
-    <message>
-      <source>Unknown plugin event</source>
-      <translation>Evento plugin sconosciuto</translation>
-    </message>
-    <message>
       <source>Failed to force using camera time, it lags too much, system time will be used</source>
       <translation>Impossibile forzare l'uso dell'orario della telecamera, la differenza è troppa, l'orario di sistema verrà utilizzato</translation>
     </message>
     <message>
       <source>Camera time is back to normal</source>
       <translation>L'orario della telecamera è tornato alla normalità</translation>
+    </message>
+    <message>
+      <source>Multiple %1 events have occurred</source>
+      <translation>Si sono verificati più eventi %1</translation>
+    </message>
+    <message>
+      <source>Multicast address conflict detected. Address %1 is already in use by %2 on %3 stream</source>
+      <translation>Rilevato conflitto di indirizzi multicast. L'indirizzo %1 è già in uso da %2 su %3 stream</translation>
+    </message>
+    <message>
+      <source>Network address %1 is not a multicast address</source>
+      <translation>L'indirizzo di rete %1 non è un indirizzo multicast</translation>
+    </message>
+    <message>
+      <source>Analytics storage &quot;%1&quot; is offline.</source>
+      <translation>La memoriadi analisi&quot;%1&quot; non è in linea.</translation>
+    </message>
+    <message>
+      <source>Analytics storage &quot;%1&quot; is almost full.</source>
+      <translation>La memoria di analisi&quot;%1&quot; è quasi piena.</translation>
+    </message>
+    <message>
+      <source>Plugin Diagnostic Event</source>
+      <translation>Evento diagnostico plug-in</translation>
+    </message>
+    <message>
+      <source>Unknown Plugin Diagnostic Event</source>
+      <translation>Evento diagnostico plugin sconosciuto</translation>
+    </message>
+    <message>
+      <source>RAID error. %1.</source>
+      <translation>Errore RAID. %1.</translation>
     </message>
   </context>
   <context>

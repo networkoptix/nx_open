@@ -10,6 +10,8 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 
+#include <api/media_server_connection.h>
+
 #include <recording/time_period_list.h>
 
 #include <utils/common/warnings.h>

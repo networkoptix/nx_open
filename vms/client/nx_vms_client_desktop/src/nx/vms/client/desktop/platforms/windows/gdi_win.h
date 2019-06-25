@@ -1,8 +1,14 @@
 #pragma once
 
+#include <QtCore/QtGlobal>
+
 #if !defined(Q_OS_WIN)
 #error This is Windows-only header.
 #endif
+
+#include <Windows.h>
+
+#include <QtGui/QColor>
 
 namespace nx::vms::client::desktop {
 namespace gdi {

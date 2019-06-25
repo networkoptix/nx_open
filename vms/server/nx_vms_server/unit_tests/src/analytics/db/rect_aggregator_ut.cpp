@@ -132,13 +132,40 @@ TEST_F(RectAggregator, rects_with_same_value_are_aggregated)
 {
     const auto expected = std::vector<AggregatedRect>{
         AggregatedRect{QRect(1, 1, 5, 5), {1, 2}},
-        AggregatedRect{QRect(9, 9, 5, 5), {1, 2}} };
+        AggregatedRect{QRect(9, 9, 5, 5), {1, 2}}};
 
     const auto actual = aggregate(
         AggregatedRect{QRect(1, 1, 5, 5), {1}},
         AggregatedRect{QRect(1, 1, 5, 5), {2}},
         AggregatedRect{QRect(9, 9, 5, 5), {1}},
         AggregatedRect{QRect(9, 9, 5, 5), {2}}
+    );
+
+    assertEqual(expected, actual);
+}
+
+TEST_F(RectAggregator, adjacent_rects_with_same_values_are_merged)
+{
+    const auto expected = std::vector<AggregatedRect>{
+        AggregatedRect{QRect(19, 13, 2, 1), {1}}};
+
+    const auto actual = aggregate(
+        AggregatedRect{QRect(19, 13, 1, 1), {1}},
+        AggregatedRect{QRect(20, 13, 1, 1), {1}}
+    );
+
+    assertEqual(expected, actual);
+}
+
+TEST_F(RectAggregator, produced_adjacent_rects_with_same_values_are_merged)
+{
+    const auto expected = std::vector<AggregatedRect>{
+        AggregatedRect{QRect(1, 1, 12, 1), {1}}};
+
+    const auto actual = aggregate(
+        AggregatedRect{QRect(1, 1, 10, 1), {1}},
+        AggregatedRect{QRect(2, 1, 10, 1), {1}},
+        AggregatedRect{QRect(12, 1, 1, 1), {1}}
     );
 
     assertEqual(expected, actual);
