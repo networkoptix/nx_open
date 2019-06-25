@@ -42,6 +42,8 @@ TreeView
                 || nodeType == ResourceTree.NodeType.localSeparator
 
             property bool isEditing: false
+            property TextInput activeEditor: null
+
             focus: isEditing
 
             Connections
@@ -50,17 +52,25 @@ TreeView
 
                 onStartEditing:
                     isEditing = true
+
+                onFinishEditing:
+                {
+                    if (activeEditor)
+                        activeEditor.onEditingFinished()
+
+                    isEditing = false
+                }
             }
 
             height: item && item.height
 
             sourceComponent:
             {
-                if (isEditing)
-                    return editorComponent
-
                 if (isSeparator)
                     return separatorComponent
+
+                if (isEditing)
+                    return editorComponent
 
                 return normalComponent
             }
@@ -155,27 +165,20 @@ TreeView
                         selectedTextColor: mainTextColor
                         color: mainTextColor
 
-                        property bool cancel: false
-
                         Keys.onEscapePressed:
-                            isEditing = false
+                            delegateItem.isEditing = false
 
                         onEditingFinished:
                         {
-                            if (model)
+                            if (model && delegateItem.isEditing)
                                 model.edit = text
 
                             delegateItem.isEditing = false
                         }
 
-                        Connections
-                        {
-                            target: delegateItem.parent
-                            onFinishEditing: nameEditor.onEditingFinished()
-                        }
-
                         Component.onCompleted:
                         {
+                            delegateItem.activeEditor = nameEditor
                             forceActiveFocus()
                             selectAll()
                         }
