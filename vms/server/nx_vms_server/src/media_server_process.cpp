@@ -3704,7 +3704,6 @@ void MediaServerProcess::stopObjects()
         m_initStoragesAsyncPromise->get_future().wait();
     // todo: #rvasilenko some undeleted resources left in the QnMain event loop. I stopped TimerManager as temporary solution for it.
     nx::utils::TimerManager::instance()->stop();
-    qnStaticCommon->instance<QnLongRunnablePool>()->stopAll();
 
     // Remove all stream recorders.
     m_remoteArchiveSynchronizer.reset();
