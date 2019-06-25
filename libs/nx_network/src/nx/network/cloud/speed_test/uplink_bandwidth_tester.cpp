@@ -12,6 +12,12 @@ using namespace std::chrono;
 
 namespace {
 
+static constexpr char kSpeedTest[] = "SPEEDTEST";
+static constexpr int kPayloadSizeBytes = 1000 * 1000;
+static constexpr float kSimilarityThreshold = 0.97F;
+static constexpr int kMinRunningAverages = 4;
+static const auto kMinTestDuration = milliseconds(1);
+
 static int ipVersion(const nx::utils::Url& url)
 {
     return HostAddress(url.host()).isPureIpV6() ? AF_INET6 : SocketFactory::tcpClientIpVersion();
@@ -19,9 +25,6 @@ static int ipVersion(const nx::utils::Url& url)
 
 static QByteArray makePayload()
 {
-	static constexpr char kSpeedTest[] = "SPEEDTEST";
-	static constexpr int kPayloadSizeBytes = 1000 * 1000;
-
 	QByteArray payload;
 	payload.reserve(kPayloadSizeBytes);
 
@@ -156,40 +159,91 @@ std::optional<int> UplinkBandwidthTester::parseSequence(const network::http::Mes
 	return it->second.toInt();
 }
 
+std::optional<int> UplinkBandwidthTester::stopEarlyIfAble(int sequence) const
+{
+    if (sequence < kMinRunningAverages
+        || (int) m_testContext.runningValues.size() < kMinRunningAverages)
+    {
+        return std::nullopt;
+    }
+
+    auto end = m_testContext.runningValues.find(sequence);
+    std::set<float> bandwidths;
+
+    std::transform(
+        std::prev(end, kMinRunningAverages),
+        end,
+        std::inserter(bandwidths, bandwidths.begin()),
+        [](const std::pair<const int, RunningValue>& elem)
+        {
+            return elem.second.averageBandwidth;
+        });
+
+    for (auto it = std::next(bandwidths.begin(), 1); it != bandwidths.end(); ++it)
+    {
+        if (!*bandwidths.begin() || !*it)
+            return std::nullopt;
+
+        if (*bandwidths.begin() / *it < kSimilarityThreshold)
+            return std::nullopt;
+    }
+
+    return (int) end->second.averageBandwidth;
+}
+
 void UplinkBandwidthTester::onMessageReceived(network::http::Message message)
 {
 	auto sequence = parseSequence(message);
 	if (!sequence)
 		return testFailed(SystemError::invalidData);
 
-	auto receivedTime = localNow();
+    auto messageSentTime = localNow() - m_pingTime;
 
-	// Received first message sent
-	if (*sequence == 0)
-		m_testContext.adjustedStartTime = receivedTime - m_pingTime;
+	auto currentDuration = messageSentTime - m_testContext.startTime;
+    if (currentDuration >= kMinTestDuration)
+    {
+        float runningTotalBytesSent = m_testContext.runningValues[*sequence].totalBytesSent;
+        m_testContext.runningValues[*sequence].averageBandwidth =
+            runningTotalBytesSent / duration_cast<milliseconds>(currentDuration).count();
 
-	if (m_testContext.stoppedSendingNewMessages && *sequence == m_testContext.sequence)
+        auto bytesPerMsec = stopEarlyIfAble(*sequence);
+        if (bytesPerMsec)
+        {
+            NX_VERBOSE(this,
+                "Stopping early on sequence: %1 with %2 Bpms (%3 Mbps), and %4 requests sent. "
+                "Time left until no more messages are sent: %5",
+                *sequence, *bytesPerMsec, *bytesPerMsec * kBytesPerMsecToMegabitsPerSec,
+                m_testContext.sequence, m_testDuration - (localNow() - m_testContext.startTime));
+
+            m_testContext.sendRequests = false;
+            return testComplete(*bytesPerMsec);
+        }
+    }
+
+	if (!m_testContext.sendRequests && *sequence == m_testContext.sequence)
 	{
-		if (*sequence == 0)
+		if (*sequence == 0 || currentDuration < kMinTestDuration)
 			return testFailed(SystemError::invalidData);
 
-		testComplete(receivedTime - m_pingTime);
+        testComplete(
+            m_testContext.totalBytesSent / duration_cast<milliseconds>(currentDuration).count());
 	}
 }
 
 void UplinkBandwidthTester::sendRequest()
 {
-	if (m_testContext.stoppedSendingNewMessages)
+	if (!m_testContext.sendRequests)
 		return;
 
 	if (localNow() - m_testContext.startTime >= m_testDuration)
 	{
-		m_testContext.stoppedSendingNewMessages = true;
+		m_testContext.sendRequests = false;
 		return;
 	}
 
 	auto [sequence, buffer] = makeRequest();
 	m_testContext.totalBytesSent += buffer.size();
+	m_testContext.runningValues[sequence].totalBytesSent = m_testContext.totalBytesSent;
 
     m_pipeline->sendData(
 		std::move(buffer),
@@ -202,36 +256,36 @@ void UplinkBandwidthTester::sendRequest()
 		});
 }
 
-void UplinkBandwidthTester::testComplete(const microseconds& endTime)
+void nx::network::cloud::speed_test::UplinkBandwidthTester::testComplete(int bandwidth)
 {
-	if (m_handler)
-	{
-		auto [errorCode, bandwidth] = calculateBandwidth(endTime);
-		if (errorCode != SystemError::noError)
-			testFailed(errorCode);
-		else
-			nx::utils::swapAndCall(m_handler, SystemError::noError, bandwidth);
-	}
-}
-
-void UplinkBandwidthTester::testFailed(SystemError::ErrorCode errorCode)
-{
-	if (m_handler)
-		nx::utils::swapAndCall(m_handler, errorCode, 0);
+    if (m_handler)
+    {
+        m_testContext = TestContext();
+        nx::utils::swapAndCall(m_handler, SystemError::noError, bandwidth);
+    }
 }
 
 std::pair<SystemError::ErrorCode, int> UplinkBandwidthTester::calculateBandwidth(
 	const microseconds& endTime)
 {
-	const int testDurationSeconds =
-		(int) duration_cast<seconds>(endTime - m_testContext.adjustedStartTime).count();
+	const int testDuration =
+		(int) duration_cast<milliseconds>(endTime - m_testContext.startTime).count();
 
-	if (testDurationSeconds == 0)
+	if (testDuration == 0)
 		return std::make_pair(SystemError::invalidData, 0);
 
 	return std::make_pair(
 		SystemError::noError,
-		m_testContext.totalBytesSent / testDurationSeconds);
+		m_testContext.totalBytesSent / testDuration);
+}
+
+void UplinkBandwidthTester::testFailed(SystemError::ErrorCode errorCode)
+{
+    if (m_handler)
+    {
+        m_testContext = TestContext();
+        nx::utils::swapAndCall(m_handler, errorCode, 0);
+    }
 }
 
 } // namespace nx::network::cloud::speed_test

@@ -12,6 +12,7 @@ using namespace nx::hpm::api;
 
 namespace {
 
+static constexpr int kMaxPingRequests = 10;
 static const milliseconds kTestDuration = seconds(3);
 
 } // namespace
@@ -84,22 +85,30 @@ void UplinkSpeedTester::setupPingTest()
         [this]
         {
             auto now = localNow();
+            auto pingTime = now - m_testContext.requestSentTime;
 
-            ++m_testContext.totalRoundTrips;
-            auto roundTripTime = now - m_testContext.requestSentTime;
-            m_testContext.totalRoundTripTime += roundTripTime;
+			// Ignoring first request because tcp uses two round trips to establish
+			// a connection, increasing the ping time on first request.
+            if (++m_testContext.totalPings == 1)
+            {
+                NX_VERBOSE(this, "Initial ping: %1", pingTime);
+                return sendPing();
+            }
+
+            m_testContext.totalPingTime += pingTime;
+
+            auto averagePingTime =
+                m_testContext.totalPingTime / m_testContext.totalPings;
+            NX_VERBOSE(this, "Average ping: %1", averagePingTime);
 
             if (now - m_testContext.startTime < kTestDuration
-				&& m_testContext.totalRoundTrips < m_testContext.kMaxPingRequests)
+				&& m_testContext.totalPings < kMaxPingRequests)
             {
                 sendPing();
             }
             else
             {
-                auto pingTime =
-					m_testContext.totalRoundTripTime / m_testContext.totalRoundTrips;
-
-				startBandwidthTest(pingTime);
+				startBandwidthTest(averagePingTime);
 
 				m_httpClient.reset();
             }
@@ -123,8 +132,9 @@ void UplinkSpeedTester::emitTestResult(
     SystemError::ErrorCode errorCode,
     std::optional<ConnectionSpeed> result)
 {
-	QString resultStr = result
-		? lm("{pingTime: %1, bandwidth: %2Bps}").args(result->pingTime, result->bandwidth)
+    QString resultStr = result
+        ? lm("{pingTime: %1, bandwidth: %2 Bpms (%3 Mbps)}")
+        .args(result->pingTime, result->bandwidth, result->bandwidth * kBytesPerMsecToMegabitsPerSec)
 		: "none";
 
 	NX_VERBOSE(this, "Test complete, reporting system error: '%1' and speed test result: %2",

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <queue>
+
 #include <nx/network/http/server/abstract_authentication_manager.h>
 #include <nx/network/http/server/http_message_dispatcher.h>
 #include <nx/network/http/server/http_server_connection.h>
@@ -7,6 +9,8 @@
 #include <nx/network/system_socket.h>
 
 namespace nx::network::cloud::speed_test {
+
+static constexpr float kBytesPerMsecToMegabitsPerSec = 1000.0F / 1024 / 1024 * 8;
 
 NX_NETWORK_API std::chrono::milliseconds localNow();
 
@@ -16,7 +20,7 @@ using BandwidthCompletionHandler =
 class NX_NETWORK_API UplinkBandwidthTester:
 	public network::aio::BasicPollable
 {
-	using base_type = network::aio::BasicPollable;
+    using base_type = network::aio::BasicPollable;
 public:
     UplinkBandwidthTester(
 		const nx::utils::Url& url,
@@ -32,25 +36,33 @@ public:
 private:
     std::pair<int/*sequence*/, nx::Buffer> makeRequest();
 	std::optional<int> parseSequence(const network::http::Message& message);
+	std::optional<int> stopEarlyIfAble(int sequence)const;
 
     void onMessageReceived(network::http::Message message);
 
 	void sendRequest();
 
-	void testComplete(const std::chrono::microseconds& endTime);
+	void testComplete(int bandwidth);
 	void testFailed(SystemError::ErrorCode errorCode);
 
-	std::pair<SystemError::ErrorCode, int> calculateBandwidth(const std::chrono::microseconds& endTime);
+	std::pair<SystemError::ErrorCode, int> calculateBandwidth(
+		const std::chrono::microseconds& endTime);
 
 private:
+    struct RunningValue
+    {
+        int totalBytesSent = 0;
+        float averageBandwidth = 0;
+    };
+
 	struct TestContext
 	{
 		std::chrono::microseconds startTime;
-		std::chrono::microseconds adjustedStartTime;
-		bool stoppedSendingNewMessages = false;
+		bool sendRequests = true;
 		int sequence = -1;
 		QByteArray payload;
 		int totalBytesSent = 0;
+		std::map<int /*sequence*/, RunningValue> runningValues;
 	};
 
 private:

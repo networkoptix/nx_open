@@ -37,12 +37,10 @@ private:
 private:
     struct PingTestContext
     {
-		static constexpr int kMaxPingRequests = 20;
-
         std::chrono::milliseconds startTime;
 		std::chrono::microseconds requestSentTime;
-		std::chrono::microseconds totalRoundTripTime;
-		int totalRoundTrips = 0;
+		std::chrono::microseconds totalPingTime;
+		int totalPings = 0;
     };
 
 private:
