@@ -4,7 +4,7 @@
 
 namespace nx::utils {
 
-NX_UTILS_API struct IosDeviceInformation
+struct NX_UTILS_API IosDeviceInformation
 {
     enum class Type
     {
@@ -17,7 +17,7 @@ NX_UTILS_API struct IosDeviceInformation
     {
         iPhoneXs = 11,
         iPhone6 = 7,
-        
+
         iPadAir2 = 5,
         iPadProA12XBionic = 8
     };
