@@ -8,7 +8,7 @@
 #include <QtCore/QMap>
 #include <QtCore/QJsonDocument>
 
-#include <nx_ec/ec_proto_version.h>
+#include <nx/vms/api/protocol_version.h>
 #include <nx/fusion/model_functions.h>
 #include "common/common_module.h"
 
@@ -93,7 +93,7 @@ bool RevealResponse::deserialize(const quint8 *bufStart, const quint8 *bufEnd)
     id = QnUuid::fromStringSafe(map.value(lit("seed")).toString());
     sslAllowed = map.value(lit("sslAllowed")).toBool();
     port = static_cast<quint16>(map.value(lit("port")).toUInt());
-    protoVersion = map.value(lit("protoVersion"), nx_ec::INITIAL_EC2_PROTO_VERSION).toInt();
+    protoVersion = map.value(lit("protoVersion"), nx::vms::api::kInitialProtocolVersion).toInt();
     runtimeId = QnUuid::fromStringSafe(map.value(lit("runtimeId")).toString());
     serverFlags = QnLexical::deserialized<nx::vms::api::ServerFlags>(
         map.value(lit("flags")).toString(), nx::vms::api::SF_None);

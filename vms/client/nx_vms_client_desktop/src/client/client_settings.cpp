@@ -174,6 +174,20 @@ QnClientSettings::QnClientSettings(const QnStartupParameters& startupParameters,
 
     setThreadSafe(true);
 
+    if (!m_settings->isWritable())
+    {
+        auto fileName = m_settings->fileName();
+        if (!fileName.isEmpty())
+        {
+            NX_ERROR(this, "QnClientSettings() - client can not write settings to %1. "
+                "Please check file permissions.", fileName);
+        }
+        else
+        {
+            NX_ERROR(this, "QnClientSettings() - client can not write settings.");
+        }
+    }
+
     m_loading = false;
 }
 
@@ -496,14 +510,15 @@ void QnClientSettings::load()
     updateFromSettings(m_settings);
 }
 
-void QnClientSettings::save()
+bool QnClientSettings::save()
 {
     submitToSettings(m_settings);
     if (!isWritable())
-        return;
+        return false;
 
     m_settings->sync();
     emit saved();
+    return true;
 }
 
 bool QnClientSettings::isWritable() const

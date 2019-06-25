@@ -1,7 +1,10 @@
 #include "common_update_installer.h"
+
 #include <nx/utils/log/log.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/software_version.h>
+#include <nx/fusion/model_functions.h>
+#include <nx/update/update_information.h>
 #include <utils/common/process.h>
 #include <utils/common/app_info.h>
 #include <utils/common/util.h>
@@ -9,9 +12,25 @@
 #include <api/model/audit/auth_session.h>
 #include <common/common_module.h>
 
-#include <QtCore>
-
 namespace nx {
+
+namespace {
+
+update::PackageInformation updateInformation(const QString& path)
+{
+    const QString infoFileName = QDir(path).absoluteFilePath("package.json");
+    QFile updateInfoFile(infoFileName);
+    updateInfoFile.setPermissions(QFileDevice::ReadOwner | QFileDevice::WriteOwner);
+    if (!updateInfoFile.open(QFile::ReadOnly))
+    {
+        NX_ERROR(NX_SCOPE_TAG, "Failed to open update information file: %1", infoFileName);
+        return {};
+    }
+
+    return QJson::deserialized<update::PackageInformation>(updateInfoFile.readAll());
+}
+
+} // namespace
 
 CommonUpdateInstaller::CommonUpdateInstaller(QObject* parent):
     QnCommonModuleAware(parent)
@@ -95,54 +114,38 @@ CommonUpdateInstaller::State CommonUpdateInstaller::state() const
 
 CommonUpdateInstaller::State CommonUpdateInstaller::checkContents(const QString& outputPath) const
 {
-    QVariantMap infoMap = updateInformation(outputPath);
-    if (infoMap.isEmpty())
+    const update::PackageInformation& info = updateInformation(outputPath);
+    if (!info.isValid())
         return CommonUpdateInstaller::State::updateContentsError;
 
-    if (infoMap.value("executable").toString().isEmpty())
+    if (info.component != component())
+    {
+        NX_ERROR(this, "Update package is for %1, not %2", info.component, component());
+        return CommonUpdateInstaller::State::updateContentsError;
+    }
+
+    const auto& systemInfo = QnAppInfo::currentSystemInformationNew();
+    if (!info.isCompatibleTo(systemInfo))
+    {
+        NX_ERROR(this, "Update is incompatible to current %1:\n%2",
+            systemInfo, QString::fromUtf8(QJson::serialized(info)));
+        return CommonUpdateInstaller::State::updateContentsError;
+    }
+
+    if (info.installScript.isEmpty())
     {
         NX_ERROR(this, "No executable specified in the update information file");
         return CommonUpdateInstaller::State::updateContentsError;
     }
 
-    m_executable = outputPath + QDir::separator() + infoMap.value("executable").toString();
+    m_executable = QDir(outputPath).absoluteFilePath(info.installScript);
     if (!checkExecutable(m_executable))
     {
         NX_ERROR(this, "Update executable file is invalid");
         return CommonUpdateInstaller::State::updateContentsError;
     }
 
-    const auto systemInfo = systemInformation();
-
-    QString platform = infoMap.value("platform").toString();
-    if (platform != systemInfo.platform)
-    {
-        NX_ERROR(this, lm("Incompatible update: %1 != %2").args(systemInfo.platform, platform));
-        return CommonUpdateInstaller::State::updateContentsError;
-    }
-
-    QString arch = infoMap.value("arch").toString();
-    if (arch != systemInfo.arch)
-    {
-        NX_ERROR(this, lm("Incompatible update: %1 != %2").args(systemInfo.arch, arch));
-        return CommonUpdateInstaller::State::updateContentsError;
-    }
-
-    QString modification = infoMap.value("modification").toString();
-    if (modification != systemInfo.modification)
-    {
-        NX_ERROR(this, lm("Incompatible update: %1 != %2").args(systemInfo.modification, modification));
-        return CommonUpdateInstaller::State::updateContentsError;
-    }
-
-    QString variantVersion = infoMap.value("variantVersion").toString();
-    if (nx::utils::SoftwareVersion(variantVersion) > nx::utils::SoftwareVersion(systemInfo.version))
-    {
-        NX_ERROR(this, lm("Incompatible update: %1 > %2").args(variantVersion, systemInfo.version));
-        return CommonUpdateInstaller::State::updateContentsError;
-    }
-
-    m_version = infoMap.value(QStringLiteral("version")).toString();
+    m_version = info.version;
 
     return CommonUpdateInstaller::State::ok;
 }
@@ -210,26 +213,6 @@ bool CommonUpdateInstaller::cleanInstallerDirectory()
     if (!removeResult)
         return false;
     return QDir().mkpath(path);
-}
-
-QVariantMap CommonUpdateInstaller::updateInformation(const QString& outputPath) const
-{
-    QFile updateInfoFile(QDir(outputPath).absoluteFilePath("update.json"));
-    updateInfoFile.setPermissions(QFileDevice::ReadOwner | QFileDevice::WriteOwner);
-    if (!updateInfoFile.open(QFile::ReadOnly))
-    {
-        NX_ERROR(
-            this,
-            lm("Failed to open update information file: %1").args(updateInfoFile.fileName()));
-        return QVariantMap();
-    }
-
-    return QJsonDocument::fromJson(updateInfoFile.readAll()).toVariant().toMap();
-}
-
-nx::vms::api::SystemInformation CommonUpdateInstaller::systemInformation() const
-{
-    return QnAppInfo::currentSystemInformation();
 }
 
 bool CommonUpdateInstaller::checkExecutable(const QString& executableName) const

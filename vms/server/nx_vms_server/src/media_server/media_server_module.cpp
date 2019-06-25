@@ -73,7 +73,6 @@
 #include <nx/vms/server/event/event_connector.h>
 #include <nx/vms/server/event/extended_rule_processor.h>
 #include <nx/vms/server/system/nx1/info.h>
-#include "server_update_tool.h"
 #include <motion/motion_helper.h>
 #include <audit/mserver_audit_manager.h>
 #include <database/server_db.h>
@@ -276,7 +275,6 @@ QnMediaServerModule::QnMediaServerModule(
     m_sharedContextPool = store(new nx::vms::server::resource::SharedContextPool(this));
     m_archiveIntegrityWatcher = store(new nx::vms::server::ServerArchiveIntegrityWatcher(this));
     m_updateManager = store(new nx::vms::server::ServerUpdateManager(this));
-    m_serverUpdateTool = store(new QnServerUpdateTool(this));
     auto dataDir = closeDirPath(settings().dataDir()) + QString("record_catalog");
     m_motionHelper = store(new QnMotionHelper(dataDir, this));
 
@@ -564,11 +562,6 @@ std::shared_ptr<ec2::AbstractECConnection> QnMediaServerModule::ec2Connection() 
 QnGlobalSettings* QnMediaServerModule::globalSettings() const
 {
     return m_commonModule->globalSettings();
-}
-
-QnServerUpdateTool* QnMediaServerModule::serverUpdateTool() const
-{
-    return m_serverUpdateTool;
 }
 
 QnMotionHelper* QnMediaServerModule::motionHelper() const

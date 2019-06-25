@@ -11,6 +11,9 @@
 #include <nx/vms/server/analytics/abstract_video_data_receptor.h>
 #include <nx/sdk/analytics/i_device_agent.h>
 
+#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/i_string_map.h>
+
 class QnAbstractDataReceptor;
 
 namespace nx::vms::server::analytics {
@@ -61,6 +64,10 @@ private:
 
     bool isEngineAlreadyBound(const QnUuid& engineId) const;
     bool isEngineAlreadyBound(const resource::AnalyticsEngineResourcePtr& engine) const;
+
+    nx::sdk::Ptr<nx::sdk::IStringMap> prepareSettings(
+        const QnUuid& engineId,
+        const QVariantMap& settings);
 
 private:
     mutable QnMutex m_mutex;

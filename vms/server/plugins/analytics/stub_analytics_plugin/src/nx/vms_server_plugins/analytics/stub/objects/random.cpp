@@ -1,12 +1,10 @@
 #include "random.h"
 
+#include <limits>
 #include <vector>
 #include <functional>
 
-#include "bicycle.h"
-#include "vehicles.h"
-#include "pedestrian.h"
-#include "human_face.h"
+#include <nx/kit/debug.h>
 
 namespace nx {
 namespace vms_server_plugins {
@@ -15,8 +13,8 @@ namespace stub {
 
 float randomFloat(float min, float max)
 {
-    if (max <= min)
-        return NAN;
+    if (!NX_KIT_ASSERT(min < max))
+        return std::numeric_limits<float>::quiet_NaN();
     return  min + (float) rand() / ((float) RAND_MAX / (max - min));
 }
 
@@ -25,17 +23,13 @@ Vector2D randomTrajectory()
     return Vector2D(randomFloat(-1, 1), randomFloat(-1, 1)).normalized();
 }
 
-std::unique_ptr<AbstractObject> randomObject()
+std::unique_ptr<AbstractObject> RandomObjectGenerator::generate() const
 {
-    static const std::vector<std::function<std::unique_ptr<AbstractObject>()>> kObjectFuncs = {
-        [](){ return std::make_unique<Bicycle>(); },
-        [](){ return std::make_unique<Car>(); },
-        [](){ return std::make_unique<Truck>(); },
-        [](){ return std::make_unique<Pedestrian>(); },
-        [](){ return std::make_unique<HumanFace>(); }
-    };
+    std::lock_guard<std::mutex> lock(m_mutex);
+    if (m_registry.empty())
+        return nullptr;
 
-    return kObjectFuncs[rand() % kObjectFuncs.size()]();
+    return m_registry[rand() % m_registry.size()].factory();
 }
 
 } // namespace stub

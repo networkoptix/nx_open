@@ -13,6 +13,7 @@
 #include <nx/utils/test_support/utils.h>
 #include <nx/utils/time.h>
 
+#include <nx_ec/ec_proto_version.h>
 #include <nx/clusterdb/engine/dao/memory/command_data_object_in_memory.h>
 #include <nx/clusterdb/engine/dao/rdb/structure_updater.h>
 #include <nx/clusterdb/engine/outgoing_command_dispatcher.h>

@@ -120,6 +120,9 @@ BaseTile
 
             visible:
             {
+                if (control.isCloudTile)
+                    return true
+
                 var localhostIPv4RegEx = /^https?\:\/\/127\.0\.0\.1\:/
 
                 var tile = control.areaLoader.item
