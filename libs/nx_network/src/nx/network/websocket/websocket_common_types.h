@@ -18,8 +18,7 @@ enum class PayloadType
 enum class Role
 {
     client,
-    server,
-    undefined
+    server
 };
 
 enum FrameType
@@ -32,6 +31,12 @@ enum FrameType
     pong = 0xa
 };
 
+enum CompressionType
+{
+    none = 0x0,
+    perMessageDeflate = 0x1
+};
+
 QString frameTypeString(FrameType type);
 
 enum class Error
@@ -41,7 +46,7 @@ enum class Error
     maskIsZero,
     handshakeError,
     connectionAbort,
-    timedOut,
+    timedOut
 };
 
 enum class SendMode
@@ -58,11 +63,16 @@ enum class SendMode
 
 enum class ReceiveMode
 {
-    frame,      /**< Read handler will be called only when complete frame has been read from socket */
-    message,    /**< Read handler will be called only when complete message has been read from socket*/
-    stream      /**< Read handler will be called only when any data has been read from socket */
+    frame, /**< Read handler will be called only when complete frame has been read from socket */
+    message /**< Read handler will be called only when complete message has been read from socket*/
 };
 
+NX_NETWORK_API inline bool isDataFrame(FrameType frameType)
+{
+    return frameType == FrameType::binary
+        || frameType == FrameType::text
+        || frameType == FrameType::continuation;
+}
 } // namespace websocket
 } // namespace network
 } // namespace nx

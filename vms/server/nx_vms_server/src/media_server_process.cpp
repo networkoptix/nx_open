@@ -3704,6 +3704,7 @@ void MediaServerProcess::stopObjects()
         m_initStoragesAsyncPromise->get_future().wait();
     // todo: #rvasilenko some undeleted resources left in the QnMain event loop. I stopped TimerManager as temporary solution for it.
     nx::utils::TimerManager::instance()->stop();
+    qnStaticCommon->instance<QnLongRunnablePool>()->stopAll();
 
     // Remove all stream recorders.
     m_remoteArchiveSynchronizer.reset();
@@ -3714,6 +3715,7 @@ void MediaServerProcess::stopObjects()
     serverModule()->analyticsManager()->stop(); //< Stop processing analytics events.
     serverModule()->pluginManager()->unloadPlugins();
     serverModule()->eventRuleProcessor()->stop();
+    serverModule()->p2pDownloader()->stopDownloads();
 
     //since mserverResourceDiscoveryManager instance is dead no events can be delivered to serverResourceProcessor: can delete it now
     //TODO refactoring of discoveryManager <-> resourceProcessor interaction is required

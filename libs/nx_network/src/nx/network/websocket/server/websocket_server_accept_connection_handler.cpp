@@ -19,10 +19,8 @@ AcceptConnectionHandler::AcceptConnectionHandler(
             http::RequestPathParams restParams)
         {
             auto webSocket = std::make_unique<WebSocket>(
-                std::move(connection),
-                SendMode::singleMessage,
-                ReceiveMode::message,
-                Role::server);
+                std::move(connection), SendMode::singleMessage, ReceiveMode::message,
+                Role::server, FrameType::binary, CompressionType::perMessageDeflate);
             webSocket->start();
             onConnectionCreated(std::move(webSocket), std::move(restParams));
         })

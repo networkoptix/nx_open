@@ -4,11 +4,12 @@ namespace nx::p2p {
 
 P2PWebsocketTransport::P2PWebsocketTransport(
     std::unique_ptr<network::AbstractStreamSocket> socket,
-    network::websocket::FrameType frameType)
+    network::websocket::Role role,
+    network::websocket::FrameType frameType,
+    network::websocket::CompressionType compressionType)
     :
-    m_webSocket(new network::WebSocket(std::move(socket), frameType))
+    m_webSocket(new network::WebSocket(std::move(socket), role, frameType, compressionType))
 {
-    // TODO: #akulikov change that to real value
     BasicPollable::bindToAioThread(m_webSocket->getAioThread());
     m_webSocket->setAliveTimeout(std::chrono::seconds(60));
 }
