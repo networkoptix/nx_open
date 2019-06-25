@@ -7,8 +7,6 @@ import nx.vms.client.desktop 1.0
 
 /**
  * A tree view with multi-selection.
- *
- * To control which items are hoverable/selectable, the delegate must have "selectable" property.
  */
 Item
 {
@@ -54,15 +52,14 @@ Item
             {
                 id: treeItem
 
-                property bool selectable: !delegateLoader.item
-                    || delegateLoader.item.selectable === undefined
-                    || delegateLoader.item.selectable
-
                 width: parent.width
                 implicitHeight: Math.max(button.implicitHeight, delegateLoader.implicitHeight)
 
+                readonly property bool selectable: itemFlags & Qt.ItemIsSelectable
+
                 readonly property var modelData: model
                 readonly property var modelIndex: linearizationListModel.index(index, 0)
+                readonly property int itemFlags: linearizationListModel.flags(modelIndex)
                 readonly property bool isCurrent: ListView.isCurrentItem
                 readonly property bool isSelected: selectionHighlight.visible
 
@@ -190,6 +187,8 @@ Item
 
                     readonly property var modelIndex: linearizationListModel.mapToSource(
                         treeItem.modelIndex)
+
+                    readonly property int itemFlags: treeItem.itemFlags
 
                     readonly property bool isCurrent: treeItem.isCurrent
                     readonly property bool isSelected: treeItem.isSelected
