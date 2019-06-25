@@ -32,8 +32,6 @@ TreeView
 
     delegate: Loader
     {
-        readonly property bool selectable: !separator
-
         readonly property int nodeType: (model && model.nodeType) || -1
 
         readonly property bool separator: nodeType == ResourceTree.NodeType.separator
