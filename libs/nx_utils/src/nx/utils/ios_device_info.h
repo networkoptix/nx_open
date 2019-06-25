@@ -2,7 +2,7 @@
 
 #include <QtCore/QString>
 
-namespace nx::media {
+namespace nx::utils {
 
 struct IosDeviceInformation
 {

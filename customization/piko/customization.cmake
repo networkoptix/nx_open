@@ -2,7 +2,7 @@ set(enable_hanwha true)
 
 # Components Namings
 set(display.product.name "Piko")
-set(display.mobile.name "Piko")
+set(display_mobile_name "Piko")
 set(product.name "Piko")
 set(product.name.short "piko")
 set(product.appName "piko")
@@ -37,7 +37,7 @@ set(customization.fullBundleUpgradeCode "{486DA831-335F-4D02-B1A1-82D3C9868404}"
 set(deb.customization.company.name "piko")
 
 set(ios.new_bundle_identifier "com.pikovms.pikomobile")
-set(ios.group_identifier "com.pikovms.piko")
+set(ios.group_identifier "group.com.pikovms.piko")
 set(ios.sign.identity "iPhone Distribution: Cook Security Group, Inc (N52Z7JQP9L)")
 
 set(mac.sign.identity "Developer ID Application: Cook Security Group, Inc (N52Z7JQP9L)")

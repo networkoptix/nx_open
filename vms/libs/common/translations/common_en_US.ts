@@ -1059,11 +1059,11 @@
     <name>nx::utils::CryptedFileStream</name>
     <message>
         <source>Wrong crypted stream size.</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Damaged crypted stream header.</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

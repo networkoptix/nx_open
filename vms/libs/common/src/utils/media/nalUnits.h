@@ -317,6 +317,7 @@ public:
         qpprime_y_zero_transform_bypass_flag = 0;
         seq_scaling_matrix_present_flag = 0;
         cpb_cnt_minus1 = -1;
+        aspect_ratio_idc = 0;
         //m_pulldown = false;
 
         memset( ScalingList4x4, 16, sizeof(ScalingList4x4) );
