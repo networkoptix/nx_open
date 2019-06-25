@@ -30,183 +30,277 @@ TreeView
         model: resourceTreeModel
     }
 
-    delegate: Loader
+    delegate: Component
     {
-        readonly property int nodeType: (model && model.nodeType) || -1
-
-        readonly property bool separator: nodeType == ResourceTree.NodeType.separator
-            || nodeType == ResourceTree.NodeType.localSeparator
-
-        sourceComponent: separator ? separatorComponent : normalRowComponent
-        height: item && item.height
-
-        Component
+        Loader
         {
-            id: normalRowComponent
+            id: delegateItem
 
-            Row
+            readonly property int nodeType: (model && model.nodeType) || -1
+
+            readonly property bool isSeparator: nodeType == ResourceTree.NodeType.separator
+                || nodeType == ResourceTree.NodeType.localSeparator
+
+            property bool isEditing: false
+            focus: isEditing
+
+            Connections
             {
-                height: kRowHeight
-                spacing: 4
+                target: delegateItem.parent
 
-                Image
+                onStartEditing:
+                    isEditing = true
+            }
+
+            height: item && item.height
+
+            sourceComponent:
+            {
+                if (isEditing)
+                    return editorComponent
+
+                if (isSeparator)
+                    return separatorComponent
+
+                return normalComponent
+            }
+
+            Component
+            {
+                id: normalComponent
+
+                Row
                 {
-                    id: icon
+                    height: kRowHeight
+                    spacing: 4
 
-                    width: 20
-                    height: parent.height
-                    fillMode: Image.Stretch
-                    source: (model && model.iconKey && model.iconKey !== 0
-                        && ("image://resource/" + model.iconKey + "/" + itemState)) || ""
-                }
-
-                Text
-                {
-                    id: name
-
-                    text: (model && model.display) || ""
-                    font.weight: Font.DemiBold
-                    height: parent.height
-                    verticalAlignment: Text.AlignVCenter
-
-                    color:
+                    Image
                     {
-                        switch (itemState)
-                        {
-                            case ResourceTree.ItemState.accented:
-                                return ColorTheme.colors.brand_core
-                            case ResourceTree.ItemState.selected:
-                                return ColorTheme.colors.light4
-                            default:
-                                return ColorTheme.colors.light10
-                        }
+                        id: icon
+
+                        width: kIconWidth
+                        height: parent.height
+                        fillMode: Image.Stretch
+                        source: iconSource
                     }
-                }
 
-                Text
-                {
-                    id: extraInfo
-
-                    text: (model && model.extraInfo) || ""
-                    font.weight: Font.Normal
-                    height: parent.height
-                    verticalAlignment: Text.AlignVCenter
-                    leftPadding: 1
-
-                    color:
+                    Text
                     {
-                        switch (itemState)
-                        {
-                            case ResourceTree.ItemState.accented:
-                                return ColorTheme.colors.brand_d3
-                            case ResourceTree.ItemState.selected:
-                                return ColorTheme.colors.light10
-                            default:
-                                return ColorTheme.colors.dark17
-                        }
+                        id: name
+
+                        text: (model && model.display) || ""
+                        font.weight: Font.DemiBold
+                        height: parent.height
+                        verticalAlignment: Text.AlignVCenter
+                        color: mainTextColor
                     }
-                }
 
-                readonly property int itemState:
-                {
-                    if (!scene || !model)
-                        return ResourceTree.ItemState.normal
-
-                    switch (nodeType)
+                    Text
                     {
-                        case ResourceTree.NodeType.currentSystem:
-                        case ResourceTree.NodeType.currentUser:
-                            return ResourceTree.ItemState.selected
+                        id: extraInfo
 
-                        case ResourceTree.NodeType.layoutItem:
+                        text: (model && model.extraInfo) || ""
+                        font.weight: Font.Normal
+                        height: parent.height
+                        verticalAlignment: Text.AlignVCenter
+                        leftPadding: 1
+
+                        color:
                         {
-                            var itemLayout = modelDataAccessor.getData(
-                                resourceTreeModel.parent(modelIndex), "resource")
-
-                            if (!itemLayout || scene.layout !== itemLayout)
-                                return ResourceTree.ItemState.normal
-
-                            return scene.currentResource && scene.currentResource === model.resource
-                                ? ResourceTree.ItemState.accented
-                                : ResourceTree.ItemState.selected
-                        }
-
-                        case ResourceTree.NodeType.resource:
-                        case ResourceTree.NodeType.sharedLayout:
-                        case ResourceTree.NodeType.edge:
-                        case ResourceTree.NodeType.sharedResource:
-                        {
-                            var resource = model.resource
-                            if (!resource)
-                                return ResourceTree.ItemState.normal
-
-                            // TODO: #vkutin handle videowalls.
-
-                            if (scene.currentResource === resource)
-                                return ResourceTree.ItemState.accented
-
-                            if (scene.layout === resource || scene.containsResource(resource))
-                                return ResourceTree.ItemState.selected
-
-                            return ResourceTree.ItemState.normal
-                        }
-
-                        case ResourceTree.NodeType.recorder:
-                        {
-                            var childCount = resourceTreeModel.rowCount(modelIndex)
-                            var hasSelectedChildren = false
-
-                            for (var i = 0; i < childCount; ++i)
+                            switch (itemState)
                             {
-                                var childResource = modelDataAccessor.getData(
-                                    resourceTreeModel.index(i, 0, modelIndex), "resource")
-
-                                if (!childResource)
-                                    continue
-
-                                if (scene.currentResource === childResource)
-                                    return ResourceTree.ItemState.accented
-
-                                hasSelectedChildren |= scene.containsResource(childResource)
+                                case ResourceTree.ItemState.accented:
+                                    return ColorTheme.colors.brand_d3
+                                case ResourceTree.ItemState.selected:
+                                    return ColorTheme.colors.light10
+                                default:
+                                    return ColorTheme.colors.dark17
                             }
-
-                            return hasSelectedChildren
-                                ? ResourceTree.ItemState.selected
-                                : ResourceTree.ItemState.normal
                         }
-
-                        // TODO: #vkutin handle these.
-                        case ResourceTree.NodeType.videoWallItem:
-                        case ResourceTree.NodeType.layoutTour:
-                            return ResourceTree.ItemState.normal
                     }
-
-                    return ResourceTree.ItemState.normal
                 }
             }
-        }
 
-        Component
-        {
-            id: separatorComponent
-
-            Item
+            Component
             {
-                width: parent.width
-                height: kSeparatorRowHeight
+                id: editorComponent
 
-                Rectangle
+                Row
                 {
-                    id: separatorLine
+                    height: kRowHeight
+                    spacing: 4
 
-                    height: 1
-                    anchors.verticalCenter: parent.verticalCenter
-                    anchors.left: parent.left
-                    anchors.right: parent.right
-                    anchors.leftMargin: -itemIndent
+                    Image
+                    {
+                        id: icon
 
-                    color: ColorTheme.transparent(ColorTheme.colors.dark8, 0.4)
+                        width: kIconWidth
+                        height: parent.height
+                        fillMode: Image.Stretch
+                        source: iconSource
+                    }
+
+                    TextInput
+                    {
+                        id: nameEditor
+
+                        focus: true
+                        text: (model && model.display) || ""
+                        font.weight: Font.DemiBold
+                        width: parent.width - x
+                        height: parent.height
+                        verticalAlignment: Text.AlignVCenter
+                        selectionColor: selectionHighlightColor
+                        selectByMouse: true
+                        selectedTextColor: mainTextColor
+                        color: mainTextColor
+
+                        property bool cancel: false
+
+                        Keys.onEscapePressed:
+                            isEditing = false
+
+                        onEditingFinished:
+                        {
+                            if (model)
+                                model.edit = text
+
+                            delegateItem.isEditing = false
+                        }
+
+                        Connections
+                        {
+                            target: delegateItem.parent
+                            onFinishEditing: nameEditor.onEditingFinished()
+                        }
+
+                        Component.onCompleted:
+                        {
+                            forceActiveFocus()
+                            selectAll()
+                        }
+                    }
                 }
+            }
+
+            Component
+            {
+                id: separatorComponent
+
+                Item
+                {
+                    width: parent.width
+                    height: kSeparatorRowHeight
+
+                    Rectangle
+                    {
+                        id: separatorLine
+
+                        height: 1
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        anchors.leftMargin: -itemIndent
+
+                        color: ColorTheme.transparent(ColorTheme.colors.dark8, 0.4)
+                    }
+                }
+            }
+
+            readonly property int kIconWidth: 20
+
+            readonly property string iconSource:
+                (model && model.iconKey && model.iconKey !== 0
+                    && ("image://resource/" + model.iconKey + "/" + itemState)) || ""
+
+            readonly property color mainTextColor:
+            {
+                switch (itemState)
+                {
+                    case ResourceTree.ItemState.accented:
+                        return ColorTheme.colors.brand_core
+                    case ResourceTree.ItemState.selected:
+                        return ColorTheme.colors.light4
+                    default:
+                        return ColorTheme.colors.light10
+                }
+            }
+
+            readonly property int itemState:
+            {
+                if (!scene || !model)
+                    return ResourceTree.ItemState.normal
+
+                switch (nodeType)
+                {
+                    case ResourceTree.NodeType.currentSystem:
+                    case ResourceTree.NodeType.currentUser:
+                        return ResourceTree.ItemState.selected
+
+                    case ResourceTree.NodeType.layoutItem:
+                    {
+                        var itemLayout = modelDataAccessor.getData(
+                            resourceTreeModel.parent(modelIndex), "resource")
+
+                        if (!itemLayout || scene.layout !== itemLayout)
+                            return ResourceTree.ItemState.normal
+
+                        return scene.currentResource && scene.currentResource === model.resource
+                            ? ResourceTree.ItemState.accented
+                            : ResourceTree.ItemState.selected
+                    }
+
+                    case ResourceTree.NodeType.resource:
+                    case ResourceTree.NodeType.sharedLayout:
+                    case ResourceTree.NodeType.edge:
+                    case ResourceTree.NodeType.sharedResource:
+                    {
+                        var resource = model.resource
+                        if (!resource)
+                            return ResourceTree.ItemState.normal
+
+                        // TODO: #vkutin handle videowalls.
+
+                        if (scene.currentResource === resource)
+                            return ResourceTree.ItemState.accented
+
+                        if (scene.layout === resource || scene.containsResource(resource))
+                            return ResourceTree.ItemState.selected
+
+                        return ResourceTree.ItemState.normal
+                    }
+
+                    case ResourceTree.NodeType.recorder:
+                    {
+                        var childCount = resourceTreeModel.rowCount(modelIndex)
+                        var hasSelectedChildren = false
+
+                        for (var i = 0; i < childCount; ++i)
+                        {
+                            var childResource = modelDataAccessor.getData(
+                                resourceTreeModel.index(i, 0, modelIndex), "resource")
+
+                            if (!childResource)
+                                continue
+
+                            if (scene.currentResource === childResource)
+                                return ResourceTree.ItemState.accented
+
+                            hasSelectedChildren |= scene.containsResource(childResource)
+                        }
+
+                        return hasSelectedChildren
+                            ? ResourceTree.ItemState.selected
+                            : ResourceTree.ItemState.normal
+                    }
+
+                    // TODO: #vkutin handle these.
+                    case ResourceTree.NodeType.videoWallItem:
+                    case ResourceTree.NodeType.layoutTour:
+                        return ResourceTree.ItemState.normal
+                }
+
+                return ResourceTree.ItemState.normal
             }
         }
     }

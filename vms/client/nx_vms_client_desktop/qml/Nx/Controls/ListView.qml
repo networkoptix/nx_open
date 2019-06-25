@@ -3,7 +3,7 @@ import QtQuick 2.6
 /**
  * A list view with not animated mouse wheel interaction and with hover tracking & highlighting.
  *
- * To control which items are hoverable the delegate must have "selectable" property.
+ * To control which items are hoverable the delegate must have "isSelectable" property.
  */
 ListView
 {
@@ -26,7 +26,7 @@ ListView
         color: listView.hoverHighlightColor
 
         visible: d.hoveredItem
-            && (!d.hoveredItem.hasOwnProperty("selectable") || d.hoveredItem.selectable)
+            && (!d.hoveredItem.hasOwnProperty("isSelectable") || d.hoveredItem.isSelectable)
 
         Connections
         {

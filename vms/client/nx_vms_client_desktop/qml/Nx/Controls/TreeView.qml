@@ -55,7 +55,8 @@ Item
                 width: parent.width
                 implicitHeight: Math.max(button.implicitHeight, delegateLoader.implicitHeight)
 
-                readonly property bool selectable: itemFlags & Qt.ItemIsSelectable
+                readonly property bool isSelectable: itemFlags & Qt.ItemIsSelectable
+                readonly property bool isEditable: itemFlags & Qt.ItemIsEditable
 
                 readonly property var modelData: model
                 readonly property var modelIndex: linearizationListModel.index(index, 0)
@@ -68,8 +69,14 @@ Item
                     id: selectionHighlight
 
                     anchors.fill: parent
-                    color: selectionHighlightColor
                     visible: false
+
+                    readonly property bool isDelegateFocused: delegateLoader.item
+                        && delegateLoader.item.activeFocus
+
+                    color: listView.activeFocus && !isDelegateFocused
+                        ? selectionHighlightColor
+                        : hoverHighlightColor
 
                     Connections
                     {
@@ -121,6 +128,8 @@ Item
                         if (mouse.flags & Qt.MouseEventCreatedDoubleClick)
                             return
 
+                        listView.focus = true
+
                         var toggle = model && model.hasChildren
                             && button.contains(mapToItem(button, mouse.x, mouse.y))
 
@@ -130,7 +139,7 @@ Item
                             return
                         }
 
-                        if (selectable)
+                        if (isSelectable)
                         {
                             if (!modelIndex.valid)
                                 return
@@ -173,6 +182,9 @@ Item
                         {
                             selectionModel.setCurrentIndex(
                                 modelIndex, ItemSelectionModel.ClearAndSelect)
+
+                            if (isEditable)
+                                delegateLoader.startEditing()
                         }
                     }
 
@@ -195,10 +207,20 @@ Item
 
                     readonly property real itemIndent: x
 
+                    signal startEditing()
+                    signal finishEditing()
+
                     sourceComponent: treeView.delegate
 
                     anchors.left: button.right
                     anchors.right: parent.right
+
+                    Connections
+                    {
+                        target: selectionModel
+                        enabled: delegateLoader.isCurrent
+                        onSelectionChanged: delegateLoader.finishEditing()
+                    }
                 }
             }
         }
