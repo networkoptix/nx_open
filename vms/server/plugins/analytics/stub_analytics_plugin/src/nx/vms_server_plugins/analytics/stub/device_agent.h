@@ -9,7 +9,6 @@
 #include <vector>
 #include <string>
 
-#include <nx/sdk/uuid.h>
 #include <nx/sdk/analytics/helpers/video_frame_processing_device_agent.h>
 #include <nx/sdk/analytics/helpers/pixel_format.h>
 
@@ -99,7 +98,7 @@ private:
     void updateEventGenerationParameters();
 
 private:
-    std::atomic<bool> m_terminated{ false };
+    std::atomic<bool> m_terminated{false};
 
     std::unique_ptr<std::thread> m_pluginEventThread;
     std::mutex m_pluginEventGenerationLoopMutex;
@@ -155,10 +154,7 @@ private:
     struct ObjectContext
     {
         ObjectContext() = default;
-        ObjectContext(std::unique_ptr<AbstractObject> object):
-            object(std::move(object))
-        {
-        }
+        ObjectContext(std::unique_ptr<AbstractObject> object): object(std::move(object)) {}
 
         ObjectContext& operator=(std::unique_ptr<AbstractObject>&& otherObject)
         {
