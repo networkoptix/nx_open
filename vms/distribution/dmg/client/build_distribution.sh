@@ -10,64 +10,12 @@ WORK_DIR="build_distribution_tmp"
 LOG_FILE="$LOGS_DIR/build_distribution.log"
 
 # TODO: Create the "stage" in $WORK_DIR.
-RAW_DMG="raw-$DISTRIBUTION_DMG"
 SRC=./dmg-folder
 VOLUME_NAME="$DISPLAY_PRODUCT_NAME $RELEASE_VERSION"
+FAKE_DIR="./fake-folder"
 
-APP_DIR="$SRC/$DISPLAY_PRODUCT_NAME.app"
-
-hexify()
-{
-    hexdump -ve '1/1 "%.2X"'
-}
-
-dehexify()
-{
-    xxd -r -p
-}
-
-patchDsStore()
-{
-    local -r xFrom="$1"
-    local -r xTo="$2"
-    local -r version="$3"
-    local -r hardCodedVersion="2.3.2"
-
-    local -r fromVerHex=$(echo -ne "$hardCodedVersion" |hexify)
-    local -r toVerHex=$(echo -ne "$version" |hexify)
-
-    cat "$xFrom" |hexify |sed "s/$fromVerHex/$toVerHex/g" |dehexify >"$xTo"
-}
-
-hardDetachDmg() # file.dmg
-{
-    if [ -f "$1" ]
-    then
-        lsof -t "$1" |xargs kill -9
-    fi
-}
-
-setDmgIcon()
-{
-    local -r attachedDmg="$WORK_DIR/attached_dmg"
-    rm -rf "$attachedDmg"
-    mkdir -p "$attachedDmg"
-
-    hdiutil attach "$RAW_DMG" -mountpoint "$attachedDmg"
-    SetFile -a C "$attachedDmg"
-
-    # Try detach multiple times because something in MacOS can sometimes hold the directory.
-    local -i detached=0
-    for i in {1..20}
-    do
-        hdiutil detach "$attachedDmg" && detached=1 && break
-        echo "Cannot detach $attachedDmg" >&2
-        sleep 1
-    done
-    [[ $detached -ne 1 ]] && exit 1
-
-    rm -rf "$attachedDmg"
-}
+APP_NAME="$DISPLAY_PRODUCT_NAME.app"
+APP_DIR="$SRC/$APP_NAME"
 
 copyMacOsSpecificApplauncherStuff()
 {
@@ -86,8 +34,6 @@ copyMacOsSpecificApplauncherStuff()
 
 buildDistribution()
 {
-    ln -s /Applications "$SRC/Applications"
-
     mv "$SRC/client.app" "$APP_DIR"
     mkdir -p "$APP_DIR/Contents/Resources"
     cp "$APP_ICON" "$APP_DIR/Contents/Resources/appIcon.icns"
@@ -96,9 +42,7 @@ buildDistribution()
 
     copyMacOsSpecificApplauncherStuff
 
-    patchDsStore "$SRC/DS_Store" "$SRC/.DS_Store" "$RELEASE_VERSION"
-    rm "$SRC/DS_Store"
-
+    
     python macdeployqt.py \
         "$CURRENT_BUILD_DIR" "$APP_DIR" "$BUILD_DIR/bin" "$BUILD_DIR/lib" "$CLIENT_HELP_PATH" "$QT_DIR" \
         "$QT_VERSION"
@@ -114,14 +58,21 @@ buildDistribution()
 
         codesign -f -v --deep $KEYCHAIN_ARGS -s "$MAC_SIGN_IDENTITY" "$APP_DIR"
     fi
+ 
+    mkdir -p "$FAKE_DIR"
 
-    SetFile -c icnC "$SRC/.VolumeIcon.icns"
+    test -f $DISTRIBUTION_DMG && rm $DISTRIBUTION_DMG
+    create-dmg \
+        --volname "$VOLUME_NAME" \
+        --volicon "$SRC/.VolumeIcon.icns" \
+        --window-size 600 400 \
+        --icon-size 48 \
+        --background "$SRC/.background/dmgBackground.png" \
+        --app-drop-link 466 236 \
+        --add-folder "$APP_NAME" "$APP_DIR" 134 236 \
+        "$DISTRIBUTION_DMG" "$FAKE_DIR"
 
-    hardDetachDmg "$RAW_DMG"
-
-    hdiutil create \
-        -srcfolder "$SRC" -volname "$VOLUME_NAME" -fs "HFS+" -format UDRW \
-        -ov "$RAW_DMG"
+    rm -rf "$FAKE_DIR"
 
     mv update.json "$SRC/"
     cp package.json "$SRC/"
@@ -129,17 +80,14 @@ buildDistribution()
     (cd "$SRC"
         zip -y -r "../$UPDATE_ZIP" *.app update.json package.json
     )
-
-    setDmgIcon
-
-    rm -f "$DISTRIBUTION_DMG"
-    hardDetachDmg "$RAW_DMG"
-    hdiutil convert "$RAW_DMG" -format UDZO -o "$DISTRIBUTION_DMG"
-    rm -f "$RAW_DMG"
 }
 
 main()
 {
+    # Supresses perl warnings.
+    export LC_CTYPE=en_US.UTF-8
+    export LC_ALL=en_US.UTF-8
+
     distrib_prepareToBuildDistribution "$WORK_DIR" "$LOG_FILE" "$@"
 
     set -x #< Log each command.
