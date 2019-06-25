@@ -303,8 +303,6 @@ bool QnTransactionMessageBus::processSpecialTransaction(
         case ApiCommand::updatePersistentSequence:
             updatePersistentMarker(tran);
             break;
-        case ApiCommand::installUpdate:
-        case ApiCommand::uploadUpdate:
         case ApiCommand::changeSystemId:
         {
             // Transactions listed here should not go to the DbManager.

@@ -76,7 +76,6 @@
 #include <network/system_helpers.h>
 
 #include <nx_ec/ec_api.h>
-#include <nx_ec/ec_proto_version.h>
 #include <nx/vms/api/data/user_data.h>
 #include <nx_ec/managers/abstract_user_manager.h>
 #include <nx_ec/managers/abstract_layout_manager.h>
@@ -138,7 +137,6 @@
 #include <rest/handlers/activate_license_rest_handler.h>
 #include <rest/handlers/test_email_rest_handler.h>
 #include <rest/handlers/test_ldap_rest_handler.h>
-#include <rest/handlers/update_rest_handler.h>
 #include <rest/handlers/update_information_rest_handler.h>
 #include <rest/handlers/start_update_rest_handler.h>
 #include <rest/handlers/finish_update_rest_handler.h>
@@ -289,6 +287,8 @@
 #include <providers/speech_synthesis_data_provider.h>
 #include <nx/utils/file_system.h>
 #include <nx/network/url/url_builder.h>
+
+#include <nx/vms/api/protocol_version.h>
 
 #include "nx/vms/server/system/nx1/info.h"
 #include <atomic>
@@ -2748,38 +2748,7 @@ void MediaServerProcess::registerRestHandlers(
      *     %param:string error Error code, "0" means no error.
      *     %param:string errorString Error message in English, or an empty string.
      *     %param:array reply List of JSON objects with the following structure:
-     *         %param reply[].name Name of the plugin from its manifest.
-     *         %param reply[].description Description of the plugin from its manifest.
-     *         %param reply[].vendor Vendor of the plugin from its manifest.
-     *         %param reply[].version Version of the plugin from its manifest.
-     *         %param reply[].libraryFilename Absolute path to the plugin dynamic library.
-     *         %param reply[].homeDir Absolute path to the plugin's dedicated directory where its
-     *             dynamic library resides together with its possible dependencies, or an empty
-     *             string if the plugin resides in a common directory with other plugins.
-     *         %param reply[].optionality Whether the plugin resides in "plugins_optional" folder
-     *             or in the regular "plugins" folder.
-     *         %param reply[].status Status of the plugin after the plugin loading attempt.
-     *         %param reply[].statusMessage Message in English with details about the plugin
-     *             loading attempt.
-     *         %param reply[].errorCode If the plugin status is "notLoadedBecauseOfError",
-     *             describes the error.
-     *             %value undefined No error.
-     *             %value cannotLoadLibrary OS cannot load the library file.
-     *             %value invalidLibrary The library does not seem to be a valid Nx Plugin library,
-     *                 e.g. no expected entry point functions found.
-     *             %value libraryFailure The plugin library failed to initialize, e.g. its entry
-     *                 point function returned an error.
-     *             %value badManifest The plugin has returned a bad manifest, e.g. null, empty,
-     *                 non-json, or json with an unexpected structure.
-     *             %value unsupportedVersion The plugin API version is no longer supported.
-     *         %param reply[].highestSupportedInterface The latest Interface type that the Plugin
-     *             object supports via queryInterface().
-     *             %value undefined
-     *             %value nxpl_PluginInterface Base interface for the old 3.2 SDK.
-     *             %value nxpl_Plugin Old 3.2 SDK plugin supporting roSettings.
-     *             %value nxpl_Plugin2 Old 3.2 SDK plugin supporting pluginContainer.
-     *             %value nx_sdk_IPlugin Base interface for the new 4.0 SDK.
-     *             %value nx_sdk_analytics_IPlugin New 4.0 SDK Analytics plugin.
+     *         %struct PluginInfo
      */
     reg("api/pluginInfo",
         new nx::vms::server::rest::PluginInfoHandler(serverModule()));
@@ -3745,6 +3714,7 @@ void MediaServerProcess::stopObjects()
     serverModule()->analyticsManager()->stop(); //< Stop processing analytics events.
     serverModule()->pluginManager()->unloadPlugins();
     serverModule()->eventRuleProcessor()->stop();
+    serverModule()->p2pDownloader()->stopDownloads();
 
     //since mserverResourceDiscoveryManager instance is dead no events can be delivered to serverResourceProcessor: can delete it now
     //TODO refactoring of discoveryManager <-> resourceProcessor interaction is required
@@ -4538,6 +4508,18 @@ void MediaServerProcess::run()
     if (m_serviceMode)
         initializeLogging(serverSettings.get());
 
+    // This must be done before QnCommonModule instantiation.
+    nx::vms::api::SystemInformation::runtimeModificationOverride =
+        ini().runtimeModificationOverride;
+    nx::vms::api::SystemInformation::runtimeOsVersionOverride = ini().runtimeOsVersionOverride;
+
+    if (m_cmdLineArguments.vmsProtocolVersion > 0)
+    {
+        nx::vms::api::protocolVersionOverride = m_cmdLineArguments.vmsProtocolVersion;
+        NX_WARNING(this, "Starting with overridden protocol version: %1",
+            m_cmdLineArguments.vmsProtocolVersion);
+    }
+
     std::shared_ptr<QnMediaServerModule> serverModule(new QnMediaServerModule(
         &m_cmdLineArguments,
         std::move(serverSettings)));
@@ -4652,8 +4634,6 @@ void MediaServerProcess::run()
 
     if (needToStop())
         return;
-
-    serverModule->serverUpdateTool()->removeUpdateFiles(m_mediaServer->getVersion().toString());
 
     serverModule->resourcePool()->threadPool()->setMaxThreadCount(
         serverModule->settings().resourceInitThreadsCount());

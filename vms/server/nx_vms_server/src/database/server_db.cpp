@@ -28,6 +28,8 @@
 #include <api/global_settings.h>
 #include <common/common_module.h>
 
+#include <nx/vms/server/database/update_helpers/update_analytics_records_helper.h>
+
 using std::chrono::milliseconds;
 using namespace std::literals::chrono_literals;
 
@@ -679,6 +681,12 @@ bool QnServerDb::bookmarksUniqueIdToCameraGuid()
     return true;
 }
 
+bool QnServerDb::updateAnalyticsEventRecords()
+{
+    nx::vms::server::database::UpdateAnalyticsRecordsHelper helper(m_sdb);
+    return helper.doUpdate();
+}
+
 bool QnServerDb::createBookmarkTagTriggersUnderTransaction()
 {
     // ATTENTION: Do not attempt to move this code to sql scripts. It uses semicolons inside SQL
@@ -1047,6 +1055,9 @@ bool QnServerDb::afterInstallUpdate(const QString& updateName)
 
     if (updateName.endsWith(lit("/07_1_bookmarks_unique_id_to_camera_guid.sql")))
         return bookmarksUniqueIdToCameraGuid();
+
+    if (updateName.endsWith("/16_update_analytics_event_records.sql"))
+        return updateAnalyticsEventRecords();
 
     return true;
 }

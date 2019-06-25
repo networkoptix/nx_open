@@ -1,8 +1,10 @@
 #pragma once
 
-#include <QtCore>
-#include <QString>
 #include <future>
+#include <utility>
+
+#include <QtCore/QString>
+
 #include <nx/update/update_information.h>
 #include <nx/vms/api/data/system_information.h>
 #include <common/common_module.h>
@@ -19,7 +21,8 @@ enum class FindPackageResult
     noInfo,
     otherError,
     latestUpdateInstalled,
-    notParticipant
+    notParticipant,
+    osVersionNotSupported,
 };
 
 /**
@@ -35,6 +38,16 @@ Information updateInformation(
     const nx::vms::api::SoftwareVersion& currentVersion,
     const QString& publicationKey = kLatestVersion,
     InformationError* error = nullptr);
+
+/** Searches for an update package for a specified OS variant. */
+std::pair<FindPackageResult, const Package*> findPackageForVariant(
+    const nx::update::Information& updateInformation,
+    bool isClient,
+    const vms::api::SystemInformationNew& systemInformation);
+std::pair<FindPackageResult, Package*> findPackageForVariant(
+    nx::update::Information& updateInformation,
+    bool isClient,
+    const vms::api::SystemInformationNew& systemInformation);
 
 /**
  * Searches for an update package for your particular module in the global update information.
@@ -64,19 +77,6 @@ FindPackageResult fromByteArray(
     const QByteArray& serializedUpdateInformation,
     Information* outInformation,
     QString* outMessage);
-
-/**
- * Simple search for a package
- * @param component component string: {server, client}
- * @param systemInfo system info of package being searched
- * @param updateInfo update contents
- * @return first package with specified data, or nullptr if no package is found. Note: it points
- *     to the object inside updateInfo. So be careful with the lifetime of updateInfo.
- */
-nx::update::Package* findPackage(
-    const QString& component,
-    nx::vms::api::SystemInformation& systemInfo,
-    nx::update::Information& updateInfo);
 
 using UpdateCheckCallback = std::function<void (const UpdateContents&)>;
 

@@ -8,7 +8,6 @@
 #include <core/resource/videowall_resource.h>
 #include <core/resource/layout_resource.h>
 
-#include <media_server/server_update_tool.h>
 #include <media_server/settings.h>
 #include <nx_ec/dummy_handler.h>
 #include <network/universal_tcp_listener.h>
@@ -114,11 +113,6 @@ void QnServerMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
 {
     base_type::connectToConnection(connection);
 
-    connect(connection->updatesNotificationManager().get(), &ec2::AbstractUpdatesNotificationManager::updateChunkReceived,
-        this, &QnServerMessageProcessor::at_updateChunkReceived);
-    connect(connection->updatesNotificationManager().get(), &ec2::AbstractUpdatesNotificationManager::updateInstallationRequested,
-        this, &QnServerMessageProcessor::at_updateInstallationRequested);
-
     connect(connection, &ec2::AbstractECConnection::remotePeerUnauthorized,
         this, &QnServerMessageProcessor::at_remotePeerUnauthorized);
 
@@ -141,7 +135,6 @@ void QnServerMessageProcessor::disconnectFromConnection(
     const ec2::AbstractECConnectionPtr& connection)
 {
     base_type::disconnectFromConnection(connection);
-    connection->updatesNotificationManager()->disconnect(this);
     connection->miscNotificationManager()->disconnect(this);
 }
 
@@ -220,18 +213,6 @@ bool QnServerMessageProcessor::isLocalAddress(const QString& addr) const
         }
     }
     return false;
-}
-
-void QnServerMessageProcessor::at_updateChunkReceived(
-    const QString& updateId, const QByteArray& data, qint64 offset)
-{
-    m_serverModule->serverUpdateTool()->addUpdateFileChunkAsync(updateId, data, offset);
-}
-
-void QnServerMessageProcessor::at_updateInstallationRequested(const QString& updateId)
-{
-    m_serverModule->serverUpdateTool()->installUpdate(
-        updateId, QnServerUpdateTool::UpdateType::Delayed);
 }
 
 void QnServerMessageProcessor::at_remotePeerUnauthorized(const QnUuid& id)

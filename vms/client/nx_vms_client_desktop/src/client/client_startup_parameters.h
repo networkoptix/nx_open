@@ -62,6 +62,7 @@ struct QnStartupParameters
     QnUuid videoWallGuid;
     QnUuid videoWallItemGuid;
     QString engineVersion;
+    int vmsProtocolVersion = 0;
     QString dynamicCustomizationPath;
     QString ipVersion;
 

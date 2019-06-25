@@ -43,9 +43,6 @@ typedef std::shared_ptr<AbstractWebPageManager> AbstractWebPageManagerPtr;
 class AbstractStoredFileManager;
 typedef std::shared_ptr<AbstractStoredFileManager> AbstractStoredFileManagerPtr;
 
-class AbstractUpdatesManager;
-typedef std::shared_ptr<AbstractUpdatesManager> AbstractUpdatesManagerPtr;
-
 class AbstractECConnection;
 typedef std::shared_ptr<AbstractECConnection> AbstractECConnectionPtr;
 

@@ -19,8 +19,6 @@
 
 #include <client/client_settings.h>
 
-#include <nx_ec/ec_proto_version.h>
-
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
 

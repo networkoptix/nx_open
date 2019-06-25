@@ -13,10 +13,12 @@ namespace {
 using namespace nx::vms::client::core;
 
 static const QSet<int> kSortingRoles = {
+    QnSystemsModel::SearchRoleId,
     QnSystemsModel::SystemNameRoleId,
     QnSystemsModel::SystemIdRoleId,
     QnSystemsModel::LocalIdRoleId,
-    QnSystemsModel::IsFactorySystemRoleId};
+    QnSystemsModel::IsFactorySystemRoleId,
+    QnSystemsModel::IsConnectableRoleId};
 
 bool getWeightFromData(
     const QnWeightsDataHash& weights,
@@ -58,48 +60,35 @@ bool getWeightFromData(
     return result;
 }
 
-class FilterModel: public QnSortFilterListModel
-{
-    using base_type = QnSortFilterListModel;
-public:
-    FilterModel(QObject* parent = nullptr);
+} // namespace
 
-    QnSystemsModel* systemsModel();
-
-    bool filterAcceptsRow(
-        int sourceRow,
-        const QModelIndex& sourceParent) const override;
-
-    void setWeights(const QnWeightsDataHash& weights);
-
-private:
-    const QScopedPointer<QnSystemsModel> m_systemsModel;
-    QnWeightsDataHash m_weights;
-};
-
-FilterModel::FilterModel(QObject* parent):
+QnSystemSortFilterListModel::QnSystemSortFilterListModel(QObject* parent):
     base_type(parent),
-    m_systemsModel(new QnSystemsModel())
+    m_weights(),
+    m_unknownSystemsWeight(0.0)
 {
-    setSourceModel(m_systemsModel.data());
     setTriggeringRoles(kSortingRoles);
 }
 
-QnSystemsModel* FilterModel::systemsModel()
+void QnSystemSortFilterListModel::setWeights(const QnWeightsDataHash& weights, qreal unknownSystemsWeight)
 {
-    return m_systemsModel.data();
-}
+    const bool sameUnknownWeight = qFuzzyEquals(m_unknownSystemsWeight, unknownSystemsWeight);
 
-void FilterModel::setWeights(const QnWeightsDataHash& weights)
-{
-    if (m_weights == weights)
+    if (sameUnknownWeight && (weights == m_weights))
         return;
 
+    m_unknownSystemsWeight = unknownSystemsWeight;
     m_weights = weights;
+
     forceUpdate();
 }
 
-bool FilterModel::filterAcceptsRow(
+bool QnSystemSortFilterListModel::isForgotten(const QString& /* id */) const
+{
+    return false;
+}
+
+bool QnSystemSortFilterListModel::filterAcceptsRow(
     int sourceRow,
     const QModelIndex& /* sourceParent */) const
 {
@@ -112,7 +101,7 @@ bool FilterModel::filterAcceptsRow(
         return true;    //< Skips every connectable system
 
     const auto id = dataIndex.data(QnSystemsModel::SystemIdRoleId).toString();
-    if (qnForgottenSystemsManager && qnForgottenSystemsManager->isForgotten(id))
+    if (isForgotten(id))
         return false;
 
     if (dataIndex.data(QnSystemsModel::IsCloudSystemRoleId).toBool())
@@ -126,68 +115,7 @@ bool FilterModel::filterAcceptsRow(
     return (weightData.weight > kMinWeight);
 }
 
-} // namespace
-
-QnOrderedSystemsModel::QnOrderedSystemsModel(QObject* parent) :
-    base_type(parent),
-    m_weights(),
-    m_unknownSystemsWeight(0.0)
-{
-    NX_ASSERT(qnSystemWeightsManager, "QnSystemWeightsManager is not available");
-    if (!qnSystemWeightsManager)
-        return;
-
-    const auto wildcardFilteredModel = new FilterModel(this);
-    setSourceModel(wildcardFilteredModel);
-
-    connect(wildcardFilteredModel->systemsModel(), &QnSystemsModel::minimalVersionChanged,
-        this, &QnOrderedSystemsModel::minimalVersionChanged);
-
-    connect(qnSystemWeightsManager, &QnSystemsWeightsManager::weightsChanged,
-        this, &QnOrderedSystemsModel::handleWeightsChanged);
-
-    // TODO: #ynikitenkov add triggering roles list here to optimize sorting/filtering model
-
-    if (qnForgottenSystemsManager)
-    {
-        connect(qnForgottenSystemsManager, &QnForgottenSystemsManager::forgottenSystemRemoved,
-            this, &QnOrderedSystemsModel::forceUpdate);
-        connect(qnForgottenSystemsManager, &QnForgottenSystemsManager::forgottenSystemAdded,
-            this, &QnOrderedSystemsModel::forceUpdate);
-    }
-
-    setTriggeringRoles(kSortingRoles);
-
-    handleWeightsChanged();
-}
-
-QString QnOrderedSystemsModel::minimalVersion() const
-{
-    if (auto model = dynamic_cast<FilterModel*>(sourceModel()))
-        return model->systemsModel()->minimalVersion();
-
-    NX_ASSERT(false, "Wrong source model!");
-    return QString();
-}
-
-void QnOrderedSystemsModel::setMinimalVersion(const QString& minimalVersion)
-{
-    if (auto model = dynamic_cast<FilterModel*>(sourceModel()))
-        model->systemsModel()->setMinimalVersion(minimalVersion);
-    else
-        NX_ASSERT(false, "Wrong source model!");
-}
-
-void QnOrderedSystemsModel::forceUpdate()
-{
-    base_type::forceUpdate();
-    if (auto model = dynamic_cast<FilterModel*>(sourceModel()))
-        model->forceUpdate();
-    else
-        NX_ASSERT(false, "Wrong source model!");
-}
-
-WeightData QnOrderedSystemsModel::getWeight(const QModelIndex& modelIndex) const
+WeightData QnSystemSortFilterListModel::getWeight(const QModelIndex& modelIndex) const
 {
     WeightData result;
     return getWeightFromData(m_weights, modelIndex, result)
@@ -195,7 +123,7 @@ WeightData QnOrderedSystemsModel::getWeight(const QModelIndex& modelIndex) const
         : WeightData{QnUuid::createUuid(), m_unknownSystemsWeight, 0, false};
 }
 
-bool QnOrderedSystemsModel::lessThan(
+bool QnSystemSortFilterListModel::lessThan(
     const QModelIndex& left,
     const QModelIndex& right) const
 {
@@ -279,20 +207,55 @@ bool QnOrderedSystemsModel::lessThan(
     return (leftData.weight > rightData.weight);
 }
 
-void QnOrderedSystemsModel::handleWeightsChanged()
+QnOrderedSystemsModel::QnOrderedSystemsModel(QObject* parent) :
+    base_type(parent),
+    m_systemsModel(new QnSystemsModel())
 {
-    const bool sameUnknownWeight = qFuzzyEquals(m_unknownSystemsWeight,
-        qnSystemWeightsManager->unknownSystemsWeight());
-
-    const auto newWeights = qnSystemWeightsManager->weights();
-    if (sameUnknownWeight && (newWeights == m_weights))
+    NX_ASSERT(qnSystemWeightsManager, "QnSystemWeightsManager is not available");
+    if (!qnSystemWeightsManager)
         return;
 
-    m_unknownSystemsWeight = qnSystemWeightsManager->unknownSystemsWeight();
-    m_weights = qnSystemWeightsManager->weights();
+    setSourceModel(m_systemsModel.data());
 
-    const auto filterModel = static_cast<FilterModel*>(sourceModel());
-    filterModel->setWeights(m_weights);
+    connect(m_systemsModel.data(), &QnSystemsModel::minimalVersionChanged,
+        this, &QnOrderedSystemsModel::minimalVersionChanged);
 
-    forceUpdate();
+    NX_ASSERT(qnSystemWeightsManager, "QnSystemsWeightsManager is not available");
+
+    connect(qnSystemWeightsManager, &QnSystemsWeightsManager::weightsChanged,
+        this, &QnOrderedSystemsModel::handleWeightsChanged);
+
+    // TODO: #ynikitenkov add triggering roles list here to optimize sorting/filtering model
+
+    if (qnForgottenSystemsManager)
+    {
+        connect(qnForgottenSystemsManager, &QnForgottenSystemsManager::forgottenSystemRemoved,
+            this, &QnOrderedSystemsModel::forceUpdate);
+        connect(qnForgottenSystemsManager, &QnForgottenSystemsManager::forgottenSystemAdded,
+            this, &QnOrderedSystemsModel::forceUpdate);
+    }
+
+    setTriggeringRoles(kSortingRoles);
+
+    handleWeightsChanged();
+}
+
+bool QnOrderedSystemsModel::isForgotten(const QString& id) const
+{
+    return qnForgottenSystemsManager && qnForgottenSystemsManager->isForgotten(id);
+}
+
+QString QnOrderedSystemsModel::minimalVersion() const
+{
+    return m_systemsModel->minimalVersion();
+}
+
+void QnOrderedSystemsModel::setMinimalVersion(const QString& minimalVersion)
+{
+    m_systemsModel->setMinimalVersion(minimalVersion);
+}
+
+void QnOrderedSystemsModel::handleWeightsChanged()
+{
+    setWeights(qnSystemWeightsManager->weights(), qnSystemWeightsManager->unknownSystemsWeight());
 }

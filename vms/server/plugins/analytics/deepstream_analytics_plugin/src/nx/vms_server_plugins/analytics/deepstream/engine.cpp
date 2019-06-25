@@ -15,6 +15,7 @@ extern "C" {
 
 #include <nx/gstreamer/gstreamer_common.h>
 #include <nx/sdk/helpers/string.h>
+#include <nx/sdk/i_utility_provider.h>
 
 #include "device_agent.h"
 #include "utils.h"
@@ -61,9 +62,6 @@ Engine::Engine(Plugin* plugin): m_plugin(plugin)
         m_objectClassDescritions = loadObjectClasses();
 
     NX_OUTPUT << __func__ << " Setting timeProvider";
-
-    m_timeUtilityProvider = queryInterfacePtr<ITimeUtilityProvider>(m_plugin->utilityProvider());
-    NX_KIT_ASSERT(m_timeUtilityProvider);
 }
 
 Engine::~Engine()
@@ -172,7 +170,8 @@ std::vector<ObjectClassDescription> Engine::objectClassDescritions() const
 
 std::chrono::microseconds Engine::currentTimeUs() const
 {
-    return std::chrono::microseconds(m_timeUtilityProvider->vmsSystemTimeSinceEpochMs() * 1000);
+    return std::chrono::microseconds(
+        m_plugin->utilityProvider()->vmsSystemTimeSinceEpochMs() * 1000);
 }
 
 std::vector<ObjectClassDescription> Engine::loadObjectClasses() const

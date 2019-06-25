@@ -7,6 +7,7 @@
 #include <utils/common/app_info.h>
 #include <utils/common/delayed.h>
 
+#include <nx/vms/api/protocol_version.h>
 #include <nx/network/app_info.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/socket_global.h>
@@ -32,7 +33,7 @@ void addServerToSystem(
     const nx::utils::Url& url = nx::utils::Url::fromUserInput(lit("127.0.0.1:7001")),
     const nx::utils::SoftwareVersion& version =
         nx::utils::SoftwareVersion(QnAppInfo::applicationVersion()),
-    int protoVersion = QnAppInfo::ec2ProtoVersion())
+    int protoVersion = nx::vms::api::protocolVersion())
 {
     const auto system = baseSystem.dynamicCast<QnLocalSystemDescription>();
     if (!system)
@@ -76,7 +77,7 @@ QnSystemDescriptionPtr createSystem(
     const nx::utils::Url& url = nx::utils::Url::fromUserInput(lit("127.0.0.1:7001")),
     const nx::utils::SoftwareVersion& version =
         nx::utils::SoftwareVersion(QnAppInfo::applicationVersion()),
-    int protoVersion = QnAppInfo::ec2ProtoVersion())
+    int protoVersion = nx::vms::api::protocolVersion())
 {
     static int systemNumber = 0;
 
@@ -339,7 +340,7 @@ void QnSystemTilesTestCase::maximizeTest(CompletionHandler completionHandler)
 void QnSystemTilesTestCase::versionChangeTest(CompletionHandler completionHandler)
 {
     const auto system = createSystem(nx::utils::Url::fromUserInput(lit("127.0.0.1:7002")),
-        nx::utils::SoftwareVersion(2, 6), QnAppInfo::ec2ProtoVersion() - 10);
+        nx::utils::SoftwareVersion(2, 6), nx::vms::api::protocolVersion() - 10);
     setSystemMaxWeight(system);
     const auto systemRemoveGuard = addSystem(system, m_finder);
 

@@ -5,7 +5,7 @@
 
 #include <nx/cloud/db/client/cdb_request_path.h>
 
-#include <nx_ec/ec_proto_version.h>
+#include <nx/vms/api/protocol_version.h>
 
 #include "ec2/vms_command_descriptor.h"
 #include "http_handlers/ping.h"
@@ -14,7 +14,7 @@
 namespace nx::cloud::db {
 
 const int kMinSupportedProtocolVersion = 3024;
-const int kMaxSupportedProtocolVersion = nx_ec::EC2_PROTO_VERSION;
+const int kMaxSupportedProtocolVersion = nx::vms::api::protocolVersion();
 
 static const QnUuid kCdbGuid("{674bafd7-4eec-4bba-84aa-a1baea7fc6db}");
 

@@ -15,6 +15,7 @@
 #include <nx/network/socket_global.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/vms/api/data/module_information.h>
+#include <nx/vms/api/protocol_version.h>
 
 namespace {
 
@@ -132,7 +133,7 @@ Qn::ConnectionResult QnConnectionValidator::validateConnectionInternal(
         return Qn::IncompatibleVersionConnectionResult;
 
     // Mobile client can connect to servers with any protocol version.
-    if (!isMobile && protoVersion != QnAppInfo::ec2ProtoVersion())
+    if (!isMobile && protoVersion != nx::vms::api::protocolVersion())
         return Qn::IncompatibleProtocolConnectionResult;
 
     // For debug purposes only

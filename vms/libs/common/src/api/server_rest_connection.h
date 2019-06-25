@@ -433,7 +433,7 @@ public:
 
     Handle updateActionStart(
         const nx::update::Information& info,
-        Result<UpdateInformationData>::type callback,
+        std::function<void(Handle, bool)>&& callback,
         QThread* targetThread = nullptr);
 
     /** Get information for a current update. It requests /ec2/updateInformation. */

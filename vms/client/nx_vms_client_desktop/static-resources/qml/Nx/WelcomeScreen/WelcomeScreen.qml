@@ -75,7 +75,7 @@ Item
                 readonly property int tileHeight: 96;
                 readonly property int tileWidth: 280;
                 readonly property int tileSpacing: 16;
-                property int totalCount: model ? model.sourceRowsCount : 0
+                property int totalCount: model ? model.acceptedRowCount : 0
 
                 readonly property int maxColsCount:
                 {

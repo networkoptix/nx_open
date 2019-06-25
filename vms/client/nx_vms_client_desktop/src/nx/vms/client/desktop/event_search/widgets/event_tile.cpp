@@ -29,9 +29,6 @@ using namespace std::chrono;
 
 namespace {
 
-// Delay after which preview is initially requested.
-static constexpr milliseconds kPreviewLoadDelay = 100ms;
-
 // Delay after which preview is requested again in case of receiving "NO DATA".
 static const milliseconds kPreviewReloadDelay = seconds(ini().rightPanelPreviewReloadDelay);
 
@@ -87,9 +84,9 @@ void setWidgetHolder(QWidget* widget, QWidget* newHolder)
 
 milliseconds previewLoadDelay()
 {
-    return ini().tilePreviewLoadDelayOverrideMs > 0
-        ? milliseconds(ini().tilePreviewLoadDelayOverrideMs)
-        : kPreviewLoadDelay;
+    return ini().tilePreviewLoadDelayOverrideMs < 1
+        ? 1ms
+        : milliseconds(ini().tilePreviewLoadDelayOverrideMs);
 }
 
 } // namespace

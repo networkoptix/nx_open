@@ -11,6 +11,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/std/algorithm.h>
+#include <nx/vms/api/protocol_version.h>
 
 #include <api/global_settings.h>
 #include <api/mediaserver_client.h>
@@ -219,8 +220,8 @@ QnJsonRestResult SystemMergeProcessor::checkWhetherMergeIsPossible(
     if (connectionResult == Qn::IncompatibleProtocolConnectionResult
         && !data.ignoreIncompatible)
     {
-        NX_DEBUG(this, lm("Incompatible systems protocol. Local %1, remote %2")
-            .args(QnAppInfo::ec2ProtoVersion(), m_remoteModuleInformation.protoVersion));
+        NX_DEBUG(this, "Incompatible systems protocol. Local %1, remote %2",
+            nx::vms::api::protocolVersion(), m_remoteModuleInformation.protoVersion);
         setMergeError(&result, MergeStatus::incompatibleVersion);
         return result;
     }

@@ -3,7 +3,7 @@
 #include <QtCore/QUrlQuery>
 
 #include <api/global_settings.h>
-#include <nx_ec/ec_proto_version.h>
+#include <nx/vms/api/protocol_version.h>
 
 #include "network/tcp_connection_priv.h"
 #include "transaction/server_transaction_message_bus.h"
@@ -164,7 +164,7 @@ void QnTransactionTcpProcessor::run()
         QByteArray::number(commonModule->systemIdentityTime())));
     d->response.headers.insert(nx::network::http::HttpHeader(
         Qn::EC2_PROTO_VERSION_HEADER_NAME,
-        nx::network::http::StringType::number(nx_ec::EC2_PROTO_VERSION)));
+        nx::network::http::StringType::number(nx::vms::api::protocolVersion())));
     d->response.headers.insert(nx::network::http::HttpHeader(
         Qn::EC2_CLOUD_HOST_HEADER_NAME,
         nx::network::SocketGlobals::cloud().cloudHost().toUtf8()));
@@ -218,7 +218,7 @@ void QnTransactionTcpProcessor::run()
             QByteArray::number(commonModule->systemIdentityTime())));
         d->response.headers.insert(nx::network::http::HttpHeader(
             Qn::EC2_PROTO_VERSION_HEADER_NAME,
-            nx::network::http::StringType::number(nx_ec::EC2_PROTO_VERSION)));
+            nx::network::http::StringType::number(nx::vms::api::protocolVersion())));
         d->response.headers.insert(nx::network::http::HttpHeader(
             Qn::EC2_CLOUD_HOST_HEADER_NAME,
             nx::network::SocketGlobals::cloud().cloudHost().toUtf8()));

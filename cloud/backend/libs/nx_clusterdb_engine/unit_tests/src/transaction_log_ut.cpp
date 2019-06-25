@@ -10,7 +10,7 @@
 #include <nx/sql/detail/query_execution_thread.h>
 #include <nx/sql/test_support/test_with_db_helper.h>
 
-#include <nx_ec/ec_proto_version.h>
+#include <nx/vms/api/protocol_version.h>
 
 #include <nx/clusterdb/engine/dao/memory/transaction_data_object_in_memory.h>
 #include <nx/clusterdb/engine/outgoing_transaction_dispatcher.h>
@@ -331,7 +331,7 @@ private:
         for (const auto& logRecord : allTransactions)
         {
             const auto serializedTransactionFromLog =
-                logRecord.serializer->serialize(Qn::UbjsonFormat, nx_ec::EC2_PROTO_VERSION);
+                logRecord.serializer->serialize(Qn::UbjsonFormat, nx::vms::api::protocolVersion());
 
             Command<vms::api::UserData> transaction(peerId());
             QnUbjsonReader<QByteArray> ubjsonStream(&serializedTransactionFromLog);
@@ -401,7 +401,7 @@ private:
                 m_systemId.c_str(),
                 clusterdb::engine::UbjsonSerializedTransaction<nx::cloud::db::ec2::command::SaveUser>(
                     std::move(transaction),
-                    nx_ec::EC2_PROTO_VERSION));
+                    nx::vms::api::protocolVersion()));
         ASSERT_TRUE(dbResult == nx::sql::DBResult::ok || dbResult == nx::sql::DBResult::cancelled)
             << "Got " << toString(dbResult);
     }

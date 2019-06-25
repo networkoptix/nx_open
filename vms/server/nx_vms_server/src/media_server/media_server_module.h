@@ -27,7 +27,6 @@ class QnResourceCommandProcessor;
 class QnResourcePool;
 class QnResourcePropertyDictionary;
 class QnCameraHistoryPool;
-class QnServerUpdateTool;
 class QnMotionHelper;
 class QnServerDb;
 class QnAuditManager;
@@ -133,7 +132,6 @@ public:
     nx::vms::server::event::ExtendedRuleProcessor* eventRuleProcessor() const;
     std::shared_ptr<ec2::AbstractECConnection> ec2Connection() const;
     QnGlobalSettings* globalSettings() const;
-    QnServerUpdateTool* serverUpdateTool() const;
     QnMotionHelper* motionHelper() const;
     nx::vms::common::p2p::downloader::Downloader* p2pDownloader() const;
     QnServerDb* serverDb() const;
@@ -199,7 +197,6 @@ private:
     std::unique_ptr<nx::analytics::db::AbstractEventsStorage> m_analyticsEventsStorage;
     std::unique_ptr<nx::vms::server::RootFileSystem> m_rootFileSystem;
     nx::vms::server::ServerUpdateManager* m_updateManager = nullptr;
-    QnServerUpdateTool* m_serverUpdateTool = nullptr;
     QnDataProviderFactory* m_resourceDataProviderFactory = nullptr;
     QScopedPointer<QnResourceCommandProcessor> m_resourceCommandProcessor;
     QnMotionHelper* m_motionHelper = nullptr;

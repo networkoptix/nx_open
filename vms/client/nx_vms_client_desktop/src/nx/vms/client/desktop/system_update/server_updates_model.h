@@ -1,7 +1,9 @@
 #pragma once
 
-#include <QtCore/QAbstractTableModel>
 #include <memory> // for shared_ptr
+
+#include <QtCore/QAbstractTableModel>
+#include <QtCore/QSortFilterProxyModel>
 
 #include <client/client_color_types.h> // For QnServerUpdatesColors.
 
@@ -79,8 +81,7 @@ private:
     QnServerUpdatesColors m_versionColors;
 };
 
-class SortedPeerUpdatesModel:
-    public QSortFilterProxyModel
+class SortedPeerUpdatesModel: public QSortFilterProxyModel
 {
     Q_OBJECT
 

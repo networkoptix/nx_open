@@ -9,6 +9,7 @@ namespace nx {
 namespace vms {
 namespace api {
 
+// TODO: #4.1 Replace with SystemInformationNew.
 class NX_VMS_API SystemInformation
 {
     Q_GADGET
@@ -19,7 +20,11 @@ class NX_VMS_API SystemInformation
 
 public:
     SystemInformation() = default;
-    SystemInformation(const QString& platform, const QString& arch, const QString& modification = {});
+    SystemInformation(
+        const QString& platform,
+        const QString& arch,
+        const QString& modification = {},
+        const QString& version = {});
     SystemInformation(const QString& infoString);
 
     Q_INVOKABLE QString toString() const;
@@ -31,7 +36,13 @@ public:
     QString version;
 
     static Q_INVOKABLE QString runtimeOsVersion();
+    static Q_INVOKABLE QString runtimeModification();
     static Q_INVOKABLE QString currentSystemRuntime();
+
+    // These variable allows to override values returned by runtimeOsVersion() and
+    // runtimeModification() for test reasons.
+    static QString runtimeOsVersionOverride;
+    static QString runtimeModificationOverride;
 };
 #define SystemInformation_Fields \
     (arch)(platform)(modification)(version)
@@ -39,6 +50,23 @@ public:
 QN_FUSION_DECLARE_FUNCTIONS(SystemInformation,
     (eq)(hash)(ubjson)(json)(xml)(csv_record)(datastream),
     NX_VMS_API)
+
+struct NX_VMS_API SystemInformationNew
+{
+    QString platform;
+    QString variant;
+    QString variantVersion; //< TODO: Use nx::utils::SoftwareVersion.
+
+    static SystemInformationNew fromLegacySystemInformation(const SystemInformation& info);
+    SystemInformation toLegacySystemInformation() const;
+};
+#define SystemInformationNew_Fields \
+    (platform)(variant)(variantVersion)
+
+QN_FUSION_DECLARE_FUNCTIONS(SystemInformationNew,
+    (eq)(hash)(ubjson)(json), NX_VMS_API)
+
+NX_VMS_API QString toString(const SystemInformationNew& systemInformation);
 
 } // namespace api
 } // namespace vms

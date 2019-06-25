@@ -5,7 +5,6 @@
 #include "utils.h"
 
 #include <algorithm>
-#include <atomic>
 #include <cstdlib>
 #include <cstring>
 #include <fstream>
@@ -679,28 +678,12 @@ void IniConfig::reload()
     return d->reload();
 }
 
-static std::atomic<int> s_tweaksInstances(false);
-static bool s_tweaksIsEnabledBackup(false);
+//-------------------------------------------------------------------------------------------------
+// Tweaks
 
-IniConfig::Tweaks::Tweaks()
-{
-    m_guards = new std::vector<std::function<void()>>();
-    if (++s_tweaksInstances != 0)
-    {
-        s_tweaksIsEnabledBackup = isEnabled();
-        setEnabled(false);
-    }
-}
-
-IniConfig::Tweaks::~Tweaks()
-{
-    for (const auto& guard: *m_guards)
-        guard();
-    delete m_guards;
-
-    if (--s_tweaksInstances == 0)
-        setEnabled(s_tweaksIsEnabledBackup);
-}
+/*static*/ IniConfig::Tweaks::MutexHolder IniConfig::Tweaks::m_mutexHolder;
+/*static*/ int IniConfig::Tweaks::tweaksInstanceCount = 0;
+/*static*/ bool IniConfig::Tweaks::originalValueOfIsEnabled = 0;
 
 } // namespace kit
 } // namespace nx
