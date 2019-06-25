@@ -205,9 +205,12 @@ std::chrono::milliseconds ScheduledUplinkSpeedTester::waitTimeBeforeNextTest() c
     // If startTime is empty, we are later in the day than anything in m_testSchedule, so take the
     // earliest start time and shift it back 24 hours.
     if (!startTime)
+    {
+        // Braces required to avoid "misleading indentation" error.
         startTime = *m_testSchedule.begin() + kOneDay;
+    }
 
-	return *startTime - now;
+    return *startTime - now;
 }
 
 void ScheduledUplinkSpeedTester::scheduleNextTest(const milliseconds& wait)

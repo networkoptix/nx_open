@@ -188,7 +188,7 @@ std::optional<int> UplinkBandwidthTester::stopEarlyIfAble(int sequence) const
             return std::nullopt;
     }
 
-    return (int) end->second.averageBandwidth;
+    return (int) (*bandwidths.rbegin());
 }
 
 void UplinkBandwidthTester::onMessageReceived(network::http::Message message)
