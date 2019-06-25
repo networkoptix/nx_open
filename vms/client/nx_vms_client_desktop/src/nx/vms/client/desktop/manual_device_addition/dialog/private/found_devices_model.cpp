@@ -72,6 +72,7 @@ void FoundDevicesModel::addDevices(const QnManualResourceSearchList& devices)
             }
         }
     }
+    emit layoutChanged();
 }
 
 void FoundDevicesModel::removeDevices(QStringList ids)

@@ -17,6 +17,7 @@ WidgetWithHintPrivate::WidgetWithHintPrivate(QWidget* q) :
     m_spacing(style::Metrics::kHintButtonMargin)
 {
     m_button->setHidden(true);
+    m_button->setFocusPolicy(Qt::NoFocus);
 }
 
 WidgetWithHintPrivate::~WidgetWithHintPrivate()

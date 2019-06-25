@@ -10,14 +10,14 @@ namespace nx::analytics::db {
 class ObjectTypeDao
 {
 public:
-    long long objectTypeIdFromName(const QString& name) const;
+    int64_t objectTypeIdFromName(const QString& name) const;
 
-    QString objectTypeFromId(long long id) const;
+    QString objectTypeFromId(int64_t id) const;
 
     /**
      * @return Id of object type.
      */
-    long long insertOrFetch(
+    int64_t insertOrFetch(
         nx::sql::QueryContext* queryContext,
         const QString& objectTypeName);
 
@@ -25,10 +25,10 @@ public:
 
 private:
     mutable QnMutex m_mutex;
-    std::map<QString, long long> m_objectTypeToId;
-    std::map<long long, QString> m_idToObjectType;
+    std::map<QString, int64_t> m_objectTypeToId;
+    std::map<int64_t, QString> m_idToObjectType;
 
-    void addObjectTypeToDictionary(long long id, const QString& name);
+    void addObjectTypeToDictionary(int64_t id, const QString& name);
 };
 
 } // namespace nx::analytics::db

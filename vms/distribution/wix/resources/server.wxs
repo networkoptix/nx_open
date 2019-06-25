@@ -136,6 +136,7 @@
             <ComponentGroupRef Id="server_misc_libraries"/>
             <ComponentGroupRef Id="server_plugins"/>
             <ComponentGroupRef Id="server_plugins_optional"/>
+            <ComponentGroupRef Id="shared_external_resources"/>
 
             <ComponentGroupRef Id="vox"/>
             <ComponentGroupRef Id="traytool"/>

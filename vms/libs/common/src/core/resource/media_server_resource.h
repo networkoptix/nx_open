@@ -3,13 +3,13 @@
 #include <QtCore/QElapsedTimer>
 
 #include <api/server_rest_connection_fwd.h>
-#include <api/media_server_connection.h>
 #include <core/resource/resource.h>
 #include <utils/common/value_cache.h>
 
 #include <nx/network/socket_common.h>
 #include <nx/utils/safe_direct_connection.h>
 #include <nx/utils/software_version.h>
+#include <nx/utils/url.h>
 #include <nx/vms/api/data/module_information.h>
 #include <nx/vms/api/data/system_information.h>
 
@@ -162,7 +162,6 @@ private:
     QList<nx::network::SocketAddress> m_netAddrList;
     QList<nx::utils::Url> m_additionalUrls;
     QList<nx::utils::Url> m_ignoredUrls;
-    bool m_sslAllowed = false;
     nx::vms::api::ServerFlags m_serverFlags;
     nx::utils::SoftwareVersion m_version;
     nx::vms::api::SystemInformation m_systemInfo;
@@ -175,7 +174,6 @@ private:
     mutable QnResourcePtr m_firstCamera;
 
     Qn::PanicMode calculatePanicMode() const;
-    nx::utils::Url buildApiUrl() const;
 };
 
 Q_DECLARE_METATYPE(QnMediaServerResourcePtr)

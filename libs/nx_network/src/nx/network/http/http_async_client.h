@@ -323,15 +323,15 @@ public:
      * until HttpClient::resumeReading() is called.
      * NOTE: Should be called only within the same AIO thread with the HttpClient socket.
      */
-    void stopReadingWhileInAioThread();
+    void stopReading();
 
     /**
      * Resume reading stopped by the HttpClient::stopReading() function. If
      * HttpClient::stopReading() hasn't been called this function will have no effect.
      * NOTE: Should be called only within the same AIO thread with the HttpClient socket.
      */
-    void resumeReadingWhileInAioThread();
-    bool isReadingWhileInAioThread();
+    void resumeReading();
+    bool isReading();
 
 private:
     enum class Result

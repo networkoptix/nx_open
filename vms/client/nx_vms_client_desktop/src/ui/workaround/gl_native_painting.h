@@ -1,11 +1,11 @@
 #pragma once
 
 class QPainter;
-class QGLContext;
+class QOpenGLWidget;
 
 class QnGlNativePainting
 {
 public:
-    static void begin(const QGLContext* context, QPainter* painter);
+    static void begin(QOpenGLWidget* glWidget, QPainter* painter);
     static void end(QPainter* painter);
 };

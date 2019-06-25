@@ -308,11 +308,15 @@ void ModuleConnector::Module::remakeConnection()
 
 void ModuleConnector::Module::setForbiddenEndpoints(std::set<nx::network::SocketAddress> endpoints)
 {
-    NX_VERBOSE(this, lm("Forbid endpoints: %1").container(endpoints));
     NX_ASSERT(!m_id.isNull(), "Does not make sense to block endpoints for unknown servers");
-    if (m_forbiddenEndpoints != endpoints)
+    std::set<QString> newEndpoints;
+    for (const auto& endpoint: endpoints)
+        newEndpoints.insert(endpoint.toString());
+
+    if (m_forbiddenEndpoints != newEndpoints)
     {
-        m_forbiddenEndpoints = std::move(endpoints);
+        NX_DEBUG(this, lm("Forbid endpoints: %1").container(newEndpoints));
+        m_forbiddenEndpoints = std::move(newEndpoints);
         if (m_connectedReader || !m_attemptingReaders.empty())
             remakeConnection();
     }
@@ -407,8 +411,11 @@ void ModuleConnector::Module::connectToGroup(Endpoints::iterator endpointsGroup)
     size_t endpointsInProgress = 0;
     for (const auto& endpoint: endpointsGroup->second)
     {
-        if (m_forbiddenEndpoints.count(endpoint))
+        if (m_forbiddenEndpoints.count(endpoint.toString()))
+        {
+            NX_VERBOSE(this, "Enpoint %1 is forbidden", endpoint);
             continue;
+        }
 
         // TODO: Remove as soon as IPv6 is finally supported.
         if (endpoint.address.isPureIpV6())

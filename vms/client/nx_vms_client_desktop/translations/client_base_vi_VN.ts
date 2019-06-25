@@ -83,15 +83,15 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Getting update information from the server</source>
-      <translation type="unfinished">Getting update information from the server</translation>
+      <translation>Nhận thông tin cập nhật từ máy chủ</translation>
     </message>
     <message>
       <source>Downloading update package</source>
-      <translation type="unfinished">Downloading update package</translation>
+      <translation>Đang tải xuống gói cập nhật</translation>
     </message>
     <message>
       <source>Installing</source>
-      <translation type="unfinished">Installing</translation>
+      <translation>Đang cài đặt</translation>
     </message>
   </context>
   <context>
@@ -231,10 +231,6 @@ to view more bookmarks</source>
     <message>
       <source>Save Video Wall View</source>
       <translation>Lưu video xem tường</translation>
-    </message>
-    <message>
-      <source>Drop Resources</source>
-      <translation>Tài Discard</translation>
     </message>
     <message>
       <source>Start Screen Recording</source>
@@ -857,19 +853,19 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Screen Settings...</source>
-      <translation type="unfinished">Screen Settings...</translation>
+      <translation>Cài đặt màn hình...</translation>
     </message>
     <message>
       <source>Export Bookmarks...</source>
-      <translation type="unfinished">Export Bookmarks...</translation>
+      <translation>Xuất dấu trang...</translation>
     </message>
     <message>
       <source>Forget password</source>
-      <translation type="unfinished">Forget password</translation>
+      <translation>Quên mật khẩu</translation>
     </message>
     <message>
       <source>Cancel Upload...</source>
-      <translation type="unfinished">Cancel Upload...</translation>
+      <translation>Hủy tải lên...</translation>
     </message>
     <message>
       <source>Copy Schedule...</source>
@@ -877,7 +873,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Analytics Engine Settings...</source>
-      <translation type="unfinished">Analytics Engine Settings...</translation>
+      <translation>Cài đặt công cụ phân tích...</translation>
     </message>
     <message>
       <source>Show Thumbnails</source>
@@ -889,19 +885,19 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Pin Panel</source>
-      <translation type="unfinished">Pin Panel</translation>
+      <translation>Bảng ghim</translation>
     </message>
     <message>
       <source>Unpin Panel</source>
-      <translation type="unfinished">Unpin Panel</translation>
+      <translation>Bỏ ghim</translation>
     </message>
     <message>
       <source>Virtual Camera...</source>
-      <translation type="unfinished">Virtual Camera...</translation>
+      <translation>Camera ảo...</translation>
     </message>
     <message>
       <source>New Virtual Camera...</source>
-      <translation type="unfinished">New Virtual Camera...</translation>
+      <translation>Camera ảo mới...</translation>
     </message>
     <message>
       <source>Show Tree</source>
@@ -925,27 +921,27 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Switch to Notifications tab</source>
-      <translation type="unfinished">Switch to Notifications tab</translation>
+      <translation>Chuyển sang tab Thông báo</translation>
     </message>
     <message>
       <source>Switch to Motion tab</source>
-      <translation type="unfinished">Switch to Motion tab</translation>
+      <translation>Chuyển sang tab Chuyển động</translation>
     </message>
     <message>
       <source>Switch to Bookmarks tab</source>
-      <translation type="unfinished">Switch to Bookmarks tab</translation>
+      <translation>Chuyển sang tab Bookmarks</translation>
     </message>
     <message>
       <source>Switch to Events tab</source>
-      <translation type="unfinished">Switch to Events tab</translation>
+      <translation>Chuyển sang tab Sự kiện</translation>
     </message>
     <message>
       <source>Switch to Objects tab</source>
-      <translation type="unfinished">Switch to Objects tab</translation>
+      <translation>Chuyển sang tab Đối tượng</translation>
     </message>
     <message>
       <source>Objects Frames and Info...</source>
-      <translation type="unfinished">Objects Frames and Info...</translation>
+      <translation>Khung Đối tượng và Thông tin...</translation>
     </message>
   </context>
   <context>
@@ -991,35 +987,35 @@ to view more bookmarks</source>
     <name>EncryptedLayoutStrings</name>
     <message>
       <source>Please enter a valid password</source>
-      <translation type="unfinished">Please enter a valid password</translation>
+      <translation>Vui lòng nhập mật khẩu hợp lệ</translation>
     </message>
     <message>
       <source>The password is not valid.</source>
-      <translation type="unfinished">The password is not valid.</translation>
+      <translation>Mật khẩu không hợp lệ.</translation>
     </message>
     <message>
       <source>Encrypted layout</source>
-      <translation type="unfinished">Encrypted layout</translation>
+      <translation>Bố cục được mã hóa</translation>
     </message>
     <message>
       <source>The file %1 is encrypted. Please enter the password:</source>
-      <translation type="unfinished">The file %1 is encrypted. Please enter the password:</translation>
+      <translation>Tệp %1 được mã hóa. Xin vui lòng nhập mật khẩu:</translation>
     </message>
     <message>
       <source>Please re-enter password for layout %1:</source>
-      <translation type="unfinished">Please re-enter password for layout %1:</translation>
+      <translation>Vui lòng nhập lại mật khẩu cho bố cục %1:</translation>
     </message>
   </context>
   <context>
     <name>ExitFullscreenActionHelper</name>
     <message>
       <source>Select layout...</source>
-      <translation type="unfinished">Select layout...</translation>
+      <translation>Chọn bố cục...</translation>
     </message>
     <message numerus="yes">
       <source>%n layouts</source>
-      <translation type="unfinished">
-        <numerusform>%n layouts</numerusform>
+      <translation>
+        <numerusform>%n bố cục</numerusform>
       </translation>
     </message>
   </context>
@@ -1073,26 +1069,26 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Select device...</source>
-      <translation type="unfinished">Select device...</translation>
+      <translation>Chọn thiết bị...</translation>
     </message>
     <message>
       <source>Select camera...</source>
-      <translation type="unfinished">Select camera...</translation>
+      <translation>Chọn camera...</translation>
     </message>
     <message>
       <source>Select layout...</source>
-      <translation type="unfinished">Select layout...</translation>
+      <translation>Chọn bố cục...</translation>
     </message>
     <message numerus="yes">
       <source>%n layouts</source>
-      <translation type="unfinished">
-        <numerusform>%n layouts</numerusform>
+      <translation>
+        <numerusform>%n bố cục</numerusform>
       </translation>
     </message>
     <message>
       <source>%1 on %2</source>
       <comment>Camera %1 on layout %2</comment>
-      <translation type="unfinished">%1 on %2</translation>
+      <translation>%1 trên %2</translation>
     </message>
   </context>
   <context>
@@ -1318,7 +1314,7 @@ to view more bookmarks</source>
     <name>PtzInstrument</name>
     <message>
       <source>Layout is locked</source>
-      <translation type="unfinished">Layout is locked</translation>
+      <translation>Bố cục bị khóa</translation>
     </message>
   </context>
   <context>
@@ -1572,15 +1568,15 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>Details for %n sessions of %1</source>
       <comment>Total number will be substituted as %1</comment>
-      <translation type="unfinished">
-        <numerusform>Details for %n sessions of %1</numerusform>
+      <translation>
+        <numerusform>Chi tiết cho %n phiên %1</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Details for %n cameras of %1</source>
       <comment>Total number will be substituted as %1</comment>
-      <translation type="unfinished">
-        <numerusform>Details for %n cameras of %1</numerusform>
+      <translation>
+        <numerusform>Chi tiết cho %n camera của %1</numerusform>
       </translation>
     </message>
   </context>
@@ -1736,12 +1732,12 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Update installed</source>
-      <translation type="unfinished">Update installed</translation>
+      <translation>Cập nhật cài đặt</translation>
     </message>
     <message numerus="yes">
       <source>%n actions</source>
-      <translation type="unfinished">
-        <numerusform>%n actions</numerusform>
+      <translation>
+        <numerusform>%n hành động</numerusform>
       </translation>
     </message>
   </context>
@@ -2018,7 +2014,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Force Acknowledgement will only work for Generic Events if camera modifiers are used in the Generic Event URL</source>
-      <translation type="unfinished">Force Acknowledgement will only work for Generic Events if camera modifiers are used in the Generic Event URL</translation>
+      <translation>Buộc công nhận chỉ hoạt động với các sự kiện chung với các điều chỉnh camera trên URL sự kiện chung</translation>
     </message>
   </context>
   <context>
@@ -2551,7 +2547,7 @@ to %1</source>
     </message>
     <message>
       <source>Internal server error. Please try again later.</source>
-      <translation type="unfinished">Internal server error. Please try again later.</translation>
+      <translation>Lỗi máy chủ nội bộ. Vui lòng thử lại sau.</translation>
     </message>
   </context>
   <context>
@@ -2705,11 +2701,11 @@ to %1</source>
     </message>
     <message>
       <source>Download &amp;&amp; Install</source>
-      <translation type="unfinished">Download &amp;&amp; Install</translation>
+      <translation>Tải xuống &amp; cài đặt</translation>
     </message>
     <message>
       <source>Failed to enter compatibility mode for version %1</source>
-      <translation type="unfinished">Failed to enter compatibility mode for version %1</translation>
+      <translation>Không thể vào chế độ tương thích cho phiên bản %1</translation>
     </message>
   </context>
   <context>
@@ -2859,10 +2855,6 @@ to %1</source>
       <source>44.1 kHz and 48 kHz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
       <translation>Các định dạng âm thanh 44.1 kHz và 48 kHz không được hỗ trợ. Hãy chọn thiết bị âm thanh khác hoặc &quot;none&quot; trong màn hình Recoding.</translation>
     </message>
-    <message>
-      <source>Configured codec: %1 not found, h263p will used</source>
-      <translation type="unfinished">Configured codec: %1 not found, h263p will used</translation>
-    </message>
   </context>
   <context>
     <name>QnDisconnectFromCloudDialogPrivate</name>
@@ -2979,15 +2971,15 @@ to %1</source>
     <message numerus="yes">
       <source>Event log for period from %1 to %2 - %n events found</source>
       <comment>Dates are substituted</comment>
-      <translation type="unfinished">
-        <numerusform>Event log for period from %1 to %2 - %n events found</numerusform>
+      <translation>
+        <numerusform>Nhật ký sự kiện trong khoảng thời gian từ %1 đến %2 - %n sự kiện được tìm thấy</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Event log for %1 - %n events found</source>
       <comment>Date is substituted</comment>
-      <translation type="unfinished">
-        <numerusform>Event log for %1 - %n events found</numerusform>
+      <translation>
+        <numerusform>Nhật ký sự kiện cho %1 - %n sự kiện được tìm thấy</numerusform>
       </translation>
     </message>
   </context>
@@ -3061,8 +3053,8 @@ to %1</source>
     <message numerus="yes">
       <source>%1 (%n cameras)</source>
       <comment>%1 is description of event. Will be replaced in runtime</comment>
-      <translation type="unfinished">
-        <numerusform>%1 (%n cameras)</numerusform>
+      <translation>
+        <numerusform>%1 (%n camera)</numerusform>
       </translation>
     </message>
   </context>
@@ -3145,11 +3137,11 @@ to %1</source>
     <name>QnFullscreenCameraActionWidget</name>
     <message>
       <source>This camera is not currently on the selected layout. Action will work if camera is added before action triggers.</source>
-      <translation type="unfinished">This camera is not currently on the selected layout. Action will work if camera is added before action triggers.</translation>
+      <translation>Camera này hiện không có trên bố cục đã chọn. Hành động sẽ hoạt động nếu camera được thêm vào trước khi kích hoạt.</translation>
     </message>
     <message>
       <source>This camera is not currently on some of the selected layouts. Action will work if camera is added before action triggers.</source>
-      <translation type="unfinished">This camera is not currently on some of the selected layouts. Action will work if camera is added before action triggers.</translation>
+      <translation>Camera này hiện không có trên một số bố trí đã chọn. Hành động sẽ được thực hiện nếu camera được thêm vào trước khi kích hoạt.</translation>
     </message>
   </context>
   <context>
@@ -3157,6 +3149,17 @@ to %1</source>
     <message>
       <source>Select exactly one camera</source>
       <translation>Chọn đúng một máy ảnh</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnGLCheckerInstrument</name>
+    <message>
+      <source>Video card drivers are outdated or not installed</source>
+      <translation>Trình điều khiển card màn hình chưa cập nhật hoặc không được cài đặt</translation>
+    </message>
+    <message>
+      <source>%1 may not work properly.</source>
+      <translation>%1 có thể không hoạt động đúng.</translation>
     </message>
   </context>
   <context>
@@ -3175,7 +3178,7 @@ to %1</source>
     </message>
     <message>
       <source>Auto (%1)</source>
-      <translation type="unfinished">Auto (%1)</translation>
+      <translation>Tự động (%1)</translation>
     </message>
   </context>
   <context>
@@ -3243,17 +3246,6 @@ to %1</source>
     <message>
       <source>Creates a backup of System configuration that can be restored in case of failure.</source>
       <translation>Bạn có thể tạo một bản sao lưu cho cấu hình Hệ thống để khôi phục trong trường hợp lỗi.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnGlHardwareChecker</name>
-    <message>
-      <source>Video card drivers are outdated or not installed</source>
-      <translation>Trình điều khiển card màn hình chưa cập nhật hoặc không được cài đặt</translation>
-    </message>
-    <message>
-      <source>%1 may not work properly.</source>
-      <translation>%1 có thể không hoạt động đúng.</translation>
     </message>
   </context>
   <context>
@@ -3344,7 +3336,7 @@ to %1</source>
     <name>QnInputDialog</name>
     <message>
       <source>Please enter a value.</source>
-      <translation type="unfinished">Please enter a value.</translation>
+      <translation>Vui lòng nhập một giá trị.</translation>
     </message>
   </context>
   <context>
@@ -3548,8 +3540,8 @@ to %1</source>
       </translation>
     </message>
     <message>
-      <source>Qty</source>
-      <translation>Số lượng</translation>
+      <source>Channels</source>
+      <translation>Kênh</translation>
     </message>
   </context>
   <context>
@@ -3738,20 +3730,20 @@ to %1</source>
     </message>
     <message>
       <source>Every license can be deactivated only a few times.</source>
-      <translation type="unfinished">Every license can be deactivated only a few times.</translation>
+      <translation>Mỗi giấy phép có thể bị vô hiệu hóa chỉ một vài lần.</translation>
     </message>
     <message numerus="yes">
       <source>%1 are currently in use</source>
       <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
-      <translation type="unfinished">
-        <numerusform>%1 are currently in use</numerusform>
+      <translation>
+        <numerusform>%1 hiện đang được sử dụng</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>At least %1 are required</source>
       <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
-      <translation type="unfinished">
-        <numerusform>At least %1 are required</numerusform>
+      <translation>
+        <numerusform>Ít nhất %1 là bắt buộc</numerusform>
       </translation>
     </message>
   </context>
@@ -4039,7 +4031,7 @@ to %1</source>
     </message>
     <message>
       <source>Area Zoom</source>
-      <translation type="unfinished">Area Zoom</translation>
+      <translation>Thu phóng diện tích</translation>
     </message>
   </context>
   <context>
@@ -4194,11 +4186,11 @@ to %1</source>
     </message>
     <message>
       <source>Virtual Camera</source>
-      <translation type="unfinished">Virtual Camera</translation>
+      <translation>Camera ảo</translation>
     </message>
     <message>
       <source>Virtual Camera %1</source>
-      <translation type="unfinished">Virtual Camera %1</translation>
+      <translation>Camera ảo %1</translation>
     </message>
   </context>
   <context>
@@ -4263,7 +4255,7 @@ to %1</source>
     <name>QnPanTiltRotationCameraAdvancedParamWidget</name>
     <message>
       <source>Rotation</source>
-      <translation type="unfinished">Rotation</translation>
+      <translation>Quay</translation>
     </message>
   </context>
   <context>
@@ -4421,8 +4413,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>about %n minutes</source>
-      <translation type="unfinished">
-        <numerusform>about %n minutes</numerusform>
+      <translation>
+        <numerusform>khoảng %n phút</numerusform>
       </translation>
     </message>
   </context>
@@ -4602,11 +4594,11 @@ to %1</source>
     </message>
     <message>
       <source>Current Bitrate</source>
-      <translation type="unfinished">Current Bitrate</translation>
+      <translation>Bitrate hiện tại</translation>
     </message>
     <message>
       <source>no data for forecast</source>
-      <translation type="unfinished">no data for forecast</translation>
+      <translation>không có dữ liệu dự báo</translation>
     </message>
   </context>
   <context>
@@ -4650,11 +4642,11 @@ to %1</source>
     <name>QnResourceBrowserWidget</name>
     <message>
       <source>Local files</source>
-      <translation type="unfinished">Local files</translation>
+      <translation>Tập tin trên thiết bị</translation>
     </message>
     <message>
       <source>No local files</source>
-      <translation type="unfinished">No local files</translation>
+      <translation>Không có tập tin trên thiết bị</translation>
     </message>
     <message>
       <source>Nothing found</source>
@@ -4662,19 +4654,19 @@ to %1</source>
     </message>
     <message>
       <source>add to current layout</source>
-      <translation type="unfinished">add to current layout</translation>
+      <translation>thêm vào bố cục hiện tại</translation>
     </message>
     <message>
       <source>open all at a new layout</source>
-      <translation type="unfinished">open all at a new layout</translation>
+      <translation>mở tất cả trong một bố cục mới</translation>
     </message>
     <message>
       <source>open all</source>
-      <translation type="unfinished">open all</translation>
+      <translation>mở tất cả</translation>
     </message>
     <message>
       <source>All types</source>
-      <translation type="unfinished">All types</translation>
+      <translation>Các loại</translation>
     </message>
     <message>
       <source>Servers</source>
@@ -4690,7 +4682,7 @@ to %1</source>
     </message>
     <message>
       <source>Video Walls</source>
-      <translation type="unfinished">Video Walls</translation>
+      <translation>Video Walls</translation>
     </message>
     <message>
       <source>Web Pages</source>
@@ -4710,7 +4702,7 @@ to %1</source>
     </message>
     <message>
       <source>Cameras &amp; Devices</source>
-      <translation type="unfinished">Cameras &amp; Devices</translation>
+      <translation>Camera và thiết bị</translation>
     </message>
   </context>
   <context>
@@ -4783,15 +4775,15 @@ to %1</source>
     </message>
     <message>
       <source>Cameras &amp; Devices</source>
-      <translation type="unfinished">Cameras &amp; Devices</translation>
+      <translation>Camera và thiết bị</translation>
     </message>
     <message>
       <source>Videowalls</source>
-      <translation type="unfinished">Videowalls</translation>
+      <translation>Videowalls</translation>
     </message>
     <message>
       <source>Analytics Engines</source>
-      <translation type="unfinished">Analytics Engines</translation>
+      <translation>Công cụ phân tích</translation>
     </message>
   </context>
   <context>
@@ -4855,7 +4847,7 @@ to %1</source>
     </message>
     <message>
       <source>Export Bookmarks...</source>
-      <translation type="unfinished">Export Bookmarks...</translation>
+      <translation>Xuất dấu trang...</translation>
     </message>
   </context>
   <context>
@@ -5046,6 +5038,10 @@ to %1</source>
     <message>
       <source>Server Web Page</source>
       <translation>Trang Web Máy chủ</translation>
+    </message>
+    <message>
+      <source>Plugins</source>
+      <translation>Plugins</translation>
     </message>
   </context>
   <context>
@@ -5389,23 +5385,23 @@ to %1</source>
     </message>
     <message>
       <source>Last 5 minutes</source>
-      <translation type="unfinished">Last 5 minutes</translation>
+      <translation>5 phút cuối</translation>
     </message>
     <message>
       <source>Last 60 minutes</source>
-      <translation type="unfinished">Last 60 minutes</translation>
+      <translation>60 phút cuối</translation>
     </message>
     <message>
       <source>Last 24 hours</source>
-      <translation type="unfinished">Last 24 hours</translation>
+      <translation>24 giờ qua</translation>
     </message>
     <message>
       <source>Longest period available</source>
-      <translation type="unfinished">Longest period available</translation>
+      <translation>Thời gian dài nhất có sẵn</translation>
     </message>
     <message>
       <source>Forecast available only for cameras with enabled recording.</source>
-      <translation type="unfinished">Forecast available only for cameras with enabled recording.</translation>
+      <translation>Dự báo chỉ có sẵn cho Camera có kích hoạt ghi.</translation>
     </message>
   </context>
   <context>
@@ -5515,16 +5511,30 @@ to %1</source>
       <translation>Sao lưu đã hoàn tất</translation>
     </message>
     <message>
-      <source>Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</source>
-      <translation>Sẽ không ghi hình khi vô hiệu hóa thiết bị lưu trữ. Tuy nhiên, xóa các video cũ từ bộ nhớ vấn được.</translation>
-    </message>
-    <message>
-      <source>Recording was enabled on the USB storage</source>
-      <translation>Ghi âm được kích hoạt trên USB lưu trữ</translation>
-    </message>
-    <message>
       <source>Reindexing can fix problems with archive or backup if they have been lost or damaged, or if some hardware has been replaced.</source>
       <translation>Lập chỉ mục lại có thể khắc phục sự cố với lưu trữ hoặc sao lưu nếu chúng bị mất hoặc bị hỏng hoặc nếu một số phần cứng đã được thay thế.</translation>
+    </message>
+    <message>
+      <source>What to do with current analytics data?</source>
+      <translation>Cần làm gì với dữ liệu phân tích hiện tại?</translation>
+    </message>
+    <message>
+      <source>Current analytics data will not be automatically moved to another location and will become unaccessible. You can keep it and manually move later, or delete permanently.
+If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
+      <translation>Dữ liệu phân tích hiện tại sẽ không được tự động chuyển đến vị trí khác và sẽ không thể truy cập được. Bạn có thể giữ và di chuyển thủ công sau đó, hoặc xóa vĩnh viễn.
+Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị trí lưu trữ khác, vui lòng liên hệ với bộ phận hỗ trợ trước khi tiếp tục.</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>Xóa bỏ</translation>
+    </message>
+    <message>
+      <source>Keep</source>
+      <translation>Giữ</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>Hủy bỏ</translation>
     </message>
   </context>
   <context>
@@ -5572,6 +5582,14 @@ to %1</source>
     <message>
       <source>Too small and system partitions are reserved and not used for writing if there is enough other storage space available.</source>
       <translation>Quá nhỏ và phân vùng hệ thống được dành riêng và không được sử dụng để ghi nếu có đủ không gian lưu trữ khác có sẵn.</translation>
+    </message>
+    <message>
+      <source>Use to store analytics data</source>
+      <translation>Sử dụng để lưu trữ dữ liệu phân tích</translation>
+    </message>
+    <message>
+      <source>Stores analytics data</source>
+      <translation>Lưu trữ dữ liệu phân tích</translation>
     </message>
   </context>
   <context>
@@ -5797,27 +5815,27 @@ to %1</source>
     </message>
     <message>
       <source>No server has internet access for time synchronization</source>
-      <translation type="unfinished">No server has internet access for time synchronization</translation>
+      <translation>Không có máy chủ nào có quyền truy cập internet để đồng bộ hóa thời gian</translation>
     </message>
     <message>
       <source>The System is in safe mode</source>
-      <translation type="unfinished">The System is in safe mode</translation>
+      <translation>Hệ thống ở chế độ an toàn</translation>
     </message>
     <message>
       <source>The System has no internet access for time synchronization</source>
-      <translation type="unfinished">The System has no internet access for time synchronization</translation>
+      <translation>Hệ thống không truy cập được internet để đồng bộ hóa thời gian</translation>
     </message>
     <message>
       <source>No online server in the System has internet access for time synchronization.</source>
-      <translation type="unfinished">No online server in the System has internet access for time synchronization.</translation>
+      <translation>Không có máy chủ trực tuyến nào trong Hệ thống có quyền truy cập internet để đồng bộ hóa thời gian.</translation>
     </message>
     <message>
       <source>The System is running in safe mode.</source>
-      <translation type="unfinished">The System is running in safe mode.</translation>
+      <translation>Hệ thống đang chạy ở chế độ an toàn.</translation>
     </message>
     <message>
       <source>Error occurred during remote archive synchronization</source>
-      <translation type="unfinished">Error occurred during remote archive synchronization</translation>
+      <translation>Xảy ra lỗi trong quá trình đồng bộ hóa lưu trữ từ xa</translation>
     </message>
   </context>
   <context>
@@ -6756,7 +6774,7 @@ to %1</source>
     </message>
     <message>
       <source>Not enough space on server storage</source>
-      <translation type="unfinished">Not enough space on server storage</translation>
+      <translation>Không đủ dung lượng lưu trữ trên máy chủ</translation>
     </message>
     <message>
       <source>Stop uploading?</source>
@@ -7140,35 +7158,35 @@ to %1</source>
     </message>
     <message>
       <source>Show information</source>
-      <translation type="unfinished">Show information</translation>
+      <translation>Hiển thị thông tin</translation>
     </message>
     <message>
       <source>Hide thumbnails</source>
-      <translation type="unfinished">Hide thumbnails</translation>
+      <translation>Ẩn hình thu nhỏ</translation>
     </message>
     <message>
       <source>Show thumbnails</source>
-      <translation type="unfinished">Show thumbnails</translation>
+      <translation>Hiển thị hình thu nhỏ</translation>
     </message>
     <message>
       <source>Last day</source>
-      <translation type="unfinished">Last day</translation>
+      <translation>Ngày cuối</translation>
     </message>
     <message>
       <source>Last 7 days</source>
-      <translation type="unfinished">Last 7 days</translation>
+      <translation>7 ngày qua</translation>
     </message>
     <message>
       <source>Last 30 days</source>
-      <translation type="unfinished">Last 30 days</translation>
+      <translation>30 ngày trước</translation>
     </message>
     <message>
       <source>Selected on Timeline</source>
-      <translation type="unfinished">Selected on Timeline</translation>
+      <translation>Được chọn trên Dòng thời gian</translation>
     </message>
     <message>
       <source>Any time</source>
-      <translation type="unfinished">Any time</translation>
+      <translation>Bất cứ lúc nào</translation>
     </message>
     <message>
       <source>none</source>
@@ -7177,23 +7195,23 @@ to %1</source>
     </message>
     <message>
       <source>Devices on layout</source>
-      <translation type="unfinished">Devices on layout</translation>
+      <translation>Các thiết trên bố cục</translation>
     </message>
     <message>
       <source>Cameras on layout</source>
-      <translation type="unfinished">Cameras on layout</translation>
+      <translation>Các Camera trên bố cục</translation>
     </message>
     <message>
       <source>Any device</source>
-      <translation type="unfinished">Any device</translation>
+      <translation>Bất kỳ thiết bị</translation>
     </message>
     <message>
       <source>Any camera</source>
-      <translation type="unfinished">Any camera</translation>
+      <translation>Bất kỳ camera</translation>
     </message>
     <message>
       <source>Selected device</source>
-      <translation type="unfinished">Selected device</translation>
+      <translation>Thiết bị được chọn</translation>
     </message>
     <message>
       <source>Selected camera</source>
@@ -7204,7 +7222,7 @@ to %1</source>
     <name>nx::vms::client::desktop::AnalyticsMenuActionFactory</name>
     <message>
       <source>Show Always</source>
-      <translation type="unfinished">Show Always</translation>
+      <translation>Luôn hiển thị</translation>
     </message>
     <message>
       <source>Show Only with &quot;Objects&quot; Tab</source>
@@ -7305,8 +7323,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n bookmarks</source>
-      <translation type="unfinished">
-        <numerusform>%n bookmarks</numerusform>
+      <translation>
+        <numerusform>%n dấu trang</numerusform>
       </translation>
     </message>
   </context>
@@ -7390,12 +7408,12 @@ to %1</source>
       </translation>
     </message>
     <message>
-      <source>UDP Multicast</source>
-      <translation type="unfinished">UDP Multicast</translation>
-    </message>
-    <message>
       <source>Server will not change any cameras settings, it will receive and use camera stream as-is.</source>
       <translation>Máy chủ sẽ không thay đổi bất kỳ cài đặt máy ảnh nào, nó sẽ nhận và sử dụng luồng máy ảnh như hiện tại.</translation>
+    </message>
+    <message>
+      <source>Multicast</source>
+      <translation type="unfinished">Multicast</translation>
     </message>
   </context>
   <context>
@@ -7618,7 +7636,7 @@ to %1</source>
     </message>
     <message>
       <source>No secondary stream</source>
-      <translation type="unfinished">No secondary stream</translation>
+      <translation>Không có luồng thứ cấp</translation>
     </message>
   </context>
   <context>
@@ -7657,7 +7675,7 @@ to %1</source>
     </message>
     <message>
       <source>Internal error.</source>
-      <translation type="unfinished">Internal error.</translation>
+      <translation>Lỗi bên trong.</translation>
     </message>
     <message>
       <source>Not enough space on disk to install the client update.</source>
@@ -8250,7 +8268,7 @@ to %1</source>
     </message>
     <message>
       <source>Custom number that can be assigned to a layout for quick identification and access</source>
-      <translation type="unfinished">Custom number that can be assigned to a layout for quick identification and access</translation>
+      <translation>Dãy số tùy chọn có thể được gán cho bố cục để nhận dạng và truy cập nhanh</translation>
     </message>
   </context>
   <context>
@@ -8261,7 +8279,7 @@ to %1</source>
     </message>
     <message>
       <source>Background</source>
-      <translation type="unfinished">Background</translation>
+      <translation>Lý lịch</translation>
     </message>
   </context>
   <context>
@@ -8413,10 +8431,6 @@ to %1</source>
       <translation type="unfinished">Some servers are offline and will not be updated. Skip them?</translation>
     </message>
     <message>
-      <source>Please make sure there is enough free storage space and network connection is stable.</source>
-      <translation type="unfinished">Please make sure there is enough free storage space and network connection is stable.</translation>
-    </message>
-    <message>
       <source>If the problem persists, please contact Customer Support.</source>
       <translation>Nếu vấn đề kích hoạt lỗi, xin vui lòng liên hệ với hỗ trợ khách hàng.</translation>
     </message>
@@ -8429,16 +8443,8 @@ to %1</source>
       <translation>Hủy cập nhật</translation>
     </message>
     <message>
-      <source>Please make sure they have enough free storage space and stable network connection.</source>
-      <translation type="unfinished">Please make sure they have enough free storage space and stable network connection.</translation>
-    </message>
-    <message>
       <source>Update completed</source>
       <translation>Cập nhật hoàn tất</translation>
-    </message>
-    <message>
-      <source>Update completed, but some servers have failed an update</source>
-      <translation type="unfinished">Update completed, but some servers have failed an update</translation>
     </message>
     <message>
       <source>Nx Witness Client will be restarted to the updated version.</source>
@@ -8449,16 +8455,8 @@ to %1</source>
       <translation>Kác định</translation>
     </message>
     <message>
-      <source>Failed to install updates to servers:</source>
-      <translation type="unfinished">Failed to install updates to servers:</translation>
-    </message>
-    <message>
       <source>Downloading updates...</source>
       <translation>Đang tải xuống bản Cập Nhật...</translation>
-    </message>
-    <message>
-      <source>Pushing updates...</source>
-      <translation type="unfinished">Pushing updates...</translation>
     </message>
     <message>
       <source>Upload</source>
@@ -8583,16 +8581,56 @@ to %1</source>
       <translation type="unfinished">Cancel update and delete all downloaded data?</translation>
     </message>
     <message>
+      <source>There was an error while installing updates:</source>
+      <translation type="unfinished">There was an error while installing updates:</translation>
+    </message>
+    <message>
+      <source>Some servers have gone offline. Please wait until they become online to continue.</source>
+      <translation type="unfinished">Some servers have gone offline. Please wait until they become online to continue.</translation>
+    </message>
+    <message>
+      <source>Update completed, but some components have failed an update</source>
+      <translation type="unfinished">Update completed, but some components have failed an update</translation>
+    </message>
+    <message>
+      <source>Please update %1 manually using an installation package.</source>
+      <translation>Hãy cập nhật %1 sử dụng gói cài đặt bằng tay.</translation>
+    </message>
+    <message>
+      <source>%1 will be restarted to the updated version.</source>
+      <translation>%1 sẽ được khởi động lại để cập nhật phiên bản.</translation>
+    </message>
+    <message>
       <source>Failed to download update packages to some components</source>
       <translation type="unfinished">Failed to download update packages to some components</translation>
+    </message>
+    <message>
+      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
+      <translation type="unfinished">OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</translation>
+    </message>
+    <message>
+      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
+      <translation type="unfinished">OS version of the client is no longer supported. Please update its OS to a supported version.</translation>
+    </message>
+    <message>
+      <source>Failed to start update</source>
+      <translation type="unfinished">Failed to start update</translation>
+    </message>
+    <message>
+      <source>Starting update to ...</source>
+      <translation type="unfinished">Starting update to ...</translation>
+    </message>
+    <message>
+      <source>Some servers have no package available</source>
+      <translation type="unfinished">Some servers have no package available</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::MultipleLayoutSelectionDialog</name>
     <message numerus="yes">
       <source>%n layouts</source>
-      <translation type="unfinished">
-        <numerusform>%n layouts</numerusform>
+      <translation>
+        <numerusform>%n bố cục</numerusform>
       </translation>
     </message>
     <message>
@@ -8615,10 +8653,6 @@ to %1</source>
       <translation>sự kiện chung</translation>
     </message>
     <message>
-      <source>Unknown Plugin Event</source>
-      <translation type="unfinished">Unknown Plugin Event</translation>
-    </message>
-    <message>
       <source>Device was disconnected</source>
       <translation type="unfinished">Device was disconnected</translation>
     </message>
@@ -8629,6 +8663,10 @@ to %1</source>
     <message>
       <source>I/O Module was disconnected</source>
       <translation type="unfinished">I/O Module was disconnected</translation>
+    </message>
+    <message>
+      <source>Unknown Plugin Diagnostic Event</source>
+      <translation type="unfinished">Unknown Plugin Diagnostic Event</translation>
     </message>
   </context>
   <context>
@@ -8650,7 +8688,7 @@ to %1</source>
     </message>
     <message>
       <source>Select layout...</source>
-      <translation type="unfinished">Select layout...</translation>
+      <translation>Chọn bố cục...</translation>
     </message>
     <message>
       <source>Select some single user in &quot;Show to&quot; line to display his local layouts in this list</source>
@@ -8702,6 +8740,62 @@ to %1</source>
     <message>
       <source>Failed to install update</source>
       <translation type="unfinished">Failed to install update</translation>
+    </message>
+    <message>
+      <source>Waiting for peer data</source>
+      <translation type="unfinished">Waiting for peer data</translation>
+    </message>
+    <message>
+      <source>There is not enough space to download update files.</source>
+      <translation type="unfinished">There is not enough space to download update files.</translation>
+    </message>
+    <message>
+      <source>There is not enough space to extract update files.</source>
+      <translation type="unfinished">There is not enough space to extract update files.</translation>
+    </message>
+    <message>
+      <source>Failed to download update packages.</source>
+      <translation type="unfinished">Failed to download update packages.</translation>
+    </message>
+    <message>
+      <source>Update contents are invalid.</source>
+      <translation type="unfinished">Update contents are invalid.</translation>
+    </message>
+    <message>
+      <source>Update archive is corrupted.</source>
+      <translation type="unfinished">Update archive is corrupted.</translation>
+    </message>
+    <message>
+      <source>Update files cannot be extracted.</source>
+      <translation type="unfinished">Update files cannot be extracted.</translation>
+    </message>
+    <message>
+      <source>Internal downloader error.</source>
+      <translation type="unfinished">Internal downloader error.</translation>
+    </message>
+    <message>
+      <source>Iternal server error.</source>
+      <translation type="unfinished">Iternal server error.</translation>
+    </message>
+    <message>
+      <source>Internal client error.</source>
+      <translation type="unfinished">Internal client error.</translation>
+    </message>
+    <message>
+      <source>Unknown error.</source>
+      <translation>Lỗi không xác định.</translation>
+    </message>
+    <message>
+      <source>Unexpected error code.</source>
+      <translation type="unfinished">Unexpected error code.</translation>
+    </message>
+    <message>
+      <source>Ready to install update</source>
+      <translation type="unfinished">Ready to install update</translation>
+    </message>
+    <message>
+      <source>Update package is not found.</source>
+      <translation type="unfinished">Update package is not found.</translation>
     </message>
   </context>
   <context>
@@ -8855,6 +8949,69 @@ to %1</source>
     <message>
       <source>Users will be automatically logged out if their session exceeds the specified duration.</source>
       <translation type="unfinished">Users will be automatically logged out if their session exceeds the specified duration.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ServerSettingsDialogStore</name>
+    <message>
+      <source>Library</source>
+      <translation type="unfinished">Library</translation>
+    </message>
+    <message>
+      <source>Version</source>
+      <translation type="unfinished">Version</translation>
+    </message>
+    <message>
+      <source>Vendor</source>
+      <translation>Nhà cung cấp:</translation>
+    </message>
+    <message>
+      <source>no error</source>
+      <translation type="unfinished">no error</translation>
+    </message>
+    <message>
+      <source>library file cannot be loaded</source>
+      <translation type="unfinished">library file cannot be loaded</translation>
+    </message>
+    <message>
+      <source>invalid or incompatible plugin library</source>
+      <translation type="unfinished">invalid or incompatible plugin library</translation>
+    </message>
+    <message>
+      <source>plugin library failed to initialize</source>
+      <translation type="unfinished">plugin library failed to initialize</translation>
+    </message>
+    <message>
+      <source>plugin returned bad manifest</source>
+      <translation type="unfinished">plugin returned bad manifest</translation>
+    </message>
+    <message>
+      <source>plugin API version is no longer supported</source>
+      <translation type="unfinished">plugin API version is no longer supported</translation>
+    </message>
+    <message>
+      <source>unknown error</source>
+      <translation type="unfinished">unknown error</translation>
+    </message>
+    <message>
+      <source>Not loaded</source>
+      <translation type="unfinished">Not loaded</translation>
+    </message>
+    <message>
+      <source>Loaded</source>
+      <translation type="unfinished">Loaded</translation>
+    </message>
+    <message>
+      <source>plugin is in the black list</source>
+      <translation type="unfinished">plugin is in the black list</translation>
+    </message>
+    <message>
+      <source>Status</source>
+      <translation type="unfinished">Status</translation>
+    </message>
+    <message>
+      <source>plugin is optional and is not in the white list</source>
+      <translation type="unfinished">plugin is optional and is not in the white list</translation>
     </message>
   </context>
   <context>
@@ -9146,8 +9303,8 @@ to %1</source>
     <name>nx::vms::client::desktop::WorkbenchExportHandler</name>
     <message numerus="yes">
       <source>%n bookmarks</source>
-      <translation type="unfinished">
-        <numerusform>%n bookmarks</numerusform>
+      <translation>
+        <numerusform>%n dấu trang</numerusform>
       </translation>
     </message>
     <message>
@@ -9185,7 +9342,7 @@ to %1</source>
     </message>
     <message>
       <source>Several bookmarks can be exported as layout only.</source>
-      <translation type="unfinished">Several bookmarks can be exported as layout only.</translation>
+      <translation>Một số dấu trang chỉ có thể được xuất dưới dạng bố cục.</translation>
     </message>
     <message>
       <source>Local files not allowed for Multi-Video export</source>
@@ -9572,7 +9729,7 @@ to %1</source>
     </message>
     <message>
       <source>Please upgrade to a next available patch or release version once available.</source>
-      <translation type="unfinished">Please upgrade to a next available patch or release version once available.</translation>
+      <translation>Vui lòng nâng cấp lên bản vá hoặc bản phát hành tiếp theo khi có sẵn.</translation>
     </message>
     <message>
       <source>System sends anonymous usage statistics</source>
@@ -9600,6 +9757,28 @@ to %1</source>
     <message>
       <source>This build is for testing purposes only.</source>
       <translation type="unfinished">This build is for testing purposes only.</translation>
+    </message>
+    <message>
+      <source>Open Server Settings</source>
+      <translation type="unfinished">Open Server Settings</translation>
+    </message>
+    <message>
+      <source>OK</source>
+      <translation>Kác định</translation>
+    </message>
+    <message>
+      <source>Confirm storage location to store analytics data on &apos;%1&apos;</source>
+      <translation type="unfinished">Confirm storage location to store analytics data on &apos;%1&apos;</translation>
+    </message>
+    <message>
+      <source>Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
+Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
+By default analytics data will be stored in mediaserver&apos;s installation directory.
+You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</source>
+      <translation type="unfinished">Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
+Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
+By default analytics data will be stored in mediaserver&apos;s installation directory.
+You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</translation>
     </message>
   </context>
   <context>

@@ -104,6 +104,7 @@ class LicenseDeactivatorPrivate: public Connective<QObject>
 
 public:
     LicenseDeactivatorPrivate(
+        const nx::utils::Url& url,
         const RequestInfo& info,
         const QnLicenseList& licenses,
         const Handler& handler,
@@ -119,6 +120,7 @@ private:
 };
 
 LicenseDeactivatorPrivate::LicenseDeactivatorPrivate(
+    const nx::utils::Url& url,
     const RequestInfo& info,
     const QnLicenseList& licenses,
     const Handler& handler,
@@ -190,7 +192,7 @@ LicenseDeactivatorPrivate::LicenseDeactivatorPrivate(
         [this, guard, handler, postHandler](nx::network::http::AsyncHttpClientPtr /*client*/)
         {
             if (guard && handler)
-                executeDelayed(postHandler, 0, guard->thread());
+                executeLaterInThread(postHandler, guard->thread());
         };
 
     connect(m_httpClient.get(), &nx::network::http::AsyncHttpClient::done, this, threadSafeHandler,
@@ -202,7 +204,7 @@ LicenseDeactivatorPrivate::LicenseDeactivatorPrivate(
         request.licenses.append({::toString(license->key()), license->hardwareId()});
 
     m_httpClient->doPost(
-        QnLicenseServer::kDeactivateUrl,
+        url,
         nx::network::http::header::ContentType::kJson,
         QJson::serialized(request));
 }
@@ -217,13 +219,14 @@ namespace license {
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(RequestInfo, (json), (name)(email)(reason)(systemName)(localUser))
 
 void Deactivator::deactivateAsync(
+    const nx::utils::Url& url,
     const RequestInfo& info,
     const QnLicenseList& licenses,
     const Handler& completionHandler,
     QObject* parent)
 {
     // Deactivator will delete himself when operation complete
-    new LicenseDeactivatorPrivate(info, licenses, completionHandler, parent);
+    new LicenseDeactivatorPrivate(url, info, licenses, completionHandler, parent);
 }
 
 QString Deactivator::errorDescription(ErrorCode error)

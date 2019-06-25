@@ -11,6 +11,7 @@
 #include <client/client_globals.h>
 #include <client/client_settings.h>
 
+#include <api/media_server_connection.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
@@ -19,7 +20,7 @@
 #include <nx/vms/client/desktop/ui/actions/action.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>
-#include <nx/vms/client/desktop/resource_views/data/node_type.h>
+#include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <ui/customization/customized.h>
 #include <ui/delegates/recording_stats_item_delegate.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
@@ -405,7 +406,7 @@ void QnStorageAnalyticsWidget::atEventsGrid_customContextMenuRequested(const QPo
     if (!selectedResources.empty())
     {
         action::Parameters parameters(selectedResources);
-        parameters.setArgument(Qn::NodeTypeRole, ResourceTreeNodeType::resource);
+        parameters.setArgument(Qn::NodeTypeRole, ResourceTree::NodeType::resource);
         auto manager = context()->menu();
         menu.reset(manager->newMenu(action::TreeScope, nullptr, parameters, 0,
             {action::IDType::CameraSettingsAction}));

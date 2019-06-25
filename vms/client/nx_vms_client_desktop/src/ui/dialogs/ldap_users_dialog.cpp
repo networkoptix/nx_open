@@ -13,6 +13,7 @@
 #include <core/resource/user_resource.h>
 
 #include <api/app_server_connection.h>
+#include <api/media_server_connection.h>
 #include <api/global_settings.h>
 
 #include <ui/style/custom_style.h>

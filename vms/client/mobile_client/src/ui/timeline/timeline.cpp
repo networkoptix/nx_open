@@ -390,7 +390,7 @@ QnTimeline::QnTimeline(QQuickItem* parent):
     connect(this, &QnTimeline::positionChanged, this, &QnTimeline::positionDateChanged);
     connect(this, &QnTimeline::widthChanged, this, [this](){ d->updateZoomLevel(); });
 
-    d->suffixList << lit("ms") << lit("s") << lit(":");
+    d->suffixList << "ms" << "s" << ":";
 
     QLocale locale;
     for (int i = 1; i <= 12; ++i)
@@ -1530,7 +1530,7 @@ void QnTimelinePrivate::updateMaxZoomLevelTextLengths()
             }
 
             if (level.type == QnTimelineZoomLevel::Days)
-                maxZoomLevelTextLength[i] += fm.size(0, lit(" 88")).width();
+                maxZoomLevelTextLength[i] += fm.size(0, " 88").width();
         }
         else
         {

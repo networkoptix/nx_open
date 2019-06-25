@@ -866,7 +866,7 @@ void QnWorkbenchConnectHandler::at_messageProcessor_initialResourcesReceived()
     const auto workbenchStateUpdate =
         [this] { context()->instance<QnWorkbenchStateManager>()->forcedUpdate(); };
 
-    executeDelayedParented(workbenchStateUpdate, 0, this);
+    executeLater(workbenchStateUpdate, this);
 
     /* In several seconds after connect show warnings. */
     executeDelayedParented([this] { showWarnMessagesOnce(); }, kMessagesDelayMs, this);
@@ -1107,7 +1107,7 @@ void QnWorkbenchConnectHandler::handleTestConnectionReply(int handle,
         // This code is also returned if we are downloading compatibility version
         case Qn::IncompatibleVersionConnectionResult:
             // Do not store connection if applauncher is offline
-            if (!applauncher::api::checkOnline(false))
+            if (!nx::vms::applauncher::api::checkOnline(false))
                 break;
             // Fall through
         case Qn::SuccessConnectionResult:

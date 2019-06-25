@@ -4,6 +4,7 @@
 
 #include <QtCore/QList>
 
+#include <api/helpers/thumbnail_request_data.h>
 #include <nx/vms/event/actions/actions.h>
 #include <nx/vms/event/events/ip_conflict_event.h>
 #include <nx/vms/event/events/server_conflict_event.h>
@@ -225,6 +226,11 @@ ExtendedRuleProcessor::ExtendedRuleProcessor(QnMediaServerModule* serverModule):
 
 ExtendedRuleProcessor::~ExtendedRuleProcessor()
 {
+    stop();
+}
+
+void ExtendedRuleProcessor::stop()
+{
     quit();
     wait();
     m_emailThreadPool.waitForDone();
@@ -232,7 +238,7 @@ ExtendedRuleProcessor::~ExtendedRuleProcessor()
     std::set<quint64> timersToRemove;
     {
         QnMutexLocker lk(&m_mutex);
-        for (const auto& value: m_aggregatedEmails)
+        for (const auto& value : m_aggregatedEmails)
         {
             if (value.periodicTaskID)
                 timersToRemove.insert(value.periodicTaskID);
@@ -240,7 +246,7 @@ ExtendedRuleProcessor::~ExtendedRuleProcessor()
         m_aggregatedEmails.clear();
     }
 
-    for (const auto& timerId: timersToRemove)
+    for (const auto& timerId : timersToRemove)
         nx::utils::TimerManager::instance()->joinAndDeleteTimer(timerId);
 }
 

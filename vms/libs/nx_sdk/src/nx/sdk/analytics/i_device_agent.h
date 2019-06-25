@@ -1,3 +1,5 @@
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+
 #pragma once
 
 #include <nx/sdk/interface.h>
@@ -30,9 +32,14 @@ class IDeviceAgent: public Interface<IDeviceAgent>
 public:
     static auto interfaceId() { return InterfaceId("nx::sdk::analytics::IDeviceAgent"); }
 
-    class IHandler
+    class IHandler: public Interface<IHandler>
     {
     public:
+        static auto interfaceId()
+        {
+            return InterfaceId("nx::sdk::analytics::IDeviceAgent::IHandler");
+        }
+
         virtual ~IHandler() = default;
         virtual void handleMetadata(IMetadataPacket* metadataPacket) = 0;
         virtual void handlePluginEvent(IPluginEvent* event) = 0;
@@ -53,12 +60,13 @@ public:
 
     /**
      * In addition to the settings stored in a Server database, a DeviceAgent can have some
-     * settings which are stored somewhere "under the hood" of the Engine, e.g. on a device acting
-     * as a DeviceAgent's backend. Such settings do not need to be explicitly marked in the Settings
-     * Model, but every time the Server offers the user to edit the values, it calls this method and
-     * merges the received values with the ones in its database.
+     * settings which are stored somewhere "under the hood" of the DeviceAgent, e.g. on a device
+     * acting as a DeviceAgent's backend. Such settings do not need to be explicitly marked in the
+     * Settings Model, but every time the Server offers the user to edit the values, it calls this
+     * method and merges the received values with the ones in its database.
      *
-     * @return DeviceAgent settings that are stored on the plugin side.
+     * @return DeviceAgent settings that are stored on the plugin side, or null if there are no
+     *     such settings.
      */
     virtual IStringMap* pluginSideSettings() const = 0;
 
@@ -71,9 +79,9 @@ public:
 
     /**
      * @param handler Processes event metadata and object metadata fetched by DeviceAgent.
-     *  DeviceAgent should fetch events metadata after setNeededMetadataTypes() call.
-     *  Generic device related events (errors, warning, info messages) might also be reported
-     *  via this handler.
+     *     DeviceAgent should fetch events metadata after setNeededMetadataTypes() call.
+     *     Generic device related events (errors, warning, info messages) might also be reported
+     *     via this handler.
      * @return noError in case of success, other value otherwise.
      */
     virtual Error setHandler(IHandler* handler) = 0;

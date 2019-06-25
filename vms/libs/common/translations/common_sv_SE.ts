@@ -1288,10 +1288,6 @@
       <translation>Ett okänt fel har uppstått</translation>
     </message>
     <message>
-      <source>Multiple %1 events have occured</source>
-      <translation>Flera %1 händelser har inträffat</translation>
-    </message>
-    <message>
       <source>Event: %1</source>
       <translation>Händelse: %1</translation>
     </message>
@@ -1377,10 +1373,6 @@
     <message>
       <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
       <translation>Anslutning till kamera (sekundärström) stängdes oväntat.</translation>
-    </message>
-    <message>
-      <source>RTP packet loss detected, prev seq.=%1 next seq.=%2.</source>
-      <translation>RTP-paketförlust detekterad, föregående seq. =%1 nästa sekv. =%2.</translation>
     </message>
     <message>
       <source>RTP packet loss detected.</source>
@@ -1558,20 +1550,44 @@
       <translation>Öppna layout</translation>
     </message>
     <message>
-      <source>Plugin Event</source>
-      <translation>Plugin Event</translation>
-    </message>
-    <message>
-      <source>Unknown plugin event</source>
-      <translation>Okänd plugin-händelse</translation>
-    </message>
-    <message>
       <source>Failed to force using camera time, it lags too much, system time will be used</source>
       <translation>Misslyckades med att använda kameratid, det ligger efter för mycket, systemtiden kommer att användas</translation>
     </message>
     <message>
       <source>Camera time is back to normal</source>
       <translation>Kameratiden är tillbaka till normal</translation>
+    </message>
+    <message>
+      <source>Multiple %1 events have occurred</source>
+      <translation>Flera %1 händelser har inträffat</translation>
+    </message>
+    <message>
+      <source>Multicast address conflict detected. Address %1 is already in use by %2 on %3 stream</source>
+      <translation type="unfinished">Multicast address conflict detected. Address %1 is already in use by %2 on %3 stream</translation>
+    </message>
+    <message>
+      <source>Network address %1 is not a multicast address</source>
+      <translation type="unfinished">Network address %1 is not a multicast address</translation>
+    </message>
+    <message>
+      <source>Analytics storage &quot;%1&quot; is offline.</source>
+      <translation type="unfinished">Analytics storage &quot;%1&quot; is offline.</translation>
+    </message>
+    <message>
+      <source>Analytics storage &quot;%1&quot; is almost full.</source>
+      <translation type="unfinished">Analytics storage &quot;%1&quot; is almost full.</translation>
+    </message>
+    <message>
+      <source>Plugin Diagnostic Event</source>
+      <translation type="unfinished">Plugin Diagnostic Event</translation>
+    </message>
+    <message>
+      <source>Unknown Plugin Diagnostic Event</source>
+      <translation type="unfinished">Unknown Plugin Diagnostic Event</translation>
+    </message>
+    <message>
+      <source>RAID error. %1.</source>
+      <translation type="unfinished">RAID error. %1.</translation>
     </message>
   </context>
   <context>

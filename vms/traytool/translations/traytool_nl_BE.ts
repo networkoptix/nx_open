@@ -113,5 +113,9 @@
       <source>pausing</source>
       <translation>pauzeren</translation>
     </message>
+    <message>
+      <source>Unknown error: %1</source>
+      <translation>Onbekende fout: %1</translation>
+    </message>
   </context>
 </TS>

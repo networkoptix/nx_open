@@ -26,7 +26,6 @@ struct QnStartupParameters
 
     nx::utils::Url parseAuthenticationString() const;
 
-    bool isDevMode() const;
     bool isVideoWallMode() const;
 
     int screen = kInvalidScreen;
@@ -36,7 +35,6 @@ struct QnStartupParameters
     const static QString kAllowMultipleClientInstancesKey;
 
     bool skipMediaFolderScan = false;
-    bool vsyncDisabled = false;
     bool clientUpdateDisabled = false;
     bool softwareYuv = false;
     bool forceLocalSettings = false;
@@ -44,7 +42,6 @@ struct QnStartupParameters
     bool showFullInfo = false;
     bool exportedMode = false;  /*< Client was run from an exported video exe-file. */
     bool hiDpiDisabled = false;
-    bool profilerMode = false;
 
     bool selfUpdateMode = false;
     const static QString kSelfUpdateKey;
@@ -55,7 +52,6 @@ struct QnStartupParameters
      */
     bool acsMode = false;
 
-    QString devModeKey;
     QString authenticationString;
     QString delayedDrop;
     QString instantDrop;
@@ -66,7 +62,6 @@ struct QnStartupParameters
     QnUuid videoWallGuid;
     QnUuid videoWallItemGuid;
     QString engineVersion;
-    QString dynamicCustomizationPath;
     QString ipVersion;
 
     /** Uri when the client was launched as uri handler. */

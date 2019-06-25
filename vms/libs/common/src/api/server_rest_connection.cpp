@@ -43,8 +43,6 @@ using namespace nx;
 
 namespace {
 
-static const size_t ResponseReadTimeoutMs = 15 * 1000;
-static const size_t TcpConnectTimeoutMs = 5 * 1000;
 
 void trace(const QString& serverId, int handle, const QString& message)
 {
@@ -454,18 +452,20 @@ Handle ServerConnection::addFileUpload(
     qint64 chunkSize,
     const QByteArray& md5,
     qint64 ttl,
+    bool recreateIfExists,
     AddUploadCallback callback,
     QThread* targetThread)
 {
     QnRequestParamList params
     {
-        { lit("size"), QString::number(size) },
-        { lit("chunkSize"), QString::number(chunkSize) },
-        { lit("md5"), QString::fromUtf8(md5) },
-        { lit("ttl"), QString::number(ttl) },
-        { lit("upload"), lit("true") }
+        {"size", QString::number(size)},
+        {"chunkSize", QString::number(chunkSize)},
+        {"md5", QString::fromUtf8(md5)},
+        {"ttl", QString::number(ttl)},
+        {"upload", "true"},
+        {"recreate", recreateIfExists ? "true" : "false"},
     };
-    QString path = lit("/api/downloads/%1").arg(fileName);
+    const auto& path = QStringLiteral("/api/downloads/%1").arg(fileName);
     return executePost(path, params, QByteArray(), QByteArray(), callback, targetThread);
 }
 
@@ -815,16 +815,21 @@ Handle ServerConnection::lookupDetectedObjects(
 }
 
 Handle ServerConnection::updateActionStart(
-    const nx::update::Information& info, QThread* targetThread)
+    const nx::update::Information& info,
+    std::function<void (Handle, bool)>&& callback,
+    QThread* targetThread)
 {
-    auto callback =
-        [](bool /*success*/, rest::Handle /*handle*/, EmptyResponseType /*response*/)
+    auto internalCallback =
+        [callback = std::move(callback)](
+            bool success, rest::Handle handle, EmptyResponseType /*response*/)
         {
+            if (callback)
+                callback(handle, success);
         };
     const auto contentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
     auto request = QJson::serialized(info);
-    return executePost<EmptyResponseType>(
-        "/ec2/startUpdate", QnRequestParamList(), contentType, request, callback, targetThread);
+    return executePost<EmptyResponseType>("/ec2/startUpdate", QnRequestParamList(), contentType,
+        request, internalCallback, targetThread);
 }
 
 Handle ServerConnection::getUpdateInfo(
@@ -911,6 +916,14 @@ Handle ServerConnection::updateActionInstall(const QSet<QnUuid>& participants,
     return executePost<EmptyResponseType>("/api/installUpdate",
         QnRequestParamList{{ lit("peers"), peerList }},
         contentType, QByteArray(), internalCallback, targetThread);
+}
+
+Handle ServerConnection::retryUpdate(
+    Result<UpdateStatusAllData>::type callback, QThread* targetThread)
+{
+    const auto contentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
+    return executePost<UpdateStatusAllData>("/ec2/retryUpdate",
+        QnRequestParamList(), contentType, QByteArray(), callback, targetThread);
 }
 
 Handle ServerConnection::getUpdateStatus(
@@ -1018,6 +1031,26 @@ Handle ServerConnection::setDeviceAnalyticsSettings(
         targetThread);
 }
 
+Handle ServerConnection::ptzCommand(
+    const QnRequestParamList& params,
+    const nx::Buffer& body,
+    std::function<void(bool, Handle, const QnJsonRestResult& response)>&& callback,
+    QThread* targetThread)
+{
+    // [](bool, Handle, const QByteArray& response) {}
+    const auto contentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
+    return executePost<QnJsonRestResult>("/api/ptz",
+        params,
+        contentType, body,
+        callback,
+        targetThread);
+}
+
+Handle ServerConnection::getPluginInformation(GetCallback callback, QThread* targetThread)
+{
+    return executeGet("/api/pluginInfo", {}, callback, targetThread);
+}
+
 Handle ServerConnection::debug(
     const QString& action, const QString& value, PostCallback callback, QThread* targetThread)
 {
@@ -1034,6 +1067,7 @@ QUrl ServerConnection::prepareUrl(const QString& path, const QnRequestParamList&
     return result;
 }
 
+/** Response deserialization for RestResultWithDataBase objects. */
 template<typename T,
     typename std::enable_if<std::is_base_of<RestResultWithDataBase, T>::value>::type* = nullptr>
 T parseMessageBody(
@@ -1062,6 +1096,7 @@ T parseMessageBody(
     return T();
 }
 
+/** Response deserialization for the objects being not inherited from RestResultWithDataBase. */
 template<typename T,
     typename std::enable_if<!std::is_base_of<RestResultWithDataBase, T>::value>::type* = nullptr>
 T parseMessageBody(
@@ -1082,6 +1117,29 @@ T parseMessageBody(
             break;
     }
     return T();
+}
+
+/** Response deserialization for pure QJsonObject. */
+template<>
+QJsonValue parseMessageBody<QJsonValue>(
+    const Qn::SerializationFormat& format,
+    const nx::network::http::BufferType& msgBody,
+    bool* success)
+{
+    QJsonValue result;
+    switch (format)
+    {
+        case Qn::JsonFormat:
+            if (QJsonDetail::deserialize_json(msgBody, &result) && success)
+                *success = true;
+            return result;
+        default:
+            if (success)
+                *success = false;
+            NX_ASSERT(0, "Unsupported data format");
+            break;
+    }
+    return QJsonObject();
 }
 
 template<typename CallbackType>
@@ -1201,11 +1259,10 @@ void invoke(Callback<ResultType> callback,
     if (targetThread)
     {
          auto ptr = std::make_shared<ResultType>(std::move(result));
-         executeDelayed([callback, success, id, ptr]() mutable
+         executeLaterInThread([callback, success, id, ptr]() mutable
              {
                  callback(success, id, std::move(*ptr));
              },
-             0,
              targetThread);
     }
     else
@@ -1235,12 +1292,11 @@ void invoke(ServerConnection::Result<QByteArray>::type callback,
     if (targetThread)
     {
         auto ptr = std::make_shared<QByteArray>(result);
-        executeDelayed(
+        executeLaterInThread(
             [callback, headers, success, id, ptr]() mutable
             {
                 callback(success, id, std::move(*ptr), headers);
             },
-            0,
             targetThread);
     }
     else

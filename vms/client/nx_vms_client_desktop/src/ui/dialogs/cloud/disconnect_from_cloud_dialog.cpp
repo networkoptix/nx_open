@@ -2,6 +2,7 @@
 
 #include <list>
 
+#include <nx_ec/ec_api.h>
 #include <api/global_settings.h>
 #include <api/server_rest_connection.h>
 #include <api/app_server_connection.h>

@@ -99,6 +99,11 @@ void ProxyImageProvider::setImageProcessor(AbstractImageProcessor* imageProcesso
     updateFromSource();
 }
 
+bool ProxyImageProvider::tryLoad()
+{
+    return m_sourceProvider ? m_sourceProvider->tryLoad() : false;
+}
+
 void ProxyImageProvider::doLoadAsync()
 {
     if (m_sourceProvider)

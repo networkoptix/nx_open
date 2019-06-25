@@ -5,7 +5,7 @@
 #include <QtCore/QStandardPaths>
 
 #include <nx/utils/log/assert.h>
-#include <nx/utils/random.h>
+#include <nx/utils/uuid.h>
 
 #ifdef _WIN32
     #include "../crash_dump/systemexcept_win.h"
@@ -114,7 +114,9 @@ void TestOptions::applyArguments(const utils::ArgumentParser& arguments)
 
 TestOptions::TemporaryDirectory::TemporaryDirectory()
 {
-    const auto kModuleSubdirectory = QString("nx_unit_tests/%1").arg(random::number());
+    const auto kModuleSubdirectory =
+        QString("nx_unit_tests/%1").arg(QnUuid::createUuid().toSimpleString());
+    
     const auto root = QDir(QStandardPaths::writableLocation(QStandardPaths::DataLocation));
     m_path = root.absoluteFilePath(kModuleSubdirectory);
 }

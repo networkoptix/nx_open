@@ -1,3 +1,5 @@
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+
 #include "engine.h"
 
 #define NX_PRINT_PREFIX (this->logUtils.printPrefix)
@@ -59,10 +61,8 @@ Engine::Engine(
     NX_PRINT << "Created " << this << ": \"" << plugin->name() << "\"";
 }
 
-std::string Engine::getParamValue(const char* paramName)
+std::string Engine::getParamValue(const std::string& paramName)
 {
-    if (paramName == nullptr)
-        return "";
     return m_settings[paramName];
 }
 
@@ -167,7 +167,8 @@ void Engine::executeAction(IAction* action, Error* outError)
 Error Engine::setHandler(IEngine::IHandler* handler)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
-    m_handler = handler;
+    handler->addRef();
+    m_handler.reset(handler);
     return Error::noError;
 }
 

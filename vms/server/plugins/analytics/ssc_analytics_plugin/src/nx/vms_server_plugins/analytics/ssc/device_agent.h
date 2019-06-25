@@ -54,7 +54,7 @@ private:
     const QUrl m_url;
     const int m_cameraLogicalId = 0;
     QByteArray m_deviceAgentManifest;
-    nx::sdk::analytics::IDeviceAgent::IHandler* m_handler = nullptr;
+    nx::sdk::Ptr<nx::sdk::analytics::IDeviceAgent::IHandler> m_handler;
     mutable uint64_t m_packetId = 0; //< autoincrement packet number for log and debug
 };
 

@@ -1,3 +1,5 @@
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+
 #include "output_redirector.h"
 
 #include <cstdlib>
@@ -44,7 +46,7 @@ OutputRedirector::OutputRedirector()
     const std::string logFilesDir =
         overridingLogFilesDir ? overridingLogFilesDir : nx::kit::IniConfig::iniFilesDir();
 
-    const std::string processName = getProcessName();
+    const std::string processName = nx::kit::utils::getProcessName();
 
     static const std::string kStdoutFilename = processName + "_stdout.log";
     static const std::string kStderrFilename = processName + "_stderr.log";
@@ -54,11 +56,6 @@ OutputRedirector::OutputRedirector()
 
     if (fileExists(logFilesDir + kStderrFilename))
         redirectOutput(stderr, "stderr", logFilesDir + kStderrFilename);
-}
-
-/*static*/ std::string OutputRedirector::getProcessName()
-{
-    return nx::kit::utils::baseName(nx::kit::utils::getProcessCmdLineArgs()[0]);
 }
 
 #if !defined(NX_OUTPUT_REDIRECTOR_DISABLED)

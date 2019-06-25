@@ -67,8 +67,6 @@ public:
     void initializeContext();
 
 protected:
-    virtual void afterContextInitialized();
-
     QAction* action(const nx::vms::client::desktop::ui::action::IDType id) const;
 
     nx::vms::client::desktop::ui::action::Manager* menu() const;

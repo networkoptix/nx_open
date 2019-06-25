@@ -1,5 +1,7 @@
 #include "connect_request_attributes.h"
 
+#include <QtCore/QUrlQuery>
+
 #include <nx/fusion/serialization/lexical.h>
 #include <nx/network/http/custom_headers.h>
 #include <nx/utils/log/log.h>

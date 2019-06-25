@@ -3,6 +3,7 @@
 #include <api/global_settings.h>
 #include <api/app_server_connection.h>
 
+#include <nx_ec/ec_api.h>
 #include <nx_ec/managers/abstract_server_manager.h>
 #include <nx_ec/data/api_conversion_functions.h>
 

@@ -28,7 +28,6 @@ protected:
 
 private:
     QString m_request;
-    nx::vms::api::RtpTransportType m_rtpTransport;
     size_t m_dataPassed = 0;
     nx::vms::server::resource::CameraPtr m_camera;
 };

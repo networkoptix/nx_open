@@ -8,7 +8,6 @@
 #include <ui/workbench/workbench_context_aware.h>
 #include <utils/common/connective.h>
 
-class QGLWidget;
 class QnStreamRecorder;
 class QnCountdownTimer;
 class QnGraphicsMessageBox;

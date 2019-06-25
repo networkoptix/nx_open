@@ -24,19 +24,19 @@ NotificationConsumerBindingService* OnvifNotificationConsumer::copy()
     return NULL;
 }
 
-int OnvifNotificationConsumer::Notify( _oasisWsnB2__Notify* notificationRequest )
+int OnvifNotificationConsumer::Notify( _wsnt__Notify* notificationRequest )
 {
     NX_DEBUG(this, lit("Received soap notification from %1").
         arg(QString::fromLatin1(notificationRequest->soap ? notificationRequest->soap->endpoint : "")));
 
     QnMutexLocker lk( &m_mutex );
 
-    //oasisWsnB2__Notify->
+    //wsnt__Notify->
     for( size_t i = 0; i < notificationRequest->NotificationMessage.size(); ++i )
     {
         if( !notificationRequest->NotificationMessage[i] )
             continue;
-        const oasisWsnB2__NotificationMessageHolderType& notification = *notificationRequest->NotificationMessage[i];
+        const wsnt__NotificationMessageHolderType& notification = *notificationRequest->NotificationMessage[i];
         if( (!notification.ProducerReference ||
              !notification.ProducerReference->Address) &&
             (!notification.SubscriptionReference ||

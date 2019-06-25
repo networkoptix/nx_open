@@ -16,6 +16,7 @@
 #include <nx/vms/client/desktop/ui/actions/action_target_provider.h>
 #include <nx/vms/client/desktop/ui/actions/action_parameter_types.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/ini.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
@@ -237,7 +238,7 @@ ActionVisibility Action::checkCondition(ActionScopes scope, const Parameters& pa
     if (!(this->scope() & scope) && this->scope() != scope)
         return InvisibleAction;
 
-    if (m_flags.testFlag(DevMode) && !qnRuntime->isDevMode())
+    if (m_flags.testFlag(DevMode) && !ini().developerMode)
         return InvisibleAction;
 
     if (m_globalPermission != GlobalPermission::none &&

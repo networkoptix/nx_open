@@ -54,13 +54,9 @@
                         </param>
                         <param>
                             <name>codec</name>
-                            <description>Defines video codec used for transcoding. Default value is H263.</description>
+                            <description>Defines video codec used for transcoding. Default value is H263p.</description>
                             <optional>true</optional>
                             <values>
-                                <value>
-                                    <name>H263</name>
-                                    <description/>
-                                </value>
                                 <value>
                                     <name>H263p</name>
                                     <description>H263 plus format</description>
@@ -99,6 +95,11 @@
                             <description>Generate SDP with two payload types(high and low qualities). Payload type of RTP packets will changed accordingly transmitted stream</description>
                             <optional>true</optional>
                         </param>
+                        <param>
+                            <name>onvif_replay</name>
+                            <description>Insert ONVIF header extension that contains absolute timestamp (See: ONVIF Streaming Specification Ver. 17.06, 6.3 RTP header extension)</description>
+                            <optional>true</optional>
+                        </param>
                     </params>
                     <result>
                         <caption>RTSP video stream.</caption>
@@ -115,7 +116,7 @@
                         Codec and stream format can be specified in URL parameters. Live stream and
                         archive can be downloaded. If required and possible, media stream
                         transcoding is performed on-the-fly. Stream format can be one of the
-                        following: webm, mpegts, mpjpeg (multipart jpeg), mp4.
+                        following: webm, mpegts, mpjpeg (multipart jpeg), mp4. For formats webm and mp4 a watermark is added to the end of stream.
                         Example:
                         http://&lt;server_ip&gt;:&lt;port&gt;/media/12AB42FD5912.webm</description>
                     <method>GET</method>
@@ -303,7 +304,7 @@
                 <function>
                     <name>Cookie-based authentication</name>
                     <description>
-                        <b>This method should only be used in browser javascript applications which share the origin with server (e.g. application and server are accessible by the single gateway).</b>
+                        <b>This method should only be used in browser javascript applications which share the origin with the Server (e.g. application and the Server are accessible by the a single gateway).</b>
                         <br/>
                         Cookie authorization scheme allows to avoid standard login/password dialog in web-applications.<br/>
                         It provides you a way to replace it with your own dialog.<br/>

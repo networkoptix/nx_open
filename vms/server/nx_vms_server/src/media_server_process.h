@@ -55,6 +55,8 @@
 #include <media_server_process_aux.h>
 #include <nx/vms/server/command_line_parameters.h>
 #include <nx/vms/server/discovery/discovery_monitor.h>
+#include <system_log/system_event_log_reader.h>
+#include <nx/vms/utils/metrics/controller.h>
 
 class QnAppserverResourceProcessor;
 class QNetworkReply;
@@ -133,6 +135,8 @@ private slots:
     void at_storageManager_noStoragesAvailable();
     void at_storageManager_storagesAvailable();
     void at_storageManager_storageFailure(const QnResourcePtr& storage,
+        nx::vms::api::EventReason reason);
+    void at_storageManager_raidStorageFailure(const QString& description,
         nx::vms::api::EventReason reason);
     void at_storageManager_rebuildFinished(QnSystemHealth::MessageType msgType);
     void at_archiveBackupFinished(qint64 backedUpToMs, nx::vms::api::EventReason code);
@@ -252,6 +256,7 @@ private:
     void createResourceProcessor();
     void setRuntimeFlag(nx::vms::api::RuntimeFlag flag, bool isSet);
     void loadResourceParamsData();
+    void initMetricsController();
 private:
     int m_argc = 0;
     char** m_argv = nullptr;
@@ -297,8 +302,10 @@ private:
     std::unique_ptr<MediaServerStatusWatcher> m_mediaServerStatusWatcher;
     std::unique_ptr<QnAudioStreamerPool> m_audioStreamerPool;
     std::shared_ptr<TcpLogReceiver> m_logReceiver;
+    std::unique_ptr<RaidEventLogReader> m_raidEventLogReader;
     std::unique_ptr<nx::network::upnp::PortMapper> m_upnpPortMapper;
     std::function<void(QnMediaServerModule*)> m_setupModuleCallback;
+    std::unique_ptr<nx::vms::utils::metrics::Controller> m_metricsController;
 
     std::atomic<bool> m_installUpdateRequestReceived{false};
 };

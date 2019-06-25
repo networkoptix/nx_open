@@ -4,6 +4,9 @@
 
 #ifdef Q_OS_MACX
 
+#include <QDebug>
+
+#include <unistd.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/time.h>

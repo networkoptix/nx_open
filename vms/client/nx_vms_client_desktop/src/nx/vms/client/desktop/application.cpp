@@ -34,11 +34,10 @@
 #include <QtNetwork/QNetworkRequest>
 #include <QtNetwork/QNetworkReply>
 
-#include <QtOpenGL/QGLWidget>
-
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QDesktopWidget>
+#include <QtWidgets/QOpenGLWidget>
 
 #include <QtSingleApplication>
 
@@ -90,6 +89,11 @@
 #include <plugins/io_device/joystick/joystick_manager.h>
 
 #include <nx/utils/app_info.h>
+
+#if defined(Q_OS_WIN)
+    #include <nx/vms/client/desktop/ini.h>
+    #include <nx/gdi_tracer/gdi_handle_tracer.h>
+#endif
 
 namespace {
 
@@ -270,14 +274,33 @@ int runApplicationInternal(QtSingleApplication* application, const QnStartupPara
             &MainWindow::handleOpenFile);
     }
 
-    client.initDesktopCamera(dynamic_cast<QGLWidget*>(mainWindow->viewport()));
+    client.initDesktopCamera(qobject_cast<QOpenGLWidget*>(mainWindow->viewport()));
     client.startLocalSearchers();
 
     const auto code = context->handleStartupParameters(startupParams);
     if (code != QnWorkbenchContext::success)
         return code == QnWorkbenchContext::forcedExit ? kSuccessCode : kInvalidParametersCode;
 
+    #if defined(Q_OS_WIN)
+        if (ini().enableGdiTrace)
+        {
+            const auto reportPathString =
+                QStandardPaths::writableLocation(QStandardPaths::DataLocation)
+                    + lit("/log/gdi_handles_report%1.txt").arg(QnUuid::createUuid().toString());
+            const auto reportPath = std::filesystem::path(reportPathString.toStdWString());
+            auto gdiTracer = gdi_tracer::GdiHandleTracer::getInstance();
+            gdiTracer->setGdiTraceLimit(ini().gdiTraceLimit);
+            gdiTracer->setReportPath(reportPath);
+            gdiTracer->attachGdiDetours();
+        }
+    #endif
+
     int result = application->exec();
+
+    #if defined(Q_OS_WIN)
+        if (ini().enableGdiTrace)
+            gdi_tracer::GdiHandleTracer::getInstance()->detachGdiDetours();
+    #endif
 
     /* Write out settings. */
     qnSettings->setAudioVolume(nx::audio::AudioDevice::instance()->volume());

@@ -11,6 +11,10 @@
       <source>Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</source>
       <translation>Аналітика камери працюватиме лише під час перегляду камери. Увімкніть запис, щоб вона працювала весь час.</translation>
     </message>
+    <message>
+      <source>This is the built-in functionality</source>
+      <translation type="unfinished">This is the built-in functionality</translation>
+    </message>
   </context>
   <context>
     <name>EmptyTilesPlaceholder</name>
@@ -65,6 +69,17 @@
     </message>
   </context>
   <context>
+    <name>PluginsInformation</name>
+    <message>
+      <source>No plugins installed</source>
+      <translation>Не встановлено плагінів</translation>
+    </message>
+    <message>
+      <source>Server is offline</source>
+      <translation>Сервер не в мережі</translation>
+    </message>
+  </context>
+  <context>
     <name>SystemTile</name>
     <message>
       <source>INCOMPATIBLE</source>
@@ -85,6 +100,14 @@
     <message>
       <source>New Server</source>
       <translation>Новий сервер</translation>
+    </message>
+    <message>
+      <source>Edit</source>
+      <translation>Редагувати</translation>
+    </message>
+    <message>
+      <source>Hide</source>
+      <translation>Сховати</translation>
     </message>
   </context>
   <context>

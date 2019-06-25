@@ -121,12 +121,12 @@
 
 
                     <div>
-                        <h3>Traffic encryption</h3>
+                        <h3>Šifrovaný přenos</h3>
                         <form novalidate name="trafficSettingsForm" class="form-horizontal" role="form" >
                             <div class="checkbox">
                                 <label>
                                     <input type="checkbox" ng-model="trafficSettings.trafficEncryptionForced"
-                                           ng-change="checkTrafficEncryption()"> Force Traffic Encryption
+                                           ng-change="checkTrafficEncryption()"> Vynutit šifrovaný přenos
                                 </label>
                             </div>
                             <div class="checkbox">
@@ -134,7 +134,7 @@
                                     <input type="checkbox"
                                            ng-disabled="!trafficSettings.trafficEncryptionForced"
                                            ng-model="trafficSettings.videoTrafficEncryptionForced">
-                                    Force Video Traffic Encryption
+                                    Vynutit šifrovaný video přenos
                                 </label>
                             </div>
                             <button type="button" class="btn btn-primary" ng-click="saveTrafficSettings()">Uložit</button>

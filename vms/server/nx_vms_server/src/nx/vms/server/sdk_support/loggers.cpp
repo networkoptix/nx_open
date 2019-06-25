@@ -105,22 +105,15 @@ void ManifestLogger::log(
 
     if (error != nx::sdk::Error::noError)
     {
-        NX_WARNING(m_logTag, buildLogString(
-            customError.isEmpty() ? nx::sdk::toString(error) : customError));
+        nx::utils::PlaceholderBinder binder(m_messageTemplate);
+        binder.bind({
+            {"device", buildDeviceStr(m_device)},
+            {"engine", buildEngineStr(m_engineResource)},
+            {"plugin", buildPluginStr(m_pluginResource)},
+            {"error", customError.isEmpty() ? nx::sdk::toString(error) : customError},
+        });
+        NX_WARNING(m_logTag, binder.str());
     }
-}
-
-QString ManifestLogger::buildLogString(const QString& error) const
-{
-    nx::utils::PlaceholderBinder binder(m_messageTemplate);
-    binder.bind({
-        {"device", buildDeviceStr(m_device)},
-        {"engine", buildEngineStr(m_engineResource)},
-        {"plugin", buildPluginStr(m_pluginResource)},
-        {"error", error},
-    });
-
-    return binder.str();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -153,14 +146,9 @@ void StartupPluginManifestLogger::log(
 
     if (error != nx::sdk::Error::noError)
     {
-        NX_WARNING(m_logTag, buildLogString(
-            customError.isEmpty() ? nx::sdk::toString(error) : customError));
+        NX_WARNING(m_logTag, "Error obtaining manifest from Plugin %1: %2",
+            m_plugin->name(), customError.isEmpty() ? nx::sdk::toString(error) : customError);
     }
-}
-
-QString StartupPluginManifestLogger::buildLogString(const QString& error) const
-{
-    return lm("Error while plugin manifest from Plugin %1: %2").args(m_plugin->name(), error);
 }
 
 } // namespace nx::vms::server::sdk_support

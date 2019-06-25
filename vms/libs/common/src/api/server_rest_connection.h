@@ -17,6 +17,7 @@
 #include <api/http_client_pool.h>
 #include <nx/vms/event/event_fwd.h>
 #include <core/resource/resource_fwd.h>
+#include <core/ptz/ptz_fwd.h>
 #include <common/common_module_aware.h>
 #include <api/model/time_reply.h>
 #include <analytics/db/abstract_storage.h>
@@ -29,6 +30,7 @@
 #include <nx/vms/event/event_fwd.h>
 #include <nx/vms/api/data/time_reply.h>
 #include <nx/vms/api/data/event_rule_data.h>
+
 
 namespace rest {
 
@@ -52,7 +54,7 @@ struct RestResultWithData: public RestResultWithDataBase
     RestResultWithData& operator=(const RestResultWithData&) = delete;
     RestResultWithData& operator=(RestResultWithData&&) = default;
 
-    QnRestResult::Error error;
+    QnRestResult::Error error = QnRestResult::NoError;
     QString errorString;
     T data;
 };
@@ -235,6 +237,7 @@ public:
         qint64 chunkSize,
         const QByteArray& md5,
         qint64 ttl,
+        bool recreateIfExists,
         AddUploadCallback callback,
         QThread* targetThread = nullptr);
 
@@ -432,6 +435,7 @@ public:
 
     Handle updateActionStart(
         const nx::update::Information& info,
+        std::function<void(Handle, bool)>&& callback,
         QThread* targetThread = nullptr);
 
     /** Get information for a current update. It requests /ec2/updateInformation. */
@@ -463,6 +467,10 @@ public:
 
     Handle updateActionInstall(const QSet<QnUuid>& participants,
         std::function<void(Handle, bool)>&& callback,
+        QThread* targetThread = nullptr);
+
+    Handle retryUpdate(
+        Result<UpdateStatusAllData>::type callback,
         QThread* targetThread = nullptr);
 
     Handle getUpdateStatus(
@@ -501,10 +509,18 @@ public:
         Result<nx::vms::api::analytics::SettingsResponse>::type&& callback,
         QThread* targetThread = nullptr);
 
+    Handle getPluginInformation(GetCallback callback, QThread* targetThread = nullptr);
+
     Handle debug(
         const QString& action,
         const QString& value,
         PostCallback callback,
+        QThread* targetThread = nullptr);
+
+    Handle ptzCommand(
+        const QnRequestParamList& params,
+        const nx::Buffer& body,
+        std::function<void(bool, Handle, const QnJsonRestResult& response)>&& callback,
         QThread* targetThread = nullptr);
 
     /**

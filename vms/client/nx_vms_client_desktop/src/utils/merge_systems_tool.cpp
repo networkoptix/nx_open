@@ -9,6 +9,7 @@
 #include "core/resource/user_resource.h"
 #include "api/app_server_connection.h"
 #include "api/server_rest_connection.h"
+#include "api/media_server_connection.h"
 #include "nx_ec/dummy_handler.h"
 #include "common/common_module.h"
 #include "nx/vms/discovery/manager.h"

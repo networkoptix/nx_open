@@ -22,6 +22,7 @@ enum class ProtocolMatchResult
 };
 
 NX_NETWORK_API std::string toString(ProtocolMatchResult detectionResult);
+NX_NETWORK_API void PrintTo(const ProtocolMatchResult& val, ::std::ostream* os);
 
 //-------------------------------------------------------------------------------------------------
 

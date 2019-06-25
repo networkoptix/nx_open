@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-
 from __future__ import print_function
 import argparse
 from rdep_cmake import RdepSyncher
@@ -23,6 +22,7 @@ def main():
     def sync(package, **kwargs):
         return syncher.sync(package, **kwargs)
 
+    sync("any/cloud_hosts")
     sync("windows/wix-3.11", path_variable="wix_directory")
     sync("windows/ilmerge", path_variable="ilmerge_directory")
     sync("windows/paxton_plugin_references", path_variable="references_directory")

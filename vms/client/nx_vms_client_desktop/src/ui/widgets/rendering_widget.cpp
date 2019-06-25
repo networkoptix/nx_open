@@ -1,6 +1,7 @@
 #include "rendering_widget.h"
 
 #include <QtCore/QTimer>
+#include <QtGui/QScreen>
 
 #include <camera/resource_display.h>
 #include <camera/cam_display.h>
@@ -32,10 +33,9 @@ QSize rendererSourceSize(const QnResourceWidgetRenderer* renderer)
 
 QnRenderingWidget::QnRenderingWidget(
     QWidget* parent,
-    QGLWidget* shareWidget,
     Qt::WindowFlags f)
     :
-    QGLWidget(parent, shareWidget, f)
+    QOpenGLWidget(parent, f)
 {
     QTimer* timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, [this]() { update(); });
@@ -170,7 +170,7 @@ void QnRenderingWidget::ensureDisplay()
         return;
 
     m_display.reset(new QnResourceDisplay(m_resource->toResourcePtr()));
-    m_renderer = new QnResourceWidgetRenderer(nullptr, context());
+    m_renderer = new QnResourceWidgetRenderer(nullptr, this);
     connect(m_renderer, &QnResourceWidgetRenderer::sourceSizeChanged, this,
         &QWidget::updateGeometry);
 
@@ -192,32 +192,30 @@ void QnRenderingWidget::ensureDisplay()
 // -------------------------------------------------------------------------- //
 void QnRenderingWidget::initializeGL()
 {
-    QGLWidget::initializeGL();
+    QOpenGLWidget::initializeGL();
     invalidateDisplay(); /* OpenGL context may have changed. */
-
-    glClearColor(0, 0, 0, 0);
-    glDisable(GL_DEPTH_TEST);
-    glDisable(GL_CULL_FACE);
+    const auto functions = context()->functions();
+    functions->glClearColor(0, 0, 0, 0);
+    functions->glDisable(GL_DEPTH_TEST);
+    functions->glDisable(GL_CULL_FACE);
 }
 
 void QnRenderingWidget::resizeGL(int width, int height)
 {
-    glViewport(0, 0, width, height);
+    context()->functions()->glViewport(0, 0, width, height);
 
-    auto renderer = QnOpenGLRendererManager::instance(context());
+    auto renderer = QnOpenGLRendererManager::instance(this);
 
     QMatrix4x4 matrix;
     matrix.translate(-1.0, 1.0, 0.0);
 
-    const auto aspect = QGLContext::currentContext()->device()->devicePixelRatio();
-    const auto scaleBase = 2.0 * aspect;
-    matrix.scale(scaleBase / width, -scaleBase / height, 1.0);
+    matrix.scale(2.0 / width, - 2.0 / height, 1.0);
     renderer->setProjectionMatrix(matrix);
 }
 
 void QnRenderingWidget::paintGL()
 {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    context()->functions()->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     ensureDisplay();
 

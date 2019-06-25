@@ -387,5 +387,9 @@
         <resource name = "AXISD201-S" public = "AXISQ1775"/>
         <resource name = "AXISQ3527" public = "AXISQ1775"/>
         <resource name = "AXISP9106" public = "AXISP8524"/>
+        <resource name = "AXISP1375" public = "AXISQ1775"/>
+        <resource name = "AXISQ6215" public = "AXISQ1775"/>
+        <resource name = "AXISM4206" public = "AXISQ6044"/>
+        <resource name = "AXISA8207" public = "AXISQ6044"/>
     </oem>
 </resources>

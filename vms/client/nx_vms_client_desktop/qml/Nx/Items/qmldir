@@ -1,0 +1,10 @@
+module Nx.Items
+
+RecordingStatusIndicator 1.0 RecordingStatusIndicator.qml
+MultiVideoLayout 1.0 MultiVideoLayout.qml
+MultiVideoOutput 1.0 MultiVideoOutput.qml
+VideoPositioner 1.0 VideoPositioner.qml
+SelectionMouseArea 1.0 SelectionMouseArea.qml
+CameraDisplay 1.0 CameraDisplay.qml
+ResourceTree 1.0 ResourceTree.qml
+Timeline 1.0 Timeline.qml

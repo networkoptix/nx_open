@@ -1,3 +1,5 @@
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+
 #pragma once
 
 #include <vector>
@@ -23,7 +25,7 @@ public:
 
 private:
     Uuid m_trackId;
-    int64_t m_timestampUs = 0;
+    int64_t m_timestampUs = -1;
     Rect m_boundingBox;
 };
 

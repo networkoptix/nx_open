@@ -13,6 +13,7 @@ class QnCurtainItem: public Customized<QGraphicsObject>
     Q_PROPERTY(QColor color READ color WRITE setColor)
 
     typedef Customized<QGraphicsObject> base_type;
+
 public:
     QnCurtainItem(QGraphicsItem *parent = NULL);
 
@@ -22,8 +23,6 @@ public:
 
     const QColor &color() const;
     void setColor(const QColor &color);
-
-
 
 private:
     QColor m_color;

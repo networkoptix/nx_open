@@ -64,7 +64,7 @@ private:
     void stopAnalyticsUnsafe();
 
     nx::sdk::Ptr<DeviceAgent> createDeviceAgent();
-    std::unique_ptr<nx::vms::server::analytics::DeviceAgentHandler> createHandler();
+    nx::sdk::Ptr<nx::vms::server::analytics::DeviceAgentHandler> createHandler();
     std::optional<nx::vms::api::analytics::DeviceAgentManifest> loadDeviceAgentManifest(
         const nx::sdk::Ptr<DeviceAgent>& deviceAgent);
 
@@ -89,7 +89,7 @@ private:
     // TODO: #dmishin: Rename to m_engineResource.
     nx::vms::server::resource::AnalyticsEngineResourcePtr m_engine;
 
-    std::unique_ptr<nx::vms::server::analytics::DeviceAgentHandler> m_handler;
+    nx::sdk::Ptr<nx::vms::server::analytics::DeviceAgentHandler> m_handler;
 
     nx::sdk::Ptr<DeviceAgent> m_deviceAgent;
 

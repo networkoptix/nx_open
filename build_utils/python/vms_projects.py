@@ -34,10 +34,12 @@ customizableProjects = [
     CustomizableProject("wixsetup").ignoreParent(),
     CustomizableProject("common"),
     CustomizableProject("client-dmg"),
+
+    # TODO: Rewrite it. Skins are not there anymore.
     CustomizableProject(
         "client",
-        ["vms/client/nx_vms_client_desktop/src", "vms/client/nx_vms_client_desktop/static-resources/src"],
-        ["vms/client/nx_vms_client_desktop/static-resources/skin"],
+        ["vms/client/nx_vms_client_desktop/src", "vms/client/nx_vms_client_desktop/external_resources/qml"],
+        ["vms/client/nx_vms_client_desktop/external_resources/skin"],
         ["vms/client/nx_vms_client_desktop/resources/skin"],
         "skin"
         ),

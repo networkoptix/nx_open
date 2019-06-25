@@ -11,13 +11,13 @@
 
 namespace {
 
-const QString kDisplayCellProperty(lit("liteClientDisplayCell"));
+const QString kDisplayCellProperty("liteClientDisplayCell");
 const QPoint kInvalidPoint(-1, -1);
 constexpr int kSaveLayoutTimeout = 500;
 
 QString pointToString(const QPoint& point)
 {
-    return lit("%1,%2").arg(point.x()).arg(point.y());
+    return QStringLiteral("%1,%2").arg(point.x()).arg(point.y());
 }
 
 QPoint pointFromString(const QString& str)

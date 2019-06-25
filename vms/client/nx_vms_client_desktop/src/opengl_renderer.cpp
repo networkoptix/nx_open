@@ -1,5 +1,9 @@
 #include "opengl_renderer.h"
 
+#include <QtGui/QOpenGLFunctions>
+#include <QtGui/QOpenGLVertexArrayObject>
+#include <QtWidgets/QOpenGLWidget>
+
 #include "ui/graphics/opengl/gl_shortcuts.h"
 
 #include <ui/graphics/shaders/base_shader_program.h>
@@ -8,7 +12,6 @@
 #include <ui/graphics/shaders/per_vertex_colored_shader_program.h>
 #include <ui/graphics/shaders/texture_transition_shader_program.h>
 
-#include <QtGui/QOpenGLFunctions>
 
 QnOpenGLRenderer::QnOpenGLRenderer(QObject *parent):
     m_colorProgram(new QnColorGLShaderProgram(parent)),
@@ -37,16 +40,16 @@ QnOpenGLRenderer::QnOpenGLRenderer(QObject *parent):
 }
 
 void  QnOpenGLRenderer::setColor(const QVector4D& c)
-{ 
-    m_color = c; 
+{
+    m_color = c;
 };
 
 void  QnOpenGLRenderer::setColor(const QColor& c)
-{ 
-    m_color.setX(c.redF()); 
-    m_color.setY(c.greenF()); 
-    m_color.setZ(c.blueF()); 
-    m_color.setW(c.alphaF()); 
+{
+    m_color.setX(c.redF());
+    m_color.setY(c.greenF());
+    m_color.setZ(c.blueF());
+    m_color.setW(c.alphaF());
 };
 
 void QnOpenGLRenderer::drawColoredQuad( const QRectF &rect , QnColorGLShaderProgram* shader )
@@ -148,7 +151,7 @@ void QnOpenGLRenderer::drawBindedTextureOnQuadVao(QOpenGLVertexArrayObject* vao,
     shader->setModelViewProjectionMatrix(m_projectionMatrix*m_modelViewMatrix);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT,m_indices_for_render_quads);
     vao->release();
-    glCheckError("render");    
+    glCheckError("render");
 }
 
 QnColorPerVertexGLShaderProgram* QnOpenGLRenderer::getColorPerVertexShader() const {
@@ -197,16 +200,15 @@ void QnOpenGLRenderer::popModelViewMatrix() {
 Q_GLOBAL_STATIC(QnOpenGLRendererManager, qn_openGlRenderManager_instance)
 
 
-QnOpenGLRenderer* QnOpenGLRendererManager::instance(const QGLContext* a_context)
+QnOpenGLRenderer* QnOpenGLRendererManager::instance(QOpenGLWidget* glWidget)
 {
-    QnOpenGLRendererManager* manager = qn_openGlRenderManager_instance();
+    auto manager = qn_openGlRenderManager_instance();
+    auto it = manager->m_container.find(glWidget);
+    if (it != manager->m_container.end())
+        return *it;
 
-    auto it = manager->m_container.find(a_context);
-    if ( it != manager->m_container.end() )
-        return (*it);
-
-    manager->m_container.insert(a_context, new QnOpenGLRenderer());
-    return *(manager->m_container.find(a_context));
+    manager->m_container.insert(glWidget, new QnOpenGLRenderer());
+    return *(manager->m_container.find(glWidget));
 }
 
 QnOpenGLRendererManager::QnOpenGLRendererManager(QObject* parent /* = NULL*/):
@@ -219,32 +221,41 @@ QnOpenGLRendererManager::~QnOpenGLRendererManager() {
         delete renderer;
 }
 
-void loadImageData( int texture_wigth , int texture_height , int image_width , int image_heigth , int gl_bytes_per_pixel , int gl_format , const uchar* pixels )
+void loadImageData(
+    QOpenGLFunctions* renderer,
+    int texture_wigth,
+    int texture_height,
+    int image_width,
+    int image_heigth,
+    int gl_bytes_per_pixel,
+    int gl_format,
+    const uchar* pixels)
 {
     Q_UNUSED(texture_wigth);
     Q_UNUSED(gl_bytes_per_pixel);
 
     // if ( texture_wigth >= image_width )
     {
-        glTexSubImage2D( GL_TEXTURE_2D, 0, 0, 0 , image_width, qMin(image_heigth,texture_height), gl_format, GL_UNSIGNED_BYTE, pixels );
+        renderer->glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, image_width,
+            qMin(image_heigth, texture_height), gl_format, GL_UNSIGNED_BYTE, pixels);
         glCheckError("glTexSubImage2D");
-    } 
-    
-    /* 
+    }
+
+    /*
        Following check reduces amount of data to be loaded to video card by the cost of increased GPU consumption.
        On the practice, data difference is very low but GPU consumption is very high, especially on integrated video.
-       Disabling it. 
+       Disabling it.
        --gdm
     */
     /*else if (texture_wigth < image_width)
-    {        
+    {
         int h = qMin(image_heigth,texture_height);
         for( int y = 0; y < h; y++ )
         {
             const uchar *row = pixels + (y*image_width) * gl_bytes_per_pixel;
-            glTexSubImage2D( GL_TEXTURE_2D, 0, 0, y , texture_wigth, 1, gl_format, GL_UNSIGNED_BYTE, row );
+            renderer->glTexSubImage2D( GL_TEXTURE_2D, 0, 0, y , texture_wigth, 1, gl_format, GL_UNSIGNED_BYTE, row );
             glCheckError("glTexSubImage2D");
-    	}   
-		 
+    	}
+
 	}*/
 }

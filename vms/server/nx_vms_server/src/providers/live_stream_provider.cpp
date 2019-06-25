@@ -104,6 +104,7 @@ QnLiveStreamProvider::QnLiveStreamProvider(const nx::vms::server::resource::Came
     {
         m_analyticsEventsSaver = QnAbstractDataReceptorPtr(
             new nx::analytics::db::AnalyticsEventsReceptor(
+                serverModule()->commonModule(),
                 serverModule()->analyticsEventsStorage()));
         m_analyticsEventsSaver = QnAbstractDataReceptorPtr(
             new ConditionalDataProxy(
@@ -234,13 +235,10 @@ void QnLiveStreamProvider::onStreamResolutionChanged( int /*channelNumber*/, con
 
 void QnLiveStreamProvider::updateSoftwareMotion()
 {
-    if (needAnalyzeMotion())
+    for (int i = 0; i < m_videoChannels; ++i)
     {
-        for (int i = 0; i < m_videoChannels; ++i)
-        {
-            QnMotionRegion region = m_cameraRes->getMotionRegion(i);
-            m_motionEstimation[i].setMotionMask(region);
-        }
+        QnMotionRegion region = m_cameraRes->getMotionRegion(i);
+        m_motionEstimation[i].setMotionMask(region);
     }
 
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)

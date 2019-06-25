@@ -113,5 +113,9 @@
       <source>pausing</source>
       <translation>призупиняється</translation>
     </message>
+    <message>
+      <source>Unknown error: %1</source>
+      <translation>Невідома помилка: %1</translation>
+    </message>
   </context>
 </TS>

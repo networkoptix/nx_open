@@ -1,7 +1,8 @@
-
 #include "ffmpeg_video_transcoder.h"
 
 #ifdef ENABLE_DATA_PROVIDERS
+
+#include <QtCore/QThread>
 
 #include "nx/streaming/video_data_packet.h"
 #include "decoders/video/ffmpeg_video_decoder.h"
@@ -66,14 +67,15 @@ QnFfmpegVideoTranscoder::QnFfmpegVideoTranscoder(
     m_config(config),
     m_decodedVideoFrame(new CLVideoDecoderOutput()),
     m_encoderCtx(0),
-    m_mtMode(false),
+    m_useMultiThreadEncode(false),
     m_lastEncodedTime(AV_NOPTS_VALUE),
     m_averageCodingTimePerFrame(0),
     m_averageVideoTimePerFrame(0),
     m_droppedFrames(0),
     m_useRealTimeOptimization(false),
     m_outPacket(av_packet_alloc()),
-    m_metrics(metrics)
+    m_metrics(metrics),
+    m_fixedFrameRate(0)
 {
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
     {
@@ -85,6 +87,11 @@ QnFfmpegVideoTranscoder::QnFfmpegVideoTranscoder(
     m_decodedVideoFrame->setUseExternalData(true);
     if (m_metrics)
         m_metrics->transcoders()++;
+}
+
+void QnFfmpegVideoTranscoder::setFixedFrameRate(int value)
+{
+    m_fixedFrameRate = value;
 }
 
 QnFfmpegVideoTranscoder::~QnFfmpegVideoTranscoder()
@@ -135,9 +142,9 @@ bool QnFfmpegVideoTranscoder::open(const QnConstCompressedVideoDataPtr& video)
     m_encoderCtx->bit_rate = m_bitrate;
     m_encoderCtx->gop_size = 32;
     m_encoderCtx->time_base.num = 1;
-    m_encoderCtx->time_base.den = 60;
+    m_encoderCtx->time_base.den = m_fixedFrameRate ? m_fixedFrameRate : 60;
     m_encoderCtx->sample_aspect_ratio.den = m_encoderCtx->sample_aspect_ratio.num = 1;
-    if (m_mtMode)
+    if (m_useMultiThreadEncode)
         m_encoderCtx->thread_count = qMin(2, QThread::idealThreadCount());
 
     AVDictionary* options = nullptr;
@@ -214,7 +221,7 @@ int QnFfmpegVideoTranscoder::transcodePacketImpl(const QnConstCompressedVideoDat
 
     QnFfmpegVideoDecoder* decoder = m_videoDecoders[video->channelNumber];
     if (!decoder)
-        decoder = m_videoDecoders[video->channelNumber] = new QnFfmpegVideoDecoder(m_config, video->compressionType, video, m_mtMode);
+        decoder = m_videoDecoders[video->channelNumber] = new QnFfmpegVideoDecoder(m_config, video->compressionType, video);
 
     if (result)
         *result = QnCompressedVideoDataPtr();
@@ -246,8 +253,16 @@ int QnFfmpegVideoTranscoder::transcodePacketImpl(const QnConstCompressedVideoDat
         return 0;
     }
 
-    m_frameNumToPts[m_encoderCtx->frame_number] = decodedFrame->pts;
-    decodedFrame->pts = m_encoderCtx->frame_number;
+    static AVRational r = { 1, 1000000 };
+    if (m_fixedFrameRate)
+    {
+        m_frameNumToPts[m_encoderCtx->frame_number] = decodedFrame->pts;
+        decodedFrame->pts = m_encoderCtx->frame_number;
+    }
+    else
+    {
+        decodedFrame->pts = av_rescale_q(decodedFrame->pts, r, m_encoderCtx->time_base);
+    }
 
     if( !result )
         return 0;
@@ -279,11 +294,19 @@ int QnFfmpegVideoTranscoder::transcodePacketImpl(const QnConstCompressedVideoDat
         return 0;
 
     QnWritableCompressedVideoData* resultVideoData = new QnWritableCompressedVideoData(CL_MEDIA_ALIGNMENT, m_outPacket->size);
-    auto itr = m_frameNumToPts.find(m_outPacket->pts);
-    if (itr != m_frameNumToPts.end())
+
+    if (m_fixedFrameRate)
     {
-        resultVideoData->timestamp = itr->second;
-        m_frameNumToPts.erase(itr);
+        auto itr = m_frameNumToPts.find(m_outPacket->pts);
+        if (itr != m_frameNumToPts.end())
+        {
+            resultVideoData->timestamp = itr->second;
+            m_frameNumToPts.erase(itr);
+        }
+    }
+    else
+    {
+        resultVideoData->timestamp = av_rescale_q(m_outPacket->pts, m_encoderCtx->time_base, r);
     }
 
     if (m_outPacket->flags & AV_PKT_FLAG_KEY)
@@ -307,9 +330,14 @@ AVCodecContext* QnFfmpegVideoTranscoder::getCodecContext()
     return m_encoderCtx;
 }
 
-void QnFfmpegVideoTranscoder::setMTMode(bool value)
+void QnFfmpegVideoTranscoder::setUseMultiThreadEncode(bool value)
 {
-    m_mtMode = value;
+    m_useMultiThreadEncode = value;
+}
+
+void QnFfmpegVideoTranscoder::setUseMultiThreadDecode(bool value)
+{
+    m_config.mtDecodePolicy = value ? MultiThreadDecodePolicy::enabled : MultiThreadDecodePolicy::disabled;
 }
 
 void QnFfmpegVideoTranscoder::setFilterList(QList<QnAbstractImageFilterPtr> filters)

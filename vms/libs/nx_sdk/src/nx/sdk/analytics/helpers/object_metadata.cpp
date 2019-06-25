@@ -1,3 +1,5 @@
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+
 #include "object_metadata.h"
 
 #include <algorithm>
@@ -30,7 +32,11 @@ const char* ObjectMetadata::subtype() const
 
 const IAttribute* ObjectMetadata::attribute(int index) const
 {
-    return (index < (int) m_attributes.size()) ? &m_attributes[index] : nullptr;
+    if (index >= (int) m_attributes.size() || index < 0)
+        return nullptr;
+
+    m_attributes[index]->addRef();
+    return  m_attributes[index].get();
 }
 
 int ObjectMetadata::attributeCount() const
@@ -41,11 +47,6 @@ int ObjectMetadata::attributeCount() const
 Rect ObjectMetadata::boundingBox() const
 {
     return m_rect;
-}
-
-const char* ObjectMetadata::auxiliaryData() const
-{
-    return m_auxiliaryData.c_str();
 }
 
 void ObjectMetadata::setTypeId(std::string typeId)
@@ -68,18 +69,21 @@ void ObjectMetadata::setSubtype(const std::string& value)
     m_subtype = value;
 }
 
-void ObjectMetadata::addAttribute(Attribute attribute)
+void ObjectMetadata::addAttribute(nx::sdk::Ptr<Attribute> attribute)
 {
+    if (!NX_KIT_ASSERT(attribute))
+        return;
+
     auto existingAttribute = std::find_if(m_attributes.begin(), m_attributes.end(),
-        [attributeName = attribute.name()](const Attribute& attribute)
+        [attributeName = attribute->name()](const nx::sdk::Ptr<Attribute>& attribute)
         {
-            return strcmp(attribute.name(), attributeName) == 0;
+            return strcmp(attribute->name(), attributeName) == 0;
         });
 
     if (existingAttribute != m_attributes.end())
     {
-        NX_KIT_ASSERT(existingAttribute->type() == attribute.type());
-        existingAttribute->setValue(attribute.value());
+        NX_KIT_ASSERT((*existingAttribute)->type() == attribute->type());
+        (*existingAttribute)->setValue(attribute->value());
     }
     else
     {
@@ -87,15 +91,10 @@ void ObjectMetadata::addAttribute(Attribute attribute)
     }
 }
 
-void ObjectMetadata::addAttributes(const std::vector<Attribute>& value)
+void ObjectMetadata::addAttributes(const std::vector<nx::sdk::Ptr<Attribute>>& value)
 {
     for (const auto& newAttribute: value)
         addAttribute(newAttribute);
-}
-
-void ObjectMetadata::setAuxiliaryData(std::string auxiliaryData)
-{
-    m_auxiliaryData = std::move(auxiliaryData);
 }
 
 void ObjectMetadata::setBoundingBox(const Rect& rect)

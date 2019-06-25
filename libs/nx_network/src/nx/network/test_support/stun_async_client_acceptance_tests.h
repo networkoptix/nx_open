@@ -154,6 +154,8 @@ public:
     }
 
 protected:
+    QnMutex m_serverSendResponseLock;
+
     void subscribeToEveryIndication()
     {
         m_indictionMethodToSubscribeTo = nx::network::stun::kEveryIndicationMethod;
@@ -220,7 +222,7 @@ protected:
         ASSERT_NE(SystemError::noError, m_connectResults.pop());
     }
 
-    void whenRemoveHandler()
+    void whenClientCancels()
     {
         m_client->cancelHandlersSync(this);
     }
@@ -239,14 +241,7 @@ protected:
 
     void whenIssueRequest()
     {
-        using namespace std::placeholders;
-
-        stun::Message request(stun::Header(
-            stun::MessageClass::request,
-            m_testMethodNumber));
-        m_client->sendRequest(
-            std::move(request),
-            std::bind(&StunAsyncClientAcceptanceTest::storeRequestResult, this, _1, _2));
+        sendRequest(m_testMethodNumber);
     }
 
     void whenForciblyCloseClientConnection()
@@ -348,6 +343,11 @@ protected:
     void thenResponseIsReceived()
     {
         m_prevRequestResult = m_requestResult.pop();
+    }
+
+    void thenResponseIsNotReceived()
+    {
+        ASSERT_FALSE(m_requestResult.pop(std::chrono::milliseconds(100)));
     }
 
     void thenRequestFailureIsReported()
@@ -485,10 +485,22 @@ private:
         return url;
     }
 
+    void sendRequest(int method)
+    {
+        using namespace std::placeholders;
+
+        m_client->sendRequest(
+            stun::Message(stun::Header(stun::MessageClass::request, method)),
+            std::bind(&StunAsyncClientAcceptanceTest::storeRequestResult, this, _1, _2),
+            this);
+    }
+
     void sendResponse(
         std::shared_ptr<stun::AbstractServerConnection> connection,
         nx::network::stun::Message request)
     {
+        QnMutexLocker lock(&m_serverSendResponseLock);
+
         nx::network::stun::Message response(
             stun::Header(
                 stun::MessageClass::successResponse,
@@ -549,7 +561,7 @@ TYPED_TEST_P(StunAsyncClientAcceptanceTest, same_handler_cannot_be_added_twice)
 TYPED_TEST_P(StunAsyncClientAcceptanceTest, add_remove_indication_handler)
 {
     this->givenClientWithIndicationHandler();
-    this->whenRemoveHandler();
+    this->whenClientCancels();
     this->thenSameHandlerCanBeAddedAgain();
 }
 
@@ -704,6 +716,24 @@ TYPED_TEST_P(
     this->thenClientConnected();
 }
 
+TYPED_TEST_P(
+    StunAsyncClientAcceptanceTest,
+    response_is_not_delivered_after_cancel)
+{
+    this->givenConnectedClient();
+
+    this->doInClientAioThread(
+        [this]()
+        {
+            QnMutexLocker lock(&this->m_serverSendResponseLock);
+
+            this->whenIssueRequest();
+            this->whenClientCancels();
+        });
+
+    this->thenResponseIsNotReceived();
+}
+
 REGISTER_TYPED_TEST_CASE_P(StunAsyncClientAcceptanceTest,
     same_handler_cannot_be_added_twice,
     add_remove_indication_handler,
@@ -720,7 +750,8 @@ REGISTER_TYPED_TEST_CASE_P(StunAsyncClientAcceptanceTest,
     connection_closure_is_not_reported_after_initial_connect_failure,
     on_connection_closed_handler_triggered_more_than_once,
     reconnecting_to_another_server_after_original_has_failed,
-    reconnecting_to_another_server_while_original_is_still_alive);
+    reconnecting_to_another_server_while_original_is_still_alive,
+    response_is_not_delivered_after_cancel);
 
 } // namespace test
 } // namespace stun

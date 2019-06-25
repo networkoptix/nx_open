@@ -77,13 +77,13 @@ bool AnalyticsEngineResource::sendSettingsToSdkEngine()
     NX_DEBUG(this, "Sending settings to the Engine %1 (%2)", getName(), getId());
 
     nx::sdk::Ptr<nx::sdk::IStringMap> effectiveSettings;
-    if (pluginsIni().analyticsEngineSettingsPath[0] != '\0')
+    if (pluginsIni().analyticsSettingsSubstitutePath[0] != '\0')
     {
-        NX_WARNING(this, "Trying to load settings for the Engine from the file. Engine %1 (%2)",
-            getName(), getId());
+        NX_WARNING(this, "Trying to load settings for the Engine %1 (%2) from a file as per %3",
+            getName(), getId(), pluginsIni().iniFile());
 
-        effectiveSettings =
-            analytics::debug_helpers::loadEngineSettingsFromFile(toSharedPointer(this));
+        effectiveSettings = analytics::debug_helpers::loadEngineSettingsFromFile(
+            toSharedPointer(this), pluginsIni().analyticsSettingsSubstitutePath);
     }
 
     if (!effectiveSettings)
@@ -125,7 +125,7 @@ std::unique_ptr<sdk_support::AbstractManifestLogger> AnalyticsEngineResource::ma
         "Error occurred while fetching Engine manifest for engine: {:engine}: {:error}");
 
     return std::make_unique<sdk_support::ManifestLogger>(
-        typeid(this), //< Using the same tag for all instances.
+        typeid(*this), //< Using the same tag for all instances.
         messageTemplate,
         toSharedPointer(this));
 }
@@ -144,7 +144,7 @@ CameraDiagnostics::Result AnalyticsEngineResource::initInternal()
     engineInfo->setName(getName().toStdString());
     m_sdkEngine->setEngineInfo(engineInfo.get());
 
-    m_handler = std::make_unique<analytics::EngineHandler>(serverModule(), getId());
+    m_handler = nx::sdk::makePtr<analytics::EngineHandler>(serverModule(), getId());
     m_sdkEngine->setHandler(m_handler.get());
 
     if (!sendSettingsToSdkEngine())

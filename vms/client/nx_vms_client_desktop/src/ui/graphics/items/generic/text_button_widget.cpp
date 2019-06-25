@@ -97,7 +97,7 @@ void QnTextButtonWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem
     QnImageButtonWidget::paint(painter, option, widget);
 }
 
-void QnTextButtonWidget::paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QGLWidget *widget, const QRectF &rect) {
+void QnTextButtonWidget::paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QOpenGLWidget *widget, const QRectF &rect) {
     qreal opacity = painter->opacity();
     painter->setOpacity(opacity * linearCombine(1.0 - progress, stateOpacity(startState), progress, stateOpacity(endState)));
 

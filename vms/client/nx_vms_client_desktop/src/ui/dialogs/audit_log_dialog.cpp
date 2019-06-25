@@ -12,6 +12,7 @@
 #include <client/client_globals.h>
 #include <client/client_settings.h>
 
+#include <api/media_server_connection.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_resource.h>
@@ -39,7 +40,7 @@
 #include <ui/style/skin.h>
 
 #include <nx/vms/client/desktop/resource_properties/camera/camera_settings_tab.h>
-#include <nx/vms/client/desktop/resource_views/data/node_type.h>
+#include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 
 #include <utils/common/event_processors.h>
 
@@ -926,7 +927,7 @@ void QnAuditLogDialog::at_customContextMenuRequested(const QPoint&)
         if (resource)
         {
             action::Parameters parameters(resource);
-            parameters.setArgument(Qn::NodeTypeRole, ResourceTreeNodeType::resource);
+            parameters.setArgument(Qn::NodeTypeRole, ResourceTree::NodeType::resource);
 
             menu.reset(manager->newMenu(action::TreeScope, nullptr, parameters));
             foreach(QAction* action, menu->actions())

@@ -489,6 +489,15 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         QString(),
         this);
 
+    m_lastMergeMasterIdAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
+        kNameLastMergeMasterId,
+        QString(),
+        this);
+    m_lastMergeSlaveIdAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
+        kNameLastMergeSlaveId,
+        QString(),
+        this);
+
     m_disabledVendorsAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
         kNameDisabledVendors,
         QString(),
@@ -680,6 +689,11 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
     m_lowQualityScreenVideoCodecAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
         kLowQualityScreenVideoCodec,
         "mpeg2video",
+        this);
+
+    m_licenseServerUrlAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
+        "licenseServer",
+        "http://licensing.vmsproxy.com", //< Licensing server does not support https.
         this);
 
     m_maxEventLogRecordsAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
@@ -877,6 +891,8 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
     result
         << m_systemNameAdaptor
         << m_localSystemIdAdaptor
+        << m_lastMergeMasterIdAdaptor
+        << m_lastMergeSlaveIdAdaptor
         << m_disabledVendorsAdaptor
         << m_cameraSettingsOptimizationAdaptor
         << m_autoUpdateThumbnailsAdaptor
@@ -914,6 +930,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         << m_defaultExportVideoCodecAdaptor
         << m_downloaderPeersAdaptor
         << m_lowQualityScreenVideoCodecAdaptor
+        << m_licenseServerUrlAdaptor
         << m_maxWebMTranscoders
         << m_maxEventLogRecordsAdaptor
         << m_forceLiveCacheForPrimaryStreamAdaptor
@@ -1351,6 +1368,26 @@ void QnGlobalSettings::setLocalSystemId(const QnUuid& value)
     m_localSystemIdAdaptor->setValue(value.toString());
 }
 
+QnUuid QnGlobalSettings::lastMergeMasterId() const
+{
+    return QnUuid(m_lastMergeMasterIdAdaptor->value());
+}
+
+void QnGlobalSettings::setLastMergeMasterId(const QnUuid& value)
+{
+    m_lastMergeMasterIdAdaptor->setValue(value.toString());
+}
+
+QnUuid QnGlobalSettings::lastMergeSlaveId() const
+{
+    return QnUuid(m_lastMergeSlaveIdAdaptor->value());
+}
+
+void QnGlobalSettings::setLastMergeSlaveId(const QnUuid& value)
+{
+    m_lastMergeSlaveIdAdaptor->setValue(value.toString());
+}
+
 QString QnGlobalSettings::clientStatisticsSettingsUrl() const
 {
     return m_clientStatisticsSettingsUrlAdaptor->value();
@@ -1718,6 +1755,16 @@ void QnGlobalSettings::setDefaultExportVideoCodec(const QString& value)
 QString QnGlobalSettings::lowQualityScreenVideoCodec() const
 {
     return m_lowQualityScreenVideoCodecAdaptor->value();
+}
+
+void QnGlobalSettings::setLicenseServerUrl(const QString& value)
+{
+    m_licenseServerUrlAdaptor->setValue(value);
+}
+
+QString QnGlobalSettings::licenseServerUrl() const
+{
+    return m_licenseServerUrlAdaptor->value();
 }
 
 void QnGlobalSettings::setLowQualityScreenVideoCodec(const QString& value)

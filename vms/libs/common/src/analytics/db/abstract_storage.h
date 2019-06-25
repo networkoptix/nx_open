@@ -90,6 +90,11 @@ public:
      * Flushes to the DB all data passed with AbstractEventsStorage::save before this call.
      */
     virtual void flush(StoreCompletionHandler completionHandler) = 0;
+
+    /**
+     * Select minumal timestamp of the data in the database.
+     */
+    virtual bool readMinimumEventTimestamp(std::chrono::milliseconds* outResult) = 0;
 };
 
 } // namespace nx::analytics::db
