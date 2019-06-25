@@ -58,7 +58,6 @@ TreeView
                     fillMode: Image.Stretch
                     source: (model && model.iconKey && model.iconKey !== 0
                         && ("image://resource/" + model.iconKey + "/" + itemState)) || ""
-                    visible: !separator
                 }
 
                 Text
@@ -69,7 +68,6 @@ TreeView
                     font.weight: Font.DemiBold
                     height: parent.height
                     verticalAlignment: Text.AlignVCenter
-                    visible: !separator
 
                     color:
                     {
@@ -94,7 +92,6 @@ TreeView
                     height: parent.height
                     verticalAlignment: Text.AlignVCenter
                     leftPadding: 1
-                    visible: !separator
 
                     color:
                     {
