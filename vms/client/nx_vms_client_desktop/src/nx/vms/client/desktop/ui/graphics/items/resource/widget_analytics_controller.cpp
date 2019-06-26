@@ -27,6 +27,8 @@
 #include <nx/analytics/metadata_logger.h>
 #include <nx/analytics/analytics_logging_ini.h>
 
+#include <nx/fusion/model_functions.h>
+
 namespace nx::vms::client::desktop {
 
 using namespace std::chrono;
@@ -181,12 +183,6 @@ void WidgetAnalyticsController::Private::updateObjectAreas(microseconds timestam
     {
         auto areaInfo = areaInfoFromObject(objectInfo);
 
-        if (ini().displayAnalyticsDelay)
-        {
-            areaInfo.text += QString("\nDelay\t%1").arg(
-                (timestamp - objectInfo.startTimestamp).count() / 1000);
-        }
-
         if (ini().enableDetectedObjectsInterpolation)
         {
             areaInfo.rectangle = interpolatedRectangle(
@@ -199,6 +195,25 @@ void WidgetAnalyticsController::Private::updateObjectAreas(microseconds timestam
         else
         {
             areaInfo.rectangle = objectInfo.rectangle;
+        }
+
+        if (ini().displayAnalyticsObjectsDebugInfo)
+        {
+            const auto addInfoRow =
+                [&areaInfo](QString label, auto value)
+                {
+                    areaInfo.text += '\n';
+                    areaInfo.text += label;
+                    areaInfo.text += '\t';
+                    areaInfo.text += QnLexical::serialized(value);
+                };
+
+            addInfoRow("ID", objectInfo.id);
+            addInfoRow("Timestamp", timestamp.count());
+            addInfoRow("Delay", (timestamp - objectInfo.startTimestamp).count() / 1000);
+            addInfoRow("Coords", objectInfo.rectangle);
+            if (ini().enableDetectedObjectsInterpolation)
+                addInfoRow("Interpolated", areaInfo.rectangle);
         }
 
         areaInfo.rectangle = Geometry::movedInto(areaInfo.rectangle, kWidgetBounds);
