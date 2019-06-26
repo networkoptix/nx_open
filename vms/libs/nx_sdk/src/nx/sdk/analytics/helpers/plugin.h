@@ -6,7 +6,7 @@
 #include <functional>
 
 #include <nx/sdk/i_utility_provider.h>
-#include <nx/sdk/error.h>
+#include <nx/sdk/i_error.h>
 #include <nx/sdk/analytics/i_plugin.h>
 #include <nx/sdk/helpers/ref_countable.h>
 #include <nx/sdk/helpers/ptr.h>
@@ -46,8 +46,8 @@ public:
 public:
     virtual const char* name() const override;
     virtual void setUtilityProvider(IUtilityProvider* utilityProvider) override;
-    virtual const IString* manifest(Error* outError) const override;
-    virtual IEngine* createEngine(Error* outError) override;
+    virtual const IString* manifest(IError* outError) const override;
+    virtual IEngine* createEngine(IError* outError) override;
 
 private:
     const std::string m_name;

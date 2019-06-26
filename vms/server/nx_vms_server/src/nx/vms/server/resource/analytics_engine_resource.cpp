@@ -12,6 +12,7 @@
 #include <nx/sdk/analytics/i_plugin.h>
 #include <nx/sdk/analytics/helpers/engine_info.h>
 #include <nx/sdk/helpers/to_string.h>
+#include <nx/sdk/helpers/error.h>
 #include <nx/sdk/i_string_map.h>
 #include <nx/utils/member_detector.h>
 #include <nx/analytics/descriptor_manager.h>
@@ -105,7 +106,8 @@ bool AnalyticsEngineResource::sendSettingsToSdkEngine()
                 "_effective_settings.json"));
     }
 
-    engine->setSettings(effectiveSettings.get());
+    auto error = nx::sdk::makePtr<nx::sdk::Error>();
+    engine->setSettings(effectiveSettings.get(), error.get());
     return true;
 }
 

@@ -69,11 +69,11 @@ Engine::~Engine()
     NX_PRINT << " Destroyed Engine for " << m_plugin->name();
 }
 
-void Engine::setEngineInfo(const nx::sdk::analytics::IEngineInfo* /*engineInfo*/)
+void Engine::setEngineInfo(const IEngineInfo* /*engineInfo*/)
 {
 }
 
-void Engine::setSettings(const IStringMap* settings)
+void Engine::setSettings(const IStringMap* settings, IError* /*outError*/)
 {
     NX_OUTPUT << __func__ << " Received " << m_plugin->name() << " settings:";
     NX_OUTPUT << "{";
@@ -88,15 +88,13 @@ void Engine::setSettings(const IStringMap* settings)
     NX_OUTPUT << "}";
 }
 
-IStringMap* Engine::pluginSideSettings() const
+IStringMap* Engine::pluginSideSettings(IError* /*outError*/) const
 {
     return nullptr;
 }
 
-const IString* Engine::manifest(Error* error) const
+const IString* Engine::manifest(IError* /*outError*/) const
 {
-    *error = Error::noError;
-
     if (!m_manifest.empty())
         return new nx::sdk::String(m_manifest);
 
@@ -138,8 +136,7 @@ const IString* Engine::manifest(Error* error) const
     return new nx::sdk::String(m_manifest);
 }
 
-IDeviceAgent* Engine::obtainDeviceAgent(
-    const IDeviceInfo* deviceInfo, Error* outError)
+IDeviceAgent* Engine::obtainDeviceAgent(const IDeviceInfo* deviceInfo, IError* /*outError*/)
 {
     NX_OUTPUT
         << __func__
@@ -147,8 +144,6 @@ IDeviceAgent* Engine::obtainDeviceAgent(
         << deviceInfo->vendor() << ", "
         << deviceInfo->model() << ", "
         << deviceInfo->id();
-
-    *outError = Error::noError;
 
     // Deepstream can't be correctly deinitialized, so we never destroy the DeviceAgent.
     // It's not a production-ready solution, but is OK for demos.
@@ -159,7 +154,7 @@ IDeviceAgent* Engine::obtainDeviceAgent(
     return m_deviceAgent;
 }
 
-void Engine::executeAction(IAction* /*action*/, Error* /*outError*/)
+void Engine::executeAction(IAction* /*action*/, IError* /*outError*/)
 {
 }
 
@@ -261,10 +256,9 @@ std::string Engine::buildManifestObectTypeString(const ObjectClassDescription& d
         })json";
 }
 
-Error Engine::setHandler(IHandler* /*handler*/)
+void Engine::setHandler(IHandler* /*handler*/)
 {
     // TODO: Implement.
-    return Error::noError;
 }
 
 bool Engine::isCompatible(const IDeviceInfo* /*deviceInfo*/) const

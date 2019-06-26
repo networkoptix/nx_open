@@ -31,23 +31,23 @@ public:
 
     void sendEventPacket(const EventType& event) const;
 
-    virtual const nx::sdk::IString* manifest(nx::sdk::Error* error) const override;
+    virtual const nx::sdk::IString* manifest(nx::sdk::IError* outError) const override;
 
-    virtual sdk::Error setHandler(
-        nx::sdk::analytics::IDeviceAgent::IHandler* handler) override;
+    virtual void setHandler(nx::sdk::analytics::IDeviceAgent::IHandler* handler) override;
 
-    virtual sdk::Error setNeededMetadataTypes(
-        const nx::sdk::analytics::IMetadataTypes* metadataTypes) override;
+    virtual void setNeededMetadataTypes(
+        const nx::sdk::analytics::IMetadataTypes* metadataTypes,
+        nx::sdk::IError* outError) override;
 
-    virtual void setSettings(const nx::sdk::IStringMap* settings) override;
+    virtual void setSettings(
+        const nx::sdk::IStringMap* settings,
+        nx::sdk::IError* outError) override;
 
-    virtual nx::sdk::IStringMap* pluginSideSettings() const override;
+    virtual nx::sdk::IStringMap* pluginSideSettings(nx::sdk::IError* outError) const override;
 
 private:
-    nx::sdk::Error startFetchingMetadata(
-        const nx::sdk::analytics::IMetadataTypes* metadataTypes);
-
-    nx::sdk::Error stopFetchingMetadata();
+    void startFetchingMetadata(const nx::sdk::analytics::IMetadataTypes* metadataTypes);
+    void stopFetchingMetadata();
 
 private:
     Engine* const m_engine;

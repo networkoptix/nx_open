@@ -2,6 +2,7 @@
 
 #include <QtCore/QString>
 
+#include <nx/sdk/helpers/ptr.h>
 #include <nx/sdk/analytics/i_plugin.h>
 
 #include <core/resource/resource_fwd.h>
@@ -18,7 +19,7 @@ public:
 
     virtual void log(
         const QString& manifestStr,
-        nx::sdk::Error error,
+        nx::sdk::Ptr<nx::sdk::IError> error,
         const QString& customError = QString()) = 0;
 };
 
@@ -46,7 +47,7 @@ public:
 
     virtual void log(
         const QString& manifestStr,
-        nx::sdk::Error error,
+        nx::sdk::Ptr<nx::sdk::IError> error,
         const QString& customError) override;
 
 private:
@@ -69,7 +70,7 @@ public:
 
     virtual void log(
         const QString& manifestStr,
-        nx::sdk::Error error,
+        nx::sdk::Ptr<nx::sdk::IError> error,
         const QString& customError) override;
 
 private:

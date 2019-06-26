@@ -23,22 +23,24 @@ public:
 
     virtual void setEngineInfo(const nx::sdk::analytics::IEngineInfo* engineInfo) override;
 
-    virtual void setSettings(const nx::sdk::IStringMap* settings) override;
+    virtual void setSettings(
+        const nx::sdk::IStringMap* settings,
+        nx::sdk::IError* outError) override;
 
-    virtual nx::sdk::IStringMap* pluginSideSettings() const override;
+    virtual nx::sdk::IStringMap* pluginSideSettings(nx::sdk::IError* outError) const override;
 
     virtual nx::sdk::analytics::IDeviceAgent* obtainDeviceAgent(
         const nx::sdk::IDeviceInfo* deviceInfo,
-        nx::sdk::Error* outError) override;
+        nx::sdk::IError* outError) override;
 
-    virtual const nx::sdk::IString* manifest(nx::sdk::Error* outError) const override;
+    virtual const nx::sdk::IString* manifest(nx::sdk::IError* outError) const override;
 
     const EngineManifest& parsedManifest() const;
 
     virtual void executeAction(
-        nx::sdk::analytics::IAction* action, nx::sdk::Error* outError) override;
+        nx::sdk::analytics::IAction* action, nx::sdk::IError* outError) override;
 
-    virtual nx::sdk::Error setHandler(nx::sdk::analytics::IEngine::IHandler* handler) override;
+    virtual void setHandler(nx::sdk::analytics::IEngine::IHandler* handler) override;
 
     virtual bool isCompatible(const nx::sdk::IDeviceInfo* deviceInfo) const override;
 

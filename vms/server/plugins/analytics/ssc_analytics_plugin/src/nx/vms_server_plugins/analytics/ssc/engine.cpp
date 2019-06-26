@@ -276,12 +276,12 @@ void Engine::setEngineInfo(const nx::sdk::analytics::IEngineInfo* /*engineInfo*/
 {
 }
 
-void Engine::setSettings(const IStringMap* settings)
+void Engine::setSettings(const IStringMap* settings, IError* /*outError*/)
 {
     // There are no DeviceAgent settings for this plugin.
 }
 
-IStringMap* Engine::pluginSideSettings() const
+IStringMap* Engine::pluginSideSettings(IError* /*outError*/) const
 {
     return nullptr;
 }
@@ -352,29 +352,28 @@ void Engine::unregisterCamera(int cameraLogicalId)
     m_cameraMap.remove(cameraLogicalId);
 }
 
-IDeviceAgent* Engine::obtainDeviceAgent(const IDeviceInfo* deviceInfo, Error* /*outError*/)
+IDeviceAgent* Engine::obtainDeviceAgent(const IDeviceInfo* deviceInfo, IError* outError)
 {
     // We should invent more accurate test.
     if (isCompatible(deviceInfo))
         return new DeviceAgent(this, deviceInfo, m_typedManifest);
-    else
-        return nullptr;
+
+    outError->setError(ErrorCode::invalidParams, "Device is not compatible with the Engine");
+    return nullptr;
 }
 
-const IString* Engine::manifest(Error* error) const
+const IString* Engine::manifest(IError* /*outError*/) const
 {
-    *error = Error::noError;
     return new nx::sdk::String(m_manifest);
 }
 
-void Engine::executeAction(IAction* /*action*/, Error* /*outError*/)
+void Engine::executeAction(IAction* /*action*/, IError* /*outError*/)
 {
 }
 
-Error Engine::setHandler(IHandler* /*handler*/)
+void Engine::setHandler(IHandler* /*handler*/)
 {
     // TODO: Use the handler for error reporting.
-    return Error::noError;
 }
 
 bool Engine::isCompatible(const IDeviceInfo* deviceInfo) const

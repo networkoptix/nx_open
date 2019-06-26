@@ -69,63 +69,63 @@ VideoFrameProcessingDeviceAgent::~VideoFrameProcessingDeviceAgent()
 //-------------------------------------------------------------------------------------------------
 // Implementation of interface methods.
 
-Error VideoFrameProcessingDeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
+void VideoFrameProcessingDeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     handler->addRef();
     m_handler.reset(handler);
-    return Error::noError;
 }
 
-Error VideoFrameProcessingDeviceAgent::pushDataPacket(IDataPacket* dataPacket)
+void VideoFrameProcessingDeviceAgent::pushDataPacket(IDataPacket* dataPacket, IError* outError)
 {
     const auto logError =
-        [this, func = __func__](Error error, const std::string& message = "")
+        [this, outError, func = __func__](ErrorCode errorCode, const std::string& message = "")
         {
-            if (!message.empty() || error != Error::noError || (NX_DEBUG_ENABLE_OUTPUT))
+            if (!message.empty() || errorCode != ErrorCode::noError || (NX_DEBUG_ENABLE_OUTPUT))
             {
                 NX_PRINT << func << "() " << ((NX_DEBUG_ENABLE_OUTPUT) ? "END " : "") << "-> "
-                    << error << (message.empty() ? "" : ": ") << message;
+                    << errorCode << (message.empty() ? "" : ": ") << message;
             }
-            return error;
+
+            outError->setError(errorCode, message.c_str());
         };
 
     NX_OUTPUT << __func__ << "() BEGIN";
 
     if (!dataPacket)
-        return logError(Error::unknownError, "dataPacket is null; discarding it.");
+        return logError(ErrorCode::invalidParams, "dataPacket is null; discarding it.");
 
     if (dataPacket->timestampUs() < 0)
     {
-        return logError(Error::unknownError, "dataPacket has invalid timestamp "
+        return logError(ErrorCode::invalidParams, "dataPacket has invalid timestamp "
             + nx::kit::utils::toString(dataPacket->timestampUs()) + "; discarding the packet.");
     }
 
     if (const auto compressedFrame = queryInterfacePtr<ICompressedVideoPacket>(dataPacket))
     {
         if (!pushCompressedVideoFrame(compressedFrame.get()))
-            return logError(Error::unknownError, "pushCompressedVideoFrame() failed.");
+            return logError(ErrorCode::otherError, "pushCompressedVideoFrame() failed.");
     }
     else if (const auto uncompressedFrame = queryInterfacePtr<IUncompressedVideoFrame>(dataPacket))
     {
         if (!pushUncompressedVideoFrame(uncompressedFrame.get()))
-            return logError(Error::unknownError, "pushUncompressedVideoFrame() failed.");
+            return logError(ErrorCode::otherError, "pushUncompressedVideoFrame() failed.");
     }
     else
     {
-        return logError(Error::noError, "Server ERROR: Unsupported frame supplied; ignored.");
+        return logError(ErrorCode::invalidParams, "Unsupported frame supplied; ignored.");
     }
 
     if (!m_handler)
-        return logError(Error::unknownError, "Server ERROR: setMetadataHandler() was not called.");
+        return logError(ErrorCode::internalError, "setMetadataHandler() was not called.");
 
     std::vector<IMetadataPacket*> metadataPackets;
     if (!pullMetadataPackets(&metadataPackets))
-        return logError(Error::unknownError, "pullMetadataPackets() failed.");
+        return logError(ErrorCode::otherError, "pullMetadataPackets() failed.");
 
     processMetadataPackets(metadataPackets);
 
-    return logError(Error::noError);
+    logError(ErrorCode::noError);
 }
 
 void VideoFrameProcessingDeviceAgent::processMetadataPackets(
@@ -167,20 +167,23 @@ void VideoFrameProcessingDeviceAgent::processMetadataPacket(
     m_handler->handleMetadata(metadataPacket);
 }
 
-const IString* VideoFrameProcessingDeviceAgent::manifest(Error* /*error*/) const
+const IString* VideoFrameProcessingDeviceAgent::manifest(IError* /*outError*/) const
 {
     return new String(manifest());
 }
 
-void VideoFrameProcessingDeviceAgent::setSettings(const IStringMap* settings)
+void VideoFrameProcessingDeviceAgent::setSettings(const IStringMap* settings, IError* outError)
 {
     if (!logUtils.convertAndOutputStringMap(&m_settings, settings, "Received settings"))
+    {
+        outError->setError(ErrorCode::invalidParams, "Settings are invalid");
         return; //< The error is already logged.
+    }
 
     settingsReceived();
 }
 
-IStringMap* VideoFrameProcessingDeviceAgent::pluginSideSettings() const
+IStringMap* VideoFrameProcessingDeviceAgent::pluginSideSettings(IError* /*outError*/) const
 {
     return nullptr;
 }

@@ -27,24 +27,27 @@ public:
 
     virtual Engine* engine() const override { return m_engine; }
 
-    virtual void setSettings(const nx::sdk::IStringMap* settings) override;
+    virtual void setSettings(
+        const nx::sdk::IStringMap* settings,
+        nx::sdk::IError* outError) override;
 
-    virtual nx::sdk::IStringMap* pluginSideSettings() const override;
+    virtual nx::sdk::IStringMap* pluginSideSettings(nx::sdk::IError* outError) const override;
 
-    virtual nx::sdk::Error setHandler(
+    virtual void setHandler(
         nx::sdk::analytics::IDeviceAgent::IHandler* handler) override;
 
-    virtual nx::sdk::Error setNeededMetadataTypes(
-        const nx::sdk::analytics::IMetadataTypes* metadataTypes) override;
+    virtual void setNeededMetadataTypes(
+        const nx::sdk::analytics::IMetadataTypes* metadataTypes,
+        nx::sdk::IError* outError) override;
 
-    virtual const nx::sdk::IString* manifest(nx::sdk::Error* error) const override;
+    virtual const nx::sdk::IString* manifest(nx::sdk::IError* error) const override;
 
-    virtual nx::sdk::Error pushDataPacket(nx::sdk::analytics::IDataPacket* dataPacket) override;
+    virtual void pushDataPacket(
+        nx::sdk::analytics::IDataPacket* dataPacket,
+        nx::sdk::IError* outError) override;
 
 private:
-    nx::sdk::Error startFetchingMetadata(
-        const nx::sdk::analytics::IMetadataTypes* metadataTypes);
-
+    void startFetchingMetadata(const nx::sdk::analytics::IMetadataTypes* metadataTypes);
     void stopFetchingMetadata();
 
 private:

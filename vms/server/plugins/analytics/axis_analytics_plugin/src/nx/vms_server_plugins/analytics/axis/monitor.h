@@ -71,8 +71,9 @@ public:
 
     nx::network::HostAddress getLocalIp(const nx::network::SocketAddress& cameraAddress);
 
-    nx::sdk::Error startMonitoring(
-        const nx::sdk::analytics::IMetadataTypes* metadataTypes);
+    void startMonitoring(
+        const nx::sdk::analytics::IMetadataTypes* metadataTypes,
+        nx::sdk::IError* outError);
 
     void stopMonitoring();
 
@@ -87,7 +88,7 @@ public:
     ElapsedEvents& eventsToCatch() noexcept { return m_eventsToCatch; }
 
  private:
-    DeviceAgent * m_deviceAgent;
+    DeviceAgent* m_deviceAgent;
     const QUrl m_url;
     const QUrl m_endpoint;
     const QAuthenticator m_auth;

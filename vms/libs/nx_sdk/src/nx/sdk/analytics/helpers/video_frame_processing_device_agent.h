@@ -118,8 +118,6 @@ protected:
      */
     std::string getParamValue(const std::string& paramName);
 
-    virtual Error setNeededMetadataTypes(const IMetadataTypes* metadataTypes) override = 0;
-
 public:
     virtual ~VideoFrameProcessingDeviceAgent() override;
 
@@ -141,11 +139,11 @@ public:
 // Not intended to be used by the descendant.
 
 public:
-    virtual Error setHandler(IDeviceAgent::IHandler* handler) override;
-    virtual Error pushDataPacket(IDataPacket* dataPacket) override;
-    virtual const IString* manifest(Error* error) const override;
-    virtual void setSettings(const IStringMap* settings) override;
-    virtual IStringMap* pluginSideSettings() const override;
+    virtual void setHandler(IDeviceAgent::IHandler* handler) override;
+    virtual void pushDataPacket(IDataPacket* dataPacket, IError* outError) override;
+    virtual const IString* manifest(IError* error) const override;
+    virtual void setSettings(const IStringMap* settings, IError* outError) override;
+    virtual IStringMap* pluginSideSettings(IError* outError) const override;
 
 private:
     void assertEngineCasted(void* engine) const;

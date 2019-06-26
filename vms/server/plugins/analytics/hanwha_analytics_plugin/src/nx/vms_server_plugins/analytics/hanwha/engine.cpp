@@ -96,14 +96,13 @@ Engine::Engine(Plugin* plugin): m_plugin(plugin)
     m_engineManifest = QJson::deserialized<Hanwha::EngineManifest>(m_manifest);
 }
 
-IDeviceAgent* Engine::obtainDeviceAgent(
-    const IDeviceInfo* deviceInfo,
-    Error* outError)
+IDeviceAgent* Engine::obtainDeviceAgent(const IDeviceInfo* deviceInfo, IError* outError)
 {
-    *outError = Error::noError;
-
     if (!isCompatible(deviceInfo))
+    {
+        outError->setError(ErrorCode::otherError, "Device is not compatible with the Engine");
         return nullptr;
+    }
 
     auto sharedRes = sharedResources(deviceInfo);
     auto sharedResourceGuard = nx::utils::makeScopeGuard(
@@ -115,7 +114,10 @@ IDeviceAgent* Engine::obtainDeviceAgent(
 
     auto supportedEventTypeIds = fetchSupportedEventTypeIds(deviceInfo);
     if (!supportedEventTypeIds)
+    {
+        outError->setError(ErrorCode::internalError, "No supported events found");
         return nullptr;
+    }
 
     nx::vms::api::analytics::DeviceAgentManifest deviceAgentManifest;
     deviceAgentManifest.supportedEventTypeIds = *supportedEventTypeIds;
@@ -130,9 +132,8 @@ IDeviceAgent* Engine::obtainDeviceAgent(
     return deviceAgent;
 }
 
-const IString* Engine::manifest(Error* error) const
+const IString* Engine::manifest(IError* /*outError*/) const
 {
-    *error = Error::noError;
     return new nx::sdk::String(m_manifest);
 }
 
@@ -140,17 +141,17 @@ void Engine::setEngineInfo(const nx::sdk::analytics::IEngineInfo* /*engineInfo*/
 {
 }
 
-void Engine::setSettings(const IStringMap* /*settings*/)
+void Engine::setSettings(const IStringMap* /*settings*/, IError* /*outError*/)
 {
     // There are no DeviceAgent settings for this plugin.
 }
 
-IStringMap* Engine::pluginSideSettings() const
+IStringMap* Engine::pluginSideSettings(IError* /*outError*/) const
 {
     return nullptr;
 }
 
-void Engine::executeAction(IAction* /*action*/, Error* /*outError*/)
+void Engine::executeAction(IAction* /*action*/, IError* /*outError*/)
 {
 }
 
@@ -318,10 +319,9 @@ std::shared_ptr<Engine::SharedResources> Engine::sharedResources(const IDeviceIn
     return sharedResourcesItr.value();
 }
 
-Error Engine::setHandler(IEngine::IHandler* /*handler*/)
+void Engine::setHandler(IEngine::IHandler* /*handler*/)
 {
     // TODO: Use the handler for error reporting.
-    return Error::noError;
 }
 
 bool Engine::isCompatible(const IDeviceInfo* deviceInfo) const

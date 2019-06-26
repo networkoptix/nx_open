@@ -8,6 +8,7 @@
 #include <nx/fusion/serialization/json.h>
 
 #include <nx/sdk/helpers/string.h>
+#include <nx/sdk/helpers/plugin_diagnostic_event.h>
 
 #define NX_PRINT_PREFIX "[axis::DeviceAgent] "
 #include <nx/kit/debug.h>
@@ -39,41 +40,35 @@ DeviceAgent::~DeviceAgent()
     NX_PRINT << "Axis DeviceAgent destroyed";
 }
 
-Error DeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
+void DeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
 {
     handler->addRef();
     m_handler.reset(handler);
-    return Error::noError;
 }
 
-Error DeviceAgent::setNeededMetadataTypes(
-    const IMetadataTypes* metadataTypes)
+void DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes, IError* outError)
 {
-    nx::sdk::Ptr<const nx::sdk::IStringList> neededEventTypeIds(metadataTypes->eventTypeIds());
+    Ptr<const IStringList> neededEventTypeIds(metadataTypes->eventTypeIds());
     if (!neededEventTypeIds || !neededEventTypeIds->count())
-    {
         stopFetchingMetadata();
-        return Error::noError;
-    }
 
-    return startFetchingMetadata(metadataTypes);
+    startFetchingMetadata(metadataTypes, outError);
 }
 
-void DeviceAgent::setSettings(const IStringMap* /*settings*/)
+void DeviceAgent::setSettings(const IStringMap* /*settings*/, IError* /*outError*/)
 {
     // There are no DeviceAgent settings for this plugin.
 }
 
-IStringMap* DeviceAgent::pluginSideSettings() const
+IStringMap* DeviceAgent::pluginSideSettings(IError* /*outError*/) const
 {
     return nullptr;
 }
 
-Error DeviceAgent::startFetchingMetadata(
-    const IMetadataTypes* metadataTypes)
+void DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTypes, IError* outError)
 {
     m_monitor = new Monitor(this, m_url, m_auth, m_handler.get());
-    return m_monitor->startMonitoring(metadataTypes);
+    m_monitor->startMonitoring(metadataTypes, outError);
 }
 
 void DeviceAgent::stopFetchingMetadata()
@@ -82,11 +77,11 @@ void DeviceAgent::stopFetchingMetadata()
     m_monitor = nullptr;
 }
 
-const IString* DeviceAgent::manifest(Error* error) const
+const IString* DeviceAgent::manifest(IError* outError) const
 {
     if (m_jsonManifest.isEmpty())
     {
-        *error = Error::unknownError;
+        outError->setError(ErrorCode::internalError, "DeviceAgent manifest is empty");
         return nullptr;
     }
     return new nx::sdk::String(m_jsonManifest);
@@ -103,6 +98,19 @@ const EventType* DeviceAgent::eventTypeById(const QString& id) const noexcept
         return nullptr;
     else
         return &(*it);
+}
+
+void DeviceAgent::pushPluginDiagnosticEvent(
+    IPluginDiagnosticEvent::Level level,
+    std::string caption,
+    std::string description)
+{
+    auto diagnosticEvent = makePtr<PluginDiagnosticEvent>(
+        level,
+        std::move(caption),
+        std::move(description));
+
+    m_handler->handlePluginDiagnosticEvent(diagnosticEvent.get());
 }
 
 } // nx::vms_server_plugins::analytics::axis

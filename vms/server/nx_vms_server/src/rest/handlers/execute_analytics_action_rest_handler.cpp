@@ -10,11 +10,13 @@
 #include <nx/vms/server/resource/analytics_plugin_resource.h>
 #include <nx/vms/server/sdk_support/utils.h>
 #include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/helpers/to_string.h>
 #include <nx/sdk/uuid.h>
 #include <nx/vms_server_plugins/utils/uuid.h>
 #include <nx/vms/server/sdk_support/utils.h>
 #include <nx/sdk/i_string_map.h>
 #include <nx/sdk/helpers/ref_countable.h>
+#include <nx/sdk/helpers/error.h>
 #include <nx/sdk/analytics/helpers/object_track_info.h>
 #include <nx/sdk/uuid.h>
 
@@ -137,15 +139,12 @@ private:
 /**
  * @return Null if no error.
  */
-QString errorMessage(nx::sdk::Error error)
+QString errorMessage(nx::sdk::Ptr<nx::sdk::IError> error)
 {
-    switch (error)
-    {
-        case nx::sdk::Error::noError: return QString();
-        case nx::sdk::Error::unknownError: return "error";
-        case nx::sdk::Error::networkError: return "network error";
-        default: return "unrecognized error";
-    }
+    if (error->errorCode() == nx::sdk::ErrorCode::noError)
+        return QString();
+
+    return QString::fromStdString(nx::sdk::toString(error.get()));
 }
 
 } // namespace
@@ -405,8 +404,8 @@ QString QnExecuteAnalyticsActionRestHandler::executeAction(
     if (!NX_ASSERT(sdkEngine, kNoSdkEngineToExecuteActionMessage))
         return kNoSdkEngineToExecuteActionMessage;
 
-    nx::sdk::Error error = nx::sdk::Error::noError;
-    sdkEngine->executeAction(action.get(), &error);
+    const auto error = nx::sdk::makePtr<nx::sdk::Error>();
+    sdkEngine->executeAction(action.get(), error.get());
 
     // By this time, the Engine either already called Action::handleResult(), or is not going to
     // do it.

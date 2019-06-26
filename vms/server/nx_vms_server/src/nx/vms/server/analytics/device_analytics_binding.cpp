@@ -15,6 +15,7 @@
 #include <nx/sdk/analytics/helpers/metadata_types.h>
 #include <nx/sdk/helpers/ptr.h>
 #include <nx/sdk/helpers/to_string.h>
+#include <nx/sdk/helpers/error.h>
 
 #include <nx/analytics/descriptor_manager.h>
 #include <nx/analytics/utils.h>
@@ -92,8 +93,9 @@ bool DeviceAnalyticsBinding::updateNeededMetadataTypes()
     }
 
     const auto metadataTypes = neededMetadataTypes();
-    const auto error = m_deviceAgent->setNeededMetadataTypes(metadataTypes.get());
-    return error == Error::noError;
+    auto error = makePtr<Error>();
+    m_deviceAgent->setNeededMetadataTypes(metadataTypes.get(), error.get());
+    return error->errorCode() == ErrorCode::noError;
 }
 
 bool DeviceAnalyticsBinding::startAnalyticsUnsafe(const Ptr<IStringMap>& settings)
@@ -141,8 +143,9 @@ bool DeviceAnalyticsBinding::startAnalyticsUnsafe(const Ptr<IStringMap>& setting
     if (!m_started)
     {
         const auto metadataTypes = neededMetadataTypes();
-        const auto error = m_deviceAgent->setNeededMetadataTypes(metadataTypes.get());
-        m_started = error == Error::noError;
+        auto error = makePtr<Error>();
+        m_deviceAgent->setNeededMetadataTypes(metadataTypes.get(), error.get());
+        m_started = (error->errorCode() == ErrorCode::noError);
     }
 
     return m_started;
@@ -155,7 +158,8 @@ void DeviceAnalyticsBinding::stopAnalyticsUnsafe()
         return;
 
     const auto neededMetadataTypes = makePtr<MetadataTypes>();
-    m_deviceAgent->setNeededMetadataTypes(neededMetadataTypes.get());
+    auto error = makePtr<Error>();
+    m_deviceAgent->setNeededMetadataTypes(neededMetadataTypes.get(), error.get());
 }
 
 QVariantMap DeviceAnalyticsBinding::getSettings() const
@@ -181,7 +185,8 @@ QVariantMap DeviceAnalyticsBinding::getSettings() const
         return jsonEngine.values();
     }
 
-    const auto pluginSideSettings = toPtr(deviceAgent->pluginSideSettings());
+    auto error = makePtr<Error>();
+    const auto pluginSideSettings = toPtr(deviceAgent->pluginSideSettings(error.get()));
     if (!pluginSideSettings)
     {
         NX_DEBUG(this, "Got null device agent settings for device %1 (%2) and engine %3 (%4)",
@@ -222,7 +227,8 @@ void DeviceAnalyticsBinding::setSettingsInternal(const Ptr<IStringMap>& settings
         return;
     }
 
-    m_deviceAgent->setSettings(settings.get());
+    auto error = makePtr<Error>();
+    m_deviceAgent->setSettings(settings.get(), error.get());
 }
 
 void DeviceAnalyticsBinding::logIncomingFrame(nx::sdk::analytics::IDataPacket* frame)
@@ -288,12 +294,12 @@ Ptr<DeviceAnalyticsBinding::DeviceAgent> DeviceAnalyticsBinding::createDeviceAge
         return nullptr;
     }
 
-    Error error = Error::noError;
-    const auto deviceAgent = toPtr(sdkEngine->obtainDeviceAgent(deviceInfo.get(), &error));
+    auto error = makePtr<Error>();
+    const auto deviceAgent = toPtr(sdkEngine->obtainDeviceAgent(deviceInfo.get(), error.get()));
 
     if (!deviceAgent)
     {
-        NX_ERROR(this, lm("Cannot obtain DeviceAgent %1 (%2), plugin returned null.")
+        NX_ERROR(this, lm("Cannot obtain DeviceAgent %1 (%2), plugin returned null")
             .args(m_device->getUserDefinedName(), m_device->getId()));
         return nullptr;
     }
@@ -302,9 +308,9 @@ Ptr<DeviceAnalyticsBinding::DeviceAgent> DeviceAnalyticsBinding::createDeviceAge
 
     m_isStreamConsumer = streamConsumer != nullptr;
 
-    if (error != Error::noError)
+    if (error->errorCode() != ErrorCode::noError)
     {
-        NX_ERROR(this, lm("Cannot obtain DeviceAgent %1 (%2), plugin returned error %3.")
+        NX_ERROR(this, lm("Cannot obtain DeviceAgent %1 (%2), plugin returned error %3")
             .args(m_device->getUserDefinedName(), m_device->getId()), error);
         return nullptr;
     }
@@ -477,8 +483,9 @@ bool DeviceAnalyticsBinding::processData(const QnAbstractDataPacketPtr& data)
 
     logIncomingFrame(packetAdapter->packet());
 
-    const Error error = consumingDeviceAgent->pushDataPacket(packetAdapter->packet());
-    if (error != Error::noError)
+    auto error = makePtr<Error>();
+    consumingDeviceAgent->pushDataPacket(packetAdapter->packet(), error.get());
+    if (error->errorCode() != ErrorCode::noError)
     {
         NX_VERBOSE(this, "Plugin %1 has rejected video data with error %2",
             m_engine->getName(), error);

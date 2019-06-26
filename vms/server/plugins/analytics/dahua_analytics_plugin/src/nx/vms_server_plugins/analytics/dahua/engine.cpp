@@ -89,19 +89,17 @@ void Engine::setEngineInfo(const nx::sdk::analytics::IEngineInfo* /*engineInfo*/
 {
 }
 
-void Engine::setSettings(const IStringMap* /*settings*/)
+void Engine::setSettings(const IStringMap* /*settings*/, IError* /*outError*/)
 {
     // There are no DeviceAgent settings for this plugin.
 }
 
-IStringMap* Engine::pluginSideSettings() const
+IStringMap* Engine::pluginSideSettings(IError* /*outError*/) const
 {
     return nullptr;
 }
 
-IDeviceAgent* Engine::obtainDeviceAgent(
-    const IDeviceInfo* deviceInfo,
-    Error* /*outError*/)
+IDeviceAgent* Engine::obtainDeviceAgent(const IDeviceInfo* deviceInfo, IError* /*outError*/)
 {
     if (!isCompatible(deviceInfo))
         return nullptr;
@@ -114,15 +112,14 @@ IDeviceAgent* Engine::obtainDeviceAgent(
     return new DeviceAgent(this, deviceInfo, deviceAgentParsedManifest);
 }
 
-const nx::sdk::IString* Engine::manifest(Error* outError) const
+const nx::sdk::IString* Engine::manifest(IError* outError) const
 {
     if (m_jsonManifest.isEmpty())
     {
-        *outError = Error::unknownError;
+        outError->setError(ErrorCode::otherError, "Engine manifest is empty");
         return nullptr;
     }
 
-    *outError = Error::noError;
     return new nx::sdk::String(m_jsonManifest);
 }
 
@@ -204,14 +201,13 @@ const EngineManifest& Engine::parsedManifest() const
     return m_parsedManifest;
 }
 
-void Engine::executeAction(IAction* /*action*/, Error* /*outError*/)
+void Engine::executeAction(IAction* /*action*/, IError* /*outError*/)
 {
 }
 
-Error Engine::setHandler(IHandler* /*handler*/)
+void Engine::setHandler(IHandler* /*handler*/)
 {
     // TODO: Use the handler for error reporting.
-    return Error::noError;
 }
 
 bool Engine::isCompatible(const IDeviceInfo* deviceInfo) const

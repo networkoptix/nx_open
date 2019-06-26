@@ -33,6 +33,7 @@
 #include <nx/sdk/i_plugin_diagnostic_event.h>
 #include <nx/sdk/helpers/device_info.h>
 #include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/helpers/error.h>
 #include <plugins/settings.h>
 #include <plugins/vms_server_plugins_ini.h>
 
@@ -99,13 +100,14 @@ std::optional<Manifest> manifestFromSdkObject(
     const SdkObjectPtr& sdkObject,
     std::unique_ptr<AbstractManifestLogger> logger = nullptr)
 {
-    nx::sdk::Error error = nx::sdk::Error::noError;
-    const auto manifestStr = nx::sdk::toPtr(sdkObject->manifest(&error));
+    using namespace nx::sdk;
+    auto error = makePtr<Error>();
+    const auto manifestStr = toPtr(sdkObject->manifest(error.get()));
 
     const auto log =
         [&logger](
             const QString& manifestString,
-            nx::sdk::Error error,
+            Ptr<nx::sdk::IError> error,
             const QString& customError = QString())
         {
             if (logger)
@@ -113,26 +115,42 @@ std::optional<Manifest> manifestFromSdkObject(
             return std::nullopt; //< Allows to call as `return log(...);` on error.
         };
 
-    if (error != nx::sdk::Error::noError)
+    if (error->errorCode() != ErrorCode::noError)
         return log(QString(), error);
 
     if (!manifestStr)
-        return log(QString(), nx::sdk::Error::unknownError, "No manifest (null IString)");
+    {
+        return log(
+            QString(),
+            makePtr<Error>(ErrorCode::internalError, "No manifest (null IString)"));
+    }
 
     const char* const rawString = manifestStr->str();
 
     if (!rawString)
-        return log(QString(), nx::sdk::Error::unknownError, "No manifest (null IString::str())");
+    {
+        return log(
+            QString(),
+            makePtr<Error>(ErrorCode::internalError, "No manifest (null IString::str())"));
+    }
 
     if (rawString[0] == '\0')
-        return log(QString(), nx::sdk::Error::unknownError, "No manifest (empty string)");
+    {
+        return log(
+            QString(),
+            makePtr<Error>(ErrorCode::internalError, "No manifest (empty string)"));
+    }
 
     bool success = false;
     const auto deserializedManifest = QJson::deserialized(rawString, Manifest(), &success);
     if (!success)
-        return log(rawString, nx::sdk::Error::unknownError, "Can't deserialize manifest");
+    {
+        return log(
+            rawString,
+            makePtr<Error>(ErrorCode::internalError, "Unable to deserialize manifest"));
+    }
 
-    log(rawString, nx::sdk::Error::noError);
+    log(rawString, error);
     return deserializedManifest;
 }
 

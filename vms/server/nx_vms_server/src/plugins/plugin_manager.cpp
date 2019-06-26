@@ -433,14 +433,15 @@ public:
 
     virtual void log(
         const QString& manifestStr,
-        nx::sdk::Error error,
+        nx::sdk::Ptr<nx::sdk::IError> error,
         const QString& customError) override
     {
-        if (error == nx::sdk::Error::noError)
+        const nx::sdk::ErrorCode errorCode = error->errorCode();
+        if (errorCode == nx::sdk::ErrorCode::noError)
             return;
 
-        const QString errorStr = (error != nx::sdk::Error::unknownError)
-            ? lm(" (error code %1)").arg(nx::sdk::toString(error))
+        const QString errorStr = (errorCode != nx::sdk::ErrorCode::otherError)
+            ? lm(" (Error: %1)").arg(nx::sdk::toString(errorCode))
             : "";
 
         const QString customErrorStr = customError.isEmpty() ? "" : lm(": %1").arg(customError);

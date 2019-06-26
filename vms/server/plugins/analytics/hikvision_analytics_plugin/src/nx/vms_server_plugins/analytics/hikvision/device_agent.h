@@ -32,23 +32,27 @@ public:
 
     virtual Engine* engine() const override { return m_engine; }
 
-    virtual nx::sdk::Error setHandler(
-        nx::sdk::analytics::IDeviceAgent::IHandler* handler) override;
+    virtual void setHandler(nx::sdk::analytics::IDeviceAgent::IHandler* handler) override;
 
-    virtual nx::sdk::Error setNeededMetadataTypes(
-        const nx::sdk::analytics::IMetadataTypes* metadataTypes) override;
+    virtual void setNeededMetadataTypes(
+        const nx::sdk::analytics::IMetadataTypes* metadataTypes,
+        nx::sdk::IError* outError) override;
 
-    virtual const nx::sdk::IString* manifest(nx::sdk::Error* error) const override;
+    virtual const nx::sdk::IString* manifest(nx::sdk::IError* outError) const override;
 
     void setDeviceInfo(const nx::sdk::IDeviceInfo* deviceInfo);
     void setDeviceAgentManifest(const QByteArray& manifest);
     void setEngineManifest(const Hikvision::EngineManifest& manifest);
-    virtual void setSettings(const nx::sdk::IStringMap* settings) override;
-    virtual nx::sdk::IStringMap* pluginSideSettings() const override;
+    virtual void setSettings(
+        const nx::sdk::IStringMap* settings,
+        nx::sdk::IError* outError) override;
+
+    virtual nx::sdk::IStringMap* pluginSideSettings(nx::sdk::IError* outError) const override;
 
 private:
-    nx::sdk::Error startFetchingMetadata(
-        const nx::sdk::analytics::IMetadataTypes* metadataTypes);
+    void startFetchingMetadata(
+        const nx::sdk::analytics::IMetadataTypes* metadataTypes,
+        nx::sdk::IError* outError);
 
     void stopFetchingMetadata();
 

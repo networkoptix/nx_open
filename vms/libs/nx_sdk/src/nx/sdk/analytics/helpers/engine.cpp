@@ -95,32 +95,33 @@ void Engine::setEngineInfo(const IEngineInfo* engineInfo)
         PrintPrefixMaker().makePrintPrefix(m_overridingPrintPrefix, m_plugin, engineInfo));
 }
 
-void Engine::setSettings(const IStringMap* settings)
+void Engine::setSettings(const IStringMap* settings, IError* outError)
 {
     if (!logUtils.convertAndOutputStringMap(&m_settings, settings, "Received settings"))
+    {
+        outError->setError(ErrorCode::invalidParams, "Unable to convert the input string map");
         return; //< The error is already logged.
+    }
 
     settingsReceived();
 }
 
-IStringMap* Engine::pluginSideSettings() const
+IStringMap* Engine::pluginSideSettings(IError* /*outError*/) const
 {
-    auto settingsValues = new StringMap();
-    settingsValues->addItem("nx.stub.engine.settings.double_0", "2.7182");
-    return settingsValues;
+    return nullptr;
 }
 
-const IString* Engine::manifest(Error* /*error*/) const
+const IString* Engine::manifest(IError* /*outError*/) const
 {
     return new String(manifest());
 }
 
-void Engine::executeAction(IAction* action, Error* outError)
+void Engine::executeAction(IAction* action, IError* outError)
 {
     if (!action)
     {
         NX_PRINT << __func__ << "(): INTERNAL ERROR: action is null";
-        *outError = Error::unknownError;
+        outError->setError(ErrorCode::invalidParams, "Action is null");
         return;
     }
 
@@ -139,7 +140,7 @@ void Engine::executeAction(IAction* action, Error* outError)
         &params, actionParams.get(), "params", /*outputIndent*/ 4))
     {
         // The error is already logged.
-        *outError = Error::unknownError;
+        outError->setError(ErrorCode::invalidParams, "Invalid action parameters");
         return;
     }
 
@@ -164,12 +165,11 @@ void Engine::executeAction(IAction* action, Error* outError)
     action->handleResult(actionUrlPtr, messageToUserPtr);
 }
 
-Error Engine::setHandler(IEngine::IHandler* handler)
+void Engine::setHandler(IEngine::IHandler* handler)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     handler->addRef();
     m_handler.reset(handler);
-    return Error::noError;
 }
 
 bool Engine::isCompatible(const IDeviceInfo* /*deviceInfo*/) const

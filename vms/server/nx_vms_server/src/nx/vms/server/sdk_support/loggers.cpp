@@ -11,6 +11,8 @@
 
 namespace nx::vms::server::sdk_support {
 
+using namespace nx::sdk;
+
 namespace {
 
 static const QString kManifestFilenamePostfix("_manifest.json");
@@ -87,7 +89,7 @@ ManifestLogger::ManifestLogger(
 
 void ManifestLogger::log(
     const QString& manifestStr,
-    sdk::Error error,
+    Ptr<IError> error,
     const QString& customError)
 {
     if (pluginsIni().analyticsManifestOutputPath[0])
@@ -103,14 +105,17 @@ void ManifestLogger::log(
                 kManifestFilenamePostfix));
     }
 
-    if (error != nx::sdk::Error::noError)
+    if (error->errorCode() != ErrorCode::noError)
     {
         nx::utils::PlaceholderBinder binder(m_messageTemplate);
         binder.bind({
             {"device", buildDeviceStr(m_device)},
             {"engine", buildEngineStr(m_engineResource)},
             {"plugin", buildPluginStr(m_pluginResource)},
-            {"error", customError.isEmpty() ? nx::sdk::toString(error) : customError},
+            {
+                "error",
+                customError.isEmpty() ? QString::fromStdString(toString(error.get())) : customError
+            },
         });
         NX_WARNING(m_logTag, binder.str());
     }
@@ -130,7 +135,7 @@ StartupPluginManifestLogger::StartupPluginManifestLogger(
 
 void StartupPluginManifestLogger::log(
     const QString& manifestStr,
-    nx::sdk::Error error,
+    Ptr<IError> error,
     const QString& customError)
 {
     if (pluginsIni().analyticsManifestOutputPath[0])
@@ -144,10 +149,11 @@ void StartupPluginManifestLogger::log(
                 kManifestFilenamePostfix));
     }
 
-    if (error != nx::sdk::Error::noError)
+    if (error->errorCode() != nx::sdk::ErrorCode::noError)
     {
         NX_WARNING(m_logTag, "Error obtaining manifest from Plugin %1: %2",
-            m_plugin->name(), customError.isEmpty() ? nx::sdk::toString(error) : customError);
+            m_plugin->name(),
+            customError.isEmpty() ? QString::fromStdString(toString(error.get())) : customError);
     }
 }
 

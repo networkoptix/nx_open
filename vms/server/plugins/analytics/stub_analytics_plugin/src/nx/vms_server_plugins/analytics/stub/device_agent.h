@@ -26,10 +26,11 @@ public:
     DeviceAgent(Engine* engine, const nx::sdk::IDeviceInfo* deviceInfo);
     virtual ~DeviceAgent() override;
 
-    virtual nx::sdk::Error setNeededMetadataTypes(
-        const nx::sdk::analytics::IMetadataTypes* neededMetadataTypes) override;
+    virtual void setNeededMetadataTypes(
+        const nx::sdk::analytics::IMetadataTypes* neededMetadataTypes,
+        nx::sdk::IError* outError) override;
 
-    virtual nx::sdk::IStringMap* pluginSideSettings() const override;
+    virtual nx::sdk::IStringMap* pluginSideSettings(nx::sdk::IError* outError) const override;
 
 protected:
     virtual std::string manifest() const override;
@@ -66,8 +67,7 @@ private:
         const nx::sdk::analytics::IUncompressedVideoFrame* frame,
         int plane) const;
 
-    nx::sdk::Error startFetchingMetadata(
-        const nx::sdk::analytics::IMetadataTypes* metadataTypes);
+    void startFetchingMetadata(const nx::sdk::analytics::IMetadataTypes* metadataTypes);
 
     void stopFetchingMetadata();
 

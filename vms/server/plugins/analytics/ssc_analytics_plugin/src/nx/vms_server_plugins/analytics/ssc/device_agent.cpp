@@ -74,53 +74,48 @@ void DeviceAgent::sendEventPacket(const EventType& event) const
         << event.internalName.toUtf8().constData() << " sent to server";
 }
 
-Error DeviceAgent::startFetchingMetadata(
-    const IMetadataTypes* /*metadataTypes*/)
+void DeviceAgent::startFetchingMetadata(const IMetadataTypes* /*metadataTypes*/)
 {
     m_engine->registerCamera(m_cameraLogicalId, this);
-    return Error::noError;
 }
 
-Error DeviceAgent::stopFetchingMetadata()
+void DeviceAgent::stopFetchingMetadata()
 {
     m_engine->unregisterCamera(m_cameraLogicalId);
-    return Error::noError;
 }
 
-const IString* DeviceAgent::manifest(Error* error) const
+const IString* DeviceAgent::manifest(IError* /*outError*/) const
 {
-    *error = Error::noError;
     return new nx::sdk::String(m_deviceAgentManifest);
 }
 
-Error DeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
+void DeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
 {
     handler->addRef();
     m_handler.reset(handler);
-    return Error::noError;
 }
 
-Error DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes)
+void DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes, IError* outError)
 {
     nx::sdk::Ptr<const nx::sdk::IStringList> eventTypeIds(metadataTypes->eventTypeIds());
-    if (!NX_ASSERT(eventTypeIds, "Event type id list is nullptr"))
-        return Error::unknownError;
-
-    if (eventTypeIds->count() == 0)
+    if (const char* message = "Event type id list is nullptr"; !NX_ASSERT(eventTypeIds, message))
     {
-        stopFetchingMetadata();
-        return Error::noError;
+        outError->setError(ErrorCode::internalError, message);
+        return;
     }
 
-    return startFetchingMetadata(metadataTypes);
+    if (eventTypeIds->count() == 0)
+        stopFetchingMetadata();
+
+    startFetchingMetadata(metadataTypes);
 }
 
-void DeviceAgent::setSettings(const IStringMap* /*settings*/)
+void DeviceAgent::setSettings(const IStringMap* /*settings*/, IError* /*outError*/)
 {
     // There are no DeviceAgent settings for this plugin.
 }
 
-IStringMap* DeviceAgent::pluginSideSettings() const
+IStringMap* DeviceAgent::pluginSideSettings(IError* /*outError*/) const
 {
     return nullptr;
 }

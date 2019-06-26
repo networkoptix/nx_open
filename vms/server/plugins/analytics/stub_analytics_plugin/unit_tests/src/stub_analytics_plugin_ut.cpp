@@ -13,6 +13,7 @@
 #include <nx/sdk/helpers/string_map.h>
 #include <nx/sdk/helpers/device_info.h>
 #include <nx/sdk/helpers/string.h>
+#include <nx/sdk/helpers/error.h>
 #include <nx/sdk/analytics/helpers/metadata_types.h>
 #include <nx/sdk/uuid.h>
 #include <nx/sdk/i_utility_provider.h>
@@ -49,15 +50,14 @@ static std::string trimString(const std::string& s)
 
 static void testEngineManifest(IEngine* engine)
 {
-    Error error = Error::noError;
-
-    const auto manifest = toPtr(engine->manifest(&error));
+    auto error = makePtr<Error>();
+    const auto manifest = toPtr(engine->manifest(error.get()));
 
     ASSERT_TRUE(manifest);
     const char* manifestStr = manifest->str();
 
     ASSERT_TRUE(manifestStr != nullptr);
-    ASSERT_EQ(Error::noError, error);
+    ASSERT_EQ(ErrorCode::noError, error->errorCode());
     ASSERT_TRUE(manifestStr[0] != '\0');
     NX_PRINT << "Engine manifest:\n" << manifestStr;
 
@@ -71,13 +71,13 @@ static void testEngineManifest(IEngine* engine)
 
 static void testDeviceAgentManifest(IDeviceAgent* deviceAgent)
 {
-    Error error = Error::noError;
-    const auto manifest = toPtr(deviceAgent->manifest(&error));
+    auto error = makePtr<Error>();
+    const auto manifest = toPtr(deviceAgent->manifest(error.get()));
 
     ASSERT_TRUE(manifest);
     const char* manifestStr = manifest->str();
     ASSERT_TRUE(manifestStr != nullptr);
-    ASSERT_EQ(Error::noError, error);
+    ASSERT_EQ(ErrorCode::noError, error->errorCode());
     ASSERT_TRUE(manifestStr[0] != '\0');
     NX_PRINT << "DeviceAgent manifest:\n" << manifest;
 
@@ -88,24 +88,34 @@ static void testDeviceAgentManifest(IDeviceAgent* deviceAgent)
 
 static void testEngineSettings(IEngine* engine)
 {
+    auto error = makePtr<Error>();
     const auto settings = makePtr<StringMap>();
     settings->addItem("setting1", "value1");
     settings->addItem("setting2", "value2");
 
-    engine->setSettings(nullptr); //< Test assigning null settings.
-    engine->setSettings(makePtr<StringMap>().get()); //< Test assigning empty settings.
-    engine->setSettings(settings.get()); //< Test assigning some settings.
+    engine->setSettings(nullptr, error.get()); //< Test assigning null settings.
+    ASSERT_EQ(ErrorCode::noError, error->errorCode());
+    engine->setSettings(makePtr<StringMap>().get(), error.get()); //< Test assigning empty settings.
+    ASSERT_EQ(ErrorCode::noError, error->errorCode());
+    engine->setSettings(settings.get(), error.get()); //< Test assigning some settings.
+    ASSERT_EQ(ErrorCode::noError, error->errorCode());
 }
 
 static void testDeviceAgentSettings(IDeviceAgent* deviceAgent)
 {
+    auto error = makePtr<Error>();
     const auto settings = makePtr<StringMap>();
     settings->addItem("setting1", "value1");
     settings->addItem("setting2", "value2");
 
-    deviceAgent->setSettings(nullptr); //< Test assigning null settings.
-    deviceAgent->setSettings(makePtr<StringMap>().get()); //< Test assigning empty settings.
-    deviceAgent->setSettings(settings.get()); //< Test assigning some settings.
+    deviceAgent->setSettings(nullptr, error.get()); //< Test assigning null settings.
+    ASSERT_EQ(ErrorCode::noError, error->errorCode());
+
+    //< Test assigning empty settings.
+    deviceAgent->setSettings(makePtr<StringMap>().get(), error.get());
+    ASSERT_EQ(ErrorCode::noError, error->errorCode());
+    deviceAgent->setSettings(settings.get(), error.get()); //< Test assigning some settings.
+    ASSERT_EQ(ErrorCode::noError, error->errorCode());
 }
 
 class Action: public RefCountable<IAction>
@@ -185,12 +195,12 @@ private:
 
 static void testExecuteActionNonExisting(IEngine* engine)
 {
+    auto error = makePtr<Error>();
     auto action = makePtr<Action>();
     action->m_actionId = "non_existing_actionId";
 
-    Error error = Error::noError;
-    engine->executeAction(action.get(), &error);
-    ASSERT_TRUE(error != Error::noError);
+    engine->executeAction(action.get(), error.get());
+    ASSERT_TRUE(error->errorCode() != ErrorCode::noError);
     action->assertExpectedState();
 }
 
@@ -207,9 +217,9 @@ static void testExecuteActionAddToList(IEngine* engine)
     });
     action->m_expectedNonNullMessageToUser = true;
 
-    Error error = Error::noError;
-    engine->executeAction(action.get(), &error);
-    ASSERT_EQ(Error::noError, error);
+    auto error = makePtr<Error>();
+    engine->executeAction(action.get(), error.get());
+    ASSERT_EQ(ErrorCode::noError, error->errorCode());
     action->assertExpectedState();
 }
 
@@ -220,9 +230,9 @@ static void testExecuteActionAddPerson(IEngine* engine)
     action->m_objectId = Uuid();
     action->m_expectedNonNullActionUrl = true;
 
-    Error error = Error::noError;
-    engine->executeAction(action.get(), &error);
-    ASSERT_EQ(Error::noError, error);
+    auto error = makePtr<Error>();
+    engine->executeAction(action.get(), error.get());
+    ASSERT_EQ(ErrorCode::noError, error->errorCode());
     action->assertExpectedState();
 }
 
@@ -291,7 +301,7 @@ TEST(stub_analytics_plugin, test)
     const auto engineHandler = nx::sdk::makePtr<EngineHandler>();
     const auto deviceAgentHandler = nx::sdk::makePtr<DeviceAgentHandler>();
 
-    Error error = Error::noError;
+    auto error = makePtr<Error>();
 
     const auto pluginObject = toPtr(createNxPlugin());
     ASSERT_TRUE(pluginObject);
@@ -303,14 +313,12 @@ TEST(stub_analytics_plugin, test)
     const auto utilityProvider = makePtr<UtilityProvider>();
     plugin->setUtilityProvider(utilityProvider.get());
 
-    const auto engine = toPtr(plugin->createEngine(&error));
-    ASSERT_EQ(Error::noError, error);
+    const auto engine = toPtr(plugin->createEngine(error.get()));
+    ASSERT_EQ(ErrorCode::noError, error->errorCode());
     ASSERT_TRUE(engine);
     ASSERT_TRUE(queryInterfacePtr<IEngine>(engine));
 
     ASSERT_EQ(plugin.get(), engine->plugin());
-
-    ASSERT_EQ(Error::noError, engine->setHandler(engineHandler.get()));
 
     const std::string pluginName = engine->plugin()->name();
     ASSERT_TRUE(!pluginName.empty());
@@ -326,23 +334,23 @@ TEST(stub_analytics_plugin, test)
 
     const auto deviceInfo = makePtr<DeviceInfo>();
     deviceInfo->setId("TEST");
-    const auto baseDeviceAgent = toPtr(engine->obtainDeviceAgent(deviceInfo.get(), &error));
-    ASSERT_EQ(Error::noError, error);
+    const auto baseDeviceAgent = toPtr(engine->obtainDeviceAgent(deviceInfo.get(), error.get()));
+    ASSERT_EQ(ErrorCode::noError, error->errorCode());
     ASSERT_TRUE(baseDeviceAgent);
     ASSERT_TRUE(queryInterfacePtr<IDeviceAgent>(baseDeviceAgent));
     const auto deviceAgent = queryInterfacePtr<IConsumingDeviceAgent>(baseDeviceAgent);
     ASSERT_TRUE(deviceAgent);
 
-    ASSERT_EQ(Error::noError, deviceAgent->setHandler(deviceAgentHandler.get()));
-
     testDeviceAgentManifest(deviceAgent.get());
     testDeviceAgentSettings(deviceAgent.get());
 
     const auto metadataTypes = makePtr<MetadataTypes>();
-    ASSERT_EQ(Error::noError, deviceAgent->setNeededMetadataTypes(metadataTypes.get()));
+    deviceAgent->setNeededMetadataTypes(metadataTypes.get(), error.get());
+    ASSERT_EQ(ErrorCode::noError, error->errorCode());
 
     const auto compressedVideoPacket = makePtr<CompressedVideoPacket>();
-    ASSERT_EQ(Error::noError, deviceAgent->pushDataPacket(compressedVideoPacket.get()));
+    deviceAgent->pushDataPacket(compressedVideoPacket.get(), error.get());
+    ASSERT_EQ(ErrorCode::noError, error->errorCode());
 }
 
 } // namespace test

@@ -73,11 +73,11 @@ protected:
         Uuid /*objectId*/,
         Uuid /*deviceId*/,
         int64_t /*timestampUs*/,
-        nx::sdk::Ptr<IObjectTrackInfo> /*trackInfo*/,
+        Ptr<IObjectTrackInfo> /*trackInfo*/,
         const std::map<std::string, std::string>& /*params*/,
         std::string* /*outActionUrl*/,
         std::string* /*outMessageToUser*/,
-        Error* /*error*/)
+        IError* /*error*/)
     {
     }
 
@@ -86,7 +86,7 @@ protected:
      * settingsReceived() was called, will be ignored in case setHandler() was not called yet.
      */
     void pushPluginDiagnosticEvent(
-        nx::sdk::IPluginDiagnosticEvent::Level level,
+        IPluginDiagnosticEvent::Level level,
         std::string caption,
         std::string description);
 
@@ -114,13 +114,13 @@ public:
 
 public:
     virtual void setEngineInfo(const IEngineInfo* engineInfo) override;
-    virtual void setSettings(const nx::sdk::IStringMap* settings) override;
-    virtual nx::sdk::IStringMap* pluginSideSettings() const override;
-    virtual const IString* manifest(Error* error) const override;
+    virtual void setSettings(const IStringMap* settings, IError* outError) override;
+    virtual IStringMap* pluginSideSettings(IError* outError) const override;
+    virtual const IString* manifest(IError* outError) const override;
 
-    virtual void executeAction(IAction* action, Error* outError) override;
-    virtual nx::sdk::Error setHandler(IEngine::IHandler* handler) override;
-    virtual bool isCompatible(const nx::sdk::IDeviceInfo* deviceInfo) const override;
+    virtual void executeAction(IAction* action, IError* outError) override;
+    virtual void setHandler(IEngine::IHandler* handler) override;
+    virtual bool isCompatible(const IDeviceInfo* deviceInfo) const override;
 
 private:
     void assertPluginCasted(void* plugin) const;
@@ -130,7 +130,7 @@ private:
     IPlugin* const m_plugin;
     const std::string m_overridingPrintPrefix;
     std::map<std::string, std::string> m_settings;
-    nx::sdk::Ptr<IEngine::IHandler> m_handler;
+    Ptr<IEngine::IHandler> m_handler;
 };
 
 } // namespace analytics

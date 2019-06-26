@@ -28,7 +28,7 @@ public:
     virtual ~Engine() override;
 
     virtual nx::sdk::analytics::IDeviceAgent* obtainDeviceAgent(
-        const nx::sdk::IDeviceInfo* deviceInfo, nx::sdk::Error* outError) override;
+        const nx::sdk::IDeviceInfo* deviceInfo, nx::sdk::IError* outError) override;
 
     // Capabilities.
     bool needUncompressedVideoFrames() const { return m_needUncompressedVideoFrames; }
@@ -50,7 +50,7 @@ protected:
         const std::map<std::string, std::string>& params,
         std::string* outActionUrl,
         std::string* outMessageToUser,
-        nx::sdk::Error* error) override;
+        nx::sdk::IError* outError) override;
 
 private:
     void obtainPluginHomeDir();

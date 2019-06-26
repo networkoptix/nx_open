@@ -33,35 +33,31 @@ DeviceAgent::~DeviceAgent()
     stopFetchingMetadata();
 }
 
-void DeviceAgent::setSettings(const IStringMap* /*settings*/)
+void DeviceAgent::setSettings(const IStringMap* /*settings*/, IError* /*outError*/)
 {
     // This plugin doesn't use DeviceAgent setting, it just ignores them.
 }
 
-IStringMap* DeviceAgent::pluginSideSettings() const
+IStringMap* DeviceAgent::pluginSideSettings(IError* /*outError*/) const
 {
     return nullptr;
 }
 
-Error DeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
+void DeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
 {
     handler->addRef();
     m_handler.reset(handler);
-    return Error::noError;
 }
 
-Error DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes)
+void DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes, IError* outError)
 {
     if (metadataTypes->isEmpty())
-    {
         stopFetchingMetadata();
-        return Error::noError;
-    }
 
-    return startFetchingMetadata(metadataTypes);
+    startFetchingMetadata(metadataTypes, outError);
 }
 
-Error DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTypes)
+void DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTypes, IError* outError)
 {
     auto monitorHandler =
         [this](const EventList& events)
@@ -74,7 +70,7 @@ Error DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTypes)
                 if (dahuaEvent.channel.has_value() && dahuaEvent.channel != m_channelNumber)
                     return;
 
-                auto eventMetadata = makePtr<nx::sdk::analytics::EventMetadata>();
+                auto eventMetadata = makePtr<EventMetadata>();
                 NX_VERBOSE(this, "Got event: %1 %2 Channel %3",
                     dahuaEvent.caption, dahuaEvent.description, m_channelNumber);
 
@@ -98,9 +94,12 @@ Error DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTypes)
     std::vector<QString> eventTypes;
 
 
-    nx::sdk::Ptr<const nx::sdk::IStringList> eventTypeIds(metadataTypes->eventTypeIds());
-    if (!NX_ASSERT(eventTypeIds, "Event type id list is empty"))
-        return Error::unknownError;
+    Ptr<const IStringList> eventTypeIds(metadataTypes->eventTypeIds());
+    if (const char* message = "Event type id list is empty";
+        !NX_ASSERT(eventTypeIds, message))
+    {
+        outError->setError(ErrorCode::internalError, message);
+    }
 
     for (int i = 0; i < eventTypeIds->count(); ++i)
         eventTypes.push_back(eventTypeIds->at(i));
@@ -114,8 +113,6 @@ Error DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTypes)
 
     m_monitor->addHandler(m_uniqueId, monitorHandler);
     m_monitor->startMonitoring();
-
-    return Error::noError;
 }
 
 void DeviceAgent::stopFetchingMetadata()
@@ -128,15 +125,14 @@ void DeviceAgent::stopFetchingMetadata()
     m_monitor = nullptr;
 }
 
-const IString* DeviceAgent::manifest(Error* error) const
+const IString* DeviceAgent::manifest(IError* outError) const
 {
     if (m_jsonManifest.isEmpty())
     {
-        *error = Error::unknownError;
+        outError->setError(ErrorCode::otherError, "DeviceAgent manifest is empty");
         return nullptr;
     }
 
-    *error = Error::noError;
     return new nx::sdk::String(m_jsonManifest);
 }
 

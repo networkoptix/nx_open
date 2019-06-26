@@ -60,8 +60,14 @@ public:
      *
      * @param settings Values of settings declared in the manifest. Never null. Valid only during
      *     the call.
+     * @param outError Output parameter for error reporting. Never null. Must contain
+     *     `ErrorCode::noError` error code in the case of success (`outError` object is guarnteed to
+     *     be prefilled with `noError` value, so no additional actions are required) or be properly
+     *     filled in a case of failure. `setSetting()` method should set information about each
+     *     failed setting via `IError::setDetail()` method (the key is a setting id and the value is
+     *     an error message).
      */
-    virtual void setSettings(const IStringMap* settings) = 0;
+    virtual void setSettings(const IStringMap* settings, IError* outError) = 0;
 
     /**
      * In addition to the settings stored in a Server database, an Engine can have some settings
@@ -70,10 +76,16 @@ public:
      * but every time the Server offers the user to edit the values, it calls this method and
      * merges the received values with the ones in its database.
      *
+     * @param outError Output parameter for error reporting. Never null. Must contain
+     *     `ErrorCode::noError` error code in the case of success (`outError` object is guarnteed to
+     *     be prefilled with `noError` value, so no additional actions are required) or be properly
+     *     filled in a case of failure. The `pluginSideSettings()` method should set information
+     *     about each setting it failed to retrieve via `IError::setDetail()` method (the key is a
+     *     setting id and the value is an error message).
      * @return Engine settings that are stored on the plugin side, or null if there are no such
      *     settings.
      */
-    virtual IStringMap* pluginSideSettings() const = 0;
+    virtual IStringMap* pluginSideSettings(IError* outError) const = 0;
 
     /**
      * Provides a JSON manifest for this Engine instance. See the example of such manifest in
@@ -82,10 +94,13 @@ public:
      * After creation of this Engine instance, this method is called after setSettings(), but can
      * be called again at any other moment to obtain the most actual manifest.
      *
-     * @param outError Status of the operation; is set to noError before this call.
+     * @param outError Output parameter for error reporting. Never null. Must contain
+     *     `ErrorCode::noError` error code in the case of success (`outError` object is guarnteed to
+     *     be prefilled with `noError` value, so no additional actions are required) or be properly
+     *     filled in a case of failure.
      * @return JSON string in UTF-8.
      */
-    virtual const IString* manifest(Error* outError) const = 0;
+    virtual const IString* manifest(IError* outError) const = 0;
 
     /**
      * @return True if the Engine is able to create DeviceAgents for the provided device, false
@@ -98,11 +113,14 @@ public:
      * given device.
      *
      * @param deviceInfo Information about the device for which a DeviceAgent should be created.
-     * @param outError Status of the operation; is set to noError before this call.
+     * @param outError Output parameter for error reporting. Never null. Must contain
+     *     `ErrorCode::noError` error code in the case of success (`outError` object is guarnteed to
+     *     be prefilled with `noError` value, so no additional actions are required) or be properly
+     *     filled in a case of failure.
      * @return Pointer to an object that implements DeviceAgent interface, or null in case of
      *     failure.
      */
-    virtual IDeviceAgent* obtainDeviceAgent(const IDeviceInfo* deviceInfo, Error* outError) = 0;
+    virtual IDeviceAgent* obtainDeviceAgent(const IDeviceInfo* deviceInfo, IError* outError) = 0;
 
     /**
      * Action handler. Called when some action defined by this Engine is triggered by Server.
@@ -110,15 +128,18 @@ public:
      * @param action Provides data for the action such as metadata object for which the action has
      *     been triggered, and a means for reporting back action results to Server. This object
      *     should not be used after returning from this function.
-     * @param outError Status of the operation; is set to noError before this call.
+     * @param outError Output parameter for error reporting. Never null. Must contain
+     *     `ErrorCode::noError` error code in the case of success (`outError` object is guarnteed to
+     *     be prefilled with `noError` value, so no additional actions are required) or be properly
+     *     filled in a case of failure.
      */
-    virtual void executeAction(IAction* action, Error* outError) = 0;
+    virtual void executeAction(IAction* action, IError* outError) = 0;
 
     /**
      * @param handler Generic Engine-related events (errors, warning, info messages)
      *     might be reported via this handler.
      */
-    virtual Error setHandler(IHandler* handler) = 0;
+    virtual void setHandler(IHandler* handler) = 0;
 };
 
 } // namespace analytics

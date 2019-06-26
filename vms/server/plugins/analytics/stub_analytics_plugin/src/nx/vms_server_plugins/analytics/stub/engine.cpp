@@ -81,8 +81,7 @@ void Engine::generatePluginDiagnosticEvents()
     }
 }
 
-IDeviceAgent* Engine::obtainDeviceAgent(
-    const IDeviceInfo* deviceInfo, Error* /*outError*/)
+IDeviceAgent* Engine::obtainDeviceAgent(const IDeviceInfo* deviceInfo, IError* /*outError*/)
 {
     return new DeviceAgent(this, deviceInfo);
 }
@@ -455,7 +454,7 @@ void Engine::executeAction(
     const std::map<std::string, std::string>& params,
     std::string* outActionUrl,
     std::string* outMessageToUser,
-    Error* error)
+    IError* outError)
 {
     if (actionId == "nx.stub.addToList")
     {
@@ -510,7 +509,7 @@ void Engine::executeAction(
     else
     {
         NX_PRINT << __func__ << "(): ERROR: Unsupported actionId.";
-        *error = Error::unknownError;
+        outError->setError(ErrorCode::invalidParams, "Unsupported actionId");
     }
 }
 

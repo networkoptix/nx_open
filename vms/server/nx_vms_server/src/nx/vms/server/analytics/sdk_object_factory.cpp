@@ -7,6 +7,7 @@
 
 #include <nx/sdk/helpers/ptr.h>
 #include <nx/sdk/helpers/to_string.h>
+#include <nx/sdk/helpers/error.h>
 #include <nx/vms/server/sdk_support/utils.h>
 #include <nx/vms/server/analytics/debug_helpers.h>
 
@@ -286,8 +287,8 @@ bool SdkObjectFactory::initEngineResources()
                 continue;
             }
 
-            Error error = Error::noError;
-            const auto sdkEngine = toPtr(sdkPlugin->createEngine(&error));
+            auto error = makePtr<nx::sdk::Error>();
+            const auto sdkEngine = toPtr(sdkPlugin->createEngine(error.get()));
             if (!sdkEngine)
             {
                 NX_WARNING(this, "Unable to create a SDK engine %1 (%2)",
@@ -295,7 +296,7 @@ bool SdkObjectFactory::initEngineResources()
                 continue;
             }
 
-            if (error != Error::noError)
+            if (error->errorCode() != ErrorCode::noError)
             {
                 NX_WARNING(this,
                     "Error '%1' occured while creating a SDK engine. "

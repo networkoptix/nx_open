@@ -248,25 +248,21 @@ bool DeviceAgent::pullMetadataPackets(std::vector<IMetadataPacket*>* metadataPac
     return true;
 }
 
-Error DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes)
+void DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes, IError* /*outError*/)
 {
     if (metadataTypes->isEmpty())
-    {
         stopFetchingMetadata();
-        return Error::noError;
-    }
 
-    return startFetchingMetadata(metadataTypes);
+    startFetchingMetadata(metadataTypes);
 }
 
-Error DeviceAgent::startFetchingMetadata(const IMetadataTypes* /*metadataTypes*/)
+void DeviceAgent::startFetchingMetadata(const IMetadataTypes* /*metadataTypes*/)
 {
     NX_OUTPUT << __func__ << "() BEGIN";
     m_eventsNeeded = true;
     m_eventGenerationLoopCondition.notify_all();
     m_eventTypeId = kLineCrossingEventType; //< First event to produce.
     NX_OUTPUT << __func__ << "() END -> noError";
-    return Error::noError;
 }
 
 void DeviceAgent::stopFetchingMetadata()
@@ -331,7 +327,7 @@ void DeviceAgent::processPluginDiagnosticEvents()
     }
 }
 
-IStringMap* DeviceAgent::pluginSideSettings() const
+IStringMap* DeviceAgent::pluginSideSettings(IError* /*outError*/) const
 {
     auto settings = new StringMap();
     settings->addItem("plugin_side_number", "100");
