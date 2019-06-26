@@ -10,7 +10,6 @@ namespace api {
 
 struct Data;
 class SoftwareVersion;
-class SystemInformation;
 
 struct ParentId;
 

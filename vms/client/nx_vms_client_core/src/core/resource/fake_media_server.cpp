@@ -57,7 +57,7 @@ void QnFakeMediaServerResource::setFakeServerModuleInformation(
         emit nameChanged(toSharedPointer(this));
 
     setVersion(serverData.version);
-    setSystemInfo(serverData.systemInformation);
+    setOsInfo(serverData.osInfo);
     setSslAllowed(serverData.sslAllowed);
 
     if (serverData.ecDbReadOnly)
