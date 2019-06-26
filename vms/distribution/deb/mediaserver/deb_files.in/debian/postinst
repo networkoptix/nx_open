@@ -90,7 +90,7 @@ checkNewSystem()
     do
         sleep 1
         echo "[$i] Checking if the server is running..." >&2
-        response=$(curl -s "http://localhost:$port/api/moduleInformation" 2>/dev/null) && break
+        response=$(wget --quiet "http://localhost:$port/api/moduleInformation" -O-) && break
     done
 
     if (( i > $RETRY_COUNT ))
@@ -286,6 +286,6 @@ startServer()
 startServer || exit $?
 
 sleep 1
-echo Started service $(ps aux | grep "mediaserver-bin -e" | grep -v grep)
+echo "Started service with PID $(pidof mediaserver-bin)"
 
 displayCompleteSetupHint $PORT
