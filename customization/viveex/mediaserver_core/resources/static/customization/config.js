@@ -11,7 +11,7 @@ Config.helpLinks.push({
 });*/
 
 Config.helpLinks.push({
-    url: "https://itunes.apple.com/eg/app/id1090087835",
+    url: "https://itunes.apple.com/eg/app/id1468554421",
     title: "iOS Client",
     target: "new" // new|frame
 });
