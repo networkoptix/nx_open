@@ -32,7 +32,7 @@ public:
     LinearizationListModel(QObject* parent = nullptr);
     virtual ~LinearizationListModel() override;
 
-    QAbstractItemModel* sourceModel() const;
+    virtual QAbstractItemModel* sourceModel() const override;
     void setSourceModel(QAbstractItemModel* value); //< Does not take ownership.
 
     Q_INVOKABLE virtual QModelIndex mapToSource(const QModelIndex& index) const override;

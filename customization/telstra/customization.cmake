@@ -12,15 +12,20 @@ set(android.alias "telstra")
 set(android.storepass "5B4M2Gn5")
 set(android.keypass "S6rtgPMk")
 
+set(display_mobile_name "Telstra Video Surveillance Mobile")
+set(mobile_bundle_name "TelstraMobile")
+
 # Support section
 set(companyUrl "https://www.telstra.com.au/")
 set(productUrl "https://www.telstra.com.au/business-enterprise/solutions/security/electronic-security/managed-video-surveillance")
 set(supportUrl "")
-set(supportEmail "")
+set(supportEmail "managedvideosurveillance@team.telstra.com")
 set(supportPhone "")
 set(licenseEmail "")
 # end of Support section
 
+set(backgroundImage
+    "{\"enabled\": true, \"name\": \":/skin/background.png\", \"mode\": \"Crop\"}")
 set(defaultWebPages "{\"Home Page\": \"https://www.telstra.com.au\"}")
 
 set(customization.upgradeCode "{e216dc9d-b009-4461-82a3-ecc5d46eb528}")

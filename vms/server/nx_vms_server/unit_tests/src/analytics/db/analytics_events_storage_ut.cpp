@@ -75,7 +75,6 @@ protected:
         packets.push_back(std::make_shared<nx::common::metadata::DetectionMetadataPacket>(
             *packets.back()));
 
-        packets.back()->timestampUsec += 1000000;
         packets.back()->objects.front().bestShot = true;
 
         saveAnalyticsDataPackets(std::move(packets));

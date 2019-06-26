@@ -9,6 +9,7 @@
 #include <nx/update/update_information.h>
 #include <nx/update/persistent_update_storage.h>
 #include <nx/network/http/test_http_server.h>
+#include <nx/vms/api/data/system_information.h>
 #include <quazip/quazipfile.h>
 #include <rest/server/json_rest_handler.h>
 #include <common/common_module.h>
@@ -385,15 +386,17 @@ private:
     update::Package preparePackage(const QString& dataDir)
     {
         update::Package result;
-        result.arch = QnAppInfo::applicationArch();
+
+        const auto sysInfo = nx::vms::api::SystemInformationNew::fromLegacySystemInformation(
+            QnAppInfo::currentSystemInformation());
+
         result.component = "server";
 
         QString updateFileFullPath;
         result.file = createUpdateZip(dataDir, &result.md5, &result.size, &updateFileFullPath);
-        result.platform = QnAppInfo::applicationPlatform();
         result.url = serveUpdateFile(updateFileFullPath);
-        result.variant = QnAppInfo::applicationPlatformModification();
-        result.variantVersion = QnAppInfo::currentSystemInformation().runtimeOsVersion();
+        result.platform = sysInfo.platform;
+        result.variants.append({sysInfo.variant, sysInfo.variantVersion});
 
         return result;
     }
@@ -426,11 +429,23 @@ R"JSON({
                 .arg(QnAppInfo::applicationPlatformModification())
                 .arg(nx::network::SocketGlobals::cloud().cloudHost()).toLocal8Bit();
 
+        const auto& sysInfo = QnAppInfo::currentSystemInformationNew();
+
+        update::PackageInformation packageInfo;
+        packageInfo.version = "4.0.0.1";
+        packageInfo.component = "server";
+        packageInfo.cloudHost = nx::network::SocketGlobals::cloud().cloudHost();
+        packageInfo.platform = sysInfo.platform;
+        packageInfo.variants.append({sysInfo.variant, sysInfo.variantVersion});
+        packageInfo.installScript = "install";
+        const QByteArray& packageInfoJsonContent = QJson::serialized(packageInfo);
+
         const QString zipFileName = "update.zip";
         const QString zipFilePath = updateFilesPath + zipFileName;
 
         QList<ZipContext> zipContextList = {
             ZipContext("update.json", updateJsonContent),
+            ZipContext("package.json", packageInfoJsonContent),
             ZipContext("install", "hello")
         };
 

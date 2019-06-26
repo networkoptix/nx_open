@@ -200,8 +200,10 @@ void ObjectCache::updateObject(
 
     if (detectedObject.bestShot)
     {
+        // "Best shot" packet contains only information about the best shot, not a real object movement.
         objectContext.object.bestShot.timestampUsec = packet.timestampUsec;
         objectContext.object.bestShot.rect = detectedObject.boundingBox;
+        return;
     }
 
     objectContext.object.lastAppearanceTimeUsec = packet.timestampUsec;

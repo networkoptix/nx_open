@@ -289,6 +289,7 @@ createUpdateZip()
 
     echo "  Copying update.json for \"update\" .zip"
     cp "update/update.json" "$STAGE_MODULE/"
+    cp "package.json" "$STAGE_MODULE/"
 
     distrib_createArchive "$DISTRIBUTION_OUTPUT_DIR/$UPDATE_ZIP" "$STAGE_MODULE" \
         zip -r `# Preserve symlinks #`-y

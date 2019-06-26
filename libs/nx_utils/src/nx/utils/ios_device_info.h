@@ -2,9 +2,9 @@
 
 #include <QtCore/QString>
 
-namespace nx::media {
+namespace nx::utils {
 
-struct IosDeviceInformation
+struct NX_UTILS_API IosDeviceInformation
 {
     enum class Type
     {
@@ -17,7 +17,7 @@ struct IosDeviceInformation
     {
         iPhoneXs = 11,
         iPhone6 = 7,
-        
+
         iPadAir2 = 5,
         iPadProA12XBionic = 8
     };

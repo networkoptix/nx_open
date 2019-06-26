@@ -86,7 +86,9 @@ void DiscoveryTestSetup::onUpgradedConnectionAccepted(
     std::unique_ptr<nx::network::AbstractStreamSocket> connection)
 {
     auto webSocket = std::make_unique<nx::network::WebSocket>(
-        std::move(connection));
+        std::move(connection), nx::network::websocket::Role::server,
+        nx::network::websocket::FrameType::binary,
+        nx::network::websocket::CompressionType::perMessageDeflate);
     onWebSocketAccepted(std::move(webSocket));
 }
 

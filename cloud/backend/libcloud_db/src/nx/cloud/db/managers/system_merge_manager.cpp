@@ -347,6 +347,7 @@ void SystemMergeManager::finishMerge(
         const auto it = m_currentRequests.find(mergeRequestContextPtr);
         NX_CRITICAL(it != m_currentRequests.end());
         mergeRequestContext.swap(it->second);
+        m_currentRequests.erase(it);
     }
 
     mergeRequestContext->completionHandler(result);

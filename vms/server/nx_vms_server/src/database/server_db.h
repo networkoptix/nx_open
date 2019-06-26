@@ -84,6 +84,7 @@ private:
     bool createBookmarkTagTriggersUnderTransaction();
     bool bookmarksUniqueIdToCameraGuid();
     bool cleanupAuditLog();
+    bool updateAnalyticsEventRecords();
 
     QString getRequestStr(const QnEventLogFilterData& request,
         Qt::SortOrder order = Qt::AscendingOrder,

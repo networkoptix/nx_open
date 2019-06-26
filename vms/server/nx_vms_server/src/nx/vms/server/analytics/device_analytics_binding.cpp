@@ -57,7 +57,7 @@ DeviceAnalyticsBinding::~DeviceAnalyticsBinding()
     stopAnalytics();
 }
 
-bool DeviceAnalyticsBinding::startAnalytics(const QVariantMap& settings)
+bool DeviceAnalyticsBinding::startAnalytics(const Ptr<IStringMap>& settings)
 {
     QnMutexLocker lock(&m_mutex);
     return startAnalyticsUnsafe(settings);
@@ -69,7 +69,7 @@ void DeviceAnalyticsBinding::stopAnalytics()
     stopAnalyticsUnsafe();
 }
 
-bool DeviceAnalyticsBinding::restartAnalytics(const QVariantMap& settings)
+bool DeviceAnalyticsBinding::restartAnalytics(const Ptr<IStringMap>& settings)
 {
     QnMutexLocker lock(&m_mutex);
     stopAnalyticsUnsafe();
@@ -96,7 +96,7 @@ bool DeviceAnalyticsBinding::updateNeededMetadataTypes()
     return error == Error::noError;
 }
 
-bool DeviceAnalyticsBinding::startAnalyticsUnsafe(const QVariantMap& settings)
+bool DeviceAnalyticsBinding::startAnalyticsUnsafe(const Ptr<IStringMap>& settings)
 {
     if (!m_deviceAgent)
     {
@@ -137,10 +137,7 @@ bool DeviceAnalyticsBinding::startAnalyticsUnsafe(const QVariantMap& settings)
         return false;
     }
 
-    const auto actualSettings = setSettingsInternal(settings);
-    if (!actualSettings)
-        return false; //< Error is already logged.
-
+    setSettingsInternal(settings);
     if (!m_started)
     {
         const auto metadataTypes = neededMetadataTypes();
@@ -169,6 +166,10 @@ QVariantMap DeviceAnalyticsBinding::getSettings() const
         deviceAgent = m_deviceAgent;
     }
 
+    interactive_settings::JsonEngine jsonEngine;
+    jsonEngine.loadModelFromJsonObject(m_engine->manifest().deviceAgentSettingsModel);
+    jsonEngine.applyValues(m_device->deviceAgentSettingsValues(m_engine->getId()));
+
     if (!deviceAgent)
     {
         NX_WARNING(this, "Can't access device agent for device %1 (%2) and engine %3 (%4)",
@@ -177,15 +178,8 @@ QVariantMap DeviceAnalyticsBinding::getSettings() const
             m_engine->getName(),
             m_engine->getId());
 
-        return QVariantMap();
+        return jsonEngine.values();
     }
-
-    const auto engineManifest = m_engine->manifest();
-    interactive_settings::JsonEngine jsonEngine;
-    jsonEngine.loadModelFromJsonObject(engineManifest.deviceAgentSettingsModel);
-
-    const auto settingsFromProperty = m_device->deviceAgentSettingsValues(m_engine->getId());
-    jsonEngine.applyValues(settingsFromProperty);
 
     const auto pluginSideSettings = toPtr(deviceAgent->pluginSideSettings());
     if (!pluginSideSettings)
@@ -209,71 +203,26 @@ QVariantMap DeviceAnalyticsBinding::getSettings() const
     return jsonEngine.values();
 }
 
-void DeviceAnalyticsBinding::setSettings(const QVariantMap& settings)
+void DeviceAnalyticsBinding::setSettings(const Ptr<IStringMap>& settings)
 {
     QnMutexLocker lock(&m_mutex);
-    if (!m_deviceAgent)
-    {
-        NX_WARNING(this, "Can't access device agent for device %1 (%2) and engine %3 (%4)",
-            m_device->getUserDefinedName(),
-            m_device->getId(),
-            m_engine->getName(),
-            m_engine->getId());
-        return;
-    }
-
     setSettingsInternal(settings);
 }
 
-bool DeviceAnalyticsBinding::setSettingsInternal(const QVariantMap& settingsFromUser)
+void DeviceAnalyticsBinding::setSettingsInternal(const Ptr<IStringMap>& settings)
 {
-    Ptr<IStringMap> effectiveSettings;
-    if (pluginsIni().analyticsSettingsSubstitutePath[0] != '\0')
+    if (!m_deviceAgent)
     {
-        NX_WARNING(this, "Trying to load settings for the DeviceAgent from the file. "
-            "Device: %1 (%2), Engine: %3 (%4)",
+        NX_DEBUG(this, "Can't access device agent for device %1 (%2) and engine %3 (%4)",
             m_device->getUserDefinedName(),
             m_device->getId(),
             m_engine->getName(),
             m_engine->getId());
 
-        effectiveSettings = debug_helpers::loadDeviceAgentSettingsFromFile(
-            m_device, m_engine, pluginsIni().analyticsSettingsSubstitutePath);
+        return;
     }
 
-    if (!effectiveSettings)
-    {
-        effectiveSettings =
-            sdk_support::toIStringMap(mergeWithDbAndDefaultSettings(settingsFromUser));
-    }
-
-    if (!NX_ASSERT(effectiveSettings, lm("Device: %1 (%2), Engine: %3 (%4)").args(
-        m_device->getUserDefinedName(), m_device->getId(),
-        m_engine->getName(), m_engine->getId())))
-    {
-        return false;
-    }
-
-    if (pluginsIni().analyticsSettingsOutputPath[0] != '\0')
-    {
-        debug_helpers::dumpStringToFile(
-            this,
-            QString::fromStdString(toJsonString(effectiveSettings.get())),
-            pluginsIni().analyticsSettingsOutputPath,
-            debug_helpers::nameOfFileToDumpOrLoadData(
-                m_device,
-                m_engine,
-                nx::vms::server::resource::AnalyticsPluginResourcePtr(),
-                "_effective_settings.json"));
-    }
-
-    m_deviceAgent->setSettings(effectiveSettings.get());
-
-    m_device->setDeviceAgentSettingsValues(
-        m_engine->getId(),
-        sdk_support::fromIStringMap(effectiveSettings.get()));
-
-    return true;
+    m_deviceAgent->setSettings(settings.get());
 }
 
 void DeviceAnalyticsBinding::logIncomingFrame(nx::sdk::analytics::IDataPacket* frame)

@@ -15,7 +15,7 @@
 #include <nx/clusterdb/engine/service/service.h>
 #include <nx/clusterdb/engine/transport/p2p_websocket/connector.h>
 
-#include <nx_ec/ec_proto_version.h>
+#include <nx/vms/api/protocol_version.h>
 #include <media_server/media_server_module.h>
 #include <media_server/serverutil.h>
 #include <utils/common/util.h>
@@ -274,8 +274,8 @@ public:
         base_type("", argc, argv)
     {
         nx::clusterdb::engine::ProtocolVersionRange protocolVersionRange(
-            nx_ec::EC2_PROTO_VERSION,
-            nx_ec::EC2_PROTO_VERSION);
+            nx::vms::api::protocolVersion(),
+            nx::vms::api::protocolVersion());
         setSupportedProtocolRange(protocolVersionRange);
     }
 };

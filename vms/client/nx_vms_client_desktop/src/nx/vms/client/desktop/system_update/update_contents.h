@@ -19,10 +19,10 @@ namespace nx::vms::client::desktop {
 
 struct UpdateStrings
 {
-    Q_DECLARE_TR_FUNCTIONS(UpdateStrings);
+    Q_DECLARE_TR_FUNCTIONS(UpdateStrings)
 
 public:
-    static QString getReportForUnsupportedServer(const nx::vms::api::SystemInformation& info);
+    static QString getReportForUnsupportedOs(const nx::vms::api::SystemInformation& info);
 };
 
 /**

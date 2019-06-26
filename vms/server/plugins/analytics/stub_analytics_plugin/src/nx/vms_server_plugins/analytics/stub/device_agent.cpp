@@ -21,10 +21,11 @@
 
 #include "utils.h"
 #include "stub_analytics_plugin_ini.h"
+
+#include "objects/bicycle.h"
 #include "objects/vehicles.h"
 #include "objects/pedestrian.h"
-#include "objects/bicycle.h"
-#include "objects/random.h"
+#include "objects/human_face.h"
 
 namespace nx {
 namespace vms_server_plugins {
@@ -33,6 +34,8 @@ namespace stub {
 
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
+using namespace std::chrono;
+using namespace std::literals::chrono_literals;
 
 namespace {
 
@@ -95,7 +98,8 @@ static const std::vector<EventDescriptor> kEventsToFire = {
 DeviceAgent::DeviceAgent(Engine* engine, const nx::sdk::IDeviceInfo* deviceInfo):
     VideoFrameProcessingDeviceAgent(engine, deviceInfo, NX_DEBUG_ENABLE_OUTPUT)
 {
-    setObjectCount();
+    m_pluginEventThread = std::make_unique<std::thread>([this]() { processPluginEvents(); });
+    m_eventThread = std::make_unique<std::thread>([this]() { processEvents(); });
 }
 
 DeviceAgent::~DeviceAgent()
@@ -103,11 +107,15 @@ DeviceAgent::~DeviceAgent()
     {
         std::unique_lock<std::mutex> lock(m_pluginEventGenerationLoopMutex);
         m_terminated = true;
-        m_needToThrowPluginEvents = false;
+        m_pluginEventGenerationLoopCondition.notify_all();
+        m_eventGenerationLoopCondition.notify_all();
     }
-    m_pluginEventGenerationLoopCondition.notify_all();
+
     if (m_pluginEventThread)
         m_pluginEventThread->join();
+
+    if (m_eventThread)
+        m_eventThread->join();
 }
 
 /**
@@ -166,21 +174,8 @@ std::string DeviceAgent::manifest() const
 void DeviceAgent::settingsReceived()
 {
     parseSettings();
-
-    if (m_deviceAgentSettings.throwPluginEvents && !m_pluginEventThread)
-    {
-        NX_PRINT << __func__ << "(): Starting plugin event generation thread";
-        m_needToThrowPluginEvents = true;
-        m_pluginEventThread = std::make_unique<std::thread>([this]() { processPluginEvents(); });
-    }
-    else if (!m_deviceAgentSettings.throwPluginEvents && m_pluginEventThread)
-    {
-        NX_PRINT << __func__ << "(): Stopping plugin event generation thread";
-        m_needToThrowPluginEvents = false;
-        m_pluginEventGenerationLoopCondition.notify_all();
-        m_pluginEventThread->join();
-        m_pluginEventThread.reset();
-    }
+    updateObjectGenerationParameters();
+    updateEventGenerationParameters();
 }
 
 /** @param func Name of the caller for logging; supply __func__. */
@@ -231,7 +226,7 @@ bool DeviceAgent::pullMetadataPackets(std::vector<IMetadataPacket*>* metadataPac
     NX_OUTPUT << __func__ << "() BEGIN";
 
     const char* logMessage = "";
-    if (m_deviceAgentSettings.generateObjects)
+    if (m_deviceAgentSettings.needToGenerateObjects())
     {
         const std::vector<IMetadataPacket*> result = cookSomeObjects();
         if (!result.empty())
@@ -243,10 +238,6 @@ bool DeviceAgent::pullMetadataPackets(std::vector<IMetadataPacket*>* metadataPac
         {
             logMessage = "Generated 0 metadata packets";
         }
-    }
-    else
-    {
-        logMessage = "Objects generation disabled by .ini";
     }
 
     m_lastVideoFrameTimestampUs = 0;
@@ -269,31 +260,9 @@ Error DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes)
 Error DeviceAgent::startFetchingMetadata(const IMetadataTypes* /*metadataTypes*/)
 {
     NX_OUTPUT << __func__ << "() BEGIN";
-
+    m_eventsNeeded = true;
+    m_eventGenerationLoopCondition.notify_all();
     m_eventTypeId = kLineCrossingEventType; //< First event to produce.
-
-    if (m_deviceAgentSettings.generateEvents)
-    {
-        auto metadataDigger =
-            [this]()
-            {
-                while (!m_stopping)
-                {
-                    using namespace std::chrono_literals;
-                    pushMetadataPacket(cookSomeEvents());
-                    std::unique_lock<std::mutex> lock(m_eventGenerationLoopMutex);
-                    // Sleep until the next event needs to be generated, or the thread is ordered
-                    // to terminate (hence condition variable instead of sleep()). Return value
-                    // (whether the timeout has occurred) and spurious wake-ups are ignored.
-                    m_eventGenerationLoopCondition.wait_for(lock, 3000ms);
-                }
-            };
-
-        NX_PRINT << "Starting event generation thread";
-        if (!m_eventThread)
-            m_eventThread.reset(new std::thread(metadataDigger));
-    }
-
     NX_OUTPUT << __func__ << "() END -> noError";
     return Error::noError;
 }
@@ -301,50 +270,59 @@ Error DeviceAgent::startFetchingMetadata(const IMetadataTypes* /*metadataTypes*/
 void DeviceAgent::stopFetchingMetadata()
 {
     NX_OUTPUT << __func__ << "() BEGIN";
-    m_stopping = true;
-
-    // Wake up event generation thread to avoid waiting until its sleeping period expires.
-    m_eventGenerationLoopCondition.notify_all();
-
-    if (m_eventThread)
-    {
-        m_eventThread->join();
-        m_eventThread.reset();
-    }
-    m_stopping = false;
-
+    m_eventsNeeded = false;
     NX_OUTPUT << __func__ << "() END -> noError";
+}
+
+void DeviceAgent::processEvents()
+{
+    while (!m_terminated)
+    {
+        if (m_deviceAgentSettings.generateEvents && m_eventsNeeded)
+            pushMetadataPacket(cookSomeEvents());
+
+        std::unique_lock<std::mutex> lock(m_eventGenerationLoopMutex);
+        if (m_terminated)
+            break;
+        // Sleep until the next event needs to be generated, or the thread is ordered
+        // to terminate (hence condition variable instead of sleep()). Return value
+        // (whether the timeout has occurred) and spurious wake-ups are ignored.
+        static const seconds kEventGenerationPeriod{3};
+        m_eventGenerationLoopCondition.wait_for(lock, kEventGenerationPeriod);
+    }
 }
 
 void DeviceAgent::processPluginEvents()
 {
-    while (!m_terminated && m_needToThrowPluginEvents)
+    while (!m_terminated)
     {
-        using namespace std::chrono_literals;
+        if (m_needToThrowPluginEvents)
+        {
+            pushPluginEvent(
+                IPluginEvent::Level::info,
+                "Info message from DeviceAgent",
+                "Info message description");
 
-        pushPluginEvent(
-            IPluginEvent::Level::info,
-            "Info message from DeviceAgent",
-            "Info message description");
+            pushPluginEvent(
+                IPluginEvent::Level::warning,
+                "Warning message from DeviceAgent",
+                "Warning message description");
 
-        pushPluginEvent(
-            IPluginEvent::Level::warning,
-            "Warning message from DeviceAgent",
-            "Warning message description");
+            pushPluginEvent(
+                IPluginEvent::Level::error,
+                "Error message from DeviceAgent",
+                "Error message description");
+        }
 
-        pushPluginEvent(
-            IPluginEvent::Level::error,
-            "Error message from DeviceAgent",
-            "Error message description");
-
-        // Sleep until the next event needs to be generated, or the thread is ordered to
-        // terminate (hence condition variable instead of sleep()). Return value (whether
-        // the timeout has occurred) and spurious wake-ups are ignored.
         {
             std::unique_lock<std::mutex> lock(m_pluginEventGenerationLoopMutex);
-            if (m_terminated || !m_needToThrowPluginEvents)
+            if (m_terminated)
                 break;
-            static const std::chrono::seconds kPluginEventGenerationPeriod{5};
+
+            // Sleep until the next event needs to be generated, or the thread is ordered to
+            // terminate (hence condition variable instead of sleep()). Return value (whether
+            // the timeout has occurred) and spurious wake-ups are ignored.
+            static const seconds kPluginEventGenerationPeriod{5};
             m_pluginEventGenerationLoopCondition.wait_for(lock, kPluginEventGenerationPeriod);
         }
     }
@@ -376,23 +354,24 @@ static IObjectMetadata* makeObjectMetadata(const AbstractObject* object)
 static IObjectTrackBestShotPacket* makeObjectTrackBestShotPacket(
     const Uuid& objectTrackId,
     int64_t timestampUs,
-    float offset)
+    Rect boundingBox)
 {
     return new ObjectTrackBestShotPacket(
         objectTrackId,
         timestampUs,
-        Rect(offset, offset, 0.1F, 0.1F));
+        std::move(boundingBox));
 }
 
-void DeviceAgent::setObjectCount()
+void DeviceAgent::setObjectCount(int objectCount)
 {
-    int objectCount = m_deviceAgentSettings.numberOfObjectsToGenerate;
+    std::unique_lock<std::mutex> lock(m_objectGenerationMutex);
+
     if (objectCount < 1)
     {
-        NX_OUTPUT << "Invalid value for objectCount in .ini; assuming 1.";
+        NX_OUTPUT << "Invalid value for objectCount: " << objectCount << ", assuming 1";
         objectCount = 1;
     }
-    m_objects.resize(objectCount);
+    m_objectContexts.resize(objectCount);
 }
 
 IMetadataPacket* DeviceAgent::cookSomeEvents()
@@ -453,6 +432,8 @@ IMetadataPacket* DeviceAgent::cookSomeEvents()
 
 std::vector<IMetadataPacket*> DeviceAgent::cookSomeObjects()
 {
+    std::unique_lock<std::mutex> lock(m_objectGenerationMutex);
+
     std::vector<IMetadataPacket*> result;
     if (m_lastVideoFrameTimestampUs == 0)
         return {};
@@ -460,66 +441,60 @@ std::vector<IMetadataPacket*> DeviceAgent::cookSomeObjects()
     if (m_frameCounter % m_deviceAgentSettings.generateObjectsEveryNFrames != 0)
         return {};
 
-    float dt = m_objectCounter / 32.0F;
-    ++m_objectCounter;
-    double intPart;
-    dt = (float) modf(dt, &intPart) * 0.75F;
-    const int sequentialNumber = static_cast<int>(intPart);
-
-    for (auto& object: m_objects)
-    {
-        if (!object)
-            object = randomObject();
-        object->update();
-        if (!object->inBounds())
-            object.reset();
-    }
-
-    bool generatePreviewPacket = false;
-    if (dt < 0.5)
-    {
-        m_previewAttributesGenerated = false;
-    }
-    else if (dt > 0.5
-        && !m_previewAttributesGenerated
-        && m_deviceAgentSettings.generatePreviewPacket)
-    {
-        m_previewAttributesGenerated = true;
-        generatePreviewPacket = true;
-    }
-
     auto objectMetadataPacket = new ObjectMetadataPacket();
+    objectMetadataPacket->setTimestampUs(m_lastVideoFrameTimestampUs);
+    objectMetadataPacket->setDurationUs(0);
 
-    for (const auto& object: m_objects)
+    for (auto& context: m_objectContexts)
     {
+        if (!context)
+            context = m_objectGenerator.generate();
+
+        if (!context)
+            continue;
+
+        auto& object = context.object;
+        object->update();
+
+        if (!object->inBounds())
+            context.reset();
+
         if (!object)
             continue;
 
-        auto objectMetadata = toPtr(makeObjectMetadata(object.get()));
+        ++(context.frameCounter);
 
-        objectMetadataPacket->addItem(objectMetadata.get());
+        static const int kNumberOfFramesBeforePreviewGeneration = 60;
+        bool previewIsNeeded = m_deviceAgentSettings.generatePreviews
+            && context.frameCounter > kNumberOfFramesBeforePreviewGeneration
+            && !context.isPreviewGenerated;
 
-        if (generatePreviewPacket)
+        if (previewIsNeeded)
         {
-            if (const auto bestShotMetadataPacket = makeObjectTrackBestShotPacket(
+            const auto position = object->position();
+            const auto size = object->size();
+            auto bestShotPacket = makeObjectTrackBestShotPacket(
                 object->id(),
                 m_lastVideoFrameTimestampUs,
-                dt))
+                Rect(position.x, position.y, size.width, size.height));
+
+            if (bestShotPacket)
             {
-                result.push_back(bestShotMetadataPacket);
+                result.push_back(bestShotPacket);
+                context.isPreviewGenerated = true;
             }
         }
+
+        auto objectMetadata = toPtr(makeObjectMetadata(object.get()));
+        objectMetadataPacket->addItem(objectMetadata.get());
     }
 
-    objectMetadataPacket->setTimestampUs(m_lastVideoFrameTimestampUs);
-    objectMetadataPacket->setDurationUs(0);
     result.push_back(objectMetadataPacket);
     return result;
 }
 
 int64_t DeviceAgent::usSinceEpoch() const
 {
-    using namespace std::chrono;
     return duration_cast<microseconds>(
         system_clock::now().time_since_epoch()).count();
 }
@@ -646,10 +621,9 @@ void DeviceAgent::parseSettings()
         [this](const std::string& parameterName, std::atomic<int>* target)
         {
             using namespace nx::kit::utils;
-
             int result = 0;
             const auto parameterValueString = getParamValue(parameterName);
-            if (const bool success = fromString(parameterValueString, &result))
+            if (fromString(parameterValueString, &result))
             {
                 *target = result;
             }
@@ -663,7 +637,15 @@ void DeviceAgent::parseSettings()
         };
 
     m_deviceAgentSettings.generateEvents = toBool(getParamValue(kGenerateEventsSetting));
-    m_deviceAgentSettings.generateObjects = toBool(getParamValue(kGenerateObjectsSetting));
+    m_deviceAgentSettings.generateCars = toBool(getParamValue(kGenerateCarsSetting));
+    m_deviceAgentSettings.generateTrucks = toBool(getParamValue(kGenerateTrucksSetting));
+    m_deviceAgentSettings.generatePedestrians = toBool(getParamValue(kGeneratePedestriansSetting));
+    m_deviceAgentSettings.generateHumanFaces = toBool(getParamValue(kGenerateHumanFacesSetting));
+    m_deviceAgentSettings.generateBicycles = toBool(getParamValue(kGenerateBicyclesSetting));
+    m_deviceAgentSettings.generatePreviews = toBool(getParamValue(kGeneratePreviewPacketSetting));
+    m_deviceAgentSettings.throwPluginEvents = toBool(
+        getParamValue(kThrowPluginEventsFromDeviceAgentSetting));
+
     assignIntegerSetting(
         kGenerateObjectsEveryNFramesSetting,
         &m_deviceAgentSettings.generateObjectsEveryNFrames);
@@ -671,11 +653,31 @@ void DeviceAgent::parseSettings()
     assignIntegerSetting(
         kNumberOfObjectsToGenerateSetting,
         &m_deviceAgentSettings.numberOfObjectsToGenerate);
+}
 
-    m_deviceAgentSettings.generatePreviewPacket =
-        toBool(getParamValue(kGeneratePreviewPacketSetting));
-    m_deviceAgentSettings.throwPluginEvents =
-        toBool(getParamValue(kThrowPluginEventsFromDeviceAgentSetting));
+void DeviceAgent::updateObjectGenerationParameters()
+{
+    setObjectCount(m_deviceAgentSettings.numberOfObjectsToGenerate);
+    setIsObjectTypeGenerationNeeded<Car>(m_deviceAgentSettings.generateCars);
+    setIsObjectTypeGenerationNeeded<Truck>(m_deviceAgentSettings.generateTrucks);
+    setIsObjectTypeGenerationNeeded<Pedestrian>(m_deviceAgentSettings.generatePedestrians);
+    setIsObjectTypeGenerationNeeded<HumanFace>(m_deviceAgentSettings.generateHumanFaces);
+    setIsObjectTypeGenerationNeeded<Bicycle>(m_deviceAgentSettings.generateBicycles);
+}
+
+void DeviceAgent::updateEventGenerationParameters()
+{
+    if (m_deviceAgentSettings.throwPluginEvents)
+    {
+        NX_PRINT << __func__ << "(): Starting plugin event generation";
+        m_needToThrowPluginEvents = true;
+    }
+    else
+    {
+        NX_PRINT << __func__ << "(): Stopping plugin event generation";
+        m_needToThrowPluginEvents = false;
+        m_pluginEventGenerationLoopCondition.notify_all();
+    }
 }
 
 } // namespace stub

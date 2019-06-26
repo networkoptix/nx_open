@@ -24,7 +24,6 @@ public:
     virtual AbstractVideowallManagerPtr getVideowallManager(const Qn::UserAccessData &) override;
     virtual AbstractWebPageManagerPtr getWebPageManager(const Qn::UserAccessData &) override;
     virtual AbstractStoredFileManagerPtr getStoredFileManager(const Qn::UserAccessData &) override;
-    virtual AbstractUpdatesManagerPtr getUpdatesManager(const Qn::UserAccessData &) override;
     virtual AbstractMiscManagerPtr getMiscManager(const Qn::UserAccessData &) override;
     virtual AbstractDiscoveryManagerPtr getDiscoveryManager(const Qn::UserAccessData &) override;
     virtual AbstractAnalyticsManagerPtr getAnalyticsManager(const Qn::UserAccessData&) override;
@@ -41,7 +40,6 @@ public:
     virtual AbstractWebPageNotificationManagerPtr webPageNotificationManager() override;
     virtual AbstractDiscoveryNotificationManagerPtr discoveryNotificationManager() override;
     virtual AbstractMiscNotificationManagerPtr miscNotificationManager() override;
-    virtual AbstractUpdatesNotificationManagerPtr updatesNotificationManager() override;
     virtual AbstractStoredFileNotificationManagerPtr storedFileNotificationManager() override;
     virtual AbstractVideowallNotificationManagerPtr videowallNotificationManager() override;
     virtual AbstractAnalyticsNotificationManagerPtr analyticsNotificationManager() override;

@@ -7,8 +7,6 @@ import nx.vms.client.desktop 1.0
 
 /**
  * A tree view with multi-selection.
- *
- * To control which items are hoverable/selectable, the delegate must have "selectable" property.
  */
 Item
 {
@@ -52,20 +50,33 @@ Item
         {
             Item
             {
-                property bool selectable: !delegateLoader.item
-                    || delegateLoader.item.selectable === undefined
-                    || delegateLoader.item.selectable
+                id: treeItem
 
                 width: parent.width
                 implicitHeight: Math.max(button.implicitHeight, delegateLoader.implicitHeight)
+
+                readonly property bool isSelectable: itemFlags & Qt.ItemIsSelectable
+                readonly property bool isEditable: itemFlags & Qt.ItemIsEditable
+
+                readonly property var modelData: model
+                readonly property var modelIndex: linearizationListModel.index(index, 0)
+                readonly property int itemFlags: linearizationListModel.flags(modelIndex)
+                readonly property bool isCurrent: ListView.isCurrentItem
+                readonly property bool isSelected: selectionHighlight.visible
 
                 Rectangle
                 {
                     id: selectionHighlight
 
                     anchors.fill: parent
-                    color: selectionHighlightColor
                     visible: false
+
+                    readonly property bool isDelegateFocused: delegateLoader.item
+                        && delegateLoader.item.activeFocus
+
+                    color: listView.activeFocus && !isDelegateFocused
+                        ? selectionHighlightColor
+                        : hoverHighlightColor
 
                     Connections
                     {
@@ -100,6 +111,7 @@ Item
 
                 MouseArea
                 {
+                    id: mouseArea
                     anchors.fill: parent
 
                     onDoubleClicked:
@@ -116,6 +128,8 @@ Item
                         if (mouse.flags & Qt.MouseEventCreatedDoubleClick)
                             return
 
+                        listView.focus = true
+
                         var toggle = model && model.hasChildren
                             && button.contains(mapToItem(button, mouse.x, mouse.y))
 
@@ -125,9 +139,8 @@ Item
                             return
                         }
 
-                        if (selectable)
+                        if (isSelectable)
                         {
-                            var modelIndex = linearizationListModel.index(index, undefined)
                             if (!modelIndex.valid)
                                 return
 
@@ -146,32 +159,68 @@ Item
 
                                 selectionModel.select(selection, ItemSelectionModel.SelectCurrent)
                             }
-                            else
+                            else if (!isSelected)
                             {
                                 selectionModel.setCurrentIndex(
                                     modelIndex, ItemSelectionModel.ClearAndSelect)
                             }
+                            else
+                            {
+                                reselectOnRelease = true
+                            }
                         }
                     }
-                }
 
-                readonly property var modelData: model
-                readonly property bool isCurrent: ListView.isCurrentItem
+                    onReleased:
+                    {
+                        if (!reselectOnRelease)
+                            return
+
+                        reselectOnRelease = false
+
+                        if (modelIndex.valid && !drag.active)
+                        {
+                            selectionModel.setCurrentIndex(
+                                modelIndex, ItemSelectionModel.ClearAndSelect)
+
+                            if (isEditable)
+                                delegateLoader.startEditing()
+                        }
+                    }
+
+                    property bool reselectOnRelease: false
+                }
 
                 Loader
                 {
                     id: delegateLoader
 
-                    readonly property var model: modelData
-                    readonly property bool isCurrentItem: isCurrent
+                    readonly property var model: treeItem.modelData
+
+                    readonly property var modelIndex: linearizationListModel.mapToSource(
+                        treeItem.modelIndex)
+
+                    readonly property int itemFlags: treeItem.itemFlags
+
+                    readonly property bool isCurrent: treeItem.isCurrent
+                    readonly property bool isSelected: treeItem.isSelected
+
                     readonly property real itemIndent: x
-                    readonly property var modelIndex:
-                        linearizationListModel.mapToSource(linearizationListModel.index(index, 0))
+
+                    signal startEditing()
+                    signal finishEditing()
 
                     sourceComponent: treeView.delegate
 
                     anchors.left: button.right
                     anchors.right: parent.right
+
+                    Connections
+                    {
+                        target: selectionModel
+                        enabled: delegateLoader.isCurrent
+                        onSelectionChanged: delegateLoader.finishEditing()
+                    }
                 }
             }
         }
