@@ -59,22 +59,24 @@ private:
 class NX_NETWORK_API ScheduledUplinkSpeedTester: public aio::BasicPollable
 {
     using base_type = aio::BasicPollable;
+public:
+    static const std::chrono::milliseconds kMinTime;
+    static const std::chrono::milliseconds kMaxTime;
+    static const std::chrono::milliseconds kInvalid;
 
 public:
     /**
      * @param testSchedule is the set of local times when each test should be sheduled
      */
-	ScheduledUplinkSpeedTester(
-		const std::set<std::chrono::milliseconds>& testSchedule = {
-			std::chrono::hours(3) /*3 a.m.*/ });
+	ScheduledUplinkSpeedTester();
 	~ScheduledUplinkSpeedTester();
 
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 	virtual void stopWhileInAioThread() override;
 
     void start(const nx::utils::Url& speedTestUrl, CompletionHandler handler);
-
 	std::chrono::milliseconds waitTimeBeforeNextTest() const;
+    std::set<std::chrono::milliseconds> testSchedule() const;
 
 private:
     void scheduleNextTest(const std::chrono::milliseconds& wait);

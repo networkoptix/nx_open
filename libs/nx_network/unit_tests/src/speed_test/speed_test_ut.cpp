@@ -145,11 +145,7 @@ protected:
     {
 		using namespace std::chrono;
 
-		m_testSchedule = {
-			localNow() + milliseconds(10),
-			localNow() + seconds(15) };
-
-		m_speedTester = std::make_unique<speed_test::ScheduledUplinkSpeedTester>(m_testSchedule);
+		m_speedTester = std::make_unique<speed_test::ScheduledUplinkSpeedTester>();
 
 		m_speedTester->start(
 			validSpeedTestUrl(),
@@ -160,23 +156,20 @@ protected:
 			});
     }
 
-	void thenAllTestsArePerformed()
-	{
-		while (m_completeTests < (int) m_testSchedule.size())
+	void thenTestIsScheduledWithinRange()
 		{
-			thenTestSucceeds();
-			andTestResultIsValid();
-		}
+		for (const auto& testTime : m_speedTester->testSchedule())
+        {
+            ASSERT_TRUE(
+                m_speedTester->kMinTime <= testTime && testTime <= m_speedTester->kMaxTime);
 	}
 
-	void andTheNextTestIsScheduledWithinOneDay()
-	{
-		auto nextTestTime = m_speedTester->waitTimeBeforeNextTest();
-		ASSERT_TRUE(nextTestTime < std::chrono::hours(24));
+        auto timeout = m_speedTester->waitTimeBeforeNextTest();
+        ASSERT_TRUE(timeout != m_speedTester->kInvalid);
+        ASSERT_TRUE(m_speedTester->waitTimeBeforeNextTest() < std::chrono::hours(24));
 	}
 
 private:
-	std::set<std::chrono::milliseconds> m_testSchedule;
     std::unique_ptr<speed_test::ScheduledUplinkSpeedTester> m_speedTester;
 	std::atomic_int m_completeTests = 0;
 };
@@ -184,8 +177,7 @@ private:
 TEST_F(ScheduledUplinkSpeedTester, performs_tests_on_schedule)
 {
 	whenScheduleSpeedTest();
-	thenAllTestsArePerformed();
-	andTheNextTestIsScheduledWithinOneDay();
+    thenTestIsScheduledWithinRange();
 }
 
 } // namespace nx::network::cloud::speed_test::test

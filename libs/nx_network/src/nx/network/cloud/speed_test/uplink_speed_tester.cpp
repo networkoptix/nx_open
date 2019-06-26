@@ -14,6 +14,7 @@ namespace {
 
 static constexpr int kMaxPingRequests = 10;
 static const milliseconds kTestDuration = seconds(3);
+static const milliseconds kOneDay = hours(24);
 
 } // namespace
 
@@ -147,10 +148,15 @@ void UplinkSpeedTester::emitTestResult(
 //-------------------------------------------------------------------------------------------------
 // ScheduledUplinkSpeedTester
 
-ScheduledUplinkSpeedTester::ScheduledUplinkSpeedTester(
-    const std::set<std::chrono::milliseconds>& testSchedule):
-	m_testSchedule(testSchedule)
+const milliseconds ScheduledUplinkSpeedTester::kMinTime = hours(1);
+const milliseconds ScheduledUplinkSpeedTester::kMaxTime = hours(4);
+const milliseconds ScheduledUplinkSpeedTester::kInvalid = milliseconds(-1);
+
+ScheduledUplinkSpeedTester::ScheduledUplinkSpeedTester()
 {
+    int min = kMinTime.count();
+    int max = kMaxTime.count();
+    m_testSchedule.emplace(milliseconds(min + rand() / (RAND_MAX / (max - min + 1) + 1)));
 }
 
 ScheduledUplinkSpeedTester::~ScheduledUplinkSpeedTester()
@@ -187,9 +193,10 @@ void ScheduledUplinkSpeedTester::start(
 		});
 }
 
-std::chrono::milliseconds ScheduledUplinkSpeedTester::waitTimeBeforeNextTest() const
+milliseconds ScheduledUplinkSpeedTester::waitTimeBeforeNextTest() const
 {
-    static const milliseconds kOneDay = hours(24);
+    if (m_testSchedule.empty())
+        return kInvalid;
 
     auto now = localNow();
     std::optional<milliseconds> startTime;
@@ -211,6 +218,11 @@ std::chrono::milliseconds ScheduledUplinkSpeedTester::waitTimeBeforeNextTest() c
     }
 
     return *startTime - now;
+}
+
+std::set<milliseconds> ScheduledUplinkSpeedTester::testSchedule() const
+{
+    return m_testSchedule;
 }
 
 void ScheduledUplinkSpeedTester::scheduleNextTest(const milliseconds& wait)
