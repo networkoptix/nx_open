@@ -3,6 +3,7 @@
 #include <QtCore/QThread>
 #include <QtCore/QFileInfo>
 #include <QtCore/QJsonDocument>
+#include <QtCore/QJsonArray>
 
 #include <common/common_module.h>
 #include <common/static_common_module.h>
@@ -54,6 +55,33 @@ QDir findFolderForFile(QDir root, QString file)
             return dir;
     }
     return root;
+}
+
+QJsonArray componentsListToJson(
+    const nx::utils::OsInfo& clientOsInfo, const QSet<nx::utils::OsInfo>& serverInfoSet)
+{
+    const auto makeItem =
+        [](const QString& component, const nx::utils::OsInfo& info)
+        {
+            QJsonObject obj = info.toJson();
+            obj[QStringLiteral("component")] = component;
+            return obj;
+        };
+
+    QJsonArray result;
+    result.append(makeItem(QStringLiteral("client"), clientOsInfo));
+    for (const auto& info: serverInfoSet)
+        result.append(makeItem(QStringLiteral("server"), info));
+
+    return result;
+}
+
+QString compactPackagesQuery(const QJsonArray& packagesQuery)
+{
+    const QByteArray& json = QJsonDocument(packagesQuery).toJson(QJsonDocument::Compact);
+    QByteArray compressed = qCompress(json);
+    compressed.remove(0, 4); //< We don't need 4 bytes which are added by Qt in the beginning.
+    return QString::fromLatin1(compressed.toBase64());
 }
 
 const QString kPackageIndexFile = "packages.json";
@@ -1258,9 +1286,8 @@ QUrl generateUpdatePackageUrl(
         osInfoList.insert(server->getOsInfo());
     }
 
-    query.addQueryItem("client", nx::utils::OsInfo::current().toString());
-    for (const auto &osInfo: osInfoList)
-        query.addQueryItem("server", osInfo.toString());
+    query.addQueryItem("components",
+        compactPackagesQuery(componentsListToJson(nx::utils::OsInfo::current(), osInfoList)));
 
     QString path = qnSettings->updateCombineUrl();
     if (path.isEmpty())
