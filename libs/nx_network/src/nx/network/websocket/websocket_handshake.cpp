@@ -17,6 +17,8 @@ static const nx::Buffer kKey = "Sec-WebSocket-Key";
 static const nx::Buffer kVersion = "Sec-WebSocket-Version";
 static const nx::Buffer kProtocol = "Sec-WebSocket-Protocol";
 static const nx::Buffer kAccept = "Sec-WebSocket-Accept";
+static const nx::Buffer kExtension = "Sec-WebSocket-Extensions";
+static const nx::Buffer kCompressionAllowed = "permessage-deflate";
 
 static const nx::Buffer kVersionNum = "13";
 static const nx::Buffer kMagic = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
@@ -71,7 +73,9 @@ static Error validateRequestHeaders(const nx::network::http::HttpHeaders& header
     return Error::noError;
 }
 
-static Error validateResponseHeaders(const nx::network::http::HttpHeaders& headers, const nx::network::http::Request& request)
+static Error validateResponseHeaders(
+    const nx::network::http::HttpHeaders& headers,
+    const nx::network::http::Request& request)
 {
     if (validateHeaders(headers) != Error::noError)
         return Error::handshakeError;
@@ -111,9 +115,22 @@ nx::Buffer makeAcceptKey(const nx::Buffer& requestKey)
     return hash.result().toBase64();
 }
 
+} // namespace detail
+
+CompressionType compressionType(const nx::network::http::HttpHeaders& headers)
+{
+    auto extensionHeaderItr = headers.find(kExtension);
+    if (extensionHeaderItr != headers.cend()
+        && extensionHeaderItr->second.contains(kCompressionAllowed))
+    {
+        return CompressionType::perMessageDeflate;
+    }
+    return CompressionType::none;
 }
 
-Error validateRequest(const nx::network::http::Request& request, nx::network::http::Response* response)
+Error validateRequest(
+    const nx::network::http::Request& request,
+    nx::network::http::Response* response)
 {
     Error result = validateRequestLine(request.requestLine);
     if (result != Error::noError)
@@ -135,26 +152,39 @@ Error validateRequest(const nx::network::http::Request& request, nx::network::ht
     if (websocketProtocolIt != request.headers.cend())
         response->headers.emplace(kProtocol, websocketProtocolIt->second);
 
+    if (compressionType(request.headers) != CompressionType::none)
+        response->headers.emplace(kExtension, kCompressionAllowed);
+
     return Error::noError;
 }
 
-void addClientHeaders(nx::network::http::HttpHeaders* headers, const nx::Buffer& protocolName)
+void addClientHeaders(
+    nx::network::http::HttpHeaders* headers,
+    const nx::Buffer& protocolName,
+    CompressionType compressionType)
 {
     headers->emplace(kUpgrade, kWebsocketProtocolName);
     headers->emplace(kConnection, kUpgrade);
     headers->emplace(kKey, makeClientKey());
     headers->emplace(kVersion, kVersionNum);
     headers->emplace(kProtocol, protocolName);
+    if (compressionType != CompressionType::none)
+        headers->emplace(kExtension, kCompressionAllowed);
 }
 
-void addClientHeaders(nx::network::http::AsyncClient* request, const nx::Buffer& protocolName)
+void addClientHeaders(
+    nx::network::http::AsyncClient* request,
+    const nx::Buffer& protocolName,
+    CompressionType compressionType)
 {
     nx::network::http::HttpHeaders headers;
-    addClientHeaders(&headers, protocolName);
+    addClientHeaders(&headers, protocolName, compressionType);
     request->setAdditionalHeaders(std::move(headers));
 }
 
-Error validateResponse(const nx::network::http::Request& request, const nx::network::http::Response& response)
+Error validateResponse(
+    const nx::network::http::Request& request,
+    const nx::network::http::Response& response)
 {
     if (response.statusLine.statusCode != nx::network::http::StatusCode::switchingProtocols)
         return Error::handshakeError;

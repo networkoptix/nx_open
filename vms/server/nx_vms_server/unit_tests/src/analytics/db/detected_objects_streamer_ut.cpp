@@ -94,8 +94,6 @@ public:
             });
     }
 
-    virtual void closeCursor(const std::shared_ptr<AbstractCursor>& /*cursor*/) override {}
-
     virtual void lookup(
         Filter /*filter*/,
         LookupCompletionHandler /*completionHandler*/) override

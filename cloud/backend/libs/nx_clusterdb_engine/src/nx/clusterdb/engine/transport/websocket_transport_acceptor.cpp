@@ -71,6 +71,7 @@ void WebSocketTransportAcceptor::createConnection(
     p2p::serializePeerData(*response, localPeer, remotePeerInfo.dataFormat);
 
     auto error = websocket::validateRequest(request, response);
+    const auto compressionType = websocket::compressionType(request.headers);
     if (error != websocket::Error::noError)
     {
         NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this),
@@ -82,7 +83,7 @@ void WebSocketTransportAcceptor::createConnection(
     nx::network::http::RequestResult result(nx::network::http::StatusCode::switchingProtocols);
     result.connectionEvents.onResponseHasBeenSent =
         [this, localPeer = std::move(localPeer), remotePeerInfo = std::move(remotePeerInfo),
-            request = std::move(request), systemId](
+            request = std::move(request), systemId, compressionType](
                 network::http::HttpServerConnection* connection) mutable
         {
             addWebSocketTransactionTransport(
@@ -90,7 +91,8 @@ void WebSocketTransportAcceptor::createConnection(
                 std::move(localPeer),
                 std::move(remotePeerInfo),
                 systemId,
-                network::http::getHeaderValue(request.headers, "User-Agent").toStdString());
+                network::http::getHeaderValue(request.headers, "User-Agent").toStdString(),
+                compressionType);
         };
     completionHandler(std::move(result));
 }
@@ -100,11 +102,13 @@ void WebSocketTransportAcceptor::addWebSocketTransactionTransport(
     vms::api::PeerDataEx localPeerInfo,
     vms::api::PeerDataEx remotePeerInfo,
     const std::string& systemId,
-    const std::string& userAgent)
+    const std::string& userAgent,
+    nx::network::websocket::CompressionType compressionType)
 {
     const auto remoteAddress = connection->getForeignAddress();
     auto p2pTransport = std::make_unique<p2p::P2PWebsocketTransport>(
-        std::move(connection), network::websocket::FrameType::binary);
+        std::move(connection), network::websocket::Role::server,
+        network::websocket::FrameType::binary, compressionType);
 
     p2pTransport->start();
     const auto connectionId = QnUuid::createUuid().toSimpleString().toStdString();

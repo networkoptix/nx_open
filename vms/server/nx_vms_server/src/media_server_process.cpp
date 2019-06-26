@@ -3714,6 +3714,7 @@ void MediaServerProcess::stopObjects()
     serverModule()->analyticsManager()->stop(); //< Stop processing analytics events.
     serverModule()->pluginManager()->unloadPlugins();
     serverModule()->eventRuleProcessor()->stop();
+    serverModule()->p2pDownloader()->stopDownloads();
 
     //since mserverResourceDiscoveryManager instance is dead no events can be delivered to serverResourceProcessor: can delete it now
     //TODO refactoring of discoveryManager <-> resourceProcessor interaction is required
@@ -4785,6 +4786,7 @@ protected:
             return 0;
 
         int res = application()->exec();
+        qnStaticCommon->instance<QnLongRunnablePool>()->stopAll();
 
         m_main.reset();
 

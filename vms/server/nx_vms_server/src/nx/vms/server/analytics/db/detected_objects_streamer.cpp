@@ -41,9 +41,10 @@ QnAbstractCompressedMetadataPtr DetectedObjectsStreamer::getMotionData(qint64 ti
         return nullptr;
     }
 
-    NX_VERBOSE(this, lm("Returning packet with timestamp %1 vs %2 requested. Difference %3 ms")
+    NX_VERBOSE(this, lm("Returning packet with timestamp %1 vs %2 requested. Difference %3 ms. packet %4")
         .args(m_packetCache.front()->timestampUsec / kUsecPerMs, timeUsec / kUsecPerMs,
-            (timeUsec - m_packetCache.front()->timestampUsec) / kUsecPerMs));
+            (timeUsec - m_packetCache.front()->timestampUsec) / kUsecPerMs,
+            *m_packetCache.front()));
 
     auto resultPacket = std::move(m_packetCache.front());
     m_packetCache.pop_front();
@@ -66,7 +67,6 @@ void DetectedObjectsStreamer::reinitializeCursorIfTimeDiscontinuityPresent(qint6
             NX_VERBOSE(this, lm("Detected %1 usec gap in timestamps requested. Re-creating cursor")
                 .args(timeUsec - m_prevRequestedTimestamp));
             m_packetCache.clear();
-            m_storage->closeCursor(m_cursor);
             m_cursor.reset();
         }
     }
@@ -100,7 +100,6 @@ bool DetectedObjectsStreamer::readPacketForTimestamp(qint64 timeUsec)
         {
             NX_VERBOSE(this, lm("Closing cursor. Device %1, timestamp %2")
                 .args(m_deviceId, timeUsec / kUsecPerMs));
-            m_storage->closeCursor(m_cursor);
             m_cursor.reset();
             return false;
         }
@@ -112,8 +111,9 @@ bool DetectedObjectsStreamer::readPacketForTimestamp(qint64 timeUsec)
                 break;
             if ((*nextIt)->timestampUsec > timeUsec)
                 break;
-            NX_VERBOSE(this, lm("Skipping packet with timestamp %1")
-                .args((*it)->timestampUsec / kUsecPerMs));
+            NX_VERBOSE(this, "Skipping packet with timestamp %1 since it is in the past for %2",
+                milliseconds((*it)->timestampUsec / kUsecPerMs), 
+                milliseconds((timeUsec - (*nextIt)->timestampUsec) / kUsecPerMs));
             it = m_packetCache.erase(it);
         }
 
@@ -152,7 +152,7 @@ void DetectedObjectsStreamer::createCursorAsync(
         std::move(filter),
         [this, sharedGuard = m_asyncOperationGuard.sharedGuard(), handler = std::move(handler)](
             ResultCode resultCode,
-            std::shared_ptr<AbstractCursor> cursor)
+            std::unique_ptr<AbstractCursor> cursor)
         {
             const auto lock = sharedGuard->lock();
             if (!lock)
@@ -160,7 +160,7 @@ void DetectedObjectsStreamer::createCursorAsync(
 
             NX_VERBOSE(this, lm("Created cursor. Device %1, resultCode %2")
                 .args(m_deviceId, QnLexical::serialized(resultCode)));
-            m_cursor = cursor;
+            m_cursor = std::move(cursor);
             handler(resultCode);
         });
 }
