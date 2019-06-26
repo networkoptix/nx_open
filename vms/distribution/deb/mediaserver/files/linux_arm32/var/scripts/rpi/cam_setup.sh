@@ -98,15 +98,15 @@ configureV4L2()
 
     if ! grep -q "repeat_sequence_header" "$file"
     then
-        # Put command above exit 0 line. This command is needed to repeat PPS and SPS
-        # for every I-frame.
+        # Put the v4l2-ctl command above `exit 0` line. This command is needed to repeat PPS and
+        # SPS for every I-frame.
         sed -i "/exit 0$/i v4l2-ctl --set-ctrl repeat_sequence_header=1" "$file"
     fi
 
     if ! grep -q "h264_i_frame_period" "$file"
     then
-        # Put command above exit 0 line. This command is needed for setting the I-frame
-        # period equal to 15.
+        # Put the v4l2-ctl command above `exit 0` line. This command is needed for setting the
+        # I-frame period equal to 15.
         sed -i "/exit 0$/i v4l2-ctl --set-ctrl h264_i_frame_period=15" "$file"
     fi
 }

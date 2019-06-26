@@ -264,15 +264,25 @@ void MutexLockAnalyzer::afterMutexLocked(const MutexLockKey& mutexLockPosition)
         return;
     }
 
+    if (mutexLockPosition.recursive)
+    {
+        const auto it = std::find_if(
+            threadContext->currentLockPath.begin(), threadContext->currentLockPath.end(),
+            [mutexLockPosition](const auto& item)
+            {
+                return item.mutexPtr == mutexLockPosition.mutexPtr;
+            });
+        if (it != threadContext->currentLockPath.end())
+        {
+            // Recursive lock: not checking deadlocks.
+            threadContext->currentLockPath.push_front(mutexLockPosition);
+            return;
+        }
+    }
+
     const MutexLockKey& prevLock = threadContext->currentLockPath.front();
     if (prevLock.mutexPtr == mutexLockPosition.mutexPtr)
     {
-        if (mutexLockPosition.recursive)
-        {
-            ++threadContext->currentLockPath.front().lockRecursionDepth;
-            return;     //ignoring recursive lock
-        }
-
         threadContext->currentLockPath.push_front(mutexLockPosition);
         const auto deadLockMsg = lm(
             "Detected deadlock. Double mutex lock. Path:\n"

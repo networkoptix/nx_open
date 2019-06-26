@@ -50,7 +50,8 @@ enum class StreamQuality
     high = 3,
     highest = 4,
     preset = 5,
-    undefined = 6
+    undefined = 6,
+    rapidReview = 7, //< Used for rapid review only. The bitrate should be very high.
 };
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(StreamQuality)
 

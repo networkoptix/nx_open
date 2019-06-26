@@ -356,10 +356,14 @@ void ConnectionProcessor::run()
     P2pTransportPtr p2pTransport;
     const auto dataFormat = remotePeer.dataFormat == Qn::JsonFormat
         ? websocket::FrameType::text : websocket::FrameType::binary;
+    auto compressionType = websocket::compressionType(d->request.headers);
+
 
     if (useWebSocket)
     {
-        p2pTransport = std::make_unique<P2PWebsocketTransport>(std::move(d->socket), dataFormat);
+        p2pTransport = std::make_unique<P2PWebsocketTransport>(
+            std::move(d->socket), nx::network::websocket::Role::server, dataFormat,
+            compressionType);
         p2pTransport->start();
 
         messageBus->gotConnectionFromRemotePeer(

@@ -93,8 +93,6 @@ AbstractPeerManager::RequestContext<QByteArray> InternetOnlyPeerManager::downloa
                 setPromiseValueIfEmpty(promise, {httpClient->fetchMessageBodyBuffer()});
             else
                 setPromiseValueIfEmpty(promise, {});
-
-            httpClient->pleaseStopSync();
         });
 
     auto cancelRequest =
