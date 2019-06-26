@@ -16,7 +16,7 @@
 #include <rest/server/json_rest_result.h>
 #include <api/server_rest_connection_fwd.h>
 
-class QnMultiserverRequestData;
+struct QnMultiserverRequestData;
 
 class QnCameraBookmarksManagerPrivate:
     public Connective<QObject>,
