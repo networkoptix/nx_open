@@ -16,7 +16,6 @@
 #include <managers/user_manager.h>
 #include <managers/videowall_manager.h>
 #include <managers/webpage_manager.h>
-#include <managers/updates_manager.h>
 #include <managers/misc_manager.h>
 #include <managers/discovery_manager.h>
 #include <managers/analytics_manager.h>
@@ -53,7 +52,6 @@ public:
     virtual AbstractVideowallManagerPtr getVideowallManager(const Qn::UserAccessData &userAccessData) override;
     virtual AbstractWebPageManagerPtr getWebPageManager(const Qn::UserAccessData &userAccessData) override;
     virtual AbstractStoredFileManagerPtr getStoredFileManager(const Qn::UserAccessData &userAccessData) override;
-    virtual AbstractUpdatesManagerPtr getUpdatesManager(const Qn::UserAccessData &userAccessData) override;
     virtual AbstractMiscManagerPtr getMiscManager(const Qn::UserAccessData &userAccessData) override;
     virtual AbstractDiscoveryManagerPtr getDiscoveryManager(const Qn::UserAccessData &userAccessData) override;
     virtual AbstractAnalyticsManagerPtr getAnalyticsManager(
@@ -71,7 +69,6 @@ public:
     virtual AbstractWebPageNotificationManagerPtr webPageNotificationManager() override;
     virtual AbstractDiscoveryNotificationManagerPtr discoveryNotificationManager() override;
     virtual AbstractMiscNotificationManagerPtr miscNotificationManager() override;
-    virtual AbstractUpdatesNotificationManagerPtr updatesNotificationManager() override;
     virtual AbstractStoredFileNotificationManagerPtr storedFileNotificationManager() override;
     virtual AbstractVideowallNotificationManagerPtr videowallNotificationManager() override;
     virtual AbstractAnalyticsNotificationManagerPtr
@@ -121,7 +118,6 @@ protected:
     QnVideowallNotificationManagerPtr m_videowallNotificationManager;
     QnWebPageNotificationManagerPtr m_webPageNotificationManager;
     QnStoredFileNotificationManagerPtr m_storedFileNotificationManager;
-    QnUpdatesNotificationManagerPtr m_updatesNotificationManager;
     QnMiscNotificationManagerPtr m_miscNotificationManager;
     QnDiscoveryNotificationManagerPtr m_discoveryNotificationManager;
     QnTimeNotificationManagerPtr m_timeNotificationManager;
@@ -148,7 +144,6 @@ BaseEc2Connection<QueryProcessorType>::BaseEc2Connection(
     m_videowallNotificationManager(new QnVideowallNotificationManager),
     m_webPageNotificationManager(new QnWebPageNotificationManager),
     m_storedFileNotificationManager(new QnStoredFileNotificationManager),
-    m_updatesNotificationManager(new QnUpdatesNotificationManager),
     m_miscNotificationManager(new QnMiscNotificationManager),
     m_discoveryNotificationManager(new QnDiscoveryNotificationManager(commonModule())),
     m_timeNotificationManager(new QnTimeNotificationManager(connectionFactory->timeSyncManager())),
@@ -169,7 +164,6 @@ BaseEc2Connection<QueryProcessorType>::BaseEc2Connection(
             m_videowallNotificationManager.get(),
             m_webPageNotificationManager.get(),
             m_storedFileNotificationManager.get(),
-            m_updatesNotificationManager.get(),
             m_miscNotificationManager.get(),
             m_discoveryNotificationManager.get(),
             m_analyticsNotificationManager.get()));
@@ -372,21 +366,6 @@ AbstractStoredFileNotificationManagerPtr
     BaseEc2Connection<QueryProcessorType>::storedFileNotificationManager()
 {
     return m_storedFileNotificationManager;
-}
-
-template<class QueryProcessorType>
-AbstractUpdatesNotificationManagerPtr
-    BaseEc2Connection<QueryProcessorType>::updatesNotificationManager()
-{
-    return m_updatesNotificationManager;
-}
-
-template<class QueryProcessorType>
-AbstractUpdatesManagerPtr BaseEc2Connection<QueryProcessorType>::getUpdatesManager(
-    const Qn::UserAccessData& userAccessData)
-{
-    return std::make_shared<QnUpdatesManager<QueryProcessorType>>(
-        m_queryProcessor, userAccessData, messageBus());
 }
 
 template<class QueryProcessorType>

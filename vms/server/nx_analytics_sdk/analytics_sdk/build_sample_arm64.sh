@@ -10,5 +10,5 @@ set -x #< Log each command.
 
 "$BASE_DIR"/build_sample.sh \
     --no-tests \
-    -DCMAKE_TOOLCHAIN_FILE=$BASE_DIR/nvidia_tegra_toolchain.cmake \
+    -DCMAKE_TOOLCHAIN_FILE=$BASE_DIR/toolchain_arm64.cmake \
     "$@"

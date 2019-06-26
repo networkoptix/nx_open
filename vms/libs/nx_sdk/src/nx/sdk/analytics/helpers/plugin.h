@@ -38,7 +38,7 @@ public:
 
     virtual ~Plugin() override;
 
-    const Ptr<IUtilityProvider>& utilityProvider() const { return m_utilityProvider; }
+    Ptr<IUtilityProvider> utilityProvider() const { return m_utilityProvider; }
 
 //-------------------------------------------------------------------------------------------------
 // Not intended to be used by a descendant.

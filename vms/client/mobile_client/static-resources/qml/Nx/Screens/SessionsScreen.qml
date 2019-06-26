@@ -19,7 +19,7 @@ Page
     [
         Button
         {
-            text: qsTr("Log in to %1").arg(applicationInfo.cloudName())
+            text: qsTr("Log in to %1", "%1 is the short cloud name (like 'Cloud')").arg(applicationInfo.cloudName())
             textColor: ColorTheme.base16
             flat: true
             leftPadding: 0
@@ -143,7 +143,8 @@ Page
         title: qsTr("No Systems found")
         description: qsTr(
              "Check your network connection or press \"%1\" button "
-                 + "to enter a known server address.").arg(customConnectionButton.text)
+                 + "to enter a known server address.",
+             "%1 is a button name").arg(customConnectionButton.text)
         visible: false
 
         Timer
@@ -160,7 +161,7 @@ Page
     function openConnectionWarningDialog(systemName)
     {
         var message = systemName ?
-                    qsTr("Cannot connect to System \"%1\"").arg(systemName) :
+                    qsTr("Cannot connect to System \"%1\"", "%1 is a system name").arg(systemName) :
                     qsTr("Cannot connect to Server")
         Workflow.openStandardDialog(
             message, qsTr("Check your network connection or contact a system administrator"))

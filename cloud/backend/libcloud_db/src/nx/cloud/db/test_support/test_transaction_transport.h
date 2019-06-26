@@ -1,6 +1,5 @@
 #pragma once
 
-#include <nx_ec/ec_proto_version.h>
 #include <transaction/transaction_transport_base.h>
 
 namespace nx::cloud::db {

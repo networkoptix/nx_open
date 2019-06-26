@@ -35,7 +35,7 @@
 #include <core/resource/media_server_user_attributes.h>
 #include <licensing/license.h>
 #include <network/router.h>
-#include <nx_ec/ec_proto_version.h>
+#include <nx/vms/api/protocol_version.h>
 #include <utils/common/app_info.h>
 #include <nx/vms/utils/installation_info.h>
 
@@ -196,7 +196,7 @@ QnCommonModule::QnCommonModule(bool clientMode,
     m_runUuid = QnUuid::createUuid();
     m_startupTime = QDateTime::currentDateTime();
 
-    m_moduleInformation.protoVersion = nx_ec::EC2_PROTO_VERSION;
+    m_moduleInformation.protoVersion = nx::vms::api::protocolVersion();
     m_moduleInformation.systemInformation = QnAppInfo::currentSystemInformation();
     m_moduleInformation.hwPlatform = nx::vms::utils::installationInfo().hwPlatform;
     m_moduleInformation.brand = QnAppInfo::productNameShort();

@@ -48,7 +48,6 @@
 #include <nx/network/socket_global.h>
 
 #include <helpers/system_weight_helper.h>
-#include <nx_ec/ec_proto_version.h>
 
 #include <platform/hardware_information.h>
 

@@ -62,6 +62,7 @@ struct QnStartupParameters
     QnUuid videoWallGuid;
     QnUuid videoWallItemGuid;
     QString engineVersion;
+    int vmsProtocolVersion = 0;
     QString ipVersion;
 
     /** Uri when the client was launched as uri handler. */

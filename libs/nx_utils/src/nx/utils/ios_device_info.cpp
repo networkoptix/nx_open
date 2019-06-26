@@ -7,7 +7,7 @@
 
 #endif // if defined (Q_OS_IOS)
 
-namespace nx::media {
+namespace nx::utils {
 
 bool IosDeviceInformation::operator==(const IosDeviceInformation& other) const
 {

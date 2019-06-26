@@ -84,7 +84,7 @@ rest::Response LocalRestHandler::executeGet(const rest::Request& request)
 
     std::optional<std::chrono::milliseconds> timeLine;
     if (const auto value = request.param("timeLine"))
-        timeLine = nx::utils::parseTimerDuration(*value, std::chrono::hours(24));
+        timeLine = nx::utils::parseTimerDuration(*value);
 
     if (request.path().endsWith("/values"))
         return rest::Response::reply(cleanJson(m_controller->values(applyRules, timeLine)));

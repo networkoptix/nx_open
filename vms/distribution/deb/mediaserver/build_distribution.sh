@@ -305,7 +305,9 @@ createUpdateZip() # file.deb
     fi
 
     cp -r "update/update.json" "$ZIP_DIR/update.json"
+    cp "package.json" "$ZIP_DIR/"
     distrib_createArchive "$DISTRIBUTION_OUTPUT_DIR/$UPDATE_ZIP" "$ZIP_DIR" zip -r
+    rm "$ZIP_DIR/package.json" #< Legacy RPI/Bananapi packages does not need this file.
 
     if [[ $TARGET_DEVICE == "linux_arm32" ]]
     then

@@ -71,6 +71,8 @@ void CmdLineArguments::init(const QStringList& arguments)
         lit("This help message"), true);
     commandLineParser.addParameter(&engineVersion, "--override-version", NULL,
         lit("Force the other engine version"), QString());
+    commandLineParser.addParameter(&vmsProtocolVersion, "--override-protocol-version", nullptr,
+        "Force VMS protocol version", QString());
     commandLineParser.addParameter(&enforceSocketType, "--enforce-socket", NULL,
         lit("Enforces stream socket type (TCP, UDT)"), QString());
     commandLineParser.addParameter(&enforcedMediatorEndpoint, "--enforce-mediator", NULL,

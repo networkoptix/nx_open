@@ -1,38 +1,27 @@
 #pragma once
 
-#include <nx/sdk/helpers/ptr.h>
-#include <nx/sdk/helpers/ref_countable.h>
 #include <nx/sdk/i_utility_provider.h>
-#include <nx/vms/server/plugins/time_utility_provider.h>
-#include <nx/vms/server/plugins/plugin_home_dir_utility_provider.h>
+#include <nx/sdk/helpers/ref_countable.h>
 
 class PluginManager;
+namespace nx::sdk { class IPlugin; }
 
 namespace nx::vms::server::plugins {
 
 class UtilityProvider: public nx::sdk::RefCountable<nx::sdk::IUtilityProvider>
 {
 public:
-    UtilityProvider(PluginManager* pluginManager): m_pluginManager(pluginManager) {}
+    UtilityProvider(PluginManager* pluginManager, const nx::sdk::IPlugin* plugin);
 
-    virtual IRefCountable* queryInterface(InterfaceId id) override
-    {
-        if (const auto ptr = IUtilityProvider::queryInterface(id))
-            return ptr;
-        if (const auto ptr = m_timeUtilityProvider->queryInterface(id))
-            return ptr;
-        if (const auto ptr = m_pluginHomeDirUtilityProvider->queryInterface(id))
-            return ptr;
-        return nullptr;
-    }
+    virtual IRefCountable* queryInterface(InterfaceId id) override;
+
+    virtual int64_t vmsSystemTimeSinceEpochMs() const override;
+
+    virtual const nx::sdk::IString* homeDir() const override;
 
 private:
-    PluginManager* const m_pluginManager;
-
-    nx::sdk::Ptr<TimeUtilityProvider> m_timeUtilityProvider{new TimeUtilityProvider()};
-
-    nx::sdk::Ptr<PluginHomeDirUtilityProvider> m_pluginHomeDirUtilityProvider{
-        new PluginHomeDirUtilityProvider(m_pluginManager)};
+    PluginManager* const m_pluginManager; /**< Never null (asserted in the constructor). */
+    const nx::sdk::IPlugin* const m_plugin; /**< Can be null for old SDK plugins. */
 };
 
 } // namespace nx::vms::server::plugins

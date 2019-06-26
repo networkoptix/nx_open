@@ -61,7 +61,7 @@ private:
     mutable std::mutex m_pluginEventGenerationLoopMutex;
     mutable std::condition_variable m_pluginEventGenerationLoopCondition;
 
-    std::unique_ptr<std::thread> m_thread;
+    std::unique_ptr<std::thread> m_pluginEventThread;
     std::atomic<bool> m_terminated{false};
     std::atomic<bool> m_needToThrowPluginEvents{false};
 
@@ -71,14 +71,19 @@ private:
     PixelFormat m_pixelFormat = PixelFormat::yuv420;
 };
 
-static const std::string kGenerateEventsSetting{"generateEvents"};
-static const std::string kGenerateObjectsSetting{"generateObjects"};
-static const std::string kGenerateObjectsEveryNFramesSetting{"generateObjectsEveryNFrames"};
-static const std::string kNumberOfObjectsToGenerateSetting{"numberOfObjectsToGenerate"};
-static const std::string kGeneratePreviewPacketSetting{"generatePreviewPacket"};
-static const std::string kThrowPluginEventsFromEngineSetting{"throwPluginEventsFromDeviceAgent"};
-static const std::string kThrowPluginEventsFromDeviceAgentSetting{
-    "throwPluginEventsFromDeviceAgent"};
+const std::string kGenerateEventsSetting{"generateEvents"};
+const std::string kGenerateCarsSetting{"generateCars"};
+const std::string kGenerateTrucksSetting{"generateTrucks"};
+const std::string kGeneratePedestriansSetting{"generatePedestrians"};
+const std::string kGenerateHumanFacesSetting{"generateHumanFaces"};
+const std::string kGenerateBicyclesSetting{"generateBicycles"};
+
+const std::string kGenerateObjectsEveryNFramesSetting{"generateObjectsEveryNFrames"};
+const std::string kNumberOfObjectsToGenerateSetting{"numberOfObjectsToGenerate"};
+const std::string kGeneratePreviewPacketSetting{"generatePreviewPacket"};
+const std::string kThrowPluginEventsFromDeviceAgentSetting{"throwPluginEventsFromDeviceAgent"};
+
+const std::string kThrowPluginEventsFromEngineSetting{"throwPluginEventsFromDeviceAgent"};
 
 } // namespace stub
 } // namespace analytics

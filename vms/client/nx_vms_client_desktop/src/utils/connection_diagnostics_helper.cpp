@@ -28,6 +28,7 @@
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/socket_global.h>
 #include <nx/vms/api/data/software_version.h>
+#include <nx/vms/api/protocol_version.h>
 
 using namespace nx::vms::client::desktop;
 
@@ -83,7 +84,7 @@ QString QnConnectionDiagnosticsHelper::getErrorDescription(
     if (ini().developerMode)
     {
         addRow(lit("Protocol: %1, Cloud: %2")
-            .arg(QnAppInfo::ec2ProtoVersion())
+            .arg(nx::vms::api::protocolVersion())
             .arg(nx::network::SocketGlobals::cloud().cloudHost()));
     }
 
@@ -320,7 +321,7 @@ QString QnConnectionDiagnosticsHelper::getDiffVersionFullExtras(
     QString devModeText;
     if (ini().developerMode)
     {
-        devModeText += L'\n' + lit("Client Protocol: %1").arg(QnAppInfo::ec2ProtoVersion());
+        devModeText += L'\n' + lit("Client Protocol: %1").arg(nx::vms::api::protocolVersion());
         devModeText += L'\n' + lit("Server Protocol: %1").arg(serverInfo.nxClusterProtoVersion);
         devModeText += L'\n' + lit("Client Cloud Host: %1").arg(nx::network::SocketGlobals::cloud().cloudHost());
         devModeText += L'\n' + lit("Server Cloud Host: %1").arg(serverInfo.cloudHost);

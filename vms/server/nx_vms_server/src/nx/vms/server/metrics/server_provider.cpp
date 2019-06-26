@@ -64,7 +64,7 @@ ServerProvider::ParameterProviders ServerProvider::makeProviders()
         ),
         singleParameterProvider(
             {"upTime", "UP-time"},
-            [](const auto& /*resource*/) { return Value("???"); } //< TODO: Implement.
+            [](const auto& /*resource*/) { return Value("1 day 23:45:06"); } //< TODO: Implement.
         ),
         singleParameterProvider(
             {"systemInfo", "system information"},
@@ -76,11 +76,11 @@ ServerProvider::ParameterProviders ServerProvider::makeProviders()
         ),
         singleParameterProvider(
             {"localTime", "time on server"},
-            [](const auto& /*resource*/) { return Value("???"); } //< TODO: Implement.
+            [](const auto& /*resource*/) { return Value("2019-01-02 12:34:56"); } //< TODO: Implement.
         ),
         singleParameterProvider(
             {"timeZone", "time zone"},
-            [](const auto& /*resource*/) { return Value("???"); } //< TODO: Implement.
+            [](const auto& /*resource*/) { return Value("UTC"); } //< TODO: Implement.
         ),
         singleParameterProvider(
             {"cpuUsage", "CPU Usage", "%"},

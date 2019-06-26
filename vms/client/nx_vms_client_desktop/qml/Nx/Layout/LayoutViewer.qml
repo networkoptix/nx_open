@@ -28,8 +28,10 @@ Control
         if (resource)
         {
             for (var i = 0; i < repeater.count; ++i)
+            {
                 if (getResource(repeater.itemAt(i).contentItem) === resource)
                     return true
+            }
         }
 
         return false
