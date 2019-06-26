@@ -12,10 +12,40 @@ LOG_FILE="$LOGS_DIR/build_distribution.log"
 # TODO: Create the "stage" in $WORK_DIR.
 SRC=./dmg-folder
 VOLUME_NAME="$DISPLAY_PRODUCT_NAME $RELEASE_VERSION"
-FAKE_DIR="./fake-folder"
+BACKGROUND_PATH="$SRC/.background/dmgBackground.png"
+PACKAGE_ICON_PATH="$SRC/.VolumeIcon.icns"
+TMP_DMG_SETTINGS="settings.json"
 
 APP_NAME="$DISPLAY_PRODUCT_NAME.app"
 APP_DIR="$SRC/$APP_NAME"
+
+buildDmg()
+{
+    test -f $DISTRIBUTION_DMG && rm $DISTRIBUTION_DMG
+
+    echo "{
+        \"title\": \"$VOLUME_NAME\",
+        \"background\": \"$BACKGROUND_PATH\",
+        \"format\": \"UDZO\",
+        \"compression-level\": 9,
+        \"icon\": \"$PACKAGE_ICON_PATH\",
+        \"icon-size\": 64,
+        \"window\": 
+        { 
+            \"position\": { \"x\": 200, \"y\": 200 },
+            \"size\": { \"width\": 600, \"height\": 400 } 
+        },
+        \"contents\": 
+        [
+            { \"x\": 134, \"y\": 236, \"type\": \"file\", \"path\": \"$APP_DIR\" },
+            { \"x\": 466, \"y\": 236, \"type\": \"link\", \"path\": \"/Applications\" }
+        ]
+    }
+    " > "$TMP_DMG_SETTINGS"
+
+    dmgbuild -s "$TMP_DMG_SETTINGS" "$VOLUME_NAME" "$DISTRIBUTION_DMG"
+    rm -rf "$TMP_DMG_SETTINGS"
+}
 
 copyMacOsSpecificApplauncherStuff()
 {
@@ -59,20 +89,7 @@ buildDistribution()
         codesign -f -v --deep $KEYCHAIN_ARGS -s "$MAC_SIGN_IDENTITY" "$APP_DIR"
     fi
  
-    mkdir -p "$FAKE_DIR"
-
-    test -f $DISTRIBUTION_DMG && rm $DISTRIBUTION_DMG
-    create-dmg \
-        --volname "$VOLUME_NAME" \
-        --volicon "$SRC/.VolumeIcon.icns" \
-        --window-size 600 400 \
-        --icon-size 48 \
-        --background "$SRC/.background/dmgBackground.png" \
-        --app-drop-link 466 236 \
-        --add-folder "$APP_NAME" "$APP_DIR" 134 236 \
-        "$DISTRIBUTION_DMG" "$FAKE_DIR"
-
-    rm -rf "$FAKE_DIR"
+    buildDmg
 
     mv update.json "$SRC/"
     cp package.json "$SRC/"
