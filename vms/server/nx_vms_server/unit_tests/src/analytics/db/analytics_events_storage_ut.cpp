@@ -1237,6 +1237,8 @@ protected:
 
     void whenReadDataUsingCursor()
     {
+        m_packetsRead.clear();
+
         // NOTE: Currently, the cursor is forward only.
         setSortOrder(Qt::AscendingOrder);
 
@@ -1244,8 +1246,8 @@ protected:
         // It will just skip data.
         filter().maxTrackSize = 0;
 
-        whenCreateCursor();
-        thenCursorIsCreated();
+        if (!m_cursor)
+            createCursor();
 
         readAllDataFromCursor();
     }
@@ -1295,6 +1297,17 @@ protected:
     void andObjectsWithSameTimestampAreDeliveredInSinglePacket()
     {
         // TODO
+    }
+
+    void createCursor()
+    {
+        whenCreateCursor();
+        thenCursorIsCreated();
+    }
+
+    void addMoreData()
+    {
+        saveAnalyticsDataPackets(generateEventsByCriteria());
     }
 
 private:
@@ -1364,6 +1377,20 @@ TEST_F(AnalyticsDbCursor, aggregates_objects_with_same_timestamp)
 TEST_F(AnalyticsDbCursor, interleaved_tracks_are_reported_interleaved)
 {
     givenObjectsWithInterleavedTracks();
+    whenReadDataUsingCursor();
+    thenResultMatchesExpectations();
+}
+
+TEST_F(AnalyticsDbCursor, recreated_cursor_is_able_to_access_new_data)
+{
+    createCursor();
+
+    addMoreData();
+    whenReadDataUsingCursor();
+
+    addMoreData();
+    createCursor();
+
     whenReadDataUsingCursor();
     thenResultMatchesExpectations();
 }
