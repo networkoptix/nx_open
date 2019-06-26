@@ -67,6 +67,8 @@ if(NOT branch AND NOT developerBuild)
 endif()
 
 include(cmake/dependencies.cmake)
+# Load generated dependencies.cmake, containing packages path variables.
+load_generated_dependencies_file()
 
 project(vms VERSION ${releaseVersion})
 

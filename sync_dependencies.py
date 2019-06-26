@@ -5,7 +5,6 @@ from __future__ import print_function
 import os
 import sys
 import argparse
-from rdep import Rdep
 from rdep_cmake import RdepSyncher
 
 
@@ -50,7 +49,8 @@ def determine_package_versions(
         "help": customization + "-4.0",
         "server-external": release_version,
         "certificates": customization,
-		"detours": "4.0.1",
+        "customization_pack": customization,
+        "detours": "4.0.1",
         "stackwalker": "1.0",
     }
 
@@ -222,6 +222,7 @@ def sync_dependencies(syncher, platform, arch, box, release_version, options={})
         sync("%s/doxygen" % platform, path_variable="doxygen_directory")
 
     sync("any/root-certificates", path_variable="root_certificates_path")
+    sync("any/customization_pack", path_variable="customization_package_directory")
 
 
 def parse_target(target):

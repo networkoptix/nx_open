@@ -38,8 +38,9 @@ function(nx_store_customization_package target_directory)
     nx_store_known_files(${listed_files})
 endfunction()
 
-nx_rdep_add_package(any/customization_pack-${customization}
-    PATH_VARIABLE customization_package_directory)
+if(NOT customization_package_directory)
+    message(FATAL_ERROR "Customization package was not loaded")
+endif()
 
 set(customization_dir "${CMAKE_BINARY_DIR}/customization/${customization}")
 set(customization_unpack_log_file "${CMAKE_BINARY_DIR}/build_logs/unpack-${customization}.log")
