@@ -32,7 +32,8 @@ buildDmg()
         \"icon-size\": 64,
         \"window\": 
         { 
-            \"position\": { \"x\": 200, \"y\": 200 },
+            \"show-pathbar\": false,
+            \"position\": { \"x\": 400, \"y\": 400 },
             \"size\": { \"width\": 600, \"height\": 400 } 
         },
         \"contents\": 
@@ -101,10 +102,6 @@ buildDistribution()
 
 main()
 {
-    # Supresses perl warnings.
-    export LC_CTYPE=en_US.UTF-8
-    export LC_ALL=en_US.UTF-8
-
     distrib_prepareToBuildDistribution "$WORK_DIR" "$LOG_FILE" "$@"
 
     set -x #< Log each command.
