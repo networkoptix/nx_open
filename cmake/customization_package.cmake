@@ -4,7 +4,6 @@ endif()
 
 function(nx_unpack_customization_package source_directory target_directory log_file)
     message(STATUS "Unpacking customization package from ${source_directory} to ${target_directory}")
-
     execute_process(
         COMMAND ${PYTHON_EXECUTABLE}
             ${build_utils_dir}/customization/pack2.py unpack
@@ -19,6 +18,26 @@ function(nx_unpack_customization_package source_directory target_directory log_f
     endif()
 endfunction()
 
+function(nx_store_customization_package target_directory)
+    message(STATUS "Listing customization package contents in the ${target_directory}")
+
+    set(listed_files)
+    execute_process(
+        COMMAND ${PYTHON_EXECUTABLE}
+            ${build_utils_dir}/customization/pack2.py list
+            ${target_directory}
+        OUTPUT_VARIABLE listed_files
+        RESULT_VARIABLE list_result
+    )
+
+    if(NOT list_result STREQUAL "0")
+        message(FATAL_ERROR "error: Customization listing failed. See ${log_file} for details.")
+    endif()
+
+    string(REPLACE "\n" ";" listed_files ${listed_files})
+    nx_store_known_files(${listed_files})
+endfunction()
+
 nx_rdep_add_package(any/customization_pack-${customization}
     PATH_VARIABLE customization_package_directory)
 
@@ -28,5 +47,6 @@ nx_unpack_customization_package(
     ${customization_package_directory}
     ${customization_dir}
     ${customization_unpack_log_file})
+nx_store_customization_package(${customization_dir})
 
 nx_store_known_file(${customization_unpack_log_file})

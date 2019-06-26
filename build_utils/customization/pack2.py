@@ -85,6 +85,14 @@ def unpack(package_path, output_path):
         copy_if_different(source, output_path / target)
 
 
+def list_files(output_path):
+    filemap = find_filemap()
+
+    unpacked_package_path = output_path / '_package_'
+    for source, target in iterate_over_dict(filemap, unpacked_package_path):
+        print(output_path / target)
+
+
 def _add_pack_command(subparsers):
 
     def pack_command(args):
@@ -111,12 +119,25 @@ def _add_unpack_command(subparsers):
     parser.set_defaults(func=unpack_command)
 
 
+def _add_list_command(subparsers):
+
+    def list_command(args):
+        return list_files(args.input)
+
+    parser = subparsers.add_parser('list', help='List customization package')
+    parser.add_argument('input', type=Path, help='Unpacked customization path')
+    parser.add_argument('-v', '--verbose', help='Verbose output', action='store_true')
+    parser.add_argument('-l', '--log', help='Log file path')
+    parser.set_defaults(func=list_command)
+
+
 def main():
     parser = argparse.ArgumentParser()
 
     subparsers = parser.add_subparsers(title="actions", dest='cmd')
     _add_pack_command(subparsers)
     _add_unpack_command(subparsers)
+    _add_list_command(subparsers)
 
     args = parser.parse_args()
 
