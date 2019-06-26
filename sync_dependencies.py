@@ -153,8 +153,8 @@ def sync_dependencies(syncher, platform, arch, box, release_version, options={})
     if platform == "linux":
         sync("sysroot", path_variable="sysroot_directory")
 
-    if box == "rpi":
-        sync("cifs-utils")
+    # if box == "rpi":
+    #     sync("cifs-utils")
 
     if (platform, arch) == ("linux", "arm64"):
         sync("tegra_video")
@@ -164,8 +164,8 @@ def sync_dependencies(syncher, platform, arch, box, release_version, options={})
     if platform in ("android", "windows") or box == "bpi":
         sync("openal")
 
-    if platform == "linux" and box != "edge1":
-        sync("cifs-utils")
+    # if platform == "linux" and box != "edge1":
+    #     sync("cifs-utils")
 
     if platform == "windows":
         sync("icu", path_variable="icu_directory")
