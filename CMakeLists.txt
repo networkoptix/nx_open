@@ -59,6 +59,8 @@ if(NOT branch AND NOT developerBuild)
 endif()
 
 include(cmake/dependencies.cmake)
+# Load generated dependencies.cmake, containing packages path variables.
+load_generated_dependencies_file()
 
 project(vms VERSION ${releaseVersion})
 
@@ -94,8 +96,7 @@ include(qrc_utils)
 include(precompiled_header)
 include(strip_target)
 include(ec_protocol)
-
-set(customization_dir "${PROJECT_SOURCE_DIR}/customization/${customization}")
+include(customization_package)
 
 include(customization/default-values.cmake)
 include(${customization_dir}/customization.cmake)
