@@ -88,14 +88,14 @@ checkNewSystem()
 
     for ((i = 1; i <= $RETRY_COUNT; i++))
     do
-        sleep 1
-        echo "[$i] Checking if the server is running..." >&2
+        echo "Checking if the server is running (attempt #$i)." >&2
         response=$(wget --quiet "http://localhost:$port/api/moduleInformation" -O-) && break
+        sleep 1
     done
 
     if (( i > $RETRY_COUNT ))
     then
-        echo "Request to /api/moduleInformation FAILED" >&2
+        echo "ERROR: Request GET /api/moduleInformation has failed." >&2
         return 1
     fi
 
@@ -105,18 +105,20 @@ checkNewSystem()
     # response and assign the match to the variable. If no match was found, assign an empty string
     # to it.
     local -r localSystemIdDefinition=$(
-        echo "$response" | grep -E -o "\"localSystemId\":\s*\"$localSystemIdRegex\""
+        echo "$response" \
+            |grep --extended-regexp --only-matching "\"localSystemId\":\s*\"$localSystemIdRegex\""
     )
 
     if [[ -z $localSystemIdDefinition ]]
     then
-        echo "Request to /api/moduleInformation returns unexpected result." >&2
+        echo "ERROR: Request GET /api/moduleInformation returned unexpected result." >&2
         return 1
     fi
 
     # Extract the value from `"localSystemId": "..."` and assign it to the variable.
     local -r localSystemIdValue=$(
-        echo "$localSystemIdDefinition" | grep -E -o "$localSystemIdRegex"
+        echo "$localSystemIdDefinition" \
+            |grep --extended-regexp --only-matching "$localSystemIdRegex"
     )
 
     if [[ $localSystemIdValue != "{00000000-0000-0000-0000-000000000000}" ]]
@@ -286,6 +288,12 @@ startServer()
 startServer || exit $?
 
 sleep 1
-echo "Started service with PID $(pidof mediaserver-bin)"
+if ! PID=$(pidof mediaserver-bin)
+then
+    echo "ERROR: Server process not found though 'systemd ... start' reported success." >&2
+    exit 1
+fi
+
+echo "Started service with PID $PID."
 
 displayCompleteSetupHint $PORT
