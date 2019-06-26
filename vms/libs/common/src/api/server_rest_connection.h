@@ -17,7 +17,6 @@
 #include <api/http_client_pool.h>
 #include <nx/vms/event/event_fwd.h>
 #include <core/resource/resource_fwd.h>
-#include <core/ptz/ptz_fwd.h>
 #include <common/common_module_aware.h>
 #include <api/model/time_reply.h>
 #include <analytics/db/abstract_storage.h>
@@ -517,10 +516,40 @@ public:
         PostCallback callback,
         QThread* targetThread = nullptr);
 
-    Handle ptzCommand(
+    /** Sends POST request with a response to be a JSON */
+    Handle postJsonResult(
+        const QString& action,
         const QnRequestParamList& params,
         const nx::Buffer& body,
         std::function<void(bool, Handle, const QnJsonRestResult& response)>&& callback,
+        QThread* targetThread = nullptr);
+
+    /** Sends POST request with a response to be an Ubjson. */
+    Handle postUbJsonResult(
+        const QString& action,
+        const QnRequestParamList& params,
+        const nx::Buffer& body,
+        std::function<void(bool, Handle, const QnUbjsonRestResult& response)>&& callback,
+        QThread* targetThread = nullptr);
+
+    /** Sends POST request with a response to be an EmptyResult. */
+    Handle postEmptyResult(
+        const QString& action,
+        const QnRequestParamList& params,
+        const nx::Buffer& body,
+        PostCallback&& callback,
+        QThread* targetThread = nullptr);
+
+    Handle getUbJsonResult(
+        const QString& action,
+        const QnRequestParamList& params,
+        std::function<void(bool, Handle, QnUbjsonRestResult response)>&& callback,
+        QThread* targetThread = nullptr);
+
+    Handle getRawResult(
+        const QString& action,
+        const QnRequestParamList& params,
+        std::function<void(bool, Handle, QByteArray, nx::network::http::HttpHeaders)> callback,
         QThread* targetThread = nullptr);
 
     /**
@@ -591,8 +620,6 @@ private:
     QnMediaServerResourcePtr getServerWithInternetAccess() const;
 
     void trace(int handle, const QString& message) const;
-    std::pair<QString, QString> getRequestCredentials(
-        const QnMediaServerResourcePtr& targetServer) const;
 
 private:
     QnUuid m_serverId;

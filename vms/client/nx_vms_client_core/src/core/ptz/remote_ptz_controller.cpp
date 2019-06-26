@@ -141,7 +141,7 @@ bool QnRemotePtzController::sendRequest(
                 auto notConstThis = const_cast<QnRemotePtzController*>(this);
                 emit notConstThis->finished(command, value);
             };
-        auto handle = connection->ptzCommand(params, body, std::move(callback));
+        auto handle = connection->postJsonResult("/api/ptz", params, body, std::move(callback));
         Q_UNUSED(handle);
     }
     return true;

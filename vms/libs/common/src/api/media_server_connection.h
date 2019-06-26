@@ -133,20 +133,6 @@ public:
 
     int backupControlActionAsync(Qn::BackupAction action, QObject* target, const char* slot);
 
-    int acknowledgeEventAsync(
-        const QnCameraBookmark& bookmark,
-        const QnUuid& eventRuleId,
-        QObject* target,
-        const char* slot);
-
-    int addBookmarkAsync(
-        const QnCameraBookmark& bookmark,
-        QObject* target,
-        const char* slot);
-
-    int updateBookmarkAsync(const QnCameraBookmark& bookmark, QObject* target, const char* slot);
-    int deleteBookmarkAsync(const QnUuid& bookmarkId, QObject* target, const char* slot);
-
     int restart(QObject* target, const char* slot);
 
     int configureAsync(
@@ -166,10 +152,6 @@ public:
     int modulesInformation(QObject* target, const char* slot);
 
     int recordedTimePeriods(const QnChunksRequestData& request, QObject* target, const char* slot);
-    int getBookmarksAsync(
-        const QnGetBookmarksRequestData& request, QObject* target, const char* slot);
-    int getBookmarkTagsAsync(
-        const QnGetBookmarkTagsRequestData& request, QObject* target, const char* slot);
 
 protected:
     virtual nx::utils::Url url() const override;
