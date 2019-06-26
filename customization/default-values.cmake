@@ -24,6 +24,11 @@ set(freeLicenseCount "4")
 set(freeLicenseIsTrial "true")
 set(eulaVersion 1)
 
+# Support section
+set(supportUrl "")
+set(supportEmail "")
+set(supportPhone "")
+
 # Update parameters
 set(update.generator.url "http://updates.hdw.mx/upcombiner/upcombine")
 set(mirrorListUrl "http://downloads.hdwitness.com/clients/mirror.xml")
@@ -47,7 +52,7 @@ set(enable_hanwha false)
 set(dynamic.customization false)
 
 # Localization
-set(installer.language "en_US")
+set(installerLanguage "en_US")
 set(installer.cultures "en-us")
 set(translations
     en_US
