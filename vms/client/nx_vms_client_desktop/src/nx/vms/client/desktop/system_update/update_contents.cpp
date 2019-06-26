@@ -256,6 +256,22 @@ bool verifyUpdateContents(
         allServers.insert(id);
 
         const auto& osInfo = server->getOsInfo();
+        if (!osInfo.isValid())
+        {
+            NX_WARNING(NX_SCOPE_TAG,
+                "verifyUpdateManifest(%1) - server %2 has invalid osInfo",
+                contents.info.version, id);
+        }
+
+        const nx::utils::SoftwareVersion serverVersion = server->getVersion();
+        // Prohibiting updates to previous version.
+        if (serverVersion >= targetVersion)
+        {
+            NX_WARNING(NX_SCOPE_TAG, "verifyUpdateManifest(%1) Server %2 has a newer version %3",
+                contents.info.version, id, serverVersion);
+            serversWithNewerVersion.insert(id);
+            continue;
+        }
 
         update::Package* package = serverPackages[osInfo];
         if (!package)
@@ -285,16 +301,6 @@ bool verifyUpdateContents(
                     contents.missingUpdate.insert(id);
                     continue;
             }
-        }
-
-        const nx::utils::SoftwareVersion serverVersion = server->getVersion();
-        // Prohibiting updates to previous version.
-        if (serverVersion > targetVersion)
-        {
-            NX_WARNING(NX_SCOPE_TAG, "verifyUpdateManifest(%1) Server %2 has a newer version %3",
-                contents.info.version, id, serverVersion);
-            serversWithNewerVersion.insert(id);
-            continue;
         }
 
         if (serverVersion < targetVersion && server->isOnline())
@@ -351,7 +357,7 @@ bool verifyUpdateContents(
         }
     }
 
-    if (!contents.invalidVersion.empty())
+    if (!contents.invalidVersion.empty() && !contents.alreadyInstalled)
     {
         NX_WARNING(typeid(UpdateContents)) << "verifyUpdateManifest("
             << contents.info.version << ") - detected incompatible version error.";

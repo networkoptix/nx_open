@@ -181,7 +181,8 @@ TEST_F(UpdateVerificationTest, testAlreadyInstalled)
 
     verifyUpdateContents(nullptr, contents, getAllServers(), clientData);
     EXPECT_EQ(contents.alreadyInstalled, true);
-    EXPECT_EQ(contents.error, nx::update::InformationError::incompatibleVersion);
+    EXPECT_TRUE(contents.peersWithUpdate.empty());
+    EXPECT_EQ(contents.error, nx::update::InformationError::noError);
     {
         const auto report = MultiServerUpdatesWidget::calculateUpdateVersionReport(
             contents, clientData.clientId);
@@ -266,7 +267,7 @@ TEST_F(UpdateVerificationTest, testForkedVersion)
     makeServer(nx::utils::SoftwareVersion("4.0.0.28525"));
     makeServer(nx::utils::SoftwareVersion("4.0.0.28525"));
     verifyUpdateContents(nullptr, contents, getAllServers(), clientData);
-    EXPECT_EQ(contents.error, nx::update::InformationError::incompatibleVersion);
+    EXPECT_EQ(contents.error, nx::update::InformationError::noError);
     removeAllServers();
 }
 
