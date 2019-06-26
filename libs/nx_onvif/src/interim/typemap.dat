@@ -152,7 +152,7 @@ onvifEvents-psmb = "http://www.onvif.org/ver10/events/wsdl/PausableSubscriptionM
 #       Permissible types are int and size_t.  This variable does not affect
 #       the size of SOAP-encoded arrays, xsd__hexBinary and xsd__base64Binary
 #       types, which is always int.
-
+ 
 ####### USER-DEFINED CONTENT
 
 #       Any other content to be included in the generated header file can be
@@ -270,7 +270,7 @@ xsd__duration = #import "custom/duration.h" | xsd__duration
 #   char *SOAP_ENV__Text; // at least one SOAP-ENV:Text for the gSOAP engine
 #   $int size;
 #   struct SOAP_ENV__Text *SOAP_ENV__Text_; // array of more SOAP-ENV:Text
-# };
+# }; 
 # struct SOAP_ENV__Text
 # {
 #   char *__item;
@@ -560,7 +560,7 @@ vprop   = "http://docs.oasis-open.org/wsbpel/2.0/varprop"
 #       http://www.onvif.org/onvif/ver10/network/wsdl/remotediscovery.wsdl
 #       http://www.onvif.org/onvif/ver10/replay.wsdl
 #       http://www.onvif.org/onvif/ver20/analytics/wsdl/analytics.wsdl
-#       http://www.onvif.org/onvif/ver10/analyticsdevice.wsdl
+#       http://www.onvif.org/onvif/ver10/analyticsdevice.wsdl   
 #       http://www.onvif.org/onvif/ver10/schema/onvif.xsd
 
 tds     = "http://www.onvif.org/ver10/device/wsdl"

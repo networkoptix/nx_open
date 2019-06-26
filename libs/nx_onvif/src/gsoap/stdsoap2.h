@@ -1,5 +1,5 @@
 /*
-        stdsoap2.h 2.8.84
+        stdsoap2.h 2.8.86
 
         gSOAP runtime engine
 
@@ -52,7 +52,7 @@ A commercial use license is available from Genivia, Inc., contact@genivia.com
 --------------------------------------------------------------------------------
 */
 
-#define GSOAP_VERSION 20884
+#define GSOAP_VERSION 20886
 
 #ifdef WITH_SOAPDEFS_H
 # include "soapdefs.h"          /* include user-defined stuff in soapdefs.h */
@@ -195,7 +195,7 @@ A commercial use license is available from Genivia, Inc., contact@genivia.com
 # endif
 #endif
 
-#ifdef __SYMBIAN32__
+#ifdef __SYMBIAN32__ 
 # define SYMBIAN
 # undef WIN32
 #endif
@@ -208,7 +208,7 @@ A commercial use license is available from Genivia, Inc., contact@genivia.com
 
 #if defined(__digital__) && defined(__unix__)
 # ifndef TRU64
-#  define TRU64
+#  define TRU64 
 # endif
 #endif
 
@@ -646,9 +646,9 @@ extern intmax_t __strtoull(const char*, char**, int);
 #endif
 
 /* silence clang's C99 variadic macro warnings */
-#ifdef __clang__
-# pragma clang diagnostic ignored "-Wvariadic-macros"
-#endif
+#ifdef __clang__ 
+# pragma clang diagnostic ignored "-Wvariadic-macros" 
+#endif 
 
 #if defined(WITH_PURE_VIRTUAL)
 # define SOAP_PURE_VIRTUAL = 0
@@ -767,18 +767,18 @@ extern intmax_t __strtoull(const char*, char**, int);
 # include <netinet\in.h>
 # include <netdb.h>
 # include <stdio.h>
-# include <fcntl.h>
-# include <string.h>
-# include <stdlib.h>
-# include <memory.h>
-# include <errno.h>
+# include <fcntl.h>                                           
+# include <string.h>                                          
+# include <stdlib.h>                                          
+# include <memory.h>                                          
+# include <errno.h>                                           
 # include <cextdecs.h(TIME,FILE_CLOSE_,AWAITIOX,DELAY,FILEINFO,FILE_GETINFO_)>
-# define INET_ERROR 4294967295
-#pragma list
+# define INET_ERROR 4294967295                                
+#pragma list                                                  
 #elif defined(__TANDEM) /* Support for OSS */
 # define int32_t int
 # define SOAP_BUFLEN (32767)
-#endif
+#endif                                                        
 
 #ifdef WITH_NTLM
 # include <ntlm.h>
@@ -1355,7 +1355,7 @@ extern "C" {
 # define SOAP_MAXLEVEL (10000)
 #endif
 
-/* maximum string content length if not already constrained by XML schema validation maxLength constraints, zero or negative means unlimited string lengths are allowed unless restricted by XML schema maxLength */
+/* maximum string content length if not already constrained by XML schema validation maxLength constraints, zero or negative means unlimited string lengths are allowed unless restricted by XML schema maxLength */ 
 #ifndef SOAP_MAXLENGTH
 # define SOAP_MAXLENGTH (0)
 #endif
@@ -1369,7 +1369,7 @@ extern "C" {
 # ifdef WMW_RPM_IO
 #  include "httpLib.h"
 # endif
-# ifdef __INCmathh
+# ifdef __INCmathh 
 #  include <private/mathP.h>
 #  ifndef HAVE_ISNAN
 #   define HAVE_ISNAN
@@ -1383,7 +1383,7 @@ extern "C" {
 # endif
 #endif
 
-#ifdef WIN32
+#ifdef WIN32 
 # ifndef HAVE_ISNAN
 #  define HAVE_ISNAN
 # endif
@@ -1797,10 +1797,10 @@ typedef soap_int32 soap_mode;
 #define SOAP_TLSv1                              (SOAP_TLSv1_0 | SOAP_TLSv1_1 | SOAP_TLSv1_2 | SOAP_TLSv1_3)
 #define SOAP_SSLv3_TLSv1                        (SOAP_SSLv3 | SOAP_TLSv1)
 
-#define SOAP_SSL_CLIENT                         0x8000  /* client context flag for internal use */
+#define SOAP_SSL_CLIENT                         (0x8000)  /* client context flag for internal use */
 
 #define SOAP_SSL_DEFAULT                        SOAP_SSL_REQUIRE_SERVER_AUTHENTICATION
-
+ 
 typedef unsigned short soap_ssl_flags;
 
 /* state */
@@ -2700,7 +2700,7 @@ extern "C" {
 #endif
 
 /******************************************************************************/
-/**
+/*
  Contains additional fields for struct soap.
 
  Responsible for patch management in gsoap functions.
@@ -2962,8 +2962,9 @@ struct SOAP_CMAC soap
   unsigned int ipv6_multicast_if; /* in_addr_t in6addr->sin6_scope_id IPv6 value */
   char* ipv4_multicast_if; /* IP_MULTICAST_IF IPv4 setsockopt interface_addr */
   unsigned char ipv4_multicast_ttl; /* IP_MULTICAST_TTL value 0..255 */
-  int client_port; /* when nonnegative, client binds to this port before connect */
-  const char *client_interface; /* when non-NULL, use this client address */
+  const char *client_addr; /* when non-NULL, client binds to this address before connect */
+  int client_port; /* when nonnegative (and client_addr not set), client binds to this port before connect */
+  const char *client_interface; /* when non-NULL, override client-side interface address using this address */
   union {
     struct sockaddr addr;
     struct sockaddr_in in;
@@ -3361,7 +3362,7 @@ SOAP_FMAC1 int SOAP_FMAC2 soap_getposition(const char *, int *);
 
 SOAP_FMAC1 char* SOAP_FMAC2 soap_putsizesoffsets(struct soap*, const char *, const int *, const int *, int);
 SOAP_FMAC1 char* SOAP_FMAC2 soap_putoffsets(struct soap*, const int *, int);
-
+ 
 SOAP_FMAC1 int SOAP_FMAC2 soap_closesock(struct soap*);
 SOAP_FMAC1 int SOAP_FMAC2 soap_force_closesock(struct soap*);
 
