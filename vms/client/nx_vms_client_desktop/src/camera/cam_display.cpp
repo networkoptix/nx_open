@@ -2188,7 +2188,7 @@ MediaQuality QnCamDisplay::getQuality() const
     return getArchiveReader()->getQuality();
 }
 
-void QnCamDisplay::setQuality(MediaQuality quality, bool fastSwitch) const
+void QnCamDisplay::setQuality(MediaQuality quality, bool fastSwitch)
 {
     NX_ASSERT(m_archiveReader);
     getArchiveReader()->setQuality(quality, fastSwitch);

@@ -146,7 +146,7 @@ public:
     virtual CameraID getCameraID() const override;
     // Forwarded to reader
     virtual MediaQuality getQuality() const override;
-    virtual void setQuality(MediaQuality quality, bool fastSwitch) const override;
+    virtual void setQuality(MediaQuality quality, bool fastSwitch) override;
     virtual bool isPaused() const override;
     virtual bool isMediaPaused() const override;
 

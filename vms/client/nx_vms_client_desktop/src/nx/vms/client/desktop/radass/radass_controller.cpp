@@ -12,6 +12,7 @@
 
 #include "radass_types.h"
 #include "radass_support.h"
+#include "radass_controller_params.h"
 #include "utils/qt_timers.h"
 
 using namespace std::chrono;
@@ -21,41 +22,6 @@ using namespace std::chrono;
 namespace {
 
 using namespace nx::vms::client::desktop;
-
-// Time to ignore recently added cameras.
-static constexpr auto kRecentlyAddedInterval = 1s;
-
-// Delay between quality switching attempts.
-static constexpr auto kQualitySwitchInterval = 5s;
-
-// Delay between checks if performance can be improved.
-static constexpr auto kPerformanceLossCheckInterval = 5s;
-
-// Put item to LQ if visual size is small.
-static const QSize kLowQualityScreenSize(320.0 / 1.4, 240.0 / 1.4);
-
-// Put item back to HQ if visual size increased to kLowQualityScreenSize * kLqToHqSizeThreshold.
-static constexpr double kLqToHqSizeThreshold = 1.34;
-
-// Try to balance every 500ms
-static constexpr auto kTimerInterval = 500ms;
-
-// Every 10 minutes try to raise quality. Value in counter ticks.
-static constexpr int kAdditionalHQRetryCounter = 10 * 60 * 1000 / static_cast<milliseconds>(kTimerInterval).count();
-
-// Ignore cameras which are on Fast Forward
-static constexpr double kSpeedValueEpsilon = 0.0001;
-
-// Switch all cameras to LQ if there are more than 16 cameras on the scene.
-static constexpr int kMaximumConsumersCount = 16;
-
-// Network considered as slow if there are less than 3 frames in display queue.
-static constexpr int kSlowNetworkFrameLimit = 3;
-
-// Item will go to LQ if it is small for this period of time already.
-static constexpr auto kLowerSmallItemQualityInterval = 1s;
-
-static constexpr int kAutomaticSpeed = std::numeric_limits<int>::max();
 
 bool isForcedHqDisplay(AbstractVideoDisplay* display)
 {
@@ -458,7 +424,7 @@ struct RadassController::Private
         }
 
         // If there are a lot of cameras on the layout, move all cameras to low quality if possible.
-        if (consumers.size() >= kMaximumConsumersCount)
+        if (consumers.size() > kMaximumConsumersCount)
         {
             trace("Setup new consumer: too many cameras on the scene, going to LQ", consumer);
             gotoLowQuality(consumer, LqReason::tooManyItems);

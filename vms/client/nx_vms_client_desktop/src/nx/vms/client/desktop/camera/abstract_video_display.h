@@ -22,12 +22,13 @@ public:
     virtual bool isFisheyeEnabled() const = 0;
     virtual float getSpeed() const = 0;
     virtual bool isRadassSupported() const = 0;
+    /** @returns largest width and heights if there are several renderers for one video stream. */
     virtual QSize getMaxScreenSize() const = 0;
     virtual QSize getVideoSize() const = 0;
     virtual QString getName() const = 0;
 
     virtual MediaQuality getQuality() const = 0;
-    virtual void setQuality(MediaQuality quality, bool fastSwitch) const = 0;
+    virtual void setQuality(MediaQuality quality, bool fastSwitch) = 0;
 
     virtual bool isRealTimeSource() const = 0;
 

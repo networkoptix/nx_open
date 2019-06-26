@@ -11,7 +11,7 @@ namespace nx::vms::client::desktop {
 
 class AbstractVideoDisplay;
 
-class RadassController: public Connective<QObject>
+class NX_VMS_CLIENT_DESKTOP_API RadassController: public Connective<QObject>
 {
     Q_OBJECT
     using base_type = Connective<QObject>;
