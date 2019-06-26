@@ -52,8 +52,6 @@
         </SetProperty>
 
         <WixVariable Id="WixUILicenseRtf" Value="license.rtf" />
-        <WixVariable Id="WixUIBannerBmp" Value="$(var.CustomizationDir)/wixsetup/nxtool/logo_493x58.bmp" />
-        <WixVariable Id="WixUIDialogBmp" Value="$(var.CustomizationDir)/wixsetup/nxtool/logo_493x312.bmp" />
 
         <!-- Logo -->
         <Icon Id="icon_menu.exe" SourceFile="$(var.CustomizationDir)/icons/windows/nxtool.ico"/>

@@ -75,8 +75,7 @@ include(precompiled_header)
 include(strip_target)
 include(mercurial)
 include(ec_protocol)
-
-set(customization_dir "${PROJECT_SOURCE_DIR}/customization/${customization}")
+include(customization_package)
 
 # Code signing can be forcefully disabled in the customization, so declaring it before.
 cmake_dependent_option(codeSigning "Enable code signing"

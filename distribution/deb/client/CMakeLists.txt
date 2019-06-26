@@ -1,4 +1,9 @@
-set(depends desktop_client)
+set(depends
+    desktop_client
+    mediaserver
+    server_plugins
+    testcamera
+)
 
 # Files copied to .deb by build_distribution.sh.
 
