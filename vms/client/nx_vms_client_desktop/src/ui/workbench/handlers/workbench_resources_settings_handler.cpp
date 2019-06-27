@@ -247,8 +247,6 @@ void QnWorkbenchResourcesSettingsHandler::at_copyRecordingScheduleAction_trigger
         parent, recordingEnabled, motionUsed, dualStreamingUsed, hasVideo);
 
     dialog->setDelegate(dialogDelegate);
-
-    dialog->setSelectedResources({camera->getId()});
     setHelpTopic(dialog.data(), Qn::CameraSettings_Recording_Export_Help);
     if (!dialog->exec())
         return;
@@ -311,6 +309,12 @@ void QnWorkbenchResourcesSettingsHandler::at_copyRecordingScheduleAction_trigger
             camera->setRecordBeforeMotionSec(sourceCamera->recordBeforeMotionSec());
             camera->setRecordAfterMotionSec(sourceCamera->recordAfterMotionSec());
             camera->setScheduleTasks(tasks);
+
+            if (copyArchiveLength)
+            {
+                camera->setMinDays(sourceCamera->minDays());
+                camera->setMaxDays(sourceCamera->maxDays());
+            }
         };
 
     const auto selectedCameras = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
