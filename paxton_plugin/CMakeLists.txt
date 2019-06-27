@@ -29,13 +29,8 @@ list(APPEND CMAKE_MODULE_PATH
 set(build_utils_dir "${repositoryRootDir}/build_utils" CACHE PATH "Path to build utils")
 set(rdep_dir "${build_utils_dir}/python" CACHE PATH "Path to rdep scripts")
 include(find_python)
+
 include(rdep)
-
-set(customization_dir "${repositoryRootDir}/customization/${customization}")
-include(utils)
-include(${customization_dir}/../default-values.cmake)
-include(${customization_dir}/customization.cmake)
-
 nx_rdep_configure()
 
 set(ENV{PYTHONPATH} ${rdep_dir})
@@ -48,6 +43,13 @@ execute_process(
         --dot-net-framework=${dotNetFramework}
     RESULT_VARIABLE sync_result
 )
+# Load generated dependencies.cmake, containing packages path variables.
+include(${depenencies_cmake_file})
+
+include(utils)
+include(customization_package)
+include(${repositoryRootDir}/customization/default-values.cmake)
+include(${customization_dir}/customization.cmake)
 
 include(cloud_host)
 include(output_directories)
