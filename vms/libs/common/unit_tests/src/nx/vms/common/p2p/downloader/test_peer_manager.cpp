@@ -125,7 +125,7 @@ int TestPeerManager::distanceTo(const QnUuid& /*peerId*/) const
     return std::numeric_limits<int>::max();
 }
 
-AbstractPeerManager::RequestContext<FileInformation> TestPeerManager::requestFileInfo(
+AbstractPeerManager::RequestContextPtr<FileInformation> TestPeerManager::requestFileInfo(
     const QnUuid& peerId,
     const QString& fileName,
     const nx::utils::Url& url)
@@ -133,7 +133,7 @@ AbstractPeerManager::RequestContext<FileInformation> TestPeerManager::requestFil
     m_requestCounter.incrementCounters(peerId, RequestCounter::FileInfoRequest);
 
     if (!m_peers.contains(peerId))
-        return {};
+        return std::make_unique<BaseRequestContext<downloader::FileInformation>>();
 
     auto promise = std::make_shared<std::promise<std::optional<downloader::FileInformation>>>();
 
@@ -162,10 +162,11 @@ AbstractPeerManager::RequestContext<FileInformation> TestPeerManager::requestFil
             }
         });
 
-    return {promise->get_future(), makeCanceller(this, peerId, handle, promise)};
+    return std::make_unique<BaseRequestContext<downloader::FileInformation>>(
+        promise->get_future(), makeCanceller(this, peerId, handle, promise));
 }
 
-AbstractPeerManager::RequestContext<QVector<QByteArray>> TestPeerManager::requestChecksums(
+AbstractPeerManager::RequestContextPtr<QVector<QByteArray>> TestPeerManager::requestChecksums(
     const QnUuid& peerId, const QString& fileName)
 {
     m_requestCounter.incrementCounters(peerId, RequestCounter::ChecksumsRequest);
@@ -192,11 +193,12 @@ AbstractPeerManager::RequestContext<QVector<QByteArray>> TestPeerManager::reques
                     : fileInfo.checksums});
         });
 
-    return {promise->get_future(), makeCanceller(this, peerId, handle, promise)};
+    return std::make_unique<BaseRequestContext<QVector<QByteArray>>>(
+        promise->get_future(), makeCanceller(this, peerId, handle, promise));
 
 }
 
-AbstractPeerManager::RequestContext<QByteArray> TestPeerManager::downloadChunk(
+AbstractPeerManager::RequestContextPtr<QByteArray> TestPeerManager::downloadChunk(
     const QnUuid& peerId,
     const QString& fileName,
     const utils::Url &url,
@@ -292,7 +294,8 @@ AbstractPeerManager::RequestContext<QByteArray> TestPeerManager::downloadChunk(
             });
     }
 
-    return {promise->get_future(), makeCanceller(this, peerId, handle, promise)};
+    return std::make_unique<BaseRequestContext<QByteArray>>(
+        promise->get_future(), makeCanceller(this, peerId, handle, promise));
 }
 
 void TestPeerManager::setValidateShouldFail()
@@ -475,7 +478,7 @@ int ProxyTestPeerManager::distanceTo(const QnUuid& peerId) const
     return m_distances.value(peerId, std::numeric_limits<int>::max());
 }
 
-AbstractPeerManager::RequestContext<FileInformation> ProxyTestPeerManager::requestFileInfo(
+AbstractPeerManager::RequestContextPtr<FileInformation> ProxyTestPeerManager::requestFileInfo(
     const QnUuid& peer,
     const QString& fileName,
     const nx::utils::Url& url)
@@ -484,14 +487,14 @@ AbstractPeerManager::RequestContext<FileInformation> ProxyTestPeerManager::reque
     return m_peerManager->requestFileInfo(peer, fileName, url);
 }
 
-AbstractPeerManager::RequestContext<QVector<QByteArray>> ProxyTestPeerManager::requestChecksums(
+AbstractPeerManager::RequestContextPtr<QVector<QByteArray>> ProxyTestPeerManager::requestChecksums(
     const QnUuid& peer, const QString& fileName)
 {
     m_requestCounter.incrementCounters(peer, RequestCounter::ChecksumsRequest);
     return m_peerManager->requestChecksums(peer, fileName);
 }
 
-AbstractPeerManager::RequestContext<QByteArray> ProxyTestPeerManager::downloadChunk(
+AbstractPeerManager::RequestContextPtr<QByteArray> ProxyTestPeerManager::downloadChunk(
     const QnUuid& peerId,
     const QString& fileName,
     const utils::Url &url,
