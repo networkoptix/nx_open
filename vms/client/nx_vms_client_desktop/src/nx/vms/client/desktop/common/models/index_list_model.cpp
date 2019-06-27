@@ -33,9 +33,9 @@ QHash<int, QByteArray> IndexListModel::roleNames() const
 
 QModelIndex IndexListModel::sourceIndex(int row) const
 {
-    return row >= 0 && row < m_source.size()
-        ? m_source[row]
-        : QModelIndex();
+    if (row >= 0 && row < m_source.size())
+        return m_source[row];
+    return {};
 }
 
 QModelIndexList IndexListModel::source() const
