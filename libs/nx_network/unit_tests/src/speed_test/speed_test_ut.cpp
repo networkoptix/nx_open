@@ -66,7 +66,7 @@ public:
     {
     }
 
-    virtual void start(const nx::utils::Url& url, CompletionHandler handler) override
+    virtual void start(const nx::utils::Url& /*url*/, CompletionHandler handler) override
     {
         m_testRunEvent->push(std::make_tuple(SystemError::noError, hpm::api::ConnectionSpeed{}));
         handler(SystemError::noError, hpm::api::ConnectionSpeed{});
@@ -194,7 +194,7 @@ protected:
         {
             thenTestSucceeds();
             andTestResultIsValid();
-        } while (m_completeTests < m_speedTester->testSchedule().size() + 1);
+        } while (m_completeTests < (int) m_speedTester->testSchedule().size() + 1);
 
         ASSERT_TRUE(m_speedTester->waitTimeBeforeNextTest() < std::chrono::hours(24));
 	}
@@ -276,7 +276,7 @@ private:
         m_fakeMediator.httpMessageDispatcher().registerRequestProcessorFunc(
             network::http::Method::post,
             hpm::api::kConnectionSpeedUplinkPath,
-            [this](auto&&... args)
+            [this](auto&&... /*args*/)
             {
                 m_reportReceivedEvent.push(true);
             });
