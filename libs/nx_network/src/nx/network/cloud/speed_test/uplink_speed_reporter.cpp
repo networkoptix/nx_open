@@ -141,8 +141,8 @@ void UplinkSpeedReporter::UplinkSpeedReporter::onSpeedTestComplete(
 
     hpm::api::PeerConnectionSpeed peerConnectionSpeed;
     peerConnectionSpeed.connectionSpeed = std::move(*connectionSpeed);
-    peerConnectionSpeed.serverId = systemCredentials->serverId;
-    peerConnectionSpeed.systemId = systemCredentials->systemId;
+    peerConnectionSpeed.serverId = systemCredentials->serverId.toStdString();
+    peerConnectionSpeed.systemId = systemCredentials->systemId.toStdString();
 
     m_mediatorApiClient->reportUplinkSpeed(
         peerConnectionSpeed,
