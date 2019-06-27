@@ -38,16 +38,6 @@ public:
         const QnUuid& videowallGuid = QnUuid(),
         bool enableOfflineRequests = false);
 
-    int getTimePeriodsAsync(
-        const QnVirtualCameraResourcePtr& camera,
-        qint64 startTimeMs,
-        qint64 endTimeMs,
-        qint64 detail,
-        Qn::TimePeriodContent periodsType,
-        const QString& filter,
-        QObject* target,
-        const char* slot);
-
     /**
      * Check the list of cameras for discovery. Forms a new list which contains only accessible
      * cameras.
@@ -85,13 +75,6 @@ public:
     int setParamsAsync(const QnNetworkResourcePtr& camera,
         const QnCameraAdvancedParamValueList& params, QObject* target, const char* slot);
 
-    int searchCameraAsyncStart(
-        const QString& startAddr, const QString& endAddr, const QString& username,
-        const QString& password, int port, QObject* target, const char* slot);
-    int searchCameraAsyncStatus(const QnUuid& processUuid, QObject* target, const char* slot);
-    int searchCameraAsyncStop(const QnUuid& processUuid, QObject* target = nullptr,
-        const char* slot = nullptr );
-
     int addCameraAsync(
         const QnManualResourceSearchList& cameras, const QString& username,
         const QString& password, QObject* target, const char* slot);
@@ -104,9 +87,6 @@ public:
     int getStorageSpaceAsync(bool fastRequest, QObject* target, const char* slot);
 
     int getStorageStatusAsync(const QString& storageUrl, QObject* target, const char* slot);
-
-    int getTimeAsync(QObject* target, const char* slot);
-    int mergeLdapUsersAsync(QObject* target, const char* slot);
 
     /**
      * Request the name of a system the mediaserver is currently connected to.
@@ -133,13 +113,6 @@ public:
 
     int backupControlActionAsync(Qn::BackupAction action, QObject* target, const char* slot);
 
-    int restart(QObject* target, const char* slot);
-
-    int configureAsync(
-        bool wholeSystem, const QString& systemName, const QString& password,
-        const QByteArray& passwordHash, const QByteArray& passwordDigest,
-        const QByteArray& cryptSha512Hash, int port, QObject* target, const char* slot);
-
     int pingSystemAsync(const nx::utils::Url &url, const QString& getKey, QObject* target, const char* slot);
     int getNonceAsync(const nx::utils::Url& url, QObject* target, const char* slot);
     int getRecordingStatisticsAsync(
@@ -148,9 +121,6 @@ public:
 
     int testEmailSettingsAsync(const QnEmailSettings& settings, QObject* target, const char* slot);
     int testLdapSettingsAsync(const QnLdapSettings& settings, QObject* target, const char* slot);
-
-    int modulesInformation(QObject* target, const char* slot);
-
     int recordedTimePeriods(const QnChunksRequestData& request, QObject* target, const char* slot);
 
 protected:
