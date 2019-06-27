@@ -8,6 +8,7 @@
 #include <utils/math/math.h>
 
 #include <nx/utils/app_info.h>
+#include <nx/utils/log/log.h>
 
 extern "C" {
 #ifdef WIN32
@@ -113,16 +114,24 @@ void CLVideoDecoderOutput::clean()
     width = height = 0;
 }
 
-void CLVideoDecoderOutput::copy(const CLVideoDecoderOutput* src, CLVideoDecoderOutput* dst)
+void CLVideoDecoderOutput::copy(const CLVideoDecoderOutput* src)
 {
-    if (src->width != dst->width || src->height != dst->height || src->format != dst->format)
-        dst->reallocate(src->width, src->height, src->format);
+    copyData(src);
+    assignMiscData(src);
+}
 
-    dst->assignMiscData(src);
-    //TODO/IMPL
-    //dst->metadata = QnMetaDataV1Ptr( new QnMetaDataV1( *src->metadata ) );
+void CLVideoDecoderOutput::copyData(const AVFrame* src)
+{
+    AVPixelFormat dstFormat = fixDeprecatedPixelFormat(AVPixelFormat(src->format));
+    if (data[0] == nullptr || src->width != width || src->height != height || dstFormat != format)
+        reallocate(src->width, src->height, dstFormat);
 
-    const AVPixFmtDescriptor* descr = av_pix_fmt_desc_get((AVPixelFormat) src->format);
+    const AVPixFmtDescriptor* descr = av_pix_fmt_desc_get(dstFormat);
+    if (!descr)
+    {
+        NX_ERROR(this, lm("Failed to copy frame, invalid pixel format: %1").arg(dstFormat));
+        return;
+    }
     for (int i = 0; i < descr->nb_components && src->data[i]; ++i)
     {
         int h = src->height;
@@ -131,7 +140,7 @@ void CLVideoDecoderOutput::copy(const CLVideoDecoderOutput* src, CLVideoDecoderO
             h >>= descr->log2_chroma_h;
             w >>= descr->log2_chroma_w;
         }
-        copyPlane(dst->data[i], src->data[i], w, dst->linesize[i], src->linesize[i], h);
+        copyPlane(data[i], src->data[i], w, linesize[i], src->linesize[i], h);
     }
 }
 
@@ -165,7 +174,7 @@ void CLVideoDecoderOutput::fillRightEdge()
     int h = height;
     for (int i = 0; i < descr->nb_components && data[i]; ++i)
     {
-        int bpp = descr->comp[i].step_minus1 + 1;
+        int bpp = descr->comp[i].step;
         int fillLen = linesize[i] - w*bpp;
         if (fillLen >= 4)
         {
@@ -206,7 +215,7 @@ void CLVideoDecoderOutput::memZerro()
         if (i > 0)
             h >>= descr->log2_chroma_h;
 
-        int bpp = descr->comp[i].step_minus1 + 1;
+        int bpp = descr->comp[i].step;
         int fillLen = h*w*bpp;
         memset(data[i], i == 0 ? 0 : 0x80, fillLen);
     }
@@ -353,29 +362,6 @@ bool CLVideoDecoderOutput::isPixelFormatSupported(AVPixelFormat format)
 {
     return format == AV_PIX_FMT_YUV422P || format == AV_PIX_FMT_YUV420P || format == AV_PIX_FMT_YUV444P;
 }
-
-void CLVideoDecoderOutput::copyDataFrom(const AVFrame* frame)
-{
-    NX_ASSERT(width == frame->width);
-    NX_ASSERT(height == frame->height);
-    NX_ASSERT(fixDeprecatedPixelFormat((AVPixelFormat) format)
-        == fixDeprecatedPixelFormat((AVPixelFormat) frame->format));
-
-    if (const AVPixFmtDescriptor* descr = av_pix_fmt_desc_get((AVPixelFormat) format))
-    {
-        for (int i = 0; i < descr->nb_components && frame->data[i]; ++i)
-        {
-            int h = height;
-            int w = width;
-            if (i > 0) {
-                h >>= descr->log2_chroma_h;
-                w >>= descr->log2_chroma_w;
-            }
-            copyPlane(data[i], frame->data[i], w * descr->comp[i].step, linesize[i], frame->linesize[i], h);
-        }
-    }
-}
-
 
 CLVideoDecoderOutput::CLVideoDecoderOutput(QImage image)
 {

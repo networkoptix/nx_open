@@ -1568,8 +1568,7 @@ void DecodedPictureToOpenGLUploader::uploadDecodedPicture(
 
 #ifdef UPLOAD_SYSMEM_FRAMES_ASYNC
         QSharedPointer<CLVideoDecoderOutput> decodedPictureCopy( new CLVideoDecoderOutput() );
-        decodedPictureCopy->reallocate( decodedPicture->width, decodedPicture->height, decodedPicture->format );
-        CLVideoDecoderOutput::copy( decodedPicture.data(), decodedPictureCopy.data() );
+        decodedPictureCopy->copy(decodedPicture.data());
         std::unique_ptr<AVPacketUploader> avPacketUploader( new AVPacketUploader( emptyPictureBuf, decodedPictureCopy, this ) );
         avPacketUploader->setAutoDelete( true );
         m_uploadThread->push( avPacketUploader.release() );
