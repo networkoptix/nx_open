@@ -14,39 +14,10 @@ SRC=./dmg-folder
 VOLUME_NAME="$DISPLAY_PRODUCT_NAME $RELEASE_VERSION"
 BACKGROUND_PATH="$SRC/.background/dmgBackground.png"
 PACKAGE_ICON_PATH="$SRC/.VolumeIcon.icns"
-TMP_DMG_SETTINGS="settings.json"
+DMG_SETTINGS="settings.py"
 
-APP_NAME="$DISPLAY_PRODUCT_NAME.app"
-APP_DIR="$SRC/$APP_NAME"
-
-buildDmg()
-{
-    test -f $DISTRIBUTION_DMG && rm $DISTRIBUTION_DMG
-
-    echo "{
-        \"title\": \"$VOLUME_NAME\",
-        \"background\": \"$BACKGROUND_PATH\",
-        \"format\": \"UDZO\",
-        \"compression-level\": 9,
-        \"icon\": \"$PACKAGE_ICON_PATH\",
-        \"icon-size\": 64,
-        \"window\": 
-        { 
-            \"show-pathbar\": false,
-            \"position\": { \"x\": 400, \"y\": 400 },
-            \"size\": { \"width\": 600, \"height\": 400 } 
-        },
-        \"contents\": 
-        [
-            { \"x\": 134, \"y\": 236, \"type\": \"file\", \"path\": \"$APP_DIR\" },
-            { \"x\": 466, \"y\": 236, \"type\": \"link\", \"path\": \"/Applications\" }
-        ]
-    }
-    " > "$TMP_DMG_SETTINGS"
-
-    dmgbuild -s "$TMP_DMG_SETTINGS" "$VOLUME_NAME" "$DISTRIBUTION_DMG"
-    rm -rf "$TMP_DMG_SETTINGS"
-}
+APP_BUNDLE="$DISPLAY_PRODUCT_NAME.app"
+APP_DIR="$SRC/$APP_BUNDLE"
 
 copyMacOsSpecificApplauncherStuff()
 {
@@ -90,7 +61,14 @@ buildDistribution()
         codesign -f -v --deep $KEYCHAIN_ARGS -s "$MAC_SIGN_IDENTITY" "$APP_DIR"
     fi
  
-    buildDmg
+    test -f $DISTRIBUTION_DMG && rm $DISTRIBUTION_DMG
+    dmgbuild                                    \
+        -s "$DMG_SETTINGS"                      \
+        -D dmg_app_path="$APP_DIR"              \
+        -D dmg_app_bundle="$APP_BUNDLE"         \
+        -D dmg_icon="$PACKAGE_ICON_PATH"        \
+        -D dmg_background="$BACKGROUND_PATH"    \
+        "$VOLUME_NAME" "$DISTRIBUTION_DMG"
 
     mv update.json "$SRC/"
     cp package.json "$SRC/"
