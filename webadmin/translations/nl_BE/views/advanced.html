@@ -1,5 +1,5 @@
 <div class="container">
-    <h1><a href="#/metrics/">New: System health report</a></h1>
+    <h1><a href="#/metrics/">Nieuw: rapport over systeemstatus</a></h1>
 </div>
 <div class="container">
     <h1>Geavanceerde serverinstellingen</h1>
@@ -120,7 +120,7 @@
     <h2>Logboekinstellingen</h2>
     <form class="form" role="form" name="logLevels" novalidate>
         <div ng-repeat="(name, level) in loggers" class="form-group">
-            <label class="col-sm-4">{{name}} log level</label>
+            <label class="col-sm-4">{{name}} logboekniveau</label>
             <div class="col-sm-8">
                 <select class="form-control" name="{{name}}LogLevel" id="{{name}}LogLevel" ng-model="loggers[name]">
                     <option value="none">Geen: Log uitgeschakeld.</option>
@@ -128,7 +128,7 @@
                     <option value="error">Fout: Alleen logboek fouten.</option>
                     <option value="warning">Waarschuwing: Meld waarschuwingen en fouten.</option>
                     <option value="info">Info: Log fouten, waarschuwingen en alle berichten.</option>
-                    <option value="debug">Debug: Log every System message and debug information.</option>
+                    <option value="debug">Debug: log elk systeembericht en debug-informatie.</option>
                     <option value="verbose">Uitgebreid: Meld alle beschikbare informatie.</option>
                 </select>
             </div>
@@ -138,7 +138,7 @@
         </div>
     </form>
 
-    <h1>Advanced System settings</h1>
+    <h1>Geavanceerde systeeminstellingen</h1>
     <div class="alert alert-danger" role="alert">
         <b>Waarschuwing!</b> Door wijzigingen op deze pagina kan de server mogelijk niet correct werken.
     </div>

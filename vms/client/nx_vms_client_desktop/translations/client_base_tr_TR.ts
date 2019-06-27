@@ -5739,8 +5739,8 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
       <translation>Kullanıcılar</translation>
     </message>
     <message>
-      <source>Analytics</source>
-      <translation>Analiz</translation>
+      <source>Plugins</source>
+      <translation type="unfinished">Plugins</translation>
     </message>
   </context>
   <context>
@@ -7658,10 +7658,6 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
       <translation>Web Sayfası</translation>
     </message>
     <message>
-      <source>Analytics</source>
-      <translation>Analiz</translation>
-    </message>
-    <message>
       <source>Expert</source>
       <translation>Uzman</translation>
     </message>
@@ -7713,6 +7709,10 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     <message>
       <source>I/O Modules Settings</source>
       <translation>I/O Modül Ayarları</translation>
+    </message>
+    <message>
+      <source>Plugins</source>
+      <translation type="unfinished">Plugins</translation>
     </message>
   </context>
   <context>
