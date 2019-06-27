@@ -65,10 +65,14 @@ StaticOpenGLInfo::StaticOpenGLInfo()
 
     const auto functions = context.functions();
 
+    const auto glString =
+        [functions](GLenum id) -> QString { return (const char*)functions->glGetString(id); };
+
     QnGlFunctions::OpenGLInfo result;
-    m_info.version = (const char*)functions->glGetString(GL_VERSION);
-    m_info.vendor = (const char*)context.functions()->glGetString(GL_VENDOR);
-    m_info.renderer = (const char*)context.functions()->glGetString(GL_RENDERER);
+    m_info.version = glString(GL_VERSION);
+    m_info.vendor = glString(GL_VENDOR);
+    m_info.renderer = glString(GL_RENDERER);
+    m_info.extensions = glString(GL_EXTENSIONS);
 
     GLint maxTextureSize = -1;
     functions->glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTextureSize);

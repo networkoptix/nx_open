@@ -9,6 +9,12 @@ Cursor::Cursor(
 {
 }
 
+Cursor::~Cursor()
+{
+    if (m_onBeforeCursorDestroyedHandler)
+        m_onBeforeCursorDestroyedHandler(this);
+}
+
 common::metadata::ConstDetectionMetadataPacketPtr Cursor::next()
 {
     while (!m_eof || !m_currentObjects.empty())
@@ -44,6 +50,12 @@ void Cursor::close()
     QnMutexLocker lock(&m_mutex);
     m_sqlCursor.reset();
     m_eof = true;
+}
+
+void Cursor::setOnBeforeCursorDestroyed(
+    nx::utils::MoveOnlyFunc<void(Cursor*)> handler)
+{
+    m_onBeforeCursorDestroyedHandler = std::move(handler);
 }
 
 std::tuple<const DetectedObject*, std::size_t /*track position*/> Cursor::readNextTrackPosition()

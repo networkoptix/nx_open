@@ -5740,8 +5740,8 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Gebruikers</translation>
     </message>
     <message>
-      <source>Analytics</source>
-      <translation>Analytics</translation>
+      <source>Plugins</source>
+      <translation type="unfinished">Plugins</translation>
     </message>
   </context>
   <context>
@@ -7659,10 +7659,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Webpagina</translation>
     </message>
     <message>
-      <source>Analytics</source>
-      <translation>Analytics</translation>
-    </message>
-    <message>
       <source>Expert</source>
       <translation>Expert</translation>
     </message>
@@ -7714,6 +7710,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>I/O Modules Settings</source>
       <translation>I/O module instellingen</translation>
+    </message>
+    <message>
+      <source>Plugins</source>
+      <translation type="unfinished">Plugins</translation>
     </message>
   </context>
   <context>

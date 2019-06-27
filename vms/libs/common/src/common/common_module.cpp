@@ -197,7 +197,7 @@ QnCommonModule::QnCommonModule(bool clientMode,
     m_startupTime = QDateTime::currentDateTime();
 
     m_moduleInformation.protoVersion = nx::vms::api::protocolVersion();
-    m_moduleInformation.systemInformation = QnAppInfo::currentSystemInformation();
+    m_moduleInformation.osInfo = utils::OsInfo::current();
     m_moduleInformation.hwPlatform = nx::vms::utils::installationInfo().hwPlatform;
     m_moduleInformation.brand = QnAppInfo::productNameShort();
     m_moduleInformation.customization = QnAppInfo::customizationName();

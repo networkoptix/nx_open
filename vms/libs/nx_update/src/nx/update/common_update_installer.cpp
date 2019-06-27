@@ -124,11 +124,11 @@ CommonUpdateInstaller::State CommonUpdateInstaller::checkContents(const QString&
         return CommonUpdateInstaller::State::updateContentsError;
     }
 
-    const auto& systemInfo = QnAppInfo::currentSystemInformationNew();
-    if (!info.isCompatibleTo(systemInfo))
+    const auto& osInfo = utils::OsInfo::current();
+    if (!info.isCompatibleTo(osInfo))
     {
         NX_ERROR(this, "Update is incompatible to current %1:\n%2",
-            systemInfo, QString::fromUtf8(QJson::serialized(info)));
+            osInfo, QString::fromUtf8(QJson::serialized(info)));
         return CommonUpdateInstaller::State::updateContentsError;
     }
 

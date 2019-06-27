@@ -59,11 +59,9 @@ bool Package::isClient() const
     return component == kClientComponent;
 }
 
-bool Package::isCompatibleTo(
-    const vms::api::SystemInformationNew& systemInformation,
-    bool ignoreVersion) const
+bool Package::isCompatibleTo(const utils::OsInfo& osInfo, bool ignoreVersion) const
 {
-    return isPackageCompatibleTo(platform, variants, systemInformation, ignoreVersion);
+    return isPackageCompatibleTo(platform, variants, osInfo, ignoreVersion);
 }
 
 bool Package::isNewerThan(const QString& variant, const Package& other) const
@@ -81,10 +79,9 @@ bool PackageInformation::isClient() const
     return component == kClientComponent;
 }
 
-bool PackageInformation::isCompatibleTo(
-    const vms::api::SystemInformationNew& systemInformation) const
+bool PackageInformation::isCompatibleTo(const utils::OsInfo& osInfo) const
 {
-    return isPackageCompatibleTo(platform, variants, systemInformation);
+    return isPackageCompatibleTo(platform, variants, osInfo);
 }
 
 void UpdateContents::resetVerification()
@@ -149,20 +146,20 @@ bool UpdateContents::preferOtherUpdate(const UpdateContents& other) const
 bool isPackageCompatibleTo(
     const QString& packagePlatform,
     const QList<Variant>& packageVariants,
-    const vms::api::SystemInformationNew& systemInformation,
+    const utils::OsInfo& osInfo,
     bool ignoreVersion)
 {
-    if (packagePlatform != systemInformation.platform)
+    if (packagePlatform != osInfo.platform)
         return false;
 
     if (packageVariants.isEmpty())
         return true;
 
-    const utils::SoftwareVersion currentVersion(systemInformation.variantVersion);
+    const utils::SoftwareVersion currentVersion(osInfo.variantVersion);
 
     for (const Variant& variant: packageVariants)
     {
-        if (variant.name != systemInformation.variant)
+        if (variant.name != osInfo.variant)
             continue;
 
         if (ignoreVersion)

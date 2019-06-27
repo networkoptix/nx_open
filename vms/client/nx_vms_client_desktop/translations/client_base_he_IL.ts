@@ -5865,8 +5865,8 @@ If you intended to move analytics data to another storage location, please conta
       <translation>משתמשים</translation>
     </message>
     <message>
-      <source>Analytics</source>
-      <translation>Analytics</translation>
+      <source>Plugins</source>
+      <translation type="unfinished">Plugins</translation>
     </message>
   </context>
   <context>
@@ -7868,10 +7868,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>דף אינטרנט</translation>
     </message>
     <message>
-      <source>Analytics</source>
-      <translation>Analytics</translation>
-    </message>
-    <message>
       <source>Expert</source>
       <translation>מומחה</translation>
     </message>
@@ -7929,6 +7925,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>I/O Modules Settings</source>
       <translation>הגדרות מודולי קלט/פלט</translation>
+    </message>
+    <message>
+      <source>Plugins</source>
+      <translation type="unfinished">Plugins</translation>
     </message>
   </context>
   <context>

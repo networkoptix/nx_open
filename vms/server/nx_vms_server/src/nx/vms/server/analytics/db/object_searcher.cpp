@@ -77,12 +77,6 @@ void ObjectSearcher::loadCurrentRecord(
     *object = loadObject(query);
 }
 
-std::unique_ptr<AbstractCursor> ObjectSearcher::createCursor(
-    std::unique_ptr<nx::sql::Cursor<DetectedObject>> sqlCursor)
-{
-    return std::make_unique<Cursor>(std::move(sqlCursor));
-}
-
 void ObjectSearcher::addObjectFilterConditions(
     const Filter& filter,
     const DeviceDao& deviceDao,
