@@ -50,10 +50,10 @@ struct Ini: public nx::kit::IniConfig
 
     #undef NX_VMS_SERVER_INI_LIVE_STREAM_CACHE_HELP
 
-    NX_INI_STRING("", runtimeModificationOverride,
-        "Override detected OS modification value (e.g. \"ubuntu\").");
-    NX_INI_STRING("", runtimeOsVersionOverride,
-        "Override detected OS version value (e.g. \"16.04\").");
+    NX_INI_STRING("", currentOsVariantOverride,
+        "Override the detected OS variant value (e.g. \"ubuntu\").");
+    NX_INI_STRING("", currentOsVariantVersionOverride,
+        "Override the detected OS variant version value (e.g. \"16.04\").");
 };
 
 inline Ini& ini()

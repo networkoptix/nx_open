@@ -418,8 +418,7 @@ Player::TranscodingSupportStatus transcodingSupportStatus(
         if (server->getVersion() < nx::utils::SoftwareVersion(3, 0))
             return Player::TranscodingNotSupportedForServersOlder30;
 
-        const auto& info = server->getSystemInfo();
-        if (info.arch == "arm" || info.arch == "aarch64")
+        if (server->getServerFlags().testFlag(vms::api::ServerFlag::SF_ArmServer))
             return Player::TranscodingNotSupportedForArmServers;
     }
 

@@ -51,9 +51,6 @@ public:
 
     void loadCurrentRecord(nx::sql::SqlQuery*, DetectedObject*);
 
-    static std::unique_ptr<AbstractCursor> createCursor(
-        std::unique_ptr<nx::sql::Cursor<DetectedObject>> sqlCursor);
-
     static void addObjectFilterConditions(
         const Filter& filter,
         const DeviceDao& deviceDao,

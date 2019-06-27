@@ -40,7 +40,11 @@ struct AsyncRequestInfo
 };
 Q_DECLARE_METATYPE(AsyncRequestInfo);
 
-// TODO: #Elric separate into two objects, one object per thread.
+
+/**
+ * QnSessionManager is used to serve QnAbstractConnection/QnMediaServerConnection requests. It can
+ * be removed when all methods from QnMediaServerConnection are moved to rest::ServerConnection.
+ */
 class QnSessionManager:
     public QObject,
     public /*mixin*/ QnCommonModuleAware,

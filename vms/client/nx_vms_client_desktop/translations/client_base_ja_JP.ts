@@ -5678,8 +5678,8 @@ If you intended to move analytics data to another storage location, please conta
       <translation>ユーザー</translation>
     </message>
     <message>
-      <source>Analytics</source>
-      <translation>解析</translation>
+      <source>Plugins</source>
+      <translation type="unfinished">Plugins</translation>
     </message>
   </context>
   <context>
@@ -7555,10 +7555,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>ウェブページ:</translation>
     </message>
     <message>
-      <source>Analytics</source>
-      <translation>解析</translation>
-    </message>
-    <message>
       <source>Expert</source>
       <translation>エキスパート</translation>
     </message>
@@ -7607,6 +7603,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>I/O Modules Settings</source>
       <translation>IOモジュール設定</translation>
+    </message>
+    <message>
+      <source>Plugins</source>
+      <translation type="unfinished">Plugins</translation>
     </message>
   </context>
   <context>

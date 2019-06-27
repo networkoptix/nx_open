@@ -31,7 +31,6 @@
 #include <core/resource/layout_item_index.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/resource_display_info.h>
-#include <core/resource/resource_property.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource/videowall_item_index.h>
@@ -492,6 +491,7 @@ void QnResourceBrowserWidget::setupAutoExpandPolicy()
                             resourcePool()->getResources<QnMediaServerResource>().count();
                         return serverCount <= kMaxAutoExpandedServers;
                     }
+                    return false;
                 }
                 case NodeType::servers:
                 case NodeType::userResources:

@@ -1,12 +1,13 @@
 import QtQuick 2.6
 import QtQml.Models 2.11
 
+import Nx 1.0
 import Nx.Controls 1.0
 
 import nx.vms.client.desktop 1.0
 
 /**
- * A tree view with multi-selection.
+ * A tree view with multi-selection, drag-n-drop and editing support.
  */
 Item
 {
@@ -19,6 +20,10 @@ Item
     property alias scrollStepSize: listView.scrollStepSize //< In pixels.
     property alias hoverHighlightColor: listView.hoverHighlightColor
     property color selectionHighlightColor: "teal"
+
+    readonly property bool dragActive: dragIndicator.Drag.active
+
+    // TODO: #vkutin Expose more dragIndicator.Drag properties when required.
 
     ListView
     {
@@ -54,6 +59,7 @@ Item
 
                 width: parent.width
                 implicitHeight: Math.max(button.implicitHeight, delegateLoader.implicitHeight)
+                clip: true
 
                 readonly property bool isSelectable: itemFlags & Qt.ItemIsSelectable
                 readonly property bool isEditable: itemFlags & Qt.ItemIsEditable
@@ -64,15 +70,15 @@ Item
                 readonly property bool isCurrent: ListView.isCurrentItem
                 readonly property bool isSelected: selectionHighlight.visible
 
+                readonly property bool isDelegateFocused: delegateLoader.item
+                    && delegateLoader.item.activeFocus
+
                 Rectangle
                 {
                     id: selectionHighlight
 
                     anchors.fill: parent
                     visible: false
-
-                    readonly property bool isDelegateFocused: delegateLoader.item
-                        && delegateLoader.item.activeFocus
 
                     color: listView.activeFocus && !isDelegateFocused
                         ? selectionHighlightColor
@@ -112,7 +118,32 @@ Item
                 MouseArea
                 {
                     id: mouseArea
+
                     anchors.fill: parent
+                    acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
+
+                    drag.onActiveChanged:
+                    {
+                        if (drag.active && dragIndicator.height > 0)
+                        {
+                            reselectOnRelease = false
+
+                            ItemGrabber.grabToImage(dragIndicator,
+                                function (resultUrl)
+                                {
+                                    if (!mouseArea.drag.active)
+                                        return
+
+                                    dragIndicator.Drag.imageSource = resultUrl
+                                    dragIndicator.Drag.active = true
+                                })
+                        }
+                        else
+                        {
+                            dragIndicator.Drag.active = false
+                            drag.target = null
+                        }
+                    }
 
                     onDoubleClicked:
                     {
@@ -138,6 +169,10 @@ Item
                             model.expanded = !model.expanded
                             return
                         }
+
+                        drag.target = (mouse.button == Qt.LeftButton)
+                            ? dragIndicator
+                            : null
 
                         if (isSelectable)
                         {
@@ -166,7 +201,10 @@ Item
                             }
                             else
                             {
-                                reselectOnRelease = true
+                                if (isDelegateFocused)
+                                    forceActiveFocus()
+                                else
+                                    reselectOnRelease = true
                             }
                         }
                     }
@@ -178,7 +216,7 @@ Item
 
                         reselectOnRelease = false
 
-                        if (modelIndex.valid && !drag.active)
+                        if (modelIndex.valid && containsMouse)
                         {
                             selectionModel.setCurrentIndex(
                                 modelIndex, ItemSelectionModel.ClearAndSelect)
@@ -220,6 +258,81 @@ Item
                         target: selectionModel
                         enabled: delegateLoader.isCurrent
                         onSelectionChanged: delegateLoader.finishEditing()
+                    }
+                }
+            }
+        }
+
+        Rectangle
+        {
+            // TODO: #vkutin What about MIME data?
+
+            // TODO: #vkutin Limit the size of displayed list.
+
+            id: dragIndicator
+
+            width: column.width
+            height: column.height
+            color: ColorTheme.transparent("black", 0.8)
+            visible: false
+
+            Drag.dragType: Drag.Automatic
+
+            Rectangle
+            {
+                anchors.fill: parent
+                color: selectionHighlightColor
+            }
+
+            Column
+            {
+                id: column
+
+                Repeater
+                {
+                    model: IndexListModel
+                    {
+                        id: indexListModel
+                        source: selectionModel.selectedIndexes
+                    }
+
+                    delegate: Component
+                    {
+                        Item
+                        {
+                            id: draggedItem
+
+                            width: dragDelegateLoader.x + dragDelegateLoader.width + 12
+                            height: dragDelegateLoader.height
+                            visible: itemFlags & Qt.ItemIsDragEnabled
+
+                            readonly property var modelData: model
+                            readonly property var modelIndex: indexListModel.sourceIndex(index)
+
+                            readonly property int itemFlags:
+                                linearizationListModel.flags(modelIndex)
+
+                            Loader
+                            {
+                                id: dragDelegateLoader
+
+                                readonly property var model: draggedItem.modelData
+                                readonly property var modelIndex:
+                                    linearizationListModel.mapToSource(draggedItem.modelIndex)
+
+                                readonly property int itemFlags: draggedItem.itemFlags
+                                readonly property bool isCurrent: false
+                                readonly property bool isSelected: true
+                                readonly property real itemIndent: x
+
+                                sourceComponent: treeView.delegate
+                                x: 24
+
+                                // Signals for compatibility with the underlying delegate.
+                                signal startEditing()
+                                signal finishEditing()
+                            }
+                        }
                     }
                 }
             }

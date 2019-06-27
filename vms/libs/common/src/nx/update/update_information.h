@@ -8,7 +8,7 @@
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/utils/uuid.h>
 #include <nx/utils/software_version.h>
-#include <nx/vms/api/data/system_information.h>
+#include <nx/utils/os_info.h>
 
 namespace nx::update {
 
@@ -53,9 +53,7 @@ struct Package
     bool isServer() const;
     bool isClient() const;
 
-    bool isCompatibleTo(
-        const vms::api::SystemInformationNew& systemInformation,
-        bool ignoreVersion = false) const;
+    bool isCompatibleTo(const utils::OsInfo& osInfo, bool ignoreVersion = false) const;
     bool isNewerThan(const QString& variant, const Package& other) const;
 };
 
@@ -103,7 +101,7 @@ struct PackageInformation
     bool isValid() const { return !version.isNull(); }
     bool isServer() const;
     bool isClient() const;
-    bool isCompatibleTo(const vms::api::SystemInformationNew& systemInformation) const;
+    bool isCompatibleTo(const utils::OsInfo& osInfo) const;
 };
 
 #define PackageInformation_Fields (version)(component)(cloudHost)(platform)(variants) \
@@ -222,25 +220,6 @@ enum class UpdateSourceType
 };
 
 /**
- * Does comparison for package cache.
- */
-struct SystemInformationComparator
-{
-    bool operator() (
-        const nx::vms::api::SystemInformation& lhs,
-        const nx::vms::api::SystemInformation& rhs) const
-    {
-        if (lhs.arch != rhs.arch)
-            return lhs.arch < rhs.arch;
-
-        if (lhs.platform != rhs.platform)
-            return lhs.platform < rhs.platform;
-
-        return lhs.modification < rhs.modification;
-    }
-};
-
-/**
  * Wraps up update info and summary for its verification.
  * All update tools inside client work with this structure directly,
  * instead of nx::update::Information.
@@ -270,8 +249,6 @@ struct UpdateContents
     QDir storageDir;
     /** A list of files to be uploaded. */
     QStringList filesToUpload;
-
-    using SystemInformation = nx::vms::api::SystemInformation;
 
     /** Information for the clent update. */
     nx::update::Package clientPackage;
@@ -314,7 +291,7 @@ struct UpdateContents
 bool isPackageCompatibleTo(
     const QString& packagePlatform,
     const QList<Variant>& packageVariants,
-    const vms::api::SystemInformationNew& systemInformation,
+    const utils::OsInfo& osInfo,
     bool ignoreVersion = false);
 
 bool isPackageNewerForVariant(

@@ -42,8 +42,6 @@ public:
         Filter filter,
         CreateCursorCompletionHandler completionHandler) override;
 
-    virtual void closeCursor(const std::shared_ptr<AbstractCursor>& cursor) override;
-
     virtual void lookup(
         Filter filter,
         LookupCompletionHandler completionHandler) override;
@@ -60,10 +58,11 @@ public:
     virtual void flush(StoreCompletionHandler completionHandler) override;
 
     virtual bool readMinimumEventTimestamp(std::chrono::milliseconds* outResult) override;
+
 private:
     QnMediaServerModule* m_mediaServerModule = nullptr;
     std::unique_ptr<DbController> m_dbController;
-    std::list<std::shared_ptr<AbstractCursor>> m_openedCursors;
+    std::list<AbstractCursor*> m_openedCursors;
     QnMutex m_dbControllerMutex;
     QnMutex m_cursorsMutex;
     std::atomic<bool> m_closingDbController {false};

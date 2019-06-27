@@ -11,6 +11,7 @@
 #include <core/resource/resource_fwd.h>
 #include <nx/update/update_information.h>
 #include <nx/vms/api/data/software_version.h>
+#include <nx/utils/os_info.h>
 #include <nx/utils/uuid.h>
 
 class QnCommonModule;
@@ -22,7 +23,7 @@ struct UpdateStrings
     Q_DECLARE_TR_FUNCTIONS(UpdateStrings)
 
 public:
-    static QString getReportForUnsupportedOs(const nx::vms::api::SystemInformation& info);
+    static QString getReportForUnsupportedOs(const nx::utils::OsInfo& info);
 };
 
 /**
@@ -41,7 +42,7 @@ bool checkCloudHost(
 
 struct ClientVerificationData
 {
-    api::SystemInformation systemInfo;
+    nx::utils::OsInfo osInfo;
     std::set<nx::utils::SoftwareVersion> installedVersions;
     /** Current client version, */
     nx::utils::SoftwareVersion currentVersion;

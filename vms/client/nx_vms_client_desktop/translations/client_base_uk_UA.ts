@@ -5868,8 +5868,8 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Користувачі</translation>
     </message>
     <message>
-      <source>Analytics</source>
-      <translation>Аналітика</translation>
+      <source>Plugins</source>
+      <translation type="unfinished">Plugins</translation>
     </message>
   </context>
   <context>
@@ -7871,10 +7871,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Веб сторінка</translation>
     </message>
     <message>
-      <source>Analytics</source>
-      <translation>Аналітика</translation>
-    </message>
-    <message>
       <source>Expert</source>
       <translation>Експрет</translation>
     </message>
@@ -7932,6 +7928,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>I/O Modules Settings</source>
       <translation>Налаштування модулів вводу-виводу</translation>
+    </message>
+    <message>
+      <source>Plugins</source>
+      <translation type="unfinished">Plugins</translation>
     </message>
   </context>
   <context>
@@ -8970,15 +8970,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Failed to start update</source>
-      <translation type="unfinished">Failed to start update</translation>
+      <translation>Не вдалося розпочати оновлення</translation>
     </message>
     <message>
       <source>Starting update to ...</source>
-      <translation type="unfinished">Starting update to ...</translation>
+      <translation>Починається оновлення до ...</translation>
     </message>
     <message>
       <source>Some servers have no package available</source>
-      <translation type="unfinished">Some servers have no package available</translation>
+      <translation>Деякі сервери не мають доступного пакету</translation>
     </message>
   </context>
   <context>
@@ -9329,51 +9329,51 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>no error</source>
-      <translation type="unfinished">no error</translation>
+      <translation>немає помилки</translation>
     </message>
     <message>
       <source>library file cannot be loaded</source>
-      <translation type="unfinished">library file cannot be loaded</translation>
+      <translation>файл бібліотеки не можна завантажити</translation>
     </message>
     <message>
       <source>invalid or incompatible plugin library</source>
-      <translation type="unfinished">invalid or incompatible plugin library</translation>
+      <translation>недійсний або несумісний плагін бібліотеки</translation>
     </message>
     <message>
       <source>plugin library failed to initialize</source>
-      <translation type="unfinished">plugin library failed to initialize</translation>
+      <translation>плагін бібліотеки не вдалося ініціалізувати</translation>
     </message>
     <message>
       <source>plugin returned bad manifest</source>
-      <translation type="unfinished">plugin returned bad manifest</translation>
+      <translation>плагін повернув поганий маніфест</translation>
     </message>
     <message>
       <source>plugin API version is no longer supported</source>
-      <translation type="unfinished">plugin API version is no longer supported</translation>
+      <translation>версія АРІ плагіна більше не підтримується</translation>
     </message>
     <message>
       <source>unknown error</source>
-      <translation type="unfinished">unknown error</translation>
+      <translation>невідома помилка</translation>
     </message>
     <message>
       <source>Not loaded</source>
-      <translation type="unfinished">Not loaded</translation>
+      <translation>Не завантажено</translation>
     </message>
     <message>
       <source>Loaded</source>
-      <translation type="unfinished">Loaded</translation>
+      <translation>Завантажено</translation>
     </message>
     <message>
       <source>plugin is in the black list</source>
-      <translation type="unfinished">plugin is in the black list</translation>
+      <translation>плагін знаходиться у чорному списку</translation>
     </message>
     <message>
       <source>Status</source>
-      <translation type="unfinished">Status</translation>
+      <translation>Статус</translation>
     </message>
     <message>
       <source>plugin is optional and is not in the white list</source>
-      <translation type="unfinished">plugin is optional and is not in the white list</translation>
+      <translation>плагін є опціональним і не входить у білий список</translation>
     </message>
   </context>
   <context>

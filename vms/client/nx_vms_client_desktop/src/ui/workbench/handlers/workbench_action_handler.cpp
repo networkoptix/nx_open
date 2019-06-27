@@ -2584,7 +2584,7 @@ void ActionHandler::confirmAnalyticsStorageLocation()
 
             const auto openSettings = msgBox.addButton(tr("Open Server Settings"),
                 QDialogButtonBox::ButtonRole::ResetRole, Qn::ButtonAccent::NoAccent);
-            const auto ok = msgBox.addButton(tr("OK"),
+            msgBox.addButton(tr("OK"),
                 QDialogButtonBox::ButtonRole::AcceptRole, Qn::ButtonAccent::Standard);
 
             msgBox.exec();

@@ -24,7 +24,7 @@ using TimePeriodsLookupCompletionHandler =
 using CreateCursorCompletionHandler =
     nx::utils::MoveOnlyFunc<void(
         ResultCode /*resultCode*/,
-        std::shared_ptr<AbstractCursor> /*cursor*/)>;
+        std::unique_ptr<AbstractCursor> /*cursor*/)>;
 
 /**
  * NOTE: Every method of this class is asynchronous if other not specified.
@@ -54,11 +54,6 @@ public:
     virtual void createLookupCursor(
         Filter filter,
         CreateCursorCompletionHandler completionHandler) = 0;
-
-    /**
-     * Close created cursor.
-     */
-    virtual void closeCursor(const std::shared_ptr<AbstractCursor>& cursor) = 0;
 
     /**
      * Selects all objects with non-empty track that satisfy to the filter.

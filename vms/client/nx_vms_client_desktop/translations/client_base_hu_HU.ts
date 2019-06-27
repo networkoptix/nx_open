@@ -5743,8 +5743,8 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Felhasználók</translation>
     </message>
     <message>
-      <source>Analytics</source>
-      <translation>analitika</translation>
+      <source>Plugins</source>
+      <translation type="unfinished">Plugins</translation>
     </message>
   </context>
   <context>
@@ -7662,10 +7662,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Weboldal</translation>
     </message>
     <message>
-      <source>Analytics</source>
-      <translation>analitika</translation>
-    </message>
-    <message>
       <source>Expert</source>
       <translation>Szakértő</translation>
     </message>
@@ -7717,6 +7713,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>I/O Modules Settings</source>
       <translation>I/O modulok beállítása</translation>
+    </message>
+    <message>
+      <source>Plugins</source>
+      <translation type="unfinished">Plugins</translation>
     </message>
   </context>
   <context>

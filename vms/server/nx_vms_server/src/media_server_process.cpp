@@ -3625,7 +3625,7 @@ bool MediaServerProcess::setUpMediaServerResource(
             nx::network::SocketAddress(nx::network::HostAddress::localhost, m_universalTcpListener->getPort()));
 
         // used for statistics reported
-        server->setSystemInfo(QnAppInfo::currentSystemInformation());
+        server->setOsInfo(nx::utils::OsInfo::current());
         server->setVersion(commonModule()->engineVersion());
 
         SettingsHelper settingsHelper(this->serverModule());
@@ -4629,9 +4629,8 @@ void MediaServerProcess::run()
         initializeLogging(serverSettings.get());
 
     // This must be done before QnCommonModule instantiation.
-    nx::vms::api::SystemInformation::runtimeModificationOverride =
-        ini().runtimeModificationOverride;
-    nx::vms::api::SystemInformation::runtimeOsVersionOverride = ini().runtimeOsVersionOverride;
+    nx::utils::OsInfo::currentVariantOverride = ini().currentOsVariantOverride;
+    nx::utils::OsInfo::currentVariantVersionOverride = ini().currentOsVariantVersionOverride;
 
     if (m_cmdLineArguments.vmsProtocolVersion > 0)
     {
@@ -4909,6 +4908,7 @@ protected:
             return 0;
 
         int res = application()->exec();
+        qnStaticCommon->instance<QnLongRunnablePool>()->stopAll();
 
         m_main.reset();
 
