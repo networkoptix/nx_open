@@ -10,6 +10,13 @@ class RetryUpdate: public QnRestRequestHandler, public ServerModuleAware
 public:
     RetryUpdate(QnMediaServerModule* serverModule);
 
+    virtual int executeGet(
+        const QString& path,
+        const QnRequestParamList& params,
+        QByteArray& result,
+        QByteArray& contentType,
+        const QnRestConnectionProcessor* processor) override;
+
     virtual int executePost(
         const QString& path,
         const QnRequestParamList& params,
