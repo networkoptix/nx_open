@@ -276,9 +276,12 @@ private:
         m_fakeMediator.httpMessageDispatcher().registerRequestProcessorFunc(
             network::http::Method::post,
             hpm::api::kConnectionSpeedUplinkPath,
-            [this](auto&&... /*args*/)
+            [this](
+                nx::network::http::RequestContext /*request*/,
+                nx::network::http::RequestProcessedHandler completionHandler)
             {
                 m_reportReceivedEvent.push(true);
+                completionHandler(nx::network::http::StatusCode::ok);
             });
     }
 

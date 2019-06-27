@@ -128,9 +128,11 @@ void UplinkSpeedReporter::UplinkSpeedReporter::onSpeedTestComplete(
     }
 
     auto systemCredentials = m_mediatorConnector->getSystemCredentials();
-    NX_VERBOSE(this, "SystemCredentials were revoked during a speed test, disabling.");
     if (!systemCredentials)
+    {
+        NX_VERBOSE(this, "SystemCredentials were revoked during a speed test, disabling.");
         return disable(__func__);
+    }
 
     m_mediatorApiClient->reportUplinkSpeed(
         hpm::api::PeerConnectionSpeed{
