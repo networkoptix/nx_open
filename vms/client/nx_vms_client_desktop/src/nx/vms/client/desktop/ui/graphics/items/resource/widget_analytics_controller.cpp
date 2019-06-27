@@ -197,23 +197,31 @@ void WidgetAnalyticsController::Private::updateObjectAreas(microseconds timestam
             areaInfo.rectangle = objectInfo.rectangle;
         }
 
-        if (ini().displayAnalyticsObjectsDebugInfo)
+        QString debugInfoDescriptor(ini().displayAnalyticsObjectsDebugInfo);
+        if (!debugInfoDescriptor.isEmpty())
         {
             const auto addInfoRow =
-                [&areaInfo](QString label, auto value)
+                [debugInfoDescriptor, &areaInfo, allowAll = debugInfoDescriptor.contains("all")]
+                (QString key, QString label, auto value)
                 {
-                    areaInfo.text += '\n';
-                    areaInfo.text += label;
-                    areaInfo.text += '\t';
-                    areaInfo.text += QnLexical::serialized(value);
+                    if (allowAll || debugInfoDescriptor.contains(key))
+                    {
+                        areaInfo.text += '\n';
+                        areaInfo.text += label;
+                        areaInfo.text += '\t';
+                        areaInfo.text += QnLexical::serialized(value);
+                    }
                 };
 
-            addInfoRow("ID", objectInfo.id);
-            addInfoRow("Timestamp", timestamp.count());
-            addInfoRow("Delay", (timestamp - objectInfo.startTimestamp).count() / 1000);
-            addInfoRow("Coords", objectInfo.rectangle);
+            addInfoRow("id", "ID", objectInfo.id);
+            addInfoRow("delay", "Delay", (timestamp - objectInfo.startTimestamp).count() / 1000);
+            addInfoRow("actual_ts", "Timestamp", timestamp.count());
             if (ini().enableDetectedObjectsInterpolation)
-                addInfoRow("Interpolated", areaInfo.rectangle);
+                addInfoRow("actual_rect", "Interpolated", areaInfo.rectangle);
+            addInfoRow("object_ts", "Original TS", objectInfo.startTimestamp.count());
+            addInfoRow("object_rect", "Original Rect", objectInfo.rectangle);
+            addInfoRow("future_ts", "Future TS", objectInfo.futureRectangleTimestamp.count());
+            addInfoRow("future_rect", "Future Rect", objectInfo.futureRectangle);
         }
 
         areaInfo.rectangle = Geometry::movedInto(areaInfo.rectangle, kWidgetBounds);
