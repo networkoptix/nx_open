@@ -150,20 +150,6 @@ private:
     std::unique_ptr<speed_test::UplinkSpeedTester> m_speedTester;
 };
 
-TEST_F(UplinkSpeedTester, succeeds_with_valid_url_california)
-{
-    whenStartSpeedTest("http://54.193.16.74");
-    thenTestSucceeds();
-    andTestResultIsValid();
-}
-
-TEST_F(UplinkSpeedTester, succeeds_with_valid_url_virginia)
-{
-	whenStartSpeedTest("http://52.55.65.28");
-	thenTestSucceeds();
-	andTestResultIsValid();
-}
-
 TEST_F(UplinkSpeedTester, succeeds_with_valid_url_local)
 {
 	whenStartSpeedTest(validSpeedTestUrl());
@@ -187,8 +173,8 @@ protected:
     {
 		using namespace std::chrono;
 
-        m_testMinTime = localNow() + milliseconds(10);
-        m_testMaxTime = localNow() + milliseconds(20);
+        m_testMinTime = localNow() + seconds(10);
+        m_testMaxTime = localNow() + seconds(11);
 
 		m_speedTester =
             std::make_unique<speed_test::ScheduledUplinkSpeedTester>(m_testMinTime, m_testMaxTime);
@@ -208,7 +194,7 @@ protected:
         {
             thenTestSucceeds();
             andTestResultIsValid();
-        } while (m_completeTests < m_speedTester->testSchedule().size());
+        } while (m_completeTests < m_speedTester->testSchedule().size() + 1);
 
         ASSERT_TRUE(m_speedTester->waitTimeBeforeNextTest() < std::chrono::hours(24));
 	}

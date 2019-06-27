@@ -26,6 +26,9 @@ public:
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
     virtual void stopWhileInAioThread() override;
 
+    /**
+     * Note: start will perform one test immediately, and then per schedule after that
+     */
     virtual void start(const nx::utils::Url& speedTestUrl, CompletionHandler handler) override;
 
     std::chrono::milliseconds waitTimeBeforeNextTest() const;

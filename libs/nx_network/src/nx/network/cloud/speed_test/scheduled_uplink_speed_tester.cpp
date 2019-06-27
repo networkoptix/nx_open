@@ -52,7 +52,7 @@ void ScheduledUplinkSpeedTester::start(
         m_url = speedTestUrl;
         m_handler = std::move(handler);
         m_timer = std::make_unique<nx::network::aio::Timer>();
-        scheduleNextTest(waitTimeBeforeNextTest());
+        scheduleNextTest(milliseconds::zero());
     });
 }
 
