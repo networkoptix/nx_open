@@ -281,13 +281,6 @@ createUpdateZip() # file.deb
     echo "  Creating symlink to .deb"
     ln -s "$DEB_FILE" "$ZIP_DIR/"
 
-    local DEB
-    for DEB in "$BUILD_DIR/deb"/*
-    do
-        echo "  Copying $(basename "$DEB")"
-        cp -r "$DEB" "$ZIP_DIR/"
-    done
-
     local FILE="update/install.sh"
     if [[ -f $FILE ]]
     then
