@@ -317,8 +317,11 @@ void QnWorkbenchResourcesSettingsHandler::at_copyRecordingScheduleAction_trigger
             }
         };
 
-    const auto selectedCameras = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
+    auto selectedCameras = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
         dialog->selectedResources());
+
+    // Do not try to copy camera schedule to itself.
+    selectedCameras.removeAll(camera);
 
     qnResourcesChangesManager->saveCameras(selectedCameras, applyChanges);
 }
