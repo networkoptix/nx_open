@@ -5745,8 +5745,8 @@ If you intended to move analytics data to another storage location, please conta
       <translation type="unfinished">Users</translation>
     </message>
     <message>
-      <source>Analytics</source>
-      <translation type="unfinished">Analytics</translation>
+      <source>Plugins</source>
+      <translation type="unfinished">Plugins</translation>
     </message>
   </context>
   <context>
@@ -7664,10 +7664,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation type="unfinished">Web Page</translation>
     </message>
     <message>
-      <source>Analytics</source>
-      <translation type="unfinished">Analytics</translation>
-    </message>
-    <message>
       <source>Expert</source>
       <translation type="unfinished">Expert</translation>
     </message>
@@ -7719,6 +7715,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>I/O Modules Settings</source>
       <translation type="unfinished">I/O Modules Settings</translation>
+    </message>
+    <message>
+      <source>Plugins</source>
+      <translation type="unfinished">Plugins</translation>
     </message>
   </context>
   <context>

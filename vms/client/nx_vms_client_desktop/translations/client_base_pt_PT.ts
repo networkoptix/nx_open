@@ -5745,8 +5745,8 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Utilizadores</translation>
     </message>
     <message>
-      <source>Analytics</source>
-      <translation type="unfinished">Analytics</translation>
+      <source>Plugins</source>
+      <translation type="unfinished">Plugins</translation>
     </message>
   </context>
   <context>
@@ -7664,10 +7664,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Página da Web</translation>
     </message>
     <message>
-      <source>Analytics</source>
-      <translation type="unfinished">Analytics</translation>
-    </message>
-    <message>
       <source>Expert</source>
       <translation>Avançado</translation>
     </message>
@@ -7719,6 +7715,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>I/O Modules Settings</source>
       <translation>Definições módulos I/O</translation>
+    </message>
+    <message>
+      <source>Plugins</source>
+      <translation type="unfinished">Plugins</translation>
     </message>
   </context>
   <context>

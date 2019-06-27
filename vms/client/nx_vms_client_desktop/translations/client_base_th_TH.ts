@@ -5677,8 +5677,8 @@ If you intended to move analytics data to another storage location, please conta
       <translation>ผู้ใช้งาน</translation>
     </message>
     <message>
-      <source>Analytics</source>
-      <translation type="unfinished">Analytics</translation>
+      <source>Plugins</source>
+      <translation type="unfinished">Plugins</translation>
     </message>
   </context>
   <context>
@@ -7554,10 +7554,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>เว็บเพจ:</translation>
     </message>
     <message>
-      <source>Analytics</source>
-      <translation>การวิเคราะห์</translation>
-    </message>
-    <message>
       <source>Expert</source>
       <translation>ระดับผู้เชี่ยวชาญ</translation>
     </message>
@@ -7606,6 +7602,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>I/O Modules Settings</source>
       <translation>การตั้งค่าโมดูล I/O</translation>
+    </message>
+    <message>
+      <source>Plugins</source>
+      <translation type="unfinished">Plugins</translation>
     </message>
   </context>
   <context>

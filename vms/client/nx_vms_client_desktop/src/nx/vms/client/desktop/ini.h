@@ -52,10 +52,10 @@ struct Ini: nx::kit::IniConfig
         "Allows the interpolation of the trajectories of the Analytics Objects between frames.\n"
         "\n"
         "If enabled, bounding boxes around the Analytics Objects are moving more smoothly.");
-    NX_INI_FLAG(0, displayAnalyticsDelay,
-        "Whether to add a delay label to Analytics Object description.\n"
+    NX_INI_FLAG(0, displayAnalyticsObjectsDebugInfo,
+        "Whether to add a debug info label to Analytics Object description.\n"
         "\n"
-        "Allows to see the Analytics latency in the Desktop Client.");
+        "Allows to see the Analytics Objects details in the Desktop Client.");
     NX_INI_FLAG(0, displayAnalyticsEnginesInResourceTree,
         "Displays Analytics Engine items in the Resource tree.");
     NX_INI_FLAG(0, debugThumbnailProviders, "Enables debug mode for thumbnail providers.");
@@ -162,10 +162,10 @@ struct Ini: nx::kit::IniConfig
         "Dump icons, generated from svg, to a given folder.");
     NX_INI_FLAG(0, enableVSyncWorkaround,
         "Always limit frame rate to approximately 60 fps, even if VSync is disabled.");
-        
+
     NX_INI_FLAG(0, enableGdiTrace,
         "Enable tracing of GDI object allocation.");
-    NX_INI_INT(5000, gdiTraceLimit, 
+    NX_INI_INT(5000, gdiTraceLimit,
         "Number of GDI handles in use which triggers report creation.");
 
     NX_INI_FLAG(0, alwaysShowGetUpdateFileButton, "Always show Get Update File button.");

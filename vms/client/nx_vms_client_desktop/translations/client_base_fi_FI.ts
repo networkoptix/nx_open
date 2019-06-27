@@ -5742,8 +5742,8 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Käyttäjät</translation>
     </message>
     <message>
-      <source>Analytics</source>
-      <translation>Analytiikka</translation>
+      <source>Plugins</source>
+      <translation type="unfinished">Plugins</translation>
     </message>
   </context>
   <context>
@@ -7661,10 +7661,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Verkkosivu</translation>
     </message>
     <message>
-      <source>Analytics</source>
-      <translation>Analytiikka</translation>
-    </message>
-    <message>
       <source>Expert</source>
       <translation>Asiantuntija</translation>
     </message>
@@ -7716,6 +7712,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>I/O Modules Settings</source>
       <translation>I/O-moduulien asetukset</translation>
+    </message>
+    <message>
+      <source>Plugins</source>
+      <translation type="unfinished">Plugins</translation>
     </message>
   </context>
   <context>
