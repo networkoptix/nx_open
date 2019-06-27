@@ -116,7 +116,7 @@ Parser::ParseState Parser::readHeaderFixed(char* data)
 {
     m_opCode = (FrameType)(*data & 0x0F);
     m_fin = (*data >> 7) & 0x01;
-    bool psv1 = ((*data >> 6) & 0x01) ? CompressionType::perMessageDeflate : CompressionType::none;
+    bool psv1 = static_cast<bool>((*data >> 6) & 0x01);
 
     if (m_firstFrame
         && m_compressionType == CompressionType::perMessageDeflate
