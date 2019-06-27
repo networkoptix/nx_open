@@ -14,7 +14,6 @@ namespace {
 
 static constexpr int kMaxPingRequests = 10;
 static const milliseconds kTestDuration = seconds(3);
-static const milliseconds kOneDay = hours(24);
 
 } // namespace
 
@@ -145,106 +144,5 @@ void UplinkSpeedTester::emitTestResult(
 		nx::utils::swapAndCall(m_handler, errorCode, std::move(result));
 }
 
-//-------------------------------------------------------------------------------------------------
-// ScheduledUplinkSpeedTester
-
-const milliseconds ScheduledUplinkSpeedTester::kMinTime = hours(1);
-const milliseconds ScheduledUplinkSpeedTester::kMaxTime = hours(4);
-const milliseconds ScheduledUplinkSpeedTester::kInvalid = milliseconds(-1);
-
-ScheduledUplinkSpeedTester::ScheduledUplinkSpeedTester()
-{
-    int min = kMinTime.count();
-    int max = kMaxTime.count();
-    m_testSchedule.emplace(milliseconds(min + rand() / (RAND_MAX / (max - min + 1) + 1)));
-}
-
-ScheduledUplinkSpeedTester::~ScheduledUplinkSpeedTester()
-{
-	pleaseStopSync();
-}
-
-void ScheduledUplinkSpeedTester::bindToAioThread(aio::AbstractAioThread* aioThread)
-{
-    base_type::bindToAioThread(aioThread);
-	if (m_timer)
-		m_timer->bindToAioThread(aioThread);
-	if (m_speedTester)
-		m_speedTester->bindToAioThread(aioThread);
-}
-
-void ScheduledUplinkSpeedTester::stopWhileInAioThread()
-{
-	m_timer.reset();
-	m_speedTester.reset();
-}
-
-void ScheduledUplinkSpeedTester::start(
-	const nx::utils::Url& speedTestUrl,
-	CompletionHandler handler)
-{
-	dispatch(
-		[this, speedTestUrl, handler = std::move(handler)]() mutable
-		{
-			m_url = speedTestUrl;
-			m_handler = std::move(handler);
-			m_timer = std::make_unique<nx::network::aio::Timer>();
-			scheduleNextTest(waitTimeBeforeNextTest());
-		});
-}
-
-milliseconds ScheduledUplinkSpeedTester::waitTimeBeforeNextTest() const
-{
-    if (m_testSchedule.empty())
-        return kInvalid;
-
-    auto now = localNow();
-    std::optional<milliseconds> startTime;
-    for (auto it = m_testSchedule.begin(); it != m_testSchedule.end(); ++it)
-    {
-        if (now < *it)
-        {
-            startTime = *it;
-            break;
-        }
-    }
-
-    // If startTime is empty, we are later in the day than anything in m_testSchedule, so take the
-    // earliest start time and shift it back 24 hours.
-    if (!startTime)
-    {
-        // Braces required to avoid "misleading indentation" error.
-        startTime = *m_testSchedule.begin() + kOneDay;
-    }
-
-    return *startTime - now;
-}
-
-std::set<milliseconds> ScheduledUplinkSpeedTester::testSchedule() const
-{
-    return m_testSchedule;
-}
-
-void ScheduledUplinkSpeedTester::scheduleNextTest(const milliseconds& wait)
-{
-	NX_VERBOSE(this, "The next test is scheduled in %1", wait);
-
-    m_timer->start(
-		wait,
-		[this]()
-		{
-			m_speedTester = std::make_unique<UplinkSpeedTester>();
-			m_speedTester->start(
-				m_url,
-				[this](SystemError::ErrorCode errorCode, std::optional<ConnectionSpeed> result)
-				{
-					m_handler(errorCode, std::move(result));
-
-					scheduleNextTest(waitTimeBeforeNextTest());
-
-					m_speedTester.reset();
-				});
-		});
-}
 
 } // namespace nx::network::cloud::speed_test

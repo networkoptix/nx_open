@@ -1,17 +1,15 @@
 #pragma once
 
+#include "abstract_speed_tester.h"
+
 #include <nx/network/cloud/mediator/api/connection_speed.h>
 #include <nx/network/http/http_async_client.h>
 #include "uplink_bandwidth_tester.h"
 
 namespace nx::network::cloud::speed_test {
 
-using CompletionHandler =
-    nx::utils::MoveOnlyFunc<void(
-		SystemError::ErrorCode,
-		std::optional<nx::hpm::api::ConnectionSpeed>)>;
-
-class NX_NETWORK_API UplinkSpeedTester: public aio::BasicPollable
+class NX_NETWORK_API UplinkSpeedTester:
+    public AbstractSpeedTester
 {
     using base_type = aio::BasicPollable;
 
@@ -21,7 +19,7 @@ public:
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 	virtual void stopWhileInAioThread() override;
 
-    void start(const nx::utils::Url& speedTestUrl, CompletionHandler handler);
+    virtual void start(const nx::utils::Url& url, CompletionHandler handler) override;
 
 private:
 	void startBandwidthTest(const std::chrono::microseconds& pingTime);
@@ -50,42 +48,6 @@ private:
     std::unique_ptr<UplinkBandwidthTester> m_bandwidthTester;
     PingTestContext m_testContext;
 
-    CompletionHandler m_handler;
-};
-
-//-------------------------------------------------------------------------------------------------
-// ScheduledUplinkSpeedTester
-
-class NX_NETWORK_API ScheduledUplinkSpeedTester: public aio::BasicPollable
-{
-    using base_type = aio::BasicPollable;
-public:
-    static const std::chrono::milliseconds kMinTime;
-    static const std::chrono::milliseconds kMaxTime;
-    static const std::chrono::milliseconds kInvalid;
-
-public:
-    /**
-     * @param testSchedule is the set of local times when each test should be sheduled
-     */
-	ScheduledUplinkSpeedTester();
-	~ScheduledUplinkSpeedTester();
-
-    virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
-	virtual void stopWhileInAioThread() override;
-
-    void start(const nx::utils::Url& speedTestUrl, CompletionHandler handler);
-	std::chrono::milliseconds waitTimeBeforeNextTest() const;
-    std::set<std::chrono::milliseconds> testSchedule() const;
-
-private:
-    void scheduleNextTest(const std::chrono::milliseconds& wait);
-
-private:
-	std::set<std::chrono::milliseconds> m_testSchedule;
-    std::unique_ptr<nx::network::aio::Timer> m_timer;
-	std::unique_ptr<UplinkSpeedTester> m_speedTester;
-	nx::utils::Url m_url;
     CompletionHandler m_handler;
 };
 
