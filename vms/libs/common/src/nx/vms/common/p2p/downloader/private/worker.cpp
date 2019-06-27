@@ -49,13 +49,14 @@ QString requestSubjectString(Worker::State state)
 }
 
 template<typename T, typename UserData>
-struct RequestContext: AbstractPeerManager::RequestContext<T>
+struct RequestContext
 {
+    AbstractPeerManager::RequestContextPtr<T> context;
     UserData data;
     int chunkIndex = -1;
 
-    RequestContext(const UserData& data, AbstractPeerManager::RequestContext<T>&& context):
-        AbstractPeerManager::RequestContext<T>(std::move(context)),
+    RequestContext(const UserData& data, AbstractPeerManager::RequestContextPtr<T> context):
+        context(std::move(context)),
         data(data)
     {
     }
@@ -70,7 +71,7 @@ struct RequestContext: AbstractPeerManager::RequestContext<T>
             auto it = contexts.begin();
             while (it != contexts.end() && !worker->needToStop())
             {
-                if (it->future.wait_for(2s) == std::future_status::ready)
+                if (it->context->future.wait_for(2s) == std::future_status::ready)
                     break;
                 ++it;
             }
@@ -81,7 +82,7 @@ struct RequestContext: AbstractPeerManager::RequestContext<T>
             if (it == contexts.end())
                 continue;
 
-            const bool stopProcessing = handleReply(it->data, it->future.get());
+            const bool stopProcessing = handleReply(it->data, it->context->future.get());
             contexts.erase(it);
 
             if (stopProcessing)
@@ -92,7 +93,7 @@ struct RequestContext: AbstractPeerManager::RequestContext<T>
             NX_VERBOSE(worker->logTag(), "Cancelling %1 requests", contexts.size());
 
         for (auto& context: contexts)
-            context.cancel();
+            context.context->cancel();
 
         contexts.clear();
     }
@@ -420,7 +421,7 @@ void Worker::requestFileInformationInternal()
             requestSubjectString(m_state), peer);
 
         auto context = peer.manager->requestFileInfo(peer.id, m_fileName, url);
-        if (context.isValid())
+        if (context->isValid())
             contexts.emplace_back(peer, std::move(context));
         else
             decreasePeerRank(peer);
@@ -540,7 +541,7 @@ void Worker::requestChecksums()
             requestSubjectString(State::requestingChecksums), peer);
 
         auto context = peer.manager->requestChecksums(peer.id, m_fileName);
-        if (context.isValid())
+        if (context->isValid())
             contexts.emplace_back(peer, std::move(context));
         else
             decreasePeerRank(peer);
@@ -632,7 +633,7 @@ void Worker::downloadChunks()
                 break;
             }
 
-            // Trying to aoid busy peers to balance network load. But this is not absolutely
+            // Trying to avoid busy peers to balance network load. But this is not absolutely
             // necessary.
             QSet<Peer> peers = availablePeers - busyPeers;
             if (peers.isEmpty())
@@ -656,7 +657,7 @@ void Worker::downloadChunks()
 
             auto context = peer.manager->downloadChunk(
                 peer.id, m_fileName, fileInfo.url, chunkIndex, (int) fileInfo.chunkSize);
-            if (context.isValid())
+            if (context->isValid())
             {
                 chunkRequested = true;
                 contexts.emplace_back(std::make_pair(peer, chunkIndex), std::move(context));
