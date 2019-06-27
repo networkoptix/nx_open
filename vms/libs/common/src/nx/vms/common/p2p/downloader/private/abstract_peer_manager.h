@@ -66,10 +66,11 @@ public:
     struct InternetRequestContext : BaseRequestContext<T>
     {
         InternetRequestContext(
-            std::unique_ptr<network::http::AsyncClient> httpClient, Future future,
+            std::unique_ptr<network::http::AsyncClient> httpClient,
+            typename BaseRequestContext<T>::Future future,
             std::function<void()> cancelFunction = {})
             :
-            BaseRequestContext(std::move(future), cancelFunction),
+            BaseRequestContext<T>(std::move(future), cancelFunction),
             httpClient(std::move(httpClient))
         {}
 
