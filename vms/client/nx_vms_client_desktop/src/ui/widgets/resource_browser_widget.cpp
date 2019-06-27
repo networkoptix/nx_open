@@ -171,7 +171,12 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
     // To keep aspect ratio specify only maximum height for server request
     m_thumbnailManager->setThumbnailSize(QSize(0, kMaxThumbnailSize.height()));
 
-    m_resourceModel = new QnResourceTreeModel(QnResourceTreeModel::FullScope, this);
+    m_resourceModel = new QnResourceTreeModel(
+        QnResourceTreeModel::FullScope, accessController(), snapshotManager(), this);
+    m_connections << connect(context, &QnWorkbenchContext::userChanged,
+        m_resourceModel, &QnResourceTreeModel::setUser);
+    m_resourceModel->setActionManager(context->menu());
+
     ui->resourceTreeWidget->setModel(m_resourceModel);
     ui->resourceTreeWidget->setCheckboxesVisible(false);
     ui->resourceTreeWidget->setGraphicsTweaks(Qn::HideLastRow | Qn::BypassGraphicsProxy);

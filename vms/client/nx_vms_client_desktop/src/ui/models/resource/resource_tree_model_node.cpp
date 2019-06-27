@@ -66,22 +66,24 @@ bool nodeRequiresChildren(ResourceTree::NodeType nodeType)
 
 } // namespace
 
-QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, NodeType nodeType, const QnUuid& uuid) :
-    QnWorkbenchContextAware(model),
+QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, NodeType nodeType,
+    const QnUuid& uuid)
+    :
+    QnCommonModuleAware(model),
     m_initialized(false),
     m_model(model),
     m_type(nodeType),
     m_uuid(uuid),
     m_state(Normal),
     m_bastard(false),
-    m_parent(NULL),
+    m_parent(nullptr),
     m_status(Qn::Online),
     m_modified(false),
     m_checkState(Qt::Unchecked),
     m_uncheckedChildren(0),
     m_checkedChildren(0)
 {
-    NX_ASSERT(model != NULL);
+    NX_ASSERT(model != nullptr);
     m_editable.checked = false;
     m_iconKey = calculateIconKey();
 }
@@ -365,7 +367,7 @@ void QnResourceTreeModelNode::update()
         }
         case NodeType::currentUser:
         {
-            auto user = context()->user();
+            auto user = m_model->getUser();
             setNameInternal(user ? user->getName() : QString());
             break;
         }
@@ -477,8 +479,8 @@ bool QnResourceTreeModelNode::calculateBastard() const
         return true;
 
     /* Here we can narrow nodes visibility, based on permissions, if needed. */
-    bool isLoggedIn = !context()->user().isNull();
-    bool isAdmin = accessController()->hasGlobalPermission(GlobalPermission::admin);
+    bool isLoggedIn = !m_model->getUser().isNull();
+    bool isAdmin = m_model->getAccessController()->hasGlobalPermission(GlobalPermission::admin);
 
     switch (m_type)
     {
@@ -529,7 +531,8 @@ bool QnResourceTreeModelNode::calculateBastard() const
         if (!m_resource)
             return true;
 
-        return !accessController()->hasPermissions(m_resource, Qn::ViewContentPermission);
+        return !m_model->getAccessController()->hasPermissions(
+            m_resource, Qn::ViewContentPermission);
     }
 
     case NodeType::users:
@@ -565,7 +568,7 @@ bool QnResourceTreeModelNode::calculateBastard() const
             return false;
 
         /* Hide non-readable resources. */
-        if (!accessController()->hasPermissions(m_resource, Qn::ReadPermission))
+        if (!m_model->getAccessController()->hasPermissions(m_resource, Qn::ReadPermission))
             return true;
 
         if (QnLayoutResourcePtr layout = m_resource.dynamicCast<QnLayoutResource>())
@@ -728,15 +731,20 @@ Qt::ItemFlags QnResourceTreeModelNode::flags(int column) const
             case NodeType::sharedLayout:
             case NodeType::resource:
             case NodeType::edge:
-                m_editable.value = menu()->canTrigger(action::RenameResourceAction, m_resource);
+            if (auto actionManager = m_model->getActionManager())
+            {
+                m_editable.value =
+                    actionManager->canTrigger(action::RenameResourceAction, m_resource);
+            }
                 break;
             case NodeType::videoWallItem:
             case NodeType::videoWallMatrix:
-                m_editable.value = accessController()->hasGlobalPermission(
-                    GlobalPermission::controlVideowall);
+            m_editable.value = m_model->getAccessController()->hasGlobalPermission(
+                GlobalPermission::controlVideowall);
                 break;
             case NodeType::layoutTour:
-                m_editable.value = menu()->canTrigger(action::RenameLayoutTourAction);
+            if (auto actionManager = m_model->getActionManager())
+                m_editable.value = actionManager->canTrigger(action::RenameLayoutTourAction);
                 break;
             case NodeType::recorder:
                 m_editable.value = true;
@@ -981,12 +989,15 @@ bool QnResourceTreeModelNode::setData(const QVariant& value, int role, int colum
     parameters.setArgument(Qn::NodeTypeRole, m_type);
     parameters.setArgument(Qn::UuidRole, m_uuid);
 
-    if (m_type == NodeType::layoutTour)
-        menu()->trigger(action::RenameLayoutTourAction, parameters);
-    else if (isVideoWallEntity)
-        menu()->trigger(action::RenameVideowallEntityAction, parameters);
-    else
-        menu()->trigger(action::RenameResourceAction, parameters);
+    if (auto actionManager = m_model->getActionManager())
+    {
+        if (m_type == NodeType::layoutTour)
+            actionManager->trigger(action::RenameLayoutTourAction, parameters);
+        else if (isVideoWallEntity)
+            actionManager->trigger(action::RenameVideowallEntityAction, parameters);
+        else
+            actionManager->trigger(action::RenameResourceAction, parameters);
+    }
     return true;
 }
 
