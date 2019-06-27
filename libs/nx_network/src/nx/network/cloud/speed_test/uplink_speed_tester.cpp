@@ -60,10 +60,7 @@ void UplinkSpeedTester::startBandwidthTest(const microseconds& pingTime)
 			if (errorCode != SystemError::noError)
 				return emitTestResult(errorCode, std::nullopt);
 
-			nx::hpm::api::ConnectionSpeed result;
-			result.bandwidth = bandwidth;
-			result.pingTime = pingTime;
-			emitTestResult(SystemError::noError, std::move(result));
+            emitTestResult(SystemError::noError, ConnectionSpeed{pingTime, bandwidth});
 		});
 }
 
@@ -77,7 +74,6 @@ void UplinkSpeedTester::setupPingTest()
 				m_httpClient->setOnResponseReceived(nullptr);
 				auto errorCode = m_httpClient->lastSysErrorCode();
 				return emitTestResult(errorCode, std::nullopt);
-				m_httpClient.reset();
 			}
 		});
 

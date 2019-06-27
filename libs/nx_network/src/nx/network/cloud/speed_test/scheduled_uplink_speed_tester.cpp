@@ -1,5 +1,7 @@
 #include "scheduled_uplink_speed_tester.h"
 
+#include <nx/utils/random.h>
+
 namespace nx::network::cloud::speed_test {
 
 using namespace std::chrono;
@@ -11,15 +13,14 @@ static const std::chrono::milliseconds kOneDay = hours(24);
 
 }
 
-const milliseconds ScheduledUplinkSpeedTester::kInvalidTime = milliseconds(-1);
-
-ScheduledUplinkSpeedTester::ScheduledUplinkSpeedTester(milliseconds minTime, milliseconds maxTime):
-    m_minTime(minTime),
-    m_maxTime(maxTime)
+ScheduledUplinkSpeedTester::ScheduledUplinkSpeedTester(
+    milliseconds minLocalTime,
+    milliseconds maxLocalTime):
+    m_minTime(minLocalTime),
+    m_maxTime(maxLocalTime)
 {
-    int min = m_minTime.count();
-    int max = m_maxTime.count();
-    m_testSchedule.emplace(milliseconds(min + rand() / (RAND_MAX / (max - min + 1) + 1)));
+    m_testSchedule.emplace(
+        milliseconds(nx::utils::random::number(m_minTime.count(), m_maxTime.count())));
 }
 
 ScheduledUplinkSpeedTester::~ScheduledUplinkSpeedTester()

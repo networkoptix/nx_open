@@ -68,8 +68,8 @@ public:
 
     virtual void start(const nx::utils::Url& url, CompletionHandler handler) override
     {
-        m_testRunEvent->push(std::make_tuple(SystemError::noError, hpm::api::ConnectionSpeed()));
-        handler(SystemError::noError, hpm::api::ConnectionSpeed());
+        m_testRunEvent->push(std::make_tuple(SystemError::noError, hpm::api::ConnectionSpeed{}));
+        handler(SystemError::noError, hpm::api::ConnectionSpeed{});
     }
 
 private:

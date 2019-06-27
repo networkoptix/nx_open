@@ -18,7 +18,6 @@
 #include "tunnel/outgoing_tunnel_pool.h"
 #include "speed_test/uplink_speed_reporter.h"
 
-
 namespace nx {
 namespace network {
 namespace cloud {

@@ -15,12 +15,12 @@ class NX_NETWORK_API ScheduledUplinkSpeedTester:
 {
     using base_type = aio::BasicPollable;
 public:
-    static const std::chrono::milliseconds kInvalidTime;
+    static constexpr std::chrono::milliseconds kInvalidTime = std::chrono::milliseconds(-1);
 
 public:
     ScheduledUplinkSpeedTester(
-        std::chrono::milliseconds minTime = std::chrono::hours(1),
-        std::chrono::milliseconds maxTime = std::chrono::hours(4));
+        std::chrono::milliseconds minLocalTime = std::chrono::hours(1),
+        std::chrono::milliseconds maxLocalTime = std::chrono::hours(4));
     ~ScheduledUplinkSpeedTester();
 
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;

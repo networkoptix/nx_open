@@ -16,12 +16,7 @@ static constexpr char kSpeedTest[] = "SPEEDTEST";
 static constexpr int kPayloadSizeBytes = 1000 * 1000;
 static constexpr float kSimilarityThreshold = 0.97F;
 static constexpr int kMinRunningAverages = 4;
-static const auto kMinTestDuration = milliseconds(1);
-
-static int ipVersion(const nx::utils::Url& url)
-{
-    return HostAddress(url.host()).isPureIpV6() ? AF_INET6 : SocketFactory::tcpClientIpVersion();
-}
+static constexpr auto kMinTestDuration = milliseconds(1);
 
 static QByteArray makePayload()
 {
@@ -79,7 +74,8 @@ void UplinkBandwidthTester::doBandwidthTest(BandwidthCompletionHandler handler)
 		[this, handler = std::move(handler)]() mutable
 		{
 			m_handler = std::move(handler);
-			m_tcpSocket = std::make_unique<network::TCPSocket>(ipVersion(m_url));
+			m_tcpSocket =
+                std::make_unique<network::TCPSocket>(SocketFactory::tcpClientIpVersion());
 			m_tcpSocket->bindToAioThread(getAioThread());
 			m_tcpSocket->setNonBlockingMode(true);
 			m_tcpSocket->connectAsync(
@@ -103,6 +99,7 @@ void UplinkBandwidthTester::doBandwidthTest(BandwidthCompletionHandler handler)
 
 					m_testContext = TestContext();
 					m_testContext.payload = makePayload();
+                    m_testContext.sendRequests = true;
 					m_testContext.startTime = localNow();
 
 					sendRequest();
@@ -115,20 +112,12 @@ std::pair<int, nx::Buffer> UplinkBandwidthTester::makeRequest()
 	++m_testContext.sequence;
 
 	Request request;
-	insertOrReplaceHeader(
-		&request.headers,
-		HttpHeader("Date", formatDateTime(QDateTime::currentDateTime())));
-    insertOrReplaceHeader(&request.headers, HttpHeader("User-Agent", userAgentString()));
-    insertOrReplaceHeader(
-        &request.headers,
-		HttpHeader("Host", url::getEndpoint(m_url).toString().toUtf8()));
-    insertOrReplaceHeader(&request.headers, HttpHeader("Content-Type", "text/plain"));
-	insertOrReplaceHeader(
-		&request.headers,
-		HttpHeader("Content-Length", std::to_string(m_testContext.payload.size()).c_str()));
-	insertOrReplaceHeader(
-		&request.headers,
-		HttpHeader("X-Test-Sequence", std::to_string(m_testContext.sequence).c_str()));
+    request.headers.emplace("Date", formatDateTime(QDateTime::currentDateTime()));
+    request.headers.emplace("User-Agent", userAgentString());
+    request.headers.emplace("Host", url::getEndpoint(m_url).toString().toUtf8());
+    request.headers.emplace("Content-Type", "text/plain");
+    request.headers.emplace("Content-Length", std::to_string(m_testContext.payload.size()).c_str());
+	request.headers.emplace("X-Test-Sequence", std::to_string(m_testContext.sequence).c_str());
 
 	request.requestLine.method = Method::post;
 	request.requestLine.url.setPath(http::kApiPath);
@@ -168,7 +157,7 @@ std::optional<int> UplinkBandwidthTester::stopEarlyIfAble(int sequence) const
     }
 
     auto end = m_testContext.runningValues.find(sequence);
-    std::set<float> bandwidths;
+    std::vector<float> bandwidths;
 
     std::transform(
         std::prev(end, kMinRunningAverages),
@@ -188,7 +177,7 @@ std::optional<int> UplinkBandwidthTester::stopEarlyIfAble(int sequence) const
             return std::nullopt;
     }
 
-    return (int) (*bandwidths.rbegin());
+    return (int) bandwidths.front();
 }
 
 void UplinkBandwidthTester::onMessageReceived(network::http::Message message)
@@ -263,20 +252,6 @@ void nx::network::cloud::speed_test::UplinkBandwidthTester::testComplete(int ban
         m_testContext = TestContext();
         nx::utils::swapAndCall(m_handler, SystemError::noError, bandwidth);
     }
-}
-
-std::pair<SystemError::ErrorCode, int> UplinkBandwidthTester::calculateBandwidth(
-	const microseconds& endTime)
-{
-	const int testDuration =
-		(int) duration_cast<milliseconds>(endTime - m_testContext.startTime).count();
-
-	if (testDuration == 0)
-		return std::make_pair(SystemError::invalidData, 0);
-
-	return std::make_pair(
-		SystemError::noError,
-		m_testContext.totalBytesSent / testDuration);
 }
 
 void UplinkBandwidthTester::testFailed(SystemError::ErrorCode errorCode)

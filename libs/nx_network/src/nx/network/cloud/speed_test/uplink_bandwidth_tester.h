@@ -45,9 +45,6 @@ private:
 	void testComplete(int bandwidth);
 	void testFailed(SystemError::ErrorCode errorCode);
 
-	std::pair<SystemError::ErrorCode, int> calculateBandwidth(
-		const std::chrono::microseconds& endTime);
-
 private:
     struct RunningValue
     {
@@ -58,7 +55,7 @@ private:
 	struct TestContext
 	{
 		std::chrono::microseconds startTime;
-		bool sendRequests = true;
+		bool sendRequests = false;
 		int sequence = -1;
 		QByteArray payload;
 		int totalBytesSent = 0;
