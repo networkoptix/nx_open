@@ -14,14 +14,22 @@
 #include <nx/vms/client/desktop/utils/wearable_manager.h>
 #include <nx/vms/client/desktop/utils/wearable_state.h>
 
+#include <ui/workbench/workbench_context_aware.h>
+#include <ui/workbench/workbench_context.h>
+
 namespace nx::vms::client::desktop {
 
 ResourceTreeModelAdapter::ResourceTreeModelAdapter(QObject* parent): base_type(parent)
 {
     // TODO: #vkutin This is a hack, refactor the context awareness mechanic of the source model.
     const auto contextAwareParent = static_cast<QtSingleApplication*>(qApp)->activationWindow();
+    const auto workbenchContext =
+        dynamic_cast<QnWorkbenchContextAware*>(contextAwareParent)->context();
 
-    const auto model = new QnResourceTreeModel(QnResourceTreeModel::FullScope, contextAwareParent);
+    const auto model = new QnResourceTreeModel(QnResourceTreeModel::FullScope,
+        workbenchContext->accessController(),
+        workbenchContext->snapshotManager(),
+        contextAwareParent);
 
     setSourceModel(model);
     model->setParent(this);
