@@ -68,7 +68,7 @@ ServerProvider::ParameterProviders ServerProvider::makeProviders()
         ),
         singleParameterProvider(
             {"systemInfo", "system information"},
-            [](const auto& resource) { return Value(resource->getSystemInfo().toString()); }
+            [](const auto& resource) { return Value(resource->getOsInfo().toString()); }
         ),
         singleParameterProvider(
             {"osInfo", "operation system"},
