@@ -83,7 +83,7 @@ public:
     QnWorkbenchAccessController* getAccessController() const;
     QnWorkbenchLayoutSnapshotManager* getLayoutSnapshotManager() const;
 
-    // TODO: #vbreus  May not be set in unit test environment.
+    // TODO: #vbreus May not be set in unit test environment.
     nx::vms::client::desktop::ui::action::Manager* getActionManager() const;
     void setActionManager(nx::vms::client::desktop::ui::action::Manager* manager);
 
