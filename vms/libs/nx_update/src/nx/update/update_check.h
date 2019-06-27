@@ -6,7 +6,7 @@
 #include <QtCore/QString>
 
 #include <nx/update/update_information.h>
-#include <nx/vms/api/data/system_information.h>
+#include <nx/utils/os_info.h>
 #include <common/common_module.h>
 
 namespace nx::update {
@@ -43,11 +43,11 @@ Information updateInformation(
 std::pair<FindPackageResult, const Package*> findPackageForVariant(
     const nx::update::Information& updateInformation,
     bool isClient,
-    const vms::api::SystemInformationNew& systemInformation);
+    const utils::OsInfo& osInfo);
 std::pair<FindPackageResult, Package*> findPackageForVariant(
     nx::update::Information& updateInformation,
     bool isClient,
-    const vms::api::SystemInformationNew& systemInformation);
+    const utils::OsInfo& osInfo);
 
 /**
  * Searches for an update package for your particular module in the global update information.

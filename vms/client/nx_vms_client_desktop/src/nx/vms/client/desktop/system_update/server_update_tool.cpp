@@ -1240,32 +1240,27 @@ QUrl generateUpdatePackageUrl(
         query.addQueryItem("password", password);
     }
 
-    QSet<nx::vms::api::SystemInformation> systemInformationList;
+    query.addQueryItem("customization", QnAppInfo::customizationName());
+
+    QSet<nx::utils::OsInfo> osInfoList;
     for (const auto& id: targets)
     {
         const auto& server = resourcePool->getResourceById<QnMediaServerResource>(id);
         if (!server)
             continue;
 
-        if (!server->getSystemInfo().isValid())
+        if (!server->getOsInfo().isValid())
             continue;
 
         if (!targetVersion.isNull() && server->getVersion() == targetVersion)
             continue;
 
-        systemInformationList.insert(server->getSystemInfo());
+        osInfoList.insert(server->getOsInfo());
     }
 
-    auto clientPlatformModification = QnAppInfo::applicationPlatformModification();
-    auto clientArch = QnAppInfo::applicationArch();
-    auto clientPlatform = nx::utils::AppInfo::applicationPlatform();
-    QString clientRuntime = QString("%1_%2_%3").arg(clientPlatform, clientArch, clientPlatformModification);
-
-    query.addQueryItem("client", clientRuntime);
-    for (const auto &systemInformation: systemInformationList)
-        query.addQueryItem("server", systemInformation.toString().replace(L' ', L'_'));
-
-    query.addQueryItem("customization", QnAppInfo::customizationName());
+    query.addQueryItem("client", nx::utils::OsInfo::current().toString());
+    for (const auto &osInfo: osInfoList)
+        query.addQueryItem("server", osInfo.toString());
 
     QString path = qnSettings->updateCombineUrl();
     if (path.isEmpty())

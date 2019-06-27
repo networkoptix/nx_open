@@ -14,6 +14,7 @@ public:
     static QString applicationRevision();
     static QString customizationName();
     static QString applicationPlatform();
+    static QString applicationPlatformNew();
     static QString applicationArch();
     static QString armBox();
 
