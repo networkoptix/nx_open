@@ -9,11 +9,7 @@
 namespace nx {
 namespace sdk {
 
-/**
- * Error codes used both by Plugin methods and Server callbacks.
- *
- * ATTENTION: The values match error constants in <camera/camera_plugin.h>.
- */
+/** Error codes used both by Plugin methods and Server callbacks. */
 enum class ErrorCode: int
 {
     noError = 0,
@@ -25,10 +21,26 @@ enum class ErrorCode: int
     otherError = -100,
 };
 
+/**
+ * Class for error reporting. Usually passed to some methods and expected to be properly filled in a
+ * case of an error.
+ */
 class IError: public Interface<IError>
 {
 public:
+    /**
+     * Sets general information about an error.
+     *
+     * @param errorCode An error code most suitable for an error that occurred.
+     * @param message Human-readable error description.
+     */
     virtual void setError(ErrorCode errorCode, const char* message) = 0;
+
+    /**
+     * Sets a detail about an error. Some methods can have specific requirements about what
+     * should be placed in the details map. Such requirements can be found in a documentation for
+     * the method.
+     */
     virtual void setDetail(const char* key, const char* message) = 0;
 
     virtual ErrorCode errorCode() const = 0;
