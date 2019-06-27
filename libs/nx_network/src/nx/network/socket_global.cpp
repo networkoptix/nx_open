@@ -144,7 +144,6 @@ SocketGlobals::~SocketGlobals()
 
     m_impl->debugIniReloadTimer->pleaseStopSync();
     m_impl->addressResolver->pleaseStopSync();
-    NX_ASSERT(m_debugCounters.httpClientConnectionCount == 0);
 }
 
 const Ini& SocketGlobals::ini()
