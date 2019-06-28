@@ -246,7 +246,7 @@ ModuleConnector::Module::Module(ModuleConnector* parent, const QnUuid& id):
     m_reconnectTimer(parent->m_retryPolicy, parent->getAioThread()),
     m_disconnectTimer(parent->getAioThread())
 {
-    NX_DEBUG(this) << "New";
+    NX_DEBUG(this, "Created with %1", parent->m_retryPolicy);
 }
 
 ModuleConnector::Module::~Module()

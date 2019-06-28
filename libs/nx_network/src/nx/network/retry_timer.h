@@ -34,6 +34,8 @@ public:
         std::chrono::milliseconds maxDelay);
 
     bool operator==(const RetryPolicy& rhs) const;
+
+    QString toString() const;
 };
 
 /**

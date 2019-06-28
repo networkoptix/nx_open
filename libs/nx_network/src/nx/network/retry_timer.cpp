@@ -32,6 +32,12 @@ bool RetryPolicy::operator==(const RetryPolicy& rhs) const
         && maxRetryCount == rhs.maxRetryCount;
 }
 
+QString RetryPolicy::toString() const
+{
+    return lm("RetryPolicy(%1, %2, %3, %4)").args(
+        maxRetryCount, initialDelay, delayMultiplier, maxDelay);
+}
+
 //-------------------------------------------------------------------------------------------------
 // class RetryTimer
 
