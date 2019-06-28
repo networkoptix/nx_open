@@ -31,6 +31,11 @@ ResourceTreeModelAdapter::ResourceTreeModelAdapter(QObject* parent): base_type(p
         workbenchContext->snapshotManager(),
         contextAwareParent);
 
+    connect(workbenchContext, &QnWorkbenchContext::userChanged,
+        model, &QnResourceTreeModel::setUser);
+    model->setUser(workbenchContext->user());
+    model->setActionManager(workbenchContext->menu());
+
     setSourceModel(model);
     model->setParent(this);
 
