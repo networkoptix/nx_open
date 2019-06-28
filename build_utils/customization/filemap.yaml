@@ -14,22 +14,6 @@ desktop: {
   intro.png: 'nx_client_desktop/resources/skin/intro.png', # 720x400.
   background.png: 'nx_client_desktop/resources/skin/background.png', # 2160x2160.
 
-  # Custom cloud icons for the desktop client.
-  cloud_logo.png: 'nx_client_desktop/resources/skin/cloud/cloud_64.png',
-  cloud_logo@2x.png: 'nx_client_desktop/resources/skin/cloud/cloud_64@2x.png',
-  cloud_user_logo.png: 'nx_client_desktop/resources/skin/cloud/cloud_32_thin_selected.png',
-  cloud_user_logo@2x.png: 'nx_client_desktop/resources/skin/cloud/cloud_32_thin_selected@2x.png',
-  cloud_icon.png: 'nx_client_desktop/resources/skin/cloud/cloud_20.png',
-  cloud_icon@2x.png: 'nx_client_desktop/resources/skin/cloud/cloud_20@2x.png',
-  cloud_icon_accented.png: 'nx_client_desktop/resources/skin/cloud/cloud_20_accented.png',
-  cloud_icon_accented@2x.png: 'nx_client_desktop/resources/skin/cloud/cloud_20_accented@2x.png',
-  cloud_icon_disabled.png: 'nx_client_desktop/resources/skin/cloud/cloud_20_disabled.png',
-  cloud_icon_disabled@2x.png: 'nx_client_desktop/resources/skin/cloud/cloud_20_disabled@2x.png',
-  cloud_icon_selected.png: 'nx_client_desktop/resources/skin/cloud/cloud_20_selected.png',
-  cloud_icon_selected@2x.png: 'nx_client_desktop/resources/skin/cloud/cloud_20_selected@2x.png',
-  cloud_icon_offline_disabled.png: 'nx_client_desktop/resources/skin/cloud/cloud_20_offline_disabled.png',
-  cloud_icon_offline_disabled@2x.png: 'nx_client_desktop/resources/skin/cloud/cloud_20_offline_disabled@2x.png',
-
   # Server section
   email_logo.png: 'mediaserver_core/resources/skin/email_attachments/productLogo.png', # 272x80.
   webadmin_logo.png: 'mediaserver_core/resources/static/customization/webadmin_logo.png', # 142x40.
@@ -120,29 +104,52 @@ mobile: {
     logo@3x.png: 'icons/ios/ios/images/logo@3x.png',
   },
 
-  # Custom cloud icons.
-  cloud.png: 'mobile_client/resources/images/cloud.png',
-  cloud@2x.png: 'mobile_client/resources/images/cloud@2x.png',
-  cloud@3x.png: 'mobile_client/resources/images/cloud@3x.png',
-  cloud@4x.png: 'mobile_client/resources/images/cloud@4x.png',
-  cloud_big.png: 'mobile_client/resources/images/cloud_big.png',
-  cloud_big@2x.png: 'mobile_client/resources/images/cloud_big@2x.png',
-  cloud_big@3x.png: 'mobile_client/resources/images/cloud_big@3x.png',
-  cloud_big@4x.png: 'mobile_client/resources/images/cloud_big@4x.png',
-  cloud_disabled.png: 'mobile_client/resources/images/cloud_disabled.png',
-  cloud_disabled@2x.png: 'mobile_client/resources/images/cloud_disabled@2x.png',
-  cloud_disabled@3x.png: 'mobile_client/resources/images/cloud_disabled@3x.png',
-  cloud_disabled@4x.png: 'mobile_client/resources/images/cloud_disabled@4x.png',
-  cloud_logged_in.png: 'mobile_client/resources/images/cloud_logged_in.png',
-  cloud_logged_in@2x.png: 'mobile_client/resources/images/cloud_logged_in@2x.png',
-  cloud_logged_in@3x.png: 'mobile_client/resources/images/cloud_logged_in@3x.png',
-  cloud_logged_in@4x.png: 'mobile_client/resources/images/cloud_logged_in@4x.png',
-  cloud_not_logged_in.png: 'mobile_client/resources/images/cloud_not_logged_in.png',
-  cloud_not_logged_in@2x.png: 'mobile_client/resources/images/cloud_not_logged_in@2x.png',
-  cloud_not_logged_in@3x.png: 'mobile_client/resources/images/cloud_not_logged_in@3x.png',
-  cloud_not_logged_in@4x.png: 'mobile_client/resources/images/cloud_not_logged_in@4x.png',
-  cloud_unavailable.png: 'mobile_client/resources/images/cloud_unavailable.png',
-  cloud_unavailable@2x.png: 'mobile_client/resources/images/cloud_unavailable@2x.png',
-  cloud_unavailable@3x.png: 'mobile_client/resources/images/cloud_unavailable@3x.png',
-  cloud_unavailable@4x.png: 'mobile_client/resources/images/cloud_unavailable@4x.png',
+
+}
+
+# Custom cloud icons.
+custom_cloud: {
+  desktop: {
+    cloud_logo.png: 'nx_client_desktop/resources/skin/cloud/cloud_64.png',
+    cloud_logo@2x.png: 'nx_client_desktop/resources/skin/cloud/cloud_64@2x.png',
+    cloud_user_logo.png: 'nx_client_desktop/resources/skin/cloud/cloud_32_thin_selected.png',
+    cloud_user_logo@2x.png: 'nx_client_desktop/resources/skin/cloud/cloud_32_thin_selected@2x.png',
+    cloud_icon.png: 'nx_client_desktop/resources/skin/cloud/cloud_20.png',
+    cloud_icon@2x.png: 'nx_client_desktop/resources/skin/cloud/cloud_20@2x.png',
+    cloud_icon_accented.png: 'nx_client_desktop/resources/skin/cloud/cloud_20_accented.png',
+    cloud_icon_accented@2x.png: 'nx_client_desktop/resources/skin/cloud/cloud_20_accented@2x.png',
+    cloud_icon_disabled.png: 'nx_client_desktop/resources/skin/cloud/cloud_20_disabled.png',
+    cloud_icon_disabled@2x.png: 'nx_client_desktop/resources/skin/cloud/cloud_20_disabled@2x.png',
+    cloud_icon_selected.png: 'nx_client_desktop/resources/skin/cloud/cloud_20_selected.png',
+    cloud_icon_selected@2x.png: 'nx_client_desktop/resources/skin/cloud/cloud_20_selected@2x.png',
+    cloud_icon_offline_disabled.png: 'nx_client_desktop/resources/skin/cloud/cloud_20_offline_disabled.png',
+    cloud_icon_offline_disabled@2x.png: 'nx_client_desktop/resources/skin/cloud/cloud_20_offline_disabled@2x.png',
+  },
+
+  mobile: {
+    cloud.png: 'mobile_client/resources/images/cloud.png',
+    cloud@2x.png: 'mobile_client/resources/images/cloud@2x.png',
+    cloud@3x.png: 'mobile_client/resources/images/cloud@3x.png',
+    cloud@4x.png: 'mobile_client/resources/images/cloud@4x.png',
+    cloud_big.png: 'mobile_client/resources/images/cloud_big.png',
+    cloud_big@2x.png: 'mobile_client/resources/images/cloud_big@2x.png',
+    cloud_big@3x.png: 'mobile_client/resources/images/cloud_big@3x.png',
+    cloud_big@4x.png: 'mobile_client/resources/images/cloud_big@4x.png',
+    cloud_disabled.png: 'mobile_client/resources/images/cloud_disabled.png',
+    cloud_disabled@2x.png: 'mobile_client/resources/images/cloud_disabled@2x.png',
+    cloud_disabled@3x.png: 'mobile_client/resources/images/cloud_disabled@3x.png',
+    cloud_disabled@4x.png: 'mobile_client/resources/images/cloud_disabled@4x.png',
+    cloud_logged_in.png: 'mobile_client/resources/images/cloud_logged_in.png',
+    cloud_logged_in@2x.png: 'mobile_client/resources/images/cloud_logged_in@2x.png',
+    cloud_logged_in@3x.png: 'mobile_client/resources/images/cloud_logged_in@3x.png',
+    cloud_logged_in@4x.png: 'mobile_client/resources/images/cloud_logged_in@4x.png',
+    cloud_not_logged_in.png: 'mobile_client/resources/images/cloud_not_logged_in.png',
+    cloud_not_logged_in@2x.png: 'mobile_client/resources/images/cloud_not_logged_in@2x.png',
+    cloud_not_logged_in@3x.png: 'mobile_client/resources/images/cloud_not_logged_in@3x.png',
+    cloud_not_logged_in@4x.png: 'mobile_client/resources/images/cloud_not_logged_in@4x.png',
+    cloud_unavailable.png: 'mobile_client/resources/images/cloud_unavailable.png',
+    cloud_unavailable@2x.png: 'mobile_client/resources/images/cloud_unavailable@2x.png',
+    cloud_unavailable@3x.png: 'mobile_client/resources/images/cloud_unavailable@3x.png',
+    cloud_unavailable@4x.png: 'mobile_client/resources/images/cloud_unavailable@4x.png',
+  }
 }
