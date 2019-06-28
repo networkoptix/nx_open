@@ -138,7 +138,7 @@ private:
         {
             using namespace nx::test;
             NX_TEST_API_POST(
-                m_launcher, url, QByteArray(), nullptr, network::http::StatusCode::ok, "admin",
+                m_launcher, url, QByteArray(), nullptr, nx::network::http::StatusCode::ok, "admin",
                 "admin", &rawResponse);
         }();
 
@@ -146,7 +146,7 @@ private:
         QnJsonRestResult restResult = QJson::deserialized<QnJsonRestResult>(
             rawResponse, QnJsonRestResult(), &success);
 
-        if (!success || restResult.error != network::rest::Result::NoError)
+        if (!success || restResult.error != nx::network::rest::Result::NoError)
             throw std::runtime_error("doPostRequest: response failed");
 
         QnWearableStatusReply reply = restResult.deserialized<QnWearableStatusReply>(&success);
@@ -221,7 +221,7 @@ protected:
         const auto url = QString("/api/wearableCamera/add?name=%1").arg(m_wearableCameraName);
 
         NX_TEST_API_POST(
-            m_server.get(), url, QByteArray(),nullptr, network::http::StatusCode::ok, "admin",
+            m_server.get(), url, QByteArray(),nullptr, nx::network::http::StatusCode::ok, "admin",
             "admin", &response);
 
         addCameraRestResult = QJson::deserialized<QnJsonRestResult>(response);
@@ -272,7 +272,7 @@ protected:
             QString("/ec2/recordedTimePeriods?cameraId=%1&detail=50").arg(m_wearableCameraId.toString()),
             &timePeriodsResult);
 
-        ASSERT_EQ(timePeriodsResult.error, network::rest::Result::NoError);
+        ASSERT_EQ(timePeriodsResult.error, nx::network::rest::Result::NoError);
         MultiServerPeriodDataList serverTimePeriods =
             timePeriodsResult.deserialized<MultiServerPeriodDataList>();
 
