@@ -278,5 +278,47 @@ TEST_F(CameraSettingsDialogStateReducerTest, recordingAlertIfScheduleIsEmpty)
     ASSERT_FALSE(recordingDisabled.recordingHint.has_value());
 }
 
+// "Motion + Lo-Res" recording type must not be available if secondary stream is disabled on the
+// expert settings page.
+TEST_F(CameraSettingsDialogStateReducerTest, disableMotionLoResIfDualStreamingIsDisabled)
+{
+    // Global option to allow expert settings editing must be enabled first.
+    State enableDeviceOptimization = Reducer::setSettingsOptimizationEnabled({}, true);
+
+    CameraResourceStubPtr camera(new CameraResourceStub());
+    camera->setHasDualStreaming(true);
+
+    State initial = Reducer::loadCameras(std::move(enableDeviceOptimization), { camera });
+    ASSERT_TRUE(initial.supportsDualStreamRecording());
+
+    State disabledDualStreaming = Reducer::setDualStreamingDisabled(std::move(initial), true);
+    ASSERT_FALSE(disabledDualStreaming.supportsDualStreamRecording());
+
+    State enabledDualStreaming = Reducer::setDualStreamingDisabled(
+        std::move(disabledDualStreaming), false);
+    ASSERT_TRUE(enabledDualStreaming.supportsDualStreamRecording());
+}
+
+// "Motion + Lo-Res" recording type must always be available if camera settings optimization is off.
+TEST_F(CameraSettingsDialogStateReducerTest, enableMotionLoResIfDeviceOptimizationIsDisabled)
+{
+    // Global option to allow expert settings editing must be enabled first.
+    State enableDeviceOptimization = Reducer::setSettingsOptimizationEnabled({}, true);
+
+    CameraResourceStubPtr camera(new CameraResourceStub());
+    camera->setHasDualStreaming(true);
+
+    State initial = Reducer::loadCameras(std::move(enableDeviceOptimization), { camera });
+    ASSERT_TRUE(initial.supportsDualStreamRecording());
+
+    State disabledDualStreaming = Reducer::setDualStreamingDisabled(std::move(initial), true);
+    ASSERT_FALSE(disabledDualStreaming.supportsDualStreamRecording());
+
+    State disableDeviceOptimization = Reducer::setSettingsOptimizationEnabled(
+        std::move(disabledDualStreaming), false);
+
+    ASSERT_TRUE(disableDeviceOptimization.supportsDualStreamRecording());
+}
+
 } // namespace test
 } // namespace nx::vms::client::desktop

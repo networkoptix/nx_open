@@ -298,6 +298,16 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractReduxState
         return result;
     }
 
+    /**
+     * @return "Motion + Lo-Res" recording mode is available.
+     */
+    bool supportsDualStreamRecording() const
+    {
+        return hasMotion()
+            && devicesDescription.hasDualStreamingCapability == CombinedValue::All
+            && (!expert.dualStreamingDisabled() || !settingsOptimizationEnabled);
+    }
+
     bool supportsSchedule() const
     {
         return devicesDescription.isDtsBased == CombinedValue::None
