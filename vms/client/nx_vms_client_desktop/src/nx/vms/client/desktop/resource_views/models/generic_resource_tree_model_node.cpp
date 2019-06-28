@@ -72,7 +72,7 @@ void GenericResourceTreeModelNode::handleAccessChanged(
     const QnResourceAccessSubject& subject,
     const QnResourcePtr& resource)
 {
-    if (!model()->getUser() || subject.user() != model()->getUser())
+    if (!model()->user() || subject.user() != model()->user())
         return;
 
     if (resourceAccessProvider()->hasAccess(subject, resource))
@@ -148,7 +148,7 @@ void GenericResourceTreeModelNode::rebuild()
 {
     clean();
 
-    if (!model()->getUser())
+    if (!model()->user())
         return;
 
     for (const auto& resource: resourcePool()->getResources())

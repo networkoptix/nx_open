@@ -207,7 +207,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModelOtherSystemsNode::ensureFakeServer
 
 bool QnResourceTreeModelOtherSystemsNode::canSeeFakeServers() const
 {
-    bool isOwner = model()->getUser() && model()->getUser()->isOwner();
+    bool isOwner = model()->user() && model()->user()->isOwner();
     bool isAutoDiscoveryEnabled = qnGlobalSettings->isAutoDiscoveryEnabled();
 
     return isOwner && isAutoDiscoveryEnabled;
@@ -215,7 +215,7 @@ bool QnResourceTreeModelOtherSystemsNode::canSeeFakeServers() const
 
 bool QnResourceTreeModelOtherSystemsNode::canSeeCloudSystem(const QnSystemDescriptionPtr& system) const
 {
-    return model()->getUser()
+    return model()->user()
         && system->isCloudSystem()
         && system->id() != qnGlobalSettings->cloudSystemId();
 }

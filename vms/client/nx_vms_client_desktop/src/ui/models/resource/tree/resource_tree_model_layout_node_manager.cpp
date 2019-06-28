@@ -14,7 +14,7 @@ QnResourceTreeModelLayoutNodeManager::QnResourceTreeModelLayoutNodeManager(QnRes
     base_type(model)
 {
     // TODO: #vbreus FIXME: layout snapshot manager mock should be assigned in test environment
-    if (const auto layoutSnapshotManager = model->getLayoutSnapshotManager())
+    if (const auto layoutSnapshotManager = model->layoutSnapshotManager())
     {
         connect(layoutSnapshotManager, &QnWorkbenchLayoutSnapshotManager::layoutFlagsChanged, this,
             [this, layoutSnapshotManager](const QnLayoutResourcePtr& layout)

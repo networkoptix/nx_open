@@ -367,7 +367,7 @@ void QnResourceTreeModelNode::update()
         }
         case NodeType::currentUser:
         {
-            auto user = m_model->getUser();
+            auto user = m_model->user();
             setNameInternal(user ? user->getName() : QString());
             break;
         }
@@ -479,8 +479,8 @@ bool QnResourceTreeModelNode::calculateBastard() const
         return true;
 
     /* Here we can narrow nodes visibility, based on permissions, if needed. */
-    bool isLoggedIn = !m_model->getUser().isNull();
-    bool isAdmin = m_model->getAccessController()->hasGlobalPermission(GlobalPermission::admin);
+    const bool isLoggedIn = !m_model->user().isNull();
+    const bool isAdmin = m_model->accessController()->hasGlobalPermission(GlobalPermission::admin);
 
     switch (m_type)
     {
@@ -531,8 +531,7 @@ bool QnResourceTreeModelNode::calculateBastard() const
         if (!m_resource)
             return true;
 
-        return !m_model->getAccessController()->hasPermissions(
-            m_resource, Qn::ViewContentPermission);
+        return !m_model->accessController()->hasPermissions(m_resource, Qn::ViewContentPermission);
     }
 
     case NodeType::users:
@@ -568,7 +567,7 @@ bool QnResourceTreeModelNode::calculateBastard() const
             return false;
 
         /* Hide non-readable resources. */
-        if (!m_model->getAccessController()->hasPermissions(m_resource, Qn::ReadPermission))
+        if (!m_model->accessController()->hasPermissions(m_resource, Qn::ReadPermission))
             return true;
 
         if (QnLayoutResourcePtr layout = m_resource.dynamicCast<QnLayoutResource>())
@@ -731,20 +730,20 @@ Qt::ItemFlags QnResourceTreeModelNode::flags(int column) const
             case NodeType::sharedLayout:
             case NodeType::resource:
             case NodeType::edge:
-            if (auto actionManager = m_model->getActionManager())
-            {
-                m_editable.value =
-                    actionManager->canTrigger(action::RenameResourceAction, m_resource);
-            }
+                if (auto actionManager = m_model->actionManager())
+                {
+                    m_editable.value =
+                        actionManager->canTrigger(action::RenameResourceAction, m_resource);
+                }
                 break;
             case NodeType::videoWallItem:
             case NodeType::videoWallMatrix:
-            m_editable.value = m_model->getAccessController()->hasGlobalPermission(
-                GlobalPermission::controlVideowall);
+                m_editable.value = m_model->accessController()->hasGlobalPermission(
+                    GlobalPermission::controlVideowall);
                 break;
             case NodeType::layoutTour:
-            if (auto actionManager = m_model->getActionManager())
-                m_editable.value = actionManager->canTrigger(action::RenameLayoutTourAction);
+                if (auto actionManager = m_model->actionManager())
+                    m_editable.value = actionManager->canTrigger(action::RenameLayoutTourAction);
                 break;
             case NodeType::recorder:
                 m_editable.value = true;
@@ -989,7 +988,7 @@ bool QnResourceTreeModelNode::setData(const QVariant& value, int role, int colum
     parameters.setArgument(Qn::NodeTypeRole, m_type);
     parameters.setArgument(Qn::UuidRole, m_uuid);
 
-    if (auto actionManager = m_model->getActionManager())
+    if (auto actionManager = m_model->actionManager())
     {
         if (m_type == NodeType::layoutTour)
             actionManager->trigger(action::RenameLayoutTourAction, parameters);

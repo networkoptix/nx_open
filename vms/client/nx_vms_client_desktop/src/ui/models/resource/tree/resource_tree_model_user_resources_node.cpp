@@ -48,7 +48,7 @@ void QnResourceTreeModelUserResourcesNode::handleAccessChanged(
     const QnResourceAccessSubject& subject,
     const QnResourcePtr& resource)
 {
-    if (!model()->getUser() || subject.user() != model()->getUser())
+    if (!model()->user() || subject.user() != model()->user())
         return;
 
     if (resourceAccessProvider()->hasAccess(subject, resource))
@@ -79,7 +79,7 @@ bool QnResourceTreeModelUserResourcesNode::isResourceVisible(const QnResourcePtr
     if (resource->hasFlags(Qn::web_page))
         return false;
 
-    if (!resourceAccessProvider()->hasAccess(model()->getUser(), resource))
+    if (!resourceAccessProvider()->hasAccess(model()->user(), resource))
         return false;
 
     if (model()->scope() == QnResourceTreeModel::CamerasScope)
@@ -139,7 +139,7 @@ void QnResourceTreeModelUserResourcesNode::rebuild()
 {
     clean();
 
-    if (!model()->getUser())
+    if (!model()->user())
         return;
 
     for (const auto& resource: resourcePool()->getResources())

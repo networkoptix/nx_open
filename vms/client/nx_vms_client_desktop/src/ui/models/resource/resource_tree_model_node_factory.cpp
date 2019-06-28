@@ -26,7 +26,7 @@ bool isAcceptableForModelCamera(
     const QnResourcePtr& resource)
 {
     return QnResourceAccessFilter::isShareableMedia(resource)
-        && model->resourceAccessProvider()->hasAccess(model->getUser(), resource)
+        && model->resourceAccessProvider()->hasAccess(model->user(), resource)
         && resource->hasFlags(Qn::live_cam);
 }
 
@@ -35,7 +35,7 @@ bool isAcceptableForModelLayout(
     const QnResourcePtr& resource)
 {
     return model->scope() == QnResourceTreeModel::FullScope
-        && model->resourceAccessProvider()->hasAccess(model->getUser(), resource)
+        && model->resourceAccessProvider()->hasAccess(model->user(), resource)
         && resource->flags().testFlag(Qn::layout)
         && !resource->flags().testFlag(Qn::local);
 }
@@ -45,7 +45,7 @@ bool isAcceptableForModelServer(
     const QnResourcePtr& resource)
 {
     return model->scope() == QnResourceTreeModel::FullScope
-        && model->resourceAccessProvider()->hasAccess(model->getUser(), resource)
+        && model->resourceAccessProvider()->hasAccess(model->user(), resource)
         && resource->hasFlags(Qn::server)
         && !resource->hasFlags(Qn::fake);
 }
@@ -55,7 +55,7 @@ bool isAcceptableForModelUser(
     const QnResourcePtr& resource)
 {
     return model->scope() != QnResourceTreeModel::CamerasScope
-        && model->resourceAccessProvider()->hasAccess(model->getUser(), resource)
+        && model->resourceAccessProvider()->hasAccess(model->user(), resource)
         && resource->hasFlags(Qn::user);
 }
 
@@ -64,7 +64,7 @@ bool isAcceptableForModelVideowall(
     const QnResourcePtr& resource)
 {
     return model->scope() == QnResourceTreeModel::FullScope
-        && model->resourceAccessProvider()->hasAccess(model->getUser(), resource)
+        && model->resourceAccessProvider()->hasAccess(model->user(), resource)
         && resource->hasFlags(Qn::videowall);
 }
 
@@ -165,7 +165,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModelNodeFactory::createResourceNode(
 {
     NodeType nodeType = NodeType::resource;
 
-    if (model->getAccessController()->hasGlobalPermission(GlobalPermission::admin)
+    if (model->accessController()->hasGlobalPermission(GlobalPermission::admin)
         && QnMediaServerResource::isHiddenServer(resource->getParentResource()))
     {
         nodeType = NodeType::edge;

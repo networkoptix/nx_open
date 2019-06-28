@@ -80,14 +80,14 @@ public:
     // TODO: #vkutin Shouldn't be public
     QnResourceTreeModelNodeManager* nodeManager() const;
     QnResourceTreeModelLayoutNodeManager* layoutNodeManager() const;
-    QnWorkbenchAccessController* getAccessController() const;
-    QnWorkbenchLayoutSnapshotManager* getLayoutSnapshotManager() const;
+    QnWorkbenchAccessController* accessController() const;
+    QnWorkbenchLayoutSnapshotManager* layoutSnapshotManager() const;
 
     // TODO: #vbreus May not be set in unit test environment.
-    nx::vms::client::desktop::ui::action::Manager* getActionManager() const;
+    nx::vms::client::desktop::ui::action::Manager* actionManager() const;
     void setActionManager(nx::vms::client::desktop::ui::action::Manager* manager);
 
-    QnUserResourcePtr getUser() const;
+    QnUserResourcePtr user() const;
     void setUser(const QnUserResourcePtr& user);
 
 signals:

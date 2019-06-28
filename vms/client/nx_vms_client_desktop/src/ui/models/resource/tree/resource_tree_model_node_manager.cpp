@@ -12,7 +12,7 @@ QnResourceTreeModelNodeManager::QnResourceTreeModelNodeManager(QnResourceTreeMod
     base_type(model),
     QnCommonModuleAware(model)
 {
-    connect(model->getAccessController(), &QnWorkbenchAccessController::permissionsChanged, this,
+    connect(model->accessController(), &QnWorkbenchAccessController::permissionsChanged, this,
         [this](const QnResourcePtr& resource)
         {
             resourceChainCall(resource, &QnResourceTreeModelNode::handlePermissionsChanged);

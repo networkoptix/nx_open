@@ -91,7 +91,7 @@ void QnResourceTreeModelUserNodes::setRootNode(const QnResourceTreeModelNodePtr&
 void QnResourceTreeModelUserNodes::initialize(const QnResourceTreeModelNodePtr& rootNode)
 {
     setRootNode(rootNode);
-    handleUserChanged(m_model->getUser());
+    handleUserChanged(m_model->user());
 }
 
 void QnResourceTreeModelUserNodes::rebuild()
@@ -106,7 +106,7 @@ void QnResourceTreeModelUserNodes::rebuild()
         /* Current user moved to own node. */
         if (m_model->scope() == QnResourceTreeModel::FullScope)
         {
-            if (user == m_model->getUser())
+            if (user == m_model->user())
                 continue;
         }
 
@@ -199,7 +199,7 @@ bool QnResourceTreeModelUserNodes::showLayoutForSubject(const QnResourceAccessSu
     if (m_model->scope() != QnResourceTreeModel::FullScope)
         return false;
 
-    if (subject.user() && subject.user() == m_model->getUser())
+    if (subject.user() && subject.user() == m_model->user())
         return false;
 
     if (layout->isFile())
@@ -632,7 +632,7 @@ void QnResourceTreeModelUserNodes::handleGlobalPermissionsChanged(
     if (!m_valid)
         return;
 
-    if (subject.user() == model()->getUser())
+    if (subject.user() == model()->user())
     {
         /* Rebuild will occur on context user change. */
         return;
