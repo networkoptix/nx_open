@@ -243,9 +243,7 @@ QnClientModule::QnClientModule(const QnStartupParameters& startupParams, QObject
     initApplication();
 
     // Skip some modules initialization for unit tests.
-    const bool isFullApplicationMode = (qApp != nullptr);
-
-    if (isFullApplicationMode)
+    if (!isTestingEnvironment())
         initExternalResources();
 
     initSingletons();
@@ -257,15 +255,14 @@ QnClientModule::QnClientModule(const QnStartupParameters& startupParams, QObject
     initNetwork();
 
     // Initialize application UI.
-    if (isFullApplicationMode)
+    if (!isTestingEnvironment())
         initSkin();
 
     initLocalResources();
     initSurfaceFormat();
 
     // WebKit initialization must occur only once per application run. Actual for ActiveX module.
-    static bool isWebKitInitialized = false;
-    if (!isWebKitInitialized)
+    if (!isTestingEnvironment())
     {
         const auto settings = QWebSettings::globalSettings();
         settings->setAttribute(QWebSettings::PluginsEnabled, ini().enableWebKitPlugins);
@@ -273,8 +270,6 @@ QnClientModule::QnClientModule(const QnStartupParameters& startupParams, QObject
 
         if (ini().enableWebKitDeveloperExtras)
             settings->setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
-
-        isWebKitInitialized = true;
     }
 }
 
@@ -399,8 +394,9 @@ void QnClientModule::initSingletons()
     // Depends on QnClientSettings.
     auto clientInstanceManager = std::make_unique<QnClientInstanceManager>();
 
-    // Log initialization depends on QnClientInstanceManager.
-    initLog();
+    // Log initialization depends on QnClientInstanceManager. Skipped in testing environment.
+    if (!isTestingEnvironment())
+        initLog();
 
     const auto clientPeerType = m_startupParameters.videoWallGuid.isNull()
         ? nx::vms::api::PeerType::desktopClient
@@ -779,4 +775,9 @@ void QnClientModule::registerResourceDataProviders()
     #if defined(Q_OS_WIN)
         factory->registerResourceType<QnWinDesktopResource>();
     #endif
+}
+
+bool QnClientModule::isTestingEnvironment() const
+{
+    return qobject_cast<QGuiApplication*>(qApp) == nullptr;
 }
