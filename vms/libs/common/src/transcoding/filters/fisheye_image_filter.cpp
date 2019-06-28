@@ -213,7 +213,7 @@ CLVideoDecoderOutputPtr QnFisheyeImageFilter::updateImage(const CLVideoDecoderOu
         m_tmpBuffer->reallocate(frame->width, frame->height, frame->format, qPower2Ceil(unsigned(frame->width + 2), CL_MEDIA_ALIGNMENT));
     }
 
-    m_tmpBuffer->copyDataFrom(frame.data());
+    m_tmpBuffer->copyData(frame.data());
 
     for (int plane = 0; plane < descr->nb_components && frame->data[plane]; ++plane)
     {
