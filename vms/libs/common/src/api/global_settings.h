@@ -104,6 +104,8 @@ const QString kKeepAliveProbeCountKey(lit("ec2KeepAliveProbeCount"));
 
 static const QString kTargetUpdateInformationName = lit("targetUpdateInformation");
 static const QString kInstalledUpdateInformationName = lit("installedUpdateInformation");
+static const QString kTargetPersistentUpdateStorageName = lit("targetPersistentUpdateStorage");
+static const QString kInstalledPersistentUpdateStorageName = lit("installedPersistentUpdateStorage");
 static const QString kDownloaderPeersName = lit("downloaderPeers");
 
 const QString kWatermarkSettingsName(lit("watermarkSettings"));
@@ -352,6 +354,12 @@ public:
     QByteArray targetUpdateInformation() const;
     void setTargetUpdateInformation(const QByteArray& updateInformation);
 
+    QByteArray targetPersistentUpdateStorage() const;
+    void setTargetPersistentUpdateStorage(const QByteArray& persistentUpdateStorageSerializedData);
+
+    QByteArray installedPersistentUpdateStorage() const;
+    void setInstalledPersistentUpdateStorage(const QByteArray& persistentUpdateStorageSerializedData);
+
     QByteArray installedUpdateInformation() const;
     void setInstalledUpdateInformation(const QByteArray& updateInformation);
 
@@ -418,6 +426,8 @@ signals:
     void targetUpdateInformationChanged();
     void installedUpdateInformationChanged();
     void downloaderPeersChanged();
+    void targetPersistentUpdateStorageChanged();
+    void installedPersistentUpdateStorageChanged();
     void watermarkChanged();
     void sessionTimeoutChanged();
 
@@ -537,6 +547,8 @@ private:
 
     QnResourcePropertyAdaptor<QByteArray>* m_targetUpdateInformationAdaptor = nullptr;
     QnResourcePropertyAdaptor<QByteArray>* m_installedUpdateInformationAdaptor = nullptr;
+    QnResourcePropertyAdaptor<QByteArray>* m_targetPersistentUpdateStorageAdaptor = nullptr;
+    QnResourcePropertyAdaptor<QByteArray>* m_installedPersistentUpdateStorageAdaptor = nullptr;
     QnResourcePropertyAdaptor<FileToPeerList>* m_downloaderPeersAdaptor = nullptr;
     QnResourcePropertyAdaptor<QnWatermarkSettings>* m_watermarkSettingsAdaptor = nullptr;
 

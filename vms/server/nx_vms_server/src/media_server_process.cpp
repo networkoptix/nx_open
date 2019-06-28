@@ -184,6 +184,7 @@
 #include <rest/handlers/multiserver_get_hardware_ids_rest_handler.h>
 #include <rest/handlers/wearable_camera_rest_handler.h>
 #include <rest/handlers/set_primary_time_server_rest_handler.h>
+#include <rest/handlers/persistent_update_storage_rest_handler.h>
 #ifdef _DEBUG
 #include <rest/handlers/debug_events_rest_handler.h>
 #endif
@@ -1503,6 +1504,8 @@ void MediaServerProcess::registerRestHandlers(
 
     /**%apidoc GET /api/storageSpace
      * Get the list of all server storages.
+     * %param:string ownedOnly If set, only storages currently owned by Mediaserver will be
+     * included in the response.
      * %return:object JSON data with server storages.
      */
     reg("api/storageSpace", new QnStorageSpaceRestHandler(serverModule()));
@@ -2551,6 +2554,24 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg("ec2/updateInformation", new QnUpdateInformationRestHandler(&serverModule()->settings(),
         commonModule()->engineVersion()));
+
+    /**%apidoc POST /ec2/updatePersistenStorages
+     * Set a list of servers used for persistent update files storage.
+     * %param:string version Possible values: {target | installed}. Indicates which update files
+     * should be stored on the given servers.
+     * %param:object JSON representation of the list of the servers selected for persistent update
+     *      files storing. If the list is empty, than it is treated as if persistent storage
+     *      selection algorithm  is reset to the initial state - automatic persistent server
+     *      selection.
+     * %return:object JSON with the updated servers list.
+     *
+     **%apidoc GET /ec2/updatePersistenStorages
+     * Retrieves a currently present list of servers IDs used for update files storage.
+     * %param:string version Possible values: {target | installed}. Indicates which list should be
+     * retrieved.
+     * %return:object JSON with the servers list.
+     */
+    reg("ec2/updatePersistenStorages", new QnPersistentUpdateStorageRestHandler(serverModule()));
 
     /**%apidoc POST /ec2/startUpdate
      * Starts an update process.
