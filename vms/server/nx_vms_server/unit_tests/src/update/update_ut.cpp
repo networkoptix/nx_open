@@ -235,21 +235,6 @@ protected:
         ASSERT_EQ(persistentStorageData, m_persistentServersData[version]);
     }
 
-    void thenAllPackagesShouldBeLoaded()
-    {
-
-    }
-
-    void whenUpdateInformationWithDifferentPackagesIsSet()
-    {
-
-    }
-
-    void thenPersistentUpdateStorageDataShouldbeRotated()
-    {
-
-    }
-
 private:
     struct ZipContext
     {
