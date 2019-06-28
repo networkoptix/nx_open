@@ -6,6 +6,7 @@
 
 namespace nx::vms::server::metrics {
 
+// TODO: Use QnMediaServerResource* instead of QnMediaServerResourcePtr.
 class ServerProvider:
     public ServerModuleAware,
     public utils::metrics::ResourceProvider<QnMediaServerResourcePtr>

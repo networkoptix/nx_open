@@ -4,9 +4,11 @@
 
 #include <QtCore/QElapsedTimer>
 
+#include <api/model/detach_from_cloud_data.h>
 #include <api/model/password_data.h>
 #include <api/model/cloud_credentials_data.h>
 #include <api/model/update_information_reply.h>
+
 #include <api/app_server_connection.h>
 #include <api/helpers/empty_request_data.h>
 #include <api/helpers/chunks_request_data.h>
@@ -14,6 +16,7 @@
 #include <api/helpers/send_statistics_request_data.h>
 #include <api/helpers/event_log_request_data.h>
 #include <api/helpers/event_log_multiserver_request_data.h>
+
 #include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
@@ -25,18 +28,20 @@
 
 #include <nx/api/mediaserver/image_request.h>
 #include <nx/fusion/model_functions.h>
+#include <nx/fusion/serialization/compressed_time_functions.h>
 #include <nx/network/http/custom_headers.h>
 #include <nx/network/http/http_types.h>
 #include <nx/utils/random.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/api/data_fwd.h>
+#include <nx/vms/api/data/email_settings_data.h>
+#include <nx/vms/api/data/peer_data.h>
 #include <nx/vms/event/rule_manager.h>
 #include <nx/vms/event/rule.h>
-#include <api/model/detach_from_cloud_data.h>
-
+#include <nx_ec/data/api_conversion_functions.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 #include <nx/vms/common/resource/analytics_plugin_resource.h>
-#include <nx/vms/api/data/peer_data.h>
+
 #include <common/static_common_module.h>
 
 using namespace nx;
@@ -1099,6 +1104,57 @@ Handle ServerConnection::getPluginInformation(GetCallback callback, QThread* tar
     return executeGet("/api/pluginInfo", {}, callback, targetThread);
 }
 
+Handle ServerConnection::testEmailSettings(
+      const QnEmailSettings& settings,
+      Result<QnTestEmailSettingsReply>::type&& callback,
+      QThread* targetThread)
+{
+    nx::vms::api::EmailSettingsData data;
+    ec2::fromResourceToApi(settings, data);
+    const auto contentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
+    auto body = QJson::serialized(data);
+    return executePost("/api/testEmailSettings", {}, contentType, body, callback, targetThread);
+}
+
+Handle ServerConnection::getAuditLog(
+    qint64 startTimeMs,
+    qint64 endTimeMs,
+    Result<QnAuditRecordList>::type&& callback,
+    QThread* targetThread)
+{
+    QnRequestParamList params;
+    params.insert("from", startTimeMs * 1000ll);
+    params.insert("to", endTimeMs * 1000ll);
+    params.insert("format", "ubjson");
+
+    return executeGet("/api/auditLog", params, callback, targetThread);
+}
+
+Handle ServerConnection::recordedTimePeriods(
+    const QnChunksRequestData& request,
+    Result<MultiServerPeriodDataList>::type&& callback,
+    QThread* targetThread)
+{
+    QnChunksRequestData fixedFormatRequest(request);
+    fixedFormatRequest.format = Qn::CompressedPeriodsFormat;
+    auto internalCallback =
+        [callback=std::move(callback)](
+            bool success, Handle requestId, QByteArray result,
+            const nx::network::http::HttpHeaders& /*headers*/)
+        {
+            if (success)
+            {
+                bool goodData = false;
+                auto chunks = QnCompressedTime::deserialized<MultiServerPeriodDataList>(
+                    result, {}, &goodData);
+                callback(goodData, requestId, chunks);
+            }
+            callback(false, requestId, {});
+        };
+    return executeGet("/ec2/recordedTimePeriods", fixedFormatRequest.toParams(), internalCallback,
+        targetThread);
+}
+
 Handle ServerConnection::debug(
     const QString& action, const QString& value, PostCallback callback, QThread* targetThread)
 {
@@ -1213,19 +1269,6 @@ Handle ServerConnection::executePost(
 
     trace(handle, path);
     return handle;
-}
-
-template <typename ResultType>
-Handle ServerConnection::executePut(
-    const QString& path,
-    const QnRequestParamList& params,
-    Callback<ResultType> callback,
-    QThread* targetThread)
-{
-    return executePut(
-        path, {},
-        nx::network::http::header::ContentType::kJson, QJson::serialized(params.toJson()),
-        std::move(callback), targetThread);
 }
 
 template <typename ResultType>

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "action_executor.h"
+#include "action_builder.h"
 #include "event_filter.h"
 
 #include <nx/fusion/model_functions_fwd.h>
@@ -16,7 +16,7 @@ public:
     QnUuid id;
     // TODO: #spanasenko and-or logic
     QList<EventFilter> eventList;
-    QList<ActionExecutor> actionList;
+    QList<ActionBuilder> actionList;
     bool enabled;
     QByteArray schedule;
     QString comment;

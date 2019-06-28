@@ -367,7 +367,7 @@ void WearableWorker::handleExtendFinished(bool success, const QnWearableStatusRe
     }
 }
 
-void WearableWorker::handleUnlockFinished(bool success, const QnWearableStatusReply& result)
+void WearableWorker::handleUnlockFinished(bool /*success*/, const QnWearableStatusReply& /*result*/)
 {
     // Not working => that's a stray reply, ignore it.
     if (!isWorking())
