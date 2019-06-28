@@ -27,7 +27,7 @@
 #include <nx/vms/api/data/email_settings_data.h>
 
 #include <nx/fusion/model_functions.h>
-#include <nx/fusion/serialization/compressed_time_functions.h>
+
 #include <nx/network/http/http_types.h>
 
 #include <api/app_server_connection.h>
@@ -40,7 +40,6 @@
 
 #include "model/camera_list_reply.h"
 #include "model/configure_reply.h"
-#include "model/upload_update_reply.h"
 #include <nx/network/http/custom_headers.h>
 #include "model/recording_stats_reply.h"
 #include <api/model/getnonce_reply.h>
@@ -68,10 +67,8 @@ QN_DEFINE_LEXICAL_ENUM(RequestObject,
     (PingSystemObject, "pingSystem")
     (GetNonceObject, "getRemoteNonce")
     (RecordingStatsObject, "recStats")
-    (AuditLogObject, "auditLog")
     (TestEmailSettingsObject, "testEmailSettings")
     (TestLdapSettingsObject, "testLdapSettings")
-    (ec2RecordedTimePeriodsObject, "ec2/recordedTimePeriods")
 );
 
 void trace(const QString& serverId, int handle, int obj, const QString& message = QString())
@@ -145,12 +142,6 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse& response
             break;
         case RecordingStatsObject:
             processJsonReply<QnRecordingStatsReply>(this, response, handle);
-            break;
-        case AuditLogObject:
-            processUbjsonReply<QnAuditRecordList>(this, response, handle);
-            break;
-        case ec2RecordedTimePeriodsObject:
-            processCompressedPeriodsReply<MultiServerPeriodDataList>(this, response, handle);
             break;
         case TestLdapSettingsObject:
             processJsonReply<QnLdapUsers>(this, response, handle);
@@ -341,19 +332,6 @@ int QnMediaServerConnection::getSystemIdAsync(QObject* target, const char* slot)
         QnRequestParamList(), QN_STRINGIZE_TYPE(QString), target, slot);
 }
 
-int QnMediaServerConnection::testEmailSettingsAsync(
-    const QnEmailSettings& settings, QObject* target, const char* slot)
-{
-    nx::network::http::HttpHeaders headers;
-    headers.emplace(nx::network::http::header::kContentType, "application/json");
-
-    nx::vms::api::EmailSettingsData data;
-    ec2::fromResourceToApi(settings, data);
-    return sendAsyncPostRequestLogged(TestEmailSettingsObject,
-        std::move(headers), QnRequestParamList(), QJson::serialized(data),
-        QN_STRINGIZE_TYPE(QnTestEmailSettingsReply), target, slot);
-}
-
 int QnMediaServerConnection::testLdapSettingsAsync(
     const QnLdapSettings& settings, QObject* target, const char* slot)
 {
@@ -443,30 +421,3 @@ int QnMediaServerConnection::getRecordingStatisticsAsync(
         params, QN_STRINGIZE_TYPE(QnRecordingStatsReply), target, slot);
 }
 
-int QnMediaServerConnection::getAuditLogAsync(
-    qint64 startTimeMs, qint64 endTimeMs, QObject* target, const char* slot)
-{
-    QnRequestParamList params;
-    params.insert("from", startTimeMs * 1000ll);
-    params.insert("to", endTimeMs * 1000ll);
-    params.insert("format", "ubjson");
-    return sendAsyncGetRequest(AuditLogObject,
-        params, QN_STRINGIZE_TYPE(QnAuditRecordList), target, slot);
-}
-
-int QnMediaServerConnection::recordedTimePeriods(
-    const QnChunksRequestData& request, QObject* target, const char* slot)
-{
-    nx::utils::SoftwareVersion connectionVersion;
-    if (const auto& connection = commonModule()->ec2Connection())
-        connectionVersion = connection->connectionInfo().version;
-
-    QnChunksRequestData fixedFormatRequest(request);
-    fixedFormatRequest.format = Qn::CompressedPeriodsFormat;
-
-    if (!connectionVersion.isNull() && connectionVersion < nx::utils::SoftwareVersion(3, 0))
-        fixedFormatRequest.requestVersion = QnChunksRequestData::RequestVersion::v2_6;
-
-    return sendAsyncGetRequestLogged(ec2RecordedTimePeriodsObject,
-        fixedFormatRequest.toParams(), QN_STRINGIZE_TYPE(MultiServerPeriodDataList), target, slot);
-}

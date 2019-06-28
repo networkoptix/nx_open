@@ -48,7 +48,7 @@ int EventMessageBus::deliverAction(const vms::event::AbstractActionPtr& action, 
     }
     auto connection = server->restConnection();
     connection->executeEventAction(actionData,
-        [this, action, dstPeer](bool success, rest::Handle requestId, QnJsonRestResult result)
+        [this, action, dstPeer](bool success, rest::Handle /*requestId*/, QnJsonRestResult result)
         {
             if (success)
             {

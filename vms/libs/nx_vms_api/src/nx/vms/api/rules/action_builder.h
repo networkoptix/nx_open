@@ -8,7 +8,7 @@
 
 namespace nx::vms::api::rules {
 
-struct NX_VMS_API ActionExecutor
+struct NX_VMS_API ActionBuilder
 {
     Q_GADGET
 
@@ -19,9 +19,9 @@ public:
     std::chrono::seconds interval;
 };
 
-#define nx_vms_api_rules_ActionExecutor_Fields \
+#define nx_vms_api_rules_ActionBuilder_Fields \
     (id)(actionType)(fieldBlocks)(interval)
 
-QN_FUSION_DECLARE_FUNCTIONS(ActionExecutor, (json), NX_VMS_API)
+QN_FUSION_DECLARE_FUNCTIONS(ActionBuilder, (json), NX_VMS_API)
 
 } // namespace nx::vms::api::rules

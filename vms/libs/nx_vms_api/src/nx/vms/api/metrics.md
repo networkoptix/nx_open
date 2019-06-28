@@ -1,9 +1,9 @@
 # External APIs
 
 NOTE: Due to current `nx_fussion` limitations optional fields can not be skipped in the output.
-Thus empty values (e.g. `""`, `[]`, `{}`, `null`) must be treated as non-present.  
+Thus empty values (e.g. `""`, `[]`, `{}`, `null`) must be treated as non-present.
 
-## GET /ec2/health/rules
+## GET /ec2/metrics/rules
 
 The rules by which server calculates extra paramiters and renerates final manifest.
 Default value is hardcoded, but can be changed by POST.
@@ -36,14 +36,23 @@ Where `<parameter>`:
         "warning": "<alarm_value>", //< Optional.
         "error": " <alarm_value>" //< Optional.
     },
-    "calculate": "<function> <parameters>...", //< Optional.
+    "calculate": "<function> <arguments>...", //< Optional.
     "name": "<parameter_name>", //< Optional.
     "insert": "<relation> <parameter_id>", //< Optional.
 }
 ```
-- If `<alarm_value>` is `numeric` it's checked by `>=`, otherwise by `==`.
-- If `calculate` is present, this entry is a new parameter, and should be calculated.
-- Fields `name` and `insert` may be present only if `calculate` is present as well.
+- If `<alarm_value>`:
+  - starts with `=`, `!=`, `>`, `<`, `>=`, `<=` - apply this function to whatever follows;
+  - is `numeric` it's checked by `>=`;
+  - otherwise it's checks by `==`.
+- If `calculate` is present, this entry is a new parameter, and should be calculated:
+  - function `add <parameter1> <parameter2>` = parameter1 + parameter2
+  - function `sub <parameter1> <parameter2>` = parameter1 + parameter2
+  - function `count <parameter> [interval]` = counts parameter changes
+  - function `sum <parameter> [interval]` = sums all values`
+  - function `avg <parameter> <interval>` = average in interval
+- Fields `name` and `insert` may be present only if `calculate` is present as well (a new
+  parameter wth calculated value will be created in manifest and values outputs).
 
 Example:
 ```json
@@ -89,9 +98,10 @@ Example:
 }
 ```
 
-## GET /ec2/health/manifest
+## GET /ec2/metrics/manifest
 
-The mainest for `/ec2/health/value` visualization.
+The mainest for `/ec2/metrics/value` visualization. Parameters:
+- noRules (optional) - do not include parameters from rules if present.
 
 Format:
 ```json
@@ -144,7 +154,7 @@ Example:
         { "id": "ip", "name": "IP" },
         { "id": "status" },
         { "id": "statusChanges", "name": "status changes last hour" },
-        { 
+        {
             "id": "primaryStream",
             "name": "primary stream",
             "group": [
@@ -159,10 +169,13 @@ Example:
 }
 ```
 
-## GET /ec2/health/values
+## GET /ec2/metrics/values
 
 Current state of the values (including values calculated by server). Initially returns JSON values, in
-future will support WebSocket for push notifications and time period quieries.
+future will support WebSocket for push notifications and time period quieries. Parameters:
+- noRules (optional) - do not include values from rules if present.
+- timeLine (optional) - return timestamp-value map instead of just values if present. Rules do not
+  apply in this case.
 
 Format:
 ```json
@@ -268,8 +281,8 @@ Example:
 
 # Internal APIs
 
-## GET /api/health/value
+## GET /api/metrics/value
 
-The same as `/ec2/health/values` but returns values from single server only, used in it's
+The same as `/ec2/metrics/values` but returns values from single server only, used in it's
 implementation, format is the same.
 

@@ -5,6 +5,7 @@
 
 namespace nx::vms::server::metrics {
 
+// TODO: Use resource::Camera* instead of resource::CameraPtr.
 class CameraProvider:
     public utils::metrics::ResourceProvider<resource::CameraPtr>,
     public QObject

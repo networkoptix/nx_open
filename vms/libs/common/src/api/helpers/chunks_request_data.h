@@ -13,6 +13,8 @@
 #include <nx/utils/datetime.h>
 #include <nx/fusion/model_functions_fwd.h>
 
+class QnCommonModule;
+
 struct QnChunksRequestData
 {
     enum class GroupBy
@@ -37,6 +39,12 @@ struct QnChunksRequestData
     QnRequestParamList toParams() const;
     QUrlQuery toUrlQuery() const;
     bool isValid() const;
+
+    /**
+     * Picks a proper requestVersion using version from ec2Connection.
+     * 28.06.2019: Mobile client still should support 2.6 version.
+     */
+    void pickRequestVersion(QnCommonModule* commonModule);
 
     RequestVersion requestVersion = RequestVersion::current;
 

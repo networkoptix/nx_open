@@ -114,11 +114,11 @@ class DebugEventConnector:
 public:
     void atInc()
     {
-        emit vmsEvent(EventPtr(new DebugEvent("Increment", qnRuntime->debugCounter())));
+        emit event(EventPtr(new DebugEvent("Increment", qnRuntime->debugCounter())));
     }
     void atDec()
     {
-        emit vmsEvent(EventPtr(new DebugEvent("Decrement", qnRuntime->debugCounter())));
+        emit event(EventPtr(new DebugEvent("Decrement", qnRuntime->debugCounter())));
     }
 };
 
