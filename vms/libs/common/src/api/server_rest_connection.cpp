@@ -1130,6 +1130,20 @@ Handle ServerConnection::getAuditLog(
     return executeGet("/api/auditLog", params, callback, targetThread);
 }
 
+Handle ServerConnection::getSystemId(
+    Result<QString>::type&& callback,
+    QThread* targetThread)
+{
+    auto internalCallback =
+        [callback=std::move(callback)](
+            bool success, Handle requestId, QByteArray result,
+            const nx::network::http::HttpHeaders& /*headers*/)
+        {
+            callback(success, requestId, QString::fromUtf8(result));
+        };
+    return executeGet("/api/getSystemId", {}, internalCallback, targetThread);
+}
+
 Handle ServerConnection::recordedTimePeriods(
     const QnChunksRequestData& request,
     Result<MultiServerPeriodDataList>::type&& callback,

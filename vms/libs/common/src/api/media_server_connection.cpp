@@ -61,13 +61,11 @@ QN_DEFINE_LEXICAL_ENUM(RequestObject,
     (CameraAddObject, "manualCamera/add")
     (checkCamerasObject, "checkDiscovery")
     (CameraDiagnosticsObject, "doCameraDiagnosticsStep")
-    (GetSystemIdObject, "getSystemId")
     (RebuildArchiveObject, "rebuildArchive")
     (BackupControlObject, "backupControl")
     (PingSystemObject, "pingSystem")
     (GetNonceObject, "getRemoteNonce")
     (RecordingStatsObject, "recStats")
-    (TestEmailSettingsObject, "testEmailSettings")
     (TestLdapSettingsObject, "testLdapSettings")
 );
 
@@ -113,9 +111,6 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse& response
         case SetParamsObject:
             processJsonReply<QnCameraAdvancedParamValueList>(this, response, handle);
             break;
-        case TestEmailSettingsObject:
-            processJsonReply<QnTestEmailSettingsReply>(this, response, handle);
-            break;
         case CameraAddObject:
             emitFinished(this, response.status, handle);
             break;
@@ -124,9 +119,6 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse& response
             break;
         case CameraDiagnosticsObject:
             processJsonReply<QnCameraDiagnosticsReply>(this, response, handle);
-            break;
-        case GetSystemIdObject:
-            emitFinished(this, response.status, QString::fromUtf8(response.msgBody), handle);
             break;
         case RebuildArchiveObject:
             processJsonReply<QnStorageScanData>(this, response, handle);
@@ -324,12 +316,6 @@ int QnMediaServerConnection::addCameraAsync(
     params.insert("password", password);
 
     return sendAsyncPostRequestLogged(CameraAddObject, params, nullptr, target, slot);
-}
-
-int QnMediaServerConnection::getSystemIdAsync(QObject* target, const char* slot)
-{
-    return sendAsyncGetRequestLogged(GetSystemIdObject,
-        QnRequestParamList(), QN_STRINGIZE_TYPE(QString), target, slot);
 }
 
 int QnMediaServerConnection::testLdapSettingsAsync(

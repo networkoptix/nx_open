@@ -65,13 +65,13 @@ namespace CameraDiagnostics
         QString errorMessage() const;
 
     public slots:
-        void onGetServerSystemIdResponse( int status, QString serverSystemId, int handle );
+        void onGetServerSystemIdResponse(bool status, int handle, QString serverSystemId);
         //!Receives response from server
         /*!
             \param status \a QNetworkReply::NetworkError
             \param performedStep Constant from \a Step::Value enumeration
         */
-        void onCameraDiagnosticsStepResponse( int status, QnCameraDiagnosticsReply, int handle );
+        void onCameraDiagnosticsStepResponse(int status, QnCameraDiagnosticsReply, int handle );
 
     signals:
         /*!

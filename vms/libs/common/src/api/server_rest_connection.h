@@ -528,6 +528,11 @@ public:
         Result<QnAuditRecordList>::type&& callback,
         QThread* targetThread = nullptr);
 
+    /** Request the name of a system the mediaserver is currently connected to. */
+    Handle getSystemId(
+        Result<QString>::type&& callback,
+        QThread* targetThread = nullptr);
+
     Handle debug(
         const QString& action,
         const QString& value,
