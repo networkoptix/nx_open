@@ -14,7 +14,12 @@ namespace test {
 
 namespace {
 
-QnScheduleTaskList makeEmptySchedule()
+QnScheduleTaskList makeSchedule(
+    Qn::RecordingType recordingType,
+    Qn::StreamQuality streamQuality = Qn::StreamQuality::normal,
+    int fps = 0,
+    int bitrateKbps = 0
+)
 {
     QnScheduleTaskList result;
     for (int day = 1; day <= 7; ++day)
@@ -23,31 +28,27 @@ QnScheduleTaskList makeEmptySchedule()
             /*dayOfWeek*/ day,
             /*startTime*/ 0,
             /*endTime*/ 86400,
-            /*recordingType*/ Qn::RecordingType::never,
-            /*streamQuality*/ Qn::StreamQuality::highest,
-            /*fps*/ 0,
-            /*bitrateKbps*/ 0
-		});
+            /*recordingType*/ recordingType,
+            /*streamQuality*/ streamQuality,
+            /*fps*/ fps,
+            /*bitrateKbps*/ bitrateKbps
+        });
     }
     return result;
 }
 
+QnScheduleTaskList makeEmptySchedule()
+{
+    return makeSchedule(/*recordingType*/ Qn::RecordingType::never);
+}
+
 QnScheduleTaskList makeDefaultSchedule()
 {
-    QnScheduleTaskList result;
-    for (int day = 1; day <= 7; ++day)
-    {
-        result.push_back({
-            /*dayOfWeek*/ day,
-            /*startTime*/ 0,
-            /*endTime*/ 86400,
-            /*recordingType*/ Qn::RecordingType::never,
-            /*streamQuality*/ Qn::StreamQuality::highest,
-            /*fps*/ 0,
-            /*bitrateKbps*/ 0
-		});
-    }
-    return result;
+    return makeSchedule(
+        /*recordingType*/ ScheduleCellParams::kDefaultRecordingType,
+        /*streamQuality*/ Qn::StreamQuality::normal,
+        /*fps*/ 10
+    );
 }
 
 } // namespace
@@ -185,6 +186,24 @@ TEST_F(CameraSettingsDialogStateReducerTest, brushFpsIsValidAfterCleanSchedule)
     CameraSettingsDialogStateConversionFunctions::applyStateToCameras(afterClean, cameras);
     State reloaded = Reducer::loadCameras(std::move(afterClean), cameras);
     ASSERT_EQ(reloaded.recording.brush.fps, kDefaultFps);
+}
+
+// If clean schedule, fps brush should be reset to a default value.
+TEST_F(CameraSettingsDialogStateReducerTest, brushQualityIsLoaded)
+{
+    CameraResourceStubPtr camera(new CameraResourceStub());
+    const QnVirtualCameraResourceList cameras{ camera };
+
+    static constexpr auto kCustomQuality = Qn::StreamQuality::low;
+
+    State initial = Reducer::loadCameras({}, cameras);
+
+    State afterSetup = Reducer::setSchedule(std::move(initial),
+        makeSchedule(Qn::RecordingType::always, kCustomQuality));
+
+    CameraSettingsDialogStateConversionFunctions::applyStateToCameras(afterSetup, cameras);
+    State reloaded = Reducer::loadCameras(std::move(afterSetup), cameras);
+    ASSERT_EQ(reloaded.recording.brush.quality, kCustomQuality);
 }
 
 // Schedule brush correctness when bitrate switches from custom to predefined and back.

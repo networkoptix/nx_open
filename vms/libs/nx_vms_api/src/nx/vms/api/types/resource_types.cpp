@@ -117,3 +117,17 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api, MetadataStorageChangePol
     (nx::vms::api::MetadataStorageChangePolicy::remove, "remove")
     (nx::vms::api::MetadataStorageChangePolicy::move, "move"))
 QN_FUSION_DEFINE_FUNCTIONS(nx::vms::api::MetadataStorageChangePolicy, (numeric)(debug))
+
+namespace nx::vms::api {
+
+QString toString(StreamQuality value)
+{
+    return QnLexical::serialized(value);
+}
+
+std::ostream& operator<<(std::ostream& os, StreamQuality value)
+{
+    return os << ::toString(value).toStdString();
+}
+
+} // namespace nx::vms::api
