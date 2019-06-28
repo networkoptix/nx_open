@@ -4560,7 +4560,7 @@ void MediaServerProcess::initMetricsController()
                 "group": {
                     "fpsDrop": {
                         "name": "fps drop",
-                        "calculate": "minus targetFps actualFps",
+                        "calculate": "sub targetFps actualFps",
                         "insert": "after actualFps",
                         "alarms": { "warning": 2 }
                     },
