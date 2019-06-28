@@ -369,6 +369,8 @@ int QnWearableCameraRestHandler::executeRelease(const QnRequestParams& params,
     reply.consuming = state.isConsuming();
     reply.progress = state.progress();
     result.setReply(reply);
+    uploader->release(cameraId);
+    serverModule()->normalStorageManager()->updateCameraHistory();
 
     return nx::network::http::StatusCode::ok;
 }
@@ -407,6 +409,18 @@ int QnWearableCameraRestHandler::executeConsume(
 
     if (!uploader->consume(cameraId, token, uploadId, startTimeMs))
         return nx::network::http::StatusCode::unprocessableEntity;
+
+    QnWearableStatusReply reply;
+    reply.success = true;
+
+    QnWearableLockInfo info = locker->lockInfo(cameraId);
+    reply.locked = info.locked;
+    reply.userId = info.userId;
+
+    WearableArchiveSynchronizationState state = uploader->state(cameraId);
+    reply.consuming = state.isConsuming();
+    reply.progress = state.progress();
+    result.setReply(reply);
 
     return nx::network::http::StatusCode::ok;
 }
