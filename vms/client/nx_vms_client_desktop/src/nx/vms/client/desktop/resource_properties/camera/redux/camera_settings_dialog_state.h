@@ -293,8 +293,16 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractReduxState
     bool hasMotion() const
     {
         bool result = devicesDescription.hasMotion == CombinedValue::All;
+
         if (isSingleCamera())
             result &= singleCameraSettings.enableMotionDetection();
+
+        if (settingsOptimizationEnabled)
+        {
+            if (expert.forcedMotionStreamType() != nx::vms::api::StreamIndex::primary)
+                result &= !expert.dualStreamingDisabled();
+        }
+
         return result;
     }
 
@@ -303,9 +311,13 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractReduxState
      */
     bool supportsDualStreamRecording() const
     {
-        return hasMotion()
-            && devicesDescription.hasDualStreamingCapability == CombinedValue::All
-            && (!expert.dualStreamingDisabled() || !settingsOptimizationEnabled);
+        bool result = hasMotion()
+            && devicesDescription.hasDualStreamingCapability == CombinedValue::All;
+
+        if (settingsOptimizationEnabled)
+            result &= !expert.dualStreamingDisabled();
+
+        return result;
     }
 
     bool supportsSchedule() const

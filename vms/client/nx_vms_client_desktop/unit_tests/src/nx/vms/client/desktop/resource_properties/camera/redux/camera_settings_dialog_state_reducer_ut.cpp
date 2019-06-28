@@ -278,9 +278,9 @@ TEST_F(CameraSettingsDialogStateReducerTest, recordingAlertIfScheduleIsEmpty)
     ASSERT_FALSE(recordingDisabled.recordingHint.has_value());
 }
 
-// "Motion + Lo-Res" recording type must not be available if secondary stream is disabled on the
-// expert settings page.
-TEST_F(CameraSettingsDialogStateReducerTest, disableMotionLoResIfDualStreamingIsDisabled)
+// "Motion" and "Motion + Lo-Res" recording types must not be available if secondary stream is
+// disabled on the expert settings page.
+TEST_F(CameraSettingsDialogStateReducerTest, disableMotionBrushIfDualStreamingIsDisabled)
 {
     // Global option to allow expert settings editing must be enabled first.
     State enableDeviceOptimization = Reducer::setSettingsOptimizationEnabled({}, true);
@@ -289,18 +289,22 @@ TEST_F(CameraSettingsDialogStateReducerTest, disableMotionLoResIfDualStreamingIs
     camera->setHasDualStreaming(true);
 
     State initial = Reducer::loadCameras(std::move(enableDeviceOptimization), { camera });
+    ASSERT_TRUE(initial.hasMotion());
     ASSERT_TRUE(initial.supportsDualStreamRecording());
 
     State disabledDualStreaming = Reducer::setDualStreamingDisabled(std::move(initial), true);
+    ASSERT_FALSE(disabledDualStreaming.hasMotion());
     ASSERT_FALSE(disabledDualStreaming.supportsDualStreamRecording());
 
     State enabledDualStreaming = Reducer::setDualStreamingDisabled(
         std::move(disabledDualStreaming), false);
+    ASSERT_TRUE(enabledDualStreaming.hasMotion());
     ASSERT_TRUE(enabledDualStreaming.supportsDualStreamRecording());
 }
 
-// "Motion + Lo-Res" recording type must always be available if camera settings optimization is off.
-TEST_F(CameraSettingsDialogStateReducerTest, enableMotionLoResIfDeviceOptimizationIsDisabled)
+// "Motion" and "Motion + Lo-Res" recording type must always be available if camera settings
+// optimization is off.
+TEST_F(CameraSettingsDialogStateReducerTest, enableMotionBrushIfDeviceOptimizationIsDisabled)
 {
     // Global option to allow expert settings editing must be enabled first.
     State enableDeviceOptimization = Reducer::setSettingsOptimizationEnabled({}, true);
@@ -309,15 +313,38 @@ TEST_F(CameraSettingsDialogStateReducerTest, enableMotionLoResIfDeviceOptimizati
     camera->setHasDualStreaming(true);
 
     State initial = Reducer::loadCameras(std::move(enableDeviceOptimization), { camera });
+    ASSERT_TRUE(initial.hasMotion());
     ASSERT_TRUE(initial.supportsDualStreamRecording());
 
     State disabledDualStreaming = Reducer::setDualStreamingDisabled(std::move(initial), true);
+    ASSERT_FALSE(disabledDualStreaming.hasMotion());
     ASSERT_FALSE(disabledDualStreaming.supportsDualStreamRecording());
 
     State disableDeviceOptimization = Reducer::setSettingsOptimizationEnabled(
         std::move(disabledDualStreaming), false);
 
+    ASSERT_TRUE(disableDeviceOptimization.hasMotion());
     ASSERT_TRUE(disableDeviceOptimization.supportsDualStreamRecording());
+}
+
+// "Motion" recording type must be available if user forces MD on the primary stream.
+TEST_F(CameraSettingsDialogStateReducerTest, disableMotionIfSecondaryStreamDisabled)
+{
+    // Global option to allow expert settings editing must be enabled first.
+    State enableDeviceOptimization = Reducer::setSettingsOptimizationEnabled({}, true);
+
+    CameraResourceStubPtr camera(new CameraResourceStub());
+    camera->setHasDualStreaming(true);
+
+    State initial = Reducer::loadCameras(std::move(enableDeviceOptimization), { camera });
+    ASSERT_EQ(initial.devicesDescription.supportsMotionStreamOverride, CombinedValue::All);
+
+    State disabledDualStreaming = Reducer::setDualStreamingDisabled(std::move(initial), true);
+    ASSERT_FALSE(disabledDualStreaming.hasMotion());
+
+    State forcedMdOnPrimaryStream = Reducer::setForcedMotionStreamType(
+        std::move(disabledDualStreaming), nx::vms::api::StreamIndex::primary);
+    ASSERT_TRUE(forcedMdOnPrimaryStream.hasMotion());
 }
 
 } // namespace test
