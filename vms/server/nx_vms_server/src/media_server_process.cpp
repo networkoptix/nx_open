@@ -2560,7 +2560,9 @@ void MediaServerProcess::registerRestHandlers(
      * %param:string version Possible values: {target | installed}. Indicates which update files
      * should be stored on the given servers.
      * %param:object JSON representation of the list of the servers selected for persistent update
-     *      files storing.
+     *      files storing. If the list is empty, than it is treated as if persistent storage
+     *      selection algorithm  is reset to the initial state - automatic persistent server
+     *      selection.
      * %return:object JSON with the updated servers list.
      *
      **%apidoc GET /ec2/updatePersistenStorages

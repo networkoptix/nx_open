@@ -187,11 +187,11 @@ void CommonUpdateManager::managePersistentDownloads()
 
     for (const auto& file: storageUpdateFiles)
     {
-        const auto packageIt = std::find_if(
+        const bool hasPackage = std::any_of(
             packages.cbegin(), packages.cend(),
             [&file](const auto& package) { return file.contains(package.file); });
 
-        if (packageIt == packages.cend())
+        if (!hasPackage)
             downloader()->deleteFile(file);
     }
 }
@@ -293,7 +293,6 @@ void CommonUpdateManager::finish()
         commonModule()->globalSettings()->targetUpdateInformation());
     commonModule()->globalSettings()->setInstalledPersistentUpdateStorage(
         commonModule()->globalSettings()->targetPersistentUpdateStorage());
-    commonModule()->globalSettings()->synchronizeNowSync();
     startUpdate("");
 }
 

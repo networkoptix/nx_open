@@ -67,7 +67,7 @@ int QnPersistentUpdateStorageRestHandler::executePost(
     }
 
     serverModule()->updateManager()->setUpdatePersistentStorageServers(
-        serverList, params[kVersionParam], /*manuallySet*/ true);
+        serverList, params[kVersionParam], /*manuallySet*/ !serverList.isEmpty());
 
     return QnFusionRestHandler::makeReply(
         serverModule()->updateManager()->updatePersistentStorageServers(params[kVersionParam]),
