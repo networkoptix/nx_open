@@ -139,8 +139,7 @@ bool QnSmtpTestConnectionWidget::testSettings(const QnEmailSettings &value)
     m_timeoutTimer->setInterval(testSmtpTimeoutMSec / ui->testProgressBar->maximum());
     m_timeoutTimer->start();
 
-    //m_testHandle = serverConnection->testEmailSettingsAsync(result, this, SLOT(at_testEmailSettingsFinished(int, const QnTestEmailSettingsReply& , int)));
-    m_testHandle = serverConnection->testEmailSettingsAsync(result,
+    m_testHandle = serverConnection->testEmailSettings(result,
         [this](bool success, int handle, const QnTestEmailSettingsReply& reply)
         {
             this->at_testEmailSettingsFinished(success, handle, reply);

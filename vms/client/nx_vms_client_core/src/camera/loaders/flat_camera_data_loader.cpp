@@ -10,7 +10,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 
-#include <api/media_server_connection.h>
+#include <api/server_rest_connection.h>
 
 #include <recording/time_period_list.h>
 
@@ -19,6 +19,7 @@
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/datetime.h>
+#include <nx/utils/guarded_callback.h>
 
 namespace {
 
@@ -119,7 +120,7 @@ int QnFlatCameraDataLoader::sendRequest(qint64 startTimeMs, qint64 resolutionMs)
         return 0;   // TODO: #GDM #bookmarks make sure invalid value is handled
     }
 
-    auto connection = m_server->apiConnection();
+    auto connection = m_server->restConnection();
     if (!connection)
     {
         trace(lit("There is no server api connection, cannot send request"));
@@ -133,11 +134,19 @@ int QnFlatCameraDataLoader::sendRequest(qint64 startTimeMs, qint64 resolutionMs)
     requestData.filter = m_filter;
     requestData.periodsType = m_dataType;
     requestData.detailLevel = std::chrono::milliseconds(resolutionMs);
+    requestData.pickRequestVersion(m_server->commonModule());
 
-    return connection->recordedTimePeriods(requestData, this, SLOT(at_timePeriodsReceived(int, const MultiServerPeriodDataList &, int)));
+    return connection->recordedTimePeriods(requestData,
+        nx::utils::guarded(this,
+            [this](bool success, int handle, const MultiServerPeriodDataList& timePeriods)
+            {
+                at_timePeriodsReceived(success, handle, timePeriods);
+            }), thread());
 }
 
-void QnFlatCameraDataLoader::at_timePeriodsReceived(int status, const MultiServerPeriodDataList &timePeriods, int requestHandle)
+void QnFlatCameraDataLoader::at_timePeriodsReceived(bool success,
+    int requestHandle,
+    const MultiServerPeriodDataList &timePeriods)
 {
     trace(lit("Received answer for req %1").arg(requestHandle));
 
@@ -147,22 +156,22 @@ void QnFlatCameraDataLoader::at_timePeriodsReceived(int status, const MultiServe
         rawPeriods.push_back(period.periods);
     QnAbstractCameraDataPtr data(new QnTimePeriodCameraData(QnTimePeriodList::mergeTimePeriods(rawPeriods)));
 
-    handleDataLoaded(status, data, requestHandle);
+    handleDataLoaded(success, requestHandle, data);
 }
 
-void QnFlatCameraDataLoader::handleDataLoaded(int status, const QnAbstractCameraDataPtr &data, int requestHandle)
+void QnFlatCameraDataLoader::handleDataLoaded(bool success, int requestHandle, const QnAbstractCameraDataPtr &data)
 {
     if (m_loading.handle != requestHandle)
         return;
 
     trace(lit("Loaded data for %1 (%2)").arg(m_loading.startTimeMs).arg(dt(m_loading.startTimeMs)));
 
-    if (status != 0)
+    if (!success)
     {
         trace(lit("Load Failed"));
         for(auto handle: m_loading.waitingHandles)
-            emit failed(status, handle);
-        emit failed(status, requestHandle);
+            emit failed(handle);
+        emit failed(requestHandle);
         m_loading.clear();
         return;
     }

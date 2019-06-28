@@ -3,7 +3,6 @@
 #include <QtCore/QUrl>
 #include <QtCore/QScopedPointer>
 #include <QtCore/QSharedPointer>
-#include <QtGui/QVector3D>
 #include <QtGui/QRegion>
 
 #include <api/helpers/request_helpers_fwd.h>
@@ -117,10 +116,9 @@ public:
     int getNonceAsync(const nx::utils::Url& url, QObject* target, const char* slot);
     int getRecordingStatisticsAsync(
         qint64 bitrateAnalyzePeriodMs, QObject* target, const char* slot);
-    int getAuditLogAsync(qint64 startTimeMs, qint64 endTimeMs, QObject* target, const char* slot);
 
+    // It expects (int status, const QnLdapUsers& users, int handle, const QString& errorString) slot.
     int testLdapSettingsAsync(const QnLdapSettings& settings, QObject* target, const char* slot);
-    int recordedTimePeriods(const QnChunksRequestData& request, QObject* target, const char* slot);
 
 protected:
     virtual nx::utils::Url url() const override;

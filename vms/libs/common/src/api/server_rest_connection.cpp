@@ -28,6 +28,7 @@
 
 #include <nx/api/mediaserver/image_request.h>
 #include <nx/fusion/model_functions.h>
+#include <nx/fusion/serialization/compressed_time_functions.h>
 #include <nx/network/http/custom_headers.h>
 #include <nx/network/http/http_types.h>
 #include <nx/utils/random.h>
@@ -1103,7 +1104,7 @@ Handle ServerConnection::getPluginInformation(GetCallback callback, QThread* tar
     return executeGet("/api/pluginInfo", {}, callback, targetThread);
 }
 
-Handle ServerConnection::testEmailSettingsAsync(
+Handle ServerConnection::testEmailSettings(
       const QnEmailSettings& settings,
       Result<QnTestEmailSettingsReply>::type&& callback,
       QThread* targetThread)
@@ -1113,6 +1114,45 @@ Handle ServerConnection::testEmailSettingsAsync(
     const auto contentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
     auto body = QJson::serialized(data);
     return executePost("/api/testEmailSettings", {}, contentType, body, callback, targetThread);
+}
+
+Handle ServerConnection::getAuditLog(
+    qint64 startTimeMs,
+    qint64 endTimeMs,
+    Result<QnAuditRecordList>::type&& callback,
+    QThread* targetThread)
+{
+    QnRequestParamList params;
+    params.insert("from", startTimeMs * 1000ll);
+    params.insert("to", endTimeMs * 1000ll);
+    params.insert("format", "ubjson");
+
+    return executeGet("/api/auditLog", params, callback, targetThread);
+}
+
+Handle ServerConnection::recordedTimePeriods(
+    const QnChunksRequestData& request,
+    Result<MultiServerPeriodDataList>::type&& callback,
+    QThread* targetThread)
+{
+    QnChunksRequestData fixedFormatRequest(request);
+    fixedFormatRequest.format = Qn::CompressedPeriodsFormat;
+    auto internalCallback =
+        [callback=std::move(callback)](
+            bool success, Handle requestId, QByteArray result,
+            const nx::network::http::HttpHeaders& /*headers*/)
+        {
+            if (success)
+            {
+                bool goodData = false;
+                auto chunks = QnCompressedTime::deserialized<MultiServerPeriodDataList>(
+                    result, {}, &goodData);
+                callback(goodData, requestId, chunks);
+            }
+            callback(false, requestId, {});
+        };
+    return executeGet("/ec2/recordedTimePeriods", fixedFormatRequest.toParams(), internalCallback,
+        targetThread);
 }
 
 Handle ServerConnection::debug(
@@ -1229,19 +1269,6 @@ Handle ServerConnection::executePost(
 
     trace(handle, path);
     return handle;
-}
-
-template <typename ResultType>
-Handle ServerConnection::executePut(
-    const QString& path,
-    const QnRequestParamList& params,
-    Callback<ResultType> callback,
-    QThread* targetThread)
-{
-    return executePut(
-        path, {},
-        nx::network::http::header::ContentType::kJson, QJson::serialized(params.toJson()),
-        std::move(callback), targetThread);
 }
 
 template <typename ResultType>
