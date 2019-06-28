@@ -75,6 +75,7 @@ update::Status CommonUpdateManager::start()
     switch (addDownload(package, ""))
     {
         case downloader::ResultCode::ok:
+        case downloader::ResultCode::fileAlreadyExists:
             return update::Status(peerId, update::Status::Code::downloading);
 
         case downloader::ResultCode::fileDoesNotExist:
@@ -95,7 +96,6 @@ update::Status CommonUpdateManager::start()
                 peerId,
                 update::Status::Code::error,
                 update::Status::ErrorCode::noFreeSpaceToDownload);
-
         default:
             NX_ASSERT(false, "Unexpected Downloader::addFile() result");
             m_downloaderFailDetail = DownloaderFailDetail::internalError;

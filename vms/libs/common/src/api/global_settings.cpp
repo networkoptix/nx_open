@@ -712,12 +712,12 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         this);
 
     m_targetPersistentUpdateStorageAdaptor = new QnLexicalResourcePropertyAdaptor<QByteArray>(
-        kTargetUpdateInformationName,
+        kTargetPersistentUpdateStorageName,
         QByteArray(),
         this);
 
     m_installedPersistentUpdateStorageAdaptor = new QnLexicalResourcePropertyAdaptor<QByteArray>(
-        kInstalledUpdateInformationName,
+        kInstalledPersistentUpdateStorageName,
         QByteArray(),
         this);
 
