@@ -329,7 +329,11 @@ int64_t SystemCommands::totalSpace(const std::string& path)
     if (statvfs64(path.c_str(), &stat) == 0)
         result = stat.f_blocks * (int64_t) stat.f_frsize;
     else
-        perror("totalSpace: statvfs64 failed:");
+    {
+        char buf[1024];
+        snprintf(buf, sizeof(buf), "totalSpace: statvfs64 failed for the path: %s", path.c_str());
+        perror(buf);
+    }
 
     return result;
 }
