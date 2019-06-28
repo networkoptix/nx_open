@@ -46,7 +46,7 @@ static QnTimePeriodList timePeriodListFromGeneratedData(const GeneratedFileData&
 }
 
 static GeneratedFileData generateTestFileData(
-    const UploadTestParameters& testParameters, const QString& basePath,
+    const UploadTestParameters& testParameters,
     const QList<int>& filePerPeriodList)
 {
     using namespace std::chrono;
@@ -210,7 +210,7 @@ protected:
 
     void givenSomeFilesOnDisk()
     {
-        m_generatedData = generateTestFileData(GetParam(), m_storagePath, {3, 2, 4});
+        m_generatedData = generateTestFileData(GetParam(), {3, 2, 4});
     }
 
     void whenWearableCameraIsCreated()
