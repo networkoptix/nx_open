@@ -230,52 +230,62 @@ bool CommonUpdateManager::canDownloadFile(
     {
         switch (fileInformation.status)
         {
-        case FileInformation::Status::downloading:
-            *outUpdateStatus = update::Status(
-                peerId,
-                update::Status::Code::downloading,
-                update::Status::ErrorCode::noError,
-                fileInformation.calculateDownloadProgress());
-            return false;
-        case FileInformation::Status::uploading:
-            *outUpdateStatus = update::Status(
-                peerId,
-                update::Status::Code::downloading,
-                update::Status::ErrorCode::noError,
-                fileInformation.calculateDownloadProgress());
-            return false;
-        case FileInformation::Status::downloaded:
-            return installerState(outUpdateStatus, peerId);
-        case FileInformation::Status::notFound:
-            NX_ASSERT(false, "Unexpected state");
-            *outUpdateStatus = update::Status(
-                peerId,
-                update::Status::Code::error,
-                update::Status::ErrorCode::unknownError);
-            return true;
-        case FileInformation::Status::corrupted:
-            *outUpdateStatus = update::Status(
-                peerId,
-                update::Status::Code::error,
-                update::Status::ErrorCode::corruptedArchive);
-            return true;
+            case FileInformation::Status::downloading:
+                *outUpdateStatus = update::Status(
+                    peerId,
+                    update::Status::Code::downloading,
+                    update::Status::ErrorCode::noError,
+                    fileInformation.calculateDownloadProgress());
+                return false;
+            case FileInformation::Status::uploading:
+                *outUpdateStatus = update::Status(
+                    peerId,
+                    update::Status::Code::downloading,
+                    update::Status::ErrorCode::noError,
+                    fileInformation.calculateDownloadProgress());
+                return false;
+            case FileInformation::Status::downloaded:
+            {
+                const bool result = installerState(outUpdateStatus, peerId);
+
+                if (outUpdateStatus->code == update::Status::Code::readyToInstall)
+                {
+                    // We can't precizely evaluate the required space for update installation.
+                    // As a very approximate value we take 10% of the package size + some padding
+                    // hard-coded inside checkFreeSpace.
+                    const qint64 required = package.size / 10;
+                    if (!installer()->checkFreeSpace(
+                        QCoreApplication::applicationDirPath(), required))
+                    {
+                        *outUpdateStatus = update::Status(
+                            peerId,
+                            update::Status::Code::error,
+                            update::Status::ErrorCode::noFreeSpaceToInstall);
+                        return false;
+                    }
+                }
+
+                return result;
+            }
+            case FileInformation::Status::notFound:
+                NX_ASSERT(false, "Unexpected state");
+                *outUpdateStatus = update::Status(
+                    peerId,
+                    update::Status::Code::error,
+                    update::Status::ErrorCode::unknownError);
+                return true;
+            case FileInformation::Status::corrupted:
+                *outUpdateStatus = update::Status(
+                    peerId,
+                    update::Status::Code::error,
+                    update::Status::ErrorCode::corruptedArchive);
+                return true;
         }
     }
 
-    const int64_t requiredSpace = package.size * 2 * 1.2;
-    const int64_t deviceFreeSpace = freeSpace(installer()->dataDirectoryPath());
-    NX_DEBUG(
-        this,
-        "Checking if there is enough space to download and install the update package. Required space: %1Mb, free space on device: %2Mb",
-        requiredSpace / (1024 * 1024), deviceFreeSpace / (1024 * 1024));
-    if (deviceFreeSpace < requiredSpace)
+    if (!installer()->checkFreeSpace(
+        downloader()->downloadsDirectory().absolutePath(), package.size))
     {
-        NX_WARNING(
-            this,
-            "Can't start downloading an update package because lack of free space on disk. " \
-            "Required: %1 Mb, free Space: %2 Mb",
-            static_cast<double>(requiredSpace) / (1024 * 1024),
-            static_cast<double>(deviceFreeSpace) / (1024 * 1024));
         *outUpdateStatus = nx::update::Status(
             peerId, update::Status::Code::error, update::Status::ErrorCode::noFreeSpaceToDownload);
         return false;
