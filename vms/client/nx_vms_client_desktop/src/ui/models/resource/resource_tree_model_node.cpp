@@ -1220,7 +1220,7 @@ int QnResourceTreeModelNode::calculateIconKey() const
         case NodeType::resource:
         case NodeType::edge:
         case NodeType::sharedLayout:
-            return m_resource ? int(qnResIconCache->key(m_resource)) : 0;
+            return m_resource ? static_cast<int>(QnResourceIconCache::key(m_resource)) : 0;
 
         case NodeType::layoutItem:
         case NodeType::sharedResource:
@@ -1229,7 +1229,7 @@ int QnResourceTreeModelNode::calculateIconKey() const
                 return 0;
 
             if (!m_resource->hasFlags(Qn::server))
-                return qnResIconCache->key(m_resource);
+                return QnResourceIconCache::key(m_resource);
 
             return m_resource->getStatus() == Qn::Offline
                 ? (QnResourceIconCache::HealthMonitor | QnResourceIconCache::Offline)
