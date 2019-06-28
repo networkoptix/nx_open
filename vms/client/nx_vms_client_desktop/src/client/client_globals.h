@@ -50,7 +50,7 @@ namespace Qn
         FirstItemDataRole = Qt::UserRole,
 
         /* Tree-based. */
-        NodeTypeRole,  /**< Role for node type, see <tt>ResourceTreeNodeType</tt>. */
+        NodeTypeRole,  /**< Role for node type, see <tt>ResourceTree::NodeType</tt>. */
         ResourceTreeScopeRole, //< Role for ResourceTreeScope.
 
         /* Resource-based. */
@@ -63,7 +63,7 @@ namespace Qn
         ResourceNameRole,                           /**< Role for resource name. Value of type QString. */
         ResourceFlagsRole,                          /**< Role for resource flags. Value of type int (Qn::ResourceFlags). */
         ResourceStatusRole,                         /**< Role for resource status. Value of type int (Qn::ResourceStatus). */
-        ResourceIconKeyRole,                        /**< Role for resource custom icon key. Value of type QString. */
+        ResourceIconKeyRole,                        /**< Role for resource custom icon key. Value of type int. */
 
         CameraExtraStatusRole,                      /**< Custom camera status (recording, buggy, etc). Value of CameraExtraStatus. */
 
@@ -115,9 +115,6 @@ namespace Qn
         ItemCheckedButtonsRole,                     /**< Role for buttons that are checked in item's titlebar. Value of type int (QnResourceWidget::Buttons). */
         ItemDisabledButtonsRole,                    /**< Role for buttons that are not to be displayed in item's titlebar. Value of type int (QnResourceWidget::Buttons). */
         ItemHealthMonitoringButtonsRole,            /**< Role for buttons that are checked on each line of Health Monitoring widget. Value of type QnServerResourceWidget::HealthMonitoringButtons. */
-
-        ItemAnalyticsModeSourceRegionRole,          /**< Role for original region in the analytics mode. */
-        ItemAnalyticsModeRegionIdRole,              /**< Role for source region id in the analytics mode. */
 
         /* Ptz-based. */
         PtzPresetRole,                              /**< Role for PTZ preset. Value of type QnPtzPreset. */
@@ -246,6 +243,8 @@ namespace Qn
 
         SelectOnOpeningRole,                        /**< Role for single-selecting an item (or first of multiple items) added to current layout (bool). */
         RaiseSelectionRole,                         /**< Role for raising a single-selected item (bool). */
+
+        ExtraResourceInfoRole,                      /**< Role for extra resource information in the tree (QString). */
 
         // Model notification roles. Do not necessarily pass any data but implement
         // item-related view-to-model notifications via setData which can be proxied.

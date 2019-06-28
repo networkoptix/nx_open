@@ -17,7 +17,7 @@ func FormatDate(t time.Time) string {
 }
 
 func ParseDate(httpDate string) (time.Time, error) {
-	return time.Parse(httpDate, kHttpTimeFormat)
+	return time.Parse(kHttpTimeFormat, httpDate)
 }
 
 type Date struct {

@@ -25,6 +25,8 @@ extern "C" {
 #include "ui/graphics/opengl/gl_functions.h"
 #include "ui/graphics/items/resource/resource_widget_renderer.h"
 #include <decoders/video/ffmpeg_video_decoder.h>
+#include <client/client_module.h>
+#include <nx/vms/client/desktop/utils/video_cache.h>
 
 using namespace std::chrono;
 
@@ -396,6 +398,15 @@ void QnVideoStreamDisplay::calcSampleAR(QSharedPointer<CLVideoDecoderOutput> out
     }
 }
 
+MultiThreadDecodePolicy QnVideoStreamDisplay::toEncoderPolicy(bool useMtDecoding) const
+{
+    if (!qnSettings->allowMtDecoding())
+        return MultiThreadDecodePolicy::disabled;
+    if (useMtDecoding)
+        return MultiThreadDecodePolicy::enabled;
+    return MultiThreadDecodePolicy::autoDetect;
+}
+
 QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompressedVideoDataPtr data, bool draw, QnFrameScaler::DownscaleFactor force_factor)
 {
     updateRenderList();
@@ -454,7 +465,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
     if (needReinitDecoders) {
         QnMutexLocker lock(&m_mtx);
         if (m_decoderData.decoder)
-            m_decoderData.decoder->setMTDecoding(enableFrameQueue);
+            m_decoderData.decoder->setMultiThreadDecodePolicy(toEncoderPolicy(enableFrameQueue));
     }
 
     QSharedPointer<CLVideoDecoderOutput> m_tmpFrame( new CLVideoDecoderOutput() );
@@ -469,12 +480,12 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
     auto dec = m_decoderData.decoder.get();
     if (!dec || m_decoderData.compressionType != data->compressionType)
     {
-        static QAtomicInt swDecoderCount = 0;
-        DecoderConfig config = DecoderConfig::fromMediaResource(m_resource);
-        config.disableMtDecoding = qnSettings->disableMtDecoding();
+        DecoderConfig config;
+        config.mtDecodePolicy = toEncoderPolicy(/*mtDecoding*/ enableFrameQueue);
+
         dec = new QnFfmpegVideoDecoder(
             config,
-            data->compressionType, data, /*mtDecoding*/ enableFrameQueue, &swDecoderCount);
+            data->compressionType, data);
         if (dec == nullptr)
         {
             NX_VERBOSE(this, lit("Can't find create decoder for compression type %1").arg(data->compressionType));
@@ -770,6 +781,8 @@ bool QnVideoStreamDisplay::processDecodedFrame(
 {
     if (!outFrame->data[0] && !outFrame->picData)
         return false;
+
+    qnClientModule->videoCache()->add(m_resource->toResource()->getId(), outFrame);
 
     if (enableFrameQueue)
     {

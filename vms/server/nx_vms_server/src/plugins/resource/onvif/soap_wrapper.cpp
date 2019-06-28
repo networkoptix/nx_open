@@ -170,8 +170,8 @@ void DeviceSoapWrapper::calcTimeDrift()
 
     if (soapRes == SOAP_OK && response.SystemDateAndTime && response.SystemDateAndTime->UTCDateTime)
     {
-        onvifXsd__Date* date = response.SystemDateAndTime->UTCDateTime->Date;
-        onvifXsd__Time* time = response.SystemDateAndTime->UTCDateTime->Time;
+        tt__Date* date = response.SystemDateAndTime->UTCDateTime->Date;
+        tt__Time* time = response.SystemDateAndTime->UTCDateTime->Time;
 
         QDateTime datetime(QDate(date->Year, date->Month, date->Day), QTime(time->Hour, time->Minute, time->Second), Qt::UTC);
         m_timeDrift = datetime.toMSecsSinceEpoch() / 1000 - QDateTime::currentMSecsSinceEpoch() / 1000;
@@ -369,14 +369,14 @@ int DeviceSoapWrapper::systemReboot(RebootReq& request, RebootResp& response)
 int DeviceSoapWrapper::setSystemFactoryDefaultHard(FactoryDefaultReq& request, FactoryDefaultResp& response)
 {
     beforeMethodInvocation<FactoryDefaultReq>();
-    request.FactoryDefault = onvifXsd__FactoryDefaultType::Hard;
+    request.FactoryDefault = tt__FactoryDefaultType::Hard;
     return m_bindingProxy.SetSystemFactoryDefault(m_endpoint, NULL, &request, response);
 }
 
 int DeviceSoapWrapper::setSystemFactoryDefaultSoft(FactoryDefaultReq& request, FactoryDefaultResp& response)
 {
     beforeMethodInvocation<FactoryDefaultReq>();
-    request.FactoryDefault = onvifXsd__FactoryDefaultType::Soft;
+    request.FactoryDefault = tt__FactoryDefaultType::Soft;
     return m_bindingProxy.SetSystemFactoryDefault(m_endpoint, NULL, &request, response);
 }
 // ------------------------------------------------------------------------------------------------
@@ -504,6 +504,12 @@ int MediaSoapWrapper::setVideoSourceConfiguration(SetVideoSrcConfigReq& request,
 {
     beforeMethodInvocation<SetVideoSrcConfigReq>();
     return m_bindingProxy.SetVideoSourceConfiguration(m_endpoint, NULL, &request, response);
+}
+
+int MediaSoapWrapper::getAudioEncoderConfiguration(AudioConfigReq& request, AudioConfigResp& response)
+{
+    beforeMethodInvocation<AudioConfigReq>();
+    return m_bindingProxy.GetAudioEncoderConfiguration(m_endpoint, NULL, &request, response);
 }
 
 int MediaSoapWrapper::getAudioEncoderConfigurations(AudioConfigsReq& request, AudioConfigsResp& response)
@@ -707,7 +713,7 @@ NotificationProducerSoapWrapper::NotificationProducerSoapWrapper(SoapParams soap
 {
 }
 
-int NotificationProducerSoapWrapper::subscribe(_oasisWsnB2__Subscribe* const request, _oasisWsnB2__SubscribeResponse* const response)
+int NotificationProducerSoapWrapper::subscribe(_wsnt__Subscribe* const request, _wsnt__SubscribeResponse* const response)
 {
     return invokeMethod(&NotificationProducerBindingProxy::Subscribe, request, *response);
 }
@@ -744,12 +750,12 @@ int PullPointSubscriptionWrapper::pullMessages(_onvifEvents__PullMessages& reque
 // ------------------------------------------------------------------------------------------------
 // SubscriptionManagerSoapWrapper
 // ------------------------------------------------------------------------------------------------
-int SubscriptionManagerSoapWrapper::renew(_oasisWsnB2__Renew& request, _oasisWsnB2__RenewResponse& response)
+int SubscriptionManagerSoapWrapper::renew(_wsnt__Renew& request, _wsnt__RenewResponse& response)
 {
     return invokeMethod(&SubscriptionManagerBindingProxy::Renew, &request, response);
 }
 
-int SubscriptionManagerSoapWrapper::unsubscribe(_oasisWsnB2__Unsubscribe& request, _oasisWsnB2__UnsubscribeResponse& response)
+int SubscriptionManagerSoapWrapper::unsubscribe(_wsnt__Unsubscribe& request, _wsnt__UnsubscribeResponse& response)
 {
     return invokeMethod(&SubscriptionManagerBindingProxy::Unsubscribe, &request, response);
 }

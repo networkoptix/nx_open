@@ -29,7 +29,6 @@
 #include "api/model/recording_stats_reply.h"
 #include <nx_ec/managers/abstract_camera_manager.h>
 #include <recorder/camera_info.h>
-#include <recorder/space_info.h>
 
 #include <atomic>
 #include <future>
@@ -58,6 +57,7 @@ class QnUuid;
 class QnScheduleSync;
 
 namespace nx { namespace analytics { namespace storage { class AbstractEventsStorage; }}}
+namespace nx::vms::server { class WritableStoragesHelper; }
 
 class QnStorageManager: public QObject, public /*mixin*/ nx::vms::server::ServerModuleAware
 {
@@ -70,11 +70,11 @@ public:
     typedef QMap<QString, DeviceFileCatalogPtr> FileCatalogMap;   /* Map by camera unique id. */
     typedef QMap<QString, QSet<QDate>> UsedMonthsMap; /* Map by camera unique id. */
 
-    static const qint64 BIG_STORAGE_THRESHOLD_COEFF = 10; // use if space >= 1/10 from max storage space
+    static constexpr int64_t kBigStorageTreshold = 10;
 
     QnStorageManager(
         QnMediaServerModule* serverModule,
-        nx::analytics::storage::AbstractEventsStorage* analyticsEventsStorage,
+        nx::analytics::db::AbstractEventsStorage* analyticsEventsStorage,
         QnServer::StoragePool kind,
         const char* threadName = nullptr);
     virtual ~QnStorageManager();
@@ -123,8 +123,10 @@ public:
     bool isStorageAvailable(int storage_index) const;
     bool isStorageAvailable(const QnStorageResourcePtr& storage) const;
 
-    DeviceFileCatalogPtr getFileCatalog(const QString& cameraUniqueId, QnServer::ChunksCatalog catalog);
-    DeviceFileCatalogPtr getFileCatalog(const QString& cameraUniqueId, const QString &catalogPrefix);
+    DeviceFileCatalogPtr getFileCatalog(
+        const QString& cameraUniqueId, QnServer::ChunksCatalog catalog);
+    DeviceFileCatalogPtr getFileCatalog(
+        const QString& cameraUniqueId, const QString &catalogPrefix);
 
     static QnTimePeriodList getRecordedPeriods(
         QnMediaServerModule* serverModule,
@@ -134,13 +136,7 @@ public:
 
     void doMigrateCSVCatalog(QnStorageResourcePtr extraAllowedStorage = QnStorageResourcePtr());
 
-    QnStorageResourcePtr getOptimalStorageRoot(
-        std::function<bool(const QnStorageResourcePtr &)> pred =
-            [](const QnStorageResourcePtr &storage) {
-                return !storage->hasFlags(Qn::storage_fastscan) ||
-                        storage->getFreeSpace() > storage->getSpaceLimit();
-            });
-
+    QnStorageResourcePtr getOptimalStorageRoot();
     QnStorageResourceList getStorages() const;
 
     /*
@@ -152,8 +148,8 @@ public:
     /*
      * Return all storages which can be used for writing
      */
-    QSet<QnStorageResourcePtr> getAllWritableStorages(
-        const QnStorageResourceList* additionalStorages = nullptr) const;
+    QnStorageResourceList getAllWritableStorages(
+        const QnStorageResourceList& additional = QnStorageResourceList()) const;
 
     QnStorageResourceList getStoragesInLexicalOrder() const;
     bool hasRebuildingStorages() const;
@@ -162,13 +158,14 @@ public:
     bool clearSpaceForFile(const QString& path, qint64 size);
     bool canAddChunk(qint64 timeMs, qint64 size);
     void checkSystemStorageSpace();
+    void checkMetadataStorageSpace();
 
     bool clearOldestSpace(const QnStorageResourcePtr &storage, bool useMinArchiveDays, qint64 targetFreeSpace);
     void clearMaxDaysData();
     void clearMaxDaysData(QnServer::ChunksCatalog catalogIdx);
 
     void deleteRecordsToTime(DeviceFileCatalogPtr catalog, qint64 minTime);
-    void clearDbByChunk(DeviceFileCatalogPtr catalog, const DeviceFileCatalog::Chunk& chunk);
+    void clearDbByChunk(DeviceFileCatalogPtr catalog, const nx::vms::server::Chunk& chunk);
 
     bool isWritableStoragesAvailable() const;
 
@@ -197,18 +194,23 @@ public:
     static Qn::StorageStatuses storageStatus(
         QnMediaServerModule* serverModule, const QnStorageResourcePtr& storage);
 
+    static bool canStorageBeUsedByVms(const QnStorageResourcePtr& storage);
+
 signals:
     void storagesAvailable();
     void noStoragesAvailable();
     void storageFailure(const QnResourcePtr &storageRes, nx::vms::api::EventReason reason);
     void rebuildFinished(QnSystemHealth::MessageType msgType);
     void backupFinished(qint64 backedUpToMs, nx::vms::api::EventReason);
+    void newCatalogCreated(const QString& cameraUniqueId, QnServer::ChunksCatalog quality);
+
 public slots:
     void at_archiveRangeChanged(const QnStorageResourcePtr &resource, qint64 newStartTimeMs, qint64 newEndTimeMs);
     void onNewResource(const QnResourcePtr &resource);
     void onDelResource(const QnResourcePtr &resource);
     void at_storageRoleChanged(const QnResourcePtr &storage);
     void testOfflineStorages();
+
 private:
     friend class TestStorageThread;
 
@@ -253,14 +255,14 @@ private:
 
     void doMigrateCSVCatalog(QnServer::ChunksCatalog catalog, QnStorageResourcePtr extraAllowedStorage);
     QMap<QString, QSet<int>> deserializeStorageFile();
-    void clearUnusedMotion();
+    void clearUnusedMetadata();
     //void clearCameraHistory();
     //void minTimeByCamera(const FileCatalogMap &catalogMap, QMap<QString, qint64>& minTimes);
     void updateRecordedMonths(UsedMonthsMap& usedMonths);
     void updateRecordedMonths(const FileCatalogMap &catalogMap, UsedMonthsMap& usedMonths);
     void findTotalMinTime(const bool useMinArchiveDays, const FileCatalogMap& catalogMap, qint64& minTime, DeviceFileCatalogPtr& catalog);
     void addDataFromDatabase(const QnStorageResourcePtr &storage);
-    bool writeCSVCatalog(const QString& fileName, const QVector<DeviceFileCatalog::Chunk> chunks);
+    bool writeCSVCatalog(const QString& fileName, const QVector<nx::vms::server::Chunk> chunks);
     void backupFolderRecursive(const QString& src, const QString& dst);
     void getCamerasWithArchiveInternal(std::set<QString>& result,  const FileCatalogMap& catalog) const;
     void testStoragesDone();
@@ -270,6 +272,7 @@ private:
     // get statistics for the whole archive except of bitrate. It's analyzed for the last records of archive only in range <= bitrateAnalyzePeriodMs
     QnRecordingStatsData mergeStatsFromCatalogs(qint64 bitrateAnalyzePeriodMs, const DeviceFileCatalogPtr& catalogHi, const DeviceFileCatalogPtr& catalogLow);
     void clearAnalyticsEvents(const QMap<QnUuid, qint64>& dataToDelete);
+    void forciblyClearAnalyticsEvents();
     QMap<QnUuid, qint64> calculateOldestDataTimestampByCamera();
     bool getMinTimes(QMap<QString, qint64>& lastTime);
     void processCatalogForMinTime(QMap<QString, qint64>& lastTime, const FileCatalogMap& catalogMap);
@@ -283,8 +286,8 @@ private:
         const QnStorageResourcePtr  &storage
     );
     static std::vector<QnUuid> getCamerasWithArchive(QnMediaServerModule* serverModule);
-    int64_t calculateNxOccupiedSpace(int storageIndex) const;
     bool hasArchive(int storageIndex) const;
+    int64_t occupiedSpace(int storageIndex) const;
     QnStorageResourcePtr getStorageByIndex(int index) const;
     bool getSqlDbPath(const QnStorageResourcePtr &storage, QString &dbFolderPath) const;
     void startAuxTimerTasks();
@@ -303,7 +306,7 @@ private:
         nx::caminfo::ArchiveCameraDataList* outArchiveCameras) const;
 
 private:
-    nx::analytics::storage::AbstractEventsStorage* m_analyticsEventsStorage;
+    nx::analytics::db::AbstractEventsStorage* m_analyticsEventsStorage;
     const QnServer::StoragePool m_role;
     StorageMap                  m_storageRoots;
     FileCatalogMap              m_devFileCatalog[QnServer::ChunksCatalogCount];
@@ -327,6 +330,7 @@ private:
 
     QnStorageScanData m_archiveRebuildInfo;
 
+    friend class nx::vms::server::WritableStoragesHelper;
     friend class RebuildAsyncTask;
     friend class AuxiliaryTask;
     friend class ArchiveIndexer;
@@ -344,7 +348,6 @@ private:
     std::atomic<bool> m_firstStoragesTestDone;
 
     bool m_isRenameDisabled;
-    nx::recorder::SpaceInfo m_spaceInfo;
     nx::caminfo::ServerWriterHandler m_camInfoWriterHandler;
     nx::caminfo::Writer m_camInfoWriter;
 

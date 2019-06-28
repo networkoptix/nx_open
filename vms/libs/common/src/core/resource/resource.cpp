@@ -1,6 +1,5 @@
 #include "resource.h"
 #include "resource_consumer.h"
-#include "resource_property.h"
 
 #include <typeinfo>
 
@@ -291,9 +290,14 @@ void QnResource::setTypeByName(const QString& resTypeName)
 
 Qn::ResourceStatus QnResource::getStatus() const
 {
-    return commonModule()
-        ? commonModule()->resourceStatusDictionary()->value(getId())
-        : Qn::NotDefined;
+    if (!commonModule())
+        return Qn::NotDefined;
+
+    const auto statusDictionary = commonModule()->resourceStatusDictionary();
+    if (!statusDictionary)
+        return Qn::NotDefined;
+
+    return statusDictionary->value(getId());
 }
 
 void QnResource::setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason reason)
@@ -701,6 +705,8 @@ void QnResource::reinitAsync()
 {
     if (commonModule()->isNeedToStop() || hasFlags(Qn::foreigner))
         return;
+    if (resourcePool() == nullptr)
+        return;
 
     NX_DEBUG(this, "Reinitialization is requested");
     {
@@ -721,6 +727,9 @@ void QnResource::reinitAsync()
 
 void QnResource::initAsync(bool optional)
 {
+    if (resourcePool() == nullptr)
+        return;
+
     NX_VERBOSE(this, "Async init requested (optional: %1)", optional);
 
     qint64 t = getUsecTimer();

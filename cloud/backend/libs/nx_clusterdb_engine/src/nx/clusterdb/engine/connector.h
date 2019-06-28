@@ -11,11 +11,12 @@
 #include <nx/utils/subscription.h>
 #include <nx/utils/url.h>
 
-#include "transport/abstract_transaction_transport_connector.h"
+#include "transport/abstract_command_transport_connector.h"
 
 namespace nx::clusterdb::engine {
 
 class ConnectionManager;
+class SynchronizationSettings;
 
 namespace transport { class TransportManager; }
 
@@ -25,6 +26,7 @@ class Connector:
 public:
     Connector(
         const std::string& nodeId,
+        const SynchronizationSettings& settings,
         transport::TransportManager* transportManager,
         ConnectionManager* connectionManager);
 
@@ -54,6 +56,7 @@ private:
     };
 
     const std::string m_nodeId;
+    const SynchronizationSettings& m_settings;
     transport::TransportManager* m_transportManager = nullptr;
     ConnectionManager* m_connectionManager = nullptr;
     std::map<nx::utils::Url, NodeContext> m_nodes;

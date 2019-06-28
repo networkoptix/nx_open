@@ -5,7 +5,7 @@
 
 #include <nx/cloud/db/client/cdb_request_path.h>
 
-#include <nx_ec/ec_proto_version.h>
+#include <nx/vms/api/protocol_version.h>
 
 #include "ec2/vms_command_descriptor.h"
 #include "http_handlers/ping.h"
@@ -14,7 +14,7 @@
 namespace nx::cloud::db {
 
 const int kMinSupportedProtocolVersion = 3024;
-const int kMaxSupportedProtocolVersion = nx_ec::EC2_PROTO_VERSION;
+const int kMaxSupportedProtocolVersion = nx::vms::api::protocolVersion();
 
 Controller::Controller(
     const conf::Settings& settings,
@@ -80,6 +80,10 @@ Controller::Controller(
     m_cloudModuleUrlProvider(
         settings.moduleFinder().newCloudModulesXmlTemplatePath)
 {
+    // TODO: #ak CLOUD-1178 Temporary solution for MYSQL deadlock in copyExternalTransaction
+    // due to locking different rows of a transaction_log table.
+    m_dbInstanceController.queryExecutor().setConcurrentModificationQueryLimit(1);
+
     performDataMigrations();
 
     initializeDataSynchronizationEngine();
@@ -96,6 +100,11 @@ Controller::~Controller()
 
     m_ec2SynchronizationEngine.unsubscribeFromSystemDeletedNotification(
         m_systemManager.systemMarkedAsDeletedSubscription());
+}
+
+const dao::rdb::DbInstanceController& Controller::dbInstanceController() const
+{
+    return m_dbInstanceController;
 }
 
 const StreeManager& Controller::streeManager() const

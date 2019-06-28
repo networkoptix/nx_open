@@ -64,6 +64,9 @@ public:
 
     void updateDecorationsState();
 
+    bool isWorkbenchVisible() const;
+    bool isWelcomeScreenVisible() const;
+
     /**
      * Handle key press.
      * @returns true if key was handled.
@@ -122,7 +125,7 @@ private:
     QStackedLayout* m_viewLayout = nullptr;
     QBoxLayout* m_globalLayout = nullptr;
 
-    bool m_welcomeScreenVisible = true;
+    bool m_welcomeScreenVisible = false;
     bool m_titleVisible = true;
 
     bool m_drawCustomFrame = false;
@@ -135,7 +138,9 @@ private:
     QRect m_storedGeometry;
 #endif
 
+    bool m_inFullscreen = false;
     bool m_inFullscreenTransition = false;
+    bool m_initialized = false;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(MainWindow::Options);

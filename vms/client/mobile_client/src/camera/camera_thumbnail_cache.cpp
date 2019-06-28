@@ -19,7 +19,7 @@ namespace {
         QString result = id.toString();
         if (result.startsWith(QLatin1Char('{')))
             result = result.mid(1, result.size() - 2);
-        result += lit(":");
+        result += ':';
         result += QString::number(time);
         return result;
     }
@@ -31,7 +31,7 @@ QnCameraThumbnailCache::QnCameraThumbnailCache(QObject *parent)
     , m_decompressThread(new QThread(this))
 {
     m_request.size = defaultSize;
-    m_decompressThread->setObjectName(lit("QnCameraThumbnailCache_decompressThread"));
+    m_decompressThread->setObjectName("QnCameraThumbnailCache_decompressThread");
     m_decompressThread->start();
 }
 
@@ -60,7 +60,7 @@ void QnCameraThumbnailCache::stop()
     if (!m_elapsedTimer.isValid())
         return;
 
-    disconnect(resourcePool(), 0, this, 0);
+    resourcePool()->disconnect(this);
 
     m_thumbnailByResourceId.clear();
     m_pixmaps.clear();

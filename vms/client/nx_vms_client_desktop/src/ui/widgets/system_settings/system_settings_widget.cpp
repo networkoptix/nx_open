@@ -20,7 +20,7 @@ QnSystemSettingsWidget::QnSystemSettingsWidget(QWidget *parent):
 
     setHelpTopic(ui->autoDiscoveryCheckBox, Qn::SystemSettings_Server_CameraAutoDiscovery_Help);
     ui->autodiscoveryHint->addHintLine(tr("When enabled, the system continuously discovers new cameras and servers, "
-        "and sends discovery requests to cameras for status update. "));
+        "and sends discovery requests to cameras for status update."));
     ui->autodiscoveryHint->addHintLine(tr("Failover server measures may still request camera status updates regardless of this setting."));
     setHelpTopic(ui->autodiscoveryHint, Qn::SystemSettings_Server_CameraAutoDiscovery_Help);
 

@@ -7,6 +7,7 @@
 
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/utils/literal.h>
+#include <nx/utils/os_info.h>
 #include <nx/vms/api/data_fwd.h>
 #include <nx/vms/api/types/days_of_week.h>
 #include <nx/vms/api/types/resource_types.h>
@@ -48,6 +49,7 @@ struct NX_VMS_API MediaServerData: ResourceData
     QString version;
     QString systemInfo;
     QString authKey;
+    QString osInfo;
 };
 #define MediaServerData_Fields \
     ResourceData_Fields \
@@ -55,7 +57,8 @@ struct NX_VMS_API MediaServerData: ResourceData
     (flags) \
     (version) \
     (systemInfo) \
-    (authKey)
+    (authKey) \
+    (osInfo)
 
 struct NX_VMS_API MediaServerUserAttributesData: Data
 {
@@ -75,6 +78,8 @@ struct NX_VMS_API MediaServerUserAttributesData: Data
 
     // Bitrate cap in bytes per second. Negative value if not capped. Not capped by default.
     int backupBitrate = kDefaultBackupBitrate;
+    QnUuid metadataStorageId;
+
     static const int kDefaultBackupBitrate;
 
     QnUuid getIdForMerging() const { return serverId; } //< See IdData::getIdForMerging().
@@ -88,7 +93,8 @@ struct NX_VMS_API MediaServerUserAttributesData: Data
     (backupDaysOfTheWeek) \
     (backupStart) \
     (backupDuration) \
-    (backupBitrate)
+    (backupBitrate) \
+    (metadataStorageId)
 #define MediaServerUserAttributesData_Fields \
     (serverId) \
     (serverName) \

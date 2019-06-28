@@ -4,7 +4,6 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QHash>
-#include <QtOpenGL/QGLWidget>
 
 #include <nx/vms/event/event_fwd.h>
 
@@ -326,6 +325,8 @@ signals:
 
     void resourceAdded(const QnResourcePtr &resource);
     void resourceAboutToBeRemoved(const QnResourcePtr &resource);
+
+    void layoutAccessChanged();
 
 protected:
     WidgetAnimator *animator(QnResourceWidget *widget);

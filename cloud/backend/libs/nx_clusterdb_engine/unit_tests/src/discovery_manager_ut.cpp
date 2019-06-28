@@ -75,18 +75,15 @@ public:
 
     void addNodeContext(const nx::utils::Url& discoveryServiceUrl)
     {
-        m_fixture.addPeer(/*startAndWaitUntilStarted*/ false);
-        Peer& peer = m_fixture.peer(m_fixture.peerCount() - 1);
-
-        peer.process().addArg("-discovery/enabled", "true");
-        peer.process().addArg(
-            "-discovery/discoveryServiceUrl",
-            discoveryServiceUrl.toStdString().c_str());
-        peer.process().addArg("-discovery/roundTripPadding", "2ms");
-        peer.process().addArg("-discovery/registrationErrorDelay", "10ms");
-        peer.process().addArg("-discovery/onlineNodesRequestDelay", "2ms");
-
-        ASSERT_TRUE(peer.process().startAndWaitUntilStarted());
+        Peer& peer = m_fixture.addPeer({
+            {"-p2pDb/discovery/enabled", "true"},
+            {"-p2pDb/discovery/discoveryServiceUrl",
+                discoveryServiceUrl.toStdString().c_str()},
+            {"-p2pDb/discovery/roundTripPadding", "2ms"},
+            {"-p2pDb/discovery/registrationErrorDelay", "10ms"},
+            {"-p2pDb/discovery/onlineNodesRequestDelay", "2ms"},
+            {"-p2pDb/nodeConnectRetryTimeout", "100ms"}
+        });
 
         m_nodes.emplace_back(peer);
     }
@@ -109,8 +106,7 @@ class DiscoveryManager: public testing::Test
 protected:
     void SetUp() override
     {
-        m_server = std::make_unique<nx::cloud::discovery::test::DiscoveryServer>(
-            m_fixture.clusterId());
+        m_server = std::make_unique<nx::cloud::discovery::test::DiscoveryServer>();
 
         ASSERT_TRUE(m_server->bindAndListen());
     }

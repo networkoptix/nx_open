@@ -19,6 +19,7 @@
 #include <core/resource/videowall_resource.h>
 #include <core/resource/webpage_resource.h>
 
+#include <nx_ec/ec_api.h>
 #include <nx_ec/data/api_conversion_functions.h>
 
 #include <nx_ec/managers/abstract_user_manager.h>

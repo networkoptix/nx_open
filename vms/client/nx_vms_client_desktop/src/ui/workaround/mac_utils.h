@@ -1,7 +1,13 @@
-#ifndef _HDWITNESS_MAC_UTILS_H_
-#define _HDWITNESS_MAC_UTILS_H_
+#pragma once
 
-void mac_initFullScreen(void *winId, void *qnmainwindow);
+#include <functional>
+
+class QWidget;
+class QString;
+
+using TransitionStateCallback = std::function<void (bool /*inProgress*/)>;
+void setFullscreenTransitionHandler(QWidget* widget, TransitionStateCallback callback);
+
 void mac_showFullScreen(void *winId, bool);
 bool mac_isFullscreen(void *winId);
 void mac_disableFullscreenButton(void *winId);
@@ -15,4 +21,3 @@ bool mac_isSandboxed();
 
 void setHidesOnDeactivate(WId windowId, bool value);
 
-#endif // _HDWITNESS_MAC_UTILS_H_

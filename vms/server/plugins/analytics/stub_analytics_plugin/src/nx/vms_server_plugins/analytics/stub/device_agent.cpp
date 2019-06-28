@@ -1,3 +1,5 @@
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+
 #include "device_agent.h"
 
 #include <iostream>
@@ -10,12 +12,20 @@
 #include <nx/sdk/analytics/helpers/event_metadata_packet.h>
 #include <nx/sdk/analytics/helpers/object_metadata.h>
 #include <nx/sdk/analytics/helpers/object_metadata_packet.h>
+#include <nx/sdk/analytics/helpers/object_track_best_shot_packet.h>
 #include <nx/sdk/helpers/string_map.h>
 
 #define NX_PRINT_PREFIX (this->logUtils.printPrefix)
 #include <nx/kit/debug.h>
+#include <nx/kit/utils.h>
 
+#include "utils.h"
 #include "stub_analytics_plugin_ini.h"
+
+#include "objects/bicycle.h"
+#include "objects/vehicles.h"
+#include "objects/pedestrian.h"
+#include "objects/human_face.h"
 
 namespace nx {
 namespace vms_server_plugins {
@@ -24,11 +34,72 @@ namespace stub {
 
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
+using namespace std::chrono;
+using namespace std::literals::chrono_literals;
+
+namespace {
+
+enum class EventContinuityType
+{
+    impulse,
+    prolonged,
+};
+
+struct EventDescriptor
+{
+    std::string eventTypeId;
+    std::string caption;
+    std::string description;
+    EventContinuityType continuityType = EventContinuityType::impulse;
+
+    EventDescriptor(
+        std::string eventTypeId,
+        std::string caption,
+        std::string description,
+        EventContinuityType continuityType)
+        :
+        eventTypeId(std::move(eventTypeId)),
+        caption(std::move(caption)),
+        description(std::move(description)),
+        continuityType(continuityType)
+    {
+    }
+};
+
+static const std::vector<EventDescriptor> kEventsToFire = {
+    {
+        kObjectInTheAreaEventType,
+        "Object in the Area - prolonged event (caption)",
+        "Object in the Area - prolonged event (description)",
+        EventContinuityType::prolonged
+    },
+    {
+        kLineCrossingEventType,
+        "Line crossing - impulse event (caption)",
+        "Line crossing - impulse event (description)",
+        EventContinuityType::impulse
+    },
+    {
+        kSuspiciousNoiseEventType,
+        "Suspicious noise - group impulse event (caption)",
+        "Suspicious noise - group impulse event (description)",
+        EventContinuityType::impulse
+    },
+    {
+        kGunshotEventType,
+        "Gunshot - group impulse event (caption)",
+        "Gunshot - group impulse event (description)",
+        EventContinuityType::impulse
+    }
+};
+
+} // namespace
 
 DeviceAgent::DeviceAgent(Engine* engine, const nx::sdk::IDeviceInfo* deviceInfo):
     VideoFrameProcessingDeviceAgent(engine, deviceInfo, NX_DEBUG_ENABLE_OUTPUT)
 {
-    generateObjectIds();
+    m_pluginEventThread = std::make_unique<std::thread>([this]() { processPluginEvents(); });
+    m_eventThread = std::make_unique<std::thread>([this]() { processEvents(); });
 }
 
 DeviceAgent::~DeviceAgent()
@@ -36,10 +107,15 @@ DeviceAgent::~DeviceAgent()
     {
         std::unique_lock<std::mutex> lock(m_pluginEventGenerationLoopMutex);
         m_terminated = true;
+        m_pluginEventGenerationLoopCondition.notify_all();
+        m_eventGenerationLoopCondition.notify_all();
     }
-    m_pluginEventGenerationLoopCondition.notify_all();
+
     if (m_pluginEventThread)
         m_pluginEventThread->join();
+
+    if (m_eventThread)
+        m_eventThread->join();
 }
 
 /**
@@ -97,15 +173,9 @@ std::string DeviceAgent::manifest() const
 
 void DeviceAgent::settingsReceived()
 {
-    if (ini().throwPluginEventsFromDeviceAgent && !m_pluginEventThread)
-    {
-        NX_PRINT << __func__ << "(): Starting plugin event generation thread";
-        m_pluginEventThread = std::make_unique<std::thread>([this]() { processPluginEvents(); });
-    }
-    else
-    {
-        NX_PRINT << __func__ << "()";
-    }
+    parseSettings();
+    updateObjectGenerationParameters();
+    updateEventGenerationParameters();
 }
 
 /** @param func Name of the caller for logging; supply __func__. */
@@ -156,22 +226,18 @@ bool DeviceAgent::pullMetadataPackets(std::vector<IMetadataPacket*>* metadataPac
     NX_OUTPUT << __func__ << "() BEGIN";
 
     const char* logMessage = "";
-    if (ini().generateObjects)
+    if (m_deviceAgentSettings.needToGenerateObjects())
     {
-        IMetadataPacket* const metadataPacket = cookSomeObjects();
-        if (metadataPacket)
+        const std::vector<IMetadataPacket*> result = cookSomeObjects();
+        if (!result.empty())
         {
-            metadataPackets->push_back(metadataPacket);
+            *metadataPackets = result;
             logMessage = "Generated 1 metadata packet";
         }
         else
         {
             logMessage = "Generated 0 metadata packets";
         }
-    }
-    else
-    {
-        logMessage = "Objects generation disabled by .ini";
     }
 
     m_lastVideoFrameTimestampUs = 0;
@@ -194,31 +260,9 @@ Error DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes)
 Error DeviceAgent::startFetchingMetadata(const IMetadataTypes* /*metadataTypes*/)
 {
     NX_OUTPUT << __func__ << "() BEGIN";
-
+    m_eventsNeeded = true;
+    m_eventGenerationLoopCondition.notify_all();
     m_eventTypeId = kLineCrossingEventType; //< First event to produce.
-
-    if (ini().generateEvents)
-    {
-        auto metadataDigger =
-            [this]()
-            {
-                while (!m_stopping)
-                {
-                    using namespace std::chrono_literals;
-                    pushMetadataPacket(cookSomeEvents());
-                    std::unique_lock<std::mutex> lock(m_eventGenerationLoopMutex);
-                    // Sleep until the next event needs to be generated, or the thread is ordered
-                    // to terminate (hence condition variable instead of sleep()). Return value
-                    // (whether the timeout has occurred) and spurious wake-ups are ignored.
-                    m_eventGenerationLoopCondition.wait_for(lock, 3000ms);
-                }
-            };
-
-        NX_PRINT << "Starting event generation thread";
-        if (!m_eventThread)
-            m_eventThread.reset(new std::thread(metadataDigger));
-    }
-
     NX_OUTPUT << __func__ << "() END -> noError";
     return Error::noError;
 }
@@ -226,50 +270,59 @@ Error DeviceAgent::startFetchingMetadata(const IMetadataTypes* /*metadataTypes*/
 void DeviceAgent::stopFetchingMetadata()
 {
     NX_OUTPUT << __func__ << "() BEGIN";
-    m_stopping = true;
-
-    // Wake up event generation thread to avoid waiting until its sleeping period expires.
-    m_eventGenerationLoopCondition.notify_all();
-
-    if (m_eventThread)
-    {
-        m_eventThread->join();
-        m_eventThread.reset();
-    }
-    m_stopping = false;
-
+    m_eventsNeeded = false;
     NX_OUTPUT << __func__ << "() END -> noError";
+}
+
+void DeviceAgent::processEvents()
+{
+    while (!m_terminated)
+    {
+        if (m_deviceAgentSettings.generateEvents && m_eventsNeeded)
+            pushMetadataPacket(cookSomeEvents());
+
+        std::unique_lock<std::mutex> lock(m_eventGenerationLoopMutex);
+        if (m_terminated)
+            break;
+        // Sleep until the next event needs to be generated, or the thread is ordered
+        // to terminate (hence condition variable instead of sleep()). Return value
+        // (whether the timeout has occurred) and spurious wake-ups are ignored.
+        static const seconds kEventGenerationPeriod{3};
+        m_eventGenerationLoopCondition.wait_for(lock, kEventGenerationPeriod);
+    }
 }
 
 void DeviceAgent::processPluginEvents()
 {
     while (!m_terminated)
     {
-        using namespace std::chrono_literals;
+        if (m_needToThrowPluginEvents)
+        {
+            pushPluginEvent(
+                IPluginEvent::Level::info,
+                "Info message from DeviceAgent",
+                "Info message description");
 
-        pushPluginEvent(
-            IPluginEvent::Level::info,
-            "Info message from DeviceAgent",
-            "Info message description");
+            pushPluginEvent(
+                IPluginEvent::Level::warning,
+                "Warning message from DeviceAgent",
+                "Warning message description");
 
-        pushPluginEvent(
-            IPluginEvent::Level::warning,
-            "Warning message from DeviceAgent",
-            "Warning message description");
+            pushPluginEvent(
+                IPluginEvent::Level::error,
+                "Error message from DeviceAgent",
+                "Error message description");
+        }
 
-        pushPluginEvent(
-            IPluginEvent::Level::error,
-            "Error message from DeviceAgent",
-            "Error message description");
-
-        // Sleep until the next event needs to be generated, or the thread is ordered to
-        // terminate (hence condition variable instead of sleep()). Return value (whether
-        // the timeout has occurred) and spurious wake-ups are ignored.
         {
             std::unique_lock<std::mutex> lock(m_pluginEventGenerationLoopMutex);
             if (m_terminated)
                 break;
-            static const std::chrono::seconds kPluginEventGenerationPeriod{5};
+
+            // Sleep until the next event needs to be generated, or the thread is ordered to
+            // terminate (hence condition variable instead of sleep()). Return value (whether
+            // the timeout has occurred) and spurious wake-ups are ignored.
+            static const seconds kPluginEventGenerationPeriod{5};
             m_pluginEventGenerationLoopCondition.wait_for(lock, kPluginEventGenerationPeriod);
         }
     }
@@ -286,183 +339,162 @@ IStringMap* DeviceAgent::pluginSideSettings() const
 //-------------------------------------------------------------------------------------------------
 // private
 
-static IObjectMetadata* makeObjectMetadata(
-    const std::string& objectTypeId,
-    const Uuid& objectId,
-    double offset,
-    int64_t lastVideoFrameTimestampUs,
-    bool generatePreviewAttributes,
-    int objectIndex)
+static IObjectMetadata* makeObjectMetadata(const AbstractObject* object)
 {
     auto objectMetadata = new ObjectMetadata();
-    objectMetadata->setAuxiliaryData(R"json({ "auxiliaryData": "someJson2" })json");
-    objectMetadata->setTypeId(objectTypeId);
-    objectMetadata->setId(objectId);
-    objectMetadata->setBoundingBox(IObjectMetadata::Rect((float) offset,
-        (float) offset + 0.05F * (float) objectIndex, 0.25F, 0.25F));
-
-    if (generatePreviewAttributes)
-    {
-        // Make a box smaller than the one in setBoundingBox() to make the change visible.
-        objectMetadata->addAttributes({
-            {IAttribute::Type::number, "nx.sys.preview.timestampUs",
-                std::to_string(lastVideoFrameTimestampUs)},
-            {IAttribute::Type::number, "nx.sys.preview.boundingBox.x", std::to_string(offset)},
-            {IAttribute::Type::number, "nx.sys.preview.boundingBox.y",
-                std::to_string(offset)},
-            {IAttribute::Type::number, "nx.sys.preview.boundingBox.width", "0.1"},
-            {IAttribute::Type::number, "nx.sys.preview.boundingBox.height", "0.1"},
-        });
-    }
-
-    const std::map<std::string, std::vector<Attribute>> kObjectAttributes = {
-        {kCarObjectType, {
-            {IAttribute::Type::string, "Brand", "Tesla"},
-            {IAttribute::Type::string, "Model", "X"},
-            {IAttribute::Type::string, "Color", "Pink"},
-        }},
-        {kHumanFaceObjectType, {
-            {IAttribute::Type::string, "Sex", "Female"},
-            {IAttribute::Type::string, "Hair color", "Red"},
-            {IAttribute::Type::string, "Age", "29"},
-            {IAttribute::Type::string, "Name", "Triss"},
-
-        }},
-        {kTruckObjectType, {
-            {IAttribute::Type::string, "Length", "12 m"},
-        }},
-        {kPedestrianObjectType, {
-            {IAttribute::Type::string, "Direction", "Towards the camera"},
-            {IAttribute::Type::string, "Clothes color", "White"},
-        }},
-        {kBicycleObjectType, {
-            {IAttribute::Type::string, "Type", "Mountain bike"},
-        }},
-    };
-
-    objectMetadata->addAttributes(kObjectAttributes.at(objectTypeId));
-
+    objectMetadata->setTypeId(object->typeId());
+    objectMetadata->setId(object->id());
+    const auto position = object->position();
+    const auto size = object->size();
+    objectMetadata->setBoundingBox(Rect(position.x, position.y, size.width, size.height));
+    objectMetadata->addAttributes(object->attributes());
     return objectMetadata;
 }
 
-void DeviceAgent::generateObjectIds()
+static IObjectTrackBestShotPacket* makeObjectTrackBestShotPacket(
+    const Uuid& objectTrackId,
+    int64_t timestampUs,
+    Rect boundingBox)
 {
-    int objectCount = ini().objectCount;
+    return new ObjectTrackBestShotPacket(
+        objectTrackId,
+        timestampUs,
+        std::move(boundingBox));
+}
+
+void DeviceAgent::setObjectCount(int objectCount)
+{
+    std::unique_lock<std::mutex> lock(m_objectGenerationMutex);
+
     if (objectCount < 1)
     {
-        NX_OUTPUT << "Invalid value for objectCount in .ini; assuming 1.";
+        NX_OUTPUT << "Invalid value for objectCount: " << objectCount << ", assuming 1";
         objectCount = 1;
     }
-    m_objectIds.resize(objectCount);
-    for (auto& objectId: m_objectIds)
-        objectId = UuidHelper::randomUuid();
+    m_objectContexts.resize(objectCount);
 }
 
 IMetadataPacket* DeviceAgent::cookSomeEvents()
 {
-    std::string caption;
-    std::string description;
-    bool isActive;
-
-    if (m_eventTypeId == kLineCrossingEventType)
-    {
-        m_eventTypeId = kObjectInTheAreaEventType;
-        caption = "Object in the Area (caption)";
-        description = "Object in the Area (description)";
-        isActive = true;
-    }
-    else
-    {
-        m_eventTypeId = kLineCrossingEventType;
-        caption = "Line Crossing (caption)";
-        description = "Line Crossing (description)";
-        isActive = false;
-    }
-
-    auto eventMetadata = makePtr<EventMetadata>();
-    eventMetadata->setCaption(caption);
-    eventMetadata->setDescription(description);
-    eventMetadata->setAuxiliaryData(R"json({ "auxiliaryData": "someJson" })json");
-    eventMetadata->setTypeId(m_eventTypeId);
-    eventMetadata->setIsActive(isActive);
-
+    const auto descriptor = kEventsToFire[m_eventContext.currentEventTypeIndex];
     auto eventMetadataPacket = new EventMetadataPacket();
     eventMetadataPacket->setTimestampUs(usSinceEpoch());
     eventMetadataPacket->setDurationUs(0);
-    eventMetadataPacket->addItem(eventMetadata.get());
+
+    auto eventMetadata = makePtr<EventMetadata>();
+    eventMetadata->setTypeId(descriptor.eventTypeId);
+
+    auto nextEventTypeIndex =
+        [this]()
+        {
+            return (m_eventContext.currentEventTypeIndex == kEventsToFire.size() - 1)
+                ? 0
+                : (m_eventContext.currentEventTypeIndex + 1);
+        };
+
+    bool isActive = false;
+    auto caption = descriptor.caption;
+    auto description = descriptor.description;
+
+    if (descriptor.continuityType == EventContinuityType::prolonged)
+    {
+        static const std::string kStartedSuffix{" STARTED"};
+        static const std::string kFinishedSuffix{" FINISHED"};
+
+        isActive = !m_eventContext.isCurrentEventActive;
+        caption += isActive ? kStartedSuffix : kFinishedSuffix;
+        description += isActive ? kStartedSuffix : kFinishedSuffix;
+
+        eventMetadata->setIsActive(isActive);
+        if (m_eventContext.isCurrentEventActive)
+            m_eventContext.currentEventTypeIndex = nextEventTypeIndex();
+
+        m_eventContext.isCurrentEventActive = isActive;
+    }
+    else
+    {
+        isActive = true;
+        eventMetadata->setIsActive(isActive);
+        m_eventContext.isCurrentEventActive = false;
+        m_eventContext.currentEventTypeIndex = nextEventTypeIndex();
+    }
+
+    eventMetadata->setCaption(std::move(caption));
+    eventMetadata->setDescription(std::move(description));
 
     NX_OUTPUT << "Firing event: "
-        << "type: " << m_eventTypeId
+        << "type: " << descriptor.eventTypeId
         << ", isActive: " << (isActive ? "true" : "false");
 
+    eventMetadataPacket->addItem(eventMetadata.get());
     return eventMetadataPacket;
 }
 
-IMetadataPacket* DeviceAgent::cookSomeObjects()
+std::vector<IMetadataPacket*> DeviceAgent::cookSomeObjects()
 {
+    std::unique_lock<std::mutex> lock(m_objectGenerationMutex);
+
+    std::vector<IMetadataPacket*> result;
     if (m_lastVideoFrameTimestampUs == 0)
-        return nullptr;
+        return {};
 
-    if (m_frameCounter % ini().generateObjectsEveryNFrames != 0)
-        return nullptr;
-
-    double dt = m_objectCounter / 32.0;
-    ++m_objectCounter;
-    double intPart;
-    dt = modf(dt, &intPart) * 0.75;
-    const int sequentialNumber = static_cast<int>(intPart);
-    static const std::vector<std::string> kObjectTypes = {
-        kCarObjectType,
-        kHumanFaceObjectType,
-        kTruckObjectType,
-        kPedestrianObjectType,
-        kBicycleObjectType,
-    };
-
-    if (m_currentObjectIndex != sequentialNumber)
-    {
-        generateObjectIds();
-        m_currentObjectIndex = sequentialNumber;
-        m_objectTypeId = kObjectTypes.at(m_currentObjectTypeIndex);
-        ++m_currentObjectTypeIndex;
-
-        if (m_currentObjectTypeIndex == (int) kObjectTypes.size())
-            m_currentObjectTypeIndex = 0;
-    }
-
-    bool generatePreviewAttributes = false;
-    if (dt < 0.5)
-    {
-        m_previewAttributesGenerated = false;
-    }
-    else if (dt > 0.5 && !m_previewAttributesGenerated && ini().generatePreviewAttributes)
-    {
-        m_previewAttributesGenerated = true;
-        generatePreviewAttributes = true;
-    }
+    if (m_frameCounter % m_deviceAgentSettings.generateObjectsEveryNFrames != 0)
+        return {};
 
     auto objectMetadataPacket = new ObjectMetadataPacket();
+    objectMetadataPacket->setTimestampUs(m_lastVideoFrameTimestampUs);
+    objectMetadataPacket->setDurationUs(0);
 
-    for (int i = 0; i < (int) m_objectIds.size(); ++i)
+    for (auto& context: m_objectContexts)
     {
-        auto objectMetadata = toPtr(makeObjectMetadata(
-            m_objectTypeId,
-            m_objectIds[i],
-            dt,
-            m_lastVideoFrameTimestampUs,
-            generatePreviewAttributes,
-            i));
+        if (!context)
+            context = m_objectGenerator.generate();
+
+        if (!context)
+            continue;
+
+        auto& object = context.object;
+        object->update();
+
+        if (!object->inBounds())
+            context.reset();
+
+        if (!object)
+            continue;
+
+        ++(context.frameCounter);
+
+        static const int kNumberOfFramesBeforePreviewGeneration = 60;
+        bool previewIsNeeded = m_deviceAgentSettings.generatePreviews
+            && context.frameCounter > kNumberOfFramesBeforePreviewGeneration
+            && !context.isPreviewGenerated;
+
+        if (previewIsNeeded)
+        {
+            const auto position = object->position();
+            const auto size = object->size();
+            auto bestShotPacket = makeObjectTrackBestShotPacket(
+                object->id(),
+                m_lastVideoFrameTimestampUs,
+                Rect(position.x, position.y, size.width, size.height));
+
+            if (bestShotPacket)
+            {
+                result.push_back(bestShotPacket);
+                context.isPreviewGenerated = true;
+            }
+        }
+
+        auto objectMetadata = toPtr(makeObjectMetadata(object.get()));
         objectMetadataPacket->addItem(objectMetadata.get());
     }
 
-    objectMetadataPacket->setTimestampUs(m_lastVideoFrameTimestampUs);
-    objectMetadataPacket->setDurationUs(0);
-    return objectMetadataPacket;
+    result.push_back(objectMetadataPacket);
+    return result;
 }
 
 int64_t DeviceAgent::usSinceEpoch() const
 {
-    using namespace std::chrono;
     return duration_cast<microseconds>(
         system_clock::now().time_since_epoch()).count();
 }
@@ -482,6 +514,9 @@ bool DeviceAgent::checkVideoFrame(const IUncompressedVideoFrame* frame) const
     if (!pixelFormatDescriptor)
         return false; //< Error is already logged.
 
+    NX_KIT_ASSERT(pixelFormatDescriptor->planeCount > 0,
+        nx::kit::utils::format("%d", pixelFormatDescriptor->planeCount));
+
     if (frame->planeCount() != pixelFormatDescriptor->planeCount)
     {
         NX_PRINT << __func__ << "() ERROR: planeCount() is "
@@ -495,43 +530,154 @@ bool DeviceAgent::checkVideoFrame(const IUncompressedVideoFrame* frame) const
         return false;
     }
 
+    bool success = true;
     for (int plane = 0; plane < frame->planeCount(); ++plane)
     {
-        const int bytesPerPlane = (plane == 0)
-            ? (frame->height() * frame->lineSize(plane))
-            : ((frame->height() / pixelFormatDescriptor->chromaHeightFactor)
-                * frame->lineSize(plane));
-
-        if (frame->dataSize(plane) != bytesPerPlane)
+        if (checkVideoFramePlane(frame, pixelFormatDescriptor, plane))
         {
-            NX_PRINT << __func__ << "() ERROR: dataSize(/*plane*/ " << plane << ") is "
-                << frame->dataSize(plane) << " instead of " << bytesPerPlane
-                << ", while lineSize(/*plane*/ " << plane << ") is " << frame->lineSize(plane)
-                << " and height is " << frame->height();
+            if (NX_DEBUG_ENABLE_OUTPUT)
+                dumpSomeFrameBytes(frame, plane);
         }
-
-        // Hex-dump some bytes from raw pixel data.
-        if (NX_DEBUG_ENABLE_OUTPUT)
+        else
         {
-            static const int dumpOffset = 0;
-            static const int dumpSize = 12;
-
-            if (frame->dataSize(plane) < dumpOffset + dumpSize)
-            {
-                NX_PRINT << __func__ << "(): WARNING: dataSize(/*plane*/ " << plane << ") is "
-                    << frame->dataSize(plane) << ", which is suspiciously low";
-            }
-            else
-            {
-                NX_PRINT_HEX_DUMP(
-                    nx::kit::utils::format("Plane %d bytes %d..%d of %d",
-                        plane, dumpOffset, dumpOffset + dumpSize - 1, frame->dataSize(plane)).c_str(),
-                    frame->data(plane) + dumpOffset, dumpSize);
-            }
+            success = false;
         }
     }
 
+    return success;
+}
+
+bool DeviceAgent::checkVideoFramePlane(
+    const IUncompressedVideoFrame* frame,
+    const PixelFormatDescriptor* pixelFormatDescriptor,
+    int plane) const
+{
+    bool success = true;
+    if (!frame->data(plane))
+    {
+        NX_PRINT << __func__ << "() ERROR: data(/*plane*/ " << plane << ") is null";
+        success = false;
+    }
+
+    if (frame->lineSize(plane) <= 0)
+    {
+        NX_PRINT << __func__ << "() ERROR: lineSize(/*plane*/ " << plane << ") is "
+            << frame->lineSize(plane);
+        success = false;
+    }
+
+    if (frame->dataSize(plane) <= 0)
+    {
+        NX_PRINT << __func__ << "() ERROR: dataSize(/*plane*/ " << plane << ") is "
+            << frame->dataSize(plane);
+        success = false;
+    }
+
+    if (!success)
+        return false;
+
+    const int bytesPerPlane = (plane == 0)
+        ? (frame->height() * frame->lineSize(plane))
+        : ((frame->height() / pixelFormatDescriptor->chromaHeightFactor)
+            * frame->lineSize(plane));
+
+    if (frame->dataSize(plane) != bytesPerPlane)
+    {
+        NX_PRINT << __func__ << "() ERROR: dataSize(/*plane*/ " << plane << ") is "
+            << frame->dataSize(plane) << " instead of " << bytesPerPlane
+            << ", while lineSize(/*plane*/ " << plane << ") is " << frame->lineSize(plane)
+            << " and height is " << frame->height();
+        return false;
+    }
+
     return true;
+}
+
+void DeviceAgent::dumpSomeFrameBytes(
+    const nx::sdk::analytics::IUncompressedVideoFrame* frame, int plane) const
+{
+    // Hex-dump some bytes from raw pixel data.
+
+    static const int dumpOffset = 0;
+    static const int dumpSize = 12;
+
+    if (frame->dataSize(plane) < dumpOffset + dumpSize)
+    {
+        NX_PRINT << __func__ << "(): WARNING: dataSize(/*plane*/ " << plane << ") is "
+            << frame->dataSize(plane) << ", which is suspiciously low";
+    }
+    else
+    {
+        NX_PRINT_HEX_DUMP(
+            nx::kit::utils::format("Plane %d bytes %d..%d of %d",
+                plane, dumpOffset, dumpOffset + dumpSize - 1, frame->dataSize(plane)).c_str(),
+            frame->data(plane) + dumpOffset, dumpSize);
+    }
+}
+
+void DeviceAgent::parseSettings()
+{
+    auto assignIntegerSetting =
+        [this](const std::string& parameterName, std::atomic<int>* target)
+        {
+            using namespace nx::kit::utils;
+            int result = 0;
+            const auto parameterValueString = getParamValue(parameterName);
+            if (fromString(parameterValueString, &result))
+            {
+                *target = result;
+            }
+            else
+            {
+                NX_PRINT << "Received an incorrect setting value for '"
+                    << parameterName << "' "
+                    << parameterValueString
+                    << ". Expected an integer";
+            }
+        };
+
+    m_deviceAgentSettings.generateEvents = toBool(getParamValue(kGenerateEventsSetting));
+    m_deviceAgentSettings.generateCars = toBool(getParamValue(kGenerateCarsSetting));
+    m_deviceAgentSettings.generateTrucks = toBool(getParamValue(kGenerateTrucksSetting));
+    m_deviceAgentSettings.generatePedestrians = toBool(getParamValue(kGeneratePedestriansSetting));
+    m_deviceAgentSettings.generateHumanFaces = toBool(getParamValue(kGenerateHumanFacesSetting));
+    m_deviceAgentSettings.generateBicycles = toBool(getParamValue(kGenerateBicyclesSetting));
+    m_deviceAgentSettings.generatePreviews = toBool(getParamValue(kGeneratePreviewPacketSetting));
+    m_deviceAgentSettings.throwPluginEvents = toBool(
+        getParamValue(kThrowPluginEventsFromDeviceAgentSetting));
+
+    assignIntegerSetting(
+        kGenerateObjectsEveryNFramesSetting,
+        &m_deviceAgentSettings.generateObjectsEveryNFrames);
+
+    assignIntegerSetting(
+        kNumberOfObjectsToGenerateSetting,
+        &m_deviceAgentSettings.numberOfObjectsToGenerate);
+}
+
+void DeviceAgent::updateObjectGenerationParameters()
+{
+    setObjectCount(m_deviceAgentSettings.numberOfObjectsToGenerate);
+    setIsObjectTypeGenerationNeeded<Car>(m_deviceAgentSettings.generateCars);
+    setIsObjectTypeGenerationNeeded<Truck>(m_deviceAgentSettings.generateTrucks);
+    setIsObjectTypeGenerationNeeded<Pedestrian>(m_deviceAgentSettings.generatePedestrians);
+    setIsObjectTypeGenerationNeeded<HumanFace>(m_deviceAgentSettings.generateHumanFaces);
+    setIsObjectTypeGenerationNeeded<Bicycle>(m_deviceAgentSettings.generateBicycles);
+}
+
+void DeviceAgent::updateEventGenerationParameters()
+{
+    if (m_deviceAgentSettings.throwPluginEvents)
+    {
+        NX_PRINT << __func__ << "(): Starting plugin event generation";
+        m_needToThrowPluginEvents = true;
+    }
+    else
+    {
+        NX_PRINT << __func__ << "(): Stopping plugin event generation";
+        m_needToThrowPluginEvents = false;
+        m_pluginEventGenerationLoopCondition.notify_all();
+    }
 }
 
 } // namespace stub

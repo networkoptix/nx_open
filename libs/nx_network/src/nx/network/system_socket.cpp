@@ -48,6 +48,13 @@ typedef void raw_type;       // Type used for raw data on this platform
 #define SOCKET_ERROR (-1)
 #endif
 
+// Needed only for bpi build, that use old C Library headers.
+#ifdef __linux__
+    #ifndef IP_MULTICAST_ALL
+        #define IP_MULTICAST_ALL 49
+    #endif
+#endif
+
 namespace nx {
 namespace network {
 
@@ -209,33 +216,39 @@ bool Socket<SocketInterfaceToImplement>::getReuseAddrFlag(bool* val) const
 }
 
 template<typename SocketInterfaceToImplement>
-bool Socket<SocketInterfaceToImplement>::setReusePortFlag(bool value)
+bool Socket<SocketInterfaceToImplement>::setReusePortFlag(
+    bool value)
 {
-#if !defined(Q_OS_WIN) && defined(SO_REUSEPORT)
-    const int on = value ? 1 : 0;
-    if (::setsockopt(m_fd, SOL_SOCKET, SO_REUSEPORT, (const char*)&on, sizeof(on)))
-        return false;
-
-    return true;
-#else
+#if defined(_WIN32)
     return setReuseAddrFlag(value);
+#elif defined(SO_REUSEPORT)
+    const int on = value ? 1 : 0;
+    return ::setsockopt(m_fd, SOL_SOCKET, SO_REUSEPORT, (const char*) &on, sizeof(on)) == 0;
+#else
+    nx::utils::unused(value);
+    SystemError::setLastErrorCode(SystemError::unknownProtocolOption);
+    return false;
 #endif
 }
 
 template<typename SocketInterfaceToImplement>
-bool Socket<SocketInterfaceToImplement>::getReusePortFlag(bool* value) const
+bool Socket<SocketInterfaceToImplement>::getReusePortFlag(
+    bool* value) const
 {
-#if !defined(Q_OS_WIN) && defined(SO_REUSEPORT)
+#if defined(_WIN32)
+    return getReuseAddrFlag(value);
+#elif defined(SO_REUSEPORT)
     int reuseAddrVal = 0;
     socklen_t optLen = sizeof(reuseAddrVal);
-
-    if (::getsockopt(m_fd, SOL_SOCKET, SO_REUSEPORT, (char*)&reuseAddrVal, &optLen))
+    if (::getsockopt(m_fd, SOL_SOCKET, SO_REUSEPORT, (char*) &reuseAddrVal, &optLen))
         return false;
 
     *value = reuseAddrVal > 0;
     return true;
 #else
-    return getReuseAddrFlag(value);
+    nx::utils::unused(value);
+    SystemError::setLastErrorCode(SystemError::unknownProtocolOption);
+    return false;
 #endif
 }
 
@@ -731,7 +744,7 @@ int CommunicatingSocket<SocketInterfaceToImplement>::send(
     int sended = doInterruptableSystemCallWithTimeout<>(
         this,
         std::bind(&::send, this->m_fd, (const void*)buffer, (size_t)bufferLen,
-#ifdef __linux
+#ifdef __linux__
             MSG_NOSIGNAL
 #else
             0
@@ -1592,10 +1605,13 @@ UDPSocket::UDPSocket(int ipVersion):
     {
         // Ignoring for now.
     }
+
+    ++SocketGlobals::instance().debugCounters().udpSocketCount;
 }
 
 UDPSocket::~UDPSocket()
 {
+    --SocketGlobals::instance().debugCounters().udpSocketCount;
 }
 
 bool UDPSocket::getProtocol(int* protocol) const
@@ -1673,6 +1689,15 @@ bool UDPSocket::setMulticastIF(const QString& multicastIF)
 
 bool UDPSocket::joinGroup(const QString &multicastGroup)
 {
+#ifdef __linux__
+    int mcAll = 0;
+    if (setsockopt(handle(), IPPROTO_IP, IP_MULTICAST_ALL, (raw_type *)&mcAll, sizeof(mcAll)) < 0)
+    {
+        NX_WARNING(this, "Failed to disable IP_MULTICAST_ALL socket option for group %1. %2",
+            multicastGroup, SystemError::getLastOSErrorText());
+        return false;
+    }
+#endif
     struct ip_mreq multicastRequest;
     memset(&multicastRequest, 0, sizeof(multicastRequest));
 
@@ -1690,9 +1715,17 @@ bool UDPSocket::joinGroup(const QString &multicastGroup)
 
 bool UDPSocket::joinGroup(const QString &multicastGroup, const QString& multicastIF)
 {
+#ifdef __linux__
+    int mcAll = 0;
+    if (setsockopt(handle(), IPPROTO_IP, IP_MULTICAST_ALL, (raw_type *)&mcAll, sizeof(mcAll)) < 0)
+    {
+        NX_WARNING(this, "Failed to disable IP_MULTICAST_ALL socket option for group %1. %2",
+            multicastGroup, SystemError::getLastOSErrorText());
+        return false;
+    }
+#endif
     struct ip_mreq multicastRequest;
     memset(&multicastRequest, 0, sizeof(multicastRequest));
-
     multicastRequest.imr_multiaddr.s_addr = inet_addr(multicastGroup.toLatin1());
     multicastRequest.imr_interface.s_addr = inet_addr(multicastIF.toLatin1());
     if (setsockopt(

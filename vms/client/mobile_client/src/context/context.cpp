@@ -134,7 +134,7 @@ nx::vms::client::core::OperationManager* QnContext::operationManager() const
     return commonModule()->instance<nx::vms::client::core::OperationManager>();
 }
 
-nx::vms::client::core::UserWatcher* QnContext::userWatcher() const
+nx::vms::client::core::UserWatcher* QnContext::currentUserWatcher() const
 {
     return commonModule()->instance<nx::vms::client::core::UserWatcher>();
 }
@@ -266,7 +266,7 @@ void QnContext::removeSavedConnection(
             auto knownConnections = qnClientCoreSettings->knownServerConnections();
             const auto moduleManager = commonModule()->moduleDiscoveryManager();
             const auto servers = system->servers();
-            for (const auto info: servers)
+            for (const auto& info: servers)
             {
                 const auto moduleId = info.id;
                 moduleManager->forgetModule(moduleId);
@@ -322,8 +322,8 @@ nx::utils::Url QnContext::getWebSocketUrl() const
         return nx::utils::Url();
 
     return nx::network::url::Builder()
-        .setScheme(lit("ws"))
-        .setHost(lit("localhost"))
+        .setScheme("ws")
+        .setHost("localhost")
         .setPort(port);
 }
 
@@ -346,8 +346,8 @@ QString QnContext::lp(const QString& path) const
 void QnContext::setLocalPrefix(const QString& prefix)
 {
     m_localPrefix = prefix;
-    if (!m_localPrefix.endsWith(lit("/")))
-        m_localPrefix.append(lit("/"));
+    if (!m_localPrefix.endsWith('/'))
+        m_localPrefix.append('/');
 }
 
 void QnContext::updateCustomMargins()

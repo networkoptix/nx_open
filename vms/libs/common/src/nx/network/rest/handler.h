@@ -22,14 +22,13 @@ enum class Permissions
  * Base class for REST requests processing.
  * Single handler instance receives all requests, each request in a different thread.
  */
-class Handler: public QObject
+class Handler
 {
 protected:
     /**
      * Override to implement request processing for all requests. Default implementation calls
-     * exeute<METHOD>, override only them to process specific requests.
-     * Implementation is expected to throw rest::Exception in case of error which is returned in
-     * response.
+     * exeute<METHOD>, override only them to process specific requests. Implementation is expected
+     * to throw rest::Exception in case of error which is returned in response.
      */
     virtual Response executeAnyMethod(const Request& request);
 
@@ -39,6 +38,7 @@ protected:
     virtual Response executePut(const Request& request);
 
 public:
+    virtual ~Handler() = default;
     Response executeRequest(const Request& request);
 
     /** Override to execute some logic after request processing. */

@@ -9,16 +9,9 @@
 #include <nx/utils/crypt/linux_passwd_crypt.h>
 #include <utils/crypt/symmetrical.h>
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((PasswordData)(CameraPasswordData)(CurrentPasswordData), (json), _Fields)
-
-PasswordData::PasswordData(const QnRequestParams &params)
-{
-    password = params.value(lit("password"));
-    realm = params.value(lit("realm"));
-    passwordHash = params.value(lit("passwordHash")).toLatin1();
-    passwordDigest = params.value(lit("passwordDigest")).toLatin1();
-    cryptSha512Hash = params.value(lit("cryptSha512Hash")).toLatin1();
-}
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
+    (PasswordData)(CameraPasswordData)(CurrentPasswordData),
+    (json), _Fields)
 
 PasswordData PasswordData::calculateHashes(const QString& username, const QString& password, bool isLdap)
 {
@@ -60,9 +53,4 @@ bool PasswordData::hasPassword() const
         !password.isEmpty() ||
         !passwordHash.isEmpty() ||
         !passwordDigest.isEmpty();
-}
-
-CurrentPasswordData::CurrentPasswordData(const QnRequestParams &params):
-    currentPassword(params.value(lit("currentPassword")))
-{
 }

@@ -4,6 +4,8 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QTimer>
+#include <QtCore/QMargins>
+#include <QtCore/QRect>
 
 #include <utils/common/disconnective.h>
 

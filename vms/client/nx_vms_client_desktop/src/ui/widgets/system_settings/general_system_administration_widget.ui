@@ -78,6 +78,9 @@
       <property name="bottomMargin">
        <number>16</number>
       </property>
+      <property name="horizontalSpacing">
+       <number>24</number>
+      </property>
       <item row="1" column="1">
        <widget class="QGroupBox" name="backupGroupBox">
         <property name="title">

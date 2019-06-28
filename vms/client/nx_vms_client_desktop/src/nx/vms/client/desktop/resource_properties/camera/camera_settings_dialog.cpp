@@ -13,6 +13,7 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/watchers/workbench_selection_watcher.h>
 #include <ui/common/read_only.h>
+#include <ui/style/custom_style.h>
 #include <utils/common/html.h>
 #include <utils/common/event_processors.h>
 #include <utils/license_usage_helper.h>
@@ -143,7 +144,12 @@ struct CameraSettingsDialog::Private: public QObject
 
     void resetChanges()
     {
+        const auto singleCamera = cameras.size() == 1
+            ? cameras.first()
+            : QnVirtualCameraResourcePtr();
+
         store->loadCameras(cameras);
+        deviceAgentSettingsAdaptor->setCamera(singleCamera);
 
         handleCamerasChanged();
     }
@@ -296,12 +302,15 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
         int(CameraSettingsTab::analytics),
         new CameraAnalyticsSettingsWidget(
             d->store, qnClientCoreModule->mainQmlEngine(), ui->tabWidget),
-        tr("Analytics"));
+        tr("Plugins"));
 
     addPage(
         int(CameraSettingsTab::expert),
         new CameraExpertSettingsWidget(d->store, ui->tabWidget),
         tr("Expert"));
+
+    autoResizePagesToContents(ui->tabWidget, QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred),
+        true);
 
     auto selectionWatcher = new QnWorkbenchSelectionWatcher(this);
     connect(
@@ -421,7 +430,6 @@ bool CameraSettingsDialog::setCameras(const QnVirtualCameraResourceList& cameras
     d->readOnlyWatcher->setCameras(cameras);
     d->wearableStateWatcher->setCameras(cameras);
     d->previewManager->selectCamera(singleCamera);
-    d->deviceAgentSettingsAdaptor->setCamera(singleCamera);
     d->analyticsEnginesWatcher->setCamera(singleCamera);
 
     d->handleCamerasWithDefaultPasswordChanged();

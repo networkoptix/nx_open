@@ -1,5 +1,8 @@
 #include "found_devices_model.h"
 
+#include <QtGui/QFont>
+#include <QtGui/QPalette>
+
 #include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
@@ -69,6 +72,7 @@ void FoundDevicesModel::addDevices(const QnManualResourceSearchList& devices)
             }
         }
     }
+    emit layoutChanged();
 }
 
 void FoundDevicesModel::removeDevices(QStringList ids)

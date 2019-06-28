@@ -164,13 +164,11 @@ int QnTCPConnectionProcessor::isFullMessage(
 void QnTCPConnectionProcessor::parseRequest()
 {
     Q_D(QnTCPConnectionProcessor);
-//    qDebug() << "Client request from " << d->socket->getForeignAddress().address.toString();
-//    qDebug() << d->clientRequest;
 
     d->request = nx::network::http::Request();
-    if( !d->request.parse( d->clientRequest ) )
+    if (!d->request.parse(d->clientRequest))
     {
-        qWarning() << Q_FUNC_INFO << "Invalid request format.";
+        NX_DEBUG(this, "Unable to parse request: [%1]", d->clientRequest);
         return;
     }
     d->protocol = d->request.requestLine.version.protocol;
@@ -610,6 +608,12 @@ bool QnTCPConnectionProcessor::isConnectionCanBePersistent() const
 QnAuthSession QnTCPConnectionProcessor::authSession() const
 {
     Q_D(const QnTCPConnectionProcessor);
+    return authSession(d->accessRights);
+}
+
+QnAuthSession QnTCPConnectionProcessor::authSession(const Qn::UserAccessData& accessRights) const
+{
+    Q_D(const QnTCPConnectionProcessor);
     QnAuthSession result;
 
     QByteArray existSession = nx::network::http::getHeaderValue(d->request.headers, Qn::AUTH_SESSION_HEADER_NAME);
@@ -617,7 +621,7 @@ QnAuthSession QnTCPConnectionProcessor::authSession() const
         result.fromByteArray(existSession);
         return result;
     }
-    if (const auto& userRes = resourcePool()->getResourceById(d->accessRights.userId))
+    if (const auto& userRes = resourcePool()->getResourceById(accessRights.userId))
         result.userName = userRes->getName();
     else if (!nx::network::http::getHeaderValue( d->request.headers,  Qn::VIDEOWALL_GUID_HEADER_NAME).isEmpty())
         result.userName = lit("Video wall");

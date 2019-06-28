@@ -2,6 +2,6 @@
 
 namespace nx::clusterdb::map::dao {
 
-static constexpr char kSchemaName[] = "nx_key_value_db_DB8F63E3-E9B1-4E7C-8AFB-D788604DEAD2";
+static constexpr char kSchemaName[] = "nx_key_value_db_db8f63e3_e9b1_4e7c_8afb_d788604alive2";
 
 } // namespace nx::clusterdb::map::dao

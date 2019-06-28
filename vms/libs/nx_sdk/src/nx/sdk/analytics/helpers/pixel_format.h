@@ -1,3 +1,5 @@
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+
 #pragma once
 
 #include <string>
@@ -13,7 +15,10 @@ namespace analytics {
 bool pixelFormatFromStdString(
     const std::string& s, IUncompressedVideoFrame::PixelFormat* outPixelFormat);
 
-/** @return Emtpy string if not found, after logging an error. */
+/**
+ * @return String representation, or, if the value is unknown, a string like `PixelFormat(#)`,
+ * where `#` is the integer value.
+ */
 std::string pixelFormatToStdString(IUncompressedVideoFrame::PixelFormat pixelFormat);
 
 std::string allPixelFormatsToStdString(const std::string& separator);
@@ -29,7 +34,7 @@ struct PixelFormatDescriptor
     int chromaWidthFactor; /**< Number of original image columns per 1 chroma plane pixel. */
 };
 
-/** @return Null if not found, after logging an error. */
+/** @return Null if not found, after failing an assertion. */
 const PixelFormatDescriptor* getPixelFormatDescriptor(
     IUncompressedVideoFrame::PixelFormat pixelFormat);
 

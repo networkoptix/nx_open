@@ -1,7 +1,7 @@
-#ifndef BOOKMARK_WIDGET_H
-#define BOOKMARK_WIDGET_H
+#pragma once
 
 #include <QtCore/QScopedPointer>
+#include <QtCore/QSet>
 #include <QtWidgets/QWidget>
 
 #include <core/resource/camera_bookmark_fwd.h>
@@ -12,6 +12,8 @@ namespace Ui {
 
 class QnBookmarkWidget : public QWidget {
     Q_OBJECT
+
+    typedef QWidget base_type;
 
 public:
     explicit QnBookmarkWidget(QWidget *parent = 0);
@@ -31,6 +33,9 @@ public:
 signals:
     bool validChanged();
 
+protected:
+    bool eventFilter(QObject *obj, QEvent *event) override;
+
 private:
     void updateTagsList();
 
@@ -40,5 +45,3 @@ private:
     QnCameraBookmarkTags m_selectedTags;
     bool m_isValid;
 };
-
-#endif // BOOKMARK_WIDGET_H

@@ -202,7 +202,9 @@ private:
     CameraDiagnostics::Result fetchPtzLimits(QnPtzLimits* outPtzLimits);
 
     CameraDiagnostics::Result fetchCodecInfo(HanwhaCodecInfo* outCodecInfo);
-    CameraDiagnostics::Result enableMulticast(const HanwhaVideoProfile& profile);
+    CameraDiagnostics::Result enableMulticast(
+        int profileNumber,
+        const nx::vms::server::resource::MulticastParameters& multicastParameters);
 
     void cleanUpOnProxiedDeviceChange();
 
@@ -275,8 +277,6 @@ private:
         const QnCameraAdvancedParameter& parameter,
         const HanwhaAdavancedParameterInfo& parameterInfo,
         const QString& str) const;
-
-    void reopenStreams(bool reopenPrimary, bool reopenSecondary);
 
     int suggestBitrate(
         const HanwhaCodecLimits& limits,

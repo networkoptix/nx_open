@@ -32,6 +32,8 @@ QString toString(const Attribute&);
 
 // TODO: Rename all classes without words "Detection" and "Detected".
 
+static constexpr int kCoordinateDecimalDigits = 4;
+
 struct DetectedObject
 {
     QString objectTypeId;
@@ -41,8 +43,9 @@ struct DetectedObject
      */
     QRectF boundingBox;
     std::vector<Attribute> labels;
+    bool bestShot = false;
 };
-#define DetectedObject_Fields (objectTypeId)(objectId)(boundingBox)(labels)
+#define DetectedObject_Fields (objectTypeId)(objectId)(boundingBox)(labels)(bestShot)
 QN_FUSION_DECLARE_FUNCTIONS(DetectedObject, (json)(ubjson));
 
 bool operator==(const DetectedObject& left, const DetectedObject& right);

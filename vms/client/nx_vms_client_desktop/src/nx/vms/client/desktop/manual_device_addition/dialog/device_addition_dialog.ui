@@ -263,22 +263,12 @@
                  <number>0</number>
                 </property>
                 <item>
-                 <widget class="QLabel" name="addressLabel">
+                 <widget class="nx::vms::client::desktop::LabelWithHint" name="addressLabel">
                   <property name="text">
                    <string>Address</string>
                   </property>
                   <property name="alignment">
                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QLabel" name="explanationLabel">
-                  <property name="text">
-                   <string notr="true">?</string>
-                  </property>
-                  <property name="textFormat">
-                   <enum>Qt::PlainText</enum>
                   </property>
                  </widget>
                 </item>
@@ -707,6 +697,9 @@
           </item>
           <item>
            <widget class="QPushButton" name="stopSearchButton">
+            <property name="focusPolicy">
+             <enum>Qt::StrongFocus</enum>
+            </property>
             <property name="text">
              <string>Stop</string>
             </property>
@@ -855,7 +848,7 @@
               <item>
                <widget class="QPushButton" name="addDevicesButton">
                 <property name="focusPolicy">
-                 <enum>Qt::NoFocus</enum>
+                 <enum>Qt::StrongFocus</enum>
                 </property>
                 <property name="text">
                  <string>Add all Devices</string>
@@ -952,6 +945,12 @@
  </widget>
  <customwidgets>
   <customwidget>
+   <class>QnWordWrappedLabel</class>
+   <extends>QWidget</extends>
+   <header location="global">ui/widgets/word_wrapped_label.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
    <class>nx::vms::client::desktop::Panel</class>
    <extends>QWidget</extends>
    <header location="global">nx/vms/client/desktop/common/widgets/panel.h</header>
@@ -981,12 +980,6 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>QnWordWrappedLabel</class>
-   <extends>QWidget</extends>
-   <header location="global">ui/widgets/word_wrapped_label.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>QnIpLineEdit</class>
    <extends>QWidget</extends>
    <header location="global">ui/widgets/common/ip_line_edit.h</header>
@@ -997,6 +990,11 @@
    <extends>QWidget</extends>
    <header location="global">nx/vms/client/desktop/common/widgets/message_bar.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>nx::vms::client::desktop::LabelWithHint</class>
+   <extends>QLabel</extends>
+   <header location="global">nx/vms/client/desktop/common/widgets/widget_with_hint.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>
@@ -1011,8 +1009,9 @@
   <tabstop>loginEdit</tabstop>
   <tabstop>passwordEdit</tabstop>
   <tabstop>searchButton</tabstop>
-  <tabstop>foundDevicesTable</tabstop>
   <tabstop>stopSearchButton</tabstop>
+  <tabstop>foundDevicesTable</tabstop>
+  <tabstop>addDevicesButton</tabstop>
  </tabstops>
  <resources/>
  <connections/>

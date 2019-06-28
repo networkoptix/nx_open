@@ -15,13 +15,13 @@ class AnalyticsSdkEvent: public ProlongedEvent
 
 public:
     AnalyticsSdkEvent(
-        const QnResourcePtr& resource,
-        const QnUuid& engineId,
-        const QString& eventTypeId,
+        QnResourcePtr resource,
+        QnUuid engineId,
+        QString eventTypeId,
         EventState toggleState,
-        const QString& caption,
-        const QString& description,
-        const QString& auxiliaryData,
+        QString caption,
+        QString description,
+        std::map<QString, QString> attributes,
         qint64 timeStampUsec);
 
     QnUuid engineId() const;
@@ -33,14 +33,15 @@ public:
 
     virtual bool checkEventParams(const EventParameters &params) const override;
 
-    QString auxiliaryData() const;
+    const std::map<QString, QString>& attributes() const;
+    const std::optional<QString> attribute(const QString& attributeName) const;
 
 private:
     const QnUuid m_engineId;
     const QString m_eventTypeId;
     const QString m_caption;
     const QString m_description;
-    const QString m_auxiliaryData;
+    const std::map<QString, QString> m_attributes;
 };
 
 } // namespace event

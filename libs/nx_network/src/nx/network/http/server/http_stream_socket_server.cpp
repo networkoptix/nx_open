@@ -4,6 +4,11 @@ namespace nx {
 namespace network {
 namespace http {
 
+HttpStreamSocketServer::~HttpStreamSocketServer()
+{
+    pleaseStopSync();
+}
+
 void HttpStreamSocketServer::setPersistentConnectionEnabled(bool value)
 {
     m_persistentConnectionEnabled = value;

@@ -256,17 +256,6 @@ TEST_F(CloudStreamSocketTest, multiple_connections_random_data)
         serverAddress);
 }
 
-const auto createServerSocketFunc =
-    []() -> std::unique_ptr<AbstractStreamServerSocket>
-    {
-        return SocketFactory::createStreamServerSocket();
-    };
-const auto createClientSocketFunc =
-    []() -> std::unique_ptr<CloudStreamSocket>
-    {
-        return std::make_unique<CloudStreamSocket>(AF_INET);
-    };
-
 TEST_F(CloudStreamSocketTest, cancellation)
 {
     const char* tempHostName = "bla.bla";

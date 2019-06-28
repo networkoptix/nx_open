@@ -294,7 +294,7 @@
                     name="Multicast Address"
                     dataType="String"
                     writeCmd="update"
-                    aux="range=media/videoprofile/add_update/RTPMulticastAddress;profile=primary;group=primaryStreamMulticast;groupInclude=true;associatedWith=PRIMARY%media/videoprofile/RTPMulticastEnable,PRIMARY%media/videoprofile/RTPMulticastTTL,PRIMARY%media/videoprofile/RTPMulticastPort;multicast=true">
+                    aux="streamsToReopen=primary;range=media/videoprofile/add_update/RTPMulticastAddress;profile=primary;group=primaryStreamMulticast;groupInclude=true;associatedWith=PRIMARY%media/videoprofile/RTPMulticastEnable,PRIMARY%media/videoprofile/RTPMulticastTTL,PRIMARY%media/videoprofile/RTPMulticastPort;multicast=true">
                     <dependencies>
                         <dependencies-show>
                             <conditional-show>
@@ -310,7 +310,7 @@
                     name="Port"
                     dataType="Number"
                     writeCmd="update"
-                    aux="range=media/videoprofile/add_update/RTPMulticastPort;profile=primary;group=primaryStreamMulticast;groupInclude=true;associatedWith=PRIMARY%media/videoprofile/RTPMulticastEnable,PRIMARY%media/videoprofile/RTPMulticastAddress,PRIMARY%media/videoprofile/RTPMulticastTTL;multicast=true">
+                    aux="streamsToReopen=primary;range=media/videoprofile/add_update/RTPMulticastPort;profile=primary;group=primaryStreamMulticast;groupInclude=true;associatedWith=PRIMARY%media/videoprofile/RTPMulticastEnable,PRIMARY%media/videoprofile/RTPMulticastAddress,PRIMARY%media/videoprofile/RTPMulticastTTL;multicast=true">
                     <dependencies>
                         <dependencies-show>
                             <conditional-show>
@@ -579,7 +579,7 @@
                     name="Multicast Address"
                     dataType="String"
                     writeCmd="update"
-                    aux="range=media/videoprofile/add_update/RTPMulticastAddress;profile=secondary;group=secondaryStreamMulticast;groupInclude=true;associatedWith=SECONDARY%media/videoprofile/RTPMulticastEnable,SECONDARY%media/videoprofile/RTPMulticastTTL,SECONDARY%media/videoprofile/RTPMulticastPort;multicast=true">
+                    aux="streamsToReopen=secondary;range=media/videoprofile/add_update/RTPMulticastAddress;profile=secondary;group=secondaryStreamMulticast;groupInclude=true;associatedWith=SECONDARY%media/videoprofile/RTPMulticastEnable,SECONDARY%media/videoprofile/RTPMulticastTTL,SECONDARY%media/videoprofile/RTPMulticastPort;multicast=true">
                     <dependencies>
                         <dependencies-show>
                             <conditional-show>
@@ -595,7 +595,7 @@
                     name="Port"
                     dataType="Number"
                     writeCmd="update"
-                    aux="range=media/videoprofile/add_update/RTPMulticastPort;profile=secondary;group=secondaryStreamMulticast;groupInclude=true;associatedWith=SECONDARY%media/videoprofile/RTPMulticastEnable,SECONDARY%media/videoprofile/RTPMulticastAddress,SECONDARY%media/videoprofile/RTPMulticastTTL;multicast=true">
+                    aux="range=streamsToReopen=secondary;media/videoprofile/add_update/RTPMulticastPort;profile=secondary;group=secondaryStreamMulticast;groupInclude=true;associatedWith=SECONDARY%media/videoprofile/RTPMulticastEnable,SECONDARY%media/videoprofile/RTPMulticastAddress,SECONDARY%media/videoprofile/RTPMulticastTTL;multicast=true">
                     <dependencies>
                         <dependencies-show>
                             <conditional-show>
@@ -1018,7 +1018,7 @@
                         dataType="Enumeration"
                         range="Open:Color/Close:BW,Open:BW/Close:Color"
                         internalRange="SwitchToBWIfCloses,SwitchToBWIfOpens"
-                        aux="group=dn;groupInclude=External">
+                        aux="group=dn;groupIncludeContains=External">
                     <dependencies>
                         <dependencies-show>
                             <conditional-show>
@@ -1055,20 +1055,34 @@
                 <param id="image/imageenhancements/Saturation"
                         name="ColorLevel"
                         dataType="Number"/>
-                <param id="image/imageenhancements/LDCEnable"
-                        name="LDC"
-                        dataType="Bool"
-                        aux="groupLead=ldc"/>
-                <param id="image/imageenhancements/LDCLevel"
-                        name="LDC Level"
-                        dataType="Number"
-                        aux="group=ldc;groupInclude=true">
+                <!-- 
+                    LDCMode - LDCLevel dependency is based on XND-6085V, LDCEnable is not used
+                    because it's handled by LDCMode. 
+                -->
+                <param id="image/imageenhancements/LDCMode"
+                        name="LDC Mode"
+                        dataType="Enumeration"
+                        aux="groupLead=ldc">
                     <dependencies>
                         <dependencies-show>
                             <conditional-show>
                                 <condition
                                     watch="image/imageenhancements/LDCEnable"
                                     condition="value=true"/>
+                            </conditional-show>
+                        </dependencies-show>
+                    </dependencies>
+                </param>
+                <param id="image/imageenhancements/LDCLevel"
+                        name="LDC Level"
+                        dataType="Number"
+                        aux="group=ldc;groupInclude=Manual">
+                    <dependencies>
+                        <dependencies-show>
+                            <conditional-show>
+                                <condition
+                                    watch="image/imageenhancements/LDCMode"
+                                    condition="value=Manual"/>
                             </conditional-show>
                         </dependencies-show>
                     </dependencies>

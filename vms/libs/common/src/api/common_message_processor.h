@@ -85,8 +85,6 @@ signals:
     void fileRemoved(const QString &filename);
 
     void businessActionReceived(const nx::vms::event::AbstractActionPtr& action);
-    void execBusinessAction(const nx::vms::event::AbstractActionPtr& action);
-
     void videowallControlMessageReceived(const nx::vms::api::VideowallControlMessageData& message);
 
     void runtimeInfoChanged(const nx::vms::api::RuntimeData& runtimeInfo);
@@ -112,7 +110,6 @@ protected:
         const QnResourcePtr &resource,
         Qn::ResourceStatus status,
         ec2::NotificationSource source) = 0;
-    virtual void execBusinessActionInternal(const nx::vms::event::AbstractActionPtr& /*action*/) {}
 
     virtual void handleTourAddedOrUpdated(const nx::vms::api::LayoutTourData& tour);
 
@@ -167,9 +164,7 @@ private slots:
     void on_mediaServerUserAttributesRemoved(const QnUuid& serverId);
 
     void on_businessEventRemoved(const QnUuid &id);
-    void on_businessActionBroadcasted(const nx::vms::event::AbstractActionPtr& businessAction);
     void on_broadcastBusinessAction(const nx::vms::event::AbstractActionPtr& action);
-    void on_execBusinessAction( const nx::vms::event::AbstractActionPtr& action);
 
     void on_eventRuleAddedOrUpdated(const nx::vms::api::EventRuleData& data);
 protected:

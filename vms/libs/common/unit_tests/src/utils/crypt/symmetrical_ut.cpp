@@ -1,7 +1,11 @@
 #include <vector>
 #include <array>
 #include <string>
+
 #include <gtest/gtest.h>
+
+#include <QtCore/QString>
+
 #include <utils/crypt/symmetrical.h>
 
 namespace {

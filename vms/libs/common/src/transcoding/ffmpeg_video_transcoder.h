@@ -33,10 +33,12 @@ public:
     AVCodecContext* getCodecContext();
 
     /* Allow multithread transcoding */
-    void setMTMode(bool value);
+    void setUseMultiThreadEncode(bool value);
+    void setUseMultiThreadDecode(bool value);
     void setUseRealTimeOptimization(bool value);
     virtual void setFilterList(QList<QnAbstractImageFilterPtr> filterList) override;
 
+    void setFixedFrameRate(int value);
 private:
     int transcodePacketImpl(const QnConstCompressedVideoDataPtr& video, QnAbstractMediaDataPtr* const result);
 
@@ -51,7 +53,7 @@ private:
     int m_lastSrcWidth[CL_MAX_CHANNELS];
     int m_lastSrcHeight[CL_MAX_CHANNELS];
 
-    bool m_mtMode;
+    bool m_useMultiThreadEncode;
 
     QElapsedTimer m_encodeTimer;
     qint64 m_lastEncodedTime;
@@ -64,6 +66,7 @@ private:
     QnConstMediaContextPtr m_ctxPtr;
     nx::metrics::Storage* m_metrics = nullptr;
     std::map<qint64, qint64> m_frameNumToPts;
+    int m_fixedFrameRate = 0;
 };
 
 typedef QSharedPointer<QnFfmpegVideoTranscoder> QnFfmpegVideoTranscoderPtr;

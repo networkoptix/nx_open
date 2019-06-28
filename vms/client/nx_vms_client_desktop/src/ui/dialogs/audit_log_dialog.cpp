@@ -12,6 +12,7 @@
 #include <client/client_globals.h>
 #include <client/client_settings.h>
 
+#include <api/server_rest_connection.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_resource.h>
@@ -39,7 +40,7 @@
 #include <ui/style/skin.h>
 
 #include <nx/vms/client/desktop/resource_properties/camera/camera_settings_tab.h>
-#include <nx/vms/client/desktop/resource_views/data/node_type.h>
+#include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 
 #include <utils/common/event_processors.h>
 
@@ -55,6 +56,7 @@
 #include <ui/workbench/extensions/workbench_stream_synchronizer.h>
 
 #include <ui/workaround/hidpi_workarounds.h>
+#include <nx/utils/guarded_callback.h>
 
 using namespace nx::vms::client::desktop;
 using namespace ui;
@@ -829,17 +831,25 @@ void QnAuditLogDialog::query(qint64 fromMsec, qint64 toMsec)
     const auto onlineServers = resourcePool()->getAllServers(Qn::Online);
     for(const QnMediaServerResourcePtr& mserver: onlineServers)
     {
-        m_requests << mserver->apiConnection()->getAuditLogAsync(
-            fromMsec, toMsec, this, SLOT(at_gotdata(int, const QnAuditRecordList&, int)));
+        auto connection = mserver->restConnection();
+        auto handle = connection->getAuditLog(
+            fromMsec, toMsec, nx::utils::guarded(this,
+            [this](bool success, int requestId, QnAuditRecordList result)
+            {
+                at_gotdata(success, requestId, result);
+            }), thread());
+
+        if (handle)
+            m_requests << handle;
     }
 }
 
-void QnAuditLogDialog::at_gotdata(int httpStatus, const QnAuditRecordList& records, int requestNum)
+void QnAuditLogDialog::at_gotdata(bool success, int requestNum, const QnAuditRecordList& records)
 {
     if (!m_requests.contains(requestNum))
         return;
     m_requests.remove(requestNum);
-    if (httpStatus == 0)
+    if (success)
         m_allData << records;
     if (m_requests.isEmpty())
         requestFinished();
@@ -926,7 +936,7 @@ void QnAuditLogDialog::at_customContextMenuRequested(const QPoint&)
         if (resource)
         {
             action::Parameters parameters(resource);
-            parameters.setArgument(Qn::NodeTypeRole, ResourceTreeNodeType::resource);
+            parameters.setArgument(Qn::NodeTypeRole, ResourceTree::NodeType::resource);
 
             menu.reset(manager->newMenu(action::TreeScope, nullptr, parameters));
             foreach(QAction* action, menu->actions())

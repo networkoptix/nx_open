@@ -1,18 +1,16 @@
 #pragma once
 
 #include <optional>
+#include <string>
+#include <QString>
+
+#include <nx/vms/api/types_fwd.h>
+#include <nx/vms/server/resource/multicast_parameters.h>
 
 struct QnCameraAdvancedParams;
 class QnPlOnvifResource;
 
 namespace nx::vms::server::resource {
-
-struct MulticastParameters
-{
-    std::optional<std::string> address;
-    std::optional<int> port;
-    std::optional<int> ttl;
-};
 
 class OnvifMulticastParametersProxy
 {
@@ -23,7 +21,11 @@ public:
 
     MulticastParameters multicastParameters();
 
-    bool setMulticastParameters(const MulticastParameters parameters);
+    bool setMulticastParameters(MulticastParameters parameters);
+
+private:
+    bool setVideoEncoderMulticastParameters(MulticastParameters& parameters);
+    bool setAudioEncoderMulticastParameters(MulticastParameters& parameters);
 
 private:
     QnPlOnvifResource* m_resource = nullptr;

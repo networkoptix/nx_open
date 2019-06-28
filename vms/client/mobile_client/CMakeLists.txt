@@ -21,7 +21,6 @@ if(IOS)
     endif()
 
     set(ios_sources
-        src/nx/mobile_client/settings/settings_migration_ios.mm
         src/ui/window_utils_ios.mm
         src/utils/app_delegate.mm
     )
@@ -105,8 +104,10 @@ if(ANDROID)
 endif()
 
 if(IOS)
-    if(mobile_bundle_name STREQUAL display_mobile_name)
-        message(FATAL_ERROR "mobile_bundle_name cannot be equal to display_mobile_name.")
+    string(LENGTH ${mobile_bundle_name} bundle_name_length)
+    string(LENGTH ${display_mobile_name} display_name_length)
+    if(bundle_name_length GREATER display_name_length)
+        message(FATAL_ERROR "mobile_bundle_name must not be longer than display_mobile_name.")
     endif()
 
     set(provisioning_profiles_dir "${certificates_path}/mobile_client/ios/provisioning_profiles")
@@ -190,7 +191,8 @@ if(IOS)
 
     set(app_dir "$<TARGET_FILE_DIR:mobile_client>")
     add_custom_command(TARGET mobile_client PRE_LINK
-        COMMAND ${CMAKE_COMMAND} -E copy_directory ${fonts_directory}/bin/fonts ${app_dir}/fonts
+        COMMAND ${CMAKE_COMMAND}
+            -E copy_directory ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/fonts ${app_dir}/fonts
         COMMENT "Copying fonts"
     )
 endif()

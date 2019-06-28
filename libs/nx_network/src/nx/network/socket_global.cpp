@@ -144,6 +144,12 @@ SocketGlobals::~SocketGlobals()
 
     m_impl->debugIniReloadTimer->pleaseStopSync();
     m_impl->addressResolver->pleaseStopSync();
+
+    m_impl.reset();
+
+    NX_ASSERT(m_debugCounters.httpClientConnectionCount == 0);
+    NX_ASSERT(m_debugCounters.tcpSocketCount == 0);
+    NX_ASSERT(m_debugCounters.udpSocketCount == 0);
 }
 
 const Ini& SocketGlobals::ini()

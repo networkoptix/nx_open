@@ -21,9 +21,10 @@
 #include <nx/vms/api/analytics/descriptors.h>
 #include <nx/vms/client/desktop/common/widgets/selectable_text_button.h>
 #include <nx/vms/client/desktop/event_search/models/event_search_list_model.h>
-#include <nx/utils/string.h>
+#include <nx/vms/client/desktop/utils/widget_utils.h>
 #include <nx/vms/event/event_fwd.h>
 #include <nx/vms/event/strings_helper.h>
+#include <nx/utils/string.h>
 
 namespace nx::vms::client::desktop {
 
@@ -150,6 +151,11 @@ void EventSearchWidget::Private::setupTypeSelection()
 
     StringsHelper helper(q->commonModule());
 
+    auto defaultAction = addMenuAction(
+        eventFilterMenu, tr("Any event"), EventType::undefinedEvent);
+
+    eventFilterMenu->addSeparator();
+
     m_analyticsEventsSubmenuAction = eventFilterMenu->addMenu(analyticsEventsMenu);
     m_analyticsEventsSubmenuAction->setVisible(false);
 
@@ -162,32 +168,28 @@ void EventSearchWidget::Private::setupTypeSelection()
     m_analyticsEventsSingleAction = addMenuAction(eventFilterMenu,
         helper.eventName(EventType::analyticsSdkEvent), EventType::analyticsSdkEvent);
 
-    for (const auto type: childEvents(EventType::anyCameraEvent))
-        addMenuAction(deviceIssuesMenu, helper.eventName(type), type);
-
-    deviceIssuesMenu->addSeparator();
-
     q->addDeviceDependentAction(
         addMenuAction(deviceIssuesMenu, "<any device issue>", vms::api::EventType::anyCameraEvent,
             QString(), true),
         tr("Any device issue"),
         tr("Any camera issue"));
 
+    deviceIssuesMenu->addSeparator();
+
+    for (const auto type: childEvents(EventType::anyCameraEvent))
+        addMenuAction(deviceIssuesMenu, helper.eventName(type), type);
+
+    addMenuAction(serverEventsMenu, tr("Any server event"), EventType::anyServerEvent);
+    serverEventsMenu->addSeparator();
+
     for (const auto type: childEvents(EventType::anyServerEvent))
         addMenuAction(serverEventsMenu, helper.eventName(type), type);
-
-    serverEventsMenu->addSeparator();
-    addMenuAction(serverEventsMenu, tr("Any server event"), EventType::anyServerEvent);
 
     eventFilterMenu->addSeparator();
     q->addDeviceDependentAction(eventFilterMenu->addMenu(deviceIssuesMenu),
         tr("Device issues"), tr("Camera issues"));
 
     m_serverEventsSubmenuAction = eventFilterMenu->addMenu(serverEventsMenu);
-    eventFilterMenu->addSeparator();
-
-    auto defaultAction = addMenuAction(
-        eventFilterMenu, tr("Any event"), EventType::undefinedEvent);
 
     connect(m_typeSelectionButton, &SelectableTextButton::stateChanged, this,
         [defaultAction](SelectableTextButton::State state)
@@ -250,7 +252,8 @@ void EventSearchWidget::Private::updateAnalyticsMenu()
         nx::analytics::EngineDescriptorManager engineDescriptorManager(q->commonModule());
         const auto eventTypeDescriptors = eventTypeDescriptorManager.descriptors();
         const auto engineDescriptors = engineDescriptorManager.descriptors();
-        analyticsMenu->clear();
+
+        WidgetUtils::clearMenu(analyticsMenu);
 
         QSet<QnUuid> enabledEngines;
         const auto cameras = q->resourcePool()->getResources<QnVirtualCameraResource>();
@@ -259,6 +262,11 @@ void EventSearchWidget::Private::updateAnalyticsMenu()
 
         if (!eventTypeDescriptors.empty())
         {
+            addMenuAction(analyticsMenu, tr("Any analytics event"),
+                EventType::analyticsSdkEvent, {});
+
+            analyticsMenu->addSeparator();
+
             QHash<QnUuid, EngineInfo> engineById;
             for (const auto& [engineId, engineDescriptor]: engineDescriptors)
             {
@@ -315,10 +323,6 @@ void EventSearchWidget::Private::updateAnalyticsMenu()
                     }
                 }
             }
-
-            analyticsMenu->addSeparator();
-            addMenuAction(analyticsMenu, tr("Any analytics event"),
-                EventType::analyticsSdkEvent, {});
         }
     }
 

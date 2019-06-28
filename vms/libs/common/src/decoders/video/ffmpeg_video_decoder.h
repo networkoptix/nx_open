@@ -32,9 +32,7 @@ public:
     */
     QnFfmpegVideoDecoder(
         const DecoderConfig& config,
-        AVCodecID codec, const QnConstCompressedVideoDataPtr& data,
-        bool mtDecoding,
-        QAtomicInt* const swDecoderCount = NULL);
+        AVCodecID codec, const QnConstCompressedVideoDataPtr& data);
     ~QnFfmpegVideoDecoder();
     bool decode( const QnConstCompressedVideoDataPtr& data, QSharedPointer<CLVideoDecoderOutput>* const outFrame );
 
@@ -60,7 +58,7 @@ public:
     virtual void flush();
     virtual const AVFrame* lastFrame() const override { return m_frame; }
     void determineOptimalThreadType(const QnConstCompressedVideoDataPtr& data);
-    virtual void setMTDecoding(bool value) override;
+    void setMultiThreadDecodePolicy(MultiThreadDecodePolicy mtDecodingPolicy);
     virtual void resetDecoder(const QnConstCompressedVideoDataPtr& data) override;
     virtual void setOutPictureSize( const QSize& outSize ) override;
     //!Implementation of QnAbstractVideoDecoder::getDecoderCaps
@@ -69,16 +67,7 @@ public:
     */
     virtual unsigned int getDecoderCaps() const override;
     virtual void setSpeed( float newValue ) override;
-
 private:
-    enum class ForceMtDecodingType
-    {
-        none,
-        forcedOn,
-        forcedOff
-    };
-
-    void setForceMtDecoding(ForceMtDecodingType value);
     static AVCodec* findCodec(AVCodecID codecId);
 
     void openDecoder(const QnConstCompressedVideoDataPtr& data);
@@ -90,7 +79,7 @@ private:
         AVFrame *picture,
         int *got_picture_ptr,
         const AVPacket *avpkt);
-    static bool needToUseMtDecoding(bool userDefinedMtDecoding, ForceMtDecodingType forcedValue);
+    void setMultiThreadDecoding(bool value);
 private:
     AVCodecContext *m_passedContext;
 
@@ -131,10 +120,12 @@ private:
     // I have used vector instead map because of 2-3 elements is typical size
     typedef QVector<QPair<qint64, FrameMetadata> > MotionMap;
     mutable double m_prevSampleAspectRatio;
-    ForceMtDecodingType m_forcedMtDecoding;
     qint64 m_prevTimestamp;
     bool m_spsFound;
     std::deque<qint64> m_dtsQueue;
+    MultiThreadDecodePolicy m_mtDecodingPolicy;
+    bool m_useMtDecoding;
+    bool m_needRecreate;
 };
 
 #endif // ENABLE_DATA_PROVIDERS

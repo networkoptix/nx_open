@@ -1,5 +1,7 @@
 #include "search_helper.h"
 
+#include <QtCore/QFileInfo>
+
 #include <common/common_module.h>
 
 #include <core/resource/camera_resource.h>
@@ -7,18 +9,29 @@
 #include <core/resource_management/user_roles_manager.h>
 #include <core/resource/avi/avi_resource.h>
 #include <core/resource/storage_resource.h>
+#include <core/resource/file_layout_resource.h>
 
 namespace nx::vms::client::desktop::resources::search_helper {
 
-//Removes "layout://" prefix and parameters from exported layout's resources urls
-//TODO: #vbreus Remove local file directories paths from local files urls
 QString getUrlForSearch(const QnResourcePtr& resource)
 {
+    // "layout://" prefix and parameters are removed from URLs of exported layouts.
+    // Only filename from local files paths is used.
     if (const auto& aviResource = resource.dynamicCast<QnAviResource>())
     {
         if (const auto storage = aviResource->getStorage())
-            return storage->getUrl();
+            return QFileInfo(storage->getUrl()).fileName();
+        else
+            return QFileInfo(resource->getUrl()).fileName();
     }
+
+    if (const auto& fileLayoutResource = resource.dynamicCast<QnFileLayoutResource>())
+        return QFileInfo(resource->getUrl()).fileName();
+
+    // Wearable camera's URL consists of prefix and physical ID, both are unwanted.
+    if (resource->flags().testFlag(Qn::wearable_camera))
+        return QString();
+
     return resource->getUrl();
 }
 
@@ -97,7 +110,8 @@ Matches matchSearchWords(const QStringList& searchWords, const QnResourcePtr& re
 QStringList uniqueSearchWords(const QString& searchString)
 {
     QStringList result = searchString.split(" ", QString::SkipEmptyParts);
-    std::for_each(result.begin(), result.end(), [](QString& str) { str.toLower(); });
+    for (auto& searchWord: result)
+        searchWord = searchWord.toLower();
     result.removeDuplicates();
     return result;
 }

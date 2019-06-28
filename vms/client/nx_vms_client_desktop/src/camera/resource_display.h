@@ -25,6 +25,10 @@ class CounterWithSignal;
 } // namespace utils
 } // namespace nx
 
+/**
+ * Proxy class to route video data and metadata through it.
+ * Also allows media distribution between several receivers.
+ */
 class QnResourceDisplay: public Connective<QObject>, protected QnResourceConsumer {
     Q_OBJECT
 
@@ -44,7 +48,8 @@ public:
     virtual ~QnResourceDisplay();
 
     /**
-     * Called while corresponding QGLWidget and QGLContext are still alive to OGL resources to be properly removed
+     * Called while corresponding QOpenGLWidget and QOpenGLContext are still alive
+     * to properly release OGL resources.
      */
     void beforeDestroy();
 

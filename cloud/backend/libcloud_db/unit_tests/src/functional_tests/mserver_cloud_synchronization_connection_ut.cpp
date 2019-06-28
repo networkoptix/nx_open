@@ -1,16 +1,37 @@
 #include <gtest/gtest.h>
 
+#include <nx/network/url/url_parse_helper.h>
 #include <nx/utils/random.h>
+
+#include <nx/cloud/db/client/cdb_request_path.h>
 
 #include "mserver_cloud_synchronization_connection_fixture.h"
 
-namespace nx::cloud::db {
-namespace test {
+namespace nx::cloud::db::test {
 
-TEST_F(Ec2MserverCloudSynchronizationConnection, connection_drop_after_system_removal)
+static constexpr auto kWaitTimeout = std::chrono::minutes(1);
+
+class Ec2SyncConnection:
+    public Ec2MserverCloudSynchronizationConnection
 {
-    constexpr static const auto kWaitTimeout = std::chrono::seconds(10);
-    constexpr static const auto kConnectionsToCreateCount = 1;
+protected:
+    void whenConnect()
+    {
+        openTransactionConnections(1);
+    }
+
+    void thenConnectionisEstablished()
+    {
+        waitForConnectionsToMoveToACertainState(
+            {::ec2::QnTransactionTransportBase::Connected,
+                ::ec2::QnTransactionTransportBase::ReadyForStreaming},
+            kWaitTimeout);
+    }
+};
+
+TEST_F(Ec2SyncConnection, connection_drop_after_system_removal)
+{
+    static constexpr auto kConnectionsToCreateCount = 1;
 
     openTransactionConnections(kConnectionsToCreateCount);
 
@@ -29,10 +50,11 @@ TEST_F(Ec2MserverCloudSynchronizationConnection, connection_drop_after_system_re
         kWaitTimeout);
 }
 
-TEST_F(Ec2MserverCloudSynchronizationConnection, multiple_connections)
+TEST_F(Ec2SyncConnection, multiple_connections)
 {
-    constexpr const int maxAllowedConcurrentConnections = 2;
-    constexpr const int maxConcurrentConnectionsToCreate = 5;
+    constexpr int maxAllowedConcurrentConnections = 2;
+    constexpr int maxConcurrentConnectionsToCreate = 5;
+    
     static_assert(
         maxConcurrentConnectionsToCreate > maxAllowedConcurrentConnections,
         "Check values");
@@ -50,10 +72,10 @@ TEST_F(Ec2MserverCloudSynchronizationConnection, multiple_connections)
     ASSERT_EQ(maxAllowedConcurrentConnections, activeConnectionCount());
 }
 
-TEST_F(Ec2MserverCloudSynchronizationConnection, cloud_db_is_stable_when_connections_blink)
+TEST_F(Ec2SyncConnection, cloud_db_is_stable_when_connections_blink)
 {
     constexpr int maxConcurrentConnectionsToCreate = 50;
-    constexpr auto iterationCount = 2;
+    constexpr int iterationCount = 2;
 
     for (int i = 0; i < iterationCount; ++i)
     {
@@ -64,5 +86,44 @@ TEST_F(Ec2MserverCloudSynchronizationConnection, cloud_db_is_stable_when_connect
     }
 }
 
-} // namespace test
-} // namespace nx::cloud::db
+//-------------------------------------------------------------------------------------------------
+
+template<typename PathHolder>
+class Ec2SyncConnectionPathAcceptance:
+    public Ec2SyncConnection
+{
+public:
+    Ec2SyncConnectionPathAcceptance()
+    {
+        this->connectionHelper().setSyncPath(
+            nx::network::url::joinPath(PathHolder::kPath, "events"));
+    }
+};
+
+TYPED_TEST_CASE_P(Ec2SyncConnectionPathAcceptance);
+
+TYPED_TEST_P(Ec2SyncConnectionPathAcceptance, connection_can_be_established)
+{
+    this->whenConnect();
+    this->thenConnectionisEstablished();
+}
+
+REGISTER_TYPED_TEST_CASE_P(Ec2SyncConnectionPathAcceptance,
+    connection_can_be_established);
+
+//-------------------------------------------------------------------------------------------------
+
+struct RegularPathHolder { static constexpr auto kPath = kEc2TransactionConnectionPathPrefix; };
+struct DeprecatedPathHolder { static constexpr auto kPath = kDeprecatedEc2TransactionConnectionPathPrefix; };
+
+INSTANTIATE_TYPED_TEST_CASE_P(
+    RegularPath,
+    Ec2SyncConnectionPathAcceptance,
+    RegularPathHolder);
+
+INSTANTIATE_TYPED_TEST_CASE_P(
+    DeprecatedPath,
+    Ec2SyncConnectionPathAcceptance,
+    DeprecatedPathHolder);
+
+} // namespace nx::cloud::db::test

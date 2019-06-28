@@ -48,6 +48,7 @@ public:
 
     void setRemoveConnectionAfterClosure(bool val);
     void setMaxDelayBeforeConnect(std::chrono::milliseconds delay);
+    void setSyncPath(const std::string& path);
 
     /**
      * @return New connection id.
@@ -109,6 +110,7 @@ private:
     std::chrono::milliseconds m_maxDelayBeforeConnect;
     OnConnectionBecomesActiveSubscription m_onConnectionBecomesActiveSubscription;
     OnConnectionFailureSubscription m_onConnectionFailureSubscription;
+    std::string m_syncPath;
 
     ConnectionContext prepareConnectionContext(
         const std::string& login,

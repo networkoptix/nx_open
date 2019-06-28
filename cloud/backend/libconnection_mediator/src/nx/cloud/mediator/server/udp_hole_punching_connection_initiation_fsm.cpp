@@ -2,6 +2,7 @@
 
 #include <chrono>
 
+#include <nx/fusion/model_functions.h>
 #include <nx/network/cloud/data/connection_ack_data.h>
 #include <nx/network/cloud/data/connection_requested_event_data.h>
 #include <nx/utils/log/log.h>
@@ -33,7 +34,7 @@ UDPHolePunchingConnectionInitiationFsm::UDPHolePunchingConnectionInitiationFsm(
     m_serverPeerConnectionMethods(api::ConnectionMethod::all),
     m_originatingPeerCloudConnectVersion(api::CloudConnectVersion::initial),
     m_findRelayInstanceFunc(
-        &AbstractRelayClusterClient::findRelayInstancePeerIsListeningOn)
+        &AbstractRelayClusterClient::findRelayInstanceForClient)
 {
     auto serverConnectionStrongRef = m_serverConnectionWeakRef.lock();
     if (!serverConnectionStrongRef)
@@ -77,6 +78,8 @@ void UDPHolePunchingConnectionInitiationFsm::onConnectRequest(
         [this, requestSourceDescriptor,
             request = std::move(request), connectResponseSender]()
         {
+            m_clientEndpoint = requestSourceDescriptor.sourceAddress;
+
             processConnectRequest(
                 requestSourceDescriptor,
                 std::move(request),
@@ -181,7 +184,7 @@ void UDPHolePunchingConnectionInitiationFsm::processTcpConnectRequest(
     findRelayInstance(
         [this, connectResponseSender = std::move(connectResponseSender)](
             nx::cloud::relay::api::ResultCode resultCode,
-            QUrl relayInstanceUrl)
+            nx::utils::Url relayInstanceUrl)
         {
             auto connectResponse = prepareConnectResponse(
                 api::ConnectionAckRequest(),
@@ -269,7 +272,8 @@ nx::network::stun::Message
         }
         if (!connectRequest.ignoreSourceAddress)
         {
-            connectionRequestedEvent.udpEndpointList.emplace_front(
+            connectionRequestedEvent.udpEndpointList.insert(
+                connectionRequestedEvent.udpEndpointList.begin(),
                 originatingPeerSourceAddress);
         }
     }
@@ -281,8 +285,8 @@ nx::network::stun::Message
         stun::Header(
             stun::MessageClass::indication,
             stun::extension::indications::connectionRequested));
-    connectionRequestedEvent.serialize(&indication);
     connectionRequestedEvent.cloudConnectVersion = connectRequest.cloudConnectVersion;
+    connectionRequestedEvent.serialize(&indication);
 
     return indication;
 }
@@ -294,7 +298,7 @@ void UDPHolePunchingConnectionInitiationFsm::noConnectionAckOnTime()
 
     m_timer.pleaseStopSync();
 
-    if (initiateCloudConnect(api::ConnectionAckRequest()))
+    if (initiateCloudConnect(api::ConnectionAckRequest{}))
     {
         NX_VERBOSE(this, "Proceeding without connection ack from listening peer");
         return;
@@ -305,10 +309,7 @@ void UDPHolePunchingConnectionInitiationFsm::noConnectionAckOnTime()
     // Sending connect response.
     m_state = State::waitingConnectionResult;
 
-    api::ConnectResponse connectResponse = prepareConnectResponse(
-        api::ConnectionAckRequest(),
-        std::list<network::SocketAddress>(),
-        std::nullopt);
+    api::ConnectResponse connectResponse = prepareConnectResponse(api::ConnectionAckRequest(), {}, std::nullopt);
     sendConnectResponse(api::ResultCode::noReplyFromServer, std::move(connectResponse));
 
     if (m_settings.connectionParameters().connectionResultWaitTimeout ==
@@ -332,7 +333,7 @@ void UDPHolePunchingConnectionInitiationFsm::processConnectionAckRequest(
         requestSourceDescriptor.sourceAddress.toString().toUtf8();
 
     if (requestSourceDescriptor.transportProtocol == nx::network::TransportProtocol::udp)
-        request.udpEndpointList.push_front(requestSourceDescriptor.sourceAddress);
+        request.udpEndpointList.insert(request.udpEndpointList.begin(), requestSourceDescriptor.sourceAddress);
 
     m_timer.pleaseStopSync();
 
@@ -383,10 +384,10 @@ void UDPHolePunchingConnectionInitiationFsm::initiateRelayInstanceSearch()
 {
     m_state = State::resolvingServersRelayInstance;
 
-    auto completionHander = 
+    auto completionHander =
         [this](
             nx::cloud::relay::api::ResultCode resultCode,
-            QUrl relayInstanceUrl)
+            nx::utils::Url relayInstanceUrl)
         {
             onRelayInstanceSearchCompletion(
                 resultCode == nx::cloud::relay::api::ResultCode::ok
@@ -400,7 +401,7 @@ void UDPHolePunchingConnectionInitiationFsm::initiateRelayInstanceSearch()
 void UDPHolePunchingConnectionInitiationFsm::findRelayInstance(
     RelayInstanceSearchCompletionHandler handler)
 {
-    auto sharedHandler = 
+    auto sharedHandler =
         std::make_shared<RelayInstanceSearchCompletionHandler>(std::move(handler));
 
     m_findRelayInstanceFunc.invokeWithTimeout(
@@ -416,10 +417,11 @@ void UDPHolePunchingConnectionInitiationFsm::findRelayInstance(
             nx::utils::swapAndCall(
                 *sharedHandler,
                 nx::cloud::relay::api::ResultCode::timedOut,
-                QUrl());
+                nx::utils::Url());
         },
         m_relayClusterClient,
-        m_serverPeerHostName.toStdString());
+        m_serverPeerHostName.toStdString(),
+        m_clientEndpoint.address);
 }
 
 void UDPHolePunchingConnectionInitiationFsm::finishConnect()
@@ -447,7 +449,7 @@ void UDPHolePunchingConnectionInitiationFsm::finishConnect()
 }
 
 void UDPHolePunchingConnectionInitiationFsm::onRelayInstanceSearchCompletion(
-    std::optional<QUrl> relayInstanceUrl)
+    std::optional<nx::utils::Url> relayInstanceUrl)
 {
     if (relayInstanceUrl)
     {
@@ -474,8 +476,8 @@ void UDPHolePunchingConnectionInitiationFsm::onRelayInstanceSearchCompletion(
 
 api::ConnectResponse UDPHolePunchingConnectionInitiationFsm::prepareConnectResponse(
     const api::ConnectionAckRequest& connectionAckRequest,
-    std::list<network::SocketAddress> tcpEndpoints,
-    std::optional<QUrl> relayInstanceUrl)
+    std::vector<network::SocketAddress> tcpEndpoints,
+    std::optional <nx::utils::Url> relayInstanceUrl)
 {
     api::ConnectResponse connectResponse;
     connectResponse.params = m_settings.connectionParameters();
@@ -496,7 +498,15 @@ void UDPHolePunchingConnectionInitiationFsm::sendConnectResponse(
     NX_VERBOSE(this, lm("Connection %1. Sending connect response (%2) while in state %3")
         .args(m_connectionID, QnLexical::serialized(resultCode), toString(m_state)));
 
-    NX_CRITICAL(m_connectResponseSender);
+    NX_ASSERT(m_connectResponseSender,
+        lm("State %1. Cached response: (%2, %3). Response: %4")
+        .args(toString(m_state),
+            m_cachedConnectResponse ? QnLexical::serialized(m_cachedConnectResponse->first) : QString(),
+            QJson::serialized(m_cachedConnectResponse ? m_cachedConnectResponse->second : api::ConnectResponse()),
+            QJson::serialized(connectResponse)));
+    if (!m_connectResponseSender)
+        return;
+
     decltype(m_connectResponseSender) connectResponseSender;
     connectResponseSender.swap(m_connectResponseSender);
 
@@ -548,8 +558,7 @@ void UDPHolePunchingConnectionInitiationFsm::done(api::ResultCode result)
 
     m_state = State::fini;
 
-    auto onFinishedHandler = std::move(m_onFsmFinishedEventHandler);
-    onFinishedHandler(m_sessionStatisticsInfo.resultCode);
+    nx::utils::swapAndCall(m_onFsmFinishedEventHandler, m_sessionStatisticsInfo.resultCode);
 }
 
 const char* UDPHolePunchingConnectionInitiationFsm::toString(State state)

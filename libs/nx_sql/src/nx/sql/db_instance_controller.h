@@ -14,8 +14,9 @@ class NX_SQL_API InstanceController
 public:
     InstanceController(const ConnectionOptions& dbConnectionOptions);
 
-    AsyncSqlQueryExecutor& queryExecutor();
-    const AsyncSqlQueryExecutor& queryExecutor() const;
+    AbstractAsyncSqlQueryExecutor& queryExecutor();
+    const AbstractAsyncSqlQueryExecutor& queryExecutor() const;
+
     const StatisticsCollector& statisticsCollector() const;
     StatisticsCollector& statisticsCollector();
 

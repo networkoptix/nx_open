@@ -16,7 +16,6 @@ ECConnectionNotificationManager::ECConnectionNotificationManager(
     QnVideowallNotificationManager* videowallManager,
     QnWebPageNotificationManager* webPageManager,
     QnStoredFileNotificationManager* storedFileManager,
-    QnUpdatesNotificationManager* updatesManager,
     QnMiscNotificationManager* miscManager,
     QnDiscoveryNotificationManager* discoveryManager,
     AnalyticsNotificationManager* analyticsManager)
@@ -34,7 +33,6 @@ ECConnectionNotificationManager::ECConnectionNotificationManager(
     m_videowallManager(videowallManager),
     m_webPageManager(webPageManager),
     m_storedFileManager(storedFileManager),
-    m_updatesManager(updatesManager),
     m_miscManager(miscManager),
     m_discoveryManager(discoveryManager),
     m_analyticsManager(analyticsManager)

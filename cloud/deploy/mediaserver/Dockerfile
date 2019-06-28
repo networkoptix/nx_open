@@ -1,4 +1,4 @@
-FROM 009544449203.dkr.ecr.us-east-1.amazonaws.com/cloud/base:3.0.1
+FROM 009544449203.dkr.ecr.us-east-1.amazonaws.com/cloud/base:3.0.2
 MAINTAINER Ivan Vigasin <ivigasin@gmail.com>
 
 COPY stage/mediaserver /opt/networkoptix/mediaserver

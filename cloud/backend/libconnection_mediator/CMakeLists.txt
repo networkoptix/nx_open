@@ -3,12 +3,13 @@ nx_configure_file(
     ${CMAKE_CURRENT_BINARY_DIR})
 
 nx_add_target(libconnection_mediator LIBRARY NO_MOC
+    WERROR_IF NOT WINDOWS
     ADDITIONAL_SOURCES
         "${CMAKE_CURRENT_BINARY_DIR}/libconnection_mediator_app_info_impl.cpp"
     PRIVATE_LIBS
         qtservice qtsinglecoreapplication
     PUBLIC_LIBS
-        cloud_db_client common nx_network nx_fusion nx_utils nx_clusterdb_map
+        cloud_db_client common nx_network nx_fusion nx_utils nx_clusterdb_map nx_geo_ip
 )
 
 set_target_properties(libconnection_mediator PROPERTIES PREFIX "")

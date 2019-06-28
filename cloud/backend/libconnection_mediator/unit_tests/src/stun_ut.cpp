@@ -15,6 +15,7 @@
 #include <common/common_globals.h>
 #include <nx/utils/scope_guard.h>
 
+#include <nx/cloud/mediator/listening_peer_db.h>
 #include <nx/cloud/mediator/listening_peer_pool.h>
 #include <nx/cloud/mediator/peer_registrator.h>
 #include <nx/cloud/mediator/mediaserver_endpoint_tester.h>
@@ -36,7 +37,8 @@ protected:
     StunCustomTest():
         mediaserverApi(&cloudData),
         m_relayClusterClient(settings),
-        m_listeningPeerPool(settings.listeningPeer()),
+        m_listeningPeerDb(settings),
+        m_listeningPeerPool(settings.listeningPeer(), &m_listeningPeerDb),
         m_listeningPeerRegistrator(settings, &cloudData, &m_listeningPeerPool, &m_relayClusterClient),
         m_server(
             &m_stunMessageDispatcher,
@@ -64,6 +66,7 @@ protected:
 
 private:
     RelayClusterClient m_relayClusterClient;
+    ListeningPeerDb m_listeningPeerDb;
     ListeningPeerPool m_listeningPeerPool;
     PeerRegistrator m_listeningPeerRegistrator;
     MessageDispatcher m_stunMessageDispatcher;
@@ -90,7 +93,7 @@ TEST_F( StunCustomTest, Ping )
     request.newAttribute< nx::network::stun::extension::attrs::SystemId >( SYSTEM_ID );
     request.newAttribute< nx::network::stun::extension::attrs::ServerId >( SERVER_ID );
 
-    std::list< nx::network::SocketAddress > allEndpoints;
+    std::vector< nx::network::SocketAddress > allEndpoints;
     allEndpoints.push_back( GOOD_ADDRESS );
     allEndpoints.push_back( BAD_ADDRESS );
     request.newAttribute< nx::network::stun::extension::attrs::PublicEndpointList >( allEndpoints );
@@ -114,7 +117,7 @@ TEST_F( StunCustomTest, Ping )
     ASSERT_NE( eps, nullptr );
 
     // only good address is expected to be returned
-    ASSERT_EQ( eps->get(), std::list< nx::network::SocketAddress >( 1, GOOD_ADDRESS ) );
+    ASSERT_EQ( eps->get(), std::vector< nx::network::SocketAddress >( 1, GOOD_ADDRESS ) );
 }
 
 TEST_F( StunCustomTest, BindResolve )
@@ -129,7 +132,7 @@ TEST_F( StunCustomTest, BindResolve )
         request.newAttribute< nx::network::stun::extension::attrs::SystemId >( SYSTEM_ID );
         request.newAttribute< nx::network::stun::extension::attrs::ServerId >( SERVER_ID );
         request.newAttribute< nx::network::stun::extension::attrs::PublicEndpointList >(
-                    std::list< nx::network::SocketAddress >( 1, GOOD_ADDRESS ) );
+                    std::vector< nx::network::SocketAddress >( 1, GOOD_ADDRESS ) );
 
         request.insertIntegrity(SYSTEM_ID, AUTH_KEY );
         cloudData.expect_getSystem( SYSTEM_ID, AUTH_KEY );
@@ -181,7 +184,7 @@ TEST_F( StunCustomTest, BindResolve )
 
         const auto eps = result.second.getAttribute< nx::network::stun::extension::attrs::PublicEndpointList >();
         ASSERT_NE( eps, nullptr );
-        ASSERT_EQ( eps->get(), std::list< nx::network::SocketAddress >( 1, GOOD_ADDRESS ) );
+        ASSERT_EQ( eps->get(), std::vector< nx::network::SocketAddress >( 1, GOOD_ADDRESS ) );
     }
     {
         nx::network::stun::Message request( Header(

@@ -2,8 +2,7 @@
 
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/test_support/utils.h>
-
-#include <nx_ec/ec_proto_version.h>
+#include <nx/vms/api/protocol_version.h>
 
 namespace nx::cloud::db {
 namespace test {
@@ -28,7 +27,7 @@ const api::SystemData& Ec2MserverCloudSynchronizationConnection::system() const
 
 void Ec2MserverCloudSynchronizationConnection::openTransactionConnections(int count)
 {
-    openTransactionConnectionsOfSpecifiedVersion(count, nx_ec::EC2_PROTO_VERSION);
+    openTransactionConnectionsOfSpecifiedVersion(count, nx::vms::api::protocolVersion());
 }
 
 std::vector<int> Ec2MserverCloudSynchronizationConnection::openTransactionConnectionsOfSpecifiedVersion(

@@ -11,6 +11,8 @@ namespace test {
 
 namespace api_requests_detail {
 
+static const std::chrono::seconds kHttpTimeout(10);
+
 struct FunctionsTag{};
 
 /**
@@ -55,6 +57,8 @@ std::unique_ptr<nx::network::http::HttpClient> createHttpClient(const QString &a
     auto httpClient = std::make_unique<nx::network::http::HttpClient>();
     httpClient->setUserName(authName);
     httpClient->setUserPassword(authPassword);
+    httpClient->setResponseReadTimeout(kHttpTimeout);
+    httpClient->setMessageBodyReadTimeout(kHttpTimeout);
     return httpClient;
 }
 
@@ -114,7 +118,7 @@ void doExecuteGet(const nx::utils::Url& url,
 
     NX_INFO(typeid(FunctionsTag), lm("GET %1").arg(url.path()));
 
-    httpClient->doGet(url);
+    ASSERT_TRUE(httpClient->doGet(url));
 
     NX_CRITICAL(outResponse);
     *outResponse = readResponseBody(httpClient.get());

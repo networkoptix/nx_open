@@ -4,6 +4,9 @@
 
 namespace nx::vms::api::analytics {
 
+// TODO: Move this file to a server-only library when manifest classes are moved the same way;
+// replace with nx::sdk::analytics::IUncompressedFramePixelFormat which values should be
+// changed to powers of 2 (to make it flag-capable).
 enum class PixelFormat
 {
     undefined = 0,

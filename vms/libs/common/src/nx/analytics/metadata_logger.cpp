@@ -1,5 +1,7 @@
 #include "metadata_logger.h"
 
+#include <QtCore/QDir>
+
 #include <nx/kit/utils.h>
 
 #include <utils/common/synctime.h>
@@ -110,8 +112,22 @@ void MetadataLogger::pushObjectMetadata(
     if (!loggingIni().isLoggingEnabled())
         return;
 
-    m_prevObjectMetadataPacket = std::move(m_currentObjectMetadataPacket);
-    m_currentObjectMetadataPacket = std::move(metadataPacket);
+    m_isLoggingBestShot = false;
+    if (metadataPacket.objects.size() == 1)
+    {
+        if (metadataPacket.objects[0].bestShot)
+            m_isLoggingBestShot = true;
+    }
+
+    if (!m_isLoggingBestShot)
+    {
+        m_prevObjectMetadataPacket = std::move(m_currentObjectMetadataPacket);
+        m_currentObjectMetadataPacket = std::move(metadataPacket);
+    }
+    else
+    {
+        m_currentBestShotMetadataPacket = std::move(metadataPacket);
+    }
 
     doLogging(kObjectMetadataLogPattern);
 }
@@ -120,6 +136,14 @@ MetadataLogger::PlaceholderMap MetadataLogger::placeholderMap() const
 {
     PlaceholderMap result;
     const microseconds currentTime(qnSyncTime->currentUSecsSinceEpoch());
+
+    const auto& currentMetadataPacket = m_isLoggingBestShot
+        ? m_currentBestShotMetadataPacket
+        : m_currentObjectMetadataPacket;
+
+    const auto& previousMetadataPacket = m_isLoggingBestShot
+        ? m_currentObjectMetadataPacket
+        : m_prevObjectMetadataPacket;
 
     return {
         {
@@ -142,25 +166,25 @@ MetadataLogger::PlaceholderMap MetadataLogger::placeholderMap() const
         },
         {
             kMetadataTimestampMsPlaceholder,
-            QString::number(m_currentObjectMetadataPacket.timestampUsec / 1000)
+            QString::number(currentMetadataPacket.timestampUsec / 1000)
         },
         {
             kMetadataDiffFromCurrentTimeMsPlaceholder,
             QString::number(duration_cast<milliseconds>(
-                microseconds(m_currentObjectMetadataPacket.timestampUsec) - currentTime).count())
+                microseconds(currentMetadataPacket.timestampUsec) - currentTime).count())
         },
         {
             kMetadataDiffFromPrevMsPlaceholder,
-            QString::number((m_currentObjectMetadataPacket.timestampUsec
-                - m_prevObjectMetadataPacket.timestampUsec) / 1000)
+            QString::number((currentMetadataPacket.timestampUsec
+                - previousMetadataPacket.timestampUsec) / 1000)
         },
         {
             kMetadataObjectCountPlaceholder,
-            QString::number(m_currentObjectMetadataPacket.objects.size())
+            QString::number(currentMetadataPacket.objects.size())
         },
         {
             kMetadataObjectsPlaceholder,
-            makeObjectsLogLines(m_currentObjectMetadataPacket.objects)
+            makeObjectsLogLines(currentMetadataPacket.objects)
         },
     };
 }

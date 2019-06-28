@@ -90,8 +90,8 @@ buildDistribution()
 
     mv "$SRC/client.app" "$APP_DIR"
     mkdir -p "$APP_DIR/Contents/Resources"
-    cp logo.icns "$APP_DIR/Contents/Resources/appIcon.icns"
-    cp logo.icns "$SRC/.VolumeIcon.icns"
+    cp "$APP_ICON" "$APP_DIR/Contents/Resources/appIcon.icns"
+    cp "$INSTALLER_ICON" "$SRC/.VolumeIcon.icns"
     cp -r "$PACKAGES_DIR/any/roboto-fonts/bin/fonts" "$APP_DIR/Contents/Resources/"
 
     copyMacOsSpecificApplauncherStuff
@@ -124,9 +124,10 @@ buildDistribution()
         -ov "$RAW_DMG"
 
     mv update.json "$SRC/"
+    cp package.json "$SRC/"
 
     (cd "$SRC"
-        zip -y -r "../$UPDATE_ZIP" *.app update.json
+        zip -y -r "../$UPDATE_ZIP" *.app update.json package.json
     )
 
     setDmgIcon

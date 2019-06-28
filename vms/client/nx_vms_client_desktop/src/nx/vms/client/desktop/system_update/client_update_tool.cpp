@@ -7,50 +7,50 @@
 #include <utils/common/app_info.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/socket_global.h>
+#include <nx/utils/app_info.h>
 #include <nx/utils/log/log.h>
 #include <nx/update/update_check.h>
-#include <nx/vms/common/p2p/downloader/private/single_connection_peer_manager.h>
+#include <nx/vms/common/p2p/downloader/private/resource_pool_peer_manager.h>
+#include <nx/vms/common/p2p/downloader/private/internet_only_peer_manager.h>
 #include <nx/vms/client/desktop/ini.h>
 
 namespace nx::vms::client::desktop {
 
+using namespace nx::vms::common::p2p::downloader;
+using namespace nx::vms::applauncher::api;
+
 bool requestInstalledVersions(QList<nx::utils::SoftwareVersion>* versions)
 {
-    using namespace applauncher::api;
-
-    /* Try to run applauncher if it is not running. */
+    // Try to run applauncher if it is not running.
     if (!checkOnline())
         return false;
-
-    const auto result = applauncher::api::getInstalledVersions(versions);
-    if (result == ResultType::ok)
-        return true;
-
-    static const int kMaxTries = 5;
-    for (int i = 0; i < kMaxTries; ++i)
+    int kMaxTries = 5;
+    do
     {
-        QThread::msleep(100);
-        qApp->processEvents();
-        if (applauncher::api::getInstalledVersions(versions) == ResultType::ok)
+        if (getInstalledVersions(versions) == ResultType::ok)
             return true;
-    }
+        std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    } while (--kMaxTries > 0);
+
     return false;
 }
 
 ClientUpdateTool::ClientUpdateTool(QObject *parent):
     base_type(parent),
-    m_outputDir(QDir::temp().absoluteFilePath("nx_updates/client"))
+    m_outputDir(QDir::temp().absoluteFilePath("nx_updates/client")),
+    m_peerManager(new ResourcePoolPeerManager(commonModule())),
+    m_proxyPeerManager(new ResourcePoolProxyPeerManager(commonModule()))
 {
     // Expecting m_outputDir to be like /temp/nx_updates/client
 
     if (ini().massSystemUpdateClearDownloads)
         clearDownloadFolder();
 
-    vms::common::p2p::downloader::AbstractPeerSelectorPtr peerSelector;
-    m_peerManager.reset(new SingleConnectionPeerManager(commonModule(), std::move(peerSelector)));
-    m_peerManager->setParent(this);
+    m_downloader.reset(new Downloader(
+        m_outputDir,
+        commonModule(),
+        {m_peerManager, new InternetOnlyPeerManager(), m_proxyPeerManager}));
 
-    m_downloader.reset(new Downloader(m_outputDir, commonModule(), this));
     connect(m_downloader.get(), &Downloader::fileStatusChanged,
         this, &ClientUpdateTool::atDownloaderStatusChanged);
 
@@ -84,12 +84,22 @@ ClientUpdateTool::ClientUpdateTool(QObject *parent):
 
 ClientUpdateTool::~ClientUpdateTool()
 {
-    m_downloader->disconnect(this);
-    // Forcing downloader to be destroyed before peerManager and serverConnection.
-    m_downloader.reset();
-    // And peer manager should die before serverConnection.
-    m_peerManager.reset();
+    NX_VERBOSE(this, "~ClientUpdateTool() enter");
+
+    // Making sure attached thread is complete
+    m_state = exiting;
+    if (m_applauncherTask.valid())
+        m_applauncherTask.get();
+
+    // Forcing downloader to be destroyed before serverConnection.
+    if (m_downloader)
+    {
+        m_downloader->disconnect(this);
+        m_downloader.reset();
+    }
+
     m_serverConnection.reset();
+    NX_VERBOSE(this, "~ClientUpdateTool() done");
 }
 
 void ClientUpdateTool::setState(State newState)
@@ -162,7 +172,8 @@ std::future<nx::update::UpdateContents> ClientUpdateTool::requestRemoteUpdateInf
 void ClientUpdateTool::setServerUrl(const nx::utils::Url& serverUrl, const QnUuid& serverId)
 {
     m_serverConnection.reset(new rest::ServerConnection(commonModule(), serverId, serverUrl));
-    m_peerManager->setServerUrl(serverUrl, serverId);
+    m_peerManager->setServerDirectConnection(serverId, m_serverConnection);
+    m_proxyPeerManager->setServerDirectConnection(serverId, m_serverConnection);
 }
 
 void ClientUpdateTool::atRemoteUpdateInformation(
@@ -171,7 +182,7 @@ void ClientUpdateTool::atRemoteUpdateInformation(
 {
     auto systemInfo = QnAppInfo::currentSystemInformation();
     QString errorMessage;
-    // Update is allowed if either target version has the same cloud host or
+    // Update is allowed if either target version has the sam_installedVersionsFutureme cloud host or
     // there are no servers linked to the cloud in the system.
     QString cloudUrl = nx::network::SocketGlobals::cloud().cloudHost();
 
@@ -219,7 +230,7 @@ std::set<nx::utils::SoftwareVersion> ClientUpdateTool::getInstalledVersions(
 
 bool ClientUpdateTool::isVersionInstalled(const nx::utils::SoftwareVersion& version) const
 {
-    auto versions = getInstalledVersions();
+    auto versions = getInstalledVersions(/*includeCurrentVersion=*/true);
     return versions.count(version) != 0;
 }
 
@@ -246,7 +257,7 @@ void ClientUpdateTool::setUpdateTarget(const UpdateContents& contents)
             NX_INFO(this)
                 << "setUpdateTarget(" << contents.info.version
                 << ") client already has this version installed"
-                << m_clientPackage.file;
+                << m_clientPackage.localFile;
             setState(State::readyRestart);
         }
         else
@@ -254,7 +265,7 @@ void ClientUpdateTool::setUpdateTarget(const UpdateContents& contents)
             NX_INFO(this)
                 << "setUpdateTarget(" << contents.info.version
                 << ") client is already at this version"
-                << m_clientPackage.file;
+                << m_clientPackage.localFile;
             setState(State::complete);
         }
     }
@@ -297,7 +308,7 @@ void ClientUpdateTool::setUpdateTarget(const UpdateContents& contents)
         setState(State::downloading);
 
         const auto code = m_downloader->addFile(info);
-        m_updateFile = m_downloader->filePath(m_clientPackage.file);
+        NX_VERBOSE(this, "setUpdateTarget(%1) m_downloader->addFile code=%2", contents.info.version, code);
 
         if (code == common::p2p::downloader::ResultCode::fileAlreadyExists
             || code == common::p2p::downloader::ResultCode::fileAlreadyDownloaded)
@@ -342,8 +353,8 @@ void ClientUpdateTool::atDownloaderStatusChanged(const FileInformation& fileInfo
             setError(tr("Update package is corrupted"));
             break;
         case FileInformation::Status::downloading:
-            m_progress = fileInformation.calculateDownloadProgress();
-            emit updateStateChanged(int(State::downloading), m_progress);
+            emit updateStateChanged(int(State::downloading),
+                fileInformation.calculateDownloadProgress());
             break;
         default:
             // Nothing to do here
@@ -356,8 +367,10 @@ void ClientUpdateTool::atDownloadFinished(const QString& fileName)
     if (fileName != m_clientPackage.file)
         return;
 
+    m_updateFile = m_downloader->filePath(fileName);
+
     NX_VERBOSE(this, "atDownloadFinished(%1) - finally downloaded file to %2",
-        fileName, m_downloader->filePath(fileName));
+        fileName, m_updateFile);
     setState(State::readyInstall);
 }
 
@@ -389,13 +402,6 @@ void ClientUpdateTool::atExtractFilesFinished(int code)
     setState(State::readyInstall);
 }
 
-int ClientUpdateTool::getDownloadProgress() const
-{
-    if (m_state == State::readyInstall)
-        return 100;
-    return std::min(m_progress, 100);
-}
-
 bool ClientUpdateTool::isDownloadComplete() const
 {
     return !hasUpdate()
@@ -406,33 +412,34 @@ bool ClientUpdateTool::isDownloadComplete() const
 
 void ClientUpdateTool::checkInternalState()
 {
+    using nx::vms::applauncher::api::ResultType;
+
     auto kWaitTime = std::chrono::milliseconds(1);
     if (m_applauncherTask.valid()
         && m_applauncherTask.wait_for(kWaitTime) == std::future_status::ready)
     {
-        using Result = applauncher::api::ResultType::Value;
-        Result result = static_cast<Result>(m_applauncherTask.get());
+        const ResultType result = m_applauncherTask.get();
         bool shouldRestart = shouldRestartTo(m_updateVersion);
 
         switch (result)
         {
-            case Result::alreadyInstalled:
-            case Result::ok:
+            case ResultType::alreadyInstalled:
+            case ResultType::ok:
                 if (shouldRestart)
                     setState(readyRestart);
                 else
                     setState(complete);
                 break;
 
-            case Result::otherError:
-            case Result::versionNotInstalled:
-            case Result::invalidVersionFormat:
-            case Result::notEnoughSpace:
-            case Result::notFound:
-            case Result::ioError:
+            case ResultType::otherError:
+            case ResultType::versionNotInstalled:
+            case ResultType::invalidVersionFormat:
+            case ResultType::notEnoughSpace:
+            case ResultType::notFound:
+            case ResultType::ioError:
             {
                 QString error = applauncherErrorToString(result);
-                NX_ERROR(this) << "Failed to run installation:" << error;
+                NX_ERROR(this) << "Failed check installation:" << error;
                 setApplauncherError(error);
                 break;
             }
@@ -464,39 +471,68 @@ bool ClientUpdateTool::installUpdateAsync()
     m_applauncherTask = std::async(std::launch::async,
         [tool = QPointer(this)](
             QString updateFile,
-            nx::utils::SoftwareVersion updateVersion) -> int
+            nx::utils::SoftwareVersion updateVersion) -> applauncher::api::ResultType
         {
-            using Result = applauncher::api::ResultType::Value;
-            static const int kMaxTries = 5;
             QString absolutePath = QFileInfo(updateFile).absoluteFilePath();
-            QString message;
 
+            const ResultType result = installZipAsync(updateVersion, absolutePath);
+            if (result != ResultType::ok)
+            {
+                const QString message = applauncherErrorToString(result);
+                NX_ERROR(NX_SCOPE_TAG, "Failed to start async zip installation: %1", message);
+                // Other variants can be fixed by retrying installation, do they?
+                return result;
+            }
+
+            NX_VERBOSE(NX_SCOPE_TAG,
+                "Started client installation from file %2. Waiting for completion", absolutePath);
+
+            // Checking state if installation, until it goes to Result::ok
+            constexpr int kMaxTries = 60;
             for (int retries = 0; retries < kMaxTries; ++retries)
             {
-                Result result = applauncher::api::installZip(updateVersion, absolutePath);
-                bool repeat = false;
+                applauncher::api::InstallationProgress progress;
+                const ResultType result = applauncher::api::checkInstallationProgress(progress);
+                QString message = applauncherErrorToString(result);
 
                 switch (result)
                 {
-                    case Result::alreadyInstalled:
-                    case Result::otherError:
-                    case Result::versionNotInstalled:
-                    case Result::invalidVersionFormat:
-                    case Result::notEnoughSpace:
-                    case Result::notFound:
-                    case Result::ioError:
+                    case ResultType::alreadyInstalled:
+                    case ResultType::versionNotInstalled:
+                    case ResultType::invalidVersionFormat:
+                    case ResultType::notEnoughSpace:
+                    case ResultType::notFound:
+                    case ResultType::ok:
+                        NX_VERBOSE(NX_SCOPE_TAG,
+                            "checkInstallationProgress returned %1. Exiting", message);
                         return result;
+                    case ResultType::unpackingZip:
+                        NX_VERBOSE(NX_SCOPE_TAG, "checkInstallationProgress() %1 of %2 unpacked",
+                            progress.extracted, progress.total);
+                        break;
+                    case ResultType::otherError:
+                    case ResultType::connectError:
+                    case ResultType::ioError:
                     default:
-                        repeat = true;
-                        // Other variats can be fixed by retrying installation, do they?
+                        NX_ERROR(NX_SCOPE_TAG, "checkInstallationProgress() failed to check zip "
+                            "installation status: %1", message);
                         break;
                 }
 
-                if (!repeat)
+                // We can spend a lot of time in this cycle. So we should be able to exit
+                // as early as possible.
+                if (!tool || tool->m_state != installing)
+                {
+                    NX_ERROR(NX_SCOPE_TAG, "checkInstallationProgress() is interrupted. Exiting");
                     break;
+                }
+
+                int percent = progress.total != 0 ? 100 * progress.extracted / progress.total : 0;
+                emit tool->updateStateChanged(tool->m_state, percent);
+                std::this_thread::sleep_for(std::chrono::seconds(2));
             }
 
-            return Result::otherError;
+            return ResultType::otherError;
         }, m_updateFile, m_updateVersion);
     return false;
 }
@@ -516,6 +552,7 @@ bool ClientUpdateTool::isInstallComplete() const
         case State::readyRestart:
         case State::complete:
         case State::initial:
+        case State::exiting:
         // Though actual install is not successful, no further progress is possible.
         case State::error:
         case State::applauncherError:
@@ -523,21 +560,20 @@ bool ClientUpdateTool::isInstallComplete() const
     }
 
     bool installed = false;
-    using Result = applauncher::api::ResultType::Value;
-    Result result = applauncher::api::isVersionInstalled(
+    const ResultType result = applauncher::api::isVersionInstalled(
         m_updateVersion,
         &installed);
 
     switch (result)
     {
-        case Result::alreadyInstalled:
+        case ResultType::alreadyInstalled:
             break;
-        case Result::ok:
+        case ResultType::ok:
             return true;
 
-        case Result::otherError:
-        case Result::versionNotInstalled:
-        case Result::invalidVersionFormat:
+        case ResultType::otherError:
+        case ResultType::versionNotInstalled:
+        case ResultType::invalidVersionFormat:
         {
             QString error = applauncherErrorToString(result);
             NX_ERROR(this) << "Failed to check installation:" << error;
@@ -564,17 +600,16 @@ bool ClientUpdateTool::restartClient(QString authString)
     if (!applauncher::api::checkOnline())
         return false;
 
-    using Result = applauncher::api::ResultType::Value;
-    Result result = applauncher::api::restartClient(m_updateVersion, authString);
-    if (result == Result::ok)
+    const ResultType result = applauncher::api::restartClient(m_updateVersion, authString);
+    if (result == ResultType::ok)
         return true;
 
-    static const int kMaxTries = 5;
+    constexpr int kMaxTries = 5;
     for (int i = 0; i < kMaxTries; ++i)
     {
-        QThread::msleep(100);
+        QThread::msleep(200);
         qApp->processEvents();
-        if (applauncher::api::restartClient(m_updateVersion, authString) == Result::ok)
+        if (applauncher::api::restartClient(m_updateVersion, authString) == ResultType::ok)
             return true;
     }
     return false;
@@ -599,7 +634,6 @@ void ClientUpdateTool::resetState()
     m_state = State::initial;
     m_lastError = "";
     m_updateFile = "";
-    m_progress = 0;
     m_updateVersion = nx::utils::SoftwareVersion();
     m_clientPackage = nx::update::Package();
     m_remoteUpdateContents = UpdateContents();
@@ -626,12 +660,6 @@ bool ClientUpdateTool::hasUpdate() const
         && m_state != State::complete;
 }
 
-ClientUpdateTool::PeerManagerPtr ClientUpdateTool::createPeerManager(
-    FileInformation::PeerSelectionPolicy /*peerPolicy*/, const QList<QnUuid>& /*additionalPeers*/)
-{
-    return m_peerManager.get();
-}
-
 QString ClientUpdateTool::toString(State state)
 {
     switch (state)
@@ -652,6 +680,8 @@ QString ClientUpdateTool::toString(State state)
             return "ReadyRestart";
         case State::complete:
             return "Complete";
+        case State::exiting:
+            return "Exiting";
         case State::error:
             return "Error";
         case State::applauncherError:
@@ -660,29 +690,28 @@ QString ClientUpdateTool::toString(State state)
     return QString();
 }
 
-QString ClientUpdateTool::applauncherErrorToString(int value)
+QString ClientUpdateTool::applauncherErrorToString(ResultType value)
 {
-    using Result = applauncher::api::ResultType::Value;
-    switch ((Result) value)
+    switch (value)
     {
-        case Result::alreadyInstalled:
+        case ResultType::alreadyInstalled:
             return tr("This update is already installed.");
-        case Result::otherError:
+        case ResultType::otherError:
             return tr("Internal error.");
-        case Result::versionNotInstalled:
+        case ResultType::versionNotInstalled:
             return tr("This version is not installed.");
-        case Result::invalidVersionFormat:
+        case ResultType::invalidVersionFormat:
             return tr("Invalid version format.");
-        case Result::brokenPackage:
+        case ResultType::brokenPackage:
             return tr("Broken update package.");
-        case Result::notEnoughSpace:
+        case ResultType::notEnoughSpace:
             return tr("Not enough space on disk to install the client update.");
-        case Result::notFound:
+        case ResultType::notFound:
             // Installed package does not exists. Either we have broken the code and asking
             // for a wrong file, or this file had been removed somehow.
             return tr("Installation package has been lost.");
         default:
-            return applauncher::api::ResultType::toString((Result) value);
+            return nx::vms::applauncher::api::toString(value);
     }
 }
 

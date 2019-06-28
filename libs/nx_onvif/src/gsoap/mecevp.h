@@ -70,7 +70,7 @@ extern "C" {
 /** Engine off */
 #define SOAP_MEC_NONE                   (0)
 
-/** Cipher type (triple DES CBC) */
+/** Cipher type (triple 3DES EDE CBC) */
 #define SOAP_MEC_DES_CBC                (0x0010)
 
 /** Cipher type (AES128 CBC) */

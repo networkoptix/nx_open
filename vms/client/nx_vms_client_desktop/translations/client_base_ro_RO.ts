@@ -234,10 +234,6 @@ to view more bookmarks</translation>
       <translation type="unfinished">Save Video Wall View</translation>
     </message>
     <message>
-      <source>Drop Resources</source>
-      <translation type="unfinished">Drop Resources</translation>
-    </message>
-    <message>
       <source>Start Screen Recording</source>
       <translation type="unfinished">Start Screen Recording</translation>
     </message>
@@ -2922,10 +2918,6 @@ to %1</translation>
       <source>44.1 kHz and 48 kHz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
       <translation type="unfinished">44.1 kHz and 48 kHz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</translation>
     </message>
-    <message>
-      <source>Configured codec: %1 not found, h263p will used</source>
-      <translation type="unfinished">Configured codec: %1 not found, h263p will used</translation>
-    </message>
   </context>
   <context>
     <name>QnDisconnectFromCloudDialogPrivate</name>
@@ -3237,6 +3229,17 @@ to %1</translation>
     </message>
   </context>
   <context>
+    <name>QnGLCheckerInstrument</name>
+    <message>
+      <source>Video card drivers are outdated or not installed</source>
+      <translation type="unfinished">Video card drivers are outdated or not installed</translation>
+    </message>
+    <message>
+      <source>%1 may not work properly.</source>
+      <translation type="unfinished">%1 may not work properly.</translation>
+    </message>
+  </context>
+  <context>
     <name>QnGeneralPreferencesWidget</name>
     <message>
       <source>Select folder...</source>
@@ -3245,6 +3248,14 @@ to %1</translation>
     <message>
       <source>Folder already added</source>
       <translation type="unfinished">Folder already added</translation>
+    </message>
+    <message>
+      <source>None</source>
+      <translation type="unfinished">None</translation>
+    </message>
+    <message>
+      <source>Auto (%1)</source>
+      <translation type="unfinished">Auto (%1)</translation>
     </message>
   </context>
   <context>
@@ -3312,17 +3323,6 @@ to %1</translation>
     <message>
       <source>Creates a backup of System configuration that can be restored in case of failure.</source>
       <translation type="unfinished">Creates a backup of System configuration that can be restored in case of failure.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnGlHardwareChecker</name>
-    <message>
-      <source>Video card drivers are outdated or not installed</source>
-      <translation type="unfinished">Video card drivers are outdated or not installed</translation>
-    </message>
-    <message>
-      <source>%1 may not work properly.</source>
-      <translation type="unfinished">%1 may not work properly.</translation>
     </message>
   </context>
   <context>
@@ -3621,8 +3621,8 @@ to %1</translation>
       </translation>
     </message>
     <message>
-      <source>Qty</source>
-      <translation type="unfinished">Qty</translation>
+      <source>Channels</source>
+      <translation type="unfinished">Channels</translation>
     </message>
   </context>
   <context>
@@ -5166,6 +5166,10 @@ to %1</translation>
       <source>Server Web Page</source>
       <translation type="unfinished">Server Web Page</translation>
     </message>
+    <message>
+      <source>Plugins</source>
+      <translation type="unfinished">Plugins</translation>
+    </message>
   </context>
   <context>
     <name>QnServerSettingsWidget</name>
@@ -5637,16 +5641,30 @@ to %1</translation>
       <translation type="unfinished">Backup completed</translation>
     </message>
     <message>
-      <source>Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</source>
-      <translation type="unfinished">Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</translation>
-    </message>
-    <message>
-      <source>Recording was enabled on the USB storage</source>
-      <translation type="unfinished">Recording was enabled on the USB storage</translation>
-    </message>
-    <message>
       <source>Reindexing can fix problems with archive or backup if they have been lost or damaged, or if some hardware has been replaced.</source>
       <translation type="unfinished">Reindexing can fix problems with archive or backup if they have been lost or damaged, or if some hardware has been replaced.</translation>
+    </message>
+    <message>
+      <source>What to do with current analytics data?</source>
+      <translation type="unfinished">What to do with current analytics data?</translation>
+    </message>
+    <message>
+      <source>Current analytics data will not be automatically moved to another location and will become unaccessible. You can keep it and manually move later, or delete permanently.
+If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
+      <translation type="unfinished">Current analytics data will not be automatically moved to another location and will become unaccessible. You can keep it and manually move later, or delete permanently.
+If you intended to move analytics data to another storage location, please contact support before proceeding.</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation type="unfinished">Delete</translation>
+    </message>
+    <message>
+      <source>Keep</source>
+      <translation type="unfinished">Keep</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation type="unfinished">Cancel</translation>
     </message>
   </context>
   <context>
@@ -5694,6 +5712,14 @@ to %1</translation>
     <message>
       <source>Too small and system partitions are reserved and not used for writing if there is enough other storage space available.</source>
       <translation type="unfinished">Too small and system partitions are reserved and not used for writing if there is enough other storage space available.</translation>
+    </message>
+    <message>
+      <source>Use to store analytics data</source>
+      <translation type="unfinished">Use to store analytics data</translation>
+    </message>
+    <message>
+      <source>Stores analytics data</source>
+      <translation type="unfinished">Stores analytics data</translation>
     </message>
   </context>
   <context>
@@ -5781,8 +5807,8 @@ to %1</translation>
       <translation type="unfinished">Users</translation>
     </message>
     <message>
-      <source>Analytics</source>
-      <translation type="unfinished">Analytics</translation>
+      <source>Plugins</source>
+      <translation type="unfinished">Plugins</translation>
     </message>
   </context>
   <context>
@@ -5945,14 +5971,6 @@ to %1</translation>
   <context>
     <name>QnSystemSettingsWidget</name>
     <message>
-      <source>Enable devices and servers auto discovery</source>
-      <translation type="unfinished">Enable devices and servers auto discovery</translation>
-    </message>
-    <message>
-      <source>Enable cameras and servers auto discovery</source>
-      <translation type="unfinished">Enable cameras and servers auto discovery</translation>
-    </message>
-    <message>
       <source>Allow System to optimize device settings</source>
       <translation type="unfinished">Allow System to optimize device settings</translation>
     </message>
@@ -5967,6 +5985,22 @@ to %1</translation>
     <message>
       <source>Does not include any personal information and is completely anonymous.</source>
       <translation type="unfinished">Does not include any personal information and is completely anonymous.</translation>
+    </message>
+    <message>
+      <source>Failover server measures may still request camera status updates regardless of this setting.</source>
+      <translation type="unfinished">Failover server measures may still request camera status updates regardless of this setting.</translation>
+    </message>
+    <message>
+      <source>Enable devices and servers autodiscovery and automated device status check</source>
+      <translation type="unfinished">Enable devices and servers autodiscovery and automated device status check</translation>
+    </message>
+    <message>
+      <source>Enable cameras and servers autodiscovery and automated camera status check</source>
+      <translation type="unfinished">Enable cameras and servers autodiscovery and automated camera status check</translation>
+    </message>
+    <message>
+      <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
+      <translation type="unfinished">When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</translation>
     </message>
   </context>
   <context>
@@ -7183,6 +7217,17 @@ to %1</translation>
     </message>
   </context>
   <context>
+    <name>SessionExpiredDialog</name>
+    <message>
+      <source>Your session has expired</source>
+      <translation type="unfinished">Your session has expired</translation>
+    </message>
+    <message>
+      <source>Session duration limit can be changed by the system administrators</source>
+      <translation type="unfinished">Session duration limit can be changed by the system administrators</translation>
+    </message>
+  </context>
+  <context>
     <name>StreamQualityStrings</name>
     <message>
       <source>Lowest</source>
@@ -7387,6 +7432,14 @@ to %1</translation>
       <source>Show Only with &quot;Objects&quot; Tab</source>
       <translation type="unfinished">Show Only with &quot;Objects&quot; Tab</translation>
     </message>
+    <message>
+      <source>Show</source>
+      <translation type="unfinished">Show</translation>
+    </message>
+    <message>
+      <source>Do Not Show</source>
+      <translation type="unfinished">Do Not Show</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::AnalyticsSearchListModel::Private</name>
@@ -7539,10 +7592,6 @@ to %1</translation>
       <translation type="unfinished">Native</translation>
     </message>
     <message>
-      <source>Server will not change any cameras settings, it will receive and use camera stream as-is. </source>
-      <translation type="unfinished">Server will not change any cameras settings, it will receive and use camera stream as-is. </translation>
-    </message>
-    <message>
       <source>Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</source>
       <translation type="unfinished">Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</translation>
     </message>
@@ -7567,6 +7616,14 @@ to %1</translation>
         <numerusform>This ID is already used on the following %n cameras:</numerusform>
         <numerusform>This ID is already used on the following %n cameras:</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Server will not change any cameras settings, it will receive and use camera stream as-is.</source>
+      <translation type="unfinished">Server will not change any cameras settings, it will receive and use camera stream as-is.</translation>
+    </message>
+    <message>
+      <source>Multicast</source>
+      <translation type="unfinished">Multicast</translation>
     </message>
   </context>
   <context>
@@ -7711,10 +7768,6 @@ to %1</translation>
       <translation type="unfinished">Web Page</translation>
     </message>
     <message>
-      <source>Analytics</source>
-      <translation type="unfinished">Analytics</translation>
-    </message>
-    <message>
       <source>Expert</source>
       <translation type="unfinished">Expert</translation>
     </message>
@@ -7769,6 +7822,10 @@ to %1</translation>
     <message>
       <source>I/O Modules Settings</source>
       <translation type="unfinished">I/O Modules Settings</translation>
+    </message>
+    <message>
+      <source>Plugins</source>
+      <translation type="unfinished">Plugins</translation>
     </message>
   </context>
   <context>
@@ -8015,14 +8072,6 @@ to %1</translation>
   </context>
   <context>
     <name>nx::vms::client::desktop::EulaDialog</name>
-    <message>
-      <source>I Agree</source>
-      <translation type="unfinished">I Agree</translation>
-    </message>
-    <message>
-      <source>I Do Not Agree</source>
-      <translation type="unfinished">I Do Not Agree</translation>
-    </message>
     <message>
       <source>Please review and agree to the %1 in order to proceed</source>
       <translation type="unfinished">Please review and agree to the %1 in order to proceed</translation>
@@ -8620,10 +8669,6 @@ to %1</translation>
       <translation type="unfinished">Some servers are offline and will not be updated. Skip them?</translation>
     </message>
     <message>
-      <source>Please make sure there is enough free storage space and network connection is stable.</source>
-      <translation type="unfinished">Please make sure there is enough free storage space and network connection is stable.</translation>
-    </message>
-    <message>
       <source>If the problem persists, please contact Customer Support.</source>
       <translation type="unfinished">If the problem persists, please contact Customer Support.</translation>
     </message>
@@ -8636,20 +8681,8 @@ to %1</translation>
       <translation type="unfinished">Cancel Update</translation>
     </message>
     <message>
-      <source>Failed to download update packages to some servers</source>
-      <translation type="unfinished">Failed to download update packages to some servers</translation>
-    </message>
-    <message>
-      <source>Please make sure they have enough free storage space and stable network connection.</source>
-      <translation type="unfinished">Please make sure they have enough free storage space and stable network connection.</translation>
-    </message>
-    <message>
       <source>Update completed</source>
       <translation type="unfinished">Update completed</translation>
-    </message>
-    <message>
-      <source>Update completed, but some servers have failed an update</source>
-      <translation type="unfinished">Update completed, but some servers have failed an update</translation>
     </message>
     <message>
       <source>Nx Witness Client will be restarted to the updated version.</source>
@@ -8660,16 +8693,8 @@ to %1</translation>
       <translation type="unfinished">OK</translation>
     </message>
     <message>
-      <source>Failed to install updates to servers:</source>
-      <translation type="unfinished">Failed to install updates to servers:</translation>
-    </message>
-    <message>
       <source>Downloading updates...</source>
       <translation type="unfinished">Downloading updates...</translation>
-    </message>
-    <message>
-      <source>Pushing updates...</source>
-      <translation type="unfinished">Pushing updates...</translation>
     </message>
     <message>
       <source>Upload</source>
@@ -8795,6 +8820,50 @@ to %1</translation>
       <source>Cancel update and delete all downloaded data?</source>
       <translation type="unfinished">Cancel update and delete all downloaded data?</translation>
     </message>
+    <message>
+      <source>There was an error while installing updates:</source>
+      <translation type="unfinished">There was an error while installing updates:</translation>
+    </message>
+    <message>
+      <source>Some servers have gone offline. Please wait until they become online to continue.</source>
+      <translation type="unfinished">Some servers have gone offline. Please wait until they become online to continue.</translation>
+    </message>
+    <message>
+      <source>Update completed, but some components have failed an update</source>
+      <translation type="unfinished">Update completed, but some components have failed an update</translation>
+    </message>
+    <message>
+      <source>Please update %1 manually using an installation package.</source>
+      <translation type="unfinished">Please update %1 manually using an installation package.</translation>
+    </message>
+    <message>
+      <source>%1 will be restarted to the updated version.</source>
+      <translation type="unfinished">%1 will be restarted to the updated version.</translation>
+    </message>
+    <message>
+      <source>Failed to download update packages to some components</source>
+      <translation type="unfinished">Failed to download update packages to some components</translation>
+    </message>
+    <message>
+      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
+      <translation type="unfinished">OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</translation>
+    </message>
+    <message>
+      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
+      <translation type="unfinished">OS version of the client is no longer supported. Please update its OS to a supported version.</translation>
+    </message>
+    <message>
+      <source>Failed to start update</source>
+      <translation type="unfinished">Failed to start update</translation>
+    </message>
+    <message>
+      <source>Starting update to ...</source>
+      <translation type="unfinished">Starting update to ...</translation>
+    </message>
+    <message>
+      <source>Some servers have no package available</source>
+      <translation type="unfinished">Some servers have no package available</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::MultipleLayoutSelectionDialog</name>
@@ -8821,6 +8890,26 @@ to %1</translation>
       <source>Acknowledge</source>
       <translation type="unfinished">Acknowledge</translation>
     </message>
+    <message>
+      <source>Generic Event</source>
+      <translation type="unfinished">Generic Event</translation>
+    </message>
+    <message>
+      <source>Device was disconnected</source>
+      <translation type="unfinished">Device was disconnected</translation>
+    </message>
+    <message>
+      <source>Camera was disconnected</source>
+      <translation type="unfinished">Camera was disconnected</translation>
+    </message>
+    <message>
+      <source>I/O Module was disconnected</source>
+      <translation type="unfinished">I/O Module was disconnected</translation>
+    </message>
+    <message>
+      <source>Unknown Plugin Diagnostic Event</source>
+      <translation type="unfinished">Unknown Plugin Diagnostic Event</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::NotificationListWidget::Private</name>
@@ -8840,10 +8929,6 @@ to %1</translation>
       <translation type="unfinished">None of selected users have access to the selected layout. Action will not work.</translation>
     </message>
     <message>
-      <source>Local layouts can only be shown to their owners. </source>
-      <translation type="unfinished">Local layouts can only be shown to their owners. </translation>
-    </message>
-    <message>
       <source>Select layout...</source>
       <translation type="unfinished">Select layout...</translation>
     </message>
@@ -8858,6 +8943,101 @@ to %1</translation>
     <message>
       <source>None of selected user roles contain users. Action will not work.</source>
       <translation type="unfinished">None of selected user roles contain users. Action will not work.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::PeerStateTracker</name>
+    <message>
+      <source>The server is taking too long to respond</source>
+      <translation type="unfinished">The server is taking too long to respond</translation>
+    </message>
+    <message>
+      <source>No update task</source>
+      <translation type="unfinished">No update task</translation>
+    </message>
+    <message>
+      <source>Ready to download update</source>
+      <translation type="unfinished">Ready to download update</translation>
+    </message>
+    <message>
+      <source>Downloading update</source>
+      <translation type="unfinished">Downloading update</translation>
+    </message>
+    <message>
+      <source>Ready to restart to the new version</source>
+      <translation type="unfinished">Ready to restart to the new version</translation>
+    </message>
+    <message>
+      <source>Installing update</source>
+      <translation type="unfinished">Installing update</translation>
+    </message>
+    <message>
+      <source>Installed</source>
+      <translation type="unfinished">Installed</translation>
+    </message>
+    <message>
+      <source>Failed to download update</source>
+      <translation type="unfinished">Failed to download update</translation>
+    </message>
+    <message>
+      <source>Failed to install update</source>
+      <translation type="unfinished">Failed to install update</translation>
+    </message>
+    <message>
+      <source>Waiting for peer data</source>
+      <translation type="unfinished">Waiting for peer data</translation>
+    </message>
+    <message>
+      <source>There is not enough space to download update files.</source>
+      <translation type="unfinished">There is not enough space to download update files.</translation>
+    </message>
+    <message>
+      <source>There is not enough space to extract update files.</source>
+      <translation type="unfinished">There is not enough space to extract update files.</translation>
+    </message>
+    <message>
+      <source>Failed to download update packages.</source>
+      <translation type="unfinished">Failed to download update packages.</translation>
+    </message>
+    <message>
+      <source>Update contents are invalid.</source>
+      <translation type="unfinished">Update contents are invalid.</translation>
+    </message>
+    <message>
+      <source>Update archive is corrupted.</source>
+      <translation type="unfinished">Update archive is corrupted.</translation>
+    </message>
+    <message>
+      <source>Update files cannot be extracted.</source>
+      <translation type="unfinished">Update files cannot be extracted.</translation>
+    </message>
+    <message>
+      <source>Internal downloader error.</source>
+      <translation type="unfinished">Internal downloader error.</translation>
+    </message>
+    <message>
+      <source>Iternal server error.</source>
+      <translation type="unfinished">Iternal server error.</translation>
+    </message>
+    <message>
+      <source>Internal client error.</source>
+      <translation type="unfinished">Internal client error.</translation>
+    </message>
+    <message>
+      <source>Unknown error.</source>
+      <translation type="unfinished">Unknown error.</translation>
+    </message>
+    <message>
+      <source>Unexpected error code.</source>
+      <translation type="unfinished">Unexpected error code.</translation>
+    </message>
+    <message>
+      <source>Ready to install update</source>
+      <translation type="unfinished">Ready to install update</translation>
+    </message>
+    <message>
+      <source>Update package is not found.</source>
+      <translation type="unfinished">Update package is not found.</translation>
     </message>
   </context>
   <context>
@@ -9003,16 +9183,79 @@ to %1</translation>
       <translation type="unfinished">Tracks and logs all user actions.</translation>
     </message>
     <message>
-      <source>User will be automatically logged out after this period of time.</source>
-      <translation type="unfinished">User will be automatically logged out after this period of time.</translation>
-    </message>
-    <message>
       <source>minutes</source>
       <translation type="unfinished">minutes</translation>
     </message>
     <message>
       <source>hours</source>
       <translation type="unfinished">hours</translation>
+    </message>
+    <message>
+      <source>Users will be automatically logged out if their session exceeds the specified duration.</source>
+      <translation type="unfinished">Users will be automatically logged out if their session exceeds the specified duration.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ServerSettingsDialogStore</name>
+    <message>
+      <source>Library</source>
+      <translation type="unfinished">Library</translation>
+    </message>
+    <message>
+      <source>Version</source>
+      <translation type="unfinished">Version</translation>
+    </message>
+    <message>
+      <source>Vendor</source>
+      <translation type="unfinished">Vendor</translation>
+    </message>
+    <message>
+      <source>no error</source>
+      <translation type="unfinished">no error</translation>
+    </message>
+    <message>
+      <source>library file cannot be loaded</source>
+      <translation type="unfinished">library file cannot be loaded</translation>
+    </message>
+    <message>
+      <source>invalid or incompatible plugin library</source>
+      <translation type="unfinished">invalid or incompatible plugin library</translation>
+    </message>
+    <message>
+      <source>plugin library failed to initialize</source>
+      <translation type="unfinished">plugin library failed to initialize</translation>
+    </message>
+    <message>
+      <source>plugin returned bad manifest</source>
+      <translation type="unfinished">plugin returned bad manifest</translation>
+    </message>
+    <message>
+      <source>plugin API version is no longer supported</source>
+      <translation type="unfinished">plugin API version is no longer supported</translation>
+    </message>
+    <message>
+      <source>unknown error</source>
+      <translation type="unfinished">unknown error</translation>
+    </message>
+    <message>
+      <source>Not loaded</source>
+      <translation type="unfinished">Not loaded</translation>
+    </message>
+    <message>
+      <source>Loaded</source>
+      <translation type="unfinished">Loaded</translation>
+    </message>
+    <message>
+      <source>plugin is in the black list</source>
+      <translation type="unfinished">plugin is in the black list</translation>
+    </message>
+    <message>
+      <source>Status</source>
+      <translation type="unfinished">Status</translation>
+    </message>
+    <message>
+      <source>plugin is optional and is not in the white list</source>
+      <translation type="unfinished">plugin is optional and is not in the white list</translation>
     </message>
   </context>
   <context>
@@ -9033,13 +9276,13 @@ to %1</translation>
       <source>Downloaded</source>
       <translation type="unfinished">Downloaded</translation>
     </message>
+    <message>
+      <source>Waiting for server to respond...</source>
+      <translation type="unfinished">Waiting for server to respond...</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerUpdatesModel</name>
-    <message>
-      <source>Current Version</source>
-      <translation type="unfinished">Current Version</translation>
-    </message>
     <message>
       <source>Status</source>
       <translation type="unfinished">Status</translation>
@@ -9059,6 +9302,10 @@ to %1</translation>
     <message>
       <source>Component</source>
       <translation type="unfinished">Component</translation>
+    </message>
+    <message>
+      <source>Installed Version</source>
+      <translation type="unfinished">Installed Version</translation>
     </message>
   </context>
   <context>
@@ -9362,6 +9609,26 @@ to %1</translation>
     <message>
       <source>Starting export...</source>
       <translation type="unfinished">Starting export...</translation>
+    </message>
+    <message>
+      <source>Saving layout</source>
+      <translation type="unfinished">Saving layout</translation>
+    </message>
+    <message>
+      <source>Stop Saving</source>
+      <translation type="unfinished">Stop Saving</translation>
+    </message>
+    <message>
+      <source>Saving failed</source>
+      <translation type="unfinished">Saving failed</translation>
+    </message>
+    <message>
+      <source>Starting saving...</source>
+      <translation type="unfinished">Starting saving...</translation>
+    </message>
+    <message>
+      <source>We are preparing files for the export process. Please wait for a few seconds.</source>
+      <translation type="unfinished">We are preparing files for the export process. Please wait for a few seconds.</translation>
     </message>
   </context>
   <context>
@@ -9760,6 +10027,28 @@ to %1</translation>
     <message>
       <source>This build is for testing purposes only.</source>
       <translation type="unfinished">This build is for testing purposes only.</translation>
+    </message>
+    <message>
+      <source>Open Server Settings</source>
+      <translation type="unfinished">Open Server Settings</translation>
+    </message>
+    <message>
+      <source>OK</source>
+      <translation type="unfinished">OK</translation>
+    </message>
+    <message>
+      <source>Confirm storage location to store analytics data on &apos;%1&apos;</source>
+      <translation type="unfinished">Confirm storage location to store analytics data on &apos;%1&apos;</translation>
+    </message>
+    <message>
+      <source>Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
+Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
+By default analytics data will be stored in mediaserver&apos;s installation directory.
+You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</source>
+      <translation type="unfinished">Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
+Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
+By default analytics data will be stored in mediaserver&apos;s installation directory.
+You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</translation>
     </message>
   </context>
   <context>

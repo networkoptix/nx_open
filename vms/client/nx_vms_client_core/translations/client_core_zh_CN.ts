@@ -37,7 +37,7 @@
     <message>
       <source>MB</source>
       <comment>Suffix for displaying megabytes</comment>
-      <translation type="unfinished">MB</translation>
+      <translation>MB</translation>
     </message>
     <message numerus="yes">
       <source>Gigabytes</source>
@@ -49,7 +49,7 @@
     <message>
       <source>GB</source>
       <comment>Suffix for displaying gigabytes</comment>
-      <translation type="unfinished">GB</translation>
+      <translation>GB</translation>
     </message>
     <message numerus="yes">
       <source>Terabytes</source>
@@ -61,7 +61,7 @@
     <message>
       <source>TB</source>
       <comment>Suffix for displaying terabytes</comment>
-      <translation type="unfinished">TB</translation>
+      <translation>TB</translation>
     </message>
     <message numerus="yes">
       <source>Petabytes</source>
@@ -74,13 +74,6 @@
       <source>PB</source>
       <comment>Suffix for displaying petabytes</comment>
       <translation type="unfinished">PB</translation>
-    </message>
-  </context>
-  <context>
-    <name>QObject</name>
-    <message>
-      <source>None</source>
-      <translation>无</translation>
     </message>
   </context>
   <context>
@@ -121,11 +114,11 @@
     <message>
       <source>%1 is temporary unavailable. Please try again later.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">%1 is temporary unavailable. Please try again later.</translation>
+      <translation>%1暂时无法使用，请稍后再试。</translation>
     </message>
     <message>
       <source>Network error. Please check your Internet connection and try again.</source>
-      <translation type="unfinished">Network error. Please check your Internet connection and try again.</translation>
+      <translation>网络错误。请检查您的互联网连接，然后重试。</translation>
     </message>
   </context>
   <context>

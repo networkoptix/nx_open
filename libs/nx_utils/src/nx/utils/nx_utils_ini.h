@@ -13,23 +13,23 @@ struct NX_UTILS_API Ini: nx::kit::IniConfig
         static constexpr int kDefaultAssertCrash = 1;
         static constexpr int kDefaultAssertHeavyCondition = 1;
         static constexpr int kShowPasswordsInLogs = 1;
-        static constexpr int kLogLevelReducerPassLimit = 5;
-        static constexpr int kLogLevelReducerWindowSizeS = 1;
+        static constexpr int kLogLevelReducerPassLimit = 100;
+        static constexpr int kLogLevelReducerWindowSizeS = 20;
     #else
         static constexpr const char* kDefaultMutexImplementation = "qt";
         static constexpr int kDefaultAssertCrash = 0;
         static constexpr int kDefaultAssertHeavyCondition = 0;
         static constexpr int kShowPasswordsInLogs = 0;
-        static constexpr int kLogLevelReducerPassLimit = 10;
-        static constexpr int kLogLevelReducerWindowSizeS = 60;
+        static constexpr int kLogLevelReducerPassLimit = 100;
+        static constexpr int kLogLevelReducerWindowSizeS = 600;
     #endif
 
     NX_INI_STRING(kDefaultMutexImplementation, mutexImplementation,
         "Mutex implementation:\n"
         "qt - fastest, default for release;\n"
-        "std - average speed, usefull for valgrind;\n"
+        "std - average speed, useful for valgrind;\n"
         "debug - average speed, provides more info for debugger, default for debug;\n"
-        "analyze - very slow, analyses metexes for deadlocks.");
+        "analyze - very slow, analyses mutexes for deadlocks.");
 
     NX_INI_FLAG(kDefaultAssertCrash, assertCrash,
         "Crash application on assertion failure.");

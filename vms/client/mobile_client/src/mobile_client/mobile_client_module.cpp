@@ -43,8 +43,6 @@
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/cloud/tunnel/outgoing_tunnel_pool.h>
 #include <nx/network/socket_global.h>
-#include <nx/mobile_client/settings/migration_helper.h>
-#include <nx/mobile_client/settings/settings_migration.h>
 #include <nx/client/mobile/software_trigger/event_rules_watcher.h>
 #include <nx/client/core/watchers/known_server_connections.h>
 #include <nx/client/core/watchers/server_time_watcher.h>
@@ -61,10 +59,7 @@
 #include <client/client_resource_processor.h>
 #include <utils/media/voice_spectrum_analyzer.h>
 
-
-using namespace nx::mobile_client;
-
-static const QString kQmlRoot = QStringLiteral("qrc:///qml");
+static const QString kQmlRoot = "qrc:///qml";
 
 template<typename BaseType>
 BaseType extract(const QSharedPointer<BaseType>& pointer)
@@ -93,7 +88,6 @@ QnMobileClientModule::QnMobileClientModule(
 
     /* Init singletons. */
     const auto settings = new QnMobileClientSettings();
-    settings::migrateSettings(); //< This must be done before QnClientCoreModule construction!
 
     m_clientCoreModule.reset(new QnClientCoreModule());
     auto commonModule = m_clientCoreModule->commonModule();
@@ -160,7 +154,6 @@ QnMobileClientModule::QnMobileClientModule(
     commonModule->instance<QnSystemsFinder>();
     commonModule->store(new QnSystemsWeightsManager());
 
-    commonModule->store(new settings::SessionsMigrationHelper());
     commonModule->store(new QnVoiceSpectrumAnalyzer());
     commonModule->store(new nx::vms::client::core::ServerTimeWatcher());
 
@@ -197,16 +190,14 @@ QnMobileClientModule::QnMobileClientModule(
     auto qmlRoot = startupParameters.qmlRoot.isEmpty() ? kQmlRoot : startupParameters.qmlRoot;
     if (!qmlRoot.endsWith(L'/'))
         qmlRoot.append(L'/');
-    NX_INFO(this, lm("Setting QML root to %1").arg(qmlRoot));
+    NX_INFO(this, "Setting QML root to %1", qmlRoot);
 
     m_clientCoreModule->mainQmlEngine()->setBaseUrl(
-        qmlRoot.startsWith(lit("qrc:"))
-            ? QUrl(qmlRoot)
-            : QUrl::fromLocalFile(qmlRoot));
+        qmlRoot.startsWith("qrc:") ? QUrl(qmlRoot) : QUrl::fromLocalFile(qmlRoot));
     m_clientCoreModule->mainQmlEngine()->addImportPath(qmlRoot);
 
-    if (QnAppInfo::applicationPlatform() == lit("ios"))
-        m_clientCoreModule->mainQmlEngine()->addImportPath(lit("qt_qml"));
+    if (QnAppInfo::applicationPlatform() == "ios")
+        m_clientCoreModule->mainQmlEngine()->addImportPath("qt_qml");
 
     m_context.reset(new QnContext());
     const auto eventRulesWatcher = commonModule->store(new nx::client::mobile::EventRulesWatcher());

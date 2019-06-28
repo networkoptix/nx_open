@@ -1,10 +1,14 @@
 #include "object_detection_metadata.h"
 
+#include <QtCore/QRegularExpression>
+
 #include <nx/kit/debug.h>
 
 #include <nx/fusion/model_functions.h>
 #include <nx/streaming/media_data_packet.h>
 #include <nx/utils/log/log_message.h>
+
+#include <utils/math/math.h>
 
 namespace nx {
 namespace common {
@@ -38,7 +42,7 @@ bool operator==(const DetectedObject& left, const DetectedObject& right)
 {
     return left.objectTypeId == right.objectTypeId
         && left.objectId == right.objectId
-        && left.boundingBox == right.boundingBox
+        && equalWithPrecision(left.boundingBox, right.boundingBox, kCoordinateDecimalDigits)
         && left.labels == right.labels;
 }
 
@@ -53,6 +57,8 @@ QString toString(const DetectedObject& object)
         + ", typeId " + object.objectTypeId
         + ", attributes {";
 
+    const QRegularExpression kExpectedCharsOnlyRegex("\\A[A-Za-z_0-9.]+\\z");
+
     bool isFirstAttribute = true;
     for (const auto& attribute: object.labels)
     {
@@ -63,7 +69,6 @@ QString toString(const DetectedObject& object)
 
         // If attribute.name is empty or contains chars other than letters, underscores, digits, or
         // dots, then properly enquote it with escaping.
-        static const QRegularExpression kExpectedCharsOnlyRegex("\\A[A-Za-z_0-9.]+\\z");
         if (kExpectedCharsOnlyRegex.match(attribute.name).hasMatch())
             s += attribute.name;
         else
@@ -75,6 +80,7 @@ QString toString(const DetectedObject& object)
     }
 
     s += "}";
+    s += QString(", isBestShot ") + (object.bestShot ? "true" : "false");
     return s;
 }
 

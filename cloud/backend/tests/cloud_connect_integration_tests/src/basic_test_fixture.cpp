@@ -8,6 +8,7 @@
 #include <nx/network/stream_server_socket_to_acceptor_wrapper.h>
 #include <nx/network/url/url_builder.h>
 
+#include <nx/cloud/mediator/listening_peer_db.h>
 #include <nx/cloud/mediator/listening_peer_pool.h>
 #include <nx/cloud/mediator/mediator_service.h>
 #include <nx/cloud/relay/model/remote_relay_peer_pool.h>
@@ -19,11 +20,11 @@ namespace network {
 namespace cloud {
 namespace test {
 
-class TrtafficBlocker:
+class TrafficBlocker:
     public nx::utils::bstream::AbstractOutputConverter
 {
 public:
-    TrtafficBlocker(
+    TrafficBlocker(
         int connectionNumber,
         std::atomic<int>* blockedConnectionNumber)
         :
@@ -65,38 +66,89 @@ std::optional<hpm::api::SystemCredentials>
 
 //-------------------------------------------------------------------------------------------------
 
+MemoryRemoteRelayPeerPool::MemoryRemoteRelayPeerPool(
+    const nx::cloud::relay::conf::Settings& settings,
+    BasicTestFixture* relayTest)
+    :
+    base_type(settings),
+    m_relayTest(relayTest)
+{
+}
+
 void MemoryRemoteRelayPeerPool::addPeer(
     const std::string& domainName,
     nx::utils::MoveOnlyFunc<void(bool /*result*/)> handler)
 {
-    m_relayTest->peerAdded(domainName);
-    return handler(true);
-}
-
-bool MemoryRemoteRelayPeerPool::connectToDb()
-{
-    return true;
-}
-
-bool MemoryRemoteRelayPeerPool::isConnected() const
-{
-    return true;
+    base_type::addPeer(
+        domainName,
+        [this, domainName, handler = std::move(handler)](bool added)
+        {
+            if (added)
+                m_relayTest->peerAdded(domainName);
+            handler(added);
+        });
 }
 
 void MemoryRemoteRelayPeerPool::removePeer(
     const std::string& domainName,
     nx::utils::MoveOnlyFunc<void(bool /*result*/)> handler)
 {
-    m_relayTest->peerRemoved(domainName);
-    return handler(true);
+    base_type::removePeer(
+        domainName,
+        [this, domainName, handler = std::move(handler)](bool removed)
+        {
+            if (removed)
+                m_relayTest->peerRemoved(domainName);
+            handler(removed);
+        });
 }
 
-void MemoryRemoteRelayPeerPool::findRelayByDomain(
-    const std::string& /*domainName*/,
-    nx::utils::MoveOnlyFunc<void(std::string /*relay hostname/ip*/)> handler) const
+//-------------------------------------------------------------------------------------------------
+
+
+MediatorConnectorCluster::Context::Context(
+    nx::hpm::MediatorInstance& mediator,
+    const QString& cloudHost)
+    :
+    mediator(mediator),
+    connector(cloudHost.toStdString())
 {
-    auto redirectToEndpoint = m_relayTest->relayInstanceEndpoint(0).toStdString();
-    return handler(std::move(redirectToEndpoint));
+}
+
+MediatorConnectorCluster::MediatorConnectorCluster(
+    const nx::utils::Url& discoveryServiceUrl)
+    :
+    m_cluster(discoveryServiceUrl)
+{
+}
+
+MediatorConnectorCluster::Context& MediatorConnectorCluster::addContext(
+    const std::vector<const char*> args,
+    int flags,
+    const QString& testDir,
+    const QString& cloudHost)
+{
+    auto context = std::make_unique<Context>(
+        m_cluster.addMediator(args, flags, testDir),
+        !cloudHost.isEmpty() ? cloudHost : AppInfo::defaultCloudHostName());
+
+    m_mediators.emplace_back(std::move(context));
+    return *m_mediators.back();
+}
+
+MediatorConnectorCluster::Context& MediatorConnectorCluster::context(int index)
+{
+    return *m_mediators[index];
+}
+
+nx::hpm::test::MediatorCluster& MediatorConnectorCluster::cluster()
+{
+    return m_cluster;
+}
+
+const nx::hpm::test::MediatorCluster& MediatorConnectorCluster::cluster() const
+{
+    return m_cluster;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -105,17 +157,34 @@ BasicTestFixture::BasicTestFixture(
     int relayCount,
     std::optional<std::chrono::seconds> disconnectedPeerTimeout)
     :
+    base_type("cloud_connect_integration"),
     m_staticMsgBody("Hello, hren!"),
-    m_mediator(
-        nx::hpm::MediatorFunctionalTest::allFlags &
-            ~nx::hpm::MediatorFunctionalTest::initializeConnectivity),
     m_unfinishedRequestsLeft(0),
     m_relayCount(relayCount),
     m_disconnectedPeerTimeout(disconnectedPeerTimeout)
 {
-    m_mediator.setUseProxy(true);
-    m_mediator.addArg("-stun/addrToListenList", "127.0.0.1:0");
-    m_mediator.addArg("-http/addrToListenList", "127.0.0.1:0");
+    NX_ASSERT(m_discoveryServer.bindAndListen());
+    m_discoveryServiceUrl = m_discoveryServer.url().toStdString();
+
+    m_mediatorCluster = std::make_unique<MediatorConnectorCluster>(m_discoveryServer.url());
+    m_relayCluster =
+        std::make_unique<nx::cloud::relay::test::TrafficRelayCluster>(m_discoveryServer.url());
+
+    addMediator();
+}
+
+BasicTestFixture::~BasicTestFixture()
+{
+    std::list<std::unique_ptr<nx::network::http::AsyncClient>> httpClients;
+    {
+        QnMutexLocker lock(&m_mutex);
+        httpClients.swap(m_httpClients);
+    }
+
+    for (const auto& httpClient : httpClients)
+        httpClient->pleaseStopSync();
+
+    m_httpServer.reset();
 }
 
 void BasicTestFixture::setUpPublicIpFactoryFunc()
@@ -128,25 +197,11 @@ void BasicTestFixture::setUpRemoteRelayPeerPoolFactoryFunc()
 {
     using namespace nx::cloud::relay::model;
     auto createRemoteRelayPeerPoolFunc =
-        [this](const conf::Settings&)
+        [this](const conf::Settings& settings)
         {
-            return std::make_unique<MemoryRemoteRelayPeerPool>(this);
+            return std::make_unique<MemoryRemoteRelayPeerPool>(settings, this);
         };
     RemoteRelayPeerPoolFactory::instance().setCustomFunc(createRemoteRelayPeerPoolFunc);
-}
-
-BasicTestFixture::~BasicTestFixture()
-{
-    std::list<std::unique_ptr<nx::network::http::AsyncClient>> httpClients;
-    {
-        QnMutexLocker lock(&m_mutex);
-        httpClients.swap(m_httpClients);
-    }
-
-    for (const auto& httpClient: httpClients)
-        httpClient->pleaseStopSync();
-
-    m_httpServer.reset();
 }
 
 void BasicTestFixture::setInitFlags(int flags)
@@ -154,9 +209,9 @@ void BasicTestFixture::setInitFlags(int flags)
     m_initFlags = flags;
 }
 
-network::SocketAddress BasicTestFixture::relayInstanceEndpoint(RelayPtrList::size_type index) const
+network::SocketAddress BasicTestFixture::relayInstanceEndpoint(int index) const
 {
-    return m_relays[index]->moduleInstance()->httpEndpoints()[0];
+    return m_relayCluster->relay(index).httpEndpoint(0);
 }
 
 void BasicTestFixture::addRelayStartupArgument(
@@ -172,46 +227,96 @@ void BasicTestFixture::SetUp()
     setUpRemoteRelayPeerPoolFactoryFunc();
     startRelays();
 
-    ASSERT_EQ(m_relayCount, m_relays.size());
+    ASSERT_EQ(m_relayCount, m_relayCluster->size());
 
     startMediator();
 
     startCloudModulesXmlProvider();
 }
 
+nx::cloud::discovery::test::DiscoveryServer& BasicTestFixture::discoveryServer()
+{
+    return m_discoveryServer;
+}
+
 //-------------------------------------------------------------------------------------------------
 // Mediator.
 
-void BasicTestFixture::startMediator()
+void BasicTestFixture::addMediator()
 {
-    if (!m_relays.empty())
-        m_mediator.addArg("-trafficRelay/url", relayUrl().toString().toStdString().c_str());
+    auto& mediatorContext = m_mediatorCluster->addContext({
+            "-stun/addrToListenList", "127.0.0.1:0",
+            "-http/addrToListenList", "127.0.0.1:0",
+            "-trafficRelay/clusterId", m_relayCluster->clusterId().c_str(),
+            "-trafficRelay/cluster/discovery/enabled", "true",
+            "-trafficRelay/cluster/discovery/discoveryServiceUrl", m_discoveryServiceUrl.c_str(),
+            "-trafficRelay/cluster/discovery/roundTripPadding", "1ms",
+            "-trafficRelay/cluster/discovery/registrationErrorDelay", "1ms",
+            "-trafficRelay/cluster/discovery/onlineNodesRequestDelay", "1ms"
+        },
+        nx::hpm::MediatorInstance::allFlags &
+            ~nx::hpm::MediatorInstance::initializeConnectivity,
+        testDataDir() + QString("/mediator_%1").arg(mediatorCluster().size()));
+    mediatorContext.mediator.setUseProxy(true);
+}
 
-    ASSERT_TRUE(m_mediator.startAndWaitUntilStarted());
+int BasicTestFixture::mediatorCount() const
+{
+    return m_mediatorCluster->cluster().size();
+}
+
+void BasicTestFixture::startMediator(int index)
+{
+    if (!m_relayCluster->empty())
+    {
+        std::string relayUrls;
+        for (int i = 0; i < m_relayCluster->size(); ++i)
+            relayUrls.append(relayUrl(i).toStdString()).append(",");
+        relayUrls.pop_back(); //< dropping final comma
+
+        mediator(index).addArg("-trafficRelay/url", relayUrls.c_str());
+    }
+
+    ASSERT_TRUE(mediator(index).startAndWaitUntilStarted());
+
+    auto& context = mediatorContext(index);
+    context.connector.mockupMediatorAddress({
+        context.mediator.httpUrl(),
+        context.mediator.stunUdpEndpoint()});
 
     if (m_proxyBeforeMediator)
     {
         switch (m_mediatorApiProtocol)
         {
             case MediatorApiProtocol::stun:
-                m_proxyBeforeMediator->proxy.setProxyDestination(m_mediator.stunTcpEndpoint());
+                m_proxyBeforeMediator->proxy.setProxyDestination(mediator(index).stunTcpEndpoint());
                 break;
 
             case MediatorApiProtocol::http:
-                m_proxyBeforeMediator->proxy.setProxyDestination(m_mediator.httpEndpoint());
+                m_proxyBeforeMediator->proxy.setProxyDestination(mediator(index).httpEndpoint());
                 break;
         }
     }
 }
 
-void BasicTestFixture::restartMediator()
+void BasicTestFixture::restartMediator(int index)
 {
-    m_mediator.restart();
+    mediator(index).restart();
 }
 
-nx::hpm::MediatorFunctionalTest& BasicTestFixture::mediator()
+const nx::hpm::test::MediatorCluster& BasicTestFixture::mediatorCluster() const
 {
-    return m_mediator;
+    return m_mediatorCluster->cluster();
+}
+
+nx::hpm::MediatorInstance& BasicTestFixture::mediator(int index)
+{
+    return m_mediatorCluster->context(index).mediator;
+}
+
+MediatorConnectorCluster::Context& BasicTestFixture::mediatorContext(int index)
+{
+    return m_mediatorCluster->context(index);
 }
 
 void BasicTestFixture::setMediatorApiProtocol(MediatorApiProtocol mediatorApiProtocol)
@@ -232,7 +337,7 @@ void BasicTestFixture::configureProxyBeforeMediator()
     m_proxyBeforeMediator->proxy.setDownStreamConverterFactory(
         [proxyContext = m_proxyBeforeMediator.get()]()
         {
-            return std::make_unique<TrtafficBlocker>(
+            return std::make_unique<TrafficBlocker>(
                 ++proxyContext->lastConnectionNumber,
                 &proxyContext->blockedConnectionNumber);
         });
@@ -296,43 +401,39 @@ void BasicTestFixture::startRelays()
 
 void BasicTestFixture::startRelay(int index)
 {
-    auto newRelay = std::make_unique<Relay>();
+    auto& newRelay = m_relayCluster->addRelay();
 
-    std::string endpointString = "127.0.0.1:0";
-    newRelay->addArg("-http/listenOn", endpointString.c_str());
-
-    std::string dataDirString = std::string("relay_") + std::to_string(index);
-    newRelay->addArg("-dataDir", dataDirString.c_str());
+    const auto dataDirString = lm("%1/relay_%2").args(testDataDir(), index).toStdString();
+    newRelay.addArg("-dataDir", dataDirString.c_str());
 
     for (const auto& argument : m_relayStartupArguments)
     {
-        newRelay->removeArgByName(argument.name.c_str());
-        newRelay->addArg(
+        newRelay.removeArgByName(argument.name.c_str());
+        newRelay.addArg(
             lm("--%1=%2").args(argument.name, argument.value).toStdString().c_str());
     }
 
     if ((bool)m_disconnectedPeerTimeout)
     {
-        newRelay->addArg(
+        newRelay.addArg(
             "-listeningPeer/disconnectedPeerTimeout",
             std::to_string(m_disconnectedPeerTimeout->count()).c_str());
     }
 
-    ASSERT_TRUE(newRelay->startAndWaitUntilStarted());
-    m_relays.push_back(std::move(newRelay));
+    ASSERT_TRUE(newRelay.startAndWaitUntilStarted());
 }
 
-nx::cloud::relay::test::Launcher& BasicTestFixture::trafficRelay()
+nx::cloud::relay::test::TrafficRelay& BasicTestFixture::trafficRelay(int index)
 {
-    return *m_relays[0];
+    return m_relayCluster->relay(index);
 }
 
 nx::utils::Url BasicTestFixture::relayUrl(int relayNum) const
 {
-    NX_ASSERT(relayNum < (int)m_relays.size());
+    NX_ASSERT(relayNum < (int)m_relayCluster->size());
 
-    const auto& httpEndpoints = m_relays[relayNum]->moduleInstance()->httpEndpoints();
-    const auto& httpsEndpoints = m_relays[relayNum]->moduleInstance()->httpsEndpoints();
+    const auto& httpEndpoints = m_relayCluster->relay(relayNum).moduleInstance()->httpEndpoints();
+    const auto& httpsEndpoints = m_relayCluster->relay(relayNum).moduleInstance()->httpsEndpoints();
 
     if (!httpEndpoints.empty())
     {
@@ -346,26 +447,34 @@ nx::utils::Url BasicTestFixture::relayUrl(int relayNum) const
             .setScheme(network::http::kSecureUrlSchemeName)
             .setEndpoint(httpsEndpoints[0]);
     }
-    else
-    {
-        return nx::utils::Url();
-    }
+
+    return nx::utils::Url();
+}
+
+std::string BasicTestFixture::relayClusterId() const
+{
+    return m_relayCluster->clusterId();
+}
+
+int BasicTestFixture::relayClusterSize() const
+{
+    return m_relayCluster->size();
 }
 
 //-------------------------------------------------------------------------------------------------
 // Listening server.
 
-void BasicTestFixture::startServer()
+void BasicTestFixture::startServer(int mediatorIndex)
 {
-    auto cloudSystemCredentials = m_mediator.addRandomSystem();
+    auto cloudSystemCredentials = m_mediatorCluster->cluster().addRandomSystem();
 
     m_cloudSystemCredentials.systemId = cloudSystemCredentials.id;
     m_cloudSystemCredentials.serverId = QnUuid::createUuid().toSimpleByteArray();
     m_cloudSystemCredentials.key = cloudSystemCredentials.authKey;
 
-    SocketGlobals::cloud().mediatorConnector().setSystemCredentials(m_cloudSystemCredentials);
+    mediatorContext(mediatorIndex).connector.setSystemCredentials(m_cloudSystemCredentials);
 
-    startHttpServer();
+    startHttpServer(&mediatorContext(mediatorIndex).connector);
 }
 
 void BasicTestFixture::stopServer()
@@ -394,7 +503,7 @@ void BasicTestFixture::stopCloud()
 {
     m_cloudModulesXmlProvider.httpMessageDispatcher().clear();
     mediator().stop();
-    m_relays.clear();
+    m_relayCluster->clear();
 }
 
 void BasicTestFixture::startCloud()
@@ -469,18 +578,16 @@ void BasicTestFixture::assertDataHasBeenExchangedCorrectly()
     }
 }
 
-void BasicTestFixture::waitUntilServerIsRegisteredOnMediator()
+nx::hpm::MediatorEndpoint BasicTestFixture::waitUntilServerIsRegisteredOnMediator()
 {
-    for (;;)
+    std::string systemId = m_cloudSystemCredentials.systemId.toStdString();
+    auto endpoint = m_mediatorCluster->cluster().lookupMediatorEndpoint(systemId);
+    while (!endpoint)
     {
-        if (!m_mediator.moduleInstance()->impl()->listeningPeerPool()->findPeersBySystemId(
-                m_cloudSystemCredentials.systemId).empty())
-        {
-            break;
-        }
-
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        endpoint = m_mediatorCluster->cluster().lookupMediatorEndpoint(systemId);
     }
+    return *endpoint;
 }
 
 void BasicTestFixture::waitUntilServerIsRegisteredOnTrafficRelay()
@@ -495,7 +602,7 @@ void BasicTestFixture::waitUntilServerIsUnRegisteredOnTrafficRelay()
 
 void BasicTestFixture::waitForServerStatusOnRelay(ServerRelayStatus status)
 {
-    const auto& listeningPool = m_relays[0]->moduleInstance()->listeningPeerPool();
+    const auto& listeningPool = m_relayCluster->relay(0).moduleInstance()->listeningPeerPool();
     auto serverId = m_cloudSystemCredentials.systemId.toStdString();
     auto getServerStatus = [&]() { return listeningPool.isPeerOnline(serverId); };
 
@@ -528,8 +635,8 @@ void BasicTestFixture::initializeCloudModulesXmlWithDirectStunPort()
     m_cloudModulesXmlProvider.registerStaticProcessor(
         kCloudModulesXmlPath,
         lm(kCloudModulesXmlTemplate).args(
-            m_proxyBeforeMediator ? m_proxyBeforeMediator->endpoint : m_mediator.stunTcpEndpoint(),
-            m_mediator.stunUdpEndpoint()).toUtf8(),
+            m_proxyBeforeMediator ? m_proxyBeforeMediator->endpoint : mediator().stunTcpEndpoint(),
+            mediator().stunUdpEndpoint()).toUtf8(),
         "application/xml");
 }
 
@@ -545,15 +652,14 @@ void BasicTestFixture::initializeCloudModulesXmlWithStunOverHttp()
     m_cloudModulesXmlProvider.registerStaticProcessor(
         kCloudModulesXmlPath,
         lm(kCloudModulesXmlTemplate)
-            .args(m_proxyBeforeMediator ? m_proxyBeforeMediator->endpoint : m_mediator.httpEndpoint(),
-                nx::hpm::api::kMediatorApiPrefix, m_mediator.stunUdpEndpoint()).toUtf8(),
+            .args(m_proxyBeforeMediator ? m_proxyBeforeMediator->endpoint : mediator().httpEndpoint(),
+                nx::hpm::api::kMediatorApiPrefix, mediator().stunUdpEndpoint()).toUtf8(),
         "application/xml");
 }
 
-void BasicTestFixture::startHttpServer()
+void BasicTestFixture::startHttpServer(nx::hpm::api::MediatorConnector* connector)
 {
-    auto cloudServerSocket = std::make_unique<CloudServerSocket>(
-        &SocketGlobals::cloud().mediatorConnector());
+    auto cloudServerSocket = std::make_unique<CloudServerSocket>(connector);
 
     m_httpServer = std::make_unique<nx::network::http::TestHttpServer>(std::move(cloudServerSocket));
     m_httpServer->registerStaticProcessor("/static", m_staticMsgBody, "text/plain");
@@ -561,7 +667,7 @@ void BasicTestFixture::startHttpServer()
 
     ASSERT_TRUE(m_httpServer->bindAndListen());
 
-    if (!m_relays.empty())
+    if (!m_relayCluster->empty())
         waitUntilServerIsRegisteredOnTrafficRelay();
 }
 

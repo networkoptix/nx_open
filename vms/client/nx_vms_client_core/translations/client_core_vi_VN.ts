@@ -77,13 +77,6 @@
     </message>
   </context>
   <context>
-    <name>QObject</name>
-    <message>
-      <source>None</source>
-      <translation>Không</translation>
-    </message>
-  </context>
-  <context>
     <name>QnCloudResultInfo</name>
     <message>
       <source>Successful.</source>
@@ -116,7 +109,7 @@
     </message>
     <message>
       <source>Too many attempts. Try again in a minute.</source>
-      <translation type="unfinished">Too many attempts. Try again in a minute.</translation>
+      <translation>Quá nhiều lần thử. Vui lòng thử lại sau một phút.</translation>
     </message>
     <message>
       <source>%1 is temporary unavailable. Please try again later.</source>

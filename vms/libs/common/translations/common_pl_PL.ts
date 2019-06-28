@@ -109,7 +109,7 @@
     <message>
       <source>Cloud systems have different owners. Merge is not allowed.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Cloud systems have different owners. Merge is not allowed.</translation>
+      <translation>Systemy w chmurze mają różnych właścicieli. Złączenie nie jest możliwe.</translation>
     </message>
   </context>
   <context>
@@ -1414,7 +1414,7 @@
     <message>
       <source>%2 &lt;b&gt;%1&lt;/b&gt;</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation type="unfinished">%2 &lt;b&gt;%1&lt;/b&gt;</translation>
+      <translation>%2 &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message numerus="yes">
       <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
@@ -1642,14 +1642,6 @@
       <translation>Otwórz układ</translation>
     </message>
     <message>
-      <source>Plugin Event</source>
-      <translation>Zdarzenie wtyczki</translation>
-    </message>
-    <message>
-      <source>Unknown plugin event</source>
-      <translation>Nieznane zdarzenie wtyczki</translation>
-    </message>
-    <message>
       <source>Failed to force using camera time, it lags too much, system time will be used</source>
       <translation>Nie można wymusić użycia czasu kamery z powodu opóźnień, zostanie wykorzystany czas systemowy</translation>
     </message>
@@ -1659,7 +1651,35 @@
     </message>
     <message>
       <source>Multiple %1 events have occurred</source>
-      <translation type="unfinished">Multiple %1 events have occurred</translation>
+      <translation>Wystąpiło wiele zdarzeń %1</translation>
+    </message>
+    <message>
+      <source>Multicast address conflict detected. Address %1 is already in use by %2 on %3 stream</source>
+      <translation>Wykryto konflikt adresów multicastowych. Adres %1 jest już używany przez %2 na strumieniu %3</translation>
+    </message>
+    <message>
+      <source>Network address %1 is not a multicast address</source>
+      <translation>Adres sieciowy %1 nie jest adresem multicastowym</translation>
+    </message>
+    <message>
+      <source>Analytics storage &quot;%1&quot; is offline.</source>
+      <translation>Archiwum analityki &quot;%1&quot; jest offline.</translation>
+    </message>
+    <message>
+      <source>Analytics storage &quot;%1&quot; is almost full.</source>
+      <translation>Archiwum analityki &quot;%1&quot; jest prawie pełne.</translation>
+    </message>
+    <message>
+      <source>Plugin Diagnostic Event</source>
+      <translation>Zdarzenie diagnostyczne wtyczki</translation>
+    </message>
+    <message>
+      <source>Unknown Plugin Diagnostic Event</source>
+      <translation>Nieznane zdarzenie diagnostyczne wtyczki</translation>
+    </message>
+    <message>
+      <source>RAID error. %1.</source>
+      <translation>Błąd RAID %1</translation>
     </message>
   </context>
   <context>

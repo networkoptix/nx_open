@@ -159,6 +159,7 @@ private:
 
             const auto removedNodeIter =
                 std::remove(nodeIds.begin(), nodeIds.end(), nodeDescriptor.name.peerId);
+            ASSERT_NE(nodeIds.end(), removedNodeIter);
             ASSERT_EQ(1, nodeIds.end() - removedNodeIter);
 
             nodeIds.erase(removedNodeIter, nodeIds.end());

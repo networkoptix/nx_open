@@ -3,6 +3,7 @@
 #include "utils/common/synctime.h"
 #include "nx/streaming/archive_stream_reader.h"
 #include "core/resource/avi/avi_archive_delegate.h"
+#include "core/resource/resource.h"
 
 QnSignDialogDisplay::QnSignDialogDisplay(QnMediaResourcePtr resource):
     QnCamDisplay(resource, 0),
@@ -26,6 +27,7 @@ void QnSignDialogDisplay::finalizeSign()
 {
     QByteArray signFromPicture;
     QByteArray calculatedSign;
+    QByteArray calculatedSign2; //< new version of signature
 #ifdef SIGN_FRAME_ENABLED
     calculatedSign = m_mdctx.result();
     QSharedPointer<CLVideoDecoderOutput> lastFrame = m_display[0]->flush(QnFrameScaler::factor_any, 0);
@@ -38,8 +40,12 @@ void QnSignDialogDisplay::finalizeSign()
         if (aviFile)
         {
             auto signPattern = aviFile->metadata().signature;
+            if (signPattern.isEmpty())
+                signPattern = QnSignHelper::loadSignatureFromFileEnd(m_reader->getResource()->getUrl());
             if (!signPattern.isEmpty())
             {
+                calculatedSign2 = m_mediaSigner.buildSignature(signPattern);
+
                 QByteArray baPattern = QByteArray(signPattern).trimmed();
                 QByteArray magic = QnSignHelper::getSignMagic();
                 QList<QByteArray> patternParams = baPattern.split(QnSignHelper::getSignPatternDelim());
@@ -62,7 +68,7 @@ void QnSignDialogDisplay::finalizeSign()
     }
 #endif
     emit calcSignInProgress(calculatedSign, 100);
-    emit gotSignature(calculatedSign, signFromPicture);
+    emit gotSignature(calculatedSign, calculatedSign2, signFromPicture);
 }
 
 bool QnSignDialogDisplay::processData(const QnAbstractDataPacketPtr& data)
@@ -100,7 +106,7 @@ bool QnSignDialogDisplay::processData(const QnAbstractDataPacketPtr& data)
         else
         {
             emit calcSignInProgress(QByteArray(), 100);
-            emit gotSignature(QByteArray(), QByteArray());
+            emit gotSignature(QByteArray(), QByteArray(), QByteArray());
         }
     }
     else if (video || audio)
@@ -112,6 +118,9 @@ bool QnSignDialogDisplay::processData(const QnAbstractDataPacketPtr& data)
         {
             const quint8* data = (const quint8*)media->data();
             QnSignHelper::updateDigest(media->context, m_mdctx, data, static_cast<int>(media->dataSize()));
+            // build new version of signature
+            m_mediaSigner.processMedia(
+                media->context, data, static_cast<int>(media->dataSize()), media->dataType);
         }
 #else
         // update digest from previous frames because of last frame it is sign frame itself

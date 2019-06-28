@@ -19,12 +19,16 @@ nx::sdk::Ptr<nx::sdk::IStringMap> loadSettingsFromFile(
     const QString& fileDescription,
     const QString& filename);
 
+/** @return Null if the properly named file was not found in the specified dir. */
 nx::sdk::Ptr<nx::sdk::IStringMap> loadDeviceAgentSettingsFromFile(
     const QnVirtualCameraResourcePtr& device,
-    const nx::vms::server::resource::AnalyticsEngineResourcePtr& engine);
+    const nx::vms::server::resource::AnalyticsEngineResourcePtr& engine,
+    const char* fileDir);
 
+/** @return Null if the properly named file was not found in the specified dir. */
 nx::sdk::Ptr<nx::sdk::IStringMap> loadEngineSettingsFromFile(
-    const nx::vms::server::resource::AnalyticsEngineResourcePtr& engine);
+    const nx::vms::server::resource::AnalyticsEngineResourcePtr& engine,
+    const char* fileDir);
 
 QString nameOfFileToDumpOrLoadData(
     const QnVirtualCameraResourcePtr& device,

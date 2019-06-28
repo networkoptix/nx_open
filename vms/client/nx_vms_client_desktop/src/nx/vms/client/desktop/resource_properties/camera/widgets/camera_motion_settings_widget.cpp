@@ -3,6 +3,7 @@
 #include "../redux/camera_settings_dialog_state.h"
 #include "../redux/camera_settings_dialog_store.h"
 
+#include <QtQml/QQmlContext>
 #include <QtQuick/QQuickItem>
 #include <QtQuick/QQuickView>
 #include <QtQuickWidgets/QQuickWidget>
@@ -106,10 +107,11 @@ CameraMotionSettingsWidget::CameraMotionSettingsWidget(
             motionItem->setProperty("cameraMotionHelper", QVariant::fromValue(m_motionHelper.data()));
             motionItem->setProperty("currentSensitivity", m_sensitivityButtons->checkedId());
             motionItem->setProperty("sensitivityColors", QVariant::fromValue(m_sensitivityColors));
-            motionItem->setProperty("maxTextureSize",
-                QnGlFunctions::estimatedInteger(GL_MAX_TEXTURE_SIZE));
             motionItem->setProperty("visible", QVariant::fromValue(false));
     });
+
+    m_motionView->rootContext()->setContextProperty("maxTextureSize",
+        QnGlFunctions::estimatedInteger(GL_MAX_TEXTURE_SIZE));
 
     m_motionView->setSource(lit("Nx/Motion/MotionSettingsItem.qml"));
     m_motionView->setResizeMode(QQuickView::SizeRootObjectToView);

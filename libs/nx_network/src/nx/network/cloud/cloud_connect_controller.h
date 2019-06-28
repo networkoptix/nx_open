@@ -51,7 +51,6 @@ public:
 private:
     std::unique_ptr<CloudConnectControllerImpl> m_impl;
 
-    void readSettingsFromIni();
     void loadSettings(const utils::ArgumentParser& arguments);
     void applySettings();
 };

@@ -23,30 +23,38 @@ Params Params::fromList(const QList<QPair<QString, QString>>& list)
     Params params;
     for (const auto& item: list)
         params.insert(item.first, item.second);
+
     return params;
 }
 
 Params Params::fromJson(const QJsonObject& value)
 {
-    const auto jsonValue =
+    static const auto jsonValue =
         [](const QJsonValue& value) -> QString
     {
-        if (value.type() == QJsonValue::Null)
-            return QString();
-
-        if (value.type() == QJsonValue::Bool)
-            return value.toBool() ? QStringLiteral("true") : QStringLiteral("false");
-
-        if (value.type() == QJsonValue::Double)
-            return QString::number(value.toDouble());
-
-        // TODO: Add some format for Array and Object.
-        return value.toString();
+        static const QString kTrue("true");
+        static const QString kFalse("false");
+        switch (value.type())
+        {
+            case QJsonValue::Null:
+                return QString();
+            case QJsonValue::Bool:
+                return value.toBool() ? kTrue : kFalse;
+            case QJsonValue::Double:
+                return QString::number(value.toDouble());
+            case QJsonValue::Array:
+                return QJsonDocument(value.toArray()).toJson(QJsonDocument::Compact);
+            case QJsonValue::Object:
+                return QJsonDocument(value.toObject()).toJson(QJsonDocument::Compact);
+            default:
+                return value.toString();
+        };
     };
 
     Params params;
     for (auto it = value.begin(); it != value.end(); ++it)
         params.insert(it.key(), jsonValue(it.value()));
+
     return params;
 }
 
@@ -62,43 +70,25 @@ QList<QPair<QString, QString>> Params::toList() const
     QList<QPair<QString, QString>> list;
     for (auto it = begin(); it != end(); ++it)
         list.append({it.key(), it.value()});
+
     return list;
 }
 
 QJsonObject Params::toJson() const
 {
-    const auto jsonValue =
-        [](const QString& value) -> QJsonValue
-    {
-        if (value.isEmpty())
-            return QJsonValue(QJsonValue::Null);
-
-        if (value == QStringLiteral("true"))
-            return QJsonValue(true);
-
-        if (value == QStringLiteral("false"))
-            return QJsonValue(false);
-
-        bool isOk = false;
-        if (const auto number = value.toDouble(&isOk); isOk)
-            return QJsonValue(number);
-
-        // TODO: Add some format for Array and Object.
-        return QJsonValue(value);
-    };
-
     QJsonObject object;
     for (auto it = begin(); it != end(); ++it)
-        object.insert(it.key(), jsonValue(it.value()));
+        object.insert(it.key(), QJsonValue(it.value()));
+
     return object;
 }
 
 std::optional<QJsonValue> Content::parse() const
 {
-    if (type == kFormContentType)
+    if (type == http::header::ContentType::kForm)
         return Params::fromUrlQuery(QUrlQuery(body)).toJson();
 
-    if (type == kJsonContentType)
+    if (type == http::header::ContentType::kJson)
     {
         QJsonValue value;
         if (!QJson::deserialize(body, &value))

@@ -34,6 +34,7 @@ static const QnUuid kVmsRuleId = QnUuid::fromArbitraryData(
     std::string("entropix::ReconstructResolutionIntegration"));
 static const QString kVmsEventSource("ReconstructResolution");
 static const QString kVmsEventCaption("Entropix: Reconstruct Resolution");
+static const QRectF kWholeFrame(0.0, 0.0, 1.0, 1.0);
 
 struct ZoomWindow
 {
@@ -65,19 +66,6 @@ struct Description
 #define Description_Fields (cameraId)(bookmarkId)(startTimeMs)(durationMs)(crops)
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((ZoomWindow)(Description), (json), _Fields)
-
-class ZoomWindowIsSelected: public ui::action::Condition
-{
-public:
-    ui::action::ActionVisibility check(
-        const QnResourceWidgetList& widgets,
-        QnWorkbenchContext* context)
-    {
-        return widgets.size() == 1 && widgets.first()->isZoomWindow()
-            ? ui::action::EnabledAction
-            : ui::action::InvisibleAction;
-    }
-};
 
 bool cameraModelMatchesPattern(const QRegularExpression& pattern, const QnResourcePtr& resource)
 {
@@ -154,7 +142,6 @@ void ReconstructResolutionIntegration::registerActions(ui::action::MenuFactory* 
         .condition(
             !condition::isSafeMode()
             && ConditionWrapper(new AddBookmarkCondition())
-            && ConditionWrapper(new ZoomWindowIsSelected())
             && ConditionWrapper(
                 new ResourceCondition(
                     [this](const QnResourcePtr& resource)
@@ -182,14 +169,13 @@ void ReconstructResolutionIntegration::addReconstructResolutionBookmark(
     const auto period = parameters.argument<QnTimePeriod>(Qn::TimePeriodRole);
 
     const auto widgets = context->display()->widgets(camera);
-    std::vector<QnResourceWidget*> selectedZoomWindows;
+    std::vector<QnResourceWidget*> selectedWindows;
     std::copy_if(widgets.cbegin(), widgets.cend(),
-        std::back_inserter(selectedZoomWindows),
-        [](QnResourceWidget* widget) { return widget->isZoomWindow() && widget->isSelected(); });
+        std::back_inserter(selectedWindows),
+        [](QnResourceWidget* widget) { return widget->isSelected(); });
 
-    NX_ASSERT(!selectedZoomWindows.empty(), "Condition must not allow this");
-    if (selectedZoomWindows.empty())
-        return;
+    if (selectedWindows.empty())
+        selectedWindows.push_back(context->display()->widget(Qn::CentralRole));
 
     QnCameraBookmark bookmark;
     bookmark.guid = QnUuid::createUuid();
@@ -209,9 +195,12 @@ void ReconstructResolutionIntegration::addReconstructResolutionBookmark(
     description.bookmarkId = bookmark.guid;
     description.startTimeMs = bookmark.startTimeMs;
     description.durationMs = bookmark.durationMs;
-    std::transform(selectedZoomWindows.cbegin(), selectedZoomWindows.cend(),
+    std::transform(selectedWindows.cbegin(), selectedWindows.cend(),
         std::back_inserter(description.crops),
-        [](QnResourceWidget* widget) { return widget->zoomRect(); });
+        [](QnResourceWidget* widget)
+        {
+            return widget->isZoomWindow() ? widget->zoomRect() : kWholeFrame;
+        });
 
     nx::vms::event::EventMetaData metadata;
     metadata.cameraRefs.push_back(camera->getId().toString());

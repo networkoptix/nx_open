@@ -4,19 +4,20 @@
 #include <nx/utils/uuid.h>
 
 #include "connection_manager.h"
+#include "p2p_sync_settings.h"
 #include "transport/command_transport_delegate.h"
 #include "transport/transport_manager.h"
 
 namespace nx::clusterdb::engine {
 
-static constexpr std::chrono::seconds kRetryConnectTimeout(7);
-
 Connector::Connector(
     const std::string& nodeId,
+    const SynchronizationSettings& settings,
     transport::TransportManager* transportManager,
     ConnectionManager* connectionManager)
     :
     m_nodeId(nodeId),
+    m_settings(settings),
     m_transportManager(transportManager),
     m_connectionManager(connectionManager)
 {
@@ -85,8 +86,7 @@ void Connector::connectToNodeAsync(const nx::utils::Url& url)
 
     nodeContext.connectionId = QnUuid::createUuid().toSimpleByteArray().toStdString();
 
-    NX_DEBUG(this, lm("Initiating connection %1 to %2")
-        .args(nodeContext.connectionId, url));
+    NX_DEBUG(this, "Initiating connection %1 to %2", nodeContext.connectionId, url);
 
     nodeContext.connector = m_transportManager->createConnector(
         nodeContext.systemId,
@@ -109,10 +109,10 @@ void Connector::onConnectCompletion(
 
     if (!connection)
     {
-        NX_DEBUG(this, lm("Error connecting to %1. %2").args(url, result));
+        NX_DEBUG(this, "Error connecting to %1. %2", url, result);
 
         nodeContext.retryTimer->start(
-            kRetryConnectTimeout,
+            m_settings.nodeConnectRetryTimeout,
             [url, this]() { connectToNodeAsync(url); });
         return;
     }
@@ -133,7 +133,7 @@ void Connector::registerConnection(
     connection->connectionClosedSubscription().subscribe(
         [this, url](auto... args) { onConnectionClosed(url, args...); },
         &nodeContext->connectionClosedSubscriptionId);
-    nodeContext->connection = connection.get();
+    auto connectionPtr = connection.get();
 
     ConnectionManager::ConnectionContext connectionContext;
     connectionContext.originatingNodeId = m_nodeId;
@@ -148,20 +148,29 @@ void Connector::registerConnection(
             std::move(connection),
             connectionSequence);
 
-    m_connectionManager->addNewConnection(std::move(connectionContext));
+    if (m_connectionManager->addNewConnection(std::move(connectionContext)))
+    {
+        nodeContext->connection = connectionPtr;
+        // NOTE: Starting connection only after it has been added to the ConnectionManager.
+        // Not relying on connectionId.
+        m_connectionManager->modifyConnectionByIdSafe(
+            nodeContext->connectionId,
+            [connectionSequence](auto abstractConnection)
+            {
+                const auto connection =
+                    dynamic_cast<ConnectionWithSequence*>(abstractConnection);
+                if (!connection || connection->data() != connectionSequence)
+                    return;
 
-    // NOTE: Not relying on connectionId.
-    m_connectionManager->modifyConnectionByIdSafe(
-        nodeContext->connectionId,
-        [connectionSequence](auto abstractConnection)
-        {
-            const auto connection =
-                dynamic_cast<ConnectionWithSequence*>(abstractConnection);
-            if (!connection || connection->data() != connectionSequence)
-                return;
-
-            connection->start();
-        });
+                connection->start();
+            });
+    }
+    else
+    {
+        NX_DEBUG(this, "Failed to register connection %1 to %2", nodeContext->connectionId, url);
+        nodeContext->connection = nullptr;
+        onConnectionClosed(url, SystemError::interrupted);
+    }
 }
 
 void Connector::onConnectionClosed(
@@ -170,8 +179,8 @@ void Connector::onConnectionClosed(
 {
     NX_ASSERT(isInSelfAioThread());
 
-    NX_DEBUG(this, lm("Connection to %1 has been closed. %2")
-        .args(url, SystemError::toString(systemErrorCode)));
+    NX_DEBUG(this, "Connection to %1 has been closed. %2",
+        url, SystemError::toString(systemErrorCode));
 
     auto nodeIter = m_nodes.find(url);
     NX_CRITICAL(nodeIter != m_nodes.end());
@@ -179,8 +188,9 @@ void Connector::onConnectionClosed(
     nodeIter->second.connection = nullptr;
     nodeIter->second.connectionClosedSubscriptionId = nx::utils::kInvalidSubscriptionId;
 
+    nodeIter->second.retryTimer->cancelSync();
     nodeIter->second.retryTimer->start(
-        kRetryConnectTimeout,
+        m_settings.nodeConnectRetryTimeout,
         [url, this]() { connectToNodeAsync(url); });
 }
 

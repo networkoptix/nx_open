@@ -14,6 +14,7 @@
 #include "transcoding/filters/tiled_image_filter.h"
 #include "transcoding/filters/scale_image_filter.h"
 #include "transcoding/filters/rotate_image_filter.h"
+#include "transcoding/filters/crop_image_filter.h"
 
 #include "plugins/resource/server_archive/server_archive_delegate.h"
 #include "media_server/media_server_module.h"
@@ -26,6 +27,14 @@ namespace {
 static constexpr int kMaxGopLen = 100;
 static constexpr int kRoundFactor = 4;
 static constexpr int kGetFrameExtraTriesPerChannel = 10;
+
+bool isSpecialArchiveTime(qint64 timestampUsec)
+{
+    static const qint64 kZeroPosition = 0;
+    return timestampUsec == DATETIME_NOW
+        || timestampUsec == nx::api::ImageRequest::kLatestThumbnail
+        || timestampUsec == kZeroPosition;
+}
 
 QnCompressedVideoDataPtr getNextArchiveVideoPacket(
     QnAbstractArchiveDelegate* archiveDelegate, qint64 ceilTimeUs)
@@ -271,7 +280,7 @@ CLVideoDecoderOutputPtr QnGetImageHelper::readFrame(
     CLVideoDecoderOutputPtr outFrame(new CLVideoDecoderOutput());
     bool gotFrame = false;
     QnFfmpegVideoDecoder decoder(
-        DecoderConfig::fromResource(resource), video->compressionType, video, false);
+        DecoderConfig(), video->compressionType, video);
 
     if (!isArchiveVideoPacket)
     {
@@ -297,6 +306,13 @@ CLVideoDecoderOutputPtr QnGetImageHelper::readFrame(
     if (video)
         outFrame->channel = video->channelNumber;
 
+    if (!gotFrame && video)
+    {
+        NX_VERBOSE(this,
+            "%1: Failed to decode frame (ts: %2, size: %3x%4, channel %5, flags: %6, dataType: %7)",
+            __func__, video->timestamp, video->width, video->height, video->channelNumber,
+            video->flags, video->dataType);
+    }
     return gotFrame ? outFrame : nullptr;
 }
 
@@ -587,6 +603,12 @@ CLVideoDecoderOutputPtr QnGetImageHelper::getImageWithCertainQuality(
         NX_VERBOSE(this, "%1() END -> null: frame not found", __func__);
         return nullptr;
     }
+    else if (!isSpecialArchiveTime(request.usecSinceEpoch)
+        && frame->pkt_dts - request.usecSinceEpoch > std::chrono::microseconds(MAX_FRAME_DURATION).count())
+    {
+        NX_VERBOSE(this, "%1() frame for a requested archive position is not found", __func__);
+        return nullptr;
+    }
 
     QnConstResourceVideoLayoutPtr layout = camera->getVideoLayout();
     const int channelCount = layout->channelCount();
@@ -594,6 +616,9 @@ CLVideoDecoderOutputPtr QnGetImageHelper::getImageWithCertainQuality(
 
     QList<QnAbstractImageFilterPtr> filterChain;
     const QSize dstSize = updateDstSize(camera.get(), request.size, *frame, request.aspectRatio);
+
+    if (!request.crop.isEmpty())
+        filterChain << QnAbstractImageFilterPtr(new QnCropImageFilter(request.crop));
     filterChain << QnAbstractImageFilterPtr(new QnScaleImageFilter(dstSize));
     filterChain << QnAbstractImageFilterPtr(new QnTiledImageFilter(layout));
     filterChain << QnAbstractImageFilterPtr(new QnRotateImageFilter(rotation));
@@ -642,8 +667,8 @@ CLVideoDecoderOutputPtr QnGetImageHelper::decodeFrameSequence(
 
     CLVideoDecoderOutputPtr outFrame(new CLVideoDecoderOutput());
     QnFfmpegVideoDecoder decoder(
-        DecoderConfig::fromResource(resource),
-        firstFrame->compressionType, firstFrame, false);
+        DecoderConfig(),
+        firstFrame->compressionType, firstFrame);
     for (int i = 0; i < randomAccess.size(); ++i)
     {
         auto frame = std::dynamic_pointer_cast<const QnCompressedVideoData>(randomAccess.at(i));

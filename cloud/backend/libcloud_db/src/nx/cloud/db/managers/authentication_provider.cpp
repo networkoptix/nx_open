@@ -12,7 +12,7 @@
 #include <nx/utils/uuid.h>
 
 #include <nx/cloud/db/client/data/auth_data.h>
-#include <nx/clusterdb/engine/transaction_log.h>
+#include <nx/clusterdb/engine/command_log.h>
 
 #include "temporary_account_password_manager.h"
 #include "../dao/user_authentication_data_object_factory.h"
@@ -25,7 +25,7 @@ namespace nx::cloud::db {
 
 AuthenticationProvider::AuthenticationProvider(
     const conf::Settings& settings,
-    nx::sql::AsyncSqlQueryExecutor* sqlQueryExecutor,
+    nx::sql::AbstractAsyncSqlQueryExecutor* sqlQueryExecutor,
     AbstractAccountManager* accountManager,
     AbstractSystemSharingManager* systemSharingManager,
     const AbstractTemporaryAccountPasswordManager& temporaryAccountCredentialsManager,

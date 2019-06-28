@@ -2399,8 +2399,8 @@ ErrorCode QnDbManager::insertOrReplaceMediaServer(const MediaServerData& data, q
 {
     QSqlQuery insQuery(m_sdb);
     insQuery.prepare("\
-        INSERT OR REPLACE INTO vms_server (auth_key, version, net_addr_list, system_info, flags, resource_ptr_id) \
-        VALUES (:authKey, :version, :networkAddresses, :systemInfo, :flags, :internalId)\
+        INSERT OR REPLACE INTO vms_server (auth_key, version, net_addr_list, system_info, os_info, flags, resource_ptr_id) \
+        VALUES (:authKey, :version, :networkAddresses, :systemInfo, :osInfo, :flags, :internalId)\
     ");
     QnSql::bind(data, &insQuery);
 
@@ -2703,7 +2703,8 @@ ErrorCode QnDbManager::insertOrReplaceMediaServerUserAttributes(const MediaServe
             backup_days_of_the_week,                             \
             backup_start,                                        \
             backup_duration,                                     \
-            backup_bitrate                                       \
+            backup_bitrate,                                      \
+            metadata_storage_id                                  \
         )                                                        \
         VALUES(                                                  \
             :serverId,                                           \
@@ -2714,7 +2715,8 @@ ErrorCode QnDbManager::insertOrReplaceMediaServerUserAttributes(const MediaServe
             :backupDaysOfTheWeek,                                \
             :backupStart,                                        \
             :backupDuration,                                     \
-            :backupBitrate                                       \
+            :backupBitrate,                                      \
+            :metadataStorageId                                   \
         )                                                        \
         ");
     QnSql::bind(data, &insQuery);
@@ -3586,6 +3588,7 @@ ErrorCode QnDbManager::doQueryNoLock(
         SELECT id, timestamp, merged_system_local_id AS mergedSystemLocalId,
             merged_system_cloud_id AS mergedSystemCloudId, username, signature
         FROM system_merge_history
+        ORDER BY id
         )sql");
     if (!fetchMergeHistoryQuery.exec())
     {
@@ -4005,7 +4008,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, MediaServerDataList& serv
     query.prepare(lit("\
         SELECT r.guid as id, r.guid, r.xtype_guid as typeId, r.parent_guid as parentId, r.name, r.url, \
         s.auth_key as authKey, s.version, s.net_addr_list as networkAddresses, s.system_info as systemInfo, \
-        s.flags \
+        s.os_info as osInfo, s.flags \
         FROM vms_resource r \
         LEFT JOIN vms_resource_status rs on rs.guid = r.guid \
         JOIN vms_server s on s.resource_ptr_id = r.id %1 ORDER BY r.guid\
@@ -4108,7 +4111,8 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& mServerId, MediaServerUserAtt
             backup_days_of_the_week as backupDaysOfTheWeek,         \
             backup_start as backupStart,                            \
             backup_duration as backupDuration,                      \
-            backup_bitrate as backupBitrate                         \
+            backup_bitrate as backupBitrate,                        \
+            metadata_storage_id as metadataStorageId                \
         FROM vms_server_user_attributes                             \
         %1                                                          \
         ORDER BY server_guid                                        \

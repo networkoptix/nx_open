@@ -11,12 +11,17 @@ ImageProvider::ImageProvider(QObject* parent):
 {
 }
 
+bool ImageProvider::tryLoad()
+{
+    return false;
+}
+
 void ImageProvider::loadAsync()
 {
     doLoadAsync();
 }
 
-BasicImageProvider::BasicImageProvider(const QImage& image, QObject* parent):
+BasicImageProvider::BasicImageProvider(const QImage& image, QObject* parent) :
     ImageProvider(parent),
     m_image(image)
 {
@@ -37,14 +42,16 @@ Qn::ThumbnailStatus BasicImageProvider::status() const
     return Qn::ThumbnailStatus::Loaded;
 }
 
+bool BasicImageProvider::tryLoad()
+{
+    emit imageChanged(m_image);
+    emit statusChanged(Qn::ThumbnailStatus::Loaded);
+    return true;
+}
+
 void BasicImageProvider::doLoadAsync()
 {
-    executeDelayedParented(
-        [this]
-        {
-            emit imageChanged(m_image);
-            emit statusChanged(Qn::ThumbnailStatus::Loaded);
-        }, this);
+    executeLater([this]() { tryLoad(); }, this);
 }
 
 } // namespace nx::vms::client::desktop

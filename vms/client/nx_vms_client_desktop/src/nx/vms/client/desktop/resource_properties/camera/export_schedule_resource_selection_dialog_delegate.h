@@ -2,6 +2,8 @@
 
 #include <ui/delegates/resource_selection_dialog_delegate.h>
 
+class QCheckBox;
+
 namespace nx::vms::client::desktop {
 
 class ExportScheduleResourceSelectionDialogDelegate: public QnResourceSelectionDialogDelegate

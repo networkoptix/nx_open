@@ -10,6 +10,7 @@
 
 #include <ui/common/palette.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
+#include <ui/dialogs/common/message_box.h>
 #include <ui/style/custom_style.h>
 
 #include <utils/email/email.h>
@@ -59,7 +60,7 @@ QnLicenseWidget::QnLicenseWidget(QWidget* parent):
                         ui->onlineKeyEdit->setCursorPosition(pos);
                 };
 
-            executeDelayedParented(adjustCursorPosition, 0, ui->onlineKeyEdit);
+            executeLater(adjustCursorPosition, ui->onlineKeyEdit);
         });
 
     ui->onlineKeyEdit->setFocus();

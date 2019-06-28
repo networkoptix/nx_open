@@ -20,8 +20,20 @@ Service::Service(
     char **argv)
     :
     base_type(argc, argv, "nx::clusterdb::engine service"),
-    m_applicationId(applicationId)
+    m_applicationId(applicationId),
+    m_protocolVersionRange(ProtocolVersionRange::any)
 {
+}
+
+void Service::setSupportedProtocolRange(
+    const ProtocolVersionRange& protocolVersionRange)
+{
+    m_protocolVersionRange = protocolVersionRange;
+}
+
+ProtocolVersionRange Service::protocolVersionRange() const
+{
+    return m_protocolVersionRange;
 }
 
 std::vector<network::SocketAddress> Service::httpEndpoints() const
@@ -85,7 +97,11 @@ int Service::serviceMain(const utils::AbstractServiceSettings& abstractSettings)
     Model model(settings);
     m_model = &model;
 
-    Controller controller(m_applicationId, settings, &model);
+    Controller controller(
+        m_applicationId,
+        settings,
+        m_protocolVersionRange,
+        &model);
     m_controller = &controller;
 
     View view(settings, settings.api().baseHttpPath, &controller);
@@ -102,7 +118,7 @@ int Service::serviceMain(const utils::AbstractServiceSettings& abstractSettings)
     setup(abstractSettings);
     auto customLogicGuard = nx::utils::makeScopeGuard([this]() { teardown(); });
 
-    if (settings.discovery().enabled)
+    if (settings.synchronization().discovery.enabled)
     {
         controller.synchronizationEngine().discoveryManager().start(
             settings.synchronization().clusterId,
@@ -117,11 +133,11 @@ int Service::serviceMain(const utils::AbstractServiceSettings& abstractSettings)
     view.listen();
     NX_INFO(this, lm("Listening on %1").container(httpEndpoints()));
 
-    NX_ALWAYS(this, lm("%1 has been started").arg(applicationDisplayName()));
+    NX_INFO(this, lm("%1 has been started").arg(applicationDisplayName()));
 
     const auto result = runMainLoop();
 
-    NX_ALWAYS(this, lm("Stopping..."));
+    NX_INFO(this, lm("Stopping..."));
 
     return result;
 }

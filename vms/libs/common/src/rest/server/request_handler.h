@@ -7,7 +7,9 @@
 using RestPermissions = nx::network::rest::Permissions;
 
 // TODO: This class should be removed as soon as old style handlers are refactored.
-class QnRestRequestHandler: public nx::network::rest::Handler
+class QnRestRequestHandler:
+    public nx::network::rest::Handler,
+    public QObject //< Required because a lot of implementations have Q_OBJECT macro w/o any reason.
 {
 protected:
     virtual nx::network::rest::Response executeGet(const nx::network::rest::Request& request);

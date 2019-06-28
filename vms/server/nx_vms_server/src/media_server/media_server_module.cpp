@@ -53,6 +53,7 @@
 #include <nx/vms/server/root_fs.h>
 #include <nx/vms/server/server_update_manager.h>
 #include <nx/vms/server/meta_types.h>
+#include <nx/vms/server/network/multicast_address_registry.h>
 
 #include <nx/vms/server/analytics/sdk_object_factory.h>
 
@@ -62,7 +63,7 @@
 
 #include <nx/vms/common/p2p/downloader/downloader.h>
 #include <plugins/plugin_manager.h>
-#include <analytics/detected_objects_storage/analytics_events_storage.h>
+#include <nx/vms/server/analytics/db/analytics_db.h>
 
 #include "wearable_lock_manager.h"
 #include "wearable_upload_manager.h"
@@ -72,7 +73,6 @@
 #include <nx/vms/server/event/event_connector.h>
 #include <nx/vms/server/event/extended_rule_processor.h>
 #include <nx/vms/server/system/nx1/info.h>
-#include "server_update_tool.h"
 #include <motion/motion_helper.h>
 #include <audit/mserver_audit_manager.h>
 #include <database/server_db.h>
@@ -89,6 +89,8 @@
 #include <core/resource_management/mserver_resource_discovery_manager.h>
 #include "server_connector.h"
 #include "resource_status_watcher.h"
+#include <core/resource/media_server_resource.h>
+#include <nx/network/url/url_builder.h>
 
 using namespace nx;
 using namespace nx::vms::server;
@@ -226,8 +228,7 @@ QnMediaServerModule::QnMediaServerModule(
     m_context.reset(new UniquePtrContext());
 
     m_analyticsEventsStorage =
-        nx::analytics::storage::EventsStorageFactory::instance()
-            .create(m_settings->analyticEventsStorage());
+        nx::analytics::db::EventsStorageFactory::instance().create(this);
 
     m_context->normalStorageManager.reset(
         new QnStorageManager(
@@ -251,13 +252,11 @@ QnMediaServerModule::QnMediaServerModule(
         isRootToolEnabled,
         qApp->applicationFilePath());
 
-    #if defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID)
-        if (QnAppInfo::isBpi() || QnAppInfo::isNx1())
-        {
-            m_settings->mutableSettings()->setBootedFromSdCard(
-                Nx1::isBootedFromSD(m_rootFileSystem.get()));
-        }
-    #endif
+    if (QnAppInfo::isNx1())
+    {
+        m_settings->mutableSettings()->setBootedFromSdCard(
+            Nx1::isBootedFromSD(m_rootFileSystem.get()));
+    }
 
     m_fileDeletor = store(new QnFileDeletor(this));
 
@@ -276,9 +275,8 @@ QnMediaServerModule::QnMediaServerModule(
     m_sharedContextPool = store(new nx::vms::server::resource::SharedContextPool(this));
     m_archiveIntegrityWatcher = store(new nx::vms::server::ServerArchiveIntegrityWatcher(this));
     m_updateManager = store(new nx::vms::server::ServerUpdateManager(this));
-    m_serverUpdateTool = store(new QnServerUpdateTool(this));
-    auto dataDir = settings().dataDir();
-    m_motionHelper = store(new QnMotionHelper(settings().dataDir(), this));
+    auto dataDir = closeDirPath(settings().dataDir()) + QString("record_catalog");
+    m_motionHelper = store(new QnMotionHelper(dataDir, this));
 
     m_resourceCommandProcessor.reset(new QnResourceCommandProcessor());
 
@@ -311,6 +309,7 @@ QnMediaServerModule::QnMediaServerModule(
     m_sdkObjectFactory = store(new nx::vms::server::analytics::SdkObjectFactory(this));
 
     m_hlsSessionPool = store(new nx::vms::server::hls::SessionPool());
+    m_multicastAddressRegistry = store(new nx::vms::server::network::MulticastAddressRegistry());
 
     // Translations must be installed from the main application thread.
     executeDelayed(&installTranslations, kDefaultDelay, qApp->thread());
@@ -319,40 +318,29 @@ QnMediaServerModule::QnMediaServerModule(
 void QnMediaServerModule::initializeP2PDownloader()
 {
     m_p2pDownloader = store(new nx::vms::common::p2p::downloader::Downloader(
-        downloadsDirectory(),
-        commonModule(),
-        nullptr,
-        this));
+        downloadsDirectory(), commonModule(), {}, this));
 }
 
 QDir QnMediaServerModule::downloadsDirectory() const
 {
     static const QString kDownloads("downloads");
     QDir dir(settings().dataDir());
-    const auto downloadsPath = dir.absoluteFilePath(kDownloads);
+    const auto downloadsDir = QDir(dir.absoluteFilePath(kDownloads));
+    if (downloadsDir.exists())
+        return downloadsDir;
+
     if (!dir.mkdir(kDownloads))
     {
-        auto err = strerror(errno);
-        const auto basePath = dir.absolutePath();
-
-        if (!dir.exists())
-        {
-            NX_ERROR(this, "downloadsDirectory() - failed to create directory %1 for downloads. "
-                "Base dir=%2 does not exists as well, err=%3", downloadsPath, basePath, err);
-        }
-        else
-        {
-            NX_ERROR(this, "downloadsDirectory() - failed to create directory %1 for downloads. "
-                "Base dir=%2, err=%3", downloadsPath, basePath, err);
-        }
+        NX_ERROR(this, "%1() - failed to create directory %2, base dir %3: %4",
+            __func__, downloadsDir.absolutePath(),
+            dir.exists() ? "exists" : "does not exist", strerror(errno));
     }
     else
     {
-        NX_VERBOSE(this, "downloadsDirectory() - created directory %1 for downloads.",
-            downloadsPath);
+        NX_VERBOSE(this, "%1() - created directory %2", __func__, downloadsDir.absolutePath());
     }
 
-    return downloadsPath;
+    return downloadsDir;
 }
 
 void QnMediaServerModule::stopStorages()
@@ -500,7 +488,7 @@ AbstractArchiveIntegrityWatcher* QnMediaServerModule::archiveIntegrityWatcher() 
     return m_archiveIntegrityWatcher;
 }
 
-nx::analytics::storage::AbstractEventsStorage* QnMediaServerModule::analyticsEventsStorage() const
+nx::analytics::db::AbstractEventsStorage* QnMediaServerModule::analyticsEventsStorage() const
 {
     return m_analyticsEventsStorage.get();
 }
@@ -574,11 +562,6 @@ std::shared_ptr<ec2::AbstractECConnection> QnMediaServerModule::ec2Connection() 
 QnGlobalSettings* QnMediaServerModule::globalSettings() const
 {
     return m_commonModule->globalSettings();
-}
-
-QnServerUpdateTool* QnMediaServerModule::serverUpdateTool() const
-{
-    return m_serverUpdateTool;
 }
 
 QnMotionHelper* QnMediaServerModule::motionHelper() const
@@ -691,7 +674,25 @@ nx::vms::server::hls::SessionPool* QnMediaServerModule::hlsSessionPool() const
     return m_hlsSessionPool;
 }
 
+nx::vms::server::network::MulticastAddressRegistry*
+    QnMediaServerModule::multicastAddressRegistry() const
+{
+    return m_multicastAddressRegistry;
+}
+
 QnStoragePluginFactory* QnMediaServerModule::storagePluginFactory() const
 {
     return m_commonModule->storagePluginFactory();
+}
+
+QString QnMediaServerModule::metadataDatabaseDir() const
+{
+    auto server = resourcePool()->getResourceById<QnMediaServerResource>(commonModule()->moduleGUID());
+    const auto defaultDir = nx::network::url::normalizePath(settings().dataDir());
+    if (!server)
+        return defaultDir;
+    auto storageResource = resourcePool()->getResourceById<QnStorageResource>(
+        server->metadataStorageId());
+    const auto pathBase = storageResource ? storageResource->getPath() : defaultDir;
+    return closeDirPath(pathBase);
 }

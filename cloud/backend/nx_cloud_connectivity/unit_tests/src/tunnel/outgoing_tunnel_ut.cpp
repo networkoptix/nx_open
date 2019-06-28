@@ -104,6 +104,11 @@ public:
         m_onClosedHandler = std::move(handler);
     }
 
+    virtual ConnectType connectType() const override
+    {
+        return ConnectType::unknown;
+    }
+
     virtual std::string toString() const override
     {
         return "DummyConnection";
@@ -280,7 +285,7 @@ private:
                         m_tunnelConnectionInvokedPromise);
 
                     auto tunnelWatcher = std::make_unique<OutgoingTunnelConnectionWatcher>(
-                        std::move(nx::hpm::api::ConnectionParameters()),
+                        nx::hpm::api::ConnectionParameters(),
                         std::move(dummyConnection));
                     tunnelWatcher->bindToAioThread(getAioThread());
                     tunnelWatcher->start();
@@ -790,8 +795,7 @@ TEST_F(OutgoingTunnel, pool)
     nx::utils::promise<std::chrono::milliseconds> tunnelConnectionInvokedPromise;
 
     setConnectorFactoryFunc(
-        [/*connectorTimeout,*/ &tunnelConnectionInvokedPromise](
-            const AddressEntry& targetAddress) -> std::unique_ptr<AbstractCrossNatConnector>
+        [](const AddressEntry& targetAddress) -> std::unique_ptr<AbstractCrossNatConnector>
         {
             return std::make_unique<DummyConnector>(
                 targetAddress,

@@ -17,10 +17,12 @@ public:
 
     virtual void selectRelayInstanceForListeningPeer(
         const std::string& peerId,
-        RelayInstanceSearchCompletionHandler completionHandler) override;
+        const nx::network::HostAddress& serverHost,
+        RelayInstanceSelectCompletionHandler completionHandler) override;
 
-    virtual void findRelayInstancePeerIsListeningOn(
+    virtual void findRelayInstanceForClient(
         const std::string& peerId,
+        const nx::network::HostAddress& clientHost,
         RelayInstanceSearchCompletionHandler completionHandler) override;
 
 private:

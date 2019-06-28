@@ -25,7 +25,6 @@
 #include <api/model/rebuild_archive_reply.h>
 #include <api/model/test_email_settings_reply.h>
 #include <api/model/configure_reply.h>
-#include <api/model/upload_update_reply.h>
 #include <api/model/update_information_reply.h>
 #include <api/model/backup_status_reply.h>
 #include <api/model/getnonce_reply.h>
@@ -120,6 +119,7 @@ void QnCommonMetaTypes::initialize()
     nx::vms::api::Metatypes::initialize();
 
     qRegisterMetaType<uintptr_t>("uintptr_t");
+    qRegisterMetaType<QSet<QString>>();
 
     qRegisterMetaType<QHostAddress>();
     qRegisterMetaType<QAuthenticator>();
@@ -265,7 +265,6 @@ void QnCommonMetaTypes::initialize()
     qRegisterMetaType<QnGetNonceReply>();
 
     qRegisterMetaType<QnConfigureReply>();
-    qRegisterMetaType<QnUploadUpdateReply>();
     qRegisterMetaType<QnUpdateFreeSpaceReply>();
     qRegisterMetaType<QnCloudHostCheckReply>();
 

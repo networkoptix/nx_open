@@ -1152,6 +1152,11 @@ protected:
         m_clientSocketThread.join();
     }
 
+    void thenPollableIsStillValid()
+    {
+        ASSERT_NE(nullptr, m_connection->pollable());
+    }
+
     //---------------------------------------------------------------------------------------------
 
     void whenSendDataConcurrentlyThroughConnectedSockets()
@@ -1198,6 +1203,11 @@ protected:
             return m_synchronousServer->endpoint();
         else
             return SocketAddress();
+    }
+
+    std::unique_ptr<typename SocketTypeSet::ServerSocket> createServerSocket()
+    {
+        return std::make_unique<typename SocketTypeSet::ServerSocket>();
     }
 
     typename SocketTypeSet::ClientSocket* connection()
@@ -1730,6 +1740,16 @@ TYPED_TEST_P(StreamSocketAcceptance, shutdown_interrupts_recv)
     this->thenConnectionOperationIsInterrupted();
 }
 
+TYPED_TEST_P(StreamSocketAcceptance, pollable_is_valid_after_shutdown)
+{
+    this->givenSilentServer();
+    this->givenConnectedSocket();
+    
+    this->whenInvokeShutdown();
+
+    this->thenPollableIsStillValid();
+}
+
 //-------------------------------------------------------------------------------------------------
 // Accepting side tests.
 
@@ -1835,6 +1855,33 @@ TYPED_TEST_P(StreamSocketAcceptance, server_socket_can_be_freed_in_accept_handle
     this->thenAcceptReported(SystemError::timedOut);
 }
 
+TYPED_TEST_P(StreamSocketAcceptance, reuse_addr)
+{
+    auto server1 = this->createServerSocket();
+    ASSERT_TRUE(server1->setReuseAddrFlag(true));
+    ASSERT_TRUE(server1->bind(SocketAddress::anyAddress));
+
+    auto server2 = this->createServerSocket();
+    ASSERT_TRUE(server2->setReuseAddrFlag(true));
+    ASSERT_TRUE(server2->bind(SocketAddress(HostAddress::localhost, server1->getLocalAddress().port)));
+}
+
+TYPED_TEST_P(StreamSocketAcceptance, reuse_port)
+{
+    auto server1 = this->createServerSocket();
+    if (!server1->setReusePortFlag(true))
+    {
+        ASSERT_EQ(SystemError::unknownProtocolOption, SystemError::getLastOSErrorCode());
+        std::cout << "SO_REUSEPORT is unsupported. Skipping this test" << std::endl;
+        return;
+    }
+    ASSERT_TRUE(server1->bind(SocketAddress::anyPrivateAddress));
+
+    auto server2 = this->createServerSocket();
+    ASSERT_TRUE(server2->setReusePortFlag(true));
+    ASSERT_TRUE(server2->bind(server1->getLocalAddress()));
+}
+
 REGISTER_TYPED_TEST_CASE_P(StreamSocketAcceptance,
     DISABLED_receiveDelay,
     sendDelay,
@@ -1879,6 +1926,7 @@ REGISTER_TYPED_TEST_CASE_P(StreamSocketAcceptance,
     DISABLED_shutdown_interrupts_connect,
     DISABLED_shutdown_interrupts_send,
     shutdown_interrupts_recv,
+    pollable_is_valid_after_shutdown,
 
     //---------------------------------------------------------------------------------------------
     // Accepting side tests.
@@ -1891,7 +1939,13 @@ REGISTER_TYPED_TEST_CASE_P(StreamSocketAcceptance,
     server_socket_accept_times_out,
     server_socket_accept_async_times_out,
     accept_async_on_blocking_socket_results_in_error,
-    server_socket_can_be_freed_in_accept_handler);
+    server_socket_can_be_freed_in_accept_handler,
+    
+    //---------------------------------------------------------------------------------------------
+    // Socket options.
+    reuse_addr,
+    reuse_port
+);
 
 } // namespace test
 } // namespace network

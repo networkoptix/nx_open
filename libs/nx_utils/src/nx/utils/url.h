@@ -4,7 +4,6 @@
 
 #include <QtCore/QUrl>
 #include <QtCore/QJsonValue>
-#include <QtXml/QtXml>
 
 #include <nx/utils/log/log.h>
 
@@ -155,6 +154,11 @@ private:
 inline quint32 qHash(const Url& url)
 {
     return qHash(url.toString());
+}
+
+inline std::ostream& operator<<(std::ostream& s, const Url& url)
+{
+    return s << url.toString().toStdString();
 }
 
 namespace url {

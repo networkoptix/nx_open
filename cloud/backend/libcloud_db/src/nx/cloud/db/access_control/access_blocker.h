@@ -53,7 +53,6 @@ private:
     using CloudUserLockerPool =
         network::server::UserLockerPool<std::string /*request name*/>;
 
-    const conf::Settings& m_settings;
     std::unique_ptr<LoginEnumerationProtectorPool> m_hostLockerPool;
     std::unique_ptr<CloudUserLockerPool> m_userLocker;
 

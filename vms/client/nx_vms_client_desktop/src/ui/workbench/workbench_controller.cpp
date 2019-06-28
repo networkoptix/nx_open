@@ -6,7 +6,6 @@
 
 #include <QtWidgets/QGraphicsScene>
 #include <QtWidgets/QGraphicsView>
-#include <QtOpenGL/QGLWidget>
 #include <QtWidgets/QGraphicsLinearLayout>
 #include <QtWidgets/QAction>
 #include <QtWidgets/QMenu>
@@ -1476,7 +1475,6 @@ void QnWorkbenchController::at_workbench_currentLayoutChanged()
 {
     if (const auto layout = workbench()->currentLayout()->resource())
     {
-
         connect(layout, &QnLayoutResource::lockedChanged, this,
             &QnWorkbenchController::updateCurrentLayoutInstruments);
     }

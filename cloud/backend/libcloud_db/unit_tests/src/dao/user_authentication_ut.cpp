@@ -5,6 +5,7 @@
 #include <nx/utils/random.h>
 #include <nx/utils/std/algorithm.h>
 #include <nx/utils/time.h>
+#include <nx/utils/string.h>
 
 #include <nx/cloud/db/dao/rdb/dao_rdb_user_authentication.h>
 #include <nx/cloud/db/dao/memory/dao_memory_user_authentication.h>
@@ -308,7 +309,7 @@ private:
     {
         assertConditionInSystemAuthRecords(
             systemId,
-            [this](const api::AuthInfo& authInfo)
+            [](const api::AuthInfo& authInfo)
             {
                 ASSERT_TRUE(authInfo.records.empty());
             });
@@ -318,7 +319,7 @@ private:
     {
         assertConditionInSystemAuthRecords(
             systemId,
-            [this](const api::AuthInfo& authInfo)
+            [](const api::AuthInfo& authInfo)
             {
                 ASSERT_FALSE(authInfo.records.empty());
             });
@@ -339,7 +340,7 @@ private:
         bool isExpired = false;
         assertConditionInSystemAuthRecords(
             systemId,
-            [this, &isExpired](const api::AuthInfo& authInfo)
+            [&isExpired](const api::AuthInfo& authInfo)
             {
                 for (const auto& record: authInfo.records)
                 {

@@ -62,12 +62,14 @@ void QnMobileClientMetaTypes::registerMetaTypes()
 }
 
 void QnMobileClientMetaTypes::registerQmlTypes() {
-    qmlRegisterUncreatableType<QnConnectionManager>("com.networkoptix.qml", 1, 0, "QnConnectionManager", lit("Cannot create an instance of QnConnectionManager."));
-    qmlRegisterUncreatableType<QnMobileAppInfo>("com.networkoptix.qml", 1, 0, "QnMobileAppInfo", lit("Cannot create an instance of QnMobileAppInfo."));
-    qmlRegisterUncreatableType<QnCloudUrlHelper>("com.networkoptix.qml", 1, 0, "QnCloudUrlHelper", lit("Cannot create an instance of QnCloudUrlHelper."));
+    qmlRegisterUncreatableType<QnConnectionManager>("com.networkoptix.qml", 1, 0,
+        "QnConnectionManager", "Cannot create an instance of QnConnectionManager.");
+    qmlRegisterUncreatableType<QnMobileAppInfo>("com.networkoptix.qml", 1, 0,
+        "QnMobileAppInfo", "Cannot create an instance of QnMobileAppInfo.");
+    qmlRegisterUncreatableType<QnCloudUrlHelper>("com.networkoptix.qml", 1, 0,
+        "QnCloudUrlHelper", "Cannot create an instance of QnCloudUrlHelper.");
     qmlRegisterUncreatableType<nx::client::mobile::QmlSettingsAdaptor>(
-        "Nx.Settings", 1, 0, "MobileSettings",
-        lit("Cannot create an instance of MobileSettings."));
+        "Nx.Settings", 1, 0, "MobileSettings", "Cannot create an instance of MobileSettings.");
 
     qmlRegisterType<QnCameraListModel>("com.networkoptix.qml", 1, 0, "QnCameraListModel");
     qmlRegisterType<QnCalendarModel>("com.networkoptix.qml", 1, 0, "QnCalendarModel");
@@ -79,7 +81,8 @@ void QnMobileClientMetaTypes::registerQmlTypes() {
     qmlRegisterType<QnCameraChunkProvider>("com.networkoptix.qml", 1, 0, "QnCameraChunkProvider");
     qmlRegisterType<QnCloudStatusWatcher>("com.networkoptix.qml", 1, 0, "QnCloudStatusWatcher");
     qmlRegisterType<QnCloudSystemInformationWatcher>("com.networkoptix.qml", 1, 0, "QnCloudSystemInformationWatcher");
-    qmlRegisterType<nx::vms::client::core::UserWatcher>("com.networkoptix.qml", 1, 0, "nx::vms::client::core::UserWatcher");
+    qmlRegisterType<nx::vms::client::core::UserWatcher>("com.networkoptix.qml", 1, 0, "UserWatcher");
+
 
 
     qmlRegisterType<QnActiveCameraThumbnailLoader>("com.networkoptix.qml", 1, 0, "QnActiveCameraThumbnailLoader");
@@ -93,7 +96,7 @@ void QnMobileClientMetaTypes::registerQmlTypes() {
 
     // Ptz related classes
     qmlRegisterUncreatableType<Ptz>("Nx.Core", 1, 0, "Ptz",
-        lit("Cannot create an instance of Ptz class"));
+        "Cannot create an instance of Ptz class");
     qmlRegisterType<nx::client::mobile::ResourcePtzController>("Nx.Core", 1, 0, "PtzController");
     qmlRegisterType<nx::client::mobile::PtzPresetModel>("Nx.Core", 1, 0, "PtzPresetModel");
 

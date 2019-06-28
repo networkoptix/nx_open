@@ -440,19 +440,40 @@ TEST_F(ServerArchiveDelegatePlaybackTest, TestHelper)
 class ChunkQualityChooserTest: public ::testing::Test
 {
 public:
-    void chooseChunk(bool hqFromBackup, bool lqFromBackup)
+    static QnVirtualCameraResourcePtr testCamera;
+    static std::unique_ptr<QnMediaServerModule> serverModule;
+
+    void addRecord(DeviceFileCatalogPtr catalog, qint64 startTimeSec, qint64 durationSec)
     {
-        QnVirtualCameraResourcePtr testCamera(new nx::CameraResourceStub());
+        nx::vms::server::Chunk chunk;
+        chunk.startTimeMs = startTimeSec * 1000;
+        chunk.durationMs = durationSec * 1000;
+        catalog->addRecord(chunk);
+    }
+
+    static void SetUpTestCase()
+    {
+        testCamera.reset(new nx::CameraResourceStub());
         testCamera->setId(QnUuid::createUuid());
         testCamera->setPhysicalId(testCamera->getId().toString());
 
-        std::unique_ptr<QnMediaServerModule> serverModule(new QnMediaServerModule());
+        serverModule.reset(new QnMediaServerModule());
         serverModule->commonModule()->setModuleGUID(QnUuid("{A680980C-70D1-4545-A5E5-72D89E33648B}"));
         serverModule->normalStorageManager()->stopAsyncTasks();
         serverModule->backupStorageManager()->stopAsyncTasks();
 
         serverModule->roSettings()->remove(lit("NORMAL_SCAN_ARCHIVE_FROM"));
         serverModule->roSettings()->remove(lit("BACKUP_SCAN_ARCHIVE_FROM"));
+    }
+
+    static void TearDownTestCase()
+    {
+        serverModule.reset();
+        testCamera.reset();
+    }
+
+    void chooseChunk(bool hqFromBackup, bool lqFromBackup)
+    {
 
         TestHelper testHelper(serverModule.get(), QStringList());
 
@@ -466,14 +487,6 @@ public:
         DeviceFileCatalogPtr lqCatalog = lqStorageManager->getFileCatalog(
             testCamera->getPhysicalId(), QnServer::ChunksCatalog::LowQualityCatalog);
 
-        auto addRecord = [](DeviceFileCatalogPtr catalog, qint64 startTimeSec, qint64 durationSec)
-        {
-            DeviceFileCatalog::Chunk chunk;
-            chunk.startTimeMs = startTimeSec * 1000;
-            chunk.durationMs = durationSec * 1000;
-            catalog->addRecord(chunk);
-        };
-
         addRecord(hqCatalog, 0, 100);
         addRecord(hqCatalog, 300, 100);
         addRecord(hqCatalog, 500, 100);
@@ -482,13 +495,13 @@ public:
         addRecord(lqCatalog, 299, 100 + 1 + 5);
         addRecord(lqCatalog, 506, 100);
 
-        DeviceFileCatalog::UniqueChunkCont ignoreList;
+        nx::vms::server::UniqueChunkCont ignoreList;
         QnDualQualityHelper qualityHelper(
             serverModule->normalStorageManager(),
             serverModule->backupStorageManager());
         qualityHelper.setResource(testCamera);
 
-        DeviceFileCatalog::TruncableChunk resultChunk;
+        nx::vms::server::TruncableChunk resultChunk;
         DeviceFileCatalogPtr resultCatalog;
 
         // Before hole LQ > HQ, after hole LQ < HQ, but both <eps/2
@@ -533,7 +546,11 @@ public:
         ASSERT_TRUE(resultCatalog != nullptr);
         ASSERT_EQ(QnServer::ChunksCatalog::LowQualityCatalog, resultCatalog->getRole());
     }
+
 };
+
+QnVirtualCameraResourcePtr ChunkQualityChooserTest::testCamera;
+std::unique_ptr<QnMediaServerModule> ChunkQualityChooserTest::serverModule;
 
 TEST_F(ChunkQualityChooserTest, main)
 {
@@ -541,4 +558,53 @@ TEST_F(ChunkQualityChooserTest, main)
     chooseChunk(false, true);
     chooseChunk(true, false);
     chooseChunk(true, true);
+}
+
+TEST_F(ChunkQualityChooserTest, fourChunkTest)
+{
+    DeviceFileCatalogPtr hqCatalogMain = serverModule->normalStorageManager()->getFileCatalog(
+        testCamera->getPhysicalId(), QnServer::ChunksCatalog::HiQualityCatalog);
+    DeviceFileCatalogPtr lqCatalogMain = serverModule->normalStorageManager()->getFileCatalog(
+        testCamera->getPhysicalId(), QnServer::ChunksCatalog::LowQualityCatalog);
+    DeviceFileCatalogPtr hqCatalogBackup = serverModule->backupStorageManager()->getFileCatalog(
+        testCamera->getPhysicalId(), QnServer::ChunksCatalog::HiQualityCatalog);
+    DeviceFileCatalogPtr lqCatalogBackup = serverModule->backupStorageManager()->getFileCatalog(
+        testCamera->getPhysicalId(), QnServer::ChunksCatalog::LowQualityCatalog);
+
+    addRecord(lqCatalogMain, 0, 100);
+    addRecord(hqCatalogBackup, 0, 100);
+    addRecord(lqCatalogBackup, 0, 100);
+    addRecord(hqCatalogMain, 300, 100);
+
+    nx::vms::server::UniqueChunkCont ignoreList;
+    QnDualQualityHelper qualityHelper(
+        serverModule->normalStorageManager(),
+        serverModule->backupStorageManager());
+    qualityHelper.setResource(testCamera);
+
+    nx::vms::server::TruncableChunk resultChunk;
+    DeviceFileCatalogPtr resultCatalog;
+
+    qualityHelper.findDataForTime(
+        0,
+        resultChunk,
+        resultCatalog,
+        DeviceFileCatalog::OnRecordHole_NextChunk,
+        /* precise find*/ true,
+        ignoreList);
+    ASSERT_TRUE(resultCatalog != nullptr);
+    ASSERT_EQ(QnServer::ChunksCatalog::HiQualityCatalog, resultCatalog->getRole());
+    ASSERT_EQ(0, resultChunk.startTimeMs);
+
+    qualityHelper.setPrefferedQuality(MediaQuality::MEDIA_Quality_Low);
+    qualityHelper.findDataForTime(
+        0,
+        resultChunk,
+        resultCatalog,
+        DeviceFileCatalog::OnRecordHole_NextChunk,
+        /* precise find*/ true,
+        ignoreList);
+    ASSERT_TRUE(resultCatalog != nullptr);
+    ASSERT_EQ(QnServer::ChunksCatalog::LowQualityCatalog, resultCatalog->getRole());
+    ASSERT_EQ(0, resultChunk.startTimeMs);
 }

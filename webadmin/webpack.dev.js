@@ -1,7 +1,9 @@
 const fs = require('fs');
 const webpack = require('webpack');
 const merge = require('webpack-merge');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 // const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+const server_address = process.env.server_address || 'https://10.1.5.115:7001';
 
 const common = require('./webpack.common.js');
 
@@ -16,7 +18,7 @@ module.exports = merge(common, {
             {
                 context: ['/web/', '/api/', '/ec2/', '/hls/', '/media/', '/proxy/'],
                 // target: 'https://fb7a19a3-2b0c-4feb-be48-539231e50113.relay.vmsproxy.hdw.mx/',
-                target: 'https://10.1.5.115:7001',
+                target: server_address,
                 changeOrigin: true,
                 secure      : false
             },
@@ -42,5 +44,14 @@ module.exports = merge(common, {
     plugins:[
         new webpack.HotModuleReplacementPlugin(),
         // new BundleAnalyzerPlugin({analyzerHost:'0.0.0.0', analyzerPort:9001})
+    
+        // make some resources available while serve the project locally
+        new CopyWebpackPlugin([
+            // Local customizations *********************
+            {
+                from: '../customization/',
+                to: 'customization/'
+            }
+        ])
     ]
 });

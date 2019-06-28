@@ -22,14 +22,15 @@ protected:
     {
         test_support::MediaserverWithStorageFixture::SetUp();
         m_server->addSetting("appserverPassword", "admin");
-        test_support::createTestLogger({"ServerArchiveIntegrityWatcher"}, &m_logBuffer);
+        test_support::createTestLogger(
+            { nx::utils::log::Filter(typeid(ServerArchiveIntegrityWatcher)) }, &m_logBuffer);
     }
 
     virtual void TearDown() override
     {
         ASSERT_TRUE(m_archiveReader);
         m_archiveReader->stop();
-        utils::log::removeLoggers({utils::log::Filter(QString("ServerArchiveIntegrityWatcher"))});
+        nx::utils::log::removeLoggers({ nx::utils::log::Filter(typeid(ServerArchiveIntegrityWatcher)) });
         nx::utils::log::lockConfiguration();
     }
 
@@ -94,7 +95,7 @@ protected:
 
         for (const auto& chunk: (*serverCatalogIt)->getChunksUnsafe())
         {
-            const auto fullFileName = (*serverCatalogIt)->fullFileName(chunk);
+            const auto fullFileName = (*serverCatalogIt)->fullFileName(chunk.chunk());
             const auto folderPath = QFileInfo(fullFileName).absolutePath();
             if (folder1Path.isEmpty())
             {
@@ -153,7 +154,7 @@ protected:
 
         for (const auto& chunk: (*serverCatalogIt)->getChunksUnsafe())
         {
-            const auto fullFileName = (*serverCatalogIt)->fullFileName(chunk);
+            const auto fullFileName = (*serverCatalogIt)->fullFileName(chunk.chunk());
             if (file1Path.isEmpty())
             {
                 file1Path = fullFileName;
@@ -178,9 +179,9 @@ private:
     QnWaitCondition m_archiveIntegrityWaitCondition;
     bool m_archiveIntegritySignalReceived = false;
     std::unique_ptr<QnArchiveStreamReader> m_archiveReader;
-    utils::log::Buffer* m_logBuffer = nullptr;
+    nx::utils::log::Buffer* m_logBuffer = nullptr;
 
-    void onArchiveIntegrityBreached(const QnStorageResourcePtr& storage)
+    void onArchiveIntegrityBreached(const QnStorageResourcePtr& /*storage*/)
     {
         NX_MUTEX_LOCKER lock(&m_archiveIntegrityMutex);
         m_archiveIntegritySignalReceived = true;

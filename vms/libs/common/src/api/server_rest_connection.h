@@ -14,20 +14,24 @@
 
 #include <rest/server/json_rest_result.h>
 #include <nx/utils/safe_direct_connection.h>
-#include <api/http_client_pool.h>
 #include <nx/vms/event/event_fwd.h>
 #include <core/resource/resource_fwd.h>
 #include <common/common_module_aware.h>
-#include <api/model/time_reply.h>
-#include <analytics/detected_objects_storage/analytics_events_storage.h>
+#include <analytics/db/abstract_storage.h>
+#include <api/http_client_pool.h>
 #include <api/model/analytics_actions.h>
-#include <api/model/wearable_prepare_data.h>
+#include <api/model/audit/audit_record.h>
 #include <api/model/manual_camera_seach_reply.h>
+#include <api/model/test_email_settings_reply.h>
+#include <api/model/time_reply.h>
+#include <api/model/wearable_prepare_data.h>
+
 #include <nx/update/update_information.h>
 
 #include <nx/vms/api/analytics/settings_response.h>
-#include <nx/vms/event/event_fwd.h>
 #include <nx/vms/api/data/time_reply.h>
+#include <nx/vms/api/data/event_rule_data.h>
+
 
 namespace rest {
 
@@ -51,7 +55,7 @@ struct RestResultWithData: public RestResultWithDataBase
     RestResultWithData& operator=(const RestResultWithData&) = delete;
     RestResultWithData& operator=(RestResultWithData&&) = default;
 
-    QnRestResult::Error error;
+    QnRestResult::Error error = QnRestResult::NoError;
     QString errorString;
     T data;
 };
@@ -234,6 +238,7 @@ public:
         qint64 chunkSize,
         const QByteArray& md5,
         qint64 ttl,
+        bool recreateIfExists,
         AddUploadCallback callback,
         QThread* targetThread = nullptr);
 
@@ -381,9 +386,9 @@ public:
     Handle getStatistics(GetCallback callback, QThread* targetThread = nullptr);
 
     Handle lookupDetectedObjects(
-        const nx::analytics::storage::Filter& request,
+        const nx::analytics::db::Filter& request,
         bool isLocal,
-        Result<nx::analytics::storage::LookupResult>::type callback,
+        Result<nx::analytics::db::LookupResult>::type callback,
         QThread* targetThread = nullptr);
 
     Handle addCamera(
@@ -424,8 +429,14 @@ public:
         Result<QnJsonRestResult>::type callback,
         QThread* targetThread = nullptr);
 
+    Handle executeEventAction(
+        const nx::vms::api::EventActionData& action,
+        Result<QnJsonRestResult>::type callback,
+        QThread* targetThread = nullptr);
+
     Handle updateActionStart(
         const nx::update::Information& info,
+        std::function<void(Handle, bool)>&& callback,
         QThread* targetThread = nullptr);
 
     /** Get information for a current update. It requests /ec2/updateInformation. */
@@ -457,6 +468,10 @@ public:
 
     Handle updateActionInstall(const QSet<QnUuid>& participants,
         std::function<void(Handle, bool)>&& callback,
+        QThread* targetThread = nullptr);
+
+    Handle retryUpdate(
+        Result<UpdateStatusAllData>::type callback,
         QThread* targetThread = nullptr);
 
     Handle getUpdateStatus(
@@ -495,10 +510,64 @@ public:
         Result<nx::vms::api::analytics::SettingsResponse>::type&& callback,
         QThread* targetThread = nullptr);
 
+    Handle getPluginInformation(GetCallback callback, QThread* targetThread = nullptr);
+
+    Handle testEmailSettings(
+        const QnEmailSettings& settings,
+        Result<QnTestEmailSettingsReply>::type&& callback,
+        QThread* targetThread = nullptr);
+
+    Handle recordedTimePeriods(
+        const QnChunksRequestData& request,
+        Result<MultiServerPeriodDataList>::type&& callback,
+        QThread* targetThread = nullptr);
+
+    Handle getAuditLog(
+        qint64 startTimeMs,
+        qint64 endTimeMs,
+        Result<QnAuditRecordList>::type&& callback,
+        QThread* targetThread = nullptr);
+
     Handle debug(
         const QString& action,
         const QString& value,
         PostCallback callback,
+        QThread* targetThread = nullptr);
+
+    /** Sends POST request with a response to be a JSON */
+    Handle postJsonResult(
+        const QString& action,
+        const QnRequestParamList& params,
+        const nx::Buffer& body,
+        std::function<void(bool, Handle, const QnJsonRestResult& response)>&& callback,
+        QThread* targetThread = nullptr);
+
+    /** Sends POST request with a response to be an Ubjson. */
+    Handle postUbJsonResult(
+        const QString& action,
+        const QnRequestParamList& params,
+        const nx::Buffer& body,
+        std::function<void(bool, Handle, const QnUbjsonRestResult& response)>&& callback,
+        QThread* targetThread = nullptr);
+
+    /** Sends POST request with a response to be an EmptyResult. */
+    Handle postEmptyResult(
+        const QString& action,
+        const QnRequestParamList& params,
+        const nx::Buffer& body,
+        PostCallback&& callback,
+        QThread* targetThread = nullptr);
+
+    Handle getUbJsonResult(
+        const QString& action,
+        const QnRequestParamList& params,
+        std::function<void(bool, Handle, QnUbjsonRestResult response)>&& callback,
+        QThread* targetThread = nullptr);
+
+    Handle getRawResult(
+        const QString& action,
+        const QnRequestParamList& params,
+        std::function<void(bool, Handle, QByteArray, nx::network::http::HttpHeaders)> callback,
         QThread* targetThread = nullptr);
 
     /**
@@ -569,8 +638,6 @@ private:
     QnMediaServerResourcePtr getServerWithInternetAccess() const;
 
     void trace(int handle, const QString& message) const;
-    std::pair<QString, QString> getRequestCredentials(
-        const QnMediaServerResourcePtr& targetServer) const;
 
 private:
     QnUuid m_serverId;
@@ -590,11 +657,25 @@ private:
     template <typename ResultType> Handle executePost(
         const QString& path,
         const QnRequestParamList& params,
+        Callback<ResultType> callback,
+        QThread* targetThread);
+
+    /**
+     * This overload thould only be used if API requires custum message body so paramiters can only
+     * be passed by URL.
+     */
+    template <typename ResultType> Handle executePost(
+        const QString& path,
+        const QnRequestParamList& params,
         const nx::network::http::StringType& contentType,
         const nx::network::http::StringType& messageBody,
         Callback<ResultType> callback,
         QThread* targetThread);
 
+    /**
+     * This overload thould only be used if API requires custum message body so paramiters can only
+     * be passed by URL.
+     */
     template <typename ResultType> Handle executePut(
         const QString& path,
         const QnRequestParamList& params,

@@ -119,15 +119,13 @@
         "upnpPortMappingEnabled": "Przekierowywanie portów UPNP włączone",
         "useTextEmailFormat": "Wysyłaj e-maile czystym tekstem",
         "useWindowsEmailLineFeed": "Używaj w e-mailach znaków końca linii zgodnych z Windows",
-        "hanwhaChunkReaderMessageBodyTimeoutSeconds": "Hanwha: Limit czasu fragmentacji wiadomości",
-        "hanwhaChunkReaderResponseTimeoutSeconds": "Hanwha: limit czasu odpowiedzi na fragment",
-        "showHanwhaAlternativePtzControlsOnTile": "Hanwha: Pokaż alternatywne sterowanie PTZ na obrazie",
         "trafficEncryptionForced": "Wymuszaj szyfrowanie transmisji",
         "videoTrafficEncryptionForced": "Wymuszaj szyfrowanie transmisji wideo",
         "updateStatus": "Aktualizacja statusu",
         "watermarkSettings": "Ustawienia znaku wodnego",
         "maxWebMTranscoders": "Maksymalna liczba połączeń WEBM do serwera. Chrome jednocześnie otwiera 2 połączenia, a następnie zamyka pierwsze z nich, dlatego zaleca się ustawienie wartości >= 2.",
-        "maxEventLogRecords": "Maksymalna liczba wpisów do dziennika zdarzeń przechowywanego w bazie danych. Rzeczywista ilość rekordów może być nawet o 20% wyższa niż podana wartość."
+        "maxEventLogRecords": "Maksymalna liczba wpisów do dziennika zdarzeń przechowywanego w bazie danych. Rzeczywista ilość rekordów może być nawet o 20% wyższa niż podana wartość.",
+        "forceLiveCacheForPrimaryStream": "Czy buforować niektóre ramki dla strumienia głównego. Wartości: „tak” - zawsze włączone (może zużywać dużo pamięci RAM), „nie” - zawsze wyłączone, chyba że wymaga tego odtwarzanie (np. HLS), „auto” - podobne do „nie”, ale włączone, gdy poprawia to wrażenia użytkownika (np. w niektórych wtyczkach analizy wideo)."
     },
     "info": {
         "tabs": {
@@ -194,17 +192,17 @@
     },
     "common": {
         "voiceCommands": {
-            "search": "find + [text for searchbar]",
+            "search": "szukaj + [tekst paska wyszukiwania]",
             "pause": "pauza",
-            "help": "help | show commands",
+            "help": "pomoc | pokaż polecenia",
             "collapse all servers": "zwiń wszystkie serwery",
-            "collapse server": "collapse server + [server name]",
+            "collapse server": "zwiń serwer + [nazwa serwera]",
             "play": "odtwarzaj",
             "clear search": "wyczyść wyszukiwanie",
-            "live": "go to live | show me live",
+            "live": "podgląd na żywo | pokaż na żywo",
             "expand all servers": "rozwiń wszystkie serwery",
             "stop listening": "przestań słuchać",
-            "expand server": "expand server + [server name]",
+            "expand server": "rozwiń serwer + [nazwa serwera]",
             "view": "pokaż + [nazwa kamery]"
         },
         "systemOffline": "Serwer jest odłączony",

@@ -41,7 +41,6 @@
 namespace {
 
 static const int RETRY_COUNT_FOR_FOREIGN_RESOURCES = 2;
-static const int kRetryCountToMakeCamOffline = 3;
 static const int kMinServerStartupTimeToTakeForeignCamerasMs = 1000 * 60;
 
 template<class ResourcePointer>
@@ -125,7 +124,7 @@ static void printInLogNetResources(const QnResourceList& resources)
         if (!netRes)
             continue;
 
-        NX_INFO(typeid(QnMServerResourceDiscoveryManager),
+        NX_DEBUG(typeid(QnMServerResourceDiscoveryManager),
             "%1 %2", netRes->getHostAddress(), netRes->getName());
     }
 }
@@ -299,9 +298,17 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
                 if (updateTypeId)
                     foundCamera->setTypeId(newTypeId);
 
-                NX_VERBOSE(this, "Add foreign resource [%1] to search list",
-                    netResourceString(existingCamera));
-
+                if (isForeign)
+                {
+                    NX_VERBOSE(this, "Add foreign resource [%1] to search list",
+                        netResourceString(existingCamera));
+                }
+                if (updateTypeId)
+                {
+                    NX_VERBOSE(this, "Resource [%1] TypeId changed (Old value = %2, new value = %3)."
+                        " Resource will be reinited",
+                        netResourceString(existingCamera), existingCamera->getTypeId(), foundCamera->getTypeId());
+                }
                 extraResources << foundCamera;
             }
             else
@@ -342,8 +349,8 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
     bool foundSmth = !resources.isEmpty();
     if (foundSmth)
     {
-        NX_INFO(this,
-            "After excluding existing resources we've got %1 new resources:", resources.size());
+        NX_DEBUG(this, "After excluding existing resources we've got %1 new resources:",
+            resources.size());
     }
 
     printInLogNetResources(resources);
@@ -358,7 +365,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
 
     if (resources.size())
     {
-        NX_INFO(this, "Final result: ");
+        NX_DEBUG(this, "Final result: ");
         printInLogNetResources(resources);
     }
     return true;
@@ -506,13 +513,23 @@ void QnMServerResourceDiscoveryManager::markOfflineIfNeeded(QSet<QString>& disco
             // resource is not found
             m_resourceDiscoveryCounter[uniqId]++;
 
-            if (m_resourceDiscoveryCounter[uniqId] >= kRetryCountToMakeCamOffline)
+            if (m_resourceDiscoveryCounter[uniqId] >= m_serverModule->settings().retryCountToMakeCameraOffline())
             {
                 QnVirtualCameraResource* camRes = dynamic_cast<QnVirtualCameraResource*>(netRes);
+
+                NX_VERBOSE(this,
+                    "Camera %1 has not answered to %2 discovery loops in a row.",
+                    netResourceString(netRes), m_resourceDiscoveryCounter[uniqId]);
+
                 if (QnLiveStreamProvider::hasRunningLiveProvider(netRes)
                     || (camRes && camRes->isLicenseUsed()))
                 {
-                    if (res->getStatus() == Qn::Offline && !m_disconnectSended[uniqId]) {
+                    if (res->getStatus() == Qn::Offline && !m_disconnectSended[uniqId])
+                    {
+                        NX_VERBOSE(this,
+                            "Send disconnected signal for camera %1",
+                            netResourceString(netRes));
+
                         QnVirtualCameraResourcePtr cam = res.dynamicCast<QnVirtualCameraResource>();
                         if (cam)
                             cam->issueOccured();
@@ -522,7 +539,7 @@ void QnMServerResourceDiscoveryManager::markOfflineIfNeeded(QSet<QString>& disco
                 }
                 else
                 {
-                    NX_INFO(this,
+                    NX_DEBUG(this,
                         "Mark resource %1 as offline"
                         " because it doesn't response to discovery any more.",
                         netResourceString(camRes));

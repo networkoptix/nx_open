@@ -1,11 +1,12 @@
-cmake_minimum_required(VERSION 3.10.0 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.12.0 FATAL_ERROR)
 
 include(cmake/option.cmake)
 include(cmake/default_target.cmake)
 
 set(customization "default" CACHE STRING "Product customization")
-nx_option(beta "Is this build is beta build" ON)
+nx_option(beta "Whether this build is a beta build" ON)
 set(buildNumber "0" CACHE STRING "Build number")
+set(eulaVersionOverride "" CACHE STRING "Overriden EULA version")
 
 # Remember to reset the in-version protocol number when updating the project version
 set(releaseVersion 4.0.0)
@@ -36,6 +37,12 @@ if(targetDevice STREQUAL "none")
     set(targetDevice "")
 endif()
 
+if(beta)
+    set(beta_bool "true")
+else()
+    set(beta_bool "false")
+endif()
+
 if(NOT CMAKE_TOOLCHAIN_FILE AND targetDevice)
     set(CMAKE_TOOLCHAIN_FILE ${CMAKE_CURRENT_LIST_DIR}/cmake/toolchain/${targetDevice}.cmake)
     if(NOT EXISTS ${CMAKE_TOOLCHAIN_FILE})
@@ -48,18 +55,20 @@ include(cmake/find_python.cmake)
 include(cmake/rdep.cmake)
 nx_rdep_configure()
 
-include(cmake/mercurial.cmake)
-hg_changeset(${CMAKE_CURRENT_LIST_DIR} changeSet)
+include(cmake/vcs_helpers.cmake)
+nx_vcs_changeset(${CMAKE_CURRENT_LIST_DIR} changeSet)
 if(NOT changeSet AND NOT developerBuild)
     message(FATAL_ERROR "Hg changeset cannot be calculated.")
 endif()
 
-hg_branch(${CMAKE_CURRENT_LIST_DIR} branch)
+nx_vcs_branch(${CMAKE_CURRENT_LIST_DIR} branch)
 if(NOT branch AND NOT developerBuild)
     message(FATAL_ERROR "Hg branch cannot be calculated.")
 endif()
 
 include(cmake/dependencies.cmake)
+# Load generated dependencies.cmake, containing packages path variables.
+load_generated_dependencies_file()
 
 project(vms VERSION ${releaseVersion})
 
@@ -70,7 +79,7 @@ endif()
 set(releaseVersion.short ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR})
 set(releaseVersion.full ${releaseVersion}.${buildNumber})
 
-set(mobileClientVersion 19.1)
+set(mobileClientVersion 19.2)
 set(mobileClientVersion.full ${mobileClientVersion}.${buildNumber})
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -92,11 +101,11 @@ include(utils)
 include(find_sources)
 include(moc_utils)
 include(qrc_utils)
+include(cpp_utils)
 include(precompiled_header)
 include(strip_target)
 include(vms_protocol_version)
-
-set(customization_dir "${PROJECT_SOURCE_DIR}/customization/${customization}")
+include(customization_package)
 
 include(customization/default-values.cmake)
 include(${customization_dir}/customization.cmake)
@@ -180,7 +189,7 @@ endif()
 
 set(QML_IMPORT_PATH
     "${QT_DIR}/qml"
-    "${CMAKE_CURRENT_LIST_DIR}/vms/client/nx_vms_client_desktop/static-resources/qml"
+    "${CMAKE_CURRENT_LIST_DIR}/vms/client/nx_vms_client_desktop/qml"
     "${CMAKE_CURRENT_LIST_DIR}/vms/client/mobile_client/static-resources/qml"
     "${CMAKE_CURRENT_LIST_DIR}/nxtool/static-resources/src/qml"
     CACHE STRING "Extra QML import paths")
@@ -228,12 +237,6 @@ if(withTests)
 endif()
 
 include(fix_qt_vars)
-
-if(beta)
-    set(beta_bool "true")
-else()
-    set(beta_bool "false")
-endif()
 
 if(withDocumentation)
     add_subdirectory(doc)

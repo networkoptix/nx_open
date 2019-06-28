@@ -4,6 +4,7 @@
 
 #include <QtCore/QList>
 
+#include <api/helpers/thumbnail_request_data.h>
 #include <nx/vms/event/actions/actions.h>
 #include <nx/vms/event/events/ip_conflict_event.h>
 #include <nx/vms/event/events/server_conflict_event.h>
@@ -225,6 +226,11 @@ ExtendedRuleProcessor::ExtendedRuleProcessor(QnMediaServerModule* serverModule):
 
 ExtendedRuleProcessor::~ExtendedRuleProcessor()
 {
+    stop();
+}
+
+void ExtendedRuleProcessor::stop()
+{
     quit();
     wait();
     m_emailThreadPool.waitForDone();
@@ -232,7 +238,7 @@ ExtendedRuleProcessor::~ExtendedRuleProcessor()
     std::set<quint64> timersToRemove;
     {
         QnMutexLocker lk(&m_mutex);
-        for (const auto& value: m_aggregatedEmails)
+        for (const auto& value : m_aggregatedEmails)
         {
             if (value.periodicTaskID)
                 timersToRemove.insert(value.periodicTaskID);
@@ -240,7 +246,7 @@ ExtendedRuleProcessor::~ExtendedRuleProcessor()
         m_aggregatedEmails.clear();
     }
 
-    for (const auto& timerId: timersToRemove)
+    for (const auto& timerId : timersToRemove)
         nx::utils::TimerManager::instance()->joinAndDeleteTimer(timerId);
 }
 
@@ -428,12 +434,12 @@ bool ExtendedRuleProcessor::executeHttpRequestAction(const vms::event::AbstractA
         action->getRuntimeParams());
     nx::network::http::StringType requestType = actionParameters.requestType;
 
-    nx::utils::Url url(action->getParams().url);
+    nx::utils::Url url(actionParameters.url);
     if ((actionParameters.requestType == nx::network::http::Method::get) ||
         (actionParameters.requestType == nx::network::http::Method::delete_) ||
         (actionParameters.requestType.isEmpty() && actionParameters.text.isEmpty()))
     {
-        auto callback = [action](
+        auto callback = [actionParameters](
             SystemError::ErrorCode osErrorCode,
             int statusCode,
             nx::network::http::StringType, /*content type*/
@@ -444,7 +450,7 @@ bool ExtendedRuleProcessor::executeHttpRequestAction(const vms::event::AbstractA
                     statusCode != nx::network::http::StatusCode::ok)
                 {
                     qWarning() << "Failed to execute HTTP action for url "
-                        << QUrl(action->getParams().url).toString(QUrl::RemoveUserInfo)
+                        << QUrl(actionParameters.url).toString(QUrl::RemoveUserInfo)
                         << "osErrorCode:" << osErrorCode
                         << "HTTP result:" << statusCode
                         << "message:" << messageBody;
@@ -465,13 +471,13 @@ bool ExtendedRuleProcessor::executeHttpRequestAction(const vms::event::AbstractA
     }
     else
     {
-        auto callback = [action](SystemError::ErrorCode osErrorCode, int statusCode)
+        auto callback = [actionParameters](SystemError::ErrorCode osErrorCode, int statusCode)
         {
             if (osErrorCode != SystemError::noError ||
                 statusCode != nx::network::http::StatusCode::ok)
             {
                 qWarning() << "Failed to execute HTTP action for url "
-                           << QUrl(action->getParams().url).toString(QUrl::RemoveUserInfo)
+                           << QUrl(actionParameters.url).toString(QUrl::RemoveUserInfo)
                            << "osErrorCode:" << osErrorCode
                            << "HTTP result:" << statusCode;
             }
@@ -485,7 +491,7 @@ bool ExtendedRuleProcessor::executeHttpRequestAction(const vms::event::AbstractA
             requestType = nx::network::http::Method::post;
 
         nx::network::http::uploadDataAsync(url,
-            action->getParams().text.toUtf8(),
+            actionParameters.text.toUtf8(),
             contentType,
             nx::network::http::HttpHeaders(),
             callback,

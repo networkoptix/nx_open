@@ -78,7 +78,7 @@ void DirectEndpointConnector::stopWhileInAioThread()
 bool DirectEndpointConnector::s_needVerification(true);
 
 void DirectEndpointConnector::performEndpointVerification(
-    std::list<SocketAddress> endpoints,
+    std::vector<SocketAddress> endpoints,
     std::chrono::milliseconds timeout,
     ConnectCompletionHandler handler)
 {
@@ -105,7 +105,7 @@ void DirectEndpointConnector::performEndpointVerification(
 }
 
 void DirectEndpointConnector::removeInvalidEmptyAddresses(
-    std::list<SocketAddress>* endpoints)
+    std::vector<SocketAddress>* endpoints)
 {
     for (auto it = endpoints->begin(); it != endpoints->end();)
     {
@@ -123,7 +123,7 @@ void DirectEndpointConnector::removeInvalidEmptyAddresses(
 }
 
 void DirectEndpointConnector::launchVerificators(
-    const std::list<SocketAddress>& endpoints,
+    const std::vector<SocketAddress>& endpoints,
     std::chrono::milliseconds timeout)
 {
     using namespace std::placeholders;

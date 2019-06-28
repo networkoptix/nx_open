@@ -317,7 +317,8 @@ public:
 
     virtual void selectRelayInstanceForListeningPeer(
         const std::string& /*peerId*/,
-        RelayInstanceSearchCompletionHandler completionHandler) override
+        const nx::network::HostAddress& /*serverHost*/,
+        RelayInstanceSelectCompletionHandler completionHandler) override
     {
         post(
             [this, completionHandler = std::move(completionHandler)]() mutable
@@ -328,8 +329,9 @@ public:
             });
     }
 
-    virtual void findRelayInstancePeerIsListeningOn(
+    virtual void findRelayInstanceForClient(
         const std::string& /*peerId*/,
+        const nx::network::HostAddress& /*clientHost*/,
         RelayInstanceSearchCompletionHandler /*completionHandler*/) override
     {
     }
@@ -347,12 +349,12 @@ public:
                 nx::utils::swapAndCall(
                     m_selectRelayInstanceForListeningPeerHandler,
                     cloud::relay::api::ResultCode::ok,
-                    QUrl("http://some-relay-instance.com"));
+                    std::vector<nx::utils::Url>({"http://some-relay-instance.com"}));
             });
     }
 
 private:
-    RelayInstanceSearchCompletionHandler m_selectRelayInstanceForListeningPeerHandler;
+    RelayInstanceSelectCompletionHandler m_selectRelayInstanceForListeningPeerHandler;
     nx::utils::SyncQueue<int> m_selectRelayInstanceForListeningPeerRequestQueue;
 };
 

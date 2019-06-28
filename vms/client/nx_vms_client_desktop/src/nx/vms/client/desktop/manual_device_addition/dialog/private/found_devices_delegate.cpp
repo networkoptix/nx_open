@@ -2,6 +2,8 @@
 
 #include <QtWidgets/QApplication>
 
+#include <nx/utils/log/assert.h>
+
 namespace nx::vms::client::desktop {
 
 FoundDevicesDelegate::FoundDevicesDelegate(QObject* parent):

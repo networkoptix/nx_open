@@ -1,36 +1,32 @@
 #include "sign_dialog.h"
 #include "ui_sign_dialog.h"
 
-#include <QtOpenGL/QGLWidget>
+#include <QtWidgets/QOpenGLWidget>
 
+#include <camera/gl_renderer.h>
+#include <camera/cam_display.h>
+#include <camera/sign_dialog_display.h>
 #include <client_core/client_core_module.h>
-
-#include "core/resource/avi/avi_resource.h"
+#include <core/resource/avi/avi_resource.h>
 #include <core/dataprovider/data_provider_factory.h>
-#include "nx/streaming/abstract_archive_stream_reader.h"
+#include <export/sign_helper.h>
+#include <ui/workaround/gl_native_painting.h>
+#include <ui/graphics/items/resource/resource_widget_renderer.h>
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
+#include <utils/common/event_processors.h>
 
-#include "camera/gl_renderer.h"
-#include "camera/cam_display.h"
-#include "camera/sign_dialog_display.h"
-
-#include "ui/workaround/gl_native_painting.h"
-#include "ui/graphics/items/resource/decodedpicturetoopengluploadercontextpool.h"
-#include "ui/graphics/items/resource/resource_widget_renderer.h"
-#include "ui/help/help_topic_accessor.h"
-#include "ui/help/help_topics.h"
-
-#include "export/sign_helper.h"
+#include <nx/streaming/abstract_archive_stream_reader.h>
 
 // TODO: #Elric replace with QnRenderingWidget
-class QnSignDialogGlWidget: public QGLWidget
+class QnSignDialogGlWidget: public QOpenGLWidget
 {
 public:
     QnSignDialogGlWidget(
         QWidget* parent = nullptr,
-        QGLWidget* shareWidget = nullptr,
         Qt::WindowFlags windowFlags = 0)
         :
-        QGLWidget(parent, shareWidget, windowFlags)
+        QOpenGLWidget(parent, windowFlags)
     {
         connect(&m_timer, &QTimer::timeout, this, [this]{ update(); });
         m_timer.start(16);
@@ -61,7 +57,7 @@ public:
     virtual void paintEvent(QPaintEvent* /*event*/) override
     {
         QPainter painter(this);
-        QnGlNativePainting::begin(QGLContext::currentContext(), &painter);
+        QnGlNativePainting::begin(this, &painter);
         if (m_renderer)
             m_renderer->paint(0, QRectF(0.0, 0.0, 1.0, 1.0), m_videoRect, 1.0);
         QnGlNativePainting::end(&painter);
@@ -89,10 +85,8 @@ SignDialog::SignDialog(QnResourcePtr checkResource, QWidget* parent):
     m_layout->setSpacing(0);
     m_layout->setContentsMargins(0, 0, 0, 0);
 
-    m_glWindow.reset(new QnSignDialogGlWidget(this));
-    m_layout->addWidget(m_glWindow.data());
-    DecodedPictureToOpenGLUploaderContextPool::instance()->ensureThereAreContextsSharedWith(
-        m_glWindow.data());
+    m_openGLWidget.reset(new QnSignDialogGlWidget(this));
+    m_layout->addWidget(m_openGLWidget.data());
 
     m_srcVideoInfo = new QnSignInfo();
 
@@ -124,13 +118,22 @@ SignDialog::SignDialog(QnResourcePtr checkResource, QWidget* parent):
     connect(m_camDispay, &QnSignDialogDisplay::gotImageSize, this,
         &SignDialog::at_gotImageSize);
 
-    m_renderer = new QnResourceWidgetRenderer(0, m_glWindow->context());
-    m_glWindow->setRenderer(m_renderer);
-    m_camDispay->addVideoRenderer(1, m_renderer, true);
-    m_reader->addDataProcessor(m_camDispay.data());
-    m_reader->setSpeed(1024 * 1024);
-    m_reader->start();
-    m_camDispay->start();
+    const auto ensureInitialized =
+        [this]()
+        {
+            if (m_renderer)
+                return;
+
+            m_renderer = new QnResourceWidgetRenderer(0, m_openGLWidget.data());
+            m_openGLWidget->setRenderer(m_renderer);
+            m_camDispay->addVideoRenderer(1, m_renderer, true);
+            m_reader->addDataProcessor(m_camDispay.data());
+            m_reader->setSpeed(1024 * 1024);
+            m_reader->start();
+            m_camDispay->start();
+        };
+
+    installEventHandler(this, QEvent::Show, this, ensureInitialized);
 }
 
 SignDialog::~SignDialog()
@@ -210,19 +213,20 @@ void SignDialog::at_calcSignInProgress(QByteArray /*sign*/, int progress)
 
 void SignDialog::at_gotImageSize(int width, int height)
 {
-    if (m_glWindow)
-        m_glWindow->setImageSize(width, height);
+    if (m_openGLWidget)
+        m_openGLWidget->setImageSize(width, height);
     ui->signInfoLabel->setImageSize(width, height);
 }
 
-void SignDialog::at_gotSignature(QByteArray calculatedSign, QByteArray signFromFrame)
+void SignDialog::at_gotSignature(
+    QByteArray calculatedSign, QByteArray calculatedSign2, QByteArray signFromFrame)
 {
 #ifndef SIGN_FRAME_ENABLED
     m_layout->addWidget(m_srcVideoInfo);
-    m_glWindow->hide();
+    m_openGLWidget->hide();
     m_srcVideoInfo->setDrawDetailTextMode(true);
 
     // It is correct. Set parameters vise versa here.
-    m_srcVideoInfo->at_gotSignature(signFromFrame, calculatedSign);
+    m_srcVideoInfo->at_gotSignature(calculatedSign2, calculatedSign, signFromFrame);
 #endif
 }

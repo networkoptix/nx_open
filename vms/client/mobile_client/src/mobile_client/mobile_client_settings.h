@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QtCore/QSize>
+
 #include <utils/common/property_storage.h>
 #include <nx/utils/singleton.h>
 #include <nx/utils/log/log_level.h>
@@ -97,7 +99,7 @@ private:
 
         QN_DECLARE_RW_PROPERTY(QString,
             logLevel, setLogLevel,
-            LogLevel, lit("none"))
+            LogLevel, "none")
 
         // Deprecated properties
         QN_DECLARE_RW_PROPERTY(QString,                     lastUsedSessionId,          setLastUsedSessionId,       LastUsedSessionId,          QString())

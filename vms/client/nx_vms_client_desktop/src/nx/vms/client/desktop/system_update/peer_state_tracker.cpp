@@ -1,6 +1,5 @@
 #include "peer_state_tracker.h"
 
-#include <nx_ec/ec_proto_version.h>
 #include <api/global_settings.h>
 #include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
@@ -9,12 +8,13 @@
 #include <nx/utils/app_info.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/api/protocol_version.h>
 #include <ui/workbench/workbench_context.h>
 #include "client_update_tool.h"
 
 namespace {
 
-auto kWaitForServerReturn = std::chrono::minutes(10);
+std::chrono::milliseconds kWaitForServerReturn = std::chrono::minutes(10);
 
 template<class Type> bool compareAndSet(const Type& from, Type& to)
 {
@@ -33,10 +33,15 @@ PeerStateTracker::PeerStateTracker(QObject* parent):
     QnWorkbenchContextAware(parent),
     m_dataLock(QnMutex::Recursive)
 {
-    if(ini().massSystemUpdateWaitForServerOnlineOverride)
-        m_waitForServerReturn = std::chrono::seconds(ini().massSystemUpdateWaitForServerOnlineOverride);
+    if (ini().massSystemUpdateWaitForServerOnlineSecOverride)
+    {
+        m_timeForServerToReturn = std::chrono::seconds(
+            ini().massSystemUpdateWaitForServerOnlineSecOverride);
+    }
     else
-        m_waitForServerReturn = kWaitForServerReturn;
+    {
+        m_timeForServerToReturn = kWaitForServerReturn;
+    }
 }
 
 bool PeerStateTracker::setResourceFeed(QnResourcePool* pool)
@@ -131,8 +136,10 @@ QnMediaServerResourcePtr PeerStateTracker::getServer(QnUuid id) const
 
 QnUuid PeerStateTracker::getClientPeerId() const
 {
-    NX_ASSERT(m_clientItem);
-    return m_clientItem->id;
+    // This ID is much more easy to distinguish.
+    if (ini().massSystemUpdateDebugInfo)
+        return QnUuid("cccccccc-cccc-cccc-cccc-cccccccccccc");
+    return commonModule()->globalSettings()->localSystemId();
 }
 
 nx::utils::SoftwareVersion PeerStateTracker::lowestInstalledVersion()
@@ -160,8 +167,14 @@ nx::utils::SoftwareVersion PeerStateTracker::lowestInstalledVersion()
 
 void PeerStateTracker::setUpdateTarget(const nx::utils::SoftwareVersion& version)
 {
-    NX_ASSERT(!version.isNull());
+    NX_VERBOSE(this, "setUpdateTarget(%1)", version);
     m_targetVersion = version;
+
+    // VMS-13789: Should set client version to target version, if client has installed it.
+    if (m_clientItem && m_clientItem->state == StatusCode::latestUpdateInstalled)
+    {
+        m_clientItem->version = version;
+    }
 
     for (auto& item: m_items)
     {
@@ -172,7 +185,7 @@ void PeerStateTracker::setUpdateTarget(const nx::utils::SoftwareVersion& version
 
             if (installed != item->installed)
             {
-                item->installed = true;
+                item->installed = installed;
                 NX_INFO(this, "setUpdateTarget() - peer %1 changed installed=%2", item->id, item->installed);
             }
             emit itemChanged(item);
@@ -225,7 +238,35 @@ bool PeerStateTracker::hasStatusErrors() const
     return false;
 }
 
-void PeerStateTracker::setUpdateStatus(const std::map<QnUuid, nx::update::Status>& statusAll)
+bool PeerStateTracker::getErrorReport(ErrorReport& report) const
+{
+    auto lastCode = UpdateItem::ErrorCode::noError;
+
+    for (auto& item: m_items)
+    {
+        if (item->errorCode == UpdateItem::ErrorCode::noError)
+            continue;
+
+        auto errorCode = item->errorCode;
+        if (errorCode < lastCode || lastCode == UpdateItem::ErrorCode::noError)
+        {
+            lastCode = errorCode;
+            // Since all error codes are sorted, we can drop all peers with previous code.
+            report.peers.clear();
+        }
+
+        if (errorCode == lastCode)
+            report.peers.insert(item->id);
+    }
+
+    if (lastCode == UpdateItem::ErrorCode::noError)
+        return false;
+
+    report.message = errorString(lastCode);
+    return true;
+}
+
+int PeerStateTracker::setUpdateStatus(const std::map<QnUuid, nx::update::Status>& statusAll)
 {
     QList<UpdateItemPtr> itemsChanged;
     {
@@ -236,34 +277,64 @@ void PeerStateTracker::setUpdateStatus(const std::map<QnUuid, nx::update::Status
             {
                 bool changed = false;
 
-                changed |= compareAndSet<int>(status.second.progress, item->progress);
-                changed |= compareAndSet(status.second.message, item->statusMessage);
-                changed |= compareAndSet(status.second.code, item->state);
+                item->lastStatusTime = UpdateItem::Clock::now();
+
+                if (status.second.code == StatusCode::offline)
+                    continue;
+
+                QString name = item->component == UpdateItem::Component::client
+                    ? QString("client")
+                    : getServer(item)->getName();
+
+                if (item->state != status.second.code)
+                {
+                    NX_INFO(this, "setUpdateStatus() - changing status %1->%2 for peer %3: %4",
+                        toString(item->state), toString(status.second.code), name, item->id);
+                    item->state = status.second.code;
+                    changed = true;
+                }
+
+                changed |= compareAndSet(status.second.progress, item->progress);
+                changed |= compareAndSet(status.second.message, item->debugMessage);
+                changed |= compareAndSet(status.second.errorCode, item->errorCode);
+
+                if (status.second.code == StatusCode::error)
+                {
+                    NX_ASSERT(status.second.errorCode != nx::update::Status::ErrorCode::noError);
+                    // Fix for the cases when server does not report error code properly.
+                    if (item->errorCode == nx::update::Status::ErrorCode::noError)
+                        item->errorCode = nx::update::Status::ErrorCode::unknownError;
+                    item->statusMessage = errorString(status.second.errorCode);
+                }
 
                 if (item->state == StatusCode::latestUpdateInstalled && item->installing)
                 {
-                    NX_DEBUG(this, "removing installation status for %1", item->id);
+                    NX_INFO(this, "setUpdateStatus() - removing installation status for %1",
+                        item->id);
                     item->installing = false;
                     changed = true;
                 }
 
                 if (item->statusUnknown)
                 {
-                    NX_DEBUG(this, "clearing unknown status for peer %1, status=%2",
+                    NX_INFO(this,
+                        "setUpdateStatus() - clearing unknown status for peer %1, status=%2",
                         item->id, toString(item->state));
                     item->statusUnknown = false;
                 }
 
-                // Ignoring 'offline' status from /ec2/updateStatus.
-                //item->offline = (status.second.code == StatusCode::offline);
-
                 if (changed)
                     itemsChanged.append(item);
+            }
+            else
+            {
+                NX_ERROR(this, "setUpdateStatus() got unknown peer id=%1", status.first);
             }
         }
     }
     for (auto item: itemsChanged)
         emit itemChanged(item);
+    return itemsChanged.size();
 }
 
 void PeerStateTracker::markStatusUnknown(const QSet<QnUuid>& targets)
@@ -273,8 +344,11 @@ void PeerStateTracker::markStatusUnknown(const QSet<QnUuid>& targets)
         if (auto item = findItemById(uid))
         {
             // Only server's state can be 'unknown'.
-            if (item->component == UpdateItem::Component::server)
+            if (item->component == UpdateItem::Component::server
+                && (!item->offline || item->state != StatusCode::offline))
+            {
                 item->statusUnknown = true;
+            }
         }
     }
 }
@@ -347,15 +421,20 @@ void PeerStateTracker::setPeersInstalling(const QSet<QnUuid>& targets, bool inst
 
 void PeerStateTracker::clearState()
 {
+    NX_DEBUG(this, "clearState()");
     QnMutexLocker locker(&m_dataLock);
     for (auto& item: m_items)
     {
+        // Offline peers are already 'clean' enough, ignoring them.
+        if (item->state == StatusCode::offline && item->offline)
+            continue;
         item->state = StatusCode::idle;
         item->progress = 0;
-        item->statusMessage = "Waiting for peer data";
+        item->statusMessage = tr("Waiting for peer data");
         item->verificationMessage = "";
         item->installing = false;
     }
+
     auto items = m_items;
     locker.unlock();
 
@@ -363,7 +442,7 @@ void PeerStateTracker::clearState()
         emit itemChanged(item);
 }
 
-std::map<QnUuid, nx::update::Status::Code> PeerStateTracker::getAllPeerStates() const
+std::map<QnUuid, nx::update::Status::Code> PeerStateTracker::allPeerStates() const
 {
     QnMutexLocker locker(&m_dataLock);
     std::map<QnUuid, nx::update::Status::Code> result;
@@ -373,7 +452,7 @@ std::map<QnUuid, nx::update::Status::Code> PeerStateTracker::getAllPeerStates() 
     return result;
 }
 
-std::map<QnUuid, QnMediaServerResourcePtr> PeerStateTracker::getActiveServers() const
+std::map<QnUuid, QnMediaServerResourcePtr> PeerStateTracker::activeServers() const
 {
     QnMutexLocker locker(&m_dataLock);
 
@@ -387,13 +466,13 @@ std::map<QnUuid, QnMediaServerResourcePtr> PeerStateTracker::getActiveServers() 
     return result;
 }
 
-QList<UpdateItemPtr> PeerStateTracker::getAllItems() const
+QList<UpdateItemPtr> PeerStateTracker::allItems() const
 {
     QnMutexLocker locker(&m_dataLock);
     return m_items;
 }
 
-QSet<QnUuid> PeerStateTracker::getAllPeers() const
+QSet<QnUuid> PeerStateTracker::allPeers() const
 {
     QnMutexLocker locker(&m_dataLock);
     QSet<QnUuid> result;
@@ -402,7 +481,7 @@ QSet<QnUuid> PeerStateTracker::getAllPeers() const
     return result;
 }
 
-QSet<QnUuid> PeerStateTracker::getPeersInState(StatusCode state) const
+QSet<QnUuid> PeerStateTracker::peersInState(StatusCode state) const
 {
     QnMutexLocker locker(&m_dataLock);
     QSet<QnUuid> result;
@@ -414,17 +493,43 @@ QSet<QnUuid> PeerStateTracker::getPeersInState(StatusCode state) const
     return result;
 }
 
-QSet<QnUuid> PeerStateTracker::getOfflineServers() const
+QSet<QnUuid> PeerStateTracker::offlineServers() const
 {
     QnMutexLocker locker(&m_dataLock);
     QSet<QnUuid> result;
     for (const auto& item: m_items)
+    {
         if (item->offline)
             result.insert(item->id);
+    }
     return result;
 }
 
-QSet<QnUuid> PeerStateTracker::getLegacyServers() const
+QSet<QnUuid> PeerStateTracker::onlineAndInState(StatusCode state) const
+{
+    QnMutexLocker locker(&m_dataLock);
+    QSet<QnUuid> result;
+    for (const auto& item: m_items)
+    {
+        if (!item->offline && item->state == state)
+            result.insert(item->id);
+    }
+    return result;
+}
+
+QSet<QnUuid> PeerStateTracker::offlineAndInState(StatusCode state) const
+{
+    QnMutexLocker locker(&m_dataLock);
+    QSet<QnUuid> result;
+    for (const auto& item: m_items)
+    {
+        if (item->offline && item->state == state)
+            result.insert(item->id);
+    }
+    return result;
+}
+
+QSet<QnUuid> PeerStateTracker::legacyServers() const
 {
     QnMutexLocker locker(&m_dataLock);
     QSet<QnUuid> result;
@@ -438,7 +543,7 @@ QSet<QnUuid> PeerStateTracker::getLegacyServers() const
     return result;
 }
 
-QSet<QnUuid> PeerStateTracker::getPeersInstalling() const
+QSet<QnUuid> PeerStateTracker::peersInstalling() const
 {
     QnMutexLocker locker(&m_dataLock);
     QSet<QnUuid> result;
@@ -448,7 +553,7 @@ QSet<QnUuid> PeerStateTracker::getPeersInstalling() const
     return result;
 }
 
-QSet<QnUuid> PeerStateTracker::getPeersCompleteInstall() const
+QSet<QnUuid> PeerStateTracker::peersCompleteInstall() const
 {
     QnMutexLocker locker(&m_dataLock);
     QSet<QnUuid> result;
@@ -458,9 +563,9 @@ QSet<QnUuid> PeerStateTracker::getPeersCompleteInstall() const
     return result;
 }
 
-QSet<QnUuid> PeerStateTracker::getServersWithChangedProtocol() const
+QSet<QnUuid> PeerStateTracker::serversWithChangedProtocol() const
 {
-    int protocol = nx_ec::EC2_PROTO_VERSION;
+    int protocol = nx::vms::api::protocolVersion();
     QnMutexLocker locker(&m_dataLock);
     QSet<QnUuid> result;
     for (const auto& item: m_items)
@@ -473,7 +578,7 @@ QSet<QnUuid> PeerStateTracker::getServersWithChangedProtocol() const
     return result;
 }
 
-QSet<QnUuid> PeerStateTracker::getPeersWithUnknownStatus() const
+QSet<QnUuid> PeerStateTracker::peersWithUnknownStatus() const
 {
     QSet<QnUuid> result;
     QnMutexLocker locker(&m_dataLock);
@@ -485,11 +590,85 @@ QSet<QnUuid> PeerStateTracker::getPeersWithUnknownStatus() const
     return result;
 }
 
+QSet<QnUuid> PeerStateTracker::peersWithDownloaderError() const
+{
+    QSet<UpdateItem::ErrorCode> errorTypes =
+    {
+        UpdateItem::ErrorCode::downloadFailed,
+        UpdateItem::ErrorCode::internalDownloaderError,
+        UpdateItem::ErrorCode::noFreeSpaceToDownload,
+        UpdateItem::ErrorCode::noFreeSpaceToExtract,
+    };
+    QSet<QnUuid> result;
+    QnMutexLocker locker(&m_dataLock);
+    for (const auto& item: m_items)
+    {
+        if (item->state != StatusCode::error)
+            continue;
+        if (errorTypes.contains(item->errorCode))
+            result.insert(item->id);
+    }
+    return result;
+}
+
+void PeerStateTracker::processUnknownStates()
+{
+    QList<UpdateItemPtr> itemsChanged;
+    auto now = UpdateItem::Clock::now();
+
+    {
+        QnMutexLocker locker(&m_dataLock);
+        for (const auto& item: m_items)
+        {
+            StatusCode state = item->state;
+            auto id = item->id;
+
+            if (item->statusUnknown && state != StatusCode::offline)
+            {
+                auto delta = now - item->lastStatusTime;
+                if (delta > m_timeForServerToReturn)
+                {
+                    NX_INFO(this, "processUnknownStates() "
+                        "peer %1 had no status updates for too long. Skipping it.", id);
+                    item->state = StatusCode::error;
+                    item->statusMessage = tr("The server is taking too long to respond");
+                }
+                continue;
+            }
+
+            if (item->offline && state != StatusCode::offline)
+            {
+                if (state != StatusCode::offline)
+                {
+                    auto delta = now - item->lastOnlineTime;
+                    if (delta > m_timeForServerToReturn)
+                    {
+                        NX_INFO(this, "processUnknownStates() "
+                            "peer %1 has been offline for too long. Skipping it.", id);
+                        item->state = StatusCode::offline;
+                        itemsChanged.push_back(item);
+                    }
+                }
+                else
+                {
+                    // Sometimes mediaserver resource has offline status, but this server is actually
+                    // online and has state != StatusCode::offline at /ec2/updateStatus. So current
+                    // logic causes constant switches to 'full offline' and back.
+                    // Resetting offline timestamp to prevent such blinking.
+                    item->lastOnlineTime = now;
+                }
+            }
+        }
+    }
+
+    for (auto item: itemsChanged)
+        emit itemChanged(item);
+}
+
 void PeerStateTracker::processDownloadTaskSet()
 {
     NX_ASSERT(!m_peersIssued.isEmpty());
     QnMutexLocker locker(&m_dataLock);
-    auto now = UpdateItem::Clock::now();
 
     for (const auto& item: m_items)
     {
@@ -505,22 +684,11 @@ void PeerStateTracker::processDownloadTaskSet()
         if (item->incompatible)
             continue;
 
-        if (item->offline || state == StatusCode::offline)
-        {
-            auto delta = now - item->lastTimeOnline;
-            if (delta > m_waitForServerReturn)
-            {
-                NX_VERBOSE(this, "processDownloadTaskSet() "
-                    "peer %1 has been offline for too long. Skipping it.", id);
-                m_peersActive.remove(id);
-                m_peersIssued.remove(id);
-            }
-        }
-        else if (item->installed)
+        if (item->installed)
         {
             if (m_peersActive.contains(id))
             {
-                NX_VERBOSE(this, "processDownloadTaskSet() ",
+                NX_VERBOSE(this, "processDownloadTaskSet() "
                     "peer %1 has already installed this package.", id);
                 m_peersActive.remove(id);
             }
@@ -540,7 +708,6 @@ void PeerStateTracker::processDownloadTaskSet()
                     m_peersComplete.insert(id);
                     break;
                 case StatusCode::error:
-                case StatusCode::idle:
                     if (m_peersActive.contains(id))
                     {
                         NX_VERBOSE(this, "processDownloadTaskSet() "
@@ -559,8 +726,10 @@ void PeerStateTracker::processDownloadTaskSet()
                     }
                     break;
                 case StatusCode::offline:
-                    // We should have already handled this case.
-                    NX_ASSERT(false);
+                    NX_VERBOSE(this, "processDownloadTaskSet() "
+                        "peer %1 has been offline for too long. Skipping it.", id);
+                    m_peersActive.remove(id);
+                    m_peersIssued.remove(id);
                     break;
                 case StatusCode::latestUpdateInstalled:
                     if (m_peersActive.contains(id))
@@ -570,6 +739,10 @@ void PeerStateTracker::processDownloadTaskSet()
                         m_peersActive.remove(id);
                     }
                     m_peersComplete.insert(id);
+                    break;
+                case StatusCode::idle:
+                    // Most likely mediaserver did not have enough time to start downloading.
+                    // Nothing to do here.
                     break;
             }
         }
@@ -626,7 +799,7 @@ void PeerStateTracker::processInstallTaskSet()
                 case StatusCode::idle:
                     if (m_peersActive.contains(id))
                     {
-                        NX_VERBOSE(this,
+                        NX_INFO(this,
                             "processInstallTaskSet() - peer %1 failed to download update package", id);
                         m_peersFailed.insert(id);
                         m_peersActive.remove(id);
@@ -652,24 +825,24 @@ void PeerStateTracker::processInstallTaskSet()
     }
 }
 
-QSet<QnUuid> PeerStateTracker::getPeersComplete() const
+QSet<QnUuid> PeerStateTracker::peersComplete() const
 {
     return m_peersComplete;
 }
 
-QSet<QnUuid> PeerStateTracker::getPeersActive() const
+QSet<QnUuid> PeerStateTracker::peersActive() const
 {
     QnMutexLocker locker(&m_dataLock);
     return m_peersActive;
 }
 
-QSet<QnUuid> PeerStateTracker::getPeersIssued() const
+QSet<QnUuid> PeerStateTracker::peersIssued() const
 {
     QnMutexLocker locker(&m_dataLock);
     return m_peersIssued;
 }
 
-QSet<QnUuid> PeerStateTracker::getPeersFailed() const
+QSet<QnUuid> PeerStateTracker::peersFailed() const
 {
     QnMutexLocker locker(&m_dataLock);
     return m_peersFailed;
@@ -692,6 +865,41 @@ void PeerStateTracker::setTaskError(const QSet<QnUuid>& targets, const QString& 
         if (auto item = findItemById(id))
             m_peersFailed.insert(id);
     }
+}
+
+QString PeerStateTracker::errorString(nx::update::Status::ErrorCode code)
+{
+    using Code = nx::update::Status::ErrorCode;
+
+    switch (code)
+    {
+        case Code::noError:
+            return "No error. It is a bug if you see this message.";
+        case Code::updatePackageNotFound:
+            return tr("Update package is not found.");
+        case Code::noFreeSpaceToDownload:
+            return tr("There is not enough space to download update files.");
+        case Code::noFreeSpaceToExtract:
+            return tr("There is not enough space to extract update files.");
+        case Code::downloadFailed:
+            return tr("Failed to download update packages.");
+        case Code::invalidUpdateContents:
+            return tr("Update contents are invalid.");
+        case Code::corruptedArchive:
+            return tr("Update archive is corrupted.");
+        case Code::extractionError:
+            return tr("Update files cannot be extracted.");
+        case Code::internalDownloaderError:
+            return tr("Internal downloader error.");
+        case Code::internalError:
+            return tr("Iternal server error.");
+        case Code::applauncherError:
+            return tr("Internal client error.");
+        case Code::unknownError:
+            return tr("Unknown error.");
+    }
+    NX_ASSERT(false);
+    return tr("Unexpected error code.");
 }
 
 void PeerStateTracker::atResourceAdded(const QnResourcePtr& resource)
@@ -783,8 +991,15 @@ void PeerStateTracker::atResourceChanged(const QnResourcePtr& resource)
 
 void PeerStateTracker::atClientupdateStateChanged(int state, int percentComplete)
 {
-    NX_ASSERT(m_clientItem);
     using State = ClientUpdateTool::State;
+    NX_ASSERT(m_clientItem);
+    if (!m_clientItem)
+    {
+        NX_VERBOSE(this, "atClientupdateStateChanged(%1, %2) - client item is already destroyed",
+            ClientUpdateTool::toString(State(state)), percentComplete);
+        return;
+    }
+
     NX_VERBOSE(this, "atClientupdateStateChanged(%1, %2)",
         ClientUpdateTool::toString(State(state)), percentComplete);
 
@@ -810,11 +1025,13 @@ void PeerStateTracker::atClientupdateStateChanged(int state, int percentComplete
         case State::readyInstall:
             m_clientItem->state = StatusCode::readyToInstall;
             m_clientItem->progress = 100;
-            m_clientItem->statusMessage = tr("Ready to download update");
+            m_clientItem->statusMessage = tr("Ready to install update");
             break;
         case State::readyRestart:
             m_clientItem->statusMessage = tr("Ready to restart to the new version");
             m_clientItem->state = StatusCode::readyToInstall;
+            NX_ASSERT(!m_targetVersion.isNull());
+            m_clientItem->version = m_targetVersion;
             m_clientItem->installed = true;
             m_clientItem->progress = 100;
             break;
@@ -825,6 +1042,8 @@ void PeerStateTracker::atClientupdateStateChanged(int state, int percentComplete
             break;
         case State::complete:
             m_clientItem->state = StatusCode::latestUpdateInstalled;
+            NX_ASSERT(!m_targetVersion.isNull());
+            m_clientItem->version = m_targetVersion;
             m_clientItem->installing = false;
             m_clientItem->installed = true;
             m_clientItem->progress = 100;
@@ -850,7 +1069,7 @@ UpdateItemPtr PeerStateTracker::addItemForServer(QnMediaServerResourcePtr server
     NX_ASSERT(server);
     if (!server)
         return nullptr;
-    NX_VERBOSE(this, "addItemForServer(%1)", server->getName());
+    NX_VERBOSE(this, "addItemForServer(name=%1, id=%2)", server->getName(), server->getId());
     UpdateItemPtr item = std::make_shared<UpdateItem>();
     item->id = server->getId();
     item->component = UpdateItem::Component::server;
@@ -873,18 +1092,15 @@ UpdateItemPtr PeerStateTracker::addItemForClient()
 {
     UpdateItemPtr item = std::make_shared<UpdateItem>();
 
-    // This ID is much more easy to distinguish.
-    if (ini().massSystemUpdateDebugInfo)
-        item->id = QnUuid("cccccccc-cccc-cccc-cccc-cccccccccccc");
-    else
-        item->id = commonModule()->globalSettings()->localSystemId();
+    item->id = getClientPeerId();
     item->component = UpdateItem::Component::client;
     item->row = m_items.size();
-    item->protocol = nx_ec::EC2_PROTO_VERSION;
-    NX_VERBOSE(this, "addItemForClient() id=%1", item->id);
+    item->protocol = nx::vms::api::protocolVersion();
     m_clientItem = item;
     m_items.push_back(item);
     updateClientData();
+
+    NX_VERBOSE(this, "addItemForClient() id=%1 version=%2", item->id, item->version);
     emit itemAdded(m_clientItem);
     return m_clientItem;
 }
@@ -927,7 +1143,7 @@ bool PeerStateTracker::updateServerData(QnMediaServerResourcePtr server, UpdateI
         if (viewAsOffline)
         {
             // TODO: Should track online->offline changes for task sets
-            item->lastTimeOnline = UpdateItem::Clock::now();
+            item->lastOnlineTime = UpdateItem::Clock::now();
             item->statusUnknown = false;
         }
         else

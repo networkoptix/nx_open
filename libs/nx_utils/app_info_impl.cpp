@@ -48,6 +48,11 @@ QString AppInfo::applicationPlatform()
     return "${platform}";
 }
 
+QString AppInfo::applicationPlatformNew()
+{
+    return "${platform_new}";
+}
+
 QString AppInfo::applicationArch()
 {
     return "${arch}";
@@ -131,26 +136,16 @@ bool AppInfo::isWin32()
 {
     return isWindows() && !isWin64();
 }
-    
-bool AppInfo::isBpi()
-{
-    return armBox() == "bpi";
-}
-
-bool AppInfo::isRaspberryPi()
-{
-    return armBox() == "rpi";
-}
 
 bool AppInfo::isNx1()
 {
-    return armBox() == "nx1";
+    return armBox() == "bpi";
 }
 
 bool AppInfo::isAndroid()
 {
     return applicationPlatform() == "android";
-}    
+}
 
 bool AppInfo::isIos()
 {
@@ -173,7 +168,7 @@ bool AppInfo::isWindows()
 }
 
 bool AppInfo::isMacOsX()
-{ 
+{
     return applicationPlatform() == "macosx";
 }
 

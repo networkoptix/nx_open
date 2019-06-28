@@ -16,6 +16,8 @@
 class QnTcpListener;
 class QnTCPConnectionProcessorPrivate;
 
+namespace Qn { struct UserAccessData; }
+
 class QnTCPConnectionProcessor: public QnLongRunnable, public /*mixin*/ QnCommonModuleAware
 {
     Q_OBJECT
@@ -49,7 +51,7 @@ public:
     bool sendChunk(const char* data, int size);
 
     void execute(QnMutexLockerBase& mutex);
-    virtual void pleaseStop();
+    virtual void pleaseStop() override;
     nx::network::SocketAddress getForeignAddress() const;
     nx::utils::Url getDecodedUrl() const;
 
@@ -81,6 +83,7 @@ public:
 
     static const int kMaxRequestSize;
 protected:
+    QnAuthSession authSession(const Qn::UserAccessData& accessRights) const;
     QString extractPath() const;
     static QString extractPath(const QString& fullUrl);
 

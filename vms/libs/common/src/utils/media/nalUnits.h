@@ -317,6 +317,7 @@ public:
         qpprime_y_zero_transform_bypass_flag = 0;
         seq_scaling_matrix_present_flag = 0;
         cpb_cnt_minus1 = -1;
+        aspect_ratio_idc = 0;
         //m_pulldown = false;
 
         memset( ScalingList4x4, 16, sizeof(ScalingList4x4) );
@@ -409,9 +410,7 @@ public:
     virtual ~SliceUnit() {
         ;
     }
-    int deserialize(quint8* buffer, quint8* end,
-                            const QMap<quint32, const SPSUnit*>& spsMap,
-                            const QMap<quint32, const PPSUnit*>& ppsMap);
+    int deserialize(quint8* buffer, quint8* end, const SPSUnit* sps, const PPSUnit* pps);
 
     const SPSUnit* getSPS() const {return sps;}
     const PPSUnit* getPPS() const {return pps;}
@@ -545,7 +544,7 @@ private:
     const SPSUnit* sps;
     int m_frameNumBits;
     int m_fullHeaderLen;
-    int deserializeSliceHeader(const QMap<quint32, const SPSUnit*>& spsMap,const QMap<quint32, const PPSUnit*>& ppsMap);
+    int deserializeSliceHeader(const SPSUnit* sps, const PPSUnit* pps);
 };
 
 namespace h264

@@ -102,7 +102,7 @@ private slots:
 
 private:
     void checkQuality();
-    void processRequest();
+    bool processRequest();
     bool parseRequestParams();
     void initResponse(
         nx::network::rtsp::StatusCodeValue code = nx::network::http::StatusCode::ok,
@@ -119,7 +119,6 @@ private:
     nx::network::rtsp::StatusCodeValue composeTeardown();
     nx::network::rtsp::StatusCodeValue composeSetParameter();
     nx::network::rtsp::StatusCodeValue composeGetParameter();
-    void processRangeHeader();
     void createDataProvider();
     void putLastIFrameToQueue();
     //QnAbstractMediaStreamDataProvider* getLiveDp();
@@ -137,6 +136,7 @@ private:
     QnConstMediaContextPtr getAudioCodecContext(int audioTrackIndex) const;
     nx::vms::api::StreamDataFilters streamFilterFromHeaders(
         nx::vms::api::StreamDataFilters oldFilters) const;
+    bool applyUrlParams();
 private:
     Q_DECLARE_PRIVATE(QnRtspConnectionProcessor);
     friend class QnRtspDataConsumer;

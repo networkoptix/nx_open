@@ -42,13 +42,13 @@ public:
 
     virtual ~DeviceAnalyticsBinding() override;
 
-    bool startAnalytics(const QVariantMap& settings);
+    bool startAnalytics(const nx::sdk::Ptr<nx::sdk::IStringMap>& settings);
     void stopAnalytics();
-    bool restartAnalytics(const QVariantMap& settings);
+    bool restartAnalytics(const nx::sdk::Ptr<nx::sdk::IStringMap>& settings);
     bool updateNeededMetadataTypes();
 
     QVariantMap getSettings() const;
-    void setSettings(const QVariantMap& settings);
+    void setSettings(const nx::sdk::Ptr<nx::sdk::IStringMap>& settings);
 
     void setMetadataSink(QnAbstractDataReceptorPtr dataReceptor);
     bool isStreamConsumer() const;
@@ -60,11 +60,11 @@ protected:
     virtual bool processData(const QnAbstractDataPacketPtr& data) override;
 
 private:
-    bool startAnalyticsUnsafe(const QVariantMap& settings);
+    bool startAnalyticsUnsafe(const nx::sdk::Ptr<nx::sdk::IStringMap>& settings);
     void stopAnalyticsUnsafe();
 
     nx::sdk::Ptr<DeviceAgent> createDeviceAgent();
-    std::unique_ptr<nx::vms::server::analytics::DeviceAgentHandler> createHandler();
+    nx::sdk::Ptr<nx::vms::server::analytics::DeviceAgentHandler> createHandler();
     std::optional<nx::vms::api::analytics::DeviceAgentManifest> loadDeviceAgentManifest(
         const nx::sdk::Ptr<DeviceAgent>& deviceAgent);
 
@@ -78,7 +78,7 @@ private:
 
     QVariantMap mergeWithDbAndDefaultSettings(const QVariantMap& settingsFromUser) const;
 
-    bool setSettingsInternal(const QVariantMap& settingsFromUser);
+    void setSettingsInternal(const nx::sdk::Ptr<nx::sdk::IStringMap>& settingsFromUser);
 
     void logIncomingFrame(nx::sdk::analytics::IDataPacket* frame);
 
@@ -89,7 +89,7 @@ private:
     // TODO: #dmishin: Rename to m_engineResource.
     nx::vms::server::resource::AnalyticsEngineResourcePtr m_engine;
 
-    std::unique_ptr<nx::vms::server::analytics::DeviceAgentHandler> m_handler;
+    nx::sdk::Ptr<nx::vms::server::analytics::DeviceAgentHandler> m_handler;
 
     nx::sdk::Ptr<DeviceAgent> m_deviceAgent;
 

@@ -19,7 +19,11 @@
 
 namespace nx {
 
-namespace cloud::relay::model {
+namespace cloud::relay{
+
+class AbstractRelaySelector;
+
+namespace model {
 
 class RemoteRelayPeerPool:
     public AbstractRemoteRelayPeerPool
@@ -59,13 +63,17 @@ public:
     virtual void registerHttpApi(
         nx::network::http::server::rest::MessageDispatcher* messageDispatcher) override;
 
-private:
-    void startDiscovery();
+    virtual void pleaseStopSync() override;
 
 private:
-    const conf::ClusterDbMap& m_settings;
+    void startDiscovery();
+    std::string toInternalStorageFormat(const std::string& peerDomain) const;
+
+private:
+    const conf::ListeningPeerDb& m_settings;
     std::unique_ptr<nx::sql::AsyncSqlQueryExecutor> m_queryExecutor;
     std::unique_ptr<nx::clusterdb::map::EmbeddedDatabase> m_map;
+    std::unique_ptr<AbstractRelaySelector> m_relaySelector;
 
     std::string m_baseApiPath;
     nx::network::http::server::rest::MessageDispatcher* m_messageDispatcher = nullptr;
@@ -78,8 +86,8 @@ private:
 //-------------------------------------------------------------------------------------------------
 
 using RemoteRelayPeerPoolFactoryFunc =
-    std::unique_ptr<model::AbstractRemoteRelayPeerPool>(
-        const conf::Settings&);
+std::unique_ptr<model::AbstractRemoteRelayPeerPool>(
+    const conf::Settings&);
 
 class RemoteRelayPeerPoolFactory:
     public nx::utils::BasicFactory<RemoteRelayPeerPoolFactoryFunc>
@@ -96,5 +104,6 @@ private:
         const conf::Settings& settings);
 };
 
-} // namespace cloud::relay::model
+} // namespace model
+} // namespace cloud::relay
 } // namespace nx

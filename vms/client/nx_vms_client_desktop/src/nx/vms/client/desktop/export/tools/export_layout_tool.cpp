@@ -420,14 +420,9 @@ void ExportLayoutTool::stop()
     d->cancelExport();
 
     if (m_currentCamera)
-    {
-        connect(m_currentCamera, SIGNAL(exportStopped()), this, SLOT(at_camera_exportStopped()));
         m_currentCamera->stopExport();
-    }
-    else
-    {
-        finishExport(false);
-    }
+
+    finishExport(false);
 }
 
 ExportLayoutSettings::Mode ExportLayoutTool::mode() const
@@ -475,7 +470,7 @@ void ExportLayoutTool::finishExport(bool success)
 
 bool ExportLayoutTool::exportMediaResource(const QnMediaResourcePtr& resource)
 {
-    m_currentCamera = new QnClientVideoCamera(resource);
+    m_currentCamera.reset(new QnClientVideoCamera(resource));
     connect(m_currentCamera, SIGNAL(exportProgress(int)), this, SLOT(at_camera_progressChanged(int)));
     connect(m_currentCamera, &QnClientVideoCamera::exportFinished, this,
         &ExportLayoutTool::at_camera_exportFinished);
@@ -554,8 +549,6 @@ void ExportLayoutTool::at_camera_exportFinished(const StreamRecorderErrorStruct&
         }
     }
 
-    camera->deleteLater();
-
     if (error)
     {
         auto camRes = camera->resource()->toResourcePtr().dynamicCast<QnVirtualCameraResource>();
@@ -569,14 +562,6 @@ void ExportLayoutTool::at_camera_exportFinished(const StreamRecorderErrorStruct&
     {
         exportNextCamera();
     }
-}
-
-void ExportLayoutTool::at_camera_exportStopped()
-{
-    if (m_currentCamera)
-        m_currentCamera->deleteLater();
-
-    finishExport(false);
 }
 
 void ExportLayoutTool::at_camera_progressChanged(int progress)

@@ -4,9 +4,11 @@
 
 #include <ui/processors/drag_processor.h>
 #include <ui/processors/drag_process_handler.h>
+#include <ui/graphics/items/resource/resource_widget.h>
 #include <utils/common/scoped_painter_rollback.h>
 
 #include <nx/client/core/utils/geometry.h>
+#include <nx/utils/log/assert.h>
 #include <nx/vms/client/desktop/common/utils/painter_transform_scale_stripper.h>
 
 namespace nx::vms::client::desktop {
@@ -21,7 +23,7 @@ class AreaSelectOverlayWidget::Private:
     AreaSelectOverlayWidget* const q = nullptr;
 
 public:
-    Private(AreaSelectOverlayWidget* q);
+    Private(AreaSelectOverlayWidget* q, QnResourceWidget* resourceWidget);
 
 protected:
     virtual void startDrag(DragInfo* info) override;
@@ -33,15 +35,20 @@ private:
 
 public:
     const QScopedPointer<DragProcessor> dragProcessor;
+    const QPointer<QnResourceWidget> resourceWidget;
     bool active = false;
     QRectF relativeRect;
 };
 
-AreaSelectOverlayWidget::Private::Private(AreaSelectOverlayWidget* q):
+AreaSelectOverlayWidget::Private::Private(
+    AreaSelectOverlayWidget* q,
+    QnResourceWidget* resourceWidget)
+    :
     QObject(),
     DragProcessHandler(),
     q(q),
-    dragProcessor(new DragProcessor())
+    dragProcessor(new DragProcessor()),
+    resourceWidget(resourceWidget)
 {
     dragProcessor->setHandler(this);
 }
@@ -84,12 +91,21 @@ void AreaSelectOverlayWidget::Private::finishDrag(DragInfo* info)
 //-------------------------------------------------------------------------------------------------
 // AreaSelectOverlayWidget
 
-AreaSelectOverlayWidget::AreaSelectOverlayWidget(QGraphicsWidget* parent):
+AreaSelectOverlayWidget::AreaSelectOverlayWidget(
+    QGraphicsWidget* parent,
+    QnResourceWidget* resourceWidget)
+    :
     base_type(parent),
-    d(new Private(this))
+    d(new Private(this, resourceWidget))
 {
     setFocusPolicy(Qt::NoFocus);
     setAcceptedMouseButtons(Qt::NoButton);
+
+    if (!NX_ASSERT(resourceWidget))
+        return;
+
+    connect(resourceWidget, &QnResourceWidget::selectionStateChanged, this,
+        [this]() { update(); });
 }
 
 AreaSelectOverlayWidget::~AreaSelectOverlayWidget()
@@ -139,8 +155,19 @@ void AreaSelectOverlayWidget::clearSelectedArea()
 void AreaSelectOverlayWidget::paint(
     QPainter* painter, const QStyleOptionGraphicsItem* /*option*/, QWidget* /*widget*/)
 {
-    if (d->relativeRect.isEmpty())
+    if (!d->resourceWidget || d->relativeRect.isEmpty())
         return;
+
+    switch (d->resourceWidget->selectionState())
+    {
+        case QnResourceWidget::SelectionState::focused:
+        case QnResourceWidget::SelectionState::focusedAndSelected:
+        case QnResourceWidget::SelectionState::inactiveFocused:
+            break;
+
+        default:
+            return;
+    }
 
     const auto absoluteRect = nx::vms::client::core::Geometry::subRect(rect(), d->relativeRect);
 

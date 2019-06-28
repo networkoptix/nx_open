@@ -159,7 +159,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     setupSelectionOverlay();
     createButtons();
 
-    executeDelayedParented([this]() { updateHud(false); }, 0, this);
+    executeLater([this]() { updateHud(false); }, this);
 
     /* Handle layout permissions if an item is placed on the common layout. Otherwise, it can be Motion Widget, for example. */
     if (itemBelongsToValidLayout(item))
@@ -951,7 +951,7 @@ void QnResourceWidget::updateHud(bool animate)
     const bool showPosition = (overlaysCanBeVisible && (detailsVisible || m_mouseInWidget))
         || forceShowPosition();
     const bool showDetailedInfo = overlaysCanBeVisible && detailsVisible &&
-        (m_mouseInWidget || qnRuntime->showFullInfo());
+        (m_mouseInWidget || qnRuntime->showFullInfo() || qnSettings->showFullInfo());
 
     const bool showButtonsOverlay = (showOnlyCameraName || showCameraNameWithButtons);
 

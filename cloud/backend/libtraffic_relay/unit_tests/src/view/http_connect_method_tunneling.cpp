@@ -39,7 +39,7 @@ protected:
     void whenServerSendsConnectRequestToOpenTunnel()
     {
         m_httpClient.doConnect(
-            relay().basicUrl(),
+            relay().httpUrl(),
             lm("%1.%2").args(m_serverId, m_systemId).toUtf8(),
             std::bind(&TunnelingUsingHttpConnectMethod::saveEstablishServerTunnelResult, this));
     }
@@ -105,7 +105,7 @@ private:
         addRelayInstance();
 
         m_relayClient = std::make_unique<api::detail::ClientOverHttpConnect>(
-            relay().basicUrl(), nullptr);
+            relay().httpUrl(), nullptr);
     }
 
     void saveEstablishServerTunnelResult()

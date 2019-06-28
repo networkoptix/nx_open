@@ -76,9 +76,7 @@ Item
         readonly property bool loadingChunks:
             cameraChunkProvider.loading || cameraChunkProvider.loadingMotion
         property bool loaded: videoScreenController.mediaPlayer.mediaStatus === MediaPlayer.Loaded
-        property bool playbackStarted: false
-        property bool controlsNeeded:
-            !cameraChunkProvider.loading || (playbackStarted && loaded)
+        property bool controlsNeeded: !cameraChunkProvider.loading || loaded
 
         property real controlsOpacity:
             Math.min(videoNavigation.controlsOpacity, controlsOpacityInternal)
@@ -837,7 +835,8 @@ Item
             d.resumePosition = -1
             // TODO: Make refactoring and get rid of serverTimeZoneShift (etc) properties.
             // Timeline and calendar should work in a same way.
-            var targetTime = date.getTime() - timeline.serverTimeZoneShift
+            var localZoneOffset = (new Date()).getTimezoneOffset() * 60 * 1000;
+            var targetTime = date.getTime() + localZoneOffset - timeline.serverTimeZoneShift
             timeline.jumpTo(targetTime)
             videoScreenController.setPosition(targetTime, true)
         }
@@ -855,7 +854,6 @@ Item
         {
             timeline.autoReturnToBounds = false
             timeline.jumpTo(position)
-            d.playbackStarted = true
         }
     }
 

@@ -113,5 +113,9 @@
       <source>pausing</source>
       <translation>đang tạm dừng</translation>
     </message>
+    <message>
+      <source>Unknown error: %1</source>
+      <translation>Lỗi không xác định: %1</translation>
+    </message>
   </context>
 </TS>

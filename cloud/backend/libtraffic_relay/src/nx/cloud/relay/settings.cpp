@@ -68,20 +68,20 @@ static constexpr std::chrono::seconds kDefaultConnectSessionIdleTimeout =
 
 //-------------------------------------------------------------------------------------------------
 
-namespace cluster_db_map {
+namespace listening_peer_db {
 
-static constexpr char kGroupName[] = "clusterDbMap";
+static constexpr char kGroupName[] = "listeningPeerDb";
 static constexpr char kConnectionRetryDelay[] = "connectionRetryDelay";
 static const std::chrono::milliseconds kDefaultConnectionRetryDelay = std::chrono::seconds(10);
 
-} // namespace cluster_db_map
+} // namespace listening_peer_db
 
 
 } // namespace
 
 //-------------------------------------------------------------------------------------------------
 
-static const QString kModuleName = lit("traffic_relay");
+static const QString kModuleName = "traffic_relay";
 
 Http::Http():
     tcpBacklogSize(kDefaultHttpTcpBacklogSize),
@@ -165,9 +165,9 @@ const Proxy& Settings::proxy() const
     return m_proxy;
 }
 
-const ClusterDbMap& Settings::clusterDbMap() const
+const ListeningPeerDb& Settings::listeningPeerDb() const
 {
-    return m_clusterDbMap;
+    return m_listeningPeerDb;
 }
 
 void Settings::loadSettings()
@@ -178,7 +178,7 @@ void Settings::loadSettings()
     loadHttps();
     m_listeningPeer.load(settings());
     loadConnectingPeer();
-    m_clusterDbMap.load(settings());
+    loadListeningPeerDb();
 }
 
 void Settings::loadServer()
@@ -258,21 +258,29 @@ void Settings::loadConnectingPeer()
             kDefaultConnectSessionIdleTimeout);
 }
 
-ClusterDbMap::ClusterDbMap():
-    connectionRetryDelay(cluster_db_map::kDefaultConnectionRetryDelay)
+ListeningPeerDb::ListeningPeerDb():
+    enabled(false),
+    connectionRetryDelay(listening_peer_db::kDefaultConnectionRetryDelay)
 {
 }
 
-void ClusterDbMap::load(const QnSettings& settings)
+void Settings::loadListeningPeerDb()
 {
-    auto str =
-        lm("%1/%2").arg(cluster_db_map::kGroupName).arg(cluster_db_map::kConnectionRetryDelay);
-    connectionRetryDelay = nx::utils::parseTimerDuration(
-        settings.value(str).toString(),
-        cluster_db_map::kDefaultConnectionRetryDelay);
+    if (!settings().containsGroup(listening_peer_db::kGroupName))
+        return;
 
-    sql.loadFromSettings(settings, cluster_db_map::kGroupName);
-    map.load(settings);
+    std::string groupName = listening_peer_db::kGroupName;
+
+    m_listeningPeerDb.enabled = true;
+
+    m_listeningPeerDb.connectionRetryDelay = nx::utils::parseTimerDuration(
+        settings().value(lm("%1/%2")
+            .arg(listening_peer_db::kGroupName)
+            .arg(listening_peer_db::kConnectionRetryDelay)).toString(),
+        listening_peer_db::kDefaultConnectionRetryDelay);
+
+    m_listeningPeerDb.sql.loadFromSettings(settings(), lm("%1/sql").arg(groupName));
+    m_listeningPeerDb.map.load(settings(), lm("%1/cluster").arg(groupName).toStdString());
 }
 
 } // namespace conf

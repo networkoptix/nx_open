@@ -6,7 +6,7 @@
     <message numerus="yes">
       <source>Bytes</source>
       <comment>Full suffix for displaying bytes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Byte</numerusform>
         <numerusform>Bytes</numerusform>
       </translation>
@@ -19,7 +19,7 @@
     <message numerus="yes">
       <source>Kilobytes</source>
       <comment>Full suffix for displaying kilobytes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Kilobyte</numerusform>
         <numerusform>Kilobytes</numerusform>
       </translation>
@@ -32,7 +32,7 @@
     <message numerus="yes">
       <source>Megabytes</source>
       <comment>Full suffix for displaying megabytes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Megabyte</numerusform>
         <numerusform>Megabytes</numerusform>
       </translation>
@@ -45,7 +45,7 @@
     <message numerus="yes">
       <source>Gigabytes</source>
       <comment>Full suffix for displaying gigabytes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Gigabyte</numerusform>
         <numerusform>Gigabytes</numerusform>
       </translation>
@@ -58,7 +58,7 @@
     <message numerus="yes">
       <source>Terabytes</source>
       <comment>Full suffix for displaying terabytes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Terabyte</numerusform>
         <numerusform>Terabytes</numerusform>
       </translation>
@@ -80,13 +80,6 @@
       <source>PB</source>
       <comment>Suffix for displaying petabytes</comment>
       <translation>PB</translation>
-    </message>
-  </context>
-  <context>
-    <name>QObject</name>
-    <message>
-      <source>None</source>
-      <translation>Nenhum</translation>
     </message>
   </context>
   <context>

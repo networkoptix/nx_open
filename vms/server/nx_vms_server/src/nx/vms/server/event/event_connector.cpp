@@ -101,6 +101,15 @@ void EventConnector::at_storageFailure(const QnResourcePtr& server, qint64 timeS
     serverModule()->eventRuleProcessor()->processEvent(event);
 }
 
+void EventConnector::at_raidStorageFailure(const QnResourcePtr& server, qint64 timeStamp,
+    vms::event::EventReason reasonCode, const QString &eventDescription)
+{
+    vms::event::StorageFailureEventPtr event(new vms::event::StorageFailureEvent(
+        server, timeStamp, reasonCode, eventDescription));
+
+    serverModule()->eventRuleProcessor()->processEvent(event);
+}
+
 void EventConnector::at_serverFailure(const QnResourcePtr& resource, qint64 timeStamp,
     vms::api::EventReason reasonCode, const QString& reasonText)
 {
@@ -547,7 +556,7 @@ bool EventConnector::createEventFromParams(const vms::event::EventParameters& pa
                 eventState,
                 params.caption,
                 params.description,
-                /*auxiliaryData*/ QString(),
+                /*attributes*/ std::map<QString, QString>(),
                 params.eventTimestampUsec));
 
             at_analyticsSdkEvent(event);

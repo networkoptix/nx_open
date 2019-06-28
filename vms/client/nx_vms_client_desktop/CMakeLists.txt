@@ -19,12 +19,23 @@ if(MACOSX)
     set(mac_sources src/ui/workaround/mac_utils.mm)
 endif()
 
-file(GLOB_RECURSE QML_FILES static-resources/qml/*.qml static-resources/qml/*.js)
-
 set(library_type)
 if(WINDOWS)
     set(library_type LIBRARY_TYPE SHARED)
 endif()
+
+nx_add_external_resources_target(nx_vms_client_desktop_skin
+        "${CMAKE_CURRENT_LIST_DIR}/external_resources"
+        "${CMAKE_CURRENT_LIST_DIR}/skins/${defaultSkin}"
+        "${customization_dir}/nx_client_desktop/resources"
+        "${customization_dir}/icons/all/logo.png"
+    OUTPUT
+        ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/nx_vms_client_desktop.dat
+)
+
+file(GLOB_RECURSE QML_FILES qml/*)
+set_source_files_properties(${QML_FILES}
+    PROPERTIES RESOURCE_BASE_DIR "${CMAKE_CURRENT_LIST_DIR}")
 
 nx_add_target(nx_vms_client_desktop LIBRARY ${library_type}
     ADDITIONAL_SOURCES
@@ -32,19 +43,17 @@ nx_add_target(nx_vms_client_desktop LIBRARY ${library_type}
         ${uic_files}
         ${mac_sources}
     ADDITIONAL_RESOURCES
-        "${CMAKE_CURRENT_LIST_DIR}/skins/${defaultSkin}"
-        "${customization_dir}/nx_client_desktop/resources"
-        "${customization_dir}/icons/all/logo.png"
         "${customization_dir}/license.html"
         "${CMAKE_CURRENT_BINARY_DIR}/globals.json"
         "${nov_file_launcher_executable}"
+        "${QML_FILES}"
     ADDITIONAL_MOCABLES
         src/nx/vms/client/desktop/system_administration/widgets/analytics_settings_widget.cpp
         src/nx/vms/client/desktop/ui/common/global_tool_tip.cpp
     OTHER_SOURCES
         ${QML_FILES}
     PUBLIC_LIBS
-        Qt5::Core Qt5::Widgets Qt5::Network Qt5::OpenGL Qt5::WebKit Qt5::WebKitWidgets
+        Qt5::Core Qt5::Gui Qt5::Widgets Qt5::Network Qt5::WebKit Qt5::WebKitWidgets
         Qt5::Qml Qt5::QuickWidgets Qt5::Xml Qt5::Multimedia Qt5::Concurrent
         Qt5::Svg
         nx_vms_client_core
@@ -55,6 +64,7 @@ nx_add_target(nx_vms_client_desktop LIBRARY ${library_type}
         qtsingleapplication
         qthttpserver
         nx_kit
+        nx_vms_rules
     MACOS_ARG_MAX_WORKAROUND
 )
 
@@ -62,8 +72,14 @@ target_compile_definitions(nx_vms_client_desktop
     PRIVATE NX_VMS_CLIENT_DESKTOP_API=${API_EXPORT_MACRO}
     INTERFACE NX_VMS_CLIENT_DESKTOP_API=${API_IMPORT_MACRO})
 
+nx_force_include(nx_vms_client_desktop ${CMAKE_SOURCE_DIR}/libs/nx_utils/src/nx/utils/literal.h)
+
+add_dependencies(nx_vms_client_desktop
+    nx_vms_client_desktop_skin)
+
 if(WINDOWS)
     add_dependencies(nx_vms_client_desktop nov_file_launcher)
+    target_link_libraries(nx_vms_client_desktop PUBLIC nx_gdi_tracer)
 endif()
 
 target_include_directories(nx_vms_client_desktop

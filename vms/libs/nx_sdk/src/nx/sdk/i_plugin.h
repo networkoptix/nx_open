@@ -1,10 +1,13 @@
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+
 #pragma once
 
 #include <nx/sdk/interface.h>
-#include <nx/sdk/i_utility_provider.h>
 
 namespace nx {
 namespace sdk {
+
+class IUtilityProvider;
 
 /**
  * The main interface that any VMS Plugin implements. The plugin's dynamic library should export

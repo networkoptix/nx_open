@@ -1,6 +1,8 @@
 #include "exec_http_request_action_widget.h"
 #include "ui_exec_http_request_action_widget.h"
 
+#include <QtCore/QScopedValueRollback>
+
 #include <nx/vms/event/action_parameters.h>
 
 #include <nx/network/http/http_async_client.h>
@@ -127,7 +129,7 @@ void QnExecHttpRequestActionWidget::paramsChanged()
     url.setUserName(ui->loginLineEdit->text());
     url.setPassword(ui->passwordLineEdit->text());
     if (url.scheme().isEmpty())
-        url.setScheme(lit("http"));
+        url.setScheme(nx::network::http::kUrlSchemeName);
 
     params.url = url.toString();
     params.text = ui->contentTextEdit->toPlainText();

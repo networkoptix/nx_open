@@ -109,7 +109,7 @@
     <message>
       <source>Cloud systems have different owners. Merge is not allowed.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Cloud systems have different owners. Merge is not allowed.</translation>
+      <translation>Cloudsysteme haben unterschiedliche Besitzer. Zusammenführen ist nicht zulässig.</translation>
     </message>
   </context>
   <context>
@@ -1550,14 +1550,6 @@
       <translation>Layout öffnen</translation>
     </message>
     <message>
-      <source>Plugin Event</source>
-      <translation>Pluginereignis</translation>
-    </message>
-    <message>
-      <source>Unknown plugin event</source>
-      <translation>Unbekanntes Pluginereignis</translation>
-    </message>
-    <message>
       <source>Failed to force using camera time, it lags too much, system time will be used</source>
       <translation>Die Kamerazeit konnte nicht erzwungen werden, die Verzögerung ist zu hoch, die Systemzeit wird verwendet</translation>
     </message>
@@ -1567,7 +1559,35 @@
     </message>
     <message>
       <source>Multiple %1 events have occurred</source>
-      <translation type="unfinished">Multiple %1 events have occurred</translation>
+      <translation>Mehrere %1 Ereignisse sind aufgetreten</translation>
+    </message>
+    <message>
+      <source>Multicast address conflict detected. Address %1 is already in use by %2 on %3 stream</source>
+      <translation>Multicast-Adresskonflikt erkannt. Adresse %1 wird bereits von %2 auf %3 Stream verwendet</translation>
+    </message>
+    <message>
+      <source>Network address %1 is not a multicast address</source>
+      <translation>Die Netzwerkadresse %1 ist keine Multicast-Adresse</translation>
+    </message>
+    <message>
+      <source>Analytics storage &quot;%1&quot; is offline.</source>
+      <translation>Analytics-Speicher &quot;%1&quot; ist offline.</translation>
+    </message>
+    <message>
+      <source>Analytics storage &quot;%1&quot; is almost full.</source>
+      <translation>Analytics-Speicher &quot;%1&quot; ist fast voll.</translation>
+    </message>
+    <message>
+      <source>Plugin Diagnostic Event</source>
+      <translation>Plugin-Diagnoseereignis</translation>
+    </message>
+    <message>
+      <source>Unknown Plugin Diagnostic Event</source>
+      <translation>Unbekanntes Plugin-Diagnoseereignis</translation>
+    </message>
+    <message>
+      <source>RAID error. %1.</source>
+      <translation>RAID-Fehler. %1.</translation>
     </message>
   </context>
   <context>

@@ -23,12 +23,6 @@ public:
 
     static nx::network::http::StatusCode::Value toHttpStatus(Error code);
 
-    /**
-     * Presents error as corresponding text with some arguments.
-     * E.g., ErrorDescriptor(MissingParameter, "id").text() will return text like
-     * "Missing required parameter 'id'".
-     * Introduced for error text unification.
-     */
     class ErrorDescriptor
     {
     public:
@@ -149,5 +143,3 @@ T UbjsonResult::deserialized(bool* isOk) const
 }
 
 } // namespace nx::network::rest
-
-QN_FUSION_DECLARE_FUNCTIONS(nx::network::rest::Result::Error, (lexical)(numeric))

@@ -10,7 +10,7 @@ namespace nx::cloud::db {
 
 SystemHealthInfoProvider::SystemHealthInfoProvider(
     clusterdb::engine::ConnectionManager* ec2ConnectionManager,
-    nx::sql::AsyncSqlQueryExecutor* const dbManager)
+    nx::sql::AbstractAsyncSqlQueryExecutor* const dbManager)
     :
     m_ec2ConnectionManager(ec2ConnectionManager),
     m_dbManager(dbManager),
@@ -102,7 +102,7 @@ SystemHealthInfoProviderFactory& SystemHealthInfoProviderFactory::instance()
 
 std::unique_ptr<AbstractSystemHealthInfoProvider> SystemHealthInfoProviderFactory::defaultFactory(
     clusterdb::engine::ConnectionManager* ec2ConnectionManager,
-    nx::sql::AsyncSqlQueryExecutor* const dbManager)
+    nx::sql::AbstractAsyncSqlQueryExecutor* const dbManager)
 {
     return std::make_unique<SystemHealthInfoProvider>(
         ec2ConnectionManager,

@@ -111,3 +111,9 @@ QN_FUSION_DEFINE_FUNCTIONS(nx::vms::api::BackupType, (numeric)(debug))
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api, StreamDataFilter, StreamDataFilter_Values)
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api, StreamDataFilters, StreamDataFilter_Values)
 QN_FUSION_DEFINE_FUNCTIONS(nx::vms::api::StreamDataFilters, (debug))
+
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api, MetadataStorageChangePolicy,
+    (nx::vms::api::MetadataStorageChangePolicy::keep, "keep")
+    (nx::vms::api::MetadataStorageChangePolicy::remove, "remove")
+    (nx::vms::api::MetadataStorageChangePolicy::move, "move"))
+QN_FUSION_DEFINE_FUNCTIONS(nx::vms::api::MetadataStorageChangePolicy, (numeric)(debug))

@@ -104,15 +104,6 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((JsonResult)(UbjsonResult), (ubjson)(
 
 } // namespace nx::network::rest
 
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(
-    nx::network::rest::Result, Error,
-    (nx::network::rest::Result::NoError, "OK")
-    (nx::network::rest::Result::MissingParameter, "Required parameter is missing")
-    (nx::network::rest::Result::InvalidParameter, "Invalid parameter value")
-    (nx::network::rest::Result::CantProcessRequest, "Internal server error")
-    (nx::network::rest::Result::Forbidden, "Access denied")
-)
-
 // Dummy methods to make the Fusion macro compile for json and ubjson at once.
 
 static void serialize(const QJsonValue& /*value*/, QnUbjsonWriter<QByteArray>* /*stream*/)

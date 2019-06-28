@@ -14,6 +14,7 @@ public:
     static QString applicationRevision();
     static QString customizationName();
     static QString applicationPlatform();
+    static QString applicationPlatformNew();
     static QString applicationArch();
     static QString armBox();
 
@@ -29,8 +30,6 @@ public:
     static bool isWin64();
     static bool isWin32();
 
-    static bool isBpi();
-    static bool isRaspberryPi();
     static bool isNx1();
     static bool isAndroid();
     static bool isIos();

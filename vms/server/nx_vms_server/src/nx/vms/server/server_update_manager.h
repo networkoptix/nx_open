@@ -12,11 +12,13 @@ class ServerUpdateManager: public CommonUpdateManager, public ServerModuleAware
 public:
     ServerUpdateManager(QnMediaServerModule* serverModule);
     virtual ~ServerUpdateManager() override;
+    virtual int64_t freeSpace(const QString& path) const override;
 
 private:
     ServerUpdateInstaller m_installer;
     virtual vms::common::p2p::downloader::Downloader* downloader() override;
     virtual CommonUpdateInstaller* installer() override;
+    virtual QnStorageSpaceDataList availableStorages() const override;
 };
 
 } // namespace vms::server

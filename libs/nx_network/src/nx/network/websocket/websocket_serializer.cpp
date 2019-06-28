@@ -1,7 +1,9 @@
-#include <cstdint>
+#include "websocket_serializer.h"
 #include <nx/utils/random.h>
 #include <nx/network/socket_common.h>
-#include "websocket_serializer.h"
+#include <nx/utils/gzip/gzip_compressor.h>
+
+#include <cstdint>
 
 namespace nx {
 namespace network {
@@ -18,15 +20,89 @@ static int calcHeaderSize(bool masked, int payloadLenType)
     return result;
 }
 
-static int fillHeader(char* data, bool fin, int opCode, int payloadLenType, int payloadLen, bool masked, unsigned int mask)
+static int payloadLenTypeByLen(int64_t len)
 {
-    char * pdata = data;
+    if (len <= 125)
+        return len;
+    else if (len < 65536)
+        return 126;
+    else
+        return 127;
+}
 
-    *pdata |= (int)fin << 7;
+} // namespace <anonymous>
+
+Serializer::Serializer(bool masked, unsigned mask)
+{
+    setMasked(masked, mask);
+}
+
+nx::Buffer Serializer::prepareMessage(
+    nx::Buffer payload, FrameType type, CompressionType compressionType)
+{
+    return prepareFrame(payload, type, compressionType, /*fin*/true, /*first*/true);
+}
+
+nx::Buffer Serializer::prepareFrame(
+    nx::Buffer payload, FrameType type, CompressionType compressionType, bool fin, bool first)
+{
+    if (isDataFrame(type))
+    {
+        switch (compressionType)
+        {
+            case CompressionType::none:
+                break;
+            case CompressionType::perMessageDeflate:
+                payload =
+                    nx::utils::bstream::gzip::Compressor::compressData(std::move(payload), false);
+                break;
+        }
+    }
+
+    nx::Buffer header;
+    int payloadLenType = payloadLenTypeByLen(payload.size());
+    header.resize(calcHeaderSize(m_masked, payloadLenType));
+    header.fill(0);
+    fillHeader(header.data(), fin, first, type, compressionType, payloadLenType, payload.size());
+
+    if (m_masked)
+    {
+        for (int i = 0; i < payload.size(); i++)
+            payload[i] = payload[i] ^ ((unsigned char*) (&m_mask))[i % 4];
+    }
+
+    return header + payload;
+}
+
+void Serializer::setMasked(bool masked, unsigned mask)
+{
+    m_masked = masked;
+    m_mask = mask;
+
+    if (m_masked && m_mask == 0)
+        m_mask = nx::utils::random::number<unsigned>(1, std::numeric_limits<unsigned>::max());
+}
+
+int Serializer::fillHeader(
+    char* data, bool fin, bool first, FrameType opCode, CompressionType compressionType,
+    int payloadLenType, int payloadLen)
+{
+    char* pdata = data;
+
+    *pdata = static_cast<uint8_t>(fin) << 7;
+    switch (compressionType)
+    {
+        case CompressionType::none:
+            break;
+        case CompressionType::perMessageDeflate:
+            *pdata |= static_cast<int>(isDataFrame(opCode) && first) << 6;
+            break;
+    }
+
     *pdata |= opCode & 0xf;
     pdata++;
 
-    *pdata |= (int)masked << 7;
+    *pdata |= static_cast<int>(m_masked) << 7;
     *pdata |= payloadLenType & 0x7f;
     pdata++;
 
@@ -41,90 +117,13 @@ static int fillHeader(char* data, bool fin, int opCode, int payloadLenType, int 
         pdata += 8;
     }
 
-    if (masked)
+    if (m_masked)
     {
-        *reinterpret_cast<unsigned int*>(pdata) = mask;
+        *reinterpret_cast<unsigned int*>(pdata) = m_mask;
         pdata += 4;
     }
 
     return pdata - data;
-}
-
-static int payloadLenTypeByLen(int64_t len)
-{
-    if (len <= 125)
-        return len;
-    else if (len < 65536)
-        return 126;
-    else
-        return 127;
-}
-
-static int prepareFrame(const char* payload, int payloadLen, FrameType type,
-    bool fin, bool masked, unsigned int mask, char* out, int outLen)
-{
-    int payloadLenType = payloadLenTypeByLen(payloadLen);
-    int neededOutLen = payloadLen + calcHeaderSize(masked, payloadLenType);
-    if (outLen < neededOutLen)
-        return neededOutLen;
-
-    if (!payload)
-        return -1;
-
-    int headerOffset = fillHeader(out, fin, type, payloadLenType, payloadLen, masked, mask);
-    memcpy(out + headerOffset, payload, payloadLen);
-
-    if (masked)
-    {
-        for (int i = 0; i < payloadLen; i++)
-            out[i + headerOffset] = out[i + headerOffset] ^ ((unsigned char*)(&mask))[i % 4];
-    }
-
-    return neededOutLen;
-}
-
-} // namespace <anonymous>
-
-Serializer::Serializer(bool masked, unsigned mask)
-{
-    setMasked(masked, mask);
-}
-
-void Serializer::prepareMessage(const nx::Buffer& payload, FrameType type, nx::Buffer* outBuffer)
-{
-    prepareFrame(payload, type, true, outBuffer);
-}
-
-int Serializer::prepareFrame(
-    const char* payload, int payloadLen,
-    FrameType type, bool fin, char* out, int outLen)
-{
-    return websocket::prepareFrame(payload, payloadLen, type, fin, m_masked, m_mask, out, outLen);
-}
-
-void Serializer::prepareFrame(
-    const nx::Buffer& payload,
-    FrameType type,
-    bool fin,
-    nx::Buffer* outBuffer)
-{
-    outBuffer->resize(
-        websocket::prepareFrame(
-            nullptr, payload.size(), type, fin, m_masked, m_mask, nullptr, 0));
-    outBuffer->fill(0);
-    prepareFrame(
-        payload.constData(),
-        payload.size(), type, fin,
-        outBuffer->data(), outBuffer->size());
-}
-
-void Serializer::setMasked(bool masked, unsigned mask)
-{
-    m_masked = masked;
-    m_mask = mask;
-
-    if (m_masked && m_mask == 0)
-        m_mask = nx::utils::random::number<unsigned>(1, std::numeric_limits<unsigned>::max());
 }
 
 } // namespace websocket

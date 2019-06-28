@@ -4,12 +4,14 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
 
+#include <nx/vms/api/data/tran_state_data.h>
+
 #include "../../command_descriptor.h"
 
 namespace nx::clusterdb::engine::transport {
 
-constexpr static const std::chrono::seconds kTcpKeepAliveTimeout = std::chrono::seconds(5);
-constexpr static const int kKeepAliveProbeCount = 3;
+static constexpr std::chrono::seconds kTcpKeepAliveTimeout = std::chrono::seconds(5);
+static constexpr int kKeepAliveProbeCount = 3;
 
 CommonHttpConnection::CommonHttpConnection(
     const ProtocolVersionRange& protocolVersionRange,

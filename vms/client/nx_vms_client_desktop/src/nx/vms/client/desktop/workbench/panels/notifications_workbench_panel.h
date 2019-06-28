@@ -1,9 +1,11 @@
 #pragma once
 
 #include <QtCore/QScopedPointer>
+#include <QtCore/QRect>
 
 #include "abstract_workbench_panel.h"
 
+class QGraphicsProxyWidget;
 class QnControlBackgroundWidget;
 class QnNotificationToolTipWidget;
 class QnImageButtonWidget;
@@ -84,7 +86,7 @@ private:
     AnimatorGroup* m_opacityAnimatorGroup;
 
     /** New event panel. */
-    QGraphicsProxyWidget* m_eventPanelContainer = nullptr;
+    QPointer<QGraphicsProxyWidget> m_eventPanelContainer;
     QScopedPointer<EventPanel> m_eventPanel;
     QPointer<HoverFocusProcessor> m_eventPanelHoverProcessor;
 

@@ -36,6 +36,9 @@ class QnVirtualCameraResource : public QnSecurityCamResource
 
 public:
     static const QString kCompatibleAnalyticsEnginesProperty;
+    static const QString kUserEnabledAnalyticsEnginesProperty;
+    static const QString kDeviceAgentsSettingsValuesProperty;
+    static const QString kDeviceAgentManifestsProperty;
 
 public:
     QnVirtualCameraResource(QnCommonModule* commonModule = nullptr);
@@ -61,7 +64,11 @@ public:
     CameraMediaStreams mediaStreams() const;
     CameraMediaStreamInfo streamInfo(StreamIndex index = StreamIndex::primary) const;
 
+    /** @return frame aspect ratio of a single channel. Does not account for default rotation. */
     virtual QnAspectRatio aspectRatio() const;
+
+    /** @return frame aspect ratio of a single channel. Accounts for default rotation. */
+    virtual QnAspectRatio aspectRatioRotated() const;
 
     // TODO: saveMediaStreamInfoIfNeeded and saveBitrateIfNeeded should be moved into
     // nx::vms::server::resource::Camera, as soon as QnLiveStreamProvider moved into nx::vms::server.
@@ -82,7 +89,7 @@ public:
 
     /**
      * @return Ids of Analytics Engines which are actually compatible with the Device, enabled by
-     * the user and active (running on the current server).
+     *     the user and active (running on the current server).
      */
     QSet<QnUuid> enabledAnalyticsEngines() const;
 
@@ -94,43 +101,43 @@ public:
 
     /**
      * @return Ids of Analytics Engines which are explicitly enabled by the user. Not validated for
-     * compatibility with the Device or if the engine is active (running on the current server).
+     *     compatibility with the Device or if the engine is active (running on the current server).
      */
     QSet<QnUuid> userEnabledAnalyticsEngines() const;
 
     /**
      * Set ids of Analytics Engines which are explicitly enabled by the user. Not validated for
-     * compatibility with the Device or if the engine is active (running on the current server).
+     * compatibility with the Device or if the Engine is active (running on the current server).
      */
     void setUserEnabledAnalyticsEngines(const QSet<QnUuid>& engines);
 
     /**
-     * @return Ids of Analytics Engines, which can be potentially used with the Device. Only active
-     * (running on the current server) Engines are included.
+     * @return Ids of Analytics Engines which can be potentially used with the Device. Only active
+     *     (running on the current server) Engines are included.
      */
     const QSet<QnUuid> compatibleAnalyticsEngines() const;
 
     /**
-     * @return Analytics Engines, which can be potentially used with the Device. Only active
-     * (running on the current server) Engines are included.
+     * @return Analytics Engines which can be potentially used with the Device. Only active
+     *     (running on the current server) Engines are included.
      */
     nx::vms::common::AnalyticsEngineResourceList compatibleAnalyticsEngineResources() const;
 
     /**
-     * Set ids of Analytics Engines, which can be potentially used with the Device. Only active
+     * Set ids of Analytics Engines which can be potentially used with the Device. Only active
      * (running on the current server) Engines must be included.
      */
     void setCompatibleAnalyticsEngines(const QSet<QnUuid>& engines);
 
     /**
      * @return Map of supported Event types by the Engine id. Only actually compatible with the
-     * Device, enabled by the user and active (running on the current Server) Engines are used.
+     *     Device, enabled by the user and active (running on the current Server) Engines are used.
      */
     std::map<QnUuid, std::set<QString>> supportedEventTypes() const;
 
     /**
-     * @return Map of supported Object types by the Engine id. Only actually compatible with the
-     * Device, enabled by the user and active (running on the current Server) Engines are used.
+     * @return Map of the supported Object types by the Engine id. Only actually compatible with the
+     *     Device, enabled by the user and active (running on the current Server) Engines are used.
      */
     std::map<QnUuid, std::set<QString>> supportedObjectTypes() const;
 
@@ -152,6 +159,7 @@ signals:
     void userEnabledAnalyticsEnginesChanged(const QnVirtualCameraResourcePtr& camera);
     void compatibleAnalyticsEnginesChanged(const QnVirtualCameraResourcePtr& camera);
     void deviceAgentManifestsChanged(const QnVirtualCameraResourcePtr& camera);
+    void isIOModuleChanged(const QnVirtualCameraResourcePtr& camera);
 
 protected:
     virtual void emitPropertyChanged(const QString& key) override;

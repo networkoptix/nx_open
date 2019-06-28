@@ -3,7 +3,7 @@
 #include <nx/network/rest/handler.h>
 #include <nx/vms/server/server_module_aware.h>
 
-namespace nx::vms::server::rest {
+namespace nx::vms::server {
 
 class BackupControlRestHandler:
     public nx::network::rest::Handler,
@@ -20,4 +20,4 @@ private:
     int execute(const QString& command);
 };
 
-} // namespace nx::vms::server::rest
+} // namespace nx::vms::server

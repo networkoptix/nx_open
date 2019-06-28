@@ -18,6 +18,7 @@
 #include <QtNetwork/QNetworkReply>
 #include <QtNetwork/QNetworkRequest>
 
+#include <nx_ec/ec_api.h>
 #include <api/app_server_connection.h>
 #include <api/runtime_info_manager.h>
 
@@ -615,7 +616,7 @@ bool QnLicenseManagerWidget::canDeactivateLicense(const QnLicensePtr &license) c
     // TODO: add more checks according to specs
     const auto errorCode = m_validator->validate(license);
     const bool activeLicense = errorCode == QnLicenseErrorCode::NoError; // Only active licenses
-    const bool acceptedLicenseType = license->type() != Qn::LC_Trial;
+    const bool acceptedLicenseType = (license->type() != Qn::LC_Trial) && !license->isSaas();
 
     const auto serverId = m_validator->serverId(license);
     const auto server = resourcePool()->getResourceById<QnMediaServerResource>(serverId);
@@ -843,7 +844,9 @@ void QnLicenseManagerWidget::deactivateLicenses(const QnLicenseList& licenses)
             QnMessageBox::success(this, text);
         };
 
-    Deactivator::deactivateAsync(m_deactivationReason, licenses, handler, parentWidget());
+    Deactivator::deactivateAsync(
+        QnLicenseServer::deactivateUrl(commonModule()),
+        m_deactivationReason, licenses, handler, parentWidget());
 }
 
 void QnLicenseManagerWidget::takeAwaySelectedLicenses()
@@ -1030,7 +1033,7 @@ void QnLicenseManagerWidget::at_licenseWidget_stateChanged()
     {
         updateFromServer(
             ui->licenseWidget->serialKey().toLatin1(), /*infoMode*/ true,
-            QnLicenseServer::kActivateUrl.toQUrl());
+            QnLicenseServer::activateUrl(commonModule()).toQUrl());
     }
     else
     {

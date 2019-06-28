@@ -12,12 +12,9 @@ QnClientRuntimeSettings::QnClientRuntimeSettings(
     init();
     setThreadSafe(true);
 
-    setDevMode(startupParameters.isDevMode());
     setSoftwareYuv(startupParameters.softwareYuv);
     setShowFullInfo(startupParameters.showFullInfo);
-    setProfilerMode(startupParameters.profilerMode);
 
-    setVSyncEnabled(!startupParameters.vsyncDisabled);
     setClientUpdateAllowed(!startupParameters.clientUpdateDisabled);
 
     // TODO: #gdm Implement lexical serialization.

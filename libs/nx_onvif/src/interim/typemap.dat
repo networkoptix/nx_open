@@ -22,48 +22,23 @@
 #
 #               s3 = "http://s3.amazonaws.com/doc/2006-03-01/"
 
-oasisWsnB2 = "http://docs.oasis-open.org/wsn/b-2"
-oasisWsrf = "http://docs.oasis-open.org/wsrf/bf-2"
-oasisWsnT1 = "http://docs.oasis-open.org/wsn/t-1"
-oasisWsrfRw2 = "http://docs.oasis-open.org/wsrf/rw-2"
-oasisWsrfR2 = "http://docs.oasis-open.org/wsrf/r-2"
-
-onvifXsd = "http://www.onvif.org/ver10/schema"
 onvifDevice = "http://www.onvif.org/ver10/device/wsdl"
 onvifDeviceIO = "http://www.onvif.org/ver10/deviceIO/wsdl"
-onvifEvents = "http://www.onvif.org/ver10/events/wsdl"
 onvifImg = "http://www.onvif.org/ver20/imaging/wsdl"
 onvifMedia = "http://www.onvif.org/ver10/media/wsdl"
 onvifMedia2 = "http://www.onvif.org/ver20/media/wsdl"
 onvifPtz = "http://www.onvif.org/ver20/ptz/wsdl"
-onvifAdvancedSecurity = "http://www.onvif.org/ver10/advancedsecurity/wsdl"
-onvifCredential = "http://www.onvif.org/ver10/credential/wsdl"
-onvifPacs = "http://www.onvif.org/ver10/pacs"
+onvifEvents = "http://www.onvif.org/ver10/events/wsdl"
 onvifNetwork = "http://www.onvif.org/ver10/network/wsdl"
-onvifAccessControl = "http://www.onvif.org/ver10/accesscontrol/wsdl"
-onvifAccessRules = "http://www.onvif.org/ver10/accessrules/wsdl"
-onvifActionEngine = "http://www.onvif.org/ver10/actionengine/wsdl"
 onvifAnalytics = "http://www.onvif.org/ver20/analytics/wsdl"
-onvifAnalyticsDevice = "http://www.onvif.org/ver10/analyticsdevice/wsdl"
-onvifDisplay = "http://www.onvif.org/ver10/display/wsdl"
-onvifDoorControl = "http://www.onvif.org/ver10/doorcontrol/wsdl"
-onvifProvisioning = "http://www.onvif.org/ver10/provisioning/wsdl"
-onvifReceiver = "http://www.onvif.org/ver10/receiver/wsdl"
-onvifRecording = "http://www.onvif.org/ver10/recording/wsdl"
-onvifReplay = "http://www.onvif.org/ver10/replay/wsdl"
-onvifScedule = "http://www.onvif.org/ver10/schedule/wsdl"
-onvifSearch = "http://www.onvif.org/ver10/search/wsdl"
-onvifThermal = "http://www.onvif.org/ver10/thermal/wsdl"
 
-#bindnings
-onvifAdvancedSecurity-assb = "http://www.onvif.org/ver10/advancedsecurity/wsdl/AdvancedSecurityServiceBinding"
-onvifAdvancedSecurity-kb = "http://www.onvif.org/ver10/advancedsecurity/wsdl/KeystoreBinding"
-onvifAdvancedSecurity-tsb = "http://www.onvif.org/ver10/advancedsecurity/wsdl/TLSServerBinding"
-onvifAdvancedSecurity-db = "http://www.onvif.org/ver10/advancedsecurity/wsdl/Dot1XBinding"
+#bindings
 onvifAnalytics-reb = "http://www.onvif.org/ver20/analytics/wsdl/RuleEngineBinding"
 onvifAnalytics-aeb = "http://www.onvif.org/ver20/analytics/wsdl/AnalyticsEngineBinding"
+
 onvifNetwork-rdb = "http://www.onvif.org/ver10/network/wsdl/RemoteDiscoveryBinding"
 onvifNetwork-dlb = "http://www.onvif.org/ver10/network/wsdl/DiscoveryLookupBinding"
+
 onvifEvents-pps = "http://www.onvif.org/ver10/events/wsdl/PullPointSubscriptionBinding"
 onvifEvents-eb = "http://www.onvif.org/ver10/events/wsdl/EventBinding"
 onvifEvents-smb = "http://www.onvif.org/ver10/events/wsdl/SubscriptionManagerBinding"
@@ -108,16 +83,6 @@ onvifEvents-psmb = "http://www.onvif.org/ver10/events/wsdl/PausableSubscriptionM
 #
 #       This ensure that the wsdl2h-generated type definition is preserved,
 #       while the use and ptr-use are changed.
-#
-#       For example, this is useful to map schema polymorphic types to C types,
-#       where we need to be able to both handle a base type and its extensions
-#       as per schema extensibility. Say base type ns:base allows derived
-#       extensions and we need to map this to C types as follows:
-#
-#               ns__base = ... | int __type_base; void*
-#
-#       where __type_base and void* are used to (de)serialize any data type,
-#       including base and its derived types.
 
 ####### CLASS/STRUCT MEMBER ADDITIONS
 
@@ -275,7 +240,7 @@ onvifEvents-psmb = "http://www.onvif.org/ver10/events/wsdl/PausableSubscriptionM
 #       Uncomment the line below to use LONG64 int for xsd:duration instead of
 #       mapping xsd:duration to string (in milliseconds precision).
 #       Then rerun wsdl2h and also compile and link custom/duration.c.
-
+#
 xsd__duration = #import "custom/duration.h" | xsd__duration
 
 #       Uncomment the line below to use C++11 std::chrono::nanoseconds for
@@ -360,6 +325,10 @@ SOAP_ENV__Reason        = | struct SOAP_ENV__Reason
 #   char *SOAP_ENV__Text;\
 # };\
 # | struct SOAP_ENV__Fault_
+
+#       Older gSOAP versions prior to 2.8.83 used a simple SOAP_ENC__Array type
+#       which can be re-enabled by uncommenting this line:
+# SOAP_ENC__Array = | struct { _XML *__ptr; int __size; } | struct { _XML *__ptr; int __size; }
 
 #       Temporary URI
 
@@ -607,8 +576,24 @@ tse     = "http://www.onvif.org/ver10/search/wsdl"
 trp     = "http://www.onvif.org/ver10/replay/wsdl"
 tan     = "http://www.onvif.org/ver20/analytics/wsdl"
 tad     = "http://www.onvif.org/ver10/analyticsdevice/wsdl"
+tas     = "http://www.onvif.org/ver10/advancedsecurity/wsdl"
 tdn     = "http://www.onvif.org/ver10/network/wsdl"
 tt      = "http://www.onvif.org/ver10/schema"
+
+#       to extend tt__EventFilter with TopicExpression element (for C):
+# tt__EventFilter = $ struct wsnt__TopicExpressionType *wsnt__TopicExpression;
+#       to extend tt__EventFilter with TopicExpression element (for C++):
+# tt__EventFilter = $ wsnt__TopicExpressionType *wsnt__TopicExpression;
+
+#       to extend _tds__Service_Capabilities with trt:ProfileCapabilities element (for C):
+# tds__Service_Capabilities = $ struct trt__ProfileCapabilities* trt__ProfileCapabilities;
+#       to extend _tds__Service_Capabilities with trt:ProfileCapabilities element (for C++):
+# _tds__Service_Capabilities = $ trt__ProfileCapabilities* trt__ProfileCapabilities_;
+
+#       to extend trt__ProfileCapabilities with @Rotation attribute (for C):
+# trt__ProfileCapabilities = $ @enum xsd__boolean Rotation;
+#       to extend trt__ProfileCapabilities with @Rotation attribute (for C++):
+# trt__ProfileCapabilities = $ @bool Rotation;
 
 #       OASIS recommended prefixes
 
@@ -621,6 +606,7 @@ wstop   = "http://docs.oasis-open.org/wsn/t-1"
 
 #       TR-069 recommended prefixes
 
+cwmp = "urn:dslforum-org:cwmp-1-1"
 cwmp = "urn:dslforum-org:cwmp-1-2"
 lwn  = "urn:broadband-forum-org:cwmp:lwnotif-1-0"
 dm   = "urn:broadband-forum-org:cwmp:datamodel-1-5"
@@ -682,3 +668,8 @@ mpt     = "http://s.mappoint.net/mappoint-30/"
 xliff = "urn:oasis:names:tc:xliff:document:2.0"
 
 xliff__priorityValue = typedef int xliff__priorityValue 1:10;
+
+[
+#import "wsse.h"
+#import "wsHeaderSubscription.h"
+]

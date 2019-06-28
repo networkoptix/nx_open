@@ -39,6 +39,8 @@
 
 #include <media_server/media_server_module.h>
 #include <core/resource_management/resource_data_pool.h>
+#include <nx/vms/server/resource/multicast_parameters.h>
+#include <nx/vms/server/analytics/predefined_attributes.h>
 
 namespace nx {
 namespace vms::server {
@@ -335,8 +337,6 @@ static const QString kFramePriorityProperty = lit("PriorityType");
 
 static const QString kHanwhaVideoSourceStateOn = lit("On");
 static const int kHanwhaInvalidInputValue = 604;
-static constexpr int kHanwhaDefaultMulticastPort = 5000;
-static const QString kHanwhaDefaultMulticastAddress = "239.0.0.1";
 
 
 // Taken from Hanwha metadata plugin manifest.json.
@@ -428,24 +428,20 @@ bool operator<(const UpdateInfo& lhs, const UpdateInfo& rhs)
 
 struct GroupParameterInfo
 {
-    GroupParameterInfo() = default;
-
-    GroupParameterInfo(
-        const QString& parameterValue,
-        const QString& name,
-        const QString& lead,
-        const QString& condition)
-        :
-        value(parameterValue),
-        groupName(name),
-        groupLead(lead),
-        groupIncludeCondition(condition)
-    {};
-
     QString value;
     QString groupName;
     QString groupLead;
     QString groupIncludeCondition;
+    QString groupIncludeContainsCondition;
+
+    bool isGroupInclude(const QString& value) const
+    {
+        if (!groupIncludeCondition.isEmpty())
+            return value == groupIncludeCondition;
+        if (!groupIncludeContainsCondition.isEmpty())
+            return value.contains(groupIncludeCondition);
+        return false;
+    }
 };
 
 static QString physicalIdForChannel(const QString& groupId, int value)
@@ -468,26 +464,31 @@ HanwhaResource::~HanwhaResource()
     m_timerHolder.terminate();
 }
 
-CameraDiagnostics::Result HanwhaResource::enableMulticast(const HanwhaVideoProfile& profile)
+CameraDiagnostics::Result HanwhaResource::enableMulticast(
+    int profileNumber,
+    const nx::vms::server::resource::MulticastParameters& multicastParameters)
 {
-    int port = profile.rtpMulticastPort;
-    QString address = profile.rtpMulticastAddress;
-    if (address.isEmpty())
-        address = kHanwhaDefaultMulticastAddress;
-    if (port <= 0)
-        port = kHanwhaDefaultMulticastPort;
+    if (!NX_ASSERT(multicastParameters.address))
+        return CameraDiagnostics::InternalServerErrorResult("Invalid multicast address");
+
+    if (!NX_ASSERT(multicastParameters.port))
+        return CameraDiagnostics::InternalServerErrorResult("Invalid multicast port");
+
+    if (!NX_ASSERT(multicastParameters.ttl))
+        return CameraDiagnostics::InternalServerErrorResult("Invalid multicast TTL");
 
     HanwhaRequestHelper helper(sharedContext());
     const auto response = helper.update(
         lit("media/videoprofile"),
         {
-            {lit("Profile"), QString::number(profile.number)},
-            {lit("RTPMulticastEnable"), kHanwhaTrue},
-            {lit("RTPMulticastAddress"), address},
-            {lit("RTPMulticastPort"), QString::number(port)},
+            {kHanwhaProfileNumberProperty, QString::number(profileNumber)},
+            {kHanwhaRtpMulticastEnable, kHanwhaTrue},
+            {kHanwhaRtpMulticastAddress, QString::fromStdString(*multicastParameters.address)},
+            {kHanwhaRtpMulticastPort, QString::number(*multicastParameters.port)},
+            {kHanwhaRtpMulticastTtl, QString::number(*multicastParameters.ttl)},
         });
 
-    NX_VERBOSE(this, "enable multicast: [%1]", response.requestUrl());
+    NX_DEBUG(this, "Enable multicast: [%1]", response.requestUrl());
     if (!response.isSuccessful())
     {
         return CameraDiagnostics::RequestFailedResult(
@@ -505,12 +506,26 @@ CameraDiagnostics::Result HanwhaResource::ensureMulticastEnabled(Qn::ConnectionR
         role == Qn::ConnectionRole::CR_SecondaryLiveVideo ? &profile : nullptr,
         /*totalProfileNumber*/ nullptr,
         /*profilesToRemove*/ nullptr);
-    if (!result)
-        return result;
 
-    if (profile && !profile->rtpMulticastEnable)
+    const nx::vms::api::StreamIndex streamIndex = toStreamIndex(role);
+    if (!result || !profile)
     {
-        result = enableMulticast(profile.value());
+        NX_DEBUG(this, "Unable to find profile for stream %1 while opening multicast stream",
+            streamIndex);
+        return result;
+    }
+
+    using nx::vms::server::resource::MulticastParameters;
+    MulticastParameters multicastParameters {
+        profile->rtpMulticastAddress.toStdString(),
+        profile->rtpMulticastPort,
+        profile->rtpMulticastTtl
+    };
+
+    const bool somethingIsFixed = fixMulticastParametersIfNeeded(&multicastParameters, streamIndex);
+    if (!profile->rtpMulticastEnable || somethingIsFixed)
+    {
+        result = enableMulticast(profile->number, multicastParameters);
         if (!result)
             return result;
     }
@@ -661,9 +676,10 @@ QSet<QString> HanwhaResource::setApiParameters(const QnCameraAdvancedParamValueM
 
         const bool success = executeCommand(*buttonParameter);
         const auto streamsToReopen = buttonInfo->streamsToReopen();
-        reopenStreams(
-            streamsToReopen.contains(Qn::ConnectionRole::CR_LiveVideo),
-            streamsToReopen.contains(Qn::ConnectionRole::CR_SecondaryLiveVideo));
+        if (streamsToReopen.contains(Qn::ConnectionRole::CR_LiveVideo))
+            reopenStream(nx::vms::api::StreamIndex::primary);
+        if (streamsToReopen.contains(Qn::ConnectionRole::CR_SecondaryLiveVideo))
+            reopenStream(nx::vms::api::StreamIndex::secondary);
 
         return success ? QSet<QString>{buttonParameter->id} : QSet<QString>();
     }
@@ -748,7 +764,10 @@ QSet<QString> HanwhaResource::setApiParameters(const QnCameraAdvancedParamValueM
     {
         initMediaStreamCapabilities();
         saveProperties();
-        reopenStreams(reopenPrimaryStream, reopenSecondaryStream);
+        if (reopenPrimaryStream)
+            reopenStream(nx::vms::api::StreamIndex::primary);
+        if (reopenSecondaryStream)
+            reopenStream(nx::vms::api::StreamIndex::secondary);
     }
 
     return success ? values.ids() : QSet<QString>();
@@ -799,9 +818,15 @@ bool HanwhaResource::captureEvent(const nx::vms::event::AbstractEventPtr& event)
     if (parameters.getAnalyticsEventTypeId() != kHanwhaInputPortEventTypeId)
         return false;
 
+    const auto portIdAttribute = analyticsEvent->attribute(
+        QString::fromStdString(nx::vms::server::analytics::kInputPortIdAttribute));
+
+    if (!portIdAttribute)
+        return false;
+
     emit inputPortStateChanged(
         toSharedPointer(this),
-        analyticsEvent->auxiliaryData(),
+        *portIdAttribute,
         analyticsEvent->getToggleState() == nx::vms::api::EventState::active,
         parameters.eventTimestampUsec);
 
@@ -898,8 +923,8 @@ CameraDiagnostics::Result HanwhaResource::initDevice()
     m_sharedContext->setResourceAccess(getUrl(), getAuth());
     m_sharedContext->setChunkLoaderSettings(
         {
-            std::chrono::seconds(qnGlobalSettings->hanwhaChunkReaderResponseTimeoutSeconds()),
-            std::chrono::seconds(qnGlobalSettings->hanwhaChunkReaderMessageBodyTimeoutSeconds())
+            std::chrono::seconds(ini().chunkReaderResponseTimeoutS),
+            std::chrono::seconds(ini().chunkReaderMessageBodyTimeoutS)
         });
 
     const auto info = m_sharedContext->information();
@@ -1508,7 +1533,7 @@ CameraDiagnostics::Result HanwhaResource::initConfigurationalPtz()
         if (parameter == boost::none || !parameter->isValid())
             continue;
 
-        if (qnGlobalSettings->showHanwhaAlternativePtzControlsOnTile())
+        if (ini().showAlternativePtzControlsOnTile)
             m_ptzCapabilities[core::ptz::Type::operational] |= descriptor.capabilities;
 
         configurationalCapabilities |= descriptor.capabilities;
@@ -1841,7 +1866,7 @@ CameraDiagnostics::Result HanwhaResource::createNxProfiles()
     if (!result)
         return result;
 
-    if (!qnGlobalSettings->hanwhaDeleteProfilesOnInitIfNeeded())
+    if (!ini().deleteProfilesOnInitIfNeeded)
     {
         int amountOfProfilesNeeded = 0;
 
@@ -3223,26 +3248,6 @@ QString HanwhaResource::fromHanwhaAdvancedParameterValue(
     return str;
 }
 
-void HanwhaResource::reopenStreams(bool reopenPrimary, bool reopenSecondary)
-{
-    auto camera = serverModule()->videoCameraPool()->getVideoCamera(toSharedPointer(this));
-    if (!camera)
-        return;
-
-    static const auto reopen =
-        [](const QnLiveStreamProviderPtr& stream)
-        {
-            if (stream && stream->isRunning())
-                stream->pleaseReopenStream();
-        };
-
-    if (reopenPrimary)
-        reopen(camera->getPrimaryReader());
-
-    if (reopenSecondary)
-        reopen(camera->getSecondaryReader());
-}
-
 int HanwhaResource::suggestBitrate(
     const HanwhaCodecLimits& limits,
     Qn::BitrateControl bitrateControl,
@@ -3316,12 +3321,12 @@ QnCameraAdvancedParamValueList HanwhaResource::filterGroupParameters(
             continue;
         }
 
-        groupParameters[value.id] =
-            GroupParameterInfo(
-                value.value,
-                group,
-                groupLead(group),
-                info->groupIncludeCondition());
+        groupParameters[value.id] = {
+            value.value,
+            group,
+            groupLead(group),
+            info->groupIncludeCondition(),
+            info->groupIncludeContainsCondition()};
     }
 
     // resolve group parameters
@@ -3349,7 +3354,7 @@ QnCameraAdvancedParamValueList HanwhaResource::filterGroupParameters(
             continue;
         }
 
-        if (info.groupIncludeCondition == groupParameters[groupLead].value)
+        if (info.isGroupInclude(groupParameters[groupLead].value))
             result.push_back(QnCameraAdvancedParamValue(parameterName, info.value));
     }
 
@@ -3364,11 +3369,12 @@ QnCameraAdvancedParamValueList HanwhaResource::filterGroupParameters(
         if (!info)
             continue;
 
-        groupParameters[lead.id] = GroupParameterInfo(
+        groupParameters[lead.id] = {
             lead.value,
             info->group(),
             lead.id,
-            info->groupIncludeCondition());
+            info->groupIncludeCondition(),
+            info->groupIncludeContainsCondition()};
     }
 
     for (const auto& parameterName: parametersToResolve)
@@ -3388,7 +3394,7 @@ QnCameraAdvancedParamValueList HanwhaResource::filterGroupParameters(
         if (!groupParameters.contains(groupLead))
             continue;
 
-        if (info.groupIncludeCondition == groupParameters[groupLead].value)
+        if (info.isGroupInclude(groupParameters[groupLead].value))
             result.push_back(QnCameraAdvancedParamValue(parameterName, info.value));
     }
 

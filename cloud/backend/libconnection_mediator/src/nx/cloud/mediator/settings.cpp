@@ -145,7 +145,19 @@ const QLatin1String kBody("cloudConnect/tcpReverseHttpTimeouts/body");
 
 // Traffic Relay - related settings.
 
-const QLatin1String kTrafficRelayUrl("trafficRelay/url");
+namespace traffic_relay {
+
+const QLatin1String kGroupName("trafficRelay");
+const QLatin1String kUrl("url");
+const QLatin1String kClusterId("clusterId");
+
+} //namespace traffic_relay
+
+// GeoIp - related settings.
+
+const QLatin1String kGeoIpDbPath("geoIp/dbPath");
+const QLatin1String kGeoIpResolveErrorUrlCount("geoIp/resolveErrorUrlCount");
+static constexpr int kDefaultGeoIpResolveErrorUrlCount = 2;
 
 const QLatin1String kListeningPeerConnectionInactivityTimeout(
     "listeningPeer/connectionInactivityTimeout");
@@ -155,14 +167,14 @@ const std::chrono::hours kDefaultListeningPeerConnectionInactivityTimeout(10);
 
 const QLatin1String kServerName("server/name");
 
-// ClusterDbMap  settings
-namespace cluster_db_map {
+// ListeningPeerDb  settings
+namespace listening_peer_db {
 
-static constexpr char kGroupName[] = "clusterDbMap";
+static constexpr char kGroupName[] = "listeningPeerDb";
 static constexpr char kConnectionRetryDelay[] = "connectionRetryDelay";
 static const std::chrono::milliseconds kDefaultConnectionRetryDelay = std::chrono::seconds(10);
 
-} //namespace cluster_db_map
+} //namespace listening_peer_db
 
 } // namespace
 
@@ -170,8 +182,8 @@ namespace nx {
 namespace hpm {
 namespace conf {
 
-ClusterDbMap::ClusterDbMap():
-    connectionRetryDelay(cluster_db_map::kDefaultConnectionRetryDelay)
+ListeningPeerDb::ListeningPeerDb():
+    connectionRetryDelay(listening_peer_db::kDefaultConnectionRetryDelay)
 {
 }
 
@@ -246,6 +258,11 @@ const TrafficRelay& Settings::trafficRelay() const
     return m_trafficRelay;
 }
 
+const GeoIp& Settings::geoIp() const
+{
+    return m_geoIp;
+}
+
 const nx::cloud::discovery::conf::Discovery& Settings::discovery() const
 {
     return m_discovery;
@@ -261,9 +278,9 @@ const Server& Settings::server() const
     return m_server;
 }
 
-const ClusterDbMap& Settings::clusterDbMap() const
+const ListeningPeerDb& Settings::listeningPeerDb() const
 {
-    return m_clusterDbMap;
+    return m_listeningPeerDb;
 }
 
 void Settings::initializeWithDefaultValues()
@@ -358,13 +375,15 @@ void Settings::loadSettings()
 
     loadTrafficRelay();
 
+    loadGeoIp();
+
     m_discovery.load(settings());
 
     loadListeningPeer();
 
     loadServer();
 
-    loadClusterDbMap();
+    loadListeningPeerDb();
 
     //analyzing values
     if (m_general.dataDir.isEmpty())
@@ -464,7 +483,25 @@ void Settings::loadConnectionParameters()
 
 void Settings::loadTrafficRelay()
 {
-    m_trafficRelay.url = settings().value(kTrafficRelayUrl).toString();
+    QString group = traffic_relay::kGroupName + "/";
+
+    auto urls = settings().value(
+        group + traffic_relay::kUrl).toString().split(',', QString::SkipEmptyParts);
+    std::transform(urls.begin(), urls.end(), std::back_inserter(m_trafficRelay.urls),
+        [](const QString& url) { return url.trimmed(); });
+
+    m_trafficRelay.clusterId = settings().value(
+        group + traffic_relay::kClusterId).toString().toStdString();
+
+    m_trafficRelay.discovery.load(settings(), (group + "cluster/discovery").toStdString());
+}
+
+void Settings::loadGeoIp()
+{
+    m_geoIp.dbPath = settings().value(kGeoIpDbPath).toString().toStdString();
+    m_geoIp.resolveErrorUrlCount = settings().value(
+        kGeoIpResolveErrorUrlCount,
+        kDefaultGeoIpResolveErrorUrlCount).toInt();
 }
 
 void Settings::loadListeningPeer()
@@ -518,16 +555,20 @@ void Settings::loadServer()
     m_server.name = settings().value(kServerName).toString().toStdString();
 }
 
-void Settings::loadClusterDbMap()
+void Settings::loadListeningPeerDb()
 {
-    const auto str =
-        lm("%1/%2").arg(cluster_db_map::kGroupName).arg(cluster_db_map::kConnectionRetryDelay);
-    m_clusterDbMap.connectionRetryDelay = nx::utils::parseTimerDuration(
-        settings().value(str).toString(),
-        cluster_db_map::kDefaultConnectionRetryDelay);
+    if (!settings().containsGroup(listening_peer_db::kGroupName))
+        return;
 
-    m_clusterDbMap.sql.loadFromSettings(settings(), cluster_db_map::kGroupName);
-    m_clusterDbMap.map.load(settings());
+    std::string groupName = listening_peer_db::kGroupName;
+
+    m_listeningPeerDb.enabled = true;
+    m_listeningPeerDb.connectionRetryDelay = nx::utils::parseTimerDuration(settings().value(
+        lm("%1/%2").arg(groupName).arg(listening_peer_db::kConnectionRetryDelay)).toString(),
+        listening_peer_db::kDefaultConnectionRetryDelay);
+
+    m_listeningPeerDb.sql.loadFromSettings(settings(), lm("%1/sql").arg(groupName));
+    m_listeningPeerDb.map.load(settings(), lm("%1/cluster").arg(groupName).toStdString());
 }
 
 

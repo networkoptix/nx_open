@@ -1,6 +1,6 @@
 #include "controller.h"
 
-#include "public_ip_discovery.h"
+#include "geo_ip/resolver_factory.h"
 #include "relay/relay_cluster_client_factory.h"
 
 namespace nx {
@@ -17,8 +17,10 @@ Controller::Controller(const conf::Settings& settings):
             settings.cloudDB().startTimeout)
         : nullptr),
     m_mediaserverEndpointTester(m_cloudDataProvider.get()),
-    m_relayClusterClient(RelayClusterClientFactory::instance().create(settings)),
-    m_listeningPeerPool(settings.listeningPeer()),
+    m_geoIpResolver(geo_ip::ResolverFactory::instance().create(settings)),
+    m_relayClusterClient(RelayClusterClientFactory::instance().create(settings, m_geoIpResolver.get())),
+    m_listeningPeerDb(settings),
+    m_listeningPeerPool(settings.listeningPeer(), &m_listeningPeerDb),
     m_listeningPeerRegistrator(
         settings,
         m_cloudDataProvider.get(),
@@ -34,13 +36,10 @@ Controller::Controller(const conf::Settings& settings):
         &m_listeningPeerPool,
         m_relayClusterClient.get(),
         &m_statsManager.collector()),
-    m_discoveredPeerPool(settings.discovery()),
-    m_remoteMediatorPeerPool(settings.clusterDbMap())
+    m_discoveredPeerPool(settings.discovery())
 {
     if (!m_cloudDataProvider)
-    {
-        NX_ALWAYS(this, lit("STUN Server is running without cloud (debug mode)"));
-    }
+        NX_INFO(this, lit("STUN Server is running without cloud (debug mode)"));
 }
 
 MediaserverEndpointTester& Controller::mediaserverEndpointTester()
@@ -63,6 +62,11 @@ const PeerRegistrator& Controller::listeningPeerRegistrator() const
     return m_listeningPeerRegistrator;
 }
 
+AbstractCloudDataProvider& Controller::cloudDataProvider()
+{
+    return *m_cloudDataProvider;
+}
+
 HolePunchingProcessor& Controller::cloudConnectProcessor()
 {
     return m_cloudConnectProcessor;
@@ -78,14 +82,14 @@ const nx::cloud::discovery::RegisteredPeerPool& Controller::discoveredPeerPool()
     return m_discoveredPeerPool;
 }
 
-RemoteMediatorPeerPool& Controller::remoteMediatorPeerPool()
+ListeningPeerDb& Controller::listeningPeerDb()
 {
-    return m_remoteMediatorPeerPool;
+    return m_listeningPeerDb;
 }
 
-const RemoteMediatorPeerPool& Controller::remoteMediatorPeerPool() const
+const ListeningPeerDb& Controller::listeningPeerDb() const
 {
-    return m_remoteMediatorPeerPool;
+    return m_listeningPeerDb;
 }
 
 const stats::StatsManager& Controller::statisticsManager() const
@@ -93,23 +97,20 @@ const stats::StatsManager& Controller::statisticsManager() const
     return m_statsManager;
 }
 
-bool Controller::doMandatoryInitialization()
+nx::geo_ip::AbstractResolver& Controller::geoIpResolver()
 {
-    return m_remoteMediatorPeerPool.initialize();
+    return *m_geoIpResolver;
 }
 
-std::optional<network::HostAddress> Controller::discoverPublicAddress()
+bool Controller::doMandatoryInitialization()
 {
-    auto publicHostAddress = PublicIpDiscovery::get();
-    if (!(bool)publicHostAddress)
-        return std::nullopt;
-
-    return *publicHostAddress;
+    return m_listeningPeerDb.initialize();
 }
 
 void Controller::stop()
 {
     m_cloudConnectProcessor.stop();
+    m_listeningPeerDb.stop();
 }
 
 } // namespace hpm

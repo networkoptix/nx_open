@@ -655,7 +655,7 @@
     <message>
       <location/>
       <source>Force motion detection for stream</source>
-      <translation type="unfinished">Force motion detection for stream</translation>
+      <translation>Force motion detection for stream</translation>
     </message>
     <message>
       <location/>
@@ -680,12 +680,12 @@
     <message>
       <location/>
       <source>System</source>
-      <translation type="unfinished">System</translation>
+      <translation>System</translation>
     </message>
     <message>
       <location/>
       <source>Native</source>
-      <translation type="unfinished">Native</translation>
+      <translation>Native</translation>
     </message>
     <message>
       <location/>
@@ -748,7 +748,7 @@
     <message>
       <location/>
       <source>Primary Stream</source>
-      <translation type="unfinished">Primary Stream</translation>
+      <translation>Primary Stream</translation>
     </message>
     <message>
       <location/>
@@ -1019,7 +1019,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/manual_device_addition/dialog/device_addition_dialog.ui"/>
       <source>to</source>
-      <translation type="unfinished">to</translation>
+      <translation>to</translation>
     </message>
     <message>
       <location/>
@@ -1095,6 +1095,24 @@
       <location/>
       <source>Default</source>
       <translation type="unfinished">Default</translation>
+    </message>
+  </context>
+  <context>
+    <name>EulaDialog</name>
+    <message>
+      <location filename="../src/nx/vms/client/desktop/ui/dialogs/eula_dialog.ui"/>
+      <source>Copy to Clipboard</source>
+      <translation>Copy to Clipboard</translation>
+    </message>
+    <message>
+      <location/>
+      <source>I Do Not Agree</source>
+      <translation type="unfinished">I Do Not Agree</translation>
+    </message>
+    <message>
+      <location/>
+      <source>I Agree</source>
+      <translation type="unfinished">I Agree</translation>
     </message>
   </context>
   <context>
@@ -1340,12 +1358,12 @@
     <message>
       <location/>
       <source>Camera</source>
-      <translation type="unfinished">Camera</translation>
+      <translation>Camera</translation>
     </message>
     <message>
       <location/>
       <source>Source camera</source>
-      <translation type="unfinished">Source camera</translation>
+      <translation>Source camera</translation>
     </message>
   </context>
   <context>
@@ -1394,11 +1412,6 @@
       <location/>
       <source>First Source</source>
       <translation>First Source</translation>
-    </message>
-    <message>
-      <location/>
-      <source>None</source>
-      <translation>None</translation>
     </message>
     <message>
       <location/>
@@ -1504,174 +1517,6 @@
     </message>
   </context>
   <context>
-    <name>InteractiveSettingsTestDialog</name>
-    <message>
-      <location filename="../src/nx/vms/client/desktop/interactive_settings/dialogs/interactive_settings_test_dialog.ui"/>
-      <source>{
-    &quot;items&quot;: [
-        {
-            &quot;type&quot;: &quot;TextField&quot;,
-            &quot;name&quot;: &quot;text&quot;,
-            &quot;caption&quot;: &quot;Text Field&quot;,
-            &quot;description&quot;: &quot;A text field&quot;,
-            &quot;defaultValue&quot;: &quot;a text&quot;,
-            &quot;value&quot;: &quot;a text&quot;
-        },
-        {
-            &quot;type&quot;: &quot;GroupBox&quot;,
-            &quot;name&quot;: &quot;group&quot;,
-            &quot;caption&quot;: &quot;Group Box&quot;,
-            &quot;items&quot;: [
-                {
-                    &quot;type&quot;: &quot;SpinBox&quot;,
-                    &quot;name&quot;: &quot;number&quot;,
-                    &quot;caption&quot;: &quot;Spin Box&quot;,
-                    &quot;description&quot;: &quot;A number&quot;,
-                    &quot;defaultValue&quot;: 42,
-                    &quot;value&quot;: 42,
-                    &quot;minValue&quot;: 0,
-                    &quot;maxValue&quot;: 100
-                },
-                {
-                    &quot;type&quot;: &quot;DoubleSpinBox&quot;,
-                    &quot;name&quot;: &quot;double&quot;,
-                    &quot;caption&quot;: &quot;Double Spin Box&quot;,
-                    &quot;description&quot;: &quot;A real number&quot;,
-                    &quot;defaultValue&quot;: 3.14,
-                    &quot;value&quot;: 3.14,
-                    &quot;minValue&quot;: 0.0,
-                    &quot;maxValue&quot;: 100.0
-                },
-                {
-                    &quot;type&quot;: &quot;ComboBox&quot;,
-                    &quot;name&quot;: &quot;combobox&quot;,
-                    &quot;caption&quot;: &quot;Combo Box&quot;,
-                    &quot;description&quot;: &quot;A choice&quot;,
-                    &quot;defaultValue&quot;: &quot;value2&quot;,
-                    &quot;value&quot;: &quot;value2&quot;,
-                    &quot;range&quot;: [&quot;value1&quot;, &quot;value2&quot;, &quot;value3&quot;]
-                },
-                {
-                    &quot;type&quot;: &quot;CheckBox&quot;,
-                    &quot;name&quot;: &quot;checkbox&quot;,
-                    &quot;caption&quot;: &quot;Check Box&quot;,
-                    &quot;description&quot;: &quot;True or False&quot;,
-                    &quot;defaultValue&quot;: true,
-                    &quot;value&quot;: true
-                },
-                {
-                    &quot;type&quot;: &quot;GroupBox&quot;,
-                    &quot;name&quot;: &quot;buttons&quot;,
-                    &quot;caption&quot;: &quot;Buttons&quot;,
-                    &quot;items&quot;: [
-                        {
-                            &quot;type&quot;: &quot;Row&quot;,
-                            &quot;name&quot;: &quot;row&quot;,
-                            &quot;items&quot;: [
-                                {
-                                    &quot;type&quot;: &quot;Button&quot;,
-                                    &quot;name&quot;: &quot;button1&quot;,
-                                    &quot;caption&quot;: &quot;Button 1&quot;,
-                                    &quot;description&quot;: &quot;Action 1&quot;
-                                },
-                                {
-                                    &quot;type&quot;: &quot;Button&quot;,
-                                    &quot;name&quot;: &quot;button2&quot;,
-                                    &quot;caption&quot;: &quot;Button 2&quot;,
-                                    &quot;description&quot;: &quot;Action 2&quot;
-                                }
-                            ]
-                        }
-                    ]
-                }
-            ]
-        }
-    ]
-}</source>
-      <translation type="unfinished">{
-    &quot;items&quot;: [
-        {
-            &quot;type&quot;: &quot;TextField&quot;,
-            &quot;name&quot;: &quot;text&quot;,
-            &quot;caption&quot;: &quot;Text Field&quot;,
-            &quot;description&quot;: &quot;A text field&quot;,
-            &quot;defaultValue&quot;: &quot;a text&quot;,
-            &quot;value&quot;: &quot;a text&quot;
-        },
-        {
-            &quot;type&quot;: &quot;GroupBox&quot;,
-            &quot;name&quot;: &quot;group&quot;,
-            &quot;caption&quot;: &quot;Group Box&quot;,
-            &quot;items&quot;: [
-                {
-                    &quot;type&quot;: &quot;SpinBox&quot;,
-                    &quot;name&quot;: &quot;number&quot;,
-                    &quot;caption&quot;: &quot;Spin Box&quot;,
-                    &quot;description&quot;: &quot;A number&quot;,
-                    &quot;defaultValue&quot;: 42,
-                    &quot;value&quot;: 42,
-                    &quot;minValue&quot;: 0,
-                    &quot;maxValue&quot;: 100
-                },
-                {
-                    &quot;type&quot;: &quot;DoubleSpinBox&quot;,
-                    &quot;name&quot;: &quot;double&quot;,
-                    &quot;caption&quot;: &quot;Double Spin Box&quot;,
-                    &quot;description&quot;: &quot;A real number&quot;,
-                    &quot;defaultValue&quot;: 3.14,
-                    &quot;value&quot;: 3.14,
-                    &quot;minValue&quot;: 0.0,
-                    &quot;maxValue&quot;: 100.0
-                },
-                {
-                    &quot;type&quot;: &quot;ComboBox&quot;,
-                    &quot;name&quot;: &quot;combobox&quot;,
-                    &quot;caption&quot;: &quot;Combo Box&quot;,
-                    &quot;description&quot;: &quot;A choice&quot;,
-                    &quot;defaultValue&quot;: &quot;value2&quot;,
-                    &quot;value&quot;: &quot;value2&quot;,
-                    &quot;range&quot;: [&quot;value1&quot;, &quot;value2&quot;, &quot;value3&quot;]
-                },
-                {
-                    &quot;type&quot;: &quot;CheckBox&quot;,
-                    &quot;name&quot;: &quot;checkbox&quot;,
-                    &quot;caption&quot;: &quot;Check Box&quot;,
-                    &quot;description&quot;: &quot;True or False&quot;,
-                    &quot;defaultValue&quot;: true,
-                    &quot;value&quot;: true
-                },
-                {
-                    &quot;type&quot;: &quot;GroupBox&quot;,
-                    &quot;name&quot;: &quot;buttons&quot;,
-                    &quot;caption&quot;: &quot;Buttons&quot;,
-                    &quot;items&quot;: [
-                        {
-                            &quot;type&quot;: &quot;Row&quot;,
-                            &quot;name&quot;: &quot;row&quot;,
-                            &quot;items&quot;: [
-                                {
-                                    &quot;type&quot;: &quot;Button&quot;,
-                                    &quot;name&quot;: &quot;button1&quot;,
-                                    &quot;caption&quot;: &quot;Button 1&quot;,
-                                    &quot;description&quot;: &quot;Action 1&quot;
-                                },
-                                {
-                                    &quot;type&quot;: &quot;Button&quot;,
-                                    &quot;name&quot;: &quot;button2&quot;,
-                                    &quot;caption&quot;: &quot;Button 2&quot;,
-                                    &quot;description&quot;: &quot;Action 2&quot;
-                                }
-                            ]
-                        }
-                    ]
-                }
-            ]
-        }
-    ]
-}</translation>
-    </message>
-  </context>
-  <context>
     <name>IoModuleSettingsWidget</name>
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_properties/camera/widgets/io_module_settings_widget.ui"/>
@@ -1742,12 +1587,12 @@
     <message>
       <location/>
       <source>Width</source>
-      <translation type="unfinished">Width</translation>
+      <translation>Width</translation>
     </message>
     <message>
       <location/>
       <source>Height</source>
-      <translation type="unfinished">Height</translation>
+      <translation>Height</translation>
     </message>
     <message>
       <location/>
@@ -2124,14 +1969,6 @@
     </message>
   </context>
   <context>
-    <name>MessageBox</name>
-    <message>
-      <location filename="../src/ui/dialogs/common/message_box.ui"/>
-      <source>Do not show this message again</source>
-      <translation>Do not show this message again</translation>
-    </message>
-  </context>
-  <context>
     <name>MultiServerUpdatesWidget</name>
     <message>
       <location filename="../src/nx/vms/client/desktop/system_update/multi_server_updates_widget.ui"/>
@@ -2156,7 +1993,7 @@
     <message>
       <location/>
       <source>Download</source>
-      <translation type="unfinished">Download</translation>
+      <translation>Download</translation>
     </message>
     <message>
       <location/>
@@ -2518,6 +2355,14 @@
     </message>
   </context>
   <context>
+    <name>QnMessageBox</name>
+    <message>
+      <location filename="../src/ui/dialogs/common/message_box.ui"/>
+      <source>Do not show this message again</source>
+      <translation>Do not show this message again</translation>
+    </message>
+  </context>
+  <context>
     <name>QnNotificationSoundManagerDialog</name>
     <message>
       <location filename="../src/ui/dialogs/notification_sound_manager_dialog.ui"/>
@@ -2806,11 +2651,6 @@
     </message>
     <message>
       <location/>
-      <source>Filter TEST</source>
-      <translation type="unfinished">Filter TEST</translation>
-    </message>
-    <message>
-      <location/>
       <source>Nothing found</source>
       <translation>Nothing found</translation>
     </message>
@@ -2930,13 +2770,18 @@
     </message>
     <message>
       <location/>
-      <source>Limit Session Length</source>
-      <translation type="unfinished">Limit Session Length</translation>
+      <source>to</source>
+      <translation>to</translation>
     </message>
     <message>
       <location/>
-      <source>to</source>
-      <translation type="unfinished">to</translation>
+      <source>Limit session duration</source>
+      <translation type="unfinished">Limit session duration</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
+      <translation type="unfinished">Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</translation>
     </message>
   </context>
   <context>
@@ -3225,6 +3070,26 @@
       <location/>
       <source>Backup Settings...</source>
       <translation>Backup Settings...</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Analytics data will continue to be stored on the disabled storage.</source>
+      <translation type="unfinished">Analytics data will continue to be stored on the disabled storage.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</source>
+      <translation type="unfinished">Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Recording was enabled on the USB storage</source>
+      <translation type="unfinished">Recording was enabled on the USB storage</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Analytics data can occupy tens of gigabytes of storage space. We recommend to choose other location for it instead of the system partition.</source>
+      <translation type="unfinished">Analytics data can occupy tens of gigabytes of storage space. We recommend to choose other location for it instead of the system partition.</translation>
     </message>
   </context>
   <context>

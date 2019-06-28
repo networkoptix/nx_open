@@ -19,6 +19,7 @@ public:
         QnUuid id;
         QString name;
         QJsonObject settingsModel;
+        bool isDeviceDependent = false;
     };
 
     AnalyticsEnginesWatcher(QObject* parent = nullptr);

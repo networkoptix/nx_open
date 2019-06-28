@@ -62,7 +62,16 @@ Error DeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
 {
     NX_OUTPUT << __func__ << " Setting metadata handler";
     std::lock_guard<std::mutex> lock(m_mutex);
-    m_handler = handler;
+
+    if (!handler)
+    {
+        m_handler.reset();
+        return Error::noError;
+    }
+
+    handler->addRef();
+    m_handler.reset(handler);
+    
     m_pipeline->setMetadataCallback(
         [this](IMetadataPacket* packet)
         {

@@ -28,7 +28,7 @@ QList<QByteArray> quotedSplit(const QByteArray& data)
         else if (*curPtr == ';' && !inQuote1 && !inQuote2)
         {
             //*curPtr = 0;
-            result << QByteArray::fromRawData(prevPtr, curPtr - prevPtr);
+            result << QByteArray::fromRawData(prevPtr, (int) (curPtr - prevPtr));
             prevPtr = curPtr + 1;
         }
     }

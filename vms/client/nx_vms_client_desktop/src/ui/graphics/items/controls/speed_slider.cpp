@@ -1,5 +1,6 @@
 #include "speed_slider.h"
 
+#include <QtCore/QtMath>
 #include <QtWidgets/QGraphicsSceneMouseEvent>
 
 #include <ui/animation/variant_animator.h>

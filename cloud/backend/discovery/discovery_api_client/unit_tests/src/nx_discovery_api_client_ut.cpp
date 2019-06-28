@@ -25,7 +25,7 @@ class DiscoveryClient: public testing::Test
 protected:
     virtual void SetUp() override
     {
-        m_server = std::make_unique<DiscoveryServer>(kClusterId);
+        m_server = std::make_unique<DiscoveryServer>();
         ASSERT_TRUE(m_server->bindAndListen());
     }
 

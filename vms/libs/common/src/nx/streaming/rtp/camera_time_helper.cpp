@@ -115,8 +115,13 @@ microseconds CameraTimeHelper::getTime(
     const microseconds deviation = abs(offset.value.load() + cameraTime - currentTime);
     if ((isPrimaryStream || useLocalOffset) && deviation >= m_resyncThreshold)
     {
-        NX_DEBUG(this, "ResourceId: %1. Resync camera time, deviation %2ms, cameraTime: %3ms",
-            m_resourceId, deviation.count() / 1000, cameraTime.count() / 1000);
+        NX_DEBUG(this,
+            "ResourceId: %1. Resync camera time, deviation %2ms, cameraTime: %3ms, isPrimaryStream %4, useLocalOffset %5",
+            m_resourceId,
+            deviation.count() / 1000,
+            cameraTime.count() / 1000,
+            isPrimaryStream,
+            useLocalOffset);
         offset.value = currentTime - cameraTime;
         callback(EventType::ResyncToLocalTime);
     }

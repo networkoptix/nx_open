@@ -9,12 +9,17 @@ distrib_loadConfig "build_distribution.conf"
 WORK_DIR="server_build_distribution_tmp"
 LOG_FILE="$LOGS_DIR/server_build_distribution.log"
 
+filesCountInDir()
+{
+    ls -Aq "$1" |wc -w
+}
+
 # Strip binaries and remove rpath.
 stripIfNeeded() # dir
 {
     local -r DIR="$1" && shift
 
-    if [[ "$BUILD_CONFIG" == "Release" && "$ARCH" != "arm64" ]]
+    if [[ $BUILD_CONFIG == "Release" && $ARCH != "arm64" && $TARGET_DEVICE != "linux_arm32" ]]
     then
         local FILE
         for FILE in $(find "$DIR" -type f)
@@ -38,7 +43,6 @@ copyLibs()
     echo ""
     echo "Copying libs"
 
-    mkdir -p "$STAGE_LIB"
     local LIB
     local LIB_BASENAME
     local BLACKLIST_ITEM
@@ -60,8 +64,13 @@ copyLibs()
         'libvms_gateway_core*'
     )
 
-    for LIB in "$BUILD_DIR/lib"/*.so*
+    for LIB in "$BUILD_DIR/lib"/*.so* "$BUILD_DIR/lib"/ffmpeg-*/*.so*
     do
+        # Skip non-resolved globs.
+        [[ -r $LIB ]] || continue
+
+        local RELATIVE_PATH=$(dirname ${LIB#"$BUILD_DIR/lib/"})
+
         LIB_BASENAME=$(basename "$LIB")
 
         SKIP_LIBRARY=0
@@ -78,12 +87,13 @@ copyLibs()
         (( $SKIP_LIBRARY == 1 )) && continue
 
         echo "  Copying $LIB_BASENAME"
-        cp -P "$LIB" "$STAGE_LIB/"
+        mkdir -p "$STAGE_LIB/${RELATIVE_PATH}/"
+        cp -P "$LIB" "$STAGE_LIB/${RELATIVE_PATH}/"
     done
 
     echo "  Copying system libs: ${CPP_RUNTIME_LIBS[@]}"
     distrib_copySystemLibs "$STAGE_LIB" "${CPP_RUNTIME_LIBS[@]}"
-    if [[ "$ARCH" != "arm" ]]
+    if [[ "$ARCH" != "arm" && $TARGET_DEVICE != "linux_arm32" ]]
     then
         echo "Copying libicu"
         distrib_copySystemLibs "$STAGE_LIB" "${ICU_RUNTIME_LIBS[@]}"
@@ -111,6 +121,17 @@ copyFestivalVox()
     echo "Copying Festival Vox files"
     mkdir -p "$STAGE_BIN"
     cp -r "$BUILD_DIR/bin/vox" "$STAGE_BIN/"
+}
+
+copyFiles()
+{
+    echo "Copying generic files"
+
+    if [[ -d $FILES_DIR/$TARGET_DEVICE ]] \
+        && (( $(filesCountInDir "$FILES_DIR/$TARGET_DEVICE") > 0 ))
+    then
+       cp -r "$FILES_DIR/$TARGET_DEVICE/"* "$STAGE_MODULE/"
+    fi
 }
 
 # [in] STAGE_LIB
@@ -188,6 +209,7 @@ copyBins()
     install -m 644 "$CURRENT_BUILD_DIR/qt.conf" "$STAGE_BIN/"
     install -m 755 "$SCRIPTS_DIR/config_helper.py" "$STAGE_BIN/"
     install -m 755 "$SCRIPTS_DIR/shell_utils.sh" "$STAGE_BIN/"
+    install -m 755 "$SOURCE_DIR/nx_log_viewer.html" "$STAGE_BIN/"
 
     echo "Copying mediaserver startup script"
     install -m 755 "bin/mediaserver" "$STAGE_BIN/"
@@ -259,21 +281,34 @@ createUpdateZip() # file.deb
     echo "  Creating symlink to .deb"
     ln -s "$DEB_FILE" "$ZIP_DIR/"
 
-    local DEB
-    for DEB in "$BUILD_DIR/deb"/*
-    do
-        echo "  Copying $(basename "$DEB")"
-        cp -r "$DEB" "$ZIP_DIR/"
-    done
-
-    local FILE
-    for FILE in "update"/*
-    do
+    local FILE="update/install.sh"
+    if [[ -f $FILE ]]
+    then
         echo "  Copying (configured) $(basename "$FILE")"
         cp -r "$FILE" "$ZIP_DIR/"
-    done
+    fi
 
+    if [[ -d update/$TARGET_DEVICE ]] && (( $(filesCountInDir "update/$TARGET_DEVICE") > 0 ))
+    then
+        for FILE in "update/$TARGET_DEVICE/"*
+        do
+            echo "  Copying (configured) $(basename "$FILE")"
+            cp -r "$FILE" "$ZIP_DIR/"
+        done
+    fi
+
+    cp -r "update/update.json" "$ZIP_DIR/update.json"
+    cp "package.json" "$ZIP_DIR/"
     distrib_createArchive "$DISTRIBUTION_OUTPUT_DIR/$UPDATE_ZIP" "$ZIP_DIR" zip -r
+    rm "$ZIP_DIR/package.json" #< Legacy RPI/Bananapi packages does not need this file.
+
+    if [[ $TARGET_DEVICE == "linux_arm32" ]]
+    then
+        cp -r "update/update.rpi.json" "$ZIP_DIR/update.json"
+        distrib_createArchive "$DISTRIBUTION_OUTPUT_DIR/$UPDATE_ZIP_RPI" "$ZIP_DIR" zip -r
+        cp -r "update/update.bananapi.json" "$ZIP_DIR/update.json"
+        distrib_createArchive "$DISTRIBUTION_OUTPUT_DIR/$UPDATE_ZIP_BANANAPI" "$ZIP_DIR" zip -r
+    fi
 }
 
 # [in] WORK_DIR
@@ -297,8 +332,9 @@ buildDistribution()
     copyQtLibs
     copyMediaserverPlugins
     copyFestivalVox
+    copyFiles
 
-    if [[ $TARGET == 'linux-arm64' ]]
+    if [[ $TARGET_DEVICE == 'linux_arm64' ]]
     then
         copyTegraSpecificFiles
     fi

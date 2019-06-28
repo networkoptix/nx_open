@@ -1,8 +1,8 @@
 #include "color_to_vector_converter.h"
 
-#include <cassert>
-
 #include <QtCore/QMetaType>
+
+#include <nx/utils/log/assert.h>
 
 void convert(const QVector4D &source, QColor *target) {
     *target = QColor(

@@ -128,13 +128,25 @@ bool NX_NETWORK_API validateAuthorization(
     const StringType& method,
     const StringType& userName,
     const boost::optional<StringType>& userPassword,
-    const boost::optional<BufferType>& predefinedHA1,
+    const boost::optional<BufferType>& predefinedHa1,
     const header::DigestAuthorization& digestAuthorizationHeader);
+
+bool NX_NETWORK_API validateAuthorization(
+    const StringType& method,
+    const StringType& userName,
+    const boost::optional<StringType>& userPassword,
+    const boost::optional<BufferType>& predefinedHa1,
+    const header::DigestCredentials& digestAuthorizationHeader);
 
 bool NX_NETWORK_API validateAuthorization(
     const StringType& method,
     const Credentials& credentials,
     const header::DigestAuthorization& digestAuthorizationHeader);
+
+bool NX_NETWORK_API validateAuthorization(
+    const StringType& method,
+    const Credentials& credentials,
+    const header::DigestCredentials& digestAuthorizationHeader);
 
 /**
  * @param ha1 That's what calcHa1 has returned.

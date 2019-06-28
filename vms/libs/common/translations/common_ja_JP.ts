@@ -109,7 +109,7 @@
     <message>
       <source>Cloud systems have different owners. Merge is not allowed.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Cloud systems have different owners. Merge is not allowed.</translation>
+      <translation>クラウドシステムのオーナーが異なります。統合は許可されていません</translation>
     </message>
   </context>
   <context>
@@ -1504,14 +1504,6 @@
       <translation>レイアウトを開く</translation>
     </message>
     <message>
-      <source>Plugin Event</source>
-      <translation>プラグインイベント</translation>
-    </message>
-    <message>
-      <source>Unknown plugin event</source>
-      <translation>不明なプラグインイベント</translation>
-    </message>
-    <message>
       <source>Failed to force using camera time, it lags too much, system time will be used</source>
       <translation>カメラ時間が使用できませんでした、時間がかかりすぎます　システム時間が使用されます</translation>
     </message>
@@ -1521,7 +1513,35 @@
     </message>
     <message>
       <source>Multiple %1 events have occurred</source>
-      <translation type="unfinished">Multiple %1 events have occurred</translation>
+      <translation>複数の%1イベントが発生しました</translation>
+    </message>
+    <message>
+      <source>Multicast address conflict detected. Address %1 is already in use by %2 on %3 stream</source>
+      <translation type="unfinished">Multicast address conflict detected. Address %1 is already in use by %2 on %3 stream</translation>
+    </message>
+    <message>
+      <source>Network address %1 is not a multicast address</source>
+      <translation type="unfinished">Network address %1 is not a multicast address</translation>
+    </message>
+    <message>
+      <source>Analytics storage &quot;%1&quot; is offline.</source>
+      <translation type="unfinished">Analytics storage &quot;%1&quot; is offline.</translation>
+    </message>
+    <message>
+      <source>Analytics storage &quot;%1&quot; is almost full.</source>
+      <translation type="unfinished">Analytics storage &quot;%1&quot; is almost full.</translation>
+    </message>
+    <message>
+      <source>Plugin Diagnostic Event</source>
+      <translation type="unfinished">Plugin Diagnostic Event</translation>
+    </message>
+    <message>
+      <source>Unknown Plugin Diagnostic Event</source>
+      <translation type="unfinished">Unknown Plugin Diagnostic Event</translation>
+    </message>
+    <message>
+      <source>RAID error. %1.</source>
+      <translation type="unfinished">RAID error. %1.</translation>
     </message>
   </context>
   <context>

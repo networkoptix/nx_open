@@ -9,6 +9,8 @@
 #include <nx/network/http/rest/http_rest_client.h>
 #include <nx/clusterdb/engine/http/http_paths.h>
 
+#include "nx/cloud/relay/relay_selection/relay_selector_factory.h"
+
 namespace nx::cloud::relay::model {
 
 namespace {
@@ -22,7 +24,8 @@ static std::string toLowerReversed(std::string domainName)
 } //namespace
 
 RemoteRelayPeerPool::RemoteRelayPeerPool(const conf::Settings& settings):
-    m_settings(settings.clusterDbMap()),
+    m_settings(settings.listeningPeerDb()),
+    m_relaySelector(RelaySelectorFactory::instance().create(settings)),
     m_baseApiPath(nx::clusterdb::engine::kBaseSynchronizationPath)
 {
     // Try to connect immediately
@@ -37,8 +40,15 @@ RemoteRelayPeerPool::~RemoteRelayPeerPool()
 
 bool RemoteRelayPeerPool::connectToDb()
 {
-    if (isConnected())
+    if (m_map)
         return true;
+
+    if (!m_settings.enabled)
+    {
+        NX_INFO(this,
+            "RemoteRelayPeerPool was not enabled. Other DB's will not be discovered...");
+        return true;
+    }
 
     try
     {
@@ -61,8 +71,7 @@ bool RemoteRelayPeerPool::connectToDb()
     }
     catch (const std::exception& e)
     {
-        NX_ERROR(
-            this,
+        NX_ERROR(this,
             "Failed to initialize database, traffic relay will not function properly: %1",
             e.what());
     }
@@ -72,6 +81,8 @@ bool RemoteRelayPeerPool::connectToDb()
 
 bool RemoteRelayPeerPool::isConnected() const
 {
+    if (!m_settings.enabled)
+        return true;
     return m_map != nullptr;
 }
 
@@ -81,9 +92,11 @@ void RemoteRelayPeerPool::findRelayByDomain(
 {
     using namespace nx::clusterdb::map;
 
-    if (!isConnected())
+    if (!m_map)
         return handler(std::string());
 
+    // NOTE: toLowerReversed() is used here in stead of toInternalStorageFormat() because we want
+    // to search only for the server's domain name.
     m_map->database().dataManager().getRangeWithPrefix(
         toLowerReversed(domainName),
         [this, domainName, handler = std::move(handler)](
@@ -91,22 +104,27 @@ void RemoteRelayPeerPool::findRelayByDomain(
         {
             if (result != ResultCode::ok)
             {
-                NX_WARNING(
-                    this,
-                    "getRangeWithPrefix returned error: %1 for key: %2",
+                NX_WARNING(this, "getRangeWithPrefix returned error: %1 for key: %2",
                     toString(result), domainName);
                 return handler(std::string());
             }
 
-            NX_VERBOSE(
-                this,
-                "getRangeWithPrefix returned ResultCode: %1 and result set: %2 for domainName: %3",
-                toString(result), containerString(map), domainName);
+            NX_VERBOSE(this, "getRangeWithPrefix returned result set: %2 for domainName: %3",
+                containerString(map), domainName);
 
             if (map.empty())
-                handler(std::string());
-            else
-                handler(map.begin()->second);
+                return handler(std::string());
+
+
+            std::vector<std::string> relayDomains;
+            for (auto& peerAndRelayDomains : map)
+            {
+                // Avoid redirecting to this relay instance by not adding this relay to the list.
+                if (peerAndRelayDomains.second.find(m_domainName) == std::string::npos)
+                    relayDomains.emplace_back(std::move(peerAndRelayDomains.second));
+            }
+
+            return handler(m_relaySelector->selectRelay(relayDomains));
         });
 }
 
@@ -116,19 +134,17 @@ void RemoteRelayPeerPool::addPeer(
 {
     using namespace nx::clusterdb::map;
 
-    if (!isConnected())
+    if (!m_map)
         return handler(false);
 
     m_map->database().dataManager().insertOrUpdate(
-        toLowerReversed(domainName),
+        toInternalStorageFormat(domainName),
         m_domainName,
         [this, domainName, handler = std::move(handler)](ResultCode result)
         {
             if (result != ResultCode::ok)
             {
-                NX_WARNING(
-                    this,
-                    "insertOrUpdate returned error: %1 for args: key: %2, value: %3",
+                NX_WARNING(this, "insertOrUpdate returned error: %1 for args: key: %2, value: %3",
                     toString(result), domainName, m_domainName);
             }
             handler(result == ResultCode::ok);
@@ -141,17 +157,16 @@ void RemoteRelayPeerPool::removePeer(
 {
     using namespace nx::clusterdb::map;
 
-    if (!isConnected())
+    if (!m_map)
         return handler(false);
 
     m_map->database().dataManager().remove(
-        toLowerReversed(domainName),
+        toInternalStorageFormat(domainName),
         [this, domainName, handler = std::move(handler)](ResultCode result)
         {
             if (result != ResultCode::ok)
             {
-                NX_VERBOSE(
-                    this,
+                NX_VERBOSE(this,
                     "remove returned error: %1, for args: key: %2, value: %3",
                     toString(result), domainName, m_domainName);
             }
@@ -193,6 +208,12 @@ void RemoteRelayPeerPool::registerHttpApi(
     startDiscovery();
 }
 
+void RemoteRelayPeerPool::pleaseStopSync()
+{
+    if (m_map)
+        m_map->synchronizationEngine().pleaseStopSync();
+}
+
 void RemoteRelayPeerPool::startDiscovery()
 {
     if (m_map && !m_syncEngineUrl.isEmpty())
@@ -201,6 +222,14 @@ void RemoteRelayPeerPool::startDiscovery()
             m_settings.map.synchronizationSettings.clusterId,
             m_syncEngineUrl);
     }
+}
+
+std::string RemoteRelayPeerPool::toInternalStorageFormat(const std::string& peerDomain) const
+{
+    std::string s;
+    s.reserve(peerDomain.size() + m_domainName.size() + 1);
+    s += toLowerReversed(peerDomain);
+    return s.append(".").append(m_domainName);
 }
 
 //-------------------------------------------------------------------------------------------------

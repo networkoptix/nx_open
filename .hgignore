@@ -7,7 +7,7 @@ syntax: glob
 *.kdev4
 .DS_Store
 *.swp
-CMakeLists.txt.user
+CMakeLists.txt.user*
 
 # Precompiled files.
 *.pyc
@@ -30,3 +30,5 @@ subinclude:cloud/deploy/monitoring_simple/.hgignore
 # Build folders in the repository root.
 re:^build/
 re:^build-.*/
+
+.git

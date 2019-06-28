@@ -18,11 +18,8 @@
                title="{{server.ipFull}}"
                ng-click="toggleServerCollapsed(server)"
                class="server-link collapse-group"
-               ng-class="{offline:server.status!='Online'}">
-                <div class="pull-right">
-                    <span>
-                        <icon for="!server.collapsed && cameras[server.id].length>0" on-true="chevron-up" title-true="collapse" ></icon>
-                        <icon for="server.collapsed && cameras[server.id].length>0" on-true="chevron-down" title-true="expand" ></icon>
+               ng-class="{offline:server.status!='Online'}"><div class="pull-right"><span><icon for="!server.collapsed && cameras[server.id].length>0" on-true="chevron-up" title-true="згорнути" ></icon>
+                        <icon for="server.collapsed && cameras[server.id].length>0" on-true="chevron-down" title-true="розгорнути" ></icon>
                     </span>
                 </div>
                 <div class="hide-excess-text">

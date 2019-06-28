@@ -4,6 +4,7 @@
 #include <QtCore/QFile>
 #include <QtGui/QScreen>
 #include <QtGui/QWindow>
+#include <QtGui/QTextDocument>
 #include <QtWidgets/QDialogButtonBox>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QStyle>
@@ -38,6 +39,7 @@ EulaDialog::EulaDialog(QWidget* parent):
     font.setPixelSize(font.pixelSize() + 2);
     ui->titleLabel->setFont(font);
     ui->titleLabel->setForegroundRole(QPalette::Light);
+    ui->copyToClipboard->setType(ClipboardButton::StandardType::copyLong);
 
     //ui->buttonBox->setStandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     // We have replaced standard buttons to keep our own button order and style.
@@ -84,8 +86,12 @@ void EulaDialog::setEulaHtml(const QString& html)
         lit("<head><style>%1</style>").arg(eulaHtmlStyle));
 
     ui->eulaView->setHtml(eulaText);
+
     // We do not want to copy embedded style to clipboard.
-    ui->copyToClipboard->setClipboardText(html);
+    QTextDocument doc;
+    doc.setHtml( html );
+    QString plainText = doc.toPlainText();
+    ui->copyToClipboard->setClipboardText(plainText);
 }
 
 bool EulaDialog::hasHeightForWidth() const
@@ -156,9 +162,22 @@ bool EulaDialog::acceptEulaHtml(const QString& html, int version, QWidget* paren
     eulaDialog.setTitle(eulaHeader);
     eulaDialog.setEulaHtml(html);
 
+    // This log line gives a clue to CI team when they start the client inside headless VM. They
+    // wonder why the client seems to be hanging. But client just wants EULA to be accepted.
+    NX_INFO(NX_SCOPE_TAG, "acceptEulaHtml(%1) - waiting for EULA to be accepted", version);
     if (eulaDialog.exec() == QDialog::DialogCode::Accepted)
     {
-        qnSettings->setAcceptedEulaVersion(version);
+        auto oldVersion = qnSettings->acceptedEulaVersion();
+        if (oldVersion < version)
+        {
+            qnSettings->setAcceptedEulaVersion(version);
+            // Preventing qnSettings from being lost. Client can be closed/restarted soon.
+            if (!qnSettings->save())
+            {
+                NX_ERROR(NX_SCOPE_TAG, "acceptEulaHtml(%1) - failed to save new EULA version. "
+                    "Client config is unaccessable. Try to check file permissions.", version);
+            }
+        }
         return true;
     }
     return false;

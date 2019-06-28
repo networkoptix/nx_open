@@ -59,7 +59,8 @@ protected:
         http::HttpHeaders httpHeaders;
         websocket::addClientHeaders(
             &httpHeaders,
-            websocket::kWebsocketProtocolName);
+            websocket::kWebsocketProtocolName,
+            websocket::CompressionType::perMessageDeflate);
 
         m_httpClient = std::make_unique<http::AsyncClient>();
         m_httpClient->setResponseReadTimeout(kNoTimeout);
@@ -132,7 +133,9 @@ private:
             nx::network::http::StatusCode::switchingProtocols)
         {
             m_websocket = std::make_unique<nx::network::websocket::WebSocket>(
-                m_httpClient->takeSocket());
+                m_httpClient->takeSocket(), nx::network::websocket::Role::client,
+                nx::network::websocket::FrameType::binary,
+                nx::network::websocket::CompressionType::perMessageDeflate);
             m_websocket->start();
         }
     }

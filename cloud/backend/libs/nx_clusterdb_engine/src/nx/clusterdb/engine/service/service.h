@@ -8,6 +8,8 @@
 #include <nx/utils/service.h>
 #include <nx/utils/url.h>
 
+#include "../compatible_ec2_protocol_version.h"
+
 namespace nx::sql { class AsyncSqlQueryExecutor; }
 
 namespace nx::clusterdb::engine {
@@ -28,6 +30,14 @@ public:
         const std::string& applicationId,
         int argc,
         char **argv);
+
+    /**
+     * Has effect only if called before starting this service.
+     */
+    void setSupportedProtocolRange(
+        const ProtocolVersionRange& protocolVersionRange);
+
+    ProtocolVersionRange protocolVersionRange() const;
 
     std::vector<network::SocketAddress> httpEndpoints() const;
 
@@ -56,6 +66,7 @@ protected:
 
 private:
     const std::string m_applicationId;
+    ProtocolVersionRange m_protocolVersionRange;
     const Settings* m_settings = nullptr;
     Model* m_model = nullptr;
     Controller* m_controller = nullptr;

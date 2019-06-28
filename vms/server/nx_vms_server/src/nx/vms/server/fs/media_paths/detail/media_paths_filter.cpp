@@ -114,6 +114,9 @@ QStringList Filter::get() const
     if (m_filterConfig.isMultipleInstancesAllowed)
         appendServerGuidPostFix(&result);
 
+    std::sort(result.begin(), result.end());
+    result.erase(std::unique(result.begin(), result.end()), result.end());
+
     return result;
 }
 

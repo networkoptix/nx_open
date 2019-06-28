@@ -1,7 +1,12 @@
+#include <algorithm>
+
 #include "synchronization_engine.h"
 
 #include "p2p_sync_settings.h"
 #include "statistics/provider.h"
+#include "transport/common_http/factory.h"
+#include "transport/p2p_http/factory.h"
+#include "transport/p2p_websocket/factory.h"
 
 namespace nx::clusterdb::engine {
 
@@ -9,7 +14,7 @@ SynchronizationEngine::SynchronizationEngine(
     const std::string& /*applicationId*/, // TODO: #ak CLOUD-2249.
     const SynchronizationSettings& settings,
     const ProtocolVersionRange& supportedProtocolRange,
-    nx::sql::AsyncSqlQueryExecutor* const dbManager)
+    nx::sql::AbstractAsyncSqlQueryExecutor* const dbManager)
     :
     m_peerId(
         !QnUuid::fromStringSafe(settings.nodeId).isNull()
@@ -20,6 +25,7 @@ SynchronizationEngine::SynchronizationEngine(
     m_outgoingTransactionDispatcher(m_outgoingCommandFilter),
     m_structureUpdater(dbManager),
     m_commandLog(
+        settings,
         m_peerId,
         m_supportedProtocolRange,
         dbManager,
@@ -35,29 +41,13 @@ SynchronizationEngine::SynchronizationEngine(
         m_supportedProtocolRange,
         &m_commandLog,
         m_outgoingCommandFilter,
+        &m_connectionManager,
         m_peerId.toSimpleByteArray().toStdString()),
     m_connector(
         m_peerId.toSimpleByteArray().toStdString(),
+        settings,
         &m_transportManager,
         &m_connectionManager),
-    m_httpTransportAcceptor(
-        m_peerId,
-        m_supportedProtocolRange,
-        &m_commandLog,
-        &m_connectionManager,
-        m_outgoingCommandFilter),
-    m_webSocketAcceptor(
-        m_peerId,
-        m_supportedProtocolRange,
-        &m_commandLog,
-        &m_connectionManager,
-        m_outgoingCommandFilter),
-    m_p2pHttpAcceptor(
-        m_peerId.toSimpleString().toStdString(),
-        m_supportedProtocolRange,
-        &m_commandLog,
-        &m_connectionManager,
-        m_outgoingCommandFilter),
     m_statisticsProvider(
         m_connectionManager,
         &m_incomingTransactionDispatcher,
@@ -66,6 +56,10 @@ SynchronizationEngine::SynchronizationEngine(
     m_httpServer(m_peerId),
     m_discoveryManager(settings.discovery, this)
 {
+    // NOTE: First type registered is used to construct connector by default.
+    m_transportManager.registerTransport(std::make_unique<transport::common_http::Factory>());
+    m_transportManager.registerTransport(std::make_unique<transport::p2p::websocket::Factory>());
+    m_transportManager.registerTransport(std::make_unique<transport::p2p::http::Factory>());
 }
 
 SynchronizationEngine::~SynchronizationEngine()
@@ -76,6 +70,7 @@ SynchronizationEngine::~SynchronizationEngine()
 void SynchronizationEngine::pleaseStopSync()
 {
     m_startedAsyncCallsCounter.wait();
+    m_connector.pleaseStopSync();
     m_connectionManager.pleaseStopSync();
     m_commandLog.pleaseStopSync();
     m_discoveryManager.pleaseStopSync();
@@ -146,6 +141,11 @@ void SynchronizationEngine::setOutgoingCommandFilter(
     m_outgoingCommandFilter.configure(configuration);
 }
 
+OutgoingCommandFilter& SynchronizationEngine::outgoingCommandFilter()
+{
+    return m_outgoingCommandFilter;
+}
+
 void SynchronizationEngine::subscribeToSystemDeletedNotification(
     nx::utils::Subscription<std::string>& subscription)
 {
@@ -173,9 +173,18 @@ void SynchronizationEngine::registerHttpApi(
 {
     m_httpServer.registerHandlers(pathPrefix, dispatcher);
 
-    m_httpTransportAcceptor.registerHandlers(pathPrefix, dispatcher);
-    m_webSocketAcceptor.registerHandlers(pathPrefix, dispatcher);
-    m_p2pHttpAcceptor.registerHandlers(pathPrefix, dispatcher);
+    auto transportAcceptors = m_transportManager.createAllAcceptors(m_peerId);
+
+    std::for_each(
+        transportAcceptors.begin(), transportAcceptors.end(),
+        [pathPrefix, dispatcher](auto& acceptor)
+        {
+            acceptor->registerHandlers(pathPrefix, dispatcher);
+        });
+
+    std::move(
+        transportAcceptors.begin(), transportAcceptors.end(),
+        std::back_inserter(m_transportAcceptors));
 }
 
 DiscoveryManager& SynchronizationEngine::discoveryManager()

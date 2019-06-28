@@ -1,6 +1,7 @@
 #include "debug_handler.h"
 
 #include <cstdlib>
+#include <thread>
 
 #include <nx/utils/switch.h>
 #include <nx/utils/crash_dump/systemexcept.h>
@@ -100,15 +101,15 @@ int QnDebugHandler::executeGet(
 }
 
 int QnDebugHandler::executePost(
-    const QString& /*path*/,
-    const QnRequestParamList& /*params*/,
+    const QString& path,
+    const QnRequestParamList& params,
     const QByteArray& /*requestBody*/,
     const QByteArray& /*srcBodyContentType*/,
-    QByteArray& /*responseMessageBody*/,
-    QByteArray& /*contentType*/,
-    const QnRestConnectionProcessor* /*owner*/)
+    QByteArray& responseMessageBody,
+    QByteArray& contentType,
+    const QnRestConnectionProcessor* owner)
 {
-    return nx::network::http::StatusCode::notFound;
+    return executeGet(path, params, responseMessageBody, contentType, owner);
 }
 
 /**

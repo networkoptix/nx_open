@@ -127,12 +127,21 @@ QnWorkbenchBookmarksHandler::QnWorkbenchBookmarksHandler(QObject *parent /* = NU
         });
 
     connect(bookmarksViewer, &QnBookmarksViewer::playBookmark, this,
-        [this, getActionParamsFunc](const QnCameraBookmark &bookmark)
+        [this](const QnCameraBookmark &bookmark)
         {
             context()->statisticsModule()->registerClick(lit("bookmark_tooltip_play"));
 
-            static const int kMicrosecondsFactor = 1000;
+            auto slider = navigator()->timeSlider();
+
+            // Pretty bookmark navigation should be performed when the slider is not immediately visible
+            // to the user (because either live streaming or the slider is outside of the time window).
+            const bool isVisibleInWindow = slider->positionMarkerVisible() &&
+                slider->windowContains(slider->sliderTimePosition());
+
             navigator()->setPosition(microseconds(bookmark.startTimeMs).count());
+            if (!isVisibleInWindow)
+                slider->navigateTo(bookmark.startTimeMs);
+
             navigator()->setPlaying(true);
         });
 

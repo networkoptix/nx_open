@@ -14,6 +14,7 @@
 #include <nx/utils/deprecated_settings.h>
 #include <nx/utils/std/optional.h>
 #include <nx/clusterdb/map/settings.h>
+#include <nx/cloud/discovery/settings.h>
 
 #include "discovery/discovery_settings.h"
 
@@ -67,7 +68,15 @@ struct Statistics
 
 struct TrafficRelay
 {
-    QString url;
+    std::vector<nx::utils::Url> urls;
+    std::string clusterId;
+    nx::cloud::discovery::Settings discovery;
+};
+
+struct GeoIp
+{
+    std::string dbPath;
+    int resolveErrorUrlCount;
 };
 
 struct ListeningPeer
@@ -80,13 +89,14 @@ struct Server
     std::string name;
 };
 
-struct ClusterDbMap
+struct ListeningPeerDb
 {
+    bool enabled = false;
     std::chrono::milliseconds connectionRetryDelay;
     nx::sql::ConnectionOptions sql;
     nx::clusterdb::map::Settings map;
 
-    ClusterDbMap();
+    ListeningPeerDb();
 };
 
 /**
@@ -125,10 +135,11 @@ public:
     const nx::sql::ConnectionOptions& dbConnectionOptions() const;
     const Statistics& statistics() const;
     const TrafficRelay& trafficRelay() const;
+    const GeoIp& geoIp() const;
     const nx::cloud::discovery::conf::Discovery& discovery() const;
     const ListeningPeer& listeningPeer() const;
     const Server& server() const;
-    const ClusterDbMap& clusterDbMap() const;
+    const ListeningPeerDb& listeningPeerDb() const;
 
 private:
     General m_general;
@@ -141,10 +152,11 @@ private:
     nx::sql::ConnectionOptions m_dbConnectionOptions;
     Statistics m_statistics;
     TrafficRelay m_trafficRelay;
+    GeoIp m_geoIp;
     nx::cloud::discovery::conf::Discovery m_discovery;
     ListeningPeer m_listeningPeer;
     Server m_server;
-    ClusterDbMap m_clusterDbMap;
+    ListeningPeerDb m_listeningPeerDb;
 
     virtual void loadSettings() override;
 
@@ -156,11 +168,12 @@ private:
 
     void loadConnectionParameters();
     void loadTrafficRelay();
+    void loadGeoIp();
     void loadListeningPeer();
     void loadHttp();
     void loadHttps();
     void loadServer();
-    void loadClusterDbMap();
+    void loadListeningPeerDb();
 };
 
 } // namespace conf

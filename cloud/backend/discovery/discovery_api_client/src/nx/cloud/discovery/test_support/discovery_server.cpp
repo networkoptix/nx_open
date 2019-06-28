@@ -2,6 +2,7 @@
 
 #include <nx/fusion/model_functions.h>
 #include <nx/network/url/url_builder.h>
+#include <nx/network/url/url_parse_helper.h>
 #include <nx/network/http/http_types.h>
 #include <nx/network/http/buffer_source.h>
 #include <nx/utils/random.h>
@@ -12,7 +13,11 @@ namespace nx::cloud::discovery::test {
 
 namespace {
 
-static constexpr char kClusterId[] = "clusterId";
+std::string getClusterId(const nx::network::http::RequestContext& requestContext)
+{
+    static constexpr char kClusterId[] = "clusterId";
+    return requestContext.requestPathParams.getByName(kClusterId);
+}
 
 } // namespace
 
@@ -28,11 +33,7 @@ std::string generateInfoJson(const std::string& nodeId)
 //-------------------------------------------------------------------------------------------------
 // DiscoveryServer
 
-DiscoveryServer::DiscoveryServer(
-    const std::string & clusterId,
-    const std::chrono::milliseconds& nodeLifetime)
-    :
-    m_clusterId(clusterId),
+DiscoveryServer::DiscoveryServer(const std::chrono::milliseconds& nodeLifetime):
     m_nodeLifetime(nodeLifetime)
 {
     registerRequestHandlers(&m_httpServer.httpMessageDispatcher());
@@ -56,6 +57,27 @@ int DiscoveryServer::onlineNodesCount() const
     return (int)m_onlineNodes.size();
 }
 
+void DiscoveryServer::mockupClientPublicIpAddress(
+    const std::string& nodeId,
+    const std::string& publicIpAddress)
+{
+    QnMutexLocker lock(&m_mutex);
+    m_clientPublicIpAddresses[nodeId] = publicIpAddress;
+}
+
+nx::utils::SubscriptionId DiscoveryServer::subscribeToNodeDiscovered(
+    nx::utils::MoveOnlyFunc<void(std::string, NodeInfo)> handler)
+{
+    nx::utils::SubscriptionId id = nx::utils::kInvalidSubscriptionId;
+    m_nodeDiscoveredSubscription.subscribe(std::move(handler), &id);
+    return id;
+}
+
+void DiscoveryServer::unsubscribeFromNodeDiscovered(const nx::utils::SubscriptionId& subscriptionId)
+{
+    m_nodeDiscoveredSubscription.removeSubscription(subscriptionId);
+}
+
 void DiscoveryServer::registerRequestHandlers(
     nx::network::http::server::rest::MessageDispatcher* messageDispatcher)
 {
@@ -74,18 +96,18 @@ void DiscoveryServer::serveRegisterNode(
     nx::network::http::RequestContext requestContext,
     nx::network::http::RequestProcessedHandler completionHandler)
 {
-    // Simulate a 10 msec round trip travel time from client to server and back
-    std::this_thread::sleep_for(std::chrono::milliseconds(10));
-
-    if (!requestContainsThisClusterId(requestContext))
-        return completionHandler(nx::network::http::StatusCode::badRequest);
-
     bool ok = false;
     NodeInfo nodeInfo = QJson::deserialized(requestContext.request.messageBody, NodeInfo(), &ok);
     if (!ok)
         return completionHandler(nx::network::http::StatusCode::badRequest);
 
-    Node node = updateNode(nodeInfo);
+    if(getClusterId(requestContext).empty())
+        return completionHandler(nx::network::http::StatusCode::badRequest);
+
+    if (!haveNodeId(getClusterId(requestContext), nodeInfo.nodeId))
+        emitNodeDiscovered(getClusterId(requestContext), nodeInfo);
+
+    Node node = updateNode(std::move(requestContext), nodeInfo);
 
     nx::network::http::RequestResult result(nx::network::http::StatusCode::created);
     result.dataSource =
@@ -100,13 +122,10 @@ void DiscoveryServer::serveGetOnlineNodes(
     nx::network::http::RequestContext requestContext,
     nx::network::http::RequestProcessedHandler completionHandler)
 {
-    // Simulate 10 msec round trip travel time from client to server and back
-    std::this_thread::sleep_for(std::chrono::milliseconds(10));
-
-    if (!requestContainsThisClusterId(requestContext))
+    if (!haveClusterId(getClusterId(requestContext)))
         return completionHandler(nx::network::http::StatusCode::badRequest);
 
-    auto onlineNodes = updateOnlineNodes();
+    auto onlineNodes = updateOnlineNodes(getClusterId(requestContext));
 
     nx::network::http::RequestResult result(nx::network::http::StatusCode::ok);
     result.dataSource =
@@ -117,21 +136,36 @@ void DiscoveryServer::serveGetOnlineNodes(
     completionHandler(std::move(result));
 }
 
-bool DiscoveryServer::requestContainsThisClusterId(
-    const nx::network::http::RequestContext& requestContext) const
-{
-    return requestContext.requestPathParams.getByName(kClusterId) == m_clusterId;
-}
-
-Node DiscoveryServer::updateNode(const NodeInfo& nodeInfo)
+bool DiscoveryServer::haveClusterId(const std::string& clusterId) const
 {
     QnMutexLocker lock(&m_mutex);
-    Node& node = m_onlineNodes[nodeInfo.nodeId];
+    return m_onlineNodes.find(clusterId) != m_onlineNodes.end();
+}
+
+bool DiscoveryServer::haveNodeId(const std::string& clusterId, const std::string& nodeId) const
+{
+    QnMutexLocker lock(&m_mutex);
+    auto nodesByCluster = m_onlineNodes.find(clusterId);
+    if (nodesByCluster == m_onlineNodes.end())
+        return false;
+    return nodesByCluster->second.find(nodeId) != nodesByCluster->second.end();
+}
+
+Node DiscoveryServer::updateNode(
+    nx::network::http::RequestContext requestContext,
+    const NodeInfo& nodeInfo)
+{
+    QnMutexLocker lock(&m_mutex);
+    Node& node = m_onlineNodes[getClusterId(requestContext)][nodeInfo.nodeId];
 
     if (node.nodeId.empty())
         node.nodeId = nodeInfo.nodeId;
 
     node.urls = nodeInfo.urls;
+
+    auto it = m_clientPublicIpAddresses.find(node.nodeId);
+    if (it != m_clientPublicIpAddresses.end())
+        node.publicIpAddress = it->second;
 
     node.infoJson = nodeInfo.infoJson;
     node.expirationTime = std::chrono::system_clock::now() + m_nodeLifetime;
@@ -139,15 +173,16 @@ Node DiscoveryServer::updateNode(const NodeInfo& nodeInfo)
     return node;
 }
 
-std::vector<Node> DiscoveryServer::updateOnlineNodes()
+std::vector<Node> DiscoveryServer::updateOnlineNodes(const std::string& clusterId)
 {
     QnMutexLocker lock(&m_mutex);
     std::vector<Node> onlineNodes;
-    for (auto it = m_onlineNodes.begin(); it != m_onlineNodes.end();)
+    auto& nodes = m_onlineNodes[clusterId];
+    for (auto it = nodes.begin(); it != nodes.end();)
     {
         if (it->second.expirationTime <= std::chrono::system_clock::now())
         {
-            it = m_onlineNodes.erase(it);
+            it = nodes.erase(it);
         }
         else
         {
@@ -156,6 +191,11 @@ std::vector<Node> DiscoveryServer::updateOnlineNodes()
         }
     }
     return onlineNodes;
+}
+
+void DiscoveryServer::emitNodeDiscovered(const std::string& clusterId, const NodeInfo& nodeInfo)
+{
+    m_nodeDiscoveredSubscription.notify(clusterId, nodeInfo);
 }
 
 } // namespace nx::cloud::discovery::test

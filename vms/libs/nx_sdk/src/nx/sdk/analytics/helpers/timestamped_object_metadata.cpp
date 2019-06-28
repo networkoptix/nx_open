@@ -1,3 +1,5 @@
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+
 #include "timestamped_object_metadata.h"
 
 namespace nx {
@@ -39,12 +41,7 @@ int TimestampedObjectMetadata::attributeCount() const
     return m_objectMetadata->attributeCount();
 }
 
-const char* TimestampedObjectMetadata::auxiliaryData() const
-{
-    return m_objectMetadata->auxiliaryData();
-}
-
-IObjectMetadata::Rect TimestampedObjectMetadata::boundingBox() const
+Rect TimestampedObjectMetadata::boundingBox() const
 {
     return m_objectMetadata->boundingBox();
 }
@@ -74,19 +71,14 @@ void TimestampedObjectMetadata::setSubtype(const std::string& value)
     m_objectMetadata->setSubtype(std::move(value));
 }
 
-void TimestampedObjectMetadata::addAttribute(Attribute attribute)
+void TimestampedObjectMetadata::addAttribute(nx::sdk::Ptr<Attribute> attribute)
 {
     m_objectMetadata->addAttribute(std::move(attribute));
 }
 
-void TimestampedObjectMetadata::addAttributes(const std::vector<Attribute>& value)
+void TimestampedObjectMetadata::addAttributes(const std::vector<nx::sdk::Ptr<Attribute>>& value)
 {
     m_objectMetadata->addAttributes(value);
-}
-
-void TimestampedObjectMetadata::setAuxiliaryData(std::string value)
-{
-    m_objectMetadata->setAuxiliaryData(std::move(value));
 }
 
 void TimestampedObjectMetadata::setBoundingBox(const Rect& rect)

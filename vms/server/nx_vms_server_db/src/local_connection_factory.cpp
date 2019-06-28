@@ -12,7 +12,7 @@
 #include <utils/common/app_info.h>
 #include <nx/utils/concurrent.h>
 #include <network/http_connection_listener.h>
-#include <nx_ec/ec_proto_version.h>
+#include <nx/vms/api/protocol_version.h>
 #include <nx/vms/api/data/access_rights_data.h>
 #include <nx/vms/api/data/discovery_data.h>
 #include <nx/vms/api/data/user_role_data.h>
@@ -234,12 +234,27 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * The list of parameters depends on the resource type.
      * %param[default] format
      * %param id Resource unique id.
-     * %return Object in the requested format.
+     * %return List of objects in the requested format.
+     *     %param resourceId Resource unique id.
+     *     %param value Parameter value.
+     *     %param name Parameter name.
      * %// AbstractResourceManager::getKvPairs
      */
     regGet<QnUuid, ResourceParamWithRefDataList>(p, ApiCommand::getResourceParams);
 
-    // AbstractResourceManager::save
+    /**%apidoc:arrayParams POST /ec2/setResourceParams
+     * Set resource (camera, user or server) additional parameters (camera firmware version, etc).
+     * The list of parameters depends on the resource type.
+     * <p>
+     * Parameters should be passed as a JSON array of objects in POST message body with
+     * content type "application/json". Example of such object can be seen in
+     * the result of the corresponding GET function.
+     * </p>
+     * %param resourceId Resource unique id.
+     * %param value Parameter value.
+     * %param name Parameter name.
+     * %// AbstractResourceManager::save
+     */
     regUpdate<ResourceParamWithRefDataList>(p, ApiCommand::setResourceParams);
 
     /**%apidoc POST /ec2/removeResource
@@ -337,6 +352,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * %param backupDuration Duration of the synchronization period (in seconds). -1 if not set.
      * %param backupBitrate Maximum backup bitrate (in bytes per second). Negative
      *     value if not limited.
+     * %param metadataStorageId Storage identifier to keep metadata SQL database.
      * %// AbstractMediaServerManager::saveUserAttributes
      */
     regUpdate<MediaServerUserAttributesDataList>(p, ApiCommand::saveMediaServerUserAttributesList);
@@ -865,6 +881,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *         %value Offline
      *         %value Online
      *         %value Recording
+     *         %value Unauthorized
      *     %param addParams List of additional parameters for the camera. This list can contain
      *         such information as full ONVIF URL, camera maximum FPS, etc.
      * %// AbstractCameraManager::getCamerasEx
@@ -959,6 +976,8 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *             %value storageTooSlow
      *             %value storageFull
      *             %value systemStorageFull
+     *             %value metadataStorageOffline
+     *             %value metadataStorageFull
      *             %value licenseRemoved
      *             %value backupFailedNoBackupStorageError
      *             %value backupFailedSourceStorageError
@@ -1656,13 +1675,6 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     // AbstractStoredFileManager::deleteStoredFile
     regUpdate<StoredFilePath>(p, ApiCommand::removeStoredFile);
 
-    // AbstractUpdatesManager::uploadUpdate
-    regUpdate<UpdateUploadData>(p, ApiCommand::uploadUpdate);
-    // AbstractUpdatesManager::uploadUpdateResponce
-    regUpdate<UpdateUploadResponseData>(p, ApiCommand::uploadUpdateResponce);
-    // AbstractUpdatesManager::installUpdate
-    regUpdate<UpdateInstallData>(p, ApiCommand::installUpdate);
-
     // AbstractDiscoveryManager::discoveredServerChanged
     regUpdate<DiscoveredServerData>(p, ApiCommand::discoveredServerChanged);
     // AbstractDiscoveryManager::discoveredServersList
@@ -1924,7 +1936,7 @@ ErrorCode LocalConnectionFactory::fillConnectionInfo(
     connectionInfo->box = QnAppInfo::armBox();
 #endif
     connectionInfo->allowSslConnections = m_sslEnabled;
-    connectionInfo->nxClusterProtoVersion = nx_ec::EC2_PROTO_VERSION;
+    connectionInfo->nxClusterProtoVersion = nx::vms::api::protocolVersion();
     connectionInfo->ecDbReadOnly = m_ecDbReadOnly;
     connectionInfo->newSystem = commonModule()->globalSettings()->isNewSystem();
     connectionInfo->p2pMode = m_p2pMode;

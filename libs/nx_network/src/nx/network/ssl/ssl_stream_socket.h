@@ -92,6 +92,8 @@ public:
     virtual void handshakeAsync(
         nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override;
 
+    virtual std::string serverName() const override;
+
 protected:
     virtual void cancelIoInAioThread(nx::network::aio::EventType eventType) override;
 

@@ -5,27 +5,27 @@
     <name>BackupCamerasDialogDelegate</name>
     <message>
       <source>Backup newly added devices</source>
-      <translation type="unfinished">Backup newly added devices</translation>
+      <translation>Sikkerhetskopiere nylig tillagte enheter</translation>
     </message>
     <message>
       <source>Backup newly added cameras</source>
-      <translation type="unfinished">Backup newly added cameras</translation>
+      <translation>Sikkerhetskopiere nylig tillagte kamera</translation>
     </message>
     <message>
       <source>Cannot add new devices while backup process is running.</source>
-      <translation type="unfinished">Cannot add new devices while backup process is running.</translation>
+      <translation>Kan ikke legge til nye enheter mens sikkerhetskopiering kjører.</translation>
     </message>
     <message>
       <source>Cannot add new cameras while backup process is running.</source>
-      <translation type="unfinished">Cannot add new cameras while backup process is running.</translation>
+      <translation>Kan ikke legge til nye kamera mens sikkerhetskopiering kjører.</translation>
     </message>
     <message>
       <source>Cannot add new devices because they store archive on external storage.</source>
-      <translation type="unfinished">Cannot add new devices because they store archive on external storage.</translation>
+      <translation>Kan ikke legge til nye enheter fordi de lagrer arkiv på ekstern lagring.</translation>
     </message>
     <message>
       <source>Cannot add new cameras because they store archive on external storage.</source>
-      <translation type="unfinished">Cannot add new cameras because they store archive on external storage.</translation>
+      <translation>Kan ikke legge til nye kameraer fordi de lagrer arkiv på ekstern lagring.</translation>
     </message>
   </context>
   <context>
@@ -34,31 +34,31 @@
       <source>Zoom timeline
 to view more bookmarks</source>
       <comment>It is highly recommended to split message in two lines</comment>
-      <translation type="unfinished">Zoom timeline
-to view more bookmarks</translation>
+      <translation>Zoom tidslinje
+å vise flere bokmerker</translation>
     </message>
     <message>
       <source>Play bookmark from the beginning</source>
-      <translation type="unfinished">Play bookmark from the beginning</translation>
+      <translation>Spill bokmerke fra begynnelsen</translation>
     </message>
     <message>
       <source>Edit bookmark</source>
-      <translation type="unfinished">Edit bookmark</translation>
+      <translation>Rediger bokmerke</translation>
     </message>
     <message>
       <source>Delete bookmark</source>
-      <translation type="unfinished">Delete bookmark</translation>
+      <translation>Slett bokmerke</translation>
     </message>
     <message>
       <source>Export bookmark</source>
-      <translation type="unfinished">Export bookmark</translation>
+      <translation>Eksporter bokmerke</translation>
     </message>
   </context>
   <context>
     <name>CameraDiagnostics::DiagnoseTool</name>
     <message>
       <source>No connection to Server %1.</source>
-      <translation type="unfinished">No connection to Server %1.</translation>
+      <translation>Ingen tilkobling til Server %1.</translation>
     </message>
   </context>
   <context>
@@ -72,15 +72,15 @@ to view more bookmarks</translation>
     <name>CompatibilityVersionInstallationDialog</name>
     <message>
       <source>Installing version %1</source>
-      <translation type="unfinished">Installing version %1</translation>
+      <translation>Installere versjon %1</translation>
     </message>
     <message>
       <source>Installation failed</source>
-      <translation type="unfinished">Installation failed</translation>
+      <translation>Installasjon feilet</translation>
     </message>
     <message>
       <source>Installation completed</source>
-      <translation type="unfinished">Installation completed</translation>
+      <translation>Installasjonen er fullført</translation>
     </message>
     <message>
       <source>Getting update information from the server</source>
@@ -99,204 +99,200 @@ to view more bookmarks</translation>
     <name>ContextMenu</name>
     <message>
       <source>Filter...</source>
-      <translation type="unfinished">Filter...</translation>
+      <translation>Filter...</translation>
     </message>
     <message>
       <source>Connect to System</source>
-      <translation type="unfinished">Connect to System</translation>
+      <translation>Koble til systemet</translation>
     </message>
     <message>
       <source>Help</source>
-      <translation type="unfinished">Help</translation>
+      <translation>Hjelp</translation>
     </message>
     <message>
       <source>Event Log...</source>
-      <translation type="unfinished">Event Log...</translation>
+      <translation>Hendelsesloggen...</translation>
     </message>
     <message>
       <source>Cameras to Backup...</source>
-      <translation type="unfinished">Cameras to Backup...</translation>
+      <translation>Kameraer til sikkerhetskopiering...</translation>
     </message>
     <message>
       <source>Control Video Wall</source>
-      <translation type="unfinished">Control Video Wall</translation>
+      <translation>Kontroller Videovegg</translation>
     </message>
     <message>
       <source>Push my screen</source>
-      <translation type="unfinished">Push my screen</translation>
+      <translation>Send skjermen min</translation>
     </message>
     <message>
       <source>Select Time Server</source>
-      <translation type="unfinished">Select Time Server</translation>
+      <translation>Velg tidsserver</translation>
     </message>
     <message>
       <source>Fit in View</source>
-      <translation type="unfinished">Fit in View</translation>
+      <translation>Tilpass til visning</translation>
     </message>
     <message>
       <source>Main Menu</source>
-      <translation type="unfinished">Main Menu</translation>
+      <translation>Hovedmeny</translation>
     </message>
     <message>
       <source>Connect to Server...</source>
-      <translation type="unfinished">Connect to Server...</translation>
+      <translation>Koble til server...</translation>
     </message>
     <message>
       <source>Disconnect from Server</source>
-      <translation type="unfinished">Disconnect from Server</translation>
+      <translation>Koble fra serveren</translation>
     </message>
     <message>
       <source>Browse Local Files</source>
-      <translation type="unfinished">Browse Local Files</translation>
+      <translation>Bla gjennom lokale filer</translation>
     </message>
     <message>
       <source>Show Welcome Screen</source>
-      <translation type="unfinished">Show Welcome Screen</translation>
+      <translation>Vis velkomstskjerm</translation>
     </message>
     <message>
       <source>New...</source>
-      <translation type="unfinished">New...</translation>
+      <translation>Ny...</translation>
     </message>
     <message>
       <source>Tab</source>
-      <translation type="unfinished">Tab</translation>
+      <translation>Fane</translation>
     </message>
     <message>
       <source>New Tab</source>
-      <translation type="unfinished">New Tab</translation>
+      <translation>Ny Fane</translation>
     </message>
     <message>
       <source>Window</source>
-      <translation type="unfinished">Window</translation>
+      <translation>Vindu</translation>
     </message>
     <message>
       <source>New Window</source>
-      <translation type="unfinished">New Window</translation>
+      <translation>Nytt vindu</translation>
     </message>
     <message>
       <source>User...</source>
-      <translation type="unfinished">User...</translation>
+      <translation>Brukere...</translation>
     </message>
     <message>
       <source>New User...</source>
-      <translation type="unfinished">New User...</translation>
+      <translation>Ny bruker...</translation>
     </message>
     <message>
       <source>Video Wall...</source>
-      <translation type="unfinished">Video Wall...</translation>
+      <translation>Videovegg...</translation>
     </message>
     <message>
       <source>New Video Wall...</source>
-      <translation type="unfinished">New Video Wall...</translation>
+      <translation>Ny Videovegg...</translation>
     </message>
     <message>
       <source>Web Page...</source>
-      <translation type="unfinished">Web Page...</translation>
+      <translation>Nettside...</translation>
     </message>
     <message>
       <source>New Web Page...</source>
-      <translation type="unfinished">New Web Page...</translation>
+      <translation>Ny webside...</translation>
     </message>
     <message>
       <source>New Layout...</source>
-      <translation type="unfinished">New Layout...</translation>
+      <translation>Ny visning...</translation>
     </message>
     <message>
       <source>Open Layout...</source>
-      <translation type="unfinished">Open Layout...</translation>
+      <translation>Åpne visning...</translation>
     </message>
     <message>
       <source>Open...</source>
-      <translation type="unfinished">Open...</translation>
+      <translation>Åpne...</translation>
     </message>
     <message>
       <source>Folder...</source>
-      <translation type="unfinished">Folder...</translation>
+      <translation>Mappe...</translation>
     </message>
     <message>
       <source>Web Client...</source>
-      <translation type="unfinished">Web Client...</translation>
+      <translation>Webklient...</translation>
     </message>
     <message>
       <source>Open Web Client...</source>
-      <translation type="unfinished">Open Web Client...</translation>
+      <translation>Åpne webklient...</translation>
     </message>
     <message>
       <source>Save Current Layout</source>
-      <translation type="unfinished">Save Current Layout</translation>
+      <translation>Lagre gjeldende visning</translation>
     </message>
     <message>
       <source>Save Current Layout As...</source>
-      <translation type="unfinished">Save Current Layout As...</translation>
+      <translation>Lagre gjeldende visning...</translation>
     </message>
     <message>
       <source>Save Video Wall View</source>
-      <translation type="unfinished">Save Video Wall View</translation>
-    </message>
-    <message>
-      <source>Drop Resources</source>
-      <translation type="unfinished">Drop Resources</translation>
+      <translation>Lagre videovegg</translation>
     </message>
     <message>
       <source>Start Screen Recording</source>
-      <translation type="unfinished">Start Screen Recording</translation>
+      <translation>Start skjermopptak</translation>
     </message>
     <message>
       <source>Stop Screen Recording</source>
-      <translation type="unfinished">Stop Screen Recording</translation>
+      <translation>Stopp skjermopptak</translation>
     </message>
     <message>
       <source>Stop current action</source>
-      <translation type="unfinished">Stop current action</translation>
+      <translation>Stopp pågående oppgave</translation>
     </message>
     <message>
       <source>Go to Fullscreen</source>
-      <translation type="unfinished">Go to Fullscreen</translation>
+      <translation>Gå til fullskjerm</translation>
     </message>
     <message>
       <source>Exit Fullscreen</source>
-      <translation type="unfinished">Exit Fullscreen</translation>
+      <translation>Avslutt fullskjerm</translation>
     </message>
     <message>
       <source>Minimize</source>
-      <translation type="unfinished">Minimize</translation>
+      <translation>Minimer</translation>
     </message>
     <message>
       <source>Maximize</source>
-      <translation type="unfinished">Maximize</translation>
+      <translation>Maksimer</translation>
     </message>
     <message>
       <source>Restore Down</source>
-      <translation type="unfinished">Restore Down</translation>
+      <translation>Gjenopprett ned</translation>
     </message>
     <message>
       <source>Open in Browser...</source>
-      <translation type="unfinished">Open in Browser...</translation>
+      <translation>Åpne i nettleser...</translation>
     </message>
     <message>
       <source>System Administration...</source>
-      <translation type="unfinished">System Administration...</translation>
+      <translation>Systemadministrasjon...</translation>
     </message>
     <message>
       <source>System Update...</source>
-      <translation type="unfinished">System Update...</translation>
+      <translation>System oppdatering...</translation>
     </message>
     <message>
       <source>User Management...</source>
-      <translation type="unfinished">User Management...</translation>
+      <translation>Brukeradministrasjon...</translation>
     </message>
     <message>
       <source>Local Settings...</source>
-      <translation type="unfinished">Local Settings...</translation>
+      <translation>Lokale instillinger...</translation>
     </message>
     <message>
       <source>Audit Trail...</source>
-      <translation type="unfinished">Audit Trail...</translation>
+      <translation>Revisjonslogg...</translation>
     </message>
     <message>
       <source>Log in to %1...</source>
       <comment>Log in to Nx Cloud</comment>
-      <translation type="unfinished">Log in to %1...</translation>
+      <translation>Logg inn på %1...</translation>
     </message>
     <message>
       <source>Log out from %1</source>
@@ -430,203 +426,203 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Save Video Wall</source>
-      <translation type="unfinished">Save Video Wall</translation>
+      <translation>Lagre videovegg</translation>
     </message>
     <message>
       <source>Save Current Matrix</source>
-      <translation type="unfinished">Save Current Matrix</translation>
+      <translation>Lagre gjeldende matrise</translation>
     </message>
     <message>
       <source>Load Matrix</source>
-      <translation type="unfinished">Load Matrix</translation>
+      <translation>Last Matrise</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Slett</translation>
     </message>
     <message>
       <source>Stop Video Wall</source>
-      <translation type="unfinished">Stop Video Wall</translation>
+      <translation>Stopp videovegg</translation>
     </message>
     <message>
       <source>Clear Screen</source>
-      <translation type="unfinished">Clear Screen</translation>
+      <translation>Tøm skjermen</translation>
     </message>
     <message>
       <source>Save Layout</source>
-      <translation type="unfinished">Save Layout</translation>
+      <translation>Lagre visning</translation>
     </message>
     <message>
       <source>Save Layout As...</source>
-      <translation type="unfinished">Save Layout As...</translation>
+      <translation>Lagre visning som...</translation>
     </message>
     <message>
       <source>Maximize Item</source>
-      <translation type="unfinished">Maximize Item</translation>
+      <translation>Maksimere</translation>
     </message>
     <message>
       <source>Restore Item</source>
-      <translation type="unfinished">Restore Item</translation>
+      <translation>Gjenopprett</translation>
     </message>
     <message>
       <source>Show Info</source>
-      <translation type="unfinished">Show Info</translation>
+      <translation>Vis info</translation>
     </message>
     <message>
       <source>Hide Info</source>
-      <translation type="unfinished">Hide Info</translation>
+      <translation>Skjul info</translation>
     </message>
     <message>
       <source>PTZ...</source>
-      <translation type="unfinished">PTZ...</translation>
+      <translation>PTZ...</translation>
     </message>
     <message>
       <source>Save Current Position...</source>
-      <translation type="unfinished">Save Current Position...</translation>
+      <translation>Lagre gjeldende posisjon...</translation>
     </message>
     <message>
       <source>Manage...</source>
-      <translation type="unfinished">Manage...</translation>
+      <translation>Behandle...</translation>
     </message>
     <message>
       <source>Show Motion/Smart Search</source>
-      <translation type="unfinished">Show Motion/Smart Search</translation>
+      <translation>Vis bevegelse / smart søk</translation>
     </message>
     <message>
       <source>Show Motion</source>
-      <translation type="unfinished">Show Motion</translation>
+      <translation>Vis bevegelse</translation>
     </message>
     <message>
       <source>Hide Motion/Smart Search</source>
-      <translation type="unfinished">Hide Motion/Smart Search</translation>
+      <translation>Skjul bevegelse / smart søk</translation>
     </message>
     <message>
       <source>Hide Motion</source>
-      <translation type="unfinished">Hide Motion</translation>
+      <translation>Skjul bevegelse</translation>
     </message>
     <message>
       <source>Clear Motion Selection</source>
-      <translation type="unfinished">Clear Motion Selection</translation>
+      <translation>Fjern markering</translation>
     </message>
     <message>
       <source>Check File Watermark</source>
-      <translation type="unfinished">Check File Watermark</translation>
+      <translation>Kontroller filvannmerke</translation>
     </message>
     <message>
       <source>Image Enhancement...</source>
-      <translation type="unfinished">Image Enhancement...</translation>
+      <translation>Bildeforbedring...</translation>
     </message>
     <message>
       <source>Rotate to...</source>
-      <translation type="unfinished">Rotate to...</translation>
+      <translation>Roter til...</translation>
     </message>
     <message>
       <source>0 degrees</source>
-      <translation type="unfinished">0 degrees</translation>
+      <translation>0 grader</translation>
     </message>
     <message>
       <source>90 degrees</source>
-      <translation type="unfinished">90 degrees</translation>
+      <translation>90 grader</translation>
     </message>
     <message>
       <source>180 degrees</source>
-      <translation type="unfinished">180 degrees</translation>
+      <translation>180 grader</translation>
     </message>
     <message>
       <source>270 degrees</source>
-      <translation type="unfinished">270 degrees</translation>
+      <translation>270 grader</translation>
     </message>
     <message>
       <source>Remove from Layout</source>
-      <translation type="unfinished">Remove from Layout</translation>
+      <translation>Fjern fra Visning</translation>
     </message>
     <message>
       <source>Stop Sharing Layout</source>
-      <translation type="unfinished">Stop Sharing Layout</translation>
+      <translation>Stopp deling av visning</translation>
     </message>
     <message>
       <source>Edit...</source>
-      <translation type="unfinished">Edit...</translation>
+      <translation>Redigere...</translation>
     </message>
     <message>
       <source>Rename</source>
-      <translation type="unfinished">Rename</translation>
+      <translation>Endre navn</translation>
     </message>
     <message>
       <source>Delete from Disk</source>
-      <translation type="unfinished">Delete from Disk</translation>
+      <translation>Slett fra disk</translation>
     </message>
     <message>
       <source>Set as Layout Background</source>
-      <translation type="unfinished">Set as Layout Background</translation>
+      <translation>Sett som bakgrunn for visning</translation>
     </message>
     <message>
       <source>User Settings...</source>
-      <translation type="unfinished">User Settings...</translation>
+      <translation>Brukerinstillinger...</translation>
     </message>
     <message>
       <source>User Roles...</source>
-      <translation type="unfinished">User Roles...</translation>
+      <translation>Brukerroller...</translation>
     </message>
     <message>
       <source>Role Settings...</source>
-      <translation type="unfinished">Role Settings...</translation>
+      <translation>Rollinnstillinger...</translation>
     </message>
     <message>
       <source>Check Device Issues...</source>
-      <translation type="unfinished">Check Device Issues...</translation>
+      <translation>Kontroller enhetsproblemer...</translation>
     </message>
     <message>
       <source>Check Devices Issues...</source>
-      <translation type="unfinished">Check Devices Issues...</translation>
+      <translation>Kontroller enhetsproblemer...</translation>
     </message>
     <message>
       <source>Check Camera Issues...</source>
-      <translation type="unfinished">Check Camera Issues...</translation>
+      <translation>Sjekk kameraproblemer...</translation>
     </message>
     <message>
       <source>Check Cameras Issues...</source>
-      <translation type="unfinished">Check Cameras Issues...</translation>
+      <translation>Sjekk kameraproblemer...</translation>
     </message>
     <message>
       <source>Check I/O Module Issues...</source>
-      <translation type="unfinished">Check I/O Module Issues...</translation>
+      <translation>Kontroller I / O-modulproblemer...</translation>
     </message>
     <message>
       <source>Check I/O Modules Issues...</source>
-      <translation type="unfinished">Check I/O Modules Issues...</translation>
+      <translation>Kontroller I / O-modulproblemer...</translation>
     </message>
     <message>
       <source>Device Rules...</source>
-      <translation type="unfinished">Device Rules...</translation>
+      <translation>Enhetsregler...</translation>
     </message>
     <message>
       <source>Devices Rules...</source>
-      <translation type="unfinished">Devices Rules...</translation>
+      <translation>Enhetsregler...</translation>
     </message>
     <message>
       <source>Camera Rules...</source>
-      <translation type="unfinished">Camera Rules...</translation>
+      <translation>Kameraregler...</translation>
     </message>
     <message>
       <source>Cameras Rules...</source>
-      <translation type="unfinished">Cameras Rules...</translation>
+      <translation>Kameraregler...</translation>
     </message>
     <message>
       <source>I/O Module Rules...</source>
-      <translation type="unfinished">I/O Module Rules...</translation>
+      <translation>I / O-modulregler...</translation>
     </message>
     <message>
       <source>I/O Modules Rules...</source>
-      <translation type="unfinished">I/O Modules Rules...</translation>
+      <translation>I / O-moduler Regler...</translation>
     </message>
     <message>
       <source>Device Settings...</source>
-      <translation type="unfinished">Device Settings...</translation>
+      <translation>Enhetsinnstillinger...</translation>
     </message>
     <message>
       <source>Devices Settings...</source>
-      <translation type="unfinished">Devices Settings...</translation>
+      <translation>Enhetsinnstillinger...</translation>
     </message>
     <message>
       <source>Camera Settings...</source>
@@ -1503,7 +1499,7 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation type="unfinished">Select All</translation>
+      <translation>Velg alle</translation>
     </message>
     <message>
       <source>Export selected records to a file</source>
@@ -2252,7 +2248,7 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation type="unfinished">Select All</translation>
+      <translation>Velg alle</translation>
     </message>
     <message>
       <source>Devices List</source>
@@ -2893,10 +2889,6 @@ to %1</translation>
       <source>44.1 kHz and 48 kHz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
       <translation type="unfinished">44.1 kHz and 48 kHz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</translation>
     </message>
-    <message>
-      <source>Configured codec: %1 not found, h263p will used</source>
-      <translation type="unfinished">Configured codec: %1 not found, h263p will used</translation>
-    </message>
   </context>
   <context>
     <name>QnDisconnectFromCloudDialogPrivate</name>
@@ -2992,7 +2984,7 @@ to %1</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation type="unfinished">Select All</translation>
+      <translation>Velg alle</translation>
     </message>
     <message>
       <source>Clear Filter</source>
@@ -3201,6 +3193,17 @@ to %1</translation>
     </message>
   </context>
   <context>
+    <name>QnGLCheckerInstrument</name>
+    <message>
+      <source>Video card drivers are outdated or not installed</source>
+      <translation type="unfinished">Video card drivers are outdated or not installed</translation>
+    </message>
+    <message>
+      <source>%1 may not work properly.</source>
+      <translation type="unfinished">%1 may not work properly.</translation>
+    </message>
+  </context>
+  <context>
     <name>QnGeneralPreferencesWidget</name>
     <message>
       <source>Select folder...</source>
@@ -3209,6 +3212,14 @@ to %1</translation>
     <message>
       <source>Folder already added</source>
       <translation type="unfinished">Folder already added</translation>
+    </message>
+    <message>
+      <source>None</source>
+      <translation type="unfinished">None</translation>
+    </message>
+    <message>
+      <source>Auto (%1)</source>
+      <translation type="unfinished">Auto (%1)</translation>
     </message>
   </context>
   <context>
@@ -3276,17 +3287,6 @@ to %1</translation>
     <message>
       <source>Creates a backup of System configuration that can be restored in case of failure.</source>
       <translation type="unfinished">Creates a backup of System configuration that can be restored in case of failure.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnGlHardwareChecker</name>
-    <message>
-      <source>Video card drivers are outdated or not installed</source>
-      <translation type="unfinished">Video card drivers are outdated or not installed</translation>
-    </message>
-    <message>
-      <source>%1 may not work properly.</source>
-      <translation type="unfinished">%1 may not work properly.</translation>
     </message>
   </context>
   <context>
@@ -3583,8 +3583,8 @@ to %1</translation>
       </translation>
     </message>
     <message>
-      <source>Qty</source>
-      <translation type="unfinished">Qty</translation>
+      <source>Channels</source>
+      <translation type="unfinished">Channels</translation>
     </message>
   </context>
   <context>
@@ -5105,6 +5105,10 @@ to %1</translation>
       <source>Server Web Page</source>
       <translation type="unfinished">Server Web Page</translation>
     </message>
+    <message>
+      <source>Plugins</source>
+      <translation type="unfinished">Plugins</translation>
+    </message>
   </context>
   <context>
     <name>QnServerSettingsWidget</name>
@@ -5416,7 +5420,7 @@ to %1</translation>
     <name>QnStorageAnalyticsWidget</name>
     <message>
       <source>Select All</source>
-      <translation type="unfinished">Select All</translation>
+      <translation>Velg alle</translation>
     </message>
     <message>
       <source>Export Selection to File...</source>
@@ -5575,16 +5579,30 @@ to %1</translation>
       <translation type="unfinished">Backup completed</translation>
     </message>
     <message>
-      <source>Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</source>
-      <translation type="unfinished">Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</translation>
-    </message>
-    <message>
-      <source>Recording was enabled on the USB storage</source>
-      <translation type="unfinished">Recording was enabled on the USB storage</translation>
-    </message>
-    <message>
       <source>Reindexing can fix problems with archive or backup if they have been lost or damaged, or if some hardware has been replaced.</source>
       <translation type="unfinished">Reindexing can fix problems with archive or backup if they have been lost or damaged, or if some hardware has been replaced.</translation>
+    </message>
+    <message>
+      <source>What to do with current analytics data?</source>
+      <translation type="unfinished">What to do with current analytics data?</translation>
+    </message>
+    <message>
+      <source>Current analytics data will not be automatically moved to another location and will become unaccessible. You can keep it and manually move later, or delete permanently.
+If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
+      <translation type="unfinished">Current analytics data will not be automatically moved to another location and will become unaccessible. You can keep it and manually move later, or delete permanently.
+If you intended to move analytics data to another storage location, please contact support before proceeding.</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>Slett</translation>
+    </message>
+    <message>
+      <source>Keep</source>
+      <translation type="unfinished">Keep</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation type="unfinished">Cancel</translation>
     </message>
   </context>
   <context>
@@ -5632,6 +5650,14 @@ to %1</translation>
     <message>
       <source>Too small and system partitions are reserved and not used for writing if there is enough other storage space available.</source>
       <translation type="unfinished">Too small and system partitions are reserved and not used for writing if there is enough other storage space available.</translation>
+    </message>
+    <message>
+      <source>Use to store analytics data</source>
+      <translation type="unfinished">Use to store analytics data</translation>
+    </message>
+    <message>
+      <source>Stores analytics data</source>
+      <translation type="unfinished">Stores analytics data</translation>
     </message>
   </context>
   <context>
@@ -5719,8 +5745,8 @@ to %1</translation>
       <translation type="unfinished">Users</translation>
     </message>
     <message>
-      <source>Analytics</source>
-      <translation type="unfinished">Analytics</translation>
+      <source>Plugins</source>
+      <translation type="unfinished">Plugins</translation>
     </message>
   </context>
   <context>
@@ -5883,14 +5909,6 @@ to %1</translation>
   <context>
     <name>QnSystemSettingsWidget</name>
     <message>
-      <source>Enable devices and servers auto discovery</source>
-      <translation type="unfinished">Enable devices and servers auto discovery</translation>
-    </message>
-    <message>
-      <source>Enable cameras and servers auto discovery</source>
-      <translation type="unfinished">Enable cameras and servers auto discovery</translation>
-    </message>
-    <message>
       <source>Allow System to optimize device settings</source>
       <translation type="unfinished">Allow System to optimize device settings</translation>
     </message>
@@ -5905,6 +5923,22 @@ to %1</translation>
     <message>
       <source>Does not include any personal information and is completely anonymous.</source>
       <translation type="unfinished">Does not include any personal information and is completely anonymous.</translation>
+    </message>
+    <message>
+      <source>Failover server measures may still request camera status updates regardless of this setting.</source>
+      <translation type="unfinished">Failover server measures may still request camera status updates regardless of this setting.</translation>
+    </message>
+    <message>
+      <source>Enable devices and servers autodiscovery and automated device status check</source>
+      <translation type="unfinished">Enable devices and servers autodiscovery and automated device status check</translation>
+    </message>
+    <message>
+      <source>Enable cameras and servers autodiscovery and automated camera status check</source>
+      <translation type="unfinished">Enable cameras and servers autodiscovery and automated camera status check</translation>
+    </message>
+    <message>
+      <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
+      <translation type="unfinished">When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</translation>
     </message>
   </context>
   <context>
@@ -7085,6 +7119,17 @@ to %1</translation>
     </message>
   </context>
   <context>
+    <name>SessionExpiredDialog</name>
+    <message>
+      <source>Your session has expired</source>
+      <translation type="unfinished">Your session has expired</translation>
+    </message>
+    <message>
+      <source>Session duration limit can be changed by the system administrators</source>
+      <translation type="unfinished">Session duration limit can be changed by the system administrators</translation>
+    </message>
+  </context>
+  <context>
     <name>StreamQualityStrings</name>
     <message>
       <source>Lowest</source>
@@ -7288,6 +7333,14 @@ to %1</translation>
       <source>Show Only with &quot;Objects&quot; Tab</source>
       <translation type="unfinished">Show Only with &quot;Objects&quot; Tab</translation>
     </message>
+    <message>
+      <source>Show</source>
+      <translation type="unfinished">Show</translation>
+    </message>
+    <message>
+      <source>Do Not Show</source>
+      <translation type="unfinished">Do Not Show</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::AnalyticsSearchListModel::Private</name>
@@ -7354,7 +7407,7 @@ to %1</translation>
     <name>nx::vms::client::desktop::AsyncImageWidget</name>
     <message>
       <source>NO DATA</source>
-      <translation type="unfinished">NO DATA</translation>
+      <translation>TIDSPUNKTET HAR INGEN OPPAK</translation>
     </message>
   </context>
   <context>
@@ -7438,10 +7491,6 @@ to %1</translation>
       <translation type="unfinished">Native</translation>
     </message>
     <message>
-      <source>Server will not change any cameras settings, it will receive and use camera stream as-is. </source>
-      <translation type="unfinished">Server will not change any cameras settings, it will receive and use camera stream as-is. </translation>
-    </message>
-    <message>
       <source>Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</source>
       <translation type="unfinished">Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</translation>
     </message>
@@ -7465,6 +7514,14 @@ to %1</translation>
         <numerusform>This ID is already used on the following %n cameras:</numerusform>
         <numerusform>This ID is already used on the following %n cameras:</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Server will not change any cameras settings, it will receive and use camera stream as-is.</source>
+      <translation type="unfinished">Server will not change any cameras settings, it will receive and use camera stream as-is.</translation>
+    </message>
+    <message>
+      <source>Multicast</source>
+      <translation type="unfinished">Multicast</translation>
     </message>
   </context>
   <context>
@@ -7607,10 +7664,6 @@ to %1</translation>
       <translation type="unfinished">Web Page</translation>
     </message>
     <message>
-      <source>Analytics</source>
-      <translation type="unfinished">Analytics</translation>
-    </message>
-    <message>
       <source>Expert</source>
       <translation type="unfinished">Expert</translation>
     </message>
@@ -7662,6 +7715,10 @@ to %1</translation>
     <message>
       <source>I/O Modules Settings</source>
       <translation type="unfinished">I/O Modules Settings</translation>
+    </message>
+    <message>
+      <source>Plugins</source>
+      <translation type="unfinished">Plugins</translation>
     </message>
   </context>
   <context>
@@ -7903,14 +7960,6 @@ to %1</translation>
   </context>
   <context>
     <name>nx::vms::client::desktop::EulaDialog</name>
-    <message>
-      <source>I Agree</source>
-      <translation type="unfinished">I Agree</translation>
-    </message>
-    <message>
-      <source>I Do Not Agree</source>
-      <translation type="unfinished">I Do Not Agree</translation>
-    </message>
     <message>
       <source>Please review and agree to the %1 in order to proceed</source>
       <translation type="unfinished">Please review and agree to the %1 in order to proceed</translation>
@@ -8359,7 +8408,7 @@ to %1</translation>
     <name>nx::vms::client::desktop::LayoutThumbnailLoader</name>
     <message>
       <source>NO DATA</source>
-      <translation type="unfinished">NO DATA</translation>
+      <translation>TIDSPUNKTET HAR INGEN OPPAK</translation>
     </message>
     <message>
       <source>NOT A CAMERA</source>
@@ -8504,10 +8553,6 @@ to %1</translation>
       <translation type="unfinished">Some servers are offline and will not be updated. Skip them?</translation>
     </message>
     <message>
-      <source>Please make sure there is enough free storage space and network connection is stable.</source>
-      <translation type="unfinished">Please make sure there is enough free storage space and network connection is stable.</translation>
-    </message>
-    <message>
       <source>If the problem persists, please contact Customer Support.</source>
       <translation type="unfinished">If the problem persists, please contact Customer Support.</translation>
     </message>
@@ -8520,20 +8565,8 @@ to %1</translation>
       <translation type="unfinished">Cancel Update</translation>
     </message>
     <message>
-      <source>Failed to download update packages to some servers</source>
-      <translation type="unfinished">Failed to download update packages to some servers</translation>
-    </message>
-    <message>
-      <source>Please make sure they have enough free storage space and stable network connection.</source>
-      <translation type="unfinished">Please make sure they have enough free storage space and stable network connection.</translation>
-    </message>
-    <message>
       <source>Update completed</source>
       <translation type="unfinished">Update completed</translation>
-    </message>
-    <message>
-      <source>Update completed, but some servers have failed an update</source>
-      <translation type="unfinished">Update completed, but some servers have failed an update</translation>
     </message>
     <message>
       <source>Nx Witness Client will be restarted to the updated version.</source>
@@ -8544,16 +8577,8 @@ to %1</translation>
       <translation type="unfinished">OK</translation>
     </message>
     <message>
-      <source>Failed to install updates to servers:</source>
-      <translation type="unfinished">Failed to install updates to servers:</translation>
-    </message>
-    <message>
       <source>Downloading updates...</source>
       <translation type="unfinished">Downloading updates...</translation>
-    </message>
-    <message>
-      <source>Pushing updates...</source>
-      <translation type="unfinished">Pushing updates...</translation>
     </message>
     <message>
       <source>Upload</source>
@@ -8678,6 +8703,50 @@ to %1</translation>
       <source>Cancel update and delete all downloaded data?</source>
       <translation type="unfinished">Cancel update and delete all downloaded data?</translation>
     </message>
+    <message>
+      <source>There was an error while installing updates:</source>
+      <translation type="unfinished">There was an error while installing updates:</translation>
+    </message>
+    <message>
+      <source>Some servers have gone offline. Please wait until they become online to continue.</source>
+      <translation type="unfinished">Some servers have gone offline. Please wait until they become online to continue.</translation>
+    </message>
+    <message>
+      <source>Update completed, but some components have failed an update</source>
+      <translation type="unfinished">Update completed, but some components have failed an update</translation>
+    </message>
+    <message>
+      <source>Please update %1 manually using an installation package.</source>
+      <translation type="unfinished">Please update %1 manually using an installation package.</translation>
+    </message>
+    <message>
+      <source>%1 will be restarted to the updated version.</source>
+      <translation type="unfinished">%1 will be restarted to the updated version.</translation>
+    </message>
+    <message>
+      <source>Failed to download update packages to some components</source>
+      <translation type="unfinished">Failed to download update packages to some components</translation>
+    </message>
+    <message>
+      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
+      <translation>OS-versjoner av enkelte komponenter støttes ikke lenger. Vennligst fjern dem fra systemet eller oppdatere operativsystemet til en støttet versjon.</translation>
+    </message>
+    <message>
+      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
+      <translation>OS-versjonen av klienten støttes ikke lenger. Vennligst oppdater operativsystemet til en støttet versjon.</translation>
+    </message>
+    <message>
+      <source>Failed to start update</source>
+      <translation type="unfinished">Failed to start update</translation>
+    </message>
+    <message>
+      <source>Starting update to ...</source>
+      <translation type="unfinished">Starting update to ...</translation>
+    </message>
+    <message>
+      <source>Some servers have no package available</source>
+      <translation type="unfinished">Some servers have no package available</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::MultipleLayoutSelectionDialog</name>
@@ -8703,6 +8772,26 @@ to %1</translation>
       <source>Acknowledge</source>
       <translation type="unfinished">Acknowledge</translation>
     </message>
+    <message>
+      <source>Generic Event</source>
+      <translation type="unfinished">Generic Event</translation>
+    </message>
+    <message>
+      <source>Device was disconnected</source>
+      <translation type="unfinished">Device was disconnected</translation>
+    </message>
+    <message>
+      <source>Camera was disconnected</source>
+      <translation type="unfinished">Camera was disconnected</translation>
+    </message>
+    <message>
+      <source>I/O Module was disconnected</source>
+      <translation type="unfinished">I/O Module was disconnected</translation>
+    </message>
+    <message>
+      <source>Unknown Plugin Diagnostic Event</source>
+      <translation type="unfinished">Unknown Plugin Diagnostic Event</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::NotificationListWidget::Private</name>
@@ -8722,10 +8811,6 @@ to %1</translation>
       <translation type="unfinished">None of selected users have access to the selected layout. Action will not work.</translation>
     </message>
     <message>
-      <source>Local layouts can only be shown to their owners. </source>
-      <translation type="unfinished">Local layouts can only be shown to their owners. </translation>
-    </message>
-    <message>
       <source>Select layout...</source>
       <translation type="unfinished">Select layout...</translation>
     </message>
@@ -8740,6 +8825,101 @@ to %1</translation>
     <message>
       <source>None of selected user roles contain users. Action will not work.</source>
       <translation type="unfinished">None of selected user roles contain users. Action will not work.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::PeerStateTracker</name>
+    <message>
+      <source>The server is taking too long to respond</source>
+      <translation type="unfinished">The server is taking too long to respond</translation>
+    </message>
+    <message>
+      <source>No update task</source>
+      <translation type="unfinished">No update task</translation>
+    </message>
+    <message>
+      <source>Ready to download update</source>
+      <translation type="unfinished">Ready to download update</translation>
+    </message>
+    <message>
+      <source>Downloading update</source>
+      <translation type="unfinished">Downloading update</translation>
+    </message>
+    <message>
+      <source>Ready to restart to the new version</source>
+      <translation type="unfinished">Ready to restart to the new version</translation>
+    </message>
+    <message>
+      <source>Installing update</source>
+      <translation type="unfinished">Installing update</translation>
+    </message>
+    <message>
+      <source>Installed</source>
+      <translation type="unfinished">Installed</translation>
+    </message>
+    <message>
+      <source>Failed to download update</source>
+      <translation type="unfinished">Failed to download update</translation>
+    </message>
+    <message>
+      <source>Failed to install update</source>
+      <translation type="unfinished">Failed to install update</translation>
+    </message>
+    <message>
+      <source>Waiting for peer data</source>
+      <translation type="unfinished">Waiting for peer data</translation>
+    </message>
+    <message>
+      <source>There is not enough space to download update files.</source>
+      <translation type="unfinished">There is not enough space to download update files.</translation>
+    </message>
+    <message>
+      <source>There is not enough space to extract update files.</source>
+      <translation type="unfinished">There is not enough space to extract update files.</translation>
+    </message>
+    <message>
+      <source>Failed to download update packages.</source>
+      <translation type="unfinished">Failed to download update packages.</translation>
+    </message>
+    <message>
+      <source>Update contents are invalid.</source>
+      <translation type="unfinished">Update contents are invalid.</translation>
+    </message>
+    <message>
+      <source>Update archive is corrupted.</source>
+      <translation type="unfinished">Update archive is corrupted.</translation>
+    </message>
+    <message>
+      <source>Update files cannot be extracted.</source>
+      <translation type="unfinished">Update files cannot be extracted.</translation>
+    </message>
+    <message>
+      <source>Internal downloader error.</source>
+      <translation type="unfinished">Internal downloader error.</translation>
+    </message>
+    <message>
+      <source>Iternal server error.</source>
+      <translation type="unfinished">Iternal server error.</translation>
+    </message>
+    <message>
+      <source>Internal client error.</source>
+      <translation type="unfinished">Internal client error.</translation>
+    </message>
+    <message>
+      <source>Unknown error.</source>
+      <translation type="unfinished">Unknown error.</translation>
+    </message>
+    <message>
+      <source>Unexpected error code.</source>
+      <translation type="unfinished">Unexpected error code.</translation>
+    </message>
+    <message>
+      <source>Ready to install update</source>
+      <translation type="unfinished">Ready to install update</translation>
+    </message>
+    <message>
+      <source>Update package is not found.</source>
+      <translation>Oppdateringspakken ble ikke funnet.</translation>
     </message>
   </context>
   <context>
@@ -8884,16 +9064,79 @@ to %1</translation>
       <translation type="unfinished">Tracks and logs all user actions.</translation>
     </message>
     <message>
-      <source>User will be automatically logged out after this period of time.</source>
-      <translation type="unfinished">User will be automatically logged out after this period of time.</translation>
-    </message>
-    <message>
       <source>minutes</source>
       <translation type="unfinished">minutes</translation>
     </message>
     <message>
       <source>hours</source>
       <translation type="unfinished">hours</translation>
+    </message>
+    <message>
+      <source>Users will be automatically logged out if their session exceeds the specified duration.</source>
+      <translation type="unfinished">Users will be automatically logged out if their session exceeds the specified duration.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ServerSettingsDialogStore</name>
+    <message>
+      <source>Library</source>
+      <translation type="unfinished">Library</translation>
+    </message>
+    <message>
+      <source>Version</source>
+      <translation type="unfinished">Version</translation>
+    </message>
+    <message>
+      <source>Vendor</source>
+      <translation type="unfinished">Vendor</translation>
+    </message>
+    <message>
+      <source>no error</source>
+      <translation type="unfinished">no error</translation>
+    </message>
+    <message>
+      <source>library file cannot be loaded</source>
+      <translation type="unfinished">library file cannot be loaded</translation>
+    </message>
+    <message>
+      <source>invalid or incompatible plugin library</source>
+      <translation type="unfinished">invalid or incompatible plugin library</translation>
+    </message>
+    <message>
+      <source>plugin library failed to initialize</source>
+      <translation type="unfinished">plugin library failed to initialize</translation>
+    </message>
+    <message>
+      <source>plugin returned bad manifest</source>
+      <translation type="unfinished">plugin returned bad manifest</translation>
+    </message>
+    <message>
+      <source>plugin API version is no longer supported</source>
+      <translation type="unfinished">plugin API version is no longer supported</translation>
+    </message>
+    <message>
+      <source>unknown error</source>
+      <translation type="unfinished">unknown error</translation>
+    </message>
+    <message>
+      <source>Not loaded</source>
+      <translation type="unfinished">Not loaded</translation>
+    </message>
+    <message>
+      <source>Loaded</source>
+      <translation type="unfinished">Loaded</translation>
+    </message>
+    <message>
+      <source>plugin is in the black list</source>
+      <translation type="unfinished">plugin is in the black list</translation>
+    </message>
+    <message>
+      <source>Status</source>
+      <translation type="unfinished">Status</translation>
+    </message>
+    <message>
+      <source>plugin is optional and is not in the white list</source>
+      <translation type="unfinished">plugin is optional and is not in the white list</translation>
     </message>
   </context>
   <context>
@@ -8914,13 +9157,13 @@ to %1</translation>
       <source>Downloaded</source>
       <translation type="unfinished">Downloaded</translation>
     </message>
+    <message>
+      <source>Waiting for server to respond...</source>
+      <translation type="unfinished">Waiting for server to respond...</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerUpdatesModel</name>
-    <message>
-      <source>Current Version</source>
-      <translation type="unfinished">Current Version</translation>
-    </message>
     <message>
       <source>Status</source>
       <translation type="unfinished">Status</translation>
@@ -8940,6 +9183,10 @@ to %1</translation>
     <message>
       <source>Component</source>
       <translation type="unfinished">Component</translation>
+    </message>
+    <message>
+      <source>Installed Version</source>
+      <translation type="unfinished">Installed Version</translation>
     </message>
   </context>
   <context>
@@ -9200,7 +9447,7 @@ to %1</translation>
     </message>
     <message>
       <source>Minimize</source>
-      <translation type="unfinished">Minimize</translation>
+      <translation>Minimer</translation>
     </message>
     <message>
       <source>Cannot write file</source>
@@ -9238,6 +9485,26 @@ to %1</translation>
     <message>
       <source>Starting export...</source>
       <translation type="unfinished">Starting export...</translation>
+    </message>
+    <message>
+      <source>Saving layout</source>
+      <translation type="unfinished">Saving layout</translation>
+    </message>
+    <message>
+      <source>Stop Saving</source>
+      <translation type="unfinished">Stop Saving</translation>
+    </message>
+    <message>
+      <source>Saving failed</source>
+      <translation type="unfinished">Saving failed</translation>
+    </message>
+    <message>
+      <source>Starting saving...</source>
+      <translation type="unfinished">Starting saving...</translation>
+    </message>
+    <message>
+      <source>We are preparing files for the export process. Please wait for a few seconds.</source>
+      <translation type="unfinished">We are preparing files for the export process. Please wait for a few seconds.</translation>
     </message>
   </context>
   <context>
@@ -9551,7 +9818,7 @@ to %1</translation>
     </message>
     <message>
       <source>Rename</source>
-      <translation type="unfinished">Rename</translation>
+      <translation>Endre navn</translation>
     </message>
     <message>
       <source>Enter new name for the selected item:</source>
@@ -9628,6 +9895,28 @@ to %1</translation>
     <message>
       <source>This build is for testing purposes only.</source>
       <translation type="unfinished">This build is for testing purposes only.</translation>
+    </message>
+    <message>
+      <source>Open Server Settings</source>
+      <translation type="unfinished">Open Server Settings</translation>
+    </message>
+    <message>
+      <source>OK</source>
+      <translation type="unfinished">OK</translation>
+    </message>
+    <message>
+      <source>Confirm storage location to store analytics data on &apos;%1&apos;</source>
+      <translation type="unfinished">Confirm storage location to store analytics data on &apos;%1&apos;</translation>
+    </message>
+    <message>
+      <source>Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
+Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
+By default analytics data will be stored in mediaserver&apos;s installation directory.
+You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</source>
+      <translation type="unfinished">Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
+Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
+By default analytics data will be stored in mediaserver&apos;s installation directory.
+You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</translation>
     </message>
   </context>
   <context>

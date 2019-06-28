@@ -11,6 +11,10 @@
       <source>Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</source>
       <translation>Analityka w kamerze będzie działać tylko wtedy, gdy kamera jest na podglądzie. Należy włączyć nagrywanie, aby analityka działała cały czas.</translation>
     </message>
+    <message>
+      <source>This is the built-in functionality</source>
+      <translation>To jest wbudowana funkcja</translation>
+    </message>
   </context>
   <context>
     <name>EmptyTilesPlaceholder</name>
@@ -65,6 +69,17 @@
     </message>
   </context>
   <context>
+    <name>PluginsInformation</name>
+    <message>
+      <source>No plugins installed</source>
+      <translation>Brak zainstalowanych wtyczek</translation>
+    </message>
+    <message>
+      <source>Server is offline</source>
+      <translation>Serwer jest odłączony</translation>
+    </message>
+  </context>
+  <context>
     <name>SystemTile</name>
     <message>
       <source>INCOMPATIBLE</source>
@@ -85,6 +100,14 @@
     <message>
       <source>New Server</source>
       <translation>Nowy serwer</translation>
+    </message>
+    <message>
+      <source>Edit</source>
+      <translation>Edytuj</translation>
+    </message>
+    <message>
+      <source>Hide</source>
+      <translation>Ukryj</translation>
     </message>
   </context>
   <context>

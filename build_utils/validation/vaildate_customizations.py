@@ -23,7 +23,12 @@ DEFAULT_SKIN = 'dark_blue'
 
 build_module_prefix = 'build_'
 
-intro_files = {"intro.mkv", "intro.avi", "intro.png", "intro.jpg", "intro.jpeg"}
+intro_files = ["intro.mkv", "intro.avi", "intro.png", "intro.jpg", "intro.jpeg"]
+optional_files = [
+    "background.png",
+    "windows/installer_icon.ico",
+    "macosx/installer_icon.icns"
+]
 
 
 class Customization():
@@ -45,8 +50,8 @@ def find_intro(files):
     return any(x for x in files if is_intro(x))
 
 
-def is_background(file):
-    return file.endswith('/background.png')
+def is_optional(file):
+    return any(x for x in optional_files if x in file)
 
 
 def get_files_list(path, recursive=True):
@@ -91,7 +96,7 @@ def validate_project(customized, project, mandatory_files, skipped_modules, skin
     for file in mandatory_files - customized_files:
         if is_intro(file) and find_intro(customized_files):
             continue
-        if is_background(file):
+        if is_optional(file):
             continue
         err('File {0}/{1} is missing'.format(project, file))
 
@@ -153,9 +158,9 @@ def validate_skins(root_dir):
         other_skins[entry] = skin
 
     for name, skin in other_skins.iteritems():
-        for icon in default_skin - skin:
+        for icon in sorted(list(default_skin - skin)):
             warn('Icon {0} is not customized in the {1} skin'.format(icon, name))
-        for icon in skin - all_files:
+        for icon in sorted(list(skin - all_files)):
             warn('Icon {0} is not used in the {1} skin'.format(icon, name))
     return all_files
 

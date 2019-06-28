@@ -1,3 +1,5 @@
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+
 #pragma once
 
 #include <nx/sdk/interface.h>
@@ -33,9 +35,11 @@ class IEngine: public Interface<IEngine>
 public:
     static auto interfaceId() { return InterfaceId("nx::sdk::analytics::IEngine"); }
 
-    class IHandler
+    class IHandler: public Interface<IHandler>
     {
     public:
+        static auto interfaceId() { return InterfaceId("nx::sdk::analytics::IEngine::IHandler"); }
+
         virtual ~IHandler() = default;
         virtual void handlePluginEvent(IPluginEvent* event) = 0;
     };

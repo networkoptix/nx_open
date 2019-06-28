@@ -70,7 +70,7 @@ bool TwoWayAudioController::start()
     setStarted(true); // Intermediate state.
 
     const auto callback =
-        [this](bool success, rest::Handle handle, const QnJsonRestResult& result)
+        [this](bool success, rest::Handle /*handle*/, const QnJsonRestResult& result)
         {
             setStarted(success && result.error == QnRestResult::NoError);
         };

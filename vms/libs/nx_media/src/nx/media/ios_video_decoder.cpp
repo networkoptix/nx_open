@@ -22,7 +22,7 @@ extern "C" {
 
 #if defined(TARGET_OS_IPHONE)
 #include <CoreVideo/CoreVideo.h>
-#include "ios_device_info.h"
+#include <nx/utils/ios_device_info.h>
 #endif
 
 #include <QtMultimedia/QAbstractVideoBuffer>
@@ -320,6 +320,7 @@ QSize IOSVideoDecoder::maxResolution(const AVCodecID codec)
     static const QSize kFullHdResolution(1920, 1080);
     static const QSize kDci4kResolution(4096, 2160);
 
+    using IosDeviceInformation = nx::utils::IosDeviceInformation;
     const auto& deviceInfo = IosDeviceInformation::currentInformation();
     switch (codec)
     {
@@ -375,11 +376,7 @@ int IOSVideoDecoder::decode(
         // It's already guaranteed by QnByteArray that there is an extra space reserved. We must
         // fill the padding bytes according to ffmpeg documentation.
         if (avpkt.data)
-        {
-            static_assert(QN_BYTE_ARRAY_PADDING >= FF_INPUT_BUFFER_PADDING_SIZE,
-                "IOSVideoDecoder: Insufficient padding size");
-            memset(avpkt.data + avpkt.size, 0, FF_INPUT_BUFFER_PADDING_SIZE);
-        }
+            memset(avpkt.data + avpkt.size, 0, AV_INPUT_BUFFER_PADDING_SIZE);
 
         d->lastPts = compressedVideoData->timestamp;
     }

@@ -233,12 +233,12 @@ void LensPtzControl::onButtonClicked(ButtonType button, bool state)
 
 void LensPtzControl::onRotationButtonCounterClockWise(bool pressed)
 {
-    m_buttonState.rotation += pressed ? kRotationIncrement : -kRotationIncrement;
+    m_buttonState.rotation -= (pressed ? kRotationIncrement : -kRotationIncrement);
 }
 
 void LensPtzControl::onRotationButtonClockWise(bool pressed)
 {
-    m_buttonState.rotation -= pressed ? kRotationIncrement : -kRotationIncrement;
+    m_buttonState.rotation += (pressed ? kRotationIncrement : -kRotationIncrement);
 }
 
 QSize LensPtzControl::sizeHint() const

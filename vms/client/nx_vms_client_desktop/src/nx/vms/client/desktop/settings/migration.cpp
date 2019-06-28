@@ -1,5 +1,7 @@
 #include "migration.h"
 
+#include <QtCore/QSettings>
+
 #include <client/client_settings.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
 

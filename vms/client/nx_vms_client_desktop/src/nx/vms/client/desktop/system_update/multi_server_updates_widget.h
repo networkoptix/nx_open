@@ -32,7 +32,7 @@ struct UpdateItem;
  * Deals with update for multiple servers.
  * It is spawned as a tab for System Administraton menu.
  */
-class MultiServerUpdatesWidget:
+class NX_VMS_CLIENT_DESKTOP_API MultiServerUpdatesWidget:
     public QnAbstractPreferencesWidget,
     public QnSessionAwareDelegate
 {
@@ -58,93 +58,10 @@ public:
 
     virtual bool canDiscardChanges() const override;
 
-protected:
-    /** This one is called by timer periodically. */
-    void atUpdateCurrentState();
-    /** Handler for a separate timer for checking installation status. We check it less often. */
-    void atCheckInstallState();
-    void atModelDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int>& roles);
-    void atStartUpdateAction();
-    /** Called by clicking 'cancel' button. */
-    bool atCancelCurrentAction();
-    /** Called when server responds to /ec2/cancelUpdate. Connected to ServerUpdateToool.*/
-    void atCancelUpdateComplete(bool success);
-    /** Called when server responds to /ec2/finishUpdate. Connected to ServerUpdateToool.*/
-    void atFinishUpdateComplete(bool success);
-
     /**
-     * Called when ServerUpdateTool finishes downloading package for mediaserver without
-     * internet.
-     */
-    void atServerPackageDownloaded(const nx::update::Package& package);
-    void atServerPackageDownloadFailed(const nx::update::Package& package, const QString& error);
-
-    void clearUpdateInfo();
-    void pickLocalFile();
-    void pickSpecificBuild();
-
-private:
-    /**
-     * General state for a widget.
-     * It extends update state from the servers, uploader and client update.
-     */
-    enum class WidgetUpdateState
-    {
-        /** We have no information about remote state right now. */
-        initial,
-        /**
-         * We have obtained update info from the internet, but we need to
-         * GET /ec2/updateInformation from the servers, to decide which state we should move to.
-         */
-        checkingServers,
-        /**
-         * We have obtained some state from the servers. We can do some actions now.
-         * Next action depends on m_updateSourceMode, and whether the update
-         * is available for picked update source.
-         */
-        ready,
-        /** We have issued a command to remote servers to start downloading the updates. */
-        downloading,
-        /** Pushing local update package to the servers. */
-        pushing,
-        /**
-         * Waiting server to respond to /ec2/cancelUpdate from 'downloading' or 'pushing'
-         * state.
-         */
-        cancelingDownload,
-        /** Some servers have downloaded update data and ready to install it. */
-        readyInstall,
-        cancelingReadyInstall,
-        /** Some servers are installing an update. */
-        installing,
-        /** Some servers are installing an update, but it took too long. */
-        installingStalled,
-        /** Waiting server to respond to /ec2/finishUpdate */
-        finishingInstall,
-        /** Installation process is complete. */
-        complete,
-    };
-
-    static QString toString(nx::update::UpdateSourceType mode);
-    static QString toString(WidgetUpdateState state);
-    static QString toString(LocalStatusCode stage);
-    static QString toString(ServerUpdateTool::OfflineUpdateState state);
-
-    void setUpdateSourceMode(nx::update::UpdateSourceType mode);
-
-    void initDropdownActions();
-    void initDownloadActions();
-
-    void setAutoUpdateCheckMode(bool mode);
-    void autoCheckForUpdates();
-    void checkForInternetUpdates(bool initial = false);
-    /**
-     * Repeat validation process for current update information. Will work only in 'Ready' state.
-     */
-    void repeatUpdateValidation();
-
-    /**
-     * Describes all possible display modes for update version.
+     * Report for picked update version. Describes all possible display modes for update version.
+     * It contains all data necessary to show at the top panel of the dialog.
+     *
      * Variations for build number:
      *  - Full build number, "4.0.0.20000".
      *  - Specific build number "10821". Appears when we waiting for response for specific build.
@@ -179,10 +96,112 @@ private:
 
         HighlightMode versionHighlight = HighlightMode::regular;
         HighlightMode statusHighlight = HighlightMode::regular;
+
+        bool isEqual(const VersionReport& another) const;
     };
 
-    VersionReport calculateUpdateVersionReport(const nx::update::UpdateContents& contents);
+    /** Generates update report for a picked update contents. */
+    static VersionReport calculateUpdateVersionReport(const nx::update::UpdateContents& contents, QnUuid clientId);
 
+protected:
+    /**
+     * This one is called by timer periodically.
+     * It checks changes in remote and local state, and calls update for UI if there are any.
+     */
+    void atUpdateCurrentState();
+
+    /** Handler for a separate timer for checking installation status. We check it less often. */
+    void atCheckInstallState();
+    void atModelDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int>& roles);
+    void atStartUpdateAction();
+    /** Called by clicking 'cancel' button. */
+    bool atCancelCurrentAction();
+
+    /** Called when server responds to /ec2/startUpdate. Connected to ServerUpdateToool. */
+    void atStartUpdateComplete(bool success);
+    /** Called when server responds to /ec2/cancelUpdate. Connected to ServerUpdateToool. */
+    void atCancelUpdateComplete(bool success);
+    /** Called when server responds to /ec2/finishUpdate. Connected to ServerUpdateToool. */
+    void atFinishUpdateComplete(bool success);
+
+    /**
+     * Called when ServerUpdateTool finishes downloading package for mediaserver without
+     * internet.
+     */
+    void atServerPackageDownloaded(const nx::update::Package& package);
+    void atServerPackageDownloadFailed(const nx::update::Package& package, const QString& error);
+
+    void clearUpdateInfo();
+    void pickLocalFile();
+    void pickSpecificBuild();
+
+private:
+    /**
+     * General state for a widget.
+     * It extends update state from the servers, uploader and client update.
+     */
+    enum class WidgetUpdateState
+    {
+        /** We have no information about remote state right now. */
+        initial,
+        /**
+         * We have obtained update info from the internet, but we need to
+         * GET /ec2/updateInformation from the servers, to decide which state we should move to.
+         */
+        initialCheck,
+        /**
+         * We have obtained some state from the servers. We can do some actions now.
+         * Next action depends on m_updateSourceMode, and whether the update
+         * is available for picked update source.
+         */
+        ready,
+        /** We have sent /ec2/startUpdate and waiting for response. */
+        startingDownload,
+        /** Mediaservers have started downloading update packages. */
+        downloading,
+        /** Pushing local update package to the servers. */
+        //pushing,
+        /**
+         * Waiting server to respond to /ec2/cancelUpdate from 'downloading' or 'pushing'
+         * state.
+         */
+        cancelingDownload,
+        /** Some servers have downloaded update data and ready to install it. */
+        readyInstall,
+        cancelingReadyInstall,
+        /** Some servers are installing an update. */
+        installing,
+        /** Some servers are installing an update, but it took too long. */
+        installingStalled,
+        /** Waiting server to respond to /ec2/finishUpdate */
+        finishingInstall,
+        /** Installation process is complete. */
+        complete,
+    };
+
+    static QString toString(nx::update::UpdateSourceType mode);
+    static QString toString(WidgetUpdateState state);
+    static QString toString(LocalStatusCode stage);
+    static QString toString(ServerUpdateTool::OfflineUpdateState state);
+
+    /**
+     * Changes source for getting update.
+     * It will try to skip any changes if we picking the same mode.
+     * @param mode - desired mode.
+     * @param force - should we force mode changes, even if mode is the same.
+     */
+    void setUpdateSourceMode(nx::update::UpdateSourceType mode, bool force = false);
+
+    void initDropdownActions();
+    void initDownloadActions();
+
+    void setAutoUpdateCheckMode(bool mode);
+    void autoCheckForUpdates();
+    void checkForInternetUpdates(bool initial = false);
+    /**
+     * Repeat validation process for current update information. Will work only in 'Ready' state.
+     */
+    void repeatUpdateValidation();
     void syncVersionReport(const VersionReport& report);
 
     /**
@@ -199,12 +218,13 @@ private:
 
     bool processRemoteChanges();
     /** Part of processRemoteChanges FSM processor. */
-    void processRemoteInitialState();
-    void processRemoteUpdateInformation();
-    void processRemoteDownloading();
-    void processRemoteInstalling();
+    void processInitialState();
+    void processInitialCheckState();
+    void processDownloadingState();
+    void processInstallingState();
 
     bool isChecking() const;
+    bool hasLatestVersion() const;
 
     bool processUploaderChanges(bool force = false);
 
@@ -216,6 +236,13 @@ private:
     void completeInstallation(bool clientUpdated);
     static bool stateHasProgress(WidgetUpdateState state);
     void syncDebugInfoToUi();
+    /**
+     * Sets current update target.
+     * It changes m_updateInfo and updates UI states according to the report.
+     * @param contents - update contents.
+     * @param activeUpdate - true if mediaservers are already updating to this version.
+     */
+    void setUpdateTarget(const nx::update::UpdateContents& contents, bool activeUpdate);
 
 private:
     QScopedPointer<Ui::MultiServerUpdatesWidget> ui;
@@ -250,9 +277,14 @@ private:
 
     /** ServerUpdateTool promises this. */
     std::future<nx::update::UpdateContents> m_updateCheck;
-
     /** This promise is used to get update info from mediaservers. */
     std::future<nx::update::UpdateContents> m_serverUpdateCheck;
+
+    /**
+     * This promise is used to wait until ServerUpdateTool restores the state
+     * for offline update package.
+     */
+    std::future<nx::update::UpdateContents> m_offlineUpdateCheck;
 
     std::future<std::vector<nx::update::Status>> m_serverStatusCheck;
 

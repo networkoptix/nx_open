@@ -675,17 +675,17 @@
     <message>
       <location/>
       <source>Preferred PTZ preset type:</source>
-      <translation type="unfinished">Preferred PTZ preset type:</translation>
+      <translation>ประเภทที่กำหนดไว้ล่วงหน้า PTZ ที่ต้องการ:</translation>
     </message>
     <message>
       <location/>
       <source>System</source>
-      <translation type="unfinished">System</translation>
+      <translation>ระบบ</translation>
     </message>
     <message>
       <location/>
       <source>Native</source>
-      <translation type="unfinished">Native</translation>
+      <translation>พื้นเมือง</translation>
     </message>
     <message>
       <location/>
@@ -695,12 +695,12 @@
     <message>
       <location/>
       <source>This camera supports pan and tilt</source>
-      <translation type="unfinished">This camera supports pan and tilt</translation>
+      <translation>กล้องนี้รองรับการแพนและเอียง</translation>
     </message>
     <message>
       <location/>
       <source>This camera supports zoom</source>
-      <translation type="unfinished">This camera supports zoom</translation>
+      <translation>กล้องนี้รองรับการซูม</translation>
     </message>
     <message>
       <location/>
@@ -1098,6 +1098,24 @@
     </message>
   </context>
   <context>
+    <name>EulaDialog</name>
+    <message>
+      <location filename="../src/nx/vms/client/desktop/ui/dialogs/eula_dialog.ui"/>
+      <source>Copy to Clipboard</source>
+      <translation>คัดลอกจากคลิปบอร์ด</translation>
+    </message>
+    <message>
+      <location/>
+      <source>I Do Not Agree</source>
+      <translation type="unfinished">I Do Not Agree</translation>
+    </message>
+    <message>
+      <location/>
+      <source>I Agree</source>
+      <translation type="unfinished">I Agree</translation>
+    </message>
+  </context>
+  <context>
     <name>EventLogDialog</name>
     <message>
       <location filename="../src/ui/dialogs/event_log_dialog.ui"/>
@@ -1397,11 +1415,6 @@
     </message>
     <message>
       <location/>
-      <source>None</source>
-      <translation>ไม่มี</translation>
-    </message>
-    <message>
-      <location/>
       <source>Second Source</source>
       <translation>แหล่งที่มาที่สอง</translation>
     </message>
@@ -1501,174 +1514,6 @@
       <location/>
       <source>No image</source>
       <translation>ไม่มีภาพ</translation>
-    </message>
-  </context>
-  <context>
-    <name>InteractiveSettingsTestDialog</name>
-    <message>
-      <location filename="../src/nx/vms/client/desktop/interactive_settings/dialogs/interactive_settings_test_dialog.ui"/>
-      <source>{
-    &quot;items&quot;: [
-        {
-            &quot;type&quot;: &quot;TextField&quot;,
-            &quot;name&quot;: &quot;text&quot;,
-            &quot;caption&quot;: &quot;Text Field&quot;,
-            &quot;description&quot;: &quot;A text field&quot;,
-            &quot;defaultValue&quot;: &quot;a text&quot;,
-            &quot;value&quot;: &quot;a text&quot;
-        },
-        {
-            &quot;type&quot;: &quot;GroupBox&quot;,
-            &quot;name&quot;: &quot;group&quot;,
-            &quot;caption&quot;: &quot;Group Box&quot;,
-            &quot;items&quot;: [
-                {
-                    &quot;type&quot;: &quot;SpinBox&quot;,
-                    &quot;name&quot;: &quot;number&quot;,
-                    &quot;caption&quot;: &quot;Spin Box&quot;,
-                    &quot;description&quot;: &quot;A number&quot;,
-                    &quot;defaultValue&quot;: 42,
-                    &quot;value&quot;: 42,
-                    &quot;minValue&quot;: 0,
-                    &quot;maxValue&quot;: 100
-                },
-                {
-                    &quot;type&quot;: &quot;DoubleSpinBox&quot;,
-                    &quot;name&quot;: &quot;double&quot;,
-                    &quot;caption&quot;: &quot;Double Spin Box&quot;,
-                    &quot;description&quot;: &quot;A real number&quot;,
-                    &quot;defaultValue&quot;: 3.14,
-                    &quot;value&quot;: 3.14,
-                    &quot;minValue&quot;: 0.0,
-                    &quot;maxValue&quot;: 100.0
-                },
-                {
-                    &quot;type&quot;: &quot;ComboBox&quot;,
-                    &quot;name&quot;: &quot;combobox&quot;,
-                    &quot;caption&quot;: &quot;Combo Box&quot;,
-                    &quot;description&quot;: &quot;A choice&quot;,
-                    &quot;defaultValue&quot;: &quot;value2&quot;,
-                    &quot;value&quot;: &quot;value2&quot;,
-                    &quot;range&quot;: [&quot;value1&quot;, &quot;value2&quot;, &quot;value3&quot;]
-                },
-                {
-                    &quot;type&quot;: &quot;CheckBox&quot;,
-                    &quot;name&quot;: &quot;checkbox&quot;,
-                    &quot;caption&quot;: &quot;Check Box&quot;,
-                    &quot;description&quot;: &quot;True or False&quot;,
-                    &quot;defaultValue&quot;: true,
-                    &quot;value&quot;: true
-                },
-                {
-                    &quot;type&quot;: &quot;GroupBox&quot;,
-                    &quot;name&quot;: &quot;buttons&quot;,
-                    &quot;caption&quot;: &quot;Buttons&quot;,
-                    &quot;items&quot;: [
-                        {
-                            &quot;type&quot;: &quot;Row&quot;,
-                            &quot;name&quot;: &quot;row&quot;,
-                            &quot;items&quot;: [
-                                {
-                                    &quot;type&quot;: &quot;Button&quot;,
-                                    &quot;name&quot;: &quot;button1&quot;,
-                                    &quot;caption&quot;: &quot;Button 1&quot;,
-                                    &quot;description&quot;: &quot;Action 1&quot;
-                                },
-                                {
-                                    &quot;type&quot;: &quot;Button&quot;,
-                                    &quot;name&quot;: &quot;button2&quot;,
-                                    &quot;caption&quot;: &quot;Button 2&quot;,
-                                    &quot;description&quot;: &quot;Action 2&quot;
-                                }
-                            ]
-                        }
-                    ]
-                }
-            ]
-        }
-    ]
-}</source>
-      <translation type="unfinished">{
-    &quot;items&quot;: [
-        {
-            &quot;type&quot;: &quot;TextField&quot;,
-            &quot;name&quot;: &quot;text&quot;,
-            &quot;caption&quot;: &quot;Text Field&quot;,
-            &quot;description&quot;: &quot;A text field&quot;,
-            &quot;defaultValue&quot;: &quot;a text&quot;,
-            &quot;value&quot;: &quot;a text&quot;
-        },
-        {
-            &quot;type&quot;: &quot;GroupBox&quot;,
-            &quot;name&quot;: &quot;group&quot;,
-            &quot;caption&quot;: &quot;Group Box&quot;,
-            &quot;items&quot;: [
-                {
-                    &quot;type&quot;: &quot;SpinBox&quot;,
-                    &quot;name&quot;: &quot;number&quot;,
-                    &quot;caption&quot;: &quot;Spin Box&quot;,
-                    &quot;description&quot;: &quot;A number&quot;,
-                    &quot;defaultValue&quot;: 42,
-                    &quot;value&quot;: 42,
-                    &quot;minValue&quot;: 0,
-                    &quot;maxValue&quot;: 100
-                },
-                {
-                    &quot;type&quot;: &quot;DoubleSpinBox&quot;,
-                    &quot;name&quot;: &quot;double&quot;,
-                    &quot;caption&quot;: &quot;Double Spin Box&quot;,
-                    &quot;description&quot;: &quot;A real number&quot;,
-                    &quot;defaultValue&quot;: 3.14,
-                    &quot;value&quot;: 3.14,
-                    &quot;minValue&quot;: 0.0,
-                    &quot;maxValue&quot;: 100.0
-                },
-                {
-                    &quot;type&quot;: &quot;ComboBox&quot;,
-                    &quot;name&quot;: &quot;combobox&quot;,
-                    &quot;caption&quot;: &quot;Combo Box&quot;,
-                    &quot;description&quot;: &quot;A choice&quot;,
-                    &quot;defaultValue&quot;: &quot;value2&quot;,
-                    &quot;value&quot;: &quot;value2&quot;,
-                    &quot;range&quot;: [&quot;value1&quot;, &quot;value2&quot;, &quot;value3&quot;]
-                },
-                {
-                    &quot;type&quot;: &quot;CheckBox&quot;,
-                    &quot;name&quot;: &quot;checkbox&quot;,
-                    &quot;caption&quot;: &quot;Check Box&quot;,
-                    &quot;description&quot;: &quot;True or False&quot;,
-                    &quot;defaultValue&quot;: true,
-                    &quot;value&quot;: true
-                },
-                {
-                    &quot;type&quot;: &quot;GroupBox&quot;,
-                    &quot;name&quot;: &quot;buttons&quot;,
-                    &quot;caption&quot;: &quot;Buttons&quot;,
-                    &quot;items&quot;: [
-                        {
-                            &quot;type&quot;: &quot;Row&quot;,
-                            &quot;name&quot;: &quot;row&quot;,
-                            &quot;items&quot;: [
-                                {
-                                    &quot;type&quot;: &quot;Button&quot;,
-                                    &quot;name&quot;: &quot;button1&quot;,
-                                    &quot;caption&quot;: &quot;Button 1&quot;,
-                                    &quot;description&quot;: &quot;Action 1&quot;
-                                },
-                                {
-                                    &quot;type&quot;: &quot;Button&quot;,
-                                    &quot;name&quot;: &quot;button2&quot;,
-                                    &quot;caption&quot;: &quot;Button 2&quot;,
-                                    &quot;description&quot;: &quot;Action 2&quot;
-                                }
-                            ]
-                        }
-                    ]
-                }
-            ]
-        }
-    ]
-}</translation>
     </message>
   </context>
   <context>
@@ -1828,7 +1673,7 @@
     <message>
       <location/>
       <source>Search Timeout (s)</source>
-      <translation type="unfinished">Search Timeout (s)</translation>
+      <translation>ค้นหาหมดเวลา (s)</translation>
     </message>
     <message>
       <location/>
@@ -2124,14 +1969,6 @@
     </message>
   </context>
   <context>
-    <name>MessageBox</name>
-    <message>
-      <location filename="../src/ui/dialogs/common/message_box.ui"/>
-      <source>Do not show this message again</source>
-      <translation>อย่าแสดงข้อความนี้อีก</translation>
-    </message>
-  </context>
-  <context>
     <name>MultiServerUpdatesWidget</name>
     <message>
       <location filename="../src/nx/vms/client/desktop/system_update/multi_server_updates_widget.ui"/>
@@ -2217,7 +2054,7 @@
     <message>
       <location/>
       <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
-      <translation type="unfinished">&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</translation>
+      <translation>&quot;Wearable Camera&quot; เป็นที่เก็บข้อมูลเสมือนจริงสำหรับไฟล์วิดีโอซึ่งสามารถอัพโหลดไปยังเซิร์ฟเวอร์ใดก็ได้ในระบบของคุณและเข้าถึงได้โดยผู้ใช้รายใด</translation>
     </message>
   </context>
   <context>
@@ -2286,22 +2123,22 @@
     <message>
       <location/>
       <source>Level:</source>
-      <translation type="unfinished">Level:</translation>
+      <translation>ระดับ</translation>
     </message>
     <message>
       <location/>
       <source>ERROR</source>
-      <translation type="unfinished">ERROR</translation>
+      <translation>ข้อผิดพลาด</translation>
     </message>
     <message>
       <location/>
       <source>WARNING</source>
-      <translation type="unfinished">WARNING</translation>
+      <translation>คำเตือน</translation>
     </message>
     <message>
       <location/>
       <source>INFO</source>
-      <translation type="unfinished">INFO</translation>
+      <translation>ข้อมูล</translation>
     </message>
   </context>
   <context>
@@ -2450,7 +2287,7 @@
     <message>
       <location/>
       <source>Restart to the updated version when ready</source>
-      <translation type="unfinished">Restart to the updated version when ready</translation>
+      <translation>รีสตาร์ทเป็นเวอร์ชั่นที่อัพเดตแล้วเมื่อพร้อม</translation>
     </message>
   </context>
   <context>
@@ -2515,6 +2352,14 @@
       <location/>
       <source>The new System will have password and name from System:</source>
       <translation>ระบบใหม่จะมีรหัสผ่านและชื่อจากระบบ:</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnMessageBox</name>
+    <message>
+      <location filename="../src/ui/dialogs/common/message_box.ui"/>
+      <source>Do not show this message again</source>
+      <translation>อย่าแสดงข้อความนี้อีก</translation>
     </message>
   </context>
   <context>
@@ -2806,18 +2651,13 @@
     </message>
     <message>
       <location/>
-      <source>Filter TEST</source>
-      <translation type="unfinished">Filter TEST</translation>
-    </message>
-    <message>
-      <location/>
       <source>Nothing found</source>
       <translation>ไม่พบสิ่งใด</translation>
     </message>
     <message>
       <location/>
       <source>Drag any image or video file to the application window to play them</source>
-      <translation type="unfinished">Drag any image or video file to the application window to play them</translation>
+      <translation>ลากไฟล์รูปภาพหรือวิดีโอใด ๆ ไปที่หน้าต่างแอปพลิเคชั่นเพื่อเล่น</translation>
     </message>
   </context>
   <context>
@@ -2930,13 +2770,18 @@
     </message>
     <message>
       <location/>
-      <source>Limit Session Length</source>
-      <translation type="unfinished">Limit Session Length</translation>
+      <source>to</source>
+      <translation>ถึง</translation>
     </message>
     <message>
       <location/>
-      <source>to</source>
-      <translation>ถึง</translation>
+      <source>Limit session duration</source>
+      <translation>จำกัด ระยะเวลาเซสชัน</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
+      <translation>ลายน้ำจะปรากฏบนวิดีโอสดที่เก็บถาวรและส่งออกสำหรับผู้ใช้ที่ไม่ใช่ผู้ดูแลระบบเท่านั้น คุณและผู้ดูแลระบบคนอื่นจะไม่เห็นพวกเขา</translation>
     </message>
   </context>
   <context>
@@ -3181,7 +3026,7 @@
     <message>
       <location/>
       <source>Base forecast on data recorded during</source>
-      <translation type="unfinished">Base forecast on data recorded during</translation>
+      <translation>การคาดการณ์จากข้อมูลที่บันทึกในระหว่างฐาน</translation>
     </message>
   </context>
   <context>
@@ -3225,6 +3070,26 @@
       <location/>
       <source>Backup Settings...</source>
       <translation>การตั้งค่าสำรอง...</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Analytics data will continue to be stored on the disabled storage.</source>
+      <translation type="unfinished">Analytics data will continue to be stored on the disabled storage.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</source>
+      <translation type="unfinished">Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Recording was enabled on the USB storage</source>
+      <translation type="unfinished">Recording was enabled on the USB storage</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Analytics data can occupy tens of gigabytes of storage space. We recommend to choose other location for it instead of the system partition.</source>
+      <translation type="unfinished">Analytics data can occupy tens of gigabytes of storage space. We recommend to choose other location for it instead of the system partition.</translation>
     </message>
   </context>
   <context>
@@ -3342,7 +3207,7 @@
     <message>
       <location/>
       <source>VMS Time</source>
-      <translation type="unfinished">VMS Time</translation>
+      <translation>เวลา VMS</translation>
     </message>
   </context>
   <context>
@@ -3350,17 +3215,17 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/system_administration/widgets/time_synchronization_widget.ui"/>
       <source>Sync Time with the Internet</source>
-      <translation type="unfinished">Sync Time with the Internet</translation>
+      <translation>ซิงค์เวลากับอินเทอร์เน็ต</translation>
     </message>
     <message>
       <location/>
       <source>VMS Time</source>
-      <translation type="unfinished">VMS Time</translation>
+      <translation>เวลา VMS</translation>
     </message>
     <message>
       <location/>
       <source>Do not sync time among servers</source>
-      <translation type="unfinished">Do not sync time among servers</translation>
+      <translation>อย่าซิงค์เวลาระหว่างเซิร์ฟเวอร์</translation>
     </message>
   </context>
   <context>
@@ -3468,7 +3333,7 @@
     <message>
       <location/>
       <source>Detect motion</source>
-      <translation type="unfinished">Detect motion</translation>
+      <translation>ตรวจจับการเคลื่อนไหว</translation>
     </message>
   </context>
   <context>

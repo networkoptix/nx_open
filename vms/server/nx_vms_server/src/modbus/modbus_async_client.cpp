@@ -1,4 +1,7 @@
 #include "modbus_async_client.h"
+
+#include <QtCore/QDataStream>
+
 #include <nx/utils/log/log.h>
 
 namespace

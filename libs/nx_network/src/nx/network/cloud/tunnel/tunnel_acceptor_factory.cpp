@@ -14,6 +14,17 @@ TunnelAcceptorFactory::TunnelAcceptorFactory():
 {
 }
 
+hpm::api::ConnectionMethods TunnelAcceptorFactory::enabledConnectionMethods() const
+{
+    return m_enabledConnectionMethods;
+}
+
+void TunnelAcceptorFactory::setEnabledConnectionMethods(
+    hpm::api::ConnectionMethods connectionMethods)
+{
+    m_enabledConnectionMethods = connectionMethods;
+}
+
 void TunnelAcceptorFactory::setUdpHolePunchingEnabled(bool val)
 {
     if (val)

@@ -67,19 +67,23 @@ private:
 
     QnJsonRestResult mergeSystems(
         Qn::UserAccessData accessRights,
-        MergeSystemData data);
+        MergeSystemData data,
+        const QnUuid& mergeId);
 
     QnJsonRestResult applyCurrentSettings(
         const nx::utils::Url& remoteUrl,
+        const QString& getKey,
         const QString& postKey,
-        bool oneServer);
+        bool oneServer,
+        const QnUuid& mergeId);
 
     QnJsonRestResult applyRemoteSettings(
         const nx::utils::Url& remoteUrl,
         const QnUuid& systemId,
         const QString& systemName,
         const QString& getKey,
-        const QString& postKey);
+        const QString& postKey,
+        const QnUuid& mergeId);
 
     bool fetchRemoteData(
         const nx::utils::Url& remoteUrl,
@@ -118,7 +122,8 @@ private:
         const nx::utils::Url &remoteUrl,
         const QString& getKey,
         ResultDataType& result,
-        const QString& path);
+        const QString& path,
+        bool post = false);
 
     void addAuthToRequest(nx::utils::Url& request, const QString& remoteAuthKey);
 

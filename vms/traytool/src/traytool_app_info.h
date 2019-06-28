@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QtCore/QString>
+
 struct QnTraytoolAppInfo
 {
     /** Real application name, visible to the user. */
@@ -7,4 +9,6 @@ struct QnTraytoolAppInfo
 
     /** Client registry key. */
     static QString clientName();
+
+    static QString mediaServerRegistryKey();
 };

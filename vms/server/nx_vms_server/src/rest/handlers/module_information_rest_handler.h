@@ -13,8 +13,6 @@ class QnModuleInformationRestHandler:
     public /*mixin*/ QnCommonModuleAware,
     public /*mixin*/ Qn::EnableSafeDirectConnection
 {
-    Q_OBJECT
-
 public:
     QnModuleInformationRestHandler(QnCommonModule* commonModule);
     virtual ~QnModuleInformationRestHandler() override;
@@ -26,10 +24,9 @@ public:
         const nx::network::rest::Request& request,
         const nx::network::rest::Response& response) override;
 
-private slots:
+private:
     void changeModuleInformation();
 
-private:
     struct Connection
     {
         std::unique_ptr<nx::network::AbstractStreamSocket> socket;
@@ -54,6 +51,4 @@ private:
 
     QnMutex m_mutex;
     bool m_aboutToStop = false;
-
-private:
 };

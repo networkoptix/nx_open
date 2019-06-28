@@ -67,6 +67,7 @@ QList<QnResourcePtr> FcResourceSearcher::checkHostAddr(
 
     httpClient.setSendTimeout(kDeviceInfoRequestTimeout);
     httpClient.setResponseReadTimeout(kDeviceInfoResponseTimeout);
+    httpClient.setMessageBodyReadTimeout(kDeviceInfoResponseTimeout);
 
     auto deviceInfoUrl = url;
     deviceInfoUrl.setScheme("http");
@@ -118,12 +119,12 @@ QnResourceList FcResourceSearcher::findResources()
     auth.setUser(kFlirDefaultUsername);
     auth.setPassword(kFlirDefaultPassword);
 
-    auto now = qnSyncTime->currentMSecsSinceEpoch();
+    qint64 now = qnSyncTime->currentMSecsSinceEpoch();
     auto itr = m_deviceInfoCache.begin();
 
     while (itr != m_deviceInfoCache.end())
     {
-        auto timestamp = itr->second.timestamp;
+        qint64 timestamp = itr->second.timestamp;
         auto deviceInfo = itr->second.deviceInfo;
         if (now - timestamp > kCacheExpirationTime.count())
         {
@@ -244,7 +245,7 @@ void FcResourceSearcher::receiveFromCallback(
     if (errorCode != SystemError::noError)
         initListenerUnsafe();
 
-    auto discoveryMessage = QString::fromUtf8(m_receiveBuffer.left(bytesRead));
+    auto discoveryMessage = QString::fromUtf8(m_receiveBuffer.left(int(bytesRead)));
     auto discoveryInfo = parseDeviceDiscoveryInfo(discoveryMessage);
 
     m_receiveBuffer.clear();
@@ -285,8 +286,8 @@ bool FcResourceSearcher::hasValidCacheUnsafe(const nx::network::SocketAddress& a
     if (itr == m_deviceInfoCache.end())
         return false;
 
-    auto timestamp = itr->second.timestamp;
-    auto now = qnSyncTime->currentMSecsSinceEpoch();
+    qint64 timestamp = itr->second.timestamp;
+    qint64 now = qnSyncTime->currentMSecsSinceEpoch();
     if (now - timestamp > kCacheExpirationTime.count())
         return false;
 

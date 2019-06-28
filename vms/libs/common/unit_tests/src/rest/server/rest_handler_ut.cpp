@@ -1,7 +1,8 @@
 #include <gtest/gtest.h>
-#include <rest/server/request_handler.h>
 
+#include <nx/network/rest/handler.h>
 #include <nx/network/rest/nx_network_rest_ini.h>
+#include <nx/kit/ini_config.h>
 #include <nx/utils/test_support/run_test.h>
 
 namespace nx::network::rest::test {
@@ -46,7 +47,7 @@ TEST_F(RestParamsTest, SimpleConversions)
     testConversions(
         {{"a", "1"}, {"b", "hello"}, {"c", "true"}},
         "a=1&b=hello&c=true",
-        R"json({"a":1,"b":"hello","c":true})json");
+        R"json({"a":"1","b":"hello","c":"true"})json");
 }
 
 TEST_F(RestParamsTest, DuplicateConversions)
@@ -54,7 +55,7 @@ TEST_F(RestParamsTest, DuplicateConversions)
     testTo(
         {{"a", "1"}, {"b", "hello"}, {"b", "world"}, {"c", "true"}},
         "a=1&b=world&b=hello&c=true",
-        R"json({"a":1,"b":"hello","c":true})json");
+        R"json({"a":"1","b":"hello","c":"true"})json");
 
     testFrom(
         {{"a", "1"}, {"b", "hello"}, {"b", "world"}, {"c", "true"}},
@@ -88,7 +89,7 @@ public:
         return request;
     }
 
-    nx::utils::test::IniConfigTweaks iniTweaks;
+    nx::kit::IniConfig::Tweaks iniTweaks;
 
 private:
     std::vector<std::unique_ptr<http::Request>> m_requests;
@@ -100,11 +101,25 @@ struct SomeData
     int i = 0;
     QString s;
 };
-
 #define SomeData_Fields (b)(i)(s)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((SomeData), (eq)(json), _Fields);
 
 static void PrintTo(const SomeData& value, std::ostream* stream)
+{
+    *stream << QJson::serialized(value).toStdString();
+}
+
+struct SomeBools
+{
+    bool a = false;
+    bool b = false;
+    bool c = true;
+    bool d = true;
+};
+#define SomeBools_Fields (a)(b)(c)(d)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((SomeBools), (eq)(json), _Fields);
+
+static void PrintTo(const SomeBools& value, std::ostream* stream)
 {
     *stream << QJson::serialized(value).toStdString();
 }
@@ -155,6 +170,69 @@ TEST_F(RestRequestTest, GetWithUrlParams)
     const auto data = request->parseContent<SomeData>();
     ASSERT_TRUE(data);
     EXPECT_EQ((SomeData{true, 42, "hi"}), *data);
+}
+
+TEST_F(RestRequestTest, GetWithJsonInString)
+{
+    const auto request = restRequest({
+        "GET /some/path?s={\"b\":true,\"i\":7,\"s\":\"hi\"} HTTP/1.1",
+        ""
+    });
+
+    EXPECT_EQ("GET", request->method());
+    EXPECT_EQ("/some/path", request->path());
+    EXPECT_EQ(Params({{"s", R"json({"b":true,"i":7,"s":"hi"})json"}}), request->params());
+
+    const auto innerData1 = QJson::deserialized<SomeData>(request->paramOrThrow("s").toUtf8());
+    EXPECT_EQ((SomeData{true, 7, "hi"}), innerData1);
+
+    const auto data = request->parseContent<SomeData>();
+    ASSERT_TRUE(data);
+
+    const auto innerData2 = QJson::deserialized<SomeData>(data->s.toUtf8());
+    EXPECT_EQ((SomeData{true, 7, "hi"}), innerData2);
+}
+
+TEST_F(RestRequestTest, GetWithSomeBools)
+{
+    const auto request = restRequest({
+        "GET /some/path?a=true&c=false HTTP/1.1",
+        ""
+    });
+    ASSERT_TRUE(request);
+    ASSERT_FALSE(request->content);
+    EXPECT_EQ(Params({{"a", "true"}, {"c", "false"}}), request->params());
+
+    const auto data = request->parseContentOrThrow<SomeBools>();
+    EXPECT_EQ((SomeBools{true, false, false, true}), data);
+}
+
+TEST_F(RestRequestTest, GetWithMixedBools)
+{
+    const auto request = restRequest({
+        "GET /some/path?a=1&b=True&c=0&d=False HTTP/1.1",
+        ""
+    });
+    ASSERT_TRUE(request);
+    ASSERT_FALSE(request->content);
+    EXPECT_EQ(Params({{"a", "1"}, {"b", "True"}, {"c", "0"}, {"d", "False"}}), request->params());
+
+    const auto data = request->parseContentOrThrow<SomeBools>();
+    EXPECT_EQ((SomeBools{true, true, false, false}), data);
+}
+
+TEST_F(RestRequestTest, GetWithBoolString)
+{
+    const auto request = restRequest({
+        "GET /some/path?s=true HTTP/1.1",
+        ""
+    });
+    ASSERT_TRUE(request);
+    ASSERT_FALSE(request->content);
+    EXPECT_EQ(Params({{"s", "true"}}), request->params());
+
+    const auto data = request->parseContentOrThrow<SomeData>();
+    EXPECT_EQ((SomeData{false, 0, "true"}), data);
 }
 
 TEST_F(RestRequestTest, GetToPostByHeader)
@@ -244,7 +322,7 @@ TEST_F(RestRequestTest, PostJson)
     });
     ASSERT_TRUE(request);
     ASSERT_TRUE(request->content);
-    EXPECT_EQ("application/json", request->content->type);
+    EXPECT_EQ(http::StringType("application/json"), request->content->type);
     EXPECT_EQ(R"json({"b":true,"i":222,"s":"data"})json", request->content->body);
 
     EXPECT_EQ("POST", request->method());
@@ -267,7 +345,7 @@ TEST_F(RestRequestTest, PostForm)
     });
     ASSERT_TRUE(request);
     ASSERT_TRUE(request->content);
-    EXPECT_EQ("application/x-www-form-urlencoded", request->content->type);
+    EXPECT_EQ(http::StringType("application/x-www-form-urlencoded"), request->content->type);
     EXPECT_EQ("b=false&i=123&s=some%20text", request->content->body);
 
     EXPECT_EQ("POST", request->method());
@@ -290,7 +368,7 @@ TEST_F(RestRequestTest, PostBadJson)
     });
     ASSERT_TRUE(request);
     ASSERT_TRUE(request->content);
-    EXPECT_EQ("application/json", request->content->type);
+    EXPECT_EQ(http::StringType("application/json"), request->content->type);
     EXPECT_EQ("not a json", request->content->body);
 
     EXPECT_EQ("POST", request->method());
@@ -298,6 +376,51 @@ TEST_F(RestRequestTest, PostBadJson)
     EXPECT_EQ(Params(), request->params());
 
     ASSERT_FALSE(request->parseContent<SomeData>());
+}
+
+TEST_F(RestRequestTest, PostWithJsonInString)
+{
+    const auto request = restRequest({
+        "POST /some/path HTTP/1.1",
+        "Content-Type: application/json",
+        "Content-Length: 42",
+        "",
+        R"json({"s":"{\"b\":true,\"i\":7,\"s\":\"hi\"}"})json"
+    });
+
+    EXPECT_EQ("POST", request->method());
+    EXPECT_EQ("/some/path", request->path());
+    EXPECT_EQ(Params({{"s", R"json({"b":true,"i":7,"s":"hi"})json"}}), request->params());
+
+    const auto innerData1 = QJson::deserialized<SomeData>(request->paramOrThrow("s").toUtf8());
+    EXPECT_EQ((SomeData{true, 7, "hi"}), innerData1);
+
+    const auto data = request->parseContent<SomeData>();
+    ASSERT_TRUE(data);
+
+    const auto innerData2 = QJson::deserialized<SomeData>(data->s.toUtf8());
+    EXPECT_EQ((SomeData{true, 7, "hi"}), innerData2);
+}
+
+TEST_F(RestRequestTest, PostWithEmbeddedJson)
+{
+    const auto request = restRequest({
+        "POST /some/path HTTP/1.1",
+        "Content-Type: application/json",
+        "Content-Length: 32",
+        "",
+        R"json({"s":{"b":true,"i":7,"s":"hi"}})json"
+    });
+
+    EXPECT_EQ("POST", request->method());
+    EXPECT_EQ("/some/path", request->path());
+    EXPECT_EQ(Params({{"s", R"json({"b":true,"i":7,"s":"hi"})json"}}), request->params());
+
+    const auto innerData1 = QJson::deserialized<SomeData>(request->paramOrThrow("s").toUtf8());
+    EXPECT_EQ((SomeData{true, 7, "hi"}), innerData1);
+
+    const auto data = request->parseContent<SomeData>();
+    ASSERT_TRUE(data);
 }
 
 TEST_F(RestRequestTest, PostWithUrlParams)
@@ -350,7 +473,7 @@ TEST_F(RestRequestTest, PutJson)
     });
     ASSERT_TRUE(request);
     ASSERT_TRUE(request->content);
-    EXPECT_EQ("application/json", request->content->type);
+    EXPECT_EQ(http::StringType("application/json"), request->content->type);
     EXPECT_EQ(R"json({"s":"some text"})json", request->content->body);
 
     EXPECT_EQ("PUT", request->method());
@@ -443,14 +566,14 @@ public:
     {
         EXPECT_EQ(statusCode, response.statusCode);
         ASSERT_TRUE(response.content);
-        EXPECT_EQ("application/json", response.content->type);
+        EXPECT_EQ(http::StringType("application/json"), response.content->type);
         EXPECT_EQ(json, response.content->body);
     }
 };
 
 TEST_F(RestResponseTest, JsonResult)
 {
-    QnJsonRestResult result;
+    JsonResult result;
     result.setReply(SomeData{false, 111, "hello"});
     expectJsonResponse(
         rest::Response::result(result),
@@ -460,8 +583,8 @@ TEST_F(RestResponseTest, JsonResult)
 
 TEST_F(RestResponseTest, JsonError)
 {
-    QnJsonRestResult result;
-    result.setError({QnRestResult::MissingParameter, "name"});
+    JsonResult result;
+    result.setError({Result::MissingParameter, "name"});
     expectJsonResponse(
         rest::Response::result(result),
         http::StatusCode::unprocessableEntity,
@@ -470,8 +593,8 @@ TEST_F(RestResponseTest, JsonError)
 
 TEST_F(RestResponseTest, RestError)
 {
-    QnRestResult result;
-    result.setError(QnRestResult::InternalServerError, "Something went wrong");
+    Result result;
+    result.setError(Result::InternalServerError, "Something went wrong");
     expectJsonResponse(
         rest::Response::result(result),
         http::StatusCode::badRequest,
@@ -489,7 +612,7 @@ TEST_F(RestResponseTest, DataReply)
 TEST_F(RestResponseTest, ErrorResult)
 {
     expectJsonResponse(
-        rest::Response::error(QnRestResult::InvalidParameter, "a", "X"),
+        rest::Response::error(Result::InvalidParameter, "a", "X"),
         http::StatusCode::unprocessableEntity,
         R"json({"error":"2","errorString":"Invalid parameter 'a' value: 'X'","reply":null})json");
 }
@@ -497,7 +620,7 @@ TEST_F(RestResponseTest, ErrorResult)
 TEST_F(RestResponseTest, ErrorResultWithCode)
 {
     expectJsonResponse(
-        rest::Response::error(http::StatusCode::ok, QnRestResult::InvalidParameter, "a", "X"),
+        rest::Response::error(http::StatusCode::ok, Result::InvalidParameter, "a", "X"),
         http::StatusCode::ok,
         R"json({"error":"2","errorString":"Invalid parameter 'a' value: 'X'","reply":null})json");
 }

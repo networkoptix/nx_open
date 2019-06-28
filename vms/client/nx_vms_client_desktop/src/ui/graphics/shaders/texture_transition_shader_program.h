@@ -1,17 +1,13 @@
-#ifndef QN_TEXTURE_TRANSITION_SHADER_PROGRAM_H
-#define QN_TEXTURE_TRANSITION_SHADER_PROGRAM_H
+#pragma once
 
-
-
-#include <QtOpenGL/QGLShaderProgram>
 #include "texture_color_shader_program.h"
 
-
-class QnTextureTransitionShaderProgram: public QnTextureGLShaderProgram {
+class QnTextureTransitionShaderProgram: public QnTextureGLShaderProgram
+{
     Q_OBJECT
+
 public:
     QnTextureTransitionShaderProgram(QObject *parent = NULL);
-
 
     void setTexture1(int target) {
         setUniformValue(m_texture1, target);
@@ -36,6 +32,3 @@ private:
     int m_texture1;
     int m_progressLocation;
 };
-
-
-#endif //QN_TEXTURE_TRANSITION_SHADER_PROGRAM_H

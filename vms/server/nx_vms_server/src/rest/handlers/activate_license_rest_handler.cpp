@@ -24,9 +24,7 @@
 
 static const int TCP_TIMEOUT = 1000 * 5;
 
-#ifdef Q_OS_LINUX
 #include <nx/vms/server/system/nx1/info.h>
-#endif
 
 using namespace nx;
 
@@ -208,7 +206,7 @@ CLHttpStatus QnActivateLicenseRestHandler::makeRequest(
     bool infoMode,
     QByteArray& response)
 {
-    const auto url = QnLicenseServer::kActivateUrl;
+    const auto url = QnLicenseServer::activateUrl(commonModule);
     CLSimpleHTTPClient client(url.host(), url.port(80), TCP_TIMEOUT, QAuthenticator());
 
     const auto runtimeData = commonModule->runtimeInfoManager()->items()
@@ -221,8 +219,7 @@ CLHttpStatus QnActivateLicenseRestHandler::makeRequest(
     // TODO: #GDM replace with qnStaticCommon->engineVersion()? And what if --override-version?
     params.addQueryItem(kVersion, QnAppInfo::applicationVersion());
 
-#ifdef Q_OS_LINUX
-    if(QnAppInfo::isBpi() || QnAppInfo::isNx1())
+    if(QnAppInfo::isNx1())
     {
         QString mac = Nx1::getMac();
         QString serial = Nx1::getSerial();
@@ -233,7 +230,6 @@ CLHttpStatus QnActivateLicenseRestHandler::makeRequest(
         if (!serial.isEmpty())
             params.addQueryItem(kSerial, serial);
     }
-#endif
 
     QLocale locale;
     params.addQueryItem(kLang, QLocale::languageToString(locale.language()));

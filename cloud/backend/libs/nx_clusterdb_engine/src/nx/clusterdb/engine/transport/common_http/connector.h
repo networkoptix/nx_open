@@ -4,7 +4,7 @@
 
 #include <transaction/transaction_transport_base.h>
 
-#include "../abstract_transaction_transport_connector.h"
+#include "../abstract_command_transport_connector.h"
 #include "../../compatible_ec2_protocol_version.h"
 
 namespace nx::clusterdb::engine {
@@ -25,7 +25,7 @@ public:
     HttpCommandPipelineConnector(
         const ProtocolVersionRange& protocolVersionRange,
         const nx::utils::Url& nodeUrl,
-        const std::string& systemId,
+        const std::string& clusterId,
         const std::string& nodeId);
 
     virtual void bindToAioThread(network::aio::AbstractAioThread* aioThread) override;
@@ -39,12 +39,12 @@ private:
     const ProtocolVersionRange m_protocolVersionRange;
     const nx::utils::Url m_getCommandsNodeUrl;
     const nx::utils::Url m_postCommandsNodeUrl;
-    const std::string m_systemId;
+    const std::string m_clusterId;
     nx::vms::api::PeerData m_peerData;
 
     Handler m_completionHandler;
-    std::unique_ptr<::ec2::QnTransactionTransportBase> m_connection;
     std::shared_ptr<::ec2::ConnectionGuardSharedState> m_connectionGuardSharedState;
+    std::unique_ptr<::ec2::QnTransactionTransportBase> m_connection;
     QMetaObject::Connection m_stateChangedConnection;
 
     void onStateChanged(::ec2::QnTransactionTransportBase::State newState);
@@ -64,9 +64,9 @@ public:
         const ProtocolVersionRange& protocolVersionRange,
         CommandLog* transactionLog,
         const OutgoingCommandFilter& outgoingCommandFilter,
-        const nx::utils::Url& nodeUrl,
-        const std::string& systemId,
-        const std::string& nodeId);
+        const std::string& clusterId,
+        const std::string& nodeId,
+        const nx::utils::Url& nodeUrl);
 
     virtual void bindToAioThread(network::aio::AbstractAioThread* aioThread) override;
 
@@ -79,7 +79,7 @@ private:
     const ProtocolVersionRange m_protocolVersionRange;
     CommandLog* m_commandLog = nullptr;
     const OutgoingCommandFilter& m_outgoingCommandFilter;
-    const std::string m_systemId;
+    const std::string m_clusterId;
     HttpCommandPipelineConnector m_pipelineConnector;
     Handler m_completionHandler;
 

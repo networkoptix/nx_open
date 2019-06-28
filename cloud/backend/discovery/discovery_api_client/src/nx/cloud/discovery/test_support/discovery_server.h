@@ -8,6 +8,8 @@
 
 #include <nx/network/aio/timer.h>
 
+#include <nx/utils/subscription.h>
+
 namespace nx::cloud::discovery::test {
 
 NX_DISCOVERY_CLIENT_API std::string generateInfoJson(const std::string& nodeId);
@@ -15,15 +17,25 @@ NX_DISCOVERY_CLIENT_API std::string generateInfoJson(const std::string& nodeId);
 class NX_DISCOVERY_CLIENT_API DiscoveryServer
 {
 public:
-    DiscoveryServer(
-        const std::string& clusterId,
-        const std::chrono::milliseconds& nodeLifetime = std::chrono::seconds(1));
+    DiscoveryServer(const std::chrono::milliseconds& nodeLifetime = std::chrono::seconds(1));
 
     bool bindAndListen();
 
     nx::utils::Url url() const;
 
     int onlineNodesCount() const;
+
+    void mockupClientPublicIpAddress(
+        const std::string& nodeId,
+        const std::string& publicIpAddress);
+
+    /**
+     * Event is emitted before the node is actually registered with discovery service.
+     */
+    nx::utils::SubscriptionId subscribeToNodeDiscovered(
+        nx::utils::MoveOnlyFunc<void(std::string /*clusterId*/, NodeInfo /*nodeInfo*/)> handler);
+
+    void unsubscribeFromNodeDiscovered(const nx::utils::SubscriptionId& subscriptionId);
 
 private:
     void registerRequestHandlers(
@@ -37,19 +49,27 @@ private:
         nx::network::http::RequestContext requestContext,
         nx::network::http::RequestProcessedHandler completionHandler);
 
-    bool requestContainsThisClusterId(
-        const nx::network::http::RequestContext& requestContext) const;
+    bool haveClusterId(const std::string& clusterId) const;
+    bool haveNodeId(const std::string& clusterId, const std::string& nodeId) const;
 
-    Node updateNode(const NodeInfo& nodeInfo);
+    Node updateNode(nx::network::http::RequestContext requestContext, const NodeInfo& nodeInfo);
 
-    std::vector<Node> updateOnlineNodes();
+    std::vector<Node> updateOnlineNodes(const std::string& clusterId);
+
+    /**
+     * Subscribe to a node discover event. Event is emitted before node is actually registered
+     * with discovery service.
+     */
+    void emitNodeDiscovered(const std::string& clusteId, const NodeInfo& nodeInfo);
 
 private:
-    const std::string m_clusterId;
     const std::chrono::milliseconds m_nodeLifetime;
 
     mutable QnMutex m_mutex;
-    std::map<std::string/*nodeId*/, Node> m_onlineNodes;
+    std::map<std::string /*clusterId*/, std::map<std::string /*nodeId*/, Node>> m_onlineNodes;
+    std::map<std::string/*nodeId*/, std::string/*publcIpAddress*/> m_clientPublicIpAddresses;
+
+    nx::utils::Subscription<std::string/*clusterId*/, NodeInfo> m_nodeDiscoveredSubscription;
 
     nx::network::http::TestHttpServer m_httpServer;
 };

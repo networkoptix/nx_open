@@ -81,6 +81,8 @@ const QString kNameStatisticsReportLastNumber(lit("statisticsReportLastNumber"))
 const QString kNameStatisticsReportTimeCycle(lit("statisticsReportTimeCycle"));
 const QString kNameStatisticsReportUpdateDelay(lit("statisticsReportUpdateDelay"));
 const QString kNameLocalSystemId(lit("localSystemId"));
+const QString kNameLastMergeMasterId(lit("lastMergeMasterId"));
+const QString kNameLastMergeSlaveId(lit("lastMergeSlaveId"));
 const QString kNameSystemName(lit("systemName"));
 const QString kNameStatisticsReportServerApi(lit("statisticsReportServerApi"));
 const QString kNameSettingsUrlParam(lit("clientStatisticsSettingsUrl"));
@@ -102,6 +104,8 @@ const QString kKeepAliveProbeCountKey(lit("ec2KeepAliveProbeCount"));
 
 static const QString kTargetUpdateInformationName = lit("targetUpdateInformation");
 static const QString kInstalledUpdateInformationName = lit("installedUpdateInformation");
+static const QString kTargetPersistentUpdateStorageName = lit("targetPersistentUpdateStorage");
+static const QString kInstalledPersistentUpdateStorageName = lit("installedPersistentUpdateStorage");
 static const QString kDownloaderPeersName = lit("downloaderPeers");
 
 const QString kWatermarkSettingsName(lit("watermarkSettings"));
@@ -110,6 +114,7 @@ const QString kDefaultVideoCodec(lit("defaultVideoCodec"));
 const QString kDefaultExportVideoCodec(lit("defaultExportVideoCodec"));
 const QString kLowQualityScreenVideoCodec(lit("lowQualityScreenVideoCodec"));
 const QString kForceLiveCacheForPrimaryStream(lit("forceLiveCacheForPrimaryStream"));
+const QString kMetadataStorageChangePolicyName(lit("metadataStorageChangePolicy"));
 
 } // namespace nx::settings_names
 
@@ -231,6 +236,16 @@ public:
     QnUuid localSystemId() const;
     void setLocalSystemId(const QnUuid& value);
 
+    /**
+     *
+     * Last merge operation id. It set same value for master and slave hosts during merge
+     */
+    QnUuid lastMergeMasterId() const;
+    void setLastMergeMasterId(const QnUuid& value);
+
+    QnUuid lastMergeSlaveId() const;
+    void setLastMergeSlaveId(const QnUuid& value);
+
     QString clientStatisticsSettingsUrl() const;
 
     QString statisticsReportServerApi() const;
@@ -330,18 +345,6 @@ public:
 
     int maxWebMTranscoders() const;
 
-    bool hanwhaDeleteProfilesOnInitIfNeeded() const;
-    void setHanwhaDeleteProfilesOnInitIfNeeded(bool deleteProfiles);
-
-    bool showHanwhaAlternativePtzControlsOnTile() const;
-    void setShowHanwhaAlternativePtzControlsOnTile(bool showPtzControls);
-
-    int hanwhaChunkReaderResponseTimeoutSeconds() const;
-    void setHanwhaChunkReaderResponseTimeoutSeconds(int value);
-
-    int hanwhaChunkReaderMessageBodyTimeoutSeconds() const;
-    void setHanwhaChunkReaderMessageBodyTimeoutSeconds(int value);
-
     bool isEdgeRecordingEnabled() const;
     void setEdgeRecordingEnabled(bool enabled);
 
@@ -350,6 +353,12 @@ public:
 
     QByteArray targetUpdateInformation() const;
     void setTargetUpdateInformation(const QByteArray& updateInformation);
+
+    QByteArray targetPersistentUpdateStorage() const;
+    void setTargetPersistentUpdateStorage(const QByteArray& persistentUpdateStorageSerializedData);
+
+    QByteArray installedPersistentUpdateStorage() const;
+    void setInstalledPersistentUpdateStorage(const QByteArray& persistentUpdateStorageSerializedData);
 
     QByteArray installedUpdateInformation() const;
     void setInstalledUpdateInformation(const QByteArray& updateInformation);
@@ -377,6 +386,13 @@ public:
 
     QString forceLiveCacheForPrimaryStream() const;
     void setForceLiveCacheForPrimaryStream(const QString& value);
+
+    nx::vms::api::MetadataStorageChangePolicy metadataStorageChangePolicy() const;
+    void setMetadataStorageChangePolicy(nx::vms::api::MetadataStorageChangePolicy value);
+
+
+    QString licenseServerUrl() const;
+    void setLicenseServerUrl(const QString& value);
 
 signals:
     void initialized();
@@ -410,6 +426,8 @@ signals:
     void targetUpdateInformationChanged();
     void installedUpdateInformationChanged();
     void downloaderPeersChanged();
+    void targetPersistentUpdateStorageChanged();
+    void installedPersistentUpdateStorageChanged();
     void watermarkChanged();
     void sessionTimeoutChanged();
 
@@ -462,6 +480,8 @@ private:
     QnResourcePropertyAdaptor<QString>* m_statisticsReportUpdateDelayAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* m_upnpPortMappingEnabledAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* m_localSystemIdAdaptor = nullptr;
+    QnResourcePropertyAdaptor<QString>* m_lastMergeMasterIdAdaptor = nullptr;
+    QnResourcePropertyAdaptor<QString>* m_lastMergeSlaveIdAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* m_statisticsReportServerApiAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* m_clientStatisticsSettingsUrlAdaptor = nullptr;
 
@@ -520,11 +540,6 @@ private:
     QnResourcePropertyAdaptor<bool>* m_cloudConnectUdpHolePunchingEnabledAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* m_cloudConnectRelayingEnabledAdaptor = nullptr;
 
-    QnResourcePropertyAdaptor<bool>* m_hanwhaDeleteProfilesOnInitIfNeeded = nullptr;
-    QnResourcePropertyAdaptor<bool>* m_showHanwhaAlternativePtzControlsOnTile = nullptr;
-    QnResourcePropertyAdaptor<int>* m_hanwhaChunkReaderResponseTimeoutSeconds = nullptr;
-    QnResourcePropertyAdaptor<int>* m_hanwhaChunkReaderMessageBodyTimeoutSeconds = nullptr;
-
     QnResourcePropertyAdaptor<bool>* m_edgeRecordingEnabledAdaptor = nullptr;
 
     QnResourcePropertyAdaptor<int>* m_maxRemoteArchiveSynchronizationThreads = nullptr;
@@ -532,6 +547,8 @@ private:
 
     QnResourcePropertyAdaptor<QByteArray>* m_targetUpdateInformationAdaptor = nullptr;
     QnResourcePropertyAdaptor<QByteArray>* m_installedUpdateInformationAdaptor = nullptr;
+    QnResourcePropertyAdaptor<QByteArray>* m_targetPersistentUpdateStorageAdaptor = nullptr;
+    QnResourcePropertyAdaptor<QByteArray>* m_installedPersistentUpdateStorageAdaptor = nullptr;
     QnResourcePropertyAdaptor<FileToPeerList>* m_downloaderPeersAdaptor = nullptr;
     QnResourcePropertyAdaptor<QnWatermarkSettings>* m_watermarkSettingsAdaptor = nullptr;
 
@@ -540,6 +557,8 @@ private:
     QnResourcePropertyAdaptor<QString>* m_defaultExportVideoCodecAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* m_lowQualityScreenVideoCodecAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* m_forceLiveCacheForPrimaryStreamAdaptor = nullptr;
+    QnResourcePropertyAdaptor<nx::vms::api::MetadataStorageChangePolicy>* m_metadataStorageChangePolicyAdaptor = nullptr;
+    QnResourcePropertyAdaptor<QString>* m_licenseServerUrlAdaptor = nullptr;
 
     AdaptorList m_allAdaptors;
 

@@ -43,10 +43,6 @@ const nx::network::http::server::Settings& Settings::http() const
     return m_http;
 }
 
-const nx::cloud::discovery::Settings& Settings::discovery() const
-{
-    return m_discovery;
-}
 
 const Api& Settings::api() const
 {
@@ -59,7 +55,6 @@ void Settings::loadSettings()
     m_syncSettings.load(settings());
     m_db.loadFromSettings(settings());
     m_http.load(settings());
-    m_discovery.load(settings());
     loadApi();
 
     if (m_http.endpoints.empty() && m_http.sslEndpoints.empty())

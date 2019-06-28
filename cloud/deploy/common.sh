@@ -66,6 +66,11 @@ function stage_cpp()
 	cp -rl $NX_VMS_DIR/build_environment/target/lib/$BUILD_CONFIGURATION/* $libdir
 }
 
+function stage_cmake_extra()
+{
+    true
+}
+
 function stage_cmake()
 {
     local cmakeBuildDirectory=$1
@@ -76,10 +81,14 @@ function stage_cmake()
     mkdir -p stage/$moduleName/bin/sqldrivers stage/$moduleName/lib stage/var/log
 
     cp ${QT_DIR}/plugins/sqldrivers/libqsqlmysql.so stage/${moduleName}/bin/sqldrivers/
+    cp ${QT_DIR}/plugins/sqldrivers/libqsqlite.so stage/${moduleName}/bin/sqldrivers/
 
     cp -l $cmakeBuildDirectory/bin/$moduleName stage/$moduleName/bin/$moduleName
     copy_deps stage/$moduleName/bin/$moduleName $cmakeBuildDirectory/lib stage/$moduleName/lib
     copy_deps stage/$moduleName/bin/sqldrivers/libqsqlmysql.so $cmakeBuildDirectory/lib stage/$moduleName/lib
+    copy_deps stage/$moduleName/bin/sqldrivers/libqsqlite.so $cmakeBuildDirectory/lib stage/$moduleName/lib
+
+    stage_cmake_extra
 }
 
 function pack()
@@ -88,7 +97,7 @@ function pack()
     local COMMON_BUILD_ARGS=(--build-arg VERSION="$VERSION" --build-arg REVISION="$REVISION" --build-arg BUILD_DATE="$BUILD_DATE" --build-arg BUILD_HOST="$BUILD_HOST" --build-arg BUILD_USER="$BUILD_USER")
     local ALL_ARGS=("${COMMON_BUILD_ARGS[@]}" "${BUILD_ARGS[@]}")
 
-    docker pull 009544449203.dkr.ecr.us-east-1.amazonaws.com/cloud/base:3.0.1
+    docker pull 009544449203.dkr.ecr.us-east-1.amazonaws.com/cloud/base:3.0.2
     docker build -t $MODULE:$VERSION "${ALL_ARGS[@]}" .
 }
 

@@ -21,7 +21,7 @@ public:
     std::vector<qint64> getFrameTimePoints();
 
 signals:
-    void debugInfoChanged(const QString& text);
+    void debugInfoChanged(const QString& richText);
 
 protected:
     virtual void enabledNotify() override;

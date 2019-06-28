@@ -1,9 +1,12 @@
 #include "simple_eip_client.h"
-#include <QtEndian>
 
-#include "eip_cip.h"
+#include <QtCore/QtEndian>
+#include <QtCore/QDataStream>
+
 #include <nx/network/socket_factory.h>
 #include <nx/utils/log/log.h>
+
+#include "eip_cip.h"
 
 SimpleEIPClient::SimpleEIPClient(QString addr) :
     m_hostAddress(addr),
@@ -31,7 +34,7 @@ bool SimpleEIPClient::sendAll(nx::network::AbstractStreamSocket* socket, QByteAr
 {
     if (!socket)
     {
-        NX_ASSERT(false, "sendAll(): socket is nullptr");
+        NX_ASSERT(false, lm("%1(): socket is nullptr").args(__func__));
         return false;
     }
 
@@ -44,10 +47,8 @@ bool SimpleEIPClient::sendAll(nx::network::AbstractStreamSocket* socket, QByteAr
         auto bytesSent = socket->send(rawData + totalBytesSent, dataSize);
         if (bytesSent <= 0)
         {
-            qDebug()
-                << "SimpleEIPCLient, error while sending data"
-                << SystemError::getLastOSErrorText()
-                << SystemError::getLastOSErrorCode();
+            NX_DEBUG(this, lm("Error while sending data: [%1] %2").args(
+                SystemError::getLastOSErrorCode(), SystemError::getLastOSErrorText()));
 
             return false;
         }
@@ -63,13 +64,13 @@ bool SimpleEIPClient::receiveMessage(nx::network::AbstractStreamSocket* socket, 
 {
     if (!socket)
     {
-        NX_ASSERT(false, "receiveMessage(): socket is nullptr");
+        NX_ASSERT(false, lm("%1(): socket is nullptr").args(__func__));
         return false;
     }
 
     if (!buffer)
     {
-        NX_ASSERT(false, "receiveMessage(): buffer is nullptr");
+        NX_ASSERT(false, lm("%1(): buffer is nullptr").args(__func__));
         return false;
     }
 
@@ -352,7 +353,7 @@ bool SimpleEIPClient::registerSessionUnsafe()
 
     if(encPacketHeader.status != EIPStatus::kEipStatusSuccess)
     {
-        qDebug() << "Sync Ethernet/IP client session registration error:" << encPacketHeader.status;
+        NX_DEBUG(this, lm("Sync Ethernet/IP client session registration error: ").args(encPacketHeader.status));
         return false;
     }
 

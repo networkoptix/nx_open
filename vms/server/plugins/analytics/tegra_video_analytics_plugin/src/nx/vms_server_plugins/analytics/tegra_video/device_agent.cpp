@@ -203,7 +203,7 @@ bool DeviceAgent::makeMetadataPacketsFromRectsPostprocNone(
         auto objectMetadata = makePtr<ObjectMetadata>();
         objectMetadata->setId(UuidHelper::randomUuid());
         objectMetadata->setTypeId(m_objectTypeId);
-        objectMetadata->setBoundingBox(IObjectMetadata::Rect(rect.x, rect.y, rect.w, rect.h));
+        objectMetadata->setBoundingBox(Rect(rect.x, rect.y, rect.w, rect.h));
 
         objectMetadataPacket->addItem(objectMetadata.get());
     }

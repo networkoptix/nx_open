@@ -84,7 +84,7 @@ void AnalyticsSdkEventModel::loadFromCameras(const QnVirtualCameraResourceList& 
                     groupDescriptor->name,
                     engineId,
                     groupDescriptor->id,
-                    false);
+                    true);
             }
 
             for (const auto& eventTypeId: eventTypeIds)

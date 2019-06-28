@@ -16,11 +16,9 @@ void detail::ServerQueryProcessor::setAuditData(
 ErrorCode detail::ServerQueryProcessor::removeHelper(
     const QnUuid& id,
     ApiCommand::Value command,
-    PostProcessList* const transactionsToSend,
-    TransactionType::Value transactionType)
+    PostProcessList* const transactionsToSend)
 {
     QnTransaction<nx::vms::api::IdData> removeTran = createTransaction(command, nx::vms::api::IdData(id));
-    removeTran.transactionType = transactionType;
     ErrorCode errorCode = processUpdateSync(removeTran, transactionsToSend, 0);
     if (errorCode != ErrorCode::ok)
         return errorCode;
@@ -60,19 +58,16 @@ ErrorCode detail::ServerQueryProcessor::removeUserAccessRightsHelper(
 
 ErrorCode detail::ServerQueryProcessor::removeResourceStatusHelper(
     const QnUuid& id,
-    PostProcessList* const transactionsToSend,
-    TransactionType::Value transactionType)
+    PostProcessList* const transactionsToSend)
 {
-    NX_VERBOSE(this, lit("%1 Processing remove resourse %2 status transaction. Transaction type = %3")
+    NX_VERBOSE(this, lit("%1 Processing remove resourse %2 status transaction.")
            .arg(Q_FUNC_INFO)
-           .arg(id.toString())
-           .arg(transactionType));
+           .arg(id.toString()));
 
     return removeHelper(
         id,
         ApiCommand::removeResourceStatus,
-        transactionsToSend,
-        transactionType);
+        transactionsToSend);
 }
 
 detail::ServerQueryProcessor ServerQueryProcessorAccess::getAccess(
@@ -83,14 +78,13 @@ detail::ServerQueryProcessor ServerQueryProcessorAccess::getAccess(
 
 namespace detail {
 
-void TransactionExecutor::stop()
+void TransactionExecutor::pleaseStop()
 {
+    QnLongRunnable::pleaseStop();
     {
         QnMutexLocker lock(&m_mutex);
-        pleaseStop();
         m_waitCondition.wakeOne();
     }
-    QnLongRunnable::stop();
 }
 
 void TransactionExecutor::enqueData(Command command)
@@ -116,6 +110,10 @@ void TransactionExecutor::run()
                 m_waitCondition.wait(&m_mutex);
             std::swap(m_commandQueue, queue);
         }
+
+        if (needToStop())
+            return;
+
         QElapsedTimer timer;
         timer.restart();
 

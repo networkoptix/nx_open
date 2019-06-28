@@ -233,10 +233,6 @@ to view more bookmarks</source>
       <translation>Videowand-Ansicht speichern</translation>
     </message>
     <message>
-      <source>Drop Resources</source>
-      <translation>Ressourcen ablegen</translation>
-    </message>
-    <message>
       <source>Start Screen Recording</source>
       <translation>Bildschirmaufnahme starten</translation>
     </message>
@@ -2888,10 +2884,6 @@ to %1</source>
       <source>44.1 kHz and 48 kHz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
       <translation>44,1 kHz und 48 kHz Audioformate werden vom Tonaufnahmegerät nicht unterstützt! Bitte wählen Sie ein anderes Audiogerät oder &quot;Keine&quot; in den Aufnahmeeinstellungen.</translation>
     </message>
-    <message>
-      <source>Configured codec: %1 not found, h263p will used</source>
-      <translation>Konfigurierter Codec: %1 nicht gefunden, h263p wird verwendet</translation>
-    </message>
   </context>
   <context>
     <name>QnDisconnectFromCloudDialogPrivate</name>
@@ -3196,6 +3188,17 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnGLCheckerInstrument</name>
+    <message>
+      <source>Video card drivers are outdated or not installed</source>
+      <translation>Grafikkartentreiber sind veraltet oder nicht installiert</translation>
+    </message>
+    <message>
+      <source>%1 may not work properly.</source>
+      <translation>%1 funktioniert nicht richtig.</translation>
+    </message>
+  </context>
+  <context>
     <name>QnGeneralPreferencesWidget</name>
     <message>
       <source>Select folder...</source>
@@ -3204,6 +3207,14 @@ to %1</source>
     <message>
       <source>Folder already added</source>
       <translation>Ordner bereits hinzugefügt</translation>
+    </message>
+    <message>
+      <source>None</source>
+      <translation>Keine</translation>
+    </message>
+    <message>
+      <source>Auto (%1)</source>
+      <translation>Auto (%1)</translation>
     </message>
   </context>
   <context>
@@ -3271,17 +3282,6 @@ to %1</source>
     <message>
       <source>Creates a backup of System configuration that can be restored in case of failure.</source>
       <translation>Erstellt ein Backup der Systemkonfiguration, das im Fehlerfall wiederhergestellt werden kann.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnGlHardwareChecker</name>
-    <message>
-      <source>Video card drivers are outdated or not installed</source>
-      <translation>Grafikkartentreiber sind veraltet oder nicht installiert</translation>
-    </message>
-    <message>
-      <source>%1 may not work properly.</source>
-      <translation>%1 funktioniert nicht richtig.</translation>
     </message>
   </context>
   <context>
@@ -3578,8 +3578,8 @@ to %1</source>
       </translation>
     </message>
     <message>
-      <source>Qty</source>
-      <translation>Stückzahl</translation>
+      <source>Channels</source>
+      <translation>Kanäle</translation>
     </message>
   </context>
   <context>
@@ -5100,6 +5100,10 @@ to %1</source>
       <source>Server Web Page</source>
       <translation>Serverwebseite</translation>
     </message>
+    <message>
+      <source>Plugins</source>
+      <translation>Plugins</translation>
+    </message>
   </context>
   <context>
     <name>QnServerSettingsWidget</name>
@@ -5570,16 +5574,30 @@ to %1</source>
       <translation>Sicherung abgeschlossen</translation>
     </message>
     <message>
-      <source>Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</source>
-      <translation>Aufnahme auf deaktivierten Speicher wird angehalten. Veraltete Aufnahmen werden weiterhin gelöscht.</translation>
-    </message>
-    <message>
-      <source>Recording was enabled on the USB storage</source>
-      <translation>Die Aufnahme wurde auf dem USB-Speicher aktiviert</translation>
-    </message>
-    <message>
       <source>Reindexing can fix problems with archive or backup if they have been lost or damaged, or if some hardware has been replaced.</source>
       <translation>Eine Neuindizierung kann Probleme mit dem Archiv oder der Sicherung beheben, wenn sie verloren gegangen sind, beschädigt wurden oder wenn eine Hardware ersetzt wurde.</translation>
+    </message>
+    <message>
+      <source>What to do with current analytics data?</source>
+      <translation>Was tun mit aktuellen Analysedaten?</translation>
+    </message>
+    <message>
+      <source>Current analytics data will not be automatically moved to another location and will become unaccessible. You can keep it and manually move later, or delete permanently.
+If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
+      <translation>Aktuelle Analysedaten werden nicht automatisch an einen anderen Speicherort verschoben und sind nicht mehr verfügbar. Sie können es behalten und später manuell verschieben oder dauerhaft löschen.
+Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden Sie sich an den Support, bevor Sie fortfahren.</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>Löschen</translation>
+    </message>
+    <message>
+      <source>Keep</source>
+      <translation>Behalten</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>Abbrechen</translation>
     </message>
   </context>
   <context>
@@ -5627,6 +5645,14 @@ to %1</source>
     <message>
       <source>Too small and system partitions are reserved and not used for writing if there is enough other storage space available.</source>
       <translation>Zu kleine und Systempartitionen sind reserviert und werden nicht zum Schreiben verwendet, wenn genügend Speicherplatz vorhanden ist.</translation>
+    </message>
+    <message>
+      <source>Use to store analytics data</source>
+      <translation>Verwendung zur Speicherung von Analysedaten</translation>
+    </message>
+    <message>
+      <source>Stores analytics data</source>
+      <translation>Speichert Analysedaten</translation>
     </message>
   </context>
   <context>
@@ -5714,8 +5740,8 @@ to %1</source>
       <translation>Benutzer</translation>
     </message>
     <message>
-      <source>Analytics</source>
-      <translation>Analytik</translation>
+      <source>Plugins</source>
+      <translation type="unfinished">Plugins</translation>
     </message>
   </context>
   <context>
@@ -5872,19 +5898,11 @@ to %1</source>
     </message>
     <message>
       <source>Error occurred during remote archive synchronization</source>
-      <translation type="unfinished">Error occurred during remote archive synchronization</translation>
+      <translation>Bei der Remote-Archivsynchronisation ist ein Fehler aufgetreten</translation>
     </message>
   </context>
   <context>
     <name>QnSystemSettingsWidget</name>
-    <message>
-      <source>Enable devices and servers auto discovery</source>
-      <translation>Automatische Suche nach Geräten und Servern aktivieren</translation>
-    </message>
-    <message>
-      <source>Enable cameras and servers auto discovery</source>
-      <translation>Automatische Suche nach Kameras und Servern aktivieren</translation>
-    </message>
     <message>
       <source>Allow System to optimize device settings</source>
       <translation>Erlauben Sie dem System die Geräteeinstellungen zu optimieren</translation>
@@ -5900,6 +5918,22 @@ to %1</source>
     <message>
       <source>Does not include any personal information and is completely anonymous.</source>
       <translation>Enthält keine persönlichen Daten und ist völlig anonym.</translation>
+    </message>
+    <message>
+      <source>Failover server measures may still request camera status updates regardless of this setting.</source>
+      <translation>Failover-Servermaßnahmen können unabhängig von dieser Einstellung weiterhin Kamerastatusupdates anfordern.</translation>
+    </message>
+    <message>
+      <source>Enable devices and servers autodiscovery and automated device status check</source>
+      <translation>Aktivieren Sie die automatische Erkennung von Geräten und Servern und die automatische Überprüfung des Gerätestatus</translation>
+    </message>
+    <message>
+      <source>Enable cameras and servers autodiscovery and automated camera status check</source>
+      <translation>Aktivieren Sie die automatische Erkennung von Kameras und Servern und die automatische Überprüfung des Kamerastatus</translation>
+    </message>
+    <message>
+      <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
+      <translation>Wenn aktiviert, erkennt das System kontinuierlich neue Kameras und Server und sendet Erkennungsanforderungen an die Kameras zur Statusaktualisierung.</translation>
     </message>
   </context>
   <context>
@@ -7080,6 +7114,17 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>SessionExpiredDialog</name>
+    <message>
+      <source>Your session has expired</source>
+      <translation>Ihre Sitzung ist abgelaufen</translation>
+    </message>
+    <message>
+      <source>Session duration limit can be changed by the system administrators</source>
+      <translation>Die Begrenzung der Sitzungsdauer kann von den Systemadministratoren geändert werden</translation>
+    </message>
+  </context>
+  <context>
     <name>StreamQualityStrings</name>
     <message>
       <source>Lowest</source>
@@ -7283,6 +7328,14 @@ to %1</source>
       <source>Show Only with &quot;Objects&quot; Tab</source>
       <translation>Nur mit &quot;Objecte&quot;-Tab anzeigen</translation>
     </message>
+    <message>
+      <source>Show</source>
+      <translation>Anzeigen</translation>
+    </message>
+    <message>
+      <source>Do Not Show</source>
+      <translation>Nicht anzeigen</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::AnalyticsSearchListModel::Private</name>
@@ -7433,10 +7486,6 @@ to %1</source>
       <translation>Nativ</translation>
     </message>
     <message>
-      <source>Server will not change any cameras settings, it will receive and use camera stream as-is. </source>
-      <translation>Der Server ändert keine Kameraeinstellungen, er empfängt und verwendet den Kamerastream wie er ist. </translation>
-    </message>
-    <message>
       <source>Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</source>
       <translation>Hilft, Probleme mit der Bildqualität bei einigen Kameras zu beheben; bei anderen wird die Bitrate deutlich erhöht.</translation>
     </message>
@@ -7460,6 +7509,14 @@ to %1</source>
         <numerusform>Diese ID wird bereits für folgende %n Kamera verwendet:</numerusform>
         <numerusform>Diese ID wird bereits für folgende %n Kameras verwendet:</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Server will not change any cameras settings, it will receive and use camera stream as-is.</source>
+      <translation>Der Server ändert keine Kameraeinstellungen, er empfängt und verwendet den Kamerastream wie er ist.</translation>
+    </message>
+    <message>
+      <source>Multicast</source>
+      <translation>Multicast</translation>
     </message>
   </context>
   <context>
@@ -7602,10 +7659,6 @@ to %1</source>
       <translation>Webseite:</translation>
     </message>
     <message>
-      <source>Analytics</source>
-      <translation>Analytik</translation>
-    </message>
-    <message>
       <source>Expert</source>
       <translation>Experte</translation>
     </message>
@@ -7657,6 +7710,10 @@ to %1</source>
     <message>
       <source>I/O Modules Settings</source>
       <translation>I/O-Moduleinstellungen</translation>
+    </message>
+    <message>
+      <source>Plugins</source>
+      <translation type="unfinished">Plugins</translation>
     </message>
   </context>
   <context>
@@ -7732,11 +7789,11 @@ to %1</source>
     </message>
     <message>
       <source>Not enough space on disk to install the client update.</source>
-      <translation type="unfinished">Not enough space on disk to install the client update.</translation>
+      <translation>Nicht genügend Speicherplatz auf der Festplatte, um das Clientupdate zu installieren.</translation>
     </message>
     <message>
       <source>Installation package has been lost.</source>
-      <translation type="unfinished">Installation package has been lost.</translation>
+      <translation>Das Installationspaket ist verloren gegangen.</translation>
     </message>
   </context>
   <context>
@@ -7899,20 +7956,12 @@ to %1</source>
   <context>
     <name>nx::vms::client::desktop::EulaDialog</name>
     <message>
-      <source>I Agree</source>
-      <translation type="unfinished">I Agree</translation>
-    </message>
-    <message>
-      <source>I Do Not Agree</source>
-      <translation type="unfinished">I Do Not Agree</translation>
-    </message>
-    <message>
       <source>Please review and agree to the %1 in order to proceed</source>
-      <translation type="unfinished">Please review and agree to the %1 in order to proceed</translation>
+      <translation>Bitte überprüfen und stimmen Sie der %1 zu, um fortzufahren</translation>
     </message>
     <message>
       <source>To use the software you must agree with the end user license agreement</source>
-      <translation type="unfinished">To use the software you must agree with the end user license agreement</translation>
+      <translation>Um die Software nutzen zu können, müssen Sie der Endbenutzer-Lizenzvereinbarung zustimmen</translation>
     </message>
   </context>
   <context>
@@ -7998,7 +8047,7 @@ to %1</source>
     </message>
     <message>
       <source>No events occurred</source>
-      <translation type="unfinished">No events occurred</translation>
+      <translation>Es sind keine Ereignisse aufgetreten</translation>
     </message>
   </context>
   <context>
@@ -8499,10 +8548,6 @@ to %1</source>
       <translation>Einige Server sind offline und werden nicht aktualisiert. Überspringen?</translation>
     </message>
     <message>
-      <source>Please make sure there is enough free storage space and network connection is stable.</source>
-      <translation>Bitte stellen Sie sicher, dass genügend freier Speicherplatz vorhanden ist und die Netzwerkverbindung stabil ist.</translation>
-    </message>
-    <message>
       <source>If the problem persists, please contact Customer Support.</source>
       <translation>Wenn das Problem weiterhin besteht, kontaktieren Sie den Kundensupport.</translation>
     </message>
@@ -8515,20 +8560,8 @@ to %1</source>
       <translation>Update abbrechen</translation>
     </message>
     <message>
-      <source>Failed to download update packages to some servers</source>
-      <translation>Aktualisierungspakete konnten nicht auf einige Server heruntergeladen werden</translation>
-    </message>
-    <message>
-      <source>Please make sure they have enough free storage space and stable network connection.</source>
-      <translation>Bitte stellen Sie sicher, dass sie genügend freien Speicherplatz und eine stabile Netzwerkverbindung haben.</translation>
-    </message>
-    <message>
       <source>Update completed</source>
       <translation>Update abgeschlossen</translation>
-    </message>
-    <message>
-      <source>Update completed, but some servers have failed an update</source>
-      <translation>Update abgeschlossen, aber einige Server haben ein Update nicht bestanden</translation>
     </message>
     <message>
       <source>Nx Witness Client will be restarted to the updated version.</source>
@@ -8539,16 +8572,8 @@ to %1</source>
       <translation>Ok</translation>
     </message>
     <message>
-      <source>Failed to install updates to servers:</source>
-      <translation>Updates für Server konnten nicht installiert werden:</translation>
-    </message>
-    <message>
       <source>Downloading updates...</source>
       <translation>Herunterladen von Updates...</translation>
-    </message>
-    <message>
-      <source>Pushing updates...</source>
-      <translation>Updates vorantreiben...</translation>
     </message>
     <message>
       <source>Upload</source>
@@ -8667,11 +8692,55 @@ to %1</source>
     </message>
     <message>
       <source>Some servers haven&apos;t completed update process. Finish it anyway?</source>
-      <translation type="unfinished">Some servers haven&apos;t completed update process. Finish it anyway?</translation>
+      <translation>Einige Server haben den Updateprozess nicht abgeschlossen. Trotzdem beenden?</translation>
     </message>
     <message>
       <source>Cancel update and delete all downloaded data?</source>
-      <translation type="unfinished">Cancel update and delete all downloaded data?</translation>
+      <translation>Update abbrechen und alle heruntergeladenen Daten löschen?</translation>
+    </message>
+    <message>
+      <source>There was an error while installing updates:</source>
+      <translation>Beim Installieren der Updates ist ein Fehler aufgetreten:</translation>
+    </message>
+    <message>
+      <source>Some servers have gone offline. Please wait until they become online to continue.</source>
+      <translation>Einige Server sind offline gegangen. Bitte warten Sie, bis sie online sind, um fortzufahren.</translation>
+    </message>
+    <message>
+      <source>Update completed, but some components have failed an update</source>
+      <translation>Update abgeschlossen, aber einige Komponenten haben ein Update nicht bestanden</translation>
+    </message>
+    <message>
+      <source>Please update %1 manually using an installation package.</source>
+      <translation>Updaten Sie %1 bitte manuell mit einem Installationspaket.</translation>
+    </message>
+    <message>
+      <source>%1 will be restarted to the updated version.</source>
+      <translation>%1 wird auf die aktualisierte Version neu gestartet werden.</translation>
+    </message>
+    <message>
+      <source>Failed to download update packages to some components</source>
+      <translation>Aktualisierungspakete für einige Komponenten konnten nicht heruntergeladen werden</translation>
+    </message>
+    <message>
+      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
+      <translation>Betriebssystemversionen einiger Komponenten werden nicht mehr unterstützt. Bitte entfernen Sie sie aus dem System oder aktualisieren Sie ihr Betriebssystem auf eine unterstützte Version.</translation>
+    </message>
+    <message>
+      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
+      <translation>Die Betriebssystemversion des Clients wird nicht mehr unterstützt. Bitte aktualisieren Sie das Betriebssystem auf eine unterstützte Version.</translation>
+    </message>
+    <message>
+      <source>Failed to start update</source>
+      <translation>Update konnte nicht gestartet werden</translation>
+    </message>
+    <message>
+      <source>Starting update to ...</source>
+      <translation>Update wird gestartet auf ...</translation>
+    </message>
+    <message>
+      <source>Some servers have no package available</source>
+      <translation>Einige Server haben kein Paket zur Verfügung</translation>
     </message>
   </context>
   <context>
@@ -8698,6 +8767,26 @@ to %1</source>
       <source>Acknowledge</source>
       <translation>Bestätigen</translation>
     </message>
+    <message>
+      <source>Generic Event</source>
+      <translation>Generisches Ereignis</translation>
+    </message>
+    <message>
+      <source>Device was disconnected</source>
+      <translation>Gerät wurde getrennt</translation>
+    </message>
+    <message>
+      <source>Camera was disconnected</source>
+      <translation>Kamera wurde getrennt</translation>
+    </message>
+    <message>
+      <source>I/O Module was disconnected</source>
+      <translation>I/O-Modul wurde getrennt</translation>
+    </message>
+    <message>
+      <source>Unknown Plugin Diagnostic Event</source>
+      <translation>Unbekanntes Plugin-Diagnoseereignis</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::NotificationListWidget::Private</name>
@@ -8717,10 +8806,6 @@ to %1</source>
       <translation>Keiner der ausgewählten Benutzer hat Zugriff auf das ausgewählte Layout. Aktion wird nicht funktionieren.</translation>
     </message>
     <message>
-      <source>Local layouts can only be shown to their owners. </source>
-      <translation>Lokale Layouts können nur ihren Besitzern angezeigt werden. </translation>
-    </message>
-    <message>
       <source>Select layout...</source>
       <translation>Layout auswählen...</translation>
     </message>
@@ -8735,6 +8820,101 @@ to %1</source>
     <message>
       <source>None of selected user roles contain users. Action will not work.</source>
       <translation>Keine der ausgewählten Benutzerrollen enthält Benutzer. Aktion wird nicht funktionieren.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::PeerStateTracker</name>
+    <message>
+      <source>The server is taking too long to respond</source>
+      <translation>Der Server braucht zu lange, um zu antworten</translation>
+    </message>
+    <message>
+      <source>No update task</source>
+      <translation>Keine Aktualisierungsaufgabe</translation>
+    </message>
+    <message>
+      <source>Ready to download update</source>
+      <translation>Bereit zum Herunterladen des Updates</translation>
+    </message>
+    <message>
+      <source>Downloading update</source>
+      <translation>Update wird heruntergeladen</translation>
+    </message>
+    <message>
+      <source>Ready to restart to the new version</source>
+      <translation>Bereit für den Neustart auf die neue Version</translation>
+    </message>
+    <message>
+      <source>Installing update</source>
+      <translation>Update wird installiert</translation>
+    </message>
+    <message>
+      <source>Installed</source>
+      <translation>Installiert</translation>
+    </message>
+    <message>
+      <source>Failed to download update</source>
+      <translation>Das Update konnte nicht heruntergeladen werden</translation>
+    </message>
+    <message>
+      <source>Failed to install update</source>
+      <translation>Das Update konnte nicht installiert werden</translation>
+    </message>
+    <message>
+      <source>Waiting for peer data</source>
+      <translation>Warten auf Peer-Daten</translation>
+    </message>
+    <message>
+      <source>There is not enough space to download update files.</source>
+      <translation>Es ist nicht genügend Speicherplatz zum Herunterladen der Aktualisierungsdateien vorhanden.</translation>
+    </message>
+    <message>
+      <source>There is not enough space to extract update files.</source>
+      <translation>Es ist nicht genügend Speicherplatz vorhanden, um Aktualisierungsdateien zu extrahieren.</translation>
+    </message>
+    <message>
+      <source>Failed to download update packages.</source>
+      <translation>Aktualisierungspakete konnten nicht heruntergeladen werden.</translation>
+    </message>
+    <message>
+      <source>Update contents are invalid.</source>
+      <translation>Aktualisierungsinhalte sind ungültig.</translation>
+    </message>
+    <message>
+      <source>Update archive is corrupted.</source>
+      <translation>Updatearchiv ist beschädigt.</translation>
+    </message>
+    <message>
+      <source>Update files cannot be extracted.</source>
+      <translation>Updatedateien können nicht extrahiert werden.</translation>
+    </message>
+    <message>
+      <source>Internal downloader error.</source>
+      <translation>Interner Downloadfehler.</translation>
+    </message>
+    <message>
+      <source>Iternal server error.</source>
+      <translation>Interner Serverfehler.</translation>
+    </message>
+    <message>
+      <source>Internal client error.</source>
+      <translation>Interner Clientfehler.</translation>
+    </message>
+    <message>
+      <source>Unknown error.</source>
+      <translation>Unbekannter Fehler.</translation>
+    </message>
+    <message>
+      <source>Unexpected error code.</source>
+      <translation>Unerwarteter Fehlercode.</translation>
+    </message>
+    <message>
+      <source>Ready to install update</source>
+      <translation>Bereit zum Installieren des Updates</translation>
+    </message>
+    <message>
+      <source>Update package is not found.</source>
+      <translation>Updatepaket wurde nicht gefunden.</translation>
     </message>
   </context>
   <context>
@@ -8879,16 +9059,79 @@ to %1</source>
       <translation>Verfolgt und protokolliert alle Benutzeraktionen.</translation>
     </message>
     <message>
-      <source>User will be automatically logged out after this period of time.</source>
-      <translation>Der Benutzer wird nach dieser Zeit automatisch abgemeldet.</translation>
-    </message>
-    <message>
       <source>minutes</source>
       <translation>minuten</translation>
     </message>
     <message>
       <source>hours</source>
       <translation>stunden</translation>
+    </message>
+    <message>
+      <source>Users will be automatically logged out if their session exceeds the specified duration.</source>
+      <translation>Benutzer werden automatisch abgemeldet, wenn ihre Sitzung die angegebene Dauer überschreitet.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ServerSettingsDialogStore</name>
+    <message>
+      <source>Library</source>
+      <translation>Bibliothek</translation>
+    </message>
+    <message>
+      <source>Version</source>
+      <translation>Version</translation>
+    </message>
+    <message>
+      <source>Vendor</source>
+      <translation>Hersteller</translation>
+    </message>
+    <message>
+      <source>no error</source>
+      <translation>kein Fehler</translation>
+    </message>
+    <message>
+      <source>library file cannot be loaded</source>
+      <translation>Bibliotheksdatei kann nicht geladen werden</translation>
+    </message>
+    <message>
+      <source>invalid or incompatible plugin library</source>
+      <translation>ungültige oder inkompatible Plugin-Bibliothek</translation>
+    </message>
+    <message>
+      <source>plugin library failed to initialize</source>
+      <translation>Plugin-Bibliothek konnte nicht initialisiert werden</translation>
+    </message>
+    <message>
+      <source>plugin returned bad manifest</source>
+      <translation>Das Plugin hat ein schlechtes Manifest zurückgegeben</translation>
+    </message>
+    <message>
+      <source>plugin API version is no longer supported</source>
+      <translation>Plugin-API-Version wird nicht mehr unterstützt</translation>
+    </message>
+    <message>
+      <source>unknown error</source>
+      <translation>unbekannter Fehler</translation>
+    </message>
+    <message>
+      <source>Not loaded</source>
+      <translation>Nicht geladen</translation>
+    </message>
+    <message>
+      <source>Loaded</source>
+      <translation>Geladen</translation>
+    </message>
+    <message>
+      <source>plugin is in the black list</source>
+      <translation>Plugin ist auf der Blacklist</translation>
+    </message>
+    <message>
+      <source>Status</source>
+      <translation>Status</translation>
+    </message>
+    <message>
+      <source>plugin is optional and is not in the white list</source>
+      <translation>Plugin ist optional und nicht in der Whitelist</translation>
     </message>
   </context>
   <context>
@@ -8909,13 +9152,13 @@ to %1</source>
       <source>Downloaded</source>
       <translation>Heruntergeladen</translation>
     </message>
+    <message>
+      <source>Waiting for server to respond...</source>
+      <translation>Warte auf Antwort des Servers...</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerUpdatesModel</name>
-    <message>
-      <source>Current Version</source>
-      <translation>Aktuelle Version</translation>
-    </message>
     <message>
       <source>Status</source>
       <translation>Status</translation>
@@ -8935,6 +9178,10 @@ to %1</source>
     <message>
       <source>Component</source>
       <translation>Komponente</translation>
+    </message>
+    <message>
+      <source>Installed Version</source>
+      <translation>Installierte Version</translation>
     </message>
   </context>
   <context>
@@ -9234,6 +9481,26 @@ to %1</source>
       <source>Starting export...</source>
       <translation>Export starten...</translation>
     </message>
+    <message>
+      <source>Saving layout</source>
+      <translation>Layout speichern</translation>
+    </message>
+    <message>
+      <source>Stop Saving</source>
+      <translation>Speichern stoppen</translation>
+    </message>
+    <message>
+      <source>Saving failed</source>
+      <translation>Speichern fehlgeschlagen</translation>
+    </message>
+    <message>
+      <source>Starting saving...</source>
+      <translation>Speichern beginnt...</translation>
+    </message>
+    <message>
+      <source>We are preparing files for the export process. Please wait for a few seconds.</source>
+      <translation>Wir bereiten Dateien für den Export vor. Bitte warten Sie einige Sekunden.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::WorkbenchUpdateWatcher</name>
@@ -9269,7 +9536,7 @@ to %1</source>
     <name>nx::vms::client::desktop::integrations::entropix::ReconstructResolutionIntegration</name>
     <message>
       <source>Reconstruct Resolution</source>
-      <translation type="unfinished">Reconstruct Resolution</translation>
+      <translation>Auflösung rekonstruieren</translation>
     </message>
   </context>
   <context>
@@ -9623,6 +9890,25 @@ to %1</source>
     <message>
       <source>This build is for testing purposes only.</source>
       <translation>Dieser Build dient nur zu Testzwecken.</translation>
+    </message>
+    <message>
+      <source>Open Server Settings</source>
+      <translation>Öffnen Sie die Servereinstellungen</translation>
+    </message>
+    <message>
+      <source>OK</source>
+      <translation>Ok</translation>
+    </message>
+    <message>
+      <source>Confirm storage location to store analytics data on &apos;%1&apos;</source>
+      <translation>Bestätigen Sie den Speicherort, um die Analysedaten auf &apos;%1&apos; zu speichern</translation>
+    </message>
+    <message>
+      <source>Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
+Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
+By default analytics data will be stored in mediaserver&apos;s installation directory.
+You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</source>
+      <translation>Die Analysedatenbank sollte auf einem lokalen Speicher gespeichert werden und kann bis zu hundert Gigabyte belegen. Sobald der Standort für die Speicherung von Analysedaten ausgewählt wurde, können diese nicht mehr so einfach geändert werden, ohne dass die Daten verloren gehen. Wir empfehlen, den Standort sorgfältig zu wählen und keine Systempartition zu verwenden, um schwere Systemfehler zu vermeiden. Standardmäßig werden die Analysedaten im Installationsverzeichnis des Mediaservers gespeichert. Sie können den Speicherort auf der Registerkarte &quot;Speichermanagement&quot; im Dialogfeld Servereinstellungen ändern.</translation>
     </message>
   </context>
   <context>

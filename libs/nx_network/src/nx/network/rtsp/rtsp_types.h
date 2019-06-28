@@ -66,7 +66,7 @@ public:
 */
 bool NX_NETWORK_API parseRangeHeader(
     const nx::network::http::StringType& rangeStr,
-    qint64* startTime, qint64* endTime);
+    int64_t* startTime, int64_t* endTime);
 
 } // namespace rtsp
 } // namespace network

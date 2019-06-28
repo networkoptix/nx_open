@@ -7,7 +7,7 @@
 #include <nx/p2p/transport/p2p_websocket_transport.h>
 #include <nx/vms/api/data/peer_data.h>
 
-#include "../abstract_transaction_transport_connector.h"
+#include "../abstract_command_transport_connector.h"
 
 namespace nx::clusterdb::engine {
 
@@ -29,9 +29,9 @@ public:
         const ProtocolVersionRange& protocolVersionRange,
         CommandLog* commandLog,
         const OutgoingCommandFilter& filter,
-        const nx::utils::Url& remoteNodeUrl,
-        const std::string& systemId,
-        const std::string& nodeId);
+        const std::string& clusterId,
+        const std::string& nodeId,
+        const nx::utils::Url& remoteNodeUrl);
 
     virtual void bindToAioThread(network::aio::AbstractAioThread* aioThread) override;
 
@@ -45,7 +45,8 @@ private:
     CommandLog* m_commandLog = nullptr;
     const OutgoingCommandFilter& m_commandFilter;
     nx::utils::Url m_remoteNodeUrl;
-    const std::string m_systemId;
+    const std::string m_clusterId;
+    int m_stage2TryCount = 0;
 
     std::unique_ptr<network::http::AsyncClient> m_connectionUpgradeClient;
     std::unique_ptr<nx::p2p::P2PWebsocketTransport> m_commandPipeline;
@@ -55,6 +56,8 @@ private:
     nx::vms::api::PeerDataEx m_remotePeerData;
 
     void handleUpgradeCompletion();
+    void upgradeHttpConnectionToCommandTransportConnection();
+    void sendConnectStage2Request();
     void handlePipelineStart(SystemError::ErrorCode resultCode);
 };
 
