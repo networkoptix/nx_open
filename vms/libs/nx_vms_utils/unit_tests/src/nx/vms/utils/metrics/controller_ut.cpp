@@ -318,6 +318,8 @@ TEST_F(MetricsControllerTest, Values)
         controller.values(/*applyRules*/ false, /*timeLine*/ std::chrono::milliseconds::zero()),
         /*isUpdated*/ false);
 
+    nx::utils::test::ScopedTimeShift timeShift(nx::utils::test::ClockType::steady);
+    timeShift.applyRelativeShift(std::chrono::minutes(10));
     updateSomeValues();
 
     expectUpdatedValues(controller.values());

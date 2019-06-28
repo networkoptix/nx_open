@@ -16,11 +16,19 @@ class AbstractResourceProvider
 public:
     virtual ~AbstractResourceProvider() = default;
 
+    /** Returns manifest for this kind of resource. */
     virtual const api::metrics::ResourceManifest& manifest() const = 0;
+
+    /** Starts monitoring for new resources. dataBaseAccess should be used to store their values. */
     virtual void startMonitoring(DataBase::Access dataBaseAccess) = 0;
+
+    /** Resource descriptions for resources, which are currently discovered. */
     virtual std::vector<ResourceDescription> resources() const = 0;
 };
 
+/**
+ * AbstractResourceProvider implementation helper.
+ */
 template<typename Resource>
 class ResourceProvider: public AbstractResourceProvider
 {
