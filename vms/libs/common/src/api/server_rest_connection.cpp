@@ -4,9 +4,11 @@
 
 #include <QtCore/QElapsedTimer>
 
+#include <api/model/detach_from_cloud_data.h>
 #include <api/model/password_data.h>
 #include <api/model/cloud_credentials_data.h>
 #include <api/model/update_information_reply.h>
+
 #include <api/app_server_connection.h>
 #include <api/helpers/empty_request_data.h>
 #include <api/helpers/chunks_request_data.h>
@@ -14,6 +16,7 @@
 #include <api/helpers/send_statistics_request_data.h>
 #include <api/helpers/event_log_request_data.h>
 #include <api/helpers/event_log_multiserver_request_data.h>
+
 #include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
@@ -30,13 +33,14 @@
 #include <nx/utils/random.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/api/data_fwd.h>
+#include <nx/vms/api/data/email_settings_data.h>
+#include <nx/vms/api/data/peer_data.h>
 #include <nx/vms/event/rule_manager.h>
 #include <nx/vms/event/rule.h>
-#include <api/model/detach_from_cloud_data.h>
-
+#include <nx_ec/data/api_conversion_functions.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 #include <nx/vms/common/resource/analytics_plugin_resource.h>
-#include <nx/vms/api/data/peer_data.h>
+
 #include <common/static_common_module.h>
 
 using namespace nx;
@@ -1097,6 +1101,18 @@ Handle ServerConnection::postUbJsonResult(
 Handle ServerConnection::getPluginInformation(GetCallback callback, QThread* targetThread)
 {
     return executeGet("/api/pluginInfo", {}, callback, targetThread);
+}
+
+Handle ServerConnection::testEmailSettingsAsync(
+      const QnEmailSettings& settings,
+      Result<QnTestEmailSettingsReply>::type&& callback,
+      QThread* targetThread)
+{
+    nx::vms::api::EmailSettingsData data;
+    ec2::fromResourceToApi(settings, data);
+    const auto contentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
+    auto body = QJson::serialized(data);
+    return executePost("/api/testEmailSettings", {}, contentType, body, callback, targetThread);
 }
 
 Handle ServerConnection::debug(

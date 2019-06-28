@@ -119,7 +119,6 @@ public:
         qint64 bitrateAnalyzePeriodMs, QObject* target, const char* slot);
     int getAuditLogAsync(qint64 startTimeMs, qint64 endTimeMs, QObject* target, const char* slot);
 
-    int testEmailSettingsAsync(const QnEmailSettings& settings, QObject* target, const char* slot);
     int testLdapSettingsAsync(const QnLdapSettings& settings, QObject* target, const char* slot);
     int recordedTimePeriods(const QnChunksRequestData& request, QObject* target, const char* slot);
 

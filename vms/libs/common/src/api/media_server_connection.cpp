@@ -40,7 +40,6 @@
 
 #include "model/camera_list_reply.h"
 #include "model/configure_reply.h"
-#include "model/upload_update_reply.h"
 #include <nx/network/http/custom_headers.h>
 #include "model/recording_stats_reply.h"
 #include <api/model/getnonce_reply.h>
@@ -339,19 +338,6 @@ int QnMediaServerConnection::getSystemIdAsync(QObject* target, const char* slot)
 {
     return sendAsyncGetRequestLogged(GetSystemIdObject,
         QnRequestParamList(), QN_STRINGIZE_TYPE(QString), target, slot);
-}
-
-int QnMediaServerConnection::testEmailSettingsAsync(
-    const QnEmailSettings& settings, QObject* target, const char* slot)
-{
-    nx::network::http::HttpHeaders headers;
-    headers.emplace(nx::network::http::header::kContentType, "application/json");
-
-    nx::vms::api::EmailSettingsData data;
-    ec2::fromResourceToApi(settings, data);
-    return sendAsyncPostRequestLogged(TestEmailSettingsObject,
-        std::move(headers), QnRequestParamList(), QJson::serialized(data),
-        QN_STRINGIZE_TYPE(QnTestEmailSettingsReply), target, slot);
 }
 
 int QnMediaServerConnection::testLdapSettingsAsync(

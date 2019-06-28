@@ -14,19 +14,19 @@
 
 #include <rest/server/json_rest_result.h>
 #include <nx/utils/safe_direct_connection.h>
-#include <api/http_client_pool.h>
 #include <nx/vms/event/event_fwd.h>
 #include <core/resource/resource_fwd.h>
 #include <common/common_module_aware.h>
-#include <api/model/time_reply.h>
 #include <analytics/db/abstract_storage.h>
+#include <api/http_client_pool.h>
+#include <api/model/time_reply.h>
 #include <api/model/analytics_actions.h>
 #include <api/model/wearable_prepare_data.h>
 #include <api/model/manual_camera_seach_reply.h>
+#include <api/model/test_email_settings_reply.h>
 #include <nx/update/update_information.h>
 
 #include <nx/vms/api/analytics/settings_response.h>
-#include <nx/vms/event/event_fwd.h>
 #include <nx/vms/api/data/time_reply.h>
 #include <nx/vms/api/data/event_rule_data.h>
 
@@ -509,6 +509,11 @@ public:
         QThread* targetThread = nullptr);
 
     Handle getPluginInformation(GetCallback callback, QThread* targetThread = nullptr);
+
+    Handle testEmailSettingsAsync(
+        const QnEmailSettings& settings,
+        Result<QnTestEmailSettingsReply>::type&& callback,
+        QThread* targetThread = nullptr);
 
     Handle debug(
         const QString& action,
