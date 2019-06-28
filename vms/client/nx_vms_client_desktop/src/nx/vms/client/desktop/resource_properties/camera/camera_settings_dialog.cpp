@@ -129,7 +129,7 @@ struct CameraSettingsDialog::Private: public QObject
                 CameraSettingsDialogStateConversionFunctions::applyStateToCameras(state, cameras);
                 if (advancedSettingsWidget->hasChanges())
                     advancedSettingsWidget->submitToResource();
-                store->loadCameras(cameras);
+                resetChanges();
             };
 
         const auto backout =
