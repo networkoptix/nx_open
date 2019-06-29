@@ -20,7 +20,7 @@ std::optional<QnStorageSpaceData> selectOne(const QnStorageSpaceDataList& candid
         filtered.begin(), filtered.end(),
         [](const auto& data1, const auto& data2) { return data1.totalSpace > data2.totalSpace; });
 
-    return filtered.empty() ? std::nullopt : std::optional(filtered[0]);
+    return filtered.empty() ? std::nullopt : std::optional<QnStorageSpaceData>(filtered[0]);
 }
 
 QList<QnUuid> selectServers(const ServerToStoragesList& serverToStorages)
