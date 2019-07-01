@@ -385,11 +385,18 @@ void ModuleConnector::Module::connectToGroup(Endpoints::iterator endpointsGroup)
         return;
     }
 
+    // Cancel reconnect timer if the method was called not after timeout.
+    if (m_reconnectTimer.timeToEvent())
+    {
+        m_reconnectTimer.cancelSync();
+        NX_VERBOSE(this, "Reconnect was requested %1 before timeout, reseting reconnect delays",
+            m_reconnectTimer.timeToEvent().get());
+    }
+
     if (endpointsGroup == m_endpoints.end())
     {
         if (!m_id.isNull())
         {
-            m_reconnectTimer.cancelSync();
             m_reconnectTimer.scheduleNextTry([this](){ connectToGroup(m_endpoints.begin()); });
             NX_VERBOSE(this, lm("No more endpoints, retry in %1").arg(m_reconnectTimer.currentDelay()));
             m_parent->m_disconnectedHandler(m_id);
@@ -403,9 +410,6 @@ void ModuleConnector::Module::connectToGroup(Endpoints::iterator endpointsGroup)
 
     NX_VERBOSE(this, lm("Connect to group %1: %2").args(
         endpointsGroup->first, containerString(endpointsGroup->second)));
-
-    if (m_reconnectTimer.timeToEvent())
-        m_reconnectTimer.cancelSync();
 
     // Initiate parallel connects to each endpoint in a group.
     size_t endpointsInProgress = 0;
