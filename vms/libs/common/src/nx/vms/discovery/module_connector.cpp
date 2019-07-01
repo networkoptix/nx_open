@@ -19,7 +19,11 @@ static const QString kUrl(
 
 static const std::chrono::seconds kDefaultDisconnectTimeout(15);
 static const network::RetryPolicy kDefaultRetryPolicy(
-    network::RetryPolicy::kInfiniteRetries, std::chrono::seconds(5), 2, std::chrono::minutes(1));
+    /*maxRetryCount*/ network::RetryPolicy::kInfiniteRetries,
+    /*initialDelay*/ std::chrono::seconds(5),
+    /*delayMultiplier*/ 2,
+    /*maxDelay*/ std::chrono::minutes(1),
+    /*randomRatio*/ 0.2);
 
 ModuleConnector::ModuleConnector(network::aio::AbstractAioThread* thread):
     network::aio::BasicPollable(thread),
