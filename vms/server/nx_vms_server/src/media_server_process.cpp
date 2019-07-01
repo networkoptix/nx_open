@@ -296,8 +296,10 @@
 #include <atomic>
 
 #include <nx/vms/server/metrics/camera_provider.h>
+#include <nx/vms/server/metrics/network_provider.h>
 #include <nx/vms/server/metrics/rest_handlers.h>
 #include <nx/vms/server/metrics/server_provider.h>
+#include <nx/vms/server/metrics/storage_provider.h>
 
 using namespace nx::vms::server;
 
@@ -4561,10 +4563,26 @@ void MediaServerProcess::initMetricsController()
 
     m_metricsController->registerGroup(
         "cameras",
-        std::make_unique<nx::vms::server::metrics::CameraProvider>(serverModule()->resourcePool()));
+        std::make_unique<nx::vms::server::metrics::CameraProvider>(serverModule()));
+
+    m_metricsController->registerGroup(
+        "storages",
+        std::make_unique<nx::vms::server::metrics::StorageProvider>(serverModule()));
+
+    m_metricsController->registerGroup(
+        "network",
+        std::make_unique<nx::vms::server::metrics::NetworkProvider>(commonModule()->moduleGUID()));
 
     // TODO: Should be moved into a resource file.
     static const QByteArray kRules(R"json({
+        "servers": {
+            "cpuUsage": { "alarms": { "warning": ">50", "error": ">70" } },
+            "misc": {
+                "group": {
+                    "encoders": { "alarms": { "error": ">2" } }
+                }
+            }
+        },
         "cameras": {
             "status": { "alarms": { "warning": "Unauthorized", "error": "Offline" } },
             "statusChanges": {
@@ -4586,6 +4604,10 @@ void MediaServerProcess::initMetricsController()
                     "bitrate": { "alarms": { "warning": "0" } }
                 }
             }
+        },
+        "storages": {
+            "status": { "alarms": { "warning": "Unauthorized", "error": "Offline" } },
+            "issues": { "alarms": { "warning": ">0", "error": ">10" } }
         }
     })json");
 
