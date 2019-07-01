@@ -71,10 +71,9 @@ void Downloader::Private::startDownload(const QString& fileName)
     workers[fileName] = worker;
 
     connect(worker.get(), &Worker::finished, this,
-        [this](const QString& fileName)
-        {
-            stopDownload(fileName, true);
-        });
+        [this](const QString& fileName) { stopDownload(fileName, true); });
+    connect(worker.get(), &Worker::stalledChanged, q,
+        [this, fileName](bool stalled) { emit q->downloadStalledChanged(fileName, stalled); });
     connect(worker.get(), &Worker::chunkDownloadFailed, q, &Downloader::chunkDownloadFailed);
 
     worker->start();
@@ -239,6 +238,15 @@ void Downloader::stopDownloads()
 void Downloader::findExistingDownloads()
 {
     d->storage->findDownloads(true);
+}
+
+bool Downloader::isStalled(const QString& fileName) const
+{
+    NX_MUTEX_LOCKER lock(&d->mutex);
+    if (const auto& worker = d->workers.value(fileName))
+        return worker->isStalled();
+
+    return false;
 }
 
 } // namespace nx::vms::common::p2p::downloader
