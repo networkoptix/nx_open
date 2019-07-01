@@ -102,6 +102,7 @@ TEST(Ptr, basic)
     Data::s_destructorCalled = false;
     {
         const Ptr<Data> data = makePtr<Data>(42);
+        ASSERT_EQ(sizeof(Data*), sizeof(data)); //< Ptr layout should be the same as a raw pointer.
         ASSERT_EQ(data->number(), 42);
         ASSERT_EQ(1, data->refCount());
         ASSERT_TRUE(static_cast<bool>(data)); //< operator bool()
