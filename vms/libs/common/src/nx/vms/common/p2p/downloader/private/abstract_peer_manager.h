@@ -74,7 +74,11 @@ public:
             httpClient(std::move(httpClient))
         {}
 
-        virtual ~InternetRequestContext() { httpClient->pleaseStopSync(); }
+        virtual ~InternetRequestContext()
+        {
+            if (httpClient)
+                httpClient->pleaseStopSync();
+        }
 
         InternetRequestContext() = default;
         std::unique_ptr<network::http::AsyncClient> httpClient;
