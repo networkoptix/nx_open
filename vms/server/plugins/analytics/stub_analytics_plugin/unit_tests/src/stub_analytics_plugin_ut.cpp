@@ -93,12 +93,16 @@ static void testEngineSettings(IEngine* engine)
     settings->addItem("setting1", "value1");
     settings->addItem("setting2", "value2");
 
-    engine->setSettings(nullptr, error.get()); //< Test assigning null settings.
-    ASSERT_EQ(ErrorCode::noError, error->errorCode());
-    engine->setSettings(makePtr<StringMap>().get(), error.get()); //< Test assigning empty settings.
-    ASSERT_EQ(ErrorCode::noError, error->errorCode());
-    engine->setSettings(settings.get(), error.get()); //< Test assigning some settings.
-    ASSERT_EQ(ErrorCode::noError, error->errorCode());
+    engine->setSettings(nullptr, error.get()); //< Test null settings.
+    ASSERT_EQ(ErrorCode::invalidParams, error->errorCode());
+
+    engine->setSettings(makePtr<StringMap>().get(), error.get()); //< Test empty settings.
+    ASSERT_EQ(ErrorCode::invalidParams, error->errorCode());
+
+    engine->setSettings(settings.get(), error.get()); //< Test invalid settings.
+    ASSERT_EQ(ErrorCode::invalidParams, error->errorCode());
+
+    // TODO: Add test for assigning expected settings.
 }
 
 static void testDeviceAgentSettings(IDeviceAgent* deviceAgent)
@@ -108,14 +112,16 @@ static void testDeviceAgentSettings(IDeviceAgent* deviceAgent)
     settings->addItem("setting1", "value1");
     settings->addItem("setting2", "value2");
 
-    deviceAgent->setSettings(nullptr, error.get()); //< Test assigning null settings.
-    ASSERT_EQ(ErrorCode::noError, error->errorCode());
+    deviceAgent->setSettings(nullptr, error.get()); //< Test null settings.
+    ASSERT_EQ(ErrorCode::invalidParams, error->errorCode());
 
-    //< Test assigning empty settings.
-    deviceAgent->setSettings(makePtr<StringMap>().get(), error.get());
-    ASSERT_EQ(ErrorCode::noError, error->errorCode());
-    deviceAgent->setSettings(settings.get(), error.get()); //< Test assigning some settings.
-    ASSERT_EQ(ErrorCode::noError, error->errorCode());
+    deviceAgent->setSettings(makePtr<StringMap>().get(), error.get()); //< Test empty settings.
+    ASSERT_EQ(ErrorCode::invalidParams, error->errorCode());
+
+    deviceAgent->setSettings(settings.get(), error.get()); //< Test invalid settings.
+    ASSERT_EQ(ErrorCode::invalidParams, error->errorCode());
+
+    // TODO: Add test for assigning expected settings.
 }
 
 class Action: public RefCountable<IAction>
@@ -295,6 +301,20 @@ public:
     virtual const nx::sdk::IString* homeDir() const override { return new nx::sdk::String(); }
 };
 
+class Handler: public nx::sdk::RefCountable<nx::sdk::analytics::IDeviceAgent::IHandler>
+{
+public:
+    virtual void handleMetadata(IMetadataPacket* metadataPacket) override
+    {
+        ASSERT_TRUE(metadataPacket);
+    }
+
+    virtual void handlePluginDiagnosticEvent(IPluginDiagnosticEvent* event) override
+    {
+        ASSERT_TRUE(event);
+    }
+};
+
 TEST(stub_analytics_plugin, test)
 {
     // These handlers should be destroyed after the Plugin, Engine and DeviceAgent objects.
@@ -343,6 +363,9 @@ TEST(stub_analytics_plugin, test)
 
     testDeviceAgentManifest(deviceAgent.get());
     testDeviceAgentSettings(deviceAgent.get());
+
+    const auto handler = makePtr<Handler>();
+    deviceAgent->setHandler(handler.get());
 
     const auto metadataTypes = makePtr<MetadataTypes>();
     deviceAgent->setNeededMetadataTypes(metadataTypes.get(), error.get());
