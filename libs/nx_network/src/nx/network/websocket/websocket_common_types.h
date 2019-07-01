@@ -88,7 +88,7 @@ enum class ReceiveMode
     message /**< Read handler will be called only when complete message has been read from socket*/
 };
 
-NX_NETWORK_API inline bool isDataFrame(FrameType frameType)
+inline bool isDataFrame(FrameType frameType)
 {
     return frameType == FrameType::binary
         || frameType == FrameType::text
@@ -101,7 +101,7 @@ NX_NETWORK_API inline bool isDataFrame(FrameType frameType)
  */
 constexpr int kCompressionMessageThreshold = 64;
 
-NX_NETWORK_API inline bool shouldMessageBeCompressed(
+inline bool shouldMessageBeCompressed(
     FrameType frameType,
     CompressionType compressionType,
     int payloadLen)
