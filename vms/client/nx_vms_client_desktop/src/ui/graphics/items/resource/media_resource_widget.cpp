@@ -2233,6 +2233,7 @@ Qn::ResourceOverlayButton QnMediaResourceWidget::calculateOverlayButton(
         return Qn::ResourceOverlayButton::Empty;
 
     if (statusOverlay == Qn::PasswordRequiredOverlay
+        && qnRuntime->isDesktopMode()
         && context()->accessController()->hasGlobalPermission(GlobalPermission::admin))
     {
         return Qn::ResourceOverlayButton::SetPassword;
