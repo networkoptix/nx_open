@@ -2225,6 +2225,11 @@ void MultiServerUpdatesWidget::syncRemoteUpdateStateToUi()
             ui->downloadButton->setEnabled(false);
             ui->downloadButton->setToolTip(tr("Some servers have no package available"));
         }
+        else
+        {
+            ui->downloadButton->setEnabled(true);
+            ui->downloadButton->setToolTip("");
+        }
     }
     else
     {
