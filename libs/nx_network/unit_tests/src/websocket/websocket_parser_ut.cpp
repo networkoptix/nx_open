@@ -38,8 +38,7 @@ static nx::Buffer prepareMessage(
         if (i > 0)
             opCode = FrameType::continuation;
 
-        result += serializer.prepareFrame(
-            payload, opCode, compressionType, i == frameCount - 1, i == 0);
+        result += serializer.prepareFrame(payload, opCode, i == frameCount - 1, i == 0);
     }
 
     return result;

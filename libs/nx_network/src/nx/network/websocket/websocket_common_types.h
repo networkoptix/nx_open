@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <functional>
 
@@ -8,6 +8,27 @@
 namespace nx {
 namespace network {
 namespace websocket {
+
+// Frame format:
+//​​
+//      0                   1                   2                   3
+//      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+//     +-+-+-+-+-------+-+-------------+-------------------------------+
+//     |F|R|R|R| opcode|M| Payload len |    Extended payload length    |
+//     |I|S|S|S|  (4)  |A|     (7)     |             (16/64)           |
+//     |N|V|V|V|       |S|             |   (if payload len==126/127)   |
+//     | |1|2|3|       |K|             |                               |
+//     +-+-+-+-+-------+-+-------------+ - - - - - - - - - - - - - - - +
+//     |     Extended payload length continued, if payload len == 127  |
+//     + - - - - - - - - - - - - - - - +-------------------------------+
+//     |                               |Masking-key, if MASK set to 1  |
+//     +-------------------------------+-------------------------------+
+//     | Masking-key (continued)       |          Payload Data         |
+//     +-------------------------------- - - - - - - - - - - - - - - - +
+//     :                     Payload Data continued ...                :
+//     + - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - +
+//     |                     Payload Data continued ...                |
+//     +---------------------------------------------------------------+
 
 enum class PayloadType
 {
@@ -73,6 +94,24 @@ NX_NETWORK_API inline bool isDataFrame(FrameType frameType)
         || frameType == FrameType::text
         || frameType == FrameType::continuation;
 }
+
+/**
+ * If message size is less than this constant, the message won't be compressed even if the
+ * PerMessageDeflate mode is enabled
+ */
+constexpr int kCompressionMessageThreshold = 64;
+
+NX_NETWORK_API inline bool shouldMessageBeCompressed(
+    FrameType frameType,
+    CompressionType compressionType,
+    int payloadLen)
+{
+    if (!isDataFrame(frameType) || compressionType == CompressionType::none)
+        return false;
+
+    return payloadLen > kCompressionMessageThreshold;
+}
+
 } // namespace websocket
 } // namespace network
 } // namespace nx

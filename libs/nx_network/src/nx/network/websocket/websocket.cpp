@@ -245,7 +245,7 @@ void WebSocket::sendAsync(const nx::Buffer& buffer, IoCompletionHandler handler)
             {
                 FrameType type = !m_isFirstFrame ? FrameType::continuation : m_frameType;
                 writeBuffer = m_serializer.prepareFrame(
-                    buffer, type, m_compressionType, m_isLastFrame, m_isFirstFrame);
+                    buffer, type, m_isLastFrame, m_isFirstFrame);
                 m_isFirstFrame = m_isLastFrame;
                 if (m_isLastFrame)
                     m_isLastFrame = false;
