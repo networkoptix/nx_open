@@ -7,6 +7,11 @@
 #include <QtWidgets/QToolButton>
 #include <QtWidgets/QAction>
 
+#if defined(NX_ENABLE_WEBENGINE)
+    #include <QtWebEngineWidgets/QWebEnginePage>
+    #include <QtWebEngineWidgets/QWebEngineView>
+#endif
+
 #include <QtWebKitWidgets/QWebView>
 
 #include <common/common_module.h>
@@ -114,6 +119,47 @@ private:
     QLineEdit* m_urlLineEdit;
 };
 
+#if defined(NX_ENABLE_WEBENGINE)
+
+    class WebEngineViewDialog: public QDialog
+    {
+        using base_type = QDialog;
+
+    public:
+        WebEngineViewDialog(QWidget* parent = nullptr) :
+            base_type(parent, Qt::Window),
+            m_page(new QWebEnginePage(this)),
+            m_webView(new QWebEngineView(this)),
+            m_urlLineEdit(new QLineEdit(this))
+        {
+            m_webView->setPage(m_page);
+
+            QVBoxLayout* layout = new QVBoxLayout(this);
+            layout->setContentsMargins(QMargins());
+            layout->addWidget(m_urlLineEdit);
+            layout->addWidget(m_webView, 1);
+            connect(m_urlLineEdit, &QLineEdit::returnPressed, this, [this]()
+                {
+                    m_webView->load(m_urlLineEdit->text());
+                });
+        }
+
+        QString url() const { return m_urlLineEdit->text(); }
+
+        void setUrl(const QString& value)
+        {
+            m_urlLineEdit->setText(value);
+            m_webView->load(QUrl::fromUserInput(value));
+        }
+
+    private:
+        QWebEnginePage* m_page;
+        QWebEngineView* m_webView;
+        QLineEdit* m_urlLineEdit;
+    };
+
+#endif
+
 //-------------------------------------------------------------------------------------------------
 // QnDebugControlDialog
 
@@ -171,6 +217,17 @@ public:
                 //dialog->setUrl("http://localhost:7001");
                 dialog->show();
             });
+
+        #if defined(NX_ENABLE_WEBENGINE)
+            addButton("Web Engine View",
+                [this]()
+                {
+                    auto dialog(new WebEngineViewDialog(this));
+                    //dialog->setUrl("http://localhost:7001");
+                    dialog->show();
+                });
+        #endif
+
 
         addButton("Toggle default password",
             [this]()
