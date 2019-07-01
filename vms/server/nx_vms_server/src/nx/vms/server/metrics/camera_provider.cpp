@@ -118,7 +118,7 @@ CameraProvider::ParameterProviderPtr CameraProvider::makeStreamProvider(api::Str
         ),
         singleParameterProvider(
             {"actualFps", "actual FPS", "fps"},
-            [](const auto& /*resource*/) { return Value(28); }
+            [](const auto& /*resource*/) { return Value(27); }
         ),
         singleParameterProvider(
             {"bitrate", "bitrate", "bps"},

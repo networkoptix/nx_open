@@ -4589,19 +4589,19 @@ void MediaServerProcess::initMetricsController()
                 "name": "status changes in last hour",
                 "calculate": "count status",
                 "insert": "after status",
-                "alarms": { "warning": 1, "error": 2 }
+                "alarms": { "warning": ">0", "error": ">2" }
             },
-            "packetLossCount": { "alarms": { "warning": 1, "error": 5 } },
-            "conflictCount": { "alarms": { "warning": 1, "error": 2 } },
+            "packetLossCount": { "alarms": { "warning": ">0", "error": ">5" } },
+            "conflictCount": { "alarms": { "warning": ">0", "error": ">5" } },
             "primaryStream": {
                 "group": {
                     "fpsDrop": {
                         "name": "fps drop",
                         "calculate": "sub targetFps actualFps",
                         "insert": "after actualFps",
-                        "alarms": { "warning": 2 }
+                        "alarms": { "warning": ">2", "error": ">10" }
                     },
-                    "bitrate": { "alarms": { "warning": "0" } }
+                    "bitrate": { "alarms": { "warning": "<1" } }
                 }
             }
         },

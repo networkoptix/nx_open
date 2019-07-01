@@ -12,8 +12,8 @@ NetworkProvider::NetworkProvider(const QnUuid& serverId):
 void NetworkProvider::startMonitoring()
 {
     // TODO: Add monitor for add/remove.
-    for (auto& interface: nx::network::getAllIPv4Interfaces())
-        found(std::make_shared<nx::network::QnInterfaceAndAddr>(std::move(interface)));
+    for (auto networkInterface: nx::network::getAllIPv4Interfaces())
+        found(std::make_shared<nx::network::QnInterfaceAndAddr>(std::move(networkInterface)));
 }
 
 std::optional<utils::metrics::ResourceDescription> NetworkProvider::describe(
