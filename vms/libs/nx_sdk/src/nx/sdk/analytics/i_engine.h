@@ -58,8 +58,7 @@ public:
      * settings stored in its database, combined with the values received from the plugin via
      * pluginSideSettings() (if any), for this Engine instance.
      *
-     * @param settings Values of settings declared in the manifest. Never null. Valid only during
-     *     the call.
+     * @param settings Values of settings declared in the manifest. Never null.
      * @param outError Output parameter for error reporting. Never null. Must contain
      *     `ErrorCode::noError` error code in the case of success (`outError` object is guarnteed to
      *     be prefilled with `noError` value, so no additional actions are required) or be properly
