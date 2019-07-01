@@ -167,8 +167,8 @@ public:
 
     QImage toImage() const;
 
-    void copy(const CLVideoDecoderOutput* src);
-    void copyData(const AVFrame* src);
+    void copyFrom(const CLVideoDecoderOutput* src);
+    void copyDataOnlyFrom(const AVFrame* src);
     static bool imagesAreEqual(const CLVideoDecoderOutput* img1, const CLVideoDecoderOutput* img2, unsigned int max_diff);
     void saveToFile(const char* filename);
     void clean();

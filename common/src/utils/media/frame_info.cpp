@@ -114,14 +114,20 @@ void CLVideoDecoderOutput::clean()
     width = height = 0;
 }
 
-void CLVideoDecoderOutput::copy(const CLVideoDecoderOutput* src)
+void CLVideoDecoderOutput::copyFrom(const CLVideoDecoderOutput* src)
 {
-    copyData(src);
+    copyDataOnlyFrom(src);
     assignMiscData(src);
 }
 
-void CLVideoDecoderOutput::copyData(const AVFrame* src)
+void CLVideoDecoderOutput::copyDataOnlyFrom(const AVFrame* src)
 {
+    if (src->width <=0 || src->height <= 0)
+    {
+        NX_ERROR(this, lm("Failed to copy frame, invalid frame resolution: %1x%2").args(
+            src->width, src->height));
+        return;
+    }
     AVPixelFormat dstFormat = fixDeprecatedPixelFormat(AVPixelFormat(src->format));
     if (data[0] == nullptr || src->width != width || src->height != height || dstFormat != format)
         reallocate(src->width, src->height, dstFormat);

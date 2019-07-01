@@ -637,7 +637,7 @@ bool QnFfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSh
 #endif
         if (!outFrame->isExternalData())
         {
-            outFrame->copyData(copyFromFrame);
+            outFrame->copyDataOnlyFrom(copyFromFrame);
             // pkt_dts and pkt_pts are mixed up after decoding in ffmpeg. So, we have to use dts here instead of pts
             outFrame->pkt_dts = m_frame->pkt_dts != AV_NOPTS_VALUE ? m_frame->pkt_dts : m_frame->pkt_pts;
         }
