@@ -1,7 +1,7 @@
 #include "drag_and_drop.h"
 
 #include <QtCore/QPointer>
-#include <QtGui/QDrag.h>
+#include <QtGui/QDrag>
 #include <QtQml/QtQml>
 #include <QtQuick/private/qquickpixmapcache_p.h>
 
