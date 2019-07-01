@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QtCore/QMetaType>
+#include <QtCore/QRect>
 
 #include <nx/utils/uuid.h>
 #include <nx/utils/url.h>
@@ -76,6 +77,8 @@ struct QnStartupParameters
 
     QString qmlRoot;
     QStringList qmlImportPaths;
+
+    QRect windowGeometry;
 };
 
 Q_DECLARE_METATYPE(QnStartupParameters)
