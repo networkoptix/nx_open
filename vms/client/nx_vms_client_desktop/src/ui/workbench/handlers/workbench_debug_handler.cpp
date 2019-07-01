@@ -135,7 +135,7 @@ public:
         layout->addWidget(newActionButton(action::DebugIncrementCounterAction));
 
         auto addButton =
-            [parent, layout](const QString& name, std::function<void(void)> handler)
+            [this, parent, layout](const QString& name, std::function<void(void)> handler)
             {
                 auto button = new QPushButton(name, parent);
                 connect(button, &QPushButton::clicked, handler);
