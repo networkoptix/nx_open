@@ -763,17 +763,29 @@ void MultiServerUpdatesWidget::atUpdateCurrentState()
             << "from" << checkResponse.source;
         if (checkResponse.sourceType == nx::update::UpdateSourceType::mediaservers)
         {
-            NX_INFO(this) << "atUpdateCurrentState this is the data from /ec2/updateInformation";
+            NX_WARNING(this,
+                "atUpdateCurrentState() this is the data from /ec2/updateInformation.");
         }
 
-        m_serverUpdateTool->verifyUpdateManifest(checkResponse, m_clientUpdateTool->getInstalledVersions());
-        if (m_updateInfo.preferOtherUpdate(checkResponse))
+        m_serverUpdateTool->verifyUpdateManifest(checkResponse,
+            m_clientUpdateTool->getInstalledVersions());
+        if (!hasActiveUpdate())
         {
-            setUpdateTarget(checkResponse, /*activeUpdate=*/false);
+            if (m_updateInfo.preferOtherUpdate(checkResponse))
+            {
+                setUpdateTarget(checkResponse, /*activeUpdate=*/false);
+            }
+            else
+            {
+                NX_VERBOSE(this, "atUpdateCurrentState() current update info with version='%1' "
+                    "is better", m_updateInfo.info.version);
+            }
         }
         else
         {
-            NX_VERBOSE(NX_SCOPE_TAG, "current update info with version='%1' is better", m_updateInfo.info.version);
+            NX_VERBOSE(this, "atUpdateCurrentState() got update version='%1', but we are already "
+                "updating to version='%2' in state=%3. Ignoring it.", checkResponse.info.version,
+                m_updateInfo.info.version, toString(m_widgetState));
         }
     }
 
@@ -1903,9 +1915,18 @@ void MultiServerUpdatesWidget::syncVersionReport(const VersionReport& report)
 
 bool MultiServerUpdatesWidget::isChecking() const
 {
+    if (hasActiveUpdate())
+        return false;
     return m_updateCheck.valid()
         || m_serverUpdateCheck.valid()
         || m_widgetState == WidgetUpdateState::initial;
+}
+
+bool MultiServerUpdatesWidget::hasActiveUpdate() const
+{
+    return m_widgetState == WidgetUpdateState::downloading
+        || m_widgetState == WidgetUpdateState::readyInstall
+        || m_widgetState == WidgetUpdateState::installing;
 }
 
 bool MultiServerUpdatesWidget::hasLatestVersion() const

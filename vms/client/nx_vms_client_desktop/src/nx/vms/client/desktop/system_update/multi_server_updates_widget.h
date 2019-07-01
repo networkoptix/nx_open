@@ -225,6 +225,7 @@ private:
 
     bool isChecking() const;
     bool hasLatestVersion() const;
+    bool hasActiveUpdate() const;
 
     bool processUploaderChanges(bool force = false);
 
