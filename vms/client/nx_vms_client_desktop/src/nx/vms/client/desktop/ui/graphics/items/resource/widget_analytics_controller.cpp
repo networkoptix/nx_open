@@ -202,7 +202,7 @@ void WidgetAnalyticsController::Private::updateObjectAreas(microseconds timestam
         {
             const auto addInfoRow =
                 [debugInfoDescriptor, &areaInfo, allowAll = debugInfoDescriptor.contains("all")]
-                (QString key, QString label, auto value)
+                (const QString& key, const QString& label, auto value)
                 {
                     if (allowAll || debugInfoDescriptor.contains(key))
                     {
