@@ -182,7 +182,7 @@ void ClientUpdateTool::atRemoteUpdateInformation(
 {
     auto systemInfo = QnAppInfo::currentSystemInformation();
     QString errorMessage;
-    // Update is allowed if either target version has the sam_installedVersionsFutureme cloud host or
+    // Update is allowed if either target version has the same cloud host or
     // there are no servers linked to the cloud in the system.
     QString cloudUrl = nx::network::SocketGlobals::cloud().cloudHost();
 
