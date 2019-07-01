@@ -21,9 +21,8 @@ Item
     property alias hoverHighlightColor: listView.hoverHighlightColor
     property color selectionHighlightColor: "teal"
 
-    readonly property bool dragActive: dragIndicator.Drag.active
-
-    // TODO: #vkutin Expose more dragIndicator.Drag properties when required.
+    property int supportedDragActions: Qt.MoveAction
+    property int proposedDragAction: Qt.IgnoreAction
 
     ListView
     {
@@ -44,11 +43,6 @@ Item
         {
             id: selectionModel
             model: linearizationListModel
-        }
-
-        ItemSelectionHelper
-        {
-            id: selectionHelper
         }
 
         delegate: Component
@@ -134,13 +128,16 @@ Item
                                     if (!mouseArea.drag.active)
                                         return
 
-                                    dragIndicator.Drag.imageSource = resultUrl
-                                    dragIndicator.Drag.active = true
+                                    DragAndDrop.execute(
+                                        treeView,
+                                        ItemModelUtils.mimeData(selectionModel.selectedIndexes),
+                                        treeView.supportedDragActions,
+                                        treeView.proposedDragAction,
+                                        resultUrl)
                                 })
                         }
                         else
                         {
-                            dragIndicator.Drag.active = false
                             drag.target = null
                         }
                     }
@@ -189,7 +186,7 @@ Item
                             }
                             else if (shiftPressed && selectionModel.currentIndex.valid)
                             {
-                                var selection = selectionHelper.createSelection(
+                                var selection = ItemModelUtils.createSelection(
                                     selectionModel.currentIndex, modelIndex)
 
                                 selectionModel.select(selection, ItemSelectionModel.SelectCurrent)
@@ -275,8 +272,6 @@ Item
             height: column.height
             color: ColorTheme.transparent("black", 0.8)
             visible: false
-
-            Drag.dragType: Drag.Automatic
 
             Rectangle
             {

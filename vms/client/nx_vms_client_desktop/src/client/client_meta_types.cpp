@@ -49,9 +49,10 @@
 #include <nx/vms/client/desktop/ui/common/global_tool_tip.h>
 #include <nx/vms/client/desktop/ui/scene/models/layout_model.h>
 #include <nx/vms/client/desktop/ui/scene/models/resource_tree_model_adapter.h>
+#include <nx/vms/client/desktop/ui/scene/drag_and_drop.h>
 #include <nx/vms/client/desktop/ui/scene/instruments/instrument.h>
-#include <nx/vms/client/desktop/ui/scene/item_selection_helper.h>
 #include <nx/vms/client/desktop/ui/scene/item_grabber.h>
+#include <nx/vms/client/desktop/ui/scene/item_model_utils.h>
 #include <nx/vms/client/desktop/utils/cursor_manager.h>
 
 QN_DEFINE_ENUM_STREAM_OPERATORS(Qn::TimeMode)
@@ -187,8 +188,9 @@ void QnClientMetaTypes::registerQmlTypes()
     IndexListModel::registerQmlType();
     ResourceTreeModelAdapter::registerQmlType();
     ResourceTree::registerQmlType();
-    ItemSelectionHelper::registerQmlType();
+    ItemModelUtils::registerQmlType();
     ItemGrabber::registerQmlType();
+    DragAndDrop::registerQmlType();
 
     qmlRegisterUncreatableType<QnWorkbench>("nx.client.desktop", 1, 0, "Workbench",
         lit("Cannot create instance of Workbench."));
