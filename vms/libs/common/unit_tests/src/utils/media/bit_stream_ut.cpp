@@ -3,6 +3,43 @@
 
 #include <utils/media/bitStream.h>
 
+
+TEST(BitStream, bufferOverflow)
+{
+    {
+        const int size = 4;
+        uint8_t data[size] = {0xcd, 0xcd, 0xcd, 0xcd};
+        BitStreamWriter writer(data, data + 2);
+
+        writer.putBits(4, 1);
+        writer.putBits(4, 1);
+        writer.putBits(8, 1);
+        writer.flushBits();
+
+        ASSERT_EQ(data[0], 0b00010001);
+        ASSERT_EQ(data[1], 0b00000001);
+        ASSERT_EQ(data[2], 0xcd);
+        ASSERT_EQ(data[3], 0xcd);
+    }
+
+    {
+        const int size = 5;
+        uint8_t data[size] = {0xcd, 0xcd, 0xcd, 0xcd, 0xcd};
+        BitStreamWriter writer(data, data + 4);
+
+        writer.putBits(16, 1);
+        writer.putBits(16, 1);
+        writer.flushBits();
+
+        ASSERT_EQ(data[0], 0b00000000);
+        ASSERT_EQ(data[1], 0b00000001);
+        ASSERT_EQ(data[2], 0b00000000);
+        ASSERT_EQ(data[3], 0b00000001);
+        ASSERT_EQ(data[4], 0xcd);
+    }
+}
+
+
 TEST(BitStream, write)
 {
     {
