@@ -975,9 +975,9 @@ void ServerUpdateTool::requestRemoteUpdateStateAsync()
     }
 }
 
-std::future<std::vector<nx::update::Status>> ServerUpdateTool::requestRemoteUpdateState()
+std::future<ServerUpdateTool::RemoteStatus> ServerUpdateTool::requestRemoteUpdateState()
 {
-    auto promise = std::make_shared<std::promise<std::vector<nx::update::Status>>>();
+    auto promise = std::make_shared<std::promise<RemoteStatus>>();
     if (auto connection = getServerConnection(commonModule()->currentServer()))
     {
         connection->getUpdateStatus(
@@ -996,7 +996,10 @@ std::future<std::vector<nx::update::Status>> ServerUpdateTool::requestRemoteUpda
 
                 if (tool)
                     tool->atUpdateStatusResponse(success, handle, response.data);
-                promise->set_value(response.data);
+                RemoteStatus remoteStatus;
+                for (const auto& status: response.data)
+                    remoteStatus[status.serverId] = status;
+                promise->set_value(remoteStatus);
             }, thread());
     }
     else
