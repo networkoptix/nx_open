@@ -117,7 +117,7 @@ void VideoFrameProcessingDeviceAgent::pushDataPacket(IDataPacket* dataPacket, IE
     }
 
     if (!m_handler)
-        return logError(ErrorCode::internalError, "setMetadataHandler() was not called.");
+        return logError(ErrorCode::internalError, "setaHandler() was not called.");
 
     std::vector<IMetadataPacket*> metadataPackets;
     if (!pullMetadataPackets(&metadataPackets))
