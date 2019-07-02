@@ -125,7 +125,6 @@ void QnResourceSelectionDialog::initModel()
     m_resourceModel = new QnResourceTreeModel(
         QnResourceTreeModel::CamerasScope, accessController(), snapshotManager(), this);
     m_resourceModel->setUser(context()->user());
-    m_resourceModel->setActionManager(context()->menu());
 
     // Auto expand if and only if server count <= 1 or cameras count <= 50.
     if (auto treeRoot = m_resourceModel->rootNode(ResourceTree::NodeType::servers))
