@@ -42,7 +42,7 @@ private:
         Removed
     };
 
-    ec2::AbstractECConnectionPtr connection2() const;
+    ec2::AbstractVideowallManagerPtr connection() const;
 
     void resetLayout(const QnVideoWallItemIndexList &items, const QnLayoutResourcePtr &layout);
 
@@ -79,7 +79,7 @@ private:
     void setItemControlledBy(const QnUuid &layoutId, const QnUuid &controllerId, bool on);
     void updateMainWindowGeometry(const QnScreenSnaps &screenSnaps);
 
-    void updateControlLayout(const QnVideoWallResourcePtr &videowall, const QnVideoWallItem &item, ItemAction action);
+    void updateControlLayout(const QnVideoWallItem &item, ItemAction action);
     void updateReviewLayout(const QnVideoWallResourcePtr &videowall, const QnVideoWallItem &item, ItemAction action);
 
     /**
