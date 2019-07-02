@@ -41,10 +41,10 @@ nx::Buffer Serializer::prepareMessage(
     nx::Buffer payload, FrameType type, CompressionType compressionType)
 {
     m_doCompress = shouldMessageBeCompressed(type, compressionType, payload.size());
-    return prepareFrame(payload, type, /*fin*/true, /*first*/true);
+    return prepareFrame(payload, type, /*fin*/true);
 }
 
-nx::Buffer Serializer::prepareFrame(nx::Buffer payload, FrameType type, bool fin, bool first)
+nx::Buffer Serializer::prepareFrame(nx::Buffer payload, FrameType type, bool fin)
 {
     if (m_doCompress)
         payload = nx::utils::bstream::gzip::Compressor::compressData(std::move(payload), false);
