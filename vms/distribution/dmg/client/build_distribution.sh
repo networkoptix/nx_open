@@ -62,12 +62,12 @@ buildDistribution()
     fi
  
     test -f $DISTRIBUTION_DMG && rm $DISTRIBUTION_DMG
-    dmgbuild                                    \
-        -s "$DMG_SETTINGS"                      \
-        -D dmg_app_path="$APP_DIR"              \
-        -D dmg_app_bundle="$APP_BUNDLE"         \
-        -D dmg_icon="$PACKAGE_ICON_PATH"        \
-        -D dmg_background="$BACKGROUND_PATH"    \
+    dmgbuild \
+        -s "$DMG_SETTINGS" \
+        -D dmg_app_path="$APP_DIR" \
+        -D dmg_app_bundle="$APP_BUNDLE" \
+        -D dmg_icon="$PACKAGE_ICON_PATH" \
+        -D dmg_background="$BACKGROUND_PATH" \
         "$VOLUME_NAME" "$DISTRIBUTION_DMG"
 
     mv update.json "$SRC/"
