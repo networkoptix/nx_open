@@ -158,12 +158,6 @@ void EventsStorage::createLookupCursor(
         });
 }
 
-void EventsStorage::closeCursor(const std::shared_ptr<AbstractCursor>& cursor)
-{
-    QnMutexLocker lock(&m_cursorsMutex);
-    m_openedCursors.remove(cursor);
-}
-
 void EventsStorage::lookup(
     Filter filter,
     LookupCompletionHandler completionHandler)
@@ -489,15 +483,18 @@ void EventsStorage::reportCreateCursorCompletion(
         &m_dbController->queryExecutor(),
         dbCursorId);
 
-    std::shared_ptr<AbstractCursor> cursor;
-    cursor = ObjectSearcher::createCursor(std::move(dbCursor));
+    auto cursor = std::make_unique<Cursor>(std::move(dbCursor));
+    cursor->setOnBeforeCursorDestroyed(
+        [this](Cursor* cursor)
+        {
+            QnMutexLocker lock(&m_cursorsMutex);
+            m_openedCursors.remove(cursor);
+        });
 
-    m_openedCursors.push_back(cursor);
+    m_openedCursors.push_back(cursor.get());
     lock.unlock();
 
-    completionHandler(
-        ResultCode::ok,
-        cursor);
+    completionHandler(ResultCode::ok, std::move(cursor));
 }
 
 void EventsStorage::scheduleDataCleanup(

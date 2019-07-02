@@ -5740,8 +5740,8 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
       <translation>Benutzer</translation>
     </message>
     <message>
-      <source>Analytics</source>
-      <translation>Analytik</translation>
+      <source>Plugins</source>
+      <translation type="unfinished">Plugins</translation>
     </message>
   </context>
   <context>
@@ -7659,10 +7659,6 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
       <translation>Webseite:</translation>
     </message>
     <message>
-      <source>Analytics</source>
-      <translation>Analytik</translation>
-    </message>
-    <message>
       <source>Expert</source>
       <translation>Experte</translation>
     </message>
@@ -7714,6 +7710,10 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     <message>
       <source>I/O Modules Settings</source>
       <translation>I/O-Moduleinstellungen</translation>
+    </message>
+    <message>
+      <source>Plugins</source>
+      <translation type="unfinished">Plugins</translation>
     </message>
   </context>
   <context>

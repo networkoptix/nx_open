@@ -19,6 +19,7 @@
 #include <nx/utils/random.h>
 #include <nx/vms/api/protocol_version.h>
 #include <nx/vms/api/data/update_sequence_data.h>
+#include <utils/common/delayed.h>
 
 namespace nx {
 namespace p2p {
@@ -188,6 +189,8 @@ void MessageBus::addOutgoingConnectionToPeer(
 
     int pos = nx::utils::random::number((int) 0, (int) m_remoteUrls.size());
     m_remoteUrls.insert(m_remoteUrls.begin() + pos, RemoteConnection(peer, url));
+
+    executeInThread(m_thread, [this]() {doPeriodicTasks();});
 }
 
 void MessageBus::deleteRemoveUrlById(const QnUuid& id)

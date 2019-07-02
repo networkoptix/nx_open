@@ -68,9 +68,10 @@ public:
      */
     void requestRemoteUpdateStateAsync();
 
-    std::future<std::vector<nx::update::Status>> requestRemoteUpdateState();
-
     using RemoteStatus = std::map<QnUuid, nx::update::Status>;
+
+    std::future<RemoteStatus> requestRemoteUpdateState();
+
     /**
      * Tries to get status changes from the server.
      * @param status storage for remote status

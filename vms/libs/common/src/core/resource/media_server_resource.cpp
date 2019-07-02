@@ -44,6 +44,8 @@ const QString safeModePropertyName = lit("ecDbReadOnly");
 
 } // namespace
 
+const QString QnMediaServerResource::kMetadataStorageIdKey = "metadataStorageId";
+
 QnMediaServerResource::QnMediaServerResource(QnCommonModule* commonModule):
     base_type(commonModule),
     m_serverFlags(vms::api::SF_None),
@@ -496,19 +498,12 @@ QnMediaServerUserAttributesPtr QnMediaServerResource::userAttributes() const
 
 QnUuid QnMediaServerResource::metadataStorageId() const
 {
-    QnMediaServerUserAttributesPool::ScopedLock lk(commonModule()->mediaServerUserAttributesPool(), getId());
-    return (*lk)->metadataStorageId;
+    return QnUuid::fromStringSafe(getProperty(kMetadataStorageIdKey));
 }
 
 void QnMediaServerResource::setMetadataStorageId(const QnUuid& value)
 {
-    {
-        QnMediaServerUserAttributesPool::ScopedLock lk(commonModule()->mediaServerUserAttributesPool(), getId());
-        if ((*lk)->metadataStorageId == value)
-            return;
-        (*lk)->metadataStorageId = value;
-    }
-    emit metadataStorageIdChanged(::toSharedPointer(this));
+    setProperty(kMetadataStorageIdKey, value.toString());
 }
 
 QnServerBackupSchedule QnMediaServerResource::getBackupSchedule() const

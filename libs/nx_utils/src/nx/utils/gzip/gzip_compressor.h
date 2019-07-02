@@ -1,4 +1,4 @@
-#pragma once 
+#pragma once
 
 #include <QObject>
 
@@ -10,7 +10,9 @@ namespace gzip {
 class NX_UTILS_API Compressor
 {
 public:
-    static QByteArray compressData(const QByteArray& data);
+    static QByteArray compressData(const QByteArray& data, bool addCrcAndSize = true);
+
+    static QByteArray uncompressData(const QByteArray& data);
 };
 
 } // namespace gzip

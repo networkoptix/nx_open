@@ -347,8 +347,8 @@ void AsyncClient::doRequest(
         url.setPort(m_socket->getForeignAddress().port);
     }
 
-    NX_ASSERT(!url.host().isEmpty() || m_socket != nullptr);
-    NX_ASSERT(url.isValid());
+    NX_ASSERT(!url.host().isEmpty() || m_socket, url.toString());
+    NX_ASSERT(url.isValid(), url.toString());
 
     resetDataBeforeNewRequest();
     m_requestUrl = url;

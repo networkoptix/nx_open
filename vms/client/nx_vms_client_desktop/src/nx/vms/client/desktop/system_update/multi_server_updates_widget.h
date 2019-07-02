@@ -221,10 +221,12 @@ private:
     void processInitialState();
     void processInitialCheckState();
     void processDownloadingState();
+    void processReadyInstallState();
     void processInstallingState();
 
     bool isChecking() const;
     bool hasLatestVersion() const;
+    bool hasActiveUpdate() const;
 
     bool processUploaderChanges(bool force = false);
 
@@ -286,7 +288,7 @@ private:
      */
     std::future<nx::update::UpdateContents> m_offlineUpdateCheck;
 
-    std::future<std::vector<nx::update::Status>> m_serverStatusCheck;
+    std::future<ServerUpdateTool::RemoteStatus> m_serverStatusCheck;
 
     nx::update::UpdateContents m_updateInfo;
     VersionReport m_updateReport;

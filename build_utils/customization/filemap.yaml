@@ -1,0 +1,155 @@
+description.json: 'description.json'
+customization.cmake: 'customization.cmake' # Compatibility layer.
+license.html: 'license.html'
+main_icon.ico: 'icons/all/favicon.ico'
+
+desktop: {
+  videowall.ico: 'icons/all/videowall.ico',
+  window_icon.png: 'icons/all/logo.png', # 256*256, rounded, framed.
+
+  # Desktop client section.
+  welcome_page_logo.png: 'nx_client_desktop/resources/skin/welcome_page/logo.png', #120x120, rounded.
+  welcome_page_logo@2x.png: 'nx_client_desktop/resources/skin/welcome_page/logo@2x.png',
+  intro.mkv: 'nx_client_desktop/resources/skin/intro.mkv',
+  intro.png: 'nx_client_desktop/resources/skin/intro.png', # 720x400.
+  background.png: 'nx_client_desktop/resources/skin/background.png', # 2160x2160.
+
+  # Server section
+  email_logo.png: 'mediaserver_core/resources/skin/email_attachments/productLogo.png', # 272x80.
+  webadmin_logo.png: 'mediaserver_core/resources/static/customization/webadmin_logo.png', # 142x40.
+  webadmin_config.js: 'mediaserver_core/resources/static/customization/config.js',
+
+  windows: {
+
+    # Installer.
+    installer_icon.ico: 'icons/windows/installer_icon.ico',
+    installer_background.png: 'icons/windows/installer_bg.png', # 480x360.
+    installer_logo_64x64.png: 'icons/windows/logo-64x64.png', # Rounded.
+    installer_logo_102x102.png: 'icons/windows/logo-102x102.png', # Rounded.
+
+    # NxTool.
+    nxtool: {
+      icon.ico: 'icons/windows/nxtool.ico',
+      installer_logo.png: 'icons/windows/nxtool-logo-64x64.png', # 64x64, rounded.
+    }
+  },
+
+  linux: {
+
+    # Desktop icon. Icons are rounded, framed.
+    icon_128x128.png: 'icons/linux/hicolor/scalable/apps/vmsclient.png',
+    icon_48x48.png: 'icons/linux/hicolor/48x48/apps/vmsclient.png',
+    icon_32x32.png: 'icons/linux/hicolor/32x32/apps/vmsclient.png',
+    icon_24x24.png: 'icons/linux/hicolor/24x24/apps/vmsclient.png',
+    icon_22x22.png: 'icons/linux/hicolor/22x22/apps/vmsclient.png',
+    icon_16x16.png: 'icons/linux/hicolor/16x16/apps/vmsclient.png',
+  },
+
+  macos: {
+
+    # Desktop icon.
+    main_icon.icns: 'icons/macosx/logo.icns',
+
+    # Installer.
+    installer_icon.icns: 'icons/macosx/installer_icon.icns',
+    installer_background.png: 'client-dmg/dmg-folder/.background/dmgBackground.png', # 600x400.
+    installer_config: 'client-dmg/dmg-folder/DS_Store'
+  }
+}
+
+mobile: {
+
+  android: {
+    key.store: 'mobile_client/key.store',
+
+    # Logos are transparent, square.
+    logo_xxxhdpi.png: 'icons/android/android/res/drawable-xxxhdpi/logo.png', # 1024px.
+    logo_xxhdpi.png:  'icons/android/android/res/drawable-xxhdpi/logo.png', # 768px.
+    logo_xhdpi.png:   'icons/android/android/res/drawable-xhdpi/logo.png', # 512px.
+    logo_hdpi.png:    'icons/android/android/res/drawable-hdpi/logo.png', # 284px.
+    logo_mdpi.png:    'icons/android/android/res/drawable-mdpi/logo.png', # 256px.
+    logo_ldpi.png:    'icons/android/android/res/drawable-ldpi/logo.png', # 192px.
+
+    # Launcher icons are rounded, framed, square.
+    launcher_xxxhdpi.png: 'icons/android/android/res/drawable-xxxhdpi/ic_launcher.png', # 192px.
+    launcher_xxhdpi.png:  'icons/android/android/res/drawable-xxhdpi/ic_launcher.png', # 144px.
+    launcher_xhdpi.png:   'icons/android/android/res/drawable-xhdpi/ic_launcher.png', # 96px.
+    launcher_hdpi.png:   'icons/android/android/res/drawable-hdpi/ic_launcher.png', # 72px.
+    launcher_mdpi.png:   'icons/android/android/res/drawable-mdpi/ic_launcher.png', # 48px.
+    launcher_ldpi.png:   'icons/android/android/res/drawable-ldpi/ic_launcher.png', # 36px.
+  },
+
+  ios: {
+    Launch.xib: 'mobile_client/ios/Launch.xib',
+
+    # Icons are square, full.
+    icon_20x20.png: 'icons/ios/ios/images/icon_20x20.png',
+    icon_29x29.png: 'icons/ios/ios/images/icon_29x29.png',
+    icon_40x40.png: 'icons/ios/ios/images/icon_40x40.png',
+    icon_58x58.png: 'icons/ios/ios/images/icon_58x58.png',
+    icon_60x60.png: 'icons/ios/ios/images/icon_60x60.png',
+    icon_76x76.png: 'icons/ios/ios/images/icon_76x76.png',
+    icon_80x80.png: 'icons/ios/ios/images/icon_80x80.png',
+    icon_87x87.png: 'icons/ios/ios/images/icon_87x87.png',
+    icon_120x120.png: 'icons/ios/ios/images/icon_120x120.png',
+    icon_152x152.png: 'icons/ios/ios/images/icon_152x152.png',
+    icon_167x167.png: 'icons/ios/ios/images/icon_167x167.png',
+    icon_180x180.png: 'icons/ios/ios/images/icon_180x180.png',
+
+    icon_appstore.png: 'icons/ios/ios/images/icon_appstore.png', # 1024x1024.
+
+    # Logos are transparent.
+    logo.png: 'icons/ios/ios/images/logo.png', # 256x256.
+    logo@2x.png: 'icons/ios/ios/images/logo@2x.png',
+    logo@3x.png: 'icons/ios/ios/images/logo@3x.png',
+  },
+
+
+}
+
+# Custom cloud icons.
+custom_cloud: {
+  desktop: {
+    cloud_logo.png: 'nx_client_desktop/resources/skin/cloud/cloud_64.png',
+    cloud_logo@2x.png: 'nx_client_desktop/resources/skin/cloud/cloud_64@2x.png',
+    cloud_user_logo.png: 'nx_client_desktop/resources/skin/cloud/cloud_32_thin_selected.png',
+    cloud_user_logo@2x.png: 'nx_client_desktop/resources/skin/cloud/cloud_32_thin_selected@2x.png',
+    cloud_icon.png: 'nx_client_desktop/resources/skin/cloud/cloud_20.png',
+    cloud_icon@2x.png: 'nx_client_desktop/resources/skin/cloud/cloud_20@2x.png',
+    cloud_icon_accented.png: 'nx_client_desktop/resources/skin/cloud/cloud_20_accented.png',
+    cloud_icon_accented@2x.png: 'nx_client_desktop/resources/skin/cloud/cloud_20_accented@2x.png',
+    cloud_icon_disabled.png: 'nx_client_desktop/resources/skin/cloud/cloud_20_disabled.png',
+    cloud_icon_disabled@2x.png: 'nx_client_desktop/resources/skin/cloud/cloud_20_disabled@2x.png',
+    cloud_icon_selected.png: 'nx_client_desktop/resources/skin/cloud/cloud_20_selected.png',
+    cloud_icon_selected@2x.png: 'nx_client_desktop/resources/skin/cloud/cloud_20_selected@2x.png',
+    cloud_icon_offline_disabled.png: 'nx_client_desktop/resources/skin/cloud/cloud_20_offline_disabled.png',
+    cloud_icon_offline_disabled@2x.png: 'nx_client_desktop/resources/skin/cloud/cloud_20_offline_disabled@2x.png',
+  },
+
+  mobile: {
+    cloud.png: 'mobile_client/resources/images/cloud.png',
+    cloud@2x.png: 'mobile_client/resources/images/cloud@2x.png',
+    cloud@3x.png: 'mobile_client/resources/images/cloud@3x.png',
+    cloud@4x.png: 'mobile_client/resources/images/cloud@4x.png',
+    cloud_big.png: 'mobile_client/resources/images/cloud_big.png',
+    cloud_big@2x.png: 'mobile_client/resources/images/cloud_big@2x.png',
+    cloud_big@3x.png: 'mobile_client/resources/images/cloud_big@3x.png',
+    cloud_big@4x.png: 'mobile_client/resources/images/cloud_big@4x.png',
+    cloud_disabled.png: 'mobile_client/resources/images/cloud_disabled.png',
+    cloud_disabled@2x.png: 'mobile_client/resources/images/cloud_disabled@2x.png',
+    cloud_disabled@3x.png: 'mobile_client/resources/images/cloud_disabled@3x.png',
+    cloud_disabled@4x.png: 'mobile_client/resources/images/cloud_disabled@4x.png',
+    cloud_logged_in.png: 'mobile_client/resources/images/cloud_logged_in.png',
+    cloud_logged_in@2x.png: 'mobile_client/resources/images/cloud_logged_in@2x.png',
+    cloud_logged_in@3x.png: 'mobile_client/resources/images/cloud_logged_in@3x.png',
+    cloud_logged_in@4x.png: 'mobile_client/resources/images/cloud_logged_in@4x.png',
+    cloud_not_logged_in.png: 'mobile_client/resources/images/cloud_not_logged_in.png',
+    cloud_not_logged_in@2x.png: 'mobile_client/resources/images/cloud_not_logged_in@2x.png',
+    cloud_not_logged_in@3x.png: 'mobile_client/resources/images/cloud_not_logged_in@3x.png',
+    cloud_not_logged_in@4x.png: 'mobile_client/resources/images/cloud_not_logged_in@4x.png',
+    cloud_unavailable.png: 'mobile_client/resources/images/cloud_unavailable.png',
+    cloud_unavailable@2x.png: 'mobile_client/resources/images/cloud_unavailable@2x.png',
+    cloud_unavailable@3x.png: 'mobile_client/resources/images/cloud_unavailable@3x.png',
+    cloud_unavailable@4x.png: 'mobile_client/resources/images/cloud_unavailable@4x.png',
+  }
+}

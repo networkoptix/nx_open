@@ -161,6 +161,7 @@ public:
         updatePackageNotFound,
         noFreeSpaceToDownload,
         noFreeSpaceToExtract,
+        noFreeSpaceToInstall,
         downloadFailed,
         invalidUpdateContents,
         corruptedArchive,

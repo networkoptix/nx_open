@@ -192,18 +192,18 @@
     },
     "common": {
         "voiceCommands": {
-            "search": "find + [text for searchbar]",
+            "search": "знайти + [текст для панелі пошуку]",
             "pause": "пауза",
-            "help": "help | show commands",
+            "help": "допомога | показати команди",
             "collapse all servers": "згорнути всі сервери",
-            "collapse server": "collapse server + [server name]",
+            "collapse server": "сховати сервер + [назва сервера]",
             "play": "відтворити",
             "clear search": "очистити вікно пошуку",
-            "live": "go to live | show me live",
+            "live": "live | show me live",
             "expand all servers": "розгорнути всі сервери",
             "stop listening": "припинити прослуховування",
-            "expand server": "expand server + [server name]",
-            "view": "view + [camera name]"
+            "expand server": "розширити сервер + [назва сервера]",
+            "view": "перегляд + [назва камери]"
         },
         "systemOffline": "Система знаходиться поза мережею",
         "cameraLinks": {

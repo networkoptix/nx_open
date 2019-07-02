@@ -5741,8 +5741,8 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
       <translation>Utenti</translation>
     </message>
     <message>
-      <source>Analytics</source>
-      <translation>Analytics</translation>
+      <source>Plugins</source>
+      <translation type="unfinished">Plugins</translation>
     </message>
   </context>
   <context>
@@ -7660,10 +7660,6 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
       <translation>Pagina web</translation>
     </message>
     <message>
-      <source>Analytics</source>
-      <translation>Analytics</translation>
-    </message>
-    <message>
       <source>Expert</source>
       <translation>Esperto</translation>
     </message>
@@ -7715,6 +7711,10 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
     <message>
       <source>I/O Modules Settings</source>
       <translation>Impostazioni dei moduli I / O</translation>
+    </message>
+    <message>
+      <source>Plugins</source>
+      <translation type="unfinished">Plugins</translation>
     </message>
   </context>
   <context>
@@ -8286,9 +8286,9 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
     </message>
     <message numerus="yes">
       <source>%n new</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n nuovo</numerusform>
-        <numerusform>%n new</numerusform>
+        <numerusform>%n nuovo</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -8725,23 +8725,23 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
     </message>
     <message>
       <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
-      <translation type="unfinished">OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</translation>
+      <translation>Le versioni del sistema operativo di alcuni componenti non sono più supportate. Si prega di rimuoverli dal sistema o aggiornare il loro sistema operativo a una versione supportata.</translation>
     </message>
     <message>
       <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
-      <translation type="unfinished">OS version of the client is no longer supported. Please update its OS to a supported version.</translation>
+      <translation>La versione del sistema operativo del client non è più supportata. Si prega di aggiornare il suo OS ad una versione supportata.</translation>
     </message>
     <message>
       <source>Failed to start update</source>
-      <translation type="unfinished">Failed to start update</translation>
+      <translation>Impossibile installare l'aggiornamento</translation>
     </message>
     <message>
       <source>Starting update to ...</source>
-      <translation type="unfinished">Starting update to ...</translation>
+      <translation>Avvio aggiornamento...</translation>
     </message>
     <message>
       <source>Some servers have no package available</source>
-      <translation type="unfinished">Some servers have no package available</translation>
+      <translation>Alcuni server non hanno alcun pacchetto disponibile</translation>
     </message>
   </context>
   <context>
@@ -8915,7 +8915,7 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
     </message>
     <message>
       <source>Update package is not found.</source>
-      <translation type="unfinished">Update package is not found.</translation>
+      <translation>Il file di aggiornamento non è stato trovato.</translation>
     </message>
   </context>
   <context>
@@ -9088,51 +9088,51 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
     </message>
     <message>
       <source>no error</source>
-      <translation type="unfinished">no error</translation>
+      <translation>nessun errore</translation>
     </message>
     <message>
       <source>library file cannot be loaded</source>
-      <translation type="unfinished">library file cannot be loaded</translation>
+      <translation>il file della libreria non può essere caricato</translation>
     </message>
     <message>
       <source>invalid or incompatible plugin library</source>
-      <translation type="unfinished">invalid or incompatible plugin library</translation>
+      <translation>libreria plugin non valida o incompatibile</translation>
     </message>
     <message>
       <source>plugin library failed to initialize</source>
-      <translation type="unfinished">plugin library failed to initialize</translation>
+      <translation>inizializzazione libreria plugin fallita</translation>
     </message>
     <message>
       <source>plugin returned bad manifest</source>
-      <translation type="unfinished">plugin returned bad manifest</translation>
+      <translation>il plugin ha restituito un manifesto errato</translation>
     </message>
     <message>
       <source>plugin API version is no longer supported</source>
-      <translation type="unfinished">plugin API version is no longer supported</translation>
+      <translation>la versione dell'API del plug-in non è più supportata</translation>
     </message>
     <message>
       <source>unknown error</source>
-      <translation type="unfinished">unknown error</translation>
+      <translation>errore sconosciuto</translation>
     </message>
     <message>
       <source>Not loaded</source>
-      <translation type="unfinished">Not loaded</translation>
+      <translation>Non caricata</translation>
     </message>
     <message>
       <source>Loaded</source>
-      <translation type="unfinished">Loaded</translation>
+      <translation>Caricato</translation>
     </message>
     <message>
       <source>plugin is in the black list</source>
-      <translation type="unfinished">plugin is in the black list</translation>
+      <translation>il plugin è nella lista nera</translation>
     </message>
     <message>
       <source>Status</source>
-      <translation type="unfinished">Status</translation>
+      <translation>Stato</translation>
     </message>
     <message>
       <source>plugin is optional and is not in the white list</source>
-      <translation type="unfinished">plugin is optional and is not in the white list</translation>
+      <translation>il plugin è opzionale e non è nella lista bianca</translation>
     </message>
   </context>
   <context>

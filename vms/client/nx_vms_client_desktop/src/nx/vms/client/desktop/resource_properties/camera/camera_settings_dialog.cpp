@@ -129,7 +129,7 @@ struct CameraSettingsDialog::Private: public QObject
                 CameraSettingsDialogStateConversionFunctions::applyStateToCameras(state, cameras);
                 if (advancedSettingsWidget->hasChanges())
                     advancedSettingsWidget->submitToResource();
-                store->loadCameras(cameras);
+                resetChanges();
             };
 
         const auto backout =
@@ -302,7 +302,7 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
         int(CameraSettingsTab::analytics),
         new CameraAnalyticsSettingsWidget(
             d->store, qnClientCoreModule->mainQmlEngine(), ui->tabWidget),
-        tr("Analytics"));
+        tr("Plugins"));
 
     addPage(
         int(CameraSettingsTab::expert),

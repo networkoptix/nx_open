@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QtCore/QString>
+#include <QtCore/QJsonObject>
 
 namespace nx::utils {
 
@@ -24,6 +25,9 @@ public:
     }
 
     bool isValid() const { return !platform.isEmpty(); }
+
+    QJsonObject toJson() const;
+    static OsInfo fromJson(const QJsonObject& obj);
 
     QString toString() const;
     static OsInfo fromString(const QString& str);

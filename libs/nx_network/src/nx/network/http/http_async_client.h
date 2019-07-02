@@ -96,7 +96,7 @@ public:
      */
     AsyncClient(std::unique_ptr<AbstractStreamSocket> socket);
 
-    virtual ~AsyncClient();
+    virtual ~AsyncClient() override;
 
     AsyncClient(const AsyncClient&) = delete;
     AsyncClient& operator=(const AsyncClient&) = delete;
