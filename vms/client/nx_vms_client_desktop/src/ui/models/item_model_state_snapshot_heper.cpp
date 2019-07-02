@@ -51,16 +51,6 @@ QJsonObject ItemModelStateSnapshotHelper::createItemModelObject() const
 {
     QJsonObject itemModelObject;
 
-    if (m_model->columnCount() > 0)
-    {
-        itemModelObject.insert(kHorizontalHeaderDataArrayKey,
-            createHeaderDataArray(Qt::Horizontal));
-    }
-    if (m_model->rowCount() > 0)
-    {
-        itemModelObject.insert(kVerticalHeaderDataArrayKey,
-            createHeaderDataArray(Qt::Vertical));
-    }
     if ((m_model->rowCount() > 0) && (m_model->columnCount() > 0))
         itemModelObject.insert(kRowsArrayKey, createRowsArray(QModelIndex()));
 
@@ -88,28 +78,6 @@ QJsonObject ItemModelStateSnapshotHelper::createItemObject(const QModelIndex& in
         itemObject.insert(kRowsArrayKey, createRowsArray(index));
 
     return itemObject;
-}
-
-QJsonArray ItemModelStateSnapshotHelper::createHeaderDataArray(Qt::Orientation orientation) const
-{
-    QJsonArray headerDataArray;
-    const auto roles = m_model->roleNames().keys();
-    const auto sectionCount =
-        orientation == Qt::Horizontal ? m_model->columnCount() : m_model->rowCount();
-
-    for (int section = 0; section < sectionCount; ++section)
-    {
-        QVariantMap headerDataMap;
-        for (const auto& role : roles)
-        {
-            const auto headerData = m_model->headerData(section, orientation, role);
-            if (!headerData.isNull())
-                headerDataMap.insert(getRoleName(role), headerData);
-        }
-        headerDataArray.append(QJsonObject::fromVariantMap(headerDataMap));
-    }
-
-    return headerDataArray;
 }
 
 QJsonArray ItemModelStateSnapshotHelper::createRowsArray(const QModelIndex& parent) const

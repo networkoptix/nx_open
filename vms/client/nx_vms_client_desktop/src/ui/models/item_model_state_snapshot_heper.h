@@ -18,7 +18,6 @@ public:
 private:
     QJsonObject createItemModelObject() const;
     QJsonObject createItemObject(const QModelIndex& index) const;
-    QJsonArray createHeaderDataArray(Qt::Orientation orientation) const;
     QJsonArray createRowsArray(const QModelIndex& parent) const;
     QJsonArray createRowItemsArray(int row, const QModelIndex& parent) const;
     QString getRoleName(int role) const;
@@ -26,8 +25,6 @@ private:
 private:
     static constexpr auto kItemDataObjectKey = "itemData";
     static constexpr auto kItemFlagsValueKey = "itemFlags";
-    static constexpr auto kVerticalHeaderDataArrayKey = "verticalHeaderData";
-    static constexpr auto kHorizontalHeaderDataArrayKey = "horizontalHeaderData";
     static constexpr auto kRowsArrayKey = "rows";
 
     QAbstractItemModel* m_model = nullptr;
