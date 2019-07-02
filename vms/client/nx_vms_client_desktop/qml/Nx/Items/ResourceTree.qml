@@ -18,6 +18,7 @@ TreeView
     scrollStepSize: kRowHeight
     hoverHighlightColor: ColorTheme.transparent(ColorTheme.colors.dark8, 0.4)
     selectionHighlightColor: ColorTheme.transparent(ColorTheme.colors.brand_core, 0.3)
+    dropHighlightColor: ColorTheme.transparent(ColorTheme.colors.brand_core, 0.6)
 
     model: ResourceTreeModel
     {

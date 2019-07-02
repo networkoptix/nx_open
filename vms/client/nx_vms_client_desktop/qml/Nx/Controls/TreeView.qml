@@ -20,6 +20,7 @@ Item
     property alias scrollStepSize: listView.scrollStepSize //< In pixels.
     property alias hoverHighlightColor: listView.hoverHighlightColor
     property color selectionHighlightColor: "teal"
+    property color dropHighlightColor: "blue"
 
     ListView
     {
@@ -119,6 +120,18 @@ Item
 
                         drag.action = action
                         return true
+                    }
+
+                    Rectangle
+                    {
+                        id: dropHighlight
+
+                        anchors.fill: parent
+                        color: "transparent"
+                        border.color: treeView.dropHighlightColor
+                        border.width: 1
+                        radius: 2
+                        visible: dropArea.containsDrag
                     }
                 }
 
