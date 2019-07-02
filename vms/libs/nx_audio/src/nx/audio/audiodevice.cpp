@@ -78,7 +78,7 @@ int AudioDevice::internalBufferInSamples(ALCdevice* device)
 AudioDevice *AudioDevice::instance()
 {
 #if defined (Q_OS_IOS)
-    forceSpeakersUsage();
+    nx::audio::forceSpeakersUsage();
 #endif
 
     static AudioDevice audioDevice;

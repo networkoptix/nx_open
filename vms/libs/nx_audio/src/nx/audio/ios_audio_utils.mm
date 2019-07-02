@@ -2,6 +2,8 @@
 
 #include <AVFoundation/AVFoundation.h>
 
+namespace nx::audio {
+    
 void forceSpeakersUsage()
 {
     const auto audioSession = [AVAudioSession sharedInstance];
@@ -9,3 +11,4 @@ void forceSpeakersUsage()
         withOptions:AVAudioSessionCategoryOptionDefaultToSpeaker error:nil];
 }
 
+} // namespace nx::audio
