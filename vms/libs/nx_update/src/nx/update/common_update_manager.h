@@ -5,9 +5,12 @@
 #include <common/common_module_aware.h>
 #include <nx/vms/common/p2p/downloader/downloader.h>
 #include <nx/update/update_information.h>
+#include <nx/update/persistent_update_storage.h>
 #include <nx/update/update_check.h>
 #include <nx/fusion/fusion/fusion_fwd.h>
 #include <nx/utils/uuid.h>
+#include <api/model/api_model_fwd.h>
+#include <api/model/storage_status_reply.h>
 
 struct QnAuthSession;
 
@@ -32,6 +35,9 @@ public:
     bool participants(QList<QnUuid>* outParticipants) const;
     bool setParticipants(const QList<QnUuid>& participants);
     bool updateLastInstallationRequestTime();
+    void setUpdatePersistentStorageServers(
+        const QList<QnUuid>& serverList, const QString& version, bool manuallySet);
+    update::PersistentUpdateStorage updatePersistentStorageServers(const QString& version) const;
     void finish();
     vms::api::SoftwareVersion targetVersion() const;
 
@@ -63,10 +69,14 @@ private:
     bool deserializedUpdateInformation(update::Information* outUpdateInformation,
         const QString& caller) const;
     void setUpdateInformation(const update::Information& updateInformation);
+    void managePersistentDownloads();
+    vms::common::p2p::downloader::ResultCode addDownload(
+        const nx::update::Package& package, const QString& downloadsDirPath);
 
     virtual vms::common::p2p::downloader::Downloader* downloader() = 0;
     virtual CommonUpdateInstaller* installer() = 0;
     virtual int64_t freeSpace(const QString& path) const = 0;
+    virtual QnStorageSpaceDataList availableStorages() const = 0;
 };
 
 } // namespace nx

@@ -5,13 +5,13 @@
 
 namespace nx::vms::client::desktop {
 
-class ItemSelectionHelper: public QObject
+class ItemModelUtils: public QObject
 {
     Q_OBJECT
 
 public:
-    Q_INVOKABLE QItemSelection createSelection(
-        const QModelIndex& topLeft, const QModelIndex& bottomRight) const;
+    Q_INVOKABLE static QItemSelection createSelection(
+        const QModelIndex& topLeft, const QModelIndex& bottomRight);
 
     static void registerQmlType();
 };

@@ -5,32 +5,33 @@
 
 namespace nx::vms::server::metrics {
 
-CameraProvider::CameraProvider(QnResourcePool* resourcePool):
-    utils::metrics::ResourceProvider<resource::CameraPtr>(makeProviders()),
-    m_resourcePool(resourcePool)
+CameraProvider::CameraProvider(QnMediaServerModule* serverModule):
+    ServerModuleAware(serverModule),
+    utils::metrics::ResourceProvider<resource::Camera*>(makeProviders())
 {
 }
 
 void CameraProvider::startMonitoring()
 {
+    const auto resourcePool = serverModule()->commonModule()->resourcePool();
     QObject::connect(
-        m_resourcePool, &QnResourcePool::resourceAdded,
+        resourcePool, &QnResourcePool::resourceAdded,
         [this](const QnResourcePtr& resource)
         {
-            if (auto camera = resource.dynamicCast<resource::Camera>())
+            if (auto camera = resource.dynamicCast<resource::Camera>().get())
             {
                 found(camera);
                 QObject::connect(
-                    camera.get(), &QnResource::flagsChanged, this,
+                    camera, &QnResource::flagsChanged, this,
                     [this, camera](QnResourcePtr) { changed(camera); });
             }
         });
 
     QObject::connect(
-        m_resourcePool, &QnResourcePool::resourceRemoved,
+        resourcePool, &QnResourcePool::resourceRemoved,
         [this](const QnResourcePtr& resource)
         {
-            if (auto camera = resource.dynamicCast<resource::Camera>())
+            if (auto camera = resource.dynamicCast<resource::Camera>().get())
             {
                 camera->disconnect(this);
                 lost(camera);
@@ -39,7 +40,7 @@ void CameraProvider::startMonitoring()
 }
 
 std::optional<utils::metrics::ResourceDescription> CameraProvider::describe(
-    const resource::CameraPtr& resource) const
+    const Resource& resource) const
 {
     if (resource->flags().testFlag(Qn::foreigner))
         return std::nullopt;
@@ -51,29 +52,13 @@ std::optional<utils::metrics::ResourceDescription> CameraProvider::describe(
     };
 }
 
-template<typename Signal>
-typename utils::metrics::SingleParameterProvider<resource::CameraPtr>::Watch
-    signalWatch(Signal signal)
-{
-    return [signal](
-        const resource::CameraPtr& resource,
-        typename utils::metrics::SingleParameterProvider<resource::CameraPtr>::OnChange change)
-    {
-        const auto connection = QObject::connect(
-            resource.get(), signal,
-            [change = std::move(change)](const auto& /*resource*/) { change(); });
-
-        return nx::utils::makeSharedGuard([connection]() { QObject::disconnect(connection); });
-    };
-}
-
 CameraProvider::ParameterProviders CameraProvider::makeProviders()
 {
     return parameterProviders(
         singleParameterProvider(
             {"url", "URL"},
             [](const auto& resource) { return Value(resource->getUrl()); },
-            signalWatch(&QnResource::urlChanged)
+            qSignalWatch(&QnResource::urlChanged)
         ),
         singleParameterProvider(
             {"type"},
@@ -98,7 +83,7 @@ CameraProvider::ParameterProviders CameraProvider::makeProviders()
         singleParameterProvider(
             {"status"},
             [](const auto& resource) { return Value(QnLexical::serialized(resource->getStatus())); },
-            signalWatch(&QnResource::statusChanged)
+            qSignalWatch(&QnResource::statusChanged)
         ),
         singleParameterProvider(
             {"packetLossCount", "number of packets lost in 1h"},
@@ -111,7 +96,8 @@ CameraProvider::ParameterProviders CameraProvider::makeProviders()
             // TODO: Detect changes.
         ),
         makeStreamProvider(api::StreamIndex::primary),
-        makeStreamProvider(api::StreamIndex::secondary)
+        makeStreamProvider(api::StreamIndex::secondary),
+        makeStorageProvider()
     );
 }
 
@@ -132,11 +118,26 @@ CameraProvider::ParameterProviderPtr CameraProvider::makeStreamProvider(api::Str
         ),
         singleParameterProvider(
             {"actualFps", "actual FPS", "fps"},
-            [](const auto& /*resource*/) { return Value(28); }
+            [](const auto& /*resource*/) { return Value(27); }
         ),
         singleParameterProvider(
             {"bitrate", "bitrate", "bps"},
             [](const auto& /*resource*/) { return Value(2500000); }
+        )
+    );
+}
+
+CameraProvider::ParameterProviderPtr CameraProvider::makeStorageProvider()
+{
+    // TODO: Implement actual providers.
+    return parameterGroupProvider({"storage"},
+        singleParameterProvider(
+            {"bitrate", "bitrate", "bps"},
+            [](const auto& /*resource*/) { return Value(2500000); }
+        ),
+        singleParameterProvider(
+            {"retention", "", "days"},
+            [](const auto& /*resource*/) { return Value(300); }
         )
     );
 }

@@ -28,7 +28,6 @@ struct FileMetadata: FileInformation
         const QDir& defaultDownloadsDirectory);
 
     QVector<QByteArray> chunkChecksums;
-    QString fullFilePath;
 };
 
 class Storage: public QObject

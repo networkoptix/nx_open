@@ -177,7 +177,7 @@ protected:
     bool m_reindexFinished = false;
     bool m_acquireServerCatalogs = true;
 
-    void onReindexFinished(QnSystemHealth::MessageType message)
+    void onReindexFinished(QnSystemHealth::MessageType /*message*/)
     {
         NX_MUTEX_LOCKER lock(&m_reindexMutex);
         for (auto it = m_generatedArchive.cbegin(); it != m_generatedArchive.cend(); ++it)
@@ -209,7 +209,7 @@ protected:
 
         const auto& serverChunks = serverCatalogIt.value()->getChunksUnsafe();
         ASSERT_EQ(generatedChunks.size(), serverChunks.size());
-        for (int i = 0; i < serverChunks.size(); ++i)
+        for (int i = 0; i < (int) serverChunks.size(); ++i)
             ASSERT_EQ(generatedChunks[i].startTimeMs, serverChunks[i].chunk().startTimeMs);
     }
 

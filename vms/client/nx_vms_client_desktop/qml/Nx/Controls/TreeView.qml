@@ -20,10 +20,7 @@ Item
     property alias scrollStepSize: listView.scrollStepSize //< In pixels.
     property alias hoverHighlightColor: listView.hoverHighlightColor
     property color selectionHighlightColor: "teal"
-
-    readonly property bool dragActive: dragIndicator.Drag.active
-
-    // TODO: #vkutin Expose more dragIndicator.Drag properties when required.
+    property color dropHighlightColor: "blue"
 
     ListView
     {
@@ -44,11 +41,6 @@ Item
         {
             id: selectionModel
             model: linearizationListModel
-        }
-
-        ItemSelectionHelper
-        {
-            id: selectionHelper
         }
 
         delegate: Component
@@ -93,6 +85,56 @@ Item
                     }
                 }
 
+                DropArea
+                {
+                    id: dropArea
+
+                    anchors.fill: parent
+
+                    onEntered:
+                    {
+                        drag.accepted = (itemFlags & Qt.ItemIsDropEnabled)
+                            && (checkDrop(drag, drag.proposedAction)
+                                || checkDrop(drag, Qt.MoveAction)
+                                || checkDrop(drag, Qt.CopyAction)
+                                || checkDrop(drag, Qt.LinkAction))
+                    }
+
+                    onDropped:
+                    {
+                        drop.accepted = (itemFlags & Qt.ItemIsDropEnabled)
+                            && DragAndDrop.drop(currentMimeData, drop.action, modelIndex)
+                    }
+
+                    function canDrop(drag, action)
+                    {
+                        return (drag.supportedActions & action)
+                            && (DragAndDrop.supportedDropActions(linearizationListModel) & action)
+                            && DragAndDrop.canDrop(currentMimeData, action, modelIndex)
+                    }
+
+                    function checkDrop(drag, action)
+                    {
+                        if (!canDrop(drag, action))
+                            return false
+
+                        drag.action = action
+                        return true
+                    }
+
+                    Rectangle
+                    {
+                        id: dropHighlight
+
+                        anchors.fill: parent
+                        color: "transparent"
+                        border.color: treeView.dropHighlightColor
+                        border.width: 1
+                        radius: 2
+                        visible: dropArea.containsDrag
+                    }
+                }
+
                 Image
                 {
                     id: button
@@ -134,13 +176,16 @@ Item
                                     if (!mouseArea.drag.active)
                                         return
 
-                                    dragIndicator.Drag.imageSource = resultUrl
-                                    dragIndicator.Drag.active = true
+                                    DragAndDrop.execute(
+                                        treeView,
+                                        DragAndDrop.createMimeData(selectionModel.selectedIndexes),
+                                        DragAndDrop.supportedDragActions(linearizationListModel),
+                                        Qt.MoveAction,
+                                        resultUrl)
                                 })
                         }
                         else
                         {
-                            dragIndicator.Drag.active = false
                             drag.target = null
                         }
                     }
@@ -189,7 +234,7 @@ Item
                             }
                             else if (shiftPressed && selectionModel.currentIndex.valid)
                             {
-                                var selection = selectionHelper.createSelection(
+                                var selection = ItemModelUtils.createSelection(
                                     selectionModel.currentIndex, modelIndex)
 
                                 selectionModel.select(selection, ItemSelectionModel.SelectCurrent)
@@ -265,8 +310,6 @@ Item
 
         Rectangle
         {
-            // TODO: #vkutin What about MIME data?
-
             // TODO: #vkutin Limit the size of displayed list.
 
             id: dragIndicator
@@ -275,8 +318,6 @@ Item
             height: column.height
             color: ColorTheme.transparent("black", 0.8)
             visible: false
-
-            Drag.dragType: Drag.Automatic
 
             Rectangle
             {

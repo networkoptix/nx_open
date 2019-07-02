@@ -1,19 +1,17 @@
 #pragma once
 
-#include <core/resource/media_server_resource.h>
+#include <core/resource/storage_resource.h>
 #include <nx/vms/server/server_module_aware.h>
 #include <nx/vms/utils/metrics/resource_providers.h>
 
-class QnStorageManager;
-
 namespace nx::vms::server::metrics {
 
-class ServerProvider:
+class StorageProvider:
     public ServerModuleAware,
-    public utils::metrics::ResourceProvider<QnMediaServerResource*>
+    public utils::metrics::ResourceProvider<QnStorageResource*>
 {
 public:
-    ServerProvider(QnMediaServerModule* serverModule);
+    StorageProvider(QnMediaServerModule* serverModule);
     void startMonitoring() override;
 
     std::optional<utils::metrics::ResourceDescription> describe(
@@ -21,8 +19,8 @@ public:
 
 private:
     ParameterProviders makeProviders();
-    ParameterProviderPtr makeStorageProvider(const QString& type, QnStorageManager* storageManager);
-    ParameterProviderPtr makeMiscProvider();
 };
 
 } // namespace nx::vms::server::metrics
+
+

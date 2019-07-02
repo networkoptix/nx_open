@@ -711,6 +711,16 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         nx::vms::api::MetadataStorageChangePolicy::keep,
         this);
 
+    m_targetPersistentUpdateStorageAdaptor = new QnLexicalResourcePropertyAdaptor<QByteArray>(
+        kTargetPersistentUpdateStorageName,
+        QByteArray(),
+        this);
+
+    m_installedPersistentUpdateStorageAdaptor = new QnLexicalResourcePropertyAdaptor<QByteArray>(
+        kInstalledPersistentUpdateStorageName,
+        QByteArray(),
+        this);
+
     connect(
         m_systemNameAdaptor,
         &QnAbstractResourcePropertyAdaptor::valueChanged,
@@ -887,6 +897,20 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         &QnGlobalSettings::downloaderPeersChanged,
         Qt::QueuedConnection);
 
+    connect(
+        m_targetPersistentUpdateStorageAdaptor,
+        &QnAbstractResourcePropertyAdaptor::valueChanged,
+        this,
+        &QnGlobalSettings::targetPersistentUpdateStorageChanged,
+        Qt::QueuedConnection);
+
+    connect(
+        m_installedPersistentUpdateStorageAdaptor,
+        &QnAbstractResourcePropertyAdaptor::valueChanged,
+        this,
+        &QnGlobalSettings::installedPersistentUpdateStorageChanged,
+        Qt::QueuedConnection);
+
     AdaptorList result;
     result
         << m_systemNameAdaptor
@@ -935,6 +959,8 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         << m_maxEventLogRecordsAdaptor
         << m_forceLiveCacheForPrimaryStreamAdaptor
         << m_metadataStorageChangePolicyAdaptor
+        << m_targetPersistentUpdateStorageAdaptor
+        << m_installedPersistentUpdateStorageAdaptor
     ;
 
     return result;
@@ -1650,6 +1676,28 @@ QByteArray QnGlobalSettings::targetUpdateInformation() const
 void QnGlobalSettings::setTargetUpdateInformation(const QByteArray& updateInformation)
 {
     m_targetUpdateInformationAdaptor->setValue(updateInformation);
+}
+
+QByteArray QnGlobalSettings::targetPersistentUpdateStorage() const
+{
+    return m_targetPersistentUpdateStorageAdaptor->value();
+}
+
+void QnGlobalSettings::setTargetPersistentUpdateStorage(
+    const QByteArray& persistentUpdateStorageSerializedData)
+{
+    m_targetPersistentUpdateStorageAdaptor->setValue(persistentUpdateStorageSerializedData);
+}
+
+QByteArray QnGlobalSettings::installedPersistentUpdateStorage() const
+{
+    return m_installedPersistentUpdateStorageAdaptor->value();
+}
+
+void QnGlobalSettings::setInstalledPersistentUpdateStorage(
+    const QByteArray& persistentUpdateStorageSerializedData)
+{
+    m_installedPersistentUpdateStorageAdaptor->setValue(persistentUpdateStorageSerializedData);
 }
 
 QByteArray QnGlobalSettings::installedUpdateInformation() const
