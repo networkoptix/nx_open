@@ -1448,7 +1448,7 @@ void MultiServerUpdatesWidget::processInitialCheckState()
         else if (!isOk)
         {
             NX_WARNING(this, "processInitialCheckState() - mediaservers have an active update "
-                "process to version %1 with error %2", updateInfo.info.version, updateInfo.error);
+                "process to version %1 with error \"%2\"", updateInfo.info.version, updateInfo.error);
         }
         else
         {
@@ -1476,7 +1476,7 @@ void MultiServerUpdatesWidget::processInitialCheckState()
         bool hasClientUpdate = m_clientUpdateTool->shouldInstallThis(updateInfo);
         m_updateLocalStateChanged = true;
 
-        if (!peersAreInstalling.empty())
+        if (!peersAreInstalling.empty() || updateInfo.alreadyInstalled)
         {
             NX_INFO(this,
                 "processInitialCheckState() - servers %1 are installing an update",
@@ -1484,7 +1484,7 @@ void MultiServerUpdatesWidget::processInitialCheckState()
 
             if (hasClientUpdate)
                 peersAreInstalling.insert(m_stateTracker->getClientPeerId());
-            setTargetState(WidgetUpdateState::installing, peersAreInstalling, false);
+            setTargetState(WidgetUpdateState::installing, peersAreInstalling + serversHaveInstalled, false);
         }
         else if (!serversAreDownloading.empty() || !serversWithDownloadingError.empty())
         {
