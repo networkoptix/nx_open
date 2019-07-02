@@ -10,24 +10,41 @@ namespace nx::vms::client::desktop {
 class ItemModelStateSnapshotHelper
 {
 public:
-    ItemModelStateSnapshotHelper(QAbstractItemModel* model);
-    QJsonDocument getItemModelStateDocument();
-    void saveItemModelStateJson(const QString& path);
-    bool compareItemModelState(const QString& referencePath, const QJsonDocument& stateDocument);
+    static QJsonDocument makeSnapshot(
+        const QAbstractItemModel* model,
+        const QModelIndex& rootIndex);
+
+    static void saveSnapshotToFile(
+        const QAbstractItemModel* model,
+        const QModelIndex& rootIndex,
+        const QString& path);
+
+    static bool compareItemModelState(
+        const QString& referencePath,
+        const QJsonDocument& stateDocument);
 
 private:
-    QJsonObject createItemModelObject() const;
-    QJsonObject createItemObject(const QModelIndex& index) const;
-    QJsonArray createRowsArray(const QModelIndex& parent) const;
-    QJsonArray createRowItemsArray(int row, const QModelIndex& parent) const;
-    QString getRoleName(int role) const;
+    static QJsonObject createItemObject(
+        const QAbstractItemModel* model,
+        const QModelIndex& index);
+
+    static QJsonArray createRowsArray(
+        const QAbstractItemModel* model,
+        const QModelIndex& parent);
+
+    static QJsonArray createRowItemsArray(
+        const QAbstractItemModel* model,
+        int row,
+        const QModelIndex& parent);
+
+    static QString getRoleName(
+        const QAbstractItemModel* model,
+        int role);
 
 private:
     static constexpr auto kItemDataObjectKey = "itemData";
     static constexpr auto kItemFlagsValueKey = "itemFlags";
     static constexpr auto kRowsArrayKey = "rows";
-
-    QAbstractItemModel* m_model = nullptr;
 };
 
 } // namespace nx::vms::client::desktop

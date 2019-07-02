@@ -6,18 +6,17 @@
 
 using namespace nx::vms::client::desktop;
 
-ItemModelStateSnapshotHelper::ItemModelStateSnapshotHelper(QAbstractItemModel* model):
-    m_model(model)
+QJsonDocument ItemModelStateSnapshotHelper::makeSnapshot(
+    const QAbstractItemModel* model,
+    const QModelIndex& rootIndex)
 {
-    NX_ASSERT(model);
+   return QJsonDocument(createRowsArray(model, rootIndex));
 }
 
-QJsonDocument ItemModelStateSnapshotHelper::getItemModelStateDocument()
-{
-    return QJsonDocument(createItemModelObject());
-}
-
-void ItemModelStateSnapshotHelper::saveItemModelStateJson(const QString& path)
+void ItemModelStateSnapshotHelper::saveSnapshotToFile(
+    const QAbstractItemModel* model,
+    const QModelIndex& rootIndex,
+    const QString& path)
 {
     QFile file(path);
     if (!file.open(QFile::WriteOnly | QFile::Truncate))
@@ -25,10 +24,11 @@ void ItemModelStateSnapshotHelper::saveItemModelStateJson(const QString& path)
         NX_ASSERT(false);
         return;
     }
-    file.write(getItemModelStateDocument().toJson(QJsonDocument::Indented));
+    file.write(makeSnapshot(model, rootIndex).toJson(QJsonDocument::Indented));
 }
 
-bool ItemModelStateSnapshotHelper::compareItemModelState(const QString& referencePath,
+bool ItemModelStateSnapshotHelper::compareItemModelState(
+    const QString& referencePath,
     const QJsonDocument& stateDocument)
 {
     QFile file(referencePath);
@@ -47,17 +47,9 @@ bool ItemModelStateSnapshotHelper::compareItemModelState(const QString& referenc
     return referenceDocument == stateDocument;
 }
 
-QJsonObject ItemModelStateSnapshotHelper::createItemModelObject() const
-{
-    QJsonObject itemModelObject;
-
-    if ((m_model->rowCount() > 0) && (m_model->columnCount() > 0))
-        itemModelObject.insert(kRowsArrayKey, createRowsArray(QModelIndex()));
-
-    return itemModelObject;
-}
-
-QJsonObject ItemModelStateSnapshotHelper::createItemObject(const QModelIndex& index) const
+QJsonObject ItemModelStateSnapshotHelper::createItemObject(
+    const QAbstractItemModel* model,
+    const QModelIndex& index)
 {
     QJsonObject itemObject;
     if (!index.isValid())
@@ -66,40 +58,45 @@ QJsonObject ItemModelStateSnapshotHelper::createItemObject(const QModelIndex& in
         return itemObject;
     }
 
-    const auto indexData = m_model->itemData(index);
+    const auto indexData = model->itemData(index);
     QVariantMap variantMap;
     for (auto i = indexData.cbegin(); i != indexData.cend(); ++i)
-        variantMap.insert(getRoleName(i.key()), i.value());
+        variantMap.insert(getRoleName(model, i.key()), i.value());
 
     if (!variantMap.empty())
         itemObject.insert(kItemDataObjectKey, QJsonObject::fromVariantMap(variantMap));
-    itemObject.insert(kItemFlagsValueKey, QJsonValue(static_cast<Qt::ItemFlags::Int>(index.flags())));
-    if ((m_model->rowCount(index) > 0) && (m_model->columnCount(index) > 0))
-        itemObject.insert(kRowsArrayKey, createRowsArray(index));
+    itemObject.insert(kItemFlagsValueKey,
+        QJsonValue(static_cast<Qt::ItemFlags::Int>(index.flags())));
+    if ((model->rowCount(index) > 0) && (model->columnCount(index) > 0))
+        itemObject.insert(kRowsArrayKey, createRowsArray(model, index));
 
     return itemObject;
 }
 
-QJsonArray ItemModelStateSnapshotHelper::createRowsArray(const QModelIndex& parent) const
+QJsonArray ItemModelStateSnapshotHelper::createRowsArray(
+    const QAbstractItemModel* model,
+    const QModelIndex& parent)
 {
     QJsonArray rowsArray;
-    for (int row = 0; row < m_model->rowCount(parent); ++row)
-        rowsArray.append(createRowItemsArray(row, parent));
+    for (int row = 0; row < model->rowCount(parent); ++row)
+        rowsArray.append(createRowItemsArray(model, row, parent));
     return rowsArray;
 }
 
-QJsonArray ItemModelStateSnapshotHelper::createRowItemsArray(int row,
-    const QModelIndex& parent) const
+QJsonArray ItemModelStateSnapshotHelper::createRowItemsArray(
+    const QAbstractItemModel* model,
+    int row,
+    const QModelIndex& parent)
 {
     QJsonArray rowItems;
-    for (int column = 0; column < m_model->columnCount(parent); ++column)
-        rowItems.append(createItemObject(m_model->index(row, column, parent)));
+    for (int column = 0; column < model->columnCount(parent); ++column)
+        rowItems.append(createItemObject(model, model->index(row, column, parent)));
     return rowItems;
 }
 
-QString ItemModelStateSnapshotHelper::getRoleName(int role) const
+QString ItemModelStateSnapshotHelper::getRoleName(const QAbstractItemModel* model, int role)
 {
-    const auto roleNames = m_model->roleNames();
+    const auto roleNames = model->roleNames();
     if (roleNames.contains(role))
         return roleNames.value(role);
     return QString::number(role);
