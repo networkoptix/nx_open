@@ -21,9 +21,6 @@ Item
     property alias hoverHighlightColor: listView.hoverHighlightColor
     property color selectionHighlightColor: "teal"
 
-    property int supportedDragActions: Qt.MoveAction
-    property int proposedDragAction: Qt.IgnoreAction
-
     ListView
     {
         id: listView
@@ -87,6 +84,44 @@ Item
                     }
                 }
 
+                DropArea
+                {
+                    id: dropArea
+
+                    anchors.fill: parent
+
+                    onEntered:
+                    {
+                        drag.accepted = (itemFlags & Qt.ItemIsDropEnabled)
+                            && (checkDrop(drag, drag.proposedAction)
+                                || checkDrop(drag, Qt.MoveAction)
+                                || checkDrop(drag, Qt.CopyAction)
+                                || checkDrop(drag, Qt.LinkAction))
+                    }
+
+                    onDropped:
+                    {
+                        drop.accepted = (itemFlags & Qt.ItemIsDropEnabled)
+                            && DragAndDrop.drop(currentMimeData, drop.action, modelIndex)
+                    }
+
+                    function canDrop(drag, action)
+                    {
+                        return (drag.supportedActions && action)
+                            && (DragAndDrop.supportedDropActions(linearizationListModel) & action)
+                            && DragAndDrop.canDrop(currentMimeData, action, modelIndex)
+                    }
+
+                    function checkDrop(drag, action)
+                    {
+                        if (!canDrop(drag, action))
+                            return false
+
+                        drag.action = action
+                        return true
+                    }
+                }
+
                 Image
                 {
                     id: button
@@ -130,9 +165,9 @@ Item
 
                                     DragAndDrop.execute(
                                         treeView,
-                                        ItemModelUtils.mimeData(selectionModel.selectedIndexes),
-                                        treeView.supportedDragActions,
-                                        treeView.proposedDragAction,
+                                        DragAndDrop.createMimeData(selectionModel.selectedIndexes),
+                                        DragAndDrop.supportedDragActions(linearizationListModel),
+                                        Qt.MoveAction,
                                         resultUrl)
                                 })
                         }
@@ -262,8 +297,6 @@ Item
 
         Rectangle
         {
-            // TODO: #vkutin What about MIME data?
-
             // TODO: #vkutin Limit the size of displayed list.
 
             id: dragIndicator
