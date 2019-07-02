@@ -8891,10 +8891,6 @@ If you intended to move analytics data to another storage location, please conta
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Iternal server error.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Internal client error.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -8912,6 +8908,14 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>Update package is not found.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>There is not enough space to install update.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Internal server error.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
