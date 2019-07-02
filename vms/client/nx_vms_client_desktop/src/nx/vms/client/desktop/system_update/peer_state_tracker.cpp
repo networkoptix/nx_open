@@ -895,7 +895,7 @@ QString PeerStateTracker::errorString(nx::update::Status::ErrorCode code)
         case Code::internalDownloaderError:
             return tr("Internal downloader error.");
         case Code::internalError:
-            return tr("Iternal server error.");
+            return tr("Internal server error.");
         case Code::applauncherError:
             return tr("Internal client error.");
         case Code::unknownError:
