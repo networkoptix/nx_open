@@ -1157,8 +1157,10 @@ void MultiServerUpdatesWidget::atStartUpdateComplete(bool success)
             if (!m_updateInfo.manualPackages.empty())
                 m_serverUpdateTool->startManualDownloads(m_updateInfo);
 
-            if (m_updateSourceMode == UpdateSourceType::file)
-                m_serverUpdateTool->startUpload(m_updateInfo);
+            if (m_serverStatusCheck.valid())
+                NX_ERROR(this, "atStartUpdateComplete() - m_serverStatusCheck is not empty. ");
+
+            m_serverStatusCheck = m_serverUpdateTool->requestRemoteUpdateState();
         }
         else
         {
@@ -1424,7 +1426,7 @@ void MultiServerUpdatesWidget::processInitialCheckState()
 
         ServerUpdateTool::RemoteStatus remoteStatus;
         m_serverUpdateTool->getServersStatusChanges(remoteStatus);
-        m_stateTracker->setUpdateStatus(remoteStatus);
+        m_stateTracker->setUpdateStatus(serverStatus);
         m_stateTracker->processUnknownStates();
 
         /*
@@ -1541,6 +1543,28 @@ void MultiServerUpdatesWidget::processDownloadingState()
     auto peersComplete = m_stateTracker->peersComplete();
     auto peersIssued = m_stateTracker->peersIssued();
 
+    // Starting uploads only when we get a proper data from /ec2/updateStatus.
+    if (m_serverStatusCheck.valid()
+        && m_serverStatusCheck.wait_for(kWaitForUpdateCheckFuture) == std::future_status::ready)
+    {
+        auto remoteStatus = m_serverStatusCheck.get();
+        m_stateTracker->setUpdateStatus(remoteStatus);
+
+        auto peersDownloading = m_stateTracker->peersInState(StatusCode::downloading);
+
+        if (!peersDownloading.isEmpty()
+            && peersFailed.isEmpty()
+            && m_updateSourceMode == UpdateSourceType::file)
+        {
+            NX_VERBOSE(this, "processStartingDownload() - starting uploads");
+            m_serverUpdateTool->startUpload(m_updateInfo);
+        }
+        else
+        {
+            NX_ERROR(this, "processStartingDownload() - no servers downloading or an error.");
+        }
+    }
+
     if (peersActive.size() + peersUnknown.size() > 0 && peersFailed.empty())
         return;
 
@@ -1594,6 +1618,25 @@ void MultiServerUpdatesWidget::processDownloadingState()
     }
 
     processUploaderChanges();
+}
+
+void MultiServerUpdatesWidget::processReadyInstallState()
+{
+    auto idle = m_stateTracker->peersInState(StatusCode::idle);
+    auto all = m_stateTracker->allPeers();
+    auto downloading = m_stateTracker->peersInState(StatusCode::downloading);
+    downloading.subtract(m_stateTracker->offlineServers());
+    if (!downloading.empty())
+    {
+        // We should go to downloading stage if we have merged
+        // another system. This system will start update automatically, so we just need
+        // to change UI state.
+        setTargetState(WidgetUpdateState::downloading, downloading, false);
+    }
+    else if (idle.size() == all.size() && m_serverUpdateTool->haveActiveUpdate())
+    {
+        setTargetState(WidgetUpdateState::ready, {});
+    }
 }
 
 void MultiServerUpdatesWidget::processInstallingState()
@@ -1770,21 +1813,7 @@ bool MultiServerUpdatesWidget::processRemoteChanges()
     }
     else if (m_widgetState == WidgetUpdateState::readyInstall)
     {
-        auto idle = m_stateTracker->peersInState(StatusCode::idle);
-        auto all = m_stateTracker->allPeers();
-        auto downloading = m_stateTracker->peersInState(StatusCode::downloading);
-        downloading.subtract(m_stateTracker->offlineServers());
-        if (!downloading.empty())
-        {
-            // We should go to downloading stage if we have merged
-            // another system. This system will start update automatically, so we just need
-            // to change UI state.
-            setTargetState(WidgetUpdateState::downloading, downloading, false);
-        }
-        else if (idle.size() == all.size() && m_serverUpdateTool->haveActiveUpdate())
-        {
-            setTargetState(WidgetUpdateState::ready, {});
-        }
+        processReadyInstallState();
     }
     m_updateRemoteStateChanged = true;
 

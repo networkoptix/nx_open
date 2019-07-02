@@ -4,6 +4,7 @@
 #include <chrono>
 
 #include <QtCore/QBitArray>
+#include <QtCore/QElapsedTimer>
 
 #include <nx/utils/thread/long_runnable.h>
 #include <api/server_rest_connection_fwd.h>
@@ -74,11 +75,14 @@ public:
 
     nx::utils::log::Tag logTag() const;
 
+    bool isStalled() const;
+
 signals:
     void finished(const QString& fileName);
     void failed(const QString& fileName);
     void chunkDownloadFailed(const QString& fileName);
     void stateChanged(State state);
+    void stalledChanged(bool stalled);
 
 private:
     struct RequestHandle
@@ -145,6 +149,9 @@ protected:
 
     QList<AbstractPeerManager*> peerManagers() const;
 
+    void markActive();
+    void checkStalled();
+
 private:
     QnUuid m_selfId;
     Storage* m_storage = nullptr;
@@ -174,6 +181,9 @@ private:
         void decreaseRank(int value = 1);
     };
     QHash<Peer, PeerInformation> m_peerInfoByPeer;
+
+    QElapsedTimer m_stallDetectionTimer;
+    bool m_stalled = false;
 };
 
 } // namespace nx::vms::common::p2p::downloader

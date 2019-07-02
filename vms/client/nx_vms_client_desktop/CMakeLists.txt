@@ -98,3 +98,18 @@ endif()
 if(withTests)
     add_subdirectory(unit_tests)
 endif()
+
+option(enableWebEngine "Enable Qt WebEngine support" OFF)
+mark_as_advanced(enableWebEngine)
+if(enableWebEngine)
+    find_package(Qt5
+        COMPONENTS
+            WebEngine
+            WebEngineWidgets)
+
+    target_compile_definitions(nx_vms_client_desktop
+        PRIVATE NX_ENABLE_WEBENGINE=1
+    )
+
+    target_link_libraries(nx_vms_client_desktop PUBLIC Qt5::WebEngine Qt5::WebEngineWidgets)
+endif()

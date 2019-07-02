@@ -22,6 +22,7 @@ constexpr int kDefaultPeersPerOperation = 5;
 constexpr int kSubsequentChunksToDownload = 10;
 static const int kMaxSimultaneousDownloads = 5;
 constexpr milliseconds kDefaultStepDelay = 1min;
+constexpr milliseconds kStallDetectionTimeout = 2min;
 constexpr int kMaxAutoRank = 5;
 constexpr int kMinAutoRank = -1;
 
@@ -192,6 +193,7 @@ void Worker::run()
 
     m_availableChunks.resize(fileInfo.downloadedChunks.size());
 
+    m_stallDetectionTimer.restart();
     m_started = true;
     doWork();
 }
@@ -273,6 +275,11 @@ utils::log::Tag Worker::logTag() const
     return m_logTag;
 }
 
+bool Worker::isStalled() const
+{
+    return m_stalled;
+}
+
 void Worker::setState(State state)
 {
     if (m_state == state)
@@ -299,6 +306,8 @@ void Worker::doWork()
             NX_VERBOSE(m_logTag, "doWork(): File information is not valid. Exiting...");
             return;
         }
+
+        checkStalled();
 
         NX_VERBOSE(m_logTag, "doWork(): Start iteration in state %1", m_state);
 
@@ -716,6 +725,8 @@ void Worker::handleDownloadChunkReply(
         emit chunkDownloadFailed(m_fileName);
         return;
     }
+
+    markActive();
 }
 
 void Worker::finish(State state)
@@ -1026,6 +1037,30 @@ void Worker::decreasePeerRank(const Peer& peer, int value)
 QList<AbstractPeerManager*> Worker::peerManagers() const
 {
     return m_peerManagers;
+}
+
+void Worker::markActive()
+{
+    NX_VERBOSE(m_logTag, "Marking the download as active...");
+    m_stallDetectionTimer.restart();
+    checkStalled();
+}
+
+void Worker::checkStalled()
+{
+    const bool stalled = m_stallDetectionTimer.hasExpired(kStallDetectionTimeout.count());
+
+    if (m_stalled == stalled)
+        return;
+
+    m_stalled = stalled;
+
+    if (stalled)
+        NX_WARNING(m_logTag, "Download is stalled.");
+    else
+        NX_INFO(m_logTag, "Download is no longer stalled.");
+
+    emit stalledChanged(stalled);
 }
 
 void Worker::PeerInformation::increaseRank(int value)
