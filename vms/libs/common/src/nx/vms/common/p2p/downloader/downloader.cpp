@@ -144,7 +144,7 @@ Downloader::Downloader(
 
 Downloader::~Downloader()
 {
-    d->workers.clear();
+    stopDownloads();
     qDeleteAll(d->peerManagers);
 }
 
