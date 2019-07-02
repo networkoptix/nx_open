@@ -19,7 +19,7 @@ WebSocket::WebSocket(
     network::websocket::CompressionType compressionType)
     :
     m_socket(std::move(streamSocket)),
-    m_parser(role, this, compressionType),
+    m_parser(role, this),
     m_serializer(role == Role::client),
     m_sendMode(sendMode),
     m_receiveMode(receiveMode),

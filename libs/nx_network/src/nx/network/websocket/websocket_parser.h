@@ -35,7 +35,7 @@ class NX_NETWORK_API Parser
     const int kFixedHeaderLen = 2;
 
 public:
-    Parser(Role role, ParserHandler* handler, CompressionType compressionType);
+    Parser(Role role, ParserHandler* handler);
     void consume(char* data, int len);
     void consume(nx::Buffer& buf);
     void setRole(Role role);
@@ -56,7 +56,6 @@ private:
     bool m_masked = false;
     unsigned int m_mask = 0;
     int m_maskPos;
-    CompressionType m_compressionType;
     bool m_firstFrame = true;
     bool m_doUncompress = false;
 

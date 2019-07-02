@@ -9,10 +9,9 @@ namespace nx {
 namespace network {
 namespace websocket {
 
-Parser::Parser(Role role, ParserHandler* handler, CompressionType compressionType):
+Parser::Parser(Role role, ParserHandler* handler):
     m_role(role),
-    m_handler(handler),
-    m_compressionType(compressionType)
+    m_handler(handler)
 {
 }
 
