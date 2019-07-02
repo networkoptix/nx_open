@@ -107,7 +107,7 @@ Item
 
                     function canDrop(drag, action)
                     {
-                        return (drag.supportedActions && action)
+                        return (drag.supportedActions & action)
                             && (DragAndDrop.supportedDropActions(linearizationListModel) & action)
                             && DragAndDrop.canDrop(currentMimeData, action, modelIndex)
                     }
