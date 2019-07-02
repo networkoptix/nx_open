@@ -2620,7 +2620,6 @@ void QnWorkbenchVideoWallHandler::at_workbenchLayoutItem_dataChanged(Qn::ItemDat
             if (display()->isChangingLayout())
                 return;
 
-        [[fallthrough]]
         case Qn::ItemGeometryRole:
         {
             QRect value = data.value<QRect>();
