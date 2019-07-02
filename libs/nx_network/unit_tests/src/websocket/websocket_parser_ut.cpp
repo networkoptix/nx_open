@@ -75,7 +75,7 @@ struct ParserTestParams
 class WebsocketParserTest : public ::testing::TestWithParam<ParserTestParams>
 {
 protected:
-    WebsocketParserTest(): m_parser(Role::client, &m_parserHandler, GetParam().compressionType)
+    WebsocketParserTest(): m_parser(Role::client, &m_parserHandler/*, GetParam().compressionType*/)
     {
         m_defaultPayload = fillDummyPayload(GetParam().payloadSize);
     }
