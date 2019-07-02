@@ -373,10 +373,10 @@ void LinearizationListModel::Private::sourceRowsAboutToBeRemoved(
     NX_CRITICAL(!m_operationInProgress);
 
     const auto node = getNode(sourceParent);
-    if (!node || node->children.empty() /*might be not expanded*/)
+    if (!node || (node != m_rootNode && node->children.empty()) /*might be not expanded*/)
         return;
 
-    if (!NX_ASSERT(first >= 0 && last >= first && last <= node->children.size()))
+    if (!NX_ASSERT(first >= 0 && last >= first && last < node->children.size()))
         return;
 
     const int linearBegin = node->children[first]->row;
