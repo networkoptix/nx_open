@@ -285,7 +285,11 @@ startServer()
     service $COMPANY_NAME-mediaserver start
 }
 
-startServer || exit $?
+if ! startServer
+then
+    echo "ERROR: Unable to start Server." >&2
+    exit 1
+fi
 
 sleep 1
 if ! PID=$(pidof mediaserver-bin)

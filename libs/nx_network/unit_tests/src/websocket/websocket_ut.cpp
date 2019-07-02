@@ -1212,6 +1212,31 @@ TEST_P(WebSocket, UnexpectedClose_ReadReturnedZero)
     ASSERT_TRUE(!serverWebSocket);
 }
 
+TEST_P(WebSocket, SendAfterConnectionHasFailed)
+{
+    givenClientModes(SendMode::singleMessage, ReceiveMode::message);
+    givenServerModes(SendMode::singleMessage, ReceiveMode::message);
+    givenClientTestDataPrepared(1684 * 1024 + 17);
+    givenServerClientWebSockets();
+
+    serverWebSocket->post([this]() { resetServerSocket(); });
+    utils::promise<SystemError::ErrorCode> failHandlerPromise;
+    auto failHandlerFuture = failHandlerPromise.get_future();
+
+    clientWebSocket->sendAsync(
+        clientSendBuf,
+        [p = std::move(failHandlerPromise)](SystemError::ErrorCode error, size_t) mutable
+        {
+            p.set_value(error);
+        });
+
+    ASSERT_EQ(SystemError::connectionAbort, failHandlerFuture.get());
+    clientWebSocket->post([this]() { resetClientSocket(); });
+
+    waitForClientSocketDestroyed();
+    waitForServerSocketDestroyed();
+}
+
 TEST_P(WebSocket, imcomingMessagesQueueOverflow)
 {
     givenClientModes(SendMode::singleMessage, ReceiveMode::message);

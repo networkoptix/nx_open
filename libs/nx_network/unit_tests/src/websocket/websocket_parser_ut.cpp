@@ -23,7 +23,11 @@ using ::testing::_;
 using ::testing::AtLeast;
 
 static nx::Buffer prepareMessage(
-    const nx::Buffer& payload, int frameCount, FrameType type, bool masked, int mask,
+    const nx::Buffer& payload,
+    int frameCount,
+    FrameType type,
+    bool masked,
+    int mask,
     CompressionType compressionType)
 {
     Serializer serializer(masked, mask);
@@ -38,8 +42,7 @@ static nx::Buffer prepareMessage(
         if (i > 0)
             opCode = FrameType::continuation;
 
-        result += serializer.prepareFrame(
-            payload, opCode, compressionType, i == frameCount - 1, i == 0);
+        result += serializer.prepareFrame(payload, opCode, i == frameCount - 1);
     }
 
     return result;
@@ -58,12 +61,23 @@ static nx::Buffer fillDummyPayload(int size)
 
 }
 
-class WebsocketParserTest : public ::testing::TestWithParam<CompressionType>
+struct ParserTestParams
+{
+    CompressionType compressionType;
+    int payloadSize;
+
+    ParserTestParams(CompressionType compressionType, int payloadSize):
+        compressionType(compressionType),
+        payloadSize(payloadSize)
+    {}
+};
+
+class WebsocketParserTest : public ::testing::TestWithParam<ParserTestParams>
 {
 protected:
-    WebsocketParserTest(): m_parser(Role::client, &m_parserHandler, GetParam())
+    WebsocketParserTest(): m_parser(Role::client, &m_parserHandler, GetParam().compressionType)
     {
-        m_defaultPayload = fillDummyPayload(1000);
+        m_defaultPayload = fillDummyPayload(GetParam().payloadSize);
     }
 
     void testWebsocketParserAndSerializer(
@@ -87,7 +101,8 @@ protected:
         }
 
         int messageOffset = 0;
-        auto message = prepareMessage(m_defaultPayload, frameCount, type, masked, mask, GetParam());
+        auto message = prepareMessage(
+            m_defaultPayload, frameCount, type, masked, mask, GetParam().compressionType);
 
         for (int i = 0; ; ++i)
         {
@@ -125,4 +140,8 @@ TEST_P(WebsocketParserTest, Mask)
 
 INSTANTIATE_TEST_CASE_P(WebsocketParserSerializer_differentCompressionModes,
     WebsocketParserTest,
-    ::testing::Values(CompressionType::none, CompressionType::perMessageDeflate));
+    ::testing::Values(
+        ParserTestParams(CompressionType::none, 20),
+        ParserTestParams(CompressionType::perMessageDeflate, 20),
+        ParserTestParams(CompressionType::none, 1000),
+        ParserTestParams(CompressionType::perMessageDeflate, 1000)));
