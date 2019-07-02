@@ -116,16 +116,9 @@ Parser::ParseState Parser::readHeaderFixed(char* data)
 {
     m_opCode = (FrameType)(*data & 0x0F);
     m_fin = (*data >> 7) & 0x01;
-    bool psv1 = ((*data >> 6) & 0x01) ? CompressionType::perMessageDeflate : CompressionType::none;
 
-    if (m_firstFrame
-        && m_compressionType == CompressionType::perMessageDeflate
-        && isDataFrame(m_opCode))
-    {
-        NX_ASSERT(psv1);
-        if (psv1)
-            m_doUncompress = true;
-    }
+    if (static_cast<bool>((*data >> 6) & 0x01)) //< RSV1 bit set
+        m_doUncompress = true;
 
     data++;
     m_masked = (*data >> 7) & 0x01;
@@ -145,7 +138,7 @@ Parser::ParseState Parser::readHeaderFixed(char* data)
 
 void Parser::handleFrame()
 {
-    if ((m_compressionType == CompressionType::perMessageDeflate) && m_doUncompress)
+    if (m_doUncompress)
         m_frameBuffer = nx::utils::bstream::gzip::Compressor::uncompressData(m_frameBuffer);
 
     m_handler->gotFrame(m_firstFrame ? m_opCode : FrameType::continuation, m_frameBuffer, m_fin);

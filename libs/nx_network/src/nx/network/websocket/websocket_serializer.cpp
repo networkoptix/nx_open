@@ -40,30 +40,20 @@ Serializer::Serializer(bool masked, unsigned mask)
 nx::Buffer Serializer::prepareMessage(
     nx::Buffer payload, FrameType type, CompressionType compressionType)
 {
-    return prepareFrame(payload, type, compressionType, /*fin*/true, /*first*/true);
+    m_doCompress = shouldMessageBeCompressed(type, compressionType, payload.size());
+    return prepareFrame(payload, type, /*fin*/true);
 }
 
-nx::Buffer Serializer::prepareFrame(
-    nx::Buffer payload, FrameType type, CompressionType compressionType, bool fin, bool first)
+nx::Buffer Serializer::prepareFrame(nx::Buffer payload, FrameType type, bool fin)
 {
-    if (isDataFrame(type))
-    {
-        switch (compressionType)
-        {
-            case CompressionType::none:
-                break;
-            case CompressionType::perMessageDeflate:
-                payload =
-                    nx::utils::bstream::gzip::Compressor::compressData(std::move(payload), false);
-                break;
-        }
-    }
+    if (m_doCompress)
+        payload = nx::utils::bstream::gzip::Compressor::compressData(std::move(payload), false);
 
     nx::Buffer header;
     int payloadLenType = payloadLenTypeByLen(payload.size());
     header.resize(calcHeaderSize(m_masked, payloadLenType));
     header.fill(0);
-    fillHeader(header.data(), fin, first, type, compressionType, payloadLenType, payload.size());
+    fillHeader(header.data(), fin, type, payloadLenType, payload.size());
 
     if (m_masked)
     {
@@ -84,20 +74,13 @@ void Serializer::setMasked(bool masked, unsigned mask)
 }
 
 int Serializer::fillHeader(
-    char* data, bool fin, bool first, FrameType opCode, CompressionType compressionType,
-    int payloadLenType, int payloadLen)
+    char* data, bool fin, FrameType opCode, int payloadLenType, int payloadLen)
 {
     char* pdata = data;
 
     *pdata = static_cast<uint8_t>(fin) << 7;
-    switch (compressionType)
-    {
-        case CompressionType::none:
-            break;
-        case CompressionType::perMessageDeflate:
-            *pdata |= static_cast<int>(isDataFrame(opCode) && first) << 6;
-            break;
-    }
+    if (m_doCompress)
+        *pdata |= 1 << 6; //< Setting the RSV1 bit
 
     *pdata |= opCode & 0xf;
     pdata++;

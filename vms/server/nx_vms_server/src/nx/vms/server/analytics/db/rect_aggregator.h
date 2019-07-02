@@ -6,6 +6,7 @@
 #include <QtGui/QRegion>
 
 #include <nx/utils/log/assert.h>
+#include <nx/utils/log/log.h>
 
 namespace nx::analytics::db {
 
@@ -46,6 +47,8 @@ public:
 
     void add(const QRect& rect, const Value& value)
     {
+        NX_VERBOSE(this, "Adding rect %1 with value %2", rect, value);
+
         QRegion region(rect);
 
         for (auto it = m_aggregatedRects.begin();
@@ -61,7 +64,8 @@ public:
                 continue;
 
             // It is always so since m_aggregatedRects does not contain intersecting rects.
-            NX_ASSERT(intersectionRegion.rectCount() == 1);
+            NX_ASSERT(intersectionRegion.rectCount() == 1,
+                lm("intersectionRegion.rectCount() = %1").args(intersectionRegion.rectCount()));
 
             const auto intersection = *intersectionRegion.begin();
             if (aggregatedRect.values.find(value) == aggregatedRect.values.end())
@@ -87,11 +91,15 @@ public:
 
     std::vector<AggregatedRect> takeAggregatedData()
     {
+        NX_VERBOSE(this, "Giving out %1 aggregated rects", m_aggregatedRects.size());
+
         return std::exchange(m_aggregatedRects, {});
     }
 
     void clear()
     {
+        NX_VERBOSE(this, "Clear");
+
         m_aggregatedRects.clear();
     }
 
@@ -163,7 +171,7 @@ private:
     bool adjacent(const QRect& one, const QRect& two)
     {
         const auto& united = one.united(two);
-        return united.width() * united.height() == 
+        return united.width() * united.height() ==
             one.width() * one.height() + two.width() * two.height();
     }
 };

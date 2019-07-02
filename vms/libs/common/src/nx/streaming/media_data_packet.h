@@ -240,6 +240,7 @@ public:
     quint64 startTimeMs;
     quint32 durationMs;
     quint8 channel;
+    quint8 reserved0;
     quint16 reserved;
     quint8 data[Qn::kMotionGridWidth*Qn::kMotionGridHeight/8];
 };

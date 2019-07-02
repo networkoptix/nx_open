@@ -58,6 +58,7 @@
 #include <nx/vms/event/rule.h>
 #include <nx/vms/time_sync/legacy/time_manager.h>
 #include <nx/sql/database.h>
+#include <core/resource/media_server_resource.h>
 
 static const QString RES_TYPE_MSERVER = "mediaserver";
 static const QString RES_TYPE_CAMERA = "camera";
@@ -1496,6 +1497,9 @@ bool QnDbManager::beforeInstallUpdate(const QString& updateName)
     if (updateName.endsWith(lit("/33_history_refactor_dummy.sql")))
         return removeOldCameraHistory();
 
+    if (updateName.endsWith(lit("/99_20190701_move_metadata_storage_id.sql")))
+        return moveAnalyticsStorageIdToProperty();
+
     return true;
 }
 
@@ -1992,7 +1996,34 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
     if (updateName.endsWith("/99_20190110_improve_layout_api.sql"))
         return resyncIfNeeded(ResyncLayouts);
 
+    if (updateName.endsWith(lit("/99_20190701_move_metadata_storage_id.sql")))
+        return resyncIfNeeded({ ResyncServerAttributes, ResyncResourceProperties });
+
     NX_DEBUG(this, lit("SQL update %1 does not require post-actions.").arg(updateName));
+    return true;
+}
+
+bool QnDbManager::moveAnalyticsStorageIdToProperty()
+{
+    QSqlQuery query(m_sdb);
+    QString queryStr(lit("SELECT server_guid, metadata_storage_id FROM vms_server_user_attributes"));
+    if (!prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
+        return false;
+    if (!execSQLQuery(&query, Q_FUNC_INFO))
+        return false;
+    while (query.next())
+    {
+        auto metadataStorageId = QnSql::deserialized_field<QnUuid>(query.value(1));
+        if (!metadataStorageId.isNull())
+        {
+            ResourceParamWithRefData param;
+            param.resourceId = QnSql::deserialized_field<QnUuid>(query.value(0));
+            param.name = QnMediaServerResource::kMetadataStorageIdKey;
+            param.value = metadataStorageId.toString();
+            if (insertAddParam(param) != ErrorCode::ok)
+                return false;
+        }
+    }
     return true;
 }
 
@@ -2703,8 +2734,7 @@ ErrorCode QnDbManager::insertOrReplaceMediaServerUserAttributes(const MediaServe
             backup_days_of_the_week,                             \
             backup_start,                                        \
             backup_duration,                                     \
-            backup_bitrate,                                      \
-            metadata_storage_id                                  \
+            backup_bitrate                                       \
         )                                                        \
         VALUES(                                                  \
             :serverId,                                           \
@@ -2715,8 +2745,7 @@ ErrorCode QnDbManager::insertOrReplaceMediaServerUserAttributes(const MediaServe
             :backupDaysOfTheWeek,                                \
             :backupStart,                                        \
             :backupDuration,                                     \
-            :backupBitrate,                                      \
-            :metadataStorageId                                   \
+            :backupBitrate                                       \
         )                                                        \
         ");
     QnSql::bind(data, &insQuery);
@@ -4111,8 +4140,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& mServerId, MediaServerUserAtt
             backup_days_of_the_week as backupDaysOfTheWeek,         \
             backup_start as backupStart,                            \
             backup_duration as backupDuration,                      \
-            backup_bitrate as backupBitrate,                        \
-            metadata_storage_id as metadataStorageId                \
+            backup_bitrate as backupBitrate                         \
         FROM vms_server_user_attributes                             \
         %1                                                          \
         ORDER BY server_guid                                        \
