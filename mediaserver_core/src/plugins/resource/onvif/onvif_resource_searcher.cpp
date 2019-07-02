@@ -293,10 +293,9 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
 
         if(!resource->getUniqueId().isEmpty())
         {
-            auto maxChannels = resource->getMaxChannels();
             resource->fetchChannelCount();
-            //if (channel > 0)
-            //    resource->updateToChannel(channel-1);
+            if (resource->getMaxChannels() > 1)
+                resource->setGroupId(resource->getPhysicalId());
             resList << resource;
 
             bool shouldAppearAsSingleChannel = resData
