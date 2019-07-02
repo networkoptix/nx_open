@@ -53,15 +53,35 @@ endif()
 # On developer workstations, when not cross-compiling, unit tests for SDK samples will be run
 # during the build phase. On CI, such tests are run with other tests, because they are included in
 # unit test distribution.
-if(NOT developerBuild OR NOT targetDevice MATCHES "linux-x64|windows-x64")
-    set(sample_tests_trigger "--no-tests")
-    set(cross_compiling_options
-        -DPACKAGES_DIR=${PACKAGES_DIR}
-        -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}
-    )
-else()
+
+# We can run the SDK tests only if build platform equals to target platform.
+if(targetDevice STREQUAL ${default_target_device})
+    # The tests will be built: inform about that.
     set(sample_tests_message " and running unit tests")
-    set(cross_compiling_options "")
+else()
+    set(sample_tests_trigger "--no-tests")
+endif()
+
+if(targetDevice STREQUAL "windows-x64")
+    set(compilingOptions "")
+else()
+    if(targetDevice STREQUAL "linux_arm32"
+        OR targetDevice STREQUAL "bpi"
+        OR targetDevice STREQUAL "edge1")
+        set(sdkToolchainFileName "linux_arm32")
+    elseif(targetDevice STREQUAL "linux_arm64")
+        set(sdkToolchainFileName "linux_arm64")
+    elseif(targetDevice STREQUAL "linux-x64")
+        set(sdkToolchainFileName "linux_x64")
+    endif()
+
+    set(compilingOptions -DPACKAGES_DIR=${PACKAGES_DIR})
+
+    if(sdkToolchainFileName)
+        set(compilingOptions ${compilingOptions}
+            -DCMAKE_TOOLCHAIN_FILE=${CMAKE_CURRENT_SOURCE_DIR}/toolchains/${sdkToolchainFileName}.cmake
+        )
+    endif()
 endif()
 
 # Command to be executed at the build phase.
@@ -73,7 +93,7 @@ add_custom_command(OUTPUT ${zip_file}
     COMMAND ${CMAKE_COMMAND} -E echo
         "  Building samples${sample_tests_message} - see ${sample_build_log}"
     COMMAND ${CMAKE_COMMAND} -E chdir ${sdk_dir}
-        ${sample_build_script} ${sample_tests_trigger} ${cross_compiling_options}
+        ${sample_build_script} ${sample_tests_trigger} ${compilingOptions}
         >${sample_build_log} 2>&1
     COMMAND ${CMAKE_COMMAND} -E remove_directory ${sdk_dir}-build #< Delete sdk build dir.
 
