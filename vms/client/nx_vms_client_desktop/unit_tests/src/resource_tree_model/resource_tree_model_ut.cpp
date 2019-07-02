@@ -17,7 +17,7 @@ protected:
         m_clientModule.reset(new QnClientModule(QnStartupParameters(), nullptr));
         m_accessController.reset(new QnWorkbenchAccessController(commonModule()));
         m_resourceTreeModel.reset(new QnResourceTreeModel(QnResourceTreeModel::FullScope,
-            m_accessController.get(), nullptr, commonModule()));
+            QnUserResourcePtr(), m_accessController.get(), nullptr, commonModule()));
         m_resourceSearchProxyModel.reset(new QnResourceSearchProxyModel());
         m_resourceSearchProxyModel->setSourceModel(m_resourceTreeModel.get());
     }

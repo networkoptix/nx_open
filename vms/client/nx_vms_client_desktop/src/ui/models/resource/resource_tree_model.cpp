@@ -124,6 +124,7 @@ QList<ResourceTree::NodeType> rootNodeTypes()
 
 QnResourceTreeModel::QnResourceTreeModel(
     Scope scope,
+    QnUserResourcePtr user,
     QnWorkbenchAccessController* accessController,
     QnWorkbenchLayoutSnapshotManager* layoutSnapshotManager,
     QObject* parent)
@@ -131,6 +132,7 @@ QnResourceTreeModel::QnResourceTreeModel(
     base_type(parent),
     QnCommonModuleAware(parent),
     m_scope(scope),
+    m_user(user),
     m_accessController(accessController),
     m_layoutSnapshotManager(layoutSnapshotManager)
 {

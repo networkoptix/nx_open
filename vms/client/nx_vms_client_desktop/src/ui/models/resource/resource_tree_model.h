@@ -44,6 +44,7 @@ public:
 
     explicit QnResourceTreeModel(
         Scope scope,
+        QnUserResourcePtr user,
         QnWorkbenchAccessController* accessController,
         QnWorkbenchLayoutSnapshotManager* layoutSnapshotManager,
         QObject* parent);

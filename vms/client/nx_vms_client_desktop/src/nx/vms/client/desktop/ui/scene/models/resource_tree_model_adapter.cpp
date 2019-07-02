@@ -27,6 +27,7 @@ ResourceTreeModelAdapter::ResourceTreeModelAdapter(QObject* parent): base_type(p
         dynamic_cast<QnWorkbenchContextAware*>(contextAwareParent)->context();
 
     const auto model = new QnResourceTreeModel(QnResourceTreeModel::FullScope,
+        workbenchContext->user(),
         workbenchContext->accessController(),
         workbenchContext->snapshotManager(),
         contextAwareParent);
