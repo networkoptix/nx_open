@@ -370,7 +370,7 @@ void LinearizationListModel::Private::sourceRowsInserted(
 void LinearizationListModel::Private::sourceRowsAboutToBeRemoved(
     const QModelIndex& sourceParent, int first, int last)
 {
-    NX_CRITICAL(!m_operationInProgress && last >= first);
+    NX_CRITICAL(!m_operationInProgress);
 
     const auto node = getNode(sourceParent);
     if (!node || node->children.empty() /*might be not expanded*/)
