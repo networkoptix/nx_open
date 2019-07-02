@@ -53,7 +53,7 @@ nx::Buffer Serializer::prepareFrame(nx::Buffer payload, FrameType type, bool fin
     int payloadLenType = payloadLenTypeByLen(payload.size());
     header.resize(calcHeaderSize(m_masked, payloadLenType));
     header.fill(0);
-    fillHeader(header.data(), fin, first, type, payloadLenType, payload.size());
+    fillHeader(header.data(), fin, type, payloadLenType, payload.size());
 
     if (m_masked)
     {
@@ -74,7 +74,7 @@ void Serializer::setMasked(bool masked, unsigned mask)
 }
 
 int Serializer::fillHeader(
-    char* data, bool fin, bool first, FrameType opCode, int payloadLenType, int payloadLen)
+    char* data, bool fin, FrameType opCode, int payloadLenType, int payloadLen)
 {
     char* pdata = data;
 
