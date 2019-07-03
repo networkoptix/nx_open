@@ -17,6 +17,9 @@ public:
     virtual bool processData(
         quint8* rtpBufferBase, int bufferOffset, int bytesRead, bool& gotData) override;
 
+    // Resolution that was configured using the camera API.
+    void setConfiguredResolution(int width, int height);
+
 private:
     int makeHeaders(
         quint8* p, int type, int w, int h, const quint8* lqt, const quint8* cqt, unsigned short dri);
@@ -25,6 +28,9 @@ private:
 
     bool parseMjpegExtension(const quint8* data, int size);
     bool processRtpExtensions(const quint8* data, int size);
+
+    void fixResolution(int* width, int* height);
+
 private:
     bool resolutionWorkaroundLogged = false;
     bool mjpeg16BitWarningLogged = false;
@@ -37,6 +43,9 @@ private:
     quint8 m_chromaTable[64 * 2];
     int m_frameWidth;
     int m_frameHeight;
+
+    int m_configuredWidth = 0;
+    int m_configuredHeight = 0;
 
     int m_lastJpegQ;
 

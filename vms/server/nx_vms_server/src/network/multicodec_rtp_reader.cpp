@@ -493,7 +493,21 @@ nx::streaming::rtp::StreamParser* QnMulticodecRtpReader::createParser(const QStr
     else if (codecName == QLatin1String("H265"))
         result = new nx::streaming::rtp::HevcParser();
     else if (codecName == QLatin1String("JPEG"))
-        result = new nx::streaming::rtp::MjpegParser;
+    {
+        auto parser = new nx::streaming::rtp::MjpegParser;
+
+        // Forward configured resolution, that can be used when resolution more than 2048, and
+        // camera not send any adittional info.
+        auto serverCamera = getResource().dynamicCast<nx::vms::server::resource::Camera>();
+        if (serverCamera)
+        {
+            auto params = serverCamera->advancedLiveStreamParams();
+            QSize& resolution = (m_role == Qn::CR_LiveVideo ? params.primaryStream.resolution :
+                params.secondaryStream.resolution);
+            parser->setConfiguredResolution(resolution.width(), resolution.height());
+        }
+        result = parser;
+    }
     else if (codecName == QLatin1String("MPEG4-GENERIC"))
         result = new nx::streaming::rtp::AacParser;
     else if (codecName == QLatin1String("PCMU")) {
