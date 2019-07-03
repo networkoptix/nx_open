@@ -1057,11 +1057,11 @@ QString ServerUpdateTool::toString(InternalError errorCode)
         case InternalError::noError:
             return "";
         case InternalError::noConnection:
-            return tr("No connection to the server");
+            return tr("No connection to the server.");
         case InternalError::networkError:
-            return tr("Network error");
+            return tr("Network error.");
     }
-    return "Unknown error";
+    return "Unknown error.";
 }
 
 const nx::update::Package* ServerUpdateTool::findPackageForFile(const QString& fileName) const

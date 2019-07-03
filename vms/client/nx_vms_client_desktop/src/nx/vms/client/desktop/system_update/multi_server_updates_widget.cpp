@@ -1169,7 +1169,7 @@ void MultiServerUpdatesWidget::atStartUpdateComplete(bool success, const QString
         {
             auto messageBox = std::make_unique<QnSessionAwareMessageBox>(this);
             messageBox->setIcon(QnMessageBoxIcon::Critical);
-            messageBox->setText(tr("Failed to start update:"));
+            messageBox->setText(tr("Failed to start update"));
             messageBox->setInformativeText(error);
             messageBox->setStandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Retry);
             messageBox->setDefaultButton(QDialogButtonBox::Ok);
@@ -1201,7 +1201,7 @@ void MultiServerUpdatesWidget::atCancelUpdateComplete(bool success, const QStrin
             NX_ERROR(this, "atCancelUpdateComplete(%1) - %2", success, error);
             QScopedPointer<QnMessageBox> messageBox(new QnMessageBox(this));
             messageBox->setIcon(QnMessageBoxIcon::Critical);
-            messageBox->setText(tr("Failed to cancel update:"));
+            messageBox->setText(tr("Failed to cancel update"));
             messageBox->setInformativeText(error);
             messageBox->setStandardButtons(QDialogButtonBox::Ok);
             messageBox->exec();
@@ -1223,7 +1223,7 @@ void MultiServerUpdatesWidget::atStartInstallComplete(bool success, const QStrin
         {
             QScopedPointer<QnMessageBox> messageBox(new QnMessageBox(this));
             messageBox->setIcon(QnMessageBoxIcon::Critical);
-            messageBox->setText(tr("Failed to start installation:"));
+            messageBox->setText(tr("Failed to start installation"));
             messageBox->setInformativeText(error);
             messageBox->setStandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Retry);
             messageBox->setDefaultButton(QDialogButtonBox::Ok);
@@ -2063,7 +2063,16 @@ void MultiServerUpdatesWidget::syncUpdateCheckToUi()
 
     bool latestVersion = hasLatestVersion();
 
-    ui->cancelProgressAction->setEnabled(m_widgetState != WidgetUpdateState::installing);
+    switch(m_widgetState)
+    {
+        case WidgetUpdateState::startingDownload:
+        case WidgetUpdateState::startingInstall:
+        case WidgetUpdateState::installing:
+            ui->cancelProgressAction->setEnabled(false);
+            break;
+        default:
+            ui->cancelProgressAction->setEnabled(true);
+    }
 
     if (m_widgetState == WidgetUpdateState::installingStalled)
         ui->cancelProgressAction->setText(tr("Finish Update"));
