@@ -612,7 +612,7 @@ private:
     bool fetchPtzInfo();
     bool setRelayOutputSettings( const RelayOutputInfo& relayOutputInfo );
     void checkPrimaryResolution(QSize& primaryResolution);
-    void setRelayOutputStateNonSafe(
+    void setRelayOutputStateInternal(
         quint64 timerID,
         const QString& outputID,
         bool active,

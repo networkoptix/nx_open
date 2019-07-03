@@ -359,7 +359,7 @@ QnPlOnvifResource::~QnPlOnvifResource()
             if (!outputTask.active)
             {
                 //returning port to inactive state
-                setRelayOutputStateNonSafe(
+                setRelayOutputStateInternal(
                     0,
                     outputTask.outputID,
                     outputTask.active,
@@ -738,7 +738,7 @@ CameraDiagnostics::Result QnPlOnvifResource::initializeIo(
 
         //resetting all ports states to inactive
         for (auto i = 0; i < relayOutputs.size(); ++i)
-            setRelayOutputStateNonSafe(0, QString::fromStdString(relayOutputs[i].token), false, 0);
+            setRelayOutputStateInternal(0, QString::fromStdString(relayOutputs[i].token), false, 0);
     }
 
     if (m_appStopping)
@@ -1665,7 +1665,7 @@ bool QnPlOnvifResource::setRelayOutputState(
 
     using namespace std::placeholders;
     const quint64 timerID = nx::utils::TimerManager::instance()->addTimer(
-        std::bind(&QnPlOnvifResource::setRelayOutputStateNonSafe, this, _1, outputID, active,
+        std::bind(&QnPlOnvifResource::setRelayOutputStateInternal, this, _1, outputID, active,
             autoResetTimeoutMS),
         std::chrono::milliseconds::zero());
     m_triggerOutputTasks[timerID] = TriggerOutputTask(outputID, active, autoResetTimeoutMS);
@@ -3958,7 +3958,7 @@ QnConstResourceVideoLayoutPtr QnPlOnvifResource::getVideoLayout(
     return m_videoLayout;
 }
 
-void QnPlOnvifResource::setRelayOutputStateNonSafe(
+void QnPlOnvifResource::setRelayOutputStateInternal(
     quint64 timerID,
     const QString& outputID,
     bool active,
@@ -4047,7 +4047,7 @@ void QnPlOnvifResource::setRelayOutputStateNonSafe(
         //adding task to reset port state
         using namespace std::placeholders;
         const quint64 timerID = nx::utils::TimerManager::instance()->addTimer(
-            std::bind(&QnPlOnvifResource::setRelayOutputStateNonSafe, this, _1, outputID, !active, 0),
+            std::bind(&QnPlOnvifResource::setRelayOutputStateInternal, this, _1, outputID, !active, 0),
             std::chrono::milliseconds(autoResetTimeoutMS));
         m_triggerOutputTasks[timerID] = TriggerOutputTask(outputID, !active, 0);
     }
