@@ -17,7 +17,7 @@
 // Will move to single variadic template after move to vs2013
 
 #define DEFINE_ONE_ARG_HANDLER(REQUEST_NAME, FIRST_ARG_TYPE)                                       \
-    typedef OneParamHandler<FIRST_ARG_TYPE> REQUEST_NAME##Handler;                                 \
+    typedef AbstractHandler<FIRST_ARG_TYPE> REQUEST_NAME##Handler;                                 \
     typedef std::shared_ptr<REQUEST_NAME##Handler> REQUEST_NAME##HandlerPtr;                       \
     template<class TargetType, class HandlerType>                                                  \
     class Custom##REQUEST_NAME##Handler:                                                           \
@@ -44,7 +44,7 @@
 
 
 #define DEFINE_TWO_ARG_HANDLER(REQUEST_NAME, FIRST_ARG_TYPE, SECOND_ARG_TYPE)         \
-    typedef TwoParamHandler<FIRST_ARG_TYPE, SECOND_ARG_TYPE> REQUEST_NAME##Handler;     \
+    typedef AbstractHandler<FIRST_ARG_TYPE, SECOND_ARG_TYPE> REQUEST_NAME##Handler;     \
     typedef std::shared_ptr<REQUEST_NAME##Handler> REQUEST_NAME##HandlerPtr;            \
     template<class TargetType, class HandlerType>                                                         \
         class Custom##REQUEST_NAME##Handler                                             \
@@ -64,7 +64,7 @@
 
 
 #define DEFINE_THREE_ARG_HANDLER(REQUEST_NAME, FIRST_ARG_TYPE, SECOND_ARG_TYPE, THIRD_ARG_TYPE)         \
-    typedef ThreeParamHandler<FIRST_ARG_TYPE, SECOND_ARG_TYPE, THIRD_ARG_TYPE> REQUEST_NAME##Handler;     \
+    typedef AbstractHandler<FIRST_ARG_TYPE, SECOND_ARG_TYPE, THIRD_ARG_TYPE> REQUEST_NAME##Handler;     \
     typedef std::shared_ptr<REQUEST_NAME##Handler> REQUEST_NAME##HandlerPtr;            \
     template<class TargetType, class HandlerType>                                       \
         class Custom##REQUEST_NAME##Handler                                             \
@@ -130,37 +130,13 @@ enum class NotificationSource
 
 namespace impl {
 
-template<class Param1>
-class OneParamHandler
+template<typename... Params>
+class AbstractHandler
 {
 public:
-    typedef Param1 first_type;
+    virtual ~AbstractHandler() = default;
 
-    virtual ~OneParamHandler() {}
-    virtual void done(int reqID, const Param1& val1) = 0;
-};
-
-template<class Param1, class Param2>
-class TwoParamHandler
-{
-public:
-    typedef Param1 first_type;
-    typedef Param2 second_type;
-
-    virtual ~TwoParamHandler() {}
-    virtual void done(int reqID, const Param1& val1, const Param2& val2) = 0;
-};
-
-template<class Param1, class Param2, class Param3>
-class ThreeParamHandler
-{
-public:
-    typedef Param1 first_type;
-    typedef Param2 second_type;
-    typedef Param3 third_type;
-
-    virtual ~ThreeParamHandler() {}
-    virtual void done(int reqID, const Param1& val1, const Param2& val2, const Param3& val3) = 0;
+    virtual void done(int reqID, const Params&... params) = 0;
 };
 
 class AppServerSignaller:
