@@ -114,13 +114,17 @@ PARAM_KEY(zoomUuid)
 PARAM_KEY(resource)
 PARAM_KEY(value)
 PARAM_KEY(role)
-PARAM_KEY(position)
 PARAM_KEY(rotation)
 PARAM_KEY(speed)
 PARAM_KEY(geometry)
 PARAM_KEY(zoomRect)
 PARAM_KEY(checkedButtons)
 PARAM_KEY(items)
+#undef PARAM_KEY
+
+static const QString kPositionUsecKey("position");
+static const QString kSilentKey("silent");
+
 
 QnVideoWallItemIndexList getIndices(const QnLayoutItemData& data)
 {
@@ -264,7 +268,7 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
     m_controlMode.syncPlayTimer = new QTimer(this);
     m_controlMode.syncPlayTimer->start(30000); //< We believe one sync in 30s is reasonable.
     connect(m_controlMode.syncPlayTimer, &QTimer::timeout, this,
-        &QnWorkbenchVideoWallHandler::at_navigator_timeSyncRequested);
+        [this]{ syncTimelinePosition(/*silent*/ true); });
 
     QnUuid pcUuid = qnSettings->pcUuid();
     if (pcUuid.isNull())
@@ -436,7 +440,7 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
             &QnWorkbenchVideoWallHandler::at_workbench_currentLayoutChanged);
 
         connect(navigator(), &QnWorkbenchNavigator::positionChanged, this,
-            &QnWorkbenchVideoWallHandler::at_navigator_timeSyncRequested);
+            [this] { syncTimelinePosition(/*silent*/ false); });
         connect(navigator(), &QnWorkbenchNavigator::playingChanged, this,
             &QnWorkbenchVideoWallHandler::at_navigator_playingChanged);
         connect(navigator(), &QnWorkbenchNavigator::speedChanged, this,
@@ -854,22 +858,37 @@ void QnWorkbenchVideoWallHandler::handleMessage(
                 {
                     QPointF data = QJson::deserialized<QPointF>(value);
                     item->setData(role, data);
+                    menu()->triggerIfPossible(action::ShowTimeLineOnVideowallAction);
                     break;
                 }
                 case Qn::ItemRotationRole:
-                case Qn::ItemSpeedRole:
                 {
                     qreal data;
                     QJson::deserialize(value, &data);
                     item->setData(role, data);
                     break;
                 }
+                case Qn::ItemSpeedRole:
+                {
+                    qreal data;
+                    QJson::deserialize(value, &data);
+                    item->setData(role, data);
+                    menu()->triggerIfPossible(action::ShowTimeLineOnVideowallAction);
+                    break;
+                }
                 case Qn::ItemFlipRole:
+                {
+                    bool data;
+                    QJson::deserialize(value, &data);
+                    item->setData(role, data);
+                    break;
+                }
                 case Qn::ItemPausedRole:
                 {
                     bool data;
                     QJson::deserialize(value, &data);
                     item->setData(role, data);
+                    menu()->triggerIfPossible(action::ShowTimeLineOnVideowallAction);
                     break;
                 }
                 case Qn::ItemCheckedButtonsRole:
@@ -890,6 +909,7 @@ void QnWorkbenchVideoWallHandler::handleMessage(
                 {
                     QnTimePeriod data = QJson::deserialized<QnTimePeriod>(value);
                     item->setData(role, data);
+                    menu()->triggerIfPossible(action::ShowTimeLineOnVideowallAction);
                     break;
                 }
                 case Qn::ItemImageEnhancementRole:
@@ -942,19 +962,25 @@ void QnWorkbenchVideoWallHandler::handleMessage(
         }
         case QnVideoWallControlMessage::NavigatorPositionChanged:
         {
-            navigator()->setPosition(message[positionKey].toLongLong());
+            const qint64 position = message.value<qint64>(kPositionUsecKey);
+            const bool silent = message.value<bool>(kSilentKey);
+            navigator()->setPosition(position);
+            if (!silent)
+                menu()->triggerIfPossible(action::ShowTimeLineOnVideowallAction);
             break;
         }
         case QnVideoWallControlMessage::NavigatorPlayingChanged:
         {
             navigator()->setPlaying(QnLexical::deserialized<bool>(message[valueKey]));
+            menu()->triggerIfPossible(action::ShowTimeLineOnVideowallAction);
             break;
         }
         case QnVideoWallControlMessage::NavigatorSpeedChanged:
         {
             navigator()->setSpeed(message[speedKey].toDouble());
-            if (message.contains(positionKey))
-                navigator()->setPosition(message[positionKey].toLongLong());
+            if (message.contains(kPositionUsecKey))
+                navigator()->setPosition(message[kPositionUsecKey].toLongLong());
+            menu()->triggerIfPossible(action::ShowTimeLineOnVideowallAction);
             break;
         }
         case QnVideoWallControlMessage::SynchronizationChanged:
@@ -962,6 +988,7 @@ void QnWorkbenchVideoWallHandler::handleMessage(
             QByteArray value = message[valueKey].toUtf8();
             auto state = QJson::deserialized<QnStreamSynchronizationState>(value);
             context()->instance<QnWorkbenchStreamSynchronizer>()->setState(state);
+            menu()->triggerIfPossible(action::ShowTimeLineOnVideowallAction);
             break;
         }
         case QnVideoWallControlMessage::MotionSelectionChanged:
@@ -2242,9 +2269,10 @@ void QnWorkbenchVideoWallHandler::at_resPool_resourceAdded(const QnResourcePtr &
             setVideoWallAutorunEnabled(videoWall->getId(), videoWall->isAutorun());
 
             auto handleTimelineEnabledChanged =
-                [](const QnVideoWallResourcePtr& videoWall)
+                [this](const QnVideoWallResourcePtr& videoWall)
                 {
                     qnRuntime->setVideoWallWithTimeLine(videoWall->isTimelineEnabled());
+                    menu()->triggerIfPossible(action::ShowTimeLineOnVideowallAction);
                 };
 
             connect(videoWall, &QnVideoWallResource::timelineEnabledChanged, this,
@@ -2774,7 +2802,7 @@ void QnWorkbenchVideoWallHandler::at_workbenchLayoutItem_dataChanged(Qn::ItemDat
     sendMessage(message, cached);
 }
 
-void QnWorkbenchVideoWallHandler::at_navigator_timeSyncRequested()
+void QnWorkbenchVideoWallHandler::syncTimelinePosition(bool silent)
 {
     if (!m_controlMode.active)
         return;
@@ -2786,7 +2814,8 @@ void QnWorkbenchVideoWallHandler::at_navigator_timeSyncRequested()
         return;
 
     QnVideoWallControlMessage message(QnVideoWallControlMessage::NavigatorPositionChanged);
-    message[positionKey] = QString::number(navigator()->positionUsec());
+    message.setValue(kPositionUsecKey, navigator()->positionUsec());
+    message.setValue(kSilentKey, silent);
     sendMessage(message);
 }
 
@@ -2815,7 +2844,7 @@ void QnWorkbenchVideoWallHandler::at_navigator_speedChanged()
     message[speedKey] = QString::number(navigator()->speed());
     auto position = navigator()->positionUsec();
     if (position != AV_NOPTS_VALUE)
-        message[positionKey] = QString::number(position);
+        message[kPositionUsecKey] = QString::number(position);
     sendMessage(message);
 }
 

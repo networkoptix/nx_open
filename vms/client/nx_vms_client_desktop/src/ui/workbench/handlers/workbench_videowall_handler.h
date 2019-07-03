@@ -200,7 +200,6 @@ private:
 
     void at_workbenchLayoutItem_dataChanged(Qn::ItemDataRole role);
 
-    void at_navigator_timeSyncRequested();
     void at_navigator_playingChanged();
     void at_navigator_speedChanged();
 
@@ -209,6 +208,14 @@ private:
     void at_controlModeCacheTimer_timeout();
 
     void submitDelayedItemOpen();
+
+    /**
+     * Send the message to sync timeline position. Target client will display timeline on each
+     * position change.
+     * @param silent Set to true when position is synced automatically, so target client can
+     *     skip timeline displaying.
+     */
+    void syncTimelinePosition(bool silent);
 
     void saveVideowall(const QnVideoWallResourcePtr& videowall, bool saveLayout = false);
     void saveVideowalls(const QSet<QnVideoWallResourcePtr>& videowalls, bool saveLayout = false);
