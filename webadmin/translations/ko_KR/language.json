@@ -8,7 +8,7 @@
     "setup": {
         "createAccount": "계정을 만듭니다",
         "errorNoHDD": "이 장치는 Hdd를 설치하여 사용하도록 설계 되었습니다. <br>장치 전원을 Off하고 Hdd를 설치하세요",
-        "errorNoNetwork": "이 장치에 네트워크 연결이 필요 합니다. <br>로컬 네트워크 or 인터넷에 연결하세요"
+        "errorNoNetwork": "이 장치에 네트워크 연결이 필요 합니다. <br>로컬 네트워크 또는 인터넷에 연결하세요"
     },
     "passwordRequirements": {
         "minLengthMessage": "비밀번호는 8자 이상이어야 합니다",
