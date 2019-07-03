@@ -16,7 +16,7 @@ public:
     QnUuid id;
     QString actionType;
     QList<QList<Field>> fieldBlocks;
-    std::chrono::seconds interval;
+    std::chrono::seconds interval = std::chrono::seconds(0);
 };
 
 #define nx_vms_api_rules_ActionBuilder_Fields \

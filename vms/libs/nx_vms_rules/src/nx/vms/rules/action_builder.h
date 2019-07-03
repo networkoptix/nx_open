@@ -11,18 +11,23 @@
 namespace nx::vms::rules {
 
 class ActionField;
+class BasicAction;
 
 class NX_VMS_RULES_API /*FieldBased*/ActionBuilder: public QObject
 {
     Q_OBJECT
 
 public:
-    ActionBuilder(const QnUuid& id);
+    using ActionConstructor = std::function<BasicAction*()>;
+
+    ActionBuilder(const QnUuid& id, const ActionConstructor& ctor);
     virtual ~ActionBuilder();
 
-    QnUuid id() const;
+    bool addField(const QString& name, ActionField* field);
 
     void process(const EventPtr& event);
+
+    QnUuid id() const;
 
     void setAggregationInterval(std::chrono::seconds interval);
     std::chrono::seconds aggregationInterval() const;
@@ -35,6 +40,7 @@ private:
 
 private:
     QnUuid m_id;
+    ActionConstructor m_constructor;
     QHash<QString, ActionField*> m_fields;
     std::chrono::seconds m_interval = std::chrono::seconds(0);
     QTimer m_timer;
