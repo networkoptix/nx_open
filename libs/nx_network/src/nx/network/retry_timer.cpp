@@ -130,13 +130,11 @@ RetryDelayCalculator::RetryDelayCalculator(const RetryPolicy &retryPolicy)
 
 std::chrono::milliseconds RetryDelayCalculator::calculateNewDelay()
 {
-    std::chrono::milliseconds delay = m_delayCalculator.calculateNewDelay();
+    m_delayCalculator.calculateNewDelay();
+    if (m_retryPolicy.randomRatio != 0)
+        m_currentRandomBias = nx::utils::random::numberDelta(1.0, m_retryPolicy.randomRatio);
 
-    if (m_retryPolicy.randomRatio == 0)
-        return delay;
-
-    m_currentRandomBias = nx::utils::random::numberDelta(1.0, m_retryPolicy.randomRatio);
-    return std::chrono::milliseconds(static_cast<int>(m_currentRandomBias * delay.count()));
+    return currentDelay();
 }
 
 std::chrono::milliseconds RetryDelayCalculator::currentDelay() const
@@ -144,8 +142,8 @@ std::chrono::milliseconds RetryDelayCalculator::currentDelay() const
     if (m_retryPolicy.randomRatio == 0)
         return m_delayCalculator.currentDelay();
 
-    return std::chrono::milliseconds(
-        static_cast<int>(m_currentRandomBias * m_delayCalculator.currentDelay().count()));
+    return std::chrono::milliseconds(static_cast<std::chrono::milliseconds::rep>(
+        m_currentRandomBias * m_delayCalculator.currentDelay().count()));
 }
 
 unsigned int RetryDelayCalculator::triesMade() const

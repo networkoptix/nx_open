@@ -392,9 +392,9 @@ void ModuleConnector::Module::connectToGroup(Endpoints::iterator endpointsGroup)
     // Cancel reconnect timer if the method was called not after timeout.
     if (m_reconnectTimer.timeToEvent())
     {
-        m_reconnectTimer.cancelSync();
         NX_VERBOSE(this, "Reconnect was requested %1 before timeout, reseting reconnect delays",
             m_reconnectTimer.timeToEvent().get());
+        m_reconnectTimer.cancelSync();
     }
 
     if (endpointsGroup == m_endpoints.end())
