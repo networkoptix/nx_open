@@ -65,11 +65,16 @@ int SystemCommands::open(const std::string& /*path*/, int /*mode*/)
     return -1;
 }
 
+static inline QString toLongPathW(const std::string& path)
+{
+    return QString("\\\\?\\") + QDir::toNativeSeparators(QString::fromStdString(path));
+}
+
 bool SystemCommands::rename(const std::string& oldPath, const std::string& newPath)
 {
     return MoveFileW(
-        (LPCTSTR) QString::fromStdString(oldPath).constData(),
-        (LPCTSTR) QString::fromStdString(newPath).constData());
+        reinterpret_cast<LPCTSTR>(toLongPathW(oldPath).constData()),
+        reinterpret_cast<LPCTSTR>(toLongPathW(newPath).constData()));
 }
 
 namespace {
