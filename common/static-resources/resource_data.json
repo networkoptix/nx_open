@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0.1.77",
+    "version": "1.0.1.80",
     "data": [
         {
             "keys": [
@@ -868,7 +868,17 @@
                 "onvif_encoder|viper-hdaenc16",
                 "dahua|dh-xvr5108hs-x",
                 "dahua|dhi-nvr4432-4ks2",
-                "dahua|dh-xvr7104*"
+                "dahua|dh-xvr7104*",
+                "onvif|ltn8716k-ht",
+                "hisi|vi-m-4-1000",
+                "onvif|ds-7204hqhi*",
+                "dahua|dhi-nvr5832-*",
+                "dh-nvr4232-*|private",
+                "har324-16|embedded net dvr",
+                "dh-nvr4216-*|private",
+                "dhi-nvr52a16-*|private",
+                "ds-6716huhi*|bldg c hik-encoder",
+                "ds-7216hqhi*|embedded net dvr"
             ],
             "analogEncoder": true
         },
