@@ -6,8 +6,6 @@
 #include <QtCore/QMetaType>
 #include <QtCore/QDebug>
 
-#include <nx/fusion/model_functions_fwd.h>
-
 #include <nx/utils/uuid.h>
 
 class QnVideoWallControlMessage
@@ -61,18 +59,6 @@ public:
     QString& operator[](const QString &key) { return params[key]; }
     const QString operator[](const QString &key) const {return params[key]; }
     bool contains(const QString& key) const { return params.contains(key); }
-
-    template<typename T>
-    T value(const QString& key, const T& defaultValue = T()) const
-    {
-        return QnLexical::deserialized<T>(params.value(key), defaultValue);
-    }
-
-    template<typename T>
-    void setValue(const QString& key, const T& value)
-    {
-        params.insert(key, QnLexical::serialized(value));
-    }
 };
 
 QDebug operator<<(QDebug dbg, const QnVideoWallControlMessage &message);

@@ -82,8 +82,7 @@
 #include <nx/vms/client/desktop/ui/messages/videowall_messages.h>
 #include <nx/vms/client/desktop/resource_views/data/node_type.h>
 
-#include <nx/fusion/serialization/json.h>
-#include <nx/fusion/serialization/json_functions.h>
+#include <nx/fusion/model_functions.h>
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/string.h>
@@ -962,8 +961,8 @@ void QnWorkbenchVideoWallHandler::handleMessage(
         }
         case QnVideoWallControlMessage::NavigatorPositionChanged:
         {
-            const qint64 position = message.value<qint64>(kPositionUsecKey);
-            const bool silent = message.value<bool>(kSilentKey);
+            const qint64 position = QnLexical::deserialized<qint64>(message[kPositionUsecKey]);
+            const bool silent = QnLexical::deserialized<bool>(message[kSilentKey]);
             navigator()->setPosition(position);
             if (!silent)
                 menu()->triggerIfPossible(action::ShowTimeLineOnVideowallAction);
@@ -2814,8 +2813,8 @@ void QnWorkbenchVideoWallHandler::syncTimelinePosition(bool silent)
         return;
 
     QnVideoWallControlMessage message(QnVideoWallControlMessage::NavigatorPositionChanged);
-    message.setValue(kPositionUsecKey, navigator()->positionUsec());
-    message.setValue(kSilentKey, silent);
+    message[kPositionUsecKey] = QnLexical::serialized(navigator()->positionUsec());
+    message[kSilentKey] = QnLexical::serialized(silent);
     sendMessage(message);
 }
 
