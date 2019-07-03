@@ -315,24 +315,25 @@ DEFINE_TWO_ARG_HANDLER(
     ec2::ErrorCode,
     nx::vms::api::AnalyticsPluginDataList)
 
-    DEFINE_TWO_ARG_HANDLER(
-        GetAnalyticsEngines,
-        ec2::ErrorCode,
-        nx::vms::api::AnalyticsEngineDataList)
+DEFINE_TWO_ARG_HANDLER(
+    GetAnalyticsEngines,
+    ec2::ErrorCode,
+    nx::vms::api::AnalyticsEngineDataList)
 
-    //////////////////////////////////////////////////////////
-    ///////// Handlers for AbstractECConnection
-    //////////////////////////////////////////////////////////
-    DEFINE_TWO_ARG_HANDLER(CurrentTime, ec2::ErrorCode, qint64)
-    DEFINE_TWO_ARG_HANDLER(DumpDatabase, ec2::ErrorCode, nx::vms::api::DatabaseDumpData)
+//////////////////////////////////////////////////////////
+///////// Handlers for AbstractECConnection
+//////////////////////////////////////////////////////////
+DEFINE_TWO_ARG_HANDLER(CurrentTime, ec2::ErrorCode, qint64)
+DEFINE_TWO_ARG_HANDLER(DumpDatabase, ec2::ErrorCode, nx::vms::api::DatabaseDumpData)
 
-    //////////////////////////////////////////////////////////
-    ///////// Handlers for AbstractECConnectionFactory
-    //////////////////////////////////////////////////////////
-    DEFINE_TWO_ARG_HANDLER(TestConnection, ec2::ErrorCode, QnConnectionInfo)
-    DEFINE_TWO_ARG_HANDLER(Connect, ec2::ErrorCode, AbstractECConnectionPtr)
-}
-}
+//////////////////////////////////////////////////////////
+///////// Handlers for AbstractECConnectionFactory
+//////////////////////////////////////////////////////////
+DEFINE_TWO_ARG_HANDLER(TestConnection, ec2::ErrorCode, QnConnectionInfo)
+DEFINE_TWO_ARG_HANDLER(Connect, ec2::ErrorCode, AbstractECConnectionPtr)
+
+} // namespace impl
+} // namespace ec2
 
 Q_DECLARE_METATYPE(ec2::ErrorCode);
 Q_DECLARE_METATYPE(ec2::AbstractECConnectionPtr);
