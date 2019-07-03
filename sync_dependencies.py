@@ -28,6 +28,7 @@ def determine_package_versions(
 ):
     v = {
         "gcc": "8.1",
+        "sdk-gcc": "5.4.0",
         "clang": "8.0.0",
         "qt": "5.11.3",
         "boost": "1.67.0",
@@ -119,6 +120,17 @@ def sync_dependencies(syncher, platform, arch, box, release_version, options={})
             sync("linux_arm64/gcc")
         else:
             sync("linux-%s/gcc" % arch)
+
+        if box == "bpi":
+            sync("linux_arm32/sdk-gcc")
+        elif box == "edge1":
+            sync("linux_arm32/sdk-gcc")
+        elif arch == "arm":
+            sync("linux_arm32/sdk-gcc")
+        elif arch == "arm64":
+            sync("linux_arm64/sdk-gcc")
+        else:
+            sync("linux-x64/sdk-gcc")
 
         if options.get("clang"):
             sync("linux/clang")
