@@ -54,7 +54,7 @@ endif()
 # during the build phase. On CI, such tests are run with other tests, because they are included in
 # unit test distribution.
 
-# We can run the SDK tests only if build platform equals to target platform.
+# We can run the SDK tests only if build platform equals target platform.
 if(targetDevice STREQUAL ${default_target_device})
     # The tests will be built: inform about that.
     set(sample_tests_message " and running unit tests")
@@ -67,7 +67,8 @@ if(targetDevice STREQUAL "windows-x64")
 else()
     if(targetDevice STREQUAL "linux_arm32"
         OR targetDevice STREQUAL "bpi"
-        OR targetDevice STREQUAL "edge1")
+        OR targetDevice STREQUAL "edge1"
+    )
         set(sdkToolchainFileName "linux_arm32")
     elseif(targetDevice STREQUAL "linux_arm64")
         set(sdkToolchainFileName "linux_arm64")
@@ -79,8 +80,7 @@ else()
 
     if(sdkToolchainFileName)
         set(compilingOptions ${compilingOptions}
-            -DCMAKE_TOOLCHAIN_FILE=${CMAKE_CURRENT_SOURCE_DIR}/toolchains/${sdkToolchainFileName}.cmake
-        )
+            -DCMAKE_TOOLCHAIN_FILE=${CMAKE_CURRENT_SOURCE_DIR}/toolchains/${sdkToolchainFileName}.cmake)
     endif()
 endif()
 
