@@ -158,6 +158,22 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddr(const QUrl& _url, cons
     return checkHostAddrInternal(url, auth, isSearchAction);
 }
 
+void OnvifResourceSearcher::setupResourceGroupIfNeed(const QnPlOnvifResourcePtr& resource)
+{
+    auto resData = qnStaticCommon
+        ->dataPool()
+        ->data(resource->getVendor(), resource->getModel());
+
+    bool shouldAppearAsSingleChannel = resData.value<bool>(
+        Qn::SHOULD_APPEAR_AS_SINGLE_CHANNEL_PARAM_NAME);
+
+    if (!shouldAppearAsSingleChannel)
+    {
+        resource->setGroupId(resource->getPhysicalId());
+        resource->setDefaultGroupName(resource->getModel() + QLatin1String(" ") + resource->getHostAddress());
+    }
+}
+
 QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& url, const QAuthenticator& auth, bool isSearchAction)
 {
     if (shouldStop())
@@ -208,17 +224,8 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
         if (channel > 0)
             resource->updateToChannel(channel-1);
 
-        auto resData = qnStaticCommon
-            ->dataPool()
-            ->data(rpResource->getVendor(), rpResource->getModel());
-
-        bool shouldAppearAsSingleChannel = resData.value<bool>(
-            Qn::SHOULD_APPEAR_AS_SINGLE_CHANNEL_PARAM_NAME);
-
-        if (rpResource->getMaxChannels() > 1  && !shouldAppearAsSingleChannel) {
-            resource->setGroupId(rpResource->getPhysicalId());
-            resource->setDefaultGroupName(resource->getModel() + QLatin1String(" ") + resource->getHostAddress());
-        }
+        if (rpResource->getMaxChannels() > 1)
+            setupResourceGroupIfNeed(resource);
 
         resList << resource;
         return resList;
@@ -295,7 +302,7 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
         {
             resource->fetchChannelCount();
             if (resource->getMaxChannels() > 1)
-                resource->setGroupId(resource->getPhysicalId());
+                setupResourceGroupIfNeed(resource);
             resList << resource;
 
             bool shouldAppearAsSingleChannel = resData

@@ -34,6 +34,7 @@ private:
     //OnvifResourceSearcherMdns m_mdnsSearcher;
 
     QList<QnResourcePtr> checkHostAddrInternal( const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck );
+    void setupResourceGroupIfNeed(const QnPlOnvifResourcePtr& resource);
 };
 
 #endif //ENABLE_ONVIF
