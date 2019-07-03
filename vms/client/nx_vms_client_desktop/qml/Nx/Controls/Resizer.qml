@@ -2,6 +2,8 @@ import QtQuick 2.6
 
 import Nx 1.0
 
+import nx.vms.client.desktop 1.0
+
 MouseArea
 {
     id: resizer
@@ -21,6 +23,9 @@ MouseArea
     signal dragPositionChanged(real pos)
 
     cursorShape: orientation === Qt.Vertical ? Qt.SplitHCursor : Qt.SplitVCursor
+
+    CursorOverride.shape: cursorShape
+    CursorOverride.active: pressed
 
     drag.smoothed: false
     drag.threshold: 0
