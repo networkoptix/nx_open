@@ -69,7 +69,17 @@ buildDistribution()
         -D dmg_icon="$PACKAGE_ICON_PATH" \
         -D dmg_background="$BACKGROUND_PATH" \
         "$VOLUME_NAME" "$DISTRIBUTION_DMG"
-
+    
+    if [[ $NOTARIZATION = true ]]
+    then
+        python notarize.py notarize \
+            --user "$NOTARIZATION_USER" \
+            --password "@keychain:NOTARIZATION_USER_PASSWORD" \
+            --team-id "$APPLE_TEAM_ID" \
+            --file-name "$DISTRIBUTION_DMG" \
+            --bundle-id "$BUNDLE_ID" 
+    fi
+    
     mv update.json "$SRC/"
     cp package.json "$SRC/"
 

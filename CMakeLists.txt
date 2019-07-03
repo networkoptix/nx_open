@@ -95,6 +95,7 @@ include(CMakeDependentOption)
 include(ExternalProject)
 
 nx_option(codeSigning "Enable code signing" OFF)
+nx_option(notarization "Enable notarization" OFF)
 
 include(target_detection)
 include(utils)
