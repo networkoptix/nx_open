@@ -34,6 +34,7 @@ private:
     const QGuiApplication app;
 };
 
+// Override1 - override2 - override3 - restore3 - restore2 - restore1.
 TEST_F(CursorOverrideTest, lifo)
 {
     QScopedPointer<CursorOverrideAttached> cursor1(new CursorOverrideAttached());
@@ -81,6 +82,7 @@ TEST_F(CursorOverrideTest, lifo)
     ASSERT_EQ(currentCursor(), noCursor);
 }
 
+// Override1 - override2 - override3 - restore1 - restore2 - restore3.
 TEST_F(CursorOverrideTest, fifo)
 {
     QScopedPointer<CursorOverrideAttached> cursor1(new CursorOverrideAttached());
@@ -130,6 +132,7 @@ TEST_F(CursorOverrideTest, fifo)
     ASSERT_EQ(currentCursor(), noCursor);
 }
 
+// Override1 - override2 - override3 - restore2 - restore3 - restore1.
 TEST_F(CursorOverrideTest, mixed)
 {
     QScopedPointer<CursorOverrideAttached> cursor1(new CursorOverrideAttached());
