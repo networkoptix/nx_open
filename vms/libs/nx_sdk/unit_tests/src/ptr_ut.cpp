@@ -119,6 +119,22 @@ TEST(Ptr, basic)
     ASSERT_TRUE(Data::s_destructorCalled);
 }
 
+TEST(Ptr, inheritance)
+{
+    Data::s_destructorCalled = false;
+    {
+        const Ptr<Data> data = makePtr<Data>(42);
+
+        const IBase* tmp = data.get();
+
+        const Ptr<const IBase> base(toPtr(tmp));
+        ASSERT_EQ(1, data->refCount());
+
+        ASSERT_FALSE(Data::s_destructorCalled);
+    } //< data destroyed
+    ASSERT_TRUE(Data::s_destructorCalled);
+}
+
 TEST(Ptr, toPtr)
 {
     Data::s_destructorCalled = false;

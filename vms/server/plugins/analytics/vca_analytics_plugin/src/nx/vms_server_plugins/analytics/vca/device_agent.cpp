@@ -453,7 +453,7 @@ void DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTypes, IEr
     if (!prepare(vcaCameraConrtoller, outError))
         return;
 
-    nx::sdk::Ptr<const nx::sdk::IStringList> eventTypeIds(metadataTypes->eventTypeIds());
+    const auto eventTypeIds = toPtr(metadataTypes->eventTypeIds());
     if (const char* message = "Event type id list is nullptr"; !NX_ASSERT(eventTypeIds, message))
     {
         handleError(outError, ErrorCode::internalError, message);

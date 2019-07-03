@@ -214,7 +214,7 @@ nx::network::HostAddress Monitor::getLocalIp(const nx::network::SocketAddress& c
 void Monitor::startMonitoring(const IMetadataTypes* metadataTypes, IError* outError)
 {
     // Assume that the list contains events only, since this plugin produces no objects.
-    Ptr<const IStringList> eventTypeList(metadataTypes->eventTypeIds());
+    const auto eventTypeList = toPtr(metadataTypes->eventTypeIds());
     if (const char* message = "Event type id list is empty"; !NX_ASSERT(eventTypeList, message))
     {
         outError->setError(ErrorCode::internalError, message);

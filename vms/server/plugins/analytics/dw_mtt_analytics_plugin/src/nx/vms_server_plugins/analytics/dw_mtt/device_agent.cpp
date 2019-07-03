@@ -383,7 +383,7 @@ QByteArray DeviceAgent::extractRequestFromBuffer()
 
     // The request may contain leading zeros. They hinder to debug. Let's eliminate them.
     int nonZeroIndex = 0;
-    while (nonZeroIndex <  request.size() && request.at(nonZeroIndex) == '\0')
+    while (nonZeroIndex < request.size() && request.at(nonZeroIndex) == '\0')
         ++nonZeroIndex;
 
     if (nonZeroIndex)
@@ -400,7 +400,7 @@ void DeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
 
 void DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes, IError* outError)
 {
-    nx::sdk::Ptr<const nx::sdk::IStringList> eventTypeIds(metadataTypes->eventTypeIds());
+    const auto eventTypeIds = toPtr(metadataTypes->eventTypeIds());
     if (const char* message = "Event type id list is nullptr"; !NX_ASSERT(eventTypeIds, message))
     {
         outError->setError(ErrorCode::internalError, message);
@@ -422,7 +422,7 @@ void DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTypes, IEr
     m_cameraController.setCredentials(m_auth.user().toLatin1(), m_auth.password().toLatin1());
 
     // Assuming that the list contains only events, since this plugin does not produce objects.
-    nx::sdk::Ptr<const IStringList> eventTypeIdList(metadataTypes->eventTypeIds());
+    const auto eventTypeIdList = toPtr(metadataTypes->eventTypeIds());
     if (const char* message = "Event type id list is nullptr"; !NX_ASSERT(eventTypeIdList, message))
     {
         outError->setError(ErrorCode::internalError, message);
@@ -451,9 +451,10 @@ void DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTypes, IEr
     NX_URL_PRINT << "Trying to get DW MTT-camera tcp notification server port.";
     if (!m_cameraController.readPortConfiguration())
     {
-        static const char* message = "Failed to get DW MTT-camera tcp notification server port";
-        NX_URL_PRINT << message;
-        outError->setError(ErrorCode::networkError, message);
+        static const char* const kMessage =
+            "Failed to get DW MTT-camera tcp notification server port";
+        NX_URL_PRINT << kMessage;
+        outError->setError(ErrorCode::networkError, kMessage);
         return;
     }
     NX_URL_PRINT << "DW MTT-camera tcp notification port = "

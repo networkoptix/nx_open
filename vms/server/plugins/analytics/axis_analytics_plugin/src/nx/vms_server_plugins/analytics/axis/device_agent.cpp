@@ -48,7 +48,7 @@ void DeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
 
 void DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes, IError* outError)
 {
-    Ptr<const IStringList> neededEventTypeIds(metadataTypes->eventTypeIds());
+    const auto neededEventTypeIds = toPtr(metadataTypes->eventTypeIds());
     if (!neededEventTypeIds || !neededEventTypeIds->count())
         stopFetchingMetadata();
 

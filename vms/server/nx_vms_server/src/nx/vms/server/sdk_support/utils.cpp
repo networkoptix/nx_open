@@ -387,7 +387,7 @@ std::map<QString, QString> attributesMap(
     std::map<QString, QString> result;
     for (int i = 0; i < metadata->attributeCount(); ++i)
     {
-        const nx::sdk::Ptr<const nx::sdk::IAttribute> attribute(metadata->attribute(i));
+        const auto attribute = toPtr(metadata->attribute(i));
         result.emplace(
             QString::fromStdString(attribute->name()),
             QString::fromStdString(attribute->value()));

@@ -127,7 +127,7 @@ static void testDeviceAgentSettings(IDeviceAgent* deviceAgent)
 class Action: public RefCountable<IAction>
 {
 public:
-    Action(): m_params(new StringMap()) {}
+    Action(): m_params(makePtr<StringMap>()) {}
 
     virtual const char* actionId() const override { return m_actionId.c_str(); }
     virtual Uuid objectId() const override { return m_objectId; }
@@ -201,7 +201,7 @@ private:
 
 static void testExecuteActionNonExisting(IEngine* engine)
 {
-    auto error = makePtr<Error>();
+    const auto error = makePtr<Error>();
     auto action = makePtr<Action>();
     action->m_actionId = "non_existing_actionId";
 
@@ -223,7 +223,7 @@ static void testExecuteActionAddToList(IEngine* engine)
     });
     action->m_expectedNonNullMessageToUser = true;
 
-    auto error = makePtr<Error>();
+    const auto error = makePtr<Error>();
     engine->executeAction(action.get(), error.get());
     ASSERT_EQ(ErrorCode::noError, error->errorCode());
     action->assertExpectedState();
@@ -236,7 +236,7 @@ static void testExecuteActionAddPerson(IEngine* engine)
     action->m_objectId = Uuid();
     action->m_expectedNonNullActionUrl = true;
 
-    auto error = makePtr<Error>();
+    const auto error = makePtr<Error>();
     engine->executeAction(action.get(), error.get());
     ASSERT_EQ(ErrorCode::noError, error->errorCode());
     action->assertExpectedState();

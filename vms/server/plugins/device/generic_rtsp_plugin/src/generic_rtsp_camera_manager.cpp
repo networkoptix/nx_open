@@ -29,7 +29,7 @@ namespace
 GenericRTSPCameraManager::GenericRTSPCameraManager(const nxcip::CameraInfo& info)
 :
     m_refManager(this),
-    m_pluginRef(GenericRTSPPlugin::instance()),
+    m_pluginRef(nx::sdk::toPtr(GenericRTSPPlugin::instance())),
     m_info(info),
     m_capabilities(0)
 {

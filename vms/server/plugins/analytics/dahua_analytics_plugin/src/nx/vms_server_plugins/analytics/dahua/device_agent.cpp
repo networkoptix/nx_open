@@ -94,7 +94,7 @@ void DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTypes, IEr
     std::vector<QString> eventTypes;
 
 
-    Ptr<const IStringList> eventTypeIds(metadataTypes->eventTypeIds());
+    const auto eventTypeIds = toPtr(metadataTypes->eventTypeIds());
     if (const char* message = "Event type id list is empty";
         !NX_ASSERT(eventTypeIds, message))
     {

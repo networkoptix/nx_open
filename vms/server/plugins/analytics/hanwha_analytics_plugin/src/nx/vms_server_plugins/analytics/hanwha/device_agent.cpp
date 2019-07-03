@@ -43,7 +43,7 @@ void DeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
 
 void DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes, IError* outError)
 {
-    nx::sdk::Ptr<const nx::sdk::IStringList> eventTypeIds(metadataTypes->eventTypeIds());
+    const auto eventTypeIds = toPtr(metadataTypes->eventTypeIds());
     if (const char* message = "Event type id list is nullptr"; !NX_ASSERT(eventTypeIds, message))
     {
         outError->setError(ErrorCode::internalError, message);
