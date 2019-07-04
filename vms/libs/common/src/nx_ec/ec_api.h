@@ -42,6 +42,7 @@
 #include <nx_ec/managers/abstract_analytics_manager.h>
 #include <nx/vms/api/data/timestamp.h>
 #include <nx/vms/time_sync/abstract_time_sync_manager.h>
+#include <nx_ec/impl/regular_completion_handler.h>
 
 #include "ec_api_fwd.h"
 
@@ -288,6 +289,22 @@ public:
                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(
                     target,
                     handler)));
+    }
+
+    int remove(
+        const QnUuid& id,
+        nx::utils::MoveOnlyFunc<void(ErrorCode)> handler)
+    {
+        return remove(id,
+            impl::makeRegularCompletionHandler<impl::SimpleHandler>(std::move(handler)));
+    }
+
+    int remove(
+        const QVector<QnUuid>& idList,
+        nx::utils::MoveOnlyFunc<void(ErrorCode)> handler)
+    {
+        return remove(idList,
+            impl::makeRegularCompletionHandler<impl::SimpleHandler>(std::move(handler)));
     }
 
 protected:
