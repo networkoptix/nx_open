@@ -22,6 +22,8 @@
 
 namespace ec2 {
 
+static const QString kHiddenPasswordFiller = ":******";
+
 bool amendOutputDataIfNeeded(const Qn::UserAccessData& accessData,
     QnResourceAccessManager* /*accessManager*/,
     nx::vms::api::ResourceParamData* paramData)
@@ -34,7 +36,7 @@ bool amendOutputDataIfNeeded(const Qn::UserAccessData& accessData,
             accessData.access == Qn::UserAccessData::Access::ReadAllResources)
             paramData->value = decryptedValue;
         else
-            paramData->value = decryptedValue.left(decryptedValue.indexOf(':')) + ":******";
+            paramData->value = decryptedValue.left(decryptedValue.indexOf(':')) + kHiddenPasswordFiller;
 
         return true;
     }
@@ -46,26 +48,26 @@ bool amendOutputDataIfNeeded(const Qn::UserAccessData& accessData,
     QnResourceAccessManager* accessManager,
     nx::vms::api::EventRuleData* rule)
 {
-    if (accessData == Qn::kSystemAccess ||
-        accessManager->hasGlobalPermission(accessData, GlobalPermission::admin))
+    bool success = false;
+    auto params = QJson::deserialized<nx::vms::event::ActionParameters>(
+        rule->actionParams,
+        nx::vms::event::ActionParameters(),
+        &success);
+    if (success)
     {
-        bool success = false;
-        auto params = QJson::deserialized<nx::vms::event::ActionParameters>(
-            rule->actionParams,
-            nx::vms::event::ActionParameters(),
-            &success);
-        if (success)
+        nx::utils::Url url = params.url;
+        if (!url.password().isEmpty())
         {
-            nx::utils::Url url = params.url;
-            if (!url.password().isEmpty())
-            {
+            bool isGranted = accessData == Qn::kSystemAccess
+                || accessManager->hasGlobalPermission(accessData, GlobalPermission::admin);
+            if (isGranted)
                 url.setPassword(nx::utils::decodeStringFromHexStringAES128CBC(url.password()));
-                params.url = url.toString();
-                rule->actionParams = QJson::serialized(params);
-            }
+            else
+                url.setPassword(kHiddenPasswordFiller);
+            params.url = url.toString();
+            rule->actionParams = QJson::serialized(params);
+            return true;
         }
-
-        return true;
     }
     return false;
 }
