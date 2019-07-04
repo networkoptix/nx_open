@@ -79,14 +79,18 @@ void MountHelper::tryMountWithDomainAndPassword(
         return;
 
     auto credentialsFile = m_delegates.credentialsFileName(m_username, password);
-    if (credentialsFile.empty())
-        return;
-
     for (const auto& ver: {"", "1.0", "2.0"})
     {
-        m_result = m_delegates.osMount(makeCommandString(domain, ver, credentialsFile));
+        m_result = m_delegates.osMount(makeCommandString(domain, ver, m_username, password));
         if (m_result == SystemCommands::MountCode::ok)
             break;
+
+        if (!credentialsFile.empty())
+        {
+            m_result = m_delegates.osMount(makeCommandString(domain, ver, credentialsFile));
+            if (m_result == SystemCommands::MountCode::ok)
+                break;
+        }
 
         if (m_result == SystemCommands::MountCode::wrongCredentials && m_password == password)
             m_hasCredentialsError = true;
@@ -101,6 +105,25 @@ std::string MountHelper::makeCommandString(
     std::ostringstream ss;
     ss << "mount -t cifs '" << m_url << "' '" << m_directory << "'"
         << " -o credentials=" << credentialFile;
+
+    if (!domain.empty())
+        ss << ",domain=" << domain;
+
+    if (!ver.empty())
+        ss << ",vers=" << ver;
+
+    return ss.str();
+}
+
+std::string MountHelper::makeCommandString(
+    const std::string& domain,
+    const std::string& ver,
+    const std::string& username,
+    const std::string& password)
+{
+    std::ostringstream ss;
+    ss << "mount -t cifs '" << m_url << "' '" << m_directory << "'"
+        << " -o username='" << username << "',password='" << password << "'";
 
     if (!domain.empty())
         ss << ",domain=" << domain;
