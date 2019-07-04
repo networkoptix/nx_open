@@ -7,17 +7,16 @@
 #include <ctime>
 #include <cmath>
 
-#include <nx/sdk/helpers/uuid_helper.h>
+#define NX_PRINT_PREFIX (this->logUtils.printPrefix)
+#include <nx/kit/debug.h>
+#include <nx/kit/utils.h>
+
 #include <nx/sdk/analytics/helpers/event_metadata.h>
 #include <nx/sdk/analytics/helpers/event_metadata_packet.h>
 #include <nx/sdk/analytics/helpers/object_metadata.h>
 #include <nx/sdk/analytics/helpers/object_metadata_packet.h>
 #include <nx/sdk/analytics/helpers/object_track_best_shot_packet.h>
 #include <nx/sdk/helpers/string_map.h>
-
-#define NX_PRINT_PREFIX (this->logUtils.printPrefix)
-#include <nx/kit/debug.h>
-#include <nx/kit/utils.h>
 
 #include "utils.h"
 #include "stub_analytics_plugin_ini.h"
