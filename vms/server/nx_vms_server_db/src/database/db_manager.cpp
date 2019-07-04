@@ -1727,6 +1727,62 @@ bool QnDbManager::encryptKvPairs()
     return true;
 }
 
+bool QnDbManager::encryptBusinessRules()
+{
+    QSqlQuery query(m_sdb);
+    query.setForwardOnly(true);
+    QString queryStr = "SELECT rowid, action_params FROM vms_businessrule";
+
+    if (!query.prepare(queryStr))
+    {
+        NX_ERROR(this, lit("Could not prepare query %1: %2").arg(queryStr).arg(query.lastError().text()));
+        return false;
+    }
+
+    if (!query.exec())
+    {
+        NX_ERROR(this, lit("Could not execute query %1: %2").arg(queryStr).arg(query.lastError().text()));
+        return false;
+    }
+
+    QSqlQuery updQuery(m_sdb);
+    QString updQueryString = "UPDATE vms_businessrule SET action_params = :value WHERE rowid = :rowid";
+    if (!prepareSQLQuery(&updQuery, updQueryString, Q_FUNC_INFO))
+        return false;
+
+    while (query.next())
+    {
+        int rowid = query.value(0).toInt();
+        QByteArray value = query.value(1).toByteArray();
+        bool success = false;
+        auto params = QJson::deserialized<nx::vms::event::ActionParameters>(
+            value,
+            nx::vms::event::ActionParameters(),
+            &success);
+        if (success)
+        {
+            nx::utils::Url url = params.url;
+            if (!url.password().isEmpty())
+            {
+                url.setPassword(nx::utils::encodeHexStringFromStringAES128CBC(url.password()));
+                params.url = url.toString();
+                value = QJson::serialized(params);
+
+                updQuery.addBindValue(value);
+                updQuery.addBindValue(rowid);
+
+                if (!updQuery.exec())
+                {
+                    NX_ERROR(this, lit("Could not execute query %1: %2").arg(updQueryString).arg(updQuery.lastError().text()));
+                    return false;
+                }
+            }
+        }
+    }
+
+    return true;
+}
+
 bool QnDbManager::updateDefaultRules(const nx::vms::event::RuleList& rules)
 {
     // TODO: #GDM move to migration
@@ -1998,6 +2054,13 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
 
     if (updateName.endsWith(lit("/99_20190701_move_metadata_storage_id.sql")))
         return resyncIfNeeded({ ResyncServerAttributes, ResyncResourceProperties });
+
+    if (updateName.endsWith(lit("/99_20190704_encrypt_action_parameters.sql")))
+    {
+        if (!encryptBusinessRules())
+            return false;
+        return resyncIfNeeded({ResyncRules});
+    }
 
     NX_DEBUG(this, lit("SQL update %1 does not require post-actions.").arg(updateName));
     return true;

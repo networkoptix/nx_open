@@ -208,6 +208,25 @@ inline void fixRequestDataIfNeeded(nx::vms::api::ResourceParamData* const paramD
     }
 }
 
+inline void fixRequestDataIfNeeded(nx::vms::api::EventRuleData* const paramData)
+{
+    bool success = false;
+    auto params = QJson::deserialized<nx::vms::event::ActionParameters>(
+        paramData->actionParams,
+        nx::vms::event::ActionParameters(),
+        &success);
+    if (success)
+    {
+        nx::utils::Url url = params.url;
+        if (!url.password().isEmpty())
+        {
+            url.setPassword(nx::utils::encodeHexStringFromStringAES128CBC(url.password()));
+            params.url = url.toString();
+            paramData->actionParams = QJson::serialized(params);
+        }
+    }
+}
+
 template <typename T>
 auto amendTranIfNeeded(const QnTransaction<T>& tran)
 {
@@ -240,6 +259,15 @@ inline QnTransaction<nx::vms::api::ResourceParamWithRefData> amendTranIfNeeded(
 {
     auto resultTran = originalTran;
     fixRequestDataIfNeeded(static_cast<nx::vms::api::ResourceParamData* const>(&resultTran.params));
+
+    return resultTran;
+}
+
+inline QnTransaction<nx::vms::api::EventRuleData> amendTranIfNeeded(
+    const QnTransaction<nx::vms::api::EventRuleData>& originalTran)
+{
+    auto resultTran = originalTran;
+    fixRequestDataIfNeeded(static_cast<nx::vms::api::EventRuleData* const>(&resultTran.params));
 
     return resultTran;
 }
@@ -466,11 +494,13 @@ public:
     {
         QnDbManagerAccess accessDataCopy(m_db);
         nx::utils::concurrent::run(Ec2ThreadPool::instance(),
-            [self = *this, accessDataCopy, input, handler, cmdCode]() mutable
+            [self = *this, accessDataCopy, input, handler, cmdCode,
+             resourceAccessManager = m_owner->commonModule()->resourceAccessManager()]() mutable
             {
                 OutputData output;
                 const ErrorCode errorCode = accessDataCopy.doQuery(cmdCode, input, output);
-                amendOutputDataIfNeeded(self.m_db.userAccessData(), &output);
+                amendOutputDataIfNeeded(self.m_db.userAccessData(),
+                    resourceAccessManager, &output);
                 handler(errorCode, output);
             });
     }
@@ -958,7 +988,8 @@ void PostProcessTransactionFunction::operator()(
 {
     messageBus->sendTransaction(tran);
     auto amendedTran = tran;
-    amendOutputDataIfNeeded(Qn::kSystemAccess, &amendedTran.params);
+    amendOutputDataIfNeeded(Qn::kSystemAccess,
+        messageBus->commonModule()->resourceAccessManager(), &amendedTran.params);
     aux::triggerNotification(auditData, amendedTran);
 }
 
