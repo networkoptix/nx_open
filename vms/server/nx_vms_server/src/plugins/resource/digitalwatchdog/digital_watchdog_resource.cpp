@@ -321,6 +321,8 @@ nx::vms::server::resource::StreamCapabilityMap
     NX_VERBOSE(this, "%1(%2): id %3", __func__, streamIndex, getId());
 
     auto onvifResult = base_type::getStreamCapabilityMapFromDriver(streamIndex);
+    if (getUrl().isEmpty())
+        return onvifResult;
 
     if (!this->getMedia2Url().isEmpty())
     {
@@ -328,6 +330,7 @@ nx::vms::server::resource::StreamCapabilityMap
         // additional dw-specific detection.
         return onvifResult;
     }
+
     const auto codecs = m_cproApiClient->getSupportedVideoCodecs(streamIndex);
     if (codecs)
     {
