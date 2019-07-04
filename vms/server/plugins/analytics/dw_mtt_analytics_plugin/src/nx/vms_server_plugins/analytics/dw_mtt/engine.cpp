@@ -136,6 +136,8 @@ static const std::string kPluginManifest = /*suppress newline*/1 + R"json(
 {
     "id": "nx.dw_mtt",
     "name": "DW MTT analytics plugin",
+    "description": "Supports built-in analytics on DW MTT cameras",
+    "version": "1.0.0",
     "engineSettingsModel": ""
 }
 )json";

@@ -141,6 +141,8 @@ static const std::string kPluginManifest = /*suppress newline*/ 1 + R"json(
 {
     "id": "nx.axis",
     "name": "Axis analytics plugin",
+    "description": "Supports built-in analytics on Axis cameras",
+    "version": "1.0.0",
     "engineSettingsModel": ""
 }
 )json";

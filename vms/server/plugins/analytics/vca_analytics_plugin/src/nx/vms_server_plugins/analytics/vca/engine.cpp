@@ -113,6 +113,8 @@ static const std::string kPluginManifest = /*suppress newline*/1 + R"json(
 {
     "id": "nx.vca",
     "name": "VCA analytics plugin",
+    "description": "Supports built-in analytics on VCA cameras",
+    "version": "1.0.0",
     "engineSettingsModel": ""
 }
 )json";
