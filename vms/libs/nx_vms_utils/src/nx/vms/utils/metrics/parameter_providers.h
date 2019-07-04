@@ -1,12 +1,13 @@
 #pragma once
 
-#include <nx/utils/scope_guard.h>
-
-#include "data_base.h"
+#include "parameter_monitors.h"
 
 namespace nx::vms::utils::metrics {
 
-template<typename Resource>
+/**
+ * Providers parameter manifest and allows to construct a monitor for a given resource.
+ */
+template<typename ResourceType>
 class AbstractParameterProvider
 {
 public:
@@ -14,123 +15,130 @@ public:
     virtual ~AbstractParameterProvider() = default;
 
     const api::metrics::ParameterGroupManifest& manifest() const;
-
-    virtual nx::utils::SharedGuardPtr monitor(
-        const Resource& resource, DataBase::Access access) const = 0;
+    virtual ParameterMonitorPtr monitor(
+        const ResourceType& resource, DataBase::Access dbAccess) const = 0;
 
 private:
     const api::metrics::ParameterGroupManifest m_manifest;
 };
 
-template<typename Resource>
-class SingleParameterProvider: public AbstractParameterProvider<Resource>
+/**
+ * Provides single parameter.
+ * If watch is provided created DataBaseParameterMonitor, otherwise RuntimeParameterMonitor only.
+ */
+template<typename ResourceType>
+class SingleParameterProvider: public AbstractParameterProvider<ResourceType>
 {
 public:
-    using Getter = nx::utils::MoveOnlyFunc<Value(const Resource&)>;
-    using OnChange = nx::utils::MoveOnlyFunc<void()>;
-    using Watch = nx::utils::MoveOnlyFunc<nx::utils::SharedGuardPtr(const Resource&, OnChange)>;
-
     SingleParameterProvider(
-        api::metrics::ParameterManifest manifest, Getter getter, Watch watch = nullptr);
+        api::metrics::ParameterManifest manifest,
+        Getter<ResourceType> getter,
+        Watch<ResourceType> watch = nullptr);
 
-    nx::utils::SharedGuardPtr monitor(
-        const Resource& resource, DataBase::Access access) const override;
+    ParameterMonitorPtr monitor(
+        const ResourceType& resource, DataBase::Access dbAccess) const override;
 
 private:
-    const Getter m_getter;
-    const Watch m_watch;
+    const Getter<ResourceType> m_getter;
+    const Watch<ResourceType> m_watch;
 };
 
 template<typename Resource>
 using ResourceParameterProviders
     = std::vector<std::unique_ptr<AbstractParameterProvider<Resource>>>;
 
-template<typename Resource>
-class ParameterGroupProvider: public AbstractParameterProvider<Resource>
+/**
+ * Provides a parameter group.
+ * Created a ParameterGroupMonitor with monitor for each parameter inside.
+ */
+template<typename ResourceType>
+class ParameterGroupProvider: public AbstractParameterProvider<ResourceType>
 {
 public:
     ParameterGroupProvider(
         api::metrics::ParameterManifest manifest,
-        ResourceParameterProviders<Resource> providers);
+        ResourceParameterProviders<ResourceType> providers);
 
-    nx::utils::SharedGuardPtr monitor(
-        const Resource& resource, DataBase::Access access) const override;
+    ParameterMonitorPtr monitor(
+        const ResourceType& resource, DataBase::Access dbAccess) const override;
 
 private:
     static api::metrics::ParameterGroupManifest makeManifest(
         api::metrics::ParameterManifest manifest,
-        const ResourceParameterProviders<Resource>& providers);
+        const ResourceParameterProviders<ResourceType>& providers);
 
 private:
-    const ResourceParameterProviders<Resource> m_providers;
+    const ResourceParameterProviders<ResourceType> m_providers;
 };
 
 // -----------------------------------------------------------------------------------------------
 
-template<typename Resource>
-AbstractParameterProvider<Resource>::AbstractParameterProvider(
+template<typename ResourceType>
+AbstractParameterProvider<ResourceType>::AbstractParameterProvider(
     api::metrics::ParameterGroupManifest manifest)
 :
     m_manifest(std::move(manifest))
 {
 }
 
-template<typename Resource>
-const api::metrics::ParameterGroupManifest& AbstractParameterProvider<Resource>::manifest() const
+template<typename ResourceType>
+const api::metrics::ParameterGroupManifest&
+    AbstractParameterProvider<ResourceType>::manifest() const
 {
     return m_manifest;
 }
 
-template<typename Resource>
-SingleParameterProvider<Resource>::SingleParameterProvider(
-    api::metrics::ParameterManifest manifest, Getter getter, Watch watch)
+template<typename ResourceType>
+SingleParameterProvider<ResourceType>::SingleParameterProvider(
+    api::metrics::ParameterManifest manifest,
+    Getter<ResourceType> getter,
+    Watch<ResourceType> watch)
 :
-    AbstractParameterProvider<Resource>(api::metrics::makeParameterManifest(
+    AbstractParameterProvider<ResourceType>(api::metrics::makeParameterManifest(
         std::move(manifest.id), std::move(manifest.name), std::move(manifest.unit))),
     m_getter(std::move(getter)),
     m_watch(std::move(watch))
 {
 }
 
-template<typename Resource>
-nx::utils::SharedGuardPtr SingleParameterProvider<Resource>::monitor(
-    const Resource& resource, DataBase::Access access) const
+template<typename ResourceType>
+ParameterMonitorPtr SingleParameterProvider<ResourceType>::monitor(
+    const ResourceType& resource, DataBase::Access dbAccess) const
 {
-    const auto update = [this, access, resource]() { access->update(m_getter(resource)); };
-    update();
-
     if (m_watch)
-        return m_watch(resource, update);
+    {
+        return std::make_unique<DataBaseParameterMonitor<ResourceType>>(
+            resource, m_getter, dbAccess, m_watch);
+    }
     else
-        return nx::utils::SharedGuardPtr();
+    {
+        return std::make_unique<RuntimeParameterMonitor<ResourceType>>(
+            resource, m_getter);
+    }
 }
 
-// -----------------------------------------------------------------------------------------------
-
-template<typename Resource>
-ParameterGroupProvider<Resource>::ParameterGroupProvider(
+template<typename ResourceType>
+ParameterGroupProvider<ResourceType>::ParameterGroupProvider(
     api::metrics::ParameterManifest manifest,
-    ResourceParameterProviders<Resource> providers)
+    ResourceParameterProviders<ResourceType> providers)
 :
-    AbstractParameterProvider<Resource>(makeManifest(std::move(manifest), providers)),
+    AbstractParameterProvider<ResourceType>(makeManifest(std::move(manifest), providers)),
     m_providers(std::move(providers))
 {
 }
 
-template<typename Resource>
-nx::utils::SharedGuardPtr ParameterGroupProvider<Resource>::monitor(
-    const Resource& resource, DataBase::Access access) const
+template<typename ResourceType>
+ParameterMonitorPtr ParameterGroupProvider<ResourceType>::monitor(
+    const ResourceType& resource, DataBase::Access dbAccess) const
 {
-    std::vector<nx::utils::MoveOnlyFunc<void()>> callbacks;
+    std::map<QString, ParameterMonitorPtr> monitors;
     for (const auto& provider: m_providers)
     {
-        const auto parameterAccess = access[provider->manifest().id];
-        if (auto guard = provider->monitor(resource, parameterAccess))
-            callbacks.emplace_back(*guard->eject());
+        const auto id = provider->manifest().id;
+        monitors[id] = provider->monitor(resource, dbAccess[id]);
     }
 
-    return nx::utils::makeSharedGuard(
-        [callbacks = std::move(callbacks)] { for (const auto& c: callbacks) c(); });
+    return std::make_unique<ParameterGroupMonitor<ResourceType>>(std::move(monitors));
 }
 
 template<typename Resource>

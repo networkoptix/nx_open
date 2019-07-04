@@ -65,57 +65,26 @@ api::metrics::SystemValues Controller::values(
     for (const auto& [name, provider]: m_resourceProviders)
     {
         auto& groupValues = systemValues[name];
-        const auto groupDb = m_dataBase.access(name);
-        const auto groupRules = m_rules.find(name);
-        for (const auto& resource: provider->resources())
+        if (timeLine)
         {
-            auto& resourceValues = groupValues[resource.id];
-            resourceValues.name = resource.name;
-            resourceValues.parent = resource.parent;
-
-            const auto resourceDb = groupDb[resource.id];
-            loadGroupValuesUnlocked(
-                &resourceValues.values, resourceDb, provider->manifest(), timeLine);
-
-            if (groupRules != m_rules.end() && applyRules && !timeLine)
-                applyRulesUnlocked(&resourceValues.values, resourceDb, groupRules->second);
+            groupValues = provider->timeline(m_currentSecsSinceEpoch(), *timeLine);
+            continue;
         }
+
+        groupValues = provider->values();
+        if (!applyRules)
+            continue;
+
+        const auto groupRules = m_rules.find(name);
+        if (groupRules == m_rules.end())
+            continue;
+
+        const auto groupDb = m_dataBase.access(name);
+        for (auto& [resourceId, resourceValues]: groupValues)
+            applyRulesUnlocked(&resourceValues.values, groupDb[resourceId], groupRules->second);
     }
 
     return systemValues;
-}
-
-void Controller::loadGroupValuesUnlocked(
-    std::map<QString /*id*/, api::metrics::ParameterGroupValues>* group,
-    DataBase::Access groupAccess,
-    const std::vector<api::metrics::ParameterGroupManifest>& manifests,
-    std::optional<std::chrono::milliseconds> timeLine) const
-{
-    for (const auto& manifest: manifests)
-    {
-        auto& parameter = (*group)[manifest.id];
-        const auto access = groupAccess[manifest.id];
-
-        if (manifest.group.empty())
-            parameter.value = timeLine ? makeTimeLine(access, *timeLine) : access->current();
-        else
-            loadGroupValuesUnlocked(&parameter.group, access, manifest.group, timeLine);
-    }
-}
-
-Value Controller::makeTimeLine(DataBase::Access access, std::chrono::milliseconds timeLine) const
-{
-    const auto timedValues = access->last(timeLine);
-    const auto now = nx::utils::monotonicTime();
-    const auto timeSinseEpochS = m_currentSecsSinceEpoch();
-    QJsonObject values;
-    for (const auto& [value, time]: timedValues)
-    {
-        const auto delayS = std::chrono::duration_cast<std::chrono::seconds>(now - time).count();
-        values[QString::number(timeSinseEpochS - delayS)] = value;
-    }
-
-    return values;
 }
 
 static double sum(const std::vector<nx::utils::TimedValue<Value>>& timeline)
