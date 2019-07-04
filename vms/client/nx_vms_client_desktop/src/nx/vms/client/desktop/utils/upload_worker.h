@@ -39,7 +39,7 @@ private:
     void handleMd5Calculated();
 
     void handleUpload();
-    void handleChunkUploaded(bool success);
+    void handleChunkUploaded(bool success, int chunkIndex);
     void handleAllUploaded();
     void handleCheckFinished(bool success, bool ok);
     void handleFileUploadCreated(bool success, RemoteResult code, QString error);

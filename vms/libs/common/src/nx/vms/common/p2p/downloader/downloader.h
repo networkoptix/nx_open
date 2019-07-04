@@ -59,9 +59,12 @@ public:
     void stopDownloads();
     void findExistingDownloads();
 
+    bool isStalled(const QString& fileName) const;
+
 signals:
     void downloadFinished(const QString& fileName);
     void downloadFailed(const QString& fileName);
+    void downloadStalledChanged(const QString& fileName, bool stalled);
     void fileAdded(
         const nx::vms::common::p2p::downloader::FileInformation& fileInformation);
     void fileDeleted(const QString& fileName);

@@ -8624,6 +8624,14 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
       <source>Some servers have no package available</source>
       <translation type="unfinished">Some servers have no package available</translation>
     </message>
+    <message>
+      <source>Failed to cancel update</source>
+      <translation type="unfinished">Failed to cancel update</translation>
+    </message>
+    <message>
+      <source>Failed to start installation</source>
+      <translation type="unfinished">Failed to start installation</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::MultipleLayoutSelectionDialog</name>
@@ -8774,10 +8782,6 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
       <translation>Lỗi tải xuống nội bộ.</translation>
     </message>
     <message>
-      <source>Iternal server error.</source>
-      <translation>Lỗi máy chủ nội bộ.</translation>
-    </message>
-    <message>
       <source>Internal client error.</source>
       <translation>Lỗi máy khách nội bộ.</translation>
     </message>
@@ -8796,6 +8800,14 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <message>
       <source>Update package is not found.</source>
       <translation>Không tìm thấy gói cập nhật.</translation>
+    </message>
+    <message>
+      <source>There is not enough space to install update.</source>
+      <translation type="unfinished">There is not enough space to install update.</translation>
+    </message>
+    <message>
+      <source>Internal server error.</source>
+      <translation type="unfinished">Internal server error.</translation>
     </message>
   </context>
   <context>
@@ -9035,6 +9047,17 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <message>
       <source>Waiting for server to respond...</source>
       <translation>Chờ đợi phản hồi của máy chủ...</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ServerUpdateTool</name>
+    <message>
+      <source>No connection to the server.</source>
+      <translation type="unfinished">No connection to the server.</translation>
+    </message>
+    <message>
+      <source>Network error.</source>
+      <translation type="unfinished">Network error.</translation>
     </message>
   </context>
   <context>

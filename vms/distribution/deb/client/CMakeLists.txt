@@ -42,6 +42,7 @@ set(common_depends
     "libxfixes3"
     "libxt6"
     "libfontconfig1"
+    "libfreetype6 (>= 2.6.0)"
     "libsm6"
     "libice6"
     "libaudio2"

@@ -98,11 +98,7 @@ AbstractPeerManager::RequestContextPtr<QByteArray> InternetOnlyPeerManager::down
         });
 
     std::function<void()> cancelRequest =
-        [promise, httpClient = httpClient.get()]()
-        {
-            httpClient->pleaseStopSync();
-            setPromiseValueIfEmpty(promise, {});
-        };
+        [promise, httpClient = httpClient.get()]() { setPromiseValueIfEmpty(promise, {}); };
 
     return std::make_unique<InternetRequestContext<QByteArray>>(
         std::move(httpClient), promise->get_future(), cancelRequest);

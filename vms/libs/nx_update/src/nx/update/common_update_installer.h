@@ -37,8 +37,11 @@ public:
     void stopSync(bool clearAndReset);
     State state() const;
 
+    bool checkFreeSpace(const QString& path, qint64 bytes) const;
+
     virtual QString dataDirectoryPath() const = 0;
     virtual QString component() const = 0;
+    virtual int64_t freeSpace(const QString& path) const = 0;
 
 private:
     update::detail::ZipExtractor m_extractor;

@@ -25,9 +25,6 @@ void QnMediaServerUserAttributes::assign(
     if (backupSchedule != right.backupSchedule)
         modifiedFields->insert("backupScheduleChanged");
 
-    if (metadataStorageId != right.metadataStorageId)
-        modifiedFields->insert("metadataStorageIdChanged");
-
     *this = right;
 }
 

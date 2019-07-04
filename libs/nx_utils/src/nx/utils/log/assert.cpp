@@ -93,7 +93,15 @@ static void handleQtMessage(
             break;
 
         default: // QtCriticalMsg, QtFatalMsg and all unknown.
-            assertFailure(/*isCritical*/ false, message);
+            // Skip some known messages.
+            if (message.contains("Refused to prefetch"))
+            {
+                NX_WARNING(&context, message);
+            }
+            else
+            {
+                assertFailure(/*isCritical*/ false, message);
+            }
             break;
     };
 

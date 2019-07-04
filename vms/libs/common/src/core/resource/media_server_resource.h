@@ -24,6 +24,8 @@ class QnMediaServerResource:
 
     typedef QnResource base_type;
 public:
+    static const QString kMetadataStorageIdKey;
+
     QnMediaServerResource(QnCommonModule* commonModule);
     virtual ~QnMediaServerResource();
 
@@ -155,7 +157,6 @@ signals:
     void backupScheduleChanged(const QnResourcePtr &resource);
     void apiUrlChanged(const QnResourcePtr& resource);
     void primaryAddressChanged(const QnResourcePtr& resource);
-    void metadataStorageIdChanged(const QnResourcePtr& resource);
 private:
     nx::network::SocketAddress m_primaryAddress;
     QnMediaServerConnectionPtr m_apiConnection; // deprecated

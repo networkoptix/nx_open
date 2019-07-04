@@ -250,12 +250,8 @@ WorkbenchUi::WorkbenchUi(QObject *parent):
 
         });
 
-    connect(qnRuntime, &QnClientRuntimeSettings::valueChanged, this,
-        [this](int id)
-        {
-           if (id == QnClientRuntimeSettings::VIDEO_WALL_WITH_TIMELINE)
-               updateControlsVisibility(false);
-        });
+    connect(action(action::ShowTimeLineOnVideowallAction), &QAction::triggered,
+        this, [this] { updateControlsVisibility(false); });
 }
 
 WorkbenchUi::~WorkbenchUi()

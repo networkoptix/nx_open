@@ -38,6 +38,16 @@ XmlRequestHelper::XmlRequestHelper(
     m_client->setAuthType(authType);
 }
 
+XmlRequestHelper::XmlRequestHelper(
+    const QString& url,
+    const QAuthenticator& authenticator,
+    nx::network::http::AuthType authType)
+:
+    XmlRequestHelper(nx::utils::Url(url), authenticator, authType)
+{
+    NX_ASSERT(m_url.isValid() && !m_url.host().isEmpty(), url);
+}
+
 XmlRequestHelper::Result::Result(
     const XmlRequestHelper* parent, QDomElement element, QStringList path)
 :

@@ -46,11 +46,11 @@ CLVideoDecoderOutputPtr QnTiledImageFilter::updateImage(const CLVideoDecoderOutp
     const QRect rect(pos.x() * m_size.width(), pos.y() * m_size.height(),
         m_size.width(), m_size.height());
     auto croppedFrame = QnCropImageFilter(rect).updateImage(m_tiledFrame);
-    CLVideoDecoderOutput::copy(frame.data(), croppedFrame.data());
+    croppedFrame->copy(frame.data());
 
     // Make sure overlays will be painter on frame copy, not on the combined frame itself.
     auto result = CLVideoDecoderOutputPtr(new CLVideoDecoderOutput());
-    CLVideoDecoderOutput::copy(m_tiledFrame.data(), result.data());
+    result->copy(m_tiledFrame.data());
     return result;
 }
 

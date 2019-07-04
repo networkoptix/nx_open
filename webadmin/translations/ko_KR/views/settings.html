@@ -104,9 +104,9 @@
                                 <a ng-if="!mode.liteClient"
                                    ng-href="{{Config.cloud.portalUrl}}"
                                    target="_blank">Learn more</a></uib-alert>
-                            <uib-alert type="error" ng-if="!hasInternetOnServer">셋업을 실행하려면 서버를 인터넷에 연결하세요 {{Config.cloud.productName}}</uib-alert>
-                            <uib-alert type="error" ng-if="hasInternetOnServer && !hasInternetOnClient">{{Config.cloud.productName}} 시스템에 연결 하는 데 인터넷 연결이 필요합니다.</uib-alert>
-                            <p ng-if="canConnectToCloud"  ><button class="btn btn-default" ng-click="connectToCloud()" ng-disabled="!hasInternetOnServer ||!hasInternetOnClient"> {{Config.cloud.productName}}에 연결</button>                                 <a ng-if="!mode.liteClient" class="btn btn-default" ng-href="{{Config.cloud.portalUrl + Config.cloud.portalRegisterUrl + Config.cloud.webadminContext}}" target="_blank"> {{Config.cloud.productName}} 계정 만들기</a></p>
+                            <uib-alert type="danger" ng-if="!hasInternetOnServer">셋업을 실행하려면 서버를 인터넷에 연결하세요 {{Config.cloud.productName}}</uib-alert>
+                            <uib-alert type="danger" ng-if="hasInternetOnServer && !hasInternetOnClient">{{Config.cloud.productName}} 시스템에 연결 하는 데 인터넷 연결이 필요합니다.</uib-alert>
+                            <p ng-if="canConnectToCloud"><button class="btn btn-default" ng-click="connectToCloud()" ng-disabled="!hasInternetOnServer ||!hasInternetOnClient"> {{Config.cloud.productName}}에 연결</button>                                 <a ng-if="!mode.liteClient" class="btn btn-default" ng-href="{{Config.cloud.portalUrl + Config.cloud.portalRegisterUrl + Config.cloud.webadminContext}}" target="_blank"> {{Config.cloud.productName}} 계정 만들기</a></p>
                         </div>
                     </div>
 
