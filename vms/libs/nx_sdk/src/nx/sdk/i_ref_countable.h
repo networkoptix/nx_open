@@ -72,7 +72,7 @@ public:
         /**
          * Makes a compound interface id for interface templates like IList<IItem>. Usage:
          * ```
-     I   * static IRefCountable::InterfaceId interfaceId()
+         * static IRefCountable::InterfaceId interfaceId()
          * {
          *     return InterfaceId::makeForTemplate<IList<IItem>, IItem>("nx::sdk::IList");
          * }
