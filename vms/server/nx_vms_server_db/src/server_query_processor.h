@@ -68,7 +68,7 @@ private:
     QnDbManager* m_db;
     QnMutex m_mutex;
     QnWaitCondition m_waitCondition;
-    std::vector<Command> m_commandQueue;
+    std::deque<Command> m_commandQueue;
 };
 
 }
