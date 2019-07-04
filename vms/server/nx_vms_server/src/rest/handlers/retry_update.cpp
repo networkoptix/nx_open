@@ -12,13 +12,11 @@ RetryUpdate::RetryUpdate(QnMediaServerModule* serverModule):
 {
 }
 
-int RetryUpdate::executePost(
+int RetryUpdate::executeGet(
     const QString& path,
     const QnRequestParamList& params,
-    const QByteArray& /*body*/,
-    const QByteArray& /*srcBodyContentType*/,
     QByteArray& result,
-    QByteArray& resultContentType,
+    QByteArray& contentType,
     const QnRestConnectionProcessor* processor)
 {
     // Hidden feature, mainly for testing purposes. This parameter should not appear in the
@@ -28,7 +26,19 @@ int RetryUpdate::executePost(
     serverModule()->updateManager()->retry(forceRedownload);
 
     QnUpdateStatusRestHandler handler(serverModule());
-    return handler.executeGet(path, {}, result, resultContentType, processor);
+    return handler.executeGet(path, params, result, contentType, processor);
+}
+
+int RetryUpdate::executePost(
+    const QString& path,
+    const QnRequestParamList& params,
+    const QByteArray& /*body*/,
+    const QByteArray& /*srcBodyContentType*/,
+    QByteArray& result,
+    QByteArray& resultContentType,
+    const QnRestConnectionProcessor* processor)
+{
+    return executeGet(path, params, result, resultContentType, processor);
 }
 
 } // namespace nx::vms::server::rest::handlers

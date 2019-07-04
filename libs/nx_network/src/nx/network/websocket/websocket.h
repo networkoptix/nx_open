@@ -29,14 +29,17 @@ public:
      */
     WebSocket(
         std::unique_ptr<AbstractStreamSocket> streamSocket,
-        SendMode sendMode = SendMode::singleMessage,
-        ReceiveMode receiveMode = ReceiveMode::message,
-        Role role = Role::undefined,
-        FrameType frameType= FrameType::binary);
+        SendMode sendMode,
+        ReceiveMode receiveMode,
+        Role role,
+        FrameType frameType,
+        network::websocket::CompressionType compressionType);
 
     WebSocket(
         std::unique_ptr<AbstractStreamSocket> streamSocket,
-        FrameType frameType);
+        Role role,
+        FrameType frameType,
+        network::websocket::CompressionType compressionType);
 
     ~WebSocket();
 
@@ -107,20 +110,17 @@ private:
     nx::utils::ObjectDestructionFlag m_destructionFlag;
     bool m_failed = false;
     FrameType m_frameType;
+    network::websocket::CompressionType m_compressionType;
     bool m_readingCeased = false;
     bool m_pingPongDisabled = false;
 
     virtual void stopWhileInAioThread() override;
 
     /** Parser handler implementation */
-    virtual void frameStarted(FrameType type, bool fin) override;
-    virtual void framePayload(const char* data, int len) override;
-    virtual void frameEnded() override;
-    virtual void messageEnded() override;
+    virtual void gotFrame(FrameType type, const nx::Buffer& data, bool fin) override;
     virtual void handleError(Error err) override;
 
     /** Own helper functions*/
-    bool isDataFrame() const;
     void sendMessage(const nx::Buffer& message, int writeSize, IoCompletionHandler handler);
     void sendControlResponse(FrameType type);
     void sendControlRequest(FrameType type);

@@ -5,7 +5,6 @@ from __future__ import print_function
 import os
 import sys
 import argparse
-from rdep import Rdep
 from rdep_cmake import RdepSyncher
 
 
@@ -51,7 +50,8 @@ def determine_package_versions(
         "help": customization + "-4.0",
         "server-external": release_version,
         "certificates": customization,
-		"detours": "4.0.1",
+        "customization_pack": customization,
+        "detours": "4.0.1",
         "stackwalker": "1.0",
     }
 
@@ -94,6 +94,9 @@ def determine_package_versions(
         v["festival-vox"] = "2.4"
         v["sysroot"] = "xenial"
         v["ffmpeg"] = "3.1.9-5"
+
+    if target in ("linux_arm32", "linux_arm64") or box in ("edge1", "bpi"):
+        v["openssl"] = "1.0.2q-2"
 
     if "festival-vox" not in v:
         v["festival-vox"] = v["festival"]
@@ -146,12 +149,12 @@ def sync_dependencies(syncher, platform, arch, box, release_version, options={})
 
     sync("any/detection_plugin_interface")
 
-    if box in ("bpi", "edge1") or (platform == "linux" and arch in ("arm", "arm64")):
-        sync("linux-%s/openssl" % arch)
+    if box in ("bpi", "edge1"):
+        sync("linux_arm32/openssl")
     else:
         sync("openssl")
 
-    if box in ("bpi", "edge1") or (platform, arch, box) == ("linux", "arm", "none"):
+    if box in ("bpi", "edge1"):
         sync("linux_arm32/ffmpeg")
     else:
         sync("ffmpeg")
@@ -162,8 +165,8 @@ def sync_dependencies(syncher, platform, arch, box, release_version, options={})
     if platform == "linux":
         sync("sysroot", path_variable="sysroot_directory")
 
-    if box == "rpi":
-        sync("cifs-utils")
+    # if box == "rpi":
+    #     sync("cifs-utils")
 
     if (platform, arch) == ("linux", "arm64"):
         sync("tegra_video")
@@ -173,8 +176,8 @@ def sync_dependencies(syncher, platform, arch, box, release_version, options={})
     if platform in ("android", "windows") or box == "bpi":
         sync("openal")
 
-    if platform == "linux" and box != "edge1":
-        sync("cifs-utils")
+    # if platform == "linux" and box != "edge1":
+    #     sync("cifs-utils")
 
     if platform == "windows":
         sync("icu", path_variable="icu_directory")
@@ -231,6 +234,7 @@ def sync_dependencies(syncher, platform, arch, box, release_version, options={})
         sync("%s/doxygen" % platform, path_variable="doxygen_directory")
 
     sync("any/root-certificates", path_variable="root_certificates_path")
+    sync("any/customization_pack", path_variable="customization_package_directory")
 
 
 def parse_target(target):

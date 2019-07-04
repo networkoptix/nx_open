@@ -103,9 +103,9 @@
                                 <a ng-if="!mode.liteClient"
                                    ng-href="{{Config.cloud.portalUrl}}"
                                    target="_blank"> Ulteriori informazioni </a></uib-alert>
-                            <uib-alert type="error" ng-if="!hasInternetOnServer">Collegare il server ad Internet per eseguire la configurazione {{Config.cloud.productName}}</uib-alert>
-                            <uib-alert type="error" ng-if="hasInternetOnServer && !hasInternetOnClient">Connessione Internet richiesta per connettere il sistema a {{Config.cloud.productName}}</uib-alert>
-                            <p ng-if="canConnectToCloud"  ><button
+                            <uib-alert type="danger" ng-if="!hasInternetOnServer">Collegare il server ad Internet per eseguire la configurazione {{Config.cloud.productName}}</uib-alert>
+                            <uib-alert type="danger" ng-if="hasInternetOnServer && !hasInternetOnClient">Connessione Internet richiesta per connettere il sistema a {{Config.cloud.productName}}</uib-alert>
+                            <p ng-if="canConnectToCloud"><button
                                     class="btn btn-default"
                                     ng-click="connectToCloud()" ng-disabled="!hasInternetOnServer || !hasInternetOnClient"> Connetti a {{Config.cloud.productName}}</button> <a ng-if="!mode.liteClient"  class="btn btn-default"
                                    ng-href="{{Config.cloud.portalUrl + Config.cloud.portalRegisterUrl + Config.cloud.webadminContext}}"

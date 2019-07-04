@@ -104,7 +104,7 @@ void VideoCache::add(const QnUuid& resourceId, const CLVideoDecoderOutputPtr& fr
     if (frame->isExternalData())
     {
         frameToAdd.reset(new CLVideoDecoderOutput());
-        CLVideoDecoderOutput::copy(frame.get(), frameToAdd.get());
+        frame->copy(frameToAdd.get());
     }
 
     auto posItr = std::upper_bound(queue.begin(), queue.end(),

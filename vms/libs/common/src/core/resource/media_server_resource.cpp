@@ -44,6 +44,8 @@ const QString safeModePropertyName = lit("ecDbReadOnly");
 
 } // namespace
 
+const QString QnMediaServerResource::kMetadataStorageIdKey = "metadataStorageId";
+
 QnMediaServerResource::QnMediaServerResource(QnCommonModule* commonModule):
     base_type(commonModule),
     m_serverFlags(vms::api::SF_None),
@@ -461,7 +463,6 @@ void QnMediaServerResource::updateInternal(const QnResourcePtr &other, Qn::Notif
         m_version = localOther->m_version;
         m_serverFlags = localOther->m_serverFlags;
         m_netAddrList = localOther->m_netAddrList;
-        m_systemInfo = localOther->m_systemInfo;
         m_authKey = localOther->m_authKey;
 
     }
@@ -497,19 +498,12 @@ QnMediaServerUserAttributesPtr QnMediaServerResource::userAttributes() const
 
 QnUuid QnMediaServerResource::metadataStorageId() const
 {
-    QnMediaServerUserAttributesPool::ScopedLock lk(commonModule()->mediaServerUserAttributesPool(), getId());
-    return (*lk)->metadataStorageId;
+    return QnUuid::fromStringSafe(getProperty(kMetadataStorageIdKey));
 }
 
 void QnMediaServerResource::setMetadataStorageId(const QnUuid& value)
 {
-    {
-        QnMediaServerUserAttributesPool::ScopedLock lk(commonModule()->mediaServerUserAttributesPool(), getId());
-        if ((*lk)->metadataStorageId == value)
-            return;
-        (*lk)->metadataStorageId = value;
-    }
-    emit metadataStorageIdChanged(::toSharedPointer(this));
+    setProperty(kMetadataStorageIdKey, value.toString());
 }
 
 QnServerBackupSchedule QnMediaServerResource::getBackupSchedule() const
@@ -556,16 +550,16 @@ void QnMediaServerResource::setVersion(const nx::utils::SoftwareVersion& version
     emit versionChanged(::toSharedPointer(this));
 }
 
-nx::vms::api::SystemInformation QnMediaServerResource::getSystemInfo() const
+utils::OsInfo QnMediaServerResource::getOsInfo() const
 {
-    QnMutexLocker lock(&m_mutex);
-    return m_systemInfo;
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    return m_osInfo;
 }
 
-void QnMediaServerResource::setSystemInfo(const nx::vms::api::SystemInformation& systemInfo)
+void QnMediaServerResource::setOsInfo(const utils::OsInfo& osInfo)
 {
-    QnMutexLocker lock(&m_mutex);
-    m_systemInfo = systemInfo;
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    m_osInfo = osInfo;
 }
 
 nx::vms::api::ModuleInformation QnMediaServerResource::getModuleInformation() const
@@ -606,7 +600,7 @@ nx::vms::api::ModuleInformation QnMediaServerResource::getModuleInformation() co
     moduleInformation.id = getId();
     moduleInformation.port = getPort();
     moduleInformation.version = getVersion();
-    moduleInformation.systemInformation = getSystemInfo();
+    moduleInformation.osInfo = getOsInfo();
     moduleInformation.serverFlags = getServerFlags();
 
     return moduleInformation;

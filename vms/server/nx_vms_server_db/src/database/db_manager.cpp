@@ -58,6 +58,7 @@
 #include <nx/vms/event/rule.h>
 #include <nx/vms/time_sync/legacy/time_manager.h>
 #include <nx/sql/database.h>
+#include <core/resource/media_server_resource.h>
 
 static const QString RES_TYPE_MSERVER = "mediaserver";
 static const QString RES_TYPE_CAMERA = "camera";
@@ -1496,6 +1497,9 @@ bool QnDbManager::beforeInstallUpdate(const QString& updateName)
     if (updateName.endsWith(lit("/33_history_refactor_dummy.sql")))
         return removeOldCameraHistory();
 
+    if (updateName.endsWith(lit("/99_20190701_move_metadata_storage_id.sql")))
+        return moveAnalyticsStorageIdToProperty();
+
     return true;
 }
 
@@ -1992,7 +1996,34 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
     if (updateName.endsWith("/99_20190110_improve_layout_api.sql"))
         return resyncIfNeeded(ResyncLayouts);
 
+    if (updateName.endsWith(lit("/99_20190701_move_metadata_storage_id.sql")))
+        return resyncIfNeeded({ ResyncServerAttributes, ResyncResourceProperties });
+
     NX_DEBUG(this, lit("SQL update %1 does not require post-actions.").arg(updateName));
+    return true;
+}
+
+bool QnDbManager::moveAnalyticsStorageIdToProperty()
+{
+    QSqlQuery query(m_sdb);
+    QString queryStr(lit("SELECT server_guid, metadata_storage_id FROM vms_server_user_attributes"));
+    if (!prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
+        return false;
+    if (!execSQLQuery(&query, Q_FUNC_INFO))
+        return false;
+    while (query.next())
+    {
+        auto metadataStorageId = QnSql::deserialized_field<QnUuid>(query.value(1));
+        if (!metadataStorageId.isNull())
+        {
+            ResourceParamWithRefData param;
+            param.resourceId = QnSql::deserialized_field<QnUuid>(query.value(0));
+            param.name = QnMediaServerResource::kMetadataStorageIdKey;
+            param.value = metadataStorageId.toString();
+            if (insertAddParam(param) != ErrorCode::ok)
+                return false;
+        }
+    }
     return true;
 }
 
@@ -2399,8 +2430,8 @@ ErrorCode QnDbManager::insertOrReplaceMediaServer(const MediaServerData& data, q
 {
     QSqlQuery insQuery(m_sdb);
     insQuery.prepare("\
-        INSERT OR REPLACE INTO vms_server (auth_key, version, net_addr_list, system_info, flags, resource_ptr_id) \
-        VALUES (:authKey, :version, :networkAddresses, :systemInfo, :flags, :internalId)\
+        INSERT OR REPLACE INTO vms_server (auth_key, version, net_addr_list, system_info, os_info, flags, resource_ptr_id) \
+        VALUES (:authKey, :version, :networkAddresses, :systemInfo, :osInfo, :flags, :internalId)\
     ");
     QnSql::bind(data, &insQuery);
 
@@ -2703,8 +2734,7 @@ ErrorCode QnDbManager::insertOrReplaceMediaServerUserAttributes(const MediaServe
             backup_days_of_the_week,                             \
             backup_start,                                        \
             backup_duration,                                     \
-            backup_bitrate,                                      \
-            metadata_storage_id                                  \
+            backup_bitrate                                       \
         )                                                        \
         VALUES(                                                  \
             :serverId,                                           \
@@ -2715,8 +2745,7 @@ ErrorCode QnDbManager::insertOrReplaceMediaServerUserAttributes(const MediaServe
             :backupDaysOfTheWeek,                                \
             :backupStart,                                        \
             :backupDuration,                                     \
-            :backupBitrate,                                      \
-            :metadataStorageId                                   \
+            :backupBitrate                                       \
         )                                                        \
         ");
     QnSql::bind(data, &insQuery);
@@ -4008,7 +4037,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, MediaServerDataList& serv
     query.prepare(lit("\
         SELECT r.guid as id, r.guid, r.xtype_guid as typeId, r.parent_guid as parentId, r.name, r.url, \
         s.auth_key as authKey, s.version, s.net_addr_list as networkAddresses, s.system_info as systemInfo, \
-        s.flags \
+        s.os_info as osInfo, s.flags \
         FROM vms_resource r \
         LEFT JOIN vms_resource_status rs on rs.guid = r.guid \
         JOIN vms_server s on s.resource_ptr_id = r.id %1 ORDER BY r.guid\
@@ -4111,8 +4140,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& mServerId, MediaServerUserAtt
             backup_days_of_the_week as backupDaysOfTheWeek,         \
             backup_start as backupStart,                            \
             backup_duration as backupDuration,                      \
-            backup_bitrate as backupBitrate,                        \
-            metadata_storage_id as metadataStorageId                \
+            backup_bitrate as backupBitrate                         \
         FROM vms_server_user_attributes                             \
         %1                                                          \
         ORDER BY server_guid                                        \

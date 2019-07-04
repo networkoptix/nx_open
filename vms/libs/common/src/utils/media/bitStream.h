@@ -93,7 +93,6 @@ private:
     uint32_t m_bitsWritten;
 };
 
-void updateBits(const BitStreamReader& bitReader, int bitOffset, int bitLen, int value);
 void updateBits(const uint8_t* buffer, int bitOffset, int bitLen, int value);
 
 // move len bits from oldBitOffset position to newBitOffset

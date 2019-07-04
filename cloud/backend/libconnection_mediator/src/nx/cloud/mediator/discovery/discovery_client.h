@@ -135,7 +135,9 @@ public:
                 nx::cloud::discovery::http::kModuleKeepAliveConnectionPath, {m_moduleId}).c_str()));
 
         m_webSocketConnector = std::make_unique<nx::network::http::AsyncClient>();
-        nx::network::websocket::addClientHeaders(m_webSocketConnector.get(), "NxDiscovery");
+        nx::network::websocket::addClientHeaders(
+            m_webSocketConnector.get(), "NxDiscovery",
+            nx::network::websocket::CompressionType::perMessageDeflate);
         m_webSocketConnector->bindToAioThread(getAioThread());
         m_webSocketConnector->doUpgrade(
             keepAliveConnectionUrl,
@@ -179,9 +181,9 @@ private:
 
         m_webSocket = std::make_unique<nx::network::WebSocket>(
             m_webSocketConnector->takeSocket(),
-            nx::network::websocket::SendMode::singleMessage,
-            nx::network::websocket::ReceiveMode::message,
-            nx::network::websocket::Role::client);
+            nx::network::websocket::Role::client,
+            nx::network::websocket::FrameType::binary,
+            nx::network::websocket::CompressionType::perMessageDeflate);
         m_webSocketConnector.reset();
 
         if (!m_sendQueue.empty())

@@ -236,6 +236,9 @@ int QnTranscoder::suggestBitrate(
         case Qn::StreamQuality::high:
             hiEnd = 1024 * 3;
             break;
+        case Qn::StreamQuality::rapidReview:
+            hiEnd = 1024 * 10;
+            break;
         case Qn::StreamQuality::highest:
         default:
             hiEnd = 1024 * 5;
@@ -249,7 +252,9 @@ int QnTranscoder::suggestBitrate(
     if (codecName)
     {
         // Increase bitrate due to bad quality of libopenh264 coding.
-        if (strcmp(codecName, "libopenh264") == 0)
+        if (strcmp(codecName, "mpeg4") == 0)
+            codecFactor = 1.2;
+        else if (strcmp(codecName, "libopenh264") == 0)
             codecFactor = 4;
     }
 
@@ -283,6 +288,7 @@ QnCodecParams::Value QnTranscoder::suggestMediaStreamParams(
                     qVal = 2;
                     break;
                 case Qn::StreamQuality::highest:
+                case Qn::StreamQuality::rapidReview:
                     qVal = 1;
                     break;
                 default:
@@ -313,6 +319,7 @@ QnCodecParams::Value QnTranscoder::suggestMediaStreamParams(
                     cpuUsed = 1;
                     break;
                 case Qn::StreamQuality::highest:
+                case Qn::StreamQuality::rapidReview:
                     cpuUsed = 0;
                     break;
                 default:

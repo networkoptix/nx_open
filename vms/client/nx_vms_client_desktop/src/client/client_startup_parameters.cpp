@@ -15,6 +15,8 @@
 
 #include <nx/vms/client/desktop/ini.h>
 
+#include <nx/fusion/model_functions.h>
+
 namespace {
 
 template<typename ValueType>
@@ -110,6 +112,9 @@ QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc, char** arg
     QString qmlImportPaths;
     addParserParam(commandLineParser, &qmlImportPaths, "--qml-import-paths");
 
+    QString windowGeometry;
+    addParserParam(commandLineParser, &windowGeometry, "--window-geometry");
+
     commandLineParser.parse(argc, (const char**) argv, stderr);
 
     if (!strCustomUri.isEmpty())
@@ -124,6 +129,9 @@ QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc, char** arg
     result.videoWallItemGuid = QnUuid(strVideoWallItemGuid);
 
     result.qmlImportPaths = qmlImportPaths.split(',', QString::SkipEmptyParts);
+
+    if (!windowGeometry.isEmpty())
+        QnLexical::deserialize(windowGeometry, &result.windowGeometry);
 
     // First unparsed entry is the application path.
     NX_ASSERT(!unparsed.empty());

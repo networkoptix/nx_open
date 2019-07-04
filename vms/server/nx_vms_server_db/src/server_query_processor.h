@@ -61,7 +61,7 @@ public:
 
     void enqueData(Command command);
 
-    virtual void stop() override;
+    virtual void pleaseStop() override;
     virtual void run() override;
 
 private:

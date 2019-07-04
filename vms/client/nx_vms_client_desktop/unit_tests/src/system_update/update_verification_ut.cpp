@@ -1,7 +1,5 @@
 #include <gtest/gtest.h>
 
-// TODO: Enable this after making server report its variantVersion.
-#if 0
 #include <common/common_module.h>
 #include <common/static_common_module.h>
 
@@ -79,47 +77,13 @@ const QString packagesForSystemSupportTest = R"(
     ]
 })";
 
-struct OS
+namespace os
 {
-    static nx::vms::api::SystemInformation ubuntu14(const QString& arch="x64")
-    {
-        nx::vms::api::SystemInformation info;
-        info.arch = arch;
-        info.platform = "linux";
-        info.modification = "ubuntu";
-        info.version = "14.04";
-        return info;
-    }
-
-    static nx::vms::api::SystemInformation ubuntu16(const QString& arch="x64")
-    {
-        nx::vms::api::SystemInformation info;
-        info.arch = arch;
-        info.platform = "linux";
-        info.modification = "ubuntu";
-        info.version = "16.04";
-        return info;
-    }
-
-    static nx::vms::api::SystemInformation ubuntu18(const QString& arch="x64")
-    {
-        nx::vms::api::SystemInformation info;
-        info.arch = arch;
-        info.platform = "linux";
-        info.modification = "ubuntu";
-        info.version = "18.04";
-        return info;
-    }
-
-    static nx::vms::api::SystemInformation windows()
-    {
-        nx::vms::api::SystemInformation info;
-        info.arch = "x64";
-        info.platform = "windows";
-        info.modification = "winxp";
-        info.version = "";
-        return info;
-    }
+    const nx::utils::OsInfo ubuntu("linux_x64", "ubuntu");
+    const nx::utils::OsInfo ubuntu14("linux_x64", "ubuntu", "14.04");
+    const nx::utils::OsInfo ubuntu16("linux_x64", "ubuntu", "16.04");
+    const nx::utils::OsInfo ubuntu18("linux_x64", "ubuntu", "18.04");
+    const nx::utils::OsInfo windows("windows_x64");
 };
 
 } // namespace
@@ -150,19 +114,10 @@ public:
         m_runtime.clear();
     }
 
-    api::SystemInformation makeSystemInfo()
-    {
-        api::SystemInformation info;
-        info.arch = "x64";
-        info.platform = "windows";
-        info.modification = "winxp";
-        return info;
-    }
-
     ClientVerificationData makeClientData(nx::utils::SoftwareVersion version)
     {
         ClientVerificationData data;
-        data.systemInfo = makeSystemInfo();
+        data.osInfo = os::windows;
         data.currentVersion = version;
         data.clientId = QnUuid("cccccccc-cccc-cccc-cccc-cccccccccccc");
         return data;
@@ -173,7 +128,7 @@ public:
         QnMediaServerResourcePtr server(new QnMediaServerResource(commonModule()));
         server->setVersion(version);
         server->setId(QnUuid::createUuid());
-        server->setSystemInfo(makeSystemInfo());
+        server->setOsInfo(os::windows);
         server->setStatus(online ? Qn::ResourceStatus::Online : Qn::ResourceStatus::Offline);
 
         resourcePool()->addResource(server);
@@ -226,7 +181,8 @@ TEST_F(UpdateVerificationTest, testAlreadyInstalled)
 
     verifyUpdateContents(nullptr, contents, getAllServers(), clientData);
     EXPECT_EQ(contents.alreadyInstalled, true);
-    EXPECT_EQ(contents.error, nx::update::InformationError::incompatibleVersion);
+    EXPECT_TRUE(contents.peersWithUpdate.empty());
+    EXPECT_EQ(contents.error, nx::update::InformationError::noError);
     {
         const auto report = MultiServerUpdatesWidget::calculateUpdateVersionReport(
             contents, clientData.clientId);
@@ -311,7 +267,7 @@ TEST_F(UpdateVerificationTest, testForkedVersion)
     makeServer(nx::utils::SoftwareVersion("4.0.0.28525"));
     makeServer(nx::utils::SoftwareVersion("4.0.0.28525"));
     verifyUpdateContents(nullptr, contents, getAllServers(), clientData);
-    EXPECT_EQ(contents.error, nx::update::InformationError::incompatibleVersion);
+    EXPECT_EQ(contents.error, nx::update::InformationError::noError);
     removeAllServers();
 }
 
@@ -328,9 +284,9 @@ TEST_F(UpdateVerificationTest, packagesForSystemSupportTest)
     // server = 4.0.0.29067
     // Showing page 'This version is already installed'.
     auto server = makeServer(nx::utils::SoftwareVersion("4.0.0.29067"));
-    server->setSystemInfo(OS::ubuntu16());
+    server->setOsInfo(os::ubuntu16);
     ClientVerificationData clientData = makeClientData(nx::utils::SoftwareVersion("4.0.0.29067"));
-    clientData.systemInfo = OS::windows();
+    clientData.osInfo = os::windows;
     auto servers = getAllServers();
     verifyUpdateContents(nullptr, contents, servers, clientData);
     EXPECT_EQ(contents.error, nx::update::InformationError::missingPackageError);
@@ -370,8 +326,8 @@ TEST_F(UpdateVerificationTest, bestVariantVersionSelection)
                 }
             ]
         })");
-    const auto& sysInfo = api::SystemInformationNew::fromLegacySystemInformation(OS::ubuntu16());
-    auto [result, package] = nx::update::findPackageForVariant(info, false, sysInfo);
+
+    auto [result, package] = nx::update::findPackageForVariant(info, false, os::ubuntu16);
     ASSERT_EQ(result, nx::update::FindPackageResult::ok);
     ASSERT_EQ(package->file, "ubuntu_16.04.zip");
 }
@@ -394,8 +350,8 @@ TEST_F(UpdateVerificationTest, variantVersionBoundaries)
                 }
             ]
         })");
-    const auto& sysInfo = api::SystemInformationNew::fromLegacySystemInformation(OS::ubuntu18());
-    auto [result, package] = nx::update::findPackageForVariant(info, false, sysInfo);
+
+    auto [result, package] = nx::update::findPackageForVariant(info, false, os::ubuntu18);
     ASSERT_EQ(result, nx::update::FindPackageResult::osVersionNotSupported);
 }
 
@@ -412,8 +368,8 @@ TEST_F(UpdateVerificationTest, emptyOsVersionAndVersionedPackage)
                 }
             ]
         })");
-    const auto& sysInfo = api::SystemInformationNew{"linux_x64", "ubuntu", {}};
-    auto [result, package] = nx::update::findPackageForVariant(info, false, sysInfo);
+
+    auto [result, package] = nx::update::findPackageForVariant(info, false, os::ubuntu);
     ASSERT_EQ(result, nx::update::FindPackageResult::osVersionNotSupported);
 }
 
@@ -435,8 +391,8 @@ TEST_F(UpdateVerificationTest, preferPackageForCertainVariant)
                 }
             ]
         })");
-    const auto& sysInfo = api::SystemInformationNew{"linux_x64", "ubuntu", {}};
-    auto [result, package] = nx::update::findPackageForVariant(info, false, sysInfo);
+
+    auto [result, package] = nx::update::findPackageForVariant(info, false, os::ubuntu);
     ASSERT_EQ(result, nx::update::FindPackageResult::ok);
     ASSERT_EQ(package->file, "ubuntu.zip");
 }
@@ -460,8 +416,8 @@ TEST_F(UpdateVerificationTest, preferVersionedVariant)
                 }
             ]
         })");
-    const auto& sysInfo = api::SystemInformationNew::fromLegacySystemInformation(OS::ubuntu16());
-    auto [result, package] = nx::update::findPackageForVariant(info, false, sysInfo);
+
+    auto [result, package] = nx::update::findPackageForVariant(info, false, os::ubuntu16);
     ASSERT_EQ(result, nx::update::FindPackageResult::ok);
     ASSERT_EQ(package->file, "ubuntu_16.04.zip");
 }
@@ -490,12 +446,10 @@ TEST_F(UpdateVerificationTest, aSyntheticTest)
                 }
             ]
         })");
-    const auto& sysInfo = api::SystemInformationNew::fromLegacySystemInformation(OS::ubuntu14());
-    auto [result, package] = nx::update::findPackageForVariant(info, false, sysInfo);
+
+    auto [result, package] = nx::update::findPackageForVariant(info, false, os::ubuntu14);
     ASSERT_EQ(result, nx::update::FindPackageResult::ok);
     ASSERT_EQ(package->file, "ubuntu.zip");
 }
 
 } // namespace nx::vms::client::desktop
-
-#endif

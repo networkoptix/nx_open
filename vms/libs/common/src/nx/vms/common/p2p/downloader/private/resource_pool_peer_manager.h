@@ -24,15 +24,15 @@ public:
     virtual QList<QnUuid> peers() const override;
     virtual int distanceTo(const QnUuid& peerId) const override;
 
-    virtual RequestContext<FileInformation> requestFileInfo(
+    virtual RequestContextPtr<FileInformation> requestFileInfo(
         const QnUuid& peerId,
         const QString& fileName,
         const nx::utils::Url& url) override;
 
-    virtual RequestContext<QVector<QByteArray>> requestChecksums(
+    virtual RequestContextPtr<QVector<QByteArray>> requestChecksums(
         const QnUuid& peerId, const QString& fileName) override;
 
-    virtual RequestContext<QByteArray> downloadChunk(
+    virtual RequestContextPtr<QByteArray> downloadChunk(
         const QnUuid& peerId,
         const QString& fileName,
         const nx::utils::Url &url,

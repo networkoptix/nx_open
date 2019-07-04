@@ -3,6 +3,7 @@ if(withDesktopClient OR withMobileClient)
 endif()
 
 if(withDesktopClient)
+
     find_package(Qt5
         COMPONENTS
             OpenGL
@@ -25,17 +26,6 @@ if(withDesktopClient)
     add_subdirectory(nx_vms_client_desktop)
     add_subdirectory(desktop_client)
     add_subdirectory(applauncher)
-
-    if (withTests)
-        project(desktop_client_with_tests)
-        add_custom_target(desktop_client_with_tests
-            DEPENDS
-                desktop_client
-                common_ut
-                client_core_ut
-                client_ut)
-    endif()
-
 endif()
 
 if(withMobileClient)

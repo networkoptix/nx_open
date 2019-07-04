@@ -748,10 +748,11 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
         if (m_mediaServer->metadataStorageId().isNull() && !QFile::exists(getMetadataDatabaseName()))
         {
             m_mediaServer->setMetadataStorageId(selectDefaultStorageForAnalyticsEvents(m_mediaServer));
-            nx::vms::api::MediaServerUserAttributesData userAttrsData;
-            ec2::fromResourceToApi(m_mediaServer->userAttributes(), userAttrsData);
-            saveMediaServerUserAttributes(ec2Connection, userAttrsData);
+            m_mediaServer->saveProperties();
         }
+
+        connect(m_mediaServer.get(), &QnMediaServerResource::propertyChanged, this,
+            &MediaServerProcess::at_metadataStorageIdChanged);
         initializeAnalyticsEvents();
 
         serverModule()->normalStorageManager()->initDone();
@@ -1071,9 +1072,10 @@ void MediaServerProcess::at_databaseDumped()
     restartServer(500);
 }
 
-void MediaServerProcess::at_metadataStorageIdChanged(const QnResourcePtr& /*resource*/)
+void MediaServerProcess::at_metadataStorageIdChanged(const QnResourcePtr& /*resource*/, const QString& key)
 {
-    initializeAnalyticsEvents();
+    if (key == QnMediaServerResource::kMetadataStorageIdKey)
+        initializeAnalyticsEvents();
 }
 
 void MediaServerProcess::at_systemIdentityTimeChanged(qint64 value, const QnUuid& sender)
@@ -3579,7 +3581,7 @@ bool MediaServerProcess::setUpMediaServerResource(
             nx::network::SocketAddress(nx::network::HostAddress::localhost, m_universalTcpListener->getPort()));
 
         // used for statistics reported
-        server->setSystemInfo(QnAppInfo::currentSystemInformation());
+        server->setOsInfo(nx::utils::OsInfo::current());
         server->setVersion(commonModule()->engineVersion());
 
         SettingsHelper settingsHelper(this->serverModule());
@@ -3631,10 +3633,6 @@ bool MediaServerProcess::setUpMediaServerResource(
 
     commonModule()->setModuleInformation(selfInformation);
     commonModule()->bindModuleInformation(m_mediaServer);
-
-
-    connect(m_mediaServer.get(), &QnMediaServerResource::metadataStorageIdChanged, this,
-        &MediaServerProcess::at_metadataStorageIdChanged);
 
     return foundOwnServerInDb;
 }
@@ -3714,6 +3712,7 @@ void MediaServerProcess::stopObjects()
     serverModule()->analyticsManager()->stop(); //< Stop processing analytics events.
     serverModule()->pluginManager()->unloadPlugins();
     serverModule()->eventRuleProcessor()->stop();
+    serverModule()->p2pDownloader()->stopDownloads();
 
     //since mserverResourceDiscoveryManager instance is dead no events can be delivered to serverResourceProcessor: can delete it now
     //TODO refactoring of discoveryManager <-> resourceProcessor interaction is required
@@ -4508,9 +4507,8 @@ void MediaServerProcess::run()
         initializeLogging(serverSettings.get());
 
     // This must be done before QnCommonModule instantiation.
-    nx::vms::api::SystemInformation::runtimeModificationOverride =
-        ini().runtimeModificationOverride;
-    nx::vms::api::SystemInformation::runtimeOsVersionOverride = ini().runtimeOsVersionOverride;
+    nx::utils::OsInfo::currentVariantOverride = ini().currentOsVariantOverride;
+    nx::utils::OsInfo::currentVariantVersionOverride = ini().currentOsVariantVersionOverride;
 
     if (m_cmdLineArguments.vmsProtocolVersion > 0)
     {
@@ -4786,6 +4784,7 @@ protected:
             return 0;
 
         int res = application()->exec();
+        qnStaticCommon->instance<QnLongRunnablePool>()->stopAll();
 
         m_main.reset();
 

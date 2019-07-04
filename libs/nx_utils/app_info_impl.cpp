@@ -48,6 +48,11 @@ QString AppInfo::applicationPlatform()
     return "${platform}";
 }
 
+QString AppInfo::applicationPlatformNew()
+{
+    return "${platform_new}";
+}
+
 QString AppInfo::applicationArch()
 {
     return "${arch}";

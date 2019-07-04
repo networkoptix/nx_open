@@ -57,7 +57,7 @@ public:
         for (const auto& server: q->commonModule()->resourcePool()->getAllServers(Qn::Online))
         {
             if (const auto& id = server->getId(); id != selfId)
-                result.append(PeerInformation{id, server->getSystemInfo()});
+                result.append(PeerInformation{id, server->getOsInfo()});
         }
 
         for (const auto& id: directConnectionByServerId.keys())
@@ -65,7 +65,7 @@ public:
             if (!std::any_of(result.begin(), result.end(),
                 [&id](const PeerInformation& info) { return info.id == id; }))
             {
-                result.append(PeerInformation{id, nx::vms::api::SystemInformation()});
+                result.append(PeerInformation{id, {}});
             }
         }
 
@@ -166,7 +166,7 @@ void ResourcePoolPeerManager::setIndirectInternetRequestsAllowed(bool allow)
     d->allowIndirectInternetRequests = allow;
 }
 
-AbstractPeerManager::RequestContext<FileInformation> ResourcePoolPeerManager::requestFileInfo(
+AbstractPeerManager::RequestContextPtr<FileInformation> ResourcePoolPeerManager::requestFileInfo(
     const QnUuid& peerId,
     const QString& fileName,
     const nx::utils::Url& url)
@@ -188,7 +188,7 @@ AbstractPeerManager::RequestContext<FileInformation> ResourcePoolPeerManager::re
         else
             setPromiseValueIfEmpty(promise, {});
 
-        return {promise->get_future()};
+        return std::make_unique<BaseRequestContext<FileInformation>>(promise->get_future());
     }
 
     auto handleReply =
@@ -204,10 +204,11 @@ AbstractPeerManager::RequestContext<FileInformation> ResourcePoolPeerManager::re
     if (handle < 0)
         return {};
 
-    return {promise->get_future(), makeCanceller(promise, connection, handle)};
+    return std::make_unique<BaseRequestContext<FileInformation>>(
+        promise->get_future(), makeCanceller(promise, connection, handle));
 }
 
-AbstractPeerManager::RequestContext<QVector<QByteArray>> ResourcePoolPeerManager::requestChecksums(
+AbstractPeerManager::RequestContextPtr<QVector<QByteArray>> ResourcePoolPeerManager::requestChecksums(
     const QnUuid& peerId, const QString& fileName)
 {
     const auto& connection = getConnection(peerId);
@@ -229,10 +230,11 @@ AbstractPeerManager::RequestContext<QVector<QByteArray>> ResourcePoolPeerManager
     if (handle < 0)
         return {};
 
-    return {promise->get_future(), makeCanceller(promise, connection, handle)};
+    return std::make_unique<BaseRequestContext<QVector<QByteArray>>>(
+        promise->get_future(), makeCanceller(promise, connection, handle));
 }
 
-AbstractPeerManager::RequestContext<QByteArray> ResourcePoolPeerManager::downloadChunk(
+AbstractPeerManager::RequestContextPtr<QByteArray> ResourcePoolPeerManager::downloadChunk(
     const QnUuid& peerId,
     const QString& fileName,
     const nx::utils::Url& url,
@@ -272,7 +274,8 @@ AbstractPeerManager::RequestContext<QByteArray> ResourcePoolPeerManager::downloa
     if (handle < 0)
         return {};
 
-    return {promise->get_future(), makeCanceller(promise, connection, handle)};
+    return std::make_unique<BaseRequestContext<QByteArray>>(
+        promise->get_future(), makeCanceller(promise, connection, handle));
 }
 
 QnMediaServerResourcePtr ResourcePoolPeerManager::getServer(const QnUuid& peerId) const

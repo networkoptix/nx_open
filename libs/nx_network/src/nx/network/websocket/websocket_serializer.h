@@ -12,27 +12,16 @@ class NX_NETWORK_API Serializer
 public:
     Serializer(bool masked, unsigned mask = 0);
 
-    void prepareMessage(
-        const nx::Buffer& payload,
-        FrameType type,
-        nx::Buffer* outBuffer);
-
-    void prepareFrame(
-        const nx::Buffer& payload,
-        FrameType type,
-        bool fin,
-        nx::Buffer* outBuffer);
-
-    int prepareFrame(
-        const char* payload, int payloadLen,
-        FrameType type, bool fin, char* out, int outLen);
-
-private:
-    void setMasked(bool masked, unsigned mask = 0);
+    nx::Buffer prepareMessage(nx::Buffer payload, FrameType type, CompressionType compressionType);
+    nx::Buffer prepareFrame(nx::Buffer payload, FrameType type, bool fin);
 
 private:
     bool m_masked;
+    bool m_doCompress = false;
     unsigned m_mask;
+
+    void setMasked(bool masked, unsigned mask = 0);
+    int fillHeader(char* data, bool fin, FrameType opCode, int payloadLenType, int payloadLen);
 };
 
 

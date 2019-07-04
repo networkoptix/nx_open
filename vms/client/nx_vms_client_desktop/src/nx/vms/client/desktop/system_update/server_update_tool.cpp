@@ -3,6 +3,7 @@
 #include <QtCore/QThread>
 #include <QtCore/QFileInfo>
 #include <QtCore/QJsonDocument>
+#include <QtCore/QJsonArray>
 
 #include <common/common_module.h>
 #include <common/static_common_module.h>
@@ -54,6 +55,33 @@ QDir findFolderForFile(QDir root, QString file)
             return dir;
     }
     return root;
+}
+
+QJsonArray componentsListToJson(
+    const nx::utils::OsInfo& clientOsInfo, const QSet<nx::utils::OsInfo>& serverInfoSet)
+{
+    const auto makeItem =
+        [](const QString& component, const nx::utils::OsInfo& info)
+        {
+            QJsonObject obj = info.toJson();
+            obj[QStringLiteral("component")] = component;
+            return obj;
+        };
+
+    QJsonArray result;
+    result.append(makeItem(QStringLiteral("client"), clientOsInfo));
+    for (const auto& info: serverInfoSet)
+        result.append(makeItem(QStringLiteral("server"), info));
+
+    return result;
+}
+
+QString compactPackagesQuery(const QJsonArray& packagesQuery)
+{
+    const QByteArray& json = QJsonDocument(packagesQuery).toJson(QJsonDocument::Compact);
+    QByteArray compressed = qCompress(json);
+    compressed.remove(0, 4); //< We don't need 4 bytes which are added by Qt in the beginning.
+    return QString::fromLatin1(compressed.toBase64());
 }
 
 const QString kPackageIndexFile = "packages.json";
@@ -398,8 +426,8 @@ void ServerUpdateTool::startManualDownloads(const UpdateContents& contents)
         switch (code)
         {
             case Code::ok:
-                NX_VERBOSE(this) << "startManualDownloads() - downloading package"
-                    << info.name << " from url=" << package.url;
+                NX_VERBOSE(this, "startManualDownloads() - downloading package %1 from url %2",
+                    info.name, package.url);
                 m_activeDownloads.insert(std::make_pair(package.file, 0));
                 break;
             case Code::fileAlreadyExists:
@@ -414,8 +442,9 @@ void ServerUpdateTool::startManualDownloads(const UpdateContents& contents)
             // Some sort of an error here.
             {
                 QString error = vms::common::p2p::downloader::toString(code);
-                NX_VERBOSE(this) << "requestStartUpdate() - failed start downloading package"
-                    << info.name << error;
+                NX_VERBOSE(this,
+                    "startManualDownloads() - failed start downloading package %1: %2",
+                    info.name, error);
                 m_failedDownloads.insert(file);
                 break;
             }
@@ -692,19 +721,24 @@ bool ServerUpdateTool::requestStopAction()
         connection->updateActionStop(nx::utils::guarded(this,
             [this](bool success, rest::Handle /*handle*/)
             {
-                // This will be called in outer
                 NX_VERBOSE(this, "requestStopAction() - success=%1", success);
-                m_remoteUpdateManifest = nx::update::Information();
+                if (success)
+                    m_remoteUpdateManifest = nx::update::Information();
                 m_requestingStop = false;
-                emit cancelUpdateComplete(success);
+                auto error = success ? InternalError::noError : InternalError::networkError;
+                emit cancelUpdateComplete(success, toString(error));
             }), thread());
+
+        for (const auto& file: m_activeDownloads)
+            m_downloader->deleteFile(file.first);
+        m_activeDownloads.clear();
+        m_stateTracker->clearState();
+        return true;
     }
 
-    for (const auto& file: m_activeDownloads)
-        m_downloader->deleteFile(file.first);
-    m_activeDownloads.clear();
-    m_stateTracker->clearState();
-    return true;
+    NX_ERROR(this, "requestStopAction() - no conenction to the server.");
+    emit cancelUpdateComplete(false, toString(InternalError::noConnection));
+    return false;
 }
 
 bool ServerUpdateTool::requestRetryAction()
@@ -751,17 +785,19 @@ bool ServerUpdateTool::requestFinishUpdate(bool skipActivePeers)
             {
                 NX_VERBOSE(this, "requestFinishUpdate(%1) - got response", skipActivePeers);
                 m_requestingFinish = false;
-                emit finishUpdateComplete(success);
+                auto error = success ? InternalError::noError : InternalError::networkError;
+                emit finishUpdateComplete(success, toString(error));
             }), thread());
         m_stateTracker->clearState();
         return true;
     }
 
-    NX_VERBOSE(this, "requestFinishUpdate(%1) - no connection to the server", skipActivePeers);
+    NX_ERROR(this, "requestFinishUpdate(%1) - no connection to the server", skipActivePeers);
+    emit finishUpdateComplete(false, toString(InternalError::noConnection));
     return false;
 }
 
-void ServerUpdateTool::requestStartUpdate(
+bool ServerUpdateTool::requestStartUpdate(
     const nx::update::Information& info,
     const QSet<QnUuid>& targets)
 {
@@ -786,19 +822,21 @@ void ServerUpdateTool::requestStartUpdate(
         dropAllRequests("requestStartUpdate()");
         auto callback = [this](bool success, rest::Handle /*requestId*/)
             {
-                // TODO: Just forcing it, until server side responds with
-                // a proper nx::update::Information
-                success = true;
-                emit startUpdateComplete(success);
+                auto error = success ? InternalError::noError : InternalError::networkError;
+                emit startUpdateComplete(success, toString(error));
             };
         connection->updateActionStart(info, nx::utils::guarded(this, callback));
         m_remoteUpdateManifest = info;
+        return true;
     }
 
     m_remoteUpdateStatus = {};
+    NX_ERROR(this, "requestStartUpdate(%1) - no connection to the server", info.version);
+    emit startUpdateComplete(false, toString(InternalError::noConnection));
+    return false;
 }
 
-void ServerUpdateTool::requestInstallAction(
+bool ServerUpdateTool::requestInstallAction(
     const QSet<QnUuid>& targets)
 {
     // Filtering out only 'server' components.
@@ -810,7 +848,6 @@ void ServerUpdateTool::requestInstallAction(
             servers.insert(id);
     }
 
-    NX_VERBOSE(this) << "requestInstallAction() for" << servers;
     m_remoteUpdateStatus = {};
 
     m_timeStartedInstall = qnSyncTime->currentMSecsSinceEpoch();
@@ -818,21 +855,27 @@ void ServerUpdateTool::requestInstallAction(
 
     auto callback = [tool = QPointer<ServerUpdateTool>(this)](bool success, rest::Handle handle)
         {
-            if (!success)
-                NX_ERROR(typeid(ServerUpdateTool)) << "requestInstallAction() - response success=false";
             if (tool)
             {
                 tool->m_requestingInstall.remove(handle);
                 tool->requestRemoteUpdateStateAsync();
+                auto error = success ? InternalError::noError : InternalError::networkError;
+                emit tool->startInstallComplete(success, tool->toString(error));
             }
         };
 
     if (auto connection = getServerConnection(commonModule()->currentServer()))
     {
+        NX_VERBOSE(this, "requestInstallAction() for %1", servers);
         dropAllRequests("requestInstallAction()");
         if (auto handle = connection->updateActionInstall(servers, callback, thread()))
             m_requestingInstall.insert(handle);
+        return true;
     }
+
+    NX_ERROR(this, "requestInstallAction(%1) - no connection to the server", targets);
+    emit startInstallComplete(false, toString(InternalError::noConnection));
+    return false;
 }
 
 void ServerUpdateTool::requestModuleInformation()
@@ -947,9 +990,9 @@ void ServerUpdateTool::requestRemoteUpdateStateAsync()
     }
 }
 
-std::future<std::vector<nx::update::Status>> ServerUpdateTool::requestRemoteUpdateState()
+std::future<ServerUpdateTool::RemoteStatus> ServerUpdateTool::requestRemoteUpdateState()
 {
-    auto promise = std::make_shared<std::promise<std::vector<nx::update::Status>>>();
+    auto promise = std::make_shared<std::promise<RemoteStatus>>();
     if (auto connection = getServerConnection(commonModule()->currentServer()))
     {
         connection->getUpdateStatus(
@@ -968,7 +1011,10 @@ std::future<std::vector<nx::update::Status>> ServerUpdateTool::requestRemoteUpda
 
                 if (tool)
                     tool->atUpdateStatusResponse(success, handle, response.data);
-                promise->set_value(response.data);
+                RemoteStatus remoteStatus;
+                for (const auto& status: response.data)
+                    remoteStatus[status.serverId] = status;
+                promise->set_value(remoteStatus);
             }, thread());
     }
     else
@@ -1002,6 +1048,20 @@ std::shared_ptr<PeerStateTracker> ServerUpdateTool::getStateTracker()
 QSet<QnUuid> ServerUpdateTool::getServersInstalling() const
 {
     return m_serversAreInstalling;
+}
+
+QString ServerUpdateTool::toString(InternalError errorCode)
+{
+    switch(errorCode)
+    {
+        case InternalError::noError:
+            return "";
+        case InternalError::noConnection:
+            return tr("No connection to the server.");
+        case InternalError::networkError:
+            return tr("Network error.");
+    }
+    return "Unknown error.";
 }
 
 const nx::update::Package* ServerUpdateTool::findPackageForFile(const QString& fileName) const
@@ -1240,32 +1300,26 @@ QUrl generateUpdatePackageUrl(
         query.addQueryItem("password", password);
     }
 
-    QSet<nx::vms::api::SystemInformation> systemInformationList;
+    query.addQueryItem("customization", QnAppInfo::customizationName());
+
+    QSet<nx::utils::OsInfo> osInfoList;
     for (const auto& id: targets)
     {
         const auto& server = resourcePool->getResourceById<QnMediaServerResource>(id);
         if (!server)
             continue;
 
-        if (!server->getSystemInfo().isValid())
+        if (!server->getOsInfo().isValid())
             continue;
 
         if (!targetVersion.isNull() && server->getVersion() == targetVersion)
             continue;
 
-        systemInformationList.insert(server->getSystemInfo());
+        osInfoList.insert(server->getOsInfo());
     }
 
-    auto clientPlatformModification = QnAppInfo::applicationPlatformModification();
-    auto clientArch = QnAppInfo::applicationArch();
-    auto clientPlatform = nx::utils::AppInfo::applicationPlatform();
-    QString clientRuntime = QString("%1_%2_%3").arg(clientPlatform, clientArch, clientPlatformModification);
-
-    query.addQueryItem("client", clientRuntime);
-    for (const auto &systemInformation: systemInformationList)
-        query.addQueryItem("server", systemInformation.toString().replace(L' ', L'_'));
-
-    query.addQueryItem("customization", QnAppInfo::customizationName());
+    query.addQueryItem("components",
+        compactPackagesQuery(componentsListToJson(nx::utils::OsInfo::current(), osInfoList)));
 
     QString path = qnSettings->updateCombineUrl();
     if (path.isEmpty())

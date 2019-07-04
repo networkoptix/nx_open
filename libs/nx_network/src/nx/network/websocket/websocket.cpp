@@ -15,7 +15,8 @@ WebSocket::WebSocket(
     SendMode sendMode,
     ReceiveMode receiveMode,
     Role role,
-    FrameType frameType)
+    FrameType frameType,
+    network::websocket::CompressionType compressionType)
     :
     m_socket(std::move(streamSocket)),
     m_parser(role, this),
@@ -28,7 +29,8 @@ WebSocket::WebSocket(
     m_frameType(
         frameType == FrameType::binary || frameType == FrameType::text
             ? frameType
-            : FrameType::binary)
+            : FrameType::binary),
+    m_compressionType(compressionType)
 {
     m_socket->setRecvTimeout(0);
     m_socket->setSendTimeout(0);
@@ -40,14 +42,17 @@ WebSocket::WebSocket(
 
 WebSocket::WebSocket(
     std::unique_ptr<AbstractStreamSocket> streamSocket,
-    FrameType frameType)
+    Role role,
+    FrameType frameType,
+    network::websocket::CompressionType compressionType)
     :
     WebSocket(
         std::move(streamSocket),
         SendMode::singleMessage,
         ReceiveMode::message,
-        Role::undefined,
-        frameType)
+        role,
+        frameType,
+        compressionType)
 {
 }
 
@@ -120,7 +125,7 @@ void WebSocket::onRead(SystemError::ErrorCode error, size_t transferred)
 
     if (m_incomingMessageQueue.size() != 0 && m_userReadContext)
     {
-        const auto incomingMessage = m_incomingMessageQueue.popFront();
+        auto incomingMessage = m_incomingMessageQueue.popFront();
         *(m_userReadContext->bufferPtr) = incomingMessage;
         utils::ObjectDestructionFlag::Watcher watcher(&m_destructionFlag);
         callOnReadhandler(SystemError::noError, incomingMessage.size());
@@ -200,7 +205,7 @@ void WebSocket::readSomeAsync(nx::Buffer* const buffer, IoCompletionHandler hand
 
             if (m_incomingMessageQueue.size() != 0)
             {
-                const auto incomingMessage = m_incomingMessageQueue.popFront();
+                auto incomingMessage = m_incomingMessageQueue.popFront();
                 *buffer = incomingMessage;
 
                 utils::ObjectDestructionFlag::Watcher watcher(&m_destructionFlag);
@@ -229,18 +234,17 @@ void WebSocket::readSomeAsync(nx::Buffer* const buffer, IoCompletionHandler hand
 void WebSocket::sendAsync(const nx::Buffer& buffer, IoCompletionHandler handler)
 {
     post(
-        [this, buffer, handler = std::move(handler)]() mutable
+        [this, buffer = buffer, handler = std::move(handler)]() mutable
         {
             nx::Buffer writeBuffer;
             if (m_sendMode == SendMode::singleMessage)
             {
-                m_serializer.prepareMessage(buffer, m_frameType, &writeBuffer);
+                writeBuffer = m_serializer.prepareMessage(buffer, m_frameType, m_compressionType);
             }
             else
             {
                 FrameType type = !m_isFirstFrame ? FrameType::continuation : m_frameType;
-
-                m_serializer.prepareFrame(buffer, type, m_isLastFrame, &writeBuffer);
+                writeBuffer = m_serializer.prepareFrame(buffer, type, m_isLastFrame);
                 m_isFirstFrame = m_isLastFrame;
                 if (m_isLastFrame)
                     m_isLastFrame = false;
@@ -268,6 +272,7 @@ void WebSocket::sendMessage(const nx::Buffer& message, int writeSize, IoCompleti
         NX_DEBUG(
             this,
             "sendMessage() called after connection has been terminated. Ignoring.");
+        handler(SystemError::connectionAbort, 0);
         return;
     }
 
@@ -352,83 +357,49 @@ void WebSocket::cancelIoInAioThread(nx::network::aio::EventType eventType)
     m_socket->cancelIOSync(eventType);
 }
 
-bool WebSocket::isDataFrame() const
+void WebSocket::gotFrame(FrameType type, const nx::Buffer& data, bool fin)
 {
-    return m_parser.frameType() == FrameType::binary
-        || m_parser.frameType() == FrameType::text
-        || m_parser.frameType() == FrameType::continuation;
-}
+    NX_VERBOSE(
+        this,
+        lm("Got frame. Type: %1, size from header: %2")
+            .args(m_parser.frameType(), m_parser.frameSize()));
 
-void WebSocket::frameStarted(FrameType /*type*/, bool /*fin*/)
-{
-    NX_VERBOSE(this, lm("Frame started. Type: %1, size from header: %2").args(
-        m_parser.frameType(), m_parser.frameSize()));
-}
-
-void WebSocket::framePayload(const char* data, int len)
-{
-    if (!isDataFrame())
+    if (isDataFrame(type))
     {
-        m_controlBuffer.append(data, len);
+        m_incomingMessageQueue.append(data);
+        if (m_receiveMode == ReceiveMode::frame || fin)
+            m_incomingMessageQueue.lock();
+
         return;
     }
 
-    m_incomingMessageQueue.append(data, len);
-    if (m_receiveMode == ReceiveMode::stream)
-        m_incomingMessageQueue.lock();
-}
-
-void WebSocket::frameEnded()
-{
-    NX_VERBOSE(this, lm("Frame ended. Type: %1, size from header: %2").args(
-        m_parser.frameType(),
-        m_parser.frameSize()));
-
-    if (m_parser.frameType() == FrameType::ping)
+    switch (type)
     {
-        NX_VERBOSE(this, "Ping received.");
-        if (!m_pingPongDisabled)
-            sendControlResponse(FrameType::pong);
-        return;
+        case FrameType::ping:
+            if (!m_pingPongDisabled)
+                sendControlResponse(FrameType::pong);
+            break;
+        case FrameType::pong:
+            NX_ASSERT(m_controlBuffer.isEmpty());
+            break;
+        case FrameType::close:
+            sendControlResponse(FrameType::close);
+            m_failed = true;
+            break;
+        default:
+            NX_ASSERT(false);
+            break;
     }
-
-    if (m_parser.frameType() == FrameType::pong)
-    {
-        NX_VERBOSE(this, "Pong received.");
-        NX_ASSERT(m_controlBuffer.isEmpty());
-        return;
-    }
-
-    if (m_parser.frameType() == FrameType::close)
-    {
-        NX_DEBUG(this, "Received close request, responding and terminating.");
-        sendControlResponse(FrameType::close);
-        m_failed = true;
-        return;
-    }
-
-    if (!isDataFrame())
-    {
-        NX_WARNING(this, lm("Unknown frame %1").arg(m_parser.frameType()));
-        m_controlBuffer.resize(0);
-        return;
-    }
-
-    if (m_receiveMode != ReceiveMode::frame)
-        return;
-
-    m_incomingMessageQueue.lock();
 }
 
 void WebSocket::sendControlResponse(FrameType type)
 {
-    nx::Buffer responseFrame;
-    m_serializer.prepareMessage(m_controlBuffer, type, &responseFrame);
+    nx::Buffer responseFrame =
+        m_serializer.prepareMessage(m_controlBuffer, type, m_compressionType);
     m_controlBuffer.resize(0);
 
     sendMessage(
-        responseFrame,
-        responseFrame.size(),
+        responseFrame, responseFrame.size(),
         [this, type](SystemError::ErrorCode error, size_t /*transferred*/)
         {
             NX_VERBOSE(
@@ -441,12 +412,9 @@ void WebSocket::sendControlResponse(FrameType type)
 
 void WebSocket::sendControlRequest(FrameType type)
 {
-    nx::Buffer requestFrame;
-    m_serializer.prepareMessage("", type, &requestFrame);
-
+    nx::Buffer requestFrame = m_serializer.prepareMessage("", type, m_compressionType);
     sendMessage(
-        requestFrame,
-        requestFrame.size(),
+        requestFrame, requestFrame.size(),
         [this, type](SystemError::ErrorCode error, size_t /*transferred*/)
         {
             NX_VERBOSE(
@@ -455,24 +423,6 @@ void WebSocket::sendControlRequest(FrameType type)
                     frameTypeString(type),
                     error));
         });
-}
-
-void WebSocket::messageEnded()
-{
-    if (!isDataFrame())
-    {
-        NX_VERBOSE(this, lm("Message ended, not data frame, type: %1").arg(m_parser.frameType()));
-        return;
-    }
-
-    if (m_receiveMode != ReceiveMode::message)
-    {
-        NX_VERBOSE(this, "Message ended, wrong receive mode.");
-        return;
-    }
-
-    NX_VERBOSE(this, "Message ended, LOCKING user data.");
-    m_incomingMessageQueue.lock();
 }
 
 void WebSocket::handleError(Error err)
