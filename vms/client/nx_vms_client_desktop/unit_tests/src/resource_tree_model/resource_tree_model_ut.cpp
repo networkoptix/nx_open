@@ -7,7 +7,10 @@
 
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/models/resource/resource_tree_model.h>
-#include <ui/models/resource_search_proxy_model.h>
+#include <ui/models/resource_tree_sort_proxy_model.h>
+
+#include <core/resource_management/resource_pool.h>
+#include <core/resource/user_resource.h>
 
 class ResourceTreeModelTest: public testing::Test
 {
@@ -18,13 +21,15 @@ protected:
         m_accessController.reset(new QnWorkbenchAccessController(commonModule()));
         m_resourceTreeModel.reset(new QnResourceTreeModel(QnResourceTreeModel::FullScope,
             QnUserResourcePtr(), m_accessController.get(), nullptr, commonModule()));
-        m_resourceSearchProxyModel.reset(new QnResourceSearchProxyModel());
-        m_resourceSearchProxyModel->setSourceModel(m_resourceTreeModel.get());
+
+        m_resourceTreeProxyModel.reset(new QnResourceTreeSortProxyModel());
+        m_resourceTreeProxyModel->setSortCaseSensitivity(Qt::CaseInsensitive);
+        m_resourceTreeProxyModel->setSourceModel(m_resourceTreeModel.get());
     }
 
     virtual void TearDown()
     {
-        m_resourceSearchProxyModel.clear();
+        m_resourceTreeProxyModel.clear();
         m_resourceTreeModel.clear();
         m_accessController.clear();
         m_clientModule.clear();
@@ -40,14 +45,28 @@ protected:
         return commonModule()->resourcePool();
     }
 
+    QnUserResourcePtr addUser(
+        const QString& name,
+        GlobalPermissions globalPermissions,
+        QnUserType userType = QnUserType::Local)
+    {
+        QnUserResourcePtr user(new QnUserResource(userType));
+        user->setId(QnUuid::createUuid());
+        user->setName(name);
+        user->setRawPermissions(globalPermissions);
+        user->addFlags(Qn::remote);
+        resourcePool()->addResource(user);
+        return user;
+    }
+
 protected:
     QSharedPointer<QnClientModule> m_clientModule;
     QSharedPointer<QnWorkbenchAccessController> m_accessController;
     QSharedPointer<QnResourceTreeModel> m_resourceTreeModel;
-    QSharedPointer<QnResourceSearchProxyModel> m_resourceSearchProxyModel;
+    QSharedPointer<QnResourceTreeSortProxyModel> m_resourceTreeProxyModel;
 };
 
 TEST_F(ResourceTreeModelTest, shouldBeNotEmpty)
 {
-    ASSERT_FALSE(m_resourceSearchProxyModel->rowCount() == 0);
+    ASSERT_FALSE(m_resourceTreeProxyModel->rowCount() == 0);
 }

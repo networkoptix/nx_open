@@ -49,7 +49,7 @@ struct QnResourceSearchQuery
 /**
  * A resource search filtering model.
  */
-class NX_VMS_CLIENT_DESKTOP_API QnResourceSearchProxyModel:
+class QnResourceSearchProxyModel:
     public QSortFilterProxyModel,
     protected QnResourceCompareHelper
 {
