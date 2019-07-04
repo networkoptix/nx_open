@@ -108,9 +108,9 @@ Kérjük csatlakozzon a hálózatra, vagy állítsa be a helyes IP-címet.
                                 <a ng-if="!mode.liteClient"
                                    ng-href="{{Config.cloud.portalUrl}}"
                                    target="_blank">Learn more</a></uib-alert>
-                            <uib-alert type="error" ng-if="!hasInternetOnServer">{{Config.cloud.productName}} beállításainak elvégzéséhez csatlakozzon az Internetre</uib-alert>
-                            <uib-alert type="error" ng-if="hasInternetOnServer && !hasInternetOnClient">Internet kapcsolat szükséges {{Config.cloud.productName}} felhőhöz való csatlakozáshoz</uib-alert>
-                            <p ng-if="canConnectToCloud"  ><button
+                            <uib-alert type="danger" ng-if="!hasInternetOnServer">{{Config.cloud.productName}} beállításainak elvégzéséhez csatlakozzon az Internetre</uib-alert>
+                            <uib-alert type="danger" ng-if="hasInternetOnServer && !hasInternetOnClient">Internet kapcsolat szükséges {{Config.cloud.productName}} felhőhöz való csatlakozáshoz</uib-alert>
+                            <p ng-if="canConnectToCloud"><button
                                     class="btn btn-default"
                                     ng-click="connectToCloud()" ng-disabled="!hasInternetOnServer || !hasInternetOnClient">Csatlakozás {{Config.cloud.productName}} felhőhöz</button>
                                 <a ng-if="!mode.liteClient"  class="btn btn-default"

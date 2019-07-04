@@ -5869,7 +5869,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Plugins</source>
-      <translation type="unfinished">Plugins</translation>
+      <translation>Плагіни</translation>
     </message>
   </context>
   <context>
@@ -7931,7 +7931,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Plugins</source>
-      <translation type="unfinished">Plugins</translation>
+      <translation>Плагіни</translation>
     </message>
   </context>
   <context>
@@ -8980,6 +8980,14 @@ If you intended to move analytics data to another storage location, please conta
       <source>Some servers have no package available</source>
       <translation>Деякі сервери не мають доступного пакету</translation>
     </message>
+    <message>
+      <source>Failed to cancel update</source>
+      <translation type="unfinished">Failed to cancel update</translation>
+    </message>
+    <message>
+      <source>Failed to start installation</source>
+      <translation type="unfinished">Failed to start installation</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::MultipleLayoutSelectionDialog</name>
@@ -9133,10 +9141,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Внутрішня помилка завантажувача.</translation>
     </message>
     <message>
-      <source>Iternal server error.</source>
-      <translation>Внутрішня помилка сервера.</translation>
-    </message>
-    <message>
       <source>Internal client error.</source>
       <translation>Внутрішня помилка клієнта.</translation>
     </message>
@@ -9155,6 +9159,14 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Update package is not found.</source>
       <translation>Пакет оновлення не знайдено.</translation>
+    </message>
+    <message>
+      <source>There is not enough space to install update.</source>
+      <translation>Не вистачає місця для встановлення оновлення.</translation>
+    </message>
+    <message>
+      <source>Internal server error.</source>
+      <translation>Внутрішня помилка сервера.</translation>
     </message>
   </context>
   <context>
@@ -9397,6 +9409,17 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Waiting for server to respond...</source>
       <translation>Очікування відповіді сервера...</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ServerUpdateTool</name>
+    <message>
+      <source>No connection to the server.</source>
+      <translation type="unfinished">No connection to the server.</translation>
+    </message>
+    <message>
+      <source>Network error.</source>
+      <translation type="unfinished">Network error.</translation>
     </message>
   </context>
   <context>

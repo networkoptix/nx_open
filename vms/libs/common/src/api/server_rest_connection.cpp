@@ -835,7 +835,7 @@ Handle ServerConnection::updateActionStart(
             bool success, rest::Handle handle, EmptyResponseType /*response*/)
         {
             if (callback)
-                callback(handle, success);
+                callback(success, handle);
         };
     const auto contentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
     auto request = QJson::serialized(info);
@@ -873,7 +873,7 @@ Handle ServerConnection::updateActionStop(
             bool success, rest::Handle handle, EmptyResponseType /*response*/)
         {
             if (callback)
-                callback(handle, success);
+                callback(success, handle);
         };
     const auto contentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
     return executePost<EmptyResponseType>("/ec2/cancelUpdate",
@@ -890,7 +890,7 @@ Handle ServerConnection::updateActionFinish(bool skipActivePeers,
             bool success, rest::Handle handle, EmptyResponseType /*response*/)
         {
             if (callback)
-                callback(handle, success);
+                callback(success, handle);
         };
 
     const auto contentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
@@ -914,7 +914,7 @@ Handle ServerConnection::updateActionInstall(const QSet<QnUuid>& participants,
             bool success, rest::Handle handle, EmptyResponseType /*response*/)
         {
             if (callback)
-                callback(handle, success);
+                callback(success, handle);
         };
     const auto contentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
     QString peerList;

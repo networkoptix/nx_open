@@ -84,7 +84,7 @@ public:
      * Asks mediaservers to start the update process.
      * @param info - update manifest
      */
-    void requestStartUpdate(const nx::update::Information& info, const QSet<QnUuid>& targets);
+    bool requestStartUpdate(const nx::update::Information& info, const QSet<QnUuid>& targets);
 
     /**
      * Asks mediaservers to stop the update process.
@@ -107,7 +107,7 @@ public:
     /**
      * Asks mediaservers to start installation process.
      */
-    void requestInstallAction(const QSet<QnUuid>& targets);
+    bool requestInstallAction(const QSet<QnUuid>& targets);
 
     /**
      * Send request for moduleInformation from the server.
@@ -190,6 +190,13 @@ public:
         bool installingClient = false;
     };
 
+    enum class InternalError
+    {
+        noError,
+        noConnection,
+        networkError,
+    };
+
     void calculateManualDownloadProgress(ProgressInfo& progress);
 
     OfflineUpdateState getUploaderState() const;
@@ -236,17 +243,21 @@ public:
      */
     QSet<QnUuid> getServersInstalling() const;
 
+    static QString toString(InternalError errorCode);
+
 signals:
     void packageDownloaded(const nx::update::Package& package);
     void packageDownloadFailed(const nx::update::Package& package, const QString& error);
     void moduleInformationReceived(const QList<nx::vms::api::ModuleInformation>& moduleInformation);
 
     /** Called when /ec2/startUpdate request is complete. */
-    void startUpdateComplete(bool success);
+    void startUpdateComplete(bool success, const QString& error);
     /** Called when /ec2/cancelUpdate request is complete. */
-    void cancelUpdateComplete(bool success);
+    void cancelUpdateComplete(bool success, const QString& error);
     /** Called when /ec2/finishUpdate request is complete. */
-    void finishUpdateComplete(bool success);
+    void finishUpdateComplete(bool success, const QString& error);
+    /** Called when /ec2/installUpdate request is complete. */
+    void startInstallComplete(bool success, const QString& error);
 
 private:
     void atUpdateStatusResponse(bool success, rest::Handle handle, const std::vector<nx::update::Status>& response);

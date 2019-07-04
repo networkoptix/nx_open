@@ -8,7 +8,7 @@
     "setup": {
         "createAccount": "skapa konto",
         "errorNoHDD": "Denna enhet är avsedd att fungera med en hårddisk installerad. <br> Vänligen stäng av enheten och installera en hårddisk.",
-        "errorNoNetwork": "Denna enhet behöver nätverksanslutning för att fungera. <br>                Vänligen anslut den till det lokala nätverket eller Internet"
+        "errorNoNetwork": "Den här enheten behöver nätverksanslutning för att fungera.<br>Anslut den till det lokala nätverket eller Internet"
     },
     "passwordRequirements": {
         "minLengthMessage": "Lösenordet måste innehålla minst 8 tecken",

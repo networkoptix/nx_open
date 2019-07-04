@@ -8,7 +8,7 @@
     "setup": {
         "createAccount": "create account",
         "errorNoHDD": "This device is intended to work with hard disk drive installed.<br>Please turn off the device and install a hard disk drive.",
-        "errorNoNetwork": "This device needs network connection to work.<br>Please connect it to the  local network ot Internet"
+        "errorNoNetwork": "This device needs network connection to work.<br>Please connect it to the local network or Internet"
     },
     "passwordRequirements": {
         "minLengthMessage": "Password must be at least 8 characters long",

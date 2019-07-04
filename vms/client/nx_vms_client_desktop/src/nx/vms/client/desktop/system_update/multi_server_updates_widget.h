@@ -118,11 +118,13 @@ protected:
     bool atCancelCurrentAction();
 
     /** Called when server responds to /ec2/startUpdate. Connected to ServerUpdateToool. */
-    void atStartUpdateComplete(bool success);
+    void atStartUpdateComplete(bool success, const QString& error);
     /** Called when server responds to /ec2/cancelUpdate. Connected to ServerUpdateToool. */
-    void atCancelUpdateComplete(bool success);
+    void atCancelUpdateComplete(bool success, const QString& error);
     /** Called when server responds to /ec2/finishUpdate. Connected to ServerUpdateToool. */
-    void atFinishUpdateComplete(bool success);
+    void atFinishUpdateComplete(bool success, const QString& error);
+    /** Called when server responds to /ec2/installUpdate. Connected to ServerUpdateToool. */
+    void atStartInstallComplete(bool success, const QString& error);
 
     /**
      * Called when ServerUpdateTool finishes downloading package for mediaserver without
@@ -168,7 +170,10 @@ private:
         cancelingDownload,
         /** Some servers have downloaded update data and ready to install it. */
         readyInstall,
+        /** Sent request /ec2/cancelUpdate and waiting for response. */
         cancelingReadyInstall,
+        /** Sent request /ec2/installUpdate and waiting for confirmation */
+        startingInstall,
         /** Some servers are installing an update. */
         installing,
         /** Some servers are installing an update, but it took too long. */

@@ -102,9 +102,9 @@
                             <uib-alert type="warning">Ця система не пов’язана з {{Config.cloud.productName}} <a ng-if="!mode.liteClient"
                                    ng-href="{{Config.cloud.portalUrl}}"
                                    target="_blank">Докладніше</a></uib-alert>
-                            <uib-alert type="error" ng-if="!hasInternetOnServer">Для виконання установки {{Config.cloud.productName}} необхідно підключити сервера до мережі Інтернет</uib-alert>
-                            <uib-alert type="error" ng-if="hasInternetOnServer && !hasInternetOnClient">Для підключення системи до {{Config.cloud.productName}} необхідне підключення до мережі Інтернет</uib-alert>
-                            <p ng-if="canConnectToCloud"  ><button
+                            <uib-alert type="danger" ng-if="!hasInternetOnServer">Для виконання установки {{Config.cloud.productName}} необхідно підключити сервера до мережі Інтернет</uib-alert>
+                            <uib-alert type="danger" ng-if="hasInternetOnServer && !hasInternetOnClient">Для підключення системи до {{Config.cloud.productName}} необхідне підключення до мережі Інтернет</uib-alert>
+                            <p ng-if="canConnectToCloud"><button
                                     class="btn btn-default"
                                     ng-click="connectToCloud()" ng-disabled="!hasInternetOnServer || !hasInternetOnClient">Підключитися до {{Config.cloud.productName}}</button>                                 <a ng-if="!mode.liteClient"  class="btn btn-default"
                                    ng-href="{{Config.cloud.portalUrl + Config.cloud.portalRegisterUrl + Config.cloud.webadminContext}}"
