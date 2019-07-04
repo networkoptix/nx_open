@@ -405,6 +405,12 @@ angular.module('webadminApp')
             openCloudDialog(); //Open Connect Dialog
         };
         $scope.saveNetworkSettings = function(){
+            for (var idx = 0; idx < $scope.networkSettings.length; idx++) {
+                if (!$scope.networkSettings[idx].dns_servers) {
+                    $scope.networkSettings[idx].dns_servers = '';
+                }
+            }
+    
             mediaserver.networkSettings($scope.networkSettings).then(restartServer, errorHandler);
         };
 

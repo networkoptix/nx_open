@@ -6,6 +6,8 @@
 #include <common/common_module.h>
 #include <core/resource/media_server_resource.h>
 #include <client/client_message_processor.h>
+#include <client/client_module.h>
+#include <camera/camera_bookmarks_manager.h>
 
 
 QnWorkbenchBookmarkTagsWatcher::QnWorkbenchBookmarkTagsWatcher(QObject *parent)
@@ -37,16 +39,18 @@ void QnWorkbenchBookmarkTagsWatcher::refresh() {
     QnGetBookmarkTagsRequestData requestData(TagsLimit);
     requestData.format = Qn::SerializationFormat::UbjsonFormat;
 
-    server->apiConnection()->getBookmarkTagsAsync(requestData,
-        this, SLOT(at_connection_gotBookmarkTags(int,QnCameraBookmarkTagList,int)));
+    auto bookmarkManager = commonModule()->instance<QnCameraBookmarksManager>();
+    bookmarkManager->getBookmarkTagsAsync(TagsLimit,
+        [this](bool success, int /*handle*/, const QnCameraBookmarkTagList &tags)
+        {
+            this->at_connection_gotBookmarkTags(success, tags);
+        });
 }
 
 void QnWorkbenchBookmarkTagsWatcher::at_connection_gotBookmarkTags(
-        int status, const QnCameraBookmarkTagList &tags, int handle)
+        bool success, const QnCameraBookmarkTagList &tags)
 {
-    Q_UNUSED(handle);
-
-    if (status != 0)
+    if (!success)
         return;
 
     m_tags = tags;

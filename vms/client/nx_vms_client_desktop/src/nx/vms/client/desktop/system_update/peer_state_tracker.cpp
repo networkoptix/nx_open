@@ -1,6 +1,5 @@
 #include "peer_state_tracker.h"
 
-#include <nx_ec/ec_proto_version.h>
 #include <api/global_settings.h>
 #include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
@@ -9,6 +8,7 @@
 #include <nx/utils/app_info.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/api/protocol_version.h>
 #include <ui/workbench/workbench_context.h>
 #include "client_update_tool.h"
 
@@ -565,7 +565,7 @@ QSet<QnUuid> PeerStateTracker::peersCompleteInstall() const
 
 QSet<QnUuid> PeerStateTracker::serversWithChangedProtocol() const
 {
-    int protocol = nx_ec::EC2_PROTO_VERSION;
+    int protocol = nx::vms::api::protocolVersion();
     QnMutexLocker locker(&m_dataLock);
     QSet<QnUuid> result;
     for (const auto& item: m_items)
@@ -598,6 +598,7 @@ QSet<QnUuid> PeerStateTracker::peersWithDownloaderError() const
         UpdateItem::ErrorCode::internalDownloaderError,
         UpdateItem::ErrorCode::noFreeSpaceToDownload,
         UpdateItem::ErrorCode::noFreeSpaceToExtract,
+        UpdateItem::ErrorCode::noFreeSpaceToInstall,
     };
     QSet<QnUuid> result;
     QnMutexLocker locker(&m_dataLock);
@@ -881,6 +882,8 @@ QString PeerStateTracker::errorString(nx::update::Status::ErrorCode code)
             return tr("There is not enough space to download update files.");
         case Code::noFreeSpaceToExtract:
             return tr("There is not enough space to extract update files.");
+        case Code::noFreeSpaceToInstall:
+            return tr("There is not enough space to install update.");
         case Code::downloadFailed:
             return tr("Failed to download update packages.");
         case Code::invalidUpdateContents:
@@ -892,7 +895,7 @@ QString PeerStateTracker::errorString(nx::update::Status::ErrorCode code)
         case Code::internalDownloaderError:
             return tr("Internal downloader error.");
         case Code::internalError:
-            return tr("Iternal server error.");
+            return tr("Internal server error.");
         case Code::applauncherError:
             return tr("Internal client error.");
         case Code::unknownError:
@@ -1095,7 +1098,7 @@ UpdateItemPtr PeerStateTracker::addItemForClient()
     item->id = getClientPeerId();
     item->component = UpdateItem::Component::client;
     item->row = m_items.size();
-    item->protocol = nx_ec::EC2_PROTO_VERSION;
+    item->protocol = nx::vms::api::protocolVersion();
     m_clientItem = item;
     m_items.push_back(item);
     updateClientData();

@@ -118,26 +118,94 @@ Value Controller::makeTimeLine(DataBase::Access access, std::chrono::millisecond
     return values;
 }
 
+static double sum(const std::vector<nx::utils::TimedValue<Value>>& timeline)
+{
+    return std::accumulate(
+        timeline.begin(), timeline.end(), (double) 0,
+        [](double current, const auto& point) { return current + point.value.toDouble(); });
+}
+
 static Value calculate(DataBase::Access access, const QStringList& formula)
 {
-    if (formula[0] == "count")
+    if (formula.isEmpty())
+        return "ERROR: No function";
+
+    const auto function = formula[0];
+    const auto arg =
+        [&](int index) { return access[index <= formula.size() ? formula[index] : QString()]; };
+
+    if (function == "+" || formula[0] == "add")
+        return arg(1)->current().toDouble() + arg(2)->current().toDouble();
+
+    if (function == "-" || formula[0] == "sub")
+        return arg(1)->current().toDouble() - arg(2)->current().toDouble();
+
+    if (function == "count")
     {
-        const auto values = access[formula[1]]->last().size();
-        return static_cast<double>(values ? values - 1 : 0);
+        const auto count = arg(1)->last().size();
+        return static_cast<double>(count ? count - 1 : 0);
     }
 
-    return "ERROR: unknown function: " + formula[0];
+    if (function == "sum")
+        return sum(arg(1)->last());
+
+    if (function == "avg" || function == "average")
+    {
+        const auto timeline = arg(1)->last();
+        return timeline.empty() ? 0 : (sum(timeline) / timeline.size());
+    }
+
+    return "ERROR: unknown function: " + function;
+}
+
+static bool isAlarmed(const Value& value, const Value& alarmValue)
+{
+    if (alarmValue.type() == Value::Double)
+        return value.toDouble() >= alarmValue.toDouble();
+
+    if (alarmValue.type() == Value::String)
+    {
+        const auto string = alarmValue.toString();
+        const auto expectOprator =
+            [string](const QString& expectedOperator) -> std::optional<QString>
+            {
+                if (string.startsWith(expectedOperator))
+                    return string.mid(expectedOperator.size());
+
+                return std::nullopt;
+            };
+
+        if (const auto expectedValue = expectOprator("="))
+            return value.toString() == *expectedValue;
+
+        if (const auto expectedValue = expectOprator("!="))
+            return value.toString() != *expectedValue;
+
+        if (const auto expectedValue = expectOprator(">="))
+            return value.toDouble() >= expectedValue->toDouble();
+
+        if (const auto expectedValue = expectOprator(">"))
+            return value.toDouble() > expectedValue->toDouble();
+
+        if (const auto expectedValue = expectOprator("<="))
+            return value.toDouble() <= expectedValue->toDouble();
+
+        if (const auto expectedValue = expectOprator("<"))
+            return value.toDouble() < expectedValue->toDouble();
+    }
+
+    return value == alarmValue;
 }
 
 static api::metrics::Status checkStatus(
     const Value& value, const std::map<api::metrics::Status, Value>& alarmRules)
 {
+    if (value.isNull() || value.toString().startsWith("ERROR: "))
+        return "error";
+
     for (const auto& [level, alarmValue]: alarmRules)
     {
-        if (value.type() == Value::Double && value.toDouble() >= alarmValue.toDouble())
-            return level;
-
-        if (value == alarmValue)
+        if (isAlarmed(value, alarmValue))
             return level;
     }
 

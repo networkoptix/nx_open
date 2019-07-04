@@ -26,6 +26,7 @@ void QnCameraBookmarksManager::setEnabled(bool value)
     d->setEnabled(value);
 }
 
+/*
 void QnCameraBookmarksManager::getBookmarksAsync(const QnVirtualCameraResourceSet &cameras
     , const QnCameraBookmarkSearchFilter &filter
     , BookmarksCallbackType callback)
@@ -38,14 +39,20 @@ void QnCameraBookmarksManager::getBookmarksAsync(const QnVirtualCameraResourceSe
             callback(success, bookmarks);
     };
     d->getBookmarksAsync(cameras, filter, internalCallback);
-}
+}*/
 
 int QnCameraBookmarksManager::getBookmarksAsync(const QnVirtualCameraResourceSet &cameras
     , const QnCameraBookmarkSearchFilter &filter
-    , BookmarksInternalCallbackType callback)
+    , BookmarksCallbackType callback)
 {
     Q_D(QnCameraBookmarksManager);
     return d->getBookmarksAsync(cameras, filter, callback);
+}
+
+int QnCameraBookmarksManager::getBookmarkTagsAsync(int maxTags, BookmarkTagsCallbackType callback)
+{
+    Q_D(QnCameraBookmarksManager);
+    return d->getBookmarkTagsAsync(maxTags, callback);
 }
 
 void QnCameraBookmarksManager::addCameraBookmark(const QnCameraBookmark &bookmark, OperationCallbackType callback)

@@ -678,9 +678,16 @@ State CameraSettingsDialogStateReducer::loadCameras(
     const auto& schedule = state.recording.schedule;
     if (schedule.hasValue() && !schedule().empty())
     {
+        // Setup brush as the highest quality task present.
         const auto tasks = schedule();
-        state.recording.brush.fps = std::max_element(tasks.cbegin(), tasks.cend(),
-            [](const auto& l, const auto& r) { return l.fps < r.fps; })->fps;
+        const auto highestQualityTask = std::max_element(tasks.cbegin(), tasks.cend(),
+            [](const auto& l, const auto& r) { return l.fps < r.fps; });
+
+        state.recording.brush.fps = highestQualityTask->fps;
+        state.recording.brush.quality = highestQualityTask->streamQuality;
+        state.recording.brush.recordingType = highestQualityTask->recordingType;
+        state.recording.brush.bitrateMbps = core::CameraBitrateCalculator::roundKbpsToMbps(
+            highestQualityTask->bitrateKbps);
     }
 
     // Default brush fps value.

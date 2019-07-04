@@ -2,6 +2,7 @@
 
 #include <nx/utils/random.h>
 #include <nx/utils/time.h>
+#include <nx/vms/api/protocol_version.h>
 
 namespace nx::cloud::db {
 namespace test {
@@ -45,7 +46,7 @@ void HealthMonitoring::establishConnectionFromMediaserverToCloudReusingPeerId()
         system().id,
         system().authKey,
         KeepAlivePolicy::enableKeepAlive,
-        nx_ec::EC2_PROTO_VERSION,
+        nx::vms::api::protocolVersion(),
         peerId);
 
     connectionHelper().waitForState(

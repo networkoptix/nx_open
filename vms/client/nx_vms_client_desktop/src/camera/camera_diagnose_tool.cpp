@@ -9,6 +9,7 @@
 
 #include <api/app_server_connection.h>
 #include <api/media_server_connection.h>
+#include <api/server_rest_connection.h>
 
 #include <common/common_module.h>
 
@@ -17,6 +18,7 @@
 #include <core/resource/camera_resource.h>
 
 #include <nx/network/http/http_types.h>
+#include <nx/utils/guarded_callback.h>
 
 
 namespace CameraDiagnostics
@@ -78,10 +80,10 @@ namespace CameraDiagnostics
         return m_errorMessage;
     }
 
-    void DiagnoseTool::onGetServerSystemIdResponse( int status, QString serverSystemId, int /*handle*/ )
+    void DiagnoseTool::onGetServerSystemIdResponse(bool success, int /*handle*/ , QString serverSystemId)
     {
         const ec2::AbstractECConnectionPtr& ecConnection = commonModule()->ec2Connection();
-        if( (status != 0) || !ecConnection || (serverSystemId != ecConnection->connectionInfo().localSystemId.toString()) )
+        if( (!success) || !ecConnection || (serverSystemId != ecConnection->connectionInfo().localSystemId.toString()) )
         {
             m_errorMessage = CameraDiagnostics::MediaServerUnavailableResult(m_serverHostAddress).toString(resourcePool());
 
@@ -113,7 +115,7 @@ namespace CameraDiagnostics
         }
     }
 
-    void DiagnoseTool::onCameraDiagnosticsStepResponse( int status, QnCameraDiagnosticsReply reply, int /*handle*/ )
+    void DiagnoseTool::onCameraDiagnosticsStepResponse(int status, QnCameraDiagnosticsReply reply, int /*handle*/)
     {
         if( status != 0 )
         {
@@ -185,10 +187,12 @@ namespace CameraDiagnostics
     {
         emit diagnosticsStepStarted( m_step );
 
-        if( !m_server || !m_server->apiConnection() ||
-            m_server->apiConnection()->getSystemIdAsync(
-                this,
-                SLOT(onGetServerSystemIdResponse(int, QString, int)) ) == -1 )
+        if (!m_server || !m_server->restConnection() ||
+            m_server->restConnection()->getSystemId(nx::utils::guarded(
+                this, [this] (bool success, int handle, QString id)
+                {
+                    onGetServerSystemIdResponse(success, handle, id);
+                }), thread()) == -1)
         {
             m_errorMessage = tr("No connection to Server %1.").arg(m_serverHostAddress);
             m_result = false;

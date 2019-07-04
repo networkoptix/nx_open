@@ -145,7 +145,8 @@ void QnImageButtonWidget::setPixmap(StateFlags flags, const QPixmap &pixmap)
 
     m_pixmaps[flags] = pixmap;
 
-    m_textures.remove(flags); //< This will force update of texture on repaint.
+    // The same pixmap may be the source for a lot of textures, so clear them all for simplicity.
+    m_textures.clear();
 
     update();
 }

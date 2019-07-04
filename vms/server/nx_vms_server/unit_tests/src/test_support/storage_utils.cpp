@@ -1,3 +1,5 @@
+#include <gtest/gtest.h>
+
 #include "storage_utils.h"
 #include <test_support/mediaserver_launcher.h>
 
@@ -5,18 +7,20 @@
 #include <recorder/storage_manager.h>
 #include <recorder/archive_integrity_watcher.h>
 #include <core/resource/storage_plugin_factory.h>
-#include <core/resource_management//resource_pool.h>
+#include <core/resource_management/resource_pool.h>
 #include <core/resource/avi/avi_archive_metadata.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <nx/streaming/rtsp_client_archive_delegate.h>
 #include <nx/streaming/archive_stream_reader.h>
 #include <media_server/media_server_module.h>
 
-extern "C" {
+extern "C"
+{
 #include <libavcodec/avcodec.h>
 #include <libavutil/opt.h>
 #include <libavutil/imgutils.h>
 #include <libavformat/avformat.h>
+#include <decoders/video/ffmpeg_video_decoder.h>
 }
 
 namespace nx::vms::server::test::test_support {
@@ -46,9 +50,10 @@ static void waitForStorageToAppear(MediaServerLauncher* server, const QString& s
             const auto fileStorage = storage.dynamicCast<QnFileStorageResource>();
             NX_ASSERT(fileStorage);
             fileStorage->setMounted(true);
+            server->serverModule()->normalStorageManager()->initDone();
 
             if (!(storage->isWritable() && storage->isOnline() && storage->isUsedForWriting()))
-                std::this_thread::sleep_for(std::chrono::milliseconds(3000));
+                std::this_thread::sleep_for(std::chrono::milliseconds(100));
             else
                 break;
         }
@@ -61,7 +66,8 @@ void addStorage(MediaServerLauncher* server, const QString& storagePath)
 {
     NX_ASSERT(!storagePath.isEmpty());
 
-    const auto existingStorages = server->serverModule()->resourcePool()->getResources<QnStorageResource>();
+    const auto existingStorages =
+        server->serverModule()->resourcePool()->getResources<QnStorageResource>();
     const auto existingIt = std::find_if(
         existingStorages.cbegin(), existingStorages.cend(),
         [&storagePath](const auto& storage) { return storage->getUrl() == storagePath; });
@@ -70,14 +76,15 @@ void addStorage(MediaServerLauncher* server, const QString& storagePath)
         return;
 
     QnStorageResourcePtr storage(server->serverModule()->storagePluginFactory()->createStorage(
-            server->commonModule(), "ufile"));
+        server->commonModule(), "ufile"));
 
     storage->setName("Test storage");
     storage->setParentId(server->commonModule()->moduleGUID());
     storage->setUrl(storagePath);
     storage->setSpaceLimit(0);
     storage->setStorageType("local");
-    storage->setUsedForWriting(storage->initOrUpdate() == Qn::StorageInit_Ok && storage->isWritable());
+    storage->setUsedForWriting(
+        storage->initOrUpdate() == Qn::StorageInit_Ok && storage->isWritable());
 
     NX_ASSERT(storage->isUsedForWriting());
 
@@ -85,7 +92,7 @@ void addStorage(MediaServerLauncher* server, const QString& storagePath)
     if (resType)
         storage->setTypeId(resType->getId());
 
-    QList<QnStorageResourcePtr> storages{ storage };
+    QList<QnStorageResourcePtr> storages{storage};
     nx::vms::api::StorageDataList apiStorages;
     ec2::fromResourceListToApi(QList<QnStorageResourcePtr>{storage}, apiStorages);
 
@@ -95,13 +102,12 @@ void addStorage(MediaServerLauncher* server, const QString& storagePath)
 
     NX_ASSERT(ec2::ErrorCode::ok == saveResult);
 
-    for (const auto &storage : storages)
+    for (const auto& storage: storages)
     {
         server->serverModule()->commonModule()->messageProcessor()->updateResource(
             storage, ec2::NotificationSource::Local);
     }
 
-    server->serverModule()->normalStorageManager()->initDone();
     waitForStorageToAppear(server, storagePath);
 }
 
@@ -260,8 +266,6 @@ void setNxOccupiedSpace(
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Test data generation
 
-static const int64_t kMediaFileDurationMs = 60000;
-
 static void replaceValue(QByteArray& payload, const QByteArray& key, const QByteArray& newValue)
 {
     const int keyPos = payload.indexOf(key);
@@ -271,40 +275,44 @@ static void replaceValue(QByteArray& payload, const QByteArray& key, const QByte
     memcpy(payload.data() + replacePos, newValue.constData(), newValue.size());
 }
 
-static void updateMetaData(QByteArray& payload, int64_t startTimeMs)
+void updateMkvMetaData(QByteArray& payload, int64_t startTimeMs)
 {
     replaceValue(payload, "startTimeMs", QByteArray::number((qint64) startTimeMs));
-    replaceValue(
-        payload, "integrityHash",
-        vms::server::IntegrityHashHelper::generateIntegrityHash(QByteArray::number((qint64) startTimeMs)).toBase64());
+    replaceValue(payload,
+        "integrityHash",
+        vms::server::IntegrityHashHelper::generateIntegrityHash(
+            QByteArray::number((qint64) startTimeMs))
+            .toBase64());
 }
 
-static ChunkDataList generateChunksForQuality(
-    const QString& baseDir, const QString& cameraName, const QString& quality, qint64 startTimeMs,
-    int count, QByteArray& payload)
+static ChunkDataList generateChunksForQuality(const QString& baseDir,
+    const QString& cameraName,
+    const QString& quality,
+    qint64 startTimeMs,
+    int count,
+    QByteArray& payload)
 {
     using namespace std::chrono;
     ChunkDataList result;
     for (int i = 0; i < count; ++i)
     {
         QString fileName = lit("%1_%2.mkv").arg(startTimeMs).arg(kMediaFileDurationMs);
-        QString pathString = QnStorageManager::dateTimeStr(
-            startTimeMs, currentTimeZone() / 60, "/");
+        QString pathString =
+            QnStorageManager::dateTimeStr(startTimeMs, currentTimeZone() / 60, "/");
 
         pathString = lit("%2/%1/%3").arg(cameraName).arg(quality).arg(pathString);
         auto fullDirPath = QDir(baseDir).absoluteFilePath(pathString);
-        QString fullFileName =
-            closeDirPath(baseDir) + closeDirPath(pathString) + fileName;
+        QString fullFileName = closeDirPath(baseDir) + closeDirPath(pathString) + fileName;
 
-        updateMetaData(payload, startTimeMs);
+        updateMkvMetaData(payload, startTimeMs);
 
         NX_ASSERT(QDir().mkpath(fullDirPath));
         QFile dataFile(fullFileName);
         NX_ASSERT(dataFile.open(QIODevice::WriteOnly));
         NX_ASSERT(dataFile.write(payload));
 
-        result.push_back(ChunkData{ startTimeMs, kMediaFileDurationMs, fullFileName });
-        startTimeMs += kMediaFileDurationMs + 5;
+        result.push_back(ChunkData{startTimeMs, kMediaFileDurationMs, fullFileName});
+        startTimeMs += kMediaFileDurationMs + kMediaFilesGapMs;
     }
 
     return result;
@@ -313,9 +321,9 @@ static ChunkDataList generateChunksForQuality(
 Catalog generateCameraArchive(
     const QString& baseDir, const QString& cameraName, qint64 startTimeMs, int count)
 {
-    QByteArray hiQualityPayLoad = createTestMkvFile(
+    QByteArray hiQualityPayLoad = createTestMkvFileData(
         kMediaFileDurationMs / 1000, kHiQualityFileWidth, kHiQualityFileHeight);
-    QByteArray lowQualityPayLoad = createTestMkvFile(
+    QByteArray lowQualityPayLoad = createTestMkvFileData(
         kMediaFileDurationMs / 1000, kLowQualityFileWidth, kLowQualityFileHeight);
 
     Catalog result;
@@ -336,18 +344,69 @@ static const int kBlockSize = 1024 * 1024;
 static int ffmpegRead(void* userCtx, uint8_t* data, int size);
 static int ffmpegWrite(void* userCtx, uint8_t* data, int size);
 static int64_t ffmpegSeek(void* userCtx, int64_t pos, int whence);
+static const int kdrawPixelSize = 16;
+
+static void drawTimestampOnFrame(AVFrame* frame, uint64_t timestamp)
+{
+    NX_ASSERT(frame->linesize[0] >= kdrawPixelSize * 8);
+    NX_ASSERT(frame->height >= kdrawPixelSize * 8);
+
+    uint64_t bitMask = 1;
+    for (int bitNum = 0; bitNum < 64; ++bitNum)
+    {
+        uint8_t color = (timestamp & bitMask) ? 0xff : 0x00;
+        int posX = (bitNum % 8) * kdrawPixelSize;
+        int posY = (bitNum / 8) * kdrawPixelSize;
+        uint8_t* data = frame->data[0] + posY * frame->linesize[0] + posX;
+        for (int y = 0; y < kdrawPixelSize; ++y)
+        {
+            for (int x = 0; x < kdrawPixelSize; ++x)
+                data[y * frame->linesize[0] + x] = color;
+        }
+        bitMask <<= 1;
+    }
+}
+
+static uint64_t getTimestampFromFrame(const AVFrame* frame)
+{
+    NX_ASSERT(frame->linesize[0] >= kdrawPixelSize * 8);
+    NX_ASSERT(frame->height >= kdrawPixelSize * 8);
+
+    uint64_t result = 0;
+    uint64_t bitMask = 1;
+    for (int bitNum = 0; bitNum < 64; ++bitNum)
+    {
+        int posX = (bitNum % 8) * kdrawPixelSize;
+        int posY = (bitNum / 8) * kdrawPixelSize;
+        uint8_t* data = frame->data[0] + posY * frame->linesize[0] + posX;
+        int color = 0;
+        for (int y = 0; y < kdrawPixelSize; ++y)
+        {
+            for (int x = 0; x < kdrawPixelSize; ++x)
+                color += data[y * frame->linesize[0] + x];
+        }
+        float avarageColor = color / (float) (kdrawPixelSize * kdrawPixelSize);
+        if (avarageColor >= 128.0)
+            result |= bitMask;
+
+        bitMask <<= 1;
+    }
+
+    return result;
+}
 
 class MkvBufferContext
 {
 public:
-    MkvBufferContext(int width, int height)
+    MkvBufferContext(
+        int width, int height, const QString& container, const QString& codec)
     {
-        allocateFfmpegObjects();
+        allocateFfmpegObjects(container, codec);
         setupCodecContext(width, height);
         setupStream();
         setupFrame();
         setupIoContext();
-        setupMetadata();
+        setupMetadata(formatFromString(container));
         av_log_set_level(AV_LOG_QUIET);
     }
 
@@ -379,9 +438,9 @@ public:
     }
 
 private:
-    friend int ffmpegRead(void *userCtx, uint8_t *data, int size);
-    friend int ffmpegWrite(void *userCtx, uint8_t *data, int size);
-    friend int64_t ffmpegSeek(void *userCtx, int64_t pos, int whence);
+    friend int ffmpegRead(void* userCtx, uint8_t* data, int size);
+    friend int ffmpegWrite(void* userCtx, uint8_t* data, int size);
+    friend int64_t ffmpegSeek(void* userCtx, int64_t pos, int whence);
 
     const AVCodec* m_codec = nullptr;
     AVCodecContext* m_codecContext = nullptr;
@@ -392,9 +451,9 @@ private:
     std::vector<char> m_buffer;
     int64_t m_pts = 0;
 
-    void allocateFfmpegObjects()
+    void allocateFfmpegObjects(const QString& container, const QString& codec)
     {
-        if (!(m_codec = avcodec_find_encoder_by_name("h263p")))
+        if (!(m_codec = avcodec_find_encoder_by_name(codec.toLatin1().constData())))
             throw std::runtime_error("Failed to initialize ffmpeg: codec");
 
         if (!(m_codecContext = avcodec_alloc_context3(m_codec)))
@@ -406,18 +465,21 @@ private:
         if (!(m_frame = av_frame_alloc()))
             throw std::runtime_error("Failed to initialize ffmpeg: frame");
 
-        if (avformat_alloc_output_context2(&m_formatContext, nullptr, "matroska", nullptr) < 0)
+        if (avformat_alloc_output_context2(
+                &m_formatContext, nullptr, container.toLatin1().constData(), nullptr) < 0)
+        {
             throw std::runtime_error("Failed to initialize ffmpeg: alloc_output_context");
+        }
     }
 
-    void setupMetadata()
+    void setupMetadata(QnAviArchiveMetadata::Format format)
     {
         QnAviArchiveMetadata metadata;
         metadata.startTimeMs = 1553604378060;
         metadata.version = QnAviArchiveMetadata::kIntegrityCheckVersion;
         metadata.integrityHash =
             vms::server::IntegrityHashHelper::generateIntegrityHash("1553604378060");
-        metadata.saveToFile(m_formatContext, QnAviArchiveMetadata::Format::custom);
+        metadata.saveToFile(m_formatContext, format);
     }
 
     void setupCodecContext(int width, int height)
@@ -425,8 +487,8 @@ private:
         m_codecContext->bit_rate = 400000;
         m_codecContext->width = width;
         m_codecContext->height = height;
-        m_codecContext->time_base = { 1, 25 };
-        m_codecContext->framerate = { 25, 1 };
+        m_codecContext->time_base = {1, 25};
+        m_codecContext->framerate = {25, 1};
         m_codecContext->gop_size = 10;
         m_codecContext->pix_fmt = AV_PIX_FMT_YUV420P;
 
@@ -450,13 +512,14 @@ private:
             throw std::runtime_error("Failed to initialize ffmpeg: avformat_new_stream");
 
         if (avcodec_parameters_from_context(outputStream->codecpar, m_codecContext) < 0)
-            throw std::runtime_error("Failed to initialize ffmpeg: avcodec_parameters_from_context");
+            throw std::runtime_error(
+                "Failed to initialize ffmpeg: avcodec_parameters_from_context");
     }
 
     void setupIoContext()
     {
         uint8_t* ioBuffer;
-        ioBuffer = (uint8_t*)av_malloc(kBlockSize);
+        ioBuffer = static_cast<uint8_t*>(av_malloc(kBlockSize));
         m_formatContext->pb = avio_alloc_context(
             ioBuffer, kBlockSize, 1, this, &ffmpegRead, &ffmpegWrite, &ffmpegSeek);
         if (!m_formatContext->pb)
@@ -468,7 +531,7 @@ private:
         if (m_formatContext->pb)
         {
             avio_flush(m_formatContext->pb);
-            m_formatContext->pb->opaque = 0;
+            m_formatContext->pb->opaque = nullptr;
             av_freep(&m_formatContext->pb->buffer);
             av_opt_free(m_formatContext->pb);
             av_free(m_formatContext->pb);
@@ -498,6 +561,15 @@ private:
             }
 
             m_frame->pts = m_pts++;
+
+            const auto codecContextTimeBase = m_codecContext->time_base;
+            const auto streamTimeBase = m_formatContext->streams[0]->time_base;
+
+            auto timestampMs = av_rescale_q(m_frame->pts, codecContextTimeBase, {1, 1000});
+            drawTimestampOnFrame(m_frame, timestampMs);
+            auto writtenTimestamp = getTimestampFromFrame(m_frame);
+            ASSERT_EQ(timestampMs, writtenTimestamp);
+
             if (avcodec_send_frame(m_codecContext, m_frame) < 0)
                 throw std::runtime_error("Write frame failed: avcodec_send_frame");
 
@@ -509,9 +581,6 @@ private:
                 else if (result < 0)
                     throw std::runtime_error("Write frame failed: avcodec_receive_packet");
 
-                const auto codecContextTimeBase = m_codecContext->time_base;
-                const auto streamTimeBase = m_formatContext->streams[0]->time_base;
-
                 m_packet->pts = av_rescale_q(m_packet->pts, codecContextTimeBase, streamTimeBase);
                 m_packet->dts = av_rescale_q(m_packet->dts, codecContextTimeBase, streamTimeBase);
                 if (av_write_frame(m_formatContext, m_packet) < 0)
@@ -521,11 +590,21 @@ private:
             }
         }
     }
+
+    static QnAviArchiveMetadata::Format formatFromString(const QString& format)
+    {
+        if (format == "avi")
+            return QnAviArchiveMetadata::Format::avi;
+        if (format == "mp4")
+            return QnAviArchiveMetadata::Format::mp4;
+
+        return QnAviArchiveMetadata::Format::custom;
+    }
 };
 
 static int ffmpegRead(void* userCtx, uint8_t* data, int size)
 {
-    MkvBufferContext* mkvContext = (MkvBufferContext*)userCtx;
+    MkvBufferContext* mkvContext = (MkvBufferContext*) userCtx;
     const auto& buffer = mkvContext->m_buffer;
 
     int result = std::min<int>(size, (int) buffer.size() - mkvContext->m_pos);
@@ -537,10 +616,10 @@ static int ffmpegRead(void* userCtx, uint8_t* data, int size)
 
 static int ffmpegWrite(void* userCtx, uint8_t* data, int size)
 {
-    MkvBufferContext* mkvContext = (MkvBufferContext*)userCtx;
+    MkvBufferContext* mkvContext = (MkvBufferContext*) userCtx;
     auto& buffer = mkvContext->m_buffer;
     const auto resizeValue = mkvContext->m_pos + size;
-    if (resizeValue > buffer.size())
+    if (resizeValue > (int) buffer.size())
         buffer.resize(resizeValue);
 
     memcpy(buffer.data() + mkvContext->m_pos, data, size);
@@ -551,7 +630,7 @@ static int ffmpegWrite(void* userCtx, uint8_t* data, int size)
 
 static int64_t ffmpegSeek(void* userCtx, int64_t pos, int whence)
 {
-    MkvBufferContext* mkvContext = (MkvBufferContext*)userCtx;
+    MkvBufferContext* mkvContext = (MkvBufferContext*) userCtx;
     int64_t absolutePos = pos;
     switch (whence)
     {
@@ -572,11 +651,12 @@ static int64_t ffmpegSeek(void* userCtx, int64_t pos, int whence)
     return (mkvContext->m_pos = absolutePos);
 }
 
-QByteArray createTestMkvFile(int lengthSec, int width, int height)
+QByteArray createTestMkvFileData(
+    int lengthSec, int width, int height, const QString& container, const QString& codec)
 {
     try
     {
-        const auto result = MkvBufferContext(width, height).create(lengthSec);
+        const auto result = MkvBufferContext(width, height, container, codec).create(lengthSec);
         return QByteArray(result.data(), (int) result.size());
     }
     catch (const std::exception& e)
@@ -603,6 +683,173 @@ std::unique_ptr<QnArchiveStreamReader> createArchiveStreamReader(
     archiveReader->setPlaybackRange(QnTimePeriod(0, std::numeric_limits<int64_t>::max()));
 
     return archiveReader;
+}
+
+QnVirtualCameraResourcePtr getCamera(QnResourcePool* resourcePool, const QString& uniqueIdOrName)
+{
+    const auto allCameras = resourcePool->getAllCameras();
+    QnVirtualCameraResourcePtr result;
+    for (const auto& camera: allCameras)
+    {
+        if (camera->getUniqueId() == uniqueIdOrName || camera->getName() == uniqueIdOrName)
+        {
+            result = camera;
+            break;
+        }
+    }
+
+    return result;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// Playback check
+
+class PlaybackChecker: public QnAbstractMediaDataReceptor
+{
+public:
+    enum State
+    {
+        failed,
+        success,
+        inProgress
+    };
+
+    PlaybackChecker(const QnTimePeriodList& timePeriods,
+        int64_t mediaFileDurationMs,
+        int64_t mediaFileGapMs,
+        bool shouldSucceed):
+        m_timePeriods(timePeriods),
+        m_mediaFileDurationMs(mediaFileDurationMs), m_mediaFileGapMs(mediaFileGapMs),
+        m_shouldSucceed(shouldSucceed)
+    {
+        std::sort(m_timePeriods.begin(), m_timePeriods.end());
+        selectNextTimePeriod(false);
+    }
+
+    virtual bool canAcceptData() const override { return true; }
+
+    virtual void putData(const QnAbstractDataPacketPtr& data) override
+    {
+        NX_MUTEX_LOCKER lock(&m_mutex);
+        if (m_state != inProgress)
+            return;
+
+        const int64_t dataTimestampMs = data->timestamp / 1000;
+        if (dataTimestampMs == AV_NOPTS_VALUE)
+            return setState(failed);
+
+        if (dataTimestampMs < m_startTime)
+        {
+            if (!m_waitingForPeriodBeginning)
+                return setState(failed);
+            return;
+        }
+
+        m_waitingForPeriodBeginning = false;
+        if (m_shouldSucceed)
+            ASSERT_LT(dataTimestampMs - m_startTime, kTimeGapMs);
+        if (dataTimestampMs - m_startTime >= kTimeGapMs)
+            return setState(failed);
+        m_startTime = dataTimestampMs;
+
+        auto video = std::dynamic_pointer_cast<const QnCompressedVideoData>(data);
+        if (video)
+        {
+            auto& decoder = m_decoders[video->compressionType];
+            if (!decoder)
+            {
+                decoder = std::make_unique<QnFfmpegVideoDecoder>(
+                    DecoderConfig(), video->compressionType, video);
+            }
+            QSharedPointer<CLVideoDecoderOutput> outFrame(new CLVideoDecoderOutput());
+            decoder->decode(video, &outFrame);
+            auto frameTimestampMs = getTimestampFromFrame(outFrame.get());
+            if (frameTimestampMs == 0
+                && dataTimestampMs - m_firstFileFrameTime
+                    == m_mediaFileDurationMs + m_mediaFileGapMs)
+            {
+                // A new file.
+                m_firstFileFrameTime += m_mediaFileDurationMs + m_mediaFileGapMs;
+            }
+            if (m_shouldSucceed)
+                ASSERT_EQ(dataTimestampMs - m_firstFileFrameTime, frameTimestampMs);
+            if (dataTimestampMs - m_firstFileFrameTime != frameTimestampMs)
+                return setState(failed);
+        }
+
+        if (m_endTime - m_startTime < kAcceptableTimeSpanToTheEndMs)
+            selectNextTimePeriod(true);
+    }
+
+    void wait()
+    {
+        NX_MUTEX_LOCKER lock(&m_mutex);
+        while (m_state == inProgress)
+            m_waitCondition.wait(&m_mutex);
+    }
+
+    State state() const
+    {
+        NX_MUTEX_LOCKER lock(&m_mutex);
+        return m_state;
+    }
+
+private:
+    const int64_t kTimeGapMs = 1000;
+    const int64_t kAcceptableTimeSpanToTheEndMs = 30000;
+
+    mutable QnMutex m_mutex;
+    QnWaitCondition m_waitCondition;
+    bool m_waitingForPeriodBeginning = true;
+    QnTimePeriodList m_timePeriods;
+    State m_state = inProgress;
+    int64_t m_firstFileFrameTime = 0;
+    int64_t m_startTime = 0;
+    int64_t m_endTime = 0;
+    std::map<AVCodecID, std::unique_ptr<QnFfmpegVideoDecoder>> m_decoders;
+    int64_t m_mediaFileDurationMs = 0;
+    int64_t m_mediaFileGapMs = 0;
+    bool m_shouldSucceed;
+
+    void selectNextTimePeriod(bool removeFirst)
+    {
+        if (m_timePeriods.isEmpty())
+            return setState(success);
+
+        if (removeFirst)
+        {
+            m_timePeriods.takeFirst();
+            if (m_timePeriods.isEmpty())
+                return setState(success);
+        }
+
+        m_firstFileFrameTime = m_startTime = m_timePeriods[0].startTimeMs;
+        m_endTime = m_timePeriods[0].endTimeMs();
+        m_waitingForPeriodBeginning = true;
+    }
+
+    void setState(State state)
+    {
+        m_state = state;
+        m_waitCondition.wakeOne();
+    }
+};
+
+void checkPlaybackCorrecteness(QnArchiveStreamReader* archiveReader,
+    const QnTimePeriodList& expectedTimePeriods, int64_t mediaFileDurationMs,
+    int64_t mediaFileGapMs, bool shouldSucceed)
+{
+    PlaybackChecker playbackChecker(
+        expectedTimePeriods, mediaFileDurationMs, mediaFileGapMs, shouldSucceed);
+    archiveReader->addDataProcessor(&playbackChecker);
+    archiveReader->start();
+    playbackChecker.wait();
+    archiveReader->removeDataProcessor(&playbackChecker);
+
+    if (shouldSucceed)
+        ASSERT_EQ(PlaybackChecker::success, playbackChecker.state());
+    else
+        ASSERT_EQ(PlaybackChecker::failed, playbackChecker.state());
 }
 
 } // namespace nx::vms::server::test::test_support

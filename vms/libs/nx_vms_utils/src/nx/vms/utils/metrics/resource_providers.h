@@ -1,5 +1,7 @@
 #pragma once
 
+#include <nx/utils/log/log.h>
+
 #include "parameter_providers.h"
 
 namespace nx::vms::utils::metrics {
@@ -16,15 +18,24 @@ class AbstractResourceProvider
 public:
     virtual ~AbstractResourceProvider() = default;
 
+    /** Returns manifest for this kind of resource. */
     virtual const api::metrics::ResourceManifest& manifest() const = 0;
+
+    /** Starts monitoring for new resources. dataBaseAccess should be used to store their values. */
     virtual void startMonitoring(DataBase::Access dataBaseAccess) = 0;
+
+    /** Resource descriptions for resources, which are currently discovered. */
     virtual std::vector<ResourceDescription> resources() const = 0;
 };
 
-template<typename Resource>
+/**
+ * AbstractResourceProvider implementation helper.
+ */
+template<typename ResourceType>
 class ResourceProvider: public AbstractResourceProvider
 {
 public:
+    using Resource = ResourceType;
     ResourceProvider(ResourceParameterProviders<Resource> providers);
 
     const api::metrics::ResourceManifest& manifest() const final;
@@ -56,6 +67,9 @@ protected:
         typename SingleParameterProvider<Resource>::Getter getter,
         typename SingleParameterProvider<Resource>::Watch watch = nullptr);
 
+    template<typename Signal>
+    static typename SingleParameterProvider<Resource>::Watch qSignalWatch(Signal signal);
+
     template<typename... Providers>
     static ResourceParameterProviders<Resource> parameterProviders(Providers... providers);
 
@@ -72,27 +86,27 @@ private:
 
 // -----------------------------------------------------------------------------------------------
 
-template<typename Resource>
-ResourceProvider<Resource>::ResourceProvider(ResourceParameterProviders<Resource> providers):
+template<typename ResourceType>
+ResourceProvider<ResourceType>::ResourceProvider(ResourceParameterProviders<Resource> providers):
     m_parameters({}, std::move(providers))
 {
 }
 
-template<typename Resource>
-const api::metrics::ResourceManifest& ResourceProvider<Resource>::manifest() const
+template<typename ResourceType>
+const api::metrics::ResourceManifest& ResourceProvider<ResourceType>::manifest() const
 {
     return m_parameters.manifest().group;
 }
 
-template<typename Resource>
-void ResourceProvider<Resource>::startMonitoring(DataBase::Access dataBaseAccess)
+template<typename ResourceType>
+void ResourceProvider<ResourceType>::startMonitoring(DataBase::Access dataBaseAccess)
 {
     m_dataBaseAccess = dataBaseAccess;
     startMonitoring();
 }
 
-template<typename Resource>
-std::vector<ResourceDescription> ResourceProvider<Resource>::resources() const
+template<typename ResourceType>
+std::vector<ResourceDescription> ResourceProvider<ResourceType>::resources() const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     std::vector<ResourceDescription> descriptions;
@@ -105,8 +119,8 @@ std::vector<ResourceDescription> ResourceProvider<Resource>::resources() const
     return descriptions;
 }
 
-template<typename Resource>
-void ResourceProvider<Resource>::found(const Resource& resource)
+template<typename ResourceType>
+void ResourceProvider<ResourceType>::found(const Resource& resource)
 {
     {
         NX_MUTEX_LOCKER lock(&m_mutex);
@@ -119,8 +133,8 @@ void ResourceProvider<Resource>::found(const Resource& resource)
     changed(resource);
 }
 
-template<typename Resource>
-void ResourceProvider<Resource>::lost(const Resource& resource)
+template<typename ResourceType>
+void ResourceProvider<ResourceType>::lost(const Resource& resource)
 {
 
     NX_VERBOSE(this, "Lost %1", resource);
@@ -128,8 +142,8 @@ void ResourceProvider<Resource>::lost(const Resource& resource)
     m_resources.erase(resource);
 }
 
-template<typename Resource>
-void ResourceProvider<Resource>::changed(const Resource& resource)
+template<typename ResourceType>
+void ResourceProvider<ResourceType>::changed(const Resource& resource)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     nx::utils::SharedGuardPtr& monitoringGuard = m_resources[resource];
@@ -153,9 +167,9 @@ void ResourceProvider<Resource>::changed(const Resource& resource)
     }
 }
 
-template<typename Resource>
-std::unique_ptr<AbstractParameterProvider<Resource>>
-    ResourceProvider<Resource>::singleParameterProvider(
+template<typename ResourceType>
+std::unique_ptr<AbstractParameterProvider<ResourceType>>
+    ResourceProvider<ResourceType>::singleParameterProvider(
         api::metrics::ParameterManifest manifest,
         typename SingleParameterProvider<Resource>::Getter getter,
         typename SingleParameterProvider<Resource>::Watch watch)
@@ -164,20 +178,35 @@ std::unique_ptr<AbstractParameterProvider<Resource>>
         std::move(manifest), std::move(getter), std::move(watch));
 }
 
-template<typename Resource>
+template<typename ResourceType>
+template<typename Signal>
+typename SingleParameterProvider<ResourceType>::Watch
+    ResourceProvider<ResourceType>::qSignalWatch(Signal signal)
+{
+    return [signal](const Resource& resource, nx::utils::MoveOnlyFunc<void()> change)
+    {
+        const auto connection = QObject::connect(
+            resource, signal,
+            [change = std::move(change)](const auto& /*resource*/) { change(); });
+
+        return nx::utils::makeSharedGuard([connection]() { QObject::disconnect(connection); });
+    };
+}
+
+template<typename ResourceType>
 template<typename... Providers>
-ResourceParameterProviders<Resource>
-    ResourceProvider<Resource>::parameterProviders(Providers... providers)
+ResourceParameterProviders<ResourceType>
+    ResourceProvider<ResourceType>::parameterProviders(Providers... providers)
 {
     ResourceParameterProviders<Resource> proviers;
     (proviers.push_back(std::forward<Providers>(providers)), ...);
     return proviers;
 }
 
-template<typename Resource>
+template<typename ResourceType>
 template<typename... Providers>
-std::unique_ptr<AbstractParameterProvider<Resource>>
-    ResourceProvider<Resource>::parameterGroupProvider(
+std::unique_ptr<AbstractParameterProvider<ResourceType>>
+    ResourceProvider<ResourceType>::parameterGroupProvider(
         api::metrics::ParameterManifest manifest, Providers... providers)
 {
     return std::make_unique<ParameterGroupProvider<Resource>>(

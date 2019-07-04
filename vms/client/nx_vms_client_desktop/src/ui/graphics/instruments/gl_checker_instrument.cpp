@@ -71,24 +71,20 @@ void checkGLHardware(QOpenGLWidget* viewport)
     }
 
     const auto functions = context->functions();
+    const auto info = QnGlFunctions(viewport).openGLInfo();
 
-    const auto extensionsString = getString(functions, GL_EXTENSIONS);
-    const QByteArray versionString = getString(functions, GL_VERSION);
-    const QByteArray rendererString = getString(functions, GL_RENDERER);
-    const QByteArray vendorString = getString(functions, GL_VENDOR);
-
-    NX_INFO(NX_SCOPE_TAG, "Version: %1.", versionString);
-    NX_INFO(NX_SCOPE_TAG, "Renderer: %1.", rendererString);
-    NX_INFO(NX_SCOPE_TAG, "Vendor: %1.", vendorString);
-    NX_DEBUG(NX_SCOPE_TAG, "Extensions: %1.", extensionsString);
+    NX_INFO(NX_SCOPE_TAG, "Version: %1.", info.version);
+    NX_INFO(NX_SCOPE_TAG, "Renderer: %1.", info.renderer);
+    NX_INFO(NX_SCOPE_TAG, "Vendor: %1.", info.vendor);
+    NX_DEBUG(NX_SCOPE_TAG, "Extensions: %1.", info.extensions);
 
     bool contextIsValid = true;
 
-    if (!versionString.contains("ES 2.0"))
+    if (!info.version.contains("ES 2.0"))
     {
-        if (nx::utils::SoftwareVersion(versionString) < nx::utils::SoftwareVersion(2, 0))
+        if (nx::utils::SoftwareVersion(info.version) < nx::utils::SoftwareVersion(2, 0))
         {
-            NX_ERROR(NX_SCOPE_TAG, "OpenGL version %1 is not supported.", versionString);
+            NX_ERROR(NX_SCOPE_TAG, "OpenGL version %1 is not supported.", info.version);
             contextIsValid = false;
         }
     }
@@ -100,7 +96,8 @@ void checkGLHardware(QOpenGLWidget* viewport)
 
     QnMessageBox::warning(nullptr,
         QnGLCheckerInstrument::tr("Video card drivers are outdated or not installed"),
-        QnGLCheckerInstrument::tr("%1 may not work properly.").arg(QnClientAppInfo::applicationDisplayName()));
+        QnGLCheckerInstrument::tr("%1 may not work properly.")
+            .arg(QnClientAppInfo::applicationDisplayName()));
 }
 
 } // namespace

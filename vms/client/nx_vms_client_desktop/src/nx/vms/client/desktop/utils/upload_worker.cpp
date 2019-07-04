@@ -11,6 +11,7 @@
 
 #include <nx/utils/cryptographic_hash.h>
 #include <nx/utils/guarded_callback.h>
+#include <nx/utils/random.h>
 #include <nx/vms/common/p2p/downloader/file_information.h>
 #include <nx/vms/common/p2p/downloader/result_code.h>
 
@@ -37,7 +38,6 @@ struct UploadWorker::Private
     QSharedPointer<QFile> file;
     QByteArray md5;
     int chunkSize = 1024 * 1024;
-    int currentChunk = 0;
     int maxSubsequentChunksToUpload = 10;
     int subsequentChunksToUploadLeft = -1;
     QBitArray uploadedChunks;
@@ -51,6 +51,11 @@ public:
     void getAvailableChunks();
     void handleGotAvailableChunks(
         const common::p2p::downloader::FileInformation& fileInformation);
+    int selectNextChunkToUpload() const;
+    int selectRandomChunkToUpload() const;
+    int selectChunkToUpload() const;
+
+    QByteArray readChunk(int chunkIndex);
 };
 
 void UploadWorker::Private::getAvailableChunks()
@@ -99,6 +104,57 @@ void UploadWorker::Private::handleGotAvailableChunks(
 
     subsequentChunksToUploadLeft = maxSubsequentChunksToUpload;
     q->handleUpload();
+}
+
+int UploadWorker::Private::selectNextChunkToUpload() const
+{
+    int chunk = 0;
+    while (chunk < uploadedChunks.size() && uploadedChunks[chunk])
+        ++chunk;
+
+    return chunk < uploadedChunks.size() ? chunk : -1;
+}
+
+int UploadWorker::Private::selectRandomChunkToUpload() const
+{
+    const int chunksCount = uploadedChunks.size();
+    const int randomChunk = utils::random::number(0, chunksCount - 1);
+
+    for (int i = randomChunk; i < chunksCount; ++i)
+    {
+        if (!uploadedChunks[i])
+            return i;
+    }
+    for (int i = 0; i < randomChunk; ++i)
+    {
+        if (!uploadedChunks[i])
+            return i;
+    }
+
+    return -1;
+}
+
+int UploadWorker::Private::selectChunkToUpload() const
+{
+    if (upload.uploadAllChunks)
+        return selectNextChunkToUpload();
+    return selectRandomChunkToUpload();
+}
+
+QByteArray UploadWorker::Private::readChunk(int chunkIndex)
+{
+    if (file->seek(static_cast<qint64>(chunkSize) * chunkIndex))
+    {
+        const QByteArray& data = file->read(chunkSize);
+        if (!data.isEmpty())
+            return data;
+    }
+
+    NX_ERROR(this, "Cannot read chunk %1 [offset: %2, size: %3] from %4: %5",
+        chunkIndex, chunkSize * chunkIndex, chunkSize, upload.destination,
+        file->errorString());
+    q->handleError(file->errorString());
+    return {};
 }
 
 UploadWorker::UploadWorker(
@@ -314,10 +370,8 @@ void UploadWorker::handleFileUploadCreated(bool success, RemoteResult code, QStr
 
 void UploadWorker::handleUpload()
 {
-    while (d->currentChunk < d->uploadedChunks.size() && d->uploadedChunks[d->currentChunk])
-        ++d->currentChunk;
-
-    if (d->currentChunk >= d->uploadedChunks.size())
+    const int chunk = d->selectChunkToUpload();
+    if (chunk == -1)
     {
         handleAllUploaded();
         return;
@@ -335,41 +389,33 @@ void UploadWorker::handleUpload()
         --d->subsequentChunksToUploadLeft;
     }
 
-    NX_VERBOSE(this, "Uploading chunk %1 for %2", d->currentChunk, d->upload.destination);
+    NX_VERBOSE(this, "Uploading chunk %1 for %2", chunk, d->upload.destination);
 
-    bool seekOk = d->file->seek(static_cast<qint64>(d->chunkSize) * d->currentChunk);
-    QByteArray bytes = d->file->read(d->chunkSize);
-    if (!seekOk || bytes.isEmpty())
-    {
-        NX_ERROR(this, "Cannot read chunk %1 [offset: %2, size: %3] from %4: %5",
-            d->currentChunk, d->chunkSize * d->currentChunk, d->chunkSize, d->upload.destination,
-            d->file->errorString());
-        handleError(d->file->errorString());
-        return;
-    }
+    const QByteArray& data = d->readChunk(chunk);
 
     const auto callback = nx::utils::guarded(this,
-        [this](bool success, rest::Handle handle, const rest::ServerConnection::EmptyResponseType&)
+        [this, chunk](
+            bool success, rest::Handle handle, const rest::ServerConnection::EmptyResponseType&)
         {
             {
-                QnMutexLocker lock(&d->mutex);
+                NX_MUTEX_LOCKER lock(&d->mutex);
                 d->requests.releaseHandle(handle);
             }
-            handleChunkUploaded(success);
+            handleChunkUploaded(success, chunk);
         });
 
     d->requests.storeHandle(d->connection()->uploadFileChunk(
         d->upload.destination,
-        d->currentChunk,
-        bytes,
+        chunk,
+        data,
         callback,
         thread()));
 }
 
-void UploadWorker::handleChunkUploaded(bool success)
+void UploadWorker::handleChunkUploaded(bool success, int chunkIndex)
 {
     NX_VERBOSE(this, "Chunk %1 was uploaded for %2: %3",
-        d->currentChunk, d->upload.destination, success);
+        chunkIndex, d->upload.destination, success);
 
     if (!success)
     {
@@ -377,11 +423,9 @@ void UploadWorker::handleChunkUploaded(bool success)
         return;
     }
 
-    d->uploadedChunks[d->currentChunk] = true;
+    d->uploadedChunks[chunkIndex] = true;
     d->upload.uploaded = std::min<qint64>(
         d->uploadedChunks.count(true) * d->chunkSize, d->upload.size);
-
-    ++d->currentChunk;
 
     handleUpload();
 }

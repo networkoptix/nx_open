@@ -62,27 +62,20 @@ bool QnFile::open(const QIODevice::OpenMode& openMode, unsigned int systemDepend
     if (systemDependentFlags == 0)
         systemDependentFlags = FILE_ATTRIBUTE_NORMAL;
 
+    QString fileName = QString("\\\\?\\") + QDir::toNativeSeparators(m_fileName);
     // Create the file handle.
-    m_impl = CreateFile((const wchar_t*)m_fileName.constData(),
-        accessRights,
-        shareMode,
-        &securityAtts,
-        creationDisp,
-        (DWORD) systemDependentFlags,
-        NULL);
+    m_impl = CreateFileW(
+        (const wchar_t*)fileName.constData(), accessRights, shareMode, &securityAtts, creationDisp,
+        (DWORD) systemDependentFlags, NULL);
 
     if (m_impl == INVALID_HANDLE_VALUE && (openMode & QIODevice::WriteOnly) && GetLastError() == ERROR_PATH_NOT_FOUND)
     {
         QDir dir;
         if (dir.mkpath(QnFile::absolutePath(m_fileName)))
         {
-            m_impl = CreateFile((const wchar_t*)m_fileName.constData(),
-                accessRights,
-                shareMode,
-                &securityAtts,
-                creationDisp,
-                (DWORD) systemDependentFlags,
-                NULL);
+            m_impl = CreateFileW(
+                (const wchar_t*)fileName.constData(), accessRights, shareMode, &securityAtts,
+                creationDisp, (DWORD) systemDependentFlags, NULL);
         }
     }
 

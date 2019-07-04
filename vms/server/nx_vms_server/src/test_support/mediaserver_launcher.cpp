@@ -174,7 +174,6 @@ bool MediaServerLauncher::start()
 
 bool MediaServerLauncher::waitForStarted()
 {
-
     //waiting for server to come up
     constexpr const auto maxPeriodToWaitForMediaServerStart = std::chrono::seconds(150);
     auto future = m_processStartedPromise->get_future();

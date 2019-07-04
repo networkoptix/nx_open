@@ -16,9 +16,13 @@ class Cursor:
 {
 public:
     Cursor(std::unique_ptr<nx::sql::Cursor<DetectedObject>> sqlCursor);
+    virtual ~Cursor();
 
     virtual common::metadata::ConstDetectionMetadataPacketPtr next() override;
     virtual void close() override;
+
+    void setOnBeforeCursorDestroyed(
+        nx::utils::MoveOnlyFunc<void(Cursor*)> handler);
 
 private:
     using Objects =
@@ -29,6 +33,7 @@ private:
     Objects m_currentObjects;
     common::metadata::DetectionMetadataPacketPtr m_packet;
     QnMutex m_mutex;
+    nx::utils::MoveOnlyFunc<void(Cursor*)> m_onBeforeCursorDestroyedHandler;
 
     void loadObjectsIfNecessary();
     void loadNextObject();

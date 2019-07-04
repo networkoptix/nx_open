@@ -147,6 +147,7 @@ SocketGlobals::~SocketGlobals()
 
     m_impl.reset();
 
+    NX_ASSERT(m_debugCounters.httpClientConnectionCount == 0);
     NX_ASSERT(m_debugCounters.tcpSocketCount == 0);
     NX_ASSERT(m_debugCounters.udpSocketCount == 0);
 }

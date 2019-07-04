@@ -66,6 +66,36 @@ public:
                     sourceDataChanges << DataChange({{dataRoleFilter}, toString(top), toString(bottom)});
             });
 
+        QObject::connect(testModel.data(), &QAbstractItemModel::rowsAboutToBeInserted,
+            [this](const QModelIndex& parent, int first, int last)
+            {
+                previousRowCount = testModel->rowCount();
+                ASSERT_FALSE(parent.isValid());
+                ASSERT_TRUE(last >= first);
+                ASSERT_TRUE(first >= 0 && first <= previousRowCount);
+            });
+
+        QObject::connect(testModel.data(), &QAbstractItemModel::rowsInserted,
+            [this](const QModelIndex& /*parent*/, int first, int last)
+            {
+                ASSERT_EQ(previousRowCount + (last - first + 1), testModel->rowCount());
+            });
+
+        QObject::connect(testModel.data(), &QAbstractItemModel::rowsAboutToBeRemoved,
+            [this](const QModelIndex& parent, int first, int last)
+            {
+                previousRowCount = testModel->rowCount();
+                ASSERT_FALSE(parent.isValid());
+                ASSERT_TRUE(last >= first);
+                ASSERT_TRUE(first >= 0 && last < previousRowCount);
+            });
+
+        QObject::connect(testModel.data(), &QAbstractItemModel::rowsRemoved,
+            [this](const QModelIndex& /*parent*/, int first, int last)
+            {
+                ASSERT_EQ(previousRowCount - (last - first + 1), testModel->rowCount());
+            });
+
         dataRoleFilter = -1;
         sourceDataChanges.clear();
         dataChanges.clear();
@@ -123,6 +153,8 @@ public:
     QList<DataChange> sourceDataChanges;
     QList<DataChange> dataChanges;
     int dataRoleFilter = -1;
+
+    int previousRowCount = 0;
 };
 
 TEST_F(LinearizationListModelTest, initialState)

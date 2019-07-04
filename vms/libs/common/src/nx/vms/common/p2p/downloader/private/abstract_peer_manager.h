@@ -7,6 +7,7 @@
 
 #include <nx/utils/uuid.h>
 #include <nx/utils/url.h>
+#include <nx/network/http/http_async_client.h>
 #include <api/server_rest_connection_fwd.h>
 
 #include <nx/vms/common/p2p/downloader/file_information.h>
@@ -34,12 +35,20 @@ public:
     virtual ~AbstractPeerManager() = default;
 
     template<typename T>
-    struct RequestContext
+    struct BaseRequestContext
     {
         using Result = std::optional<T>;
         using Future = std::future<Result>;
         Future future;
         std::function<void()> cancelFunction = {};
+
+        BaseRequestContext(Future future, std::function<void()> cancelFunction = {}) :
+            future(std::move(future)),
+            cancelFunction(cancelFunction)
+        {}
+
+        BaseRequestContext() = default;
+        virtual ~BaseRequestContext() {}
 
         void cancel() const
         {
@@ -52,6 +61,31 @@ public:
             return future.valid();
         }
     };
+
+    template<typename T>
+    struct InternetRequestContext : BaseRequestContext<T>
+    {
+        InternetRequestContext(
+            std::unique_ptr<network::http::AsyncClient> httpClient,
+            typename BaseRequestContext<T>::Future future,
+            std::function<void()> cancelFunction = {})
+            :
+            BaseRequestContext<T>(std::move(future), cancelFunction),
+            httpClient(std::move(httpClient))
+        {}
+
+        virtual ~InternetRequestContext()
+        {
+            if (httpClient)
+                httpClient->pleaseStopSync();
+        }
+
+        InternetRequestContext() = default;
+        std::unique_ptr<network::http::AsyncClient> httpClient;
+    };
+
+    template<typename T>
+    using RequestContextPtr = std::unique_ptr<BaseRequestContext<T>>;
 
     // All peer managers share promise between handler and canceller, and it is hard to guarantee
     // a certain call order. This function simplifies their code.
@@ -74,13 +108,13 @@ public:
     virtual QList<QnUuid> peers() const = 0;
     virtual int distanceTo(const QnUuid& peerId) const = 0;
 
-    virtual RequestContext<FileInformation> requestFileInfo(
+    virtual RequestContextPtr<FileInformation> requestFileInfo(
         const QnUuid& peer, const QString& fileName, const nx::utils::Url& url) = 0;
 
-    virtual RequestContext<QVector<QByteArray>> requestChecksums(
+    virtual RequestContextPtr<QVector<QByteArray>> requestChecksums(
         const QnUuid& peer, const QString& fileName) = 0;
 
-    virtual RequestContext<QByteArray> downloadChunk(
+    virtual RequestContextPtr<QByteArray> downloadChunk(
         const QnUuid& peerId,
         const QString& fileName,
         const nx::utils::Url& url,

@@ -14,20 +14,21 @@
 
 #include <rest/server/json_rest_result.h>
 #include <nx/utils/safe_direct_connection.h>
-#include <api/http_client_pool.h>
 #include <nx/vms/event/event_fwd.h>
 #include <core/resource/resource_fwd.h>
-#include <core/ptz/ptz_fwd.h>
 #include <common/common_module_aware.h>
-#include <api/model/time_reply.h>
 #include <analytics/db/abstract_storage.h>
+#include <api/http_client_pool.h>
 #include <api/model/analytics_actions.h>
-#include <api/model/wearable_prepare_data.h>
+#include <api/model/audit/audit_record.h>
 #include <api/model/manual_camera_seach_reply.h>
+#include <api/model/test_email_settings_reply.h>
+#include <api/model/time_reply.h>
+#include <api/model/wearable_prepare_data.h>
+
 #include <nx/update/update_information.h>
 
 #include <nx/vms/api/analytics/settings_response.h>
-#include <nx/vms/event/event_fwd.h>
 #include <nx/vms/api/data/time_reply.h>
 #include <nx/vms/api/data/event_rule_data.h>
 
@@ -511,16 +512,67 @@ public:
 
     Handle getPluginInformation(GetCallback callback, QThread* targetThread = nullptr);
 
+    Handle testEmailSettings(
+        const QnEmailSettings& settings,
+        Result<QnTestEmailSettingsReply>::type&& callback,
+        QThread* targetThread = nullptr);
+
+    Handle recordedTimePeriods(
+        const QnChunksRequestData& request,
+        Result<MultiServerPeriodDataList>::type&& callback,
+        QThread* targetThread = nullptr);
+
+    Handle getAuditLog(
+        qint64 startTimeMs,
+        qint64 endTimeMs,
+        Result<QnAuditRecordList>::type&& callback,
+        QThread* targetThread = nullptr);
+
+    /** Request the name of a system the mediaserver is currently connected to. */
+    Handle getSystemId(
+        Result<QString>::type&& callback,
+        QThread* targetThread = nullptr);
+
     Handle debug(
         const QString& action,
         const QString& value,
         PostCallback callback,
         QThread* targetThread = nullptr);
 
-    Handle ptzCommand(
+    /** Sends POST request with a response to be a JSON */
+    Handle postJsonResult(
+        const QString& action,
         const QnRequestParamList& params,
         const nx::Buffer& body,
         std::function<void(bool, Handle, const QnJsonRestResult& response)>&& callback,
+        QThread* targetThread = nullptr);
+
+    /** Sends POST request with a response to be an Ubjson. */
+    Handle postUbJsonResult(
+        const QString& action,
+        const QnRequestParamList& params,
+        const nx::Buffer& body,
+        std::function<void(bool, Handle, const QnUbjsonRestResult& response)>&& callback,
+        QThread* targetThread = nullptr);
+
+    /** Sends POST request with a response to be an EmptyResult. */
+    Handle postEmptyResult(
+        const QString& action,
+        const QnRequestParamList& params,
+        const nx::Buffer& body,
+        PostCallback&& callback,
+        QThread* targetThread = nullptr);
+
+    Handle getUbJsonResult(
+        const QString& action,
+        const QnRequestParamList& params,
+        std::function<void(bool, Handle, QnUbjsonRestResult response)>&& callback,
+        QThread* targetThread = nullptr);
+
+    Handle getRawResult(
+        const QString& action,
+        const QnRequestParamList& params,
+        std::function<void(bool, Handle, QByteArray, nx::network::http::HttpHeaders)> callback,
         QThread* targetThread = nullptr);
 
     /**
@@ -591,8 +643,6 @@ private:
     QnMediaServerResourcePtr getServerWithInternetAccess() const;
 
     void trace(int handle, const QString& message) const;
-    std::pair<QString, QString> getRequestCredentials(
-        const QnMediaServerResourcePtr& targetServer) const;
 
 private:
     QnUuid m_serverId;
@@ -624,12 +674,6 @@ private:
         const QnRequestParamList& params,
         const nx::network::http::StringType& contentType,
         const nx::network::http::StringType& messageBody,
-        Callback<ResultType> callback,
-        QThread* targetThread);
-
-    template <typename ResultType> Handle executePut(
-        const QString& path,
-        const QnRequestParamList& params,
         Callback<ResultType> callback,
         QThread* targetThread);
 

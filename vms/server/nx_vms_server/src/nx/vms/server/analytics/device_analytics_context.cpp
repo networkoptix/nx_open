@@ -12,6 +12,9 @@
 #include <nx/vms/server/analytics/debug_helpers.h>
 #include <nx/vms/server/analytics/event_rule_watcher.h>
 #include <nx/vms/server/sdk_support/utils.h>
+#include <nx/vms/server/interactive_settings/json_engine.h>
+
+#include <nx/sdk/helpers/to_string.h>
 
 #include <nx/utils/log/log.h>
 
@@ -22,6 +25,22 @@ using namespace nx::vms::server;
 static bool isAliveStatus(Qn::ResourceStatus status)
 {
     return status == Qn::ResourceStatus::Online || status == Qn::ResourceStatus::Recording;
+}
+
+static nx::sdk::Ptr<nx::sdk::IStringMap> mergeWithDbAndDefaultSettings(
+    const QnVirtualCameraResourcePtr& device,
+    const nx::vms::server::resource::AnalyticsEngineResourcePtr& engine,
+    const QVariantMap& settingsFromUser)
+{
+    const auto engineManifest = engine->manifest();
+    interactive_settings::JsonEngine jsonEngine;
+    jsonEngine.loadModelFromJsonObject(engineManifest.deviceAgentSettingsModel);
+
+    const auto settingsFromProperty = device->deviceAgentSettingsValues(engine->getId());
+    jsonEngine.applyValues(settingsFromProperty);
+    jsonEngine.applyValues(settingsFromUser);
+
+    return sdk_support::toIStringMap(jsonEngine.values());
 }
 
 DeviceAnalyticsContext::DeviceAnalyticsContext(
@@ -74,7 +93,11 @@ void DeviceAnalyticsContext::setEnabledAnalyticsEngines(
         m_bindings.emplace(engine->getId(), binding);
 
         if (deviceIsAlive)
-            binding->startAnalytics(m_device->deviceAgentSettingsValues(engine->getId()));
+        {
+            const auto engineId = engine->getId();
+            binding->startAnalytics(
+                prepareSettings(engineId, m_device->deviceAgentSettingsValues(engineId)));
+        }
     }
 
     updateSupportedFrameTypes();
@@ -107,27 +130,113 @@ void DeviceAnalyticsContext::setMetadataSink(QWeakPointer<QnAbstractDataReceptor
 void DeviceAnalyticsContext::setSettings(const QString& engineId, const QVariantMap& settings)
 {
     std::shared_ptr<DeviceAnalyticsBinding> binding;
+    QnUuid analyticsEngineId(engineId);
+
     {
         QnMutexLocker lock(&m_mutex);
-        binding = analyticsBinding(QnUuid(engineId));
+        binding = analyticsBinding(analyticsEngineId);
     }
+
+    const auto effectiveSettings = prepareSettings(analyticsEngineId, settings);
+    m_device->setDeviceAgentSettingsValues(
+        analyticsEngineId,
+        sdk_support::fromIStringMap(effectiveSettings.get()));
 
     if (!binding)
         return;
 
-    binding->setSettings(settings);
+    binding->setSettings(effectiveSettings);
+}
+
+nx::sdk::Ptr<nx::sdk::IStringMap> DeviceAnalyticsContext::prepareSettings(
+    const QnUuid& engineId,
+    const QVariantMap& settings)
+{
+    using namespace nx::sdk;
+    const auto engine = serverModule()
+        ->resourcePool()
+        ->getResourceById<nx::vms::server::resource::AnalyticsEngineResource>(engineId);
+
+    if (!engine)
+    {
+        NX_WARNING(this,
+            "Unable to access an Engine with; id %1 while preparing settings", engineId);
+        return nullptr;
+    }
+
+    Ptr<IStringMap> effectiveSettings;
+    if (pluginsIni().analyticsSettingsSubstitutePath[0] != '\0')
+    {
+        NX_WARNING(this, "Trying to load settings for the DeviceAgent from the file. "
+            "Device: %1 (%2), Engine: %3 (%4)",
+            m_device->getUserDefinedName(),
+            m_device->getId(),
+            engine->getName(),
+            engine->getId());
+
+        effectiveSettings = debug_helpers::loadDeviceAgentSettingsFromFile(
+            m_device, engine, pluginsIni().analyticsSettingsSubstitutePath);
+    }
+
+    if (!effectiveSettings)
+        effectiveSettings = mergeWithDbAndDefaultSettings(m_device, engine, settings);
+
+    if (!NX_ASSERT(effectiveSettings, "Device: %1 (%2), Engine: %3 (%4)",
+        m_device->getUserDefinedName(), m_device->getId(),
+        engine->getName(), engine->getId()))
+    {
+        return nullptr;
+    }
+
+    if (pluginsIni().analyticsSettingsOutputPath[0] != '\0')
+    {
+        debug_helpers::dumpStringToFile(
+            this,
+            QString::fromStdString(toJsonString(effectiveSettings.get())),
+            pluginsIni().analyticsSettingsOutputPath,
+            debug_helpers::nameOfFileToDumpOrLoadData(
+                m_device,
+                engine,
+                nx::vms::server::resource::AnalyticsPluginResourcePtr(),
+                "_effective_settings.json"));
+    }
+
+    return effectiveSettings;
 }
 
 QVariantMap DeviceAnalyticsContext::getSettings(const QString& engineId) const
 {
     std::shared_ptr<DeviceAnalyticsBinding> binding;
+    QnUuid analyticsEngineId(engineId);
     {
         QnMutexLocker lock(&m_mutex);
-        binding = analyticsBinding(QnUuid(engineId));
+        binding = analyticsBinding(analyticsEngineId);
     }
 
     if (!binding)
-        return QVariantMap();
+    {
+        NX_DEBUG(this, "No device analytics binding for device %1 and engine %2",
+            m_device, engineId);
+
+        const auto engine = serverModule()
+            ->resourcePool()
+            ->getResourceById<resource::AnalyticsEngineResource>(analyticsEngineId);
+
+        if (!engine)
+        {
+            NX_WARNING(this,
+                "Unable to access engine %1 while gettings DeviceAgent settings",
+                analyticsEngineId);
+
+            return QVariantMap();
+        }
+
+        interactive_settings::JsonEngine jsonEngine;
+        jsonEngine.loadModelFromJsonObject(engine->manifest().deviceAgentSettingsModel);
+        jsonEngine.applyValues(m_device->deviceAgentSettingsValues(analyticsEngineId));
+
+        return jsonEngine.values();
+    }
 
     return binding->getSettings();
 }
@@ -253,9 +362,14 @@ void DeviceAnalyticsContext::at_deviceUpdated(const QnResourcePtr& resource)
         auto engineId = entry.first;
         auto binding = entry.second;
         if (isAlive)
-            binding->restartAnalytics(m_device->deviceAgentSettingsValues(engineId));
+        {
+            binding->restartAnalytics(
+                prepareSettings(engineId, m_device->deviceAgentSettingsValues(engineId)));
+        }
         else
+        {
             binding->stopAnalytics();
+        }
 
         updateSupportedFrameTypes();
     }

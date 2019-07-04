@@ -177,7 +177,8 @@ public:
      */
     bool convertTo(const AVFrame* avFrame) const;
 
-    static void copy(const CLVideoDecoderOutput* src, CLVideoDecoderOutput* dst);
+    void copy(const CLVideoDecoderOutput* src);
+    void copyData(const AVFrame* src);
     static bool imagesAreEqual(const CLVideoDecoderOutput* img1, const CLVideoDecoderOutput* img2, unsigned int max_diff);
     static bool isPixelFormatSupported(AVPixelFormat format);
 
@@ -190,7 +191,6 @@ public:
     void reallocate(int newWidth, int newHeight, int newFormat, int lineSizeHint);
     void memZero();
 
-    void copyDataFrom(const AVFrame* frame);
     CLVideoDecoderOutput* rotated(int angle);
     /** Scale frame to new size */
     CLVideoDecoderOutput* scaled(const QSize& newSize, AVPixelFormat newFormat = AV_PIX_FMT_NONE) const;

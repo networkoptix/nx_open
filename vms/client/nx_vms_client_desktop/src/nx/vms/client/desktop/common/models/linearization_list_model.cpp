@@ -331,10 +331,10 @@ void LinearizationListModel::Private::sourceRowsAboutToBeInserted(
     NX_CRITICAL(!m_operationInProgress);
     const auto node = getNode(sourceParent);
 
-    if (!node || (node != m_rootNode && node->children.empty()))
+    if (!node || (node != m_rootNode && node->children.empty() /*might be not expanded*/))
         return;
 
-    if (!NX_ASSERT(first >= 0 && first <= node->children.size()))
+    if (!NX_ASSERT(first >= 0 && first <= node->children.size() && last >= first))
         return;
 
     m_operationInProgress = true;
@@ -371,14 +371,19 @@ void LinearizationListModel::Private::sourceRowsAboutToBeRemoved(
     const QModelIndex& sourceParent, int first, int last)
 {
     NX_CRITICAL(!m_operationInProgress);
-    const auto firstIndex = mapFromSource(m_sourceModel->index(first, 0, sourceParent));
-    const auto lastIndex = mapFromSource(m_sourceModel->index(last, 0, sourceParent));
 
-    if (!NX_ASSERT(firstIndex.isValid() == lastIndex.isValid()) || !firstIndex.isValid())
+    const auto node = getNode(sourceParent);
+    if (!node || (node != m_rootNode && node->children.empty()) /*might be not expanded*/)
         return;
 
+    if (!NX_ASSERT(first >= 0 && last >= first && last < node->children.size()))
+        return;
+
+    const int linearBegin = node->children[first]->row;
+    const int linearEnd = nextRow(node->children[last]);
+
     m_operationInProgress = true;
-    q->beginRemoveRows({}, firstIndex.row(), lastIndex.row());
+    q->beginRemoveRows({}, linearBegin, linearEnd - 1);
 }
 
 void LinearizationListModel::Private::sourceRowsRemoved(

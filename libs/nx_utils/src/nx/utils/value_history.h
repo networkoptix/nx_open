@@ -34,8 +34,6 @@ private:
     std::deque<TimedValue<Value>> m_values;
 };
 
-// -----------------------------------------------------------------------------------------------
-
 template<typename Id, typename Value>
 class TreeValueHistory
 {

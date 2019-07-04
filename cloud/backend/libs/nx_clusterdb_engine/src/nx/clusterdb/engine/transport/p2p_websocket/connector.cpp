@@ -69,8 +69,8 @@ void Connector::connect(Handler completionHandler)
         Qn::EC2_RUNTIME_GUID_HEADER_NAME, m_localPeer.instanceId.toByteArray());
 
     nx::network::websocket::addClientHeaders(
-        m_connectionUpgradeClient.get(),
-        nx::network::websocket::kWebsocketProtocolName);
+        m_connectionUpgradeClient.get(), nx::network::websocket::kWebsocketProtocolName,
+        nx::network::websocket::CompressionType::perMessageDeflate);
 
     auto url = m_remoteNodeUrl;
     QUrlQuery query;
@@ -145,7 +145,9 @@ void Connector::upgradeHttpConnectionToCommandTransportConnection()
 
     m_commandPipeline = std::make_unique<nx::p2p::P2PWebsocketTransport>(
         m_connectionUpgradeClient->takeSocket(),
-        nx::network::websocket::FrameType::binary);
+        nx::network::websocket::Role::client,
+        nx::network::websocket::FrameType::binary,
+        nx::network::websocket::CompressionType::perMessageDeflate);
     m_commandPipeline->bindToAioThread(getAioThread());
 
     m_connectionUpgradeClient.reset();

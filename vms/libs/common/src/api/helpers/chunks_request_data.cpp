@@ -4,6 +4,8 @@
 
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <common/common_module.h>
+#include <nx_ec/ec_api.h>
 
 #include <nx/fusion/model_functions.h>
 #include <nx/fusion/serialization/lexical.h>
@@ -145,6 +147,16 @@ QnRequestParamList QnChunksRequestData::toParams() const
     }
 
     return result;
+}
+
+void QnChunksRequestData::pickRequestVersion(QnCommonModule* commonModule)
+{
+    nx::utils::SoftwareVersion connectionVersion;
+    if (const auto& connection = commonModule->ec2Connection())
+        connectionVersion = connection->connectionInfo().version;
+
+    if (!connectionVersion.isNull() && connectionVersion < nx::utils::SoftwareVersion(3, 0))
+        requestVersion = QnChunksRequestData::RequestVersion::v2_6;
 }
 
 QUrlQuery QnChunksRequestData::toUrlQuery() const

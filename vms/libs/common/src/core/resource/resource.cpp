@@ -1,6 +1,5 @@
 #include "resource.h"
 #include "resource_consumer.h"
-#include "resource_property.h"
 
 #include <typeinfo>
 

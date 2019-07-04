@@ -66,6 +66,15 @@ rest::Response QnRestRequestHandler::executePut(const rest::Request& request)
     return result;
 }
 
+void QnRestRequestHandler::afterExecute(
+    const rest::Request& request, const rest::Response& response)
+{
+    afterExecute(
+        request.path(), request.params(),
+        response.content ? response.content->body : QByteArray(),
+        request.owner);
+}
+
 int QnRestRequestHandler::executeGet(
     const QString& /*path*/,
     const QnRequestParamList& /*params*/,

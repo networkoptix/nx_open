@@ -39,12 +39,14 @@ public:
 
     void updateServer(const QnMediaServerResourcePtr& server);
 
-private slots:
-    void at_timePeriodsReceived(int status, const MultiServerPeriodDataList &timePeriods, int requestHandle);
+private:
+    void at_timePeriodsReceived(bool success,
+        int requestHandle,
+        const MultiServerPeriodDataList &timePeriods);
 
 private:
     int sendRequest(qint64 startTimeMs, qint64 resolutionMs);
-    void handleDataLoaded(int status, const QnAbstractCameraDataPtr &data, int requestHandle);
+    void handleDataLoaded(bool success, int requestHandle, const QnAbstractCameraDataPtr &data);
 
     void trace(const QString& message);
 

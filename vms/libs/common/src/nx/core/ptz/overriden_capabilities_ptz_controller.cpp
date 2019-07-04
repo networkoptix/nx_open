@@ -14,7 +14,7 @@ OverridenCapabilitiesPtzController::OverridenCapabilitiesPtzController(
 }
 
 Ptz::Capabilities OverridenCapabilitiesPtzController::getCapabilities(
-    const Options& options) const
+    const Options& /*options*/) const
 {
     return m_overridenCapabilities;
 }

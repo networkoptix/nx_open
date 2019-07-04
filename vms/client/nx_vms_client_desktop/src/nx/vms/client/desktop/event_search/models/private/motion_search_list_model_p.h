@@ -64,8 +64,8 @@ private:
 
     rest::Handle getMotion(const QnTimePeriod& period, Qt::SortOrder order, int limit);
 
-    Q_SLOT void processReceivedTimePeriods(
-        int status, const MultiServerPeriodDataList& timePeriods, int requestId);
+    void processReceivedTimePeriods(bool success, int requestId,
+        const MultiServerPeriodDataList& timePeriods);
 
     void fetchLive();
 

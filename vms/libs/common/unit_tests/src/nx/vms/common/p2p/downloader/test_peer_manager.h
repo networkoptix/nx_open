@@ -88,15 +88,15 @@ public:
     virtual QList<QnUuid> peers() const override { return m_peerList; }
     virtual int distanceTo(const QnUuid&) const override;
 
-    virtual RequestContext<downloader::FileInformation> requestFileInfo(
+    virtual RequestContextPtr<downloader::FileInformation> requestFileInfo(
         const QnUuid& peer,
         const QString& fileName,
         const nx::utils::Url& url) override;
 
-    virtual RequestContext<QVector<QByteArray>> requestChecksums(
+    virtual RequestContextPtr<QVector<QByteArray>> requestChecksums(
         const QnUuid& peerId, const QString& fileName) override;
 
-    virtual RequestContext<QByteArray> downloadChunk(
+    virtual RequestContextPtr<QByteArray> downloadChunk(
         const QnUuid& peerId,
         const QString& fileName,
         const nx::utils::Url& url,
@@ -175,15 +175,15 @@ public:
     virtual QList<QnUuid> peers() const override { return m_peerList; }
     virtual int distanceTo(const QnUuid&) const override;
 
-    virtual RequestContext<FileInformation> requestFileInfo(
+    virtual RequestContextPtr<FileInformation> requestFileInfo(
         const QnUuid& peer,
         const QString& fileName,
         const nx::utils::Url& url) override;
 
-    virtual RequestContext<QVector<QByteArray>> requestChecksums(
+    virtual RequestContextPtr<QVector<QByteArray>> requestChecksums(
         const QnUuid& peer, const QString& fileName) override;
 
-    virtual RequestContext<QByteArray> downloadChunk(
+    virtual RequestContextPtr<QByteArray> downloadChunk(
         const QnUuid& peerId,
         const QString& fileName,
         const nx::utils::Url& url,

@@ -1,13 +1,20 @@
 #include "gzip_compressor.h"
 
 #include <nx/utils/crc32.h>
+#include <nx/utils/byte_stream/custom_output_stream.h>
+#include "gzip_uncompressor.h"
 
 namespace nx {
 namespace utils {
 namespace bstream {
 namespace gzip {
 
-QByteArray Compressor::compressData(const QByteArray& data)
+QByteArray Compressor::uncompressData(const QByteArray& data)
+{
+    return runBytesThroughFilter<Uncompressor>(data);
+}
+
+QByteArray Compressor::compressData(const QByteArray& data, bool addCrcAndSize)
 {
     QByteArray result;
 
@@ -25,15 +32,18 @@ QByteArray Compressor::compressData(const QByteArray& data)
     };
 
     QByteArray compressedData = qCompress(data);
-    QByteArray cleanData = QByteArray::fromRawData(compressedData.data() + QT_HEADER_SIZE + ZLIB_HEADER_SIZE, 
+    QByteArray cleanData = QByteArray::fromRawData(compressedData.data() + QT_HEADER_SIZE + ZLIB_HEADER_SIZE,
         compressedData.size() - (QT_HEADER_SIZE + ZLIB_HEADER_SIZE + ZLIB_SUFFIX_SIZE));
     result.reserve(cleanData.size() + GZIP_HEADER_SIZE);
     result.append((const char*) GZIP_HEADER, GZIP_HEADER_SIZE);
     result.append(cleanData);
-    quint32 tmp = crc32(data.data(), static_cast<std::size_t>(data.size()));
-    result.append((const char*) &tmp, sizeof(quint32));
-    tmp = (quint32)data.size();
-    result.append((const char*) &tmp, sizeof(quint32));
+    if (addCrcAndSize)
+    {
+        quint32 tmp = crc32(data.data(), static_cast<std::size_t>(data.size()));
+        result.append((const char*) &tmp, sizeof(quint32));
+        tmp = (quint32)data.size();
+        result.append((const char*) &tmp, sizeof(quint32));
+    }
     return result;
 }
 

@@ -31,6 +31,11 @@ add_subdirectory(custom_actions)
 nx_copy_bin_resources(${CMAKE_CURRENT_SOURCE_DIR}/resources ${CMAKE_CURRENT_BINARY_DIR})
 nx_configure_directory(${CMAKE_CURRENT_SOURCE_DIR}/resources.in ${CMAKE_CURRENT_BINARY_DIR})
 
+nx_generate_package_json(${client_update_files_directory}/package.json
+    COMPONENT client)
+nx_generate_package_json(${server_update_files_directory}/package.json
+    INSTALL_SCRIPT "install.bat")
+
 file(WRITE ${bin_source_dir}/launcher.version "${releaseVersion.full}")
 file(COPY "${CMAKE_SOURCE_DIR}/vms/libs/common/maven/bin-resources/resources/qt/etc/qt.conf"
     DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")

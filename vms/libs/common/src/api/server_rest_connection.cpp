@@ -4,9 +4,11 @@
 
 #include <QtCore/QElapsedTimer>
 
+#include <api/model/detach_from_cloud_data.h>
 #include <api/model/password_data.h>
 #include <api/model/cloud_credentials_data.h>
 #include <api/model/update_information_reply.h>
+
 #include <api/app_server_connection.h>
 #include <api/helpers/empty_request_data.h>
 #include <api/helpers/chunks_request_data.h>
@@ -14,6 +16,7 @@
 #include <api/helpers/send_statistics_request_data.h>
 #include <api/helpers/event_log_request_data.h>
 #include <api/helpers/event_log_multiserver_request_data.h>
+
 #include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
@@ -25,18 +28,20 @@
 
 #include <nx/api/mediaserver/image_request.h>
 #include <nx/fusion/model_functions.h>
+#include <nx/fusion/serialization/compressed_time_functions.h>
 #include <nx/network/http/custom_headers.h>
 #include <nx/network/http/http_types.h>
 #include <nx/utils/random.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/api/data_fwd.h>
+#include <nx/vms/api/data/email_settings_data.h>
+#include <nx/vms/api/data/peer_data.h>
 #include <nx/vms/event/rule_manager.h>
 #include <nx/vms/event/rule.h>
-#include <api/model/detach_from_cloud_data.h>
-
+#include <nx_ec/data/api_conversion_functions.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 #include <nx/vms/common/resource/analytics_plugin_resource.h>
-#include <nx/vms/api/data/peer_data.h>
+
 #include <common/static_common_module.h>
 
 using namespace nx;
@@ -824,7 +829,7 @@ Handle ServerConnection::updateActionStart(
             bool success, rest::Handle handle, EmptyResponseType /*response*/)
         {
             if (callback)
-                callback(handle, success);
+                callback(success, handle);
         };
     const auto contentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
     auto request = QJson::serialized(info);
@@ -862,7 +867,7 @@ Handle ServerConnection::updateActionStop(
             bool success, rest::Handle handle, EmptyResponseType /*response*/)
         {
             if (callback)
-                callback(handle, success);
+                callback(success, handle);
         };
     const auto contentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
     return executePost<EmptyResponseType>("/ec2/cancelUpdate",
@@ -879,7 +884,7 @@ Handle ServerConnection::updateActionFinish(bool skipActivePeers,
             bool success, rest::Handle handle, EmptyResponseType /*response*/)
         {
             if (callback)
-                callback(handle, success);
+                callback(success, handle);
         };
 
     const auto contentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
@@ -903,7 +908,7 @@ Handle ServerConnection::updateActionInstall(const QSet<QnUuid>& participants,
             bool success, rest::Handle handle, EmptyResponseType /*response*/)
         {
             if (callback)
-                callback(handle, success);
+                callback(success, handle);
         };
     const auto contentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
     QString peerList;
@@ -1031,15 +1036,63 @@ Handle ServerConnection::setDeviceAnalyticsSettings(
         targetThread);
 }
 
-Handle ServerConnection::ptzCommand(
+Handle ServerConnection::postJsonResult(
+    const QString& action,
     const QnRequestParamList& params,
     const nx::Buffer& body,
     std::function<void(bool, Handle, const QnJsonRestResult& response)>&& callback,
     QThread* targetThread)
 {
-    // [](bool, Handle, const QByteArray& response) {}
     const auto contentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
-    return executePost<QnJsonRestResult>("/api/ptz",
+    return executePost<QnJsonRestResult>(action,
+        params,
+        contentType, body,
+        callback,
+        targetThread);
+}
+
+Handle ServerConnection::postEmptyResult(
+    const QString& action,
+    const QnRequestParamList& params,
+    const nx::Buffer& body,
+    PostCallback&& callback,
+    QThread* targetThread)
+{
+    const auto contentType = Qn::serializationFormatToHttpContentType(Qn::UbjsonFormat);
+    return executePost<EmptyResponseType>(action,
+        params,
+        contentType, body,
+        callback,
+        targetThread);
+}
+
+Handle ServerConnection::getUbJsonResult(
+    const QString& path,
+    const QnRequestParamList& params,
+    std::function<void(bool, Handle, QnUbjsonRestResult response)>&& callback,
+    QThread* targetThread)
+{
+    return executeGet(path, params, callback, targetThread);
+}
+
+Handle ServerConnection::getRawResult(
+    const QString& path,
+    const QnRequestParamList& params,
+    std::function<void(bool, Handle, QByteArray, nx::network::http::HttpHeaders)> callback,
+    QThread* targetThread)
+{
+    return executeGet(path, params, callback, targetThread);
+}
+
+Handle ServerConnection::postUbJsonResult(
+    const QString& action,
+    const QnRequestParamList& params,
+    const nx::Buffer& body,
+    std::function<void(bool, Handle, const QnUbjsonRestResult& response)>&& callback,
+    QThread* targetThread)
+{
+    const auto contentType = Qn::serializationFormatToHttpContentType(Qn::UbjsonFormat);
+    return executePost<QnUbjsonRestResult>(action,
         params,
         contentType, body,
         callback,
@@ -1049,6 +1102,71 @@ Handle ServerConnection::ptzCommand(
 Handle ServerConnection::getPluginInformation(GetCallback callback, QThread* targetThread)
 {
     return executeGet("/api/pluginInfo", {}, callback, targetThread);
+}
+
+Handle ServerConnection::testEmailSettings(
+      const QnEmailSettings& settings,
+      Result<QnTestEmailSettingsReply>::type&& callback,
+      QThread* targetThread)
+{
+    nx::vms::api::EmailSettingsData data;
+    ec2::fromResourceToApi(settings, data);
+    const auto contentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
+    auto body = QJson::serialized(data);
+    return executePost("/api/testEmailSettings", {}, contentType, body, callback, targetThread);
+}
+
+Handle ServerConnection::getAuditLog(
+    qint64 startTimeMs,
+    qint64 endTimeMs,
+    Result<QnAuditRecordList>::type&& callback,
+    QThread* targetThread)
+{
+    QnRequestParamList params;
+    params.insert("from", startTimeMs * 1000ll);
+    params.insert("to", endTimeMs * 1000ll);
+    params.insert("format", "ubjson");
+
+    return executeGet("/api/auditLog", params, callback, targetThread);
+}
+
+Handle ServerConnection::getSystemId(
+    Result<QString>::type&& callback,
+    QThread* targetThread)
+{
+    auto internalCallback =
+        [callback=std::move(callback)](
+            bool success, Handle requestId, QByteArray result,
+            const nx::network::http::HttpHeaders& /*headers*/)
+        {
+            callback(success, requestId, QString::fromUtf8(result));
+        };
+    return executeGet("/api/getSystemId", {}, internalCallback, targetThread);
+}
+
+Handle ServerConnection::recordedTimePeriods(
+    const QnChunksRequestData& request,
+    Result<MultiServerPeriodDataList>::type&& callback,
+    QThread* targetThread)
+{
+    QnChunksRequestData fixedFormatRequest(request);
+    fixedFormatRequest.format = Qn::CompressedPeriodsFormat;
+    auto internalCallback =
+        [callback=std::move(callback)](
+            bool success, Handle requestId, QByteArray result,
+            const nx::network::http::HttpHeaders& /*headers*/)
+        {
+            if (success)
+            {
+                bool goodData = false;
+                auto chunks = QnCompressedTime::deserialized<MultiServerPeriodDataList>(
+                    result, {}, &goodData);
+                callback(goodData, requestId, chunks);
+            }
+            callback(false, requestId, {});
+        };
+    return executeGet("/ec2/recordedTimePeriods", fixedFormatRequest.toParams(), internalCallback,
+        targetThread);
 }
 
 Handle ServerConnection::debug(
@@ -1119,29 +1237,6 @@ T parseMessageBody(
     return T();
 }
 
-/** Response deserialization for pure QJsonObject. */
-template<>
-QJsonValue parseMessageBody<QJsonValue>(
-    const Qn::SerializationFormat& format,
-    const nx::network::http::BufferType& msgBody,
-    bool* success)
-{
-    QJsonValue result;
-    switch (format)
-    {
-        case Qn::JsonFormat:
-            if (QJsonDetail::deserialize_json(msgBody, &result) && success)
-                *success = true;
-            return result;
-        default:
-            if (success)
-                *success = false;
-            NX_ASSERT(0, "Unsupported data format");
-            break;
-    }
-    return QJsonObject();
-}
-
 template<typename CallbackType>
 Handle ServerConnection::executeGet(
     const QString& path,
@@ -1188,19 +1283,6 @@ Handle ServerConnection::executePost(
 
     trace(handle, path);
     return handle;
-}
-
-template <typename ResultType>
-Handle ServerConnection::executePut(
-    const QString& path,
-    const QnRequestParamList& params,
-    Callback<ResultType> callback,
-    QThread* targetThread)
-{
-    return executePut(
-        path, {},
-        nx::network::http::header::ContentType::kJson, QJson::serialized(params.toJson()),
-        std::move(callback), targetThread);
 }
 
 template <typename ResultType>
@@ -1344,6 +1426,9 @@ Handle ServerConnection::executeRequest(
     return sendRequest(request);
 }
 
+// This is a specialization for request with QByteArray in response. Its callback is a bit different
+// from regular Result<SomeType>::type. Result<QByteArray>::type has 4 arguments:
+// `(bool success, Handle requestId, QByteArray result, nx::network::http::HttpHeaders& headers)`
 Handle ServerConnection::executeRequest(
     const nx::network::http::ClientPool::Request& request,
     Result<QByteArray>::type callback,
@@ -1444,14 +1529,15 @@ QnUuid ServerConnection::getServerId() const
     return m_serverId;
 }
 
-std::pair<QString, QString> ServerConnection::getRequestCredentials(
-    const QnMediaServerResourcePtr& targetServer) const
+std::pair<QString, QString> getRequestCredentials(
+    std::shared_ptr<ec2::AbstractECConnection> connection,
+    const QnMediaServerResourcePtr& targetServer)
 {
     using namespace nx::vms::api;
     const auto localPeerType = qnStaticCommon->localPeerType();
     if (PeerData::isClient(localPeerType))
     {
-        const auto ecUrl = commonModule()->ec2Connection()->connectionInfo().ecUrl;
+        const auto ecUrl = connection->connectionInfo().ecUrl;
         return std::make_pair(ecUrl.userName(), ecUrl.password());
     }
 
@@ -1489,7 +1575,7 @@ nx::network::http::ClientPool::Request ServerConnection::prepareRequest(
     request.contentType = contentType;
     request.messageBody = messageBody;
 
-    const auto [user, password] =  getRequestCredentials(server);
+    const auto [user, password] =  getRequestCredentials(connection, server);
 
     auto videoWallGuid = commonModule()->videowallGuid();
     if (!videoWallGuid.isNull())

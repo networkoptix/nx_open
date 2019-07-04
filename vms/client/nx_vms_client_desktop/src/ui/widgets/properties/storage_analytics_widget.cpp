@@ -52,17 +52,11 @@ using std::chrono::seconds;
 using std::chrono::minutes;
 using std::chrono::hours;
 
-auto days(int count)
-{
-    return hours(count * 24);
-}
-
 const qint64 kDefaultBitrateAveragingPeriod = milliseconds(5min).count();
 
 // TODO: #GDM #vkutin #common Refactor all this to use HumanReadable helper class
 const qint64 kBytesInGB = 1024ll * 1024 * 1024;
 const qint64 kBytesInTB = 1024ll * kBytesInGB;
-const qint64 kFinalStepSeconds = 1000000000ll * 10;
 
 const int kTableRowHeight = 24;
 const int kMinimumColumnWidth = 110;

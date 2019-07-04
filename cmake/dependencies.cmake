@@ -77,12 +77,14 @@ function(copy_system_libraries)
     nx_store_known_files(${files})
 endfunction()
 
+macro(load_generated_dependencies_file)
+    include(${cmake_include_file})
+endmacro()
+
 macro(load_dependencies)
     if(WIN32)
         set(nxKitLibraryType "SHARED" CACHE STRING "" FORCE)
     endif()
-
-    include(${cmake_include_file})
 
     foreach(package_dir ${synched_package_dirs})
         if(EXISTS ${package_dir}/.nocopy)
