@@ -356,16 +356,16 @@ QRect QnMetaDataV1::rectFromNormalizedRect(const QRectF& rectF)
 {
     const qreal kEpsilon = 0.01;
 
-    const auto x1 = rectF.left() * Qn::kMotionGridWidth;
-    const auto y1 = rectF.top() * Qn::kMotionGridHeight;
-    const auto x2 = rectF.right() * Qn::kMotionGridWidth;
-    const auto y2 = rectF.bottom() * Qn::kMotionGridHeight;
+    const qreal x1 = rectF.left() * Qn::kMotionGridWidth;
+    const qreal y1 = rectF.top() * Qn::kMotionGridHeight;
+    const qreal x2 = rectF.right() * Qn::kMotionGridWidth;
+    const qreal y2 = rectF.bottom() * Qn::kMotionGridHeight;
 
     const int x = x1 + kEpsilon;
     const int y = y1 + kEpsilon;
 
-    auto result = QRect(x, y, x2 - x + (1.0 - kEpsilon), y2 - y + (1.0 - kEpsilon));
-    return result.intersected(QRect(0,0, Qn::kMotionGridWidth, Qn::kMotionGridHeight));
+    const auto result = QRect(x, y, x2 - x + (1.0 - kEpsilon), y2 - y + (1.0 - kEpsilon));
+    return result.intersected(QRect(0, 0, Qn::kMotionGridWidth, Qn::kMotionGridHeight));
 }
 
 void QnMetaDataV1::addMotion(const QRectF& rectF)
@@ -375,14 +375,14 @@ void QnMetaDataV1::addMotion(const QRectF& rectF)
 
 void QnMetaDataV1::addMotion(const QRect& rect)
 {
-    const quint32 maskL = quint32(-1) >> rect.top();
-    const quint32 maskR = quint32(-1) << (31 - rect.bottom());
+    const quint32 maskL = (quint32) (-1) >> rect.top();
+    const quint32 maskR = (quint32) (-1) << (31 - rect.bottom());
     const quint32 mask = qToBigEndian(maskL & maskR);
-    const quint64 mask64 = (quint64(mask) << 32) + mask;
+    const quint64 mask64 = ((quint64) mask << 32) + mask;
 
-    quint32* data = ((quint32*)m_data.data()) + rect.left();
-    const quint32* dataEnd = data + rect.width();
-    const quint64* dataEnd64 = (quint64*) (std::uintptr_t(dataEnd) & ~std::uintptr_t(7));
+    quint32* data = (quint32*) m_data.data() + rect.left();
+    const quint32* const dataEnd = data + rect.width();
+    const quint64* const dataEnd64 = (quint64*) (std::uintptr_t(dataEnd) & ~std::uintptr_t(7));
     if (std::uintptr_t(data) % 8 != 0)
         *data++ |= mask;
     quint64* data64 = (quint64*) data;
