@@ -78,7 +78,7 @@ protected:
         const api::metrics::ParameterGroupManifest& manifest,
         const QString& id, const QString& name, size_t groupSize = 0)
     {
-        EXPECT_EQ("XX", manifest.id);
+        EXPECT_EQ(id, manifest.id);
         EXPECT_EQ(name, manifest.name);
         EXPECT_EQ(groupSize, manifest.group.size());
     }
