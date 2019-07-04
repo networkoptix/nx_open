@@ -12,7 +12,7 @@ namespace sdk {
 /**
  * Smart pointer to objects that implement IRefCountable.
  *
- * Supports dynamic-cast, and is assignment-compatible with smart pointers to derived classes.
+ * Is assignment-compatible with smart pointers to derived classes.
  */
 template<class RefCountable>
 class Ptr final
