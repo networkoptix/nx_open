@@ -58,7 +58,7 @@ buildDistribution()
             KEYCHAIN_ARGS="--keychain $KEYCHAIN"
         fi
 
-        codesign -f -v --deep $KEYCHAIN_ARGS -s "$MAC_SIGN_IDENTITY" "$APP_DIR"
+        codesign -f -v --options runtime --deep $KEYCHAIN_ARGS -s "$MAC_SIGN_IDENTITY" "$APP_DIR"
     fi
  
     test -f $DISTRIBUTION_DMG && rm $DISTRIBUTION_DMG
