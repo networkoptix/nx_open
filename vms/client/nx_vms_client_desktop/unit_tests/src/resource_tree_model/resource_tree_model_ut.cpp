@@ -17,7 +17,10 @@ class ResourceTreeModelTest: public testing::Test
 protected:
     virtual void SetUp()
     {
-        m_clientModule.reset(new QnClientModule(QnStartupParameters(), nullptr));
+        QnStartupParameters startupParameters;
+        startupParameters.skipMediaFolderScan = true;
+
+        m_clientModule.reset(new QnClientModule(startupParameters, nullptr));
         m_accessController.reset(new QnWorkbenchAccessController(commonModule()));
         m_resourceTreeModel.reset(new QnResourceTreeModel(QnResourceTreeModel::FullScope,
             QnUserResourcePtr(), m_accessController.get(), nullptr, commonModule()));
