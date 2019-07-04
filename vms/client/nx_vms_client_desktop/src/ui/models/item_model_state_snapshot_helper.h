@@ -7,7 +7,7 @@ class QAbstractItemModel;
 
 namespace nx::vms::client::desktop {
 
-class ItemModelStateSnapshotHelper
+class NX_VMS_CLIENT_DESKTOP_API ItemModelStateSnapshotHelper
 {
 public:
     static QJsonDocument makeSnapshot(
