@@ -8741,6 +8741,14 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
       <source>Some servers have no package available</source>
       <translation type="unfinished">Some servers have no package available</translation>
     </message>
+    <message>
+      <source>Failed to cancel update</source>
+      <translation type="unfinished">Failed to cancel update</translation>
+    </message>
+    <message>
+      <source>Failed to start installation</source>
+      <translation type="unfinished">Failed to start installation</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::MultipleLayoutSelectionDialog</name>
@@ -8892,10 +8900,6 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
       <translation>Dahili indirme hatası.</translation>
     </message>
     <message>
-      <source>Iternal server error.</source>
-      <translation>Yerel sunucu hatası.</translation>
-    </message>
-    <message>
       <source>Internal client error.</source>
       <translation>İç sunucu hatası.</translation>
     </message>
@@ -8914,6 +8918,14 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     <message>
       <source>Update package is not found.</source>
       <translation type="unfinished">Update package is not found.</translation>
+    </message>
+    <message>
+      <source>There is not enough space to install update.</source>
+      <translation type="unfinished">There is not enough space to install update.</translation>
+    </message>
+    <message>
+      <source>Internal server error.</source>
+      <translation type="unfinished">Internal server error.</translation>
     </message>
   </context>
   <context>
@@ -9154,6 +9166,17 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     <message>
       <source>Waiting for server to respond...</source>
       <translation>Sunucunun yanıt vermesi bekleniyor...</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ServerUpdateTool</name>
+    <message>
+      <source>No connection to the server.</source>
+      <translation type="unfinished">No connection to the server.</translation>
+    </message>
+    <message>
+      <source>Network error.</source>
+      <translation type="unfinished">Network error.</translation>
     </message>
   </context>
   <context>

@@ -3,6 +3,7 @@
 #include <nx/vms/api/rules/rule.h>
 
 #include "event_connector.h"
+#include "action_executor.h"
 
 #include "event_filter.h"
 #include "action_builder.h"
@@ -23,6 +24,53 @@ bool Engine::addEventConnector(EventConnector *eventConnector)
 
     connect(eventConnector, &EventConnector::event, this, &Engine::processEvent);
     m_connectors.push_back(eventConnector);
+    return true;
+}
+
+bool Engine::addActionExecutor(const QString& actionType, ActionExecutor* actionExecutor)
+{
+    if (m_executors.contains(actionType))
+        return false; // TODO: #spanasenko Verbose output?
+
+    m_executors[actionType] = actionExecutor;
+    return true;
+}
+
+bool Engine::addRule(const api::Rule& serialized)
+{
+    if (auto rule = buildRule(serialized))
+    {
+        m_rules[serialized.id] = rule;
+        return true;
+    }
+
+    return false;
+}
+
+bool Engine::registerActionType(const QString& type, const ActionConstructor& ctor)
+{
+    if (m_actionTypes.contains(type))
+        return false; // TODO: #spanasenko Verbose output?
+
+    m_actionTypes[type] = ctor;
+    return true;
+}
+
+bool Engine::registerEventField(const QString& type, const EventFieldConstructor& ctor)
+{
+    if (m_eventFields.contains(type))
+        return false;
+
+    m_eventFields[type] = ctor;
+    return true;
+}
+
+bool Engine::registerActionField(const QString& type, const ActionFieldConstructor& ctor)
+{
+    if (m_actionFields.contains(type))
+        return false;
+
+    m_actionFields[type] = ctor;
     return true;
 }
 
@@ -75,6 +123,7 @@ Rule* Engine::buildRule(const api::Rule& serialized) const
             return nullptr;
 
         rule->addActionBuilder(builder);
+        connect(builder, &ActionBuilder::action, this, &Engine::processAction); // TODO: Move out.
     }
 
     rule->setComment(serialized.comment);
@@ -86,7 +135,7 @@ Rule* Engine::buildRule(const api::Rule& serialized) const
 
 EventFilter* Engine::buildEventFilter(const api::EventFilter& serialized) const
 {
-    QScopedPointer<EventFilter> filter(new EventFilter(serialized.id));
+    QScopedPointer<EventFilter> filter(new EventFilter(serialized.id, serialized.eventType));
 
     for (const auto& block: serialized.fieldBlocks)
     {
@@ -96,7 +145,7 @@ EventFilter* Engine::buildEventFilter(const api::EventFilter& serialized) const
             if (!field)
                 return nullptr;
 
-            // builder->addField(field); // XXX
+            filter->addField(fieldInfo.name, field);
         }
     }
 
@@ -105,7 +154,11 @@ EventFilter* Engine::buildEventFilter(const api::EventFilter& serialized) const
 
 ActionBuilder* Engine::buildActionBuilder(const api::ActionBuilder& serialized) const
 {
-    QScopedPointer<ActionBuilder> builder(new ActionBuilder(serialized.id));
+    ActionConstructor ctor = m_actionTypes.value(serialized.actionType);
+    if (!ctor)
+        return nullptr;
+
+    QScopedPointer<ActionBuilder> builder(new ActionBuilder(serialized.id, ctor));
 
     for (const auto& block: serialized.fieldBlocks)
     {
@@ -115,7 +168,7 @@ ActionBuilder* Engine::buildActionBuilder(const api::ActionBuilder& serialized) 
             if (!field)
                 return nullptr;
 
-            // builder->addField(field); // XXX
+            builder->addField(fieldInfo.name, field);
         }
     }
 
@@ -131,7 +184,7 @@ EventField* Engine::buildEventField(const api::Field& serialized) const
     if (!ctor)
         return nullptr; // TODO: #spanasenko Default field type
 
-    EventField* field = ctor(serialized.id, serialized.name);
+    EventField* field = ctor();
     if (!field)
         return nullptr; // Should be unreachable.
 
@@ -140,7 +193,7 @@ EventField* Engine::buildEventField(const api::Field& serialized) const
         const auto& propName = it.key();
         const auto& propValue = it.value();
         // TODO: #spanasenko Check manifested names.
-        field->setProperty(propName.toLatin1().data(), propValue);
+        field->setProperty(propName.toUtf8().data(), propValue);
     }
 
     return field;
@@ -153,7 +206,7 @@ ActionField* Engine::buildActionField(const api::Field& serialized) const
     if (!ctor)
         return nullptr; // TODO: #spanasenko Default field type
 
-    ActionField* field = ctor(serialized.id, serialized.name);
+    ActionField* field = ctor();
     if (!field)
         return nullptr; // Should be unreachable.
 
@@ -162,16 +215,49 @@ ActionField* Engine::buildActionField(const api::Field& serialized) const
         const auto& propName = it.key();
         const auto& propValue = it.value();
         // TODO: #spanasenko Check manifested names.
-        field->setProperty(propName.toLatin1().data(), propValue);
+        field->setProperty(propName.toUtf8().data(), propValue);
     }
 
     return field;
 }
 
-void Engine::processEvent(const EventPtr &event)
+void Engine::processEvent(const EventPtr& event)
 {
-    qDebug() << "Processing " << event->type();
+    qDebug() << "Processing Event " << event->type();
     qDebug() << event->property("action").toString();
+
+    // TODO: #spanasenko Add filters-by-type maps?
+    for (const auto rule: m_rules)
+    {
+        bool matched = false;
+        for (const auto filter: rule->eventFilters())
+        {
+            if (filter->eventType() == event->type())
+            {
+                if (filter->match(event))
+                {
+                    matched = true;
+                    break;
+                }
+            }
+        }
+
+        if (matched)
+        {
+            for (const auto builder: rule->actionBuilders())
+            {
+                builder->process(event);
+            }
+        }
+    }
+}
+
+void Engine::processAction(const ActionPtr& action)
+{
+    qDebug() << "Processing Action " << action->type();
+
+    if (auto executor = m_executors.value(action->type()))
+        executor->execute(action);
 }
 
 } // namespace nx::vms::rules

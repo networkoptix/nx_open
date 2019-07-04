@@ -21,6 +21,9 @@ class EventField;
 class ActionField;
 
 class EventConnector;
+class ActionExecutor;
+
+class BasicAction;
 
 class ActionBuilder;
 class EventFilter;
@@ -38,6 +41,9 @@ public:
     Engine();
 
     bool addEventConnector(EventConnector* eventConnector);
+    bool addActionExecutor(const QString& actionType, ActionExecutor* actionExecutor);
+
+    bool addRule(const api::Rule& serialized);
 
     //template<class T>
     //inline bool registerEventField()
@@ -46,8 +52,14 @@ public:
     //}
 
 public:
-    using EventFieldConstructor = std::function<EventField*(const QnUuid&, const QString&)>;
-    using ActionFieldConstructor = std::function<ActionField*(const QnUuid&, const QString&)>;
+    using EventFieldConstructor = std::function<EventField*()>;
+    using ActionFieldConstructor = std::function<ActionField*()>;
+    using ActionConstructor = std::function<BasicAction*()>;
+
+    bool registerActionType(const QString& type, const ActionConstructor& ctor);
+
+    bool registerEventField(const QString& type, const EventFieldConstructor& ctor);
+    bool registerActionField(const QString& type, const ActionFieldConstructor& ctor);
 
 private: //< ?
     bool registerEventField(
@@ -77,16 +89,19 @@ private:
     ActionField* buildActionField(const api::Field& serialized) const;
 
 private:
-    void processEvent(const EventPtr &event);
+    void processEvent(const EventPtr& event);
+    void processAction(const ActionPtr& action);
 
 private:
     QList<EventConnector*> m_connectors;
-    QList<EventConnector*> m_executors;
+    QHash<QString, ActionExecutor*> m_executors;
 
     QHash<QString, EventFieldConstructor> m_eventFields;
     QHash<QString, ActionFieldConstructor> m_actionFields;
 
-    QHash<QnUuid, void*> m_rules;
+    QHash<QString, ActionConstructor> m_actionTypes;
+
+    QHash<QnUuid, Rule*> m_rules;
 };
 
 } // namespace nx::vms::rules

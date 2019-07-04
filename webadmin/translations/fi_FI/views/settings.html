@@ -108,9 +108,9 @@
                                 <a ng-if="!mode.liteClient"
                                    ng-href="{{Config.cloud.portalUrl}}"
                                    target="_blank"> Lisätietoja </a></uib-alert>
-                            <uib-alert type="error" ng-if="!hasInternetOnServer">Yhdistä palvelin Internetiin suorittaaksesi asetuksia {{Config.cloud.productName}}</uib-alert>
-                            <uib-alert type="error" ng-if="hasInternetOnServer && !hasInternetOnClient">Internet-yhteys tarvitaan järjestelmän liittämiseen {{Config.cloud.productName}}</uib-alert>
-                            <p ng-if="canConnectToCloud"  ><button
+                            <uib-alert type="danger" ng-if="!hasInternetOnServer">Yhdistä palvelin Internetiin suorittaaksesi asetuksia {{Config.cloud.productName}}</uib-alert>
+                            <uib-alert type="danger" ng-if="hasInternetOnServer && !hasInternetOnClient">Internet-yhteys tarvitaan järjestelmän liittämiseen {{Config.cloud.productName}}</uib-alert>
+                            <p ng-if="canConnectToCloud"><button
                                     class="btn btn-default"
                                     ng-click="connectToCloud()" ng-disabled="!hasInternetOnServer || !hasInternetOnClient"> Yhdistä {{Config.cloud.productName}}</button>
                                 <a ng-if="!mode.liteClient"  class="btn btn-default"

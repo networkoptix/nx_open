@@ -2,6 +2,7 @@
 
 #include <nx/network/nettools.h>
 #include <nx/vms/utils/metrics/resource_providers.h>
+#include <nx/utils/uuid.h>
 
 namespace nx::vms::server::metrics {
 

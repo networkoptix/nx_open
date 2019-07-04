@@ -40,7 +40,6 @@ public:
 
 private:
     static bool getInstalledVersions(QList<nx::utils::SoftwareVersion>* versions);
-    static Qn::ConnectionResult handleApplauncherError(QWidget* parentWidget);
 
     static QString getDiffVersionsText();
     static QString getDiffVersionsExtra(

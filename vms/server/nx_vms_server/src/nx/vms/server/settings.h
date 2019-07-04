@@ -121,8 +121,10 @@ public:
         "0 means no limit"
     };
     Option<bool> allowSslConnections{this, "allowSslConnections", true,
-        "Either enable or not receive  ssl connection on the same TCP port. It's enabled by "
-        "default."
+        "Recommended TCP transport to the media server. Default value is true."
+        "If change this parameter to the false, other media servers use HTTP "
+        "instead of HTTPS when open connection to the this server. "
+        "It allows to save CPU for the very slow ARM devices."
     };
     Option<bool> createFullCrashDump{this, "createFullCrashDump", false,
         "Configures the size of crash dumps:\n"

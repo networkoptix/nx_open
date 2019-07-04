@@ -829,7 +829,7 @@ Handle ServerConnection::updateActionStart(
             bool success, rest::Handle handle, EmptyResponseType /*response*/)
         {
             if (callback)
-                callback(handle, success);
+                callback(success, handle);
         };
     const auto contentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
     auto request = QJson::serialized(info);
@@ -867,7 +867,7 @@ Handle ServerConnection::updateActionStop(
             bool success, rest::Handle handle, EmptyResponseType /*response*/)
         {
             if (callback)
-                callback(handle, success);
+                callback(success, handle);
         };
     const auto contentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
     return executePost<EmptyResponseType>("/ec2/cancelUpdate",
@@ -884,7 +884,7 @@ Handle ServerConnection::updateActionFinish(bool skipActivePeers,
             bool success, rest::Handle handle, EmptyResponseType /*response*/)
         {
             if (callback)
-                callback(handle, success);
+                callback(success, handle);
         };
 
     const auto contentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
@@ -908,7 +908,7 @@ Handle ServerConnection::updateActionInstall(const QSet<QnUuid>& participants,
             bool success, rest::Handle handle, EmptyResponseType /*response*/)
         {
             if (callback)
-                callback(handle, success);
+                callback(success, handle);
         };
     const auto contentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
     QString peerList;
@@ -1075,6 +1075,15 @@ Handle ServerConnection::getUbJsonResult(
     return executeGet(path, params, callback, targetThread);
 }
 
+Handle ServerConnection::getJsonResult(
+    const QString& path,
+    const QnRequestParamList& params,
+    std::function<void(bool, Handle, QnJsonRestResult response)>&& callback,
+    QThread* targetThread)
+{
+    return executeGet(path, params, callback, targetThread);
+}
+
 Handle ServerConnection::getRawResult(
     const QString& path,
     const QnRequestParamList& params,
@@ -1128,6 +1137,32 @@ Handle ServerConnection::getAuditLog(
     params.insert("format", "ubjson");
 
     return executeGet("/api/auditLog", params, callback, targetThread);
+}
+
+Handle ServerConnection::getSystemId(
+    Result<QString>::type&& callback,
+    QThread* targetThread)
+{
+    auto internalCallback =
+        [callback=std::move(callback)](
+            bool success, Handle requestId, QByteArray result,
+            const nx::network::http::HttpHeaders& /*headers*/)
+        {
+            callback(success, requestId, QString::fromUtf8(result));
+        };
+    return executeGet("/api/getSystemId", {}, internalCallback, targetThread);
+}
+
+Handle ServerConnection::doCameraDiagnosticsStep(
+    const QnUuid& cameraId, CameraDiagnostics::Step::Value previousStep,
+    Result<RestResultWithData<QnCameraDiagnosticsReply>>::type&& callback,
+    QThread* targetThread)
+{
+    QnRequestParamList params;
+    params.insert("cameraId", cameraId);
+    params.insert("type", CameraDiagnostics::Step::toString(previousStep));
+
+    return executeGet("/api/doCameraDiagnosticsStep", params, callback, targetThread);
 }
 
 Handle ServerConnection::recordedTimePeriods(
@@ -1618,6 +1653,7 @@ void ServerConnection::onHttpClientDone(
 
     HttpCompletionFunc callback = itr.value();
     m_runningRequests.remove(requestId);
+    lock.unlock();
 
     SystemError::ErrorCode systemError = SystemError::noError;
     nx::network::http::StatusCode::Value statusCode = nx::network::http::StatusCode::ok;
@@ -1635,7 +1671,7 @@ void ServerConnection::onHttpClientDone(
         contentType = httpClient->contentType();
         messageBody = httpClient->fetchMessageBodyBuffer();
     }
-    lock.unlock();
+
     if (callback)
     {
         const auto response = httpClient->response();

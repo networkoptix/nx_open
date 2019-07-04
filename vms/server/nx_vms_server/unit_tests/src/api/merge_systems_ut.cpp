@@ -163,7 +163,7 @@ protected:
         ASSERT_EQ(servers.size() + 1, fullInfoData.users.size());
         ASSERT_EQ(servers.size(), fullInfoData.layouts.size());
 
-        for (int i = 1; i < servers.size(); ++i)
+        for (size_t i = 1; i < servers.size(); ++i)
         {
             vms::api::FullInfoData fullInfoData2;
             NX_TEST_API_GET(servers[0].get(), "/ec2/getFullInfo", &fullInfoData2,
@@ -225,7 +225,6 @@ void waitForMergeFinished(
     const LauncherPtr& server,
     const QString& adminPassword = "admin")
 {
-    int success = 0;
     do
     {
         QnJsonRestResult jsonResult;

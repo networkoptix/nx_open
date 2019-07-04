@@ -30,6 +30,12 @@ QJsonDocument convertHttpToJsonRequest(const QtHttpRequest& request)
     for (const auto& item: items)
         result.insert(item.first, item.second);
 
+    auto path = request.getUrl().path();
+    const auto pathCommand = path.remove('/'); //< Strip leading or trailing "/".
+    // We give priority to "command" parameter vs. URL path parameter.
+    if (!result.contains("command") && !pathCommand.isEmpty())
+        result.insert("command", pathCommand);
+
     return QJsonDocument(result);
 }
 } // namespace

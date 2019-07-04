@@ -1,5 +1,7 @@
 #include "common_update_installer.h"
 
+#include <QtCore/QCoreApplication>
+
 #include <nx/utils/log/log.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/software_version.h>
@@ -51,6 +53,15 @@ void CommonUpdateInstaller::prepareAsync(const QString& path)
         m_state = CommonUpdateInstaller::State::inProgress;
         if (!cleanInstallerDirectory())
             return setState(CommonUpdateInstaller::State::cleanTemporaryFilesError);
+    }
+
+    {
+        qint64 requiredSpace = QnZipExtractor(path, QString()).estimateUnpackedSize();
+        if (requiredSpace < -1)
+            return setState(CommonUpdateInstaller::State::cantOpenFile);
+
+        if (!checkFreeSpace(dataDirectoryPath(), requiredSpace))
+            return setState(CommonUpdateInstaller::State::noFreeSpace);
     }
 
     m_extractor.extractAsync(
@@ -110,6 +121,29 @@ CommonUpdateInstaller::State CommonUpdateInstaller::state() const
 {
     QnMutexLocker lock(&m_mutex);
     return m_state;
+}
+
+bool CommonUpdateInstaller::checkFreeSpace(const QString& path, qint64 bytes) const
+{
+    constexpr qint64 kReservedSpace = 50 * 1024 * 1024;
+
+    const qint64 required = bytes + kReservedSpace;
+    const qint64 free = freeSpace(path);
+
+    const auto requiredMb = required / (1024 * 1024);
+    const auto freeMb = free / (1024 * 1024);
+
+    NX_DEBUG(this, "Checking free space in %1. Required: %2MB, Free: %3MB",
+        path, requiredMb, freeMb);
+
+    if (free < required)
+    {
+        NX_WARNING(this, "Not enough free space in %1. Required: %2MB, Free: %3MB",
+            path, requiredMb, freeMb);
+        return false;
+    }
+
+    return true;
 }
 
 CommonUpdateInstaller::State CommonUpdateInstaller::checkContents(const QString& outputPath) const

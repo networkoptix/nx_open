@@ -344,6 +344,11 @@ enum IDType
     FreespaceAction,
 
     /**
+     * Show timeline on the videowall for some time as a reaction for the some user actions.
+     */
+    ShowTimeLineOnVideowallAction,
+
+    /**
      * Minimizes client's main window.
      */
     MinimizeAction,

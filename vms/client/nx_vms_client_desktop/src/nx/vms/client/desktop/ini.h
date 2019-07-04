@@ -52,10 +52,22 @@ struct Ini: nx::kit::IniConfig
         "Allows the interpolation of the trajectories of the Analytics Objects between frames.\n"
         "\n"
         "If enabled, bounding boxes around the Analytics Objects are moving more smoothly.");
-    NX_INI_FLAG(0, displayAnalyticsObjectsDebugInfo,
+    NX_INI_STRING("", displayAnalyticsObjectsDebugInfo,
         "Whether to add a debug info label to Analytics Object description.\n"
         "\n"
-        "Allows to see the Analytics Objects details in the Desktop Client.");
+        "Allows to see the Analytics Objects details in the Desktop Client. Use \"all\" to\n"
+        "display all available metadata. More precise filtering is available by combining the\n"
+        "following options:\n"
+        " * \"id\" - Object id,\n"
+        " * \"delay\" - Delay between actual timestamp and object timestamp in milliseconds,\n"
+        " * \"actual_ts\" - Current timestamp,\n"
+        " * \"actual_rect\" - Interpolated rect if \"enableDetectedObjectsInterpolation\" is on,\n"
+        " * \"object_ts\" - Original object timestamp,\n"
+        " * \"object_rect\" - Original object rect,\n"
+        " * \"future_ts\" - Future object timestamp,\n"
+        " * \"future_rect\" - Future object rect.\n"
+        "Fields can be combined using space, comma or any other separator."
+    );
     NX_INI_FLAG(0, displayAnalyticsEnginesInResourceTree,
         "Displays Analytics Engine items in the Resource tree.");
     NX_INI_FLAG(0, debugThumbnailProviders, "Enables debug mode for thumbnail providers.");

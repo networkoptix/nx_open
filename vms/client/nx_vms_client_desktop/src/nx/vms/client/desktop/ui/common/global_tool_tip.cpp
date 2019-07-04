@@ -1,8 +1,14 @@
 #include "global_tool_tip.h"
 
+#include <QtCore/QPointF>
+#include <QtCore/QRectF>
 #include <QtCore/QTimer>
+
+#include <QtQml/QtQml>
+
 #include <QtQuick/QQuickWindow>
 #include <QtQuick/QQuickItem>
+
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QStyle>
 

@@ -104,6 +104,6 @@ namespace nx::utils {
 
 // TODO: Invent a better place for it.
 // So far OsInfo serialization is required only for ModuleInformation.
-QN_FUSION_DECLARE_FUNCTIONS(nx::utils::OsInfo, (ubjson)(json)(xml)(csv_record), NX_UTILS_API)
+QN_FUSION_DECLARE_FUNCTIONS(nx::utils::OsInfo, (ubjson)(json)(xml)(csv_record), NX_VMS_API)
 
 } // namespace nx::utils

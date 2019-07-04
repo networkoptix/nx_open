@@ -6,7 +6,9 @@ namespace nx::vms::rules {
 
 using namespace std::chrono;
 
-ActionBuilder::ActionBuilder(const QnUuid& id): m_id(id)
+ActionBuilder::ActionBuilder(const QnUuid& id, const ActionConstructor& ctor):
+    m_id(id),
+    m_constructor(ctor)
 {
     m_timer.setSingleShot(true);
     connect(&m_timer, &QTimer::timeout, this, &ActionBuilder::onTimeout);
@@ -17,10 +19,14 @@ ActionBuilder::~ActionBuilder()
     qDeleteAll(m_fields);
 }
 
-QnUuid ActionBuilder::id() const
-{
-    return m_id;
-}
+ bool ActionBuilder::addField(const QString& name, ActionField* field)
+ {
+    if (m_fields.contains(name))
+        return false;
+
+    m_fields[name] = field;
+    return true;
+ }
 
 void ActionBuilder::process(const EventPtr& event)
 {
@@ -33,8 +39,26 @@ void ActionBuilder::process(const EventPtr& event)
     }
     else
     {
-        emit action(ActionPtr(new BasicAction()));
+        ActionPtr ptr(m_constructor());
+        if (!ptr)
+            return;
+
+        for (auto it = m_fields.begin(); it != m_fields.end(); ++it)
+        {
+            const auto& fieldName = it.key();
+            const auto field = it.value();
+
+            const auto value = field->build(event);
+            ptr->setProperty(fieldName.toUtf8().data(), value);
+        }
+
+        emit action(ptr);
     }
+}
+
+QnUuid ActionBuilder::id() const
+{
+    return m_id;
 }
 
 void ActionBuilder::setAggregationInterval(seconds interval)

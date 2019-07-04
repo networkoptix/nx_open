@@ -133,7 +133,9 @@ protected:
         for (const auto& peer: m_peers)
         {
             if (participants.contains(peer->commonModule()->moduleGUID()))
+            {
                 ASSERT_TRUE(peer->mediaServerProcess()->installUpdateRequestReceived());
+            }
         }
     }
 

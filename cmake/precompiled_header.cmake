@@ -1,6 +1,10 @@
 option(enablePrecompiledHeaders "Enable precompiled headers support" ON)
 mark_as_advanced(enablePrecompiledHeaders)
 
+function(_nx_create_compiler_id_file file_name)
+    configure_file(${CMAKE_SOURCE_DIR}/cmake/compiler_id.in ${file_name})
+endfunction()
+
 function(_generate_pch_parameters target parameters_file)
     set(flags
         "$<TARGET_PROPERTY:${target},COMPILE_OPTIONS>"
@@ -117,12 +121,15 @@ function(_add_gcc_clang_precompiled_header target input)
         set(depfile_cmd_args -MD -MF "${depfile}" -MT "${pch_file_relative}")
     endif()
 
+    set(compiler_id_file ${CMAKE_CURRENT_BINARY_DIR}/compiler_id)
+    _nx_create_compiler_id_file(${compiler_id_file})
+
     add_custom_command(
         OUTPUT "${pch_file}"
         COMMAND "${CMAKE_CXX_COMPILER}"
             "@${parameters_file}" ${cxx_standard} -x c++-header "${input}" -o "${pch_file}"
             ${depfile_cmd_args}
-        DEPENDS "${input}" "${parameters_file}"
+        DEPENDS "${input}" "${parameters_file}" ${compiler_id_file}
         IMPLICIT_DEPENDS CXX "${input}"
         ${depfile_args}
         COMMENT "Precompiling ${pch_dir}")

@@ -50,35 +50,6 @@ public:
     int checkCameraList(const QnNetworkResourceList& cameras, QObject* target, const char* slot);
 
     /**
-     * Get camera params.
-     *
-     * Returns immediately. On request completion the specified slot of the specified target is
-     * called with signature <tt>(int httpStatusCode, const QList<QPair<QString, QVariant>>& params)</tt>.
-     * Status is 0 in case of success, in other cases it holds error code.
-     *
-     * @param keys List of parameter ids that are requested.
-     * @return Request handle.
-     */
-    int getParamsAsync(const QnNetworkResourcePtr& camera, const QStringList& keys,
-        QObject* target, const char* slot);
-
-    /**
-     * Set camera params.
-     *
-     * Returns immediately. On request completion the specified slot of the specified target is
-     * called with signature <tt>(int httpStatusCode, const QList<QPair<QString, bool>>& operationResult)</tt>
-     * Status is 0 in case of success, in other cases it holds error code.
-     *
-     * @return Request handle.
-     */
-    int setParamsAsync(const QnNetworkResourcePtr& camera,
-        const QnCameraAdvancedParamValueList& params, QObject* target, const char* slot);
-
-    int addCameraAsync(
-        const QnManualResourceSearchList& cameras, const QString& username,
-        const QString& password, QObject* target, const char* slot);
-
-    /**
      * @param fastRequest Request information about existing storages only. Getting full info may
      *     be quite slow.
      * @return information about storages space.
@@ -86,22 +57,6 @@ public:
     int getStorageSpaceAsync(bool fastRequest, QObject* target, const char* slot);
 
     int getStorageStatusAsync(const QString& storageUrl, QObject* target, const char* slot);
-
-    /**
-     * Request the name of a system the mediaserver is currently connected to.
-     * @param slot Slot MUST have signature (int, QString, int).
-     * @return Request handle. -1 In case of failure to start async request.
-     */
-    int getSystemIdAsync(QObject* target, const char* slot);
-
-    /**
-     * Request the server to run the camera diagnostics step following previousStep.
-     * @param slot Slot MUST have signature (int, QnCameraDiagnosticsReply, int).
-     * @return Request handle.
-     */
-    int doCameraDiagnosticsStepAsync(
-        const QnUuid& cameraId, CameraDiagnostics::Step::Value previousStep,
-        QObject* target, const char* slot );
 
     /**
      * @param slot Slot MUST have signature (int, QnStorageScanData, int).

@@ -50,9 +50,10 @@ static void waitForStorageToAppear(MediaServerLauncher* server, const QString& s
             const auto fileStorage = storage.dynamicCast<QnFileStorageResource>();
             NX_ASSERT(fileStorage);
             fileStorage->setMounted(true);
+            server->serverModule()->normalStorageManager()->initDone();
 
             if (!(storage->isWritable() && storage->isOnline() && storage->isUsedForWriting()))
-                std::this_thread::sleep_for(std::chrono::milliseconds(3000));
+                std::this_thread::sleep_for(std::chrono::milliseconds(100));
             else
                 break;
         }
@@ -107,7 +108,6 @@ void addStorage(MediaServerLauncher* server, const QString& storagePath)
             storage, ec2::NotificationSource::Local);
     }
 
-    server->serverModule()->normalStorageManager()->initDone();
     waitForStorageToAppear(server, storagePath);
 }
 

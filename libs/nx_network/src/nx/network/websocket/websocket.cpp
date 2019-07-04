@@ -21,7 +21,7 @@ WebSocket::WebSocket(
     network::websocket::CompressionType compressionType)
     :
     m_socket(std::move(streamSocket)),
-    m_parser(role, this, compressionType),
+    m_parser(role, this),
     m_serializer(role == Role::client),
     m_sendMode(sendMode),
     m_receiveMode(receiveMode),
@@ -250,8 +250,7 @@ void WebSocket::sendAsync(const nx::Buffer& buffer, IoCompletionHandler handler)
             else
             {
                 FrameType type = !m_isFirstFrame ? FrameType::continuation : m_frameType;
-                writeBuffer = m_serializer.prepareFrame(
-                    buffer, type, m_compressionType, m_isLastFrame, m_isFirstFrame);
+                writeBuffer = m_serializer.prepareFrame(buffer, type, m_isLastFrame);
                 m_isFirstFrame = m_isLastFrame;
                 if (m_isLastFrame)
                     m_isLastFrame = false;

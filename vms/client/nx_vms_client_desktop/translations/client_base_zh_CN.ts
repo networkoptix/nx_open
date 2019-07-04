@@ -874,7 +874,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Analytics Engine Settings...</source>
-      <translation type="unfinished">Analytics Engine Settings...</translation>
+      <translation>分析引擎设置......</translation>
     </message>
     <message>
       <source>Show Thumbnails</source>
@@ -894,11 +894,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Virtual Camera...</source>
-      <translation type="unfinished">Virtual Camera...</translation>
+      <translation>虚拟摄像机</translation>
     </message>
     <message>
       <source>New Virtual Camera...</source>
-      <translation type="unfinished">New Virtual Camera...</translation>
+      <translation>新增的虚拟摄像机...</translation>
     </message>
     <message>
       <source>Show Tree</source>
@@ -922,27 +922,27 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Switch to Notifications tab</source>
-      <translation type="unfinished">Switch to Notifications tab</translation>
+      <translation>切换到通知分页</translation>
     </message>
     <message>
       <source>Switch to Motion tab</source>
-      <translation type="unfinished">Switch to Motion tab</translation>
+      <translation>切换到位移分页</translation>
     </message>
     <message>
       <source>Switch to Bookmarks tab</source>
-      <translation type="unfinished">Switch to Bookmarks tab</translation>
+      <translation>切换到书签分頁</translation>
     </message>
     <message>
       <source>Switch to Events tab</source>
-      <translation type="unfinished">Switch to Events tab</translation>
+      <translation>切换到事件分页</translation>
     </message>
     <message>
       <source>Switch to Objects tab</source>
-      <translation type="unfinished">Switch to Objects tab</translation>
+      <translation>切换到物件分页</translation>
     </message>
     <message>
       <source>Objects Frames and Info...</source>
-      <translation type="unfinished">Objects Frames and Info...</translation>
+      <translation>物件影像帧数和信息...</translation>
     </message>
   </context>
   <context>
@@ -988,23 +988,23 @@ to view more bookmarks</source>
     <name>EncryptedLayoutStrings</name>
     <message>
       <source>Please enter a valid password</source>
-      <translation type="unfinished">Please enter a valid password</translation>
+      <translation>请输入正确密码</translation>
     </message>
     <message>
       <source>The password is not valid.</source>
-      <translation type="unfinished">The password is not valid.</translation>
+      <translation>密码错误</translation>
     </message>
     <message>
       <source>Encrypted layout</source>
-      <translation type="unfinished">Encrypted layout</translation>
+      <translation>加密布局</translation>
     </message>
     <message>
       <source>The file %1 is encrypted. Please enter the password:</source>
-      <translation type="unfinished">The file %1 is encrypted. Please enter the password:</translation>
+      <translation>档案 %1已被保护。请输入密码:</translation>
     </message>
     <message>
       <source>Please re-enter password for layout %1:</source>
-      <translation type="unfinished">Please re-enter password for layout %1:</translation>
+      <translation>请重新输入布局 %1密码：</translation>
     </message>
   </context>
   <context>
@@ -1315,7 +1315,7 @@ to view more bookmarks</source>
     <name>PtzInstrument</name>
     <message>
       <source>Layout is locked</source>
-      <translation type="unfinished">Layout is locked</translation>
+      <translation>布局已锁定</translation>
     </message>
   </context>
   <context>
@@ -1569,15 +1569,15 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>Details for %n sessions of %1</source>
       <comment>Total number will be substituted as %1</comment>
-      <translation type="unfinished">
-        <numerusform>Details for %n sessions of %1</numerusform>
+      <translation>
+        <numerusform>%1的登入期间 %n 的详细信息</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Details for %n cameras of %1</source>
       <comment>Total number will be substituted as %1</comment>
-      <translation type="unfinished">
-        <numerusform>Details for %n cameras of %1</numerusform>
+      <translation>
+        <numerusform>%1的摄像机 %n 的详细信息</numerusform>
       </translation>
     </message>
   </context>
@@ -1733,12 +1733,12 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Update installed</source>
-      <translation type="unfinished">Update installed</translation>
+      <translation>已安装更新</translation>
     </message>
     <message numerus="yes">
       <source>%n actions</source>
-      <translation type="unfinished">
-        <numerusform>%n actions</numerusform>
+      <translation>
+        <numerusform>%n 个动作</numerusform>
       </translation>
     </message>
   </context>
@@ -2015,7 +2015,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Force Acknowledgement will only work for Generic Events if camera modifiers are used in the Generic Event URL</source>
-      <translation type="unfinished">Force Acknowledgement will only work for Generic Events if camera modifiers are used in the Generic Event URL</translation>
+      <translation>如在通用事件URL中使用了摄像机修改器，则强制确认仅适用于通用事件</translation>
     </message>
   </context>
   <context>
@@ -2548,7 +2548,7 @@ to %1</source>
     </message>
     <message>
       <source>Internal server error. Please try again later.</source>
-      <translation type="unfinished">Internal server error. Please try again later.</translation>
+      <translation>服務器內部發生錯誤。請稍後再試。</translation>
     </message>
   </context>
   <context>
@@ -2702,11 +2702,11 @@ to %1</source>
     </message>
     <message>
       <source>Download &amp;&amp; Install</source>
-      <translation type="unfinished">Download &amp;&amp; Install</translation>
+      <translation>下载并安装</translation>
     </message>
     <message>
       <source>Failed to enter compatibility mode for version %1</source>
-      <translation type="unfinished">Failed to enter compatibility mode for version %1</translation>
+      <translation>无法进入版本 %1兼容模式</translation>
     </message>
   </context>
   <context>
@@ -2972,15 +2972,15 @@ to %1</source>
     <message numerus="yes">
       <source>Event log for period from %1 to %2 - %n events found</source>
       <comment>Dates are substituted</comment>
-      <translation type="unfinished">
-        <numerusform>Event log for period from %1 to %2 - %n events found</numerusform>
+      <translation>
+        <numerusform>事件日志从 %1 到 %2 - 找到事件 %n</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Event log for %1 - %n events found</source>
       <comment>Date is substituted</comment>
-      <translation type="unfinished">
-        <numerusform>Event log for %1 - %n events found</numerusform>
+      <translation>
+        <numerusform>%1 的事件日志 - 找到事件 %n</numerusform>
       </translation>
     </message>
   </context>
@@ -3054,8 +3054,8 @@ to %1</source>
     <message numerus="yes">
       <source>%1 (%n cameras)</source>
       <comment>%1 is description of event. Will be replaced in runtime</comment>
-      <translation type="unfinished">
-        <numerusform>%1 (%n cameras)</numerusform>
+      <translation>
+        <numerusform>%1 (%n 摄像机)</numerusform>
       </translation>
     </message>
   </context>
@@ -3138,11 +3138,11 @@ to %1</source>
     <name>QnFullscreenCameraActionWidget</name>
     <message>
       <source>This camera is not currently on the selected layout. Action will work if camera is added before action triggers.</source>
-      <translation type="unfinished">This camera is not currently on the selected layout. Action will work if camera is added before action triggers.</translation>
+      <translation>此摄像机现在不在选定的布局上。请在触发报警前加入摄像机，否则报警将无法作用。</translation>
     </message>
     <message>
       <source>This camera is not currently on some of the selected layouts. Action will work if camera is added before action triggers.</source>
-      <translation type="unfinished">This camera is not currently on some of the selected layouts. Action will work if camera is added before action triggers.</translation>
+      <translation>此摄像机现在不在一些选定的布局上。请在触发报警前加入摄像机，否则报警将无法作用。</translation>
     </message>
   </context>
   <context>
@@ -3179,7 +3179,7 @@ to %1</source>
     </message>
     <message>
       <source>Auto (%1)</source>
-      <translation type="unfinished">Auto (%1)</translation>
+      <translation>自动 (%1)</translation>
     </message>
   </context>
   <context>
@@ -3337,7 +3337,7 @@ to %1</source>
     <name>QnInputDialog</name>
     <message>
       <source>Please enter a value.</source>
-      <translation type="unfinished">Please enter a value.</translation>
+      <translation>请输入一个数值。</translation>
     </message>
   </context>
   <context>
@@ -3542,7 +3542,7 @@ to %1</source>
     </message>
     <message>
       <source>Channels</source>
-      <translation type="unfinished">Channels</translation>
+      <translation>授权数</translation>
     </message>
   </context>
   <context>
@@ -3731,7 +3731,7 @@ to %1</source>
     </message>
     <message>
       <source>Every license can be deactivated only a few times.</source>
-      <translation type="unfinished">Every license can be deactivated only a few times.</translation>
+      <translation>每个授权仅能被注销重置数次。</translation>
     </message>
     <message numerus="yes">
       <source>%1 are currently in use</source>
@@ -4032,7 +4032,7 @@ to %1</source>
     </message>
     <message>
       <source>Area Zoom</source>
-      <translation type="unfinished">Area Zoom</translation>
+      <translation>区域缩放</translation>
     </message>
   </context>
   <context>
@@ -4187,11 +4187,11 @@ to %1</source>
     </message>
     <message>
       <source>Virtual Camera</source>
-      <translation type="unfinished">Virtual Camera</translation>
+      <translation>虚拟摄像机</translation>
     </message>
     <message>
       <source>Virtual Camera %1</source>
-      <translation type="unfinished">Virtual Camera %1</translation>
+      <translation>虚拟摄像机%1</translation>
     </message>
   </context>
   <context>
@@ -4414,8 +4414,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>about %n minutes</source>
-      <translation type="unfinished">
-        <numerusform>about %n minutes</numerusform>
+      <translation>
+        <numerusform>大约 %n 分钟</numerusform>
       </translation>
     </message>
   </context>
@@ -4595,11 +4595,11 @@ to %1</source>
     </message>
     <message>
       <source>Current Bitrate</source>
-      <translation type="unfinished">Current Bitrate</translation>
+      <translation>当前流量</translation>
     </message>
     <message>
       <source>no data for forecast</source>
-      <translation type="unfinished">no data for forecast</translation>
+      <translation>没有预测数据</translation>
     </message>
   </context>
   <context>
@@ -4643,11 +4643,11 @@ to %1</source>
     <name>QnResourceBrowserWidget</name>
     <message>
       <source>Local files</source>
-      <translation type="unfinished">Local files</translation>
+      <translation>本地文件</translation>
     </message>
     <message>
       <source>No local files</source>
-      <translation type="unfinished">No local files</translation>
+      <translation>没有本地文件</translation>
     </message>
     <message>
       <source>Nothing found</source>
@@ -4663,7 +4663,7 @@ to %1</source>
     </message>
     <message>
       <source>open all</source>
-      <translation type="unfinished">open all</translation>
+      <translation>打开全部内容</translation>
     </message>
     <message>
       <source>All types</source>
@@ -4784,7 +4784,7 @@ to %1</source>
     </message>
     <message>
       <source>Analytics Engines</source>
-      <translation type="unfinished">Analytics Engines</translation>
+      <translation>分析引擎</translation>
     </message>
   </context>
   <context>
@@ -5042,7 +5042,7 @@ to %1</source>
     </message>
     <message>
       <source>Plugins</source>
-      <translation type="unfinished">Plugins</translation>
+      <translation>插件</translation>
     </message>
   </context>
   <context>
@@ -5387,23 +5387,23 @@ to %1</source>
     </message>
     <message>
       <source>Last 5 minutes</source>
-      <translation type="unfinished">Last 5 minutes</translation>
+      <translation>最后5分钟</translation>
     </message>
     <message>
       <source>Last 60 minutes</source>
-      <translation type="unfinished">Last 60 minutes</translation>
+      <translation>最后60分钟</translation>
     </message>
     <message>
       <source>Last 24 hours</source>
-      <translation type="unfinished">Last 24 hours</translation>
+      <translation>过去24小时</translation>
     </message>
     <message>
       <source>Longest period available</source>
-      <translation type="unfinished">Longest period available</translation>
+      <translation>最长可用天数</translation>
     </message>
     <message>
       <source>Forecast available only for cameras with enabled recording.</source>
-      <translation type="unfinished">Forecast available only for cameras with enabled recording.</translation>
+      <translation>预测功能仅适用于已启用录影的摄像机。</translation>
     </message>
   </context>
   <context>
@@ -5518,13 +5518,13 @@ to %1</source>
     </message>
     <message>
       <source>What to do with current analytics data?</source>
-      <translation type="unfinished">What to do with current analytics data?</translation>
+      <translation>如何处理当前的分析数据？</translation>
     </message>
     <message>
       <source>Current analytics data will not be automatically moved to another location and will become unaccessible. You can keep it and manually move later, or delete permanently.
 If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
-      <translation type="unfinished">Current analytics data will not be automatically moved to another location and will become unaccessible. You can keep it and manually move later, or delete permanently.
-If you intended to move analytics data to another storage location, please contact support before proceeding.</translation>
+      <translation>当前的分析数据不会自动移动到其他位置，并且将无法读取。您可以保留它并稍后手动移动，或永久删除。
+如果您决定将其移至另一个存储位置，请在继续操作前与支援部门联系。</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -5587,11 +5587,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Use to store analytics data</source>
-      <translation type="unfinished">Use to store analytics data</translation>
+      <translation>用于存储数据分析</translation>
     </message>
     <message>
       <source>Stores analytics data</source>
-      <translation type="unfinished">Stores analytics data</translation>
+      <translation>存储数据分析</translation>
     </message>
   </context>
   <context>
@@ -5680,7 +5680,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Plugins</source>
-      <translation type="unfinished">Plugins</translation>
+      <translation>插件</translation>
     </message>
   </context>
   <context>
@@ -5817,27 +5817,27 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>No server has internet access for time synchronization</source>
-      <translation type="unfinished">No server has internet access for time synchronization</translation>
+      <translation>没有能连接网路的服务器来同步时间</translation>
     </message>
     <message>
       <source>The System is in safe mode</source>
-      <translation type="unfinished">The System is in safe mode</translation>
+      <translation>系统处于安全模式</translation>
     </message>
     <message>
       <source>The System has no internet access for time synchronization</source>
-      <translation type="unfinished">The System has no internet access for time synchronization</translation>
+      <translation>没有能连接网路的系統来同步时间</translation>
     </message>
     <message>
       <source>No online server in the System has internet access for time synchronization.</source>
-      <translation type="unfinished">No online server in the System has internet access for time synchronization.</translation>
+      <translation>系统中没有在线的服务器可连接网路来同步时间.</translation>
     </message>
     <message>
       <source>The System is running in safe mode.</source>
-      <translation type="unfinished">The System is running in safe mode.</translation>
+      <translation>系统运行在安全模式下.</translation>
     </message>
     <message>
       <source>Error occurred during remote archive synchronization</source>
-      <translation type="unfinished">Error occurred during remote archive synchronization</translation>
+      <translation>远程归档同步期间发生错误</translation>
     </message>
   </context>
   <context>
@@ -5860,19 +5860,19 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Failover server measures may still request camera status updates regardless of this setting.</source>
-      <translation type="unfinished">Failover server measures may still request camera status updates regardless of this setting.</translation>
+      <translation>无论此设定为何，备援服务器仍可请求摄像机更新状态。</translation>
     </message>
     <message>
       <source>Enable devices and servers autodiscovery and automated device status check</source>
-      <translation type="unfinished">Enable devices and servers autodiscovery and automated device status check</translation>
+      <translation>启用设备和服务器的自动搜寻以及自动确认设备状态</translation>
     </message>
     <message>
       <source>Enable cameras and servers autodiscovery and automated camera status check</source>
-      <translation type="unfinished">Enable cameras and servers autodiscovery and automated camera status check</translation>
+      <translation>启用摄像机和服务器的自动搜寻以及自动确认摄像机状态</translation>
     </message>
     <message>
       <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
-      <translation type="unfinished">When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</translation>
+      <translation>启用后，系统会持续搜寻新的摄像机和服务器，并向摄像机传送请求以进行状态更新。</translation>
     </message>
   </context>
   <context>
@@ -5887,11 +5887,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>HTML file</source>
-      <translation type="unfinished">HTML file</translation>
+      <translation>HTML 文件</translation>
     </message>
     <message>
       <source>Spread Sheet (CSV) File</source>
-      <translation type="unfinished">Spread Sheet (CSV) File</translation>
+      <translation>电子表格（CSV）文件</translation>
     </message>
   </context>
   <context>
@@ -5925,11 +5925,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>VMS time is synchronized with the Internet and does not depend on local time on servers.</source>
-      <translation type="unfinished">VMS time is synchronized with the Internet and does not depend on local time on servers.</translation>
+      <translation>VMS时间与網路同步，不依赖于服务器上的本地时间。</translation>
     </message>
     <message>
       <source>VMS time is synchronized with local time on the selected server and does not depend on local time on other servers.</source>
-      <translation type="unfinished">VMS time is synchronized with local time on the selected server and does not depend on local time on other servers.</translation>
+      <translation>VMS时间与所选服务器上的本地时间同步，并且不取决于其他服务器上的本地时间。</translation>
     </message>
   </context>
   <context>
@@ -6446,15 +6446,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>%1 has been successfully configured.</source>
-      <translation type="unfinished">%1 has been successfully configured.</translation>
+      <translation>%1 已成功配置。</translation>
     </message>
     <message>
       <source>To complete the process, please connect to it with Client and update to version %1.</source>
-      <translation type="unfinished">To complete the process, please connect to it with Client and update to version %1.</translation>
+      <translation>要完成此程序，请使用客户端连接并更新到版本 %1。</translation>
     </message>
     <message>
       <source>Failed to merge %1 to our system.</source>
-      <translation type="unfinished">Failed to merge %1 to our system.</translation>
+      <translation>无法将 %1 合并到我们的系统。</translation>
     </message>
   </context>
   <context>
@@ -6525,7 +6525,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>AVI (Audio/Video Interleaved)</source>
-      <translation type="unfinished">AVI (Audio/Video Interleaved)</translation>
+      <translation>AVI (音频/视频交错)</translation>
     </message>
   </context>
   <context>
@@ -6576,11 +6576,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>PNG Image</source>
-      <translation type="unfinished">PNG Image</translation>
+      <translation>PNG 图像</translation>
     </message>
     <message>
       <source>JPEG Image</source>
-      <translation type="unfinished">JPEG Image</translation>
+      <translation>JPEG 图像</translation>
     </message>
   </context>
   <context>
@@ -6792,16 +6792,16 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Failed to add virtual camera</source>
-      <translation type="unfinished">Failed to add virtual camera</translation>
+      <translation>无法新增虚拟摄像机</translation>
     </message>
     <message>
       <source>Open Virtual Camera Recordings...</source>
-      <translation type="unfinished">Open Virtual Camera Recordings...</translation>
+      <translation>开启虚拟摄像机录影功能...</translation>
     </message>
     <message numerus="yes">
       <source>You can upload these files to a different instance of a Virtual Camera.</source>
-      <translation type="unfinished">
-        <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
+      <translation>
+        <numerusform>您可以上传这些档案至不同的虚拟摄像机.</numerusform>
       </translation>
     </message>
     <message>
@@ -7011,8 +7011,8 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Some video files are still being uploaded to %n virtual cameras:</source>
-      <translation type="unfinished">
-        <numerusform>Some video files are still being uploaded to %n virtual cameras:</numerusform>
+      <translation>
+        <numerusform>某些视频文件仍在上传至 %n 虚拟摄像机:</numerusform>
       </translation>
     </message>
   </context>
@@ -7020,11 +7020,11 @@ If you intended to move analytics data to another storage location, please conta
     <name>SessionExpiredDialog</name>
     <message>
       <source>Your session has expired</source>
-      <translation type="unfinished">Your session has expired</translation>
+      <translation>您的登录已过期。</translation>
     </message>
     <message>
       <source>Session duration limit can be changed by the system administrators</source>
-      <translation type="unfinished">Session duration limit can be changed by the system administrators</translation>
+      <translation>系统管理员可以更改登入时间限制</translation>
     </message>
   </context>
   <context>
@@ -7108,21 +7108,21 @@ If you intended to move analytics data to another storage location, please conta
     <name>UpdateStrings</name>
     <message>
       <source>This Linux platform is no longer supported</source>
-      <translation type="unfinished">This Linux platform is no longer supported</translation>
+      <translation>不再支持此Linux平台</translation>
     </message>
     <message>
       <source>This OS version is no longer supported</source>
-      <translation type="unfinished">This OS version is no longer supported</translation>
+      <translation>不再支持此操作系统版本</translation>
     </message>
     <message>
       <source>This %1 version is no longer supported</source>
       <comment>%1 is OS name, e.g. Windows</comment>
-      <translation type="unfinished">This %1 version is no longer supported</translation>
+      <translation>不再支持此版本 %1</translation>
     </message>
     <message>
       <source>%1 %2 is no longer supported</source>
       <comment>%1 %2 are OS name and version, e.g. Windows 7</comment>
-      <translation type="unfinished">%1 %2 is no longer supported</translation>
+      <translation>不再支持%1 %2</translation>
     </message>
   </context>
   <context>
@@ -7197,38 +7197,38 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Devices on layout</source>
-      <translation type="unfinished">Devices on layout</translation>
+      <translation>布局上的设备</translation>
     </message>
     <message>
       <source>Cameras on layout</source>
-      <translation type="unfinished">Cameras on layout</translation>
+      <translation>布局上的摄像机</translation>
     </message>
     <message>
       <source>Any device</source>
-      <translation type="unfinished">Any device</translation>
+      <translation>任何设备</translation>
     </message>
     <message>
       <source>Any camera</source>
-      <translation type="unfinished">Any camera</translation>
+      <translation>任何摄像机</translation>
     </message>
     <message>
       <source>Selected device</source>
-      <translation type="unfinished">Selected device</translation>
+      <translation>选择设备</translation>
     </message>
     <message>
       <source>Selected camera</source>
-      <translation type="unfinished">Selected camera</translation>
+      <translation>选择摄像机</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::AnalyticsMenuActionFactory</name>
     <message>
       <source>Show Always</source>
-      <translation type="unfinished">Show Always</translation>
+      <translation>始终显示</translation>
     </message>
     <message>
       <source>Show Only with &quot;Objects&quot; Tab</source>
-      <translation type="unfinished">Show Only with &quot;Objects&quot; Tab</translation>
+      <translation>仅显示 &quot;物件&quot; 分页</translation>
     </message>
     <message>
       <source>Show</source>
@@ -7236,7 +7236,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Do Not Show</source>
-      <translation type="unfinished">Do Not Show</translation>
+      <translation>不显示</translation>
     </message>
   </context>
   <context>
@@ -7247,7 +7247,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>deleted camera</source>
-      <translation type="unfinished">deleted camera</translation>
+      <translation>移除摄像机</translation>
     </message>
   </context>
   <context>
@@ -7262,8 +7262,8 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>%n objects</source>
-      <translation type="unfinished">
-        <numerusform>%n objects</numerusform>
+      <translation>
+        <numerusform>%n 物件</numerusform>
       </translation>
     </message>
     <message>
@@ -7272,11 +7272,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Select area</source>
-      <translation type="unfinished">Select area</translation>
+      <translation>选择区域</translation>
     </message>
     <message>
       <source>Select some area on the video...</source>
-      <translation type="unfinished">Select some area on the video...</translation>
+      <translation>选择视频中的某区域...</translation>
     </message>
     <message>
       <source>In selected area</source>
@@ -7284,7 +7284,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>unnamed analytics engine</source>
-      <translation type="unfinished">unnamed analytics engine</translation>
+      <translation>未命名的分析引擎</translation>
     </message>
     <message>
       <source>Failed to execute plugin action</source>
@@ -7292,11 +7292,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Enter parameters</source>
-      <translation type="unfinished">Enter parameters</translation>
+      <translation>输入参数。</translation>
     </message>
     <message>
       <source>Action requires some parameters to be filled.</source>
-      <translation type="unfinished">Action requires some parameters to be filled.</translation>
+      <translation>操作需要填入参数。</translation>
     </message>
   </context>
   <context>
@@ -7310,7 +7310,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::BookmarkSearchListModel::Private</name>
     <message>
       <source>deleted camera</source>
-      <translation type="unfinished">deleted camera</translation>
+      <translation>移除摄像机</translation>
     </message>
   </context>
   <context>
@@ -7415,7 +7415,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Multicast</source>
-      <translation type="unfinished">Multicast</translation>
+      <translation>多播</translation>
     </message>
   </context>
   <context>
@@ -7516,13 +7516,13 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::CameraSelectionDialog</name>
     <message numerus="yes">
       <source>%n cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n cameras</numerusform>
+      <translation>
+        <numerusform>%n 支摄像机</numerusform>
       </translation>
     </message>
     <message>
       <source>You do not have any cameras</source>
-      <translation type="unfinished">You do not have any cameras</translation>
+      <translation>您没有任何摄像机</translation>
     </message>
   </context>
   <context>
@@ -7607,7 +7607,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Plugins</source>
-      <translation type="unfinished">Plugins</translation>
+      <translation>插件</translation>
     </message>
   </context>
   <context>
@@ -7645,35 +7645,35 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::ClientUpdateTool</name>
     <message>
       <source>Update file is not found</source>
-      <translation type="unfinished">Update file is not found</translation>
+      <translation>未找到更新文件。</translation>
     </message>
     <message>
       <source>Update package is corrupted</source>
-      <translation type="unfinished">Update package is corrupted</translation>
+      <translation>更新文件已损坏</translation>
     </message>
     <message>
       <source>Failed to download update package: %1</source>
-      <translation type="unfinished">Failed to download update package: %1</translation>
+      <translation>无法下载更新包： %1</translation>
     </message>
     <message>
       <source>Update package is corrupted: %1</source>
-      <translation type="unfinished">Update package is corrupted: %1</translation>
+      <translation>更新包已损坏: %1</translation>
     </message>
     <message>
       <source>This update is already installed.</source>
-      <translation type="unfinished">This update is already installed.</translation>
+      <translation>更新已安装。</translation>
     </message>
     <message>
       <source>This version is not installed.</source>
-      <translation type="unfinished">This version is not installed.</translation>
+      <translation>此版本未安装。</translation>
     </message>
     <message>
       <source>Invalid version format.</source>
-      <translation type="unfinished">Invalid version format.</translation>
+      <translation>无效的文件格式。</translation>
     </message>
     <message>
       <source>Broken update package.</source>
-      <translation type="unfinished">Broken update package.</translation>
+      <translation>更新包损坏。</translation>
     </message>
     <message>
       <source>Internal error.</source>
@@ -7681,11 +7681,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Not enough space on disk to install the client update.</source>
-      <translation type="unfinished">Not enough space on disk to install the client update.</translation>
+      <translation>磁盘空间不足以更新客户端。</translation>
     </message>
     <message>
       <source>Installation package has been lost.</source>
-      <translation type="unfinished">Installation package has been lost.</translation>
+      <translation>安装包丢失。</translation>
     </message>
   </context>
   <context>
@@ -7738,7 +7738,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Some of selected cameras require password to be set up.</source>
-      <translation type="unfinished">Some of selected cameras require password to be set up.</translation>
+      <translation>某些选定的摄像机需要设置密码。</translation>
     </message>
     <message>
       <source>Ask your system administrator to do it.</source>
@@ -7819,12 +7819,12 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>All devices are already added</source>
-      <translation type="unfinished">All devices are already added</translation>
+      <translation>所有设备都已被加入</translation>
     </message>
     <message numerus="yes">
       <source>%n devices are being added. You can close this dialog or start a new search</source>
-      <translation type="unfinished">
-        <numerusform>%n devices are being added. You can close this dialog or start a new search</numerusform>
+      <translation>
+        <numerusform>正在添加 %n 个设备。您可以关闭此对话框或开始新的搜索</numerusform>
       </translation>
     </message>
     <message>
@@ -7839,18 +7839,18 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Address field cannot be empty</source>
-      <translation type="unfinished">Address field cannot be empty</translation>
+      <translation>地址栏位不能为空</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::EulaDialog</name>
     <message>
       <source>Please review and agree to the %1 in order to proceed</source>
-      <translation type="unfinished">Please review and agree to the %1 in order to proceed</translation>
+      <translation>请查看并同意 %1 以继续</translation>
     </message>
     <message>
       <source>To use the software you must agree with the end user license agreement</source>
-      <translation type="unfinished">To use the software you must agree with the end user license agreement</translation>
+      <translation>使用软件前，您必须同意用户许可协议</translation>
     </message>
   </context>
   <context>
@@ -7885,39 +7885,39 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::EventSearchWidget</name>
     <message>
       <source>Server events</source>
-      <translation type="unfinished">Server events</translation>
+      <translation>服务器事件</translation>
     </message>
     <message>
       <source>Analytics events</source>
-      <translation type="unfinished">Analytics events</translation>
+      <translation>分析事件</translation>
     </message>
     <message>
       <source>Any device issue</source>
-      <translation type="unfinished">Any device issue</translation>
+      <translation>任一设备问题</translation>
     </message>
     <message>
       <source>Any camera issue</source>
-      <translation type="unfinished">Any camera issue</translation>
+      <translation>任一摄像机问题</translation>
     </message>
     <message>
       <source>Any server event</source>
-      <translation type="unfinished">Any server event</translation>
+      <translation>任一服务器事件</translation>
     </message>
     <message>
       <source>Device issues</source>
-      <translation type="unfinished">Device issues</translation>
+      <translation>设备问题</translation>
     </message>
     <message>
       <source>Camera issues</source>
-      <translation type="unfinished">Camera issues</translation>
+      <translation>摄像机问题</translation>
     </message>
     <message>
       <source>Any event</source>
-      <translation type="unfinished">Any event</translation>
+      <translation>任一事件</translation>
     </message>
     <message>
       <source>Any analytics event</source>
-      <translation type="unfinished">Any analytics event</translation>
+      <translation>任一分析事件</translation>
     </message>
     <message>
       <source>No events</source>
@@ -7931,11 +7931,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>unnamed analytics engine</source>
-      <translation type="unfinished">unnamed analytics engine</translation>
+      <translation>未命名的分析引擎</translation>
     </message>
     <message>
       <source>No events occurred</source>
-      <translation type="unfinished">No events occurred</translation>
+      <translation>没有发生事件</translation>
     </message>
   </context>
   <context>
@@ -7951,7 +7951,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::ExportPasswordWidget</name>
     <message>
       <source>Please enter the password.</source>
-      <translation type="unfinished">Please enter the password.</translation>
+      <translation>请输入密码</translation>
     </message>
   </context>
   <context>
@@ -8100,7 +8100,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>You are about to export a long video. It may require a lot of storage space and take significant time.</source>
-      <translation type="unfinished">You are about to export a long video. It may require a lot of storage space and take significant time.</translation>
+      <translation>您即将汇出一段长时视频。它可能需要消耗很多存储空间及时间。</translation>
     </message>
   </context>
   <context>
@@ -8134,15 +8134,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Image is not round</source>
-      <translation type="unfinished">Image is not round</translation>
+      <translation>未找到图像文件</translation>
     </message>
     <message>
       <source>Image might be too dim</source>
-      <translation type="unfinished">Image might be too dim</translation>
+      <translation>图像可能太暗。</translation>
     </message>
     <message>
       <source>Invalid input image</source>
-      <translation type="unfinished">Invalid input image</translation>
+      <translation>输入图片无效</translation>
     </message>
     <message>
       <source>Internal error</source>
@@ -8172,14 +8172,14 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>%n new</source>
-      <translation type="unfinished">
-        <numerusform>%n new</numerusform>
+      <translation>
+        <numerusform>%n 新</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n devices total</source>
-      <translation type="unfinished">
-        <numerusform>%n devices total</numerusform>
+      <translation>
+        <numerusform>共有%n 个设备</numerusform>
       </translation>
     </message>
   </context>
@@ -8224,7 +8224,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Copy Link Location</source>
-      <translation type="unfinished">Copy Link Location</translation>
+      <translation>复制链接位置</translation>
     </message>
   </context>
   <context>
@@ -8330,7 +8330,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>deleted camera</source>
-      <translation type="unfinished">deleted camera</translation>
+      <translation>移除摄像机</translation>
     </message>
     <message>
       <source>Bookmark it...</source>
@@ -8345,27 +8345,27 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Checking for updates automatically</source>
-      <translation type="unfinished">Checking for updates automatically</translation>
+      <translation>自动检查更新</translation>
     </message>
     <message>
       <source>Check for updates</source>
-      <translation type="unfinished">Check for updates</translation>
+      <translation>檢查更新</translation>
     </message>
     <message>
       <source>Force check</source>
-      <translation type="unfinished">Force check</translation>
+      <translation>强制检查</translation>
     </message>
     <message>
       <source>Disable Automatically Checking</source>
-      <translation type="unfinished">Disable Automatically Checking</translation>
+      <translation>禁用自动检查</translation>
     </message>
     <message>
       <source>Check Once</source>
-      <translation type="unfinished">Check Once</translation>
+      <translation>检查一次</translation>
     </message>
     <message>
       <source>Check Automatically</source>
-      <translation type="unfinished">Check Automatically</translation>
+      <translation>自动检查</translation>
     </message>
     <message>
       <source>Download in External Browser</source>
@@ -8377,39 +8377,39 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>You have already installed this version.</source>
-      <translation type="unfinished">You have already installed this version.</translation>
+      <translation>您已安装此版本。</translation>
     </message>
     <message>
       <source>Unable to check updates on the internet</source>
-      <translation type="unfinished">Unable to check updates on the internet</translation>
+      <translation>无法联网检查更新。</translation>
     </message>
     <message>
       <source>Build not found</source>
-      <translation type="unfinished">Build not found</translation>
+      <translation>未找到版本</translation>
     </message>
     <message>
       <source>Cannot update from the selected file</source>
-      <translation type="unfinished">Cannot update from the selected file</translation>
+      <translation>无法从选取档案更新</translation>
     </message>
     <message>
       <source>Invalid update information</source>
-      <translation type="unfinished">Invalid update information</translation>
+      <translation>无效的更新信息</translation>
     </message>
     <message>
       <source>Downgrade to earlier versions is not possible</source>
-      <translation type="unfinished">Downgrade to earlier versions is not possible</translation>
+      <translation>无法降级到先前版本</translation>
     </message>
     <message>
       <source>Update file is not found</source>
-      <translation type="unfinished">Update file is not found</translation>
+      <translation>未找到更新文件。</translation>
     </message>
     <message>
       <source>Upgrade package is broken</source>
-      <translation type="unfinished">Upgrade package is broken</translation>
+      <translation>升级包损毁</translation>
     </message>
     <message>
       <source>Missing update package for some servers</source>
-      <translation type="unfinished">Missing update package for some servers</translation>
+      <translation>缺少某些服务器的更新包</translation>
     </message>
     <message>
       <source>Incompatible %1 instance. To update disconnect System from %1 first.</source>
@@ -8418,7 +8418,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>No update package available</source>
-      <translation type="unfinished">No update package available</translation>
+      <translation>无可用更新</translation>
     </message>
     <message>
       <source>Select Update File...</source>
@@ -8450,7 +8450,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Nx Witness Client will be restarted to the updated version.</source>
-      <translation type="unfinished">Nx Witness Client will be restarted to the updated version.</translation>
+      <translation>Nx Witness 客户端将重新启动到更新的版本.</translation>
     </message>
     <message>
       <source>OK</source>
@@ -8462,11 +8462,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Upload</source>
-      <translation type="unfinished">Upload</translation>
+      <translation>上传</translation>
     </message>
     <message>
       <source>Upload &amp;&amp; Install</source>
-      <translation type="unfinished">Upload &amp;&amp; Install</translation>
+      <translation>上传并安装</translation>
     </message>
     <message>
       <source>Download</source>
@@ -8474,15 +8474,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Download &amp;&amp; Install</source>
-      <translation type="unfinished">Download &amp;&amp; Install</translation>
+      <translation>下载并安装</translation>
     </message>
     <message>
       <source>Select Another Build</source>
-      <translation type="unfinished">Select Another Build</translation>
+      <translation>选择其他版本</translation>
     </message>
     <message>
       <source>Browse for Another File...</source>
-      <translation type="unfinished">Browse for Another File...</translation>
+      <translation>浏览另一个文件...</translation>
     </message>
     <message>
       <source>Update to Specific Build</source>
@@ -8490,11 +8490,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Uploading updates...</source>
-      <translation type="unfinished">Uploading updates...</translation>
+      <translation>正在上传更新......</translation>
     </message>
     <message>
       <source>Downloading client package...</source>
-      <translation type="unfinished">Downloading client package...</translation>
+      <translation>正在下载客户端包...</translation>
     </message>
     <message>
       <source>Installing updates...</source>
@@ -8502,7 +8502,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Installing client updates...</source>
-      <translation type="unfinished">Installing client updates...</translation>
+      <translation>正在安装客户端更新...</translation>
     </message>
     <message>
       <source>Updating to ...</source>
@@ -8518,7 +8518,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>System updated to</source>
-      <translation type="unfinished">System updated to</translation>
+      <translation>系统更新至</translation>
     </message>
     <message>
       <source>System update in process</source>
@@ -8538,7 +8538,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Update from mediaservers</source>
-      <translation type="unfinished">Update from mediaservers</translation>
+      <translation>从媒体服务器更新</translation>
     </message>
     <message>
       <source>Latest Available Update</source>
@@ -8546,17 +8546,17 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Missing update package for the client and %n servers</source>
-      <translation type="unfinished">
-        <numerusform>Missing update package for the client and %n servers</numerusform>
+      <translation>
+        <numerusform>缺少客户端和 %n 个伺服器的更新包</numerusform>
       </translation>
     </message>
     <message>
       <source>Missing update package for the client</source>
-      <translation type="unfinished">Missing update package for the client</translation>
+      <translation>缺少客户端的更新包</translation>
     </message>
     <message>
       <source>Finish Update</source>
-      <translation type="unfinished">Finish Update</translation>
+      <translation>完成更新</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -8564,35 +8564,35 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>The latest version is already installed</source>
-      <translation type="unfinished">The latest version is already installed</translation>
+      <translation>已安装最新版本</translation>
     </message>
     <message>
       <source>This version is already installed</source>
-      <translation type="unfinished">This version is already installed</translation>
+      <translation>此版本已安装</translation>
     </message>
     <message>
       <source>There are no online servers to update.</source>
-      <translation type="unfinished">There are no online servers to update.</translation>
+      <translation>没有要更新的在线服务器。</translation>
     </message>
     <message>
       <source>Some servers haven&apos;t completed update process. Finish it anyway?</source>
-      <translation type="unfinished">Some servers haven&apos;t completed update process. Finish it anyway?</translation>
+      <translation>有些服务器&apos;未完成更新。继续完成？</translation>
     </message>
     <message>
       <source>Cancel update and delete all downloaded data?</source>
-      <translation type="unfinished">Cancel update and delete all downloaded data?</translation>
+      <translation>取消更新并删除所有下载数据？</translation>
     </message>
     <message>
       <source>There was an error while installing updates:</source>
-      <translation type="unfinished">There was an error while installing updates:</translation>
+      <translation>安装更新时出错：</translation>
     </message>
     <message>
       <source>Some servers have gone offline. Please wait until they become online to continue.</source>
-      <translation type="unfinished">Some servers have gone offline. Please wait until they become online to continue.</translation>
+      <translation>有些服务器已离线。请等待连线后再继续。</translation>
     </message>
     <message>
       <source>Update completed, but some components have failed an update</source>
-      <translation type="unfinished">Update completed, but some components have failed an update</translation>
+      <translation>更新完成，但有些组件没有更新</translation>
     </message>
     <message>
       <source>Please update %1 manually using an installation package.</source>
@@ -8604,27 +8604,35 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Failed to download update packages to some components</source>
-      <translation type="unfinished">Failed to download update packages to some components</translation>
+      <translation>无法将更新包下载到某些组件</translation>
     </message>
     <message>
       <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
-      <translation type="unfinished">OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</translation>
+      <translation>不再支持某些组件的操作系统版本。请从系统中删除或将其操作系统更新为支持的版本。</translation>
     </message>
     <message>
       <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
-      <translation type="unfinished">OS version of the client is no longer supported. Please update its OS to a supported version.</translation>
+      <translation>不再支持客户端的操作系统。请将操作系统更新为支持的版本。</translation>
     </message>
     <message>
       <source>Failed to start update</source>
-      <translation type="unfinished">Failed to start update</translation>
+      <translation>启动更新失败。</translation>
     </message>
     <message>
       <source>Starting update to ...</source>
-      <translation type="unfinished">Starting update to ...</translation>
+      <translation>开始更新到......</translation>
     </message>
     <message>
       <source>Some servers have no package available</source>
-      <translation type="unfinished">Some servers have no package available</translation>
+      <translation>有些服务器没有可用的套件包</translation>
+    </message>
+    <message>
+      <source>Failed to cancel update</source>
+      <translation type="unfinished">Failed to cancel update</translation>
+    </message>
+    <message>
+      <source>Failed to start installation</source>
+      <translation type="unfinished">Failed to start installation</translation>
     </message>
   </context>
   <context>
@@ -8637,7 +8645,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>You do not have any layouts</source>
-      <translation type="unfinished">You do not have any layouts</translation>
+      <translation>您没有任何布局</translation>
     </message>
   </context>
   <context>
@@ -8656,26 +8664,26 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Device was disconnected</source>
-      <translation type="unfinished">Device was disconnected</translation>
+      <translation>设备已断开</translation>
     </message>
     <message>
       <source>Camera was disconnected</source>
-      <translation type="unfinished">Camera was disconnected</translation>
+      <translation>摄像机已断开</translation>
     </message>
     <message>
       <source>I/O Module was disconnected</source>
-      <translation type="unfinished">I/O Module was disconnected</translation>
+      <translation>I/O 模组已断线</translation>
     </message>
     <message>
       <source>Unknown Plugin Diagnostic Event</source>
-      <translation type="unfinished">Unknown Plugin Diagnostic Event</translation>
+      <translation>未知的插件诊断事件</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::NotificationListWidget::Private</name>
     <message>
       <source>No new notifications</source>
-      <translation type="unfinished">No new notifications</translation>
+      <translation>没有新通知</translation>
     </message>
   </context>
   <context>
@@ -8698,90 +8706,86 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Local layouts can only be shown to their owners.</source>
-      <translation type="unfinished">Local layouts can only be shown to their owners.</translation>
+      <translation>本地布局仅对其拥有者显示。</translation>
     </message>
     <message>
       <source>None of selected user roles contain users. Action will not work.</source>
-      <translation type="unfinished">None of selected user roles contain users. Action will not work.</translation>
+      <translation>所选用户角色均不包含用户。操作不起作用。</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::PeerStateTracker</name>
     <message>
       <source>The server is taking too long to respond</source>
-      <translation type="unfinished">The server is taking too long to respond</translation>
+      <translation>服务器响应时间过长</translation>
     </message>
     <message>
       <source>No update task</source>
-      <translation type="unfinished">No update task</translation>
+      <translation>没有更新任务</translation>
     </message>
     <message>
       <source>Ready to download update</source>
-      <translation type="unfinished">Ready to download update</translation>
+      <translation>准备下载更新</translation>
     </message>
     <message>
       <source>Downloading update</source>
-      <translation type="unfinished">Downloading update</translation>
+      <translation>正在下载更新</translation>
     </message>
     <message>
       <source>Ready to restart to the new version</source>
-      <translation type="unfinished">Ready to restart to the new version</translation>
+      <translation>准备重新启动到新版本</translation>
     </message>
     <message>
       <source>Installing update</source>
-      <translation type="unfinished">Installing update</translation>
+      <translation>正在安装更新</translation>
     </message>
     <message>
       <source>Installed</source>
-      <translation type="unfinished">Installed</translation>
+      <translation>已安装</translation>
     </message>
     <message>
       <source>Failed to download update</source>
-      <translation type="unfinished">Failed to download update</translation>
+      <translation>无法下载更新</translation>
     </message>
     <message>
       <source>Failed to install update</source>
-      <translation type="unfinished">Failed to install update</translation>
+      <translation>无法安装更新</translation>
     </message>
     <message>
       <source>Waiting for peer data</source>
-      <translation type="unfinished">Waiting for peer data</translation>
+      <translation>等待同等数据中</translation>
     </message>
     <message>
       <source>There is not enough space to download update files.</source>
-      <translation type="unfinished">There is not enough space to download update files.</translation>
+      <translation>没有足够的空间来下载更新文件。</translation>
     </message>
     <message>
       <source>There is not enough space to extract update files.</source>
-      <translation type="unfinished">There is not enough space to extract update files.</translation>
+      <translation>没有足够的空间来解压缩更新文件。</translation>
     </message>
     <message>
       <source>Failed to download update packages.</source>
-      <translation type="unfinished">Failed to download update packages.</translation>
+      <translation>无法下载更新包。</translation>
     </message>
     <message>
       <source>Update contents are invalid.</source>
-      <translation type="unfinished">Update contents are invalid.</translation>
+      <translation>更新内容无效。</translation>
     </message>
     <message>
       <source>Update archive is corrupted.</source>
-      <translation type="unfinished">Update archive is corrupted.</translation>
+      <translation>更新档案已损坏。</translation>
     </message>
     <message>
       <source>Update files cannot be extracted.</source>
-      <translation type="unfinished">Update files cannot be extracted.</translation>
+      <translation>无法解压缩更新文件。</translation>
     </message>
     <message>
       <source>Internal downloader error.</source>
-      <translation type="unfinished">Internal downloader error.</translation>
-    </message>
-    <message>
-      <source>Iternal server error.</source>
-      <translation type="unfinished">Iternal server error.</translation>
+      <translation>内部下载程序错误。</translation>
     </message>
     <message>
       <source>Internal client error.</source>
-      <translation type="unfinished">Internal client error.</translation>
+      <translation>内部客户端错误。</translation>
     </message>
     <message>
       <source>Unknown error.</source>
@@ -8789,15 +8793,23 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Unexpected error code.</source>
-      <translation type="unfinished">Unexpected error code.</translation>
+      <translation>意外的错误代码。</translation>
     </message>
     <message>
       <source>Ready to install update</source>
-      <translation type="unfinished">Ready to install update</translation>
+      <translation>准备下载更新</translation>
     </message>
     <message>
       <source>Update package is not found.</source>
-      <translation type="unfinished">Update package is not found.</translation>
+      <translation>未找到更新包。</translation>
+    </message>
+    <message>
+      <source>There is not enough space to install update.</source>
+      <translation>没有足够的空间来安装更新文件。</translation>
+    </message>
+    <message>
+      <source>Internal server error.</source>
+      <translation>服务器内部错误。</translation>
     </message>
   </context>
   <context>
@@ -8874,7 +8886,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Motion + Low-Res</source>
-      <translation type="unfinished">Motion + Low-Res</translation>
+      <translation>移动+低分辨率</translation>
     </message>
   </context>
   <context>
@@ -8950,18 +8962,18 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Users will be automatically logged out if their session exceeds the specified duration.</source>
-      <translation type="unfinished">Users will be automatically logged out if their session exceeds the specified duration.</translation>
+      <translation>如果登入超过限定时间，用户将自动被登出。</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerSettingsDialogStore</name>
     <message>
       <source>Library</source>
-      <translation type="unfinished">Library</translation>
+      <translation>程序库</translation>
     </message>
     <message>
       <source>Version</source>
-      <translation type="unfinished">Version</translation>
+      <translation>版本</translation>
     </message>
     <message>
       <source>Vendor</source>
@@ -8969,51 +8981,51 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>no error</source>
-      <translation type="unfinished">no error</translation>
+      <translation>无错误</translation>
     </message>
     <message>
       <source>library file cannot be loaded</source>
-      <translation type="unfinished">library file cannot be loaded</translation>
+      <translation>无法加载函式库档案</translation>
     </message>
     <message>
       <source>invalid or incompatible plugin library</source>
-      <translation type="unfinished">invalid or incompatible plugin library</translation>
+      <translation>无效或不相容的插件函式库</translation>
     </message>
     <message>
       <source>plugin library failed to initialize</source>
-      <translation type="unfinished">plugin library failed to initialize</translation>
+      <translation>无法初始化插件函式库</translation>
     </message>
     <message>
       <source>plugin returned bad manifest</source>
-      <translation type="unfinished">plugin returned bad manifest</translation>
+      <translation>插件回应不良</translation>
     </message>
     <message>
       <source>plugin API version is no longer supported</source>
-      <translation type="unfinished">plugin API version is no longer supported</translation>
+      <translation>不再支援API版本的插件</translation>
     </message>
     <message>
       <source>unknown error</source>
-      <translation type="unfinished">unknown error</translation>
+      <translation>未知的错误</translation>
     </message>
     <message>
       <source>Not loaded</source>
-      <translation type="unfinished">Not loaded</translation>
+      <translation>未载入</translation>
     </message>
     <message>
       <source>Loaded</source>
-      <translation type="unfinished">Loaded</translation>
+      <translation>已载入</translation>
     </message>
     <message>
       <source>plugin is in the black list</source>
-      <translation type="unfinished">plugin is in the black list</translation>
+      <translation>插件在黑名单中</translation>
     </message>
     <message>
       <source>Status</source>
-      <translation type="unfinished">Status</translation>
+      <translation>状态</translation>
     </message>
     <message>
       <source>plugin is optional and is not in the white list</source>
-      <translation type="unfinished">plugin is optional and is not in the white list</translation>
+      <translation>插件是可选的且不在白名单中</translation>
     </message>
   </context>
   <context>
@@ -9024,11 +9036,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Installed</source>
-      <translation type="unfinished">Installed</translation>
+      <translation>已安装</translation>
     </message>
     <message>
       <source>Installing...</source>
-      <translation type="unfinished">Installing...</translation>
+      <translation>安装中...</translation>
     </message>
     <message>
       <source>Downloaded</source>
@@ -9036,7 +9048,18 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Waiting for server to respond...</source>
-      <translation type="unfinished">Waiting for server to respond...</translation>
+      <translation>等待服务器响应...</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ServerUpdateTool</name>
+    <message>
+      <source>No connection to the server.</source>
+      <translation type="unfinished">No connection to the server.</translation>
+    </message>
+    <message>
+      <source>Network error.</source>
+      <translation type="unfinished">Network error.</translation>
     </message>
   </context>
   <context>
@@ -9051,7 +9074,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Store Update Files</source>
-      <translation type="unfinished">Store Update Files</translation>
+      <translation>存储更新文件</translation>
     </message>
     <message>
       <source>Client</source>
@@ -9059,11 +9082,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Component</source>
-      <translation type="unfinished">Component</translation>
+      <translation>组件</translation>
     </message>
     <message>
       <source>Installed Version</source>
-      <translation type="unfinished">Installed Version</translation>
+      <translation>当前版本</translation>
     </message>
   </context>
   <context>
@@ -9081,7 +9104,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::SimpleMotionSearchWidget</name>
     <message>
       <source>Select area on the video to filter results</source>
-      <translation type="unfinished">Select area on the video to filter results</translation>
+      <translation>选择视频上的区域来筛选结果</translation>
     </message>
     <message>
       <source>In selected area</source>
@@ -9103,15 +9126,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Selected camera</source>
-      <translation type="unfinished">Selected camera</translation>
+      <translation>选择摄像机</translation>
     </message>
     <message>
       <source>Selected device</source>
-      <translation type="unfinished">Selected device</translation>
+      <translation>选择设备</translation>
     </message>
     <message>
       <source>Selected media</source>
-      <translation type="unfinished">Selected media</translation>
+      <translation>选择媒体</translation>
     </message>
     <message>
       <source>none</source>
@@ -9130,8 +9153,8 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::SystemHealthListModel::Private</name>
     <message numerus="yes">
       <source>Email address is not set for %n users</source>
-      <translation type="unfinished">
-        <numerusform>Email address is not set for %n users</numerusform>
+      <translation>
+        <numerusform>用户 %n 邮件地址未设置</numerusform>
       </translation>
     </message>
     <message>
@@ -9149,13 +9172,13 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Double click to add cameras to the current layout or ctrl+click to open in a new tab</source>
-      <translation type="unfinished">
-        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
+      <translation>
+        <numerusform>双击将摄影机添加到当前布局或按住Ctrl加单击键以在新分页中打开</numerusform>
       </translation>
     </message>
     <message>
       <source>No available archive</source>
-      <translation type="unfinished">No available archive</translation>
+      <translation>没有可用的档案</translation>
     </message>
   </context>
   <context>
@@ -9166,7 +9189,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Time Zone</source>
-      <translation type="unfinished">Time Zone</translation>
+      <translation>时区</translation>
     </message>
     <message>
       <source>Date</source>
@@ -9174,42 +9197,42 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Server OS Time</source>
-      <translation type="unfinished">Server OS Time</translation>
+      <translation>服务器操作系统时间</translation>
     </message>
     <message>
       <source>VMS Time</source>
-      <translation type="unfinished">VMS Time</translation>
+      <translation>VMS时间</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::TimeSynchronizationWidget</name>
     <message>
       <source>Time, common and synchronized between all servers. Can be different with OS time on any particular server.</source>
-      <translation type="unfinished">Time, common and synchronized between all servers. Can be different with OS time on any particular server.</translation>
+      <translation>所有服务器之间的时间，通用和同步。可以与任何特定服务器上的作业系统时间不同。</translation>
     </message>
     <message>
       <source>Synchronized with the Internet</source>
-      <translation type="unfinished">Synchronized with the Internet</translation>
+      <translation>与互联网同步</translation>
     </message>
     <message>
       <source>Synchronized with the local time at the selected server</source>
-      <translation type="unfinished">Synchronized with the local time at the selected server</translation>
+      <translation>与所选服务器上的本地时间同步</translation>
     </message>
     <message>
       <source>Not synchronized. Each server uses its own local time.</source>
-      <translation type="unfinished">Not synchronized. Each server uses its own local time.</translation>
+      <translation>不同步。每个服务器都使用自己的本地时间。</translation>
     </message>
     <message>
       <source>Equal to the server local time</source>
-      <translation type="unfinished">Equal to the server local time</translation>
+      <translation>同于服务器本地时间</translation>
     </message>
     <message>
       <source>No Internet connection. Time is not being synchronized.</source>
-      <translation type="unfinished">No Internet connection. Time is not being synchronized.</translation>
+      <translation>没有网络连接。时间没有同步。</translation>
     </message>
     <message>
       <source>Time Server is offline. Time is not being synchronized.</source>
-      <translation type="unfinished">Time Server is offline. Time is not being synchronized.</translation>
+      <translation>时间服务器处于离线状态。时间没有同步。</translation>
     </message>
   </context>
   <context>
@@ -9235,7 +9258,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Could not create upload on the server side: %1</source>
-      <translation type="unfinished">Could not create upload on the server side: %1</translation>
+      <translation>无法在服务器端创建上载:%1</translation>
     </message>
     <message>
       <source>Could not upload file chunk to the server</source>
@@ -9254,11 +9277,11 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::WearableCameraMotionWidget</name>
     <message>
       <source>Motion is being detected only during video uploading.</source>
-      <translation type="unfinished">Motion is being detected only during video uploading.</translation>
+      <translation>仅在视频上传过程中侦测到移动。</translation>
     </message>
     <message>
       <source>Enabling or disabling this setting does not change anything in the existing archive.</source>
-      <translation type="unfinished">Enabling or disabling this setting does not change anything in the existing archive.</translation>
+      <translation>启用或停用此设定不会更改现有存档中的任何内容。</translation>
     </message>
   </context>
   <context>
@@ -9356,27 +9379,27 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Starting export...</source>
-      <translation type="unfinished">Starting export...</translation>
+      <translation>导出中......</translation>
     </message>
     <message>
       <source>Saving layout</source>
-      <translation type="unfinished">Saving layout</translation>
+      <translation>储存布局中</translation>
     </message>
     <message>
       <source>Stop Saving</source>
-      <translation type="unfinished">Stop Saving</translation>
+      <translation>停止储存</translation>
     </message>
     <message>
       <source>Saving failed</source>
-      <translation type="unfinished">Saving failed</translation>
+      <translation>储存失败</translation>
     </message>
     <message>
       <source>Starting saving...</source>
-      <translation type="unfinished">Starting saving...</translation>
+      <translation>储存中...</translation>
     </message>
     <message>
       <source>We are preparing files for the export process. Please wait for a few seconds.</source>
-      <translation type="unfinished">We are preparing files for the export process. Please wait for a few seconds.</translation>
+      <translation>正在为导出过程准备文件。请稍等。</translation>
     </message>
   </context>
   <context>
@@ -9413,7 +9436,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::integrations::entropix::ReconstructResolutionIntegration</name>
     <message>
       <source>Reconstruct Resolution</source>
-      <translation type="unfinished">Reconstruct Resolution</translation>
+      <translation>重建解析度</translation>
     </message>
   </context>
   <context>
@@ -9454,7 +9477,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::ui::PluginEventModel</name>
     <message>
       <source>Any Plugin</source>
-      <translation type="unfinished">Any Plugin</translation>
+      <translation>任何插件</translation>
     </message>
   </context>
   <context>
@@ -9585,7 +9608,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::ui::workbench::ActionHandler</name>
     <message>
       <source>Layout is full</source>
-      <translation type="unfinished">Layout is full</translation>
+      <translation>布局已满</translation>
     </message>
     <message>
       <source>Failed to change password</source>
@@ -9637,11 +9660,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Virtual Cameras cannot be moved between servers</source>
-      <translation type="unfinished">Virtual Cameras cannot be moved between servers</translation>
+      <translation>虚拟摄像机无法在服务器之间移动</translation>
     </message>
     <message>
       <source>Layout is locked and cannot be changed</source>
-      <translation type="unfinished">Layout is locked and cannot be changed</translation>
+      <translation>布局已锁定且无法更改</translation>
     </message>
     <message>
       <source>Open File</source>
@@ -9649,7 +9672,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>All Supported</source>
-      <translation type="unfinished">All Supported</translation>
+      <translation>全部支持</translation>
     </message>
     <message>
       <source>Select folder...</source>
@@ -9752,17 +9775,17 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>Failed to change password on %n cameras of %1</source>
       <comment>Total number of cameras will be substituted as %1</comment>
-      <translation type="unfinished">
-        <numerusform>Failed to change password on %n cameras of %1</numerusform>
+      <translation>
+        <numerusform>无法更改%1支摄像机中的%n支的密码</numerusform>
       </translation>
     </message>
     <message>
       <source>This build is for testing purposes only.</source>
-      <translation type="unfinished">This build is for testing purposes only.</translation>
+      <translation>此版本仅用于测试。</translation>
     </message>
     <message>
       <source>Open Server Settings</source>
-      <translation type="unfinished">Open Server Settings</translation>
+      <translation>开启服务器设定</translation>
     </message>
     <message>
       <source>OK</source>
@@ -9770,17 +9793,17 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Confirm storage location to store analytics data on &apos;%1&apos;</source>
-      <translation type="unfinished">Confirm storage location to store analytics data on &apos;%1&apos;</translation>
+      <translation>请确认储存位置以将分析数据存于 &apos;%1&apos;</translation>
     </message>
     <message>
       <source>Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
 Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
 By default analytics data will be stored in mediaserver&apos;s installation directory.
 You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</source>
-      <translation type="unfinished">Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
-Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
-By default analytics data will be stored in mediaserver&apos;s installation directory.
-You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</translation>
+      <translation>建议将分析资料库储存于本地端，可占用多达数百GB。
+选择存储分析数据的位置后，如不删除现有资料，将无法轻易更改。我们建议仔细选择储存位置，请不要使用系统分区以避免发生严重的系统故障。
+在初始设定下，数据将存储在mediaserver&apos;的安装目录中。
+您可以在“服务器设定”对话框分页中的“ &quot;Storage Management&quot; 更改存储位置。</translation>
     </message>
   </context>
   <context>
@@ -9799,7 +9822,7 @@ You can change storage location in the &quot;Storage Management&quot; tab in the
     <message>
       <source>Switch by</source>
       <comment>Arrows will follow</comment>
-      <translation type="unfinished">Switch by</translation>
+      <translation>切换</translation>
     </message>
     <message>
       <source>Display for</source>

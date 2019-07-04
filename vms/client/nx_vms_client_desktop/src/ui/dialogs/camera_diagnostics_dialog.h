@@ -41,8 +41,8 @@ private slots:
     void updateOkButtonEnabled();
     void clearLog();
 
-    void at_tool_diagnosticsStepStarted(CameraDiagnostics::Step::Value stepType);
-    void at_tool_diagnosticsStepResult(CameraDiagnostics::Step::Value stepType, bool result, const QString &errorMessage);
+    void at_tool_diagnosticsStepStarted(int stepType);
+    void at_tool_diagnosticsStepResult(int stepType, bool result, const QString &errorMessage);
     void at_tool_diagnosticsDone();
 
     void at_copyButton_clicked();

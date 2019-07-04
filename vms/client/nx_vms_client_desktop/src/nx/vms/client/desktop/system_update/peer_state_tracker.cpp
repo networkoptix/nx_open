@@ -598,6 +598,7 @@ QSet<QnUuid> PeerStateTracker::peersWithDownloaderError() const
         UpdateItem::ErrorCode::internalDownloaderError,
         UpdateItem::ErrorCode::noFreeSpaceToDownload,
         UpdateItem::ErrorCode::noFreeSpaceToExtract,
+        UpdateItem::ErrorCode::noFreeSpaceToInstall,
     };
     QSet<QnUuid> result;
     QnMutexLocker locker(&m_dataLock);
@@ -881,6 +882,8 @@ QString PeerStateTracker::errorString(nx::update::Status::ErrorCode code)
             return tr("There is not enough space to download update files.");
         case Code::noFreeSpaceToExtract:
             return tr("There is not enough space to extract update files.");
+        case Code::noFreeSpaceToInstall:
+            return tr("There is not enough space to install update.");
         case Code::downloadFailed:
             return tr("Failed to download update packages.");
         case Code::invalidUpdateContents:
@@ -892,7 +895,7 @@ QString PeerStateTracker::errorString(nx::update::Status::ErrorCode code)
         case Code::internalDownloaderError:
             return tr("Internal downloader error.");
         case Code::internalError:
-            return tr("Iternal server error.");
+            return tr("Internal server error.");
         case Code::applauncherError:
             return tr("Internal client error.");
         case Code::unknownError:

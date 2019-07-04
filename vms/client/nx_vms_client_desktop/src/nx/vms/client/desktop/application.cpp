@@ -223,19 +223,28 @@ int runApplicationInternal(QtSingleApplication* application, const QnStartupPara
 
     nx::media::DecoderRegistrar::registerDecoders({}, true, true);
 
-    QDesktopWidget *desktop = qApp->desktop();
+    const auto desktop = qApp->desktop();
     bool customScreen = startupParams.screen != QnStartupParameters::kInvalidScreen
         && startupParams.screen < desktop->screenCount();
-    if (customScreen)
+    const bool customWindowGeometry = !startupParams.windowGeometry.isEmpty();
+
+    if (customWindowGeometry)
+    {
+        // We must handle all 'WindowScreenChange' events _before_ we move window.
+        qApp->processEvents();
+        mainWindow->move(startupParams.windowGeometry.topLeft());
+        mainWindow->resize(startupParams.windowGeometry.size());
+    }
+    else if (customScreen)
     {
         NX_INFO(kMainWindow) << "Running application on a custom screen" << startupParams.screen;
         const auto windowHandle = mainWindow->windowHandle();
         if (windowHandle && (desktop->screenCount() > 0))
         {
-            /* We must handle all 'WindowScreenChange' events _before_ we changing screen. */
+            // We must handle all 'WindowScreenChange' events _before_ we change screen.
             qApp->processEvents();
 
-            /* Set target screen for fullscreen mode. */
+            // Set target screen for fullscreen mode.
             const auto screen = QGuiApplication::screens().value(startupParams.screen, 0);
             NX_INFO(kMainWindow) << "Target screen geometry is" << screen->geometry();
             windowHandle->setScreen(screen);
@@ -255,18 +264,21 @@ int runApplicationInternal(QtSingleApplication* application, const QnStartupPara
 
     mainWindow->show();
     joystickManager->start(mainWindow->winId());
-    if (customScreen)
-    {
-        /* We must handle 'move' event _before_ we activate fullscreen. */
-        qApp->processEvents();
-    }
 
-    const bool instantlyMaximize = !startupParams.fullScreenDisabled && qnRuntime->isDesktopMode();
+    const bool instantlyMaximize = !startupParams.fullScreenDisabled
+        && !customWindowGeometry
+        && qnRuntime->isDesktopMode();
 
     if (instantlyMaximize)
+    {
+        // We must handle 'move' event _before_ we activate fullscreen.
+        qApp->processEvents();
         context->action(nx::vms::client::desktop::ui::action::EffectiveMaximizeAction)->trigger();
+    }
     else
+    {
         mainWindow->updateDecorationsState();
+    }
 
     if (!allowMultipleClientInstances)
     {
