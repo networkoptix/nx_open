@@ -517,13 +517,8 @@ void Worker::handleFileInformationReply(
 
     increasePeerRank(peer);
 
-    if (m_state == State::requestingAvailableChunks)
-    {
-        if (haveChunksToDownload())
-            setState(State::foundAvailableChunks);
-        else
-            sleep();
-    }
+    if (m_state == State::requestingAvailableChunks && haveChunksToDownload())
+        setState(State::foundAvailableChunks);
 }
 
 void Worker::requestChecksums()
