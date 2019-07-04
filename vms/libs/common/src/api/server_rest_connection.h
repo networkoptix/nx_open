@@ -581,6 +581,12 @@ public:
         std::function<void(bool, Handle, QnUbjsonRestResult response)>&& callback,
         QThread* targetThread = nullptr);
 
+    Handle getJsonResult(
+        const QString& action,
+        const QnRequestParamList& params,
+        std::function<void(bool, Handle, QnJsonRestResult response)>&& callback,
+        QThread* targetThread = nullptr);
+
     Handle getRawResult(
         const QString& action,
         const QnRequestParamList& params,

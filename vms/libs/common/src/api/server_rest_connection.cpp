@@ -1075,6 +1075,15 @@ Handle ServerConnection::getUbJsonResult(
     return executeGet(path, params, callback, targetThread);
 }
 
+Handle ServerConnection::getJsonResult(
+    const QString& path,
+    const QnRequestParamList& params,
+    std::function<void(bool, Handle, QnJsonRestResult response)>&& callback,
+    QThread* targetThread)
+{
+    return executeGet(path, params, callback, targetThread);
+}
+
 Handle ServerConnection::getRawResult(
     const QString& path,
     const QnRequestParamList& params,
