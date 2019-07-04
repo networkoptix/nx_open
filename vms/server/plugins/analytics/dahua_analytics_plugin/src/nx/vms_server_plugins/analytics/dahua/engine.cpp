@@ -153,7 +153,11 @@ nx::vms::api::analytics::DeviceAgentManifest Engine::fetchDeviceAgentParsedManif
 
     auto& data = m_cachedDeviceData[deviceInfo->sharedId()];
     if (!data.hasExpired())
-        return DeviceAgentManifest{ data.supportedEventTypeIds };
+    {
+        DeviceAgentManifest manifest;
+        manifest.supportedEventTypeIds = data.supportedEventTypeIds;
+        return manifest;
+    }
 
     using namespace std::chrono;
 
@@ -193,7 +197,10 @@ nx::vms::api::analytics::DeviceAgentManifest Engine::fetchDeviceAgentParsedManif
 
     data.supportedEventTypeIds = parseSupportedEvents(*buffer);
     data.timeout.restart();
-    return nx::vms::api::analytics::DeviceAgentManifest{ data.supportedEventTypeIds };
+
+    DeviceAgentManifest manifest;
+    manifest.supportedEventTypeIds = data.supportedEventTypeIds;
+    return manifest;
 }
 
 const EngineManifest& Engine::parsedManifest() const

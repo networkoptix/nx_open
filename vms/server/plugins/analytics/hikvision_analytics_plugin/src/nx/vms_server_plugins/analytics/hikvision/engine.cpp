@@ -99,7 +99,7 @@ IDeviceAgent* Engine::obtainDeviceAgent(const IDeviceInfo* deviceInfo, IError* o
     return deviceAgent;
 }
 
-const IString* Engine::manifest(IError* error) const
+const IString* Engine::manifest(IError* /*error*/) const
 {
     return new nx::sdk::String(m_manifest);
 }
