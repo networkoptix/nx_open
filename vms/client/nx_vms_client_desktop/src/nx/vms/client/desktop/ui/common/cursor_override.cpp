@@ -1,7 +1,10 @@
 #include "cursor_override.h"
 
 #include <QtCore/QList>
+
 #include <QtGui/QGuiApplication>
+#include <QtGui/QCursor>
+
 #include <QtQml/QtQml>
 
 #include <nx/utils/log/assert.h>

@@ -2,7 +2,9 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QPointer>
-#include <QtQml/QtQml>
+
+// Narrowest standard include to use QML_DECLARE_TYPEINFO.
+#include <QtQml/QQmlComponent>
 
 #include <nx/utils/impl_ptr.h>
 

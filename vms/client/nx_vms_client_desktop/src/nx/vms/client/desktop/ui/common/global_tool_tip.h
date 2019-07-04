@@ -1,7 +1,9 @@
 #pragma once
 
 #include <QtCore/QObject>
-#include <QtQml/QtQml>
+
+// Narrowest standard include to use QML_DECLARE_TYPEINFO.
+#include <QtQml/QQmlComponent>
 
 namespace nx::vms::client::desktop {
 
