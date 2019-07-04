@@ -58,16 +58,16 @@ api::metrics::SystemManifest Controller::manifest(bool applyRules) const
 }
 
 api::metrics::SystemValues Controller::values(
-    bool applyRules, std::optional<std::chrono::milliseconds> timeLine) const
+    bool applyRules, std::optional<std::chrono::milliseconds> timeline) const
 {
     NX_MUTEX_LOCKER locker(&m_mutex);
     api::metrics::SystemValues systemValues;
     for (const auto& [name, provider]: m_resourceProviders)
     {
         auto& groupValues = systemValues[name];
-        if (timeLine)
+        if (timeline)
         {
-            groupValues = provider->timeline(m_currentSecsSinceEpoch(), *timeLine);
+            groupValues = provider->timeline(m_currentSecsSinceEpoch(), *timeline);
             continue;
         }
 

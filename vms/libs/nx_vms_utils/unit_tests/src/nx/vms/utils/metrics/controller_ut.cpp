@@ -315,7 +315,7 @@ TEST_F(MetricsControllerTest, Values)
 {
     expectCurrentValues(controller.values());
     expectTimelineValues(
-        controller.values(/*applyRules*/ false, /*timeLine*/ std::chrono::milliseconds::zero()),
+        controller.values(/*applyRules*/ false, /*timeline*/ std::chrono::milliseconds::zero()),
         /*isUpdated*/ false);
 
     nx::utils::test::ScopedTimeShift timeShift(nx::utils::test::ClockType::steady);
@@ -324,7 +324,7 @@ TEST_F(MetricsControllerTest, Values)
 
     expectUpdatedValues(controller.values());
     expectTimelineValues(
-        controller.values(/*applyRules*/ false, /*timeLine*/ std::chrono::milliseconds::zero()),
+        controller.values(/*applyRules*/ false, /*timeline*/ std::chrono::milliseconds::zero()),
         /*isUpdated*/ true);
 
     ASSERT_TRUE(setRules());

@@ -85,12 +85,12 @@ rest::Response LocalRestHandler::executeGet(const rest::Request& request)
     if (request.path().endsWith("/manifest"))
         return rest::Response::reply(cleanJson(m_controller->manifest(applyRules)));
 
-    std::optional<std::chrono::milliseconds> timeLine;
-    if (const auto value = request.param("timeLine"))
-        timeLine = nx::utils::parseTimerDuration(*value);
+    std::optional<std::chrono::milliseconds> timeline;
+    if (const auto value = request.param("timeline"))
+        timeline = nx::utils::parseTimerDuration(*value);
 
     if (request.path().endsWith("/values"))
-        return rest::Response::reply(cleanJson(m_controller->values(applyRules, timeLine)));
+        return rest::Response::reply(cleanJson(m_controller->values(applyRules, timeline)));
 
     return rest::Response::error(http::StatusCode::notFound, rest::Result::BadRequest);
 }

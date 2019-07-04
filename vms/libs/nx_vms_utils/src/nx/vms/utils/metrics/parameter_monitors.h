@@ -19,7 +19,7 @@ using Watch = nx::utils::MoveOnlyFunc<nx::utils::SharedGuardPtr(const ResourceTy
 /**
  * Allows to monitor parameter value.
  */
-class AbstractParameterMonitor
+class NX_VMS_UTILS_API AbstractParameterMonitor
 {
 public:
     virtual ~AbstractParameterMonitor() = default;
