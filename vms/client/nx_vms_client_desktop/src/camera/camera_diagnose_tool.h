@@ -64,31 +64,34 @@ namespace CameraDiagnostics
         //!Valid only after diagnostics finished
         QString errorMessage() const;
 
-    public slots:
-        void onGetServerSystemIdResponse(bool status, int handle, QString serverSystemId);
+    protected:
+        void onGetServerSystemIdResponse(bool success, int handle, QString serverSystemId);
         //!Receives response from server
         /*!
             \param status \a QNetworkReply::NetworkError
             \param performedStep Constant from \a Step::Value enumeration
         */
-        void onCameraDiagnosticsStepResponse(int status, QnCameraDiagnosticsReply, int handle );
+        void onCameraDiagnosticsStepResponse(
+            bool success, int handle, const QnCameraDiagnosticsReply& reply);
+
+        void doNextStep(Step::Value nextStep);
 
     signals:
         /*!
             \param stepType Value from CameraDiagnostics::Step::Value enumeration
         */
-        void diagnosticsStepStarted( CameraDiagnostics::Step::Value stepType );
+        void diagnosticsStepStarted(int stepType );
         /*!
             \param stepType Value from CameraDiagnostics::Step::Value enumeration
         */
-        void diagnosticsStepResult( CameraDiagnostics::Step::Value stepType, bool result, const QString &errorMessage );
+        void diagnosticsStepResult(int stepType, bool result, const QString &errorMessage );
         //!Emmitted on diagnostics done (with any result)
         /*!
             \param finalStep Value from CameraDiagnostics::Step::Value enumeration
             \param result \a true, if diagnostics found no errors
             \param finalStep Step, diagnostics has been stopped on
         */
-        void diagnosticsDone( CameraDiagnostics::Step::Value finalStep, bool result, const QString &errorMessage );
+        void diagnosticsDone(int finalStep, bool result, const QString &errorMessage );
 
     private:
         const QnUuid m_cameraId;

@@ -60,7 +60,6 @@ QN_DEFINE_LEXICAL_ENUM(RequestObject,
     (SetParamsObject, "setCameraParam")
     (CameraAddObject, "manualCamera/add")
     (checkCamerasObject, "checkDiscovery")
-    (CameraDiagnosticsObject, "doCameraDiagnosticsStep")
     (RebuildArchiveObject, "rebuildArchive")
     (BackupControlObject, "backupControl")
     (PingSystemObject, "pingSystem")
@@ -116,9 +115,6 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse& response
             break;
         case checkCamerasObject:
             processJsonReply<QnCameraListReply>(this, response, handle);
-            break;
-        case CameraDiagnosticsObject:
-            processJsonReply<QnCameraDiagnosticsReply>(this, response, handle);
             break;
         case RebuildArchiveObject:
             processJsonReply<QnStorageScanData>(this, response, handle);
@@ -327,17 +323,6 @@ int QnMediaServerConnection::testLdapSettingsAsync(
     return sendAsyncPostRequestLogged(TestLdapSettingsObject, std::move(headers),
         QnRequestParamList(), QJson::serialized(settings),
         QN_STRINGIZE_TYPE(QnLdapUsers), target, slot, timeout);
-}
-
-int QnMediaServerConnection::doCameraDiagnosticsStepAsync(
-    const QnUuid& cameraId, CameraDiagnostics::Step::Value previousStep, QObject* target,
-    const char* slot)
-{
-    QnRequestParamList params;
-    params.insert("cameraId", cameraId);
-    params.insert("type", CameraDiagnostics::Step::toString(previousStep));
-    return sendAsyncGetRequestLogged(CameraDiagnosticsObject,
-        params, QN_STRINGIZE_TYPE(QnCameraDiagnosticsReply), target, slot);
 }
 
 int QnMediaServerConnection::doRebuildArchiveAsync(

@@ -88,15 +88,6 @@ public:
     int getStorageStatusAsync(const QString& storageUrl, QObject* target, const char* slot);
 
     /**
-     * Request the server to run the camera diagnostics step following previousStep.
-     * @param slot Slot MUST have signature (int, QnCameraDiagnosticsReply, int).
-     * @return Request handle.
-     */
-    int doCameraDiagnosticsStepAsync(
-        const QnUuid& cameraId, CameraDiagnostics::Step::Value previousStep,
-        QObject* target, const char* slot );
-
-    /**
      * @param slot Slot MUST have signature (int, QnStorageScanData, int).
      * @return Request handle. -1 In case of failure to start async request.
      */

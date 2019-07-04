@@ -1144,6 +1144,18 @@ Handle ServerConnection::getSystemId(
     return executeGet("/api/getSystemId", {}, internalCallback, targetThread);
 }
 
+Handle ServerConnection::doCameraDiagnosticsStep(
+    const QnUuid& cameraId, CameraDiagnostics::Step::Value previousStep,
+    Result<RestResultWithData<QnCameraDiagnosticsReply>>::type&& callback,
+    QThread* targetThread)
+{
+    QnRequestParamList params;
+    params.insert("cameraId", cameraId);
+    params.insert("type", CameraDiagnostics::Step::toString(previousStep));
+
+    return executeGet("/api/doCameraDiagnosticsStep", params, callback, targetThread);
+}
+
 Handle ServerConnection::recordedTimePeriods(
     const QnChunksRequestData& request,
     Result<MultiServerPeriodDataList>::type&& callback,
@@ -1632,6 +1644,7 @@ void ServerConnection::onHttpClientDone(
 
     HttpCompletionFunc callback = itr.value();
     m_runningRequests.remove(requestId);
+    lock.unlock();
 
     SystemError::ErrorCode systemError = SystemError::noError;
     nx::network::http::StatusCode::Value statusCode = nx::network::http::StatusCode::ok;
@@ -1649,7 +1662,7 @@ void ServerConnection::onHttpClientDone(
         contentType = httpClient->contentType();
         messageBody = httpClient->fetchMessageBodyBuffer();
     }
-    lock.unlock();
+
     if (callback)
     {
         const auto response = httpClient->response();
