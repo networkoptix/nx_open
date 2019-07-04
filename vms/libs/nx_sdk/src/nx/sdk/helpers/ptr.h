@@ -98,7 +98,8 @@ public:
     operator bool() const { return m_ptr != nullptr; }
 
 private:
-    template<class RefCountable> friend Ptr<RefCountable> toPtr(RefCountable* refCountable);
+    template<class OtherRefCountable>
+    friend Ptr<OtherRefCountable> toPtr(OtherRefCountable* refCountable);
 
     explicit Ptr(RefCountable* ptr): m_ptr(ptr) {}
 
