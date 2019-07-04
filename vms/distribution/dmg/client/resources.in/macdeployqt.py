@@ -101,7 +101,7 @@ def prepare(build_dir, binary, sbindir, tlibdir):
             set_permissions(dep)
             yield dep
 
-    tqmldir = join(tcontentsdir, 'qml')
+    tqmldir = join(tbindir, 'qml')
     shutil.copytree(join(sbindir, 'vox'), join(tresdir, 'vox'))
     shutil.copytree(join(sbindir, 'qml'), tqmldir)
 
