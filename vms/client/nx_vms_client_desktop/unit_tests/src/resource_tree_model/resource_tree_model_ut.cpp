@@ -6,6 +6,7 @@
 #include <client/client_module.h>
 
 #include <ui/workbench/workbench_access_controller.h>
+#include <ui/workbench/workbench_layout_snapshot_manager.h>
 #include <ui/models/resource/resource_tree_model.h>
 #include <ui/models/resource_tree_sort_proxy_model.h>
 
@@ -22,8 +23,13 @@ protected:
 
         m_clientModule.reset(new QnClientModule(startupParameters, nullptr));
         m_accessController.reset(new QnWorkbenchAccessController(commonModule()));
-        m_resourceTreeModel.reset(new QnResourceTreeModel(QnResourceTreeModel::FullScope,
-            QnUserResourcePtr(), m_accessController.get(), nullptr, commonModule()));
+        m_layoutSnapshotManager.reset(new QnWorkbenchLayoutSnapshotManager(commonModule()));
+        m_resourceTreeModel.reset(new QnResourceTreeModel(
+            QnResourceTreeModel::FullScope,
+            QnUserResourcePtr(),
+            m_accessController.get(),
+            m_layoutSnapshotManager.get(),
+            commonModule()));
 
         m_resourceTreeProxyModel.reset(new QnResourceTreeSortProxyModel());
         m_resourceTreeProxyModel->setSortCaseSensitivity(Qt::CaseInsensitive);
@@ -34,6 +40,7 @@ protected:
     {
         m_resourceTreeProxyModel.clear();
         m_resourceTreeModel.clear();
+        m_layoutSnapshotManager.clear();
         m_accessController.clear();
         m_clientModule.clear();
     }
@@ -65,6 +72,7 @@ protected:
 protected:
     QSharedPointer<QnClientModule> m_clientModule;
     QSharedPointer<QnWorkbenchAccessController> m_accessController;
+    QSharedPointer<QnWorkbenchLayoutSnapshotManager> m_layoutSnapshotManager;
     QSharedPointer<QnResourceTreeModel> m_resourceTreeModel;
     QSharedPointer<QnResourceTreeSortProxyModel> m_resourceTreeProxyModel;
 };

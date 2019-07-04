@@ -13,16 +13,13 @@
 QnResourceTreeModelLayoutNodeManager::QnResourceTreeModelLayoutNodeManager(QnResourceTreeModel* model):
     base_type(model)
 {
-    // TODO: #vbreus FIXME: layout snapshot manager mock should be assigned in test environment
-    if (const auto layoutSnapshotManager = model->layoutSnapshotManager())
-    {
-        connect(layoutSnapshotManager, &QnWorkbenchLayoutSnapshotManager::layoutFlagsChanged, this,
-            [this, layoutSnapshotManager](const QnLayoutResourcePtr& layout)
-            {
-                resourceChainCall(layout, &QnResourceTreeModelNode::setModified,
-                    layoutSnapshotManager->isModified(layout));
-            });
-    }
+    const auto layoutSnapshotManager = model->layoutSnapshotManager();
+    connect(layoutSnapshotManager, &QnWorkbenchLayoutSnapshotManager::layoutFlagsChanged, this,
+        [this, layoutSnapshotManager](const QnLayoutResourcePtr& layout)
+        {
+            resourceChainCall(layout, &QnResourceTreeModelNode::setModified,
+                layoutSnapshotManager->isModified(layout));
+        });
 
     connect(resourceAccessProvider(), &QnResourceAccessProvider::accessChanged, this,
         [this](const QnResourceAccessSubject& subject, const QnResourcePtr& resource)

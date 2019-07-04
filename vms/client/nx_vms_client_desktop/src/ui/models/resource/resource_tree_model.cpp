@@ -137,8 +137,7 @@ QnResourceTreeModel::QnResourceTreeModel(
     m_layoutSnapshotManager(layoutSnapshotManager)
 {
     NX_ASSERT(accessController != nullptr);
-    // TODO: #vbreus FIXME: layout snapshot manager mock should be assigned in test environment
-    // NX_ASSERT(layoutSnapshotManager != nullptr);
+    NX_ASSERT(layoutSnapshotManager != nullptr);
 
     m_nodeManager = new QnResourceTreeModelNodeManager(this);
     m_layoutNodeManager = new QnResourceTreeModelLayoutNodeManager(this);
@@ -170,12 +169,9 @@ QnResourceTreeModel::QnResourceTreeModel(
     connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
         &QnResourceTreeModel::at_resPool_resourceRemoved);
 
-    // TODO: #vbreus FIXME: layout snapshot manager mock should be assigned in test environment
-    if (layoutSnapshotManager)
-    {
-        connect(layoutSnapshotManager, &QnWorkbenchLayoutSnapshotManager::layoutFlagsChanged,
-            this, &QnResourceTreeModel::at_snapshotManager_flagsChanged);
-    }
+    connect(layoutSnapshotManager, &QnWorkbenchLayoutSnapshotManager::layoutFlagsChanged,
+        this, &QnResourceTreeModel::at_snapshotManager_flagsChanged);
+
     connect(globalSettings(), &QnGlobalSettings::systemNameChanged, this,
         &QnResourceTreeModel::at_systemNameChanged);
 
