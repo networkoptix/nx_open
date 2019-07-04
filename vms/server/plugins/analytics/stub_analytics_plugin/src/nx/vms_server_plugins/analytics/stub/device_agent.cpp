@@ -2,10 +2,11 @@
 
 #include "device_agent.h"
 
-#include <iostream>
+#include <vector>
+#include <string>
+#include <mutex>
 #include <chrono>
 #include <ctime>
-#include <cmath>
 
 #define NX_PRINT_PREFIX (this->logUtils.printPrefix)
 #include <nx/kit/debug.h>
