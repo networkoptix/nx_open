@@ -14,9 +14,16 @@
 
 namespace nx::test {
 
-class CameraAuthUt: public ::testing::Test
+
+class CameraAuthFt: public ::testing::Test
 {
 protected:
+    CameraAuthFt()
+    {
+        m_server = std::unique_ptr<MediaServerLauncher>(new MediaServerLauncher());
+        m_server->addSetting(QnServer::kNoInitStoragesOnStartup, "1");
+    }
+
     template <typename Data>
     ec2::QnTransaction<Data> createTran(const QString& name, const QString& value)
     {
@@ -122,7 +129,10 @@ protected:
     {
         auto originalTran = createTran<Data>(paramName, "user:password");
         auto amendedTran = whenTransactionProcessed(originalTran);
-        ec2::amendOutputDataIfNeeded(accessData, &amendedTran.params);
+        ec2::amendOutputDataIfNeeded(
+            accessData,
+            m_server->serverModule()->commonModule()->resourceAccessManager(),
+            &amendedTran.params);
 
         if (shouldBeEqual)
         {
@@ -135,20 +145,14 @@ protected:
         }
     }
 
-};
-
-class CameraAuthFt: public ::testing::Test
-{
-protected:
-    CameraAuthFt()
+    void whenServerLaunched()
     {
-        m_server = std::unique_ptr<MediaServerLauncher>(new MediaServerLauncher());
-        m_server->addSetting(QnServer::kNoInitStoragesOnStartup, "1");
+        ASSERT_TRUE(m_server->start());
     }
 
     void whenServerLaunchedAndDataPrepared()
     {
-        ASSERT_TRUE(m_server->start());
+        whenServerLaunched();
         m_cameraData.typeId = qnResTypePool->getResourceTypeByName("Camera")->getId();
         m_cameraData.physicalId = "physId";
         m_cameraData.vendor = "vendor";
@@ -228,14 +232,16 @@ private:
     }
 };
 
-TEST_F(CameraAuthUt, amendTransaction)
+TEST_F(CameraAuthFt, amendTransaction)
 {
+    whenServerLaunched();
     checkAmendTransaction<vms::api::ResourceParamData>();
     checkAmendTransaction<vms::api::ResourceParamWithRefData>();
 }
 
-TEST_F(CameraAuthUt, amendOutputData)
+TEST_F(CameraAuthFt, amendOutputData)
 {
+    whenServerLaunched();
     checkOutputDataAmending<vms::api::ResourceParamData>();
     checkOutputDataAmending<vms::api::ResourceParamWithRefData>();
 }
