@@ -6,6 +6,7 @@
 
 #include <nx/network/aio/basic_pollable.h>
 #include <nx/utils/move_only_func.h>
+#include <nx/utils/std/filesystem.h>
 
 #include "result_code.h"
 
