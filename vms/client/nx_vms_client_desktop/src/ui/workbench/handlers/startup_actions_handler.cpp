@@ -18,6 +18,7 @@
 #include <client/client_runtime_settings.h>
 #include <client/client_startup_parameters.h>
 
+#include <nx/vms/client/desktop/system_logon/data/logon_parameters.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/utils/mime_data.h>
 #include <nx/vms/client/desktop/ini.h>
@@ -366,10 +367,10 @@ bool StartupActionsHandler::connectUsingCustomUri(const nx::vms::utils::SystemUr
     systemUrl.setUserName(auth.user);
     systemUrl.setPassword(auth.password);
 
-    auto parameters = Parameters().withArgument(Qn::UrlRole, systemUrl);
-    parameters.setArgument(Qn::ForceRole, true);
-    parameters.setArgument(Qn::StoreSessionRole, false);
-    menu()->trigger(ConnectAction, parameters);
+    LogonParameters parameters(systemUrl);
+    parameters.force = true;
+    parameters.storeSession = false;
+    menu()->trigger(ConnectAction, Parameters().withArgument(Qn::LogonParametersRole, parameters));
     return true;
 }
 
@@ -391,10 +392,10 @@ bool StartupActionsHandler::connectUsingCommandLineAuth(
     if (!serverUrl.isValid())
         return false;
 
-    auto params = Parameters().withArgument(Qn::UrlRole, serverUrl);
-    params.setArgument(Qn::ForceRole, true);
-    params.setArgument(Qn::StoreSessionRole, false);
-    menu()->trigger(ConnectAction, params);
+    LogonParameters parameters(serverUrl);
+    parameters.force = true;
+    parameters.storeSession = false;
+    menu()->trigger(ConnectAction, Parameters().withArgument(Qn::LogonParametersRole, parameters));
     return true;
 }
 

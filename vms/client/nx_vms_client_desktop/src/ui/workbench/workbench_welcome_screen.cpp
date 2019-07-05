@@ -26,6 +26,7 @@
 #include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/common/utils/connection_url_parser.h>
+#include <nx/vms/client/desktop/system_logon/data/logon_parameters.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/style/nx_style.h>
 #include <ui/dialogs/login_dialog.h>
@@ -413,12 +414,11 @@ void QnWorkbenchWelcomeScreen::connectToSystemInternal(
             if (!credentials.user.isEmpty())
                 url.setUserName(credentials.user);
 
-            action::Parameters params;
-            params.setArgument(Qn::UrlRole, url);
-            params.setArgument(Qn::StorePasswordRole, storePassword);
-            params.setArgument(Qn::AutoLoginRole, autoLogin);
-            params.setArgument(Qn::StoreSessionRole, true);
-            menu()->trigger(action::ConnectAction, params);
+            LogonParameters parameters(url);
+            parameters.autoLogin = autoLogin;
+            parameters.storePassword = storePassword;
+            menu()->trigger(action::ConnectAction,
+                action::Parameters().withArgument(Qn::LogonParametersRole, parameters));
         };
 
     enum { kMinimalDelay = 1};
