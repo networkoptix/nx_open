@@ -312,8 +312,8 @@ INSTANTIATE_TEST_CASE_P(
     UploadDifferentContainersAndCodecs, FtWearableCameraUpload,
     ::testing::Values(
         UploadTestParameters("matroska","h263p"), UploadTestParameters("mp4","mpeg4"),
-        UploadTestParameters("mov","h263p"), UploadTestParameters("avi","h263p")
-        //UploadTestParameters("matroska", "libopenh264")
+        UploadTestParameters("mov","h263p"), UploadTestParameters("avi","h263p"),
+        UploadTestParameters("matroska", "libopenh264")
         ));
 
 } // namespace nx::vms::server::test
