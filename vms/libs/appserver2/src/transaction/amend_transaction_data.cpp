@@ -22,7 +22,7 @@
 
 namespace ec2 {
 
-static const QString kHiddenPasswordFiller = ":******";
+static const QString kHiddenPasswordFiller = "******";
 
 bool amendOutputDataIfNeeded(const Qn::UserAccessData& accessData,
     QnResourceAccessManager* /*accessManager*/,
@@ -36,7 +36,7 @@ bool amendOutputDataIfNeeded(const Qn::UserAccessData& accessData,
             accessData.access == Qn::UserAccessData::Access::ReadAllResources)
             paramData->value = decryptedValue;
         else
-            paramData->value = decryptedValue.left(decryptedValue.indexOf(':')) + kHiddenPasswordFiller;
+            paramData->value = decryptedValue.left(decryptedValue.indexOf(':')) + ":" + kHiddenPasswordFiller;
 
         return true;
     }
@@ -121,9 +121,9 @@ bool amendOutputDataIfNeeded(const Qn::UserAccessData& accessData,
     QnResourceAccessManager* accessManager,
     nx::vms::api::FullInfoData* paramData)
 {
-    if (!amendOutputDataIfNeeded(accessData, accessManager, &paramData->allProperties))
-        return false;
-    return amendOutputDataIfNeeded(accessData, accessManager, &paramData->rules);
+    auto result = amendOutputDataIfNeeded(accessData, accessManager, &paramData->allProperties);
+    result |= amendOutputDataIfNeeded(accessData, accessManager, &paramData->rules);
+    return result;
 }
 
 bool amendOutputDataIfNeeded(const Qn::UserAccessData& accessData,
