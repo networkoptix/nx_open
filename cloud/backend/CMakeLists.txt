@@ -25,4 +25,4 @@ if(withClouds)
     endif()
 endif()
 
-add_custom_target(cloud-backend DEPENDS cloud_db_client connection_mediator cloud_db traffic_relay time_server cloud_connect_test_util)
+add_custom_target(cloud-backend DEPENDS cloud_db_client connection_mediator cloud_db traffic_relay time_server cloud_connect_test_util cloud_storage_backend)
