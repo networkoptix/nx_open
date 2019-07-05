@@ -2327,34 +2327,34 @@ void MultiServerUpdatesWidget::syncRemoteUpdateStateToUi()
     bool hasVerificationErrors = m_stateTracker->hasVerificationErrors();
     bool hasStatusErrors = m_stateTracker->hasStatusErrors();
 
+    QStringList errorTooltips;
     if (m_widgetState == WidgetUpdateState::readyInstall)
     {
         if (readyAndOnline.empty() || !readyAndOffline.empty())
         {
-            ui->downloadButton->setEnabled(false);
-            ui->downloadButton->setToolTip(tr("Some servers have gone offline. "
-                "Please wait until they become online to continue."));
+            errorTooltips << tr("Some servers have gone offline. "
+                                "Please wait until they become online to continue.");
         }
         else if (hasVerificationErrors)
         {
-            ui->downloadButton->setEnabled(false);
-            ui->downloadButton->setToolTip(tr("Some servers have no package available"));
+            errorTooltips << tr("Some servers have no update packages available.");
         }
         else if (hasStatusErrors)
         {
-            ui->downloadButton->setEnabled(false);
-            ui->downloadButton->setToolTip(tr("Some servers have errors"));
-        }
-        else
-        {
-            ui->downloadButton->setEnabled(true);
-            ui->downloadButton->setToolTip("");
+            errorTooltips << tr("Some servers have encountered an internal error.");
         }
     }
-    else
+
+    if (errorTooltips.isEmpty())
     {
         ui->downloadButton->setEnabled(true);
         ui->downloadButton->setToolTip("");
+    }
+    else
+    {
+        ui->downloadButton->setEnabled(false);
+        errorTooltips << tr("Please please contact Customer Support.");
+        ui->downloadButton->setToolTip(errorTooltips.join("\n"));
     }
 
     ui->tableView->setColumnHidden(ServerUpdatesModel::Columns::StorageSettingsColumn, !m_showStorageSettings);
