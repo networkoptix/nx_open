@@ -1,6 +1,6 @@
 #pragma once
 
-#include <QtCore/QMetatype>
+#include <QtCore/QMetaType>
 
 #include <nx/utils/url.h>
 
