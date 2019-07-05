@@ -1,5 +1,5 @@
 /*
-        stdsoap2.c[pp] 2.8.84
+        stdsoap2.c[pp] 2.8.86
 
         gSOAP runtime engine
 
@@ -52,7 +52,7 @@ A commercial use license is available from Genivia, Inc., contact@genivia.com
 --------------------------------------------------------------------------------
 */
 
-#define GSOAP_LIB_VERSION 20884
+#define GSOAP_LIB_VERSION 20886
 
 #ifdef AS400
 # pragma convert(819)   /* EBCDIC to ASCII */
@@ -86,10 +86,10 @@ A commercial use license is available from Genivia, Inc., contact@genivia.com
 #endif
 
 #ifdef __cplusplus
-SOAP_SOURCE_STAMP("@(#) stdsoap2.cpp ver 2.8.84 2019-05-14 00:00:00 GMT")
+SOAP_SOURCE_STAMP("@(#) stdsoap2.cpp ver 2.8.86 2019-06-24 00:00:00 GMT")
 extern "C" {
 #else
-SOAP_SOURCE_STAMP("@(#) stdsoap2.c ver 2.8.84 2019-05-14 00:00:00 GMT")
+SOAP_SOURCE_STAMP("@(#) stdsoap2.c ver 2.8.86 2019-06-24 00:00:00 GMT")
 #endif
 
 /* 8bit character representing unknown character entity or multibyte data */
@@ -4451,8 +4451,8 @@ ssl_auth_init(struct soap *soap)
     DH_free(dh);
   }
   /* enable all TSLv1 protocols and disable SSLv3 by default if no SSL/TLS flags are set */
-  if (!(soap->ssl_flags & SOAP_SSLv3_TLSv1))
-    soap->ssl_flags = SOAP_TLSv1;
+  if ((soap->ssl_flags & SOAP_SSLv3_TLSv1) == 0)
+    soap->ssl_flags |= SOAP_TLSv1;
 #if OPENSSL_VERSION_NUMBER >= 0x10101000L
   if ((soap->ssl_flags & SOAP_SSLv3))
     minv = SSL3_VERSION;
@@ -4581,8 +4581,8 @@ ssl_auth_init(struct soap *soap)
       gnutls_certificate_server_set_request(soap->session, GNUTLS_CERT_REQUEST);
     gnutls_session_enable_compatibility_mode(soap->session);
     /* enable all TSLv1 protocols and disable SSLv3 by default if no SSL/TLS flags are set */
-    if (!(soap->ssl_flags & SOAP_SSLv3_TLSv1))
-      soap->ssl_flags = SOAP_TLSv1;
+    if ((soap->ssl_flags & SOAP_SSLv3_TLSv1) == 0)
+      soap->ssl_flags |= SOAP_TLSv1;
 #if GNUTLS_VERSION_NUMBER < 0x030300
     if ((soap->ssl_flags & SOAP_SSLv3))
       *protocol++ = GNUTLS_SSL3;
@@ -4615,8 +4615,8 @@ ssl_auth_init(struct soap *soap)
     if (err == GSK_OK)
       err = gsk_attribute_set_enum(soap->ctx, GSK_PROTOCOL_SSLV2, GSK_PROTOCOL_SSLV2_OFF); 
     /* enable all TSLv1 protocols and disable SSLv3 by default if no SSL/TLS flags are set */
-    if (!(soap->ssl_flags & SOAP_SSLv3_TLSv1))
-      soap->ssl_flags = SOAP_TLSv1;
+    if ((soap->ssl_flags & SOAP_SSLv3_TLSv1) == 0)
+      soap->ssl_flags |= SOAP_TLSv1;
     if (err == GSK_OK)
     {
       if ((soap->ssl_flags & SOAP_SSLv3))
@@ -5506,7 +5506,23 @@ again:
   soap->peerlen = sizeof(soap->peer.in);
   memset((void*)&soap->peer.in, 0, sizeof(soap->peer.in));
   soap->peer.in.sin_family = AF_INET;
-  if (soap->client_port >= 0)
+  if (soap->client_addr)
+  {
+    struct sockaddr_in addr;
+    memset((void*)&addr, 0, sizeof(addr));
+    addr.sin_family = AF_INET;
+    if (inet_pton(AF_INET, soap->client_addr, (void*)&addr.sin_addr) != 1 || bind(sk, (struct sockaddr*)&addr, sizeof(addr)))
+    {
+      soap->errnum = soap_socket_errno(sk);
+      DBGLOG(TEST, SOAP_MESSAGE(fdebug, "Could not bind before connect\n"));
+      soap_set_receiver_error(soap, tcp_error(soap), "bind failed in tcp_connect()", SOAP_TCP_ERROR);
+      soap->fclosesocket(soap, sk);
+      soap->client_addr = NULL;
+      return soap->socket = SOAP_INVALID_SOCKET;
+    }
+    soap->client_addr = NULL; /* disable bind before connect, so need to set it again before the next connect */
+  }
+  else if (soap->client_port >= 0)
   {
     struct sockaddr_in addr;
     memset((void*)&addr, 0, sizeof(addr));
@@ -5564,7 +5580,43 @@ again:
     return sk;
 #endif
 #else
-  if (soap->client_port >= 0)
+  if (soap->client_addr)
+  {
+    struct sockaddr_in6 addr;
+    memset((void*)&addr, 0, sizeof(addr));
+    addr.sin6_family = AF_INET6;
+    if (inet_pton(AF_INET6, soap->client_addr, (void*)&addr.sin6_addr.s6_addr) == 1)
+    {
+      if (bind(sk, (struct sockaddr*)&addr, sizeof(addr)))
+      {
+        soap->errnum = soap_socket_errno(sk);
+        freeaddrinfo(ressave);
+        DBGLOG(TEST, SOAP_MESSAGE(fdebug, "Could not bind before connect\n"));
+        soap_set_receiver_error(soap, tcp_error(soap), "bind failed in tcp_connect()", SOAP_TCP_ERROR);
+        soap->fclosesocket(soap, sk);
+        soap->client_addr = NULL;
+        return soap->socket = SOAP_INVALID_SOCKET;
+      }
+    }
+    else /* not an IPv6 address, must be IPv4 */
+    {
+      struct sockaddr_in addr;
+      memset((void*)&addr, 0, sizeof(addr));
+      addr.sin_family = AF_INET;
+      if (inet_pton(AF_INET, soap->client_addr, (void*)&addr.sin_addr) != 1 || bind(sk, (struct sockaddr*)&addr, sizeof(addr)))
+      {
+        soap->errnum = soap_socket_errno(sk);
+        freeaddrinfo(ressave);
+        DBGLOG(TEST, SOAP_MESSAGE(fdebug, "Could not bind before connect\n"));
+        soap_set_receiver_error(soap, tcp_error(soap), "bind failed in tcp_connect()", SOAP_TCP_ERROR);
+        soap->fclosesocket(soap, sk);
+        soap->client_addr = NULL;
+        return soap->socket = SOAP_INVALID_SOCKET;
+      }
+    }
+    soap->client_addr = NULL; /* disable bind before connect, so need to set it again before the next connect */
+  }
+  else if (soap->client_port >= 0)
   {
     struct sockaddr_in6 addr;
     memset((void*)&addr, 0, sizeof(addr));
@@ -5580,7 +5632,7 @@ again:
       soap->client_port = -1;
       return soap->socket = SOAP_INVALID_SOCKET;
     }
-    soap->client_port = -1; /* disable bind before connect, so need to set t again before the next connect */
+    soap->client_port = -1; /* disable bind before connect, so need to set it again before the next connect */
   }
   if (soap->client_interface)
   {
@@ -12018,7 +12070,8 @@ soap_versioning(soap_init)(struct soap *soap, soap_mode imode, soap_mode omode)
   soap->ipv6_multicast_if = 0; /* in_addr_t value */
   soap->ipv4_multicast_if = NULL; /* points to struct in_addr or in_addr_t */
   soap->ipv4_multicast_ttl = 0; /* 0: use default */
-  soap->client_port = -1; /* client port to bind, -1 for none */
+  soap->client_addr = NULL; /* client address (IPv4 or iPv6 or host name) to bind before connect, NULL for none */
+  soap->client_port = -1; /* client port to bind before connect, -1 for none */
   soap->client_interface = NULL; /* client interface address, NULL for none */
 #ifndef WITH_IPV6
   soap->fresolve = tcp_gethost;

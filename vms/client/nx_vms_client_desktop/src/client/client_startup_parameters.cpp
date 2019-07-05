@@ -15,6 +15,8 @@
 
 #include <nx/vms/client/desktop/ini.h>
 
+#include <nx/fusion/model_functions.h>
+
 namespace {
 
 template<typename ValueType>
@@ -77,6 +79,7 @@ QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc, char** arg
     addParserParam(commandLineParser, &result.fullScreenDisabled,   "--no-fullscreen");
     addParserParam(commandLineParser, &result.skipMediaFolderScan,  "--skip-media-folder-scan");
     addParserParam(commandLineParser, &result.engineVersion,        "--override-version");
+    addParserParam(commandLineParser, &result.vmsProtocolVersion,   "--override-protocol-version");
     addParserParam(commandLineParser, &result.showFullInfo,         "--show-full-info");
     addParserParam(commandLineParser, &result.exportedMode,         "--exported");
     addParserParam(commandLineParser, &result.hiDpiDisabled,        "--no-hidpi");
@@ -108,6 +111,9 @@ QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc, char** arg
     QString qmlImportPaths;
     addParserParam(commandLineParser, &qmlImportPaths, "--qml-import-paths");
 
+    QString windowGeometry;
+    addParserParam(commandLineParser, &windowGeometry, "--window-geometry");
+
     commandLineParser.parse(argc, (const char**) argv, stderr);
 
     if (!strCustomUri.isEmpty())
@@ -122,6 +128,9 @@ QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc, char** arg
     result.videoWallItemGuid = QnUuid(strVideoWallItemGuid);
 
     result.qmlImportPaths = qmlImportPaths.split(',', QString::SkipEmptyParts);
+
+    if (!windowGeometry.isEmpty())
+        QnLexical::deserialize(windowGeometry, &result.windowGeometry);
 
     // First unparsed entry is the application path.
     NX_ASSERT(!unparsed.empty());

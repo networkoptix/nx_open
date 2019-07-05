@@ -13,6 +13,9 @@ static std::optional<QJsonValue> cleanupJson(QJsonValue value)
 {
     switch (value.type())
     {
+        case QJsonValue::Null:
+            return std::nullopt;
+
         case QJsonValue::String:
         {
             if (value.toString().isEmpty())

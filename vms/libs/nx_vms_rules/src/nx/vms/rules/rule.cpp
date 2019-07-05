@@ -1,1 +1,100 @@
 #include "rule.h"
+
+#include "event_filter.h"
+#include "action_builder.h"
+
+namespace nx::vms::rules {
+
+Rule::Rule(const QnUuid& id): m_id(id)
+{
+}
+
+Rule::~Rule()
+{
+    qDeleteAll(m_filters);
+    qDeleteAll(m_builders);
+}
+
+QnUuid Rule::id() const
+{
+    return m_id;
+}
+
+void Rule::addEventFilter(EventFilter* filter)
+{
+    insertEventFilter(m_filters.size(), filter);
+}
+
+void Rule::addActionBuilder(ActionBuilder* builder)
+{
+    insertActionBuilder(m_builders.size(), builder);
+}
+
+void Rule::insertEventFilter(int index, EventFilter* filter)
+{
+    // TODO: assert, emit
+    m_filters.insert(index, filter);
+}
+
+void Rule::insertActionBuilder(int index, ActionBuilder* builder)
+{
+    // TODO: assert, emit
+    m_builders.insert(index, builder);
+}
+
+EventFilter* Rule::takeEventFilter(int index)
+{
+    // TODO: assert, emit
+    return m_filters.takeAt(index);
+}
+
+ActionBuilder* Rule::takeActionBuilder(int index)
+{
+    // TODO: assert, emit
+    return m_builders.takeAt(index);
+}
+
+const QList<EventFilter*> Rule::eventFilters() const
+{
+    return m_filters;
+}
+
+const QList<ActionBuilder*> Rule::actionBuilders() const
+{
+    return m_builders;
+}
+
+void Rule::setComment(const QString& comment)
+{
+    m_comment = comment;
+    // TODO: #spanasenko emit?
+}
+
+QString Rule::comment() const
+{
+    return m_comment;
+}
+
+void Rule::setEnabled(bool isEnabled)
+{
+    m_enabled = isEnabled;
+    // TODO: #spanasenko emit?
+}
+
+bool Rule::enabled() const
+{
+    return m_enabled;
+}
+
+void Rule::setSchedule(const QByteArray& schedule)
+{
+    m_schedule = schedule;
+    // TODO: #spanasenko emit?
+}
+
+QByteArray Rule::schedule() const
+{
+    return m_schedule;
+}
+
+} // namespace nx::vms::rules

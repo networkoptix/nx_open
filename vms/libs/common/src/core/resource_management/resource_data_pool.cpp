@@ -166,7 +166,6 @@ bool QnResourceDataPool::loadData(const QByteArray& data)
 {
     QJsonObject map;
     QList<QnResourceDataPoolChunk> chunks;
-    bool result = false;
 
     if(!validateDataInternal(data, map, chunks))
         return false;

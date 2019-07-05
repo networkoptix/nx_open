@@ -233,10 +233,21 @@ SOAP_FMAC3 int SOAP_FMAC4 soap_s2xsd__duration(struct soap *soap, const char *s,
       N = n;
       break;
     case '.':
-      S = n;
-          (void)soap_s2float(soap, s, &f);
-      s = NULL;
-      continue;
+          {
+            char tmp[32];
+            int i;
+            for (i = 0; i < 31; i++)
+            {
+              tmp[i] = *s++;
+              if (*s < '0' || *s > '9')
+                break;
+            }
+            tmp[i + 1] = '\0';
+            if (soap_s2float(soap, tmp, &f))
+              return soap->error;
+            S = n;
+            continue;
+          }
     case 'S':
     case 's':
       S = n;

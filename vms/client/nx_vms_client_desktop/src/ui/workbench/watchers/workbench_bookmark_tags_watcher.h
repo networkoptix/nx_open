@@ -25,7 +25,7 @@ public slots:
     void refresh();
 
 private slots:
-    void at_connection_gotBookmarkTags(int status, const QnCameraBookmarkTagList &tags, int handle);
+    void at_connection_gotBookmarkTags(bool success, const QnCameraBookmarkTagList &tags);
     void at_messageProcessor_connectionOpened();
     void at_messageProcessor_connectionClosed();
 

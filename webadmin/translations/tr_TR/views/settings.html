@@ -107,9 +107,9 @@ Lütfen ağa bağlanın veya doğru IP Adresini yazın.
                                 <a ng-if="!mode.liteClient"
                                    ng-href="{{Config.cloud.portalUrl}}"
                                    target="_blank">Daha fazla bilgi</a></uib-alert>
-                            <uib-alert type="error" ng-if="!hasInternetOnServer">{{Config.cloud.productName}} ayarlamak için sunucuyu internete bağlayın</uib-alert>
-                            <uib-alert type="error" ng-if="hasInternetOnServer && !hasInternetOnClient">{{Config.cloud.productName}} bağlanmak için internet gereklidir</uib-alert>
-                            <p ng-if="canConnectToCloud"  ><button
+                            <uib-alert type="danger" ng-if="!hasInternetOnServer">{{Config.cloud.productName}} ayarlamak için sunucuyu internete bağlayın</uib-alert>
+                            <uib-alert type="danger" ng-if="hasInternetOnServer && !hasInternetOnClient">{{Config.cloud.productName}} bağlanmak için internet gereklidir</uib-alert>
+                            <p ng-if="canConnectToCloud"><button
                                     class="btn btn-default"
                                     ng-click="connectToCloud()" ng-disabled="!hasInternetOnServer || !hasInternetOnClient">Bağlan {{Config.cloud.productName}}</button>
                                 <a ng-if="!mode.liteClient"  class="btn btn-default"

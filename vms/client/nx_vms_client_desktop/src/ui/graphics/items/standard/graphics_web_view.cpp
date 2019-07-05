@@ -1,6 +1,7 @@
 #include "graphics_web_view.h"
 
 #include <QtNetwork/QNetworkReply>
+#include <QtWidgets/QGraphicsOpacityEffect>
 #include <QtWebKit/QWebHistory>
 
 #include <ui/style/webview_style.h>
@@ -39,6 +40,12 @@ QnGraphicsWebView::QnGraphicsWebView(const QUrl &url
 {
     setRenderHints(0);
     setAcceptDrops(false);
+
+    // Forcefully create additional non-screen buffer to make transparency composition work in the
+    // webkit engine over the QOpenGLWidget.
+    auto opacityEffect = new QGraphicsOpacityEffect(this);
+    opacityEffect->setOpacity(0.99); //< 1.0 can be optimized and ignored.
+    setGraphicsEffect(opacityEffect);
 
     settings()->setAttribute(QWebSettings::PluginsEnabled, true);
     settings()->setAttribute(QWebSettings::TiledBackingStoreEnabled, true);

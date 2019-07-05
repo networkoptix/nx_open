@@ -32,10 +32,8 @@ QList<QnUuid> PeerSelector::selectPeers(const QList<PeerSelector::PeerInformatio
 
         case FileInformation::byPlatform:
             return filterPeers(peers,
-                [this](const PeerInformation& peer)
-                {
-                    return systemInformation == peer.systemInformation;
-                }, additionalPeers);
+                [this](const PeerInformation& peer) { return osInfo == peer.osInfo; },
+                additionalPeers);
 
         case FileInformation::none:
         default:

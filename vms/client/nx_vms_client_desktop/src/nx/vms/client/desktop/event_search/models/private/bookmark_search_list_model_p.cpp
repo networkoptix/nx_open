@@ -182,13 +182,13 @@ rest::Handle BookmarkSearchListModel::Private::getBookmarks(
         filter.limit);
 
     return qnCameraBookmarksManager->getBookmarksAsync(q->cameras(), filter,
-        BookmarksInternalCallbackType(nx::utils::guarded(this, callback)));
+        BookmarksCallbackType(nx::utils::guarded(this, callback)));
 }
 
 rest::Handle BookmarkSearchListModel::Private::requestPrefetch(const QnTimePeriod& period)
 {
     const auto callback =
-        [this](bool success, const QnCameraBookmarkList& bookmarks, rest::Handle requestId)
+        [this](bool success, rest::Handle requestId, const QnCameraBookmarkList& bookmarks)
         {
             if (!requestId || requestId != currentRequest().id)
                 return;
@@ -407,7 +407,7 @@ void BookmarkSearchListModel::Private::dynamicUpdate(const QnTimePeriod& period)
         return;
 
     const auto callback =
-        [this](bool success, const QnCameraBookmarkList& bookmarks, rest::Handle requestId)
+        [this](bool success, rest::Handle requestId, const QnCameraBookmarkList& bookmarks)
         {
             // It doesn't matter if we receive results limited by maximum count.
 

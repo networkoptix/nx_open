@@ -176,7 +176,7 @@
         "started": "Actualización se inició correctamente. Tardará varios minutos",
         "upToDate": "Error de actualización. Ya está instalada la versión proporcionada.",
         "invalidFile": "Error de actualización. Archivo proporcionado no es un archivo de actualización válido.",
-        "incompatibleSystem": "Update failed. Provided file is targeted for another System.",
+        "incompatibleSystem": "Actualización fallida. El archivo provisto está dirigido a otro sistema.",
         "extractionError": "Error de actualización. No hay suficiente espacio para extraer el archivo, revise almacenamiento disponible.",
         "installationError": "La actualización falló. No puede ejecutar la escritura de instalación.",
         "selectFiles": "Seleccionar archivos"
@@ -192,17 +192,17 @@
     },
     "common": {
         "voiceCommands": {
-            "search": "find + [text for searchbar]",
+            "search": "encontrar + [texto para la barra de búsqueda]",
             "pause": "pausa",
-            "help": "help | show commands",
+            "help": "ayuda | mostrar comandos",
             "collapse all servers": "colapsar todos los servidores",
-            "collapse server": "collapse server + [server name]",
+            "collapse server": "colapsar servidor + [nombre del servidor]",
             "play": "reproducir",
             "clear search": "borrar búsqueda",
-            "live": "go to live | show me live",
+            "live": "ir a vista en vivo | muéstrame vista en vivo",
             "expand all servers": "expandir todos los servidores",
             "stop listening": "detener escucha",
-            "expand server": "expand server + [server name]",
+            "expand server": "expandir servidor + [nombre del servidor]",
             "view": "vista + [nombre de la cámara]"
         },
         "systemOffline": "Sistema está desconectado",

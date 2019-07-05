@@ -42,6 +42,7 @@ set(common_depends
     "libxfixes3"
     "libxt6"
     "libfontconfig1"
+    "libfreetype6 (>= 2.6.0)"
     "libsm6"
     "libice6"
     "libaudio2"
@@ -53,6 +54,11 @@ nx_configure_directory(
     ${CMAKE_CURRENT_BINARY_DIR}
     @ONLY
     OUTPUT_FILES_VARIABLE configured_files)
+
+nx_generate_package_json(${CMAKE_CURRENT_BINARY_DIR}/package.json
+    COMPONENT client
+    VARIANTS "{ \"name\": \"ubuntu\", \"minimumVersion\": \"16.04\" }")
+list(APPEND configured_files ${CMAKE_CURRENT_BINARY_DIR}/package.json)
 
 nx_configure_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/build_distribution.conf.in

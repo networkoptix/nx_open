@@ -13,7 +13,7 @@
     </message>
     <message>
       <source>This is the built-in functionality</source>
-      <translation type="unfinished">This is the built-in functionality</translation>
+      <translation>Esta es la funcionalidad incorporada</translation>
     </message>
   </context>
   <context>
@@ -72,11 +72,11 @@
     <name>PluginsInformation</name>
     <message>
       <source>No plugins installed</source>
-      <translation type="unfinished">No plugins installed</translation>
+      <translation>No hay plugins instalados</translation>
     </message>
     <message>
       <source>Server is offline</source>
-      <translation type="unfinished">Server is offline</translation>
+      <translation>El servidor esta desconectado</translation>
     </message>
   </context>
   <context>

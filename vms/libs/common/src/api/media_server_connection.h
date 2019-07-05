@@ -3,7 +3,6 @@
 #include <QtCore/QUrl>
 #include <QtCore/QScopedPointer>
 #include <QtCore/QSharedPointer>
-#include <QtGui/QVector3D>
 #include <QtGui/QRegion>
 
 #include <api/helpers/request_helpers_fwd.h>
@@ -37,16 +36,6 @@ public:
         const QnMediaServerResourcePtr& server,
         const QnUuid& videowallGuid = QnUuid(),
         bool enableOfflineRequests = false);
-
-    int getTimePeriodsAsync(
-        const QnVirtualCameraResourcePtr& camera,
-        qint64 startTimeMs,
-        qint64 endTimeMs,
-        qint64 detail,
-        Qn::TimePeriodContent periodsType,
-        const QString& filter,
-        QObject* target,
-        const char* slot);
 
     /**
      * Check the list of cameras for discovery. Forms a new list which contains only accessible
@@ -85,13 +74,6 @@ public:
     int setParamsAsync(const QnNetworkResourcePtr& camera,
         const QnCameraAdvancedParamValueList& params, QObject* target, const char* slot);
 
-    int searchCameraAsyncStart(
-        const QString& startAddr, const QString& endAddr, const QString& username,
-        const QString& password, int port, QObject* target, const char* slot);
-    int searchCameraAsyncStatus(const QnUuid& processUuid, QObject* target, const char* slot);
-    int searchCameraAsyncStop(const QnUuid& processUuid, QObject* target = nullptr,
-        const char* slot = nullptr );
-
     int addCameraAsync(
         const QnManualResourceSearchList& cameras, const QString& username,
         const QString& password, QObject* target, const char* slot);
@@ -104,16 +86,6 @@ public:
     int getStorageSpaceAsync(bool fastRequest, QObject* target, const char* slot);
 
     int getStorageStatusAsync(const QString& storageUrl, QObject* target, const char* slot);
-
-    int getTimeAsync(QObject* target, const char* slot);
-    int mergeLdapUsersAsync(QObject* target, const char* slot);
-
-    /**
-     * Request the name of a system the mediaserver is currently connected to.
-     * @param slot Slot MUST have signature (int, QString, int).
-     * @return Request handle. -1 In case of failure to start async request.
-     */
-    int getSystemIdAsync(QObject* target, const char* slot);
 
     /**
      * Request the server to run the camera diagnostics step following previousStep.
@@ -133,47 +105,13 @@ public:
 
     int backupControlActionAsync(Qn::BackupAction action, QObject* target, const char* slot);
 
-    int acknowledgeEventAsync(
-        const QnCameraBookmark& bookmark,
-        const QnUuid& eventRuleId,
-        QObject* target,
-        const char* slot);
-
-    int addBookmarkAsync(
-        const QnCameraBookmark& bookmark,
-        QObject* target,
-        const char* slot);
-
-    int updateBookmarkAsync(const QnCameraBookmark& bookmark, QObject* target, const char* slot);
-    int deleteBookmarkAsync(const QnUuid& bookmarkId, QObject* target, const char* slot);
-
-    int installUpdate(const QString& updateId, bool delayed, QObject* target, const char* slot);
-    int uploadUpdateChunk(const QString& updateId,
-        const QByteArray& data, qint64 offset, QObject* target, const char* slot);
-
-    int restart(QObject* target, const char* slot);
-
-    int configureAsync(
-        bool wholeSystem, const QString& systemName, const QString& password,
-        const QByteArray& passwordHash, const QByteArray& passwordDigest,
-        const QByteArray& cryptSha512Hash, int port, QObject* target, const char* slot);
-
     int pingSystemAsync(const nx::utils::Url &url, const QString& getKey, QObject* target, const char* slot);
     int getNonceAsync(const nx::utils::Url& url, QObject* target, const char* slot);
     int getRecordingStatisticsAsync(
         qint64 bitrateAnalyzePeriodMs, QObject* target, const char* slot);
-    int getAuditLogAsync(qint64 startTimeMs, qint64 endTimeMs, QObject* target, const char* slot);
 
-    int testEmailSettingsAsync(const QnEmailSettings& settings, QObject* target, const char* slot);
+    // It expects (int status, const QnLdapUsers& users, int handle, const QString& errorString) slot.
     int testLdapSettingsAsync(const QnLdapSettings& settings, QObject* target, const char* slot);
-
-    int modulesInformation(QObject* target, const char* slot);
-
-    int recordedTimePeriods(const QnChunksRequestData& request, QObject* target, const char* slot);
-    int getBookmarksAsync(
-        const QnGetBookmarksRequestData& request, QObject* target, const char* slot);
-    int getBookmarkTagsAsync(
-        const QnGetBookmarkTagsRequestData& request, QObject* target, const char* slot);
 
 protected:
     virtual nx::utils::Url url() const override;

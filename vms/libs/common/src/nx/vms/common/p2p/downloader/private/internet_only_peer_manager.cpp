@@ -40,7 +40,7 @@ int InternetOnlyPeerManager::distanceTo(const QnUuid& /*peerId*/) const
     return 0;
 }
 
-AbstractPeerManager::RequestContext<FileInformation> InternetOnlyPeerManager::requestFileInfo(
+AbstractPeerManager::RequestContextPtr<FileInformation> InternetOnlyPeerManager::requestFileInfo(
     const QnUuid& peerId,
     const QString& fileName,
     const nx::utils::Url& url)
@@ -53,16 +53,18 @@ AbstractPeerManager::RequestContext<FileInformation> InternetOnlyPeerManager::re
         promise.set_value(FileInformation(fileName));
     else
         promise.set_value({});
-    return {promise.get_future()};
+
+    return std::make_unique<InternetRequestContext<FileInformation>>(
+        nullptr, promise.get_future());
 }
 
-AbstractPeerManager::RequestContext<QVector<QByteArray>> InternetOnlyPeerManager::requestChecksums(
+AbstractPeerManager::RequestContextPtr<QVector<QByteArray>> InternetOnlyPeerManager::requestChecksums(
     const QnUuid& /*peerId*/, const QString& /*fileName*/)
 {
-    return {};
+    return std::make_unique<InternetRequestContext<QVector<QByteArray>>>();
 }
 
-AbstractPeerManager::RequestContext<QByteArray> InternetOnlyPeerManager::downloadChunk(
+AbstractPeerManager::RequestContextPtr<QByteArray> InternetOnlyPeerManager::downloadChunk(
     const QnUuid& peerId,
     const QString& /*fileName*/,
     const utils::Url& url,
@@ -74,7 +76,7 @@ AbstractPeerManager::RequestContext<QByteArray> InternetOnlyPeerManager::downloa
     if (!peerId.isNull())
         return {};
 
-    auto httpClient = std::make_shared<nx::network::http::AsyncClient>();
+    auto httpClient = std::make_unique<nx::network::http::AsyncClient>();
     httpClient->bindToAioThread(m_aioTimer.getAioThread());
     httpClient->setResponseReadTimeout(kDownloadRequestTimeout);
     httpClient->setSendTimeout(kDownloadRequestTimeout);
@@ -87,24 +89,19 @@ AbstractPeerManager::RequestContext<QByteArray> InternetOnlyPeerManager::downloa
     auto promise = std::make_shared<std::promise<std::optional<QByteArray>>>();
 
     httpClient->doGet(url,
-        [promise, httpClient, thread = thread()]()
+        [promise, httpClient = httpClient.get(), thread = thread()]()
         {
             if (httpClient->hasRequestSucceeded())
                 setPromiseValueIfEmpty(promise, {httpClient->fetchMessageBodyBuffer()});
             else
                 setPromiseValueIfEmpty(promise, {});
-
-            httpClient->pleaseStopSync();
         });
 
-    auto cancelRequest =
-        [promise, httpClient]()
-        {
-            httpClient->pleaseStopSync();
-            setPromiseValueIfEmpty(promise, {});
-        };
+    std::function<void()> cancelRequest =
+        [promise, httpClient = httpClient.get()]() { setPromiseValueIfEmpty(promise, {}); };
 
-    return {promise->get_future(), cancelRequest};
+    return std::make_unique<InternetRequestContext<QByteArray>>(
+        std::move(httpClient), promise->get_future(), cancelRequest);
 }
 
 } // namespace nx::vms::common::p2p::downloader

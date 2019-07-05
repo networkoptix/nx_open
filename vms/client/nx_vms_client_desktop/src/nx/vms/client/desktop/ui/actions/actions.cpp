@@ -122,6 +122,11 @@ void initialize(Manager* manager, Action* root)
         .condition(!condition::tourIsRunning())
         .autoRepeat(false);
 
+    factory(ShowTimeLineOnVideowallAction)
+        .flags(NoTarget)
+        .mode(VideoWallMode)
+        .condition(condition::isTrue(qnRuntime->videoWallWithTimeline()));
+
     factory(WhatsThisAction)
         .flags(NoTarget)
         .text(ContextMenu::tr("Help")) //< To be displayed on button tooltip

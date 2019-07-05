@@ -102,9 +102,9 @@
                             <uib-alert type="warning">מערכת זו מקושרת אל {{Config.cloud.productName}} <a ng-if="!mode.liteClient"
                                    ng-href="{{Config.cloud.portalUrl}}"
                                    target="_blank">מידע נוסף</a></uib-alert>
-                            <uib-alert type="error" ng-if="!hasInternetOnServer">חבר את השרת לאינטרנט כדי לבצע התקנה {{Config.cloud.productName}}</uib-alert>
-                            <uib-alert type="error" ng-if="hasInternetOnServer && !hasInternetOnClient">מחויב חיבור לאינטרנט בכדי לחבר מערכת אל {{Config.cloud.productName}}</uib-alert>
-                            <p ng-if="canConnectToCloud"  ><button
+                            <uib-alert type="danger" ng-if="!hasInternetOnServer">חבר את השרת לאינטרנט כדי לבצע התקנה {{Config.cloud.productName}}</uib-alert>
+                            <uib-alert type="danger" ng-if="hasInternetOnServer && !hasInternetOnClient">מחויב חיבור לאינטרנט בכדי לחבר מערכת אל {{Config.cloud.productName}}</uib-alert>
+                            <p ng-if="canConnectToCloud"><button
                                     class="btn btn-default"
                                     ng-click="connectToCloud()" ng-disabled="!hasInternetOnServer || !hasInternetOnClient">התחבר ל- {{Config.cloud.productName}}</button>                                 <a ng-if="!mode.liteClient"  class="btn btn-default"
                                    ng-href="{{Config.cloud.portalUrl + Config.cloud.portalRegisterUrl + Config.cloud.webadminContext}}"

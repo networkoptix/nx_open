@@ -10,7 +10,8 @@
 #include <utils/common/id.h>
 #include <common/common_globals.h>
 
-struct QnStorageSpaceData {
+struct QnStorageSpaceData
+{
     QString url;
     QnUuid storageId;
     qint64 totalSpace;
@@ -30,7 +31,8 @@ struct QnStorageSpaceData {
 #define QnStorageSpaceData_Fields (url)(storageId)(totalSpace)(freeSpace)(reservedSpace) \
     (isExternal)(isWritable)(isUsedForWriting)(storageType)(isBackup)(isOnline)(storageStatus)
 
-struct QnStorageStatusReply {
+struct QnStorageStatusReply
+{
     bool pluginExists;
     QnStorageSpaceData storage;
     Qn::StorageInitResult status;

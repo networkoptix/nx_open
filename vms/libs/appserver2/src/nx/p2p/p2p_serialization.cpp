@@ -8,12 +8,12 @@
 
 #include <utils/math/math.h>
 #include <utils/media/nalUnits.h>
-#include <nx_ec/ec_proto_version.h>
 
 #include <nx/fusion/model_functions.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/http/custom_headers.h>
 #include <nx/network/socket_global.h>
+#include <nx/vms/api/protocol_version.h>
 #include <nx/vms/api/data/peer_data.h>
 #include <nx/vms/api/types/connection_types.h>
 
@@ -459,7 +459,7 @@ vms::api::PeerDataEx deserializePeerData(
         {
             nx::vms::api::PeerDataEx result;
             result.cloudHost = nx::network::SocketGlobals::cloud().cloudHost();
-            result.protoVersion = nx_ec::EC2_PROTO_VERSION;
+            result.protoVersion = nx::vms::api::protocolVersion();
             return result;
         };
 

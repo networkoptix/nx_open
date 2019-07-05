@@ -116,9 +116,6 @@ namespace Qn
         ItemDisabledButtonsRole,                    /**< Role for buttons that are not to be displayed in item's titlebar. Value of type int (QnResourceWidget::Buttons). */
         ItemHealthMonitoringButtonsRole,            /**< Role for buttons that are checked on each line of Health Monitoring widget. Value of type QnServerResourceWidget::HealthMonitoringButtons. */
 
-        ItemAnalyticsModeSourceRegionRole,          /**< Role for original region in the analytics mode. */
-        ItemAnalyticsModeRegionIdRole,              /**< Role for source region id in the analytics mode. */
-
         /* Ptz-based. */
         PtzPresetRole,                              /**< Role for PTZ preset. Value of type QnPtzPreset. */
         PtzTourRole,                                /**< Role for PTZ tour. Value of type QnPtzTour. */

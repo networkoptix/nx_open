@@ -15,4 +15,4 @@ struct QnTestEmailSettingsReply
 
 #define QnTestEmailSettingsReply_Fields (errorCode)(smtpReplyCode)(errorString)
 
-QN_FUSION_DECLARE_FUNCTIONS(QnTestEmailSettingsReply, (json)(metatype))
+QN_FUSION_DECLARE_FUNCTIONS(QnTestEmailSettingsReply, (json)(ubjson)(metatype))

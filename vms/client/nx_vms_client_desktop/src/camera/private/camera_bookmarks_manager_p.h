@@ -13,6 +13,10 @@
 #include <utils/common/connective.h>
 #include <nx/vms/event/event_fwd.h>
 #include <nx/vms/event/actions/abstract_action.h>
+#include <rest/server/json_rest_result.h>
+#include <api/server_rest_connection_fwd.h>
+
+struct QnMultiserverRequestData;
 
 class QnCameraBookmarksManagerPrivate:
     public Connective<QObject>,
@@ -26,6 +30,10 @@ public:
 
     virtual ~QnCameraBookmarksManagerPrivate();
 
+    using UbJsonCallback = std::function<void (bool success, int handle, const QnUbjsonRestResult& response)>;
+    using EmptyResponseCallback = std::function<void (bool success, int handle)>;
+    using RawResponseType = std::function<void (bool, rest::Handle, QByteArray, nx::network::http::HttpHeaders)>;
+
     bool isEnabled() const;
     void setEnabled(bool value);
 
@@ -36,8 +44,9 @@ public:
     /// @param filter           Filter parameters.
     /// @param callback         Callback for receiving bookmarks data.
     /// @returns                Internal id of the request.
-    int getBookmarksAsync(const QnVirtualCameraResourceSet &cameras, const QnCameraBookmarkSearchFilter &filter, BookmarksInternalCallbackType callback);
+    int getBookmarksAsync(const QnVirtualCameraResourceSet &cameras, const QnCameraBookmarkSearchFilter &filter, BookmarksCallbackType callback);
 
+    int getBookmarkTagsAsync(int maxTags, BookmarkTagsCallbackType callback);
     /// @brief                  Add the bookmark to the camera.
     /// @param bookmark         Target bookmark.
     /// @param callback         Callback with operation result.
@@ -77,10 +86,8 @@ public:
     void executeQueryRemoteAsync(const QnCameraBookmarksQueryPtr &query, BookmarksCallbackType callback);
 
 private slots:
-
-    void handleDataLoaded(int status, const QnCameraBookmarkList &bookmarks, int requestId);
-
     void handleBookmarkOperation(int status, int handle);
+
 private:
     /// @brief                  Register bookmarks search query to auto-update it if needed.
     /// @param query            Target query.
@@ -89,9 +96,6 @@ private:
     /// @brief                  Unregister bookmarks search query.
     /// @param queryId          Target query id.
     void unregisterQuery(const QUuid &queryId);
-
-    /// @brief                  Clear all local cache data.
-    void clearCache();
 
     /// @brief                  Check if the single query should be updated.
     /// @param queryId          Target query id.
@@ -106,9 +110,6 @@ private:
 
     /// @brief                  Update cache with provided value and emit signals if needed.
     void updateQueryCache(const QUuid &queryId, const QnCameraBookmarkList &bookmarks);
-
-    void executeCallbackDelayed(BookmarksInternalCallbackType callback);
-    void executeCallbackDelayed(BookmarksCallbackType callback);
 
     /** @brief                  Add the added or updated bookmark to the pending bookmarks list.
      *  Pending bookmark is the bookmark that was created, modified or deleted on the client
@@ -133,13 +134,25 @@ private:
         const QnUuid& eventRuleId,
         OperationCallbackType callback = OperationCallbackType());
 
+    void executeCallbackDelayed(BookmarksCallbackType callback);
+
+    int sendPostRequest(rest::QnConnectionPtr connection,
+        const QString& path, QnMultiserverRequestData& request);
+
+    int sendGetRequest(rest::QnConnectionPtr connection,
+        const QString& path, QnMultiserverRequestData& request, RawResponseType callback);
+
+
+    void onBookmarkCommandResponse(bool status, int handle);
+
+    rest::QnConnectionPtr getDefaultConnection();
+    rest::QnConnectionPtr getConnectionForBookmark(const QnCameraBookmark &bookmark);
+
 private:
     Q_DECLARE_PUBLIC(QnCameraBookmarksManager)
     QnCameraBookmarksManager *q_ptr;
 
     QTimer* m_operationsTimer;
-
-    QMap<int, BookmarksInternalCallbackType> m_requests;
 
     struct OperationInfo {
         enum class OperationType {
@@ -195,7 +208,9 @@ private:
         PendingInfo(const QnUuid &bookmarkId, Type type);
     };
 
-    /* Cache for case when we have sent getBookmarks request and THEN added/removed a bookmark
-     * locally. So when we've got reply for getBookmarks, we may fix it correspondingly. */
+    /**
+     * Cache for case when we have sent getBookmarks request and THEN added/removed a bookmark
+     * locally. So when we've got reply for getBookmarks, we may fix it correspondingly.
+     */
     QHash<QnUuid, PendingInfo> m_pendingBookmarks;
 };

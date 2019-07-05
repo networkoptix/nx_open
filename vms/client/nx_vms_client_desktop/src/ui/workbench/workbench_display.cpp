@@ -2115,8 +2115,6 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged()
 
     for (int i = 0; i < widgets.size(); i++)
     {
-        QnResourceWidget *resourceWidget = widgets[i];
-
         QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget *>(widgets[i]);
         if (!widget)
             continue;

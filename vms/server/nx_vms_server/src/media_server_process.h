@@ -50,7 +50,6 @@
 #include <media_server/mserver_status_watcher.h>
 #include <media_server/resource_status_watcher.h>
 #include <media_server/server_connector.h>
-#include <media_server/server_update_tool.h>
 #include <streaming/audio_streamer_pool.h>
 #include <media_server_process_aux.h>
 #include <nx/vms/server/command_line_parameters.h>
@@ -151,7 +150,7 @@ private slots:
     void at_databaseDumped();
     void at_systemIdentityTimeChanged(qint64 value, const QnUuid& sender);
     void at_updatePublicAddress(const QHostAddress& publicIp);
-    void at_metadataStorageIdChanged(const QnResourcePtr& resource);
+    void at_metadataStorageIdChanged(const QnResourcePtr& resource, const QString& key);
 
 private:
     void updateDisabledVendorsIfNeeded();

@@ -4,7 +4,7 @@ Installed-Size: INSTALLED_SIZE
 Architecture: @target.arch@
 Maintainer: @company.name@ <@supportEmail@>
 Pre-Depends: debconf
-Depends: @deb.dependencies@
+Depends: @deb_dependencies@
 Section: database
 Priority: optional
 Homepage: @companyUrl@

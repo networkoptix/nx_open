@@ -456,7 +456,7 @@ void QnCloudStatusWatcher::resendActivationEmail(const QString& email)
         d->resendActivationConnection = qnCloudConnectionProvider->createConnection();
 
     const auto callback =
-        [this](api::ResultCode result, api::AccountConfirmationCode code)
+        [this](api::ResultCode result, api::AccountConfirmationCode /*code*/)
         {
             const bool success =
                 result == api::ResultCode::ok || result == api::ResultCode::partialContent;

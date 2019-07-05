@@ -32,10 +32,14 @@ static void findStorageByName(
     *outStorage = *foundStorage; //< Copy struct by value.
 
     if (!id.isNull())
+    {
         ASSERT_EQ(id, outStorage->id);
+    }
 
     if (!parentId.isNull())
+    {
         ASSERT_EQ(parentId, outStorage->parentId);
+    }
 }
 
 } // namespace

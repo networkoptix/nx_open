@@ -92,7 +92,7 @@ void QnResourcePool::addIncompatibleServer(const QnMediaServerResourcePtr& serve
     addResources({{server}}, UseIncompatibleServerPool);
 }
 
-void QnResourcePool::addNewResources(const QnResourceList& resources, AddResourceFlags flags)
+void QnResourcePool::addNewResources(const QnResourceList& resources, AddResourceFlags /*flags*/)
 {
     addResources(
         resources.filtered(

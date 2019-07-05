@@ -1,7 +1,7 @@
 #pragma once
 
 #include <nx/utils/uuid.h>
-#include <nx/vms/api/data/system_information.h>
+#include <nx/utils/os_info.h>
 #include <nx/vms/common/p2p/downloader/file_information.h>
 
 namespace nx::vms::common::p2p::downloader {
@@ -12,22 +12,22 @@ public:
     struct PeerInformation
     {
         QnUuid id;
-        nx::vms::api::SystemInformation systemInformation;
+        nx::utils::OsInfo osInfo;
     };
 
     PeerSelector(
         FileInformation::PeerSelectionPolicy peerSelectionPolicy = FileInformation::all,
-        nx::vms::api::SystemInformation systemInformation = {},
+        const nx::utils::OsInfo& osInfo = {},
         const QList<QnUuid>& additionalPeers = {})
         :
         peerSelectionPolicy(peerSelectionPolicy),
-        systemInformation(systemInformation),
+        osInfo(osInfo),
         additionalPeers(additionalPeers)
     {
     }
 
     FileInformation::PeerSelectionPolicy peerSelectionPolicy;
-    nx::vms::api::SystemInformation systemInformation;
+    nx::utils::OsInfo osInfo;
     QList<QnUuid> additionalPeers;
 
     QList<QnUuid> selectPeers(const QList<PeerInformation>& peers);

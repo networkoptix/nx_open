@@ -262,11 +262,6 @@ void LayoutTourItemWidget::initOverlay()
 
             QScopedValueRollback<bool> guard(m_updating, true);
             item()->setData(Qn::LayoutTourItemDelayMsRole, value * 1000);
-        });
-
-    connect(delayEdit, &QSpinBox::editingFinished, this,
-        [this]
-        {
             menu()->trigger(action::SaveCurrentLayoutTourAction);
         });
 

@@ -446,6 +446,7 @@ api::ResultType InstallationManager::installZip(
 
     installation->setVersion(version);
     targetDir.remove("update.json");
+    targetDir.remove("package.json");
 
     {
         std::scoped_lock<std::mutex> lk(m_mutex);

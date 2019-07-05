@@ -26,6 +26,8 @@ Qn::ResourceStatus QnLayoutResource::getStatus() const
 void QnLayoutResource::setStatus(Qn::ResourceStatus newStatus,
     Qn::StatusChangeReason reason /*= Qn::StatusChangeReason::Local*/)
 {
+    Q_UNUSED(newStatus);
+    Q_UNUSED(reason);
     NX_ASSERT(false, "Not implemented");
 }
 

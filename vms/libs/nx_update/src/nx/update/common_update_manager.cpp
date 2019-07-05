@@ -4,6 +4,8 @@
 #include <common/common_module.h>
 #include <nx/utils/log/assert.h>
 #include <nx/update/common_update_installer.h>
+#include <nx/update/persistent_update_storage.h>
+#include <nx/update/update_storages_helper.h>
 #include <utils/common/synctime.h>
 
 namespace nx {
@@ -11,6 +13,8 @@ namespace nx {
 using vms::common::p2p::downloader::FileInformation;
 using vms::common::p2p::downloader::Downloader;
 namespace downloader = vms::common::p2p::downloader;
+
+static const QString kUpdatesPath = "downloads/updates";
 
 CommonUpdateManager::CommonUpdateManager(QnCommonModule* commonModule):
     QnCommonModuleAware(commonModule)
@@ -53,6 +57,7 @@ update::Status CommonUpdateManager::start()
     if (!package.isValid())
         return updateStatus;
 
+    managePersistentDownloads();
     if (!shouldDownloadFromScratch)
     {
         if (downloader()->fileInformation(package.file).status
@@ -67,30 +72,10 @@ update::Status CommonUpdateManager::start()
 
     m_downloaderFailDetail = DownloaderFailDetail::noError;
 
-    FileInformation fileInformation;
-    fileInformation.name = package.file;
-    fileInformation.md5 = QByteArray::fromHex(package.md5.toLatin1());
-    fileInformation.size = package.size;
-    fileInformation.url = package.url;
-
-    auto downloaderPeers = globalSettings()->downloaderPeers();
-    if (downloaderPeers.contains(fileInformation.name))
-    {
-        fileInformation.additionalPeers = downloaderPeers[fileInformation.name];
-        fileInformation.peerPolicy = FileInformation::PeerSelectionPolicy::byPlatform;
-    }
-    else
-    {
-        fileInformation.peerPolicy = FileInformation::PeerSelectionPolicy::all;
-    }
-
-    const auto addFileResult = downloader()->addFile(fileInformation);
-    NX_DEBUG(this, "Downloader::addFile (%1) called. Result is: %2",
-        fileInformation.name, addFileResult);
-
-    switch (addFileResult)
+    switch (addDownload(package, ""))
     {
         case downloader::ResultCode::ok:
+        case downloader::ResultCode::fileAlreadyExists:
             return update::Status(peerId, update::Status::Code::downloading);
 
         case downloader::ResultCode::fileDoesNotExist:
@@ -111,7 +96,6 @@ update::Status CommonUpdateManager::start()
                 peerId,
                 update::Status::Code::error,
                 update::Status::ErrorCode::noFreeSpaceToDownload);
-
         default:
             NX_ASSERT(false, "Unexpected Downloader::addFile() result");
             m_downloaderFailDetail = DownloaderFailDetail::internalError;
@@ -120,6 +104,132 @@ update::Status CommonUpdateManager::start()
                     update::Status::Code::error,
                     update::Status::ErrorCode::unknownError);
     }
+}
+
+downloader::ResultCode CommonUpdateManager::addDownload(
+    const nx::update::Package& package, const QString& downloadsDirPath)
+{
+    FileInformation fileInformation;
+    fileInformation.name = package.file;
+    fileInformation.md5 = QByteArray::fromHex(package.md5.toLatin1());
+    fileInformation.size = package.size;
+    fileInformation.url = package.url;
+    fileInformation.absoluteDirectoryPath = downloadsDirPath;
+
+    auto downloaderPeers = globalSettings()->downloaderPeers();
+    if (downloaderPeers.contains(fileInformation.name))
+    {
+        fileInformation.additionalPeers = downloaderPeers[fileInformation.name];
+        fileInformation.peerPolicy = FileInformation::PeerSelectionPolicy::byPlatform;
+    }
+    else
+    {
+        fileInformation.peerPolicy = FileInformation::PeerSelectionPolicy::all;
+    }
+
+    const auto addFileResult = downloader()->addFile(fileInformation);
+    NX_DEBUG(this, "Downloader::addFile (%1) called. Result is: %2",
+        fileInformation.name, addFileResult);
+
+    return addFileResult;
+}
+
+void CommonUpdateManager::managePersistentDownloads()
+{
+    const auto variants = {
+        std::make_pair(
+            commonModule()->globalSettings()->targetUpdateInformation(), update::kTargetKey),
+        std::make_pair(
+            commonModule()->globalSettings()->installedUpdateInformation(), update::kInstalledKey)
+    };
+
+    std::vector<update::Package> packages;
+    for (const auto& p: variants)
+    {
+        const auto persistentServers = updatePersistentStorageServers(p.second);
+        if (!persistentServers.servers.contains(commonModule()->moduleGUID()))
+            continue;
+
+        update::Information info;
+        if (fromByteArray(p.first, &info, /*message*/ nullptr) != update::FindPackageResult::ok)
+            continue;
+
+        std::copy(info.packages.cbegin(), info.packages.cend(), std::back_inserter(packages));
+    }
+
+    const auto storageData = update::storage::selectOne(availableStorages());
+    if (!storageData)
+    {
+        NX_WARNING(this, "Couldn't determine correct storage for storing persistent update files");
+        return;
+    }
+
+    QStringList storageUpdateFiles;
+    for (const auto& f: downloader()->files())
+    {
+        const auto fileInfo = downloader()->fileInformation(f);
+        if (!fileInfo.isValid())
+            continue;
+
+        if (fileInfo.fullFilePath.contains(storageData->url))
+            storageUpdateFiles.append(fileInfo.fullFilePath);
+    }
+
+    for (const auto& package: packages)
+    {
+        const bool hasFile = std::any_of(
+            storageUpdateFiles.cbegin(), storageUpdateFiles.cend(),
+            [&package](const QString& fileName) { return fileName.contains(package.file); });
+
+        if (!hasFile)
+            addDownload(package, QDir(storageData->url).absoluteFilePath(kUpdatesPath));
+    }
+
+    for (const auto& file: storageUpdateFiles)
+    {
+        const bool hasPackage = std::any_of(
+            packages.cbegin(), packages.cend(),
+            [&file](const auto& package) { return file.contains(package.file); });
+
+        if (!hasPackage)
+            downloader()->deleteFile(file);
+    }
+}
+
+void CommonUpdateManager::setUpdatePersistentStorageServers(
+    const QList<QnUuid>& serverList, const QString& version, bool manuallySet)
+{
+    update::PersistentUpdateStorage updateStorage;
+    updateStorage.manuallySet = manuallySet;
+    updateStorage.servers = serverList;
+
+    if (version == update::kTargetKey)
+    {
+        commonModule()->globalSettings()->setTargetPersistentUpdateStorage(
+            QJson::serialized(updateStorage));
+    }
+    else
+    {
+        commonModule()->globalSettings()->setInstalledPersistentUpdateStorage(
+            QJson::serialized(updateStorage));
+    }
+
+    commonModule()->globalSettings()->synchronizeNow();
+}
+
+update::PersistentUpdateStorage CommonUpdateManager::updatePersistentStorageServers(
+    const QString& version) const
+{
+    QByteArray data;
+    if (version == update::kTargetKey)
+        data  = commonModule()->globalSettings()->targetPersistentUpdateStorage();
+    else
+        data = commonModule()->globalSettings()->installedPersistentUpdateStorage();
+
+    update::PersistentUpdateStorage result =
+        QJson::deserialized<update::PersistentUpdateStorage>(data);
+
+    return result;
 }
 
 update::Status CommonUpdateManager::status()
@@ -160,6 +270,7 @@ void CommonUpdateManager::retry(bool forceRedownload)
         case ErrorCode::unknownError:
         case ErrorCode::applauncherError:
         case ErrorCode::invalidUpdateContents:
+        case ErrorCode::noFreeSpaceToInstall:
             // We can do nothing with these cases.
             break;
 
@@ -181,7 +292,8 @@ void CommonUpdateManager::finish()
 {
     commonModule()->globalSettings()->setInstalledUpdateInformation(
         commonModule()->globalSettings()->targetUpdateInformation());
-    commonModule()->globalSettings()->synchronizeNowSync();
+    commonModule()->globalSettings()->setInstalledPersistentUpdateStorage(
+        commonModule()->globalSettings()->targetPersistentUpdateStorage());
     startUpdate("");
 }
 
@@ -230,52 +342,62 @@ bool CommonUpdateManager::canDownloadFile(
     {
         switch (fileInformation.status)
         {
-        case FileInformation::Status::downloading:
-            *outUpdateStatus = update::Status(
-                peerId,
-                update::Status::Code::downloading,
-                update::Status::ErrorCode::noError,
-                fileInformation.calculateDownloadProgress());
-            return false;
-        case FileInformation::Status::uploading:
-            *outUpdateStatus = update::Status(
-                peerId,
-                update::Status::Code::downloading,
-                update::Status::ErrorCode::noError,
-                fileInformation.calculateDownloadProgress());
-            return false;
-        case FileInformation::Status::downloaded:
-            return installerState(outUpdateStatus, peerId);
-        case FileInformation::Status::notFound:
-            NX_ASSERT(false, "Unexpected state");
-            *outUpdateStatus = update::Status(
-                peerId,
-                update::Status::Code::error,
-                update::Status::ErrorCode::unknownError);
-            return true;
-        case FileInformation::Status::corrupted:
-            *outUpdateStatus = update::Status(
-                peerId,
-                update::Status::Code::error,
-                update::Status::ErrorCode::corruptedArchive);
-            return true;
+            case FileInformation::Status::downloading:
+                *outUpdateStatus = update::Status(
+                    peerId,
+                    update::Status::Code::downloading,
+                    update::Status::ErrorCode::noError,
+                    fileInformation.calculateDownloadProgress());
+                return false;
+            case FileInformation::Status::uploading:
+                *outUpdateStatus = update::Status(
+                    peerId,
+                    update::Status::Code::downloading,
+                    update::Status::ErrorCode::noError,
+                    fileInformation.calculateDownloadProgress());
+                return false;
+            case FileInformation::Status::downloaded:
+            {
+                const bool result = installerState(outUpdateStatus, peerId);
+
+                if (outUpdateStatus->code == update::Status::Code::readyToInstall)
+                {
+                    // We can't precizely evaluate the required space for update installation.
+                    // As a very approximate value we take 10% of the package size + some padding
+                    // hard-coded inside checkFreeSpace.
+                    const qint64 required = package.size / 10;
+                    if (!installer()->checkFreeSpace(
+                        QCoreApplication::applicationDirPath(), required))
+                    {
+                        *outUpdateStatus = update::Status(
+                            peerId,
+                            update::Status::Code::error,
+                            update::Status::ErrorCode::noFreeSpaceToInstall);
+                        return false;
+                    }
+                }
+
+                return result;
+            }
+            case FileInformation::Status::notFound:
+                NX_ASSERT(false, "Unexpected state");
+                *outUpdateStatus = update::Status(
+                    peerId,
+                    update::Status::Code::error,
+                    update::Status::ErrorCode::unknownError);
+                return true;
+            case FileInformation::Status::corrupted:
+                *outUpdateStatus = update::Status(
+                    peerId,
+                    update::Status::Code::error,
+                    update::Status::ErrorCode::corruptedArchive);
+                return true;
         }
     }
 
-    const int64_t requiredSpace = package.size * 2 * 1.2;
-    const int64_t deviceFreeSpace = freeSpace(installer()->dataDirectoryPath());
-    NX_DEBUG(
-        this,
-        "Checking if there is enough space to download and install the update package. Required space: %1Mb, free space on device: %2Mb",
-        requiredSpace / (1024 * 1024), deviceFreeSpace / (1024 * 1024));
-    if (deviceFreeSpace < requiredSpace)
+    if (!installer()->checkFreeSpace(
+        downloader()->downloadsDirectory().absolutePath(), package.size))
     {
-        NX_WARNING(
-            this,
-            "Can't start downloading an update package because lack of free space on disk. " \
-            "Required: %1 Mb, free Space: %2 Mb",
-            static_cast<double>(requiredSpace) / (1024 * 1024),
-            static_cast<double>(deviceFreeSpace) / (1024 * 1024));
         *outUpdateStatus = nx::update::Status(
             peerId, update::Status::Code::error, update::Status::ErrorCode::noFreeSpaceToDownload);
         return false;
@@ -490,6 +612,7 @@ bool CommonUpdateManager::statusAppropriateForDownload(
         case update::FindPackageResult::ok:
             return canDownloadFile(*outPackage, outStatus);
         case update::FindPackageResult::otherError:
+        case update::FindPackageResult::osVersionNotSupported:
             *outStatus = update::Status(
                 commonModule()->moduleGUID(),
                 update::Status::Code::error,

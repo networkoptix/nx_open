@@ -26,12 +26,22 @@ private:
     bool m_state;
 };
 
+using EventPtr = QSharedPointer<BasicEvent>;
+
+#define FIELD(type, getter, setter) \
+    Q_PROPERTY(type getter READ getter WRITE setter) \
+public: \
+    type getter() const { return m_##getter; } \
+    void setter(const type &val) { m_##getter = val; } \
+private: \
+    type m_##getter;
+
 class NX_VMS_RULES_API DebugEvent: public BasicEvent
 {
     Q_OBJECT
 
-    Q_PROPERTY(QString action READ action)
-    Q_PROPERTY(qint64 value READ value)
+    //Q_PROPERTY(QString action READ action)
+    //Q_PROPERTY(qint64 value READ value)
 
 public:
     DebugEvent(const QString &action, qint64 value):
@@ -41,19 +51,22 @@ public:
     {
     }
 
-    QString action() const
-    {
-        return m_action;
-    }
+    FIELD(QString, action, setAction)
+    FIELD(qint64, value, setValue)
 
-    qint64 value() const
-    {
-        return m_value;
-    }
-
-private:
-    QString m_action;
-    qint64 m_value;
+//    QString action() const
+//    {
+//        return m_action;
+//    }
+//
+//    qint64 value() const
+//    {
+//        return m_value;
+//    }
+//
+//private:
+//    QString m_action;
+//    qint64 m_value;
 };
 
 } // namespace nx::vms::rules

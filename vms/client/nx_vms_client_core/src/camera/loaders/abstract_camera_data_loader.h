@@ -53,10 +53,9 @@ signals:
     /**
      * This signal is emitted whenever the reader was unable to load motion periods.
      *
-     * \param status                    Error code.
      * \param handle                    Request handle.
      */
-    void failed(int status, int handle);
+    void failed(int handle);
 
 protected:
     /** Resource that this loader gets chunks for. */

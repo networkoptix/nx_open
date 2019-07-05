@@ -7,6 +7,11 @@
 #include <QtWidgets/QToolButton>
 #include <QtWidgets/QAction>
 
+#if defined(NX_ENABLE_WEBENGINE)
+    #include <QtWebEngineWidgets/QWebEnginePage>
+    #include <QtWebEngineWidgets/QWebEngineView>
+#endif
+
 #include <QtWebKitWidgets/QWebView>
 
 #include <common/common_module.h>
@@ -56,6 +61,13 @@
 
 #include <nx/vms/rules/engine.h>
 #include <nx/vms/rules/event_connector.h>
+#include <nx/vms/rules/action_executor.h>
+#include <nx/vms/rules/event_fields/keywords.h>
+#include <nx/vms/rules/action_fields/substitution.h>
+#include <common/common_module_aware.h>
+#include <api/common_message_processor.h>
+#include <nx/vms/event/actions/common_action.h>
+#include <nx/vms/api/rules/rule.h>
 
 #include <nx/fusion/model_functions.h>
 
@@ -114,11 +126,37 @@ class DebugEventConnector:
 public:
     void atInc()
     {
-        emit vmsEvent(EventPtr(new DebugEvent("Increment", qnRuntime->debugCounter())));
+        emit event(EventPtr(new DebugEvent("Increment", qnRuntime->debugCounter())));
     }
     void atDec()
     {
-        emit vmsEvent(EventPtr(new DebugEvent("Decrement", qnRuntime->debugCounter())));
+        emit event(EventPtr(new DebugEvent("Decrement", qnRuntime->debugCounter())));
+    }
+};
+
+class DebugActionExecutor:
+    public ActionExecutor,
+    public QnCommonModuleAware,
+    public Singleton<DebugActionExecutor>
+{
+public:
+    DebugActionExecutor(QnCommonModule* commonModule): QnCommonModuleAware(commonModule){}
+
+    virtual void execute(const ActionPtr& action) override
+    {
+        // Assuming that now we have only one action type...
+        auto notif = (NotificationAction*)action.data();
+
+        nx::vms::event::EventParameters runtimeParams;
+        runtimeParams.eventType = nx::vms::api::EventType::userDefinedEvent;
+        runtimeParams.caption = notif->caption();
+        runtimeParams.description = notif->description();
+        nx::vms::event::AbstractActionPtr oldAction(nx::vms::event::CommonAction::create(nx::vms::api::ActionType::showPopupAction, runtimeParams));
+        auto params = oldAction->getParams();
+        params.allUsers = true;
+        oldAction->setParams(params);
+
+        emit commonModule()->messageProcessor()->businessActionReceived(oldAction);
     }
 };
 
@@ -174,6 +212,47 @@ private:
     QWebView* m_webView;
     QLineEdit* m_urlLineEdit;
 };
+
+#if defined(NX_ENABLE_WEBENGINE)
+
+    class WebEngineViewDialog: public QDialog
+    {
+        using base_type = QDialog;
+
+    public:
+        WebEngineViewDialog(QWidget* parent = nullptr) :
+            base_type(parent, Qt::Window),
+            m_page(new QWebEnginePage(this)),
+            m_webView(new QWebEngineView(this)),
+            m_urlLineEdit(new QLineEdit(this))
+        {
+            m_webView->setPage(m_page);
+
+            QVBoxLayout* layout = new QVBoxLayout(this);
+            layout->setContentsMargins(QMargins());
+            layout->addWidget(m_urlLineEdit);
+            layout->addWidget(m_webView, 1);
+            connect(m_urlLineEdit, &QLineEdit::returnPressed, this, [this]()
+                {
+                    m_webView->load(m_urlLineEdit->text());
+                });
+        }
+
+        QString url() const { return m_urlLineEdit->text(); }
+
+        void setUrl(const QString& value)
+        {
+            m_urlLineEdit->setText(value);
+            m_webView->load(QUrl::fromUserInput(value));
+        }
+
+    private:
+        QWebEnginePage* m_page;
+        QWebEngineView* m_webView;
+        QLineEdit* m_urlLineEdit;
+    };
+
+#endif
 
 //-------------------------------------------------------------------------------------------------
 // QnDebugControlDialog
@@ -232,6 +311,17 @@ public:
                 //dialog->setUrl("http://localhost:7001");
                 dialog->show();
             });
+
+        #if defined(NX_ENABLE_WEBENGINE)
+            addButton("Web Engine View",
+                [this]()
+                {
+                    auto dialog(new WebEngineViewDialog(this));
+                    //dialog->setUrl("http://localhost:7001");
+                    dialog->show();
+                });
+        #endif
+
 
         addButton("Toggle default password",
             [this]()
@@ -396,15 +486,48 @@ QnWorkbenchDebugHandler::QnWorkbenchDebugHandler(QObject *parent):
 
     if (const int port = ini().clientWebServerPort; port > 0 && port < 65536)
     {
-        context()->instance<nx::vmx::client::desktop::DirectorWebserver>()->setPort(port);
-        bool started = context()->instance<nx::vmx::client::desktop::DirectorWebserver>()->start();
+        auto director = context()->instance<nx::vmx::client::desktop::DirectorWebserver>();
+        QString host = ini().clientWebServerHost;
+        director->setListenAddress(host, port);
+        bool started = director->start();
         if (!started)
             NX_ERROR(this, QString("Cannot start client webserver - port %1 already occupied?").arg(port));
     }
 
     auto connector = new DebugEventConnector(); // initialize instance
     auto engine = new nx::vms::rules::Engine(); // initialize instance
+    auto executor = new DebugActionExecutor(commonModule()); // initialize instance
     engine->addEventConnector(connector);
+    engine->addActionExecutor("nx.showNotification", executor);
+    engine->registerActionType("nx.showNotification", [](){ return new NotificationAction(); });
+    engine->registerEventField("nx.stringWithKeywords", [](){ return new Keywords(); });
+    engine->registerActionField("nx.substitution", [](){ return new Substitution(); });
+
+    nx::vms::api::rules::Rule rule;
+    nx::vms::api::rules::EventFilter filter;
+    nx::vms::api::rules::ActionBuilder builder;
+
+    filter.eventType = "DebugEvent";
+    filter.fieldBlocks << QList<nx::vms::api::rules::Field>();
+    filter.fieldBlocks[0] << nx::vms::api::rules::Field();
+    filter.fieldBlocks[0][0].name = "action";
+    filter.fieldBlocks[0][0].metatype = "nx.stringWithKeywords";
+    filter.fieldBlocks[0][0].props["string"] = "Inc";
+    rule.eventList << filter;
+
+    builder.actionType = "nx.showNotification";
+    builder.fieldBlocks << QList<nx::vms::api::rules::Field>();
+    builder.fieldBlocks[0] << nx::vms::api::rules::Field();
+    builder.fieldBlocks[0] << nx::vms::api::rules::Field();
+    builder.fieldBlocks[0][0].name = "caption";
+    builder.fieldBlocks[0][0].metatype = "nx.substitution";
+    builder.fieldBlocks[0][0].props["fieldName"] = "action";
+    builder.fieldBlocks[0][1].name = "description";
+    builder.fieldBlocks[0][1].metatype = "nx.substitution";
+    builder.fieldBlocks[0][1].props["fieldName"] = "value";
+    rule.actionList << builder;
+
+    engine->addRule(rule);
 }
 
 void QnWorkbenchDebugHandler::at_debugControlPanelAction_triggered()

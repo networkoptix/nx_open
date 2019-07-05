@@ -281,13 +281,6 @@ createUpdateZip() # file.deb
     echo "  Creating symlink to .deb"
     ln -s "$DEB_FILE" "$ZIP_DIR/"
 
-    local DEB
-    for DEB in "$BUILD_DIR/deb"/*
-    do
-        echo "  Copying $(basename "$DEB")"
-        cp -r "$DEB" "$ZIP_DIR/"
-    done
-
     local FILE="update/install.sh"
     if [[ -f $FILE ]]
     then
@@ -305,7 +298,9 @@ createUpdateZip() # file.deb
     fi
 
     cp -r "update/update.json" "$ZIP_DIR/update.json"
+    cp "package.json" "$ZIP_DIR/"
     distrib_createArchive "$DISTRIBUTION_OUTPUT_DIR/$UPDATE_ZIP" "$ZIP_DIR" zip -r
+    rm "$ZIP_DIR/package.json" #< Legacy RPI/Bananapi packages does not need this file.
 
     if [[ $TARGET_DEVICE == "linux_arm32" ]]
     then
