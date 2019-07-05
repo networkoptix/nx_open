@@ -68,14 +68,10 @@ public:
     bool closingDown() const;
     void setClosingDown(bool value);
 
-    enum StartupParametersCode {
-        success,
-        wrongParameters,
-        forcedExit
-    };
-
-    /** Process startup parameters and call related actions. Returns false if something goes critically wrong. */
-    StartupParametersCode handleStartupParameters(const QnStartupParameters& startupParams);
+    /**
+     * Process startup parameters and call related actions.
+     */
+    void handleStartupParameters(const QnStartupParameters& startupParams);
 
     /** Whether the scene is visible in the main window. */
     bool isWorkbenchVisible() const;
@@ -99,9 +95,7 @@ signals:
 private:
     void initWorkarounds();
 
-    bool connectUsingCustomUri(const nx::vms::utils::SystemUri& uri);
 
-    bool connectUsingCommandLineAuth(const QnStartupParameters& startupParams);
 
 private:
     QScopedPointer<QnWorkbench> m_workbench;
