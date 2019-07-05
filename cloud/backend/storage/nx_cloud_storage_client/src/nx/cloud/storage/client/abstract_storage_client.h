@@ -1,0 +1,30 @@
+#pragma once
+
+#include <nx/network/http/auth_tools.h>
+#include <nx/utils/url.h>
+
+#include "abstract_content_client.h"
+#include "abstract_metadata_client.h"
+
+namespace nx::cloud::storage::client {
+
+class NX_CLOUD_STORAGE_CLIENT_API AbstractStorageClient
+{
+public:
+    virtual ~AbstractStorageClient() = default;
+
+    /**
+     * @param storageClientId Id of storage client. Should be unique for every client and
+     *   preserved for every storage usage by the same client.
+     * MUST be invoked prior to any other method.
+     */
+    virtual void open(
+        const std::string& storageClientId,
+        const nx::utils::Url& url,
+        const nx::network::http::Credentials& credentials) = 0;
+
+    virtual AbstractContentClient* getContentClient() = 0;
+    virtual AbstractMetadataClient* getMetadataClient() = 0;
+};
+
+} // namespace nx::cloud::storage::client
