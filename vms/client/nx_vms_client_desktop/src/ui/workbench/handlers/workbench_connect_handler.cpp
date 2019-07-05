@@ -1,4 +1,3 @@
-
 #include "workbench_connect_handler.h"
 
 #include <QtCore/QTimer>
@@ -74,7 +73,6 @@
 #include <ui/workbench/workbench_welcome_screen.h>
 #include <ui/workbench/workbench_display.h>
 
-#include <ui/workbench/watchers/workbench_version_mismatch_watcher.h>
 #include <ui/workbench/watchers/workbench_user_watcher.h>
 #include <ui/workbench/watchers/workbench_session_timeout_watcher.h>
 #include <ui/workbench/workbench_license_notifier.h>
@@ -650,11 +648,7 @@ void QnWorkbenchConnectHandler::showWarnMessagesOnce()
     m_crashReporter.scanAndReportAsync(qnSettings->rawSettings());
 
     menu()->triggerIfPossible(action::AllowStatisticsReportMessageAction);
-
-    auto watcher = context()->instance<QnWorkbenchVersionMismatchWatcher>();
-    if (watcher->hasMismatches())
-        menu()->trigger(action::VersionMismatchMessageAction);
-
+    menu()->triggerIfPossible(action::VersionMismatchMessageAction);
     menu()->triggerIfPossible(action::ConfirmAnalyticsStorageAction);
 
     context()->instance<QnWorkbenchLicenseNotifier>()->checkLicenses();
@@ -917,6 +911,10 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered()
             options |= StorePassword;
         if (parameters.autoLogin)
             options |= AutoLogin;
+
+        // Ignore warning messages for now if one client instance is opened already.
+        if (parameters.secondaryInstance)
+            m_warnMessagesDisplayed = true;
 
         testConnectionToServer(parameters.url, options, parameters.force);
     }

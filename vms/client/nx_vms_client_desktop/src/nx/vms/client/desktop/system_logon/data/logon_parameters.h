@@ -23,6 +23,9 @@ struct LogonParameters
     // TODO: Get rid of this parameter. It means almost nothing now.
     bool force = false;
 
+    /** The client was run as a secondary instance - using "Open in New Window" action. */
+    bool secondaryInstance = false;
+
     LogonParameters() = default;
     LogonParameters(const nx::utils::Url& url): url(url) { }
 };

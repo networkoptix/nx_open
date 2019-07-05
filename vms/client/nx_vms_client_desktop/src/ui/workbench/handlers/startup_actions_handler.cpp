@@ -370,6 +370,7 @@ bool StartupActionsHandler::connectUsingCustomUri(const nx::vms::utils::SystemUr
     LogonParameters parameters(systemUrl);
     parameters.force = true;
     parameters.storeSession = false;
+    parameters.secondaryInstance = true;
     menu()->trigger(ConnectAction, Parameters().withArgument(Qn::LogonParametersRole, parameters));
     return true;
 }
@@ -395,6 +396,7 @@ bool StartupActionsHandler::connectUsingCommandLineAuth(
     LogonParameters parameters(serverUrl);
     parameters.force = true;
     parameters.storeSession = false;
+    parameters.secondaryInstance = true;
     menu()->trigger(ConnectAction, Parameters().withArgument(Qn::LogonParametersRole, parameters));
     return true;
 }
