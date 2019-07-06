@@ -223,7 +223,7 @@ static const AggregatedRect1 rects2[] = {
     AggregatedRect1{ QRect(15,13, 11, 8), {"31ba2512-130e-4342-8d9f-614d42e4596a"}}
 };
 
-TEST_F(RectAggregator, xxx)
+TEST_F(RectAggregator, does_not_skip_aggregated_rects_when_splitting)
 {
     ::RectAggregator<std::string> aggregator;
 
