@@ -107,7 +107,7 @@ void EventsStorage::save(common::metadata::ConstDetectionMetadataPacketPtr packe
         return;
 
     m_dbController->queryExecutor().executeUpdate(
-        [this, packet = packet, detectionDataSaver = std::move(detectionDataSaver)](
+        [packet = packet, detectionDataSaver = std::move(detectionDataSaver)](
             nx::sql::QueryContext* queryContext) mutable
         {
             detectionDataSaver.save(queryContext);
