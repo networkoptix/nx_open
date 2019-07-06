@@ -1,10 +1,10 @@
 #include <gtest/gtest.h>
 
-#include <nx/vms/server/analytics/db/rect_aggregator.h>
+#include <utils/math/rect_aggregator.h>
 
-namespace nx::analytics::db::test {
+namespace test {
 
-using AggregatedRect = db::RectAggregator<int>::AggregatedRect;
+using AggregatedRect = RectAggregator<int>::AggregatedRect;
 
 /**
  * NOTE: This comparator makes sense for this test only.
@@ -54,7 +54,7 @@ protected:
     }
 
 private:
-    db::RectAggregator<int> m_aggregator;
+    ::RectAggregator<int> m_aggregator;
 
     template<typename ... Args>
     void aggregateInternal(const AggregatedRect& data, const Args&... args)
@@ -171,4 +171,4 @@ TEST_F(RectAggregator, produced_adjacent_rects_with_same_values_are_merged)
     assertEqual(expected, actual);
 }
 
-} // namespace nx::analytics::db::test
+} // namespace test

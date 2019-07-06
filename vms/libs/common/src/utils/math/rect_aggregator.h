@@ -8,8 +8,6 @@
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
 
-namespace nx::analytics::db {
-
 /**
  * Aggregates / splits provided rectangles so that the result does not contain
  * interlapping rectangles while preserving association between area and some value.
@@ -175,5 +173,3 @@ private:
             one.width() * one.height() + two.width() * two.height();
     }
 };
-
-} // namespace nx::analytics::db
