@@ -102,7 +102,9 @@ protected:
         ASSERT_EQ(m_defaultPayload, m_payload);
 
         if (frameCount > 1)
+        {
             ASSERT_TRUE(m_fin);
+        }
 
         m_frameTypes.clear();
     }
