@@ -27,7 +27,7 @@ private:
     aws_s3::StorageClient m_client;
 };
 
-TEST_F(AwsS3StorageClient, uploads_file)
+TEST_F(AwsS3StorageClient, DISABLED_uploads_file)
 {
     whenUploadFile();
     thenFileIsUploaded();

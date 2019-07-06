@@ -40,7 +40,7 @@ private:
     nx::utils::SyncQueue<aws_s3::Result> m_uploadResults;
 };
 
-TEST_F(AwsS3Client, uploads_file)
+TEST_F(AwsS3Client, DISABLED_uploads_file)
 {
     whenUploadFile();
     thenFileIsUploaded();
