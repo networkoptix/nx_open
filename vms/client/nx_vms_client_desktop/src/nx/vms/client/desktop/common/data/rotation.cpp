@@ -8,12 +8,23 @@ namespace nx::vms::client::desktop {
 
 namespace {
 
-static const QList<Rotation> kStandardRotations{
+static const Rotation::RotationList kStandardRotations {
     Rotation(0),
     Rotation(90),
     Rotation(180),
-    Rotation(270)
+    Rotation(270),
 };
+
+static const Rotation::RotationList kExtendedRotations =
+    []()
+    {
+        auto result = kStandardRotations;
+        result.append(Rotation(-90));
+        result.append(Rotation(-180));
+        result.append(Rotation(-270));
+        result.append(Rotation(-360));
+        return result;
+    }();
 
 } // namespace
 
@@ -40,13 +51,10 @@ QList<Rotation> Rotation::standardRotations()
 Rotation Rotation::closestStandardRotation(qreal degrees)
 {
     degrees = std::fmod(degrees, 360);
-    if (degrees < 0)
-        degrees += 360;
-
-    auto closest = kStandardRotations.first();
+    auto closest = kExtendedRotations.first();
     qreal diff = qAbs(degrees - closest.value());
 
-    for (const auto& rotation: kStandardRotations)
+    for (const auto& rotation: kExtendedRotations)
     {
         const auto d = qAbs(degrees - rotation.value());
         if (d < diff)
@@ -56,7 +64,9 @@ Rotation Rotation::closestStandardRotation(qreal degrees)
         }
     }
 
-    return closest;
+    return closest.value() < 0
+        ? Rotation(closest.value() + 360)
+        : closest;
 }
 
 bool Rotation::operator==(const Rotation& other) const
