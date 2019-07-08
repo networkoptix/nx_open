@@ -37,6 +37,9 @@ EventsStorage::EventsStorage(QnMediaServerModule* mediaServerModule):
 
 EventsStorage::~EventsStorage()
 {
+    if (!m_dbController)
+        return;
+
     // Flushing all cached data.
     // Since update queries are queued all scheduled requests will be completed before flush.
     std::promise<ResultCode> done;
@@ -270,6 +273,9 @@ void EventsStorage::flush(StoreCompletionHandler completionHandler)
     if (!m_dbController)
     {
         NX_DEBUG(this, "Attempt to flush non-initialized analytics DB");
+        lock.unlock();
+
+        completionHandler(ResultCode::error);
         return;
     }
 
