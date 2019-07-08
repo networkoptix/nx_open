@@ -147,9 +147,19 @@ void MediaStreamCache::clearCacheIfNeeded(QnMutexLockerBase* const /*lk*/)
         } );
     if( lastItToRemove != m_packetsByTimestamp.begin() )
         --lastItToRemove;
-    //iterating to first key frame to the left from lastItToRemove
-    for( ; lastItToRemove != m_packetsByTimestamp.begin() && !lastItToRemove->isKeyFrame; --lastItToRemove ) {}
-    //updating cache size (in bytes)
+
+    // Iterating to first key frame to the left from lastItToRemove or until hardlimit reached.
+    for (;; --lastItToRemove)
+    {
+       if (lastItToRemove == m_packetsByTimestamp.begin())
+           break;
+       if (lastItToRemove->isKeyFrame)
+           break;
+       if ((maxTimestamp - lastItToRemove->timestamp) > m_maxCacheSizeUsec)
+           break;
+    }
+
+    // Updating cache size (in bytes).
     for( PacketContainerType::const_iterator
         it = m_packetsByTimestamp.cbegin();
         it != lastItToRemove;
