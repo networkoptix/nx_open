@@ -1150,7 +1150,7 @@ private:
 
         std::map<std::string, std::string> allEntries;
         node(0).database().database().dataManager().getAll(
-            [this, &insertComplete, &allEntries](
+            [&insertComplete, &allEntries](
                 ResultCode resultCode,
                 std::map<std::string, std::string> map)
             {
