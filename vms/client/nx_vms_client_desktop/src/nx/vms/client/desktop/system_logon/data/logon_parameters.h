@@ -30,6 +30,6 @@ struct LogonParameters
     LogonParameters(const nx::utils::Url& url): url(url) { }
 };
 
-Q_DECLARE_METATYPE(LogonParameters)
-
 } // namespace nx::vms::client::desktop
+
+Q_DECLARE_METATYPE(nx::vms::client::desktop::LogonParameters)
