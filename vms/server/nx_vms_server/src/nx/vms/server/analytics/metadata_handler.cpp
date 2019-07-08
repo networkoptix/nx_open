@@ -196,10 +196,11 @@ void MetadataHandler::handleEventMetadata(
 {
     auto eventState = nx::vms::api::EventState::undefined;
 
-    const auto eventTypeId = eventMetadata->typeId();
+    const char* const eventTypeId = eventMetadata->typeId();
+    // TODO: #dmishin: Properly handle the null value.
     NX_VERBOSE(this, "%1(): typeId %2", __func__, eventTypeId);
 
-    auto descriptor = eventTypeDescriptor(eventTypeId);
+    const auto descriptor = eventTypeDescriptor(eventTypeId);
     if (!descriptor)
     {
         NX_WARNING(this, "Unable to find descriptor for %1", eventTypeId);
@@ -208,8 +209,9 @@ void MetadataHandler::handleEventMetadata(
 
     if (descriptor->flags.testFlag(nx::vms::api::analytics::EventTypeFlag::stateDependent))
     {
-        eventState = eventMetadata->isActive() ? nx::vms::api::EventState::active
-                                               : nx::vms::api::EventState::inactive;
+        eventState = eventMetadata->isActive()
+            ? nx::vms::api::EventState::active
+            : nx::vms::api::EventState::inactive;
 
         const bool isDuplicate = eventState == nx::vms::api::EventState::inactive
             && lastEventState(eventTypeId) == nx::vms::api::EventState::inactive;
@@ -223,7 +225,8 @@ void MetadataHandler::handleEventMetadata(
 
     setLastEventState(eventTypeId, eventState);
 
-    auto sdkEvent = nx::vms::event::AnalyticsSdkEventPtr::create(m_resource,
+    const auto sdkEvent = nx::vms::event::AnalyticsSdkEventPtr::create(
+        m_resource,
         m_engineId,
         eventTypeId,
         eventState,

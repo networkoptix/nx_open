@@ -14,7 +14,7 @@ namespace sdk {
 namespace analytics {
 
 /**
- * A single object detected on the scene.
+ * A single object detected on the scene on a particular video frame, defined as a bounding box.
  */
 class IObjectMetadata: public Interface<IObjectMetadata, IMetadata>
 {
