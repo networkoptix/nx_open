@@ -1,5 +1,4 @@
 #include <gtest/gtest.h>
-#include <nx/sql/test_support/test_with_db_helper.h>
 
 #include <nx/sql/async_sql_query_executor.h>
 #include <nx/sql/types.h>
@@ -1090,6 +1089,96 @@ TEST_F(Database, multiple_nodes_synchronize_remove_operation)
 
     andValueIsNotInDb();
     andValueIsNotInSecondDb();
+}
+
+//-------------------------------------------------------------------------------------------------
+// EmbeddedDatabase
+
+class EmbeddedDatabase:
+    public testing::Test
+{
+protected:
+    void whenStartEmbeddedDatabaseWithCache()
+    {
+        m_nodes.emplace_back(std::make_unique<EmbeddedNodeLauncher>());
+        m_nodes.back()->addArg("-enableCache", "true");
+        ASSERT_TRUE(m_nodes.back()->startAndWaitUntilStarted());
+    }
+
+    void thenEmbeddedDatabaseHasCache()
+    {
+        ASSERT_NE(node(0).database().cache(), nullptr);
+    }
+
+    void givenEmbeddedDatabaseWithCache()
+    {
+        whenStartEmbeddedDatabaseWithCache();
+        thenEmbeddedDatabaseHasCache();
+        insertKeyValuePair();
+    }
+
+    void whenEmbeddedDatabaseIsRestarted()
+    {
+        ASSERT_TRUE(m_nodes[0]->restart());
+    }
+
+    void thenCacheIsReloaded()
+    {
+        auto value = node(0).database().cache()->find("key");
+        ASSERT_NE(std::nullopt, value);
+        ASSERT_EQ("value", *value);
+    }
+
+private:
+    EmbeddedNode& node(int index)
+    {
+        return *m_nodes[index]->moduleInstance();
+    }
+
+    void insertKeyValuePair()
+    {
+        nx::utils::SyncQueue<ResultCode>insertComplete;
+
+        // Inserting key value pair to test cache reload after restart
+        node(0).database().database().dataManager().insertOrUpdate(
+            "key",
+            "value",
+            [&insertComplete](ResultCode resultCode)
+            {
+                insertComplete.push(resultCode);
+            });
+
+        std::map<std::string, std::string> allEntries;
+        node(0).database().database().dataManager().getAll(
+            [this, &insertComplete, &allEntries](
+                ResultCode resultCode,
+                std::map<std::string, std::string> map)
+            {
+                allEntries = std::move(map);
+                insertComplete.push(resultCode);
+            });
+
+        for (int i = 0; i < 2; ++i)
+            ASSERT_EQ(ResultCode::ok, insertComplete.pop());
+
+        ASSERT_NE(0, (int) allEntries.size());
+    }
+
+private:
+    std::vector<std::unique_ptr<EmbeddedNodeLauncher>> m_nodes;
+};
+
+TEST_F(EmbeddedDatabase, cache_is_enabled_through_settings)
+{
+    whenStartEmbeddedDatabaseWithCache();
+    thenEmbeddedDatabaseHasCache();
+}
+
+TEST_F(EmbeddedDatabase, cache_is_reloaded_after_restart)
+{
+    givenEmbeddedDatabaseWithCache();
+    whenEmbeddedDatabaseIsRestarted();
+    thenCacheIsReloaded();
 }
 
 } // namespace nx::clusterdb::map::test

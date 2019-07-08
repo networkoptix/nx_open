@@ -294,6 +294,26 @@ void DataManager::getRangeWithPrefix(
         getRange(keyPrefix, std::move(completionHandler));
 }
 
+void DataManager::getAll(GetRangeCompletionHandler completionHandler)
+{
+    auto sharedPairs = std::make_shared<std::optional<std::map<std::string, std::string>>>();
+
+    m_queryExecutor->executeSelect(
+        [this, sharedPairs](
+            nx::sql::QueryContext* queryContext)
+        {
+            *sharedPairs = m_keyValueDao.getAll(queryContext);
+            return nx::sql::DBResult::ok;
+        },
+        [sharedPairs, completionHandler = std::move(completionHandler)](
+            nx::sql::DBResult dbResult)
+        {
+            completionHandler(
+                toResultCode(filterDbResult(*sharedPairs, dbResult)),
+                getValue(*sharedPairs));
+        });
+}
+
 void DataManager::insertToOrUpdateDb(
     nx::sql::QueryContext* queryContext,
     const std::string& key,

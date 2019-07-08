@@ -46,6 +46,9 @@ public:
     std::map<std::string, std::string> getRange(
         nx::sql::QueryContext* queryContext,
         const std::string& keyLowerBound);
+
+    std::map<std::string, std::string> getAll(
+        nx::sql::QueryContext* queryContext);
 };
 
 } // namespace nx::clusterdb::map::dao

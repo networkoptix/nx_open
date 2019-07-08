@@ -10,6 +10,7 @@ namespace nx::sql { class AsyncSqlQueryExecutor; }
 namespace nx::clusterdb::map {
 
 class Settings;
+class Cache;
 
 class NX_KEY_VALUE_DB_API EmbeddedDatabase
 {
@@ -20,11 +21,19 @@ public:
 
     Database& database();
 
+    /**
+     * Get a pointer to this maps local in memory cache of all key/value pairs in the db.
+     * NOTE: returns nullptr if Settings::enableCache is false
+     */
+    Cache* cache();
+
+
     nx::clusterdb::engine::SynchronizationEngine& synchronizationEngine();
 
 private:
     nx::clusterdb::engine::SynchronizationEngine m_syncEngine;
     Database m_database;
+    std::unique_ptr<Cache> m_cache;
 };
 
 } // namespace nx::clusterdb::map

@@ -73,6 +73,12 @@ SELECT key, value from `%1_data` WHERE key >= :lower_bound
 
 )sql";
 
+static constexpr char kFetchAllTemplate[] = R"sql(
+
+SELECT * from `%1_data`
+
+)sql";
+
 std::string hash(const QByteArray& key)
 {
     //SHA512 hash is 64 bytes. Converted to hex, we have 128 characters.
@@ -196,6 +202,15 @@ std::map<std::string, std::string> KeyValueDao::getRange(
     auto query = queryContext->connection()->createQuery();
     query->prepare(QString(kFetchRangeTemplateWithoutUpperBound).arg(kSchemaName));
     query->bindValue(kLowerBoundBinding, toByteArray(keyLowerBound));
+    query->exec();
+
+    return toStdMap(query.get());
+}
+
+std::map<std::string, std::string> KeyValueDao::getAll(nx::sql::QueryContext* queryContext)
+{
+    auto query = queryContext->connection()->createQuery();
+    query->prepare(QString(kFetchAllTemplate).arg(kSchemaName));
     query->exec();
 
     return toStdMap(query.get());

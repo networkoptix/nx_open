@@ -116,6 +116,8 @@ public:
         const std::string& keyPrefix,
         GetRangeCompletionHandler completionHandler);
 
+    void getAll(GetRangeCompletionHandler completionHandler);
+
 private:
     /**
      * Inserts/updates key/value within existing transaction.

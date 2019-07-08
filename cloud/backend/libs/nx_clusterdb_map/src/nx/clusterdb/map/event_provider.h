@@ -9,24 +9,24 @@ namespace nx::sql { class QueryContext; }
 
 namespace nx::clusterdb::map {
 
-using InsertTriggerHandler = nx::utils::MoveOnlyFunc<void(
+using RecordInsertedHandler = nx::utils::MoveOnlyFunc<void(
     nx::sql::QueryContext* /*queryContext*/,
     std::string /*key*/,
     std::string /*value*/)>;
 
-using RemoveTriggerhandler = nx::utils::MoveOnlyFunc<void(
-    nx::sql::QueryContext*,
+using RecordRemovedHandler = nx::utils::MoveOnlyFunc<void(
+    nx::sql::QueryContext* /*queryContext*/,
     std::string /*key*/)>;
 
 class NX_KEY_VALUE_DB_API EventProvider
 {
 public:
     void subscribeToRecordInserted(
-        InsertTriggerHandler insertTriggerHandler,
+        RecordInsertedHandler insertTriggerHandler,
         nx::utils::SubscriptionId* const subscriptionId);
 
     void subscribeToRecordRemoved(
-        RemoveTriggerhandler removeTriggerHandler,
+        RecordRemovedHandler removeTriggerHandler,
         nx::utils::SubscriptionId* const subcriptionId);
 
     void unsubscribeFromRecordInserted(nx::utils::SubscriptionId subscriptionid);
@@ -50,7 +50,7 @@ private:
 
     nx::utils::Subscription<
         nx::sql::QueryContext*,
-        std::string/*key*/> m_recordRemoved;
+        std::string /*key*/> m_recordRemoved;
 };
 
 } // namespace nx::clusterdb::map
