@@ -29,7 +29,7 @@ enum IDType
     OpenLoginDialogAction,
 
     /**
-     * Connects to server.
+     * Connects to the system.
      */
     ConnectAction,
 

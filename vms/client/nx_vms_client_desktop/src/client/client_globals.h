@@ -155,17 +155,22 @@ namespace Qn
         FileNameRole,                               /**< Role for target filename. Used in TakeScreenshotAction. */
         TextRole,                                   /**< Role for generic text. Used in several places. */
         IntRole,                                    /**< Role for generic integer. Used in several places. */
-        UrlRole,                                    /**< Role for target url. Used in BrowseUrlAction and action::ConnectAction. */
-        AutoLoginRole,                              /**< Role for flag that shows if client should connect with last credentials
-                                                         (or to the last system) automatically next time */
 
-        StoreSessionRole,                          /**< Role for flag that shows if session on successful connection should be stored.
-                                                         Used in action::ConnectAction. */
-        StorePasswordRole,                          /**< Role for flag that shows if password of successful connection should be stored.
-                                                        Used in action::ConnectAction. */
-        CloudSystemIdRole,                          /**< Role for cloud system id (QString). Used in cloud system nodes and ConnectToCloudAction. */
+        /** Role for target url. Used in BrowseUrlAction. */
+        UrlRole,
 
-        ForceRole,                                  /**< Role for 'forced' flag. Used in ConnectAction/DisconnectAction. */
+        /** LogonParameters structure. Used in the ConnectAction. */
+        LogonParametersRole,
+
+        /**
+         * Role for cloud system id (QString). Used in cloud system nodes in the resources tree and
+         * as the ConnectToCloudAction parameter.
+         */
+        CloudSystemIdRole,
+
+        /** Role for 'forced' flag. Used in DisconnectAction. */
+        ForceRole,
+
         CameraBookmarkRole,                         /**< Role for the selected camera bookmark (if any). Used in Edit/RemoveCameraBookmarkAction */
         CameraBookmarkListRole,                     /**< Role for the list of bookmarks. Used in RemoveBookmarksAction */
         BookmarkTagRole,                            /**< Role for bookmark tag. Used in OpenBookmarksSearchAction */

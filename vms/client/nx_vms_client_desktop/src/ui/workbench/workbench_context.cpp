@@ -9,7 +9,6 @@
 #include <common/common_module.h>
 
 #include <client/client_app_info.h>
-#include <client/client_module.h>
 #include <client/client_settings.h>
 #include <client/client_startup_parameters.h>
 #include <client/client_runtime_settings.h>
@@ -28,7 +27,6 @@
 #include <ui/workbench/watchers/workbench_user_watcher.h>
 #include <ui/workbench/watchers/workbench_layout_watcher.h>
 #include <ui/workbench/watchers/workbench_desktop_camera_watcher.h>
-#include <ui/workbench/workbench_welcome_screen.h>
 #include <ui/graphics/instruments/gl_checker_instrument.h>
 
 #include <statistics/statistics_manager.h>
@@ -45,8 +43,6 @@
 #endif
 
 #include <utils/common/app_info.h>
-
-#include <watchers/cloud_status_watcher.h>
 
 #include <nx/utils/log/log.h>
 #include <nx/client/core/watchers/user_watcher.h>
@@ -250,145 +246,10 @@ void QnWorkbenchContext::setClosingDown(bool value)
     m_closingDown = value;
 }
 
-bool QnWorkbenchContext::connectUsingCustomUri(const nx::vms::utils::SystemUri& uri)
+void QnWorkbenchContext::handleStartupParameters(const QnStartupParameters& startupParams)
 {
-    if (!uri.isValid())
-        return false;
-
-    using namespace nx::vms::utils;
-
-    SystemUri::Auth auth = uri.authenticator();
-    const nx::vms::common::Credentials credentials(auth.user, auth.password);
-
-    switch (uri.clientCommand())
-    {
-        case SystemUri::ClientCommand::LoginToCloud:
-        {
-            NX_DEBUG(this, lit("Custom URI: Connecting to cloud"));
-            qnClientModule->cloudStatusWatcher()->setCredentials(credentials, true);
-            break;
-        }
-        case SystemUri::ClientCommand::Client:
-        {
-            QString systemId = uri.systemId();
-            if (systemId.isEmpty())
-                return false;
-
-            bool systemIsCloud = !QnUuid::fromStringSafe(systemId).isNull();
-
-            auto systemUrl = nx::utils::Url::fromUserInput(systemId);
-            systemUrl.setScheme("https");
-            NX_DEBUG(this, lit("Custom URI: Connecting to system %1").arg(systemUrl.toString()));
-
-            systemUrl.setUserName(auth.user);
-            systemUrl.setPassword(auth.password);
-
-            if (systemIsCloud)
-            {
-                qnClientModule->cloudStatusWatcher()->setCredentials(credentials, true);
-                NX_DEBUG(this, lit("Custom URI: System is cloud, connecting to cloud first"));
-            }
-
-            auto parameters = action::Parameters().withArgument(Qn::UrlRole, systemUrl);
-            parameters.setArgument(Qn::ForceRole, true);
-            parameters.setArgument(Qn::StoreSessionRole, false);
-            menu()->trigger(action::ConnectAction, parameters);
-            return true;
-
-        }
-        default:
-            break;
-    }
-    return false;
-}
-
-bool QnWorkbenchContext::connectUsingCommandLineAuth(const QnStartupParameters& startupParams)
-{
-    /* Set authentication parameters from command line. */
-
-    nx::utils::Url appServerUrl = startupParams.parseAuthenticationString();
-
-    // TODO: #refactor System URI to support videowall
-    if (!startupParams.videoWallGuid.isNull())
-    {
-        NX_ASSERT(appServerUrl.isValid());
-        if (!appServerUrl.isValid())
-        {
-            return false;
-        }
-
-        appServerUrl.setUserName(startupParams.videoWallGuid.toString());
-    }
-
-    auto params = action::Parameters().withArgument(Qn::UrlRole, appServerUrl);
-    params.setArgument(Qn::ForceRole, true);
-    params.setArgument(Qn::StoreSessionRole, false);
-    menu()->trigger(action::ConnectAction, params);
-    return true;
-}
-
-QnWorkbenchContext::StartupParametersCode
-    QnWorkbenchContext::handleStartupParameters(const QnStartupParameters& startupParams)
-{
-    /* Process input files. */
-    bool haveInputFiles = false;
-    {
-        auto window = qobject_cast<MainWindow*>(mainWindow());
-        NX_ASSERT(window);
-
-        bool skipArg = true;
-        for (const auto& arg : qApp->arguments())
-        {
-            if (!skipArg)
-                haveInputFiles |= window && window->handleOpenFile(arg);
-            skipArg = false;
-        }
-    }
-
-    /* If no input files were supplied --- open welcome page.
-    * Do not try to connect in the following cases:
-    * * we were not connected and clicked "Open in new window"
-    * * we have opened exported exe-file
-    * Otherwise we should try to connect or show welcome page.
-    */
-    if (const auto welcomeScreen = mainWindow()->welcomeScreen())
-        welcomeScreen->setVisibleControls(true);
-
-    if (!connectUsingCustomUri(startupParams.customUri)
-        && startupParams.instantDrop.isEmpty()
-        && !haveInputFiles
-        && !connectUsingCommandLineAuth(startupParams)
-        )
-    {
-        return wrongParameters;
-    }
-
-    if (!startupParams.videoWallGuid.isNull())
-    {
-        menu()->trigger(action::DelayedOpenVideoWallItemAction, action::Parameters()
-                                 .withArgument(Qn::VideoWallGuidRole, startupParams.videoWallGuid)
-                                 .withArgument(Qn::VideoWallItemGuidRole, startupParams.videoWallItemGuid));
-    }
-
     menu()->trigger(action::ProcessStartupParametersAction,
         {Qn::StartupParametersRole, startupParams});
-
-    /* Show beta version warning message for the main instance only */
-    const bool showBetaWarning = QnAppInfo::beta()
-        && !startupParams.allowMultipleClientInstances
-        && qnRuntime->isDesktopMode()
-        && !ini().developerMode
-        && startupParams.customUri.isNull();
-
-    if (showBetaWarning)
-        action(action::BetaVersionMessageAction)->trigger();
-
-#ifdef _DEBUG
-    /* Show FPS in debug. */
-    menu()->trigger(action::ShowFpsAction);
-#endif
-
-    return success;
 }
 
 void QnWorkbenchContext::initWorkarounds()
