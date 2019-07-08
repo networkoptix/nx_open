@@ -186,10 +186,10 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddr(
 
 void OnvifResourceSearcher::setupResourceGroupIfNeed(const QnPlOnvifResourcePtr& resource)
 {
-    auto resData = commonModule()->resourceDataPool();
+    auto resData = resource->resourceData();
 
     bool shouldAppearAsSingleChannel = resData.value<bool>(
-        Qn::SHOULD_APPEAR_AS_SINGLE_CHANNEL_PARAM_NAME);
+        ResourceDataKey::kShouldAppearAsSingleChannel);
 
     if (!shouldAppearAsSingleChannel)
     {
