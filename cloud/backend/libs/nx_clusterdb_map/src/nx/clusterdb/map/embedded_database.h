@@ -3,6 +3,7 @@
 #include <nx/utils/uuid.h>
 #include <nx/clusterdb/engine/synchronization_engine.h>
 
+#include "cache.h"
 #include "database.h"
 
 namespace nx::sql { class AsyncSqlQueryExecutor; }
@@ -10,7 +11,6 @@ namespace nx::sql { class AsyncSqlQueryExecutor; }
 namespace nx::clusterdb::map {
 
 class Settings;
-class Cache;
 
 class NX_KEY_VALUE_DB_API EmbeddedDatabase
 {
@@ -22,11 +22,10 @@ public:
     Database& database();
 
     /**
-     * Get a pointer to this maps local in memory cache of all key/value pairs in the db.
+     * Get a pointer to this map's local in memory cache of all key/value pairs in the db.
      * NOTE: returns nullptr if Settings::enableCache is false
      */
     Cache* cache();
-
 
     nx::clusterdb::engine::SynchronizationEngine& synchronizationEngine();
 
