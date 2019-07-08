@@ -173,7 +173,6 @@ void QnBusinessRuleWidget::at_model_dataChanged(Fields fields)
 
     if (fields & Field::eventType)
     {
-
         QModelIndexList eventTypeIdx = m_model->eventTypesModel()->match(
             m_model->eventTypesModel()->index(0, 0), Qt::UserRole + 1, (int)m_model->eventType(), 1, Qt::MatchExactly);
         ui->eventTypeComboBox->setCurrentIndex(eventTypeIdx.isEmpty() ? 0 : eventTypeIdx.first().row());
@@ -191,7 +190,7 @@ void QnBusinessRuleWidget::at_model_dataChanged(Fields fields)
         ui->eventStatesComboBox->setCurrentIndex(stateIdx.isEmpty() ? 0 : stateIdx.first().row());
     }
 
-    if (fields & Field::eventResources)
+    if (fields & Field::eventResources || fields & Field::eventType)
     {
         ui->eventResourcesHolder->setText(m_model->data(Column::source).toString());
         ui->eventResourcesHolder->setIcon(iconHelper(m_model->data(Column::source,
