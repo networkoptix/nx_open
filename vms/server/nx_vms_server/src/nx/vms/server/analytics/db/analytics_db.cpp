@@ -37,7 +37,11 @@ EventsStorage::EventsStorage(QnMediaServerModule* mediaServerModule):
 
 EventsStorage::~EventsStorage()
 {
-    // TODO: Waiting for completion or cancelling posted queries.
+    // Flushing all cached data.
+    // Since update queries are queued all scheduled requests will be completed before flush.
+    std::promise<ResultCode> done;
+    flush([&done](auto resultCode) { done.set_value(resultCode); });
+    done.get_future().wait();
 }
 
 bool EventsStorage::initialize(const Settings& settings)
