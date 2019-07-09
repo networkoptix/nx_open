@@ -102,7 +102,7 @@ void CameraManager::setCredentials( const char* username, const char* password )
     for (int i = 0; i < kEncoderCount; ++i)
     {
         if (m_encoder[i])
-            m_encoder[i]->updateCredentials(username, password);
+            m_encoder[i]->updateCredentials(QString::fromUtf8(username), QString::fromUtf8(password));
     }
 }
 
