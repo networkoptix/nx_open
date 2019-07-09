@@ -14,7 +14,12 @@ namespace test {
 
 namespace {
 
-QnScheduleTaskList makeEmptySchedule()
+QnScheduleTaskList makeSchedule(
+    Qn::RecordingType recordingType,
+    Qn::StreamQuality streamQuality = Qn::StreamQuality::normal,
+    int fps = 0,
+    int bitrateKbps = 0
+)
 {
     QnScheduleTaskList result;
     for (int day = 1; day <= 7; ++day)
@@ -23,31 +28,27 @@ QnScheduleTaskList makeEmptySchedule()
             /*dayOfWeek*/ day,
             /*startTime*/ 0,
             /*endTime*/ 86400,
-            /*recordingType*/ Qn::RecordingType::never,
-            /*streamQuality*/ Qn::StreamQuality::highest,
-            /*fps*/ 0,
-            /*bitrateKbps*/ 0
-		});
+            /*recordingType*/ recordingType,
+            /*streamQuality*/ streamQuality,
+            /*fps*/ fps,
+            /*bitrateKbps*/ bitrateKbps
+        });
     }
     return result;
 }
 
+QnScheduleTaskList makeEmptySchedule()
+{
+    return makeSchedule(/*recordingType*/ Qn::RecordingType::never);
+}
+
 QnScheduleTaskList makeDefaultSchedule()
 {
-    QnScheduleTaskList result;
-    for (int day = 1; day <= 7; ++day)
-    {
-        result.push_back({
-            /*dayOfWeek*/ day,
-            /*startTime*/ 0,
-            /*endTime*/ 86400,
-            /*recordingType*/ Qn::RecordingType::never,
-            /*streamQuality*/ Qn::StreamQuality::highest,
-            /*fps*/ 0,
-            /*bitrateKbps*/ 0
-		});
-    }
-    return result;
+    return makeSchedule(
+        /*recordingType*/ ScheduleCellParams::kDefaultRecordingType,
+        /*streamQuality*/ Qn::StreamQuality::normal,
+        /*fps*/ 10
+    );
 }
 
 } // namespace
@@ -187,6 +188,24 @@ TEST_F(CameraSettingsDialogStateReducerTest, brushFpsIsValidAfterCleanSchedule)
     ASSERT_EQ(reloaded.recording.brush.fps, kDefaultFps);
 }
 
+// If clean schedule, fps brush should be reset to a default value.
+TEST_F(CameraSettingsDialogStateReducerTest, brushQualityIsLoaded)
+{
+    CameraResourceStubPtr camera(new CameraResourceStub());
+    const QnVirtualCameraResourceList cameras{ camera };
+
+    static constexpr auto kCustomQuality = Qn::StreamQuality::low;
+
+    State initial = Reducer::loadCameras({}, cameras);
+
+    State afterSetup = Reducer::setSchedule(std::move(initial),
+        makeSchedule(Qn::RecordingType::always, kCustomQuality));
+
+    CameraSettingsDialogStateConversionFunctions::applyStateToCameras(afterSetup, cameras);
+    State reloaded = Reducer::loadCameras(std::move(afterSetup), cameras);
+    ASSERT_EQ(reloaded.recording.brush.quality, kCustomQuality);
+}
+
 // Schedule brush correctness when bitrate switches from custom to predefined and back.
 TEST_F(CameraSettingsDialogStateReducerTest, brushBitrateIsValidOnScheduleBrushChange)
 {
@@ -257,6 +276,75 @@ TEST_F(CameraSettingsDialogStateReducerTest, recordingAlertIfScheduleIsEmpty)
     // Warning should be hidden if we setup some schedule.
     State scheduleSet = Reducer::setSchedule(makeRecordingState(), makeDefaultSchedule());
     ASSERT_FALSE(recordingDisabled.recordingHint.has_value());
+}
+
+// "Motion" and "Motion + Lo-Res" recording types must not be available if secondary stream is
+// disabled on the expert settings page.
+TEST_F(CameraSettingsDialogStateReducerTest, disableMotionBrushIfDualStreamingIsDisabled)
+{
+    // Global option to allow expert settings editing must be enabled first.
+    State enableDeviceOptimization = Reducer::setSettingsOptimizationEnabled({}, true);
+
+    CameraResourceStubPtr camera(new CameraResourceStub());
+    camera->setHasDualStreaming(true);
+
+    State initial = Reducer::loadCameras(std::move(enableDeviceOptimization), { camera });
+    ASSERT_TRUE(initial.hasMotion());
+    ASSERT_TRUE(initial.supportsDualStreamRecording());
+
+    State disabledDualStreaming = Reducer::setDualStreamingDisabled(std::move(initial), true);
+    ASSERT_FALSE(disabledDualStreaming.hasMotion());
+    ASSERT_FALSE(disabledDualStreaming.supportsDualStreamRecording());
+
+    State enabledDualStreaming = Reducer::setDualStreamingDisabled(
+        std::move(disabledDualStreaming), false);
+    ASSERT_TRUE(enabledDualStreaming.hasMotion());
+    ASSERT_TRUE(enabledDualStreaming.supportsDualStreamRecording());
+}
+
+// "Motion" and "Motion + Lo-Res" recording type must always be available if camera settings
+// optimization is off.
+TEST_F(CameraSettingsDialogStateReducerTest, enableMotionBrushIfDeviceOptimizationIsDisabled)
+{
+    // Global option to allow expert settings editing must be enabled first.
+    State enableDeviceOptimization = Reducer::setSettingsOptimizationEnabled({}, true);
+
+    CameraResourceStubPtr camera(new CameraResourceStub());
+    camera->setHasDualStreaming(true);
+
+    State initial = Reducer::loadCameras(std::move(enableDeviceOptimization), { camera });
+    ASSERT_TRUE(initial.hasMotion());
+    ASSERT_TRUE(initial.supportsDualStreamRecording());
+
+    State disabledDualStreaming = Reducer::setDualStreamingDisabled(std::move(initial), true);
+    ASSERT_FALSE(disabledDualStreaming.hasMotion());
+    ASSERT_FALSE(disabledDualStreaming.supportsDualStreamRecording());
+
+    State disableDeviceOptimization = Reducer::setSettingsOptimizationEnabled(
+        std::move(disabledDualStreaming), false);
+
+    ASSERT_TRUE(disableDeviceOptimization.hasMotion());
+    ASSERT_TRUE(disableDeviceOptimization.supportsDualStreamRecording());
+}
+
+// "Motion" recording type must be available if user forces MD on the primary stream.
+TEST_F(CameraSettingsDialogStateReducerTest, disableMotionIfSecondaryStreamDisabled)
+{
+    // Global option to allow expert settings editing must be enabled first.
+    State enableDeviceOptimization = Reducer::setSettingsOptimizationEnabled({}, true);
+
+    CameraResourceStubPtr camera(new CameraResourceStub());
+    camera->setHasDualStreaming(true);
+
+    State initial = Reducer::loadCameras(std::move(enableDeviceOptimization), { camera });
+    ASSERT_EQ(initial.devicesDescription.supportsMotionStreamOverride, CombinedValue::All);
+
+    State disabledDualStreaming = Reducer::setDualStreamingDisabled(std::move(initial), true);
+    ASSERT_FALSE(disabledDualStreaming.hasMotion());
+
+    State forcedMdOnPrimaryStream = Reducer::setForcedMotionStreamType(
+        std::move(disabledDualStreaming), nx::vms::api::StreamIndex::primary);
+    ASSERT_TRUE(forcedMdOnPrimaryStream.hasMotion());
 }
 
 } // namespace test

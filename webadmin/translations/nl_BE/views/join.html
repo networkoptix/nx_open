@@ -48,18 +48,16 @@
         </ng-form>
 
         <div class="form-group" ng-class="{hidden:!systems.systemFound}">
-            <label for="currentSystemPassword" class="control-label">Current Password (for this System)</label>
+            <label for="currentSystemPassword" class="control-label">Huidige wachtwoord (voor dit systeem)</label>
             <div class="">
                 <input type="password" ng-model="settings.currentPassword"  class="form-control" id="currentSystemPassword" placeholder="Password" required />
             </div>
         </div>
 
         <div class="form-group" ng-class="{hidden:!systems.systemFound}">
-            <p>The current System is about to be merged <b>{{systems.systemName}}</b> with System <b>{{systems.joinSystemName}}</b></p>
+            <p>Het huidige systeem zal worden samengevoegd <b>{{systems.systemName}}</b> met systeem <b>{{systems.joinSystemName}}</b></p>
             <p>
-                The new System will have password and name from the following System:<br/>
-                <label><input type="radio" name="keepMySystem" ng-value="true" ng-disabled="systems.remoteSystemIsNew" ng-model="settings.keepMySystem" id="checkbox-current-system"/> {{systems.systemName}} (current)</label> <br/>
-                <label ng-if="!systems.remoteSystemIsNew"><input type="radio" name="keepMySystem" ng-value="false" ng-disabled="systems.remoteSystemIsNew" ng-model="settings.keepMySystem" id="checkbox-external-system"/> {{systems.joinSystemName}}</label>
+                Het nieuwe systeem zal het wachtwoord en de naam krijgen van het volgende systeem: <br/> <label><input type="radio" name="keepMySystem" ng-value="true" ng-disabled="systems.remoteSystemIsNew" ng-model="settings.keepMySystem" id="checkbox-current-system"/> {{systems.systemName}} (huidige)</label> <br/> <label ng-if="!systems.remoteSystemIsNew"><input type="radio" name="keepMySystem" ng-value="false" ng-disabled="systems.remoteSystemIsNew" ng-model="settings.keepMySystem" id="checkbox-external-system"/> {{systems.joinSystemName}}</label>
             </p>
         </div>
     </div>

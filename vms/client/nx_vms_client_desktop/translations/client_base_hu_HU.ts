@@ -5743,8 +5743,8 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Felhasználók</translation>
     </message>
     <message>
-      <source>Analytics</source>
-      <translation>analitika</translation>
+      <source>Plugins</source>
+      <translation type="unfinished">Plugins</translation>
     </message>
   </context>
   <context>
@@ -7662,10 +7662,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Weboldal</translation>
     </message>
     <message>
-      <source>Analytics</source>
-      <translation>analitika</translation>
-    </message>
-    <message>
       <source>Expert</source>
       <translation>Szakértő</translation>
     </message>
@@ -7717,6 +7713,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>I/O Modules Settings</source>
       <translation>I/O modulok beállítása</translation>
+    </message>
+    <message>
+      <source>Plugins</source>
+      <translation type="unfinished">Plugins</translation>
     </message>
   </context>
   <context>
@@ -8745,6 +8745,14 @@ If you intended to move analytics data to another storage location, please conta
       <source>Some servers have no package available</source>
       <translation type="unfinished">Some servers have no package available</translation>
     </message>
+    <message>
+      <source>Failed to cancel update</source>
+      <translation type="unfinished">Failed to cancel update</translation>
+    </message>
+    <message>
+      <source>Failed to start installation</source>
+      <translation type="unfinished">Failed to start installation</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::MultipleLayoutSelectionDialog</name>
@@ -8896,10 +8904,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation type="unfinished">Internal downloader error.</translation>
     </message>
     <message>
-      <source>Iternal server error.</source>
-      <translation type="unfinished">Iternal server error.</translation>
-    </message>
-    <message>
       <source>Internal client error.</source>
       <translation type="unfinished">Internal client error.</translation>
     </message>
@@ -8918,6 +8922,14 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Update package is not found.</source>
       <translation type="unfinished">Update package is not found.</translation>
+    </message>
+    <message>
+      <source>There is not enough space to install update.</source>
+      <translation type="unfinished">There is not enough space to install update.</translation>
+    </message>
+    <message>
+      <source>Internal server error.</source>
+      <translation type="unfinished">Internal server error.</translation>
     </message>
   </context>
   <context>
@@ -9158,6 +9170,17 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Waiting for server to respond...</source>
       <translation type="unfinished">Waiting for server to respond...</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ServerUpdateTool</name>
+    <message>
+      <source>No connection to the server.</source>
+      <translation type="unfinished">No connection to the server.</translation>
+    </message>
+    <message>
+      <source>Network error.</source>
+      <translation type="unfinished">Network error.</translation>
     </message>
   </context>
   <context>

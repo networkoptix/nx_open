@@ -217,8 +217,7 @@ void ScheduleSettingsWidget::loadState(const CameraSettingsDialogState& state)
         ui->recordMotionButton->setToolTip(motionOptionHint(state));
     }
 
-    const bool hasDualRecordingOption = state.hasMotion()
-        && state.devicesDescription.hasDualStreamingCapability == CombinedValue::All;
+    const bool hasDualRecordingOption = state.supportsDualStreamRecording();
 
     ui->recordMotionPlusLQButton->setEnabled(hasDualRecordingOption);
     ui->labelMotionPlusLQ->setEnabled(hasDualRecordingOption);

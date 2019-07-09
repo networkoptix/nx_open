@@ -8,7 +8,7 @@
     "setup": {
         "createAccount": "account aanmaken",
         "errorNoHDD": "Dit apparaat is bedoeld om te werken met een harde schijf. <br>Gelieve het apparaat uit te schakelen en een harde schijf te installeren.",
-        "errorNoNetwork": "Dit apparaat heeft een netwerkverbinding nodig om te functioneren.<br>\n                Sluit het apparaat aan op het  lokale netwerk of het internet"
+        "errorNoNetwork": "Dit apparaat heeft een netwerkverbinding nodig om te functioneren.<br>\n Sluit het apparaat aan op het lokale netwerk of het internet"
     },
     "passwordRequirements": {
         "minLengthMessage": "Het wachtwoord moet tenminste 8 karakters lang zijn",

@@ -5740,8 +5740,8 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
       <translation>Benutzer</translation>
     </message>
     <message>
-      <source>Analytics</source>
-      <translation>Analytik</translation>
+      <source>Plugins</source>
+      <translation>Plugins</translation>
     </message>
   </context>
   <context>
@@ -7659,10 +7659,6 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
       <translation>Webseite:</translation>
     </message>
     <message>
-      <source>Analytics</source>
-      <translation>Analytik</translation>
-    </message>
-    <message>
       <source>Expert</source>
       <translation>Experte</translation>
     </message>
@@ -7714,6 +7710,10 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     <message>
       <source>I/O Modules Settings</source>
       <translation>I/O-Moduleinstellungen</translation>
+    </message>
+    <message>
+      <source>Plugins</source>
+      <translation>Plugins</translation>
     </message>
   </context>
   <context>
@@ -8742,6 +8742,14 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
       <source>Some servers have no package available</source>
       <translation>Einige Server haben kein Paket zur Verfügung</translation>
     </message>
+    <message>
+      <source>Failed to cancel update</source>
+      <translation type="unfinished">Failed to cancel update</translation>
+    </message>
+    <message>
+      <source>Failed to start installation</source>
+      <translation type="unfinished">Failed to start installation</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::MultipleLayoutSelectionDialog</name>
@@ -8893,10 +8901,6 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
       <translation>Interner Downloadfehler.</translation>
     </message>
     <message>
-      <source>Iternal server error.</source>
-      <translation>Interner Serverfehler.</translation>
-    </message>
-    <message>
       <source>Internal client error.</source>
       <translation>Interner Clientfehler.</translation>
     </message>
@@ -8915,6 +8919,14 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     <message>
       <source>Update package is not found.</source>
       <translation>Updatepaket wurde nicht gefunden.</translation>
+    </message>
+    <message>
+      <source>There is not enough space to install update.</source>
+      <translation>Es ist nicht genügend Speicherplatz zum Installieren des Updates vorhanden.</translation>
+    </message>
+    <message>
+      <source>Internal server error.</source>
+      <translation>Interner Serverfehler.</translation>
     </message>
   </context>
   <context>
@@ -9155,6 +9167,17 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     <message>
       <source>Waiting for server to respond...</source>
       <translation>Warte auf Antwort des Servers...</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ServerUpdateTool</name>
+    <message>
+      <source>No connection to the server.</source>
+      <translation type="unfinished">No connection to the server.</translation>
+    </message>
+    <message>
+      <source>Network error.</source>
+      <translation type="unfinished">Network error.</translation>
     </message>
   </context>
   <context>

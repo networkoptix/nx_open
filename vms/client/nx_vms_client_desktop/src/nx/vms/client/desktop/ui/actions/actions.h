@@ -29,7 +29,7 @@ enum IDType
     OpenLoginDialogAction,
 
     /**
-     * Connects to server.
+     * Connects to the system.
      */
     ConnectAction,
 
@@ -342,6 +342,11 @@ enum IDType
      * Goes to fullscreen and slides out all panels.
      */
     FreespaceAction,
+
+    /**
+     * Show timeline on the videowall for some time as a reaction for the some user actions.
+     */
+    ShowTimeLineOnVideowallAction,
 
     /**
      * Minimizes client's main window.

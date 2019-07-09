@@ -293,8 +293,30 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractReduxState
     bool hasMotion() const
     {
         bool result = devicesDescription.hasMotion == CombinedValue::All;
+
         if (isSingleCamera())
             result &= singleCameraSettings.enableMotionDetection();
+
+        if (settingsOptimizationEnabled)
+        {
+            if (expert.forcedMotionStreamType() != nx::vms::api::StreamIndex::primary)
+                result &= !expert.dualStreamingDisabled();
+        }
+
+        return result;
+    }
+
+    /**
+     * @return "Motion + Lo-Res" recording mode is available.
+     */
+    bool supportsDualStreamRecording() const
+    {
+        bool result = hasMotion()
+            && devicesDescription.hasDualStreamingCapability == CombinedValue::All;
+
+        if (settingsOptimizationEnabled)
+            result &= !expert.dualStreamingDisabled();
+
         return result;
     }
 

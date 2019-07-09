@@ -177,6 +177,7 @@ protected:
     void atDownloadFinished(const QString& fileName);
     void atChunkDownloadFailed(const QString& fileName);
     void atDownloadFailed(const QString& fileName);
+    void atDownloadStallChanged(const QString& fileName, bool stalled);
     void atExtractFilesFinished(int code);
 
 private:

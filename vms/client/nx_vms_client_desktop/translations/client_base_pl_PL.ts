@@ -5863,8 +5863,8 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Użytkownicy</translation>
     </message>
     <message>
-      <source>Analytics</source>
-      <translation>Analityka</translation>
+      <source>Plugins</source>
+      <translation>Wtyczki</translation>
     </message>
   </context>
   <context>
@@ -7866,10 +7866,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Strona WWW</translation>
     </message>
     <message>
-      <source>Analytics</source>
-      <translation>Analityka</translation>
-    </message>
-    <message>
       <source>Expert</source>
       <translation>Ekspert</translation>
     </message>
@@ -7927,6 +7923,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>I/O Modules Settings</source>
       <translation>Ustawienia modułów I/O</translation>
+    </message>
+    <message>
+      <source>Plugins</source>
+      <translation>Wtyczki</translation>
     </message>
   </context>
   <context>
@@ -8965,15 +8965,23 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Failed to start update</source>
-      <translation type="unfinished">Failed to start update</translation>
+      <translation>Nie udało się rozpocząć aktualizacji</translation>
     </message>
     <message>
       <source>Starting update to ...</source>
-      <translation type="unfinished">Starting update to ...</translation>
+      <translation>Rozpoczynanie aktualizacji...</translation>
     </message>
     <message>
       <source>Some servers have no package available</source>
-      <translation type="unfinished">Some servers have no package available</translation>
+      <translation>Niektóre serwery nie mają dostępnego pakietu</translation>
+    </message>
+    <message>
+      <source>Failed to cancel update</source>
+      <translation type="unfinished">Failed to cancel update</translation>
+    </message>
+    <message>
+      <source>Failed to start installation</source>
+      <translation type="unfinished">Failed to start installation</translation>
     </message>
   </context>
   <context>
@@ -9128,10 +9136,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Błąd wewnętrzny pobierania.</translation>
     </message>
     <message>
-      <source>Iternal server error.</source>
-      <translation>Wewnętrzny błąd serwera.</translation>
-    </message>
-    <message>
       <source>Internal client error.</source>
       <translation>Wewnętrzny błąd klienta.</translation>
     </message>
@@ -9150,6 +9154,14 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Update package is not found.</source>
       <translation>Nie znaleziono pakietu aktualizacji.</translation>
+    </message>
+    <message>
+      <source>There is not enough space to install update.</source>
+      <translation>Brak wystarczającej ilości przestrzeni do zainstalowania aktualizacji.</translation>
+    </message>
+    <message>
+      <source>Internal server error.</source>
+      <translation>Wewnętrzny błąd serwera.</translation>
     </message>
   </context>
   <context>
@@ -9324,51 +9336,51 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>no error</source>
-      <translation type="unfinished">no error</translation>
+      <translation>brak błędu</translation>
     </message>
     <message>
       <source>library file cannot be loaded</source>
-      <translation type="unfinished">library file cannot be loaded</translation>
+      <translation>nie można załadować pliku biblioteki</translation>
     </message>
     <message>
       <source>invalid or incompatible plugin library</source>
-      <translation type="unfinished">invalid or incompatible plugin library</translation>
+      <translation>nieprawidłowa lub niezgodna biblioteka wtyczki</translation>
     </message>
     <message>
       <source>plugin library failed to initialize</source>
-      <translation type="unfinished">plugin library failed to initialize</translation>
+      <translation>nie można zainicjować biblioteki wtyczki</translation>
     </message>
     <message>
       <source>plugin returned bad manifest</source>
-      <translation type="unfinished">plugin returned bad manifest</translation>
+      <translation>wtyczka zwróciła zły manifest</translation>
     </message>
     <message>
       <source>plugin API version is no longer supported</source>
-      <translation type="unfinished">plugin API version is no longer supported</translation>
+      <translation>wersja API wtyczki nie jest już obsługiwana</translation>
     </message>
     <message>
       <source>unknown error</source>
-      <translation type="unfinished">unknown error</translation>
+      <translation>nieznany błąd</translation>
     </message>
     <message>
       <source>Not loaded</source>
-      <translation type="unfinished">Not loaded</translation>
+      <translation>Nie załadowano</translation>
     </message>
     <message>
       <source>Loaded</source>
-      <translation type="unfinished">Loaded</translation>
+      <translation>Załadowano</translation>
     </message>
     <message>
       <source>plugin is in the black list</source>
-      <translation type="unfinished">plugin is in the black list</translation>
+      <translation>wtyczka znajduje się na czarnej liście</translation>
     </message>
     <message>
       <source>Status</source>
-      <translation type="unfinished">Status</translation>
+      <translation>Status</translation>
     </message>
     <message>
       <source>plugin is optional and is not in the white list</source>
-      <translation type="unfinished">plugin is optional and is not in the white list</translation>
+      <translation>wtyczka jest opcjonalna i nie znajduje się na białej liście</translation>
     </message>
   </context>
   <context>
@@ -9392,6 +9404,17 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Waiting for server to respond...</source>
       <translation>Oczekiwanie na odpowiedź serwera...</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ServerUpdateTool</name>
+    <message>
+      <source>No connection to the server.</source>
+      <translation type="unfinished">No connection to the server.</translation>
+    </message>
+    <message>
+      <source>Network error.</source>
+      <translation type="unfinished">Network error.</translation>
     </message>
   </context>
   <context>

@@ -168,58 +168,94 @@ nx::utils::SoftwareVersion PeerStateTracker::lowestInstalledVersion()
 void PeerStateTracker::setUpdateTarget(const nx::utils::SoftwareVersion& version)
 {
     NX_VERBOSE(this, "setUpdateTarget(%1)", version);
-    m_targetVersion = version;
-
-    // VMS-13789: Should set client version to target version, if client has installed it.
-    if (m_clientItem && m_clientItem->state == StatusCode::latestUpdateInstalled)
+    QList<UpdateItemPtr> itemsChanged;
     {
-        m_clientItem->version = version;
-    }
+        QnMutexLocker locker(&m_dataLock);
+        m_targetVersion = version;
 
-    for (auto& item: m_items)
-    {
-        if (version != item->version)
+        // VMS-13789: Should set client version to target version, if client has installed it.
+        if (m_clientItem && m_clientItem->state == StatusCode::latestUpdateInstalled)
         {
-            bool installed = (item->version == m_targetVersion)
-                || item->state == StatusCode::latestUpdateInstalled;
+            m_clientItem->version = version;
+        }
 
-            if (installed != item->installed)
+        for (auto& item: m_items)
+        {
+            if (version != item->version)
             {
-                item->installed = installed;
-                NX_INFO(this, "setUpdateTarget() - peer %1 changed installed=%2", item->id, item->installed);
+                bool installed = (item->version == m_targetVersion)
+                    || item->state == StatusCode::latestUpdateInstalled;
+
+                if (installed != item->installed)
+                {
+                    item->installed = installed;
+                    NX_INFO(this, "setUpdateTarget() - peer %1 changed installed=%2", item->id, item->installed);
+                }
+                itemsChanged << item;
             }
-            emit itemChanged(item);
         }
     }
+
+    for (auto item: itemsChanged)
+        emit itemChanged(item);
 }
 
 void PeerStateTracker::setVerificationError(const QSet<QnUuid>& targets, const QString& message)
 {
-    for (auto& item: m_items)
+    QList<UpdateItemPtr> itemsChanged;
     {
-        if (!targets.contains(item->id))
-            continue;
-        item->verificationMessage = message;
+        QnMutexLocker locker(&m_dataLock);
+        for (auto& item: m_items)
+        {
+            if (!targets.contains(item->id))
+                continue;
+            item->verificationMessage = message;
+            itemsChanged << item;
+        }
     }
+
+    for (auto item: itemsChanged)
+        emit itemChanged(item);
 }
 
 void PeerStateTracker::setVerificationError(const QMap<QnUuid, QString>& errors)
 {
-    for (auto& item: m_items)
+    QList<UpdateItemPtr> itemsChanged;
     {
-        if (auto it = errors.find(item->id); it != errors.end())
-            item->verificationMessage = it.value();
+        QnMutexLocker locker(&m_dataLock);
+        for (auto& item: m_items)
+        {
+            if (auto it = errors.find(item->id); it != errors.end())
+            {
+                item->verificationMessage = it.value();
+                itemsChanged << item;
+            }
+        }
     }
+
+    for (auto item: itemsChanged)
+        emit itemChanged(item);
 }
 
 void PeerStateTracker::clearVerificationErrors()
 {
-    for (auto& item: m_items)
-        item->verificationMessage = QString();
+    QList<UpdateItemPtr> itemsChanged;
+    {
+        QnMutexLocker locker(&m_dataLock);
+        for (auto& item: m_items)
+        {
+            item->verificationMessage = QString();
+            itemsChanged << item;
+        }
+    }
+
+    for (auto item: itemsChanged)
+        emit itemChanged(item);
 }
 
 bool PeerStateTracker::hasVerificationErrors() const
 {
+    QnMutexLocker locker(&m_dataLock);
     for (auto& item: m_items)
     {
         if (!item->verificationMessage.isEmpty())
@@ -230,6 +266,7 @@ bool PeerStateTracker::hasVerificationErrors() const
 
 bool PeerStateTracker::hasStatusErrors() const
 {
+    QnMutexLocker locker(&m_dataLock);
     for (auto& item: m_items)
     {
         if (item->state == StatusCode::error && !item->statusMessage.isEmpty())
@@ -288,8 +325,17 @@ int PeerStateTracker::setUpdateStatus(const std::map<QnUuid, nx::update::Status>
 
                 if (item->state != status.second.code)
                 {
-                    NX_INFO(this, "setUpdateStatus() - changing status %1->%2 for peer %3: %4",
-                        toString(item->state), toString(status.second.code), name, item->id);
+                    if (status.second.code == nx::update::Status::Code::error)
+                    {
+                        QString error = errorString(status.second.errorCode);
+                        NX_INFO(this, "setUpdateStatus() - changing status %1->error:\"%2\" for peer %3: %4",
+                            toString(item->state), error, name, item->id);
+                    }
+                    else
+                    {
+                        NX_INFO(this, "setUpdateStatus() - changing status %1->%2 for peer %3: %4",
+                            toString(item->state), toString(status.second.code), name, item->id);
+                    }
                     item->state = status.second.code;
                     changed = true;
                 }
@@ -598,6 +644,7 @@ QSet<QnUuid> PeerStateTracker::peersWithDownloaderError() const
         UpdateItem::ErrorCode::internalDownloaderError,
         UpdateItem::ErrorCode::noFreeSpaceToDownload,
         UpdateItem::ErrorCode::noFreeSpaceToExtract,
+        UpdateItem::ErrorCode::noFreeSpaceToInstall,
     };
     QSet<QnUuid> result;
     QnMutexLocker locker(&m_dataLock);
@@ -881,6 +928,8 @@ QString PeerStateTracker::errorString(nx::update::Status::ErrorCode code)
             return tr("There is not enough space to download update files.");
         case Code::noFreeSpaceToExtract:
             return tr("There is not enough space to extract update files.");
+        case Code::noFreeSpaceToInstall:
+            return tr("There is not enough space to install update.");
         case Code::downloadFailed:
             return tr("Failed to download update packages.");
         case Code::invalidUpdateContents:
@@ -892,7 +941,7 @@ QString PeerStateTracker::errorString(nx::update::Status::ErrorCode code)
         case Code::internalDownloaderError:
             return tr("Internal downloader error.");
         case Code::internalError:
-            return tr("Iternal server error.");
+            return tr("Internal server error.");
         case Code::applauncherError:
             return tr("Internal client error.");
         case Code::unknownError:

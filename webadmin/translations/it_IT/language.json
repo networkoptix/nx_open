@@ -192,18 +192,18 @@
     },
     "common": {
         "voiceCommands": {
-            "search": "find + [text for searchbar]",
+            "search": "trova + [testo per la barra di ricerca]",
             "pause": "pausa",
-            "help": "help | show commands",
+            "help": "aiuto | mostra comandi",
             "collapse all servers": "comprimi tutti i server",
-            "collapse server": "collapse server + [server name]",
+            "collapse server": "comprimi server + [nome server]",
             "play": "riproduci",
             "clear search": "cancella ricerca",
-            "live": "go to live | show me live",
+            "live": "vai in live | mostra live",
             "expand all servers": "espandere tutti i server",
             "stop listening": "interrompere l'ascolto",
-            "expand server": "expand server + [server name]",
-            "view": "view + [camera name]"
+            "expand server": "espandi server + [nome server]",
+            "view": "visualizza + [nome telecamera]"
         },
         "systemOffline": "Il sistema è offline",
         "cameraLinks": {

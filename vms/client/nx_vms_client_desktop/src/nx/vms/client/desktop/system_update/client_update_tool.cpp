@@ -66,6 +66,9 @@ ClientUpdateTool::ClientUpdateTool(QObject *parent):
     connect(m_downloader.get(), &Downloader::downloadFailed,
         this, &ClientUpdateTool::atDownloadFailed);
 
+    connect(m_downloader.get(), &Downloader::downloadStalledChanged,
+        this, &ClientUpdateTool::atDownloadStallChanged);
+
     m_downloader->startDownloads();
 
     m_installedVersionsFuture = std::async(std::launch::async,
@@ -182,7 +185,7 @@ void ClientUpdateTool::atRemoteUpdateInformation(
 {
     auto systemInfo = QnAppInfo::currentSystemInformation();
     QString errorMessage;
-    // Update is allowed if either target version has the sam_installedVersionsFutureme cloud host or
+    // Update is allowed if either target version has the same cloud host or
     // there are no servers linked to the cloud in the system.
     QString cloudUrl = nx::network::SocketGlobals::cloud().cloudHost();
 
@@ -384,7 +387,16 @@ void ClientUpdateTool::atDownloadFailed(const QString& fileName)
 {
     if (m_state == State::downloading)
     {
-        NX_VERBOSE(this) << "atDownloadFailed() failed to download file" << fileName;
+        NX_ERROR(this, "atDownloadFailed() failed to download file %1", fileName);
+        setError(tr("Failed to download update package: %1").arg(fileName));
+    }
+}
+
+void ClientUpdateTool::atDownloadStallChanged(const QString& fileName, bool stalled)
+{
+    if (m_state == State::downloading && stalled)
+    {
+        NX_ERROR(this, "atDownloadFailed() download of %1 has stalled", fileName);
         setError(tr("Failed to download update package: %1").arg(fileName));
     }
 }
@@ -394,11 +406,12 @@ void ClientUpdateTool::atExtractFilesFinished(int code)
     if (code != QnZipExtractor::Ok)
     {
         QString error = QnZipExtractor::errorToString((QnZipExtractor::Error)code);
-        NX_VERBOSE(this) << "atExtractFilesFinished() err=" << error;
+        NX_ERROR(this, "atExtractFilesFinished() err=%1",  error);
         setError(tr("Update package is corrupted: %1").arg(error));
         return;
     }
-    NX_VERBOSE(this) << "at_extractFilesFinished() done unpacking file" << error;
+
+    NX_VERBOSE(this, "at_extractFilesFinished() done unpacking file");
     setState(State::readyInstall);
 }
 
@@ -612,6 +625,9 @@ bool ClientUpdateTool::restartClient(QString authString)
         if (applauncher::api::restartClient(m_updateVersion, authString) == ResultType::ok)
             return true;
     }
+
+    NX_ERROR(this, "restartClient() - failed to restart client to desired version %1",
+        m_updateVersion);
     return false;
 }
 

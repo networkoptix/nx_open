@@ -5740,8 +5740,8 @@ Als u analysegegevens naar een andere opslaglocatie wilt verplaatsen, neemt u co
       <translation>Gebruikers</translation>
     </message>
     <message>
-      <source>Analytics</source>
-      <translation>Analyse</translation>
+      <source>Plugins</source>
+      <translation>Plugins</translation>
     </message>
   </context>
   <context>
@@ -7659,10 +7659,6 @@ Als u analysegegevens naar een andere opslaglocatie wilt verplaatsen, neemt u co
       <translation>Webpagina</translation>
     </message>
     <message>
-      <source>Analytics</source>
-      <translation>Analyse</translation>
-    </message>
-    <message>
       <source>Expert</source>
       <translation>Expert</translation>
     </message>
@@ -7714,6 +7710,10 @@ Als u analysegegevens naar een andere opslaglocatie wilt verplaatsen, neemt u co
     <message>
       <source>I/O Modules Settings</source>
       <translation>I/O module instellingen</translation>
+    </message>
+    <message>
+      <source>Plugins</source>
+      <translation>Plugins</translation>
     </message>
   </context>
   <context>
@@ -8724,23 +8724,31 @@ Als u analysegegevens naar een andere opslaglocatie wilt verplaatsen, neemt u co
     </message>
     <message>
       <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
-      <translation type="unfinished">OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</translation>
+      <translation>OS-versies van sommige componenten worden niet langer ondersteund. Verwijder ze uit het systeem of werk hun besturingssysteem bij naar een ondersteunde versie.</translation>
     </message>
     <message>
       <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
-      <translation type="unfinished">OS version of the client is no longer supported. Please update its OS to a supported version.</translation>
+      <translation>OS-versie van de client wordt niet langer ondersteund. Werk zijn besturingssysteem bij tot een ondersteunde versie.</translation>
     </message>
     <message>
       <source>Failed to start update</source>
-      <translation type="unfinished">Failed to start update</translation>
+      <translation>Kan update niet starten</translation>
     </message>
     <message>
       <source>Starting update to ...</source>
-      <translation type="unfinished">Starting update to ...</translation>
+      <translation>Update starten naar ...</translation>
     </message>
     <message>
       <source>Some servers have no package available</source>
-      <translation type="unfinished">Some servers have no package available</translation>
+      <translation>Sommige servers hebben geen pakket beschikbaar</translation>
+    </message>
+    <message>
+      <source>Failed to cancel update</source>
+      <translation type="unfinished">Failed to cancel update</translation>
+    </message>
+    <message>
+      <source>Failed to start installation</source>
+      <translation type="unfinished">Failed to start installation</translation>
     </message>
   </context>
   <context>
@@ -8893,10 +8901,6 @@ Als u analysegegevens naar een andere opslaglocatie wilt verplaatsen, neemt u co
       <translation>Interne downloader fout.</translation>
     </message>
     <message>
-      <source>Iternal server error.</source>
-      <translation>Interne serverfout.</translation>
-    </message>
-    <message>
       <source>Internal client error.</source>
       <translation>Interne client fout.</translation>
     </message>
@@ -8914,7 +8918,15 @@ Als u analysegegevens naar een andere opslaglocatie wilt verplaatsen, neemt u co
     </message>
     <message>
       <source>Update package is not found.</source>
-      <translation type="unfinished">Update package is not found.</translation>
+      <translation>Update bestand kan niet gevonden worden.</translation>
+    </message>
+    <message>
+      <source>There is not enough space to install update.</source>
+      <translation>Er is niet voldoende ruimte om de update te installeren.</translation>
+    </message>
+    <message>
+      <source>Internal server error.</source>
+      <translation>Interne Server Fout.</translation>
     </message>
   </context>
   <context>
@@ -9087,51 +9099,51 @@ Als u analysegegevens naar een andere opslaglocatie wilt verplaatsen, neemt u co
     </message>
     <message>
       <source>no error</source>
-      <translation type="unfinished">no error</translation>
+      <translation>geen fout</translation>
     </message>
     <message>
       <source>library file cannot be loaded</source>
-      <translation type="unfinished">library file cannot be loaded</translation>
+      <translation>bibliotheekbestand kan niet worden geladen</translation>
     </message>
     <message>
       <source>invalid or incompatible plugin library</source>
-      <translation type="unfinished">invalid or incompatible plugin library</translation>
+      <translation>ongeldige of incompatibele plug-inbibliotheek</translation>
     </message>
     <message>
       <source>plugin library failed to initialize</source>
-      <translation type="unfinished">plugin library failed to initialize</translation>
+      <translation>plugin bibliotheek initialiseren mislukt</translation>
     </message>
     <message>
       <source>plugin returned bad manifest</source>
-      <translation type="unfinished">plugin returned bad manifest</translation>
+      <translation>plugin gaf slecht manifest terug</translation>
     </message>
     <message>
       <source>plugin API version is no longer supported</source>
-      <translation type="unfinished">plugin API version is no longer supported</translation>
+      <translation>plug-in API-versie wordt niet langer ondersteund</translation>
     </message>
     <message>
       <source>unknown error</source>
-      <translation type="unfinished">unknown error</translation>
+      <translation>onbekende fout</translation>
     </message>
     <message>
       <source>Not loaded</source>
-      <translation type="unfinished">Not loaded</translation>
+      <translation>Niet geladen</translation>
     </message>
     <message>
       <source>Loaded</source>
-      <translation type="unfinished">Loaded</translation>
+      <translation>Geladen</translation>
     </message>
     <message>
       <source>plugin is in the black list</source>
-      <translation type="unfinished">plugin is in the black list</translation>
+      <translation>plugin staat in de zwarte lijst</translation>
     </message>
     <message>
       <source>Status</source>
-      <translation type="unfinished">Status</translation>
+      <translation>Status</translation>
     </message>
     <message>
       <source>plugin is optional and is not in the white list</source>
-      <translation type="unfinished">plugin is optional and is not in the white list</translation>
+      <translation>plugin is optioneel en staat niet in de witte lijst</translation>
     </message>
   </context>
   <context>
@@ -9155,6 +9167,17 @@ Als u analysegegevens naar een andere opslaglocatie wilt verplaatsen, neemt u co
     <message>
       <source>Waiting for server to respond...</source>
       <translation>Wacht tot de server reageert...</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ServerUpdateTool</name>
+    <message>
+      <source>No connection to the server.</source>
+      <translation type="unfinished">No connection to the server.</translation>
+    </message>
+    <message>
+      <source>Network error.</source>
+      <translation type="unfinished">Network error.</translation>
     </message>
   </context>
   <context>

@@ -81,13 +81,19 @@ void ColorTheme::Private::loadColorsFromFile(const QString& filename)
 
         const auto& colorName = it.key();
         const auto& color = QColor(it.value().toString());
-        if (color.isValid())
-            colors[colorName] = color;
+        if (!color.isValid())
+            continue;
+
+        const QColor oldColor = colors[colorName].value<QColor>();
+        colors[colorName] = color;
 
         if (groupRegExp.exactMatch(colorName))
         {
-            const auto& group = groupRegExp.cap(1);
-            groups[group].append(color);
+            const QString& groupName = groupRegExp.cap(1);
+            QList<QColor>& group = groups[groupName];
+            if (oldColor.isValid())
+                group.removeOne(oldColor);
+            groups[groupName].append(color);
         }
     }
 
