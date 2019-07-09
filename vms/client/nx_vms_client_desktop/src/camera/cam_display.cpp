@@ -443,8 +443,11 @@ qint64 QnCamDisplay::doSmartSleep(const qint64 needToSleep, float speed)
 
 bool QnCamDisplay::isDataQueueFull() const
 {
-    return std::chrono::microseconds(m_lastQueuedVideoTime - m_lastVideoPacketTime)
-        >= m_forcedVideoBufferLength;
+    const auto diff = std::chrono::microseconds(m_lastQueuedVideoTime - m_lastVideoPacketTime);
+    if (diff < std::chrono::seconds::zero())
+        return true;
+
+    return diff >= m_forcedVideoBufferLength;
 }
 
 int QnCamDisplay::maxDataQueueSize(QueueSizeType type) const
