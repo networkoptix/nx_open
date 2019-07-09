@@ -39,9 +39,9 @@ nx::sql::DBResult filterDbResult(
 }
 
 template<typename OptionalType>
-OptionalType getValue(const std::optional<OptionalType>& optional)
+OptionalType getValue(std::optional<OptionalType>&& optional)
 {
-    return optional.has_value() ? *optional : OptionalType();
+    return optional.has_value() ? std::move(*optional) : OptionalType();
 }
 
 } // namespace
@@ -179,7 +179,7 @@ void DataManager::get(
         {
             completionHandler(
                 toResultCode(filterDbResult(*sharedValue, dbResult)),
-                getValue(*sharedValue));
+                getValue(std::move(*sharedValue)));
         }
     );
 }
@@ -202,7 +202,7 @@ void DataManager::lowerBound(const std::string& key, LookupCompletionHandler com
         {
             completionHandler(
                 toResultCode(filterDbResult(*sharedKey, dbResult)),
-                getValue(*sharedKey));
+                getValue(std::move(*sharedKey)));
         });
 }
 
@@ -224,7 +224,7 @@ void DataManager::upperBound(const std::string& key, LookupCompletionHandler com
         {
             completionHandler(
                 toResultCode(filterDbResult(*sharedKey, dbResult)),
-                getValue(*sharedKey));
+                getValue(std::move(*sharedKey)));
         });
 }
 
@@ -250,7 +250,7 @@ void DataManager::getRange(
         {
             completionHandler(
                 toResultCode(filterDbResult(*sharedPairs, dbResult)),
-                getValue(*sharedPairs));
+                getValue(std::move(*sharedPairs)));
         });
 }
 
@@ -275,7 +275,7 @@ void DataManager::getRange(
         {
             completionHandler(
                 toResultCode(filterDbResult(*sharedPairs, dbResult)),
-                getValue(*sharedPairs));
+                getValue(std::move(*sharedPairs)));
         });
 }
 
@@ -310,7 +310,7 @@ void DataManager::getAll(GetRangeCompletionHandler completionHandler)
         {
             completionHandler(
                 toResultCode(filterDbResult(*sharedPairs, dbResult)),
-                getValue(*sharedPairs));
+                getValue(std::move(*sharedPairs)));
         });
 }
 

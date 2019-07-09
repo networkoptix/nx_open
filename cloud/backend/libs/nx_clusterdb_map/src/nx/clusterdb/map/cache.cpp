@@ -52,18 +52,28 @@ std::map<std::string, std::string> Cache::getRangeWithPrefix(const std::string& 
 
 void Cache::initialize()
 {
+    std::promise<void> done;
     m_db->dataManager().getAll(
-        [this](ResultCode resultCode, std::map<std::string/*key*/, std::string /*value*/> map)
+        [this, &done](
+            ResultCode resultCode,
+            std::map<std::string/*key*/, std::string /*value*/> map)
         {
             if (resultCode != ResultCode::ok)
             {
                 NX_WARNING(this, "Failed to initialize cache: %1", toString(resultCode));
+                done.set_value();
                 return;
             }
 
-            QnMutexLocker lock(&m_mutex);
-            m_stringCache = std::move(map);
+            {
+                QnMutexLocker lock(&m_mutex);
+                m_stringCache = std::move(map);
+            }
+
+            done.set_value();
         });
+
+    done.get_future().get();
 }
 
 void Cache::subscribeToEvents()
@@ -71,18 +81,18 @@ void Cache::subscribeToEvents()
     m_db->eventProvider().subscribeToRecordInserted(
         [this](
             nx::sql::QueryContext* /*queryContext*/,
-            std::string key,
+            const std::string& key,
             std::string value)
         {
             QnMutexLocker lock(&m_mutex);
-            m_stringCache[key] = value;
+            m_stringCache[key] = std::move(value);
         },
         &m_recordInsertedId);
 
     m_db->eventProvider().subscribeToRecordRemoved(
         [this](
             nx::sql::QueryContext* /*queryContext*/,
-            std::string key)
+            const std::string& key)
         {
             QnMutexLocker lock(&m_mutex);
             m_stringCache.erase(key);
