@@ -91,6 +91,7 @@
 #include "resource_status_watcher.h"
 #include <core/resource/media_server_resource.h>
 #include <nx/network/url/url_builder.h>
+#include <plugins/storage/dts/vmax480/vmax480_resource.h>
 
 using namespace nx;
 using namespace nx::vms::server;
@@ -371,6 +372,10 @@ void QnMediaServerModule::stop()
 
     m_licenseWatcher->stop();
     m_resourceSearchers->clear();
+
+    #ifdef ENABLE_VMAX
+        QnPlVmax480Resource::stopChunkReaders();
+    #endif
 }
 
 void QnMediaServerModule::stopLongRunnables()
