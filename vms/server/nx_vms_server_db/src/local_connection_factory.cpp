@@ -1384,7 +1384,6 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      */
     regUpdate<WebPageData>(p, ApiCommand::saveWebPage);
 
-
     /**%apidoc POST /ec2/removeWebPage
      * Delete the specified web page.
      * <p>

@@ -9,8 +9,12 @@ class AnalyticsEngineSettingsHandler: public QnJsonRestHandler, public ServerMod
 {
 public:
     AnalyticsEngineSettingsHandler(QnMediaServerModule* serverModule);
-    virtual JsonRestResponse executeGet(const JsonRestRequest& request);
-    virtual JsonRestResponse executePost(const JsonRestRequest& request, const QByteArray& body);
+
+    virtual JsonRestResponse executeGet(
+        const JsonRestRequest& request) override;
+
+    virtual JsonRestResponse executePost(
+        const JsonRestRequest& request, const QByteArray& body) override;
 };
 
 } // namespace nx::vms::server::rest
