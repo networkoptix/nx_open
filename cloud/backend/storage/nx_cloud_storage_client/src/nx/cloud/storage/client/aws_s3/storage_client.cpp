@@ -17,7 +17,7 @@ void StorageClient::open(
     m_contentClient = std::make_unique<ContentClient>(storageClientId, url, credentials);
 
     // TODO: #ak Verify url and credentials.
-    post([this, handler = std::move(handler)]() { handler(ResultCode::ok); });
+    post([handler = std::move(handler)]() { handler(ResultCode::ok); });
 }
 
 AbstractContentClient* StorageClient::getContentClient()
