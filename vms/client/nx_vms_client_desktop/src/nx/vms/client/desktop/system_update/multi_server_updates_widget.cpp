@@ -1672,6 +1672,7 @@ void MultiServerUpdatesWidget::processDownloadingState()
             m_serverUpdateTool->requestRetryAction();
             m_clientUpdateTool->setUpdateTarget(m_updateInfo);
             setTargetState(WidgetUpdateState::downloading, serversToRetry);
+            m_stateTracker->markStatusUnknown(serversToRetry);
         }
         else if (clicked == cancelUpdate)
         {
