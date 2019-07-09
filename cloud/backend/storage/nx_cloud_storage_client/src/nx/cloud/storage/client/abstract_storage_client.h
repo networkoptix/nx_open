@@ -1,6 +1,7 @@
 #pragma once
 
 #include <nx/network/http/auth_tools.h>
+#include <nx/utils/move_only_func.h>
 #include <nx/utils/url.h>
 
 #include "abstract_content_client.h"
@@ -21,9 +22,17 @@ public:
     virtual void open(
         const std::string& storageClientId,
         const nx::utils::Url& url,
-        const nx::network::http::Credentials& credentials) = 0;
+        const nx::network::http::Credentials& credentials,
+        nx::utils::MoveOnlyFunc<void(ResultCode)> handler) = 0;
 
+    /**
+     * NOTE: AbstractContentClient object is owned by AbstractStorageClient instance.
+     */
     virtual AbstractContentClient* getContentClient() = 0;
+
+    /**
+     * NOTE: AbstractMetadataClient object is owned by AbstractStorageClient instance.
+     */
     virtual AbstractMetadataClient* getMetadataClient() = 0;
 };
 

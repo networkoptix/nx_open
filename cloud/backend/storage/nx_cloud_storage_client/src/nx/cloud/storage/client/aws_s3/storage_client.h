@@ -21,7 +21,8 @@ public:
     virtual void open(
         const std::string& storageClientId,
         const nx::utils::Url& url,
-        const nx::network::http::Credentials& credentials) override;
+        const nx::network::http::Credentials& credential,
+        nx::utils::MoveOnlyFunc<void(ResultCode)> handler) override;
 
     virtual AbstractContentClient* getContentClient() override;
     virtual AbstractMetadataClient* getMetadataClient() override;
