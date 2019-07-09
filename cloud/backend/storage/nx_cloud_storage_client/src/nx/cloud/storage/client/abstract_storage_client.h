@@ -1,5 +1,6 @@
 #pragma once
 
+#include <nx/network/aio/basic_pollable.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/url.h>
@@ -9,7 +10,8 @@
 
 namespace nx::cloud::storage::client {
 
-class NX_CLOUD_STORAGE_CLIENT_API AbstractStorageClient
+class NX_CLOUD_STORAGE_CLIENT_API AbstractStorageClient:
+    public nx::network::aio::BasicPollable
 {
 public:
     virtual ~AbstractStorageClient() = default;

@@ -12,10 +12,12 @@ void StorageClient::open(
     const std::string& storageClientId,
     const nx::utils::Url& url,
     const nx::network::http::Credentials& credentials,
-    nx::utils::MoveOnlyFunc<void(ResultCode)> /*handler*/)
+    nx::utils::MoveOnlyFunc<void(ResultCode)> handler)
 {
     m_contentClient = std::make_unique<ContentClient>(storageClientId, url, credentials);
-    // TODO
+
+    // TODO: #ak Verify url and credentials.
+    post([this, handler = std::move(handler)]() { handler(ResultCode::ok); });
 }
 
 AbstractContentClient* StorageClient::getContentClient()
