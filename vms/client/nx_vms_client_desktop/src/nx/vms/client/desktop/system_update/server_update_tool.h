@@ -195,6 +195,7 @@ public:
         noError,
         noConnection,
         networkError,
+        serverError,
     };
 
     void calculateManualDownloadProgress(ProgressInfo& progress);
