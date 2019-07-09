@@ -2813,34 +2813,64 @@ void MediaServerProcess::registerRestHandlers(
      * %return:array List of setting descriptions.
      *     %param:string name Setting name.
      *     %param:string defaultValue Setting default value.
-     *     %param:string description Setiing description.
+     *     %param:string description Setting description.
      */
     reg("api/settingsDocumentation", new QnSettingsDocumentationHandler(&serverModule()->settings()));
 
     /**%apidoc GET /ec2/analyticsEngineSettings
+     * Return values of settings of the specified Engine.
      * %param:string analyticsEngineId Id of analytics engine.
-     * Return settings values of the specified Engine.
-     * %return:object TODO:CHECK JSON object consisting of name-value settings pairs.
+     * %return:object JSON object with an error code, error string, and the reply on success.
+     *     %param:string error Error code, "0" means no error.
+     *     %param:string errorString Error message in English, or an empty string.
+     *     %param:object reply Object with Engine settings model and values.
+     *         %param:object reply.model Settings model, as in Engine manifest.
+     *         %param:object reply.values Name-value map with setting values, using JSON types
+     *             according to each setting type.
      *
      * %apidoc POST /ec2/analyticsEngineSettings
      * Applies passed settings values to correspondent Analytics Engine.
      * %param:string engineId Unique id of Analytics Engine.
-     * %param settings JSON object consisting of name-value settings pairs.
+     * %param:object settings Name-value map with setting values, using JSON types according to
+     *     each setting type.
+     * %return:object JSON object with an error code, error string, and the reply on success.
+     *     %param:string error Error code, "0" means no error.
+     *     %param:string errorString Error message in English, or an empty string.
+     *     %param:object reply Object with Engine settings model and values that the Engine returns
+     *         after the values have been supplied.
+     *         %param:object reply.model Settings model, as in Engine manifest.
+     *         %param:object reply.values Name-value map with setting values, using JSON types
+     *             according to each setting type.
      */
     reg("ec2/analyticsEngineSettings",
         new nx::vms::server::rest::AnalyticsEngineSettingsHandler(serverModule()));
 
     /**%apidoc GET /ec2/deviceAnalyticsSettings
+     * Return settings values of the specified device-engine pair.
      * %param:string analyticsEngineId Unique id of an Analytics Engine.
      * %param:string deviceId Id of a device.
-     * Return settings values of the specified device-engine pair.
-     * %return:object TODO:CHECK JSON object consisting of name-value settings pairs.
+     * %return:object JSON object with an error code, error string, and the reply on success.
+     *     %param:string error Error code, "0" means no error.
+     *     %param:string errorString Error message in English, or an empty string.
+     *     %param:object reply Object with DeviceAgent settings model and values.
+     *         %param:object reply.model Settings model, as in DeviceAgent manifest.
+     *         %param:object reply.values Name-value map with setting values, using JSON types
+     *             according to each setting type.
      *
      * %apidoc POST /ec2/deviceAnalyticsSettings
      * Applies passed settings values to the correspondent device-engine pair.
      * %param:string engineId Unique id of an Analytics Engine.
      * %param:string deviceId Id of a device.
-     * %param settings JSON object consisting of name-value settings pairs.
+     * %param:object settings Name-value map with setting values, using JSON types according to
+     *     each setting type.
+     * %return:object JSON object with an error code, error string, and the reply on success.
+     *     %param:string error Error code, "0" means no error.
+     *     %param:string errorString Error message in English, or an empty string.
+     *     %param:object reply Object with DeviceAgent settings model and values that the
+     *         DeviceAgent returns after the values have been supplied.
+     *         %param:object reply.model Settings model, as in DeviceAgent manifest.
+     *         %param:object reply.values Name-value map with setting values, using JSON types
+     *             according to each setting type.
      */
     reg("ec2/deviceAnalyticsSettings",
         new nx::vms::server::rest::DeviceAnalyticsSettingsHandler(serverModule()));
