@@ -334,7 +334,7 @@ void DeviceAgent::processPluginDiagnosticEvents()
 Result<const ISettingsResponse*> DeviceAgent::pluginSideSettings() const
 {
     auto response = new SettingsResponse();
-    response->setValue("plugin_side_number", "100");
+    response->setValue("pluginSideTestSpinBox", "100");
 
     return response;
 }

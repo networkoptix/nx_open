@@ -331,8 +331,8 @@ std::string Engine::manifestInternal() const
                     },
                     {
                         "type": "SpinBox",
-                        "caption": "Device Agent SpinBox",
-                        "name": "testSpinBox",
+                        "caption": "Device Agent SpinBox (plugin side)",
+                        "name": "pluginSideTestSpinBox",
                         "defaultValue": 42,
                         "minValue": 0,
                         "maxValue": 100
