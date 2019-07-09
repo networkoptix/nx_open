@@ -52,15 +52,6 @@ void ApiClient::uploadFile(
         });
 }
 
-void ApiClient::uploadFile(
-    const std::string& /*destinationPath*/,
-    const std::filesystem::path& /*data*/,
-    CommonHandler handler)
-{
-    handler(Result(ResultCode::notImplemented));
-    // TODO
-}
-
 void ApiClient::downloadFile(
     const std::string& path,
     DownloadHandler handler)
@@ -82,15 +73,6 @@ void ApiClient::downloadFile(
                 url,
                 [this, &context]() { m_requestPool.completeRequest(&context); });
         });
-}
-
-void ApiClient::downloadFile(
-    const std::string& /*path*/,
-    const std::filesystem::path& /*destinationPath*/,
-    CommonHandler handler)
-{
-    handler(Result(ResultCode::notImplemented));
-    // TODO
 }
 
 void ApiClient::stopWhileInAioThread()

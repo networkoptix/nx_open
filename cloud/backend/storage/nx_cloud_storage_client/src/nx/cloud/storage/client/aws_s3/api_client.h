@@ -8,7 +8,6 @@
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/http/http_async_client.h>
 #include <nx/utils/move_only_func.h>
-#include <nx/utils/std/filesystem.h>
 #include <nx/utils/url.h>
 
 namespace nx::cloud::storage::client::aws_s3 {
@@ -83,25 +82,9 @@ public:
         nx::Buffer data,
         CommonHandler handler);
 
-    /**
-     * Uploads file specified by path into destinationPath in S3.
-     */
-    void uploadFile(
-        const std::string& destinationPath,
-        const std::filesystem::path& path,
-        CommonHandler handler);
-
     void downloadFile(
         const std::string& path,
         DownloadHandler handler);
-
-    /**
-     * Downloads file from path and saves to local filesystem under the destinationPath.
-     */
-    void downloadFile(
-        const std::string& path,
-        const std::filesystem::path& destinationPath,
-        CommonHandler handler);
 
 protected:
     virtual void stopWhileInAioThread() override;

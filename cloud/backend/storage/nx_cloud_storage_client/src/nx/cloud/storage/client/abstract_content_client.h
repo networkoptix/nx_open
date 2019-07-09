@@ -6,7 +6,6 @@
 
 #include <nx/network/aio/basic_pollable.h>
 #include <nx/utils/move_only_func.h>
-#include <nx/utils/std/filesystem.h>
 
 #include "result_code.h"
 
@@ -43,12 +42,6 @@ public:
 
     //---------------------------------------------------------------------------------------------
     // Uploading chunks.
-
-    virtual void uploadMediaChunk(
-        const std::string& deviceId,
-        std::chrono::system_clock::time_point timestamp,
-        const std::filesystem::path& sourcePath,
-        Handler handler) = 0;
 
     virtual void uploadMediaChunk(
         const std::string& deviceId,

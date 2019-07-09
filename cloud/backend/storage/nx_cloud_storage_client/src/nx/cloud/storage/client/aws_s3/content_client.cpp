@@ -13,16 +13,6 @@ ContentClient::ContentClient(
 void ContentClient::uploadMediaChunk(
     const std::string& /*deviceId*/,
     std::chrono::system_clock::time_point /*timestamp*/,
-    const std::filesystem::path& /*sourcePath*/,
-    Handler handler)
-{
-    handler(ResultCode::notImplemented);
-    // TODO
-}
-
-void ContentClient::uploadMediaChunk(
-    const std::string& /*deviceId*/,
-    std::chrono::system_clock::time_point /*timestamp*/,
     const nx::Buffer& /*data*/,
     Handler handler)
 {
