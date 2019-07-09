@@ -155,18 +155,15 @@ api::metrics::ResourceGroupValues ResourceProvider<ResourceType>::timeline(
 template<typename ResourceType>
 void ResourceProvider<ResourceType>::found(const Resource& resource)
 {
-    if constexpr (!std::is_same_v<std::decay_t<ResourceType>, std::nullptr_t>)
     {
-        {
-            NX_MUTEX_LOCKER lock(&m_mutex);
-            const auto [it, isInserted] =  m_resources.emplace(resource, ParameterMonitorPtr{});
-            if (!NX_ASSERT(isInserted, "Duplicate %1", resource))
-                return;
-        }
-
-        NX_VERBOSE(this, "Found %1", resource);
-        changed(resource);
+        NX_MUTEX_LOCKER lock(&m_mutex);
+        const auto [it, isInserted] =  m_resources.emplace(resource, ParameterMonitorPtr{});
+        if (!NX_ASSERT(isInserted, "Duplicate %1", resource))
+            return;
     }
+
+    NX_VERBOSE(this, "Found %1", resource);
+    changed(resource);
 }
 
 template<typename ResourceType>
