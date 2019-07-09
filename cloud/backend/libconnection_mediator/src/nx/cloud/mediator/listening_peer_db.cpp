@@ -1,5 +1,7 @@
 #include "listening_peer_db.h"
 
+#include <typeinfo>
+
 #include <nx/utils/std/algorithm.h>
 #include <nx/clusterdb/engine/http/http_paths.h>
 #include <nx/fusion/model_functions.h>
@@ -15,53 +17,56 @@ namespace nx::hpm {
 
 namespace {
 
+// The following constants are used as key type identifiers. one of them is suffixed to the end
+// of each key placed in the db so that the values can be deserialized to the right type.
+static constexpr char kUplinkSpeedId[] = "#uplinkSpeed";
+static constexpr char kMediatorEndpointId[] = "#mediatorEndpoint";
+
+static std::string parsePeerId(const std::string& key)
+{
+    // Key is expected to be of the form: <systemId>.<serverId>#<keyTypeId>
+    // The return value will have the form: <serverId>.<systemId>
+
+    std::vector<std::string> result;
+    boost::split(result, key, boost::is_any_of("."));
+    if ((int) result.size() < 2) // all keys should contain systemId.serverId, 2 entries
+    {
+        NX_WARNING(NX_SCOPE_TAG, "key: %1 is missing required delimitter: '.'", key);
+        return {};
+    }
+
+    auto head = std::move(result[0]); //< systemId
+    auto tail = result[1];
+
+    result.clear();
+    boost::split(result, tail, boost::is_any_of("#"));
+    if (result.empty())
+    {
+        NX_WARNING(NX_SCOPE_TAG, "key: %1 missing expected delimitter: '#'", key);
+        return {};
+    }
+
+    // reversing systemId.serverId to serverId.systemId.
+    return result[0] + "." + head;
+}
+
+template<typename Output>
+static std::optional<Output> deserialize(const std::string& string, const char* callingFunc)
+{
+    Output output;
+    if (!QJson::deserialize(QByteArray(string.c_str()), &output))
+    {
+        NX_WARNING(NX_SCOPE_TAG, "%1: failed to deserialize string: %2 to type: %3",
+            callingFunc, string, typeid(Output).name());
+        return std::nullopt;
+    }
+    return output;
+}
+
 static std::string toLowerReversed(std::string domainName)
 {
     nx::utils::to_lower(&domainName);
     return nx::utils::reverseWords(domainName, ".");
-}
-
-int toInt(const std::string& integer)
-{
-    try
-    {
-        return std::stoi(integer);
-    }
-    catch (const std::exception& /*e*/)
-    {
-        NX_WARNING(
-            typeid(ListeningPeerDb),
-            "error converting string to int: %1",
-            integer);
-        return MediatorEndpoint::kPortUnused;
-    }
-}
-
-std::string toString(const MediatorEndpoint& endpoint)
-{
-    std::string s = endpoint.domainName;
-    s += ";";
-    s += std::to_string(endpoint.httpPort);
-    s += ";";
-    s += std::to_string(endpoint.httpsPort);
-    s += ";";
-    s += std::to_string(endpoint.stunUdpPort);
-    return s;
-}
-
-std::optional<MediatorEndpoint> toMediatorEndpoint(const std::string& endpointStr)
-{
-    std::vector<std::string> values;
-    boost::split(values, endpointStr, boost::is_any_of(";"));
-    if (values.size() != 4)
-        return std::nullopt;
-
-    return MediatorEndpoint{
-        std::move(values[0]),
-        toInt(values[1]),
-        toInt(values[2]),
-        toInt(values[3])
-    };
 }
 
 struct Urls
@@ -83,7 +88,7 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (json),
     _Fields)
 
-} //namespace
+} // namespace
 
 //-------------------------------------------------------------------------------------------------
 // ListeningPeerDb
@@ -222,9 +227,10 @@ void ListeningPeerDb::findMediatorByPeerDomain(
             bool ok = true;
             std::vector<MediatorEndpoint> endpoints;
             std::transform(map.begin(), map.end(), std::back_inserter(endpoints),
-                [&ok](const auto& element)
+                [&ok, func = __func__](const auto& element)
                 {
-                    auto endpoint = toMediatorEndpoint(element.second);
+                    auto endpoint =
+                        deserialize<MediatorEndpoint>(element.second, func);
                     ok &= endpoint.has_value();
                     return endpoint ? *endpoint : MediatorEndpoint();
                 });
@@ -238,6 +244,30 @@ void ListeningPeerDb::findMediatorByPeerDomain(
             }
 
             return handler(m_mediatorSelector->select(endpoints));
+        });
+}
+
+void ListeningPeerDb::addUplinkSpeed(
+    const std::string& peerId,
+    const nx::hpm::api::ConnectionSpeed& connectionSpeed,
+    nx::utils::MoveOnlyFunc<void(bool)> handler)
+{
+    if (!m_map)
+        return handler(false);
+
+    auto key = toLowerReversed(peerId) + kUplinkSpeedId;
+
+    m_map->database().dataManager().insertOrUpdate(
+        key,
+        QJson::serialized(connectionSpeed).toStdString(),
+        [this, func = __func__, key, handler = std::move(handler)](clusterdb::map::ResultCode result)
+        {
+            if (result != clusterdb::map::ResultCode::ok)
+            {
+                NX_VERBOSE(this, "%1: insertOrUpdate failed for key: %2 with ResultCode: %3",
+                    func, key, clusterdb::map::toString(result));
+                return handler(false);
+            }
         });
 }
 
@@ -261,6 +291,62 @@ void ListeningPeerDb::startDiscovery(
         m_syncEngineUrl);
 }
 
+std::map<std::string, ListeningPeerStatus> ListeningPeerDb::getListeningPeerStatus(
+    const std::string& peerId) const
+{
+    if (!m_map)
+        return {};
+
+    auto range = m_map->cache()->getRangeWithPrefix(toLowerReversed(peerId));
+    if (range.empty())
+    {
+        NX_VERBOSE(this, "No values found in cache for peerId: %1", peerId);
+        return {};
+    }
+
+    std::map<std::string, ListeningPeerStatus> result;
+
+    for (auto element : range)
+    {
+        auto peerIdParsed = parsePeerId(element.first);
+        if (peerIdParsed.empty())
+            continue;
+
+        if (element.first.find(kMediatorEndpointId) != std::string::npos)
+        {
+            auto endpoint = deserialize<MediatorEndpoint>(element.second, __func__);
+            if (!endpoint)
+                continue;
+            result[peerIdParsed].connectedEndpoints.push_back(std::move(*endpoint));
+        }
+        else if (element.first.find(kUplinkSpeedId) != std::string::npos)
+        {
+            auto uplinkSpeed =
+                deserialize<nx::hpm::api::ConnectionSpeed>(element.second, __func__);
+            if (!uplinkSpeed)
+                continue;
+            result[peerIdParsed].uplinkSpeed = std::move(*uplinkSpeed);
+        }
+        else
+        {
+            NX_WARNING(this, "Unknown key value pair found in cache: {%1, %2}",
+                element.first, element.second);
+        }
+    }
+
+    for (auto it = result.begin(); it != result.end();)
+    {
+        // An empty list of endpoints means that the peer has disconnected from all mediators
+        // and should not be included.
+        if (it->second.connectedEndpoints.empty())
+            it = result.erase(it);
+        else
+            ++it;
+    }
+
+    return result;
+}
+
 std::string ListeningPeerDb::nodeId() const
 {
     const auto& nodeId = m_settings.map.synchronizationSettings.nodeId;
@@ -275,9 +361,7 @@ std::string ListeningPeerDb::nodeId() const
 void ListeningPeerDb::setThisMediatorEndpoint(const MediatorEndpoint& endpoint)
 {
     m_mediatorEndpoint = endpoint;
-    m_mediatorEndpointString = toString(endpoint);
-
-    NX_ASSERT(toMediatorEndpoint(m_mediatorEndpointString) == m_mediatorEndpoint);
+    m_mediatorEndpointString = QJson::serialized(endpoint).toStdString();
 
     m_syncEngineUrl = nx::network::url::Builder()
         .setScheme(nx::network::http::kUrlSchemeName)
@@ -290,10 +374,12 @@ void ListeningPeerDb::setThisMediatorEndpoint(const MediatorEndpoint& endpoint)
 
 std::string ListeningPeerDb::toInternalStorageFormat(const std::string& peerDomainName) const
 {
+    // NOTE: m_mediatorEndpointString is added to the key to guarantee uniqueness.
     std::string s;
-    s.reserve(peerDomainName.size() + m_mediatorEndpointString.size() + 1);
+    s.reserve(
+        peerDomainName.size() + m_mediatorEndpointString.size() + 1 + sizeof(kMediatorEndpointId));
     s += toLowerReversed(peerDomainName);
-    return s.append(".").append(m_mediatorEndpointString);
+    return s.append("#").append(m_mediatorEndpointString).append(kMediatorEndpointId);
 }
 
 std::string ListeningPeerDb::buildInfoJson(const MediatorEndpoint& endpoint) const
