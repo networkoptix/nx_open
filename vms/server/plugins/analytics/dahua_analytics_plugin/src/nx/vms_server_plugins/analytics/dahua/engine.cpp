@@ -11,6 +11,7 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/log/log_main.h>
 #include <nx/sdk/helpers/string.h>
+#include <nx/sdk/helpers/error.h>
 
 #include "device_agent.h"
 #include "common.h"
@@ -89,36 +90,35 @@ void Engine::setEngineInfo(const nx::sdk::analytics::IEngineInfo* /*engineInfo*/
 {
 }
 
-void Engine::setSettings(const IStringMap* /*settings*/, IError* /*outError*/)
+StringMapResult Engine::setSettings(const IStringMap* /*settings*/)
 {
     // There are no DeviceAgent settings for this plugin.
+    return nullptr;
 }
 
-IStringMap* Engine::pluginSideSettings(IError* /*outError*/) const
+SettingsResponseResult Engine::pluginSideSettings() const
 {
     return nullptr;
 }
 
-IDeviceAgent* Engine::obtainDeviceAgent(const IDeviceInfo* deviceInfo, IError* /*outError*/)
+DeviceAgentResult Engine::obtainDeviceAgent(const IDeviceInfo* deviceInfo)
 {
     if (!isCompatible(deviceInfo))
         return nullptr;
 
     const nx::vms::api::analytics::DeviceAgentManifest deviceAgentParsedManifest
         = fetchDeviceAgentParsedManifest(deviceInfo);
+
     if (deviceAgentParsedManifest.supportedEventTypeIds.isEmpty())
         return nullptr;
 
     return new DeviceAgent(this, deviceInfo, deviceAgentParsedManifest);
 }
 
-const nx::sdk::IString* Engine::manifest(IError* outError) const
+StringResult Engine::manifest() const
 {
     if (m_jsonManifest.isEmpty())
-    {
-        outError->setError(ErrorCode::otherError, "Engine manifest is empty");
-        return nullptr;
-    }
+        return error(ErrorCode::otherError, "Engine manifest is empty");
 
     return new nx::sdk::String(m_jsonManifest);
 }
@@ -208,8 +208,9 @@ const EngineManifest& Engine::parsedManifest() const
     return m_parsedManifest;
 }
 
-void Engine::executeAction(IAction* /*action*/, IError* /*outError*/)
+VoidResult Engine::executeAction(IAction* /*action*/)
 {
+    return {};
 }
 
 void Engine::setHandler(IHandler* /*handler*/)

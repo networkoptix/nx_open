@@ -35,6 +35,33 @@ namespace test {
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 
+template<typename Value>
+struct ResultHolder
+{
+public:
+    ResultHolder(Result<Value>&& result): result(std::move(result)) {};
+    ~ResultHolder()
+    {
+        toPtr(result.value);
+        toPtr(result.error.errorMessage);
+    }
+
+    bool isOk() const { return result.isOk(); }
+
+    const Result<Value> result;
+};
+
+class VoidResultHolder
+{
+public:
+    VoidResultHolder(Result<void>&& result): result(std::move(result)) {};
+    ~VoidResultHolder() { toPtr(result.error.errorMessage); }
+
+    bool isOk() const { return result.isOk(); }
+
+    const Result<void> result;
+};
+
 static std::string trimString(const std::string& s)
 {
     int start = 0;
@@ -50,14 +77,14 @@ static std::string trimString(const std::string& s)
 
 static void testEngineManifest(IEngine* engine)
 {
-    auto error = makePtr<Error>();
-    const auto manifest = toPtr(engine->manifest(error.get()));
+    const ResultHolder<const IString*> result = engine->manifest();
 
+    ASSERT_TRUE(result.isOk());
+    const auto manifest = result.result.value;
     ASSERT_TRUE(manifest);
-    const char* manifestStr = manifest->str();
 
-    ASSERT_TRUE(manifestStr != nullptr);
-    ASSERT_EQ(ErrorCode::noError, error->errorCode());
+    const char* const manifestStr = manifest->str();
+    ASSERT_TRUE(manifestStr);
     ASSERT_TRUE(manifestStr[0] != '\0');
     NX_PRINT << "Engine manifest:\n" << manifestStr;
 
@@ -71,13 +98,13 @@ static void testEngineManifest(IEngine* engine)
 
 static void testDeviceAgentManifest(IDeviceAgent* deviceAgent)
 {
-    auto error = makePtr<Error>();
-    const auto manifest = toPtr(deviceAgent->manifest(error.get()));
+    const ResultHolder<const IString*> result = deviceAgent->manifest();
+    ASSERT_TRUE(result.isOk());
 
+    const auto manifest = result.result.value;
     ASSERT_TRUE(manifest);
     const char* manifestStr = manifest->str();
     ASSERT_TRUE(manifestStr != nullptr);
-    ASSERT_EQ(ErrorCode::noError, error->errorCode());
     ASSERT_TRUE(manifestStr[0] != '\0');
     NX_PRINT << "DeviceAgent manifest:\n" << manifest;
 
@@ -88,39 +115,44 @@ static void testDeviceAgentManifest(IDeviceAgent* deviceAgent)
 
 static void testEngineSettings(IEngine* engine)
 {
-    auto error = makePtr<Error>();
     const auto settings = makePtr<StringMap>();
     settings->addItem("setting1", "value1");
     settings->addItem("setting2", "value2");
 
-    engine->setSettings(nullptr, error.get()); //< Test null settings.
-    ASSERT_EQ(ErrorCode::invalidParams, error->errorCode());
+    {
+        // Test assigning empty settings.
+        const ResultHolder<const IStringMap*> result =
+            engine->setSettings(makePtr<StringMap>().get());
+        ASSERT_TRUE(result.isOk());
+    }
 
-    engine->setSettings(makePtr<StringMap>().get(), error.get()); //< Test empty settings.
-    ASSERT_EQ(ErrorCode::invalidParams, error->errorCode());
-
-    engine->setSettings(settings.get(), error.get()); //< Test invalid settings.
-    ASSERT_EQ(ErrorCode::invalidParams, error->errorCode());
-
-    // TODO: Add test for assigning expected settings.
+    {
+        // Test assigning some settings
+        const ResultHolder<const IStringMap*> result =
+            engine->setSettings(settings.get());
+        ASSERT_TRUE(result.isOk());
+    }
 }
 
 static void testDeviceAgentSettings(IDeviceAgent* deviceAgent)
 {
-    auto error = makePtr<Error>();
     const auto settings = makePtr<StringMap>();
     settings->addItem("setting1", "value1");
     settings->addItem("setting2", "value2");
 
-    deviceAgent->setSettings(nullptr, error.get()); //< Test null settings.
-    ASSERT_EQ(ErrorCode::invalidParams, error->errorCode());
+    {
+        // Test assigning empty settings.
+        const ResultHolder<const IStringMap*> result =
+            deviceAgent->setSettings(makePtr<StringMap>().get());
+        ASSERT_TRUE(result.isOk());
+    }
 
-    deviceAgent->setSettings(makePtr<StringMap>().get(), error.get()); //< Test empty settings.
-    ASSERT_EQ(ErrorCode::invalidParams, error->errorCode());
-
-    deviceAgent->setSettings(settings.get(), error.get()); //< Test invalid settings.
-    ASSERT_EQ(ErrorCode::invalidParams, error->errorCode());
-
+    {
+        // Test assigning some settings.
+        const ResultHolder<const IStringMap*> result =
+            deviceAgent->setSettings(settings.get());
+        ASSERT_TRUE(result.isOk());
+    }
     // TODO: Add test for assigning expected settings.
 }
 
@@ -201,12 +233,11 @@ private:
 
 static void testExecuteActionNonExisting(IEngine* engine)
 {
-    const auto error = makePtr<Error>();
     auto action = makePtr<Action>();
     action->m_actionId = "non_existing_actionId";
 
-    engine->executeAction(action.get(), error.get());
-    ASSERT_TRUE(error->errorCode() != ErrorCode::noError);
+    const VoidResultHolder result = engine->executeAction(action.get());
+    ASSERT_TRUE(!result.isOk());
     action->assertExpectedState();
 }
 
@@ -223,9 +254,8 @@ static void testExecuteActionAddToList(IEngine* engine)
     });
     action->m_expectedNonNullMessageToUser = true;
 
-    const auto error = makePtr<Error>();
-    engine->executeAction(action.get(), error.get());
-    ASSERT_EQ(ErrorCode::noError, error->errorCode());
+    const VoidResultHolder result = engine->executeAction(action.get());
+    ASSERT_TRUE(result.isOk());
     action->assertExpectedState();
 }
 
@@ -236,9 +266,8 @@ static void testExecuteActionAddPerson(IEngine* engine)
     action->m_objectId = Uuid();
     action->m_expectedNonNullActionUrl = true;
 
-    const auto error = makePtr<Error>();
-    engine->executeAction(action.get(), error.get());
-    ASSERT_EQ(ErrorCode::noError, error->errorCode());
+    const VoidResultHolder result = engine->executeAction(action.get());
+    ASSERT_TRUE(result.isOk());
     action->assertExpectedState();
 }
 
@@ -321,8 +350,6 @@ TEST(stub_analytics_plugin, test)
     const auto engineHandler = nx::sdk::makePtr<EngineHandler>();
     const auto deviceAgentHandler = nx::sdk::makePtr<DeviceAgentHandler>();
 
-    auto error = makePtr<Error>();
-
     const auto pluginObject = toPtr(createNxPlugin());
     ASSERT_TRUE(pluginObject);
     ASSERT_TRUE(queryInterfacePtr<IRefCountable>(pluginObject));
@@ -333,8 +360,10 @@ TEST(stub_analytics_plugin, test)
     const auto utilityProvider = makePtr<UtilityProvider>();
     plugin->setUtilityProvider(utilityProvider.get());
 
-    const auto engine = toPtr(plugin->createEngine(error.get()));
-    ASSERT_EQ(ErrorCode::noError, error->errorCode());
+    const ResultHolder<IEngine*> result = plugin->createEngine();
+    ASSERT_TRUE(result.isOk());
+
+    const auto engine = result.result.value;
     ASSERT_TRUE(engine);
     ASSERT_TRUE(queryInterfacePtr<IEngine>(engine));
 
@@ -345,22 +374,25 @@ TEST(stub_analytics_plugin, test)
     NX_PRINT << "Plugin name: [" << pluginName << "]";
     ASSERT_STREQ(pluginName, "stub_analytics_plugin");
 
-    testEngineManifest(engine.get());
-    testEngineSettings(engine.get());
+    testEngineManifest(engine);
+    testEngineSettings(engine);
 
-    testExecuteActionNonExisting(engine.get());
-    testExecuteActionAddToList(engine.get());
-    testExecuteActionAddPerson(engine.get());
+    testExecuteActionNonExisting(engine);
+    testExecuteActionAddToList(engine);
+    testExecuteActionAddPerson(engine);
 
     const auto deviceInfo = makePtr<DeviceInfo>();
     deviceInfo->setId("TEST");
-    const auto baseDeviceAgent = toPtr(engine->obtainDeviceAgent(deviceInfo.get(), error.get()));
-    ASSERT_EQ(ErrorCode::noError, error->errorCode());
+    const ResultHolder<IDeviceAgent*> deviceAgentResult = engine->obtainDeviceAgent(deviceInfo.get());
+    ASSERT_TRUE(deviceAgentResult.isOk());
+
+    const auto baseDeviceAgent = deviceAgentResult.result.value;
     ASSERT_TRUE(baseDeviceAgent);
     ASSERT_TRUE(queryInterfacePtr<IDeviceAgent>(baseDeviceAgent));
     const auto deviceAgent = queryInterfacePtr<IConsumingDeviceAgent>(baseDeviceAgent);
     ASSERT_TRUE(deviceAgent);
 
+    deviceAgent->setHandler(makePtr<DeviceAgentHandler>().get());
     testDeviceAgentManifest(deviceAgent.get());
     testDeviceAgentSettings(deviceAgent.get());
 
@@ -368,12 +400,14 @@ TEST(stub_analytics_plugin, test)
     deviceAgent->setHandler(handler.get());
 
     const auto metadataTypes = makePtr<MetadataTypes>();
-    deviceAgent->setNeededMetadataTypes(metadataTypes.get(), error.get());
-    ASSERT_EQ(ErrorCode::noError, error->errorCode());
+    const VoidResultHolder setNeededMetadataTypesResult =
+        deviceAgent->setNeededMetadataTypes(metadataTypes.get());
+    ASSERT_TRUE(setNeededMetadataTypesResult.isOk());
 
     const auto compressedVideoPacket = makePtr<CompressedVideoPacket>();
-    deviceAgent->pushDataPacket(compressedVideoPacket.get(), error.get());
-    ASSERT_EQ(ErrorCode::noError, error->errorCode());
+    const VoidResultHolder pushDataPacketResult =
+        deviceAgent->pushDataPacket(compressedVideoPacket.get());
+    ASSERT_TRUE(pushDataPacketResult.isOk());
 }
 
 } // namespace test

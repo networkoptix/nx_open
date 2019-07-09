@@ -3,7 +3,9 @@
 #pragma once
 
 #include <nx/sdk/interface.h>
-#include <nx/sdk/i_error.h>
+#include <nx/sdk/result.h>
+
+#include <nx/sdk/error_code.h>
 #include <nx/sdk/i_string.h>
 #include <nx/sdk/i_plugin.h>
 
@@ -23,24 +25,19 @@ public:
 
     /**
      * Provides plugin manifest in JSON format.
-     * @param outError Output parameter for error reporting. Never null. Must contain
-     *     `ErrorCode::noError` error code in the case of success (`outError` object is guarnteed to
-     *     be prefilled with `noError` value, so no additional actions are required) or be properly
-     *     filled in a case of failure.
-     * @return JSON string in UTF-8.
+     *
+     * @return Result containing JSON string in UTF-8 in case of success of error information in a
+     *     case of failure.
      */
-    virtual const IString* manifest(IError* outError) const = 0;
+    virtual Result<const IString*> manifest() const = 0;
 
     /**
      * Creates a new instance of Analytics Engine.
-     * @param outError Output parameter for error reporting. Never null. Must contain
-     *     `ErrorCode::noError` error code in the case of success (`outError` object is guarnteed to
-     *     be prefilled with `noError` value, so no additional actions are required) or be properly
-     *     filled in a case of failure.
-     * @return Pointer to an object that implements DeviceAgent interface, or null in case of
-     *     failure.
+     *
+     * @return Result containing a pointer to an object that implements the IEngine interface, or
+     *     error information in case of failure.
      */
-    virtual IEngine* createEngine(IError* outError) = 0;
+    virtual Result<IEngine*> createEngine() = 0;
 
     /**
      * Name of the plugin dynamic library, without "lib" prefix and without extension.

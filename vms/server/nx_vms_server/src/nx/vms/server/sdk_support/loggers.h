@@ -7,6 +7,7 @@
 
 #include <core/resource/resource_fwd.h>
 #include <nx/vms/server/resource/resource_fwd.h>
+#include <nx/vms/server/sdk_support/error.h>
 
 #include <nx/utils/log/log.h>
 
@@ -19,8 +20,7 @@ public:
 
     virtual void log(
         const QString& manifestStr,
-        nx::sdk::Ptr<nx::sdk::IError> error,
-        const QString& customError = QString()) = 0;
+        const sdk_support::Error& error) = 0;
 };
 
 /**
@@ -47,8 +47,7 @@ public:
 
     virtual void log(
         const QString& manifestStr,
-        nx::sdk::Ptr<nx::sdk::IError> error,
-        const QString& customError) override;
+        const sdk_support::Error& error) override;
 
 private:
     nx::utils::log::Tag m_logTag;
@@ -70,8 +69,7 @@ public:
 
     virtual void log(
         const QString& manifestStr,
-        nx::sdk::Ptr<nx::sdk::IError> error,
-        const QString& customError) override;
+        const sdk_support::Error& error) override;
 
 private:
     nx::utils::log::Tag m_logTag;

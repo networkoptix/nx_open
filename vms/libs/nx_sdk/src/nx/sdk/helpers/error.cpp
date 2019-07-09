@@ -1,48 +1,20 @@
-// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
-
 #include "error.h"
+
+#define NX_PRINT_PREFIX "nx::sdk::error() "
+#include <nx/sdk/helpers/string.h>
+
+#include <nx/kit/debug.h>
 
 namespace nx {
 namespace sdk {
 
-Error::Error():
-    m_message(makePtr<String>()),
-    m_details(makePtr<StringMap>())
+Error error(ErrorCode errorCode, std::string errorMessage)
 {
-}
+    NX_KIT_ASSERT(errorCode != ErrorCode::noError,
+        "Error code must differ from `ErrorCode::noError`");
+    NX_KIT_ASSERT(!errorMessage.empty(), "Error message must not be empty");
 
-Error::Error(ErrorCode errorCode, const char* message):
-    m_errorCode(errorCode),
-    m_message(makePtr<String>(message))
-{
-}
-
-void Error::setError(ErrorCode errorCode, const char* message)
-{
-    m_errorCode = errorCode;
-    m_message->setString(message);
-}
-
-void Error::setDetail(const char* key, const char* message)
-{
-    m_details->addItem(key, message);
-}
-
-ErrorCode Error::errorCode() const
-{
-    return m_errorCode;
-}
-
-const IString* Error::message() const
-{
-    m_message->addRef();
-    return m_message.get();
-}
-
-const IStringMap* Error::details() const
-{
-    m_details->addRef();
-    return m_details.get();
+    return { errorCode, new String(std::move(errorMessage)) };
 }
 
 } // namespace sdk

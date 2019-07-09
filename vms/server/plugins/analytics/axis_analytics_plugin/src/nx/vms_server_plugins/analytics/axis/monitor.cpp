@@ -6,6 +6,7 @@
 #include <nx/sdk/analytics/helpers/event_metadata.h>
 #include <nx/sdk/analytics/helpers/event_metadata_packet.h>
 #include <nx/sdk/helpers/attribute.h>
+#include <nx/sdk/helpers/error.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/network/system_socket.h>
 
@@ -211,14 +212,14 @@ nx::network::HostAddress Monitor::getLocalIp(const nx::network::SocketAddress& c
     return nx::network::HostAddress();
 }
 
-void Monitor::startMonitoring(const IMetadataTypes* metadataTypes, IError* outError)
+VoidResult Monitor::startMonitoring(const IMetadataTypes* metadataTypes)
 {
     // Assume that the list contains events only, since this plugin produces no objects.
     const auto eventTypeList = toPtr(metadataTypes->eventTypeIds());
-    if (const char* message = "Event type id list is empty"; !NX_ASSERT(eventTypeList, message))
+    if (const char* const kMessage = "Event type id list is empty";
+        !NX_ASSERT(eventTypeList, kMessage))
     {
-        outError->setError(ErrorCode::internalError, message);
-        return;
+        return error(ErrorCode::internalError, kMessage);
     }
 
     for (int i = 0; i < eventTypeList->count(); ++i)
@@ -238,10 +239,7 @@ void Monitor::startMonitoring(const IMetadataTypes* metadataTypes, IError* outEr
     nx::network::HostAddress localIp = this->getLocalIp(cameraAddress);
 
     if (localIp == nx::network::HostAddress())
-    {
-        outError->setError(ErrorCode::internalError, kGetLocalIpFailureErrorString);
-        return;
-    }
+        return error(ErrorCode::internalError, kGetLocalIpFailureErrorString);
 
     nx::network::SocketAddress localAddress(localIp);
     m_httpServer = new nx::network::http::TestHttpServer;
@@ -257,6 +255,8 @@ void Monitor::startMonitoring(const IMetadataTypes* metadataTypes, IError* outEr
 
     localAddress = m_httpServer->server().address();
     this->addRules(localAddress, eventTypeList.get());
+
+    return {};
 }
 
 void Monitor::stopMonitoring()

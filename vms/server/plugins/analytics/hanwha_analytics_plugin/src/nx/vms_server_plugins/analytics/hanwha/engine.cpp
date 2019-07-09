@@ -14,6 +14,7 @@
 #include <nx/utils/scope_guard.h>
 
 #include <nx/sdk/helpers/string.h>
+#include <nx/sdk/helpers/error.h>
 
 #include "device_agent.h"
 #include "common.h"
@@ -96,13 +97,10 @@ Engine::Engine(Plugin* plugin): m_plugin(plugin)
     m_engineManifest = QJson::deserialized<Hanwha::EngineManifest>(m_manifest);
 }
 
-IDeviceAgent* Engine::obtainDeviceAgent(const IDeviceInfo* deviceInfo, IError* outError)
+DeviceAgentResult Engine::obtainDeviceAgent(const IDeviceInfo* deviceInfo)
 {
     if (!isCompatible(deviceInfo))
-    {
-        outError->setError(ErrorCode::otherError, "Device is not compatible with the Engine");
-        return nullptr;
-    }
+        return error(ErrorCode::otherError, "Device is not compatible with the Engine");
 
     auto sharedRes = sharedResources(deviceInfo);
     auto sharedResourceGuard = nx::utils::makeScopeGuard(
@@ -114,10 +112,7 @@ IDeviceAgent* Engine::obtainDeviceAgent(const IDeviceInfo* deviceInfo, IError* o
 
     auto supportedEventTypeIds = fetchSupportedEventTypeIds(deviceInfo);
     if (!supportedEventTypeIds)
-    {
-        outError->setError(ErrorCode::internalError, "No supported events found");
-        return nullptr;
-    }
+        return error(ErrorCode::internalError, "No supported events found");
 
     nx::vms::api::analytics::DeviceAgentManifest deviceAgentManifest;
     deviceAgentManifest.supportedEventTypeIds = *supportedEventTypeIds;
@@ -132,7 +127,7 @@ IDeviceAgent* Engine::obtainDeviceAgent(const IDeviceInfo* deviceInfo, IError* o
     return deviceAgent;
 }
 
-const IString* Engine::manifest(IError* /*outError*/) const
+StringResult Engine::manifest() const
 {
     return new nx::sdk::String(m_manifest);
 }
@@ -141,18 +136,20 @@ void Engine::setEngineInfo(const nx::sdk::analytics::IEngineInfo* /*engineInfo*/
 {
 }
 
-void Engine::setSettings(const IStringMap* /*settings*/, IError* /*outError*/)
+StringMapResult Engine::setSettings(const IStringMap* /*settings*/)
 {
     // There are no DeviceAgent settings for this plugin.
+    return nullptr;
 }
 
-IStringMap* Engine::pluginSideSettings(IError* /*outError*/) const
+SettingsResponseResult Engine::pluginSideSettings() const
 {
     return nullptr;
 }
 
-void Engine::executeAction(IAction* /*action*/, IError* /*outError*/)
+VoidResult Engine::executeAction(IAction* /*action*/)
 {
+    return {};
 }
 
 boost::optional<QList<QString>> Engine::fetchSupportedEventTypeIds(

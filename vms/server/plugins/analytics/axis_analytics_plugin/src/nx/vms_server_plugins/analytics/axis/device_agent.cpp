@@ -9,6 +9,7 @@
 
 #include <nx/sdk/helpers/string.h>
 #include <nx/sdk/helpers/plugin_diagnostic_event.h>
+#include <nx/sdk/helpers/error.h>
 
 #define NX_PRINT_PREFIX "[axis::DeviceAgent] "
 #include <nx/kit/debug.h>
@@ -46,29 +47,30 @@ void DeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
     m_handler.reset(handler);
 }
 
-void DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes, IError* outError)
+VoidResult DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes)
 {
     const auto neededEventTypeIds = toPtr(metadataTypes->eventTypeIds());
     if (!neededEventTypeIds || !neededEventTypeIds->count())
         stopFetchingMetadata();
 
-    startFetchingMetadata(metadataTypes, outError);
+    return startFetchingMetadata(metadataTypes);
 }
 
-void DeviceAgent::setSettings(const IStringMap* /*settings*/, IError* /*outError*/)
+nx::sdk::StringMapResult DeviceAgent::setSettings(const IStringMap* /*settings*/)
 {
     // There are no DeviceAgent settings for this plugin.
+    return nullptr;
 }
 
-IStringMap* DeviceAgent::pluginSideSettings(IError* /*outError*/) const
+SettingsResponseResult DeviceAgent::pluginSideSettings() const
 {
     return nullptr;
 }
 
-void DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTypes, IError* outError)
+VoidResult DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTypes)
 {
     m_monitor = new Monitor(this, m_url, m_auth, m_handler.get());
-    m_monitor->startMonitoring(metadataTypes, outError);
+    return m_monitor->startMonitoring(metadataTypes);
 }
 
 void DeviceAgent::stopFetchingMetadata()
@@ -77,13 +79,11 @@ void DeviceAgent::stopFetchingMetadata()
     m_monitor = nullptr;
 }
 
-const IString* DeviceAgent::manifest(IError* outError) const
+StringResult DeviceAgent::manifest() const
 {
     if (m_jsonManifest.isEmpty())
-    {
-        outError->setError(ErrorCode::internalError, "DeviceAgent manifest is empty");
-        return nullptr;
-    }
+        return error(ErrorCode::internalError, "DeviceAgent manifest is empty");
+
     return new nx::sdk::String(m_jsonManifest);
 }
 

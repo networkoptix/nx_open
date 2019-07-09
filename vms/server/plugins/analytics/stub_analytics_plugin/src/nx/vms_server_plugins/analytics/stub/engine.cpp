@@ -7,6 +7,7 @@
 
 #include <nx/sdk/i_device_info.h>
 #include <nx/sdk/helpers/uuid_helper.h>
+#include <nx/sdk/helpers/error.h>
 
 #include "utils.h"
 #include "device_agent.h"
@@ -81,7 +82,7 @@ void Engine::generatePluginDiagnosticEvents()
     }
 }
 
-IDeviceAgent* Engine::obtainDeviceAgent(const IDeviceInfo* deviceInfo, IError* /*outError*/)
+Result<IDeviceAgent*> Engine::obtainDeviceAgent(const IDeviceInfo* deviceInfo)
 {
     return new DeviceAgent(this, deviceInfo);
 }
@@ -124,7 +125,7 @@ void Engine::initCapabilities()
         m_capabilities.erase(0, 1);
 }
 
-std::string Engine::manifest() const
+std::string Engine::manifestInternal() const
 {
     return /*suppress newline*/1 + R"json(
 {
@@ -366,7 +367,7 @@ std::string Engine::manifest() const
 )json";
 }
 
-void Engine::settingsReceived()
+StringMapResult Engine::settingsReceived()
 {
     m_needToThrowPluginDiagnosticEvents = toBool(
         getParamValue(kThrowPluginDiagnosticEventsFromEngineSetting));
@@ -382,6 +383,8 @@ void Engine::settingsReceived()
         m_needToThrowPluginDiagnosticEvents = false;
         m_pluginDiagnosticEventGenerationLoopCondition.notify_all();
     }
+
+    return nullptr;
 }
 
 static std::string timestampedObjectMetadataToString(const ITimestampedObjectMetadata* metadata)
@@ -445,7 +448,7 @@ static std::string uncompressedVideoFrameToString(const IUncompressedVideoFrame*
         frame->width(), frame->height(), pixelFormatToStdString(frame->pixelFormat()).c_str());
 }
 
-void Engine::executeAction(
+Result<void> Engine::executeAction(
     const std::string& actionId,
     Uuid objectId,
     Uuid /*deviceId*/,
@@ -453,8 +456,7 @@ void Engine::executeAction(
     nx::sdk::Ptr<IObjectTrackInfo> objectTrackInfo,
     const std::map<std::string, std::string>& params,
     std::string* outActionUrl,
-    std::string* outMessageToUser,
-    IError* outError)
+    std::string* outMessageToUser)
 {
     if (actionId == "nx.stub.addToList")
     {
@@ -509,8 +511,10 @@ void Engine::executeAction(
     else
     {
         NX_PRINT << __func__ << "(): ERROR: Unsupported actionId.";
-        outError->setError(ErrorCode::invalidParams, "Unsupported actionId");
+        return error(ErrorCode::invalidParams, "Unsupported actionId");
     }
+
+    return {};
 }
 
 } // namespace stub

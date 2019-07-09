@@ -73,7 +73,7 @@ void Engine::setEngineInfo(const IEngineInfo* /*engineInfo*/)
 {
 }
 
-void Engine::setSettings(const IStringMap* settings, IError* /*outError*/)
+StringMapResult Engine::setSettings(const IStringMap* settings)
 {
     NX_OUTPUT << __func__ << " Received " << m_plugin->name() << " settings:";
     NX_OUTPUT << "{";
@@ -86,14 +86,15 @@ void Engine::setSettings(const IStringMap* settings, IError* /*outError*/)
             << ((i < count - 1) ? "," : "");
     }
     NX_OUTPUT << "}";
+    return nullptr;
 }
 
-IStringMap* Engine::pluginSideSettings(IError* /*outError*/) const
+SettingsResponseResult Engine::pluginSideSettings() const
 {
     return nullptr;
 }
 
-const IString* Engine::manifest(IError* /*outError*/) const
+StringResult Engine::manifest() const
 {
     if (!m_manifest.empty())
         return new nx::sdk::String(m_manifest);
@@ -136,7 +137,7 @@ const IString* Engine::manifest(IError* /*outError*/) const
     return new nx::sdk::String(m_manifest);
 }
 
-IDeviceAgent* Engine::obtainDeviceAgent(const IDeviceInfo* deviceInfo, IError* /*outError*/)
+DeviceAgentResult Engine::obtainDeviceAgent(const IDeviceInfo* deviceInfo)
 {
     NX_OUTPUT
         << __func__
@@ -154,8 +155,9 @@ IDeviceAgent* Engine::obtainDeviceAgent(const IDeviceInfo* deviceInfo, IError* /
     return m_deviceAgent;
 }
 
-void Engine::executeAction(IAction* /*action*/, IError* /*outError*/)
+VoidResult Engine::executeAction(IAction* /*action*/)
 {
+    return {};
 }
 
 std::vector<ObjectClassDescription> Engine::objectClassDescritions() const

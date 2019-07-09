@@ -15,6 +15,7 @@
 
 #include <nx/sdk/analytics/i_metadata_types.h>
 #include <nx/sdk/analytics/i_device_agent.h>
+#include <nx/sdk/analytics/helpers/aliases.h>
 
 #include <nx/network/aio/timer.h>
 #include <nx/network/system_socket.h>
@@ -62,9 +63,8 @@ public:
 
     void reconnectSocket();
 
-    void startFetchingMetadata(
-        const nx::sdk::analytics::IMetadataTypes* metadataTypes,
-        nx::sdk::IError* outError);
+    nx::sdk::VoidResult startFetchingMetadata(
+        const nx::sdk::analytics::IMetadataTypes* metadataTypes);
 
     void stopFetchingMetadata();
 
@@ -80,17 +80,14 @@ public:
 
     void onTimer();
 
-    virtual void setNeededMetadataTypes(
-        const nx::sdk::analytics::IMetadataTypes* metadataTypes,
-        nx::sdk::IError* outError) override;
+    virtual nx::sdk::VoidResult setNeededMetadataTypes(
+        const nx::sdk::analytics::IMetadataTypes* metadataTypes) override;
 
-    virtual const nx::sdk::IString* manifest(nx::sdk::IError* outError) const override;
+    virtual nx::sdk::StringResult manifest() const override;
 
-    virtual void setSettings(
-        const nx::sdk::IStringMap* settings,
-        nx::sdk::IError* outError) override;
+    virtual nx::sdk::StringMapResult setSettings(const nx::sdk::IStringMap* settings) override;
 
-    virtual nx::sdk::IStringMap* pluginSideSettings(nx::sdk::IError* outError) const override;
+    virtual nx::sdk::SettingsResponseResult pluginSideSettings() const override;
 
 private:
     Engine* const m_engine;

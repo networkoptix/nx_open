@@ -12,6 +12,7 @@
 #include <nx/network/http/http_async_client.h>
 #include <nx/network/http/test_http_server.h>
 #include <nx/utils/elapsed_timer_thread_safe.h>
+#include <nx/sdk/analytics/helpers/aliases.h>
 
 #include "common.h"
 
@@ -71,9 +72,7 @@ public:
 
     nx::network::HostAddress getLocalIp(const nx::network::SocketAddress& cameraAddress);
 
-    void startMonitoring(
-        const nx::sdk::analytics::IMetadataTypes* metadataTypes,
-        nx::sdk::IError* outError);
+    nx::sdk::VoidResult startMonitoring(const nx::sdk::analytics::IMetadataTypes* metadataTypes);
 
     void stopMonitoring();
 

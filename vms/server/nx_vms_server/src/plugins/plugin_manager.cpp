@@ -17,7 +17,8 @@
 #include <nx/sdk/analytics/i_plugin.h>
 #include <nx/vms/server/plugins/utility_provider.h>
 #include <nx/vms/server/sdk_support/utils.h>
-#include <nx/sdk/helpers/to_string.h>
+#include <nx/vms/server/sdk_support/error.h>
+#include <nx/vms/server/sdk_support/to_string.h>
 #include <nx/vms/api/analytics/plugin_manifest.h>
 
 #include "vms_server_plugins_ini.h"
@@ -433,23 +434,19 @@ public:
 
     virtual void log(
         const QString& manifestStr,
-        nx::sdk::Ptr<nx::sdk::IError> error,
-        const QString& customError) override
+        const nx::vms::server::sdk_support::Error& error) override
     {
-        const nx::sdk::ErrorCode errorCode = error->errorCode();
-        if (errorCode == nx::sdk::ErrorCode::noError)
+        if (error.errorCode == nx::sdk::ErrorCode::noError)
             return;
 
-        const QString errorStr = (errorCode != nx::sdk::ErrorCode::otherError)
-            ? lm(" (Error: %1)").arg(nx::sdk::toString(errorCode))
+        const QString errorStr = (error.errorCode != nx::sdk::ErrorCode::otherError)
+            ? lm(" (Error: [%1] %2)").args(error.errorCode, error.errorMessage)
             : "";
-
-        const QString customErrorStr = customError.isEmpty() ? "" : lm(": %1").arg(customError);
 
         m_pluginInfo->errorCode = PluginInfo::Error::badManifest;
         m_pluginInfo->status = PluginInfo::Status::notLoadedBecauseOfError;
-        m_pluginInfo->statusMessage = lm("Failed loading plugin [%1]: Bad manifest%2%3").args(
-            m_libFilename, errorStr, customErrorStr);
+        m_pluginInfo->statusMessage = lm("Failed loading plugin [%1]: Bad manifest%2").args(
+            m_libFilename, errorStr);
 
         QString logMessage = m_pluginInfo->statusMessage;
         if (!manifestStr.isEmpty())

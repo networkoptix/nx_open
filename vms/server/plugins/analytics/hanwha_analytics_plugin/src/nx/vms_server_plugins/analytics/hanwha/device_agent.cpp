@@ -8,6 +8,7 @@
 #include <nx/kit/debug.h>
 
 #include <nx/sdk/helpers/string.h>
+#include <nx/sdk/helpers/error.h>
 
 #include <nx/sdk/analytics/helpers/event_metadata.h>
 #include <nx/sdk/analytics/helpers/event_metadata_packet.h>
@@ -41,32 +42,33 @@ void DeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
     m_handler.reset(handler);
 }
 
-void DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes, IError* outError)
+VoidResult DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes)
 {
     const auto eventTypeIds = toPtr(metadataTypes->eventTypeIds());
-    if (const char* message = "Event type id list is nullptr"; !NX_ASSERT(eventTypeIds, message))
+    if (const char* const kMessage = "Event type id list is nullptr";
+        !NX_ASSERT(eventTypeIds, kMessage))
     {
-        outError->setError(ErrorCode::internalError, message);
-        return;
+        return error(ErrorCode::internalError, kMessage);
     }
 
     if (eventTypeIds->count() == 0)
         stopFetchingMetadata();
 
-    return startFetchingMetadata(metadataTypes, outError);
+    return startFetchingMetadata(metadataTypes);
 }
 
-void DeviceAgent::setSettings(const IStringMap* /*settings*/, IError* /*outError*/)
+StringMapResult DeviceAgent::setSettings(const IStringMap* /*settings*/)
 {
     // There are no DeviceAgent settings for this plugin.
+    return nullptr;
 }
 
-IStringMap* DeviceAgent::pluginSideSettings(IError* /*outError*/) const
+SettingsResponseResult DeviceAgent::pluginSideSettings() const
 {
     return nullptr;
 }
 
-void DeviceAgent::startFetchingMetadata(const IMetadataTypes* /*metadataTypes*/, IError* outError)
+VoidResult DeviceAgent::startFetchingMetadata(const IMetadataTypes* /*metadataTypes*/)
 {
     const auto monitorHandler =
         [this](const EventList& events)
@@ -113,20 +115,16 @@ void DeviceAgent::startFetchingMetadata(const IMetadataTypes* /*metadataTypes*/,
         };
 
     if (!NX_ASSERT(m_engine))
-    {
-        outError->setError(ErrorCode::internalError, "Unable to access the Engine");
-        return;
-    }
+        return error(ErrorCode::internalError, "Unable to access the Engine");
 
     m_monitor = m_engine->monitor(m_sharedId, m_url, m_auth);
     if (!m_monitor)
-    {
-        outError->setError(ErrorCode::internalError, "Unable to access the monitor");
-        return;
-    }
+        return error(ErrorCode::internalError, "Unable to access the monitor");
 
     m_monitor->addHandler(m_uniqueId, monitorHandler);
     m_monitor->startMonitoring();
+
+    return {};
 }
 
 void DeviceAgent::stopFetchingMetadata()
@@ -141,13 +139,10 @@ void DeviceAgent::stopFetchingMetadata()
     m_monitor = nullptr;
 }
 
-const IString* DeviceAgent::manifest(IError* outError) const
+StringResult DeviceAgent::manifest() const
 {
     if (m_deviceAgentManifest.isEmpty())
-    {
-        outError->setError(ErrorCode::internalError, "DeviceAgent manifest is empty");
-        return nullptr;
-    }
+        return error(ErrorCode::internalError, "DeviceAgent manifest is empty");
 
     return new nx::sdk::String(m_deviceAgentManifest);
 }

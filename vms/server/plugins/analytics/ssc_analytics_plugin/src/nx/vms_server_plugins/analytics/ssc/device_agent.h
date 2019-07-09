@@ -8,6 +8,7 @@
 #include <nx/sdk/helpers/ref_countable.h>
 
 #include <nx/sdk/analytics/i_device_agent.h>
+#include <nx/sdk/analytics/helpers/aliases.h>
 
 #include "common.h"
 #include "engine.h"
@@ -31,19 +32,16 @@ public:
 
     void sendEventPacket(const EventType& event) const;
 
-    virtual const nx::sdk::IString* manifest(nx::sdk::IError* outError) const override;
+    virtual nx::sdk::StringResult manifest() const override;
 
     virtual void setHandler(nx::sdk::analytics::IDeviceAgent::IHandler* handler) override;
 
-    virtual void setNeededMetadataTypes(
-        const nx::sdk::analytics::IMetadataTypes* metadataTypes,
-        nx::sdk::IError* outError) override;
+    virtual nx::sdk::VoidResult setNeededMetadataTypes(
+        const nx::sdk::analytics::IMetadataTypes* metadataTypes) override;
 
-    virtual void setSettings(
-        const nx::sdk::IStringMap* settings,
-        nx::sdk::IError* outError) override;
+    virtual nx::sdk::StringMapResult setSettings(const nx::sdk::IStringMap* settings) override;
 
-    virtual nx::sdk::IStringMap* pluginSideSettings(nx::sdk::IError* outError) const override;
+    virtual nx::sdk::SettingsResponseResult pluginSideSettings() const override;
 
 private:
     void startFetchingMetadata(const nx::sdk::analytics::IMetadataTypes* metadataTypes);

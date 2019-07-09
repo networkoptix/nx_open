@@ -20,6 +20,7 @@
 
 #include <nx/sdk/analytics/helpers/event_metadata.h>
 #include <nx/sdk/analytics/helpers/event_metadata_packet.h>
+#include <nx/sdk/helpers/error.h>
 
 #include <network/tcp_connection_processor.h>
 
@@ -398,22 +399,22 @@ void DeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
     m_handler.reset(handler);
 }
 
-void DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes, IError* outError)
+VoidResult DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes)
 {
     const auto eventTypeIds = toPtr(metadataTypes->eventTypeIds());
-    if (const char* message = "Event type id list is nullptr"; !NX_ASSERT(eventTypeIds, message))
+    if (const char* const kMessage = "Event type id list is nullptr";
+        !NX_ASSERT(eventTypeIds, kMessage))
     {
-        outError->setError(ErrorCode::internalError, message);
-        return;
+        return error(ErrorCode::internalError, kMessage);
     }
 
     if (eventTypeIds->count() == 0)
         stopFetchingMetadata();
 
-    return startFetchingMetadata(metadataTypes, outError);
+    return startFetchingMetadata(metadataTypes);
 }
 
-void DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTypes, IError* outError)
+VoidResult DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTypes)
 {
     m_terminated = false;
 
@@ -423,10 +424,10 @@ void DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTypes, IEr
 
     // Assuming that the list contains only events, since this plugin does not produce objects.
     const auto eventTypeIdList = toPtr(metadataTypes->eventTypeIds());
-    if (const char* message = "Event type id list is nullptr"; !NX_ASSERT(eventTypeIdList, message))
+    if (const char* const message = "Event type id list is nullptr";
+        !NX_ASSERT(eventTypeIdList, message))
     {
-        outError->setError(ErrorCode::internalError, message);
-        return;
+        return error(ErrorCode::internalError, message);
     };
 
     for (int i = 0; i < eventTypeIdList->count(); ++i)
@@ -443,9 +444,8 @@ void DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTypes, IEr
 
     QByteArray eventNames;
     for (const auto& event: m_eventsToCatch)
-    {
         eventNames = eventNames + event.type.internalName.toUtf8() + " ";
-    }
+
     NX_URL_PRINT << "Server demanded to start fetching event(s): " << eventNames.constData();
 
     NX_URL_PRINT << "Trying to get DW MTT-camera tcp notification server port.";
@@ -454,13 +454,13 @@ void DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTypes, IEr
         static const char* const kMessage =
             "Failed to get DW MTT-camera tcp notification server port";
         NX_URL_PRINT << kMessage;
-        outError->setError(ErrorCode::networkError, kMessage);
-        return;
+        return error(ErrorCode::networkError, kMessage);
     }
     NX_URL_PRINT << "DW MTT-camera tcp notification port = "
         << m_cameraController.longPollingPort();
 
     makeSubscription();
+    return {};
 }
 
 void DeviceAgent::stopFetchingMetadata()
@@ -486,17 +486,18 @@ void DeviceAgent::stopFetchingMetadata()
     promise.get_future().wait();
 }
 
-const IString* DeviceAgent::manifest(IError* /*outError*/) const
+StringResult DeviceAgent::manifest() const
 {
     return new nx::sdk::String(m_cameraManifest);
 }
 
-void DeviceAgent::setSettings(const IStringMap* /*settings*/, IError* /*outError*/)
+StringMapResult DeviceAgent::setSettings(const IStringMap* /*settings*/)
 {
     // There are no DeviceAgent settings for this plugin.
+    return nullptr;
 }
 
-IStringMap* DeviceAgent::pluginSideSettings(IError* /*outError*/) const
+SettingsResponseResult DeviceAgent::pluginSideSettings() const
 {
     return nullptr;
 }

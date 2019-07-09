@@ -3,10 +3,13 @@
 #pragma once
 
 #include <nx/sdk/interface.h>
-#include <nx/sdk/i_error.h>
+#include <nx/sdk/result.h>
+
 #include <nx/sdk/i_string_map.h>
 #include <nx/sdk/i_string.h>
 #include <nx/sdk/i_plugin_diagnostic_event.h>
+#include <nx/sdk/i_settings_response.h>
+
 #include <nx/sdk/analytics/i_metadata_types.h>
 #include <nx/sdk/analytics/i_metadata_packet.h>
 
@@ -48,16 +51,15 @@ public:
      * combined with the values received from the plugin via pluginSideSettings() (if any), for
      * the combination of a device instance and an Engine instance.
      *
-     * @param outError Output parameter for error reporting. Never null. Must contain
-     *     `ErrorCode::noError` error code in the case of success (`outError` object is guarnteed to
-     *     be prefilled with `noError` value, so no additional actions are required) or be properly
-     *     filled in a case of failure. `setSetting()` method should set information about each
-     *     failed setting via `IError::setDetail()` method (the key is a setting id and the value is
-     *     an error message).
-     * @param settings Values of settings declared in the manifest. Never null. Valid only during
-     *     the call.
+     * @param settings Values of settings declared in the manifest. Never null.
+     * @return Result containing a map of errors that occurred during settings applying. Keys of
+     *     the map are the setting ids and values are human readable error strings. Even if some
+     *     settings can't be applied or an error happened during its applying, this method must
+     *     return a successful result with a corresponding map of errors. A faulty result
+     *     containing error information instead of the map should be returned only in case of some
+     *     general failure affected the settings applying procedure as a whole.
      */
-    virtual void setSettings(const IStringMap* settings, IError* outError) = 0;
+    virtual Result<const IStringMap*> setSettings(const IStringMap* settings) = 0;
 
     /**
      * In addition to the settings stored in a Server database, a DeviceAgent can have some
@@ -66,26 +68,20 @@ public:
      * Settings Model, but every time the Server offers the user to edit the values, it calls this
      * method and merges the received values with the ones in its database.
      *
-     * @param outError Output parameter for error reporting. Never null. Must contain
-     *     `ErrorCode::noError` error code in the case of success (`outError` object is guarnteed to
-     *     be prefilled with `noError` value, so no additional actions are required) or be properly
-     *     filled in a case of failure. The `pluginSideSettings()` method should set information
-     *     about each setting it failed to retrieve via `IError::setDetail()` method (the key is a
-     *     setting id and the value is an error message).
-     * @return DeviceAgent settings that are stored on the plugin side, or null if there are no
-     *     such settings.
+     * @return Result containing (in case of success) information about settings that are stored on
+     *     the plugin side. Errors corresponding to particular settings should be placed in the
+     *     `ISettingsResponse` object. A faulty result must be returned only in case of general
+     *     error that affects the settings retrieval procedure as a whole.
      */
-    virtual IStringMap* pluginSideSettings(IError* outError) const = 0;
+    virtual Result<const ISettingsResponse*> pluginSideSettings() const = 0;
 
     /**
      * Provides DeviceAgent manifest in JSON format.
-     * @param outError Output parameter for error reporting. Never null. Must contain
-     *     `ErrorCode::noError` error code in the case of success (`outError` object is guarnteed to
-     *     be prefilled with `noError` value, so no additional actions are required) or be properly
-     *     filled in a case of failure.
-     * @return JSON string in UTF-8.
+     *
+     * @return Result containing JSON string in UTF-8 in case of success. Otherwise a result
+     *     containing error information must be returned.
      */
-    virtual const IString* manifest(IError* outError) const = 0;
+    virtual Result<const IString*> manifest() const = 0;
 
     /**
      * @param handler Processes event metadata and object metadata fetched by DeviceAgent.
@@ -98,15 +94,11 @@ public:
     /**
      * Sets a list of metadata types that are needed by the Server. Empty list means that the
      * Server does not need any metadata from this DeviceAgent.
+     *
      * @param neededMetadataTypes Lists of type ids of events and objects.
-     * @param outError Output parameter for error reporting. Never null. Must contain
-     *     `ErrorCode::noError` error code in the case of success (`outError` object is guarnteed to
-     *     be prefilled with `noError` value, so no additional actions are required) or be properly
-     *     filled in a case of failure.
+     * @return Result containing error information in case of failure.
      */
-    virtual void setNeededMetadataTypes(
-        const IMetadataTypes* neededMetadataTypes,
-        IError* outError) = 0;
+    virtual Result<void> setNeededMetadataTypes(const IMetadataTypes* neededMetadataTypes) = 0;
 };
 
 } // namespace analytics

@@ -5,6 +5,7 @@
 #include <nx/fusion/model_functions.h>
 
 #include <nx/sdk/helpers/string.h>
+#include <nx/sdk/helpers/error.h>
 
 #include <nx/vms/api/analytics/device_agent_manifest.h>
 
@@ -84,7 +85,7 @@ void DeviceAgent::stopFetchingMetadata()
     m_engine->unregisterCamera(m_cameraLogicalId);
 }
 
-const IString* DeviceAgent::manifest(IError* /*outError*/) const
+StringResult DeviceAgent::manifest() const
 {
     return new nx::sdk::String(m_deviceAgentManifest);
 }
@@ -95,27 +96,29 @@ void DeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
     m_handler.reset(handler);
 }
 
-void DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes, IError* outError)
+VoidResult DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes)
 {
     const auto eventTypeIds = toPtr(metadataTypes->eventTypeIds());
-    if (const char* message = "Event type id list is nullptr"; !NX_ASSERT(eventTypeIds, message))
+    if (const char* const kMessage = "Event type id list is nullptr";
+        !NX_ASSERT(eventTypeIds, kMessage))
     {
-        outError->setError(ErrorCode::internalError, message);
-        return;
+        return error(ErrorCode::internalError, kMessage);
     }
 
     if (eventTypeIds->count() == 0)
         stopFetchingMetadata();
 
     startFetchingMetadata(metadataTypes);
+    return {};
 }
 
-void DeviceAgent::setSettings(const IStringMap* /*settings*/, IError* /*outError*/)
+StringMapResult DeviceAgent::setSettings(const IStringMap* /*settings*/)
 {
     // There are no DeviceAgent settings for this plugin.
+    return nullptr;
 }
 
-IStringMap* DeviceAgent::pluginSideSettings(IError* /*outError*/) const
+SettingsResponseResult DeviceAgent::pluginSideSettings() const
 {
     return nullptr;
 }

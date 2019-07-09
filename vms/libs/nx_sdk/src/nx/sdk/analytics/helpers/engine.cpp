@@ -7,13 +7,16 @@
 #include <nx/kit/debug.h>
 #include <nx/kit/utils.h>
 
+#include <nx/sdk/analytics/i_plugin.h>
+
 #include <nx/sdk/helpers/uuid_helper.h>
 #include <nx/sdk/helpers/log_utils.h>
 #include <nx/sdk/helpers/ptr.h>
 #include <nx/sdk/helpers/string_map.h>
 #include <nx/sdk/helpers/string.h>
 #include <nx/sdk/helpers/plugin_diagnostic_event.h>
-#include <nx/sdk/analytics/i_plugin.h>
+#include <nx/sdk/helpers/settings_response.h>
+#include <nx/sdk/helpers/error.h>
 
 namespace nx {
 namespace sdk {
@@ -95,34 +98,30 @@ void Engine::setEngineInfo(const IEngineInfo* engineInfo)
         PrintPrefixMaker().makePrintPrefix(m_overridingPrintPrefix, m_plugin, engineInfo));
 }
 
-void Engine::setSettings(const IStringMap* settings, IError* outError)
+Result<const IStringMap*> Engine::setSettings(const IStringMap* settings)
 {
     if (!logUtils.convertAndOutputStringMap(&m_settings, settings, "Received settings"))
-    {
-        outError->setError(ErrorCode::invalidParams, "Unable to convert the input string map");
-        return; //< The error is already logged.
-    }
+        return error(ErrorCode::invalidParams, "Unable to convert the input string map");
 
-    settingsReceived();
+    return settingsReceived();
 }
 
-IStringMap* Engine::pluginSideSettings(IError* /*outError*/) const
+Result<const ISettingsResponse*> Engine::pluginSideSettings() const
 {
     return nullptr;
 }
 
-const IString* Engine::manifest(IError* /*outError*/) const
+Result<const IString*> Engine::manifest() const
 {
-    return new String(manifest());
+    return new String(manifestInternal());
 }
 
-void Engine::executeAction(IAction* action, IError* outError)
+Result<void> Engine::executeAction(IAction* action)
 {
     if (!action)
     {
         NX_PRINT << __func__ << "(): INTERNAL ERROR: action is null";
-        outError->setError(ErrorCode::invalidParams, "Action is null");
-        return;
+        return error(ErrorCode::invalidParams, "Action is null");
     }
 
     std::map<std::string, std::string> params;
@@ -140,8 +139,7 @@ void Engine::executeAction(IAction* action, IError* outError)
         &params, actionParams.get(), "params", /*outputIndent*/ 4))
     {
         // The error is already logged.
-        outError->setError(ErrorCode::invalidParams, "Invalid action parameters");
-        return;
+        return error(ErrorCode::invalidParams, "Invalid action parameters");
     }
 
     NX_OUTPUT << "}";
@@ -149,7 +147,7 @@ void Engine::executeAction(IAction* action, IError* outError)
     std::string actionUrl;
     std::string messageToUser;
 
-    executeAction(
+    auto result = executeAction(
         action->actionId(),
         action->objectId(),
         action->deviceId(),
@@ -157,12 +155,13 @@ void Engine::executeAction(IAction* action, IError* outError)
         nx::sdk::toPtr(action->objectTrackInfo()),
         params,
         &actionUrl,
-        &messageToUser,
-        outError);
+        &messageToUser);
 
     const char* const actionUrlPtr = actionUrl.empty() ? nullptr : actionUrl.c_str();
     const char* const messageToUserPtr = messageToUser.empty() ? nullptr : messageToUser.c_str();
     action->handleResult(actionUrlPtr, messageToUserPtr);
+
+    return result;
 }
 
 void Engine::setHandler(IEngine::IHandler* handler)

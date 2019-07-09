@@ -11,6 +11,7 @@
 #include <nx/sdk/uuid.h>
 #include <nx/sdk/analytics/helpers/plugin.h>
 #include <nx/sdk/analytics/helpers/engine.h>
+#include <nx/sdk/analytics/helpers/aliases.h>
 #include <nx/sdk/analytics/i_uncompressed_video_frame.h>
 
 namespace nx {
@@ -27,8 +28,8 @@ public:
     Engine(Plugin* plugin);
     virtual ~Engine() override;
 
-    virtual nx::sdk::analytics::IDeviceAgent* obtainDeviceAgent(
-        const nx::sdk::IDeviceInfo* deviceInfo, nx::sdk::IError* outError) override;
+    virtual nx::sdk::Result<nx::sdk::analytics::IDeviceAgent*> obtainDeviceAgent(
+        const nx::sdk::IDeviceInfo* deviceInfo) override;
 
     // Capabilities.
     bool needUncompressedVideoFrames() const { return m_needUncompressedVideoFrames; }
@@ -37,11 +38,11 @@ public:
     virtual Plugin* plugin() const override { return pluginCasted<Plugin>(); }
 
 protected:
-    virtual std::string manifest() const override;
+    virtual std::string manifestInternal() const override;
 
-    virtual void settingsReceived() override;
+    virtual nx::sdk::StringMapResult settingsReceived() override;
 
-    virtual void executeAction(
+    virtual nx::sdk::Result<void> executeAction(
         const std::string& actionId,
         nx::sdk::Uuid objectId,
         nx::sdk::Uuid deviceId,
@@ -49,8 +50,7 @@ protected:
         nx::sdk::Ptr<nx::sdk::analytics::IObjectTrackInfo> objectTrackInfo,
         const std::map<std::string, std::string>& params,
         std::string* outActionUrl,
-        std::string* outMessageToUser,
-        nx::sdk::IError* outError) override;
+        std::string* outMessageToUser) override;
 
 private:
     void obtainPluginHomeDir();

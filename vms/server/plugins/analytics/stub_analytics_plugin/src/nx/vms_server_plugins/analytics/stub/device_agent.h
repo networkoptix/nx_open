@@ -11,6 +11,7 @@
 
 #include <nx/sdk/analytics/helpers/video_frame_processing_device_agent.h>
 #include <nx/sdk/analytics/helpers/pixel_format.h>
+#include <nx/sdk/analytics/helpers/aliases.h>
 
 #include "engine.h"
 #include "objects/random.h"
@@ -26,16 +27,15 @@ public:
     DeviceAgent(Engine* engine, const nx::sdk::IDeviceInfo* deviceInfo);
     virtual ~DeviceAgent() override;
 
-    virtual void setNeededMetadataTypes(
-        const nx::sdk::analytics::IMetadataTypes* neededMetadataTypes,
-        nx::sdk::IError* outError) override;
+    virtual nx::sdk::Result<void> setNeededMetadataTypes(
+        const nx::sdk::analytics::IMetadataTypes* neededMetadataTypes) override;
 
-    virtual nx::sdk::IStringMap* pluginSideSettings(nx::sdk::IError* outError) const override;
+    virtual nx::sdk::Result<const nx::sdk::ISettingsResponse*> pluginSideSettings() const override;
 
 protected:
-    virtual std::string manifest() const override;
+    virtual std::string manifestInternal() const override;
 
-    virtual void settingsReceived() override;
+    virtual nx::sdk::StringMapResult settingsReceived() override;
 
     virtual bool pushCompressedVideoFrame(
         const nx::sdk::analytics::ICompressedVideoPacket* videoFrame) override;

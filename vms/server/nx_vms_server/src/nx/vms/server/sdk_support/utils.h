@@ -26,14 +26,17 @@
 #include <nx/vms/server/analytics/debug_helpers.h>
 
 #include <nx/vms/server/sdk_support/loggers.h>
+#include <nx/vms/server/sdk_support/result_holder.h>
 
 #include <analytics/db/analytics_db_types.h>
 
 #include <nx/sdk/i_string_map.h>
 #include <nx/sdk/i_plugin_diagnostic_event.h>
+#include <nx/sdk/result.h>
+
 #include <nx/sdk/helpers/device_info.h>
 #include <nx/sdk/helpers/ptr.h>
-#include <nx/sdk/helpers/error.h>
+
 #include <plugins/settings.h>
 #include <plugins/vms_server_plugins_ini.h>
 
@@ -101,28 +104,25 @@ std::optional<Manifest> manifestFromSdkObject(
     std::unique_ptr<AbstractManifestLogger> logger = nullptr)
 {
     using namespace nx::sdk;
-    auto error = makePtr<Error>();
-    const auto manifestStr = toPtr(sdkObject->manifest(error.get()));
+    const ResultHolder<const IString*> result = sdkObject->manifest();
 
     const auto log =
-        [&logger](
-            const QString& manifestString,
-            Ptr<nx::sdk::IError> error,
-            const QString& customError = QString())
+        [&logger](const QString& manifestString, const sdk_support::Error& error)
         {
             if (logger)
-                logger->log(manifestString, error, customError);
+                logger->log(manifestString, error);
             return std::nullopt; //< Allows to call as `return log(...);` on error.
         };
 
-    if (error->errorCode() != ErrorCode::noError)
-        return log(QString(), error);
+    if (!result.isOk())
+        return log(QString(), sdk_support::Error::fromResultHolder(result));
 
+    const auto manifestStr = result.value();
     if (!manifestStr)
     {
         return log(
             QString(),
-            makePtr<Error>(ErrorCode::internalError, "No manifest (null IString)"));
+            {ErrorCode::internalError, "No manifest (null IString)"});
     }
 
     const char* const rawString = manifestStr->str();
@@ -131,14 +131,14 @@ std::optional<Manifest> manifestFromSdkObject(
     {
         return log(
             QString(),
-            makePtr<Error>(ErrorCode::internalError, "No manifest (null IString::str())"));
+            {ErrorCode::internalError, "No manifest (null IString::str())"});
     }
 
     if (rawString[0] == '\0')
     {
         return log(
             QString(),
-            makePtr<Error>(ErrorCode::internalError, "No manifest (empty string)"));
+            {ErrorCode::internalError, "No manifest (empty string)"});
     }
 
     bool success = false;
@@ -147,10 +147,10 @@ std::optional<Manifest> manifestFromSdkObject(
     {
         return log(
             rawString,
-            makePtr<Error>(ErrorCode::internalError, "Unable to deserialize manifest"));
+            {ErrorCode::internalError, "Unable to deserialize manifest"});
     }
 
-    log(rawString, error);
+    log(rawString, sdk_support::Error::fromResultHolder(result));
     return deserializedManifest;
 }
 
@@ -248,4 +248,14 @@ nx::sdk::Ptr<nx::sdk::analytics::IUncompressedVideoFrame> createUncompressedVide
 std::map<QString, QString> attributesMap(
     const nx::sdk::Ptr<const nx::sdk::analytics::IMetadata>& metadata);
 
+template<typename Value>
+QString toErrorString(const ResultHolder<Value>& result)
+{
+    const auto errorMessage = result.errorMessage();
+    return lm("[%1]: %2").args(
+        result.errorCode(),
+        errorMessage.isEmpty() ? errorMessage : QString("no error message"));
+}
+
 } // namespace nx::vms::server::sdk_support
+

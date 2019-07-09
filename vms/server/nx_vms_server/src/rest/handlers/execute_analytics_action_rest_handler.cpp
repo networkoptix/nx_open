@@ -10,13 +10,13 @@
 #include <nx/vms/server/resource/analytics_plugin_resource.h>
 #include <nx/vms/server/sdk_support/utils.h>
 #include <nx/sdk/helpers/ptr.h>
-#include <nx/sdk/helpers/to_string.h>
 #include <nx/sdk/uuid.h>
 #include <nx/vms_server_plugins/utils/uuid.h>
 #include <nx/vms/server/sdk_support/utils.h>
+#include <nx/vms/server/sdk_support/to_string.h>
+#include <nx/vms/server/sdk_support/result_holder.h>
 #include <nx/sdk/i_string_map.h>
 #include <nx/sdk/helpers/ref_countable.h>
-#include <nx/sdk/helpers/error.h>
 #include <nx/sdk/analytics/helpers/object_track_info.h>
 #include <nx/sdk/uuid.h>
 
@@ -29,6 +29,9 @@
 
 using namespace nx::vms::server;
 using namespace nx::analytics::db;
+
+template<typename T>
+using ResultHolder = nx::vms::server::sdk_support::ResultHolder<T>;
 
 namespace {
 
@@ -135,17 +138,6 @@ private:
 
     AnalyticsActionResult* m_actionResult = nullptr;
 };
-
-/**
- * @return Null if no error.
- */
-QString errorMessage(nx::sdk::Ptr<nx::sdk::IError> error)
-{
-    if (error->errorCode() == nx::sdk::ErrorCode::noError)
-        return QString();
-
-    return QString::fromStdString(nx::sdk::toString(error.get()));
-}
 
 } // namespace
 
@@ -404,12 +396,11 @@ QString QnExecuteAnalyticsActionRestHandler::executeAction(
     if (!NX_ASSERT(sdkEngine, kNoSdkEngineToExecuteActionMessage))
         return kNoSdkEngineToExecuteActionMessage;
 
-    const auto error = nx::sdk::makePtr<nx::sdk::Error>();
-    sdkEngine->executeAction(action.get(), error.get());
+    const ResultHolder<void> result = sdkEngine->executeAction(action.get());
 
     // By this time, the Engine either already called Action::handleResult(), or is not going to
     // do it.
-    return errorMessage(error);
+    return result.isOk() ? QString() : sdk_support::toErrorString(result);
 }
 
 std::optional<nx::analytics::db::ObjectPosition>

@@ -10,6 +10,7 @@
 
 #include <nx/sdk/helpers/ref_countable.h>
 #include <nx/sdk/analytics/helpers/plugin.h>
+#include <nx/sdk/analytics/helpers/aliases.h>
 #include <nx/sdk/analytics/i_device_agent.h>
 #include <nx/sdk/analytics/i_engine.h>
 
@@ -32,24 +33,19 @@ public:
 
     virtual void setEngineInfo(const nx::sdk::analytics::IEngineInfo* engineInfo) override;
 
-    virtual void setSettings(
-        const nx::sdk::IStringMap* settings,
-        nx::sdk::IError* outError) override;
+    virtual nx::sdk::StringMapResult setSettings(const nx::sdk::IStringMap* settings) override;
 
-    virtual nx::sdk::IStringMap* pluginSideSettings(nx::sdk::IError* outError) const override;
+    virtual nx::sdk::SettingsResponseResult pluginSideSettings() const override;
 
-    virtual nx::sdk::analytics::IDeviceAgent* obtainDeviceAgent(
-        const nx::sdk::IDeviceInfo* deviceInfo,
-        nx::sdk::IError* outError) override;
+    virtual nx::sdk::analytics::DeviceAgentResult obtainDeviceAgent(
+        const nx::sdk::IDeviceInfo* deviceInfo) override;
 
-    virtual const nx::sdk::IString* manifest(nx::sdk::IError* error) const override;
+    virtual nx::sdk::StringResult manifest() const override;
 
     void registerCamera(int cameraLogicalId, DeviceAgent* deviceAgent);
     void unregisterCamera(int cameraLogicalId);
 
-    virtual void executeAction(
-        nx::sdk::analytics::IAction* action,
-        nx::sdk::IError* outError) override;
+    virtual nx::sdk::VoidResult executeAction(nx::sdk::analytics::IAction* action) override;
 
     virtual void setHandler(nx::sdk::analytics::IEngine::IHandler* handler) override;
 

@@ -6,12 +6,16 @@
 #include <map>
 #include <mutex>
 
-#include <nx/sdk/helpers/ref_countable.h>
-#include <nx/sdk/helpers/ptr.h>
-#include <nx/sdk/uuid.h>
-#include <nx/sdk/helpers/log_utils.h>
 #include <nx/sdk/i_string_map.h>
 #include <nx/sdk/analytics/i_engine.h>
+
+#include <nx/sdk/result.h>
+#include <nx/sdk/uuid.h>
+
+#include <nx/sdk/helpers/ref_countable.h>
+#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/helpers/log_utils.h>
+
 
 namespace nx {
 namespace sdk {
@@ -43,13 +47,13 @@ protected:
         bool enableOutput,
         const std::string& printPrefix = "");
 
-    virtual std::string manifest() const = 0;
+    virtual std::string manifestInternal() const = 0;
 
     /**
      * Called when the settings are received from the server (even if the values are not changed).
      * Should perform any required (re)initialization. Called even if the settings model is empty.
      */
-    virtual void settingsReceived() {}
+    virtual Result<const IStringMap*> settingsReceived() { return nullptr; }
 
     /**
      * Provides access to the Plugin global settings stored by the server.
@@ -68,7 +72,7 @@ protected:
      * @param outActionUrl If set by this call, Client will open this URL in an embedded browser.
      * @param outMessageToUser If set by this call, Client will show this text to the user.
      */
-    virtual void executeAction(
+    virtual Result<void> executeAction(
         const std::string& /*actionId*/,
         Uuid /*objectId*/,
         Uuid /*deviceId*/,
@@ -76,14 +80,15 @@ protected:
         Ptr<IObjectTrackInfo> /*trackInfo*/,
         const std::map<std::string, std::string>& /*params*/,
         std::string* /*outActionUrl*/,
-        std::string* /*outMessageToUser*/,
-        IError* /*error*/)
+        std::string* /*outMessageToUser*/)
     {
+        return {};
     }
 
     /**
-     * Sends a PluginDiagnosticEvent to the Server. Can be called from any thread, but if called before
-     * settingsReceived() was called, will be ignored in case setHandler() was not called yet.
+     * Sends a PluginDiagnosticEvent to the Server. Can be called from any thread, but if called
+     * before settingsReceived() was called, will be ignored in case setHandler() was not called
+     * yet.
      */
     void pushPluginDiagnosticEvent(
         IPluginDiagnosticEvent::Level level,
@@ -114,11 +119,10 @@ public:
 
 public:
     virtual void setEngineInfo(const IEngineInfo* engineInfo) override;
-    virtual void setSettings(const IStringMap* settings, IError* outError) override;
-    virtual IStringMap* pluginSideSettings(IError* outError) const override;
-    virtual const IString* manifest(IError* outError) const override;
-
-    virtual void executeAction(IAction* action, IError* outError) override;
+    virtual Result<const IStringMap*> setSettings(const IStringMap* settings) override;
+    virtual Result<const ISettingsResponse*> pluginSideSettings() const override;
+    virtual Result<const IString*> manifest() const override;
+    virtual Result<void> executeAction(IAction* action) override;
     virtual void setHandler(IEngine::IHandler* handler) override;
     virtual bool isCompatible(const IDeviceInfo* deviceInfo) const override;
 

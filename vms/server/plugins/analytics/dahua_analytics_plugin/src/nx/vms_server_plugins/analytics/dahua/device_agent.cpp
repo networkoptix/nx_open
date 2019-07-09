@@ -6,6 +6,7 @@
 #include <nx/fusion/model_functions.h>
 
 #include <nx/sdk/helpers/string.h>
+#include <nx/sdk/helpers/error.h>
 
 #include "common.h"
 #include "device_agent.h"
@@ -33,12 +34,13 @@ DeviceAgent::~DeviceAgent()
     stopFetchingMetadata();
 }
 
-void DeviceAgent::setSettings(const IStringMap* /*settings*/, IError* /*outError*/)
+StringMapResult DeviceAgent::setSettings(const IStringMap* /*settings*/)
 {
     // This plugin doesn't use DeviceAgent setting, it just ignores them.
+    return nullptr;
 }
 
-IStringMap* DeviceAgent::pluginSideSettings(IError* /*outError*/) const
+SettingsResponseResult DeviceAgent::pluginSideSettings() const
 {
     return nullptr;
 }
@@ -49,15 +51,15 @@ void DeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
     m_handler.reset(handler);
 }
 
-void DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes, IError* outError)
+VoidResult DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes)
 {
     if (metadataTypes->isEmpty())
         stopFetchingMetadata();
 
-    startFetchingMetadata(metadataTypes, outError);
+    return startFetchingMetadata(metadataTypes);
 }
 
-void DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTypes, IError* outError)
+VoidResult DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTypes)
 {
     auto monitorHandler =
         [this](const EventList& events)
@@ -93,12 +95,11 @@ void DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTypes, IEr
     NX_ASSERT(m_engine);
     std::vector<QString> eventTypes;
 
-
     const auto eventTypeIds = toPtr(metadataTypes->eventTypeIds());
-    if (const char* message = "Event type id list is empty";
-        !NX_ASSERT(eventTypeIds, message))
+    if (const char* const kMessage = "Event type id list is empty";
+        !NX_ASSERT(eventTypeIds, kMessage))
     {
-        outError->setError(ErrorCode::internalError, message);
+        return error(ErrorCode::internalError, kMessage);
     }
 
     for (int i = 0; i < eventTypeIds->count(); ++i)
@@ -113,6 +114,8 @@ void DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTypes, IEr
 
     m_monitor->addHandler(m_uniqueId, monitorHandler);
     m_monitor->startMonitoring();
+
+    return {};
 }
 
 void DeviceAgent::stopFetchingMetadata()
@@ -125,13 +128,10 @@ void DeviceAgent::stopFetchingMetadata()
     m_monitor = nullptr;
 }
 
-const IString* DeviceAgent::manifest(IError* outError) const
+StringResult DeviceAgent::manifest() const
 {
     if (m_jsonManifest.isEmpty())
-    {
-        outError->setError(ErrorCode::otherError, "DeviceAgent manifest is empty");
-        return nullptr;
-    }
+        return error(ErrorCode::otherError, "DeviceAgent manifest is empty");
 
     return new nx::sdk::String(m_jsonManifest);
 }

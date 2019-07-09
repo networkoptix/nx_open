@@ -21,13 +21,12 @@ Engine::Engine(nx::sdk::analytics::IPlugin* plugin):
 {
 }
 
-IDeviceAgent* Engine::obtainDeviceAgent(
-    const IDeviceInfo* deviceInfo, IError* /*outError*/)
+DeviceAgentResult Engine::obtainDeviceAgent(const IDeviceInfo* deviceInfo)
 {
     return new DeviceAgent(this, deviceInfo);
 }
 
-std::string Engine::manifest() const
+std::string Engine::manifestInternal() const
 {
     return /*suppress newline*/1 + R"json(
     "eventTypes": [

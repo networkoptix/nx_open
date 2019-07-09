@@ -18,6 +18,7 @@
 #include <nx/sdk/analytics/helpers/object_metadata_packet.h>
 #include <nx/sdk/analytics/helpers/object_track_best_shot_packet.h>
 #include <nx/sdk/helpers/string_map.h>
+#include <nx/sdk/helpers/settings_response.h>
 
 #include "utils.h"
 #include "stub_analytics_plugin_ini.h"
@@ -127,7 +128,7 @@ DeviceAgent::~DeviceAgent()
  * lists which are treated as white-list filters for the respective set (absent lists are treated
  * as empty lists, thus, disabling all types from the Engine).
  */
-std::string DeviceAgent::manifest() const
+std::string DeviceAgent::manifestInternal() const
 {
     return /*suppress newline*/1 + R"json(
 {
@@ -173,11 +174,13 @@ std::string DeviceAgent::manifest() const
 )json";
 }
 
-void DeviceAgent::settingsReceived()
+Result<const IStringMap*> DeviceAgent::settingsReceived()
 {
     parseSettings();
     updateObjectGenerationParameters();
     updateEventGenerationParameters();
+
+    return nullptr;
 }
 
 /** @param func Name of the caller for logging; supply __func__. */
@@ -248,12 +251,13 @@ bool DeviceAgent::pullMetadataPackets(std::vector<IMetadataPacket*>* metadataPac
     return true;
 }
 
-void DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes, IError* /*outError*/)
+Result<void> DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes)
 {
     if (metadataTypes->isEmpty())
         stopFetchingMetadata();
 
     startFetchingMetadata(metadataTypes);
+    return {};
 }
 
 void DeviceAgent::startFetchingMetadata(const IMetadataTypes* /*metadataTypes*/)
@@ -327,12 +331,12 @@ void DeviceAgent::processPluginDiagnosticEvents()
     }
 }
 
-IStringMap* DeviceAgent::pluginSideSettings(IError* /*outError*/) const
+Result<const ISettingsResponse*> DeviceAgent::pluginSideSettings() const
 {
-    auto settings = new StringMap();
-    settings->addItem("plugin_side_number", "100");
+    auto response = new SettingsResponse();
+    response->setValue("plugin_side_number", "100");
 
-    return settings;
+    return response;
 }
 
 //-------------------------------------------------------------------------------------------------

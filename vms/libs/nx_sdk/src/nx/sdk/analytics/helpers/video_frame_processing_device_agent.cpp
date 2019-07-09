@@ -10,8 +10,10 @@
 #include <nx/sdk/helpers/ptr.h>
 #include <nx/sdk/helpers/string.h>
 #include <nx/sdk/helpers/to_string.h>
-#include <nx/sdk/analytics/helpers/engine.h>
+#include <nx/sdk/helpers/error.h>
 #include <nx/sdk/helpers/plugin_diagnostic_event.h>
+#include <nx/sdk/analytics/helpers/engine.h>
+
 #include <nx/sdk/analytics/i_plugin.h>
 #include <nx/sdk/analytics/i_object_metadata_packet.h>
 #include <nx/sdk/analytics/i_event_metadata_packet.h>
@@ -76,10 +78,10 @@ void VideoFrameProcessingDeviceAgent::setHandler(IDeviceAgent::IHandler* handler
     m_handler.reset(handler);
 }
 
-void VideoFrameProcessingDeviceAgent::pushDataPacket(IDataPacket* dataPacket, IError* outError)
+Result<void> VideoFrameProcessingDeviceAgent::pushDataPacket(IDataPacket* dataPacket)
 {
     const auto logError =
-        [this, outError, func = __func__](ErrorCode errorCode, const std::string& message = "")
+        [this, func = __func__](ErrorCode errorCode, const std::string& message = "")
         {
             if (!message.empty() || errorCode != ErrorCode::noError || (NX_DEBUG_ENABLE_OUTPUT))
             {
@@ -87,7 +89,7 @@ void VideoFrameProcessingDeviceAgent::pushDataPacket(IDataPacket* dataPacket, IE
                     << errorCode << (message.empty() ? "" : ": ") << message;
             }
 
-            outError->setError(errorCode, message.c_str());
+            return error(errorCode, message);
         };
 
     NX_OUTPUT << __func__ << "() BEGIN";
@@ -125,7 +127,7 @@ void VideoFrameProcessingDeviceAgent::pushDataPacket(IDataPacket* dataPacket, IE
 
     processMetadataPackets(metadataPackets);
 
-    logError(ErrorCode::noError);
+    return {};
 }
 
 void VideoFrameProcessingDeviceAgent::processMetadataPackets(
@@ -167,23 +169,21 @@ void VideoFrameProcessingDeviceAgent::processMetadataPacket(
     m_handler->handleMetadata(metadataPacket);
 }
 
-const IString* VideoFrameProcessingDeviceAgent::manifest(IError* /*outError*/) const
+Result<const IString*> VideoFrameProcessingDeviceAgent::manifest() const
 {
-    return new String(manifest());
+    return new String(manifestInternal());
 }
 
-void VideoFrameProcessingDeviceAgent::setSettings(const IStringMap* settings, IError* outError)
+Result<const IStringMap*> VideoFrameProcessingDeviceAgent::setSettings(
+    const IStringMap* settings)
 {
     if (!logUtils.convertAndOutputStringMap(&m_settings, settings, "Received settings"))
-    {
-        outError->setError(ErrorCode::invalidParams, "Settings are invalid");
-        return; //< The error is already logged.
-    }
+        return error(ErrorCode::invalidParams, "Settings are invalid");
 
-    settingsReceived();
+    return settingsReceived();
 }
 
-IStringMap* VideoFrameProcessingDeviceAgent::pluginSideSettings(IError* /*outError*/) const
+Result<const ISettingsResponse*> VideoFrameProcessingDeviceAgent::pluginSideSettings() const
 {
     return nullptr;
 }

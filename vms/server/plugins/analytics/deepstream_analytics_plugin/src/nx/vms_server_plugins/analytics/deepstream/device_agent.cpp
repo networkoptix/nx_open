@@ -38,7 +38,7 @@ DeviceAgent::DeviceAgent(Engine* engine, const std::string& id): m_engine(engine
     m_pipeline->start();
 }
 
-void DeviceAgent::setSettings(const IStringMap* settings, IError* /*outError*/)
+StringMapResult DeviceAgent::setSettings(const IStringMap* settings)
 {
     NX_OUTPUT << __func__ << " Received  settings:";
     NX_OUTPUT << "{";
@@ -51,9 +51,10 @@ void DeviceAgent::setSettings(const IStringMap* settings, IError* /*outError*/)
             << ((i < count - 1) ? "," : "");
     }
     NX_OUTPUT << "}";
+    return nullptr;
 }
 
-IStringMap* DeviceAgent::pluginSideSettings(IError* /*outError*/) const
+SettingsResponseResult DeviceAgent::pluginSideSettings() const
 {
     return nullptr;
 }
@@ -82,7 +83,7 @@ void DeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
     NX_OUTPUT << __func__ << "() END -> noError";
 }
 
-void DeviceAgent::pushDataPacket(IDataPacket* dataPacket, IError* /*outError*/)
+VoidResult DeviceAgent::pushDataPacket(IDataPacket* dataPacket)
 {
 // TODO: Investigate why this code is commented out.
 #if 0
@@ -94,14 +95,16 @@ void DeviceAgent::pushDataPacket(IDataPacket* dataPacket, IError* /*outError*/)
 
     NX_OUTPUT << __func__ << " Pushing data packet to pipeline";
     m_pipeline->pushDataPacket(dataPacket);
+    return {};
 }
 
-void DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes, IError* outError)
+VoidResult DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes)
 {
     if (metadataTypes->isEmpty())    
         stopFetchingMetadata();
 
     startFetchingMetadata(metadataTypes);
+    return {};
 }
 
 void DeviceAgent::startFetchingMetadata(const IMetadataTypes* /*metadataTypes*/)
@@ -114,7 +117,7 @@ void DeviceAgent::stopFetchingMetadata()
     NX_OUTPUT << __func__ << " Stopping to fetch metadata. Doing nothing, actually...";
 }
 
-const IString* DeviceAgent::manifest(IError* /*outError*/) const
+StringResult DeviceAgent::manifest() const
 {    
     if (!m_manifest.empty())
         return new nx::sdk::String(m_manifest);

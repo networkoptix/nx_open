@@ -51,7 +51,7 @@ protected:
         bool enableOutput,
         const std::string& printPrefix = "");
 
-    virtual std::string manifest() const = 0;
+    virtual std::string manifestInternal() const = 0;
 
     /**
      * Override to accept next compressed video frame for processing. Should not block the caller
@@ -107,7 +107,7 @@ protected:
      * Called when the settings are received from the server (even if the values are not changed).
      * Should perform any required (re)initialization. Called even if the settings model is empty.
      */
-    virtual void settingsReceived() {}
+    virtual Result<const IStringMap*> settingsReceived() { return nullptr; }
 
     /**
      * Provides access to the Manager settings stored by the server for a particular Resource.
@@ -140,10 +140,10 @@ public:
 
 public:
     virtual void setHandler(IDeviceAgent::IHandler* handler) override;
-    virtual void pushDataPacket(IDataPacket* dataPacket, IError* outError) override;
-    virtual const IString* manifest(IError* error) const override;
-    virtual void setSettings(const IStringMap* settings, IError* outError) override;
-    virtual IStringMap* pluginSideSettings(IError* outError) const override;
+    virtual Result<void> pushDataPacket(IDataPacket* dataPacket) override;
+    virtual Result<const IString*> manifest() const override;
+    virtual Result<const IStringMap*> setSettings(const IStringMap* settings) override;
+    virtual Result<const ISettingsResponse*> pluginSideSettings() const override;
 
 private:
     void assertEngineCasted(void* engine) const;

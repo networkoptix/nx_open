@@ -22,13 +22,11 @@ public:
 
     /**
      * Supplies data to the engine. Called from a worker thread.
+     *
      * @param dataPacket Never null. Has a valid timestamp >= 0.
-     * @param outError Output parameter for error reporting. Never null. Must contain
-     *     `ErrorCode::noError` error code in the case of success (`outError` object is guarnteed to
-     *     be prefilled with `noError` value, so no additional actions are required) or be properly
-     *     filled in a case of failure.
+     * @return Result containing error information in case of failure.
      */
-    virtual void pushDataPacket(IDataPacket* dataPacket, IError* outError) = 0;
+    virtual Result<void> pushDataPacket(IDataPacket* dataPacket) = 0;
 };
 
 } // namespace analytics

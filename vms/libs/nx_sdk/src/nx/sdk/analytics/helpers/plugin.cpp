@@ -5,6 +5,7 @@
 #include <nx/kit/debug.h>
 
 #include <nx/sdk/helpers/string.h>
+#include <nx/sdk/helpers/error.h>
 
 #include "engine.h"
 
@@ -40,20 +41,19 @@ void Plugin::setUtilityProvider(IUtilityProvider* utilityProvider)
     m_utilityProvider.reset(utilityProvider);
 }
 
-const IString* Plugin::manifest(IError* /*outError*/) const
+Result<const IString*> Plugin::manifest() const
 {
     return new String(m_jsonManifest);
 }
 
-IEngine* Plugin::createEngine(IError* outError)
+Result<IEngine*> Plugin::createEngine()
 {
     IEngine* engine = m_createEngine(this);
     if (!engine)
     {
         const std::string errorMessage{"createEngine() failed"};
         NX_PRINT << "ERROR: " << m_name << ": " << errorMessage;
-        outError->setError(ErrorCode::internalError, errorMessage.c_str());
-        return nullptr;
+        return error(ErrorCode::internalError, errorMessage);
     }
     return engine;
 }

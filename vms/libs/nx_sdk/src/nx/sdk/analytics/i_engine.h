@@ -3,10 +3,13 @@
 #pragma once
 
 #include <nx/sdk/interface.h>
+#include <nx/sdk/result.h>
 
 #include <nx/sdk/i_device_info.h>
 #include <nx/sdk/i_string.h>
 #include <nx/sdk/i_plugin_diagnostic_event.h>
+
+#include <nx/sdk/i_settings_response.h>
 
 #include "i_device_agent.h"
 #include "i_engine_info.h"
@@ -59,14 +62,15 @@ public:
      * pluginSideSettings() (if any), for this Engine instance.
      *
      * @param settings Values of settings declared in the manifest. Never null.
-     * @param outError Output parameter for error reporting. Never null. Must contain
-     *     `ErrorCode::noError` error code in the case of success (`outError` object is guarnteed to
-     *     be prefilled with `noError` value, so no additional actions are required) or be properly
-     *     filled in a case of failure. `setSetting()` method should set information about each
-     *     failed setting via `IError::setDetail()` method (the key is a setting id and the value is
-     *     an error message).
+     * @return Result containing a map of errors that occurred during settings applying. Keys of
+     *     the map are the setting ids and values are human readable error strings. Even if some
+     *     settings can't be applied or an error happened during its applying, this method must
+     *     return a successful result with a corresponding map of errors. A faulty result
+     *     containing error information instead of the map should be returned only in case of some
+     *     general failure affected the settings applying procedure as a whole. May contain null
+     *     no errors occurred.
      */
-    virtual void setSettings(const IStringMap* settings, IError* outError) = 0;
+    virtual Result<const IStringMap*> setSettings(const IStringMap* settings) = 0;
 
     /**
      * In addition to the settings stored in a Server database, an Engine can have some settings
@@ -75,16 +79,13 @@ public:
      * but every time the Server offers the user to edit the values, it calls this method and
      * merges the received values with the ones in its database.
      *
-     * @param outError Output parameter for error reporting. Never null. Must contain
-     *     `ErrorCode::noError` error code in the case of success (`outError` object is guarnteed to
-     *     be prefilled with `noError` value, so no additional actions are required) or be properly
-     *     filled in a case of failure. The `pluginSideSettings()` method should set information
-     *     about each setting it failed to retrieve via `IError::setDetail()` method (the key is a
-     *     setting id and the value is an error message).
-     * @return Engine settings that are stored on the plugin side, or null if there are no such
-     *     settings.
+     * @return Result containing (in case of success) information about settings that are stored on
+     *     the plugin side. Errors corresponding to particular settings should be placed in the
+     *     `ISettingsResponse` object. A faulty result must be returned only in case of general
+     *     error that affects the settings retrieval procedure as a whole. May contain null if
+     *     Engine has no plugin-side settings.
      */
-    virtual IStringMap* pluginSideSettings(IError* outError) const = 0;
+    virtual Result<const ISettingsResponse*> pluginSideSettings() const = 0;
 
     /**
      * Provides a JSON manifest for this Engine instance. See the example of such manifest in
@@ -93,13 +94,10 @@ public:
      * After creation of this Engine instance, this method is called after setSettings(), but can
      * be called again at any other moment to obtain the most actual manifest.
      *
-     * @param outError Output parameter for error reporting. Never null. Must contain
-     *     `ErrorCode::noError` error code in the case of success (`outError` object is guarnteed to
-     *     be prefilled with `noError` value, so no additional actions are required) or be properly
-     *     filled in a case of failure.
-     * @return JSON string in UTF-8.
+     * @return Result containing JSON string in UTF-8 in case of success. Otherwise a result
+     *     containing error information must be returned.
      */
-    virtual const IString* manifest(IError* outError) const = 0;
+    virtual Result<const IString*> manifest() const = 0;
 
     /**
      * @return True if the Engine is able to create DeviceAgents for the provided device, false
@@ -112,14 +110,10 @@ public:
      * given device.
      *
      * @param deviceInfo Information about the device for which a DeviceAgent should be created.
-     * @param outError Output parameter for error reporting. Never null. Must contain
-     *     `ErrorCode::noError` error code in the case of success (`outError` object is guarnteed to
-     *     be prefilled with `noError` value, so no additional actions are required) or be properly
-     *     filled in a case of failure.
-     * @return Pointer to an object that implements DeviceAgent interface, or null in case of
-     *     failure.
+     * @return Result containing a pointer to an object that implements the IDeviceAgent interface,
+     *     or a result containing information about the error in case of failure.
      */
-    virtual IDeviceAgent* obtainDeviceAgent(const IDeviceInfo* deviceInfo, IError* outError) = 0;
+    virtual Result<IDeviceAgent*> obtainDeviceAgent(const IDeviceInfo* deviceInfo) = 0;
 
     /**
      * Action handler. Called when some action defined by this Engine is triggered by Server.
@@ -127,12 +121,9 @@ public:
      * @param action Provides data for the action such as metadata object for which the action has
      *     been triggered, and a means for reporting back action results to Server. This object
      *     should not be used after returning from this function.
-     * @param outError Output parameter for error reporting. Never null. Must contain
-     *     `ErrorCode::noError` error code in the case of success (`outError` object is guarnteed to
-     *     be prefilled with `noError` value, so no additional actions are required) or be properly
-     *     filled in a case of failure.
+     * @return Result containing error information in case of failure.
      */
-    virtual void executeAction(IAction* action, IError* outError) = 0;
+    virtual Result<void> executeAction(IAction* action) = 0;
 
     /**
      * @param handler Generic Engine-related events (errors, warning, info messages)

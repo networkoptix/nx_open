@@ -88,7 +88,7 @@ std::string toJsonString(const IDeviceInfo* deviceInfo, int overallIndent)
     return result;
 }
 
-std::string toString(ErrorCode errorCode)
+std::string toStdString(ErrorCode errorCode)
 {
     switch (errorCode)
     {
@@ -101,18 +101,6 @@ std::string toString(ErrorCode errorCode)
         case ErrorCode::notImplemented: return "notImplemented";
         default: return "<unsupported Error>";
     }
-}
-
-std::string toString(const IError* error)
-{
-    std::string result = std::string("[") + toString(error->errorCode()) + std::string("]: ")
-        + toStdString(error->message());
-
-    auto details = toPtr(error->details());
-    if (details && details->count())
-        result += "\n    Details:\n" + toString(details.get(), 8);
-
-    return result;
 }
 
 } // namespace sdk
