@@ -334,6 +334,12 @@ MjpegParser::MjpegParser()
     m_frameSize = 0;
 }
 
+void MjpegParser::setConfiguredResolution(int width, int height)
+{
+    m_configuredWidth = width;
+    m_configuredHeight = height;
+}
+
 void MjpegParser::setSdpInfo(const Sdp::Media& sdp)
 {
     for (int i = 0; i < sdp.sdpAttributes.size(); ++i)
@@ -434,6 +440,41 @@ bool MjpegParser::processRtpExtensions(const quint8* data, int size)
     return size == 0;
 }
 
+void MjpegParser::fixResolution(int* width, int* height)
+{
+    if (*width == 0)
+        *width += 256;
+
+    if (*height == 0)
+        *height += 256;
+
+
+    if (m_configuredWidth == *width * 8 + 2048)
+        *width = m_configuredWidth / 8;
+
+    if (m_configuredHeight == *height * 8 + 2048)
+        *height = m_configuredHeight / 8;
+
+    if (m_frameWidth > 0)
+        *width = m_frameWidth / 8;
+    if (m_frameHeight > 0)
+        *height = m_frameHeight / 8;
+
+    // Workaround: certain 4K cameras do not provide "a=framesize", and drop MSB from resolution.
+    if (m_frameWidth <= 0 && m_frameHeight <= 0
+        && *width == (3840 - 2048) / 8 && *height == (2160 - 2048) / 8)
+    {
+        if (!resolutionWorkaroundLogged)
+        {
+            resolutionWorkaroundLogged = true;
+            NX_DEBUG(this,
+                "[mjpeg_rtp_parser] Camera reports resolution 1792 x 112, assuming 3840 x 2160 (~4K)");
+        }
+        *width = 3840 / 8;
+        *height = 2160 / 8;
+    }
+}
+
 bool MjpegParser::processData(quint8* rtpBufferBase, int bufferOffset, int bytesRead, bool& gotData)
 {
     gotData = false;
@@ -477,24 +518,7 @@ bool MjpegParser::processData(quint8* rtpBufferBase, int bufferOffset, int bytes
     int width = *curPtr++;
     int height = *curPtr++;
 
-    if (m_frameWidth > 0)
-        width = m_frameWidth / 8;
-    if (m_frameHeight > 0)
-        height = m_frameHeight / 8;
-
-    // Workaround: certain 4K cameras do not provide "a=framesize", and drop MSB from resolution.
-    if (m_frameWidth <= 0 && m_frameHeight <= 0
-        && width == (3840 - 2048) / 8 && height == (2160 - 2048) / 8)
-    {
-        if (!resolutionWorkaroundLogged)
-        {
-            resolutionWorkaroundLogged = true;
-            NX_DEBUG(this, lit(
-                "[mjpeg_rtp_parser] Camera reports resolution 1792 x 112, assuming 3840 x 2160 (~4K)"));
-        }
-        width = 3840 / 8;
-        height = 2160 / 8;
-    }
+    fixResolution(&width, &height);
 
     bytesLeft -= 8;
 

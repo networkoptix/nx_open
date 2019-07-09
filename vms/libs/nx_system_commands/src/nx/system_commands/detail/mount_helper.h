@@ -51,6 +51,11 @@ private:
         const std::string& domain,
         const std::string& ver,
         const std::string& credentialFile);
+    std::string makeCommandString(
+        const std::string& domain,
+        const std::string& ver,
+        const std::string& username,
+        const std::string& password);
     bool checkAndParseUsername();
 };
 

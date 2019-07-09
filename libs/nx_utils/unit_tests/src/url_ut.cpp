@@ -132,6 +132,22 @@ TEST(Url, logging)
     }
 }
 
+TEST(Url, fromUserInput)
+{
+    const auto expectEq =
+        [](const QString& input, const QString& expectedUrl)
+        {
+            EXPECT_EQ(expectedUrl, Url::fromUserInput(input).toString());
+        };
+
+    expectEq("192.168.0.1", "http://192.168.0.1");
+    expectEq("192.168.0.2:7001", "http://192.168.0.2:7001");
+    expectEq("192.168.0.3:7001/api/call", "http://192.168.0.3:7001/api/call");
+
+    expectEq("ya.ru", "http://ya.ru");
+    expectEq("ya.ru:8080", "http://ya.ru:8080");
+    expectEq("ya.ru/index.html", "http://ya.ru/index.html");
+}
 
 } // namespace test
 } // namespace utils

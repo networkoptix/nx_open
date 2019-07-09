@@ -563,6 +563,15 @@ void downloadFileAsyncEx(
     }
 }
 
+AsyncHttpClient::Timeouts defaultDownloadTimeouts()
+{
+    return {
+        AsyncHttpClient::Timeouts::kDefaultSendTimeout,
+        AsyncHttpClient::Timeouts::kDefaultResponseReadTimeout,
+        AsyncHttpClient::Timeouts::kDefaultResponseReadTimeout
+    };
+}
+
 void downloadFileAsyncEx(
     const nx::utils::Url& url,
     DownloadCompletionHandlerEx completionHandlerEx,

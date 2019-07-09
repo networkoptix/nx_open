@@ -732,7 +732,7 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
         }
 
         connect(m_mediaServer.get(), &QnMediaServerResource::propertyChanged, this,
-            &MediaServerProcess::at_metadataStorageIdChanged);
+            &MediaServerProcess::at_serverPropertyChanged);
         initializeAnalyticsEvents();
 
         serverModule()->normalStorageManager()->initDone();
@@ -1052,7 +1052,7 @@ void MediaServerProcess::at_databaseDumped()
     restartServer(500);
 }
 
-void MediaServerProcess::at_metadataStorageIdChanged(const QnResourcePtr& /*resource*/, const QString& key)
+void MediaServerProcess::at_serverPropertyChanged(const QnResourcePtr& /*resource*/, const QString& key)
 {
     if (key == QnMediaServerResource::kMetadataStorageIdKey)
         initializeAnalyticsEvents();
