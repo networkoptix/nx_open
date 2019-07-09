@@ -9,6 +9,11 @@ namespace test {
 
 CameraMock::CameraMock(QnMediaServerModule* serverModule): Camera(serverModule)
 {
+    static std::atomic<int> number{0};
+    const auto current = QString::number(number++);
+    setId(QnUuid::createUuid());
+    setPhysicalId("CMock_" + current);
+    setUrl("http://cmock" + current + ":80/api");
 }
 
 boost::optional<QString> CameraMock::getApiParameter(const QString& id)

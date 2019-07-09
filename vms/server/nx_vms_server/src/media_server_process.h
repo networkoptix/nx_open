@@ -149,7 +149,7 @@ private slots:
     void at_databaseDumped();
     void at_systemIdentityTimeChanged(qint64 value, const QnUuid& sender);
     void at_updatePublicAddress(const QHostAddress& publicIp);
-    void at_metadataStorageIdChanged(const QnResourcePtr& resource, const QString& key);
+    void at_serverPropertyChanged(const QnResourcePtr& resource, const QString& key);
 
 private:
     void updateDisabledVendorsIfNeeded();

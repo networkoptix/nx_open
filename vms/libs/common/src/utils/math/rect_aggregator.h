@@ -8,8 +8,6 @@
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
 
-namespace nx::analytics::db {
-
 /**
  * Aggregates / splits provided rectangles so that the result does not contain
  * interlapping rectangles while preserving association between area and some value.
@@ -51,11 +49,9 @@ public:
 
         QRegion region(rect);
 
-        for (auto it = m_aggregatedRects.begin();
-            it != m_aggregatedRects.end();
-            ++it)
+        for (std::size_t i = 0; i < m_aggregatedRects.size(); ++i)
         {
-            const auto& aggregatedRect = *it;
+            auto& aggregatedRect = m_aggregatedRects[i];
             if (!rect.intersects(aggregatedRect.rect))
                 continue;
 
@@ -70,9 +66,11 @@ public:
             const auto intersection = *intersectionRegion.begin();
             if (aggregatedRect.values.find(value) == aggregatedRect.values.end())
             {
+                // Have to create new rect in m_aggregatedRects with (old values + new value).
                 if (intersection != aggregatedRect.rect)
-                    it = splitRectInplace(it, intersection, value);
-                it->values.insert(value);
+                    splitRectInplace(m_aggregatedRects.begin() + i, intersection, value);
+                else
+                    aggregatedRect.values.insert(value);
             }
             region -= intersection;
 
@@ -117,20 +115,23 @@ private:
     AggregatedRects m_aggregatedRects;
 
     /**
+     * Splits {rect, values} (pointed to by rectIter) to
+     * {newRect, values|newValue} and {rect-newRect, values}.
+     * If {rect-newRect} is not a rect, it is expanded to set of rects with constitute it.
      * @return Iterator pointing to the rect equal to requiredSubRect.
      */
     typename AggregatedRects::iterator splitRectInplace(
         typename AggregatedRects::iterator rectIter,
-        const QRect& requiredSubRect,
-        const Value& value)
+        const QRect& newRect,
+        const Value& newValue)
     {
-        NX_ASSERT(rectIter->rect.contains(requiredSubRect));
+        NX_ASSERT(rectIter->rect.contains(newRect));
 
         const auto posToInsertAt = rectIter - m_aggregatedRects.begin();
         const auto aggregatedRect = std::move(*rectIter);
         m_aggregatedRects.erase(rectIter);
 
-        auto leftover = QRegion(aggregatedRect.rect) - requiredSubRect;
+        auto leftover = QRegion(aggregatedRect.rect) - newRect;
 
         for (const auto& subRect: leftover)
         {
@@ -140,22 +141,23 @@ private:
         }
 
         auto newValues = aggregatedRect.values;
-        newValues.insert(value);
+        newValues.insert(newValue);
 
         return insertNonOverlappingRect(
             m_aggregatedRects.begin() + posToInsertAt,
-            {requiredSubRect, std::move(newValues)});
+            {newRect, std::move(newValues)});
     }
 
     /**
      * If there is adjacent rect with same values, then merges adjacent rects instead of inserting.
      * NOTE: The caller MUST guarantee that data.rect does not intersect with any existing rect.
+     * @return The iterator where data was inserted.
      */
     typename AggregatedRects::iterator insertNonOverlappingRect(
         typename AggregatedRects::iterator pos,
         const AggregatedRect& data)
     {
-        // Checking for adjasent rect to merge to.
+        // Checking for adjacent rect to merge to.
         for (auto it = m_aggregatedRects.begin(); it != m_aggregatedRects.end(); ++it)
         {
             if (it->values == data.values && adjacent(it->rect, data.rect))
@@ -175,5 +177,3 @@ private:
             one.width() * one.height() + two.width() * two.height();
     }
 };
-
-} // namespace nx::analytics::db

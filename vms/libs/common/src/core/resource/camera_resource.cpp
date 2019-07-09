@@ -181,11 +181,14 @@ void QnVirtualCameraResource::updateSourceUrl(const nx::utils::Url& tempUrl,
     if (!storeUrlForRole(role))
         return;
 
-    auto cachedUrl = m_cachedStreamUrls.find(role);
-    bool cachedUrlExists = cachedUrl != m_cachedStreamUrls.end();
+    {
+        QnMutexLocker lock(&m_mutex);
+        auto cachedUrl = m_cachedStreamUrls.find(role);
+        bool cachedUrlExists = cachedUrl != m_cachedStreamUrls.end();
 
-    if (cachedUrlExists && cachedUrl->second == url)
-        return;
+        if (cachedUrlExists && cachedUrl->second == url)
+            return;
+    }
 
     auto urlUpdater =
         [url, role](QString oldValue)

@@ -296,7 +296,7 @@ TEST_F(StunCustomTest, ClientBind)
 {
     typedef std::chrono::seconds s;
     auto& params = const_cast<conf::ConnectionParameters&>(settings.connectionParameters());
-    params.tcpReverseRetryPolicy = nx::network::RetryPolicy(3, s(1), 2, s(7));
+    params.tcpReverseRetryPolicy = nx::network::RetryPolicy(3, s(1), 2, s(7), 0);
     params.tcpReverseHttpTimeouts = nx::network::http::AsyncHttpClient::Timeouts(s(1), s(2), s(3));
     cloudData.expect_getSystem(SYSTEM_ID, AUTH_KEY, 3);
 

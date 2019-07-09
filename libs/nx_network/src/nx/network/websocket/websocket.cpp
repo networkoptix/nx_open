@@ -10,6 +10,8 @@ static const auto kAliveTimeout = std::chrono::seconds(10);
 static const auto kBufferSize = 4096;
 static const auto kMaxIncomingMessageQueueSize = 1000;
 
+using namespace std::placeholders;
+
 WebSocket::WebSocket(
     std::unique_ptr<AbstractStreamSocket> streamSocket,
     SendMode sendMode,
@@ -19,7 +21,7 @@ WebSocket::WebSocket(
     network::websocket::CompressionType compressionType)
     :
     m_socket(std::move(streamSocket)),
-    m_parser(role, this),
+    m_parser(role, std::bind(&WebSocket::gotFrame, this, _1, _2, _3)),
     m_serializer(role == Role::client),
     m_sendMode(sendMode),
     m_receiveMode(receiveMode),
@@ -423,12 +425,6 @@ void WebSocket::sendControlRequest(FrameType type)
                     frameTypeString(type),
                     error));
         });
-}
-
-void WebSocket::handleError(Error err)
-{
-    NX_DEBUG(this, lm("Parse error %1. Closing connection.").arg((int) err));
-    m_failed = true;
 }
 
 QString frameTypeString(FrameType type)

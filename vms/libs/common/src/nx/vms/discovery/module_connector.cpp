@@ -19,7 +19,11 @@ static const QString kUrl(
 
 static const std::chrono::seconds kDefaultDisconnectTimeout(15);
 static const network::RetryPolicy kDefaultRetryPolicy(
-    network::RetryPolicy::kInfiniteRetries, std::chrono::seconds(5), 2, std::chrono::minutes(1));
+    /*maxRetryCount*/ network::RetryPolicy::kInfiniteRetries,
+    /*initialDelay*/ std::chrono::seconds(5),
+    /*delayMultiplier*/ 2,
+    /*maxDelay*/ std::chrono::minutes(1),
+    /*randomRatio*/ 0.2);
 
 ModuleConnector::ModuleConnector(network::aio::AbstractAioThread* thread):
     network::aio::BasicPollable(thread),
@@ -246,7 +250,7 @@ ModuleConnector::Module::Module(ModuleConnector* parent, const QnUuid& id):
     m_reconnectTimer(parent->m_retryPolicy, parent->getAioThread()),
     m_disconnectTimer(parent->getAioThread())
 {
-    NX_DEBUG(this) << "New";
+    NX_DEBUG(this, "Created with %1", parent->m_retryPolicy);
 }
 
 ModuleConnector::Module::~Module()
@@ -385,11 +389,18 @@ void ModuleConnector::Module::connectToGroup(Endpoints::iterator endpointsGroup)
         return;
     }
 
+    // Cancel reconnect timer if the method was called not after timeout.
+    if (m_reconnectTimer.timeToEvent())
+    {
+        NX_VERBOSE(this, "Reconnect was requested %1 before timeout, reseting reconnect delays",
+            m_reconnectTimer.timeToEvent().get());
+        m_reconnectTimer.cancelSync();
+    }
+
     if (endpointsGroup == m_endpoints.end())
     {
         if (!m_id.isNull())
         {
-            m_reconnectTimer.cancelSync();
             m_reconnectTimer.scheduleNextTry([this](){ connectToGroup(m_endpoints.begin()); });
             NX_VERBOSE(this, lm("No more endpoints, retry in %1").arg(m_reconnectTimer.currentDelay()));
             m_parent->m_disconnectedHandler(m_id);
@@ -403,9 +414,6 @@ void ModuleConnector::Module::connectToGroup(Endpoints::iterator endpointsGroup)
 
     NX_VERBOSE(this, lm("Connect to group %1: %2").args(
         endpointsGroup->first, containerString(endpointsGroup->second)));
-
-    if (m_reconnectTimer.timeToEvent())
-        m_reconnectTimer.cancelSync();
 
     // Initiate parallel connects to each endpoint in a group.
     size_t endpointsInProgress = 0;

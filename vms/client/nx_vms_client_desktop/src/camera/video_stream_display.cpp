@@ -665,7 +665,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
 
         if( !scalingStillNeeded )
         {
-            outFrame->copy(m_tmpFrame.data());
+            outFrame->copyFrom(m_tmpFrame.data());
         }
         else if( !(dec->getDecoderCaps() & QnAbstractVideoDecoder::decodedPictureScaling) )
         {
@@ -1066,7 +1066,7 @@ CLVideoDecoderOutputPtr QnVideoStreamDisplay::getScreenshot(bool anyQuality)
     if (m_decoderData.decoder)
         getLastDecodedFrame(m_decoderData.decoder.get(), &outFrame);
     else
-        outFrame->copy(m_lastDisplayedFrame.data());
+        outFrame->copyFrom(m_lastDisplayedFrame.data());
     outFrame->channel = m_lastDisplayedFrame->channel;
     return outFrame;
 }

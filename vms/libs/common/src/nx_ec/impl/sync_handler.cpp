@@ -1,17 +1,8 @@
-/**********************************************************
-* 27 jan 2014
-* a.kolesnikov
-***********************************************************/
-
 #include "sync_handler.h"
 
 #include <nx/utils/thread/mutex.h>
 
 namespace ec2::impl {
-
-SyncHandler::SyncHandler(): m_done(false), m_errorCode(ErrorCode::ok)
-{
-}
 
 void SyncHandler::wait()
 {

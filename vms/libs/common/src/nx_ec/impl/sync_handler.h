@@ -1,10 +1,4 @@
-/**********************************************************
-* 27 jan 2014
-* a.kolesnikov
-***********************************************************/
-
-#ifndef SYNC_HANDLER_H
-#define SYNC_HANDLER_H
+#pragma once
 
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
@@ -13,12 +7,12 @@
 
 namespace ec2::impl {
 
-//!Allows executing ec api methods synchronously
+/**
+ * Allows executing ec api methods synchronously.
+ */
 class SyncHandler
 {
 public:
-    SyncHandler();
-
     void wait();
     ErrorCode errorCode() const;
     void done(int reqID, ErrorCode errorCode);
@@ -26,24 +20,25 @@ public:
 private:
     QnWaitCondition m_cond;
     mutable QnMutex m_mutex;
-    bool m_done;
-    ErrorCode m_errorCode;
+    bool m_done = false;
+    ErrorCode m_errorCode = ErrorCode::ok;
 };
 
 template<class BaseHandler, class OutDataType>
-class CustomSyncHandler
-:
+class CustomSyncHandler:
     public SyncHandler,
     public BaseHandler
 {
 public:
-    CustomSyncHandler(OutDataType* const outParam)
-        : m_outParam(outParam) {}
+    CustomSyncHandler(OutDataType* const outParam):
+        m_outParam(outParam)
+    {
+    }
 
     virtual void done(int reqID, const ErrorCode& errorCode, const OutDataType& _outParam) override
     {
         if (m_outParam)
-            *m_outParam = _outParam;
+            * m_outParam = _outParam;
         SyncHandler::done(reqID, errorCode);
     }
 
@@ -62,7 +57,9 @@ ErrorCode doSyncCall(AsyncFuncType asyncFunc, OutParamType* outParam)
 }
 
 template<class BaseHandler>
-class CustomSyncHandler1: public SyncHandler, public BaseHandler
+class CustomSyncHandler1:
+    public SyncHandler,
+    public BaseHandler
 {
 public:
     virtual void done(int reqID, const ErrorCode& errorCode) override
@@ -81,5 +78,3 @@ ErrorCode doSyncCall(AsyncFuncType asyncFunc)
 }
 
 } // namespace ec2::impl
-
-#endif  //SYNC_HANDLER_H

@@ -10,13 +10,6 @@
 
 using namespace nx::network::websocket;
 
-class TestParserHandler : public ParserHandler
-{
-public:
-    MOCK_METHOD3(gotFrame, void(FrameType type, const nx::Buffer& data, bool fin));
-    MOCK_METHOD1(handleError, void(Error err));
-};
-
 namespace {
 
 using ::testing::_;
@@ -75,7 +68,14 @@ struct ParserTestParams
 class WebsocketParserTest : public ::testing::TestWithParam<ParserTestParams>
 {
 protected:
-    WebsocketParserTest(): m_parser(Role::client, &m_parserHandler/*, GetParam().compressionType*/)
+    WebsocketParserTest(): m_parser(
+        Role::client,
+        [this](FrameType frameType, const nx::Buffer& payload, bool fin)
+        {
+            m_frameTypes.push_back(frameType);
+            m_payload = payload;
+            m_fin = fin;
+        })
     {
         m_defaultPayload = fillDummyPayload(GetParam().payloadSize);
     }
@@ -83,23 +83,6 @@ protected:
     void testWebsocketParserAndSerializer(
         int readSize, int frameCount, FrameType type, bool masked, unsigned int mask)
     {
-        EXPECT_CALL(
-            m_parserHandler, gotFrame(type, m_defaultPayload, _)).Times(1);
-
-        if (frameCount > 1)
-        {
-            EXPECT_CALL(
-                m_parserHandler, gotFrame(FrameType::continuation, m_defaultPayload, true))
-                .Times(1);
-        }
-
-        if (frameCount > 2)
-        {
-            EXPECT_CALL(
-                m_parserHandler, gotFrame(FrameType::continuation, m_defaultPayload, false))
-                .Times(frameCount - 2);
-        }
-
         int messageOffset = 0;
         auto message = prepareMessage(
             m_defaultPayload, frameCount, type, masked, mask, GetParam().compressionType);
@@ -112,11 +95,25 @@ protected:
             if (messageOffset >= message.size())
                 break;
         }
+
+        ASSERT_TRUE(std::any_of(
+            m_frameTypes.cbegin(), m_frameTypes.cend(),
+            [type](auto t) {return t == type; }));
+        ASSERT_EQ(m_defaultPayload, m_payload);
+
+        if (frameCount > 1)
+        {
+            ASSERT_TRUE(m_fin);
+        }
+
+        m_frameTypes.clear();
     }
 
 private:
-    TestParserHandler m_parserHandler;
     Parser m_parser;
+    std::vector<FrameType> m_frameTypes;
+    nx::Buffer m_payload;
+    bool m_fin;
     nx::Buffer m_defaultPayload;
 };
 
