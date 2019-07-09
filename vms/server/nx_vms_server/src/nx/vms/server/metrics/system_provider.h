@@ -5,9 +5,12 @@
 
 namespace nx::vms::server::metrics {
 
+/**
+ * Provides a single system (the system where currnt server participates).
+ */
 class SystemProvider:
     public ServerModuleAware,
-    public utils::metrics::ResourceProvider<std::nullptr_t>
+    public utils::metrics::ResourceProvider<void*>
 {
 public:
     SystemProvider(QnMediaServerModule* serverModule);

@@ -10,7 +10,7 @@ namespace nx::vms::server::metrics {
 
 SystemProvider::SystemProvider(QnMediaServerModule* serverModule):
     ServerModuleAware(serverModule),
-    utils::metrics::ResourceProvider<std::nullptr_t>(makeProviders())
+    utils::metrics::ResourceProvider<void*>(makeProviders())
 {
 }
 

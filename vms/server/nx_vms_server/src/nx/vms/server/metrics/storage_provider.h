@@ -6,6 +6,9 @@
 
 namespace nx::vms::server::metrics {
 
+/**
+ * Provides storages which are bound to the current server.
+ */
 class StorageProvider:
     public ServerModuleAware,
     public utils::metrics::ResourceProvider<QnStorageResource*>
