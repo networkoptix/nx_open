@@ -19,10 +19,9 @@
 #include <nx/vms/api/data/event_rule_data.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <nx/vms/event/action_parameters.h>
+#include <nx/fusion/serialization/json.h>
 
 namespace ec2 {
-
-static const QString kHiddenPasswordFiller = "******";
 
 bool amendOutputDataIfNeeded(const Qn::UserAccessData& accessData,
     QnResourceAccessManager* /*accessManager*/,
@@ -48,28 +47,23 @@ bool amendOutputDataIfNeeded(const Qn::UserAccessData& accessData,
     QnResourceAccessManager* accessManager,
     nx::vms::api::EventRuleData* rule)
 {
-    bool success = false;
-    auto params = QJson::deserialized<nx::vms::event::ActionParameters>(
-        rule->actionParams,
-        nx::vms::event::ActionParameters(),
-        &success);
-    if (success)
-    {
-        nx::utils::Url url = params.url;
-        if (!url.password().isEmpty())
-        {
-            bool isGranted = accessData == Qn::kSystemAccess
-                || accessManager->hasGlobalPermission(accessData, GlobalPermission::admin);
-            if (isGranted)
-                url.setPassword(nx::utils::decodeStringFromHexStringAES128CBC(url.password()));
-            else
-                url.setPassword(kHiddenPasswordFiller);
-            params.url = url.toString();
-            rule->actionParams = QJson::serialized(params);
-            return true;
-        }
-    }
-    return false;
+    nx::vms::event::ActionParameters params;
+    if (!QJson::deserialize<nx::vms::event::ActionParameters>(rule->actionParams, &params))
+        return false;
+
+    nx::utils::Url url = params.url;
+    if (url.password().isEmpty())
+        return false;
+
+    bool isGranted = accessData == Qn::kSystemAccess
+        || accessManager->hasGlobalPermission(accessData, GlobalPermission::admin);
+    if (isGranted)
+        url.setPassword(nx::utils::decodeStringFromHexStringAES128CBC(url.password()));
+    else
+        url.setPassword(kHiddenPasswordFiller);
+    params.url = url.toString();
+    rule->actionParams = QJson::serialized(params);
+    return true;
 }
 
 bool amendOutputDataIfNeeded(const Qn::UserAccessData& accessData,

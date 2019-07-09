@@ -210,20 +210,16 @@ inline void fixRequestDataIfNeeded(nx::vms::api::ResourceParamData* const paramD
 
 inline void fixRequestDataIfNeeded(nx::vms::api::EventRuleData* const paramData)
 {
-    bool success = false;
-    auto params = QJson::deserialized<nx::vms::event::ActionParameters>(
-        paramData->actionParams,
-        nx::vms::event::ActionParameters(),
-        &success);
-    if (success)
+    nx::vms::event::ActionParameters params;
+    if (!QJson::deserialize(paramData->actionParams, &params))
+        return;
+
+    nx::utils::Url url = params.url;
+    if (!url.password().isEmpty())
     {
-        nx::utils::Url url = params.url;
-        if (!url.password().isEmpty())
-        {
-            url.setPassword(nx::utils::encodeHexStringFromStringAES128CBC(url.password()));
-            params.url = url.toString();
-            paramData->actionParams = QJson::serialized(params);
-        }
+        url.setPassword(nx::utils::encodeHexStringFromStringAES128CBC(url.password()));
+        params.url = url.toString();
+        paramData->actionParams = QJson::serialized(params);
     }
 }
 

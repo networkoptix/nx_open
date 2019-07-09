@@ -9,6 +9,8 @@ class QnResourceAccessManager;
 
 namespace ec2 {
 
+static const QString kHiddenPasswordFiller("******");
+
 // Returns true if data has been amended.
 template <typename T>
 bool amendOutputDataIfNeeded(const Qn::UserAccessData&, QnResourceAccessManager*, T*)

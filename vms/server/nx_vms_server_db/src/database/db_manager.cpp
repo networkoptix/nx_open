@@ -1735,13 +1735,13 @@ bool QnDbManager::encryptBusinessRules()
 
     if (!query.prepare(queryStr))
     {
-        NX_ERROR(this, lit("Could not prepare query %1: %2").arg(queryStr).arg(query.lastError().text()));
+        NX_ERROR(this, "Could not prepare query %1: %2", queryStr, query.lastError().text());
         return false;
     }
 
     if (!query.exec())
     {
-        NX_ERROR(this, lit("Could not execute query %1: %2").arg(queryStr).arg(query.lastError().text()));
+        NX_ERROR(this, "Could not execute query %1: %2", queryStr, query.lastError().text());
         return false;
     }
 
@@ -2056,11 +2056,7 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
         return resyncIfNeeded({ ResyncServerAttributes, ResyncResourceProperties });
 
     if (updateName.endsWith(lit("/99_20190704_encrypt_action_parameters.sql")))
-    {
-        if (!encryptBusinessRules())
-            return false;
-        return resyncIfNeeded({ResyncRules});
-    }
+        return encryptBusinessRules() && resyncIfNeeded({ResyncRules});
 
     NX_DEBUG(this, lit("SQL update %1 does not require post-actions.").arg(updateName));
     return true;

@@ -13,13 +13,14 @@
 namespace nx::test {
 
 
+static const QString kTestPassword = "123";
+
 class EventRuleEncryptFt: public ::testing::Test
 {
 protected:
     EventRuleEncryptFt()
     {
         m_server = std::unique_ptr<MediaServerLauncher>(new MediaServerLauncher());
-        m_server->addSetting(QnServer::kNoInitStoragesOnStartup, "1");
     }
 
     void whenServerLaunched()
@@ -34,7 +35,7 @@ protected:
         nx::vms::event::ActionParameters params;
         auto url = nx::utils::Url("http://localhost/ec2/test");
         url.setUserName("admin");
-        url.setPassword("123");
+        url.setPassword(kTestPassword);
         params.url = url.toString();
         m_eventRule.id = QnUuid::createUuid();
         m_eventRule.actionParams = QJson::serialized(params);
@@ -53,7 +54,7 @@ protected:
     {
         nx::vms::api::EventRuleDataList eventRules;
         NX_TEST_API_GET(m_server.get(), "/ec2/getEventRules", &eventRules);
-        thenPasswordShouldBe(eventRules, "123");
+        thenPasswordShouldBe(eventRules, kTestPassword);
     }
 
     void thenNonAdminCanNotSeePassword()
@@ -62,26 +63,29 @@ protected:
         NX_TEST_API_GET(m_server.get(), "/ec2/getEventRules", &eventRules,
             nx::network::http::StatusCode::ok,
             m_nonAdminUser.name, m_nonAdminUser.password);
-        thenPasswordShouldBe(eventRules, "******");
+        thenPasswordShouldBe(eventRules, ec2::kHiddenPasswordFiller);
 
         nx::vms::api::FullInfoData fullInfoData;
         NX_TEST_API_GET(m_server.get(), "/ec2/getFullInfo", &fullInfoData,
             nx::network::http::StatusCode::ok,
             m_nonAdminUser.name, m_nonAdminUser.password);
-        thenPasswordShouldBe(fullInfoData.rules, "******");
+        thenPasswordShouldBe(fullInfoData.rules, ec2::kHiddenPasswordFiller);
 
     }
 
     void thenPasswordShouldBe(const nx::vms::api::EventRuleDataList& eventRules, const QString& password)
     {
+        bool isRuleFound = false;
         for (const auto& rule: eventRules)
         {
             if (rule.id != m_eventRule.id)
                 continue;
             auto params = QJson::deserialized<nx::vms::event::ActionParameters>(rule.actionParams);
             auto url = nx::utils::Url(params.url);
+            isRuleFound = true;
             ASSERT_EQ(password, url.password());
         }
+        ASSERT_TRUE(isRuleFound);
     }
 
     void thenServerSeeDataUnencrypted()
@@ -90,7 +94,7 @@ protected:
         const auto rules = resourcePool->eventRuleManager()->rules();
         nx::vms::api::EventRuleDataList apiRuleList;
         ec2::fromResourceListToApi(rules, apiRuleList);
-        thenPasswordShouldBe(apiRuleList, "123");
+        thenPasswordShouldBe(apiRuleList, kTestPassword);
     }
 
 private:
