@@ -23,14 +23,6 @@ public:
         std::optional<std::chrono::milliseconds> timeline = {}) const;
 
 private:
-    void loadGroupValuesUnlocked(
-        std::map<QString /*id*/, api::metrics::ParameterGroupValues>* group,
-        DataBase::Access dataBaseAccess,
-        const std::vector<api::metrics::ParameterGroupManifest>& manifests,
-        std::optional<std::chrono::milliseconds> timeLine) const;
-
-    Value makeTimeLine(DataBase::Access access, std::chrono::milliseconds timeLine) const;
-
     void applyRulesUnlocked(
         std::map<QString /*id*/, api::metrics::ParameterGroupValues>* group,
         DataBase::Access dataBaseAccess,

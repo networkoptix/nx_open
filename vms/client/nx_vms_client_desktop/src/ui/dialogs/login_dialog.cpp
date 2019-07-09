@@ -41,6 +41,7 @@
 #include <nx/streaming/abstract_archive_stream_reader.h>
 #include <core/resource/avi/filetypesupport.h>
 
+#include <nx/vms/client/desktop/system_logon/data/logon_parameters.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <ui/dialogs/common/message_box.h>
@@ -321,7 +322,7 @@ void QnLoginDialog::accept()
             {
                 case Qn::SuccessConnectionResult:
                 {
-                    // In most cases we will connect succesfully by this url. Sow we can store it.
+                    // In most cases we will connect succesfully by this url. So we can store it.
 
                     const bool autoLogin = ui->autoLoginCheckBox->isChecked();
                     nx::utils::Url lastUrlForLoginDialog = url;
@@ -334,13 +335,13 @@ void QnLoginDialog::accept()
                     const bool storePasswordForTile =
                         haveToStorePassword(connectionInfo.localSystemId, url) || autoLogin;
 
-                    action::Parameters params;
-                    params.setArgument(Qn::UrlRole, url);
-                    params.setArgument(Qn::StoreSessionRole, true);
-                    params.setArgument(Qn::AutoLoginRole, autoLogin);
-                    params.setArgument(Qn::StorePasswordRole, storePasswordForTile);
-                    params.setArgument(Qn::ForceRole, true);
-                    menu()->trigger(action::ConnectAction, params);
+                    LogonParameters parameters(url);
+                    parameters.storePassword = storePasswordForTile;
+                    parameters.autoLogin = autoLogin;
+                    parameters.force = true;
+
+                    menu()->trigger(action::ConnectAction,
+                        action::Parameters().withArgument(Qn::LogonParametersRole, parameters));
 
                     break;
                 }

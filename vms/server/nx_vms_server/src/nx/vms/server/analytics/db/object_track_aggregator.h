@@ -9,8 +9,7 @@
 #include <QtCore/QSize>
 
 #include <analytics/db/analytics_db_types.h>
-
-#include "rect_aggregator.h"
+#include <utils/math/rect_aggregator.h>
 
 namespace nx::analytics::db {
 

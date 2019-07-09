@@ -174,7 +174,7 @@ Example:
 Current state of the values (including values calculated by server). Initially returns JSON values, in
 future will support WebSocket for push notifications and time period quieries. Parameters:
 - noRules (optional) - do not include values from rules if present.
-- timeLine (optional) - return timestamp-value map instead of just values if present. Rules do not
+- timeline (optional) - return timestamp-value map instead of just values if present. Rules do not
   apply in this case.
 
 Format:

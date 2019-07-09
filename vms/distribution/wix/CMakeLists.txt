@@ -85,7 +85,6 @@ if(withNxTool)
             "--qml-root" ${nxtool_qml_root}
             "--qt-root" ${qt.dir}
             "--output" ${nxtool_qml_dir}
-            "--prefer-compiled"
             "--skip-styles"
         )
 

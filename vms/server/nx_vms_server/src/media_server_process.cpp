@@ -300,6 +300,7 @@
 #include <nx/vms/server/metrics/rest_handlers.h>
 #include <nx/vms/server/metrics/server_provider.h>
 #include <nx/vms/server/metrics/storage_provider.h>
+#include <nx/vms/server/metrics/system_provider.h>
 
 using namespace nx::vms::server;
 
@@ -731,7 +732,7 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
         }
 
         connect(m_mediaServer.get(), &QnMediaServerResource::propertyChanged, this,
-            &MediaServerProcess::at_metadataStorageIdChanged);
+            &MediaServerProcess::at_serverPropertyChanged);
         initializeAnalyticsEvents();
 
         serverModule()->normalStorageManager()->initDone();
@@ -1051,7 +1052,7 @@ void MediaServerProcess::at_databaseDumped()
     restartServer(500);
 }
 
-void MediaServerProcess::at_metadataStorageIdChanged(const QnResourcePtr& /*resource*/, const QString& key)
+void MediaServerProcess::at_serverPropertyChanged(const QnResourcePtr& /*resource*/, const QString& key)
 {
     if (key == QnMediaServerResource::kMetadataStorageIdKey)
         initializeAnalyticsEvents();
@@ -2894,7 +2895,7 @@ void MediaServerProcess::registerRestHandlers(
      *
      * %apidoc GET /ec2/metrics/values
      * %param:string noRules Do not include parameters fron rules.
-     * %param:string timeLine Return values with timestamps instead of just values, ignores noRules.
+     * %param:string timeline Return values with timestamps instead of just values, ignores noRules.
      * %return:object Metrics parameter values according to manifest. See metrics.md for details.
      */
     reg("ec2/metrics/", new nx::vms::server::metrics::SystemRestHandler(
@@ -4556,6 +4557,10 @@ void MediaServerProcess::initMetricsController()
         [](){ return (uint64_t) qnSyncTime->currentMSecsSinceEpoch() / 1000; });
 
     m_metricsController->registerGroup(
+        "systems",
+        std::make_unique<nx::vms::server::metrics::SystemProvider>(serverModule()));
+
+    m_metricsController->registerGroup(
         "servers",
         std::make_unique<nx::vms::server::metrics::ServerProvider>(serverModule()));
 
@@ -4568,11 +4573,16 @@ void MediaServerProcess::initMetricsController()
         std::make_unique<nx::vms::server::metrics::StorageProvider>(serverModule()));
 
     m_metricsController->registerGroup(
-        "network",
+        "networks",
         std::make_unique<nx::vms::server::metrics::NetworkProvider>(commonModule()->moduleGUID()));
 
     // TODO: Should be moved into a resource file.
     static const QByteArray kRules(R"json({
+        "systems": {
+            "servers": { "alarms": { "warning": ">100" } },
+            "offlineServers": { "alarms": { "error": ">0" } },
+            "offlineServerEvents": { "alarms": { "warning": ">10" } }
+        },
         "servers": {
             "cpuUsage": { "alarms": { "warning": ">50", "error": ">70" } },
             "misc": {

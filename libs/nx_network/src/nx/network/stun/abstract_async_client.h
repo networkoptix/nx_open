@@ -29,7 +29,8 @@ public:
                 nx::network::RetryPolicy::kInfiniteRetries,
                 std::chrono::milliseconds(500),
                 nx::network::RetryPolicy::kDefaultDelayMultiplier,
-                std::chrono::minutes(1))
+                std::chrono::minutes(1),
+                nx::network::RetryPolicy::kDefaultRandomRatio)
         {}
     };
 

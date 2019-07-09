@@ -49,6 +49,7 @@ public:
     void remove(int first, int count);
 
 private:
+    void doAddItem(QnSystemHealth::MessageType message, const QVariant& params, bool initial);
     void addItem(QnSystemHealth::MessageType message, const QVariant& params);
     void removeItem(QnSystemHealth::MessageType message, const QVariant& params);
     void toggleItem(QnSystemHealth::MessageType message, bool isOn);

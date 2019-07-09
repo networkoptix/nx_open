@@ -553,6 +553,9 @@ CameraDiagnostics::Result Camera::initializeAdvancedParametersProviders()
 
 StreamCapabilityMap Camera::getStreamCapabilityMap(nx::vms::api::StreamIndex streamIndex)
 {
+    if (getUrl().isEmpty())
+        return {};
+
     auto defaultStreamCapability = [this](const StreamCapabilityKey& key)
     {
         nx::media::CameraStreamCapability result;

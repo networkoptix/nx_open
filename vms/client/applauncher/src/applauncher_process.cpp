@@ -163,6 +163,7 @@ int ApplauncherProcess::run()
     {
         if (m_startupParameters.mode == StartupParameters::Mode::Quit)
         {
+            NX_INFO(this, "run() - commanding another applauncher to exit");
             // Asking already-running instance to stop.
             return sendCommandToApplauncher(QuitTask()) == ResultType::ok;
         }
@@ -187,6 +188,8 @@ int ApplauncherProcess::run()
     // Waiting for all running tasks to stop.
     m_taskServer.pleaseStop();
     m_taskServer.wait();
+
+    NX_ALWAYS(this, "run() - exited gracefully");
 
     return 0;
 }

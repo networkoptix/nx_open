@@ -1,10 +1,10 @@
 #include <gtest/gtest.h>
 
-#include <nx/vms/server/analytics/db/rect_aggregator.h>
+#include <utils/math/rect_aggregator.h>
 
 namespace nx::analytics::db::test {
 
-using AggregatedRect = db::RectAggregator<int>::AggregatedRect;
+using AggregatedRect = RectAggregator<int>::AggregatedRect;
 
 /**
  * NOTE: This comparator makes sense for this test only.
@@ -54,7 +54,7 @@ protected:
     }
 
 private:
-    db::RectAggregator<int> m_aggregator;
+    ::RectAggregator<int> m_aggregator;
 
     template<typename ... Args>
     void aggregateInternal(const AggregatedRect& data, const Args&... args)
@@ -169,6 +169,66 @@ TEST_F(RectAggregator, produced_adjacent_rects_with_same_values_are_merged)
     );
 
     assertEqual(expected, actual);
+}
+
+using StringItem = ::RectAggregator<std::string>::AggregatedRect;
+
+static const StringItem kTestData[] = {
+    StringItem{QRect(9,10, 7, 5), {"29a86763-4800-422b-8357-45bc6dfd1359"}},
+    StringItem{QRect(9,10, 8, 4), {"29a86763-4800-422b-8357-45bc6dfd1359"}},
+    StringItem{QRect(9,9, 8, 5), {"29a86763-4800-422b-8357-45bc6dfd1359"}},
+    StringItem{QRect(9,8, 8, 5), {"29a86763-4800-422b-8357-45bc6dfd1359"}},
+    StringItem{QRect(9,7, 8, 5), {"29a86763-4800-422b-8357-45bc6dfd1359"}},
+    StringItem{QRect(9,6, 8, 5), {"29a86763-4800-422b-8357-45bc6dfd1359"}},
+    StringItem{QRect(9,5, 8, 5), {"29a86763-4800-422b-8357-45bc6dfd1359"}},
+    StringItem{QRect(9,4, 8, 5), {"29a86763-4800-422b-8357-45bc6dfd1359"}},
+    StringItem{QRect(9,3, 8, 5), {"29a86763-4800-422b-8357-45bc6dfd1359"}},
+    StringItem{QRect(9,2, 8, 5), {"29a86763-4800-422b-8357-45bc6dfd1359"}},
+    StringItem{QRect(9,2, 8, 4), {"29a86763-4800-422b-8357-45bc6dfd1359"}},
+    StringItem{QRect(10,1, 7, 5), {"29a86763-4800-422b-8357-45bc6dfd1359"}},
+    StringItem{QRect(10,0, 7, 5), {"29a86763-4800-422b-8357-45bc6dfd1359"}},
+    StringItem{QRect(6,6, 11, 6), {"25c66495-6fde-4fd5-9fb2-214747b106de"}},
+    StringItem{QRect(5,7, 12, 6), {"25c66495-6fde-4fd5-9fb2-214747b106de"}},
+    StringItem{QRect(4,7, 12, 6), {"25c66495-6fde-4fd5-9fb2-214747b106de"}},
+    StringItem{QRect(4,8, 11, 6), {"25c66495-6fde-4fd5-9fb2-214747b106de"}},
+    StringItem{QRect(5,8, 11, 6), {"25c66495-6fde-4fd5-9fb2-214747b106de"}},
+    StringItem{QRect(6,8, 12, 6), {"25c66495-6fde-4fd5-9fb2-214747b106de"}},
+    StringItem{QRect(7,8, 12, 6), {"25c66495-6fde-4fd5-9fb2-214747b106de"}},
+    StringItem{QRect(9,8, 11, 6), {"25c66495-6fde-4fd5-9fb2-214747b106de"}},
+    StringItem{QRect(10,8, 11, 6), {"25c66495-6fde-4fd5-9fb2-214747b106de"}},
+    StringItem{QRect(11,8, 12, 6), {"25c66495-6fde-4fd5-9fb2-214747b106de"}},
+    StringItem{QRect(12,7, 12, 7), {"25c66495-6fde-4fd5-9fb2-214747b106de"}},
+    StringItem{QRect(14,7, 11, 6), {"25c66495-6fde-4fd5-9fb2-214747b106de"}},
+    StringItem{QRect(15,7, 11, 6), {"25c66495-6fde-4fd5-9fb2-214747b106de"}},
+    StringItem{QRect(16,7, 12, 6), {"25c66495-6fde-4fd5-9fb2-214747b106de"}},
+    StringItem{QRect(17,7, 12, 6), {"25c66495-6fde-4fd5-9fb2-214747b106de"}},
+    StringItem{QRect(19,7, 11, 6), {"25c66495-6fde-4fd5-9fb2-214747b106de"}},
+    StringItem{QRect(20,7, 11, 6), {"25c66495-6fde-4fd5-9fb2-214747b106de"}},
+    StringItem{QRect(21,7, 12, 6), {"25c66495-6fde-4fd5-9fb2-214747b106de"}},
+    StringItem{QRect(22,7, 12, 6), {"25c66495-6fde-4fd5-9fb2-214747b106de"}},
+    StringItem{QRect(24,7, 11, 6), {"25c66495-6fde-4fd5-9fb2-214747b106de"}},
+    StringItem{QRect(25,7, 11, 6), {"25c66495-6fde-4fd5-9fb2-214747b106de"}},
+    StringItem{QRect(26,7, 12, 6), {"25c66495-6fde-4fd5-9fb2-214747b106de"}},
+    StringItem{QRect(27,7, 12, 6), {"25c66495-6fde-4fd5-9fb2-214747b106de"}},
+    StringItem{QRect(29,7, 11, 6), {"25c66495-6fde-4fd5-9fb2-214747b106de"}},
+    StringItem{QRect(30,7, 11, 6), {"25c66495-6fde-4fd5-9fb2-214747b106de"}},
+    StringItem{QRect(31,7, 12, 6), {"25c66495-6fde-4fd5-9fb2-214747b106de"}},
+    StringItem{QRect(32,7, 12, 6), {"25c66495-6fde-4fd5-9fb2-214747b106de"}},
+    StringItem{QRect(25,11, 19, 11), {"09357097-1ce5-49cd-a210-5f0e6eaf241b"}},
+    StringItem{QRect(25,10, 19, 11), {"09357097-1ce5-49cd-a210-5f0e6eaf241b"}},
+    StringItem{QRect(17,12, 12, 8), {"31ba2512-130e-4342-8d9f-614d42e4596a"}},
+    StringItem{QRect(17,12, 12, 8), {"31ba2512-130e-4342-8d9f-614d42e4596a"}},
+    StringItem{QRect(16,13, 12, 8), {"31ba2512-130e-4342-8d9f-614d42e4596a"}},
+    StringItem{QRect(15,13, 12, 8), {"31ba2512-130e-4342-8d9f-614d42e4596a"}},
+    StringItem{QRect(15,13, 11, 8), {"31ba2512-130e-4342-8d9f-614d42e4596a"}}
+};
+
+TEST_F(RectAggregator, does_not_skip_aggregated_rects_when_splitting)
+{
+    ::RectAggregator<std::string> aggregator;
+
+    for (const auto& item: kTestData)
+        aggregator.add(item.rect, *item.values.begin());
 }
 
 } // namespace nx::analytics::db::test

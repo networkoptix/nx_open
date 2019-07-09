@@ -1,5 +1,4 @@
-#ifndef EC_API_H
-#define EC_API_H
+#pragma once
 
 #include <algorithm>
 #include <functional>
@@ -43,6 +42,7 @@
 #include <nx_ec/managers/abstract_analytics_manager.h>
 #include <nx/vms/api/data/timestamp.h>
 #include <nx/vms/time_sync/abstract_time_sync_manager.h>
+#include <nx_ec/impl/regular_completion_handler.h>
 
 #include "ec_api_fwd.h"
 
@@ -53,7 +53,7 @@ class QnCommonModule;
 namespace nx {
 namespace network { class SocketAddress; }
 
-namespace vms { namespace discovery { class Manager; }}
+namespace vms { namespace discovery { class Manager; } }
 } // namespace nx
 
 //!Contains API classes for the new Server
@@ -62,6 +62,7 @@ namespace vms { namespace discovery { class Manager; }}
     \note All methods are thread-safe
 */
 namespace ec2 {
+
 class ECConnectionNotificationManager;
 class TransactionMessageBusAdapter;
 class P2pMessageBus;
@@ -88,9 +89,9 @@ struct QnPeerTimeInfo
 
 class AbstractResourceNotificationManager: public QObject
 {
-Q_OBJECT
+    Q_OBJECT
 public:
-signals :
+signals:
     void statusChanged(
         const QnUuid& resourceId,
         nx::vms::api::ResourceStatus status,
@@ -133,11 +134,11 @@ public:
     {
         return impl::doSyncCall<impl::GetResourceTypesHandler>(
             [&](const impl::GetResourceTypesHandlerPtr& handler)
-                {
-                    return getResourceTypes(handler);
-                },
+        {
+            return getResourceTypes(handler);
+        },
             resTypeList
-        );
+            );
     }
 
     /*!
@@ -162,7 +163,7 @@ public:
     ErrorCode setResourceStatusSync(const QnUuid& id, Qn::ResourceStatus status)
     {
         QnUuid rezId;
-        int (AbstractResourceManager::*fn)(
+        int (AbstractResourceManager:: * fn)(
             const QnUuid&,
             Qn::ResourceStatus,
             impl::SetResourceStatusHandlerPtr) = &AbstractResourceManager::setResourceStatus;
@@ -192,11 +193,11 @@ public:
     {
         return impl::doSyncCall<impl::GetKvPairsHandler>(
             [=](const impl::GetKvPairsHandlerPtr& handler)
-                {
-                    return this->getKvPairs(resourceId, handler);
-                },
+        {
+            return this->getKvPairs(resourceId, handler);
+        },
             outData
-        );
+            );
     }
 
     /*!
@@ -220,11 +221,11 @@ public:
     {
         return impl::doSyncCall<impl::GetStatusListHandler>(
             [=](const impl::GetStatusListHandlerPtr& handler)
-                {
-                    return this->getStatusList(resourceId, handler);
-                },
+        {
+            return this->getStatusList(resourceId, handler);
+        },
             outData
-        );
+            );
     }
 
     /*!
@@ -249,10 +250,9 @@ public:
     {
         return impl::doSyncCall<impl::SimpleHandler>(
             [=](const impl::SimpleHandlerPtr& handler)
-                {
-                    return this->save(kvPairs, handler);
-                }
-        );
+            {
+                return this->save(kvPairs, handler);
+            });
     }
 
     ErrorCode saveSync(
@@ -260,7 +260,7 @@ public:
         const nx::vms::api::ResourceParamDataList& properties)
     {
         nx::vms::api::ResourceParamWithRefDataList kvPairs;
-        for (const auto& p: properties)
+        for (const auto& p : properties)
             kvPairs.emplace_back(resourceId, p.name, p.value);
         return saveSync(kvPairs);
     }
@@ -291,6 +291,22 @@ public:
                     handler)));
     }
 
+    int remove(
+        const QnUuid& id,
+        nx::utils::MoveOnlyFunc<void(ErrorCode)> handler)
+    {
+        return remove(id,
+            impl::makeRegularCompletionHandler<impl::SimpleHandler>(std::move(handler)));
+    }
+
+    int remove(
+        const QVector<QnUuid>& idList,
+        nx::utils::MoveOnlyFunc<void(ErrorCode)> handler)
+    {
+        return remove(idList,
+            impl::makeRegularCompletionHandler<impl::SimpleHandler>(std::move(handler)));
+    }
+
 protected:
     virtual int getResourceTypes(impl::GetResourceTypesHandlerPtr handler) = 0;
     virtual int setResourceStatus(
@@ -312,9 +328,9 @@ protected:
 
 class AbstractLicenseNotificationManager: public QObject
 {
-Q_OBJECT
+    Q_OBJECT
 public:
-signals :
+signals:
     void licenseChanged(QnLicensePtr license);
     void licenseRemoved(QnLicensePtr license);
 };
@@ -348,11 +364,11 @@ public:
     {
         return impl::doSyncCall<impl::GetLicensesHandler>(
             [=](const impl::GetLicensesHandlerPtr& handler)
-                {
-                    return this->getLicenses(handler);
-                },
+        {
+            return this->getLicenses(handler);
+        },
             licenseList
-        );
+            );
     }
 
     /*!
@@ -371,7 +387,7 @@ public:
 
     ErrorCode addLicensesSync(const QList<QnLicensePtr>& licenses)
     {
-        int (AbstractLicenseManager::*fn)(const QList<QnLicensePtr>&, impl::SimpleHandlerPtr) = &
+        int (AbstractLicenseManager:: * fn)(const QList<QnLicensePtr>&, impl::SimpleHandlerPtr) = &
             AbstractLicenseManager::addLicenses;
         return impl::doSyncCall<impl::SimpleHandler>(
             std::bind(fn, this, licenses, std::placeholders::_1));
@@ -390,7 +406,7 @@ public:
 
     ErrorCode removeLicenseSync(const QnLicensePtr& license)
     {
-        int (AbstractLicenseManager::*fn)(const QnLicensePtr&, impl::SimpleHandlerPtr) = &
+        int (AbstractLicenseManager:: * fn)(const QnLicensePtr&, impl::SimpleHandlerPtr) = &
             AbstractLicenseManager::removeLicense;
         return impl::doSyncCall<impl::SimpleHandler>(
             std::bind(fn, this, license, std::placeholders::_1));
@@ -406,9 +422,9 @@ protected:
 
 class AbstractStoredFileNotificationManager: public QObject
 {
-Q_OBJECT
+    Q_OBJECT
 public:
-signals :
+signals:
     void added(QString filename);
     void updated(QString filename);
     void removed(QString filename);
@@ -443,7 +459,7 @@ public:
 
     ErrorCode getStoredFileSync(const QString& fileName, QByteArray* fileData)
     {
-        int (AbstractStoredFileManager::*fn)(const QString& fname, impl::GetStoredFileHandlerPtr) =
+        int (AbstractStoredFileManager:: * fn)(const QString & fname, impl::GetStoredFileHandlerPtr) =
             &AbstractStoredFileManager::getStoredFile;
         return impl::doSyncCall<impl::GetStoredFileHandler>(
             std::bind(fn, this, fileName, std::placeholders::_1),
@@ -503,19 +519,19 @@ public:
     {
         return impl::doSyncCall<impl::ListDirectoryHandler>(
             [=](const impl::ListDirectoryHandlerPtr& handler)
-                {
-                    return this->listDirectory(folderName, handler);
-                },
+        {
+            return this->listDirectory(folderName, handler);
+        },
             outData
-        );
+            );
     }
 
     ErrorCode addStoredFileSync(const QString& folderName, const QByteArray& data)
     {
-        int (AbstractStoredFileManager::*fn)(
-                const QString&,
-                const QByteArray&,
-                impl::SimpleHandlerPtr) =
+        int (AbstractStoredFileManager:: * fn)(
+            const QString&,
+            const QByteArray&,
+            impl::SimpleHandlerPtr) =
             &AbstractStoredFileManager::addStoredFile;
         return impl::doSyncCall<impl::SimpleHandler>(
             std::bind(fn, this, folderName, data, std::placeholders::_1));
@@ -616,7 +632,7 @@ public:
 
     ErrorCode getDiscoveryDataSync(nx::vms::api::DiscoveryDataList* const discoveryDataList)
     {
-        int (AbstractDiscoveryManager::*fn)(impl::GetDiscoveryDataHandlerPtr) = &
+        int (AbstractDiscoveryManager:: * fn)(impl::GetDiscoveryDataHandlerPtr) = &
             AbstractDiscoveryManager::getDiscoveryData;
         return impl::doSyncCall<impl::GetDiscoveryDataHandler>(
             std::bind(fn, this, std::placeholders::_1),
@@ -645,13 +661,13 @@ typedef std::shared_ptr<AbstractDiscoveryManager> AbstractDiscoveryManagerPtr;
 
 class AbstractTimeNotificationManager: public QObject
 {
-Q_OBJECT
+    Q_OBJECT
 public:
     virtual ~AbstractTimeNotificationManager()
     {
     }
 
-signals :
+signals:
     //!Emitted when synchronized time has been changed
     void timeChanged(qint64 syncTime);
     void primaryTimeServerTimeChanged();
@@ -682,7 +698,7 @@ public:
 
     ErrorCode getCurrentTimeSync(qint64* const time)
     {
-        int (AbstractTimeManager::*fn)(impl::CurrentTimeHandlerPtr) = &AbstractTimeManager::
+        int (AbstractTimeManager:: * fn)(impl::CurrentTimeHandlerPtr) = &AbstractTimeManager::
             getCurrentTimeImpl;
         return impl::doSyncCall<impl::CurrentTimeHandler>(
             std::bind(fn, this, std::placeholders::_1),
@@ -736,15 +752,15 @@ public:
     {
         return impl::doSyncCall<impl::SimpleHandler>(
             [=](const impl::SimpleHandlerPtr& handler)
-                {
-                    return this->changeSystemId(systemId, sysIdTime, tranLogTime, handler);
-                }
+        {
+            return this->changeSystemId(systemId, sysIdTime, tranLogTime, handler);
+        }
         );
     }
 
     ErrorCode cleanupDatabaseSync(bool cleanupDbObjects, bool cleanupTransactionLog)
     {
-        int (AbstractMiscManager::*fn)(bool, bool, impl::SimpleHandlerPtr) = &AbstractMiscManager::
+        int (AbstractMiscManager:: * fn)(bool, bool, impl::SimpleHandlerPtr) = &AbstractMiscManager::
             cleanupDatabase;
         return impl::doSyncCall<impl::SimpleHandler>(
             std::bind(fn, this, cleanupDbObjects, cleanupTransactionLog, std::placeholders::_1));
@@ -764,7 +780,7 @@ public:
 
     ErrorCode markLicenseOverflowSync(bool value, qint64 time)
     {
-        int (AbstractMiscManager::*fn)(bool, qint64, impl::SimpleHandlerPtr) =
+        int (AbstractMiscManager:: * fn)(bool, qint64, impl::SimpleHandlerPtr) =
             &AbstractMiscManager::markLicenseOverflow;
 
         return impl::doSyncCall<impl::SimpleHandler>(
@@ -773,7 +789,7 @@ public:
 
     ErrorCode saveMiscParamSync(const nx::vms::api::MiscData& param)
     {
-        int (AbstractMiscManager::*fn)(const nx::vms::api::MiscData&, impl::SimpleHandlerPtr) =
+        int (AbstractMiscManager:: * fn)(const nx::vms::api::MiscData&, impl::SimpleHandlerPtr) =
             &AbstractMiscManager::saveMiscParam;
 
         return impl::doSyncCall<impl::SimpleHandler>(
@@ -822,17 +838,17 @@ public:
     {
         return impl::doSyncCall<impl::GetMiscParamHandler>(
             [=](const impl::GetMiscParamHandlerPtr& handler)
-                {
-                    return this->getMiscParam(paramName, handler);
-                },
+        {
+            return this->getMiscParam(paramName, handler);
+        },
             outData);
     }
 
     ErrorCode saveSystemMergeHistoryRecord(const nx::vms::api::SystemMergeHistoryRecord& param)
     {
-        int (AbstractMiscManager::*fn)(
-                const nx::vms::api::SystemMergeHistoryRecord&,
-                impl::SimpleHandlerPtr) =
+        int (AbstractMiscManager:: * fn)(
+            const nx::vms::api::SystemMergeHistoryRecord&,
+            impl::SimpleHandlerPtr) =
             &AbstractMiscManager::saveSystemMergeHistoryRecord;
         return impl::doSyncCall<impl::SimpleHandler>(
             std::bind(fn, this, param, std::placeholders::_1));
@@ -851,9 +867,9 @@ public:
     {
         return impl::doSyncCall<impl::GetSystemMergeHistoryHandler>(
             [this](const impl::GetSystemMergeHistoryHandlerPtr& handler)
-                {
-                    return this->getSystemMergeHistory(handler);
-                },
+        {
+            return this->getSystemMergeHistory(handler);
+        },
             outData);
     }
 
@@ -890,7 +906,7 @@ typedef std::shared_ptr<AbstractMiscManager> AbstractMiscManagerPtr;
 */
 class AbstractECConnection: public QObject
 {
-Q_OBJECT
+    Q_OBJECT
 
 public:
     virtual ~AbstractECConnection()
@@ -1014,7 +1030,7 @@ public:
 
     ErrorCode dumpDatabaseToFileSync(const QString& dumpFilePath)
     {
-        int (AbstractECConnection::*fn)(const QString&, impl::SimpleHandlerPtr) = &
+        int (AbstractECConnection:: * fn)(const QString&, impl::SimpleHandlerPtr) = &
             AbstractECConnection::dumpDatabaseToFileAsync;
         return impl::doSyncCall<impl::SimpleHandler>(
             std::bind(fn, this, dumpFilePath, std::placeholders::_1));
@@ -1043,7 +1059,7 @@ public:
         could already have been completed and resulte posted to handler
     */
     //virtual void cancelRequest( int requestID ) = 0;
-signals :
+signals:
     //!Delivers all resources found in Server
     /*!
         This signal is emitted after starting notifications delivery by call to
@@ -1085,7 +1101,7 @@ protected:
 */
 class AbstractECConnectionFactory: public QObject, public /*mixin*/ QnCommonModuleAware
 {
-Q_OBJECT
+    Q_OBJECT
 
 public:
     AbstractECConnectionFactory(QnCommonModule* commonModule);
@@ -1156,10 +1172,9 @@ protected:
         const nx::vms::api::ClientInfoData& clientInfo,
         impl::ConnectHandlerPtr handler) = 0;
 };
-}
 
-Q_DECLARE_METATYPE(ec2::QnPeerTimeInfo) ;
+} // namespace ec2
 
-Q_DECLARE_METATYPE(ec2::QnPeerTimeInfoList) ;
+Q_DECLARE_METATYPE(ec2::QnPeerTimeInfo);
 
-#endif  //EC_API_H
+Q_DECLARE_METATYPE(ec2::QnPeerTimeInfoList);

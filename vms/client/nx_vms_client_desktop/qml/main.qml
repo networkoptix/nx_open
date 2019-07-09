@@ -122,6 +122,11 @@ Control
             width: narrowWidth
 
             anchors { top: titlePanel.bottom; bottom: timelinePanel.top }
+
+            contentItem: RightPanel
+            {
+                id: rightPanelTabs
+            }
         }
 
         // ----------------------------------------------------------------------------------------

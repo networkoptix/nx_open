@@ -1075,6 +1075,15 @@ Handle ServerConnection::getUbJsonResult(
     return executeGet(path, params, callback, targetThread);
 }
 
+Handle ServerConnection::getJsonResult(
+    const QString& path,
+    const QnRequestParamList& params,
+    std::function<void(bool, Handle, QnJsonRestResult response)>&& callback,
+    QThread* targetThread)
+{
+    return executeGet(path, params, callback, targetThread);
+}
+
 Handle ServerConnection::getRawResult(
     const QString& path,
     const QnRequestParamList& params,
@@ -1142,6 +1151,18 @@ Handle ServerConnection::getSystemId(
             callback(success, requestId, QString::fromUtf8(result));
         };
     return executeGet("/api/getSystemId", {}, internalCallback, targetThread);
+}
+
+Handle ServerConnection::doCameraDiagnosticsStep(
+    const QnUuid& cameraId, CameraDiagnostics::Step::Value previousStep,
+    Result<RestResultWithData<QnCameraDiagnosticsReply>>::type&& callback,
+    QThread* targetThread)
+{
+    QnRequestParamList params;
+    params.insert("cameraId", cameraId);
+    params.insert("type", CameraDiagnostics::Step::toString(previousStep));
+
+    return executeGet("/api/doCameraDiagnosticsStep", params, callback, targetThread);
 }
 
 Handle ServerConnection::recordedTimePeriods(
@@ -1632,6 +1653,7 @@ void ServerConnection::onHttpClientDone(
 
     HttpCompletionFunc callback = itr.value();
     m_runningRequests.remove(requestId);
+    lock.unlock();
 
     SystemError::ErrorCode systemError = SystemError::noError;
     nx::network::http::StatusCode::Value statusCode = nx::network::http::StatusCode::ok;
@@ -1649,7 +1671,7 @@ void ServerConnection::onHttpClientDone(
         contentType = httpClient->contentType();
         messageBody = httpClient->fetchMessageBodyBuffer();
     }
-    lock.unlock();
+
     if (callback)
     {
         const auto response = httpClient->response();

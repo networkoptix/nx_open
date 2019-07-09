@@ -24,7 +24,8 @@ EventConnection::EventConnection(
         network::RetryPolicy::kInfiniteRetries,
         std::chrono::milliseconds::zero(),
         2,
-        std::chrono::minutes(1))),
+        std::chrono::minutes(1),
+        network::RetryPolicy::kDefaultRandomRatio)),
     m_state(State::init)
 {
 }

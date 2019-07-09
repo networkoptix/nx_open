@@ -8,6 +8,9 @@ class QnStorageManager;
 
 namespace nx::vms::server::metrics {
 
+/**
+ * Provides a single server (the current one).
+ */
 class ServerProvider:
     public ServerModuleAware,
     public utils::metrics::ResourceProvider<QnMediaServerResource*>

@@ -8,6 +8,8 @@
 #include <nx/utils/scoped_model_operations.h>
 #include <nx/utils/uuid.h>
 
+class QnWorkbenchContext;
+
 namespace nx::vms::client::desktop {
 
 class ProgressListModel:
@@ -18,7 +20,7 @@ class ProgressListModel:
    using base_type = ScopedModelOperations<QAbstractListModel>;
 
 public:
-    ProgressListModel(QObject* parent);
+    ProgressListModel(QnWorkbenchContext* context, QObject* parent = nullptr);
     virtual ~ProgressListModel() override = default;
 
     virtual int rowCount(const QModelIndex& parent = QModelIndex()) const override;

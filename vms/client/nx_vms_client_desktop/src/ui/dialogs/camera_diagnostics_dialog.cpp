@@ -22,6 +22,7 @@
 #include <nx/vms/client/desktop/common/widgets/clipboard_button.h>
 
 using namespace nx::vms::client::desktop;
+using DiagnoseTool = CameraDiagnostics::DiagnoseTool;
 
 QnCameraDiagnosticsDialog::QnCameraDiagnosticsDialog(QWidget *parent, Qt::WindowFlags windowFlags):
     base_type(parent, windowFlags),
@@ -71,12 +72,12 @@ void QnCameraDiagnosticsDialog::restart() {
     stop();
 
     m_tool = new CameraDiagnostics::DiagnoseTool(m_resource->getId(), this);
-    connect(m_tool, SIGNAL(diagnosticsStepStarted(CameraDiagnostics::Step::Value)),
-            this, SLOT(at_tool_diagnosticsStepStarted(CameraDiagnostics::Step::Value)));
-    connect(m_tool, SIGNAL(diagnosticsStepResult(CameraDiagnostics::Step::Value, bool, QString)),
-            this, SLOT(at_tool_diagnosticsStepResult(CameraDiagnostics::Step::Value, bool, QString)));
-    connect(m_tool, SIGNAL(diagnosticsDone(CameraDiagnostics::Step::Value, bool, QString)),
-            this, SLOT(at_tool_diagnosticsDone()));
+    connect(m_tool, &DiagnoseTool::diagnosticsStepStarted,
+            this, &QnCameraDiagnosticsDialog::at_tool_diagnosticsStepStarted);
+    connect(m_tool, &DiagnoseTool::diagnosticsStepResult,
+            this, &QnCameraDiagnosticsDialog::at_tool_diagnosticsStepResult);
+    connect(m_tool, &DiagnoseTool::diagnosticsDone,
+            this, &QnCameraDiagnosticsDialog::at_tool_diagnosticsDone);
     m_tool->start();
 
     m_started = true;
@@ -101,7 +102,6 @@ void QnCameraDiagnosticsDialog::stop() {
 
 void QnCameraDiagnosticsDialog::retranslateUi()
 {
-
     ui->retranslateUi(this);
 
     if (!m_resource)
@@ -129,16 +129,20 @@ void QnCameraDiagnosticsDialog::retranslateUi()
         ) , m_resource));
 }
 
-void QnCameraDiagnosticsDialog::updateOkButtonEnabled() {
+void QnCameraDiagnosticsDialog::updateOkButtonEnabled()
+{
     ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(!m_started || m_finished);
 }
 
-void QnCameraDiagnosticsDialog::clearLog() {
+void QnCameraDiagnosticsDialog::clearLog()
+{
     ui->textEdit->clear();
 }
 
-QString QnCameraDiagnosticsDialog::diagnosticsStepText(int stepType) {
-    switch(stepType) {
+QString QnCameraDiagnosticsDialog::diagnosticsStepText(int stepType)
+{
+    switch(stepType)
+    {
     case CameraDiagnostics::Step::mediaServerAvailability:
         return tr("Confirming server availability.");
     case CameraDiagnostics::Step::cameraAvailability:
@@ -164,19 +168,24 @@ QString QnCameraDiagnosticsDialog::diagnosticsStepText(int stepType) {
     }
 }
 
-void QnCameraDiagnosticsDialog::at_tool_diagnosticsStepStarted(CameraDiagnostics::Step::Value stepType) {
+void QnCameraDiagnosticsDialog::at_tool_diagnosticsStepStarted(int stepType)
+{
     m_lastLine = diagnosticsStepText(stepType);
-
     ui->textEdit->append(m_lastLine);
 }
 
-void QnCameraDiagnosticsDialog::at_tool_diagnosticsStepResult(CameraDiagnostics::Step::Value, bool result, const QString &errorMessage) {
+void QnCameraDiagnosticsDialog::at_tool_diagnosticsStepResult(
+    int /*step*/, bool result, const QString &errorMessage)
+{
     QString message;
     QColor color;
-    if(result) {
+    if (result)
+    {
         message = tr("OK");
         color = QColor(128, 255, 128);
-    } else {
+    }
+    else
+    {
         message = tr("FAILED: %1").arg(errorMessage);
         color = qnGlobals->errorTextColor();
     }
@@ -186,11 +195,10 @@ void QnCameraDiagnosticsDialog::at_tool_diagnosticsStepResult(CameraDiagnostics:
     ui->textEdit->append(lit("<br/>"));
 }
 
-void QnCameraDiagnosticsDialog::at_tool_diagnosticsDone() {
+void QnCameraDiagnosticsDialog::at_tool_diagnosticsDone()
+{
     ui->textEdit->append(tr("Diagnostics complete"));
-
     m_finished = true;
-
     updateOkButtonEnabled();
 }
 

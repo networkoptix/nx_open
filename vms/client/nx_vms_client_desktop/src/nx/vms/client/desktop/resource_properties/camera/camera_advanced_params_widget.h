@@ -4,6 +4,7 @@
 
 #include <core/resource/resource_fwd.h>
 #include <core/resource/camera_advanced_param.h>
+#include <api/server_rest_connection_fwd.h>
 
 #include <utils/common/connective.h>
 #include <nx/utils/uuid.h>
@@ -55,17 +56,20 @@ private:
     void updateCameraAvailability();
     void updateButtonsState();
     void updateParameretsVisibility();
-    QnMediaServerConnectionPtr getServerConnection() const;
+    static rest::QnConnectionPtr getServerConnection(const QnNetworkResourcePtr& camera);
 
     // Returns current values of all parameters that belong to the given group set.
     QnCameraAdvancedParamValueMap groupParameters(const QSet<QString>& groups) const;
 
-    void at_advancedParamChanged(const QString &id, const QString &value);
+    /** Sends setCameraParam request to mediaserver. */
+    bool sendSetCameraParams(const QnNetworkResourcePtr& camera, const QnCameraAdvancedParamValueList& values);
+    /** Sends getCameraParam request to mediaserver. */
+    bool sendGetCameraParams(const QnNetworkResourcePtr& camera, const QStringList& keys);
 
-private slots:
-    void at_advancedSettingsLoaded(int status, const QnCameraAdvancedParamValueList &params, int handle);
-    void at_advancedParam_saved(int status, const QnCameraAdvancedParamValueList &params, int handle);
-    void at_ptzCommandProcessed(int status, const QVariant& reply, int handle);
+private:
+    void at_advancedParamChanged(const QString &id, const QString &value);
+    void at_advancedSettingsLoaded(bool success, int handle, const QnCameraAdvancedParamValueList &params);
+    void at_advancedParam_saved(bool success, int handle, const QnCameraAdvancedParamValueList &params);
 
 private:
     enum class State
