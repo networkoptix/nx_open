@@ -23,6 +23,7 @@ struct ChunkLogEntry
     ChunkOperation action;
     std::string deviceId;
     std::chrono::system_clock::time_point timestamp;
+    std::size_t size = 0;
 };
 
 /**
