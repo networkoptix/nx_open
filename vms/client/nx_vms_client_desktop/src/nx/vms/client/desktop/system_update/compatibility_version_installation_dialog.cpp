@@ -200,8 +200,18 @@ void CompatibilityVersionInstallationDialog::atUpdateCurrentState()
         if (m_private->updateInfoMediaserver.valid()
             && m_private->updateInfoMediaserver.wait_for(kWaitForUpdateInfo) == std::future_status::ready)
         {
-            NX_DEBUG(this, "atUpdateCurrentState() - done with updateInfoMediaserver");
-            processUpdateContents(m_private->updateInfoMediaserver.get());
+            auto updateContents = m_private->updateInfoMediaserver.get();
+            if (updateContents.getVersion() != m_versionToInstall)
+            {
+                NX_ERROR(this, "atUpdateCurrentState() - updateInfoMediaserver mismatch. "
+                    "We need %1 but server returned %2.",
+                    m_versionToInstall, updateContents.getVersion());
+            }
+            else
+            {
+                NX_DEBUG(this, "atUpdateCurrentState() - done with updateInfoMediaserver");
+                processUpdateContents(updateContents);
+            }
             --m_private->requestsLeft;
         }
 
