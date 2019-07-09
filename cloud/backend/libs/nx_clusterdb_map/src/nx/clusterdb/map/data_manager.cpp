@@ -44,20 +44,6 @@ OptionalType getValue(const std::optional<OptionalType>& optional)
     return optional.has_value() ? *optional : OptionalType();
 }
 
-std::optional<std::string> calculateUpperBound(const std::string& keyPrefix)
-{
-    if (!keyPrefix.empty())
-    {
-        std::string upperBound = keyPrefix;
-        for (auto rit = upperBound.rbegin(); rit != upperBound.rend(); ++rit)
-        {
-            if (++(*rit) != 0)
-                return upperBound;
-        }
-    }
-    return std::nullopt;
-}
-
 } // namespace
 
 const char * toString(ResultCode result)
@@ -74,6 +60,20 @@ const char * toString(ResultCode result)
         default:
             return "unknown error";
     }
+}
+
+std::optional<std::string> calculateUpperBound(const std::string& keyPrefix)
+{
+    if (!keyPrefix.empty())
+    {
+        std::string upperBound = keyPrefix;
+        for (auto rit = upperBound.rbegin(); rit != upperBound.rend(); ++rit)
+        {
+            if (++(*rit) != 0)
+                return upperBound;
+        }
+    }
+    return std::nullopt;
 }
 
 //-------------------------------------------------------------------------------------------------

@@ -28,6 +28,28 @@ std::optional<std::string> Cache::find(const std::string& key) const
     return it->second;
 }
 
+std::map<std::string, std::string> Cache::getRange(
+    const std::string& lowerBound,
+    const std::string& upperBound) const
+{
+    QnMutexLocker lock(&m_mutex);
+    return {
+        m_stringCache.lower_bound(lowerBound),
+        m_stringCache.upper_bound(upperBound)};
+}
+
+std::map<std::string, std::string> Cache::getRange(const std::string& lowerBound) const
+{
+    QnMutexLocker lock(&m_mutex);
+    return {m_stringCache.lower_bound(lowerBound), m_stringCache.end()};
+}
+
+std::map<std::string, std::string> Cache::getRangeWithPrefix(const std::string& prefix) const
+{
+    auto upperBound = calculateUpperBound(prefix);
+    return upperBound ? getRange(prefix, *upperBound) : getRange(prefix);
+}
+
 void Cache::initialize()
 {
     m_db->dataManager().getAll(

@@ -21,6 +21,14 @@ public:
 
     std::optional<std::string> find(const std::string& key) const;
 
+    std::map<std::string, std::string> getRange(
+        const std::string& lowerBound,
+        const std::string& upperBound) const;
+
+    std::map<std::string, std::string> getRange(const std::string& lowerBound) const;
+
+    std::map<std::string, std::string> getRangeWithPrefix(const std::string& prefix) const;
+
 private:
     void initialize();
     void subscribeToEvents();
