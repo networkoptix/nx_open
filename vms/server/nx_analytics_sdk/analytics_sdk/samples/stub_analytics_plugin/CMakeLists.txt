@@ -13,7 +13,7 @@ if(UNIX)
     # In Linux, for the plugin .so library, set `rpath` to "$ORIGIN" and do not set `runpath`, thus
     # enabling the lookup of the dependencies in the plugin dir first.
     string(APPEND CMAKE_SHARED_LINKER_FLAGS " -Wl,--disable-new-dtags")
-endif()    
+endif()
 set(CMAKE_SKIP_BUILD_RPATH ON)
 set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
 set(CMAKE_INSTALL_RPATH "$ORIGIN")
