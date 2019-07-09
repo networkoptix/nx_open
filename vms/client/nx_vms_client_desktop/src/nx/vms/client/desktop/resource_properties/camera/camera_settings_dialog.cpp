@@ -403,8 +403,7 @@ bool CameraSettingsDialog::setCameras(const QnVirtualCameraResourceList& cameras
         !force
         && isVisible()
         && d->cameras != cameras
-        && (d->hasChanges()
-            || d->store->state().analytics.loading);
+        && d->hasChanges();
 
     if (askConfirmation)
     {
