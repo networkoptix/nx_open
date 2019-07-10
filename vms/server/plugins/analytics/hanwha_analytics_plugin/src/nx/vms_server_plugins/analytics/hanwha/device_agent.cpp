@@ -108,7 +108,7 @@ VoidResult DeviceAgent::startFetchingMetadata(const IMetadataTypes* /*metadataTy
                 eventMetadataPacket->addItem(eventMetadata.get());
             }
 
-            if (!NX_ASSERT(!m_handler))
+            if (NX_ASSERT(m_handler))
                 m_handler->handleMetadata(eventMetadataPacket);
 
             eventMetadataPacket->releaseRef();
