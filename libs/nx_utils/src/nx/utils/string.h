@@ -336,6 +336,11 @@ String<CharType> maxPrefix(const String<CharType>& one, const String<CharType>& 
  */
 NX_UTILS_API QByteArray formatJsonString(const QByteArray& data);
 
-NX_UTILS_API int stricmp(const std::string& left, const std::string& right);
+/**
+ * Compares two strings case-insensitive.
+ * @return 0 if strings are equal, negative value if left < right, positive if left > right.
+ */
+NX_UTILS_API int stricmp(const std::string_view& left, const std::string_view& right);
+NX_UTILS_API int stricmp(const QByteArray& left, const QByteArray& right);
 
 } // namespace nx::utils
