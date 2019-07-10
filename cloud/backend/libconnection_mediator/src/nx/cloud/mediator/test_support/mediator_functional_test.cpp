@@ -42,6 +42,7 @@ MediatorInstance::MediatorInstance(int flags, const QString& dataDir):
     addArg("-http/addrToListenList", "127.0.0.1:0");
     addArg("-log/logLevel", "DEBUG2");
     addArg("-general/dataDir", dataDir.toLatin1().constData());
+    addArg("-listeningPeerDb/cluster/enableCache", "true");
 }
 
 MediatorInstance::~MediatorInstance()
