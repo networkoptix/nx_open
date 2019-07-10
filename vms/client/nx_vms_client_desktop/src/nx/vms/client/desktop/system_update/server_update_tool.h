@@ -21,8 +21,6 @@
 
 #include <nx/vms/common/p2p/downloader/downloader.h>
 
-#include "update_contents.h"
-
 namespace nx::vms::client::desktop {
 
 class UploadManager;

@@ -12,6 +12,8 @@
 #include <nx/utils/guarded_callback.h>
 #include <ui/workbench/handlers/workbench_connect_handler.h>
 
+#include "update_verification.h"
+
 using namespace std::chrono_literals;
 using ClientUpdateTool = nx::vms::client::desktop::ClientUpdateTool;
 using Clock = std::chrono::steady_clock;

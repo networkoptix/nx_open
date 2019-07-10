@@ -36,6 +36,7 @@
 
 #include "server_update_tool.h"
 #include "server_updates_model.h"
+#include "update_verification.h"
 
 using namespace nx::vms::common::p2p::downloader;
 
