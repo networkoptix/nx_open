@@ -68,7 +68,7 @@ void ArgumentParser::parse(int argc, const char* argv[])
             else
             {
                 // We have unnamed value.
-                m_unnamedArgs.push_back(QString::fromUtf8(arg));
+                m_positionalArgs.push_back(QString::fromUtf8(arg));
             }
         }
     }
@@ -114,9 +114,9 @@ std::multimap<QString, QString> ArgumentParser::allArgs() const
     return m_args;
 }
 
-std::vector<QString> ArgumentParser::getUnnamedArgs() const
+std::vector<QString> ArgumentParser::getPositionalArgs() const
 {
-    return m_unnamedArgs;
+    return m_positionalArgs;
 }
 
 } // namespace utils

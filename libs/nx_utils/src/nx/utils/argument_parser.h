@@ -47,7 +47,7 @@ public:
     /**
      * @return Arguments without name in the order of appearance.
      */
-    std::vector<QString> getUnnamedArgs() const;
+    std::vector<QString> getPositionalArgs() const;
 
 private:
     template<typename ValueType = QString>
@@ -57,7 +57,7 @@ private:
     boost::optional<ValueType> getImpl(const char* name) const;
 
     std::multimap<QString, QString> m_args;
-    std::vector<QString> m_unnamedArgs;
+    std::vector<QString> m_positionalArgs;
 };
 
 template<typename ValueType, typename MainName, typename ... AltNames>

@@ -25,9 +25,9 @@ protected:
         }
     }
 
-    void andTrailingArgsPresent(const std::vector<QString>& expected)
+    void andPositionalArgsPresent(const std::vector<QString>& expected)
     {
-        ASSERT_EQ(expected, m_argumentParser.getUnnamedArgs());
+        ASSERT_EQ(expected, m_argumentParser.getPositionalArgs());
     }
 
 private:
@@ -37,10 +37,10 @@ private:
 TEST_F(ArgumentParser, parsing_args)
 {
     whenParseArgs(
-        {"-o", "file", "unnamed0", "-m", "mode", "--long=value", "unnamed1", "unnamed2"});
+        {"-o", "file", "positional0", "-m", "mode", "--long=value", "positional1", "positional2"});
 
     thenNamedArgsAreFound({{"o", "file"}, {"m", "mode"}, {"long", "value"}});
-    andTrailingArgsPresent({"unnamed0", "unnamed1", "unnamed2"});
+    andPositionalArgsPresent({"positional0", "positional1", "positional2"});
 }
 
 } // namespace nx::utils::test
