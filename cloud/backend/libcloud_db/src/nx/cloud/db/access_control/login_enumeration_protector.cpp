@@ -13,7 +13,8 @@ LoginEnumerationProtector::LoginEnumerationProtector(
     m_delayCalculator(nx::utils::ProgressiveDelayPolicy(
         m_settings.minBlockPeriod,
         kLoginLockPeriodGrowthRate,
-        m_settings.maxBlockPeriod))
+        m_settings.maxBlockPeriod,
+        nx::utils::ProgressiveDelayPolicy::kDefaultRandomRatio))
 {
 }
 
