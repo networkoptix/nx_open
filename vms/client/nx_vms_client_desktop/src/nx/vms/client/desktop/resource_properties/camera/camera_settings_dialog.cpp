@@ -431,6 +431,8 @@ bool CameraSettingsDialog::setCameras(const QnVirtualCameraResourceList& cameras
     d->previewManager->selectCamera(singleCamera);
     d->analyticsEnginesWatcher->setCamera(singleCamera);
 
+    d->previewManager->refreshSelectedCamera();
+
     d->handleCamerasWithDefaultPasswordChanged();
     d->handleCamerasChanged();
 
@@ -441,6 +443,12 @@ void CameraSettingsDialog::reject()
 {
     d->resetChanges();
     base_type::reject();
+}
+
+void CameraSettingsDialog::showEvent(QShowEvent* event)
+{
+    base_type::showEvent(event);
+    d->previewManager->refreshSelectedCamera();
 }
 
 void CameraSettingsDialog::buttonBoxClicked(QDialogButtonBox::StandardButton button)
