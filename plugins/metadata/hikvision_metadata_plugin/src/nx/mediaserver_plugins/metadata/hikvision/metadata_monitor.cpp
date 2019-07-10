@@ -23,6 +23,7 @@ static const QString kMonitorUrlTemplate("/ISAPI/Event/notification/alertStream"
 static const QString kLprUrlTemplate("/ISAPI/Traffic/channels/1/vehicleDetect/plates");
 
 static const int kDefaultHttpPort = 80;
+static const std::chrono::seconds kLprHttpRequestTimeout(15);
 static const std::chrono::minutes kKeepAliveTimeout(2);
 static const std::chrono::seconds kMinReopenInterval(10);
 static const std::chrono::seconds kLprRequestsTimeout(2);
@@ -34,11 +35,11 @@ HikvisionMetadataMonitor::HikvisionMetadataMonitor(
     const QUrl& url,
     const QAuthenticator& auth,
     const std::vector<QnUuid>& eventTypes)
-    : 
-    m_manifest(manifest), 
+    :
+    m_manifest(manifest),
     m_deviceManifest(deviceManifest),
-    m_monitorUrl(buildMonitoringUrl(url, eventTypes)), 
-    m_lprUrl(buildLprUrl(url)), 
+    m_monitorUrl(buildMonitoringUrl(url, eventTypes)),
+    m_lprUrl(buildLprUrl(url)),
     m_auth(auth)
 {
     m_lprTimer.bindToAioThread(m_monitorTimer.getAioThread());
@@ -141,6 +142,7 @@ void HikvisionMetadataMonitor::initEventMonitor()
     httpClient->setTotalReconnectTries(nx_http::AsyncHttpClient::UNLIMITED_RECONNECT_TRIES);
     httpClient->setUserName(m_auth.user());
     httpClient->setUserPassword(m_auth.password());
+    httpClient->setResponseReadTimeout(kKeepAliveTimeout);
     httpClient->setMessageBodyReadTimeout(kKeepAliveTimeout);
 
     m_contentParser = std::make_unique<nx_http::MultipartContentParser>();
@@ -161,7 +163,8 @@ void HikvisionMetadataMonitor::initLprMonitor()
     httpClient->setTotalReconnectTries(nx_http::AsyncHttpClient::UNLIMITED_RECONNECT_TRIES);
     httpClient->setUserName(m_auth.user());
     httpClient->setUserPassword(m_auth.password());
-    httpClient->setMessageBodyReadTimeout(kKeepAliveTimeout);
+    httpClient->setResponseReadTimeout(kLprHttpRequestTimeout);
+    httpClient->setMessageBodyReadTimeout(kLprHttpRequestTimeout);
     m_lprHttpClient = std::move(httpClient);
     sendLprRequest();
 }
@@ -245,8 +248,8 @@ bool HikvisionMetadataMonitor::processEvent(const HikvisionEvent& hikvisionEvent
     if (!hikvisionEvent.typeId.isNull())
         result.push_back(hikvisionEvent);
 
-    auto getEventKey = 
-        [](const HikvisionEvent& event) 
+    auto getEventKey =
+        [](const HikvisionEvent& event)
         {
             QString result = event.typeId.toString();
             if (event.region)
@@ -270,7 +273,7 @@ bool HikvisionMetadataMonitor::processEvent(const HikvisionEvent& hikvisionEvent
 
     if (result.empty())
         return true;
-    
+
     for (const HikvisionEvent& e : result)
         NX_VERBOSE(this, lm("Got event %1, isActive=%2").args(e.caption, e.isActive));
 
