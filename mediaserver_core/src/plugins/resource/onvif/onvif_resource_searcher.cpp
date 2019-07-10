@@ -158,7 +158,8 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddr(const QUrl& _url, cons
     return checkHostAddrInternal(url, auth, isSearchAction);
 }
 
-void OnvifResourceSearcher::setupResourceGroupIfNeed(const QnPlOnvifResourcePtr& resource)
+void OnvifResourceSearcher::setupResourceGroupIfNeed(
+    const QnPlOnvifResourcePtr& resource, const QString& groupId)
 {
     auto resData = qnStaticCommon
         ->dataPool()
@@ -169,7 +170,7 @@ void OnvifResourceSearcher::setupResourceGroupIfNeed(const QnPlOnvifResourcePtr&
 
     if (!shouldAppearAsSingleChannel)
     {
-        resource->setGroupId(resource->getPhysicalId());
+        resource->setGroupId(groupId);
         resource->setDefaultGroupName(resource->getModel() + QLatin1String(" ") + resource->getHostAddress());
     }
 }
@@ -225,7 +226,7 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
             resource->updateToChannel(channel-1);
 
         if (rpResource->getMaxChannels() > 1)
-            setupResourceGroupIfNeed(resource);
+            setupResourceGroupIfNeed(resource, rpResource->getPhysicalId());
 
         resList << resource;
         return resList;
@@ -302,7 +303,7 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
         {
             resource->fetchChannelCount();
             if (resource->getMaxChannels() > 1)
-                setupResourceGroupIfNeed(resource);
+                setupResourceGroupIfNeed(resource, resource->getPhysicalId());
             resList << resource;
 
             bool shouldAppearAsSingleChannel = resData
