@@ -40,7 +40,7 @@ protected:
 
 private:
     std::unique_ptr<OnvifResourceSearcherWsdd> m_wsddSearcher;
-    void setupResourceGroupIfNeed(const QnPlOnvifResourcePtr& resource);
+    void setupResourceGroupIfNeed(const QnPlOnvifResourcePtr& resource, const QString& groupId);
 };
 
 #endif //ENABLE_ONVIF
