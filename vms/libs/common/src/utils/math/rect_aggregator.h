@@ -49,7 +49,7 @@ public:
 
         QRegion region(rect);
 
-        for (std::size_t i = 0; i < m_aggregatedRects.size(); ++i)
+        for (int i = 0; i < (int) m_aggregatedRects.size(); ++i)
         {
             auto& aggregatedRect = m_aggregatedRects[i];
             if (!rect.intersects(aggregatedRect.rect))
@@ -68,9 +68,24 @@ public:
             {
                 // Have to create new rect in m_aggregatedRects with (old values + new value).
                 if (intersection != aggregatedRect.rect)
+                {
                     splitRectInplace(m_aggregatedRects.begin() + i, intersection, value);
+                    // NOTE: As a result of splitting, the number of rects can actually decrease
+                    // since new rects can be merged to existing ones. Example:
+                    // 1 1 1 3 3 3                                              1 1 1 1 1 1
+                    // 1 1 1 3 3 3  splitting rect 3 in the middle may produce  1 1 1 1 1 1
+                    // 2 2 2 3 3 3                                              2 2 2 2 2 2
+                    // 2 2 2 3 3 3                                              2 2 2 2 2 2
+                    // Rect 3 has been merged into rects 1 & 2. So, rect count has actually decreased.
+                    // To address it, processing the current index once more.
+                    // We cannot deadloop here because the region is decreased by non-empty intersection
+                    // at every iteration.
+                    --i;
+                }
                 else
+                {
                     aggregatedRect.values.insert(value);
+                }
             }
             region -= intersection;
 
@@ -117,7 +132,7 @@ private:
     /**
      * Splits {rect, values} (pointed to by rectIter) to
      * {newRect, values|newValue} and {rect-newRect, values}.
-     * If {rect-newRect} is not a rect, it is expanded to set of rects with constitute it.
+     * If {rect-newRect} is not a rect, it is expanded to set of rects which constitute it.
      * @return Iterator pointing to the rect equal to requiredSubRect.
      */
     typename AggregatedRects::iterator splitRectInplace(
@@ -149,7 +164,7 @@ private:
     }
 
     /**
-     * If there is adjacent rect with same values, then merges adjacent rects instead of inserting.
+     * If there is an adjacent rect with same values, then merges adjacent rects instead of inserting.
      * NOTE: The caller MUST guarantee that data.rect does not intersect with any existing rect.
      * @return The iterator where data was inserted.
      */
@@ -175,5 +190,24 @@ private:
         const auto& united = one.united(two);
         return united.width() * united.height() ==
             one.width() * one.height() + two.width() * two.height();
+    }
+
+    void assertNoIntersectionWithAggregatedRects(
+        const QRegion& region, int from = 0, int to = -1)
+    {
+        for (const auto& newRect: region)
+            assertDoesNotIntersect(newRect, from, to);
+    }
+
+    void assertNoIntersectionWithAggregatedRects(
+        const QRect& rect, int from, int to)
+    {
+        if (to == -1)
+            to = (int) m_aggregatedRects.size();
+
+        for (std::size_t j = from; j < to; ++j)
+        {
+            NX_ASSERT(!m_aggregatedRects[j].rect.intersects(rect));
+        }
     }
 };
