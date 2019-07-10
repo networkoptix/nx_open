@@ -31,7 +31,7 @@ angular.module('webadminApp')
                 $scope.errorMessage += ': ' + result.data.errorString;
                 $scope.succeed = false;
             }else {
-                $timeout($uibModalInstance.close('success'), 2000);
+                $timeout(function (){$uibModalInstance.close('success');}, 2000);
             }
         }
         function errorHandler(result){
@@ -91,6 +91,7 @@ angular.module('webadminApp')
         $scope.action = function(){
             $scope.settings.cloudError = false;
             if(connect){
+                $scope.connecting = true;
                 cloudAPI.connect( $scope.settings.systemName, $scope.settings.cloudEmail, $scope.settings.cloudPassword).then(
                     function(message){
                         //2. Save settings to local server

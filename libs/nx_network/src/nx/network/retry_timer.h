@@ -19,18 +19,10 @@ class NX_NETWORK_API RetryPolicy:
 public:
     constexpr static unsigned int kInfiniteRetries = std::numeric_limits<unsigned int>::max();
     constexpr static unsigned int kDefaultMaxRetryCount = 7;
-    constexpr static double kDefaultRandomRatio = 0;
 
     const static RetryPolicy kNoRetries;
 
     unsigned int maxRetryCount;
-
-    /**
-     * Value from [0, 1], which defines random uniform dispersion for the delay. E.g. if
-     * randomRatio=0.3, the resulting delay will be between 0.7 * X and 1.3 * X, where X is delay
-     * calculated by ProgressiveDelayCalculator.
-     */
-    double randomRatio;
 
     RetryPolicy();
     RetryPolicy(
@@ -43,24 +35,6 @@ public:
     bool operator==(const RetryPolicy& rhs) const;
 
     QString toString() const;
-};
-
-class NX_NETWORK_API RetryDelayCalculator
-{
-public:
-    RetryDelayCalculator(const RetryPolicy& retryPolicy);
-
-    std::chrono::milliseconds calculateNewDelay();
-    std::chrono::milliseconds currentDelay() const;
-    unsigned int triesMade() const;
-    unsigned int retriesLeft() const;
-    void reset();
-
-private:
-    const RetryPolicy m_retryPolicy;
-
-    nx::utils::ProgressiveDelayCalculator m_delayCalculator;
-    double m_currentRandomBias;
 };
 
 /**
@@ -100,8 +74,9 @@ protected:
     virtual void stopWhileInAioThread() override;
 
 private:
-    RetryDelayCalculator m_delayCalculator;
+    nx::utils::ProgressiveDelayCalculator m_delayCalculator;
     std::unique_ptr<aio::Timer> m_timer;
+    const RetryPolicy m_retryPolicy;
 };
 
 } // namespace nx::network
