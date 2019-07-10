@@ -79,6 +79,9 @@ int QnStorageSpaceRestHandler::executeGet(
 
     reply.storageProtocols = getStorageProtocols();
     result.setReply(reply);
+    NX_DEBUG(this, "Return %1 storages and %2 protocols%3",
+        reply.storages.size(), reply.storageProtocols.size(),
+        fastRequest ? " on fast request" : "");
 
     return nx::network::http::StatusCode::ok;
 }
@@ -138,10 +141,16 @@ QnStorageSpaceDataList QnStorageSpaceRestHandler::getOptionalStorages(QnCommonMo
     for(const QnPlatformMonitor::PartitionSpace &partition: partitions)
     {
         if (partition.path.indexOf(NX_TEMP_FOLDER_NAME) != -1)
+        {
+            NX_VERBOSE(this, "Ignore temporary optional partition %1", partition);
             continue;
+        }
 
         if (!partitionEnoughSpace(partition.type, partition.sizeBytes))
+        {
+            NX_VERBOSE(this, "Ignore small optional partition %1", partition);
             continue;
+        }
 
         bool hasStorage = std::any_of(
             storagePaths.cbegin(), storagePaths.cend(),
@@ -150,8 +159,11 @@ QnStorageSpaceDataList QnStorageSpaceRestHandler::getOptionalStorages(QnCommonMo
                 return closeDirPath(storagePath).startsWith(partition.path);
             });
 
-        if(hasStorage)
+        if (hasStorage)
+        {
+            NX_VERBOSE(this, "Ignore known optional partition %1", partition);
             continue;
+        }
 
         QnStorageSpaceData data;
         data.url = partition.path + QnAppInfo::mediaFolderName();
@@ -201,6 +213,10 @@ QnStorageSpaceDataList QnStorageSpaceRestHandler::getOptionalStorages(QnCommonMo
             auto fileStorage = storage.dynamicCast<QnFileStorageResource>();
             if (fileStorage && data.isOnline)
                 data.reservedSpace = fileStorage->calcInitialSpaceLimit();
+        }
+        else
+        {
+            NX_VERBOSE(this, "Unable to create storage for partition %1", partition);
         }
 
         result.push_back(data);
