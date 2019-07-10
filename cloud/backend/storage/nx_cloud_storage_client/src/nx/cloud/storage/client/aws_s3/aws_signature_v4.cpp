@@ -6,37 +6,40 @@
 
 namespace nx::cloud::storage::client::aws_s3 {
 
-static constexpr std::string_view kAwsAuthName = "AWS4-HMAC-SHA256";
-static constexpr std::string_view kAws4Request = "aws4_request";
+static const nx::String kAwsAuthName = "AWS4-HMAC-SHA256";
+static const nx::String kAws4Request = "aws4_request";
 
-network::http::header::Authorization SignatureCalculator::calculateAuthorization(
+nx::String SignatureCalculator::calculateAuthorizationHeader(
     const network::http::Request& request,
     const network::http::Credentials& credentials,
     const std::string& region,
     const std::string& service)
 {
-    const auto signature = calculateSignature(request, credentials, region, service);
-    network::http::header::Authorization header;
+    IntermediateValues intermediateValues;
+    const auto signature = calculateSignature(
+        request, credentials, region, service, &intermediateValues);
 
-    // TODO network::http::header::Authorization supports onlyBasic and Digest currently.
-
-    return header;
+    return nx::String("AWS4-HMAC-SHA256 ") +
+        "Credential=" + credentials.username.toUtf8() + "/" + intermediateValues.scope + ","
+        "SignedHeaders=" + intermediateValues.signedHeaders + ","
+        "Signature=" + signature;
 }
 
-nx::Buffer SignatureCalculator::calculateSignature(
+nx::String SignatureCalculator::calculateSignature(
     const network::http::Request& request,
     const network::http::Credentials& credentials,
     const std::string& region,
-    const std::string& service)
+    const std::string& service,
+    IntermediateValues* intermediateValues)
 {
     const auto xAmzDateIter = request.headers.find("x-amz-date");
     if (xAmzDateIter == request.headers.end())
-        return nx::Buffer();
+        return nx::String();
 
     const auto& timestamp = xAmzDateIter->second;
     const auto tokens = timestamp.split('T');
     if (tokens.isEmpty())
-        return nx::Buffer();
+        return nx::String();
     const auto& date = tokens[0];
 
     const auto signKey = calculateSignKey(date, credentials, region, service);
@@ -44,19 +47,23 @@ nx::Buffer SignatureCalculator::calculateSignature(
     HMAC_CTX hmacCtx;
     memset(&hmacCtx, 0, sizeof(hmacCtx));
     if (!HMAC_Init_ex(&hmacCtx, signKey.data(), signKey.size(), EVP_sha256(), NULL))
-        return nx::Buffer();
+        return nx::String();
 
     HMAC_Update(&hmacCtx, (const unsigned char*) kAwsAuthName.data(), kAwsAuthName.size());
     HMAC_Update(&hmacCtx, (const unsigned char*) "\n", 1);
     HMAC_Update(&hmacCtx, (const unsigned char*) timestamp.data(), timestamp.size());
     HMAC_Update(&hmacCtx, (const unsigned char*) "\n", 1);
-    addScope(&hmacCtx, date, region, service);
+    const auto scope =
+        date + "/" + region.c_str() + "/" + service.c_str() + "/" + kAws4Request;
+    HMAC_Update(&hmacCtx, (const unsigned char*) scope.data(), scope.size());
     HMAC_Update(&hmacCtx, (const unsigned char*) "\n", 1);
+    if (intermediateValues)
+        intermediateValues->scope = scope;
 
-    const auto requestHash = calculateCanonicalRequestSha256Hash(request);
+    const auto requestHash = calculateCanonicalRequestSha256Hash(request, intermediateValues);
     HMAC_Update(&hmacCtx, (const unsigned char*) requestHash.data(), requestHash.size());
 
-    nx::Buffer signature(SHA256_DIGEST_LENGTH, 0);
+    nx::String signature(SHA256_DIGEST_LENGTH, 0);
     unsigned int signatureLength = signature.size();
     HMAC_Final(&hmacCtx, (unsigned char*) signature.data(), &signatureLength);
 
@@ -101,7 +108,8 @@ nx::Buffer SignatureCalculator::calculateSignKey(
 }
 
 nx::Buffer SignatureCalculator::calculateCanonicalRequestSha256Hash(
-    const network::http::Request& request)
+    const network::http::Request& request,
+    IntermediateValues* intermediateValues)
 {
     nx::utils::QnCryptographicHash cryptographicHash(
         nx::utils::QnCryptographicHash::Algorithm::Sha256);
@@ -131,17 +139,22 @@ nx::Buffer SignatureCalculator::calculateCanonicalRequestSha256Hash(
     cryptographicHash.addData("\n");
 
     // Signed headers.
+    nx::String signedHeaders;
     bool first = true;
     for (const auto& name: lowCaseHeaderNames)
     {
         if (first)
             first = false;
         else
-            cryptographicHash.addData(";");
+            signedHeaders += ";";
 
-        cryptographicHash.addData(name);
+        signedHeaders += name;
     }
+    cryptographicHash.addData(signedHeaders);
     cryptographicHash.addData("\n");
+
+    if (intermediateValues)
+        intermediateValues->signedHeaders = std::move(signedHeaders);
 
     // Payload hash.
     auto it = request.headers.find("x-amz-content-sha256");

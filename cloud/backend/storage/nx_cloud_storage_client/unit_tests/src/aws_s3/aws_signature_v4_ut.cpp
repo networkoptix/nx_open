@@ -54,16 +54,16 @@ TEST_F(AwsSignatureV4, GET_request_signature)
         signature);
 }
 
-TEST_F(AwsSignatureV4, DISABLED_GET_request_authorization_header)
+TEST_F(AwsSignatureV4, GET_request_authorization_header)
 {
-    const auto header = SignatureCalculator::calculateAuthorization(
+    const auto header = SignatureCalculator::calculateAuthorizationHeader(
         prepareGetRequest(), credentials(), "us-east-1", "s3");
 
     ASSERT_EQ(
         "AWS4-HMAC-SHA256 Credential=AKIAIOSFODNN7EXAMPLE/20130524/us-east-1/s3/aws4_request,"
         "SignedHeaders=host;range;x-amz-content-sha256;x-amz-date,"
         "Signature=f0e8bdb87c964420e857bd35b5d6ed310bd44f0170aba48dd91039c6036bdb41",
-        header.serialized());
+        header);
 }
 
 } // namespace nx::cloud::storage::client::aws_s3::test
