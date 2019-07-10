@@ -196,7 +196,7 @@ private:
         const QRegion& region, int from = 0, int to = -1)
     {
         for (const auto& newRect: region)
-            assertDoesNotIntersect(newRect, from, to);
+            assertNoIntersectionWithAggregatedRects(newRect, from, to);
     }
 
     void assertNoIntersectionWithAggregatedRects(
