@@ -501,7 +501,7 @@ void QnMetaDataV1::serialize(QIODevice* ioDevice) const
     ioDevice->write((const char*) &durationMs, sizeof(int));
     quint8 channel8 = channelNumber;
     ioDevice->write((const char*) &channel8, 1);
-    quint16 reserved  = 0;
+    const quint8 reserved[3] = {0, 0, 0};
     ioDevice->write((const char*) &reserved, 3);
     ioDevice->write(m_data.data(), m_data.size());
 }
