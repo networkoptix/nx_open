@@ -59,9 +59,17 @@ void ArgumentParser::parse(int argc, const char* argv[])
         }
         else
         {
-            //we have value
             if (curParamIter != m_args.end())
+            {
+                // We have named value.
                 curParamIter->second = QString::fromUtf8(arg);
+                curParamIter = m_args.end();
+            }
+            else
+            {
+                // We have unnamed value.
+                m_unnamedArgs.push_back(QString::fromUtf8(arg));
+            }
         }
     }
 }
@@ -96,9 +104,19 @@ bool ArgumentParser::read(const QString& name, size_t* const value) const
     return true;
 }
 
+bool ArgumentParser::contains(const QString& name) const
+{
+    return m_args.count(name) > 0;
+}
+
 std::multimap<QString, QString> ArgumentParser::allArgs() const
 {
     return m_args;
+}
+
+std::vector<QString> ArgumentParser::getUnnamedArgs() const
+{
+    return m_unnamedArgs;
 }
 
 } // namespace utils
