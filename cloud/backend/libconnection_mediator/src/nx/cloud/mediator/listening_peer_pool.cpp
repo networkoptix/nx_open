@@ -194,13 +194,12 @@ ListeningPeerPool::DataLocker ListeningPeerPool::insertAndLockPeerData(
 boost::optional<ListeningPeerPool::ConstDataLocker>
     ListeningPeerPool::findAndLockPeerDataByHostName(const nx::String& hostName) const
 {
-    QnMutexLocker lock(&m_mutex);
-
     // TODO: hostName alias resolution in cloud_db
 
     const auto ids = hostName.split('.');
     if (ids.size() == 2)
     {
+        QnMutexLocker lock(&m_mutex);
         //hostName is serverId.systemId
         const auto& systemId = ids[1];
         const auto& serverId = ids[0];
@@ -215,6 +214,15 @@ boost::optional<ListeningPeerPool::ConstDataLocker>
     else if (ids.size() == 1)
     {
         const auto& systemId = ids[0];
+
+        // NOTE: this function returns nothing if discovery is not enabled, or if
+        // Settings::server().name is empty, so it cannot replace the logic below.
+        // if it returns nothing, the original logic should be used as a fallback.
+        auto dataLocker = findLocalPeerWithBestUplinkSpeed(systemId);
+        if (dataLocker)
+            return dataLocker;
+
+        QnMutexLocker lock(&m_mutex);
         //resolving to any server of a system
         auto peerIter = m_peers.lower_bound(MediaserverData(systemId, nx::String()));
         if (peerIter != m_peers.end() && peerIter->first.systemId == systemId)
@@ -320,6 +328,39 @@ void ListeningPeerPool::closeConnectionAsync(
             peerConnection->closeConnection(SystemError::connectionReset);
             peerConnection.reset();
         });
+}
+
+boost::optional<ListeningPeerPool::ConstDataLocker>
+    ListeningPeerPool::findLocalPeerWithBestUplinkSpeed(const nx::String& systemId) const
+{
+    auto statuses = m_listeningPeerDb->getListeningPeerStatus(nx::toStdString(systemId));
+    if (statuses.empty())
+        return boost::none;
+
+    using Status = std::pair<std::string, ListeningPeerStatus>;
+
+    std::vector<Status> statusesSorted;
+    std::transform(statuses.begin(), statuses.end(), std::back_inserter(statusesSorted),
+        [](std::pair<std::string, ListeningPeerStatus>&& status) { return std::move(status); });
+
+    std::sort(statusesSorted.begin(), statusesSorted.end(),
+        [](const Status& a, const Status& b)
+        {
+            return a.second.uplinkSpeed.bandwidth > b.second.uplinkSpeed.bandwidth;
+        });
+
+    for (const auto& status : statusesSorted)
+    {
+        QnMutexLocker lock(&m_mutex);
+        auto peerIter = m_peers.find(
+            MediaserverData(
+                status.second.systemId.c_str(),
+                status.second.serverId.c_str()));
+        if (peerIter != m_peers.end())
+            return ConstDataLocker(std::move(lock), std::move(peerIter));
+    }
+
+    return boost::none;
 }
 
 } // namespace hpm

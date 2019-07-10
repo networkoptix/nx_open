@@ -18,6 +18,9 @@ struct ListeningPeerDb;
 
 struct ListeningPeerStatus
 {
+    std::string serverId;
+    std::string systemId;
+
     // The list of Mediators that a listeningPeer is connected to.
     std::vector<MediatorEndpoint> connectedEndpoints;
     // The listeningPeers uplink speed.
@@ -44,9 +47,11 @@ public:
      */
     void stop();
 
+    void setThisMediatorEndpoint(const MediatorEndpoint& endpoint);
+
     /**
-    * Get this mediator instance's endpoint.
-    */
+     * Get this mediator instance's endpoint.
+     */
     const MediatorEndpoint& thisMediatorEndpoint() const;
 
     /**
@@ -82,7 +87,6 @@ public:
         const nx::hpm::api::ConnectionSpeed& connectionSpeed,
         nx::utils::MoveOnlyFunc<void(bool)> handler);
 
-
     /**
      * Get the status of the listening peer specified by peerId ([serverId.]systemId])
      * Optionally, if only systemId is given, the map will contain the ListeningPeerStatus for all
@@ -90,10 +94,12 @@ public:
      * one entry.
      * @param peerId either serverId.systemId or systemId.
      * NOTE: the peerId key for each entry in the map is lower case.
+     * NOTE: the peerId key is always serverId.systemId, needed to uniquely identify each peer.
      */
-    std::map<std::string, ListeningPeerStatus> getListeningPeerStatus(const std::string& peerId) const;
+    std::map<std::string, ListeningPeerStatus> getListeningPeerStatus(
+        const std::string& peerId) const;
 
-    /*
+    /**
      * Starts discovery of other mediator instances and synchronizes
      * their ListeningPeerDb entries.
      *
@@ -110,7 +116,6 @@ public:
     std::string nodeId() const;
 
 private:
-    void setThisMediatorEndpoint(const MediatorEndpoint& endpoint);
 
     std::string toInternalStorageFormat(const std::string& peerId) const;
 

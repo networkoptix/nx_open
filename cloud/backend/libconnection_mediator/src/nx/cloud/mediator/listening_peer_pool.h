@@ -136,6 +136,9 @@ private:
         const MediaserverData& peerData,
         nx::network::stun::AbstractServerConnection* connection);
     void closeConnectionAsync(std::shared_ptr<nx::network::stun::ServerConnection> peerConnection);
+
+    boost::optional<ConstDataLocker> findLocalPeerWithBestUplinkSpeed(
+        const nx::String& peerId) const;
 };
 
 } // namespace hpm

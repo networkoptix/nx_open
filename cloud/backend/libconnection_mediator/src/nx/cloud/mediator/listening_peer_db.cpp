@@ -22,7 +22,10 @@ namespace {
 static constexpr char kUplinkSpeedId[] = "#uplinkSpeed";
 static constexpr char kMediatorEndpointId[] = "#mediatorEndpoint";
 
-static std::string parsePeerId(const std::string& key)
+/**
+ * @return an std::pair containing {<serverId>, <systemId>}
+ */
+static std::pair<std::string, std::string> parsePeerId(const std::string& key)
 {
     // Key is expected to be of the form: <systemId>.<serverId>#<keyTypeId>
     // The return value will have the form: <serverId>.<systemId>
@@ -42,12 +45,12 @@ static std::string parsePeerId(const std::string& key)
     boost::split(result, tail, boost::is_any_of("#"));
     if (result.empty())
     {
-        NX_WARNING(NX_SCOPE_TAG, "key: %1 missing expected delimitter: '#'", key);
+        NX_WARNING(NX_SCOPE_TAG, "key: %1 is missing expected delimitter: '#'", key);
         return {};
     }
 
     // reversing systemId.serverId to serverId.systemId.
-    return result[0] + "." + head;
+    return {result[0], head};
 }
 
 template<typename Output>
@@ -139,6 +142,21 @@ void ListeningPeerDb::stop()
     if (m_sqlExecutor)
         m_sqlExecutor->pleaseStopSync();
 }
+
+void ListeningPeerDb::setThisMediatorEndpoint(const MediatorEndpoint& endpoint)
+{
+    m_mediatorEndpoint = endpoint;
+    m_mediatorEndpointString = QJson::serialized(endpoint).toStdString();
+
+    m_syncEngineUrl = nx::network::url::Builder()
+        .setScheme(nx::network::http::kUrlSchemeName)
+        .setHost(endpoint.domainName.c_str())
+        .setPath(nx::network::http::rest::substituteParameters(
+            nx::clusterdb::engine::kBaseSynchronizationPath,
+            {m_settings.map.synchronizationSettings.clusterId}).c_str())
+        .setPort(endpoint.httpPort).toUrl();
+}
+
 
 const MediatorEndpoint& ListeningPeerDb::thisMediatorEndpoint() const
 {
@@ -308,9 +326,13 @@ std::map<std::string, ListeningPeerStatus> ListeningPeerDb::getListeningPeerStat
 
     for (auto element : range)
     {
-        auto peerIdParsed = parsePeerId(element.first);
-        if (peerIdParsed.empty())
+        auto [serverId, systemId] = parsePeerId(element.first);
+        if (serverId.empty() || systemId.empty())
             continue;
+
+        auto peerIdParsed = serverId + "." + systemId;
+        result[peerIdParsed].serverId = std::move(serverId);
+        result[peerIdParsed].systemId = std::move(systemId);
 
         if (element.first.find(kMediatorEndpointId) != std::string::npos)
         {
@@ -356,20 +378,6 @@ std::string ListeningPeerDb::nodeId() const
     return m_map
         ? m_map->synchronizationEngine().peerId().toSimpleString().toStdString()
         : std::string();
-}
-
-void ListeningPeerDb::setThisMediatorEndpoint(const MediatorEndpoint& endpoint)
-{
-    m_mediatorEndpoint = endpoint;
-    m_mediatorEndpointString = QJson::serialized(endpoint).toStdString();
-
-    m_syncEngineUrl = nx::network::url::Builder()
-        .setScheme(nx::network::http::kUrlSchemeName)
-        .setHost(endpoint.domainName.c_str())
-        .setPath(nx::network::http::rest::substituteParameters(
-            nx::clusterdb::engine::kBaseSynchronizationPath,
-            { m_settings.map.synchronizationSettings.clusterId }).c_str())
-        .setPort(endpoint.httpPort).toUrl();
 }
 
 std::string ListeningPeerDb::toInternalStorageFormat(const std::string& peerDomainName) const
