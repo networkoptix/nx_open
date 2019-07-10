@@ -1903,7 +1903,10 @@ void QnWorkbenchNavigator::updateLive()
     m_lastLive = live;
 
     if (live)
+    {
         setSpeed(1.0);
+        setPosition(DATETIME_NOW);
+    }
 
     emit liveChanged();
 }
