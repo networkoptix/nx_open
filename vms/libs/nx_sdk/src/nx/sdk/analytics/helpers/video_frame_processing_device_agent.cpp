@@ -81,14 +81,10 @@ void VideoFrameProcessingDeviceAgent::setHandler(IDeviceAgent::IHandler* handler
 Result<void> VideoFrameProcessingDeviceAgent::pushDataPacket(IDataPacket* dataPacket)
 {
     const auto logError =
-        [this, func = __func__](ErrorCode errorCode, const std::string& message = "")
+        [this, func = __func__](ErrorCode errorCode, const std::string& message)
         {
-            if (!message.empty() || errorCode != ErrorCode::noError || (NX_DEBUG_ENABLE_OUTPUT))
-            {
-                NX_PRINT << func << "() " << ((NX_DEBUG_ENABLE_OUTPUT) ? "END " : "") << "-> "
-                    << errorCode << (message.empty() ? "" : ": ") << message;
-            }
-
+            NX_PRINT << func << "() " << ((NX_DEBUG_ENABLE_OUTPUT) ? "END " : "") << "-> "
+                << errorCode << ": " << message;
             return error(errorCode, message);
         };
 
@@ -119,7 +115,7 @@ Result<void> VideoFrameProcessingDeviceAgent::pushDataPacket(IDataPacket* dataPa
     }
 
     if (!m_handler)
-        return logError(ErrorCode::internalError, "setaHandler() was not called.");
+        return logError(ErrorCode::internalError, "setHandler() was not called.");
 
     std::vector<IMetadataPacket*> metadataPackets;
     if (!pullMetadataPackets(&metadataPackets))
@@ -127,6 +123,7 @@ Result<void> VideoFrameProcessingDeviceAgent::pushDataPacket(IDataPacket* dataPa
 
     processMetadataPackets(metadataPackets);
 
+    NX_OUTPUT << __func__ << "() END";
     return {};
 }
 

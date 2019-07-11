@@ -16,7 +16,7 @@ Error error(ErrorCode errorCode, std::string errorMessage)
         "Error code must differ from `ErrorCode::noError`");
     NX_KIT_ASSERT(!errorMessage.empty(), "Error message must not be empty");
 
-    return { errorCode, new String(std::move(errorMessage)) };
+    return {errorCode, new String(std::move(errorMessage))};
 }
 
 } // namespace sdk
