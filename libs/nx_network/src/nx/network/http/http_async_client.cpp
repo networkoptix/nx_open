@@ -1296,6 +1296,9 @@ void AsyncClient::composeRequest(const nx::network::http::StringType& httpMethod
         m_contentLocationUrl.setPassword(m_user.authToken.value);
 
     prepareRequestHeaders(useHttp11, httpMethod);
+
+    if (m_customRequestPrepareFunc)
+        m_customRequestPrepareFunc(&m_request);
 }
 
 void AsyncClient::prepareRequestLine(bool useHttp11, const nx::network::http::StringType& httpMethod)
@@ -1459,6 +1462,11 @@ void AsyncClient::addRequestHeaders(const HttpHeaders& headers)
 {
     for (HttpHeaders::const_iterator itr = headers.begin(); itr != headers.end(); ++itr)
         m_additionalHeaders.emplace(itr->first, itr->second);
+}
+
+void AsyncClient::setCustomRequestPrepareFunc(CustomRequestPrepareFunc func)
+{
+    m_customRequestPrepareFunc = std::move(func);
 }
 
 void AsyncClient::serializeRequest()

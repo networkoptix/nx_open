@@ -3,16 +3,28 @@
 #include <nx/network/http/buffer_source.h>
 #include <nx/network/url/url_builder.h>
 
+#include "aws_signature_v4.h"
+
 namespace nx::cloud::storage::client::aws_s3 {
+
+static constexpr char kAwsS3ServiceName[] = "s3";
 
 ApiClient::ApiClient(
     const std::string& /*storageClientId*/,
+    const std::string& awsRegion,
     const nx::utils::Url& url,
-    const nx::network::http::Credentials& /*credentials*/)
+    const nx::network::http::Credentials& credentials)
     :
-    m_url(url)
+    m_awsRegion(awsRegion),
+    m_url(url),
+    m_credentials(credentials)
 {
     bindToAioThread(getAioThread());
+}
+
+ApiClient::~ApiClient()
+{
+    pleaseStopSync();
 }
 
 void ApiClient::bindToAioThread(nx::network::aio::AbstractAioThread* aioThread)
@@ -38,7 +50,7 @@ void ApiClient::uploadFile(
         [this, destinationPath, data = std::move(data), handler = std::move(handler)]() mutable
         {
             auto& context = m_requestPool.add(
-                std::make_unique<http::AsyncClient>(),
+                prepareHttpClient(),
                 [this](auto&&... args) { handleUploadResult(std::forward<decltype(args)>(args)...); },
                 std::move(handler));
             context.executor->setTimeouts(m_timeouts);
@@ -62,7 +74,7 @@ void ApiClient::downloadFile(
         [this, path, handler = std::move(handler)]() mutable
         {
             auto& context = m_requestPool.add(
-                std::make_unique<http::AsyncClient>(),
+                prepareHttpClient(),
                 [this](auto&&... args) { handleDownloadResult(std::forward<decltype(args)>(args)...); },
                 std::move(handler));
             context.executor->setTimeouts(m_timeouts);
@@ -78,7 +90,46 @@ void ApiClient::downloadFile(
 void ApiClient::stopWhileInAioThread()
 {
     m_requestPool.pleaseStopSync();
-    // TODO
+}
+
+std::unique_ptr<network::http::AsyncClient> ApiClient::prepareHttpClient()
+{
+    auto client = std::make_unique<network::http::AsyncClient>();
+    client->setCustomRequestPrepareFunc(
+        [this](auto* request) { addAuthorizationToRequest(request); });
+    return client;
+}
+
+void ApiClient::addAuthorizationToRequest(network::http::Request* request)
+{
+    static constexpr char kHexSha256OfEmptyString[] =
+        "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855";
+
+    static constexpr char kUnsignedPayloadHash[] = "UNSIGNED-PAYLOAD";
+
+    // x-amz-content-sha256
+    if (request->requestLine.method == network::http::Method::get)
+        request->headers.emplace("x-amz-content-sha256", kHexSha256OfEmptyString);
+    else
+        request->headers.emplace("x-amz-content-sha256", kUnsignedPayloadHash);
+
+    auto iso8601Date = QDateTime::currentDateTime().toUTC().toString(Qt::ISODate).toUtf8() + "Z";
+    iso8601Date.replace("-", "");
+    iso8601Date.replace(":", "");
+
+    // x-amz-date
+    request->headers.emplace("x-amz-date", iso8601Date);
+
+    if (!m_credentials.username.isEmpty())
+    {
+        const auto authorization = SignatureCalculator::calculateAuthorizationHeader(
+            *request,
+            m_credentials,
+            m_awsRegion,
+            kAwsS3ServiceName);
+
+        request->headers.emplace(network::http::header::Authorization::NAME, authorization);
+    }
 }
 
 void ApiClient::handleUploadResult(
@@ -93,10 +144,7 @@ void ApiClient::handleDownloadResult(
     DownloadHandler userHandler)
 {
     const auto resultCode = getResultCode(*httpClient);
-    if (resultCode != ResultCode::ok)
-        return userHandler(Result(resultCode), nx::Buffer());
-
-    userHandler(resultCode, httpClient->fetchMessageBodyBuffer());
+    return userHandler(Result(resultCode), httpClient->fetchMessageBodyBuffer());
 }
 
 ResultCode ApiClient::getResultCode(const nx::network::http::AsyncClient& httpClient) const

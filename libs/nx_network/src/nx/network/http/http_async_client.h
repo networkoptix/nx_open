@@ -89,6 +89,8 @@ public:
         }
     };
 
+    using CustomRequestPrepareFunc = nx::utils::MoveOnlyFunc<void(Request* request)>;
+
     static constexpr Timeouts kInfiniteTimeouts = {
         std::chrono::milliseconds::zero(),
         std::chrono::milliseconds::zero(),
@@ -322,6 +324,12 @@ public:
     void addRequestHeaders(const HttpHeaders& headers);
     void removeAdditionalHeader(const StringType& key);
     void setAdditionalHeaders(HttpHeaders additionalHeaders);
+
+    /**
+     * @param func Invoked after fully preparing request to be sent.
+     */
+    void setCustomRequestPrepareFunc(CustomRequestPrepareFunc func);
+
     void setAuthType(AuthType value);
     AuthInfoCache::AuthorizationCacheItem authCacheItem() const;
 
@@ -398,6 +406,7 @@ private:
     Timeouts m_timeouts;
     AuthType m_authType;
     HttpHeaders m_additionalHeaders;
+    CustomRequestPrepareFunc m_customRequestPrepareFunc;
     int m_awaitedMessageNumber;
     QString m_remoteEndpointWithProtocol;
     AuthInfoCache::AuthorizationCacheItem m_authCacheItem;

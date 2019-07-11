@@ -1,5 +1,6 @@
 #pragma once
 
+#include <optional>
 #include <string>
 
 #include <nx/network/aio/async_operation_pool.h>
@@ -10,50 +11,9 @@
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/url.h>
 
+#include "api_types.h"
+
 namespace nx::cloud::storage::client::aws_s3 {
-
-enum class ResultCode
-{
-    ok = 0,
-    unauthorized,
-    networkError,
-    error,
-    notImplemented,
-};
-
-constexpr std::string_view toString(ResultCode code)
-{
-    switch (code)
-    {
-        case ResultCode::ok: return "ok";
-        case ResultCode::unauthorized: return "unauthorized";
-        case ResultCode::networkError: return "networkError";
-        case ResultCode::error: return "error";
-        case ResultCode::notImplemented: return "notImplemented";
-    }
-
-    return "unknown";
-}
-
-struct Result
-{
-    ResultCode code = ResultCode::ok;
-    std::string text;
-
-    Result(ResultCode code):
-        code(code),
-        text(toString(code))
-    {
-    }
-
-    Result(ResultCode code, std::string text):
-        code(code),
-        text(std::move(text))
-    {
-    }
-};
-
-//-------------------------------------------------------------------------------------------------
 
 class NX_CLOUD_STORAGE_CLIENT_API ApiClient:
     public nx::network::aio::BasicPollable
@@ -70,8 +30,10 @@ public:
      */
     ApiClient(
         const std::string& storageClientId,
+        const std::string& awsRegion,
         const nx::utils::Url& url,
         const nx::network::http::Credentials& credentials);
+    virtual ~ApiClient();
 
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
 
@@ -92,9 +54,15 @@ protected:
 private:
     using RequestPool = nx::network::aio::AsyncOperationPool<nx::network::http::AsyncClient>;
 
+    const std::string m_awsRegion;
     const nx::utils::Url m_url;
+    const nx::network::http::Credentials m_credentials;
     RequestPool m_requestPool;
     nx::network::http::AsyncClient::Timeouts m_timeouts;
+
+    std::unique_ptr<network::http::AsyncClient> prepareHttpClient();
+
+    void addAuthorizationToRequest(network::http::Request* request);
 
     void handleUploadResult(
         std::unique_ptr<nx::network::http::AsyncClient> httpClient,

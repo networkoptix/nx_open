@@ -25,6 +25,7 @@ protected:
 
         m_client = std::make_unique<aws_s3::ApiClient>(
             "id",
+            "us-east-1",
             nx::network::url::Builder()
                 .setScheme(nx::network::http::kUrlSchemeName)
                 .setEndpoint(m_awsS3Emulator.serverAddress()),
@@ -58,7 +59,7 @@ protected:
 
     void thenUploadCompletesSuccessfully()
     {
-        ASSERT_EQ(ResultCode::ok, m_uploadResults.pop().code);
+        ASSERT_EQ(ResultCode::ok, m_uploadResults.pop().code());
     }
 
     void andFileIsUploaded()
@@ -71,7 +72,7 @@ protected:
     void thenDownloadIsDownloaded()
     {
         auto [result, fileContents] = m_downloadResults.pop();
-        ASSERT_EQ(ResultCode::ok, result.code);
+        ASSERT_EQ(ResultCode::ok, result.code());
         ASSERT_EQ(kExistingFileBody, fileContents);
     }
 
