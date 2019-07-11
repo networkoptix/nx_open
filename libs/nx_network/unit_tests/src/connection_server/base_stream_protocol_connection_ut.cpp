@@ -79,9 +79,9 @@ struct HttpMessageWithIncompleteInfiniteBody: HttpMessageTestData
     {
         fullMessage =
             "HTTP/1.1 200 OK\r\n"
-            "Server: Network Optix\r\n"
             "Connection: close\r\n"
             "Content-Type: video/mp2t\r\n"
+            "Server: Network Optix\r\n"
             "\r\n"
             "Here goes mpeg2-ts video.";
         messageBody = "Here goes mpeg2-ts video.";
@@ -97,10 +97,10 @@ struct HttpMessageWithFiniteBody: HttpMessageTestData
     {
         fullMessage =
             "HTTP/1.1 200 OK\r\n"
-            "Server: Network Optix\r\n"
             "Connection: close\r\n"
-            "Content-Type: video/mp2t\r\n"
             "Content-Length: 25\r\n"
+            "Content-Type: video/mp2t\r\n"
+            "Server: Network Optix\r\n"
             "\r\n"
             "Here goes mpeg2-ts video.";
 
@@ -117,9 +117,9 @@ struct HttpMessageWithoutBody: HttpMessageTestData
     {
         fullMessage =
             "HTTP/1.1 204 No Content\r\n"
-            "Server: Network Optix\r\n"
             "Connection: close\r\n"
             "Content-Type: video/mp2t\r\n"
+            "Server: Network Optix\r\n"
             "\r\n";
     }
 };
