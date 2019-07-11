@@ -9,4 +9,17 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
 	(json),
 	_Fields)
 
+bool ConnectionSpeed::operator==(const ConnectionSpeed& other) const
+{
+    return bandwidth == other.bandwidth && pingTime == other.pingTime;
+}
+
+bool PeerConnectionSpeed::operator==(const PeerConnectionSpeed& other) const
+{
+    return
+        systemId == other.systemId
+        && serverId == other.serverId
+        && connectionSpeed == other.connectionSpeed;
+}
+
 } // namespace nx::hpm::api
