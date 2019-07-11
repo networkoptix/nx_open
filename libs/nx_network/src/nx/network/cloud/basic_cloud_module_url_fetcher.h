@@ -50,7 +50,7 @@ public:
         hpmTcpUrl,
         hpmUdpUrl,
         notificationModuleUrl,
-        speedTestModuleName
+        speedTestModuleUrl
     };
 
     CloudInstanceSelectionAttributeNameset();

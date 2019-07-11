@@ -29,7 +29,7 @@ CloudInstanceSelectionAttributeNameset::CloudInstanceSelectionAttributeNameset()
     registerResource(hpmUdpUrl, "hpm.udpUrl", QVariant::String);
 
     registerResource(notificationModuleUrl, kNotificationModuleName, QVariant::String);
-    registerResource(speedTestModuleName, kSpeedTestModuleName, QVariant::String);
+    registerResource(speedTestModuleUrl, kSpeedTestModuleName, QVariant::String);
 }
 
 } // namespace cloud
