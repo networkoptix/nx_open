@@ -506,7 +506,6 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
     bool isLive = media->flags & QnAbstractMediaData::MediaFlags_LIVE;
     bool isVideo = media->dataType == QnAbstractMediaData::VIDEO;
     bool isAudio = media->dataType == QnAbstractMediaData::AUDIO;
-    bool isMetadata = media->dataType == QnAbstractMediaData::GENERIC_METADATA;
 
     if (isVideo || isAudio)
     {
@@ -514,15 +513,9 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
         bool isSecondaryProvider = media->flags & QnAbstractMediaData::MediaFlags_LowQuality;
 
         if (isSecondaryProvider && m_secondaryLogger)
-        {
-            m_secondaryLogger->pushFrameInfo(
-                std::make_unique<nx::analytics::FrameInfo>(media->timestamp));
-        }
+            m_secondaryLogger->pushData(media);
         else if (m_primaryLogger)
-        {
-            m_primaryLogger->pushFrameInfo(
-                std::make_unique<nx::analytics::FrameInfo>(media->timestamp));
-        }
+            m_primaryLogger->pushData(media);
 
         {
             QnMutexLocker lock( &m_qualityChangeMutex );
@@ -597,14 +590,8 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
     const auto logger =
         ini().analyzeSecondaryStream ? m_secondaryLogger.get() : m_primaryLogger.get();
 
-    if (isMetadata && logger)
-    {
-        nx::common::metadata::DetectionMetadataPacketPtr detectionMetadata =
-            nx::common::metadata::fromMetadataPacket(
-                std::dynamic_pointer_cast<const QnCompressedMetadata>(media));
-
-        logger->pushObjectMetadata(*detectionMetadata);
-    }
+    if (logger)
+        logger->pushData(media);
 
     int trackNum = media->channelNumber;
     if (!m_multiChannelVideo && media->dataType == QnAbstractMediaData::VIDEO)
