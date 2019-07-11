@@ -57,7 +57,7 @@ public:
     DataBaseParameterMonitor(
         const ResourceType& resource,
         const Getter<ResourceType>& getter,
-        DataBase::Access dbAccess,
+        DataBase::Writer dbWriter,
         const Watch<ResourceType>& watch);
 
     Values current() override;
@@ -68,7 +68,7 @@ private:
     void updateValue();
 
 private:
-    const DataBase::Access m_dbAccess;
+    const DataBase::Writer m_dbWriter;
     nx::utils::SharedGuardPtr m_watchGuard;
 };
 
@@ -111,11 +111,11 @@ template<typename ResourceType>
 DataBaseParameterMonitor<ResourceType>::DataBaseParameterMonitor(
     const ResourceType& resource,
     const Getter<ResourceType>& getter,
-    DataBase::Access dbAccess,
+    DataBase::Writer dbWriter,
     const Watch<ResourceType>& watch)
 :
     RuntimeParameterMonitor<ResourceType>(resource, std::move(getter)),
-    m_dbAccess(dbAccess),
+    m_dbWriter(dbWriter),
     m_watchGuard(watch(resource, [this](){ updateValue(); }))
 {
     updateValue();
@@ -124,14 +124,14 @@ DataBaseParameterMonitor<ResourceType>::DataBaseParameterMonitor(
 template<typename ResourceType>
 Values DataBaseParameterMonitor<ResourceType>::current()
 {
-    return api::metrics::makeParameterValue(m_dbAccess->current());
+    return api::metrics::makeParameterValue(m_dbWriter->current());
 }
 
 template<typename ResourceType>
 std::optional<Values> DataBaseParameterMonitor<ResourceType>::timeline(
     uint64_t nowSecsSinceEpoch, std::chrono::milliseconds length)
 {
-    const auto timedValues = m_dbAccess->last(length);
+    const auto timedValues = m_dbWriter->last(length);
     const auto now = nx::utils::monotonicTime();
     QJsonObject values;
     for (const auto& [value, time]: timedValues)
@@ -146,7 +146,7 @@ std::optional<Values> DataBaseParameterMonitor<ResourceType>::timeline(
 template<typename ResourceType>
 void DataBaseParameterMonitor<ResourceType>::updateValue()
 {
-    return m_dbAccess->update(this->m_getter(this->m_resource));
+    return m_dbWriter->update(this->m_getter(this->m_resource));
 }
 
 template<typename ResourceType>

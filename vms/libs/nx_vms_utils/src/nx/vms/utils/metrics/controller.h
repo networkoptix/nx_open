@@ -25,7 +25,7 @@ public:
 private:
     void applyRulesUnlocked(
         std::map<QString /*id*/, api::metrics::ParameterGroupValues>* group,
-        DataBase::Access dataBaseAccess,
+        DataBase::Reader reader,
         const std::map<QString /*id*/, api::metrics::ParameterGroupRules>& rules) const;
 
     void applyRulesUnlocked(

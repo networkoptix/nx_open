@@ -25,7 +25,7 @@ void Controller::startMonitoring()
 {
     NX_MUTEX_LOCKER locker(&m_mutex);
     for (const auto& [name, provider]: m_resourceProviders)
-        provider->startMonitoring(m_dataBase.access(name));
+        provider->startMonitoring(m_dataBase.writer(name));
 }
 
 api::metrics::SystemRules Controller::rules() const
@@ -79,7 +79,7 @@ api::metrics::SystemValues Controller::values(
         if (groupRules == m_rules.end())
             continue;
 
-        const auto groupDb = m_dataBase.access(name);
+        const auto groupDb = m_dataBase.reader(name);
         for (auto& [resourceId, resourceValues]: groupValues)
             applyRulesUnlocked(&resourceValues.values, groupDb[resourceId], groupRules->second);
     }
@@ -94,14 +94,14 @@ static double sum(const std::vector<nx::utils::TimedValue<Value>>& timeline)
         [](double current, const auto& point) { return current + point.value.toDouble(); });
 }
 
-static Value calculate(DataBase::Access access, const QStringList& formula)
+static Value calculate(DataBase::Reader reader, const QStringList& formula)
 {
     if (formula.isEmpty())
         return "ERROR: No function";
 
     const auto function = formula[0];
     const auto arg =
-        [&](int index) { return access[index <= formula.size() ? formula[index] : QString()]; };
+        [&](int index) { return reader[index <= formula.size() ? formula[index] : QString()]; };
 
     if (function == "+" || formula[0] == "add")
         return arg(1)->current().toDouble() + arg(2)->current().toDouble();
@@ -183,7 +183,7 @@ static api::metrics::Status checkStatus(
 
 void Controller::applyRulesUnlocked(
     std::map<QString /*id*/, api::metrics::ParameterGroupValues>* group,
-    DataBase::Access groupAccess,
+    DataBase::Reader reader,
     const std::map<QString /*id*/, api::metrics::ParameterGroupRules>& rules) const
 {
     for (const auto& [id, rule]: rules)
@@ -191,12 +191,12 @@ void Controller::applyRulesUnlocked(
         auto& parameter = (*group)[id];
         if (!parameter.group.empty())
         {
-            applyRulesUnlocked(&parameter.group, groupAccess[id], rule.group);
+            applyRulesUnlocked(&parameter.group, reader[id], rule.group);
             continue;
         }
 
         if (!rule.calculate.isEmpty())
-            parameter.value = calculate(groupAccess, rule.calculate.split(" "));
+            parameter.value = calculate(reader, rule.calculate.split(" "));
 
         parameter.status = checkStatus(parameter.value, rule.alarms);
     }
