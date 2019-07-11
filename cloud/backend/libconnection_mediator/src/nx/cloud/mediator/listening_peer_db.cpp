@@ -107,6 +107,11 @@ ListeningPeerDb::ListeningPeerDb(const conf::Settings& settings):
 {
 }
 
+ListeningPeerDb::~ListeningPeerDb()
+{
+    stop();
+}
+
 bool ListeningPeerDb::initialize()
 {
     if (m_map)

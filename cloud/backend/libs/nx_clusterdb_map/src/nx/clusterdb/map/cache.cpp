@@ -54,7 +54,7 @@ void Cache::initialize()
 {
     std::promise<void> done;
     m_db->dataManager().getAll(
-        [this, guard = m_asyncGuard.sharedGuard(), &done](
+        [this, &done](
             ResultCode resultCode,
             std::map<std::string/*key*/, std::string /*value*/> map)
         {
@@ -79,7 +79,7 @@ void Cache::initialize()
 void Cache::subscribeToEvents()
 {
     m_db->eventProvider().subscribeToRecordInserted(
-        [this, guard = m_asyncGuard.sharedGuard()](
+        [this](
             nx::sql::QueryContext* /*queryContext*/,
             const std::string& key,
             std::string value)
@@ -90,7 +90,7 @@ void Cache::subscribeToEvents()
         &m_recordInsertedId);
 
     m_db->eventProvider().subscribeToRecordRemoved(
-        [this, guard = m_asyncGuard.sharedGuard()](
+        [this](
             nx::sql::QueryContext* /*queryContext*/,
             const std::string& key)
         {

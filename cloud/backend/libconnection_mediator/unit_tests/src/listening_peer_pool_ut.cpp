@@ -50,6 +50,7 @@ public:
     ~ListeningPeerPool()
     {
         whenCloseAllConnections();
+        m_listeningPeerDb->stop();
     }
 
 protected:

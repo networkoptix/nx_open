@@ -39,9 +39,8 @@ private:
     mutable QnMutex m_mutex;
     std::map<std::string, std::string> m_stringCache;
 
-    nx::utils::SubscriptionId m_recordInsertedId;
-    nx::utils::SubscriptionId m_recordRemovedId;
-    nx::utils::AsyncOperationGuard m_asyncGuard;
+    nx::utils::SubscriptionId m_recordInsertedId = nx::utils::kInvalidSubscriptionId;
+    nx::utils::SubscriptionId m_recordRemovedId = nx::utils::kInvalidSubscriptionId;
 };
 
 } // namespace nx::clusterdb::map

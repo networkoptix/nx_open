@@ -37,6 +37,7 @@ class ListeningPeerDb
 {
 public:
     ListeningPeerDb(const conf::Settings& settings);
+    ~ListeningPeerDb();
 
     /**
      * Initializes the underlying database.
@@ -44,7 +45,7 @@ public:
     bool initialize();
 
     /**
-     * stops the underlying database.
+     * Stops the underlying database.
      */
     void stop();
 
