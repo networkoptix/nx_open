@@ -7,6 +7,8 @@
 
 #include <common/common_module.h>
 
+#include <client/client_module.h>
+
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/layout_tour_manager.h>
 #include <core/resource_access/providers/resource_access_provider.h>
@@ -16,19 +18,30 @@
 #include <client/client_runtime_settings.h>
 #include <client/client_startup_parameters.h>
 
+#include <nx/vms/client/desktop/system_logon/data/logon_parameters.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/utils/mime_data.h>
+#include <nx/vms/client/desktop/ini.h>
 
 #include <ui/graphics/items/controls/time_slider.h>
+#include <ui/widgets/main_window.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_state_manager.h>
+#include <ui/workbench/workbench_welcome_screen.h>
 #include <ui/workbench/extensions/workbench_stream_synchronizer.h>
 #include <ui/workbench/workbench_navigator.h>
 
+#include <watchers/cloud_status_watcher.h>
+
+#include <utils/common/credentials.h>
 #include <utils/common/synctime.h>
+
 #include <api/helpers/layout_id_helper.h>
+
+#include <nx/utils/app_info.h>
+#include <nx/utils/log/log.h>
 
 namespace {
 
@@ -92,6 +105,7 @@ StartupActionsHandler::StartupActionsHandler(QObject* parent):
 {
     connect(action(ProcessStartupParametersAction), &QAction::triggered, this,
         &StartupActionsHandler::handleStartupParameters);
+
     connect(context(), &QnWorkbenchContext::userChanged, this,
         &StartupActionsHandler::handleUserLoggedIn);
 }
@@ -197,32 +211,81 @@ void StartupActionsHandler::submitDelayedDrops()
 
 void StartupActionsHandler::handleStartupParameters()
 {
-    const auto data = menu()->currentParameters(sender())
+    const auto startupParameters = menu()->currentParameters(sender())
         .argument<QnStartupParameters>(Qn::StartupParametersRole);
 
-    if (!data.instantDrop.isEmpty())
+    // Process input files.
+    bool haveInputFiles = false;
+    if (auto window = qobject_cast<MainWindow*>(mainWindow()))
     {
-        const auto raw = QByteArray::fromBase64(data.instantDrop.toLatin1());
+        NX_ASSERT(window);
+
+        bool skipArg = true;
+        // TODO: Apply this to unparsed parameters only.
+        for (const auto& arg: qApp->arguments())
+        {
+            if (!skipArg)
+                haveInputFiles |= window->handleOpenFile(arg);
+            skipArg = false;
+        }
+    }
+
+    if (const auto welcomeScreen = mainWindow()->welcomeScreen())
+        welcomeScreen->setVisibleControls(true);
+
+    connectToCloudIfNeeded(startupParameters);
+    const bool connectingToSystem = connectToSystemIfNeeded(startupParameters, haveInputFiles);
+
+    if (!startupParameters.videoWallGuid.isNull())
+    {
+        NX_ASSERT(connectingToSystem);
+        menu()->trigger(DelayedOpenVideoWallItemAction, Parameters()
+            .withArgument(Qn::VideoWallGuidRole, startupParameters.videoWallGuid)
+            .withArgument(Qn::VideoWallItemGuidRole, startupParameters.videoWallItemGuid));
+    }
+
+    if (!startupParameters.instantDrop.isEmpty())
+    {
+        const auto raw = QByteArray::fromBase64(startupParameters.instantDrop.toLatin1());
         const auto mimeData = MimeData::deserialized(raw, resourcePool());
         const auto resources = mimeData.resources();
         resourcePool()->addNewResources(resources);
         handleInstantDrops(resources);
     }
 
-    if (!data.delayedDrop.isEmpty())
+    if (!startupParameters.delayedDrop.isEmpty())
     {
-        d->delayedDrops.raw = QByteArray::fromBase64(data.delayedDrop.toLatin1());
+        if (NX_ASSERT(connectingToSystem))
+            d->delayedDrops.raw = QByteArray::fromBase64(startupParameters.delayedDrop.toLatin1());
     }
 
-    if (data.customUri.isValid())
+    if (startupParameters.customUri.isValid())
     {
-        d->delayedDrops.resourceIds = data.customUri.resourceIds();
-        d->delayedDrops.timeStampMs = data.customUri.timestamp();
+        if (NX_ASSERT(connectingToSystem))
+        {
+            d->delayedDrops.resourceIds = startupParameters.customUri.resourceIds();
+            d->delayedDrops.timeStampMs = startupParameters.customUri.timestamp();
+        }
     }
 
-    d->delayedDrops.layoutRef = data.layoutRef;
+    if (!startupParameters.layoutRef.isEmpty())
+    {
+        if (NX_ASSERT(connectingToSystem))
+            d->delayedDrops.layoutRef = startupParameters.layoutRef;
+    }
 
     submitDelayedDrops();
+
+    // Show beta version warning message for the main instance only.
+    const bool showBetaWarning = nx::utils::AppInfo::beta()
+        && !startupParameters.allowMultipleClientInstances
+        && !ini().developerMode;
+
+    if (showBetaWarning)
+        menu()->triggerIfPossible(BetaVersionMessageAction);
+
+    if (ini().developerMode || ini().profilerMode)
+        menu()->trigger(ShowFpsAction);
 }
 
 void StartupActionsHandler::handleInstantDrops(const QnResourceList& resources)
@@ -271,6 +334,110 @@ void StartupActionsHandler::handleAcsModeResources(
     timeSlider->setWindow(windowStart, windowStart + kAcsModeTimelineWindowSize, false);
 
     navigator()->setPosition(timeStampMs * 1000);
+}
+
+bool StartupActionsHandler::connectUsingCustomUri(const nx::vms::utils::SystemUri& uri)
+{
+    using namespace nx::vms::utils;
+
+    if (!uri.isValid())
+        return false;
+
+    if (uri.clientCommand() != SystemUri::ClientCommand::Client)
+        return false;
+
+    QString systemId = uri.systemId();
+    if (systemId.isEmpty())
+        return false;
+
+    SystemUri::Auth auth = uri.authenticator();
+    const nx::vms::common::Credentials credentials(auth.user, auth.password);
+
+    const bool systemIsCloud = !QnUuid::fromStringSafe(systemId).isNull();
+    if (systemIsCloud)
+    {
+        qnClientModule->cloudStatusWatcher()->setCredentials(credentials, true);
+        NX_DEBUG(this, "Custom URI: System is cloud, connecting to the cloud first");
+    }
+
+    auto systemUrl = nx::utils::Url::fromUserInput(systemId);
+    systemUrl.setScheme("https");
+    NX_DEBUG(this, "Custom URI: Connecting to the system %1", systemUrl.toString());
+
+    systemUrl.setUserName(auth.user);
+    systemUrl.setPassword(auth.password);
+
+    LogonParameters parameters(systemUrl);
+    parameters.force = true;
+    parameters.storeSession = false;
+    parameters.secondaryInstance = true;
+    menu()->trigger(ConnectAction, Parameters().withArgument(Qn::LogonParametersRole, parameters));
+    return true;
+}
+
+bool StartupActionsHandler::connectUsingCommandLineAuth(
+    const QnStartupParameters& startupParameters)
+{
+    // Set authentication parameters from the command line.
+    nx::utils::Url serverUrl = startupParameters.parseAuthenticationString();
+
+    // TODO: #refactor System URI to support videowall
+    if (!startupParameters.videoWallGuid.isNull())
+    {
+        if (!NX_ASSERT(serverUrl.isValid()))
+            return false;
+
+        serverUrl.setUserName(startupParameters.videoWallGuid.toString());
+    }
+
+    if (!serverUrl.isValid())
+        return false;
+
+    LogonParameters parameters(serverUrl);
+    parameters.force = true;
+    parameters.storeSession = false;
+    parameters.secondaryInstance = true;
+    menu()->trigger(ConnectAction, Parameters().withArgument(Qn::LogonParametersRole, parameters));
+    return true;
+}
+
+bool StartupActionsHandler::connectToSystemIfNeeded(
+    const QnStartupParameters& startupParameters,
+    bool haveInputFiles)
+{
+    // If no input files were supplied --- open welcome page.
+    // Do not try to connect in the following cases:
+    // * client was not connected and user clicked "Open in new window"
+    // * user opened exported exe-file
+    // Otherwise we should try to connect or show welcome page.
+
+    // TODO: #GDM Separate this mess to certain scenarios. Videowall, "Open new Window", etc.
+    if (connectUsingCustomUri(startupParameters.customUri))
+        return true;
+
+    if (!startupParameters.instantDrop.isEmpty() || haveInputFiles)
+        return false;
+
+    return connectUsingCommandLineAuth(startupParameters);
+}
+
+bool StartupActionsHandler::connectToCloudIfNeeded(const QnStartupParameters& startupParameters)
+{
+    using namespace nx::vms::utils;
+
+    const auto uri = startupParameters.customUri;
+    if (!uri.isValid())
+        return false;
+
+    if (uri.clientCommand() != SystemUri::ClientCommand::LoginToCloud)
+        return false;
+
+    SystemUri::Auth auth = uri.authenticator();
+    const nx::vms::common::Credentials credentials(auth.user, auth.password);
+
+    NX_DEBUG(this, "Custom URI: Connecting to cloud as %1", auth.user);
+    qnClientModule->cloudStatusWatcher()->setCredentials(credentials, true);
+    return true;
 }
 
 } // namespace nx::vms::client::desktop

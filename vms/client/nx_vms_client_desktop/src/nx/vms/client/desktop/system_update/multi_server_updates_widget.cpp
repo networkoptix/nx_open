@@ -1687,13 +1687,17 @@ void MultiServerUpdatesWidget::processReadyInstallState()
 {
     auto idle = m_stateTracker->peersInState(StatusCode::idle);
     auto all = m_stateTracker->allPeers();
-    auto downloading = m_stateTracker->peersInState(StatusCode::downloading);
+    auto downloading = m_stateTracker->peersInState(StatusCode::downloading)
+        + m_stateTracker->peersInState(StatusCode::preparing);
     downloading.subtract(m_stateTracker->offlineServers());
+
     if (!downloading.empty())
     {
         // We should go to downloading stage if we have merged
         // another system. This system will start update automatically, so we just need
         // to change UI state.
+        NX_DEBUG(this, "processReadyInstallState() - detected servers %1 in downloading state",
+            downloading);
         setTargetState(WidgetUpdateState::downloading, downloading, false);
     }
     else if (idle.size() == all.size() && m_serverUpdateTool->haveActiveUpdate())
@@ -2320,31 +2324,37 @@ void MultiServerUpdatesWidget::syncRemoteUpdateStateToUi()
 
     auto readyAndOnline = m_stateTracker->onlineAndInState(LocalStatusCode::readyToInstall);
     auto readyAndOffline = m_stateTracker->offlineAndInState(LocalStatusCode::readyToInstall);
-    bool hasErrors = m_stateTracker->hasVerificationErrors();
+    bool hasVerificationErrors = m_stateTracker->hasVerificationErrors();
+    bool hasStatusErrors = m_stateTracker->hasStatusErrors();
 
+    QStringList errorTooltips;
     if (m_widgetState == WidgetUpdateState::readyInstall)
     {
         if (readyAndOnline.empty() || !readyAndOffline.empty())
         {
-            ui->downloadButton->setEnabled(false);
-            ui->downloadButton->setToolTip(tr("Some servers have gone offline. "
-                "Please wait until they become online to continue."));
+            errorTooltips << tr("Some servers have gone offline. "
+                                "Please wait until they become online to continue.");
         }
-        else if (hasErrors)
+        else if (hasVerificationErrors)
         {
-            ui->downloadButton->setEnabled(false);
-            ui->downloadButton->setToolTip(tr("Some servers have no package available"));
+            errorTooltips << tr("Some servers have no update packages available.");
         }
-        else
+        else if (hasStatusErrors)
         {
-            ui->downloadButton->setEnabled(true);
-            ui->downloadButton->setToolTip("");
+            errorTooltips << tr("Some servers have encountered an internal error.");
         }
     }
-    else
+
+    if (errorTooltips.isEmpty())
     {
         ui->downloadButton->setEnabled(true);
         ui->downloadButton->setToolTip("");
+    }
+    else
+    {
+        ui->downloadButton->setEnabled(false);
+        errorTooltips << tr("Please please contact Customer Support.");
+        ui->downloadButton->setToolTip(errorTooltips.join("\n"));
     }
 
     ui->tableView->setColumnHidden(ServerUpdatesModel::Columns::StorageSettingsColumn, !m_showStorageSettings);

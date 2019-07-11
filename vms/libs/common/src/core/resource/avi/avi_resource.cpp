@@ -99,20 +99,38 @@ QnAbstractStreamDataProvider* QnAviResource::createDataProvider(
 
 QnConstResourceVideoLayoutPtr QnAviResource::getVideoLayout(const QnAbstractStreamDataProvider* dataProvider) const
 {
-    const QnArchiveStreamReader* archiveReader = dynamic_cast<const QnArchiveStreamReader*> (dataProvider);
-    if (archiveReader)
+    // Try to return cached value, which is calculated on first opening.
     {
         QnMutexLocker lock(&m_mutex);
         if (m_videoLayout)
             return m_videoLayout;
-        lock.unlock();
-        auto result = archiveReader->getDPVideoLayout();
-        lock.relock();
-        m_videoLayout = result;
-        return result;
     }
 
-    return QnMediaResource::getVideoLayout();
+    // Calculate using provided archive reader.
+    const auto archiveReader = dynamic_cast<const QnArchiveStreamReader*>(dataProvider);
+    if (archiveReader)
+    {
+        auto result = archiveReader->getDPVideoLayout();
+        NX_ASSERT(result);
+
+        if (result)
+        {
+            QnMutexLocker lock(&m_mutex);
+            m_videoLayout = result;
+            return result;
+        }
+    }
+
+    // Calculate using delegate
+    const QScopedPointer<QnAviArchiveDelegate> archiveDelegate(createArchiveDelegate());
+    archiveDelegate->open(toSharedPointer(this));
+
+    auto result = archiveDelegate->getVideoLayout();
+    NX_ASSERT(result);
+
+    QnMutexLocker lock(&m_mutex);
+    m_videoLayout = result;
+    return result;
 }
 
 bool QnAviResource::hasVideo(const QnAbstractStreamDataProvider* dataProvider) const

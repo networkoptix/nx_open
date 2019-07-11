@@ -625,6 +625,9 @@ bool ClientUpdateTool::restartClient(QString authString)
         if (applauncher::api::restartClient(m_updateVersion, authString) == ResultType::ok)
             return true;
     }
+
+    NX_ERROR(this, "restartClient() - failed to restart client to desired version %1",
+        m_updateVersion);
     return false;
 }
 

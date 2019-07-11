@@ -37,7 +37,14 @@ EventsStorage::EventsStorage(QnMediaServerModule* mediaServerModule):
 
 EventsStorage::~EventsStorage()
 {
-    // TODO: Waiting for completion or cancelling posted queries.
+    if (!m_dbController)
+        return;
+
+    // Flushing all cached data.
+    // Since update queries are queued all scheduled requests will be completed before flush.
+    std::promise<ResultCode> done;
+    flush([&done](auto resultCode) { done.set_value(resultCode); });
+    done.get_future().wait();
 }
 
 bool EventsStorage::initialize(const Settings& settings)
@@ -107,7 +114,7 @@ void EventsStorage::save(common::metadata::ConstDetectionMetadataPacketPtr packe
         return;
 
     m_dbController->queryExecutor().executeUpdate(
-        [this, packet = packet, detectionDataSaver = std::move(detectionDataSaver)](
+        [packet = packet, detectionDataSaver = std::move(detectionDataSaver)](
             nx::sql::QueryContext* queryContext) mutable
         {
             detectionDataSaver.save(queryContext);
@@ -266,6 +273,9 @@ void EventsStorage::flush(StoreCompletionHandler completionHandler)
     if (!m_dbController)
     {
         NX_DEBUG(this, "Attempt to flush non-initialized analytics DB");
+        lock.unlock();
+
+        completionHandler(ResultCode::error);
         return;
     }
 

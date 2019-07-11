@@ -819,7 +819,8 @@ void ServerMessageBus::gotTransaction(
     if (m_handler)
     {
         auto amendedTran = tran;
-        amendOutputDataIfNeeded(Qn::kSystemAccess, &amendedTran.params);
+        amendOutputDataIfNeeded(Qn::kSystemAccess,
+            commonModule()->resourceAccessManager(), &amendedTran.params);
         m_handler->triggerNotification(amendedTran, NotificationSource::Remote);
     }
 }

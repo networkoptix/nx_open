@@ -18,7 +18,7 @@ static const std::chrono::seconds kWaitForDiscoveryTimeout(10);
 size_t kInitialServerCount = 3;
 size_t kAdditionalServerCount = 2;
 nx::network::RetryPolicy kReconnectPolicy(
-    nx::network::RetryPolicy::kInfiniteRetries, kDiscoveryTimeouts, 1, kDiscoveryTimeouts);
+    nx::network::RetryPolicy::kInfiniteRetries, kDiscoveryTimeouts, 1, kDiscoveryTimeouts, 0);
 
 class DiscoveryTest: public testing::Test
 {
