@@ -126,7 +126,7 @@ void MetadataLogger::pushData(
                 std::dynamic_pointer_cast<const QnCompressedMetadata>(data));
 
         if (objectMetadata)
-            pushObjectMetadata(*objectMetadata, additionalInfo);
+            pushObjectMetadata(std::move(*objectMetadata), additionalInfo);
     }
 }
 
