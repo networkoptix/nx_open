@@ -383,6 +383,7 @@ void NotificationsWorkbenchPanel::createEventPanel(QGraphicsWidget* parentWidget
     m_eventPanelContainer = new QnMaskedProxyWidget(parentWidget);
     m_eventPanelContainer->setProperty(Qn::NoHandScrollOver, true);
     m_eventPanelContainer->setProperty(Qn::BlockMotionSelection, true);
+    m_eventPanelContainer->setFocusPolicy(Qt::ClickFocus);
 
     auto eventPanelResizer = new ResizerWidget(item, m_eventPanelContainer);
     auto dragProcessor = new DragProcessor(this);
