@@ -53,7 +53,7 @@ void UplinkSpeedReporter::mockupSpeedTestUrl(const nx::utils::Url& url)
 {
     QnMutexLocker lock(&m_mutex);
     m_speedTestUrlMockup = url;
-    if(m_cloudModuleUrlFetcher)
+    if (m_cloudModuleUrlFetcher)
         m_cloudModuleUrlFetcher->setUrl(url);
 }
 
@@ -91,7 +91,7 @@ void UplinkSpeedReporter::onFetchSpeedTestUrlComplete(
 {
     using namespace std::placeholders;
 
-    if (!http::StatusCode::isSuccessCode(statusCode))
+    if (!http::StatusCode::isSuccessCode(statusCode) || speedTestUrl.isEmpty())
     {
         NX_VERBOSE(this, "Fetching speed test url from cloud_modules.xml failed: %1",
             http::StatusCode::toString(statusCode));
