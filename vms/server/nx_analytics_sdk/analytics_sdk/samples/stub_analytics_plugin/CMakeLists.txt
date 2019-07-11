@@ -53,8 +53,7 @@ endif()
 
 target_compile_definitions(stub_analytics_plugin
     PRIVATE NX_PLUGIN_API=${API_EXPORT_MACRO}
-    INTERFACE NX_PLUGIN_API=${API_IMPORT_MACRO}
-    PRIVATE NX_SDK_API=
+    INTERFACE NX_PLUGIN_API=${API_IMPORT_MACRO} #< Needed to link plugin ut lib to plugin lib.
 )
 
 if(NOT WIN32)
@@ -71,8 +70,5 @@ target_include_directories(stub_analytics_plugin_ut PRIVATE
 target_link_libraries(stub_analytics_plugin_ut PRIVATE
     nx_kit
     stub_analytics_plugin
-)
-target_compile_definitions(stub_analytics_plugin_ut
-    PRIVATE NX_SDK_API=
 )
 add_test(NAME stub_analytics_plugin_ut COMMAND stub_analytics_plugin_ut)
