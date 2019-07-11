@@ -13,6 +13,8 @@
 #include <nx/kit/utils.h>
 
 #include <plugins/plugin_api.h>
+#include <nx/sdk/helpers/lib_context.h>
+#include <nx/vms/server/sdk_support/ref_countable_registry.h>
 #include <nx/sdk/helpers/ptr.h>
 #include <nx/sdk/analytics/i_plugin.h>
 #include <nx/vms/server/plugins/utility_provider.h>
@@ -24,6 +26,7 @@
 #include "vms_server_plugins_ini.h"
 
 using namespace nx::sdk;
+using nx::vms::server::sdk_support::RefCountableRegistry;
 
 static QStringList stringToListViaComma(const QString& s)
 {
@@ -35,6 +38,13 @@ static QStringList stringToListViaComma(const QString& s)
 
 PluginManager::PluginManager(QObject* parent): QObject(parent)
 {
+    libContext().setName("nx_vms_server");
+
+    if (pluginsIni().useRefCountableRegistry)
+    {
+        libContext().setRefCountableRegistry(new RefCountableRegistry(
+            libContext().name(), pluginsIni().verboseRefCountableRegistry));
+    }
 }
 
 PluginManager::~PluginManager()
@@ -43,7 +53,7 @@ PluginManager::~PluginManager()
 
 void PluginManager::unloadPlugins()
 {
-    m_nxPlugins.clear();
+    m_pluginContexts.clear();
 }
 
 /**
@@ -117,7 +127,7 @@ void PluginManager::loadPluginsFromDir(
     {
         const QString& libName = libNameFromFileInfo(fileInfo);
 
-        PluginInfoPtr pluginInfo = std::make_shared<PluginInfo>();
+        const PluginInfoPtr pluginInfo = std::make_shared<PluginInfo>();
         pluginInfo->optionality = optionality;
         pluginInfo->libraryFilename = fileInfo.absoluteFilePath();
 
@@ -304,7 +314,7 @@ void PluginManager::storePluginInfo(
         NX_INFO(this, pluginInfo->statusMessage);
     else
         NX_ERROR(this, pluginInfo->statusMessage);
-    m_nxPlugins.push_back({pluginInfo, /*plugin*/ nullptr});
+    m_pluginContexts.push_back({pluginInfo, /*plugin*/ nullptr});
 }
 
 bool PluginManager::loadNxPlugin(
@@ -323,12 +333,31 @@ bool PluginManager::loadNxPlugin(
     if (!lib)
         return false;
 
-    if (const auto entryPointFunc = reinterpret_cast<nxpl::Plugin::EntryPointFunc>(
+    if (const auto nxLibContextFunc = reinterpret_cast<NxLibContextFunc>(
+        lib->resolve(kNxLibContextFuncName)))
+    {
+        ILibContext* const pluginLibContext = nxLibContextFunc();
+        if (!NX_ASSERT(pluginLibContext))
+        {
+            lib->unload();
+            return false;
+        }
+
+        pluginLibContext->setName(libName.toStdString().c_str());
+
+        if (pluginsIni().useRefCountableRegistry)
+        {
+            pluginLibContext->setRefCountableRegistry(new RefCountableRegistry(
+                libName.toStdString(), pluginsIni().verboseRefCountableRegistry));
+        }
+    }
+
+    if (const auto oldEntryPointFunc = reinterpret_cast<nxpl::Plugin::EntryPointFunc>(
         lib->resolve(nxpl::Plugin::kEntryPointFuncName)))
     {
         // Old entry point found: currently, this is a Storage or Camera plugin.
         if (!loadNxPluginForOldSdk(
-            entryPointFunc, settingsHolder, libFilename, libName, pluginInfo))
+            oldEntryPointFunc, settingsHolder, libFilename, libName, pluginInfo))
         {
             lib->unload();
             return false;
@@ -414,7 +443,7 @@ bool PluginManager::loadNxPluginForOldSdk(
             makePtr<nx::vms::server::plugins::UtilityProvider>(this, /*plugin*/ nullptr).get()));
     }
 
-    m_nxPlugins.push_back({pluginInfo, toPtr(reinterpret_cast<IRefCountable*>(plugin))});
+    m_pluginContexts.push_back({pluginInfo, toPtr(reinterpret_cast<IRefCountable*>(plugin))});
     return true;
 }
 
@@ -521,7 +550,7 @@ bool PluginManager::loadNxPluginForNewSdk(
         return false;
     }
 
-    static const QString kPluginLoadedMessageFormat =
+    const QString kPluginLoadedMessageFormat =
         "Loaded plugin [" + libFilename + "]; highest supported interface: %1";
 
     pluginInfo->name = name;
@@ -553,14 +582,14 @@ bool PluginManager::loadNxPluginForNewSdk(
         }
         else
         {
-            m_nxPlugins.push_back({pluginInfo, /*plugin*/ nullptr});
+            m_pluginContexts.push_back({pluginInfo, /*plugin*/ nullptr});
             return false; //< The error is already logged.
         }
     }
 
     plugin->setUtilityProvider(
         makePtr<nx::vms::server::plugins::UtilityProvider>(this, plugin.get()).get());
-    m_nxPlugins.push_back({pluginInfo, plugin});
+    m_pluginContexts.push_back({pluginInfo, plugin});
     return true;
 }
 
@@ -568,7 +597,7 @@ nx::vms::api::PluginInfoList PluginManager::pluginInfoList() const
 {
     if (m_cachedPluginInfo.empty())
     {
-        for (const auto& pluginContext: m_nxPlugins)
+        for (const auto& pluginContext: m_pluginContexts)
             m_cachedPluginInfo.push_back(*pluginContext.pluginInfo);
     }
 
@@ -581,7 +610,7 @@ std::shared_ptr<const nx::vms::api::PluginInfo> PluginManager::pluginInfo(
     if (!NX_ASSERT(plugin))
         return nullptr;
 
-    for (const auto& pluginContext: m_nxPlugins)
+    for (const auto& pluginContext: m_pluginContexts)
     {
         if (pluginContext.plugin.get() == plugin)
             return pluginContext.pluginInfo;

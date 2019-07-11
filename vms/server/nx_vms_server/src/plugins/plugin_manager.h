@@ -46,7 +46,7 @@ public:
     QList<Interface*> findNxPlugins(const nxpl::NX_GUID& oldSdkInterfaceId) const
     {
         QList<Interface*> foundPlugins;
-        for (const auto& pluginContext: m_nxPlugins)
+        for (const auto& pluginContext: m_pluginContexts)
         {
             auto plugin = pluginContext.plugin;
             if (!plugin)
@@ -71,7 +71,7 @@ public:
     QList<nx::sdk::Ptr<Interface>> findNxPlugins() const
     {
         QList<nx::sdk::Ptr<Interface>> foundPlugins;
-        for (const auto& pluginContext: m_nxPlugins)
+        for (const auto& pluginContext: m_pluginContexts)
         {
             auto plugin = pluginContext.plugin;
             if (!plugin)
@@ -159,7 +159,7 @@ private:
         nx::sdk::Ptr<nx::sdk::IRefCountable> plugin;
     };
 
-    std::vector<PluginContext> m_nxPlugins;
+    std::vector<PluginContext> m_pluginContexts;
     mutable std::vector<PluginInfo> m_cachedPluginInfo;
 
     mutable QnMutex m_mutex;
