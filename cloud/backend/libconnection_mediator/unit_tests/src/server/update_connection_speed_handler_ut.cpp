@@ -59,7 +59,7 @@ protected:
 
         m_mediatorApiClient->reportUplinkSpeed(
             m_expectedUplinkSpeed,
-            [this](hpm::api::ResultCode resultCode)
+            [](hpm::api::ResultCode resultCode)
             {
                 ASSERT_EQ(hpm::api::ResultCode::ok, resultCode);
             });

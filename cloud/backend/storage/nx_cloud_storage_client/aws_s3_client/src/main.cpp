@@ -92,7 +92,7 @@ struct CommonSettings
 
 //-------------------------------------------------------------------------------------------------
 
-int upload(const nx::utils::ArgumentParser& arguments)
+int upload(const nx::utils::ArgumentParser& /*arguments*/)
 {
     // TODO
     return 1;

@@ -192,7 +192,6 @@ private:
     std::vector<ConnectionContext> m_connections;
     nx::String m_systemId;
     ConnectionContext* m_bestConnection = nullptr;
-    int m_bestConnectionIndex = 0;
     boost::optional<nx::hpm::ListeningPeerPool::ConstDataLocker> m_chosenPeer;
 };
 
