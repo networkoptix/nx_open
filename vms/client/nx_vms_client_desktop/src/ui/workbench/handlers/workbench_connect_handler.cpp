@@ -426,6 +426,7 @@ void QnWorkbenchConnectHandler::handleConnectReply(
 
     if (m_logicalState == LogicalState::reconnecting)
     {
+        connectingStateGuard.fire();
         processReconnectingReply(status, connection);
         return;
     }
