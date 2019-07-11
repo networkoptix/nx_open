@@ -1880,7 +1880,10 @@ void QnWorkbenchNavigator::updateScrollBarFromSlider()
         m_timeScrollBar->setIndicatorPosition(m_timeSlider->sliderTimePosition());
     }
 
-    updateSliderFromScrollBar(); /* Bi-directional sync is needed as time scrollbar may adjust the provided values. */
+    // Evil call at first sight, but it actually needed for smooth scrolling due "special"
+    // implementation of scrollbar and stuff.
+    if (m_timeScrollBar->isSliderDown())
+        updateSliderFromScrollBar();
 }
 
 void QnWorkbenchNavigator::updateCalendarFromSlider()
