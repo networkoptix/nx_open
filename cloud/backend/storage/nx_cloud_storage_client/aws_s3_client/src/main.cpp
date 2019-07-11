@@ -160,7 +160,7 @@ int download(const nx::utils::ArgumentParser& arguments)
 
     ApiClient client(
         "cmd_line_client",
-        settings.common.region,    // TODO: #ak Take region from somewhere.
+        settings.common.region,
         baseUrl,
         nx::network::http::Credentials(
             settings.common.user.c_str(),
