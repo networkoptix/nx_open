@@ -159,6 +159,7 @@ protected:
 private:
     void findBestConnection()
     {
+        m_bestConnection = nullptr;
         for (auto& connection : m_connections)
         {
             if (!m_bestConnection)
