@@ -14,21 +14,28 @@ def getUpploadRequestErrors(requestResult):
     return plistlib.writePlistToString(errors) if errors else None
     
 def parseUploadResult(requestOutput):
-    requestResult  = plistlib.readPlistFromString(requestOutput)
+    requestResult = plistlib.readPlistFromString(requestOutput)
     requestId = getRequestUUID(requestResult)
     return [requestId, ""] if requestId else [None, getUpploadRequestErrors(requestResult)]
+
+def execute(command):
+    pipe = os.popen(command)
+    output = pipe.read()
+    return [not pipe.close(), output]
 
 def uploadForNotarization(options):
     commandTemplate = "xcrun altool --notarize-app --output-format xml -f {0} --primary-bundle-id {1} -itc_provider {2} -u {3} -p {4}"
     command = commandTemplate.format(options.dmgFileName, options.bundleId, options.teamId, options.user, options.password)
-    return parseUploadResult(os.popen(command).read())
+    [success, output] = execute(command)
+    return parseUploadResult(output)
 
 def checkNotarizationCompletion(options):
     commandTemplate = "xcrun altool --notarization-info {0} -u {1} -p {2} --output-format xml"
     command = commandTemplate.format(options.requestId, options.user, options.password)
-    progressData = plistlib.readPlistFromString(os.popen(command).read())
+    [success, output] = execute(command)
+    progressData = plistlib.readPlistFromString(output)
     info = progressData.get("notarization-info", None)
-    if not info:
+    if (not success) or (not info):
         return [False, False, "Unexpected error: no data returned"]
     
     status = info.get("Status", None)
@@ -57,7 +64,8 @@ def waitForNotarizationCompletion(options, checkPeriodSeconds):
 
 def stapleApp(dmgFileName):
     command = "xcrun stapler staple {}".format(dmgFileName)
-    sys.stdout.write(os.popen(command).read())
+    [success, output] = execute(command)
+    return success
 
 def addStandardParserParameters(parser):
     parser.add_argument("--user", metavar = "<Apple Developer ID>", dest = "user", required = True)
@@ -99,9 +107,11 @@ def main():
     [success, notarizationError] = waitForNotarizationCompletion(options, kCheckPeriodSeconds)
     
     elapsedTimeMessage = "Total time is {}\n".format(datetime.timedelta(seconds = (time.time() - startTime)))
-    if success:
-        sys.stdout.write("\nNotarization successful\n\n{}").format(elapsedTimeMessage)
-    else:
+    if not success:
         showCriticalErrorAndExit("\nNotarization failed:\n{0}\n\n{1}\n".format(notarizationError, elapsedTimeMessage))
-     
+    
+    sys.stdout.write("\nNotarization successful\n\n{}".format(elapsedTimeMessage))
+    if not stapleApp(options.dmgFileName):
+        showCriticalErrorAndExit("Can't staple application")
+    
 main()
