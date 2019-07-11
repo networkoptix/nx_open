@@ -126,11 +126,11 @@ void MetadataHandler::handleObjectMetadataPacket(
         NX_VERBOSE(this, "%1(): x %2, y %3, width %4, height %5, typeId %6, id %7",
             __func__, box.x, box.y, box.width, box.height, object.objectTypeId, object.objectId);
 
-        for (int i = 0; i < item->attributeCount(); ++i)
+        for (int j = 0; j < item->attributeCount(); ++j)
         {
             nx::common::metadata::Attribute attribute;
-            attribute.name = QString::fromStdString(item->attribute(i)->name());
-            attribute.value = QString::fromStdString(item->attribute(i)->value());
+            attribute.name = QString::fromStdString(toPtr(item->attribute(j))->name());
+            attribute.value = QString::fromStdString(toPtr(item->attribute(j))->value());
             object.labels.push_back(attribute);
 
             NX_VERBOSE(this, "%1(): Attribute: %2 %3", __func__, attribute.name, attribute.value);
