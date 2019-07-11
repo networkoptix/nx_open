@@ -4,39 +4,79 @@
 #include <memory>
 #include <unordered_set>
 
-#define NX_DEBUG_ENABLE_OUTPUT (m_verbose)
-#define NX_PRINT_PREFIX (m_printPrefix)
+#define NX_PRINT_PREFIX (m_logPrefix + ": ")
 #include <nx/kit/debug.h>
 
 #include <nx/kit/utils.h>
+
+#include <plugins/vms_server_plugins_ini.h>
+#include <nx/utils/log/to_string.h>
+#include <nx/utils/log/log.h>
 
 namespace nx::vms::server::sdk_support {
 
 using namespace nx::sdk;
 
-// TODO: #mshevchenko: Consider .ini option to switch logging to VMS logs or to stderr; the same
-// option may switch NX_KIT_ASSERT to NX_ASSERT.
-
-std::string RefCountableRegistry::readableRef(const IRefCountable* refCountable, int refCount)
+RefCountableRegistry::RefCountableRegistry(const std::string& name):
+    m_logPrefix("RefCountableRegistry{" + name + "}"),
+    m_useServerLog(pluginsIni().useServerLogForRefCountableRegistry),
+    m_isVerbose(pluginsIni().verboseRefCountableRegistry)
 {
-    NX_KIT_ASSERT(refCountable);
-    // TODO: #mshevchenko Consider demangling via boost - requires moving impl to the Server.
-    return std::string(typeid(*refCountable).name())
+}
+
+#define ASSERT(CONDITION, /*MESSAGE*/...) ( \
+    m_useServerLog \
+        ? NX_ASSERT(CONDITION, std::string(__VA_ARGS__)) \
+        : NX_KIT_ASSERT(CONDITION, std::string(__VA_ARGS__)) \
+)
+
+#define INFO(MESSAGE) do \
+{ \
+    if (m_useServerLog) \
+        NX_INFO(nx::utils::log::Tag(m_logPrefix), MESSAGE); \
+    else \
+        NX_PRINT << (MESSAGE); \
+} while (0)
+
+#define VERBOSE(MESSAGE) do \
+{ \
+    const std::string funcPrefix = std::string(__func__) + "(): "; \
+    if (m_isVerbose) \
+    { \
+        if (m_useServerLog) \
+            NX_INFO(nx::utils::log::Tag(m_logPrefix), funcPrefix + (MESSAGE)); \
+        else \
+            NX_PRINT << (funcPrefix + (MESSAGE)); \
+    } \
+} while (0)
+
+/*static*/ RefCountableRegistry* RefCountableRegistry::createIfEnabled(const std::string& name)
+{
+    if (!pluginsIni().enableRefCountableRegistry)
+        return nullptr;
+    return new RefCountableRegistry(name);
+}
+
+std::string RefCountableRegistry::readableRef(
+    const IRefCountable* refCountable, int refCount) const
+{
+    ASSERT(refCountable);
+
+    return demangleTypeName(typeid(*refCountable).name()).toStdString()
         + "{refCount: " + nx::kit::utils::toString(refCount) + "}";
 }
 
 void RefCountableRegistry::notifyCreated(
     const IRefCountable* const refCountable, const int refCount)
 {
-    NX_KIT_ASSERT(refCountable);
-    NX_OUTPUT << __func__ << "(): " << readableRef(refCountable, refCount);
+    ASSERT(refCountable);
+    VERBOSE(readableRef(refCountable, refCount));
 
-    NX_KIT_ASSERT(refCount == 1,
+    ASSERT(refCount == 1,
         "Created an object with refCount != 1: " + readableRef(refCountable, refCount));
 
-    NX_KIT_ASSERT(m_refCountables.count(refCountable) == 0,
-        "Created an object which is already registered: "
-            + readableRef(refCountable, refCount));
+    ASSERT(m_refCountables.count(refCountable) == 0,
+        "Created an object which is already registered: " + readableRef(refCountable, refCount));
 
     m_refCountables.insert(refCountable);
 }
@@ -44,13 +84,13 @@ void RefCountableRegistry::notifyCreated(
 void RefCountableRegistry::notifyDestroyed(
     const IRefCountable* const refCountable, const int refCount)
 {
-    NX_KIT_ASSERT(refCountable);
-    NX_OUTPUT << __func__ << "(): " << readableRef(refCountable, refCount);
+    ASSERT(refCountable);
+    VERBOSE(readableRef(refCountable, refCount));
 
-    NX_KIT_ASSERT(refCount == 0,
+    ASSERT(refCount == 0,
         "Destroying an object with refCount != 0: " + readableRef(refCountable, refCount));
 
-    if (!NX_KIT_ASSERT(m_refCountables.count(refCountable) != 0,
+    if (!ASSERT(m_refCountables.count(refCountable) != 0,
         "Destroying an object which has not been registered: "
             + readableRef(refCountable, refCount)))
     {
@@ -59,26 +99,30 @@ void RefCountableRegistry::notifyDestroyed(
 
     if (m_refCountables.erase(refCountable) != 1)
     {
-        NX_PRINT << "INTERNAL ERROR: Unable to unregister the object being destroyed: "
-            << readableRef(refCountable, refCount);
-        NX_KIT_ASSERT(false);
+        INFO("INTERNAL ERROR: Unable to unregister the object being destroyed: "
+            + readableRef(refCountable, refCount));
+        ASSERT(false);
     }
 }
 
 RefCountableRegistry::~RefCountableRegistry()
 {
-    if (m_refCountables.empty())
+    const int count = (int) m_refCountables.size();
+    if (count == 0)
     {
-        NX_OUTPUT << __func__ << "(): SUCCESS: No registered objects remain.";
+        VERBOSE("SUCCESS: No registered objects remain.");
         return;
     }
 
-    std::string message = m_printPrefix + "The following objects remain registered:";
+    std::string message = "\n" + m_logPrefix + ": The following "
+        + (count > 1 ? (nx::kit::utils::toString(count) + " objects remain") : "object remains")
+        + " registered:";
+
     for (const auto& refCountable: m_refCountables)
         message += "\n" + readableRef(refCountable, refCountable->refCountThreadUnsafe());
 
     // Always fails; the condition is added for better output.
-    NX_KIT_ASSERT(m_refCountables.empty(), message);
+    ASSERT(m_refCountables.empty(), message);
 }
 
 } // namespace nx::vms::server::sdk_support

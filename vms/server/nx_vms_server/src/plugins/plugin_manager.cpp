@@ -26,7 +26,6 @@
 #include "vms_server_plugins_ini.h"
 
 using namespace nx::sdk;
-using nx::vms::server::sdk_support::RefCountableRegistry;
 
 static QStringList stringToListViaComma(const QString& s)
 {
@@ -39,12 +38,8 @@ static QStringList stringToListViaComma(const QString& s)
 PluginManager::PluginManager(QObject* parent): QObject(parent)
 {
     libContext().setName("nx_vms_server");
-
-    if (pluginsIni().useRefCountableRegistry)
-    {
-        libContext().setRefCountableRegistry(new RefCountableRegistry(
-            libContext().name(), pluginsIni().verboseRefCountableRegistry));
-    }
+    libContext().setRefCountableRegistry(
+        nx::vms::server::sdk_support::RefCountableRegistry::createIfEnabled(libContext().name()));
 }
 
 PluginManager::~PluginManager()
@@ -344,12 +339,9 @@ bool PluginManager::loadNxPlugin(
         }
 
         pluginLibContext->setName(libName.toStdString().c_str());
-
-        if (pluginsIni().useRefCountableRegistry)
-        {
-            pluginLibContext->setRefCountableRegistry(new RefCountableRegistry(
-                libName.toStdString(), pluginsIni().verboseRefCountableRegistry));
-        }
+        pluginLibContext->setRefCountableRegistry(
+            nx::vms::server::sdk_support::RefCountableRegistry::createIfEnabled(
+                libName.toStdString()));
     }
 
     if (const auto oldEntryPointFunc = reinterpret_cast<nxpl::Plugin::EntryPointFunc>(

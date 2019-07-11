@@ -12,23 +12,22 @@ namespace nx::vms::server::sdk_support {
  *
  * The registry works automatically for any classes inherited from nx::sdk::RefCountable.
  *
- * An NX_KIT_ASSERT() will fail if any discrepancy is detected.
+ * An assertion will fail if any discrepancy is detected.
  *
  * The Server and each Plugin have their own instance of such registry, tracking objects
  * created/destroyed in the respective module. Such instances are created as global variables by
  * value, thus, are never physically destroyed. Their destructors (called on static
  * deinitialization phase) attempt to detect and log objects which were not deleted, failing an
- * NX_KIT_ASSERT() if there were any such objects.
+ * assertion if there were any such objects.
+ *
+ * Type of logging (Server log vs stderr) and type of assertions (NX_KIT_ASSERT vs NX_ASSERT) are
+ * determined by vms_server_plugins.ini, as well as the logging verbosity.
  */
 class RefCountableRegistry: public nx::sdk::IRefCountableRegistry
 {
 public:
-    RefCountableRegistry(std::string name, bool verbose):
-        m_name(std::move(name)),
-        m_verbose(verbose),
-        m_printPrefix("RefCountableRegistry{" + m_name + "}: ")
-    {
-    }
+    /** @return New instance of the registry, or null if the registry is disabled by .ini. */
+    static RefCountableRegistry* createIfEnabled(const std::string& name);
 
     virtual ~RefCountableRegistry() override;
 
@@ -39,12 +38,14 @@ public:
         const nx::sdk::IRefCountable* refCountable, int refCount) override;
 
 private:
-    std::string readableRef(const nx::sdk::IRefCountable* refCountable, int refCount);
+    RefCountableRegistry(const std::string& name);
+
+    std::string readableRef(const nx::sdk::IRefCountable* refCountable, int refCount) const;
 
 private:
-    const std::string m_name;
-    const bool m_verbose;
-    const std::string m_printPrefix;
+    const std::string m_logPrefix;
+    const bool m_useServerLog;
+    const bool m_isVerbose;
     std::unordered_set<const nx::sdk::IRefCountable*> m_refCountables;
 };
 
