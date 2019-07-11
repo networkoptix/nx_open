@@ -12,6 +12,9 @@ struct LoggingIni: public nx::kit::IniConfig
         "Path (absolute or relative to .ini dir) to a dir where all analytics logs will be\n"
         "written. If empty, no logging is performed.");
 
+    NX_INI_FLAG(1, logObjectMetadataDetails,
+        "If set to 1 additional information about objects (uuid, bounding boxes) will be logged");
+
     bool isLoggingEnabled() const
     {
         return analyticsLogPath[0] != '\0';

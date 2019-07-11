@@ -21,6 +21,8 @@
 #include <nx/vms/server/resource/resource_fwd.h>
 #include <utils/common/value_cache.h>
 
+#include <nx/analytics/metadata_logger.h>
+
 static const int META_FRAME_INTERVAL = 10;
 static const int META_DATA_DURATION_MS = 300;
 static const int MAX_PRIMARY_RES_FOR_SOFT_MOTION = 1024 * 768;
@@ -131,6 +133,8 @@ private:
     QnAbstractDataReceptorPtr m_analyticsEventsSaver;
     QSharedPointer<DataCopier> m_dataReceptorMultiplexer;
     bool m_doNotConfigureCamera = false;
+
+    std::unique_ptr<nx::analytics::MetadataLogger> m_metadataLogger;
 };
 
 typedef QSharedPointer<QnLiveStreamProvider> QnLiveStreamProviderPtr;
