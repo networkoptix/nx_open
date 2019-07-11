@@ -6,6 +6,7 @@
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/subscription.h>
 #include <nx/utils/thread/mutex.h>
+#include <nx/utils/async_operation_guard.h>
 
 namespace nx::sql { class QueryContext; }
 
@@ -40,6 +41,7 @@ private:
 
     nx::utils::SubscriptionId m_recordInsertedId;
     nx::utils::SubscriptionId m_recordRemovedId;
+    nx::utils::AsyncOperationGuard m_asyncGuard;
 };
 
 } // namespace nx::clusterdb::map
