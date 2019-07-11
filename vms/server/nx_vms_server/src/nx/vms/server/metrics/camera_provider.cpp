@@ -47,11 +47,10 @@ std::optional<utils::metrics::ResourceDescription> CameraProvider::describe(
     if (resource->flags().testFlag(Qn::foreigner))
         return std::nullopt;
 
-    return utils::metrics::ResourceDescription{
+    return utils::metrics::ResourceDescription(
         resource->getId().toSimpleString(),
         resource->getParentId().toSimpleString(),
-        resource->getName()
-    };
+        resource->getName());
 }
 
 CameraProvider::ParameterProviders CameraProvider::makeProviders()

@@ -21,9 +21,8 @@ void NetworkProvider::startMonitoring()
 std::optional<utils::metrics::ResourceDescription> NetworkProvider::describe(
     const Resource& resource) const
 {
-    return utils::metrics::ResourceDescription{
-        m_serverId + "_" + resource->name, m_serverId, resource->name
-    };
+    return utils::metrics::ResourceDescription(
+        m_serverId + "_" + resource->name, m_serverId, resource->name);
 }
 
 NetworkProvider::ParameterProviders NetworkProvider::makeProviders()

@@ -47,7 +47,7 @@ public:
         controller.startMonitoring();
 
         for (int id = 0; id <= 2; ++id)
-            resources.push_back(resourceProvider->makeResource(id));
+            resources.push_back(resourceProvider->makeResource(id, /*isLocal*/ id % 2 == 0));
     }
 
 protected:
@@ -130,17 +130,18 @@ protected:
             << id.toStdString() << " = " << item->second.status.toStdString();
     }
 
-    void expectCurrentValues(api::metrics::SystemValues systemValues)
+    void expectCurrentValues(api::metrics::SystemValues systemValues, bool includeRemote)
     {
-        NX_INFO(this, __func__);
+        NX_INFO(this, "%1 includeRemote=%2", __func__, includeRemote);
         EXPECT_EQ(1, systemValues.size());
 
         auto testValues = systemValues["tests"];
-        EXPECT_EQ(3, testValues.size());
+        EXPECT_EQ(includeRemote ? 3 : 2, testValues.size());
 
         auto test0 = testValues["test_0"];
-        EXPECT_EQ("Test 0", test0.name);
         {
+            EXPECT_EQ("Test 0", test0.name);
+
             EXPECT_EQ(3, test0.values.size());
             checkParameter(test0.values, "i", 0);
             checkParameter(test0.values, "t", "text_a0");
@@ -152,8 +153,10 @@ protected:
         }
 
         auto test1 = testValues["test_1"];
-        EXPECT_EQ("Test 1", test1.name);
+        if (includeRemote)
         {
+            EXPECT_EQ("Test 1", test1.name);
+
             EXPECT_EQ(3, test1.values.size());
             checkParameter(test1.values, "i", 1);
             checkParameter(test1.values, "t", "text_a1");
@@ -163,22 +166,28 @@ protected:
             checkParameter(group, "i", 11);
             checkParameter(group, "t", "text_b1");
         }
+        else
+        {
+            EXPECT_EQ("", test1.name);
+            EXPECT_EQ(0, test1.values.size());
+        }
 
         auto test2 = testValues["test_2"];
         EXPECT_EQ("Test 2", test2.name);
     }
 
-    void expectUpdatedValues(api::metrics::SystemValues systemValues)
+    void expectUpdatedValues(api::metrics::SystemValues systemValues, bool includeRemote)
     {
-        NX_INFO(this, __func__);
+        NX_INFO(this, "%1 includeRemote=%2", __func__, includeRemote);
         EXPECT_EQ(1, systemValues.size());
 
         auto testValues = systemValues["tests"];
-        EXPECT_EQ(3, testValues.size());
+        EXPECT_EQ(includeRemote ? 3 : 2, testValues.size());
 
         auto test0 = testValues["test_0"];
-        EXPECT_EQ("Test 0", test0.name);
         {
+            EXPECT_EQ("Test 0", test0.name);
+
             EXPECT_EQ(3, test0.values.size());
             checkParameter(test0.values, "i", 7);
             checkParameter(test0.values, "t", "hello");
@@ -190,8 +199,10 @@ protected:
         }
 
         auto test1 = testValues["test_1"];
-        EXPECT_EQ("Test 1", test1.name);
+        if (includeRemote)
         {
+            EXPECT_EQ("Test 1", test1.name);
+
             EXPECT_EQ(3, test1.values.size());
             checkParameter(test1.values, "i", 1);
             checkParameter(test1.values, "t", "text_a1");
@@ -201,22 +212,28 @@ protected:
             checkParameter(group, "i", 9);
             checkParameter(group, "t", "world");
         }
+        else
+        {
+            EXPECT_EQ("", test1.name);
+            EXPECT_EQ(0, test1.values.size());
+        }
 
         auto test2 = testValues["test_2"];
         EXPECT_EQ("Test 2", test2.name);
     }
 
-    void expectUpdatedValuesWithRules(api::metrics::SystemValues systemValues)
+    void expectUpdatedValuesWithRules(api::metrics::SystemValues systemValues, bool includeRemote)
     {
-        NX_INFO(this, __func__);
+        NX_INFO(this, "%1 includeRemote=%2", __func__, includeRemote);
         EXPECT_EQ(1, systemValues.size());
 
         auto testValues = systemValues["tests"];
-        EXPECT_EQ(3, testValues.size());
+        EXPECT_EQ(includeRemote ? 3 : 2, testValues.size());
 
         auto test0 = testValues["test_0"];
-        EXPECT_EQ("Test 0", test0.name);
         {
+            EXPECT_EQ("Test 0", test0.name);
+
             EXPECT_EQ(4, test0.values.size());
             checkParameter(test0.values, "i", 7, "warning");
             checkParameter(test0.values, "iChanges", 1, "error");
@@ -230,8 +247,10 @@ protected:
         }
 
         auto test1 = testValues["test_1"];
-        EXPECT_EQ("Test 1", test1.name);
+        if (includeRemote)
         {
+            EXPECT_EQ("Test 1", test1.name);
+
             EXPECT_EQ(4, test1.values.size());
             checkParameter(test1.values, "i", 1);
             checkParameter(test1.values, "iChanges", 0);
@@ -242,6 +261,11 @@ protected:
             checkParameter(group, "i", 9);
             checkParameter(group, "tChanges", 1);
             checkParameter(group, "t", "world", "error");
+        }
+        else
+        {
+            EXPECT_EQ("", test1.name);
+            EXPECT_EQ(0, test1.values.size());
         }
 
         auto test2 = testValues["test_2"];
@@ -260,17 +284,20 @@ protected:
         ASSERT_EQ(expectedValueCount, value.toObject().size()) << id.toStdString();
     }
 
-    void expectTimelineValues(api::metrics::SystemValues systemValues, bool isUpdated = false)
+    void expectTimelineValues(
+        api::metrics::SystemValues systemValues, 
+        bool isUpdated, bool includeRemote)
     {
-        NX_INFO(this, "%1 %2", __func__, isUpdated ? "updated" : "");
+        NX_INFO(this, "%1 isUpdated=%2, includeRemote=%3", __func__, isUpdated, includeRemote);
         EXPECT_EQ(1, systemValues.size());
 
         auto testValues = systemValues["tests"];
-        EXPECT_EQ(3, testValues.size());
+        EXPECT_EQ(includeRemote ? 3 : 2, testValues.size());
 
         auto test0 = testValues["test_0"];
-        EXPECT_EQ("Test 0", test0.name);
         {
+            EXPECT_EQ("Test 0", test0.name);
+
             EXPECT_EQ(3, test0.values.size());
             checkParameterTimeline(test0.values, "i", isUpdated ? 2 : 1);
             checkParameterTimeline(test0.values, "t", isUpdated ? 2 : 1);
@@ -282,8 +309,10 @@ protected:
         }
 
         auto test1 = testValues["test_1"];
-        EXPECT_EQ("Test 1", test1.name);
+        if (includeRemote)
         {
+            EXPECT_EQ("Test 1", test1.name);
+
             EXPECT_EQ(3, test1.values.size());
             checkParameterTimeline(test1.values, "i", 1);
             checkParameterTimeline(test1.values, "t", 1);
@@ -292,6 +321,11 @@ protected:
             EXPECT_EQ(2, group.size());
             checkParameterTimeline(group, "i", isUpdated ? 2 : 1);
             checkParameterTimeline(group, "t", isUpdated ? 2 : 1);
+        }
+        else
+        {
+            EXPECT_EQ("", test1.name);
+            EXPECT_EQ(0, test1.values.size());
         }
     }
 
@@ -303,34 +337,63 @@ protected:
 
 TEST_F(MetricsControllerTest, Manifest)
 {
-    expectManifest(controller.manifest());
+    expectManifest(controller.manifest(Controller::none));
 
     ASSERT_TRUE(setRules());
 
-    expectManifestWithRules(controller.manifest());
-    expectManifest(controller.manifest(/*applyRules*/ false));
+    expectManifestWithRules(controller.manifest(Controller::applyRules));
+    expectManifest(controller.manifest(Controller::none));
 }
 
 TEST_F(MetricsControllerTest, Values)
 {
-    expectCurrentValues(controller.values());
+    expectCurrentValues(
+        controller.values(Controller::none), 
+        /*includeRemote*/ false);
     expectTimelineValues(
-        controller.values(/*applyRules*/ false, /*timeline*/ std::chrono::milliseconds::zero()),
-        /*isUpdated*/ false);
+        controller.values(Controller::none, std::chrono::milliseconds::zero()),
+        /*isUpdated*/ false, /*includeRemote*/ false);
+
+    expectCurrentValues(
+        controller.values(Controller::includeRemote), 
+        /*includeRemote*/ true);
+    expectTimelineValues(
+        controller.values(Controller::includeRemote, std::chrono::milliseconds::zero()),
+        /*isUpdated*/ false, /*includeRemote*/ true);
 
     nx::utils::test::ScopedTimeShift timeShift(nx::utils::test::ClockType::steady);
     timeShift.applyRelativeShift(std::chrono::minutes(10));
     updateSomeValues();
 
-    expectUpdatedValues(controller.values());
+    expectUpdatedValues(
+        controller.values(Controller::none), 
+        /*includeRemote*/ false);
     expectTimelineValues(
-        controller.values(/*applyRules*/ false, /*timeline*/ std::chrono::milliseconds::zero()),
-        /*isUpdated*/ true);
+        controller.values(Controller::none, std::chrono::milliseconds::zero()),
+        /*isUpdated*/ true, /*includeRemote*/ false);
+
+    expectUpdatedValues(
+        controller.values(Controller::includeRemote), 
+        /*includeRemote*/ true);
+    expectTimelineValues(
+        controller.values(Controller::includeRemote, std::chrono::milliseconds::zero()),
+        /*isUpdated*/ true, /*includeRemote*/ true);
 
     ASSERT_TRUE(setRules());
 
-    expectUpdatedValuesWithRules(controller.values());
-    expectUpdatedValues(controller.values(/*applyRules*/ false));
+    expectUpdatedValuesWithRules(
+        controller.values(Controller::applyRules), 
+        /*includeRemote*/ false);
+    expectUpdatedValues(
+        controller.values(Controller::none), 
+        /*includeRemote*/ false);
+
+    expectUpdatedValuesWithRules(
+        controller.values({Controller::includeRemote, Controller::applyRules}),
+        /*includeRemote*/ true);
+    expectUpdatedValues(
+        controller.values(Controller::includeRemote), 
+        /*includeRemote*/ true);
 }
 
 } // namespace nx::vms::utils::metrics::test

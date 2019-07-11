@@ -39,11 +39,10 @@ std::optional<utils::metrics::ResourceDescription> StorageProvider::describe(
     if (resource->getParentId() != moduleGUID())
         return std::nullopt;
 
-    return utils::metrics::ResourceDescription{
+    return utils::metrics::ResourceDescription(
         resource->getId().toSimpleString(),
         resource->getParentId().toSimpleString(),
-        resource->getName()
-    };
+        resource->getName());
 }
 
 StorageProvider::ParameterProviders StorageProvider::makeProviders()

@@ -68,16 +68,25 @@ TEST_F(MetricsApi, Api)
     // TODO: Merge with more servers to test aggreagation.
 
     const auto values = get<SystemValues>("/api/metrics/values");
-    expectCounts(values, "systems", 1, "servers", 1);
-    expectEq(values, get<SystemValues>("/ec2/metrics/values"));
+    expectCounts(values, "systems", 0, "servers", 1);
+
+    const auto systemValues = get<SystemValues>("/ec2/metrics/values");
+    expectCounts(systemValues, "systems", 1, "servers", 1);
+    expectEq(values.find("servers")->second, systemValues.find("servers")->second);
 
     const auto rawValues = get<SystemValues>("/api/metrics/values?noRules");
-    expectCounts(rawValues, "systems", 1, "servers", 1);
-    expectEq(rawValues, get<SystemValues>("/ec2/metrics/values?noRules"));
+    expectCounts(rawValues, "systems", 0, "servers", 1);
+
+    const auto rawSystemValues = get<SystemValues>("/ec2/metrics/values?noRules");
+    expectCounts(rawSystemValues, "systems", 1, "servers", 1);
+    expectEq(rawValues.find("servers")->second, rawSystemValues.find("servers")->second);
 
     const auto timelineValues = get<SystemValues>("/api/metrics/values?timeline");
     expectCounts(timelineValues, "systems", 0, "servers", 1);
-    expectEq(timelineValues, get<SystemValues>("/ec2/metrics/values?timeline"));
+
+    const auto timelineSystemValues = get<SystemValues>("/ec2/metrics/values?timeline");
+    expectCounts(timelineSystemValues, "systems", 0, "servers", 1);
+    expectEq(timelineValues.find("servers")->second, timelineSystemValues.find("servers")->second);
 }
 
 } // nx::test

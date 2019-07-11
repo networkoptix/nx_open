@@ -2899,7 +2899,7 @@ void MediaServerProcess::registerRestHandlers(
      * %return:object Metrics parameter values according to manifest. See metrics.md for details.
      */
     reg("ec2/metrics/", new nx::vms::server::metrics::SystemRestHandler(
-        m_metricsController.get(), serverModule()->resourcePool()));
+        m_metricsController.get(), serverModule()));
 }
 
 void MediaServerProcess::reg(

@@ -11,6 +11,10 @@ struct ResourceDescription
     QString id;
     QString parent;
     QString name;
+    bool isLocal = true;
+
+    ResourceDescription(QString id, QString parent, QString name, bool isLocal = true):
+        id(std::move(id)), parent(std::move(parent)), name(std::move(name)), isLocal(isLocal) {}
 };
 
 class AbstractResourceProvider
@@ -25,9 +29,9 @@ public:
     virtual void startMonitoring(DataBase::Writer dbWriter) = 0;
 
     /** Returns current resources with parameter values. */
-    virtual api::metrics::ResourceGroupValues values() const = 0;
+    virtual api::metrics::ResourceGroupValues values(bool includeRemote) const = 0;
     virtual api::metrics::ResourceGroupValues timeline(
-        uint64_t nowSecsSinceEpoch, std::chrono::milliseconds length) const = 0;
+        bool includeRemote, uint64_t nowSecsSinceEpoch, std::chrono::milliseconds length) const = 0;
 };
 
 /**
@@ -47,9 +51,9 @@ public:
     const api::metrics::ResourceManifest& manifest() const final;
     void startMonitoring(DataBase::Writer dbWriter) final;
 
-    api::metrics::ResourceGroupValues values() const final;
+    api::metrics::ResourceGroupValues values(bool includeRemote) const final;
     api::metrics::ResourceGroupValues timeline(
-        uint64_t nowSecsSinceEpoch, std::chrono::milliseconds length) const final;
+        bool includeRemote, uint64_t nowSecsSinceEpoch, std::chrono::milliseconds length) const final;
 
 protected:
     /** Should be implemented in inheritors to begin resource discovery process. */
@@ -107,13 +111,16 @@ void ResourceProvider<ResourceType>::startMonitoring(DataBase::Writer dbWriter)
 }
 
 template<typename ResourceType>
-api::metrics::ResourceGroupValues ResourceProvider<ResourceType>::values() const
+api::metrics::ResourceGroupValues ResourceProvider<ResourceType>::values(bool includeRemote) const
 {
     api::metrics::ResourceGroupValues groupValues;
     for (const auto& [resource, monitor]: m_resources)
     {
         if (auto description = describe(resource))
         {
+            if (!includeRemote && !description->isLocal)
+                continue;
+
             auto parameterValues = monitor->current();
             NX_ASSERT(!parameterValues.group.empty());
 
@@ -130,13 +137,16 @@ api::metrics::ResourceGroupValues ResourceProvider<ResourceType>::values() const
 
 template<typename ResourceType>
 api::metrics::ResourceGroupValues ResourceProvider<ResourceType>::timeline(
-    uint64_t nowSecsSinceEpoch, std::chrono::milliseconds length) const
+    bool includeRemote, uint64_t nowSecsSinceEpoch, std::chrono::milliseconds length) const
 {
     api::metrics::ResourceGroupValues groupValues;
     for (const auto& [resource, monitor]: m_resources)
     {
         if (auto description = describe(resource))
         {
+            if (!includeRemote && !description->isLocal)
+                continue;
+
             auto parameterValues = monitor->timeline(nowSecsSinceEpoch, length);
             if (!parameterValues)
                 continue;

@@ -40,7 +40,7 @@ void Controller::setRules(api::metrics::SystemRules rules)
     m_rules = rules;
 }
 
-api::metrics::SystemManifest Controller::manifest(bool applyRules) const
+api::metrics::SystemManifest Controller::manifest(RequestFlags flags) const
 {
     NX_MUTEX_LOCKER locker(&m_mutex);
     api::metrics::SystemManifest systemManifest;
@@ -50,7 +50,7 @@ api::metrics::SystemManifest Controller::manifest(bool applyRules) const
         groupManifest = provider->manifest();
 
         const auto groupRules = m_rules.find(name);
-        if (groupRules != m_rules.end() && applyRules)
+        if (groupRules != m_rules.end() && (flags & applyRules))
             applyRulesUnlocked(&groupManifest, groupRules->second);
     }
 
@@ -58,7 +58,7 @@ api::metrics::SystemManifest Controller::manifest(bool applyRules) const
 }
 
 api::metrics::SystemValues Controller::values(
-    bool applyRules, std::optional<std::chrono::milliseconds> timeline) const
+    RequestFlags flags, std::optional<std::chrono::milliseconds> timeline) const
 {
     NX_MUTEX_LOCKER locker(&m_mutex);
     api::metrics::SystemValues systemValues;
@@ -67,12 +67,13 @@ api::metrics::SystemValues Controller::values(
         auto& groupValues = systemValues[name];
         if (timeline)
         {
-            groupValues = provider->timeline(m_currentSecsSinceEpoch(), *timeline);
+            groupValues = provider->timeline(
+                flags & includeRemote, m_currentSecsSinceEpoch(), *timeline);
             continue;
         }
 
-        groupValues = provider->values();
-        if (!applyRules)
+        groupValues = provider->values(flags & includeRemote);
+        if (!(flags & applyRules))
             continue;
 
         const auto groupRules = m_rules.find(name);

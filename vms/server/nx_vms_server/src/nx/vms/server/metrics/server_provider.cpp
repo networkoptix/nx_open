@@ -34,11 +34,30 @@ std::optional<utils::metrics::ResourceDescription> ServerProvider::describe(
     if (systemId.isNull())
         systemId = globalSettings()->localSystemId();
 
-    return utils::metrics::ResourceDescription{
+    return utils::metrics::ResourceDescription(
         resource->getId().toSimpleString(),
         systemId.toSimpleString(),
-        resource->getName()
-    };
+        resource->getName(),
+        isLocal(resource));
+}
+
+bool ServerProvider::isLocal(const Resource& resource) const
+{
+    return resource->getId() == moduleGUID();
+}
+
+utils::metrics::Getter<ServerProvider::Resource> ServerProvider::localGetter(
+    utils::metrics::Getter<Resource> getter) const
+{
+    return 
+        [this, getter = std::move(getter), isLocalCache = std::unique_ptr<bool>()](
+            const Resource& resource) mutable
+        {
+            if (!isLocalCache)
+                isLocalCache = std::make_unique<bool>(isLocal(resource));
+
+            return *isLocalCache ? getter(resource) : Value();
+        };
 }
 
 ServerProvider::ParameterProviders ServerProvider::makeProviders()
@@ -46,54 +65,56 @@ ServerProvider::ParameterProviders ServerProvider::makeProviders()
     return parameterProviders(
         singleParameterProvider(
             {"url", "URL"},
-            [](const auto& resource) { return Value(resource->getUrl()); },
+            [](const auto& r) { return Value(r->getUrl()); },
             qtSignalWatch<Resource>(&QnResource::urlChanged)
         ),
         singleParameterProvider(
             {"upTime", "UP-time"},
-            [](const auto& /*resource*/) { return Value("1 day 23:45:06"); } //< TODO: Implement.
+            localGetter([](const auto&) { return Value("1 day 23:45:06"); }) //< TODO.
         ),
         singleParameterProvider(
             {"platform"},
-            [](const auto& resource) { return Value(resource->getOsInfo().platform); },
+            [](const auto& r) { return Value(r->getOsInfo().platform); },
             staticWatch<Resource>()
         ),
         singleParameterProvider(
             {"os", "operation system"},
-            [](const auto&) { return Value(api::SystemInformation::currentSystemRuntime()); },
+            localGetter(
+                [](const auto&) { return Value(api::SystemInformation::currentSystemRuntime()); }),
             staticWatch<Resource>()
         ),
         singleParameterProvider(
             {"localTime", "time on server"},
-            [](const auto& /*resource*/) { return Value("2019-01-02 12:34:56"); } //< TODO: Implement.
+            localGetter([](const auto&) { return Value("2019-01-02 12:34:56"); }) //< TODO.
         ),
         singleParameterProvider(
             {"timeZone", "time zone"},
-            [](const auto& /*resource*/) { return Value("UTC"); } //< TODO: Implement.
+            localGetter([](const auto&) { return Value("UTC"); }) //< TODO.
         ),
         singleParameterProvider(
             {"cpuUsage", "CPU Usage", "%"},
-            [](const auto& /*resource*/) { return Value(0); }, //< TODO: Implement.
+            localGetter([](const auto&) { return Value(0); }), //< TODO.
             timerWatch<Resource>(std::chrono::seconds(5))
         ),
         singleParameterProvider(
             {"cpuName", "CPU Name"},
-            [](const auto&) { return Value(HardwareInformation::instance().cpuModelName); },
+            localGetter(
+                [](const auto&) { return Value(HardwareInformation::instance().cpuModelName); }),
             staticWatch<Resource>()
         ),
         singleParameterProvider(
             {"cpuCores", "CPU Cores"},
-            [](const auto&) { return Value(4); }, //< TODO: Implement.
+            localGetter([](const auto&) { return Value(4); }), //< TODO.
             staticWatch<Resource>()
         ),
         singleParameterProvider(
             {"memoryUsage", "%"},
-            [](const auto& /*resource*/) { return Value(50); }, //< TODO: Implement.
+            localGetter([](const auto&) { return Value(50); }), //< TODO.
             timerWatch<Resource>(std::chrono::seconds(5))
         ),
         singleParameterProvider(
             {"memoryUsage", "B"},
-            [](const auto& /*resource*/) { return Value(2 * 1024 * 1024 * 1024); }, //< TODO: Implement.
+            localGetter([](const auto&) { return Value(2.0 * 1024 * 1024 * 1024); }), //< TODO.
             timerWatch<Resource>(std::chrono::seconds(5))
         ),
         makeStorageProvider("main", serverModule()->normalStorageManager()),
@@ -111,12 +132,12 @@ ServerProvider::ParameterProviderPtr ServerProvider::makeStorageProvider(
         },
         singleParameterProvider(
             {"inRate", "IN rate", "bps"},
-            [](const auto& /*resource*/) { return Value("25000000"); },
+            localGetter([](const auto&) { return Value("25000000"); }),
             staticWatch<Resource>()
         ),
         singleParameterProvider(
             {"outRate", "OUT rate", "bps"},
-            [](const auto& /*resource*/) { return Value("55000000"); },
+            localGetter([](const auto&) { return Value("55000000"); }),
             staticWatch<Resource>()
         )
     );
@@ -130,47 +151,47 @@ ServerProvider::ParameterProviderPtr ServerProvider::makeMiscProvider()
         },
         singleParameterProvider(
             {"decoders", "decoders in use"},
-            [](const auto& /*resource*/) { return Value("25000000"); },
+            localGetter([](const auto&) { return Value("25000000"); }),
             staticWatch<Resource>()
         ),
         singleParameterProvider(
             {"encoders", "encoders in use"},
-            [](const auto& /*resource*/) { return Value("25000000"); },
+            localGetter([](const auto&) { return Value("25000000"); }),
             staticWatch<Resource>()
         ),
         singleParameterProvider(
             {"decoderPixelRate", "decoder pixel rate", "px/s"},
-            [](const auto& /*resource*/) { return Value("55000000"); },
+            localGetter([](const auto&) { return Value("55000000"); }),
             staticWatch<Resource>()
         ),
         singleParameterProvider(
             {"encoderPixelRate", "encoder pixel rate", "px/s"},
-            [](const auto& /*resource*/) { return Value("55000000"); },
+            localGetter([](const auto&) { return Value("55000000"); }),
             staticWatch<Resource>()
         ),
         singleParameterProvider(
             {"hiStreams", "OUT HQ streams"},
-            [](const auto& /*resource*/) { return Value("55000000"); },
+            localGetter([](const auto&) { return Value("55000000"); }),
             staticWatch<Resource>()
         ),
         singleParameterProvider(
             {"lowStreams", "OUT LQ streams"},
-            [](const auto& /*resource*/) { return Value("55000000"); },
+            localGetter([](const auto&) { return Value("55000000"); }),
             staticWatch<Resource>()
         ),
         singleParameterProvider(
             {"transactions", "transactions per second"},
-            [](const auto& /*resource*/) { return Value("1"); },
+            localGetter([](const auto&) { return Value("1"); }),
             staticWatch<Resource>()
         ),
         singleParameterProvider(
             {"apiCalls", "API calls per second"},
-            [](const auto& /*resource*/) { return Value("10"); },
+            localGetter([](const auto&) { return Value("10"); }),
             staticWatch<Resource>()
         ),
         singleParameterProvider(
             {"events", "events per second"},
-            [](const auto& /*resource*/) { return Value("3"); },
+            localGetter([](const auto&) { return Value("3"); }),
             staticWatch<Resource>()
         )
     );
