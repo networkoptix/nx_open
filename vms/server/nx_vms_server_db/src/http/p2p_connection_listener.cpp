@@ -77,7 +77,7 @@ bool ConnectionProcessor::isPeerCompatible(const vms::api::PeerDataEx& remotePee
 
     if (remotePeer.peerType == vms::api::PeerType::server && commonModule->isReadOnly())
         return false;
-    if (!remotePeer.systemId.isNull() &&
+    if (!remotePeer.systemId.isNull() && !remotePeer.isClient() &&
         remotePeer.systemId != commonModule->globalSettings()->localSystemId())
     {
         NX_WARNING(
