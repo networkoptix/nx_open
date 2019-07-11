@@ -22,6 +22,18 @@ namespace {
 static constexpr char kUplinkSpeedId[] = "#uplinkSpeed";
 static constexpr char kMediatorEndpointId[] = "#mediatorEndpoint";
 
+static std::pair<std::string, std::string> splitPeerId(const std::string& peerId)
+{
+    std::vector<std::string> result;
+    boost::split(result, peerId, boost::is_any_of("."));
+    if (result.size() != 2)
+    {
+        NX_WARNING(NX_SCOPE_TAG, "peerId: %1 is missing required delimitter '.'", peerId);
+        return {};
+    }
+    return {std::move(result[0]),std::move(result[1])};
+}
+
 /**
  * @return an std::pair containing {<serverId>, <systemId>}
  */
@@ -30,18 +42,11 @@ static std::pair<std::string, std::string> parsePeerId(const std::string& key)
     // Key is expected to be of the form: <systemId>.<serverId>#<keyTypeId>
     // The return value will have the form: <serverId>.<systemId>
 
+    // head == systemId
+    // tail == serverId#<key-type-id>
+    auto [head, tail] = splitPeerId(key);
+
     std::vector<std::string> result;
-    boost::split(result, key, boost::is_any_of("."));
-    if ((int) result.size() < 2) // all keys should contain systemId.serverId, 2 entries
-    {
-        NX_WARNING(NX_SCOPE_TAG, "key: %1 is missing required delimitter: '.'", key);
-        return {};
-    }
-
-    auto head = std::move(result[0]); //< systemId
-    auto tail = result[1];
-
-    result.clear();
     boost::split(result, tail, boost::is_any_of("#"));
     if (result.empty())
     {
@@ -267,7 +272,7 @@ void ListeningPeerDb::findMediatorByPeerDomain(
 
 void ListeningPeerDb::addUplinkSpeed(
     const std::string& peerId,
-    const nx::hpm::api::ConnectionSpeed& connectionSpeed,
+    const nx::hpm::api::ConnectionSpeed& uplinkSpeed,
     nx::utils::MoveOnlyFunc<void(bool)> handler)
 {
     if (!m_map)
@@ -277,8 +282,10 @@ void ListeningPeerDb::addUplinkSpeed(
 
     m_map->database().dataManager().insertOrUpdate(
         key,
-        QJson::serialized(connectionSpeed).toStdString(),
-        [this, func = __func__, key, handler = std::move(handler)](clusterdb::map::ResultCode result)
+        QJson::serialized(uplinkSpeed).toStdString(),
+        [this, func = __func__, key, peerId, uplinkSpeed,
+            handler = std::move(handler)](
+                clusterdb::map::ResultCode result)
         {
             if (result != clusterdb::map::ResultCode::ok)
             {
@@ -286,6 +293,15 @@ void ListeningPeerDb::addUplinkSpeed(
                     func, key, clusterdb::map::toString(result));
                 return handler(false);
             }
+
+            auto [serverId, systemId] = splitPeerId(peerId);
+            m_uplinkSpeedUpdated.notify(
+                nx::hpm::api::PeerConnectionSpeed{
+                    std::move(serverId),
+                    std::move(systemId),
+                    uplinkSpeed});
+
+            handler(true);
         });
 }
 
@@ -378,6 +394,20 @@ std::string ListeningPeerDb::nodeId() const
     return m_map
         ? m_map->synchronizationEngine().peerId().toSimpleString().toStdString()
         : std::string();
+}
+
+nx::utils::SubscriptionId
+    nx::hpm::ListeningPeerDb::subscribeToUplinkSpeedUpdated(
+        nx::utils::MoveOnlyFunc<void(nx::hpm::api::PeerConnectionSpeed)> handler)
+{
+    nx::utils::SubscriptionId id;
+    m_uplinkSpeedUpdated.subscribe(std::move(handler), &id);
+    return id;
+}
+
+void nx::hpm::ListeningPeerDb::unsubscribeFromUplinkSpeedUpdated(nx::utils::SubscriptionId id)
+{
+    m_uplinkSpeedUpdated.removeSubscription(id);
 }
 
 std::string ListeningPeerDb::toInternalStorageFormat(const std::string& peerDomainName) const

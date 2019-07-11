@@ -3,6 +3,7 @@
 #include <nx/clusterdb/map/embedded_database.h>
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/network/cloud/mediator/api/connection_speed.h>
+#include <nx/utils/subscription.h>
 
 #include "mediator_endpoint.h"
 #include "mediator_selector.h"
@@ -18,8 +19,8 @@ struct ListeningPeerDb;
 
 struct ListeningPeerStatus
 {
-    std::string serverId;
     std::string systemId;
+    std::string serverId;
 
     // The list of Mediators that a listeningPeer is connected to.
     std::vector<MediatorEndpoint> connectedEndpoints;
@@ -84,7 +85,7 @@ public:
      */
     void addUplinkSpeed(
         const std::string& peerId,
-        const nx::hpm::api::ConnectionSpeed& connectionSpeed,
+        const nx::hpm::api::ConnectionSpeed& uplinkSpeed,
         nx::utils::MoveOnlyFunc<void(bool)> handler);
 
     /**
@@ -115,6 +116,10 @@ public:
      */
     std::string nodeId() const;
 
+    nx::utils::SubscriptionId subscribeToUplinkSpeedUpdated(
+        nx::utils::MoveOnlyFunc<void(nx::hpm::api::PeerConnectionSpeed)> handler);
+    void unsubscribeFromUplinkSpeedUpdated(nx::utils::SubscriptionId id);
+
 private:
 
     std::string toInternalStorageFormat(const std::string& peerId) const;
@@ -130,6 +135,8 @@ private:
     MediatorEndpoint m_mediatorEndpoint;
     std::string m_mediatorEndpointString;
     nx::utils::Url m_syncEngineUrl;
+
+    nx::utils::Subscription<nx::hpm::api::PeerConnectionSpeed> m_uplinkSpeedUpdated;
 };
 
 } // namespace nx::hpm
