@@ -1,5 +1,6 @@
 #include "controller.h"
 
+#include <stdexcept>
 #include <QtCore/QJsonObject>
 
 namespace nx::vms::utils::metrics {
@@ -95,14 +96,30 @@ static double sum(const std::vector<nx::utils::TimedValue<Value>>& timeline)
         [](double current, const auto& point) { return current + point.value.toDouble(); });
 }
 
+template<typename... Args>
+std::domain_error error(Args... args)
+{
+    return std::domain_error(nx::utils::log::makeMessage(std::forward<Args>(args)...).toStdString());
+}
+
 static Value calculate(DataBase::Reader reader, const QStringList& formula)
 {
     if (formula.isEmpty())
-        return "ERROR: No function";
+        throw error("no function name");
 
     const auto function = formula[0];
     const auto arg =
-        [&](int index) { return reader[index <= formula.size() ? formula[index] : QString()]; };
+        [&](int index) 
+        { 
+            if (index >= formula.size())
+                throw error("%1 arg is missing", index);
+
+            const auto name = formula[index];
+            if (const auto argReader = reader[name])
+                return argReader;
+
+            throw error("parameter %1 is not is DB", name);
+        };
 
     if (function == "+" || formula[0] == "add")
         return arg(1)->current().toDouble() + arg(2)->current().toDouble();
@@ -125,7 +142,7 @@ static Value calculate(DataBase::Reader reader, const QStringList& formula)
         return timeline.empty() ? 0 : (sum(timeline) / timeline.size());
     }
 
-    return "ERROR: unknown function: " + function;
+    throw error("unknown function %1", function);
 }
 
 static bool isAlarmed(const Value& value, const Value& alarmValue)
@@ -167,21 +184,6 @@ static bool isAlarmed(const Value& value, const Value& alarmValue)
     return value == alarmValue;
 }
 
-static api::metrics::Status checkStatus(
-    const Value& value, const std::map<api::metrics::Status, Value>& alarmRules)
-{
-    if (value.isNull() || value.toString().startsWith("ERROR: "))
-        return "error";
-
-    for (const auto& [level, alarmValue]: alarmRules)
-    {
-        if (isAlarmed(value, alarmValue))
-            return level;
-    }
-
-    return {};
-}
-
 void Controller::applyRulesUnlocked(
     std::map<QString /*id*/, api::metrics::ParameterGroupValues>* group,
     DataBase::Reader reader,
@@ -197,9 +199,27 @@ void Controller::applyRulesUnlocked(
         }
 
         if (!rule.calculate.isEmpty())
-            parameter.value = calculate(reader, rule.calculate.split(" "));
+        {
+            try
+            {
+                parameter.value = calculate(reader, rule.calculate.split(" "));
+            }
+            catch(const std::domain_error& error)
+            {
+                parameter.value = QString(error.what());
+                parameter.status = QString("error");
+                continue;
+            }
+        }
 
-        parameter.status = checkStatus(parameter.value, rule.alarms);
+        for (const auto& [level, alarmValue]: rule.alarms)
+        {
+            if (isAlarmed(parameter.value, alarmValue))
+            {
+                parameter.status = level;
+                continue;
+            }
+        }
     }
 }
 
