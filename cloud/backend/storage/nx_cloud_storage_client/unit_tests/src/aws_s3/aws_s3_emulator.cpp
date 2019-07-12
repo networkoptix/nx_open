@@ -104,7 +104,7 @@ void AwsS3Emulator::getFile(
 //-------------------------------------------------------------------------------------------------
 
 void AwsSignatureV4Authenticator::authenticate(
-    const nx::network::http::HttpServerConnection& connection,
+    const nx::network::http::HttpServerConnection& /*connection*/,
     const nx::network::http::Request& request,
     nx::network::http::server::AuthenticationCompletionHandler completionHandler)
 {
