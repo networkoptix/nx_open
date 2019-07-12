@@ -2319,7 +2319,7 @@ void MultiServerUpdatesWidget::syncRemoteUpdateStateToUi()
     if (m_widgetState == WidgetUpdateState::readyInstall)
     {
         if (readyAndOnline.empty() || !readyAndOffline.empty()
-            || hasStatusErrors || hasStatusErrors)
+            || hasStatusErrors || hasVerificationErrors)
         {
             if (hasVerificationErrors)
             {
