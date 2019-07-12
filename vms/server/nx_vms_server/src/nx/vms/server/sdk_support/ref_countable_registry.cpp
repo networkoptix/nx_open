@@ -62,14 +62,16 @@ std::string RefCountableRegistry::readableRef(
     ASSERT(refCountable);
 
     return demangleTypeName(typeid(*refCountable).name()).toStdString()
-        + "{refCount: " + nx::kit::utils::toString(refCount) + "}";
+        + "{"
+        + "refCount: " + nx::kit::utils::toString(refCount)
+        + (m_isVerbose ? (", @" + nx::kit::utils::toString(refCountable)) : "")
+        + "}";
 }
 
 void RefCountableRegistry::notifyCreated(
     const IRefCountable* const refCountable, const int refCount)
 {
     ASSERT(refCountable);
-    // TODO: #mshevchenko: Write "Created " without func.
     VERBOSE("Created " + readableRef(refCountable, refCount));
 
     ASSERT(refCount == 1,
