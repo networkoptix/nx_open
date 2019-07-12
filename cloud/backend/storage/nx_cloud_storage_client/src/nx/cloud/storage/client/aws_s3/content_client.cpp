@@ -50,8 +50,8 @@ void ContentClient::removeChunk(
 }
 
 void ContentClient::saveDeviceDescription(
-    const std::string& cameraId,
-    const DeviceDescription& data,
+    const std::string& /*cameraId*/,
+    const DeviceDescription& /*data*/,
     Handler handler)
 {
     handler(ResultCode::notImplemented);
@@ -59,7 +59,7 @@ void ContentClient::saveDeviceDescription(
 }
 
 void ContentClient::getDeviceDescription(
-    const std::string& cameraId,
+    const std::string& /*cameraId*/,
     GetDeviceDescriptionHandler handler)
 {
     handler(ResultCode::notImplemented, DeviceDescription{});
