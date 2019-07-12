@@ -156,6 +156,7 @@ void CommonUpdateManager::retry(bool forceRedownload)
     {
         case ErrorCode::noError:
         case ErrorCode::updatePackageNotFound:
+        case ErrorCode::osVersionNotSupported:
         case ErrorCode::internalError:
         case ErrorCode::unknownError:
         case ErrorCode::applauncherError:
