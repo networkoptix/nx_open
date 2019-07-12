@@ -277,46 +277,14 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
             repeatUpdateValidation();
         });
 
-    connect(m_stateTracker.get(), &PeerStateTracker::itemRemoved, this,
-        [this](UpdateItemPtr item)
-        {
-            if (m_widgetState != WidgetUpdateState::ready)
-                return;
+    connect(m_stateTracker.get(), &PeerStateTracker::itemRemoved,
+        this, &MultiServerUpdatesWidget::atServerConfigurationChanged);
 
-            NX_VERBOSE(this,
-               "peer %1 is going to be removed. We should repeat validation.", item->id);
-            repeatUpdateValidation();
-        });
+    connect(m_stateTracker.get(), &PeerStateTracker::itemAdded,
+        this, &MultiServerUpdatesWidget::atServerConfigurationChanged);
 
-    connect(m_stateTracker.get(), &PeerStateTracker::itemAdded, this,
-        [this](UpdateItemPtr item)
-        {
-            if (m_widgetState != WidgetUpdateState::ready)
-                return;
-
-            NX_VERBOSE(this,
-               "peer %1 is going to be added. We should repeat validation.", item->id);
-            repeatUpdateValidation();
-        });
-
-    connect(m_stateTracker.get(), &PeerStateTracker::itemOnlineStatusChanged, this,
-        [this](UpdateItemPtr item)
-        {
-            if (m_widgetState != WidgetUpdateState::ready
-                && m_widgetState != WidgetUpdateState::readyInstall)
-            {
-                return;
-            }
-
-            if (!item->offline || !item->verificationMessage.isEmpty())
-            {
-                // TODO: Make more conservative check: only check if server goes online, or if
-                // server has errors and goes offline.
-                NX_VERBOSE(this,
-                   "peer %1 has changed online status. We should repeat validation.", item->id);
-                repeatUpdateValidation();
-            }
-        });
+    connect(m_stateTracker.get(), &PeerStateTracker::itemOnlineStatusChanged,
+        this, &MultiServerUpdatesWidget::atServerConfigurationChanged);
 
     connect(m_serverUpdateTool.get(), &ServerUpdateTool::startUpdateComplete,
         this, &MultiServerUpdatesWidget::atStartUpdateComplete);
@@ -1339,6 +1307,25 @@ void MultiServerUpdatesWidget::atServerPackageDownloadFailed(
     }
 }
 
+void MultiServerUpdatesWidget::atServerConfigurationChanged(std::shared_ptr<UpdateItem> item)
+{
+    if (m_widgetState != WidgetUpdateState::ready
+        && m_widgetState != WidgetUpdateState::readyInstall
+        && m_widgetState != WidgetUpdateState::downloading)
+    {
+        return;
+    }
+
+    if (!item->offline || !item->verificationMessage.isEmpty())
+    {
+        // TODO: Make more conservative check: only check if server goes online, or if
+        // server has errors and goes offline.
+        NX_VERBOSE(this,
+           "peer %1 has changed online status. We should repeat validation.", item->id);
+        repeatUpdateValidation();
+    }
+}
+
 ServerUpdateTool::ProgressInfo MultiServerUpdatesWidget::calculateActionProgress() const
 {
     ServerUpdateTool::ProgressInfo result;
@@ -2331,7 +2318,8 @@ void MultiServerUpdatesWidget::syncRemoteUpdateStateToUi()
     QStringList errorTooltips;
     if (m_widgetState == WidgetUpdateState::readyInstall)
     {
-        if (readyAndOnline.empty() || !readyAndOffline.empty())
+        if (readyAndOnline.empty() || !readyAndOffline.empty()
+            || hasStatusErrors || hasStatusErrors)
         {
             if (hasVerificationErrors)
             {

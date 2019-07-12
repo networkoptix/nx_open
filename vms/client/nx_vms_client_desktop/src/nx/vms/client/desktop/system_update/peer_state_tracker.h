@@ -278,9 +278,6 @@ private:
     QList<UpdateItemPtr> m_items;
     UpdateItemPtr m_clientItem;
 
-    /** Servers we do work with. */
-    std::map<QnUuid, QnMediaServerResourcePtr> m_activeServers;
-
     mutable QnMutex m_dataLock;
 
     /**

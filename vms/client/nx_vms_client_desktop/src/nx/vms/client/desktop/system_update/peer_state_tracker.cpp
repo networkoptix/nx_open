@@ -60,7 +60,6 @@ bool PeerStateTracker::setResourceFeed(QnResourcePool* pool)
     }
 
     m_items.clear();
-    m_activeServers.clear();
 
     for (auto it = itemsCache.rbegin(); it != itemsCache.rend(); ++it)
         emit itemRemoved(*it);
@@ -517,11 +516,14 @@ std::map<QnUuid, QnMediaServerResourcePtr> PeerStateTracker::activeServers() con
     QnMutexLocker locker(&m_dataLock);
 
     std::map<QnUuid, QnMediaServerResourcePtr> result;
-    for (const auto& item: m_activeServers)
+    for (const auto& item: m_items)
     {
-        if (!item.second->isOnline())
+        if (item->offline)
             continue;
-        result[item.first] = item.second;
+        if (item->component != UpdateItem::Component::server)
+            continue;
+        if (auto server = getServer(item))
+            result[item->id] = server;
     }
     return result;
 }
@@ -996,7 +998,6 @@ void PeerStateTracker::atResourceAdded(const QnResourcePtr& resource)
     UpdateItemPtr item;
     {
         QnMutexLocker locker(&m_dataLock);
-        m_activeServers[server->getId()] = server;
         item = addItemForServer(server);
         updateServerData(server, item);
     }
@@ -1021,7 +1022,6 @@ void PeerStateTracker::atResourceRemoved(const QnResourcePtr& resource)
     emit itemToBeRemoved(item);
     {
         QnMutexLocker locker(&m_dataLock);
-        m_activeServers.erase(id);
         m_peersIssued.remove(id);
         m_peersFailed.remove(id);
         m_peersActive.remove(id);
