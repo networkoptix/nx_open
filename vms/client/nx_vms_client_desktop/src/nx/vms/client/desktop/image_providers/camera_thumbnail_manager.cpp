@@ -96,10 +96,13 @@ void CameraThumbnailManager::refreshSelectedCamera()
     if (!m_selectedCamera)
         return;
 
-    if (!isRequestAvailable(m_selectedCamera))
-        return;
-
     ThumbnailData& data = m_thumbnailByCamera[m_selectedCamera];
+
+    if (!isRequestAvailable(m_selectedCamera))
+    {
+        data.status = Qn::ThumbnailStatus::NoData;
+        return;
+    }
 
     if (isUpdating(data.status))
         return;

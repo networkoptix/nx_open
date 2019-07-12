@@ -167,7 +167,20 @@ Item
 
             onValuesEdited: { store.setDeviceAgentSettingsValues(currentEngineId, getValues()) }
 
-            enabled: enableSwitch.checked
+            contentEnabled: enableSwitch.checked
+            verticalScrollBar: scrollBar
+        }
+    }
+
+    ScrollBar
+    {
+        id: scrollBar
+
+        anchors
+        {
+            top: parent.top
+            right: parent.right
+            bottom: alertBar.top
         }
     }
 

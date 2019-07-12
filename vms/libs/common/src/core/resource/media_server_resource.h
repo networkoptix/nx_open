@@ -92,6 +92,9 @@ public:
     void setRedundancy(bool value);
     bool isRedundancy() const;
 
+    void setCompatible(bool value);
+    bool isCompatible() const;
+
     QnServerBackupSchedule getBackupSchedule() const;
     void setBackupSchedule(const QnServerBackupSchedule& value);
 
@@ -157,6 +160,8 @@ signals:
     void backupScheduleChanged(const QnResourcePtr &resource);
     void apiUrlChanged(const QnResourcePtr& resource);
     void primaryAddressChanged(const QnResourcePtr& resource);
+    void compatibilityChanged(const QnResourcePtr& resource);
+
 private:
     nx::network::SocketAddress m_primaryAddress;
     QnMediaServerConnectionPtr m_apiConnection; // deprecated
@@ -170,6 +175,7 @@ private:
     QVector<nx::network::http::AsyncHttpClientPtr> m_runningIfRequests;
     QElapsedTimer m_statusTimer;
     QString m_authKey;
+    bool m_isCompatible = true;
 
     CachedValue<Qn::PanicMode> m_panicModeCache;
 
