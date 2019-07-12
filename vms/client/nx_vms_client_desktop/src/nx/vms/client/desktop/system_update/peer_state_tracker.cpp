@@ -930,6 +930,20 @@ void PeerStateTracker::setTaskError(const QSet<QnUuid>& targets, const QString& 
     }
 }
 
+void PeerStateTracker::addToTask(QnUuid id)
+{
+    m_peersIssued.insert(id);
+    m_peersActive.insert(id);
+}
+
+void PeerStateTracker::removeFromTask(QnUuid id)
+{
+    m_peersIssued.remove(id);
+    m_peersActive.remove(id);
+    m_peersComplete.remove(id);
+    m_peersFailed.remove(id);
+}
+
 QString PeerStateTracker::errorString(nx::update::Status::ErrorCode code)
 {
     using Code = nx::update::Status::ErrorCode;

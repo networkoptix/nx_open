@@ -277,14 +277,24 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
             repeatUpdateValidation();
         });
 
-    connect(m_stateTracker.get(), &PeerStateTracker::itemRemoved,
-        this, &MultiServerUpdatesWidget::atServerConfigurationChanged);
+    connect(m_stateTracker.get(), &PeerStateTracker::itemRemoved, this,
+        [this](UpdateItemPtr item)
+        {
+            if (m_widgetState == WidgetUpdateState::downloading)
+                m_stateTracker->removeFromTask(item->id);
+            atServerConfigurationChanged(item);
+        });
 
-    connect(m_stateTracker.get(), &PeerStateTracker::itemAdded,
-        this, &MultiServerUpdatesWidget::atServerConfigurationChanged);
+    connect(m_stateTracker.get(), &PeerStateTracker::itemAdded, this,
+        [this](UpdateItemPtr item)
+        {
+            if (m_widgetState == WidgetUpdateState::downloading)
+                m_stateTracker->addToTask(item->id);
+            atServerConfigurationChanged(item);
+        });
 
-    connect(m_stateTracker.get(), &PeerStateTracker::itemOnlineStatusChanged,
-        this, &MultiServerUpdatesWidget::atServerConfigurationChanged);
+    connect(m_stateTracker.get(), &PeerStateTracker::itemOnlineStatusChanged, this,
+        &MultiServerUpdatesWidget::atServerConfigurationChanged);
 
     connect(m_serverUpdateTool.get(), &ServerUpdateTool::startUpdateComplete,
         this, &MultiServerUpdatesWidget::atStartUpdateComplete);
