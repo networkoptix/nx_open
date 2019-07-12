@@ -10,7 +10,6 @@
 #include <nx/update/update_information.h>
 #include <utils/common/connective.h>
 #include <utils/update/zip_utils.h>
-#include "update_contents.h"
 
 namespace nx::vms::applauncher::api { enum class ResultType; }
 

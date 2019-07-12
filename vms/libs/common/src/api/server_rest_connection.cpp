@@ -866,7 +866,7 @@ Handle ServerConnection::getInstalledUpdateInfo(Result<UpdateInformationData>::t
 }
 
 Handle ServerConnection::updateActionStop(
-    std::function<void (Handle, bool)>&& callback, QThread* targetThread)
+    std::function<void (bool, Handle)>&& callback, QThread* targetThread)
 {
     auto internalCallback =
         [callback = std::move(callback)](
@@ -883,14 +883,14 @@ Handle ServerConnection::updateActionStop(
 }
 
 Handle ServerConnection::updateActionFinish(bool skipActivePeers,
-    std::function<void (Handle, bool)>&& callback, QThread* targetThread)
+    std::function<void (bool, Handle, const QnRestResult& result)>&& callback, QThread* targetThread)
 {
     auto internalCallback =
         [callback=std::move(callback)](
-            bool success, rest::Handle handle, EmptyResponseType /*response*/)
+            bool success, rest::Handle handle, const QnRestResult& result)
         {
             if (callback)
-                callback(success, handle);
+                callback(success, handle, result);
         };
 
     const auto contentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
@@ -899,22 +899,22 @@ Handle ServerConnection::updateActionFinish(bool skipActivePeers,
     if (skipActivePeers)
         params.insert("ignorePendingPeers", "true");
 
-    return executePost<EmptyResponseType>("/ec2/finishUpdate",
+    return executePost<QnRestResult>("/ec2/finishUpdate",
         params,
         contentType, QByteArray(),
         internalCallback, targetThread);
 }
 
 Handle ServerConnection::updateActionInstall(const QSet<QnUuid>& participants,
-    std::function<void (Handle, bool)>&& callback,
+    std::function<void (bool, Handle, const QnRestResult& result)>&& callback,
     QThread* targetThread)
 {
     auto internalCallback =
         [callback=std::move(callback)](
-            bool success, rest::Handle handle, EmptyResponseType /*response*/)
+            bool success, rest::Handle handle, const QnRestResult& result)
         {
             if (callback)
-                callback(success, handle);
+                callback(success, handle, result);
         };
     const auto contentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
     QString peerList;
@@ -924,7 +924,7 @@ Handle ServerConnection::updateActionInstall(const QSet<QnUuid>& participants,
             peerList += ",";
         peerList += peer.toString();
     }
-    return executePost<EmptyResponseType>("/api/installUpdate",
+    return executePost<QnRestResult>("/api/installUpdate",
         QnRequestParamList{{ lit("peers"), peerList }},
         contentType, QByteArray(), internalCallback, targetThread);
 }

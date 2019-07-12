@@ -456,15 +456,15 @@ public:
         QThread* targetThread = nullptr);
 
     Handle updateActionStop(
-        std::function<void(Handle, bool)>&& callback,
+        std::function<void(bool, Handle)>&& callback,
         QThread* targetThread = nullptr);
 
     Handle updateActionFinish(bool skipActivePeers,
-        std::function<void(Handle, bool)>&& callback,
+        std::function<void(bool, Handle, const QnRestResult&)>&& callback,
         QThread* targetThread = nullptr);
 
     Handle updateActionInstall(const QSet<QnUuid>& participants,
-        std::function<void(Handle, bool)>&& callback,
+        std::function<void(bool, Handle, const QnRestResult&)>&& callback,
         QThread* targetThread = nullptr);
 
     Handle retryUpdate(

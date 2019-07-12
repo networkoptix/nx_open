@@ -12,7 +12,7 @@
 #include <nx/utils/app_info.h>
 #include <utils/common/app_info.h>
 
-#include "update_contents.h"
+#include "update_verification.h"
 
 using nx::update::UpdateContents;
 
@@ -138,7 +138,7 @@ bool verifyUpdateContents(
     nx::update::Information& info = contents.info;
     if (contents.error != nx::update::InformationError::noError)
     {
-        NX_ERROR(typeid(UpdateContents)) << "verifyUpdateManifest("
+        NX_ERROR(typeid(UpdateContents)) << "verifyUpdateContents("
             << contents.info.version << ") has an error before verification:"
             << nx::update::toString(contents.error);
         return false;
@@ -151,6 +151,14 @@ bool verifyUpdateContents(
     }
 
     nx::utils::SoftwareVersion targetVersion(info.version);
+
+    if (contents.info.version.isEmpty() || targetVersion.isNull())
+    {
+        NX_ERROR(typeid(UpdateContents),
+            "verifyUpdateContents(...) - missing or invalid version.");
+        contents.error = nx::update::InformationError::jsonError;
+        return false;
+    }
 
     contents.invalidVersion.clear();
     contents.missingUpdate.clear();

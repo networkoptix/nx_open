@@ -1,4 +1,5 @@
 import QtQuick 2.0
+import QtQuick.Controls 2.4
 
 import "settings.js" as Settings
 import "components"
@@ -11,6 +12,8 @@ Item
     signal valuesEdited()
 
     property Item contentItem: null
+    property bool contentEnabled: true
+    property ScrollBar verticalScrollBar: null
 
     function loadModel(model, initialValues)
     {
@@ -18,6 +21,8 @@ Item
             contentItem.destroy()
 
         contentItem = Settings.createItems(settingsView, model)
+        contentItem.contentEnabled = Qt.binding(function() { return contentEnabled })
+        contentItem.verticalScrollBar = Qt.binding(function() { return verticalScrollBar })
 
         if (initialValues)
             setValues(initialValues)

@@ -14,7 +14,7 @@
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 
-#include "nx/vms/client/desktop/system_update/update_contents.h"
+#include "nx/vms/client/desktop/system_update/update_verification.h"
 #include "nx/vms/client/desktop/system_update/multi_server_updates_widget.h"
 
 namespace {

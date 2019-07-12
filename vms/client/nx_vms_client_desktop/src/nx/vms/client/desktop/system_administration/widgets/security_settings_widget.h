@@ -35,6 +35,7 @@ private:
 
 protected:
     virtual void setReadOnlyInternal(bool readOnly) override;
+    virtual void resizeEvent(QResizeEvent* resizeEvent) override;
 
 private:
     QScopedPointer<Ui::SecuritySettingsWidget> ui;

@@ -159,6 +159,7 @@ public:
     {
         noError = 0,
         updatePackageNotFound,
+        osVersionNotSupported,
         noFreeSpaceToDownload,
         noFreeSpaceToExtract,
         noFreeSpaceToInstall,

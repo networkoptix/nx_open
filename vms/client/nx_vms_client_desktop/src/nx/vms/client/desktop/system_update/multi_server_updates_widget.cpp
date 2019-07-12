@@ -1672,6 +1672,7 @@ void MultiServerUpdatesWidget::processDownloadingState()
             m_serverUpdateTool->requestRetryAction();
             m_clientUpdateTool->setUpdateTarget(m_updateInfo);
             setTargetState(WidgetUpdateState::downloading, serversToRetry);
+            m_stateTracker->markStatusUnknown(serversToRetry);
         }
         else if (clicked == cancelUpdate)
         {
@@ -2332,16 +2333,20 @@ void MultiServerUpdatesWidget::syncRemoteUpdateStateToUi()
     {
         if (readyAndOnline.empty() || !readyAndOffline.empty())
         {
-            errorTooltips << tr("Some servers have gone offline. "
-                                "Please wait until they become online to continue.");
-        }
-        else if (hasVerificationErrors)
-        {
-            errorTooltips << tr("Some servers have no update packages available.");
-        }
-        else if (hasStatusErrors)
-        {
-            errorTooltips << tr("Some servers have encountered an internal error.");
+            if (hasVerificationErrors)
+            {
+                errorTooltips << tr("Some servers have no update packages available.");
+            }
+            else if (hasStatusErrors)
+            {
+                errorTooltips << tr("Some servers have encountered an internal error.");
+                errorTooltips << tr("Please please contact Customer Support.");
+            }
+            else
+            {
+                errorTooltips << tr("Some servers have gone offline. "
+                                    "Please wait until they become online to continue.");
+            }
         }
     }
 
@@ -2353,7 +2358,6 @@ void MultiServerUpdatesWidget::syncRemoteUpdateStateToUi()
     else
     {
         ui->downloadButton->setEnabled(false);
-        errorTooltips << tr("Please please contact Customer Support.");
         ui->downloadButton->setToolTip(errorTooltips.join("\n"));
     }
 
