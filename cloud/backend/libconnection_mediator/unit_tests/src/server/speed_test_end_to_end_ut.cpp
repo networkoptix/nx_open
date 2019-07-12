@@ -107,9 +107,9 @@ protected:
         updateBestConnection();
     }
 
-    void whenResultsAreReportedToMediator()
+    void whenSpeedTestResultsAreReportedToMediator()
     {
-        // speed tests are started and reported automatically by UplinkSpeedReporter
+        // Speed tests are started and reported automatically by UplinkSpeedReporter
         // in it's constructor
         while (m_uplinkSpeedTestsDone != (int) m_serverCount)
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
@@ -226,9 +226,9 @@ TEST_F(SpeedTestEndToEnd, client_connects_to_mediaserver_with_best_uplink_speed)
     givenMediator();
     givenMediaservers();
 
-    whenResultsAreReportedToMediator();
-
+    whenSpeedTestResultsAreReportedToMediator();
     whenClientRequestToConnectToSystem();
+
     thenClientConnectsToServerWithBestUplinkSpeed();
 }
 
