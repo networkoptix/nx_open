@@ -5,6 +5,7 @@
 #include <nx/network/socket_global.h>
 #include <nx/utils/argument_parser.h>
 #include <nx/utils/log/log_initializer.h>
+#include <nx/utils/std/filesystem.h>
 
 #include <nx/cloud/storage/client/aws_s3/api_client.h>
 
@@ -18,7 +19,7 @@ int main(int argc, const char* argv[])
 
     nx::utils::log::initializeGlobally(arguments);
 
-    if (arguments.contains("-h") || arguments.contains("--help"))
+    if (arguments.contains("h") || arguments.contains("help"))
     {
         printHelp(argv[0]);
         return 0;
@@ -26,7 +27,7 @@ int main(int argc, const char* argv[])
 
     nx::network::SocketGlobalsHolder socketGlobalsHolder;
 
-    if (arguments.contains("-u"))
+    if (arguments.contains("u"))
         return upload(arguments);
     else
         return download(arguments);
@@ -42,7 +43,7 @@ void printHelp(const char* name)
         "Provides some operation with AWS S3 bucket." << std::endl <<
         "Common parameters: " << std::endl <<
         "   [URL] should be s3://BucketName.s3.amazonaws.com/ObjectName" << std::endl <<
-        "   -u user:password" << std::endl <<
+        "   --user=user:password" << std::endl <<
         "   -r aws_region (e.g., us-west-1)" << std::endl <<
         std::endl <<
         "Usage examples: " << std::endl <<
@@ -57,6 +58,8 @@ void printHelp(const char* name)
 
 struct CommonSettings
 {
+    std::string url;
+
     std::string user;
     std::string password;
 
@@ -67,7 +70,7 @@ struct CommonSettings
     {
         CommonSettings settings;
 
-        if (auto credentialsStr = arguments.get("u"))
+        if (auto credentialsStr = arguments.get("user"))
         {
             const auto tokens = credentialsStr->split(":");
             if (tokens.empty())
@@ -89,16 +92,85 @@ struct CommonSettings
         }
         settings.region = region->toStdString();
 
+        const auto positionalArgs = arguments.getPositionalArgs();
+        if (positionalArgs.empty())
+        {
+            std::cerr << "Missing required argument URL. See -h" << std::endl;
+            return std::make_tuple(settings, false);
+        }
+
+        settings.url = positionalArgs.front().toStdString();
+
         return std::make_tuple(std::move(settings), true);
     }
 };
 
+std::unique_ptr<nx::cloud::storage::client::aws_s3::ApiClient>
+    prepareApiClient(const CommonSettings& settings)
+{
+    return std::make_unique<nx::cloud::storage::client::aws_s3::ApiClient>(
+        "cmd_line_client",
+        settings.region,
+        nx::utils::Url(settings.url),
+        nx::network::http::Credentials(
+            settings.user.c_str(),
+            nx::network::http::PasswordAuthToken(settings.password.c_str())));
+}
+
 //-------------------------------------------------------------------------------------------------
 
-int upload(const nx::utils::ArgumentParser& /*arguments*/)
+struct UploadSettings
 {
-    // TODO
-    return 1;
+    CommonSettings common;
+    std::string inputFilePath;
+
+    static std::tuple<UploadSettings, bool /*result*/> read(
+        const nx::utils::ArgumentParser& arguments)
+    {
+        UploadSettings settings;
+
+        bool result = false;
+        std::tie(settings.common, result) = CommonSettings::read(arguments);
+        if (!result)
+            return std::make_tuple(settings, false);
+
+        if (auto arg = arguments.get("i"))
+            settings.inputFilePath = arg->toStdString();
+
+        return std::make_tuple(settings, true);
+    }
+};
+
+int upload(const nx::utils::ArgumentParser& arguments)
+{
+    using namespace nx::cloud::storage::client::aws_s3;
+
+    const auto [settings, result] = UploadSettings::read(arguments);
+    if (!result)
+        return 1;
+
+    auto client = prepareApiClient(settings.common);
+
+    std::ifstream contentFile(settings.inputFilePath, std::ios_base::in | std::ios_base::binary);
+    if (!contentFile.is_open())
+        return false;
+    std::stringstream contents;
+    contents << contentFile.rdbuf();
+
+    std::promise<Result> done;
+    client->uploadFile(
+        std::filesystem::path(settings.inputFilePath).filename().string(),
+        nx::Buffer::fromStdString(contents.str()),
+        [&done](auto result) { done.set_value(result); });
+
+    const auto uploadResult = done.get_future().get();
+    if (!uploadResult.ok())
+    {
+        std::cerr << "Error: " << uploadResult.text() << std::endl;
+        return 2;
+    }
+
+    return 0;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -107,29 +179,19 @@ struct DownloadSettings
 {
     CommonSettings common;
     std::string outputFilePath;
-    std::string url;
 
     static std::tuple<DownloadSettings, bool /*result*/> read(
         const nx::utils::ArgumentParser& arguments)
     {
         DownloadSettings settings;
 
-        const auto& [commonSettings, result] = CommonSettings::read(arguments);
+        bool result = false;
+        std::tie(settings.common, result) = CommonSettings::read(arguments);
         if (!result)
             return std::make_tuple(settings, false);
-        settings.common = commonSettings;
 
         if (auto arg = arguments.get("o"))
             settings.outputFilePath = arg->toStdString();
-
-        const auto unnamedArgs = arguments.getPositionalArgs();
-        if (unnamedArgs.empty())
-        {
-            std::cerr << "Missing required argument URL. See -h" << std::endl;
-            return std::make_tuple(settings, false);
-        }
-
-        settings.url = unnamedArgs.front().toStdString();
 
         return std::make_tuple(settings, true);
     }
@@ -157,21 +219,11 @@ int download(const nx::utils::ArgumentParser& arguments)
     if (!result)
         return 1;
 
-    nx::utils::Url baseUrl(settings.url);
-    const auto path = baseUrl.path().toStdString();
-    baseUrl.setPath("");
-
-    ApiClient client(
-        "cmd_line_client",
-        settings.common.region,
-        baseUrl,
-        nx::network::http::Credentials(
-            settings.common.user.c_str(),
-            nx::network::http::PasswordAuthToken(settings.common.password.c_str())));
+    auto client = prepareApiClient(settings.common);
 
     std::promise<std::tuple<Result, nx::Buffer>> done;
-    client.downloadFile(
-        path,
+    client->downloadFile(
+        "",
         [&done](auto result, auto fileContents)
         {
             done.set_value(std::make_tuple(result, std::move(fileContents)));
