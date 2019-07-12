@@ -76,7 +76,7 @@ private:
 
 MediaServerEmulator::MediaServerEmulator(
     const network::SocketAddress& mediatorUdpEndpoint,
-    const network::SocketAddress& mediatorTcpEndpoint,
+    const nx::utils::Url& mediatorTcpUrl,
     AbstractCloudDataProvider::System systemData,
     nx::String serverName)
 :
@@ -114,9 +114,7 @@ MediaServerEmulator::MediaServerEmulator(
     bindToAioThread(getAioThread());
 
     m_mediatorConnector->mockupMediatorAddress({
-        nx::network::url::Builder()
-            .setScheme(network::stun::kUrlSchemeName)
-            .setEndpoint(mediatorTcpEndpoint),
+        mediatorTcpUrl,
         mediatorUdpEndpoint});
 
     m_mediatorConnector->setSystemCredentials(

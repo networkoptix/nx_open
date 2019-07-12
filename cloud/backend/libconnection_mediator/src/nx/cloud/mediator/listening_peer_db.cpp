@@ -136,6 +136,7 @@ bool ListeningPeerDb::initialize()
 
         m_sqlExecutor = std::move(sqlExecutor);
         m_map = std::move(map);
+        m_stopped = false;
     }
     catch (const std::exception& e)
     {
@@ -147,10 +148,18 @@ bool ListeningPeerDb::initialize()
 
 void ListeningPeerDb::stop()
 {
+    if (m_stopped)
+        return;
+
+    NX_VERBOSE(this, "Stopping...");
+
+    m_stopped = true;
     if (m_map)
         m_map->synchronizationEngine().pleaseStopSync();
     if (m_sqlExecutor)
         m_sqlExecutor->pleaseStopSync();
+
+    NX_VERBOSE(this, "Stop complete");
 }
 
 void ListeningPeerDb::setThisMediatorEndpoint(const MediatorEndpoint& endpoint)
@@ -177,7 +186,7 @@ void ListeningPeerDb::addPeer(
     const std::string& peerDomainName,
     nx::utils::MoveOnlyFunc<void(bool)> handler)
 {
-    if (!m_map || m_mediatorEndpointString.empty())
+    if (!m_map || m_mediatorEndpointString.empty() || m_stopped)
         return handler(false);
 
     m_map->database().dataManager().insertOrUpdate(
@@ -204,7 +213,7 @@ void ListeningPeerDb::removePeer(
     const std::string& peerDomainName,
     nx::utils::MoveOnlyFunc<void(bool)> handler)
 {
-    if (!m_map)
+    if (!m_map || m_stopped)
         return handler(false);
 
     m_map->database().dataManager().remove(
@@ -229,7 +238,7 @@ void ListeningPeerDb::findMediatorByPeerDomain(
     const std::string& peerDomainName,
     nx::utils::MoveOnlyFunc<void(MediatorEndpoint)> handler)
 {
-   if (!m_map)
+   if (!m_map || m_stopped)
         return handler(MediatorEndpoint());
 
     m_map->database().dataManager().getRangeWithPrefix(
@@ -280,7 +289,7 @@ void ListeningPeerDb::addUplinkSpeed(
     const nx::hpm::api::ConnectionSpeed& uplinkSpeed,
     nx::utils::MoveOnlyFunc<void(bool)> handler)
 {
-    if (!m_map)
+    if (!m_map || m_stopped)
         return handler(false);
 
     auto key = toLowerReversed(peerId) + kUplinkSpeedId;
@@ -314,7 +323,7 @@ void ListeningPeerDb::startDiscovery(
     const MediatorEndpoint& endpoint,
     nx::network::http::server::rest::MessageDispatcher* messageDispatcher)
 {
-    if (!m_map)
+    if (!m_map || m_stopped)
         return;
 
     setThisMediatorEndpoint(endpoint);

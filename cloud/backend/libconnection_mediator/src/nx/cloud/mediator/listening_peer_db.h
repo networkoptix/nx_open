@@ -30,8 +30,7 @@ struct ListeningPeerStatus
 
 /**
  * Associates peer domains (e.g. mediaserverid.systemid) with a mediator instance domain
- * discovering other mediator instances and synchronizing with their
- * ListeningPeerDbs.
+ * discovering other mediator instances and synchronizing with their ListeningPeerDbs.
  */
 class ListeningPeerDb
 {
@@ -41,11 +40,14 @@ public:
 
     /**
      * Initializes the underlying database.
+     * NOTE: Any async call made before initialize() returns successfully will be done in the same
+     * thread as the calling function.
      */
     bool initialize();
 
     /**
-     * Stops the underlying database.
+     * Stops the underlying database. All further async calls will return immediately in the same
+     * thread as the calling function until initialize is called again.
      */
     void stop();
 
@@ -138,6 +140,7 @@ private:
     nx::utils::Url m_syncEngineUrl;
 
     nx::utils::Subscription<nx::hpm::api::PeerConnectionSpeed> m_uplinkSpeedUpdated;
+    std::atomic_bool m_stopped = true;
 };
 
 } // namespace nx::hpm

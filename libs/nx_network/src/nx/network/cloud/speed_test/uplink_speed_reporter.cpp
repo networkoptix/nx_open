@@ -15,6 +15,8 @@ UplinkSpeedReporter::UplinkSpeedReporter(hpm::api::MediatorConnector* mediatorCo
             &UplinkSpeedReporter::onSystemCredentialsSet,
             this,
             std::placeholders::_1));
+
+    onSystemCredentialsSet(m_mediatorConnector->getSystemCredentials());
 }
 
 UplinkSpeedReporter::~UplinkSpeedReporter()

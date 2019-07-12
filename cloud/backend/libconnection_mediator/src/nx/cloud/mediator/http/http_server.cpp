@@ -191,7 +191,7 @@ void Server::registerApiHandlers(const PeerRegistrator& peerRegistrator)
         network::http::Method::post);
 
     m_httpMessageDispatcher.registerRequestProcessor<UpdateConnectionSpeedHandler>(
-        api::kConnectionSpeedUplinkPath,
+        network::url::joinPath(api::kMediatorApiPrefix, api::kConnectionSpeedUplinkPath).c_str(),
         [this]()
         {
             return std::make_unique<UpdateConnectionSpeedHandler>(m_listeningPeerDb);
