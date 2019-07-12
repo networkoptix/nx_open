@@ -40,13 +40,12 @@ RefCountableRegistry::RefCountableRegistry(const std::string& name):
 
 #define VERBOSE(MESSAGE) do \
 { \
-    const std::string funcPrefix = std::string(__func__) + "(): "; \
     if (m_isVerbose) \
     { \
         if (m_useServerLog) \
-            NX_INFO(nx::utils::log::Tag(m_logPrefix), funcPrefix + (MESSAGE)); \
+            NX_INFO(nx::utils::log::Tag(m_logPrefix), (MESSAGE)); \
         else \
-            NX_PRINT << (funcPrefix + (MESSAGE)); \
+            NX_PRINT << (MESSAGE); \
     } \
 } while (0)
 
@@ -70,7 +69,8 @@ void RefCountableRegistry::notifyCreated(
     const IRefCountable* const refCountable, const int refCount)
 {
     ASSERT(refCountable);
-    VERBOSE(readableRef(refCountable, refCount));
+    // TODO: #mshevchenko: Write "Created " without func.
+    VERBOSE("Created " + readableRef(refCountable, refCount));
 
     ASSERT(refCount == 1,
         "Created an object with refCount != 1: " + readableRef(refCountable, refCount));
@@ -85,7 +85,7 @@ void RefCountableRegistry::notifyDestroyed(
     const IRefCountable* const refCountable, const int refCount)
 {
     ASSERT(refCountable);
-    VERBOSE(readableRef(refCountable, refCount));
+    VERBOSE("Destroyed " + readableRef(refCountable, refCount));
 
     ASSERT(refCount == 0,
         "Destroying an object with refCount != 0: " + readableRef(refCountable, refCount));
