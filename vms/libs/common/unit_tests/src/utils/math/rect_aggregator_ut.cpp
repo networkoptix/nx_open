@@ -1,10 +1,12 @@
 #include <gtest/gtest.h>
 
-#include <nx/vms/server/analytics/db/rect_aggregator.h>
+#include <nx/utils/random.h>
+
+#include <utils/math/rect_aggregator.h>
 
 namespace nx::analytics::db::test {
 
-using AggregatedRect = db::RectAggregator<int>::AggregatedRect;
+using AggregatedRect = RectAggregator<int>::AggregatedRect;
 
 /**
  * NOTE: This comparator makes sense for this test only.
@@ -36,6 +38,39 @@ class RectAggregator:
     public ::testing::Test
 {
 protected:
+    std::vector<AggregatedRect> generateRandomRects(
+        int count,
+        int uniqueValueCount)
+    {
+        // Generating random values.
+        std::vector<int> values(uniqueValueCount);
+        std::generate(values.begin(), values.end(), &rand);
+
+        const QRect maxRect(0, 0, 100, 100);
+
+        std::vector<AggregatedRect> data;
+        for (int i = 0; i < count; ++i)
+        {
+            QRect rect(
+                nx::utils::random::number<int>(0, 100),
+                nx::utils::random::number<int>(0, 100),
+                nx::utils::random::number<int>(0, 100),
+                nx::utils::random::number<int>(0, 100));
+            rect = rect.intersected(maxRect);
+
+            data.push_back({rect, {nx::utils::random::choice(values)}});
+        }
+
+        return data;
+    }
+
+    std::vector<AggregatedRect> aggregate(const std::vector<AggregatedRect>& data)
+    {
+        for (const auto& item: data)
+            m_aggregator.add(item.rect, *item.values.begin());
+        return m_aggregator.aggregatedData();
+    }
+
     template<typename ... Args>
     std::vector<AggregatedRect> aggregate(const Args&... args)
     {
@@ -54,7 +89,7 @@ protected:
     }
 
 private:
-    db::RectAggregator<int> m_aggregator;
+    ::RectAggregator<int> m_aggregator;
 
     template<typename ... Args>
     void aggregateInternal(const AggregatedRect& data, const Args&... args)
@@ -169,6 +204,11 @@ TEST_F(RectAggregator, produced_adjacent_rects_with_same_values_are_merged)
     );
 
     assertEqual(expected, actual);
+}
+
+TEST_F(RectAggregator, stress_test)
+{
+    aggregate(generateRandomRects(150, 5));
 }
 
 } // namespace nx::analytics::db::test

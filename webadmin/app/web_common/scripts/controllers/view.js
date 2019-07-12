@@ -529,7 +529,7 @@ angular.module('nxCommon').controller('ViewCtrl',
             
             if (!$scope.isEmbeded) {
                 $scope.storage.cameraId  = $scope.activeCamera.id;
-                $scope.storage.serverStates[$scope.activeCamera.server.id] = true; // media server status - expanded
+                $scope.storage.serverStates[$scope.activeCamera.server.id] = false; // media server isCollapsed
             }
             
             systemAPI.setCameraPath($scope.activeCamera.id);

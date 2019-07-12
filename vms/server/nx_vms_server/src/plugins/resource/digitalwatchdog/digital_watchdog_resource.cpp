@@ -345,7 +345,10 @@ nx::vms::server::resource::StreamCapabilityMap
         return result;
     }
 
-    const auto resourceUrl = nx::utils::Url(getUrl());
+    const auto resourceUrl = nx::utils::Url::fromUserInput(getUrl());
+    if (resourceUrl.host().isEmpty())
+        return onvifResult;
+
     JsonApiClient jsonClient({resourceUrl.host(), static_cast<quint16>(resourceUrl.port())}, getAuth());
     const auto codecsFromJson = jsonClient.getSupportedVideoCodecs(getChannel(), streamIndex);
     if (codecsFromJson.empty())

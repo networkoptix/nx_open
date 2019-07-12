@@ -571,7 +571,10 @@ QList<QnPlatformMonitor::PartitionSpace> QnLinuxMonitor::totalPartitionSpaceInfo
         d_ptr->partitionsInfoProvider.get(),
         &partitions);
     if (errCode != SystemError::noError)
+    {
+        NX_WARNING(this, "Unable to read partitions: %1", SystemError::toString(errCode));
         return result;
+    }
 
     for (const auto& data: partitions)
     {

@@ -28,7 +28,8 @@ enum MountCommandFlags
     domain = 1,
     defaultDomain = 2,
     ver1 = 4,
-    ver2 = 8
+    ver2 = 8,
+    noCredentials = 16,
 };
 
 enum class CredentialsFileNameCall
@@ -112,11 +113,13 @@ protected:
                 m_osMountCalledTImes++;
 
                 std::stringstream ss;
-                ss << "mount -t cifs '" << kValidUrl << "' '" << kPath
-                    << "' -o credentials=" << kCredentialsFile;
+                ss << "mount -t cifs '" << kValidUrl << "' '" << kPath << "'";
 
-                auto baseCommand = ss.str();
-                assertEq(true, command.find(baseCommand) != std::string::npos);
+                if (m_mountCommandFlags & MountCommandFlags::noCredentials)
+                    ss << " -o username='" << kUserName << "',password='" << kPassword << "'";
+                else
+                    ss << " -o credentials=" << kCredentialsFile;
+
                 if (m_mountCommandFlags & MountCommandFlags::domain)
                     ss << ",domain=" << kDomain;
                 else if (m_mountCommandFlags & MountCommandFlags::defaultDomain)
@@ -127,16 +130,22 @@ protected:
                 else if (m_mountCommandFlags & MountCommandFlags::ver2)
                     ss << ",vers=" << kVer2;
 
-                baseCommand = ss.str();
+                auto baseCommand = ss.str();
                 if (command != baseCommand)
                     return SystemCommands::MountCode::otherError;
 
                 switch (m_osMountExpectation)
                 {
-                case OsMount::called_Ok: return SystemCommands::MountCode::ok;
-                case OsMount::called_wrongCredentials: return SystemCommands::MountCode::wrongCredentials;
-                case OsMount::called_otherError: return SystemCommands::MountCode::otherError;
-                case OsMount::notCalled: assertEq(true, false); break;
+                    case OsMount::called_Ok:
+                        return SystemCommands::MountCode::ok;
+                    case OsMount::called_wrongCredentials:
+                        return SystemCommands::MountCode::wrongCredentials;
+                    case OsMount::called_otherError:
+                        return SystemCommands::MountCode::otherError;
+                    case OsMount::notCalled:
+                        EXPECT_TRUE(false) << "wrong expectation: "
+                            << static_cast<int>(m_osMountExpectation);
+                        break;
                 }
 
                 return SystemCommands::MountCode::otherError;
@@ -239,9 +248,6 @@ private:
 
     int m_osMountCalledTImes = 0;
     mutable bool m_credentialsFileNameCalled = false;
-
-    template<typename Expected, typename Actual>
-    void assertEq(const Expected& expected, const Actual& actual) { ASSERT_EQ(expected, actual); }
 };
 
 TEST_F(MountHelper, Credentials_Conversions)
@@ -252,6 +258,19 @@ TEST_F(MountHelper, Credentials_Conversions)
     assertCredentialsConversion(UserName::notPresent, Password::notPresent);
     assertCredentialsConversion(UserName::present_noDomain, Password::notPresent);
     assertCredentialsConversion(UserName::present_noDomain, Password::present);
+}
+
+TEST_F(MountHelper, success_noCredentials)
+{
+    whenDerivedProvides(
+        OsMount::called_Ok,
+        MountCommandFlags::noCredentials,
+        MountPath::valid);
+    whenMountCalled(kValidUrl, kUserName);
+    expectingCalls(
+        /*osMountCalledTimesAtLeast*/ 1,
+        CredentialsFileNameCall::called_Ok);
+    thenMountShouldReturn(SystemCommands::MountCode::ok);
 }
 
 TEST_F(MountHelper, success_noVer_noDomain)

@@ -11,6 +11,8 @@
 
 #include <nx/vms/server/resource/resource_fwd.h>
 
+#include <nx/analytics/metadata_logger.h>
+
 struct QnAbstractMediaData;
 
 class CLServerPushStreamReader
@@ -63,6 +65,8 @@ private:
     QElapsedTimer m_needControlTimer;
     bool m_openedWithStreamCtrl = false;
     QnLiveStreamParams m_currentLiveParams;
+
+    std::unique_ptr<nx::analytics::MetadataLogger> m_metadataLogger;
 };
 
 #endif // ENABLE_DATA_PROVIDERS

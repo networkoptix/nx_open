@@ -101,9 +101,10 @@ void TransactionExecutor::enqueData(Command command)
 
 void TransactionExecutor::run()
 {
+    std::deque<Command> queue;
     while (!needToStop())
     {
-        std::vector<Command> queue;
+        if (queue.empty())
         {
             QnMutexLocker lock(&m_mutex);
             while (m_commandQueue.empty() && !needToStop())
@@ -120,8 +121,9 @@ void TransactionExecutor::run()
         ErrorCode result = ErrorCode::ok;
         {
             std::unique_ptr<detail::QnDbManager::QnDbTransactionLocker> dbTran;
-            for (auto& command: queue)
+            for (int i = 0; i < queue.size(); ++i)
             {
+                auto& command = queue[i];
                 if (!dbTran && ApiCommand::isPersistent(command.command))
                 {
                     dbTran.reset(
@@ -129,10 +131,23 @@ void TransactionExecutor::run()
                 }
 
                 result = command.result = command.execTranFunc(&command.postProcList);
-                if (result == ErrorCode::dbError)
+                if (result != ErrorCode::ok)
+                {
+                    command.completionHandler(command.result);
+                    // Rollback DB transaction and push back unprocessed transactions back to the execution queue
+                    QnMutexLocker lock(&m_mutex);
+                    for (int j = queue.size() - 1; j > i; --j)
+                        m_commandQueue.push_front(queue[j]);
+                    queue.erase(queue.begin() + i, queue.end());
+                    for (auto& rollbackCommand: queue)
+                        rollbackCommand.postProcList.clear();
                     break;
+                }
             }
-            if (result != ErrorCode::dbError && dbTran)
+            if (result != ErrorCode::ok)
+                continue;
+
+            if (dbTran)
             {
                 if (!NX_ASSERT(dbTran->commit()))
                     result = ErrorCode::dbError;
@@ -141,17 +156,12 @@ void TransactionExecutor::run()
 
         for (auto& command: queue)
         {
-            if (result == ErrorCode::dbError)
-                command.result = ErrorCode::dbError; //< Mark all transactions as error because data is rolled back.
-            if (command.result == ErrorCode::ok)
-            {
-                for (const auto& postProcFunc: command.postProcList)
-                    postProcFunc();
-            }
+            for (const auto& postProcFunc: command.postProcList)
+                postProcFunc();
             command.completionHandler(command.result);
         }
-
         NX_VERBOSE(this, "Aggregate %1 tranasction. Execution time %2 ms", queue.size(), timer.elapsed());
+        queue.clear();
     }
 }
 

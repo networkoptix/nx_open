@@ -23,7 +23,7 @@ static const std::chrono::seconds kMaxWaitDelay(30);
 static const std::chrono::milliseconds kExpectNoChanesDelay(300);
 static const network::RetryPolicy kReconnectPolicy(
     network::RetryPolicy::kInfiniteRetries,
-    std::chrono::milliseconds(100), 2, std::chrono::seconds(1));
+    std::chrono::milliseconds(100), 2, std::chrono::seconds(1), 0);
 
 class DiscoveryModuleConnector: public testing::Test
 {

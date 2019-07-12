@@ -21,6 +21,7 @@
 #include "p2p_serialization.h"
 #include <transaction/amend_transaction_data.h>
 #include <nx/utils/elapsed_timer.h>
+#include <common/common_module.h>
 
 namespace nx {
 namespace p2p {
@@ -156,7 +157,9 @@ protected:
         if (connection->remotePeer().isClient())
         {
             modifiedTran = srcTran;
-            if (ec2::amendOutputDataIfNeeded(connection.staticCast<Connection>()->userAccessData(),
+            if (ec2::amendOutputDataIfNeeded(
+                    connection.staticCast<Connection>()->userAccessData(),
+                    commonModule()->resourceAccessManager(),
                     &modifiedTran.params))
             {
                 // Make persistent info null in case if data has been amended. We don't want such

@@ -179,6 +179,8 @@ TEST_F(MotionArchive, addMotion)
     checkMotion(QRectF(0, 0, 1.0, 1.0));
     checkMotion(QRectF(0, 0, 0, 0));
     checkMotion(QRectF(0.2, 0.15, 0.8, 0.54));
+
+    checkMotion(QRectF(0.2, 0.15, 1.8, 0.54));
 }
 
 } // nx::vms::server::test

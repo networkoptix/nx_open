@@ -17,10 +17,8 @@ class NX_NETWORK_API RetryPolicy:
     using base_type = nx::utils::ProgressiveDelayPolicy;
 
 public:
-    constexpr static const unsigned int kInfiniteRetries =
-        std::numeric_limits<unsigned int>::max();
-
-    constexpr static const unsigned int kDefaultMaxRetryCount = 7;
+    constexpr static unsigned int kInfiniteRetries = std::numeric_limits<unsigned int>::max();
+    constexpr static unsigned int kDefaultMaxRetryCount = 7;
 
     const static RetryPolicy kNoRetries;
 
@@ -31,13 +29,16 @@ public:
         unsigned int maxRetryCount,
         std::chrono::milliseconds initialDelay,
         unsigned int delayMultiplier,
-        std::chrono::milliseconds maxDelay);
+        std::chrono::milliseconds maxDelay,
+        double randomRatio);
 
     bool operator==(const RetryPolicy& rhs) const;
+
+    QString toString() const;
 };
 
 /**
- * Implements request retry policy, specified in STUN rfc.
+ * Implements request retry policy, supports policy specified in STUN rfc.
  * There are maximum N retries, delay between retries is increased by
  *   some multiplier with each unsuccessful try.
  * NOTE: RetryTimer instance can be safely freed within doAnotherTryFunc.

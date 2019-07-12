@@ -63,6 +63,7 @@ NX_UTILS_API QString toString(const std::chrono::minutes& value);
 NX_UTILS_API QString toString(const std::chrono::seconds& value);
 NX_UTILS_API QString toString(const std::chrono::milliseconds& value);
 NX_UTILS_API QString toString(const std::chrono::microseconds& value);
+NX_UTILS_API QString toString(const std::chrono::nanoseconds& value);
 
 //-------------------------------------------------------------------------------------------------
 // Pointers.
