@@ -18,6 +18,7 @@ public:
 
     virtual void uploadMediaChunk(
         const std::string& deviceId,
+        int streamIndex,
         std::chrono::system_clock::time_point timestamp,
         const nx::Buffer& data,
         Handler handler) override;
@@ -28,22 +29,24 @@ public:
 
     virtual void downloadChunk(
         const std::string& deviceId,
+        int streamIndex,
         std::chrono::system_clock::time_point timestamp,
         DownloadHandler handler) override;
 
     virtual void removeChunk(
         const std::string& deviceId,
+        int streamIndex,
         std::chrono::system_clock::time_point timestamp,
         Handler handler) override;
 
-    virtual void uploadFile(
-        const std::string& destinationPath,
-        const nx::Buffer& data,
+    virtual void saveDeviceDescription(
+        const std::string& cameraId,
+        const DeviceDescription& data,
         Handler handler) override;
 
-    virtual void downloadFile(
-        const std::string& path,
-        DownloadHandler handler) override;
+    virtual void getDeviceDescription(
+        const std::string& cameraId,
+        GetDeviceDescriptionHandler handler) override;
 };
 
 } // namespace nx::cloud::storage::client::aws_s3

@@ -12,6 +12,7 @@ ContentClient::ContentClient(
 
 void ContentClient::uploadMediaChunk(
     const std::string& /*deviceId*/,
+    int /*streamIndex*/,
     std::chrono::system_clock::time_point /*timestamp*/,
     const nx::Buffer& /*data*/,
     Handler handler)
@@ -30,6 +31,7 @@ void ContentClient::getChunkLog(
 
 void ContentClient::downloadChunk(
     const std::string& /*deviceId*/,
+    int /*streamIndex*/,
     std::chrono::system_clock::time_point /*timestamp*/,
     DownloadHandler handler)
 {
@@ -39,6 +41,7 @@ void ContentClient::downloadChunk(
 
 void ContentClient::removeChunk(
     const std::string& /*deviceId*/,
+    int /*streamIndex*/,
     std::chrono::system_clock::time_point /*timestamp*/,
     Handler handler)
 {
@@ -46,20 +49,20 @@ void ContentClient::removeChunk(
     // TODO
 }
 
-void ContentClient::uploadFile(
-    const std::string& /*destinationPath*/,
-    const nx::Buffer& /*data*/,
+void ContentClient::saveDeviceDescription(
+    const std::string& cameraId,
+    const DeviceDescription& data,
     Handler handler)
 {
     handler(ResultCode::notImplemented);
     // TODO
 }
 
-void ContentClient::downloadFile(
-    const std::string& /*path*/,
-    DownloadHandler handler)
+void ContentClient::getDeviceDescription(
+    const std::string& cameraId,
+    GetDeviceDescriptionHandler handler)
 {
-    handler(ResultCode::notImplemented, nx::Buffer());
+    handler(ResultCode::notImplemented, DeviceDescription{});
     // TODO
 }
 

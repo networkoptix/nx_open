@@ -13,17 +13,28 @@ namespace nx::cloud::storage::client {
 
 enum class ChunkOperation
 {
+    none,
     add = 0,
     remove,
 };
 
 struct ChunkLogEntry
 {
-    ChunkOperation action;
+    ChunkOperation action = ChunkOperation::none;
     std::string deviceId;
     std::chrono::system_clock::time_point timestamp;
+
+    /**
+     * Stream index used when uploading chunks.
+     * E.g., 0 - high-quality stream, 1 - low-quality stream.
+     */
+    int streamIndex = 0;
+
+    /** Specified only for ChunkOperation::add. */
     std::size_t size = 0;
 };
+
+using DeviceDescription = std::vector<std::pair<std::string, std::string>>;
 
 /**
  * NOTE: Chunk log is modified automatically when uploading/removing chunks.
@@ -40,11 +51,15 @@ public:
     using DownloadHandler =
         nx::utils::MoveOnlyFunc<void(ResultCode, nx::Buffer /*fileData*/)>;
 
+    using GetDeviceDescriptionHandler =
+        nx::utils::MoveOnlyFunc<void(ResultCode, DeviceDescription /*data*/)>;
+
     //---------------------------------------------------------------------------------------------
     // Uploading chunks.
 
     virtual void uploadMediaChunk(
         const std::string& deviceId,
+        int streamIndex,
         std::chrono::system_clock::time_point timestamp,
         const nx::Buffer& data,
         Handler handler) = 0;
@@ -58,6 +73,7 @@ public:
 
     virtual void downloadChunk(
         const std::string& deviceId,
+        int streamIndex,
         std::chrono::system_clock::time_point timestamp,
         DownloadHandler handler) = 0;
 
@@ -70,20 +86,21 @@ public:
 
     virtual void removeChunk(
         const std::string& deviceId,
+        int streamIndex,
         std::chrono::system_clock::time_point timestamp,
         Handler handler) = 0;
 
     //---------------------------------------------------------------------------------------------
     // Auxiliary.
 
-    virtual void uploadFile(
-        const std::string& destinationPath,
-        const nx::Buffer& data,
+    virtual void saveDeviceDescription(
+        const std::string& cameraId,
+        const DeviceDescription& data,
         Handler handler) = 0;
 
-    virtual void downloadFile(
-        const std::string& path,
-        DownloadHandler handler) = 0;
+    virtual void getDeviceDescription(
+        const std::string& cameraId,
+        GetDeviceDescriptionHandler handler) = 0;
 };
 
 // TODO: #ak Upload a directory while monitoring for changes in it.
