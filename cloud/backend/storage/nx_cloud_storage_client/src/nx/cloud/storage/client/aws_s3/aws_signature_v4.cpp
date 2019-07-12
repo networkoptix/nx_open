@@ -1,5 +1,7 @@
 #include "aws_signature_v4.h"
 
+#include <algorithm>
+
 #include <openssl/sha.h>
 
 #include <nx/utils/cryptographic_hash.h>
@@ -9,23 +11,27 @@ namespace nx::cloud::storage::client::aws_s3 {
 static const nx::String kAwsAuthName = "AWS4-HMAC-SHA256";
 static const nx::String kAws4Request = "aws4_request";
 
-nx::String SignatureCalculator::calculateAuthorizationHeader(
+std::tuple<nx::String, bool /*result*/> SignatureCalculator::calculateAuthorizationHeader(
     const network::http::Request& request,
     const network::http::Credentials& credentials,
     const std::string& region,
     const std::string& service)
 {
     IntermediateValues intermediateValues;
-    const auto signature = calculateSignature(
+    const auto [signature, result] = calculateSignature(
         request, credentials, region, service, &intermediateValues);
+    if (!result)
+        return std::make_tuple(nx::String(), false);
 
-    return nx::String("AWS4-HMAC-SHA256 ") +
+    const auto authorizaton = nx::String("AWS4-HMAC-SHA256 ") +
         "Credential=" + credentials.username.toUtf8() + "/" + intermediateValues.scope + ","
         "SignedHeaders=" + intermediateValues.signedHeaders + ","
         "Signature=" + signature;
+
+    return std::make_tuple(std::move(authorizaton), true);
 }
 
-nx::String SignatureCalculator::calculateSignature(
+std::tuple<nx::String, bool /*result*/> SignatureCalculator::calculateSignature(
     const network::http::Request& request,
     const network::http::Credentials& credentials,
     const std::string& region,
@@ -34,12 +40,12 @@ nx::String SignatureCalculator::calculateSignature(
 {
     const auto xAmzDateIter = request.headers.find("x-amz-date");
     if (xAmzDateIter == request.headers.end())
-        return nx::String();
+        return std::make_tuple(nx::String(), false);
 
     const auto& timestamp = xAmzDateIter->second;
     const auto tokens = timestamp.split('T');
     if (tokens.isEmpty())
-        return nx::String();
+        return std::make_tuple(nx::String(), false);
     const auto& date = tokens[0];
 
     const auto signKey = calculateSignKey(date, credentials, region, service);
@@ -47,7 +53,7 @@ nx::String SignatureCalculator::calculateSignature(
     HMAC_CTX hmacCtx;
     memset(&hmacCtx, 0, sizeof(hmacCtx));
     if (!HMAC_Init_ex(&hmacCtx, signKey.data(), signKey.size(), EVP_sha256(), NULL))
-        return nx::String();
+        return std::make_tuple(nx::String(), false);
 
     HMAC_Update(&hmacCtx, (const unsigned char*) kAwsAuthName.data(), kAwsAuthName.size());
     HMAC_Update(&hmacCtx, (const unsigned char*) "\n", 1);
@@ -60,14 +66,17 @@ nx::String SignatureCalculator::calculateSignature(
     if (intermediateValues)
         intermediateValues->scope = scope;
 
-    const auto requestHash = calculateCanonicalRequestSha256Hash(request, intermediateValues);
+    const auto [requestHash, result] =
+        calculateCanonicalRequestSha256Hash(request, intermediateValues);
+    if (!result)
+        return std::make_tuple(nx::String(), false);
     HMAC_Update(&hmacCtx, (const unsigned char*) requestHash.data(), requestHash.size());
 
     nx::String signature(SHA256_DIGEST_LENGTH, 0);
     unsigned int signatureLength = signature.size();
     HMAC_Final(&hmacCtx, (unsigned char*) signature.data(), &signatureLength);
 
-    return signature.toHex();
+    return std::make_tuple(signature.toHex(), true);
 }
 
 nx::Buffer SignatureCalculator::calculateSignKey(
@@ -107,9 +116,10 @@ nx::Buffer SignatureCalculator::calculateSignKey(
     return md;
 }
 
-nx::Buffer SignatureCalculator::calculateCanonicalRequestSha256Hash(
-    const network::http::Request& request,
-    IntermediateValues* intermediateValues)
+std::tuple<nx::Buffer, bool /*result*/>
+    SignatureCalculator::calculateCanonicalRequestSha256Hash(
+        const network::http::Request& request,
+        IntermediateValues* intermediateValues)
 {
     nx::utils::QnCryptographicHash cryptographicHash(
         nx::utils::QnCryptographicHash::Algorithm::Sha256);
@@ -117,28 +127,89 @@ nx::Buffer SignatureCalculator::calculateCanonicalRequestSha256Hash(
     cryptographicHash.addData(request.requestLine.method);
     cryptographicHash.addData("\n");
 
-    // TODO: #ak UriEncode.
-    cryptographicHash.addData(request.requestLine.url.path().toUtf8());
+    hashPath(&cryptographicHash, request.requestLine.url.path());
     cryptographicHash.addData("\n");
 
-    cryptographicHash.addData(request.requestLine.url.query().toUtf8());
+    hashQuery(&cryptographicHash, request.requestLine.url.query().toUtf8());
     cryptographicHash.addData("\n");
 
     // Canonical headers.
     std::vector<nx::String> lowCaseHeaderNames;
-    lowCaseHeaderNames.reserve(request.headers.size());
-    for (const auto& header: request.headers)
-    {
-        lowCaseHeaderNames.push_back(header.first.toLower());
-
-        cryptographicHash.addData(lowCaseHeaderNames.back());
-        cryptographicHash.addData(":");
-        cryptographicHash.addData(header.second.trimmed());
-        cryptographicHash.addData("\n");
-    }
+    hashCanonicalHeaders(&cryptographicHash, request.headers, &lowCaseHeaderNames);
     cryptographicHash.addData("\n");
 
     // Signed headers.
+    hashSignedHeaders(&cryptographicHash, lowCaseHeaderNames, intermediateValues);
+    cryptographicHash.addData("\n");
+
+    // Payload hash.
+    auto it = request.headers.find("x-amz-content-sha256");
+    if (it == request.headers.end())
+        return std::make_tuple(nx::Buffer(), false);
+    cryptographicHash.addData(it->second);
+
+    return std::make_tuple(cryptographicHash.result().toHex(), true);
+}
+
+void SignatureCalculator::hashPath(
+    nx::utils::QnCryptographicHash* hash, const QString& path)
+{
+    const auto encodedPath = QUrl::toPercentEncoding(path, "/");
+    if (!encodedPath.startsWith('/'))
+        hash->addData("/");
+    hash->addData(encodedPath);
+}
+
+void SignatureCalculator::hashQuery(
+    nx::utils::QnCryptographicHash* hash,
+    const nx::String& query)
+{
+    if (query.isEmpty())
+        return;
+
+    auto queryItems = query.split('&');
+    std::sort(queryItems.begin(), queryItems.end());
+    for (int i = 0; i < queryItems.size(); ++i)
+    {
+        if (i > 0)
+            hash->addData("&");
+
+        const auto tokens = queryItems[i].split('=');
+        if (!tokens.isEmpty())
+        {
+            hash->addData(tokens[0]);
+            hash->addData("=");
+        }
+        if (tokens.size() > 1)
+            hash->addData(tokens[1]);
+    }
+}
+
+void SignatureCalculator::hashCanonicalHeaders(
+    nx::utils::QnCryptographicHash* hash,
+    const nx::network::http::HttpHeaders& headers,
+    std::vector<nx::String>* lowCaseHeaderNames)
+{
+    lowCaseHeaderNames->reserve(headers.size());
+    for (const auto& header: headers)
+    {
+        if (header.first.toLower() == "authorization")
+            continue; //< Ignoring Authorization header which may be present in case of server-side usage.
+
+        lowCaseHeaderNames->push_back(header.first.toLower());
+
+        hash->addData(lowCaseHeaderNames->back());
+        hash->addData(":");
+        hash->addData(header.second.trimmed());
+        hash->addData("\n");
+    }
+}
+
+void SignatureCalculator::hashSignedHeaders(
+    nx::utils::QnCryptographicHash* hash,
+    const std::vector<nx::String>& lowCaseHeaderNames,
+    IntermediateValues* intermediateValues)
+{
     nx::String signedHeaders;
     bool first = true;
     for (const auto& name: lowCaseHeaderNames)
@@ -150,19 +221,10 @@ nx::Buffer SignatureCalculator::calculateCanonicalRequestSha256Hash(
 
         signedHeaders += name;
     }
-    cryptographicHash.addData(signedHeaders);
-    cryptographicHash.addData("\n");
+    hash->addData(signedHeaders);
 
     if (intermediateValues)
         intermediateValues->signedHeaders = std::move(signedHeaders);
-
-    // Payload hash.
-    auto it = request.headers.find("x-amz-content-sha256");
-    if (it == request.headers.end())
-        return nx::Buffer();
-    cryptographicHash.addData(it->second);
-
-    return cryptographicHash.result().toHex();
 }
 
 bool SignatureCalculator::addScope(

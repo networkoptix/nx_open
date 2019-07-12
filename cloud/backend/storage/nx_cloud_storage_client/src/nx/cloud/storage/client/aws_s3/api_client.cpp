@@ -2,6 +2,7 @@
 
 #include <nx/network/http/buffer_source.h>
 #include <nx/network/url/url_builder.h>
+#include <nx/utils/log/log.h>
 
 #include "aws_signature_v4.h"
 
@@ -56,7 +57,6 @@ void ApiClient::uploadFile(
             context.executor->setTimeouts(m_timeouts);
 
             const auto url = url::Builder(m_url).appendPath(destinationPath);
-            // TODO: #ak Add Authorization.
             context.executor->doPut(
                 url,
                 std::make_unique<http::BufferSource>("application/octet-stream", std::move(data)),
@@ -80,7 +80,6 @@ void ApiClient::downloadFile(
             context.executor->setTimeouts(m_timeouts);
 
             const auto url = url::Builder(m_url).appendPath(path);
-            // TODO: #ak Add Authorization.
             context.executor->doGet(
                 url,
                 [this, &context]() { m_requestPool.completeRequest(&context); });
@@ -113,20 +112,20 @@ void ApiClient::addAuthorizationToRequest(network::http::Request* request)
     else
         request->headers.emplace("x-amz-content-sha256", kUnsignedPayloadHash);
 
-    auto iso8601Date = QDateTime::currentDateTime().toUTC().toString(Qt::ISODate).toUtf8() + "Z";
+    // x-amz-date
+    auto iso8601Date = QDateTime::currentDateTime().toUTC().toString(Qt::ISODate).toUtf8();
     iso8601Date.replace("-", "");
     iso8601Date.replace(":", "");
-
-    // x-amz-date
     request->headers.emplace("x-amz-date", iso8601Date);
 
     if (!m_credentials.username.isEmpty())
     {
-        const auto authorization = SignatureCalculator::calculateAuthorizationHeader(
+        const auto [authorization, result] = SignatureCalculator::calculateAuthorizationHeader(
             *request,
             m_credentials,
             m_awsRegion,
             kAwsS3ServiceName);
+        NX_ASSERT(result);
 
         request->headers.emplace(network::http::header::Authorization::NAME, authorization);
     }

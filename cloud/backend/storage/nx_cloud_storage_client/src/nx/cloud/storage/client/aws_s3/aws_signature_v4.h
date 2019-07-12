@@ -1,11 +1,14 @@
 #pragma once
 
 #include <string>
+#include <tuple>
 
 #include <openssl/hmac.h>
 
 #include <nx/network/buffer.h>
 #include <nx/network/http/auth_tools.h>
+
+namespace nx::utils { class QnCryptographicHash; }
 
 namespace nx::cloud::storage::client::aws_s3 {
 
@@ -27,7 +30,7 @@ public:
      *
      * @return Value of the Authorization header.
      */
-    static nx::String calculateAuthorizationHeader(
+    static std::tuple<nx::String, bool /*result*/> calculateAuthorizationHeader(
         const network::http::Request& request,
         const network::http::Credentials& credentials,
         const std::string& region,
@@ -36,7 +39,7 @@ public:
     /**
      * @return Hex(HMAC-SHA256(SigningKey, StringToSign)).
      */
-    static nx::String calculateSignature(
+    static std::tuple<nx::String, bool /*result*/> calculateSignature(
         const network::http::Request& request,
         const network::http::Credentials& credentials,
         const std::string& region,
@@ -51,8 +54,21 @@ private:
         const std::string& region,
         const std::string& service);
 
-    static nx::Buffer calculateCanonicalRequestSha256Hash(
+    static std::tuple<nx::Buffer, bool /*result*/> calculateCanonicalRequestSha256Hash(
         const network::http::Request& request,
+        IntermediateValues* intermediateValues);
+
+    static void hashPath(nx::utils::QnCryptographicHash* hash, const QString& path);
+    static void hashQuery(nx::utils::QnCryptographicHash* hash, const nx::String& query);
+
+    static void hashCanonicalHeaders(
+        nx::utils::QnCryptographicHash* hash,
+        const nx::network::http::HttpHeaders& headers,
+        std::vector<nx::String>* lowCaseHeaderNames);
+
+    static void hashSignedHeaders(
+        nx::utils::QnCryptographicHash* hash,
+        const std::vector<nx::String>& lowCaseHeaderNames,
         IntermediateValues* intermediateValues);
 
     static bool addScope(

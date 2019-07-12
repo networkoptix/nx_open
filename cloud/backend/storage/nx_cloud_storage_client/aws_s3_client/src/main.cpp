@@ -4,6 +4,7 @@
 
 #include <nx/network/socket_global.h>
 #include <nx/utils/argument_parser.h>
+#include <nx/utils/log/log_initializer.h>
 
 #include <nx/cloud/storage/client/aws_s3/api_client.h>
 
@@ -14,6 +15,8 @@ int download(const nx::utils::ArgumentParser& arguments);
 int main(int argc, const char* argv[])
 {
     nx::utils::ArgumentParser arguments(argc - 1, argv + 1);
+
+    nx::utils::log::initializeGlobally(arguments);
 
     if (arguments.contains("-h") || arguments.contains("--help"))
     {

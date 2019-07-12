@@ -1,6 +1,7 @@
 #pragma once
 
 #include <optional>
+#include <ostream>
 #include <string>
 #include <string_view>
 
@@ -27,6 +28,11 @@ constexpr std::string_view toString(ResultCode code)
     }
 
     return "unknown";
+}
+
+inline std::ostream& operator<<(std::ostream& os, ResultCode code)
+{
+    return os << toString(code);
 }
 
 struct Result

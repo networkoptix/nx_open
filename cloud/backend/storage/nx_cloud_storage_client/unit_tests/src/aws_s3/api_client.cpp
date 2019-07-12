@@ -21,6 +21,10 @@ protected:
         ASSERT_TRUE(m_awsS3Emulator.bindAndListen(
             nx::network::SocketAddress::anyPrivateAddress));
 
+        m_credentials.username = nx::utils::generateRandomName(7);
+        m_credentials.authToken.setPassword(nx::utils::generateRandomName(7));
+        m_awsS3Emulator.enableAthentication(std::regex(".*"), m_credentials);
+
         m_awsS3Emulator.saveOrReplaceFile(kExistingFilePath, kExistingFileBody);
 
         m_client = std::make_unique<aws_s3::ApiClient>(
@@ -29,7 +33,7 @@ protected:
             nx::network::url::Builder()
                 .setScheme(nx::network::http::kUrlSchemeName)
                 .setEndpoint(m_awsS3Emulator.serverAddress()),
-            nx::network::http::Credentials());
+            m_credentials);
 
         m_client->setTimeouts(nx::network::http::AsyncClient::kInfiniteTimeouts);
     }
@@ -84,6 +88,7 @@ private:
     };
 
     AwsS3Emulator m_awsS3Emulator;
+    nx::network::http::Credentials m_credentials;
     std::unique_ptr<aws_s3::ApiClient> m_client;
     nx::utils::SyncQueue<aws_s3::Result> m_uploadResults;
     nx::utils::SyncQueue<std::tuple<aws_s3::Result, nx::Buffer>> m_downloadResults;

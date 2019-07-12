@@ -350,6 +350,9 @@ void AsyncClient::doRequest(
     if (m_requestBody)
         addBodyToRequest();
 
+    if (m_customRequestPrepareFunc)
+        m_customRequestPrepareFunc(&m_request);
+
     initiateHttpMessageDelivery();
 }
 
@@ -1296,9 +1299,6 @@ void AsyncClient::composeRequest(const nx::network::http::StringType& httpMethod
         m_contentLocationUrl.setPassword(m_user.authToken.value);
 
     prepareRequestHeaders(useHttp11, httpMethod);
-
-    if (m_customRequestPrepareFunc)
-        m_customRequestPrepareFunc(&m_request);
 }
 
 void AsyncClient::prepareRequestLine(bool useHttp11, const nx::network::http::StringType& httpMethod)
