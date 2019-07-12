@@ -1038,8 +1038,11 @@ void QnTimeSlider::setWindow(milliseconds start, milliseconds end, bool animate,
 {
     milliseconds targetWindowSize = end - start;
 
-    start = qBound(minimum(), start, maximum());
-    end = qMax(start, qBound(minimum(), end, maximum()));
+    if (!qnRuntime->isAcsMode())
+    {
+        start = qBound(minimum(), start, maximum());
+        end = qMax(start, qBound(minimum(), end, maximum()));
+    }
 
     /* Check if window size was spoiled and fix it if possible. */
     if (!forceResize && m_options.testFlag(PreserveWindowSize))
