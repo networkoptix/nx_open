@@ -145,6 +145,16 @@ protected:
 private:
     void addServer()
     {
+        const auto keepAssigningBandwidth =
+            [this](int bandwidth)
+        {
+            return std::find_if(m_servers.begin(), m_servers.end(),
+                [this, &bandwidth](const TestContext& testContext)
+                {
+                    return bandwidth == testContext.uplinkSpeed.connectionSpeed.bandwidth;
+                }) != m_servers.end();
+        };
+
         if (!m_system)
             m_system = addRandomSystem();
 
@@ -156,10 +166,16 @@ private:
                 ServerTweak::defaultBehavior,
                 network::http::kUrlSchemeName);
 
-        m_servers.back().uplinkSpeed.serverId = m_servers.back().mediaserver->serverId();
-        m_servers.back().uplinkSpeed.systemId = m_system->id;
-        m_servers.back().uplinkSpeed.connectionSpeed.bandwidth =
-            nx::utils::random::number(10, 10000);
+        m_servers.back().uplinkSpeed.serverId =
+            nx::toStdString(m_servers.back().mediaserver->serverId());
+        m_servers.back().uplinkSpeed.systemId = nx::toStdString(m_system->id);
+
+        // Ensuring every bandwidth is unique.
+        int bandwidth = nx::utils::random::number(10, 10000);
+        while(keepAssigningBandwidth(bandwidth))
+            bandwidth = nx::utils::random::number(10, 10000);
+
+        m_servers.back().uplinkSpeed.connectionSpeed.bandwidth = bandwidth;
         m_servers.back().uplinkSpeed.connectionSpeed.pingTime =
             std::chrono::microseconds(nx::utils::random::number(10, 10000));
 
