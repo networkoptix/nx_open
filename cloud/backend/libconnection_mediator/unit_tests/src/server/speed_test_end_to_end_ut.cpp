@@ -67,7 +67,7 @@ public:
     api::ConnectionSpeed getUplinkSpeed(const nx::utils::Url& url)
     {
         return std::find_if(m_servers.begin(), m_servers.end(),
-            [this, &url](const TestContext& testContext)
+            [&url](const TestContext& testContext)
             {
                 return testContext.speedTestUrl == url;
             })->uplinkSpeed.connectionSpeed;
@@ -149,7 +149,7 @@ private:
             [this](int bandwidth)
         {
             return std::find_if(m_servers.begin(), m_servers.end(),
-                [this, &bandwidth](const TestContext& testContext)
+                [&bandwidth](const TestContext& testContext)
                 {
                     return bandwidth == testContext.uplinkSpeed.connectionSpeed.bandwidth;
                 }) != m_servers.end();
@@ -194,7 +194,7 @@ private:
     void updateBestConnection()
     {
         m_bestConnection = &*std::max_element(m_servers.begin(), m_servers.end(),
-            [this](const TestContext& a, const TestContext& b)
+            [](const TestContext& a, const TestContext& b)
             {
                 return a.uplinkSpeed.connectionSpeed.bandwidth
                     < b.uplinkSpeed.connectionSpeed.bandwidth;
