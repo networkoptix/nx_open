@@ -67,7 +67,7 @@ public:
      *     settings can't be applied or an error happened during its applying, this method must
      *     return a successful result with a corresponding map of errors. A faulty result
      *     containing error information instead of the map should be returned only in case of some
-     *     general failure affected the settings applying procedure as a whole. May contain null
+     *     general failure affected the settings applying procedure as a whole. May contain null if
      *     no errors occurred.
      */
     virtual Result<const IStringMap*> setSettings(const IStringMap* settings) = 0;

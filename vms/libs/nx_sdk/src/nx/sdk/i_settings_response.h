@@ -15,7 +15,7 @@ public:
     static auto interfaceId() { return InterfaceId("nx::sdk::ISettingsResponse"); }
 
     /**
-     * @return map of settings values having setting ids as keys.
+     * @return map of setting values having setting ids as keys.
      */
     virtual IStringMap* values() const = 0;
 

@@ -26,7 +26,7 @@ public:
     /**
      * Provides plugin manifest in JSON format.
      *
-     * @return Result containing JSON string in UTF-8 in case of success of error information in a
+     * @return Result containing JSON string in UTF-8 in case of success of error information in
      *     case of failure.
      */
     virtual Result<const IString*> manifest() const = 0;
