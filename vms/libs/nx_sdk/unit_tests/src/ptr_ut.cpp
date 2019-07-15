@@ -127,8 +127,9 @@ TEST(Ptr, inheritance)
 
         const IBase* tmp = data.get();
 
-        const Ptr<const IBase> base(toPtr(tmp));
+        Ptr<const IBase> base(toPtr(tmp));
         ASSERT_EQ(1, data->refCount());
+        base.releasePtr();
 
         ASSERT_FALSE(Data::s_destructorCalled);
     } //< data destroyed
