@@ -191,7 +191,7 @@ Ptr<IStringMap> toIStringMap(const QVariantMap& map)
 {
     const auto stringMap = makePtr<StringMap>();
     for (auto it = map.cbegin(); it != map.cend(); ++it)
-        stringMap->addItem(it.key().toStdString(), it.value().toString().toStdString());
+        stringMap->setItem(it.key().toStdString(), it.value().toString().toStdString());
 
     return stringMap;
 }
@@ -200,7 +200,7 @@ Ptr<IStringMap> toIStringMap(const QMap<QString, QString>& map)
 {
     const auto stringMap = makePtr<StringMap>();
     for (auto it = map.cbegin(); it != map.cend(); ++it)
-        stringMap->addItem(it.key().toStdString(), it.value().toStdString());
+        stringMap->setItem(it.key().toStdString(), it.value().toStdString());
 
     return stringMap;
 }
@@ -219,7 +219,7 @@ Ptr<IStringMap> toIStringMap(const QString& mapJson)
     {
         if (stringMap->value(setting.name.c_str()) != nullptr) //< Duplicate key.
             return nullptr;
-        stringMap->addItem(setting.name, setting.value);
+        stringMap->setItem(setting.name, setting.value);
     }
 
     return stringMap;

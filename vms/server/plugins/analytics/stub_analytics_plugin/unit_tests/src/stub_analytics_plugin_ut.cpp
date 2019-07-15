@@ -116,8 +116,8 @@ static void testDeviceAgentManifest(IDeviceAgent* deviceAgent)
 static void testEngineSettings(IEngine* engine)
 {
     const auto settings = makePtr<StringMap>();
-    settings->addItem("setting1", "value1");
-    settings->addItem("setting2", "value2");
+    settings->setItem("setting1", "value1");
+    settings->setItem("setting2", "value2");
 
     {
         // Test assigning empty settings.
@@ -137,8 +137,8 @@ static void testEngineSettings(IEngine* engine)
 static void testDeviceAgentSettings(IDeviceAgent* deviceAgent)
 {
     const auto settings = makePtr<StringMap>();
-    settings->addItem("setting1", "value1");
-    settings->addItem("setting2", "value2");
+    settings->setItem("setting1", "value1");
+    settings->setItem("setting2", "value2");
 
     {
         // Test assigning empty settings.
@@ -215,7 +215,7 @@ public:
     {
         m_params.reset(new StringMap());
         for (const auto& param: params)
-            m_params->addItem(param.first, param.second);
+            m_params->setItem(param.first, param.second);
     }
 
 public:

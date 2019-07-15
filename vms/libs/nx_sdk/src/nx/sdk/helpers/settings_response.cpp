@@ -32,7 +32,7 @@ void SettingsResponse::setValue(std::string key, std::string value)
     if (!m_values)
         m_values = makePtr<StringMap>();
 
-    m_values->addItem(std::move(key), std::move(value));
+    m_values->setItem(std::move(key), std::move(value));
 }
 
 void SettingsResponse::setError(std::string key, std::string value)
@@ -40,7 +40,7 @@ void SettingsResponse::setError(std::string key, std::string value)
     if (!m_errors)
         m_errors = makePtr<StringMap>();
 
-    m_errors->addItem(std::move(key), std::move(value));
+    m_errors->setItem(std::move(key), std::move(value));
 }
 
 void SettingsResponse::setValues(Ptr<StringMap> values)
