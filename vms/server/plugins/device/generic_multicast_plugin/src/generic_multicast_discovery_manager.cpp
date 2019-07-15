@@ -64,7 +64,7 @@ int GenericMulticastDiscoveryManager::checkHostAddress(
     const char* login,
     const char* password)
 {
-    QUrl url(address);
+    QUrl url(QString::fromUtf8(address));
     if (url.scheme().toLower() != "udp")
         return 0;
 
