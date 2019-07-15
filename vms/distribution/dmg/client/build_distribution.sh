@@ -72,9 +72,20 @@ buildDistribution()
     
     if [[ $NOTARIZATION = true ]]
     then
+        # Use environment variable NOTARIZATION_PASSWORD if specified.
+        # If it is unset we use KEYCHAIN_NOTARIZATION_USER_PASSWORD from login keychain. 
+        # It can be usefull for development purposes.
+        KEYCHAIN_PASSWORD="@keychain:KEYCHAIN_NOTARIZATION_USER_PASSWORD"
+        FINAL_PASSWORD="${NOTARIZATION_PASSWORD:-$KEYCHAIN_PASSWORD}"
+        
+        # Use environment variable NOTARIZATION_USER if specified.
+        # If it is unset we use KEYCHAIN_NOTARIZATION_USER from environment.
+        # It can be usefull for development purposes.
+        FINAL_USER="${NOTARIZATION_USER:-$KEYCHAIN_NOTARIZATION_USER}"
+
         python notarize.py notarize \
-            --user "$NOTARIZATION_USER" \
-            --password "@keychain:NOTARIZATION_USER_PASSWORD" \
+            --user "$FINAL_USER" \
+            --password "$FINAL_PASSWORD" \
             --team-id "$APPLE_TEAM_ID" \
             --file-name "$DISTRIBUTION_DMG" \
             --bundle-id "$BUNDLE_ID" 
