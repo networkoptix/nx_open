@@ -28,7 +28,7 @@ TEST(MaxEventLimit, maxEventLimit)
     }
 
     QnEventLogFilterData filter;
-    filter.period.setEndTimeMs(QnTimePeriod::kInfiniteDuration);
+    filter.period.setEndTimeMs(QnTimePeriod::kMaxTimeValue);
     auto result = db->getActions(filter);
     ASSERT_LE(result.size(), kEventLimit * 1.2);
 }
