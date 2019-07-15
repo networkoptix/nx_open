@@ -1522,7 +1522,9 @@ void QnWorkbenchNavigator::updateSliderFromReader(UpdateSliderMode mode)
     m_timeSlider->setTimeRange(milliseconds(startTimeMSec), milliseconds(endTimeMSec));
 
     if (m_calendar)
-        m_calendar->setDateRange(QDateTime::fromMSecsSinceEpoch(startTimeMSec).date(), QDateTime::fromMSecsSinceEpoch(endTimeMSec).date());
+        m_calendar->setDateRange(
+            QDateTime::fromMSecsSinceEpoch(startTimeMSec + m_calendar->localOffset()).date(),
+            QDateTime::fromMSecsSinceEpoch(endTimeMSec + m_calendar->localOffset()).date());
     if (m_dayTimeWidget)
         m_dayTimeWidget->setEnabledWindow(startTimeMSec, endTimeMSec);
 

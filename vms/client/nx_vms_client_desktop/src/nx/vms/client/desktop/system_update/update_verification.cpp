@@ -162,6 +162,7 @@ bool verifyUpdateContents(
 
     contents.invalidVersion.clear();
     contents.missingUpdate.clear();
+    contents.unsuportedSystemsReport.clear();
 
     // Check if some packages from manifest do not exist.
     if (contents.sourceType == nx::update::UpdateSourceType::file && !contents.packagesGenerated)
