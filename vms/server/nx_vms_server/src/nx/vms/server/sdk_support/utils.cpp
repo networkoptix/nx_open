@@ -315,7 +315,7 @@ nx::sdk::Ptr<ITimestampedObjectMetadata> createTimestampedObjectMetadata(
     const nx::analytics::db::ObjectPosition& objectPosition)
 {
     auto objectMetadata = nx::sdk::makePtr<TimestampedObjectMetadata>();
-    objectMetadata->setId(
+    objectMetadata->setTrackId(
         nx::vms_server_plugins::utils::fromQnUuidToSdkUuid(detectedObject.objectAppearanceId));
     objectMetadata->setTypeId(detectedObject.objectTypeId.toStdString());
     objectMetadata->setTimestampUs(objectPosition.timestampUsec);

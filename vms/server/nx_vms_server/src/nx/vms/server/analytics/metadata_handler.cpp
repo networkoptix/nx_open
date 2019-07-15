@@ -119,7 +119,7 @@ void MetadataHandler::handleObjectMetadataPacket(
 
         nx::common::metadata::DetectedObject object;
         object.objectTypeId = item->typeId();
-        object.objectId = nx::vms_server_plugins::utils::fromSdkUuidToQnUuid(item->id());
+        object.objectId = nx::vms_server_plugins::utils::fromSdkUuidToQnUuid(item->trackId());
         const auto box = item->boundingBox();
         object.boundingBox = QRectF(box.x, box.y, box.width, box.height);
 

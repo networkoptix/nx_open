@@ -201,7 +201,7 @@ bool DeviceAgent::makeMetadataPacketsFromRectsPostprocNone(
     for (const auto& rect: rects)
     {
         auto objectMetadata = makePtr<ObjectMetadata>();
-        objectMetadata->setId(UuidHelper::randomUuid());
+        objectMetadata->setTrackId(UuidHelper::randomUuid());
         objectMetadata->setTypeId(m_objectTypeId);
         objectMetadata->setBoundingBox(Rect(rect.x, rect.y, rect.w, rect.h));
 

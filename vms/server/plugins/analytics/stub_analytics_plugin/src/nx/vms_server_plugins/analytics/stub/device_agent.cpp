@@ -346,7 +346,7 @@ static IObjectMetadata* makeObjectMetadata(const AbstractObject* object)
 {
     auto objectMetadata = new ObjectMetadata();
     objectMetadata->setTypeId(object->typeId());
-    objectMetadata->setId(object->id());
+    objectMetadata->setTrackId(object->id());
     const auto position = object->position();
     const auto size = object->size();
     objectMetadata->setBoundingBox(Rect(position.x, position.y, size.width, size.height));

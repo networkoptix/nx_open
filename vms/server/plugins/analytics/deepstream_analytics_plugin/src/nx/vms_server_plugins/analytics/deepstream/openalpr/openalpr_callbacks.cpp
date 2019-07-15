@@ -177,7 +177,7 @@ gboolean handleOpenAlprMetadata(GstBuffer* buffer, GstMeta** meta, gpointer user
             }
         }
 
-        detectedObject->setId(info.uuid);
+        detectedObject->setTrackId(info.uuid);
         detectedObject->setBoundingBox(rectangle);
         detectedObject->setConfidence(1.0);
         detectedObject->setTypeId(kLicensePlateObjectTypeId);

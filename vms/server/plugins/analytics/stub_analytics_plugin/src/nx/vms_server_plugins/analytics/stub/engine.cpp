@@ -393,7 +393,7 @@ static std::string timestampedObjectMetadataToString(const ITimestampedObjectMet
         return "null";
 
     return nx::kit::utils::format("timestamp: %lld, id: %s",
-        metadata->timestampUs(), UuidHelper::toStdString(metadata->id()).c_str());
+        metadata->timestampUs(), UuidHelper::toStdString(metadata->trackId()).c_str());
 }
 
 static std::string objectTrackToString(
@@ -414,15 +414,15 @@ static std::string objectTrackToString(
     for (int i = 0; i < track->count(); ++i)
     {
         const auto timestampedObjectMetadata = track->at(i);
-        objectIdFromTrack = timestampedObjectMetadata->id();
-        if (objectIdFromTrack != track->at(0)->id())
+        objectIdFromTrack = timestampedObjectMetadata->trackId();
+        if (objectIdFromTrack != toPtr(track->at(0))->trackId())
         {
             if (!result.empty())
                 result += "; ";
             result += format("INTERNAL ERROR: Object id #%d %s does not equal object id #0 %s",
                 i,
                 UuidHelper::toStdString(objectIdFromTrack).c_str(),
-                UuidHelper::toStdString(track->at(0)->id()).c_str());
+                UuidHelper::toStdString(toPtr(track->at(0))->trackId()).c_str());
             break;
         }
     }
