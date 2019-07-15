@@ -88,6 +88,9 @@ void EventsStorage::save(common::metadata::ConstDetectionMetadataPacketPtr packe
 {
     using namespace std::chrono;
 
+    QElapsedTimer t;
+    t.restart();
+
     NX_VERBOSE(this, "Saving packet %1", *packet);
 
     {
@@ -111,7 +114,10 @@ void EventsStorage::save(common::metadata::ConstDetectionMetadataPacketPtr packe
     }
 
     if (detectionDataSaver.empty())
+    {
+        NX_VERBOSE(this, "Saving packet (1) took %1ms", t.elapsed());
         return;
+    }
 
     m_dbController->queryExecutor().executeUpdate(
         [packet = packet, detectionDataSaver = std::move(detectionDataSaver)](
@@ -122,6 +128,8 @@ void EventsStorage::save(common::metadata::ConstDetectionMetadataPacketPtr packe
         },
         [this](sql::DBResult resultCode) { logDataSaveResult(resultCode); },
         kSaveEventQueryAggregationKey);
+
+    NX_VERBOSE(this, "Saving packet (2) took %1ms", t.elapsed());
 }
 
 void EventsStorage::createLookupCursor(
