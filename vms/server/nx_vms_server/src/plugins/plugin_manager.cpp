@@ -48,6 +48,7 @@ PluginManager::~PluginManager()
 
 void PluginManager::unloadPlugins()
 {
+    QnMutexLocker lock(&m_mutex);
     m_pluginContexts.clear();
 }
 
@@ -309,6 +310,7 @@ void PluginManager::storePluginInfo(
         NX_INFO(this, pluginInfo->statusMessage);
     else
         NX_ERROR(this, pluginInfo->statusMessage);
+
     m_pluginContexts.push_back({pluginInfo, /*plugin*/ nullptr});
 }
 
@@ -581,12 +583,15 @@ bool PluginManager::loadNxPluginForNewSdk(
 
     plugin->setUtilityProvider(
         makePtr<nx::vms::server::plugins::UtilityProvider>(this, plugin.get()).get());
-    m_pluginContexts.push_back({pluginInfo, plugin});
+
+    m_pluginContexts.push_back({ pluginInfo, plugin });
+
     return true;
 }
 
 nx::vms::api::PluginInfoList PluginManager::pluginInfoList() const
 {
+    QnMutexLocker lock(&m_mutex);
     if (m_cachedPluginInfo.empty())
     {
         for (const auto& pluginContext: m_pluginContexts)
@@ -602,12 +607,35 @@ std::shared_ptr<const nx::vms::api::PluginInfo> PluginManager::pluginInfo(
     if (!NX_ASSERT(plugin))
         return nullptr;
 
-    for (const auto& pluginContext: m_pluginContexts)
     {
-        if (pluginContext.plugin.get() == plugin)
-            return pluginContext.pluginInfo;
+        QnMutexLocker lock(&m_mutex);
+        for (const auto& pluginContext : m_pluginContexts)
+        {
+            if (pluginContext.plugin.get() == plugin)
+                return pluginContext.pluginInfo;
+        }
     }
 
     NX_ERROR(this, "PluginInfo not found for plugin [%1]", plugin->name());
     return nullptr;
+}
+
+void PluginManager::setIsActive(const nx::sdk::IRefCountable* plugin, bool isActive)
+{
+    if (!plugin)
+        return;
+
+    QnMutexLocker lock(&m_mutex);
+    for (auto& pluginContext: m_pluginContexts)
+    {
+        if (pluginContext.plugin.get() != plugin)
+            continue;
+
+        if (pluginContext.pluginInfo->isActive == isActive)
+            return;
+
+        pluginContext.pluginInfo->isActive = isActive;
+        m_cachedPluginInfo.clear();
+        return;
+    }
 }

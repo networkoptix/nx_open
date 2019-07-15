@@ -320,6 +320,17 @@ bool SdkObjectFactory::initEngineResources()
 
                 continue;
             }
+
+            if (engineResource->isDeviceDependent())
+            {
+                if (const auto pluginManager = getPluginManager(serverModule()))
+                {
+                    pluginManager->setIsActive(
+                        parentPlugin->sdkPlugin().get(),
+                        /*isActive*/ false);
+                }
+            }
+
             activeEngines.insert(engineResource->getId());
         }
     }

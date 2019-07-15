@@ -142,6 +142,13 @@ struct NX_VMS_API PluginInfo: Data
      * supports via queryInterface().
      */
     MainInterface mainInterface = MainInterface::undefined;
+
+    /**%apidoc
+     * For non-analytics plugins and for device-independent analytics plugins is always set to
+     * true. For device-dependent analytics plugins is set to true if and only if the plugin have
+     * ever had a DeviceAgent since the Server start.
+     */
+    bool isActive = true;
 };
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PluginInfo::Optionality)
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PluginInfo::Status)
@@ -157,7 +164,8 @@ QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PluginInfo::MainInterface)
     (status) \
     (statusMessage) \
     (errorCode) \
-    (mainInterface)
+    (mainInterface) \
+    (isActive)
 
 } // namespace nx::vms::api
 

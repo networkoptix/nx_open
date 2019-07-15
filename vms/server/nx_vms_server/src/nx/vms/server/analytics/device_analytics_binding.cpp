@@ -1,5 +1,6 @@
 #include "device_analytics_binding.h"
 
+#include <plugins/plugin_manager.h>
 #include <plugins/vms_server_plugins_ini.h>
 
 #include <core/resource/camera_resource.h>
@@ -107,15 +108,15 @@ bool DeviceAnalyticsBinding::startAnalyticsUnsafe(const Ptr<IStringMap>& setting
 {
     if (!m_deviceAgent)
     {
-        m_deviceAgent = createDeviceAgent();
-        if (!m_deviceAgent)
+        const auto deviceAgent = createDeviceAgent();
+        if (!deviceAgent)
         {
             NX_ERROR(this, "Device agent creation failed, device %1 (%2)",
                 m_device->getUserDefinedName(), m_device->getId());
             return false;
         }
 
-        const auto manifest = loadDeviceAgentManifest(m_deviceAgent);
+        const auto manifest = loadDeviceAgentManifest(deviceAgent);
         if (!manifest)
         {
             NX_ERROR(this, lm("Cannot load device agent manifest, device %1 (%2)")
@@ -127,8 +128,12 @@ bool DeviceAnalyticsBinding::startAnalyticsUnsafe(const Ptr<IStringMap>& setting
             return false;
 
         m_handler = createHandler();
-        m_deviceAgent->setHandler(m_handler.get());
+        deviceAgent->setHandler(m_handler.get());
+        if (!updatePluginInfo())
+            return false;
+
         updateDeviceWithManifest(*manifest);
+        m_deviceAgent = deviceAgent;
         m_device->saveProperties();
     }
 
@@ -278,6 +283,29 @@ void DeviceAnalyticsBinding::logIncomingFrame(nx::sdk::analytics::IDataPacket* f
         return;
 
     m_incomingFrameLogger.pushFrameInfo({std::chrono::microseconds(frame->timestampUs())});
+}
+
+bool DeviceAnalyticsBinding::updatePluginInfo() const
+{
+    if (const auto pluginManager = serverModule()->pluginManager())
+    {
+        if (!NX_ASSERT(m_engine))
+            return false;
+
+        const auto plugin = m_engine->plugin();
+        if (!NX_ASSERT(plugin))
+            return false;
+
+        const auto serverPlugin =
+            plugin.dynamicCast<server::resource::AnalyticsPluginResource>();
+
+        if (!NX_ASSERT(serverPlugin))
+            return false;
+
+        pluginManager->setIsActive(serverPlugin->sdkPlugin().get(), /*isActive*/ true);
+    }
+
+    return true;
 }
 
 void DeviceAnalyticsBinding::setMetadataSink(QnAbstractDataReceptorPtr metadataSink)

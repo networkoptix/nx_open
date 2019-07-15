@@ -82,6 +82,8 @@ private:
 
     void logIncomingFrame(nx::sdk::analytics::IDataPacket* frame);
 
+    bool updatePluginInfo() const;
+
 private:
     mutable QnMutex m_mutex;
     QnVirtualCameraResourcePtr m_device;

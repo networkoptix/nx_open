@@ -97,6 +97,8 @@ public:
     std::shared_ptr<const nx::vms::api::PluginInfo> pluginInfo(
         const nx::sdk::IPlugin* plugin) const;
 
+    void setIsActive(const nx::sdk::IRefCountable* plugin, bool isActive);
+
 signals:
     /** Emitted just after new plugin has been loaded. */
     void pluginLoaded();
