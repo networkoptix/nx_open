@@ -13,7 +13,8 @@ public:
     qreal value() const;
     QString toString() const;
 
-    static QList<Rotation> standardRotations();
+    using RotationList = QList<Rotation>;
+    static RotationList standardRotations();
     static Rotation closestStandardRotation(qreal degrees);
 
     bool operator==(const Rotation& other) const;

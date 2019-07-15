@@ -612,7 +612,8 @@ public:
                 nx::network::RetryPolicy::kInfiniteRetries,
                 std::chrono::milliseconds(0),
                 nx::network::RetryPolicy::kDefaultDelayMultiplier,
-                std::chrono::minutes(1));
+                std::chrono::minutes(1),
+                nx::network::RetryPolicy::kDefaultRandomRatio);
         nx::hpm::api::MediatorConnector::setStunClientSettings(stunClientSettings);
 
         SocketGlobalsHolder::instance()->reinitialize();

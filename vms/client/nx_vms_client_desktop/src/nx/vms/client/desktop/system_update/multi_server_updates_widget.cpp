@@ -280,43 +280,21 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
     connect(m_stateTracker.get(), &PeerStateTracker::itemRemoved, this,
         [this](UpdateItemPtr item)
         {
-            if (m_widgetState != WidgetUpdateState::ready)
-                return;
-
-            NX_VERBOSE(this,
-               "peer %1 is going to be removed. We should repeat validation.", item->id);
-            repeatUpdateValidation();
+            if (m_widgetState == WidgetUpdateState::downloading)
+                m_stateTracker->removeFromTask(item->id);
+            atServerConfigurationChanged(item);
         });
 
     connect(m_stateTracker.get(), &PeerStateTracker::itemAdded, this,
         [this](UpdateItemPtr item)
         {
-            if (m_widgetState != WidgetUpdateState::ready)
-                return;
-
-            NX_VERBOSE(this,
-               "peer %1 is going to be added. We should repeat validation.", item->id);
-            repeatUpdateValidation();
+            if (m_widgetState == WidgetUpdateState::downloading)
+                m_stateTracker->addToTask(item->id);
+            atServerConfigurationChanged(item);
         });
 
     connect(m_stateTracker.get(), &PeerStateTracker::itemOnlineStatusChanged, this,
-        [this](UpdateItemPtr item)
-        {
-            if (m_widgetState != WidgetUpdateState::ready
-                && m_widgetState != WidgetUpdateState::readyInstall)
-            {
-                return;
-            }
-
-            if (!item->offline || !item->verificationMessage.isEmpty())
-            {
-                // TODO: Make more conservative check: only check if server goes online, or if
-                // server has errors and goes offline.
-                NX_VERBOSE(this,
-                   "peer %1 has changed online status. We should repeat validation.", item->id);
-                repeatUpdateValidation();
-            }
-        });
+        &MultiServerUpdatesWidget::atServerConfigurationChanged);
 
     connect(m_serverUpdateTool.get(), &ServerUpdateTool::startUpdateComplete,
         this, &MultiServerUpdatesWidget::atStartUpdateComplete);
@@ -326,6 +304,9 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
 
     connect(m_serverUpdateTool.get(), &ServerUpdateTool::cancelUpdateComplete,
         this, &MultiServerUpdatesWidget::atCancelUpdateComplete);
+
+    connect(m_serverUpdateTool.get(), &ServerUpdateTool::startInstallComplete,
+        this, &MultiServerUpdatesWidget::atStartInstallComplete);
 
     connect(qnGlobalSettings, &QnGlobalSettings::localSystemIdChanged, this,
         [this]()
@@ -975,7 +956,7 @@ void MultiServerUpdatesWidget::atStartUpdateAction()
         NX_INFO(this)
             << "atStartUpdateAction() - starting installation for"
             << targets.size() << ":" << targets;
-        setTargetState(WidgetUpdateState::installing, targets);
+        setTargetState(WidgetUpdateState::startingInstall, targets);
     }
     else if (m_widgetState == WidgetUpdateState::ready && m_haveValidUpdate)
     {
@@ -1138,7 +1119,7 @@ bool MultiServerUpdatesWidget::atCancelCurrentAction()
     return true;
 }
 
-void MultiServerUpdatesWidget::atStartUpdateComplete(bool success)
+void MultiServerUpdatesWidget::atStartUpdateComplete(bool success, const QString& error)
 {
     if (m_widgetState == WidgetUpdateState::startingDownload)
     {
@@ -1167,48 +1148,108 @@ void MultiServerUpdatesWidget::atStartUpdateComplete(bool success)
             auto messageBox = std::make_unique<QnSessionAwareMessageBox>(this);
             messageBox->setIcon(QnMessageBoxIcon::Critical);
             messageBox->setText(tr("Failed to start update"));
-            messageBox->setStandardButtons(QDialogButtonBox::Ok);
-            messageBox->setDefaultButton(QDialogButtonBox::Ok, Qn::ButtonAccent::Warning);
-            messageBox->exec();
-            setTargetState(WidgetUpdateState::ready, {});
+            messageBox->setInformativeText(error);
+            messageBox->setStandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Retry);
+            messageBox->setDefaultButton(QDialogButtonBox::Ok);
+            if (messageBox->exec() == QDialogButtonBox::Retry)
+            {
+                auto targets = m_stateTracker->peersIssued();
+                m_serverUpdateTool->requestStartUpdate(m_updateInfo.info, targets);
+            }
+            else
+            {
+                setTargetState(WidgetUpdateState::ready, {});
+            }
         }
     }
 }
 
-void MultiServerUpdatesWidget::atCancelUpdateComplete(bool /*success*/)
+void MultiServerUpdatesWidget::atCancelUpdateComplete(bool success, const QString& error)
 {
     if (m_widgetState == WidgetUpdateState::cancelingDownload
         || m_widgetState == WidgetUpdateState::cancelingReadyInstall)
     {
         m_clientUpdateTool->resetState();
-        setTargetState(WidgetUpdateState::ready, {});
-    }
-}
-
-void MultiServerUpdatesWidget::atFinishUpdateComplete(bool /*success*/)
-{
-    if (m_widgetState == WidgetUpdateState::finishingInstall)
-    {
-        bool shouldRestartClient = m_clientUpdateTool->hasUpdate()
-            && m_clientUpdateTool->shouldRestartTo(m_updateInfo.getVersion());
-
-        setTargetState(WidgetUpdateState::initial, {});
-        if (shouldRestartClient)
+        if (success)
         {
-            // 1. Check if there is any server who completed installation
-            // 2. Check if there is online servers. - What for?
-            auto complete = m_stateTracker->peersCompleteInstall();
-            QScopedPointer<QnMessageBox> messageBox(new QnMessageBox(this));
-            // 1. Everything is complete
-            messageBox->setIcon(QnMessageBoxIcon::Success);
-            messageBox->setText(tr("Nx Witness Client will be restarted to the updated version."));
-            messageBox->setStandardButtons(QDialogButtonBox::Ok);
-            messageBox->exec();
-            completeInstallation(true);
+            setTargetState(WidgetUpdateState::ready, {});
         }
         else
         {
-            m_clientUpdateTool->resetState();
+            NX_ERROR(this, "atCancelUpdateComplete(%1) - %2", success, error);
+            QScopedPointer<QnMessageBox> messageBox(new QnMessageBox(this));
+            messageBox->setIcon(QnMessageBoxIcon::Critical);
+            messageBox->setText(tr("Failed to cancel update"));
+            messageBox->setInformativeText(error);
+            messageBox->setStandardButtons(QDialogButtonBox::Ok);
+            messageBox->exec();
+            setTargetState(WidgetUpdateState::readyInstall, {});
+        }
+    }
+}
+
+void MultiServerUpdatesWidget::atStartInstallComplete(bool success, const QString& error)
+{
+    if (m_widgetState == WidgetUpdateState::startingInstall)
+    {
+        if (success)
+        {
+            auto targets = m_stateTracker->peersIssued();
+            setTargetState(WidgetUpdateState::installing, targets);
+        }
+        else
+        {
+            QScopedPointer<QnMessageBox> messageBox(new QnMessageBox(this));
+            messageBox->setIcon(QnMessageBoxIcon::Critical);
+            messageBox->setText(tr("Failed to start installation"));
+            messageBox->setInformativeText(error);
+            messageBox->setStandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Retry);
+            messageBox->setDefaultButton(QDialogButtonBox::Ok);
+            if (messageBox->exec() == QDialogButtonBox::Retry)
+            {
+                QSet<QnUuid> servers = m_stateTracker->peersIssued();
+                servers.remove(m_stateTracker->getClientPeerId());
+                m_serverUpdateTool->requestInstallAction(servers);
+            }
+            else
+            {
+                setTargetState(WidgetUpdateState::readyInstall, {});
+            }
+        }
+    }
+}
+
+void MultiServerUpdatesWidget::atFinishUpdateComplete(bool success, const QString& error)
+{
+    if (m_widgetState == WidgetUpdateState::finishingInstall)
+    {
+        if (success)
+        {
+            bool shouldRestartClient = m_clientUpdateTool->hasUpdate()
+                && m_clientUpdateTool->shouldRestartTo(m_updateInfo.getVersion());
+
+            setTargetState(WidgetUpdateState::initial, {});
+            if (shouldRestartClient)
+            {
+                // 1. Check if there is any server who completed installation
+                // 2. Check if there is online servers. - What for?
+                auto complete = m_stateTracker->peersCompleteInstall();
+                QScopedPointer<QnMessageBox> messageBox(new QnMessageBox(this));
+                // 1. Everything is complete
+                messageBox->setIcon(QnMessageBoxIcon::Success);
+                messageBox->setText(tr("Nx Witness Client will be restarted to the updated version."));
+                messageBox->setStandardButtons(QDialogButtonBox::Ok);
+                messageBox->exec();
+                completeInstallation(true);
+            }
+            else
+            {
+                m_clientUpdateTool->resetState();
+            }
+        }
+        else
+        {
+            NX_ERROR(this, "atFinishUpdateComplete(%1) - %2", success, error);
         }
     }
 }
@@ -1273,6 +1314,25 @@ void MultiServerUpdatesWidget::atServerPackageDownloadFailed(
         NX_INFO(this)
             << "atServerPackageDownloadFailed() - failed to download server package"
             << package.file << "and widget is not in downloading state" << "error:" << error;
+    }
+}
+
+void MultiServerUpdatesWidget::atServerConfigurationChanged(std::shared_ptr<UpdateItem> item)
+{
+    if (m_widgetState != WidgetUpdateState::ready
+        && m_widgetState != WidgetUpdateState::readyInstall
+        && m_widgetState != WidgetUpdateState::downloading)
+    {
+        return;
+    }
+
+    if (!item->offline || !item->verificationMessage.isEmpty())
+    {
+        // TODO: Make more conservative check: only check if server goes online, or if
+        // server has errors and goes offline.
+        NX_VERBOSE(this,
+           "peer %1 has changed online status. We should repeat validation.", item->id);
+        repeatUpdateValidation();
     }
 }
 
@@ -1448,7 +1508,7 @@ void MultiServerUpdatesWidget::processInitialCheckState()
         else if (!isOk)
         {
             NX_WARNING(this, "processInitialCheckState() - mediaservers have an active update "
-                "process to version %1 with error %2", updateInfo.info.version, updateInfo.error);
+                "process to version %1 with error \"%2\"", updateInfo.info.version, updateInfo.error);
         }
         else
         {
@@ -1476,7 +1536,7 @@ void MultiServerUpdatesWidget::processInitialCheckState()
         bool hasClientUpdate = m_clientUpdateTool->shouldInstallThis(updateInfo);
         m_updateLocalStateChanged = true;
 
-        if (!peersAreInstalling.empty())
+        if (!peersAreInstalling.empty() || updateInfo.alreadyInstalled)
         {
             NX_INFO(this,
                 "processInitialCheckState() - servers %1 are installing an update",
@@ -1484,7 +1544,7 @@ void MultiServerUpdatesWidget::processInitialCheckState()
 
             if (hasClientUpdate)
                 peersAreInstalling.insert(m_stateTracker->getClientPeerId());
-            setTargetState(WidgetUpdateState::installing, peersAreInstalling, false);
+            setTargetState(WidgetUpdateState::installing, peersAreInstalling + serversHaveInstalled, false);
         }
         else if (!serversAreDownloading.empty() || !serversWithDownloadingError.empty())
         {
@@ -1609,6 +1669,7 @@ void MultiServerUpdatesWidget::processDownloadingState()
             m_serverUpdateTool->requestRetryAction();
             m_clientUpdateTool->setUpdateTarget(m_updateInfo);
             setTargetState(WidgetUpdateState::downloading, serversToRetry);
+            m_stateTracker->markStatusUnknown(serversToRetry);
         }
         else if (clicked == cancelUpdate)
         {
@@ -1624,13 +1685,17 @@ void MultiServerUpdatesWidget::processReadyInstallState()
 {
     auto idle = m_stateTracker->peersInState(StatusCode::idle);
     auto all = m_stateTracker->allPeers();
-    auto downloading = m_stateTracker->peersInState(StatusCode::downloading);
+    auto downloading = m_stateTracker->peersInState(StatusCode::downloading)
+        + m_stateTracker->peersInState(StatusCode::preparing);
     downloading.subtract(m_stateTracker->offlineServers());
+
     if (!downloading.empty())
     {
         // We should go to downloading stage if we have merged
         // another system. This system will start update automatically, so we just need
         // to change UI state.
+        NX_DEBUG(this, "processReadyInstallState() - detected servers %1 in downloading state",
+            downloading);
         setTargetState(WidgetUpdateState::downloading, downloading, false);
     }
     else if (idle.size() == all.size() && m_serverUpdateTool->haveActiveUpdate())
@@ -1864,6 +1929,15 @@ void MultiServerUpdatesWidget::setTargetState(
                 break;
             case WidgetUpdateState::installingStalled:
                 break;
+            case WidgetUpdateState::startingInstall:
+                if (runCommands && !targets.empty())
+                {
+                    QSet<QnUuid> servers = targets;
+                    servers.remove(m_stateTracker->getClientPeerId());
+                    m_serverUpdateTool->requestInstallAction(servers);
+                }
+                // The rest will be done in a handler for WidgetUpdateState::installing.
+                break;
             case WidgetUpdateState::installing:
                 m_stateTracker->setPeersInstalling(targets, true);
                 if (runCommands && !targets.empty())
@@ -1872,7 +1946,6 @@ void MultiServerUpdatesWidget::setTargetState(
                     servers.remove(m_stateTracker->getClientPeerId());
                     if (!servers.empty())
                         qnClientMessageProcessor->setHoldConnection(true);
-                    m_serverUpdateTool->requestInstallAction(servers);
                 }
 
                 m_installCheckTimer = std::make_unique<QTimer>(this);
@@ -1992,7 +2065,16 @@ void MultiServerUpdatesWidget::syncUpdateCheckToUi()
 
     bool latestVersion = hasLatestVersion();
 
-    ui->cancelProgressAction->setEnabled(m_widgetState != WidgetUpdateState::installing);
+    switch(m_widgetState)
+    {
+        case WidgetUpdateState::startingDownload:
+        case WidgetUpdateState::startingInstall:
+        case WidgetUpdateState::installing:
+            ui->cancelProgressAction->setEnabled(false);
+            break;
+        default:
+            ui->cancelProgressAction->setEnabled(true);
+    }
 
     if (m_widgetState == WidgetUpdateState::installingStalled)
         ui->cancelProgressAction->setText(tr("Finish Update"));
@@ -2115,6 +2197,7 @@ bool MultiServerUpdatesWidget::stateHasProgress(WidgetUpdateState state)
         case WidgetUpdateState::initialCheck:
         case WidgetUpdateState::ready:
         case WidgetUpdateState::readyInstall:
+        case WidgetUpdateState::startingInstall:
         case WidgetUpdateState::cancelingReadyInstall:
         case WidgetUpdateState::complete:
             return false;
@@ -2239,31 +2322,41 @@ void MultiServerUpdatesWidget::syncRemoteUpdateStateToUi()
 
     auto readyAndOnline = m_stateTracker->onlineAndInState(LocalStatusCode::readyToInstall);
     auto readyAndOffline = m_stateTracker->offlineAndInState(LocalStatusCode::readyToInstall);
-    bool hasErrors = m_stateTracker->hasVerificationErrors();
+    bool hasVerificationErrors = m_stateTracker->hasVerificationErrors();
+    bool hasStatusErrors = m_stateTracker->hasStatusErrors();
 
+    QStringList errorTooltips;
     if (m_widgetState == WidgetUpdateState::readyInstall)
     {
-        if (readyAndOnline.empty() || !readyAndOffline.empty())
+        if (readyAndOnline.empty() || !readyAndOffline.empty()
+            || hasStatusErrors || hasVerificationErrors)
         {
-            ui->downloadButton->setEnabled(false);
-            ui->downloadButton->setToolTip(tr("Some servers have gone offline. "
-                "Please wait until they become online to continue."));
-        }
-        else if (hasErrors)
-        {
-            ui->downloadButton->setEnabled(false);
-            ui->downloadButton->setToolTip(tr("Some servers have no package available"));
-        }
-        else
-        {
-            ui->downloadButton->setEnabled(true);
-            ui->downloadButton->setToolTip("");
+            if (hasVerificationErrors)
+            {
+                errorTooltips << tr("Some servers have no update packages available.");
+            }
+            else if (hasStatusErrors)
+            {
+                errorTooltips << tr("Some servers have encountered an internal error.");
+                errorTooltips << tr("Please please contact Customer Support.");
+            }
+            else
+            {
+                errorTooltips << tr("Some servers have gone offline. "
+                                    "Please wait until they become online to continue.");
+            }
         }
     }
-    else
+
+    if (errorTooltips.isEmpty())
     {
         ui->downloadButton->setEnabled(true);
         ui->downloadButton->setToolTip("");
+    }
+    else
+    {
+        ui->downloadButton->setEnabled(false);
+        ui->downloadButton->setToolTip(errorTooltips.join("\n"));
     }
 
     ui->tableView->setColumnHidden(ServerUpdatesModel::Columns::StorageSettingsColumn, !m_showStorageSettings);
@@ -2275,7 +2368,6 @@ void MultiServerUpdatesWidget::syncRemoteUpdateStateToUi()
         ui->tableView->setEditTriggers(QAbstractItemView::AllEditTriggers);
     else
         ui->tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    //NX_VERBOSE(this) << "syncRemoteUpdateState() - done with m_updateStateChanged";
     m_updateRemoteStateChanged = false;
 }
 
@@ -2511,6 +2603,8 @@ QString MultiServerUpdatesWidget::toString(WidgetUpdateState state)
             return "ReadyInstall";
         case WidgetUpdateState::cancelingReadyInstall:
             return "CancelingReadyInstall";
+        case WidgetUpdateState::startingInstall:
+            return "StartingInstall";
         case WidgetUpdateState::installing:
             return "Installing";
         case WidgetUpdateState::installingStalled:

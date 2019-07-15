@@ -5741,7 +5741,7 @@ Als u analysegegevens naar een andere opslaglocatie wilt verplaatsen, neemt u co
     </message>
     <message>
       <source>Plugins</source>
-      <translation type="unfinished">Plugins</translation>
+      <translation>Plugins</translation>
     </message>
   </context>
   <context>
@@ -7713,7 +7713,7 @@ Als u analysegegevens naar een andere opslaglocatie wilt verplaatsen, neemt u co
     </message>
     <message>
       <source>Plugins</source>
-      <translation type="unfinished">Plugins</translation>
+      <translation>Plugins</translation>
     </message>
   </context>
   <context>
@@ -8742,6 +8742,14 @@ Als u analysegegevens naar een andere opslaglocatie wilt verplaatsen, neemt u co
       <source>Some servers have no package available</source>
       <translation>Sommige servers hebben geen pakket beschikbaar</translation>
     </message>
+    <message>
+      <source>Failed to cancel update</source>
+      <translation type="unfinished">Failed to cancel update</translation>
+    </message>
+    <message>
+      <source>Failed to start installation</source>
+      <translation type="unfinished">Failed to start installation</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::MultipleLayoutSelectionDialog</name>
@@ -8893,10 +8901,6 @@ Als u analysegegevens naar een andere opslaglocatie wilt verplaatsen, neemt u co
       <translation>Interne downloader fout.</translation>
     </message>
     <message>
-      <source>Iternal server error.</source>
-      <translation>Interne serverfout.</translation>
-    </message>
-    <message>
       <source>Internal client error.</source>
       <translation>Interne client fout.</translation>
     </message>
@@ -8915,6 +8919,14 @@ Als u analysegegevens naar een andere opslaglocatie wilt verplaatsen, neemt u co
     <message>
       <source>Update package is not found.</source>
       <translation>Update bestand kan niet gevonden worden.</translation>
+    </message>
+    <message>
+      <source>There is not enough space to install update.</source>
+      <translation>Er is niet voldoende ruimte om de update te installeren.</translation>
+    </message>
+    <message>
+      <source>Internal server error.</source>
+      <translation>Interne Server Fout.</translation>
     </message>
   </context>
   <context>
@@ -9155,6 +9167,17 @@ Als u analysegegevens naar een andere opslaglocatie wilt verplaatsen, neemt u co
     <message>
       <source>Waiting for server to respond...</source>
       <translation>Wacht tot de server reageert...</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ServerUpdateTool</name>
+    <message>
+      <source>No connection to the server.</source>
+      <translation type="unfinished">No connection to the server.</translation>
+    </message>
+    <message>
+      <source>Network error.</source>
+      <translation type="unfinished">Network error.</translation>
     </message>
   </context>
   <context>

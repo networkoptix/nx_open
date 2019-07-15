@@ -157,6 +157,12 @@ int QnInstallUpdateRestHandler::executePost(
     sendInstallRequest(ifParticipantPredicate, serverModule()->commonModule(), path,
         srcBodyContentType, &context);
 
+    // Client expects json object in all cases or response is considered failed.
+    QnRestResult restResult;
+    restResult.setError(QnRestResult::Error::NoError);
+    QnFusionRestHandlerDetail::serialize(
+        restResult, result, resultContentType, Qn::JsonFormat);
+
     return nx::network::http::StatusCode::ok;
 }
 

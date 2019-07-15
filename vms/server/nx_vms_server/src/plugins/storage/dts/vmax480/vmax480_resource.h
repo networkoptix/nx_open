@@ -48,6 +48,7 @@ public:
     virtual QnAbstractArchiveDelegate* createArchiveDelegate() override;
     QnTimePeriodList getChunks();
 
+    static void stopChunkReaders();
 protected:
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
 

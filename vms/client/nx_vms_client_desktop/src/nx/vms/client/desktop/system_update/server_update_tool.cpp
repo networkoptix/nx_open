@@ -36,6 +36,7 @@
 
 #include "server_update_tool.h"
 #include "server_updates_model.h"
+#include "update_verification.h"
 
 using namespace nx::vms::common::p2p::downloader;
 
@@ -426,8 +427,8 @@ void ServerUpdateTool::startManualDownloads(const UpdateContents& contents)
         switch (code)
         {
             case Code::ok:
-                NX_VERBOSE(this) << "startManualDownloads() - downloading package"
-                    << info.name << " from url=" << package.url;
+                NX_VERBOSE(this, "startManualDownloads() - downloading package %1 from url %2",
+                    info.name, package.url);
                 m_activeDownloads.insert(std::make_pair(package.file, 0));
                 break;
             case Code::fileAlreadyExists:
@@ -442,8 +443,9 @@ void ServerUpdateTool::startManualDownloads(const UpdateContents& contents)
             // Some sort of an error here.
             {
                 QString error = vms::common::p2p::downloader::toString(code);
-                NX_VERBOSE(this) << "requestStartUpdate() - failed start downloading package"
-                    << info.name << error;
+                NX_VERBOSE(this,
+                    "startManualDownloads() - failed start downloading package %1: %2",
+                    info.name, error);
                 m_failedDownloads.insert(file);
                 break;
             }
@@ -720,19 +722,24 @@ bool ServerUpdateTool::requestStopAction()
         connection->updateActionStop(nx::utils::guarded(this,
             [this](bool success, rest::Handle /*handle*/)
             {
-                // This will be called in outer
                 NX_VERBOSE(this, "requestStopAction() - success=%1", success);
-                m_remoteUpdateManifest = nx::update::Information();
+                if (success)
+                    m_remoteUpdateManifest = nx::update::Information();
                 m_requestingStop = false;
-                emit cancelUpdateComplete(success);
+                auto error = success ? InternalError::noError : InternalError::networkError;
+                emit cancelUpdateComplete(success, toString(error));
             }), thread());
+
+        for (const auto& file: m_activeDownloads)
+            m_downloader->deleteFile(file.first);
+        m_activeDownloads.clear();
+        m_stateTracker->clearState();
+        return true;
     }
 
-    for (const auto& file: m_activeDownloads)
-        m_downloader->deleteFile(file.first);
-    m_activeDownloads.clear();
-    m_stateTracker->clearState();
-    return true;
+    NX_ERROR(this, "requestStopAction() - no conenction to the server.");
+    emit cancelUpdateComplete(false, toString(InternalError::noConnection));
+    return false;
 }
 
 bool ServerUpdateTool::requestRetryAction()
@@ -775,21 +782,39 @@ bool ServerUpdateTool::requestFinishUpdate(bool skipActivePeers)
     {
         NX_VERBOSE(this, "requestFinishUpdate(%1) - sending request", skipActivePeers);
         connection->updateActionFinish(skipActivePeers, nx::utils::guarded(this,
-            [this, skipActivePeers](bool success, rest::Handle /*handle*/)
+            [this, skipActivePeers](
+                bool success, rest::Handle/*handle*/, const QnJsonRestResult& result)
             {
-                NX_VERBOSE(this, "requestFinishUpdate(%1) - got response", skipActivePeers);
+                NX_VERBOSE(this, "requestFinishUpdate(%1) - got response, success=%2",
+                    skipActivePeers, success);
                 m_requestingFinish = false;
-                emit finishUpdateComplete(success);
+                auto error = InternalError::noError;
+                if (!success)
+                {
+                    error = InternalError::networkError;
+                    NX_ERROR(this, "requestFinishUpdate(%1) - failed to send a request",
+                        skipActivePeers);
+                }
+                else if (result.error != QnRestResult::NoError)
+                {
+                    success = false;
+                    error = InternalError::serverError;
+                    NX_ERROR(this, "requestFinishUpdate(%1) - server responded with %2",
+                        skipActivePeers, result.errorString);
+                }
+
+                emit finishUpdateComplete(success, toString(error));
             }), thread());
         m_stateTracker->clearState();
         return true;
     }
 
-    NX_VERBOSE(this, "requestFinishUpdate(%1) - no connection to the server", skipActivePeers);
+    NX_ERROR(this, "requestFinishUpdate(%1) - no connection to the server", skipActivePeers);
+    emit finishUpdateComplete(false, toString(InternalError::noConnection));
     return false;
 }
 
-void ServerUpdateTool::requestStartUpdate(
+bool ServerUpdateTool::requestStartUpdate(
     const nx::update::Information& info,
     const QSet<QnUuid>& targets)
 {
@@ -814,19 +839,21 @@ void ServerUpdateTool::requestStartUpdate(
         dropAllRequests("requestStartUpdate()");
         auto callback = [this](bool success, rest::Handle /*requestId*/)
             {
-                // TODO: Just forcing it, until server side responds with
-                // a proper nx::update::Information
-                success = true;
-                emit startUpdateComplete(success);
+                auto error = success ? InternalError::noError : InternalError::networkError;
+                emit startUpdateComplete(success, toString(error));
             };
         connection->updateActionStart(info, nx::utils::guarded(this, callback));
         m_remoteUpdateManifest = info;
+        return true;
     }
 
     m_remoteUpdateStatus = {};
+    NX_ERROR(this, "requestStartUpdate(%1) - no connection to the server", info.version);
+    emit startUpdateComplete(false, toString(InternalError::noConnection));
+    return false;
 }
 
-void ServerUpdateTool::requestInstallAction(
+bool ServerUpdateTool::requestInstallAction(
     const QSet<QnUuid>& targets)
 {
     // Filtering out only 'server' components.
@@ -838,29 +865,47 @@ void ServerUpdateTool::requestInstallAction(
             servers.insert(id);
     }
 
-    NX_VERBOSE(this) << "requestInstallAction() for" << servers;
     m_remoteUpdateStatus = {};
 
     m_timeStartedInstall = qnSyncTime->currentMSecsSinceEpoch();
     m_serversAreInstalling = servers;
 
-    auto callback = [tool = QPointer<ServerUpdateTool>(this)](bool success, rest::Handle handle)
+    auto callback = [tool = QPointer<ServerUpdateTool>(this)](
+            bool success, rest::Handle handle, const QnRestResult& result)
         {
-            if (!success)
-                NX_ERROR(typeid(ServerUpdateTool)) << "requestInstallAction() - response success=false";
             if (tool)
             {
                 tool->m_requestingInstall.remove(handle);
                 tool->requestRemoteUpdateStateAsync();
+                auto error = InternalError::noError;
+                if (!success)
+                {
+                    error = InternalError::networkError;
+                }
+                else if (result.error != QnRestResult::NoError)
+                {
+                    success = false;
+                    error = InternalError::serverError;
+                    NX_ERROR(tool.data(), "requestInstallAction() - server responded with %1",
+                        result.errorString);
+                }
+
+                emit tool->startInstallComplete(success, tool->toString(error));
             }
         };
 
     if (auto connection = getServerConnection(commonModule()->currentServer()))
     {
+        NX_VERBOSE(this, "requestInstallAction() for %1", servers);
         dropAllRequests("requestInstallAction()");
-        if (auto handle = connection->updateActionInstall(servers, callback, thread()))
+        if (auto handle = connection->updateActionInstall(servers, callback))
             m_requestingInstall.insert(handle);
+        return true;
     }
+
+    NX_ERROR(this, "requestInstallAction(%1) - no connection to the server", targets);
+    emit startInstallComplete(false, toString(InternalError::noConnection));
+    return false;
 }
 
 void ServerUpdateTool::requestModuleInformation()
@@ -1033,6 +1078,22 @@ std::shared_ptr<PeerStateTracker> ServerUpdateTool::getStateTracker()
 QSet<QnUuid> ServerUpdateTool::getServersInstalling() const
 {
     return m_serversAreInstalling;
+}
+
+QString ServerUpdateTool::toString(InternalError errorCode)
+{
+    switch(errorCode)
+    {
+        case InternalError::noError:
+            return "";
+        case InternalError::noConnection:
+            return tr("No connection to the server.");
+        case InternalError::networkError:
+            return tr("Network error.");
+        case InternalError::serverError:
+            return tr("Server error.");
+    }
+    return "Unknown error.";
 }
 
 const nx::update::Package* ServerUpdateTool::findPackageForFile(const QString& fileName) const

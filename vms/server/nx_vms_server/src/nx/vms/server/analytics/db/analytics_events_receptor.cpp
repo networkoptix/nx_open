@@ -9,6 +9,7 @@
 #include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
+#include <nx/analytics/analytics_logging_ini.h>
 
 namespace nx::analytics::db {
 
@@ -41,7 +42,7 @@ void AnalyticsEventsReceptor::putData(const QnAbstractDataPacketPtr& data)
     *detectionMetadataPacket =
         QnUbjson::deserialized<nx::common::metadata::DetectionMetadataPacket>(
             QByteArray::fromRawData(metadataPacket->data(),
-            (int) metadataPacket->dataSize()),
+            (int)metadataPacket->dataSize()),
             nx::common::metadata::DetectionMetadataPacket(),
             &isParsedSuccessfully);
     if (!isParsedSuccessfully)
@@ -62,7 +63,41 @@ void AnalyticsEventsReceptor::putData(const QnAbstractDataPacketPtr& data)
         }
     }
 
+
+    using namespace std::chrono;
+    time_point<high_resolution_clock> startTime;
+    nx::common::metadata::DetectionMetadataPacket copy;
+    if (loggingIni().isLoggingEnabled())
+    {
+        if (!m_metadataLogger
+            && detectionMetadataPacket
+            && !detectionMetadataPacket->deviceId.isNull())
+        {
+            m_metadataLogger = std::make_unique<MetadataLogger>(
+                "analytics_event_receptor_",
+                detectionMetadataPacket->deviceId,
+                /*engineId*/ QnUuid());
+        }
+
+        if (m_metadataLogger)
+        {
+            copy = *detectionMetadataPacket;
+            startTime = high_resolution_clock::now();
+        }
+    }
+
     m_eventsStorage->save(std::move(detectionMetadataPacket));
+
+    if (m_metadataLogger)
+    {
+        const int64_t callDurationUs = duration_cast<microseconds>(
+            high_resolution_clock::now() - startTime).count();
+
+        const auto endTime = high_resolution_clock::now();
+        m_metadataLogger->pushObjectMetadata(
+            std::move(copy),
+            lm("save() call took %1us").args(callDurationUs));
+    }
 }
 
 } // namespace nx::analytics::db

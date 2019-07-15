@@ -71,7 +71,7 @@ MotionSearchSynchronizer::MotionSearchSynchronizer(
                 ? ui::action::StartSmartSearchAction
                 : ui::action::StopSmartSearchAction;
 
-            menu()->trigger(action, display()->widgets());
+            menu()->triggerIfPossible(action, display()->widgets());
         };
 
     connect(this, &AbstractSearchSynchronizer::activeChanged, this, updateActiveState);

@@ -1,5 +1,7 @@
 #include "client_update_tool.h"
 
+#include <QtCore/QCoreApplication>
+
 #include <common/common_module.h>
 #include <api/global_settings.h>
 #include <api/server_rest_connection.h>
@@ -13,6 +15,8 @@
 #include <nx/vms/common/p2p/downloader/private/resource_pool_peer_manager.h>
 #include <nx/vms/common/p2p/downloader/private/internet_only_peer_manager.h>
 #include <nx/vms/client/desktop/ini.h>
+
+#include "update_verification.h"
 
 namespace nx::vms::client::desktop {
 
@@ -625,6 +629,9 @@ bool ClientUpdateTool::restartClient(QString authString)
         if (applauncher::api::restartClient(m_updateVersion, authString) == ResultType::ok)
             return true;
     }
+
+    NX_ERROR(this, "restartClient() - failed to restart client to desired version %1",
+        m_updateVersion);
     return false;
 }
 

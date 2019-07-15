@@ -383,6 +383,7 @@ void NotificationsWorkbenchPanel::createEventPanel(QGraphicsWidget* parentWidget
     m_eventPanelContainer = new QnMaskedProxyWidget(parentWidget);
     m_eventPanelContainer->setProperty(Qn::NoHandScrollOver, true);
     m_eventPanelContainer->setProperty(Qn::BlockMotionSelection, true);
+    m_eventPanelContainer->setFocusPolicy(Qt::ClickFocus);
 
     auto eventPanelResizer = new ResizerWidget(item, m_eventPanelContainer);
     auto dragProcessor = new DragProcessor(this);
@@ -448,7 +449,7 @@ void NotificationsWorkbenchPanel::at_eventTileHovered(
 
     const auto parentWidget = m_eventPanel->graphicsProxyWidget();
     const auto imageProvider = tile->preview();
-    const auto text = tile->toolTip().isEmpty() ? tile->title() : tile->toolTip();
+    const auto text = tile->toolTip();
     if (text.isEmpty())
         return;
 

@@ -217,11 +217,11 @@ void ScheduleSettingsWidget::loadState(const CameraSettingsDialogState& state)
         ui->recordMotionButton->setToolTip(motionOptionHint(state));
     }
 
-    const bool hasDualRecordingOption = state.supportsDualStreamRecording();
+    const bool supportsMotionPlusLQ = state.supportsMotionPlusLQ();
 
-    ui->recordMotionPlusLQButton->setEnabled(hasDualRecordingOption);
-    ui->labelMotionPlusLQ->setEnabled(hasDualRecordingOption);
-    if (hasDualRecordingOption)
+    ui->recordMotionPlusLQButton->setEnabled(supportsMotionPlusLQ);
+    ui->labelMotionPlusLQ->setEnabled(supportsMotionPlusLQ);
+    if (supportsMotionPlusLQ)
     {
         ui->recordMotionPlusLQButton->setChecked(brush.recordingType == Qn::RecordingType::motionAndLow);
         setReadOnly(ui->recordMotionPlusLQButton, state.readOnly);

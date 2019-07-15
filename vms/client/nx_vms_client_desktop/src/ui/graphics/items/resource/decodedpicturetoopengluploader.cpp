@@ -117,9 +117,9 @@ public:
         forceSoftYUV(false),
         yv12SharedUsed(false),
         nv12SharedUsed(false),
-        functions(new QnGlFunctions(glWidget))
+        functions(new QnGlFunctions(glWidget) /*Resets current context*/)
     {
-        initializeOpenGLFunctions();
+        glWidget->makeCurrent();
 
         /* Clamp constant. */
         clampConstant = GL_CLAMP_TO_EDGE;

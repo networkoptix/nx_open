@@ -8,7 +8,7 @@ namespace nx {
 namespace vms {
 namespace discovery {
 
-static const int kMaxDatagramSize(1500); //< Expected MTU size with a little reserve.
+static const int kMaxDatagramSize(1024*4);
 
 const nx::network::SocketAddress UdpMulticastFinder::kMulticastEndpoint("239.255.11.11:5008");
 const std::chrono::milliseconds UdpMulticastFinder::kUpdateInterfacesInterval = std::chrono::minutes(1);

@@ -11,6 +11,7 @@
 #include <utils/common/event_processors.h>
 
 #include <nx/utils/log/assert.h>
+#include <nx/vms/client/desktop/utils/widget_utils.h>
 
 namespace nx::vms::client::desktop {
 
@@ -103,7 +104,9 @@ void LinkHoverProcessor::changeLabelState(const QString& text, bool hovered)
     m_alteredText = text;
 
     m_label->setText(text);
-    m_label->repaint();
+
+    if (!WidgetUtils::graphicsProxyWidget(m_label))
+        m_label->repaint();
 
     if (hovered)
         m_label->setCursor(Qt::PointingHandCursor);

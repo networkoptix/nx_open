@@ -9,9 +9,9 @@ namespace nx {
 namespace network {
 namespace websocket {
 
-Parser::Parser(Role role, ParserHandler* handler):
+Parser::Parser(Role role, GotFrameHandler handler):
     m_role(role),
-    m_handler(handler)
+    m_frameHandler(std::move(handler))
 {
 }
 
@@ -122,9 +122,6 @@ Parser::ParseState Parser::readHeaderFixed(char* data)
     data++;
     m_masked = (*data >> 7) & 0x01;
 
-    if (!m_masked && m_role == Role::server)
-        m_handler->handleError(Error::noMaskBit);
-
     m_payloadLen = (unsigned char)(*data & (~0x80));
     m_headerExtLen = (m_payloadLen <= 125 ? 0 : m_payloadLen == 126 ? 2 : 8) + (m_masked ? 4 : 0);
     if (m_headerExtLen == 0 && m_payloadLen == 0)
@@ -140,7 +137,7 @@ void Parser::handleFrame()
     if (m_doUncompress)
         m_frameBuffer = nx::utils::bstream::gzip::Compressor::uncompressData(m_frameBuffer);
 
-    m_handler->gotFrame(m_firstFrame ? m_opCode : FrameType::continuation, m_frameBuffer, m_fin);
+    m_frameHandler(m_firstFrame ? m_opCode : FrameType::continuation, m_frameBuffer, m_fin);
     m_frameBuffer.clear();
 
     if (m_firstFrame)

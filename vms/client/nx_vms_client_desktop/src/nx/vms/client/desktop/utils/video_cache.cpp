@@ -100,11 +100,15 @@ void VideoCache::add(const QnUuid& resourceId, const CLVideoDecoderOutputPtr& fr
     while (!queue.empty() && frame->pkt_dts - queue.front()->pkt_dts >= m_cacheSize.count())
         queue.pop_front();
 
+    NX_VERBOSE(this, "queue duration=%1us, size=%2",
+        queue.empty() ? 0 : frame->pkt_dts - queue.front()->pkt_dts,
+        queue.size());
+
     CLVideoDecoderOutputPtr frameToAdd(frame);
     if (frame->isExternalData())
     {
         frameToAdd.reset(new CLVideoDecoderOutput());
-        frame->copy(frameToAdd.get());
+        frameToAdd->copyFrom(frame.get());
     }
 
     auto posItr = std::upper_bound(queue.begin(), queue.end(),

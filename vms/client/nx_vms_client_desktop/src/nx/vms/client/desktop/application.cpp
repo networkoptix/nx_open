@@ -289,9 +289,7 @@ int runApplicationInternal(QtSingleApplication* application, const QnStartupPara
     client.initDesktopCamera(qobject_cast<QOpenGLWidget*>(mainWindow->viewport()));
     client.startLocalSearchers();
 
-    const auto code = context->handleStartupParameters(startupParams);
-    if (code != QnWorkbenchContext::success)
-        return code == QnWorkbenchContext::forcedExit ? kSuccessCode : kInvalidParametersCode;
+    context->handleStartupParameters(startupParams);
 
     #if defined(Q_OS_WIN)
         if (ini().enableGdiTrace)

@@ -101,7 +101,7 @@ private:
     int m_requestId;
     std::chrono::milliseconds m_defaultRequestTimeout{std::chrono::minutes(1)};
     std::chrono::milliseconds m_defaultResponseTimeout{std::chrono::minutes(1)};
-    std::chrono::milliseconds m_defaultMessageBodyTimeout{std::chrono::minutes(10)};
+    std::chrono::milliseconds m_defaultMessageBodyTimeout{std::chrono::minutes(1)};
 };
 
 } // namespace nx

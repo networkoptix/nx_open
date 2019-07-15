@@ -21,6 +21,7 @@ static const QString kMonitorUrlTemplate("/ISAPI/Event/notification/alertStream"
 static const QString kLprUrlTemplate("/ISAPI/Traffic/channels/1/vehicleDetect/plates");
 
 static const int kDefaultHttpPort = 80;
+static const std::chrono::seconds kLprHttpRequestTimeout(15);
 static const std::chrono::minutes kKeepAliveTimeout(2);
 static const std::chrono::seconds kMinReopenInterval(10);
 static const std::chrono::seconds kLprRequestsTimeout(2);
@@ -140,6 +141,7 @@ void HikvisionMetadataMonitor::initEventMonitor()
     httpClient->setTotalReconnectTries(nx::network::http::AsyncClient::UNLIMITED_RECONNECT_TRIES);
     httpClient->setUserName(m_auth.user());
     httpClient->setUserPassword(m_auth.password());
+    httpClient->setResponseReadTimeout(kKeepAliveTimeout);
     httpClient->setMessageBodyReadTimeout(kKeepAliveTimeout);
 
     m_contentParser = std::make_unique<nx::network::http::MultipartContentParser>();
@@ -160,7 +162,8 @@ void HikvisionMetadataMonitor::initLprMonitor()
     httpClient->setTotalReconnectTries(nx::network::http::AsyncClient::UNLIMITED_RECONNECT_TRIES);
     httpClient->setUserName(m_auth.user());
     httpClient->setUserPassword(m_auth.password());
-    httpClient->setMessageBodyReadTimeout(kKeepAliveTimeout);
+    httpClient->setResponseReadTimeout(kLprHttpRequestTimeout);
+    httpClient->setMessageBodyReadTimeout(kLprHttpRequestTimeout);
     m_lprHttpClient = std::move(httpClient);
     sendLprRequest();
 }

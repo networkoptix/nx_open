@@ -1034,15 +1034,18 @@ void QnTimeSlider::setWindowEnd(milliseconds windowEnd)
     setWindow(qMin(m_windowStart, windowEnd - m_minimalWindow), windowEnd);
 }
 
-void QnTimeSlider::setWindow(milliseconds start, milliseconds end, bool animate)
+void QnTimeSlider::setWindow(milliseconds start, milliseconds end, bool animate, bool forceResize)
 {
     milliseconds targetWindowSize = end - start;
 
-    start = qBound(minimum(), start, maximum());
-    end = qMax(start, qBound(minimum(), end, maximum()));
+    if (!qnRuntime->isAcsMode())
+    {
+        start = qBound(minimum(), start, maximum());
+        end = qMax(start, qBound(minimum(), end, maximum()));
+    }
 
     /* Check if window size was spoiled and fix it if possible. */
-    if (m_options.testFlag(PreserveWindowSize))
+    if (!forceResize && m_options.testFlag(PreserveWindowSize))
     {
         milliseconds newWindowSize = end - start;
         milliseconds range = maximum() - minimum();
