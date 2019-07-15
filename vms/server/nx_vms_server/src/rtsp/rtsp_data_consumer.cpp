@@ -73,9 +73,6 @@ QnRtspDataConsumer::QnRtspDataConsumer(QnRtspConnectionProcessor* owner):
     m_adaptiveSleep(MAX_FRAME_DURATION_MS*1000),
     m_useUTCTime(true),
     m_fastChannelZappingSize(0),
-    m_firstLiveTime(AV_NOPTS_VALUE),
-    m_lastLiveTime(AV_NOPTS_VALUE),
-    m_allowAdaptiveStreaming(true),
     m_sendBuffer(CL_MEDIA_ALIGNMENT, 1024*256),
     m_someDataIsDropped(false),
     m_previousRtpTimestamp(-1),
@@ -175,18 +172,6 @@ bool removeItemsCondition(const QnAbstractDataPacketPtr& data)
     return !(std::dynamic_pointer_cast<QnAbstractMediaData>(data)->flags & AV_PKT_FLAG_KEY);
 }
 
-bool QnRtspDataConsumer::isMediaTimingsSlow() const
-{
-    QnMutexLocker lock( &m_liveTimingControlMtx );
-    if (m_lastLiveTime == (qint64)AV_NOPTS_VALUE)
-        return false;
-    NX_ASSERT(m_firstLiveTime != (qint64)AV_NOPTS_VALUE);
-    //qint64 elapsed = m_liveTimer.elapsed()*1000;
-    bool rez = m_lastLiveTime - m_firstLiveTime < m_liveTimer.elapsed()*1000;
-
-    return rez;
-}
-
 void QnRtspDataConsumer::getEdgePackets(
     const QnDataPacketQueue::RandomAccess<>& unsafeQueue,
     qint64& firstVTime,
@@ -236,6 +221,7 @@ static const int MAX_DATA_QUEUE_SIZE = 120;
 
 void QnRtspDataConsumer::cleanupQueueToPos(QnDataPacketQueue::RandomAccess<>& unsafeQueue, int lastIndex, quint32 ch)
 {
+    NX_WARNING(this, "Too long frame queue, cleanup");
     int currentIndex = lastIndex;
     if (m_videoChannels == 1)
     {
@@ -320,11 +306,12 @@ void QnRtspDataConsumer::putData(const QnAbstractDataPacketPtr& nonConstData)
         }
     }
 
-    // Queue to large. Clear data anyway causing video artifacts
+    // Queue too large. Clear data anyway causing video artifacts
     while(m_dataQueue.size() > MAX_DATA_QUEUE_SIZE * (int) m_videoChannels)
     {
         QnAbstractDataPacketPtr tmp;
         m_dataQueue.pop(tmp);
+        NX_WARNING(this, "Too long frame queue, drop frame");
     }
 }
 
@@ -632,15 +619,6 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
     if( (m_streamingSpeed != MAX_STREAMING_SPEED) && (!isLive) )
         doRealtimeDelay(media);
 
-    if (isLive && media->dataType == QnAbstractMediaData::VIDEO)
-    {
-        QnMutexLocker lock( &m_liveTimingControlMtx );
-        if (m_firstLiveTime == (qint64)AV_NOPTS_VALUE) {
-            m_liveTimer.restart();
-            m_lastLiveTime = m_firstLiveTime = media->timestamp;
-        }
-    }
-
     QnRtspFfmpegEncoder* ffmpegEncoder = dynamic_cast<QnRtspFfmpegEncoder*>(codecEncoder.get());
     if (ffmpegEncoder)
     {
@@ -713,9 +691,6 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
     if (m_packetSended++ == MAX_PACKETS_AT_SINGLE_SHOT)
         m_singleShotMode = false;
 
-    QnMutexLocker lock( &m_liveTimingControlMtx );
-    if (media->dataType == QnAbstractMediaData::VIDEO && m_lastLiveTime != (qint64)AV_NOPTS_VALUE)
-        m_lastLiveTime = media->timestamp;
 
     return true;
 }
@@ -799,10 +774,6 @@ int QnRtspDataConsumer::copyLastGopFromCamera(
     m_dataQueue.setMaxSize(m_dataQueue.size()-prevSize + MAX_QUEUE_SIZE);
     m_fastChannelZappingSize = copySize;
 
-    QnMutexLocker lock( &m_liveTimingControlMtx );
-    m_firstLiveTime = AV_NOPTS_VALUE;
-    m_lastLiveTime = AV_NOPTS_VALUE;
-
     return copySize;
 }
 
@@ -845,14 +816,8 @@ void QnRtspDataConsumer::setUseUTCTime(bool value)
     m_useUTCTime = value;
 }
 
-void QnRtspDataConsumer::setAllowAdaptiveStreaming(bool value)
-{
-    m_allowAdaptiveStreaming = value;
-}
-
 void QnRtspDataConsumer::setLiveQualityInternal(MediaQuality quality)
 {
-    qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
     QHostAddress clientAddress = m_owner->getPeerAddress();
     m_liveQuality = quality;
 }
