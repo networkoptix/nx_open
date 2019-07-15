@@ -1,7 +1,7 @@
 #include "server_storage_manager.h"
 
 #include <api/app_server_connection.h>
-#include <api/media_server_connection.h>
+#include <api/server_rest_connection.h>
 #include <api/model/backup_status_reply.h>
 #include <api/model/rebuild_archive_reply.h>
 #include <api/model/storage_space_reply.h>
@@ -10,6 +10,7 @@
 
 #include <nx_ec/managers/abstract_server_manager.h>
 #include <nx_ec/data/api_conversion_functions.h>
+#include <nx_ec/ec_api.h>
 
 #include <core/resource/media_server_resource.h>
 #include <core/resource/storage_resource.h>
@@ -17,6 +18,7 @@
 #include <core/resource/client_storage_resource.h>
 
 #include <utils/common/delayed.h>
+#include <nx/utils/guarded_callback.h>
 #include <core/resource/fake_media_server.h>
 
 namespace {
@@ -34,6 +36,31 @@ namespace {
         storage->setSpaceLimit(spaceInfo.reservedSpace);
         storage->setStatus(spaceInfo.isOnline ? Qn::Online : Qn::Offline);
         storage->setStatusFlag(spaceInfo.storageStatus);
+    }
+
+    /**
+     * Helper method to generate a callback, compatible with rest::ServerConenction::postJsonResult
+     * It attaches to an object with type `Class` and a method with a signature:
+     * `void someMethod(bool success, int handle, const TargetType& data)`
+     */
+    template<class Class, class TargetType> auto methodCallback(
+        Class* object,
+        void (Class::* method)(bool, int, const TargetType&))
+    {
+        NX_ASSERT(object);
+        return nx::utils::guarded(object,
+            [object, method](bool success, int handle, QnJsonRestResult jsonData) -> void
+            {
+                if (success)
+                {
+                    TargetType data = jsonData.deserialized<TargetType>(&success);
+                    (object->*method)(success, handle, data);
+                }
+                else
+                {
+                    (object->*method)(success, handle, {});
+                }
+            });
     }
 }
 
@@ -162,7 +189,7 @@ void QnServerStorageManager::invalidateRequests()
 bool QnServerStorageManager::isServerValid( const QnMediaServerResourcePtr &server ) const
 {
     /* Server is invalid. */
-    if (!server || !server->apiConnection())
+    if (!server || !server->restConnection())
         return false;
 
     /* Server is not watched. */
@@ -273,12 +300,17 @@ bool QnServerStorageManager::sendArchiveRebuildRequest( const QnMediaServerResou
     if (!isServerValid(server))
         return false;
 
-    int handle = server->apiConnection()->doRebuildArchiveAsync(
-        action,
-        pool == QnServerStoragesPool::Main,
-        this,
-        SLOT(at_archiveRebuildReply(int, const QnStorageScanData &, int)));
-    if (handle <= 0)
+    QnRequestParamList params;
+    params.insert("action", QnLexical::serialized(action));
+    params.insert("mainPool", pool == QnServerStoragesPool::Main);
+    auto connection = server->restConnection();
+    if (!connection)
+        return false;
+
+    auto handle = connection->postJsonResult("api/rebuildArchive", params, {}, 
+        methodCallback(this, &QnServerStorageManager::at_archiveRebuildReply), thread());
+
+    if (!handle)
         return false;
 
     if (action != Qn::RebuildAction_ShowProgress)
@@ -288,7 +320,7 @@ bool QnServerStorageManager::sendArchiveRebuildRequest( const QnMediaServerResou
     return true;
 }
 
-void QnServerStorageManager::at_archiveRebuildReply( int status, const QnStorageScanData &reply, int handle )
+void QnServerStorageManager::at_archiveRebuildReply(bool success, int handle, const QnStorageScanData& reply)
 {
     /* Requests were invalidated. */
     if (!m_requests.contains(handle))
@@ -304,7 +336,7 @@ void QnServerStorageManager::at_archiveRebuildReply( int status, const QnStorage
     ServerPoolInfo &poolInfo = serverInfo.storages[static_cast<int>(requestKey.pool)];
 
     Callback timerCallback;
-    if ((reply.state > Qn::RebuildState_None) || (status != 0))
+    if ((reply.state > Qn::RebuildState_None) || !success)
     {
         timerCallback =
             [this, requestKey]() { sendArchiveRebuildRequest(requestKey.server, requestKey.pool); };
@@ -316,7 +348,7 @@ void QnServerStorageManager::at_archiveRebuildReply( int status, const QnStorage
     }
     executeDelayedParented(timerCallback, updateRebuildStatusDelayMs, this);
 
-    if(status != 0)
+    if(!success)
         return;
 
     if (poolInfo.rebuildStatus != reply)
@@ -329,19 +361,22 @@ void QnServerStorageManager::at_archiveRebuildReply( int status, const QnStorage
         if (finished)
             emit serverRebuildArchiveFinished(requestKey.server, requestKey.pool);
     }
-
 }
 
-bool QnServerStorageManager::sendBackupRequest( const QnMediaServerResourcePtr &server, Qn::BackupAction action )
+bool QnServerStorageManager::sendBackupRequest(const QnMediaServerResourcePtr &server, Qn::BackupAction action )
 {
     if (!isServerValid(server))
         return false;
 
-    int handle = server->apiConnection()->backupControlActionAsync(
-        action,
-        this,
-        SLOT(at_backupStatusReply(int, const QnBackupStatusData &, int)));
-    if (handle <= 0)
+    auto connection = server->restConnection();
+
+    QnRequestParamList params;
+    params.insert("action", QnLexical::serialized(action));
+
+    auto handle = connection->postJsonResult("api/backupControl", params, {},
+        methodCallback(this, &QnServerStorageManager::at_backupStatusReply), thread());
+    
+    if (!handle)
         return false;
 
     if (action != Qn::BackupAction_ShowProgress)
@@ -351,7 +386,7 @@ bool QnServerStorageManager::sendBackupRequest( const QnMediaServerResourcePtr &
     return true;
 }
 
-void QnServerStorageManager::at_backupStatusReply( int status, const QnBackupStatusData &reply, int handle )
+void QnServerStorageManager::at_backupStatusReply(bool success, int handle, const QnBackupStatusData& reply)
 {
     /* Requests were invalidated. */
     if (!m_requests.contains(handle))
@@ -364,13 +399,13 @@ void QnServerStorageManager::at_backupStatusReply( int status, const QnBackupSta
         return;
 
     ServerInfo &serverInfo = m_serverInfo[requestKey.server];
-    if (reply.state == Qn::BackupState_InProgress || status != 0)
+    if (reply.state == Qn::BackupState_InProgress || !success)
     {
         const auto timerCallback = [this, requestKey]() { sendBackupRequest(requestKey.server); };
         executeDelayedParented(timerCallback, updateBackupStatusDelayMs, this);
     }
 
-    if(status != 0)
+    if (!success)
         return;
 
     if (serverInfo.backupStatus != reply)
@@ -385,26 +420,32 @@ void QnServerStorageManager::at_backupStatusReply( int status, const QnBackupSta
     }
 }
 
-bool QnServerStorageManager::sendStorageSpaceRequest(const QnMediaServerResourcePtr &server)
+int QnServerStorageManager::sendStorageSpaceRequest(const QnMediaServerResourcePtr &server)
 {
     if (!isServerValid(server))
-        return false;
+        return 0;
 
+    auto connection = server->restConnection();
+    
+    QnRequestParamList params;
     bool sendFastRequest = !m_serverInfo[server].fastInfoReady;
+    if (sendFastRequest)
+        params.insert("fast", QnLexical::serialized(true));
 
-    int handle = server->apiConnection()->getStorageSpaceAsync(
-        sendFastRequest,
-        this,
-        SLOT(at_storageSpaceReply(int, const QnStorageSpaceReply &, int)));
-    if (handle <= 0)
-        return false;
+    int handle = connection->postJsonResult("api/storageSpace", params, {},
+        methodCallback(this, &QnServerStorageManager::at_storageSpaceReply), thread());
+
+    if (!handle)
+        return 0;
 
     m_requests.insert(handle, RequestKey(server, QnServerStoragesPool::Main));
-    return true;
+    return 0;
 }
 
-void QnServerStorageManager::at_storageSpaceReply( int status, const QnStorageSpaceReply &reply, int handle )
+void QnServerStorageManager::at_storageSpaceReply(bool success, int handle, const QnStorageSpaceReply& reply)
 {
+    emit storageSpaceRecieved(success, handle, reply);
+
     for (const QnStorageSpaceData &spaceInfo: reply.storages)
     {
         QnClientStorageResourcePtr storage = resourcePool()->getResourceById<QnClientStorageResource>(spaceInfo.storageId);
@@ -420,7 +461,7 @@ void QnServerStorageManager::at_storageSpaceReply( int status, const QnStorageSp
 
     const auto requestKey = m_requests.take(handle);
 
-    if(status != 0)
+    if (!success)
         return;
 
     /* Server was removed from pool. */

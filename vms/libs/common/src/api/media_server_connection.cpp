@@ -54,11 +54,6 @@ namespace {
 
 // TODO: Introduce constants for API methods registered in media_server_process.cpp.
 QN_DEFINE_LEXICAL_ENUM(RequestObject,
-    (StorageStatusObject, "storageStatus")
-    (StorageSpaceObject, "storageSpace")
-    (checkCamerasObject, "checkDiscovery")
-    (RebuildArchiveObject, "rebuildArchive")
-    (BackupControlObject, "backupControl")
     (PingSystemObject, "pingSystem")
     (GetNonceObject, "getRemoteNonce")
     (RecordingStatsObject, "recStats")
@@ -97,21 +92,6 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse& response
     trace(m_serverId, handle, object(), lit("Received reply (%1ms)").arg(timer.elapsed()));
     switch (object())
     {
-        case StorageStatusObject:
-            processJsonReply<QnStorageStatusReply>(this, response, handle);
-            break;
-        case StorageSpaceObject:
-            processJsonReply<QnStorageSpaceReply>(this, response, handle);
-            break;
-        case checkCamerasObject:
-            processJsonReply<QnCameraListReply>(this, response, handle);
-            break;
-        case RebuildArchiveObject:
-            processJsonReply<QnStorageScanData>(this, response, handle);
-            break;
-        case BackupControlObject:
-            processJsonReply<QnBackupStatusData>(this, response, handle);
-            break;
         case PingSystemObject:
             processJsonReply<nx::vms::api::ModuleInformation>(this, response, handle);
             break;
@@ -244,21 +224,6 @@ void QnMediaServerConnection::trace(int handle, int obj, const QString& message 
     ::trace(m_serverId, handle, obj, message);
 }
 
-int QnMediaServerConnection::checkCameraList(
-    const QnNetworkResourceList& cameras, QObject* target, const char* slot)
-{
-    QnCameraListReply camList;
-    for (const QnResourcePtr& c: cameras)
-        camList.uniqueIdList << c->getUniqueId();
-
-    nx::network::http::HttpHeaders headers;
-    headers.emplace(nx::network::http::header::kContentType, "application/json");
-
-    return sendAsyncPostRequestLogged(checkCamerasObject,
-        std::move(headers), QnRequestParamList(), QJson::serialized(camList),
-        QN_STRINGIZE_TYPE(QnCameraListReply), target, slot);
-}
-
 int QnMediaServerConnection::testLdapSettingsAsync(
     const QnLdapSettings& settings, QObject* target, const char* slot)
 {
@@ -269,71 +234,3 @@ int QnMediaServerConnection::testLdapSettingsAsync(
         QnRequestParamList(), QJson::serialized(settings),
         QN_STRINGIZE_TYPE(QnLdapUsers), target, slot, timeout);
 }
-
-int QnMediaServerConnection::doRebuildArchiveAsync(
-    Qn::RebuildAction action, bool isMainPool, QObject* target, const char* slot)
-{
-    QnRequestParamList params;
-    params.insert("action", QnLexical::serialized(action));
-    params.insert("mainPool", isMainPool);
-    return sendAsyncPostRequestLogged(RebuildArchiveObject,
-        params, QN_STRINGIZE_TYPE(QnStorageScanData), target, slot);
-}
-
-int QnMediaServerConnection::backupControlActionAsync(
-    Qn::BackupAction action, QObject* target, const char* slot)
-{
-    QnRequestParamList params;
-    params.insert("action", QnLexical::serialized(action));
-    return sendAsyncPostRequestLogged(BackupControlObject,
-        params, QN_STRINGIZE_TYPE(QnBackupStatusData), target, slot);
-}
-
-int QnMediaServerConnection::getStorageSpaceAsync(
-    bool fastRequest, QObject* target, const char* slot)
-{
-    QnRequestParamList params;
-    if (fastRequest)
-        params.insert("fast", QnLexical::serialized(true));
-    return sendAsyncGetRequestLogged(StorageSpaceObject,
-        params, QN_STRINGIZE_TYPE(QnStorageSpaceReply), target, slot);
-}
-
-int QnMediaServerConnection::getStorageStatusAsync(
-    const QString& storageUrl, QObject* target, const char* slot)
-{
-    QnRequestParamList params;
-    params.insert("path", storageUrl);
-    return sendAsyncGetRequestLogged(StorageStatusObject,
-        params, QN_STRINGIZE_TYPE(QnStorageStatusReply), target, slot);
-}
-
-int QnMediaServerConnection::pingSystemAsync(
-    const nx::utils::Url& url, const QString& getKey, QObject* target, const char* slot)
-{
-    QnRequestParamList params;
-    params.insert("url", url.toString());
-    params.insert("getKey", getKey);
-
-    return sendAsyncGetRequestLogged(PingSystemObject,
-        params, QN_STRINGIZE_TYPE(nx::vms::api::ModuleInformation), target, slot);
-}
-
-int QnMediaServerConnection::getNonceAsync(const nx::utils::Url& url, QObject* target, const char* slot)
-{
-    QnRequestParamList params;
-    params.insert("url", url.toString());
-
-    return sendAsyncGetRequest(GetNonceObject,
-        params, QN_STRINGIZE_TYPE(QnGetNonceReply), target, slot);
-}
-
-int QnMediaServerConnection::getRecordingStatisticsAsync(
-    qint64 bitrateAnalyzePeriodMs, QObject* target, const char* slot)
-{
-    QnRequestParamList params;
-    params.insert("bitrateAnalyzePeriodMs", bitrateAnalyzePeriodMs);
-    return sendAsyncGetRequestLogged(RecordingStatsObject,
-        params, QN_STRINGIZE_TYPE(QnRecordingStatsReply), target, slot);
-}
-
