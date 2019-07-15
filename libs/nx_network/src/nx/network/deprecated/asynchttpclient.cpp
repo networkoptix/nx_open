@@ -568,7 +568,7 @@ AsyncHttpClient::Timeouts defaultDownloadTimeouts()
     return {
         AsyncHttpClient::Timeouts::kDefaultSendTimeout,
         AsyncHttpClient::Timeouts::kDefaultResponseReadTimeout,
-        AsyncHttpClient::Timeouts::kDefaultResponseReadTimeout
+        std::chrono::seconds(10),
     };
 }
 
