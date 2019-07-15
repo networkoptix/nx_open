@@ -70,7 +70,7 @@ buildDistribution()
         -D dmg_background="$BACKGROUND_PATH" \
         "$VOLUME_NAME" "$DISTRIBUTION_DMG"
     
-    if [[ $NOTARIZATION = true ]]
+    if [ $NOTARIZATION = true && $CODE_SIGNING = true ]
     then
         # Use environment variable NOTARIZATION_PASSWORD if specified.
         # If it is unset we use KEYCHAIN_NOTARIZATION_USER_PASSWORD from login keychain. 
