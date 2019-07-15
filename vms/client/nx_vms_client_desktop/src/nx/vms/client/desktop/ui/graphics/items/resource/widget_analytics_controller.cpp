@@ -278,7 +278,7 @@ void WidgetAnalyticsController::updateAreas(microseconds timestamp, int channel)
         return;
 
     if (d->logger)
-        d->logger->pushFrameInfo(std::make_unique<nx::analytics::FrameInfo>(timestamp));
+        d->logger->pushFrameInfo({timestamp});
 
     auto metadataList = d->metadataProvider->metadataRange(
         timestamp,

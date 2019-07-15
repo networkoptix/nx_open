@@ -503,20 +503,14 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
             NX_DEBUG(this, "Speed parameter was ignored for live mode");
     }
 
-    bool isLive = media->flags & QnAbstractMediaData::MediaFlags_LIVE;
-    bool isVideo = media->dataType == QnAbstractMediaData::VIDEO;
-    bool isAudio = media->dataType == QnAbstractMediaData::AUDIO;
+    const bool isLive = media->flags & QnAbstractMediaData::MediaFlags_LIVE;
+    const bool isVideo = media->dataType == QnAbstractMediaData::VIDEO;
+    const bool isAudio = media->dataType == QnAbstractMediaData::AUDIO;
+    const bool isSecondaryProvider = media->flags & QnAbstractMediaData::MediaFlags_LowQuality;
 
     if (isVideo || isAudio)
     {
-        bool isKeyFrame = media->flags & AV_PKT_FLAG_KEY;
-        bool isSecondaryProvider = media->flags & QnAbstractMediaData::MediaFlags_LowQuality;
-
-        if (isSecondaryProvider && m_secondaryLogger)
-            m_secondaryLogger->pushData(media);
-        else if (m_primaryLogger)
-            m_primaryLogger->pushData(media);
-
+        const bool isKeyFrame = media->flags & AV_PKT_FLAG_KEY;
         {
             QnMutexLocker lock( &m_qualityChangeMutex );
             if (isKeyFrame && isVideo && m_newLiveQuality != MEDIA_Quality_None)
@@ -535,6 +529,7 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
                 }
             }
         }
+
         if (isLive)
         {
             if (media->channelNumber >= 0 && media->channelNumber < CL_MAX_CHANNELS)
@@ -587,8 +582,9 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
         }
     }
 
-    const auto logger =
-        ini().analyzeSecondaryStream ? m_secondaryLogger.get() : m_primaryLogger.get();
+    const auto& logger = ini().analyzeSecondaryStream || isSecondaryProvider
+        ? m_secondaryLogger
+        : m_primaryLogger;
 
     if (logger)
         logger->pushData(media);

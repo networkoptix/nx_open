@@ -4,10 +4,9 @@
 
 #include <QtCore/QFile>
 
+#include <nx/analytics/frame_info.h>
 #include <nx/streaming/video_data_packet.h>
-#include <nx/utils/uuid.h>
-#include <utils/media/frame_info.h>
-#include <nx/analytics/i_frame_info.h>
+#include <nx/vms/api/types/motion_types.h>
 #include <analytics/common/object_detection_metadata.h>
 
 namespace nx::analytics {
@@ -26,24 +25,20 @@ public:
         const QString& additionalInfo = QString());
 
     void pushFrameInfo(
-        std::unique_ptr<IFrameInfo> frameInfo,
+        const FrameInfo& frameInfo,
         const QString& additionalFrameInfo = QString());
 
     void pushObjectMetadata(
-        nx::common::metadata::DetectionMetadataPacket metadataPacket,
+        const nx::common::metadata::DetectionMetadataPacket& metadataPacket,
         const QString& additionalObjectMetadataInfo = QString());
 
 private:
-    using PlaceholderMap = std::map</*PlaceholderName*/ QString, /*PlaceholderValue*/ QString>;
+    void log(QString logLine);
 
-    PlaceholderMap placeholderMap() const;
-    void doLogging(const QString& logPattern);
-    QString makeLogFileName(
-        const QString& analyticsLoggingPath,
-        const QString& logFilePrefix,
-        QnUuid deviceId,
-        QnUuid engineId,
-        nx::vms::api::StreamIndex streamIndex);
+    QString buildFrameLogString(const FrameInfo& frameInfo, const QString& additionalInfo);
+    QString buildObjectMetadataLogString(
+        const nx::common::metadata::DetectionMetadataPacket& metadataPacket,
+        const QString& additionalInfo);
 
 private:
     QFile m_outputFile;
@@ -51,15 +46,8 @@ private:
 
     bool m_isLoggingBestShot = false;
 
-    nx::common::metadata::DetectionMetadataPacket m_currentObjectMetadataPacket;
-    nx::common::metadata::DetectionMetadataPacket m_prevObjectMetadataPacket;
-
-    nx::common::metadata::DetectionMetadataPacket m_currentBestShotMetadataPacket;
-    QString m_additionalObjectMetadataInfo;
-
-    std::chrono::microseconds m_currentFrameTimestamp{0};
     std::chrono::microseconds m_prevFrameTimestamp{0};
-    QString m_additionalFrameInfo;
+    std::chrono::microseconds m_prevObjectMetadataPacketTimestamp{0};
 };
 
 } // namespace nx::analytics

@@ -277,8 +277,7 @@ void DeviceAnalyticsBinding::logIncomingFrame(nx::sdk::analytics::IDataPacket* f
     if (!nx::analytics::loggingIni().isLoggingEnabled())
         return;
 
-    auto frameInfo = std::make_unique<nx::analytics::FrameInfo>(frame->timestampUs());
-    m_incomingFrameLogger.pushFrameInfo(std::move(frameInfo));
+    m_incomingFrameLogger.pushFrameInfo({std::chrono::microseconds(frame->timestampUs())});
 }
 
 void DeviceAnalyticsBinding::setMetadataSink(QnAbstractDataReceptorPtr metadataSink)
