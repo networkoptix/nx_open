@@ -390,7 +390,7 @@ IMetadataPacket* DeviceAgent::cookSomeEvents()
     auto nextEventTypeIndex =
         [this]()
         {
-            return (m_eventContext.currentEventTypeIndex == kEventsToFire.size() - 1)
+            return (m_eventContext.currentEventTypeIndex == (int) kEventsToFire.size() - 1)
                 ? 0
                 : (m_eventContext.currentEventTypeIndex + 1);
         };
