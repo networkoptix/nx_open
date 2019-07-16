@@ -66,6 +66,7 @@ public:
 
     api::ConnectionSpeed getUplinkSpeed(const nx::utils::Url& url)
     {
+        QnMutexLocker lock(&m_mutex);
         return std::find_if(m_servers.begin(), m_servers.end(),
             [&url](const TestContext& testContext)
             {
@@ -157,28 +158,31 @@ private:
         if (!m_system)
             m_system = addRandomSystem();
 
-        m_servers.emplace_back(TestContext());
-        m_servers.back().mediaserver =
-            addRandomServer(
-                *m_system,
-                boost::none,
-                ServerTweak::defaultBehavior,
-                network::http::kUrlSchemeName);
+        {
+            QnMutexLocker lock(&m_mutex);
+            m_servers.emplace_back(TestContext());
+            m_servers.back().mediaserver =
+                addRandomServer(
+                    *m_system,
+                    boost::none,
+                    ServerTweak::defaultBehavior,
+                    network::http::kUrlSchemeName);
 
-        m_servers.back().uplinkSpeed.serverId =
-            nx::toStdString(m_servers.back().mediaserver->serverId());
-        m_servers.back().uplinkSpeed.systemId = nx::toStdString(m_system->id);
+            m_servers.back().uplinkSpeed.serverId =
+                nx::toStdString(m_servers.back().mediaserver->serverId());
+            m_servers.back().uplinkSpeed.systemId = nx::toStdString(m_system->id);
 
-        // Ensuring every bandwidth is unique.
-        int bandwidth = nx::utils::random::number(10, 10000);
-        while (keepAssigningBandwidth(bandwidth))
-            bandwidth = nx::utils::random::number(10, 10000);
+            // Ensuring every bandwidth is unique.
+            int bandwidth = nx::utils::random::number(10, 10000);
+            while (keepAssigningBandwidth(bandwidth))
+                bandwidth = nx::utils::random::number(10, 10000);
 
-        m_servers.back().uplinkSpeed.connectionSpeed.bandwidth = bandwidth;
-        m_servers.back().uplinkSpeed.connectionSpeed.pingTime =
-            std::chrono::microseconds(nx::utils::random::number(10, 10000));
+            m_servers.back().uplinkSpeed.connectionSpeed.bandwidth = bandwidth;
+            m_servers.back().uplinkSpeed.connectionSpeed.pingTime =
+                std::chrono::microseconds(nx::utils::random::number(10, 10000));
 
-        m_servers.back().speedTestUrl = lm("http://speedtest.%1.com").arg(m_servers.size() - 1);
+            m_servers.back().speedTestUrl = lm("http://speedtest.%1.com").arg(m_servers.size() - 1);
+        }
 
         ASSERT_EQ(api::ResultCode::ok, m_servers.back().mediaserver->listen().first);
 
@@ -205,6 +209,7 @@ private:
     UplinkSpeedTesterFactory::Function m_factoryFuncBak;
     std::optional<AbstractCloudDataProvider::System> m_system;
     int m_serverCount = 10;
+    QnMutex m_mutex;
     std::vector<TestContext> m_servers;
     std::atomic_int m_uplinkSpeedTestsDone = 0;
     nx::utils::SubscriptionId m_uplinkSpeedUpdatedId = nx::utils::kInvalidSubscriptionId;
