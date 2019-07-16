@@ -13,6 +13,8 @@ struct NX_NETWORK_API ConnectionSpeed
 	int bandwidth = 0;
 
     bool operator==(const ConnectionSpeed& other) const;
+
+    std::string toString() const;
 };
 
 #define ConnectionSpeed_Fields (pingTime)(bandwidth)
@@ -24,6 +26,8 @@ struct NX_NETWORK_API PeerConnectionSpeed
 	ConnectionSpeed connectionSpeed;
 
     bool operator==(const PeerConnectionSpeed& other) const;
+
+    std::string toString() const;
 };
 
 #define PeerConnectionSpeed_Fields (serverId)(systemId)(connectionSpeed)

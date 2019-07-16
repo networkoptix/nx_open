@@ -82,8 +82,7 @@ protected:
             subscribeToUplinkSpeedUpdated([this](api::PeerConnectionSpeed peerUplinkSpeed)
                 {
                     ++m_uplinkSpeedTestsDone;
-                    NX_DEBUG(this, "Received peerConnectionSpeed for server: %1",
-                        peerUplinkSpeed.serverId);
+                    NX_DEBUG(this, "Received peerUplinkSpeed: %1", peerUplinkSpeed);
                 });
 
         m_factoryFuncBak =
@@ -172,7 +171,7 @@ private:
 
         // Ensuring every bandwidth is unique.
         int bandwidth = nx::utils::random::number(10, 10000);
-        while(keepAssigningBandwidth(bandwidth))
+        while (keepAssigningBandwidth(bandwidth))
             bandwidth = nx::utils::random::number(10, 10000);
 
         m_servers.back().uplinkSpeed.connectionSpeed.bandwidth = bandwidth;
@@ -184,11 +183,11 @@ private:
         ASSERT_EQ(api::ResultCode::ok, m_servers.back().mediaserver->listen().first);
 
         m_servers.back().uplinkSpeedReporter = std::make_unique<UplinkSpeedReporter>(
-            &m_servers.back().mediaserver->mediatorConnector());
-        m_servers.back().uplinkSpeedReporter->mockupSpeedTestUrl(m_servers.back().speedTestUrl);
+            &m_servers.back().mediaserver->mediatorConnector(),
+            m_servers.back().speedTestUrl);
 
-        NX_DEBUG(this, "Added a new server: %1, server count: %2",
-            m_servers.back().mediaserver->fullName(), m_servers.size());
+        NX_DEBUG(this, "Added a new server, index: %1, uplinkSpeed: %3",
+            m_servers.size() - 1, m_servers.back().uplinkSpeed);
     }
 
     void updateBestConnection()
@@ -199,6 +198,7 @@ private:
                 return a.uplinkSpeed.connectionSpeed.bandwidth
                     < b.uplinkSpeed.connectionSpeed.bandwidth;
             });
+        NX_DEBUG(this, "Decided best uplink speed: %1", m_bestConnection->uplinkSpeed);
     }
 
 private:

@@ -243,7 +243,7 @@ boost::optional<ListeningPeerPool::ConstDataLocker>
         QnMutexLocker lock(&m_mutex);
 
         if (!m_bestUplinkSpeed)
-            m_bestUplinkSpeed = findLocalPeerWithBestUplinkSpeedUnsafe(systemId);
+            m_bestUplinkSpeed = findLocalPeerWithBestUplinkSpeedUnsafe(__func__, systemId);
 
         if (m_bestUplinkSpeed)
         {
@@ -348,7 +348,8 @@ void ListeningPeerPool::onListeningPeerConnectionClosed(
     if (!m_bestUplinkSpeed ||
         peerDataLowerCase.hostName() == toMediaServerData(*m_bestUplinkSpeed).hostName())
     {
-        m_bestUplinkSpeed = findLocalPeerWithBestUplinkSpeedUnsafe(peerDataLowerCase.systemId);
+        m_bestUplinkSpeed =
+            findLocalPeerWithBestUplinkSpeedUnsafe(__func__, peerDataLowerCase.systemId);
     }
 }
 
@@ -387,10 +388,15 @@ void ListeningPeerPool::onUplinkSpeedUpdated(nx::hpm::api::PeerConnectionSpeed p
         return;
 
     m_bestUplinkSpeed = peerUplinkSpeed;
+
+    NX_VERBOSE(this, "%1: updating best uplink speed: %2",
+        __func__, QJson::serialized(*m_bestUplinkSpeed));
 }
 
 std::optional<nx::hpm::api::PeerConnectionSpeed>
-    ListeningPeerPool::findLocalPeerWithBestUplinkSpeedUnsafe(const nx::String& systemId) const
+    ListeningPeerPool::findLocalPeerWithBestUplinkSpeedUnsafe(
+        const char* callingFunc,
+        const nx::String& systemId) const
 {
     using Status = std::pair<std::string, ListeningPeerStatus>;
 
@@ -419,10 +425,14 @@ std::optional<nx::hpm::api::PeerConnectionSpeed>
         // 0 bandwidth probably means that uplinkSpeed is default constructed and shouldn't be used
         if (peerIter != m_peers.end() && status.second.uplinkSpeed.bandwidth != 0)
         {
-            return nx::hpm::api::PeerConnectionSpeed{
+            nx::hpm::api::PeerConnectionSpeed uplinkSpeed{
                 status.second.serverId,
                 status.second.systemId,
                 status.second.uplinkSpeed};
+
+            NX_VERBOSE(this, "%1: found best uplink speed: %2", callingFunc, uplinkSpeed);
+
+            return uplinkSpeed;
         }
     }
 

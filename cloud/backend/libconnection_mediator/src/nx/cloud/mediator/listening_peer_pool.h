@@ -144,6 +144,7 @@ private:
     void onUplinkSpeedUpdated(nx::hpm::api::PeerConnectionSpeed peerUplinkSpeed);
 
     std::optional<nx::hpm::api::PeerConnectionSpeed> findLocalPeerWithBestUplinkSpeedUnsafe(
+        const char* callingFunc,
         const nx::String& peerId) const;
 };
 

@@ -7,8 +7,11 @@
 
 namespace nx::network::cloud::speed_test {
 
-UplinkSpeedReporter::UplinkSpeedReporter(hpm::api::MediatorConnector* mediatorConnector):
-    m_mediatorConnector(mediatorConnector)
+UplinkSpeedReporter::UplinkSpeedReporter(
+    hpm::api::MediatorConnector* mediatorConnector,
+    const std::optional<nx::utils::Url>& speedTestUrlMockup):
+    m_mediatorConnector(mediatorConnector),
+    m_speedTestUrlMockup(speedTestUrlMockup)
 {
     m_systemCredentialsSubscriptionId = m_mediatorConnector->subsribeToSystemCredentialsSet(
         std::bind(

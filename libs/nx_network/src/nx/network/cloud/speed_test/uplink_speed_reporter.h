@@ -24,7 +24,9 @@ class NX_NETWORK_API UplinkSpeedReporter: public aio::BasicPollable
 {
     using base_type = aio::BasicPollable;
 public:
-    UplinkSpeedReporter(hpm::api::MediatorConnector* mediatorConnector);
+    UplinkSpeedReporter(
+        hpm::api::MediatorConnector* mediatorConnector,
+        const std::optional<nx::utils::Url>& speedTestUrlMockup = std::nullopt);
     ~UplinkSpeedReporter();
 
     virtual void stopWhileInAioThread() override;
