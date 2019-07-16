@@ -4062,6 +4062,9 @@ void MediaServerProcess::connectSignals()
         &MediaServerProcess::at_storageManager_raidStorageFailure);
     m_raidEventLogReader->subscribe();
 
+    connect(
+        this, &MediaServerProcess::started,
+        [this]() { emit MediaServerProcess::startedWithSignalsProcessed(); });
 }
 
 void MediaServerProcess::setUpDataFromSettings()

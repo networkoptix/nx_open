@@ -121,6 +121,7 @@ public:
 
 signals:
     void started();
+    void startedWithSignalsProcessed();
 
 public slots:
     void stopAsync();
