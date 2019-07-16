@@ -43,6 +43,7 @@ private:
     std::string readableRef(const nx::sdk::IRefCountable* refCountable, int refCount) const;
 
 private:
+    std::mutex m_mutex;
     const std::string m_logPrefix;
     const bool m_useServerLog;
     const bool m_isVerbose;

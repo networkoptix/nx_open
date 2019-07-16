@@ -71,6 +71,8 @@ std::string RefCountableRegistry::readableRef(
 void RefCountableRegistry::notifyCreated(
     const IRefCountable* const refCountable, const int refCount)
 {
+    const auto lock = std::lock_guard(m_mutex);
+
     ASSERT(refCountable);
     VERBOSE("Created " + readableRef(refCountable, refCount));
 
@@ -86,6 +88,8 @@ void RefCountableRegistry::notifyCreated(
 void RefCountableRegistry::notifyDestroyed(
     const IRefCountable* const refCountable, const int refCount)
 {
+    const auto lock = std::lock_guard(m_mutex);
+
     ASSERT(refCountable);
     VERBOSE("Destroyed " + readableRef(refCountable, refCount));
 
@@ -109,6 +113,8 @@ void RefCountableRegistry::notifyDestroyed(
 
 RefCountableRegistry::~RefCountableRegistry()
 {
+    const auto lock = std::lock_guard(m_mutex);
+
     const int count = (int) m_refCountables.size();
     if (count == 0)
     {
