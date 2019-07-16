@@ -10,9 +10,9 @@
 
 namespace nx::utils { class QnCryptographicHash; }
 
-namespace nx::cloud::storage::client::aws_s3 {
+namespace nx::cloud::aws {
 
-class NX_CLOUD_STORAGE_CLIENT_API SignatureCalculator
+class NX_AWS_CLIENT_API SignatureCalculator
 {
 public:
     struct IntermediateValues
@@ -78,4 +78,4 @@ private:
         const std::string& service);
 };
 
-} // namespace nx::cloud::storage::client::aws_s3
+} // namespace nx::cloud::aws

@@ -5,7 +5,7 @@
 #include <string>
 #include <string_view>
 
-namespace nx::cloud::storage::client::aws_s3 {
+namespace nx::cloud::aws {
 
 enum class ResultCode
 {
@@ -58,4 +58,4 @@ private:
     std::optional<std::string> m_text;
 };
 
-} // namespace nx::cloud::storage::client::aws_s3
+} // namespace nx::cloud::aws

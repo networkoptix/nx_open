@@ -2,9 +2,9 @@
 
 #include <nx/network/http/http_types.h>
 
-#include <nx/cloud/storage/client/aws_s3/aws_signature_v4.h>
+#include <nx/cloud/aws/aws_signature_v4.h>
 
-namespace nx::cloud::storage::client::aws_s3::test {
+namespace nx::cloud::aws::test {
 
 class AwsSignatureV4:
     public ::testing::Test
@@ -174,4 +174,4 @@ TEST_F(AwsSignatureV4, PUT_request_authorization_header)
         header);
 }
 
-} // namespace nx::cloud::storage::client::aws_s3::test
+} // namespace nx::cloud::aws::test

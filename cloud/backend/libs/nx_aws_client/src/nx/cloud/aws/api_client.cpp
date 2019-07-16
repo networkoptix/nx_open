@@ -6,7 +6,7 @@
 
 #include "aws_signature_v4.h"
 
-namespace nx::cloud::storage::client::aws_s3 {
+namespace nx::cloud::aws {
 
 static constexpr char kAwsS3ServiceName[] = "s3";
 
@@ -169,4 +169,4 @@ ResultCode ApiClient::getResultCode(const nx::network::http::AsyncClient& httpCl
     return ResultCode::ok;
 }
 
-} // namespace nx::cloud::storage::client::aws_s3
+} // namespace nx::cloud::aws

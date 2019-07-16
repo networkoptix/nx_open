@@ -7,7 +7,7 @@
 #include <nx/utils/log/log_initializer.h>
 #include <nx/utils/std/filesystem.h>
 
-#include <nx/cloud/storage/client/aws_s3/api_client.h>
+#include <nx/cloud/aws/api_client.h>
 
 void printHelp(const char* name);
 int upload(const nx::utils::ArgumentParser& arguments);
@@ -105,10 +105,10 @@ struct CommonSettings
     }
 };
 
-std::unique_ptr<nx::cloud::storage::client::aws_s3::ApiClient>
+std::unique_ptr<nx::cloud::aws::ApiClient>
     prepareApiClient(const CommonSettings& settings)
 {
-    return std::make_unique<nx::cloud::storage::client::aws_s3::ApiClient>(
+    return std::make_unique<nx::cloud::aws::ApiClient>(
         "cmd_line_client",
         settings.region,
         nx::utils::Url(settings.url),
@@ -143,7 +143,7 @@ struct UploadSettings
 
 int upload(const nx::utils::ArgumentParser& arguments)
 {
-    using namespace nx::cloud::storage::client::aws_s3;
+    using namespace nx::cloud::aws;
 
     const auto [settings, result] = UploadSettings::read(arguments);
     if (!result)
@@ -213,7 +213,7 @@ int writeTo(const std::string& path, const nx::Buffer& data)
 
 int download(const nx::utils::ArgumentParser& arguments)
 {
-    using namespace nx::cloud::storage::client::aws_s3;
+    using namespace nx::cloud::aws;
 
     const auto [settings, result] = DownloadSettings::read(arguments);
     if (!result)

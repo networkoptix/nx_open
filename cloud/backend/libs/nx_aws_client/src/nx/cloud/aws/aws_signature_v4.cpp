@@ -6,7 +6,7 @@
 
 #include <nx/utils/cryptographic_hash.h>
 
-namespace nx::cloud::storage::client::aws_s3 {
+namespace nx::cloud::aws {
 
 static const nx::String kAwsAuthName = "AWS4-HMAC-SHA256";
 static const nx::String kAws4Request = "aws4_request";
@@ -244,4 +244,4 @@ bool SignatureCalculator::addScope(
     return true;
 }
 
-} // namespace nx::cloud::storage::client::aws_s3
+} // namespace nx::cloud::aws

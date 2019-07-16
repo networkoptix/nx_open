@@ -3,9 +3,9 @@
 #include <nx/network/http/buffer_source.h>
 #include <nx/network/url/url_builder.h>
 
-#include <nx/cloud/storage/client/aws_s3/aws_signature_v4.h>
+#include <nx/cloud/aws/aws_signature_v4.h>
 
-namespace nx::cloud::storage::client::aws_s3::test {
+namespace nx::cloud::aws::test {
 
 AwsS3Emulator::AwsS3Emulator()
 {
@@ -177,4 +177,4 @@ nx::network::http::server::AuthenticationResult
     return authenticationResult;
 }
 
-} // namespace nx::cloud::storage::client::aws_s3::test
+} // namespace nx::cloud::aws::test

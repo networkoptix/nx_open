@@ -7,7 +7,7 @@
 #include <nx/network/http/test_http_server.h>
 #include <nx/utils/thread/mutex.h>
 
-namespace nx::cloud::storage::client::aws_s3::test {
+namespace nx::cloud::aws::test {
 
 /**
  * Requires a request to be signed using AWS Signature V4
@@ -74,4 +74,4 @@ private:
         nx::network::http::RequestProcessedHandler completionHandler);
 };
 
-} // namespace nx::cloud::storage::client::aws_s3::test
+} // namespace nx::cloud::aws::test

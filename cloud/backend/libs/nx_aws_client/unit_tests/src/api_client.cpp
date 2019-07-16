@@ -3,11 +3,11 @@
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/thread/sync_queue.h>
 
-#include <nx/cloud/storage/client/aws_s3/api_client.h>
+#include <nx/cloud/aws/api_client.h>
 
 #include "aws_s3_emulator.h"
 
-namespace nx::cloud::storage::client::aws_s3::test {
+namespace nx::cloud::aws::test {
 
 class AwsS3Client:
     public ::testing::Test
@@ -27,7 +27,7 @@ protected:
 
         m_awsS3Emulator.saveOrReplaceFile(kExistingFilePath, kExistingFileBody);
 
-        m_client = std::make_unique<aws_s3::ApiClient>(
+        m_client = std::make_unique<aws::ApiClient>(
             "id",
             "us-east-1",
             nx::network::url::Builder()
@@ -89,9 +89,9 @@ private:
 
     AwsS3Emulator m_awsS3Emulator;
     nx::network::http::Credentials m_credentials;
-    std::unique_ptr<aws_s3::ApiClient> m_client;
-    nx::utils::SyncQueue<aws_s3::Result> m_uploadResults;
-    nx::utils::SyncQueue<std::tuple<aws_s3::Result, nx::Buffer>> m_downloadResults;
+    std::unique_ptr<aws::ApiClient> m_client;
+    nx::utils::SyncQueue<Result> m_uploadResults;
+    nx::utils::SyncQueue<std::tuple<Result, nx::Buffer>> m_downloadResults;
     File m_lastUploadedFilePath;
 };
 
@@ -109,4 +109,4 @@ TEST_F(AwsS3Client, downloads_file)
     thenDownloadIsDownloaded();
 }
 
-} // namespace nx::cloud::storage::client::aws_s3::test
+} // namespace nx::cloud::aws::test

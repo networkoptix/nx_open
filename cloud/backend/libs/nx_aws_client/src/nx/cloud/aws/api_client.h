@@ -13,9 +13,9 @@
 
 #include "api_types.h"
 
-namespace nx::cloud::storage::client::aws_s3 {
+namespace nx::cloud::aws {
 
-class NX_CLOUD_STORAGE_CLIENT_API ApiClient:
+class NX_AWS_CLIENT_API ApiClient:
     public nx::network::aio::BasicPollable
 {
     using base_type = nx::network::aio::BasicPollable;
@@ -75,4 +75,4 @@ private:
     ResultCode getResultCode(const nx::network::http::AsyncClient& httpClient) const;
 };
 
-} // namespace nx::cloud::storage::client::aws_s3
+} // namespace nx::cloud::aws
