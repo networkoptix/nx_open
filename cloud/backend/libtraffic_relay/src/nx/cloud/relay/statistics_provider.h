@@ -3,7 +3,7 @@
 #include <memory>
 
 #include <nx/fusion/model_functions_fwd.h>
-#include <nx/network/connection_server/server_statistics.h>
+#include <nx/network/http/server/http_statistics.h>
 #include <nx/utils/basic_factory.h>
 
 #include <nx/cloud/relaying/statistics.h>
@@ -20,7 +20,7 @@ namespace relay {
 struct Statistics
 {
     relaying::Statistics relaying;
-    nx::network::server::Statistics http;
+    nx::network::http::server::HttpStatistics http;
     controller::RelaySessionStatistics relaySessions;
 
     bool operator==(const Statistics& right) const;
@@ -48,7 +48,7 @@ class StatisticsProvider:
 public:
     StatisticsProvider(
         const relaying::AbstractListeningPeerPool& listeningPeerPool,
-        const nx::network::server::AbstractStatisticsProvider& httpServerStatisticsProvider,
+        const network::http::server::AbstractHttpStatisticsProvider& httpServerStatisticsProvider,
         const controller::AbstractTrafficRelay& trafficRelay);
     virtual ~StatisticsProvider() = default;
 
@@ -56,7 +56,7 @@ public:
 
 private:
     const relaying::AbstractListeningPeerPool& m_listeningPeerPool;
-    const nx::network::server::AbstractStatisticsProvider& m_httpServerStatisticsProvider;
+    const network::http::server::AbstractHttpStatisticsProvider& m_httpServerStatisticsProvider;
     const controller::AbstractTrafficRelay& m_trafficRelay;
 };
 
@@ -65,7 +65,7 @@ private:
 using StatisticsProviderFactoryFunc =
     std::unique_ptr<AbstractStatisticsProvider>(
         const relaying::AbstractListeningPeerPool&,
-        const nx::network::server::AbstractStatisticsProvider&,
+        const nx::network::http::server::AbstractHttpStatisticsProvider&,
         const controller::AbstractTrafficRelay&);
 
 class StatisticsProviderFactory:
@@ -81,7 +81,7 @@ public:
 private:
     std::unique_ptr<AbstractStatisticsProvider> defaultFactoryFunction(
         const relaying::AbstractListeningPeerPool& listeningPeerPool,
-        const nx::network::server::AbstractStatisticsProvider& httpServerStatisticsProvider,
+        const network::http::server::AbstractHttpStatisticsProvider& httpServerStatisticsProvider,
         const controller::AbstractTrafficRelay& trafficRelay);
 };
 
