@@ -166,7 +166,7 @@ distrib_copySystemLibs() # dest_dir libs_to_copy...
 #
 distrib_copyMediaserverPlugins() # plugins-folder-name target-dir plugin_lib_name...
 {
-    local -r PLUGINS_DIR_NAME="$1" && shift
+    local -r PLUGINS_DIR_NAME="$1" && shift #< e.g.: plugins, plugins_optional
     local -r TARGET_DIR="$1" && shift
 
     mkdir -p "$TARGET_DIR/$PLUGINS_DIR_NAME"
@@ -176,8 +176,18 @@ distrib_copyMediaserverPlugins() # plugins-folder-name target-dir plugin_lib_nam
     for PLUGIN in "$@"
     do
         PLUGIN_FILENAME="lib$PLUGIN.so"
-        echo "  Copying $PLUGIN_FILENAME to $PLUGINS_DIR_NAME"
-        cp "$BUILD_DIR/bin/$PLUGINS_DIR_NAME/$PLUGIN_FILENAME" "$TARGET_DIR/$PLUGINS_DIR_NAME/"
+
+        if [[ -f "$BUILD_DIR/bin/$PLUGINS_DIR_NAME/$PLUGIN_FILENAME" ]]
+        then
+            echo "  Copying $PLUGIN_FILENAME to $PLUGINS_DIR_NAME"
+            cp "$BUILD_DIR/bin/$PLUGINS_DIR_NAME/$PLUGIN_FILENAME" "$TARGET_DIR/$PLUGINS_DIR_NAME/"
+        elif [[ -d "$BUILD_DIR/bin/$PLUGINS_DIR_NAME/$PLUGIN" ]]
+        then
+            echo "  Copying $PLUGIN dedicated directory to $PLUGINS_DIR_NAME"
+            cp -r "$BUILD_DIR/bin/$PLUGINS_DIR_NAME/$PLUGIN" "$TARGET_DIR/$PLUGINS_DIR_NAME/"
+        else
+            echo "ERROR: Cannot find plugin $PLUGIN" >&2
+        fi
     done
 }
 

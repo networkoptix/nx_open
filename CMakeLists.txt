@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.12.0 FATAL_ERROR)
 
+include(cmake/utils.cmake)
 include(cmake/option.cmake)
 include(cmake/default_target.cmake)
 
@@ -97,7 +98,7 @@ include(ExternalProject)
 nx_option(codeSigning "Enable code signing" OFF)
 
 include(target_detection)
-include(utils)
+nx_init_known_files_list()
 include(find_sources)
 include(moc_utils)
 include(qrc_utils)
