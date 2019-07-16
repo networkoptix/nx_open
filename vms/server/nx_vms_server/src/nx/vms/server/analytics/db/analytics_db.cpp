@@ -93,14 +93,12 @@ void EventsStorage::save(common::metadata::ConstDetectionMetadataPacketPtr packe
 
     NX_VERBOSE(this, "Saving packet %1", *packet);
 
-    {
-        QnMutexLocker lock(&m_mutex);
-        m_maxRecordedTimestamp = std::max<milliseconds>(
-            m_maxRecordedTimestamp,
-            duration_cast<milliseconds>(microseconds(packet->timestampUsec)));
-    }
-
     QnMutexLocker lock(&m_mutex);
+
+    m_maxRecordedTimestamp = std::max<milliseconds>(
+        m_maxRecordedTimestamp,
+        duration_cast<milliseconds>(microseconds(packet->timestampUsec)));
+
     savePacketDataToCache(lock, packet);
     auto detectionDataSaver = takeDataToSave(lock, /*flush*/ false);
     lock.unlock();
