@@ -5,8 +5,8 @@
 ---------------------------------------------------------------------------------------------------
 ## Introduction
 
-This repository `nx_open` contains **Network Optix Meta Video Management Platform Open Source
-Components** - the source code and specifications which are part of Nx Meta Video Management
+This repository `nx_open` contains **Network Optix Meta Video Management Platform open source
+components** - the source code and specifications which are part of Nx Meta Video Management
 Platform (VMP) which in turn is used to build all Powered-by-Nx products, including Nx Witness
 Video Management System (VMS).
 
@@ -25,5 +25,5 @@ linked component sites for additional licensing, dependency, and use information
 source code.
 
 - Qt
-    - Homepage or download site: http://www.qt.io
-    - Licensing notices: http://doc.qt.io/qt-5/opensourcelicense.html
+    - Website: http://www.qt.io
+    - License: http://doc.qt.io/qt-5/opensourcelicense.html
