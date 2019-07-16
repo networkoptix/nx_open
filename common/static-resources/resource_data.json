@@ -1243,7 +1243,8 @@
                 "HIKVISION|iDS-2CD8426*",
                 "ONVIF|NC328-VBZ",
                 "Hikvision|DS-2DF8223*",
-                "hikvision|DS-2CD2155FWD-IS"
+                "hikvision|DS-2CD2155FWD-IS",
+                "HIKVISION|DS-2TD1217-6/V1"
             ],
             "parseOnvifNotificationsWithHttpReader": true
         },

@@ -3674,11 +3674,11 @@ void QnPlOnvifResource::pullMessages(quint64 timerID)
     request.Timeout = buf;
     request.MessageLimit = MAX_MESSAGES_TO_PULL;
 
-    if (m_onvifNotificationSubscriptionID.isEmpty())
+    if (!m_onvifNotificationSubscriptionID.isEmpty())
     {
         QByteArray onvifNotificationSubscriptionIDLatin1 = m_onvifNotificationSubscriptionID.toLatin1();
         strcpy(buf, onvifNotificationSubscriptionIDLatin1.data());
-        soapWrapper->getProxy()->soap->header->subscriptionID = buf;
+        header->subscriptionID = buf;
     }
 
     //TODO #ak move away check for "Samsung"
