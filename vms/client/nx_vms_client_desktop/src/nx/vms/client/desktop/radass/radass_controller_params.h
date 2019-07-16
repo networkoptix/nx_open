@@ -7,9 +7,9 @@
  * They are used in RadAss controller itself and its tests.
  */
 
-namespace {
+namespace nx::vms::client::desktop::radass {
 
-using namespace std::chrono;
+using namespace std::literals::chrono_literals;
 
 // Time to ignore recently added cameras.
 static constexpr auto kRecentlyAddedInterval = 1s;
@@ -30,7 +30,8 @@ static constexpr double kLqToHqSizeThreshold = 1.34;
 static constexpr auto kTimerInterval = 500ms;
 
 // Every 10 minutes try to raise quality. Value in counter ticks.
-static constexpr int kAdditionalHQRetryCounter = 10 * 60 * 1000 / static_cast<milliseconds>(kTimerInterval).count();
+static constexpr int kAdditionalHQRetryCounter = 10 * 60 * 1000
+    / static_cast<std::chrono::milliseconds>(kTimerInterval).count();
 
 // Ignore cameras which are on Fast Forward
 static constexpr double kSpeedValueEpsilon = 0.0001;
@@ -46,4 +47,4 @@ static constexpr auto kLowerSmallItemQualityInterval = 1s;
 
 static constexpr int kAutomaticSpeed = std::numeric_limits<int>::max();
 
-} // namespace
+} // namespace nx::vms::client::desktop::radass

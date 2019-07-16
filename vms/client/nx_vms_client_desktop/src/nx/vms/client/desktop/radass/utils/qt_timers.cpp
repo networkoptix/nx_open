@@ -75,6 +75,11 @@ public:
         return m_timer.hasExpired(value.count());
     }
 
+    virtual bool hasExpiredOrInvalid(milliseconds value) const override
+    {
+        return !isValid() || hasExpired(value);
+    }
+
     virtual milliseconds restart() override
     {
         return milliseconds(m_timer.restart());

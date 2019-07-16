@@ -120,6 +120,11 @@ public:
         return m_factory->currentTime() >= value + m_startMoment;
     }
 
+    virtual bool hasExpiredOrInvalid(milliseconds value) const override
+    {
+        return !isValid() || hasExpired(value);
+    }
+
     virtual milliseconds restart() override
     {
         NX_ASSERT(m_active, "Undefined timer behaviour.");

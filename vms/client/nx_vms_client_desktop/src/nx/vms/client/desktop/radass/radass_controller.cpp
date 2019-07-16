@@ -16,12 +16,12 @@
 #include "utils/qt_timers.h"
 
 using namespace std::chrono;
+using namespace nx::vms::client::desktop;
+using namespace radass;
 
-//#define TRACE_RADASS
+// #define TRACE_RADASS
 
 namespace {
-
-using namespace nx::vms::client::desktop;
 
 bool isForcedHqDisplay(AbstractVideoDisplay* display)
 {
@@ -128,6 +128,12 @@ namespace nx::vms::client::desktop {
 struct RadassController::Private
 {
     mutable QnMutex mutex;
+
+    // Time factory should be declared before ALL timers to prevent crash
+    // as it is needed in theirs destructors.
+    TimerFactoryPtr timerFactory;
+
+    TimerPtr mainTimer;
     ElapsedTimerPtr lastAutoSwitchTimer; //< Latest automatic HQ->LQ or LQ->HQ switch.
     int timerTicks = 0;    //< onTimer ticks count
     ElapsedTimerPtr lastSystemRtspDrop; //< Time since last RTSP drop in the system.
@@ -143,10 +149,9 @@ struct RadassController::Private
 
     QnCounterHash<AbstractVideoDisplay::CameraID> cameras;
 
-    TimerFactoryPtr timerFactory;
-
     Private(const TimerFactoryPtr& timerFactory):
         mutex(QnMutex::Recursive),
+        mainTimer(timerFactory->createTimer()),
         lastAutoSwitchTimer((NX_ASSERT(timerFactory), timerFactory->createElapsedTimer())),
         lastSystemRtspDrop(timerFactory->createElapsedTimer()),
         lastModeChangeTimer(timerFactory->createElapsedTimer())
@@ -367,7 +372,7 @@ struct RadassController::Private
         {
             // Run timer for the small items.
             if (!consumer->itemIsSmallInHq->isValid())
-                consumer->itemIsSmallInHq->restart();
+                consumer->itemIsSmallInHq->start();
 
             if (consumer->itemIsSmallInHq->hasExpired(kLowerSmallItemQualityInterval))
             {
@@ -393,7 +398,7 @@ struct RadassController::Private
             // Check if camera is not paused
             && !display->isMediaPaused()
             // No recently slow report by any camera.
-            && lastSystemRtspDrop->hasExpired(kQualitySwitchInterval)
+            && lastSystemRtspDrop->hasExpiredOrInvalid(kQualitySwitchInterval)
             // Is big enough item for HQ.
             && isBigItem(display))
         {
@@ -443,7 +448,7 @@ struct RadassController::Private
     void onSlowStream(Consumer consumer)
     {
         trace("Slow stream detected.", consumer);
-        lastSystemRtspDrop->restart();
+        lastSystemRtspDrop->start();
 
         // Skip unsupported cameras and cameras with manual stream control.
         if (consumer->mode != RadassMode::Auto)
@@ -556,7 +561,7 @@ struct RadassController::Private
         }
 
         // Recently slow report received (not all reports affect d->lastAutoSwitchTimer).
-        if (lastSystemRtspDrop->isValid() && !lastSystemRtspDrop->hasExpired(kQualitySwitchInterval))
+        if (!lastSystemRtspDrop->hasExpiredOrInvalid(kQualitySwitchInterval))
         {
             trace("RTSP drop was less than 5 seconds ago, leaving as is.", consumer);
             return;
@@ -656,9 +661,8 @@ RadassController::RadassController(TimerFactoryPtr timerFactory, QObject* parent
     base_type(parent),
     d(new Private(timerFactory))
 {
-    auto timer = timerFactory->createTimer(this);
-    connect(timer, &AbstractTimer::timeout, this, &RadassController::onTimer);
-    timer->start(kTimerInterval);
+    connect(d->mainTimer, &AbstractTimer::timeout, this, &RadassController::onTimer);
+    d->mainTimer->start(kTimerInterval);
 }
 
 
@@ -700,7 +704,7 @@ void RadassController::onTimer()
     {
         // Sometimes allow addition LQ->HQ switch.
         // Check if there were no slow stream reports lately.
-        if (d->lastSystemRtspDrop->hasExpired(kQualitySwitchInterval))
+        if (d->lastSystemRtspDrop->hasExpiredOrInvalid(kQualitySwitchInterval))
         {
             d->addHqTry();
             d->timerTicks = 0;
@@ -745,8 +749,7 @@ void RadassController::onTimer()
     {
         // Recently slow report received or there is a slow consumer.
         const auto performanceLoss =
-            (d->lastSystemRtspDrop->isValid()
-            && !d->lastSystemRtspDrop->hasExpired(kPerformanceLossCheckInterval))
+            (!d->lastSystemRtspDrop->hasExpiredOrInvalid(kPerformanceLossCheckInterval))
             || d->isValid(d->slowConsumer());
 
         const auto hasHq = std::any_of(d->consumers.cbegin(), d->consumers.cend(),

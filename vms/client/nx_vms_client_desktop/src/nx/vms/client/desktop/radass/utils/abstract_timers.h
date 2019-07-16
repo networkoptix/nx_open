@@ -49,6 +49,7 @@ public:
 
     virtual ~AbstractElapsedTimer() = default;
     virtual bool hasExpired(milliseconds value) const = 0;
+    virtual bool hasExpiredOrInvalid(milliseconds value) const = 0;
     virtual milliseconds restart() = 0;
     virtual void invalidate() = 0;
     virtual bool isValid() const = 0;
