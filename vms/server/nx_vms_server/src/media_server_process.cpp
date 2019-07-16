@@ -789,11 +789,12 @@ QnMediaServerResourcePtr MediaServerProcess::findServer(ec2::AbstractECConnectio
 
     while (servers.empty() && !needToStop())
     {
-        ec2::ErrorCode rez = ec2Connection->getMediaServerManager(Qn::kSystemAccess)->getServersSync(&servers);
-        if (rez == ec2::ErrorCode::ok)
+        const ec2::ErrorCode res =
+            ec2Connection->getMediaServerManager(Qn::kSystemAccess)->getServersSync(&servers);
+        if (res == ec2::ErrorCode::ok)
             break;
 
-        qDebug() << "findServer(): Call to getServers failed. Reason: " << ec2::toString(rez);
+        NX_DEBUG(this, "%1(): Call to getServers failed: %2", __func__, res);
         QnSleep::msleep(1000);
     }
 
@@ -1488,6 +1489,8 @@ void MediaServerProcess::registerRestHandlers(
     const auto kAdmin = GlobalPermission::admin;
     const auto kViewLogs = GlobalPermission::viewLogs;
 
+    const auto reg = [this](auto&&... args) { registerRestHandler(std::move(args)...); };
+
     /**%apidoc GET /api/synchronizedTime
      * This method is used for internal purpose to synchronize time between mediaservers and clients.
      * %return:object Information about server synchronized time.
@@ -1839,8 +1842,8 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/recStats", new QnRecordingStatsRestHandler(serverModule()));
 
     /**%apidoc GET /api/auditLog
+     * Return audit log information.
      * %permissions Owner.
-     * Return audit log information in the requested format.
      * %param:string from Start time of a time interval (as a string containing time in
      *     milliseconds since epoch, or a local time formatted like
      *     <code>"<i>YYYY</i>-<i>MM</i>-<i>DD</i>T<i>HH</i>:<i>mm</i>:<i>ss</i>.<i>zzz</i>"</code>
@@ -1849,7 +1852,7 @@ void MediaServerProcess::registerRestHandlers(
      *     milliseconds since epoch, or a local time formatted like
      *     <code>"<i>YYYY</i>-<i>MM</i>-<i>DD</i>T<i>HH</i>:<i>mm</i>:<i>ss</i>.<i>zzz</i>"</code>
      *     - the format is auto-detected).
-     * %return:text Tail of the server log file in text format
+     * %return:text Tail of the server log file in plain text format.
      */
     reg("api/auditLog", new QnAuditLogRestHandler(serverModule()), kAdmin);
 
@@ -2881,15 +2884,15 @@ void MediaServerProcess::registerRestHandlers(
         new OptionsRequestHandler());
 }
 
-void MediaServerProcess::reg(
+void MediaServerProcess::registerRestHandler(
     const QString& path,
     QnRestRequestHandler* handler,
     GlobalPermission permission)
 {
-    reg(QnRestProcessorPool::kAnyHttpMethod, path, handler, permission);
+    registerRestHandler(QnRestProcessorPool::kAnyHttpMethod, path, handler, permission);
 }
 
-void MediaServerProcess::reg(
+void MediaServerProcess::registerRestHandler(
     const nx::network::http::Method::ValueType& method,
     const QString& path,
     QnRestRequestHandler* handler,
@@ -2903,12 +2906,12 @@ void MediaServerProcess::reg(
         m_autoRequestForwarder->addCameraIdUrlParams(path, cameraIdUrlParams);
 }
 
-template<class TcpConnectionProcessor, typename... ExtraParam>
-void MediaServerProcess::regTcp(
-    const QByteArray& protocol, const QString& path, ExtraParam... extraParam)
+template<class TcpConnectionProcessor, typename... ExtraParams>
+void MediaServerProcess::regTcpHandler(
+    const QByteArray& protocol, const QString& path, ExtraParams... extraParams)
 {
     m_universalTcpListener->addHandler<TcpConnectionProcessor>(
-        protocol, path, extraParam...);
+        protocol, path, extraParams...);
 
     if (TcpConnectionProcessor::doesPathEndWithCameraId())
         m_autoRequestForwarder->addAllowedProtocolAndPathPart(protocol, path);
@@ -2919,7 +2922,7 @@ bool MediaServerProcess::initTcpListener(
     nx::vms::cloud_integration::CloudManagerGroup* const cloudManagerGroup,
     ec2::LocalConnectionFactory* ec2ConnectionFactory)
 {
-    auto messageBus = ec2ConnectionFactory->messageBus();
+    const auto messageBus = ec2ConnectionFactory->messageBus();
     m_universalTcpListener->setupAuthorizer(timeBasedNonceProvider, *cloudManagerGroup);
     m_universalTcpListener->setCloudConnectionManager(cloudManagerGroup->connectionManager);
 
@@ -2966,18 +2969,18 @@ bool MediaServerProcess::initTcpListener(
         nx::network::http::AuthMethod::temporaryUrlQueryKey);
     QnUniversalRequestProcessor::setUnauthorizedPageBody(
         QnFileConnectionProcessor::readStaticFile("static/login.html"), methods);
-    regTcp<QnRtspConnectionProcessor>("RTSP", "*", serverModule());
-    regTcp<QnRestConnectionProcessor>("HTTP", "api");
-    regTcp<QnRestConnectionProcessor>("HTTP", "ec2");
-    regTcp<QnRestConnectionProcessor>("HTTP", "favicon.ico");
-    regTcp<QnFileConnectionProcessor>("HTTP", "static");
-    regTcp<QnCrossdomainConnectionProcessor>("HTTP", "crossdomain.xml");
-    regTcp<QnProgressiveDownloadingConsumer>("HTTP", "media", serverModule());
-    regTcp<QnIOMonitorConnectionProcessor>("HTTP", "api/iomonitor");
+    regTcpHandler<QnRtspConnectionProcessor>("RTSP", "*", serverModule());
+    regTcpHandler<QnRestConnectionProcessor>("HTTP", "api");
+    regTcpHandler<QnRestConnectionProcessor>("HTTP", "ec2");
+    regTcpHandler<QnRestConnectionProcessor>("HTTP", "favicon.ico");
+    regTcpHandler<QnFileConnectionProcessor>("HTTP", "static");
+    regTcpHandler<QnCrossdomainConnectionProcessor>("HTTP", "crossdomain.xml");
+    regTcpHandler<QnProgressiveDownloadingConsumer>("HTTP", "media", serverModule());
+    regTcpHandler<QnIOMonitorConnectionProcessor>("HTTP", "api/iomonitor");
 
     nx::vms::server::hls::HttpLiveStreamingProcessor::setMinPlayListSizeToStartStreaming(
         serverModule()->settings().hlsPlaylistPreFillChunks());
-    regTcp<nx::vms::server::hls::HttpLiveStreamingProcessor>("HTTP", "hls", serverModule());
+    regTcpHandler<nx::vms::server::hls::HttpLiveStreamingProcessor>("HTTP", "hls", serverModule());
 
     // Our HLS uses implementation uses authKey (generated by target server) to skip authorization,
     // to keep this warning we should not ask for authorization along the way.
@@ -2985,14 +2988,15 @@ bool MediaServerProcess::initTcpListener(
 
     //regTcp<QnDefaultTcpConnectionProcessor>("HTTP", "*");
 
-    regTcp<nx::vms::network::ProxyConnectionProcessor>("*", "proxy", ec2ConnectionFactory->serverConnector());
-    regTcp<QnAudioProxyReceiver>("HTTP", "proxy-2wayaudio", serverModule());
+    regTcpHandler<nx::vms::network::ProxyConnectionProcessor>(
+        "*", "proxy", ec2ConnectionFactory->serverConnector());
+    regTcpHandler<QnAudioProxyReceiver>("HTTP", "proxy-2wayaudio", serverModule());
 
     if( !serverModule()->settings().authenticationEnabled())
         m_universalTcpListener->disableAuth();
 
     #if defined(ENABLE_DESKTOP_CAMERA)
-        regTcp<QnDesktopCameraRegistrator>("HTTP", "desktop_camera", serverModule());
+        regTcpHandler<QnDesktopCameraRegistrator>("HTTP", "desktop_camera", serverModule());
     #endif
 
     return true;
@@ -3285,7 +3289,7 @@ QString MediaServerProcess::hardwareIdAsGuid() const
 {
     auto hwId = LLUtil::getLatestHardwareId();
     auto hwIdString = QnUuid::fromHardwareId(hwId).toString();
-    std::cout << "Got hwID \"" << hwIdString.toStdString() << "\"" << std::endl;
+    qWarning() << "Got hwID" << hwIdString;
     return hwIdString;
 }
 
@@ -3467,8 +3471,9 @@ void MediaServerProcess::initializeHardwareId()
     const QnUuid guid(serverModule()->settings().serverGuid());
     if (guid.isNull())
     {
-        qDebug() << "Can't save guid. Run once as administrator.";
-        NX_ERROR(this, "Can't save guid. Run once as administrator.");
+        const char* const kMessage = "Can't save guid. Run once as administrator.";
+        std::cerr << kMessage;
+        NX_ERROR(this, kMessage);
         qApp->quit();
         return;
     }
