@@ -15,10 +15,15 @@ set_property(GLOBAL PROPERTY nx_server_plugins_optional_list)
 function(nx_add_server_plugin target)
     cmake_parse_arguments(PLUGIN "OPTIONAL;DEDICATED_DIR" "" "ADD_TO_DISTRIBUTION_IF" ${ARGN})
 
-    string(CONCAT outputDirectory
-        "bin/plugins$<$<BOOL:${PLUGIN_OPTIONAL}>:_optional>"
-        "$<$<BOOL:${PLUGIN_DEDICATED_DIR}>:/${target}>"
-    )
+    if(PLUGIN_OPTIONAL)
+        set(optionalPostfix "_optional")
+    endif()
+
+    if(PLUGIN_DEDICATED_DIR)
+        set(dedicatedDirPathSuffix "/${target}")
+    endif()
+
+    string(CONCAT outputDirectory "bin/plugins${optionalPostfix}${dedicatedDirPathSuffix}")
 
     set_output_directories(RUNTIME "${outputDirectory}" LIBRARY "${outputDirectory}")
 
