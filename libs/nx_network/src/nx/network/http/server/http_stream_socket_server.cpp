@@ -7,6 +7,7 @@ namespace http {
 HttpStreamSocketServer::~HttpStreamSocketServer()
 {
     pleaseStopSync();
+    closeAllConnections();
 }
 
 void HttpStreamSocketServer::setPersistentConnectionEnabled(bool value)
