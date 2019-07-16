@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.12.0 FATAL_ERROR)
 
+set(metaVersion R12)
+
 include(cmake/utils.cmake)
 include(cmake/option.cmake)
 include(cmake/default_target.cmake)
