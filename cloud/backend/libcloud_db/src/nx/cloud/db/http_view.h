@@ -38,8 +38,21 @@ namespace conf { class Settings; }
 class HttpView
 {
 public:
-    using HttpServer =
-        nx::network::server::MultiAddressServer<nx::network::http::HttpStreamSocketServer>;
+    class HttpServer:
+        public network::server::MultiAddressServer<nx::network::http::HttpStreamSocketServer>,
+        public network::http::server::AbstractHttpStatisticsProvider
+    {
+        using base_type =
+            network::server::MultiAddressServer<nx::network::http::HttpStreamSocketServer>;
+    public:
+        template<typename... Args>
+        HttpServer(Args... args):
+            base_type(std::forward<decltype(args)>(args)...)
+        {
+        }
+
+        virtual network::http::server::HttpStatistics httpStatistics() const override;
+    };
 
     HttpView(
         const conf::Settings& settings,

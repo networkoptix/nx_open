@@ -466,4 +466,36 @@ void HttpView::registerWriteOnlyRestHandler(
         method);
 }
 
+network::http::server::HttpStatistics HttpView::HttpServer::httpStatistics() const
+{
+    using namespace network::http;
+
+    int totalRequestAverages = 0;
+    std::chrono::milliseconds totalRequestAverageProcessingTime(0);
+    std::chrono::milliseconds maxRequestProcessingTime(0);
+    server::HttpStatistics accumulatedStats;
+
+    const_cast<HttpServer*>(this)->forEachListener(
+        [&totalRequestAverageProcessingTime, &maxRequestProcessingTime,
+        &totalRequestAverages, &accumulatedStats](
+            const HttpStreamSocketServer* listener)
+        {
+            ++totalRequestAverages;
+            server::HttpStatistics httpStats = listener->httpStatistics();
+            accumulatedStats.add(httpStats);
+            totalRequestAverageProcessingTime += httpStats.averageRequestProcessingTime;
+            maxRequestProcessingTime =
+                std::max(maxRequestProcessingTime, httpStats.maxRequestProcessingTime);
+        });
+
+    accumulatedStats.maxRequestProcessingTime = maxRequestProcessingTime;
+    if (totalRequestAverages > 0)
+    {
+        accumulatedStats.averageRequestProcessingTime =
+            totalRequestAverageProcessingTime / totalRequestAverages;
+    }
+
+    return accumulatedStats;
+}
+
 } // namespace nx::cloud::db
