@@ -7,6 +7,7 @@
 
 #include <nx/network/socket_global.h>
 #include <nx/utils/datetime.h>
+#include <nx/utils/time.h>
 
 #include "http_message_dispatcher.h"
 #include "http_stream_socket_server.h"
@@ -42,6 +43,12 @@ SocketAddress HttpServerConnection::clientEndpoint() const
 void HttpServerConnection::setPersistentConnectionEnabled(bool value)
 {
     m_persistentConnectionEnabled = value;
+}
+
+void HttpServerConnection::setOnResponseSent(
+    nx::utils::MoveOnlyFunc<void(std::chrono::milliseconds)> handler)
+{
+    m_responseSentHandler = std::move(handler);
 }
 
 void HttpServerConnection::processMessage(
@@ -128,7 +135,7 @@ void HttpServerConnection::authenticate(
         *this,
         request,
         [this, weakThis = std::move(weakThis), requestContext = std::move(requestContext)](
-            nx::network::http::server::AuthenticationResult authenticationResult) mutable
+                nx::network::http::server::AuthenticationResult authenticationResult) mutable
         {
             auto strongThis = weakThis.lock();
             if (!strongThis)
@@ -181,6 +188,7 @@ std::unique_ptr<HttpServerConnection::RequestContext>
         nx::network::http::Request request)
 {
     auto requestContext = std::make_unique<RequestContext>();
+    requestContext->requestReceivedTime = clock_type::now();
     requestContext->descriptor.sequence = ++m_lastRequestSequence;
     requestContext->descriptor.requestLine = request.requestLine;
     requestContext->descriptor.protocolToUpgradeTo =
@@ -214,7 +222,8 @@ void HttpServerConnection::sendUnauthorizedResponse(
         std::make_unique<ResponseMessageContext>(
             std::move(response),
             std::move(authenticationResult.msgBody),
-            ConnectionEvents()));
+            ConnectionEvents(),
+            requestContext->requestReceivedTime));
 }
 
 void HttpServerConnection::dispatchRequest(
@@ -225,7 +234,8 @@ void HttpServerConnection::dispatchRequest(
     std::weak_ptr<HttpServerConnection> weakThis = strongRef;
 
     auto sendResponseFunc =
-        [this, weakThis, requestDescriptor = requestContext->descriptor](
+        [this, weakThis, requestDescriptor = requestContext->descriptor,
+            requestReceivedTime = requestContext->requestReceivedTime](
             nx::network::http::Message response,
             std::unique_ptr<nx::network::http::AbstractMsgBodySource> responseMsgBody,
             ConnectionEvents connectionEvents) mutable
@@ -240,7 +250,8 @@ void HttpServerConnection::dispatchRequest(
                 std::make_unique<ResponseMessageContext>(
                     std::move(response),
                     std::move(responseMsgBody),
-                    std::move(connectionEvents)));
+                    std::move(connectionEvents),
+                    requestReceivedTime));
         };
 
     if (!m_httpMessageDispatcher ||
@@ -257,7 +268,8 @@ void HttpServerConnection::dispatchRequest(
             std::make_unique<ResponseMessageContext>(
                 std::move(response),
                 nullptr,
-                ConnectionEvents()));
+                ConnectionEvents(),
+                requestContext->requestReceivedTime));
     }
 }
 
@@ -429,11 +441,20 @@ void HttpServerConnection::sendNextResponse()
     m_currentMsgBody = std::move(m_responseQueue.front()->msgBody);
     sendMessage(
         std::move(m_responseQueue.front()->msg),
-        std::bind(&HttpServerConnection::responseSent, this));
+        std::bind(
+            &HttpServerConnection::responseSent, this,
+            m_responseQueue.front()->requestReceivedTime));
 }
 
-void HttpServerConnection::responseSent()
+void HttpServerConnection::responseSent(const time_point& requestReceivedTime)
 {
+    using namespace std::chrono;
+    if (m_responseSentHandler)
+    {
+        m_responseSentHandler(
+            duration_cast<milliseconds>(clock_type::now() - requestReceivedTime));
+    }
+
     // TODO: #ak check sendData error code.
     if (!m_currentMsgBody)
     {

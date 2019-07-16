@@ -16,6 +16,36 @@ network::server::Statistics MultiEndpointAcceptor::statistics() const
     return m_multiAddressHttpServer->statistics();
 }
 
+HttpStatistics MultiEndpointAcceptor::httpStatistics() const
+{
+    int totalRequestAverages = 0;
+    std::chrono::milliseconds totalRequestAverageProcessingTime(0);
+    std::chrono::milliseconds maxRequestProcessingTime(0);
+    HttpStatistics accumulatedStats;
+
+    m_multiAddressHttpServer->forEachListener(
+        [&totalRequestAverageProcessingTime, &maxRequestProcessingTime,
+            &totalRequestAverages, &accumulatedStats](
+                const HttpStreamSocketServer* listener)
+        {
+            ++totalRequestAverages;
+            HttpStatistics httpStats = listener->httpStatistics();
+            accumulatedStats.add(httpStats);
+            totalRequestAverageProcessingTime += httpStats.averageRequestProcessingTime;
+            maxRequestProcessingTime =
+                std::max(maxRequestProcessingTime, httpStats.maxRequestProcessingTime);
+        });
+
+    accumulatedStats.maxRequestProcessingTime = maxRequestProcessingTime;
+    if (totalRequestAverages > 0)
+    {
+        accumulatedStats.averageRequestProcessingTime =
+            totalRequestAverageProcessingTime / totalRequestAverages;
+    }
+
+    return accumulatedStats;
+}
+
 void MultiEndpointAcceptor::pleaseStopSync()
 {
     if (m_multiAddressHttpServer)

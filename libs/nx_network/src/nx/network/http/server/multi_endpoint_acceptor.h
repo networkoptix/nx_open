@@ -9,7 +9,8 @@
 namespace nx::network::http::server {
 
 class NX_NETWORK_API MultiEndpointAcceptor:
-    public network::server::AbstractStatisticsProvider
+    public network::server::AbstractStatisticsProvider,
+    public network::http::server::AbstractHttpStatisticsProvider
 {
 public:
     MultiEndpointAcceptor(
@@ -17,6 +18,7 @@ public:
         AbstractMessageDispatcher* httpMessageDispatcher);
 
     virtual network::server::Statistics statistics() const override;
+    virtual HttpStatistics httpStatistics() const override;
 
     void pleaseStopSync();
 
