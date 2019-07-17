@@ -55,11 +55,11 @@ protected:
 
     void whenForceFetchingObjectToInsert()
     {
-        auto object = m_objectTrackCache.getTrackToInsertForced(
+        auto track = m_objectTrackCache.getTrackToInsertForced(
             m_analyticsDataPackets.front()->objectMetadataList.front().trackId);
 
-        if (object)
-            m_objectsToInsert.push_back(std::move(*object));
+        if (track)
+            m_objectsToInsert.push_back(std::move(*track));
     }
 
     void whenRemovingExpiredDataFromCache()

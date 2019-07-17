@@ -47,7 +47,7 @@ int64_t ObjectTrackGroupDao::saveToDb(
 {
     auto query = queryContext->connection()->createQuery();
     query->prepare(R"sql(
-        INSERT INTO object_group (group_id, object_id) VALUES (?, ?)
+        INSERT INTO track_group (group_id, track_id) VALUES (?, ?)
     )sql");
 
     query->bindValue(0, -1);
@@ -58,7 +58,7 @@ int64_t ObjectTrackGroupDao::saveToDb(
 
     // Replacing -1 with the correct value.
     queryContext->connection()->executeQuery(
-        "UPDATE object_group SET group_id = ? WHERE rowid = ?",
+        "UPDATE track_group SET group_id = ? WHERE rowid = ?",
         groupId, groupId);
 
     for (auto it = std::next(trackIds.begin()); it != trackIds.end(); ++it)

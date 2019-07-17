@@ -41,10 +41,10 @@ std::vector<ObjectTrack> ObjectTrackSearcher::lookup(nx::sql::QueryContext* quer
     {
         if (!m_filter.objectTrackId.isNull())
         {
-            auto object = fetchTrackById(queryContext, m_filter.objectTrackId);
-            if (!object || !satisfiesFilter(m_filter, *object))
+            auto track = fetchTrackById(queryContext, m_filter.objectTrackId);
+            if (!track || !satisfiesFilter(m_filter, *track))
                 return {};
-            return {std::move(*object)};
+            return {std::move(*track)};
         }
         else
         {
@@ -281,8 +281,8 @@ std::optional<ObjectTrack> ObjectTrackSearcher::fetchTrackById(
     query->prepare(R"sql(
         SELECT device_id, object_type_id, guid, track_start_ms, track_end_ms, track_detail,
             ua.content AS content, best_shot_timestamp_ms, best_shot_rect
-        FROM object o, unique_attributes ua
-        WHERE o.attributes_id=ua.id AND guid=?
+        FROM track t, unique_attributes ua
+        WHERE t.attributes_id=ua.id AND guid=?
     )sql");
     query->addBindValue(QnSql::serialized_field(trackGuid));
 
@@ -361,7 +361,7 @@ void ObjectTrackSearcher::fetchTracksFromDb(
     std::vector<ObjectTrack>* result)
 {
     nx::sql::SqlFilterFieldAnyOf objectGroupFilter(
-        "og.group_id",
+        "tg.group_id",
         ":groupId",
         std::vector<long long>(objectTrackGroups.begin(), objectTrackGroups.end()));
 
@@ -377,8 +377,8 @@ void ObjectTrackSearcher::fetchTracksFromDb(
         FROM
             (SELECT device_id, object_type_id, guid, track_start_ms, track_end_ms, track_detail,
                 ua.content AS content, best_shot_timestamp_ms, best_shot_rect
-            FROM object o, unique_attributes ua, object_group og
-            WHERE o.attributes_id=ua.id AND o.id=og.object_id AND %1
+            FROM track t, unique_attributes ua, track_group tg
+            WHERE t.attributes_id=ua.id AND t.id=tg.track_id AND %1
             ORDER BY track_start_ms DESC
             %2)
         ORDER BY track_start_ms %3
@@ -419,8 +419,8 @@ void ObjectTrackSearcher::prepareCursorQueryImpl(nx::sql::AbstractSqlQuery* quer
     query->prepare(lm(R"sql(
         SELECT device_id, object_type_id, guid, track_start_ms, track_end_ms, track_detail,
             ua.content AS content, best_shot_timestamp_ms, best_shot_rect
-        FROM object o, unique_attributes ua
-        WHERE o.attributes_id=ua.id %1
+        FROM track t, unique_attributes ua
+        WHERE t.attributes_id=ua.id %1
         ORDER BY track_start_ms %2
         %3
     )sql").args(
@@ -437,7 +437,7 @@ void ObjectTrackSearcher::prepareLookupQuery(nx::sql::AbstractSqlQuery* query)
         WITH
           %boxFilteredTable%
           filtered_object AS
-            (SELECT o.*
+            (SELECT t.*
             FROM
                %fromBoxFilteredTable%
                %objectFilteredByText%
@@ -447,10 +447,10 @@ void ObjectTrackSearcher::prepareLookupQuery(nx::sql::AbstractSqlQuery* query)
               1 = 1
             ORDER BY track_start_ms DESC
             %limitObjectCount%)
-        SELECT o.id, device_id, object_type_id, guid, track_start_ms, track_end_ms,
+        SELECT t.id, device_id, object_type_id, guid, track_start_ms, track_end_ms,
             track_detail, attrs.content AS content, best_shot_timestamp_ms, best_shot_rect
-        FROM filtered_object o, unique_attributes attrs
-        WHERE o.attributes_id = attrs.id
+        FROM filtered_object t, unique_attributes attrs
+        WHERE t.attributes_id = attrs.id
         ORDER BY track_start_ms %objectOrderByTrackStart%
     )sql";
 
@@ -458,7 +458,7 @@ void ObjectTrackSearcher::prepareLookupQuery(nx::sql::AbstractSqlQuery* query)
         {kBoxFilteredTable, ""},
         {kFromBoxFilteredTable, ""},
         {kJoinBoxFilteredTable, ""},
-        {kObjectFilteredByTextExpr, "object o"},
+        {kObjectFilteredByTextExpr, "track t"},
         {kObjectExpr, ""},
         {kLimitObjectCount, ""},
         {kObjectOrderByTrackStart, "DESC"}});
@@ -470,7 +470,7 @@ void ObjectTrackSearcher::prepareLookupQuery(nx::sql::AbstractSqlQuery* query)
         std::tie(queryText, boxSubqueryFilter) = prepareBoxFilterSubQuery();
         queryTextParams[kBoxFilteredTable] = "box_filtered_ids AS (" + queryText + "),";
         queryTextParams[kFromBoxFilteredTable] = "box_filtered_ids,";
-        queryTextParams[kJoinBoxFilteredTable] = "o.id = box_filtered_ids.object_id AND ";
+        queryTextParams[kJoinBoxFilteredTable] = "t.id = box_filtered_ids.object_id AND ";
     }
 
     const auto sqlQueryFilter = prepareTrackFilterSqlExpression();
@@ -487,7 +487,7 @@ void ObjectTrackSearcher::prepareLookupQuery(nx::sql::AbstractSqlQuery* query)
     if (!m_filter.freeText.isEmpty())
     {
         queryTextParams[kObjectFilteredByTextExpr] =
-            "(SELECT * FROM object WHERE attributes_id IN "
+            "(SELECT * FROM track WHERE attributes_id IN "
                 "(SELECT docid FROM attributes_text_index WHERE content MATCH :textQuery)) o";
     }
 
@@ -564,10 +564,10 @@ std::vector<ObjectTrack> ObjectTrackSearcher::loadTracks(nx::sql::AbstractSqlQue
 
     while (query->next())
     {
-        auto object = loadTrack(query);
+        auto track = loadTrack(query);
 
-        if (satisfiesFilter(m_filter, object))
-            tracks.push_back(std::move(object));
+        if (satisfiesFilter(m_filter, track))
+            tracks.push_back(std::move(track));
     }
 
     return tracks;

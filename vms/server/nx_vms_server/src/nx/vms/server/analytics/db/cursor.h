@@ -36,7 +36,7 @@ private:
     nx::utils::MoveOnlyFunc<void(Cursor*)> m_onBeforeCursorDestroyedHandler;
 
     void loadObjectsIfNecessary();
-    void loadNextObject();
+    void loadNextTrack();
 
     qint64 nextTrackPositionTimestamp();
     Tracks::iterator findTrackPosition();

@@ -332,7 +332,7 @@ bool EventsStorage::readMaximumEventTimestamp()
             [](nx::sql::QueryContext* queryContext)
             {
                 auto query = queryContext->connection()->createQuery();
-                query->prepare("SELECT max(track_end_ms) FROM object");
+                query->prepare("SELECT max(track_end_ms) FROM track");
                 query->exec();
                 if (query->next())
                     return std::chrono::milliseconds(query->value(0).toLongLong());
@@ -356,7 +356,7 @@ bool EventsStorage::readMinimumEventTimestamp(std::chrono::milliseconds* outResu
             [](nx::sql::QueryContext* queryContext)
         {
             auto query = queryContext->connection()->createQuery();
-            query->prepare("SELECT min(track_start_ms) FROM object");
+            query->prepare("SELECT min(track_start_ms) FROM track");
             query->exec();
             if (query->next())
                 return std::chrono::milliseconds(query->value(0).toLongLong());

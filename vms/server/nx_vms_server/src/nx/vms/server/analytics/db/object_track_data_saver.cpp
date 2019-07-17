@@ -104,7 +104,7 @@ void ObjectTrackDataSaver::insertObjects(nx::sql::QueryContext* queryContext)
 {
     auto query = queryContext->connection()->createQuery();
     query->prepare(R"sql(
-        INSERT INTO object (device_id, object_type_id, guid,
+        INSERT INTO track (device_id, object_type_id, guid,
             track_start_ms, track_end_ms, track_detail, attributes_id,
             best_shot_timestamp_ms, best_shot_rect)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -166,7 +166,7 @@ void ObjectTrackDataSaver::updateObjects(nx::sql::QueryContext* queryContext)
 {
     auto updateObjectQuery = queryContext->connection()->createQuery();
     updateObjectQuery->prepare(R"sql(
-        UPDATE object
+        UPDATE track
         SET track_detail = CAST(track_detail || CAST(? AS BLOB) AS BLOB),
             attributes_id = ?,
             track_start_ms = min(track_start_ms, ?),

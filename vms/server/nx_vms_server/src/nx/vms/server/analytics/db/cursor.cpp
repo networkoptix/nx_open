@@ -72,32 +72,32 @@ std::tuple<const ObjectTrack*, std::size_t /*track position*/> Cursor::readNextT
 
 void Cursor::loadObjectsIfNecessary()
 {
-    // Always storing the next detected object in advance.
+    // Always storing the next track in advance.
     // I.e., the one that has track_start_time larger than the current track position.
 
     while (!m_eof &&
         (m_currentTracks.empty() ||
             nextTrackPositionTimestamp() >= maxObjectTrackStartTimestamp()))
     {
-        loadNextObject();
+        loadNextTrack();
     }
 }
 
-void Cursor::loadNextObject()
+void Cursor::loadNextTrack()
 {
     QnMutexLocker lock(&m_mutex);
 
     if (m_eof)
         return;
 
-    auto object = m_sqlCursor->next();
-    if (!object)
+    auto track = m_sqlCursor->next();
+    if (!track)
     {
         m_eof = true;
         return;
     }
 
-    m_currentTracks.emplace_back(std::move(*object), 0);
+    m_currentTracks.emplace_back(std::move(*track), 0);
 }
 
 qint64 Cursor::nextTrackPositionTimestamp()
