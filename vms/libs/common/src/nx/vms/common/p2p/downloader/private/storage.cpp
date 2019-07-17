@@ -468,6 +468,28 @@ ResultCode Storage::deleteFileInternal(const QString& fileName, bool deleteData)
     return ResultCode::ok;
 }
 
+ResultCode Storage::clearFile(const QString& fileName, bool force)
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+
+    const auto it = m_fileInformationByName.find(fileName);
+    if (it == m_fileInformationByName.end())
+        return ResultCode::fileDoesNotExist;
+
+    if (!force && it->status == FileInformation::Status::downloaded)
+        return ResultCode::fileAlreadyDownloaded;
+
+    if (it->status != FileInformation::Status::uploading)
+        it->status = FileInformation::Status::downloading;
+    it->downloadedChunks.fill(false);
+
+    lock.unlock();
+    emit fileInformationChanged(*it);
+    emit fileStatusChanged(*it);
+
+    return ResultCode::ok;
+}
+
 QVector<QByteArray> Storage::getChunkChecksums(const QString& fileName)
 {
     QnMutexLocker lock(&m_mutex);
