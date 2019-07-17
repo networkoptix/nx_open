@@ -7,7 +7,6 @@
 
 #include <nx/network/socket_global.h>
 #include <nx/utils/datetime.h>
-#include <nx/utils/time.h>
 
 #include "http_message_dispatcher.h"
 #include "http_stream_socket_server.h"
@@ -135,7 +134,7 @@ void HttpServerConnection::authenticate(
         *this,
         request,
         [this, weakThis = std::move(weakThis), requestContext = std::move(requestContext)](
-                nx::network::http::server::AuthenticationResult authenticationResult) mutable
+            nx::network::http::server::AuthenticationResult authenticationResult) mutable
         {
             auto strongThis = weakThis.lock();
             if (!strongThis)
@@ -236,9 +235,9 @@ void HttpServerConnection::dispatchRequest(
     auto sendResponseFunc =
         [this, weakThis, requestDescriptor = requestContext->descriptor,
             requestReceivedTime = requestContext->requestReceivedTime](
-            nx::network::http::Message response,
-            std::unique_ptr<nx::network::http::AbstractMsgBodySource> responseMsgBody,
-            ConnectionEvents connectionEvents) mutable
+                nx::network::http::Message response,
+                std::unique_ptr<nx::network::http::AbstractMsgBodySource> responseMsgBody,
+                ConnectionEvents connectionEvents) mutable
         {
             auto strongThis = weakThis.lock();
             if (!strongThis)
