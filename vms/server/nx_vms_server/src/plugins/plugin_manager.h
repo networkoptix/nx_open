@@ -141,7 +141,6 @@ private:
         PluginInfoPtr pluginInfo);
 
     std::unique_ptr<QLibrary> loadPluginLibrary(
-        const QString& pluginHomeDir,
         const QString& libFilename,
         PluginInfoPtr pluginInfo);
 
