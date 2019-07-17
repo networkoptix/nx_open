@@ -7,10 +7,10 @@
 
 namespace nx::vms::client::desktop {
 
-ProgressListModel::ProgressListModel(QObject* parent):
+ProgressListModel::ProgressListModel(QnWorkbenchContext* context, QObject* parent):
     base_type(parent),
-    QnWorkbenchContextAware(parent),
-    m_activities(context()->instance<WorkbenchProgressManager>()->activities())
+    QnWorkbenchContextAware(context),
+    m_activities(this->context()->instance<WorkbenchProgressManager>()->activities())
 {
     const auto added =
         [this](const QnUuid& activityId)
@@ -54,7 +54,7 @@ ProgressListModel::ProgressListModel(QObject* parent):
                 };
         };
 
-    auto manager = context()->instance<WorkbenchProgressManager>();
+    auto manager = this->context()->instance<WorkbenchProgressManager>();
     connect(manager, &WorkbenchProgressManager::added, this, added);
     connect(manager, &WorkbenchProgressManager::removed, this, removed);
     connect(manager, &WorkbenchProgressManager::progressChanged,

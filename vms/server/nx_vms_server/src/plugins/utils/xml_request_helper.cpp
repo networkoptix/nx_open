@@ -43,7 +43,7 @@ XmlRequestHelper::XmlRequestHelper(
     const QAuthenticator& authenticator,
     nx::network::http::AuthType authType)
 :
-    XmlRequestHelper(nx::utils::Url(url), authenticator, authType)
+    XmlRequestHelper(nx::utils::Url::fromUserInput(url), authenticator, authType)
 {
     NX_ASSERT(m_url.isValid() && !m_url.host().isEmpty(), url);
 }

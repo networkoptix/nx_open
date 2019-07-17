@@ -6,6 +6,9 @@
 
 namespace nx::vms::server::metrics {
 
+/**
+ * Provides network interfaces from current PC.
+ */
 class NetworkProvider:
     public utils::metrics::ResourceProvider<std::shared_ptr<nx::network::QnInterfaceAndAddr>>
 {

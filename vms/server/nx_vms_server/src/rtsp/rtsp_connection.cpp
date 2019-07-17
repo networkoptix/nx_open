@@ -1586,6 +1586,7 @@ void QnRtspConnectionProcessor::run()
     auto guard = nx::utils::makeScopeGuard(
         [d]()
         {
+            d->socket->shutdown();
             d->deleteDP();
             d->socket->close();
             d->trackInfo.clear();

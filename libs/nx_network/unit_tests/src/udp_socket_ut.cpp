@@ -158,7 +158,8 @@ private:
             RetryPolicy::kInfiniteRetries,
             std::chrono::milliseconds(100),
             1,
-            RetryPolicy::kNoMaxDelay));
+            RetryPolicy::kNoMaxDelay,
+            RetryPolicy::kDefaultRandomRatio));
         m_sendRetryTimer->bindToAioThread(m_sender->getAioThread());
 
         issueSendTo(targetEndpoint);

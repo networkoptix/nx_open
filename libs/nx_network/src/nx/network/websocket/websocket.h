@@ -18,9 +18,7 @@ namespace nx {
 namespace network {
 namespace websocket {
 
-class NX_NETWORK_API WebSocket :
-    public aio::AbstractAsyncChannel,
-    private websocket::ParserHandler
+class NX_NETWORK_API WebSocket : public aio::AbstractAsyncChannel
 {
 public:
     /**
@@ -117,8 +115,7 @@ private:
     virtual void stopWhileInAioThread() override;
 
     /** Parser handler implementation */
-    virtual void gotFrame(FrameType type, const nx::Buffer& data, bool fin) override;
-    virtual void handleError(Error err) override;
+    void gotFrame(FrameType type, const nx::Buffer& data, bool fin);
 
     /** Own helper functions*/
     void sendMessage(const nx::Buffer& message, int writeSize, IoCompletionHandler handler);

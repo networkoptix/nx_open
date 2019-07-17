@@ -6,15 +6,14 @@ namespace {
 class TestResource
 {
 public:
-    TestResource(int id):
-        m_id(id)
+    TestResource(int id, bool isLocal):
+        m_id(id),
+        m_isLocal(isLocal)
     {
     }
 
-    int id() const
-    {
-        return m_id;
-    }
+    int id() const { return m_id; }
+    bool isLocal() const { return m_isLocal; }
 
     void update(const QString& name, Value value)
     {
@@ -44,6 +43,7 @@ private:
 
 private:
     const int m_id = 0;
+    const bool m_isLocal = false;
     std::map<QString, Param> m_params;
 };
 
@@ -52,9 +52,9 @@ class TestResourceProvider: public ResourceProvider<std::shared_ptr<TestResource
 public:
     TestResourceProvider(): ResourceProvider<std::shared_ptr<TestResource>>(makeProviders()) {}
 
-    std::shared_ptr<TestResource> makeResource(int id)
+    std::shared_ptr<TestResource> makeResource(int id, bool isLocal)
     {
-        auto resource = std::make_shared<TestResource>(id);
+        auto resource = std::make_shared<TestResource>(id, isLocal);
 
         resource->update("i", id);
         resource->update("t", "text_a" + QString::number(id));
@@ -76,7 +76,7 @@ private:
         const std::shared_ptr<TestResource>& resource) const override
     {
         const auto id = QString::number(resource->id());
-        return ResourceDescription{"test_" + id, "system_x", "Test " + id};
+        return ResourceDescription("test_" + id, "system_x", "Test " + id, resource->isLocal());
     }
 
     static ResourceParameterProviders<std::shared_ptr<TestResource>> makeProviders()

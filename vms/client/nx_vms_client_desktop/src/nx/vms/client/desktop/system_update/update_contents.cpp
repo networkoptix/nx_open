@@ -346,14 +346,14 @@ bool verifyUpdateContents(
             && !clientData.installedVersions.count(targetVersion))
         {
             NX_WARNING(typeid(UpdateContents)) << "verifyUpdateManifest("
-                << contents.info.version << ") - we should install client package, but there are no such.";
+                << contents.info.version << ") - we should install client package, but there is no such.";
             contents.error = nx::update::InformationError::missingPackageError;
             contents.missingUpdate.insert(clientData.clientId);
         }
         else
         {
             NX_WARNING(typeid(UpdateContents)) << "verifyUpdateManifest("
-                << contents.info.version << ") - there are no client package, but applauncher has it. That's ok.";
+                << contents.info.version << ") - there is no client package, but applauncher has it. That's ok.";
         }
     }
 

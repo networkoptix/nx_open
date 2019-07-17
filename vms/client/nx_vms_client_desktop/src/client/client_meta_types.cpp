@@ -45,14 +45,14 @@
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/ui/common/cursor_override.h>
-#include <nx/vms/client/desktop/ui/common/recording_status_helper.h>
+#include <nx/vms/client/desktop/ui/common/drag_and_drop.h>
 #include <nx/vms/client/desktop/ui/common/focus_frame_item.h>
 #include <nx/vms/client/desktop/ui/common/global_tool_tip.h>
+#include <nx/vms/client/desktop/ui/common/item_grabber.h>
+#include <nx/vms/client/desktop/ui/common/recording_status_helper.h>
 #include <nx/vms/client/desktop/ui/scene/models/layout_model.h>
 #include <nx/vms/client/desktop/ui/scene/models/resource_tree_model_adapter.h>
-#include <nx/vms/client/desktop/ui/scene/drag_and_drop.h>
 #include <nx/vms/client/desktop/ui/scene/instruments/instrument.h>
-#include <nx/vms/client/desktop/ui/scene/item_grabber.h>
 #include <nx/vms/client/desktop/ui/scene/item_model_utils.h>
 #include <nx/vms/client/desktop/utils/cursor_manager.h>
 

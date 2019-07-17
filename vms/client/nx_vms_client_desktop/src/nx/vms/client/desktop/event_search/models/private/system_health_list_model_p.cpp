@@ -82,7 +82,10 @@ SystemHealthListModel::Private::Private(SystemHealthListModel* q) :
     connect(systemHealthState, &SystemHealthState::dataChanged, this, &Private::updateItem);
 
     for (const auto index: QnSystemHealth::allVisibleMessageTypes())
-        toggleItem(index, systemHealthState->state(index));
+    {
+        if (systemHealthState->state(index))
+            doAddItem(index, {}, true /*initial*/);
+    }
 
     auto userChangesListener = new QnResourceChangesListener(this);
     userChangesListener->connectToResources<QnUserResource>(&QnUserResource::nameChanged,
@@ -314,8 +317,13 @@ action::Parameters SystemHealthListModel::Private::parameters(int index) const
 }
 
 void SystemHealthListModel::Private::addItem(
-    QnSystemHealth::MessageType message,
-    const QVariant& params)
+    QnSystemHealth::MessageType message, const QVariant& params)
+{
+    doAddItem(message, params, false /*initial*/);
+}
+
+void SystemHealthListModel::Private::doAddItem(
+    QnSystemHealth::MessageType message, const QVariant& params, bool initial)
 {
     if (!QnSystemHealth::isMessageVisible(message))
         return;
@@ -356,7 +364,7 @@ void SystemHealthListModel::Private::addItem(
     updateCachedData(message);
 
     // New item.
-    ScopedInsertRows insertRows(q, index, index);
+    ScopedInsertRows insertRows(q, index, index, !initial);
     m_items.insert(position, item);
 }
 

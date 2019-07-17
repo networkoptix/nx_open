@@ -62,7 +62,10 @@ bool QnFile::open(const QIODevice::OpenMode& openMode, unsigned int systemDepend
     if (systemDependentFlags == 0)
         systemDependentFlags = FILE_ATTRIBUTE_NORMAL;
 
+    // Using prefix \\?\ here to support long paths handling.
+    // https://docs.microsoft.com/en-us/windows/win32/fileio/naming-a-file
     QString fileName = QString("\\\\?\\") + QDir::toNativeSeparators(m_fileName);
+
     // Create the file handle.
     m_impl = CreateFileW(
         (const wchar_t*)fileName.constData(), accessRights, shareMode, &securityAtts, creationDisp,
