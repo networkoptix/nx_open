@@ -163,7 +163,14 @@ std::future<nx::update::UpdateContents> ClientUpdateTool::requestRemoteUpdateInf
                 }
 
                 if (tool)
-                    tool->atRemoteUpdateInformation(error, response.data);
+                {
+                    UpdateContents contents;
+                    contents.sourceType = nx::update::UpdateSourceType::mediaservers;
+                    contents.source = "mediaserver";
+                    contents.info = response.data;
+                    contents.error = error;
+                    tool->m_remoteUpdateInfoRequest.set_value(contents);
+                }
             }, thread());
     }
     else
@@ -181,44 +188,6 @@ void ClientUpdateTool::setServerUrl(const nx::utils::Url& serverUrl, const QnUui
     m_serverConnection.reset(new rest::ServerConnection(commonModule(), serverId, serverUrl));
     m_peerManager->setServerDirectConnection(serverId, m_serverConnection);
     m_proxyPeerManager->setServerDirectConnection(serverId, m_serverConnection);
-}
-
-void ClientUpdateTool::atRemoteUpdateInformation(
-    nx::update::InformationError error,
-    const nx::update::Information& updateInformation)
-{
-    auto systemInfo = QnAppInfo::currentSystemInformation();
-    QString errorMessage;
-    // Update is allowed if either target version has the same cloud host or
-    // there are no servers linked to the cloud in the system.
-    QString cloudUrl = nx::network::SocketGlobals::cloud().cloudHost();
-
-    nx::update::Package clientPackage;
-    nx::update::findPackage(*commonModule(), updateInformation, &clientPackage, &errorMessage);
-
-    UpdateContents contents;
-    contents.sourceType = nx::update::UpdateSourceType::mediaservers;
-    contents.source = "mediaserver";
-    contents.info = updateInformation;
-    contents.clientPackage = clientPackage;
-    contents.error = error;
-    m_remoteUpdateContents = contents;
-
-    if (clientPackage.isValid())
-    {
-        setState(State::readyDownload);
-    }
-    else if (updateInformation.isValid())
-    {
-        NX_WARNING(this) << "atRemoteUpdateInformation have valid update info but no client package";
-        setError("Missing client package inside UpdateInfo");
-    }
-    m_remoteUpdateInfoRequest.set_value(contents);
-}
-
-nx::update::UpdateContents ClientUpdateTool::getRemoteUpdateInfo() const
-{
-    return m_remoteUpdateContents;
 }
 
 std::set<nx::utils::SoftwareVersion> ClientUpdateTool::getInstalledVersions(
@@ -656,7 +625,6 @@ void ClientUpdateTool::resetState()
     m_updateFile = "";
     m_updateVersion = nx::utils::SoftwareVersion();
     m_clientPackage = nx::update::Package();
-    m_remoteUpdateContents = UpdateContents();
 }
 
 void ClientUpdateTool::clearDownloadFolder()

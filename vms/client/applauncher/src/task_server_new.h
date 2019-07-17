@@ -7,8 +7,6 @@
 
 namespace nx::vms::applauncher {
 
-class AbstractRequestProcessor;
-
 /**
  * Accepts tasks from application instances and stores them in a task queue.
  *
@@ -18,7 +16,7 @@ class AbstractRequestProcessor;
 class TaskServerNew: public QnLongRunnable
 {
 public:
-    TaskServerNew(AbstractRequestProcessor* const requestProcessor);
+    TaskServerNew();
     virtual ~TaskServerNew() override;
 
     virtual void pleaseStop() override;
@@ -29,17 +27,63 @@ public:
      */
     bool listen(const QString& pipeName);
 
+    enum class ResponseError
+    {
+        noError,
+        noChannel,
+        failedToDeserialize,
+    };
+
+    /** Channel for a single comamnd type. Incoming packets are dispatched to this channels. */
+    struct Channel
+    {
+        QByteArray name;
+        using Callback = std::function<ResponseError (Channel&, const QByteArray&, QByteArray&)>;
+        Callback requestParser;
+    };
+
+    /**
+     * Add a subscriber to a specified channel.
+     * Will return false if specified channel is already occupied
+     * or empty name or callback is provided.
+     */
+    template<class RequestType, class ResponseType>
+    bool subscribe(
+        const QByteArray& name,
+        std::function<void (const RequestType&, ResponseType&)>&& callback)
+    {
+        return subscribe(name,
+            [callback](
+                Channel& /*channel*/,
+                const QByteArray& requestRawData,
+                QByteArray& responseRawData)
+            {
+                RequestType request;
+                ResponseType response;
+                if (!request.deserialize(requestRawData))
+                    return ResponseError::failedToDeserialize;
+                callback(request, response);
+                responseRawData = response.serialize();
+                return ResponseError::noError;
+            });
+    }
+
+    /** Adds a simple 'responseless' subscriber. */
+    bool subscribe(const QByteArray& name, std::function<bool (const QByteArray& name)> callback);
+
 protected:
     virtual void run() override;
 
 private:
     void processNewConnection(NamedPipeSocket* clientConnection);
+    bool subscribe(const QByteArray& name, Channel::Callback&& callback);
 
 private:
-    AbstractRequestProcessor* const m_requestProcessor;
     NamedPipeServer m_server;
     QString m_pipeName;
     bool m_terminated = false;
+    QHash<QByteArray, Channel> m_channels;
+
 };
 
 } // namespace nx::vms::applauncher
