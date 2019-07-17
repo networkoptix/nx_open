@@ -142,8 +142,8 @@ private:
     nx::network::http::server::rest::MessageDispatcher m_httpMessageDispatcher;
     nx::network::http::server::PlainTextCredentialsProvider m_credentialsProvider;
     server::BaseAuthenticationManager m_authenticationManager;
-    std::unique_ptr<nx::network::http::HttpStreamSocketServer> m_httpServer;
     server::AuthenticationDispatcher m_authDispatcher;
+    std::unique_ptr<nx::network::http::HttpStreamSocketServer> m_httpServer;
 };
 
 //-------------------------------------------------------------------------------------------------
