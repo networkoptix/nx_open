@@ -693,6 +693,7 @@ using CameraBackupQualities = nx::vms::api::CameraBackupQualities;
         ForbiddenConnectionResult,                  /*< Connection is not allowed yet. Try again later*/
         DisabledUserConnectionResult,               /*< Disabled user*/
         UserTemporaryLockedOut,                     /*< User is prohibited from logging in for several minutes. Try again later*/
+        FactoryServerConnectionResult,              /*< Server is factory default one */
     };
 
     enum MediaStreamEvent

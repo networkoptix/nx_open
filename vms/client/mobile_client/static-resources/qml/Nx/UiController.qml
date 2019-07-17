@@ -30,7 +30,7 @@ Object
         }
 
         onConnectToServerScreenRequested:
-            Workflow.openConnectToServerScreen(host, user, password)
+            Workflow.openConnectToServerScreen(host, user, password, operationId)
         onResourcesScreenRequested:
             Workflow.openResourcesScreen(connectionManager.systemName, filterIds)
         onVideoScreenRequested:

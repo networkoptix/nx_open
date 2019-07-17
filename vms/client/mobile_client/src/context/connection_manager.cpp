@@ -382,7 +382,11 @@ bool QnConnectionManagerPrivate::doConnect(bool restoringConnection)
             const auto errorCode = ec2::ErrorCode(result->status());
             const auto connectionInfo = result->reply<QnConnectionInfo>();
 
-            auto status = QnConnectionValidator::validateConnection(connectionInfo, errorCode);
+            // We treat factory server connection as error only in mobile client
+            auto status = connectionInfo.newSystem
+                ? Qn::FactoryServerConnectionResult
+                : QnConnectionValidator::validateConnection(connectionInfo, errorCode);
+
             QVariant infoParameter;
 
             if (status == Qn::IncompatibleVersionConnectionResult)
