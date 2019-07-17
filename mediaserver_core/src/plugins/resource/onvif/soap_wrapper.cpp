@@ -288,8 +288,11 @@ void DeviceSoapWrapper::calcTimeDrift()
         onvifXsd__Date* date = response.SystemDateAndTime->UTCDateTime->Date;
         onvifXsd__Time* time = response.SystemDateAndTime->UTCDateTime->Time;
 
-        QDateTime datetime(QDate(date->Year, date->Month, date->Day), QTime(time->Hour, time->Minute, time->Second), Qt::UTC);
-        m_timeDrift = datetime.toMSecsSinceEpoch()/1000 - QDateTime::currentMSecsSinceEpoch()/1000;
+        if (date && time)
+        {
+            QDateTime datetime(QDate(date->Year, date->Month, date->Day), QTime(time->Hour, time->Minute, time->Second), Qt::UTC);
+            m_timeDrift = datetime.toMSecsSinceEpoch() / 1000 - QDateTime::currentMSecsSinceEpoch() / 1000;
+        }
     }
 }
 
