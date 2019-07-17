@@ -311,14 +311,14 @@ nx::vms::api::EventLevel fromPluginDiagnosticEventLevel(IPluginDiagnosticEvent::
 }
 
 nx::sdk::Ptr<ITimestampedObjectMetadata> createTimestampedObjectMetadata(
-    const nx::analytics::db::DetectedObject& detectedObject,
+    const nx::analytics::db::ObjectTrack& track,
     const nx::analytics::db::ObjectPosition& objectPosition)
 {
     auto objectMetadata = nx::sdk::makePtr<TimestampedObjectMetadata>();
     objectMetadata->setTrackId(
-        nx::vms_server_plugins::utils::fromQnUuidToSdkUuid(detectedObject.objectAppearanceId));
-    objectMetadata->setTypeId(detectedObject.objectTypeId.toStdString());
-    objectMetadata->setTimestampUs(objectPosition.timestampUsec);
+        nx::vms_server_plugins::utils::fromQnUuidToSdkUuid(track.id));
+    objectMetadata->setTypeId(track.objectTypeId.toStdString());
+    objectMetadata->setTimestampUs(objectPosition.timestampUs);
     const auto& boundingBox = objectPosition.boundingBox;
     objectMetadata->setBoundingBox(Rect(
         boundingBox.x(),
@@ -326,7 +326,7 @@ nx::sdk::Ptr<ITimestampedObjectMetadata> createTimestampedObjectMetadata(
         boundingBox.width(),
         boundingBox.height()));
 
-    for (const auto& attribute: detectedObject.attributes)
+    for (const auto& attribute: track.attributes)
     {
         auto sdkAttribute = nx::sdk::makePtr<Attribute>(
             // Information about attribute types isn't stored in the database.
@@ -341,19 +341,16 @@ nx::sdk::Ptr<ITimestampedObjectMetadata> createTimestampedObjectMetadata(
 }
 
 nx::sdk::Ptr<nx::sdk::IList<ITimestampedObjectMetadata>> createObjectTrack(
-    const nx::analytics::db::DetectedObject& detectedObject)
+    const nx::analytics::db::ObjectTrack& track)
 {
-    auto track = nx::sdk::makePtr<nx::sdk::List<ITimestampedObjectMetadata>>();
-    for (const auto& objectPosition : detectedObject.track)
+    auto timestampedTrack = nx::sdk::makePtr<nx::sdk::List<ITimestampedObjectMetadata>>();
+    for (const auto& objectPosition: track.objectPositionSequence)
     {
-        if (auto objectMetadataPtr =
-            createTimestampedObjectMetadata(detectedObject, objectPosition))
-        {
-            track->addItem(objectMetadataPtr.get());
-        }
+        if (auto objectMetadataPtr = createTimestampedObjectMetadata(track, objectPosition))
+            timestampedTrack->addItem(objectMetadataPtr.get());
     }
 
-    return track;
+    return timestampedTrack;
 }
 
 nx::sdk::Ptr<IUncompressedVideoFrame> createUncompressedVideoFrame(

@@ -24,7 +24,7 @@ public:
     virtual Rect boundingBox() const override;
 
 private:
-    Uuid m_trackId;
+    Uuid m_objectTrackId;
     int64_t m_timestampUs = -1;
     Rect m_boundingBox;
 };

@@ -48,7 +48,7 @@ struct Ini: nx::kit::IniConfig
         "from the nearest past. The metadata with timestamps that are older than the\n"
         "(currentTime - analyticsVideoBufferLengthMs) is ignored (not shown in the Client).");
     NX_INI_FLAG(0, hideEnhancedVideo, "Hides enhanced video from the scene.");
-    NX_INI_FLAG(1, enableDetectedObjectsInterpolation,
+    NX_INI_FLAG(1, enableObjectMetadataInterpolation,
         "Allows the interpolation of the trajectories of the Analytics Objects between frames.\n"
         "\n"
         "If enabled, bounding boxes around the Analytics Objects are moving more smoothly.");
@@ -58,10 +58,10 @@ struct Ini: nx::kit::IniConfig
         "Allows to see the Analytics Objects details in the Desktop Client. Use \"all\" to\n"
         "display all available metadata. More precise filtering is available by combining the\n"
         "following options:\n"
-        " * \"id\" - Object id,\n"
+        " * \"id\" - Track id,\n"
         " * \"delay\" - Delay between actual timestamp and object timestamp in milliseconds,\n"
         " * \"actual_ts\" - Current timestamp,\n"
-        " * \"actual_rect\" - Interpolated rect if \"enableDetectedObjectsInterpolation\" is on,\n"
+        " * \"actual_rect\" - Interpolated rect if \"enableObjectMetadataInterpolation\" is on,\n"
         " * \"object_ts\" - Original object timestamp,\n"
         " * \"object_rect\" - Original object rect,\n"
         " * \"future_ts\" - Future object timestamp,\n"

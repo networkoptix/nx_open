@@ -15,7 +15,7 @@ public:
 
     virtual void push(const QnConstCompressedVideoDataPtr& video) = 0;
     virtual void push(
-        const nx::common::metadata::DetectionMetadataPacketPtr& detectionMetadata) = 0;
+        const nx::common::metadata::ObjectMetadataPacketPtr& metadataPacket) = 0;
     virtual void push(const CLConstVideoDecoderOutputPtr& frame) = 0;
     virtual void push(const QnConstCompressedMetadataPtr& metadata) = 0;
 };

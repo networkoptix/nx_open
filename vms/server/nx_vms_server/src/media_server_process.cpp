@@ -2648,11 +2648,11 @@ void MediaServerProcess::registerRestHandlers(
 
     reg("ec2/statistics", new QnMultiserverStatisticsRestHandler("ec2/statistics"));
 
-    /**%apidoc GET /ec2/analyticsLookupDetectedObjects
+    /**%apidoc GET /ec2/analyticsLookupObjectTracks
      * Search analytics DB for objects that match filter specified.
      * %param[opt] deviceId Id of camera.
      * %param[opt] objectTypeId Analytics object type id.
-     * %param[opt] objectId Analytics object id.
+     * %param[opt] objectTrackId Analytics object track id.
      * %param[opt] startTime Milliseconds since epoch (1970-01-01 00:00, UTC).
      * %param[opt] endTime Milliseconds since epoch (1970-01-01 00:00, UTC).
      * %param[opt] x1 Top left "x" coordinate of picture bounding box to search within. In range
@@ -2663,17 +2663,17 @@ void MediaServerProcess::registerRestHandlers(
      *     range [0.0; 1.0].
      * %param[opt] y2 Bottom right "y" coordinate of picture bounding box to search within. In
      *     range [0.0; 1.0].
-     * %param[opt] freeText Text to match within object's properties.
-     * %param[opt] limit Maximum number of objects to return.
-     * %param[opt] maxTrackSize Maximum length of elements of object's track.
-     * %param[opt] sortOrder Sort order of objects by track start timestamp.
+     * %param[opt] freeText Text to match within track properties.
+     * %param[opt] limit Maximum number of object tracks to return.
+     * %param[opt] maxObjectTrackSize Maximum number of elements of an object track.
+     * %param[opt] sortOrder Sort order of object tracks by a track start timestamp.
      *     %value asc Ascending order.
      *     %value desc Descending order.
      * %param[opt] isLocal If "false" then request is forwarded to every other online server and
      *     results are merged. Otherwise, request is processed on receiving server only.
      * %return JSON data.
      */
-    reg("ec2/analyticsLookupDetectedObjects", new QnMultiserverAnalyticsLookupDetectedObjects(
+    reg("ec2/analyticsLookupObjectTracks", new QnMultiserverAnalyticsLookupObjectTracks(
         commonModule(), serverModule()->analyticsEventsStorage()));
 
     /**%apidoc GET /api/getAnalyticsActions
@@ -2694,10 +2694,10 @@ void MediaServerProcess::registerRestHandlers(
 
     /**%apidoc POST /api/executeAnalyticsAction
      * Execute analytics action from the particular analytics plugin on this server. The action is
-     * applied to the specified metadata object.
+     * applied to the specified track.
      * %param engineId Id of an Analytics Engine which offers the Action.
      * %param actionId Id of an Action to execute.
-     * %param objectId Id of an Analytics Object to which the Action is applied.
+     * %param trackId Id of a track to which the Action is applied.
      * %param deviceId Id of a Device from which the Action was triggered.
      * %param timestampUs Timestamp (microseconds) of the video frame from which the action was
      *     triggered.

@@ -29,61 +29,55 @@ bool operator==(const Attribute& left, const Attribute& right);
 QString toString(const Attribute&);
 
 //-------------------------------------------------------------------------------------------------
-
-// TODO: Rename all classes without words "Detection" and "Detected".
-
 static constexpr int kCoordinateDecimalDigits = 4;
 
-struct DetectedObject
+struct ObjectMetadata
 {
     QString objectTypeId;
-    QnUuid objectId;
+    QnUuid trackId;
     /**
      * Coordinates are in range [0;1].
      */
     QRectF boundingBox;
-    std::vector<Attribute> labels;
+    std::vector<Attribute> attributes;
     bool bestShot = false;
 };
-#define DetectedObject_Fields (objectTypeId)(objectId)(boundingBox)(labels)(bestShot)
-QN_FUSION_DECLARE_FUNCTIONS(DetectedObject, (json)(ubjson));
+#define ObjectMetadata_Fields (objectTypeId)(trackId)(boundingBox)(attributes)(bestShot)
+QN_FUSION_DECLARE_FUNCTIONS(ObjectMetadata, (json)(ubjson));
 
-bool operator==(const DetectedObject& left, const DetectedObject& right);
-QString toString(const DetectedObject& object);
+bool operator==(const ObjectMetadata& left, const ObjectMetadata& right);
+QString toString(const ObjectMetadata& object);
 
 //-------------------------------------------------------------------------------------------------
 
-struct DetectionMetadataPacket
+struct ObjectMetadataPacket
 {
     QnUuid deviceId;
-    // TODO: Rename "Usec" -> "Us".
-    qint64 timestampUsec = 0;
-    qint64 durationUsec = 0;
-    std::vector<DetectedObject> objects;
+    qint64 timestampUs = 0;
+    qint64 durationUs = 0;
+    std::vector<ObjectMetadata> objectMetadataList;
 };
-#define DetectionMetadataPacket_Fields (deviceId)(timestampUsec)(durationUsec)(objects)
-QN_FUSION_DECLARE_FUNCTIONS(DetectionMetadataPacket, (json)(ubjson));
+#define ObjectMetadataPacket_Fields (deviceId)(timestampUs)(durationUs)(objectMetadataList)
+QN_FUSION_DECLARE_FUNCTIONS(ObjectMetadataPacket, (json)(ubjson));
 
-bool operator==(const DetectionMetadataPacket& left, const DetectionMetadataPacket& right);
+bool operator==(const ObjectMetadataPacket& left, const ObjectMetadataPacket& right);
 
 #define QN_OBJECT_DETECTION_TYPES \
     (Attribute)\
-    (DetectedObject)\
-    (DetectionMetadataPacket)
+    (ObjectMetadata)\
+    (ObjectMetadataPacket)
 
-using DetectionMetadataPacketPtr = std::shared_ptr<DetectionMetadataPacket>;
-using ConstDetectionMetadataPacketPtr = std::shared_ptr<const DetectionMetadataPacket>;
-using DetectionMetadataTrack = DetectionMetadataPacket;
+using ObjectMetadataPacketPtr = std::shared_ptr<ObjectMetadataPacket>;
+using ConstObjectMetadataPacketPtr = std::shared_ptr<const ObjectMetadataPacket>;
 
-bool operator<(const DetectionMetadataPacket& first,
-    const DetectionMetadataPacket& second);
-bool operator<(std::chrono::microseconds first, const DetectionMetadataPacket& second);
-bool operator<(const DetectionMetadataPacket& first, std::chrono::microseconds second);
+bool operator<(const ObjectMetadataPacket& first, const ObjectMetadataPacket& second);
+bool operator<(std::chrono::microseconds first, const ObjectMetadataPacket& second);
+bool operator<(const ObjectMetadataPacket& first, std::chrono::microseconds second);
 
-QString toString(const DetectionMetadataPacket& packet);
-QnCompressedMetadataPtr toMetadataPacket(const DetectionMetadataPacket&);
-DetectionMetadataPacketPtr fromMetadataPacket(const QnConstCompressedMetadataPtr&);
-::std::ostream& operator<<(::std::ostream& os, const DetectionMetadataPacket& packet);
+QString toString(const ObjectMetadataPacket& packet);
+QnCompressedMetadataPtr toCompressedMetadataPacket(const ObjectMetadataPacket&);
+ObjectMetadataPacketPtr fromCompressedMetadataPacket(const QnConstCompressedMetadataPtr&);
+::std::ostream& operator<<(::std::ostream& os, const ObjectMetadataPacket& packet);
 
 } // namespace metadata
 } // namespace common

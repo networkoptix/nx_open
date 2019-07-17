@@ -19,7 +19,7 @@ class MetadataAnalyticsController:
 public:
     void gotMetadata(
         const QnResourcePtr& resource,
-        const nx::common::metadata::DetectionMetadataPacketPtr& metadata);
+        const nx::common::metadata::ObjectMetadataPacketPtr& metadata);
     void gotFrame(const QnResourcePtr& resource, qint64 timestampUs);
 
 signals:

@@ -398,7 +398,7 @@ static std::string timestampedObjectMetadataToString(const ITimestampedObjectMet
 
 static std::string objectTrackToString(
     const IList<ITimestampedObjectMetadata>* track,
-    Uuid expectedObjectId)
+    Uuid expectedTrackId)
 {
     using nx::kit::utils::format;
 
@@ -410,30 +410,30 @@ static std::string objectTrackToString(
 
     std::string result = format("%d metadata items", track->count());
 
-    Uuid objectIdFromTrack;
+    Uuid trackld;
     for (int i = 0; i < track->count(); ++i)
     {
         const auto timestampedObjectMetadata = track->at(i);
-        objectIdFromTrack = timestampedObjectMetadata->trackId();
-        if (objectIdFromTrack != toPtr(track->at(0))->trackId())
+        trackld = timestampedObjectMetadata->trackId();
+        if (trackld != toPtr(track->at(0))->trackId())
         {
             if (!result.empty())
                 result += "; ";
-            result += format("INTERNAL ERROR: Object id #%d %s does not equal object id #0 %s",
+            result += format("INTERNAL ERROR: Track id #%d %s does not equal track id #0 %s",
                 i,
-                UuidHelper::toStdString(objectIdFromTrack).c_str(),
+                UuidHelper::toStdString(trackld).c_str(),
                 UuidHelper::toStdString(toPtr(track->at(0))->trackId()).c_str());
             break;
         }
     }
 
-    if (objectIdFromTrack != expectedObjectId)
+    if (trackld != expectedTrackId)
     {
         if (!result.empty())
             result += "; ";
-        result += format("INTERNAL ERROR: Object id in the track is %s, but in the action is %s",
-            UuidHelper::toStdString(objectIdFromTrack).c_str(),
-            UuidHelper::toStdString(expectedObjectId).c_str());
+        result += format("INTERNAL ERROR: Track id in the track is %s, but in the action is %s",
+            UuidHelper::toStdString(trackld).c_str(),
+            UuidHelper::toStdString(expectedTrackId).c_str());
     }
 
     return result;
@@ -450,7 +450,7 @@ static std::string uncompressedVideoFrameToString(const IUncompressedVideoFrame*
 
 Result<void> Engine::executeAction(
     const std::string& actionId,
-    Uuid objectId,
+    Uuid trackId,
     Uuid /*deviceId*/,
     int64_t /*timestampUs*/,
     nx::sdk::Ptr<IObjectTrackInfo> objectTrackInfo,
@@ -461,7 +461,7 @@ Result<void> Engine::executeAction(
     if (actionId == "nx.stub.addToList")
     {
         *outMessageToUser =
-            std::string("Object id: ") + UuidHelper::toStdString(objectId) + "\n\n";
+            std::string("Track id: ") + UuidHelper::toStdString(trackId) + "\n\n";
 
         if (!objectTrackInfo)
         {
@@ -470,7 +470,7 @@ Result<void> Engine::executeAction(
         else
         {
             *outMessageToUser += std::string("Object track info:\n")
-                + "    Track: " + objectTrackToString(objectTrackInfo->track(), objectId) + "\n"
+                + "    Track: " + objectTrackToString(objectTrackInfo->track(), trackId) + "\n"
                 + "    Best shot frame: "
                     + uncompressedVideoFrameToString(objectTrackInfo->bestShotVideoFrame()) + "\n"
                 + "    Best shot metadata: "
@@ -505,7 +505,7 @@ Result<void> Engine::executeAction(
     else if (actionId == "nx.stub.addPerson")
     {
         *outActionUrl =
-            "http://internal.server/addPerson?objectId=" + UuidHelper::toStdString(objectId);
+            "http://internal.server/addPerson?trackId=" + UuidHelper::toStdString(trackId);
         NX_PRINT << __func__ << "(): Returning URL: " << nx::kit::utils::toString(*outActionUrl);
     }
     else

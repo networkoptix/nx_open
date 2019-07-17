@@ -808,7 +808,7 @@ Handle ServerConnection::changeCameraPassword(
     return handle;
 }
 
-Handle ServerConnection::lookupDetectedObjects(
+Handle ServerConnection::lookupObjectTracks(
     const nx::analytics::db::Filter& request,
     bool isLocal,
     Result<nx::analytics::db::LookupResult>::type callback,
@@ -819,7 +819,7 @@ Handle ServerConnection::lookupDetectedObjects(
     queryParams.insert(lit("isLocal"), isLocal? lit("true") : lit("false"));
 
     return executeGet(
-        lit("/ec2/analyticsLookupDetectedObjects"),
+        lit("/ec2/analyticsLookupObjectTracks"),
         queryParams,
         callback,
         targetThread);

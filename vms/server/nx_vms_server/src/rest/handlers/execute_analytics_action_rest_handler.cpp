@@ -43,9 +43,9 @@ nx::sdk::Ptr<nx::sdk::analytics::IObjectTrackInfo> makeObjectTrackInfo(
     using namespace nx::vms::server::sdk_support;
     auto objectTrackInfo = nx::sdk::makePtr<nx::sdk::analytics::ObjectTrackInfo>();
 
-    if (actionData.detectedObject)
+    if (actionData.objectTrack)
     {
-        const auto track = createObjectTrack(*actionData.detectedObject);
+        const auto track = createObjectTrack(*actionData.objectTrack);
         if (!track)
             return nullptr;
 
@@ -54,7 +54,7 @@ nx::sdk::Ptr<nx::sdk::analytics::IObjectTrackInfo> makeObjectTrackInfo(
         if (actionData.bestShotObjectPosition)
         {
             const auto bestShotObjectMetadata = createTimestampedObjectMetadata(
-                *actionData.detectedObject,
+                *actionData.objectTrack,
                 *actionData.bestShotObjectPosition);
 
             if (!bestShotObjectMetadata)
@@ -85,7 +85,8 @@ class Action: public nx::sdk::RefCountable<nx::sdk::analytics::IAction>
 public:
     Action(const ExtendedAnalyticsActionData& actionData, AnalyticsActionResult* actionResult):
         m_actionId(actionData.action.actionId.toStdString()),
-        m_objectId(nx::vms_server_plugins::utils::fromQnUuidToSdkUuid(actionData.action.objectId)),
+        m_objectTrackId(
+            nx::vms_server_plugins::utils::fromQnUuidToSdkUuid(actionData.action.objectTrackId)),
         m_deviceId(nx::vms_server_plugins::utils::fromQnUuidToSdkUuid(actionData.action.deviceId)),
         m_timestampUs(actionData.action.timestampUs),
         m_objectTrackInfo(makeObjectTrackInfo(actionData)),
@@ -97,7 +98,7 @@ public:
 
     virtual const char* actionId() const override { return m_actionId.c_str(); }
 
-    virtual nx::sdk::Uuid objectId() const override { return m_objectId; }
+    virtual nx::sdk::Uuid objectTrackId() const override { return m_objectTrackId; }
 
     virtual nx::sdk::Uuid deviceId() const override { return m_deviceId; }
 
@@ -129,7 +130,7 @@ public:
 
 private:
     std::string m_actionId;
-    nx::sdk::Uuid m_objectId;
+    nx::sdk::Uuid m_objectTrackId;
     nx::sdk::Uuid m_deviceId;
     int64_t m_timestampUs;
 
@@ -243,8 +244,8 @@ QString QnExecuteAnalyticsActionRestHandler::checkInputParameters(
         return makeErrorMessage("engineId");
     else if (actionData.actionId.isEmpty())
         return makeErrorMessage("actionId");
-    else if (actionData.objectId.isNull())
-        return makeErrorMessage("objectId");
+    else if (actionData.objectTrackId.isNull())
+        return makeErrorMessage("trackId");
 
     return QString();
 }
@@ -297,7 +298,7 @@ std::optional<ExtendedAnalyticsActionData>
     extendedAnalyticsActionData.engine = engineResource;
     extendedAnalyticsActionData.actionTypeDescriptor = actionTypeDescriptor;
 
-    const auto& trackId = action.objectId;
+    const auto& trackId = action.objectTrackId;
     const auto& capabilities = actionTypeDescriptor.requirements.capabilities;
 
     if (!capabilities)
@@ -342,28 +343,28 @@ std::optional<ExtendedAnalyticsActionData>
 
         if (needToFetchFullTrack || needBestShotObjectPosition)
         {
-            extendedAnalyticsActionData.detectedObject = fetchDetectedObject(
+            extendedAnalyticsActionData.objectTrack = fetchObjectTrack(
                 trackId,
                 needToFetchFullTrack);
         }
     }
     else
     {
-        auto detectedObject = fetchDetectedObject(trackId, needToFetchFullTrack);
-        if (!detectedObject)
+        auto objectTrack = fetchObjectTrack(trackId, needToFetchFullTrack);
+        if (!objectTrack)
         {
             NX_DEBUG(this, "Unable fetch track by id %1", trackId);
             return std::nullopt;
         }
 
-        const auto& bestShotObjectPosition = detectedObject->track[0];
+        const auto& bestShotObjectPosition = objectTrack->objectPositionSequence[0];
         if (needBestShotTimestamp)
-            bestShotTimestampUs = bestShotObjectPosition.timestampUsec;
+            bestShotTimestampUs = bestShotObjectPosition.timestampUs;
 
         if (needToFetchFullTrack || needBestShotObjectPosition)
         {
             extendedAnalyticsActionData.bestShotObjectPosition = bestShotObjectPosition;
-            extendedAnalyticsActionData.detectedObject = std::move(detectedObject);
+            extendedAnalyticsActionData.objectTrack = std::move(objectTrack);
         }
     }
 
@@ -418,28 +419,28 @@ std::optional<nx::analytics::db::ObjectPosition>
         objectTrackId, timestampUs);
 
     Filter filter;
-    filter.objectAppearanceId = objectTrackId;
+    filter.objectTrackId = objectTrackId;
     filter.timePeriod = QnTimePeriod(
         duration_cast<milliseconds>(microseconds(timestampUs) - kSearchTimeRangeDuration / 2),
         duration_cast<milliseconds>(kSearchTimeRangeDuration));
-    filter.maxTrackSize = 0;
+    filter.maxObjectTrackSize = 0;
 
     const auto result = makeDatabaseRequest(filter);
     if (!result || result->empty())
         return std::nullopt;
 
-    const auto& track = result->at(0).track;
+    const auto& track = result->at(0).objectPositionSequence;
     class Comparator
     {
     public:
         bool operator()(const ObjectPosition& position, int64_t timestamp) const
         {
-            return position.timestampUsec > timestamp;
+            return position.timestampUs > timestamp;
         };
 
         bool operator()(int64_t timestamp, const ObjectPosition& position) const
         {
-            return position.timestampUsec > timestamp;
+            return position.timestampUs > timestamp;
         }
     };
 
@@ -463,26 +464,26 @@ std::optional<nx::analytics::db::ObjectPosition>
         NX_DEBUG(this,
             "Unable to find lower bound for position with timestamp %1 in the track %2, "
             "using upper bound %3",
-            timestampUs, objectTrackId, upperBound->timestampUsec);
+            timestampUs, objectTrackId, upperBound->timestampUs);
 
         return *upperBound;
     }
 
     NX_DEBUG(this, "Got poistion for timestamp %1 for the track %2, position timestmap is %3",
-        timestampUs, objectTrackId, lowerBound->timestampUsec);
+        timestampUs, objectTrackId, lowerBound->timestampUs);
 
     return *lowerBound;
 }
 
-std::optional<nx::analytics::db::DetectedObject>
-    QnExecuteAnalyticsActionRestHandler::fetchDetectedObject(
+std::optional<nx::analytics::db::ObjectTrack>
+    QnExecuteAnalyticsActionRestHandler::fetchObjectTrack(
         const QnUuid& objectTrackId,
         bool needFullTrack)
 {
     using namespace nx::analytics::db;
     Filter filter;
-    filter.objectAppearanceId = objectTrackId;
-    filter.maxTrackSize = needFullTrack ? /*unlimited length*/ 0 : 1;
+    filter.objectTrackId = objectTrackId;
+    filter.maxObjectTrackSize = needFullTrack ? /*unlimited length*/ 0 : 1;
 
     NX_DEBUG(this,
         "Trying to fetch track with id %1. Full track is needed: %2",
@@ -511,8 +512,8 @@ int64_t QnExecuteAnalyticsActionRestHandler::tryToFindBestShotTimestampUsByAttru
 {
     using namespace nx::analytics::db;
     Filter filter;
-    filter.objectAppearanceId = objectTrackId;
-    filter.maxTrackSize = 1;
+    filter.objectTrackId = objectTrackId;
+    filter.maxObjectTrackSize = 1;
 
     // It's a hack needed because filter.requiredAttrributes field doesn't work.
     filter.freeText = kBestShotAttribute;

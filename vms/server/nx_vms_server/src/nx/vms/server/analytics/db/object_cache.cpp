@@ -2,32 +2,32 @@
 
 namespace nx::analytics::db {
 
-ObjectCache::ObjectCache(
+ObjectTrackCache::ObjectTrackCache(
     std::chrono::milliseconds aggregationPeriod,
     std::chrono::milliseconds maxObjectLifetime)
     :
     m_aggregationPeriod(aggregationPeriod),
     m_maxObjectLifetime(maxObjectLifetime),
-    m_timerPool([this](const QnUuid& objectGuid) { removeObject(objectGuid); })
+    m_timerPool([this](const QnUuid& trackGuid) { removeTrack(trackGuid); })
 {
 }
 
-void ObjectCache::add(const common::metadata::ConstDetectionMetadataPacketPtr& packet)
+void ObjectTrackCache::add(const common::metadata::ConstObjectMetadataPacketPtr& packet)
 {
     QnMutexLocker lock(&m_mutex);
 
-    for (const auto& detectedObject: packet->objects)
-        updateObject(detectedObject, *packet);
+    for (const auto& objectMetadata: packet->objectMetadataList)
+        updateObject(objectMetadata, *packet);
 }
 
-std::vector<DetectedObject> ObjectCache::getObjectsToInsert(bool flush)
+std::vector<ObjectTrack> ObjectTrackCache::getTracksToInsert(bool flush)
 {
     QnMutexLocker lock(&m_mutex);
 
     const auto currentClock = nx::utils::monotonicTime();
 
-    std::vector<DetectedObject> result;
-    for (auto& [objectId, ctx]: m_objectsById)
+    std::vector<ObjectTrack> result;
+    for (auto& [trackId, ctx]: m_tracksById)
     {
         if ((!flush && currentClock - ctx.lastReportTime < m_aggregationPeriod) ||
             ctx.insertionReported)
@@ -38,23 +38,23 @@ std::vector<DetectedObject> ObjectCache::getObjectsToInsert(bool flush)
 
         ctx.lastReportTime = currentClock;
         m_timerPool.addTimer(
-            ctx.object.objectAppearanceId,
+            ctx.track.id,
             m_maxObjectLifetime);
 
-        result.push_back(ctx.object);
-        ctx.object.track.clear();
+        result.push_back(ctx.track);
+        ctx.track.objectPositionSequence.clear();
         ctx.newAttributesSinceLastUpdate.clear();
     }
 
     return result;
 }
 
-std::optional<DetectedObject> ObjectCache::getObjectToInsertForced(const QnUuid& objectGuid)
+std::optional<ObjectTrack> ObjectTrackCache::getTrackToInsertForced(const QnUuid& trackGuid)
 {
     QnMutexLocker lock(&m_mutex);
 
-    auto it = m_objectsById.find(objectGuid);
-    if (it == m_objectsById.end())
+    auto it = m_tracksById.find(trackGuid);
+    if (it == m_tracksById.end())
         return std::nullopt;
 
     auto& ctx = it->second;
@@ -65,76 +65,76 @@ std::optional<DetectedObject> ObjectCache::getObjectToInsertForced(const QnUuid&
 
     ctx.lastReportTime = nx::utils::monotonicTime();
     m_timerPool.addTimer(
-        ctx.object.objectAppearanceId,
+        ctx.track.id,
         m_maxObjectLifetime);
 
-    auto result = ctx.object;
-    ctx.object.track.clear();
+    auto result = ctx.track;
+    ctx.track.objectPositionSequence.clear();
     ctx.newAttributesSinceLastUpdate.clear();
 
     return result;
 }
 
-std::vector<ObjectUpdate> ObjectCache::getObjectsToUpdate(bool flush)
+std::vector<ObjectTrackUpdate> ObjectTrackCache::getTracksToUpdate(bool flush)
 {
     QnMutexLocker lock(&m_mutex);
 
     const auto currentClock = nx::utils::monotonicTime();
 
-    std::vector<ObjectUpdate> result;
-    for (auto& [objectId, ctx]: m_objectsById)
+    std::vector<ObjectTrackUpdate> result;
+    for (auto& [trackId, ctx]: m_tracksById)
     {
         if ((!flush && currentClock - ctx.lastReportTime < m_aggregationPeriod) ||
             !ctx.insertionReported ||
-            ctx.object.track.empty())
+            ctx.track.objectPositionSequence.empty())
         {
             continue;
         }
 
         ctx.lastReportTime = currentClock;
         m_timerPool.addTimer(
-            ctx.object.objectAppearanceId,
+            ctx.track.id,
             m_maxObjectLifetime);
 
-        ObjectUpdate objectUpdate;
-        objectUpdate.objectId = objectId;
-        objectUpdate.appendedTrack = std::exchange(ctx.object.track, {});
-        objectUpdate.appendedAttributes = std::exchange(ctx.newAttributesSinceLastUpdate, {});
-        objectUpdate.allAttributes = ctx.object.attributes;
+        ObjectTrackUpdate trackUpdate;
+        trackUpdate.trackId = trackId;
+        trackUpdate.appendedTrack = std::exchange(ctx.track.objectPositionSequence, {});
+        trackUpdate.appendedAttributes = std::exchange(ctx.newAttributesSinceLastUpdate, {});
+        trackUpdate.allAttributes = ctx.track.attributes;
 
-        result.push_back(std::move(objectUpdate));
+        result.push_back(std::move(trackUpdate));
     }
 
     return result;
 }
 
-std::optional<DetectedObject> ObjectCache::getObjectById(const QnUuid& objectGuid) const
+std::optional<ObjectTrack> ObjectTrackCache::getTrackById(const QnUuid& trackGuid) const
 {
     QnMutexLocker lock(&m_mutex);
 
-    if (auto it = m_objectsById.find(objectGuid); it != m_objectsById.end())
-        return it->second.object;
+    if (auto it = m_tracksById.find(trackGuid); it != m_tracksById.end())
+        return it->second.track;
 
     return std::nullopt;
 }
 
-void ObjectCache::setObjectIdInDb(const QnUuid& objectId, int64_t dbId)
+void ObjectTrackCache::setTrackIdInDb(const QnUuid& trackId, int64_t dbId)
 {
     QnMutexLocker lock(&m_mutex);
 
-    if (auto it = m_objectsById.find(objectId);
-        it != m_objectsById.end())
+    if (auto it = m_tracksById.find(trackId);
+        it != m_tracksById.end())
     {
         it->second.dbId = dbId;
     }
 }
 
-int64_t ObjectCache::dbIdFromObjectId(const QnUuid& objectId) const
+int64_t ObjectTrackCache::dbIdFromTrackId(const QnUuid& trackId) const
 {
     QnMutexLocker lock(&m_mutex);
 
-    if (auto it = m_objectsById.find(objectId);
-        it != m_objectsById.end())
+    if (auto it = m_tracksById.find(trackId);
+        it != m_tracksById.end())
     {
         return it->second.dbId;
     }
@@ -142,25 +142,25 @@ int64_t ObjectCache::dbIdFromObjectId(const QnUuid& objectId) const
     return -1;
 }
 
-void ObjectCache::saveObjectGuidToAttributesId(
-    const QnUuid& objectId,
+void ObjectTrackCache::saveTrackGuidToAttributesId(
+    const QnUuid& trackId,
     int64_t attributesId)
 {
     QnMutexLocker lock(&m_mutex);
 
-    if (auto it = m_objectsById.find(objectId);
-        it != m_objectsById.end())
+    if (auto it = m_tracksById.find(trackId);
+        it != m_tracksById.end())
     {
         it->second.attributesDbId = attributesId;
     }
 }
 
-int64_t ObjectCache::getAttributesIdByObjectGuid(const QnUuid& objectId) const
+int64_t ObjectTrackCache::getAttributesIdByTrackGuid(const QnUuid& trackId) const
 {
     QnMutexLocker lock(&m_mutex);
 
-    if (auto it = m_objectsById.find(objectId);
-        it != m_objectsById.end())
+    if (auto it = m_tracksById.find(trackId);
+        it != m_tracksById.end())
     {
         return it->second.attributesDbId;
     }
@@ -168,70 +168,70 @@ int64_t ObjectCache::getAttributesIdByObjectGuid(const QnUuid& objectId) const
     return -1;
 }
 
-void ObjectCache::removeExpiredData()
+void ObjectTrackCache::removeExpiredData()
 {
     QnMutexLocker lock(&m_mutex);
 
     m_timerPool.processTimers();
 }
 
-void ObjectCache::updateObject(
-    const nx::common::metadata::DetectedObject& detectedObject,
-    const nx::common::metadata::DetectionMetadataPacket& packet)
+void ObjectTrackCache::updateObject(
+    const nx::common::metadata::ObjectMetadata& objectMetadata,
+    const nx::common::metadata::ObjectMetadataPacket& packet)
 {
-    auto [objectIter, inserted] = m_objectsById.emplace(
-        detectedObject.objectId,
-        ObjectContext());
-    auto& objectContext = objectIter->second;
+    auto [trackIter, inserted] = m_tracksById.emplace(
+        objectMetadata.trackId,
+        ObjectTrackContext());
+    auto& trackContext = trackIter->second;
 
     if (inserted)
     {
-        objectContext.object.deviceId = packet.deviceId;
-        objectContext.object.objectAppearanceId = detectedObject.objectId;
-        objectContext.object.objectTypeId = detectedObject.objectTypeId;
-        objectContext.object.firstAppearanceTimeUsec = packet.timestampUsec;
+        trackContext.track.deviceId = packet.deviceId;
+        trackContext.track.id = objectMetadata.trackId;
+        trackContext.track.objectTypeId = objectMetadata.objectTypeId;
+        trackContext.track.firstAppearanceTimeUs = packet.timestampUs;
 
-        objectContext.lastReportTime = nx::utils::monotonicTime();
+        trackContext.lastReportTime = nx::utils::monotonicTime();
 
         m_timerPool.addTimer(
-            objectContext.object.objectAppearanceId,
+            trackContext.track.id,
             m_maxObjectLifetime);
     }
 
-    if (detectedObject.bestShot)
+    if (objectMetadata.bestShot)
     {
         // "Best shot" packet contains only information about the best shot, not a real object movement.
-        objectContext.object.bestShot.timestampUsec = packet.timestampUsec;
-        objectContext.object.bestShot.rect = detectedObject.boundingBox;
+        trackContext.track.bestShot.timestampUs = packet.timestampUs;
+        trackContext.track.bestShot.rect = objectMetadata.boundingBox;
         return;
     }
 
-    objectContext.object.lastAppearanceTimeUsec = packet.timestampUsec;
+    trackContext.track.lastAppearanceTimeUs = packet.timestampUs;
 
-    addNewAttributes(detectedObject.labels, &objectContext);
+    addNewAttributes(objectMetadata.attributes, &trackContext);
 
     ObjectPosition objectPosition;
     objectPosition.deviceId = packet.deviceId;
-    objectPosition.timestampUsec = packet.timestampUsec;
-    objectPosition.durationUsec = packet.durationUsec;
-    objectPosition.boundingBox = detectedObject.boundingBox;
-    objectPosition.attributes = detectedObject.labels;
+    objectPosition.timestampUs = packet.timestampUs;
+    objectPosition.durationUs = packet.durationUs;
+    objectPosition.boundingBox = objectMetadata.boundingBox;
+    objectPosition.attributes = objectMetadata.attributes;
 
-    objectContext.object.track.push_back(std::move(objectPosition));
+    trackContext.track.objectPositionSequence.push_back(std::move(objectPosition));
 }
 
-void ObjectCache::addNewAttributes(
+void ObjectTrackCache::addNewAttributes(
     const std::vector<common::metadata::Attribute>& attributes,
-    ObjectContext* objectContext)
+    ObjectTrackContext* trackContext)
 {
     for (const auto& attribute: attributes)
     {
-        auto it = objectContext->allAttributes.find(attribute.name);
-        if (it == objectContext->allAttributes.end())
+        auto it = trackContext->allAttributes.find(attribute.name);
+        if (it == trackContext->allAttributes.end())
         {
-            objectContext->object.attributes.push_back(attribute);
-            objectContext->newAttributesSinceLastUpdate.push_back(attribute);
-            objectContext->allAttributes[attribute.name] = attribute.value;
+            trackContext->track.attributes.push_back(attribute);
+            trackContext->newAttributesSinceLastUpdate.push_back(attribute);
+            trackContext->allAttributes[attribute.name] = attribute.value;
             continue;
         }
 
@@ -239,19 +239,19 @@ void ObjectCache::addNewAttributes(
             continue;
 
         it->second = attribute.value;
-        for (auto& existingAttribute: objectContext->object.attributes)
+        for (auto& existingAttribute: trackContext->track.attributes)
         {
             if (existingAttribute.name == attribute.name)
                 existingAttribute.value = attribute.value;
         }
 
-        objectContext->newAttributesSinceLastUpdate.push_back(attribute);
+        trackContext->newAttributesSinceLastUpdate.push_back(attribute);
     }
 }
 
-void ObjectCache::removeObject(const QnUuid& objectGuid)
+void ObjectTrackCache::removeTrack(const QnUuid& trackGuid)
 {
-    m_objectsById.erase(objectGuid);
+    m_tracksById.erase(trackGuid);
 }
 
 } // namespace nx::analytics::db

@@ -27,6 +27,7 @@ namespace analytics {
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 using namespace nx::vms::api::analytics;
+using namespace nx::vms_server_plugins::utils;
 
 MetadataHandler::MetadataHandler(
     QnMediaServerModule* serverModule, QnVirtualCameraResourcePtr device, QnUuid engineId):
@@ -110,49 +111,50 @@ void MetadataHandler::handleEventMetadataPacket(
 void MetadataHandler::handleObjectMetadataPacket(
     const Ptr<IObjectMetadataPacket>& objectMetadataPacket)
 {
-    nx::common::metadata::DetectionMetadataPacket data;
+    nx::common::metadata::ObjectMetadataPacket data;
     for (int i = 0; i < objectMetadataPacket->count(); ++i)
     {
         const auto item = toPtr(objectMetadataPacket->at(i));
         if (!item)
             break;
 
-        nx::common::metadata::DetectedObject object;
-        object.objectTypeId = item->typeId();
-        object.objectId = nx::vms_server_plugins::utils::fromSdkUuidToQnUuid(item->trackId());
+        nx::common::metadata::ObjectMetadata objectMetadata;
+        objectMetadata.objectTypeId = item->typeId();
+        objectMetadata.trackId = fromSdkUuidToQnUuid(item->trackId());
         const auto box = item->boundingBox();
-        object.boundingBox = QRectF(box.x, box.y, box.width, box.height);
+        objectMetadata.boundingBox = QRectF(box.x, box.y, box.width, box.height);
 
         NX_VERBOSE(this, "%1(): x %2, y %3, width %4, height %5, typeId %6, id %7",
-            __func__, box.x, box.y, box.width, box.height, object.objectTypeId, object.objectId);
+            __func__, box.x, box.y, box.width, box.height,
+            objectMetadata.objectTypeId, objectMetadata.trackId);
 
         for (int j = 0; j < item->attributeCount(); ++j)
         {
             nx::common::metadata::Attribute attribute;
             attribute.name = QString::fromStdString(toPtr(item->attribute(j))->name());
             attribute.value = QString::fromStdString(toPtr(item->attribute(j))->value());
-            object.labels.push_back(attribute);
+            objectMetadata.attributes.push_back(attribute);
 
             NX_VERBOSE(this, "%1(): Attribute: %2 %3", __func__, attribute.name, attribute.value);
         }
-        data.objects.push_back(std::move(object));
+        data.objectMetadataList.push_back(std::move(objectMetadata));
     }
 
-    if (data.objects.empty())
+    if (data.objectMetadataList.empty())
         NX_VERBOSE(this, "%1(): WARNING: ObjectsMetadataPacket is empty", __func__);
 
-    data.timestampUsec = objectMetadataPacket->timestampUs();
-    data.durationUsec = objectMetadataPacket->durationUs();
+    data.timestampUs = objectMetadataPacket->timestampUs();
+    data.durationUs = objectMetadataPacket->durationUs();
     data.deviceId = m_resource->getId();
 
-    if (data.timestampUsec <= 0)
-        NX_WARNING(this, "Invalid ObjectsMetadataPacket timestamp: %1", data.timestampUsec);
+    if (data.timestampUs <= 0)
+        NX_WARNING(this, "Invalid ObjectsMetadataPacket timestamp: %1", data.timestampUs);
 
-    if (m_metadataSink && data.timestampUsec >= 0) //< Warn about 0 but still accept it.
-        m_metadataSink->putData(nx::common::metadata::toMetadataPacket(data));
+    if (m_metadataSink && data.timestampUs >= 0) //< Warn about 0 but still accept it.
+        m_metadataSink->putData(nx::common::metadata::toCompressedMetadataPacket(data));
 
     if (m_visualDebugger)
-        m_visualDebugger->push(nx::common::metadata::toMetadataPacket(data));
+        m_visualDebugger->push(nx::common::metadata::toCompressedMetadataPacket(data));
 
     if (nx::analytics::loggingIni().isLoggingEnabled())
         m_metadataLogger.pushObjectMetadata(data);
@@ -161,31 +163,31 @@ void MetadataHandler::handleObjectMetadataPacket(
 void MetadataHandler::handleObjectTrackBestShotPacket(
     const nx::sdk::Ptr<nx::sdk::analytics::IObjectTrackBestShotPacket>& objectTrackBestShotPacket)
 {
-    nx::common::metadata::DetectionMetadataPacket bestShotPacket;
-    bestShotPacket.timestampUsec = objectTrackBestShotPacket->timestampUs();
-    if (bestShotPacket.timestampUsec < 0)
+    nx::common::metadata::ObjectMetadataPacket bestShotPacket;
+    bestShotPacket.timestampUs = objectTrackBestShotPacket->timestampUs();
+    if (bestShotPacket.timestampUs < 0)
     {
         NX_WARNING(this,
             "Invalid ObjectTrackBestShotPacket timestamp: %1, ignoring packet",
-            bestShotPacket.timestampUsec);
+            bestShotPacket.timestampUs);
 
         return;
     }
 
-    bestShotPacket.durationUsec = 0;
+    bestShotPacket.durationUs = 0;
     bestShotPacket.deviceId = m_resource->getId();
 
-    nx::common::metadata::DetectedObject bestShot;
-    bestShot.objectId =
+    nx::common::metadata::ObjectMetadata bestShot;
+    bestShot.trackId =
         nx::vms_server_plugins::utils::fromSdkUuidToQnUuid(objectTrackBestShotPacket->trackId());
     bestShot.bestShot = true;
     const auto box = objectTrackBestShotPacket->boundingBox();
     bestShot.boundingBox = QRectF(box.x, box.y, box.width, box.height);
 
-    bestShotPacket.objects.push_back(std::move(bestShot));
+    bestShotPacket.objectMetadataList.push_back(std::move(bestShot));
 
     if (m_metadataSink)
-        m_metadataSink->putData(nx::common::metadata::toMetadataPacket(bestShotPacket));
+        m_metadataSink->putData(nx::common::metadata::toCompressedMetadataPacket(bestShotPacket));
 
     if (nx::analytics::loggingIni().isLoggingEnabled())
         m_metadataLogger.pushObjectMetadata(bestShotPacket);

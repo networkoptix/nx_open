@@ -15,23 +15,23 @@ class Cursor:
     public AbstractCursor
 {
 public:
-    Cursor(std::unique_ptr<nx::sql::Cursor<DetectedObject>> sqlCursor);
+    Cursor(std::unique_ptr<nx::sql::Cursor<ObjectTrack>> sqlCursor);
     virtual ~Cursor();
 
-    virtual common::metadata::ConstDetectionMetadataPacketPtr next() override;
+    virtual common::metadata::ConstObjectMetadataPacketPtr next() override;
     virtual void close() override;
 
     void setOnBeforeCursorDestroyed(
         nx::utils::MoveOnlyFunc<void(Cursor*)> handler);
 
 private:
-    using Objects =
-        std::vector<std::pair<DetectedObject, std::size_t /*current track position*/>>;
+    using Tracks =
+        std::vector<std::pair<ObjectTrack, std::size_t /*current track position*/>>;
 
-    std::unique_ptr<nx::sql::Cursor<DetectedObject>> m_sqlCursor;
+    std::unique_ptr<nx::sql::Cursor<ObjectTrack>> m_sqlCursor;
     bool m_eof = false;
-    Objects m_currentObjects;
-    common::metadata::DetectionMetadataPacketPtr m_packet;
+    Tracks m_currentTracks;
+    common::metadata::ObjectMetadataPacketPtr m_packet;
     QnMutex m_mutex;
     nx::utils::MoveOnlyFunc<void(Cursor*)> m_onBeforeCursorDestroyedHandler;
 
@@ -39,25 +39,25 @@ private:
     void loadNextObject();
 
     qint64 nextTrackPositionTimestamp();
-    Objects::iterator findTrackPosition();
+    Tracks::iterator findTrackPosition();
     qint64 maxObjectTrackStartTimestamp();
 
-    std::tuple<const DetectedObject*, std::size_t /*track position*/> readNextTrackPosition();
+    std::tuple<const ObjectTrack*, std::size_t /*track position*/> readNextTrackPosition();
 
-    common::metadata::DetectionMetadataPacketPtr createMetaDataPacket(
-        const DetectedObject& object,
+    common::metadata::ObjectMetadataPacketPtr createMetaDataPacket(
+        const ObjectTrack& track,
         int trackPositionIndex);
 
-    nx::common::metadata::DetectedObject toMetadataObject(
-        const DetectedObject& object,
+    nx::common::metadata::ObjectMetadata toMetadataObject(
+        const ObjectTrack& track,
         int trackPositionIndex);
 
     bool canAddToTheCurrentPacket(
-        const DetectedObject& object,
+        const ObjectTrack& track,
         int trackPositionIndex) const;
 
     void addToCurrentPacket(
-        const DetectedObject& object,
+        const ObjectTrack& track,
         int trackPositionIndex);
 };
 

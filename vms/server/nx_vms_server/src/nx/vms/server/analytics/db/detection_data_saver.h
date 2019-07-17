@@ -16,24 +16,24 @@ namespace nx::analytics::db {
 class AttributesDao;
 class DeviceDao;
 class ObjectTypeDao;
-class ObjectGroupDao;
+class ObjectTrackGroupDao;
 class AnalyticsArchiveDirectory;
 
-class DetectionDataSaver
+class ObjectTrackDataSaver
 {
 public:
-    DetectionDataSaver(
+    ObjectTrackDataSaver(
         AttributesDao* attributesDao,
         DeviceDao* deviceDao,
         ObjectTypeDao* objectTypeDao,
-        ObjectGroupDao* objectGroupDao,
-        ObjectCache* objectCache,
+        ObjectTrackGroupDao* objectGroupDao,
+        ObjectTrackCache* trackCache,
         AnalyticsArchiveDirectory* analyticsArchive);
 
-    DetectionDataSaver(const DetectionDataSaver&) = delete;
-    DetectionDataSaver& operator=(const DetectionDataSaver&) = delete;
-    DetectionDataSaver(DetectionDataSaver&&) = default;
-    DetectionDataSaver& operator=(DetectionDataSaver&&) = default;
+    ObjectTrackDataSaver(const ObjectTrackDataSaver&) = delete;
+    ObjectTrackDataSaver& operator=(const ObjectTrackDataSaver&) = delete;
+    ObjectTrackDataSaver(ObjectTrackDataSaver&&) = default;
+    ObjectTrackDataSaver& operator=(ObjectTrackDataSaver&&) = default;
 
     /**
      * @param flush If true then all available data is loaded, the aggregation period is ignored.
@@ -48,10 +48,10 @@ public:
     void save(nx::sql::QueryContext* queryContext);
 
 private:
-    struct AnalArchiveItem
+    struct AnalyticsArchiveItem
     {
         QnUuid deviceId;
-        uint32_t objectsGroupId = 0;
+        uint32_t trackGroupId = 0;
         int objectType = -1;
         std::chrono::milliseconds timestamp = std::chrono::milliseconds::zero();
         /**
@@ -61,7 +61,7 @@ private:
         int64_t combinedAttributesId = -1;
     };
 
-    struct ObjectDbAttributes
+    struct ObjectTrackDbAttributes
     {
         QnUuid deviceId;
         int objectTypeId = -1;
@@ -71,29 +71,28 @@ private:
     AttributesDao* m_attributesDao = nullptr;
     DeviceDao* m_deviceDao = nullptr;
     ObjectTypeDao* m_objectTypeDao = nullptr;
-    ObjectGroupDao* m_objectGroupDao = nullptr;
-    ObjectCache* m_objectCache = nullptr;
+    ObjectTrackGroupDao* m_trackGroupDao = nullptr;
+    ObjectTrackCache* m_objectTrackCache = nullptr;
     AnalyticsArchiveDirectory* m_analyticsArchive = nullptr;
 
-    std::vector<DetectedObject> m_objectsToInsert;
-    std::vector<ObjectUpdate> m_objectsToUpdate;
-    std::vector<AggregatedTrackData> m_objectSearchData;
-    std::map<QnUuid, int64_t> m_objectGuidToId;
+    std::vector<ObjectTrack> m_tracksToInsert;
+    std::vector<ObjectTrackUpdate> m_tracksToUpdate;
+    std::vector<AggregatedTrackData> m_trackSearchData;
+    std::map<QnUuid, int64_t> m_trackGuidToId;
 
-    void resolveObjectIds();
+    void resolveTrackIds();
 
     void insertObjects(nx::sql::QueryContext* queryContext);
 
-    std::pair<qint64, qint64> findMinMaxTimestamp(
-        const std::vector<ObjectPosition>& track);
+    std::pair<qint64, qint64> findMinMaxTimestamp(const std::vector<ObjectPosition>& track);
 
     void updateObjects(nx::sql::QueryContext* queryContext);
 
     void saveObjectSearchData(nx::sql::QueryContext* queryContext);
 
     void saveToAnalyticsArchive(nx::sql::QueryContext* queryContext);
-    std::vector<AnalArchiveItem> prepareArchiveData(nx::sql::QueryContext* queryContext);
-    ObjectDbAttributes getObjectDbDataById(const QnUuid& objectId);
+    std::vector<AnalyticsArchiveItem> prepareArchiveData(nx::sql::QueryContext* queryContext);
+    ObjectTrackDbAttributes getTrackDbDataById(const QnUuid& trackId);
 };
 
 } // namespace nx::analytics::db

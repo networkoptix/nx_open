@@ -11,7 +11,7 @@ ObjectTrackBestShotPacket::ObjectTrackBestShotPacket(
     int64_t timestampUs,
     Rect boundingBox)
     :
-    m_trackId(trackId),
+    m_objectTrackId(trackId),
     m_timestampUs(timestampUs),
     m_boundingBox(boundingBox)
 {
@@ -19,7 +19,7 @@ ObjectTrackBestShotPacket::ObjectTrackBestShotPacket(
 
 Uuid ObjectTrackBestShotPacket::trackId() const
 {
-    return m_trackId;
+    return m_objectTrackId;
 }
 
 int64_t ObjectTrackBestShotPacket::timestampUs() const

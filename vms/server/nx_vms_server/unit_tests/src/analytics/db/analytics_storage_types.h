@@ -17,7 +17,7 @@ private:
 
 Filter generateRandomFilter(const AttributeDictionary* attributeDictionary = nullptr);
 
-common::metadata::DetectionMetadataPacketPtr generateRandomPacket(
+common::metadata::ObjectMetadataPacketPtr generateRandomPacket(
     int eventCount,
     const AttributeDictionary* attributeDictionary = nullptr);
 

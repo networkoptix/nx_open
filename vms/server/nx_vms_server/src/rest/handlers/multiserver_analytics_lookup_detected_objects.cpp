@@ -15,7 +15,7 @@ static const char* kFormatParamName = "format";
 
 } // namespace
 
-QnMultiserverAnalyticsLookupDetectedObjects::QnMultiserverAnalyticsLookupDetectedObjects(
+QnMultiserverAnalyticsLookupObjectTracks::QnMultiserverAnalyticsLookupObjectTracks(
     QnCommonModule* commonModule,
     nx::analytics::db::AbstractEventsStorage* eventStorage)
     :
@@ -24,7 +24,7 @@ QnMultiserverAnalyticsLookupDetectedObjects::QnMultiserverAnalyticsLookupDetecte
 {
 }
 
-int QnMultiserverAnalyticsLookupDetectedObjects::executeGet(
+int QnMultiserverAnalyticsLookupObjectTracks::executeGet(
     const QString& path,
     const QnRequestParamList& params,
     QByteArray& result,
@@ -42,7 +42,7 @@ int QnMultiserverAnalyticsLookupDetectedObjects::executeGet(
     return execute(filter, isLocal, outputFormat, &result, &contentType);
 }
 
-int QnMultiserverAnalyticsLookupDetectedObjects::executePost(
+int QnMultiserverAnalyticsLookupObjectTracks::executePost(
     const QString& /*path*/,
     const QnRequestParamList& params,
     const QByteArray& body,
@@ -62,7 +62,7 @@ int QnMultiserverAnalyticsLookupDetectedObjects::executePost(
     return execute(filter, isLocal, outputFormat, &result, &resultContentType);
 }
 
-bool QnMultiserverAnalyticsLookupDetectedObjects::deserializeRequest(
+bool QnMultiserverAnalyticsLookupObjectTracks::deserializeRequest(
     const QnRequestParamList& params,
     nx::analytics::db::Filter* filter,
     Qn::SerializationFormat* outputFormat)
@@ -79,7 +79,7 @@ bool QnMultiserverAnalyticsLookupDetectedObjects::deserializeRequest(
     return true;
 }
 
-bool QnMultiserverAnalyticsLookupDetectedObjects::deserializeOutputFormat(
+bool QnMultiserverAnalyticsLookupObjectTracks::deserializeOutputFormat(
     const QnRequestParamList& params,
     Qn::SerializationFormat* outputFormat)
 {
@@ -100,7 +100,7 @@ bool QnMultiserverAnalyticsLookupDetectedObjects::deserializeOutputFormat(
     return true;
 }
 
-bool QnMultiserverAnalyticsLookupDetectedObjects::deserializeRequest(
+bool QnMultiserverAnalyticsLookupObjectTracks::deserializeRequest(
     const QnRequestParamList& params,
     const QByteArray& body,
     const QByteArray& srcBodyContentType,
@@ -124,7 +124,7 @@ bool QnMultiserverAnalyticsLookupDetectedObjects::deserializeRequest(
     }
 }
 
-nx::network::http::StatusCode::Value QnMultiserverAnalyticsLookupDetectedObjects::execute(
+nx::network::http::StatusCode::Value QnMultiserverAnalyticsLookupObjectTracks::execute(
     const nx::analytics::db::Filter& filter,
     bool isLocal,
     Qn::SerializationFormat outputFormat,
@@ -188,7 +188,7 @@ nx::network::http::StatusCode::Value QnMultiserverAnalyticsLookupDetectedObjects
 }
 
 nx::network::http::StatusCode::Value
-    QnMultiserverAnalyticsLookupDetectedObjects::lookupOnEveryOtherServer(
+    QnMultiserverAnalyticsLookupObjectTracks::lookupOnEveryOtherServer(
         const nx::analytics::db::Filter& filter,
         std::vector<nx::analytics::db::LookupResult>* lookupResults)
 {
@@ -209,7 +209,7 @@ nx::network::http::StatusCode::Value
 
         serverConnections.push_back(
             std::make_unique<rest::ServerConnection>(m_commonModule, server->getId()));
-        serverConnections.back()->lookupDetectedObjects(
+        serverConnections.back()->lookupObjectTracks(
             filter,
             true /*isLocal*/,
             [&requestResultQueue](
@@ -236,7 +236,7 @@ nx::network::http::StatusCode::Value
 }
 
 nx::analytics::db::LookupResult
-    QnMultiserverAnalyticsLookupDetectedObjects::mergeResults(
+    QnMultiserverAnalyticsLookupObjectTracks::mergeResults(
         std::vector<nx::analytics::db::LookupResult> lookupResults,
         Qt::SortOrder resultSortOrder)
 {
@@ -251,19 +251,19 @@ nx::analytics::db::LookupResult
 
     std::sort(
         aggregatedResult.begin(), aggregatedResult.end(),
-        [resultSortOrder](const DetectedObject& left, const DetectedObject& right)
+        [resultSortOrder](const ObjectTrack& left, const ObjectTrack& right)
         {
             if (resultSortOrder == Qt::SortOrder::AscendingOrder)
-                return left.firstAppearanceTimeUsec < right.firstAppearanceTimeUsec;
+                return left.firstAppearanceTimeUs < right.firstAppearanceTimeUs;
             else
-                return left.firstAppearanceTimeUsec > right.firstAppearanceTimeUsec;
+                return left.firstAppearanceTimeUs > right.firstAppearanceTimeUs;
         });
 
     return aggregatedResult;
 }
 
 template<typename T>
-QByteArray QnMultiserverAnalyticsLookupDetectedObjects::serializeOutputData(
+QByteArray QnMultiserverAnalyticsLookupObjectTracks::serializeOutputData(
     const T& output,
     Qn::SerializationFormat outputFormat)
 {

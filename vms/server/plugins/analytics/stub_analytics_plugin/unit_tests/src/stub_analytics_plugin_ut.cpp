@@ -162,7 +162,7 @@ public:
     Action(): m_params(makePtr<StringMap>()) {}
 
     virtual const char* actionId() const override { return m_actionId.c_str(); }
-    virtual Uuid objectId() const override { return m_objectId; }
+    virtual Uuid objectTrackId() const override { return m_objectTrackId; }
     virtual Uuid deviceId() const override { return m_deviceId; }
     virtual IObjectTrackInfo* objectTrackInfo() const override { return nullptr; }
     virtual int64_t timestampUs() const override { return m_timestampUs; }
@@ -220,7 +220,7 @@ public:
 
 public:
     std::string m_actionId;
-    Uuid m_objectId;
+    Uuid m_objectTrackId;
     Uuid m_deviceId;
     int64_t m_timestampUs = 0;
     bool m_handleResultCalled = false;
@@ -263,7 +263,7 @@ static void testExecuteActionAddPerson(IEngine* engine)
 {
     const auto action = makePtr<Action>();
     action->m_actionId = "nx.stub.addPerson";
-    action->m_objectId = Uuid();
+    action->m_objectTrackId = Uuid();
     action->m_expectedNonNullActionUrl = true;
 
     const VoidResultHolder result = engine->executeAction(action.get());

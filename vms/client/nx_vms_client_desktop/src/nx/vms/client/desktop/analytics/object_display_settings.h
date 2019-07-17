@@ -17,11 +17,11 @@ public:
     virtual ~ObjectDisplaySettings() override;
 
     QColor objectColor(const QString& objectTypeId);
-    QColor objectColor(const nx::common::metadata::DetectedObject& object);
+    QColor objectColor(const nx::common::metadata::ObjectMetadata& object);
     std::vector<nx::common::metadata::Attribute> briefAttributes(
-        const nx::common::metadata::DetectedObject& object) const;
+        const nx::common::metadata::ObjectMetadata& object) const;
     std::vector<nx::common::metadata::Attribute> visibleAttributes(
-        const nx::common::metadata::DetectedObject& object) const;
+        const nx::common::metadata::ObjectMetadata& object) const;
 
 private:
     class Private;

@@ -6,44 +6,44 @@ namespace nx::analytics::db {
 
 static constexpr int kCacheSize = 1001;
 
-ObjectGroupDao::ObjectGroupDao()
+ObjectTrackGroupDao::ObjectTrackGroupDao()
 {
     m_groupCache.setMaxCost(kCacheSize);
 }
 
-int64_t ObjectGroupDao::insertOrFetchGroup(
+int64_t ObjectTrackGroupDao::insertOrFetchGroup(
     nx::sql::QueryContext* queryContext,
-    const std::set<int64_t>& objectIds)
+    const std::set<int64_t>& trackIds)
 {
-    if (objectIds.empty())
+    if (trackIds.empty())
         return -1;
 
-    if (int64_t * id = m_groupCache.object(objectIds);
+    if (int64_t * id = m_groupCache.object(trackIds);
         id != nullptr)
     {
         // Found in the cache.
         return *id;
     }
 
-    const auto groupId = saveToDb(queryContext, objectIds);
+    const auto groupId = saveToDb(queryContext, trackIds);
 
     m_groupCache.insert(
-        objectIds,
+        trackIds,
         std::make_unique<int64_t>(groupId).release());
 
     queryContext->transaction()->addOnTransactionCompletionHandler(
-        [this, objectIds](nx::sql::DBResult result)
+        [this, trackIds](nx::sql::DBResult result)
         {
             if (result != nx::sql::DBResult::ok)
-                m_groupCache.remove(objectIds);
+                m_groupCache.remove(trackIds);
         });
 
     return groupId;
 }
 
-int64_t ObjectGroupDao::saveToDb(
+int64_t ObjectTrackGroupDao::saveToDb(
     nx::sql::QueryContext* queryContext,
-    const std::set<int64_t>& objectIds)
+    const std::set<int64_t>& trackIds)
 {
     auto query = queryContext->connection()->createQuery();
     query->prepare(R"sql(
@@ -51,7 +51,7 @@ int64_t ObjectGroupDao::saveToDb(
     )sql");
 
     query->bindValue(0, -1);
-    query->bindValue(1, (long long) *objectIds.begin());
+    query->bindValue(1, (long long) *trackIds.begin());
     query->exec();
 
     const auto groupId = query->lastInsertId().toLongLong();
@@ -61,7 +61,7 @@ int64_t ObjectGroupDao::saveToDb(
         "UPDATE object_group SET group_id = ? WHERE rowid = ?",
         groupId, groupId);
 
-    for (auto it = std::next(objectIds.begin()); it != objectIds.end(); ++it)
+    for (auto it = std::next(trackIds.begin()); it != trackIds.end(); ++it)
     {
         query->bindValue(0, groupId);
         query->bindValue(1, (long long)* it);

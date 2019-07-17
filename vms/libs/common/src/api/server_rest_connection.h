@@ -382,7 +382,7 @@ public:
     /** Get statistics for server health monitor. */
     Handle getStatistics(GetCallback callback, QThread* targetThread = nullptr);
 
-    Handle lookupDetectedObjects(
+    Handle lookupObjectTracks(
         const nx::analytics::db::Filter& request,
         bool isLocal,
         Result<nx::analytics::db::LookupResult>::type callback,

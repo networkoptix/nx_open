@@ -38,29 +38,29 @@ QString toString(const Attribute& attribute)
 
 //-------------------------------------------------------------------------------------------------
 
-bool operator==(const DetectedObject& left, const DetectedObject& right)
+bool operator==(const ObjectMetadata& left, const ObjectMetadata& right)
 {
     return left.objectTypeId == right.objectTypeId
-        && left.objectId == right.objectId
+        && left.trackId == right.trackId
         && equalWithPrecision(left.boundingBox, right.boundingBox, kCoordinateDecimalDigits)
-        && left.labels == right.labels;
+        && left.attributes == right.attributes;
 }
 
-QString toString(const DetectedObject& object)
+QString toString(const ObjectMetadata& objectMetadata)
 {
     QString s =
-        "x " + QString::number(object.boundingBox.x())
-        + ", y " + QString::number(object.boundingBox.y())
-        + ", width " + QString::number(object.boundingBox.width())
-        + ", height " + QString::number(object.boundingBox.height())
-        + ", id " + object.objectId.toString()
-        + ", typeId " + object.objectTypeId
+        "x " + QString::number(objectMetadata.boundingBox.x())
+        + ", y " + QString::number(objectMetadata.boundingBox.y())
+        + ", width " + QString::number(objectMetadata.boundingBox.width())
+        + ", height " + QString::number(objectMetadata.boundingBox.height())
+        + ", trackId " + objectMetadata.trackId.toString()
+        + ", typeId " + objectMetadata.objectTypeId
         + ", attributes {";
 
     const QRegularExpression kExpectedCharsOnlyRegex("\\A[A-Za-z_0-9.]+\\z");
 
     bool isFirstAttribute = true;
-    for (const auto& attribute: object.labels)
+    for (const auto& attribute: objectMetadata.attributes)
     {
         if (isFirstAttribute)
             isFirstAttribute = false;
@@ -80,75 +80,76 @@ QString toString(const DetectedObject& object)
     }
 
     s += "}";
-    s += QString(", isBestShot ") + (object.bestShot ? "true" : "false");
+    s += QString(", isBestShot ") + (objectMetadata.bestShot ? "true" : "false");
     return s;
 }
 
 //-------------------------------------------------------------------------------------------------
 
-bool operator<(const DetectionMetadataPacket& first, const DetectionMetadataPacket& other)
+bool operator<(const ObjectMetadataPacket& first, const ObjectMetadataPacket& other)
 {
-    return first.timestampUsec < other.timestampUsec;
+    return first.timestampUs < other.timestampUs;
 }
 
-bool operator<(std::chrono::microseconds first, const DetectionMetadataPacket& second)
+bool operator<(std::chrono::microseconds first, const ObjectMetadataPacket& second)
 {
-    return first.count() < second.timestampUsec;
+    return first.count() < second.timestampUs;
 }
 
-QString toString(const DetectionMetadataPacket& packet)
+QString toString(const ObjectMetadataPacket& packet)
 {
-    QString s = lit("PTS ") + QString::number(packet.timestampUsec)
-        + lit(", durationUs ") + QString::number(packet.durationUsec)
+    QString s = lit("PTS ") + QString::number(packet.timestampUs)
+        + lit(", durationUs ") + QString::number(packet.durationUs)
         + lit(", deviceId ") + packet.deviceId.toString()
-        + lit(", objects: ") + QString::number(packet.objects.size()) + lit("\n");
+        + lit(", objects: ") + QString::number(packet.objectMetadataList.size()) + lit("\n");
 
-    for (const auto& object: packet.objects)
+    for (const auto& object: packet.objectMetadataList)
         s += "    " + toString(object) + "\n";
 
     return s;
 }
 
-::std::ostream& operator<<(::std::ostream& os, const DetectionMetadataPacket& packet)
+::std::ostream& operator<<(::std::ostream& os, const ObjectMetadataPacket& packet)
 {
     return os << toString(packet).toStdString();
 }
 
-QnCompressedMetadataPtr toMetadataPacket(
-    const DetectionMetadataPacket& detectionPacket)
+QnCompressedMetadataPtr toCompressedMetadataPacket(
+    const ObjectMetadataPacket& packet)
 {
     auto metadataPacket = std::make_shared<QnCompressedMetadata>(
         MetadataType::ObjectDetection);
-    metadataPacket->setTimestampUsec(detectionPacket.timestampUsec);
-    metadataPacket->setDurationUsec(detectionPacket.durationUsec);
-    metadataPacket->setData(QnUbjson::serialized(detectionPacket));
+    metadataPacket->setTimestampUsec(packet.timestampUs);
+    metadataPacket->setDurationUsec(packet.durationUs);
+    metadataPacket->setData(QnUbjson::serialized(packet));
     return metadataPacket;
 }
 
-DetectionMetadataPacketPtr fromMetadataPacket(const QnConstCompressedMetadataPtr& compressedMetadata)
+ObjectMetadataPacketPtr fromCompressedMetadataPacket(
+    const QnConstCompressedMetadataPtr& compressedMetadata)
 {
     if (!compressedMetadata)
-        return DetectionMetadataPacketPtr();
+        return ObjectMetadataPacketPtr();
 
-    DetectionMetadataPacketPtr metadata(new DetectionMetadataPacket);
+    ObjectMetadataPacketPtr metadata(new ObjectMetadataPacket);
 
-    *metadata = QnUbjson::deserialized<DetectionMetadataPacket>(
+    *metadata = QnUbjson::deserialized<ObjectMetadataPacket>(
         QByteArray::fromRawData(compressedMetadata->data(), int(compressedMetadata->dataSize())));
 
     return metadata;
 }
 
-bool operator==(const DetectionMetadataPacket& left, const DetectionMetadataPacket& right)
+bool operator==(const ObjectMetadataPacket& left, const ObjectMetadataPacket& right)
 {
     return left.deviceId == right.deviceId
-        && left.timestampUsec == right.timestampUsec
-        && left.durationUsec == right.durationUsec
-        && left.objects == right.objects;
+        && left.timestampUs == right.timestampUs
+        && left.durationUs == right.durationUs
+        && left.objectMetadataList == right.objectMetadataList;
 }
 
-bool operator<(const DetectionMetadataPacket& first, std::chrono::microseconds second)
+bool operator<(const ObjectMetadataPacket& first, std::chrono::microseconds second)
 {
-    return first.timestampUsec < second.count();
+    return first.timestampUs < second.count();
 }
 
 } // namespace metadata

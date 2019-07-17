@@ -39,7 +39,7 @@ public:
 private:
     std::string m_typeId;
     float m_confidence = 1.0;
-    Uuid m_trackId;
+    Uuid m_objectTrackId;
     std::string m_subtype;
     std::vector<nx::sdk::Ptr<Attribute>> m_attributes;
     Rect m_rect;

@@ -11,7 +11,7 @@ namespace nx::analytics::db {
 static const auto kMaxStreamingDuration = std::chrono::hours(24) * 30 * 12 * 7;
 static const auto kUsecPerMs = 1000;
 
-DetectedObjectsStreamer::DetectedObjectsStreamer(
+ObjectMetadataStreamer::ObjectMetadataStreamer(
     AbstractEventsStorage* storage,
     const QnUuid& deviceId)
     :
@@ -20,12 +20,12 @@ DetectedObjectsStreamer::DetectedObjectsStreamer(
 {
 }
 
-DetectedObjectsStreamer::~DetectedObjectsStreamer()
+ObjectMetadataStreamer::~ObjectMetadataStreamer()
 {
     m_asyncOperationGuard->terminate();
 }
 
-QnAbstractCompressedMetadataPtr DetectedObjectsStreamer::getMotionData(qint64 timeUsec)
+QnAbstractCompressedMetadataPtr ObjectMetadataStreamer::getMotionData(qint64 timeUsec)
 {
     NX_VERBOSE(this, lm("Requested timestamp %1").args(timeUsec / kUsecPerMs));
 
@@ -34,24 +34,24 @@ QnAbstractCompressedMetadataPtr DetectedObjectsStreamer::getMotionData(qint64 ti
     if (!readPacketForTimestamp(timeUsec))
         return nullptr;
 
-    if (m_packetCache.front()->timestampUsec > timeUsec)
+    if (m_packetCache.front()->timestampUs > timeUsec)
     {
         NX_VERBOSE(this, lm("Delaying packet with timestamp %1 vs requested %2")
-            .args(m_packetCache.front()->timestampUsec / kUsecPerMs, timeUsec / kUsecPerMs));
+            .args(m_packetCache.front()->timestampUs / kUsecPerMs, timeUsec / kUsecPerMs));
         return nullptr;
     }
 
     NX_VERBOSE(this, lm("Returning packet with timestamp %1 vs %2 requested. Difference %3 ms. packet %4")
-        .args(m_packetCache.front()->timestampUsec / kUsecPerMs, timeUsec / kUsecPerMs,
-            (timeUsec - m_packetCache.front()->timestampUsec) / kUsecPerMs,
+        .args(m_packetCache.front()->timestampUs / kUsecPerMs, timeUsec / kUsecPerMs,
+            (timeUsec - m_packetCache.front()->timestampUs) / kUsecPerMs,
             *m_packetCache.front()));
 
     auto resultPacket = std::move(m_packetCache.front());
     m_packetCache.pop_front();
-    return nx::common::metadata::toMetadataPacket(*resultPacket);
+    return nx::common::metadata::toCompressedMetadataPacket(*resultPacket);
 }
 
-void DetectedObjectsStreamer::reinitializeCursorIfTimeDiscontinuityPresent(qint64 timeUsec)
+void ObjectMetadataStreamer::reinitializeCursorIfTimeDiscontinuityPresent(qint64 timeUsec)
 {
     using namespace std::chrono;
 
@@ -74,7 +74,7 @@ void DetectedObjectsStreamer::reinitializeCursorIfTimeDiscontinuityPresent(qint6
     m_prevRequestedTimestamp = timeUsec;
 }
 
-bool DetectedObjectsStreamer::readPacketForTimestamp(qint64 timeUsec)
+bool ObjectMetadataStreamer::readPacketForTimestamp(qint64 timeUsec)
 {
     using namespace std::chrono;
 
@@ -85,14 +85,14 @@ bool DetectedObjectsStreamer::readPacketForTimestamp(qint64 timeUsec)
 
     for (;;)
     {
-        if (!m_packetCache.empty() && m_packetCache.back()->timestampUsec > timeUsec)
+        if (!m_packetCache.empty() && m_packetCache.back()->timestampUs > timeUsec)
             break;
 
         auto detectionPacket = m_cursor->next();
         if (detectionPacket)
         {
             NX_VERBOSE(this, lm("Read packet with timestamp %1")
-                .args(detectionPacket->timestampUsec / kUsecPerMs));
+                .args(detectionPacket->timestampUs / kUsecPerMs));
             m_packetCache.push_back(detectionPacket);
         }
 
@@ -109,11 +109,11 @@ bool DetectedObjectsStreamer::readPacketForTimestamp(qint64 timeUsec)
             auto nextIt = std::next(it);
             if (nextIt == m_packetCache.end())
                 break;
-            if ((*nextIt)->timestampUsec > timeUsec)
+            if ((*nextIt)->timestampUs > timeUsec)
                 break;
             NX_VERBOSE(this, "Skipping packet with timestamp %1 since it is in the past for %2",
-                milliseconds((*it)->timestampUsec / kUsecPerMs), 
-                milliseconds((timeUsec - (*nextIt)->timestampUsec) / kUsecPerMs));
+                milliseconds((*it)->timestampUs / kUsecPerMs),
+                milliseconds((timeUsec - (*nextIt)->timestampUs) / kUsecPerMs));
             it = m_packetCache.erase(it);
         }
 
@@ -125,17 +125,17 @@ bool DetectedObjectsStreamer::readPacketForTimestamp(qint64 timeUsec)
     return true;
 }
 
-ResultCode DetectedObjectsStreamer::createCursor(
+ResultCode ObjectMetadataStreamer::createCursor(
     std::chrono::milliseconds startTimestamp)
 {
     using namespace std::placeholders;
 
     auto result = makeSyncCall<ResultCode>(
-        std::bind(&DetectedObjectsStreamer::createCursorAsync, this, startTimestamp, _1));
+        std::bind(&ObjectMetadataStreamer::createCursorAsync, this, startTimestamp, _1));
     return std::get<0>(result);
 }
 
-void DetectedObjectsStreamer::createCursorAsync(
+void ObjectMetadataStreamer::createCursorAsync(
     std::chrono::milliseconds startTimestamp,
     nx::utils::MoveOnlyFunc<void(ResultCode)> handler)
 {
@@ -147,7 +147,7 @@ void DetectedObjectsStreamer::createCursorAsync(
     filter.sortOrder = Qt::SortOrder::AscendingOrder;
     filter.timePeriod.setStartTime(startTimestamp);
     filter.timePeriod.setDuration(kMaxStreamingDuration);
-    filter.maxTrackSize = 0;
+    filter.maxObjectTrackSize = 0;
     m_storage->createLookupCursor(
         std::move(filter),
         [this, sharedGuard = m_asyncOperationGuard.sharedGuard(), handler = std::move(handler)](

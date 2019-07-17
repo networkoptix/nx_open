@@ -8,11 +8,11 @@
 class QnCommonModule;
 
 // TODO: Rename with suffix "RestHandler".
-class QnMultiserverAnalyticsLookupDetectedObjects:
+class QnMultiserverAnalyticsLookupObjectTracks:
     public QnRestRequestHandler
 {
 public:
-    QnMultiserverAnalyticsLookupDetectedObjects(
+    QnMultiserverAnalyticsLookupObjectTracks(
         QnCommonModule* commonModule,
         nx::analytics::db::AbstractEventsStorage* eventStorage);
 

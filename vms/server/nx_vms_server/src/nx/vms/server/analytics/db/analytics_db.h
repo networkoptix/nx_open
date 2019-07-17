@@ -36,7 +36,7 @@ public:
 
     virtual bool initialize(const Settings& settings) override;
 
-    virtual void save(common::metadata::ConstDetectionMetadataPacketPtr packet) override;
+    virtual void save(common::metadata::ConstObjectMetadataPacketPtr packet) override;
 
     virtual void createLookupCursor(
         Filter filter,
@@ -72,9 +72,9 @@ private:
     ObjectTypeDao m_objectTypeDao;
     DeviceDao m_deviceDao;
     std::unique_ptr<AnalyticsArchiveDirectory> m_analyticsArchiveDirectory;
-    ObjectCache m_objectCache;
+    ObjectTrackCache m_objectTrackCache;
     ObjectTrackAggregator m_trackAggregator;
-    ObjectGroupDao m_objectGroupDao;
+    ObjectTrackGroupDao m_trackGroupDao;
 
     bool ensureDbDirIsWritable(const QString& path);
 
@@ -88,21 +88,21 @@ private:
      */
     void insertEvent(
         nx::sql::QueryContext* queryContext,
-        const common::metadata::DetectionMetadataPacket& packet,
-        const common::metadata::DetectedObject& detectedObject,
+        const common::metadata::ObjectMetadataPacket& packet,
+        const common::metadata::ObjectMetadata& objectMetadata,
         int64_t attributesId,
         int64_t timePeriodId);
 
     void updateDictionariesIfNeeded(
         nx::sql::QueryContext* queryContext,
-        const common::metadata::DetectionMetadataPacket& packet,
-        const common::metadata::DetectedObject& detectedObject);
+        const common::metadata::ObjectMetadataPacket& packet,
+        const common::metadata::ObjectMetadata& objectMetadata);
 
     void savePacketDataToCache(
         const QnMutexLockerBase& /*lock*/,
-        const common::metadata::ConstDetectionMetadataPacketPtr& packet);
+        const common::metadata::ConstObjectMetadataPacketPtr& packet);
 
-    DetectionDataSaver takeDataToSave(const QnMutexLockerBase& /*lock*/, bool flushData);
+    ObjectTrackDataSaver takeDataToSave(const QnMutexLockerBase& /*lock*/, bool flushData);
 
     void reportCreateCursorCompletion(
         sql::DBResult resultCode,

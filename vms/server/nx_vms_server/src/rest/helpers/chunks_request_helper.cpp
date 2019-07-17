@@ -73,7 +73,7 @@ QnTimePeriodList QnChunksRequestHelper::loadAnalyticsTimePeriods(
         filter = *request.analyticsStorageFilter;
     filter.timePeriod.setStartTime(milliseconds(request.startTimeMs));
     filter.timePeriod.setDuration(milliseconds(request.endTimeMs - request.startTimeMs));
-    filter.maxObjectsToSelect = request.limit;
+    filter.maxObjectTracksToSelect = request.limit;
     filter.sortOrder = request.sortOrder;
 
     filter.deviceIds.clear();

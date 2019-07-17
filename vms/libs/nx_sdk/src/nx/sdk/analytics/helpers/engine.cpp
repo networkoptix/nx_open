@@ -129,7 +129,7 @@ Result<void> Engine::executeAction(IAction* action)
     NX_OUTPUT << __func__ << "():";
     NX_OUTPUT << "{";
     NX_OUTPUT << "    actionId: " << nx::kit::utils::toString(action->actionId());
-    NX_OUTPUT << "    objectId: " << action->objectId();
+    NX_OUTPUT << "    objectTrackId: " << action->objectTrackId();
     NX_OUTPUT << "    deviceId: " << action->deviceId();
     NX_OUTPUT << "    timestampUs: " << action->timestampUs();
 
@@ -149,7 +149,7 @@ Result<void> Engine::executeAction(IAction* action)
 
     auto result = executeAction(
         action->actionId(),
-        action->objectId(),
+        action->objectTrackId(),
         action->deviceId(),
         action->timestampUs(),
         nx::sdk::toPtr(action->objectTrackInfo()),

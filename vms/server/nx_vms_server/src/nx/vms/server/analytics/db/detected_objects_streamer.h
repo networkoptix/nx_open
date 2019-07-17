@@ -13,14 +13,14 @@ namespace nx::analytics::db {
 
 class AbstractEventsStorage;
 
-class DetectedObjectsStreamer:
+class ObjectMetadataStreamer:
     public QnAbstractMotionArchiveConnection
 {
 public:
-    DetectedObjectsStreamer(
+    ObjectMetadataStreamer(
         AbstractEventsStorage* storage,
         const QnUuid& deviceId);
-    ~DetectedObjectsStreamer();
+    ~ObjectMetadataStreamer();
 
     virtual QnAbstractCompressedMetadataPtr getMotionData(qint64 timeUsec) override;
 
@@ -30,7 +30,7 @@ private:
     std::unique_ptr<AbstractCursor> m_cursor;
     nx::utils::AsyncOperationGuard m_asyncOperationGuard;
     // TODO: #ak Use cyclic array here.
-    std::deque<common::metadata::ConstDetectionMetadataPacketPtr> m_packetCache;
+    std::deque<common::metadata::ConstObjectMetadataPacketPtr> m_packetCache;
     qint64 m_prevRequestedTimestamp = -1;
 
     void reinitializeCursorIfTimeDiscontinuityPresent(qint64 timeUsec);

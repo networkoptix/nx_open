@@ -17,7 +17,7 @@ public:
     AnalyticsDbObjectCache():
         m_aggregationPeriod(std::chrono::hours(1)),
         m_maxObjectLifeTime(std::chrono::hours(10)),
-        m_objectCache(m_aggregationPeriod, m_maxObjectLifeTime),
+        m_objectTrackCache(m_aggregationPeriod, m_maxObjectLifeTime),
         m_timeShift(nx::utils::test::ClockType::steady)
     {
     }
@@ -50,13 +50,13 @@ protected:
 
     void whenFetchObjectsToInsert()
     {
-        m_objectsToInsert = m_objectCache.getObjectsToInsert();
+        m_objectsToInsert = m_objectTrackCache.getTracksToInsert();
     }
 
     void whenForceFetchingObjectToInsert()
     {
-        auto object = m_objectCache.getObjectToInsertForced(
-            m_analyticsDataPackets.front()->objects.front().objectId);
+        auto object = m_objectTrackCache.getTrackToInsertForced(
+            m_analyticsDataPackets.front()->objectMetadataList.front().trackId);
 
         if (object)
             m_objectsToInsert.push_back(std::move(*object));
@@ -64,12 +64,12 @@ protected:
 
     void whenRemovingExpiredDataFromCache()
     {
-        m_objectCache.removeExpiredData();
+        m_objectTrackCache.removeExpiredData();
     }
 
     void whenRequestObjectUpdates()
     {
-        m_objectUpdates = m_objectCache.getObjectsToUpdate();
+        m_objectUpdates = m_objectTrackCache.getTracksToUpdate();
     }
 
     void whenMoreAnalyticsEventsAdded()
@@ -78,14 +78,14 @@ protected:
         if (!m_analyticsDataPackets.empty())
         {
             packet->deviceId = m_analyticsDataPackets.back()->deviceId;
-            packet->objects.front().objectId =
-                m_analyticsDataPackets.back()->objects.front().objectId;
-            packet->objects.front().objectTypeId =
-                m_analyticsDataPackets.back()->objects.front().objectTypeId;
+            packet->objectMetadataList.front().trackId =
+                m_analyticsDataPackets.back()->objectMetadataList.front().trackId;
+            packet->objectMetadataList.front().objectTypeId =
+                m_analyticsDataPackets.back()->objectMetadataList.front().objectTypeId;
         }
 
         m_analyticsDataPackets.push_back(std::move(packet));
-        m_objectCache.add(m_analyticsDataPackets.back());
+        m_objectTrackCache.add(m_analyticsDataPackets.back());
     }
 
     void thenTheObjectInsertionIsProvided()
@@ -117,8 +117,8 @@ protected:
     {
         ASSERT_EQ(
             calcAttrDiff(
-                m_analyticsDataPackets.front()->objects.front().labels,
-                m_analyticsDataPackets.back()->objects.front().labels),
+                m_analyticsDataPackets.front()->objectMetadataList.front().attributes,
+                m_analyticsDataPackets.back()->objectMetadataList.front().attributes),
             m_objectUpdates.front().appendedAttributes);
     }
 
@@ -126,8 +126,8 @@ protected:
     {
         const auto expected =
             uniqueAttribites(
-                m_analyticsDataPackets.front()->objects.front().labels,
-                m_analyticsDataPackets.back()->objects.front().labels);
+                m_analyticsDataPackets.front()->objectMetadataList.front().attributes,
+                m_analyticsDataPackets.back()->objectMetadataList.front().attributes);
         const auto actual = m_objectUpdates.front().allAttributes;
 
         ASSERT_EQ(expected, actual);
@@ -138,12 +138,12 @@ private:
 
     const std::chrono::seconds m_aggregationPeriod;
     const std::chrono::seconds m_maxObjectLifeTime;
-    db::ObjectCache m_objectCache;
+    db::ObjectTrackCache m_objectTrackCache;
     nx::utils::test::ScopedTimeShift m_timeShift;
-    std::vector<ObjectUpdate> m_objectUpdates;
+    std::vector<ObjectTrackUpdate> m_objectUpdates;
 
-    std::vector<DetectedObject> m_objectsToInsert;
-    std::vector<common::metadata::DetectionMetadataPacketPtr> m_analyticsDataPackets;
+    std::vector<ObjectTrack> m_objectsToInsert;
+    std::vector<common::metadata::ObjectMetadataPacketPtr> m_analyticsDataPackets;
 
     Attributes calcAttrDiff(const Attributes& from, const Attributes& to)
     {

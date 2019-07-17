@@ -66,7 +66,7 @@ protected:
     /**
      * Action handler. Called when some action defined by this engine is triggered by Server.
      * @param actionId Id of the action being triggered.
-     * @param objectId Id of a metadata object for which the action has been triggered.
+     * @param objectTrackId Id of an object track for which the action has been triggered.
      * @param params If the engine manifest defines params for the action being triggered,
      *     contains their values after they are filled by the user via Client form. Otherwise,
      *     empty.
@@ -75,7 +75,7 @@ protected:
      */
     virtual Result<void> executeAction(
         const std::string& /*actionId*/,
-        Uuid /*objectId*/,
+        Uuid /*objectTrackId*/,
         Uuid /*deviceId*/,
         int64_t /*timestampUs*/,
         Ptr<IObjectTrackInfo> /*trackInfo*/,

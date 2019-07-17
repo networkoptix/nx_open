@@ -26,18 +26,18 @@ public:
         EventsStorageStub* eventsStorageStub,
         Filter filter);
 
-    virtual common::metadata::ConstDetectionMetadataPacketPtr next() override;
+    virtual common::metadata::ConstObjectMetadataPacketPtr next() override;
 
     virtual void close() override;
 
     const Filter& filter() const;
 
-    nx::utils::SyncQueue<common::metadata::ConstDetectionMetadataPacketPtr>& packetsProvidedQueue();
+    nx::utils::SyncQueue<common::metadata::ConstObjectMetadataPacketPtr>& packetsProvidedQueue();
 private:
     std::size_t m_nextPacketPosition = 0;
     EventsStorageStub* m_eventsStorageStub = nullptr;
     Filter m_filter;
-    nx::utils::SyncQueue<common::metadata::ConstDetectionMetadataPacketPtr> m_packetsProvidedQueue;
+    nx::utils::SyncQueue<common::metadata::ConstObjectMetadataPacketPtr> m_packetsProvidedQueue;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -66,19 +66,19 @@ public:
         return true;
     }
 
-    virtual void save(common::metadata::ConstDetectionMetadataPacketPtr packet) override
+    virtual void save(common::metadata::ConstObjectMetadataPacketPtr packet) override
     {
         auto it = std::upper_bound(
-            m_detectionPackets.begin(),
-            m_detectionPackets.end(),
+            m_objectMetadataPackets.begin(),
+            m_objectMetadataPackets.end(),
             packet,
-            [](const common::metadata::ConstDetectionMetadataPacketPtr& one,
-                const common::metadata::ConstDetectionMetadataPacketPtr& two)
+            [](const common::metadata::ConstObjectMetadataPacketPtr& one,
+                const common::metadata::ConstObjectMetadataPacketPtr& two)
             {
-                return one->timestampUsec < two->timestampUsec;
+                return one->timestampUs < two->timestampUs;
             });
 
-        m_detectionPackets.insert(it, std::move(packet));
+        m_objectMetadataPackets.insert(it, std::move(packet));
     }
 
     virtual void createLookupCursor(
@@ -121,29 +121,29 @@ public:
         FAIL();
     }
 
-    const std::vector<common::metadata::ConstDetectionMetadataPacketPtr>& packets() const
+    const std::vector<common::metadata::ConstObjectMetadataPacketPtr>& packets() const
     {
-        return m_detectionPackets;
+        return m_objectMetadataPackets;
     }
 
-    std::vector<common::metadata::ConstDetectionMetadataPacketPtr>& packets()
+    std::vector<common::metadata::ConstObjectMetadataPacketPtr>& packets()
     {
-        return m_detectionPackets;
+        return m_objectMetadataPackets;
     }
 
-    common::metadata::ConstDetectionMetadataPacketPtr getPacketByTimestamp(
+    common::metadata::ConstObjectMetadataPacketPtr getPacketByTimestamp(
         std::chrono::microseconds timestamp) const
     {
         auto it = std::upper_bound(
-            m_detectionPackets.begin(),
-            m_detectionPackets.end(),
+            m_objectMetadataPackets.begin(),
+            m_objectMetadataPackets.end(),
             timestamp,
             [](std::chrono::microseconds one,
-                const common::metadata::ConstDetectionMetadataPacketPtr& two)
+                const common::metadata::ConstObjectMetadataPacketPtr& two)
             {
-                return one.count() < two->timestampUsec;
+                return one.count() < two->timestampUs;
             });
-        if (it == m_detectionPackets.begin())
+        if (it == m_objectMetadataPackets.begin())
             return nullptr;
 
         return *(--it);
@@ -158,8 +158,8 @@ public:
         {
             auto packet = generateRandomPacket(1);
             packet->deviceId = deviceId;
-            packet->timestampUsec = (kInitialTimestamp + i * kTimestampStep).count();
-            m_detectionPackets.push_back(packet);
+            packet->timestampUs = (kInitialTimestamp + i * kTimestampStep).count();
+            m_objectMetadataPackets.push_back(packet);
         }
     }
     virtual bool readMinimumEventTimestamp(std::chrono::milliseconds* outResult) override
@@ -173,7 +173,7 @@ private:
     /**
      * Sorted by increasing timestamp.
      */
-    std::vector<common::metadata::ConstDetectionMetadataPacketPtr> m_detectionPackets;
+    std::vector<common::metadata::ConstObjectMetadataPacketPtr> m_objectMetadataPackets;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -187,11 +187,11 @@ Cursor::Cursor(
 {
 }
 
-common::metadata::ConstDetectionMetadataPacketPtr Cursor::next()
+common::metadata::ConstObjectMetadataPacketPtr Cursor::next()
 {
-    if (m_nextPacketPosition >= m_eventsStorageStub->m_detectionPackets.size())
+    if (m_nextPacketPosition >= m_eventsStorageStub->m_objectMetadataPackets.size())
         return nullptr;
-    auto resultPacket = m_eventsStorageStub->m_detectionPackets[m_nextPacketPosition++];
+    auto resultPacket = m_eventsStorageStub->m_objectMetadataPackets[m_nextPacketPosition++];
     m_packetsProvidedQueue.push(resultPacket);
     return resultPacket;
 }
@@ -205,7 +205,7 @@ const Filter& Cursor::filter() const
     return m_filter;
 }
 
-nx::utils::SyncQueue<common::metadata::ConstDetectionMetadataPacketPtr>&
+nx::utils::SyncQueue<common::metadata::ConstObjectMetadataPacketPtr>&
     Cursor::packetsProvidedQueue()
 {
     return m_packetsProvidedQueue;
@@ -215,15 +215,15 @@ nx::utils::SyncQueue<common::metadata::ConstDetectionMetadataPacketPtr>&
 
 //-------------------------------------------------------------------------------------------------
 
-class DetectedObjectsStreamer:
+class ObjectMetadataStreamer:
     public ::testing::Test
 {
 public:
-    DetectedObjectsStreamer():
+    ObjectMetadataStreamer():
         m_deviceId(QnUuid::createUuid()),
         m_eventsStorageStub(&m_createdCursors)
     {
-        m_streamer = std::make_unique<db::DetectedObjectsStreamer>(
+        m_streamer = std::make_unique<db::ObjectMetadataStreamer>(
             &m_eventsStorageStub,
             m_deviceId);
 
@@ -250,14 +250,14 @@ protected:
     void whenRequestPacketUsingTimestampSmallerThenNextPacketAvailable()
     {
         readPacket(std::chrono::microseconds(
-            m_eventsStorageStub.packets()[0]->timestampUsec - 1));
+            m_eventsStorageStub.packets()[0]->timestampUs - 1));
     }
 
     void whenReadPacketsInALoopUsingNextPacketTimestamp()
     {
         for (const auto& nextExpectedPacket: m_eventsStorageStub.packets())
         {
-            auto packet = m_streamer->getMotionData(nextExpectedPacket->timestampUsec);
+            auto packet = m_streamer->getMotionData(nextExpectedPacket->timestampUs);
             if (!packet)
                 break;
             m_packetsRead.push(packet);
@@ -267,7 +267,7 @@ protected:
     void whenRequestMultiplePacketsUsingTimestampsWithGap(
         std::chrono::milliseconds timestampGap)
     {
-        std::chrono::microseconds timestamp(m_eventsStorageStub.packets()[0]->timestampUsec);
+        std::chrono::microseconds timestamp(m_eventsStorageStub.packets()[0]->timestampUs);
         readPacket(timestamp);
 
         timestamp += timestampGap;
@@ -277,8 +277,7 @@ protected:
     void whenRequestPacketUsingSomeTimestamp()
     {
         readPacket(std::chrono::microseconds(
-            m_eventsStorageStub.packets()[m_eventsStorageStub.packets().size() / 2]
-                ->timestampUsec));
+            m_eventsStorageStub.packets()[m_eventsStorageStub.packets().size() / 2]->timestampUs));
     }
 
     void whenRequestPacketUsingMaxTimestamp()
@@ -291,7 +290,7 @@ protected:
         for (auto timestamp = m_initialRequestTimestamp;; timestamp += m_requestTimestampStep)
         {
             auto expectedPacket =
-                nx::common::metadata::toMetadataPacket(
+                nx::common::metadata::toCompressedMetadataPacket(
                     *m_eventsStorageStub.getPacketByTimestamp(timestamp));
             if (m_expectedPackets.empty() ||
                 expectedPacket->timestamp != m_expectedPackets.back()->timestamp)
@@ -364,7 +363,7 @@ protected:
         std::vector<QnAbstractCompressedMetadataPtr> packetsExpected;
         auto packet = m_eventsStorageStub.getPacketByTimestamp(m_lastRequestedTimestamp);
         if (packet)
-            packetsExpected.push_back(nx::common::metadata::toMetadataPacket(*packet));
+            packetsExpected.push_back(nx::common::metadata::toCompressedMetadataPacket(*packet));
 
         assertEqual(packetsExpected, packetsRead);
     }
@@ -382,7 +381,7 @@ private:
     const QnUuid m_deviceId;
     nx::utils::SyncQueue<Cursor*> m_createdCursors;
     EventsStorageStub m_eventsStorageStub;
-    std::unique_ptr<db::DetectedObjectsStreamer> m_streamer;
+    std::unique_ptr<db::ObjectMetadataStreamer> m_streamer;
     std::chrono::microseconds m_lastRequestedTimestamp;
     nx::utils::SyncQueue<QnAbstractCompressedMetadataPtr> m_packetsRead;
     QnAbstractCompressedMetadataPtr m_prevPacketRead;
@@ -398,7 +397,7 @@ private:
     }
 
     void assertEqual(
-        const std::vector<common::metadata::ConstDetectionMetadataPacketPtr>& expected,
+        const std::vector<common::metadata::ConstObjectMetadataPacketPtr>& expected,
         const std::vector<QnAbstractCompressedMetadataPtr>& actual)
     {
         ASSERT_EQ(expected.size(), actual.size());
@@ -407,11 +406,11 @@ private:
     }
 
     void assertEqual(
-        const common::metadata::DetectionMetadataPacket& expected,
+        const common::metadata::ObjectMetadataPacket& expected,
         const QnAbstractCompressedMetadata& actual)
     {
-        ASSERT_EQ(expected.timestampUsec, actual.timestamp);
-        ASSERT_EQ(expected.durationUsec, actual.m_duration);
+        ASSERT_EQ(expected.timestampUs, actual.timestamp);
+        ASSERT_EQ(expected.durationUs, actual.m_duration);
     }
 
     void assertEqual(
@@ -430,7 +429,7 @@ private:
 
 //-------------------------------------------------------------------------------------------------
 
-TEST_F(DetectedObjectsStreamer, creates_cursor_with_proper_time_period_filter)
+TEST_F(ObjectMetadataStreamer, creates_cursor_with_proper_time_period_filter)
 {
     whenRequestPacket();
 
@@ -438,7 +437,7 @@ TEST_F(DetectedObjectsStreamer, creates_cursor_with_proper_time_period_filter)
     andCursorFilterIsCorrect();
 }
 
-TEST_F(DetectedObjectsStreamer, returns_null_if_next_packet_timestamp_exceeds_requested_one)
+TEST_F(ObjectMetadataStreamer, returns_null_if_next_packet_timestamp_exceeds_requested_one)
 {
     whenRequestPacketUsingTimestampSmallerThenNextPacketAvailable();
 
@@ -446,39 +445,39 @@ TEST_F(DetectedObjectsStreamer, returns_null_if_next_packet_timestamp_exceeds_re
     thenEmptyPacketIsReturned();
 }
 
-TEST_F(DetectedObjectsStreamer, reads_all_available_packets)
+TEST_F(ObjectMetadataStreamer, reads_all_available_packets)
 {
     whenReadPacketsInALoopUsingNextPacketTimestamp();
     thenAllPacketsAreRead();
 }
 
-TEST_F(DetectedObjectsStreamer, acquires_new_cursor_in_case_of_a_gap_in_timestamp)
+TEST_F(ObjectMetadataStreamer, acquires_new_cursor_in_case_of_a_gap_in_timestamp)
 {
     whenRequestMultiplePacketsUsingTimestampsWithGap(
         MAX_FRAME_DURATION + std::chrono::milliseconds(1));
     thenCursorIsRecreatedUsingNewTimestamp();
 }
 
-TEST_F(DetectedObjectsStreamer, acquires_new_cursor_if_timestamp_jumps_backward)
+TEST_F(ObjectMetadataStreamer, acquires_new_cursor_if_timestamp_jumps_backward)
 {
     whenRequestMultiplePacketsUsingTimestampsWithGap(
         std::chrono::milliseconds(-100));
     thenCursorIsRecreatedUsingNewTimestamp();
 }
 
-TEST_F(DetectedObjectsStreamer, returns_closest_packet_to_the_requested_time_skipping_some_if_needed)
+TEST_F(ObjectMetadataStreamer, returns_closest_packet_to_the_requested_time_skipping_some_if_needed)
 {
     whenRequestPacketUsingSomeTimestamp();
     thenOnlyNearestPacketIsProvided();
 }
 
-TEST_F(DetectedObjectsStreamer, returns_only_last_packet_if_needed)
+TEST_F(ObjectMetadataStreamer, returns_only_last_packet_if_needed)
 {
     whenRequestPacketUsingMaxTimestamp();
     thenOnlyNearestPacketIsProvided();
 }
 
-TEST_F(DetectedObjectsStreamer, skips_packets_when_timestamp_skips_every_second_packet)
+TEST_F(ObjectMetadataStreamer, skips_packets_when_timestamp_skips_every_second_packet)
 {
     setFirstRequestTimestamp(kInitialTimestamp);
     setRequestTimestampStep(kTimestampStep * 2);
@@ -490,7 +489,7 @@ TEST_F(DetectedObjectsStreamer, skips_packets_when_timestamp_skips_every_second_
 //-------------------------------------------------------------------------------------------------
 // Error handling.
 
-// TEST_F(DetectedObjectsStreamer, removes_cursor_in_case_of_eof_or_error)
-// TEST_F(DetectedObjectsStreamer, cursor_recreated_after_failure_not_too_often)
+// TEST_F(ObjectMetadataStreamer, removes_cursor_in_case_of_eof_or_error)
+// TEST_F(ObjectMetadataStreamer, cursor_recreated_after_failure_not_too_often)
 
 } // namespace nx::analytics::db::test

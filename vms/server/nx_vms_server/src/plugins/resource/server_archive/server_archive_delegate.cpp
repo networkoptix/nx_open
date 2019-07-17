@@ -472,7 +472,7 @@ QnAbstractMotionArchiveConnectionPtr QnServerArchiveDelegate::getAnalyticsConnec
 {
     QnMutexLocker lock(&m_mutex);
 
-    return std::make_shared<nx::analytics::db::DetectedObjectsStreamer>(
+    return std::make_shared<nx::analytics::db::ObjectMetadataStreamer>(
         m_mediaServerModule->analyticsEventsStorage(),
         m_resource->getId());
 }

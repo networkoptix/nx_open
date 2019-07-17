@@ -29,7 +29,7 @@ public:
         const QString& additionalFrameInfo = QString());
 
     void pushObjectMetadata(
-        const nx::common::metadata::DetectionMetadataPacket& metadataPacket,
+        const nx::common::metadata::ObjectMetadataPacket& metadataPacket,
         const QString& additionalObjectMetadataInfo = QString());
 
 private:
@@ -37,7 +37,7 @@ private:
 
     QString buildFrameLogString(const FrameInfo& frameInfo, const QString& additionalInfo);
     QString buildObjectMetadataLogString(
-        const nx::common::metadata::DetectionMetadataPacket& metadataPacket,
+        const nx::common::metadata::ObjectMetadataPacket& metadataPacket,
         const QString& additionalInfo);
 
 private:

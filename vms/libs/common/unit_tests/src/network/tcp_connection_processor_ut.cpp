@@ -49,7 +49,7 @@ protected:
         static const int kSteps = 64;
         std::vector<char> buffer(kTotalTestBytes / kSteps);
         for (int i = 0; i < kSteps; ++i)
-            ASSERT_TRUE(sendData(buffer.data(), buffer.size()));
+            ASSERT_TRUE(sendData(buffer.data(), (int) buffer.size()));
     }
 
 };

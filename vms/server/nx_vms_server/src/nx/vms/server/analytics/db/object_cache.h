@@ -14,10 +14,10 @@ namespace nx::analytics::db {
 
 static constexpr int64_t kInvalidDbId = -1;
 
-struct ObjectUpdate
+struct ObjectTrackUpdate
 {
     int64_t dbId = kInvalidDbId;
-    QnUuid objectId;
+    QnUuid trackId;
     std::vector<ObjectPosition> appendedTrack;
     /** Attributes that were added since the last insert/update. */
     std::vector<common::metadata::Attribute> appendedAttributes;
@@ -28,7 +28,7 @@ struct ObjectUpdate
 /**
  * NOTE: All methods of this class are thread-safe.
  */
-class ObjectCache
+class ObjectTrackCache
 {
 public:
     /**
@@ -36,51 +36,52 @@ public:
      * inserts to the DB.
      *
      * Object is removed from the cache if:
-     * - every change made to the object was reported using getObjectsToInsert and getObjectsToUpdate
+     * - every change made to the object was reported using getTracksToInsert and getTracksToUpdate
      * - AND there was no new object data during the aggregationPeriod
      * OR
-     * - there was no new object data during the maxObjectLifetime period regardless of previous conditions.
+     * - there was no new object data during the maxObjectLifetime period regardless of previous
+     * conditions.
      */
-    ObjectCache(
+    ObjectTrackCache(
         std::chrono::milliseconds aggregationPeriod,
         std::chrono::milliseconds maxObjectLifetime);
 
-    void add(const common::metadata::ConstDetectionMetadataPacketPtr& packet);
+    void add(const common::metadata::ConstObjectMetadataPacketPtr& packet);
 
     /**
      * Objects are provided only after the aggregation period passes.
      * @param flush If true, all available data is provided.
      * @return Objects that are to be inserted.
      */
-    std::vector<DetectedObject> getObjectsToInsert(bool flush = false);
+    std::vector<ObjectTrack> getTracksToInsert(bool flush = false);
 
     /**
      * Provides new object regardless of the aggregation period.
      * NOTE: Should be avoided when possible.
      */
-    std::optional<DetectedObject> getObjectToInsertForced(const QnUuid& objectGuid);
+    std::optional<ObjectTrack> getTrackToInsertForced(const QnUuid& trackGuid);
 
     /**
      * Provides data only for objects with known dbId.
-     * Db id is set using ObjectCache::setObjectIdInDb.
+     * Db id is set using ObjectTrackCache::setTrackIdInDb.
      */
-    std::vector<ObjectUpdate> getObjectsToUpdate(bool flush = false);
+    std::vector<ObjectTrackUpdate> getTracksToUpdate(bool flush = false);
 
-    std::optional<DetectedObject> getObjectById(const QnUuid& objectGuid) const;
+    std::optional<ObjectTrack> getTrackById(const QnUuid& trackGuid) const;
 
     /**
-     * MUST be invoked after inserting object to the DB.
+     * MUST be invoked after inserting track to the DB.
      */
-    void setObjectIdInDb(const QnUuid& objectId, int64_t dbId);
+    void setTrackIdInDb(const QnUuid& trackId, int64_t dbId);
 
     /**
-     * @return kInvalidDbId if object id is unknown.
+     * @return kInvalidDbId if track id is unknown.
      */
-    int64_t dbIdFromObjectId(const QnUuid& objectId) const;
+    int64_t dbIdFromTrackId(const QnUuid& trackId) const;
 
-    void saveObjectGuidToAttributesId(const QnUuid& guid, int64_t attributesId);
+    void saveTrackGuidToAttributesId(const QnUuid& guid, int64_t attributesId);
 
-    int64_t getAttributesIdByObjectGuid(const QnUuid& guid) const;
+    int64_t getAttributesIdByTrackGuid(const QnUuid& guid) const;
 
     /**
      * NOTE: Data removal happens only in this method.
@@ -89,12 +90,12 @@ public:
     void removeExpiredData();
 
 private:
-    struct ObjectContext
+    struct ObjectTrackContext
     {
         int64_t dbId = -1;
         int64_t attributesDbId = -1;
 
-        DetectedObject object;
+        ObjectTrack track;
         std::vector<common::metadata::Attribute> newAttributesSinceLastUpdate;
 
         std::chrono::steady_clock::time_point lastReportTime;
@@ -106,18 +107,18 @@ private:
     const std::chrono::milliseconds m_aggregationPeriod;
     const std::chrono::milliseconds m_maxObjectLifetime;
     mutable QnMutex m_mutex;
-    std::map<QnUuid, ObjectContext> m_objectsById;
+    std::map<QnUuid, ObjectTrackContext> m_tracksById;
     nx::utils::ElapsedTimerPool<QnUuid> m_timerPool;
 
     void updateObject(
-        const nx::common::metadata::DetectedObject& detectedObject,
-        const nx::common::metadata::DetectionMetadataPacket& packet);
+        const nx::common::metadata::ObjectMetadata& objectMetadata,
+        const nx::common::metadata::ObjectMetadataPacket& packet);
 
     void addNewAttributes(
         const std::vector<common::metadata::Attribute>& attributes,
-        ObjectContext* objectContext);
+        ObjectTrackContext* trackContext);
 
-    void removeObject(const QnUuid& objectGuid);
+    void removeTrack(const QnUuid& trackGuid);
 };
 
 } // namespace nx::analytics::db

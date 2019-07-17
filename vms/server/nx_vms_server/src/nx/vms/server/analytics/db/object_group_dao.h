@@ -10,20 +10,20 @@
 
 namespace nx::analytics::db {
 
-class ObjectGroupDao
+class ObjectTrackGroupDao
 {
 public:
-    ObjectGroupDao();
+    ObjectTrackGroupDao();
 
     /**
-     * If the group objectIds is already known, then the existing id is returned.
+     * If the group trackIds is already known, then the existing id is returned.
      */
     int64_t insertOrFetchGroup(
         nx::sql::QueryContext* queryContext,
-        const std::set<int64_t>& objectIds);
+        const std::set<int64_t>& trackIds);
 
 private:
-    QCache<std::set<int64_t> /*objectIds*/, int64_t /*groupId*/> m_groupCache;
+    QCache<std::set<int64_t> /*trackIds*/, int64_t /*groupId*/> m_groupCache;
 
     int64_t saveToDb(
         nx::sql::QueryContext* queryContext,

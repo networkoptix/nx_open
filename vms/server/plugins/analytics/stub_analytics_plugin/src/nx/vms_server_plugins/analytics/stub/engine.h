@@ -44,7 +44,7 @@ protected:
 
     virtual nx::sdk::Result<void> executeAction(
         const std::string& actionId,
-        nx::sdk::Uuid objectId,
+        nx::sdk::Uuid trackId,
         nx::sdk::Uuid deviceId,
         int64_t timestampUs,
         nx::sdk::Ptr<nx::sdk::analytics::IObjectTrackInfo> objectTrackInfo,

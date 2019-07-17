@@ -57,23 +57,23 @@ QString makeLogFileName(
 }
 
 static QString makeObjectsLogLines(
-    const std::vector<nx::common::metadata::DetectedObject>& objects)
+    const std::vector<nx::common::metadata::ObjectMetadata>& objectMetadataList)
 {
     static const QString kIndent = "    ";
 
-    if (objects.empty())
+    if (objectMetadataList.empty())
         return "";
 
     QString result = ":\n"; //< The previous line ends with object count.
 
-    for (int i = 0; i < (int) objects.size(); ++i)
+    for (int i = 0; i < (int) objectMetadataList.size(); ++i)
     {
-        const auto& object = objects.at(i);
+        const auto& object = objectMetadataList.at(i);
         result.append(kIndent);
 
         result.append(toString(object));
 
-        if (i < (int) objects.size() - 1) //< Not the last object.
+        if (i < (int) objectMetadataList.size() - 1) //< Not the last object metadata.
             result.append("\n");
     }
 
@@ -130,8 +130,8 @@ void MetadataLogger::pushData(
     }
     else if (data->dataType == QnAbstractMediaData::DataType::GENERIC_METADATA)
     {
-        const ConstDetectionMetadataPacketPtr objectMetadata =
-            fromMetadataPacket(std::dynamic_pointer_cast<const QnCompressedMetadata>(data));
+        const ConstObjectMetadataPacketPtr objectMetadata =
+            fromCompressedMetadataPacket(std::dynamic_pointer_cast<const QnCompressedMetadata>(data));
 
         if (objectMetadata)
             pushObjectMetadata(*objectMetadata, additionalInfo);
@@ -150,22 +150,22 @@ void MetadataLogger::pushFrameInfo(
 }
 
 void MetadataLogger::pushObjectMetadata(
-    const DetectionMetadataPacket& metadataPacket,
+    const ObjectMetadataPacket& metadataPacket,
     const QString& additionalMetadataInfo)
 {
     if (!loggingIni().isLoggingEnabled())
         return;
 
     m_isLoggingBestShot = false;
-    if (metadataPacket.objects.size() == 1)
+    if (metadataPacket.objectMetadataList.size() == 1)
     {
-        if (metadataPacket.objects[0].bestShot)
+        if (metadataPacket.objectMetadataList[0].bestShot)
             m_isLoggingBestShot = true;
     }
 
     log(buildObjectMetadataLogString(metadataPacket, additionalMetadataInfo).toUtf8());
     if (!m_isLoggingBestShot)
-        m_prevObjectMetadataPacketTimestamp = microseconds(metadataPacket.timestampUsec);
+        m_prevObjectMetadataPacketTimestamp = microseconds(metadataPacket.timestampUs);
 }
 
 QString MetadataLogger::buildFrameLogString(
@@ -186,11 +186,11 @@ QString MetadataLogger::buildFrameLogString(
 }
 
 QString MetadataLogger::buildObjectMetadataLogString(
-    const DetectionMetadataPacket& metadataPacket,
+    const ObjectMetadataPacket& metadataPacket,
     const QString& additionalInfo)
 {
     const microseconds currentTime{ qnSyncTime->currentUSecsSinceEpoch() };
-    const microseconds currentPacketTimestamp = microseconds(metadataPacket.timestampUsec);
+    const microseconds currentPacketTimestamp = microseconds(metadataPacket.timestampUs);
     const microseconds diffFromPrev = currentPacketTimestamp - m_prevObjectMetadataPacketTimestamp;
 
     QString result = QString("metadataTimestampMs ") + toMsString(currentPacketTimestamp) + ", "
@@ -201,10 +201,10 @@ QString MetadataLogger::buildObjectMetadataLogString(
     if (!additionalInfo.isEmpty())
         result += ", additonalInfo: " + additionalInfo;
 
-    result += ", objects: " + QString::number(metadataPacket.objects.size());
+    result += ", objects: " + QString::number(metadataPacket.objectMetadataList.size());
 
     if (!loggingIni().logObjectMetadataDetails)
-        result += makeObjectsLogLines(metadataPacket.objects);
+        result += makeObjectsLogLines(metadataPacket.objectMetadataList);
 
     return result;
 }

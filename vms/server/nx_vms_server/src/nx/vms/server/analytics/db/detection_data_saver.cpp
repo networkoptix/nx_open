@@ -13,87 +13,86 @@
 
 namespace nx::analytics::db {
 
-DetectionDataSaver::DetectionDataSaver(
+ObjectTrackDataSaver::ObjectTrackDataSaver(
     AttributesDao* attributesDao,
     DeviceDao* deviceDao,
     ObjectTypeDao* objectTypeDao,
-    ObjectGroupDao* objectGroupDao,
-    ObjectCache* objectCache,
+    ObjectTrackGroupDao* trackGroupDao,
+    ObjectTrackCache* trackCache,
     AnalyticsArchiveDirectory* analyticsArchive)
     :
     m_attributesDao(attributesDao),
     m_deviceDao(deviceDao),
     m_objectTypeDao(objectTypeDao),
-    m_objectGroupDao(objectGroupDao),
-    m_objectCache(objectCache),
+    m_trackGroupDao(trackGroupDao),
+    m_objectTrackCache(trackCache),
     m_analyticsArchive(analyticsArchive)
 {
 }
 
-void DetectionDataSaver::load(
+void ObjectTrackDataSaver::load(
     ObjectTrackAggregator* trackAggregator,
     bool flush)
 {
-    m_objectsToInsert = m_objectCache->getObjectsToInsert(flush);
-    m_objectsToUpdate = m_objectCache->getObjectsToUpdate(flush);
-    m_objectSearchData = trackAggregator->getAggregatedData(flush);
+    m_tracksToInsert = m_objectTrackCache->getTracksToInsert(flush);
+    m_tracksToUpdate = m_objectTrackCache->getTracksToUpdate(flush);
+    m_trackSearchData = trackAggregator->getAggregatedData(flush);
 
-    resolveObjectIds();
+    resolveTrackIds();
 }
 
-bool DetectionDataSaver::empty() const
+bool ObjectTrackDataSaver::empty() const
 {
-    return m_objectsToInsert.empty()
-        && m_objectsToUpdate.empty()
-        && m_objectSearchData.empty();
+    return m_tracksToInsert.empty()
+        && m_tracksToUpdate.empty()
+        && m_trackSearchData.empty();
 }
 
-void DetectionDataSaver::save(nx::sql::QueryContext* queryContext)
+void ObjectTrackDataSaver::save(nx::sql::QueryContext* queryContext)
 {
     insertObjects(queryContext);
     updateObjects(queryContext);
-    
+
     if (!kLookupObjectsInAnalyticsArchive)
         saveObjectSearchData(queryContext);
-    
+
     if (m_analyticsArchive)
         saveToAnalyticsArchive(queryContext);
 }
 
-void DetectionDataSaver::resolveObjectIds()
+void ObjectTrackDataSaver::resolveTrackIds()
 {
-    for (auto& objectSearchGridCell: m_objectSearchData)
+    for (auto& trackSearchGridCell: m_trackSearchData)
     {
-        for (auto it = objectSearchGridCell.objectIds.begin();
-            it != objectSearchGridCell.objectIds.end();
+        for (auto it = trackSearchGridCell.trackIds.begin();
+            it != trackSearchGridCell.trackIds.end();
             )
         {
-            const auto& objectId = *it;
+            const auto& trackId = *it;
 
             auto newObjectIter = std::find_if(
-                m_objectsToInsert.begin(), m_objectsToInsert.end(),
-                [objectId](const DetectedObject& detectedObject)
-                { return detectedObject.objectAppearanceId == objectId; });
+                m_tracksToInsert.begin(), m_tracksToInsert.end(),
+                [trackId](const ObjectTrack& track) { return track.id == trackId; });
 
-            if (newObjectIter == m_objectsToInsert.end())
+            if (newObjectIter == m_tracksToInsert.end())
             {
                 // Object MUST be known.
-                const auto dbId = m_objectCache->dbIdFromObjectId(objectId);
+                const auto dbId = m_objectTrackCache->dbIdFromTrackId(trackId);
                 if (dbId == kInvalidDbId)
                 {
-                    if (auto object = m_objectCache->getObjectToInsertForced(objectId);
+                    if (auto object = m_objectTrackCache->getTrackToInsertForced(trackId);
                         object)
                     {
-                        m_objectsToInsert.push_back(std::move(*object));
+                        m_tracksToInsert.push_back(std::move(*object));
                     }
                     else
                     {
-                        // The object insertion task may already be in the query queue.
+                        // The track insertion task may already be in the query queue.
                         // So, the dbId will be available when we need to insert.
                     }
                 }
 
-                m_objectGuidToId[objectId] = dbId;
+                m_trackGuidToId[trackId] = dbId;
             }
 
             ++it;
@@ -101,7 +100,7 @@ void DetectionDataSaver::resolveObjectIds()
     }
 }
 
-void DetectionDataSaver::insertObjects(nx::sql::QueryContext* queryContext)
+void ObjectTrackDataSaver::insertObjects(nx::sql::QueryContext* queryContext)
 {
     auto query = queryContext->connection()->createQuery();
     query->prepare(R"sql(
@@ -111,41 +110,41 @@ void DetectionDataSaver::insertObjects(nx::sql::QueryContext* queryContext)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     )sql");
 
-    for (const auto& object: m_objectsToInsert)
+    for (const auto& track: m_tracksToInsert)
     {
-        const auto deviceDbId = m_deviceDao->insertOrFetch(queryContext, object.deviceId);
-        const auto objectTypeDbId = m_objectTypeDao->insertOrFetch(queryContext, object.objectTypeId);
+        const auto deviceDbId = m_deviceDao->insertOrFetch(queryContext, track.deviceId);
+        const auto objectTypeDbId = m_objectTypeDao->insertOrFetch(queryContext, track.objectTypeId);
         const auto attributesId = m_attributesDao->insertOrFetchAttributes(
-            queryContext, object.attributes);
+            queryContext, track.attributes);
 
-        auto [trackMinTimestamp, trackMaxTimestamp] = findMinMaxTimestamp(object.track);
+        auto [trackMinTimestamp, trackMaxTimestamp] = findMinMaxTimestamp(track.objectPositionSequence);
 
         query->bindValue(0, deviceDbId);
         query->bindValue(1, (long long) objectTypeDbId);
-        query->bindValue(2, QnSql::serialized_field(object.objectAppearanceId));
+        query->bindValue(2, QnSql::serialized_field(track.id));
         query->bindValue(3, trackMinTimestamp / kUsecInMs);
         query->bindValue(4, trackMaxTimestamp / kUsecInMs);
-        query->bindValue(5, TrackSerializer::serialized(object.track));
+        query->bindValue(5, TrackSerializer::serialized(track.objectPositionSequence));
         query->bindValue(6, (long long) attributesId);
-        query->bindValue(7, object.bestShot.initialized()
-            ? object.bestShot.timestampUsec / kUsecInMs
+        query->bindValue(7, track.bestShot.initialized()
+            ? track.bestShot.timestampUs / kUsecInMs
             : 0);
-        query->bindValue(8, object.bestShot.initialized()
-            ? TrackSerializer::serialized(object.bestShot.rect)
+        query->bindValue(8, track.bestShot.initialized()
+            ? TrackSerializer::serialized(track.bestShot.rect)
             : QByteArray());
 
         query->exec();
 
-        const auto objectDbId = query->lastInsertId().toLongLong();
-        m_objectGuidToId[object.objectAppearanceId] = objectDbId;
-        m_objectCache->setObjectIdInDb(object.objectAppearanceId, objectDbId);
+        const auto trackDbId = query->lastInsertId().toLongLong();
+        m_trackGuidToId[track.id] = trackDbId;
+        m_objectTrackCache->setTrackIdInDb(track.id, trackDbId);
 
-        m_objectCache->saveObjectGuidToAttributesId(
-            object.objectAppearanceId, attributesId);
+        m_objectTrackCache->saveTrackGuidToAttributesId(
+            track.id, attributesId);
     }
 }
 
-std::pair<qint64, qint64> DetectionDataSaver::findMinMaxTimestamp(
+std::pair<qint64, qint64> ObjectTrackDataSaver::findMinMaxTimestamp(
     const std::vector<ObjectPosition>& track)
 {
     auto timestamps = std::make_pair<qint64, qint64>(
@@ -154,16 +153,16 @@ std::pair<qint64, qint64> DetectionDataSaver::findMinMaxTimestamp(
 
     for (const auto& pos: track)
     {
-        if (pos.timestampUsec < timestamps.first)
-            timestamps.first = pos.timestampUsec;
-        if (pos.timestampUsec > timestamps.second)
-            timestamps.second = pos.timestampUsec;
+        if (pos.timestampUs < timestamps.first)
+            timestamps.first = pos.timestampUs;
+        if (pos.timestampUs > timestamps.second)
+            timestamps.second = pos.timestampUs;
     }
 
     return timestamps;
 }
 
-void DetectionDataSaver::updateObjects(nx::sql::QueryContext* queryContext)
+void ObjectTrackDataSaver::updateObjects(nx::sql::QueryContext* queryContext)
 {
     auto updateObjectQuery = queryContext->connection()->createQuery();
     updateObjectQuery->prepare(R"sql(
@@ -175,28 +174,28 @@ void DetectionDataSaver::updateObjects(nx::sql::QueryContext* queryContext)
         WHERE id = ?
     )sql");
 
-    for (const auto& objectUpdate: m_objectsToUpdate)
+    for (const auto& trackUpdate: m_tracksToUpdate)
     {
         const auto newAttributesId = m_attributesDao->insertOrFetchAttributes(
-            queryContext, objectUpdate.allAttributes);
+            queryContext, trackUpdate.allAttributes);
 
         auto [trackMinTimestamp, trackMaxTimestamp] =
-            findMinMaxTimestamp(objectUpdate.appendedTrack);
+            findMinMaxTimestamp(trackUpdate.appendedTrack);
 
-        updateObjectQuery->bindValue(0, TrackSerializer::serialized(objectUpdate.appendedTrack));
+        updateObjectQuery->bindValue(0, TrackSerializer::serialized(trackUpdate.appendedTrack));
         updateObjectQuery->bindValue(1, (long long) newAttributesId);
         updateObjectQuery->bindValue(2, trackMinTimestamp / kUsecInMs);
         updateObjectQuery->bindValue(3, trackMaxTimestamp / kUsecInMs);
-        updateObjectQuery->bindValue(4, objectUpdate.dbId != -1
-            ? (long long) objectUpdate.dbId
-            : (long long) m_objectCache->dbIdFromObjectId(objectUpdate.objectId));
+        updateObjectQuery->bindValue(4, trackUpdate.dbId != -1
+            ? (long long) trackUpdate.dbId
+            : (long long) m_objectTrackCache->dbIdFromTrackId(trackUpdate.trackId));
         updateObjectQuery->exec();
 
-        m_objectCache->saveObjectGuidToAttributesId(objectUpdate.objectId, newAttributesId);
+        m_objectTrackCache->saveTrackGuidToAttributesId(trackUpdate.trackId, newAttributesId);
     }
 }
 
-void DetectionDataSaver::saveObjectSearchData(nx::sql::QueryContext* queryContext)
+void ObjectTrackDataSaver::saveObjectSearchData(nx::sql::QueryContext* queryContext)
 {
     using namespace std::chrono;
 
@@ -208,32 +207,32 @@ void DetectionDataSaver::saveObjectSearchData(nx::sql::QueryContext* queryContex
         VALUES (?, ?, ?, ?, ?, ?)
     )sql");
 
-    for (const auto& objectSearchGridCell: m_objectSearchData)
+    for (const auto& trackSearchGridCell: m_trackSearchData)
     {
-        std::set<int64_t> objectDbIds;
+        std::set<int64_t> trackDbIds;
         std::transform(
-            objectSearchGridCell.objectIds.begin(), objectSearchGridCell.objectIds.end(),
-            std::inserter(objectDbIds, objectDbIds.end()),
-            [this](const QnUuid& objectId) { return m_objectCache->dbIdFromObjectId(objectId); });
+            trackSearchGridCell.trackIds.begin(), trackSearchGridCell.trackIds.end(),
+            std::inserter(trackDbIds, trackDbIds.end()),
+            [this](const QnUuid& trackId) { return m_objectTrackCache->dbIdFromTrackId(trackId); });
 
-        const auto objectGroupId = m_objectGroupDao->insertOrFetchGroup(queryContext, objectDbIds);
+        const auto trackGroupId = m_trackGroupDao->insertOrFetchGroup(queryContext, trackDbIds);
 
         insertObjectSearchCell->bindValue(0,
-            (long long) duration_cast<seconds>(objectSearchGridCell.timestamp).count());
+            (long long) duration_cast<seconds>(trackSearchGridCell.timestamp).count());
 
-        insertObjectSearchCell->bindValue(1, objectSearchGridCell.boundingBox.topLeft().x());
-        insertObjectSearchCell->bindValue(2, objectSearchGridCell.boundingBox.topLeft().y());
-        insertObjectSearchCell->bindValue(3, objectSearchGridCell.boundingBox.bottomRight().x());
-        insertObjectSearchCell->bindValue(4, objectSearchGridCell.boundingBox.bottomRight().y());
-        insertObjectSearchCell->bindValue(5, (long long) objectGroupId);
+        insertObjectSearchCell->bindValue(1, trackSearchGridCell.boundingBox.topLeft().x());
+        insertObjectSearchCell->bindValue(2, trackSearchGridCell.boundingBox.topLeft().y());
+        insertObjectSearchCell->bindValue(3, trackSearchGridCell.boundingBox.bottomRight().x());
+        insertObjectSearchCell->bindValue(4, trackSearchGridCell.boundingBox.bottomRight().y());
+        insertObjectSearchCell->bindValue(5, (long long) trackGroupId);
 
         insertObjectSearchCell->exec();
     }
 }
 
-void DetectionDataSaver::saveToAnalyticsArchive(nx::sql::QueryContext* queryContext)
+void ObjectTrackDataSaver::saveToAnalyticsArchive(nx::sql::QueryContext* queryContext)
 {
-    if (m_objectSearchData.empty())
+    if (m_trackSearchData.empty())
         return;
 
     const auto data = prepareArchiveData(queryContext);
@@ -244,7 +243,7 @@ void DetectionDataSaver::saveToAnalyticsArchive(nx::sql::QueryContext* queryCont
             item.deviceId,
             item.timestamp,
             std::vector<QRect>(item.region.begin(), item.region.end()),
-            item.objectsGroupId,
+            item.trackGroupId,
             item.objectType,
             item.combinedAttributesId);
         if (!result)
@@ -252,44 +251,44 @@ void DetectionDataSaver::saveToAnalyticsArchive(nx::sql::QueryContext* queryCont
     }
 }
 
-std::vector<DetectionDataSaver::AnalArchiveItem>
-    DetectionDataSaver::prepareArchiveData(nx::sql::QueryContext* queryContext)
+std::vector<ObjectTrackDataSaver::AnalyticsArchiveItem>
+    ObjectTrackDataSaver::prepareArchiveData(nx::sql::QueryContext* queryContext)
 {
     struct Item
     {
         QRegion region;
         std::set<int64_t> attributesIds;
-        std::set<int64_t> objectIds;
+        std::set<int64_t> trackIds;
     };
 
     std::map<std::pair<QnUuid /*deviceGuid*/, int /*objectType*/>, Item> regionByObjectType;
 
-    std::chrono::milliseconds minTimestamp = m_objectSearchData.front().timestamp;
-    for (const auto& aggregatedTrackData: m_objectSearchData)
+    std::chrono::milliseconds minTimestamp = m_trackSearchData.front().timestamp;
+    for (const auto& aggregatedTrackData: m_trackSearchData)
     {
         // NOTE: All timestamp belong to the same period of size of kTrackAggregationPeriod.
         if (minTimestamp > aggregatedTrackData.timestamp)
             minTimestamp = aggregatedTrackData.timestamp;
 
-        for (const auto& objectId: aggregatedTrackData.objectIds)
+        for (const auto& trackId: aggregatedTrackData.trackIds)
         {
-            const auto objectAttributes = getObjectDbDataById(objectId);
+            const auto trackAttributes = getTrackDbDataById(trackId);
 
             Item& item = regionByObjectType[
-                {objectAttributes.deviceId, objectAttributes.objectTypeId}];
+                {trackAttributes.deviceId, trackAttributes.objectTypeId}];
             item.region += aggregatedTrackData.boundingBox;
-            item.attributesIds.insert(objectAttributes.attributesDbId);
-            item.objectIds.insert(m_objectCache->dbIdFromObjectId(objectId));
+            item.attributesIds.insert(trackAttributes.attributesDbId);
+            item.trackIds.insert(m_objectTrackCache->dbIdFromTrackId(trackId));
         }
     }
 
-    std::vector<DetectionDataSaver::AnalArchiveItem> result;
+    std::vector<ObjectTrackDataSaver::AnalyticsArchiveItem> result;
     for (const auto& [deviceIdAndObjectType, item]: regionByObjectType)
     {
-        AnalArchiveItem archiveItem;
+        AnalyticsArchiveItem archiveItem;
         archiveItem.deviceId = deviceIdAndObjectType.first;
-        archiveItem.objectsGroupId =
-            m_objectGroupDao->insertOrFetchGroup(queryContext, item.objectIds);
+        archiveItem.trackGroupId =
+            m_trackGroupDao->insertOrFetchGroup(queryContext, item.trackIds);
         archiveItem.combinedAttributesId =
             m_attributesDao->combineAttributes(queryContext, item.attributesIds);
         archiveItem.objectType = deviceIdAndObjectType.second;
@@ -301,15 +300,15 @@ std::vector<DetectionDataSaver::AnalArchiveItem>
     return result;
 }
 
-DetectionDataSaver::ObjectDbAttributes
-    DetectionDataSaver::getObjectDbDataById(const QnUuid& objectId)
+ObjectTrackDataSaver::ObjectTrackDbAttributes
+    ObjectTrackDataSaver::getTrackDbDataById(const QnUuid& trackId)
 {
-    ObjectDbAttributes result;
-    result.attributesDbId = m_objectCache->getAttributesIdByObjectGuid(objectId);
-    if (auto object = m_objectCache->getObjectById(objectId); object)
+    ObjectTrackDbAttributes result;
+    result.attributesDbId = m_objectTrackCache->getAttributesIdByTrackGuid(trackId);
+    if (auto track = m_objectTrackCache->getTrackById(trackId); track)
     {
-        result.objectTypeId = m_objectTypeDao->objectTypeIdFromName(object->objectTypeId);
-        result.deviceId = object->deviceId;
+        result.objectTypeId = m_objectTypeDao->objectTypeIdFromName(track->objectTypeId);
+        result.deviceId = track->deviceId;
     }
 
     return result;

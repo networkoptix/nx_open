@@ -18,7 +18,7 @@ class IObjectTrackInfo: public Interface<IObjectTrackInfo>
 public:
     static auto interfaceId() { return InterfaceId("nx::sdk::analytics::IObjectTrackInfo"); }
 
-    /** @return List of metadata for all objects sharing the same objectId. */
+    /** @return List of metadata for all objects sharing the same trackId. */
     virtual IList<ITimestampedObjectMetadata>* track() const = 0;
 
     /**

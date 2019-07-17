@@ -11,14 +11,13 @@ namespace nx::vms::client::desktop {
 
 void MetadataAnalyticsController::gotMetadata(
     const QnResourcePtr& resource,
-    const nx::common::metadata::DetectionMetadataPacketPtr& metadata)
+    const nx::common::metadata::ObjectMetadataPacketPtr& metadataPacket)
 {
     std::map<QnUuid, QRectF> rectangles;
     auto& prevRectangles = m_rectMap[resource->getId()];
-    auto detectedObjects = metadata->objects;
 
-    for (const auto& obj: detectedObjects)
-        rectangles[obj.objectId] = QRectF(obj.boundingBox);
+    for (const auto& objectMetadata: metadataPacket->objectMetadataList)
+        rectangles[objectMetadata.trackId] = QRectF(objectMetadata.boundingBox);
 
     for (const auto& uuid: prevRectangles)
     {

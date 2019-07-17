@@ -26,16 +26,16 @@ struct TimeRangeFields
 
 struct ObjectFields
 {
-    const char* objectId;
+    const char* trackId;
     TimeRangeFields timeRange;
 
     ObjectFields() = delete;
 };
 
-class ObjectSearcher
+class ObjectTrackSearcher
 {
 public:
-    ObjectSearcher(
+    ObjectTrackSearcher(
         const DeviceDao& deviceDao,
         const ObjectTypeDao& objectTypeDao,
         AttributesDao* attributesDao,
@@ -45,13 +45,13 @@ public:
     /**
      * Throws on failure.
      */
-    std::vector<DetectedObject> lookup(nx::sql::QueryContext* queryContext);
+    std::vector<ObjectTrack> lookup(nx::sql::QueryContext* queryContext);
 
     void prepareCursorQuery(nx::sql::SqlQuery* query);
 
-    void loadCurrentRecord(nx::sql::SqlQuery*, DetectedObject*);
+    void loadCurrentRecord(nx::sql::SqlQuery*, ObjectTrack*);
 
-    static void addObjectFilterConditions(
+    static void addTrackFilterConditions(
         const Filter& filter,
         const DeviceDao& deviceDao,
         const ObjectTypeDao& objectTypeDao,
@@ -77,7 +77,7 @@ public:
         nx::sql::Filter* sqlFilter);
 
     static bool satisfiesFilter(
-        const Filter& filter, const DetectedObject& detectedObject);
+        const Filter& filter, const ObjectTrack& track);
 
     static bool matchAttributes(
         const std::vector<nx::common::metadata::Attribute>& attributes,
@@ -90,16 +90,16 @@ private:
     AnalyticsArchiveDirectory* m_analyticsArchive = nullptr;
     Filter m_filter;
 
-    std::optional<DetectedObject> fetchObjectById(
+    std::optional<ObjectTrack> fetchTrackById(
         nx::sql::QueryContext* queryContext,
-        const QnUuid& objectGuid);
+        const QnUuid& trackGuid);
 
-    std::vector<DetectedObject> lookupObjectsUsingArchive(nx::sql::QueryContext* queryContext);
+    std::vector<ObjectTrack> lookupTracksUsingArchive(nx::sql::QueryContext* queryContext);
 
-    void fetchObjectsFromDb(
+    void fetchTracksFromDb(
         nx::sql::QueryContext* queryContext,
-        const std::vector<std::int64_t>& objectGroups,
-        std::vector<DetectedObject>* result);
+        const std::vector<std::int64_t>& trackGroups,
+        std::vector<ObjectTrack>* result);
 
     void prepareCursorQueryImpl(nx::sql::AbstractSqlQuery* query);
 
@@ -107,10 +107,10 @@ private:
 
     std::tuple<QString /*query text*/, nx::sql::Filter> prepareBoxFilterSubQuery();
 
-    nx::sql::Filter prepareFilterObjectSqlExpression();
+    nx::sql::Filter prepareTrackFilterSqlExpression();
 
-    std::vector<DetectedObject> loadObjects(nx::sql::AbstractSqlQuery* query);
-    DetectedObject loadObject(nx::sql::AbstractSqlQuery* query);
+    std::vector<ObjectTrack> loadTracks(nx::sql::AbstractSqlQuery* query);
+    ObjectTrack loadTrack(nx::sql::AbstractSqlQuery* query);
 
     void filterTrack(std::vector<ObjectPosition>* const track);
 

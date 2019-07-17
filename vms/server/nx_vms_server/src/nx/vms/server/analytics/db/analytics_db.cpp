@@ -26,7 +26,7 @@ static constexpr char kSaveEventQueryAggregationKey[] = "c119fb61-b7d3-42c5-b833
 
 EventsStorage::EventsStorage(QnMediaServerModule* mediaServerModule):
     m_mediaServerModule(mediaServerModule),
-    m_objectCache(kTrackAggregationPeriod, kMaxCachedObjectLifeTime),
+    m_objectTrackCache(kTrackAggregationPeriod, kMaxCachedObjectLifeTime),
     m_trackAggregator(
         kTrackSearchResolutionX,
         kTrackSearchResolutionY,
@@ -84,7 +84,7 @@ bool EventsStorage::initialize(const Settings& settings)
     return true;
 }
 
-void EventsStorage::save(common::metadata::ConstDetectionMetadataPacketPtr packet)
+void EventsStorage::save(common::metadata::ConstObjectMetadataPacketPtr packet)
 {
     using namespace std::chrono;
 
@@ -94,7 +94,7 @@ void EventsStorage::save(common::metadata::ConstDetectionMetadataPacketPtr packe
         QnMutexLocker lock(&m_mutex);
         m_maxRecordedTimestamp = std::max<milliseconds>(
             m_maxRecordedTimestamp,
-            duration_cast<milliseconds>(microseconds(packet->timestampUsec)));
+            duration_cast<milliseconds>(microseconds(packet->timestampUs)));
     }
 
     QnMutexLocker lock(&m_mutex);
@@ -142,14 +142,14 @@ void EventsStorage::createLookupCursor(
         return;
     }
 
-    auto objectSearcher = std::make_shared<ObjectSearcher>(
+    auto objectSearcher = std::make_shared<ObjectTrackSearcher>(
         m_deviceDao,
         m_objectTypeDao,
         &m_attributesDao,
         m_analyticsArchiveDirectory.get(),
         std::move(filter));
 
-    m_dbController->queryExecutor().createCursor<DetectedObject>(
+    m_dbController->queryExecutor().createCursor<ObjectTrack>(
         [objectSearcher](auto&&... args)
             { objectSearcher->prepareCursorQuery(std::forward<decltype(args)>(args)...); },
         [objectSearcher](auto&&... args)
@@ -171,7 +171,7 @@ void EventsStorage::lookup(
 {
     QnMutexLocker lock(&m_dbControllerMutex);
 
-    NX_DEBUG(this, "Selecting objects. Filter %1", filter);
+    NX_DEBUG(this, "Selecting tracks. Filter %1", filter);
 
     if (!m_dbController)
     {
@@ -181,11 +181,11 @@ void EventsStorage::lookup(
         return;
     }
 
-    auto result = std::make_shared<std::vector<DetectedObject>>();
+    auto result = std::make_shared<std::vector<ObjectTrack>>();
     m_dbController->queryExecutor().executeSelect(
         [this, filter = std::move(filter), result](nx::sql::QueryContext* queryContext)
         {
-            ObjectSearcher objectSearcher(
+            ObjectTrackSearcher objectSearcher(
                 m_deviceDao,
                 m_objectTypeDao,
                 &m_attributesDao,
@@ -395,17 +395,17 @@ bool EventsStorage::loadDictionaries()
 
 void EventsStorage::updateDictionariesIfNeeded(
     nx::sql::QueryContext* queryContext,
-    const common::metadata::DetectionMetadataPacket& packet,
-    const common::metadata::DetectedObject& detectedObject)
+    const common::metadata::ObjectMetadataPacket& packet,
+    const common::metadata::ObjectMetadata& objectMetadata)
 {
     m_deviceDao.insertOrFetch(queryContext, packet.deviceId);
-    m_objectTypeDao.insertOrFetch(queryContext, detectedObject.objectTypeId);
+    m_objectTypeDao.insertOrFetch(queryContext, objectMetadata.objectTypeId);
 }
 
 void EventsStorage::insertEvent(
     sql::QueryContext* queryContext,
-    const common::metadata::DetectionMetadataPacket& packet,
-    const common::metadata::DetectedObject& detectedObject,
+    const common::metadata::ObjectMetadataPacket& packet,
+    const common::metadata::ObjectMetadata& objectMetadata,
     int64_t attributesId,
     int64_t /*timePeriodId*/)
 {
@@ -415,22 +415,22 @@ void EventsStorage::insertEvent(
             device_id, object_type_id, object_id, attributes_id,
             box_top_left_x, box_top_left_y, box_bottom_right_x, box_bottom_right_y)
         VALUES(:timestampMs, :durationMs, :deviceId,
-            :objectTypeId, :objectAppearanceId, :attributesId,
+            :objectTypeId, :trackId, :attributesId,
             :boxTopLeftX, :boxTopLeftY, :boxBottomRightX, :boxBottomRightY)
     )sql"));
-    insertEventQuery.bindValue(":timestampMs", packet.timestampUsec / kUsecInMs);
-    insertEventQuery.bindValue(":durationMs", packet.durationUsec / kUsecInMs);
+    insertEventQuery.bindValue(":timestampMs", packet.timestampUs / kUsecInMs);
+    insertEventQuery.bindValue(":durationMs", packet.durationUs / kUsecInMs);
     insertEventQuery.bindValue(":deviceId", m_deviceDao.deviceIdFromGuid(packet.deviceId));
     insertEventQuery.bindValue(
         ":objectTypeId",
-        (long long) m_objectTypeDao.objectTypeIdFromName(detectedObject.objectTypeId));
+        (long long) m_objectTypeDao.objectTypeIdFromName(objectMetadata.objectTypeId));
     insertEventQuery.bindValue(
-        ":objectAppearanceId",
-        QnSql::serialized_field(detectedObject.objectId));
+        ":trackId",
+        QnSql::serialized_field(objectMetadata.trackId));
 
     insertEventQuery.bindValue(":attributesId", (long long) attributesId);
 
-    const auto packedBoundingBox = packRect(detectedObject.boundingBox);
+    const auto packedBoundingBox = packRect(objectMetadata.boundingBox);
 
     insertEventQuery.bindValue(":boxTopLeftX", packedBoundingBox.topLeft().x());
     insertEventQuery.bindValue(":boxTopLeftY", packedBoundingBox.topLeft().y());
@@ -442,36 +442,36 @@ void EventsStorage::insertEvent(
 
 void EventsStorage::savePacketDataToCache(
     const QnMutexLockerBase& /*lock*/,
-    const common::metadata::ConstDetectionMetadataPacketPtr& packet)
+    const common::metadata::ConstObjectMetadataPacketPtr& packet)
 {
     using namespace std::chrono;
 
-    m_objectCache.add(packet);
+    m_objectTrackCache.add(packet);
 
-    for (const auto& detectedObject: packet->objects)
+    for (const auto& objectMetadata: packet->objectMetadataList)
     {
         m_trackAggregator.add(
-            detectedObject.objectId,
-            duration_cast<milliseconds>(microseconds(packet->timestampUsec)),
-            detectedObject.boundingBox);
+            objectMetadata.trackId,
+            duration_cast<milliseconds>(microseconds(packet->timestampUs)),
+            objectMetadata.boundingBox);
     }
 }
 
-DetectionDataSaver EventsStorage::takeDataToSave(
+ObjectTrackDataSaver EventsStorage::takeDataToSave(
     const QnMutexLockerBase& /*lock*/,
     bool flushData)
 {
-    DetectionDataSaver detectionDataSaver(
+    ObjectTrackDataSaver detectionDataSaver(
         &m_attributesDao,
         &m_deviceDao,
         &m_objectTypeDao,
-        &m_objectGroupDao,
-        &m_objectCache,
+        &m_trackGroupDao,
+        &m_objectTrackCache,
         m_analyticsArchiveDirectory.get());
 
     detectionDataSaver.load(&m_trackAggregator, flushData);
 
-    m_objectCache.removeExpiredData();
+    m_objectTrackCache.removeExpiredData();
 
     return detectionDataSaver;
 }
@@ -489,7 +489,7 @@ void EventsStorage::reportCreateCursorCompletion(
     if (m_closingDbController)
         return completionHandler(ResultCode::ok, nullptr);
 
-    auto dbCursor = std::make_unique<sql::Cursor<DetectedObject>>(
+    auto dbCursor = std::make_unique<sql::Cursor<ObjectTrack>>(
         &m_dbController->queryExecutor(),
         dbCursorId);
 

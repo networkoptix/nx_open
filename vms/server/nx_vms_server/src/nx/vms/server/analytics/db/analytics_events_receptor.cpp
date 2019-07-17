@@ -36,14 +36,14 @@ void AnalyticsEventsReceptor::putData(const QnAbstractDataPacketPtr& data)
         return;
 
     auto detectionMetadataPacket =
-        std::make_shared<nx::common::metadata::DetectionMetadataPacket>();
+        std::make_shared<nx::common::metadata::ObjectMetadataPacket>();
 
     bool isParsedSuccessfully = false;
     *detectionMetadataPacket =
-        QnUbjson::deserialized<nx::common::metadata::DetectionMetadataPacket>(
+        QnUbjson::deserialized<nx::common::metadata::ObjectMetadataPacket>(
             QByteArray::fromRawData(metadataPacket->data(),
             (int)metadataPacket->dataSize()),
-            nx::common::metadata::DetectionMetadataPacket(),
+            nx::common::metadata::ObjectMetadataPacket(),
             &isParsedSuccessfully);
     if (!isParsedSuccessfully)
     {
@@ -66,7 +66,7 @@ void AnalyticsEventsReceptor::putData(const QnAbstractDataPacketPtr& data)
 
     using namespace std::chrono;
     time_point<high_resolution_clock> startTime;
-    nx::common::metadata::DetectionMetadataPacket copy;
+    nx::common::metadata::ObjectMetadataPacket copy;
     if (loggingIni().isLoggingEnabled())
     {
         if (!m_metadataLogger
