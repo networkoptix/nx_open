@@ -24,7 +24,6 @@ public:
      * Supplies data to the engine. Called from a worker thread.
      *
      * @param dataPacket Never null. Has a valid timestamp >= 0.
-     * @return Result containing error information in case of failure.
      */
     virtual Result<void> pushDataPacket(IDataPacket* dataPacket) = 0;
 };

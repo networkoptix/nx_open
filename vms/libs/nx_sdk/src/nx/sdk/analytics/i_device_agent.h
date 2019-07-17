@@ -22,8 +22,9 @@ class IEngine; //< Forward declaration for the parent object.
 /**
  * Used to control the process of fetching metadata from the resource.
  *
- * All methods are guaranteed to be called without overlappings, even if from different threads,
- * thus, no synchronization is required for the implementation.
+ * All methods are guaranteed to be called without overlapping even if from different threads (i.e.
+ * with a guaranteed barrier between the calls), thus, no synchronization is required for the
+ * implementation.
  */
 class IDeviceAgent: public Interface<IDeviceAgent>
 {
@@ -52,12 +53,13 @@ public:
      * the combination of a device instance and an Engine instance.
      *
      * @param settings Values of settings declared in the manifest. Never null.
-     * @return Result containing a map of errors that occurred during settings applying. Keys of
-     *     the map are the setting ids and values are human readable error strings. Even if some
-     *     settings can't be applied or an error happened during its applying, this method must
-     *     return a successful result with a corresponding map of errors. A faulty result
-     *     containing error information instead of the map should be returned only in case of some
-     *     general failure affected the settings applying procedure as a whole.
+     * @return Result containing a map of errors that occurred while applying each setting - the
+     *     keys are the setting ids, and the values are human readable error strings in English.
+     *     Even if some settings can't be applied or an error happens while applying them, this
+     *     method must return a successful result with a corresponding map of errors. A faulty
+     *     result containing error information instead of the map should be returned only in case
+     *     of some general failure that affected the procedure of applying the settings. The result
+     *     should contain null if no errors occurred.
      */
     virtual Result<const IStringMap*> setSettings(const IStringMap* settings) = 0;
 
@@ -70,16 +72,16 @@ public:
      *
      * @return Result containing (in case of success) information about settings that are stored on
      *     the plugin side. Errors corresponding to particular settings should be placed in the
-     *     `ISettingsResponse` object. A faulty result must be returned only in case of general
-     *     error that affects the settings retrieval procedure as a whole.
+     *     ISettingsResponse object. A faulty result must be returned only in case of a general
+     *     failure that affects the settings retrieval procedure. The result should contain null if
+     *     the Engine has no plugin-side settings.
      */
     virtual Result<const ISettingsResponse*> pluginSideSettings() const = 0;
 
     /**
      * Provides DeviceAgent manifest in JSON format.
      *
-     * @return Result containing JSON string in UTF-8 in case of success. Otherwise a result
-     *     containing error information must be returned.
+     * @return JSON string in UTF-8.
      */
     virtual Result<const IString*> manifest() const = 0;
 
@@ -96,7 +98,6 @@ public:
      * Server does not need any metadata from this DeviceAgent.
      *
      * @param neededMetadataTypes Lists of type ids of events and objects.
-     * @return Result containing error information in case of failure.
      */
     virtual Result<void> setNeededMetadataTypes(const IMetadataTypes* neededMetadataTypes) = 0;
 };

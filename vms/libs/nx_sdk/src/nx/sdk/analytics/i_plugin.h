@@ -5,7 +5,6 @@
 #include <nx/sdk/interface.h>
 #include <nx/sdk/result.h>
 
-#include <nx/sdk/error_code.h>
 #include <nx/sdk/i_string.h>
 #include <nx/sdk/i_plugin.h>
 
@@ -26,16 +25,14 @@ public:
     /**
      * Provides plugin manifest in JSON format.
      *
-     * @return Result containing JSON string in UTF-8 in case of success of error information in
-     *     case of failure.
+     * @return JSON string in UTF-8.
      */
     virtual Result<const IString*> manifest() const = 0;
 
     /**
      * Creates a new instance of Analytics Engine.
      *
-     * @return Result containing a pointer to an object that implements the IEngine interface, or
-     *     error information in case of failure.
+     * @return Pointer to an object that implements the IEngine interface.
      */
     virtual Result<IEngine*> createEngine() = 0;
 

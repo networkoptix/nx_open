@@ -15,13 +15,13 @@ public:
     static auto interfaceId() { return InterfaceId("nx::sdk::ISettingsResponse"); }
 
     /**
-     * @return map of setting values having setting ids as keys.
+     * @return Map of setting values, indexed by setting ids.
      */
     virtual IStringMap* values() const = 0;
 
     /**
-     * @return map of errors that happened while obtaining setting values. Keys are setting ids,
-     *     values are human-readable error strings.
+     * @return Map of errors that happened while obtaining setting values, indexed by setting
+     *     ids. Each value must be a human-readable error message in English.
      */
     virtual IStringMap* errors() const = 0;
 };

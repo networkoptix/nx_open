@@ -11,7 +11,7 @@
 
 #include <nx/sdk/analytics/helpers/video_frame_processing_device_agent.h>
 #include <nx/sdk/analytics/helpers/pixel_format.h>
-#include <nx/sdk/analytics/helpers/aliases.h>
+#include <nx/sdk/analytics/helpers/result_aliases.h>
 
 #include "engine.h"
 #include "objects/random.h"
@@ -30,10 +30,10 @@ public:
     virtual nx::sdk::Result<void> setNeededMetadataTypes(
         const nx::sdk::analytics::IMetadataTypes* neededMetadataTypes) override;
 
-    virtual nx::sdk::Result<const nx::sdk::ISettingsResponse*> pluginSideSettings() const override;
+    virtual nx::sdk::SettingsResponseResult pluginSideSettings() const override;
 
 protected:
-    virtual std::string manifestInternal() const override;
+    virtual std::string manifestString() const override;
 
     virtual nx::sdk::StringMapResult settingsReceived() override;
 

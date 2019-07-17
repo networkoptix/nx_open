@@ -104,7 +104,7 @@ void ManifestLogger::log(
                 kManifestFilenamePostfix));
     }
 
-    if (error.errorCode != nx::sdk::ErrorCode::noError)
+    if (!error.isOk())
     {
         nx::utils::PlaceholderBinder binder(m_messageTemplate);
         binder.bind({
@@ -144,7 +144,7 @@ void StartupPluginManifestLogger::log(
                 kManifestFilenamePostfix));
     }
 
-    if (error.errorCode != nx::sdk::ErrorCode::noError)
+    if (!error.isOk())
     {
         NX_WARNING(m_logTag, "Error obtaining manifest from Plugin %1: %2",
             m_plugin->name(),

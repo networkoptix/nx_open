@@ -6,10 +6,11 @@
 #include <functional>
 
 #include <nx/sdk/i_utility_provider.h>
-#include <nx/sdk/error_code.h>
 #include <nx/sdk/analytics/i_plugin.h>
 #include <nx/sdk/helpers/ref_countable.h>
 #include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/helpers/result_aliases.h>
+#include <nx/sdk/analytics/helpers/result_aliases.h>
 
 #include "engine.h"
 
@@ -46,8 +47,8 @@ public:
 public:
     virtual const char* name() const override;
     virtual void setUtilityProvider(IUtilityProvider* utilityProvider) override;
-    virtual Result<const IString*> manifest() const override;
-    virtual Result<IEngine*> createEngine() override;
+    virtual StringResult manifest() const override;
+    virtual MutableEngineResult createEngine() override;
 
 private:
     const std::string m_name;

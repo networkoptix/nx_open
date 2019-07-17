@@ -125,7 +125,7 @@ void Engine::initCapabilities()
         m_capabilities.erase(0, 1);
 }
 
-std::string Engine::manifestInternal() const
+std::string Engine::manifestString() const
 {
     return /*suppress newline*/1 + R"json(
 {

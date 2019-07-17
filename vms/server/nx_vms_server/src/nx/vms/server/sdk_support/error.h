@@ -20,6 +20,8 @@ struct Error
 
         return error;
     }
+
+    bool isOk() const { return errorCode == nx::sdk::ErrorCode::noError; }
 };
 
 } // namespace nx::vms::server::sdk_support

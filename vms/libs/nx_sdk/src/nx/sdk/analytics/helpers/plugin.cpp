@@ -41,19 +41,19 @@ void Plugin::setUtilityProvider(IUtilityProvider* utilityProvider)
     m_utilityProvider.reset(utilityProvider);
 }
 
-Result<const IString*> Plugin::manifest() const
+StringResult Plugin::manifest() const
 {
     return new String(m_jsonManifest);
 }
 
-Result<IEngine*> Plugin::createEngine()
+MutableEngineResult Plugin::createEngine()
 {
     IEngine* engine = m_createEngine(this);
     if (!engine)
     {
-        const std::string errorMessage{"createEngine() failed"};
+        const std::string errorMessage = "Unable to create Engine";
         NX_PRINT << "ERROR: " << m_name << ": " << errorMessage;
-        return error(ErrorCode::internalError, errorMessage);
+        return error(ErrorCode::otherError, errorMessage);
     }
     return engine;
 }

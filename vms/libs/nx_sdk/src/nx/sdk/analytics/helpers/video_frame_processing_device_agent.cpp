@@ -166,12 +166,12 @@ void VideoFrameProcessingDeviceAgent::processMetadataPacket(
     m_handler->handleMetadata(metadataPacket);
 }
 
-Result<const IString*> VideoFrameProcessingDeviceAgent::manifest() const
+StringResult VideoFrameProcessingDeviceAgent::manifest() const
 {
-    return new String(manifestInternal());
+    return new String(manifestString());
 }
 
-Result<const IStringMap*> VideoFrameProcessingDeviceAgent::setSettings(
+StringMapResult VideoFrameProcessingDeviceAgent::setSettings(
     const IStringMap* settings)
 {
     if (!logUtils.convertAndOutputStringMap(&m_settings, settings, "Received settings"))
@@ -180,7 +180,7 @@ Result<const IStringMap*> VideoFrameProcessingDeviceAgent::setSettings(
     return settingsReceived();
 }
 
-Result<const ISettingsResponse*> VideoFrameProcessingDeviceAgent::pluginSideSettings() const
+SettingsResponseResult VideoFrameProcessingDeviceAgent::pluginSideSettings() const
 {
     return nullptr;
 }

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <nx/sdk/analytics/helpers/engine.h>
-#include <nx/sdk/analytics/helpers/aliases.h>
+#include <nx/sdk/analytics/helpers/result_aliases.h>
 
 namespace nx {
 namespace vms_server_plugins {
@@ -17,7 +17,7 @@ public:
         const nx::sdk::IDeviceInfo* deviceInfo) override;
 
 protected:
-    virtual std::string manifestInternal() const override;
+    virtual std::string manifestString() const override;
 };
 
 } // namespace tegra_video

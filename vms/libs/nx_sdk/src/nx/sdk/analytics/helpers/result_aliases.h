@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include <nx/sdk/helpers/aliases.h>
 #include <nx/sdk/analytics/i_device_agent.h>
 #include <nx/sdk/analytics/i_engine.h>
+#include <nx/sdk/helpers/result_aliases.h>
 
 namespace nx {
 namespace sdk {

@@ -5,7 +5,7 @@
 #include <string>
 #include <ostream>
 
-#include <nx/sdk/error_code.h>
+#include <nx/sdk/result.h>
 #include <nx/sdk/i_string.h>
 #include <nx/sdk/i_string_map.h>
 #include <nx/sdk/i_device_info.h>
@@ -16,13 +16,12 @@ namespace sdk {
 std::string toStdString(const IString* string);
 
 /**
- * @return Human-readable multiline string with a trailing `\n` or an empty string if the input
- *     pointer to a map is null or if the map contains 0 elements:
+ * @return Possibly multiline string with a trailing `\n`, or an empty string if the map is null or
+ *     empty:
  * <code><pre>
  *     [name0]: value0
  *     [name1]: value1
  *     ...
- *
  * </pre></code>
  */
 std::string toString(const IStringMap* map, int overallIndent = 0);

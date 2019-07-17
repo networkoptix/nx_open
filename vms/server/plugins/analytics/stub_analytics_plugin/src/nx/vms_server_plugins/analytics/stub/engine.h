@@ -11,7 +11,7 @@
 #include <nx/sdk/uuid.h>
 #include <nx/sdk/analytics/helpers/plugin.h>
 #include <nx/sdk/analytics/helpers/engine.h>
-#include <nx/sdk/analytics/helpers/aliases.h>
+#include <nx/sdk/analytics/helpers/result_aliases.h>
 #include <nx/sdk/analytics/i_uncompressed_video_frame.h>
 
 namespace nx {
@@ -38,7 +38,7 @@ public:
     virtual Plugin* plugin() const override { return pluginCasted<Plugin>(); }
 
 protected:
-    virtual std::string manifestInternal() const override;
+    virtual std::string manifestString() const override;
 
     virtual nx::sdk::StringMapResult settingsReceived() override;
 

@@ -16,7 +16,7 @@
 #include <nx/sdk/analytics/i_engine.h>
 #include <nx/utils/elapsed_timer.h>
 #include <nx/sdk/analytics/helpers/plugin.h>
-#include <nx/sdk/analytics/helpers/aliases.h>
+#include <nx/sdk/analytics/helpers/result_aliases.h>
 
 namespace nx {
 namespace vms_server_plugins {

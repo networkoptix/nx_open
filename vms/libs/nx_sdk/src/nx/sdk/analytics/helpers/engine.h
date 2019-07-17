@@ -15,7 +15,7 @@
 #include <nx/sdk/helpers/ref_countable.h>
 #include <nx/sdk/helpers/ptr.h>
 #include <nx/sdk/helpers/log_utils.h>
-
+#include <nx/sdk/helpers/result_aliases.h>
 
 namespace nx {
 namespace sdk {
@@ -47,13 +47,14 @@ protected:
         bool enableOutput,
         const std::string& printPrefix = "");
 
-    virtual std::string manifestInternal() const = 0;
+    virtual std::string manifestString() const = 0;
 
     /**
-     * Called when the settings are received from the server (even if the values are not changed).
+     * Called when the settings are received from the Server, even if the values are not changed.
      * Should perform any required (re)initialization. Called even if the settings model is empty.
+     * @return Error messages per setting (if any), as in IEngine::setSettings().
      */
-    virtual Result<const IStringMap*> settingsReceived() { return nullptr; }
+    virtual StringMapResult settingsReceived() { return nullptr; }
 
     /**
      * Provides access to the Plugin global settings stored by the server.
@@ -119,9 +120,9 @@ public:
 
 public:
     virtual void setEngineInfo(const IEngineInfo* engineInfo) override;
-    virtual Result<const IStringMap*> setSettings(const IStringMap* settings) override;
-    virtual Result<const ISettingsResponse*> pluginSideSettings() const override;
-    virtual Result<const IString*> manifest() const override;
+    virtual StringMapResult setSettings(const IStringMap* settings) override;
+    virtual SettingsResponseResult pluginSideSettings() const override;
+    virtual StringResult manifest() const override;
     virtual Result<void> executeAction(IAction* action) override;
     virtual void setHandler(IEngine::IHandler* handler) override;
     virtual bool isCompatible(const IDeviceInfo* deviceInfo) const override;

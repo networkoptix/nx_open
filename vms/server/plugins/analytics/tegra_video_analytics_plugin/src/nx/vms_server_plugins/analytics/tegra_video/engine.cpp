@@ -26,7 +26,7 @@ MutableDeviceAgentResult Engine::obtainDeviceAgent(const IDeviceInfo* deviceInfo
     return new DeviceAgent(this, deviceInfo);
 }
 
-std::string Engine::manifestInternal() const
+std::string Engine::manifestString() const
 {
     return /*suppress newline*/1 + R"json(
     "eventTypes": [

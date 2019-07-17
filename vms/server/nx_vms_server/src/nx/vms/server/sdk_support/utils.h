@@ -106,51 +106,42 @@ std::optional<Manifest> manifestFromSdkObject(
     using namespace nx::sdk;
     const ResultHolder<const IString*> result = sdkObject->manifest();
 
-    const auto log =
-        [&logger](const QString& manifestString, const sdk_support::Error& error)
+    const auto logError =
+        [&logger](const sdk_support::Error& error, const QString& manifestString = QString())
         {
             if (logger)
                 logger->log(manifestString, error);
-            return std::nullopt; //< Allows to call as `return log(...);` on error.
+            return std::nullopt; //< Allows to call as `return logError(...);` on error.
+        };
+
+    const auto logInternalError =
+        [&logger, &logError](
+            const QString& errorMessage, const QString& manifestString = QString())
+        {
+            return logError({ErrorCode::internalError, errorMessage}, manifestString);
         };
 
     if (!result.isOk())
-        return log(QString(), sdk_support::Error::fromResultHolder(result));
+        return logError(sdk_support::Error::fromResultHolder(result));
 
     const auto manifestStr = result.value();
     if (!manifestStr)
-    {
-        return log(
-            QString(),
-            {ErrorCode::internalError, "No manifest (null IString)"});
-    }
+        return logInternalError("No manifest (null IString)");
 
     const char* const rawString = manifestStr->str();
 
     if (!rawString)
-    {
-        return log(
-            QString(),
-            {ErrorCode::internalError, "No manifest (null IString::str())"});
-    }
+        return logInternalError("No manifest (null IString::str())");
 
     if (rawString[0] == '\0')
-    {
-        return log(
-            QString(),
-            {ErrorCode::internalError, "No manifest (empty string)"});
-    }
+        return logInternalError("No manifest (empty string)");
 
     bool success = false;
     const auto deserializedManifest = QJson::deserialized(rawString, Manifest(), &success);
     if (!success)
-    {
-        return log(
-            rawString,
-            {ErrorCode::internalError, "Unable to deserialize manifest"});
-    }
+        return logInternalError("Unable to deserialize manifest", rawString);
 
-    log(rawString, sdk_support::Error::fromResultHolder(result));
+    logError(sdk_support::Error::fromResultHolder(result), rawString);
     return deserializedManifest;
 }
 

@@ -128,7 +128,7 @@ DeviceAgent::~DeviceAgent()
  * lists which are treated as white-list filters for the respective set (absent lists are treated
  * as empty lists, thus, disabling all types from the Engine).
  */
-std::string DeviceAgent::manifestInternal() const
+std::string DeviceAgent::manifestString() const
 {
     return /*suppress newline*/1 + R"json(
 {
@@ -174,7 +174,7 @@ std::string DeviceAgent::manifestInternal() const
 )json";
 }
 
-Result<const IStringMap*> DeviceAgent::settingsReceived()
+StringMapResult DeviceAgent::settingsReceived()
 {
     parseSettings();
     updateObjectGenerationParameters();
@@ -331,7 +331,7 @@ void DeviceAgent::processPluginDiagnosticEvents()
     }
 }
 
-Result<const ISettingsResponse*> DeviceAgent::pluginSideSettings() const
+SettingsResponseResult DeviceAgent::pluginSideSettings() const
 {
     auto response = new SettingsResponse();
     response->setValue("pluginSideTestSpinBox", "100");

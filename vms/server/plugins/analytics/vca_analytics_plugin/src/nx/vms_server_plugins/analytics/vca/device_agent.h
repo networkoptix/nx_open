@@ -15,7 +15,7 @@
 
 #include <nx/sdk/analytics/i_metadata_types.h>
 #include <nx/sdk/analytics/i_device_agent.h>
-#include <nx/sdk/analytics/helpers/aliases.h>
+#include <nx/sdk/analytics/helpers/result_aliases.h>
 
 #include <nx/network/aio/timer.h>
 #include <nx/network/system_socket.h>

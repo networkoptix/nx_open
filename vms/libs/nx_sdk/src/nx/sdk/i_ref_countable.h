@@ -67,6 +67,21 @@ public:
         {
             static_assert(len + /*terminating zero*/ 1 >= 16,
                 "Interface id should contain at least 15 chars");
+            assert(value[0] != '\0');
+            assert(value[1] != '\0');
+            assert(value[2] != '\0');
+            assert(value[3] != '\0');
+            assert(value[4] != '\0');
+            assert(value[5] != '\0');
+            assert(value[6] != '\0');
+            assert(value[7] != '\0');
+            assert(value[8] != '\0');
+            assert(value[9] != '\0');
+            assert(value[10] != '\0');
+            assert(value[11] != '\0');
+            assert(value[12] != '\0');
+            assert(value[13] != '\0');
+            assert(value[14] != '\0');
         }
 
         /**
@@ -88,7 +103,9 @@ public:
             static_assert(std::is_base_of<IRefCountable, TemplateArg>::value,
                 "TemplateArg should be inherited from IRefCountable");
 
+            // The id is stored in a static array because it is unique for the given template args.
             static char id[kMaxStaticInterfaceIdSize];
+            assert(id[0] == '\0'); //< Assert that the static id has not been initialized yet.
 
             const int result = snprintf(
                 id,

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <nx/sdk/error_code.h>
+#include <nx/sdk/result.h>
 #include <nx/vms/server/sdk_support/error.h>
 
 namespace nx::sdk {

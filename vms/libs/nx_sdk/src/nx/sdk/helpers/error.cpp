@@ -2,7 +2,7 @@
 
 #include "error.h"
 
-#define NX_PRINT_PREFIX "nx::sdk::error() "
+#define NX_PRINT_PREFIX "nx::sdk::error(): "
 #include <nx/sdk/helpers/string.h>
 
 #include <nx/kit/debug.h>

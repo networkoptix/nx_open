@@ -30,8 +30,9 @@ class IPlugin; //< Forward declaration for the parent object.
  * For the VMS end user, each Engine instance is perceived as an independent Analytics Engine
  * which has its own set of values of settings stored in the Mediaserver database.
  *
- * All methods are guaranteed to be called without overlappings, even if from different threads,
- * thus, no synchronization is required for the implementation.
+ * All methods are guaranteed to be called without overlapping even if from different threads (i.e.
+ * with a guaranteed barrier between the calls), thus, no synchronization is required for the
+ * implementation.
  */
 class IEngine: public Interface<IEngine>
 {
@@ -62,13 +63,13 @@ public:
      * pluginSideSettings() (if any), for this Engine instance.
      *
      * @param settings Values of settings declared in the manifest. Never null.
-     * @return Result containing a map of errors that occurred during settings applying. Keys of
-     *     the map are the setting ids and values are human readable error strings. Even if some
-     *     settings can't be applied or an error happened during its applying, this method must
-     *     return a successful result with a corresponding map of errors. A faulty result
-     *     containing error information instead of the map should be returned only in case of some
-     *     general failure affected the settings applying procedure as a whole. May contain null if
-     *     no errors occurred.
+     * @return Result containing a map of errors that occurred while applying each setting - the
+     *     keys are the setting ids, and the values are human readable error strings in English.
+     *     Even if some settings can't be applied or an error happens while applying them, this
+     *     method must return a successful result with a corresponding map of errors. A faulty
+     *     result containing error information instead of the map should be returned only in case
+     *     of some general failure that affected the procedure of applying the settings. The result
+     *     should contain null if no errors occurred.
      */
     virtual Result<const IStringMap*> setSettings(const IStringMap* settings) = 0;
 
@@ -81,9 +82,9 @@ public:
      *
      * @return Result containing (in case of success) information about settings that are stored on
      *     the plugin side. Errors corresponding to particular settings should be placed in the
-     *     `ISettingsResponse` object. A faulty result must be returned only in case of general
-     *     error that affects the settings retrieval procedure as a whole. May contain null if
-     *     Engine has no plugin-side settings.
+     *     ISettingsResponse object. A faulty result must be returned only in case of a general
+     *     failure that affects the settings retrieval procedure. The result should contain null if
+     *     the Engine has no plugin-side settings.
      */
     virtual Result<const ISettingsResponse*> pluginSideSettings() const = 0;
 
@@ -94,8 +95,7 @@ public:
      * After creation of this Engine instance, this method is called after setSettings(), but can
      * be called again at any other moment to obtain the most actual manifest.
      *
-     * @return Result containing JSON string in UTF-8 in case of success. Otherwise a result
-     *     containing error information must be returned.
+     * @return JSON string in UTF-8.
      */
     virtual Result<const IString*> manifest() const = 0;
 
@@ -110,8 +110,7 @@ public:
      * given device.
      *
      * @param deviceInfo Information about the device for which a DeviceAgent should be created.
-     * @return Result containing a pointer to an object that implements the IDeviceAgent interface,
-     *     or a result containing information about the error in case of failure.
+     * @return Pointer to an object that implements IDeviceAgent interface.
      */
     virtual Result<IDeviceAgent*> obtainDeviceAgent(const IDeviceInfo* deviceInfo) = 0;
 
@@ -121,7 +120,6 @@ public:
      * @param action Provides data for the action such as metadata object for which the action has
      *     been triggered, and a means for reporting back action results to Server. This object
      *     should not be used after returning from this function.
-     * @return Result containing error information in case of failure.
      */
     virtual Result<void> executeAction(IAction* action) = 0;
 

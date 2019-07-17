@@ -137,7 +137,7 @@ StringResult Engine::manifest() const
     return new nx::sdk::String(m_manifest);
 }
 
-DeviceAgentResult Engine::obtainDeviceAgent(const IDeviceInfo* deviceInfo)
+MutableDeviceAgentResult Engine::obtainDeviceAgent(const IDeviceInfo* deviceInfo)
 {
     NX_OUTPUT
         << __func__

@@ -72,7 +72,7 @@ void DeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
 
     handler->addRef();
     m_handler.reset(handler);
-    
+
     m_pipeline->setMetadataCallback(
         [this](IMetadataPacket* packet)
         {
@@ -100,7 +100,7 @@ Result<void> DeviceAgent::pushDataPacket(IDataPacket* dataPacket)
 
 Result<void> DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes)
 {
-    if (metadataTypes->isEmpty())    
+    if (metadataTypes->isEmpty())
         stopFetchingMetadata();
 
     startFetchingMetadata(metadataTypes);
@@ -118,7 +118,7 @@ void DeviceAgent::stopFetchingMetadata()
 }
 
 StringResult DeviceAgent::manifest() const
-{    
+{
     if (!m_manifest.empty())
         return new nx::sdk::String(m_manifest);
 

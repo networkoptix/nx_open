@@ -6,7 +6,7 @@
 #include <string>
 
 #include <nx/sdk/analytics/helpers/video_frame_processing_device_agent.h>
-#include <nx/sdk/analytics/helpers/aliases.h>
+#include <nx/sdk/analytics/helpers/result_aliases.h>
 
 #include <tegra_video.h> //< libtegra_video.so - analytics for Tegra; the lib is a stub on a PC.
 
@@ -30,7 +30,7 @@ public:
         const nx::sdk::analytics::IMetadataTypes* metadataTypes) override;
 
 protected:
-    virtual std::string manifestInternal() const override;
+    virtual std::string manifestString() const override;
 
     virtual bool pushCompressedVideoFrame(
         const nx::sdk::analytics::ICompressedVideoPacket* videoFrame) override;

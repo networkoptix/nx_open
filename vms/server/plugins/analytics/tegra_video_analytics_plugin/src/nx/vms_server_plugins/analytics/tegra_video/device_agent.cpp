@@ -76,7 +76,7 @@ Result<void> DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* /*metadat
     return {};
 }
 
-std::string DeviceAgent::manifestInternal() const
+std::string DeviceAgent::manifestString() const
 {
     return R"manifest(
         {

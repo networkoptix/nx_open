@@ -98,7 +98,7 @@ void Engine::setEngineInfo(const IEngineInfo* engineInfo)
         PrintPrefixMaker().makePrintPrefix(m_overridingPrintPrefix, m_plugin, engineInfo));
 }
 
-Result<const IStringMap*> Engine::setSettings(const IStringMap* settings)
+StringMapResult Engine::setSettings(const IStringMap* settings)
 {
     if (!logUtils.convertAndOutputStringMap(&m_settings, settings, "Received settings"))
         return error(ErrorCode::invalidParams, "Unable to convert the input string map");
@@ -106,14 +106,14 @@ Result<const IStringMap*> Engine::setSettings(const IStringMap* settings)
     return settingsReceived();
 }
 
-Result<const ISettingsResponse*> Engine::pluginSideSettings() const
+SettingsResponseResult Engine::pluginSideSettings() const
 {
     return nullptr;
 }
 
-Result<const IString*> Engine::manifest() const
+StringResult Engine::manifest() const
 {
-    return new String(manifestInternal());
+    return new String(manifestString());
 }
 
 Result<void> Engine::executeAction(IAction* action)

@@ -12,7 +12,7 @@
 #include <nx/sdk/analytics/i_engine.h>
 #include <nx/sdk/analytics/i_device_agent.h>
 #include <nx/sdk/analytics/helpers/plugin.h>
-#include <nx/sdk/analytics/helpers/aliases.h>
+#include <nx/sdk/analytics/helpers/result_aliases.h>
 
 #include <nx/vms_server_plugins/analytics/deepstream/default/object_class_description.h>
 
@@ -37,7 +37,7 @@ public:
 
     virtual nx::sdk::StringResult manifest() const override;
 
-    virtual nx::sdk::analytics::DeviceAgentResult obtainDeviceAgent(
+    virtual nx::sdk::analytics::MutableDeviceAgentResult obtainDeviceAgent(
         const nx::sdk::IDeviceInfo* deviceInfo) override;
 
     virtual nx::sdk::Result<void> executeAction(nx::sdk::analytics::IAction*) override;

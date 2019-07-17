@@ -10,6 +10,7 @@
 #include <nx/sdk/helpers/ref_countable.h>
 #include <nx/sdk/helpers/log_utils.h>
 #include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/helpers/result_aliases.h>
 
 #include <nx/sdk/analytics/i_engine.h>
 #include <nx/sdk/analytics/i_consuming_device_agent.h>
@@ -51,7 +52,7 @@ protected:
         bool enableOutput,
         const std::string& printPrefix = "");
 
-    virtual std::string manifestInternal() const = 0;
+    virtual std::string manifestString() const = 0;
 
     /**
      * Override to accept next compressed video frame for processing. Should not block the caller
@@ -106,8 +107,9 @@ protected:
     /**
      * Called when the settings are received from the server (even if the values are not changed).
      * Should perform any required (re)initialization. Called even if the settings model is empty.
+     * @return Error messages per setting (if any), as in IDeviceAgent::setSettings().
      */
-    virtual Result<const IStringMap*> settingsReceived() { return nullptr; }
+    virtual StringMapResult settingsReceived() { return nullptr; }
 
     /**
      * Provides access to the Manager settings stored by the server for a particular Resource.
@@ -141,9 +143,9 @@ public:
 public:
     virtual void setHandler(IDeviceAgent::IHandler* handler) override;
     virtual Result<void> pushDataPacket(IDataPacket* dataPacket) override;
-    virtual Result<const IString*> manifest() const override;
-    virtual Result<const IStringMap*> setSettings(const IStringMap* settings) override;
-    virtual Result<const ISettingsResponse*> pluginSideSettings() const override;
+    virtual StringResult manifest() const override;
+    virtual StringMapResult setSettings(const IStringMap* settings) override;
+    virtual SettingsResponseResult pluginSideSettings() const override;
 
 private:
     void assertEngineCasted(void* engine) const;
@@ -156,7 +158,7 @@ private:
 private:
     mutable std::mutex m_mutex;
     IEngine* const m_engine;
-    nx::sdk::Ptr<IDeviceAgent::IHandler> m_handler;
+    Ptr<IDeviceAgent::IHandler> m_handler;
     std::map<std::string, std::string> m_settings;
 };
 
