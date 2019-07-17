@@ -75,7 +75,7 @@ public:
     bool transcodeAsync(
         const StreamingChunkCacheKey& transcodeParams,
         StreamingChunkPtr chunk);
-
+    void stop();
 protected:
     virtual void onTimer(const quint64& timerID);
 
