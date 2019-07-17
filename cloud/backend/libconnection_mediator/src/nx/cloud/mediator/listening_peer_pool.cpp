@@ -243,10 +243,12 @@ boost::optional<ListeningPeerPool::ConstDataLocker>
         QnMutexLocker lock(&m_mutex);
 
         if (!m_bestUplinkSpeed)
-            m_bestUplinkSpeed = findLocalPeerWithBestUplinkSpeedUnsafe(__func__, systemId);
+            m_bestUplinkSpeed = findLocalPeerWithBestUplinkSpeedUnsafe(systemId);
 
         if (m_bestUplinkSpeed)
         {
+            NX_VERBOSE(this, "Found best uplink speed while searching for Peer: %2",
+                *m_bestUplinkSpeed);
             auto peerIter = m_peers.find(toMediaServerData(*m_bestUplinkSpeed));
             if (peerIter != m_peers.end())
                 return ConstDataLocker(std::move(lock), std::move(peerIter));
@@ -349,7 +351,13 @@ void ListeningPeerPool::onListeningPeerConnectionClosed(
         peerDataLowerCase.hostName() == toMediaServerData(*m_bestUplinkSpeed).hostName())
     {
         m_bestUplinkSpeed =
-            findLocalPeerWithBestUplinkSpeedUnsafe(__func__, peerDataLowerCase.systemId);
+            findLocalPeerWithBestUplinkSpeedUnsafe(peerDataLowerCase.systemId);
+
+        if (m_bestUplinkSpeed)
+        {
+            NX_VERBOSE(this, "Found best uplink speed after closing connection to Peer: %2",
+                *m_bestUplinkSpeed);
+        }
     }
 }
 
@@ -389,13 +397,11 @@ void ListeningPeerPool::onUplinkSpeedUpdated(nx::hpm::api::PeerConnectionSpeed p
 
     m_bestUplinkSpeed = peerUplinkSpeed;
 
-    NX_VERBOSE(this, "%1: updating best uplink speed: %2",
-        __func__, QJson::serialized(*m_bestUplinkSpeed));
+    NX_VERBOSE(this, "Updating best uplink speed: %2", m_bestUplinkSpeed->toString());
 }
 
 std::optional<nx::hpm::api::PeerConnectionSpeed>
     ListeningPeerPool::findLocalPeerWithBestUplinkSpeedUnsafe(
-        const char* callingFunc,
         const nx::String& systemId) const
 {
     using Status = std::pair<std::string, ListeningPeerStatus>;
@@ -429,8 +435,6 @@ std::optional<nx::hpm::api::PeerConnectionSpeed>
                 status.second.serverId,
                 status.second.systemId,
                 status.second.uplinkSpeed};
-
-            NX_VERBOSE(this, "%1: found best uplink speed: %2", callingFunc, uplinkSpeed);
 
             return uplinkSpeed;
         }
