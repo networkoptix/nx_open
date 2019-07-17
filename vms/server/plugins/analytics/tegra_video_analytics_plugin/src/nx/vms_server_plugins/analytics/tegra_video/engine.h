@@ -13,7 +13,7 @@ class Engine: public nx::sdk::analytics::Engine
 public:
     Engine(nx::sdk::analytics::IPlugin* plugin);
 
-    virtual nx::sdk::analytics::DeviceAgentResult obtainDeviceAgent(
+    virtual nx::sdk::analytics::MutableDeviceAgentResult obtainDeviceAgent(
         const nx::sdk::IDeviceInfo* deviceInfo) override;
 
 protected:

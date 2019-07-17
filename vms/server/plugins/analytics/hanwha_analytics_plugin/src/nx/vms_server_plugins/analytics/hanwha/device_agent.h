@@ -31,7 +31,7 @@ public:
     virtual void setHandler(
         nx::sdk::analytics::IDeviceAgent::IHandler* IHandler) override;
 
-    virtual nx::sdk::VoidResult setNeededMetadataTypes(
+    virtual nx::sdk::Result<void> setNeededMetadataTypes(
         const nx::sdk::analytics::IMetadataTypes* metadataTypes) override;
 
     virtual nx::sdk::StringResult manifest() const override;
@@ -47,7 +47,7 @@ public:
     virtual nx::sdk::SettingsResponseResult pluginSideSettings() const override;
 
 private:
-    nx::sdk::VoidResult startFetchingMetadata(
+    nx::sdk::Result<void> startFetchingMetadata(
         const nx::sdk::analytics::IMetadataTypes* metadataTypes);
 
     void stopFetchingMetadata();

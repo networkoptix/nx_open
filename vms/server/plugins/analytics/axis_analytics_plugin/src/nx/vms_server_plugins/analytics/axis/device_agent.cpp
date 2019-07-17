@@ -47,7 +47,7 @@ void DeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
     m_handler.reset(handler);
 }
 
-VoidResult DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes)
+Result<void> DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes)
 {
     const auto neededEventTypeIds = toPtr(metadataTypes->eventTypeIds());
     if (!neededEventTypeIds || !neededEventTypeIds->count())
@@ -67,7 +67,7 @@ SettingsResponseResult DeviceAgent::pluginSideSettings() const
     return nullptr;
 }
 
-VoidResult DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTypes)
+Result<void> DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTypes)
 {
     m_monitor = new Monitor(this, m_url, m_auth, m_handler.get());
     return m_monitor->startMonitoring(metadataTypes);

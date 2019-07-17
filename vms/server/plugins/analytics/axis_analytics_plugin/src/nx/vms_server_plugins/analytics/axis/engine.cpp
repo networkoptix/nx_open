@@ -60,7 +60,7 @@ SettingsResponseResult Engine::pluginSideSettings() const
     return nullptr;
 }
 
-DeviceAgentResult Engine::obtainDeviceAgent(const IDeviceInfo* deviceInfo)
+MutableDeviceAgentResult Engine::obtainDeviceAgent(const IDeviceInfo* deviceInfo)
 {
     if (!isCompatible(deviceInfo))
         return error(ErrorCode::invalidParams, "Device is not compatible");
@@ -111,7 +111,7 @@ EngineManifest Engine::fetchSupportedEvents(const IDeviceInfo* deviceInfo)
     return result;
 }
 
-VoidResult Engine::executeAction(IAction* /*action*/)
+Result<void> Engine::executeAction(IAction* /*action*/)
 {
     return {};
 }

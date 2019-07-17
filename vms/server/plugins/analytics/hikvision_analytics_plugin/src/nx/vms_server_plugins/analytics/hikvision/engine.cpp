@@ -78,7 +78,7 @@ SettingsResponseResult Engine::pluginSideSettings() const
     return nullptr;
 }
 
-DeviceAgentResult Engine::obtainDeviceAgent(const IDeviceInfo* deviceInfo)
+MutableDeviceAgentResult Engine::obtainDeviceAgent(const IDeviceInfo* deviceInfo)
 {
     if (!isCompatible(deviceInfo))
         return nullptr;
@@ -183,7 +183,7 @@ const Hikvision::EngineManifest& Engine::engineManifest() const
     return m_engineManifest;
 }
 
-VoidResult Engine::executeAction(IAction* /*action*/)
+Result<void> Engine::executeAction(IAction* /*action*/)
 {
     return {};
 }

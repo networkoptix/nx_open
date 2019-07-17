@@ -212,7 +212,7 @@ nx::network::HostAddress Monitor::getLocalIp(const nx::network::SocketAddress& c
     return nx::network::HostAddress();
 }
 
-VoidResult Monitor::startMonitoring(const IMetadataTypes* metadataTypes)
+Result<void> Monitor::startMonitoring(const IMetadataTypes* metadataTypes)
 {
     // Assume that the list contains events only, since this plugin produces no objects.
     const auto eventTypeList = toPtr(metadataTypes->eventTypeIds());

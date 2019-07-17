@@ -28,7 +28,7 @@ public:
     Engine(Plugin* plugin);
     virtual ~Engine() override;
 
-    virtual nx::sdk::Result<nx::sdk::analytics::IDeviceAgent*> obtainDeviceAgent(
+    virtual nx::sdk::analytics::MutableDeviceAgentResult obtainDeviceAgent(
         const nx::sdk::IDeviceInfo* deviceInfo) override;
 
     // Capabilities.

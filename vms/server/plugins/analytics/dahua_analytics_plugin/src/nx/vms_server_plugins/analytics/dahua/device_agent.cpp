@@ -51,7 +51,7 @@ void DeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
     m_handler.reset(handler);
 }
 
-VoidResult DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes)
+Result<void> DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes)
 {
     if (metadataTypes->isEmpty())
         stopFetchingMetadata();
@@ -59,7 +59,7 @@ VoidResult DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTyp
     return startFetchingMetadata(metadataTypes);
 }
 
-VoidResult DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTypes)
+Result<void> DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTypes)
 {
     auto monitorHandler =
         [this](const EventList& events)

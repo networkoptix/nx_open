@@ -42,7 +42,7 @@ void DeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
     m_handler.reset(handler);
 }
 
-VoidResult DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes)
+Result<void> DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes)
 {
     const auto eventTypeIds = toPtr(metadataTypes->eventTypeIds());
     if (const char* const kMessage = "Event type id list is nullptr";
@@ -68,7 +68,7 @@ SettingsResponseResult DeviceAgent::pluginSideSettings() const
     return nullptr;
 }
 
-VoidResult DeviceAgent::startFetchingMetadata(const IMetadataTypes* /*metadataTypes*/)
+Result<void> DeviceAgent::startFetchingMetadata(const IMetadataTypes* /*metadataTypes*/)
 {
     const auto monitorHandler =
         [this](const EventList& events)

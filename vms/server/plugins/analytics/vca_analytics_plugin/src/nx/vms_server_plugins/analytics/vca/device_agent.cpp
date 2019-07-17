@@ -430,7 +430,7 @@ void DeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
 }
 
 
-VoidResult DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes)
+Result<void> DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes)
 {
     if (metadataTypes->isEmpty())
         stopFetchingMetadata();
@@ -438,7 +438,7 @@ VoidResult DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTyp
     return startFetchingMetadata(metadataTypes);
 }
 
-VoidResult DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTypes)
+Result<void> DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTypes)
 {
     QString host = m_url.host();
     nx::vca::CameraController vcaCameraConrtoller(host, m_auth.user(), m_auth.password());

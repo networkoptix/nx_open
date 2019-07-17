@@ -72,7 +72,7 @@ public:
 
     nx::network::HostAddress getLocalIp(const nx::network::SocketAddress& cameraAddress);
 
-    nx::sdk::VoidResult startMonitoring(const nx::sdk::analytics::IMetadataTypes* metadataTypes);
+    nx::sdk::Result<void> startMonitoring(const nx::sdk::analytics::IMetadataTypes* metadataTypes);
 
     void stopMonitoring();
 

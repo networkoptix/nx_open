@@ -29,14 +29,14 @@ public:
 
     virtual nx::sdk::SettingsResponseResult pluginSideSettings() const override;
 
-    virtual nx::sdk::analytics::DeviceAgentResult obtainDeviceAgent(
+    virtual nx::sdk::analytics::MutableDeviceAgentResult obtainDeviceAgent(
         const nx::sdk::IDeviceInfo* deviceInfo) override;
 
     virtual nx::sdk::StringResult manifest() const override;
 
     const EventType* eventTypeById(const QString& id) const noexcept;
 
-    virtual nx::sdk::VoidResult executeAction(nx::sdk::analytics::IAction* action) override;
+    virtual nx::sdk::Result<void> executeAction(nx::sdk::analytics::IAction* action) override;
 
     virtual void setHandler(nx::sdk::analytics::IEngine::IHandler* handler) override;
 

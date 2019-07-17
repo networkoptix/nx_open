@@ -96,7 +96,7 @@ void DeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
     m_handler.reset(handler);
 }
 
-VoidResult DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes)
+Result<void> DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes)
 {
     const auto eventTypeIds = toPtr(metadataTypes->eventTypeIds());
     if (const char* const kMessage = "Event type id list is nullptr";

@@ -40,7 +40,7 @@ public:
     virtual nx::sdk::analytics::DeviceAgentResult obtainDeviceAgent(
         const nx::sdk::IDeviceInfo* deviceInfo) override;
 
-    virtual nx::sdk::VoidResult executeAction(nx::sdk::analytics::IAction*) override;
+    virtual nx::sdk::Result<void> executeAction(nx::sdk::analytics::IAction*) override;
 
     std::vector<ObjectClassDescription> objectClassDescritions() const;
 

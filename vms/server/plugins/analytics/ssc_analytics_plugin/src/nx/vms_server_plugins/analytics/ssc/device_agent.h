@@ -36,7 +36,7 @@ public:
 
     virtual void setHandler(nx::sdk::analytics::IDeviceAgent::IHandler* handler) override;
 
-    virtual nx::sdk::VoidResult setNeededMetadataTypes(
+    virtual nx::sdk::Result<void> setNeededMetadataTypes(
         const nx::sdk::analytics::IMetadataTypes* metadataTypes) override;
 
     virtual nx::sdk::StringMapResult setSettings(const nx::sdk::IStringMap* settings) override;

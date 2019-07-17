@@ -21,7 +21,7 @@ Engine::Engine(nx::sdk::analytics::IPlugin* plugin):
 {
 }
 
-DeviceAgentResult Engine::obtainDeviceAgent(const IDeviceInfo* deviceInfo)
+MutableDeviceAgentResult Engine::obtainDeviceAgent(const IDeviceInfo* deviceInfo)
 {
     return new DeviceAgent(this, deviceInfo);
 }

@@ -354,7 +354,7 @@ void Engine::unregisterCamera(int cameraLogicalId)
     m_cameraMap.remove(cameraLogicalId);
 }
 
-DeviceAgentResult Engine::obtainDeviceAgent(const IDeviceInfo* deviceInfo)
+MutableDeviceAgentResult Engine::obtainDeviceAgent(const IDeviceInfo* deviceInfo)
 {
     // We should invent more accurate test.
     if (isCompatible(deviceInfo))
@@ -368,7 +368,7 @@ StringResult Engine::manifest() const
     return new nx::sdk::String(m_manifest);
 }
 
-VoidResult Engine::executeAction(IAction* /*action*/)
+Result<void> Engine::executeAction(IAction* /*action*/)
 {
     return {};
 }

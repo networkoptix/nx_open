@@ -83,7 +83,7 @@ void DeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
     NX_OUTPUT << __func__ << "() END -> noError";
 }
 
-VoidResult DeviceAgent::pushDataPacket(IDataPacket* dataPacket)
+Result<void> DeviceAgent::pushDataPacket(IDataPacket* dataPacket)
 {
 // TODO: Investigate why this code is commented out.
 #if 0
@@ -98,7 +98,7 @@ VoidResult DeviceAgent::pushDataPacket(IDataPacket* dataPacket)
     return {};
 }
 
-VoidResult DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes)
+Result<void> DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes)
 {
     if (metadataTypes->isEmpty())    
         stopFetchingMetadata();

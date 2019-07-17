@@ -10,8 +10,8 @@ namespace nx {
 namespace sdk {
 namespace analytics {
 
-using DeviceAgentResult = nx::sdk::Result<nx::sdk::analytics::IDeviceAgent*>;
-using EngineResult = nx::sdk::Result<nx::sdk::analytics::IEngine*>;
+using MutableDeviceAgentResult = Result<IDeviceAgent*>;
+using MutableEngineResult = Result<IEngine*>;
 
 } // namespace analytics
 } // namespace sdk

@@ -26,7 +26,7 @@ public:
     DeviceAgent(Engine* engine, const nx::sdk::IDeviceInfo* deviceInfo);
     virtual ~DeviceAgent() override;
 
-    virtual nx::sdk::VoidResult setNeededMetadataTypes(
+    virtual nx::sdk::Result<void> setNeededMetadataTypes(
         const nx::sdk::analytics::IMetadataTypes* metadataTypes) override;
 
 protected:

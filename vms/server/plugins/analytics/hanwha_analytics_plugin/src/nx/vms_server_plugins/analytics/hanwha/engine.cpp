@@ -97,7 +97,7 @@ Engine::Engine(Plugin* plugin): m_plugin(plugin)
     m_engineManifest = QJson::deserialized<Hanwha::EngineManifest>(m_manifest);
 }
 
-DeviceAgentResult Engine::obtainDeviceAgent(const IDeviceInfo* deviceInfo)
+MutableDeviceAgentResult Engine::obtainDeviceAgent(const IDeviceInfo* deviceInfo)
 {
     if (!isCompatible(deviceInfo))
         return error(ErrorCode::otherError, "Device is not compatible with the Engine");
@@ -147,7 +147,7 @@ SettingsResponseResult Engine::pluginSideSettings() const
     return nullptr;
 }
 
-VoidResult Engine::executeAction(IAction* /*action*/)
+Result<void> Engine::executeAction(IAction* /*action*/)
 {
     return {};
 }

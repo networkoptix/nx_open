@@ -155,7 +155,7 @@ DeviceAgentResult Engine::obtainDeviceAgent(const IDeviceInfo* deviceInfo)
     return m_deviceAgent;
 }
 
-VoidResult Engine::executeAction(IAction* /*action*/)
+Result<void> Engine::executeAction(IAction* /*action*/)
 {
     return {};
 }

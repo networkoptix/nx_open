@@ -101,7 +101,7 @@ SettingsResponseResult Engine::pluginSideSettings() const
     return nullptr;
 }
 
-DeviceAgentResult Engine::obtainDeviceAgent(const IDeviceInfo* deviceInfo)
+MutableDeviceAgentResult Engine::obtainDeviceAgent(const IDeviceInfo* deviceInfo)
 {
     if (!isCompatible(deviceInfo))
         return nullptr;
@@ -208,7 +208,7 @@ const EngineManifest& Engine::parsedManifest() const
     return m_parsedManifest;
 }
 
-VoidResult Engine::executeAction(IAction* /*action*/)
+Result<void> Engine::executeAction(IAction* /*action*/)
 {
     return {};
 }

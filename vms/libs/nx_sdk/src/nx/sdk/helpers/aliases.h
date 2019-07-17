@@ -10,10 +10,9 @@
 namespace nx {
 namespace sdk {
 
-using VoidResult = nx::sdk::Result<void>;
-using StringResult = nx::sdk::Result<const nx::sdk::IString*>;
-using StringMapResult = nx::sdk::Result<const nx::sdk::IStringMap*>;
-using SettingsResponseResult = nx::sdk::Result<const nx::sdk::ISettingsResponse*>;
+using StringResult = Result<const IString*>;
+using StringMapResult = Result<const IStringMap*>;
+using SettingsResponseResult = Result<const ISettingsResponse*>;
 
 } // namespace sdk
 } // namespace nx

@@ -82,7 +82,7 @@ void Engine::generatePluginDiagnosticEvents()
     }
 }
 
-Result<IDeviceAgent*> Engine::obtainDeviceAgent(const IDeviceInfo* deviceInfo)
+MutableDeviceAgentResult Engine::obtainDeviceAgent(const IDeviceInfo* deviceInfo)
 {
     return new DeviceAgent(this, deviceInfo);
 }
