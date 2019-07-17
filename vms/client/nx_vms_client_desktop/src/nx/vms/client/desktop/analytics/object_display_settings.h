@@ -4,7 +4,7 @@
 #include <QtGui/QColor>
 
 #include <nx/utils/uuid.h>
-#include <analytics/common/object_detection_metadata.h>
+#include <analytics/common/object_metadata.h>
 
 namespace nx::vms::client::desktop {
 

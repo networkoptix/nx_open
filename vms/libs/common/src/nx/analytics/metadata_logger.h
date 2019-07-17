@@ -7,7 +7,7 @@
 #include <nx/analytics/frame_info.h>
 #include <nx/streaming/video_data_packet.h>
 #include <nx/vms/api/types/motion_types.h>
-#include <analytics/common/object_detection_metadata.h>
+#include <analytics/common/object_metadata.h>
 
 namespace nx::analytics {
 

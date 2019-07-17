@@ -1,4 +1,4 @@
-#include "object_detection_metadata.h"
+#include "object_metadata.h"
 
 #include <QtCore/QRegularExpression>
 

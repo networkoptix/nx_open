@@ -7,7 +7,7 @@
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/thread/sync_queue.h>
 
-#include <nx/vms/server/analytics/db/detected_objects_streamer.h>
+#include <nx/vms/server/analytics/db/object_metadata_streamer.h>
 #include <utils/common/util.h>
 
 #include "analytics_storage_types.h"

@@ -8,7 +8,7 @@
 #include <QtWidgets/QMenu>
 
 #include <api/server_rest_connection.h>
-#include <analytics/common/object_detection_metadata.h>
+#include <analytics/common/object_metadata.h>
 #include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/camera_history.h>

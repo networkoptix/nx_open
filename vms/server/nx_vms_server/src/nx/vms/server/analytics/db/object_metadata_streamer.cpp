@@ -1,4 +1,4 @@
-#include "detected_objects_streamer.h"
+#include "object_metadata_streamer.h"
 
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/log/log.h>

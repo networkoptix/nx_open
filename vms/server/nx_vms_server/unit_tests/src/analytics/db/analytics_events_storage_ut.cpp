@@ -13,7 +13,7 @@
 #include <analytics/db/config.h>
 
 #include <nx/vms/server/analytics/db/analytics_db.h>
-#include <nx/vms/server/analytics/db/object_searcher.h>
+#include <nx/vms/server/analytics/db/object_track_searcher.h>
 #include <nx/vms/server/analytics/db/serializers.h>
 
 #include "analytics_storage_types.h"

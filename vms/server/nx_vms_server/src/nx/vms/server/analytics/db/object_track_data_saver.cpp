@@ -1,4 +1,4 @@
-#include "detection_data_saver.h"
+#include "object_track_data_saver.h"
 
 #include <nx/fusion/serialization/sql_functions.h>
 
@@ -8,7 +8,7 @@
 #include "attributes_dao.h"
 #include "device_dao.h"
 #include "object_type_dao.h"
-#include "object_group_dao.h"
+#include "object_track_group_dao.h"
 #include "serializers.h"
 
 namespace nx::analytics::db {

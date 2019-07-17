@@ -10,7 +10,7 @@
 #include <nx/network/http/http_types.h>
 #include <nx/sql/types.h>
 
-#include <analytics/common/object_detection_metadata.h>
+#include <analytics/common/object_metadata.h>
 #include <recording/time_period.h>
 #include <utils/common/request_param.h>
 

@@ -7,7 +7,7 @@
 #include <nx/utils/elapsed_timer_pool.h>
 #include <nx/utils/thread/mutex.h>
 
-#include <analytics/common/object_detection_metadata.h>
+#include <analytics/common/object_metadata.h>
 #include <analytics/db/analytics_db_types.h>
 
 namespace nx::analytics::db {

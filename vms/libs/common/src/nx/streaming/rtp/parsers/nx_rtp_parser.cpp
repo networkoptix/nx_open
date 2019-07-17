@@ -2,7 +2,7 @@
 
 #include <nx/utils/log/log.h>
 
-#include <analytics/common/object_detection_metadata.h>
+#include <analytics/common/object_metadata.h>
 
 #include <nx/streaming/rtp/rtp.h>
 #include <nx/streaming/audio_data_packet.h>

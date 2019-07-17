@@ -3,7 +3,7 @@
 #include <set>
 
 #include <core/resource/camera_resource.h>
-#include <analytics/common/object_detection_metadata.h>
+#include <analytics/common/object_metadata.h>
 #include <nx/fusion/fusion/fusion.h>
 #include <nx/fusion/serialization/ubjson.h>
 

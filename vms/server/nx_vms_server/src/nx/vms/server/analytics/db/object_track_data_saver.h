@@ -8,7 +8,7 @@
 
 #include <analytics/db/analytics_db_types.h>
 
-#include "object_cache.h"
+#include "object_track_cache.h"
 #include "object_track_aggregator.h"
 
 namespace nx::analytics::db {

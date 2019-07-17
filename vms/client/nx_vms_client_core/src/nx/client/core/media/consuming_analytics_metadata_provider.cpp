@@ -1,6 +1,6 @@
 #include "consuming_analytics_metadata_provider.h"
 
-#include <analytics/common/object_detection_metadata.h>
+#include <analytics/common/object_metadata.h>
 #include <core/resource/camera_resource.h>
 #include <nx/media/caching_metadata_consumer.h>
 #include <nx/fusion/serialization/ubjson.h>

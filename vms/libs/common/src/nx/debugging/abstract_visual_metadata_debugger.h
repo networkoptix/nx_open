@@ -3,7 +3,7 @@
 #include <nx/streaming/video_data_packet.h>
 
 #include <utils/media/frame_info.h>
-#include <analytics/common/object_detection_metadata.h>
+#include <analytics/common/object_metadata.h>
 
 namespace nx {
 namespace debugging {

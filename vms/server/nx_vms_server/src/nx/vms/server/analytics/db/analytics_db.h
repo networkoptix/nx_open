@@ -17,9 +17,9 @@
 #include "analytics_archive_directory.h"
 #include "attributes_dao.h"
 #include "device_dao.h"
-#include "detection_data_saver.h"
-#include "object_cache.h"
-#include "object_group_dao.h"
+#include "object_track_data_saver.h"
+#include "object_track_cache.h"
+#include "object_track_group_dao.h"
 #include "object_track_aggregator.h"
 #include "object_type_dao.h"
 

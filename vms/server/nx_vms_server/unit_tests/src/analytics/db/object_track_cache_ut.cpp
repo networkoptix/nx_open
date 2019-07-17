@@ -4,7 +4,7 @@
 
 #include <nx/utils/time.h>
 
-#include <nx/vms/server/analytics/db/object_cache.h>
+#include <nx/vms/server/analytics/db/object_track_cache.h>
 
 #include "analytics_storage_types.h"
 

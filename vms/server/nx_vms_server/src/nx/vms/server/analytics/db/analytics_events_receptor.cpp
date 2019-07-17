@@ -4,7 +4,7 @@
 #include <nx/streaming/media_data_packet.h>
 #include <nx/utils/log/log.h>
 
-#include <analytics/common/object_detection_metadata.h>
+#include <analytics/common/object_metadata.h>
 #include <analytics/db/abstract_storage.h>
 #include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>

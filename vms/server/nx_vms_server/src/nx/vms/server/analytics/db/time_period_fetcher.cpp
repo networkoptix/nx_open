@@ -7,7 +7,7 @@
 
 #include "attributes_dao.h"
 #include "device_dao.h"
-#include "object_searcher.h"
+#include "object_track_searcher.h"
 #include "serializers.h"
 
 namespace nx::analytics::db {

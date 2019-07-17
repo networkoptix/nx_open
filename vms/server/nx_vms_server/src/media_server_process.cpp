@@ -168,7 +168,7 @@
 #include <rest/handlers/save_cloud_system_credentials.h>
 #include <rest/handlers/multiserver_thumbnail_rest_handler.h>
 #include <rest/handlers/multiserver_statistics_rest_handler.h>
-#include <rest/handlers/multiserver_analytics_lookup_detected_objects.h>
+#include <rest/handlers/multiserver_analytics_lookup_object_tracks.h>
 #include <rest/handlers/execute_analytics_action_rest_handler.h>
 #include <rest/handlers/get_analytics_actions_rest_handler.h>
 #include <rest/server/rest_connection_processor.h>
