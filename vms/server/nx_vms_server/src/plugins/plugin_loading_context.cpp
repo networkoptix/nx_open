@@ -55,7 +55,7 @@ public:
 
 private:
     /**
-     * @return The current value, possibly empty, or null QString on error. Note: there seems to be
+     * @return The current value (possibly empty) or null QString on error. Note: there seems to be
      *     no way to learn whether the previous call to SetDllDirectoryW() has set null or empty
      *     string.
      */
