@@ -217,7 +217,8 @@ CameraDiagnostics::Result QnAxisStreamReader::openStreamInternal(bool isCameraCo
 
             str << "/axis-cgi/param.cgi?action=" << action;
             str << "&template=streamprofile";
-            str << "&group=StreamProfile";
+            if (action != "update")
+                str << "&group=StreamProfile";
             str << "&StreamProfile." << profileNumber << ".Name=" << profileName;
             str << "&StreamProfile." << profileNumber << ".Description=" << QUrl::toPercentEncoding(QLatin1String(profileDescription));
             str << "&StreamProfile." << profileNumber << ".Parameters=" << QUrl::toPercentEncoding(QLatin1String(paramsStr));
