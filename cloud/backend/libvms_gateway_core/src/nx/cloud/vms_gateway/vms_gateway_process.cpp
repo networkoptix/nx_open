@@ -140,22 +140,19 @@ int VmsGatewayProcess::serviceMain(
 
         if (!multiAddressHttpServer.listen())
             return 5;
-        m_httpEndpoints = multiAddressHttpServer.endpoints();
 
-        NX_INFO(this, lm("%1 has been started on %2")
-            .arg(QnLibVmsGatewayAppInfo::applicationDisplayName())
-            .container(m_httpEndpoints));
+        m_httpEndpoints = multiAddressHttpServer.endpoints();
+        NX_INFO(this, "%1 has been started on %2",
+            QnLibVmsGatewayAppInfo::applicationDisplayName(),
+            containerString(m_httpEndpoints));
 
         const auto result = runMainLoop();
-
-        NX_INFO(this, lm("%1 has been stopped")
-            .arg(QnLibVmsGatewayAppInfo::applicationDisplayName()));
-
+        NX_INFO(this, "%1 has been stopped", QnLibVmsGatewayAppInfo::applicationDisplayName());
         return result;
     }
     catch (const std::exception& e)
     {
-        NX_ERROR(this, lit("Failed to start application. %1").arg(e.what()));
+        NX_ERROR(this, "Failed to start application. %1", e.what());
         return 3;
     }
 }
