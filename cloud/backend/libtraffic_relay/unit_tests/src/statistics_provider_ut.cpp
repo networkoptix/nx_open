@@ -36,10 +36,10 @@ nx::network::http::server::HttpStatistics generateHttpServerStatistics()
     statistics.connectionsAcceptedPerMinute = nx::utils::random::number<>(1, 20);
     statistics.requestsAveragePerConnection = nx::utils::random::number<>(1, 20);
     statistics.requestsServedPerMinute = nx::utils::random::number<>(1, 20);
-    statistics.averageRequestProcessingTime =
-        std::chrono::milliseconds(nx::utils::random::number(1, 20));
-    statistics.maxRequestProcessingTime =
-        std::chrono::milliseconds(nx::utils::random::number(1, 20));
+    statistics.averageRequestProcessingTimeUsec =
+        std::chrono::microseconds(nx::utils::random::number(1, 20));
+    statistics.maxRequestProcessingTimeUsec =
+        std::chrono::microseconds(nx::utils::random::number(1, 20));
     return statistics;
 }
 
