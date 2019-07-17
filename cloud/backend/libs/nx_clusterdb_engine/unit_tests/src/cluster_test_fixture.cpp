@@ -155,7 +155,6 @@ void Peer::setOutgoingCommandFilter(const OutgoingCommandFilterConfiguration& fi
 //-------------------------------------------------------------------------------------------------
 
 ClusterTestFixture::ClusterTestFixture():
-    base_type("nx_data_sync_engine_ut", ""),
     m_clusterId("test_cluster_id")
 {
 }

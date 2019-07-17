@@ -26,7 +26,6 @@ class AnalyticsDb:
 {
 public:
     AnalyticsDb():
-        nx::utils::test::TestWithTemporaryDirectory("analytics_db", QString()),
         m_allowedTimeRange(
             std::chrono::system_clock::from_time_t(0),
             std::chrono::system_clock::from_time_t(0))

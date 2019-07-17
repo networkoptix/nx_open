@@ -7,8 +7,7 @@
 
 namespace nx::sql::test {
 
-BasicFixture::BasicFixture(const std::string& testModuleName):
-    nx::utils::test::TestWithTemporaryDirectory(testModuleName.c_str(), "")
+BasicFixture::BasicFixture()
 {
     m_tmpDir = testDataDir().toStdString() + "/db_test";
     QDir(m_tmpDir.c_str()).removeRecursively();

@@ -19,7 +19,6 @@ class DataBase:
 
 public:
     DataBase():
-        base_type("sql"),
         m_file(testDataDir() + QLatin1String("/db.sqlite"))
     {
 

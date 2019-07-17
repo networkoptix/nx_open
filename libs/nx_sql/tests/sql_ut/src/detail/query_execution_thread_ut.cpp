@@ -16,8 +16,7 @@ class QueryExecutionThread:
     using base_type = nx::sql::test::BaseDbTest;
 
 public:
-    QueryExecutionThread():
-        base_type(kModuleName)
+    QueryExecutionThread()
     {
         initializeDatabase();
     }

@@ -286,7 +286,7 @@ bool MediatorInstance::allocateTcpPorts()
 }
 
 MediatorFunctionalTest::MediatorFunctionalTest(int flags, const QString& testDir):
-    utils::test::TestWithTemporaryDirectory("hpm", testDir),
+    utils::test::TestWithTemporaryDirectory(testDir),
     MediatorInstance(flags, testDir.isEmpty() ? testDataDir() : testDir)
 {
     if (flags & initializeSocketGlobals)

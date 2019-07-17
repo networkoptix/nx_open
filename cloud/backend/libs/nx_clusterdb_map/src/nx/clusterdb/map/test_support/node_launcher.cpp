@@ -17,8 +17,7 @@ NodeLauncher::~NodeLauncher()
     stop();
 }
 
-EmbeddedNodeLauncher::EmbeddedNodeLauncher():
-    base_type("EmbeddedNodeLauncher")
+EmbeddedNodeLauncher::EmbeddedNodeLauncher()
 {
     addArg("--http/listenOn=127.0.0.1:0");
     addArg("-p2pDb/clusterId", kClusterId);

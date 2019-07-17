@@ -4,6 +4,8 @@
 
 int main(int argc, char** argv)
 {
+    nx::utils::TestOptions::setModuleName("nx_cloud_storage_client_ut");
+
     QCoreApplication application(argc, argv);
 
     const auto resultCode = nx::network::test::runTest(
