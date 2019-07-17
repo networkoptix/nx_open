@@ -247,7 +247,7 @@ boost::optional<ListeningPeerPool::ConstDataLocker>
 
         if (m_bestUplinkSpeed)
         {
-            NX_VERBOSE(this, "Found best uplink speed while searching for Peer: %2",
+            NX_VERBOSE(this, "Found best uplink speed while searching for Peer: %1",
                 *m_bestUplinkSpeed);
             auto peerIter = m_peers.find(toMediaServerData(*m_bestUplinkSpeed));
             if (peerIter != m_peers.end())
@@ -355,7 +355,7 @@ void ListeningPeerPool::onListeningPeerConnectionClosed(
 
         if (m_bestUplinkSpeed)
         {
-            NX_VERBOSE(this, "Found best uplink speed after closing connection to Peer: %2",
+            NX_VERBOSE(this, "Found best uplink speed after closing connection to Peer: %1",
                 *m_bestUplinkSpeed);
         }
     }
@@ -397,7 +397,7 @@ void ListeningPeerPool::onUplinkSpeedUpdated(nx::hpm::api::PeerConnectionSpeed p
 
     m_bestUplinkSpeed = peerUplinkSpeed;
 
-    NX_VERBOSE(this, "Updating best uplink speed: %2", m_bestUplinkSpeed->toString());
+    NX_VERBOSE(this, "Updating best uplink speed: %1", m_bestUplinkSpeed->toString());
 }
 
 std::optional<nx::hpm::api::PeerConnectionSpeed>
