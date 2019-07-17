@@ -13,7 +13,7 @@ namespace nx::cloud::aws::test {
  * Requires a request to be signed using AWS Signature V4
  * (https://docs.aws.amazon.com/AmazonS3/latest/API/sig-v4-header-based-auth.html).
  */
-class AwsSignatureV4Authenticator:
+class NX_AWS_CLIENT_API AwsSignatureV4Authenticator:
     public nx::network::http::server::AbstractAuthenticationManager
 {
 public:
@@ -34,7 +34,7 @@ private:
 
 //-------------------------------------------------------------------------------------------------
 
-class AwsS3Emulator
+class NX_AWS_CLIENT_API AwsS3Emulator
 {
 public:
     AwsS3Emulator();

@@ -4,8 +4,7 @@
 #include <nx/utils/thread/sync_queue.h>
 
 #include <nx/cloud/aws/api_client.h>
-
-#include "aws_s3_emulator.h"
+#include <nx/cloud/aws/test_support/aws_s3_emulator.h>
 
 namespace nx::cloud::aws::test {
 

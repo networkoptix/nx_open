@@ -18,10 +18,13 @@ public:
     StorageClient(StorageClient&&) = delete;
     StorageClient& operator=(StorageClient&&) = delete;
 
+    /**
+     * @param url Url of a AWS S3 bucket.
+     */
     virtual void open(
         const std::string& storageClientId,
         const nx::utils::Url& url,
-        const nx::network::http::Credentials& credential,
+        const nx::network::http::Credentials& credentials,
         nx::utils::MoveOnlyFunc<void(ResultCode)> handler) override;
 
     virtual AbstractContentClient* getContentClient() override;
