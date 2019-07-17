@@ -437,6 +437,8 @@ void ClientUpdateTool::checkInternalState()
 
 bool ClientUpdateTool::installUpdateAsync()
 {
+    if (m_state != readyInstall)
+        return false;
     // Try to run applauncher if it is not running.
     if (!applauncher::api::checkOnline())
     {
@@ -445,11 +447,7 @@ bool ClientUpdateTool::installUpdateAsync()
         return false;
     }
 
-    if (m_state != readyInstall)
-        return false;
-
     NX_INFO(this, "installUpdateAsync() from file %1", m_updateFile);
-
     NX_ASSERT(!m_updateFile.isEmpty());
 
     setState(installing);
@@ -461,62 +459,81 @@ bool ClientUpdateTool::installUpdateAsync()
         {
             QString absolutePath = QFileInfo(updateFile).absoluteFilePath();
 
-            const ResultType result = installZipAsync(updateVersion, absolutePath);
-            if (result != ResultType::ok)
+            int installationAttempts = 2;
+            bool stopInstallationAttempts = false;
+            // We will try several installation attempts. It will solve a problem, when
+            // applauncher was restarted during zip installation.
+            do
             {
-                const QString message = applauncherErrorToString(result);
-                NX_ERROR(NX_SCOPE_TAG, "Failed to start async zip installation: %1", message);
-                // Other variants can be fixed by retrying installation, do they?
-                return result;
-            }
-
-            NX_VERBOSE(NX_SCOPE_TAG,
-                "Started client installation from file %2. Waiting for completion", absolutePath);
-
-            // Checking state if installation, until it goes to Result::ok
-            constexpr int kMaxTries = 60;
-            for (int retries = 0; retries < kMaxTries; ++retries)
-            {
-                applauncher::api::InstallationProgress progress;
-                const ResultType result = applauncher::api::checkInstallationProgress(progress);
-                QString message = applauncherErrorToString(result);
-
-                switch (result)
+                const ResultType result = installZipAsync(updateVersion, absolutePath);
+                if (result != ResultType::ok)
                 {
-                    case ResultType::alreadyInstalled:
-                    case ResultType::versionNotInstalled:
-                    case ResultType::invalidVersionFormat:
-                    case ResultType::notEnoughSpace:
-                    case ResultType::notFound:
-                    case ResultType::ok:
-                        NX_VERBOSE(NX_SCOPE_TAG,
-                            "checkInstallationProgress returned %1. Exiting", message);
-                        return result;
-                    case ResultType::unpackingZip:
-                        NX_VERBOSE(NX_SCOPE_TAG, "checkInstallationProgress() %1 of %2 unpacked",
-                            progress.extracted, progress.total);
-                        break;
-                    case ResultType::otherError:
-                    case ResultType::connectError:
-                    case ResultType::ioError:
-                    default:
-                        NX_ERROR(NX_SCOPE_TAG, "checkInstallationProgress() failed to check zip "
-                            "installation status: %1", message);
-                        break;
+                    const QString message = applauncherErrorToString(result);
+                    NX_ERROR(NX_SCOPE_TAG, "Failed to start async zip installation: %1", message);
+                    // Other variants can be fixed by retrying installation, do they?
+                    return result;
                 }
 
-                // We can spend a lot of time in this cycle. So we should be able to exit
-                // as early as possible.
-                if (!tool || tool->m_state != installing)
+                NX_VERBOSE(NX_SCOPE_TAG,
+                    "Started client installation from file %2. Waiting for completion", absolutePath);
+
+                // Checking state if installation, until it goes to Result::ok
+                constexpr int kMaxTries = 60;
+                for (int retries = 0; retries < kMaxTries; ++retries)
                 {
-                    NX_ERROR(NX_SCOPE_TAG, "checkInstallationProgress() is interrupted. Exiting");
+                    bool stopCheck = false;
+                    applauncher::api::InstallationProgress progress;
+                    const ResultType result = applauncher::api::checkInstallationProgress(
+                        updateVersion, progress);
+                    QString message = applauncherErrorToString(result);
+
+                    switch (result)
+                    {
+                        case ResultType::versionNotInstalled:
+                            NX_VERBOSE(NX_SCOPE_TAG,
+                            "checkInstallationProgress - installation failed. Retrying");
+                            stopCheck = true;
+                            break;
+                        case ResultType::alreadyInstalled:
+                        case ResultType::invalidVersionFormat:
+                        case ResultType::notEnoughSpace:
+                        case ResultType::notFound:
+                        case ResultType::ok:
+                            NX_VERBOSE(NX_SCOPE_TAG,
+                                "checkInstallationProgress returned %1. Exiting", message);
+                            return result;
+                        case ResultType::unpackingZip:
+                            NX_VERBOSE(NX_SCOPE_TAG, "checkInstallationProgress() %1 of %2 unpacked",
+                                progress.extracted, progress.total);
+                            break;
+                        case ResultType::otherError:
+                        case ResultType::connectError:
+                        case ResultType::ioError:
+                        default:
+                            NX_ERROR(NX_SCOPE_TAG, "checkInstallationProgress() failed to check zip "
+                                "installation status: %1", message);
+                            break;
+                    }
+
+                    // We can spend a lot of time in this cycle. So we should be able to exit
+                    // as early as possible.
+                    if (!tool || tool->m_state != installing)
+                    {
+                        NX_ERROR(NX_SCOPE_TAG, "checkInstallationProgress() is interrupted. Exiting");
+                        stopInstallationAttempts = true;
+                        break;
+                    }
+
+                    if (stopCheck)
+                        break;
+
+                    int percent = progress.total != 0 ? 100 * progress.extracted / progress.total : 0;
+                    emit tool->updateStateChanged(tool->m_state, percent);
+                    std::this_thread::sleep_for(std::chrono::seconds(2));
+                }
+                if (stopInstallationAttempts)
                     break;
-                }
-
-                int percent = progress.total != 0 ? 100 * progress.extracted / progress.total : 0;
-                emit tool->updateStateChanged(tool->m_state, percent);
-                std::this_thread::sleep_for(std::chrono::seconds(2));
-            }
+            }while(--installationAttempts > 0);
 
             return ResultType::otherError;
         }, m_updateFile, m_updateVersion);

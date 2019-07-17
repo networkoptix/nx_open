@@ -92,11 +92,13 @@ private:
 
     virtual void onTimer(const quint64& timerID) override;
 
-    template<class RequestType, class ResponseType>
+    template<class CallbackType>
     bool subscribe(applauncher::api::TaskType task,
-        std::function<void (const RequestType&, ResponseType&)>&& callback)
+        CallbackType&& callback)
     {
-        return m_taskServer.subscribe(serializeTaskType(task), std::move(callback));
+        return m_taskServer.subscribe(
+            serializeTaskType(task),
+            std::move(callback));
     }
 
 private:
