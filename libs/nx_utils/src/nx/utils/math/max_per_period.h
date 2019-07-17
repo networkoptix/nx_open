@@ -22,7 +22,7 @@ public:
 private:
     std::chrono::milliseconds elapsedTimeSincePeriodStart(const time_point& timepoint) const;
 
-    void removeExpiredValues();
+    void removeExpiredValues(const time_point& now);
 
 private:
     const std::chrono::milliseconds m_period;
@@ -40,20 +40,14 @@ template<typename Value>
 void MaxPerPeriod<Value>::add(const Value& value)
 {
     auto now = monotonicTime();
-    if (!m_periodStart)
-        m_periodStart = now;
-
-    removeExpiredValues();
-
-    if (elapsedTimeSincePeriodStart(now) > m_period)
-        m_periodStart = now;
-
+    removeExpiredValues(now);
     m_values.push({now, value});
 }
 
 template<typename Value>
 Value MaxPerPeriod<Value>::getMaxPerLastPeriod() const
 {
+    const_cast<MaxPerPeriod<Value>*>(this)->removeExpiredValues(monotonicTime());
     return m_values.empty() ? Value() : m_values.top().second;
 }
 
@@ -66,10 +60,16 @@ std::chrono::milliseconds MaxPerPeriod<Value>::elapsedTimeSincePeriodStart(
 }
 
 template<typename Value>
-void MaxPerPeriod<Value>::removeExpiredValues()
+void MaxPerPeriod<Value>::removeExpiredValues(const time_point& now)
 {
-    while (!m_values.empty() && elapsedTimeSincePeriodStart(m_values.front().first) > m_period)
+    if (!m_periodStart || elapsedTimeSincePeriodStart(now) > m_period)
+        m_periodStart = now;
+
+    using namespace std::chrono;
+    while (!m_values.empty() && m_values.front().first < *m_periodStart)
+    {
         m_values.pop();
+    }
 }
 
 //-------------------------------------------------------------------------------------------------

@@ -38,21 +38,7 @@ namespace conf { class Settings; }
 class HttpView
 {
 public:
-    class HttpServer:
-        public network::server::MultiAddressServer<nx::network::http::HttpStreamSocketServer>,
-        public network::http::server::AbstractHttpStatisticsProvider
-    {
-        using base_type =
-            network::server::MultiAddressServer<nx::network::http::HttpStreamSocketServer>;
-    public:
-        template<typename... Args>
-        HttpServer(Args... args):
-            base_type(std::forward<decltype(args)>(args)...)
-        {
-        }
-
-        virtual network::http::server::HttpStatistics httpStatistics() const override;
-    };
+    class HttpServer;
 
     HttpView(
         const conf::Settings& settings,
@@ -67,6 +53,33 @@ public:
     const HttpServer& httpServer() const;
 
     void registerStatisticsApiHandlers(statistics::Provider* statisticsProvider);
+
+public:
+    class HttpServer:
+        public network::server::MultiAddressServer<nx::network::http::HttpStreamSocketServer>,
+        public network::http::server::AbstractHttpStatisticsProvider
+    {
+        using base_type =
+            network::server::MultiAddressServer<nx::network::http::HttpStreamSocketServer>;
+
+        friend void HttpView::listen();
+
+    public:
+        template<typename... Args>
+        HttpServer(Args... args):
+            base_type(std::forward<decltype(args)>(args)...)
+        {
+        }
+
+        virtual network::http::server::HttpStatistics httpStatistics() const override;
+
+    private:
+        void initializeHttpStatisticsProvider();
+
+    private:
+        std::unique_ptr<
+            network::http::server::AggregateHttpStatisticsProvider> m_httpStatsProvider;
+    };
 
 private:
     /** Provides htdigest authentication for maintenance server*/

@@ -15,6 +15,29 @@
 
 namespace nx::cloud::db {
 
+void HttpView::HttpServer::initializeHttpStatisticsProvider()
+{
+    using namespace network::http::server;
+    std::vector<const AbstractHttpStatisticsProvider*> providers;
+    forEachListener(
+        [&providers](const auto& listener)
+        {
+            providers.emplace_back(listener);
+        });
+
+    m_httpStatsProvider = std::make_unique<AggregateHttpStatisticsProvider>(std::move(providers));
+}
+
+network::http::server::HttpStatistics HttpView::HttpServer::httpStatistics() const
+{
+    return m_httpStatsProvider
+        ? m_httpStatsProvider->httpStatistics()
+        : network::http::server::HttpStatistics();
+}
+
+//-------------------------------------------------------------------------------------------------
+// HttpView
+
 HttpView::HttpView(
     const conf::Settings& settings,
     Controller* controller)
@@ -85,6 +108,8 @@ void HttpView::listen()
 {
     if (!m_multiAddressHttpServer.listen(m_settings.http().tcpBacklogSize))
         throw std::system_error(SystemError::getLastOSErrorCode(), std::system_category());
+
+    m_multiAddressHttpServer.initializeHttpStatisticsProvider();
 
     NX_INFO(this, "HTTP server is listening on %1",
         containerString(m_multiAddressHttpServer.endpoints()));
@@ -464,38 +489,6 @@ void HttpView::registerWriteOnlyRestHandler(
                 handler);
         },
         method);
-}
-
-network::http::server::HttpStatistics HttpView::HttpServer::httpStatistics() const
-{
-    using namespace network::http;
-
-    int totalRequestAverages = 0;
-    std::chrono::milliseconds totalRequestAverageProcessingTime(0);
-    std::chrono::milliseconds maxRequestProcessingTime(0);
-    server::HttpStatistics accumulatedStats;
-
-    const_cast<HttpServer*>(this)->forEachListener(
-        [&totalRequestAverageProcessingTime, &maxRequestProcessingTime,
-        &totalRequestAverages, &accumulatedStats](
-            const HttpStreamSocketServer* listener)
-        {
-            ++totalRequestAverages;
-            server::HttpStatistics httpStats = listener->httpStatistics();
-            accumulatedStats.add(httpStats);
-            totalRequestAverageProcessingTime += httpStats.averageRequestProcessingTime;
-            maxRequestProcessingTime =
-                std::max(maxRequestProcessingTime, httpStats.maxRequestProcessingTime);
-        });
-
-    accumulatedStats.maxRequestProcessingTime = maxRequestProcessingTime;
-    if (totalRequestAverages > 0)
-    {
-        accumulatedStats.averageRequestProcessingTime =
-            totalRequestAverageProcessingTime / totalRequestAverages;
-    }
-
-    return accumulatedStats;
 }
 
 } // namespace nx::cloud::db

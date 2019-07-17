@@ -17,9 +17,9 @@ void HttpStreamSocketServer::setPersistentConnectionEnabled(bool value)
 
 server::HttpStatistics HttpStreamSocketServer::httpStatistics() const
 {
-    QnMutexLocker lock(&m_mutex);
     server::HttpStatistics httpStats;
     httpStats.add(statistics());
+    QnMutexLocker lock(&m_mutex);
     httpStats.assign(m_statsCalculator.requestStatistics());
     return httpStats;
 }
@@ -33,7 +33,7 @@ std::shared_ptr<HttpServerConnection> HttpStreamSocketServer::createConnection(
         m_httpMessageDispatcher);
     result->setPersistentConnectionEnabled(m_persistentConnectionEnabled);
     result->setOnResponseSent(
-        [this](const std::chrono::milliseconds& requestProcessingTime)
+        [this](const auto& requestProcessingTime)
         {
             QnMutexLocker lock(&m_mutex);
             m_statsCalculator.add(requestProcessingTime);

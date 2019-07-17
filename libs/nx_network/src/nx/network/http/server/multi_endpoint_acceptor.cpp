@@ -18,32 +18,9 @@ network::server::Statistics MultiEndpointAcceptor::statistics() const
 
 HttpStatistics MultiEndpointAcceptor::httpStatistics() const
 {
-    int totalRequestAverages = 0;
-    std::chrono::milliseconds totalRequestAverageProcessingTime(0);
-    std::chrono::milliseconds maxRequestProcessingTime(0);
-    HttpStatistics accumulatedStats;
-
-    m_multiAddressHttpServer->forEachListener(
-        [&totalRequestAverageProcessingTime, &maxRequestProcessingTime,
-            &totalRequestAverages, &accumulatedStats](
-                const HttpStreamSocketServer* listener)
-        {
-            ++totalRequestAverages;
-            HttpStatistics httpStats = listener->httpStatistics();
-            accumulatedStats.add(httpStats);
-            totalRequestAverageProcessingTime += httpStats.averageRequestProcessingTime;
-            maxRequestProcessingTime =
-                std::max(maxRequestProcessingTime, httpStats.maxRequestProcessingTime);
-        });
-
-    accumulatedStats.maxRequestProcessingTime = maxRequestProcessingTime;
-    if (totalRequestAverages > 0)
-    {
-        accumulatedStats.averageRequestProcessingTime =
-            totalRequestAverageProcessingTime / totalRequestAverages;
-    }
-
-    return accumulatedStats;
+    return m_httpStatsProvider
+        ? m_httpStatsProvider->httpStatistics()
+        : HttpStatistics();
 }
 
 void MultiEndpointAcceptor::pleaseStopSync()
@@ -84,6 +61,8 @@ bool MultiEndpointAcceptor::bind(
             std::move(regularServer),
             std::move(securedServer));
     }
+
+    initializeHttpStatisticsProvider();
 
     return m_multiAddressHttpServer != nullptr;
 }
@@ -145,6 +124,23 @@ std::unique_ptr<MultiEndpointAcceptor::MultiHttpServer>
         return nullptr;
 
     return multiAddressHttpServer;
+}
+
+void MultiEndpointAcceptor::initializeHttpStatisticsProvider()
+{
+    using namespace network::http::server;
+
+    if (!m_multiAddressHttpServer)
+        return;
+
+    std::vector<const AbstractHttpStatisticsProvider*> providers;
+    m_multiAddressHttpServer->forEachListener(
+        [&providers](const auto& listener)
+        {
+            providers.emplace_back(listener);
+        });
+
+    m_httpStatsProvider = std::make_unique<AggregateHttpStatisticsProvider>(std::move(providers));
 }
 
 } // namespace nx::network::http::server

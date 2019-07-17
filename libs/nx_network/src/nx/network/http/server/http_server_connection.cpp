@@ -46,7 +46,7 @@ void HttpServerConnection::setPersistentConnectionEnabled(bool value)
 }
 
 void HttpServerConnection::setOnResponseSent(
-    nx::utils::MoveOnlyFunc<void(std::chrono::milliseconds)> handler)
+    nx::utils::MoveOnlyFunc<void(std::chrono::microseconds)> handler)
 {
     m_responseSentHandler = std::move(handler);
 }
@@ -448,11 +448,11 @@ void HttpServerConnection::sendNextResponse()
 
 void HttpServerConnection::responseSent(const time_point& requestReceivedTime)
 {
-    using namespace std::chrono;
     if (m_responseSentHandler)
     {
+        using namespace std::chrono;
         m_responseSentHandler(
-            duration_cast<milliseconds>(clock_type::now() - requestReceivedTime));
+            duration_cast<microseconds>(clock_type::now() - requestReceivedTime));
     }
 
     // TODO: #ak check sendData error code.

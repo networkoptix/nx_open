@@ -9,10 +9,10 @@ namespace nx::network::http::server {
 
 struct NX_NETWORK_API RequestStatistics
 {
-    std::chrono::milliseconds maxRequestProcessingTime =
-        std::chrono::milliseconds(0);
-    std::chrono::milliseconds averageRequestProcessingTime =
-        std::chrono::milliseconds(0);
+    std::chrono::microseconds maxRequestProcessingTimeUsec =
+        std::chrono::microseconds(0);
+    std::chrono::microseconds averageRequestProcessingTimeUsec =
+        std::chrono::microseconds(0);
 };
 
 struct NX_NETWORK_API HttpStatistics:
@@ -24,7 +24,7 @@ struct NX_NETWORK_API HttpStatistics:
 
 #define HttpStatistics_Fields \
     (connectionCount)(connectionsAcceptedPerMinute)(requestsServedPerMinute) \
-    (requestsAveragePerConnection)(maxRequestProcessingTime)(averageRequestProcessingTime)
+    (requestsAveragePerConnection)(maxRequestProcessingTimeUsec)(averageRequestProcessingTimeUsec)
 
 QN_FUSION_DECLARE_FUNCTIONS(HttpStatistics, (json), NX_NETWORK_API)
 
@@ -40,22 +40,36 @@ public:
 };
 
 //-------------------------------------------------------------------------------------------------
-// HttpStatisticsCalculator
+// RequestStatisticsCalculator
 
-class NX_NETWORK_API HttpStatisticsCalculator
+class NX_NETWORK_API RequestStatisticsCalculator
 {
 public:
-    HttpStatisticsCalculator();
+    RequestStatisticsCalculator();
 
-    void add(const std::chrono::milliseconds& duration);
+    void add(const std::chrono::microseconds& duration);
 
     RequestStatistics requestStatistics() const;
 
 private:
     // AveragePerPeriod does not compile when std::chrono::milliseconds is used directly
-    nx::utils::math::AveragePerPeriod<std::chrono::milliseconds::rep>
+    nx::utils::math::AveragePerPeriod<std::chrono::microseconds::rep>
         m_averageRequestProcessingTime;
-    nx::utils::math::MaxPerMinute<std::chrono::milliseconds> m_maxRequestProcessingTime;
+    nx::utils::math::MaxPerMinute<std::chrono::microseconds> m_maxRequestProcessingTime;
+};
+
+//-------------------------------------------------------------------------------------------------
+// AggregateHttpStatisticsProvider
+
+class NX_NETWORK_API AggregateHttpStatisticsProvider: public AbstractHttpStatisticsProvider
+{
+public:
+    AggregateHttpStatisticsProvider(std::vector<const AbstractHttpStatisticsProvider*> providers);
+
+    virtual HttpStatistics httpStatistics() const override;
+
+private:
+    std::vector<const AbstractHttpStatisticsProvider*> m_providers;
 };
 
 } // namespace nx::network::http::server

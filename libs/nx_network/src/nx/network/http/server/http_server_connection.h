@@ -101,7 +101,7 @@ public:
     /** Introduced for test purpose. */
     void setPersistentConnectionEnabled(bool value);
 
-    void setOnResponseSent(nx::utils::MoveOnlyFunc<void(std::chrono::milliseconds)> handler);
+    void setOnResponseSent(nx::utils::MoveOnlyFunc<void(std::chrono::microseconds)> handler);
 
 protected:
     virtual void processMessage(nx::network::http::Message request) override;
@@ -156,7 +156,7 @@ private:
     std::atomic<std::int64_t> m_lastRequestSequence{0};
     std::map<std::int64_t /*sequence*/, std::unique_ptr<ResponseMessageContext>>
         m_requestsBeingProcessed;
-    nx::utils::MoveOnlyFunc<void(std::chrono::milliseconds)> m_responseSentHandler;
+    nx::utils::MoveOnlyFunc<void(std::chrono::microseconds)> m_responseSentHandler;
 
     void extractClientEndpoint(const HttpHeaders& headers);
     void extractClientEndpointFromXForwardedHeader(const HttpHeaders& headers);

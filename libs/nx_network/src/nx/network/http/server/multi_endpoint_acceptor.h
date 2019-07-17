@@ -46,6 +46,7 @@ private:
     std::vector<SocketAddress> m_endpoints;
     std::vector<SocketAddress> m_sslEndpoints;
     std::unique_ptr<MultiHttpServer> m_multiAddressHttpServer;
+    std::unique_ptr<AggregateHttpStatisticsProvider> m_httpStatsProvider;
 
     std::unique_ptr<MultiHttpServer> startHttpServer(
         const std::vector<network::SocketAddress>& endpoints);
@@ -56,6 +57,8 @@ private:
     std::unique_ptr<MultiHttpServer> startServer(
         const std::vector<network::SocketAddress>& endpoints,
         bool sslMode);
+
+    void initializeHttpStatisticsProvider();
 };
 
 } // namespace nx::network::http::server

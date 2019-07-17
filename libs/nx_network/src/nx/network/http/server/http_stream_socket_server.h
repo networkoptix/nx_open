@@ -50,7 +50,7 @@ private:
     bool m_persistentConnectionEnabled;
 
     mutable QnMutex m_mutex;
-    nx::network::http::server::HttpStatisticsCalculator m_statsCalculator;
+    nx::network::http::server::RequestStatisticsCalculator m_statsCalculator;
 };
 
 class NX_NETWORK_API StreamConnectionHolder:
