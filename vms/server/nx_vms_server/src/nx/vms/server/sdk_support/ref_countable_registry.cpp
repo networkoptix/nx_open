@@ -17,13 +17,6 @@ namespace nx::vms::server::sdk_support {
 
 using namespace nx::sdk;
 
-RefCountableRegistry::RefCountableRegistry(const std::string& name):
-    m_logPrefix("RefCountableRegistry{" + name + "}"),
-    m_useServerLog(pluginsIni().useServerLogForRefCountableRegistry),
-    m_isVerbose(pluginsIni().verboseRefCountableRegistry)
-{
-}
-
 #define ASSERT(CONDITION, /*MESSAGE*/...) ( \
     m_useServerLog \
         ? NX_ASSERT(CONDITION, std::string(__VA_ARGS__)) \
@@ -48,6 +41,14 @@ RefCountableRegistry::RefCountableRegistry(const std::string& name):
             NX_PRINT << (MESSAGE); \
     } \
 } while (0)
+
+RefCountableRegistry::RefCountableRegistry(const std::string& name):
+    m_logPrefix("RefCountableRegistry{" + name + "}"),
+    m_useServerLog(pluginsIni().useServerLogForRefCountableRegistry),
+    m_isVerbose(pluginsIni().verboseRefCountableRegistry)
+{
+    INFO("STARTED.");
+}
 
 /*static*/ RefCountableRegistry* RefCountableRegistry::createIfEnabled(const std::string& name)
 {
@@ -118,7 +119,7 @@ RefCountableRegistry::~RefCountableRegistry()
     const int count = (int) m_refCountables.size();
     if (count == 0)
     {
-        VERBOSE("SUCCESS: No registered objects remain.");
+        INFO("FINISHED SUCCESSFULLY: No registered objects remain.");
         return;
     }
 
