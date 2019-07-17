@@ -65,14 +65,11 @@ int Service::serviceMain(const utils::AbstractServiceSettings& abstractSettings)
     //nx::utils::CurrentProcess::changeUser(settings.changeUser());
 
     view.listen();
-    NX_INFO(this, lm("Listening on %1").container(httpEndpoints()));
-
-    NX_INFO(this, lm("%1 has been started").arg(applicationDisplayName()));
+    NX_INFO(this, "%1 has been started, listening on %2",
+        applicationDisplayName(), containerString(httpEndpoints()));
 
     const auto result = runMainLoop();
-
-    NX_INFO(this, lm("Stopping..."));
-
+    NX_INFO(this, "%1 stopping...", applicationDisplayName());
     return result;
 }
 

@@ -109,10 +109,7 @@ int MediatorProcess::serviceMain(const nx::utils::AbstractServiceSettings& abstr
 
     view.stop();
     controller.stop();
-
-    NX_INFO(this, lm("%1 is stopped")
-        .arg(QnLibConnectionMediatorAppInfo::applicationDisplayName()));
-
+    NX_INFO(this, "%1 is stopped", QnLibConnectionMediatorAppInfo::applicationDisplayName());
     return result;
 }
 

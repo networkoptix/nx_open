@@ -51,9 +51,9 @@ void Server::listen()
                 .arg(SystemError::toString(osErrorCode)).toStdString());
     }
 
-    NX_INFO(this, lm("HTTP server is listening on %1, ssl: %2")
-        .container(m_multiAddressHttpServer.endpoints())
-        .container(m_multiAddressHttpServer.sslEndpoints()));
+    NX_INFO(this, "HTTP server is listening on %1, ssl: %2",
+        containerString(m_multiAddressHttpServer.endpoints()),
+        containerString(m_multiAddressHttpServer.sslEndpoints()));
 }
 
 void Server::stopAcceptingNewRequests()

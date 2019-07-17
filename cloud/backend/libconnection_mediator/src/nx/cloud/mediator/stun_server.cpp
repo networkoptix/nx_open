@@ -44,8 +44,8 @@ void StunServer::listen()
                 .arg(containerString(m_udpEndpoints)).toStdString());
     }
 
-    NX_INFO(this, lm("STUN Server is listening on tcp/%1 and udp/%2")
-        .args(containerString(m_tcpEndpoints), containerString(m_udpEndpoints)));
+    NX_INFO(this, "STUN Server is listening on tcp/%1 and udp/%2",
+        containerString(m_tcpEndpoints), containerString(m_udpEndpoints));
 }
 
 void StunServer::stopAcceptingNewRequests()
