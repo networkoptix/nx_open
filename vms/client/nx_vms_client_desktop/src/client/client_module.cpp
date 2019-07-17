@@ -647,7 +647,8 @@ void QnClientModule::initNetwork()
     if (!m_startupParameters.videoWallGuid.isNull())
         commonModule->setVideowallGuid(m_startupParameters.videoWallGuid);
 
-    commonModule->moduleDiscoveryManager()->start();
+    if (!isTestingEnvironment())
+        commonModule->moduleDiscoveryManager()->start();
 
     commonModule->instance<QnSystemsFinder>();
     commonModule->store(new QnForgottenSystemsManager());
@@ -699,7 +700,7 @@ void QnClientModule::initLocalResources()
     resourceDiscoveryManager->setReady(true);
     commonModule->store(new QnSystemsWeightsManager());
     commonModule->store(new QnLocalResourceStatusWatcher());
-    if (!m_startupParameters.skipMediaFolderScan)
+    if (!m_startupParameters.skipMediaFolderScan && !isTestingEnvironment())
     {
         auto localFilesSearcher = commonModule->store(new ResourceDirectoryBrowser());
         QStringList paths;
