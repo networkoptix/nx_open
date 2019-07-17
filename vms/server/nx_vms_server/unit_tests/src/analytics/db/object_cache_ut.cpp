@@ -10,11 +10,11 @@
 
 namespace nx::analytics::db::test {
 
-class AnalyticsDbObjectCache:
+class AnalyticsDbObjectTrackCache:
     public ::testing::Test
 {
 public:
-    AnalyticsDbObjectCache():
+    AnalyticsDbObjectTrackCache():
         m_aggregationPeriod(std::chrono::hours(1)),
         m_maxObjectLifeTime(std::chrono::hours(10)),
         m_objectTrackCache(m_aggregationPeriod, m_maxObjectLifeTime),
@@ -175,7 +175,7 @@ private:
     }
 };
 
-TEST_F(AnalyticsDbObjectCache, new_object_is_provided_for_insertion_after_aggregation_period)
+TEST_F(AnalyticsDbObjectTrackCache, new_object_is_provided_for_insertion_after_aggregation_period)
 {
     givenSomeAnalyticsData();
 
@@ -185,7 +185,7 @@ TEST_F(AnalyticsDbObjectCache, new_object_is_provided_for_insertion_after_aggreg
     thenTheObjectInsertionIsProvided();
 }
 
-TEST_F(AnalyticsDbObjectCache, object_insertion_is_reported_only_once)
+TEST_F(AnalyticsDbObjectTrackCache, object_insertion_is_reported_only_once)
 {
     givenAlreadyUsedObjectInCache();
 
@@ -195,21 +195,21 @@ TEST_F(AnalyticsDbObjectCache, object_insertion_is_reported_only_once)
     thenNoObjectAreProvided();
 }
 
-TEST_F(AnalyticsDbObjectCache, new_object_is_not_provided_for_insertion_until_aggregation_period)
+TEST_F(AnalyticsDbObjectTrackCache, new_object_is_not_provided_for_insertion_until_aggregation_period)
 {
     givenSomeAnalyticsData();
     whenFetchObjectsToInsert();
     thenNoObjectAreProvided();
 }
 
-TEST_F(AnalyticsDbObjectCache, new_object_can_be_taken_for_insertion_asap)
+TEST_F(AnalyticsDbObjectTrackCache, new_object_can_be_taken_for_insertion_asap)
 {
     givenSomeAnalyticsData();
     whenForceFetchingObjectToInsert();
     thenTheObjectInsertionIsProvided();
 }
 
-TEST_F(AnalyticsDbObjectCache, object_update_is_reported_after_aggregation_period)
+TEST_F(AnalyticsDbObjectTrackCache, object_update_is_reported_after_aggregation_period)
 {
     givenAlreadyUsedObjectInCache();
 
@@ -223,7 +223,7 @@ TEST_F(AnalyticsDbObjectCache, object_update_is_reported_after_aggregation_perio
     andFullAttributeListIsPresentInUpdate();
 }
 
-TEST_F(AnalyticsDbObjectCache, object_update_is_not_reported_if_no_changes)
+TEST_F(AnalyticsDbObjectTrackCache, object_update_is_not_reported_if_no_changes)
 {
     givenAlreadyUsedObjectInCache();
 
@@ -233,7 +233,7 @@ TEST_F(AnalyticsDbObjectCache, object_update_is_not_reported_if_no_changes)
     thenNoObjectUpdateIsReported();
 }
 
-TEST_F(AnalyticsDbObjectCache, new_object_is_not_reported_as_updated)
+TEST_F(AnalyticsDbObjectTrackCache, new_object_is_not_reported_as_updated)
 {
     givenSomeAnalyticsData();
 
@@ -243,14 +243,14 @@ TEST_F(AnalyticsDbObjectCache, new_object_is_not_reported_as_updated)
     thenNoObjectUpdateIsReported();
 }
 
-TEST_F(AnalyticsDbObjectCache, object_update_not_is_provided_until_aggregation_period)
+TEST_F(AnalyticsDbObjectTrackCache, object_update_not_is_provided_until_aggregation_period)
 {
     givenAlreadyUsedObjectInCache();
     whenRequestObjectUpdates();
     thenNoObjectUpdateIsReported();
 }
 
-TEST_F(AnalyticsDbObjectCache, the_object_is_removed_after_maxObjectLifetime)
+TEST_F(AnalyticsDbObjectTrackCache, the_object_is_removed_after_maxObjectLifetime)
 {
     givenAlreadyUsedObjectInCache();
 
