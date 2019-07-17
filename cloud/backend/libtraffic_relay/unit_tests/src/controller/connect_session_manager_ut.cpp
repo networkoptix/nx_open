@@ -133,7 +133,6 @@ private:
 } // namespace
 
 static constexpr int kMaxPreemptiveConnectionCount = 7;
-static constexpr int kRecommendedPreemptiveConnectionCount = 4;
 static constexpr std::chrono::seconds kConnectSessionIdleTimeout =
     std::chrono::seconds(11);
 

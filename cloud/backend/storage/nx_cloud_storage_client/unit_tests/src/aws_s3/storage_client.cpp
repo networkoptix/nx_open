@@ -52,7 +52,7 @@ private:
     aws::test::AwsS3Emulator m_awsS3;
     Chunk m_lastUploadedChunk;
 
-    std::string generateChunkPath(const Chunk& chunk)
+    std::string generateChunkPath(const Chunk& /*chunk*/)
     {
         // TODO
         return std::string();
