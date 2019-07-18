@@ -348,7 +348,7 @@ void Manager::setSettings(
     if (!NX_ASSERT(analyticsContext, lm("Device %1").arg(deviceId)))
         return;
 
-    return analyticsContext->setSettings(engineId, deviceAgentSettings);
+    analyticsContext->setSettings(engineId, deviceAgentSettings);
 }
 
 QVariantMap Manager::getSettings(const QString& deviceId, const QString& engineId) const

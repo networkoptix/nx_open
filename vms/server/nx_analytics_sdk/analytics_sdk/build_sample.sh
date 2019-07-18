@@ -52,7 +52,7 @@ esac
     cmake "$SOURCE_DIR" `# allow empty array #` ${GEN_OPTIONS[@]+"${GEN_OPTIONS[@]}"} "$@"
     cmake --build . `# allow empty array #` ${BUILD_OPTIONS[@]+"${BUILD_OPTIONS[@]}"}
 )
-cd "$BUILD_DIR" #< Restore the required current directory after exiting the subshell.
+cd "$BUILD_DIR" #< Set the required current directory after exiting the subshell above.
 
 ARTIFACT=$(find "$BUILD_DIR" -name "*$PLUGIN_NAME.dll" -o -name "*$PLUGIN_NAME.so")
 if [ ! -f "$ARTIFACT" ]

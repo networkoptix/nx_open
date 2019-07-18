@@ -21,10 +21,12 @@ public:
         QnMediaServerModule* serverModule,
         QnUuid engineResourceId);
 
-    virtual void handlePluginEvent(nx::sdk::IPluginEvent* pluginEvent) override;
+    virtual void handlePluginDiagnosticEvent(
+        nx::sdk::IPluginDiagnosticEvent* pluginDiagnosticEvent) override;
 
 signals:
-    void pluginEventTriggered(const nx::vms::event::PluginEventPtr pluginEvent);
+    void pluginDiagnosticEventTriggered(
+        const nx::vms::event::PluginDiagnosticEventPtr pluginDiagnosticEvent);
 
 private:
     QnUuid m_engineResourceId;

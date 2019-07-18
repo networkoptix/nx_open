@@ -69,11 +69,11 @@ Engine::~Engine()
     NX_PRINT << " Destroyed Engine for " << m_plugin->name();
 }
 
-void Engine::setEngineInfo(const nx::sdk::analytics::IEngineInfo* /*engineInfo*/)
+void Engine::setEngineInfo(const IEngineInfo* /*engineInfo*/)
 {
 }
 
-void Engine::setSettings(const IStringMap* settings)
+StringMapResult Engine::setSettings(const IStringMap* settings)
 {
     NX_OUTPUT << __func__ << " Received " << m_plugin->name() << " settings:";
     NX_OUTPUT << "{";
@@ -86,17 +86,16 @@ void Engine::setSettings(const IStringMap* settings)
             << ((i < count - 1) ? "," : "");
     }
     NX_OUTPUT << "}";
+    return nullptr;
 }
 
-IStringMap* Engine::pluginSideSettings() const
+SettingsResponseResult Engine::pluginSideSettings() const
 {
     return nullptr;
 }
 
-const IString* Engine::manifest(Error* error) const
+StringResult Engine::manifest() const
 {
-    *error = Error::noError;
-
     if (!m_manifest.empty())
         return new nx::sdk::String(m_manifest);
 
@@ -138,8 +137,7 @@ const IString* Engine::manifest(Error* error) const
     return new nx::sdk::String(m_manifest);
 }
 
-IDeviceAgent* Engine::obtainDeviceAgent(
-    const IDeviceInfo* deviceInfo, Error* outError)
+MutableDeviceAgentResult Engine::obtainDeviceAgent(const IDeviceInfo* deviceInfo)
 {
     NX_OUTPUT
         << __func__
@@ -147,8 +145,6 @@ IDeviceAgent* Engine::obtainDeviceAgent(
         << deviceInfo->vendor() << ", "
         << deviceInfo->model() << ", "
         << deviceInfo->id();
-
-    *outError = Error::noError;
 
     // Deepstream can't be correctly deinitialized, so we never destroy the DeviceAgent.
     // It's not a production-ready solution, but is OK for demos.
@@ -159,8 +155,9 @@ IDeviceAgent* Engine::obtainDeviceAgent(
     return m_deviceAgent;
 }
 
-void Engine::executeAction(IAction* /*action*/, Error* /*outError*/)
+Result<void> Engine::executeAction(IAction* /*action*/)
 {
+    return {};
 }
 
 std::vector<ObjectClassDescription> Engine::objectClassDescritions() const
@@ -261,10 +258,9 @@ std::string Engine::buildManifestObectTypeString(const ObjectClassDescription& d
         })json";
 }
 
-Error Engine::setHandler(IHandler* /*handler*/)
+void Engine::setHandler(IHandler* /*handler*/)
 {
     // TODO: Implement.
-    return Error::noError;
 }
 
 bool Engine::isCompatible(const IDeviceInfo* /*deviceInfo*/) const

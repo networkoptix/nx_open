@@ -11,16 +11,19 @@
 
 #include <nx/utils/log/log.h>
 #include <nx/kit/utils.h>
-
 #include <plugins/plugin_api.h>
+#include <nx/sdk/helpers/lib_context.h>
+#include <nx/vms/server/sdk_support/ref_countable_registry.h>
 #include <nx/sdk/helpers/ptr.h>
 #include <nx/sdk/analytics/i_plugin.h>
 #include <nx/vms/server/plugins/utility_provider.h>
 #include <nx/vms/server/sdk_support/utils.h>
-#include <nx/sdk/helpers/to_string.h>
+#include <nx/vms/server/sdk_support/error.h>
+#include <nx/vms/server/sdk_support/to_string.h>
 #include <nx/vms/api/analytics/plugin_manifest.h>
 
 #include "vms_server_plugins_ini.h"
+#include "plugin_loading_context.h"
 
 using namespace nx::sdk;
 
@@ -34,6 +37,9 @@ static QStringList stringToListViaComma(const QString& s)
 
 PluginManager::PluginManager(QObject* parent): QObject(parent)
 {
+    libContext().setName("nx_vms_server");
+    libContext().setRefCountableRegistry(
+        nx::vms::server::sdk_support::RefCountableRegistry::createIfEnabled(libContext().name()));
 }
 
 PluginManager::~PluginManager()
@@ -42,7 +48,8 @@ PluginManager::~PluginManager()
 
 void PluginManager::unloadPlugins()
 {
-    m_nxPlugins.clear();
+    QnMutexLocker lock(&m_mutex);
+    m_pluginContexts.clear();
 }
 
 /**
@@ -116,7 +123,7 @@ void PluginManager::loadPluginsFromDir(
     {
         const QString& libName = libNameFromFileInfo(fileInfo);
 
-        PluginInfoPtr pluginInfo = std::make_shared<PluginInfo>();
+        const PluginInfoPtr pluginInfo = std::make_shared<PluginInfo>();
         pluginInfo->optionality = optionality;
         pluginInfo->libraryFilename = fileInfo.absoluteFilePath();
 
@@ -241,25 +248,9 @@ void PluginManager::loadOptionalPluginsIfNeeded(
  * @param pluginHomeDir Can be empty if the plugin does not reside in its dedicated dir.
  */
 std::unique_ptr<QLibrary> PluginManager::loadPluginLibrary(
-    const QString& pluginHomeDir,
     const QString& libFilename,
     PluginInfoPtr pluginInfo)
 {
-    #if defined(_WIN32)
-        if (!pluginsIni().disablePluginLinkedDllLookup && !pluginHomeDir.isEmpty())
-        {
-            NX_DEBUG(this, "Calling SetDllDirectoryW(%1)",
-                nx::kit::utils::toString(pluginHomeDir));
-            if (!SetDllDirectoryW(pluginHomeDir.toStdWString().c_str()))
-            {
-                NX_ERROR(this, "SetDllDirectoryW(%1) failed",
-                    nx::kit::utils::toString(pluginHomeDir));
-            }
-        }
-    #else
-        nx::utils::unused(pluginHomeDir);
-    #endif
-
     auto lib = std::make_unique<QLibrary>(libFilename);
 
     // Flag DeepBindHint forces plugin (the loaded side) to use its functions instead of the same
@@ -268,18 +259,7 @@ std::unique_ptr<QLibrary> PluginManager::loadPluginLibrary(
     hints |= QLibrary::DeepBindHint;
     lib->setLoadHints(hints);
 
-    const bool libLoaded = lib->load();
-
-    #if defined(_WIN32)
-        if (!pluginsIni().disablePluginLinkedDllLookup && !pluginHomeDir.isEmpty())
-        {
-            NX_DEBUG(this, "Calling SetDllDirectoryW(nullptr)");
-            if (!SetDllDirectoryW(nullptr))
-                NX_ERROR(this, "SetDllDirectoryW(nullptr) failed");
-        }
-    #endif
-
-    if (libLoaded)
+    if (lib->load())
         return lib;
 
     storePluginInfo(
@@ -303,7 +283,8 @@ void PluginManager::storePluginInfo(
         NX_INFO(this, pluginInfo->statusMessage);
     else
         NX_ERROR(this, pluginInfo->statusMessage);
-    m_nxPlugins.push_back({pluginInfo, /*plugin*/ nullptr});
+
+    m_pluginContexts.push_back({pluginInfo, /*plugin*/ nullptr});
 }
 
 bool PluginManager::loadNxPlugin(
@@ -318,16 +299,34 @@ bool PluginManager::loadNxPlugin(
     using namespace nx::vms::server;
     using nx::vms::api::analytics::PluginManifest;
 
-    const auto lib = loadPluginLibrary(pluginHomeDir, libFilename, pluginInfo);
+    const PluginLoadingContext pluginLoadingContext(this, pluginHomeDir, libName);
+
+    const auto lib = loadPluginLibrary(libFilename, pluginInfo);
     if (!lib)
         return false;
 
-    if (const auto entryPointFunc = reinterpret_cast<nxpl::Plugin::EntryPointFunc>(
+    if (const auto nxLibContextFunc = reinterpret_cast<NxLibContextFunc>(
+        lib->resolve(kNxLibContextFuncName)))
+    {
+        ILibContext* const pluginLibContext = nxLibContextFunc();
+        if (!NX_ASSERT(pluginLibContext))
+        {
+            lib->unload();
+            return false;
+        }
+
+        pluginLibContext->setName(libName.toStdString().c_str());
+        pluginLibContext->setRefCountableRegistry(
+            nx::vms::server::sdk_support::RefCountableRegistry::createIfEnabled(
+                libName.toStdString()));
+    }
+
+    if (const auto oldEntryPointFunc = reinterpret_cast<nxpl::Plugin::EntryPointFunc>(
         lib->resolve(nxpl::Plugin::kEntryPointFuncName)))
     {
         // Old entry point found: currently, this is a Storage or Camera plugin.
         if (!loadNxPluginForOldSdk(
-            entryPointFunc, settingsHolder, libFilename, libName, pluginInfo))
+            oldEntryPointFunc, settingsHolder, libFilename, libName, pluginInfo))
         {
             lib->unload();
             return false;
@@ -413,7 +412,7 @@ bool PluginManager::loadNxPluginForOldSdk(
             makePtr<nx::vms::server::plugins::UtilityProvider>(this, /*plugin*/ nullptr).get()));
     }
 
-    m_nxPlugins.push_back({pluginInfo, toPtr(reinterpret_cast<IRefCountable*>(plugin))});
+    m_pluginContexts.push_back({pluginInfo, toPtr(reinterpret_cast<IRefCountable*>(plugin))});
     return true;
 }
 
@@ -433,22 +432,16 @@ public:
 
     virtual void log(
         const QString& manifestStr,
-        nx::sdk::Error error,
-        const QString& customError) override
+        const nx::vms::server::sdk_support::Error& error) override
     {
-        if (error == nx::sdk::Error::noError)
+        if (error.errorCode == nx::sdk::ErrorCode::noError)
             return;
-
-        const QString errorStr = (error != nx::sdk::Error::unknownError)
-            ? lm(" (error code %1)").arg(nx::sdk::toString(error))
-            : "";
-
-        const QString customErrorStr = customError.isEmpty() ? "" : lm(": %1").arg(customError);
 
         m_pluginInfo->errorCode = PluginInfo::Error::badManifest;
         m_pluginInfo->status = PluginInfo::Status::notLoadedBecauseOfError;
-        m_pluginInfo->statusMessage = lm("Failed loading plugin [%1]: Bad manifest%2%3").args(
-            m_libFilename, errorStr, customErrorStr);
+        m_pluginInfo->statusMessage = lm("Failed loading plugin [%1]: Bad manifest%2").args(
+            m_libFilename,
+            lm(" (Error: [%1] %2)").args(error.errorCode, error.errorMessage));
 
         QString logMessage = m_pluginInfo->statusMessage;
         if (!manifestStr.isEmpty())
@@ -523,7 +516,7 @@ bool PluginManager::loadNxPluginForNewSdk(
         return false;
     }
 
-    static const QString kPluginLoadedMessageFormat =
+    const QString kPluginLoadedMessageFormat =
         "Loaded plugin [" + libFilename + "]; highest supported interface: %1";
 
     pluginInfo->name = name;
@@ -555,22 +548,25 @@ bool PluginManager::loadNxPluginForNewSdk(
         }
         else
         {
-            m_nxPlugins.push_back({pluginInfo, /*plugin*/ nullptr});
+            m_pluginContexts.push_back({pluginInfo, /*plugin*/ nullptr});
             return false; //< The error is already logged.
         }
     }
 
     plugin->setUtilityProvider(
         makePtr<nx::vms::server::plugins::UtilityProvider>(this, plugin.get()).get());
-    m_nxPlugins.push_back({pluginInfo, plugin});
+
+    m_pluginContexts.push_back({ pluginInfo, plugin });
+
     return true;
 }
 
 nx::vms::api::PluginInfoList PluginManager::pluginInfoList() const
 {
+    QnMutexLocker lock(&m_mutex);
     if (m_cachedPluginInfo.empty())
     {
-        for (const auto& pluginContext: m_nxPlugins)
+        for (const auto& pluginContext: m_pluginContexts)
             m_cachedPluginInfo.push_back(*pluginContext.pluginInfo);
     }
 
@@ -583,12 +579,35 @@ std::shared_ptr<const nx::vms::api::PluginInfo> PluginManager::pluginInfo(
     if (!NX_ASSERT(plugin))
         return nullptr;
 
-    for (const auto& pluginContext: m_nxPlugins)
     {
-        if (pluginContext.plugin.get() == plugin)
-            return pluginContext.pluginInfo;
+        QnMutexLocker lock(&m_mutex);
+        for (const auto& pluginContext : m_pluginContexts)
+        {
+            if (pluginContext.plugin.get() == plugin)
+                return pluginContext.pluginInfo;
+        }
     }
 
     NX_ERROR(this, "PluginInfo not found for plugin [%1]", plugin->name());
     return nullptr;
+}
+
+void PluginManager::setIsActive(const nx::sdk::IRefCountable* plugin, bool isActive)
+{
+    if (!plugin)
+        return;
+
+    QnMutexLocker lock(&m_mutex);
+    for (auto& pluginContext: m_pluginContexts)
+    {
+        if (pluginContext.plugin.get() != plugin)
+            continue;
+
+        if (pluginContext.pluginInfo->isActive == isActive)
+            return;
+
+        pluginContext.pluginInfo->isActive = isActive;
+        m_cachedPluginInfo.clear();
+        return;
+    }
 }

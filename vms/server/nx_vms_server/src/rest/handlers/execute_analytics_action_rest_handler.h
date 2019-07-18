@@ -19,7 +19,7 @@ struct ExtendedAnalyticsActionData
     nx::vms::server::resource::AnalyticsEngineResourcePtr engine;
     nx::vms::api::analytics::ActionTypeDescriptor actionTypeDescriptor;
 
-    std::optional<nx::analytics::db::DetectedObject> detectedObject;
+    std::optional<nx::analytics::db::ObjectTrack> objectTrack;
     std::optional<nx::analytics::db::ObjectPosition> bestShotObjectPosition;
     CLVideoDecoderOutputPtr bestShotVideoFrame;
 };
@@ -60,7 +60,7 @@ private:
         const ExtendedAnalyticsActionData& actionData,
         AnalyticsActionResult* outActionResult);
 
-    std::optional<nx::analytics::db::DetectedObject> fetchDetectedObject(
+    std::optional<nx::analytics::db::ObjectTrack> fetchObjectTrack(
         const QnUuid& objectTrackId,
         bool needFullTrack);
 

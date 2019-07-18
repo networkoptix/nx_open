@@ -354,11 +354,11 @@ ec2::ErrorCode MediaServerClient::ec2GetSystemMergeHistory(
         result);
 }
 
-void MediaServerClient::ec2AnalyticsLookupDetectedObjects(
+void MediaServerClient::ec2AnalyticsLookupObjectTracks(
     const nx::analytics::db::Filter& request,
     std::function<void(ec2::ErrorCode, nx::analytics::db::LookupResult)> completionHandler)
 {
-    QString requestPath(lit("ec2/analyticsLookupDetectedObjects"));
+    QString requestPath(lit("ec2/analyticsLookupObjectTracks"));
 
     QnRequestParamList queryParams;
     nx::analytics::db::serializeToParams(request, &queryParams);
@@ -376,7 +376,7 @@ void MediaServerClient::ec2AnalyticsLookupDetectedObjects(
         std::move(completionHandler));
 }
 
-ec2::ErrorCode MediaServerClient::ec2AnalyticsLookupDetectedObjects(
+ec2::ErrorCode MediaServerClient::ec2AnalyticsLookupObjectTracks(
     const nx::analytics::db::Filter& request,
     nx::analytics::db::LookupResult* result)
 {
@@ -387,7 +387,7 @@ ec2::ErrorCode MediaServerClient::ec2AnalyticsLookupDetectedObjects(
 
     return syncCallWrapper(
         this,
-        static_cast<AsyncFuncPointer>(&MediaServerClient::ec2AnalyticsLookupDetectedObjects),
+        static_cast<AsyncFuncPointer>(&MediaServerClient::ec2AnalyticsLookupObjectTracks),
         request,
         result);
 }

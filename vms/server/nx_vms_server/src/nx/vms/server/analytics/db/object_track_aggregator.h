@@ -22,7 +22,7 @@ struct AggregatedTrackData
      * Resolution is defined by ObjectTrackAggregator settings.
      */
     QRect boundingBox;
-    std::set<QnUuid> objectIds;
+    std::set<QnUuid> trackIds;
 };
 
 /**
@@ -40,7 +40,7 @@ public:
      * @param box Every coordinate is in [0;1] range.
      */
     void add(
-        const QnUuid& objectId,
+        const QnUuid& trackId,
         std::chrono::milliseconds timestamp,
         const QRectF& box);
 
@@ -54,8 +54,8 @@ private:
     {
         std::optional<std::chrono::milliseconds> aggregationStartTimestamp;
         std::optional<std::chrono::milliseconds> aggregationEndTimestamp;
-        //RectAggregator<QnUuid /*objectId*/> rectAggregator;
-        nx::utils::math::RectAggregatorGrid<QnUuid /*objectId*/> rectAggregator;
+        //RectAggregator<QnUuid /*trackId*/> rectAggregator;
+        nx::utils::math::RectAggregatorGrid<QnUuid /*trackId*/> rectAggregator;
 
         AggregationContext();
     };
@@ -67,7 +67,7 @@ private:
 
     void add(
         AggregationContext* context,
-        const QnUuid& objectId,
+        const QnUuid& trackId,
         std::chrono::milliseconds timestamp,
         const QRectF& box);
 

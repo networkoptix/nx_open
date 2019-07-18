@@ -10,7 +10,7 @@ CameraManager::CameraManager(const nxcip::CameraInfo& info,
                              nxpl::TimeProvider *const timeProvider)
 :
     m_refManager( this ),
-    m_pluginRef( HttpLinkPlugin::instance() ),
+    m_pluginRef( nx::sdk::toPtr(HttpLinkPlugin::instance()) ),
     m_info( info ),
     m_capabilities(
         nxcip::BaseCameraManager::nativeMediaStreamCapability |

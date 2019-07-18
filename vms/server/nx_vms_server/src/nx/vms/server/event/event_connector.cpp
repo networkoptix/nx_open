@@ -228,7 +228,7 @@ void EventConnector::at_analyticsSdkEvent(const nx::vms::event::AnalyticsSdkEven
     serverModule()->eventRuleProcessor()->processEvent(event);
 }
 
-void EventConnector::at_pluginEvent(const nx::vms::event::PluginEventPtr& event)
+void EventConnector::at_pluginDiagnosticEvent(const nx::vms::event::PluginDiagnosticEventPtr& event)
 {
     serverModule()->eventRuleProcessor()->processEvent(event);
 }
@@ -261,7 +261,11 @@ void EventConnector::at_serverConflict(const QnResourcePtr& resource, qint64 tim
     serverModule()->eventRuleProcessor()->processEvent(event);
 }
 
-void EventConnector::at_archiveBackupFinished(const QnResourcePtr& resource, qint64 timeStamp, vms::api::EventReason reasonCode, const QString& reasonText)
+void EventConnector::at_archiveBackupFinished(
+    const QnResourcePtr& resource,
+    qint64 timeStamp,
+    vms::api::EventReason reasonCode,
+    const QString& reasonText)
 {
     vms::event::BackupFinishedEventPtr event(new vms::event::BackupFinishedEvent(
         resource, timeStamp, reasonCode, reasonText));

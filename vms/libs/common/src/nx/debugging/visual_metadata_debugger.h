@@ -34,9 +34,9 @@ public:
 public:
     virtual void push(const QnConstCompressedVideoDataPtr& video) override;
     virtual void push(
-        const nx::common::metadata::DetectionMetadataPacketPtr& detectionMetadata) override;
+        const nx::common::metadata::ObjectMetadataPacketPtr& metadataPacket) override;
     virtual void push(const CLConstVideoDecoderOutputPtr& frame) override;
-    virtual void push(const QnConstCompressedMetadataPtr& metadata) override;
+    virtual void push(const QnConstCompressedMetadataPtr& compressedMetadata) override;
 
 protected:
     virtual void run() override;
@@ -45,25 +45,25 @@ private:
     CLVideoDecoderOutputPtr decode(const QnConstCompressedVideoDataPtr& video);
 
     void addFrameToCache(const CLConstVideoDecoderOutputPtr& frame);
-    void addMetadataToCache(const nx::common::metadata::DetectionMetadataPacketPtr& metadata);
+    void addMetadataToCache(const nx::common::metadata::ObjectMetadataPacketPtr& metadata);
     std::pair<FrameTimestamp, MetadataTimestamp> makeOverlayedImages();
     void updateCache(
         const std::pair<FrameTimestamp, MetadataTimestamp>& lastProcessedTimestamps);
 
     static QByteArray makeMetadataString(
-        const nx::common::metadata::DetectionMetadataPacketPtr& detectionMetadata);
+        const nx::common::metadata::ObjectMetadataPacketPtr& metadata);
 
     static void drawMetadata(
         QImage* inOutImage,
-        const nx::common::metadata::DetectionMetadataPacketPtr& detectionMetadata);
+        const nx::common::metadata::ObjectMetadataPacketPtr& metadata);
 
 private:
     mutable QnMutex m_mutex;
     std::queue<CLConstVideoDecoderOutputPtr> m_frameQueue;
-    std::queue<nx::common::metadata::DetectionMetadataPacketPtr> m_metadataQueue;
+    std::queue<nx::common::metadata::ObjectMetadataPacketPtr> m_metadataQueue;
 
     std::map<FrameTimestamp, CLConstVideoDecoderOutputPtr> m_frameCache;
-    std::map<MetadataTimestamp, nx::common::metadata::DetectionMetadataPacketPtr> m_metadataCache;
+    std::map<MetadataTimestamp, nx::common::metadata::ObjectMetadataPacketPtr> m_metadataCache;
 
     const int m_maxFrameCacheSize;
     const int m_maxMetadataCacheSize;

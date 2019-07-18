@@ -29,8 +29,8 @@ protected:
             auto packet = generateRandomPacket(1);
             if (!m_packets.empty())
             {
-                packet->timestampUsec =
-                    m_packets.back()->timestampUsec + microseconds(hours(1)).count();
+                packet->timestampUs =
+                    m_packets.back()->timestampUs + microseconds(hours(1)).count();
             }
 
             m_packets.push_back(packet);
@@ -38,14 +38,14 @@ protected:
 
         for (auto& packet: m_packets)
         {
-            for (auto& object: packet->objects)
+            for (auto& objectMetadata: packet->objectMetadataList)
             {
-                const auto timestamp = milliseconds(packet->timestampUsec / 1000);
+                const auto timestamp = milliseconds(packet->timestampUs / 1000);
                 m_aggregator.add(
-                    object.objectId,
+                    objectMetadata.trackId,
                     timestamp,
-                    object.boundingBox);
-                m_objectToTimestamp[object.objectId] = timestamp;
+                    objectMetadata.boundingBox);
+                m_objectToTimestamp[objectMetadata.trackId] = timestamp;
             }
         }
     }
@@ -64,10 +64,10 @@ protected:
     {
         for (const auto& aggregatedTrack: m_aggregatedData)
         {
-            for (const auto& objectId: aggregatedTrack.objectIds)
+            for (const auto& trackId: aggregatedTrack.trackIds)
             {
                 ASSERT_LE(
-                    std::chrono::abs(m_objectToTimestamp[objectId] - aggregatedTrack.timestamp),
+                    std::chrono::abs(m_objectToTimestamp[trackId] - aggregatedTrack.timestamp),
                     kTrackAggregationPeriod);
             }
         }
@@ -75,8 +75,8 @@ protected:
 
 private:
     ObjectTrackAggregator m_aggregator;
-    std::vector<common::metadata::DetectionMetadataPacketPtr> m_packets;
-    std::map<QnUuid /*objectId*/, std::chrono::milliseconds /*timestamp*/> m_objectToTimestamp;
+    std::vector<common::metadata::ObjectMetadataPacketPtr> m_packets;
+    std::map<QnUuid /*trackId*/, std::chrono::milliseconds /*timestamp*/> m_objectToTimestamp;
 
     std::vector<AggregatedTrackData> m_aggregatedData;
 };

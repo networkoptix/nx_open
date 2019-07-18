@@ -5,6 +5,7 @@
 #include <nx/fusion/model_functions.h>
 
 #include <nx/sdk/helpers/string.h>
+#include <nx/sdk/helpers/error.h>
 
 #include <nx/vms/api/analytics/device_agent_manifest.h>
 
@@ -74,53 +75,50 @@ void DeviceAgent::sendEventPacket(const EventType& event) const
         << event.internalName.toUtf8().constData() << " sent to server";
 }
 
-Error DeviceAgent::startFetchingMetadata(
-    const IMetadataTypes* /*metadataTypes*/)
+void DeviceAgent::startFetchingMetadata(const IMetadataTypes* /*metadataTypes*/)
 {
     m_engine->registerCamera(m_cameraLogicalId, this);
-    return Error::noError;
 }
 
-Error DeviceAgent::stopFetchingMetadata()
+void DeviceAgent::stopFetchingMetadata()
 {
     m_engine->unregisterCamera(m_cameraLogicalId);
-    return Error::noError;
 }
 
-const IString* DeviceAgent::manifest(Error* error) const
+StringResult DeviceAgent::manifest() const
 {
-    *error = Error::noError;
     return new nx::sdk::String(m_deviceAgentManifest);
 }
 
-Error DeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
+void DeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
 {
     handler->addRef();
     m_handler.reset(handler);
-    return Error::noError;
 }
 
-Error DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes)
+Result<void> DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes)
 {
-    nx::sdk::Ptr<const nx::sdk::IStringList> eventTypeIds(metadataTypes->eventTypeIds());
-    if (!NX_ASSERT(eventTypeIds, "Event type id list is nullptr"))
-        return Error::unknownError;
-
-    if (eventTypeIds->count() == 0)
+    const auto eventTypeIds = toPtr(metadataTypes->eventTypeIds());
+    if (const char* const kMessage = "Event type id list is nullptr";
+        !NX_ASSERT(eventTypeIds, kMessage))
     {
-        stopFetchingMetadata();
-        return Error::noError;
+        return error(ErrorCode::internalError, kMessage);
     }
 
-    return startFetchingMetadata(metadataTypes);
+    if (eventTypeIds->count() == 0)
+        stopFetchingMetadata();
+
+    startFetchingMetadata(metadataTypes);
+    return {};
 }
 
-void DeviceAgent::setSettings(const IStringMap* /*settings*/)
+StringMapResult DeviceAgent::setSettings(const IStringMap* /*settings*/)
 {
     // There are no DeviceAgent settings for this plugin.
+    return nullptr;
 }
 
-IStringMap* DeviceAgent::pluginSideSettings() const
+SettingsResponseResult DeviceAgent::pluginSideSettings() const
 {
     return nullptr;
 }

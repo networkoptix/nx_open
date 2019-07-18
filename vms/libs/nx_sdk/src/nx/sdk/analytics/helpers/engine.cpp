@@ -7,13 +7,16 @@
 #include <nx/kit/debug.h>
 #include <nx/kit/utils.h>
 
+#include <nx/sdk/analytics/i_plugin.h>
+
 #include <nx/sdk/helpers/uuid_helper.h>
 #include <nx/sdk/helpers/log_utils.h>
 #include <nx/sdk/helpers/ptr.h>
 #include <nx/sdk/helpers/string_map.h>
 #include <nx/sdk/helpers/string.h>
-#include <nx/sdk/helpers/plugin_event.h>
-#include <nx/sdk/analytics/i_plugin.h>
+#include <nx/sdk/helpers/plugin_diagnostic_event.h>
+#include <nx/sdk/helpers/settings_response.h>
+#include <nx/sdk/helpers/error.h>
 
 namespace nx {
 namespace sdk {
@@ -61,13 +64,13 @@ Engine::Engine(
     NX_PRINT << "Created " << this << ": \"" << plugin->name() << "\"";
 }
 
-std::string Engine::getParamValue(const std::string& paramName)
+std::string Engine::settingValue(const std::string& settingName)
 {
-    return m_settings[paramName];
+    return m_settings[settingName];
 }
 
-void Engine::pushPluginEvent(
-    IPluginEvent::Level level,
+void Engine::pushPluginDiagnosticEvent(
+    IPluginDiagnosticEvent::Level level,
     std::string caption,
     std::string description)
 {
@@ -79,9 +82,9 @@ void Engine::pushPluginEvent(
         return;
     }
 
-    const auto event = makePtr<PluginEvent>(
+    const auto event = makePtr<PluginDiagnosticEvent>(
         level, std::move(caption), std::move(description));
-    m_handler->handlePluginEvent(event.get());
+    m_handler->handlePluginDiagnosticEvent(event.get());
 }
 
 Engine::~Engine()
@@ -95,33 +98,30 @@ void Engine::setEngineInfo(const IEngineInfo* engineInfo)
         PrintPrefixMaker().makePrintPrefix(m_overridingPrintPrefix, m_plugin, engineInfo));
 }
 
-void Engine::setSettings(const IStringMap* settings)
+StringMapResult Engine::setSettings(const IStringMap* settings)
 {
     if (!logUtils.convertAndOutputStringMap(&m_settings, settings, "Received settings"))
-        return; //< The error is already logged.
+        return error(ErrorCode::invalidParams, "Unable to convert the input string map");
 
-    settingsReceived();
+    return settingsReceived();
 }
 
-IStringMap* Engine::pluginSideSettings() const
+SettingsResponseResult Engine::pluginSideSettings() const
 {
-    auto settingsValues = new StringMap();
-    settingsValues->addItem("nx.stub.engine.settings.double_0", "2.7182");
-    return settingsValues;
+    return nullptr;
 }
 
-const IString* Engine::manifest(Error* /*error*/) const
+StringResult Engine::manifest() const
 {
-    return new String(manifest());
+    return new String(manifestString());
 }
 
-void Engine::executeAction(IAction* action, Error* outError)
+Result<void> Engine::executeAction(IAction* action)
 {
     if (!action)
     {
         NX_PRINT << __func__ << "(): INTERNAL ERROR: action is null";
-        *outError = Error::unknownError;
-        return;
+        return error(ErrorCode::invalidParams, "Action is null");
     }
 
     std::map<std::string, std::string> params;
@@ -129,7 +129,7 @@ void Engine::executeAction(IAction* action, Error* outError)
     NX_OUTPUT << __func__ << "():";
     NX_OUTPUT << "{";
     NX_OUTPUT << "    actionId: " << nx::kit::utils::toString(action->actionId());
-    NX_OUTPUT << "    objectId: " << action->objectId();
+    NX_OUTPUT << "    objectTrackId: " << action->objectTrackId();
     NX_OUTPUT << "    deviceId: " << action->deviceId();
     NX_OUTPUT << "    timestampUs: " << action->timestampUs();
 
@@ -139,8 +139,7 @@ void Engine::executeAction(IAction* action, Error* outError)
         &params, actionParams.get(), "params", /*outputIndent*/ 4))
     {
         // The error is already logged.
-        *outError = Error::unknownError;
-        return;
+        return error(ErrorCode::invalidParams, "Invalid action parameters");
     }
 
     NX_OUTPUT << "}";
@@ -148,28 +147,28 @@ void Engine::executeAction(IAction* action, Error* outError)
     std::string actionUrl;
     std::string messageToUser;
 
-    executeAction(
+    auto result = executeAction(
         action->actionId(),
-        action->objectId(),
+        action->objectTrackId(),
         action->deviceId(),
         action->timestampUs(),
         nx::sdk::toPtr(action->objectTrackInfo()),
         params,
         &actionUrl,
-        &messageToUser,
-        outError);
+        &messageToUser);
 
     const char* const actionUrlPtr = actionUrl.empty() ? nullptr : actionUrl.c_str();
     const char* const messageToUserPtr = messageToUser.empty() ? nullptr : messageToUser.c_str();
     action->handleResult(actionUrlPtr, messageToUserPtr);
+
+    return result;
 }
 
-Error Engine::setHandler(IEngine::IHandler* handler)
+void Engine::setHandler(IEngine::IHandler* handler)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     handler->addRef();
     m_handler.reset(handler);
-    return Error::noError;
 }
 
 bool Engine::isCompatible(const IDeviceInfo* /*deviceInfo*/) const

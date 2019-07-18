@@ -787,7 +787,7 @@ bool SystemMergeProcessor::fetchUserParams(
     std::vector<std::tuple<QnUuid, ec2::ErrorCode, nx::vms::api::ResourceParamDataList>>
         getUsersParamsResults;
 
-    nx::utils::Counter expectedResponseCount(users.size());
+    nx::utils::Counter expectedResponseCount((int) users.size());
 
     for (const auto& user: users)
     {

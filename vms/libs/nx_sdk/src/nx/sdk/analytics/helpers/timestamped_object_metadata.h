@@ -20,7 +20,7 @@ class TimestampedObjectMetadata: public RefCountable<ITimestampedObjectMetadata>
 public:
     TimestampedObjectMetadata();
 
-    virtual Uuid id() const override;
+    virtual Uuid trackId() const override;
 
     virtual const char* subtype() const override;
 
@@ -38,7 +38,7 @@ public:
 
     void setTypeId(std::string typeId);
     void setConfidence(float confidence);
-    void setId(const Uuid& value);
+    void setTrackId(const Uuid& value);
     void setSubtype(const std::string& value);
     void addAttribute(nx::sdk::Ptr<Attribute> attribute);
     void addAttributes(const std::vector<nx::sdk::Ptr<Attribute>>& value);

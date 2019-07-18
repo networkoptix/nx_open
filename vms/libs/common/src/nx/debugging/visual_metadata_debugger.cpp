@@ -49,15 +49,15 @@ void VisualMetadataDebugger::push(const CLConstVideoDecoderOutputPtr& frame)
     m_frameQueue.push(frame);
 }
 
-void VisualMetadataDebugger::push(const QnConstCompressedMetadataPtr& metadata)
+void VisualMetadataDebugger::push(const QnConstCompressedMetadataPtr& compressedMetadata)
 {
-    if (metadata->metadataType != MetadataType::ObjectDetection)
+    if (compressedMetadata->metadataType != MetadataType::ObjectDetection)
         return;
 
     QnMutexLocker lock(&m_mutex);
-    auto detectionMetadata = nx::common::metadata::fromMetadataPacket(metadata);
-    if (detectionMetadata)
-        m_metadataQueue.push(detectionMetadata);
+    auto metadataPacket = nx::common::metadata::fromCompressedMetadataPacket(compressedMetadata);
+    if (metadataPacket)
+        m_metadataQueue.push(metadataPacket);
 }
 
 void VisualMetadataDebugger::push(const QnConstCompressedVideoDataPtr& video)
@@ -71,10 +71,10 @@ void VisualMetadataDebugger::push(const QnConstCompressedVideoDataPtr& video)
 }
 
 void VisualMetadataDebugger::push(
-    const nx::common::metadata::DetectionMetadataPacketPtr& detectionMetadata)
+    const nx::common::metadata::ObjectMetadataPacketPtr& metadataPacket)
 {
     QnMutexLocker lock(&m_mutex);
-    m_metadataQueue.push(detectionMetadata);
+    m_metadataQueue.push(metadataPacket);
 }
 
 void VisualMetadataDebugger::run()
@@ -82,7 +82,7 @@ void VisualMetadataDebugger::run()
     while (!needToStop())
     {
         CLConstVideoDecoderOutputPtr frame;
-        nx::common::metadata::DetectionMetadataPacketPtr detectionMetadata;
+        nx::common::metadata::ObjectMetadataPacketPtr metadataPacket;
 
         {
             QnMutexLocker lock(&m_mutex);
@@ -94,12 +94,12 @@ void VisualMetadataDebugger::run()
 
             if (!m_metadataQueue.empty())
             {
-                detectionMetadata = m_metadataQueue.front();
+                metadataPacket = m_metadataQueue.front();
                 m_metadataQueue.pop();
             }
         }
 
-        if (!frame && !detectionMetadata)
+        if (!frame && !metadataPacket)
         {
             QnSleep::msleep(10);
             continue;
@@ -113,7 +113,7 @@ void VisualMetadataDebugger::run()
             addFrameToCache(frame);
         }
 
-        if (detectionMetadata)
+        if (metadataPacket)
         {
             if (!m_metadataDumpFile)
             {
@@ -121,9 +121,9 @@ void VisualMetadataDebugger::run()
                 m_metadataDumpFile->open(QIODevice::WriteOnly);
             }
 
-            m_metadataDumpFile->write(makeMetadataString(detectionMetadata));
+            m_metadataDumpFile->write(makeMetadataString(metadataPacket));
             m_metadataDumpFile->flush();
-            addMetadataToCache(detectionMetadata);
+            addMetadataToCache(metadataPacket);
         }
 
         const auto lastProcesedTimestamps = makeOverlayedImages();
@@ -164,12 +164,12 @@ void VisualMetadataDebugger::addFrameToCache(const CLConstVideoDecoderOutputPtr&
 }
 
 void VisualMetadataDebugger::addMetadataToCache(
-    const nx::common::metadata::DetectionMetadataPacketPtr& metadata)
+    const nx::common::metadata::ObjectMetadataPacketPtr& metadata)
 {
     while (m_metadataCache.size() > m_maxMetadataCacheSize)
         m_metadataCache.erase(m_metadataCache.begin());
 
-    m_metadataCache[metadata->timestampUsec] = metadata;
+    m_metadataCache[metadata->timestampUs] = metadata;
 }
 
 std::pair<FrameTimestamp, MetadataTimestamp> VisualMetadataDebugger::makeOverlayedImages()
@@ -245,27 +245,27 @@ void VisualMetadataDebugger::updateCache(
 }
 
 QByteArray VisualMetadataDebugger::makeMetadataString(
-    const nx::common::metadata::DetectionMetadataPacketPtr& detectionMetadata)
+    const nx::common::metadata::ObjectMetadataPacketPtr& metadataPacket)
 {
     QString str = lit("Packet:%1,%2\n")
-        .arg(detectionMetadata->timestampUsec)
-        .arg(detectionMetadata->durationUsec);
+        .arg(metadataPacket->timestampUs)
+        .arg(metadataPacket->durationUs);
 
-    for (const auto& obj : detectionMetadata->objects)
+    for (const auto& objectMetadata : metadataPacket->objectMetadataList)
     {
         str += lit("\tObject:%1,%2,%3,%4,%5,%6\n")
-            .arg(obj.objectTypeId)
-            .arg(obj.objectId.toString())
-            .arg(obj.boundingBox.x())
-            .arg(obj.boundingBox.y())
-            .arg(obj.boundingBox.width())
-            .arg(obj.boundingBox.height());
+            .arg(objectMetadata.objectTypeId)
+            .arg(objectMetadata.trackId.toString())
+            .arg(objectMetadata.boundingBox.x())
+            .arg(objectMetadata.boundingBox.y())
+            .arg(objectMetadata.boundingBox.width())
+            .arg(objectMetadata.boundingBox.height());
 
-        for (const auto& label : obj.labels)
+        for (const auto& attribute: objectMetadata.attributes)
         {
             str += lit("\t\tLabel:%1,%2\n")
-                .arg(label.name)
-                .arg(label.value);
+                .arg(attribute.name)
+                .arg(attribute.value);
         }
     }
 
@@ -274,7 +274,7 @@ QByteArray VisualMetadataDebugger::makeMetadataString(
 
 void VisualMetadataDebugger::drawMetadata(
     QImage* inOutImage,
-    const nx::common::metadata::DetectionMetadataPacketPtr& detectionMetadata)
+    const nx::common::metadata::ObjectMetadataPacketPtr& metadataPacket)
 {
     const auto imageWidth = inOutImage->width();
     const auto imageHeight = inOutImage->height();
@@ -285,13 +285,13 @@ void VisualMetadataDebugger::drawMetadata(
     pen.setWidth(7);
     painter.setPen(pen);
 
-    for (const auto& obj : detectionMetadata->objects)
+    for (const auto& objectMetadata : metadataPacket->objectMetadataList)
     {
         painter.drawRect(
-            obj.boundingBox.x() * imageWidth,
-            obj.boundingBox.y() * imageHeight,
-            obj.boundingBox.width() * imageWidth,
-            obj.boundingBox.height() * imageHeight);
+            objectMetadata.boundingBox.x() * imageWidth,
+            objectMetadata.boundingBox.y() * imageHeight,
+            objectMetadata.boundingBox.width() * imageWidth,
+            objectMetadata.boundingBox.height() * imageHeight);
     }
 
     painter.end();
