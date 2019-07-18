@@ -100,8 +100,9 @@ void EventsStorage::save(common::metadata::ConstObjectMetadataPacketPtr packet)
             duration_cast<milliseconds>(microseconds(packet->timestampUs)));
     }
 
+    QnMutexLocker lock(&m_mutex);
     savePacketDataToCache(lock, packet);
-    auto detectionDataSaver = takeDataToSave(lock, /*flush*/ false);
+    ObjectTrackDataSaver detectionDataSaver = takeDataToSave(lock, /*flush*/ false);
     lock.unlock();
 
     QnMutexLocker dbLock(&m_dbControllerMutex);
@@ -292,7 +293,7 @@ void EventsStorage::flush(StoreCompletionHandler completionHandler)
             NX_DEBUG(this, "Flushing unsaved data");
 
             QnMutexLocker lock(&m_mutex);
-            auto detectionDataSaver = takeDataToSave(lock, /*flush*/ true);
+            ObjectTrackDataSaver detectionDataSaver = takeDataToSave(lock, /*flush*/ true);
             lock.unlock();
 
             if (!detectionDataSaver.empty())
