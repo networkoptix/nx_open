@@ -222,8 +222,9 @@ public:
      * It will reset all internal task sets.
      */
     void setTask(const QSet<QnUuid>& targets);
-
     void setTaskError(const QSet<QnUuid>& targets, const QString& error);
+    void addToTask(QnUuid id);
+    void removeFromTask(QnUuid id);
 
     static QString errorString(nx::update::Status::ErrorCode code);
 
@@ -277,9 +278,6 @@ private:
 
     QList<UpdateItemPtr> m_items;
     UpdateItemPtr m_clientItem;
-
-    /** Servers we do work with. */
-    std::map<QnUuid, QnMediaServerResourcePtr> m_activeServers;
 
     mutable QnMutex m_dataLock;
 

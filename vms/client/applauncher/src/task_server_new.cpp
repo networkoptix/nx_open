@@ -9,12 +9,9 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/app_info.h>
 
-#include "abstract_request_processor.h"
-
 namespace nx::vms::applauncher {
 
-TaskServerNew::TaskServerNew(AbstractRequestProcessor* const requestProcessor):
-    m_requestProcessor(requestProcessor)
+TaskServerNew::TaskServerNew()
 {
 }
 
@@ -113,23 +110,75 @@ void TaskServerNew::processNewConnection(NamedPipeSocket* clientConnection)
         return;
     }
 
-    api::BaseTask* task = nullptr;
-    if (!deserializeTask(QByteArray::fromRawData(buffer, (int) bytesRead), &task))
+    auto requestRawData = QByteArray::fromRawData(buffer, (int) bytesRead);
+    const int taskNameEnd = requestRawData.indexOf('\n');
+    if (taskNameEnd == -1)
     {
-        NX_DEBUG(this, "Failed to deserialize received task data");
+        NX_ERROR(NX_SCOPE_TAG, "deserializeTask(): Cannot deserialize task name:\n%1",
+            QString::fromUtf8(requestRawData));
         return;
     }
 
-    if (task->type == api::TaskType::quit)
-        m_terminated = true;
-
-    api::Response* response = nullptr;
-    m_requestProcessor->processRequest(std::shared_ptr<api::BaseTask>(task), &response);
-
-    const QByteArray& responseMsg = (response == nullptr) ? "ok\n\n" : response->serialize();
-    unsigned int bytesWritten = 0;
-    clientConnection->write(responseMsg.constData(), (unsigned) responseMsg.size(), &bytesWritten);
+    const QByteArray taskName(requestRawData.constData(), taskNameEnd);
+    if (m_channels.contains(taskName))
+    {
+        auto& channel = m_channels[taskName];
+        QByteArray responseRawData;
+        auto code = channel.requestParser(channel, requestRawData, responseRawData);
+        if (code == ResponseError::noError)
+        {
+            if (responseRawData.isEmpty())
+                responseRawData = "ok\n\n";
+            unsigned int bytesWritten = 0;
+            clientConnection->write(
+                responseRawData.constData(),
+                (unsigned) responseRawData.size(),
+                &bytesWritten);
+        }
+        else if (code == ResponseError::failedToDeserialize)
+        {
+            NX_ERROR(this, "Failed to deserialize request \"%1\"", taskName);
+            return;
+        }
+        else
+        {
+            NX_ERROR(this, "Unknown error while processing request \"%1\"", taskName);
+            return;
+        }
+    }
+    else
+    {
+        NX_ERROR(this, "Unknown channel \"%1\"", taskName);
+    }
     clientConnection->flush();
+}
+
+/** Adds a simple 'responseless' subscriber. */
+bool TaskServerNew::subscribe(const QByteArray& name, std::function<bool (const QByteArray&)> callback)
+{
+    return subscribe(name,
+        [callback](
+            Channel& channel,
+            const QByteArray& /*requestRawData*/,
+            QByteArray& /*responseRawData*/)
+        {
+            if (callback(channel.name))
+                return ResponseError::noError;
+            return ResponseError::failedToDeserialize;
+        });
+}
+
+bool TaskServerNew::subscribe(const QByteArray& name, Channel::Callback&& callback)
+{
+    NX_ASSERT(!name.isEmpty());
+    NX_ASSERT(callback);
+    if (name.isEmpty() || !callback)
+        return false;
+    if (m_channels.contains(name))
+        return false;
+
+    m_channels.insert(name, {name, callback});
+    return true;
 }
 
 } // namespace nx::vms::applauncher

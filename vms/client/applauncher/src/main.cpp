@@ -132,6 +132,7 @@ int main(int argc, char* argv[])
         SetConsoleCtrlHandler(stopServer_WIN, true);
     #endif
 
+    applauncherProcess.initChannels();
     int status = applauncherProcess.run();
 
     #if defined(Q_OS_WIN)

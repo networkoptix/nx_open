@@ -22,10 +22,10 @@ enum class TaskType
     addProcessKillTimer,
     startZipInstallation,
     checkZipProgress,
+    pingApplauncher,
     invalidTaskType
 };
 
-NX_VMS_APPLAUNCHER_API_API TaskType deserializeTaskType(const QByteArray& data);
 NX_VMS_APPLAUNCHER_API_API QByteArray serializeTaskType(TaskType value);
 NX_VMS_APPLAUNCHER_API_API QString toString(TaskType value);
 
@@ -70,9 +70,6 @@ public:
     virtual QByteArray serialize() const;
     virtual bool deserialize(const QByteArray& data);
 };
-
-//* Parses serializedTask header, creates the corresponding object (*ptr) and calls deserialize. */
-NX_VMS_APPLAUNCHER_API_API bool deserializeTask(const QByteArray& serializedTask, BaseTask** ptr);
 
 class NX_VMS_APPLAUNCHER_API_API Response
 {
@@ -239,5 +236,32 @@ public:
 class NX_VMS_APPLAUNCHER_API_API AddProcessKillTimerResponse: public Response
 {
 };
+
+class NX_VMS_APPLAUNCHER_API_API PingRequest: public BaseTask
+{
+public:
+    quint64 pingId = 0;
+    /** Stamp for the time request was generated and sent. */
+    quint64 pingStamp = 0;
+
+    PingRequest(): BaseTask(TaskType::pingApplauncher) {}
+
+    virtual QByteArray serialize() const override;
+    virtual bool deserialize(const QByteArray& data) override;
+};
+
+class NX_VMS_APPLAUNCHER_API_API PingResponse: public Response
+{
+public:
+    quint64 pingId = 0;
+    /** Stamp for the time request was generated and sent. It was taken from PingRequest. */
+    quint64 pingRequestStamp = 0;
+    /** Stamp for the time response was generated and sent. */
+    quint64 pingResponseStamp = 0;
+
+    virtual QByteArray serialize() const override;
+    virtual bool deserialize(const QByteArray& data) override;
+};
+
 
 } // namespace nx::vms::applauncher::api

@@ -58,7 +58,7 @@ buildDistribution()
             KEYCHAIN_ARGS="--keychain $KEYCHAIN"
         fi
 
-        codesign -f -v --deep $KEYCHAIN_ARGS -s "$MAC_SIGN_IDENTITY" "$APP_DIR"
+        codesign -f -v --options runtime --deep $KEYCHAIN_ARGS -s "$MAC_SIGN_IDENTITY" "$APP_DIR"
     fi
  
     test -f $DISTRIBUTION_DMG && rm $DISTRIBUTION_DMG
@@ -69,7 +69,28 @@ buildDistribution()
         -D dmg_icon="$PACKAGE_ICON_PATH" \
         -D dmg_background="$BACKGROUND_PATH" \
         "$VOLUME_NAME" "$DISTRIBUTION_DMG"
+    
+    if [ $NOTARIZATION = true ] && [ $CODE_SIGNING = true ]
+    then
+        # Use environment variable NOTARIZATION_PASSWORD if specified.
+        # If it is unset we use KEYCHAIN_NOTARIZATION_USER_PASSWORD from login keychain. 
+        # It can be usefull for development purposes.
+        KEYCHAIN_PASSWORD="@keychain:KEYCHAIN_NOTARIZATION_USER_PASSWORD"
+        FINAL_PASSWORD="${NOTARIZATION_PASSWORD:-$KEYCHAIN_PASSWORD}"
+        
+        # Use environment variable NOTARIZATION_USER if specified.
+        # If it is unset we use KEYCHAIN_NOTARIZATION_USER from environment.
+        # It can be usefull for development purposes.
+        FINAL_USER="${NOTARIZATION_USER:-$KEYCHAIN_NOTARIZATION_USER}"
 
+        python notarize.py notarize \
+            --user "$FINAL_USER" \
+            --password "$FINAL_PASSWORD" \
+            --team-id "$APPLE_TEAM_ID" \
+            --file-name "$DISTRIBUTION_DMG" \
+            --bundle-id "$BUNDLE_ID" 
+    fi
+    
     mv update.json "$SRC/"
     cp package.json "$SRC/"
 

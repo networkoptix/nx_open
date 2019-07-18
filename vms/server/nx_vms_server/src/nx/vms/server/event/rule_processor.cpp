@@ -67,12 +67,19 @@ RuleProcessor::RuleProcessor(QnMediaServerModule* serverModule):
         this, std::bind(&RuleProcessor::toggleInputPortMonitoring, this, _1, false),
         Qt::QueuedConnection);
 
+    auto ruleModificationStarted = [this]() {++m_updatingRulesCnt; };
+
+    connect(eventRuleManager(), &vms::event::RuleManager::ruleAddedOrUpdated, ruleModificationStarted);
     connect(eventRuleManager(), &vms::event::RuleManager::ruleAddedOrUpdated,
-            this, &RuleProcessor::at_ruleAddedOrUpdated);
+            this, &RuleProcessor::at_ruleAddedOrUpdated); //< Queued connection.
+
+    connect(eventRuleManager(), &vms::event::RuleManager::ruleRemoved, ruleModificationStarted);
     connect(eventRuleManager(), &vms::event::RuleManager::ruleRemoved,
-            this, &RuleProcessor::at_ruleRemoved);
+            this, &RuleProcessor::at_ruleRemoved); //< Queued connection.
+
+    connect(eventRuleManager(), &vms::event::RuleManager::ruleRemoved, ruleModificationStarted);
     connect(eventRuleManager(), &vms::event::RuleManager::rulesReset,
-            this, &RuleProcessor::at_rulesReset);
+            this, &RuleProcessor::at_rulesReset); //< Queued connection.
 
     connect(&m_timer, &QTimer::timeout, this, &RuleProcessor::at_timer, Qt::QueuedConnection);
     m_timer.start(1000);
@@ -81,6 +88,8 @@ RuleProcessor::RuleProcessor(QnMediaServerModule* serverModule):
 
 RuleProcessor::~RuleProcessor()
 {
+    m_updatingRulesCnt = 0;
+    m_ruleUpdateCond.wakeAll();
 }
 
 QnMediaServerResourcePtr RuleProcessor::getDestinationServer(
@@ -406,6 +415,9 @@ void RuleProcessor::processEvent(const vms::event::AbstractEventPtr& event)
     NX_VERBOSE(this, "Processing event [%1]", event->getEventType());
 
     QnMutexLocker lock(&m_mutex);
+    while (m_updatingRulesCnt > 0)
+        m_ruleUpdateCond.wait(&m_mutex);
+
     // Get pairs of {rule, action} for event
     const auto actions = matchActions(event);
     for (const auto& action: actions)
@@ -693,6 +705,7 @@ void RuleProcessor::at_ruleAddedOrUpdated(const vms::event::RulePtr& rule)
 {
     QnMutexLocker lock(&m_mutex);
     at_ruleAddedOrUpdated_impl(rule);
+    ruleModificationFinishedUnsafe();
 }
 
 void RuleProcessor::at_rulesReset(const vms::event::RuleList& rules)
@@ -710,6 +723,8 @@ void RuleProcessor::at_rulesReset(const vms::event::RuleList& rules)
 
     for (const auto& rule: rules)
         at_ruleAddedOrUpdated_impl(rule);
+
+    ruleModificationFinishedUnsafe();
 }
 
 void RuleProcessor::toggleInputPortMonitoring(const QnResourcePtr& resource, bool on)
@@ -796,6 +811,15 @@ void RuleProcessor::at_ruleRemoved(QnUuid id)
             break;
         }
     }
+
+    ruleModificationFinishedUnsafe();
+}
+
+void RuleProcessor::ruleModificationFinishedUnsafe()
+{
+    if (m_updatingRulesCnt > 0)
+        --m_updatingRulesCnt;
+    m_ruleUpdateCond.wakeAll();
 }
 
 void RuleProcessor::notifyResourcesAboutEventIfNeccessary(

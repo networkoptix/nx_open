@@ -83,7 +83,7 @@ private:
 
     void invokeBackupSettings();
 
-    static QString backupPositionToString(qint64 backupTimeMs);
+    QString backupPositionToString(qint64 backupTimeMs);
     static QString intervalToString(qint64 backupTimeMs);
 
     quint64 nextScheduledBackupTimeMs() const;

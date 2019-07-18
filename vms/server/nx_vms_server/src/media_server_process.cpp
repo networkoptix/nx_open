@@ -1348,7 +1348,7 @@ void MediaServerProcess::at_serverSaved(int, ec2::ErrorCode err)
         qWarning() << "Error saving server.";
 }
 
-void MediaServerProcess::at_connectionOpened()
+void MediaServerProcess::writeServerStartedEvent()
 {
     if (isStopping())
         return;
@@ -4062,6 +4062,9 @@ void MediaServerProcess::connectSignals()
         &MediaServerProcess::at_storageManager_raidStorageFailure);
     m_raidEventLogReader->subscribe();
 
+    connect(
+        this, &MediaServerProcess::started,
+        [this]() { emit MediaServerProcess::startedWithSignalsProcessed(); });
 }
 
 void MediaServerProcess::setUpDataFromSettings()
@@ -4241,7 +4244,6 @@ void MediaServerProcess::initNewSystemStateIfNeeded(
 
 void MediaServerProcess::startObjects()
 {
-    QTimer::singleShot(3000, this, SLOT(at_connectionOpened()));
     QTimer::singleShot(0, this, SLOT(at_appStarted()));
 
     at_timer();
@@ -4292,6 +4294,7 @@ void MediaServerProcess::startObjects()
         serverModule()->licenseWatcher()->start();
 
     commonModule()->messageProcessor()->init(commonModule()->ec2Connection()); // start receiving notifications
+    writeServerStartedEvent();
 }
 
 std::map<QString, QVariant> MediaServerProcess::confParamsFromSettings() const

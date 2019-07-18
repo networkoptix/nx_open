@@ -433,7 +433,13 @@ void ResourceTreeWorkbenchPanel::updateControlsGeometry()
     paintGeometry.setLeft(0.0);
     item->setPaintGeometry(paintGeometry);
 
-    m_backgroundItem->setGeometry(paintGeometry);
+    auto backgroundItemGeometry =
+        paintGeometry.adjusted(0.0, 0.0, m_backgroundItem->frameWidth(), 0.0);
+    #if defined(Q_OS_WIN)
+        // Windows specific workaround, looks neat at any DPI, otherwise doesn't.
+        backgroundItemGeometry.adjust(0.0, 0.0, 0.5, 0.0);
+    #endif
+    m_backgroundItem->setGeometry(backgroundItemGeometry);
 
     m_showButton->setPos(QPointF(
         qMax(parentWidgetRect.left(), geometry.right()),

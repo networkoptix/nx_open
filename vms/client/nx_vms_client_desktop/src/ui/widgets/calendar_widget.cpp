@@ -139,7 +139,7 @@ void QnCalendarWidget::paintCell(QPainter *painter, const QRect &rect, const QDa
     const bool isEnabled = m_enabledPeriod.intersects(localPeriod);
     const bool isSelected = m_selectedPeriod.intersects(localPeriod);
 
-    QDateTime day(QDateTime::fromMSecsSinceEpoch(localPeriod.startTimeMs).date(), QTime());
+    QDateTime day(QDateTime::fromMSecsSinceEpoch(localPeriod.startTimeMs + m_localOffset).date(), QTime());
 
     const int dayOfWeek = day.date().dayOfWeek();
     const auto foregroundRole = (dayOfWeek == Qt::Saturday || dayOfWeek == Qt::Sunday) && isEnabled

@@ -19,9 +19,11 @@ OS_IS_WINDOWS = sys.platform.startswith("win32") or sys.platform.startswith("cyg
 
 TIMESTAMPS_FILE = "timestamps.dat"
 
-ADDITIONAL_SYNC_ARGS = []
-ADDITIONAL_UPLOAD_ARGS = []
+ADDITIONAL_SYNC_ARGS = ["--chmod=ugo=rwX", "--executability"]
+ADDITIONAL_UPLOAD_ARGS = ["--chmod=ugo=rwX", "--executability"]
 if OS_IS_WINDOWS:
+    # Note lowercase 'x' in contrast to other cases. In Windows all files and directories must have
+    # executable flag.
     ADDITIONAL_SYNC_ARGS = ["--chmod=ugo=rwx"]
     ADDITIONAL_UPLOAD_ARGS = ["--chmod=ugo=rwX"]
 

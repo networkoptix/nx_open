@@ -63,7 +63,25 @@ def set_permissions(path):
     else:
         os.chmod(path, 0644)
 
+# Since Apple does not allow dots in the folders names in the bundle we have 
+# to replace them with underscore and preserve folders tree by symlinks creation
+def fix_qt_folder(root):
+    current_directory = os.getcwd()
+    root = os.path.join(current_directory, root)
+    for info in os.walk(root):
+        source_path = info[0]
+        base_path = os.path.dirname(source_path)
+        source_name = os.path.basename(source_path)
+        target_name = source_name.replace('.', '_')
+        if source_name == target_name:
+            continue
 
+        os.chdir(base_path)
+        os.rename(source_name, target_name)
+        os.symlink(target_name, source_name)
+    
+    os.chdir(current_directory)
+        
 def prepare(build_dir, binary, sbindir, tlibdir):
     tbindir = os.path.dirname(binary)
 #    if os.path.exists(tbindir):
@@ -101,9 +119,10 @@ def prepare(build_dir, binary, sbindir, tlibdir):
             set_permissions(dep)
             yield dep
 
-    tqmldir = join(tcontentsdir, 'qml')
+    tqmldir = join(tbindir, 'qml')
     shutil.copytree(join(sbindir, 'vox'), join(tresdir, 'vox'))
     shutil.copytree(join(sbindir, 'qml'), tqmldir)
+    fix_qt_folder(tqmldir)
 
     for root, dirs, files in os.walk(tqmldir):
         for xfile in files:

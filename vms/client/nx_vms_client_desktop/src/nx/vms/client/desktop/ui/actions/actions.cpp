@@ -57,7 +57,7 @@ void initialize(Manager* manager, Action* root)
 
     factory(ProcessStartupParametersAction)
         .flags(NoTarget)
-        .mode(DesktopMode | AcsMode);
+        .mode(DesktopMode | AcsMode | VideoWallMode);
 
     factory(MoveCameraAction)
         .flags(ResourceTarget | SingleTarget | MultiTarget)

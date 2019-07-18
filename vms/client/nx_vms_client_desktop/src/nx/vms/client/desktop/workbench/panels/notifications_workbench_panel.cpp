@@ -449,7 +449,7 @@ void NotificationsWorkbenchPanel::at_eventTileHovered(
 
     const auto parentWidget = m_eventPanel->graphicsProxyWidget();
     const auto imageProvider = tile->preview();
-    const auto text = tile->toolTip().isEmpty() ? tile->title() : tile->toolTip();
+    const auto text = tile->toolTip();
     if (text.isEmpty())
         return;
 

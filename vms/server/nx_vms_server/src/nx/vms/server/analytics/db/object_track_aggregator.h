@@ -8,6 +8,8 @@
 #include <QtCore/QRect>
 #include <QtCore/QSize>
 
+#include <nx/utils/math/rect_aggregator_grid.h>
+
 #include <analytics/db/analytics_db_types.h>
 #include <utils/math/rect_aggregator.h>
 
@@ -52,7 +54,10 @@ private:
     {
         std::optional<std::chrono::milliseconds> aggregationStartTimestamp;
         std::optional<std::chrono::milliseconds> aggregationEndTimestamp;
-        RectAggregator<QnUuid /*objectId*/> rectAggregator;
+        //RectAggregator<QnUuid /*objectId*/> rectAggregator;
+        nx::utils::math::RectAggregatorGrid<QnUuid /*objectId*/> rectAggregator;
+
+        AggregationContext();
     };
 
     const QSize m_resolution;

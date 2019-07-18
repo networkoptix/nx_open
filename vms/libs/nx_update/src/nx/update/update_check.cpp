@@ -269,11 +269,6 @@ static InformationError parseHeader(
         NX_WARNING(typeid(Information)) << "no eulaVersion at" << baseUpdateUrl;
     }
 
-    if (!QJson::deserialize(topLevelObject, "eulaLink", &result->eulaLink))
-    {
-        NX_WARNING(typeid(Information)) << "no eulaLink at" << baseUpdateUrl;
-    }
-
     if (!QJson::deserialize(topLevelObject, "eula", &result->eula))
     {
         NX_WARNING(typeid(Information)) << "no eula data at" << baseUpdateUrl;

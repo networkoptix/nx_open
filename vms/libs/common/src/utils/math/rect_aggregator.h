@@ -146,7 +146,8 @@ private:
         const auto aggregatedRect = std::move(*rectIter);
         m_aggregatedRects.erase(rectIter);
 
-        auto leftover = QRegion(aggregatedRect.rect) - newRect;
+        QRegion leftover(aggregatedRect.rect);
+        leftover -= newRect;
 
         for (const auto& subRect: leftover)
         {

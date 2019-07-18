@@ -37,6 +37,7 @@
 #include <ui/widgets/storage_space_slider.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 #include <ui/workaround/hidpi_workarounds.h>
+#include <ui/workbench/workbench_context.h>
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
 #include <utils/common/scoped_painter_rollback.h>
@@ -45,6 +46,7 @@
 #include <utils/math/color_transformations.h>
 
 #include <nx/client/core/utils/human_readable.h>
+#include <nx/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/common/utils/item_view_hover_tracker.h>
 #include <nx/vms/client/desktop/common/delegates/switch_item_delegate.h>
@@ -53,6 +55,8 @@
 
 using namespace nx;
 using namespace nx::vms::client::desktop;
+
+using ServerTimeWatcher = nx::vms::client::core::ServerTimeWatcher;
 
 namespace
 {
@@ -880,8 +884,9 @@ quint64 QnStorageConfigWidget::nextScheduledBackupTimeMs() const
     if (m_backupSchedule.backupType != vms::api::BackupType::scheduled || !m_backupSchedule.isValid())
         return 0;
 
-    QDateTime current = qnSyncTime->currentDateTime();
-    qint64 currentTimeMs = current.toMSecsSinceEpoch();
+    // Backup schedule struct always contains server time.
+    const QDateTime current = ServerTimeWatcher::serverTime(m_server, qnSyncTime->currentMSecsSinceEpoch());
+    const qint64 currentTimeMs = current.toMSecsSinceEpoch();
 
     static const int kDaysPerWeek = 7;
     int currentDayOfWeek = current.date().dayOfWeek() - 1; // zero-based
@@ -908,7 +913,10 @@ quint64 QnStorageConfigWidget::nextScheduledBackupTimeMs() const
 
 QString QnStorageConfigWidget::backupPositionToString(qint64 backupTimeMs)
 {
-    return datetime::toString(backupTimeMs);
+    QDateTime backupDateTime = ServerTimeWatcher::serverTime(m_server, backupTimeMs);
+    if (context()->instance<ServerTimeWatcher>()->timeMode() == ServerTimeWatcher::clientTimeMode)
+        backupDateTime = backupDateTime.toLocalTime();
+    return datetime::toString(backupDateTime);
 }
 
 QString QnStorageConfigWidget::intervalToString(qint64 backupTimeMs)

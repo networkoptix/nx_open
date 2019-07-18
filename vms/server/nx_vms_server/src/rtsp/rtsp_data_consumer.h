@@ -65,7 +65,6 @@ public:
     void setStreamingSpeed(int speed);
     void setMultiChannelVideo(bool value);
     void setUseUTCTime(bool value);
-    void setAllowAdaptiveStreaming(bool value);
     void setResource(const QnResourcePtr& resource);
     std::chrono::milliseconds timeFromLastReceiverReport();
 
@@ -134,12 +133,6 @@ private:
     QnAdaptiveSleep m_adaptiveSleep;
     bool m_useUTCTime; // use absolute UTC file for RTP (used for proprietary format)
     int m_fastChannelZappingSize;
-
-    qint64 m_firstLiveTime;
-    qint64 m_lastLiveTime;
-    QElapsedTimer m_liveTimer;
-    mutable QnMutex m_liveTimingControlMtx;
-    bool m_allowAdaptiveStreaming;
 
     QnByteArray m_sendBuffer;
     bool m_someDataIsDropped;

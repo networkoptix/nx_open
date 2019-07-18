@@ -46,6 +46,7 @@ class QnMediaServerResourceSearchers;
 class QnPlatformAbstraction;
 class QnServerConnector;
 class QnResourceStatusWatcher;
+class StreamingChunkTranscoder;
 
 namespace nx::vms::common::p2p::downloader { class Downloader; }
 namespace nx::vms::server::hls { class SessionPool; }
@@ -219,4 +220,5 @@ private:
     nx::vms::server::analytics::SdkObjectFactory* m_sdkObjectFactory;
     nx::vms::server::hls::SessionPool* m_hlsSessionPool = nullptr;
     nx::vms::server::network::MulticastAddressRegistry* m_multicastAddressRegistry = nullptr;
+    StreamingChunkTranscoder* m_streamingChunkTranscoder = nullptr;
 };

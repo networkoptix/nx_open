@@ -9,7 +9,7 @@
 
 namespace {
 
-const std::size_t kBufferCapacity = 32 * 1024;
+const std::size_t kBufferCapacity = 256 * 1024;
 const std::chrono::milliseconds kReceiveTimeout(5000);
 const int kFixedRtpHeaderLength = 12;
 const char kRtpHeaderMask = 0b01000000;
