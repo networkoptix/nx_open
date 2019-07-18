@@ -356,8 +356,11 @@ bool verifyUpdateContents(
         {
             NX_WARNING(typeid(UpdateContents)) << "verifyUpdateManifest("
                 << contents.info.version << ") - we should install client package, but there is no such.";
-            contents.error = nx::update::InformationError::missingPackageError;
-            contents.missingUpdate.insert(clientData.clientId);
+            if (!contents.unsuportedSystemsReport.contains(clientData.clientId))
+            {
+                contents.error = nx::update::InformationError::missingPackageError;
+                contents.missingUpdate.insert(clientData.clientId);
+            }
         }
         else
         {
