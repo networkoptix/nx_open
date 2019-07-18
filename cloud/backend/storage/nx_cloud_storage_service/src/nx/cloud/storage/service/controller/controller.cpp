@@ -4,8 +4,8 @@
 
 namespace nx::cloud::storage::service {
 
-Controller::Controller(const Settings& settings):
-    m_settings(settings)
+Controller::Controller(const Settings& /*settings*/)/*:
+    m_settings(settings)*/
 {
 }
 

@@ -9,7 +9,6 @@ class Controller;
 
 class View
 {
-
 public:
     View(const Settings& settings, Controller& controller);
 
@@ -20,7 +19,7 @@ public:
     const HttpServer& httpServer() const;
 
 private:
-    const Settings& m_settings;
+    /*const Settings& m_settings;*/
     HttpServer m_httpServer;
 };
 
