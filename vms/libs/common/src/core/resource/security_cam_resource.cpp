@@ -921,6 +921,7 @@ void QnSecurityCamResource::setModel(const QString &model)
 {
     QnMutexLocker lk(&m_mutex);
     m_model = model;
+    emit modelChanged(::toSharedPointer(this));
 }
 
 QString QnSecurityCamResource::getFirmware() const
@@ -963,6 +964,7 @@ QString QnSecurityCamResource::getVendor() const
 void QnSecurityCamResource::setVendor(const QString& value)
 {
     SAFE(m_vendor = value)
+    emit vendorChanged(::toSharedPointer(this));
 }
 
 int QnSecurityCamResource::logicalId() const

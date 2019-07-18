@@ -293,6 +293,13 @@
 #include "nx/vms/server/system/nx1/info.h"
 #include <atomic>
 
+#include <nx/vms/server/metrics/camera_provider.h>
+#include <nx/vms/server/metrics/network_provider.h>
+#include <nx/vms/server/metrics/rest_handlers.h>
+#include <nx/vms/server/metrics/server_provider.h>
+#include <nx/vms/server/metrics/storage_provider.h>
+#include <nx/vms/server/metrics/system_provider.h>
+
 using namespace nx::vms::server;
 
 // This constant is used while checking for compatibility.
@@ -2849,6 +2856,25 @@ void MediaServerProcess::registerRestHandlers(
         nx::network::http::Method::options,
         QnRestProcessorPool::kAnyPath,
         new OptionsRequestHandler());
+
+    reg("api/metrics/", new nx::vms::server::metrics::LocalRestHandler(
+        m_metricsController.get()));
+
+    /**%apidoc GET /ec2/metrics/rules
+     * %return:object Metric rules, which are currently in use in the system. See metrics.md
+     * for details.
+     *
+     * %apidoc GET /ec2/metrics/manifest
+     * %param:string noRules Do not include parameters fron rules.
+     * %return:object Metrics parameter manifest. See metrics.md for details.
+     *
+     * %apidoc GET /ec2/metrics/values
+     * %param:string noRules Do not include parameters fron rules.
+     * %param:string timeline Return values with timestamps instead of just values, ignores noRules.
+     * %return:object Metrics parameter values according to manifest. See metrics.md for details.
+     */
+    reg("ec2/metrics/", new nx::vms::server::metrics::SystemRestHandler(
+        m_metricsController.get(), serverModule()));
 }
 
 void MediaServerProcess::reg(
@@ -3751,6 +3777,7 @@ void MediaServerProcess::stopObjects()
     m_autoRequestForwarder.reset();
     m_audioStreamerPool.reset();
     m_upnpPortMapper.reset();
+    m_metricsController.reset();
 
     stopAsync();
 }
@@ -4477,6 +4504,81 @@ void MediaServerProcess::loadResourceParamsData()
     }
 }
 
+void MediaServerProcess::initMetricsController()
+{
+    m_metricsController = std::make_unique<nx::vms::utils::metrics::Controller>(
+        [](){ return (uint64_t) qnSyncTime->currentMSecsSinceEpoch() / 1000; });
+
+    m_metricsController->registerGroup(
+        "systems",
+        std::make_unique<nx::vms::server::metrics::SystemProvider>(serverModule()));
+
+    m_metricsController->registerGroup(
+        "servers",
+        std::make_unique<nx::vms::server::metrics::ServerProvider>(serverModule()));
+
+    m_metricsController->registerGroup(
+        "cameras",
+        std::make_unique<nx::vms::server::metrics::CameraProvider>(serverModule()));
+
+    m_metricsController->registerGroup(
+        "storages",
+        std::make_unique<nx::vms::server::metrics::StorageProvider>(serverModule()));
+
+    m_metricsController->registerGroup(
+        "networks",
+        std::make_unique<nx::vms::server::metrics::NetworkProvider>(commonModule()->moduleGUID()));
+
+    // TODO: Should be moved into a resource file.
+    static const QByteArray kRules(R"json({
+        "systems": {
+            "servers": { "alarms": { "warning": ">100" } },
+            "offlineServers": { "alarms": { "error": ">0" } },
+            "offlineServerEvents": { "alarms": { "warning": ">10" } }
+        },
+        "servers": {
+            "cpuUsage": { "alarms": { "warning": ">50", "error": ">70" } },
+            "misc": {
+                "group": {
+                    "encoders": { "alarms": { "error": ">2" } }
+                }
+            }
+        },
+        "cameras": {
+            "status": { "alarms": { "warning": "Unauthorized", "error": "Offline" } },
+            "statusChanges": {
+                "name": "status changes in last hour",
+                "calculate": "count status",
+                "insert": "after status",
+                "alarms": { "warning": ">0", "error": ">2" }
+            },
+            "packetLossCount": { "alarms": { "warning": ">0", "error": ">5" } },
+            "conflictCount": { "alarms": { "warning": ">0", "error": ">5" } },
+            "primaryStream": {
+                "group": {
+                    "fpsDrop": {
+                        "name": "fps drop",
+                        "calculate": "sub targetFps actualFps",
+                        "insert": "after actualFps",
+                        "alarms": { "warning": ">2", "error": ">10" }
+                    },
+                    "bitrate": { "alarms": { "warning": "<1" } }
+                }
+            }
+        },
+        "storages": {
+            "status": { "alarms": { "warning": "Unauthorized", "error": "Offline" } },
+            "issues": { "alarms": { "warning": ">0", "error": ">10" } }
+        }
+    })json");
+
+    nx::vms::api::metrics::SystemRules rules;
+    NX_CRITICAL(QJson::deserialize(kRules, &rules));
+    m_metricsController->setRules(std::move(rules));
+
+    m_metricsController->startMonitoring();
+}
+
 void MediaServerProcess::updateRootPassword()
 {
     // TODO: Root password for Nx1 should be updated in case of cloud owner.
@@ -4604,6 +4706,8 @@ void MediaServerProcess::run()
     loadPlugins();
 
     initResourceTypes();
+
+    initMetricsController();
 
     if (needToStop())
         return;

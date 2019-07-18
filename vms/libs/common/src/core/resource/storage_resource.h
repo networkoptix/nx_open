@@ -90,6 +90,7 @@ signals:
     void isUsedForWritingChanged(const QnResourcePtr& resource);
     void isBackupChanged(const QnResourcePtr& resource);
     void spaceLimitChanged(const QnResourcePtr& resource);
+    void typeChanged(const QnResourcePtr& resource);
 
 private:
     qint64 m_spaceLimit;
