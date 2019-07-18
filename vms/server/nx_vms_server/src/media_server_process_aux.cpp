@@ -66,12 +66,12 @@ QnStorageResourceList UnmountedLocalStoragesFilter::getUnmountedStorages(
     return result;
 }
 
-bool isStorageUnmounted(
+bool isStorageMounted(
     QnPlatformAbstraction* platform,
     const QnStorageResourcePtr& storage,
     const nx::vms::server::Settings* settings)
 {
-    return getUnmountedStorages(
+    return !getUnmountedStorages(
         platform,
         QnStorageResourceList() << storage, settings).contains(storage);
 }

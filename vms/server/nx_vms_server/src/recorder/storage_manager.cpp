@@ -89,7 +89,6 @@ const QString kArchiveCameraGroupNameKey = lit("groupName");
 
 static const std::chrono::hours kAnalyticsDataCleanupStep {1};
 
-const std::chrono::minutes kWriteInfoFilesInterval(5);
 
 struct TasksQueueInfo {
     int tasksCount;
@@ -304,7 +303,7 @@ public:
             setObjectName(threadName);
     }
 
-    virtual ~ScanMediaFilesTask()
+    virtual ~ScanMediaFilesTask() override
     {
         stop();
     }
@@ -532,13 +531,12 @@ public:
     {
         for (const auto& storage: storagesToTest())
         {
-            auto fileStorage = storage.dynamicCast<QnFileStorageResource>();
-            if (fileStorage && !nx::mserver_aux::isStorageUnmounted(
-                m_owner->serverModule()->platform(),
-                storage,
-                m_settings))
+            if (auto fileStorage = storage.dynamicCast<QnFileStorageResource>(); fileStorage)
             {
-                fileStorage->setMounted(true);
+                fileStorage->setMounted(nx::mserver_aux::isStorageMounted(
+                    m_owner->serverModule()->platform(),
+                    storage,
+                    m_settings));
             }
         }
 
@@ -1274,12 +1272,13 @@ void QnStorageManager::onNewResource(const QnResourcePtr &resource)
     QnStorageResourcePtr storage = qSharedPointerDynamicCast<QnStorageResource>(resource);
     if (storage && storage->getParentId() == moduleGUID())
     {
-        auto fileStorage = storage.dynamicCast<QnFileStorageResource>();
-        if (fileStorage && nx::mserver_aux::isStorageUnmounted(
-            serverModule()->platform(),
-            fileStorage,
-            &serverModule()->settings()))
-            fileStorage->setMounted(false);
+        if (auto fileStorage = storage.dynamicCast<QnFileStorageResource>(); fileStorage)
+        {
+            fileStorage->setMounted(nx::mserver_aux::isStorageMounted(
+                serverModule()->platform(),
+                fileStorage,
+                &serverModule()->settings()));
+        }
 
         if (checkIfMyStorage(storage))
             addStorage(storage);
