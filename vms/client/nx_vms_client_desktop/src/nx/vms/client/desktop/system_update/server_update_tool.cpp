@@ -30,6 +30,7 @@
 #include <nx/utils/guarded_callback.h>
 #include <nx/update/update_check.h>
 #include <nx/vms/client/desktop/utils/upload_manager.h>
+#include <nx/vms/common/p2p/downloader/private/internet_only_peer_manager.h>
 
 #include <quazip/quazip.h>
 #include <quazip/quazipfile.h>
@@ -108,7 +109,8 @@ ServerUpdateTool::ServerUpdateTool(QObject* parent):
         m_stateTracker.get(), &PeerStateTracker::setVersionInformation);
     m_updatesModel.reset(new ServerUpdatesModel(m_stateTracker, this));
 
-    m_downloader.reset(new Downloader(m_outputDir, commonModule()));
+    m_downloader.reset(new Downloader(
+        m_outputDir, commonModule(), {new InternetOnlyPeerManager()}));
 
     // This object is managed by shared_ptr. So we must sure there is no parent, or this instance
     // can be deleted twice.
