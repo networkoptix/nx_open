@@ -24,8 +24,9 @@ TestWithDbHelper::TestWithDbHelper(QString tmpDir):
 
     if (m_dbConnectionOptions.dbName.isEmpty() && m_dbConnectionOptions.driverType == RdbmsDriverType::sqlite)
     {
+        static std::atomic<int> sequence{0};
         m_dbConnectionOptions.dbName =
-            QString("%1/%2").arg(testDataDir()).arg(QString("%1_ut.sqlite").arg(nx::utils::TestOptions::moduleName()));
+            QString("%1/%2").arg(testDataDir()).arg(QString("%1.db").arg(++sequence));
     }
 
     cleanDatabase();
