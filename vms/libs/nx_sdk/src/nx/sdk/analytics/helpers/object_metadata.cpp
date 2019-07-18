@@ -22,7 +22,7 @@ float ObjectMetadata::confidence() const
 
 Uuid ObjectMetadata::trackId() const
 {
-    return m_objectTrackId;
+    return m_trackId;
 }
 
 const char* ObjectMetadata::subtype() const
@@ -61,7 +61,7 @@ void ObjectMetadata::setConfidence(float confidence)
 
 void ObjectMetadata::setTrackId(const Uuid& value)
 {
-    m_objectTrackId = value;
+    m_trackId = value;
 }
 
 void ObjectMetadata::setSubtype(const std::string& value)
