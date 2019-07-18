@@ -145,7 +145,7 @@ struct NX_VMS_API PluginInfo: Data
 
     /**%apidoc
      * For non-analytics plugins and for device-independent analytics plugins is always set to
-     * true. For device-dependent analytics plugins is set to true if and only if the plugin have
+     * true. For device-dependent analytics plugins is set to true if and only if the plugin has
      * ever had a DeviceAgent since the Server start.
      */
     bool isActive = true;
