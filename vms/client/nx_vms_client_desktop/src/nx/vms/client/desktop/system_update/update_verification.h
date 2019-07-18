@@ -6,6 +6,7 @@
 
 #include <QtCore/QDir>
 #include <QtCore/QStringList>
+#include <QtCore/QCoreApplication>
 
 #include <core/resource/resource_fwd.h>
 #include <nx/update/update_information.h>
