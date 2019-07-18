@@ -133,6 +133,8 @@ protected:
     void atServerPackageDownloaded(const nx::update::Package& package);
     void atServerPackageDownloadFailed(const nx::update::Package& package, const QString& error);
 
+    void atServerConfigurationChanged(std::shared_ptr<UpdateItem> item);
+
     void clearUpdateInfo();
     void pickLocalFile();
     void pickSpecificBuild();

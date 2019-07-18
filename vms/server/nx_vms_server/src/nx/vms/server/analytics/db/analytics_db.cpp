@@ -88,6 +88,9 @@ void EventsStorage::save(common::metadata::ConstObjectMetadataPacketPtr packet)
 {
     using namespace std::chrono;
 
+    QElapsedTimer t;
+    t.restart();
+
     NX_VERBOSE(this, "Saving packet %1", *packet);
 
     {
@@ -97,7 +100,6 @@ void EventsStorage::save(common::metadata::ConstObjectMetadataPacketPtr packet)
             duration_cast<milliseconds>(microseconds(packet->timestampUs)));
     }
 
-    QnMutexLocker lock(&m_mutex);
     savePacketDataToCache(lock, packet);
     auto detectionDataSaver = takeDataToSave(lock, /*flush*/ false);
     lock.unlock();
@@ -111,7 +113,10 @@ void EventsStorage::save(common::metadata::ConstObjectMetadataPacketPtr packet)
     }
 
     if (detectionDataSaver.empty())
+    {
+        NX_VERBOSE(this, "Saving packet (1) took %1ms", t.elapsed());
         return;
+    }
 
     m_dbController->queryExecutor().executeUpdate(
         [packet = packet, detectionDataSaver = std::move(detectionDataSaver)](
@@ -122,6 +127,8 @@ void EventsStorage::save(common::metadata::ConstObjectMetadataPacketPtr packet)
         },
         [this](sql::DBResult resultCode) { logDataSaveResult(resultCode); },
         kSaveEventQueryAggregationKey);
+
+    NX_VERBOSE(this, "Saving packet (2) took %1ms", t.elapsed());
 }
 
 void EventsStorage::createLookupCursor(

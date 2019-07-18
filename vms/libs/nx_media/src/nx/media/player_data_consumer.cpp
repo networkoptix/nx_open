@@ -225,8 +225,11 @@ QnCompressedVideoDataPtr PlayerDataConsumer::queueVideoFrame(
     const QnCompressedVideoDataPtr& videoFrame)
 {
     QnMutexLocker lock(&m_queueMutex);
+    if (videoFrame)
+        m_predecodeQueue.push_back(videoFrame);
 
-    m_predecodeQueue.push_back(videoFrame);
+    if (m_predecodeQueue.empty())
+        return QnCompressedVideoDataPtr();
 
     QnCompressedVideoDataPtr result = m_predecodeQueue.front();
     if (!m_audioOutput || result->timestamp < m_audioOutput->playbackPositionUsec())
@@ -247,8 +250,12 @@ QnCompressedVideoDataPtr PlayerDataConsumer::queueVideoFrame(
 
 bool PlayerDataConsumer::processVideoFrame(const QnCompressedVideoDataPtr& videoFrame)
 {
-    quint32 videoChannel = videoFrame->channelNumber;
-    auto archiveReader = dynamic_cast<const QnArchiveStreamReader*>(videoFrame->dataProvider);
+    QnCompressedVideoDataPtr data = queueVideoFrame(videoFrame);
+    if (!data)
+        return true;
+
+    quint32 videoChannel = data->channelNumber;
+    auto archiveReader = dynamic_cast<const QnArchiveStreamReader*>(data->dataProvider);
     if (archiveReader)
     {
         auto resource = archiveReader->getResource();
@@ -274,13 +281,6 @@ bool PlayerDataConsumer::processVideoFrame(const QnCompressedVideoDataPtr& video
         }
     }
     SeamlessVideoDecoder* videoDecoder = m_videoDecoders[videoChannel].get();
-
-    QnCompressedVideoDataPtr data = queueVideoFrame(videoFrame);
-    if (!data)
-    {
-        //NX_VERBOSE(this, lm("PlayerDataConsumer::processVideoFrame(): queueVideoFrame() -> null"));
-        return true; //< The frame is processed.
-    }
 
     QVideoFramePtr decodedFrame;
     if (!videoDecoder->decode(data, &decodedFrame))
@@ -416,10 +416,8 @@ bool PlayerDataConsumer::processAudioFrame(const QnCompressedAudioDataPtr& data)
             && !m_predecodeQueue.empty()
             && m_predecodeQueue.front()->timestamp < currentPos)
         {
-            QnCompressedVideoDataPtr videoFrame = m_predecodeQueue.front();
-            m_predecodeQueue.pop_front();
             lock.unlock();
-            if (!processVideoFrame(videoFrame))
+            if (!processVideoFrame(nullptr))
                 return false;
             lock.relock();
         }
