@@ -26,3 +26,4 @@ ZoomableFlickable 1.0 ZoomableFlickable.qml
 WheelSwitchArea 1.0 WheelSwitchArea.qml
 ActionButtonsPanel 1.0 ActionButtonsPanel.qml
 ActivityPreloader 1.0 ActivityPreloader.qml
+SearchEdit 1.0 SearchEdit.qml

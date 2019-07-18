@@ -4,7 +4,7 @@ import QtQuick.Layouts 1.3
 
 TextField
 {
-    id: textField
+    id: control
 
     placeholderText: qsTr("Search")
     enterKeyType: TextInput.EnterKeySearch
@@ -24,8 +24,9 @@ TextField
         height: 48
 
         icon.source: lp("/images/clear.png")
-        onClicked: clear()
-        opacity: textField.text ? 1.0 : 0.0
+        onClicked: parent.text= ""
+
+        opacity: parent.text ? 1.0 : 0.0
         Behavior on opacity { NumberAnimation { duration: 100 } }
         alwaysCompleteHighlightAnimation: false
 

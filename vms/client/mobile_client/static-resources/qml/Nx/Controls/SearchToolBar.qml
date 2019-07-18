@@ -39,11 +39,6 @@ ToolBarBase
         }
     }
 
-    function clear()
-    {
-        searchField.text = ""
-    }
-
     function close()
     {
         opacity = 0.0
@@ -51,7 +46,7 @@ ToolBarBase
 
     function open()
     {
-        clear()
+        searchField.text = ""
         opacity = 1.0
         searchField.forceActiveFocus()
     }

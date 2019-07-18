@@ -37,6 +37,15 @@ Page
         anchors.fill: parent
         anchors.margins: -4
 
+        header: SearchEdit
+        {
+            id: searchEdit
+
+            width: sessionsList.width
+
+            onTextChanged: sessionsList.model.filterWildcard = text
+        }
+
         property real horizontalSpacing: 8
         property real verticalSpacing: cellsInRow > 1 ? 8 : 1
         readonly property real maxCellWidth: 488 + horizontalSpacing
@@ -49,6 +58,8 @@ Page
         {
             id: systemsModel
             minimalVersion: "2.5"
+            filterCaseSensitivity: Qt.CaseInsensitive;
+            filterRole: 257; //
         }
 
         delegate: Item
