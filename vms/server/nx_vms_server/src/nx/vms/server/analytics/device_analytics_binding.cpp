@@ -198,7 +198,6 @@ QVariantMap DeviceAnalyticsBinding::getSettings() const
     const ResultHolder<const ISettingsResponse*> result = deviceAgent->pluginSideSettings();
     if (!result.isOk())
     {
-        const auto errorMessage = result.errorMessage();
         NX_DEBUG(this,
             "Got an error: '%5' while obtaining device agent settings for device %1 (%2) "
             "and engine %3 (%4)",

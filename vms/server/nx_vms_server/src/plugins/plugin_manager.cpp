@@ -437,14 +437,11 @@ public:
         if (error.errorCode == nx::sdk::ErrorCode::noError)
             return;
 
-        const QString errorStr = (error.errorCode != nx::sdk::ErrorCode::otherError)
-            ? lm(" (Error: [%1] %2)").args(error.errorCode, error.errorMessage)
-            : "";
-
         m_pluginInfo->errorCode = PluginInfo::Error::badManifest;
         m_pluginInfo->status = PluginInfo::Status::notLoadedBecauseOfError;
         m_pluginInfo->statusMessage = lm("Failed loading plugin [%1]: Bad manifest%2").args(
-            m_libFilename, errorStr);
+            m_libFilename,
+            lm(" (Error: [%1] %2)").args(error.errorCode, error.errorMessage));
 
         QString logMessage = m_pluginInfo->statusMessage;
         if (!manifestStr.isEmpty())
