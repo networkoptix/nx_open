@@ -147,12 +147,9 @@ JsonRestResponse SystemRestHandler::executeGet(const JsonRestRequest& request)
             continue;
         }
 
-        nx::network::http::BufferType msgBody;
-        while (!client.eof())
-            msgBody.append(client.fetchMessageBodyBuffer());
-
+        const auto message = client.fetchMessageBodyBuffer();
         const auto httpCode = client.response()->statusLine.statusCode;
-        const auto result = QJson::deserialized<QnJsonRestResult>(msgBody);
+        const auto result = QJson::deserialized<QnJsonRestResult>(message);
         if (!nx::network::http::StatusCode::isSuccessCode(httpCode)
             || result.error != QnJsonRestResult::NoError)
         {

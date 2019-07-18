@@ -63,13 +63,14 @@ api::metrics::SystemValues Controller::values(
 {
     NX_MUTEX_LOCKER locker(&m_mutex);
     api::metrics::SystemValues systemValues;
+    const auto currentSecsSinceEpoch = m_currentSecsSinceEpoch();
     for (const auto& [name, provider]: m_resourceProviders)
     {
         auto& groupValues = systemValues[name];
         if (timeline)
         {
             groupValues = provider->timeline(
-                flags & includeRemote, m_currentSecsSinceEpoch(), *timeline);
+                flags & includeRemote, currentSecsSinceEpoch, *timeline);
             continue;
         }
 
@@ -109,8 +110,8 @@ static Value calculate(DataBase::Reader reader, const QStringList& formula)
 
     const auto function = formula[0];
     const auto arg =
-        [&](int index) 
-        { 
+        [&](int index)
+        {
             if (index >= formula.size())
                 throw error("%1 arg is missing", index);
 
