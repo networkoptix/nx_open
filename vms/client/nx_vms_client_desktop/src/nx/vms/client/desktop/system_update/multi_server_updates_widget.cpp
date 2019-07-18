@@ -270,8 +270,12 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
     connect(qnGlobalSettings, &QnGlobalSettings::cloudSettingsChanged, this,
         [this]()
         {
-            if (m_widgetState != WidgetUpdateState::ready)
+            if (m_widgetState != WidgetUpdateState::ready
+                && m_widgetState != WidgetUpdateState::readyInstall
+                && m_widgetState != WidgetUpdateState::downloading)
+            {
                 return;
+            }
 
             NX_VERBOSE(this, "Cloud settings has been changed. We should repeat validation.");
             repeatUpdateValidation();
@@ -2320,16 +2324,20 @@ void MultiServerUpdatesWidget::syncRemoteUpdateStateToUi()
     if (stateHasProgress(m_widgetState))
         syncProgress();
 
-    auto readyAndOnline = m_stateTracker->onlineAndInState(LocalStatusCode::readyToInstall);
-    auto readyAndOffline = m_stateTracker->offlineAndInState(LocalStatusCode::readyToInstall);
+
     bool hasVerificationErrors = m_stateTracker->hasVerificationErrors();
     bool hasStatusErrors = m_stateTracker->hasStatusErrors();
 
     QStringList errorTooltips;
-    if (m_widgetState == WidgetUpdateState::readyInstall)
+    if (m_widgetState == WidgetUpdateState::readyInstall
+        || m_widgetState == WidgetUpdateState::ready)
     {
-        if (readyAndOnline.empty() || !readyAndOffline.empty()
-            || hasStatusErrors || hasVerificationErrors)
+        auto readyAndOnline = m_stateTracker->onlineAndInState(LocalStatusCode::readyToInstall);
+        auto readyAndOffline = m_stateTracker->offlineAndInState(LocalStatusCode::readyToInstall);
+        bool hasInstallIssues = (readyAndOnline.empty() || !readyAndOffline.empty())
+            && m_widgetState == WidgetUpdateState::readyInstall;
+
+        if (hasInstallIssues || hasStatusErrors || hasVerificationErrors)
         {
             if (hasVerificationErrors)
             {
@@ -2340,7 +2348,7 @@ void MultiServerUpdatesWidget::syncRemoteUpdateStateToUi()
                 errorTooltips << tr("Some servers have encountered an internal error.");
                 errorTooltips << tr("Please please contact Customer Support.");
             }
-            else
+            else if (hasInstallIssues)
             {
                 errorTooltips << tr("Some servers have gone offline. "
                                     "Please wait until they become online to continue.");
