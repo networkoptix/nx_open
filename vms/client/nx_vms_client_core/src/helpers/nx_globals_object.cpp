@@ -87,7 +87,7 @@ void NxGlobalsObject::ensureFlickableChildVisible(QQuickItem* item)
         QRect(0, 0, static_cast<int>(item->width()), static_cast<int>(item->height())));
 
     auto adjustContentPosition =
-        [](qreal position, qreal contentSize, qreal flickableSize,
+        [](qreal position, qreal origin, qreal contentSize, qreal flickableSize,
             qreal startMargin, qreal endMargin,
             qreal itemPosition, qreal itemSize)
         {
@@ -101,15 +101,17 @@ void NxGlobalsObject::ensureFlickableChildVisible(QQuickItem* item)
 
             position = qBound(-startMargin, position, contentSize - flickableSize + endMargin);
 
-            return position;
+            return position + origin;
         };
 
     flickable->setContentX(adjustContentPosition(
-        flickable->contentX(), flickable->contentWidth(), flickable->width(),
+        flickable->contentX(), flickable->originX(),
+        flickable->contentWidth(), flickable->width(),
         flickable->leftMargin(), flickable->rightMargin(),
         rect.x(), rect.width()));
     flickable->setContentY(adjustContentPosition(
-        flickable->contentY(), flickable->contentHeight(), flickable->height(),
+        flickable->contentY(), flickable->originY(),
+        flickable->contentHeight(), flickable->height(),
         flickable->topMargin(), flickable->bottomMargin(),
         rect.y(), rect.height()));
 }
