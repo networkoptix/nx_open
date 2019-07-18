@@ -63,7 +63,6 @@ void AnalyticsEventsReceptor::putData(const QnAbstractDataPacketPtr& data)
         }
     }
 
-
     using namespace std::chrono;
     time_point<high_resolution_clock> startTime;
     nx::common::metadata::ObjectMetadataPacket copy;
@@ -96,7 +95,7 @@ void AnalyticsEventsReceptor::putData(const QnAbstractDataPacketPtr& data)
         const auto endTime = high_resolution_clock::now();
         m_metadataLogger->pushObjectMetadata(
             std::move(copy),
-            lm("save() call took %1us").args(callDurationUs));
+            lm("save() call took %1 us").args(callDurationUs));
     }
 }
 
