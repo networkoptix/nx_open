@@ -36,6 +36,7 @@
 #include <nx/fusion/model_functions.h>
 
 #include <utils/common/scoped_timer.h>
+#include <nx/utils/std/algorithm.h>
 
 using namespace nx::core::access;
 using namespace nx::vms::common;
@@ -301,8 +302,40 @@ void QnResourceAccessManager::recalculateAllPermissions()
     if (isUpdating())
         return;
 
-    for (const auto& subject : resourceAccessSubjectsCache()->allSubjects())
-        updatePermissionsBySubject(subject);
+
+    const auto& resPool = commonModule()->resourcePool();
+    auto resources = resPool->getResources();
+    auto subjects = resourceAccessSubjectsCache()->allSubjects();
+
+    nx::utils::remove_if(resources,
+        [this](const auto& resource)
+        {
+            return resource->resourcePool() == nullptr;
+        });
+    nx::utils::remove_if(subjects,
+        [this](const auto& subject)
+        {
+            if (subject.user())
+                return subject.user()->resourcePool() == nullptr;
+            return !userRolesManager()->hasRole(subject.role().id);
+
+        });
+
+    QMap<PermissionKey, Qn::Permissions> permissionsCache;
+    for (const QnResourcePtr& resource: resources)
+    {
+        PermissionKey key(QnUuid(), resource->getId());
+
+        for (const auto& subject: subjects)
+        {
+            key.subjectId = subject.id();
+            permissionsCache.insert(key, calculatePermissions(subject, resource));
+        }
+    }
+    {
+        QnMutexLocker lk(&m_mutex);
+        m_permissionsCache = permissionsCache;
+    }
 }
 
 void QnResourceAccessManager::updatePermissions(const QnResourceAccessSubject& subject,
@@ -483,8 +516,10 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
 
     Qn::Permissions result = Qn::NoPermissions;
 
+    const auto& globalPermissions = globalPermissionsManager()->globalPermissions(subject);
+
     /* Admins must be able to remove any cameras to delete servers.  */
-    if (hasGlobalPermission(subject, GlobalPermission::admin))
+    if (globalPermissions.testFlag(GlobalPermission::admin))
         result |= Qn::RemovePermission;
 
     if (!commonModule()->resourceAccessProvider()->hasAccess(subject, camera))
@@ -493,31 +528,14 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
     result |= Qn::ReadPermission | Qn::ViewContentPermission;
 
     bool isLiveAllowed = !camera->needsToChangeDefaultPassword();
-    bool isFootageAllowed = hasGlobalPermission(subject, GlobalPermission::viewArchive);
+    bool isFootageAllowed = globalPermissions.testFlag(GlobalPermission::viewArchive);
     bool isExportAllowed = isFootageAllowed
-        && hasGlobalPermission(subject, GlobalPermission::exportArchive);
+        && globalPermissions.testFlag(GlobalPermission::exportArchive);
 
-    if (!camera->isLicenseUsed())
+    if (!camera->isLicenseUsed() && camera->isDtsBased())
     {
-        switch (camera->licenseType())
-        {
-            case Qn::LC_Bridge:
-            {
-                isFootageAllowed = false;
-                isExportAllowed = false;
-                break;
-            }
-
-            // TODO: Forbid all for VMAX when discussed with management
-            case Qn::LC_VMAX:
-            {
-                //isLiveAllowed = false;
-                //footageAllowed = false;
-                break;
-            }
-            default:
-                break;
-        }
+        isFootageAllowed = false;
+        isExportAllowed = false;
     }
 
     if (isLiveAllowed)
@@ -532,13 +550,13 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
         result |= Qn::ExportPermission;
     }
 
-    if (hasGlobalPermission(subject, GlobalPermission::userInput))
+    if (globalPermissions.testFlag(GlobalPermission::userInput))
         result |= Qn::WritePtzPermission;
 
     if (commonModule()->isReadOnly())
         return result;
 
-    if (hasGlobalPermission(subject, GlobalPermission::editCameras))
+    if (globalPermissions.testFlag(GlobalPermission::editCameras))
         result |= Qn::ReadWriteSavePermission | Qn::WriteNamePermission;
 
     return result;

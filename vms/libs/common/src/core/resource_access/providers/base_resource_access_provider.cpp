@@ -86,8 +86,22 @@ void QnBaseResourceAccessProvider::afterUpdate()
     if (mode() == Mode::direct)
         return;
 
-    for (const auto& subject: resourceAccessSubjectsCache()->allSubjects())
-        updateAccessBySubject(subject);
+    auto resources = commonModule()->resourcePool()->getResources();
+    const auto& subjects = resourceAccessSubjectsCache()->allSubjects();
+
+    QnMutexLocker lk(&m_mutex);
+    for (const auto& subject: subjects)
+    {
+        if (!isSubjectEnabled(subject))
+            continue;
+
+        auto& accessible = m_accessibleResources[subject.id()];
+        for (const auto& resource: resources)
+        {
+            if (calculateAccess(subject, resource))
+                accessible.insert(resource->getId());
+        }
+    }
 }
 
 bool QnBaseResourceAccessProvider::acceptable(const QnResourceAccessSubject& subject,

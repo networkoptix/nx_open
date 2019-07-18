@@ -199,6 +199,12 @@ private:
         {
             return subjectId == other.subjectId && resourceId == other.resourceId;
         }
+        bool operator<(const PermissionKey& other) const
+        {
+            if (subjectId != other.subjectId)
+                return subjectId < other.subjectId;
+            return resourceId < other.resourceId;
+        }
 
         friend uint qHash(const PermissionKey& key)
         {
@@ -206,5 +212,5 @@ private:
         }
     };
 
-    QHash<PermissionKey, Qn::Permissions> m_permissionsCache;
+    QMap<PermissionKey, Qn::Permissions> m_permissionsCache;
 };

@@ -135,6 +135,9 @@ void QnResourceAccessProvider::endUpdateInternal()
 
 void QnResourceAccessProvider::afterUpdate()
 {
+    //todo: #GDM. recheck it. I assume it is not need during update mode.
+    return;
+
     if (mode() == Mode::direct)
         return;
 
