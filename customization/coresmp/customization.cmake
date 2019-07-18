@@ -13,7 +13,7 @@ set(android.keypass "31O2zNNy")
 set(android.packageName "com.comm_core.coresmp")
 
 set(display_mobile_name "COREsmp")
-set(mobile_bundle_name "COREsmpMobile")
+set(mobile_bundle_name "COREsmp")
 
 # Support section
 set(companyUrl "http://www.comm-core.com")
