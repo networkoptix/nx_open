@@ -341,6 +341,7 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
                 // So we can clear our state as well.
                 clearUpdateInfo();
                 setTargetState(WidgetUpdateState::initial, {});
+                setUpdateSourceMode(UpdateSourceType::internet);
             }
         });
 
