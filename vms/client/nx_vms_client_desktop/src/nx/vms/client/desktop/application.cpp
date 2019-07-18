@@ -25,6 +25,8 @@
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonDocument>
 #include <QtCore/QSettings>
+#include <QtCore/QFile>
+#include <QtCore/QDateTime>
 
 #include <QtGui/QDesktopServices>
 #include <QtGui/QWindow>
@@ -93,6 +95,7 @@
 #if defined(Q_OS_WIN)
     #include <nx/vms/client/desktop/ini.h>
     #include <nx/gdi_tracer/gdi_handle_tracer.h>
+    #include <nx/vms/client/desktop/debug_utils/instruments/widget_profiler.h>
 #endif
 
 namespace {
@@ -294,13 +297,30 @@ int runApplicationInternal(QtSingleApplication* application, const QnStartupPara
     #if defined(Q_OS_WIN)
         if (ini().enableGdiTrace)
         {
-            const auto reportPathString =
-                QStandardPaths::writableLocation(QStandardPaths::DataLocation)
-                    + lit("/log/gdi_handles_report%1.txt").arg(QnUuid::createUuid().toString());
-            const auto reportPath = std::filesystem::path(reportPathString.toStdWString());
+            const auto traceLimitCallback =
+                []()
+                {
+                    const auto reportFileName = lit("/log/gdi_handles_report_%1.txt")
+                        .arg(QDateTime::currentDateTime().toString("dd.MM.yyyy_hh.mm.ss"));
+
+                    const auto reportPathString =
+                        QStandardPaths::writableLocation(QStandardPaths::DataLocation)
+                        + reportFileName;
+
+                    QFile reportFile(reportPathString);
+                    if (reportFile.open(QFile::WriteOnly | QFile::Truncate))
+                    {
+                        const auto gdiTracer = gdi_tracer::GdiHandleTracer::getInstance();
+                        QTextStream textStream(&reportFile);
+                        textStream.setCodec("UTF-8");
+                        textStream << QString::fromStdString(gdiTracer->getReport());
+                        textStream << WidgetProfiler::getWidgetHierarchy();
+                    }
+                };
+
             auto gdiTracer = gdi_tracer::GdiHandleTracer::getInstance();
             gdiTracer->setGdiTraceLimit(ini().gdiTraceLimit);
-            gdiTracer->setReportPath(reportPath);
+            gdiTracer->setGdiTraceLimitCallback(traceLimitCallback);
             gdiTracer->attachGdiDetours();
         }
     #endif

@@ -2,6 +2,7 @@
 
 #include <nx/utils/log/log.h>
 #include <nx/streaming/av_codec_media_context.h>
+#include <utils/media/ffmpeg_helper.h>
 
 
 namespace nx {
@@ -161,7 +162,6 @@ Error remux(QIODevice* inputMedia, QIODevice* outputMedia, const QString& dstCon
     AVIOContext* inputAvioContext = nullptr;
     AVIOContext* outputAvioContext = nullptr;
 
-    AVPacket pkt;
     const char *in_filename, *out_filename;
     int ret, i;
     int streamIndex = 0;
@@ -284,6 +284,8 @@ Error remux(QIODevice* inputMedia, QIODevice* outputMedia, const QString& dstCon
 
     while (1)
     {
+        QnFfmpegAvPacket pkt;
+
         AVStream *inputStream, *outputStream;
 
         if (av_read_frame(inputFormatContext, &pkt) < 0)
@@ -293,7 +295,6 @@ Error remux(QIODevice* inputMedia, QIODevice* outputMedia, const QString& dstCon
         if (pkt.stream_index >= streamMappingSize ||
             streamMapping[pkt.stream_index] < 0)
         {
-            av_packet_unref(&pkt);
             continue;
         }
 
@@ -327,8 +328,6 @@ Error remux(QIODevice* inputMedia, QIODevice* outputMedia, const QString& dstCon
 
         if (av_interleaved_write_frame(outputFormatContext, &pkt) < 0)
             break;
-
-        av_packet_unref(&pkt);
     }
 
     ret = av_write_trailer(outputFormatContext);

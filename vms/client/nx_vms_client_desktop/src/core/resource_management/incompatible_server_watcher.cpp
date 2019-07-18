@@ -255,6 +255,10 @@ void QnIncompatibleServerWatcherPrivate::at_discoveredServerChanged(
 void QnIncompatibleServerWatcherPrivate::addResource(
     const nx::vms::api::DiscoveredServerData& serverData)
 {
+    // Setting '!compatible' flag for original server.
+    if (auto server = resourcePool()->getResourceById<QnMediaServerResource>(serverData.id))
+        server->setCompatible(false);
+
     QnUuid id = getFakeId(serverData.id);
 
     if (id.isNull())
@@ -302,6 +306,10 @@ void QnIncompatibleServerWatcherPrivate::removeResource(const QnUuid &id)
 {
     if (id.isNull())
         return;
+
+    // Removing incompatible flag from original resource.
+    if (auto server = resourcePool()->getResourceById<QnMediaServerResource>(id))
+        server->setCompatible(true);
 
     QnUuid serverId;
     {

@@ -119,7 +119,8 @@ void MediaServerLauncher::prepareToStart()
 
     m_mediaServerProcess.reset();
     m_mediaServerProcess.reset(new MediaServerProcess((int) argv.size() - 1, (char**) argv.data()));
-    connect(m_mediaServerProcess.get(), &MediaServerProcess::started, this,
+    connect(
+        m_mediaServerProcess.get(), &MediaServerProcess::startedWithSignalsProcessed, this,
         &MediaServerLauncher::started);
 
     m_firstStartup = false;
@@ -132,17 +133,14 @@ void MediaServerLauncher::prepareToStart()
         server->globalSettings()->setAutoDiscoveryResponseEnabled(enableDiscovery);
     });
 
+    m_processStartedPromise = std::make_unique<nx::utils::promise<bool>>();
     connect(
-        m_mediaServerProcess.get(),
-        &MediaServerProcess::started,
-        this,
+        m_mediaServerProcess.get(), &MediaServerProcess::startedWithSignalsProcessed,
         [this]()
         {
             setLowDelayIntervals();
             m_processStartedPromise->set_value(true);
-        }, Qt::DirectConnection);
-
-    m_processStartedPromise = std::make_unique<nx::utils::promise<bool>>();
+        });
 }
 
 void MediaServerLauncher::run()
