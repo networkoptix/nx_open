@@ -19,7 +19,7 @@ public:
     virtual void printCmdLineArgsHelp() override;
     virtual QString dataDir() const override;
     virtual utils::log::Settings logging() const override;
-    
+
 protected:
     virtual void loadSettings() = 0;
 
