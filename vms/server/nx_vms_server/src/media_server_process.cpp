@@ -2881,7 +2881,6 @@ void MediaServerProcess::registerRestHandlers(
         QnRestProcessorPool::kAnyPath,
         new OptionsRequestHandler());
 
-
     reg("api/metrics/", new nx::vms::server::metrics::LocalRestHandler(
         m_metricsController.get()));
 
