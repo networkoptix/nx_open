@@ -244,7 +244,7 @@ namespace Qn
         NotificationLevelRole,                      /**< Role for notification level (QnNotificationLevel::Value). */
         ContextMenuRole,                            /**< Role for context menu (QSharedPointer<QMenu>). */
         ForcePrecisePreviewRole,                    /**< Role for forcing precise preview frame (bool). */
-        PreviewStreamSelectionRole,                 /**< Role for camera preview stream (CameraImageRequest::StreamSelectionMode). */
+        PreviewStreamSelectionRole,                 /**< Role for camera preview stream (ImageRequest::StreamSelectionMode). */
 
         SelectOnOpeningRole,                        /**< Role for single-selecting an item (or first of multiple items) added to current layout (bool). */
         RaiseSelectionRole,                         /**< Role for raising a single-selected item (bool). */

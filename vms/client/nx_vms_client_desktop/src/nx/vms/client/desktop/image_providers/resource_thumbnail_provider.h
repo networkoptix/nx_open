@@ -34,9 +34,6 @@ public:
     nx::api::ResourceImageRequest requestData() const;
     void setRequestData(const nx::api::ResourceImageRequest& data);
 
-    nx::api::CameraImageRequest::StreamSelectionMode streamSelectionMode() const;
-    void setStreamSelectionMode(nx::api::CameraImageRequest::StreamSelectionMode value);
-
     std::chrono::microseconds timestamp() const; //< For cameras returns precise frame timestamp.
 
     virtual bool tryLoad() override;

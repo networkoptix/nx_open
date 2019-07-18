@@ -71,7 +71,7 @@ void QnThumbnailRequestData::loadFromParams(QnResourcePool* resourcePool,
     request.aspectRatio = QnLexical::deserialized<nx::api::ImageRequest::AspectRatio>(
         params.value(kAspectRatioParam), /*defaultValue*/ request.aspectRatio);
     request.streamSelectionMode =
-        QnLexical::deserialized<nx::api::CameraImageRequest::StreamSelectionMode>(
+        QnLexical::deserialized<nx::api::ImageRequest::StreamSelectionMode>(
             params.value(kStreamSelectionModeParam), /*defaultValue*/ request.streamSelectionMode);
 }
 
