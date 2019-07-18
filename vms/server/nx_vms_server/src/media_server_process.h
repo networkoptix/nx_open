@@ -175,7 +175,7 @@ private:
         GlobalPermission permission = GlobalPermission::none);
 
     template<class TcpConnectionProcessor, typename... ExtraParams>
-    void regTcpHandler(
+    void registerTcpHandler(
         const QByteArray& protocol, const QString& path, ExtraParams... extraParams);
 
     bool initTcpListener(
