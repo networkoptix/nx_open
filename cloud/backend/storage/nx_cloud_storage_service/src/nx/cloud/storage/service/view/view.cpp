@@ -5,7 +5,7 @@
 
 namespace nx::cloud::storage::service {
 
-View::View(const Settings& settings, Controller& controller):
+View::View(const Settings& settings, Controller& /*controller*/):
     m_settings(settings),
     m_httpServer(settings)
 {
