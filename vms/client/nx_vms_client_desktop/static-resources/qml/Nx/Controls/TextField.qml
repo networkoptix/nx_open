@@ -9,7 +9,7 @@ TextField
     id: control
 
     implicitWidth: 200
-    implicitHeight: 28
+    implicitHeight: 48
     leftPadding: 8
     rightPadding: 8
 

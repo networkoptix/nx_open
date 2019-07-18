@@ -30,29 +30,12 @@ ToolBarBase
             alwaysCompleteHighlightAnimation: false
         }
 
-        TextField
+        SearchEdit
         {
             id: searchField
 
             Layout.fillWidth: true
-
-            placeholderText: qsTr("Search")
-            enterKeyType: TextInput.EnterKeySearch
-
-            background: null
-            inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase
-            cursorColor: color
-
-            onAccepted: Qt.inputMethod.hide()
-        }
-
-        IconButton
-        {
-            icon.source: lp("/images/clear.png")
-            onClicked: clear()
-            opacity: searchField.text ? 1.0 : 0.0
-            Behavior on opacity { NumberAnimation { duration: 100 } }
-            alwaysCompleteHighlightAnimation: false
+            Layout.minimumHeight: height
         }
     }
 
