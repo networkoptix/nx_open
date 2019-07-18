@@ -79,7 +79,6 @@ QnTimePeriodList TimePeriodFetcher::selectTimePeriodsFiltered(
 {
     AnalyticsArchive::Filter archiveFilter =
         AnalyticsArchiveDirectory::prepareArchiveFilter(filter, m_objectTypeDao);
-    archiveFilter.region = options.region;
     archiveFilter.detailLevel = options.detailLevel;
 
     nx::utils::ElapsedTimer timer;

@@ -1459,9 +1459,6 @@ protected:
 
     void whenLookupTimePeriods()
     {
-        if (filter().boundingBox)
-            m_lookupOptions.region += translateToSearchGrid(*filter().boundingBox);
-
         filter().sortOrder = Qt::AscendingOrder;
 
         eventsStorage().lookupTimePeriods(

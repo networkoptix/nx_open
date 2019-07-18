@@ -46,15 +46,17 @@ struct QnChunksRequestData
     qint64 endTimeMs = DATETIME_NOW;
     std::chrono::milliseconds detailLevel{1};
     bool keepSmallChunks = false;
-    QString filter; //< TODO: This string is a json. Consider changing to QList<QRegion>.
+
+    // Serialized search filter. For motion requests it's a QList<QRegion> object, for analytics
+    // it's an nx::analytics::db::Filter object.
+    // TODO: unify filter object for all type of requests.
+    QString filter;
     bool isLocal = false;
     Qn::SerializationFormat format = Qn::JsonFormat;
     int limit = INT_MAX;
 
     GroupBy groupBy = GroupBy::serverId;
     Qt::SortOrder sortOrder = Qt::SortOrder::AscendingOrder;
-
-    boost::optional<nx::analytics::db::Filter> analyticsStorageFilter;
 };
 
 QN_FUSION_DECLARE_FUNCTIONS(QnChunksRequestData::GroupBy, (lexical))

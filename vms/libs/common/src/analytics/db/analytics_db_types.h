@@ -131,14 +131,6 @@ using LookupResult = std::vector<ObjectTrack>;
 struct TimePeriodsLookupOptions
 {
     /**
-     * This is a time periods search region. Filter::boundingBox is ignored!
-     * This region is in search resolution coordinates (not [0; 1]!).
-     * NOTE: Introduced as an AnalyticsArchive requirement.
-     * TODO: #ak Refactor it out when AnalyticsArchive::save/match are symmetric.
-     */
-    QRegion region;
-
-    /**
      * If distance between two time periods less than this value,
      * then those periods SHOULD be merged ignoring gap.
      */
