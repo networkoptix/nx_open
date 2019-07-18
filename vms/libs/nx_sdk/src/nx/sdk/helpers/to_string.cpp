@@ -17,7 +17,7 @@ static std::string indent(int overallIndent, int level)
     return std::string(overallIndent, ' ') + std::string(kLevelIndent * level, ' ');
 }
 
-std::string toStdString(const IString* string)
+std::string toString(const IString* string)
 {
     if (!string)
         return std::string();
@@ -88,7 +88,7 @@ std::string toJsonString(const IDeviceInfo* deviceInfo, int overallIndent)
     return result;
 }
 
-std::string toStdString(ErrorCode errorCode)
+std::string toString(ErrorCode errorCode)
 {
     switch (errorCode)
     {
