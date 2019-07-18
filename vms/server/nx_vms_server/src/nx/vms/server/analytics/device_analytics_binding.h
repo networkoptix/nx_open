@@ -29,11 +29,11 @@ namespace nx::vms::server::analytics {
 class DeviceAnalyticsBinding:
     public QnAbstractDataConsumer,
     public /*mixin*/ nx::vms::server::ServerModuleAware
-
 {
     using base_type = QnAbstractDataConsumer;
     using Engine = nx::sdk::analytics::IEngine;
     using DeviceAgent = nx::sdk::analytics::IDeviceAgent;
+
 public:
     DeviceAnalyticsBinding(
         QnMediaServerModule* serverModule,
