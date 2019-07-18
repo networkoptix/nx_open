@@ -13,8 +13,8 @@ namespace nx::cloud::storage::client {
 
 enum class ChunkOperation
 {
-    none,
-    add = 0,
+    none = 0,
+    add,
     remove,
 };
 
