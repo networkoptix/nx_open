@@ -18,17 +18,7 @@
     <widget class="nx::vms::client::desktop::Panel" name="topPanel" native="true">
      <layout class="QVBoxLayout" name="verticalLayout_3">
       <item>
-       <widget class="QLabel" name="headerLabel">
-        <property name="text">
-         <string>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-        </property>
-        <property name="wordWrap">
-         <bool>true</bool>
-        </property>
-       </widget>
+       <widget class="QnWordWrappedLabel" name="headerLabel" native="true"/>
       </item>
      </layout>
     </widget>
@@ -102,6 +92,12 @@
    <class>nx::vms::client::desktop::InputField</class>
    <extends>QWidget</extends>
    <header location="global">nx/vms/client/desktop/common/widgets/input_field.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QnWordWrappedLabel</class>
+   <extends>QWidget</extends>
+   <header location="global">ui/widgets/word_wrapped_label.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
