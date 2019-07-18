@@ -215,7 +215,7 @@ void VideoFrameProcessingDeviceAgent::pushPluginDiagnosticEvent(
 }
 
 // TODO: Consider making a template with param type, checked according to the manifest.
-std::string VideoFrameProcessingDeviceAgent::getParamValue(const std::string& paramName)
+std::string VideoFrameProcessingDeviceAgent::settingValue(const std::string& paramName)
 {
     return m_settings[paramName];
 }

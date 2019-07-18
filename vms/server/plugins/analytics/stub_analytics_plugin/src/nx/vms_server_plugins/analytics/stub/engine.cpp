@@ -370,7 +370,7 @@ std::string Engine::manifestString() const
 StringMapResult Engine::settingsReceived()
 {
     m_needToThrowPluginDiagnosticEvents = toBool(
-        getParamValue(kThrowPluginDiagnosticEventsFromEngineSetting));
+        settingValue(kThrowPluginDiagnosticEventsFromEngineSetting));
 
     if (m_needToThrowPluginDiagnosticEvents && !m_pluginDiagnosticEventThread)
     {

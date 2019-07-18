@@ -112,13 +112,15 @@ protected:
     virtual StringMapResult settingsReceived() { return nullptr; }
 
     /**
-     * Provides access to the Manager settings stored by the server for a particular Resource.
+     * Provides access to the DeviceAgent settings stored by the Server for the particular Device.
+     *
      * ATTENTION: If settingsReceived() has not been called yet, it means that the DeviceAgent has
-     * not received its settings from the server yet, and thus this method will yield empty values.
-     * @return Param value, or an empty string if such param does not exist, having logged the
+     * not received its settings from the Server yet, and thus this method will yield empty values.
+     *
+     * @return Setting value, or an empty string if such setting does not exist, having logged the
      *     error.
      */
-    std::string getParamValue(const std::string& paramName);
+    std::string settingValue(const std::string& paramName);
 
 public:
     virtual ~VideoFrameProcessingDeviceAgent() override;

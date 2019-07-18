@@ -625,7 +625,7 @@ void DeviceAgent::parseSettings()
         {
             using namespace nx::kit::utils;
             int result = 0;
-            const auto parameterValueString = getParamValue(parameterName);
+            const auto parameterValueString = settingValue(parameterName);
             if (fromString(parameterValueString, &result))
             {
                 *target = result;
@@ -639,15 +639,15 @@ void DeviceAgent::parseSettings()
             }
         };
 
-    m_deviceAgentSettings.generateEvents = toBool(getParamValue(kGenerateEventsSetting));
-    m_deviceAgentSettings.generateCars = toBool(getParamValue(kGenerateCarsSetting));
-    m_deviceAgentSettings.generateTrucks = toBool(getParamValue(kGenerateTrucksSetting));
-    m_deviceAgentSettings.generatePedestrians = toBool(getParamValue(kGeneratePedestriansSetting));
-    m_deviceAgentSettings.generateHumanFaces = toBool(getParamValue(kGenerateHumanFacesSetting));
-    m_deviceAgentSettings.generateBicycles = toBool(getParamValue(kGenerateBicyclesSetting));
-    m_deviceAgentSettings.generatePreviews = toBool(getParamValue(kGeneratePreviewPacketSetting));
+    m_deviceAgentSettings.generateEvents = toBool(settingValue(kGenerateEventsSetting));
+    m_deviceAgentSettings.generateCars = toBool(settingValue(kGenerateCarsSetting));
+    m_deviceAgentSettings.generateTrucks = toBool(settingValue(kGenerateTrucksSetting));
+    m_deviceAgentSettings.generatePedestrians = toBool(settingValue(kGeneratePedestriansSetting));
+    m_deviceAgentSettings.generateHumanFaces = toBool(settingValue(kGenerateHumanFacesSetting));
+    m_deviceAgentSettings.generateBicycles = toBool(settingValue(kGenerateBicyclesSetting));
+    m_deviceAgentSettings.generatePreviews = toBool(settingValue(kGeneratePreviewPacketSetting));
     m_deviceAgentSettings.throwPluginDiagnosticEvents = toBool(
-        getParamValue(kThrowPluginDiagnosticEventsFromDeviceAgentSetting));
+        settingValue(kThrowPluginDiagnosticEventsFromDeviceAgentSetting));
 
     assignIntegerSetting(
         kGenerateObjectsEveryNFramesSetting,

@@ -57,11 +57,15 @@ protected:
     virtual StringMapResult settingsReceived() { return nullptr; }
 
     /**
-     * Provides access to the Plugin global settings stored by the server.
-     * @return Param value, or an empty string if such param does not exist, having logged the
-     * error.
+     * Provides access to the Engine global settings stored by the Server.
+     *
+     * ATTENTION: If settingsReceived() has not been called yet, it means that the Engine has not
+     * received its settings from the Server yet, and thus this method will yield empty values.
+     *
+     * @return Setting value, or an empty string if such setting does not exist, having logged the
+     *     error.
      */
-    std::string getParamValue(const std::string& paramName);
+    std::string settingValue(const std::string& settingName);
 
     /**
      * Action handler. Called when some action defined by this engine is triggered by Server.

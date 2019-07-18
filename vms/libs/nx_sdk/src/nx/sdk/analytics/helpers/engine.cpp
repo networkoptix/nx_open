@@ -64,9 +64,9 @@ Engine::Engine(
     NX_PRINT << "Created " << this << ": \"" << plugin->name() << "\"";
 }
 
-std::string Engine::getParamValue(const std::string& paramName)
+std::string Engine::settingValue(const std::string& settingName)
 {
-    return m_settings[paramName];
+    return m_settings[settingName];
 }
 
 void Engine::pushPluginDiagnosticEvent(
