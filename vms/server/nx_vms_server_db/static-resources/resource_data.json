@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0.1.82",
+    "version": "1.0.1.90",
     "data": [
         {
             "keys": [
@@ -1238,6 +1238,12 @@
                     "VideoEncoderConfigurationA16,VideoEncoderConfigurationA32"
                 ]
             }
+        },
+        {
+            "keys": [
+                "HIKVISION|DS-2TD1217-6/V1"
+            ],
+            "pullInputEventsAsOdm": true
         },
         {
             "keys": [
