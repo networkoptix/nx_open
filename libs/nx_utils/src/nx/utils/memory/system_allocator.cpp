@@ -1,21 +1,15 @@
-/**********************************************************
-* 27 jun 2014
-* a.kolesnikov
-***********************************************************/
-
 #include "system_allocator.h"
 
 #include <stdlib.h>
 
-
-void* QnSystemAllocator::alloc( size_t size )
+void* QnSystemAllocator::alloc(size_t size)
 {
-    return ::malloc( size );
+    return ::malloc(size);
 }
 
-void QnSystemAllocator::release( void* ptr )
+void QnSystemAllocator::release(void* ptr)
 {
-    ::free( ptr );
+    ::free(ptr);
 }
 
 static QnSystemAllocator QnSystemAllocator_instance;

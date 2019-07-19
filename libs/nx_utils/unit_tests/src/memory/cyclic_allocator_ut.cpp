@@ -33,7 +33,7 @@ struct CyclicAllocatorUserSettings
     size_t maxSize = 3 * 1024 * 1024;
     size_t step = 200 * 1024;
     size_t maxQueueSize = 16;
-    std::chrono::milliseconds sleepTimeout{1};
+    std::chrono::milliseconds sleepTimeout{ 1 };
 };
 
 class CyclicAllocatorUser: public QnLongRunnable
@@ -52,7 +52,7 @@ private:
     void popExcessPackets();
 };
 
-CyclicAllocatorUser::CyclicAllocatorUser(const CyclicAllocatorUserSettings &settings):
+CyclicAllocatorUser::CyclicAllocatorUser(const CyclicAllocatorUserSettings& settings):
     m_settings(settings)
 {
     m_testData.resize(settings.dataSize);
@@ -154,9 +154,9 @@ std::string ProcessRamUsageFetcher::toLower(const std::string& line)
         line.cend(),
         std::back_inserter(result),
         [](char c)
-        {
-            return std::tolower(c);
-        });
+    {
+        return std::tolower(c);
+    });
 
     return result;
 }
@@ -257,4 +257,3 @@ TEST_F(CyclicAllocator, ConstantMemoryConsuming)
 } // namespace nx
 
 #endif
-
