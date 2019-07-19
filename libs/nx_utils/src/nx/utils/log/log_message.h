@@ -72,7 +72,7 @@ private:
     static QString argToQString(T&& str)
     {
         if constexpr (std::is_convertible_v<T, QString>)
-            return str;
+            return QString(std::forward<T>(str));
         else
             return toQStringExplicitly(std::forward<T>(str));
     }
