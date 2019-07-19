@@ -411,7 +411,7 @@ class CloudSession(object):
         self.test_traffic_relay('relay-sy')
 
     @testmethod(metric='traffic_relay_failure', host='relay-si', continue_if_fails=True)
-    def test_traffic_relay_sy(self):
+    def test_traffic_relay_si(self):
         self.test_traffic_relay('relay-si')
 
     @testmethod(metric='email_failure', continue_if_fails=True, debug_skip=True)
