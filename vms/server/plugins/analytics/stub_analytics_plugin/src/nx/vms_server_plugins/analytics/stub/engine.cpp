@@ -315,6 +315,13 @@ std::string Engine::manifestString() const
                         "caption": "Throw plugin events from the DeviceAgent",
                         "defaultValue": false,
                         "value": false
+                    },
+                    {
+                        "type": "CheckBox",
+                        "name": ")json" + kLeakFrames + R"json(",
+                        "caption": "Force a memory leak when proccessing a video frame",
+                        "defaultValue": false,
+                        "value": false
                     }
                 ]
             },
