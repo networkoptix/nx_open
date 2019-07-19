@@ -12,7 +12,7 @@
 /*!
     Using abstract class for allocator to leave QnAbstractMediaData and children largely unchanged
 */
-class QnAbstractAllocator
+class NX_UTILS_API QnAbstractAllocator
 {
 public:
     virtual ~QnAbstractAllocator() {}

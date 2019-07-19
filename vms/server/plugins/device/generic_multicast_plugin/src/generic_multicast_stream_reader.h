@@ -9,7 +9,7 @@
 #include <plugins/plugin_tools.h>
 
 #include <nx/network/abstract_socket.h>
-#include <utils/memory/cyclic_allocator.h>
+#include <nx/utils/memory/cyclic_allocator.h>
 
 extern "C" {
 

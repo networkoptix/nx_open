@@ -1,7 +1,6 @@
+#if 0
+
 #include <gtest/gtest.h>
-#include <utils/memory/cyclic_allocator.h>
-#include <utils/memory/system_allocator.h>
-#include <utils/common/byte_array.h>
 
 #include <memory>
 #include <deque>
@@ -16,6 +15,10 @@
 #include <algorithm>
 #include <iterator>
 #include <cctype>
+
+#include <nx/utils/memory/cyclic_allocator.h>
+#include <nx/utils/memory/system_allocator.h>
+#include <utils/common/byte_array.h>
 #include <nx/utils/thread/long_runnable.h>
 
 namespace nx {
@@ -252,4 +255,6 @@ TEST_F(CyclicAllocator, ConstantMemoryConsuming)
 } // namespace memory
 } // namespace utils
 } // namespace nx
+
+#endif
 

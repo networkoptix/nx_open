@@ -15,7 +15,7 @@
     Based on the fact that video frames of same stream do generally have almost same size across GOPs
     \note This class is intended to be used for allocating relatively large buffers (e.g., video packets)
 */
-class NxBufferCache
+class NX_UTILS_API NxBufferCache
 {
 public:
     //!When searching for an existing buffer, buffer with size MAX_BUFFER_SIZE_EXCESS_PERCENT percent greater than requested will do

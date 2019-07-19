@@ -22,7 +22,7 @@
     
     \note Maximum possible memory fragmentation is one arena size
 */
-class CyclicAllocator
+class NX_UTILS_API CyclicAllocator
 :
     public QnAbstractAllocator
 {

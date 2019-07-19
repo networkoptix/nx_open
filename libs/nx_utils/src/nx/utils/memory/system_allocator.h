@@ -10,7 +10,7 @@
 
 
 //!Allocates memory using \a malloc and frees with \a free
-class QnSystemAllocator
+class NX_UTILS_API QnSystemAllocator
 :
     public QnAbstractAllocator
 {
