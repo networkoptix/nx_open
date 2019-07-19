@@ -58,23 +58,49 @@ api::metrics::SystemManifest Controller::manifest(RequestFlags flags) const
     return systemManifest;
 }
 
+static void timelineToLocalTime(
+    double timelineDiff,
+    std::map<QString, nx::vms::api::metrics::ParameterGroupValues>* values)
+{
+    for (auto& [id, valueOrGroup]: *values)
+    {
+        timelineToLocalTime(timelineDiff, &valueOrGroup.group);
+        if (valueOrGroup.value.type() == Value::Object)
+        {
+            QJsonObject monotonicTimeline = valueOrGroup.value.toObject();
+            QJsonObject localTimeline;
+            for (auto it = monotonicTimeline.begin(); it != monotonicTimeline.end(); ++it)
+            {
+                const auto timestampS = static_cast<uint64_t>(it.key().toDouble() + timelineDiff);
+                localTimeline.insert(QString::number(timestampS), it.value());
+            }
+
+            valueOrGroup.value = std::move(localTimeline);
+        }
+    }
+}
+
 api::metrics::SystemValues Controller::values(
     RequestFlags flags, std::optional<std::chrono::milliseconds> timeline) const
 {
+    const auto monotonicTime = nx::utils::monotonicTime().time_since_epoch();
+    const auto timelineDiff = static_cast<double>(m_currentSecsSinceEpoch()
+        - std::chrono::duration_cast<std::chrono::seconds>(monotonicTime).count());
+
     NX_MUTEX_LOCKER locker(&m_mutex);
     api::metrics::SystemValues systemValues;
-    const auto currentSecsSinceEpoch = m_currentSecsSinceEpoch();
     for (const auto& [name, provider]: m_resourceProviders)
     {
         auto& groupValues = systemValues[name];
+        groupValues = provider->values(flags & includeRemote, timeline);
         if (timeline)
         {
-            groupValues = provider->timeline(
-                flags & includeRemote, currentSecsSinceEpoch, *timeline);
+            for (auto& [resourceId, resourceValues]: groupValues)
+                timelineToLocalTime(timelineDiff, &resourceValues.values);
+
             continue;
         }
 
-        groupValues = provider->values(flags & includeRemote);
         if (!(flags & applyRules))
             continue;
 

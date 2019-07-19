@@ -28,10 +28,13 @@ public:
     /** Starts monitoring for new resources. dataBaseAccess should be used to store their values. */
     virtual void startMonitoring(DataBase::Writer dbWriter) = 0;
 
-    /** Returns current resources with parameter values. */
-    virtual api::metrics::ResourceGroupValues values(bool includeRemote) const = 0;
-    virtual api::metrics::ResourceGroupValues timeline(
-        bool includeRemote, uint64_t nowSecsSinceEpoch, std::chrono::milliseconds length) const = 0;
+    /**
+     * Returns current resources with parameter values.
+     * @param includeRemote If true the list of all known resourses is returned.
+     * @param length If specified values are returned in a form dictionary with timestamps.
+     */
+    virtual api::metrics::ResourceGroupValues values(
+        bool includeRemote, std::optional<std::chrono::milliseconds> timeline) const = 0;
 };
 
 /**
@@ -51,9 +54,8 @@ public:
     const api::metrics::ResourceManifest& manifest() const final;
     void startMonitoring(DataBase::Writer dbWriter) final;
 
-    api::metrics::ResourceGroupValues values(bool includeRemote) const final;
-    api::metrics::ResourceGroupValues timeline(
-        bool includeRemote, uint64_t nowSecsSinceEpoch, std::chrono::milliseconds length) const final;
+    api::metrics::ResourceGroupValues values(
+        bool includeRemote, std::optional<std::chrono::milliseconds> timeline) const final;
 
 protected:
     /** Should be implemented in inheritors to begin resource discovery process. */
@@ -111,7 +113,8 @@ void ResourceProvider<ResourceType>::startMonitoring(DataBase::Writer dbWriter)
 }
 
 template<typename ResourceType>
-api::metrics::ResourceGroupValues ResourceProvider<ResourceType>::values(bool includeRemote) const
+api::metrics::ResourceGroupValues ResourceProvider<ResourceType>::values(
+    bool includeRemote, std::optional<std::chrono::milliseconds> timeline) const
 {
     api::metrics::ResourceGroupValues groupValues;
     for (const auto& [resource, monitor]: m_resources)
@@ -121,41 +124,28 @@ api::metrics::ResourceGroupValues ResourceProvider<ResourceType>::values(bool in
             if (!includeRemote && !description->isLocal)
                 continue;
 
-            auto parameterValues = monitor->current();
-            NX_ASSERT(!parameterValues.group.empty());
+            api::metrics::ParameterGroupValues parameterValues;
+            if (timeline)
+            {
+                auto timelineValues = monitor->timeline(*timeline);
+                if (!timelineValues)
+                    continue;
+
+                parameterValues = std::move(*timelineValues);
+            }
+            else
+            {
+                parameterValues = monitor->current();
+            }
+
+            if (!NX_ASSERT(!parameterValues.group.empty()))
+                continue;
 
             groupValues[description->id] = {
                 std::move(description->name),
                 std::move(description->parent),
                 std::move(parameterValues.group)
             };
-        }
-    }
-
-    return groupValues;
-}
-
-template<typename ResourceType>
-api::metrics::ResourceGroupValues ResourceProvider<ResourceType>::timeline(
-    bool includeRemote, uint64_t nowSecsSinceEpoch, std::chrono::milliseconds length) const
-{
-    api::metrics::ResourceGroupValues groupValues;
-    for (const auto& [resource, monitor]: m_resources)
-    {
-        if (auto description = describe(resource))
-        {
-            if (!includeRemote && !description->isLocal)
-                continue;
-
-            auto parameterValues = monitor->timeline(nowSecsSinceEpoch, length);
-            if (!parameterValues)
-                continue;
-
-            NX_ASSERT(!parameterValues->group.empty());
-            groupValues[description->id] = {
-                std::move(description->name),
-                std::move(description->parent),
-                parameterValues->group};
         }
     }
 

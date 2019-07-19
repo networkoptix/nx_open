@@ -17,6 +17,7 @@ public:
 
     void update(const QString& name, Value value)
     {
+        NX_VERBOSE(this, "Set %1 = %2", name, value);
         auto& param = m_params[name];
         param.value = std::move(value);
         if (param.change)
@@ -25,13 +26,20 @@ public:
 
     Value current(const QString& name) const
     {
-        return m_params.find(name)->second.value;
+        const auto value = m_params.find(name)->second.value;
+        NX_VERBOSE(this, "Return %1 = %2", name, value);
+        return value;
     }
 
     nx::utils::SharedGuardPtr monitor(const QString& name, nx::utils::MoveOnlyFunc<void()> change)
     {
         m_params[name].change = std::move(change);
         return nx::utils::makeSharedGuard([](){});
+    }
+
+    QString idForToStringFromPtr() const
+    {
+        return QString::number(m_id);
     }
 
 private:
@@ -95,12 +103,12 @@ private:
             parameterGroupProvider(
                 {"g", "group in resource"},
                 singleParameterProvider(
-                    {"i", "int parameter"},
+                    {"gi", "int parameter"},
                     [](const auto& r) { return r->current("gi"); },
                     [](const auto& r, auto change) { return r->monitor("gi", std::move(change)); }
                 ),
                 singleParameterProvider(
-                    {"t", "text parameter"},
+                    {"gt", "text parameter"},
                     [](const auto& r) { return r->current("gt"); },
                     [](const auto& r, auto change) { return r->monitor("gt", std::move(change)); }
                 )
