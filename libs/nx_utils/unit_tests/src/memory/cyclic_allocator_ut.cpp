@@ -99,7 +99,7 @@ private:
     CyclicAllocator* m_allocator = nullptr;
     std::deque<std::shared_ptr<SampleDynamicArray>> m_packets;
     std::vector<char> m_testData;
-    std::atomic<int> m_totalPacketsAllocated{0};
+    std::atomic<std::size_t> m_totalPacketsAllocated{0};
 
     void resizeDataIfNeeded();
     void popExcessPackets();
