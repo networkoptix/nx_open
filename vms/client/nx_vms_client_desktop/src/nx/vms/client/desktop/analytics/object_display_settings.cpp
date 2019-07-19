@@ -77,19 +77,19 @@ QColor ObjectDisplaySettings::objectColor(const QString& objectTypeId)
     return settings.color;
 }
 
-QColor ObjectDisplaySettings::objectColor(const nx::common::metadata::DetectedObject& object)
+QColor ObjectDisplaySettings::objectColor(const nx::common::metadata::ObjectMetadata& object)
 {
     return objectColor(object.objectTypeId);
 }
 
 std::vector<nx::common::metadata::Attribute> ObjectDisplaySettings::briefAttributes(
-    const nx::common::metadata::DetectedObject& object) const
+    const nx::common::metadata::ObjectMetadata& object) const
 {
     const auto& settings = d->settingsByObjectTypeId.value(object.objectTypeId);
 
     std::vector<nx::common::metadata::Attribute> result;
 
-    for (const auto& attribute: object.labels)
+    for (const auto& attribute: object.attributes)
     {
         if (!systemAttribute(attribute.name) && settings.attributeVisibility.value(attribute.name)
             == ObjectDisplaySettingsItem::AttributeVisibilityPolicy::always)
@@ -102,13 +102,13 @@ std::vector<nx::common::metadata::Attribute> ObjectDisplaySettings::briefAttribu
 }
 
 std::vector<nx::common::metadata::Attribute> ObjectDisplaySettings::visibleAttributes(
-    const nx::common::metadata::DetectedObject& object) const
+    const nx::common::metadata::ObjectMetadata& object) const
 {
     const auto& settings = d->settingsByObjectTypeId.value(object.objectTypeId);
 
     std::vector<nx::common::metadata::Attribute> result;
 
-    for (const auto& attribute: object.labels)
+    for (const auto& attribute: object.attributes)
     {
         if (!systemAttribute(attribute.name) && settings.attributeVisibility.value(attribute.name)
             != ObjectDisplaySettingsItem::AttributeVisibilityPolicy::never)

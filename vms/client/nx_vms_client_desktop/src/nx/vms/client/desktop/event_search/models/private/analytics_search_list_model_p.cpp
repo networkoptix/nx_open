@@ -8,7 +8,7 @@
 #include <QtWidgets/QMenu>
 
 #include <api/server_rest_connection.h>
-#include <analytics/common/object_detection_metadata.h>
+#include <analytics/common/object_metadata.h>
 #include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/camera_history.h>
@@ -51,31 +51,31 @@ static constexpr milliseconds kMetadataTimerInterval = 1000ms;
 static constexpr milliseconds kDataChangedInterval = 500ms;
 static constexpr milliseconds kUpdateWorkbenchFilterDelay = 100ms;
 
-milliseconds startTime(const DetectedObject& object)
+milliseconds startTime(const ObjectTrack& track)
 {
-    return duration_cast<milliseconds>(microseconds(object.firstAppearanceTimeUsec));
+    return duration_cast<milliseconds>(microseconds(track.firstAppearanceTimeUs));
 }
 
-microseconds objectDuration(const DetectedObject& object)
+microseconds objectDuration(const ObjectTrack& track)
 {
     // TODO: #vkutin Is this duration formula good enough for us?
     //   Or we need to add some "lastAppearanceDurationUsec"?
-    return microseconds(object.lastAppearanceTimeUsec - object.firstAppearanceTimeUsec);
+    return microseconds(track.lastAppearanceTimeUs - track.firstAppearanceTimeUs);
 }
 
 static const auto lowerBoundPredicate =
-    [](const DetectedObject& left, milliseconds right)
+    [](const ObjectTrack& left, milliseconds right)
     {
         return startTime(left) > right;
     };
 
 static const auto upperBoundPredicate =
-    [](milliseconds left, const DetectedObject& right)
+    [](milliseconds left, const ObjectTrack& right)
     {
         return left > startTime(right);
     };
 
-bool acceptedByTextFilter(const nx::common::metadata::DetectedObject& item, const QString& filter)
+bool acceptedByTextFilter(const nx::common::metadata::ObjectMetadata& item, const QString& filter)
 {
     if (filter.isEmpty())
         return true;
@@ -86,7 +86,7 @@ bool acceptedByTextFilter(const nx::common::metadata::DetectedObject& item, cons
             return word.startsWith(filter, Qt::CaseInsensitive);
         };
 
-    return std::any_of(item.labels.cbegin(), item.labels.cend(),
+    return std::any_of(item.attributes.cbegin(), item.attributes.cend(),
         [checkWord](const nx::common::metadata::Attribute& attribute) -> bool
         {
             if (checkWord(attribute.name))
@@ -140,7 +140,7 @@ int AnalyticsSearchListModel::Private::count() const
 QVariant AnalyticsSearchListModel::Private::data(const QModelIndex& index, int role,
     bool& handled) const
 {
-    const auto& object = m_data[index.row()];
+    const auto& track = m_data[index.row()];
     handled = true;
 
     static const auto kDefaultLocale = QString();
@@ -149,12 +149,12 @@ QVariant AnalyticsSearchListModel::Private::data(const QModelIndex& index, int r
         case Qt::DisplayRole:
         {
             const auto fallbackTitle =
-                [typeId = object.objectTypeId]()
+                [typeId = track.objectTypeId]()
                 {
-                    return QString("<%1>").arg(typeId.isEmpty() ? tr("Unknown object") : typeId);
+                    return QString("<%1>").arg(typeId.isEmpty() ? tr("Unknown track") : typeId);
                 };
 
-            const auto objectCamera = camera(object);
+            const auto objectCamera = camera(track);
             if (!objectCamera)
                 return fallbackTitle();
 
@@ -162,7 +162,7 @@ QVariant AnalyticsSearchListModel::Private::data(const QModelIndex& index, int r
                 objectCamera->commonModule());
 
             const auto objectTypeDescriptor = objectTypeDescriptorManager.descriptor(
-                object.objectTypeId);
+                track.objectTypeId);
 
             if (!objectTypeDescriptor)
                 return fallbackTitle();
@@ -176,23 +176,23 @@ QVariant AnalyticsSearchListModel::Private::data(const QModelIndex& index, int r
             return QVariant::fromValue(qnSkin->pixmap("text_buttons/analytics.png"));
 
         case Qn::DescriptionTextRole:
-            return description(object);
+            return description(track);
 
         case Qn::AdditionalTextRole:
-            return attributes(object);
+            return attributes(track);
 
         case Qn::TimestampRole:
-            return QVariant::fromValue(std::chrono::microseconds(object.firstAppearanceTimeUsec));
+            return QVariant::fromValue(std::chrono::microseconds(track.firstAppearanceTimeUs));
 
         case Qn::PreviewTimeRole:
-            return QVariant::fromValue(previewParams(object).timestamp);
+            return QVariant::fromValue(previewParams(track).timestamp);
 
         case Qn::PreviewStreamSelectionRole:
             return QVariant::fromValue(
                 nx::api::CameraImageRequest::StreamSelectionMode::sameAsAnalytics);
 
         case Qn::DurationRole:
-            return QVariant::fromValue(objectDuration(object));
+            return QVariant::fromValue(objectDuration(track));
 
         case Qn::HelpTopicIdRole:
             return Qn::Empty_Help;
@@ -200,7 +200,7 @@ QVariant AnalyticsSearchListModel::Private::data(const QModelIndex& index, int r
         case Qn::ResourceListRole:
         case Qn::DisplayedResourceListRole:
         {
-            if (const auto resource = camera(object))
+            if (const auto resource = camera(track))
                 return QVariant::fromValue(QnResourceList({resource}));
 
             if (role == Qn::DisplayedResourceListRole)
@@ -210,13 +210,13 @@ QVariant AnalyticsSearchListModel::Private::data(const QModelIndex& index, int r
         }
 
         case Qn::ResourceRole:
-            return QVariant::fromValue<QnResourcePtr>(camera(object));
+            return QVariant::fromValue<QnResourcePtr>(camera(track));
 
         case Qn::ItemZoomRectRole:
-            return QVariant::fromValue(previewParams(object).boundingBox);
+            return QVariant::fromValue(previewParams(track).boundingBox);
 
         case Qn::ContextMenuRole:
-            return QVariant::fromValue(contextMenu(object));
+            return QVariant::fromValue(contextMenu(track));
 
         default:
             handled = false;
@@ -271,15 +271,15 @@ void AnalyticsSearchListModel::Private::clearData()
     ScopedReset reset(q, !m_data.empty());
     m_data.clear();
     m_prefetch.clear();
-    m_objectIdToTimestamp.clear();
+    m_objectTrackIdToTimestamp.clear();
 }
 
 void AnalyticsSearchListModel::Private::truncateToMaximumCount()
 {
     const auto itemCleanup =
-        [this](const DetectedObject& object)
+        [this](const ObjectTrack& track)
         {
-            m_objectIdToTimestamp.remove(object.objectAppearanceId);
+            m_objectTrackIdToTimestamp.remove(track.id);
         };
 
     q->truncateDataToMaximumCount(m_data, &startTime, itemCleanup);
@@ -288,9 +288,9 @@ void AnalyticsSearchListModel::Private::truncateToMaximumCount()
 void AnalyticsSearchListModel::Private::truncateToRelevantTimePeriod()
 {
     const auto itemCleanup =
-        [this](const DetectedObject& object)
+        [this](const ObjectTrack& track)
         {
-            m_objectIdToTimestamp.remove(object.objectAppearanceId);
+            m_objectTrackIdToTimestamp.remove(track.id);
         };
 
     q->truncateDataToTimePeriod(
@@ -319,7 +319,7 @@ rest::Handle AnalyticsSearchListModel::Private::requestPrefetch(const QnTimePeri
             if (success)
             {
                 m_prefetch = std::move(data);
-                NX_ASSERT(m_prefetch.empty() || !m_prefetch.front().track.empty());
+                NX_ASSERT(m_prefetch.empty() || !m_prefetch.front().objectPositionSequence.empty());
 
                 if (!m_prefetch.empty())
                 {
@@ -347,19 +347,19 @@ bool AnalyticsSearchListModel::Private::commitInternal(const QnTimePeriod& perio
     if (handleOverlaps && !m_data.empty())
     {
         const auto& last = m_data.front();
-        const auto lastTimeUs = last.firstAppearanceTimeUsec;
+        const auto lastTimeUs = last.firstAppearanceTimeUs;
 
         while (end != begin)
         {
             const auto iter = end - 1;
-            const auto timeUs = iter->firstAppearanceTimeUsec;
+            const auto timeUs = iter->firstAppearanceTimeUs;
 
             if (timeUs > lastTimeUs)
                 break;
 
             end = iter;
 
-            if (timeUs == lastTimeUs && iter->objectAppearanceId == last.objectAppearanceId)
+            if (timeUs == lastTimeUs && iter->id == last.id)
                 break;
         }
     }
@@ -378,8 +378,8 @@ bool AnalyticsSearchListModel::Private::commitInternal(const QnTimePeriod& perio
     ScopedInsertRows insertRows(q, position, position + count - 1);
     for (auto iter = begin; iter != end; ++iter)
     {
-        if (!m_objectIdToTimestamp.contains(iter->objectAppearanceId)) //< Just to be safe.
-            m_objectIdToTimestamp[iter->objectAppearanceId] = startTime(*iter);
+        if (!m_objectTrackIdToTimestamp.contains(iter->id)) //< Just to be safe.
+            m_objectTrackIdToTimestamp[iter->id] = startTime(*iter);
     }
 
     m_data.insert(m_data.begin() + position,
@@ -417,7 +417,7 @@ rest::Handle AnalyticsSearchListModel::Private::getObjects(const QnTimePeriod& p
     }
 
     request.timePeriod = period;
-    request.maxObjectsToSelect = limit;
+    request.maxObjectTracksToSelect = limit;
     request.freeText = m_filterText;
 
     if (!m_selectedObjectType.isEmpty())
@@ -437,9 +437,9 @@ rest::Handle AnalyticsSearchListModel::Private::getObjects(const QnTimePeriod& p
         request.boundingBox,
         request.freeText,
         QVariant::fromValue(request.sortOrder).toString(),
-        request.maxObjectsToSelect);
+        request.maxObjectTracksToSelect);
 
-    return server->restConnection()->lookupDetectedObjects(
+    return server->restConnection()->lookupObjectTracks(
         request, false /*isLocal*/, nx::utils::guarded(this, callback), thread());
 }
 
@@ -528,25 +528,25 @@ void AnalyticsSearchListModel::Private::processMetadata()
     NX_VERBOSE(q, "Processing %1 live metadata packets from %2 sources",
         totalPackets, packetsBySource.size());
 
-    std::vector<DetectedObject> newObjects;
-    newObjects.reserve(totalPackets);
+    std::vector<ObjectTrack> newTracks;
+    newTracks.reserve(totalPackets);
 
     QHash<QnUuid, int> newObjectIndices;
 
-    struct FoundObject
+    struct FoundObjectTrack
     {
-        DetectedObject* const object = nullptr;
+        ObjectTrack* const track = nullptr;
         const bool isNew = false;
     };
 
     const auto findObject =
-        [&](const QnUuid& objectId) -> FoundObject
+        [&](const QnUuid& trackId) -> FoundObjectTrack
         {
-            auto index = newObjectIndices.value(objectId, -1);
+            auto index = newObjectIndices.value(trackId, -1);
             if (index >= 0)
-                return {&newObjects[index], true};
+                return {&newTracks[index], true};
 
-            index = indexOf(objectId);
+            index = indexOf(trackId);
             if (index >= 0)
                 return {&m_data[index], false};
 
@@ -559,40 +559,40 @@ void AnalyticsSearchListModel::Private::processMetadata()
         {
             NX_ASSERT(metadata->metadataType == MetadataType::ObjectDetection);
             const auto compressedMetadata = std::dynamic_pointer_cast<QnCompressedMetadata>(metadata);
-            const auto detectionMetadata = nx::common::metadata::fromMetadataPacket(compressedMetadata);
+            const auto objectMetadata = nx::common::metadata::fromCompressedMetadataPacket(compressedMetadata);
 
-            if (!detectionMetadata || detectionMetadata->objects.empty())
+            if (!objectMetadata || objectMetadata->objectMetadataList.empty())
                 continue;
 
-            for (const auto& item: detectionMetadata->objects)
+            for (const auto& item: objectMetadata->objectMetadataList)
             {
-                const auto found = findObject(item.objectId);
+                const auto found = findObject(item.trackId);
                 if (item.bestShot)
                 {
-                    if (!found.object)
-                        continue; //< A valid situation - an object can be filtered out.
+                    if (!found.track)
+                        continue; //< A valid situation - an track can be filtered out.
 
-                    found.object->bestShot.timestampUsec = detectionMetadata->timestampUsec;
-                    found.object->bestShot.rect = item.boundingBox;
+                    found.track->bestShot.timestampUs = objectMetadata->timestampUs;
+                    found.track->bestShot.rect = item.boundingBox;
 
                     if (found.isNew)
                         continue;
 
-                    m_dataChangedObjectIds.insert(found.object->objectAppearanceId);
+                    m_dataChangedTrackIds.insert(found.track->id);
                     m_emitDataChanged->requestOperation();
                     continue;
                 }
 
                 ObjectPosition pos;
-                pos.deviceId = detectionMetadata->deviceId;
-                pos.timestampUsec = detectionMetadata->timestampUsec;
-                pos.durationUsec = detectionMetadata->durationUsec;
+                pos.deviceId = objectMetadata->deviceId;
+                pos.timestampUs = objectMetadata->timestampUs;
+                pos.durationUs = objectMetadata->durationUs;
                 pos.boundingBox = item.boundingBox;
 
-                if (found.object)
+                if (found.track)
                 {
-                    pos.attributes = item.labels;
-                    advanceObject(*found.object, std::move(pos), !found.isNew);
+                    pos.attributes = item.attributes;
+                    advanceTrack(*found.track, std::move(pos), !found.isNew);
                     continue;
                 }
 
@@ -603,40 +603,40 @@ void AnalyticsSearchListModel::Private::processMetadata()
                     continue;
                 }
 
-                DetectedObject newObject;
-                newObject.objectAppearanceId = item.objectId;
-                newObject.objectTypeId = item.objectTypeId;
-                newObject.attributes = item.labels;
-                newObject.track.push_back(pos);
-                newObject.firstAppearanceTimeUsec = pos.timestampUsec;
-                newObject.lastAppearanceTimeUsec = pos.timestampUsec;
+                ObjectTrack newTrack;
+                newTrack.id = item.trackId;
+                newTrack.objectTypeId = item.objectTypeId;
+                newTrack.attributes = item.attributes;
+                newTrack.objectPositionSequence.push_back(pos);
+                newTrack.firstAppearanceTimeUs = pos.timestampUs;
+                newTrack.lastAppearanceTimeUs = pos.timestampUs;
 
-                newObjectIndices[item.objectId] = int(newObjects.size());
-                newObjects.push_back(newObject);
+                newObjectIndices[item.trackId] = int(newTracks.size());
+                newTracks.push_back(newTrack);
             }
         }
     }
 
-    if (newObjects.empty())
+    if (newTracks.empty())
         return;
 
     if (packetsBySource.size() > 1)
     {
-        std::sort(newObjects.begin(), newObjects.end(),
-            [](const DetectedObject& left, const DetectedObject& right)
+        std::sort(newTracks.begin(), newTracks.end(),
+            [](const ObjectTrack& left, const ObjectTrack& right)
             {
-                return left.firstAppearanceTimeUsec < right.firstAppearanceTimeUsec;
+                return left.firstAppearanceTimeUs < right.firstAppearanceTimeUs;
             });
     }
 
     auto periodToCommit = QnTimePeriod::fromInterval(
-        startTime(newObjects.front()), startTime(newObjects.back()));
+        startTime(newTracks.front()), startTime(newTracks.back()));
 
     q->setFetchDirection(FetchDirection::later);
     q->addToFetchedTimeWindow(periodToCommit);
 
     NX_VERBOSE(q, "Live update commit");
-    commitInternal(periodToCommit, newObjects.rbegin(), newObjects.rend(), 0, true);
+    commitInternal(periodToCommit, newTracks.rbegin(), newTracks.rend(), 0, true);
 
     if (count() > q->maximumCount())
     {
@@ -647,10 +647,10 @@ void AnalyticsSearchListModel::Private::processMetadata()
 
 void AnalyticsSearchListModel::Private::emitDataChangedIfNeeded()
 {
-    if (m_dataChangedObjectIds.empty())
+    if (m_dataChangedTrackIds.empty())
         return;
 
-    for (const auto& id: m_dataChangedObjectIds)
+    for (const auto& id: m_dataChangedTrackIds)
     {
         const auto index = indexOf(id);
         if (index < 0)
@@ -660,45 +660,45 @@ void AnalyticsSearchListModel::Private::emitDataChangedIfNeeded()
         emit q->dataChanged(modelIndex, modelIndex);
     }
 
-    m_dataChangedObjectIds.clear();
+    m_dataChangedTrackIds.clear();
 };
 
-void AnalyticsSearchListModel::Private::advanceObject(DetectedObject& object,
+void AnalyticsSearchListModel::Private::advanceTrack(ObjectTrack& track,
     ObjectPosition&& position, bool emitDataChanged)
 {
-    // Currently there's a mess between object.attributes and object.track[i].attributes.
+    // Currently there's a mess between track.attributes and track.track[i].attributes.
     // There's no clear understanding what to use and what to show.
-    // On GUI side we use just object.attributes for now.
+    // On GUI side we use just track.attributes for now.
 
     for (const auto& attribute: position.attributes)
     {
         auto iter = std::find_if(
-            object.attributes.begin(),
-            object.attributes.end(),
+            track.attributes.begin(),
+            track.attributes.end(),
             [&attribute](const nx::common::metadata::Attribute& value)
             {
                 return attribute.name == value.name;
             });
 
-        if (iter != object.attributes.end())
+        if (iter != track.attributes.end())
             iter->value = attribute.value;
         else
-            object.attributes.push_back(attribute);
+            track.attributes.push_back(attribute);
     }
 
-    object.lastAppearanceTimeUsec = position.timestampUsec;
+    track.lastAppearanceTimeUs = position.timestampUs;
 
     if (emitDataChanged)
     {
-        m_dataChangedObjectIds.insert(object.objectAppearanceId);
+        m_dataChangedTrackIds.insert(track.id);
         m_emitDataChanged->requestOperation();
     }
 }
 
-int AnalyticsSearchListModel::Private::indexOf(const QnUuid& objectId) const
+int AnalyticsSearchListModel::Private::indexOf(const QnUuid& trackId) const
 {
-    const auto timestampIter = m_objectIdToTimestamp.find(objectId);
-    if (timestampIter == m_objectIdToTimestamp.end())
+    const auto timestampIter = m_objectTrackIdToTimestamp.find(trackId);
+    if (timestampIter == m_objectTrackIdToTimestamp.end())
         return -1;
 
     const auto range = std::make_pair(
@@ -706,33 +706,33 @@ int AnalyticsSearchListModel::Private::indexOf(const QnUuid& objectId) const
         std::upper_bound(m_data.cbegin(), m_data.cend(), *timestampIter, upperBoundPredicate));
 
     const auto iter = std::find_if(range.first, range.second,
-        [&objectId](const DetectedObject& item) { return item.objectAppearanceId == objectId; });
+        [&trackId](const ObjectTrack& item) { return item.id == trackId; });
 
     return iter != range.second ? int(std::distance(m_data.cbegin(), iter)) : -1;
 }
 
 QString AnalyticsSearchListModel::Private::description(
-    const DetectedObject& object) const
+    const ObjectTrack& track) const
 {
     if (!ini().showDebugTimeInformationInRibbon)
         return QString();
 
     const auto timeWatcher = q->context()->instance<nx::vms::client::core::ServerTimeWatcher>();
-    const auto start = timeWatcher->displayTime(startTime(object).count());
-    const auto duration = objectDuration(object);
+    const auto start = timeWatcher->displayTime(startTime(track).count());
+    const auto duration = objectDuration(track);
 
     using namespace std::chrono;
     return lm("Timestamp: %1 us<br>%2<br>Duration: %3 us<br>%4").args( //< Not translatable, debug.
-        object.firstAppearanceTimeUsec,
+        track.firstAppearanceTimeUs,
         start.toString(Qt::RFC2822Date),
         duration.count(),
         core::HumanReadable::timeSpan(duration_cast<milliseconds>(duration)));
 }
 
 QString AnalyticsSearchListModel::Private::attributes(
-    const DetectedObject& object) const
+    const ObjectTrack& track) const
 {
-    if (object.attributes.empty())
+    if (track.attributes.empty())
         return QString();
 
     static const auto kCss = QString::fromLatin1(R"(
@@ -746,7 +746,7 @@ QString AnalyticsSearchListModel::Private::attributes(
         + QString("<td>%2</td></tr>");
 
     QString rows;
-    for (const auto& attribute: object.attributes)
+    for (const auto& attribute: track.attributes)
     {
         if (!attribute.name.startsWith("nx.sys."))
             rows += kRowTemplate.arg(attribute.name, attribute.value);
@@ -760,16 +760,16 @@ QString AnalyticsSearchListModel::Private::attributes(
 }
 
 QSharedPointer<QMenu> AnalyticsSearchListModel::Private::contextMenu(
-    const analytics::db::DetectedObject& object) const
+    const analytics::db::ObjectTrack& track) const
 {
     using nx::vms::api::analytics::ActionTypeDescriptor;
-    const auto camera = this->camera(object);
+    const auto camera = this->camera(track);
     if (!camera)
         return {};
 
     const nx::analytics::ActionTypeDescriptorManager descriptorManager(q->commonModule());
     const auto actionByEngine = descriptorManager.availableObjectActionTypeDescriptors(
-        object.objectTypeId,
+        track.objectTypeId,
         camera);
 
     QSharedPointer<QMenu> menu(new QMenu());
@@ -782,9 +782,9 @@ QSharedPointer<QMenu> AnalyticsSearchListModel::Private::contextMenu(
         {
             const auto name = actionDescriptor.name;
             menu->addAction<std::function<void()>>(name, nx::utils::guarded(this,
-                [this, engineId = engineId, actionId = actionDescriptor.id, object, camera]()
+                [this, engineId = engineId, actionId = actionDescriptor.id, track, camera]()
                 {
-                    emit q->pluginActionRequested(engineId, actionId, object, camera, {});
+                    emit q->pluginActionRequested(engineId, actionId, track, camera, {});
                 }));
         }
     }
@@ -793,26 +793,26 @@ QSharedPointer<QMenu> AnalyticsSearchListModel::Private::contextMenu(
 }
 
 AnalyticsSearchListModel::Private::PreviewParams AnalyticsSearchListModel::Private::previewParams(
-    const analytics::db::DetectedObject& object)
+    const analytics::db::ObjectTrack& track)
 {
-    if (object.bestShot.initialized())
-        return {microseconds(object.bestShot.timestampUsec), object.bestShot.rect};
+    if (track.bestShot.initialized())
+        return {microseconds(track.bestShot.timestampUs), track.bestShot.rect};
 
-    const auto rect = object.track.empty()
+    const auto rect = track.objectPositionSequence.empty()
         ? QRectF()
-        : object.track.front().boundingBox;
+        : track.objectPositionSequence.front().boundingBox;
 
-    return {microseconds(object.firstAppearanceTimeUsec), rect};
+    return {microseconds(track.firstAppearanceTimeUs), rect};
 }
 
 QnVirtualCameraResourcePtr AnalyticsSearchListModel::Private::camera(
-    const analytics::db::DetectedObject& object) const
+    const analytics::db::ObjectTrack& track) const
 {
-    NX_ASSERT(!object.track.empty());
-    if (object.track.empty())
+    NX_ASSERT(!track.objectPositionSequence.empty());
+    if (track.objectPositionSequence.empty())
         return {};
 
-    return q->resourcePool()->getResourceById<QnVirtualCameraResource>(object.track[0].deviceId);
+    return q->resourcePool()->getResourceById<QnVirtualCameraResource>(track.objectPositionSequence[0].deviceId);
 }
 
 } // namespace nx::vms::client::desktop

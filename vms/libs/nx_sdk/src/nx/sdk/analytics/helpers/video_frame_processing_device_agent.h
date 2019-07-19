@@ -10,6 +10,7 @@
 #include <nx/sdk/helpers/ref_countable.h>
 #include <nx/sdk/helpers/log_utils.h>
 #include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/helpers/result_aliases.h>
 
 #include <nx/sdk/analytics/i_engine.h>
 #include <nx/sdk/analytics/i_consuming_device_agent.h>
@@ -51,7 +52,7 @@ protected:
         bool enableOutput,
         const std::string& printPrefix = "");
 
-    virtual std::string manifest() const = 0;
+    virtual std::string manifestString() const = 0;
 
     /**
      * Override to accept next compressed video frame for processing. Should not block the caller
@@ -94,27 +95,32 @@ protected:
     void pushMetadataPacket(IMetadataPacket* metadataPacket);
 
     /**
-     * Sends a PluginEvent to the Server. Can be called from any thread, but if called before
-     * settingsReceived() was called, will be ignored in case setHandler() was not called yet.
+     * Sends a PluginDiagnosticEvent to the Server. Can be called from any thread, but if called
+     * before settingsReceived() was called, will be ignored in case setHandler() was not called
+     * yet.
      */
-    void pushPluginEvent(IPluginEvent::Level level, std::string caption, std::string description);
+    void pushPluginDiagnosticEvent(
+        IPluginDiagnosticEvent::Level level,
+        std::string caption,
+        std::string description);
 
     /**
      * Called when the settings are received from the server (even if the values are not changed).
      * Should perform any required (re)initialization. Called even if the settings model is empty.
+     * @return Error messages per setting (if any), as in IDeviceAgent::setSettings().
      */
-    virtual void settingsReceived() {}
+    virtual StringMapResult settingsReceived() { return nullptr; }
 
     /**
-     * Provides access to the Manager settings stored by the server for a particular Resource.
+     * Provides access to the DeviceAgent settings stored by the Server for the particular Device.
+     *
      * ATTENTION: If settingsReceived() has not been called yet, it means that the DeviceAgent has
-     * not received its settings from the server yet, and thus this method will yield empty values.
-     * @return Param value, or an empty string if such param does not exist, having logged the
+     * not received its settings from the Server yet, and thus this method will yield empty values.
+     *
+     * @return Setting value, or an empty string if such setting does not exist, having logged the
      *     error.
      */
-    std::string getParamValue(const std::string& paramName);
-
-    virtual Error setNeededMetadataTypes(const IMetadataTypes* metadataTypes) override = 0;
+    std::string settingValue(const std::string& paramName);
 
 public:
     virtual ~VideoFrameProcessingDeviceAgent() override;
@@ -137,11 +143,11 @@ public:
 // Not intended to be used by the descendant.
 
 public:
-    virtual Error setHandler(IDeviceAgent::IHandler* handler) override;
-    virtual Error pushDataPacket(IDataPacket* dataPacket) override;
-    virtual const IString* manifest(Error* error) const override;
-    virtual void setSettings(const IStringMap* settings) override;
-    virtual IStringMap* pluginSideSettings() const override;
+    virtual void setHandler(IDeviceAgent::IHandler* handler) override;
+    virtual Result<void> pushDataPacket(IDataPacket* dataPacket) override;
+    virtual StringResult manifest() const override;
+    virtual StringMapResult setSettings(const IStringMap* settings) override;
+    virtual SettingsResponseResult pluginSideSettings() const override;
 
 private:
     void assertEngineCasted(void* engine) const;
@@ -154,7 +160,7 @@ private:
 private:
     mutable std::mutex m_mutex;
     IEngine* const m_engine;
-    nx::sdk::Ptr<IDeviceAgent::IHandler> m_handler;
+    Ptr<IDeviceAgent::IHandler> m_handler;
     std::map<std::string, std::string> m_settings;
 };
 

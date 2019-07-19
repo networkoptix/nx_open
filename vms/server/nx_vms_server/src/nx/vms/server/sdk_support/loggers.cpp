@@ -6,10 +6,12 @@
 #include <nx/vms/server/resource/analytics_engine_resource.h>
 #include <nx/vms/server/analytics/debug_helpers.h>
 #include <nx/vms/server/sdk_support/utils.h>
+#include <nx/vms/server/sdk_support/to_string.h>
 #include <nx/utils/placeholder_binder.h>
-#include <nx/sdk/helpers/to_string.h>
 
 namespace nx::vms::server::sdk_support {
+
+using namespace nx::sdk;
 
 namespace {
 
@@ -87,8 +89,7 @@ ManifestLogger::ManifestLogger(
 
 void ManifestLogger::log(
     const QString& manifestStr,
-    sdk::Error error,
-    const QString& customError)
+    const sdk_support::Error& error)
 {
     if (pluginsIni().analyticsManifestOutputPath[0])
     {
@@ -103,14 +104,14 @@ void ManifestLogger::log(
                 kManifestFilenamePostfix));
     }
 
-    if (error != nx::sdk::Error::noError)
+    if (!error.isOk())
     {
         nx::utils::PlaceholderBinder binder(m_messageTemplate);
         binder.bind({
             {"device", buildDeviceStr(m_device)},
             {"engine", buildEngineStr(m_engineResource)},
             {"plugin", buildPluginStr(m_pluginResource)},
-            {"error", customError.isEmpty() ? nx::sdk::toString(error) : customError},
+            {"error", toString(error)},
         });
         NX_WARNING(m_logTag, binder.str());
     }
@@ -130,8 +131,7 @@ StartupPluginManifestLogger::StartupPluginManifestLogger(
 
 void StartupPluginManifestLogger::log(
     const QString& manifestStr,
-    nx::sdk::Error error,
-    const QString& customError)
+    const sdk_support::Error& error)
 {
     if (pluginsIni().analyticsManifestOutputPath[0])
     {
@@ -144,10 +144,11 @@ void StartupPluginManifestLogger::log(
                 kManifestFilenamePostfix));
     }
 
-    if (error != nx::sdk::Error::noError)
+    if (!error.isOk())
     {
         NX_WARNING(m_logTag, "Error obtaining manifest from Plugin %1: %2",
-            m_plugin->name(), customError.isEmpty() ? nx::sdk::toString(error) : customError);
+            m_plugin->name(),
+            error);
     }
 }
 

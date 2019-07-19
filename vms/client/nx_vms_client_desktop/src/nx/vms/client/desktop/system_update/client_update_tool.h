@@ -139,9 +139,6 @@ public:
 
     std::future<UpdateContents> requestRemoteUpdateInfo();
 
-    /** Get cached update information from the mediaservers. */
-    UpdateContents getRemoteUpdateInfo() const;
-
     /**
      * Get installed versions. It can block up to 500ms until applauncher check it complete.
      * The check is initiated when ClientUpdateTool is created, so there will be no block
@@ -171,8 +168,6 @@ signals:
 protected:
     // Callbacks
     void atDownloaderStatusChanged(const FileInformation& fileInformation);
-    void atRemoteUpdateInformation(nx::update::InformationError error,
-        const nx::update::Information& updateInformation);
     void atDownloadFinished(const QString& fileName);
     void atChunkDownloadFailed(const QString& fileName);
     void atDownloadFailed(const QString& fileName);
@@ -209,7 +204,6 @@ private:
     QString m_lastError;
 
     std::promise<UpdateContents> m_remoteUpdateInfoRequest;
-    UpdateContents m_remoteUpdateContents;
     QnMutex m_mutex;
 
     std::future<nx::vms::applauncher::api::ResultType> m_applauncherTask;

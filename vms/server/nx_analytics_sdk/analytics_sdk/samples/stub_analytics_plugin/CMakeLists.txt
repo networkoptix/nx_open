@@ -9,6 +9,11 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
+if(UNIX)
+    # In Linux, for the plugin .so library, set `rpath` to "$ORIGIN" and do not set `runpath`, thus
+    # enabling the lookup of the dependencies in the plugin dir first.
+    string(APPEND CMAKE_SHARED_LINKER_FLAGS " -Wl,--disable-new-dtags")
+endif()
 set(CMAKE_SKIP_BUILD_RPATH ON)
 set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
 set(CMAKE_INSTALL_RPATH "$ORIGIN")
@@ -48,8 +53,7 @@ endif()
 
 target_compile_definitions(stub_analytics_plugin
     PRIVATE NX_PLUGIN_API=${API_EXPORT_MACRO}
-    INTERFACE NX_PLUGIN_API=${API_IMPORT_MACRO}
-    PRIVATE NX_SDK_API=
+    INTERFACE NX_PLUGIN_API=${API_IMPORT_MACRO} #< Needed to link plugin ut lib to plugin lib.
 )
 
 if(NOT WIN32)
@@ -66,8 +70,5 @@ target_include_directories(stub_analytics_plugin_ut PRIVATE
 target_link_libraries(stub_analytics_plugin_ut PRIVATE
     nx_kit
     stub_analytics_plugin
-)
-target_compile_definitions(stub_analytics_plugin_ut
-    PRIVATE NX_SDK_API=
 )
 add_test(NAME stub_analytics_plugin_ut COMMAND stub_analytics_plugin_ut)

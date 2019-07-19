@@ -28,12 +28,12 @@ void TrackSerializer::serializeTrackSequence(
     buf->reserve(buf->size() + 9 + 2 + track.size() * 11);
 
     // Writing base timestamp. All timestamps will be saved as an offset from this base.
-    nx::utils::compact_int::serialize(track.front().timestampUsec, buf);
+    nx::utils::compact_int::serialize(track.front().timestampUs, buf);
 
     nx::utils::compact_int::serialize((long long)track.size(), buf);
 
     for (const auto& position: track)
-        serialize(track.front().timestampUsec, position, buf);
+        serialize(track.front().timestampUs, position, buf);
 }
 
 void TrackSerializer::serialize(
@@ -41,8 +41,8 @@ void TrackSerializer::serialize(
     const ObjectPosition& position,
     QByteArray* buf)
 {
-    nx::utils::compact_int::serialize(position.timestampUsec - baseTimestamp, buf);
-    nx::utils::compact_int::serialize(position.durationUsec, buf);
+    nx::utils::compact_int::serialize(position.timestampUs - baseTimestamp, buf);
+    nx::utils::compact_int::serialize(position.durationUs, buf);
     serialize(translate(position.boundingBox, kResolution), buf);
 
     // TODO: attributes?
@@ -87,10 +87,10 @@ void TrackSerializer::deserialize(
     QnByteArrayConstRef* buf,
     ObjectPosition* position)
 {
-    nx::utils::compact_int::deserialize(buf, &position->timestampUsec);
-    position->timestampUsec += baseTimestamp;
+    nx::utils::compact_int::deserialize(buf, &position->timestampUs);
+    position->timestampUs += baseTimestamp;
 
-    nx::utils::compact_int::deserialize(buf, &position->durationUsec);
+    nx::utils::compact_int::deserialize(buf, &position->durationUs);
 
     QRect translatedRect;
     deserialize(buf, &translatedRect);

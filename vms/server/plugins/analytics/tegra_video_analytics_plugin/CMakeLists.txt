@@ -1,4 +1,4 @@
-nx_add_server_plugin(tegra_video_analytics_plugin NO_MOC OPTIONAL
+nx_add_server_plugin(tegra_video_analytics_plugin NO_MOC OPTIONAL DEDICATED_DIR
     PRIVATE_LIBS
         Qt5::Gui #< for QVector2D
         boost #< for optional

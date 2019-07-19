@@ -53,6 +53,8 @@ NX_KIT_API std::string getProcessName();
 
 /**
  * Convert a value to its report-friendly text representation, e.g. a quoted and escaped string.
+ * Non-printable chars in a string are represented as hex escape sequences like `\xFF""` - note
+ * that the two quotes after it are inserted to indicate the end of the hex number, as in C/C++.
  */
 template<typename T>
 std::string toString(T value);
@@ -168,6 +170,23 @@ inline void freeAligned(void* ptr)
 //-------------------------------------------------------------------------------------------------
 // Implementation.
 
+// The order of overloads below is important - it defines which will be chosen by inline functions.
+NX_KIT_API std::string toString(bool b);
+NX_KIT_API std::string toString(const void* ptr);
+inline std::string toString(void* ptr) { return toString(const_cast<const void*>(ptr)); }
+inline std::string toString(std::nullptr_t ptr) { return toString((const void*) ptr); }
+inline std::string toString(uint8_t i) { return toString((int) i); } //< Avoid matching as char.
+inline std::string toString(int8_t i) { return toString((int) i); } //< Avoid matching as char.
+NX_KIT_API std::string toString(char c);
+NX_KIT_API std::string toString(const char* s);
+inline std::string toString(char* s) { return toString(const_cast<const char*>(s)); }
+inline std::string toString(const std::string& s) { return toString(s.c_str()); }
+NX_KIT_API std::string toString(wchar_t c);
+NX_KIT_API std::string toString(const wchar_t* w);
+inline std::string toString(wchar_t* w) { return toString(const_cast<const wchar_t*>(w)); }
+inline std::string toString(const std::wstring& w) { return toString(w.c_str()); }
+
+// For unknown types, use their operator<<().
 template<typename T>
 std::string toString(T value)
 {
@@ -175,16 +194,6 @@ std::string toString(T value)
     outputString << value;
     return outputString.str();
 }
-
-NX_KIT_API std::string toString(std::string s); //< By value to avoid calling the template impl.
-NX_KIT_API std::string toString(uint8_t i); //< Otherwise, uint8_t would be printed as char.
-NX_KIT_API std::string toString(char c);
-NX_KIT_API std::string toString(const char* s);
-NX_KIT_API std::string toString(char* s);
-NX_KIT_API std::string toString(const void* ptr);
-NX_KIT_API std::string toString(void* ptr);
-NX_KIT_API std::string toString(std::nullptr_t ptr);
-NX_KIT_API std::string toString(bool b);
 
 #if defined(QT_CORE_LIB)
 

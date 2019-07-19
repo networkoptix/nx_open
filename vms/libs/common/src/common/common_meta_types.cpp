@@ -80,7 +80,7 @@
 #include <nx/vms/event/event_fwd.h>
 #include <nx/vms/event/events/abstract_event.h>
 #include <nx/vms/event/events/analytics_sdk_event.h>
-#include <nx/vms/event/events/plugin_event.h>
+#include <nx/vms/event/events/plugin_diagnostic_event.h>
 #include <nx/vms/event/rule.h>
 
 #include <licensing/license.h>
@@ -141,7 +141,7 @@ void QnCommonMetaTypes::initialize()
     qRegisterMetaType<Qn::ResourceStatus>();
     qRegisterMetaType<nx::vms::api::EventReason>();
     qRegisterMetaType<nx::vms::event::AnalyticsSdkEventPtr>();
-    qRegisterMetaType<nx::vms::event::PluginEventPtr>();
+    qRegisterMetaType<nx::vms::event::PluginDiagnosticEventPtr>();
 
     qRegisterMetaType<QnUserResourcePtr>();
     qRegisterMetaType<QnLayoutResourcePtr>();

@@ -12,6 +12,7 @@
 
 #include <nx/sdk/helpers/ref_countable.h>
 #include <nx/sdk/analytics/i_device_agent.h>
+#include <nx/sdk/analytics/helpers/result_aliases.h>
 #include <nx/utils/url.h>
 
 namespace nx {
@@ -32,22 +33,22 @@ public:
 
     virtual Engine* engine() const override { return m_engine; }
 
-    virtual nx::sdk::Error setHandler(
-        nx::sdk::analytics::IDeviceAgent::IHandler* handler) override;
+    virtual void setHandler(nx::sdk::analytics::IDeviceAgent::IHandler* handler) override;
 
-    virtual nx::sdk::Error setNeededMetadataTypes(
+    virtual nx::sdk::Result<void> setNeededMetadataTypes(
         const nx::sdk::analytics::IMetadataTypes* metadataTypes) override;
 
-    virtual const nx::sdk::IString* manifest(nx::sdk::Error* error) const override;
+    virtual nx::sdk::StringResult manifest() const override;
 
     void setDeviceInfo(const nx::sdk::IDeviceInfo* deviceInfo);
     void setDeviceAgentManifest(const QByteArray& manifest);
     void setEngineManifest(const Hikvision::EngineManifest& manifest);
-    virtual void setSettings(const nx::sdk::IStringMap* settings) override;
-    virtual nx::sdk::IStringMap* pluginSideSettings() const override;
+    virtual nx::sdk::StringMapResult setSettings(const nx::sdk::IStringMap* settings) override;
+
+    virtual nx::sdk::SettingsResponseResult pluginSideSettings() const override;
 
 private:
-    nx::sdk::Error startFetchingMetadata(
+    nx::sdk::Result<void> startFetchingMetadata(
         const nx::sdk::analytics::IMetadataTypes* metadataTypes);
 
     void stopFetchingMetadata();

@@ -279,5 +279,3 @@ function(nx_find_first_matching_file var glob)
     endif()
     set(${var} ${file} PARENT_SCOPE)
 endfunction()
-
-nx_init_known_files_list()

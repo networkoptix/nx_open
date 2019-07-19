@@ -94,21 +94,21 @@ QString StringsHelper::eventName(EventType value, int count) const
 
     switch (value)
     {
-        case EventType::cameraMotionEvent:    return tr("Motion on Cameras", "", count);
-        case EventType::storageFailureEvent:  return tr("Storage Issue");
-        case EventType::networkIssueEvent:    return tr("Network Issue");
-        case EventType::serverFailureEvent:   return tr("Server Failure");
-        case EventType::serverConflictEvent:  return tr("Server Conflict");
-        case EventType::serverStartEvent:     return tr("Server Started");
-        case EventType::licenseIssueEvent:    return tr("License Issue");
-        case EventType::backupFinishedEvent:  return tr("Archive backup finished");
-        case EventType::analyticsSdkEvent:    return tr("Analytics Event");
-        case EventType::pluginEvent:          return tr("Plugin Diagnostic Event");
+        case EventType::cameraMotionEvent:     return tr("Motion on Cameras", "", count);
+        case EventType::storageFailureEvent:   return tr("Storage Issue");
+        case EventType::networkIssueEvent:     return tr("Network Issue");
+        case EventType::serverFailureEvent:    return tr("Server Failure");
+        case EventType::serverConflictEvent:   return tr("Server Conflict");
+        case EventType::serverStartEvent:      return tr("Server Started");
+        case EventType::licenseIssueEvent:     return tr("License Issue");
+        case EventType::backupFinishedEvent:   return tr("Archive backup finished");
+        case EventType::analyticsSdkEvent:     return tr("Analytics Event");
+        case EventType::pluginDiagnosticEvent: return tr("Plugin Diagnostic Event");
 
-        case EventType::anyServerEvent:       return tr("Any Server Issue");
-        case EventType::anyEvent:             return tr("Any Event");
+        case EventType::anyServerEvent:        return tr("Any Server Issue");
+        case EventType::anyEvent:              return tr("Any Event");
 
-        case EventType::softwareTriggerEvent: return tr("Soft Trigger");
+        case EventType::softwareTriggerEvent:  return tr("Soft Trigger");
 
         case EventType::cameraInputEvent:
             return QnDeviceDependentStrings::getDefaultNameFromSet(
@@ -218,7 +218,7 @@ QString StringsHelper::eventAtResource(const EventParameters& params,
                 .arg(getAnalyticsSdkEventName(params))
                 .arg(resourceName);
 
-        case EventType::pluginEvent:
+        case EventType::pluginDiagnosticEvent:
         {
             const QString caption = params.caption.isEmpty()
                 ? tr("Unknown Plugin Diagnostic Event")
@@ -353,7 +353,7 @@ QStringList StringsHelper::eventDetails(const EventParameters& params) const
 
         case EventType::analyticsSdkEvent:
         case EventType::userDefinedEvent:
-        case EventType::pluginEvent:
+        case EventType::pluginDiagnosticEvent:
             if (!params.description.isEmpty())
                 result << params.description;
             break;

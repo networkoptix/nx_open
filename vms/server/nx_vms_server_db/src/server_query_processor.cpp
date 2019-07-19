@@ -136,7 +136,7 @@ void TransactionExecutor::run()
                     command.completionHandler(command.result);
                     // Rollback DB transaction and push back unprocessed transactions back to the execution queue
                     QnMutexLocker lock(&m_mutex);
-                    for (int j = queue.size() - 1; j > i; --j)
+                    for (int j = (int) queue.size() - 1; j > i; --j)
                         m_commandQueue.push_front(queue[j]);
                     queue.erase(queue.begin() + i, queue.end());
                     for (auto& rollbackCommand: queue)

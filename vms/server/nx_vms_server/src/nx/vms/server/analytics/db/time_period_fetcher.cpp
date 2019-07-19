@@ -7,7 +7,7 @@
 
 #include "attributes_dao.h"
 #include "device_dao.h"
-#include "object_searcher.h"
+#include "object_track_searcher.h"
 #include "serializers.h"
 
 namespace nx::analytics::db {
@@ -37,7 +37,7 @@ nx::sql::DBResult TimePeriodFetcher::selectTimePeriods(
     const TimePeriodsLookupOptions& options,
     QnTimePeriodList* result)
 {
-    if (!filter.objectAppearanceId.isNull())
+    if (!filter.objectTrackId.isNull())
         *result = selectTimePeriodsByObject(queryContext, filter, options);
     else
         *result = selectTimePeriodsFiltered(queryContext, filter, options);
@@ -52,17 +52,19 @@ QnTimePeriodList TimePeriodFetcher::selectTimePeriodsByObject(
 {
     using namespace std::chrono;
 
-    ObjectSearcher objectSearcher(m_deviceDao, m_objectTypeDao, m_attributesDao, m_analyticsArchive, filter);
-    const auto objects = objectSearcher.lookup(queryContext);
+    ObjectTrackSearcher objectTrackSearcher(
+        m_deviceDao, m_objectTypeDao, m_attributesDao, m_analyticsArchive, filter);
+
+    const auto tracks = objectTrackSearcher.lookup(queryContext);
 
     QnTimePeriodList result;
-    for (const auto& object: objects)
+    for (const auto& track: tracks)
     {
-        for (const auto& position: object.track)
+        for (const auto& position: track.objectPositionSequence)
         {
             result += QnTimePeriod(
-                duration_cast<milliseconds>(microseconds(position.timestampUsec)),
-                duration_cast<milliseconds>(microseconds(position.durationUsec)));
+                duration_cast<milliseconds>(microseconds(position.timestampUs)),
+                duration_cast<milliseconds>(microseconds(position.durationUs)));
         }
     }
 
@@ -77,7 +79,6 @@ QnTimePeriodList TimePeriodFetcher::selectTimePeriodsFiltered(
 {
     ArchiveFilter archiveFilter =
         AnalyticsArchiveDirectory::prepareArchiveFilter(filter, m_objectTypeDao);
-    archiveFilter.region = options.region;
     archiveFilter.detailLevel = options.detailLevel;
 
     nx::utils::ElapsedTimer timer;

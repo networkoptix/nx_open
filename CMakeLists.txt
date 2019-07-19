@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 3.12.0 FATAL_ERROR)
 
+set(metaVersion R12)
+
+include(cmake/utils.cmake)
 include(cmake/option.cmake)
 include(cmake/default_target.cmake)
 
@@ -95,9 +98,10 @@ include(CMakeDependentOption)
 include(ExternalProject)
 
 nx_option(codeSigning "Enable code signing" OFF)
+nx_option(notarization "Enable notarization" OFF)
 
 include(target_detection)
-include(utils)
+nx_init_known_files_list()
 include(find_sources)
 include(moc_utils)
 include(qrc_utils)

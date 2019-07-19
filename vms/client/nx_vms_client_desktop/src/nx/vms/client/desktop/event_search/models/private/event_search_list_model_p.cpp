@@ -419,7 +419,7 @@ QPixmap EventSearchListModel::Private::pixmap(const vms::event::EventParameters&
             return QnSoftwareTriggerPixmaps::colorizedPixmap(
                 parameters.description, QPalette().light().color());
 
-        case EventType::pluginEvent:
+        case EventType::pluginDiagnosticEvent:
         {
             switch (QnNotificationLevel::valueOf(parameters))
             {
