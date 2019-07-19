@@ -43,7 +43,7 @@ public:
         int64_t allAttributesHash);
 
     QnTimePeriodList matchPeriods(
-        const std::vector<QnUuid>& deviceIds,
+        std::vector<QnUuid> deviceIds,
         ArchiveFilter filter);
 
     QnTimePeriodList matchPeriods(
@@ -55,7 +55,7 @@ public:
      * Object groups have to be converted to objects (and filtered) later.
      */
     ObjectMatchResult matchObjects(
-        const std::vector<QnUuid>& deviceIds,
+        std::vector<QnUuid> deviceIds,
         ArchiveFilter filter);
 
     static ArchiveFilter prepareArchiveFilter(
@@ -79,6 +79,8 @@ private:
     ObjectMatchResult toObjectMatchResult(
         const ArchiveFilter& filter,
         std::vector<std::pair<std::chrono::milliseconds /*timestamp*/, int64_t /*objectGroupId*/>> objectGroups);
+
+    void copyAllDeviceIds(std::vector<QnUuid>* deviceIds);
 };
 
 } // namespace nx::analytics::db

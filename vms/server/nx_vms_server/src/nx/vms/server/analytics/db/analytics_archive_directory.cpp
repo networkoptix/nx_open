@@ -1,5 +1,7 @@
 #include "analytics_archive_directory.h"
 
+#include <QtCore/QDir>
+
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 
@@ -19,6 +21,19 @@ AnalyticsArchiveDirectory::AnalyticsArchiveDirectory(
     m_mediaServerModule(mediaServerModule),
     m_dataDir(dataDir)
 {
+    if (!m_mediaServerModule)
+    {
+        QDir dir(m_dataDir + "/metadata");
+        const auto cameraDirs = dir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot);
+        for (const auto& cameraDir: cameraDirs)
+        {
+            const auto cameraId = QnUuid::fromStringSafe(cameraDir);
+            if (cameraId.isNull())
+                continue;
+
+            openOrGetArchive(cameraId);
+        }
+    }
 }
 
 bool AnalyticsArchiveDirectory::saveToArchive(
@@ -44,9 +59,12 @@ bool AnalyticsArchiveDirectory::saveToArchive(
 }
 
 QnTimePeriodList AnalyticsArchiveDirectory::matchPeriods(
-    const std::vector<QnUuid>& deviceIds,
+    std::vector<QnUuid> deviceIds,
     ArchiveFilter filter)
 {
+    if (deviceIds.empty())
+        copyAllDeviceIds(&deviceIds);
+
     fixFilterRegion(&filter);
 
     // TODO: #ak If there are more than one device given we can apply map/reduce to speed things up.
@@ -74,11 +92,11 @@ QnTimePeriodList AnalyticsArchiveDirectory::matchPeriods(
 }
 
 AnalyticsArchiveDirectory::ObjectMatchResult AnalyticsArchiveDirectory::matchObjects(
-    const std::vector<QnUuid>& deviceIds,
+    std::vector<QnUuid> deviceIds,
     ArchiveFilter filter)
 {
     if (deviceIds.empty())
-        return {};
+        copyAllDeviceIds(&deviceIds);
 
     fixFilterRegion(&filter);
     filter.limit = std::min(
@@ -203,6 +221,26 @@ nx::vms::server::metadata::AnalyticsArchive::MatchObjectsResult AnalyticsArchive
     {
         return {};
     }
+}
+
+void AnalyticsArchiveDirectory::copyAllDeviceIds(std::vector<QnUuid>* deviceIds)
+{
+    if (m_mediaServerModule)
+    {
+        const auto cameraResources = m_mediaServerModule->resourcePool()->getAllCameras(
+            m_mediaServerModule->resourcePool()->getResourceById(
+                m_mediaServerModule->commonModule()->moduleGUID()));
+
+        for (const auto& camera: cameraResources)
+            openOrGetArchive(camera->getId());
+    }
+
+    QnMutexLocker lock(&m_mutex);
+
+    std::transform(
+        m_deviceIdToArchive.begin(), m_deviceIdToArchive.end(),
+        std::back_inserter(*deviceIds),
+        [](const auto& item) { return item.first; });
 }
 
 } // namespace nx::analytics::db

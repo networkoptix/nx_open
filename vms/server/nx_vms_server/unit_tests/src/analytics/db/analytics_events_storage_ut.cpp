@@ -425,9 +425,7 @@ protected:
 
     Filter buildEmptyFilter()
     {
-        Filter filter;
-        filter.deviceIds = allowedDeviceIds();
-        return filter;
+        return Filter();
     }
 
 private:
@@ -586,7 +584,7 @@ private:
     template<typename T>
     bool satisfiesCommonConditions(const Filter& filter, const T& data)
     {
-        if (!nx::utils::contains(filter.deviceIds, data.deviceId))
+        if (!filter.deviceIds.empty() && !nx::utils::contains(filter.deviceIds, data.deviceId))
             return false;
 
         if (!filter.timePeriod.contains(data.timestampUsec / kUsecInMs))
@@ -743,7 +741,7 @@ protected:
     void addRandomKnownDeviceIdToFilter()
     {
         ASSERT_FALSE(allowedDeviceIds().empty());
-        
+
         m_filter.deviceIds.clear();
         m_filter.deviceIds.push_back(
             nx::utils::random::choice(allowedDeviceIds()));

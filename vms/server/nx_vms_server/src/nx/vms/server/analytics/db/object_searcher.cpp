@@ -194,8 +194,12 @@ bool ObjectSearcher::satisfiesFilter(
         return false;
     }
 
-    if (!nx::utils::contains(filter.deviceIds, detectedObject.deviceId))
+    // Matching every device if device list is empty.
+    if (!filter.deviceIds.empty() &&
+        !nx::utils::contains(filter.deviceIds, detectedObject.deviceId))
+    {
         return false;
+    }
 
     if (!(microseconds(detectedObject.lastAppearanceTimeUsec) >= filter.timePeriod.startTime() &&
           (filter.timePeriod.isInfinite() ||
@@ -230,7 +234,7 @@ bool ObjectSearcher::satisfiesFilter(
                 break;
             }
         }
-        
+
         if (!instersects)
             return false;
     }
@@ -279,7 +283,7 @@ std::optional<DetectedObject> ObjectSearcher::fetchObjectById(
     auto query = queryContext->connection()->createQuery();
     query->setForwardOnly(true);
     query->prepare(R"sql(
-        SELECT device_id, object_type_id, guid, track_start_ms, track_end_ms, track_detail, 
+        SELECT device_id, object_type_id, guid, track_start_ms, track_end_ms, track_detail,
             ua.content AS content, best_shot_timestamp_ms, best_shot_rect
         FROM object o, unique_attributes ua
         WHERE o.attributes_id=ua.id AND guid=?
@@ -299,7 +303,7 @@ std::vector<DetectedObject> ObjectSearcher::lookupObjectsUsingArchive(
 {
     auto archiveFilter =
         AnalyticsArchiveDirectory::prepareArchiveFilter(m_filter, m_objectTypeDao);
-    // NOTE: We are always searching for newest objects. 
+    // NOTE: We are always searching for newest objects.
     // The sortOrder is applied to the lookup result.
     archiveFilter.sortOrder = Qt::DescendingOrder;
 
@@ -372,10 +376,10 @@ void ObjectSearcher::fetchObjectsFromDb(
     auto query = queryContext->connection()->createQuery();
     query->setForwardOnly(true);
     query->prepare(lm(R"sql(
-        SELECT device_id, object_type_id, guid, track_start_ms, track_end_ms, track_detail, 
+        SELECT device_id, object_type_id, guid, track_start_ms, track_end_ms, track_detail,
             content, best_shot_timestamp_ms, best_shot_rect
         FROM
-            (SELECT device_id, object_type_id, guid, track_start_ms, track_end_ms, track_detail, 
+            (SELECT device_id, object_type_id, guid, track_start_ms, track_end_ms, track_detail,
                 ua.content AS content, best_shot_timestamp_ms, best_shot_rect
             FROM object o, unique_attributes ua, object_group og
             WHERE o.attributes_id=ua.id AND o.id=og.object_id AND %1
@@ -417,7 +421,7 @@ void ObjectSearcher::prepareCursorQueryImpl(nx::sql::AbstractSqlQuery* query)
     query->setForwardOnly(true);
 
     query->prepare(lm(R"sql(
-        SELECT device_id, object_type_id, guid, track_start_ms, track_end_ms, track_detail, 
+        SELECT device_id, object_type_id, guid, track_start_ms, track_end_ms, track_detail,
             ua.content AS content, best_shot_timestamp_ms, best_shot_rect
         FROM object o, unique_attributes ua
         WHERE o.attributes_id=ua.id %1
@@ -565,7 +569,7 @@ std::vector<DetectedObject> ObjectSearcher::loadObjects(nx::sql::AbstractSqlQuer
     while (query->next())
     {
         auto object = loadObject(query);
-     
+
         if (satisfiesFilter(m_filter, object))
             objects.push_back(std::move(object));
     }
