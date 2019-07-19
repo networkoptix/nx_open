@@ -71,9 +71,8 @@ bool isStorageMounted(
     const QnStorageResourcePtr& storage,
     const nx::vms::server::Settings* settings)
 {
-    return !getUnmountedStorages(
-        platform,
-        QnStorageResourceList() << storage, settings).contains(storage);
+    const auto unmountedStorages = getUnmountedStorages(platform, {storage}, settings);
+    return !unmountedStorages.contains(storage);
 }
 
 QnStorageResourceList getUnmountedStorages(
