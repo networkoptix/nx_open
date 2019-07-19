@@ -166,11 +166,8 @@ ResultCode Storage::addNewFile(const FileInformation& fileInformation)
         return ResultCode::fileAlreadyExists;
 
     FileMetadata info = FileMetadata::fromFileInformation(fileInformation, m_downloadsDirectory);
-    if (!QDir(info.absoluteDirectoryPath).exists())
-    {
-        if (!QDir().mkpath(info.absoluteDirectoryPath))
-            return ResultCode::ioError;
-    }
+    if (!nx::utils::file_system::ensureDir(info.absoluteDirectoryPath))
+        return ResultCode::ioError;
 
     if (!info.md5.isEmpty() && calculateMd5(info.fullFilePath) == info.md5)
     {
@@ -696,6 +693,9 @@ QVector<QByteArray> Storage::calculateChecksums(const QString& filePath, qint64 
 
 bool Storage::saveMetadata(const FileMetadata& fileInformation)
 {
+    if (!nx::utils::file_system::ensureDir(metadataDirectoryPath()))
+        return false;
+
     const auto fileName = metadataFileName(fileInformation.fullFilePath);
 
     QFile file(fileName);
