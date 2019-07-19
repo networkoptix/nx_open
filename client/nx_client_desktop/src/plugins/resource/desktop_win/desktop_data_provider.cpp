@@ -703,10 +703,9 @@ void QnDesktopDataProvider::start(Priority priority)
     m_started = true;
 
     m_isInitialized = init();
-    if (!m_isInitialized) {
+    if (!m_isInitialized)
         m_needStop = true;
-        return;
-    }
+
     QnLongRunnable::start(priority);
 }
 
