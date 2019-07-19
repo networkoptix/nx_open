@@ -1,7 +1,5 @@
 #pragma once
 
-//#define USE_IN_MEMORY_ARCHIVE
-
 #include <vector>
 
 #include <nx/utils/thread/mutex.h>
@@ -9,24 +7,18 @@
 #include <nx/vms/server/metadata/analytics_archive.h>
 #include <analytics/db/analytics_db_types.h>
 
-#include "analytics_archive.h"
 #include "media_server/media_server_module.h"
 
 namespace nx::analytics::db {
 
-#ifdef USE_IN_MEMORY_ARCHIVE
-using AnalyticsArchiveImpl = AnalyticsArchive;
-#else
-using AnalyticsArchiveImpl = nx::vms::server::metadata::AnalyticsArchive;
-#endif
-
 class ObjectTypeDao;
+
+using ArchiveFilter = nx::vms::server::metadata::AnalyticsArchive::AnalyticsFilter;
+using AnalyticsArchiveImpl = nx::vms::server::metadata::AnalyticsArchive;
 
 class AnalyticsArchiveDirectory
 {
 public:
-    using Filter = nx::vms::server::metadata::AnalyticsArchive::AnalyticsFilter;
-
     struct ObjectMatchResult
     {
         std::vector<std::int64_t> objectGroups;
@@ -52,11 +44,11 @@ public:
 
     QnTimePeriodList matchPeriods(
         const std::vector<QnUuid>& deviceIds,
-        Filter filter);
+        ArchiveFilter filter);
 
     QnTimePeriodList matchPeriods(
         const QnUuid& deviceId,
-        const Filter& filter);
+        const ArchiveFilter& filter);
 
     /**
      * NOTE: This method selects object groups by filter.
@@ -64,9 +56,9 @@ public:
      */
     ObjectMatchResult matchObjects(
         const std::vector<QnUuid>& deviceIds,
-        Filter filter);
+        ArchiveFilter filter);
 
-    static AnalyticsArchive::Filter prepareArchiveFilter(
+    static ArchiveFilter prepareArchiveFilter(
         const db::Filter& filter,
         const ObjectTypeDao& objectTypeDao);
 
@@ -78,14 +70,14 @@ private:
 
     AnalyticsArchiveImpl* openOrGetArchive(const QnUuid& deviceId);
 
-    void fixFilterRegion(Filter* filter);
+    void fixFilterRegion(ArchiveFilter* filter);
 
     nx::vms::server::metadata::AnalyticsArchive::MatchObjectsResult matchObjects(
         const QnUuid& deviceId,
-        const Filter& filter);
+        const ArchiveFilter& filter);
 
     ObjectMatchResult toObjectMatchResult(
-        const Filter& filter,
+        const ArchiveFilter& filter,
         std::vector<std::pair<std::chrono::milliseconds /*timestamp*/, int64_t /*objectGroupId*/>> objectGroups);
 };
 
