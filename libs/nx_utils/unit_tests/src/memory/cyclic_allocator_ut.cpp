@@ -1,5 +1,3 @@
-#if 0
-
 #include <gtest/gtest.h>
 
 #include <memory>
@@ -18,42 +16,101 @@
 
 #include <nx/utils/memory/cyclic_allocator.h>
 #include <nx/utils/memory/system_allocator.h>
-#include <utils/common/byte_array.h>
 #include <nx/utils/thread/long_runnable.h>
 
-namespace nx {
-namespace utils {
-namespace memory {
-namespace test {
+namespace nx::utils::memory::test {
 
-// CyclicAllocatorUser -----------------------------------------------------------------------------
 struct CyclicAllocatorUserSettings
 {
     size_t dataSize = 1 * 1024 * 1024;
     size_t maxSize = 3 * 1024 * 1024;
     size_t step = 200 * 1024;
     size_t maxQueueSize = 16;
-    std::chrono::milliseconds sleepTimeout{ 1 };
+    std::chrono::milliseconds sleepTimeout{1};
 };
 
-class CyclicAllocatorUser: public QnLongRunnable
+class SampleDynamicArray
 {
 public:
-    CyclicAllocatorUser(const CyclicAllocatorUserSettings& settings);
-    virtual ~CyclicAllocatorUser() override;
-    virtual void run() override;
+    SampleDynamicArray(QnAbstractAllocator* allocator, std::size_t capacity):
+        m_allocator(allocator)
+    {
+        if (capacity)
+            reserve(capacity);
+    }
+
+    ~SampleDynamicArray()
+    {
+        if (m_data)
+            m_allocator->release(m_data);
+    }
+
+    SampleDynamicArray(const SampleDynamicArray&) = delete;
+    SampleDynamicArray& operator=(const SampleDynamicArray&) = delete;
+
+    void append(const char* data, std::size_t count)
+    {
+        if (m_size + count > m_capacity)
+            reserve(m_size + count);
+
+        memcpy(m_data + m_size, data, count);
+        m_size += count;
+    }
+
+    void reserve(std::size_t capacity)
+    {
+        if (capacity <= m_capacity)
+            return;
+
+        char* newData = (char*) m_allocator->alloc(capacity);
+        memcpy(newData, m_data, m_size);
+
+        m_allocator->release(m_data);
+        m_data = newData;
+        m_capacity = capacity;
+    }
+
 private:
-    CyclicAllocator m_allocator;
-    std::deque<std::shared_ptr<QnByteArray>> m_packets;
-    std::vector<char> m_testData;
+    QnAbstractAllocator* m_allocator = nullptr;
+    char* m_data = nullptr;
+    std::size_t m_size = 0;
+    std::size_t m_capacity = 0;
+};
+
+//-------------------------------------------------------------------------------------------------
+
+class CyclicAllocatorUser:
+    public QnLongRunnable
+{
+public:
+    CyclicAllocatorUser(
+        const CyclicAllocatorUserSettings& settings,
+        CyclicAllocator* allocator);
+
+    virtual ~CyclicAllocatorUser() override;
+
+    void waitUntilMaxMemoryIsAllocated();
+
+protected:
+    virtual void run() override;
+
+private:
     CyclicAllocatorUserSettings m_settings;
+    CyclicAllocator* m_allocator = nullptr;
+    std::deque<std::shared_ptr<SampleDynamicArray>> m_packets;
+    std::vector<char> m_testData;
+    std::atomic<int> m_totalPacketsAllocated{0};
 
     void resizeDataIfNeeded();
     void popExcessPackets();
 };
 
-CyclicAllocatorUser::CyclicAllocatorUser(const CyclicAllocatorUserSettings& settings):
-    m_settings(settings)
+CyclicAllocatorUser::CyclicAllocatorUser(
+    const CyclicAllocatorUserSettings& settings,
+    CyclicAllocator* allocator)
+    :
+    m_settings(settings),
+    m_allocator(allocator)
 {
     m_testData.resize(settings.dataSize);
 }
@@ -63,13 +120,20 @@ CyclicAllocatorUser::~CyclicAllocatorUser()
     stop();
 }
 
+void CyclicAllocatorUser::waitUntilMaxMemoryIsAllocated()
+{
+    while (m_totalPacketsAllocated < m_settings.maxQueueSize)
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+}
+
 void CyclicAllocatorUser::run()
 {
     while (!m_needStop)
     {
-        auto newPacket = std::shared_ptr<QnByteArray>(new QnByteArray(&m_allocator, 32, 0));
-        newPacket->write(m_testData.data(), m_testData.size());
+        auto newPacket = std::make_shared<SampleDynamicArray>(m_allocator, 0);
+        newPacket->append(m_testData.data(), m_testData.size());
         m_packets.push_back(newPacket);
+        ++m_totalPacketsAllocated;
 
         resizeDataIfNeeded();
         popExcessPackets();
@@ -95,165 +159,56 @@ void CyclicAllocatorUser::popExcessPackets()
 
 //-------------------------------------------------------------------------------------------------
 
-// ProcessRamUsageFetcher --------------------------------------------------------------------------
-class ProcessRamUsageFetcher
-{
-public:
-    int64_t get();
-private:
-    std::unique_ptr<std::ifstream> m_file;
-    int64_t m_value = -1;
-
-    bool reset();
-    bool processFileLine();
-    bool rssFound() const;
-    void parseLine(const std::string& line);
-
-    static std::string toLower(const std::string& line);
-};
-
-int64_t ProcessRamUsageFetcher::get()
-{
-    if (!reset())
-        return -1;
-
-    while (processFileLine() && !rssFound())
-        ;
-
-    return m_value;
-}
-
-bool ProcessRamUsageFetcher::reset()
-{
-    m_value = -1;
-    m_file.reset(new std::ifstream("/proc/self/status"));
-    if (!m_file || !m_file->is_open())
-        return false;
-
-    return true;
-}
-
-bool ProcessRamUsageFetcher::processFileLine()
-{
-    if (m_file->fail() || m_file->eof())
-        return false;
-
-    std::string line;
-    if (!std::getline(*m_file, line))
-        return false;
-
-    parseLine(toLower(line));
-    return true;
-}
-
-std::string ProcessRamUsageFetcher::toLower(const std::string& line)
-{
-    std::string result;
-    std::transform(
-        line.cbegin(),
-        line.cend(),
-        std::back_inserter(result),
-        [](char c)
-    {
-        return std::tolower(c);
-    });
-
-    return result;
-}
-
-void ProcessRamUsageFetcher::parseLine(const std::string& line)
-{
-    if (line.find("vmrss") == std::string::npos)
-        return;
-
-    std::stringstream parseStream(line);
-    std::string name;
-    std::string measure;
-
-    parseStream >> name >> m_value >> measure;
-    if (m_value == -1)
-        return;
-
-    if (measure == "kb")
-        m_value *= 1024;
-
-    if (measure == "mb")
-        m_value *= 1024 * 1024;
-}
-
-bool ProcessRamUsageFetcher::rssFound() const
-{
-    return m_value != -1;
-}
-
-static int64_t processMemoryUsed()
-{
-    return ProcessRamUsageFetcher().get();
-}
-//-------------------------------------------------------------------------------------------------
-
-// Test class --------------------------------------------------------------------------------------
-class CyclicAllocator: public ::testing::Test
+class CyclicAllocator:
+    public ::testing::Test
 {
 protected:
-    virtual void TearDown() override;
+    virtual void TearDown() override
+    {
+        m_allocatorUser.reset();
+    }
 
-    void givenAllocatorUserWithDefaultSettings();
-    void whenAllocatorWorksForSomeTime();
-    void thenMemoryConsumedShouldHaveNotConsiderablyGrown();
+    void givenAllocatorUserWithDefaultSettings()
+    {
+        m_allocatorUser = std::make_unique<CyclicAllocatorUser>(
+            CyclicAllocatorUserSettings(), &m_allocator);
+    }
+
+    void whenAllocatorWorksForSomeTime()
+    {
+        m_allocatorUser->start();
+        m_allocatorUser->waitUntilMaxMemoryIsAllocated();
+
+        workAndMeasure(&m_firstMemoryProbe);
+        workAndMeasure(&m_secondMemoryProbe);
+    }
+
+    void thenAllocatorMemoryUsageStaysConstant()
+    {
+        ASSERT_EQ(m_firstMemoryProbe, m_secondMemoryProbe);
+    }
 
 private:
-    int64_t m_firstMemoryProbe;
-    int64_t m_secondMemoryProbe;
+    int64_t m_firstMemoryProbe = 0;
+    int64_t m_secondMemoryProbe = 0;
+    ::CyclicAllocator m_allocator;
     std::unique_ptr<CyclicAllocatorUser> m_allocatorUser;
 
-    void workAndMeasure(int64_t* outValue);
+    void workAndMeasure(int64_t* outValue)
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        *outValue = m_allocator.totalBytesAllocated();
+        ASSERT_NE(-1, *outValue);
+    }
 };
 
-void CyclicAllocator::TearDown()
-{
-    m_allocatorUser.reset();
-}
-
-void CyclicAllocator::givenAllocatorUserWithDefaultSettings()
-{
-    m_allocatorUser.reset(new CyclicAllocatorUser(CyclicAllocatorUserSettings()));
-}
-
-void CyclicAllocator::whenAllocatorWorksForSomeTime()
-{
-    m_allocatorUser->start();
-    workAndMeasure(&m_firstMemoryProbe);
-    workAndMeasure(&m_secondMemoryProbe);
-}
-
-void CyclicAllocator::workAndMeasure(int64_t* outValue)
-{
-    std::this_thread::sleep_for(std::chrono::seconds(4));
-    *outValue = processMemoryUsed();
-    ASSERT_NE(-1, *outValue);
-}
-
-void CyclicAllocator::thenMemoryConsumedShouldHaveNotConsiderablyGrown()
-{
-    ASSERT_LT(std::abs(m_secondMemoryProbe - m_firstMemoryProbe), 100 * 1024);
-}
 //-------------------------------------------------------------------------------------------------
 
-#if defined (Q_OS_LINUX)
-
-TEST_F(CyclicAllocator, ConstantMemoryConsuming)
+TEST_F(CyclicAllocator, constant_memory_consumption)
 {
     givenAllocatorUserWithDefaultSettings();
     whenAllocatorWorksForSomeTime();
-    thenMemoryConsumedShouldHaveNotConsiderablyGrown();
+    thenAllocatorMemoryUsageStaysConstant();
 }
 
-#endif
-
-} // namespace test
-} // namespace memory
-} // namespace utils
-} // namespace nx
-
-#endif
+} // namespace nx::utils::memory::test

@@ -27,6 +27,11 @@ public:
     virtual void* alloc(size_t size) override;
     virtual void release(void* ptr) override;
 
+    /**
+     * @return Sum of sizes of all arenas. That is total amount of bytes allocated in the heap.
+     */
+    std::size_t totalBytesAllocated() const;
+
 private:
     class Arena
     {
@@ -37,6 +42,9 @@ private:
 
         Arena(size_t size);
         ~Arena();
+
+        Arena(const Arena&) = delete;
+        Arena& operator=(const Arena&) = delete;
     };
 
     class Position
@@ -51,10 +59,11 @@ private:
         bool operator!=(const Position& right) const;
     };
 
-    std::mutex m_mutex;
+    mutable std::mutex m_mutex;
     Position m_leftMostAllocatedBlock;
     Position m_freeMemStart;
     size_t m_arenaSize;
+    size_t m_totalAllocatedBytes = 0;
 
     size_t m_allocatedBlockCount;
 

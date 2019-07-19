@@ -1,6 +1,7 @@
 #include "cyclic_allocator.h"
 
 #include <memory>
+#include <atomic>
 #include <nx/utils/log/assert.h>
 
 #ifdef CA_DEBUG
@@ -219,6 +220,12 @@ void CyclicAllocator::release(void* ptr)
     --m_allocatedBlockCount;
 }
 
+std::size_t CyclicAllocator::totalBytesAllocated() const
+{
+    std::unique_lock<std::mutex> lk(m_mutex);
+    return m_totalAllocatedBytes;
+}
+
 size_t CyclicAllocator::calcCurrentArenaBytesAvailable() const
 {
     if (!m_freeMemStart.arena)
@@ -247,6 +254,9 @@ bool CyclicAllocator::allocateNewArenaBeforeCurrent(size_t spaceRequired, Arena*
     std::unique_ptr<Arena> newArena(new Arena(newArenaSize));
     if (!newArena->mem)
         return false;
+
+    m_totalAllocatedBytes += newArena->size;
+
     if (m_arenaSize < newArenaSize)
         m_arenaSize = newArenaSize; //updating arena size only in case of successfull arena allocation
     if (prevArena)
