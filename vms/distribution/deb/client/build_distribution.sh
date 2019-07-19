@@ -287,9 +287,13 @@ createUpdateZip()
     mkdir -p "$STAGE_UPDATE_ICONS"
     cp "$STAGE_ICONS/hicolor/scalable/apps"/* "$STAGE_UPDATE_ICONS/"
 
-    echo "  Copying update.json for \"update\" .zip"
+    local -r FREE_SPACE_REQUIRED=$(du -bs "$STAGE_MODULE" |awk '{print $1}')
+
+    echo "  Copying update.json and package.json for \"update\" .zip"
     cp "update/update.json" "$STAGE_MODULE/"
-    cp "package.json" "$STAGE_MODULE/"
+
+    sed "s/\"freeSpaceRequired\": 0/\"freeSpaceRequired\": $FREE_SPACE_REQUIRED/" \
+        "package.json" >"$STAGE_MODULE/package.json"
 
     distrib_createArchive "$DISTRIBUTION_OUTPUT_DIR/$UPDATE_ZIP" "$STAGE_MODULE" \
         zip -r `# Preserve symlinks #`-y

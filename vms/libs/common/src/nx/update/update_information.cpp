@@ -41,9 +41,12 @@ QString toString(InformationError error)
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (Variant)(Package)(Information)(PackageInformation),
+    (Variant)(Package)(Information),
     (ubjson)(json)(datastream)(eq),
     _Fields)
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
+    (PackageInformation), (json)(datastream), _Fields)
 
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(nx::update::Status, Code)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(nx::update::Status, ErrorCode)

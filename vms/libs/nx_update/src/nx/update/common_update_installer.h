@@ -38,6 +38,9 @@ public:
     State state() const;
 
     bool checkFreeSpace(const QString& path, qint64 bytes) const;
+    bool checkFreeSpaceForInstallation() const;
+
+    qint64 reservedSpacePadding() const;
 
     virtual QString dataDirectoryPath() const = 0;
     virtual QString component() const = 0;
@@ -49,6 +52,8 @@ private:
     QnWaitCondition m_condition;
     mutable QString m_version;
     mutable QString m_executable;
+    qint64 m_bytesExtracted = 0;
+    mutable qint64 m_freeSpaceRequiredToUpdate;
     mutable CommonUpdateInstaller::State m_state = CommonUpdateInstaller::State::idle;
 
     virtual bool initializeUpdateLog(const QString& targetVersion, QString* logFileName) const = 0;
