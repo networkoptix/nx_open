@@ -82,6 +82,8 @@ private:
     ObjectTrackMatchResult toObjectTrackMatchResult(
         const ArchiveFilter& filter,
         TrackGroups trackGroups);
+
+    void copyAllDeviceIds(std::vector<QnUuid>* deviceIds);
 };
 
 } // namespace nx::analytics::db
