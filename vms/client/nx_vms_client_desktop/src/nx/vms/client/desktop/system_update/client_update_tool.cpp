@@ -117,21 +117,21 @@ void ClientUpdateTool::setState(State newState)
     m_state = newState;
     m_stateChanged = true;
     m_lastError = QString();
-    emit updateStateChanged((int)m_state, 0);
+    emit updateStateChanged((int)m_state, 0, {});
 }
 
 void ClientUpdateTool::setError(const QString& error)
 {
     m_state = State::error;
     m_lastError = error;
-    emit updateStateChanged((int)m_state, 0);
+    emit updateStateChanged((int)m_state, 0, error);
 }
 
 void ClientUpdateTool::setApplauncherError(const QString& error)
 {
     m_state = State::applauncherError;
     m_lastError = error;
-    emit updateStateChanged((int)m_state, 0);
+    emit updateStateChanged((int)m_state, 0, error);
 }
 
 QString ClientUpdateTool::getErrorText() const
@@ -139,48 +139,59 @@ QString ClientUpdateTool::getErrorText() const
     return m_lastError;
 }
 
-std::future<nx::update::UpdateContents> ClientUpdateTool::requestRemoteUpdateInfo()
+std::future<nx::update::UpdateContents> ClientUpdateTool::requestInstalledUpdateInfo()
 {
-    m_remoteUpdateInfoRequest = std::promise<UpdateContents>();
-
-    if (m_serverConnection)
+    if (!m_serverConnection)
     {
-        // Requesting remote update info.
-        // NOTE: This can be a 3.2 system, so we can fail this step completely.
-        m_serverConnection->getInstalledUpdateInfo(
-            [this, tool=QPointer<ClientUpdateTool>(this)](
-                bool success, rest::Handle /*handle*/, rest::UpdateInformationData response)
+        NX_WARNING(this, "requestInstalledUpdateInfo() - have no connection to the server");
+        std::promise<UpdateContents> promise;
+        promise.set_value(UpdateContents());
+        return promise.get_future();
+    }
+
+    auto promise = std::make_shared<std::promise<UpdateContents>>();
+    // Requesting remote update info.
+    // NOTE: This can be a 3.2 system, so we can fail this step completely.
+    m_serverConnection->getInstalledUpdateInfo(
+        [promise](bool success, rest::Handle /*handle*/, rest::UpdateInformationData response)
+        {
+            nx::update::InformationError error = nx::update::InformationError::noError;
+            if (!success || response.error != QnRestResult::NoError)
             {
-                nx::update::InformationError error = nx::update::InformationError::noError;
-                if (!success || response.error != QnRestResult::NoError)
-                {
-                    NX_DEBUG(
-                        this,
-                        lm("requestRemoteUpdateInfo: Error in response for /updateInformation request: %1")
-                            .args(response.errorString));
-                    if (!QnLexical::deserialize(response.errorString, &error))
-                        error = nx::update::InformationError::httpError;
-                }
+                NX_DEBUG(typeid(UpdateContents),
+                    "requestInstalledUpdateInfo() - Error in response for /updateInformation request: %1",
+                    response.errorString);
+                if (!QnLexical::deserialize(response.errorString, &error))
+                    error = nx::update::InformationError::httpError;
+            }
 
-                if (tool)
-                {
-                    UpdateContents contents;
-                    contents.sourceType = nx::update::UpdateSourceType::mediaservers;
-                    contents.source = "mediaserver";
-                    contents.info = response.data;
-                    contents.error = error;
-                    tool->m_remoteUpdateInfoRequest.set_value(contents);
-                }
-            }, thread());
-    }
-    else
-    {
-        NX_WARNING(this) << "requestRemoteUpdateInfo() - have no connection to the server";
+            UpdateContents contents;
+            contents.sourceType = nx::update::UpdateSourceType::mediaservers;
+            contents.source = "mediaserver";
+            contents.info = response.data;
+            contents.error = error;
+            promise->set_value(contents);
+        });
+    return promise->get_future();
+}
 
-        m_remoteUpdateInfoRequest.set_value(UpdateContents());
-        return m_remoteUpdateInfoRequest.get_future();
-    }
-    return m_remoteUpdateInfoRequest.get_future();
+std::future<nx::update::UpdateContents> ClientUpdateTool::requestInternetUpdateInfo(
+    const QString& updateUrl,
+    const QString& changeset)
+{
+    auto engineVersion = commonModule()->engineVersion();
+
+    if (!m_serverConnection)
+        NX_WARNING(this, "requestInternetUpdateInfo() - have no connection to the server");
+
+    return std::async(
+        [updateUrl, connection = m_serverConnection, engineVersion, changeset]()
+        {
+            auto contents = nx::update::checkSpecificChangesetProxied(
+                connection, engineVersion, updateUrl, changeset);
+            contents.sourceType = nx::update::UpdateSourceType::internetSpecific;
+            return contents;
+        });
 }
 
 void ClientUpdateTool::setServerUrl(const nx::utils::Url& serverUrl, const QnUuid& serverId)
@@ -190,7 +201,7 @@ void ClientUpdateTool::setServerUrl(const nx::utils::Url& serverUrl, const QnUui
     m_proxyPeerManager->setServerDirectConnection(serverId, m_serverConnection);
 }
 
-std::set<nx::utils::SoftwareVersion> ClientUpdateTool::getInstalledVersions(
+std::set<nx::utils::SoftwareVersion> ClientUpdateTool::getInstalledClientVersions(
     bool includeCurrentVersion) const
 {
     if (m_installedVersionsFuture.valid())
@@ -206,7 +217,7 @@ std::set<nx::utils::SoftwareVersion> ClientUpdateTool::getInstalledVersions(
 
 bool ClientUpdateTool::isVersionInstalled(const nx::utils::SoftwareVersion& version) const
 {
-    auto versions = getInstalledVersions(/*includeCurrentVersion=*/true);
+    auto versions = getInstalledClientVersions(/*includeCurrentVersion=*/true);
     return versions.count(version) != 0;
 }
 
@@ -216,7 +227,7 @@ bool ClientUpdateTool::shouldInstallThis(const UpdateContents& contents) const
         return false;
 
     auto version = contents.getVersion();
-    auto installedVersions = getInstalledVersions(true);
+    auto installedVersions = getInstalledClientVersions(true);
 
     return installedVersions.count(version) == 0;
 }
@@ -330,7 +341,7 @@ void ClientUpdateTool::atDownloaderStatusChanged(const FileInformation& fileInfo
             break;
         case FileInformation::Status::downloading:
             emit updateStateChanged(int(State::downloading),
-                fileInformation.calculateDownloadProgress());
+                fileInformation.calculateDownloadProgress(), {});
             break;
         default:
             // Nothing to do here
@@ -528,7 +539,7 @@ bool ClientUpdateTool::installUpdateAsync()
                         break;
 
                     int percent = progress.total != 0 ? 100 * progress.extracted / progress.total : 0;
-                    emit tool->updateStateChanged(tool->m_state, percent);
+                    emit tool->updateStateChanged(tool->m_state, percent, {});
                     std::this_thread::sleep_for(std::chrono::seconds(2));
                 }
                 if (stopInstallationAttempts)

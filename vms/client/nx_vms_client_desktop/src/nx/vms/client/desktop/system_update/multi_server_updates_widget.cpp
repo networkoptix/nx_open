@@ -208,7 +208,7 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
         this, &MultiServerUpdatesWidget::atServerPackageDownloadFailed);
 
     connect(m_clientUpdateTool.get(), &ClientUpdateTool::updateStateChanged,
-        m_stateTracker.get(), &PeerStateTracker::atClientupdateStateChanged);
+        m_stateTracker.get(), &PeerStateTracker::atClientUpdateStateChanged);
 
     connect(ui->cancelProgressAction, &QPushButton::clicked, this,
         &MultiServerUpdatesWidget::atCancelCurrentAction);
@@ -754,7 +754,7 @@ void MultiServerUpdatesWidget::atUpdateCurrentState()
         }
 
         m_serverUpdateTool->verifyUpdateManifest(checkResponse,
-            m_clientUpdateTool->getInstalledVersions());
+            m_clientUpdateTool->getInstalledClientVersions());
         if (!hasActiveUpdate())
         {
             if (m_updateInfo.preferOtherUpdate(checkResponse))
@@ -892,7 +892,7 @@ void MultiServerUpdatesWidget::checkForInternetUpdates(bool initial)
         // info, if there is any.
         auto watcher = context()->instance<nx::vms::client::desktop::WorkbenchUpdateWatcher>();
         auto contents = watcher->getUpdateContents();
-        auto installedVersions = m_clientUpdateTool->getInstalledVersions();
+        auto installedVersions = m_clientUpdateTool->getInstalledClientVersions();
         if (!contents.isEmpty()
             && m_serverUpdateTool->verifyUpdateManifest(contents, installedVersions))
         {
@@ -1255,6 +1255,8 @@ void MultiServerUpdatesWidget::atFinishUpdateComplete(bool success, const QStrin
         else
         {
             NX_ERROR(this, "atFinishUpdateComplete(%1) - %2", success, error);
+            auto targets = m_stateTracker->peersIssued();
+            setTargetState(WidgetUpdateState::installingStalled, targets);
         }
     }
 }
@@ -1264,7 +1266,7 @@ void MultiServerUpdatesWidget::repeatUpdateValidation()
     if (!m_updateInfo.isEmpty())
     {
         NX_INFO(this, "repeatUpdateValidation() - recalculating update report");
-        auto installedVersions = m_clientUpdateTool->getInstalledVersions();
+        auto installedVersions = m_clientUpdateTool->getInstalledClientVersions();
         if (m_updateInfo.error != nx::update::InformationError::httpError
             || m_updateInfo.error != nx::update::InformationError::networkError)
         {
@@ -1501,7 +1503,7 @@ void MultiServerUpdatesWidget::processInitialCheckState()
          *  It should download an update package using p2p downloader
          */
 
-        auto installedVersions = m_clientUpdateTool->getInstalledVersions();
+        auto installedVersions = m_clientUpdateTool->getInstalledClientVersions();
         bool isOk = m_serverUpdateTool->verifyUpdateManifest(updateInfo, installedVersions);
 
         if (updateInfo.isEmpty())
