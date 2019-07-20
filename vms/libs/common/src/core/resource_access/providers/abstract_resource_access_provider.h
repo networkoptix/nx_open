@@ -26,6 +26,8 @@ public:
     virtual bool hasAccess(const QnResourceAccessSubject& subject,
         const QnResourcePtr& resource) const = 0;
 
+    virtual QSet<QnUuid> accessibleResources(const QnResourceAccessSubject& subject) const = 0;
+
     /**
     * Check the way how the resource is accessible to the subject.
     *

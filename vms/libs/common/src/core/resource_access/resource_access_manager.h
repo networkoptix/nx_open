@@ -161,23 +161,40 @@ private:
     void handleResourceRemoved(const QnResourcePtr& resource);
     void handleSubjectRemoved(const QnResourceAccessSubject& subject);
 
-    Qn::Permissions calculatePermissions(const QnResourceAccessSubject& subject,
-        const QnResourcePtr& target) const;
+    Qn::Permissions calculatePermissions(
+        const QnResourceAccessSubject& subject,
+        const QnResourcePtr& target,
+        GlobalPermissions* globalPermissionsHint = nullptr,
+        bool* hasAccessToResourceHint = nullptr) const;
 
     Qn::Permissions calculatePermissionsInternal(const QnResourceAccessSubject& subject,
-        const QnVirtualCameraResourcePtr& camera) const;
+        const QnVirtualCameraResourcePtr& camera,
+        GlobalPermissions globalPermissions,
+        bool hasAccessToResource) const;
     Qn::Permissions calculatePermissionsInternal(const QnResourceAccessSubject& subject,
-        const QnMediaServerResourcePtr& server) const;
+        const QnMediaServerResourcePtr& server,
+        GlobalPermissions globalPermissions,
+        bool hasAccessToResource) const;
     Qn::Permissions calculatePermissionsInternal(const QnResourceAccessSubject& subject,
-        const QnStorageResourcePtr& storage) const;
+        const QnStorageResourcePtr& storage,
+        GlobalPermissions globalPermissions,
+        bool hasAccessToResource) const;
     Qn::Permissions calculatePermissionsInternal(const QnResourceAccessSubject& subject,
-        const QnVideoWallResourcePtr& videoWall) const;
+        const QnVideoWallResourcePtr& videoWall,
+        GlobalPermissions globalPermissions,
+        bool hasAccessToResource) const;
     Qn::Permissions calculatePermissionsInternal(const QnResourceAccessSubject& subject,
-        const QnWebPageResourcePtr& webPage) const;
+        const QnWebPageResourcePtr& webPage,
+        GlobalPermissions globalPermissions,
+        bool hasAccessToResource) const;
     Qn::Permissions calculatePermissionsInternal(const QnResourceAccessSubject& subject,
-        const QnLayoutResourcePtr& layout) const;
+        const QnLayoutResourcePtr& layout,
+        GlobalPermissions globalPermissions,
+        bool hasAccessToResource) const;
     Qn::Permissions calculatePermissionsInternal(const QnResourceAccessSubject& subject,
-        const QnUserResourcePtr& targetUser) const;
+        const QnUserResourcePtr& targetUser,
+        GlobalPermissions globalPermissions,
+        bool hasAccessToResource) const;
 
     void setPermissionsInternal(const QnResourceAccessSubject& subject,
         const QnResourcePtr& resource, Qn::Permissions permissions);

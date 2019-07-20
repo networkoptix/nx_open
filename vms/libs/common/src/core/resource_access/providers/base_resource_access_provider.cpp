@@ -52,10 +52,15 @@ bool QnBaseResourceAccessProvider::hasAccess(const QnResourceAccessSubject& subj
      * * access provider checks 'has access' to this user itself
      */
     QnMutexLocker lk(&m_mutex);
-    if (!m_accessibleResources.contains(subject.id()))
-        return false;
 
-    return m_accessibleResources[subject.id()].contains(resource->getId());
+    const auto iterator = m_accessibleResources.find(subject.id());
+    return iterator == m_accessibleResources.end() ? false : iterator->contains(resource->getId());
+}
+
+QSet<QnUuid> QnBaseResourceAccessProvider::accessibleResources(const QnResourceAccessSubject& subject) const
+{
+    QnMutexLocker lk(&m_mutex);
+    return m_accessibleResources.value(subject.id());
 }
 
 Source QnBaseResourceAccessProvider::accessibleVia(
@@ -86,7 +91,7 @@ void QnBaseResourceAccessProvider::afterUpdate()
     if (mode() == Mode::direct)
         return;
 
-    auto resources = commonModule()->resourcePool()->getResources();
+    const auto& resources = commonModule()->resourcePool()->getResources();
     const auto& subjects = resourceAccessSubjectsCache()->allSubjects();
 
     QnMutexLocker lk(&m_mutex);

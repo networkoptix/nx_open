@@ -29,6 +29,14 @@ bool QnResourceAccessProvider::hasAccess(const QnResourceAccessSubject& subject,
         });
 }
 
+QSet<QnUuid> QnResourceAccessProvider::accessibleResources(const QnResourceAccessSubject& subject) const
+{
+    QSet<QnUuid> result;
+    for (const auto& provider: m_providers)
+        result += provider->accessibleResources(subject);
+    return result;
+}
+
 Source QnResourceAccessProvider::accessibleVia(
     const QnResourceAccessSubject& subject,
     const QnResourcePtr& resource,
