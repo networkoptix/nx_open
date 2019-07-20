@@ -170,6 +170,11 @@ FileInformation Downloader::fileInformation(const QString& fileName) const
 
 ResultCode Downloader::addFile(const FileInformation& fileInformation)
 {
+    static int timesCalled = 0;
+    qDebug() << "Downloader::addFile called" << timesCalled;
+    if (timesCalled++ == 0)
+        return ResultCode::noFreeSpace;
+
     return d->storage->addFile(fileInformation);
 }
 

@@ -112,9 +112,14 @@ int QnUpdateInformationRestHandler::checkInternetForUpdate(
     QByteArray* contentType,
     const UpdateInformationRequestData& request) const
 {
+    NX_DEBUG(this, "Checking the Internet for the update information...");
     nx::update::InformationError error;
     auto information = nx::update::updateInformation(m_settings->checkForUpdateUrl(),
         m_engineVersion, publicationKey, &error);
+
+    NX_DEBUG(
+        this, "Checking the Internet for the update information. Done. Success: %1",
+        error == nx::update::InformationError::noError);
 
     if (error == nx::update::InformationError::noError)
     {
