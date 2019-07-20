@@ -240,6 +240,8 @@ int QnUpdateInformationRestHandler::executeGet(
     const auto request = QnMultiserverRequestData::fromParams<UpdateInformationRequestData>(
         processor->resourcePool(), params);
 
+    NX_DEBUG(this, "Received /ec2/updateInformation request. IsLocal = %1", request.isLocal);
+
     QnMultiserverRequestContext<UpdateInformationRequestData> context(
         request, processor->owner()->getPort());
 
