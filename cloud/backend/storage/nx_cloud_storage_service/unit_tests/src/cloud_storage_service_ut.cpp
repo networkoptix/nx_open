@@ -21,7 +21,6 @@ protected:
     {
         m_cloudStorage->addArg("-http/tcpBacklogSize", "130");
         m_cloudStorage->addArg("-http/connectionInactivityPeriod", "1h");
-        m_cloudStorage->addArg("-http/endpoints", "127.0.0.1:0");
         m_cloudStorage->addArg("-http/sslEndpoints", "127.0.0.1:0");
         m_htdigestPath = (testDataDir() + "/htdigest.txt").toStdString();
         m_cloudStorage->addArg("-http/htdigestPath", m_htdigestPath.c_str());

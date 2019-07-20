@@ -5,9 +5,9 @@
 
 namespace nx::cloud::storage::service {
 
-View::View(const Settings& settings, Controller& /*controller*/):
+View::View(const Settings& settings, Controller* controller):
     /*m_settings(settings),*/
-    m_httpServer(settings)
+    m_httpServer(settings, controller)
 {
 }
 
@@ -33,12 +33,12 @@ void View::stop()
     NX_INFO(this, "View stopped");
 }
 
-HttpServer& View::httpServer()
+http::Server& View::httpServer()
 {
     return m_httpServer;
 }
 
-const HttpServer& View::httpServer() const
+const http::Server& View::httpServer() const
 {
     return m_httpServer;
 }

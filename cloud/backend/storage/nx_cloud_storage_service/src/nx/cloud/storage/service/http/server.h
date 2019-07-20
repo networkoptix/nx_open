@@ -6,12 +6,16 @@
 
 namespace nx::cloud::storage::service {
 
+class AbstractStorageManager;
+class Controller;
 class Settings;
 
-class HttpServer
+namespace http {
+
+class Server
 {
 public:
-    HttpServer(const Settings& settings);
+    Server(const Settings& settings, Controller* controller);
 
     network::http::server::MultiEndpointAcceptor& server();
     network::http::server::rest::MessageDispatcher& messageDispatcher();
@@ -28,9 +32,12 @@ private:
 
 private:
     const Settings& m_settings;
+    AbstractStorageManager* m_storageManager = nullptr;
+
     network::http::server::rest::MessageDispatcher m_messageDispatcher;
     network::http::server::AuthenticationDispatcher m_authenticationDispatcher;
     network::http::server::MultiEndpointAcceptor m_multiAddressServer;
 };
 
+} // namespace http
 } // namespace nx::cloud::storage::service

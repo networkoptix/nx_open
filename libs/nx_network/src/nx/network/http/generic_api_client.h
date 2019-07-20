@@ -19,7 +19,7 @@ namespace nx::network::http {
  * - If ResultCode is different from nx::network::http::StatusCode, then following method MUST be
  * defined too:
  * <pre><code>
- * template<typename Output>
+ * template<typename... Output>
  * auto getResultCode(
  *     SystemError::ErrorCode systemErrorCode,
  *     const network::http::Response* response,
@@ -48,6 +48,13 @@ protected:
      */
     template<typename OutputData, typename CompletionHandler, typename... InputArgs>
     void makeAsyncCall(
+        const std::string& requestPath,
+        CompletionHandler completionHandler,
+        InputArgs... inputArgs);
+
+    template<typename OutputData, typename CompletionHandler, typename... InputArgs>
+    void makeAsyncCall(
+        const network::http::Method::ValueType& method,
         const std::string& requestPath,
         CompletionHandler completionHandler,
         InputArgs... inputArgs);
@@ -147,6 +154,27 @@ void GenericApiClient<ApiResultCodeDescriptor>::makeAsyncCall(
     request->execute(
         [this, request, handler = std::move(handler)](
             auto&&... args) mutable
+        {
+            this->processResponse(request, std::move(handler), std::move(args)...);
+        });
+}
+
+template<typename ApiResultCodeDescriptor>
+template<typename Output, typename CompletionHandler, typename ...InputArgs>
+inline void GenericApiClient<ApiResultCodeDescriptor>::makeAsyncCall(
+    const network::http::Method::ValueType& method,
+    const std::string& requestPath,
+    CompletionHandler handler,
+    InputArgs ...inputArgs)
+{
+    auto request = createHttpClient<Output>(
+        requestPath,
+        std::move(inputArgs)...);
+
+    request->execute(
+        method,
+        [this, request, handler = std::move(handler)](
+            auto&& ... args) mutable
         {
             this->processResponse(request, std::move(handler), std::move(args)...);
         });

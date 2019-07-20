@@ -39,7 +39,7 @@ int StorageService::serviceMain(const utils::AbstractServiceSettings& settings)
     Controller controller(storageSettings);
     m_controller = &controller;
 
-    View view(storageSettings, controller);
+    View view(storageSettings, m_controller);
     m_view = &view;
 
     view.listen();

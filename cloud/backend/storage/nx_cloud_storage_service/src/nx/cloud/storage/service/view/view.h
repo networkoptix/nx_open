@@ -1,6 +1,6 @@
 #pragma once
 
-#include "http_server.h"
+#include "../http/server.h"
 
 namespace nx::cloud::storage::service {
 
@@ -10,17 +10,17 @@ class Controller;
 class View
 {
 public:
-    View(const Settings& settings, Controller& controller);
+    View(const Settings& settings, Controller* controller);
 
     void listen();
     void stop();
 
-    HttpServer& httpServer();
-    const HttpServer& httpServer() const;
+    http::Server& httpServer();
+    const http::Server& httpServer() const;
 
 private:
     /*const Settings& m_settings;*/
-    HttpServer m_httpServer;
+    http::Server m_httpServer;
 };
 
 } // namespace nx::cloud::storage::service
