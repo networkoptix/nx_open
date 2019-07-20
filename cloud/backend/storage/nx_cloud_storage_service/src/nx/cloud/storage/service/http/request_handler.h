@@ -57,12 +57,12 @@ void RequestHandler<Input, Output, RestArgFetchers...>::processResponseInternal(
         network::http::FusionRequestResult error;
         error.setHttpStatusCode(toHttpStatusCode(result.resultCode));
         error.errorText = result.error.c_str();
-        return requestCompleted(std::move(error), std::move(output)...);
+        return this->requestCompleted(std::move(error), std::move(output)...);
     }
 
     // OK case, forcing invocation of requestCompleted overload with FusionRequestResult parameter
     // instead of http::StatusCode::Value, which is undefined if constructed by default
-    requestCompleted(network::http::FusionRequestResult(), std::move(output)...);
+    this->requestCompleted(network::http::FusionRequestResult(), std::move(output)...);
 }
 
 } // namespace nx::cloud::storage::service::http
