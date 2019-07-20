@@ -24,7 +24,7 @@ void StorageManager::readStorage(
 }
 
 void StorageManager::removeStorage(
-    const std::string& storageId,
+    const std::string& /*storageId*/,
     nx::utils::MoveOnlyFunc<void(api::Result)> handler)
 {
     handler(api::Result{api::ResultCode::ok, "removeOk"});

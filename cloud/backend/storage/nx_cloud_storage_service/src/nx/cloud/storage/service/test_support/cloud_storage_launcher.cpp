@@ -1,5 +1,8 @@
 #include "cloud_storage_launcher.h"
 
+#include <nx/network/http/http_types.h>
+#include <nx/network/url/url_builder.h>
+
 namespace nx::cloud::storage::service::test {
 
 CloudStorageLauncher::CloudStorageLauncher()
@@ -9,7 +12,9 @@ CloudStorageLauncher::CloudStorageLauncher()
 
 nx::utils::Url CloudStorageLauncher::httpUrl() const
 {
-    return lm("http://%1").arg(moduleInstance()->httpEndpoints().front());
+    return network::url::Builder()
+        .setScheme(network::http::kUrlSchemeName)
+        .setEndpoint(moduleInstance()->httpEndpoints().front());
 }
 
 } // namespace nx::cloud::storage::service::test

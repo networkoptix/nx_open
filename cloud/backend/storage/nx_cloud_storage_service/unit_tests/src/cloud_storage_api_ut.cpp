@@ -14,13 +14,13 @@ class StorageManagerStub: public AbstractStorageManager
 {
 public:
     void addStorage(
-        const api::AddStorageRequest & request,
+        const api::AddStorageRequest& request,
         nx::utils::MoveOnlyFunc<void(api::Result, api::AddStorageResponse)> handler) override
     {
         api::AddStorageResponse response;
         response.totalSpace = request.size;
         response.freeSpace = request.size;
-        handler(api::Result{api::ResultCode::ok}, std::move(response));
+        handler(api::Result{api::ResultCode::ok, {}}, std::move(response));
     }
 
     void readStorage(
@@ -29,14 +29,14 @@ public:
     {
         api::ReadStorageResponse response;
         response.id = storageId;
-        handler(api::Result{api::ResultCode::ok}, std::move(response));
+        handler(api::Result{api::ResultCode::ok, {}}, std::move(response));
     }
 
     void removeStorage(
-        const std::string& storageId,
+        const std::string& /*storageId*/,
         nx::utils::MoveOnlyFunc<void(api::Result)> handler) override
     {
-        handler(api::Result{api::ResultCode::ok});
+        handler(api::Result{api::ResultCode::ok, {}});
     }
 };
 
