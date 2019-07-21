@@ -32,6 +32,10 @@ public:
 signals:
     void dataDropped(QnArchiveStreamReader* reader);
 
+protected slots:
+    virtual void resetCachedValues() override;
 protected:
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
+private:
+    CachedValue<Qn::ResourceFlags> m_cachedFlags;
 };
