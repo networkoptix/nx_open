@@ -279,7 +279,7 @@ private:
     };
 
     /** Resource pool this resource belongs to. */
-    QnResourcePool* m_resourcePool = nullptr;
+    std::atomic<QnResourcePool*> m_resourcePool{};
 
     /** Identifier of this resource. */
     QnUuid m_id;

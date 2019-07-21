@@ -37,7 +37,7 @@ QnResource::QnResource(const QnResource& right):
     m_parentId(right.m_parentId),
     m_name(right.m_name),
     m_url(right.m_url),
-    m_resourcePool(right.m_resourcePool),
+    m_resourcePool(right.m_resourcePool.load()),
     m_id(right.m_id),
     m_typeId(right.m_typeId),
     m_flags(right.m_flags),
@@ -58,14 +58,11 @@ QnResource::~QnResource()
 
 QnResourcePool *QnResource::resourcePool() const
 {
-    QnMutexLocker mutexLocker(&m_mutex);
-
     return m_resourcePool;
 }
 
 void QnResource::setResourcePool(QnResourcePool *resourcePool)
 {
-    QnMutexLocker mutexLocker(&m_mutex);
     m_resourcePool = resourcePool;
 }
 
