@@ -9,6 +9,7 @@
 
 #include <core/resource/user_resource.h>
 #include <common/common_module.h>
+#include <core/resource_access/global_permissions_manager.h>
 
 using namespace nx::core::access;
 
@@ -43,7 +44,8 @@ bool QnBaseResourceAccessProvider::hasAccess(const QnResourceAccessSubject& subj
         return false;
 
     if (mode() == Mode::direct)
-        return isSubjectEnabled(subject) && calculateAccess(subject, resource);
+        return isSubjectEnabled(subject) && calculateAccess(subject, resource, 
+            globalPermissionsManager()->globalPermissions(subject));
 
     /* We can get cache miss in the following scenario:
      * * new user was added
@@ -99,11 +101,11 @@ void QnBaseResourceAccessProvider::afterUpdate()
     {
         if (!isSubjectEnabled(subject))
             continue;
-
+        const auto globalPermissions = globalPermissionsManager()->globalPermissions(subject);
         auto& accessible = m_accessibleResources[subject.id()];
         for (const auto& resource: resources)
         {
-            if (calculateAccess(subject, resource))
+            if (calculateAccess(subject, resource, globalPermissions))
                 accessible.insert(resource->getId());
         }
     }
@@ -166,7 +168,8 @@ void QnBaseResourceAccessProvider::updateAccess(const QnResourceAccessSubject& s
         auto targetId = resource->getId();
 
         bool oldValue = accessible.contains(targetId);
-        newValue = isSubjectEnabled(subject) && calculateAccess(subject, resource);
+        newValue = isSubjectEnabled(subject) && calculateAccess(
+            subject, resource, globalPermissionsManager()->globalPermissions(subject));
         if (oldValue == newValue)
             return;
 

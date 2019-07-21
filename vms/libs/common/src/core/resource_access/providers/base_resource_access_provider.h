@@ -35,7 +35,8 @@ protected:
     virtual Source baseSource() const = 0;
 
     virtual bool calculateAccess(const QnResourceAccessSubject& subject,
-        const QnResourcePtr& resource) const = 0;
+        const QnResourcePtr& resource,
+        nx::vms::api::GlobalPermissions globalPermissions) const = 0;
 
     bool acceptable(const QnResourceAccessSubject& subject,
         const QnResourcePtr& resource) const;

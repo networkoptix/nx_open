@@ -34,7 +34,8 @@ Source QnSharedResourceAccessProvider::baseSource() const
 }
 
 bool QnSharedResourceAccessProvider::calculateAccess(const QnResourceAccessSubject& subject,
-    const QnResourcePtr& resource) const
+    const QnResourcePtr& resource,
+    GlobalPermissions globalPermissions) const
 {
     NX_ASSERT(acceptable(subject, resource));
     if (!acceptable(subject, resource))

@@ -44,7 +44,8 @@ Source QnPermissionsResourceAccessProvider::baseSource() const
 }
 
 bool QnPermissionsResourceAccessProvider::calculateAccess(const QnResourceAccessSubject& subject,
-    const QnResourcePtr& resource) const
+    const QnResourcePtr& resource,
+    GlobalPermissions globalPermissions) const
 {
     NX_ASSERT(acceptable(subject, resource));
     if (!acceptable(subject, resource))
@@ -64,7 +65,7 @@ bool QnPermissionsResourceAccessProvider::calculateAccess(const QnResourceAccess
     else if (isLayout(resource) && subject.user() && resource->getParentId() == subject.id())
         requiredPermission = {};
 
-    return globalPermissionsManager()->hasGlobalPermission(subject, requiredPermission);
+    return globalPermissions.testFlag(requiredPermission);
 }
 
 void QnPermissionsResourceAccessProvider::handleResourceAdded(const QnResourcePtr& resource)
