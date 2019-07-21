@@ -148,7 +148,7 @@ GlobalPermissions QnGlobalPermissionsManager::calculateGlobalPermissions(
     else
     {
         /* If the group does not exist, permissions will be empty. */
-        result = subject.role().permissions;
+        result = subject.rolePermissions();
 
         /* If user belongs to group, he cannot be an admin - by design. */
         result &= ~GlobalPermissions(GlobalPermission::admin);

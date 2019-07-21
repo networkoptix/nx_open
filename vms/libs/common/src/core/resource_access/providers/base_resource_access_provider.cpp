@@ -180,7 +180,7 @@ void QnBaseResourceAccessProvider::updateAccess(const QnResourceAccessSubject& s
 
     if (subject.isRole())
     {
-        for (const auto& dependent: resourceAccessSubjectsCache()->usersInRole(subject.role().id))
+        for (const auto& dependent: resourceAccessSubjectsCache()->usersInRole(subject.effectiveId()))
             updateAccess(dependent, resource);
     }
 }

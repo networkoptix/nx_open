@@ -93,7 +93,7 @@ void QnResourceAccessManager::setPermissionsInternal(const QnResourceAccessSubje
             if (subject.user())
                 return subject.user()->resourcePool() != nullptr;
 
-            return userRolesManager()->hasRole(subject.role().id);
+            return userRolesManager()->hasRole(subject.effectiveId());
         };
 
     PermissionKey key(subject.id(), resource->getId());
@@ -317,7 +317,7 @@ void QnResourceAccessManager::recalculateAllPermissions()
         {
             if (subject.user())
                 return !subject.user()->isEnabled() || subject.user()->resourcePool() == nullptr;
-            return !userRolesManager()->hasRole(subject.role().id);
+            return !userRolesManager()->hasRole(subject.effectiveId());
 
         });
 
