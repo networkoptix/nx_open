@@ -44,7 +44,7 @@ def determine_package_versions(
         "doxygen": "1.8.14",
         "gstreamer": "1.0",
         "icu": "60.2",
-        "deepstream": "0.1",
+        "deepstream": "0.2",
         "android-sdk": "28",
         "android-ndk": "r17",
         "help": customization + "-4.0",
