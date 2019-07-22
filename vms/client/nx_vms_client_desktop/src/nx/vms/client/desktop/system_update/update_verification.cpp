@@ -130,10 +130,10 @@ QString UpdateStrings::getReportForUnsupportedOs(const nx::utils::OsInfo& info)
 }
 
 bool verifyUpdateContents(
-    QnCommonModule* commonModule,
     nx::update::UpdateContents& contents,
     const std::map<QnUuid, QnMediaServerResourcePtr>& activeServers,
-    const ClientVerificationData& clientData)
+    const ClientVerificationData& clientData,
+    const VerificationOptions& options)
 {
     nx::update::Information& info = contents.info;
     if (contents.error != nx::update::InformationError::noError)
@@ -213,7 +213,7 @@ bool verifyUpdateContents(
 
     if (!clientData.clientId.isNull()
         && (clientData.currentVersion < targetVersion
-            || (clientData.currentVersion > targetVersion && clientData.compatibilityMode))
+            || (clientData.currentVersion > targetVersion && options.compatibilityMode))
         && clientData.installedVersions.find(targetVersion) == clientData.installedVersions.end())
     {
         contents.alreadyInstalled = false;
@@ -319,7 +319,7 @@ bool verifyUpdateContents(
             package->targets.insert(id);
 
             auto hasInternet = server->getServerFlags().testFlag(nx::vms::api::SF_HasPublicIP);
-            if (!hasInternet)
+            if (!hasInternet || options.downloadAllPackages)
                 manualPackages.insert(package);
         }
     }
@@ -332,10 +332,10 @@ bool verifyUpdateContents(
     else
         contents.ignorePeers = serversWithNewerVersion;
 
-    if (commonModule)
+    if (options.commonModule)
     {
         contents.cloudIsCompatible = checkCloudHost(
-            commonModule, targetVersion, contents.info.cloudHost, allServers);
+            options.commonModule, targetVersion, contents.info.cloudHost, allServers);
     }
 
     for (auto id: contents.unsuportedSystemsReport.keys())

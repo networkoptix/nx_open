@@ -171,6 +171,7 @@ TEST_F(UpdateVerificationTest, testAlreadyInstalled)
     ASSERT_FALSE(contents.isEmpty());
 
     ClientVerificationData clientData;
+    VerificationOptions options;
 
     // Update to 4.0.0.28524
     // client = 4.0.0.28524
@@ -179,7 +180,7 @@ TEST_F(UpdateVerificationTest, testAlreadyInstalled)
     makeServer(nx::utils::SoftwareVersion("4.0.0.28525"));
     clientData = makeClientData(nx::utils::SoftwareVersion("4.0.0.28524"));
 
-    verifyUpdateContents(nullptr, contents, getAllServers(), clientData);
+    verifyUpdateContents(contents, getAllServers(), clientData, options);
     EXPECT_EQ(contents.alreadyInstalled, true);
     EXPECT_TRUE(contents.peersWithUpdate.empty());
     // VMS-13236 expects there is noError.
@@ -200,7 +201,7 @@ TEST_F(UpdateVerificationTest, testAlreadyInstalled)
     makeServer(nx::utils::SoftwareVersion("4.0.0.28524"));
     clientData = makeClientData(nx::utils::SoftwareVersion("4.0.0.28525"));
     clientData.installedVersions.insert(nx::utils::SoftwareVersion("4.0.0.28524"));
-    verifyUpdateContents(nullptr, contents, getAllServers(), clientData);
+    verifyUpdateContents(contents, getAllServers(), clientData, options);
     EXPECT_EQ(contents.error, nx::update::InformationError::noError);
     {
         const auto report = MultiServerUpdatesWidget::calculateUpdateVersionReport(
@@ -219,7 +220,7 @@ TEST_F(UpdateVerificationTest, testAlreadyInstalled)
     makeServer(nx::utils::SoftwareVersion("4.0.0.28524"));
     makeServer(nx::utils::SoftwareVersion("4.0.0.28523"), /*online=*/false);
     clientData = makeClientData(nx::utils::SoftwareVersion("4.0.0.28524"));
-    verifyUpdateContents(nullptr, contents, getAllServers(), clientData);
+    verifyUpdateContents(contents, getAllServers(), clientData, options);
     EXPECT_EQ(contents.alreadyInstalled, true);
     {
         const auto report = MultiServerUpdatesWidget::calculateUpdateVersionReport(contents, clientData.clientId);
@@ -241,6 +242,7 @@ TEST_F(UpdateVerificationTest, testForkedVersion)
     ASSERT_TRUE(QJson::deserialize<nx::update::Information>(packageRawData, &contents.info));
     ASSERT_FALSE(contents.isEmpty());
     EXPECT_EQ(contents.getVersion(), nx::utils::SoftwareVersion("4.0.0.28524"));
+    VerificationOptions options;
 
     // Update to 4.0.0.28524
     // client = 4.0.0.28523
@@ -250,7 +252,7 @@ TEST_F(UpdateVerificationTest, testForkedVersion)
     makeServer(nx::utils::SoftwareVersion("4.0.0.28523"));
     makeServer(nx::utils::SoftwareVersion("4.0.0.28525"));
 
-    verifyUpdateContents(nullptr, contents, getAllServers(), clientData);
+    verifyUpdateContents(contents, getAllServers(), clientData, options);
     EXPECT_EQ(contents.error, nx::update::InformationError::noError);
     removeAllServers();
     contents.resetVerification();
@@ -259,7 +261,7 @@ TEST_F(UpdateVerificationTest, testForkedVersion)
     // It should be fine to start update only for a client.
     makeServer(nx::utils::SoftwareVersion("4.0.0.28525"));
     makeServer(nx::utils::SoftwareVersion("4.0.0.28525"));
-    verifyUpdateContents(nullptr, contents, getAllServers(), clientData);
+    verifyUpdateContents(contents, getAllServers(), clientData, options);
     EXPECT_EQ(contents.error, nx::update::InformationError::noError);
     removeAllServers();
     contents.resetVerification();
@@ -269,7 +271,7 @@ TEST_F(UpdateVerificationTest, testForkedVersion)
     clientData = makeClientData(nx::utils::SoftwareVersion("4.0.0.28525"));
     makeServer(nx::utils::SoftwareVersion("4.0.0.28525"));
     makeServer(nx::utils::SoftwareVersion("4.0.0.28525"));
-    verifyUpdateContents(nullptr, contents, getAllServers(), clientData);
+    verifyUpdateContents(contents, getAllServers(), clientData, options);
     EXPECT_EQ(contents.error, nx::update::InformationError::incompatibleVersion);
     EXPECT_TRUE(contents.alreadyInstalled);
     removeAllServers();
@@ -282,6 +284,7 @@ TEST_F(UpdateVerificationTest, packagesForSystemSupportTest)
     ASSERT_TRUE(QJson::deserialize<nx::update::Information>(packagesForSystemSupportTest,
         &contents.info));
     ASSERT_FALSE(contents.isEmpty());
+    VerificationOptions options;
 
     // Update to 4.0.0.29069
     // client = 4.0.0.29067
@@ -291,7 +294,7 @@ TEST_F(UpdateVerificationTest, packagesForSystemSupportTest)
     ClientVerificationData clientData = makeClientData(nx::utils::SoftwareVersion("4.0.0.29067"));
     clientData.osInfo = os::windows;
     auto servers = getAllServers();
-    verifyUpdateContents(nullptr, contents, servers, clientData);
+    verifyUpdateContents(contents, servers, clientData, options);
     EXPECT_EQ(contents.error, nx::update::InformationError::missingPackageError);
     // There should be one unsupported system.
     EXPECT_EQ(contents.unsuportedSystemsReport.size(), 1);

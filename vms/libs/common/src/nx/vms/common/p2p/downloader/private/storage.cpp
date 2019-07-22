@@ -144,7 +144,10 @@ ResultCode Storage::addDownloadedFile(const FileInformation& fileInformation)
     info.downloadedChunks.fill(true, chunkCount);
 
     if (!saveMetadata(info))
+    {
+        NX_ERROR(this, "Failed to save metadata for a file \"%1\"", fileInformation.name);
         return ResultCode::ioError;
+    }
 
     m_fileInformationByName.insert(fileInformation.name, info);
 
@@ -167,7 +170,11 @@ ResultCode Storage::addNewFile(const FileInformation& fileInformation)
 
     FileMetadata info = FileMetadata::fromFileInformation(fileInformation, m_downloadsDirectory);
     if (!nx::utils::file_system::ensureDir(info.absoluteDirectoryPath))
+    {
+        NX_ERROR(this, "Failed to generate folder \"%1\" for a file \"%2\"",
+            info.absoluteDirectoryPath, info.name);
         return ResultCode::ioError;
+    }
 
     if (!info.md5.isEmpty() && calculateMd5(info.fullFilePath) == info.md5)
     {
