@@ -70,6 +70,7 @@ private:
     bool isPacketStreamOk(const AVPacket& packet) const;
     bool isPacketDataTypeOk(const AVPacket& packet) const;
     bool isPacketTimestampOk(const AVPacket& packet) const;
+    bool isPacketChannelOk(const AVPacket& packet) const;
 
     nxcip::UsecUTCTimestamp packetTimestamp(const AVPacket& packet) const;
     unsigned int packetChannelNumber(const AVPacket& packet) const;
