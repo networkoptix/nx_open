@@ -9,7 +9,7 @@
 namespace nx {
 namespace sdk {
 
-void StringMap::addItem(const std::string& key, const std::string& value)
+void StringMap::setItem(const std::string& key, const std::string& value)
 {
     NX_KIT_ASSERT(!key.empty());
     m_map[key] = value;

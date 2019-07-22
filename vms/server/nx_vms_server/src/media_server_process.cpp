@@ -168,7 +168,7 @@
 #include <rest/handlers/save_cloud_system_credentials.h>
 #include <rest/handlers/multiserver_thumbnail_rest_handler.h>
 #include <rest/handlers/multiserver_statistics_rest_handler.h>
-#include <rest/handlers/multiserver_analytics_lookup_detected_objects.h>
+#include <rest/handlers/multiserver_analytics_lookup_object_tracks.h>
 #include <rest/handlers/execute_analytics_action_rest_handler.h>
 #include <rest/handlers/get_analytics_actions_rest_handler.h>
 #include <rest/server/rest_connection_processor.h>
@@ -789,11 +789,12 @@ QnMediaServerResourcePtr MediaServerProcess::findServer(ec2::AbstractECConnectio
 
     while (servers.empty() && !needToStop())
     {
-        ec2::ErrorCode rez = ec2Connection->getMediaServerManager(Qn::kSystemAccess)->getServersSync(&servers);
-        if (rez == ec2::ErrorCode::ok)
+        const ec2::ErrorCode res =
+            ec2Connection->getMediaServerManager(Qn::kSystemAccess)->getServersSync(&servers);
+        if (res == ec2::ErrorCode::ok)
             break;
 
-        qDebug() << "findServer(): Call to getServers failed. Reason: " << ec2::toString(rez);
+        NX_DEBUG(this, "%1(): Call to getServers failed: %2", __func__, res);
         QnSleep::msleep(1000);
     }
 
@@ -1348,7 +1349,7 @@ void MediaServerProcess::at_serverSaved(int, ec2::ErrorCode err)
         qWarning() << "Error saving server.";
 }
 
-void MediaServerProcess::at_connectionOpened()
+void MediaServerProcess::writeServerStartedEvent()
 {
     if (isStopping())
         return;
@@ -1487,6 +1488,8 @@ void MediaServerProcess::registerRestHandlers(
     // TODO: When supported by apidoctool, the comment to these constants should be parsed.
     const auto kAdmin = GlobalPermission::admin;
     const auto kViewLogs = GlobalPermission::viewLogs;
+
+    const auto reg = [this](auto&&... args) { registerRestHandler(std::move(args)...); };
 
     /**%apidoc GET /api/synchronizedTime
      * This method is used for internal purpose to synchronize time between mediaservers and clients.
@@ -1839,8 +1842,8 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/recStats", new QnRecordingStatsRestHandler(serverModule()));
 
     /**%apidoc GET /api/auditLog
+     * Return audit log information.
      * %permissions Owner.
-     * Return audit log information in the requested format.
      * %param:string from Start time of a time interval (as a string containing time in
      *     milliseconds since epoch, or a local time formatted like
      *     <code>"<i>YYYY</i>-<i>MM</i>-<i>DD</i>T<i>HH</i>:<i>mm</i>:<i>ss</i>.<i>zzz</i>"</code>
@@ -1849,7 +1852,7 @@ void MediaServerProcess::registerRestHandlers(
      *     milliseconds since epoch, or a local time formatted like
      *     <code>"<i>YYYY</i>-<i>MM</i>-<i>DD</i>T<i>HH</i>:<i>mm</i>:<i>ss</i>.<i>zzz</i>"</code>
      *     - the format is auto-detected).
-     * %return:text Tail of the server log file in text format
+     * %return:text Tail of the server log file in plain text format.
      */
     reg("api/auditLog", new QnAuditLogRestHandler(serverModule()), kAdmin);
 
@@ -2645,11 +2648,11 @@ void MediaServerProcess::registerRestHandlers(
 
     reg("ec2/statistics", new QnMultiserverStatisticsRestHandler("ec2/statistics"));
 
-    /**%apidoc GET /ec2/analyticsLookupDetectedObjects
+    /**%apidoc GET /ec2/analyticsLookupObjectTracks
      * Search analytics DB for objects that match filter specified.
      * %param[opt] deviceId Id of camera.
      * %param[opt] objectTypeId Analytics object type id.
-     * %param[opt] objectId Analytics object id.
+     * %param[opt] objectTrackId Analytics object track id.
      * %param[opt] startTime Milliseconds since epoch (1970-01-01 00:00, UTC).
      * %param[opt] endTime Milliseconds since epoch (1970-01-01 00:00, UTC).
      * %param[opt] x1 Top left "x" coordinate of picture bounding box to search within. In range
@@ -2660,17 +2663,17 @@ void MediaServerProcess::registerRestHandlers(
      *     range [0.0; 1.0].
      * %param[opt] y2 Bottom right "y" coordinate of picture bounding box to search within. In
      *     range [0.0; 1.0].
-     * %param[opt] freeText Text to match within object's properties.
-     * %param[opt] limit Maximum number of objects to return.
-     * %param[opt] maxTrackSize Maximum length of elements of object's track.
-     * %param[opt] sortOrder Sort order of objects by track start timestamp.
+     * %param[opt] freeText Text to match within track properties.
+     * %param[opt] limit Maximum number of object tracks to return.
+     * %param[opt] maxObjectTrackSize Maximum number of elements of an object track.
+     * %param[opt] sortOrder Sort order of object tracks by a track start timestamp.
      *     %value asc Ascending order.
      *     %value desc Descending order.
      * %param[opt] isLocal If "false" then request is forwarded to every other online server and
      *     results are merged. Otherwise, request is processed on receiving server only.
      * %return JSON data.
      */
-    reg("ec2/analyticsLookupDetectedObjects", new QnMultiserverAnalyticsLookupDetectedObjects(
+    reg("ec2/analyticsLookupObjectTracks", new QnMultiserverAnalyticsLookupObjectTracks(
         commonModule(), serverModule()->analyticsEventsStorage()));
 
     /**%apidoc GET /api/getAnalyticsActions
@@ -2691,10 +2694,10 @@ void MediaServerProcess::registerRestHandlers(
 
     /**%apidoc POST /api/executeAnalyticsAction
      * Execute analytics action from the particular analytics plugin on this server. The action is
-     * applied to the specified metadata object.
+     * applied to the specified track.
      * %param engineId Id of an Analytics Engine which offers the Action.
      * %param actionId Id of an Action to execute.
-     * %param objectId Id of an Analytics Object to which the Action is applied.
+     * %param trackId Id of a track to which the Action is applied.
      * %param deviceId Id of a Device from which the Action was triggered.
      * %param timestampUs Timestamp (microseconds) of the video frame from which the action was
      *     triggered.
@@ -2813,34 +2816,64 @@ void MediaServerProcess::registerRestHandlers(
      * %return:array List of setting descriptions.
      *     %param:string name Setting name.
      *     %param:string defaultValue Setting default value.
-     *     %param:string description Setiing description.
+     *     %param:string description Setting description.
      */
     reg("api/settingsDocumentation", new QnSettingsDocumentationHandler(&serverModule()->settings()));
 
     /**%apidoc GET /ec2/analyticsEngineSettings
+     * Return values of settings of the specified Engine.
      * %param:string analyticsEngineId Id of analytics engine.
-     * Return settings values of the specified Engine.
-     * %return:object TODO:CHECK JSON object consisting of name-value settings pairs.
+     * %return:object JSON object with an error code, error string, and the reply on success.
+     *     %param:string error Error code, "0" means no error.
+     *     %param:string errorString Error message in English, or an empty string.
+     *     %param:object reply Object with Engine settings model and values.
+     *         %param:object reply.model Settings model, as in Engine manifest.
+     *         %param:object reply.values Name-value map with setting values, using JSON types
+     *             according to each setting type.
      *
      * %apidoc POST /ec2/analyticsEngineSettings
      * Applies passed settings values to correspondent Analytics Engine.
      * %param:string engineId Unique id of Analytics Engine.
-     * %param settings JSON object consisting of name-value settings pairs.
+     * %param:object settings Name-value map with setting values, using JSON types according to
+     *     each setting type.
+     * %return:object JSON object with an error code, error string, and the reply on success.
+     *     %param:string error Error code, "0" means no error.
+     *     %param:string errorString Error message in English, or an empty string.
+     *     %param:object reply Object with Engine settings model and values that the Engine returns
+     *         after the values have been supplied.
+     *         %param:object reply.model Settings model, as in Engine manifest.
+     *         %param:object reply.values Name-value map with setting values, using JSON types
+     *             according to each setting type.
      */
     reg("ec2/analyticsEngineSettings",
         new nx::vms::server::rest::AnalyticsEngineSettingsHandler(serverModule()));
 
     /**%apidoc GET /ec2/deviceAnalyticsSettings
+     * Return settings values of the specified device-engine pair.
      * %param:string analyticsEngineId Unique id of an Analytics Engine.
      * %param:string deviceId Id of a device.
-     * Return settings values of the specified device-engine pair.
-     * %return:object TODO:CHECK JSON object consisting of name-value settings pairs.
+     * %return:object JSON object with an error code, error string, and the reply on success.
+     *     %param:string error Error code, "0" means no error.
+     *     %param:string errorString Error message in English, or an empty string.
+     *     %param:object reply Object with DeviceAgent settings model and values.
+     *         %param:object reply.model Settings model, as in DeviceAgent manifest.
+     *         %param:object reply.values Name-value map with setting values, using JSON types
+     *             according to each setting type.
      *
      * %apidoc POST /ec2/deviceAnalyticsSettings
      * Applies passed settings values to the correspondent device-engine pair.
      * %param:string engineId Unique id of an Analytics Engine.
      * %param:string deviceId Id of a device.
-     * %param settings JSON object consisting of name-value settings pairs.
+     * %param:object settings Name-value map with setting values, using JSON types according to
+     *     each setting type.
+     * %return:object JSON object with an error code, error string, and the reply on success.
+     *     %param:string error Error code, "0" means no error.
+     *     %param:string errorString Error message in English, or an empty string.
+     *     %param:object reply Object with DeviceAgent settings model and values that the
+     *         DeviceAgent returns after the values have been supplied.
+     *         %param:object reply.model Settings model, as in DeviceAgent manifest.
+     *         %param:object reply.values Name-value map with setting values, using JSON types
+     *             according to each setting type.
      */
     reg("ec2/deviceAnalyticsSettings",
         new nx::vms::server::rest::DeviceAnalyticsSettingsHandler(serverModule()));
@@ -2851,15 +2884,15 @@ void MediaServerProcess::registerRestHandlers(
         new OptionsRequestHandler());
 }
 
-void MediaServerProcess::reg(
+void MediaServerProcess::registerRestHandler(
     const QString& path,
     QnRestRequestHandler* handler,
     GlobalPermission permission)
 {
-    reg(QnRestProcessorPool::kAnyHttpMethod, path, handler, permission);
+    registerRestHandler(QnRestProcessorPool::kAnyHttpMethod, path, handler, permission);
 }
 
-void MediaServerProcess::reg(
+void MediaServerProcess::registerRestHandler(
     const nx::network::http::Method::ValueType& method,
     const QString& path,
     QnRestRequestHandler* handler,
@@ -2873,12 +2906,12 @@ void MediaServerProcess::reg(
         m_autoRequestForwarder->addCameraIdUrlParams(path, cameraIdUrlParams);
 }
 
-template<class TcpConnectionProcessor, typename... ExtraParam>
-void MediaServerProcess::regTcp(
-    const QByteArray& protocol, const QString& path, ExtraParam... extraParam)
+template<class TcpConnectionProcessor, typename... ExtraParams>
+void MediaServerProcess::registerTcpHandler(
+    const QByteArray& protocol, const QString& path, ExtraParams... extraParams)
 {
     m_universalTcpListener->addHandler<TcpConnectionProcessor>(
-        protocol, path, extraParam...);
+        protocol, path, extraParams...);
 
     if (TcpConnectionProcessor::doesPathEndWithCameraId())
         m_autoRequestForwarder->addAllowedProtocolAndPathPart(protocol, path);
@@ -2889,7 +2922,7 @@ bool MediaServerProcess::initTcpListener(
     nx::vms::cloud_integration::CloudManagerGroup* const cloudManagerGroup,
     ec2::LocalConnectionFactory* ec2ConnectionFactory)
 {
-    auto messageBus = ec2ConnectionFactory->messageBus();
+    const auto messageBus = ec2ConnectionFactory->messageBus();
     m_universalTcpListener->setupAuthorizer(timeBasedNonceProvider, *cloudManagerGroup);
     m_universalTcpListener->setCloudConnectionManager(cloudManagerGroup->connectionManager);
 
@@ -2936,18 +2969,18 @@ bool MediaServerProcess::initTcpListener(
         nx::network::http::AuthMethod::temporaryUrlQueryKey);
     QnUniversalRequestProcessor::setUnauthorizedPageBody(
         QnFileConnectionProcessor::readStaticFile("static/login.html"), methods);
-    regTcp<QnRtspConnectionProcessor>("RTSP", "*", serverModule());
-    regTcp<QnRestConnectionProcessor>("HTTP", "api");
-    regTcp<QnRestConnectionProcessor>("HTTP", "ec2");
-    regTcp<QnRestConnectionProcessor>("HTTP", "favicon.ico");
-    regTcp<QnFileConnectionProcessor>("HTTP", "static");
-    regTcp<QnCrossdomainConnectionProcessor>("HTTP", "crossdomain.xml");
-    regTcp<QnProgressiveDownloadingConsumer>("HTTP", "media", serverModule());
-    regTcp<QnIOMonitorConnectionProcessor>("HTTP", "api/iomonitor");
+    registerTcpHandler<QnRtspConnectionProcessor>("RTSP", "*", serverModule());
+    registerTcpHandler<QnRestConnectionProcessor>("HTTP", "api");
+    registerTcpHandler<QnRestConnectionProcessor>("HTTP", "ec2");
+    registerTcpHandler<QnRestConnectionProcessor>("HTTP", "favicon.ico");
+    registerTcpHandler<QnFileConnectionProcessor>("HTTP", "static");
+    registerTcpHandler<QnCrossdomainConnectionProcessor>("HTTP", "crossdomain.xml");
+    registerTcpHandler<QnProgressiveDownloadingConsumer>("HTTP", "media", serverModule());
+    registerTcpHandler<QnIOMonitorConnectionProcessor>("HTTP", "api/iomonitor");
 
-    nx::vms::server::hls::HttpLiveStreamingProcessor::setMinPlayListSizeToStartStreaming(
+    hls::HttpLiveStreamingProcessor::setMinPlayListSizeToStartStreaming(
         serverModule()->settings().hlsPlaylistPreFillChunks());
-    regTcp<nx::vms::server::hls::HttpLiveStreamingProcessor>("HTTP", "hls", serverModule());
+    registerTcpHandler<hls::HttpLiveStreamingProcessor>("HTTP", "hls", serverModule());
 
     // Our HLS uses implementation uses authKey (generated by target server) to skip authorization,
     // to keep this warning we should not ask for authorization along the way.
@@ -2955,14 +2988,15 @@ bool MediaServerProcess::initTcpListener(
 
     //regTcp<QnDefaultTcpConnectionProcessor>("HTTP", "*");
 
-    regTcp<nx::vms::network::ProxyConnectionProcessor>("*", "proxy", ec2ConnectionFactory->serverConnector());
-    regTcp<QnAudioProxyReceiver>("HTTP", "proxy-2wayaudio", serverModule());
+    registerTcpHandler<nx::vms::network::ProxyConnectionProcessor>(
+        "*", "proxy", ec2ConnectionFactory->serverConnector());
+    registerTcpHandler<QnAudioProxyReceiver>("HTTP", "proxy-2wayaudio", serverModule());
 
     if( !serverModule()->settings().authenticationEnabled())
         m_universalTcpListener->disableAuth();
 
     #if defined(ENABLE_DESKTOP_CAMERA)
-        regTcp<QnDesktopCameraRegistrator>("HTTP", "desktop_camera", serverModule());
+        registerTcpHandler<QnDesktopCameraRegistrator>("HTTP", "desktop_camera", serverModule());
     #endif
 
     return true;
@@ -3255,7 +3289,7 @@ QString MediaServerProcess::hardwareIdAsGuid() const
 {
     auto hwId = LLUtil::getLatestHardwareId();
     auto hwIdString = QnUuid::fromHardwareId(hwId).toString();
-    std::cout << "Got hwID \"" << hwIdString.toStdString() << "\"" << std::endl;
+    qWarning() << "Got hwID" << hwIdString;
     return hwIdString;
 }
 
@@ -3437,8 +3471,9 @@ void MediaServerProcess::initializeHardwareId()
     const QnUuid guid(serverModule()->settings().serverGuid());
     if (guid.isNull())
     {
-        qDebug() << "Can't save guid. Run once as administrator.";
-        NX_ERROR(this, "Can't save guid. Run once as administrator.");
+        const char* const kMessage = "Can't save guid. Run once as administrator.";
+        std::cerr << kMessage;
+        NX_ERROR(this, kMessage);
         qApp->quit();
         return;
     }
@@ -4062,6 +4097,9 @@ void MediaServerProcess::connectSignals()
         &MediaServerProcess::at_storageManager_raidStorageFailure);
     m_raidEventLogReader->subscribe();
 
+    connect(
+        this, &MediaServerProcess::started,
+        [this]() { emit MediaServerProcess::startedWithSignalsProcessed(); });
 }
 
 void MediaServerProcess::setUpDataFromSettings()
@@ -4241,7 +4279,6 @@ void MediaServerProcess::initNewSystemStateIfNeeded(
 
 void MediaServerProcess::startObjects()
 {
-    QTimer::singleShot(3000, this, SLOT(at_connectionOpened()));
     QTimer::singleShot(0, this, SLOT(at_appStarted()));
 
     at_timer();
@@ -4292,6 +4329,7 @@ void MediaServerProcess::startObjects()
         serverModule()->licenseWatcher()->start();
 
     commonModule()->messageProcessor()->init(commonModule()->ec2Connection()); // start receiving notifications
+    writeServerStartedEvent();
 }
 
 std::map<QString, QVariant> MediaServerProcess::confParamsFromSettings() const

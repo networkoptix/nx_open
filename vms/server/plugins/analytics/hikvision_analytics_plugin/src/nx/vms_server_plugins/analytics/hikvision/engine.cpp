@@ -18,6 +18,7 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/log/log_main.h>
 #include <nx/sdk/helpers/string.h>
+#include <nx/sdk/helpers/error.h>
 
 namespace nx {
 namespace vms_server_plugins {
@@ -66,28 +67,25 @@ void Engine::setEngineInfo(const nx::sdk::analytics::IEngineInfo* /*engineInfo*/
 {
 }
 
-void Engine::setSettings(const IStringMap* /*settings*/)
+StringMapResult Engine::setSettings(const IStringMap* /*settings*/)
 {
     // There are no DeviceAgent settings for this plugin.
+    return nullptr;
 }
 
-IStringMap* Engine::pluginSideSettings() const
+SettingsResponseResult Engine::pluginSideSettings() const
 {
     return nullptr;
 }
 
-IDeviceAgent* Engine::obtainDeviceAgent(
-    const IDeviceInfo* deviceInfo,
-    Error* outError)
+MutableDeviceAgentResult Engine::obtainDeviceAgent(const IDeviceInfo* deviceInfo)
 {
-    *outError = Error::noError;
-
     if (!isCompatible(deviceInfo))
         return nullptr;
 
     auto supportedEventTypeIds = fetchSupportedEventTypeIds(deviceInfo);
     if (!supportedEventTypeIds)
-        return nullptr;
+        return error(ErrorCode::internalError, "No supported event types");
 
     nx::vms::api::analytics::DeviceAgentManifest deviceAgentManifest;
     deviceAgentManifest.supportedEventTypeIds = *supportedEventTypeIds;
@@ -100,9 +98,8 @@ IDeviceAgent* Engine::obtainDeviceAgent(
     return deviceAgent;
 }
 
-const IString* Engine::manifest(Error* error) const
+StringResult Engine::manifest() const
 {
-    *error = Error::noError;
     return new nx::sdk::String(m_manifest);
 }
 
@@ -186,14 +183,14 @@ const Hikvision::EngineManifest& Engine::engineManifest() const
     return m_engineManifest;
 }
 
-void Engine::executeAction(IAction* /*action*/, Error* /*outError*/)
+Result<void> Engine::executeAction(IAction* /*action*/)
 {
+    return {};
 }
 
-Error Engine::setHandler(IHandler* /*handler*/)
+void Engine::setHandler(IHandler* /*handler*/)
 {
     // TODO: Use the handler for error reporting.
-    return Error::noError;
 }
 
 bool Engine::isCompatible(const IDeviceInfo* deviceInfo) const
@@ -215,6 +212,8 @@ static const std::string kPluginManifest = /*suppress newline*/1 + R"json(
 {
     "id": "nx.hikvision",
     "name": "Hikvision analytics plugin",
+    "description": "Supports built-in analytics on Hikvision cameras",
+    "version": "1.0.0",
     "engineSettingsModel": ""
 }
 )json";

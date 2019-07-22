@@ -25,11 +25,13 @@ const char* multicastPluginParamsXML =
 GenericMulticastCameraManager::GenericMulticastCameraManager(const nxcip::CameraInfo& info)
 :
     m_refManager(this),
-    m_pluginRef(GenericMulticastPlugin::instance()),
+    m_pluginRef(nx::sdk::toPtr(GenericMulticastPlugin::instance())),
     m_info(info),
     m_capabilities(0)
 {
+    // TODO: Get rid of GenericMulticastPlugin::instance(), store parent plugin as a raw pointer.
     m_pluginRef->addRef();
+
     m_capabilities
         |= nxcip::BaseCameraManager::audioCapability
         | nxcip::BaseCameraManager::shareIpCapability

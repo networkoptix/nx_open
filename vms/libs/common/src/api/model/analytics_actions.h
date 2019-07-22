@@ -22,8 +22,8 @@ struct AnalyticsAction
 
     QString actionId;
 
-    /** Id of an Analytics Object to which the Action is applied. */
-    QnUuid objectId;
+    /** Id of an Analytics Object Track to which the Action is applied. */
+    QnUuid objectTrackId;
 
     QnUuid deviceId;
 
@@ -32,7 +32,7 @@ struct AnalyticsAction
     using Parameters = QMap<QString, QString>;
     Parameters params;
 };
-#define AnalyticsAction_Fields (engineId)(actionId)(objectId)(deviceId)(timestampUs)(params)
+#define AnalyticsAction_Fields (engineId)(actionId)(objectTrackId)(deviceId)(timestampUs)(params)
 
 // TODO: #dmishin: Rename to AvailableAnalyticsActionsOfEngine.
 struct AvailableAnalyticsActionsOfEngine

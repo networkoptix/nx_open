@@ -10,7 +10,7 @@
 #include <nx/network/http/http_types.h>
 #include <nx/sql/types.h>
 
-#include <analytics/common/object_detection_metadata.h>
+#include <analytics/common/object_metadata.h>
 #include <recording/time_period.h>
 #include <utils/common/request_param.h>
 
@@ -20,8 +20,8 @@ struct ObjectPosition
 {
     /** Device object has been detected on. */
     QnUuid deviceId;
-    qint64 timestampUsec = 0;
-    qint64 durationUsec = 0;
+    qint64 timestampUs = 0;
+    qint64 durationUs = 0;
     QRectF boundingBox;
     /** Variable object attributes. E.g., car speed. */
     std::vector<common::metadata::Attribute> attributes;
@@ -30,45 +30,45 @@ struct ObjectPosition
 };
 
 #define ObjectPosition_analytics_storage_Fields \
-    (deviceId)(timestampUsec)(durationUsec)(boundingBox)(attributes)
+    (deviceId)(timestampUs)(durationUs)(boundingBox)(attributes)
 QN_FUSION_DECLARE_FUNCTIONS(ObjectPosition, (json)(ubjson));
 
 struct BestShot
 {
-    qint64 timestampUsec = 0;
+    qint64 timestampUs = 0;
     QRectF rect;
 
-    bool initialized() const { return timestampUsec > 0; }
+    bool initialized() const { return timestampUs > 0; }
 
     bool operator==(const BestShot& right) const;
 };
 
 #define BestShot_analytics_storage_Fields \
-    (timestampUsec)(rect)
+    (timestampUs)(rect)
 
 QN_FUSION_DECLARE_FUNCTIONS(BestShot, (json)(ubjson));
 
-struct DetectedObject
+struct ObjectTrack
 {
     /** Device object has been detected on. */
     QnUuid deviceId;
-    QnUuid objectAppearanceId;
+    QnUuid id;
     QString objectTypeId;
     /** Persistent object attributes. E.g., license plate number. */
     std::vector<common::metadata::Attribute> attributes;
-    qint64 firstAppearanceTimeUsec = 0;
-    qint64 lastAppearanceTimeUsec = 0;
-    std::vector<ObjectPosition> track;
+    qint64 firstAppearanceTimeUs = 0;
+    qint64 lastAppearanceTimeUs = 0;
+    std::vector<ObjectPosition> objectPositionSequence;
     BestShot bestShot;
 
-    bool operator==(const DetectedObject& right) const;
+    bool operator==(const ObjectTrack& right) const;
 };
 
-#define DetectedObject_analytics_storage_Fields \
-    (objectAppearanceId)(objectTypeId)(attributes)(firstAppearanceTimeUsec) \
-    (lastAppearanceTimeUsec)(track)(bestShot)
+#define ObjectTrack_analytics_storage_Fields \
+    (id)(objectTypeId)(attributes)(firstAppearanceTimeUs) \
+    (lastAppearanceTimeUs)(objectPositionSequence)(bestShot)
 
-QN_FUSION_DECLARE_FUNCTIONS(DetectedObject, (json)(ubjson));
+QN_FUSION_DECLARE_FUNCTIONS(ObjectTrack, (json)(ubjson));
 
 //-------------------------------------------------------------------------------------------------
 
@@ -79,7 +79,7 @@ struct Filter
      */
     std::vector<QnUuid> deviceIds;
     std::vector<QString> objectTypeId;
-    QnUuid objectAppearanceId;
+    QnUuid objectTrackId;
     QnTimePeriod timePeriod;
     /**
      * Coordinates are in range [0;1].
@@ -97,10 +97,10 @@ struct Filter
     /**
      * Zero value is treated as no limit.
      */
-    int maxObjectsToSelect = 0;
-    int maxTrackSize = 1;
+    int maxObjectTracksToSelect = 0;
+    int maxObjectTrackSize = 1;
     /**
-     * Found objects are sorted by minimal track time using this order.
+     * Found tracks are sorted by minimal track time using this order.
      */
     Qt::SortOrder sortOrder = Qt::SortOrder::DescendingOrder;
 
@@ -119,25 +119,17 @@ bool deserializeFromParams(const QnRequestParamList& params, Filter* filter);
 QString toString(const Filter& filter);
 
 #define Filter_analytics_storage_Fields \
-    (deviceIds)(objectTypeId)(objectAppearanceId)(timePeriod)(boundingBox)(freeText)
+    (deviceIds)(objectTypeId)(objectTrackId)(timePeriod)(boundingBox)(freeText)
 QN_FUSION_DECLARE_FUNCTIONS(Filter, (json));
 
 //-------------------------------------------------------------------------------------------------
 
-using LookupResult = std::vector<DetectedObject>;
+using LookupResult = std::vector<ObjectTrack>;
 
 //-------------------------------------------------------------------------------------------------
 
 struct TimePeriodsLookupOptions
 {
-    /**
-     * This is a time periods search region. Filter::boundingBox is ignored!
-     * This region is in search resolution coordinates (not [0; 1]!).
-     * NOTE: Introduced as an AnalyticsArchive requirement.
-     * TODO: #ak Refactor it out when AnalyticsArchive::save/match are symmetric.
-     */
-    QRegion region;
-
     /**
      * If distance between two time periods less than this value,
      * then those periods SHOULD be merged ignoring gap.
@@ -163,5 +155,4 @@ QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ResultCode)
 
 } // namespace nx::analytics::db
 
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (nx::analytics::db::ResultCode), (lexical))
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((nx::analytics::db::ResultCode), (lexical))

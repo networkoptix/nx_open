@@ -27,9 +27,9 @@ class AnalyticsArchiveDirectory
 public:
     using Filter = nx::vms::server::metadata::AnalyticsArchive::AnalyticsFilter;
 
-    struct ObjectMatchResult
+    struct ObjectTrackMatchResult
     {
-        std::vector<std::int64_t> objectGroups;
+        std::vector<std::int64_t> trackGroups;
         QnTimePeriod timePeriod;
     };
 
@@ -46,7 +46,7 @@ public:
         const QnUuid& deviceId,
         std::chrono::milliseconds timestamp,
         const std::vector<QRect>& region,
-        uint32_t objectsGroupId,
+        uint32_t objectTrackGroupId,
         uint32_t objectType,
         int64_t allAttributesHash);
 
@@ -62,7 +62,7 @@ public:
      * NOTE: This method selects object groups by filter.
      * Object groups have to be converted to objects (and filtered) later.
      */
-    ObjectMatchResult matchObjects(
+    ObjectTrackMatchResult matchObjects(
         const std::vector<QnUuid>& deviceIds,
         Filter filter);
 
@@ -84,9 +84,12 @@ private:
         const QnUuid& deviceId,
         const Filter& filter);
 
-    ObjectMatchResult toObjectMatchResult(
+    using TrackGroups =
+        std::vector<std::pair<std::chrono::milliseconds /*timestamp*/, int64_t /*trackGroupId*/>>;
+
+    ObjectTrackMatchResult toObjectTrackMatchResult(
         const Filter& filter,
-        std::vector<std::pair<std::chrono::milliseconds /*timestamp*/, int64_t /*objectGroupId*/>> objectGroups);
+        TrackGroups trackGroups);
 };
 
 } // namespace nx::analytics::db

@@ -1,6 +1,7 @@
 #include "device_agent.h"
 
 #include <chrono>
+#include <optional>
 
 #include <QtCore/QString>
 
@@ -10,14 +11,14 @@
 #include <nx/fusion/serialization/json.h>
 
 #include <nx/sdk/helpers/string.h>
+#include <nx/sdk/helpers/error.h>
+#include <nx/sdk/helpers/plugin_diagnostic_event.h>
 #include <nx/sdk/analytics/helpers/event_metadata.h>
 #include <nx/sdk/analytics/helpers/event_metadata_packet.h>
 
 #include <nx/vms/api/analytics/device_agent_manifest.h>
 
 #include <nx/utils/std/cppnx.h>
-
-#include "nx/vca/camera_controller.h"
 
 namespace nx {
 namespace vms_server_plugins {
@@ -141,13 +142,16 @@ bool switchOnEnabledRulesNotification(nx::vca::CameraController& vcaCameraConrto
     return noErrorsOccurred;
 }
 
-Error prepare(nx::vca::CameraController& vcaCameraConrtoller)
+nx::sdk::Error handleError(ErrorCode errorCode, const char* message)
+{
+    NX_PRINT << message;
+    return error(errorCode, message);
+}
+
+std::optional<nx::sdk::Error> prepare(nx::vca::CameraController& vcaCameraConrtoller)
 {
     if (!vcaCameraConrtoller.readSupportedRules2())
-    {
-        NX_PRINT << "Failed to get VCA-camera analytic rules.";
-        return Error::networkError;
-    }
+        return handleError(ErrorCode::networkError, "Failed to get VCA camera analytic rules");
 
     switchOnEnabledRulesNotification(vcaCameraConrtoller);
 
@@ -156,19 +160,17 @@ Error prepare(nx::vca::CameraController& vcaCameraConrtoller)
         vcaCameraConrtoller.suppotedRules().cend(),
         [](const std::pair<int, nx::vca::SupportedRule>& rule) { return rule.second.isActive(); }))
     {
-        NX_PRINT << "No enabled rules.";
-        return Error::networkError;
+        return handleError(ErrorCode::otherError, "No enabled rules");
     }
 
     // Switch on VCA-camera heartbeat and set interval slightly less then kReceiveTimeout.
     if (!vcaCameraConrtoller.setHeartbeat(
         nx::vca::Heartbeat{ kReceiveTimeout - std::chrono::seconds(2), /*enabled*/ true }))
     {
-        NX_PRINT << "Failed to set VCA-camera heartbeat.";
-        return Error::networkError;
+        return handleError(ErrorCode::networkError, "Failed to set VCA-camera heartbeat");
     }
 
-    return Error::noError;
+    return std::nullopt;
 }
 
 } // namespace
@@ -421,37 +423,35 @@ void DeviceAgent::reconnectSocket()
     });
 }
 
-Error DeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
+void DeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
 {
     handler->addRef();
     m_handler.reset(handler);
-    return Error::noError;
 }
 
 
-Error DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes)
+Result<void> DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes)
 {
     if (metadataTypes->isEmpty())
-    {
         stopFetchingMetadata();
-        return Error::noError;
-    }
 
     return startFetchingMetadata(metadataTypes);
 }
 
-Error DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTypes)
+Result<void> DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTypes)
 {
     QString host = m_url.host();
     nx::vca::CameraController vcaCameraConrtoller(host, m_auth.user(), m_auth.password());
 
-    const auto error = prepare(vcaCameraConrtoller);
-    if (error != Error::noError)
-        return error;
+    if (auto error = prepare(vcaCameraConrtoller))
+        return std::move(error.value());
 
-    nx::sdk::Ptr<const nx::sdk::IStringList> eventTypeIds(metadataTypes->eventTypeIds());
-    if (!NX_ASSERT(eventTypeIds, "Event type id list is nullptr"))
-        return Error::unknownError;
+    const auto eventTypeIds = toPtr(metadataTypes->eventTypeIds());
+    if (const char* const kMessage = "Event type id list is nullptr";
+        !NX_ASSERT(eventTypeIds, kMessage))
+    {
+        return handleError(ErrorCode::internalError, kMessage);
+    }
 
     for (int i = 0; i < eventTypeIds->count(); ++i)
     {
@@ -472,8 +472,9 @@ Error DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTypes)
 
     if (!vcaCameraConrtoller.readTcpServerPort())
     {
-        NX_PRINT << "Failed to get VCA-camera tcp notification server port.";
-        return Error::networkError;
+        return handleError(
+            ErrorCode::networkError,
+            "Failed to get VCA-camera tcp notification server port");
     }
 
     static const QString kAddressPattern("%1:%2");
@@ -484,10 +485,10 @@ Error DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTypes)
 
     reconnectSocket();
 
-    return Error::noError;
+    return {};
 }
 
-Error DeviceAgent::stopFetchingMetadata()
+void DeviceAgent::stopFetchingMetadata()
 {
     if (m_tcpSocket)
     {
@@ -502,32 +503,32 @@ Error DeviceAgent::stopFetchingMetadata()
             });
         promise.get_future().wait();
     }
-    return Error::noError;
 }
 
-const IString* DeviceAgent::manifest(Error* /*error*/) const
+StringResult DeviceAgent::manifest() const
 {
     // If camera has no enabled events at the moment, return empty manifest.
     QString host = m_url.host();
     nx::vca::CameraController vcaCameraConrtoller(host, m_auth.user(), m_auth.password());
     if (!vcaCameraConrtoller.readSupportedRulesState())
-    {
         NX_PRINT << "Failed to read VCA camera rules state.";
-    }
-    for (const auto& rule: vcaCameraConrtoller.suppotedRules())
+
+    for (const auto& rule : vcaCameraConrtoller.suppotedRules())
     {
         if (rule.second.ruleEnabled) //< At least one enabled rule.
             return new nx::sdk::String(m_cameraManifest);
     }
-    return new nx::sdk::String();
+
+    return error(ErrorCode::otherError, "No rules are enabled on the device");
 }
 
-void DeviceAgent::setSettings(const IStringMap* /*settings*/)
+StringMapResult DeviceAgent::setSettings(const IStringMap* /*settings*/)
 {
     // There are no DeviceAgent settings for this plugin.
+    return nullptr;
 }
 
-IStringMap* DeviceAgent::pluginSideSettings() const
+SettingsResponseResult DeviceAgent::pluginSideSettings() const
 {
     return nullptr;
 }

@@ -2,7 +2,7 @@
 
 #include <nx/sdk/helpers/ref_countable.h>
 #include <nx/sdk/analytics/i_device_agent.h>
-#include <nx/sdk/i_plugin_event.h>
+#include <nx/sdk/i_plugin_diagnostic_event.h>
 
 #include <core/resource/resource_fwd.h>
 #include <core/dataconsumer/abstract_data_receptor.h>
@@ -27,12 +27,14 @@ public:
         QnVirtualCameraResourcePtr device);
 
     virtual void handleMetadata(nx::sdk::analytics::IMetadataPacket* metadataPacket) override;
-    virtual void handlePluginEvent(nx::sdk::IPluginEvent* sdkPluginEvent) override;
+    virtual void handlePluginDiagnosticEvent(
+        nx::sdk::IPluginDiagnosticEvent* sdkPluginDiagnosticEvent) override;
 
     void setMetadataSink(QnAbstractDataReceptor* metadataSink);
 
 signals:
-    void pluginEventTriggered(const nx::vms::event::PluginEventPtr& pluginEvent);
+    void pluginDiagnosticEventTriggered(
+        const nx::vms::event::PluginDiagnosticEventPtr& pluginDiagnosticEvent);
 
 private:
     QnUuid m_engineResourceId;

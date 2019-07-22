@@ -139,10 +139,10 @@ public:
 
     ec2::ErrorCode ec2GetSystemMergeHistory(nx::vms::api::SystemMergeHistoryRecordList* result);
 
-    void ec2AnalyticsLookupDetectedObjects(
+    void ec2AnalyticsLookupObjectTracks(
         const nx::analytics::db::Filter& request,
         std::function<void(ec2::ErrorCode, nx::analytics::db::LookupResult)> completionHandler);
-    ec2::ErrorCode ec2AnalyticsLookupDetectedObjects(
+    ec2::ErrorCode ec2AnalyticsLookupObjectTracks(
         const nx::analytics::db::Filter& request,
         nx::analytics::db::LookupResult* result);
 

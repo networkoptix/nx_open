@@ -14,6 +14,7 @@
 #include <nx/utils/scope_guard.h>
 
 #include <nx/sdk/helpers/string.h>
+#include <nx/sdk/helpers/error.h>
 
 #include "device_agent.h"
 #include "common.h"
@@ -96,14 +97,10 @@ Engine::Engine(Plugin* plugin): m_plugin(plugin)
     m_engineManifest = QJson::deserialized<Hanwha::EngineManifest>(m_manifest);
 }
 
-IDeviceAgent* Engine::obtainDeviceAgent(
-    const IDeviceInfo* deviceInfo,
-    Error* outError)
+MutableDeviceAgentResult Engine::obtainDeviceAgent(const IDeviceInfo* deviceInfo)
 {
-    *outError = Error::noError;
-
     if (!isCompatible(deviceInfo))
-        return nullptr;
+        return error(ErrorCode::otherError, "Device is not compatible with the Engine");
 
     auto sharedRes = sharedResources(deviceInfo);
     auto sharedResourceGuard = nx::utils::makeScopeGuard(
@@ -115,7 +112,7 @@ IDeviceAgent* Engine::obtainDeviceAgent(
 
     auto supportedEventTypeIds = fetchSupportedEventTypeIds(deviceInfo);
     if (!supportedEventTypeIds)
-        return nullptr;
+        return error(ErrorCode::internalError, "No supported events found");
 
     nx::vms::api::analytics::DeviceAgentManifest deviceAgentManifest;
     deviceAgentManifest.supportedEventTypeIds = *supportedEventTypeIds;
@@ -130,9 +127,8 @@ IDeviceAgent* Engine::obtainDeviceAgent(
     return deviceAgent;
 }
 
-const IString* Engine::manifest(Error* error) const
+StringResult Engine::manifest() const
 {
-    *error = Error::noError;
     return new nx::sdk::String(m_manifest);
 }
 
@@ -140,18 +136,20 @@ void Engine::setEngineInfo(const nx::sdk::analytics::IEngineInfo* /*engineInfo*/
 {
 }
 
-void Engine::setSettings(const IStringMap* /*settings*/)
+StringMapResult Engine::setSettings(const IStringMap* /*settings*/)
 {
     // There are no DeviceAgent settings for this plugin.
+    return nullptr;
 }
 
-IStringMap* Engine::pluginSideSettings() const
+SettingsResponseResult Engine::pluginSideSettings() const
 {
     return nullptr;
 }
 
-void Engine::executeAction(IAction* /*action*/, Error* /*outError*/)
+Result<void> Engine::executeAction(IAction* /*action*/)
 {
+    return {};
 }
 
 boost::optional<QList<QString>> Engine::fetchSupportedEventTypeIds(
@@ -318,10 +316,9 @@ std::shared_ptr<Engine::SharedResources> Engine::sharedResources(const IDeviceIn
     return sharedResourcesItr.value();
 }
 
-Error Engine::setHandler(IEngine::IHandler* /*handler*/)
+void Engine::setHandler(IEngine::IHandler* /*handler*/)
 {
     // TODO: Use the handler for error reporting.
-    return Error::noError;
 }
 
 bool Engine::isCompatible(const IDeviceInfo* deviceInfo) const
@@ -343,6 +340,8 @@ static const std::string kPluginManifest = /*suppress newline*/1 + R"json(
 {
     "id": "nx.hanwha",
     "name": "Hanwha analytics plugin",
+    "description": "Supports built-in analytics on Hanwha cameras",
+    "version": "1.0.0",
     "engineSettingsModel": ""
 }
 )json";

@@ -16,9 +16,11 @@
 #include <nx/vms/api/analytics/device_agent_manifest.h>
 
 #include <nx/sdk/helpers/string.h>
+#include <nx/sdk/helpers/plugin_diagnostic_event.h>
 
 #include <nx/sdk/analytics/helpers/event_metadata.h>
 #include <nx/sdk/analytics/helpers/event_metadata_packet.h>
+#include <nx/sdk/helpers/error.h>
 
 #include <network/tcp_connection_processor.h>
 
@@ -381,7 +383,7 @@ QByteArray DeviceAgent::extractRequestFromBuffer()
     m_buffer.reserve(kBufferCapacity);
 
     // The request may contain leading zeros. They hinder to debug. Let's eliminate them.
-    size_t nonZeroIndex = 0;
+    int nonZeroIndex = 0;
     while (nonZeroIndex < request.size() && request.at(nonZeroIndex) == '\0')
         ++nonZeroIndex;
 
@@ -391,29 +393,28 @@ QByteArray DeviceAgent::extractRequestFromBuffer()
     return request;
 }
 
-Error DeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
+void DeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
 {
     handler->addRef();
     m_handler.reset(handler);
-    return Error::noError;
 }
 
-Error DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes)
+Result<void> DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes)
 {
-    nx::sdk::Ptr<const nx::sdk::IStringList> eventTypeIds(metadataTypes->eventTypeIds());
-    if (!NX_ASSERT(eventTypeIds, "Event type id list is nullptr"))
-        return Error::unknownError;
+    const auto eventTypeIds = toPtr(metadataTypes->eventTypeIds());
+    if (const char* const kMessage = "Event type id list is nullptr";
+        !NX_ASSERT(eventTypeIds, kMessage))
+    {
+        return error(ErrorCode::internalError, kMessage);
+    }
 
     if (eventTypeIds->count() == 0)
-    {
         stopFetchingMetadata();
-        return Error::noError;
-    }
 
     return startFetchingMetadata(metadataTypes);
 }
 
-Error DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTypes)
+Result<void> DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTypes)
 {
     m_terminated = false;
 
@@ -422,9 +423,12 @@ Error DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTypes)
     m_cameraController.setCredentials(m_auth.user().toLatin1(), m_auth.password().toLatin1());
 
     // Assuming that the list contains only events, since this plugin does not produce objects.
-    nx::sdk::Ptr<const IStringList> eventTypeIdList(metadataTypes->eventTypeIds());
-    if (!NX_ASSERT(eventTypeIdList, "Event type id list is nullptr"))
-        return Error::unknownError;
+    const auto eventTypeIdList = toPtr(metadataTypes->eventTypeIds());
+    if (const char* const message = "Event type id list is nullptr";
+        !NX_ASSERT(eventTypeIdList, message))
+    {
+        return error(ErrorCode::internalError, message);
+    };
 
     for (int i = 0; i < eventTypeIdList->count(); ++i)
     {
@@ -440,23 +444,23 @@ Error DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTypes)
 
     QByteArray eventNames;
     for (const auto& event: m_eventsToCatch)
-    {
         eventNames = eventNames + event.type.internalName.toUtf8() + " ";
-    }
+
     NX_URL_PRINT << "Server demanded to start fetching event(s): " << eventNames.constData();
 
     NX_URL_PRINT << "Trying to get DW MTT-camera tcp notification server port.";
     if (!m_cameraController.readPortConfiguration())
     {
-        NX_URL_PRINT << "Failed to get DW MTT-camera tcp notification server port.";
-        return Error::networkError;
+        static const char* const kMessage =
+            "Failed to get DW MTT-camera tcp notification server port";
+        NX_URL_PRINT << kMessage;
+        return error(ErrorCode::networkError, kMessage);
     }
     NX_URL_PRINT << "DW MTT-camera tcp notification port = "
         << m_cameraController.longPollingPort();
 
     makeSubscription();
-
-    return Error::noError;
+    return {};
 }
 
 void DeviceAgent::stopFetchingMetadata()
@@ -482,17 +486,18 @@ void DeviceAgent::stopFetchingMetadata()
     promise.get_future().wait();
 }
 
-const IString* DeviceAgent::manifest(Error* /*error*/) const
+StringResult DeviceAgent::manifest() const
 {
     return new nx::sdk::String(m_cameraManifest);
 }
 
-void DeviceAgent::setSettings(const IStringMap* /*settings*/)
+StringMapResult DeviceAgent::setSettings(const IStringMap* /*settings*/)
 {
     // There are no DeviceAgent settings for this plugin.
+    return nullptr;
 }
 
-IStringMap* DeviceAgent::pluginSideSettings() const
+SettingsResponseResult DeviceAgent::pluginSideSettings() const
 {
     return nullptr;
 }

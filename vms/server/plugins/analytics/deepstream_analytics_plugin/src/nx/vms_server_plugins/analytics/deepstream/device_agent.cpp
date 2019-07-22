@@ -38,7 +38,7 @@ DeviceAgent::DeviceAgent(Engine* engine, const std::string& id): m_engine(engine
     m_pipeline->start();
 }
 
-void DeviceAgent::setSettings(const IStringMap* settings)
+StringMapResult DeviceAgent::setSettings(const IStringMap* settings)
 {
     NX_OUTPUT << __func__ << " Received  settings:";
     NX_OUTPUT << "{";
@@ -51,14 +51,15 @@ void DeviceAgent::setSettings(const IStringMap* settings)
             << ((i < count - 1) ? "," : "");
     }
     NX_OUTPUT << "}";
+    return nullptr;
 }
 
-IStringMap* DeviceAgent::pluginSideSettings() const
+SettingsResponseResult DeviceAgent::pluginSideSettings() const
 {
     return nullptr;
 }
 
-Error DeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
+void DeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
 {
     NX_OUTPUT << __func__ << " Setting metadata handler";
     std::lock_guard<std::mutex> lock(m_mutex);
@@ -66,12 +67,12 @@ Error DeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
     if (!handler)
     {
         m_handler.reset();
-        return Error::noError;
+        return;
     }
 
     handler->addRef();
     m_handler.reset(handler);
-    
+
     m_pipeline->setMetadataCallback(
         [this](IMetadataPacket* packet)
         {
@@ -80,10 +81,9 @@ Error DeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
         });
 
     NX_OUTPUT << __func__ << "() END -> noError";
-    return Error::noError;
 }
 
-Error DeviceAgent::pushDataPacket(IDataPacket* dataPacket)
+Result<void> DeviceAgent::pushDataPacket(IDataPacket* dataPacket)
 {
 // TODO: Investigate why this code is commented out.
 #if 0
@@ -93,29 +93,23 @@ Error DeviceAgent::pushDataPacket(IDataPacket* dataPacket)
     NX_OUTPUT << __func__ << " Frame timestamp is: " << dataPacket->timestampUs();
 #endif
 
-    NX_OUTPUT
-        << __func__
-        << " Pushing data packet to pipeline";
-
+    NX_OUTPUT << __func__ << " Pushing data packet to pipeline";
     m_pipeline->pushDataPacket(dataPacket);
-    return Error::noError;
+    return {};
 }
 
-Error DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes)
+Result<void> DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes)
 {
     if (metadataTypes->isEmpty())
-    {
         stopFetchingMetadata();
-        return Error::noError;
-    }
 
-    return startFetchingMetadata(metadataTypes);
+    startFetchingMetadata(metadataTypes);
+    return {};
 }
 
-Error DeviceAgent::startFetchingMetadata(const IMetadataTypes* /*metadataTypes*/)
+void DeviceAgent::startFetchingMetadata(const IMetadataTypes* /*metadataTypes*/)
 {
     NX_OUTPUT << __func__ << " Starting to fetch metadata. Doing nothing, actually...";
-    return Error::noError;
 }
 
 void DeviceAgent::stopFetchingMetadata()
@@ -123,10 +117,8 @@ void DeviceAgent::stopFetchingMetadata()
     NX_OUTPUT << __func__ << " Stopping to fetch metadata. Doing nothing, actually...";
 }
 
-const IString* DeviceAgent::manifest(Error* error) const
+StringResult DeviceAgent::manifest() const
 {
-    *error = Error::noError;
-
     if (!m_manifest.empty())
         return new nx::sdk::String(m_manifest);
 

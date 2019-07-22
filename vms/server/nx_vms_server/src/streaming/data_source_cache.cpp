@@ -28,6 +28,11 @@ DataSourceCache::~DataSourceCache()
         m_timerManager->joinAndDeleteTimer(val.first);
 }
 
+void DataSourceCache::clear()
+{
+    m_cachedDataProviders.clear();
+}
+
 DataSourceContextPtr DataSourceCache::take(const StreamingChunkCacheKey& key)
 {
     nx::utils::TimerManager::TimerGuard timerGuard;

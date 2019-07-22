@@ -7,12 +7,13 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/file_system.h>
 
-#include <nx/sdk/i_plugin_event.h>
+#include <nx/sdk/i_plugin_diagnostic_event.h>
 #include <nx/sdk/i_attribute.h>
 #include <nx/sdk/analytics/helpers/pixel_format.h>
 #include <nx/sdk/analytics/helpers/object_track_info.h>
 #include <nx/sdk/helpers/ptr.h>
 #include <nx/sdk/helpers/string_map.h>
+#include <nx/sdk/helpers/to_string.h>
 #include <nx/vms/server/resource/resource_fwd.h>
 
 #include <nx/vms_server_plugins/utils/uuid.h>
@@ -190,7 +191,7 @@ Ptr<IStringMap> toIStringMap(const QVariantMap& map)
 {
     const auto stringMap = makePtr<StringMap>();
     for (auto it = map.cbegin(); it != map.cend(); ++it)
-        stringMap->addItem(it.key().toStdString(), it.value().toString().toStdString());
+        stringMap->setItem(it.key().toStdString(), it.value().toString().toStdString());
 
     return stringMap;
 }
@@ -199,7 +200,7 @@ Ptr<IStringMap> toIStringMap(const QMap<QString, QString>& map)
 {
     const auto stringMap = makePtr<StringMap>();
     for (auto it = map.cbegin(); it != map.cend(); ++it)
-        stringMap->addItem(it.key().toStdString(), it.value().toStdString());
+        stringMap->setItem(it.key().toStdString(), it.value().toStdString());
 
     return stringMap;
 }
@@ -218,7 +219,7 @@ Ptr<IStringMap> toIStringMap(const QString& mapJson)
     {
         if (stringMap->value(setting.name.c_str()) != nullptr) //< Duplicate key.
             return nullptr;
-        stringMap->addItem(setting.name, setting.value);
+        stringMap->setItem(setting.name, setting.value);
     }
 
     return stringMap;
@@ -290,18 +291,18 @@ std::optional<IUncompressedVideoFrame::PixelFormat>
     return pixelFormat;
 }
 
-nx::vms::api::EventLevel fromSdkPluginEventLevel(IPluginEvent::Level level)
+nx::vms::api::EventLevel fromPluginDiagnosticEventLevel(IPluginDiagnosticEvent::Level level)
 {
     using namespace nx::sdk;
     using namespace nx::vms::api;
 
     switch (level)
     {
-        case IPluginEvent::Level::info:
+        case IPluginDiagnosticEvent::Level::info:
             return EventLevel::InfoEventLevel;
-        case IPluginEvent::Level::warning:
+        case IPluginDiagnosticEvent::Level::warning:
             return EventLevel::WarningEventLevel;
-        case IPluginEvent::Level::error:
+        case IPluginDiagnosticEvent::Level::error:
             return EventLevel::ErrorEventLevel;
         default:
             NX_ASSERT(false, "Wrong plugin event level");
@@ -310,14 +311,14 @@ nx::vms::api::EventLevel fromSdkPluginEventLevel(IPluginEvent::Level level)
 }
 
 nx::sdk::Ptr<ITimestampedObjectMetadata> createTimestampedObjectMetadata(
-    const nx::analytics::db::DetectedObject& detectedObject,
+    const nx::analytics::db::ObjectTrack& track,
     const nx::analytics::db::ObjectPosition& objectPosition)
 {
     auto objectMetadata = nx::sdk::makePtr<TimestampedObjectMetadata>();
-    objectMetadata->setId(
-        nx::vms_server_plugins::utils::fromQnUuidToSdkUuid(detectedObject.objectAppearanceId));
-    objectMetadata->setTypeId(detectedObject.objectTypeId.toStdString());
-    objectMetadata->setTimestampUs(objectPosition.timestampUsec);
+    objectMetadata->setTrackId(
+        nx::vms_server_plugins::utils::fromQnUuidToSdkUuid(track.id));
+    objectMetadata->setTypeId(track.objectTypeId.toStdString());
+    objectMetadata->setTimestampUs(objectPosition.timestampUs);
     const auto& boundingBox = objectPosition.boundingBox;
     objectMetadata->setBoundingBox(Rect(
         boundingBox.x(),
@@ -325,7 +326,7 @@ nx::sdk::Ptr<ITimestampedObjectMetadata> createTimestampedObjectMetadata(
         boundingBox.width(),
         boundingBox.height()));
 
-    for (const auto& attribute: detectedObject.attributes)
+    for (const auto& attribute: track.attributes)
     {
         auto sdkAttribute = nx::sdk::makePtr<Attribute>(
             // Information about attribute types isn't stored in the database.
@@ -340,19 +341,16 @@ nx::sdk::Ptr<ITimestampedObjectMetadata> createTimestampedObjectMetadata(
 }
 
 nx::sdk::Ptr<nx::sdk::IList<ITimestampedObjectMetadata>> createObjectTrack(
-    const nx::analytics::db::DetectedObject& detectedObject)
+    const nx::analytics::db::ObjectTrack& track)
 {
-    auto track = nx::sdk::makePtr<nx::sdk::List<ITimestampedObjectMetadata>>();
-    for (const auto& objectPosition : detectedObject.track)
+    auto timestampedTrack = nx::sdk::makePtr<nx::sdk::List<ITimestampedObjectMetadata>>();
+    for (const auto& objectPosition: track.objectPositionSequence)
     {
-        if (auto objectMetadataPtr =
-            createTimestampedObjectMetadata(detectedObject, objectPosition))
-        {
-            track->addItem(objectMetadataPtr.get());
-        }
+        if (auto objectMetadataPtr = createTimestampedObjectMetadata(track, objectPosition))
+            timestampedTrack->addItem(objectMetadataPtr.get());
     }
 
-    return track;
+    return timestampedTrack;
 }
 
 nx::sdk::Ptr<IUncompressedVideoFrame> createUncompressedVideoFrame(
@@ -387,7 +385,7 @@ std::map<QString, QString> attributesMap(
     std::map<QString, QString> result;
     for (int i = 0; i < metadata->attributeCount(); ++i)
     {
-        const nx::sdk::Ptr<const nx::sdk::IAttribute> attribute(metadata->attribute(i));
+        const auto attribute = toPtr(metadata->attribute(i));
         result.emplace(
             QString::fromStdString(attribute->name()),
             QString::fromStdString(attribute->value()));

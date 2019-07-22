@@ -2,7 +2,7 @@
 
 #include <chrono>
 
-#include <analytics/common/object_detection_metadata.h>
+#include <analytics/common/object_metadata.h>
 
 namespace nx::analytics::db {
 

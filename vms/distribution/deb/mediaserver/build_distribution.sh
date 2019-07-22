@@ -102,17 +102,17 @@ copyLibs()
     stripIfNeeded "$STAGE_LIB"
 }
 
-# [in] STAGE_MODULE
+# [in] STAGE_BIN
 copyMediaserverPlugins()
 {
     echo ""
     echo "Copying mediaserver plugins"
 
-    distrib_copyMediaserverPlugins "plugins" "$STAGE_MODULE/bin" "${SERVER_PLUGINS[@]}"
-    stripIfNeeded "$STAGE_MODULE/bin/plugins"
+    distrib_copyMediaserverPlugins "plugins" "$STAGE_BIN" "${SERVER_PLUGINS[@]}"
+    stripIfNeeded "$STAGE_BIN/plugins"
 
-    distrib_copyMediaserverPlugins "plugins_optional" "$STAGE_MODULE/bin" "${SERVER_PLUGINS_OPTIONAL[@]}"
-    stripIfNeeded "$STAGE_MODULE/bin/plugins_optional"
+    distrib_copyMediaserverPlugins "plugins_optional" "$STAGE_BIN" "${SERVER_PLUGINS_OPTIONAL[@]}"
+    stripIfNeeded "$STAGE_BIN/plugins_optional"
 }
 
 # [in] STAGE_BIN

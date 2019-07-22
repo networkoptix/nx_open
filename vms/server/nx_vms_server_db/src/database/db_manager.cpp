@@ -2045,7 +2045,7 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
 
     if (updateName.endsWith(lit("/99_20181211_add_default_plugin_event_rules.sql")))
     {
-        return updateDefaultRules(vms::event::Rule::getPluginEventUpdateRules())
+        return updateDefaultRules(vms::event::Rule::getPluginDiagnosticEventUpdateRules())
             && resyncIfNeeded(ResyncRules);
     }
 

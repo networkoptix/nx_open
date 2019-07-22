@@ -54,9 +54,24 @@ struct PluginsIniConfig: public nx::kit::IniConfig
         "Path (absolute or relative to .ini dir) to existing dir for saving settings that the\n"
         "Server sends to an analytics plugin.");
 
-    NX_INI_FLAG(false, tryAllLibsInPluginDir,
+    NX_INI_FLAG(0, tryAllLibsInPluginDir,
         "Attempt to load each dynamic library from each plugin directory instead of only the one\n"
         "with the plugin_name equal to the directory name.");
+
+    NX_INI_FLAG(0, enableRefCountableRegistry,
+        "Turn on a debugging mechanism that tracks ref-countable object creation and deletion to\n"
+        "detect leaks and double-frees. An assertion will fail if a discrepancy is detected.\n"
+        "The Server and each Plugin have their own instance of such registry, tracking objects\n"
+        "created/destroyed in the respective module.");
+
+    NX_INI_FLAG(0, verboseRefCountableRegistry,
+        "Turn on verbose output of the ref-countable registry (if it is enabled): log each\n"
+        "ref-countable object creating and deleting.");
+
+    NX_INI_FLAG(0, useServerLogForRefCountableRegistry,
+        "Whether the ref-countable registry should write its logs to the regular Server log with\n"
+        "the level INFO, instead of stderr. Also the type of assertions used by the registry\n"
+        "depends on this value: NX_KIT_ASSERT() for stderr, NX_ASSERT() for the Server log.");
 };
 
 inline PluginsIniConfig& pluginsIni()

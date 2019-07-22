@@ -64,7 +64,7 @@ public:
     void executePluginAction(
         const QnUuid& engineId,
         const QString& actionTypeId,
-        const analytics::db::DetectedObject& object,
+        const analytics::db::ObjectTrack& object,
         const QnVirtualCameraResourcePtr& camera) const;
 
 private:
@@ -441,7 +441,7 @@ QAction* AnalyticsSearchWidget::Private::addMenuAction(
 void AnalyticsSearchWidget::Private::executePluginAction(
     const QnUuid& engineId,
     const QString& actionTypeId,
-    const analytics::db::DetectedObject& object,
+    const analytics::db::ObjectTrack& track,
     const QnVirtualCameraResourcePtr& camera) const
 {
     const auto server = q->commonModule()->currentServer();
@@ -456,8 +456,8 @@ void AnalyticsSearchWidget::Private::executePluginAction(
     AnalyticsAction actionData;
     actionData.engineId = engineId;
     actionData.actionId = actionDescriptor->id;
-    actionData.objectId = object.objectAppearanceId;
-    actionData.timestampUs = object.firstAppearanceTimeUsec;
+    actionData.objectTrackId = track.id;
+    actionData.timestampUs = track.firstAppearanceTimeUs;
     actionData.deviceId = camera->getId();
 
     if (!actionDescriptor->parametersModel.isEmpty())

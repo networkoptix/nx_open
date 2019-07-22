@@ -6,8 +6,8 @@
 #include <nx_ec/data/api_conversion_functions.h>
 
 #include <nx/sdk/helpers/ptr.h>
-#include <nx/sdk/helpers/to_string.h>
 #include <nx/vms/server/sdk_support/utils.h>
+#include <nx/vms/server/sdk_support/to_string.h>
 #include <nx/vms/server/analytics/debug_helpers.h>
 
 #include <nx/vms/common/resource/analytics_plugin_resource.h>
@@ -31,6 +31,9 @@ namespace nx::vms::server::analytics {
 
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
+
+template<typename T>
+using ResultHolder = nx::vms::server::sdk_support::ResultHolder<T>;
 
 class SdkObjectFactory;
 
@@ -286,36 +289,48 @@ bool SdkObjectFactory::initEngineResources()
                 continue;
             }
 
-            Error error = Error::noError;
-            const auto sdkEngine = toPtr(sdkPlugin->createEngine(&error));
-            if (!sdkEngine)
+            const ResultHolder<IEngine*> result = sdkPlugin->createEngine();
+            if (!result.isOk())
             {
-                NX_WARNING(this, "Unable to create a SDK engine %1 (%2)",
-                    engineResource->getName(), engineResource->getId());
+                NX_WARNING(this,
+                    "Unable to create the SDK engine %1 (%2), plugin returned an error: %3",
+                    engineResource->getName(),
+                    engineResource->getId(),
+                    sdk_support::toErrorString(result));
                 continue;
             }
 
-            if (error != Error::noError)
+            const auto sdkEngine = result.value();
+            if (!sdkEngine)
             {
                 NX_WARNING(this,
-                    "Error '%1' occured while creating a SDK engine. "
-                    "Engine resource name: %2, engine resource Id: %3",
-                    error, engineResource->getName(), engineResource->getId());
+                    "Unable to create the SDK Engine %1 (%2), plugin returned null",
+                    engineResource->getName(), engineResource->getId());
 
                 continue;
             }
 
             engineResource->setSdkEngine(sdkEngine);
-            const auto result = engineResource->init();
-            if (!result)
+            if (!engineResource->init())
             {
                 NX_WARNING(this,
-                    "Error while initializing engine resource: %1. "
-                    "Engine resource name: %2, engine resource Id: %3",
-                    result, engineResource->getName(), engineResource->getId());
+                    "Error occured while initializing engine resource %1 (%2)",
+                    engineResource->getName(),
+                    engineResource->getId());
 
                 continue;
             }
+
+            if (engineResource->isDeviceDependent())
+            {
+                if (const auto pluginManager = getPluginManager(serverModule()))
+                {
+                    pluginManager->setIsActive(
+                        parentPlugin->sdkPlugin().get(),
+                        /*isActive*/ false);
+                }
+            }
+
             activeEngines.insert(engineResource->getId());
         }
     }
