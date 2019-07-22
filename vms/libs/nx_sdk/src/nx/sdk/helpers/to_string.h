@@ -42,7 +42,6 @@ std::string toJsonString(const IDeviceInfo* deviceInfo, int overallIndent = 0);
 
 std::string toString(ErrorCode errorCode);
 
-
 } // namespace sdk
 } // namespace nx
 
