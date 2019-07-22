@@ -41,7 +41,7 @@ public:
     Message args(const Values& ... values) const
     {
         using ::toString;
-        return m_str.arg(argToQString(toString(values)) ...);
+        return m_str.arg(toString(toString(values)) ...);
     }
 
     template<typename ... Arguments>
@@ -61,21 +61,6 @@ public:
     Message arg(short value, int width = 0, int base = 10, const QChar& fill = kSpace) const;
     Message arg(ushort value, int width = 0, int base = 10, const QChar& fill = kSpace) const;
     Message arg(double value, int width = 0, char format = 'g', int precision = -1, const QChar& fill = kSpace) const;
-
-private:
-    static QString toQStringExplicitly(const std::string& str)
-    {
-        return QString::fromStdString(str);
-    }
-
-    template<typename T>
-    static QString argToQString(T&& str)
-    {
-        if constexpr (std::is_convertible_v<T, QString>)
-            return QString(std::forward<T>(str));
-        else
-            return toQStringExplicitly(std::forward<T>(str));
-    }
 
 private:
     QString m_str;
