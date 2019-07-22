@@ -3003,17 +3003,17 @@ a %1</translation>
     <message numerus="yes">
       <source>Event log for period from %1 to %2 - %n events found</source>
       <comment>Dates are substituted</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Registro de eventos para el período de %1 a %2 - %n eventos encontrados</numerusform>
-        <numerusform>Event log for period from %1 to %2 - %n events found</numerusform>
+        <numerusform>Registro de eventos para el período de %1 a %2: %n eventos encontrados</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Event log for %1 - %n events found</source>
       <comment>Date is substituted</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Registro de eventos para %1 - %n eventos encontrados</numerusform>
-        <numerusform>Event log for %1 - %n events found</numerusform>
+        <numerusform>Registro de eventos para %1 - %n eventos encontrados</numerusform>
       </translation>
     </message>
   </context>
@@ -3091,9 +3091,9 @@ a %1</translation>
     <message numerus="yes">
       <source>%1 (%n cameras)</source>
       <comment>%1 is description of event. Will be replaced in runtime</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%1 (%n cámaras)</numerusform>
-        <numerusform>%1 (%n cameras)</numerusform>
+        <numerusform>%1 (%n cámaras)</numerusform>
       </translation>
     </message>
   </context>
@@ -4242,6 +4242,10 @@ a %1</translation>
     <message>
       <source>Virtual Camera %1</source>
       <translation>Camara Virtual %1</translation>
+    </message>
+    <message>
+      <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
+      <translation type="unfinished">&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</translation>
     </message>
   </context>
   <context>
@@ -7342,12 +7346,12 @@ Si usted pretende mover datos analíticos a otra ubicación de almacenamiento, p
   <context>
     <name>nx::vms::client::desktop::AnalyticsSearchListModel::Private</name>
     <message>
-      <source>Unknown object</source>
-      <translation>Objeto desconocido</translation>
-    </message>
-    <message>
       <source>deleted camera</source>
       <translation>cámara eliminada</translation>
+    </message>
+    <message>
+      <source>Unknown track</source>
+      <translation type="unfinished">Unknown track</translation>
     </message>
   </context>
   <context>
@@ -8741,16 +8745,24 @@ Si usted pretende mover datos analíticos a otra ubicación de almacenamiento, p
       <translation>Iniciando actualización a ...</translation>
     </message>
     <message>
-      <source>Some servers have no package available</source>
-      <translation>Algunos servidores no tienen paquete disponible</translation>
-    </message>
-    <message>
       <source>Failed to cancel update</source>
-      <translation type="unfinished">Failed to cancel update</translation>
+      <translation>Error al cancelar la actualización</translation>
     </message>
     <message>
       <source>Failed to start installation</source>
-      <translation type="unfinished">Failed to start installation</translation>
+      <translation>Error al iniciar la instalación</translation>
+    </message>
+    <message>
+      <source>Some servers have no update packages available.</source>
+      <translation type="unfinished">Some servers have no update packages available.</translation>
+    </message>
+    <message>
+      <source>Some servers have encountered an internal error.</source>
+      <translation type="unfinished">Some servers have encountered an internal error.</translation>
+    </message>
+    <message>
+      <source>Please please contact Customer Support.</source>
+      <translation type="unfinished">Please please contact Customer Support.</translation>
     </message>
   </context>
   <context>
@@ -8867,10 +8879,6 @@ Si usted pretende mover datos analíticos a otra ubicación de almacenamiento, p
       <translation>Error al descargar la actualización</translation>
     </message>
     <message>
-      <source>Failed to install update</source>
-      <translation>Error al instalar la actualización</translation>
-    </message>
-    <message>
       <source>Waiting for peer data</source>
       <translation>Esperando datos de pares</translation>
     </message>
@@ -8924,11 +8932,15 @@ Si usted pretende mover datos analíticos a otra ubicación de almacenamiento, p
     </message>
     <message>
       <source>There is not enough space to install update.</source>
-      <translation type="unfinished">There is not enough space to install update.</translation>
+      <translation>No hay suficiente espacio para instalar la actualización.</translation>
     </message>
     <message>
       <source>Internal server error.</source>
-      <translation type="unfinished">Internal server error.</translation>
+      <translation>Error de servidor interno.</translation>
+    </message>
+    <message>
+      <source>This OS version is no longer supported.</source>
+      <translation type="unfinished">This OS version is no longer supported.</translation>
     </message>
   </context>
   <context>
@@ -9084,6 +9096,10 @@ Si usted pretende mover datos analíticos a otra ubicación de almacenamiento, p
       <source>Users will be automatically logged out if their session exceeds the specified duration.</source>
       <translation>Los usuarios se desconectarán automáticamente si su sesión excede la duración especificada.</translation>
     </message>
+    <message>
+      <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
+      <translation type="unfinished">Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerSettingsDialogStore</name>
@@ -9175,11 +9191,15 @@ Si usted pretende mover datos analíticos a otra ubicación de almacenamiento, p
     <name>nx::vms::client::desktop::ServerUpdateTool</name>
     <message>
       <source>No connection to the server.</source>
-      <translation type="unfinished">No connection to the server.</translation>
+      <translation>No hay conexión con el servidor.</translation>
     </message>
     <message>
       <source>Network error.</source>
-      <translation type="unfinished">Network error.</translation>
+      <translation>Error de red.</translation>
+    </message>
+    <message>
+      <source>Server error.</source>
+      <translation type="unfinished">Server error.</translation>
     </message>
   </context>
   <context>
@@ -9599,29 +9619,29 @@ Si usted pretende mover datos analíticos a otra ubicación de almacenamiento, p
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::ui::PluginEventModel</name>
+    <name>nx::vms::client::desktop::ui::PluginDiagnosticEventModel</name>
     <message>
       <source>Any Plugin</source>
-      <translation>Cualquier Plugin</translation>
+      <translation type="unfinished">Any Plugin</translation>
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::ui::PluginEventWidget</name>
+    <name>nx::vms::client::desktop::ui::PluginDiagnosticEventWidget</name>
     <message>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation>El evento se activará solo si hay coincidencias en el título con cualquiera de las palabras clave ingresadas.</translation>
+      <translation type="unfinished">Event will trigger only if there are matches in the caption with any of the entered keywords.</translation>
     </message>
     <message>
       <source>If the field is empty, event will always trigger.</source>
-      <translation>Si el campo está vacío, el evento siempre se disparará.</translation>
+      <translation type="unfinished">If the field is empty, event will always trigger.</translation>
     </message>
     <message>
       <source>This field is case sensitive.</source>
-      <translation>Este campo es sensible a mayúsculas y minúsculas.</translation>
+      <translation type="unfinished">This field is case sensitive.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
-      <translation>El evento se activará solo si hay coincidencias en el campo de descripción con cualquiera de las palabras clave ingresadas.</translation>
+      <translation type="unfinished">Event will trigger only if there are matches in the description field with any of the entered keywords.</translation>
     </message>
   </context>
   <context>

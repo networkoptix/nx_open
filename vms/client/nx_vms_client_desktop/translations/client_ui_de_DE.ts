@@ -2051,11 +2051,6 @@
       <source>New Virtual Camera...</source>
       <translation>Neue virtuelle Kamera...</translation>
     </message>
-    <message>
-      <location/>
-      <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
-      <translation>&quot;Virtuelle Kamera&quot; ist ein virtueller Speicher für Videodateien, der auf jeden Server auf Ihrem System hochgeladen werden kann und von jedem Benutzer zugänglich ist.</translation>
-    </message>
   </context>
   <context>
     <name>OpenLayoutActionWidget</name>
@@ -2099,46 +2094,46 @@
     </message>
   </context>
   <context>
-    <name>PluginEventWidget</name>
+    <name>PluginDiagnosticEventWidget</name>
     <message>
-      <location filename="../src/nx/vms/client/desktop/ui/event_rules/widgets/plugin_event_widget.ui"/>
+      <location filename="../src/nx/vms/client/desktop/ui/event_rules/widgets/plugin_diagnostic_event_widget.ui"/>
       <source>Source:</source>
-      <translation>Quelle:</translation>
+      <translation type="unfinished">Source:</translation>
     </message>
     <message>
       <location/>
       <source>Caption contains:</source>
-      <translation>Beschriftung enthält:</translation>
+      <translation type="unfinished">Caption contains:</translation>
     </message>
     <message>
       <location/>
       <source>Keywords separated by space</source>
-      <translation>Passwörter, die durch Leerzeichen getrennt sind</translation>
+      <translation type="unfinished">Keywords separated by space</translation>
     </message>
     <message>
       <location/>
       <source>Description contains:</source>
-      <translation>Beschreibung enthält:</translation>
+      <translation type="unfinished">Description contains:</translation>
     </message>
     <message>
       <location/>
       <source>Level:</source>
-      <translation>Level:</translation>
+      <translation type="unfinished">Level:</translation>
     </message>
     <message>
       <location/>
       <source>ERROR</source>
-      <translation>FEHLER</translation>
+      <translation type="unfinished">ERROR</translation>
     </message>
     <message>
       <location/>
       <source>WARNING</source>
-      <translation>WARNUNG</translation>
+      <translation type="unfinished">WARNING</translation>
     </message>
     <message>
       <location/>
       <source>INFO</source>
-      <translation>INFO</translation>
+      <translation type="unfinished">INFO</translation>
     </message>
   </context>
   <context>
@@ -2777,11 +2772,6 @@
       <location/>
       <source>Limit session duration</source>
       <translation>Dauer der Sitzung begrenzen</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
-      <translation>Wasserzeichen werden nur für Nicht-Administratoren über Livevideos angezeigt, archiviert und exportiert. Sie und andere Administratoren werden sie nicht sehen.</translation>
     </message>
   </context>
   <context>

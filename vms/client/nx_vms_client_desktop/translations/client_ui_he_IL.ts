@@ -2051,11 +2051,6 @@
       <source>New Virtual Camera...</source>
       <translation>מצלמה וירטואלית חדשה...</translation>
     </message>
-    <message>
-      <location/>
-      <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
-      <translation>&quot;מצלמה וירטואלית&quot; היא אחסון וירטואלי עבור קבצי וידאו, אשר יכול להיות נטען על כל שרת על המערכת שלך להיות נגיש על ידי כל משתמש.</translation>
-    </message>
   </context>
   <context>
     <name>OpenLayoutActionWidget</name>
@@ -2099,46 +2094,46 @@
     </message>
   </context>
   <context>
-    <name>PluginEventWidget</name>
+    <name>PluginDiagnosticEventWidget</name>
     <message>
-      <location filename="../src/nx/vms/client/desktop/ui/event_rules/widgets/plugin_event_widget.ui"/>
+      <location filename="../src/nx/vms/client/desktop/ui/event_rules/widgets/plugin_diagnostic_event_widget.ui"/>
       <source>Source:</source>
-      <translation>מקור:</translation>
+      <translation type="unfinished">Source:</translation>
     </message>
     <message>
       <location/>
       <source>Caption contains:</source>
-      <translation>הכתובית מכילה:</translation>
+      <translation type="unfinished">Caption contains:</translation>
     </message>
     <message>
       <location/>
       <source>Keywords separated by space</source>
-      <translation>מילות מפתח מופרדות ע"י רווח</translation>
+      <translation type="unfinished">Keywords separated by space</translation>
     </message>
     <message>
       <location/>
       <source>Description contains:</source>
-      <translation>התיאור מכיל:</translation>
+      <translation type="unfinished">Description contains:</translation>
     </message>
     <message>
       <location/>
       <source>Level:</source>
-      <translation>רמה:</translation>
+      <translation type="unfinished">Level:</translation>
     </message>
     <message>
       <location/>
       <source>ERROR</source>
-      <translation>שגיאה</translation>
+      <translation type="unfinished">ERROR</translation>
     </message>
     <message>
       <location/>
       <source>WARNING</source>
-      <translation>אזהרה</translation>
+      <translation type="unfinished">WARNING</translation>
     </message>
     <message>
       <location/>
       <source>INFO</source>
-      <translation>מידע</translation>
+      <translation type="unfinished">INFO</translation>
     </message>
   </context>
   <context>
@@ -2776,12 +2771,7 @@
     <message>
       <location/>
       <source>Limit session duration</source>
-      <translation type="unfinished">Limit session duration</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
-      <translation type="unfinished">Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</translation>
+      <translation>הגבלת משך חיבור</translation>
     </message>
   </context>
   <context>
@@ -3074,22 +3064,22 @@
     <message>
       <location/>
       <source>Analytics data will continue to be stored on the disabled storage.</source>
-      <translation type="unfinished">Analytics data will continue to be stored on the disabled storage.</translation>
+      <translation>נתוני אנליטיקה ימשיכו להיות מאוחסנים באחסון שהושבת.</translation>
     </message>
     <message>
       <location/>
       <source>Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</source>
-      <translation type="unfinished">Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</translation>
+      <translation>ההקלטה לאחסון שהושבת תיפסק. עם זאת, מחיקת הקלטות ישנות ממנו תמשיך.</translation>
     </message>
     <message>
       <location/>
       <source>Recording was enabled on the USB storage</source>
-      <translation type="unfinished">Recording was enabled on the USB storage</translation>
+      <translation>ההקלטה אופשרה באחסון ה- USB</translation>
     </message>
     <message>
       <location/>
       <source>Analytics data can occupy tens of gigabytes of storage space. We recommend to choose other location for it instead of the system partition.</source>
-      <translation type="unfinished">Analytics data can occupy tens of gigabytes of storage space. We recommend to choose other location for it instead of the system partition.</translation>
+      <translation>נתוני אנליטיקה יכולים להכיל עשרות ג 'יגה בייט של שטח אחסון. אנו ממליצים לבחור במקום אחר עבורו במקום במחיצה של מערכת ההפעלה.</translation>
     </message>
   </context>
   <context>

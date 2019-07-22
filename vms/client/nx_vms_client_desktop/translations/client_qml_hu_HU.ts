@@ -9,11 +9,11 @@
     </message>
     <message>
       <source>Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</source>
-      <translation type="unfinished">Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</translation>
+      <translation>A kamera analitika csak akkor működik, ha a kamerát épp megtekintjük. Engedélyezze a rögzítést annak érdekében, hogy az mindig működjön.</translation>
     </message>
     <message>
       <source>This is the built-in functionality</source>
-      <translation type="unfinished">This is the built-in functionality</translation>
+      <translation>Ez a beépített funkció</translation>
     </message>
   </context>
   <context>
@@ -72,11 +72,11 @@
     <name>PluginsInformation</name>
     <message>
       <source>No plugins installed</source>
-      <translation type="unfinished">No plugins installed</translation>
+      <translation>Nincs telepítve bővítmény</translation>
     </message>
     <message>
       <source>Server is offline</source>
-      <translation type="unfinished">Server is offline</translation>
+      <translation>A szerver offine</translation>
     </message>
   </context>
   <context>

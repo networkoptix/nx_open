@@ -575,7 +575,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Are you sure you want to delete &apos;%1&apos;?</source>
-      <translation>&apos;%1&apos; を削除してもよろしいですか？</translation>
+      <translation>&apos;%1&apos; を削除しますか？</translation>
     </message>
     <message>
       <source>Could not delete directory.</source>
@@ -636,7 +636,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>List of places and bookmarks</source>
-      <translation>アドレスやブックマークのリスト</translation>
+      <translation>アドレスとブックマークのリスト</translation>
     </message>
     <message>
       <source>Files</source>
@@ -679,11 +679,11 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Invalid filename</source>
-      <translation>無効なファイル名</translation>
+      <translation>ファイル名が正しくありません。</translation>
     </message>
     <message>
       <source>&lt;b&gt;The name &quot;%1&quot; can not be used.&lt;/b&gt;&lt;p&gt;Try using another name, with fewer characters or no punctuations marks.</source>
-      <translation>&lt;b&gt; &quot;%1&quot;という名前は使用できません.&lt;/b&gt;&lt;p&gt;文字の数を減らしたり、句読記号を付けずに別の名前を使用してください</translation>
+      <translation>&lt;b&gt; &quot;%1&quot;という名前は使用できません.&lt;/b&gt;&lt;p&gt;文字数を減らすか、句読記号を付けずに別の名前を使用してください</translation>
     </message>
     <message>
       <source>Name</source>
@@ -982,11 +982,11 @@ Do you want to delete it anyway?</source>
     <name>QSaveFile</name>
     <message>
       <source>Existing file %1 is not writable</source>
-      <translation>既存のファイル %1 は書き込み可能ではありません</translation>
+      <translation>既存のファイル %1 は書き込みできません</translation>
     </message>
     <message>
       <source>Filename refers to a directory</source>
-      <translation>ファイルではなくディレクトリを参照しています</translation>
+      <translation>ファイル名はディレクトリを参照します</translation>
     </message>
     <message>
       <source>Writing canceled by application</source>
@@ -1173,7 +1173,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Select All</source>
-      <translation>すべてを選択</translation>
+      <translation>すべて選択</translation>
     </message>
   </context>
 </TS>

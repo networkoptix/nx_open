@@ -4240,6 +4240,10 @@ to %1</source>
       <source>Virtual Camera %1</source>
       <translation>Virtuelle Kamera %1</translation>
     </message>
+    <message>
+      <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
+      <translation type="unfinished">&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</translation>
+    </message>
   </context>
   <context>
     <name>QnNotificationSoundManagerDialog</name>
@@ -7340,12 +7344,12 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
   <context>
     <name>nx::vms::client::desktop::AnalyticsSearchListModel::Private</name>
     <message>
-      <source>Unknown object</source>
-      <translation>Unbekanntes Objekt</translation>
-    </message>
-    <message>
       <source>deleted camera</source>
       <translation>gelöschte Kamera</translation>
+    </message>
+    <message>
+      <source>Unknown track</source>
+      <translation type="unfinished">Unknown track</translation>
     </message>
   </context>
   <context>
@@ -8739,16 +8743,24 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
       <translation>Update wird gestartet auf ...</translation>
     </message>
     <message>
-      <source>Some servers have no package available</source>
-      <translation>Einige Server haben kein Paket zur Verfügung</translation>
-    </message>
-    <message>
       <source>Failed to cancel update</source>
-      <translation type="unfinished">Failed to cancel update</translation>
+      <translation>Aktualisierung konnte nicht abgebrochen werden</translation>
     </message>
     <message>
       <source>Failed to start installation</source>
-      <translation type="unfinished">Failed to start installation</translation>
+      <translation>Installation konnte nicht gestartet werden</translation>
+    </message>
+    <message>
+      <source>Some servers have no update packages available.</source>
+      <translation type="unfinished">Some servers have no update packages available.</translation>
+    </message>
+    <message>
+      <source>Some servers have encountered an internal error.</source>
+      <translation type="unfinished">Some servers have encountered an internal error.</translation>
+    </message>
+    <message>
+      <source>Please please contact Customer Support.</source>
+      <translation type="unfinished">Please please contact Customer Support.</translation>
     </message>
   </context>
   <context>
@@ -8865,10 +8877,6 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
       <translation>Das Update konnte nicht heruntergeladen werden</translation>
     </message>
     <message>
-      <source>Failed to install update</source>
-      <translation>Das Update konnte nicht installiert werden</translation>
-    </message>
-    <message>
       <source>Waiting for peer data</source>
       <translation>Warten auf Peer-Daten</translation>
     </message>
@@ -8927,6 +8935,10 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     <message>
       <source>Internal server error.</source>
       <translation>Interner Serverfehler.</translation>
+    </message>
+    <message>
+      <source>This OS version is no longer supported.</source>
+      <translation type="unfinished">This OS version is no longer supported.</translation>
     </message>
   </context>
   <context>
@@ -9082,6 +9094,10 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
       <source>Users will be automatically logged out if their session exceeds the specified duration.</source>
       <translation>Benutzer werden automatisch abgemeldet, wenn ihre Sitzung die angegebene Dauer überschreitet.</translation>
     </message>
+    <message>
+      <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
+      <translation type="unfinished">Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerSettingsDialogStore</name>
@@ -9173,11 +9189,15 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     <name>nx::vms::client::desktop::ServerUpdateTool</name>
     <message>
       <source>No connection to the server.</source>
-      <translation type="unfinished">No connection to the server.</translation>
+      <translation>Keine Verbindung zum Server.</translation>
     </message>
     <message>
       <source>Network error.</source>
-      <translation type="unfinished">Network error.</translation>
+      <translation>Netzwerkfehler.</translation>
+    </message>
+    <message>
+      <source>Server error.</source>
+      <translation type="unfinished">Server error.</translation>
     </message>
   </context>
   <context>
@@ -9597,29 +9617,29 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::ui::PluginEventModel</name>
+    <name>nx::vms::client::desktop::ui::PluginDiagnosticEventModel</name>
     <message>
       <source>Any Plugin</source>
-      <translation>Jedes Plugin</translation>
+      <translation type="unfinished">Any Plugin</translation>
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::ui::PluginEventWidget</name>
+    <name>nx::vms::client::desktop::ui::PluginDiagnosticEventWidget</name>
     <message>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation>Das Ereignis wird nur ausgelöst, wenn es Übereinstimmungen mit einem der eingegebenen Schlüsselwörter gibt.</translation>
+      <translation type="unfinished">Event will trigger only if there are matches in the caption with any of the entered keywords.</translation>
     </message>
     <message>
       <source>If the field is empty, event will always trigger.</source>
-      <translation>Wenn das Feld leer ist, wird immer ein Ereignis ausgelöst.</translation>
+      <translation type="unfinished">If the field is empty, event will always trigger.</translation>
     </message>
     <message>
       <source>This field is case sensitive.</source>
-      <translation>In diesem Feld wird zwischen Groß- und Kleinschreibung unterschieden.</translation>
+      <translation type="unfinished">This field is case sensitive.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
-      <translation>Das Ereignis wird nur ausgelöst, wenn im Beschreibungsfeld Übereinstimmungen mit einem der eingegebenen Schlüsselwörter vorhanden sind.</translation>
+      <translation type="unfinished">Event will trigger only if there are matches in the description field with any of the entered keywords.</translation>
     </message>
   </context>
   <context>

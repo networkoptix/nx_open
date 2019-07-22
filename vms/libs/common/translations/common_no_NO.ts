@@ -5,11 +5,11 @@
     <name>DateTimeFormats</name>
     <message>
       <source>MM/dd</source>
-      <translation type="unfinished">MM/dd</translation>
+      <translation>dd/MM</translation>
     </message>
     <message>
       <source>MMMM yyyy</source>
-      <translation type="unfinished">MMMM yyyy</translation>
+      <translation>MMMM yyyy</translation>
     </message>
   </context>
   <context>
@@ -85,31 +85,31 @@
     <message>
       <source>Cannot connect to the other System because current System is already connected to %1.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Cannot connect to the other System because current System is already connected to %1.</translation>
+      <translation>Kan ikke koble til det andre systemet fordi nåværende system allerede er koblet til %1.</translation>
     </message>
     <message>
       <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 System can only be merged with non-%1. System name and password are taken from %1 System.</translation>
+      <translation>%1 Systemet kan bare slås sammen med ikke%1. Systemnavn og passord er hentet fra %1 System.</translation>
     </message>
     <message>
       <source>Both Systems are connected to %1. Merge is not allowed.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Both Systems are connected to %1. Merge is not allowed.</translation>
+      <translation>Begge systemene er koblet til %1. Sammenslåing er ikke tillatt.</translation>
     </message>
     <message>
       <source>These Systems are built with different %1 URL. Merge is not allowed.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">These Systems are built with different %1 URL. Merge is not allowed.</translation>
+      <translation>Disse systemene er bygget med forskjellige %1 URL. Sammenslåing er ikke tillatt.</translation>
     </message>
     <message>
       <source>Cannot merge Systems because they have at least one server with the same ID. Please remove this server and try again.</source>
-      <translation type="unfinished">Cannot merge Systems because they have at least one server with the same ID. Please remove this server and try again.</translation>
+      <translation>Kan ikke slå sammen systemer fordi de har minst én server med samme ID. Fjern denne serveren og prøv igjen.</translation>
     </message>
     <message>
       <source>Cloud systems have different owners. Merge is not allowed.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Cloud systems have different owners. Merge is not allowed.</translation>
+      <translation>Cloud systemer har forskjellige eiere. Sammenslåing er ikke tillatt.</translation>
     </message>
   </context>
   <context>
@@ -336,15 +336,15 @@
     </message>
     <message>
       <source>Plugin error. %1</source>
-      <translation type="unfinished">Plugin error. %1</translation>
+      <translation>Feil med tillegg. %1</translation>
     </message>
     <message>
       <source>Plugin is unavailable</source>
-      <translation type="unfinished">Plugin is unavailable</translation>
+      <translation>Plugin er utilgjengelig</translation>
     </message>
     <message>
       <source>Internal server error. %1</source>
-      <translation type="unfinished">Internal server error. %1</translation>
+      <translation>Intern server feil. %1</translation>
     </message>
   </context>
   <context>
@@ -383,7 +383,7 @@
     </message>
     <message>
       <source>Could not allocate sample buffers</source>
-      <translation type="unfinished">Could not allocate sample buffers</translation>
+      <translation>Kunne ikke allokere prøvebuffere</translation>
     </message>
   </context>
   <context>
@@ -521,129 +521,129 @@
     <message numerus="yes">
       <source>%n Time Licenses</source>
       <translation type="unfinished">
-        <numerusform>%n Time Licenses</numerusform>
+        <numerusform>%n Demolisenser</numerusform>
         <numerusform>%n Time Licenses</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Analog Licenses</source>
       <translation type="unfinished">
-        <numerusform>%n Analog Licenses</numerusform>
+        <numerusform>%n Enkoder lisenser</numerusform>
         <numerusform>%n Analog Licenses</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Professional Licenses</source>
       <translation type="unfinished">
-        <numerusform>%n Professional Licenses</numerusform>
+        <numerusform>%n Pro lisenser</numerusform>
         <numerusform>%n Professional Licenses</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Edge Licenses</source>
       <translation type="unfinished">
-        <numerusform>%n Edge Licenses</numerusform>
+        <numerusform>%n Edge-lisenser</numerusform>
         <numerusform>%n Edge Licenses</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Vmax Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Vmax Licenses</numerusform>
-        <numerusform>%n Vmax Licenses</numerusform>
+      <translation>
+        <numerusform>%n Vmax-lisenser</numerusform>
+        <numerusform>%n Vmax-lisenser</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Analog Encoder Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Analog Encoder Licenses</numerusform>
-        <numerusform>%n Analog Encoder Licenses</numerusform>
+      <translation>
+        <numerusform>%n Analog Encoder-lisenser</numerusform>
+        <numerusform>%n Analog Encoder-lisenser</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Video Wall Licenses</source>
       <translation type="unfinished">
-        <numerusform>%n Video Wall Licenses</numerusform>
+        <numerusform>%n Videovegg Lisenser</numerusform>
         <numerusform>%n Video Wall Licenses</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O Module Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n I/O Module Licenses</numerusform>
-        <numerusform>%n I/O Module Licenses</numerusform>
+      <translation>
+        <numerusform>%n I/O-modul lisenser</numerusform>
+        <numerusform>%n I/O-modul lisenser</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Start Licenses</source>
       <translation type="unfinished">
         <numerusform>%n Start Licenses</numerusform>
-        <numerusform>%n Start Licenses</numerusform>
+        <numerusform>%n Start lisenser</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Bridge Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Bridge Licenses</numerusform>
-        <numerusform>%n Bridge Licenses</numerusform>
+      <translation>
+        <numerusform>%n Bridge lisenser</numerusform>
+        <numerusform>%n Bridge lisenser</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Invalid Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Invalid Licenses</numerusform>
-        <numerusform>%n Invalid Licenses</numerusform>
+      <translation>
+        <numerusform>%n Ugyldig lisens</numerusform>
+        <numerusform>%n Ugyldige lisenser</numerusform>
       </translation>
     </message>
     <message>
       <source>Free Licenses</source>
-      <translation type="unfinished">Free Licenses</translation>
+      <translation>Demo lisenser</translation>
     </message>
     <message numerus="yes">
       <source>%n Free Licenses</source>
       <translation type="unfinished">
         <numerusform>%n Free Licenses</numerusform>
-        <numerusform>%n Free Licenses</numerusform>
+        <numerusform>%n Demo lisenser</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Time Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation type="unfinished">
-        <numerusform>%n/%1 Time Licenses</numerusform>
+        <numerusform>%n/%1 Demolisens</numerusform>
         <numerusform>%n/%1 Time Licenses</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Analog Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Analog Licenses</numerusform>
-        <numerusform>%n/%1 Analog Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 Enkoder lisens</numerusform>
+        <numerusform>%n/%1 Enkoder lisenser</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Professional Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Professional Licenses</numerusform>
-        <numerusform>%n/%1 Professional Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 Pro lisens</numerusform>
+        <numerusform>%n/%1 Pro lisenser</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Edge Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Edge Licenses</numerusform>
-        <numerusform>%n/%1 Edge Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 Edge lisens</numerusform>
+        <numerusform>%n/%1 Edge lisenser</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Vmax Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Vmax Licenses</numerusform>
-        <numerusform>%n/%1 Vmax Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 Vmax lisenser</numerusform>
+        <numerusform>%n/%1 Vmax lisenser</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -651,31 +651,31 @@
       <comment>%n will be replaced by the total count</comment>
       <translation type="unfinished">
         <numerusform>%n/%1 Analog Encoder Licenses</numerusform>
-        <numerusform>%n/%1 Analog Encoder Licenses</numerusform>
+        <numerusform>%n/%1 Analog Enkoder lisenser</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Video Wall Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Video Wall Licenses</numerusform>
-        <numerusform>%n/%1 Video Wall Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 Videovegg Lisens</numerusform>
+        <numerusform>%n/%1 Videovegg Lisenser</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 I/O Module Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 I/O Module Licenses</numerusform>
-        <numerusform>%n/%1 I/O Module Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 / I/O-modul lisens</numerusform>
+        <numerusform>%n/%1 / I/O-modul lisenser</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Start Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Start Licenses</numerusform>
-        <numerusform>%n/%1 Start Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 på Start-lisens</numerusform>
+        <numerusform>%n/%1 på Start-lisenser</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -683,23 +683,23 @@
       <comment>%n will be replaced by the total count</comment>
       <translation type="unfinished">
         <numerusform>%n/%1 Free Licenses</numerusform>
-        <numerusform>%n/%1 Free Licenses</numerusform>
+        <numerusform>%n/%1 Demo lisenser</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Bridge Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Bridge Licenses</numerusform>
-        <numerusform>%n/%1 Bridge Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 Bridge lisenser</numerusform>
+        <numerusform>%n/%1 Bridge lisenser</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Invalid Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Invalid Licenses</numerusform>
-        <numerusform>%n/%1 Invalid Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 ugyldig lisens</numerusform>
+        <numerusform>%n/%1 ugyldige lisenser</numerusform>
       </translation>
     </message>
   </context>
@@ -762,15 +762,15 @@
     </message>
     <message>
       <source>Server with matching Hardware ID not found</source>
-      <translation type="unfinished">Server with matching Hardware ID not found</translation>
+      <translation>Server med matchende maskinvare-ID ikke funnet</translation>
     </message>
     <message>
       <source>Only one starter license is allowed per System.</source>
-      <translation type="unfinished">Only one starter license is allowed per System.</translation>
+      <translation>Bare en startlisens er tillatt per system.</translation>
     </message>
     <message>
       <source>You already have one active starter license.</source>
-      <translation type="unfinished">You already have one active starter license.</translation>
+      <translation>Du har allerede en aktiv startlisens.</translation>
     </message>
   </context>
   <context>
@@ -832,44 +832,44 @@
     </message>
     <message numerus="yes">
       <source>%n Cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n Cameras</numerusform>
-        <numerusform>%n Cameras</numerusform>
+      <translation>
+        <numerusform>%n kameraer</numerusform>
+        <numerusform>%n kameraer</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n cameras</numerusform>
-        <numerusform>%n cameras</numerusform>
+      <translation>
+        <numerusform>%n kamera</numerusform>
+        <numerusform>%n kameraer</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O Modules</source>
       <translation type="unfinished">
         <numerusform>%n I/O Modules</numerusform>
-        <numerusform>%n I/O Modules</numerusform>
+        <numerusform>%n I / O-moduler</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O modules</source>
       <translation type="unfinished">
         <numerusform>%n I/O modules</numerusform>
-        <numerusform>%n I/O modules</numerusform>
+        <numerusform>%n I/O-moduler</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Devices</source>
-      <translation type="unfinished">
-        <numerusform>%n Devices</numerusform>
-        <numerusform>%n Devices</numerusform>
+      <translation>
+        <numerusform>%n Enheter</numerusform>
+        <numerusform>%n Enheter</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n devices</source>
-      <translation type="unfinished">
-        <numerusform>%n devices</numerusform>
-        <numerusform>%n devices</numerusform>
+      <translation>
+        <numerusform>%n enhet</numerusform>
+        <numerusform>%n enheter</numerusform>
       </translation>
     </message>
   </context>
@@ -897,7 +897,7 @@
     </message>
     <message>
       <source>Hardware ID: %1</source>
-      <translation type="unfinished">Hardware ID: %1</translation>
+      <translation>Maskinvare-ID: %1</translation>
     </message>
   </context>
   <context>
@@ -1028,19 +1028,19 @@
     <name>QnZipExtractor</name>
     <message>
       <source>Zip file is corrupted.</source>
-      <translation type="unfinished">Zip file is corrupted.</translation>
+      <translation>Zip-fil er ødelagt.</translation>
     </message>
     <message>
       <source>Could not find target dir.</source>
-      <translation type="unfinished">Could not find target dir.</translation>
+      <translation>Kunne ikke finne måldir.</translation>
     </message>
     <message>
       <source>Could not open file for writing.</source>
-      <translation type="unfinished">Could not open file for writing.</translation>
+      <translation>Kunne ikke åpne filen for skriving.</translation>
     </message>
     <message>
       <source>There is no free space on the disk.</source>
-      <translation type="unfinished">There is no free space on the disk.</translation>
+      <translation>Det er ikke ledig plass på disken.</translation>
     </message>
     <message>
       <source>Unknown error.</source>
@@ -1048,22 +1048,22 @@
     </message>
     <message>
       <source>Extraction was cancelled.</source>
-      <translation type="unfinished">Extraction was cancelled.</translation>
+      <translation>Dekomprimering ble avbrutt.</translation>
     </message>
     <message>
       <source>Extractor is busy.</source>
-      <translation type="unfinished">Extractor is busy.</translation>
+      <translation>Dekomprimerer er opptatt.</translation>
     </message>
   </context>
   <context>
     <name>nx::utils::CryptedFileStream</name>
     <message>
       <source>Wrong crypted stream size.</source>
-      <translation type="unfinished">Wrong crypted stream size.</translation>
+      <translation>Feil kryptert strømstørrelse.</translation>
     </message>
     <message>
       <source>Damaged crypted stream header.</source>
-      <translation type="unfinished">Damaged crypted stream header.</translation>
+      <translation>Skadet kryptert strøm header.</translation>
     </message>
   </context>
   <context>
@@ -1531,19 +1531,19 @@
     </message>
     <message>
       <source>Storage Issue</source>
-      <translation type="unfinished">Storage Issue</translation>
+      <translation>Harddiskproblem</translation>
     </message>
     <message>
       <source>Storage Issue at %1</source>
-      <translation type="unfinished">Storage Issue at %1</translation>
+      <translation>Haddiskproblem på %1</translation>
     </message>
     <message>
       <source>Set to fullscreen</source>
-      <translation type="unfinished">Set to fullscreen</translation>
+      <translation>Sett til fullskjerm</translation>
     </message>
     <message>
       <source>Exit fullscreen</source>
-      <translation type="unfinished">Exit fullscreen</translation>
+      <translation>Gå ut av fullskjerm</translation>
     </message>
     <message>
       <source>Open layout</source>
@@ -1551,43 +1551,43 @@
     </message>
     <message>
       <source>Failed to force using camera time, it lags too much, system time will be used</source>
-      <translation type="unfinished">Failed to force using camera time, it lags too much, system time will be used</translation>
+      <translation>Kunne ikke tvinge bruk av tid fra kamera, det henger for mye, systemtid vil bli brukt</translation>
     </message>
     <message>
       <source>Camera time is back to normal</source>
-      <translation type="unfinished">Camera time is back to normal</translation>
+      <translation>Kameratiden er tilbake til det normale</translation>
     </message>
     <message>
       <source>Multiple %1 events have occurred</source>
-      <translation type="unfinished">Multiple %1 events have occurred</translation>
+      <translation>Flere %1 hendelser har skjedd</translation>
     </message>
     <message>
       <source>Multicast address conflict detected. Address %1 is already in use by %2 on %3 stream</source>
-      <translation type="unfinished">Multicast address conflict detected. Address %1 is already in use by %2 on %3 stream</translation>
+      <translation>Multicast adresse konflikt oppdaget. Adresse %1 er allerede i bruk med %2 på %3 strøm</translation>
     </message>
     <message>
       <source>Network address %1 is not a multicast address</source>
-      <translation type="unfinished">Network address %1 is not a multicast address</translation>
+      <translation>Nettverksadresse %1 er ikke en multicast-adresse</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; is offline.</source>
-      <translation type="unfinished">Analytics storage &quot;%1&quot; is offline.</translation>
+      <translation>Analytics-lagring &quot;%1&quot; er frakoblet.</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; is almost full.</source>
-      <translation type="unfinished">Analytics storage &quot;%1&quot; is almost full.</translation>
+      <translation>Analytics-lagring &quot;%1&quot; er nesten full.</translation>
     </message>
     <message>
       <source>Plugin Diagnostic Event</source>
-      <translation type="unfinished">Plugin Diagnostic Event</translation>
+      <translation>Plugin Diagnostic Event</translation>
     </message>
     <message>
       <source>Unknown Plugin Diagnostic Event</source>
-      <translation type="unfinished">Unknown Plugin Diagnostic Event</translation>
+      <translation>Ukjent diagnostikkhendelse for plugin</translation>
     </message>
     <message>
       <source>RAID error. %1.</source>
-      <translation type="unfinished">RAID error. %1.</translation>
+      <translation>RAID-feil. %1.</translation>
     </message>
   </context>
   <context>

@@ -520,9 +520,9 @@
     </message>
     <message numerus="yes">
       <source>%n Time Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Licencias de Tiempo</numerusform>
+      <translation>
         <numerusform>%n Time Licenses</numerusform>
+        <numerusform>%n Licencias de Tiempo</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -555,9 +555,9 @@
     </message>
     <message numerus="yes">
       <source>%n Analog Encoder Licenses</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n Licencias de Codificador Analógico</numerusform>
-        <numerusform>%n Analog Encoder Licenses</numerusform>
+        <numerusform>%n Licencias de Codificador Analógico</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -601,9 +601,9 @@
     </message>
     <message numerus="yes">
       <source>%n Free Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Licencias Libres</numerusform>
-        <numerusform>%n Free Licenses</numerusform>
+      <translation>
+        <numerusform>%n Licencia Gratis</numerusform>
+        <numerusform>%n Licencias Gratis</numerusform>
       </translation>
     </message>
     <message numerus="yes">

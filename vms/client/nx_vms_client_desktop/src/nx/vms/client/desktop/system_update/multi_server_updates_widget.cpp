@@ -208,7 +208,7 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
         this, &MultiServerUpdatesWidget::atServerPackageDownloadFailed);
 
     connect(m_clientUpdateTool.get(), &ClientUpdateTool::updateStateChanged,
-        m_stateTracker.get(), &PeerStateTracker::atClientupdateStateChanged);
+        m_stateTracker.get(), &PeerStateTracker::atClientUpdateStateChanged);
 
     connect(ui->cancelProgressAction, &QPushButton::clicked, this,
         &MultiServerUpdatesWidget::atCancelCurrentAction);
@@ -270,8 +270,12 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
     connect(qnGlobalSettings, &QnGlobalSettings::cloudSettingsChanged, this,
         [this]()
         {
-            if (m_widgetState != WidgetUpdateState::ready)
+            if (m_widgetState != WidgetUpdateState::ready
+                && m_widgetState != WidgetUpdateState::readyInstall
+                && m_widgetState != WidgetUpdateState::downloading)
+            {
                 return;
+            }
 
             NX_VERBOSE(this, "Cloud settings has been changed. We should repeat validation.");
             repeatUpdateValidation();
@@ -337,6 +341,7 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
                 // So we can clear our state as well.
                 clearUpdateInfo();
                 setTargetState(WidgetUpdateState::initial, {});
+                setUpdateSourceMode(UpdateSourceType::internet);
             }
         });
 
@@ -749,7 +754,7 @@ void MultiServerUpdatesWidget::atUpdateCurrentState()
         }
 
         m_serverUpdateTool->verifyUpdateManifest(checkResponse,
-            m_clientUpdateTool->getInstalledVersions());
+            m_clientUpdateTool->getInstalledClientVersions());
         if (!hasActiveUpdate())
         {
             if (m_updateInfo.preferOtherUpdate(checkResponse))
@@ -887,7 +892,7 @@ void MultiServerUpdatesWidget::checkForInternetUpdates(bool initial)
         // info, if there is any.
         auto watcher = context()->instance<nx::vms::client::desktop::WorkbenchUpdateWatcher>();
         auto contents = watcher->getUpdateContents();
-        auto installedVersions = m_clientUpdateTool->getInstalledVersions();
+        auto installedVersions = m_clientUpdateTool->getInstalledClientVersions();
         if (!contents.isEmpty()
             && m_serverUpdateTool->verifyUpdateManifest(contents, installedVersions))
         {
@@ -1250,6 +1255,8 @@ void MultiServerUpdatesWidget::atFinishUpdateComplete(bool success, const QStrin
         else
         {
             NX_ERROR(this, "atFinishUpdateComplete(%1) - %2", success, error);
+            auto targets = m_stateTracker->peersIssued();
+            setTargetState(WidgetUpdateState::installingStalled, targets);
         }
     }
 }
@@ -1259,7 +1266,7 @@ void MultiServerUpdatesWidget::repeatUpdateValidation()
     if (!m_updateInfo.isEmpty())
     {
         NX_INFO(this, "repeatUpdateValidation() - recalculating update report");
-        auto installedVersions = m_clientUpdateTool->getInstalledVersions();
+        auto installedVersions = m_clientUpdateTool->getInstalledClientVersions();
         if (m_updateInfo.error != nx::update::InformationError::httpError
             || m_updateInfo.error != nx::update::InformationError::networkError)
         {
@@ -1496,7 +1503,7 @@ void MultiServerUpdatesWidget::processInitialCheckState()
          *  It should download an update package using p2p downloader
          */
 
-        auto installedVersions = m_clientUpdateTool->getInstalledVersions();
+        auto installedVersions = m_clientUpdateTool->getInstalledClientVersions();
         bool isOk = m_serverUpdateTool->verifyUpdateManifest(updateInfo, installedVersions);
 
         if (updateInfo.isEmpty())
@@ -2320,16 +2327,20 @@ void MultiServerUpdatesWidget::syncRemoteUpdateStateToUi()
     if (stateHasProgress(m_widgetState))
         syncProgress();
 
-    auto readyAndOnline = m_stateTracker->onlineAndInState(LocalStatusCode::readyToInstall);
-    auto readyAndOffline = m_stateTracker->offlineAndInState(LocalStatusCode::readyToInstall);
+
     bool hasVerificationErrors = m_stateTracker->hasVerificationErrors();
     bool hasStatusErrors = m_stateTracker->hasStatusErrors();
 
     QStringList errorTooltips;
-    if (m_widgetState == WidgetUpdateState::readyInstall)
+    if (m_widgetState == WidgetUpdateState::readyInstall
+        || m_widgetState == WidgetUpdateState::ready)
     {
-        if (readyAndOnline.empty() || !readyAndOffline.empty()
-            || hasStatusErrors || hasVerificationErrors)
+        auto readyAndOnline = m_stateTracker->onlineAndInState(LocalStatusCode::readyToInstall);
+        auto readyAndOffline = m_stateTracker->offlineAndInState(LocalStatusCode::readyToInstall);
+        bool hasInstallIssues = (readyAndOnline.empty() || !readyAndOffline.empty())
+            && m_widgetState == WidgetUpdateState::readyInstall;
+
+        if (hasInstallIssues || hasStatusErrors || hasVerificationErrors)
         {
             if (hasVerificationErrors)
             {
@@ -2340,7 +2351,7 @@ void MultiServerUpdatesWidget::syncRemoteUpdateStateToUi()
                 errorTooltips << tr("Some servers have encountered an internal error.");
                 errorTooltips << tr("Please please contact Customer Support.");
             }
-            else
+            else if (hasInstallIssues)
             {
                 errorTooltips << tr("Some servers have gone offline. "
                                     "Please wait until they become online to continue.");

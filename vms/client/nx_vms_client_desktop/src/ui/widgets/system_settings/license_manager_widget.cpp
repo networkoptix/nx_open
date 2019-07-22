@@ -872,7 +872,11 @@ void QnLicenseManagerWidget::takeAwaySelectedLicenses()
 
 void QnLicenseManagerWidget::exportLicenses()
 {
-    QnTableExportHelper::exportToFile(ui->gridLicenses, false, this, tr("Export licenses to a file"));
+    QnTableExportHelper::exportToFile(
+        ui->gridLicenses->model(),
+        QnTableExportHelper::getAllIndexes(ui->gridLicenses->model()),
+        this,
+        tr("Export licenses to a file"));
 }
 
 void QnLicenseManagerWidget::updateButtons()

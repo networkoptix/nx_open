@@ -252,12 +252,7 @@ bool CommonUpdateManager::canDownloadFile(
 
                 if (outUpdateStatus->code == update::Status::Code::readyToInstall)
                 {
-                    // We can't precizely evaluate the required space for update installation.
-                    // As a very approximate value we take 10% of the package size + some padding
-                    // hard-coded inside checkFreeSpace.
-                    const qint64 required = package.size / 10;
-                    if (!installer()->checkFreeSpace(
-                        QCoreApplication::applicationDirPath(), required))
+                    if (!installer()->checkFreeSpaceForInstallation())
                     {
                         *outUpdateStatus = update::Status(
                             peerId,
@@ -286,7 +281,8 @@ bool CommonUpdateManager::canDownloadFile(
     }
 
     if (!installer()->checkFreeSpace(
-        downloader()->downloadsDirectory().absolutePath(), package.size))
+        downloader()->downloadsDirectory().absolutePath(),
+        package.size + installer()->reservedSpacePadding()))
     {
         *outUpdateStatus = nx::update::Status(
             peerId, update::Status::Code::error, update::Status::ErrorCode::noFreeSpaceToDownload);

@@ -239,13 +239,20 @@ void QnCameraListDialog::at_camerasView_customContextMenuRequested(const QPoint&
 
 void QnCameraListDialog::at_exportAction_triggered()
 {
-    QnTableExportHelper::exportToFile(ui->camerasView, true, this,
-        QnDeviceDependentStrings::getDefaultNameFromSet(resourcePool(),
-            tr("Export selected devices to a file."),
-            tr("Export selected cameras to a file.")));
+    const auto caption = QnDeviceDependentStrings::getDefaultNameFromSet(resourcePool(),
+        tr("Export selected devices to a file."),
+        tr("Export selected cameras to a file."));
+
+    QnTableExportHelper::exportToFile(
+        ui->camerasView->model(),
+        ui->camerasView->selectionModel()->selectedIndexes(),
+        this,
+        caption);
 }
 
 void QnCameraListDialog::at_clipboardAction_triggered()
 {
-    QnTableExportHelper::copyToClipboard(ui->camerasView);
+    QnTableExportHelper::copyToClipboard(
+        ui->camerasView->model(),
+        ui->camerasView->selectionModel()->selectedIndexes());
 }

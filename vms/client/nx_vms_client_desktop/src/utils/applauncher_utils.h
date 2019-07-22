@@ -52,7 +52,9 @@ struct InstallationProgress
  * Checks progress of an installation.
  * @return ResultType::ok if request has been performed successfully, otherwise - error code.
  */
-ResultType checkInstallationProgress(InstallationProgress& progress);
+ResultType checkInstallationProgress(
+    const nx::utils::SoftwareVersion& version,
+    InstallationProgress& progress);
 
 /** Adds timer to kill process with pid processId in a timeoutMillis. */
 ResultType scheduleProcessKill(qint64 processId, quint32 timeoutMillis);

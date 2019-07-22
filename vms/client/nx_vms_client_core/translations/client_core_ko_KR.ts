@@ -114,11 +114,11 @@
     <message>
       <source>%1 is temporary unavailable. Please try again later.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">%1 is temporary unavailable. Please try again later.</translation>
+      <translation>%1 은 일시적으로 사용할 수 없습니다. 나중에 다시 시도하십시오.</translation>
     </message>
     <message>
       <source>Network error. Please check your Internet connection and try again.</source>
-      <translation type="unfinished">Network error. Please check your Internet connection and try again.</translation>
+      <translation>네트워크 오류. 인터넷 연결을 확인하고 다시 시도하십시오.</translation>
     </message>
   </context>
   <context>

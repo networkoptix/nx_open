@@ -184,12 +184,17 @@ void QnResourcesChangesManager::deleteResources(
     QVector<QnUuid> idToDelete;
     for (const QnResourcePtr& resource: resources)
     {
-        // if we are deleting an edge camera, also delete its server
-        // check for camera to avoid unnecessary parent lookup
-        QnUuid parentToDelete = resource.dynamicCast<QnVirtualCameraResource>() &&
-            QnMediaServerResource::isHiddenServer(resource->getParentResource())
-            ? resource->getParentId()
-            : QnUuid();
+        // If we are deleting an edge camera, also delete its server.
+        // Check for camera to avoid unnecessary parent lookup.
+        QnUuid parentToDelete;
+        if (const auto camera = resource.dynamicCast<QnVirtualCameraResource>())
+        {
+            const bool isHiddenEdgeServer =
+                QnMediaServerResource::isHiddenServer(camera->getParentResource());
+            if (isHiddenEdgeServer && !camera->hasFlags(Qn::wearable_camera))
+                parentToDelete = camera->getParentId();
+        }
+
         if (!parentToDelete.isNull())
             idToDelete << parentToDelete; //< Parent remove its children by server side.
         else

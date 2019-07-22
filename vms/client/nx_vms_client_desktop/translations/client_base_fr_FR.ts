@@ -3584,7 +3584,7 @@ to %1</source>
     </message>
     <message>
       <source>Channels</source>
-      <translation type="unfinished">Channels</translation>
+      <translation>Canaux</translation>
     </message>
   </context>
   <context>
@@ -4244,6 +4244,10 @@ to %1</source>
     <message>
       <source>Virtual Camera %1</source>
       <translation>Caméra virtuelle %1</translation>
+    </message>
+    <message>
+      <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
+      <translation type="unfinished">&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</translation>
     </message>
   </context>
   <context>
@@ -7345,12 +7349,12 @@ If you intended to move analytics data to another storage location, please conta
   <context>
     <name>nx::vms::client::desktop::AnalyticsSearchListModel::Private</name>
     <message>
-      <source>Unknown object</source>
-      <translation>Objet inconnu</translation>
-    </message>
-    <message>
       <source>deleted camera</source>
       <translation>caméra supprimée</translation>
+    </message>
+    <message>
+      <source>Unknown track</source>
+      <translation type="unfinished">Unknown track</translation>
     </message>
   </context>
   <context>
@@ -8725,7 +8729,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Failed to download update packages to some components</source>
-      <translation type="unfinished">Failed to download update packages to some components</translation>
+      <translation>Échec du téléchargement de paquets de mise à jour pour certains composants</translation>
     </message>
     <message>
       <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
@@ -8744,16 +8748,24 @@ If you intended to move analytics data to another storage location, please conta
       <translation type="unfinished">Starting update to ...</translation>
     </message>
     <message>
-      <source>Some servers have no package available</source>
-      <translation type="unfinished">Some servers have no package available</translation>
-    </message>
-    <message>
       <source>Failed to cancel update</source>
       <translation type="unfinished">Failed to cancel update</translation>
     </message>
     <message>
       <source>Failed to start installation</source>
       <translation type="unfinished">Failed to start installation</translation>
+    </message>
+    <message>
+      <source>Some servers have no update packages available.</source>
+      <translation type="unfinished">Some servers have no update packages available.</translation>
+    </message>
+    <message>
+      <source>Some servers have encountered an internal error.</source>
+      <translation type="unfinished">Some servers have encountered an internal error.</translation>
+    </message>
+    <message>
+      <source>Please please contact Customer Support.</source>
+      <translation type="unfinished">Please please contact Customer Support.</translation>
     </message>
   </context>
   <context>
@@ -8870,10 +8882,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Échec du téléchargement de la mise à jour</translation>
     </message>
     <message>
-      <source>Failed to install update</source>
-      <translation>Échec d'installation de la mise à jour</translation>
-    </message>
-    <message>
       <source>Waiting for peer data</source>
       <translation type="unfinished">Waiting for peer data</translation>
     </message>
@@ -8887,7 +8895,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Failed to download update packages.</source>
-      <translation type="unfinished">Failed to download update packages.</translation>
+      <translation>Échec du téléchargement des paquets de mise à jour.</translation>
     </message>
     <message>
       <source>Update contents are invalid.</source>
@@ -8931,7 +8939,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Internal server error.</source>
-      <translation type="unfinished">Internal server error.</translation>
+      <translation>Erreur Interne du Serveur.</translation>
+    </message>
+    <message>
+      <source>This OS version is no longer supported.</source>
+      <translation type="unfinished">This OS version is no longer supported.</translation>
     </message>
   </context>
   <context>
@@ -9087,6 +9099,10 @@ If you intended to move analytics data to another storage location, please conta
       <source>Users will be automatically logged out if their session exceeds the specified duration.</source>
       <translation>Les utilisateurs seront automatiquement déconnectés si leur session dépasse la durée spécifiée.</translation>
     </message>
+    <message>
+      <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
+      <translation type="unfinished">Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerSettingsDialogStore</name>
@@ -9096,7 +9112,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Version</source>
-      <translation type="unfinished">Version</translation>
+      <translation>Version</translation>
     </message>
     <message>
       <source>Vendor</source>
@@ -9128,7 +9144,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>unknown error</source>
-      <translation type="unfinished">unknown error</translation>
+      <translation>erreur inconnue</translation>
     </message>
     <message>
       <source>Not loaded</source>
@@ -9144,7 +9160,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Status</source>
-      <translation type="unfinished">Status</translation>
+      <translation>État</translation>
     </message>
     <message>
       <source>plugin is optional and is not in the white list</source>
@@ -9182,7 +9198,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Network error.</source>
-      <translation type="unfinished">Network error.</translation>
+      <translation>Erreur Réseau.</translation>
+    </message>
+    <message>
+      <source>Server error.</source>
+      <translation type="unfinished">Server error.</translation>
     </message>
   </context>
   <context>
@@ -9602,29 +9622,29 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::ui::PluginEventModel</name>
+    <name>nx::vms::client::desktop::ui::PluginDiagnosticEventModel</name>
     <message>
       <source>Any Plugin</source>
-      <translation>N'importe quel plugin</translation>
+      <translation type="unfinished">Any Plugin</translation>
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::ui::PluginEventWidget</name>
+    <name>nx::vms::client::desktop::ui::PluginDiagnosticEventWidget</name>
     <message>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation>Événement se déclenchera uniquement s'il y a des correspondances dans la légende avec l'un des mots clés saisis.</translation>
+      <translation type="unfinished">Event will trigger only if there are matches in the caption with any of the entered keywords.</translation>
     </message>
     <message>
       <source>If the field is empty, event will always trigger.</source>
-      <translation>Si le champ est vide, l'événement sera toujours déclenché.</translation>
+      <translation type="unfinished">If the field is empty, event will always trigger.</translation>
     </message>
     <message>
       <source>This field is case sensitive.</source>
-      <translation>Ce champ est sensible à la casse.</translation>
+      <translation type="unfinished">This field is case sensitive.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
-      <translation>Événement ne se déclenchera que s'il y a des correspondances dans le champ de description avec l'un des mots-clés saisis.</translation>
+      <translation type="unfinished">Event will trigger only if there are matches in the description field with any of the entered keywords.</translation>
     </message>
   </context>
   <context>

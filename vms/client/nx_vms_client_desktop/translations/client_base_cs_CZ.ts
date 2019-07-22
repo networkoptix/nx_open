@@ -3657,7 +3657,7 @@ to %1</source>
     </message>
     <message>
       <source>Channels</source>
-      <translation type="unfinished">Channels</translation>
+      <translation>Kanálů</translation>
     </message>
   </context>
   <context>
@@ -4337,6 +4337,10 @@ to %1</source>
     <message>
       <source>Virtual Camera %1</source>
       <translation type="unfinished">Virtual Camera %1</translation>
+    </message>
+    <message>
+      <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
+      <translation type="unfinished">&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</translation>
     </message>
   </context>
   <context>
@@ -7540,12 +7544,12 @@ If you intended to move analytics data to another storage location, please conta
   <context>
     <name>nx::vms::client::desktop::AnalyticsSearchListModel::Private</name>
     <message>
-      <source>Unknown object</source>
-      <translation>Neznámý objekt</translation>
-    </message>
-    <message>
       <source>deleted camera</source>
       <translation type="unfinished">deleted camera</translation>
+    </message>
+    <message>
+      <source>Unknown track</source>
+      <translation type="unfinished">Unknown track</translation>
     </message>
   </context>
   <context>
@@ -8975,16 +8979,24 @@ If you intended to move analytics data to another storage location, please conta
       <translation type="unfinished">Starting update to ...</translation>
     </message>
     <message>
-      <source>Some servers have no package available</source>
-      <translation type="unfinished">Some servers have no package available</translation>
-    </message>
-    <message>
       <source>Failed to cancel update</source>
       <translation type="unfinished">Failed to cancel update</translation>
     </message>
     <message>
       <source>Failed to start installation</source>
       <translation type="unfinished">Failed to start installation</translation>
+    </message>
+    <message>
+      <source>Some servers have no update packages available.</source>
+      <translation type="unfinished">Some servers have no update packages available.</translation>
+    </message>
+    <message>
+      <source>Some servers have encountered an internal error.</source>
+      <translation type="unfinished">Some servers have encountered an internal error.</translation>
+    </message>
+    <message>
+      <source>Please please contact Customer Support.</source>
+      <translation type="unfinished">Please please contact Customer Support.</translation>
     </message>
   </context>
   <context>
@@ -9103,10 +9115,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation type="unfinished">Failed to download update</translation>
     </message>
     <message>
-      <source>Failed to install update</source>
-      <translation type="unfinished">Failed to install update</translation>
-    </message>
-    <message>
       <source>Waiting for peer data</source>
       <translation type="unfinished">Waiting for peer data</translation>
     </message>
@@ -9120,7 +9128,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Failed to download update packages.</source>
-      <translation type="unfinished">Failed to download update packages.</translation>
+      <translation>Nepodařilo se stáhnout balíčky aktualizací.</translation>
     </message>
     <message>
       <source>Update contents are invalid.</source>
@@ -9165,6 +9173,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Internal server error.</source>
       <translation type="unfinished">Internal server error.</translation>
+    </message>
+    <message>
+      <source>This OS version is no longer supported.</source>
+      <translation type="unfinished">This OS version is no longer supported.</translation>
     </message>
   </context>
   <context>
@@ -9322,6 +9334,10 @@ If you intended to move analytics data to another storage location, please conta
       <source>Users will be automatically logged out if their session exceeds the specified duration.</source>
       <translation type="unfinished">Users will be automatically logged out if their session exceeds the specified duration.</translation>
     </message>
+    <message>
+      <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
+      <translation type="unfinished">Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerSettingsDialogStore</name>
@@ -9331,7 +9347,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Version</source>
-      <translation type="unfinished">Version</translation>
+      <translation>Verze</translation>
     </message>
     <message>
       <source>Vendor</source>
@@ -9363,7 +9379,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>unknown error</source>
-      <translation type="unfinished">unknown error</translation>
+      <translation>neznámá chyba</translation>
     </message>
     <message>
       <source>Not loaded</source>
@@ -9379,7 +9395,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Status</source>
-      <translation type="unfinished">Status</translation>
+      <translation>Stav</translation>
     </message>
     <message>
       <source>plugin is optional and is not in the white list</source>
@@ -9417,7 +9433,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Network error.</source>
-      <translation type="unfinished">Network error.</translation>
+      <translation>Chyba sítě.</translation>
+    </message>
+    <message>
+      <source>Server error.</source>
+      <translation type="unfinished">Server error.</translation>
     </message>
   </context>
   <context>
@@ -9847,29 +9867,29 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::ui::PluginEventModel</name>
+    <name>nx::vms::client::desktop::ui::PluginDiagnosticEventModel</name>
     <message>
       <source>Any Plugin</source>
       <translation type="unfinished">Any Plugin</translation>
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::ui::PluginEventWidget</name>
+    <name>nx::vms::client::desktop::ui::PluginDiagnosticEventWidget</name>
     <message>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation>Událost se spustí pouze v případě, že jsou v titulku schody se zadanými klíčovými slovy.</translation>
+      <translation type="unfinished">Event will trigger only if there are matches in the caption with any of the entered keywords.</translation>
     </message>
     <message>
       <source>If the field is empty, event will always trigger.</source>
-      <translation>Je-li pole prázdné, událost se vždy spustí.</translation>
+      <translation type="unfinished">If the field is empty, event will always trigger.</translation>
     </message>
     <message>
       <source>This field is case sensitive.</source>
-      <translation>V tomto poli se rozlišují velká a malá písmena.</translation>
+      <translation type="unfinished">This field is case sensitive.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
-      <translation>Událost se spustí pouze v případě, že jsou v poli popisu schody s některými zadanými klíčovými slovy.</translation>
+      <translation type="unfinished">Event will trigger only if there are matches in the description field with any of the entered keywords.</translation>
     </message>
   </context>
   <context>

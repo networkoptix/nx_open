@@ -192,18 +192,18 @@
     },
     "common": {
         "voiceCommands": {
-            "search": "find + [text for searchbar]",
+            "search": "etsi + [hakupalkin teksti]",
             "pause": "tauko",
-            "help": "help | show commands",
+            "help": "apua | näytä komennot",
             "collapse all servers": "kokoa kaikki palvelimet",
-            "collapse server": "collapse server + [server name]",
+            "collapse server": "pienennä palvelin + [palvelimen nimi]",
             "play": "toista",
             "clear search": "tyhjennä haku",
-            "live": "go to live | show me live",
+            "live": "siirry reaaliaikaiseen | näytä minulle reaaliaikainen kuva",
             "expand all servers": "laajenna kaikki palvelimet",
             "stop listening": "lopeta kuuntelu",
-            "expand server": "expand server + [server name]",
-            "view": "view + [camera name]"
+            "expand server": "laajenna palvelin + [palvelimen nimi]",
+            "view": "näkymä + [kameran nimi]"
         },
         "systemOffline": "Järjestelmä offline-tilassa",
         "cameraLinks": {

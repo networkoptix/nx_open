@@ -166,11 +166,8 @@ ResultCode Storage::addNewFile(const FileInformation& fileInformation)
         return ResultCode::fileAlreadyExists;
 
     FileMetadata info = FileMetadata::fromFileInformation(fileInformation, m_downloadsDirectory);
-    if (!QDir(info.absoluteDirectoryPath).exists())
-    {
-        if (!QDir().mkpath(info.absoluteDirectoryPath))
-            return ResultCode::ioError;
-    }
+    if (!nx::utils::file_system::ensureDir(info.absoluteDirectoryPath))
+        return ResultCode::ioError;
 
     if (!info.md5.isEmpty() && calculateMd5(info.fullFilePath) == info.md5)
     {
@@ -468,6 +465,28 @@ ResultCode Storage::deleteFileInternal(const QString& fileName, bool deleteData)
     return ResultCode::ok;
 }
 
+ResultCode Storage::clearFile(const QString& fileName, bool force)
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+
+    const auto it = m_fileInformationByName.find(fileName);
+    if (it == m_fileInformationByName.end())
+        return ResultCode::fileDoesNotExist;
+
+    if (!force && it->status == FileInformation::Status::downloaded)
+        return ResultCode::fileAlreadyDownloaded;
+
+    if (it->status != FileInformation::Status::uploading)
+        it->status = FileInformation::Status::downloading;
+    it->downloadedChunks.fill(false);
+
+    lock.unlock();
+    emit fileInformationChanged(*it);
+    emit fileStatusChanged(*it);
+
+    return ResultCode::ok;
+}
+
 QVector<QByteArray> Storage::getChunkChecksums(const QString& fileName)
 {
     QnMutexLocker lock(&m_mutex);
@@ -674,6 +693,9 @@ QVector<QByteArray> Storage::calculateChecksums(const QString& filePath, qint64 
 
 bool Storage::saveMetadata(const FileMetadata& fileInformation)
 {
+    if (!nx::utils::file_system::ensureDir(metadataDirectoryPath()))
+        return false;
+
     const auto fileName = metadataFileName(fileInformation.fullFilePath);
 
     QFile file(fileName);

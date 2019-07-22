@@ -174,6 +174,13 @@ TableView* QnStorageAnalyticsWidget::currentTable() const
         : ui->forecastTable;
 }
 
+TableView* QnStorageAnalyticsWidget::currentTotalsTable() const
+{
+    return ui->tabWidget->currentWidget() == ui->statsTab
+        ? ui->statsTotalsTable
+        : ui->forecastTotalsTable;
+}
+
 qint64 QnStorageAnalyticsWidget::currentForecastAveragingPeriod()
 {
     return ui->averagingPeriodCombobox->currentData().toLongLong();
@@ -429,12 +436,50 @@ void QnStorageAnalyticsWidget::atEventsGrid_customContextMenuRequested(const QPo
 
 void QnStorageAnalyticsWidget::atExportAction_triggered()
 {
-    QnTableExportHelper::exportToFile(currentTable(), true, this, tr("Export selected events to file"));
+    const auto model = currentTable()->model();
+    const auto totalsModel = currentTotalsTable()->model();
+    const auto selectionModel = currentTable()->selectionModel();
+    const bool isAllRowsSelected = selectionModel->selectedRows().size() == model->rowCount();
+
+    if (isAllRowsSelected)
+    {
+        QnTableExportCompositeModel compositeModel({model, totalsModel});
+        QnTableExportHelper::exportToFile(
+            &compositeModel,
+            QnTableExportHelper::getAllIndexes(&compositeModel),
+            this,
+            tr("Export selected events to file"));
+    }
+    else
+    {
+        QnTableExportHelper::exportToFile(
+            currentTable()->model(),
+            currentTable()->selectionModel()->selectedIndexes(),
+            this,
+            tr("Export selected events to file"));
+    }
 }
 
 void QnStorageAnalyticsWidget::atClipboardAction_triggered()
 {
-    QnTableExportHelper::copyToClipboard(currentTable());
+    const auto model = currentTable()->model();
+    const auto totalsModel = currentTotalsTable()->model();
+    const auto selectionModel = currentTable()->selectionModel();
+    const bool isAllRowsSelected = selectionModel->selectedRows().size() == model->rowCount();
+
+    if (isAllRowsSelected)
+    {
+        QnTableExportCompositeModel compositeModel({model, totalsModel});
+        QnTableExportHelper::copyToClipboard(
+            &compositeModel,
+            QnTableExportHelper::getAllIndexes(&compositeModel));
+    }
+    else
+    {
+        QnTableExportHelper::copyToClipboard(
+            currentTable()->model(),
+            currentTable()->selectionModel()->selectedIndexes());
+    }
 }
 
 void QnStorageAnalyticsWidget::atMouseButtonRelease(QObject*, QEvent* event)

@@ -83,15 +83,15 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Getting update information from the server</source>
-      <translation type="unfinished">Getting update information from the server</translation>
+      <translation>서버에서 업데이트 정보 받는 중</translation>
     </message>
     <message>
       <source>Downloading update package</source>
-      <translation type="unfinished">Downloading update package</translation>
+      <translation>업데이트 패키지 다운 받는 중</translation>
     </message>
     <message>
       <source>Installing</source>
-      <translation type="unfinished">Installing</translation>
+      <translation>설치 중...</translation>
     </message>
   </context>
   <context>
@@ -861,11 +861,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Forget password</source>
-      <translation type="unfinished">Forget password</translation>
+      <translation>패스워드 잊음</translation>
     </message>
     <message>
       <source>Cancel Upload...</source>
-      <translation type="unfinished">Cancel Upload...</translation>
+      <translation>업로드 취소</translation>
     </message>
     <message>
       <source>Copy Schedule...</source>
@@ -873,7 +873,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Analytics Engine Settings...</source>
-      <translation type="unfinished">Analytics Engine Settings...</translation>
+      <translation>분석 엔진 설정...</translation>
     </message>
     <message>
       <source>Show Thumbnails</source>
@@ -885,19 +885,19 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Pin Panel</source>
-      <translation type="unfinished">Pin Panel</translation>
+      <translation>패널 고정</translation>
     </message>
     <message>
       <source>Unpin Panel</source>
-      <translation type="unfinished">Unpin Panel</translation>
+      <translation>패널 고정 해제</translation>
     </message>
     <message>
       <source>Virtual Camera...</source>
-      <translation type="unfinished">Virtual Camera...</translation>
+      <translation>가상 카메라</translation>
     </message>
     <message>
       <source>New Virtual Camera...</source>
-      <translation type="unfinished">New Virtual Camera...</translation>
+      <translation>새로운 가상 카메라...</translation>
     </message>
     <message>
       <source>Show Tree</source>
@@ -921,27 +921,27 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Switch to Notifications tab</source>
-      <translation type="unfinished">Switch to Notifications tab</translation>
+      <translation>알림 탭으로 전환</translation>
     </message>
     <message>
       <source>Switch to Motion tab</source>
-      <translation type="unfinished">Switch to Motion tab</translation>
+      <translation>모션 탭으로 전환</translation>
     </message>
     <message>
       <source>Switch to Bookmarks tab</source>
-      <translation type="unfinished">Switch to Bookmarks tab</translation>
+      <translation>북마크 탭으로 전환</translation>
     </message>
     <message>
       <source>Switch to Events tab</source>
-      <translation type="unfinished">Switch to Events tab</translation>
+      <translation>이벤트 탭으로 전환</translation>
     </message>
     <message>
       <source>Switch to Objects tab</source>
-      <translation type="unfinished">Switch to Objects tab</translation>
+      <translation>개체 탭으로 전환</translation>
     </message>
     <message>
       <source>Objects Frames and Info...</source>
-      <translation type="unfinished">Objects Frames and Info...</translation>
+      <translation>개체 프레임 및 정보...</translation>
     </message>
   </context>
   <context>
@@ -987,19 +987,19 @@ to view more bookmarks</source>
     <name>EncryptedLayoutStrings</name>
     <message>
       <source>Please enter a valid password</source>
-      <translation type="unfinished">Please enter a valid password</translation>
+      <translation>유효한 패스워드를 입력 하십시오.</translation>
     </message>
     <message>
       <source>The password is not valid.</source>
-      <translation type="unfinished">The password is not valid.</translation>
+      <translation>패스워드가 유효하지 않습니다.</translation>
     </message>
     <message>
       <source>Encrypted layout</source>
-      <translation type="unfinished">Encrypted layout</translation>
+      <translation>암호화 된 레이아웃</translation>
     </message>
     <message>
       <source>The file %1 is encrypted. Please enter the password:</source>
-      <translation type="unfinished">The file %1 is encrypted. Please enter the password:</translation>
+      <translation>파일 %1 은 암호화되어있습니다. 패스워드를 입력하십시오:</translation>
     </message>
     <message>
       <source>Please re-enter password for layout %1:</source>
@@ -3541,7 +3541,7 @@ to %1</source>
     </message>
     <message>
       <source>Channels</source>
-      <translation type="unfinished">Channels</translation>
+      <translation>개의 채널</translation>
     </message>
   </context>
   <context>
@@ -4191,6 +4191,10 @@ to %1</source>
     <message>
       <source>Virtual Camera %1</source>
       <translation type="unfinished">Virtual Camera %1</translation>
+    </message>
+    <message>
+      <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
+      <translation type="unfinished">&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</translation>
     </message>
   </context>
   <context>
@@ -7241,12 +7245,12 @@ If you intended to move analytics data to another storage location, please conta
   <context>
     <name>nx::vms::client::desktop::AnalyticsSearchListModel::Private</name>
     <message>
-      <source>Unknown object</source>
-      <translation type="unfinished">Unknown object</translation>
-    </message>
-    <message>
       <source>deleted camera</source>
       <translation type="unfinished">deleted camera</translation>
+    </message>
+    <message>
+      <source>Unknown track</source>
+      <translation type="unfinished">Unknown track</translation>
     </message>
   </context>
   <context>
@@ -8622,16 +8626,24 @@ If you intended to move analytics data to another storage location, please conta
       <translation type="unfinished">Starting update to ...</translation>
     </message>
     <message>
-      <source>Some servers have no package available</source>
-      <translation type="unfinished">Some servers have no package available</translation>
-    </message>
-    <message>
       <source>Failed to cancel update</source>
       <translation type="unfinished">Failed to cancel update</translation>
     </message>
     <message>
       <source>Failed to start installation</source>
       <translation type="unfinished">Failed to start installation</translation>
+    </message>
+    <message>
+      <source>Some servers have no update packages available.</source>
+      <translation type="unfinished">Some servers have no update packages available.</translation>
+    </message>
+    <message>
+      <source>Some servers have encountered an internal error.</source>
+      <translation type="unfinished">Some servers have encountered an internal error.</translation>
+    </message>
+    <message>
+      <source>Please please contact Customer Support.</source>
+      <translation type="unfinished">Please please contact Customer Support.</translation>
     </message>
   </context>
   <context>
@@ -8675,7 +8687,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Unknown Plugin Diagnostic Event</source>
-      <translation type="unfinished">Unknown Plugin Diagnostic Event</translation>
+      <translation>알 수없는 플러그인 진단 이벤트</translation>
     </message>
   </context>
   <context>
@@ -8747,10 +8759,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation type="unfinished">Failed to download update</translation>
     </message>
     <message>
-      <source>Failed to install update</source>
-      <translation type="unfinished">Failed to install update</translation>
-    </message>
-    <message>
       <source>Waiting for peer data</source>
       <translation type="unfinished">Waiting for peer data</translation>
     </message>
@@ -8808,7 +8816,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Internal server error.</source>
-      <translation type="unfinished">Internal server error.</translation>
+      <translation>인터넷 서버 오류.</translation>
+    </message>
+    <message>
+      <source>This OS version is no longer supported.</source>
+      <translation type="unfinished">This OS version is no longer supported.</translation>
     </message>
   </context>
   <context>
@@ -8963,6 +8975,10 @@ If you intended to move analytics data to another storage location, please conta
       <source>Users will be automatically logged out if their session exceeds the specified duration.</source>
       <translation type="unfinished">Users will be automatically logged out if their session exceeds the specified duration.</translation>
     </message>
+    <message>
+      <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
+      <translation type="unfinished">Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerSettingsDialogStore</name>
@@ -8972,7 +8988,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Version</source>
-      <translation type="unfinished">Version</translation>
+      <translation>버전 정보</translation>
     </message>
     <message>
       <source>Vendor</source>
@@ -9004,7 +9020,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>unknown error</source>
-      <translation type="unfinished">unknown error</translation>
+      <translation>알 수 없는 오류</translation>
     </message>
     <message>
       <source>Not loaded</source>
@@ -9020,7 +9036,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Status</source>
-      <translation type="unfinished">Status</translation>
+      <translation>상태</translation>
     </message>
     <message>
       <source>plugin is optional and is not in the white list</source>
@@ -9058,7 +9074,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Network error.</source>
-      <translation type="unfinished">Network error.</translation>
+      <translation>네트워크 문제.</translation>
+    </message>
+    <message>
+      <source>Server error.</source>
+      <translation type="unfinished">Server error.</translation>
     </message>
   </context>
   <context>
@@ -9473,29 +9493,29 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::ui::PluginEventModel</name>
+    <name>nx::vms::client::desktop::ui::PluginDiagnosticEventModel</name>
     <message>
       <source>Any Plugin</source>
       <translation type="unfinished">Any Plugin</translation>
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::ui::PluginEventWidget</name>
+    <name>nx::vms::client::desktop::ui::PluginDiagnosticEventWidget</name>
     <message>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation>캡션에 입력 한 키워드 중 하나와 일치하는 것이있는 경우에만 이벤트가 트리거됩니다.</translation>
+      <translation type="unfinished">Event will trigger only if there are matches in the caption with any of the entered keywords.</translation>
     </message>
     <message>
       <source>If the field is empty, event will always trigger.</source>
-      <translation>필드가 비어 있으면 이벤트가 항상 트리거됩니다.</translation>
+      <translation type="unfinished">If the field is empty, event will always trigger.</translation>
     </message>
     <message>
       <source>This field is case sensitive.</source>
-      <translation>이 필드는 대소 문자를 구분합니다.</translation>
+      <translation type="unfinished">This field is case sensitive.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
-      <translation>설명 필드에 입력 한 키워드 중 하나와 일치하는 항목이있는 경우에만 이벤트가 트리거됩니다.</translation>
+      <translation type="unfinished">Event will trigger only if there are matches in the description field with any of the entered keywords.</translation>
     </message>
   </context>
   <context>
