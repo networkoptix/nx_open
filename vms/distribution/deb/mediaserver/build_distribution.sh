@@ -144,9 +144,6 @@ copyTegraSpecificFiles()
 
     mkdir -p "$STAGE_LIB"
 
-    echo "  Copying libtegra_video.so"
-    cp -P "$BUILD_DIR/lib/libtegra_video.so" "$STAGE_LIB/"
-
     local -r TEGRA_VIDEO_SOURCE_DIR="$SOURCE_DIR/artifacts/tx1/tegra_multimedia_api"
     # Demo neural networks.
     local -r NVIDIA_MODELS_SOURCE_DIR="$TEGRA_VIDEO_SOURCE_DIR/data/model"

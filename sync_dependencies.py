@@ -52,7 +52,7 @@ def determine_package_versions(
         "certificates": customization,
         "customization_pack": customization,
         "detours": "4.0.1",
-        "stackwalker": "1.0",
+        "stackwalker": "1.0"
     }
 
     if platform == "linux" and box == "none" and target not in ("linux_arm32", "linux_arm64"):
@@ -169,8 +169,8 @@ def sync_dependencies(syncher, platform, arch, box, release_version, options={})
     #     sync("cifs-utils")
 
     if (platform, arch) == ("linux", "arm64"):
-        sync("tegra_video")
-        sync("jetpack")
+        sync("tegra_video", path_variable="tegra_video_directory")
+        sync("jetpack", path_variable="jetpack_directory")
         sync("deepstream")
 
     if platform in ("android", "windows") or box == "bpi":

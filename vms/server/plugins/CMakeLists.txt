@@ -42,6 +42,10 @@ function(nx_add_server_plugin target)
         set_property(TARGET ${target} PROPERTY add_to_distribution ON)
     endif()
 
+    if(PLUGIN_DEDICATED_DIR)
+        set_target_properties(${target} PROPERTIES INSTALL_RPATH "$ORIGIN")
+    endif()
+
     add_dependencies(server_plugins ${target})
 
     target_compile_definitions(${target}
