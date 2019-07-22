@@ -5,7 +5,7 @@
 /**
  * Fixed size cyclic buffer implementation.
  */
-class QnMediaCyclicBuffer
+class NX_UTILS_API QnMediaCyclicBuffer
 {
 public:
     typedef int size_type;
