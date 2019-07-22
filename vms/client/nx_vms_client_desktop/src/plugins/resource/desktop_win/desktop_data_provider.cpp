@@ -703,7 +703,10 @@ void QnDesktopDataProvider::start(Priority priority)
 
     m_isInitialized = init();
     if (!m_isInitialized)
+    {
         m_needStop = true;
+        NX_WARNING(this, "Could not initialize audio/video capturing: %1", m_lastErrorStr);
+    }
 
     QnLongRunnable::start(priority);
 }
