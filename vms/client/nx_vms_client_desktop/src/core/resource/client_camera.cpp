@@ -8,28 +8,29 @@
 #include <nx/vms/client/desktop/radass/radass_controller.h>
 
 QnClientCameraResource::QnClientCameraResource(const QnUuid& resourceTypeId):
-    base_type(resourceTypeId),
-    m_cachedFlags(
-        [this]()
-        { 
-            Qn::ResourceFlags result = base_type::flags();
-            if (!isDtsBased() && supportedMotionType() != Qn::MotionType::MT_NoMotion)
-                result |= Qn::motion;
-            return result;
-        },
-        &m_mutex)
+    base_type(resourceTypeId)
 {
+}
+
+Qn::ResourceFlags QnClientCameraResource::calculateFlags() const
+{
+    Qn::ResourceFlags result = base_type::flags();
+    if (!isDtsBased() && supportedMotionType() != Qn::MotionType::MT_NoMotion)
+        result |= Qn::motion;
+    return result;
 }
 
 Qn::ResourceFlags QnClientCameraResource::flags() const
 {
-    return m_cachedFlags.get();
+    if (m_cachedFlags.load() == Qn::ResourceFlags())
+        m_cachedFlags.store(calculateFlags());
+    return m_cachedFlags;
 }
 
 void QnClientCameraResource::resetCachedValues()
 {
     base_type::resetCachedValues();
-    m_cachedFlags.reset();
+    m_cachedFlags = calculateFlags();
 }
 
 void QnClientCameraResource::setAuthToCameraGroup(
