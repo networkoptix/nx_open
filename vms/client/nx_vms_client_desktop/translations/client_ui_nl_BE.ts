@@ -2051,11 +2051,6 @@
       <source>New Virtual Camera...</source>
       <translation>Nieuwe virtuele camera...</translation>
     </message>
-    <message>
-      <location/>
-      <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
-      <translation>&quot;Virtual Camera&quot; is een virtuele opslag voor videobestanden, die kunnen worden geüpload naar elke server op uw systeem en door elke gebruiker kunnen worden geopend.</translation>
-    </message>
   </context>
   <context>
     <name>OpenLayoutActionWidget</name>
@@ -2099,46 +2094,46 @@
     </message>
   </context>
   <context>
-    <name>PluginEventWidget</name>
+    <name>PluginDiagnosticEventWidget</name>
     <message>
-      <location filename="../src/nx/vms/client/desktop/ui/event_rules/widgets/plugin_event_widget.ui"/>
+      <location filename="../src/nx/vms/client/desktop/ui/event_rules/widgets/plugin_diagnostic_event_widget.ui"/>
       <source>Source:</source>
-      <translation>Bron:</translation>
+      <translation type="unfinished">Source:</translation>
     </message>
     <message>
       <location/>
       <source>Caption contains:</source>
-      <translation>Onderschrift bevat:</translation>
+      <translation type="unfinished">Caption contains:</translation>
     </message>
     <message>
       <location/>
       <source>Keywords separated by space</source>
-      <translation>Trefwoorden scheiden met een spatie</translation>
+      <translation type="unfinished">Keywords separated by space</translation>
     </message>
     <message>
       <location/>
       <source>Description contains:</source>
-      <translation>Beschrijving bevat:</translation>
+      <translation type="unfinished">Description contains:</translation>
     </message>
     <message>
       <location/>
       <source>Level:</source>
-      <translation>Niveau:</translation>
+      <translation type="unfinished">Level:</translation>
     </message>
     <message>
       <location/>
       <source>ERROR</source>
-      <translation>FOUT</translation>
+      <translation type="unfinished">ERROR</translation>
     </message>
     <message>
       <location/>
       <source>WARNING</source>
-      <translation>WAARSCHUWING</translation>
+      <translation type="unfinished">WARNING</translation>
     </message>
     <message>
       <location/>
       <source>INFO</source>
-      <translation>INFO</translation>
+      <translation type="unfinished">INFO</translation>
     </message>
   </context>
   <context>
@@ -2777,11 +2772,6 @@
       <location/>
       <source>Limit session duration</source>
       <translation>Beperk sessiegeduur</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
-      <translation>Watermerken worden alleen weergegeven voor live, gearchiveerde en geëxporteerde video's voor niet-beheerdersgebruikers. U en andere beheerders zullen ze niet zien.</translation>
     </message>
   </context>
   <context>

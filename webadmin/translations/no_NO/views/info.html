@@ -12,7 +12,7 @@
                 </uib-tab>
                 <uib-tab heading="{{L.info.tabs.storage}}" ng-if="user.isAdmin">
                     <br>
-                    <p>Below is a list of storage locations available on this server</p>
+                    <p>Nedenfor er en liste over lagringssteder tilgjengelig på denne serveren</p>
                     <table class="table">
                         <thead>
                         <tr>
@@ -20,7 +20,7 @@
                                 URL
                             </th>
                             <th >
-                                Space
+                                Plass
                             </th>
                             <th width="54">
                                 &nbsp;
@@ -43,7 +43,7 @@
                 <uib-tab heading="{{L.info.tabs.log}}" ng-if="user.isAdmin">
                     <br>
                     <div class="form-inline">
-                        <label class="my-1 mr-2" for="loggerSelect">Current Logger :</label>
+                        <label class="my-1 mr-2" for="loggerSelect"> Gjeldende logger: </label>
                         <select class="custom-select my-1 mr-sm-2" id="loggerSelect"
                                 ng-model="currentLogger" ng-options="logger for logger in loggers"
                                 ng-change="getLogger(currentLogger)"></select>
@@ -51,9 +51,9 @@
                     <br>
                     <iframe class="log-frame" name="log-frame" ng-src="{{logUrl}}"></iframe>
                     <a ng-href="{{logUrl}}"  target="log-frame"
-                       id="refresh-log" class="btn btn-primary">Refresh</a>
+                       id="refresh-log" class="btn btn-primary">Oppdater</a>
                     <a ng-if="!mode.liteClient" ng-href="{{logUrl}}"
-                       target="_blank" id="open-log" class="btn btn-default">Open in new window</a>
+                       target="_blank" id="open-log" class="btn btn-default">Åpne i nytt vindu</a>
                 </uib-tab>
             </uib-tabset>
         </div>
