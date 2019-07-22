@@ -10,7 +10,8 @@ class RestArgFetcher
 public:
     using type = std::string;
 
-    std::string operator()(network::http::RequestContext requestContext) const
+    std::string operator()(
+        const network::http::RequestContext& requestContext) const
     {
         return requestContext.requestPathParams.getByName(name);
     }
