@@ -643,7 +643,8 @@ bool ServerUpdateTool::verifyUpdateManifest(
     clientData.fillDefault();
     clientData.clientId = checkClient ? m_stateTracker->getClientPeerId() : QnUuid();
     clientData.installedVersions = clientVersions;
-    VerificationOptions options {.commonModule = commonModule()};
+    VerificationOptions options;
+    options.commonModule = commonModule();
     return verifyUpdateContents(contents, activeServers, clientData, options);
 }
 
