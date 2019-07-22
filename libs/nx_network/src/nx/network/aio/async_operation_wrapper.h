@@ -44,56 +44,47 @@ public:
     }
 
     /**
-     * NOTE: Another operation can be started while the previous is still running.
+     * NOTE: Another operation can be started while the previous one is still running.
      */
     template<typename Handler, typename... Args>
-    void invoke(Handler handler, Args... args)
+    void invoke(Handler handler, Args&&... args)
     {
         invokeWithTimeout(
             std::move(handler),
             std::chrono::milliseconds::zero(),
             OnTimeoutHandler(),
-            std::move(args)...);
+            std::forward<Args>(args)...);
     }
 
+    /**
+     * @param timeout 0 is treated as "no timeout".
+     */
     template<typename Handler, typename... Args>
     void invokeWithTimeout(
         Handler handler,
         std::chrono::milliseconds timeout,
         OnTimeoutHandler timedOutHandler,
-        Args... args)
+        Args&&... args)
     {
-        // TODO: #ak Move execution to the aio thread and simplify 
-        // when perfect forwarding is available.
-
+        auto argsTuple = std::make_tuple(std::forward<Args>(args)...);
         const auto operationId = ++m_prevOperationId;
 
         {
             QnMutexLocker lock(&m_mutex);
-            m_idToOperationContext.emplace(operationId, OperationContext{});
+            auto it = m_idToOperationContext.emplace(operationId, OperationContext{}).first;
+            it->second.saveHandler(std::move(handler));
         }
 
-        auto processResult = prepareCompletionHandler(
-            operationId,
-            std::move(handler));
+        auto processResult = prepareCompletionHandler<Handler>(operationId);
 
-        if constexpr(std::is_member_function_pointer<Func>::value)
-        {
-            invokeAsMemberFunction(
-                std::move(processResult),
-                std::move(args)...);
-        }
-        else
-        {
-            invokeAsFunctor(
-                std::move(processResult),
-                std::move(args)...);
-        }
+        std::apply(
+            m_func,
+            std::tuple_cat(std::move(argsTuple), std::make_tuple(std::move(processResult))));
 
         if (timeout > std::chrono::milliseconds::zero())
         {
-            post(
-                [this, operationId, timeout, 
+            dispatch(
+                [this, operationId, timeout,
                     timedOutHandler = std::move(timedOutHandler)]() mutable
                 {
                     startTimer(operationId, timeout, std::move(timedOutHandler));
@@ -144,42 +135,19 @@ private:
     QnMutex m_mutex;
     std::map<int, OperationContext> m_idToOperationContext;
 
-    template<typename Handler, typename Class, typename... Args>
-    void invokeAsMemberFunction(
-        Handler handler,
-        Class* pThis,
-        Args... args)
-    {
-        (pThis->*m_func)(
-            std::move(args)...,
-            std::move(handler));
-    }
-
-    template<typename Handler, typename... Args>
-    void invokeAsFunctor(Handler handler, Args... args)
-    {
-        m_func(
-            std::move(args)...,
-            std::move(handler));
-    }
-
     template<typename Handler>
-    auto prepareCompletionHandler(
-        int operationId,
-        Handler handler)
+    auto prepareCompletionHandler(int operationId)
     {
-        storeHandlerToOperationContext(operationId, std::move(handler));
-
         return
             [this, sharedGuard = m_guard.sharedGuard(), operationId](
-                auto... args) mutable
+                auto&&... args) mutable
             {
                 auto lock = sharedGuard->lock();
                 if (!lock)
                     return;
 
                 dispatch(
-                    [this, args = std::make_tuple(std::move(args)...),
+                    [this, args = std::make_tuple(std::forward<decltype(args)>(args)...),
                         operationId]() mutable
                     {
                         OperationContext context;
@@ -187,7 +155,7 @@ private:
                             QnMutexLocker lock(&m_mutex);
                             auto it = m_idToOperationContext.find(operationId);
                             if (it == m_idToOperationContext.end())
-                                return; //< operation has already completed.
+                                return; //< the operation has already completed.
                             context = std::move(it->second);
                             m_idToOperationContext.erase(it);
                         }
@@ -196,17 +164,6 @@ private:
                         std::apply(handler, std::move(args));
                     });
             };
-    }
-
-    template<typename Handler>
-    void storeHandlerToOperationContext(
-        int operationId,
-        Handler handler)
-    {
-        QnMutexLocker lock(&m_mutex);
-        auto it = m_idToOperationContext.find(operationId);
-        NX_CRITICAL(it != m_idToOperationContext.end());
-        it->second.saveHandler(std::move(handler));
     }
 
     void startTimer(
