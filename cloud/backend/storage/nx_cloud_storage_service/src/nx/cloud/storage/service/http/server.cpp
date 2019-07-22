@@ -2,10 +2,12 @@
 
 #include <nx/network/url/url_parse_helper.h>
 #include <nx/network/cloud/storage/service/api/request_paths.h>
+#include <nx/network/url/url_parse_helper.h>
 
 #include "../settings.h"
 #include "../controller/controller.h"
 #include "../controller/storage_manager.h"
+#include "cloud_db_authentication_manager.h"
 #include "request_handler.h"
 
 namespace nx::cloud::storage::service::http {
@@ -19,10 +21,16 @@ static constexpr char kStorageIdParam[] = "id";
 Server::Server(const Settings& settings, Controller* controller):
     m_settings(settings),
     m_storageManager(controller->storageManager()),
+    m_cloudDBAuthenticationForwarder(CloudDbAuthenticationFactory::instance().create(settings)),
     m_multiAddressServer(
         &m_authenticationDispatcher,
         &m_messageDispatcher)
 {
+    // Adding "/storages/" and "/storage/{id}" to cloud db authentication forwarding.
+    registerAuthenticationManager(
+        std::string(api::kStoragePrefix) + ".*",
+        m_cloudDBAuthenticationForwarder.get());
+
     registerApiHandlers();
 }
 
@@ -62,6 +70,14 @@ std::vector<network::SocketAddress> Server::httpEndpoints() const
 std::vector<network::SocketAddress> Server::httpsEndpoints() const
 {
     return m_multiAddressServer.sslEndpoints();
+}
+
+void Server::registerAuthenticationManager(
+    const std::string& regex,
+    network::http::server::AbstractAuthenticationManager* authenticationManager)
+{
+    m_authenticationDispatcher.add(std::regex(regex), authenticationManager);
+    NX_VERBOSE(this, "Registered path regex: %1 for HTTP authentication", regex);
 }
 
 void Server::registerApiHandlers()

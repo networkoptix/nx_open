@@ -28,11 +28,17 @@ public:
     std::vector<network::SocketAddress> httpsEndpoints() const;
 
 private:
+    void registerAuthenticationManager(
+        const std::string& regex,
+        network::http::server::AbstractAuthenticationManager* authenticationManager);
+
     void registerApiHandlers();
 
 private:
     const Settings& m_settings;
     AbstractStorageManager* m_storageManager = nullptr;
+    std::unique_ptr<network::http::server::AbstractAuthenticationManager>
+        m_cloudDBAuthenticationForwarder;
 
     network::http::server::rest::MessageDispatcher m_messageDispatcher;
     network::http::server::AuthenticationDispatcher m_authenticationDispatcher;

@@ -33,6 +33,14 @@ static constexpr bool kDefaultEnabled = false;
 
 }
 
+namespace cloud_db {
+
+static constexpr char kGroupName[] = "cloud_db";
+static constexpr char kUrl[] = "url";
+static constexpr char kDefaultUrl[] = "";
+
+}
+
 Http::Http(const char* groupName):
     network::http::server::Settings(groupName)
 {
@@ -52,19 +60,28 @@ void Settings::loadSettings()
     loadHttp();
     loadServer();
     loadStatistics();
+    loadCloudDb();
 }
 
 void Settings::loadHttp()
 {
+    using namespace http;
     m_http.load(settings());
     m_http.htdigestPath = settings().value(
-        lm("%1/%2").args(http::kGroupName, http::kHtdigestPath)).toString().toStdString();
+        lm("%1/%2").args(kGroupName, kHtdigestPath)).toString().toStdString();
 }
 
 void Settings::loadServer()
 {
+    using namespace server;
     m_server.name = settings().value(
-        lm("%1/%2").args(server::kGroupName, server::kName)).toString().toStdString();
+        lm("%1/%2").args(kGroupName, kName)).toString().toStdString();
+}
+
+void Settings::loadCloudDb()
+{
+    using namespace cloud_db;
+    m_cloudDb.url = settings().value(lm("%1/%2").args(kGroupName, kUrl), kDefaultUrl).toString();
 }
 
 void Settings::loadStatistics()
@@ -82,6 +99,11 @@ const Http& Settings::http() const
 const Server& Settings::server() const
 {
     return m_server;
+}
+
+const CloudDb& Settings::cloudDb() const
+{
+    return m_cloudDb;
 }
 
 const Statistics& Settings::statistics() const

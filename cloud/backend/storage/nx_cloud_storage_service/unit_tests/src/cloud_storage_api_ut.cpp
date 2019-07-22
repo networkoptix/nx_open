@@ -5,6 +5,7 @@
 #include <nx/utils/thread/sync_queue.h>
 
 #include <nx/cloud/storage/service/controller/storage_manager.h>
+#include <nx/cloud/storage/service/http/cloud_db_authentication_manager.h>
 
 namespace nx::cloud::storage::service::test {
 
@@ -40,6 +41,28 @@ public:
     }
 };
 
+class CloudDBAuthenticationForwarderStub:
+    public network::http::server::AbstractAuthenticationManager
+{
+public:
+    CloudDBAuthenticationForwarderStub(nx::utils::SyncQueue<bool>* authenticationEvent):
+        m_authenticationEvent(authenticationEvent)
+    {
+    }
+
+    virtual void authenticate(
+        const network::http::HttpServerConnection& /*connection*/,
+        const network::http::Request& /*request*/,
+        network::http::server::AuthenticationCompletionHandler completionHandler) override
+    {
+        m_authenticationEvent->push(true);
+        completionHandler(network::http::server::SuccessfulAuthenticationResult());
+    }
+
+private:
+    nx::utils::SyncQueue<bool>* m_authenticationEvent = nullptr;
+};
+
 } // namespace
 
 class CloudStorageApi:
@@ -55,6 +78,14 @@ protected:
                     return std::make_unique<StorageManagerStub>();
                 });
 
+        m_cloudDBAuthenticationFactoryFuncBak =
+            http::CloudDbAuthenticationFactory::instance().setCustomFunc(
+                [this](const Settings& /*settings*/)
+                {
+                    return std::make_unique<CloudDBAuthenticationForwarderStub>(
+                        &m_authenticationEvent);
+                });
+
         m_cloudStorage = std::make_unique<CloudStorageLauncher>();
         ASSERT_TRUE(m_cloudStorage->startAndWaitUntilStarted());
 
@@ -67,6 +98,12 @@ protected:
         {
             StorageManagerFactory::instance().setCustomFunc(
                 std::move(m_storageManagerFactoryFuncBak));
+        }
+
+        if (m_cloudDBAuthenticationFactoryFuncBak)
+        {
+            http::CloudDbAuthenticationFactory::instance().setCustomFunc(
+                std::move(m_cloudDBAuthenticationFactoryFuncBak));
         }
     }
 
@@ -101,6 +138,11 @@ protected:
             });
     }
 
+    void thenRequestIsForwardedToCloudDb()
+    {
+        ASSERT_TRUE(m_authenticationEvent.pop());
+    }
+
     void thenRequestSucceeds()
     {
         ASSERT_EQ(api::Client::ResultCode::ok, m_response.pop());
@@ -111,23 +153,28 @@ private:
     std::unique_ptr<api::Client> m_cloudStorageClient;
     nx::utils::SyncQueue<api::Client::ResultCode> m_response;
     StorageManagerFactory::Function m_storageManagerFactoryFuncBak;
+    service::http::CloudDbAuthenticationFactory::Function m_cloudDBAuthenticationFactoryFuncBak;
+    nx::utils::SyncQueue<bool> m_authenticationEvent;
 };
 
 TEST_F(CloudStorageApi, add_storage)
 {
     whenAddStorage();
+    thenRequestIsForwardedToCloudDb();
     thenRequestSucceeds();
 }
 
 TEST_F(CloudStorageApi, read_storage)
 {
     whenReadStorage();
+    thenRequestIsForwardedToCloudDb();
     thenRequestSucceeds();
 }
 
 TEST_F(CloudStorageApi, remove_storage)
 {
     whenRemoveStorage();
+    thenRequestIsForwardedToCloudDb();
     thenRequestSucceeds();
 }
 

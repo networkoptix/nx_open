@@ -3,6 +3,7 @@
 #include <nx/utils/basic_service_settings.h>
 
 #include <nx/network/http/server/settings.h>
+#include <nx/utils/url.h>
 
 namespace nx::cloud::storage::service {
 
@@ -17,6 +18,11 @@ struct Http:
 struct Server
 {
     std::string name;
+};
+
+struct CloudDb
+{
+    nx::utils::Url url;
 };
 
 struct Statistics
@@ -34,6 +40,7 @@ public:
 
     const Http& http() const;
     const Server& server() const;
+    const CloudDb& cloudDb() const;
     const Statistics& statistics() const;
 
 protected:
@@ -42,11 +49,13 @@ protected:
 private:
     void loadHttp();
     void loadServer();
+    void loadCloudDb();
     void loadStatistics();
 
 private:
     Http m_http;
     Server m_server;
+    CloudDb m_cloudDb;
     Statistics m_statistics;
 };
 
