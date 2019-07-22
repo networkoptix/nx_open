@@ -27,7 +27,7 @@ public:
     const QnUuid& id() const { return m_id; }
 
     /** Key value in the shared resources map. */
-    const QnUuid& effectiveId() const
+    QnUuid effectiveId() const
     {
         return m_user && m_user->userRole() == Qn::UserRole::customUserRole 
             ? m_user->userRoleId() : m_id; 
