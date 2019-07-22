@@ -306,6 +306,7 @@ QnDesktopDataProvider::QnDesktopDataProvider(
     }
 
     m_needStop = false;
+    m_timer = std::make_unique<QElapsedTimer>();
 }
 
 QnDesktopDataProvider::~QnDesktopDataProvider()
@@ -332,20 +333,19 @@ int QnDesktopDataProvider::calculateBitrate(const char* codecName)
     return bitrate;
 }
 
-bool QnDesktopDataProvider::init()
+bool QnDesktopDataProvider::initVideoCapturing()
 {
-    m_initTime = AV_NOPTS_VALUE;
     m_grabber = new QnBufferedScreenGrabber(
-            m_desktopNum,
-            QnBufferedScreenGrabber::DEFAULT_QUEUE_SIZE,
-            QnBufferedScreenGrabber::DEFAULT_FRAME_RATE,
-            m_captureMode,
-            m_captureCursor,
-            m_captureResolution,
-            m_widget);
+        m_desktopNum,
+        QnBufferedScreenGrabber::DEFAULT_QUEUE_SIZE,
+        QnBufferedScreenGrabber::DEFAULT_FRAME_RATE,
+        m_captureMode,
+        m_captureCursor,
+        m_captureResolution,
+        m_widget);
     m_grabber->setLogo(m_logo);
+    m_grabber->setTimer(m_timer.get());
 
-    //av_log_set_callback(FffmpegLog::av_log_default_callback_impl);
 
     m_videoBufSize = av_image_get_buffer_size((AVPixelFormat) m_grabber->format(), m_grabber->width(), m_grabber->height(), /*align*/ 1);
     m_videoBuf = (quint8*) av_malloc(m_videoBufSize);
@@ -454,6 +454,17 @@ bool QnDesktopDataProvider::init()
         return false;
     }
 
+    // QnMediaContext was created before open() call to avoid encoder specific fields.
+    // Transfer extradata manually.
+    videoContext->setExtradata(m_videoCodecCtx->extradata, m_videoCodecCtx->extradata_size);
+
+    return true;
+}
+
+bool QnDesktopDataProvider::initAudioCapturing()
+{
+    m_initTime = AV_NOPTS_VALUE;
+
     // init audio capture
     if (!m_audioInfo.isEmpty())
     {
@@ -525,14 +536,6 @@ bool QnDesktopDataProvider::init()
             return false;
         }
     }
-
-    // QnMediaContext was created before open() call to avoid encoder specific fields.
-    // Transfer extradata manually.
-    videoContext->setExtradata(m_videoCodecCtx->extradata, m_videoCodecCtx->extradata_size);
-
-    //m_videoContext = QnMediaContextPtr(new QnAvCodecMediaContext(m_videoCodecCtx));
-    //m_videoContext->ctx()->stats_out = 0;
-    //m_videoContext->ctx()->coded_frame = 0;
 
     return true;
 }
@@ -701,11 +704,11 @@ void QnDesktopDataProvider::start(Priority priority)
         return;
     m_started = true;
 
-    m_isInitialized = init();
-    if (!m_isInitialized)
+    m_isAudioInitialized = initAudioCapturing();
+    if (!m_isAudioInitialized)
     {
         m_needStop = true;
-        NX_WARNING(this, "Could not initialize audio/video capturing: %1", m_lastErrorStr);
+        NX_WARNING(this, "Could not initialize audio capturing: %1", m_lastErrorStr);
     }
 
     QnLongRunnable::start(priority);
@@ -713,7 +716,7 @@ void QnDesktopDataProvider::start(Priority priority)
 
 bool QnDesktopDataProvider::isInitialized() const
 {
-    return m_isInitialized;
+    return m_isAudioInitialized;
 }
 
 bool QnDesktopDataProvider::needVideoData() const
@@ -730,11 +733,22 @@ bool QnDesktopDataProvider::needVideoData() const
 void QnDesktopDataProvider::run()
 {
     QThread::currentThread()->setPriority(QThread::HighPriority);
+    m_timer->restart();
 
-    while (!needToStop() || m_grabber->dataExist())
+    while (!needToStop() || (m_grabber && m_grabber->dataExist()))
     {
         if (needVideoData())
         {
+            if (!m_isVideoInitialized)
+            {
+                m_isVideoInitialized = initVideoCapturing();
+                if (!m_isVideoInitialized)
+                {
+                    m_needStop = true;
+                    break;
+                }
+            }
+
             m_grabber->start(QThread::HighestPriority);
 
             if (needToStop() && !m_capturingStopped)
@@ -771,7 +785,8 @@ void QnDesktopDataProvider::run()
         }
         else
         {
-            m_grabber->pleaseStop();
+            if (m_grabber)
+                m_grabber->pleaseStop();
             putAudioData();
         }
         if (needToStop())
@@ -794,7 +809,8 @@ void QnDesktopDataProvider::stopCapturing()
 {
     foreach(EncodedAudioInfo* info, m_audioInfo)
         info->stop();
-    m_grabber->pleaseStop();
+    if (m_grabber)
+        m_grabber->pleaseStop();
 }
 
 void QnDesktopDataProvider::closeStream()
@@ -841,7 +857,7 @@ QnConstResourceAudioLayoutPtr QnDesktopDataProvider::getAudioLayout()
 
 qint64 QnDesktopDataProvider::currentTime() const
 {
-    return m_grabber->currentTime();
+    return m_timer->elapsed();
 }
 
 void QnDesktopDataProvider::beforeDestroyDataProvider(QnAbstractDataConsumer* consumer)
