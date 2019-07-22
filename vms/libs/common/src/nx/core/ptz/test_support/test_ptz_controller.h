@@ -12,7 +12,7 @@ namespace core {
 namespace ptz {
 namespace test_support {
 
-#define FUNC_TYPE(METHOD) std::function<typename nx::utils::meta::SignatureExtractor<\
+#define FUNC_TYPE(METHOD) std::function<typename nx::utils::SignatureExtractor<\
     decltype(&QnAbstractPtzController::METHOD)>::type>
 
 using GetCapabilitiesExecutor = FUNC_TYPE(getCapabilities);

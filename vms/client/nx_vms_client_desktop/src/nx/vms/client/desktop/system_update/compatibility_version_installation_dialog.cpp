@@ -117,7 +117,8 @@ void CompatibilityVersionInstallationDialog::processUpdateContents(
     }
 }
 
-void CompatibilityVersionInstallationDialog::atUpdateStateChanged(int state, int progress)
+void CompatibilityVersionInstallationDialog::atUpdateStateChanged(
+    int state, int progress, const QString& message)
 {
     NX_DEBUG(this, "CompatibilityVersionInstallationDialog::atUpdateStateChanged(%1, %2)",
         ClientUpdateTool::toString(ClientUpdateTool::State(state)), progress);
@@ -173,18 +174,27 @@ void CompatibilityVersionInstallationDialog::atUpdateStateChanged(int state, int
             else
                 m_installationResult = InstallResult::failedDownload;
             setMessage(tr("Installation failed"));
+            m_errorMessage = message;
             finalProgress = 100;
             done(QDialogButtonBox::StandardButton::Ok);
             break;
         case ClientUpdateTool::State::applauncherError:
             m_installationResult = InstallResult::failedInstall;
             setMessage(tr("Installation failed"));
+            m_errorMessage = message;
             finalProgress = 100;
             done(QDialogButtonBox::StandardButton::Ok);
+            break;
+        case ClientUpdateTool::State::exiting:
             break;
     }
 
     m_ui->progressBar->setValue(finalProgress);
+}
+
+QString CompatibilityVersionInstallationDialog::errorString() const
+{
+    return m_errorMessage;
 }
 
 void CompatibilityVersionInstallationDialog::atUpdateCurrentState()
@@ -242,17 +252,17 @@ int CompatibilityVersionInstallationDialog::startUpdate()
     connect(m_private->clientUpdateTool, &ClientUpdateTool::updateStateChanged,
         this, &CompatibilityVersionInstallationDialog::atUpdateStateChanged);
 
-    // Should request specific build from the internet.
     QString updateUrl = qnSettings->updateFeedUrl();
     QString build = QString::number(m_versionToInstall.build());
 
     m_private->checkingUpdates = true;
-    m_private->updateInfoInternet = nx::update::checkSpecificChangeset(
-        updateUrl, m_engineVersion, build);
+    // Starting check for update manifest from the internet.
+    m_private->updateInfoInternet = m_private->clientUpdateTool->requestInternetUpdateInfo(
+        updateUrl, build);
     if (m_private->updateInfoInternet.valid())
         ++m_private->requestsLeft;
     // Checking update info from the mediaservers.
-    m_private->updateInfoMediaserver = m_private->clientUpdateTool->requestRemoteUpdateInfo();
+    m_private->updateInfoMediaserver = m_private->clientUpdateTool->requestInstalledUpdateInfo();
     if (m_private->updateInfoMediaserver.valid())
         ++m_private->requestsLeft;
 
@@ -266,7 +276,6 @@ int CompatibilityVersionInstallationDialog::startUpdate()
 
     setMessage(tr("Installing version %1").arg(m_versionToInstall.toString()));
     m_ui->buttonBox->setStandardButtons(QDialogButtonBox::Cancel);
-
     int result = base_type::exec();
     return result;
 }

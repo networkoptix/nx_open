@@ -270,6 +270,21 @@ bool InstallZipTaskAsync::deserialize(const QByteArray& data)
     return false;
 }
 
+QByteArray InstallZipCheckStatus::serialize() const
+{
+    return serializeTaskParameters(type, {version.toString()});
+}
+
+bool InstallZipCheckStatus::deserialize(const QByteArray& data)
+{
+    if (const auto& parameters = deserializeTaskParameters(type, 1, data))
+    {
+        version = nx::utils::SoftwareVersion(parameters->at(0));
+        return true;
+    }
+    return false;
+}
+
 QByteArray InstallZipCheckStatusResponse::serialize() const
 {
     return serializeResponseParameters(result,
@@ -342,8 +357,8 @@ bool PingRequest::deserialize(const QByteArray& data)
 {
     if (const auto& parameters = deserializeTaskParameters(type, 2, data))
     {
-        pingId = parameters->at(0).toULong();
-        pingStamp = (quint32) parameters->at(1).toULong();
+        pingId = parameters->at(0).toULongLong();
+        pingStamp = parameters->at(1).toULongLong();
         return true;
     }
     return false;
@@ -357,11 +372,11 @@ QByteArray PingResponse::serialize() const
 
 bool PingResponse::deserialize(const QByteArray& data)
 {
-    if (const auto& parameters = deserializeResponseParameters(&result, 1, data))
+    if (const auto& parameters = deserializeResponseParameters(&result, 3, data))
     {
-        pingId = parameters->at(0).toULong();
-        pingRequestStamp = (quint32) parameters->at(1).toULong();
-        pingResponseStamp = (quint32) parameters->at(2).toULong();
+        pingId = parameters->at(0).toULongLong();
+        pingRequestStamp = parameters->at(1).toULongLong();
+        pingResponseStamp = parameters->at(2).toULongLong();
         return true;
     }
     return false;

@@ -4,7 +4,8 @@
 
 namespace nx::update::detail {
 
-using ExtractHandler = std::function<void(QnZipExtractor::Error, const QString& /*outputPath*/)>;
+using ExtractHandler = std::function<void(
+    QnZipExtractor::Error, const QString& /*outputPath*/, qint64 bytesExtracted)>;
 
 class ZipExtractor
 {

@@ -76,7 +76,7 @@
     </message>
     <message>
       <source>Server is offline</source>
-      <translation type="unfinished">Server is offline</translation>
+      <translation>เซิร์ฟเวอร์ออฟไลน์</translation>
     </message>
   </context>
   <context>

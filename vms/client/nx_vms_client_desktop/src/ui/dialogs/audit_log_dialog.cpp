@@ -981,7 +981,13 @@ void QnAuditLogDialog::retranslateUi()
 void QnAuditLogDialog::at_exportAction_triggered()
 {
     if (currentGridView())
-        QnTableExportHelper::exportToFile(currentGridView(), true, this, tr("Export selected records to a file"));
+    {
+        QnTableExportHelper::exportToFile(
+            currentGridView()->model(),
+            currentGridView()->selectionModel()->selectedIndexes(),
+            this,
+            tr("Export selected records to a file"));
+    }
 }
 
 void QnAuditLogDialog::at_selectAllAction_triggered()
@@ -993,7 +999,11 @@ void QnAuditLogDialog::at_selectAllAction_triggered()
 void QnAuditLogDialog::at_clipboardAction_triggered()
 {
     if (currentGridView())
-        QnTableExportHelper::copyToClipboard(currentGridView());
+    {
+        QnTableExportHelper::copyToClipboard(
+            currentGridView()->model(),
+            currentGridView()->selectionModel()->selectedIndexes());
+    }
 }
 
 void QnAuditLogDialog::disableUpdateData()

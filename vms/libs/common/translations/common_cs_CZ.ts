@@ -520,101 +520,101 @@
     </message>
     <message numerus="yes">
       <source>%n Time Licenses</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n Časově omezená licence</numerusform>
-        <numerusform>%n Time Licenses</numerusform>
-        <numerusform>%n Time Licenses</numerusform>
-        <numerusform>%n Time Licenses</numerusform>
+        <numerusform>%n Časově omezená licence</numerusform>
+        <numerusform>%n Časově omezená licence</numerusform>
+        <numerusform>%n Časově omezená licence</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Analog Licenses</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n Analogové licence</numerusform>
-        <numerusform>%n Analog Licenses</numerusform>
-        <numerusform>%n Analog Licenses</numerusform>
-        <numerusform>%n Analog Licenses</numerusform>
+        <numerusform>%n Analogové licence</numerusform>
+        <numerusform>%n Analogové licence</numerusform>
+        <numerusform>%n Analogové licence</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Professional Licenses</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n Profesionální licence</numerusform>
-        <numerusform>%n Professional Licenses</numerusform>
-        <numerusform>%n Professional Licenses</numerusform>
-        <numerusform>%n Professional Licenses</numerusform>
+        <numerusform>%n Profesionální licence</numerusform>
+        <numerusform>%n Profesionální licence</numerusform>
+        <numerusform>%n Profesionální licence</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Edge Licenses</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n Edge licence</numerusform>
-        <numerusform>%n Edge Licenses</numerusform>
-        <numerusform>%n Edge Licenses</numerusform>
-        <numerusform>%n Edge Licenses</numerusform>
+        <numerusform>%n Edge licence</numerusform>
+        <numerusform>%n Edge licence</numerusform>
+        <numerusform>%n Edge licence</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Vmax Licenses</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n Vmax licence</numerusform>
-        <numerusform>%n Vmax Licenses</numerusform>
-        <numerusform>%n Vmax Licenses</numerusform>
-        <numerusform>%n Vmax Licenses</numerusform>
+        <numerusform>%n Vmax licence</numerusform>
+        <numerusform>%n Vmax licence</numerusform>
+        <numerusform>%n Vmax licence</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Analog Encoder Licenses</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n Licence pro analogové enkodéry</numerusform>
-        <numerusform>%n Analog Encoder Licenses</numerusform>
-        <numerusform>%n Analog Encoder Licenses</numerusform>
-        <numerusform>%n Analog Encoder Licenses</numerusform>
+        <numerusform>%n Licence pro analogové enkodéry</numerusform>
+        <numerusform>%n Licence pro analogové enkodéry</numerusform>
+        <numerusform>%n Licence pro analogové enkodéry</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Video Wall Licenses</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n Licence pro videostěny</numerusform>
-        <numerusform>%n Video Wall Licenses</numerusform>
-        <numerusform>%n Video Wall Licenses</numerusform>
-        <numerusform>%n Video Wall Licenses</numerusform>
+        <numerusform>%n Licence pro videostěny</numerusform>
+        <numerusform>%n Licence pro videostěny</numerusform>
+        <numerusform>%n Licence pro videostěny</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O Module Licenses</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n Licence pro I/O moduly</numerusform>
-        <numerusform>%n I/O Module Licenses</numerusform>
-        <numerusform>%n I/O Module Licenses</numerusform>
-        <numerusform>%n I/O Module Licenses</numerusform>
+        <numerusform>%n Licence pro I/O moduly</numerusform>
+        <numerusform>%n Licence pro I/O moduly</numerusform>
+        <numerusform>%n Licence pro I/O moduly</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Start Licenses</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n Start Licence</numerusform>
-        <numerusform>%n Start Licenses</numerusform>
-        <numerusform>%n Start Licenses</numerusform>
-        <numerusform>%n Start Licenses</numerusform>
+        <numerusform>%n Start Licence</numerusform>
+        <numerusform>%n Start Licence</numerusform>
+        <numerusform>%n Start Licence</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Bridge Licenses</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n Bridge Licence</numerusform>
-        <numerusform>%n Bridge Licenses</numerusform>
-        <numerusform>%n Bridge Licenses</numerusform>
-        <numerusform>%n Bridge Licenses</numerusform>
+        <numerusform>%n Bridge Licence</numerusform>
+        <numerusform>%n Bridge Licence</numerusform>
+        <numerusform>%n Bridge Licence</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Invalid Licenses</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n Neplatné licence</numerusform>
-        <numerusform>%n Invalid Licenses</numerusform>
-        <numerusform>%n Invalid Licenses</numerusform>
-        <numerusform>%n Invalid Licenses</numerusform>
+        <numerusform>%n Neplatné licence</numerusform>
+        <numerusform>%n Neplatné licence</numerusform>
+        <numerusform>%n Neplatné licence</numerusform>
       </translation>
     </message>
     <message>
@@ -633,91 +633,91 @@
     <message numerus="yes">
       <source>%n/%1 Time Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n%1 Časově omezená licence</numerusform>
-        <numerusform>%n/%1 Time Licenses</numerusform>
-        <numerusform>%n/%1 Time Licenses</numerusform>
-        <numerusform>%n/%1 Time Licenses</numerusform>
+        <numerusform>%n%1 Časově omezená licence</numerusform>
+        <numerusform>%n%1 Časově omezená licence</numerusform>
+        <numerusform>%n%1 Časově omezená licence</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Analog Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n%1 Analogové licence</numerusform>
-        <numerusform>%n/%1 Analog Licenses</numerusform>
-        <numerusform>%n/%1 Analog Licenses</numerusform>
-        <numerusform>%n/%1 Analog Licenses</numerusform>
+        <numerusform>%n%1 Analogové licence</numerusform>
+        <numerusform>%n%1 Analogové licence</numerusform>
+        <numerusform>%n%1 Analogové licence</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Professional Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n%1 Profesionální licence</numerusform>
-        <numerusform>%n/%1 Professional Licenses</numerusform>
-        <numerusform>%n/%1 Professional Licenses</numerusform>
-        <numerusform>%n/%1 Professional Licenses</numerusform>
+        <numerusform>%n%1 Profesionální licence</numerusform>
+        <numerusform>%n%1 Profesionální licence</numerusform>
+        <numerusform>%n%1 Profesionální licence</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Edge Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n%1 Edge licence</numerusform>
-        <numerusform>%n/%1 Edge Licenses</numerusform>
-        <numerusform>%n/%1 Edge Licenses</numerusform>
-        <numerusform>%n/%1 Edge Licenses</numerusform>
+        <numerusform>%n%1 Edge licence</numerusform>
+        <numerusform>%n%1 Edge licence</numerusform>
+        <numerusform>%n%1 Edge licence</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Vmax Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n%1 Vmax licence</numerusform>
-        <numerusform>%n/%1 Vmax Licenses</numerusform>
-        <numerusform>%n/%1 Vmax Licenses</numerusform>
-        <numerusform>%n/%1 Vmax Licenses</numerusform>
+        <numerusform>%n%1 Vmax licence</numerusform>
+        <numerusform>%n%1 Vmax licence</numerusform>
+        <numerusform>%n%1 Vmax licence</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Analog Encoder Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n%1 Licence pro analogové enkodéry</numerusform>
-        <numerusform>%n/%1 Analog Encoder Licenses</numerusform>
-        <numerusform>%n/%1 Analog Encoder Licenses</numerusform>
-        <numerusform>%n/%1 Analog Encoder Licenses</numerusform>
+        <numerusform>%n%1 Licence pro analogové enkodéry</numerusform>
+        <numerusform>%n%1 Licence pro analogové enkodéry</numerusform>
+        <numerusform>%n%1 Licence pro analogové enkodéry</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Video Wall Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n%1 Licence pro videostěny</numerusform>
-        <numerusform>%n/%1 Video Wall Licenses</numerusform>
-        <numerusform>%n/%1 Video Wall Licenses</numerusform>
-        <numerusform>%n/%1 Video Wall Licenses</numerusform>
+        <numerusform>%n%1 Licence pro videostěny</numerusform>
+        <numerusform>%n%1 Licence pro videostěny</numerusform>
+        <numerusform>%n%1 Licence pro videostěny</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 I/O Module Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n%1 Licence pro I/O moduly</numerusform>
-        <numerusform>%n/%1 I/O Module Licenses</numerusform>
-        <numerusform>%n/%1 I/O Module Licenses</numerusform>
-        <numerusform>%n/%1 I/O Module Licenses</numerusform>
+        <numerusform>%n%1 Licence pro I/O moduly</numerusform>
+        <numerusform>%n%1 Licence pro I/O moduly</numerusform>
+        <numerusform>%n%1 Licence pro I/O moduly</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Start Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n%1 Start Licence</numerusform>
-        <numerusform>%n/%1 Start Licenses</numerusform>
-        <numerusform>%n/%1 Start Licenses</numerusform>
-        <numerusform>%n/%1 Start Licenses</numerusform>
+        <numerusform>%n%1 Start Licence</numerusform>
+        <numerusform>%n%1 Start Licence</numerusform>
+        <numerusform>%n%1 Start Licence</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -733,21 +733,21 @@
     <message numerus="yes">
       <source>%n/%1 Bridge Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n%1 Bridge Licence</numerusform>
-        <numerusform>%n/%1 Bridge Licenses</numerusform>
-        <numerusform>%n/%1 Bridge Licenses</numerusform>
-        <numerusform>%n/%1 Bridge Licenses</numerusform>
+        <numerusform>%n%1 Bridge Licence</numerusform>
+        <numerusform>%n%1 Bridge Licence</numerusform>
+        <numerusform>%n%1 Bridge Licence</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Invalid Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n%1 Neplatné licence</numerusform>
-        <numerusform>%n/%1 Invalid Licenses</numerusform>
-        <numerusform>%n/%1 Invalid Licenses</numerusform>
-        <numerusform>%n/%1 Invalid Licenses</numerusform>
+        <numerusform>%n%1 Neplatné licence</numerusform>
+        <numerusform>%n%1 Neplatné licence</numerusform>
+        <numerusform>%n%1 Neplatné licence</numerusform>
       </translation>
     </message>
   </context>

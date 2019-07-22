@@ -97,6 +97,7 @@ struct PackageInformation
     QString platform;
     QList<Variant> variants;
     QString installScript;
+    qint64 freeSpaceRequired = 0;
 
     bool isValid() const { return !version.isNull(); }
     bool isServer() const;
@@ -105,9 +106,9 @@ struct PackageInformation
 };
 
 #define PackageInformation_Fields (version)(component)(cloudHost)(platform)(variants) \
-    (installScript)
+    (installScript)(freeSpaceRequired)
 
-QN_FUSION_DECLARE_FUNCTIONS(PackageInformation, (ubjson)(json)(eq))
+QN_FUSION_DECLARE_FUNCTIONS(PackageInformation, (json))
 
 enum class InformationError
 {

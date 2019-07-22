@@ -2051,11 +2051,6 @@
       <source>New Virtual Camera...</source>
       <translation>Nouvelle caméra virtuelle...</translation>
     </message>
-    <message>
-      <location/>
-      <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
-      <translation>&quot;Caméra Virtuelle&quot; est un stockage virtuel pour les fichiers vidéo, qui peut être envoyer sur n'importe quel serveur de votre Système et accessible à tout utilisateur.</translation>
-    </message>
   </context>
   <context>
     <name>OpenLayoutActionWidget</name>
@@ -2099,46 +2094,46 @@
     </message>
   </context>
   <context>
-    <name>PluginEventWidget</name>
+    <name>PluginDiagnosticEventWidget</name>
     <message>
-      <location filename="../src/nx/vms/client/desktop/ui/event_rules/widgets/plugin_event_widget.ui"/>
+      <location filename="../src/nx/vms/client/desktop/ui/event_rules/widgets/plugin_diagnostic_event_widget.ui"/>
       <source>Source:</source>
-      <translation>Source:</translation>
+      <translation type="unfinished">Source:</translation>
     </message>
     <message>
       <location/>
       <source>Caption contains:</source>
-      <translation>Légende contient:</translation>
+      <translation type="unfinished">Caption contains:</translation>
     </message>
     <message>
       <location/>
       <source>Keywords separated by space</source>
-      <translation>Mots-clés séparés par des espaces</translation>
+      <translation type="unfinished">Keywords separated by space</translation>
     </message>
     <message>
       <location/>
       <source>Description contains:</source>
-      <translation>Description contient:</translation>
+      <translation type="unfinished">Description contains:</translation>
     </message>
     <message>
       <location/>
       <source>Level:</source>
-      <translation>Niveau:</translation>
+      <translation type="unfinished">Level:</translation>
     </message>
     <message>
       <location/>
       <source>ERROR</source>
-      <translation>ERREUR</translation>
+      <translation type="unfinished">ERROR</translation>
     </message>
     <message>
       <location/>
       <source>WARNING</source>
-      <translation>ATTENTION</translation>
+      <translation type="unfinished">WARNING</translation>
     </message>
     <message>
       <location/>
       <source>INFO</source>
-      <translation>INFO</translation>
+      <translation type="unfinished">INFO</translation>
     </message>
   </context>
   <context>
@@ -2778,11 +2773,6 @@
       <source>Limit session duration</source>
       <translation>Limiter la durée de la session</translation>
     </message>
-    <message>
-      <location/>
-      <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
-      <translation>Les filigranes seront affichés sur des vidéos en direct, archivées et exportées pour les utilisateurs non-administrateurs uniquement. Vous et les autres administrateurs ne les verrons pas.</translation>
-    </message>
   </context>
   <context>
     <name>SendmailBusinessActionWidget</name>
@@ -3084,7 +3074,7 @@
     <message>
       <location/>
       <source>Recording was enabled on the USB storage</source>
-      <translation type="unfinished">Recording was enabled on the USB storage</translation>
+      <translation>Enregistrement a été activé sur le stockage USB</translation>
     </message>
     <message>
       <location/>

@@ -140,6 +140,22 @@ distrib_loadConfig() # config_file
     fi
 }
 
+# Read installed size from a DEB package.
+#
+# dpkg-deb will print the required info like "Installed-Size: 12345" where 12345 is approximate
+# size in kylobytes.
+#
+# [in] DEB_FILE
+#
+distrib_getInstalledSizeFromDeb() # deb_file
+{
+    local -r DEB_FILE="$1" && shift
+
+    local FREE_SPACE_REQUIRED=$(dpkg-deb -I "$DEB_FILE" |grep "Installed-Size:" |awk '{print $2}')
+    FREE_SPACE_REQUIRED=$(($FREE_SPACE_REQUIRED * 1024))
+    echo $FREE_SPACE_REQUIRED
+}
+
 # Copy system libraries using copy_system_library.py.
 #
 # [in] SOURCE_DIR

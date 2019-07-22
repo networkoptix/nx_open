@@ -109,16 +109,16 @@
     </message>
     <message>
       <source>Too many attempts. Try again in a minute.</source>
-      <translation>試行回数が多すぎます。暫くしてからもう一度お試しください</translation>
+      <translation>試行回数が多すぎます。しばらくしてからもう一度お試しください</translation>
     </message>
     <message>
       <source>%1 is temporary unavailable. Please try again later.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>%1 は一時的に利用できません　後でもう一度やり直してください</translation>
+      <translation>%1 は一時的に利用できません。後でもう一度やり直してください。</translation>
     </message>
     <message>
       <source>Network error. Please check your Internet connection and try again.</source>
-      <translation>ネットワーク エラー　インターネット接続を確認してやり直してください</translation>
+      <translation>ネットワーク エラーです。インターネット接続を確認してやり直してください。</translation>
     </message>
   </context>
   <context>
@@ -141,11 +141,11 @@
     </message>
     <message>
       <source>Could not initialize audio encoder.</source>
-      <translation>オーディオエンコーダーをイニシャライズできません</translation>
+      <translation>オーディオエンコーダーを初期化できませんでした</translation>
     </message>
     <message>
       <source>Sample format of input device %1 is not supported.</source>
-      <translation>入力デバイス %1 のサンプルフォーマットはサポートされません</translation>
+      <translation>入力デバイス %1 のサンプルフォーマットはサポートされていません</translation>
     </message>
     <message>
       <source>Primary audio device is not selected.</source>

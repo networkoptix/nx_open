@@ -83,15 +83,15 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Getting update information from the server</source>
-      <translation type="unfinished">Getting update information from the server</translation>
+      <translation>Updategegevens ophalen van de server</translation>
     </message>
     <message>
       <source>Downloading update package</source>
-      <translation type="unfinished">Downloading update package</translation>
+      <translation>Update pakket downloaden</translation>
     </message>
     <message>
       <source>Installing</source>
-      <translation type="unfinished">Installing</translation>
+      <translation>Installeren</translation>
     </message>
   </context>
   <context>
@@ -861,7 +861,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Forget password</source>
-      <translation type="unfinished">Forget password</translation>
+      <translation>Wachtwoord vergeten</translation>
     </message>
     <message>
       <source>Cancel Upload...</source>
@@ -873,7 +873,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Analytics Engine Settings...</source>
-      <translation type="unfinished">Analytics Engine Settings...</translation>
+      <translation>Analytics Engine instellingen...</translation>
     </message>
     <message>
       <source>Show Thumbnails</source>
@@ -893,11 +893,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Virtual Camera...</source>
-      <translation type="unfinished">Virtual Camera...</translation>
+      <translation>Virtuele camera...</translation>
     </message>
     <message>
       <source>New Virtual Camera...</source>
-      <translation type="unfinished">New Virtual Camera...</translation>
+      <translation>Nieuwe virtuele camera...</translation>
     </message>
     <message>
       <source>Show Tree</source>
@@ -921,23 +921,23 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Switch to Notifications tab</source>
-      <translation type="unfinished">Switch to Notifications tab</translation>
+      <translation>Ga naar het tabblad Notificaties</translation>
     </message>
     <message>
       <source>Switch to Motion tab</source>
-      <translation type="unfinished">Switch to Motion tab</translation>
+      <translation>Ga naar het tabblad Bewegingsdetectie</translation>
     </message>
     <message>
       <source>Switch to Bookmarks tab</source>
-      <translation type="unfinished">Switch to Bookmarks tab</translation>
+      <translation>Ga naar het tabblad Bladwijzers</translation>
     </message>
     <message>
       <source>Switch to Events tab</source>
-      <translation type="unfinished">Switch to Events tab</translation>
+      <translation>Ga naar het tabblad Evenementen</translation>
     </message>
     <message>
       <source>Switch to Objects tab</source>
-      <translation type="unfinished">Switch to Objects tab</translation>
+      <translation>Ga naar het tabblad Objecten</translation>
     </message>
     <message>
       <source>Objects Frames and Info...</source>
@@ -987,23 +987,23 @@ to view more bookmarks</source>
     <name>EncryptedLayoutStrings</name>
     <message>
       <source>Please enter a valid password</source>
-      <translation type="unfinished">Please enter a valid password</translation>
+      <translation>Voer een geldig wachtwoord in</translation>
     </message>
     <message>
       <source>The password is not valid.</source>
-      <translation type="unfinished">The password is not valid.</translation>
+      <translation>Het wachtwoord is niet geldig.</translation>
     </message>
     <message>
       <source>Encrypted layout</source>
-      <translation type="unfinished">Encrypted layout</translation>
+      <translation>Versleutelde schermindeling</translation>
     </message>
     <message>
       <source>The file %1 is encrypted. Please enter the password:</source>
-      <translation type="unfinished">The file %1 is encrypted. Please enter the password:</translation>
+      <translation>Het bestand %1 is versleuteld. Voer het wachtwoord in:</translation>
     </message>
     <message>
       <source>Please re-enter password for layout %1:</source>
-      <translation type="unfinished">Please re-enter password for layout %1:</translation>
+      <translation>Voer het wachtwoord opnieuw in voor lay-out %1:</translation>
     </message>
   </context>
   <context>
@@ -1322,7 +1322,7 @@ to view more bookmarks</source>
     <name>PtzInstrument</name>
     <message>
       <source>Layout is locked</source>
-      <translation type="unfinished">Layout is locked</translation>
+      <translation>De schermindeling is vergrendeld</translation>
     </message>
   </context>
   <context>
@@ -1582,17 +1582,17 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>Details for %n sessions of %1</source>
       <comment>Total number will be substituted as %1</comment>
-      <translation type="unfinished">
-        <numerusform>Details for %n sessions of %1</numerusform>
-        <numerusform>Details for %n sessions of %1</numerusform>
+      <translation>
+        <numerusform>Details voor %n sessies van %1</numerusform>
+        <numerusform>Details voor %n sessies van %1</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Details for %n cameras of %1</source>
       <comment>Total number will be substituted as %1</comment>
-      <translation type="unfinished">
-        <numerusform>Details for %n cameras of %1</numerusform>
-        <numerusform>Details for %n cameras of %1</numerusform>
+      <translation>
+        <numerusform>Details voor %n camera's van %1</numerusform>
+        <numerusform>Details voor %n camera's van %1</numerusform>
       </translation>
     </message>
   </context>
@@ -1748,13 +1748,13 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Update installed</source>
-      <translation type="unfinished">Update installed</translation>
+      <translation>Update geïnstalleerd</translation>
     </message>
     <message numerus="yes">
       <source>%n actions</source>
-      <translation type="unfinished">
-        <numerusform>%n actions</numerusform>
-        <numerusform>%n actions</numerusform>
+      <translation>
+        <numerusform>%n acties</numerusform>
+        <numerusform>%n acties</numerusform>
       </translation>
     </message>
   </context>
@@ -2037,7 +2037,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Force Acknowledgement will only work for Generic Events if camera modifiers are used in the Generic Event URL</source>
-      <translation type="unfinished">Force Acknowledgement will only work for Generic Events if camera modifiers are used in the Generic Event URL</translation>
+      <translation>Het forceren van een bevestiging werkt alleen als voor een Generic Event camera ID's zijn gebruikt in de Generic Event URL</translation>
     </message>
   </context>
   <context>
@@ -2576,7 +2576,7 @@ to %1</source>
     </message>
     <message>
       <source>Internal server error. Please try again later.</source>
-      <translation type="unfinished">Internal server error. Please try again later.</translation>
+      <translation>Interne serverfout. Probeer het later opnieuw.</translation>
     </message>
   </context>
   <context>
@@ -2730,7 +2730,7 @@ to %1</source>
     </message>
     <message>
       <source>Download &amp;&amp; Install</source>
-      <translation type="unfinished">Download &amp;&amp; Install</translation>
+      <translation>Download &amp;&amp; Installeren</translation>
     </message>
     <message>
       <source>Failed to enter compatibility mode for version %1</source>
@@ -3579,7 +3579,7 @@ to %1</source>
     </message>
     <message>
       <source>Channels</source>
-      <translation type="unfinished">Channels</translation>
+      <translation>Kanalen</translation>
     </message>
   </context>
   <context>
@@ -4234,11 +4234,15 @@ to %1</source>
     </message>
     <message>
       <source>Virtual Camera</source>
-      <translation type="unfinished">Virtual Camera</translation>
+      <translation>Virtuele camera</translation>
     </message>
     <message>
       <source>Virtual Camera %1</source>
       <translation type="unfinished">Virtual Camera %1</translation>
+    </message>
+    <message>
+      <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
+      <translation type="unfinished">&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</translation>
     </message>
   </context>
   <context>
@@ -7340,12 +7344,12 @@ If you intended to move analytics data to another storage location, please conta
   <context>
     <name>nx::vms::client::desktop::AnalyticsSearchListModel::Private</name>
     <message>
-      <source>Unknown object</source>
-      <translation>Onbekend object</translation>
-    </message>
-    <message>
       <source>deleted camera</source>
       <translation type="unfinished">deleted camera</translation>
+    </message>
+    <message>
+      <source>Unknown track</source>
+      <translation type="unfinished">Unknown track</translation>
     </message>
   </context>
   <context>
@@ -7618,9 +7622,9 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::CameraSelectionDialog</name>
     <message numerus="yes">
       <source>%n cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n cameras</numerusform>
-        <numerusform>%n cameras</numerusform>
+      <translation>
+        <numerusform>%n camera's</numerusform>
+        <numerusform>%n camera's</numerusform>
       </translation>
     </message>
     <message>
@@ -8589,7 +8593,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Download &amp;&amp; Install</source>
-      <translation type="unfinished">Download &amp;&amp; Install</translation>
+      <translation>Download &amp;&amp; Installeren</translation>
     </message>
     <message>
       <source>Select Another Build</source>
@@ -8739,16 +8743,24 @@ If you intended to move analytics data to another storage location, please conta
       <translation type="unfinished">Starting update to ...</translation>
     </message>
     <message>
-      <source>Some servers have no package available</source>
-      <translation type="unfinished">Some servers have no package available</translation>
-    </message>
-    <message>
       <source>Failed to cancel update</source>
       <translation type="unfinished">Failed to cancel update</translation>
     </message>
     <message>
       <source>Failed to start installation</source>
       <translation type="unfinished">Failed to start installation</translation>
+    </message>
+    <message>
+      <source>Some servers have no update packages available.</source>
+      <translation type="unfinished">Some servers have no update packages available.</translation>
+    </message>
+    <message>
+      <source>Some servers have encountered an internal error.</source>
+      <translation type="unfinished">Some servers have encountered an internal error.</translation>
+    </message>
+    <message>
+      <source>Please please contact Customer Support.</source>
+      <translation type="unfinished">Please please contact Customer Support.</translation>
     </message>
   </context>
   <context>
@@ -8793,7 +8805,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Unknown Plugin Diagnostic Event</source>
-      <translation type="unfinished">Unknown Plugin Diagnostic Event</translation>
+      <translation>Onbekend Plugin Diagnose Event</translation>
     </message>
   </context>
   <context>
@@ -8865,10 +8877,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation type="unfinished">Failed to download update</translation>
     </message>
     <message>
-      <source>Failed to install update</source>
-      <translation type="unfinished">Failed to install update</translation>
-    </message>
-    <message>
       <source>Waiting for peer data</source>
       <translation type="unfinished">Waiting for peer data</translation>
     </message>
@@ -8882,7 +8890,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Failed to download update packages.</source>
-      <translation type="unfinished">Failed to download update packages.</translation>
+      <translation>Downloaden van updatepakketten mislukt.</translation>
     </message>
     <message>
       <source>Update contents are invalid.</source>
@@ -8926,7 +8934,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Internal server error.</source>
-      <translation type="unfinished">Internal server error.</translation>
+      <translation>Interne server error.</translation>
+    </message>
+    <message>
+      <source>This OS version is no longer supported.</source>
+      <translation type="unfinished">This OS version is no longer supported.</translation>
     </message>
   </context>
   <context>
@@ -9082,6 +9094,10 @@ If you intended to move analytics data to another storage location, please conta
       <source>Users will be automatically logged out if their session exceeds the specified duration.</source>
       <translation type="unfinished">Users will be automatically logged out if their session exceeds the specified duration.</translation>
     </message>
+    <message>
+      <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
+      <translation type="unfinished">Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerSettingsDialogStore</name>
@@ -9091,7 +9107,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Version</source>
-      <translation type="unfinished">Version</translation>
+      <translation>Versie</translation>
     </message>
     <message>
       <source>Vendor</source>
@@ -9123,7 +9139,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>unknown error</source>
-      <translation type="unfinished">unknown error</translation>
+      <translation>onbekende fout</translation>
     </message>
     <message>
       <source>Not loaded</source>
@@ -9139,7 +9155,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Status</source>
-      <translation type="unfinished">Status</translation>
+      <translation>Status</translation>
     </message>
     <message>
       <source>plugin is optional and is not in the white list</source>
@@ -9158,7 +9174,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Installing...</source>
-      <translation type="unfinished">Installing...</translation>
+      <translation>Installeren...</translation>
     </message>
     <message>
       <source>Downloaded</source>
@@ -9177,7 +9193,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Network error.</source>
-      <translation type="unfinished">Network error.</translation>
+      <translation>Netwerkfout.</translation>
+    </message>
+    <message>
+      <source>Server error.</source>
+      <translation type="unfinished">Server error.</translation>
     </message>
   </context>
   <context>
@@ -9597,29 +9617,29 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::ui::PluginEventModel</name>
+    <name>nx::vms::client::desktop::ui::PluginDiagnosticEventModel</name>
     <message>
       <source>Any Plugin</source>
       <translation type="unfinished">Any Plugin</translation>
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::ui::PluginEventWidget</name>
+    <name>nx::vms::client::desktop::ui::PluginDiagnosticEventWidget</name>
     <message>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation>De gebeurtenis wordt alleen geactiveerd als er overeenkomsten zijn in het onderschrift met een van de gekozen trefwoorden.</translation>
+      <translation type="unfinished">Event will trigger only if there are matches in the caption with any of the entered keywords.</translation>
     </message>
     <message>
       <source>If the field is empty, event will always trigger.</source>
-      <translation>Als het veld leeg is, wordt het event altijd geactiveerd.</translation>
+      <translation type="unfinished">If the field is empty, event will always trigger.</translation>
     </message>
     <message>
       <source>This field is case sensitive.</source>
-      <translation>Dit veld is hoofdlettergevoelig.</translation>
+      <translation type="unfinished">This field is case sensitive.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
-      <translation>De gebeurtenis wordt alleen geactiveerd als er overeenkomsten zijn in de Omschrijving met een van de gekozen trefwoorden.</translation>
+      <translation type="unfinished">Event will trigger only if there are matches in the description field with any of the entered keywords.</translation>
     </message>
   </context>
   <context>

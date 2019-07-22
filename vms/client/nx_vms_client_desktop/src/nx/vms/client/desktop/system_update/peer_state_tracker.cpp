@@ -1068,7 +1068,7 @@ void PeerStateTracker::atResourceChanged(const QnResourcePtr& resource)
         emit itemChanged(item);
 }
 
-void PeerStateTracker::atClientupdateStateChanged(int state, int percentComplete)
+void PeerStateTracker::atClientUpdateStateChanged(int state, int percentComplete, const QString& message)
 {
     using State = ClientUpdateTool::State;
     NX_ASSERT(m_clientItem);
@@ -1134,7 +1134,8 @@ void PeerStateTracker::atClientupdateStateChanged(int state, int percentComplete
             break;
         case State::applauncherError:
             m_clientItem->state = StatusCode::error;
-            m_clientItem->statusMessage = tr("Failed to install update");
+            m_clientItem->errorCode = nx::update::Status::ErrorCode::applauncherError;
+            m_clientItem->statusMessage = message;
             break;
         default:
             break;

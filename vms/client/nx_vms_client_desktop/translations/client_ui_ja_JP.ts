@@ -2051,11 +2051,6 @@
       <source>New Virtual Camera...</source>
       <translation>新規バーチャルカメラ</translation>
     </message>
-    <message>
-      <location/>
-      <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
-      <translation>&quot;バーチャルカメラ&quot; はシステム上の任意のサーバーにビデオをアップロードして、すべてのユーザーがアクセスできるビデオ ファイルの仮想ストレージです</translation>
-    </message>
   </context>
   <context>
     <name>OpenLayoutActionWidget</name>
@@ -2099,46 +2094,46 @@
     </message>
   </context>
   <context>
-    <name>PluginEventWidget</name>
+    <name>PluginDiagnosticEventWidget</name>
     <message>
-      <location filename="../src/nx/vms/client/desktop/ui/event_rules/widgets/plugin_event_widget.ui"/>
+      <location filename="../src/nx/vms/client/desktop/ui/event_rules/widgets/plugin_diagnostic_event_widget.ui"/>
       <source>Source:</source>
-      <translation>ソース:</translation>
+      <translation type="unfinished">Source:</translation>
     </message>
     <message>
       <location/>
       <source>Caption contains:</source>
-      <translation>キャプションに含まれる:</translation>
+      <translation type="unfinished">Caption contains:</translation>
     </message>
     <message>
       <location/>
       <source>Keywords separated by space</source>
-      <translation>キーワードをスペースで区切る</translation>
+      <translation type="unfinished">Keywords separated by space</translation>
     </message>
     <message>
       <location/>
       <source>Description contains:</source>
-      <translation>説明に含まれる:</translation>
+      <translation type="unfinished">Description contains:</translation>
     </message>
     <message>
       <location/>
       <source>Level:</source>
-      <translation>レベル:</translation>
+      <translation type="unfinished">Level:</translation>
     </message>
     <message>
       <location/>
       <source>ERROR</source>
-      <translation>エラー</translation>
+      <translation type="unfinished">ERROR</translation>
     </message>
     <message>
       <location/>
       <source>WARNING</source>
-      <translation>警告</translation>
+      <translation type="unfinished">WARNING</translation>
     </message>
     <message>
       <location/>
       <source>INFO</source>
-      <translation>情報</translation>
+      <translation type="unfinished">INFO</translation>
     </message>
   </context>
   <context>
@@ -2776,12 +2771,7 @@
     <message>
       <location/>
       <source>Limit session duration</source>
-      <translation type="unfinished">Limit session duration</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
-      <translation type="unfinished">Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</translation>
+      <translation>セッション期間を制限する</translation>
     </message>
   </context>
   <context>
@@ -3074,22 +3064,22 @@
     <message>
       <location/>
       <source>Analytics data will continue to be stored on the disabled storage.</source>
-      <translation type="unfinished">Analytics data will continue to be stored on the disabled storage.</translation>
+      <translation>分析データは引き続き無効なストレージに保存されます。</translation>
     </message>
     <message>
       <location/>
       <source>Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</source>
-      <translation type="unfinished">Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</translation>
+      <translation>無効な保存場所への記録は停止します。ただし、古い映像の削除は続行されます。</translation>
     </message>
     <message>
       <location/>
       <source>Recording was enabled on the USB storage</source>
-      <translation type="unfinished">Recording was enabled on the USB storage</translation>
+      <translation>USBストレージで録画が有効になりました</translation>
     </message>
     <message>
       <location/>
       <source>Analytics data can occupy tens of gigabytes of storage space. We recommend to choose other location for it instead of the system partition.</source>
-      <translation type="unfinished">Analytics data can occupy tens of gigabytes of storage space. We recommend to choose other location for it instead of the system partition.</translation>
+      <translation>分析データは、数十ギガバイトのストレージスペースを占めることがあります。システムパーティションではなく、他の場所を選択することをお勧めします。</translation>
     </message>
   </context>
   <context>
