@@ -274,7 +274,7 @@ bool verifyUpdateContents(
 
         const nx::utils::SoftwareVersion serverVersion = server->getVersion();
         // Prohibiting updates to previous version.
-        if (serverVersion >= targetVersion)
+        if (serverVersion > targetVersion)
         {
             NX_WARNING(typeid(UpdateContents), "verifyUpdateManifest(%1) Server %2 has a newer version %3",
                 contents.info.version, id, serverVersion);
@@ -369,7 +369,10 @@ bool verifyUpdateContents(
         }
     }
 
-    if (!contents.invalidVersion.empty() && !contents.alreadyInstalled)
+    // According to VMS-14494 we should allow update if some servers have more recent version
+    // than update, but some servers can be updated to it.
+    if (!contents.invalidVersion.empty()
+        && (!contents.alreadyInstalled || contents.peersWithUpdate.empty()))
     {
         NX_WARNING(typeid(UpdateContents)) << "verifyUpdateManifest("
             << contents.info.version << ") - detected incompatible version error.";

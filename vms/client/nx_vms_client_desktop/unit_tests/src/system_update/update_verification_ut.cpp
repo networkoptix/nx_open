@@ -182,7 +182,9 @@ TEST_F(UpdateVerificationTest, testAlreadyInstalled)
     verifyUpdateContents(nullptr, contents, getAllServers(), clientData);
     EXPECT_EQ(contents.alreadyInstalled, true);
     EXPECT_TRUE(contents.peersWithUpdate.empty());
-    EXPECT_EQ(contents.error, nx::update::InformationError::noError);
+    // VMS-13236 expects there is noError.
+    // Recent changes to VMS-14494 make this return incompatibleVersion.
+    EXPECT_EQ(contents.error, nx::update::InformationError::incompatibleVersion);
     {
         const auto report = MultiServerUpdatesWidget::calculateUpdateVersionReport(
             contents, clientData.clientId);
@@ -263,11 +265,13 @@ TEST_F(UpdateVerificationTest, testForkedVersion)
     contents.resetVerification();
 
     // Both servers and a client are newer.
+    // According to VMS-14814, we should show 'downgrade is not possible'
     clientData = makeClientData(nx::utils::SoftwareVersion("4.0.0.28525"));
     makeServer(nx::utils::SoftwareVersion("4.0.0.28525"));
     makeServer(nx::utils::SoftwareVersion("4.0.0.28525"));
     verifyUpdateContents(nullptr, contents, getAllServers(), clientData);
-    EXPECT_EQ(contents.error, nx::update::InformationError::noError);
+    EXPECT_EQ(contents.error, nx::update::InformationError::incompatibleVersion);
+    EXPECT_TRUE(contents.alreadyInstalled);
     removeAllServers();
 }
 
@@ -282,7 +286,6 @@ TEST_F(UpdateVerificationTest, packagesForSystemSupportTest)
     // Update to 4.0.0.29069
     // client = 4.0.0.29067
     // server = 4.0.0.29067
-    // Showing page 'This version is already installed'.
     auto server = makeServer(nx::utils::SoftwareVersion("4.0.0.29067"));
     server->setOsInfo(os::ubuntu16);
     ClientVerificationData clientData = makeClientData(nx::utils::SoftwareVersion("4.0.0.29067"));
