@@ -101,9 +101,10 @@ struct NX_VMS_API PluginInfo: Data
      */
     QString libraryFilename;
 
-    /**%apidoc Absolute path to the plugin's dedicated directory where its dynamic library resides
-     * together with its possible dependencies, or an empty string if the plugin resides in a
-     * common directory with other plugins.
+    /**%apidoc
+     * Absolute path to the plugin's dedicated directory where its dynamic library resides together
+     * with its possible dependencies, or an empty string if the plugin resides in a common
+     * directory with other plugins.
      */
     QString homeDir;
 

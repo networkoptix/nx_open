@@ -36,7 +36,8 @@ QString nameOfFileToDumpOrLoadData(
     const nx::vms::server::resource::AnalyticsPluginResourcePtr& plugin,
     const QString& postfix);
 
-QString nameOfFileToDumpOrLoadData(const nx::sdk::analytics::IPlugin* plugin, const QString& postfix);
+QString nameOfFileToDumpOrLoadData(
+    const nx::sdk::analytics::IPlugin* plugin, const QString& postfix);
 
 /** If the string is not empty and does not end with `\n`, `\n` will be added. */
 void dumpStringToFile(

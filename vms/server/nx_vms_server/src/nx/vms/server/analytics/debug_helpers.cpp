@@ -41,7 +41,7 @@ static QString pluginLibName(
 
     const char* const pluginName = plugin->name();
     if (!pluginName)
-        NX_ERROR(NX_SCOPE_TAG, "Plugin name is null Plugin instance %1", plugin);
+        NX_ERROR(NX_SCOPE_TAG, "Plugin name is null for Plugin instance %1", plugin);
     if (pluginName[0] == '\0')
         NX_ERROR(NX_SCOPE_TAG, "Plugin name is empty for Plugin instance %1", plugin);
     return pluginName;
