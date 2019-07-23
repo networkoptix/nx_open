@@ -143,12 +143,11 @@ void QnResourceAccessProvider::endUpdateInternal()
 
 void QnResourceAccessProvider::afterUpdate()
 {
-    //todo: #GDM. recheck it. I assume it is not need during update mode.
-    return;
-
     if (mode() == Mode::direct)
         return;
 
+    // This check assures client will receive all requred notifications if something was modified
+    // on the server while it was in the 'Reconnecting' state.
     for (const auto& subject: resourceAccessSubjectsCache()->allSubjects())
     {
         for (const QnResourcePtr& resource: commonModule()->resourcePool()->getResources())
