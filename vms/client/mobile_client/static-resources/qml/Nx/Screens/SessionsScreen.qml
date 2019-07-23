@@ -56,6 +56,7 @@ Page
 
         height: searchEdit.height + 8
         width: sessionsList.width
+        visible: sessionsList.model.sourceRowsCount > 8
 
         SearchEdit
         {
@@ -82,7 +83,14 @@ Page
         header: Item
         {
             width: sessionsList.width
-            height: searchPanel.searching || !searchPanel.visible ? 0 : searchPanel.height
+            height: (searchPanel.searching || !searchPanel.visible) ? 0 : searchPanel.height
+            onHeightChanged:
+            {
+                // Since we change header height in some cases it is hidden when list is scrolled to
+                // the frist tile. This code fixes behaviour and shows search edit on top if tiles.
+                if (sessionsList.contentY + sessionsList.originY== -height)
+                    sessionsList.positionViewAtBeginning()
+            }
 
             Component.onCompleted: searchEdit.placeholder = this
         }
@@ -189,14 +197,20 @@ Page
     {
         id: dummyMessage
 
+        readonly property string kCheckNetworkMessage:
+            qsTr("Check your network connection or press \"%1\" button to enter a known server address.",
+             "%1 is a button name").arg(customConnectionButton.text)
+
         anchors.fill: parent
         anchors.topMargin: -16
         anchors.bottomMargin: -24
-        title: qsTr("No Systems found")
-        description: qsTr(
-             "Check your network connection or press \"%1\" button "
-                 + "to enter a known server address.",
-             "%1 is a button name").arg(customConnectionButton.text)
+
+        readonly property bool emptySearchMode:
+            searchPanel.searching && sessionsList.model.sourceRowsCount > 0
+
+        title: emptySearchMode ? qsTr("Nothing found") : qsTr("No Systems found")
+        description: emptySearchMode ? "" : kCheckNetworkMessage
+
         visible: false
 
         Timer
