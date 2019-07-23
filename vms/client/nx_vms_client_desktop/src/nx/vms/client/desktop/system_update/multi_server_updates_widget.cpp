@@ -687,6 +687,20 @@ MultiServerUpdatesWidget::VersionReport MultiServerUpdatesWidget::calculateUpdat
     return report;
 }
 
+bool MultiServerUpdatesWidget::checkSpaceRequirements(
+    const nx::update::UpdateContents& contents) const
+{
+    bool checkClient = m_clientUpdateTool->shouldInstallThis(contents);
+    auto spaceForManualPackages = contents.getClientSpaceRequirements(checkClient);
+    if (spaceForManualPackages > 0 )
+    {
+        auto downloadDir = m_serverUpdateTool->getDownloadDir();
+        auto spaceAvailable = m_serverUpdateTool->getAvailableSpace();
+        return spaceForManualPackages < spaceAvailable;
+    }
+    return true;
+}
+
 void MultiServerUpdatesWidget::setUpdateTarget(
     const nx::update::UpdateContents& contents, bool activeUpdate)
 {
@@ -2330,6 +2344,8 @@ void MultiServerUpdatesWidget::syncRemoteUpdateStateToUi()
 
     bool hasVerificationErrors = m_stateTracker->hasVerificationErrors();
     bool hasStatusErrors = m_stateTracker->hasStatusErrors();
+    bool hasSpaceIssues = !checkSpaceRequirements(m_updateInfo)
+        && m_widgetState == WidgetUpdateState::ready;
 
     QStringList errorTooltips;
     if (m_widgetState == WidgetUpdateState::readyInstall
@@ -2359,7 +2375,18 @@ void MultiServerUpdatesWidget::syncRemoteUpdateStateToUi()
         }
     }
 
-    if (errorTooltips.isEmpty())
+    if (hasSpaceIssues)
+    {
+        setWarningStyle(ui->spaceErrorLabel);
+        ui->spaceErrorLabel->setText("Client does not have enough space to download update packages.");
+        ui->spaceErrorLabel->show();
+    }
+    else
+    {
+        ui->spaceErrorLabel->hide();
+    }
+
+    if (errorTooltips.isEmpty() && !hasSpaceIssues)
     {
         ui->downloadButton->setEnabled(true);
         ui->downloadButton->setToolTip("");

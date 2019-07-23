@@ -403,6 +403,15 @@ QDir ServerUpdateTool::getDownloadDir() const
     return m_outputDir;
 }
 
+uint64_t ServerUpdateTool::getAvailableSpace() const
+{
+    auto downloadDir = getDownloadDir();
+    QStorageInfo storageInfo(downloadDir);
+    uint64_t space = storageInfo.bytesAvailable();
+    uint64_t spaceReserved = nx::update::reservedSpacePadding();
+    return spaceReserved > space ? 0 : space - spaceReserved;
+}
+
 void ServerUpdateTool::startManualDownloads(const UpdateContents& contents)
 {
     NX_ASSERT(m_downloader);
