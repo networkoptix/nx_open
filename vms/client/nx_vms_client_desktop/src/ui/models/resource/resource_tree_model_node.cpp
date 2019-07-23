@@ -434,7 +434,7 @@ ResourceTreeNodeType QnResourceTreeModelNode::type() const
     return m_type;
 }
 
-QnResourcePtr QnResourceTreeModelNode::resource() const
+const QnResourcePtr& QnResourceTreeModelNode::resource() const
 {
     return m_resource;
 }
@@ -633,6 +633,11 @@ void QnResourceTreeModelNode::setBastard(bool bastard)
         m_parent->addChildInternal(toSharedPointer());
 }
 
+QSet<QnResourceTreeModelNodePtr> QnResourceTreeModelNode::allChildren() const
+{
+    return m_allChildren;
+}
+
 QList<QnResourceTreeModelNodePtr> QnResourceTreeModelNode::children() const
 {
     return m_children;
@@ -661,6 +666,9 @@ void QnResourceTreeModelNode::setParent(const QnResourceTreeModelNodePtr& parent
     if (m_parent == parent)
         return;
 
+    if (m_parent)
+        m_parent->removeChildLink(toSharedPointer());
+
     if (m_parent && !m_bastard)
         m_parent->removeChildInternal(toSharedPointer());
 
@@ -668,6 +676,8 @@ void QnResourceTreeModelNode::setParent(const QnResourceTreeModelNodePtr& parent
 
     if (m_parent)
     {
+        m_parent->addChildLink(toSharedPointer());
+
         setState(m_parent->state());
         if (!m_bastard)
         {
@@ -1273,6 +1283,12 @@ CameraExtraStatus QnResourceTreeModelNode::calculateCameraExtraStatus() const
     return CameraExtraStatus();
 }
 
+void QnResourceTreeModelNode::addChildLink(const QnResourceTreeModelNodePtr& child)
+{
+    NX_ASSERT(!m_allChildren.contains(child));
+    m_allChildren.insert(child);
+}
+
 void QnResourceTreeModelNode::removeChildInternal(const QnResourceTreeModelNodePtr& child)
 {
     NX_ASSERT(child->parent() == this);
@@ -1297,6 +1313,12 @@ void QnResourceTreeModelNode::removeChildInternal(const QnResourceTreeModelNodeP
 
     if (nodeRequiresChildren(m_type) && m_children.size() == 0)
         setBastard(true);
+}
+
+void QnResourceTreeModelNode::removeChildLink(const QnResourceTreeModelNodePtr& child)
+{
+    NX_ASSERT(m_allChildren.contains(child));
+    m_allChildren.remove(child);
 }
 
 void QnResourceTreeModelNode::addChildInternal(const QnResourceTreeModelNodePtr& child)
