@@ -67,6 +67,8 @@ set(translations
     uk_UA
     vi_VN
     th_TH
+    fi_FI
+    sv_SE
 )
 set(defaultTranslation en_US)
 

@@ -358,6 +358,14 @@ bool EventsStorage::readMaximumEventTimestamp()
 
 bool EventsStorage::readMinimumEventTimestamp(std::chrono::milliseconds* outResult)
 {
+    QnMutexLocker dbLock(&m_dbControllerMutex);
+
+    if (!m_dbController)
+    {
+        NX_DEBUG(this, "Attempt to readMinimumEventTimestamp to non-initialized analytics DB");
+        return false;
+    }
+
     try
     {
         *outResult = m_dbController->queryExecutor().executeSelectQuerySync(

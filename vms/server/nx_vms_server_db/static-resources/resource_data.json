@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0.1.91",
+    "version": "1.0.1.92",
     "data": [
         {
             "keys": [
@@ -670,7 +670,6 @@
                 "dahua|dh-nvr4208-8p-4ks2",
                 "ds-7208huhi-k2|embedded net dvr",
                 "dahua|dhi-nvr4108hs-8p-4ks2",
-                "dahua|dh-xvr5216a",
                 "hangzhou hikvision digital technology co., ltd|ds-9632ni-i8",
                 "uniview|nvr304-32e-b",
                 "private|dh-nvr4832-4k",
@@ -731,7 +730,6 @@
                 "ds-7216hghi-sh|embedded_net_dvr",
                 "dahua|dh-nvr4216-16p-hds2",
                 "dhi-nvr5208-8p-4ks2|general",
-                "dahua|dh-xvr5108h-4kl",
                 "n16nxp|speco",
                 "moxa inc.|vport_364a_4ch_video_encoder",
                 "uniview|nvr302-16s-p16",
@@ -781,7 +779,6 @@
                 "rvi-ipn4/1-4p|group",
                 "private|dh-nvr4816-4k",
                 "onvif|ltd8516k-st",
-                "dahua|dh-xvr1a08",
                 "ds-7208huhi-f2/s|embedded net dvr",
                 "hangzhou hikvision digital technology co., ltd|ds-7316*",
                 "hev0118h|hitron_hev0118h",
@@ -796,7 +793,6 @@
                 "dahua|dhi-nvr4104hs-p-4ks2",
                 "dh-nvr5832-16p-4k|private",
                 "dh-nvr7464|private",
-                "dahua|dh-xvr4116hs-s2",
                 "rvi-hdr16lb-ta|rvi dvr",
                 "dhi-nvr4208-8p-4k|private",
                 "ds-7104hqhi-f1/n|embedded net dvr",
@@ -809,12 +805,10 @@
                 "dahua|dhi-nvr4104hs-p-4ks2",
                 "dh-nvr5832-16p-4k|private",
                 "dh-nvr7464|private",
-                "dahua|dh-xvr4116hs-s2",
                 "rvi-hdr16lb-ta|rvi dvr",
                 "dhi-nvr4208-8p-4k|private",
                 "ds-7104hqhi-f1/n|embedded net dvr",
                 "ds-9804hdt-f1|embedded net dvr",
-                "dahua|dh-xvr5232an-x",
                 "axis|axisq7424rmkii",
                 "ds-7732ni-i4|network video recorder",
                 "dahua|x24a5l",
@@ -835,7 +829,6 @@
                 "ds-7208hqhi-k2|embedded net dvr",
                 "tr2116a|embedded net dvr",
                 "vlr-enc-16|vlr-enc-16",
-                "dahua|dh-xvr5104c-x1",
                 "dahua|dhi-nvr5432-16p-4ks2e",
                 "dahua|dhi-nvr4104hs-4ks2",
                 "hangzhou hikvision digital technology co., ltd|ds-9016huhi*",
@@ -856,7 +849,6 @@
                 "dh-nvr4208-8p-4k|private",
                 "dh-nvr608-32-4ks2|private",
                 "general|nvr-p16/16p-4va",
-                "dahua|dh-xvr5116he",
                 "rvi-ipn16/2-pro-4k|general",
                 "sth795|cellinx-sth795",
                 "hq-thd1602k-poc|embedded net dvr",
@@ -868,17 +860,12 @@
                 "DS-6708HQHI-SATA|Hangzhou Hikvision Digital Technology Co., Ltd",
                 "c7413-awr|dvr support center",
                 "ds-7116hqhi-k1|business ddd co,.ltd.",
-                "dahua|dh-xvr5116he-x",
                 "acti|v24",
-                "dahua|dh-xvr7108e-4kl-b-x",
                 "ds-7208hthi-k2|embedded net dvr",
                 "ds-h116g|embedded net dvr",
-                "dahua|dh-xvr5108hs-4kl-x",
                 "yc-r0814|network video recorder",
                 "onvif_encoder|viper-hdaenc16",
-                "dahua|dh-xvr5108hs-x",
                 "dahua|dhi-nvr4432-4ks2",
-                "dahua|dh-xvr7104*",
                 "onvif|ltn8716k-ht",
                 "hisi|vi-m-4-1000",
                 "onvif|ds-7204hqhi*",
@@ -888,7 +875,8 @@
                 "dh-nvr4216-*|private",
                 "dhi-nvr52a16-*|private",
                 "ds-6716huhi*|bldg c hik-encoder",
-                "ds-7216hqhi*|embedded net dvr"
+                "ds-7216hqhi*|embedded net dvr",
+                "dahua|dh-xvr*"
             ],
             "analogEncoder": true
         },
@@ -1311,7 +1299,8 @@
                 "DW|DWC-PF5M1TIR",
                 "DW|DWC-MB45DiA",
                 "DW|DWC-MV85DiA",
-                "DW|DWC-PB6M4T"
+                "DW|DWC-PB6M4T",
+                "DW|DWC-PVF9M2TIR"
             ],
             "fixWrongInputPortNumber": true
         },
@@ -3154,7 +3143,8 @@
             "hikvision|ds-2cd6d24fwd*",
             "flir|FLIR DH-390*",
             "DH-390*|FLIR DH-390*",
-            "flir|DH-390*"
+            "flir|DH-390*",
+            "ONVIF|SHS-2215IZ*"
             ],
             "canShareLicenseGroup": true
         },
@@ -3523,6 +3513,33 @@
                         "device":  [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1],
                         "logical": [1, 2.26, 3.90, 5.46, 7.13, 8.72, 10.31, 12.21, 13.95, 15.69, 18],
                         "logicalMultiplier": 33,
+                        "space": "35MmEquiv"
+                    }
+                }
+            }
+        },
+        {
+            "_comment1": "Mapped for fs20190114NRS",
+            "keys": [
+                "FLIR*|CP-6302-*"
+            ],
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [  -1,1],
+                        "logical": [-180, 180]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [0,1],
+                        "logical": [-90, 20]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.85, 0.9, 0.95, 1],
+                        "logical": [1, 1.12, 1.29, 1.59, 2.06, 2.76, 3.65, 5.24, 8.12, 10.35, 12.71, 16.47, 24.12],
+                        "logicalMultiplier": 35,
                         "space": "35MmEquiv"
                     }
                 }

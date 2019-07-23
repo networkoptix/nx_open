@@ -7,6 +7,7 @@
 
 #include <nx/network/socket_factory.h>
 #include <nx/utils/std/cpp14.h>
+#include <nx/utils/log/log.h>
 #include <utils/media/nalUnits.h>
 #include <utils/media/ffmpeg_helper.h>
 #include <decoders/audio/aac.h>
@@ -129,6 +130,7 @@ int GenericMulticastStreamReader::getNextData(nxcip::MediaDataPacket** outPacket
 
         if (!isPacketOk(packet))
         {
+            NX_VERBOSE(this, lm("Skipping invalid packet %1").args(packet.pts));
             av_packet_unref(&packet);
             continue;
         }
@@ -239,6 +241,9 @@ bool GenericMulticastStreamReader::isPacketOk(const AVPacket& packet) const
     if (!isPacketTimestampOk(packet))
         return false;
 
+    if (!isPacketChannelOk(packet))
+        return false;
+
     return true;
 }
 
@@ -287,6 +292,12 @@ bool GenericMulticastStreamReader::isPacketTimestampOk(const AVPacket& packet) c
     return packet.dts != AV_NOPTS_VALUE || packet.pts != AV_NOPTS_VALUE;
 }
 
+bool GenericMulticastStreamReader::isPacketChannelOk(const AVPacket &packet) const
+{
+    auto channelNumber = m_streamIndexToChannelNumber.find(packet.stream_index);
+    return channelNumber != m_streamIndexToChannelNumber.end();
+}
+
 nxcip::UsecUTCTimestamp GenericMulticastStreamReader::packetTimestamp(const AVPacket& packet) const
 {
     if (!isPacketStreamOk(packet))
@@ -302,7 +313,7 @@ unsigned int GenericMulticastStreamReader::packetChannelNumber(const AVPacket& p
 {
     auto channelNumber = m_streamIndexToChannelNumber.find(packet.stream_index);
 
-    NX_ASSERT(
+    NX_CRITICAL(
         channelNumber != m_streamIndexToChannelNumber.end(),
         lm("No correspondent channel for stream"));
 
