@@ -508,12 +508,12 @@ bool QnUserResource::passwordExpired() const
     return !m_ldapPasswordValid;
 }
 
-void QnUserResource::fillId()
+void QnUserResource::fillIdUnsafe()
 {
     // ATTENTION: This logic is similar to UserData::fillId().
     NX_ASSERT(!(isCloud() && getEmail().isEmpty()));
     QnUuid id = isCloud() ? guidFromArbitraryData(getEmail()) : QnUuid::createUuid();
-    setId(id);
+    setIdUnsafe(id);
 }
 
 QString QnUserResource::idForToStringFromPtr() const

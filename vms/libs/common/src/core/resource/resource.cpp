@@ -336,20 +336,8 @@ void QnResource::setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason 
     }
 }
 
-QnUuid QnResource::getId() const
+void QnResource::setIdUnsafe(const QnUuid& id)
 {
-    QnMutexLocker mutexLocker(&m_mutex);
-    return m_id;
-}
-
-void QnResource::setId(const QnUuid& id)
-{
-    QnMutexLocker mutexLocker(&m_mutex);
-
-    // TODO: #dmishin it seems really wrong. Think about how to do it in another way.
-    NX_ASSERT(this->inherits("QnSecurityCamResource") || m_locallySavedProperties.empty(),
-        lit("Only camera resources are allowed to set properties if id is not set."));
-
     m_id = id;
 }
 

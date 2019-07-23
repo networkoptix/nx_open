@@ -97,7 +97,7 @@ public:
      * Fill ID field.
      * For regular users it is random value, for cloud users it's md5 hash from email address.
      */
-    void fillId();
+    void fillIdUnsafe();
 
     virtual QString idForToStringFromPtr() const override; //< Used by toString(const T*).
 
