@@ -180,10 +180,12 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
     m_sortedModel->setSourceModel(m_updatesModel.get());
     ui->tableView->setModel(m_sortedModel.get());
     m_statusItemDelegate.reset(new ServerStatusItemDelegate(ui->tableView));
-    ui->tableView->setItemDelegateForColumn(ServerUpdatesModel::ProgressColumn, m_statusItemDelegate.get());
+    ui->tableView->setItemDelegateForColumn(ServerUpdatesModel::ProgressColumn,
+        m_statusItemDelegate.get());
 
     m_resourceNameDelegate.reset(new QnResourceItemDelegate(ui->tableView));
-    ui->tableView->setItemDelegateForColumn(ServerUpdatesModel::NameColumn, m_resourceNameDelegate.get());
+    ui->tableView->setItemDelegateForColumn(ServerUpdatesModel::NameColumn,
+        m_resourceNameDelegate.get());
 
     connect(m_sortedModel.get(), &SortedPeerUpdatesModel::dataChanged,
         this, &MultiServerUpdatesWidget::atModelDataChanged);
@@ -194,8 +196,8 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
     if (auto horizontalHeader = ui->tableView->horizontalHeader())
     {
         horizontalHeader->setSectionResizeMode(QHeaderView::ResizeToContents);
-        horizontalHeader->setSectionResizeMode(ServerUpdatesModel::NameColumn, QHeaderView::Stretch);
-        horizontalHeader->setSectionResizeMode(ServerUpdatesModel::ProgressColumn, QHeaderView::Stretch);
+        horizontalHeader->setSectionResizeMode(ServerUpdatesModel::ProgressColumn,
+            QHeaderView::Stretch);
         horizontalHeader->setSectionResizeMode(ServerUpdatesModel::StatusMessageColumn,
             QHeaderView::Stretch);
         horizontalHeader->setSectionsClickable(false);
