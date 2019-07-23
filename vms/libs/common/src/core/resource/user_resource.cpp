@@ -12,34 +12,17 @@
 #include <nx/utils/log/log.h>
 #include <nx/network/aio/timer.h>
 
-namespace
-{
+namespace {
+
 std::chrono::minutes kDefaultLdapPasswordExperationPeriod(5);
-static const int MSEC_PER_SEC = 1000;
 
-nx::utils::SharedGuardPtr createSignalGuard(
-    QnUserResource* resource,
-    void (QnUserResource::*targetSignal)(const QnResourcePtr&))
-{
-    return nx::utils::makeSharedGuard(
-        [resource, targetSignal]()
-        {
-            (resource->*targetSignal)(::toSharedPointer(resource));
-        });
-}
-
-}
+} // namespace
 
 const QnUuid QnUserResource::kAdminGuid("99cbc715-539b-4bfe-856f-799b45b69b1e");
 
 QnUserResource::QnUserResource(QnUserType userType):
     m_userType(userType),
     m_realm(nx::network::AppInfo::realm()),
-    m_permissions(0),
-    m_userRoleId(),
-    m_isOwner(false),
-    m_isEnabled(true),
-    m_fullName(),
     m_ldapPasswordExperationPeriod(kDefaultLdapPasswordExperationPeriod)
 {
     addFlags(Qn::user | Qn::remote);
@@ -54,10 +37,10 @@ QnUserResource::QnUserResource(const QnUserResource& right):
     m_digest(right.m_digest),
     m_cryptSha512Hash(right.m_cryptSha512Hash),
     m_realm(right.m_realm),
-    m_permissions(right.m_permissions),
+    m_permissions(right.m_permissions.load()),
     m_userRoleId(right.m_userRoleId),
-    m_isOwner(right.m_isOwner),
-    m_isEnabled(right.m_isEnabled),
+    m_isOwner(right.m_isOwner.load()),
+    m_isEnabled(right.m_isEnabled.load()),
     m_email(right.m_email),
     m_fullName(right.m_fullName),
     m_ldapPasswordExperationPeriod(right.m_ldapPasswordExperationPeriod)
@@ -271,13 +254,13 @@ void QnUserResource::setRealm(const QString& realm)
 
 GlobalPermissions QnUserResource::getRawPermissions() const
 {
-    QnMutexLocker locker(&m_mutex);
     return m_permissions;
 }
 
 void QnUserResource::setRawPermissions(GlobalPermissions permissions)
 {
-    if (setMemberChecked(&QnUserResource::m_permissions, permissions))
+    const auto oldValue = m_permissions.exchange(permissions);
+    if (oldValue != permissions)
         emit permissionsChanged(::toSharedPointer(this));
 }
 
@@ -288,19 +271,14 @@ bool QnUserResource::isBuiltInAdmin() const
 
 bool QnUserResource::isOwner() const
 {
-    QnMutexLocker locker(&m_mutex);
     return m_isOwner;
 }
 
 void QnUserResource::setOwner(bool isOwner)
 {
-    {
-        QnMutexLocker locker(&m_mutex);
-        if (m_isOwner == isOwner)
-            return;
-        m_isOwner = isOwner;
-    }
-    emit permissionsChanged(::toSharedPointer(this));
+    const auto oldValue = m_isOwner.exchange(isOwner);
+    if (oldValue != isOwner)
+        emit permissionsChanged(::toSharedPointer(this));
 }
 
 QnUuid QnUserResource::userRoleId() const
@@ -322,19 +300,14 @@ void QnUserResource::setUserRoleId(const QnUuid& userRoleId)
 
 bool QnUserResource::isEnabled() const
 {
-    QnMutexLocker locker(&m_mutex);
     return m_isEnabled;
 }
 
 void QnUserResource::setEnabled(bool isEnabled)
 {
-    {
-        QnMutexLocker locker(&m_mutex);
-        if (m_isEnabled == isEnabled)
-            return;
-        m_isEnabled = isEnabled;
-    }
-    emit enabledChanged(::toSharedPointer(this));
+    const auto oldValue = m_isEnabled.exchange(isEnabled);
+    if (oldValue != isEnabled)
+        emit enabledChanged(::toSharedPointer(this));
 }
 
 QnUserType QnUserResource::userType() const
@@ -402,6 +375,8 @@ void QnUserResource::updateInternal(const QnResourcePtr &other, Qn::NotifierList
     if (localOther)
     {
         NX_ASSERT(m_userType == localOther->m_userType, "User type was designed to be read-only");
+        NX_ASSERT(m_isOwner == localOther->m_isOwner, "'Owner' field must never be changed.");
+
         bool hashesChanged = false;
         if (m_password != localOther->m_password)
         {
@@ -427,23 +402,15 @@ void QnUserResource::updateInternal(const QnResourcePtr &other, Qn::NotifierList
             hashesChanged = true;
         }
 
-        if (m_permissions != localOther->m_permissions)
-        {
-            m_permissions = localOther->m_permissions;
+        const auto newPermissions = localOther->m_permissions.load();
+        const auto oldPermissions = m_permissions.exchange(newPermissions);
+        if (oldPermissions != newPermissions)
             notifiers << [r = toSharedPointer(this)]{ emit r->permissionsChanged(r); };
-        }
 
         if (m_userRoleId != localOther->m_userRoleId)
         {
             m_userRoleId = localOther->m_userRoleId;
             notifiers << [r = toSharedPointer(this)]{ emit r->userRoleChanged(r); };
-        }
-
-        if (m_isOwner != localOther->m_isOwner)
-        {
-            NX_ASSERT(false, "'Owner' field should not be changed.");
-            m_isOwner = localOther->m_isOwner;
-            notifiers << [r = toSharedPointer(this)]{ emit r->permissionsChanged(r); };
         }
 
         if (m_email != localOther->m_email)
@@ -466,11 +433,10 @@ void QnUserResource::updateInternal(const QnResourcePtr &other, Qn::NotifierList
             hashesChanged = true;
         }
 
-        if (m_isEnabled != localOther->m_isEnabled)
-        {
-            m_isEnabled = localOther->m_isEnabled;
+        const bool isEnabled = localOther->m_isEnabled.load();
+        const bool wasEnabled = m_isEnabled.exchange(isEnabled);
+        if (isEnabled != wasEnabled)
             notifiers << [r = toSharedPointer(this)]{ emit r->enabledChanged(r); };
-        }
 
         if (hashesChanged)
             notifiers << [r = toSharedPointer(this)]{ emit r->hashesChanged(r); };
