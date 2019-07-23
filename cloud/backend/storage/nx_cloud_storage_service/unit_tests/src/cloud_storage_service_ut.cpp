@@ -37,7 +37,7 @@ protected:
 
     void thenSettingsAreLoaded()
     {
-        const service::Settings& settings = m_cloudStorage->moduleInstance()->settings();
+        const conf::Settings& settings = m_cloudStorage->moduleInstance()->settings();
 
         ASSERT_EQ(130, settings.http().tcpBacklogSize);
         ASSERT_EQ(1, (int) settings.http().endpoints.size());

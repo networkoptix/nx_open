@@ -1,12 +1,11 @@
 #include "view.h"
 
-#include "../controller/controller.h"
-#include "../settings.h"
+#include "controller.h"
+#include "settings.h"
 
 namespace nx::cloud::storage::service {
 
-View::View(const Settings& settings, Controller* controller):
-    /*m_settings(settings),*/
+View::View(const conf::Settings& settings, Controller* controller):
     m_httpServer(settings, controller)
 {
 }
@@ -33,14 +32,14 @@ void View::stop()
     NX_INFO(this, "View stopped");
 }
 
-http::Server& View::httpServer()
+http::Server* View::httpServer()
 {
-    return m_httpServer;
+    return &m_httpServer;
 }
 
-const http::Server& View::httpServer() const
+const http::Server* View::httpServer() const
 {
-    return m_httpServer;
+    return &m_httpServer;
 }
 
 } // namespace nx::cloud::storage::service

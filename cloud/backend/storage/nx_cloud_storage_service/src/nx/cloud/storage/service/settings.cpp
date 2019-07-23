@@ -5,6 +5,8 @@
 
 namespace nx::cloud::storage::service {
 
+namespace conf {
+
 namespace {
 
 static constexpr char kModuleName[] = "nx_cloud_storage_service";
@@ -31,13 +33,29 @@ static constexpr char kGroupName[] = "statistics";
 static constexpr char kEnabled[] = "enabled";
 static constexpr bool kDefaultEnabled = false;
 
-}
+} // namespace statistics
 
 namespace cloud_db {
 
 static constexpr char kGroupName[] = "cloud_db";
 static constexpr char kUrl[] = "url";
 static constexpr char kDefaultUrl[] = "";
+
+} // namespace cloud_db
+
+namespace aws {
+
+static constexpr char kGroupName[] = "aws";
+static constexpr char kUser[] = "user";
+static constexpr char kDefaultUser[] = "";
+
+} // namespace aws
+
+namespace database {
+
+static constexpr char kGroupName[] = "database";
+static constexpr char kSqlGroupName[] = "sql";
+static constexpr char kSynchronizationGroupName[] = "p2pDb";
 
 }
 
@@ -46,7 +64,7 @@ Http::Http(const char* groupName):
 {
 }
 
-Settings::Settings():
+Settings::Settings() :
     base_type(
         nx::utils::AppInfo::organizationNameForSettings(),
         kModuleName,
@@ -59,8 +77,9 @@ void Settings::loadSettings()
 {
     loadHttp();
     loadServer();
-    loadStatistics();
     loadCloudDb();
+    loadDatabase();
+    loadStatistics();
 }
 
 void Settings::loadHttp()
@@ -82,6 +101,24 @@ void Settings::loadCloudDb()
 {
     using namespace cloud_db;
     m_cloudDb.url = settings().value(lm("%1/%2").args(kGroupName, kUrl), kDefaultUrl).toString();
+}
+
+void Settings::loadAws()
+{
+    using namespace aws;
+    m_aws.user = settings().value(
+        lm("%1/%2").args(kGroupName, kUser), kDefaultUser).toString().toStdString();
+}
+
+void Settings::loadDatabase()
+{
+    using namespace database;
+    m_database.sql.loadFromSettings(
+        settings(),
+        lm("%1/%2").args(kGroupName, kSqlGroupName));
+    m_database.synchronization.load(
+        settings(),
+        lm("%1/%2").args(kGroupName, kSynchronizationGroupName).toStdString());
 }
 
 void Settings::loadStatistics()
@@ -106,9 +143,20 @@ const CloudDb& Settings::cloudDb() const
     return m_cloudDb;
 }
 
+const Aws& Settings::aws() const
+{
+    return m_aws;
+}
+
+const Database& Settings::database() const
+{
+    return m_database;
+}
+
 const Statistics& Settings::statistics() const
 {
     return m_statistics;
 }
 
+} // namespace conf
 } // namespace nx::cloud::storage::service

@@ -6,7 +6,7 @@ namespace nx::cloud::storage::service::http {
 
 using namespace nx::network::http;
 
-CloudDbAuthenticationForwarder::CloudDbAuthenticationForwarder(const CloudDb& /*settings*/)
+CloudDbAuthenticationForwarder::CloudDbAuthenticationForwarder(const conf::CloudDb& /*settings*/)
 {
     // TODO add cloud db url to settings
 }
@@ -39,7 +39,7 @@ CloudDbAuthenticationFactory& CloudDbAuthenticationFactory::instance()
 
 std::unique_ptr<server::AbstractAuthenticationManager>
     CloudDbAuthenticationFactory::defaultFactoryFunction(
-        const Settings& settings)
+        const conf::Settings& settings)
 {
     return std::make_unique<CloudDbAuthenticationForwarder>(settings.cloudDb());
 }

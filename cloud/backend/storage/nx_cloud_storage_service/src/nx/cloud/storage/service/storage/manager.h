@@ -9,12 +9,15 @@
 
 namespace nx::cloud::storage::service {
 
-class Settings;
+namespace conf { class Settings; }
+class Database;
 
-class AbstractStorageManager
+namespace storage {
+
+class AbstractManager
 {
 public:
-    virtual ~AbstractStorageManager() = default;
+    virtual ~AbstractManager() = default;
 
     virtual void addStorage(
         const api::AddStorageRequest& request,
@@ -30,41 +33,50 @@ public:
 };
 
 //-------------------------------------------------------------------------------------------------
-// StorageManager
+// Manager
 
-class StorageManager:
-    public AbstractStorageManager
+class Manager:
+    public AbstractManager
 {
 public:
+    Manager(Database* database);
+
     virtual void addStorage(
         const api::AddStorageRequest& request,
         nx::utils::MoveOnlyFunc<void(api::Result, api::AddStorageResponse)> handler) override;
 
     virtual void readStorage(
         const std::string& storageId,
-        nx::utils::MoveOnlyFunc<void(api::Result, api::ReadStorageResponse) > handler) override;
+        nx::utils::MoveOnlyFunc<void(api::Result, api::ReadStorageResponse)> handler) override;
 
     virtual void removeStorage(
         const std::string& storageId,
         nx::utils::MoveOnlyFunc<void(api::Result)> handler) override;
+
+private:
+    Database* m_database;
 };
 
 //-------------------------------------------------------------------------------------------------
-// StorageManagerFactory
+// ManagerFactory
 
-using StorageManagerFactoryFunc = std::unique_ptr<AbstractStorageManager>(const Settings&);
+using FactoryType = std::unique_ptr<AbstractManager>(const conf::Settings&, Database*);
 
-class StorageManagerFactory:
-    public nx::utils::BasicFactory<StorageManagerFactoryFunc>
+class ManagerFactory:
+    public nx::utils::BasicFactory<FactoryType>
 {
-    using base_type = nx::utils::BasicFactory<StorageManagerFactoryFunc>;
-public:
-    StorageManagerFactory();
+    using base_type = nx::utils::BasicFactory<FactoryType>;
 
-    static StorageManagerFactory& instance();
+public:
+    ManagerFactory();
+
+    static ManagerFactory& instance();
 
 private:
-    std::unique_ptr<AbstractStorageManager> defaultFactoryFunction(const Settings& settings);
+    std::unique_ptr<AbstractManager> defaultFactoryFunction(
+        const conf::Settings& settings,
+        Database* database);
 };
 
-}
+} // namespace storage
+} // namespace nx::cloud::storage::service

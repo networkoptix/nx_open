@@ -4,10 +4,14 @@
 #include <nx/network/http/server/abstract_authentication_manager.h>
 #include <nx/utils/basic_factory.h>
 
-namespace nx::cloud::storage::service{
+namespace nx::cloud::storage::service {
+
+namespace conf {
 
 struct CloudDb;
 class Settings;
+
+} // namespace conf
 
 namespace http {
 
@@ -15,7 +19,7 @@ class CloudDbAuthenticationForwarder:
     public network::http::server::AbstractAuthenticationManager
 {
 public:
-    CloudDbAuthenticationForwarder(const CloudDb& settings);
+    CloudDbAuthenticationForwarder(const conf::CloudDb& settings);
 
     virtual void authenticate(
         const network::http::HttpServerConnection& connection,
@@ -27,7 +31,7 @@ public:
 // CloudDbAuthenticationFactory
 
 using CloudDbAuthenticationFactoryType =
-    std::unique_ptr<network::http::server::AbstractAuthenticationManager>(const Settings&);
+    std::unique_ptr<network::http::server::AbstractAuthenticationManager>(const conf::Settings&);
 
 class CloudDbAuthenticationFactory:
     public nx::utils::BasicFactory<CloudDbAuthenticationFactoryType>
@@ -41,7 +45,7 @@ public:
 
 private:
     std::unique_ptr<network::http::server::AbstractAuthenticationManager> defaultFactoryFunction(
-        const Settings& settings);
+        const conf::Settings& settings);
 };
 
 } // namespace http

@@ -1,10 +1,18 @@
-#include "storage_manager.h"
+#include "manager.h"
 
 #include "../settings.h"
+#include "../database.h"
 
-namespace nx::cloud::storage::service {
+namespace nx::cloud::storage::service::storage {
 
-void StorageManager::addStorage(
+using namespace std::placeholders;
+
+Manager::Manager(Database* /*database*/)/*:
+    m_database(database)*/
+{
+}
+
+void Manager::addStorage(
     const api::AddStorageRequest& request,
     nx::utils::MoveOnlyFunc<void(api::Result, api::AddStorageResponse)> handler)
 {
@@ -14,7 +22,7 @@ void StorageManager::addStorage(
     handler(api::Result{api::ResultCode::ok, "addOk"}, std::move(response));
 }
 
-void StorageManager::readStorage(
+void Manager::readStorage(
     const std::string& storageId,
     nx::utils::MoveOnlyFunc<void(api::Result, api::ReadStorageResponse)> handler)
 {
@@ -23,29 +31,28 @@ void StorageManager::readStorage(
     handler(api::Result{api::ResultCode::ok, "readOk"}, std::move(response));
 }
 
-void StorageManager::removeStorage(
+void Manager::removeStorage(
     const std::string& /*storageId*/,
     nx::utils::MoveOnlyFunc<void(api::Result)> handler)
 {
     handler(api::Result{api::ResultCode::ok, "removeOk"});
 }
 
-StorageManagerFactory::StorageManagerFactory():
-    base_type(
-        std::bind(&StorageManagerFactory::defaultFactoryFunction, this, std::placeholders::_1))
+ManagerFactory::ManagerFactory():
+    base_type(std::bind(&ManagerFactory::defaultFactoryFunction, this, _1, _2))
 {
 }
 
-StorageManagerFactory& StorageManagerFactory::instance()
+ManagerFactory& ManagerFactory::instance()
 {
-    static StorageManagerFactory factory;
+    static ManagerFactory factory;
     return factory;
 }
 
-std::unique_ptr<AbstractStorageManager> StorageManagerFactory::defaultFactoryFunction(
-    const Settings& /*settings*/)
+std::unique_ptr<AbstractManager> ManagerFactory::defaultFactoryFunction(
+    const  conf::Settings& /*settings*/, Database* database)
 {
-    return std::make_unique<StorageManager>();
+    return std::make_unique<Manager>(database);
 }
 
-} // namespace nx::cloud::storage::service
+} // namespace nx::cloud::storage::service:: storage

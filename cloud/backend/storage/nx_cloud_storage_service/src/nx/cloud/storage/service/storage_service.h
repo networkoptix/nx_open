@@ -4,8 +4,10 @@
 
 namespace nx::cloud::storage::service {
 
+namespace conf { class Settings; }
+
 class Controller;
-class Settings;
+class Model;
 class View;
 
 class StorageService:
@@ -16,7 +18,7 @@ class StorageService:
 public:
     StorageService(int argc, char** argv);
 
-    const Settings& settings() const;
+    const conf::Settings& settings() const;
 
     std::vector<network::SocketAddress> httpEndpoints() const;
     std::vector<network::SocketAddress> httpsEndpoints() const;
@@ -26,7 +28,8 @@ protected:
     virtual int serviceMain(const utils::AbstractServiceSettings& settings) override;
 
 private:
-    const Settings* m_settings = nullptr;
+    const conf::Settings* m_settings = nullptr;
+    Model* m_model = nullptr;
     Controller* m_controller = nullptr;
     View* m_view = nullptr;
 };

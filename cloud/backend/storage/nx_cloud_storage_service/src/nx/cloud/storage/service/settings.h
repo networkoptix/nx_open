@@ -2,10 +2,12 @@
 
 #include <nx/utils/basic_service_settings.h>
 
+#include <nx/clusterdb/engine/p2p_sync_settings.h>
 #include <nx/network/http/server/settings.h>
+#include <nx/sql/types.h>
 #include <nx/utils/url.h>
 
-namespace nx::cloud::storage::service {
+namespace nx::cloud::storage::service::conf {
 
 struct Http:
     public network::http::server::Settings
@@ -25,6 +27,17 @@ struct CloudDb
     nx::utils::Url url;
 };
 
+struct Aws
+{
+    std::string user;
+};
+
+struct Database
+{
+    nx::sql::ConnectionOptions sql;
+    nx::clusterdb::engine::SynchronizationSettings synchronization;
+};
+
 struct Statistics
 {
     bool enabled = true;
@@ -41,6 +54,8 @@ public:
     const Http& http() const;
     const Server& server() const;
     const CloudDb& cloudDb() const;
+    const Aws& aws() const;
+    const Database& database() const;
     const Statistics& statistics() const;
 
 protected:
@@ -50,13 +65,17 @@ private:
     void loadHttp();
     void loadServer();
     void loadCloudDb();
+    void loadAws();
+    void loadDatabase();
     void loadStatistics();
 
 private:
     Http m_http;
     Server m_server;
     CloudDb m_cloudDb;
+    Aws m_aws;
+    Database m_database;
     Statistics m_statistics;
 };
 
-} // namespace nx::cloud::storage::service
+} // namespace nx::cloud::storage::service::conf

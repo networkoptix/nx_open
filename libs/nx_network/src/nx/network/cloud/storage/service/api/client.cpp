@@ -44,6 +44,36 @@ void Client::removeStorage(
         std::move(handler));
 }
 
+void Client::addBucket(
+    const AddBucketRequest& request,
+    nx::utils::MoveOnlyFunc<void(ResultCode, AddBucketResponse)> handler)
+{
+    base_type::template makeAsyncCall<AddBucketResponse>(
+        Method::put,
+        api::kAwsBuckets,
+        std::move(handler),
+        request);
+}
+
+void Client::removeBucket(
+    const std::string& bucketName,
+    nx::utils::MoveOnlyFunc<void(ResultCode)> handler)
+{
+    base_type::template makeAsyncCall<void>(
+        Method::delete_,
+        rest::substituteParameters(api::kAwsBucketName, {bucketName}),
+        std::move(handler));
+}
+
+void Client::getBuckets(
+    nx::utils::MoveOnlyFunc<void(ResultCode, std::vector<Bucket>)> handler)
+{
+    base_type::template makeAsyncCall<std::vector<Bucket>>(
+        Method::get,
+        api::kAwsBuckets,
+        std::move(handler));
+}
+
 Client::ResultCode Client::toResultCode(SystemError::ErrorCode errorCode)
 {
     switch (errorCode)

@@ -8,6 +8,7 @@ namespace nx::cloud::storage::service::test {
 CloudStorageLauncher::CloudStorageLauncher()
 {
     addArg("-http/endpoints", "127.0.0.1:0");
+    addArg("-database/sql/driverName", "QSQLITE");
 }
 
 nx::utils::Url CloudStorageLauncher::httpUrl() const

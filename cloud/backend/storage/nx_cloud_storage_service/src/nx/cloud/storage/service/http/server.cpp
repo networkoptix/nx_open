@@ -1,12 +1,12 @@
 #include "server.h"
 
-#include <nx/network/url/url_parse_helper.h>
 #include <nx/network/cloud/storage/service/api/request_paths.h>
 #include <nx/network/url/url_parse_helper.h>
 
+#include "../controller.h"
 #include "../settings.h"
-#include "../controller/controller.h"
-#include "../controller/storage_manager.h"
+#include "../bucket/manager.h"
+#include "../storage/manager.h"
 #include "cloud_db_authentication_manager.h"
 #include "request_handler.h"
 
@@ -18,8 +18,9 @@ static constexpr char kStorageIdParam[] = "id";
 
 } // namespace
 
-Server::Server(const Settings& settings, Controller* controller):
+Server::Server(const conf::Settings& settings, Controller* controller):
     m_settings(settings),
+    m_bucketManager(controller->bucketManager()),
     m_storageManager(controller->storageManager()),
     m_cloudDBAuthenticationForwarder(CloudDbAuthenticationFactory::instance().create(settings)),
     m_multiAddressServer(
@@ -31,7 +32,8 @@ Server::Server(const Settings& settings, Controller* controller):
         std::string(api::kStoragePrefix) + ".*",
         m_cloudDBAuthenticationForwarder.get());
 
-    registerApiHandlers();
+    registerBucketApiHandlers();
+    registerStorageApiHandlers();
 }
 
 network::http::server::MultiEndpointAcceptor& Server::server()
@@ -80,7 +82,7 @@ void Server::registerAuthenticationManager(
     NX_VERBOSE(this, "Registered path regex: %1 for HTTP authentication", regex);
 }
 
-void Server::registerApiHandlers()
+void Server::registerStorageApiHandlers()
 {
     using namespace std::placeholders;
     using namespace nx::network::http::server::rest;
@@ -91,7 +93,7 @@ void Server::registerApiHandlers()
         [this]()
         {
             return std::make_unique<AddStorageHandler>(
-                std::bind(&AbstractStorageManager::addStorage, m_storageManager, _1, _2));
+                std::bind(&storage::AbstractManager::addStorage, m_storageManager, _1, _2));
         },
         network::http::Method::put);
 
@@ -102,7 +104,7 @@ void Server::registerApiHandlers()
         [this]()
         {
             return std::make_unique<ReadStorageHandler>(
-                std::bind(&AbstractStorageManager::readStorage, m_storageManager, _1, _2));
+                std::bind(&storage::AbstractManager::readStorage, m_storageManager, _1, _2));
         },
         network::http::Method::get);
 
@@ -112,9 +114,14 @@ void Server::registerApiHandlers()
         [this]()
         {
             return std::make_unique<RemoveStorageHandler>(
-                std::bind(&AbstractStorageManager::removeStorage, m_storageManager, _1, _2));
+                std::bind(&storage::AbstractManager::removeStorage, m_storageManager, _1, _2));
         },
         network::http::Method::delete_);
+}
+
+void Server::registerBucketApiHandlers()
+{
+    // TODO
 }
 
 } // namespace nx::cloud::storage::service::http

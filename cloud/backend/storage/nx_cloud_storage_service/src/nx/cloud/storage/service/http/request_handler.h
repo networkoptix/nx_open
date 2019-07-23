@@ -36,10 +36,12 @@ private:
         {
             case api::ResultCode::ok:
                 return StatusCode::ok;
-            case api::ResultCode::notFound:
-                return StatusCode::notFound;
+            case api::ResultCode::badRequest:
+                return StatusCode::badRequest;
             case api::ResultCode::unauthorized:
                 return StatusCode::unauthorized;
+            case api::ResultCode::notFound:
+                return StatusCode::notFound;
             case api::ResultCode::internalError:
             default:
                 return StatusCode::internalServerError;

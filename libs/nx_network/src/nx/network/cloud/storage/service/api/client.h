@@ -5,6 +5,8 @@
 #include "add_storage.h"
 #include "read_storage.h"
 #include "result.h"
+#include "add_bucket.h"
+#include "bucket.h"
 
 namespace nx::cloud::storage::service::api {
 
@@ -30,6 +32,19 @@ public:
         const std::string& storageId,
         nx::utils::MoveOnlyFunc<void(ResultCode)> handler);
 
+    /**
+     * NOTE: AddBucketResponse is only defined if ResultCode is not ResultCode::ok
+     */
+    void addBucket(
+        const AddBucketRequest& request,
+        nx::utils::MoveOnlyFunc<void(ResultCode, AddBucketResponse)> handler);
+
+    void removeBucket(
+        const std::string& bucketName,
+        nx::utils::MoveOnlyFunc<void(ResultCode)> handler);
+
+    void getBuckets(
+        nx::utils::MoveOnlyFunc<void(ResultCode, std::vector<Bucket>)> handler);
 
     template<typename... Output>
     static auto getResultCode(

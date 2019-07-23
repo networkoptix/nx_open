@@ -6,16 +6,17 @@
 
 namespace nx::cloud::storage::service {
 
-class AbstractStorageManager;
+namespace conf { class Settings; }
+namespace bucket { class AbstractManager; }
+namespace storage { class AbstractManager; }
 class Controller;
-class Settings;
 
 namespace http {
 
 class Server
 {
 public:
-    Server(const Settings& settings, Controller* controller);
+    Server(const conf::Settings& settings, Controller* controller);
 
     network::http::server::MultiEndpointAcceptor& server();
     network::http::server::rest::MessageDispatcher& messageDispatcher();
@@ -32,11 +33,14 @@ private:
         const std::string& regex,
         network::http::server::AbstractAuthenticationManager* authenticationManager);
 
-    void registerApiHandlers();
+    void registerStorageApiHandlers();
+    void registerBucketApiHandlers();
 
 private:
-    const Settings& m_settings;
-    AbstractStorageManager* m_storageManager = nullptr;
+    const conf::Settings& m_settings;
+    bucket::AbstractManager* m_bucketManager = nullptr;
+    storage::AbstractManager* m_storageManager = nullptr;
+
     std::unique_ptr<network::http::server::AbstractAuthenticationManager>
         m_cloudDBAuthenticationForwarder;
 

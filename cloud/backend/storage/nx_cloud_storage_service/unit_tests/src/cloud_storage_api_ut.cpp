@@ -4,14 +4,15 @@
 #include <nx/network/cloud/storage/service/api/client.h>
 #include <nx/utils/thread/sync_queue.h>
 
-#include <nx/cloud/storage/service/controller/storage_manager.h>
+#include <nx/cloud/storage/service/storage/manager.h>
 #include <nx/cloud/storage/service/http/cloud_db_authentication_manager.h>
 
 namespace nx::cloud::storage::service::test {
 
 namespace {
 
-class StorageManagerStub: public AbstractStorageManager
+class StorageManagerStub:
+    public storage::AbstractManager
 {
 public:
     void addStorage(
@@ -72,15 +73,15 @@ protected:
     virtual void SetUp() override
     {
         m_storageManagerFactoryFuncBak =
-            StorageManagerFactory::instance().setCustomFunc(
-                [](const Settings& /*settings*/)
+            storage::ManagerFactory::instance().setCustomFunc(
+                [](const conf::Settings& /*settings*/, Database* /*database*/)
                 {
                     return std::make_unique<StorageManagerStub>();
                 });
 
         m_cloudDBAuthenticationFactoryFuncBak =
             http::CloudDbAuthenticationFactory::instance().setCustomFunc(
-                [this](const Settings& /*settings*/)
+                [this](const conf::Settings& /*settings*/)
                 {
                     return std::make_unique<CloudDBAuthenticationForwarderStub>(
                         &m_authenticationEvent);
@@ -96,7 +97,7 @@ protected:
     {
         if (m_storageManagerFactoryFuncBak)
         {
-            StorageManagerFactory::instance().setCustomFunc(
+            storage::ManagerFactory::instance().setCustomFunc(
                 std::move(m_storageManagerFactoryFuncBak));
         }
 
@@ -152,7 +153,7 @@ private:
     std::unique_ptr<CloudStorageLauncher> m_cloudStorage;
     std::unique_ptr<api::Client> m_cloudStorageClient;
     nx::utils::SyncQueue<api::Client::ResultCode> m_response;
-    StorageManagerFactory::Function m_storageManagerFactoryFuncBak;
+    storage::ManagerFactory::Function m_storageManagerFactoryFuncBak;
     service::http::CloudDbAuthenticationFactory::Function m_cloudDBAuthenticationFactoryFuncBak;
     nx::utils::SyncQueue<bool> m_authenticationEvent;
 };
