@@ -246,4 +246,22 @@ Page
         Workflow.openStandardDialog(
             message, qsTr("Check your network connection or contact a system administrator"))
     }
+
+    Object
+    {
+        id: d
+
+        readonly property bool connectingState:
+        {
+            var state = connectionManager.connectionState
+            return state == QnConnectionManager.Connecting
+                || (state == QnConnectionManager.Connected && !connectionManager.online)
+        }
+
+        onConnectingStateChanged:
+        {
+            if (connectingState)
+                searchEdit.text = ""
+        }
+    }
 }
