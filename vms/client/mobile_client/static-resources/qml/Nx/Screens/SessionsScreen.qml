@@ -81,6 +81,18 @@ Page
             height: 40
             width: parent.width
             onTextChanged: sessionsList.model.filterWildcard = text
+
+            function handleBackPressed()
+            {
+                if (Qt.inputMethod.visible)
+                    return
+
+                focus = false
+                text = ""
+            }
+
+            Keys.onEscapePressed: handleBackPressed()
+            Keys.onBackPressed: handleBackPressed()
         }
     }
 
