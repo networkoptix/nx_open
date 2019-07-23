@@ -84,7 +84,8 @@ Page
 
             function handleBackPressed()
             {
-                if (Qt.inputMethod.visible)
+                var kSomeSmallHeight = 30
+                if (Qt.inputMethod.keyboardRectangle.height > kSomeSmallHeight)
                     return
 
                 focus = false
