@@ -383,6 +383,7 @@ bool EventsStorage::readMinimumEventTimestamp(std::chrono::milliseconds* outResu
         },
             [&waitCondition, this](sql::DBResult resultCode)
         {
+            QnMutexLocker dbLock(&m_dbControllerMutex);
             waitCondition.wakeAll();
         });
         waitCondition.wait(&m_dbControllerMutex);
