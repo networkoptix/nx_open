@@ -194,6 +194,8 @@ public:
         progress(progress)
     {}
 
+    bool suitableForRetrying() const { return code == Code::error || code == Code::idle; }
+
     friend inline uint qHash(nx::update::Status::ErrorCode key, uint seed)
     {
         return ::qHash(static_cast<uint>(key), seed);

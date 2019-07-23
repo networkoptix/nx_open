@@ -8,8 +8,6 @@
 #include <utils/common/byte_array.h>
 #include <utils/media/audioformat.h>
 #include <utils/media/sse_helper.h>
-#include <utils/memory/abstract_allocator.h>
-#include <utils/memory/system_allocator.h>
 #include <utils/math/math.h>
 
 #include <motion/motion_detection.h>
@@ -17,6 +15,8 @@
 #include <nx/streaming/aligned_allocator.h>
 #include <nx/streaming/abstract_data_packet.h>
 #include <nx/streaming/media_context.h>
+#include <nx/utils/memory/abstract_allocator.h>
+#include <nx/utils/memory/system_allocator.h>
 
 #include <nx/fusion/model_functions_fwd.h>
 #include <common/common_globals.h>
