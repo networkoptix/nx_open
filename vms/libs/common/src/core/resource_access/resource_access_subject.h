@@ -29,8 +29,8 @@ public:
     /** Key value in the shared resources map. */
     QnUuid effectiveId() const
     {
-        return m_user && m_user->userRole() == Qn::UserRole::customUserRole 
-            ? m_user->userRoleId() : m_id; 
+        return m_user && m_user->userRole() == Qn::UserRole::customUserRole
+            ? m_user->userRoleId() : m_id;
     }
     QString name() const;
 
