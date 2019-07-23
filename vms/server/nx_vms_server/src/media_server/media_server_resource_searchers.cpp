@@ -3,7 +3,6 @@
 #include <api/global_settings.h>
 #include <core/resource_management/resource_discovery_manager.h>
 #include <nx/utils/app_info.h>
-#include <nx/utils/unused.h>
 
 #include <camera_vendors.h>
 
@@ -68,8 +67,9 @@ void QnMediaServerResourceSearchers::initialize()
 
         // TODO: #sivanov Is it the best place for this class instance? Why not place it directly
         //     in the searcher?
-        QnDesktopCameraDeleter* autoDeleter = new QnDesktopCameraDeleter(commonModule);
-        nx::utils::unused(autoDeleter); //< The object will be deleted by its (QObject's) parent.
+
+        // The object will be deleted by its (QObject's) parent.
+        [[maybe_unused]] auto autoDeleter = new QnDesktopCameraDeleter(commonModule);
     #endif
 
     #if defined(ENABLE_WEARABLE)

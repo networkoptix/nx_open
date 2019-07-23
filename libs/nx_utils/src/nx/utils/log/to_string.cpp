@@ -1,6 +1,5 @@
 #include "to_string.h"
 
-#include <nx/utils/unused.h>
 #include <nx/utils/log/log.h>
 
 #include <boost/algorithm/string.hpp>
@@ -218,7 +217,7 @@ static void findFunctionScope(
  *     not included.
  */
 std::string scopeOfFunction(
-    const std::type_info& scopeTagTypeInfo, const char* functionMacro)
+    const std::type_info& scopeTagTypeInfo, [[maybe_unused]] const char* functionMacro)
 {
     std::string demangledType;
     #if defined(_MSC_VER)
@@ -235,7 +234,6 @@ std::string scopeOfFunction(
             boost::replace_all(demangledType, "* __ptr64", "*");
         }
     #else
-        nx::utils::unused(functionMacro);
         demangledType = boost::core::demangle(scopeTagTypeInfo.name());
     #endif
 

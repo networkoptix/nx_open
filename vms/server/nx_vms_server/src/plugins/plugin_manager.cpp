@@ -241,7 +241,7 @@ void PluginManager::loadOptionalPluginsIfNeeded(
  * @param pluginHomeDir Can be empty if the plugin does not reside in its dedicated dir.
  */
 std::unique_ptr<QLibrary> PluginManager::loadPluginLibrary(
-    const QString& pluginHomeDir,
+    [[maybe_unused]] const QString& pluginHomeDir,
     const QString& libFilename,
     PluginInfoPtr pluginInfo)
 {
@@ -256,8 +256,6 @@ std::unique_ptr<QLibrary> PluginManager::loadPluginLibrary(
                     nx::kit::utils::toString(pluginHomeDir));
             }
         }
-    #else
-        nx::utils::unused(pluginHomeDir);
     #endif
 
     auto lib = std::make_unique<QLibrary>(libFilename);

@@ -2,7 +2,6 @@
 
 #include <QtCore/QThreadPool>
 
-#include <nx/utils/unused.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/concurrent.h>
 #include <common/common_module.h>
@@ -229,9 +228,8 @@ bool QnManualSearchTaskManager::canRunTask(QThreadPool *threadPool)
 {
     NX_CRITICAL(m_pollable.isInSelfAioThread());
     bool allQueuesAreBlocked = true;
-    for (const auto& [queueName, queue]: m_searchTasksQueues)
+    for ([[maybe_unused]] const auto& [queueName, queue]: m_searchTasksQueues)
     {
-        nx::utils::unused(queue);
         auto& context = m_searchQueueContexts[queueName];
         if (!context.isBlocked)
         {

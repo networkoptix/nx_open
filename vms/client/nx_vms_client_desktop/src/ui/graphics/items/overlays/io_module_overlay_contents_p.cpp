@@ -5,7 +5,6 @@
 #include <nx/client/core/utils/geometry.h>
 #include <ui/common/text_pixmap_cache.h>
 #include <ui/workaround/sharp_pixmap_painting.h>
-#include <nx/utils/unused.h>
 
 using nx::vms::client::core::Geometry;
 

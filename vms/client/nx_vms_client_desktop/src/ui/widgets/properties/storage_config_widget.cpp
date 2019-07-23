@@ -51,7 +51,6 @@
 #include <nx/vms/client/desktop/common/utils/item_view_hover_tracker.h>
 #include <nx/vms/client/desktop/common/delegates/switch_item_delegate.h>
 #include <nx/analytics/utils.h>
-#include <nx/utils/unused.h>
 
 using namespace nx;
 using namespace nx::vms::client::desktop;
