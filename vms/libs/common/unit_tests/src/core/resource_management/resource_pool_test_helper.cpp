@@ -29,7 +29,7 @@ QnUserResourcePtr QnResourcePoolTestHelper::createUser(GlobalPermissions globalP
     QnUserType userType)
 {
     QnUserResourcePtr user(new QnUserResource(userType));
-    user->setId(QnUuid::createUuid());
+    user->setIdUnsafe(QnUuid::createUuid());
     user->setName(name);
     user->setRawPermissions(globalPermissions);
     user->addFlags(Qn::remote);
@@ -48,7 +48,7 @@ QnUserResourcePtr QnResourcePoolTestHelper::addUser(GlobalPermissions globalPerm
 QnLayoutResourcePtr QnResourcePoolTestHelper::createLayout()
 {
     QnLayoutResourcePtr layout(new QnLayoutResource());
-    layout->setId(QnUuid::createUuid());
+    layout->setIdUnsafe(QnUuid::createUuid());
     return layout;
 }
 
@@ -76,7 +76,7 @@ nx::CameraResourceStubPtr QnResourcePoolTestHelper::addCamera(Qn::LicenseType li
 QnWebPageResourcePtr QnResourcePoolTestHelper::addWebPage()
 {
     QnWebPageResourcePtr webPage(new QnWebPageResource());
-    webPage->setId(QnUuid::createUuid());
+    webPage->setIdUnsafe(QnUuid::createUuid());
     webPage->setUrl("http://www.ru");
     webPage->setName(QnWebPageResource::nameForUrl(webPage->getUrl()));
     resourcePool()->addResource(webPage);
@@ -86,7 +86,7 @@ QnWebPageResourcePtr QnResourcePoolTestHelper::addWebPage()
 QnVideoWallResourcePtr QnResourcePoolTestHelper::createVideoWall()
 {
     QnVideoWallResourcePtr videoWall(new QnVideoWallResource());
-    videoWall->setId(QnUuid::createUuid());
+    videoWall->setIdUnsafe(QnUuid::createUuid());
     return videoWall;
 }
 
@@ -114,7 +114,7 @@ QnLayoutResourcePtr QnResourcePoolTestHelper::addLayoutForVideoWall(
 QnMediaServerResourcePtr QnResourcePoolTestHelper::addServer(nx::vms::api::ServerFlags additionalFlags)
 {
     QnMediaServerResourcePtr server(new QnMediaServerResource(commonModule()));
-    server->setId(QnUuid::createUuid());
+    server->setIdUnsafe(QnUuid::createUuid());
     server->setUrl(lit("http://localhost:7001"));
     resourcePool()->addResource(server);
     server->setStatus(Qn::Online);
