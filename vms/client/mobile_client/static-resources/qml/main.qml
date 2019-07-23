@@ -211,7 +211,11 @@ ApplicationWindow
     {
         id: autoScrollDelayTimer
         interval: 50
-        onTriggered: NxGlobals.ensureFlickableChildVisible(activeFocusItem)
+        onTriggered:
+        {
+            if (activeFocusItem && !NxGlobals.ensureFlickableChildVisible(activeFocusItem))
+                NxGlobals.ensureFlickableChildVisible(activeFocusItem.placeholder)
+        }
     }
 
     Object

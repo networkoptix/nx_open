@@ -30,6 +30,21 @@ Page
         }
     ]
 
+    SearchEdit
+    {
+        id: searchEdit
+
+        property Item placeholder: null
+
+        x: sessionsList.searchEditPosition.x
+        y: sessionsList.searchEditPosition.y
+        z: 1
+
+        width: sessionsList.width
+
+        onTextChanged: sessionsList.model.filterWildcard = text
+    }
+
     GridView
     {
         id: sessionsList
@@ -37,13 +52,17 @@ Page
         anchors.fill: parent
         anchors.margins: -4
 
-        header: SearchEdit
+        readonly property point searchEditPosition:
+            mapToItem(searchEdit.parent, originX - contentX, originY - contentY)
+
+        header: Item
         {
-            id: searchEdit
+            id: searchEditPlaceholder
 
             width: sessionsList.width
+            height: searchEdit.height
 
-            onTextChanged: sessionsList.model.filterWildcard = text
+            Component.onCompleted: searchEdit.placeholder = this
         }
 
         property real horizontalSpacing: 8

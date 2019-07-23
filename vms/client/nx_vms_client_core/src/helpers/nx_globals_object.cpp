@@ -65,23 +65,23 @@ nx::vms::api::SoftwareVersion NxGlobalsObject::softwareVersion(const QString& ve
     return nx::vms::api::SoftwareVersion(version);
 }
 
-void NxGlobalsObject::ensureFlickableChildVisible(QQuickItem* item)
+bool NxGlobalsObject::ensureFlickableChildVisible(QQuickItem* item)
 {
     if (!item)
-        return;
+        return false;
 
     auto flickable = findFlickable(item);
     if (!flickable)
-        return;
+        return false;
 
     static const auto kDenyPositionCorrectionPropertyName = "denyFlickableVisibleAreaCorrection";
     const auto denyCorrection = flickable->property(kDenyPositionCorrectionPropertyName);
     if (denyCorrection.isValid() && denyCorrection.toBool())
-        return;
+        return false;
 
     const auto contentItem = flickable->contentItem();
     if (!contentItem || !itemIsAncestorOf(item, contentItem))
-        return;
+        return false;
 
     const auto rect = item->mapRectToItem(contentItem,
         QRect(0, 0, static_cast<int>(item->width()), static_cast<int>(item->height())));
@@ -114,6 +114,8 @@ void NxGlobalsObject::ensureFlickableChildVisible(QQuickItem* item)
         flickable->contentHeight(), flickable->height(),
         flickable->topMargin(), flickable->bottomMargin(),
         rect.y(), rect.height()));
+
+    return true;
 }
 
 QnUuid NxGlobalsObject::uuid(const QString& uuid) const
