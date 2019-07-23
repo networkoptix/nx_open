@@ -29,6 +29,7 @@
 
 using namespace nx::sdk;
 using nx::vms::server::sdk_support::RefCountableRegistry;
+using nx::vms::api::PluginInfo;
 
 static QStringList stringToListViaComma(const QString& s)
 {
@@ -67,7 +68,7 @@ nx::vms::api::PluginInfoList PluginManager::pluginInfoList() const
     return m_cachedPluginInfo;
 }
 
-std::shared_ptr<const nx::vms::api::PluginInfo> PluginManager::pluginInfo(
+std::shared_ptr<const PluginInfo> PluginManager::pluginInfo(
     const IPlugin* plugin) const
 {
     if (!NX_ASSERT(plugin))
@@ -82,11 +83,18 @@ std::shared_ptr<const nx::vms::api::PluginInfo> PluginManager::pluginInfo(
         }
     }
 
-    NX_ERROR(this, "PluginInfo not found for plugin [%1]", plugin->name());
-    return nullptr;
+    const QString errorMessage = "PluginManager: PluginInfo not found for plugin instance @"
+        + QString::fromLatin1(nx::kit::utils::toString(plugin).c_str());
+
+    NX_ASSERT(false, errorMessage);
+
+    const auto internalErrorPluginInfo = std::make_shared<PluginInfo>();
+    internalErrorPluginInfo->errorCode = Error::internalError;
+    internalErrorPluginInfo->statusMessage = "INTERNAL ERROR: " + errorMessage;
+    return internalErrorPluginInfo;
 }
 
-void PluginManager::setIsActive(const nx::sdk::IRefCountable* plugin, bool isActive)
+void PluginManager::setIsActive(const IRefCountable* plugin, bool isActive)
 {
     if (!NX_ASSERT(plugin))
         return;
@@ -170,17 +178,15 @@ static QFileInfoList pluginFileInfoList(const QDir& dirToSearch, bool searchInne
     return filteredEntries;
 }
 
-static QString mainInterfaceMessage(nx::vms::api::PluginInfo::MainInterface mainInterface)
+static QString mainInterfaceMessage(PluginInfo::MainInterface mainInterface)
 {
-    using MainInterface = nx::vms::api::PluginInfo::MainInterface;
-
-    if (mainInterface == MainInterface::undefined)
+    if (mainInterface == PluginInfo::MainInterface::undefined)
         return QString();
 
     const bool isMainInterfaceOldSdk = nx::utils::switch_(mainInterface,
-        MainInterface::nxpl_PluginInterface, [] { return true; },
-        MainInterface::nxpl_Plugin, [] { return true; },
-        MainInterface::nxpl_Plugin2, [] { return true; },
+        PluginInfo::MainInterface::nxpl_PluginInterface, [] { return true; },
+        PluginInfo::MainInterface::nxpl_Plugin, [] { return true; },
+        PluginInfo::MainInterface::nxpl_Plugin2, [] { return true; },
         nx::utils::default_, [] { return false; }
     );
 
@@ -189,9 +195,35 @@ static QString mainInterfaceMessage(nx::vms::api::PluginInfo::MainInterface main
         mainInterface);
 }
 
+void PluginManager::storeInternalErrorPluginInfo(
+    PluginInfoPtr pluginInfo, Ptr<IRefCountable> plugin, const QString& errorMessage)
+{
+    QString originalPluginInfoDescription;
+    if (pluginInfo)
+    {
+        originalPluginInfoDescription =
+            lm("Original PluginInfo fields: errorCode [%1], statusMessage %2.").args(
+                pluginInfo->errorCode, nx::kit::utils::toString(pluginInfo->statusMessage));
+    }
+    else
+    {
+        pluginInfo.reset(new PluginInfo);
+        originalPluginInfoDescription = "Original PluginInfo is null.";
+    }
+
+    NX_ASSERT(!errorMessage.isEmpty());
+
+    pluginInfo->statusMessage =
+        lm("INTERNAL ERROR: %1 %2").args(errorMessage, originalPluginInfoDescription);
+
+    pluginInfo->errorCode = Error::internalError;
+
+    m_pluginContexts.push_back({pluginInfo, plugin});
+}
+
 /** @return Always false, to enable usage `return storeNotLoadedPluginInfo(...);`. */
 bool PluginManager::storeNotLoadedPluginInfo(
-    PluginInfoPtr pluginInfo, Status status, Error errorCode, QString reason)
+    PluginInfoPtr pluginInfo, Status status, Error errorCode, const QString& reason)
 {
     const bool isOk = errorCode == Error::noError;
     if (!NX_ASSERT(pluginInfo)
@@ -202,11 +234,8 @@ bool PluginManager::storeNotLoadedPluginInfo(
         || !NX_ASSERT(pluginInfo->statusMessage.isEmpty())
     )
     {
-        if (!pluginInfo)
-            pluginInfo.reset(new PluginInfo);
-        pluginInfo->statusMessage =
-            "INTERNAL ERROR: Server Plugin not loaded and assertion failed - see Server log";
-        m_pluginContexts.push_back({pluginInfo, /*plugin*/ nullptr});
+        storeInternalErrorPluginInfo(pluginInfo, /*plugin*/ nullptr,
+            "Server Plugin was not loaded and an assertion has failed - see the Server log.");
         return false;
     }
 
@@ -242,11 +271,8 @@ bool PluginManager::storeLoadedPluginInfo(
         || !NX_ASSERT(pluginInfo->mainInterface != MainInterface::undefined)
     )
     {
-        if (!pluginInfo)
-            pluginInfo.reset(new PluginInfo);
-        pluginInfo->statusMessage =
-            "INTERNAL ERROR: Server Plugin loaded but assertion failed - see Server log";
-        m_pluginContexts.push_back({pluginInfo, plugin});
+        storeInternalErrorPluginInfo(pluginInfo, plugin,
+            "Server Plugin was loaded but an assertion has failed - see the Server log.");
         return true;
     }
 
@@ -315,18 +341,6 @@ bool PluginManager::processPluginEntryPointForNewSdk(
     if (!queryInterfacePtr<IPlugin>(plugin))
         return error ("Interface nx::sdk::IPlugin is not supported");
 
-    const char* const name = plugin->name();
-    if (!name)
-        return error("name() returned null");
-    if (name[0] == '\0')
-        return error("name() returned an empty string");
-    if (name != pluginInfo->libName)
-    {
-        NX_WARNING(this, "Analytics plugin name [%1] does not equal library name [%2]",
-            name, pluginInfo->libName);
-    }
-
-    pluginInfo->name = name;
     pluginInfo->mainInterface = MainInterface::nx_sdk_IPlugin;
 
     if (const auto analyticsPlugin = queryInterfacePtr<nx::sdk::analytics::IPlugin>(plugin))

@@ -94,7 +94,7 @@ public:
 
     nx::vms::api::PluginInfoList pluginInfoList() const;
 
-    /** @return Null if not found. */
+    /** @return Never null; if not found, fails an assertion and returns a stub structure. */
     std::shared_ptr<const nx::vms::api::PluginInfo> pluginInfo(
         const nx::sdk::IPlugin* plugin) const;
 
@@ -113,8 +113,13 @@ private:
     using Optionality = PluginInfo::Optionality;
     using MainInterface = PluginInfo::MainInterface;
 
+    void storeInternalErrorPluginInfo(
+        PluginInfoPtr pluginInfo,
+        nx::sdk::Ptr<nx::sdk::IRefCountable> plugin,
+        const QString& errorMessage);
+
     bool storeNotLoadedPluginInfo(
-        PluginInfoPtr pluginInfo, Status status, Error errorCode, QString reason);
+        PluginInfoPtr pluginInfo, Status status, Error errorCode, const QString& reason);
 
     bool storeLoadedPluginInfo(
         PluginInfoPtr pluginInfo, nx::sdk::Ptr<nx::sdk::IRefCountable> plugin);

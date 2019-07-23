@@ -27,19 +27,14 @@ class PrintPrefixMaker
 public:
     std::string makePrintPrefix(
         const std::string& overridingPrintPrefix,
-        const IEngine* engine,
         const IDeviceInfo* deviceInfo)
     {
-        NX_KIT_ASSERT(engine);
-        NX_KIT_ASSERT(engine->plugin());
-        NX_KIT_ASSERT(engine->plugin()->name());
         NX_KIT_ASSERT(deviceInfo);
 
         if (!overridingPrintPrefix.empty())
             return overridingPrintPrefix;
 
-        return std::string("[") + engine->plugin()->name()
-            + "_device_" + deviceInfo->id() + "] ";
+        return std::string("[") + libContext().name() + "_device_" + deviceInfo->id() + "] ";
     }
 
 private:
@@ -57,7 +52,7 @@ VideoFrameProcessingDeviceAgent::VideoFrameProcessingDeviceAgent(
     bool enableOutput,
     const std::string& printPrefix)
     :
-    logUtils(enableOutput, PrintPrefixMaker().makePrintPrefix(printPrefix, engine, deviceInfo)),
+    logUtils(enableOutput, PrintPrefixMaker().makePrintPrefix(printPrefix, deviceInfo)),
     m_engine(engine)
 {
     NX_PRINT << "Created " << this;

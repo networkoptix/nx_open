@@ -15,6 +15,7 @@
 #include <nx/vms/server/resource/analytics_plugin_resource.h>
 
 #include <nx/vms/server/sdk_support/utils.h>
+#include <plugins/plugin_manager.h>
 
 #include <nx/sdk/helpers/ptr.h>
 
@@ -34,47 +35,31 @@ static const QString kSettingsFilenamePostfix("_settings.json");
 // Engine: stub_analytics_plugin_engine_settings.json
 
 static QString pluginLibName(
-    const nx::sdk::analytics::IPlugin* plugin)
-{
-    if (!NX_ASSERT(plugin))
-        return QString();
-
-    const char* const pluginName = plugin->name();
-    if (!pluginName)
-        NX_ERROR(NX_SCOPE_TAG, "Plugin name is null for Plugin instance %1", plugin);
-    if (pluginName[0] == '\0')
-        NX_ERROR(NX_SCOPE_TAG, "Plugin name is empty for Plugin instance %1", plugin);
-    return pluginName;
-}
-
-static QString pluginLibName(
     const nx::vms::server::resource::AnalyticsPluginResourcePtr& pluginResource)
 {
-    if (!NX_ASSERT(pluginResource))
-        return QString();
+    const auto pluginManager = pluginResource->serverModule()->pluginManager();
+    if (!NX_ASSERT(pluginManager))
+        return "<unknown_plugin_missing_plugin_manager>";
 
-    const auto plugin = pluginResource->sdkPlugin();
-    if (!NX_ASSERT(plugin, "Unable to access SDK's Plugin for Plugin Resource %1", pluginResource))
-        return QString();
-
-    const char* const pluginName = plugin->name();
-    if (!pluginName)
-        NX_ERROR(NX_SCOPE_TAG, "Plugin name is null for Plugin Resource %1", pluginResource);
-    if (pluginName[0] == '\0')
-        NX_ERROR(NX_SCOPE_TAG, "Plugin name is empty for Plugin Resource %1", pluginResource);
-    return pluginName;
+    return pluginManager->pluginInfo(pluginResource->sdkPlugin().get())->libName;
 }
 
 static QString pluginLibName(
     const nx::vms::server::resource::AnalyticsEngineResourcePtr& engineResource)
 {
+    if (!NX_ASSERT(engineResource))
+        return "missingEngineResource";
+
     const auto pluginResource =
         engineResource->plugin().dynamicCast<nx::vms::server::resource::AnalyticsPluginResource>();
-
     if (!NX_ASSERT(pluginResource))
-        return QString();
+        return "missingEnginePluginResource";
 
-    return pluginLibName(pluginResource);
+    const auto pluginManager = engineResource->serverModule()->pluginManager();
+    if (!NX_ASSERT(pluginManager))
+        return "missingPluginManager";
+
+    return pluginManager->pluginInfo(pluginResource->sdkPlugin().get())->libName;
 }
 
 static QString nameOfFileToDumpOrLoadDataForDevice(
@@ -82,17 +67,15 @@ static QString nameOfFileToDumpOrLoadDataForDevice(
     const nx::vms::server::resource::AnalyticsEngineResourcePtr& engineResource,
     const QString& postfix)
 {
+    const QString deviceStr = pluginLibName(engineResource) + "_device";
+
     if (!NX_ASSERT(engineResource))
-        return QString();
+        return deviceStr;
 
     if (!NX_ASSERT(deviceResource))
-        return QString();
+        return deviceStr + "_missingDeviceResource";
 
-    const auto libName = pluginLibName(engineResource);
-    if (!NX_ASSERT(!libName.isEmpty()))
-        return QString();
-
-    return libName + "_device_" + deviceResource->getId().toSimpleString() + postfix;
+    return deviceStr + "_" + deviceResource->getId().toSimpleString() + postfix;
 }
 
 static QString nameOfFileToDumpOrLoadDataForEngine(
@@ -100,19 +83,15 @@ static QString nameOfFileToDumpOrLoadDataForEngine(
     const QString& postfix,
     bool useEngineId)
 {
+    const QString engineStr = pluginLibName(engineResource) + "_engine";
+
     if (!NX_ASSERT(engineResource))
-        return QString();
+        return engineStr;
 
-    const auto libName = pluginLibName(engineResource);
-    if (!NX_ASSERT(!libName.isEmpty()))
-        return QString();
+    const QString engineResourceIdSuffix =
+        useEngineId ? ("_" + engineResource->getId().toSimpleString()) : "";
 
-    QString result = libName + "_engine";
-    if (useEngineId)
-        result += "_" + engineResource->getId().toSimpleString();
-
-    result += postfix;
-    return result;
+    return engineStr + engineResourceIdSuffix + postfix;
 }
 
 /** @param settingsFilename If empty, the call does nothing - an assertion has already failed. */
@@ -217,16 +196,11 @@ QString nameOfFileToDumpOrLoadData(
     return QString();
 }
 
-QString nameOfFileToDumpOrLoadData(
-    const nx::sdk::analytics::IPlugin* plugin,
-    const QString& postfix)
+QString nameOfFileToDumpOrLoadData(const QString& pluginLibName, const QString& postfix)
 {
     NX_ASSERT(!postfix.isEmpty());
 
-    if (!NX_ASSERT(plugin))
-        return QString();
-
-    return pluginLibName(plugin) + postfix;
+    return pluginLibName + postfix;
 }
 
 void dumpStringToFile(

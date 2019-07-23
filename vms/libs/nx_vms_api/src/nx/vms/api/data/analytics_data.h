@@ -74,6 +74,12 @@ struct NX_VMS_API PluginInfo: Data
          * The plugin API version is no longer supported.
          */
         unsupportedVersion,
+
+        /**%apidoc
+         * Some internal error has occured which made the proper PluginInfo structure unavailable.
+         * In this case the error message is stored in statusMessage field.
+         */
+        internalError,
     };
 
     enum class MainInterface
