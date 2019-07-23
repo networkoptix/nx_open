@@ -606,7 +606,7 @@ void Worker::downloadChunks()
 
     while (chunksLeft > 0)
     {
-        while (contexts.size() < kMaxSimultaneousDownloads && chunksLeft > 0)
+        for (int i = 0; i < kMaxSimultaneousDownloads && chunksLeft > 0; ++i)
         {
             const int chunk = selectNextChunk(downloadingChunks);
             if (chunk < 0)

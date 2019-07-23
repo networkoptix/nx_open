@@ -40,8 +40,6 @@ public:
     bool checkFreeSpace(const QString& path, qint64 bytes) const;
     bool checkFreeSpaceForInstallation() const;
 
-    qint64 reservedSpacePadding() const;
-
     virtual QString dataDirectoryPath() const = 0;
     virtual QString component() const = 0;
     virtual int64_t freeSpace(const QString& path) const = 0;

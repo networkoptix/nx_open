@@ -643,7 +643,9 @@ bool ServerUpdateTool::verifyUpdateManifest(
     clientData.fillDefault();
     clientData.clientId = checkClient ? m_stateTracker->getClientPeerId() : QnUuid();
     clientData.installedVersions = clientVersions;
-    return verifyUpdateContents(commonModule(), contents, activeServers, clientData);
+    VerificationOptions options;
+    options.commonModule = commonModule();
+    return verifyUpdateContents(contents, activeServers, clientData, options);
 }
 
 void ServerUpdateTool::calculateManualDownloadProgress(ProgressInfo& progress)
