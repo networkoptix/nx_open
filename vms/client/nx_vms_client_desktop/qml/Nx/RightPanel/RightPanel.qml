@@ -3,6 +3,8 @@ import QtQuick.Controls 2.4
 
 import Nx.Controls 1.0
 
+import nx.vms.client.desktop 1.0
+
 Item
 {
     TabBar
@@ -58,17 +60,24 @@ Item
 
         contentItem: Item {}
 
-        // TODO: #vkutin This is a stub that will be replaced with actual tabs content.
-
         Fader
         {
             anchors.fill: parent
             opaque: tabView.currentItem === this
 
-            contentItem: Rectangle
+            contentItem: Item
             {
                 id: notificationsItem
-                color: "grey"
+
+                EventRibbon
+                {
+                    anchors.fill: parent
+                    model: RightPanelModel
+                    {
+                        context: workbenchContext
+                        type: RightPanel.Tab.notifications
+                    }
+                }
             }
         }
 
@@ -77,10 +86,19 @@ Item
             anchors.fill: parent
             opaque: tabView.currentItem === this
 
-            contentItem: Rectangle
+            contentItem: Item
             {
-                id: motionsItem
-                color: "green"
+                id: motionItem
+
+                EventRibbon
+                {
+                    anchors.fill: parent
+                    model: RightPanelModel
+                    {
+                        context: workbenchContext
+                        type: RightPanel.Tab.motion
+                    }
+                }
             }
         }
 
@@ -89,10 +107,19 @@ Item
             anchors.fill: parent
             opaque: tabView.currentItem === this
 
-            contentItem: Rectangle
+            contentItem: Item
             {
                 id: bookmarksItem
-                color: "cyan"
+
+                EventRibbon
+                {
+                    anchors.fill: parent
+                    model: RightPanelModel
+                    {
+                        context: workbenchContext
+                        type: RightPanel.Tab.bookmarks
+                    }
+                }
             }
         }
 
@@ -101,10 +128,19 @@ Item
             anchors.fill: parent
             opaque: tabView.currentItem === this
 
-            contentItem: Rectangle
+            contentItem: Item
             {
                 id: eventsItem
-                color: "yellow"
+
+                EventRibbon
+                {
+                    anchors.fill: parent
+                    model: RightPanelModel
+                    {
+                        context: workbenchContext
+                        type: RightPanel.Tab.events
+                    }
+                }
             }
         }
 
@@ -113,10 +149,19 @@ Item
             anchors.fill: parent
             opaque: tabView.currentItem === this
 
-            contentItem: Rectangle
+            contentItem: Item
             {
                 id: analyticsItem
-                color: "red"
+
+                EventRibbon
+                {
+                    anchors.fill: parent
+                    model: RightPanelModel
+                    {
+                        context: workbenchContext
+                        type: RightPanel.Tab.analytics
+                    }
+                }
             }
         }
     }
