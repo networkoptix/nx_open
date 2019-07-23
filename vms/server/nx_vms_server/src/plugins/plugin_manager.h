@@ -84,7 +84,8 @@ public:
     }
 
     /**
-     * @param settings This settings are reported to each plugin (if supported by the plugin).
+     * @param settings Mediaserver settings (aka "roSettings"). They are passed to the old SDK
+     *     plugins which implement setSettings() method.
      */
     void loadPlugins(const QSettings* settings);
 
@@ -106,49 +107,44 @@ signals:
 private:
     using PluginInfo = nx::vms::api::PluginInfo;
     using PluginInfoPtr = std::shared_ptr<PluginInfo>;
+    using SettingsHolder = nx::plugins::SettingsHolder;
+    using Status = PluginInfo::Status;
+    using Error = PluginInfo::Error;
+    using Optionality = PluginInfo::Optionality;
+    using MainInterface = PluginInfo::MainInterface;
 
-    void loadNonOptionalPluginsIfNeeded(
-        const QString& binPath, const nx::plugins::SettingsHolder& settingsHolder);
+    bool storeNotLoadedPluginInfo(
+        PluginInfoPtr pluginInfo, Status status, Error errorCode, QString reason);
 
-    void loadOptionalPluginsIfNeeded(
-        const QString& binPath, const nx::plugins::SettingsHolder& settingsHolder);
+    bool storeLoadedPluginInfo(
+        PluginInfoPtr pluginInfo, nx::sdk::Ptr<nx::sdk::IRefCountable> plugin);
+
+    bool processPluginEntryPointForNewSdk(
+        nx::sdk::IPlugin::EntryPointFunc entryPointFunc,
+        PluginInfoPtr pluginInfo);
+
+    bool processPluginEntryPointForOldSdk(
+        nxpl::Plugin::EntryPointFunc entryPointFunc,
+        const SettingsHolder& settingsHolder,
+        PluginInfoPtr pluginInfo);
+
+    bool processPluginLib(
+        QLibrary* lib, const SettingsHolder& settingsHolder, PluginInfoPtr pluginInfo);
+
+    void loadPlugin(
+        const SettingsHolder& settingsHolder, PluginInfoPtr pluginInfo);
 
     void loadPluginsFromDir(
-        const nx::plugins::SettingsHolder& settingsHolder,
-        const QDir& dirToSearchIn,
-        PluginInfo::Optionality pluginLoadingType,
-        std::function<bool(const QFileInfo& pluginFileInfo, PluginInfoPtr pluginInfo)>
-            allowPlugin);
+        const SettingsHolder& settingsHolder,
+        const QDir& dirToSearch,
+        Optionality pluginLoadingType,
+        std::function<bool(PluginInfoPtr pluginInfo)> allowPlugin);
 
-    bool loadNxPlugin(
-        const nx::plugins::SettingsHolder& settingsHolder,
-        const QString& pluginHomeDir,
-        const QString& libFilename,
-        const QString& libName,
-        PluginInfoPtr pluginInfo);
+    void loadOptionalPluginsIfNeeded(
+        const QString& binPath, const SettingsHolder& settingsHolder);
 
-    bool loadNxPluginForOldSdk(
-        const nxpl::Plugin::EntryPointFunc entryPointFunc,
-        const nx::plugins::SettingsHolder& settingsHolder,
-        const QString& libFilename,
-        const QString& libName,
-        PluginInfoPtr pluginInfo);
-
-    bool loadNxPluginForNewSdk(
-        const nx::sdk::IPlugin::EntryPointFunc entryPointFunc,
-        const QString& libFilename,
-        const QString& libName,
-        PluginInfoPtr pluginInfo);
-
-    std::unique_ptr<QLibrary> loadPluginLibrary(
-        const QString& libFilename,
-        PluginInfoPtr pluginInfo);
-
-    void storePluginInfo(
-        PluginInfoPtr pluginInfo,
-        PluginInfo::Status loadingStatus,
-        PluginInfo::Error errorCode,
-        QString statusMessage);
+    void loadNonOptionalPluginsIfNeeded(
+        const QString& binPath, const SettingsHolder& settingsHolder);
 
 private:
     struct PluginContext

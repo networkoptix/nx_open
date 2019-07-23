@@ -97,6 +97,11 @@ struct NX_VMS_API PluginInfo: Data
     QString description;
 
     /**%apidoc
+     * Plugin name for logging: library file name with no `lib` prefix (on Linux) and no extension.
+     */
+    QString libName;
+
+    /**%apidoc
      * Absolute path to the plugin dynamic library.
      */
     QString libraryFilename;
@@ -145,8 +150,8 @@ struct NX_VMS_API PluginInfo: Data
     MainInterface mainInterface = MainInterface::undefined;
 
     /**%apidoc
-     * For non-analytics plugins and for device-independent analytics plugins is always set to
-     * true. For device-dependent analytics plugins is set to true if and only if the plugin has
+     * For non-Analytics plugins and for device-independent Analytics plugins, is always set to
+     * true. For device-dependent Analytics plugins, is set to true if and only if the plugin has
      * ever had a DeviceAgent since the Server start.
      */
     bool isActive = true;
@@ -157,6 +162,7 @@ QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PluginInfo::Error)
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PluginInfo::MainInterface)
 #define PluginInfo_Fields (name) \
     (description) \
+    (libName) \
     (libraryFilename) \
     (homeDir) \
     (vendor) \
@@ -167,6 +173,11 @@ QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PluginInfo::MainInterface)
     (errorCode) \
     (mainInterface) \
     (isActive)
+
+NX_VMS_API QString toString(PluginInfo::Optionality value);
+NX_VMS_API QString toString(PluginInfo::Status value);
+NX_VMS_API QString toString(PluginInfo::Error value);
+NX_VMS_API QString toString(PluginInfo::MainInterface value);
 
 } // namespace nx::vms::api
 
