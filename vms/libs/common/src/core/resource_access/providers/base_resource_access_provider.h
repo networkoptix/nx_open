@@ -4,6 +4,7 @@
 
 #include <nx/utils/thread/mutex.h>
 #include <common/common_module_aware.h>
+#include <nx_ec/data/api_fwd.h>
 
 /** Abstract base class for access providers containing common code.
  *  Thread-safety is achieved by using only signal-slot system with auto-connections.

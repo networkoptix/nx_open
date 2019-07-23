@@ -3,7 +3,6 @@
 #include <common/common_globals.h>
 
 #include <nx/core/core_fwd.h>
-#include <core/resource_access/resource_access_subject.h>
 #include <core/resource_access/user_access_data.h>
 
 #include <nx/utils/singleton.h>
@@ -11,6 +10,10 @@
 
 #include <utils/common/connective.h>
 #include <common/common_module_aware.h>
+#include <nx_ec/data/api_fwd.h>
+
+
+class QnResourceAccessSubject;
 
 class QnGlobalPermissionsManager:
     public Connective<QObject>,

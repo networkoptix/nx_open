@@ -3,10 +3,12 @@
 #include <QtCore/QObject>
 
 #include <nx/core/access/access_types.h>
-#include <core/resource_access/resource_access_subject.h>
 
 #include <utils/common/connective.h>
 #include <utils/common/updatable.h>
+#include <core/resource/resource_fwd.h>
+
+class QnResourceAccessSubject;
 
 /** Public interface for all Resource Access Provider classes. */
 class QnAbstractResourceAccessProvider:

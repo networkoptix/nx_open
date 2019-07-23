@@ -42,6 +42,7 @@
 
 #include <nx/utils/app_info.h>
 #include <nx/utils/log/log.h>
+#include <core/resource_access/resource_access_subject.h>
 
 namespace {
 

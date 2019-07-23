@@ -37,6 +37,7 @@
 
 #include <utils/common/scoped_timer.h>
 #include <nx/utils/std/algorithm.h>
+#include <core/resource_access/resource_access_subject.h>
 
 using namespace nx::core::access;
 using namespace nx::vms::common;

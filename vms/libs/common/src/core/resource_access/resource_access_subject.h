@@ -5,8 +5,6 @@
 #include <nx/vms/api/data/user_role_data.h>
 #include <core/resource/user_resource.h>
 
-struct QnResourceAccessSubjectPrivate;
-
 /**
 * This class represents subject of resource access - user or user role.
 */

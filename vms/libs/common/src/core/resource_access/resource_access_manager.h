@@ -6,7 +6,6 @@
 #include <common/common_module_aware.h>
 
 #include <nx/core/core_fwd.h>
-#include <core/resource_access/resource_access_subject.h>
 #include <core/resource_access/user_access_data.h>
 
 #include <core/resource/resource_fwd.h>
@@ -18,6 +17,8 @@
 
 #include <utils/common/connective.h>
 #include <utils/common/updatable.h>
+
+class QnResourceAccessSubject;
 
 class QnResourceAccessManager:
     public Connective<QObject>,

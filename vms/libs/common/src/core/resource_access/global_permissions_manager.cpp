@@ -8,6 +8,8 @@
 
 #include <core/resource/user_resource.h>
 #include <common/common_module.h>
+#include <core/resource_access/resource_access_subject.h>
+
 
 using namespace nx::core::access;
 
