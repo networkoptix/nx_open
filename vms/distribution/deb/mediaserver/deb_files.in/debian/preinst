@@ -3,6 +3,7 @@
 COMPANY_NAME="@deb.customization.company.name@"
 CLOUD_HOST="@cloudHost@"
 CLOUD_NAME="@cloudName@"
+LICENSE_VERSION="@eulaVersion@"
 
 . /usr/share/debconf/confmodule
 
@@ -68,8 +69,21 @@ then
     done
 fi
 
+SHOW_LICENSE=0
 db_get $COMPANY_NAME-mediaserver/accepted-$license
-if [ "$RET" = "true" ]; then
+if [ "$RET" = "true" ]
+then
+    db_get $COMPANY_NAME-mediaserver/accepted-$license-version
+    if [ "$LICENSE_VERSION" -gt 1 ] && ([ -z "$RET" ] || [ "$RET" -lt "$LICENSE_VERSION" ])
+    then
+        SHOW_LICENSE=1
+    fi
+else
+    SHOW_LICENSE=1
+fi
+
+if [ $SHOW_LICENSE = 0 ]
+then
     echo "$license license has already been accepted" >&2
     exit 0
 else
@@ -100,6 +114,7 @@ while true; do
     2)  # determine users' choice
         db_get $COMPANY_NAME-mediaserver/accepted-$license
         if [ "$RET" = "true" ]; then
+            db_set $COMPANY_NAME-mediaserver/accepted-$license-version "$LICENSE_VERSION"
             # license accepted
             exit 0
         fi
