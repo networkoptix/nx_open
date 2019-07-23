@@ -20,13 +20,10 @@ public:
     Value getMaxPerLastPeriod() const;
 
 private:
-    std::chrono::milliseconds elapsedTimeSincePeriodStart(const time_point& now) const;
-
     void removeExpiredValues(const time_point& now);
 
 private:
     const std::chrono::milliseconds m_period;
-    std::optional<time_point> m_periodStart;
     nx::utils::TopQueue<std::pair<time_point, Value>> m_values;
 };
 
@@ -52,20 +49,9 @@ Value MaxPerPeriod<Value>::getMaxPerLastPeriod() const
 }
 
 template<typename Value>
-std::chrono::milliseconds MaxPerPeriod<Value>::elapsedTimeSincePeriodStart(
-    const time_point& now) const
-{
-    using namespace std::chrono;
-    return duration_cast<milliseconds>(now - *m_periodStart);
-}
-
-template<typename Value>
 void MaxPerPeriod<Value>::removeExpiredValues(const time_point& now)
 {
-    if (!m_periodStart || elapsedTimeSincePeriodStart(now) > m_period)
-        m_periodStart = now;
-
-    while (!m_values.empty() && m_values.front().first < *m_periodStart)
+    while (!m_values.empty() && m_values.front().first < now - m_period)
         m_values.pop();
 }
 
