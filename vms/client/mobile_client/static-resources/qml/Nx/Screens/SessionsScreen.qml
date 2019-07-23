@@ -32,6 +32,20 @@ Page
 
     readonly property real margins: -4
 
+    MouseArea
+    {
+        id: searchCanceller
+
+        z: 1
+        anchors.fill: parent
+
+        onPressed:
+        {
+            mouse.accepted = false
+            searchEdit.focus = false
+        }
+    }
+
     Item
     {
         id: searchPanel
@@ -52,7 +66,7 @@ Page
 
         x: searchPanelPosition.x
         y: searchPanelPosition.y
-        z: 1
+        z: 2
 
         height: searchEdit.height + 8
         width: sessionsList.width
