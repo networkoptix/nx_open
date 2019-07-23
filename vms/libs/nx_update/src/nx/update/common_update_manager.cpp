@@ -148,13 +148,12 @@ void CommonUpdateManager::retry(bool forceRedownload)
     }
 
     const update::Status status = this->status();
-    if (status.code != update::Status::Code::error)
+    if (!status.suitableForFurtherProcessing())
         return;
 
     using ErrorCode = update::Status::ErrorCode;
     switch (status.errorCode)
     {
-        case ErrorCode::noError:
         case ErrorCode::updatePackageNotFound:
         case ErrorCode::osVersionNotSupported:
         case ErrorCode::internalError:
@@ -165,6 +164,7 @@ void CommonUpdateManager::retry(bool forceRedownload)
             // We can do nothing with these cases.
             break;
 
+        case ErrorCode::noError:
         case ErrorCode::noFreeSpaceToDownload:
         case ErrorCode::downloadFailed:
         case ErrorCode::corruptedArchive:
@@ -288,6 +288,9 @@ bool CommonUpdateManager::canDownloadFile(
             peerId, update::Status::Code::error, update::Status::ErrorCode::noFreeSpaceToDownload);
         return false;
     }
+
+    *outUpdateStatus = nx::update::Status(
+        peerId, update::Status::Code::idle, update::Status::ErrorCode::noError);
 
     return true;
 }
