@@ -39,6 +39,20 @@ def get_unit_tests_list():
             yield m.group(1) + extension
 
 
+def archiveMacOsFrameworks(archiver, target_dir, source_dir):
+    for framework_dir in glob(join(source_dir, "*.framework")):
+        framework, _ = os.path.splitext(os.path.basename(framework_dir))
+        library_name = os.path.normpath(join(framework_dir, framework))
+        if not os.path.exists(library_name):
+            continue
+
+        logging.info("  Adding %s.framework", framework)
+
+        real_name = os.path.realpath(library_name)
+        relative_name = os.path.relpath(real_name, source_dir)
+        archiver.add(real_name, join(target_dir, relative_name))
+
+
 def archiveFiles(archiver, target_dir, source_dir, file_list):
     for file in file_list:
         logging.info("  Adding %s", os.path.basename(file))
@@ -52,6 +66,7 @@ def archiveByGlob(archiver, category, target_dir, pattern):
 
 def main():
     isWindows = conf.CMAKE_SYSTEM_NAME == "Windows"
+    isMac = conf.CMAKE_SYSTEM_NAME == "Darwin"
 
     bin_dir = "bin"
     lib_dir = bin_dir if isWindows else "lib"
@@ -91,6 +106,9 @@ def main():
                 archiveByGlob(a, "Qt plugins from %s" % plugin_group, join(bin_dir, plugin_group),
                     join(conf.QT_DIR, "plugins", plugin_group, dll_glob))
             archiveByGlob(a, "Qt dlls", bin_dir, join(conf.QT_DIR, "bin", dll_glob))
+
+        if isMac:
+            archiveMacOsFrameworks(a, lib_dir, join(conf.QT_DIR, "lib"))
 
         # Archive analytics_sdk unit tests.
         ut_bin_glob = "Debug\\*_ut.exe" if isWindows else "*_ut"
