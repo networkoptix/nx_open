@@ -216,6 +216,7 @@ private:
         {
             return subjectId == other.subjectId && resourceId == other.resourceId;
         }
+
         bool operator<(const PermissionKey& other) const
         {
             if (subjectId != other.subjectId)

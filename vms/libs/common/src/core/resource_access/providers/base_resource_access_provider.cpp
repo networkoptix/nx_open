@@ -44,10 +44,14 @@ bool QnBaseResourceAccessProvider::hasAccess(const QnResourceAccessSubject& subj
         return false;
 
     if (mode() == Mode::direct)
-        return isSubjectEnabled(subject) && calculateAccess(subject, resource, 
-            globalPermissionsManager()->globalPermissions(subject));
+    {
+        return isSubjectEnabled(subject)
+            && calculateAccess(subject, resource,
+                globalPermissionsManager()->globalPermissions(subject));
+    }
 
-    /* We can get cache miss in the following scenario:
+    /**
+     * We can get cache miss in the following scenarios:
      * * new user was added
      * * global permissions manager emits 'changed'
      * * access manager recalculates all permissions

@@ -302,7 +302,6 @@ void QnResourceAccessManager::recalculateAllPermissions()
     if (isUpdating())
         return;
 
-
     const auto& resPool = commonModule()->resourcePool();
     auto resources = resPool->getResources();
     auto subjects = resourceAccessSubjectsCache()->allSubjects();
@@ -312,6 +311,7 @@ void QnResourceAccessManager::recalculateAllPermissions()
         {
             return resource->resourcePool() == nullptr;
         });
+
     nx::utils::remove_if(subjects,
         [this](const auto& subject)
         {
@@ -324,8 +324,9 @@ void QnResourceAccessManager::recalculateAllPermissions()
     std::sort(resources.begin(), resources.end(),
         [](const QnResourcePtr& left, const QnResourcePtr& right)
         {
-        return left->getId() < right->getId();
+            return left->getId() < right->getId();
         });
+
     std::sort(subjects.begin(), subjects.end(),
         [](const QnResourceAccessSubject& left, const QnResourceAccessSubject& right)
         {
@@ -338,7 +339,8 @@ void QnResourceAccessManager::recalculateAllPermissions()
     {
         PermissionKey key(subject.id(), QnUuid());
         auto globalPermissions = globalPermissionsManager()->globalPermissions(subject);
-        auto accessibleResources = commonModule()->resourceAccessProvider()->accessibleResources(subject);
+        auto accessibleResources =
+            commonModule()->resourceAccessProvider()->accessibleResources(subject);
         auto accessResItr = accessibleResources.begin();
         for (const QnResourcePtr& resource: resources)
         {
@@ -494,10 +496,12 @@ Qn::Permissions QnResourceAccessManager::calculatePermissions(
     if (!target || !target->resourcePool())
         return Qn::NoPermissions;
 
-    auto globalPermissions = globalPermissionsHint ? *globalPermissionsHint
+    auto globalPermissions = globalPermissionsHint
+        ? *globalPermissionsHint
         : globalPermissionsManager()->globalPermissions(subject);
 
-    bool hasAccessToResource = hasAccessToResourceHint ? *hasAccessToResourceHint
+    bool hasAccessToResource = hasAccessToResourceHint
+        ? *hasAccessToResourceHint
         : commonModule()->resourceAccessProvider()->hasAccess(subject, target);
 
     if (QnUserResourcePtr targetUser = target.dynamicCast<QnUserResource>())
