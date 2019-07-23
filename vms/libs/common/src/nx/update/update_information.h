@@ -194,7 +194,7 @@ public:
         progress(progress)
     {}
 
-    bool suitableForFurtherProcessing() const { return code == Code::error || code == Code::idle; }
+    bool suitableForRetrying() const { return code == Code::error || code == Code::idle; }
 
     friend inline uint qHash(nx::update::Status::ErrorCode key, uint seed)
     {

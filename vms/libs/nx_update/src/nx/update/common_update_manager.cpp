@@ -148,7 +148,7 @@ void CommonUpdateManager::retry(bool forceRedownload)
     }
 
     const update::Status status = this->status();
-    if (!status.suitableForFurtherProcessing())
+    if (!status.suitableForRetrying())
         return;
 
     using ErrorCode = update::Status::ErrorCode;
