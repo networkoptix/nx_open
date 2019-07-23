@@ -899,7 +899,7 @@ bool ServerUpdateTool::requestInstallAction(
                 {
                     success = false;
                     error = InternalError::serverError;
-                    NX_ERROR(tool.data(), "requestInstallAction() - server responded with %1",
+                    NX_ERROR(tool.data(), "requestInstallAction() - server responded with \"%1\"",
                         result.errorString);
                 }
 

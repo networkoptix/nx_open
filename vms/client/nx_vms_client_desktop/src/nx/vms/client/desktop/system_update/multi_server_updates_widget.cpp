@@ -1046,12 +1046,13 @@ void MultiServerUpdatesWidget::atStartUpdateAction()
 
         setTargetState(WidgetUpdateState::startingDownload, targets);
 
-        NX_INFO(this) << "atStartUpdateAction() - sending 'download' command to peers" << targets;
+        NX_INFO(this, "atStartUpdateAction() - sending 'download' command to peers %1", targets);
         m_serverUpdateTool->requestStartUpdate(m_updateInfo.info, targets);
     }
     else
     {
-        NX_WARNING(this) << "atStartUpdateAction() - invalid widget state for download command";
+        NX_WARNING(this, "atStartUpdateAction() - invalid widget state for download command %1",
+            toString(m_widgetState));
     }
 
     if (m_updateRemoteStateChanged)
@@ -2218,11 +2219,11 @@ bool MultiServerUpdatesWidget::stateHasProgress(WidgetUpdateState state)
         case WidgetUpdateState::initialCheck:
         case WidgetUpdateState::ready:
         case WidgetUpdateState::readyInstall:
-        case WidgetUpdateState::startingInstall:
         case WidgetUpdateState::cancelingReadyInstall:
         case WidgetUpdateState::complete:
             return false;
         case WidgetUpdateState::startingDownload:
+        case WidgetUpdateState::startingInstall:
         case WidgetUpdateState::downloading:
         case WidgetUpdateState::cancelingDownload:
         case WidgetUpdateState::installing:
@@ -2570,7 +2571,8 @@ void MultiServerUpdatesWidget::syncStatusVisibility()
     StatusMode statusMode = StatusMode::remoteStatus;
 
     if (m_widgetState == WidgetUpdateState::initial
-        || m_widgetState == WidgetUpdateState::ready)
+        || m_widgetState == WidgetUpdateState::ready
+        || m_widgetState == WidgetUpdateState::cancelingReadyInstall)
     {
         statusMode = StatusMode::hidden;
     }
