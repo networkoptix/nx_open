@@ -30,37 +30,59 @@ Page
         }
     ]
 
-    SearchEdit
+    readonly property real margins: -4
+
+    Item
     {
-        id: searchEdit
+        id: searchPanel
 
-        property Item placeholder: null
+        readonly property bool searching:
+            visible && (searchEdit.activeFocus || searchEdit.text.length)
 
-        x: sessionsList.searchEditPosition.x
-        y: sessionsList.searchEditPosition.y
+        readonly property point searchPanelPosition:
+        {
+            if (searchPanel.searching)
+                return Qt.point(sessionsScreen.margins, sessionsScreen.margins)
+
+            return sessionsList.mapToItem(
+                searchPanel.parent,
+                sessionsList.originX - sessionsList.contentX,
+                sessionsList.originY - sessionsList.contentY)
+        }
+
+        x: searchPanelPosition.x
+        y: searchPanelPosition.y
         z: 1
 
+        height: searchEdit.height + 8
         width: sessionsList.width
 
-        onTextChanged: sessionsList.model.filterWildcard = text
+        SearchEdit
+        {
+            id: searchEdit
+
+            property Item placeholder: null
+
+            height: 40
+            width: parent.width
+            onTextChanged: sessionsList.model.filterWildcard = text
+        }
     }
 
     GridView
     {
         id: sessionsList
 
-        anchors.fill: parent
-        anchors.margins: -4
-
-        readonly property point searchEditPosition:
-            mapToItem(searchEdit.parent, originX - contentX, originY - contentY)
+        clip: true
+        x: sessionsScreen.margins
+        y: sessionsScreen.margins + (searchPanel.searching ? searchPanel.height : 0)
+        width: parent.width - sessionsScreen.margins * 2
+        height: parent.height - sessionsScreen.margins * 2
 
         header: Item
         {
-            id: searchEditPlaceholder
-
             width: sessionsList.width
-            height: searchEdit.height
+            height: searchPanel.searching || !searchPanel.visible ? 0 : searchPanel.height
 
             Component.onCompleted: searchEdit.placeholder = this
         }
