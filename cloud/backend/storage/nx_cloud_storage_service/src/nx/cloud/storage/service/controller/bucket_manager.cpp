@@ -20,8 +20,7 @@ static nx::utils::Url makeBucketUrl(const std::string& bucketName)
 
 } // namespace
 
-BucketManager::BucketManager(const conf::Aws& /*settings*/)/*:
-    m_settings(settings)*/
+BucketManager::BucketManager(const conf::Aws& /*settings*/)
 {
 }
 

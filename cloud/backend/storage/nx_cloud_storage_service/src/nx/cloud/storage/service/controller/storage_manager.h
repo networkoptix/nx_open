@@ -23,23 +23,21 @@ class StorageManager
 public:
     StorageManager(const conf::Aws& settings);
 
-    virtual void addStorage(
+    void addStorage(
         const api::AddStorageRequest& request,
         nx::utils::MoveOnlyFunc<void(api::Result, api::Storage)> handler);
 
-    virtual void readStorage(
+    void readStorage(
         const std::string& storageId,
         nx::utils::MoveOnlyFunc<void(api::Result, api::Storage)> handler);
 
-    virtual void removeStorage(
+    void removeStorage(
         const std::string& storageId,
         nx::utils::MoveOnlyFunc<void(api::Result)> handler);
 
-    virtual void listCameras(
+    void listCameras(
         const std::string& storageId,
         nx::utils::MoveOnlyFunc<void(api::Result, std::vector<std::string>)> handler);
-
-private:
 };
 
 } // namespace controller

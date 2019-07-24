@@ -22,19 +22,16 @@ class BucketManager
 public:
     BucketManager(const conf::Aws& settings);
 
-    virtual void addBucket(
+   void addBucket(
         const api::AddBucketRequest& request,
         const nx::utils::MoveOnlyFunc<void(api::Result, api::Error)> handler);
 
-    virtual void listBuckets(
+    void listBuckets(
         nx::utils::MoveOnlyFunc<void(api::Result, std::vector<api::Bucket>)> handler);
 
-    virtual void removeBucket(
+    void removeBucket(
         const std::string& bucketName,
         nx::utils::MoveOnlyFunc<void(api::Result)> handler);
-
-private:
-    //const conf::Aws& m_settings;
 };
 
 } // namespace controller
