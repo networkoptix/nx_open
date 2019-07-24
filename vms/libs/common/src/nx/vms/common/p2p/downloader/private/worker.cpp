@@ -67,7 +67,7 @@ struct RequestContext
             auto it = contexts.begin();
             while (it != contexts.end() && !worker->needToStop())
             {
-                if (it->context->future.wait_for(2s) == std::future_status::ready)
+                if (it->context->future.wait_for(30ms) == std::future_status::ready)
                     break;
                 ++it;
             }
