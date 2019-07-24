@@ -131,15 +131,20 @@ Page
 
             SessionItem
             {
-                readonly property bool firstRowItem: Math.floor(index / sessionsList.cellsInRow) < 1
+                readonly property bool firstRowItem: index < sessionsList.cellsInRow
+                readonly property bool lastRowItem: sessionsList.count - index < sessionsList.cellsInRow
                 readonly property real verticalMargin: Math.floor(sessionsList.verticalSpacing / 2)
                 readonly property real horizontalMargin: sessionsList.horizontalSpacing / 2
 
                 anchors.fill: parent
                 anchors.leftMargin: horizontalMargin
                 anchors.rightMargin: horizontalMargin
-                anchors.topMargin: firstRowItem ? 0 : verticalMargin
-                anchors.bottomMargin: sessionsList.verticalSpacing - verticalMargin
+                anchors.topMargin: firstRowItem
+                    ? 0
+                    : verticalMargin
+                anchors.bottomMargin: lastRowItem
+                    ? 16
+                    : sessionsList.verticalSpacing - verticalMargin
 
                 systemName: model.systemName
                 systemId: model.systemId
