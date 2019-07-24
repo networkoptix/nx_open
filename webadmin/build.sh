@@ -42,7 +42,15 @@ popd
 
 # Save the repository info.
 echo "Create version.txt" >&2
-hg log -r . --repository "$SOURCE_DIR/.." > static/version.txt
+if [ -d "$SOURCE_DIR/../.hg" ]; then
+    hg log -r . --repository "$SOURCE_DIR/.." > static/version.txt
+elif [ -d "$SOURCE_DIR/../.git" ]; then
+    local format="changeset: %H%nrefs: %D%nparents: %P%nauthor: %aN <%aE>%ndate: %ad%nsummary: %s"
+    git -C "$SOURCE_DIR/.." show -s --format=$format > static/version.txt
+else
+    echo "Error: Did not found any VCS." >&2
+    exit 1
+fi
 cat static/version.txt >&2
 
 #Pack
