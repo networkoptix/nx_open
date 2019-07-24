@@ -19,7 +19,12 @@ class Ptr final
 {
 public:
     /** Supports implicit conversion from nullptr. */
-    Ptr(std::nullptr_t = nullptr) {}
+    Ptr(std::nullptr_t = nullptr)
+    {
+        // This assertion needs to be placed in any method because it uses sizeof().
+        static_assert(sizeof(Ptr<RefCountable>) == sizeof(RefCountable*),
+            "Ptr layout should be the same as of a raw pointer.");
+    }
 
     /** Sfinae: Compiles if OtherRefCountable* is convertible to RefCountable*. */
     template<class OtherRefCountable>
