@@ -71,6 +71,19 @@ void ApiClient::downloadFile(
         });
 }
 
+void ApiClient::deleteFile(
+    const std::string& path,
+    CommonHandler handler)
+{
+    doAwsApiCall(
+        nx::network::http::Method::delete_,
+        path,
+        [this, handler = std::move(handler)](auto httpClient) mutable
+        {
+            handler(getResultCode(*httpClient));
+        });
+}
+
 void ApiClient::stopWhileInAioThread()
 {
     m_requestPool.pleaseStopSync();

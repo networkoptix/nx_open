@@ -48,6 +48,10 @@ public:
         const std::string& path,
         DownloadHandler handler);
 
+    void deleteFile(
+        const std::string& path,
+        CommonHandler handler);
+
 protected:
     virtual void stopWhileInAioThread() override;
 

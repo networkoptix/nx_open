@@ -57,6 +57,11 @@ public:
      */
     std::optional<nx::Buffer> getFile(const std::string& path) const;
 
+    /**
+     * @return true if file was deleted. false if file now found.
+     */
+    bool deleteFile(const std::string& path);
+
 private:
     AwsSignatureV4Authenticator m_awsAuthenticator;
     nx::network::http::TestHttpServer m_httpServer;
@@ -70,6 +75,10 @@ private:
         nx::network::http::RequestProcessedHandler completionHandler);
 
     void getFile(
+        nx::network::http::RequestContext requestContext,
+        nx::network::http::RequestProcessedHandler completionHandler);
+
+    void deleteFile(
         nx::network::http::RequestContext requestContext,
         nx::network::http::RequestProcessedHandler completionHandler);
 };

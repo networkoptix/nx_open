@@ -60,6 +60,13 @@ protected:
             });
     }
 
+    void whenDeleteFile()
+    {
+        m_client->deleteFile(
+            kExistingFilePath,
+            [this](auto result) { m_deleteResults.push(result); });
+    }
+
     void thenUploadCompletesSuccessfully()
     {
         ASSERT_EQ(ResultCode::ok, m_uploadResults.pop().code());
@@ -79,6 +86,14 @@ protected:
         ASSERT_EQ(kExistingFileBody, fileContents);
     }
 
+    void thenFileIsDeleted()
+    {
+        const auto result = m_deleteResults.pop();
+        ASSERT_EQ(ResultCode::ok, result.code());
+
+        ASSERT_FALSE(m_awsS3Emulator.getFile(kExistingFilePath));
+    }
+
 private:
     struct File
     {
@@ -91,6 +106,7 @@ private:
     std::unique_ptr<aws::ApiClient> m_client;
     nx::utils::SyncQueue<Result> m_uploadResults;
     nx::utils::SyncQueue<std::tuple<Result, nx::Buffer>> m_downloadResults;
+    nx::utils::SyncQueue<Result> m_deleteResults;
     File m_lastUploadedFilePath;
 };
 
@@ -106,6 +122,12 @@ TEST_F(AwsS3Client, downloads_file)
 {
     whenDownloadFile();
     thenDownloadIsDownloaded();
+}
+
+TEST_F(AwsS3Client, deletes_file)
+{
+    whenDeleteFile();
+    thenFileIsDeleted();
 }
 
 } // namespace nx::cloud::aws::test
