@@ -947,6 +947,18 @@ void QnRtspConnectionProcessor::at_camera_parentIdChanged(const QnResourcePtr & 
     }
 }
 
+void QnRtspConnectionProcessor::waitForResourceInitializing(const QnNetworkResourcePtr& resource)
+{
+    constexpr std::chrono::milliseconds kSleepInterval(100);
+    constexpr std::chrono::seconds kWaitTimeout(4);
+    std::chrono::milliseconds overallWait(0);
+    while(!m_needStop && !resource->isInitialized() && overallWait < kWaitTimeout)
+    {
+        std::this_thread::sleep_for(kSleepInterval);
+        overallWait += kSleepInterval;
+    }
+}
+
 void QnRtspConnectionProcessor::createDataProvider()
 {
     Q_D(QnRtspConnectionProcessor);
@@ -992,14 +1004,7 @@ void QnRtspConnectionProcessor::createDataProvider()
             cameraRes->initAsync(true);
 
             // Wait for camera initializing.
-            constexpr std::chrono::milliseconds sleepInterval(100);
-            constexpr std::chrono::seconds waitTimeout(4);
-            std::chrono::milliseconds overallWait(0);
-            while(!m_needStop && !cameraRes->isInitialized() && overallWait < waitTimeout)
-            {
-                std::this_thread::sleep_for(sleepInterval);
-                overallWait += sleepInterval;
-            }
+            waitForResourceInitializing(cameraRes);
         }
     }
     if (camera && d->playbackMode == PlaybackMode::Live)
@@ -1038,10 +1043,6 @@ void QnRtspConnectionProcessor::createDataProvider()
         if (d->liveDpLow) {
             d->liveDpLow->addDataProcessor(d->dataProcessor);
             d->liveDpLow->startIfNotRunning();
-        }
-        else
-        {
-            NX_ERROR(this, "Invalid live data provider resource isInitialized %1", d->mediaRes->toResource()->isInitialized());
         }
     }
     if (!d->archiveDP)
