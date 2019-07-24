@@ -5,7 +5,7 @@
 #include <QtCore/QTimeZone>
 
 namespace nx_hls {
-    
+
 Chunk::Chunk():
     duration(0),
     discontinuity(false)
@@ -47,12 +47,12 @@ QByteArray Playlist::toString() const
     {
         if (chunk.discontinuity)
             playlistStr += "#EXT-X-DISCONTINUITY\r\n";
-        // Generating string 2010-02-19T14:54:23.031+08:00, since QDateTime::setTimeSpec() 
+        // Generating string 2010-02-19T14:54:23.031+08:00, since QDateTime::setTimeSpec()
         //   and QDateTime::toString(Qt::ISODate) do not provide expected result.
         if (chunk.programDateTime)
         {
             playlistStr += "#EXT-X-PROGRAM-DATE-TIME:";
-            playlistStr += chunk.programDateTime.get().toString(Qt::ISODateWithMs); //< data/time.
+            playlistStr += chunk.programDateTime.get().toString(Qt::ISODate); //< data/time.
             playlistStr += "\r\n";
         }
         playlistStr += "#EXTINF:" + QByteArray::number(chunk.duration, 'f', 3) + ",\r\n";
@@ -82,7 +82,7 @@ QByteArray VariantPlaylist::toString() const
             str += "BANDWIDTH=" + QByteArray::number(playlist.bandwidth.get());
         str += "\r\n";
         str += playlist.url.host().isEmpty()
-            ? playlist.url.path().toLatin1() + "?" + 
+            ? playlist.url.path().toLatin1() + "?" +
                 playlist.url.query(QUrl::FullyEncoded).toLatin1()    //< Reporting only path if host not specified.
             : playlist.url.toString(QUrl::FullyEncoded).toLatin1();
         str += "\r\n";
