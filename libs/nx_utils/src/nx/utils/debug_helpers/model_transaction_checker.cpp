@@ -490,7 +490,7 @@ void ModelTransactionChecker::Private::handleDataChanged(
 }
 
 void ModelTransactionChecker::Private::handleLayoutAboutToBeChanged(
-    const QList<QPersistentModelIndex>& parents)
+    const QList<QPersistentModelIndex>& /*parents*/)
 {
     NX_ASSERT(m_currentOperation == Operation::none,
         lm("layoutAboutToBeChanged while another operation is in progress: model=%1, operation=%2")
@@ -500,7 +500,7 @@ void ModelTransactionChecker::Private::handleLayoutAboutToBeChanged(
 }
 
 void ModelTransactionChecker::Private::handleLayoutChanged(
-    const QList<QPersistentModelIndex>& parents)
+    const QList<QPersistentModelIndex>& /*parents*/)
 {
     NX_ASSERT(m_currentOperation == Operation::layoutChange,
         lm("layoutChanged while current operation is not layout change: model=%1, operation=%2")
