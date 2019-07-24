@@ -64,13 +64,12 @@ private:
 
     void addAuthorizationToRequest(network::http::Request* request);
 
-    void handleUploadResult(
-        std::unique_ptr<nx::network::http::AsyncClient> httpClient,
-        CommonHandler userHandler);
-
-    void handleDownloadResult(
-        std::unique_ptr<nx::network::http::AsyncClient> httpClient,
-        DownloadHandler userHandler);
+    template<typename Handler>
+    void doAwsApiCall(
+        const nx::network::http::Method::ValueType& method,
+        const std::string& path,
+        Handler handler,
+        std::unique_ptr<nx::network::http::AbstractMsgBodySource> body = nullptr);
 
     ResultCode getResultCode(const nx::network::http::AsyncClient& httpClient) const;
 };

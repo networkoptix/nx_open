@@ -47,42 +47,27 @@ void ApiClient::uploadFile(
 {
     using namespace nx::network;
 
-    dispatch(
-        [this, destinationPath, data = std::move(data), handler = std::move(handler)]() mutable
+    doAwsApiCall(
+        http::Method::put,
+        destinationPath,
+        [this, handler = std::move(handler)](auto httpClient) mutable
         {
-            auto& context = m_requestPool.add(
-                prepareHttpClient(),
-                [this](auto&&... args) { handleUploadResult(std::forward<decltype(args)>(args)...); },
-                std::move(handler));
-            context.executor->setTimeouts(m_timeouts);
-
-            const auto url = url::Builder(m_url).appendPath(destinationPath);
-            context.executor->doPut(
-                url,
-                std::make_unique<http::BufferSource>("application/octet-stream", std::move(data)),
-                [this, &context]() { m_requestPool.completeRequest(&context); });
-        });
+            handler(getResultCode(*httpClient));
+        },
+        std::make_unique<http::BufferSource>("application/octet-stream", std::move(data)));
 }
 
 void ApiClient::downloadFile(
     const std::string& path,
     DownloadHandler handler)
 {
-    using namespace nx::network;
-
-    dispatch(
-        [this, path, handler = std::move(handler)]() mutable
+    doAwsApiCall(
+        nx::network::http::Method::get,
+        path,
+        [this, handler = std::move(handler)](auto httpClient) mutable
         {
-            auto& context = m_requestPool.add(
-                prepareHttpClient(),
-                [this](auto&&... args) { handleDownloadResult(std::forward<decltype(args)>(args)...); },
-                std::move(handler));
-            context.executor->setTimeouts(m_timeouts);
-
-            const auto url = url::Builder(m_url).appendPath(path);
-            context.executor->doGet(
-                url,
-                [this, &context]() { m_requestPool.completeRequest(&context); });
+            const auto resultCode = getResultCode(*httpClient);
+            return handler(Result(resultCode), httpClient->fetchMessageBodyBuffer());
         });
 }
 
@@ -131,19 +116,34 @@ void ApiClient::addAuthorizationToRequest(network::http::Request* request)
     }
 }
 
-void ApiClient::handleUploadResult(
-    std::unique_ptr<nx::network::http::AsyncClient> httpClient,
-    CommonHandler userHandler)
+template<typename Handler>
+void ApiClient::doAwsApiCall(
+    const nx::network::http::Method::ValueType& method,
+    const std::string& path,
+    Handler handler,
+    std::unique_ptr<nx::network::http::AbstractMsgBodySource> body)
 {
-    userHandler(getResultCode(*httpClient));
-}
+    using namespace nx::network;
 
-void ApiClient::handleDownloadResult(
-    std::unique_ptr<nx::network::http::AsyncClient> httpClient,
-    DownloadHandler userHandler)
-{
-    const auto resultCode = getResultCode(*httpClient);
-    return userHandler(Result(resultCode), httpClient->fetchMessageBodyBuffer());
+    dispatch(
+        [this, method, path, handler = std::move(handler), body = std::move(body)]() mutable
+        {
+            auto& context = m_requestPool.add(
+                prepareHttpClient(),
+                std::move(handler));
+            context.executor->setTimeouts(m_timeouts);
+
+            if (body)
+            {
+                body->bindToAioThread(getAioThread());
+                context.executor->setRequestBody(std::move(body));
+            }
+
+            context.executor->doRequest(
+                method,
+                url::Builder(m_url).appendPath(path),
+                [this, &context]() { m_requestPool.completeRequest(&context); });
+        });
 }
 
 ResultCode ApiClient::getResultCode(const nx::network::http::AsyncClient& httpClient) const
