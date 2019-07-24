@@ -650,7 +650,7 @@ void Worker::downloadChunks()
             {
                 if (data)
                 {
-                    const bool lastChunk = ctx.chunkIndex < m_availableChunks.size() - 1;
+                    const bool lastChunk = ctx.chunkIndex == m_availableChunks.size() - 1;
                     if (!lastChunk)
                     {
                         // Last chunk is usually smaller than others, so skip it.
