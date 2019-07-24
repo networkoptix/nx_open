@@ -403,6 +403,15 @@ QDir ServerUpdateTool::getDownloadDir() const
     return m_outputDir;
 }
 
+uint64_t ServerUpdateTool::getAvailableSpace() const
+{
+    auto downloadDir = getDownloadDir();
+    QStorageInfo storageInfo(downloadDir);
+    uint64_t space = storageInfo.bytesAvailable();
+    uint64_t spaceReserved = nx::update::reservedSpacePadding();
+    return spaceReserved > space ? 0 : space - spaceReserved;
+}
+
 void ServerUpdateTool::startManualDownloads(const UpdateContents& contents)
 {
     NX_ASSERT(m_downloader);
@@ -643,7 +652,9 @@ bool ServerUpdateTool::verifyUpdateManifest(
     clientData.fillDefault();
     clientData.clientId = checkClient ? m_stateTracker->getClientPeerId() : QnUuid();
     clientData.installedVersions = clientVersions;
-    return verifyUpdateContents(commonModule(), contents, activeServers, clientData);
+    VerificationOptions options;
+    options.commonModule = commonModule();
+    return verifyUpdateContents(contents, activeServers, clientData, options);
 }
 
 void ServerUpdateTool::calculateManualDownloadProgress(ProgressInfo& progress)
@@ -888,7 +899,7 @@ bool ServerUpdateTool::requestInstallAction(
                 {
                     success = false;
                     error = InternalError::serverError;
-                    NX_ERROR(tool.data(), "requestInstallAction() - server responded with %1",
+                    NX_ERROR(tool.data(), "requestInstallAction() - server responded with \"%1\"",
                         result.errorString);
                 }
 

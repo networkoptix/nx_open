@@ -9,7 +9,7 @@
 #include <nx/update/update_information.h>
 #include <utils/common/process.h>
 #include <utils/common/util.h>
-#include <nx/utils/app_info.h>
+#include <nx/update/update_check.h>
 #include <audit/audit_manager.h>
 #include <api/model/audit/auth_session.h>
 #include <common/common_module.h>
@@ -67,7 +67,7 @@ void CommonUpdateInstaller::prepareAsync(const QString& path)
         if (requiredSpace < -1)
             return setState(CommonUpdateInstaller::State::cantOpenFile);
 
-        if (!checkFreeSpace(dataDirectoryPath(), requiredSpace + reservedSpacePadding()))
+        if (!checkFreeSpace(dataDirectoryPath(), requiredSpace + update::reservedSpacePadding()))
             return setState(CommonUpdateInstaller::State::noFreeSpace);
     }
 
@@ -157,23 +157,7 @@ bool CommonUpdateInstaller::checkFreeSpaceForInstallation() const
         : m_bytesExtracted / 10;
 
     return checkFreeSpace(
-        QCoreApplication::applicationDirPath(), required + reservedSpacePadding());
-}
-
-qint64 CommonUpdateInstaller::reservedSpacePadding() const
-{
-    // Reasoning for such constant values: QA team asked to make them so.
-    constexpr qint64 kDefaultReservedSpace = 100 * 1024 * 1024;
-    constexpr qint64 kWindowsReservedSpace = 500 * 1024 * 1024;
-    constexpr qint64 kArmReservedSpace = 5 * 1024 * 1024;
-
-    if (nx::utils::AppInfo::isWindows())
-        return kWindowsReservedSpace;
-
-    if (nx::utils::AppInfo::isArm())
-        return kArmReservedSpace;
-
-    return kDefaultReservedSpace;
+        QCoreApplication::applicationDirPath(), required + update::reservedSpacePadding());
 }
 
 CommonUpdateInstaller::State CommonUpdateInstaller::checkContents(const QString& outputPath) const

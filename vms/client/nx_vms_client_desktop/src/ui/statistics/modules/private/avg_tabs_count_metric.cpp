@@ -57,10 +57,7 @@ QString AvgTabsCountMetric::value() const
         overalDuration += duration;
     }
 
-    if (overalDuration != 0)
-        return QString::number(0);
-
-    return QString::number(sum / static_cast<double>(overalDuration));
+    return QString::number(overalDuration == 0 ? 0 : sum / overalDuration);
 }
 
 void AvgTabsCountMetric::reset()

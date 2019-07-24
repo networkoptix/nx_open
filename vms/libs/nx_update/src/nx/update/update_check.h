@@ -127,4 +127,6 @@ QString rootUpdatesDirectoryForDownloader();
 QString updatesDirectoryForDownloader(const QString& publicationKey);
 QString updateFilePathForDownloader(const QString& publicationKey, const QString& fileName);
 
+qint64 reservedSpacePadding();
+
 } // namespace nx::update

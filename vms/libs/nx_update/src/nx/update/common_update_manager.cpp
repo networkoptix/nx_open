@@ -282,7 +282,7 @@ bool CommonUpdateManager::canDownloadFile(
 
     if (!installer()->checkFreeSpace(
         downloader()->downloadsDirectory().absolutePath(),
-        package.size + installer()->reservedSpacePadding()))
+        package.size + update::reservedSpacePadding()))
     {
         *outUpdateStatus = nx::update::Status(
             peerId, update::Status::Code::error, update::Status::ErrorCode::noFreeSpaceToDownload);
