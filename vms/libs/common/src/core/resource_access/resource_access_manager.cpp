@@ -516,8 +516,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissions(
                 subject, targetUser, globalPermissions, hasAccessToResource);
         }
     }
-
-    if (flags.testFlag(Qn::layout))
+    else if (flags.testFlag(Qn::layout))
     {
         const auto layout = target.dynamicCast<QnLayoutResource>();
         if (NX_ASSERT(layout))
@@ -526,18 +525,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissions(
                 subject, layout, globalPermissions, hasAccessToResource);
         }
     }
-
-    if (flags.testFlag(Qn::server_live_cam))
-    {
-        const auto camera = target.dynamicCast<QnVirtualCameraResource>();
-        if (NX_ASSERT(camera))
-        {
-            return calculatePermissionsInternal(
-                subject, camera, globalPermissions, hasAccessToResource);
-        }
-    }
-
-    if (flags.testFlag(Qn::server))
+    else if (flags.testFlag(Qn::server))
     {
         const auto server = target.dynamicCast<QnMediaServerResource>();
         if (NX_ASSERT(server))
@@ -546,8 +534,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissions(
                 subject, server, globalPermissions, hasAccessToResource);
         }
     }
-
-    if (flags.testFlag(Qn::videowall))
+    else if (flags.testFlag(Qn::videowall))
     {
         const auto videowall = target.dynamicCast<QnVideoWallResource>();
         if (NX_ASSERT(videowall))
@@ -556,8 +543,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissions(
                 subject, videowall, globalPermissions, hasAccessToResource);
         }
     }
-
-    if (flags.testFlag(Qn::web_page))
+    else if (flags.testFlag(Qn::web_page))
     {
         const auto webPage = target.dynamicCast<QnWebPageResource>();
         if (NX_ASSERT(webPage))
@@ -567,8 +553,17 @@ Qn::Permissions QnResourceAccessManager::calculatePermissions(
         }
     }
 
-    if (QnStorageResourcePtr storage = target.dynamicCast<QnStorageResource>())
-        return calculatePermissionsInternal(subject, storage, globalPermissions, hasAccessToResource);
+    if (const auto camera = target.dynamicCast<QnVirtualCameraResource>())
+    {
+        return calculatePermissionsInternal(
+            subject, camera, globalPermissions, hasAccessToResource);
+    }
+
+    if (const auto storage = target.dynamicCast<QnStorageResource>())
+    {
+        return calculatePermissionsInternal(
+            subject, storage, globalPermissions, hasAccessToResource);
+    }
 
     if (QnAbstractArchiveResourcePtr archive = target.dynamicCast<QnAbstractArchiveResource>())
         return Qn::ReadPermission | Qn::ExportPermission;
