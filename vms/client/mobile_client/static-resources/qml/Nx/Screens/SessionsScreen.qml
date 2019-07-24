@@ -78,25 +78,18 @@ Page
         {
             id: searchEdit
 
-            property Item placeholder: null
+            property Item placeholder: searchPanel.searching ? null : placeholderHolder
+            property Item placeholderHolder: null
 
             y: 4
             height: 40
             width: parent.width
-            onTextChanged: sessionsList.model.filterWildcard = text
-
-            function handleBackPressed()
+            onTextChanged:
             {
-                var kSomeSmallHeight = 30
-                if (Qt.inputMethod.keyboardRectangle.height > kSomeSmallHeight)
-                    return
-
-                focus = false
-                text = ""
+                sessionsList.model.filterWildcard = text
+                if (!text.length)
+                    sessionsList.positionViewAtBeginning()
             }
-
-            Keys.onEscapePressed: handleBackPressed()
-            Keys.onBackPressed: handleBackPressed()
         }
     }
 
@@ -112,7 +105,7 @@ Page
         {
             width: sessionsList.width
             height: searchPanel.searching || searchPanel.visible ? searchPanel.height : 16
-            Component.onCompleted: searchEdit.placeholder = this
+            Component.onCompleted: searchEdit.placeholderHolder = this
         }
 
         property real horizontalSpacing: 8
