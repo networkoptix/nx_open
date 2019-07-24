@@ -147,4 +147,5 @@ fi
 
 echo -e "Building container at ${SS}${DOCKER_WS}${EE} using mediaserver_deb=$DEB_NAME name=$CONTAINER_NAME"
 cp "$DOCKER_SOURCE/manage.sh" "$DOCKER_WS"
-docker build -t $CONTAINER_NAME --build-arg mediaserver_deb="$DEB_NAME" --build-arg cloud_host="$CLOUD_OVERRIDE" -f - . < $DOCKERFILE
+cp "$DOCKER_SOURCE/Dockerfile" "$DOCKER_WS"
+docker build -t $CONTAINER_NAME --build-arg mediaserver_deb="$DEB_NAME" --build-arg cloud_host="$CLOUD_OVERRIDE" .
