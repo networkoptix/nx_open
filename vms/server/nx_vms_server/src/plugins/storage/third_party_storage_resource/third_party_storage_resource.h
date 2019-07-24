@@ -5,6 +5,7 @@
 #include "core/resource/storage_resource.h"
 #include <storage/third_party_storage.h>
 #include <nx/utils/thread/mutex.h>
+#include <nx/sdk/helpers/ptr.h>
 
 namespace nx::vms::server { class Settings; }
 
@@ -12,18 +13,18 @@ class QnThirdPartyStorageResource: public QnStorageResource
 {
     using base_type = QnStorageResource;
 public: //typedefs
-    typedef std::shared_ptr<
+    typedef nx::sdk::Ptr<
         nx_spl::Storage
     > StoragePtrType;
 
     typedef nx_spl::StorageFactory *StorageFactoryPtrType;
 
 
-    typedef std::shared_ptr<
+    typedef nx::sdk::Ptr<
         nx_spl::FileInfoIterator
     > FileInfoIteratorPtrType;
 
-    typedef std::shared_ptr<
+    typedef nx::sdk::Ptr<
         nx_spl::IODevice
     > IODevicePtrType;
 
@@ -72,7 +73,7 @@ public: // inherited interface overrides
 private:
     void openStorage(
         const char                  *storageUrl,
-        const StorageFactoryPtrType &sf
+        const StorageFactoryPtrType &storageFactory
     );
 private:
     StoragePtrType                      m_storage;

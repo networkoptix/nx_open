@@ -6,6 +6,8 @@
 #include "utils/fs/file.h"
 #include <media_server/media_server_module.h>
 
+using namespace nx::sdk;
+
 namespace aux
 {
     class ThirdPartyIODevice
@@ -188,57 +190,27 @@ QnThirdPartyStorageResource::QnThirdPartyStorageResource(
 }
 
 void QnThirdPartyStorageResource::openStorage(
-    const char                  *storageUrl,
-    const StorageFactoryPtrType &sf
-)
+    const char* storageUrl, const StorageFactoryPtrType& storageFactory)
 {
     QnMutexLocker lock(&m_mutex);
 
-    int ecode;
-    nx_spl::Storage* spRaw = sf->createStorage(storageUrl, &ecode);
+    int errorCode;
+    const auto storage = toPtr(storageFactory->createStorage(storageUrl, &errorCode));
 
-    if (ecode != nx_spl::error::NoError)
-    {
-        if (spRaw != nullptr)
-            spRaw->releaseRef();
-        throw std::runtime_error("Couldn't create Storage");
-    }
-
-    if (spRaw == nullptr)
+    if (errorCode != nx_spl::error::NoError)
         throw std::runtime_error("Couldn't create Storage");
 
-    // TODO: Migrate to nx::sdk::Ptr.
+    if (!storage)
+        throw std::runtime_error("Couldn't create Storage");
 
-    std::shared_ptr<nx_spl::Storage> sp =
-        std::shared_ptr<nx_spl::Storage>(
-            spRaw,
-            [](nx_spl::Storage* p)
-            {
-                p->releaseRef();
-            }
-        );
-
-    void* queryResult = nullptr;
-    if (queryResult = sp->queryInterface(nx_spl::IID_Storage))
-    {
-        m_storage.reset(
-            static_cast<nx_spl::Storage*>(queryResult),
-            [](nx_spl::Storage* p)
-            {
-                p->releaseRef();
-            }
-        );
-    }
-    else
-    {
+    if (!queryInterfacePtr<nx_spl::Storage>(storage, nx_spl::IID_Storage))
         throw std::logic_error("Unknown storage interface version");
-    }
+
+    m_storage = storage;
 }
 
 QIODevice *QnThirdPartyStorageResource::open(
-    const QString       &fileName,
-    QIODevice::OpenMode  openMode
-)
+    const QString& fileName, QIODevice::OpenMode openMode)
 {
     if (!m_valid)
         return nullptr;
@@ -246,7 +218,7 @@ QIODevice *QnThirdPartyStorageResource::open(
     if (fileName.isEmpty())
         return nullptr;
 
-    int ecode;
+    int errorCode;
     int ioFlags = 0;
 
     if (openMode & QIODevice::ReadOnly)
@@ -254,72 +226,41 @@ QIODevice *QnThirdPartyStorageResource::open(
     if (openMode & QIODevice::WriteOnly)
         ioFlags |= nx_spl::io::WriteOnly;
 
-    // TODO: Migrate to nx::sdk::Ptr.
-
-    nx_spl::IODevice* ioRaw = m_storage->open(
+    const auto ioDevice = toPtr(m_storage->open(
         QUrl(fileName).path().toLatin1().constData(),
         ioFlags,
-        &ecode
-    );
+        &errorCode));
 
-    if (ioRaw == nullptr)
-        return nullptr;
-    else if (ecode != nx_spl::error::NoError)
+    if (!ioDevice || errorCode != nx_spl::error::NoError
+        || !queryInterfacePtr<nx_spl::IODevice>(ioDevice, nx_spl::IID_IODevice))
     {
-        ioRaw->releaseRef();
         return nullptr;
     }
 
-    void* queryResult = ioRaw->queryInterface(nx_spl::IID_IODevice);
-    if (queryResult == nullptr)
+    int ioBlockSize = 0;
+    int ffmpegBufferSize = 0;
+
+    const int ffmpegMaxBufferSize = m_settings->maxFfmpegBufferSize();
+
+    if (openMode & QIODevice::WriteOnly)
     {
-        ioRaw->releaseRef();
+        ioBlockSize = m_settings->ioBlockSize();
+        ffmpegBufferSize = m_settings->ffmpegBufferSize();
+    }
+
+    std::unique_ptr<QBufferedFile> result(
+        new QBufferedFile(
+            std::shared_ptr<IQnFile>(
+                new aux::ThirdPartyFile(
+                    fileName,
+                    std::make_shared<aux::ThirdPartyIODevice>(ioDevice, openMode))),
+            ioBlockSize,
+            ffmpegBufferSize,
+            ffmpegMaxBufferSize,
+            getId()));
+    if (!result->open(openMode))
         return nullptr;
-    }
-    else
-    {
-        ioRaw->releaseRef();
-
-        int ioBlockSize = 0;
-        int ffmpegBufferSize = 0;
-
-        int ffmpegMaxBufferSize =
-            m_settings->maxFfmpegBufferSize();
-
-        if (openMode & QIODevice::WriteOnly)
-        {
-            ioBlockSize = m_settings->ioBlockSize();
-            ffmpegBufferSize = m_settings->ffmpegBufferSize();
-        }
-        std::unique_ptr<QBufferedFile> rez(
-            new QBufferedFile(
-                std::shared_ptr<IQnFile>(
-                    new aux::ThirdPartyFile(
-                        fileName,
-                        std::shared_ptr<aux::ThirdPartyIODevice>(
-                            new aux::ThirdPartyIODevice(
-                                IODevicePtrType(
-                                    static_cast<nx_spl::IODevice*>(queryResult),
-                                    [](nx_spl::IODevice *p)
-                                    {
-                                        p->releaseRef();
-                                    }
-                                ),
-                                openMode
-                            )
-                        )
-                    )
-                ),
-                ioBlockSize,
-                ffmpegBufferSize,
-                ffmpegMaxBufferSize,
-                getId()
-            )
-        );
-        if (!rez->open(openMode))
-            return nullptr;
-        return rez.release();
-    }
+    return result.release();
 }
 
 int QnThirdPartyStorageResource::getCapabilities() const
@@ -412,68 +353,39 @@ QnAbstractStorageResource::FileInfoList
 QnThirdPartyStorageResource::getFileList(const QString& dirName)
 {
     if (!m_valid)
-        return QnAbstractStorageResource::FileInfoList();
-
-    // TODO: Migrate to nx::sdk::Ptr.
+        return FileInfoList();
 
     QnMutexLocker lock(&m_mutex);
-    int ecode;
-    nx_spl::FileInfoIterator* fitRaw = m_storage->getFileIterator(
+
+    int errorCode;
+    const auto fileInfoIterator = toPtr(m_storage->getFileIterator(
         urlToPath(dirName).toLatin1().constData(),
-        &ecode
-    );
-    if (fitRaw == nullptr)
-        return QnAbstractStorageResource::FileInfoList();
-
-    if (ecode != nx_spl::error::NoError)
+        &errorCode));
+    if (!fileInfoIterator || errorCode != nx_spl::error::NoError
+        || !queryInterfacePtr<nx_spl::FileInfoIterator>(
+            fileInfoIterator, nx_spl::IID_FileInfoIterator))
     {
-        fitRaw->releaseRef();
-        return QnAbstractStorageResource::FileInfoList();
+        return FileInfoList();
     }
 
-    void* queryResult = fitRaw->queryInterface(nx_spl::IID_FileInfoIterator);
-    if (queryResult == nullptr)
+    FileInfoList result;
+    for (;;)
     {
-        fitRaw->releaseRef();
-        return QnAbstractStorageResource::FileInfoList();
+        nx_spl::FileInfo* const fileInfo = fileInfoIterator->next(&errorCode);
+
+        if (fileInfo == nullptr || errorCode != nx_spl::error::NoError)
+            break;
+
+        QString urlString = QString::fromLatin1(fileInfo->url);
+        if (!urlString.contains("://"))
+            urlString = QUrl(dirName).toString(QUrl::RemovePath) + QString::fromLatin1(fileInfo->url);
+
+        result.append(FileInfo(
+            urlString,
+            fileInfo->size,
+            fileInfo->type & nx_spl::isDir));
     }
-    else
-    {
-        FileInfoIteratorPtrType fit = FileInfoIteratorPtrType(
-            static_cast<nx_spl::FileInfoIterator*>(queryResult),
-            [](nx_spl::FileInfoIterator *p)
-            {
-                p->releaseRef();
-            }
-        );
-        fitRaw->releaseRef();
-
-        if (!fit)
-            return QnAbstractStorageResource::FileInfoList();
-
-        QnAbstractStorageResource::FileInfoList ret;
-        while (true)
-        {
-            int ecode;
-            nx_spl::FileInfo *fi = fit->next(&ecode);
-
-            if (fi == nullptr || ecode != nx_spl::error::NoError)
-                break;
-
-            QString urlString = QString::fromLatin1(fi->url);
-            if (!urlString.contains("://"))
-                urlString = QUrl(dirName).toString(QUrl::RemovePath) + QString::fromLatin1(fi->url);
-
-            ret.append(
-                QnAbstractStorageResource::FileInfo(
-                    urlString,
-                    fi->size,
-                    (fi->type & nx_spl::isDir) ? true : false
-                )
-            );
-        }
-        return ret;
-    }
+    return result;
 }
 
 bool QnThirdPartyStorageResource::isFileExists(const QString& url)
