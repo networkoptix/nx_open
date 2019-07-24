@@ -201,7 +201,7 @@
         <resource name = "3355" public = "3556"/>        
         <resource name = "3356" public = "3556"/>     
         <resource name = "1355" public = "1225"/>  
-        <resource name = "20375" public = "20365"/>        
+        <resource name = "20375" public = "20365"/>
         <resource name = "08ZMD-300" public = "08ZMD-400"/>
         <resource name = "02CLD-100" public = "ArecontVision_Abstract,ArecontVision_H264">
             <params>
@@ -259,5 +259,8 @@
         </resource>
         <resource name = "08ZMV-300" public = "08ZMD-400"/>
         <resource name = "12ZMV" public = "12ZMD-401"/>
+        <resource name = "20975" public = "20365"/>
+        <resource name = "12975" public = "12375"/>
+        <resource name = "12976" public = "12375"/>
     </oem>
 </resources>

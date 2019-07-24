@@ -153,29 +153,27 @@ public:
         // NOTE: not locking mutex because all public method calls are synchronized
         // by caller and no request interleaving is allowed.
         m_socket = nx::network::SocketFactory::createStreamSocket(
-            false,
+            /*sslRequired*/ false,
             nx::network::NatTraversalSupport::disabled);
 
-        m_syncWrapper->soap()->user = this;
-        m_syncWrapper->soap()->fconnect = [](struct soap*, const char*, const char*, int){ return SOAP_OK; };
-        m_syncWrapper->soap()->fdisconnect = [](struct soap*){ return SOAP_OK; };
-        m_syncWrapper->soap()->fsend = &custom_soap_fsend<typename std::remove_reference<decltype(*this)>::type>;
-        m_syncWrapper->soap()->frecv = &custom_soap_frecv<typename std::remove_reference<decltype(*this)>::type>;
-        m_syncWrapper->soap()->fopen = NULL;
-        m_syncWrapper->soap()->fclose = [](struct soap*){ return SOAP_OK; };
-        m_syncWrapper->soap()->fclosesocket = [](struct soap*, SOAP_SOCKET){ return SOAP_OK; };
-        m_syncWrapper->soap()->fshutdownsocket = [](struct soap*, SOAP_SOCKET, int){ return SOAP_OK; };
-        m_syncWrapper->soap()->socket = m_socket->handle();
-        m_syncWrapper->soap()->master = m_socket->handle();
+        struct soap* soap = m_syncWrapper->soap();
+        soap->user = this;
+        soap->fconnect = [](struct soap*, const char*, const char*, int){ return SOAP_OK; };
+        soap->fdisconnect = [](struct soap*){ return SOAP_OK; };
+        soap->fsend = &custom_soap_fsend<typename std::remove_reference<decltype(*this)>::type>;
+        soap->frecv = &custom_soap_frecv<typename std::remove_reference<decltype(*this)>::type>;
+        soap->fopen = NULL;
+        soap->fclose = [](struct soap*){ return SOAP_OK; };
+        soap->fclosesocket = [](struct soap*, SOAP_SOCKET){ return SOAP_OK; };
+        soap->fshutdownsocket = [](struct soap*, SOAP_SOCKET, int){ return SOAP_OK; };
+        soap->socket = m_socket->handle();
+        soap->master = m_socket->handle();
 
         //serializing request
         m_request = std::forward<RequestType>(request);
-
-        const QUrl endpoint(QLatin1String(m_syncWrapper->endpoint()));
-
-        using namespace std::placeholders;
-        if (!m_socket->setSendTimeout(SOAP_SOCKET_TIMEOUT_MS) ||
-            !m_socket->setRecvTimeout(SOAP_SOCKET_TIMEOUT_MS) ||
+        constexpr int kMsPerSecond = 1000;
+        if (!m_socket->setSendTimeout(soap->send_timeout * kMsPerSecond) ||
+            !m_socket->setRecvTimeout(soap->recv_timeout * kMsPerSecond) ||
             !m_socket->setNonBlockingMode(true))
         {
             m_socket->post(std::bind(
@@ -185,6 +183,8 @@ public:
             return;
         }
 
+        const QUrl endpoint(QLatin1String(m_syncWrapper->endpoint()));
+        using namespace std::placeholders;
         m_socket->connectAsync(
             nx::network::SocketAddress(endpoint.host(), endpoint.port(nx::network::http::DEFAULT_HTTP_PORT)),
             std::bind(&GSoapAsyncCallWrapper::onConnectCompleted, this, _1));

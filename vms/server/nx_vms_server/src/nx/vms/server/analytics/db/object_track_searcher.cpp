@@ -194,8 +194,12 @@ bool ObjectTrackSearcher::satisfiesFilter(
         return false;
     }
 
-    if (!nx::utils::contains(filter.deviceIds, track.deviceId))
+    // Matching every device if device list is empty.
+    if (!filter.deviceIds.empty() &&
+        !nx::utils::contains(filter.deviceIds, track.deviceId))
+    {
         return false;
+    }
 
     if (!(microseconds(track.lastAppearanceTimeUs) >= filter.timePeriod.startTime() &&
           (filter.timePeriod.isInfinite() ||
@@ -299,7 +303,7 @@ std::vector<ObjectTrack> ObjectTrackSearcher::lookupTracksUsingArchive(
 {
     auto archiveFilter =
         AnalyticsArchiveDirectory::prepareArchiveFilter(m_filter, m_objectTypeDao);
-    // NOTE: We are always searching for newest tracks.
+    // NOTE: We are always searching for newest objects.
     // The sortOrder is applied to the lookup result.
     archiveFilter.sortOrder = Qt::DescendingOrder;
 

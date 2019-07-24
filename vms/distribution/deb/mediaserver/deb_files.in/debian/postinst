@@ -33,9 +33,9 @@ SYSTEM_USER=$COMPANY_NAME
 TARGET_DEVICE='@targetDevice@'
 WITH_ROOT_TOOL='@withRootTool@'
 
-isSystemdUsed()
+isInDockerContainer()
 {
-    [[ $(readlink -m /sbin/init) =~ .*systemd$ ]]
+    [[ $(cat "/var/run/systemd/container" 2>/dev/null) == "docker" ]]
 }
 
 isRpi()
@@ -129,7 +129,7 @@ checkNewSystem()
     return 0
 }
 
-displayCompleteSetupHint()
+displayCompleteSetupHintIfNeeded()
 {
     local -i port="$1"
 
@@ -156,11 +156,14 @@ installModificationSpecificConfig()
 # This is necessary because changed configuration options should take effect
 # immediately.
 
-service $COMPANY_NAME-mediaserver stop || true
-
-if [[ $WITH_ROOT_TOOL == 'true' ]]
+if ! isInDockerContainer
 then
-    service $COMPANY_NAME-root-tool stop || true
+    systemctl stop $COMPANY_NAME-mediaserver || true
+
+    if [[ $WITH_ROOT_TOOL == 'true' ]]
+    then
+        systemctl stop $COMPANY_NAME-root-tool || true
+    fi
 fi
 
 case "$1" in
@@ -243,9 +246,12 @@ case "$1" in
 esac
 
 # Dirty hack to prevent apport from catching our crash dumps.
-echo manual > /etc/init/apport.override
-systemctl disable apport >/dev/null 2>&1 || true
-service apport stop >/dev/null 2>&1 || true
+systemctl disable apport &>/dev/null || true
+
+if ! isInDockerContainer
+then
+    systemctl stop apport &>/dev/null || true
+fi
 
 [[ -L "${BASE_DIR}/lib/ffmpeg" ]] && unlink "${BASE_DIR}/lib/ffmpeg"
 
@@ -264,40 +270,40 @@ fi
 
 installModificationSpecificConfig
 
-if isSystemdUsed
+# Systemd requires explicit enabling of the service to start it on boot.
+if [[ $WITH_ROOT_TOOL == 'true' ]]
 then
-    # Systemd requires explicit enabling of the service to start it on boot.
-    if [[ $WITH_ROOT_TOOL == 'true' ]]
-    then
-        systemctl enable $COMPANY_NAME-root-tool || exit $?
-    fi
-
-    systemctl enable $COMPANY_NAME-mediaserver || exit $?
+    systemctl enable $COMPANY_NAME-root-tool || exit $?
 fi
+
+systemctl enable $COMPANY_NAME-mediaserver || exit $?
 
 startServer()
 {
     if [[ $WITH_ROOT_TOOL == 'true' ]]
     then
-        service $COMPANY_NAME-root-tool start || return $?
+        systemctl start $COMPANY_NAME-root-tool || return $?
     fi
 
-    service $COMPANY_NAME-mediaserver start
+    systemctl start $COMPANY_NAME-mediaserver
+
+    sleep 1
+    if ! PID=$(pidof mediaserver-bin)
+    then
+        echo "ERROR: Server process not found though 'systemd ... start' reported success." >&2
+        exit 1
+    fi
+    
+    echo "Started service with PID $PID."
 }
 
-if ! startServer
+if ! isInDockerContainer
 then
-    echo "ERROR: Unable to start Server." >&2
-    exit 1
+    if ! startServer
+    then
+        echo "ERROR: Unable to start Server." >&2
+        exit 1
+    fi
+
+    displayCompleteSetupHintIfNeeded $PORT
 fi
-
-sleep 1
-if ! PID=$(pidof mediaserver-bin)
-then
-    echo "ERROR: Server process not found though 'systemd ... start' reported success." >&2
-    exit 1
-fi
-
-echo "Started service with PID $PID."
-
-displayCompleteSetupHint $PORT

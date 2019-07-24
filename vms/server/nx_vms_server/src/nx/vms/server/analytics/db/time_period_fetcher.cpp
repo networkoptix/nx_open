@@ -77,7 +77,7 @@ QnTimePeriodList TimePeriodFetcher::selectTimePeriodsFiltered(
     const Filter& filter,
     const TimePeriodsLookupOptions& options)
 {
-    AnalyticsArchive::Filter archiveFilter =
+    ArchiveFilter archiveFilter =
         AnalyticsArchiveDirectory::prepareArchiveFilter(filter, m_objectTypeDao);
     archiveFilter.detailLevel = options.detailLevel;
 

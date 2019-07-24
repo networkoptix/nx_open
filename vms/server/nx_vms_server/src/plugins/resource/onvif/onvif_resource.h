@@ -497,13 +497,20 @@ protected:
 
     qreal getBestSecondaryCoeff(const QList<QSize> resList, qreal aspectRatio) const;
     int getSecondaryIndex(const QList<VideoEncoderCapabilities>& optList) const;
+
+    void readSubscriptionReferenceParameters(
+        wsa5__EndpointReferenceType& SubscriptionReference);
+
     //!Registers local NotificationConsumer in resource's NotificationProducer
     bool registerNotificationConsumer();
     void updateFirmware();
     void scheduleRetrySubscriptionTimer();
+    void scheduleRetrySubscriptionTimerAsOdm();
     virtual bool subscribeToCameraNotifications();
 
     bool createPullPointSubscription();
+    bool createPullPointSubscriptionAsOdm();
+
     bool loadXmlParametersInternal(
         QnCameraAdvancedParams &params, const QString& paramsTemplateFileName) const;
     void setMaxChannels(int value);
@@ -527,9 +534,7 @@ private:
     class SubscriptionReferenceParametersParseHandler: public QXmlDefaultHandler
     {
     public:
-        QString subscriptionID;
-
-        SubscriptionReferenceParametersParseHandler();
+        std::string subscriptionID;
 
         virtual bool characters(const QString& ch) override;
         virtual bool startElement(const QString& namespaceURI, const QString& localName,
@@ -538,7 +543,7 @@ private:
             const QString& qName) override;
 
     private:
-        bool m_readingSubscriptionID;
+        bool m_readingSubscriptionID = false;
     };
 
     struct onvifSimpleItem
@@ -614,7 +619,7 @@ private:
     bool m_fixWrongInputPortNumber;
     bool m_fixWrongOutputPortToken;
     std::map<QString, RelayInputState> m_relayInputStates;
-    QString m_onvifNotificationSubscriptionID;
+    std::string m_onvifNotificationSubscriptionID;
     mutable QnMutex m_ioPortMutex;
     bool m_inputMonitored;
     qint64 m_clearInputsTimeoutUSec;
@@ -632,6 +637,7 @@ private:
 
     QElapsedTimer m_pullMessagesResponseElapsedTimer;
     QSharedPointer<GSoapAsyncPullMessagesCallWrapper> m_asyncPullMessagesCallWrapper;
+    std::future<void> m_renewPullCicleFuture;
 
     QString m_portNamePrefixToIgnore;
     size_t m_inputPortCount;
@@ -642,8 +648,17 @@ private:
     std::unique_ptr<std::string> m_profile;
 
     void removePullPointSubscription();
+
+    SOAP_ENV__Header* createPullMessagesRequestHeader(std::vector<void*>& memoryPool);
     void pullMessages(quint64 timerID);
+    void pullMessagesAsOdm();
     void onPullMessagesDone(GSoapAsyncPullMessagesCallWrapper* asyncWrapper, int resultCode);
+
+    void nextRenewPullCicleAsOdm(GSoapAsyncPullMessagesCallWrapper* asyncWrapper, int resultCode);
+    void onPullMessagesDoneAsOdm(GSoapAsyncPullMessagesCallWrapper* asyncWrapper, int resultCode);
+
+    bool RenewSubscriptionAsOdm();
+
     /**
      * Used for cameras that do not support renew request.
      */
