@@ -3,23 +3,23 @@
 from __future__ import print_function
 import os
 import sys
-import time
 import distutils.spawn
 import rdep_config
 
 DEPRECATED_SYNC_URLS = [
     "rsync://enk.me/buildenv/rdep/packages",
-    "rsync://mono.enk.me/buildenv/rdep/packages"
+    "rsync://mono.enk.me/buildenv/rdep/packages",
+    "rsync://rdep.enk.me/buildenv/rdep/packages",
+    "rsync://la.hdw.mx/buildenv/rdep/packages",
 ]
-SYNC_URL = "rsync://rdep.enk.me/buildenv/rdep/packages"
-if time.timezone == 28800:
-    SYNC_URL = "rsync://la.hdw.mx/buildenv/rdep/packages"
+SYNC_URL = "rsync://rdep.lan.hdw.mx/rdep"
 
 DEPRECATED_PUSH_URLS = [
     "rsync@enk.me:buildenv/rdep/packages",
-    "rsync@mono.enk.me:buildenv/rdep/packages"
+    "rsync@mono.enk.me:buildenv/rdep/packages",
+    "rsync@rdep.enk.me:buildenv/rdep/packages",
 ]
-PUSH_URL = "rsync@rdep.enk.me:buildenv/rdep/packages"
+PUSH_URL = "rsync@rdep.lan.hdw.mx:rdep"
 
 
 OS_IS_WINDOWS = sys.platform.startswith("win32") or sys.platform.startswith("cygwin")
