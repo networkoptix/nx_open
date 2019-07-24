@@ -978,8 +978,12 @@
             "isRTSPSupported": false
         },
         {
-            "keys": ["ArecontVision|20185DN"],
+            "keys": ["ArecontVision|20185DN", "ArecontVision|AV20CPD-118"],
             "forceRtspSupport": true
+        },
+        {
+            "keys": ["ArecontVision|AV20CPD-118"],
+            "totalMdZones": 1024
         },
         {
             "keys": ["ArecontVision|*"],

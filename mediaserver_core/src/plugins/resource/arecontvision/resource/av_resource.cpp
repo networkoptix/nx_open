@@ -237,14 +237,23 @@ CameraDiagnostics::Result QnPlAreconVisionResource::initializeCameraDriver()
     if (!setApiParameter(lit("motiondetect"), lit("on"))) // enables motion detection;
         return CameraDiagnostics::RequestFailedResult(lit("Enable motion detection"), lit("unknown"));
 
-    // check if we've got 1024 zones
-    QString totalZones = QString::number(1024);
-    setApiParameter(lit("mdtotalzones"), totalZones); // try to set total zones to 64; new cams support it
-    if (!getApiParameter(lit("mdtotalzones"), totalZones))
-        return CameraDiagnostics::RequestFailedResult(lit("TotalZones"), lit("unknown"));
+    auto resData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
+    int totalZonesInt = resData.value<int>(lit("totalMdZones"), 0);
+    if (totalZonesInt > 0)
+    {
+        m_totalMdZones = totalZonesInt;
+    }
+    else
+    {
+        // check if we've got 1024 zones
+        QString totalZones = QString::number(1024);
+        setApiParameter(lit("mdtotalzones"), totalZones); // try to set total zones to 64; new cams support it
+        if (!getApiParameter(lit("mdtotalzones"), totalZones))
+            return CameraDiagnostics::RequestFailedResult(lit("TotalZones"), lit("unknown"));
 
-    if (totalZones.toInt() == 1024)
-        m_totalMdZones = 1024;
+        if (totalZones.toInt() == 1024)
+            m_totalMdZones = 1024;
+    }
 
     // lets set zone size
     //one zone - 32x32 pixels; zone sizes are 1-15
@@ -693,9 +702,10 @@ bool QnPlAreconVisionResource::isRTSPSupported() const
     auto cameraSupportsH264 = isH264();
     auto cameraSupportsRtsp = resData.value<bool>(lit("isRTSPSupported"), true);
     auto rtspIsForcedOnCamera = resData.value<bool>(lit("forceRtspSupport"), false);
+    if (rtspIsForcedOnCamera)
+        return true;
 
-    return arecontRtspIsAllowed
-        && ((cameraSupportsH264 && cameraSupportsRtsp) || rtspIsForcedOnCamera);
+    return arecontRtspIsAllowed && cameraSupportsH264 && cameraSupportsRtsp;
 }
 
 QnCameraAdvancedParams QnPlAreconVisionResource::AvParametersProvider::descriptions()
