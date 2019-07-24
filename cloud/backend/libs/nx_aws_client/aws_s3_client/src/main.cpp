@@ -9,34 +9,6 @@
 
 #include <nx/cloud/aws/api_client.h>
 
-void printHelp(const char* name);
-int upload(const nx::utils::ArgumentParser& arguments);
-int download(const nx::utils::ArgumentParser& arguments);
-
-int main(int argc, const char* argv[])
-{
-    nx::utils::ArgumentParser arguments(argc - 1, argv + 1);
-
-    nx::utils::log::initializeGlobally(arguments);
-
-    if (arguments.contains("h") || arguments.contains("help"))
-    {
-        printHelp(argv[0]);
-        return 0;
-    }
-
-    nx::network::SocketGlobalsHolder socketGlobalsHolder;
-
-    if (arguments.contains("u"))
-        return upload(arguments);
-    else
-        return download(arguments);
-
-    return 0;
-}
-
-//-------------------------------------------------------------------------------------------------
-
 void printHelp(const char* name)
 {
     std::cout <<
@@ -49,7 +21,7 @@ void printHelp(const char* name)
         "Usage examples: " << std::endl <<
         "   To download and print to STDOUT use \"" << name << " [URL]\"." << std::endl <<
         "   To download and save to file use \"" << name << " [URL] -O file\"." << std::endl <<
-        "   To upload file: \"" << name << " -u file [URL]\"" <<
+        "   To upload file: \"" << name << " -u -i file [URL]\"" <<
         std::endl <<
         std::endl;
 }
@@ -105,17 +77,99 @@ struct CommonSettings
     }
 };
 
-std::unique_ptr<nx::cloud::aws::ApiClient>
-    prepareApiClient(const CommonSettings& settings)
+template<typename Settings>
+class AbstractOperation
 {
-    return std::make_unique<nx::cloud::aws::ApiClient>(
-        "cmd_line_client",
-        settings.region,
-        nx::utils::Url(settings.url),
-        nx::network::http::Credentials(
-            settings.user.c_str(),
-            nx::network::http::PasswordAuthToken(settings.password.c_str())));
-}
+public:
+    AbstractOperation(const nx::utils::ArgumentParser& arguments):
+        m_arguments(arguments)
+    {
+    }
+
+    int run()
+    {
+        bool result = false;
+        std::tie(m_settings, result) = Settings::read(m_arguments);
+        if (!result)
+            return 1;
+
+        if constexpr (std::is_same_v<Settings, CommonSettings>)
+            m_client = prepareApiClient(m_settings);
+        else
+            m_client = prepareApiClient(m_settings.common);
+
+        return runImpl();
+    }
+
+protected:
+    const nx::utils::ArgumentParser& m_arguments;
+    Settings m_settings;
+    std::unique_ptr<nx::cloud::aws::ApiClient> m_client;
+
+    virtual int runImpl() = 0;
+
+    std::unique_ptr<nx::cloud::aws::ApiClient>
+        prepareApiClient(const CommonSettings& settings)
+    {
+        return std::make_unique<nx::cloud::aws::ApiClient>(
+            "cmd_line_client",
+            settings.region,
+            nx::utils::Url(settings.url),
+            nx::network::http::Credentials(
+                settings.user.c_str(),
+                nx::network::http::PasswordAuthToken(settings.password.c_str())));
+    }
+
+    template<typename Func>
+    struct DeriveResultTupleFromHandler;
+
+    template<typename... Args>
+    struct DeriveResultTupleFromHandler<nx::utils::MoveOnlyFunc<void(Args...)>>
+    {
+        using type = std::tuple<Args...>;
+    };
+
+    template <typename... Args>
+    struct select_last;
+
+    template <typename T>
+    struct select_last<T>
+    {
+        using type = T;
+    };
+
+    template <typename T, typename... Args>
+    struct select_last<T, Args...>
+    {
+        using type = typename select_last<Args...>::type;
+    };
+
+    template<typename... InputArgs, typename... FuncInputArgs,
+        typename Handler = typename select_last<FuncInputArgs...>::type,
+        typename OutputTuple = typename DeriveResultTupleFromHandler<Handler>::type
+    >
+    OutputTuple invoke(
+        void (nx::cloud::aws::ApiClient::*func)(FuncInputArgs...),
+        InputArgs&&... inputArgs)
+    {
+        std::promise<OutputTuple> done;
+        (m_client.get()->*func)(
+            std::forward<InputArgs>(inputArgs)...,
+            [&done](auto&&... result)
+            {
+                done.set_value(std::make_tuple(std::forward<decltype(result)>(result)...));
+            });
+
+        auto resultTuple = done.get_future().get();
+        if (!std::get<0>(resultTuple).ok())
+        {
+            std::cerr << "Error: " << std::get<0>(resultTuple).text() << std::endl;
+            return resultTuple;
+        }
+
+        return resultTuple;
+    }
+};
 
 //-------------------------------------------------------------------------------------------------
 
@@ -141,37 +195,37 @@ struct UploadSettings
     }
 };
 
-int upload(const nx::utils::ArgumentParser& arguments)
+class UploadOperation:
+    public AbstractOperation<UploadSettings>
 {
-    using namespace nx::cloud::aws;
+    using base_type = AbstractOperation;
 
-    const auto [settings, result] = UploadSettings::read(arguments);
-    if (!result)
-        return 1;
+public:
+    using base_type::base_type;
 
-    auto client = prepareApiClient(settings.common);
-
-    std::ifstream contentFile(settings.inputFilePath, std::ios_base::in | std::ios_base::binary);
-    if (!contentFile.is_open())
-        return false;
-    std::stringstream contents;
-    contents << contentFile.rdbuf();
-
-    std::promise<Result> done;
-    client->uploadFile(
-        std::filesystem::path(settings.inputFilePath).filename().string(),
-        nx::Buffer::fromStdString(contents.str()),
-        [&done](auto result) { done.set_value(result); });
-
-    const auto uploadResult = done.get_future().get();
-    if (!uploadResult.ok())
+    virtual int runImpl() override
     {
-        std::cerr << "Error: " << uploadResult.text() << std::endl;
-        return 2;
-    }
+        std::ifstream contentFile(
+            m_settings.inputFilePath,
+            std::ios_base::in | std::ios_base::binary);
+        if (!contentFile.is_open())
+            return false;
+        std::stringstream contents;
+        contents << contentFile.rdbuf();
 
-    return 0;
-}
+        std::string uploadPath;
+        const nx::utils::Url url(m_settings.common.url.c_str());
+        if (!std::filesystem::path(url.path().toStdString()).has_filename())
+            uploadPath = std::filesystem::path(m_settings.inputFilePath).filename().string();
+
+        const auto [uploadResult] = invoke(
+            &nx::cloud::aws::ApiClient::uploadFile,
+            uploadPath,
+            nx::Buffer::fromStdString(contents.str()));
+
+        return uploadResult.ok() ? 0 : 2;
+    }
+};
 
 //-------------------------------------------------------------------------------------------------
 
@@ -197,44 +251,61 @@ struct DownloadSettings
     }
 };
 
-int writeTo(const std::string& path, const nx::Buffer& data)
+class DownloadOperation:
+    public AbstractOperation<DownloadSettings>
 {
-    if (!path.empty())
+    using base_type = AbstractOperation;
+
+public:
+    using base_type::base_type;
+
+    virtual int runImpl() override
     {
-        // TODO: Saving to file.
+        const auto [downloadResult, fileContents] = invoke(
+            &nx::cloud::aws::ApiClient::downloadFile,
+            "");
+        if (!downloadResult.ok())
+            return 2;
+
+        return writeTo(m_settings.outputFilePath, fileContents);
     }
+
+private:
+    int writeTo(const std::string& path, const nx::Buffer& data)
+    {
+        if (!path.empty())
+        {
+            // TODO: Saving to file.
+        }
+        else
+        {
+            std::cout << std::string_view(data.data(), data.size()) << std::endl;
+        }
+
+        return 0;
+    }
+};
+
+//-------------------------------------------------------------------------------------------------
+
+int main(int argc, const char* argv[])
+{
+    nx::utils::ArgumentParser arguments(argc - 1, argv + 1);
+
+    nx::utils::log::initializeGlobally(arguments);
+
+    if (arguments.contains("h") || arguments.contains("help"))
+    {
+        printHelp(argv[0]);
+        return 0;
+    }
+
+    nx::network::SocketGlobalsHolder socketGlobalsHolder;
+
+    if (arguments.contains("u"))
+        return UploadOperation(arguments).run();
     else
-    {
-        std::cout << std::string_view(data.data(), data.size()) << std::endl;
-    }
+        return DownloadOperation(arguments).run();
 
     return 0;
-}
-
-int download(const nx::utils::ArgumentParser& arguments)
-{
-    using namespace nx::cloud::aws;
-
-    const auto [settings, result] = DownloadSettings::read(arguments);
-    if (!result)
-        return 1;
-
-    auto client = prepareApiClient(settings.common);
-
-    std::promise<std::tuple<Result, nx::Buffer>> done;
-    client->downloadFile(
-        "",
-        [&done](auto result, auto fileContents)
-        {
-            done.set_value(std::make_tuple(result, std::move(fileContents)));
-        });
-
-    const auto [downloadResult, fileContents] = done.get_future().get();
-    if (!downloadResult.ok())
-    {
-        std::cerr << "Error: " << downloadResult.text() << std::endl;
-        return 2;
-    }
-
-    return writeTo(settings.outputFilePath, fileContents);
 }
