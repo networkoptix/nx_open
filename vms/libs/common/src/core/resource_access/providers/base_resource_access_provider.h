@@ -2,6 +2,8 @@
 
 #include <core/resource_access/providers/abstract_resource_access_provider.h>
 
+#include <nx/vms/api/types/access_rights_types.h>
+
 #include <nx/utils/thread/mutex.h>
 #include <common/common_module_aware.h>
 #include <nx_ec/data/api_fwd.h>
