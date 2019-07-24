@@ -4,7 +4,7 @@
 #include <nx/utils/string.h>
 #include <nx/vms/event/actions/abstract_action.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
-#include <core/resource/security_cam_resource.h>
+#include <core/resource/camera_resource.h>
 
 namespace nx {
 namespace vms {
@@ -16,7 +16,7 @@ PluginDiagnosticEvent::PluginDiagnosticEvent(
     const QString& caption,
     const QString& description,
     nx::vms::api::EventLevel level,
-    const QnSecurityCamResourcePtr& device)
+    const QnVirtualCameraResourcePtr& device)
     :
     base_type(EventType::pluginDiagnosticEvent, QnResourcePtr(), timeStamp),
     m_resourceId(engineResourceId),

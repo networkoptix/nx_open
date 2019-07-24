@@ -27,7 +27,7 @@ static bool isAliveStatus(Qn::ResourceStatus status)
     return status == Qn::ResourceStatus::Online || status == Qn::ResourceStatus::Recording;
 }
 
-static nx::sdk::Ptr<nx::sdk::IStringMap> mergeWithDbAndDefaultSettings(
+static QVariantMap mergeWithDbAndDefaultSettings(
     const QnVirtualCameraResourcePtr& device,
     const nx::vms::server::resource::AnalyticsEngineResourcePtr& engine,
     const QVariantMap& settingsFromUser)
@@ -40,7 +40,7 @@ static nx::sdk::Ptr<nx::sdk::IStringMap> mergeWithDbAndDefaultSettings(
     jsonEngine.applyValues(settingsFromProperty);
     jsonEngine.applyValues(settingsFromUser);
 
-    return sdk_support::toIStringMap(jsonEngine.values());
+    return jsonEngine.values();
 }
 
 DeviceAnalyticsContext::DeviceAnalyticsContext(
@@ -129,26 +129,22 @@ void DeviceAnalyticsContext::setMetadataSink(QWeakPointer<QnAbstractDataReceptor
 
 void DeviceAnalyticsContext::setSettings(const QString& engineId, const QVariantMap& settings)
 {
-    std::shared_ptr<DeviceAnalyticsBinding> binding;
     QnUuid analyticsEngineId(engineId);
+    const QVariantMap effectiveSettings = prepareSettings(analyticsEngineId, settings);
+    m_device->setDeviceAgentSettingsValues(analyticsEngineId, effectiveSettings);
 
+    std::shared_ptr<DeviceAnalyticsBinding> binding;
     {
         QnMutexLocker lock(&m_mutex);
         binding = analyticsBinding(analyticsEngineId);
     }
-
-    const auto effectiveSettings = prepareSettings(analyticsEngineId, settings);
-    m_device->setDeviceAgentSettingsValues(
-        analyticsEngineId,
-        sdk_support::fromIStringMap(effectiveSettings.get()));
-
     if (!binding)
         return;
 
     binding->setSettings(effectiveSettings);
 }
 
-nx::sdk::Ptr<nx::sdk::IStringMap> DeviceAnalyticsContext::prepareSettings(
+QVariantMap DeviceAnalyticsContext::prepareSettings(
     const QnUuid& engineId,
     const QVariantMap& settings)
 {
@@ -161,10 +157,10 @@ nx::sdk::Ptr<nx::sdk::IStringMap> DeviceAnalyticsContext::prepareSettings(
     {
         NX_WARNING(this,
             "Unable to access an Engine with; id %1 while preparing settings", engineId);
-        return nullptr;
+        return {};
     }
 
-    Ptr<IStringMap> effectiveSettings;
+    std::optional<QVariantMap> effectiveSettings;
     if (pluginsIni().analyticsSettingsSubstitutePath[0] != '\0')
     {
         NX_WARNING(this, "Trying to load settings for the DeviceAgent from the file. "
@@ -185,23 +181,10 @@ nx::sdk::Ptr<nx::sdk::IStringMap> DeviceAnalyticsContext::prepareSettings(
         m_device->getUserDefinedName(), m_device->getId(),
         engine->getName(), engine->getId()))
     {
-        return nullptr;
+        return {};
     }
 
-    if (pluginsIni().analyticsSettingsOutputPath[0] != '\0')
-    {
-        debug_helpers::dumpStringToFile(
-            this,
-            QString::fromStdString(toJsonString(effectiveSettings.get())),
-            pluginsIni().analyticsSettingsOutputPath,
-            debug_helpers::nameOfFileToDumpOrLoadData(
-                m_device,
-                engine,
-                nx::vms::server::resource::AnalyticsPluginResourcePtr(),
-                "_effective_settings.json"));
-    }
-
-    return effectiveSettings;
+    return *effectiveSettings;
 }
 
 QVariantMap DeviceAnalyticsContext::getSettings(const QString& engineId) const
@@ -213,32 +196,34 @@ QVariantMap DeviceAnalyticsContext::getSettings(const QString& engineId) const
         binding = analyticsBinding(analyticsEngineId);
     }
 
+    const auto engine = serverModule()
+        ->resourcePool()
+        ->getResourceById<resource::AnalyticsEngineResource>(analyticsEngineId);
+
+    if (!engine)
+    {
+        NX_WARNING(this,
+            "Unable to access engine %1 while gettings DeviceAgent settings",
+            analyticsEngineId);
+
+        return QVariantMap();
+    }
+
+    interactive_settings::JsonEngine jsonEngine;
+    jsonEngine.loadModelFromJsonObject(engine->manifest().deviceAgentSettingsModel);
+    jsonEngine.applyValues(m_device->deviceAgentSettingsValues(analyticsEngineId));
+
     if (!binding)
     {
         NX_DEBUG(this, "No device analytics binding for device %1 and engine %2",
             m_device, engineId);
 
-        const auto engine = serverModule()
-            ->resourcePool()
-            ->getResourceById<resource::AnalyticsEngineResource>(analyticsEngineId);
-
-        if (!engine)
-        {
-            NX_WARNING(this,
-                "Unable to access engine %1 while gettings DeviceAgent settings",
-                analyticsEngineId);
-
-            return QVariantMap();
-        }
-
-        interactive_settings::JsonEngine jsonEngine;
-        jsonEngine.loadModelFromJsonObject(engine->manifest().deviceAgentSettingsModel);
-        jsonEngine.applyValues(m_device->deviceAgentSettingsValues(analyticsEngineId));
-
         return jsonEngine.values();
     }
 
-    return binding->getSettings();
+    const QVariantMap pluginSideSettings = binding->getSettings();
+    jsonEngine.applyValues(pluginSideSettings);
+    return jsonEngine.values();
 }
 
 bool DeviceAnalyticsContext::needsCompressedFrames() const
@@ -317,7 +302,7 @@ void DeviceAnalyticsContext::putFrame(
             if (binding->canAcceptData()
                 && NX_ASSERT(dataPacket->timestampUs() >= 0))
             {
-                binding->putData(std::make_shared<DataPacketAdapter>(dataPacket.get()));
+                binding->putData(std::make_shared<DataPacketAdapter>(dataPacket));
             }
             else
             {

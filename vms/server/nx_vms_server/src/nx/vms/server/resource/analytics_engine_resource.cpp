@@ -3,6 +3,7 @@
 #include <media_server/media_server_module.h>
 #include <plugins/vms_server_plugins_ini.h>
 
+#include <nx/vms/server/analytics/wrappers/helpers.h>
 #include <nx/vms/server/sdk_support/utils.h>
 #include <nx/vms/server/sdk_support/to_string.h>
 #include <nx/vms/server/sdk_support/result_holder.h>
@@ -87,8 +88,11 @@ bool AnalyticsEngineResource::sendSettingsToSdkEngine()
         NX_WARNING(this, "Trying to load settings for the Engine %1 (%2) from a file as per %3",
             getName(), getId(), pluginsIni().iniFile());
 
-        effectiveSettings = analytics::debug_helpers::loadEngineSettingsFromFile(
+        auto settingsFromFile = analytics::debug_helpers::loadEngineSettingsFromFile(
             toSharedPointer(this), pluginsIni().analyticsSettingsSubstitutePath);
+
+        if (settingsFromFile)
+            effectiveSettings = sdk_support::toIStringMap(*settingsFromFile);
     }
 
     if (!effectiveSettings)

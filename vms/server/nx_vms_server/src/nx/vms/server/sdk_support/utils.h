@@ -60,6 +60,8 @@ AVPixelFormat sdkToAvPixelFormat(
 std::optional<nx::sdk::analytics::IUncompressedVideoFrame::PixelFormat> avPixelFormatToSdk(
     AVPixelFormat avPixelFormat);
 
+QString debugFileAbsolutePath(const QString& debugDirPath, const QString& filename);
+
 template<typename Manifest>
 std::optional<Manifest> loadManifestFromFile(const QString& filename)
 {
@@ -77,11 +79,8 @@ std::optional<Manifest> loadManifestFromFile(const QString& filename)
     if (!NX_ASSERT(pluginsIni().analyticsManifestSubstitutePath[0]))
         return std::nullopt;
 
-    const QDir dir(nx::utils::debug_helpers::debugFilesDirectoryPath(
-        pluginsIni().analyticsManifestSubstitutePath));
-
     const QString fileData = analytics::debug_helpers::loadStringFromFile(
-        dir.absoluteFilePath(filename), logger);
+        debugFileAbsolutePath(pluginsIni().analyticsManifestSubstitutePath, filename), logger);
 
     if (fileData.isEmpty())
     {
@@ -98,6 +97,16 @@ std::optional<Manifest> loadManifestFromFile(const QString& filename)
 
     return std::nullopt;
 }
+
+nx::sdk::Ptr<const nx::sdk::IString> loadManifestStringFromFile(
+    const QnVirtualCameraResourcePtr& device,
+    const nx::vms::server::resource::AnalyticsEngineResourcePtr& engine,
+    const nx::vms::server::resource::AnalyticsPluginResourcePtr& plugin,
+    std::unique_ptr<AbstractManifestLogger> logger = nullptr);
+
+nx::sdk::Ptr<const nx::sdk::IString> loadManifestStringFromFile(
+    const QString& filename,
+    std::unique_ptr<AbstractManifestLogger> logger = nullptr);
 
 template<typename Manifest, typename SdkObjectPtr>
 std::optional<Manifest> manifestFromSdkObject(
@@ -221,6 +230,8 @@ nx::sdk::Ptr<nx::sdk::IStringMap> toIStringMap(const QMap<QString, QString>& map
 nx::sdk::Ptr<nx::sdk::IStringMap> toIStringMap(const QString& mapJson);
 
 QVariantMap fromIStringMap(const nx::sdk::IStringMap* map);
+
+std::optional<QVariantMap> toQVariantMap(const QString& mapJson);
 
 std::optional<nx::sdk::analytics::IUncompressedVideoFrame::PixelFormat>
     pixelFormatFromEngineManifest(

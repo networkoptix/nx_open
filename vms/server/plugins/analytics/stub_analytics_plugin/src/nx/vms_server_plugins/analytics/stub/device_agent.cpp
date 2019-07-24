@@ -19,6 +19,7 @@
 #include <nx/sdk/analytics/helpers/object_track_best_shot_packet.h>
 #include <nx/sdk/helpers/string_map.h>
 #include <nx/sdk/helpers/settings_response.h>
+#include <nx/sdk/helpers/error.h>
 
 #include "utils.h"
 #include "stub_analytics_plugin_ini.h"
@@ -192,7 +193,7 @@ void DeviceAgent::processVideoFrame(const IDataPacket* videoFrame, const char* f
 
     if (m_deviceAgentSettings.leakFrames)
     {
-        NX_PRINT << "Intentionally creating a memomry leak with IDataPacket @"
+        NX_PRINT << "Intentionally creating a memory leak with IDataPacket @"
             << nx::kit::utils::toString(videoFrame);
         videoFrame->addRef();
     }

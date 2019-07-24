@@ -13,6 +13,7 @@
 #include <nx/sdk/analytics/helpers/object_track_info.h>
 #include <nx/sdk/ptr.h>
 #include <nx/sdk/helpers/string_map.h>
+#include <nx/sdk/helpers/string.h>
 #include <nx/sdk/helpers/to_string.h>
 #include <nx/vms/server/resource/resource_fwd.h>
 
@@ -225,6 +226,26 @@ Ptr<IStringMap> toIStringMap(const QString& mapJson)
     return stringMap;
 }
 
+std::optional<QVariantMap> toQVariantMap(const QString& mapJson)
+{
+    bool isValid = false;
+    const auto deserialized = QJson::deserialized<std::vector<StringMapItem>>(
+        mapJson.toUtf8(), /*defaultValue*/{}, &isValid);
+
+    if (!isValid)
+        std::nullopt;
+
+    QVariantMap result;
+    for (const auto& setting: deserialized)
+    {
+        result.insert(
+            QString::fromStdString(setting.name),
+            QString::fromStdString(setting.value));
+    }
+
+    return result;
+}
+
 QVariantMap fromIStringMap(const IStringMap* map)
 {
     QVariantMap variantMap;
@@ -392,6 +413,55 @@ std::map<QString, QString> attributesMap(
     }
 
     return result;
+}
+
+nx::sdk::Ptr<const nx::sdk::IString> loadManifestStringFromFile(
+    const QnVirtualCameraResourcePtr& device,
+    const nx::vms::server::resource::AnalyticsEngineResourcePtr& engine,
+    const nx::vms::server::resource::AnalyticsPluginResourcePtr& plugin,
+    std::unique_ptr<AbstractManifestLogger> logger)
+{
+    const auto substitutionFilename = analytics::debug_helpers::nameOfFileToDumpOrLoadData(
+        device, engine, plugin, "_manifest.json");
+
+    return loadManifestStringFromFile(substitutionFilename, std::move(logger));
+}
+
+// TODO: #dmishin generalize this method.
+nx::sdk::Ptr<const nx::sdk::IString> loadManifestStringFromFile(
+    const QString& filename,
+    std::unique_ptr<AbstractManifestLogger> logger)
+{
+    if (!NX_ASSERT(pluginsIni().analyticsManifestSubstitutePath[0]))
+        return nullptr;
+
+    const QString fileData = analytics::debug_helpers::loadStringFromFile(
+        debugFileAbsolutePath(pluginsIni().analyticsManifestSubstitutePath, filename),
+        [](nx::utils::log::Level, const QString& message)
+        {
+            // TODO: #dmishin change interface of this method
+        });
+
+    if (fileData.isEmpty())
+    {
+        if (logger)
+            logger->log(lm("Unable to read data from file %1").args(filename), {});
+        return nullptr;
+    }
+
+    return makePtr<nx::sdk::String>(fileData.toStdString());
+}
+
+QString debugFileAbsolutePath(const QString& debugDirPath, const QString& filename)
+{
+    if (!NX_ASSERT(!debugDirPath.isEmpty()))
+        return QString();
+
+    if (!NX_ASSERT(!filename.isEmpty()))
+        return QString();
+
+    const QDir dir(nx::utils::debug_helpers::debugFilesDirectoryPath(debugDirPath));
+    return dir.absoluteFilePath(filename);
 }
 
 } // namespace nx::vms::server::sdk_support

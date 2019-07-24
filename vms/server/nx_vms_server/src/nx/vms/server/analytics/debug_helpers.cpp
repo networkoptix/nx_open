@@ -95,14 +95,14 @@ static QString nameOfFileToDumpOrLoadDataForEngine(
 }
 
 /** @param settingsFilename If empty, the call does nothing - an assertion has already failed. */
-static nx::sdk::Ptr<nx::sdk::IStringMap> doLoadEngineSettingsFromFile(
+static std::optional<QVariantMap> doLoadEngineSettingsFromFile(
     const char* fileDir, const QString& settingsFilename)
 {
     if (settingsFilename.isEmpty())
-        return nullptr;
+        return std::nullopt;
 
     if (!NX_ASSERT(fileDir) || !NX_ASSERT(fileDir[0]))
-        return nullptr;
+        return std::nullopt;
 
     const QDir dir(nx::utils::debug_helpers::debugFilesDirectoryPath(fileDir));
 
@@ -111,7 +111,7 @@ static nx::sdk::Ptr<nx::sdk::IStringMap> doLoadEngineSettingsFromFile(
 
 } // namespace
 
-nx::sdk::Ptr<nx::sdk::IStringMap> loadSettingsFromFile(
+std::optional<QVariantMap> loadSettingsFromFile(
     const QString& fileDescription,
     const QString& filename)
 {
@@ -121,14 +121,15 @@ nx::sdk::Ptr<nx::sdk::IStringMap> loadSettingsFromFile(
         {
             NX_UTILS_LOG(level, NX_SCOPE_TAG, "Analytics %1 settings: %2: [%3]",
                 fileDescription, message, filename);
-            return nullptr;
+            return std::nullopt;
         };
 
     const QString settingsJson = loadStringFromFile(filename, log);
     if (settingsJson.isEmpty())
         return log(Level::error, "Unable to read from file");
 
-    const auto settings = sdk_support::toIStringMap(settingsJson);
+    bool success = false;
+    const auto settings = sdk_support::toQVariantMap(settingsJson.toUtf8());
     if (!settings)
         return log(Level::error, "Invalid JSON in file");
 
@@ -136,25 +137,25 @@ nx::sdk::Ptr<nx::sdk::IStringMap> loadSettingsFromFile(
     return settings;
 }
 
-nx::sdk::Ptr<nx::sdk::IStringMap> loadDeviceAgentSettingsFromFile(
+std::optional<QVariantMap> loadDeviceAgentSettingsFromFile(
     const QnVirtualCameraResourcePtr& device,
     const nx::vms::server::resource::AnalyticsEngineResourcePtr& engine,
     const char* fileDir)
 {
     const auto settingsFilename = nameOfFileToDumpOrLoadDataForDevice(
         device, engine, kSettingsFilenamePostfix);
+
     if (settingsFilename.isEmpty())
-        return nullptr;
+        return std::nullopt;
 
     if (!NX_ASSERT(fileDir) || !NX_ASSERT(fileDir))
-        return nullptr;
+        return std::nullopt;
 
     const QDir dir(nx::utils::debug_helpers::debugFilesDirectoryPath(fileDir));
-
     return loadSettingsFromFile("DeviceAgent settings", dir.absoluteFilePath(settingsFilename));
 }
 
-nx::sdk::Ptr<nx::sdk::IStringMap> loadEngineSettingsFromFile(
+std::optional<QVariantMap> loadEngineSettingsFromFile(
     const nx::vms::server::resource::AnalyticsEngineResourcePtr& engine, const char* fileDir)
 {
     const QString specificFileName = nameOfFileToDumpOrLoadDataForEngine(
@@ -163,8 +164,7 @@ nx::sdk::Ptr<nx::sdk::IStringMap> loadEngineSettingsFromFile(
     NX_WARNING(NX_SCOPE_TAG, "Trying to load Engine %1 settings from the Engine-specific file %2",
         engine, specificFileName);
 
-    const nx::sdk::Ptr<nx::sdk::IStringMap> settings =
-        doLoadEngineSettingsFromFile(fileDir, specificFileName);
+    const auto settings = doLoadEngineSettingsFromFile(fileDir, specificFileName);
     if (settings)
         return settings;
 

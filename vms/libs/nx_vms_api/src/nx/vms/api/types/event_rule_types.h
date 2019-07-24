@@ -261,6 +261,24 @@ QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(EventLevel)
 Q_DECLARE_FLAGS(EventLevels, EventLevel)
 Q_DECLARE_OPERATORS_FOR_FLAGS(EventLevels)
 
+
+enum class PredefinedPluginEventType
+{
+    undefined,
+    nullDeviceAgent,
+    nullDeviceAgentManifest,
+    nullDeviceAgentManifestString,
+    emptyDeviceAgentManifestString,
+    deviceAgentManifestDeserializationError,
+
+    nullEngine,
+    nullEngineManifest,
+    nullEngineManifestString,
+    emptyEngineManifestString,
+    engineManifestDeserializationError,
+};
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PredefinedPluginEventType)
+
 } // namespace api
 } // namespace vms
 } // namespace nx
@@ -270,3 +288,6 @@ QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::ActionType, (metatype)(lexical)(debug)
 
 QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::EventLevel, (metatype)(numeric)(lexical)(debug), NX_VMS_API)
 QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::EventLevels, (metatype)(numeric)(lexical)(debug), NX_VMS_API)
+
+QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::PredefinedPluginEventType,
+    (metatype)(numeric)(lexical)(debug), NX_VMS_API)

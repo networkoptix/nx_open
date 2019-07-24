@@ -14,19 +14,19 @@
 
 namespace nx::vms::server::analytics::debug_helpers {
 
-/** @return Null if the file does not exist, or on error. */
-nx::sdk::Ptr<nx::sdk::IStringMap> loadSettingsFromFile(
+/** @return Nullopt if the file does not exist, or on error. */
+std::optional<QVariantMap> loadSettingsFromFile(
     const QString& fileDescription,
     const QString& filename);
 
-/** @return Null if the properly named file was not found in the specified dir. */
-nx::sdk::Ptr<nx::sdk::IStringMap> loadDeviceAgentSettingsFromFile(
+/** @return Nullopt if the properly named file was not found in the specified dir. */
+std::optional<QVariantMap> loadDeviceAgentSettingsFromFile(
     const QnVirtualCameraResourcePtr& device,
     const nx::vms::server::resource::AnalyticsEngineResourcePtr& engine,
     const char* fileDir);
 
-/** @return Null if the properly named file was not found in the specified dir. */
-nx::sdk::Ptr<nx::sdk::IStringMap> loadEngineSettingsFromFile(
+/** @return Nullopt if the properly named file was not found in the specified dir. */
+std::optional<QVariantMap> loadEngineSettingsFromFile(
     const nx::vms::server::resource::AnalyticsEngineResourcePtr& engine,
     const char* fileDir);
 

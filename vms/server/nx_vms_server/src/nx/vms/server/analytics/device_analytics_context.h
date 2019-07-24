@@ -65,9 +65,7 @@ private:
     bool isEngineAlreadyBound(const QnUuid& engineId) const;
     bool isEngineAlreadyBound(const resource::AnalyticsEngineResourcePtr& engine) const;
 
-    nx::sdk::Ptr<nx::sdk::IStringMap> prepareSettings(
-        const QnUuid& engineId,
-        const QVariantMap& settings);
+    QVariantMap prepareSettings(const QnUuid& engineId, const QVariantMap& settings);
 
 private:
     mutable QnMutex m_mutex;
