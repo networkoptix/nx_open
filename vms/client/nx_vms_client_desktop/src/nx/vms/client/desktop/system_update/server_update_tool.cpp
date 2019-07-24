@@ -895,6 +895,7 @@ bool ServerUpdateTool::requestInstallAction(
                 if (!success)
                 {
                     error = InternalError::networkError;
+                    tool->m_serversAreInstalling = {};
                 }
                 else if (result.error != QnRestResult::NoError)
                 {
@@ -1029,6 +1030,8 @@ void ServerUpdateTool::requestRemoteUpdateStateAsync()
                     tool->m_remoteUpdateManifest = response.data;
                     if (response.data.lastInstallationRequestTime > 0)
                         tool->m_serversAreInstalling = QSet<QnUuid>::fromList(response.data.participants);
+                    else
+                        tool->m_serversAreInstalling = {};
                 }
             }, thread());
         m_activeRequests.insert(handle);
