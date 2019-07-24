@@ -70,10 +70,8 @@ private:
     bool isPacketStreamOk(const AVPacket& packet) const;
     bool isPacketDataTypeOk(const AVPacket& packet) const;
     bool isPacketTimestampOk(const AVPacket& packet) const;
-    bool isPacketChannelOk(const AVPacket& packet) const;
 
     nxcip::UsecUTCTimestamp packetTimestamp(const AVPacket& packet) const;
-    unsigned int packetChannelNumber(const AVPacket& packet) const;
     unsigned int packetFlags(const AVPacket& packet) const;
     nxcip::DataPacketType packetDataType(const AVPacket& packet) const;
 
@@ -86,7 +84,6 @@ private:
     CyclicAllocator m_allocator;
 
     AVFormatContext* m_formatContext = nullptr;
-    std::map<int64_t, int64_t> m_streamIndexToChannelNumber;
     int m_firstVideoIndex = 0;
 
     nxcip::AudioFormat m_audioFormat;

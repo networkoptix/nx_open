@@ -149,7 +149,7 @@ int GenericMulticastStreamReader::getNextData(nxcip::MediaDataPacket** outPacket
         auto mediaPacket = std::make_unique<GenericMulticastMediaPacket>(&m_allocator);
         mediaPacket->setCodecType(stream->codecpar->codec_id);
         mediaPacket->setTimestamp(packetTimestamp(packet));
-        mediaPacket->setChannelNumber(packetChannelNumber(packet));
+        mediaPacket->setChannelNumber(0);
         mediaPacket->setFlags(packetFlags(packet));
         mediaPacket->setType(packetDataType(packet));
         mediaPacket->setData(dataPointer, dataSize);
@@ -194,8 +194,6 @@ bool GenericMulticastStreamReader::initLayout()
         {
             if (m_firstVideoIndex == -1)
                 m_firstVideoIndex = i;
-
-            m_streamIndexToChannelNumber[i] = ++videoChannelNumber;
         }
     }
 
@@ -216,7 +214,6 @@ bool GenericMulticastStreamReader::initLayout()
         if (params->codec_type == AVMEDIA_TYPE_AUDIO)
         {
             ++audioChannelNumber;
-            m_streamIndexToChannelNumber[i] = videoChannelNumber + audioChannelNumber + 1;
             m_audioFormat.compressionType = fromFfmpegCodecIdToNx(params->codec_id);
             m_audioFormat.bitsPerCodedSample = params->bits_per_coded_sample;
             m_audioFormat.sampleRate = params->sample_rate;
@@ -241,8 +238,6 @@ bool GenericMulticastStreamReader::isPacketOk(const AVPacket& packet) const
     if (!isPacketTimestampOk(packet))
         return false;
 
-    if (!isPacketChannelOk(packet))
-        return false;
 
     return true;
 }
@@ -254,11 +249,6 @@ bool GenericMulticastStreamReader::isPacketStreamOk(const AVPacket& packet) cons
 
     unsigned int streamIndex = packet.stream_index;
 
-    bool noCorrespondentChannel = m_streamIndexToChannelNumber.find(streamIndex)
-        == m_streamIndexToChannelNumber.end();
-
-    if (noCorrespondentChannel)
-        return false;
 
     NX_ASSERT(m_formatContext, lm("No AVFormatContext exists for provided AVPacket"));
     if (!m_formatContext)
@@ -292,12 +282,6 @@ bool GenericMulticastStreamReader::isPacketTimestampOk(const AVPacket& packet) c
     return packet.dts != AV_NOPTS_VALUE || packet.pts != AV_NOPTS_VALUE;
 }
 
-bool GenericMulticastStreamReader::isPacketChannelOk(const AVPacket &packet) const
-{
-    auto channelNumber = m_streamIndexToChannelNumber.find(packet.stream_index);
-    return channelNumber != m_streamIndexToChannelNumber.end();
-}
-
 nxcip::UsecUTCTimestamp GenericMulticastStreamReader::packetTimestamp(const AVPacket& packet) const
 {
     if (!isPacketStreamOk(packet))
@@ -307,17 +291,6 @@ nxcip::UsecUTCTimestamp GenericMulticastStreamReader::packetTimestamp(const AVPa
     const auto packetTime = packet.dts != AV_NOPTS_VALUE ? packet.dts : packet.pts;
     static const AVRational dstRate = {1, 1000000};
     return av_rescale_q(packetTime, stream->time_base, dstRate);
-}
-
-unsigned int GenericMulticastStreamReader::packetChannelNumber(const AVPacket& packet) const
-{
-    auto channelNumber = m_streamIndexToChannelNumber.find(packet.stream_index);
-
-    NX_CRITICAL(
-        channelNumber != m_streamIndexToChannelNumber.end(),
-        lm("No correspondent channel for stream"));
-
-    return channelNumber->second;
 }
 
 unsigned int GenericMulticastStreamReader::packetFlags(const AVPacket& packet) const
