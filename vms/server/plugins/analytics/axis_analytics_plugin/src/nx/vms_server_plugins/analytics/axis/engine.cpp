@@ -20,7 +20,6 @@ namespace nx::vms_server_plugins::analytics::axis {
 namespace {
 
 const QString kAxisVendor("axis");
-const QString kSoapPath("/vapix/services");
 
 } // namespace
 
@@ -131,8 +130,6 @@ bool Engine::isCompatible(const IDeviceInfo* deviceInfo) const
 
 namespace {
 
-static const std::string kLibName = "axis_analytics_plugin";
-
 static const std::string kPluginManifest = /*suppress newline*/ 1 + R"json(
 {
     "id": "nx.axis",
@@ -150,7 +147,6 @@ extern "C" {
 NX_PLUGIN_API nx::sdk::IPlugin* createNxPlugin()
 {
     return new nx::sdk::analytics::Plugin(
-        kLibName,
         kPluginManifest,
         [](nx::sdk::analytics::IPlugin* plugin)
         {

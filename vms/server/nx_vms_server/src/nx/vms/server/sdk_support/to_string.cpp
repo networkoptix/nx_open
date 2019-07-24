@@ -2,15 +2,6 @@
 
 #include <nx/sdk/helpers/to_string.h>
 
-namespace nx::sdk {
-
-QString toString(nx::sdk::ErrorCode errorCode)
-{
-    return QString::fromStdString(nx::sdk::toStdString(errorCode));
-}
-
-} // namespace nx::sdk
-
 namespace nx::vms::server::sdk_support {
 
 QString toString(const Error& error)

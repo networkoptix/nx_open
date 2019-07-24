@@ -9,6 +9,7 @@ extern "C" {
 } // extern "C"
 
 #include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/helpers/lib_context.h>
 
 #define NX_PRINT_PREFIX "deepstream::Engine::"
 #include <nx/kit/debug.h>
@@ -56,7 +57,7 @@ Engine::Engine(Plugin* plugin): m_plugin(plugin)
         std::to_string(gstreamerDebugLevel).c_str(), 1);
 
     gst_init(NULL, NULL);
-    NX_PRINT << " Created Engine for " << plugin->name();
+    NX_PRINT << " Created Engine for " << libContext().name();
 
     if (m_objectClassDescritions.empty())
         m_objectClassDescritions = loadObjectClasses();
@@ -66,7 +67,7 @@ Engine::Engine(Plugin* plugin): m_plugin(plugin)
 
 Engine::~Engine()
 {
-    NX_PRINT << " Destroyed Engine for " << m_plugin->name();
+    NX_PRINT << " Destroyed Engine for " << libContext().name();
 }
 
 void Engine::setEngineInfo(const IEngineInfo* /*engineInfo*/)
@@ -75,7 +76,7 @@ void Engine::setEngineInfo(const IEngineInfo* /*engineInfo*/)
 
 StringMapResult Engine::setSettings(const IStringMap* settings)
 {
-    NX_OUTPUT << __func__ << " Received " << m_plugin->name() << " settings:";
+    NX_OUTPUT << __func__ << " Received " << libContext().name() << " settings:";
     NX_OUTPUT << "{";
 
     const auto count = settings->count();
@@ -275,8 +276,6 @@ bool Engine::isCompatible(const IDeviceInfo* /*deviceInfo*/) const
 
 namespace {
 
-static const std::string kLibName = "deepstream_analytics_plugin";
-
 static const std::string kPluginManifest = /*suppress newline*/1 + R"json(
 {
     "id": "nx.deepstream",
@@ -292,7 +291,6 @@ extern "C" {
 NX_PLUGIN_API nx::sdk::IPlugin* createNxPlugin()
 {
     return new nx::sdk::analytics::Plugin(
-        kLibName,
         kPluginManifest,
         [](nx::sdk::analytics::IPlugin* plugin)
         {

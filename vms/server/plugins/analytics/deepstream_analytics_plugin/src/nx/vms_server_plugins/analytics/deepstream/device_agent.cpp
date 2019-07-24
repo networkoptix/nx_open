@@ -2,6 +2,7 @@
 
 #include <nx/sdk/helpers/ptr.h>
 #include <nx/sdk/helpers/string.h>
+#include <nx/sdk/helpers/lib_context.h>
 
 #include <nx/sdk/analytics/i_compressed_video_packet.h>
 #include <nx/sdk/analytics/i_metadata_packet.h>
@@ -25,7 +26,7 @@ using namespace nx::sdk::analytics;
 
 DeviceAgent::DeviceAgent(Engine* engine, const std::string& id): m_engine(engine)
 {
-    NX_OUTPUT << __func__ << "(\"" << m_engine->plugin()->name() << "\") -> " << this;
+    NX_OUTPUT << __func__ << "(\"" << libContext().name() << "\") -> " << this;
 
     std::unique_ptr<BasePipelineBuilder> builder;
 

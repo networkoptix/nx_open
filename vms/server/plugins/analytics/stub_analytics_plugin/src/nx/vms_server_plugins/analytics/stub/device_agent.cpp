@@ -189,6 +189,12 @@ void DeviceAgent::processVideoFrame(const IDataPacket* videoFrame, const char* f
     NX_OUTPUT << func << "(): timestamp " << videoFrame->timestampUs() << " us;"
         << " frame #" << m_frameCounter;
 
+    if (m_deviceAgentSettings.leakFrames)
+    {
+        NX_PRINT << "Intentionally creating a memomry leak with IDataPacket @"
+            << nx::kit::utils::toString(videoFrame);
+        videoFrame->addRef();
+    }
     if (m_frameCounter == ini().crashDeviceAgentOnFrameN)
     {
         const std::string message = nx::kit::utils::format(
@@ -648,6 +654,7 @@ void DeviceAgent::parseSettings()
     m_deviceAgentSettings.generatePreviews = toBool(settingValue(kGeneratePreviewPacketSetting));
     m_deviceAgentSettings.throwPluginDiagnosticEvents = toBool(
         settingValue(kThrowPluginDiagnosticEventsFromDeviceAgentSetting));
+    m_deviceAgentSettings.leakFrames = toBool(settingValue(kLeakFrames));
 
     assignIntegerSetting(
         kGenerateObjectsEveryNFramesSetting,
