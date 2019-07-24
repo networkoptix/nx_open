@@ -947,6 +947,18 @@ void QnRtspConnectionProcessor::at_camera_parentIdChanged(const QnResourcePtr & 
     }
 }
 
+void QnRtspConnectionProcessor::waitForResourceInitializing(const QnNetworkResourcePtr& resource)
+{
+    constexpr std::chrono::milliseconds kSleepInterval(100);
+    constexpr std::chrono::seconds kWaitTimeout(4);
+    std::chrono::milliseconds overallWait(0);
+    while(!m_needStop && !resource->isInitialized() && overallWait < kWaitTimeout)
+    {
+        std::this_thread::sleep_for(kSleepInterval);
+        overallWait += kSleepInterval;
+    }
+}
+
 void QnRtspConnectionProcessor::createDataProvider()
 {
     Q_D(QnRtspConnectionProcessor);
@@ -987,9 +999,12 @@ void QnRtspConnectionProcessor::createDataProvider()
         QnNetworkResourcePtr cameraRes = d->mediaRes.dynamicCast<QnNetworkResource>();
         if (cameraRes && !cameraRes->isInitialized() && !cameraRes->hasFlags(Qn::foreigner))
         {
-            NX_VERBOSE(this,
-                "Trying to initialise resource if it was not initialised for some unknown reason");
+            NX_DEBUG(this,
+                "Trying to initialize resource if it was not initialized for some unknown reason");
             cameraRes->initAsync(true);
+
+            // Wait for camera initializing.
+            waitForResourceInitializing(cameraRes);
         }
     }
     if (camera && d->playbackMode == PlaybackMode::Live)
@@ -1261,8 +1276,8 @@ nx::network::rtsp::StatusCodeValue QnRtspConnectionProcessor::composePlay()
 
     if (!currentDP)
     {
-        NX_WARNING(this, "Failed to play rtsp session, data provider not found");
-        return nx::network::http::StatusCode::notFound;
+        NX_WARNING(this, "Failed to play rtsp session, resource not initialized");
+        return nx::network::http::StatusCode::serviceUnavailable;
     }
 
     Qn::ResourceStatus status = getResource()->toResource()->getStatus();
