@@ -22,6 +22,7 @@ void printHelp(const char* name)
         "   To download and print to STDOUT use \"" << name << " [URL]\"." << std::endl <<
         "   To download and save to file use \"" << name << " [URL] -O file\"." << std::endl <<
         "   To upload file: \"" << name << " -u -i file [URL]\"" <<
+        "   To delete file: \"" << name << " -d [URL]\"" <<
         std::endl <<
         std::endl;
 }
@@ -229,6 +230,23 @@ public:
 
 //-------------------------------------------------------------------------------------------------
 
+class DeleteOperation:
+    public AbstractOperation<CommonSettings>
+{
+    using base_type = AbstractOperation;
+
+public:
+    using base_type::base_type;
+
+    virtual int runImpl() override
+    {
+        const auto [deleteResult] = invoke(&nx::cloud::aws::ApiClient::deleteFile, "");
+        return deleteResult.ok() ? 0 : 2;
+    }
+};
+
+//-------------------------------------------------------------------------------------------------
+
 struct DownloadSettings
 {
     CommonSettings common;
@@ -304,6 +322,8 @@ int main(int argc, const char* argv[])
 
     if (arguments.contains("u"))
         return UploadOperation(arguments).run();
+    else if (arguments.contains("d"))
+        return DeleteOperation(arguments).run();
     else
         return DownloadOperation(arguments).run();
 
