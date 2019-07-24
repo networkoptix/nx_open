@@ -8,7 +8,7 @@
 #include <nx/sdk/interface.h>
 #include <nx/sdk/helpers/ref_countable.h>
 #include <nx/sdk/helpers/to_string.h>
-#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/ptr.h>
 #include <nx/sdk/helpers/string_map.h>
 #include <nx/sdk/helpers/device_info.h>
 #include <nx/sdk/helpers/string.h>

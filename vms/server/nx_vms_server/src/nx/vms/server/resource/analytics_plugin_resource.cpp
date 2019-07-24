@@ -1,7 +1,7 @@
 #include "analytics_plugin_resource.h"
 
 #include <nx/sdk/analytics/i_plugin.h>
-#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/ptr.h>
 
 #include <media_server/media_server_module.h>
 

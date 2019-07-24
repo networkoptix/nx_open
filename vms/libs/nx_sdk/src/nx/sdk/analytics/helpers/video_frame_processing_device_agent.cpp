@@ -7,7 +7,7 @@
 #include <nx/kit/debug.h>
 
 #include <nx/sdk/helpers/log_utils.h>
-#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/ptr.h>
 #include <nx/sdk/helpers/string.h>
 #include <nx/sdk/helpers/to_string.h>
 #include <nx/sdk/helpers/error.h>

@@ -11,7 +11,7 @@
 
 #include <nx/sdk/helpers/uuid_helper.h>
 #include <nx/sdk/helpers/log_utils.h>
-#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/ptr.h>
 #include <nx/sdk/helpers/string_map.h>
 #include <nx/sdk/helpers/string.h>
 #include <nx/sdk/helpers/plugin_diagnostic_event.h>

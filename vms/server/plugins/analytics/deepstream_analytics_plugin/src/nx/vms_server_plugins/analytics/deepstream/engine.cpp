@@ -8,7 +8,7 @@ extern "C" {
 
 } // extern "C"
 
-#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/ptr.h>
 #include <nx/sdk/helpers/lib_context.h>
 
 #define NX_PRINT_PREFIX "deepstream::Engine::"

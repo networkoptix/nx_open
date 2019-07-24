@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/ptr.h>
 #include <nx/sdk/helpers/ref_countable.h>
 
 #include <nx/sdk/analytics/i_object_track_info.h>

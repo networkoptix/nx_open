@@ -3,7 +3,7 @@
 #define NX_PRINT_PREFIX "deepstream::baseCallbacks::"
 #include <nx/kit/debug.h>
 
-#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/ptr.h>
 #include <nx/sdk/analytics/i_compressed_video_packet.h>
 
 #include "deepstream_analytics_plugin_ini.h"

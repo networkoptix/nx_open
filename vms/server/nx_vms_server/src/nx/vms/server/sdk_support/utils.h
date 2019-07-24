@@ -35,7 +35,7 @@
 #include <nx/sdk/result.h>
 
 #include <nx/sdk/helpers/device_info.h>
-#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/ptr.h>
 #include <nx/sdk/helpers/to_string.h>
 
 #include <plugins/settings.h>

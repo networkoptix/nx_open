@@ -9,7 +9,7 @@
 
 #include <nx/sdk/helpers/ref_countable.h>
 #include <nx/sdk/helpers/log_utils.h>
-#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/ptr.h>
 #include <nx/sdk/helpers/result_aliases.h>
 
 #include <nx/sdk/analytics/i_engine.h>

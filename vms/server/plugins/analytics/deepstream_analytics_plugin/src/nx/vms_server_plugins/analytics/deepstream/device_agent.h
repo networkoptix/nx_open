@@ -4,7 +4,7 @@
 #include <memory>
 #include <mutex>
 
-#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/ptr.h>
 #include <nx/sdk/helpers/ref_countable.h>
 
 #include <nx/vms_server_plugins/analytics/deepstream/engine.h>

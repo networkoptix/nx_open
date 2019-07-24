@@ -4,7 +4,7 @@
 
 #include <nx/sdk/helpers/ref_countable.h>
 
-#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/ptr.h>
 #include <nx/sdk/helpers/string_list.h>
 #include <nx/sdk/analytics/i_metadata_types.h>
 

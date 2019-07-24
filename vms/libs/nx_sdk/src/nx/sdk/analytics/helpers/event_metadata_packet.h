@@ -5,7 +5,7 @@
 #include <vector>
 
 #include <nx/sdk/helpers/ref_countable.h>
-#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/ptr.h>
 #include <nx/sdk/analytics/i_event_metadata_packet.h>
 
 namespace nx {

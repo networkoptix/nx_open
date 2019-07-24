@@ -17,7 +17,7 @@
 #include <nx/sdk/helpers/to_string.h>
 
 #include <nx/sdk/analytics/helpers/metadata_types.h>
-#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/ptr.h>
 
 #include <nx/analytics/descriptor_manager.h>
 #include <nx/analytics/utils.h>

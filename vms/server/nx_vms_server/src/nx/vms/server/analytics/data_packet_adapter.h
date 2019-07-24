@@ -1,6 +1,6 @@
 #pragma once
 
-#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/ptr.h>
 #include <nx/streaming/abstract_data_packet.h>
 
 namespace nx::vms::server::analytics {

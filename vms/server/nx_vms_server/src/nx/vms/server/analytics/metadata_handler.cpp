@@ -3,7 +3,7 @@
 #include <nx/kit/debug.h>
 #include <nx/utils/log/log.h>
 
-#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/ptr.h>
 #include <nx/vms_server_plugins/utils/uuid.h>
 
 #include <nx/vms/event/events/events.h>

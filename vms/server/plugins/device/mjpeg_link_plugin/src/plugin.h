@@ -2,7 +2,7 @@
 
 #include <plugins/plugin_tools.h>
 
-#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/ptr.h>
 #include <plugins/plugin_api.h>
 #include <plugins/plugin_container_api.h>
 

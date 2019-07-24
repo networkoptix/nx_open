@@ -13,7 +13,7 @@
 
 #include "third_party_resource.h"
 #include <nx/utils/time_helper.h>
-#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/ptr.h>
 
 //!Stream reader for resource, implemented in external plugin
 class ThirdPartyStreamReader: public CLServerPushStreamReader

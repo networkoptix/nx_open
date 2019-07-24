@@ -7,7 +7,7 @@
 
 #include <nx/sdk/helpers/attribute.h>
 #include <nx/sdk/helpers/ref_countable.h>
-#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/ptr.h>
 
 #include <nx/sdk/uuid.h>
 #include <nx/sdk/analytics/i_object_metadata.h>

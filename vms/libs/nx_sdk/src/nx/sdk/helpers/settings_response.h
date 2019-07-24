@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/ptr.h>
 #include <nx/sdk/i_settings_response.h>
 
 #include <nx/sdk/helpers/ref_countable.h>

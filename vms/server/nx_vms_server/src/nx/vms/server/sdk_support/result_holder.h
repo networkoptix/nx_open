@@ -3,7 +3,7 @@
 #include <type_traits>
 
 #include <nx/sdk/result.h>
-#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/ptr.h>
 
 namespace nx::vms::server::sdk_support {
 

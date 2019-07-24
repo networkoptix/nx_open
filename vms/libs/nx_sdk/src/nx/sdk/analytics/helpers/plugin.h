@@ -8,7 +8,7 @@
 #include <nx/sdk/i_utility_provider.h>
 #include <nx/sdk/analytics/i_plugin.h>
 #include <nx/sdk/helpers/ref_countable.h>
-#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/ptr.h>
 #include <nx/sdk/helpers/result_aliases.h>
 #include <nx/sdk/analytics/helpers/result_aliases.h>
 

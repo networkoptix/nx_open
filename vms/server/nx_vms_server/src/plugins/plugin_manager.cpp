@@ -16,7 +16,7 @@
 #include <plugins/plugin_api.h>
 #include <nx/sdk/helpers/lib_context.h>
 #include <nx/vms/server/sdk_support/ref_countable_registry.h>
-#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/ptr.h>
 #include <nx/sdk/analytics/i_plugin.h>
 #include <nx/vms/server/plugins/utility_provider.h>
 #include <nx/vms/server/sdk_support/utils.h>

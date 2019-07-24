@@ -5,7 +5,7 @@
 #include "core/resource/storage_resource.h"
 #include <storage/third_party_storage.h>
 #include <nx/utils/thread/mutex.h>
-#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/ptr.h>
 
 namespace nx::vms::server { class Settings; }
 

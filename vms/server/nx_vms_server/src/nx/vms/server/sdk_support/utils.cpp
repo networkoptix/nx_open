@@ -11,7 +11,7 @@
 #include <nx/sdk/i_attribute.h>
 #include <nx/sdk/analytics/helpers/pixel_format.h>
 #include <nx/sdk/analytics/helpers/object_track_info.h>
-#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/ptr.h>
 #include <nx/sdk/helpers/string_map.h>
 #include <nx/sdk/helpers/to_string.h>
 #include <nx/vms/server/resource/resource_fwd.h>

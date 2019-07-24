@@ -1,6 +1,6 @@
 #include "device_agent.h"
 
-#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/ptr.h>
 #include <nx/sdk/helpers/string.h>
 #include <nx/sdk/helpers/lib_context.h>
 

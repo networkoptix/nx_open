@@ -11,7 +11,7 @@
 #include <nx/vms/server/analytics/abstract_video_data_receptor.h>
 #include <nx/sdk/analytics/i_device_agent.h>
 
-#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/ptr.h>
 #include <nx/sdk/i_string_map.h>
 
 class QnAbstractDataReceptor;

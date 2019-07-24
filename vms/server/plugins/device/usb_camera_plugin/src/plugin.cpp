@@ -3,7 +3,7 @@ extern "C" {
 #include <libavdevice/avdevice.h>
 } // extern "C"
 
-#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/ptr.h>
 
 #include "discovery_manager.h"
 #include "device/audio/utils.h"

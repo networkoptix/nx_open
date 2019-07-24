@@ -217,5 +217,31 @@ int refCount(const Ptr<RefCountable>& ptr)
     return refCount(ptr.get());
 }
 
+//-------------------------------------------------------------------------------------------------
+
+template<class RefCountable>
+class RawPtr
+{
+public:
+    RawPtr(std::nullptr_t = nullptr): m_refCountable(nullptr) {}
+
+    RawPtr(RefCountable* refCountable): m_refCountable(refCountable) {}
+
+    RawPtr(const Ptr<RefCountable>& ptr): m_refCountable(ptr.get()) {}
+
+    RefCountable* operator->() const { return m_refCountable; }
+    RefCountable& operator*() const { return *m_refCountable; }
+    RefCountable* get() const { return m_refCountable; }
+
+    operator Ptr<RefCountable>() const
+    {
+        m_refCountable->addRef();
+        return toPtr(m_refCountable);
+    }
+
+private:
+    RefCountable* const m_refCountable;
+};
+
 } // namespace sdk
 } // namespace nx

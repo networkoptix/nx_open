@@ -4,7 +4,7 @@
 #include <nx/vms/server/server_module_aware.h>
 
 #include <nx/sdk/analytics/i_plugin.h>
-#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/ptr.h>
 
 #include <nx/vms/server/sdk_support/loggers.h>
 

@@ -4,7 +4,7 @@
 
 #include <nx/sdk/interface.h>
 #include <nx/sdk/helpers/ref_countable.h>
-#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/ptr.h>
 
 namespace nx {
 namespace sdk {
@@ -245,6 +245,25 @@ TEST(Ptr, queryInterfacePtrConst)
         ASSERT_EQ(dataPtr, iDataPtrFromIData);
     }
     ASSERT_TRUE(Data::s_destructorCalled);
+}
+
+TEST(Ptr, rawPtr)
+{
+    Data* const data = new Data(42);
+    Data::s_destructorCalled = false;
+    {
+        const RawPtr<IData> raw{data};
+        ASSERT_EQ(1, data->refCount()); //< RawPtr constructors do not call addRef().
+        ASSERT_EQ(42, raw->number()); //< operator->()
+        ASSERT_EQ(42, (*raw).number()); //< operator*()
+        ASSERT_EQ(data, raw.get()); //< get()
+
+        const Ptr<IData> ptr = raw; //< operator Ptr<>()
+        ASSERT_EQ(2, data->refCount()); //< operator Ptr<>() calls addRef().
+        ASSERT_EQ(ptr.get(), raw.get());
+    }
+    ASSERT_FALSE(Data::s_destructorCalled);
+    delete data;
 }
 
 } // namespace test

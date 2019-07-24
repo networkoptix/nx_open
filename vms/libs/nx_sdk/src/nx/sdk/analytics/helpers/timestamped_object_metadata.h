@@ -6,7 +6,7 @@
 
 #include <nx/sdk/analytics/i_timestamped_object_metadata.h>
 
-#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/ptr.h>
 #include <nx/sdk/helpers/ref_countable.h>
 #include <nx/sdk/analytics/helpers/object_metadata.h>
 #include <nx/sdk/helpers/attribute.h>

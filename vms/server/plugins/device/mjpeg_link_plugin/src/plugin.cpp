@@ -4,7 +4,7 @@
 
 #include "discovery_manager.h"
 
-#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/ptr.h>
 #include <nx/utils/log/log.h>
 
 using namespace std::chrono;

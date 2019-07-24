@@ -9,7 +9,7 @@
 #include <nx/utils/thread/mutex.h>
 
 #include <nx/sdk/i_plugin.h>
-#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/ptr.h>
 #include <plugins/plugin_api.h>
 #include <nx/vms/server/plugins/utility_provider.h>
 #include <plugins/settings.h>
