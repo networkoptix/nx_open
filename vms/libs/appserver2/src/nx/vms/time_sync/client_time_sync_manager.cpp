@@ -54,8 +54,18 @@ void ClientTimeSyncManager::updateTime()
     {
         if (!m_lastSyncTimeInterval.hasExpired(networkTimeSyncInterval))
             return;
-        if (loadTimeFromServer(route))
-            m_lastSyncTimeInterval.restart();
+        auto result = loadTimeFromServer(route);
+        switch(result)
+        {
+            case Result::ok:
+                m_lastSyncTimeInterval.restart();
+                break;
+            case Result::incompatibleServer:
+                stop();
+                break;
+            default:
+                break;
+        }
     }
 }
 
