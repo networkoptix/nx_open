@@ -1199,6 +1199,7 @@ void MultiServerUpdatesWidget::atCancelUpdateComplete(bool success, const QStrin
         m_clientUpdateTool->resetState();
         if (success)
         {
+            repeatUpdateValidation();
             setTargetState(WidgetUpdateState::ready, {});
         }
         else
@@ -1213,6 +1214,9 @@ void MultiServerUpdatesWidget::atCancelUpdateComplete(bool success, const QStrin
             setTargetState(WidgetUpdateState::readyInstall, {});
         }
     }
+
+    if (m_updateRemoteStateChanged)
+        loadDataToUi();
 }
 
 void MultiServerUpdatesWidget::atStartInstallComplete(bool success, const QString& error)
@@ -1244,6 +1248,8 @@ void MultiServerUpdatesWidget::atStartInstallComplete(bool success, const QStrin
             }
         }
     }
+    if (m_updateRemoteStateChanged)
+        loadDataToUi();
 }
 
 void MultiServerUpdatesWidget::atFinishUpdateComplete(bool success, const QString& error)
@@ -1281,6 +1287,9 @@ void MultiServerUpdatesWidget::atFinishUpdateComplete(bool success, const QStrin
             setTargetState(WidgetUpdateState::installingStalled, targets);
         }
     }
+
+    if (m_updateRemoteStateChanged)
+        loadDataToUi();
 }
 
 void MultiServerUpdatesWidget::repeatUpdateValidation()
@@ -2394,7 +2403,8 @@ void MultiServerUpdatesWidget::syncRemoteUpdateStateToUi()
         ui->spaceErrorLabel->hide();
     }
 
-    if (errorTooltips.isEmpty() && !hasSpaceIssues)
+    if (errorTooltips.isEmpty() && !hasSpaceIssues
+        && m_widgetState != WidgetUpdateState::cancelingReadyInstall)
     {
         ui->downloadButton->setEnabled(true);
         ui->downloadButton->setToolTip("");
