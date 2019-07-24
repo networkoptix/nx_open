@@ -4247,7 +4247,7 @@ till %1</translation>
     </message>
     <message>
       <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
-      <translation type="unfinished">&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</translation>
+      <translation>&quot;Virtual Camera&quot; är ett virtuellt lagringsutrymme för videofiler, som kan laddas upp till vilken server som helst på ditt system och nås av någon användare.</translation>
     </message>
   </context>
   <context>
@@ -7354,7 +7354,7 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
     <message>
       <source>Unknown track</source>
-      <translation type="unfinished">Unknown track</translation>
+      <translation>Okänt spår</translation>
     </message>
   </context>
   <context>
@@ -8757,15 +8757,15 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
     <message>
       <source>Some servers have no update packages available.</source>
-      <translation type="unfinished">Some servers have no update packages available.</translation>
+      <translation>Vissa servrar har inga tillgängliga uppdateringspaket.</translation>
     </message>
     <message>
       <source>Some servers have encountered an internal error.</source>
-      <translation type="unfinished">Some servers have encountered an internal error.</translation>
+      <translation>Vissa servrar har stött på ett internt fel.</translation>
     </message>
     <message>
       <source>Please please contact Customer Support.</source>
-      <translation type="unfinished">Please please contact Customer Support.</translation>
+      <translation>Vänligen kontakta kundsupport.</translation>
     </message>
   </context>
   <context>
@@ -8943,7 +8943,7 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
     <message>
       <source>This OS version is no longer supported.</source>
-      <translation type="unfinished">This OS version is no longer supported.</translation>
+      <translation>Den här OS-versionen stöds inte längre.</translation>
     </message>
   </context>
   <context>
@@ -9101,7 +9101,7 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
     <message>
       <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
-      <translation type="unfinished">Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</translation>
+      <translation>Vattenmärken kommer att visas över live, arkiv och exporterade videor för icke-administrativa användare. Du och andra administratörer ser inte dem.</translation>
     </message>
   </context>
   <context>
@@ -9202,7 +9202,7 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
     <message>
       <source>Server error.</source>
-      <translation type="unfinished">Server error.</translation>
+      <translation>Serverfel.</translation>
     </message>
   </context>
   <context>
@@ -9625,26 +9625,26 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     <name>nx::vms::client::desktop::ui::PluginDiagnosticEventModel</name>
     <message>
       <source>Any Plugin</source>
-      <translation type="unfinished">Any Plugin</translation>
+      <translation>Någon plugin</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ui::PluginDiagnosticEventWidget</name>
     <message>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the caption with any of the entered keywords.</translation>
+      <translation>Händelsen utlöses endast om det finns matchningar i rubriken med något av de angivna sökorden.</translation>
     </message>
     <message>
       <source>If the field is empty, event will always trigger.</source>
-      <translation type="unfinished">If the field is empty, event will always trigger.</translation>
+      <translation>Om fältet är tomt kommer händelsen alltid att trigga.</translation>
     </message>
     <message>
       <source>This field is case sensitive.</source>
-      <translation type="unfinished">This field is case sensitive.</translation>
+      <translation>Det här fältet är skiftlägeskänsligt.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the description field with any of the entered keywords.</translation>
+      <translation>Händelsen utlöses endast om det finns matchningar i beskrivningen med något av de angivna sökorden.</translation>
     </message>
   </context>
   <context>
