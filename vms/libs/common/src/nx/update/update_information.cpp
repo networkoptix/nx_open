@@ -107,6 +107,16 @@ void UpdateContents::resetVerification()
     packagesGenerated = false;
 }
 
+uint64_t UpdateContents::getClientSpaceRequirements(bool withClient) const
+{
+    uint64_t spaceRequired = 0;
+    for (const auto& package: manualPackages)
+        spaceRequired += package.size;
+    if (withClient && clientPackage.isValid())
+        spaceRequired += clientPackage.size;
+    return spaceRequired;
+}
+
 nx::utils::SoftwareVersion UpdateContents::getVersion() const
 {
     return nx::utils::SoftwareVersion(info.version);

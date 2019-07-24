@@ -254,7 +254,6 @@ struct UpdateContents
     QDir storageDir;
     /** A list of files to be uploaded. */
     QStringList filesToUpload;
-
     /** Information for the clent update. */
     nx::update::Package clientPackage;
 
@@ -265,6 +264,7 @@ struct UpdateContents
      * pushed to mediaservers without internet.
      */
     QList<Package> manualPackages;
+
     bool cloudIsCompatible = true;
 
     bool packagesGenerated = false;
@@ -273,6 +273,9 @@ struct UpdateContents
 
     /** Resets data from verification. */
     void resetVerification();
+
+    /** Estimated space to keep manual packages. */
+    uint64_t getClientSpaceRequirements(bool withClient) const;
 
     nx::utils::SoftwareVersion getVersion() const;
 

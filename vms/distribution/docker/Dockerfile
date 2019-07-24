@@ -11,9 +11,6 @@ ENV container docker
 # This will override our EULA check. 
 ENV DEBIAN_FRONTEND noninteractive
 
-# This is the deb file used to install mediaserver
-ARG mediaserver_deb
-
 # Disabling it since build.sh does all the necessary checks.
 # RUN ["/bin/bash", "-c", ": ${mediaserver_deb:?Missing source deb file. You should set --build-arg mediaserver_deb=path_to_mediaserver.deb!}"]
 
@@ -33,6 +30,9 @@ STOPSIGNAL SIGRTMIN+3
 
 # Using systemd as an entry point. It will launch mediaserver according to systemd scripts.
 ENTRYPOINT ["/sbin/init", "--log-target=journal"]
+
+# This is the deb file used to install mediaserver
+ARG mediaserver_deb
 
 COPY "${mediaserver_deb}" /setup/
 

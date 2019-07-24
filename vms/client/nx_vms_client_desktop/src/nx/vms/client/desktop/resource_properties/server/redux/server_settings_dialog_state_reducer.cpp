@@ -57,6 +57,9 @@ State ServerSettingsDialogStateReducer::setPluginModules(
     QSet<QString> usedNames;
     for (const auto& plugin: value)
     {
+        if (!plugin.isActive)
+            continue;
+
         if (!NX_ASSERT(!usedNames.contains(plugin.libraryFilename)))
             continue;
 
