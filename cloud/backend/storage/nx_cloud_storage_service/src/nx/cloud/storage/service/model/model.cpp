@@ -1,9 +1,9 @@
 #include "model.h"
 
-#include "settings.h"
+#include "nx/cloud/storage/service/settings.h"
 #include "database.h"
 
-namespace nx::cloud::storage::service {
+namespace nx::cloud::storage::service::model {
 
 Model::Model(const conf::Settings& settings):
     m_database(std::make_unique<Database>(settings))
@@ -22,4 +22,4 @@ Database* Model::database()
     return m_database.get();
 }
 
-} // namespace nx::cloud::storage::service
+} // namespace nx::cloud::storage::service::model

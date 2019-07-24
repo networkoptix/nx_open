@@ -4,50 +4,11 @@
 #include <nx/network/cloud/storage/service/api/client.h>
 #include <nx/utils/thread/sync_queue.h>
 
-#include <nx/cloud/storage/service/storage/manager.h>
-#include <nx/cloud/storage/service/http/cloud_db_authentication_manager.h>
+#include <nx/cloud/storage/service/view/http/cloud_db_authentication_manager.h>
 
 namespace nx::cloud::storage::service::test {
 
 namespace {
-
-class StorageManagerStub:
-    public storage::AbstractManager
-{
-public:
-    void addStorage(
-        const api::AddStorageRequest& request,
-        nx::utils::MoveOnlyFunc<void(api::Result, api::Storage)> handler) override
-    {
-        api::Storage response;
-        response.totalSpace = request.totalSpace;
-        response.freeSpace = request.totalSpace;
-        handler(api::Result{api::ResultCode::ok, {}}, std::move(response));
-    }
-
-    void readStorage(
-        const std::string& storageId,
-        nx::utils::MoveOnlyFunc<void(api::Result, api::Storage)> handler) override
-    {
-        api::Storage response;
-        response.id = storageId;
-        handler(api::Result{api::ResultCode::ok, {}}, std::move(response));
-    }
-
-    void removeStorage(
-        const std::string& /*storageId*/,
-        nx::utils::MoveOnlyFunc<void(api::Result)> handler) override
-    {
-        handler(api::Result{api::ResultCode::ok, {}});
-    }
-
-    void listCameras(
-        const std::string& /*storageId*/,
-        nx::utils::MoveOnlyFunc<void(api::Result, std::vector<std::string>)> handler) override
-    {
-        handler(api::Result{api::ResultCode::ok, {}}, std::vector<std::string>());
-    }
-};
 
 class CloudDBAuthenticationForwarderStub:
     public network::http::server::AbstractAuthenticationManager
@@ -79,15 +40,8 @@ class CloudStorageApi:
 protected:
     virtual void SetUp() override
     {
-        m_storageManagerFactoryFuncBak =
-            storage::ManagerFactory::instance().setCustomFunc(
-                [](const conf::Settings& /*settings*/, Database* /*database*/)
-                {
-                    return std::make_unique<StorageManagerStub>();
-                });
-
         m_cloudDBAuthenticationFactoryFuncBak =
-            http::CloudDbAuthenticationFactory::instance().setCustomFunc(
+            view::http::CloudDbAuthenticationFactory::instance().setCustomFunc(
                 [this](const conf::Settings& /*settings*/)
                 {
                     return std::make_unique<CloudDBAuthenticationForwarderStub>(
@@ -102,15 +56,9 @@ protected:
 
     virtual void TearDown() override
     {
-        if (m_storageManagerFactoryFuncBak)
-        {
-            storage::ManagerFactory::instance().setCustomFunc(
-                std::move(m_storageManagerFactoryFuncBak));
-        }
-
         if (m_cloudDBAuthenticationFactoryFuncBak)
         {
-            http::CloudDbAuthenticationFactory::instance().setCustomFunc(
+            view::http::CloudDbAuthenticationFactory::instance().setCustomFunc(
                 std::move(m_cloudDBAuthenticationFactoryFuncBak));
         }
     }
@@ -160,8 +108,7 @@ private:
     std::unique_ptr<CloudStorageLauncher> m_cloudStorage;
     std::unique_ptr<api::Client> m_cloudStorageClient;
     nx::utils::SyncQueue<api::Client::ResultCode> m_response;
-    storage::ManagerFactory::Function m_storageManagerFactoryFuncBak;
-    service::http::CloudDbAuthenticationFactory::Function m_cloudDBAuthenticationFactoryFuncBak;
+    view::http::CloudDbAuthenticationFactory::Function m_cloudDBAuthenticationFactoryFuncBak;
     nx::utils::SyncQueue<bool> m_authenticationEvent;
 };
 

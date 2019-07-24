@@ -4,7 +4,7 @@
 
 #include <nx/network/cloud/storage/service/api/result.h>
 
-namespace nx::cloud::storage::service::http {
+namespace nx::cloud::storage::service::view::http {
 
 template<typename Input, typename Output, typename... RestArgFetchers>
 class RequestHandler:
@@ -67,4 +67,4 @@ void RequestHandler<Input, Output, RestArgFetchers...>::processResponseInternal(
     this->requestCompleted(network::http::FusionRequestResult(), std::move(output)...);
 }
 
-} // namespace nx::cloud::storage::service::http
+} // namespace nx::cloud::storage::service::view::http

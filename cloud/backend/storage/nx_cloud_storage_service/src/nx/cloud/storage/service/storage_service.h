@@ -6,9 +6,9 @@ namespace nx::cloud::storage::service {
 
 namespace conf { class Settings; }
 
-class Controller;
-class Model;
-class View;
+namespace controller { class Controller; }
+namespace model { class Model; }
+namespace view { class View; }
 
 class StorageService:
     public nx::utils::Service
@@ -29,9 +29,9 @@ protected:
 
 private:
     const conf::Settings* m_settings = nullptr;
-    Model* m_model = nullptr;
-    Controller* m_controller = nullptr;
-    View* m_view = nullptr;
+    model::Model* m_model = nullptr;
+    controller::Controller* m_controller = nullptr;
+    view::View* m_view = nullptr;
 };
 
 } // namespace nx::cloud::storage::service

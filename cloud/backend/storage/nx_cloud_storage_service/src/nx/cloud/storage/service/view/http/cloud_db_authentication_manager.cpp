@@ -1,8 +1,8 @@
 #include "cloud_db_authentication_manager.h"
 
-#include "../settings.h"
+#include "nx/cloud/storage/service/settings.h"
 
-namespace nx::cloud::storage::service::http {
+namespace nx::cloud::storage::service::view::http {
 
 using namespace nx::network::http;
 
@@ -44,4 +44,4 @@ std::unique_ptr<server::AbstractAuthenticationManager>
     return std::make_unique<CloudDbAuthenticationForwarder>(settings.cloudDb());
 }
 
-} // namespace nx::cloud::storage::service::http
+} // namespace nx::cloud::storage::service::view::http

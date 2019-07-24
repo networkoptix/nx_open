@@ -4,13 +4,15 @@
 
 namespace nx::cloud::storage::service {
 
-namespace conf { namespace conf { class Settings; } }
-class Controller;
+namespace conf { class Settings; }
+namespace controller { class Controller; }
+
+namespace view {
 
 class View
 {
 public:
-    View(const conf::Settings& settings, Controller* controller);
+    View(const conf::Settings& settings, controller::Controller* controller);
 
     void listen();
     void stop();
@@ -22,4 +24,5 @@ private:
     http::Server m_httpServer;
 };
 
+} // namespace view
 } // namespace nx::cloud::storage::service

@@ -13,7 +13,7 @@ class Settings;
 
 } // namespace conf
 
-namespace http {
+namespace view::http {
 
 class CloudDbAuthenticationForwarder:
     public network::http::server::AbstractAuthenticationManager
@@ -48,5 +48,5 @@ private:
         const conf::Settings& settings);
 };
 
-} // namespace http
+} // namespace view::http
 } // namespace nx::cloud::storage::service

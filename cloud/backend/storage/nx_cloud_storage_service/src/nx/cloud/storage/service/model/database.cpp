@@ -1,8 +1,8 @@
 #include "database.h"
 
-#include "settings.h"
+#include "nx/cloud/storage/service/settings.h"
 
-namespace nx::cloud::storage::service {
+namespace nx::cloud::storage::service::model {
 
 namespace {
 
@@ -40,4 +40,4 @@ nx::clusterdb::engine::SynchronizationEngine& Database::synchronizationEngine()
     return *m_syncEngine;
 }
 
-} // namespace nx::cloud::storage::service
+} // namespace nx::cloud::storage::service::model

@@ -1,9 +1,9 @@
 #include "storage_service.h"
 
 #include "settings.h"
-#include "controller.h"
-#include "model.h"
-#include "view.h"
+#include "controller/controller.h"
+#include "model/model.h"
+#include "view/view.h"
 
 namespace nx::cloud::storage::service {
 
@@ -37,13 +37,13 @@ int StorageService::serviceMain(const utils::AbstractServiceSettings& settings)
     const conf::Settings& storageSettings = static_cast<const conf::Settings&>(settings);
     m_settings = &storageSettings;
 
-    Model model(storageSettings);
+    model::Model model(storageSettings);
     m_model = &model;
 
-    Controller controller(storageSettings, m_model);
+    controller::Controller controller(storageSettings, m_model);
     m_controller = &controller;
 
-    View view(storageSettings, m_controller);
+    view::View view(storageSettings, m_controller);
     m_view = &view;
 
     view.listen();

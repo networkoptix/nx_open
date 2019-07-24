@@ -1,18 +1,14 @@
-#include "manager.h"
+#include "storage_manager.h"
 
-#include "../settings.h"
-#include "../database.h"
+#include "nx/cloud/storage/service/settings.h"
 
-namespace nx::cloud::storage::service::storage {
+namespace nx::cloud::storage::service::controller {
 
-using namespace std::placeholders;
-
-Manager::Manager(Database* /*database*/)/*:
-    m_database(database)*/
+StorageManager::StorageManager(const conf::Aws& /*settings*/)
 {
 }
 
-void Manager::addStorage(
+void StorageManager::addStorage(
     const api::AddStorageRequest& request,
     nx::utils::MoveOnlyFunc<void(api::Result, api::Storage)> handler)
 {
@@ -22,7 +18,7 @@ void Manager::addStorage(
     handler(api::Result{api::ResultCode::ok, "addOk"}, std::move(response));
 }
 
-void Manager::readStorage(
+void StorageManager::readStorage(
     const std::string& storageId,
     nx::utils::MoveOnlyFunc<void(api::Result, api::Storage)> handler)
 {
@@ -31,35 +27,18 @@ void Manager::readStorage(
     handler(api::Result{api::ResultCode::ok, "readOk"}, std::move(response));
 }
 
-void Manager::removeStorage(
+void StorageManager::removeStorage(
     const std::string& /*storageId*/,
     nx::utils::MoveOnlyFunc<void(api::Result)> handler)
 {
     handler(api::Result{api::ResultCode::ok, "removeOk"});
 }
 
-void Manager::listCameras(
+void StorageManager::listCameras(
     const std::string& /*storageId*/,
     nx::utils::MoveOnlyFunc<void(api::Result, std::vector<std::string>)> handler)
 {
     handler(api::Result{api::ResultCode::ok, "listCamerasOk"}, std::vector<std::string>());
 }
 
-ManagerFactory::ManagerFactory():
-    base_type(std::bind(&ManagerFactory::defaultFactoryFunction, this, _1, _2))
-{
-}
-
-ManagerFactory& ManagerFactory::instance()
-{
-    static ManagerFactory factory;
-    return factory;
-}
-
-std::unique_ptr<AbstractManager> ManagerFactory::defaultFactoryFunction(
-    const  conf::Settings& /*settings*/, Database* database)
-{
-    return std::make_unique<Manager>(database);
-}
-
-} // namespace nx::cloud::storage::service:: storage
+} // namespace nx::cloud::storage::service::controller

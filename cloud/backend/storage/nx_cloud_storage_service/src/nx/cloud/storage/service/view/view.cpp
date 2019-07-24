@@ -1,11 +1,11 @@
 #include "view.h"
 
-#include "controller.h"
-#include "settings.h"
+#include "nx/cloud/storage/service/controller/controller.h"
+#include "nx/cloud/storage/service/settings.h"
 
-namespace nx::cloud::storage::service {
+namespace nx::cloud::storage::service::view {
 
-View::View(const conf::Settings& settings, Controller* controller):
+View::View(const conf::Settings& settings, controller::Controller* controller):
     m_httpServer(settings, controller)
 {
 }
@@ -42,4 +42,4 @@ const http::Server* View::httpServer() const
     return &m_httpServer;
 }
 
-} // namespace nx::cloud::storage::service
+} // namespace nx::cloud::storage::service::view

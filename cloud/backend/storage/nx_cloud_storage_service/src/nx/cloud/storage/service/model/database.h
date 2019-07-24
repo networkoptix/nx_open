@@ -7,6 +7,8 @@ namespace nx::cloud::storage::service {
 
 namespace conf { class Settings; }
 
+namespace model {
+
 class Database
 {
 public:
@@ -22,4 +24,5 @@ private:
     std::unique_ptr<nx::clusterdb::engine::SynchronizationEngine> m_syncEngine;
 };
 
+} // namespace model
 } // namespace nx::cloud::storage::service
