@@ -84,7 +84,6 @@ private:
     CyclicAllocator m_allocator;
 
     AVFormatContext* m_formatContext = nullptr;
-    int m_firstVideoIndex = 0;
 
     nxcip::AudioFormat m_audioFormat;
     bool m_audioEnabled = false;

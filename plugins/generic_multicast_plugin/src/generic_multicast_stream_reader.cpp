@@ -172,32 +172,7 @@ bool GenericMulticastStreamReader::initLayout()
 {
     resetAudioFormat();
 
-    m_firstVideoIndex = -1;
     int lastStreamId = -1;
-    int videoChannelNumber = -1;
-    int audioChannelNumber = -1;
-
-    for (unsigned int i = 0; i < m_formatContext->nb_streams; i++)
-    {
-        AVStream* stream = m_formatContext->streams[i];
-        AVCodecParameters* params = stream->codecpar;
-
-        if (params->codec_type >= AVMEDIA_TYPE_NB)
-            continue;
-
-        if (stream->id && stream->id == lastStreamId)
-            continue; // duplicate
-
-        lastStreamId = stream->id;
-
-        if (params->codec_type == AVMEDIA_TYPE_VIDEO)
-        {
-            if (m_firstVideoIndex == -1)
-                m_firstVideoIndex = i;
-        }
-    }
-
-    lastStreamId = -1;
     for (unsigned int i = 0; i < m_formatContext->nb_streams; i++)
     {
         AVStream* stream = m_formatContext->streams[i];
@@ -213,7 +188,6 @@ bool GenericMulticastStreamReader::initLayout()
 
         if (params->codec_type == AVMEDIA_TYPE_AUDIO)
         {
-            ++audioChannelNumber;
             m_audioFormat.compressionType = fromFfmpegCodecIdToNx(params->codec_id);
             m_audioFormat.bitsPerCodedSample = params->bits_per_coded_sample;
             m_audioFormat.sampleRate = params->sample_rate;
