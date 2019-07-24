@@ -602,8 +602,25 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
 
     if (!camera->isLicenseUsed() && camera->isDtsBased())
     {
-        isFootageAllowed = false;
-        isExportAllowed = false;
+        switch (camera->licenseType())
+        {
+            case Qn::LC_Bridge:
+            {
+                isFootageAllowed = false;
+                isExportAllowed = false;
+                break;
+            }
+
+            // TODO: Forbid all for VMAX when discussed with management
+            case Qn::LC_VMAX:
+            {
+                // isLiveAllowed = false;
+                // footageAllowed = false;
+                break;
+            }
+            default:
+                break;
+        }
     }
 
     if (isLiveAllowed)
