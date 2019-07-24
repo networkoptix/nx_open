@@ -252,7 +252,7 @@ void ServerTimeSyncManager::updateTime()
         if (route.id == ownId)
             success = loadTimeFromInternet();
         else
-            success = loadTimeFromServer(route);
+            success = loadTimeFromServer(route) == TimeSyncManager::Result::ok;
         if (success)
         {
             m_timeLoadFromServer = route.id;
@@ -266,7 +266,7 @@ void ServerTimeSyncManager::updateTime()
         {
             if (isTimeRecentlySync && m_timeLoadFromServer == route.id)
                 return;
-            if (loadTimeFromServer(route))
+            if (loadTimeFromServer(route) == TimeSyncManager::Result::ok)
             {
                 m_timeLoadFromServer = route.id;
                 m_lastNetworkSyncTime.restart();
