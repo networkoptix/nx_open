@@ -311,8 +311,15 @@ void AbstractGraphicsSlider::setRepeatAction(SliderAction action, int thresholdT
     }
 }
 
-void AbstractGraphicsSlider::sliderChange(SliderChange)
+void AbstractGraphicsSlider::setSkipUpdateOnSliderChange(const QSet<SliderChange>& set)
 {
+    d_func()->setSkipUpdateOnSliderChange(set);
+}
+
+void AbstractGraphicsSlider::sliderChange(SliderChange change)
+{
+    if (d_func()->canSkipUpdate(change))
+        return;
     update();
 }
 

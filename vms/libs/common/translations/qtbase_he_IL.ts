@@ -74,7 +74,7 @@
     </message>
     <message>
       <source>SetFocus</source>
-      <translation>קבע מיקוד</translation>
+      <translation>קבע פוקוס</translation>
     </message>
     <message>
       <source>Toggle</source>
@@ -146,11 +146,11 @@
     </message>
     <message>
       <source>Goes back a page</source>
-      <translation>הולך דף אחורה</translation>
+      <translation>עובר דף אחורה</translation>
     </message>
     <message>
       <source>Goes to the next page</source>
-      <translation>הולך לדף הבא</translation>
+      <translation>עובר לדף הבא</translation>
     </message>
   </context>
   <context>
@@ -180,7 +180,7 @@
     </message>
     <message>
       <source>About</source>
-      <translation>שירותים</translation>
+      <translation>אודות</translation>
     </message>
     <message>
       <source>Config</source>
@@ -200,7 +200,7 @@
     </message>
     <message>
       <source>Setup</source>
-      <translation>הגדרות</translation>
+      <translation>התקנה</translation>
     </message>
     <message>
       <source>Quit</source>

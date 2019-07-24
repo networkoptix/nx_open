@@ -3194,7 +3194,7 @@ void MediaServerProcess::startPublicIpDiscovery()
 void MediaServerProcess::resetSystemState(
     nx::vms::cloud_integration::CloudConnectionManager& cloudConnectionManager)
 {
-    for (;;)
+    while (!needToStop())
     {
         if (!cloudConnectionManager.detachSystemFromCloud())
         {

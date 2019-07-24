@@ -294,8 +294,12 @@ createUpdateZip() # file.deb
         done
     fi
 
+    # Take space required to install from the DEB package and put it into package.json.
+    local FREE_SPACE_REQUIRED=$(distrib_getInstalledSizeFromDeb "$DEB_FILE")
+    sed "s/\"freeSpaceRequired\": 0/\"freeSpaceRequired\": $FREE_SPACE_REQUIRED/" \
+        "package.json" >"$ZIP_DIR/package.json"
+
     cp -r "update/update.json" "$ZIP_DIR/update.json"
-    cp "package.json" "$ZIP_DIR/"
     distrib_createArchive "$DISTRIBUTION_OUTPUT_DIR/$UPDATE_ZIP" "$ZIP_DIR" zip -r
     rm "$ZIP_DIR/package.json" #< Legacy RPI/Bananapi packages does not need this file.
 

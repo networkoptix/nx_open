@@ -41,7 +41,7 @@
     <message>
       <location/>
       <source>ARM support policy</source>
-      <translation type="unfinished">ARM support policy</translation>
+      <translation>ARM-stödregler</translation>
     </message>
   </context>
   <context>
@@ -189,12 +189,12 @@
     <message>
       <location/>
       <source>Max. days</source>
-      <translation type="unfinished">Max. days</translation>
+      <translation>Max. dagar</translation>
     </message>
     <message>
       <location/>
       <source>Min. days</source>
-      <translation type="unfinished">Min. days</translation>
+      <translation>Min. dagar</translation>
     </message>
   </context>
   <context>
@@ -320,7 +320,7 @@
     <message>
       <location/>
       <source>on the next day</source>
-      <translation type="unfinished">on the next day</translation>
+      <translation>nästa dag</translation>
     </message>
   </context>
   <context>
@@ -552,7 +552,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_properties/camera/dialogs/camera_credentials_dialog.ui"/>
       <source>Authentication credentials</source>
-      <translation type="unfinished">Authentication credentials</translation>
+      <translation>Autentiseringsuppgifter</translation>
     </message>
   </context>
   <context>
@@ -665,12 +665,12 @@
     <message>
       <location/>
       <source>Custom Media Port</source>
-      <translation type="unfinished">Custom Media Port</translation>
+      <translation>Anpassad mediaport</translation>
     </message>
     <message>
       <location/>
       <source>Trust camera timestamp</source>
-      <translation type="unfinished">Trust camera timestamp</translation>
+      <translation>Lita på kameratidsstämpeln</translation>
     </message>
     <message>
       <location/>
@@ -690,7 +690,7 @@
     <message>
       <location/>
       <source>Native camera presets will not be avaliable.</source>
-      <translation type="unfinished">Native camera presets will not be avaliable.</translation>
+      <translation>Varning! Ursprungliga förinställningar i kameran kommer inte vara tillgängliga.</translation>
     </message>
     <message>
       <location/>
@@ -705,7 +705,7 @@
     <message>
       <location/>
       <source>Detect motion during archive import</source>
-      <translation type="unfinished">Detect motion during archive import</translation>
+      <translation>Upptäck rörelse under arkivimport</translation>
     </message>
   </context>
   <context>
@@ -763,7 +763,7 @@
     <message>
       <location/>
       <source>Show on layout</source>
-      <translation type="unfinished">Show on layout</translation>
+      <translation>Visa på Layout</translation>
     </message>
     <message>
       <location/>
@@ -773,7 +773,7 @@
     <message>
       <location/>
       <source>Camera rules</source>
-      <translation type="unfinished">Camera rules</translation>
+      <translation>Kameraregler</translation>
     </message>
     <message>
       <location/>
@@ -866,7 +866,7 @@
     <message>
       <location/>
       <source>Copy Schedule to...</source>
-      <translation type="unfinished">Copy Schedule to...</translation>
+      <translation>Kopiera schema till...</translation>
     </message>
   </context>
   <context>
@@ -892,7 +892,7 @@
     <message>
       <location/>
       <source>Edit Credentials</source>
-      <translation type="unfinished">Edit Credentials</translation>
+      <translation>Redigera autentiseringsuppgifter</translation>
     </message>
     <message>
       <location/>
@@ -902,7 +902,7 @@
     <message>
       <location/>
       <source>Enable audio</source>
-      <translation type="unfinished">Enable audio</translation>
+      <translation>Aktivera ljud</translation>
     </message>
     <message>
       <location/>
@@ -990,7 +990,7 @@
     <message>
       <location/>
       <source>Omit Logging</source>
-      <translation type="unfinished">Omit Logging</translation>
+      <translation>Avaktivera Loggning</translation>
     </message>
   </context>
   <context>
@@ -1024,12 +1024,12 @@
     <message>
       <location/>
       <source>SELECT SERVER</source>
-      <translation type="unfinished">SELECT SERVER</translation>
+      <translation>VÄLJ SERVER</translation>
     </message>
     <message>
       <location/>
       <source>Known Address</source>
-      <translation type="unfinished">Known Address</translation>
+      <translation>Känd adress</translation>
     </message>
     <message>
       <location/>
@@ -1044,7 +1044,7 @@
     <message>
       <location/>
       <source>Hint</source>
-      <translation type="unfinished">Hint</translation>
+      <translation>Tips</translation>
     </message>
     <message>
       <location/>
@@ -1084,12 +1084,12 @@
     <message>
       <location/>
       <source>Add all Devices</source>
-      <translation type="unfinished">Add all Devices</translation>
+      <translation>Lägg till alla enheter</translation>
     </message>
     <message>
       <location/>
       <source>Add Devices</source>
-      <translation type="unfinished">Add Devices</translation>
+      <translation>Lägg till enheter</translation>
     </message>
     <message>
       <location/>
@@ -1107,12 +1107,12 @@
     <message>
       <location/>
       <source>I Do Not Agree</source>
-      <translation type="unfinished">I Do Not Agree</translation>
+      <translation>Jag godkänner inte</translation>
     </message>
     <message>
       <location/>
       <source>I Agree</source>
-      <translation type="unfinished">I Agree</translation>
+      <translation>Jag godkänner</translation>
     </message>
   </context>
   <context>
@@ -1248,7 +1248,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/export/widgets/export_password_widget.ui"/>
       <source>Protect with password</source>
-      <translation type="unfinished">Protect with password</translation>
+      <translation>Skydda med lösenord</translation>
     </message>
     <message>
       <location/>
@@ -1444,7 +1444,7 @@
     <message>
       <location/>
       <source>Encrypting video traffic will significantly increase CPU usage.</source>
-      <translation type="unfinished">Encrypting video traffic will significantly increase CPU usage.</translation>
+      <translation>Kryptering av videotrafik ökar väsentligt CPU-användningen.</translation>
     </message>
   </context>
   <context>
@@ -1457,12 +1457,12 @@
     <message>
       <location/>
       <source>Aspect ratio</source>
-      <translation type="unfinished">Aspect ratio</translation>
+      <translation>Bildförhållande</translation>
     </message>
     <message>
       <location/>
       <source>Default rotation</source>
-      <translation type="unfinished">Default rotation</translation>
+      <translation>Standardrotation</translation>
     </message>
   </context>
   <context>
@@ -1612,7 +1612,7 @@
     <message>
       <location/>
       <source>Minimum Grid Size</source>
-      <translation type="unfinished">Minimum Grid Size</translation>
+      <translation>Minsta gridstorlek</translation>
     </message>
   </context>
   <context>
@@ -1678,7 +1678,7 @@
     <message>
       <location/>
       <source>Admin DN or CN</source>
-      <translation type="unfinished">Admin DN or CN</translation>
+      <translation>Admin DN eller CN</translation>
     </message>
   </context>
   <context>
@@ -1978,7 +1978,7 @@
     <message>
       <location/>
       <source>Check for update</source>
-      <translation type="unfinished">Check for update</translation>
+      <translation>Sök efter uppdatering</translation>
     </message>
     <message>
       <location/>
@@ -2003,7 +2003,7 @@
     <message>
       <location/>
       <source>Download &amp;&amp; Install</source>
-      <translation type="unfinished">Download &amp;&amp; Install</translation>
+      <translation>Hämta &amp;&amp; Installera</translation>
     </message>
     <message>
       <location/>
@@ -2018,7 +2018,7 @@
     <message>
       <location/>
       <source>Advanced Update Settings</source>
-      <translation type="unfinished">Advanced Update Settings</translation>
+      <translation>Avancerade uppdateringsinställningar</translation>
     </message>
     <message>
       <location/>
@@ -2031,12 +2031,12 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_dialogs/multiple_layout_selection_dialog.ui"/>
       <source>Show all layouts</source>
-      <translation type="unfinished">Show all layouts</translation>
+      <translation>Visa alla layouter</translation>
     </message>
     <message>
       <location/>
       <source>Select Layouts</source>
-      <translation type="unfinished">Select Layouts</translation>
+      <translation>Välj layouter</translation>
     </message>
   </context>
   <context>
@@ -2049,12 +2049,7 @@
     <message>
       <location/>
       <source>New Virtual Camera...</source>
-      <translation type="unfinished">New Virtual Camera...</translation>
-    </message>
-    <message>
-      <location/>
-      <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
-      <translation type="unfinished">&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</translation>
+      <translation>Ny virtuell kamera...</translation>
     </message>
   </context>
   <context>
@@ -2062,12 +2057,12 @@
     <message>
       <location filename="../src/ui/widgets/business/open_layout_action_widget.ui"/>
       <source>Layout</source>
-      <translation type="unfinished">Layout</translation>
+      <translation>Vyer</translation>
     </message>
     <message>
       <location/>
       <source>Show to</source>
-      <translation type="unfinished">Show to</translation>
+      <translation>Visa för</translation>
     </message>
     <message>
       <location/>
@@ -2099,26 +2094,26 @@
     </message>
   </context>
   <context>
-    <name>PluginEventWidget</name>
+    <name>PluginDiagnosticEventWidget</name>
     <message>
-      <location filename="../src/nx/vms/client/desktop/ui/event_rules/widgets/plugin_event_widget.ui"/>
+      <location filename="../src/nx/vms/client/desktop/ui/event_rules/widgets/plugin_diagnostic_event_widget.ui"/>
       <source>Source:</source>
-      <translation>Källa:</translation>
+      <translation type="unfinished">Source:</translation>
     </message>
     <message>
       <location/>
       <source>Caption contains:</source>
-      <translation>Bildtexten innehåller:</translation>
+      <translation type="unfinished">Caption contains:</translation>
     </message>
     <message>
       <location/>
       <source>Keywords separated by space</source>
-      <translation>Nyckelord åtskilda med blanksteg</translation>
+      <translation type="unfinished">Keywords separated by space</translation>
     </message>
     <message>
       <location/>
       <source>Description contains:</source>
-      <translation>Beskrivningen innehåller:</translation>
+      <translation type="unfinished">Description contains:</translation>
     </message>
     <message>
       <location/>
@@ -2287,7 +2282,7 @@
     <message>
       <location/>
       <source>Restart to the updated version when ready</source>
-      <translation type="unfinished">Restart to the updated version when ready</translation>
+      <translation>Starta om till den uppdaterade versionen när du är klar</translation>
     </message>
   </context>
   <context>
@@ -2540,7 +2535,7 @@
     <message>
       <location/>
       <source>Server name</source>
-      <translation type="unfinished">Server name</translation>
+      <translation>Servernamn</translation>
     </message>
   </context>
   <context>
@@ -2657,7 +2652,7 @@
     <message>
       <location/>
       <source>Drag any image or video file to the application window to play them</source>
-      <translation type="unfinished">Drag any image or video file to the application window to play them</translation>
+      <translation>Dra en bild eller en videofil till programfönstret för att spela upp dem</translation>
     </message>
   </context>
   <context>
@@ -2751,12 +2746,12 @@
     <message>
       <location/>
       <source>Allow only secure connections</source>
-      <translation type="unfinished">Allow only secure connections</translation>
+      <translation>Tillåt endast säkra anslutningar</translation>
     </message>
     <message>
       <location/>
       <source>Encrypt video traffic</source>
-      <translation type="unfinished">Encrypt video traffic</translation>
+      <translation>Kryptera videotrafik</translation>
     </message>
     <message>
       <location/>
@@ -2776,12 +2771,7 @@
     <message>
       <location/>
       <source>Limit session duration</source>
-      <translation type="unfinished">Limit session duration</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
-      <translation type="unfinished">Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</translation>
+      <translation>Begränsa sessionens varaktighet</translation>
     </message>
   </context>
   <context>
@@ -3026,7 +3016,7 @@
     <message>
       <location/>
       <source>Base forecast on data recorded during</source>
-      <translation type="unfinished">Base forecast on data recorded during</translation>
+      <translation>Basprognos för data som registrerats under</translation>
     </message>
   </context>
   <context>
@@ -3074,22 +3064,22 @@
     <message>
       <location/>
       <source>Analytics data will continue to be stored on the disabled storage.</source>
-      <translation type="unfinished">Analytics data will continue to be stored on the disabled storage.</translation>
+      <translation>Analytics-data fortsätter att lagras i det inaktiverade lagret.</translation>
     </message>
     <message>
       <location/>
       <source>Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</source>
-      <translation type="unfinished">Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</translation>
+      <translation>Inspelning till avaktiverad lagring stoppas. Men det kommer att fortsätta att radera utdaterat material från det.</translation>
     </message>
     <message>
       <location/>
       <source>Recording was enabled on the USB storage</source>
-      <translation type="unfinished">Recording was enabled on the USB storage</translation>
+      <translation>Inspelningen aktiverades på USB-minnet</translation>
     </message>
     <message>
       <location/>
       <source>Analytics data can occupy tens of gigabytes of storage space. We recommend to choose other location for it instead of the system partition.</source>
-      <translation type="unfinished">Analytics data can occupy tens of gigabytes of storage space. We recommend to choose other location for it instead of the system partition.</translation>
+      <translation>Analytics-data kan uppta tiotals gigabyte lagringsutrymme. Vi rekommenderar att du väljer annan plats för den istället för systempartitionen.</translation>
     </message>
   </context>
   <context>
@@ -3207,7 +3197,7 @@
     <message>
       <location/>
       <source>VMS Time</source>
-      <translation type="unfinished">VMS Time</translation>
+      <translation>VMS-tid</translation>
     </message>
   </context>
   <context>
@@ -3215,17 +3205,17 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/system_administration/widgets/time_synchronization_widget.ui"/>
       <source>Sync Time with the Internet</source>
-      <translation type="unfinished">Sync Time with the Internet</translation>
+      <translation>Synkronisera tiden med Internet</translation>
     </message>
     <message>
       <location/>
       <source>VMS Time</source>
-      <translation type="unfinished">VMS Time</translation>
+      <translation>VMS-tid</translation>
     </message>
     <message>
       <location/>
       <source>Do not sync time among servers</source>
-      <translation type="unfinished">Do not sync time among servers</translation>
+      <translation>Synkronisera inte tid bland servrar</translation>
     </message>
   </context>
   <context>
@@ -3333,7 +3323,7 @@
     <message>
       <location/>
       <source>Detect motion</source>
-      <translation type="unfinished">Detect motion</translation>
+      <translation>Registrera rörelse</translation>
     </message>
   </context>
   <context>
@@ -3346,7 +3336,7 @@
     <message>
       <location/>
       <source>Upload Footage</source>
-      <translation type="unfinished">Upload Footage</translation>
+      <translation>Ladda upp bilder</translation>
     </message>
     <message>
       <location/>

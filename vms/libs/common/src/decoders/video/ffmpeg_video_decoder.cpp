@@ -166,6 +166,8 @@ void QnFfmpegVideoDecoder::determineOptimalThreadType(const QnConstCompressedVid
     else
         m_context->thread_count = 1; //< Turn off multi thread decoding.
 
+    NX_DEBUG(this, "Initialize video decoder, codec id: %1, thread count: %2",
+        m_context->codec_id, m_context->thread_count);
 
     if (m_forceSliceDecoding == -1 && data && data->data() && m_context->codec_id == AV_CODEC_ID_H264)
     {

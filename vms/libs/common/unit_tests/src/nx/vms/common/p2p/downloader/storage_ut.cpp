@@ -251,6 +251,29 @@ TEST_F(DistributedFileDownloaderStorageTest, fileDeletion)
     ASSERT_FALSE(QFile::exists(testFilePath));
 }
 
+TEST_F(DistributedFileDownloaderStorageTest, fileCleanup)
+{
+    createDefaultTestFile();
+
+    ASSERT_EQ(downloaderStorage->clearFile(testFileName),
+        ResultCode::fileDoesNotExist);
+
+    FileInformation fileInfo(testFileName);
+    fileInfo.status = FileInformation::Status::downloaded;
+
+    ASSERT_EQ(downloaderStorage->addFile(fileInfo),
+        ResultCode::ok);
+    ASSERT_EQ(downloaderStorage->fileInformation(testFileName).status,
+        FileInformation::Status::downloaded);
+
+    ASSERT_EQ(downloaderStorage->clearFile(testFileName, false),
+        ResultCode::fileAlreadyDownloaded);
+    ASSERT_EQ(downloaderStorage->clearFile(testFileName, true),
+        ResultCode::ok);
+    ASSERT_EQ(downloaderStorage->fileInformation(testFileName).status,
+        FileInformation::Status::downloading);
+}
+
 TEST_F(DistributedFileDownloaderStorageTest, updateEmptyFile)
 {
     ASSERT_EQ(downloaderStorage->addFile(testFileName),

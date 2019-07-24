@@ -321,11 +321,11 @@ public:
     //void notificationReceived(const std::string& relayToken, bool active);
 
     /** Notifications with timestamp earlier than \a minNotificationTime are ignored. */
-    void handleOneNotification(
+    void handleOneNotificationThreadUnsafe(
         const oasisWsnB2__NotificationMessageHolderType& notification,
         time_t minNotificationTime = (time_t)-1);
 
-    void onRelayInputStateChange(const QString& name, const RelayInputState& state);
+    void onRelayInputStateChangeThreadUnsafe(const QString& name, const RelayInputState& state);
     QString fromOnvifDiscoveredUrl(const std::string& onvifUrl, bool updatePort = true);
 
     virtual int getMaxChannelsFromDriver() const override;
@@ -497,13 +497,20 @@ protected:
 
     qreal getBestSecondaryCoeff(const QList<QSize> resList, qreal aspectRatio) const;
     int getSecondaryIndex(const QList<VideoEncoderCapabilities>& optList) const;
+
+    void readSubscriptionReferenceParametersThreadUnsafe(
+        wsa5__EndpointReferenceType& SubscriptionReference);
+
     //!Registers local NotificationConsumer in resource's NotificationProducer
     bool registerNotificationConsumer();
     void updateFirmware();
     void scheduleRetrySubscriptionTimer();
+    void scheduleRetrySubscriptionTimerAsOdmThreadUnsafe();
     virtual bool subscribeToCameraNotifications();
 
     bool createPullPointSubscription();
+    bool createPullPointSubscriptionAsOdmThreadSafe();
+
     bool loadXmlParametersInternal(
         QnCameraAdvancedParams &params, const QString& paramsTemplateFileName) const;
     void setMaxChannels(int value);
@@ -527,9 +534,7 @@ private:
     class SubscriptionReferenceParametersParseHandler: public QXmlDefaultHandler
     {
     public:
-        QString subscriptionID;
-
-        SubscriptionReferenceParametersParseHandler();
+        std::string subscriptionID;
 
         virtual bool characters(const QString& ch) override;
         virtual bool startElement(const QString& namespaceURI, const QString& localName,
@@ -538,7 +543,7 @@ private:
             const QString& qName) override;
 
     private:
-        bool m_readingSubscriptionID;
+        bool m_readingSubscriptionID = false;
     };
 
     struct onvifSimpleItem
@@ -614,7 +619,7 @@ private:
     bool m_fixWrongInputPortNumber;
     bool m_fixWrongOutputPortToken;
     std::map<QString, RelayInputState> m_relayInputStates;
-    QString m_onvifNotificationSubscriptionID;
+    std::string m_onvifNotificationSubscriptionID;
     mutable QnMutex m_ioPortMutex;
     bool m_inputMonitored;
     qint64 m_clearInputsTimeoutUSec;
@@ -632,6 +637,7 @@ private:
 
     QElapsedTimer m_pullMessagesResponseElapsedTimer;
     QSharedPointer<GSoapAsyncPullMessagesCallWrapper> m_asyncPullMessagesCallWrapper;
+    std::future<void> m_renewPullCycleFuture;
 
     QString m_portNamePrefixToIgnore;
     size_t m_inputPortCount;
@@ -641,9 +647,17 @@ private:
     std::unique_ptr<int> m_govLength;
     std::unique_ptr<std::string> m_profile;
 
-    void removePullPointSubscription();
+    void removePullPointSubscriptionThreadSafe();
+
     void pullMessages(quint64 timerID);
+    void pullMessagesAsOdmThreadSafe();
     void onPullMessagesDone(GSoapAsyncPullMessagesCallWrapper* asyncWrapper, int resultCode);
+
+    void nextRenewPullCicleAsOdmThreadSafe(GSoapAsyncPullMessagesCallWrapper* asyncWrapper, int resultCode);
+    void onPullMessagesDoneAsOdm(GSoapAsyncPullMessagesCallWrapper* asyncWrapper, int resultCode);
+
+    bool RenewSubscriptionAsOdmThreadSafe();
+
     /**
      * Used for cameras that do not support renew request.
      */
@@ -651,7 +665,7 @@ private:
     void renewPullPointSubscriptionFallback(quint64 timerId);
 
     /** Handle all notifications listed in the response. */
-    void handleAllNotifications(const _onvifEvents__PullMessagesResponse& response);
+    void handleAllNotificationsThreadUnsafe(const _onvifEvents__PullMessagesResponse& response);
 
     //!Reads relay output list from resource
     bool fetchRelayOutputs(std::vector<RelayOutputInfo>* relayOutputInfoList);

@@ -3,7 +3,7 @@
 
 #include <functional>
 
-#include <utils/memory/system_allocator.h>
+#include <nx/utils/memory/system_allocator.h>
 #include <nx/utils/log/assert.h>
 #include <nx/kit/utils.h>
 

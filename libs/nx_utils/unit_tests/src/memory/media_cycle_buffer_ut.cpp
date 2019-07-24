@@ -3,7 +3,7 @@
 #include <QtCore/QDateTime>
 #include <QtCore/QDebug>
 
-#include <utils/memory/cycle_buffer.h>
+#include <nx/utils/memory/cycle_buffer.h>
 
 bool isDataEq(const QByteArray& data, char ch)
 {

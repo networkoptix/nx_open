@@ -341,9 +341,9 @@ bool SystemCommands::isPathExists(const std::string& path)
 
 SystemCommands::Stats SystemCommands::stat(const std::string& path)
 {
-    struct stat buf;
+    struct stat64 buf;
     Stats result;
-    result.exists = ::stat(path.c_str(), &buf) == 0;
+    result.exists = ::stat64(path.c_str(), &buf) == 0;
 
     if (result.exists)
     {
@@ -364,7 +364,7 @@ std::string SystemCommands::serializedFileList(const std::string& path)
 {
     DIR *dir = opendir(path.c_str());
     struct dirent *entry;
-    struct stat statBuf;
+    struct stat64 statBuf;
     std::stringstream out;
     char pathBuf[2048];
     ssize_t pathBufLen;
@@ -389,7 +389,7 @@ std::string SystemCommands::serializedFileList(const std::string& path)
         strncpy(pathBuf + pathBufLen, entry->d_name,
             std::max<int>((ssize_t) sizeof(pathBuf) - pathBufLen, 0));
 
-        if (::stat(pathBuf, &statBuf) != 0)
+        if (::stat64(pathBuf, &statBuf) != 0)
             continue;
 
         out << pathBuf << "," << (S_ISDIR(statBuf.st_mode) ? statBuf.st_size : 0) << ","
@@ -409,9 +409,9 @@ int64_t SystemCommands::fileSize(const std::string& path)
 
 std::string SystemCommands::devicePath(const std::string& path)
 {
-    struct stat statBuf;
+    struct stat64 statBuf;
     std::string result;
-    if (::stat(path.c_str(), &statBuf) == 0)
+    if (::stat64(path.c_str(), &statBuf) == 0)
     {
         std::ifstream partitionsFile("/proc/partitions");
         if (partitionsFile.is_open())

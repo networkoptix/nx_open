@@ -148,13 +148,12 @@ void CommonUpdateManager::retry(bool forceRedownload)
     }
 
     const update::Status status = this->status();
-    if (status.code != update::Status::Code::error)
+    if (!status.suitableForRetrying())
         return;
 
     using ErrorCode = update::Status::ErrorCode;
     switch (status.errorCode)
     {
-        case ErrorCode::noError:
         case ErrorCode::updatePackageNotFound:
         case ErrorCode::osVersionNotSupported:
         case ErrorCode::internalError:
@@ -165,6 +164,7 @@ void CommonUpdateManager::retry(bool forceRedownload)
             // We can do nothing with these cases.
             break;
 
+        case ErrorCode::noError:
         case ErrorCode::noFreeSpaceToDownload:
         case ErrorCode::downloadFailed:
         case ErrorCode::corruptedArchive:
@@ -252,12 +252,7 @@ bool CommonUpdateManager::canDownloadFile(
 
                 if (outUpdateStatus->code == update::Status::Code::readyToInstall)
                 {
-                    // We can't precizely evaluate the required space for update installation.
-                    // As a very approximate value we take 10% of the package size + some padding
-                    // hard-coded inside checkFreeSpace.
-                    const qint64 required = package.size / 10;
-                    if (!installer()->checkFreeSpace(
-                        QCoreApplication::applicationDirPath(), required))
+                    if (!installer()->checkFreeSpaceForInstallation())
                     {
                         *outUpdateStatus = update::Status(
                             peerId,
@@ -286,12 +281,16 @@ bool CommonUpdateManager::canDownloadFile(
     }
 
     if (!installer()->checkFreeSpace(
-        downloader()->downloadsDirectory().absolutePath(), package.size))
+        downloader()->downloadsDirectory().absolutePath(),
+        package.size + update::reservedSpacePadding()))
     {
         *outUpdateStatus = nx::update::Status(
             peerId, update::Status::Code::error, update::Status::ErrorCode::noFreeSpaceToDownload);
         return false;
     }
+
+    *outUpdateStatus = nx::update::Status(
+        peerId, update::Status::Code::idle, update::Status::ErrorCode::noError);
 
     return true;
 }

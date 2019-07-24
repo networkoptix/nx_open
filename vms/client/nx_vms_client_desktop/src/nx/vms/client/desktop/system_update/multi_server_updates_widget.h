@@ -87,6 +87,7 @@ public:
         };
 
         VersionMode versionMode = VersionMode::full;
+        bool notEnoughSpace = false;
         enum class HighlightMode
         {
             regular,
@@ -101,7 +102,11 @@ public:
     };
 
     /** Generates update report for a picked update contents. */
-    static VersionReport calculateUpdateVersionReport(const nx::update::UpdateContents& contents, QnUuid clientId);
+    static VersionReport calculateUpdateVersionReport(
+        const nx::update::UpdateContents& contents,
+        QnUuid clientId);
+
+    bool checkSpaceRequirements(const nx::update::UpdateContents& contents) const;
 
 protected:
     /**

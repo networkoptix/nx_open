@@ -62,8 +62,10 @@ void RemoteArchiveSynchronizationTask::createArchiveReaderThreadUnsafe(
     std::unique_ptr<QnAbstractArchiveDelegate> archiveDelegate = std::move(aviDelegate);
     if (m_resource->isRemoteArchiveMotionDetectionEnabled())
     {
+        QnMotionEstimation::Config config;
+        config.decoderConfig.mtDecodePolicy = serverModule()->settings().multiThreadDecodePolicy();
         auto motionDelegate = std::make_unique<plugins::MotionDelegateWrapper>(
-            std::move(archiveDelegate));
+            config, std::move(archiveDelegate));
 
         motionDelegate->setMotionRegion(m_resource->getMotionRegion(0));
         archiveDelegate = std::move(motionDelegate);

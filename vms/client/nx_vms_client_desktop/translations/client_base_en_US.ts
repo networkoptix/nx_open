@@ -4240,6 +4240,10 @@ to %1</source>
         <source>Virtual Camera %1</source>
         <translation></translation>
     </message>
+    <message>
+        <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnNotificationSoundManagerDialog</name>
@@ -7338,12 +7342,12 @@ If you intended to move analytics data to another storage location, please conta
 <context>
     <name>nx::vms::client::desktop::AnalyticsSearchListModel::Private</name>
     <message>
-        <source>Unknown object</source>
+        <source>deleted camera</source>
         <translation></translation>
     </message>
     <message>
-        <source>deleted camera</source>
-        <translation></translation>
+        <source>Unknown track</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8737,15 +8741,23 @@ If you intended to move analytics data to another storage location, please conta
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Some servers have no package available</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Failed to cancel update</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Failed to start installation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Some servers have no update packages available.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Some servers have encountered an internal error.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please please contact Customer Support.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -8863,10 +8875,6 @@ If you intended to move analytics data to another storage location, please conta
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Failed to install update</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Waiting for peer data</source>
         <translation type="unfinished"></translation>
     </message>
@@ -8924,6 +8932,10 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>Internal server error.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This OS version is no longer supported.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -9080,6 +9092,10 @@ If you intended to move analytics data to another storage location, please conta
         <source>Users will be automatically logged out if their session exceeds the specified duration.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::ServerSettingsDialogStore</name>
@@ -9175,6 +9191,10 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>Network error.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server error.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -9595,29 +9615,29 @@ If you intended to move analytics data to another storage location, please conta
     </message>
 </context>
 <context>
-    <name>nx::vms::client::desktop::ui::PluginEventModel</name>
+    <name>nx::vms::client::desktop::ui::PluginDiagnosticEventModel</name>
     <message>
         <source>Any Plugin</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
-    <name>nx::vms::client::desktop::ui::PluginEventWidget</name>
+    <name>nx::vms::client::desktop::ui::PluginDiagnosticEventWidget</name>
     <message>
         <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>If the field is empty, event will always trigger.</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>This field is case sensitive.</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

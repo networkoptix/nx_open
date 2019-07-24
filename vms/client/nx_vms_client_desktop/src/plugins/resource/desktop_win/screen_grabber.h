@@ -3,7 +3,7 @@
 #include <memory>
 
 #include <QtCore/QObject>
-#include <QtCore/QTime>
+#include <QtCore/QElapsedTimer>
 #include <QtGui/QPixmap>
 
 #include <windows.h>
@@ -60,7 +60,6 @@ public:
     //AVPixelFormat format() const { return AV_PIX_FMT_BGRA; }
     int width() const;
     int height() const;
-    qint64 currentTime() const;
     int refreshRate() const { return m_ddm.RefreshRate;}
     void restart();
     void setLogo(const QPixmap& logo);
@@ -68,6 +67,7 @@ public:
     int screenHeight() const;
     void pleaseStop();
     Qn::CaptureMode getMode() const { return m_mode; }
+    void setTimer(QElapsedTimer* timer) { m_timer = timer;  }
 private:
     HRESULT        InitD3D(HWND hWnd);
     bool dataToFrame(quint8* data, int dataStride, int width, int height, AVFrame* pFrame);
@@ -87,7 +87,7 @@ private:
     QVector<quint8*> m_openGLData;
     RECT m_rect{0, 0, 0, 0};
     D3DDISPLAYMODE m_ddm{};
-    QTime m_timer;
+    QElapsedTimer* m_timer = nullptr;
     unsigned m_frameNum = 0;
     int m_currentIndex = 0;
 

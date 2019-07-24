@@ -87,7 +87,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Downloading update package</source>
-      <translation>更新プログラム パッケージをダウンロード</translation>
+      <translation>アップロードパッケージのダウンロード中</translation>
     </message>
     <message>
       <source>Installing</source>
@@ -829,11 +829,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Some cameras require passwords to be set</source>
-      <translation>幾つかのカメラでパスワードを設定する必要があります</translation>
+      <translation>一部のカメラにパスワードを設定する必要があります</translation>
     </message>
     <message>
       <source>Export Video...</source>
-      <translation>ビデオエクスポート...</translation>
+      <translation>動画をエクスポート...</translation>
     </message>
     <message>
       <source>Export Bookmark...</source>
@@ -869,7 +869,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Copy Schedule...</source>
-      <translation>スケジュールコピー...</translation>
+      <translation>スケジュールをコピー...</translation>
     </message>
     <message>
       <source>Analytics Engine Settings...</source>
@@ -877,11 +877,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Show Thumbnails</source>
-      <translation>サムネイル表示</translation>
+      <translation>サムネイルを表示する</translation>
     </message>
     <message>
       <source>Hide Thumbnails</source>
-      <translation>サムネイル非表示</translation>
+      <translation>サムネイルを非表示にする</translation>
     </message>
     <message>
       <source>Pin Panel</source>
@@ -889,7 +889,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Unpin Panel</source>
-      <translation>パネルを固定解除</translation>
+      <translation>パネル固定を解除</translation>
     </message>
     <message>
       <source>Virtual Camera...</source>
@@ -980,7 +980,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Hardware ID of Server with this license does not match Hardware ID on which license was activated.</source>
-      <translation>このサーバーのハードウェアIDは、ライセンスがアクティブ化されたハードウェアIDと一致しません</translation>
+      <translation>このライセンスを持つサーバーのハードウェアIDは、ライセンスが有効化されたハードウェアIDと一致しません。</translation>
     </message>
   </context>
   <context>
@@ -1027,7 +1027,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Video</source>
-      <translation>ビデオ</translation>
+      <translation>映像</translation>
     </message>
     <message>
       <source>All Files</source>
@@ -1042,11 +1042,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Matroska</source>
-      <translation>Matroska</translation>
+      <translation>マトリョーシカ</translation>
     </message>
     <message>
       <source>MPEG-4 Part 14</source>
-      <translation>MPEG-4 Part 14</translation>
+      <translation>MPEG-4 Part14</translation>
     </message>
     <message>
       <source>%1 Media File</source>
@@ -1088,7 +1088,7 @@ to view more bookmarks</source>
     <message>
       <source>%1 on %2</source>
       <comment>Camera %1 on layout %2</comment>
-      <translation>%1 / %2</translation>
+      <translation>%2の%1</translation>
     </message>
   </context>
   <context>
@@ -1214,7 +1214,7 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>Password must be at least %n characters long.</source>
       <translation>
-        <numerusform>パスワードは最低でも %n 文字以上にして下さい</numerusform>
+        <numerusform>パスワードは最低でも %n 文字以上必要です</numerusform>
       </translation>
     </message>
     <message>
@@ -1253,7 +1253,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Only latin letters, numbers and keyboard symbols %1 are allowed.</source>
-      <translation>ラテン文字、数字、およびキーボードシンボル%1のみが許可されます</translation>
+      <translation>英数字およびキーボードの記号%1のみが許可されます。</translation>
     </message>
     <message>
       <source>Only latin letters, numbers and keyboard symbols are allowed.</source>
@@ -1451,11 +1451,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Helps avoid problems with OpenGL drawing which result in 100% CPU load.</source>
-      <translation>OpenGLの表示でCPU負荷が100％になる問題を回避できます</translation>
+      <translation>OpenGLの表示でCPU負荷が100％になる問題を回避できます。</translation>
     </message>
     <message>
       <source>Adjust to smallest value that does not degrade live view. Bigger buffer makes playback smoother but increases delay between real time and live view; smaller buffer decreases delay but can cause stutters.</source>
-      <translation>ライブビューを劣化させない最小値に調整します。バッファが大きいほど、再生はスムーズになりますが、リアルタイムとライブビューの間の遅延が増えます。バッファーを小さくすると遅延が減少しますが、スタッターが発生する可能性があります。</translation>
+      <translation>ライブビューを劣化させない最小値に調整してください。バッファが大きいほど再生はスムーズになりますが、リアルタイムとライブビューの間の遅延が増えます。バッファを小さくすると遅延は減少しますが、スタッターが発生する可能性があります。</translation>
     </message>
   </context>
   <context>
@@ -2014,7 +2014,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Force Acknowledgement will only work for Generic Events if camera modifiers are used in the Generic Event URL</source>
-      <translation>カメライベントが一般的イベントで使用されている場合、強制承認は一般的イベントに対してのみ機能します</translation>
+      <translation>カメライベントが汎用イベントで使用されている場合、強制承認は汎用イベントに対してのみ機能します</translation>
     </message>
   </context>
   <context>
@@ -2355,7 +2355,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Password should be at least 8 symbols long and contain different types of characters.</source>
-      <translation>パスワードは8文字以上で、異なる種類の文字を含む必要があります</translation>
+      <translation>パスワードは8文字以上で、異なる種類の文字を含む必要があります。</translation>
     </message>
     <message>
       <source>Password should not be equal to camera&apos;s user name</source>
@@ -2461,12 +2461,12 @@ to %1</source>
     </message>
     <message>
       <source>Account is not activated.</source>
-      <translation>アカウントがアクティベートされていません</translation>
+      <translation>アカウントが有効化されていません</translation>
     </message>
     <message>
       <source>Please log in to %1 and follow the provided instructions.</source>
       <comment>%1 is a cloud site name like &quot;Nx Cloud&quot;</comment>
-      <translation>%1 にログインし指示に従ってください</translation>
+      <translation>%1 ログインし、表示される指示に従ってください。</translation>
     </message>
     <message>
       <source>Invalid password</source>
@@ -2474,7 +2474,7 @@ to %1</source>
     </message>
     <message>
       <source>Too many attempts. Try again in a minute.</source>
-      <translation>試行回数が多すぎます。暫くしてからもう一度お試しください</translation>
+      <translation>試行回数が多すぎます。しばらくしてからもう一度お試しください</translation>
     </message>
   </context>
   <context>
@@ -2547,7 +2547,7 @@ to %1</source>
     </message>
     <message>
       <source>Internal server error. Please try again later.</source>
-      <translation>内部サーバーエラーです　後で再試行してください</translation>
+      <translation>内部サーバーエラーです　後で再試行してください。</translation>
     </message>
   </context>
   <context>
@@ -2697,7 +2697,7 @@ to %1</source>
     </message>
     <message>
       <source>Too many attempts. Try again in a minute.</source>
-      <translation>試行回数が多すぎます。暫くしてからもう一度お試しください</translation>
+      <translation>試行回数が多すぎます。しばらくしてからもう一度お試しください。</translation>
     </message>
     <message>
       <source>Download &amp;&amp; Install</source>
@@ -2731,19 +2731,19 @@ to %1</source>
     <name>QnCustomBusinessEventWidget</name>
     <message>
       <source>If the field is empty, event will always trigger.</source>
-      <translation>フィールドが空の場合は、常にイベントがトリガーされます</translation>
+      <translation>フィールドが空の場合は、常にイベントがトリガーされます。</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the source with any of the entered keywords.</source>
-      <translation>ソースフィールドに入力したキーワードのいずれかと一致するものがある場合にのみ、イベントが発生します</translation>
+      <translation>ソースフィールドに入力したキーワードのいずれかと一致するものがある場合にのみ、イベントが発生します。</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation>キャプションフィールドに入力したキーワードのいずれかと一致するものがある場合にのみ、イベントが発生します</translation>
+      <translation>キャプションフィールドに入力したキーワードのいずれかと一致するものがある場合にのみ、イベントが発生します。</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the description with any of the entered keywords.</source>
-      <translation>説明フィールドに入力したキーワードのいずれかと一致するものがある場合にのみ、イベントが発生します</translation>
+      <translation>説明フィールドに入力したキーワードのいずれかと一致するものがある場合にのみ、イベントが発生します。</translation>
     </message>
     <message>
       <source>Server API</source>
@@ -2751,7 +2751,7 @@ to %1</source>
     </message>
     <message>
       <source>To generate Generic Event, please refer to %1.</source>
-      <translation>一般的イベントの発報方法は %1を参照してください</translation>
+      <translation>汎用イベントを生成するには、 %1を参照してください。</translation>
     </message>
   </context>
   <context>
@@ -3178,7 +3178,7 @@ to %1</source>
     </message>
     <message>
       <source>Auto (%1)</source>
-      <translation type="unfinished">Auto (%1)</translation>
+      <translation>自動(%1)</translation>
     </message>
   </context>
   <context>
@@ -3541,7 +3541,7 @@ to %1</source>
     </message>
     <message>
       <source>Channels</source>
-      <translation type="unfinished">Channels</translation>
+      <translation>チャンネル</translation>
     </message>
   </context>
   <context>
@@ -4191,6 +4191,10 @@ to %1</source>
     <message>
       <source>Virtual Camera %1</source>
       <translation>バーチャルカメラ%1</translation>
+    </message>
+    <message>
+      <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
+      <translation type="unfinished">&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</translation>
     </message>
   </context>
   <context>
@@ -5041,7 +5045,7 @@ to %1</source>
     </message>
     <message>
       <source>Plugins</source>
-      <translation type="unfinished">Plugins</translation>
+      <translation>プラグイン</translation>
     </message>
   </context>
   <context>
@@ -5517,13 +5521,13 @@ to %1</source>
     </message>
     <message>
       <source>What to do with current analytics data?</source>
-      <translation type="unfinished">What to do with current analytics data?</translation>
+      <translation>現在の分析データをどうしますか？</translation>
     </message>
     <message>
       <source>Current analytics data will not be automatically moved to another location and will become unaccessible. You can keep it and manually move later, or delete permanently.
 If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
-      <translation type="unfinished">Current analytics data will not be automatically moved to another location and will become unaccessible. You can keep it and manually move later, or delete permanently.
-If you intended to move analytics data to another storage location, please contact support before proceeding.</translation>
+      <translation>現在の分析データは自動的に別の場所に移動されることなく、アクセス不能になります。そのままにして後で手動で移動するか、完全に削除することができます。
+分析データを別の保管場所に移動する予定の場合は、作業を進める前にサポートに連絡してください。</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -5586,11 +5590,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Use to store analytics data</source>
-      <translation type="unfinished">Use to store analytics data</translation>
+      <translation>分析データの保存に使用</translation>
     </message>
     <message>
       <source>Stores analytics data</source>
-      <translation type="unfinished">Stores analytics data</translation>
+      <translation>分析データを保管する</translation>
     </message>
   </context>
   <context>
@@ -5679,7 +5683,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Plugins</source>
-      <translation type="unfinished">Plugins</translation>
+      <translation>プラグイン</translation>
     </message>
   </context>
   <context>
@@ -5859,19 +5863,19 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Failover server measures may still request camera status updates regardless of this setting.</source>
-      <translation type="unfinished">Failover server measures may still request camera status updates regardless of this setting.</translation>
+      <translation>フェイルオーバーサーバーの対策では、この設定に関係なくカメラステータスの更新を要求することがあります。</translation>
     </message>
     <message>
       <source>Enable devices and servers autodiscovery and automated device status check</source>
-      <translation type="unfinished">Enable devices and servers autodiscovery and automated device status check</translation>
+      <translation>デバイスとサーバーの自動検出と自動デバイスステータスチェックを有効にする</translation>
     </message>
     <message>
       <source>Enable cameras and servers autodiscovery and automated camera status check</source>
-      <translation type="unfinished">Enable cameras and servers autodiscovery and automated camera status check</translation>
+      <translation>カメラとサーバーの自動検出と自動カメラステータスチェックを有効にする</translation>
     </message>
     <message>
       <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
-      <translation type="unfinished">When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</translation>
+      <translation>有効にすると、システムは新しいカメラとサーバーを継続的に検出し、状態更新のために検出リクエストをカメラに送信します。</translation>
     </message>
   </context>
   <context>
@@ -7019,11 +7023,11 @@ If you intended to move analytics data to another storage location, please conta
     <name>SessionExpiredDialog</name>
     <message>
       <source>Your session has expired</source>
-      <translation type="unfinished">Your session has expired</translation>
+      <translation>セッションの期限が切れました</translation>
     </message>
     <message>
       <source>Session duration limit can be changed by the system administrators</source>
-      <translation type="unfinished">Session duration limit can be changed by the system administrators</translation>
+      <translation>セッション期間の制限はシステム管理者が変更できます</translation>
     </message>
   </context>
   <context>
@@ -7235,18 +7239,18 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Do Not Show</source>
-      <translation type="unfinished">Do Not Show</translation>
+      <translation>非表示</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::AnalyticsSearchListModel::Private</name>
     <message>
-      <source>Unknown object</source>
-      <translation>不明なオブジェクト</translation>
-    </message>
-    <message>
       <source>deleted camera</source>
       <translation>削除されたカメラ</translation>
+    </message>
+    <message>
+      <source>Unknown track</source>
+      <translation type="unfinished">Unknown track</translation>
     </message>
   </context>
   <context>
@@ -7414,7 +7418,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Multicast</source>
-      <translation type="unfinished">Multicast</translation>
+      <translation>マルチキャスト</translation>
     </message>
   </context>
   <context>
@@ -7606,7 +7610,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Plugins</source>
-      <translation type="unfinished">Plugins</translation>
+      <translation>プラグイン</translation>
     </message>
   </context>
   <context>
@@ -8583,15 +8587,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>There was an error while installing updates:</source>
-      <translation type="unfinished">There was an error while installing updates:</translation>
+      <translation>アップデートのインストール中にエラーが発生しました。</translation>
     </message>
     <message>
       <source>Some servers have gone offline. Please wait until they become online to continue.</source>
-      <translation type="unfinished">Some servers have gone offline. Please wait until they become online to continue.</translation>
+      <translation>一部のサーバーがオフラインになりました。オンラインになるまで待ってください。</translation>
     </message>
     <message>
       <source>Update completed, but some components have failed an update</source>
-      <translation type="unfinished">Update completed, but some components have failed an update</translation>
+      <translation>アップデートは完了しましたが、一部のコンポーネントがアップデートに失敗しました</translation>
     </message>
     <message>
       <source>Please update %1 manually using an installation package.</source>
@@ -8603,35 +8607,43 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Failed to download update packages to some components</source>
-      <translation type="unfinished">Failed to download update packages to some components</translation>
+      <translation>一部のコンポーネントにアップデートパッケージをダウンロードできませんでした</translation>
     </message>
     <message>
       <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
-      <translation type="unfinished">OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</translation>
+      <translation>一部のコンポーネントのOSバージョンはサポートが終了しました。システムから削除するか、サポートされているバージョンにOSを更新してください。</translation>
     </message>
     <message>
       <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
-      <translation type="unfinished">OS version of the client is no longer supported. Please update its OS to a supported version.</translation>
+      <translation>クライアントのOSバージョンはサポートが終了しました。 OSをサポートされているバージョンに更新してください。</translation>
     </message>
     <message>
       <source>Failed to start update</source>
-      <translation type="unfinished">Failed to start update</translation>
+      <translation>更新を開始できませんでした</translation>
     </message>
     <message>
       <source>Starting update to ...</source>
-      <translation type="unfinished">Starting update to ...</translation>
-    </message>
-    <message>
-      <source>Some servers have no package available</source>
-      <translation type="unfinished">Some servers have no package available</translation>
+      <translation>更新を開始中...</translation>
     </message>
     <message>
       <source>Failed to cancel update</source>
-      <translation type="unfinished">Failed to cancel update</translation>
+      <translation>更新をキャンセルできませんでした</translation>
     </message>
     <message>
       <source>Failed to start installation</source>
-      <translation type="unfinished">Failed to start installation</translation>
+      <translation>インストールを開始できませんでした</translation>
+    </message>
+    <message>
+      <source>Some servers have no update packages available.</source>
+      <translation type="unfinished">Some servers have no update packages available.</translation>
+    </message>
+    <message>
+      <source>Some servers have encountered an internal error.</source>
+      <translation type="unfinished">Some servers have encountered an internal error.</translation>
+    </message>
+    <message>
+      <source>Please please contact Customer Support.</source>
+      <translation type="unfinished">Please please contact Customer Support.</translation>
     </message>
   </context>
   <context>
@@ -8663,19 +8675,19 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Device was disconnected</source>
-      <translation type="unfinished">Device was disconnected</translation>
+      <translation>デバイスが切断されました</translation>
     </message>
     <message>
       <source>Camera was disconnected</source>
-      <translation type="unfinished">Camera was disconnected</translation>
+      <translation>カメラの接続が切断されました</translation>
     </message>
     <message>
       <source>I/O Module was disconnected</source>
-      <translation type="unfinished">I/O Module was disconnected</translation>
+      <translation>I / Oモジュールが切断されました</translation>
     </message>
     <message>
       <source>Unknown Plugin Diagnostic Event</source>
-      <translation type="unfinished">Unknown Plugin Diagnostic Event</translation>
+      <translation>不明なプラグイン診断イベント</translation>
     </message>
   </context>
   <context>
@@ -8716,27 +8728,27 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::PeerStateTracker</name>
     <message>
       <source>The server is taking too long to respond</source>
-      <translation type="unfinished">The server is taking too long to respond</translation>
+      <translation>サーバーの応答に時間がかかりすぎています</translation>
     </message>
     <message>
       <source>No update task</source>
-      <translation type="unfinished">No update task</translation>
+      <translation>更新タスクはありません</translation>
     </message>
     <message>
       <source>Ready to download update</source>
-      <translation type="unfinished">Ready to download update</translation>
+      <translation>更新プログラムをダウンロードする準備ができました</translation>
     </message>
     <message>
       <source>Downloading update</source>
-      <translation type="unfinished">Downloading update</translation>
+      <translation>更新プログラムダウンロード中</translation>
     </message>
     <message>
       <source>Ready to restart to the new version</source>
-      <translation type="unfinished">Ready to restart to the new version</translation>
+      <translation>新しいバージョンに再起動する準備ができました</translation>
     </message>
     <message>
       <source>Installing update</source>
-      <translation type="unfinished">Installing update</translation>
+      <translation>更新プログラムのインストール中</translation>
     </message>
     <message>
       <source>Installed</source>
@@ -8744,47 +8756,43 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Failed to download update</source>
-      <translation type="unfinished">Failed to download update</translation>
-    </message>
-    <message>
-      <source>Failed to install update</source>
-      <translation type="unfinished">Failed to install update</translation>
+      <translation>更新プログラムをダウンロードできませんでした</translation>
     </message>
     <message>
       <source>Waiting for peer data</source>
-      <translation type="unfinished">Waiting for peer data</translation>
+      <translation>ピアデータを待っています</translation>
     </message>
     <message>
       <source>There is not enough space to download update files.</source>
-      <translation type="unfinished">There is not enough space to download update files.</translation>
+      <translation>更新ファイルをダウンロードするための十分なスペースがありません。</translation>
     </message>
     <message>
       <source>There is not enough space to extract update files.</source>
-      <translation type="unfinished">There is not enough space to extract update files.</translation>
+      <translation>更新ファイルを抽出するための十分なスペースがありません。</translation>
     </message>
     <message>
       <source>Failed to download update packages.</source>
-      <translation type="unfinished">Failed to download update packages.</translation>
+      <translation>アップデートパッケージのダウンロードに失敗しました。</translation>
     </message>
     <message>
       <source>Update contents are invalid.</source>
-      <translation type="unfinished">Update contents are invalid.</translation>
+      <translation>更新内容が無効です。</translation>
     </message>
     <message>
       <source>Update archive is corrupted.</source>
-      <translation type="unfinished">Update archive is corrupted.</translation>
+      <translation>更新アーカイブが破損しています。</translation>
     </message>
     <message>
       <source>Update files cannot be extracted.</source>
-      <translation type="unfinished">Update files cannot be extracted.</translation>
+      <translation>更新ファイルは解凍できません。</translation>
     </message>
     <message>
       <source>Internal downloader error.</source>
-      <translation type="unfinished">Internal downloader error.</translation>
+      <translation>内部ダウンローダーエラー</translation>
     </message>
     <message>
       <source>Internal client error.</source>
-      <translation type="unfinished">Internal client error.</translation>
+      <translation>内部クライアントエラー</translation>
     </message>
     <message>
       <source>Unknown error.</source>
@@ -8792,23 +8800,27 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Unexpected error code.</source>
-      <translation type="unfinished">Unexpected error code.</translation>
+      <translation>予期しないエラーコード</translation>
     </message>
     <message>
       <source>Ready to install update</source>
-      <translation type="unfinished">Ready to install update</translation>
+      <translation>更新プログラムをインストールする準備ができました</translation>
     </message>
     <message>
       <source>Update package is not found.</source>
-      <translation type="unfinished">Update package is not found.</translation>
+      <translation>更新パッケージが見つかりません。</translation>
     </message>
     <message>
       <source>There is not enough space to install update.</source>
-      <translation type="unfinished">There is not enough space to install update.</translation>
+      <translation>更新ファイルをインストールするための十分なスペースがありません。</translation>
     </message>
     <message>
       <source>Internal server error.</source>
-      <translation type="unfinished">Internal server error.</translation>
+      <translation>内部サーバーエラー</translation>
+    </message>
+    <message>
+      <source>This OS version is no longer supported.</source>
+      <translation type="unfinished">This OS version is no longer supported.</translation>
     </message>
   </context>
   <context>
@@ -8961,18 +8973,22 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Users will be automatically logged out if their session exceeds the specified duration.</source>
-      <translation type="unfinished">Users will be automatically logged out if their session exceeds the specified duration.</translation>
+      <translation>セッションが指定された期間を超えると、ユーザーは自動的にログアウトされます。</translation>
+    </message>
+    <message>
+      <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
+      <translation type="unfinished">Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerSettingsDialogStore</name>
     <message>
       <source>Library</source>
-      <translation type="unfinished">Library</translation>
+      <translation>ライブラリ</translation>
     </message>
     <message>
       <source>Version</source>
-      <translation type="unfinished">Version</translation>
+      <translation>バージョン</translation>
     </message>
     <message>
       <source>Vendor</source>
@@ -8980,51 +8996,51 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>no error</source>
-      <translation type="unfinished">no error</translation>
+      <translation>エラーはありません</translation>
     </message>
     <message>
       <source>library file cannot be loaded</source>
-      <translation type="unfinished">library file cannot be loaded</translation>
+      <translation>ライブラリファイルを読み込めません</translation>
     </message>
     <message>
       <source>invalid or incompatible plugin library</source>
-      <translation type="unfinished">invalid or incompatible plugin library</translation>
+      <translation>無効または互換性のないプラグインライブラリ</translation>
     </message>
     <message>
       <source>plugin library failed to initialize</source>
-      <translation type="unfinished">plugin library failed to initialize</translation>
+      <translation>プラグインライブラリを初期化できませんでした</translation>
     </message>
     <message>
       <source>plugin returned bad manifest</source>
-      <translation type="unfinished">plugin returned bad manifest</translation>
+      <translation>プラグインが悪いマニフェストを戻しました</translation>
     </message>
     <message>
       <source>plugin API version is no longer supported</source>
-      <translation type="unfinished">plugin API version is no longer supported</translation>
+      <translation>プラグインAPIバージョンはサポートが終了しました</translation>
     </message>
     <message>
       <source>unknown error</source>
-      <translation type="unfinished">unknown error</translation>
+      <translation>不明なエラー</translation>
     </message>
     <message>
       <source>Not loaded</source>
-      <translation type="unfinished">Not loaded</translation>
+      <translation>読み込まれていません</translation>
     </message>
     <message>
       <source>Loaded</source>
-      <translation type="unfinished">Loaded</translation>
+      <translation>読み込みました</translation>
     </message>
     <message>
       <source>plugin is in the black list</source>
-      <translation type="unfinished">plugin is in the black list</translation>
+      <translation>プラグインはブラックリストに入っています</translation>
     </message>
     <message>
       <source>Status</source>
-      <translation type="unfinished">Status</translation>
+      <translation>状態</translation>
     </message>
     <message>
       <source>plugin is optional and is not in the white list</source>
-      <translation type="unfinished">plugin is optional and is not in the white list</translation>
+      <translation>プラグインはオプションであり、ホワイトリストにはありません</translation>
     </message>
   </context>
   <context>
@@ -9047,18 +9063,22 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Waiting for server to respond...</source>
-      <translation type="unfinished">Waiting for server to respond...</translation>
+      <translation>サーバーの応答を待っています...</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerUpdateTool</name>
     <message>
       <source>No connection to the server.</source>
-      <translation type="unfinished">No connection to the server.</translation>
+      <translation>サーバー に接続できません.</translation>
     </message>
     <message>
       <source>Network error.</source>
-      <translation type="unfinished">Network error.</translation>
+      <translation>ネットワークエラー</translation>
+    </message>
+    <message>
+      <source>Server error.</source>
+      <translation type="unfinished">Server error.</translation>
     </message>
   </context>
   <context>
@@ -9085,7 +9105,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Installed Version</source>
-      <translation type="unfinished">Installed Version</translation>
+      <translation>インストール済のバージョン</translation>
     </message>
   </context>
   <context>
@@ -9382,23 +9402,23 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Saving layout</source>
-      <translation type="unfinished">Saving layout</translation>
+      <translation>レイアウトを保存</translation>
     </message>
     <message>
       <source>Stop Saving</source>
-      <translation type="unfinished">Stop Saving</translation>
+      <translation>保存を停止</translation>
     </message>
     <message>
       <source>Saving failed</source>
-      <translation type="unfinished">Saving failed</translation>
+      <translation>保存できませんでした</translation>
     </message>
     <message>
       <source>Starting saving...</source>
-      <translation type="unfinished">Starting saving...</translation>
+      <translation>保存を開始しています...</translation>
     </message>
     <message>
       <source>We are preparing files for the export process. Please wait for a few seconds.</source>
-      <translation type="unfinished">We are preparing files for the export process. Please wait for a few seconds.</translation>
+      <translation>エクスポート処理用のファイルを準備中です。数秒待ってください。</translation>
     </message>
   </context>
   <context>
@@ -9473,29 +9493,29 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::ui::PluginEventModel</name>
+    <name>nx::vms::client::desktop::ui::PluginDiagnosticEventModel</name>
     <message>
       <source>Any Plugin</source>
-      <translation>すべてのプラグイン</translation>
+      <translation type="unfinished">Any Plugin</translation>
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::ui::PluginEventWidget</name>
+    <name>nx::vms::client::desktop::ui::PluginDiagnosticEventWidget</name>
     <message>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation>キャプションフィールドに入力したキーワードのいずれかと一致するものがある場合にのみ、イベントが発生します</translation>
+      <translation type="unfinished">Event will trigger only if there are matches in the caption with any of the entered keywords.</translation>
     </message>
     <message>
       <source>If the field is empty, event will always trigger.</source>
-      <translation>フィールドが空の場合は、常にイベントがトリガーされます</translation>
+      <translation type="unfinished">If the field is empty, event will always trigger.</translation>
     </message>
     <message>
       <source>This field is case sensitive.</source>
-      <translation>このフィールドは大文字と小文字を区別します</translation>
+      <translation type="unfinished">This field is case sensitive.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
-      <translation>説明フィールドに入力したキーワードのいずれかと一致するものがある場合にのみ、イベントが発生します</translation>
+      <translation type="unfinished">Event will trigger only if there are matches in the description field with any of the entered keywords.</translation>
     </message>
   </context>
   <context>
@@ -9784,7 +9804,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Open Server Settings</source>
-      <translation type="unfinished">Open Server Settings</translation>
+      <translation>サーバー設定を開く</translation>
     </message>
     <message>
       <source>OK</source>
@@ -9792,17 +9812,17 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Confirm storage location to store analytics data on &apos;%1&apos;</source>
-      <translation type="unfinished">Confirm storage location to store analytics data on &apos;%1&apos;</translation>
+      <translation>&apos;%1&apos; で分析データを保管する場所を確認してください</translation>
     </message>
     <message>
       <source>Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
 Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
 By default analytics data will be stored in mediaserver&apos;s installation directory.
 You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</source>
-      <translation type="unfinished">Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
-Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
-By default analytics data will be stored in mediaserver&apos;s installation directory.
-You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</translation>
+      <translation>Analyticsデータベースはローカルストレージに保存する必要があり、最大100ギガバイトを占めることがあります。
+分析データを保存する場所を選択した後は、既存のデータを失うことなく簡単に変更することはできません。重度のシステム誤動作を避けるために、慎重に位置を選択し、システムパーティションを使用しないことをお勧めします。
+デフォルトでは、分析データはメディアサーバー&apos;のインストールディレクトリに保存されます。
+[サーバー設定]ダイアログの[ &quot;Storage Management&quot;]タブで、保存場所を変更できます。</translation>
     </message>
   </context>
   <context>

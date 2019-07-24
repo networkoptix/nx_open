@@ -571,6 +571,7 @@ AbstractRtspEncoderPtr QnRtspConnectionProcessor::createRtpEncoder(
         rotation = res->getProperty(QnMediaResource::rotationKey()).toInt();
 
     QnUniversalRtpEncoder::Config config;
+    config.transcoderConfig.decoderConfig.mtDecodePolicy = d->serverModule->settings().multiThreadDecodePolicy();
     config.absoluteRtcpTimestamps = d->serverModule->settings().absoluteRtcpTimestamps();
     config.useRealTimeOptimization = d->serverModule->settings().ffmpegRealTimeOptimization();
     config.addOnvifHeaderExtension = d->params.onvifReplay();
@@ -1062,10 +1063,11 @@ void QnRtspConnectionProcessor::checkQuality()
 
 QnRtspFfmpegEncoder* QnRtspConnectionProcessor::createRtspFfmpegEncoder(bool isVideo)
 {
-    Q_D(const QnRtspConnectionProcessor);
+    Q_D(QnRtspConnectionProcessor);
 
-    QnRtspFfmpegEncoder* result = new QnRtspFfmpegEncoder(
-        DecoderConfig(), commonModule()->metrics());
+    DecoderConfig config;
+    config.mtDecodePolicy = d->serverModule->settings().multiThreadDecodePolicy();
+    QnRtspFfmpegEncoder* result = new QnRtspFfmpegEncoder(config, commonModule()->metrics());
     if (isVideo && !d->transcodeParams.empty())
         result->setDstResolution(d->transcodeParams.resolution, d->transcodeParams.codecId);
     return result;
@@ -1110,8 +1112,10 @@ void QnRtspConnectionProcessor::createPredefinedTracks(QnConstResourceVideoLayou
     }
 
     RtspServerTrackInfoPtr aTrack(new RtspServerTrackInfo());
+    DecoderConfig config;
+    config.mtDecodePolicy = d->serverModule->settings().multiThreadDecodePolicy();
     aTrack->setEncoder(AbstractRtspEncoderPtr(new QnRtspFfmpegEncoder(
-        DecoderConfig(),
+        config,
         commonModule()->metrics())));
     aTrack->clientPort = trackNum*2;
     aTrack->clientRtcpPort = trackNum*2+1;

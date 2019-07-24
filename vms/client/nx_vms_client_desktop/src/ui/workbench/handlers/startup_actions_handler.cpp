@@ -8,6 +8,7 @@
 #include <common/common_module.h>
 
 #include <client/client_module.h>
+#include <client/client_settings.h>
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/layout_tour_manager.h>
@@ -415,10 +416,23 @@ bool StartupActionsHandler::connectToSystemIfNeeded(
     if (connectUsingCustomUri(startupParameters.customUri))
         return true;
 
+    // A local file is being opened.
     if (!startupParameters.instantDrop.isEmpty() || haveInputFiles)
         return false;
 
-    return connectUsingCommandLineAuth(startupParameters);
+    if (connectUsingCommandLineAuth(startupParameters))
+        return true;
+
+    // Attempt auto-login, if needed.
+    if (qnSettings->autoLogin() && qnSettings->lastUsedConnection().url.isValid()
+        && !qnSettings->lastUsedConnection().localId.isNull())
+    {
+        menu()->trigger(ConnectAction,
+            Parameters().withArgument(Qn::LogonParametersRole, LogonParameters()));
+        return true;
+    }
+
+    return false;
 }
 
 bool StartupActionsHandler::connectToCloudIfNeeded(const QnStartupParameters& startupParameters)

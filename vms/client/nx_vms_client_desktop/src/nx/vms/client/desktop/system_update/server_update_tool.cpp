@@ -30,6 +30,7 @@
 #include <nx/utils/guarded_callback.h>
 #include <nx/update/update_check.h>
 #include <nx/vms/client/desktop/utils/upload_manager.h>
+#include <nx/vms/common/p2p/downloader/private/internet_only_peer_manager.h>
 
 #include <quazip/quazip.h>
 #include <quazip/quazipfile.h>
@@ -108,7 +109,8 @@ ServerUpdateTool::ServerUpdateTool(QObject* parent):
         m_stateTracker.get(), &PeerStateTracker::setVersionInformation);
     m_updatesModel.reset(new ServerUpdatesModel(m_stateTracker, this));
 
-    m_downloader.reset(new Downloader(m_outputDir, commonModule()));
+    m_downloader.reset(new Downloader(
+        m_outputDir, commonModule(), {new InternetOnlyPeerManager()}));
 
     // This object is managed by shared_ptr. So we must sure there is no parent, or this instance
     // can be deleted twice.
@@ -401,6 +403,15 @@ QDir ServerUpdateTool::getDownloadDir() const
     return m_outputDir;
 }
 
+uint64_t ServerUpdateTool::getAvailableSpace() const
+{
+    auto downloadDir = getDownloadDir();
+    QStorageInfo storageInfo(downloadDir);
+    uint64_t space = storageInfo.bytesAvailable();
+    uint64_t spaceReserved = nx::update::reservedSpacePadding();
+    return spaceReserved > space ? 0 : space - spaceReserved;
+}
+
 void ServerUpdateTool::startManualDownloads(const UpdateContents& contents)
 {
     NX_ASSERT(m_downloader);
@@ -641,7 +652,9 @@ bool ServerUpdateTool::verifyUpdateManifest(
     clientData.fillDefault();
     clientData.clientId = checkClient ? m_stateTracker->getClientPeerId() : QnUuid();
     clientData.installedVersions = clientVersions;
-    return verifyUpdateContents(commonModule(), contents, activeServers, clientData);
+    VerificationOptions options;
+    options.commonModule = commonModule();
+    return verifyUpdateContents(contents, activeServers, clientData, options);
 }
 
 void ServerUpdateTool::calculateManualDownloadProgress(ProgressInfo& progress)
@@ -886,7 +899,7 @@ bool ServerUpdateTool::requestInstallAction(
                 {
                     success = false;
                     error = InternalError::serverError;
-                    NX_ERROR(tool.data(), "requestInstallAction() - server responded with %1",
+                    NX_ERROR(tool.data(), "requestInstallAction() - server responded with \"%1\"",
                         result.errorString);
                 }
 
@@ -1229,62 +1242,17 @@ std::future<ServerUpdateTool::UpdateContents> ServerUpdateTool::checkSpecificCha
     auto engineVersion = commonModule()->engineVersion();
 
     return std::async(
-        [this, updateUrl, connection, engineVersion, changeset]() -> UpdateContents
+        [updateUrl, connection, engineVersion, changeset]() -> UpdateContents
         {
-            UpdateContents contents;
-
-            contents.changeset = changeset;
-            contents.info = nx::update::updateInformation(updateUrl, engineVersion,
-                changeset, &contents.error);
+            auto contents = nx::update::checkSpecificChangesetProxied(
+                connection, engineVersion, updateUrl, changeset);
             if (changeset == kLatestChangeset)
                 contents.sourceType = nx::update::UpdateSourceType::internet;
             else
                 contents.sourceType = nx::update::UpdateSourceType::internetSpecific;
-            contents.source = lit("%1 by serverUpdateTool for build=%2").arg(updateUrl, changeset);
-
-            if (contents.error == nx::update::InformationError::networkError && connection)
-            {
-                NX_WARNING(NX_SCOPE_TAG, "Checking for updates using mediaserver as proxy");
-                auto promise = std::make_shared<std::promise<bool>>();
-                contents.source = lit("%1 by serverUpdateTool for build=%2 proxied by mediaserver").arg(updateUrl, changeset);
-                contents.info = {};
-                auto proxyCheck = promise->get_future();
-                connection->checkForUpdates(changeset,
-                    [this, promise = std::move(promise), &contents](bool success,
-                        rest::Handle /*handle*/, rest::UpdateInformationData response)
-                    {
-                        if (success)
-                        {
-                            if (response.error != QnRestResult::NoError)
-                            {
-                                NX_DEBUG(
-                                    this,
-                                    lm("checkSpecificChangeset: An error in response to the /ec2/updateInformation request: %1")
-                                        .args(response.errorString));
-
-                                QnLexical::deserialize(response.errorString, &contents.error);
-                            }
-                            else
-                            {
-                                contents.error = nx::update::InformationError::noError;
-                                contents.info = response.data;
-                            }
-                        }
-                        else
-                        {
-                            contents.error = nx::update::InformationError::networkError;
-                        }
-
-                        promise->set_value(success);
-                    });
-
-                proxyCheck.wait();
-            }
-
             return contents;
         });
 }
-
 
 nx::utils::SoftwareVersion getCurrentVersion(
     const nx::vms::api::SoftwareVersion& engineVersion,
