@@ -35,11 +35,6 @@ public:
      * @return Pointer to an object that implements the IEngine interface.
      */
     virtual Result<IEngine*> createEngine() = 0;
-
-    /**
-     * Name of the plugin dynamic library, without "lib" prefix and without extension.
-     */
-    virtual const char* name() const override = 0;
 };
 
 } // namespace analytics

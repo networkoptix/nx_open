@@ -13,7 +13,7 @@
 namespace nx {
 namespace sdk {
 
-std::string toStdString(const IString* string);
+std::string toString(const IString* string);
 
 /**
  * @return Possibly multiline string with a trailing `\n`, or an empty string if the map is null or
@@ -40,8 +40,7 @@ std::string toJsonString(const IStringMap* map, int overallIndent = 0);
 /** @return Multiline JSON string without the trailing `\n`. */
 std::string toJsonString(const IDeviceInfo* deviceInfo, int overallIndent = 0);
 
-std::string toStdString(ErrorCode errorCode);
-
+std::string toString(ErrorCode errorCode);
 
 } // namespace sdk
 } // namespace nx
@@ -53,7 +52,7 @@ namespace std {
 
 inline std::ostream& operator<<(std::ostream& os, nx::sdk::ErrorCode errorCode)
 {
-    return os << nx::sdk::toStdString(errorCode);
+    return os << nx::sdk::toString(errorCode);
 }
 
 } // namespace std

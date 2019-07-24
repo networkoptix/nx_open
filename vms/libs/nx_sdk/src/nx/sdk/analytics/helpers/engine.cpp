@@ -17,6 +17,7 @@
 #include <nx/sdk/helpers/plugin_diagnostic_event.h>
 #include <nx/sdk/helpers/settings_response.h>
 #include <nx/sdk/helpers/error.h>
+#include <nx/sdk/helpers/lib_context.h>
 
 namespace nx {
 namespace sdk {
@@ -27,16 +28,12 @@ class PrintPrefixMaker
 public:
     std::string makePrintPrefix(
         const std::string& overridingPrintPrefix,
-        const IPlugin* plugin,
         const IEngineInfo* engineInfo = nullptr)
     {
-        NX_KIT_ASSERT(plugin);
-        NX_KIT_ASSERT(plugin->name());
-
         if (!overridingPrintPrefix.empty())
             return overridingPrintPrefix;
 
-        std::string printPrefix = std::string("[") + plugin->name() + "_engine";
+        std::string printPrefix = std::string("[") + libContext().name() + "_engine";
         if (engineInfo)
             printPrefix += std::string("_") + engineInfo->id();
 
@@ -57,11 +54,11 @@ Engine::Engine(
     bool enableOutput,
     const std::string& printPrefix)
     :
-    logUtils(enableOutput, PrintPrefixMaker().makePrintPrefix(printPrefix, plugin)),
+    logUtils(enableOutput, PrintPrefixMaker().makePrintPrefix(printPrefix)),
     m_plugin(plugin),
     m_overridingPrintPrefix(printPrefix)
 {
-    NX_PRINT << "Created " << this << ": \"" << plugin->name() << "\"";
+    NX_PRINT << "Created " << this << ": \"" << libContext().name() << "\"";
 }
 
 std::string Engine::settingValue(const std::string& settingName)
@@ -95,7 +92,7 @@ Engine::~Engine()
 void Engine::setEngineInfo(const IEngineInfo* engineInfo)
 {
     logUtils.setPrintPrefix(
-        PrintPrefixMaker().makePrintPrefix(m_overridingPrintPrefix, m_plugin, engineInfo));
+        PrintPrefixMaker().makePrintPrefix(m_overridingPrintPrefix, engineInfo));
 }
 
 StringMapResult Engine::setSettings(const IStringMap* settings)

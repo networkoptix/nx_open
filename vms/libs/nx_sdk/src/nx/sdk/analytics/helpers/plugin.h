@@ -32,10 +32,7 @@ public:
      * @param pluginManifest Plugin manifest to be returned from the manifest method.
      * @param createEngine Functor for engine creation.
      */
-    Plugin(
-        std::string libName,
-        std::string pluginManifest,
-        CreateEngine createEngine);
+    Plugin(std::string pluginManifest, CreateEngine createEngine);
 
     virtual ~Plugin() override;
 
@@ -45,13 +42,11 @@ public:
 // Not intended to be used by a descendant.
 
 public:
-    virtual const char* name() const override;
     virtual void setUtilityProvider(IUtilityProvider* utilityProvider) override;
     virtual StringResult manifest() const override;
     virtual MutableEngineResult createEngine() override;
 
 private:
-    const std::string m_name;
     const std::string m_jsonManifest;
 
     CreateEngine m_createEngine;

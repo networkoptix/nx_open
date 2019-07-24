@@ -1,6 +1,5 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include <iostream>
 #include <vector>
 
 #include <nx/kit/debug.h>
@@ -368,11 +367,6 @@ TEST(stub_analytics_plugin, test)
     ASSERT_TRUE(queryInterfacePtr<IEngine>(engine));
 
     ASSERT_EQ(plugin.get(), engine->plugin());
-
-    const std::string pluginName = engine->plugin()->name();
-    ASSERT_TRUE(!pluginName.empty());
-    NX_PRINT << "Plugin name: [" << pluginName << "]";
-    ASSERT_STREQ(pluginName, "stub_analytics_plugin");
 
     testEngineManifest(engine);
     testEngineSettings(engine);

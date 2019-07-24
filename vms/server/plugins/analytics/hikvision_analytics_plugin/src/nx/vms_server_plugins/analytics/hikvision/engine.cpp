@@ -206,8 +206,6 @@ bool Engine::isCompatible(const IDeviceInfo* deviceInfo) const
 
 namespace {
 
-static const std::string kLibName = "hikvision_analytics_plugin";
-
 static const std::string kPluginManifest = /*suppress newline*/1 + R"json(
 {
     "id": "nx.hikvision",
@@ -225,7 +223,6 @@ extern "C" {
 NX_PLUGIN_API nx::sdk::IPlugin* createNxPlugin()
 {
     return new nx::sdk::analytics::Plugin(
-        kLibName,
         kPluginManifest,
         [](nx::sdk::analytics::IPlugin* plugin)
         {

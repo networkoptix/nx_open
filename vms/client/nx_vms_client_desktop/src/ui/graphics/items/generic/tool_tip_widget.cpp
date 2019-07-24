@@ -160,7 +160,11 @@ void QnToolTipWidget::setTailWidth(qreal tailWidth) {
 void QnToolTipWidget::pointTo(const QPointF &pos) {
     QPointF parentTailPos = mapToParent(m_tailPos);
     QPointF parentZeroPos = mapToParent(QPointF(0, 0));
-    setPos(pos + parentZeroPos - parentTailPos);
+    QPointF newPos = pos + parentZeroPos - parentTailPos;
+    if ((this->pos() - newPos).manhattanLength() < 1.0)
+        return;
+
+    setPos(newPos);
 }
 
 GraphicsLabel* QnToolTipWidget::label() const {

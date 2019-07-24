@@ -74,6 +74,12 @@ struct NX_VMS_API PluginInfo: Data
          * The plugin API version is no longer supported.
          */
         unsupportedVersion,
+
+        /**%apidoc
+         * Some internal error has occured which made the proper PluginInfo structure unavailable.
+         * In this case the error message is stored in statusMessage field.
+         */
+        internalError,
     };
 
     enum class MainInterface
@@ -97,13 +103,19 @@ struct NX_VMS_API PluginInfo: Data
     QString description;
 
     /**%apidoc
+     * Plugin name for logging: library file name with no `lib` prefix (on Linux) and no extension.
+     */
+    QString libName;
+
+    /**%apidoc
      * Absolute path to the plugin dynamic library.
      */
     QString libraryFilename;
 
-    /**%apidoc Absolute path to the plugin's dedicated directory where its dynamic library resides
-     * together with its possible dependencies, or an empty string if the plugin resides in a
-     * common directory with other plugins.
+    /**%apidoc
+     * Absolute path to the plugin's dedicated directory where its dynamic library resides together
+     * with its possible dependencies, or an empty string if the plugin resides in a common
+     * directory with other plugins.
      */
     QString homeDir;
 
@@ -144,8 +156,8 @@ struct NX_VMS_API PluginInfo: Data
     MainInterface mainInterface = MainInterface::undefined;
 
     /**%apidoc
-     * For non-analytics plugins and for device-independent analytics plugins is always set to
-     * true. For device-dependent analytics plugins is set to true if and only if the plugin has
+     * For non-Analytics plugins and for device-independent Analytics plugins, is always set to
+     * true. For device-dependent Analytics plugins, is set to true if and only if the plugin has
      * ever had a DeviceAgent since the Server start.
      */
     bool isActive = true;
@@ -156,6 +168,7 @@ QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PluginInfo::Error)
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PluginInfo::MainInterface)
 #define PluginInfo_Fields (name) \
     (description) \
+    (libName) \
     (libraryFilename) \
     (homeDir) \
     (vendor) \
@@ -166,6 +179,11 @@ QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PluginInfo::MainInterface)
     (errorCode) \
     (mainInterface) \
     (isActive)
+
+NX_VMS_API QString toString(PluginInfo::Optionality value);
+NX_VMS_API QString toString(PluginInfo::Status value);
+NX_VMS_API QString toString(PluginInfo::Error value);
+NX_VMS_API QString toString(PluginInfo::MainInterface value);
 
 } // namespace nx::vms::api
 

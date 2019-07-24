@@ -32,9 +32,6 @@ public:
     /** Prototype of a plugin entry point function. */
     typedef IPlugin* (*EntryPointFunc)();
 
-    /** Name of the plugin, used for information purpose only. */
-    virtual const char* name() const = 0;
-
     /**
      * Provides an object which the plugin can use for calling back to access some data and
      * functionality provided by the process that uses the plugin.

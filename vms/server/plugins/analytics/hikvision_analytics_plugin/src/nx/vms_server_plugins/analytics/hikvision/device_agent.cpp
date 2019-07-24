@@ -97,8 +97,11 @@ Result<void> DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTy
     std::vector<QString> eventTypes;
 
     const auto eventTypeIdList = toPtr(metadataTypes->eventTypeIds());
-    if (const char* message = "Event type id list is nullptr"; !NX_ASSERT(eventTypeIdList, message))
-        return error(ErrorCode::internalError, message);
+    if (const char* const  kMessage = "Event type id list is nullptr";
+        !NX_ASSERT(eventTypeIdList, kMessage))
+    {
+        return error(ErrorCode::internalError, kMessage);
+    }
 
     for (int i = 0; i < eventTypeIdList->count(); ++i)
         eventTypes.push_back(eventTypeIdList->at(i));

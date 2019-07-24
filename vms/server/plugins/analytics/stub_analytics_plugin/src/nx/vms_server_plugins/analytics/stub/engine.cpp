@@ -315,6 +315,13 @@ std::string Engine::manifestString() const
                         "caption": "Throw plugin events from the DeviceAgent",
                         "defaultValue": false,
                         "value": false
+                    },
+                    {
+                        "type": "CheckBox",
+                        "name": ")json" + kLeakFrames + R"json(",
+                        "caption": "Force a memory leak when proccessing a video frame",
+                        "defaultValue": false,
+                        "value": false
                     }
                 ]
             },
@@ -526,8 +533,6 @@ namespace {
 
 using namespace nx::vms_server_plugins::analytics::stub;
 
-static const std::string kLibName = "stub_analytics_plugin";
-
 static const std::string kPluginManifest = R"json(
 {
     "id": "nx.stub",
@@ -603,7 +608,6 @@ static const std::string kPluginManifest = R"json(
 extern "C" NX_PLUGIN_API nx::sdk::IPlugin* createNxPlugin()
 {
     return new nx::sdk::analytics::Plugin(
-        kLibName,
         kPluginManifest,
         [](nx::sdk::analytics::Plugin* plugin)
         {
