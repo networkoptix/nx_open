@@ -6,7 +6,7 @@ struct NX_NETWORK_API Bucket
 {
     // The name of the aws bucket;
     std::string name;
-    // The region of the bucket, e.g., "us-west-1"
+    // The region of the bucket, e.g., "us-east-1"
     std::string region;
     // The number of cloud storages associated with this bucket
     int cloudStorageCount;

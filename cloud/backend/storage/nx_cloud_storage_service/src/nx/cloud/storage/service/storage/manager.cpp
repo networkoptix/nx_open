@@ -14,19 +14,19 @@ Manager::Manager(Database* /*database*/)/*:
 
 void Manager::addStorage(
     const api::AddStorageRequest& request,
-    nx::utils::MoveOnlyFunc<void(api::Result, api::AddStorageResponse)> handler)
+    nx::utils::MoveOnlyFunc<void(api::Result, api::Storage)> handler)
 {
-    api::AddStorageResponse response;
-    response.totalSpace = request.size;
-    response.freeSpace = request.size;
+    api::Storage response;
+    response.totalSpace = request.totalSpace;
+    response.freeSpace = request.totalSpace;
     handler(api::Result{api::ResultCode::ok, "addOk"}, std::move(response));
 }
 
 void Manager::readStorage(
     const std::string& storageId,
-    nx::utils::MoveOnlyFunc<void(api::Result, api::ReadStorageResponse)> handler)
+    nx::utils::MoveOnlyFunc<void(api::Result, api::Storage)> handler)
 {
-    api::ReadStorageResponse response;
+    api::Storage response;
     response.id = storageId;
     handler(api::Result{api::ResultCode::ok, "readOk"}, std::move(response));
 }
@@ -36,6 +36,13 @@ void Manager::removeStorage(
     nx::utils::MoveOnlyFunc<void(api::Result)> handler)
 {
     handler(api::Result{api::ResultCode::ok, "removeOk"});
+}
+
+void Manager::listCameras(
+    const std::string& /*storageId*/,
+    nx::utils::MoveOnlyFunc<void(api::Result, std::vector<std::string>)> handler)
+{
+    handler(api::Result{api::ResultCode::ok, "listCamerasOk"}, std::vector<std::string>());
 }
 
 ManagerFactory::ManagerFactory():

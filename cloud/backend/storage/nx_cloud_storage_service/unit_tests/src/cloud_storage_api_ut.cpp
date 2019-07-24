@@ -17,19 +17,19 @@ class StorageManagerStub:
 public:
     void addStorage(
         const api::AddStorageRequest& request,
-        nx::utils::MoveOnlyFunc<void(api::Result, api::AddStorageResponse)> handler) override
+        nx::utils::MoveOnlyFunc<void(api::Result, api::Storage)> handler) override
     {
-        api::AddStorageResponse response;
-        response.totalSpace = request.size;
-        response.freeSpace = request.size;
+        api::Storage response;
+        response.totalSpace = request.totalSpace;
+        response.freeSpace = request.totalSpace;
         handler(api::Result{api::ResultCode::ok, {}}, std::move(response));
     }
 
     void readStorage(
         const std::string& storageId,
-        nx::utils::MoveOnlyFunc<void(api::Result, api::ReadStorageResponse)> handler) override
+        nx::utils::MoveOnlyFunc<void(api::Result, api::Storage)> handler) override
     {
-        api::ReadStorageResponse response;
+        api::Storage response;
         response.id = storageId;
         handler(api::Result{api::ResultCode::ok, {}}, std::move(response));
     }
@@ -39,6 +39,13 @@ public:
         nx::utils::MoveOnlyFunc<void(api::Result)> handler) override
     {
         handler(api::Result{api::ResultCode::ok, {}});
+    }
+
+    void listCameras(
+        const std::string& /*storageId*/,
+        nx::utils::MoveOnlyFunc<void(api::Result, std::vector<std::string>)> handler) override
+    {
+        handler(api::Result{api::ResultCode::ok, {}}, std::vector<std::string>());
     }
 };
 
@@ -110,8 +117,8 @@ protected:
 
     void whenAddStorage()
     {
-        m_cloudStorageClient->addStorage({100},
-            [this](api::Client::ResultCode resultCode, api::AddStorageResponse response)
+        m_cloudStorageClient->addStorage({100, "any_region"},
+            [this](api::Client::ResultCode resultCode, api::Storage response)
             {
                 ASSERT_EQ(100, response.totalSpace);
                 m_response.push(resultCode);
@@ -122,7 +129,7 @@ protected:
     {
         m_cloudStorageClient->readStorage(
             "any_storage_id",
-            [this](api::Client::ResultCode resultCode, api::ReadStorageResponse response)
+            [this](api::Client::ResultCode resultCode, api::Storage response)
             {
                 ASSERT_EQ(std::string("any_storage_id"), response.id);
                 m_response.push(resultCode);

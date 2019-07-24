@@ -15,9 +15,9 @@ Client::Client(const nx::utils::Url& cloudStorageServiceUrl):
 
 void Client::addStorage(
     const AddStorageRequest& request,
-    nx::utils::MoveOnlyFunc<void(ResultCode, AddStorageResponse)> handler)
+    nx::utils::MoveOnlyFunc<void(ResultCode, Storage)> handler)
 {
-    base_type::template makeAsyncCall<AddStorageResponse>(
+    base_type::template makeAsyncCall<Storage>(
         Method::put,
         api::kStorages,
         std::move(handler),
@@ -26,9 +26,9 @@ void Client::addStorage(
 
 void Client::readStorage(
     const std::string& storageId,
-    nx::utils::MoveOnlyFunc<void(ResultCode, ReadStorageResponse)> handler)
+    nx::utils::MoveOnlyFunc<void(ResultCode, Storage)> handler)
 {
-    base_type::template makeAsyncCall<ReadStorageResponse>(
+    base_type::template makeAsyncCall<Storage>(
         Method::get,
         rest::substituteParameters(api::kStorageId, {storageId}),
         std::move(handler));
@@ -44,11 +44,20 @@ void Client::removeStorage(
         std::move(handler));
 }
 
+void Client::listCameras(
+    const std::string& storageId,
+    nx::utils::MoveOnlyFunc<void(ResultCode, std::vector<std::string>)> handler)
+{
+    base_type::template makeAsyncCall<std::vector<std::string>>(
+        rest::substituteParameters(api::kCameras, {storageId}),
+        std::move(handler));
+}
+
 void Client::addBucket(
     const AddBucketRequest& request,
-    nx::utils::MoveOnlyFunc<void(ResultCode, AddBucketResponse)> handler)
+    nx::utils::MoveOnlyFunc<void(ResultCode, Error)> handler)
 {
-    base_type::template makeAsyncCall<AddBucketResponse>(
+    base_type::template makeAsyncCall<Error>(
         Method::put,
         api::kAwsBuckets,
         std::move(handler),
@@ -65,7 +74,7 @@ void Client::removeBucket(
         std::move(handler));
 }
 
-void Client::getBuckets(
+void Client::listBuckets(
     nx::utils::MoveOnlyFunc<void(ResultCode, std::vector<Bucket>)> handler)
 {
     base_type::template makeAsyncCall<std::vector<Bucket>>(

@@ -25,7 +25,7 @@ public:
 
     virtual void addBucket(
         const api::AddBucketRequest& request,
-        const nx::utils::MoveOnlyFunc<void(api::Result, api::AddBucketResponse)> handler) = 0;
+        const nx::utils::MoveOnlyFunc<void(api::Result, api::Error)> handler) = 0;
 
     virtual void listBuckets(
         nx::utils::MoveOnlyFunc<void(api::Result, std::vector<api::Bucket>)> handler) = 0;
@@ -46,7 +46,7 @@ public:
 
     virtual void addBucket(
         const api::AddBucketRequest& request,
-        const nx::utils::MoveOnlyFunc<void(api::Result, api::AddBucketResponse)> handler) override;
+        const nx::utils::MoveOnlyFunc<void(api::Result, api::Error)> handler) override;
 
     virtual void listBuckets(
         nx::utils::MoveOnlyFunc<void(api::Result, std::vector<api::Bucket>)> handler) override;

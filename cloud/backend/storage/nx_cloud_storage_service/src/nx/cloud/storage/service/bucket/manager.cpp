@@ -17,7 +17,7 @@ Manager::Manager(const conf::Aws& settings, Database* database):
 
 void Manager::addBucket(
     const api::AddBucketRequest& /*request*/,
-    const nx::utils::MoveOnlyFunc<void(api::Result, api::AddBucketResponse)> /*handler*/)
+    const nx::utils::MoveOnlyFunc<void(api::Result, api::Error)> /*handler*/)
 {
 }
 

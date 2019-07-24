@@ -87,7 +87,7 @@ void Server::registerStorageApiHandlers()
     using namespace std::placeholders;
     using namespace nx::network::http::server::rest;
 
-    using AddStorageHandler = RequestHandler<api::AddStorageRequest, api::AddStorageResponse>;
+    using AddStorageHandler = RequestHandler<api::AddStorageRequest, api::Storage>;
     m_messageDispatcher.registerRequestProcessor<AddStorageHandler>(
         api::kStorages,
         [this]()
@@ -98,7 +98,7 @@ void Server::registerStorageApiHandlers()
         network::http::Method::put);
 
     using ReadStorageHandler =
-        RequestHandler<void, api::ReadStorageResponse, RestArgFetcher<kStorageIdParam>>;
+        RequestHandler<void, api::Storage, RestArgFetcher<kStorageIdParam>>;
     m_messageDispatcher.registerRequestProcessor<ReadStorageHandler>(
         api::kStorageId,
         [this]()

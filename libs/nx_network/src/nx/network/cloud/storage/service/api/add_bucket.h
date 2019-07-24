@@ -15,19 +15,19 @@ struct NX_NETWORK_API AddBucketRequest
 QN_FUSION_DECLARE_FUNCTIONS(AddBucketRequest, (json), NX_NETWORK_API)
 
 //-------------------------------------------------------------------------------------------------
-// BadRequest
+// Error
 
 /**
- * A structure that is only valid if HTTP status code is not 200 OK
+ * Used to forward the the error from actual service that generated it, if one occured
  */
-struct AddBucketResponse
+struct NX_NETWORK_API Error
 {
     std::string resultCode;
-    std::string errorText;
+    std::string text;
 };
 
-#define AddBucketResponse_Fields (resultCode)(errorText)
+#define Error_Fields (resultCode)(text)
 
-QN_FUSION_DECLARE_FUNCTIONS(AddBucketResponse, (json), NX_NETWORK_API)
+QN_FUSION_DECLARE_FUNCTIONS(Error, (json), NX_NETWORK_API)
 
 } // namespace nx::cloud::storage::service::api
