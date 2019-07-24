@@ -46,14 +46,21 @@ function check_file()
     fi
 }
 
-check_file "$BRANCH_FILE"
 check_file "$RDEP"
 check_file "$WEBADMIN_FILE" \
     "$WEBADMIN_FILE is not found. Build webadmin project before deploying it."
 check_file "$PACKAGES_DIR"/.rdep \
     "RDep repository is not found in $PACKAGES_DIR."
 
-BRANCH=$(cat $BRANCH_FILE)
+if [ -d "$ROOT_DIR/.hg" ]; then
+    check_file "$BRANCH_FILE"
+    BRANCH=$(cat $BRANCH_FILE)
+elif [ -d "$ROOT_DIR/.git" ]; then
+    BRANCH=$(git -C "$ROOT_DIR" show -s --format=%B | sed -n "s/^Branch: \(.*\)\$/\1/p" | tail -n1)
+else
+    echo "Error: Did not found any VCS." >&2
+    exit 1
+fi
 
 deploy_package "$PACKAGES_DIR/any/$PACKAGE_BASE_NAME-$BRANCH"
 if [ $DEPLOY_RELEASE_VERSION = 1 ]
