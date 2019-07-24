@@ -3359,7 +3359,7 @@ bool QnPlOnvifResource::loadXmlParametersInternal(
     bool result = QnCameraAdvacedParamsXmlParser::readXml(&paramsTemplateFile, params);
 
     if (!result)
-        NX_DEBUG(this, "Error while parsing xml (onvif) %1", paramsTemplateFileName);
+        NX_WARNING(this, "Error while parsing xml (onvif) %1", paramsTemplateFileName);
 
     return result;
 }
