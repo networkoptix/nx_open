@@ -11,7 +11,9 @@ Page
     objectName: "sessionsScreen"
 
     leftButtonIcon.source: lp("/images/menu.png")
-    padding: 16
+
+    leftPadding: 12
+    rightPadding: 12
 
     onLeftButtonClicked: sideNavigation.open()
 
@@ -30,8 +32,6 @@ Page
         }
     ]
 
-    readonly property real margins: -4
-
     MouseArea
     {
         id: searchCanceller
@@ -46,9 +46,11 @@ Page
         }
     }
 
-    Item
+    Rectangle
     {
         id: searchPanel
+
+        color: sessionsScreen.backgroundColor
 
         readonly property bool searching:
             visible && (searchEdit.activeFocus || searchEdit.text.length)
@@ -56,7 +58,7 @@ Page
         readonly property point searchPanelPosition:
         {
             if (searchPanel.searching)
-                return Qt.point(sessionsScreen.margins, sessionsScreen.margins)
+                return Qt.point(0, 0)
 
             return sessionsList.mapToItem(
                 searchPanel.parent,
@@ -68,7 +70,7 @@ Page
         y: searchPanelPosition.y
         z: 2
 
-        height: searchEdit.height + 8
+        height: searchEdit.y + searchEdit.height + 12
         width: sessionsList.width
         visible: sessionsList.model.sourceRowsCount > 8
 
@@ -78,6 +80,7 @@ Page
 
             property Item placeholder: null
 
+            y: 4
             height: 40
             width: parent.width
             onTextChanged: sessionsList.model.filterWildcard = text
@@ -102,23 +105,13 @@ Page
         id: sessionsList
 
         clip: true
-        x: sessionsScreen.margins
-        y: sessionsScreen.margins + (searchPanel.searching ? searchPanel.height : 0)
-        width: parent.width - sessionsScreen.margins * 2
-        height: parent.height - sessionsScreen.margins * 2
+        width: parent.width
+        height: parent.height
 
         header: Item
         {
             width: sessionsList.width
-            height: (searchPanel.searching || !searchPanel.visible) ? 0 : searchPanel.height
-            onHeightChanged:
-            {
-                // Since we change header height in some cases it is hidden when list is scrolled to
-                // the frist tile. This code fixes behaviour and shows search edit on top if tiles.
-                if (sessionsList.contentY + sessionsList.originY== -height)
-                    sessionsList.positionViewAtBeginning()
-            }
-
+            height: searchPanel.searching || searchPanel.visible ? searchPanel.height : 16
             Component.onCompleted: searchEdit.placeholder = this
         }
 
@@ -145,11 +138,15 @@ Page
 
             SessionItem
             {
+                readonly property bool firstRowItem: Math.floor(index / sessionsList.cellsInRow) < 1
+                readonly property real verticalMargin: Math.floor(sessionsList.verticalSpacing / 2)
+                readonly property real horizontalMargin: sessionsList.horizontalSpacing / 2
+
                 anchors.fill: parent
-                anchors.leftMargin: sessionsList.horizontalSpacing / 2
-                anchors.rightMargin: sessionsList.horizontalSpacing / 2
-                anchors.topMargin: Math.floor(sessionsList.verticalSpacing / 2)
-                anchors.bottomMargin: sessionsList.verticalSpacing - anchors.topMargin
+                anchors.leftMargin: horizontalMargin
+                anchors.rightMargin: horizontalMargin
+                anchors.topMargin: firstRowItem ? 0 : verticalMargin
+                anchors.bottomMargin: sessionsList.verticalSpacing - verticalMargin
 
                 systemName: model.systemName
                 systemId: model.systemId
@@ -175,9 +172,6 @@ Page
             visible: liteMode
         }
         highlightMoveDuration: 0
-
-        displayMarginBeginning: 16
-        displayMarginEnd: 16 + mainWindow.bottomPadding
 
         focus: liteMode
 
@@ -229,8 +223,7 @@ Page
              "%1 is a button name").arg(customConnectionButton.text)
 
         anchors.fill: parent
-        anchors.topMargin: -16
-        anchors.bottomMargin: -24
+        anchors.bottomMargin: -8
 
         readonly property bool emptySearchMode:
             searchPanel.searching && sessionsList.model.sourceRowsCount > 0
