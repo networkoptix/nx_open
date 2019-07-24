@@ -5,7 +5,8 @@
 #include <nx/network/cloud/storage/service/api/add_bucket.h>
 #include <nx/network/cloud/storage/service/api/bucket.h>
 
-namespace nx::cloud::storage::service {
+namespace nx::cloud {
+namespace storage::service {
 
 namespace conf {
 
@@ -56,8 +57,8 @@ public:
         nx::utils::MoveOnlyFunc<void(api::Result)> handler) override;
 
 private:
-    const conf::Aws& m_settings;
-    Database* m_database;
+    /*const conf::Aws& m_settings;
+    Database* m_database;*/
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -81,4 +82,5 @@ private:
 };
 
 } // namespace bucket
-} // namespace nx::cloud::storage::service
+} // namespace storage::service
+} // namespace nx::cloud

@@ -2,6 +2,7 @@
 
 #include <nx/network/url/url_builder.h>
 #include <nx/network/http/http_types.h>
+#include <nx/cloud/aws/api_client.h>
 
 #include "../settings.h"
 
@@ -9,9 +10,20 @@ namespace nx::cloud::storage::service::bucket {
 
 using namespace std::placeholders;
 
-Manager::Manager(const conf::Aws& settings, Database* database):
+namespace {
+
+static nx::utils::Url makeBucketUrl(const std::string& bucketName)
+{
+    static constexpr char kBucketUrlTemplate[] =
+        "https://%1.s3.amazonaws.com";
+    return lm(kBucketUrlTemplate).arg(bucketName).toQString();
+}
+
+} // namespace
+
+Manager::Manager(const conf::Aws& /*settings*/, Database* /*database*/)/*:
     m_settings(settings),
-    m_database(database)
+    m_database(database)*/
 {
 }
 
