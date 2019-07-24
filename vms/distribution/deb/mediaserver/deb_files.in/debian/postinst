@@ -30,13 +30,36 @@ CAMERA_SETTINGS_OPTIMIZATION_DEFAULT=true
 STATISTICS_REPORT_ALLOWED_DEFAULT=true
 SYSTEM_USER=$COMPANY_NAME
 
+declare RUNTIME #< The assignment is placed hereinafter.
+
 TARGET_DEVICE='@targetDevice@'
 WITH_ROOT_TOOL='@withRootTool@'
 
-isInDockerContainer()
+# Acquire the runtime type (real, docker, chroot and so on) and store its name to the variable
+# named outputVariableName.
+getRuntimeType() #< outputVariableName
 {
-    [[ $(cat "/var/run/systemd/container" 2>/dev/null) == "docker" ]]
+    local -r outputVariableName="$1"; shift
+    local -r runtime=$(systemd-detect-virt)
+
+    if [[ $runtime == "" ]]
+    then
+        echo "Error detecting type of runtime." >&2
+        return 1
+    fi
+
+    if [[ $runtime != "none" ]]
+    then
+        echo "Detected runtime type: $runtime." >&2
+        eval "${outputVariableName}=$runtime"
+    else
+        eval "${outputVariableName}=real"
+    fi
+
+    return 0
 }
+
+getRuntimeType RUNTIME
 
 isRpi()
 {
@@ -156,7 +179,7 @@ installModificationSpecificConfig()
 # This is necessary because changed configuration options should take effect
 # immediately.
 
-if ! isInDockerContainer
+if [[ $RUNTIME == "real" ]] 
 then
     systemctl stop $COMPANY_NAME-mediaserver || true
 
@@ -248,7 +271,7 @@ esac
 # Dirty hack to prevent apport from catching our crash dumps.
 systemctl disable apport &>/dev/null || true
 
-if ! isInDockerContainer
+if [[ $RUNTIME == "real" ]]
 then
     systemctl stop apport &>/dev/null || true
 fi
@@ -297,7 +320,7 @@ startServer()
     echo "Started service with PID $PID."
 }
 
-if ! isInDockerContainer
+if [[ $RUNTIME == "real" ]]
 then
     if ! startServer
     then

@@ -18,12 +18,35 @@ CFG_HELPER="$BIN_DIR/config_helper.py $CONFIG_FILE"
 
 WITH_ROOT_TOOL='@withRootTool@'
 
-isInDockerContainer()
+declare RUNTIME #< The assignment is placed hereinafter.
+
+# Acquire the runtime type (real, docker, chroot and so on) and store its name to the variable
+# named outputVariableName.
+getRuntimeType() #< outputVariableName
 {
-    [[ $(cat "/var/run/systemd/container" 2>/dev/null) == "docker" ]]
+    local -r outputVariableName="$1"; shift
+    local -r runtime=$(systemd-detect-virt)
+
+    if [[ $runtime == "" ]]
+    then
+        echo "Error detecting type of runtime." >&2
+        return 1
+    fi
+
+    if [[ $runtime != "none" ]]
+    then
+        echo "Detected runtime type: $runtime." >&2
+        eval "${outputVariableName}=$runtime"
+    else
+        eval "${outputVariableName}=real"
+    fi
+
+    return 0
 }
 
-if ! isInDockerContainer
+getRuntimeType RUNTIME
+
+if [[ $RUNTIME == "real" ]]
 then
     systemctl stop $COMPANY_NAME-mediaserver || true
 
