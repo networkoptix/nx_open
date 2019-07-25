@@ -48,7 +48,7 @@ elif [ -d "$SOURCE_DIR/../.git" ]; then
     local format="changeset: %H%nrefs: %D%nparents: %P%nauthor: %aN <%aE>%ndate: %ad%nsummary: %s"
     git -C "$SOURCE_DIR/.." show -s --format=$format > static/version.txt
 else
-    echo "Error: Did not found any VCS." >&2
+    echo "Error: Used VCS is not detected. Building without repository is not supported." >&2
     exit 1
 fi
 cat static/version.txt >&2

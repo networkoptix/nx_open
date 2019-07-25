@@ -56,9 +56,14 @@ if [ -d "$ROOT_DIR/.hg" ]; then
     check_file "$BRANCH_FILE"
     BRANCH=$(cat $BRANCH_FILE)
 elif [ -d "$ROOT_DIR/.git" ]; then
-    BRANCH=$(git -C "$ROOT_DIR" show -s --format=%B | sed -n "s/^Branch: \(.*\)\$/\1/p" | tail -n1)
+    BRANCH=$(git -C "$ROOT_DIR" show -s --format=%B | grep '^Branch:' | tail -n1 | awk '{print $2}')
 else
-    echo "Error: Did not found any VCS." >&2
+    echo "Error: Used VCS is not detected. Deploying without repository is not supported." >&2
+    exit 1
+fi
+
+if [ -z "$BRANCH" ]; then
+    echo "Error: Failed to get the branch from VCS."
     exit 1
 fi
 
