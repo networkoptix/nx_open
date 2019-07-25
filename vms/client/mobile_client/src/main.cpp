@@ -384,6 +384,9 @@ void processStartupParams(const QnMobileClientStartupParameters& startupParamete
 
 int main(int argc, char *argv[])
 {
+    // Disables platform-specific text input handles sine we have our custom ones.
+    qputenv("QT_QPA_NO_TEXT_HANDLES", "1");
+
 	nx::kit::OutputRedirector::ensureOutputRedirection();
 
     // TODO: #muskov Introduce a convenient cross-platform entity for crash handlers.
