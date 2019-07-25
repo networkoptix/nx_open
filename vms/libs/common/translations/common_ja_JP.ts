@@ -90,7 +90,7 @@
     <message>
       <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>%1 システムはクラウドに接続されていない-%1 システムとのみ結合できます　システム名とパスワードは %1 システムから取得されます</translation>
+      <translation>%1 システムはクラウドに接続されていない-%1 システムとのみ結合できます　システム名とパスワードは %1 システムから取得されます。</translation>
     </message>
     <message>
       <source>Both Systems are connected to %1. Merge is not allowed.</source>
@@ -104,12 +104,12 @@
     </message>
     <message>
       <source>Cannot merge Systems because they have at least one server with the same ID. Please remove this server and try again.</source>
-      <translation>同じIDを持つサーバーが少なくとも1つあるため、システムを統合できません　このサーバーを削除してやり直してください。</translation>
+      <translation>同じIDを持つサーバーが少なくとも1つあるため、システムを統合できません。このサーバーを削除してやり直してください。</translation>
     </message>
     <message>
       <source>Cloud systems have different owners. Merge is not allowed.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>クラウドシステムの所有者が異なります。統合は許可されていません。</translation>
+      <translation>クラウドシステムのオーナーが異なります。統合は許可されていません。</translation>
     </message>
   </context>
   <context>
@@ -200,11 +200,11 @@
     </message>
     <message>
       <source>Device request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-      <translation>デバイス要求&quot;%1&quot; は、エラー&quot;%2&quot; により失敗しました</translation>
+      <translation>デバイス要求&quot;%1&quot; は、エラー&quot;%2&quot; により失敗しました。</translation>
     </message>
     <message>
       <source>Camera request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-      <translation>カメラ要求&quot;%1&quot; は、エラー&quot;%2&quot; により失敗しました</translation>
+      <translation>カメラ要求&quot;%1&quot; は、エラー&quot;%2&quot; により失敗しました。</translation>
     </message>
     <message>
       <source>Unknown device issue.</source>
@@ -240,7 +240,7 @@
     </message>
     <message>
       <source>I/O Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-      <translation>I/Oモジュール要求&quot;%1&quot; はエラー&quot;%2&quot; により失敗しました</translation>
+      <translation>I/Oモジュール要求&quot;%1&quot; はエラー&quot;%2&quot; により失敗しました。</translation>
     </message>
     <message>
       <source>Unknown I/O module issue.</source>
@@ -316,7 +316,7 @@
     </message>
     <message>
       <source>Camera was restored from archive. Delete the camera and add it again to view Live video.</source>
-      <translation>カメラはアーカイブから復元されました　カメラを削除して再度登録すると、ライブ映像が表示されます。</translation>
+      <translation>カメラはアーカイブから復元されました。カメラを削除して再度登録すると、ライブ映像が表示されます。</translation>
     </message>
     <message>
       <source>First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</source>
@@ -1096,7 +1096,7 @@
     </message>
     <message>
       <source>Generic Event</source>
-      <translation>汎用イベント</translation>
+      <translation>一般的イベント</translation>
     </message>
     <message numerus="yes">
       <source>Motion on Cameras</source>
@@ -1240,7 +1240,7 @@
     </message>
     <message>
       <source>Generic Event at %1</source>
-      <translation>汎用イベント %1</translation>
+      <translation>一般的イベント %1</translation>
     </message>
     <message>
       <source>An unknown event has occurred</source>
@@ -1315,12 +1315,12 @@
     <message numerus="yes">
       <source>No data received during last %n seconds.</source>
       <translation>
-        <numerusform>%n 秒間データを受信していません.</numerusform>
+        <numerusform>%n 秒間データを受信していません。</numerusform>
       </translation>
     </message>
     <message>
       <source>Connection to device was unexpectedly closed.</source>
-      <translation>デバイスとの通信が予期せずに閉じられました.</translation>
+      <translation>デバイスとの通信が予期せずに閉じられました。</translation>
     </message>
     <message>
       <source>Connection to camera (primary stream) was unexpectedly closed.</source>
@@ -1336,7 +1336,7 @@
     </message>
     <message>
       <source>Device does not respond to network requests.</source>
-      <translation>デバイスがネットワーク要求に応答しません</translation>
+      <translation>デバイスがネットワーク要求に応答しません。</translation>
     </message>
     <message>
       <source>Connection to server is lost.</source>
@@ -1344,7 +1344,7 @@
     </message>
     <message>
       <source>Server stopped unexpectedly.</source>
-      <translation>サーバーが予期せず停止しました</translation>
+      <translation>サーバーが予期せず停止しました。</translation>
     </message>
     <message>
       <source>I/O error has occurred at %1.</source>
@@ -1352,7 +1352,7 @@
     </message>
     <message>
       <source>Not enough HDD/SSD speed for recording to %1.</source>
-      <translation>%1へのHDD/SSD書き込み速度が不十分です</translation>
+      <translation>%1へのHDD/SSD書き込み速度が不十分です。</translation>
     </message>
     <message>
       <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
@@ -1476,7 +1476,7 @@
     </message>
     <message>
       <source>Analytics Event</source>
-      <translation>解析イベント</translation>
+      <translation>分析イベント</translation>
     </message>
     <message>
       <source>%1 at %2</source>

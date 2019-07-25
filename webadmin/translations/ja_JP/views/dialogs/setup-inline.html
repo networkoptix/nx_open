@@ -20,7 +20,7 @@
 <div class="panel-body text-center" ng-if="stepIs('brokenSystem')">
     <div class="master-icon"><span class="icon-fail"></span></div>
     <h2>システムをセットアップすることはできません</h2>
-    <p class="master-description">システムを構成できません <br>
+    <p class="master-description">システムを構成できません。 <br>
         <span ng-bind-html="settings.localError"></span>
     </p>
     <p class="master-controls">
@@ -142,7 +142,7 @@
     </div>
     <h2>{{Config.cloud.productName}} アカウント</h2>
     <p class="master-description">
-        クラウド {{Config.cloud.productName}} を使用するにはアカウントが必要です
+        クラウドシステム {{Config.cloud.productName}} を使用するにはアカウントが必要です
     </p>
     <p class="master-controls">
         <button class="btn btn-primary" ng-click="createAccount()" auto-focus>新規アカウントを登録</button>&nbsp;&nbsp;
@@ -332,7 +332,7 @@
 
 <div class="panel-body text-center" ng-if="stepIs('mergeProcess')">
     <div class="master-icon"><span class="preloader"></span></div>
-    <h2>システム統合 ...</h2>
+    <h2>システム統合中 ...</h2>
     <p class="master-description">数分かかる場合があります</p>
 </div>
 
@@ -357,7 +357,7 @@
 
 <div class="panel-body text-center" ng-if="stepIs('mergeTemporaryFailure')">
     <div class="master-icon"><span class="icon-fail"></span></div>
-    <h2>システムは正常に統合されましたが、まだ準備ができていません</h2>
+    <h2>システムは正常に統合されましたが、まだ準備ができていません。</h2>
     <p class="master-description">
         {{settings.remoteError}}
     </p>
@@ -368,7 +368,7 @@
 
 <div class="panel-body text-center" ng-if="stepIs('cloudProcess')">
     <div class="master-icon"><span class="preloader"></span></div>
-    <h2>{{Config.cloud.productName}} に接続中</h2>
+    <h2>{{Config.cloud.productName}} に接続中...</h2>
     <p class="master-description">数分かかる場合があります</p>
 </div>
 
@@ -414,7 +414,7 @@
 <div class="panel-body text-center" ng-if="stepIs('noInternetOnServer')">
     <h2>サーバーをインターネットに接続します</h2>
     <p class="master-description">
-        インターネット接続を設定すると何処からでも<br>{{Config.cloud.productName}}を使用して接続することができます
+        インターネット接続を設定すると何処からでも<br>{{Config.cloud.productName}}を使用して接続することができます。
     </p>
     <p class="master-controls">
         <button class="btn btn-default" ng-click="retry()">再試行</button>       
@@ -429,7 +429,7 @@
 <div class="panel-body text-center" ng-if="stepIs('noInternetOnClient')">
     <h2>{{Config.cloud.productName}} に接続できません</h2>
     <p class="master-description">
-        インターネット接続を確認してください
+        インターネット接続を確認してください。
     </p>
     <p class="master-controls">
         <button class="btn btn-default" ng-click="retry()">再試行</button>       
@@ -452,7 +452,7 @@
 <div class="panel-body text-center" ng-if="stepIs('localFailure')">
     <div class="master-icon"><span class="icon-fail"></span></div>
     <h2>システムをセットアップすることはできません</h2>
-    <p class="master-description">何らかの問題が発生しました <br>
+    <p class="master-description">何らかの問題が発生しました。 <br>
 　　エラーの説明：{{settings.localError}}
     </p>
     <p class="master-controls">

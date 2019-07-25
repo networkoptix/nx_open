@@ -944,6 +944,14 @@ om du vill visa fler bokmärken</translation>
       <source>Objects Frames and Info...</source>
       <translation>Objektramar och Info...</translation>
     </message>
+    <message>
+      <source>Pin Calendar</source>
+      <translation type="unfinished">Pin Calendar</translation>
+    </message>
+    <message>
+      <source>Unpin Calendar</source>
+      <translation type="unfinished">Unpin Calendar</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -7587,6 +7595,10 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
       <source>This action cannot be undone.</source>
       <translation>Denna åtgärd kan inte ångras.</translation>
     </message>
+    <message>
+      <source>Motion detection stream is disabled</source>
+      <translation type="unfinished">Motion detection stream is disabled</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraScheduleWidget</name>
@@ -8442,8 +8454,8 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
       <translation>Det angivna IP-adressområdet har mer än 255 adresser.</translation>
     </message>
     <message>
-      <source>Can&apos;t start searching process</source>
-      <translation>Kan&apos;t börja sökprocessen</translation>
+      <source>Can not start the search process</source>
+      <translation type="unfinished">Can not start the search process</translation>
     </message>
   </context>
   <context>
@@ -8700,10 +8712,6 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
       <translation>Det finns inga online-servrar att uppdatera.</translation>
     </message>
     <message>
-      <source>Some servers haven&apos;t completed update process. Finish it anyway?</source>
-      <translation>Vissa servrar har ej slutförda uppdateringsprocesser. Slutför det ändå?</translation>
-    </message>
-    <message>
       <source>Cancel update and delete all downloaded data?</source>
       <translation>Avbryt uppdatering och radera alla nedladdade data?</translation>
     </message>
@@ -8767,6 +8775,10 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
       <source>Please please contact Customer Support.</source>
       <translation>Vänligen kontakta kundsupport.</translation>
     </message>
+    <message>
+      <source>Some servers have not completed the update process. Finish it anyway?</source>
+      <translation type="unfinished">Some servers have not completed the update process. Finish it anyway?</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::MultipleLayoutSelectionDialog</name>
@@ -8823,10 +8835,6 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
   <context>
     <name>nx::vms::client::desktop::OpenLayoutActionWidget</name>
     <message>
-      <source>Some users don&apos;t have access to the selected layout. Action will not work for them.</source>
-      <translation>Vissa användare har inte tillgång till den valda layouten. Åtgärden fungerar inte för dem.</translation>
-    </message>
-    <message>
       <source>None of selected users have access to the selected layout. Action will not work.</source>
       <translation>Ingen av de valda användare har tillgång till den valda layouten. Åtgärden fungerar inte.</translation>
     </message>
@@ -8845,6 +8853,10 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     <message>
       <source>None of selected user roles contain users. Action will not work.</source>
       <translation>Ingen av de valda användargrupperna innehåller användare. Åtgärden fungerar inte.</translation>
+    </message>
+    <message>
+      <source>Some users do not have access to the selected layout. Action will not work for them.</source>
+      <translation type="unfinished">Some users do not have access to the selected layout. Action will not work for them.</translation>
     </message>
   </context>
   <context>
@@ -9050,28 +9062,12 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
       <translation>Fler inställningar</translation>
     </message>
     <message>
-      <source>Dual-Streaming not supported for this camera</source>
-      <translation>Dubbla strömmar stöds inte för den här kameran</translation>
+      <source>Motion detection is disabled or not supported</source>
+      <translation type="unfinished">Motion detection is disabled or not supported</translation>
     </message>
     <message>
-      <source>Dual-Streaming and motion detection not supported for this camera</source>
-      <translation>Dubbla strömmar och rörelsedetektering stöds inte för den här kameran</translation>
-    </message>
-    <message>
-      <source>Motion detection disabled</source>
-      <translation>Rörelsedetektering avaktiverad</translation>
-    </message>
-    <message>
-      <source>To enable or adjust it, go to the &quot;Motion&quot; tab in Camera Settings</source>
-      <translation>För att aktivera eller justera det går du till fliken &quot;Rörelsedetektering&quot; i kamerainställningar</translation>
-    </message>
-    <message>
-      <source>Motion detection disabled or not supported</source>
-      <translation>Rörelsedetektering avaktiverad eller inte stödd</translation>
-    </message>
-    <message>
-      <source>To ensure it is supported and to enable it, go to the &quot;Motion&quot; tab in Camera Settings.</source>
-      <translation>För att säkerställa att det stöds och aktivera det, gå till fliken &quot;Motion&quot; i kamerainställningar.</translation>
+      <source>Dual-streaming is disabled or not supported</source>
+      <translation type="unfinished">Dual-streaming is disabled or not supported</translation>
     </message>
   </context>
   <context>
@@ -9165,6 +9161,10 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     <message>
       <source>plugin is optional and is not in the white list</source>
       <translation>plugin är valfritt och finns inte på den vita listan</translation>
+    </message>
+    <message>
+      <source>internal error</source>
+      <translation>internt fel</translation>
     </message>
   </context>
   <context>
