@@ -47,7 +47,7 @@ void ContentClient::uploadMediaChunk(
     m_awsClient.uploadFile(
         filePath,
         std::move(data),
-        [this, handler = std::move(handler)](nx::cloud::aws::Result result)
+        [handler = std::move(handler)](nx::cloud::aws::Result result)
         {
             handler(toResultCode(result));
         });
@@ -82,8 +82,8 @@ void ContentClient::removeChunk(
 }
 
 void ContentClient::saveDeviceDescription(
-    const std::string& cameraId,
-    const DeviceDescription& data,
+    const std::string& /*cameraId*/,
+    const DeviceDescription& /*data*/,
     Handler handler)
 {
     handler(ResultCode::notImplemented);
@@ -104,7 +104,8 @@ std::string ContentClient::generateChunkPath(
     std::chrono::system_clock::time_point timestamp)
 {
     const std::time_t unixTimestamp = std::chrono::system_clock::to_time_t(timestamp);
-    std::tm tm{ 0 };
+    std::tm tm;
+    memset(&tm, 0, sizeof(tm));
     gmtime_r(&unixTimestamp, &tm);
 
     return lm("/camera/%1/%2/%3/%4/%5/%6/%7.mkv")
