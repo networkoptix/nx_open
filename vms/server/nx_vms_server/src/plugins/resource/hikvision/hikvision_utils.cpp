@@ -523,14 +523,14 @@ bool tuneHttpClient(nx::network::http::HttpClient* outHttpClient, const QAuthent
     return true;
 }
 
-QString buildChannelNumber(Qn::ConnectionRole role, int channelNumber)
+QString buildChannelNumber(Qn::ConnectionRole role, int hikvisionChannelNumber)
 {
-    auto hikvisionChannelNumber = QString::number(channelNumber + 1);
+    auto channel = QString::number(hikvisionChannelNumber);
     auto streamNumber = role == Qn::ConnectionRole::CR_LiveVideo
         ? kPrimaryStreamNumber
         : kSecondaryStreamNumber;
 
-    return hikvisionChannelNumber + streamNumber;
+    return channel + streamNumber;
 }
 
 bool codecSupported(AVCodecID codecId, const ChannelCapabilities& channelCapabilities)

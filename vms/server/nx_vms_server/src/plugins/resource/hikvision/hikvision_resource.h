@@ -26,14 +26,14 @@ public:
     virtual QString defaultCodec() const override;
 
     boost::optional<hikvision::ChannelCapabilities>
-    channelCapabilities(Qn::ConnectionRole role);
+    channelCapabilities(Qn::ConnectionRole role, bool allowBuildFromCapabilityMap);
     bool findDefaultPtzProfileToken();
+    int hikvisionChannelNumber() const;
 
     static hikvision::ProtocolStates tryToEnableIntegrationProtocols(
         const nx::utils::Url& url,
         const QAuthenticator& authenticator,
         bool isAdditionalSupportCheckNeeded = false);
-
 protected:
     virtual nx::vms::server::resource::StreamCapabilityMap getStreamCapabilityMapFromDriver(
         StreamIndex streamIndex) override;
