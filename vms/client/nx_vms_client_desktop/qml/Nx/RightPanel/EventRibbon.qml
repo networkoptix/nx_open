@@ -90,6 +90,7 @@ ListView
         NumberAnimation
         {
             property: "opacity"
+            duration: 320
             to: 1.0
         }
     }
