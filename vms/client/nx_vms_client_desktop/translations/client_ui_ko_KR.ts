@@ -41,7 +41,7 @@
     <message>
       <location/>
       <source>ARM support policy</source>
-      <translation type="unfinished">ARM support policy</translation>
+      <translation>ARM 지원 정책</translation>
     </message>
   </context>
   <context>
@@ -189,12 +189,12 @@
     <message>
       <location/>
       <source>Max. days</source>
-      <translation type="unfinished">Max. days</translation>
+      <translation>최대 일:</translation>
     </message>
     <message>
       <location/>
       <source>Min. days</source>
-      <translation type="unfinished">Min. days</translation>
+      <translation>최소 일</translation>
     </message>
   </context>
   <context>
@@ -320,7 +320,7 @@
     <message>
       <location/>
       <source>on the next day</source>
-      <translation type="unfinished">on the next day</translation>
+      <translation>다음날에</translation>
     </message>
   </context>
   <context>
@@ -665,12 +665,12 @@
     <message>
       <location/>
       <source>Custom Media Port</source>
-      <translation type="unfinished">Custom Media Port</translation>
+      <translation>사용자 지정 미디어 포트</translation>
     </message>
     <message>
       <location/>
       <source>Trust camera timestamp</source>
-      <translation type="unfinished">Trust camera timestamp</translation>
+      <translation>트러스트 카메라 타임 스탬프</translation>
     </message>
     <message>
       <location/>
@@ -690,7 +690,7 @@
     <message>
       <location/>
       <source>Native camera presets will not be avaliable.</source>
-      <translation type="unfinished">Native camera presets will not be avaliable.</translation>
+      <translation>카메라 자체 사전 설정은 사용할 수 없습니다.</translation>
     </message>
     <message>
       <location/>
@@ -705,7 +705,7 @@
     <message>
       <location/>
       <source>Detect motion during archive import</source>
-      <translation type="unfinished">Detect motion during archive import</translation>
+      <translation>아카이브 가져 오기 중 모션 감지</translation>
     </message>
   </context>
   <context>
@@ -763,7 +763,7 @@
     <message>
       <location/>
       <source>Show on layout</source>
-      <translation type="unfinished">Show on layout</translation>
+      <translation>레이아웃에 표시</translation>
     </message>
     <message>
       <location/>
@@ -773,7 +773,7 @@
     <message>
       <location/>
       <source>Camera rules</source>
-      <translation type="unfinished">Camera rules</translation>
+      <translation>카메라 규칙</translation>
     </message>
     <message>
       <location/>
@@ -866,7 +866,7 @@
     <message>
       <location/>
       <source>Copy Schedule to...</source>
-      <translation type="unfinished">Copy Schedule to...</translation>
+      <translation>... 에 일정 복사</translation>
     </message>
   </context>
   <context>
@@ -892,7 +892,7 @@
     <message>
       <location/>
       <source>Edit Credentials</source>
-      <translation type="unfinished">Edit Credentials</translation>
+      <translation>인증 수정</translation>
     </message>
     <message>
       <location/>
@@ -902,7 +902,7 @@
     <message>
       <location/>
       <source>Enable audio</source>
-      <translation type="unfinished">Enable audio</translation>
+      <translation>오디오 활성화</translation>
     </message>
     <message>
       <location/>
@@ -990,7 +990,7 @@
     <message>
       <location/>
       <source>Omit Logging</source>
-      <translation type="unfinished">Omit Logging</translation>
+      <translation>로깅 생략</translation>
     </message>
   </context>
   <context>
@@ -1024,12 +1024,12 @@
     <message>
       <location/>
       <source>SELECT SERVER</source>
-      <translation type="unfinished">SELECT SERVER</translation>
+      <translation>서버 선택</translation>
     </message>
     <message>
       <location/>
       <source>Known Address</source>
-      <translation type="unfinished">Known Address</translation>
+      <translation>알려진 주소</translation>
     </message>
     <message>
       <location/>
@@ -1044,7 +1044,7 @@
     <message>
       <location/>
       <source>Hint</source>
-      <translation type="unfinished">Hint</translation>
+      <translation>힌트</translation>
     </message>
     <message>
       <location/>
@@ -1084,12 +1084,12 @@
     <message>
       <location/>
       <source>Add all Devices</source>
-      <translation type="unfinished">Add all Devices</translation>
+      <translation>모든 장치 추가</translation>
     </message>
     <message>
       <location/>
       <source>Add Devices</source>
-      <translation type="unfinished">Add Devices</translation>
+      <translation>장치 추가</translation>
     </message>
     <message>
       <location/>
@@ -1107,12 +1107,12 @@
     <message>
       <location/>
       <source>I Do Not Agree</source>
-      <translation type="unfinished">I Do Not Agree</translation>
+      <translation>동의하지 않음</translation>
     </message>
     <message>
       <location/>
       <source>I Agree</source>
-      <translation type="unfinished">I Agree</translation>
+      <translation>동의함</translation>
     </message>
   </context>
   <context>
@@ -1248,7 +1248,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/export/widgets/export_password_widget.ui"/>
       <source>Protect with password</source>
-      <translation type="unfinished">Protect with password</translation>
+      <translation>패스워드로 보호</translation>
     </message>
     <message>
       <location/>
@@ -1292,7 +1292,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_dialogs/details/filtered_resource_selection_widget.ui"/>
       <source>Nothing matches your search</source>
-      <translation type="unfinished">Nothing matches your search</translation>
+      <translation>검색과 일치하는 것이 없습니다,</translation>
     </message>
   </context>
   <context>
@@ -1457,12 +1457,12 @@
     <message>
       <location/>
       <source>Aspect ratio</source>
-      <translation type="unfinished">Aspect ratio</translation>
+      <translation>가로세로 비율</translation>
     </message>
     <message>
       <location/>
       <source>Default rotation</source>
-      <translation type="unfinished">Default rotation</translation>
+      <translation>기본 회전</translation>
     </message>
   </context>
   <context>
@@ -1612,7 +1612,7 @@
     <message>
       <location/>
       <source>Minimum Grid Size</source>
-      <translation type="unfinished">Minimum Grid Size</translation>
+      <translation>최소 눈금 크기</translation>
     </message>
   </context>
   <context>
@@ -1678,7 +1678,7 @@
     <message>
       <location/>
       <source>Admin DN or CN</source>
-      <translation type="unfinished">Admin DN or CN</translation>
+      <translation>도메인 DN 또는 CN</translation>
     </message>
   </context>
   <context>
@@ -1978,7 +1978,7 @@
     <message>
       <location/>
       <source>Check for update</source>
-      <translation type="unfinished">Check for update</translation>
+      <translation>업데이트 확인</translation>
     </message>
     <message>
       <location/>
@@ -2003,7 +2003,7 @@
     <message>
       <location/>
       <source>Download &amp;&amp; Install</source>
-      <translation type="unfinished">Download &amp;&amp; Install</translation>
+      <translation>다운로드 및 설치</translation>
     </message>
     <message>
       <location/>
@@ -2018,7 +2018,7 @@
     <message>
       <location/>
       <source>Advanced Update Settings</source>
-      <translation type="unfinished">Advanced Update Settings</translation>
+      <translation>고급 업데이트 설정</translation>
     </message>
     <message>
       <location/>
@@ -2031,12 +2031,12 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_dialogs/multiple_layout_selection_dialog.ui"/>
       <source>Show all layouts</source>
-      <translation type="unfinished">Show all layouts</translation>
+      <translation>모든 레이아웃 표시</translation>
     </message>
     <message>
       <location/>
       <source>Select Layouts</source>
-      <translation type="unfinished">Select Layouts</translation>
+      <translation>레이아웃 선택</translation>
     </message>
   </context>
   <context>
@@ -2049,12 +2049,7 @@
     <message>
       <location/>
       <source>New Virtual Camera...</source>
-      <translation type="unfinished">New Virtual Camera...</translation>
-    </message>
-    <message>
-      <location/>
-      <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
-      <translation type="unfinished">&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</translation>
+      <translation>새로운 가상 카메라...</translation>
     </message>
   </context>
   <context>
@@ -2062,12 +2057,12 @@
     <message>
       <location filename="../src/ui/widgets/business/open_layout_action_widget.ui"/>
       <source>Layout</source>
-      <translation type="unfinished">Layout</translation>
+      <translation>레이아웃</translation>
     </message>
     <message>
       <location/>
       <source>Show to</source>
-      <translation type="unfinished">Show to</translation>
+      <translation>에 보이기 </translation>
     </message>
     <message>
       <location/>
@@ -2099,46 +2094,46 @@
     </message>
   </context>
   <context>
-    <name>PluginEventWidget</name>
+    <name>PluginDiagnosticEventWidget</name>
     <message>
-      <location filename="../src/nx/vms/client/desktop/ui/event_rules/widgets/plugin_event_widget.ui"/>
+      <location filename="../src/nx/vms/client/desktop/ui/event_rules/widgets/plugin_diagnostic_event_widget.ui"/>
       <source>Source:</source>
-      <translation>소스:</translation>
+      <translation>출처:</translation>
     </message>
     <message>
       <location/>
       <source>Caption contains:</source>
-      <translation>주석 포함</translation>
+      <translation>캡션에 포함:</translation>
     </message>
     <message>
       <location/>
       <source>Keywords separated by space</source>
-      <translation>공간으로 단어 구분됨</translation>
+      <translation>스페이스로 구분 된 키워드</translation>
     </message>
     <message>
       <location/>
       <source>Description contains:</source>
-      <translation>상세 포함</translation>
+      <translation>내용 포함:</translation>
     </message>
     <message>
       <location/>
       <source>Level:</source>
-      <translation type="unfinished">Level:</translation>
+      <translation>단계</translation>
     </message>
     <message>
       <location/>
       <source>ERROR</source>
-      <translation type="unfinished">ERROR</translation>
+      <translation>오류</translation>
     </message>
     <message>
       <location/>
       <source>WARNING</source>
-      <translation type="unfinished">WARNING</translation>
+      <translation>경고</translation>
     </message>
     <message>
       <location/>
       <source>INFO</source>
-      <translation type="unfinished">INFO</translation>
+      <translation>정보</translation>
     </message>
   </context>
   <context>
@@ -2287,7 +2282,7 @@
     <message>
       <location/>
       <source>Restart to the updated version when ready</source>
-      <translation type="unfinished">Restart to the updated version when ready</translation>
+      <translation>준비가되면 업데이트 된 버전으로 다시 시작하십시오.</translation>
     </message>
   </context>
   <context>
@@ -2540,7 +2535,7 @@
     <message>
       <location/>
       <source>Server name</source>
-      <translation type="unfinished">Server name</translation>
+      <translation>서버 이름</translation>
     </message>
   </context>
   <context>
@@ -2777,11 +2772,6 @@
       <location/>
       <source>Limit session duration</source>
       <translation type="unfinished">Limit session duration</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
-      <translation type="unfinished">Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</translation>
     </message>
   </context>
   <context>
@@ -3084,7 +3074,7 @@
     <message>
       <location/>
       <source>Recording was enabled on the USB storage</source>
-      <translation type="unfinished">Recording was enabled on the USB storage</translation>
+      <translation>USB 저장소에서 저장이 활성화되었습니다.</translation>
     </message>
     <message>
       <location/>

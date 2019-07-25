@@ -1,7 +1,5 @@
 #pragma once
 
-//#define USE_IN_MEMORY_ARCHIVE
-
 #include <vector>
 
 #include <nx/utils/thread/mutex.h>
@@ -9,27 +7,21 @@
 #include <nx/vms/server/metadata/analytics_archive.h>
 #include <analytics/db/analytics_db_types.h>
 
-#include "analytics_archive.h"
 #include "media_server/media_server_module.h"
 
 namespace nx::analytics::db {
 
-#ifdef USE_IN_MEMORY_ARCHIVE
-using AnalyticsArchiveImpl = AnalyticsArchive;
-#else
-using AnalyticsArchiveImpl = nx::vms::server::metadata::AnalyticsArchive;
-#endif
-
 class ObjectTypeDao;
+
+using ArchiveFilter = nx::vms::server::metadata::AnalyticsArchive::AnalyticsFilter;
+using AnalyticsArchiveImpl = nx::vms::server::metadata::AnalyticsArchive;
 
 class AnalyticsArchiveDirectory
 {
 public:
-    using Filter = nx::vms::server::metadata::AnalyticsArchive::AnalyticsFilter;
-
-    struct ObjectMatchResult
+    struct ObjectTrackMatchResult
     {
-        std::vector<std::int64_t> objectGroups;
+        std::vector<std::int64_t> trackGroups;
         QnTimePeriod timePeriod;
     };
 
@@ -46,27 +38,27 @@ public:
         const QnUuid& deviceId,
         std::chrono::milliseconds timestamp,
         const std::vector<QRect>& region,
-        uint32_t objectsGroupId,
+        uint32_t objectTrackGroupId,
         uint32_t objectType,
         int64_t allAttributesHash);
 
     QnTimePeriodList matchPeriods(
-        const std::vector<QnUuid>& deviceIds,
-        Filter filter);
+        std::vector<QnUuid> deviceIds,
+        ArchiveFilter filter);
 
     QnTimePeriodList matchPeriods(
         const QnUuid& deviceId,
-        const Filter& filter);
+        const ArchiveFilter& filter);
 
     /**
      * NOTE: This method selects object groups by filter.
      * Object groups have to be converted to objects (and filtered) later.
      */
-    ObjectMatchResult matchObjects(
-        const std::vector<QnUuid>& deviceIds,
-        Filter filter);
+    ObjectTrackMatchResult matchObjects(
+        std::vector<QnUuid> deviceIds,
+        ArchiveFilter filter);
 
-    static AnalyticsArchive::Filter prepareArchiveFilter(
+    static ArchiveFilter prepareArchiveFilter(
         const db::Filter& filter,
         const ObjectTypeDao& objectTypeDao);
 
@@ -78,15 +70,20 @@ private:
 
     AnalyticsArchiveImpl* openOrGetArchive(const QnUuid& deviceId);
 
-    void fixFilterRegion(Filter* filter);
+    void fixFilterRegion(ArchiveFilter* filter);
 
     nx::vms::server::metadata::AnalyticsArchive::MatchObjectsResult matchObjects(
         const QnUuid& deviceId,
-        const Filter& filter);
+        const ArchiveFilter& filter);
 
-    ObjectMatchResult toObjectMatchResult(
-        const Filter& filter,
-        std::vector<std::pair<std::chrono::milliseconds /*timestamp*/, int64_t /*objectGroupId*/>> objectGroups);
+    using TrackGroups =
+        std::vector<std::pair<std::chrono::milliseconds /*timestamp*/, int64_t /*trackGroupId*/>>;
+
+    ObjectTrackMatchResult toObjectTrackMatchResult(
+        const ArchiveFilter& filter,
+        TrackGroups trackGroups);
+
+    void copyAllDeviceIds(std::vector<QnUuid>* deviceIds);
 };
 
 } // namespace nx::analytics::db

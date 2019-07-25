@@ -130,10 +130,10 @@ QString UpdateStrings::getReportForUnsupportedOs(const nx::utils::OsInfo& info)
 }
 
 bool verifyUpdateContents(
-    QnCommonModule* commonModule,
     nx::update::UpdateContents& contents,
     const std::map<QnUuid, QnMediaServerResourcePtr>& activeServers,
-    const ClientVerificationData& clientData)
+    const ClientVerificationData& clientData,
+    const VerificationOptions& options)
 {
     nx::update::Information& info = contents.info;
     if (contents.error != nx::update::InformationError::noError)
@@ -213,7 +213,7 @@ bool verifyUpdateContents(
 
     if (!clientData.clientId.isNull()
         && (clientData.currentVersion < targetVersion
-            || (clientData.currentVersion > targetVersion && clientData.compatibilityMode))
+            || (clientData.currentVersion > targetVersion && options.compatibilityMode))
         && clientData.installedVersions.find(targetVersion) == clientData.installedVersions.end())
     {
         contents.alreadyInstalled = false;
@@ -274,7 +274,7 @@ bool verifyUpdateContents(
 
         const nx::utils::SoftwareVersion serverVersion = server->getVersion();
         // Prohibiting updates to previous version.
-        if (serverVersion >= targetVersion)
+        if (serverVersion > targetVersion)
         {
             NX_WARNING(typeid(UpdateContents), "verifyUpdateManifest(%1) Server %2 has a newer version %3",
                 contents.info.version, id, serverVersion);
@@ -319,7 +319,7 @@ bool verifyUpdateContents(
             package->targets.insert(id);
 
             auto hasInternet = server->getServerFlags().testFlag(nx::vms::api::SF_HasPublicIP);
-            if (!hasInternet)
+            if (!hasInternet || options.downloadAllPackages)
                 manualPackages.insert(package);
         }
     }
@@ -332,10 +332,10 @@ bool verifyUpdateContents(
     else
         contents.ignorePeers = serversWithNewerVersion;
 
-    if (commonModule)
+    if (options.commonModule)
     {
         contents.cloudIsCompatible = checkCloudHost(
-            commonModule, targetVersion, contents.info.cloudHost, allServers);
+            options.commonModule, targetVersion, contents.info.cloudHost, allServers);
     }
 
     for (auto id: contents.unsuportedSystemsReport.keys())
@@ -356,8 +356,11 @@ bool verifyUpdateContents(
         {
             NX_WARNING(typeid(UpdateContents)) << "verifyUpdateManifest("
                 << contents.info.version << ") - we should install client package, but there is no such.";
-            contents.error = nx::update::InformationError::missingPackageError;
-            contents.missingUpdate.insert(clientData.clientId);
+            if (!contents.unsuportedSystemsReport.contains(clientData.clientId))
+            {
+                contents.error = nx::update::InformationError::missingPackageError;
+                contents.missingUpdate.insert(clientData.clientId);
+            }
         }
         else
         {
@@ -366,7 +369,10 @@ bool verifyUpdateContents(
         }
     }
 
-    if (!contents.invalidVersion.empty() && !contents.alreadyInstalled)
+    // According to VMS-14494 we should allow update if some servers have more recent version
+    // than update, but some servers can be updated to it.
+    if (!contents.invalidVersion.empty()
+        && (!contents.alreadyInstalled || contents.peersWithUpdate.empty()))
     {
         NX_WARNING(typeid(UpdateContents)) << "verifyUpdateManifest("
             << contents.info.version << ") - detected incompatible version error.";

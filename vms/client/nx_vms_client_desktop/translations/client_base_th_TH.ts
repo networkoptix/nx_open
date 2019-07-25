@@ -943,6 +943,14 @@ to view more bookmarks</source>
       <source>Objects Frames and Info...</source>
       <translation type="unfinished">Objects Frames and Info...</translation>
     </message>
+    <message>
+      <source>Pin Calendar</source>
+      <translation>การตรึงปฏิทิน</translation>
+    </message>
+    <message>
+      <source>Unpin Calendar</source>
+      <translation>ยกเลิกการตรึงปฏิทิน</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -2701,7 +2709,7 @@ to %1</source>
     </message>
     <message>
       <source>Download &amp;&amp; Install</source>
-      <translation type="unfinished">Download &amp;&amp; Install</translation>
+      <translation>ดาวน์โหลด &amp;&amp; ติดตั้ง</translation>
     </message>
     <message>
       <source>Failed to enter compatibility mode for version %1</source>
@@ -4191,6 +4199,10 @@ to %1</source>
     <message>
       <source>Virtual Camera %1</source>
       <translation type="unfinished">Virtual Camera %1</translation>
+    </message>
+    <message>
+      <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
+      <translation>&quot;Wearable Camera&quot; เป็นที่เก็บข้อมูลเสมือนจริงสำหรับไฟล์วิดีโอซึ่งสามารถอัพโหลดไปยังเซิร์ฟเวอร์ใดก็ได้ในระบบของคุณและเข้าถึงได้โดยผู้ใช้รายใด</translation>
     </message>
   </context>
   <context>
@@ -7240,12 +7252,12 @@ If you intended to move analytics data to another storage location, please conta
   <context>
     <name>nx::vms::client::desktop::AnalyticsSearchListModel::Private</name>
     <message>
-      <source>Unknown object</source>
-      <translation>วัตถุที่ไม่รู้จัก</translation>
-    </message>
-    <message>
       <source>deleted camera</source>
       <translation>ลบกล้อง</translation>
+    </message>
+    <message>
+      <source>Unknown track</source>
+      <translation type="unfinished">Unknown track</translation>
     </message>
   </context>
   <context>
@@ -7473,6 +7485,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>This action cannot be undone.</source>
       <translation>ไม่สามารถดำเนินการดังกล่าวให้ได้</translation>
+    </message>
+    <message>
+      <source>Motion detection stream is disabled</source>
+      <translation type="unfinished">Motion detection stream is disabled</translation>
     </message>
   </context>
   <context>
@@ -7929,7 +7945,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>unnamed analytics engine</source>
-      <translation type="unfinished">unnamed analytics engine</translation>
+      <translation>โปรแกรมวิเคราะห์ชื่อ</translation>
     </message>
     <message>
       <source>No events occurred</source>
@@ -8316,8 +8332,8 @@ If you intended to move analytics data to another storage location, please conta
       <translation>ระบุช่วงที่อยู่ IP ห้ามมากกว่า 255.</translation>
     </message>
     <message>
-      <source>Can&apos;t start searching process</source>
-      <translation>สามารถเริ่มการค้นหา&apos;t</translation>
+      <source>Can not start the search process</source>
+      <translation type="unfinished">Can not start the search process</translation>
     </message>
   </context>
   <context>
@@ -8328,7 +8344,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>deleted camera</source>
-      <translation type="unfinished">deleted camera</translation>
+      <translation>ลบกล้อง</translation>
     </message>
     <message>
       <source>Bookmark it...</source>
@@ -8399,7 +8415,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Update file is not found</source>
-      <translation type="unfinished">Update file is not found</translation>
+      <translation>ไม่พบไฟล์อัพเดท</translation>
     </message>
     <message>
       <source>Upgrade package is broken</source>
@@ -8573,10 +8589,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>ไม่มีเซิร์ฟเวอร์ออนไลน์ที่จะอัปเดต</translation>
     </message>
     <message>
-      <source>Some servers haven&apos;t completed update process. Finish it anyway?</source>
-      <translation>เซิร์ฟเวอร์บางตัวยังไม่เสร็จสิ้นกระบวนการอัพเดต&apos;ครั้ง เสร็จแล้วหรือยัง?</translation>
-    </message>
-    <message>
       <source>Cancel update and delete all downloaded data?</source>
       <translation>ยกเลิกการอัปเดตและลบข้อมูลที่ดาวน์โหลดทั้งหมดหรือไม่?</translation>
     </message>
@@ -8602,7 +8614,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Failed to download update packages to some components</source>
-      <translation type="unfinished">Failed to download update packages to some components</translation>
+      <translation>ไม่สามารถดาวน์โหลดแพ็คเกจการอัพเดทไปยังส่วนประกอบบางอย่างได้</translation>
     </message>
     <message>
       <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
@@ -8621,16 +8633,28 @@ If you intended to move analytics data to another storage location, please conta
       <translation type="unfinished">Starting update to ...</translation>
     </message>
     <message>
-      <source>Some servers have no package available</source>
-      <translation type="unfinished">Some servers have no package available</translation>
-    </message>
-    <message>
       <source>Failed to cancel update</source>
       <translation type="unfinished">Failed to cancel update</translation>
     </message>
     <message>
       <source>Failed to start installation</source>
       <translation type="unfinished">Failed to start installation</translation>
+    </message>
+    <message>
+      <source>Some servers have no update packages available.</source>
+      <translation type="unfinished">Some servers have no update packages available.</translation>
+    </message>
+    <message>
+      <source>Some servers have encountered an internal error.</source>
+      <translation type="unfinished">Some servers have encountered an internal error.</translation>
+    </message>
+    <message>
+      <source>Please please contact Customer Support.</source>
+      <translation type="unfinished">Please please contact Customer Support.</translation>
+    </message>
+    <message>
+      <source>Some servers have not completed the update process. Finish it anyway?</source>
+      <translation type="unfinished">Some servers have not completed the update process. Finish it anyway?</translation>
     </message>
   </context>
   <context>
@@ -8687,10 +8711,6 @@ If you intended to move analytics data to another storage location, please conta
   <context>
     <name>nx::vms::client::desktop::OpenLayoutActionWidget</name>
     <message>
-      <source>Some users don&apos;t have access to the selected layout. Action will not work for them.</source>
-      <translation>ผู้ใช้บางคนสวม&apos;t มีการเข้าถึงรูปแบบที่เลือก การดำเนินการจะไม่ทำงานสำหรับพวกเขา</translation>
-    </message>
-    <message>
       <source>None of selected users have access to the selected layout. Action will not work.</source>
       <translation>ไม่มีผู้ใช้ที่เลือกมีสิทธิ์ในการเลือกเค้าโครงที่เลือก การกระทำจะไม่ทำงาน</translation>
     </message>
@@ -8709,6 +8729,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>None of selected user roles contain users. Action will not work.</source>
       <translation>ไม่มีบทบาทผู้ใช้ที่เลือกไว้ประกอบด้วยผู้ใช้ การกระทำจะไม่ทำงาน</translation>
+    </message>
+    <message>
+      <source>Some users do not have access to the selected layout. Action will not work for them.</source>
+      <translation type="unfinished">Some users do not have access to the selected layout. Action will not work for them.</translation>
     </message>
   </context>
   <context>
@@ -8744,10 +8768,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Failed to download update</source>
       <translation>ดาวน์โหลดการอัปเดตล้มเหลว</translation>
-    </message>
-    <message>
-      <source>Failed to install update</source>
-      <translation>ไม่สามารถติดตั้งการอัปเดต</translation>
     </message>
     <message>
       <source>Waiting for peer data</source>
@@ -8808,6 +8828,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Internal server error.</source>
       <translation type="unfinished">Internal server error.</translation>
+    </message>
+    <message>
+      <source>This OS version is no longer supported.</source>
+      <translation>รุ่นนี้ไม่สนับสนุน.</translation>
     </message>
   </context>
   <context>
@@ -8913,28 +8937,12 @@ If you intended to move analytics data to another storage location, please conta
       <translation>การตั้งค่าเพิ่มเติม</translation>
     </message>
     <message>
-      <source>Dual-Streaming not supported for this camera</source>
-      <translation>ไม่สนับสนุนสตรีมมิงแบบคู่สำหรับกล้องนี้</translation>
+      <source>Motion detection is disabled or not supported</source>
+      <translation type="unfinished">Motion detection is disabled or not supported</translation>
     </message>
     <message>
-      <source>Dual-Streaming and motion detection not supported for this camera</source>
-      <translation>ไม่สนับสนุนการสตรีมแบบคู่และการตรวจจับการเคลื่อนไหวสำหรับกล้องนี้</translation>
-    </message>
-    <message>
-      <source>Motion detection disabled</source>
-      <translation>การตรวจจับการเคลื่อนไหวถูกปิดใช้งาน</translation>
-    </message>
-    <message>
-      <source>To enable or adjust it, go to the &quot;Motion&quot; tab in Camera Settings</source>
-      <translation>เพื่อให้มั่นใจว่าได้รับการสนับสนุนและเปิดใช้งานได้ให้ไปที่แท็บ &quot;Motion&quot; ในการตั้งค่ากล้อง</translation>
-    </message>
-    <message>
-      <source>Motion detection disabled or not supported</source>
-      <translation>การตรวจจับการเคลื่อนไหวถูกปิดใช้งานหรือไม่รองรับ</translation>
-    </message>
-    <message>
-      <source>To ensure it is supported and to enable it, go to the &quot;Motion&quot; tab in Camera Settings.</source>
-      <translation>เพื่อให้มั่นใจว่าได้รับการสนับสนุนและเปิดใช้งานได้ให้ไปที่แท็บ &quot;Motion&quot; ในการตั้งค่ากล้อง</translation>
+      <source>Dual-streaming is disabled or not supported</source>
+      <translation type="unfinished">Dual-streaming is disabled or not supported</translation>
     </message>
   </context>
   <context>
@@ -8962,6 +8970,10 @@ If you intended to move analytics data to another storage location, please conta
       <source>Users will be automatically logged out if their session exceeds the specified duration.</source>
       <translation>ผู้ใช้จะออกจากระบบโดยอัตโนมัติหากเซสชั่นของพวกเขาเกินระยะเวลาที่กำหนด</translation>
     </message>
+    <message>
+      <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
+      <translation>ลายน้ำจะปรากฏบนวิดีโอสดที่เก็บถาวรและส่งออกสำหรับผู้ใช้ที่ไม่ใช่ผู้ดูแลระบบเท่านั้น คุณและผู้ดูแลระบบคนอื่นจะไม่เห็นพวกเขา</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerSettingsDialogStore</name>
@@ -8971,7 +8983,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Version</source>
-      <translation type="unfinished">Version</translation>
+      <translation>เวอร์ชัน</translation>
     </message>
     <message>
       <source>Vendor</source>
@@ -9003,7 +9015,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>unknown error</source>
-      <translation type="unfinished">unknown error</translation>
+      <translation>ข้อผิดพลาดที่ไม่รู้จัก</translation>
     </message>
     <message>
       <source>Not loaded</source>
@@ -9019,11 +9031,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Status</source>
-      <translation type="unfinished">Status</translation>
+      <translation>สถานะ</translation>
     </message>
     <message>
       <source>plugin is optional and is not in the white list</source>
       <translation type="unfinished">plugin is optional and is not in the white list</translation>
+    </message>
+    <message>
+      <source>internal error</source>
+      <translation>ข้อผิดพลาดภายใน</translation>
     </message>
   </context>
   <context>
@@ -9058,6 +9074,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Network error.</source>
       <translation type="unfinished">Network error.</translation>
+    </message>
+    <message>
+      <source>Server error.</source>
+      <translation type="unfinished">Server error.</translation>
     </message>
   </context>
   <context>
@@ -9199,7 +9219,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>VMS Time</source>
-      <translation type="unfinished">VMS Time</translation>
+      <translation>เวลา VMS</translation>
     </message>
   </context>
   <context>
@@ -9472,14 +9492,14 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::ui::PluginEventModel</name>
+    <name>nx::vms::client::desktop::ui::PluginDiagnosticEventModel</name>
     <message>
       <source>Any Plugin</source>
       <translation type="unfinished">Any Plugin</translation>
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::ui::PluginEventWidget</name>
+    <name>nx::vms::client::desktop::ui::PluginDiagnosticEventWidget</name>
     <message>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
       <translation>เหตุการณ์จะทริกเกอร์เฉพาะกรณีที่มีการจับคู่ในแหล่งที่มากับคำหลักที่ป้อนไว้</translation>

@@ -29,11 +29,11 @@ static QRectF randomRect()
         h);
 }
 
-struct DemoAnalyticsObject: DetectedObject
+struct DemoAnalyticsObjectMetadata: ObjectMetadata
 {
     QPointF movementSpeed;
 
-    DemoAnalyticsObject animated(microseconds dt)
+    DemoAnalyticsObjectMetadata animated(microseconds dt)
     {
         // Ping-pong movement animation.
 
@@ -47,33 +47,33 @@ struct DemoAnalyticsObject: DetectedObject
                 return (reflections % 2 == 1) ? space - value : value;
             };
 
-        DemoAnalyticsObject animatedObject = *this;
-        animatedObject.boundingBox.moveTo(
+        DemoAnalyticsObjectMetadata animatedObjectMetadata = *this;
+        animatedObjectMetadata.boundingBox.moveTo(
             movedCoordinate(boundingBox.x(), movementSpeed.x(), 1.0 - boundingBox.width()),
             movedCoordinate(boundingBox.y(), movementSpeed.y(), 1.0 - boundingBox.height()));
-        return animatedObject;
+        return animatedObjectMetadata;
     }
 };
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(DemoAnalyticsObject, (json),
-    DetectedObject_Fields (movementSpeed));
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(DemoAnalyticsObjectMetadata, (json),
+    ObjectMetadata_Fields (movementSpeed));
 } // namespace
 
 class DemoAnalyticsMetadataProvider::Private
 {
 public:
-    int objectsCount = 0;
+    int objectMetadataCount = 0;
 
-    QVector<DemoAnalyticsObject> objects;
+    QVector<DemoAnalyticsObjectMetadata> objectMetadataList;
     microseconds startTimestamp = 0us;
 
 public:
     Private():
-        objectsCount(ini().demoAnalyticsProviderObjectsCount)
+        objectMetadataCount(ini().demoAnalyticsProviderObjectsCount)
     {
     }
 
-    void createObjects()
+    void createObjectMetadata()
     {
         const auto& descriptionsFileName =
             QString::fromUtf8(ini().demoAnalyticsProviderObjectDescriptionsFile);
@@ -87,35 +87,35 @@ public:
             const QByteArray& jsonData = file.readAll();
             file.close();
 
-            objects = QJson::deserialized<decltype(objects)>(jsonData);
+            objectMetadataList = QJson::deserialized<decltype(objectMetadataList)>(jsonData);
 
-            for (auto& object: objects)
+            for (auto& objectMetadata: objectMetadataList)
             {
-                if (object.objectId.isNull())
-                    object.objectId = QnUuid::createUuid();
+                if (objectMetadata.trackId.isNull())
+                    objectMetadata.trackId = QnUuid::createUuid();
 
-                if (object.objectTypeId.isNull())
-                    object.objectTypeId = QnUuid::createUuid().toString();
+                if (objectMetadata.objectTypeId.isNull())
+                    objectMetadata.objectTypeId = QnUuid::createUuid().toString();
 
-                if (object.boundingBox.isNull())
-                    object.boundingBox = randomRect();
+                if (objectMetadata.boundingBox.isNull())
+                    objectMetadata.boundingBox = randomRect();
             }
 
             return;
         }
 
-        objects.reserve(objectsCount);
+        objectMetadataList.reserve(objectMetadataCount);
 
-        for (int i = 0; i < objectsCount; ++i)
+        for (int i = 0; i < objectMetadataCount; ++i)
         {
-            DemoAnalyticsObject object;
-            object.objectId = QnUuid::createUuid();
-            object.boundingBox = randomRect();
-            object.labels.emplace_back(
+            DemoAnalyticsObjectMetadata objectMetadata;
+            objectMetadata.trackId = QnUuid::createUuid();
+            objectMetadata.boundingBox = randomRect();
+            objectMetadata.attributes.emplace_back(
                 nx::common::metadata::Attribute{lit("Object %1").arg(i), QString()});
-            object.movementSpeed = QPointF(1.0, 1.0);
+            objectMetadata.movementSpeed = QPointF(1.0, 1.0);
 
-            objects.append(object);
+            objectMetadataList.append(objectMetadata);
         }
     }
 };
@@ -125,16 +125,16 @@ DemoAnalyticsMetadataProvider::DemoAnalyticsMetadataProvider():
 {
 }
 
-DetectionMetadataPacketPtr DemoAnalyticsMetadataProvider::metadata(
+ObjectMetadataPacketPtr DemoAnalyticsMetadataProvider::metadata(
     microseconds timestamp, int /*channel*/) const
 {
-    if (d->objectsCount <= 0)
+    if (d->objectMetadataCount <= 0)
         return {};
 
-    if (d->objects.isEmpty())
-        d->createObjects();
+    if (d->objectMetadataList.isEmpty())
+        d->createObjectMetadata();
 
-    const auto metadata = std::make_shared<DetectionMetadataPacket>();
+    const auto metadata = std::make_shared<ObjectMetadataPacket>();
 
     const microseconds precision{ini().demoAnalyticsProviderTimestampPrecisionUs};
     if (precision > 0us)
@@ -144,15 +144,15 @@ DetectionMetadataPacketPtr DemoAnalyticsMetadataProvider::metadata(
         d->startTimestamp = timestamp;
     const auto dt = timestamp - d->startTimestamp;
 
-    metadata->timestampUsec = timestamp.count();
+    metadata->timestampUs = timestamp.count();
 
-    for (auto& object: d->objects)
-        metadata->objects.push_back(object.animated(dt));
+    for (auto& objectMetadata: d->objectMetadataList)
+        metadata->objectMetadataList.push_back(objectMetadata.animated(dt));
 
     return metadata;
 }
 
-QList<DetectionMetadataPacketPtr> DemoAnalyticsMetadataProvider::metadataRange(
+QList<ObjectMetadataPacketPtr> DemoAnalyticsMetadataProvider::metadataRange(
     microseconds startTimestamp,
     microseconds endTimestamp,
     int channel,
@@ -164,7 +164,7 @@ QList<DetectionMetadataPacketPtr> DemoAnalyticsMetadataProvider::metadataRange(
         microseconds(ini().demoAnalyticsProviderTimestampPrecisionUs), kMinPrecision);
     startTimestamp = startTimestamp - startTimestamp % precision;
 
-    QList<DetectionMetadataPacketPtr> result;
+    QList<ObjectMetadataPacketPtr> result;
     for (int i = 0; i < maximumCount && startTimestamp <= endTimestamp; ++i)
     {
         result.append(metadata(startTimestamp, channel));

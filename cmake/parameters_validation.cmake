@@ -25,6 +25,16 @@ if(NOT developerBuild AND NOT dw_edge1 IN_LIST skipConfigurationChecks)
     endif()
 endif()
 
+if(NOT developerBuild AND NOT customizations_for_nx1 IN_LIST skipConfigurationChecks)
+    set(_nx1_customizations default vista)
+    if(targetDevice STREQUAL "bpi" AND NOT customization IN_LIST _nx1_customizations)
+        string(REPLACE ";" ", " _nx1_customizations "${_nx1_customizations}")
+        nx_fail_configuration_check(customizations_for_nx1
+            DESCRIPTION "${targetDevice} can be used only with the following customizations: ${_nx1_customizations}."
+            PRINT_VARIABLES targetDevice customization)
+    endif()
+endif()
+
 if(hardwareSigning AND NOT hardware_signing IN_LIST skipConfigurationChecks)
     if(WINDOWS AND NOT customization STREQUAL "vista")
         nx_fail_configuration_check(hardware_signing

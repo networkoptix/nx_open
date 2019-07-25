@@ -98,7 +98,7 @@ TEST_F(AnalyticsArchive, findAnalyticsAsc)
 
     auto request = createRequest(Qt::SortOrder::AscendingOrder);
 
-    checkData(archive.matchImage(m_resList, request), m_numericDates.size());
+    checkData(archive.matchImage(m_resList, request), (int) m_numericDates.size());
 
     request.limit = 50;
     checkData(archive.matchImage(m_resList, request), request.limit);
@@ -118,7 +118,7 @@ TEST_F(AnalyticsArchive, findAnalyticsDesc)
     std::reverse(m_numericDates.begin(), m_numericDates.end());
 
     auto response = archive.matchImage(m_resList, request);
-    checkData(response, m_numericDates.size());
+    checkData(response, (int) m_numericDates.size());
 
     request.limit = 50;
     checkData(archive.matchImage(m_resList, request), request.limit);
@@ -189,8 +189,8 @@ TEST_F(AnalyticsArchive, matchObjectGroups)
 
     auto result = archive.matchObjects(request);
     ASSERT_EQ(request.limit, result.data.size());
-    ASSERT_EQ(1, result.data[0].objectGroupId);
-    ASSERT_EQ(request.limit, result.data[result.data.size()-1].objectGroupId);
+    ASSERT_EQ(1, result.data[0].trackGroupId);
+    ASSERT_EQ(request.limit, result.data[result.data.size()-1].trackGroupId);
     ASSERT_EQ(kBaseDateMs, result.boundingPeriod.startTimeMs);
     ASSERT_EQ((request.limit-1) * kDeltaMs + kAggregationInterval.count(),
         result.boundingPeriod.durationMs);
@@ -200,8 +200,8 @@ TEST_F(AnalyticsArchive, matchObjectGroups)
     request.endTime = milliseconds(kBaseDateMs + (kSteps - 1) * kDeltaMs - 1);
     result = archive.matchObjects(request);
     ASSERT_EQ(request.limit, result.data.size());
-    ASSERT_EQ(kSteps - 1, result.data[0].objectGroupId);
-    ASSERT_EQ(kSteps - request.limit, result.data[result.data.size()-1].objectGroupId);
+    ASSERT_EQ(kSteps - 1, result.data[0].trackGroupId);
+    ASSERT_EQ(kSteps - request.limit, result.data[result.data.size()-1].trackGroupId);
 
     request.limit = 2;
     request.sortOrder = Qt::SortOrder::DescendingOrder;
@@ -209,8 +209,8 @@ TEST_F(AnalyticsArchive, matchObjectGroups)
     request.startTime = milliseconds(request.endTime.count() - kDeltaMs);
     result = archive.matchObjects(request);
     ASSERT_EQ(2, result.data.size());
-    ASSERT_EQ(kSteps, result.data[0].objectGroupId);
-    ASSERT_EQ(kSteps-1, result.data[1].objectGroupId);
+    ASSERT_EQ(kSteps, result.data[0].trackGroupId);
+    ASSERT_EQ(kSteps-1, result.data[1].trackGroupId);
 }
 
 TEST_F(AnalyticsArchive, matchLongArchive)
@@ -228,7 +228,7 @@ TEST_F(AnalyticsArchive, matchLongArchive)
         archive.saveToArchive(
             std::chrono::milliseconds(timestampMs),
             rects,
-            /*objectGroupId*/ 0,
+            /*trackGroupId*/ 0,
             kObjectTypeId,
             kAllAttributesHash /*allAttributesHash*/);
     }

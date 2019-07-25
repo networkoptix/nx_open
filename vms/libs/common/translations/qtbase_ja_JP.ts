@@ -408,7 +408,7 @@ Press ESC to cancel</source>
     </message>
     <message>
       <source>Failure to write block</source>
-      <translation>書き込みに失敗しました</translation>
+      <translation>ブロックの書き込みに失敗</translation>
     </message>
     <message>
       <source>Cannot create %1 for output</source>
@@ -542,13 +542,13 @@ Press ESC to cancel</source>
 Directory not found.
 Please verify the correct directory name was given.</source>
       <translation>%1
-ディレクトリが見つかりません。
-正しいディレクトリ名が入力されているかを確認してください。</translation>
+ディレクトリが見つかりません.
+正しいディレクトリ名が入力されているかを確認してください.</translation>
     </message>
     <message>
       <source>%1 already exists.
 Do you want to replace it?</source>
-      <translation>%1 は既に存在します。
+      <translation>%1 は既に存在します.
 置き換えますか?</translation>
     </message>
     <message>
@@ -556,8 +556,8 @@ Do you want to replace it?</source>
 File not found.
 Please verify the correct file name was given.</source>
       <translation>%1
-ファイルが見つかりません。
-正しいファイル名が入力されているかを確認してください。</translation>
+ファイルが見つかりません.
+正しいファイル名が入力されているかを確認してください.</translation>
     </message>
     <message>
       <source>New Folder</source>
@@ -570,7 +570,7 @@ Please verify the correct file name was given.</source>
     <message>
       <source>&apos;%1&apos; is write protected.
 Do you want to delete it anyway?</source>
-      <translation>&apos;%1&apos; は書き込み禁止です
+      <translation>&apos;%1&apos; は書き込み禁止です.
 削除しますか？</translation>
     </message>
     <message>
@@ -579,7 +579,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Could not delete directory.</source>
-      <translation>ディレクトリを削除できませんでした。</translation>
+      <translation>ディレクトリを削除できませんでした.</translation>
     </message>
     <message>
       <source>Recent Places</source>
@@ -628,7 +628,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Unknown</source>
-      <translation>未知の値</translation>
+      <translation>不明</translation>
     </message>
     <message>
       <source>Sidebar</source>
@@ -636,7 +636,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>List of places and bookmarks</source>
-      <translation>アドレスやブックマークのリスト</translation>
+      <translation>アドレスとブックマークのリスト</translation>
     </message>
     <message>
       <source>Files</source>
@@ -683,7 +683,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>&lt;b&gt;The name &quot;%1&quot; can not be used.&lt;/b&gt;&lt;p&gt;Try using another name, with fewer characters or no punctuations marks.</source>
-      <translation>&lt;b&gt; &quot;%1&quot;という名前は使用できません.&lt;/b&gt;&lt;p&gt;文字の数を減らしたり、句読記号を付けずに別の名前を使用してください</translation>
+      <translation>&lt;b&gt; &quot;%1&quot;という名前は使用できません. &lt;/b&gt;&lt;p&gt;文字数を減らすか、句読記号を付けずに別の名前を使用してください.</translation>
     </message>
     <message>
       <source>Name</source>
@@ -986,7 +986,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Filename refers to a directory</source>
-      <translation>ファイルではなくディレクトリを参照しています</translation>
+      <translation>ファイル名はディレクトリを参照します</translation>
     </message>
     <message>
       <source>Writing canceled by application</source>
@@ -1173,7 +1173,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Select All</source>
-      <translation>すべてを選択</translation>
+      <translation>すべて選択</translation>
     </message>
   </context>
 </TS>

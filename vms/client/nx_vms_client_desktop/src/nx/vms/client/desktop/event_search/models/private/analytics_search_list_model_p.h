@@ -65,24 +65,24 @@ private:
     void updateMetadataReceivers();
     void processMetadata();
 
-    int indexOf(const QnUuid& objectId) const;
+    int indexOf(const QnUuid& trackId) const;
 
     template<typename Iter>
     bool commitInternal(const QnTimePeriod& periodToCommit, Iter prefetchBegin, Iter prefetchEnd,
         int position, bool handleOverlaps);
 
     void emitDataChangedIfNeeded();
-    void advanceObject(analytics::db::DetectedObject& object,
+    void advanceTrack(analytics::db::ObjectTrack& track,
         analytics::db::ObjectPosition&& position, bool emitDataChanged = true);
 
     using GetCallback = std::function<void(bool, rest::Handle, analytics::db::LookupResult&&)>;
     rest::Handle getObjects(const QnTimePeriod& period, GetCallback callback, int limit) const;
 
-    QString description(const analytics::db::DetectedObject& object) const;
-    QString attributes(const analytics::db::DetectedObject& object) const;
-    QSharedPointer<QMenu> contextMenu(const analytics::db::DetectedObject& object) const;
+    QString description(const analytics::db::ObjectTrack& track) const;
+    QString attributes(const analytics::db::ObjectTrack& track) const;
+    QSharedPointer<QMenu> contextMenu(const analytics::db::ObjectTrack& track) const;
 
-    QnVirtualCameraResourcePtr camera(const analytics::db::DetectedObject& object) const;
+    QnVirtualCameraResourcePtr camera(const analytics::db::ObjectTrack& track) const;
 
     void setLiveReceptionActive(bool value);
 
@@ -92,7 +92,7 @@ private:
         QRectF boundingBox;
     };
 
-    static PreviewParams previewParams(const analytics::db::DetectedObject& object);
+    static PreviewParams previewParams(const analytics::db::ObjectTrack& track);
 
 private:
     AnalyticsSearchListModel* const q;
@@ -108,10 +108,10 @@ private:
     const QScopedPointer<QTimer> m_metadataProcessingTimer;
 
     analytics::db::LookupResult m_prefetch;
-    std::deque<analytics::db::DetectedObject> m_data;
+    std::deque<analytics::db::ObjectTrack> m_data;
 
-    QSet<QnUuid> m_dataChangedObjectIds; //< For which objects delayed dataChanged is queued.
-    QHash<QnUuid, std::chrono::milliseconds> m_objectIdToTimestamp;
+    QSet<QnUuid> m_dataChangedTrackIds; //< For which tracks delayed dataChanged is queued.
+    QHash<QnUuid, std::chrono::milliseconds> m_objectTrackIdToTimestamp;
 };
 
 } // namespace nx::vms::client::desktop

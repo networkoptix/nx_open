@@ -136,3 +136,9 @@ AVRational QnBufferedScreenGrabber::getFrameRate()
     rez.den = m_frameRate;
     return rez;
 }
+
+void QnBufferedScreenGrabber::setTimer(QElapsedTimer* timer)
+{
+    m_timer = timer;
+    m_grabber.setTimer(timer);
+}

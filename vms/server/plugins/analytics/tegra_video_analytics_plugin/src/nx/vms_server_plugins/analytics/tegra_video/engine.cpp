@@ -21,13 +21,12 @@ Engine::Engine(nx::sdk::analytics::IPlugin* plugin):
 {
 }
 
-IDeviceAgent* Engine::obtainDeviceAgent(
-    const IDeviceInfo* deviceInfo, Error* /*outError*/)
+MutableDeviceAgentResult Engine::obtainDeviceAgent(const IDeviceInfo* deviceInfo)
 {
     return new DeviceAgent(this, deviceInfo);
 }
 
-std::string Engine::manifest() const
+std::string Engine::manifestString() const
 {
     return /*suppress newline*/1 + R"json(
     "eventTypes": [
@@ -61,12 +60,12 @@ std::string Engine::manifest() const
 
 namespace {
 
-static const std::string kLibName = "tegra_video_analytics_plugin";
-
 static const std::string kPluginManifest = /*suppress newline*/1 + R"json(
 {
     "id": "nx.tegra_video",
     "name": "TegraVideo analytics plugin",
+    "description": "Supports video analytics implemented using NVIDIA Tegra Multimedia API for Tegra (Jetson) AI platforms",
+    "version": "1.0.0",
     "engineSettingsModel": ""
 }
 )json";
@@ -78,7 +77,6 @@ extern "C" {
 NX_PLUGIN_API nx::sdk::IPlugin* createNxPlugin()
 {
     return new nx::sdk::analytics::Plugin(
-        kLibName,
         kPluginManifest,
         [](nx::sdk::analytics::IPlugin* plugin)
         {

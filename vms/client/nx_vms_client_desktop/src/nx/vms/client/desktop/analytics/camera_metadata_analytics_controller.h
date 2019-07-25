@@ -4,7 +4,7 @@
 #include <QRectF>
 
 #include <nx/utils/singleton.h>
-#include <analytics/common/object_detection_metadata.h>
+#include <analytics/common/object_metadata.h>
 #include <core/resource/resource_fwd.h>
 #include <nx/streaming/media_data_packet.h>
 
@@ -19,7 +19,7 @@ class MetadataAnalyticsController:
 public:
     void gotMetadata(
         const QnResourcePtr& resource,
-        const nx::common::metadata::DetectionMetadataPacketPtr& metadata);
+        const nx::common::metadata::ObjectMetadataPacketPtr& metadata);
     void gotFrame(const QnResourcePtr& resource, qint64 timestampUs);
 
 signals:

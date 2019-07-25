@@ -27,6 +27,7 @@ def determine_package_versions(
 ):
     v = {
         "gcc": "8.1",
+        "sdk-gcc": "5.4.0",
         "clang": "8.0.0",
         "qt": "5.11.3",
         "boost": "1.67.0",
@@ -43,7 +44,7 @@ def determine_package_versions(
         "doxygen": "1.8.14",
         "gstreamer": "1.0",
         "icu": "60.2",
-        "deepstream": "0.1",
+        "deepstream": "0.2",
         "android-sdk": "28",
         "android-ndk": "r17",
         "help": customization + "-4.0",
@@ -51,7 +52,7 @@ def determine_package_versions(
         "certificates": customization,
         "customization_pack": customization,
         "detours": "4.0.1",
-        "stackwalker": "1.0",
+        "stackwalker": "1.0"
     }
 
     if platform == "linux" and box == "none" and target not in ("linux_arm32", "linux_arm64"):
@@ -123,6 +124,17 @@ def sync_dependencies(syncher, platform, arch, box, release_version, options={})
         else:
             sync("linux-%s/gcc" % arch)
 
+        if box == "bpi":
+            sync("linux_arm32/sdk-gcc")
+        elif box == "edge1":
+            sync("linux_arm32/sdk-gcc")
+        elif arch == "arm":
+            sync("linux_arm32/sdk-gcc")
+        elif arch == "arm64":
+            sync("linux_arm64/sdk-gcc")
+        else:
+            sync("linux-x64/sdk-gcc")
+
         if options.get("clang"):
             sync("linux/clang")
     elif platform == "android":
@@ -153,19 +165,13 @@ def sync_dependencies(syncher, platform, arch, box, release_version, options={})
     if platform == "linux":
         sync("sysroot", path_variable="sysroot_directory")
 
-    # if box == "rpi":
-    #     sync("cifs-utils")
-
     if (platform, arch) == ("linux", "arm64"):
-        sync("tegra_video")
-        sync("jetpack")
+        sync("tegra_video", path_variable="tegra_video_directory")
+        sync("jetpack", path_variable="jetpack_directory")
         sync("deepstream")
 
     if platform in ("android", "windows") or box == "bpi":
         sync("openal")
-
-    # if platform == "linux" and box != "edge1":
-    #     sync("cifs-utils")
 
     if platform == "windows":
         sync("icu", path_variable="icu_directory")

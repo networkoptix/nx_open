@@ -102,17 +102,17 @@ copyLibs()
     stripIfNeeded "$STAGE_LIB"
 }
 
-# [in] STAGE_MODULE
+# [in] STAGE_BIN
 copyMediaserverPlugins()
 {
     echo ""
     echo "Copying mediaserver plugins"
 
-    distrib_copyMediaserverPlugins "plugins" "$STAGE_MODULE/bin" "${SERVER_PLUGINS[@]}"
-    stripIfNeeded "$STAGE_MODULE/bin/plugins"
+    distrib_copyMediaserverPlugins "plugins" "$STAGE_BIN" "${SERVER_PLUGINS[@]}"
+    stripIfNeeded "$STAGE_BIN/plugins"
 
-    distrib_copyMediaserverPlugins "plugins_optional" "$STAGE_MODULE/bin" "${SERVER_PLUGINS_OPTIONAL[@]}"
-    stripIfNeeded "$STAGE_MODULE/bin/plugins_optional"
+    distrib_copyMediaserverPlugins "plugins_optional" "$STAGE_BIN" "${SERVER_PLUGINS_OPTIONAL[@]}"
+    stripIfNeeded "$STAGE_BIN/plugins_optional"
 }
 
 # [in] STAGE_BIN
@@ -143,9 +143,6 @@ copyTegraSpecificFiles()
     echo "Copying Tegra-specific files"
 
     mkdir -p "$STAGE_LIB"
-
-    echo "  Copying libtegra_video.so"
-    cp -P "$BUILD_DIR/lib/libtegra_video.so" "$STAGE_LIB/"
 
     local -r TEGRA_VIDEO_SOURCE_DIR="$SOURCE_DIR/artifacts/tx1/tegra_multimedia_api"
     # Demo neural networks.
@@ -297,8 +294,12 @@ createUpdateZip() # file.deb
         done
     fi
 
+    # Take space required to install from the DEB package and put it into package.json.
+    local FREE_SPACE_REQUIRED=$(distrib_getInstalledSizeFromDeb "$DEB_FILE")
+    sed "s/\"freeSpaceRequired\": 0/\"freeSpaceRequired\": $FREE_SPACE_REQUIRED/" \
+        "package.json" >"$ZIP_DIR/package.json"
+
     cp -r "update/update.json" "$ZIP_DIR/update.json"
-    cp "package.json" "$ZIP_DIR/"
     distrib_createArchive "$DISTRIBUTION_OUTPUT_DIR/$UPDATE_ZIP" "$ZIP_DIR" zip -r
     rm "$ZIP_DIR/package.json" #< Legacy RPI/Bananapi packages does not need this file.
 

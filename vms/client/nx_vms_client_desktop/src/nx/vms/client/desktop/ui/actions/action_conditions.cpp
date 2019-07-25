@@ -617,6 +617,15 @@ ActionVisibility ResourceRemovalCondition::check(const Parameters& parameters, Q
         if (resource.dynamicCast<QnFileLayoutResource>()) //< Cannot remove local layout from server.
             return false;
 
+        if (const auto camera = resource.dynamicCast<QnVirtualCameraResource>())
+        {
+            const bool isHiddenEdgeServer =
+                QnMediaServerResource::isHiddenServer(camera->getParentResource());
+            const bool isServerOnline = camera->getParentResource()->getStatus() == Qn::Online;
+            if (isHiddenEdgeServer && isServerOnline && !camera->hasFlags(Qn::wearable_camera))
+                return false;
+        }
+
         /* All other resources can be safely deleted if we have correct permissions. */
         return true;
     };

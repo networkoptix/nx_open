@@ -943,6 +943,14 @@ to view more bookmarks</source>
       <source>Objects Frames and Info...</source>
       <translation>Oggetti Frame e Info...</translation>
     </message>
+    <message>
+      <source>Pin Calendar</source>
+      <translation type="unfinished">Pin Calendar</translation>
+    </message>
+    <message>
+      <source>Unpin Calendar</source>
+      <translation type="unfinished">Unpin Calendar</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -4241,6 +4249,10 @@ to %1</source>
       <source>Virtual Camera %1</source>
       <translation>Telecamera virtuale</translation>
     </message>
+    <message>
+      <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
+      <translation>&quot;Telecamera virtuale&quot; è una memoria virtuale per file video, che può essere caricata su qualsiasi server del sistema e accessibile da qualsiasi utente.</translation>
+    </message>
   </context>
   <context>
     <name>QnNotificationSoundManagerDialog</name>
@@ -5742,7 +5754,7 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
     </message>
     <message>
       <source>Plugins</source>
-      <translation type="unfinished">Plugins</translation>
+      <translation>Plugins</translation>
     </message>
   </context>
   <context>
@@ -7341,12 +7353,12 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
   <context>
     <name>nx::vms::client::desktop::AnalyticsSearchListModel::Private</name>
     <message>
-      <source>Unknown object</source>
-      <translation>Oggetto sconosciuto</translation>
-    </message>
-    <message>
       <source>deleted camera</source>
       <translation>telecamera rimossa</translation>
+    </message>
+    <message>
+      <source>Unknown track</source>
+      <translation>Traccia sconosciuta</translation>
     </message>
   </context>
   <context>
@@ -7579,6 +7591,10 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
       <source>This action cannot be undone.</source>
       <translation>Questa azione non può essere annullata.</translation>
     </message>
+    <message>
+      <source>Motion detection stream is disabled</source>
+      <translation type="unfinished">Motion detection stream is disabled</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraScheduleWidget</name>
@@ -7714,7 +7730,7 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
     </message>
     <message>
       <source>Plugins</source>
-      <translation type="unfinished">Plugins</translation>
+      <translation>Plugins</translation>
     </message>
   </context>
   <context>
@@ -8434,8 +8450,8 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
       <translation>L'intervallo di indirizzi IP specificato ha più di 255 indirizzi.</translation>
     </message>
     <message>
-      <source>Can&apos;t start searching process</source>
-      <translation>Può t&apos;avviare processo di ricerca</translation>
+      <source>Can not start the search process</source>
+      <translation type="unfinished">Can not start the search process</translation>
     </message>
   </context>
   <context>
@@ -8692,10 +8708,6 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
       <translation>Non ci sono server online da aggiornare.</translation>
     </message>
     <message>
-      <source>Some servers haven&apos;t completed update process. Finish it anyway?</source>
-      <translation>Alcuni server non hanno completato il processo di aggiornamento di&apos;t. Finirlo comunque?</translation>
-    </message>
-    <message>
       <source>Cancel update and delete all downloaded data?</source>
       <translation>Annulla l'aggiornamento ed elimina tutti i dati scaricati?</translation>
     </message>
@@ -8740,16 +8752,28 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
       <translation>Avvio aggiornamento...</translation>
     </message>
     <message>
-      <source>Some servers have no package available</source>
-      <translation>Alcuni server non hanno alcun pacchetto disponibile</translation>
-    </message>
-    <message>
       <source>Failed to cancel update</source>
-      <translation type="unfinished">Failed to cancel update</translation>
+      <translation>Impossibile annullare l'aggiornamento</translation>
     </message>
     <message>
       <source>Failed to start installation</source>
-      <translation type="unfinished">Failed to start installation</translation>
+      <translation>Impossibile avviare l'installazione</translation>
+    </message>
+    <message>
+      <source>Some servers have no update packages available.</source>
+      <translation>Alcuni server non hanno pacchetti di aggiornamento disponibili.</translation>
+    </message>
+    <message>
+      <source>Some servers have encountered an internal error.</source>
+      <translation>Alcuni server hanno riscontrato un errore interno.</translation>
+    </message>
+    <message>
+      <source>Please please contact Customer Support.</source>
+      <translation>Si prega di contattare l'assistenza clienti.</translation>
+    </message>
+    <message>
+      <source>Some servers have not completed the update process. Finish it anyway?</source>
+      <translation type="unfinished">Some servers have not completed the update process. Finish it anyway?</translation>
     </message>
   </context>
   <context>
@@ -8807,10 +8831,6 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
   <context>
     <name>nx::vms::client::desktop::OpenLayoutActionWidget</name>
     <message>
-      <source>Some users don&apos;t have access to the selected layout. Action will not work for them.</source>
-      <translation>Alcuni utenti non&apos; hanno accesso al layout selezionato. L'azione non funzionerà per loro.</translation>
-    </message>
-    <message>
       <source>None of selected users have access to the selected layout. Action will not work.</source>
       <translation>Nessuno degli utenti selezionati ha accesso al layout selezionato. L'azione non funzionerà.</translation>
     </message>
@@ -8829,6 +8849,10 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
     <message>
       <source>None of selected user roles contain users. Action will not work.</source>
       <translation>Nessuno dei ruoli utente selezionati contiene utenti. L'azione non funzionerà.</translation>
+    </message>
+    <message>
+      <source>Some users do not have access to the selected layout. Action will not work for them.</source>
+      <translation type="unfinished">Some users do not have access to the selected layout. Action will not work for them.</translation>
     </message>
   </context>
   <context>
@@ -8864,10 +8888,6 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
     <message>
       <source>Failed to download update</source>
       <translation>Impossibile scaricare il pacchetto di aggiornamento</translation>
-    </message>
-    <message>
-      <source>Failed to install update</source>
-      <translation>Impossibile installare l'aggiornamento</translation>
     </message>
     <message>
       <source>Waiting for peer data</source>
@@ -8923,11 +8943,15 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
     </message>
     <message>
       <source>There is not enough space to install update.</source>
-      <translation type="unfinished">There is not enough space to install update.</translation>
+      <translation>Non c'è abbastanza spazio per installare l'aggiornamento.</translation>
     </message>
     <message>
       <source>Internal server error.</source>
-      <translation type="unfinished">Internal server error.</translation>
+      <translation>Errore interno del server.</translation>
+    </message>
+    <message>
+      <source>This OS version is no longer supported.</source>
+      <translation>Questa versione del sistema operativo non è più supportata.</translation>
     </message>
   </context>
   <context>
@@ -9034,28 +9058,12 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
       <translation>Più configurazioni</translation>
     </message>
     <message>
-      <source>Dual-Streaming not supported for this camera</source>
-      <translation>Dual-Streaming non supportato per questa telecamera</translation>
+      <source>Motion detection is disabled or not supported</source>
+      <translation type="unfinished">Motion detection is disabled or not supported</translation>
     </message>
     <message>
-      <source>Dual-Streaming and motion detection not supported for this camera</source>
-      <translation>Dual-Streaming e motion detection non supportati per questa telecamera</translation>
-    </message>
-    <message>
-      <source>Motion detection disabled</source>
-      <translation>Rilevazione del movimento disabilitata</translation>
-    </message>
-    <message>
-      <source>To enable or adjust it, go to the &quot;Motion&quot; tab in Camera Settings</source>
-      <translation>Per abilitarlo o regolarlo, vai alla scheda &quot;Motion&quot; di configurazione della telecamera</translation>
-    </message>
-    <message>
-      <source>Motion detection disabled or not supported</source>
-      <translation>Rilevamento del movimento disabilitato o non supportato</translation>
-    </message>
-    <message>
-      <source>To ensure it is supported and to enable it, go to the &quot;Motion&quot; tab in Camera Settings.</source>
-      <translation>Per assicurarti che sia supportato e per abilitarlo, vai su &quot;Movimento&quot; scheda in Impostazioni telecamera.</translation>
+      <source>Dual-streaming is disabled or not supported</source>
+      <translation type="unfinished">Dual-streaming is disabled or not supported</translation>
     </message>
   </context>
   <context>
@@ -9082,6 +9090,10 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
     <message>
       <source>Users will be automatically logged out if their session exceeds the specified duration.</source>
       <translation>Gli utenti verranno automaticamente disconnessi se la loro sessione supera la durata specificata.</translation>
+    </message>
+    <message>
+      <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
+      <translation>I Watermarks saranno visualizzati su live, archivi e video esportati solo per gli utenti non amministratori. Per tutti gli amministratori non sara' possibile visualizzarli.</translation>
     </message>
   </context>
   <context>
@@ -9146,6 +9158,10 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
       <source>plugin is optional and is not in the white list</source>
       <translation>il plugin è opzionale e non è nella lista bianca</translation>
     </message>
+    <message>
+      <source>internal error</source>
+      <translation>errore interno</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerStatusItemDelegate</name>
@@ -9174,11 +9190,15 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
     <name>nx::vms::client::desktop::ServerUpdateTool</name>
     <message>
       <source>No connection to the server.</source>
-      <translation type="unfinished">No connection to the server.</translation>
+      <translation>Nessuna connessione al server.</translation>
     </message>
     <message>
       <source>Network error.</source>
-      <translation type="unfinished">Network error.</translation>
+      <translation>Errore di rete.</translation>
+    </message>
+    <message>
+      <source>Server error.</source>
+      <translation>Errore del server.</translation>
     </message>
   </context>
   <context>
@@ -9598,17 +9618,17 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::ui::PluginEventModel</name>
+    <name>nx::vms::client::desktop::ui::PluginDiagnosticEventModel</name>
     <message>
       <source>Any Plugin</source>
       <translation>Qualsiasi plugin</translation>
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::ui::PluginEventWidget</name>
+    <name>nx::vms::client::desktop::ui::PluginDiagnosticEventWidget</name>
     <message>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation>L'evento verrà attivato solo se sono presenti corrispondenze nella didascalia con una qualsiasi delle parole chiave immesse.</translation>
+      <translation>L'evento verrà attivato solo se sono presenti nella descrizione con una qualsiasi delle parole chiave immesse.</translation>
     </message>
     <message>
       <source>If the field is empty, event will always trigger.</source>
@@ -9620,7 +9640,7 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
     </message>
     <message>
       <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
-      <translation>L'evento verrà attivato solo se sono presenti corrispondenze in didascalia con una qualsiasi delle parole chiave immesse.</translation>
+      <translation>L'evento verrà attivato solo se sono presenti nella descrizione con una qualsiasi delle parole chiave immesse.</translation>
     </message>
   </context>
   <context>

@@ -1,5 +1,6 @@
 #include "device_analytics_binding.h"
 
+#include <plugins/plugin_manager.h>
 #include <plugins/vms_server_plugins_ini.h>
 
 #include <core/resource/camera_resource.h>
@@ -9,12 +10,14 @@
 
 #include <nx/vms/api/analytics/descriptors.h>
 
+#include <nx/sdk/i_settings_response.h>
 #include <nx/sdk/analytics/i_engine.h>
 #include <nx/sdk/analytics/i_device_agent.h>
 #include <nx/sdk/analytics/i_consuming_device_agent.h>
+#include <nx/sdk/helpers/to_string.h>
+
 #include <nx/sdk/analytics/helpers/metadata_types.h>
 #include <nx/sdk/helpers/ptr.h>
-#include <nx/sdk/helpers/to_string.h>
 
 #include <nx/analytics/descriptor_manager.h>
 #include <nx/analytics/utils.h>
@@ -24,6 +27,8 @@
 #include <nx/vms/server/analytics/device_agent_handler.h>
 #include <nx/vms/server/analytics/event_rule_watcher.h>
 #include <nx/vms/server/sdk_support/utils.h>
+#include <nx/vms/server/sdk_support/to_string.h>
+#include <nx/vms/server/sdk_support/result_holder.h>
 #include <nx/vms/server/resource/analytics_engine_resource.h>
 #include <nx/vms/server/interactive_settings/json_engine.h>
 
@@ -35,6 +40,9 @@ namespace nx::vms::server::analytics {
 using namespace nx::vms::api::analytics;
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
+
+template<typename T>
+using ResultHolder = nx::vms::server::sdk_support::ResultHolder<T>;
 
 static const int kMaxQueueSize = 100;
 
@@ -92,23 +100,24 @@ bool DeviceAnalyticsBinding::updateNeededMetadataTypes()
     }
 
     const auto metadataTypes = neededMetadataTypes();
-    const auto error = m_deviceAgent->setNeededMetadataTypes(metadataTypes.get());
-    return error == Error::noError;
+    const ResultHolder<void> result = m_deviceAgent->setNeededMetadataTypes(metadataTypes.get());
+
+    return result.isOk();
 }
 
 bool DeviceAnalyticsBinding::startAnalyticsUnsafe(const Ptr<IStringMap>& settings)
 {
     if (!m_deviceAgent)
     {
-        m_deviceAgent = createDeviceAgent();
-        if (!m_deviceAgent)
+        const auto deviceAgent = createDeviceAgent();
+        if (!deviceAgent)
         {
             NX_ERROR(this, "Device agent creation failed, device %1 (%2)",
                 m_device->getUserDefinedName(), m_device->getId());
             return false;
         }
 
-        auto manifest = loadDeviceAgentManifest(m_deviceAgent);
+        const auto manifest = loadDeviceAgentManifest(deviceAgent);
         if (!manifest)
         {
             NX_ERROR(this, lm("Cannot load device agent manifest, device %1 (%2)")
@@ -120,8 +129,12 @@ bool DeviceAnalyticsBinding::startAnalyticsUnsafe(const Ptr<IStringMap>& setting
             return false;
 
         m_handler = createHandler();
-        m_deviceAgent->setHandler(m_handler.get());
+        deviceAgent->setHandler(m_handler.get());
+        if (!updatePluginInfo())
+            return false;
+
         updateDeviceWithManifest(*manifest);
+        m_deviceAgent = deviceAgent;
         m_device->saveProperties();
     }
 
@@ -141,8 +154,10 @@ bool DeviceAnalyticsBinding::startAnalyticsUnsafe(const Ptr<IStringMap>& setting
     if (!m_started)
     {
         const auto metadataTypes = neededMetadataTypes();
-        const auto error = m_deviceAgent->setNeededMetadataTypes(metadataTypes.get());
-        m_started = error == Error::noError;
+        const ResultHolder<void> result =
+            m_deviceAgent->setNeededMetadataTypes(metadataTypes.get());
+
+        m_started = result.isOk();
     }
 
     return m_started;
@@ -154,8 +169,8 @@ void DeviceAnalyticsBinding::stopAnalyticsUnsafe()
     if (!m_deviceAgent)
         return;
 
-    const auto neededMetadataTypes = makePtr<MetadataTypes>();
-    m_deviceAgent->setNeededMetadataTypes(neededMetadataTypes.get());
+    const ResultHolder<void> result =
+        m_deviceAgent->setNeededMetadataTypes(makePtr<MetadataTypes>().get());
 }
 
 QVariantMap DeviceAnalyticsBinding::getSettings() const
@@ -181,26 +196,58 @@ QVariantMap DeviceAnalyticsBinding::getSettings() const
         return jsonEngine.values();
     }
 
-    const auto pluginSideSettings = toPtr(deviceAgent->pluginSideSettings());
-    if (!pluginSideSettings)
+    const ResultHolder<const ISettingsResponse*> result = deviceAgent->pluginSideSettings();
+    if (!result.isOk())
     {
-        NX_DEBUG(this, "Got null device agent settings for device %1 (%2) and engine %3 (%4)",
+        NX_DEBUG(this,
+            "Got an error: '%5' while obtaining device agent settings for device %1 (%2) "
+            "and engine %3 (%4)",
             m_device->getUserDefinedName(),
             m_device->getId(),
             m_engine->getName(),
-            m_engine->getId());
+            m_engine->getId(),
+            sdk_support::toErrorString(result));
+
+        return jsonEngine.values();
     }
     else
     {
-        QVariantMap result;
-        const auto count = pluginSideSettings->count();
+        QVariantMap settingsMap;
+        const auto settingsResponse = result.value();
+        if (!settingsResponse)
+        {
+            NX_DEBUG(this,
+                "Got a null settings response while obtaining device agent settings "
+                "for device %1 (%2) and engine %3 (%4)",
+                m_device->getUserDefinedName(),
+                m_device->getId(),
+                m_engine->getName(),
+                m_engine->getId());
+
+            return jsonEngine.values();
+        }
+
+        const auto values = toPtr(settingsResponse->values());
+        if (!values)
+        {
+            NX_DEBUG(this,
+                "Got a null settings value map while obtaining device agent settings "
+                "for device %1 (%2) and engine %3 (%4)",
+                m_device->getUserDefinedName(),
+                m_device->getId(),
+                m_engine->getName(),
+                m_engine->getId());
+
+            return jsonEngine.values();
+        }
+
+        const auto count = values->count();
         for (auto i = 0; i < count; ++i)
-            result.insert(pluginSideSettings->key(i), pluginSideSettings->value(i));
+            settingsMap.insert(values->key(i), values->value(i));
 
-        jsonEngine.applyValues(result);
+        jsonEngine.applyValues(settingsMap);
+        return jsonEngine.values();
     }
-
-    return jsonEngine.values();
 }
 
 void DeviceAnalyticsBinding::setSettings(const Ptr<IStringMap>& settings)
@@ -222,7 +269,12 @@ void DeviceAnalyticsBinding::setSettingsInternal(const Ptr<IStringMap>& settings
         return;
     }
 
-    m_deviceAgent->setSettings(settings.get());
+    const ResultHolder<const IStringMap*> result = m_deviceAgent->setSettings(settings.get());
+    if (!result.isOk())
+    {
+        NX_WARNING(this, "Unable to set device agent stttings for device %1, error: '%2'",
+            m_device, sdk_support::Error::fromResultHolder(result));
+    }
 }
 
 void DeviceAnalyticsBinding::logIncomingFrame(nx::sdk::analytics::IDataPacket* frame)
@@ -230,8 +282,30 @@ void DeviceAnalyticsBinding::logIncomingFrame(nx::sdk::analytics::IDataPacket* f
     if (!nx::analytics::loggingIni().isLoggingEnabled())
         return;
 
-    auto frameInfo = std::make_unique<nx::analytics::FrameInfo>(frame->timestampUs());
-    m_incomingFrameLogger.pushFrameInfo(std::move(frameInfo));
+    m_incomingFrameLogger.pushFrameInfo({std::chrono::microseconds(frame->timestampUs())});
+}
+
+bool DeviceAnalyticsBinding::updatePluginInfo() const
+{
+    if (const auto pluginManager = serverModule()->pluginManager())
+    {
+        if (!NX_ASSERT(m_engine))
+            return false;
+
+        const auto plugin = m_engine->plugin();
+        if (!NX_ASSERT(plugin))
+            return false;
+
+        const auto serverPlugin =
+            plugin.dynamicCast<server::resource::AnalyticsPluginResource>();
+
+        if (!NX_ASSERT(serverPlugin))
+            return false;
+
+        pluginManager->setIsActive(serverPlugin->sdkPlugin().get(), /*isActive*/ true);
+    }
+
+    return true;
 }
 
 void DeviceAnalyticsBinding::setMetadataSink(QnAbstractDataReceptorPtr metadataSink)
@@ -288,12 +362,18 @@ Ptr<DeviceAnalyticsBinding::DeviceAgent> DeviceAnalyticsBinding::createDeviceAge
         return nullptr;
     }
 
-    Error error = Error::noError;
-    const auto deviceAgent = toPtr(sdkEngine->obtainDeviceAgent(deviceInfo.get(), &error));
+    const ResultHolder<IDeviceAgent*> result = sdkEngine->obtainDeviceAgent(deviceInfo.get());
+    if (!result.isOk())
+    {
+        NX_ERROR(this, "Cannot obtain DeviceAgent %1 (%2), Engine returned an error: '%3'",
+            m_device->getUserDefinedName(), m_device->getId(), sdk_support::toErrorString(result));
+        return nullptr;
+    }
 
+    const auto deviceAgent = result.value();
     if (!deviceAgent)
     {
-        NX_ERROR(this, lm("Cannot obtain DeviceAgent %1 (%2), plugin returned null.")
+        NX_ERROR(this, lm("Cannot obtain DeviceAgent %1 (%2), plugin returned null")
             .args(m_device->getUserDefinedName(), m_device->getId()));
         return nullptr;
     }
@@ -301,14 +381,6 @@ Ptr<DeviceAnalyticsBinding::DeviceAgent> DeviceAnalyticsBinding::createDeviceAge
     const auto streamConsumer = queryInterfacePtr<IConsumingDeviceAgent>(deviceAgent);
 
     m_isStreamConsumer = streamConsumer != nullptr;
-
-    if (error != Error::noError)
-    {
-        NX_ERROR(this, lm("Cannot obtain DeviceAgent %1 (%2), plugin returned error %3.")
-            .args(m_device->getUserDefinedName(), m_device->getId()), error);
-        return nullptr;
-    }
-
     return deviceAgent;
 }
 
@@ -477,11 +549,13 @@ bool DeviceAnalyticsBinding::processData(const QnAbstractDataPacketPtr& data)
 
     logIncomingFrame(packetAdapter->packet());
 
-    const Error error = consumingDeviceAgent->pushDataPacket(packetAdapter->packet());
-    if (error != Error::noError)
+    const ResultHolder<void> result =
+        consumingDeviceAgent->pushDataPacket(packetAdapter->packet());
+
+    if (!result.isOk())
     {
-        NX_VERBOSE(this, "Plugin %1 has rejected video data with error %2",
-            m_engine->getName(), error);
+        NX_VERBOSE(this, "Plugin %1 has rejected video data with error: %2",
+            m_engine->getName(), sdk_support::toErrorString(result));
     }
 
     return true;

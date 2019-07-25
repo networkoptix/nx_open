@@ -2051,11 +2051,6 @@
       <source>New Virtual Camera...</source>
       <translation>新增虚拟摄像机...</translation>
     </message>
-    <message>
-      <location/>
-      <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
-      <translation>&quot;虚拟摄像机&quot; 是一个视频资料专用的虚拟空间, 可上传到系统中的任一服务器并让所有用户存取.</translation>
-    </message>
   </context>
   <context>
     <name>OpenLayoutActionWidget</name>
@@ -2099,9 +2094,9 @@
     </message>
   </context>
   <context>
-    <name>PluginEventWidget</name>
+    <name>PluginDiagnosticEventWidget</name>
     <message>
-      <location filename="../src/nx/vms/client/desktop/ui/event_rules/widgets/plugin_event_widget.ui"/>
+      <location filename="../src/nx/vms/client/desktop/ui/event_rules/widgets/plugin_diagnostic_event_widget.ui"/>
       <source>Source:</source>
       <translation>源:</translation>
     </message>
@@ -2777,11 +2772,6 @@
       <location/>
       <source>Limit session duration</source>
       <translation>限制登入时间</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
-      <translation>水印仅显示在非管理员用户的实时，存档和导出视频上。您和其他管理员并不会看到。</translation>
     </message>
   </context>
   <context>

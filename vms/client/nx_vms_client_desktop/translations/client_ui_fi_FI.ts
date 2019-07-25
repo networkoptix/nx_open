@@ -2051,11 +2051,6 @@
       <source>New Virtual Camera...</source>
       <translation>Uusi virtuaalikamera...</translation>
     </message>
-    <message>
-      <location/>
-      <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
-      <translation>&quot;Virtuaalikamera&quot; on virtuaalinen tallennustila videotiedostoille, jotka voidaan ladata mihin tahansa järjestelmän palvelimeen, ja jokainen käyttäjä voi käyttää sitä.</translation>
-    </message>
   </context>
   <context>
     <name>OpenLayoutActionWidget</name>
@@ -2099,16 +2094,16 @@
     </message>
   </context>
   <context>
-    <name>PluginEventWidget</name>
+    <name>PluginDiagnosticEventWidget</name>
     <message>
-      <location filename="../src/nx/vms/client/desktop/ui/event_rules/widgets/plugin_event_widget.ui"/>
+      <location filename="../src/nx/vms/client/desktop/ui/event_rules/widgets/plugin_diagnostic_event_widget.ui"/>
       <source>Source:</source>
       <translation>Lähde:</translation>
     </message>
     <message>
       <location/>
       <source>Caption contains:</source>
-      <translation>Kuvateksti sisältää:</translation>
+      <translation>Otsikko sisältää:</translation>
     </message>
     <message>
       <location/>
@@ -2778,11 +2773,6 @@
       <source>Limit session duration</source>
       <translation>Rajoita istunnon kestoa</translation>
     </message>
-    <message>
-      <location/>
-      <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
-      <translation>Vesileimat näkyvät reaaliaikaisen, arkistoitujen ja vietyjen videoiden kautta vain muille kuin hallinnollisille käyttäjille. Sinä ja muut ylläpitäjät eivät näe niitä.</translation>
-    </message>
   </context>
   <context>
     <name>SendmailBusinessActionWidget</name>
@@ -3074,22 +3064,22 @@
     <message>
       <location/>
       <source>Analytics data will continue to be stored on the disabled storage.</source>
-      <translation type="unfinished">Analytics data will continue to be stored on the disabled storage.</translation>
+      <translation>Analytiikan-tiedot tallennetaan edelleen pois käytöstä poistetussa tallennuksessa.</translation>
     </message>
     <message>
       <location/>
       <source>Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</source>
-      <translation type="unfinished">Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</translation>
+      <translation>Käytöstä poistetun arkiston tallennus lopetetaan. Vanhentuneen materiaalin poistaminen siitä kuitenkin jatkuu.</translation>
     </message>
     <message>
       <location/>
       <source>Recording was enabled on the USB storage</source>
-      <translation type="unfinished">Recording was enabled on the USB storage</translation>
+      <translation>USB-muistille tallennus on otettu käyttöön</translation>
     </message>
     <message>
       <location/>
       <source>Analytics data can occupy tens of gigabytes of storage space. We recommend to choose other location for it instead of the system partition.</source>
-      <translation type="unfinished">Analytics data can occupy tens of gigabytes of storage space. We recommend to choose other location for it instead of the system partition.</translation>
+      <translation>Analytiikan-tiedot voivat viedä kymmeniä gigatavuja tallennustilaa. Suosittelemme valitsemaan toisen sijainnin järjestelmän osion sijaan.</translation>
     </message>
   </context>
   <context>

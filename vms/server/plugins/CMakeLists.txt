@@ -13,10 +13,21 @@ set_property(GLOBAL PROPERTY nx_server_plugins_list)
 set_property(GLOBAL PROPERTY nx_server_plugins_optional_list)
 
 function(nx_add_server_plugin target)
-    cmake_parse_arguments(PLUGIN "OPTIONAL" "" "ADD_TO_DISTRIBUTION_IF" ${ARGN})
+    cmake_parse_arguments(PLUGIN "OPTIONAL;DEDICATED_DIR" "" "ADD_TO_DISTRIBUTION_IF" ${ARGN})
 
     if(PLUGIN_OPTIONAL)
-        set_output_directories(RUNTIME "bin/plugins_optional" LIBRARY "bin/plugins_optional")
+        set(optionalPostfix "_optional")
+    endif()
+
+    if(PLUGIN_DEDICATED_DIR)
+        set(dedicatedDirPathSuffix "/${target}")
+    endif()
+
+    string(CONCAT outputDirectory "bin/plugins${optionalPostfix}${dedicatedDirPathSuffix}")
+
+    set_output_directories(RUNTIME "${outputDirectory}" LIBRARY "${outputDirectory}")
+
+    if(PLUGIN_OPTIONAL)
         set_property(GLOBAL APPEND PROPERTY nx_server_plugins_optional_list ${target})
     else()
         set_property(GLOBAL APPEND PROPERTY nx_server_plugins_list ${target})
@@ -29,6 +40,10 @@ function(nx_add_server_plugin target)
     endif()
     if(${PLUGIN_ADD_TO_DISTRIBUTION_IF})
         set_property(TARGET ${target} PROPERTY add_to_distribution ON)
+    endif()
+
+    if(PLUGIN_DEDICATED_DIR)
+        set_target_properties(${target} PROPERTIES INSTALL_RPATH "$ORIGIN")
     endif()
 
     add_dependencies(server_plugins ${target})

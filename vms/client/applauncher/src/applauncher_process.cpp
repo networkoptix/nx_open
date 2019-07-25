@@ -72,8 +72,8 @@ void ApplauncherProcess::pleaseStop()
 
 void ApplauncherProcess::initChannels()
 {
-    m_taskServer.subscribe(serializeTaskType(TaskType::quit),
-        [this](const QByteArray& /*data*/) -> bool
+    m_taskServer.subscribeSimple(serializeTaskType(TaskType::quit),
+        [this]() -> bool
         {
             NX_INFO(this, "processRequest() - received a command to stop. Exiting.");
             m_taskServer.pleaseStop();
@@ -81,66 +81,63 @@ void ApplauncherProcess::initChannels()
             return true;
         });
 
-    subscribe<PingRequest, PingResponse>(TaskType::pingApplauncher,
+    subscribe(TaskType::pingApplauncher,
         [](const PingRequest& request, PingResponse& response)
         {
             response.pingId = request.pingId;
+            auto now = std::chrono::system_clock::now().time_since_epoch();
+            response.pingResponseStamp =
+                std::chrono::duration_cast<std::chrono::milliseconds>(now).count();
             response.pingRequestStamp = request.pingStamp;
         });
 
-    subscribe<StartApplicationTask, Response>(TaskType::startApplication,
+    subscribe(TaskType::startApplication,
         [this](const StartApplicationTask& request, Response& response)
         {
             m_installationManager->updateInstalledVersionsInformation();
             startApplication(request, response);
         });
 
-    subscribe<StartApplicationTask, Response>(TaskType::startApplication,
+    subscribe(TaskType::startApplication,
         [this](const StartApplicationTask& request, Response& response)
         {
             m_installationManager->updateInstalledVersionsInformation();
             startApplication(request, response);
         });
 
-    subscribe<InstallZipTask, Response>(
-        TaskType::installZip,
+    subscribe(TaskType::installZip,
         [this](const InstallZipTask& request, Response& response)
         {
             installZip(request, response);
         });
 
-    subscribe<InstallZipTaskAsync, Response>(
-        TaskType::startZipInstallation,
+    subscribe(TaskType::startZipInstallation,
         [this](const InstallZipTaskAsync& request, Response& response)
         {
             installZipAsync(request, response);
         });
 
-    subscribe<InstallZipCheckStatus, InstallZipCheckStatusResponse>(
-        TaskType::checkZipProgress,
+    subscribe(TaskType::checkZipProgress,
         [this](const InstallZipCheckStatus& request, InstallZipCheckStatusResponse& response)
         {
             checkInstallationProgress(request, response);
         });
 
-    subscribe<IsVersionInstalledRequest, IsVersionInstalledResponse>(
-        TaskType::isVersionInstalled,
+    subscribe(TaskType::isVersionInstalled,
         [this](const IsVersionInstalledRequest& request, IsVersionInstalledResponse& response)
         {
             m_installationManager->updateInstalledVersionsInformation();
             isVersionInstalled(request, response);
         });
 
-    subscribe<GetInstalledVersionsRequest, GetInstalledVersionsResponse>(
-        TaskType::getInstalledVersions,
+    subscribe(TaskType::getInstalledVersions,
         [this](const GetInstalledVersionsRequest& request, GetInstalledVersionsResponse& response)
         {
             m_installationManager->updateInstalledVersionsInformation();
             getInstalledVersions(request, response);
         });
 
-    subscribe<AddProcessKillTimerRequest, AddProcessKillTimerResponse>(
-        TaskType::addProcessKillTimer,
+    subscribe(TaskType::addProcessKillTimer,
         [this](const AddProcessKillTimerRequest& request, AddProcessKillTimerResponse& response)
         {
             m_installationManager->updateInstalledVersionsInformation();
@@ -389,7 +386,7 @@ bool ApplauncherProcess::installZipAsync(
 }
 
 bool ApplauncherProcess::checkInstallationProgress(
-    const nx::vms::applauncher::api::InstallZipCheckStatus& /*request*/,
+    const nx::vms::applauncher::api::InstallZipCheckStatus& request,
     applauncher::api::InstallZipCheckStatusResponse& response)
 {
     if (!m_process.isEmpty())
@@ -414,7 +411,8 @@ bool ApplauncherProcess::checkInstallationProgress(
     }
     else
     {
-        response.result = ResultType::ok;
+        bool installed = m_installationManager->isVersionInstalled(request.version);
+        response.result = installed ? ResultType::ok : ResultType::versionNotInstalled;
         NX_DEBUG(this,
             "checkInstallationProgress() - there is no active installation");
     }

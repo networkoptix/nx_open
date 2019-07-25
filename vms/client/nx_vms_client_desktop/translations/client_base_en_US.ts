@@ -943,6 +943,14 @@ to view more bookmarks</source>
         <source>Objects Frames and Info...</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Pin Calendar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unpin Calendar</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Deactivator</name>
@@ -4240,6 +4248,10 @@ to %1</source>
         <source>Virtual Camera %1</source>
         <translation></translation>
     </message>
+    <message>
+        <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnNotificationSoundManagerDialog</name>
@@ -7338,12 +7350,12 @@ If you intended to move analytics data to another storage location, please conta
 <context>
     <name>nx::vms::client::desktop::AnalyticsSearchListModel::Private</name>
     <message>
-        <source>Unknown object</source>
+        <source>deleted camera</source>
         <translation></translation>
     </message>
     <message>
-        <source>deleted camera</source>
-        <translation></translation>
+        <source>Unknown track</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7575,6 +7587,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
         <source>This action cannot be undone.</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Motion detection stream is disabled</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8431,8 +8447,8 @@ If you intended to move analytics data to another storage location, please conta
         <translation></translation>
     </message>
     <message>
-        <source>Can&apos;t start searching process</source>
-        <translation></translation>
+        <source>Can not start the search process</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8689,10 +8705,6 @@ If you intended to move analytics data to another storage location, please conta
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Some servers haven&apos;t completed update process. Finish it anyway?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Cancel update and delete all downloaded data?</source>
         <translation type="unfinished"></translation>
     </message>
@@ -8737,15 +8749,27 @@ If you intended to move analytics data to another storage location, please conta
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Some servers have no package available</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Failed to cancel update</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Failed to start installation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Some servers have no update packages available.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Some servers have encountered an internal error.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please please contact Customer Support.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Some servers have not completed the update process. Finish it anyway?</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -8804,10 +8828,6 @@ If you intended to move analytics data to another storage location, please conta
 <context>
     <name>nx::vms::client::desktop::OpenLayoutActionWidget</name>
     <message>
-        <source>Some users don&apos;t have access to the selected layout. Action will not work for them.</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>None of selected users have access to the selected layout. Action will not work.</source>
         <translation></translation>
     </message>
@@ -8826,6 +8846,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
         <source>None of selected user roles contain users. Action will not work.</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Some users do not have access to the selected layout. Action will not work for them.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8860,10 +8884,6 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>Failed to download update</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Failed to install update</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -8924,6 +8944,10 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>Internal server error.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This OS version is no longer supported.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -9031,28 +9055,12 @@ If you intended to move analytics data to another storage location, please conta
         <translation></translation>
     </message>
     <message>
-        <source>Dual-Streaming not supported for this camera</source>
-        <translation></translation>
+        <source>Motion detection is disabled or not supported</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Dual-Streaming and motion detection not supported for this camera</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Motion detection disabled</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>To enable or adjust it, go to the &quot;Motion&quot; tab in Camera Settings</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Motion detection disabled or not supported</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>To ensure it is supported and to enable it, go to the &quot;Motion&quot; tab in Camera Settings.</source>
-        <translation></translation>
+        <source>Dual-streaming is disabled or not supported</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -9078,6 +9086,10 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>Users will be automatically logged out if their session exceeds the specified duration.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -9143,6 +9155,10 @@ If you intended to move analytics data to another storage location, please conta
         <source>plugin is optional and is not in the white list</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>internal error</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::ServerStatusItemDelegate</name>
@@ -9175,6 +9191,10 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>Network error.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server error.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -9595,29 +9615,29 @@ If you intended to move analytics data to another storage location, please conta
     </message>
 </context>
 <context>
-    <name>nx::vms::client::desktop::ui::PluginEventModel</name>
+    <name>nx::vms::client::desktop::ui::PluginDiagnosticEventModel</name>
     <message>
         <source>Any Plugin</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
-    <name>nx::vms::client::desktop::ui::PluginEventWidget</name>
+    <name>nx::vms::client::desktop::ui::PluginDiagnosticEventWidget</name>
     <message>
         <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>If the field is empty, event will always trigger.</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>This field is case sensitive.</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

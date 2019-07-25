@@ -165,22 +165,20 @@ private:
         QnUniversalTcpListener* tcpListener,
         ec2::TransactionMessageBusAdapter* messageBus);
 
-    /**
-     * This weird name is an apidoctool requirement.
-     */
-    void reg(
+    void registerRestHandler(
         const QString& path,
         QnRestRequestHandler* handler,
         GlobalPermission permission = GlobalPermission::none);
 
-    void reg(
+    void registerRestHandler(
         const nx::network::http::Method::ValueType& method,
         const QString& path,
         QnRestRequestHandler* handler,
         GlobalPermission permission = GlobalPermission::none);
 
-    template<class TcpConnectionProcessor, typename... ExtraParam>
-    void regTcp(const QByteArray& protocol, const QString& path, ExtraParam... extraParam);
+    template<class TcpConnectionProcessor, typename... ExtraParams>
+    void registerTcpHandler(
+        const QByteArray& protocol, const QString& path, ExtraParams... extraParams);
 
     bool initTcpListener(
         TimeBasedNonceProvider* timeBasedNonceProvider,

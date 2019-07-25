@@ -20,7 +20,8 @@ function(get_distributable_plugins_list variable_name property_name)
 endfunction()
 
 function(nx_generate_package_json file_name)
-    cmake_parse_arguments(PACK "" "COMPONENT;VARIANTS;INSTALL_SCRIPT" "" ${ARGN})
+    cmake_parse_arguments(
+        PACK "" "COMPONENT;VARIANTS;INSTALL_SCRIPT;FREE_SPACE_REQUIRED" "" ${ARGN})
     set(version ${releaseVersion.full})
     set(platform ${platform_new})
     set(cloud_host ${cloudHost})
@@ -37,6 +38,12 @@ function(nx_generate_package_json file_name)
         set(install_script ${PACK_INSTALL_SCRIPT})
     elseif(component STREQUAL server)
         message(FATAL_ERROR "Install script for server must be specified")
+    endif()
+
+    if(PACK_FREE_SPACE_REQUIRED)
+        set(freeSpaceRequired ${PACK_FREE_SPACE_REQUIRED})
+    else()
+        set(freeSpaceRequired 0)
     endif()
 
     nx_configure_file(${_nx_vms_distribution_dir}/package.json.in ${file_name})

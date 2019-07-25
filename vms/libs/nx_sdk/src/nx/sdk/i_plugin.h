@@ -16,6 +16,10 @@ class IUtilityProvider;
  *
  * The only object of this class is created by a Server on its start, and is destroyed (via
  * releaseRef()) on the Server shutdown.
+ *
+ * All methods are guaranteed to be called without overlapping even if from different threads (i.e.
+ * with a guaranteed barrier between the calls), thus, no synchronization is required for the
+ * implementation.
  */
 class IPlugin: public Interface<IPlugin>
 {
@@ -27,9 +31,6 @@ public:
 
     /** Prototype of a plugin entry point function. */
     typedef IPlugin* (*EntryPointFunc)();
-
-    /** Name of the plugin, used for information purpose only. */
-    virtual const char* name() const = 0;
 
     /**
      * Provides an object which the plugin can use for calling back to access some data and

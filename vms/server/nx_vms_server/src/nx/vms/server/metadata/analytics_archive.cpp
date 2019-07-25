@@ -55,7 +55,7 @@ AnalyticsArchive::MatchObjectsResult  AnalyticsArchive::matchObjects(
             if (isMatched)
             {
                 BinaryRecordEx* recordEx = (BinaryRecordEx*)data;
-                result.data.push_back({recordEx->objectsGroupId(), timestampMs});
+                result.data.push_back({recordEx->trackGroupId(), timestampMs});
             }
             return isMatched;
     };
@@ -88,7 +88,7 @@ template <typename RectType>
 bool AnalyticsArchive::saveToArchive(
     std::chrono::milliseconds startTime,
     const std::vector<RectType>& data,
-    uint32_t objectsGroupId,
+    uint32_t trackGroupId,
     uint32_t objectType,
     int64_t allAttributesHash)
 {
@@ -98,7 +98,7 @@ bool AnalyticsArchive::saveToArchive(
     packet->m_duration = std::chrono::microseconds(kAggregationInterval).count();
 
     BinaryRecordEx* recordEx = (BinaryRecordEx*)(packet->data() + QnMetaDataV1::kMotionDataBufferSize);
-    recordEx->setObjectsGroupId(objectsGroupId);
+    recordEx->setTrackGroupId(trackGroupId);
     recordEx->setObjectType(objectType);
     recordEx->setAttributesHash(allAttributesHash);
 
@@ -111,14 +111,14 @@ bool AnalyticsArchive::saveToArchive(
 template bool AnalyticsArchive::saveToArchive<QRect>(
     std::chrono::milliseconds startTime,
     const std::vector<QRect>& data,
-    uint32_t objectsGroupId,
+    uint32_t trackGroupId,
     uint32_t objectType,
     int64_t allAttributesHash);
 
 template bool AnalyticsArchive::saveToArchive<QRectF>(
     std::chrono::milliseconds startTime,
     const std::vector<QRectF>& data,
-    uint32_t objectsGroupId,
+    uint32_t trackGroupId,
     uint32_t objectType,
     int64_t allAttributesHash);
 

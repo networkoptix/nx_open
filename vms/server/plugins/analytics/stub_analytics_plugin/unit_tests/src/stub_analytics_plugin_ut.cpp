@@ -1,6 +1,5 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include <iostream>
 #include <vector>
 
 #include <nx/kit/debug.h>
@@ -13,6 +12,7 @@
 #include <nx/sdk/helpers/string_map.h>
 #include <nx/sdk/helpers/device_info.h>
 #include <nx/sdk/helpers/string.h>
+#include <nx/sdk/helpers/error.h>
 #include <nx/sdk/analytics/helpers/metadata_types.h>
 #include <nx/sdk/uuid.h>
 #include <nx/sdk/i_utility_provider.h>
@@ -34,6 +34,33 @@ namespace test {
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 
+template<typename Value>
+struct ResultHolder
+{
+public:
+    ResultHolder(Result<Value>&& result): result(std::move(result)) {};
+    ~ResultHolder()
+    {
+        toPtr(result.value);
+        toPtr(result.error.errorMessage);
+    }
+
+    bool isOk() const { return result.isOk(); }
+
+    const Result<Value> result;
+};
+
+class VoidResultHolder
+{
+public:
+    VoidResultHolder(Result<void>&& result): result(std::move(result)) {};
+    ~VoidResultHolder() { toPtr(result.error.errorMessage); }
+
+    bool isOk() const { return result.isOk(); }
+
+    const Result<void> result;
+};
+
 static std::string trimString(const std::string& s)
 {
     int start = 0;
@@ -49,15 +76,14 @@ static std::string trimString(const std::string& s)
 
 static void testEngineManifest(IEngine* engine)
 {
-    Error error = Error::noError;
+    const ResultHolder<const IString*> result = engine->manifest();
 
-    const auto manifest = toPtr(engine->manifest(&error));
-
+    ASSERT_TRUE(result.isOk());
+    const auto manifest = result.result.value;
     ASSERT_TRUE(manifest);
-    const char* manifestStr = manifest->str();
 
-    ASSERT_TRUE(manifestStr != nullptr);
-    ASSERT_EQ(Error::noError, error);
+    const char* const manifestStr = manifest->str();
+    ASSERT_TRUE(manifestStr);
     ASSERT_TRUE(manifestStr[0] != '\0');
     NX_PRINT << "Engine manifest:\n" << manifestStr;
 
@@ -71,13 +97,13 @@ static void testEngineManifest(IEngine* engine)
 
 static void testDeviceAgentManifest(IDeviceAgent* deviceAgent)
 {
-    Error error = Error::noError;
-    const auto manifest = toPtr(deviceAgent->manifest(&error));
+    const ResultHolder<const IString*> result = deviceAgent->manifest();
+    ASSERT_TRUE(result.isOk());
 
+    const auto manifest = result.result.value;
     ASSERT_TRUE(manifest);
     const char* manifestStr = manifest->str();
     ASSERT_TRUE(manifestStr != nullptr);
-    ASSERT_EQ(Error::noError, error);
     ASSERT_TRUE(manifestStr[0] != '\0');
     NX_PRINT << "DeviceAgent manifest:\n" << manifest;
 
@@ -89,32 +115,53 @@ static void testDeviceAgentManifest(IDeviceAgent* deviceAgent)
 static void testEngineSettings(IEngine* engine)
 {
     const auto settings = makePtr<StringMap>();
-    settings->addItem("setting1", "value1");
-    settings->addItem("setting2", "value2");
+    settings->setItem("setting1", "value1");
+    settings->setItem("setting2", "value2");
 
-    engine->setSettings(nullptr); //< Test assigning null settings.
-    engine->setSettings(makePtr<StringMap>().get()); //< Test assigning empty settings.
-    engine->setSettings(settings.get()); //< Test assigning some settings.
+    {
+        // Test assigning empty settings.
+        const ResultHolder<const IStringMap*> result =
+            engine->setSettings(makePtr<StringMap>().get());
+        ASSERT_TRUE(result.isOk());
+    }
+
+    {
+        // Test assigning some settings
+        const ResultHolder<const IStringMap*> result =
+            engine->setSettings(settings.get());
+        ASSERT_TRUE(result.isOk());
+    }
 }
 
 static void testDeviceAgentSettings(IDeviceAgent* deviceAgent)
 {
     const auto settings = makePtr<StringMap>();
-    settings->addItem("setting1", "value1");
-    settings->addItem("setting2", "value2");
+    settings->setItem("setting1", "value1");
+    settings->setItem("setting2", "value2");
 
-    deviceAgent->setSettings(nullptr); //< Test assigning null settings.
-    deviceAgent->setSettings(makePtr<StringMap>().get()); //< Test assigning empty settings.
-    deviceAgent->setSettings(settings.get()); //< Test assigning some settings.
+    {
+        // Test assigning empty settings.
+        const ResultHolder<const IStringMap*> result =
+            deviceAgent->setSettings(makePtr<StringMap>().get());
+        ASSERT_TRUE(result.isOk());
+    }
+
+    {
+        // Test assigning some settings.
+        const ResultHolder<const IStringMap*> result =
+            deviceAgent->setSettings(settings.get());
+        ASSERT_TRUE(result.isOk());
+    }
+    // TODO: Add test for assigning expected settings.
 }
 
 class Action: public RefCountable<IAction>
 {
 public:
-    Action(): m_params(new StringMap()) {}
+    Action(): m_params(makePtr<StringMap>()) {}
 
     virtual const char* actionId() const override { return m_actionId.c_str(); }
-    virtual Uuid objectId() const override { return m_objectId; }
+    virtual Uuid objectTrackId() const override { return m_objectTrackId; }
     virtual Uuid deviceId() const override { return m_deviceId; }
     virtual IObjectTrackInfo* objectTrackInfo() const override { return nullptr; }
     virtual int64_t timestampUs() const override { return m_timestampUs; }
@@ -167,12 +214,12 @@ public:
     {
         m_params.reset(new StringMap());
         for (const auto& param: params)
-            m_params->addItem(param.first, param.second);
+            m_params->setItem(param.first, param.second);
     }
 
 public:
     std::string m_actionId;
-    Uuid m_objectId;
+    Uuid m_objectTrackId;
     Uuid m_deviceId;
     int64_t m_timestampUs = 0;
     bool m_handleResultCalled = false;
@@ -188,9 +235,8 @@ static void testExecuteActionNonExisting(IEngine* engine)
     auto action = makePtr<Action>();
     action->m_actionId = "non_existing_actionId";
 
-    Error error = Error::noError;
-    engine->executeAction(action.get(), &error);
-    ASSERT_TRUE(error != Error::noError);
+    const VoidResultHolder result = engine->executeAction(action.get());
+    ASSERT_TRUE(!result.isOk());
     action->assertExpectedState();
 }
 
@@ -207,9 +253,8 @@ static void testExecuteActionAddToList(IEngine* engine)
     });
     action->m_expectedNonNullMessageToUser = true;
 
-    Error error = Error::noError;
-    engine->executeAction(action.get(), &error);
-    ASSERT_EQ(Error::noError, error);
+    const VoidResultHolder result = engine->executeAction(action.get());
+    ASSERT_TRUE(result.isOk());
     action->assertExpectedState();
 }
 
@@ -217,12 +262,11 @@ static void testExecuteActionAddPerson(IEngine* engine)
 {
     const auto action = makePtr<Action>();
     action->m_actionId = "nx.stub.addPerson";
-    action->m_objectId = Uuid();
+    action->m_objectTrackId = Uuid();
     action->m_expectedNonNullActionUrl = true;
 
-    Error error = Error::noError;
-    engine->executeAction(action.get(), &error);
-    ASSERT_EQ(Error::noError, error);
+    const VoidResultHolder result = engine->executeAction(action.get());
+    ASSERT_TRUE(result.isOk());
     action->assertExpectedState();
 }
 
@@ -239,9 +283,9 @@ public:
         ASSERT_TRUE(metadata->timestampUs() >= 0);
     }
 
-    virtual void handlePluginEvent(IPluginEvent* event) override
+    virtual void handlePluginDiagnosticEvent(IPluginDiagnosticEvent* event) override
     {
-        NX_PRINT << "DeviceAgentHandler: Received plugin event: "
+        NX_PRINT << "DeviceAgentHandler: Received a plugin diagnostic event: "
             << "level " << (int) event->level() << ", "
             << "caption " << nx::kit::utils::toString(event->caption()) << ", "
             << "description " << nx::kit::utils::toString(event->description());
@@ -251,9 +295,9 @@ public:
 class EngineHandler: public nx::sdk::RefCountable<IEngine::IHandler>
 {
 public:
-    virtual void handlePluginEvent(IPluginEvent* event) override
+    virtual void handlePluginDiagnosticEvent(IPluginDiagnosticEvent* event) override
     {
-        NX_PRINT << "EngineHandler: Received plugin event: "
+        NX_PRINT << "EngineHandler: Received a plugin diagnostic event: "
             << "level " << (int) event->level() << ", "
             << "caption " << nx::kit::utils::toString(event->caption()) << ", "
             << "description " << nx::kit::utils::toString(event->description());
@@ -285,13 +329,25 @@ public:
     virtual const nx::sdk::IString* homeDir() const override { return new nx::sdk::String(); }
 };
 
+class Handler: public nx::sdk::RefCountable<nx::sdk::analytics::IDeviceAgent::IHandler>
+{
+public:
+    virtual void handleMetadata(IMetadataPacket* metadataPacket) override
+    {
+        ASSERT_TRUE(metadataPacket);
+    }
+
+    virtual void handlePluginDiagnosticEvent(IPluginDiagnosticEvent* event) override
+    {
+        ASSERT_TRUE(event);
+    }
+};
+
 TEST(stub_analytics_plugin, test)
 {
     // These handlers should be destroyed after the Plugin, Engine and DeviceAgent objects.
     const auto engineHandler = nx::sdk::makePtr<EngineHandler>();
     const auto deviceAgentHandler = nx::sdk::makePtr<DeviceAgentHandler>();
-
-    Error error = Error::noError;
 
     const auto pluginObject = toPtr(createNxPlugin());
     ASSERT_TRUE(pluginObject);
@@ -303,46 +359,49 @@ TEST(stub_analytics_plugin, test)
     const auto utilityProvider = makePtr<UtilityProvider>();
     plugin->setUtilityProvider(utilityProvider.get());
 
-    const auto engine = toPtr(plugin->createEngine(&error));
-    ASSERT_EQ(Error::noError, error);
+    const ResultHolder<IEngine*> result = plugin->createEngine();
+    ASSERT_TRUE(result.isOk());
+
+    const auto engine = result.result.value;
     ASSERT_TRUE(engine);
     ASSERT_TRUE(queryInterfacePtr<IEngine>(engine));
 
     ASSERT_EQ(plugin.get(), engine->plugin());
 
-    ASSERT_EQ(Error::noError, engine->setHandler(engineHandler.get()));
+    testEngineManifest(engine);
+    testEngineSettings(engine);
 
-    const std::string pluginName = engine->plugin()->name();
-    ASSERT_TRUE(!pluginName.empty());
-    NX_PRINT << "Plugin name: [" << pluginName << "]";
-    ASSERT_STREQ(pluginName, "stub_analytics_plugin");
-
-    testEngineManifest(engine.get());
-    testEngineSettings(engine.get());
-
-    testExecuteActionNonExisting(engine.get());
-    testExecuteActionAddToList(engine.get());
-    testExecuteActionAddPerson(engine.get());
+    testExecuteActionNonExisting(engine);
+    testExecuteActionAddToList(engine);
+    testExecuteActionAddPerson(engine);
 
     const auto deviceInfo = makePtr<DeviceInfo>();
     deviceInfo->setId("TEST");
-    const auto baseDeviceAgent = toPtr(engine->obtainDeviceAgent(deviceInfo.get(), &error));
-    ASSERT_EQ(Error::noError, error);
+    const ResultHolder<IDeviceAgent*> deviceAgentResult = engine->obtainDeviceAgent(deviceInfo.get());
+    ASSERT_TRUE(deviceAgentResult.isOk());
+
+    const auto baseDeviceAgent = deviceAgentResult.result.value;
     ASSERT_TRUE(baseDeviceAgent);
     ASSERT_TRUE(queryInterfacePtr<IDeviceAgent>(baseDeviceAgent));
     const auto deviceAgent = queryInterfacePtr<IConsumingDeviceAgent>(baseDeviceAgent);
     ASSERT_TRUE(deviceAgent);
 
-    ASSERT_EQ(Error::noError, deviceAgent->setHandler(deviceAgentHandler.get()));
-
+    deviceAgent->setHandler(makePtr<DeviceAgentHandler>().get());
     testDeviceAgentManifest(deviceAgent.get());
     testDeviceAgentSettings(deviceAgent.get());
 
+    const auto handler = makePtr<Handler>();
+    deviceAgent->setHandler(handler.get());
+
     const auto metadataTypes = makePtr<MetadataTypes>();
-    ASSERT_EQ(Error::noError, deviceAgent->setNeededMetadataTypes(metadataTypes.get()));
+    const VoidResultHolder setNeededMetadataTypesResult =
+        deviceAgent->setNeededMetadataTypes(metadataTypes.get());
+    ASSERT_TRUE(setNeededMetadataTypesResult.isOk());
 
     const auto compressedVideoPacket = makePtr<CompressedVideoPacket>();
-    ASSERT_EQ(Error::noError, deviceAgent->pushDataPacket(compressedVideoPacket.get()));
+    const VoidResultHolder pushDataPacketResult =
+        deviceAgent->pushDataPacket(compressedVideoPacket.get());
+    ASSERT_TRUE(pushDataPacketResult.isOk());
 }
 
 } // namespace test

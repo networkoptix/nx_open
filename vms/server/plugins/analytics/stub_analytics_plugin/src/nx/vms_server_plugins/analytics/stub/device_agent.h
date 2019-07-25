@@ -9,9 +9,9 @@
 #include <vector>
 #include <string>
 
-#include <nx/sdk/uuid.h>
 #include <nx/sdk/analytics/helpers/video_frame_processing_device_agent.h>
 #include <nx/sdk/analytics/helpers/pixel_format.h>
+#include <nx/sdk/analytics/helpers/result_aliases.h>
 
 #include "engine.h"
 #include "objects/random.h"
@@ -27,15 +27,15 @@ public:
     DeviceAgent(Engine* engine, const nx::sdk::IDeviceInfo* deviceInfo);
     virtual ~DeviceAgent() override;
 
-    virtual nx::sdk::Error setNeededMetadataTypes(
+    virtual nx::sdk::Result<void> setNeededMetadataTypes(
         const nx::sdk::analytics::IMetadataTypes* neededMetadataTypes) override;
 
-    virtual nx::sdk::IStringMap* pluginSideSettings() const override;
+    virtual nx::sdk::SettingsResponseResult pluginSideSettings() const override;
 
 protected:
-    virtual std::string manifest() const override;
+    virtual std::string manifestString() const override;
 
-    virtual void settingsReceived() override;
+    virtual nx::sdk::StringMapResult settingsReceived() override;
 
     virtual bool pushCompressedVideoFrame(
         const nx::sdk::analytics::ICompressedVideoPacket* videoFrame) override;
@@ -67,14 +67,13 @@ private:
         const nx::sdk::analytics::IUncompressedVideoFrame* frame,
         int plane) const;
 
-    nx::sdk::Error startFetchingMetadata(
-        const nx::sdk::analytics::IMetadataTypes* metadataTypes);
+    void startFetchingMetadata(const nx::sdk::analytics::IMetadataTypes* metadataTypes);
 
     void stopFetchingMetadata();
 
     void processEvents();
 
-    void processPluginEvents();
+    void processPluginDiagnosticEvents();
 
     void setObjectCount(int objectCount);
 
@@ -99,12 +98,12 @@ private:
     void updateEventGenerationParameters();
 
 private:
-    std::atomic<bool> m_terminated{ false };
+    std::atomic<bool> m_terminated{false};
 
-    std::unique_ptr<std::thread> m_pluginEventThread;
-    std::mutex m_pluginEventGenerationLoopMutex;
-    std::condition_variable m_pluginEventGenerationLoopCondition;
-    std::atomic<bool> m_needToThrowPluginEvents{false};
+    std::unique_ptr<std::thread> m_pluginDiagnosticEventThread;
+    std::mutex m_pluginDiagnosticEventGenerationLoopMutex;
+    std::condition_variable m_pluginDiagnosticEventGenerationLoopCondition;
+    std::atomic<bool> m_needToThrowPluginDiagnosticEvents{false};
 
     std::unique_ptr<std::thread> m_eventThread;
     std::mutex m_eventGenerationLoopMutex;
@@ -139,7 +138,8 @@ private:
 
         std::atomic<bool> generatePreviews{true};
 
-        std::atomic<bool> throwPluginEvents{false};
+        std::atomic<bool> throwPluginDiagnosticEvents{false};
+        std::atomic<bool> leakFrames{false};
     };
 
     DeviceAgentSettings m_deviceAgentSettings;
@@ -155,10 +155,7 @@ private:
     struct ObjectContext
     {
         ObjectContext() = default;
-        ObjectContext(std::unique_ptr<AbstractObject> object):
-            object(std::move(object))
-        {
-        }
+        ObjectContext(std::unique_ptr<AbstractObject> object): object(std::move(object)) {}
 
         ObjectContext& operator=(std::unique_ptr<AbstractObject>&& otherObject)
         {

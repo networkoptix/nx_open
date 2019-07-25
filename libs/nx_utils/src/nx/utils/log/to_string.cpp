@@ -143,6 +143,9 @@ QString demangleTypeName(const char* type)
         {
             if (boost::starts_with(typeName, prefix))
                 typeName = typeName.substr(prefix.size());
+            // Remove prefixes in template arguments.
+            boost::replace_all(typeName, "<" + prefix, "<");
+            boost::replace_all(typeName, " " + prefix, " ");
         }
     #endif
 

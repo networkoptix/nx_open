@@ -9,7 +9,7 @@ void PrintTo(ResultCode value, ::std::ostream* os)
     *os << QnLexical::serialized(value).toStdString();
 }
 
-void PrintTo(const std::vector<DetectedObject>& value, ::std::ostream* os)
+void PrintTo(const std::vector<ObjectTrack>& value, ::std::ostream* os)
 {
     *os << "[" << value.size() << "]";
 }

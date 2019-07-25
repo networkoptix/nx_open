@@ -944,6 +944,14 @@ to view more bookmarks</source>
       <source>Objects Frames and Info...</source>
       <translation>物件影像帧数和信息...</translation>
     </message>
+    <message>
+      <source>Pin Calendar</source>
+      <translation>隐藏日历</translation>
+    </message>
+    <message>
+      <source>Unpin Calendar</source>
+      <translation>显示日历</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -4193,6 +4201,10 @@ to %1</source>
       <source>Virtual Camera %1</source>
       <translation>虚拟摄像机%1</translation>
     </message>
+    <message>
+      <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
+      <translation>&quot;虚拟摄像机&quot; 是一个视频资料专用的虚拟空间, 可上传到系统中的任一服务器并让所有用户存取.</translation>
+    </message>
   </context>
   <context>
     <name>QnNotificationSoundManagerDialog</name>
@@ -7242,12 +7254,12 @@ If you intended to move analytics data to another storage location, please conta
   <context>
     <name>nx::vms::client::desktop::AnalyticsSearchListModel::Private</name>
     <message>
-      <source>Unknown object</source>
-      <translation>未知对象</translation>
-    </message>
-    <message>
       <source>deleted camera</source>
       <translation>移除摄像机</translation>
+    </message>
+    <message>
+      <source>Unknown track</source>
+      <translation type="unfinished">Unknown track</translation>
     </message>
   </context>
   <context>
@@ -7475,6 +7487,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>This action cannot be undone.</source>
       <translation>该操作无法撤消。</translation>
+    </message>
+    <message>
+      <source>Motion detection stream is disabled</source>
+      <translation type="unfinished">Motion detection stream is disabled</translation>
     </message>
   </context>
   <context>
@@ -8318,8 +8334,8 @@ If you intended to move analytics data to another storage location, please conta
       <translation>超出IP地址区间，最大允许255个地址.</translation>
     </message>
     <message>
-      <source>Can&apos;t start searching process</source>
-      <translation>可以&apos;t开始搜索过程</translation>
+      <source>Can not start the search process</source>
+      <translation type="unfinished">Can not start the search process</translation>
     </message>
   </context>
   <context>
@@ -8575,10 +8591,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>没有要更新的在线服务器。</translation>
     </message>
     <message>
-      <source>Some servers haven&apos;t completed update process. Finish it anyway?</source>
-      <translation>有些服务器&apos;未完成更新。继续完成？</translation>
-    </message>
-    <message>
       <source>Cancel update and delete all downloaded data?</source>
       <translation>取消更新并删除所有下载数据？</translation>
     </message>
@@ -8623,16 +8635,28 @@ If you intended to move analytics data to another storage location, please conta
       <translation>开始更新到......</translation>
     </message>
     <message>
-      <source>Some servers have no package available</source>
-      <translation>有些服务器没有可用的套件包</translation>
-    </message>
-    <message>
       <source>Failed to cancel update</source>
-      <translation type="unfinished">Failed to cancel update</translation>
+      <translation>无法取消更新</translation>
     </message>
     <message>
       <source>Failed to start installation</source>
-      <translation type="unfinished">Failed to start installation</translation>
+      <translation>启动安装失败</translation>
+    </message>
+    <message>
+      <source>Some servers have no update packages available.</source>
+      <translation type="unfinished">Some servers have no update packages available.</translation>
+    </message>
+    <message>
+      <source>Some servers have encountered an internal error.</source>
+      <translation type="unfinished">Some servers have encountered an internal error.</translation>
+    </message>
+    <message>
+      <source>Please please contact Customer Support.</source>
+      <translation type="unfinished">Please please contact Customer Support.</translation>
+    </message>
+    <message>
+      <source>Some servers have not completed the update process. Finish it anyway?</source>
+      <translation type="unfinished">Some servers have not completed the update process. Finish it anyway?</translation>
     </message>
   </context>
   <context>
@@ -8689,10 +8713,6 @@ If you intended to move analytics data to another storage location, please conta
   <context>
     <name>nx::vms::client::desktop::OpenLayoutActionWidget</name>
     <message>
-      <source>Some users don&apos;t have access to the selected layout. Action will not work for them.</source>
-      <translation>某些用户&apos;t 对所选布局不具有访问权限。指令將不起作用。</translation>
-    </message>
-    <message>
       <source>None of selected users have access to the selected layout. Action will not work.</source>
       <translation>所选用户无权访问所选布局。指令无效。</translation>
     </message>
@@ -8711,6 +8731,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>None of selected user roles contain users. Action will not work.</source>
       <translation>所选用户角色均不包含用户。操作不起作用。</translation>
+    </message>
+    <message>
+      <source>Some users do not have access to the selected layout. Action will not work for them.</source>
+      <translation type="unfinished">Some users do not have access to the selected layout. Action will not work for them.</translation>
     </message>
   </context>
   <context>
@@ -8746,10 +8770,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Failed to download update</source>
       <translation>无法下载更新</translation>
-    </message>
-    <message>
-      <source>Failed to install update</source>
-      <translation>无法安装更新</translation>
     </message>
     <message>
       <source>Waiting for peer data</source>
@@ -8810,6 +8830,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Internal server error.</source>
       <translation>服务器内部错误。</translation>
+    </message>
+    <message>
+      <source>This OS version is no longer supported.</source>
+      <translation>不再支持此操作系统版本.</translation>
     </message>
   </context>
   <context>
@@ -8915,28 +8939,12 @@ If you intended to move analytics data to another storage location, please conta
       <translation>更多设置</translation>
     </message>
     <message>
-      <source>Dual-Streaming not supported for this camera</source>
-      <translation>设备不支持双码流.</translation>
+      <source>Motion detection is disabled or not supported</source>
+      <translation type="unfinished">Motion detection is disabled or not supported</translation>
     </message>
     <message>
-      <source>Dual-Streaming and motion detection not supported for this camera</source>
-      <translation>设备不支持双码流和移动侦测.</translation>
-    </message>
-    <message>
-      <source>Motion detection disabled</source>
-      <translation>移动侦测禁用</translation>
-    </message>
-    <message>
-      <source>To enable or adjust it, go to the &quot;Motion&quot; tab in Camera Settings</source>
-      <translation>到摄像机设置中的&quot;移动侦测&quot;启用或設置移动侦测.</translation>
-    </message>
-    <message>
-      <source>Motion detection disabled or not supported</source>
-      <translation>移动侦测禁用或不受支持</translation>
-    </message>
-    <message>
-      <source>To ensure it is supported and to enable it, go to the &quot;Motion&quot; tab in Camera Settings.</source>
-      <translation>到摄像机设置中的&quot;移动侦测&quot;确保支持并启用移动侦测.</translation>
+      <source>Dual-streaming is disabled or not supported</source>
+      <translation type="unfinished">Dual-streaming is disabled or not supported</translation>
     </message>
   </context>
   <context>
@@ -8963,6 +8971,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Users will be automatically logged out if their session exceeds the specified duration.</source>
       <translation>如果登入超过限定时间，用户将自动被登出。</translation>
+    </message>
+    <message>
+      <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
+      <translation>水印仅显示在非管理员用户的实时，存档和导出视频上。您和其他管理员并不会看到。</translation>
     </message>
   </context>
   <context>
@@ -9027,6 +9039,10 @@ If you intended to move analytics data to another storage location, please conta
       <source>plugin is optional and is not in the white list</source>
       <translation>插件是可选的且不在白名单中</translation>
     </message>
+    <message>
+      <source>internal error</source>
+      <translation>内部错误</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerStatusItemDelegate</name>
@@ -9055,11 +9071,15 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::ServerUpdateTool</name>
     <message>
       <source>No connection to the server.</source>
-      <translation type="unfinished">No connection to the server.</translation>
+      <translation>未连接到服务器.</translation>
     </message>
     <message>
       <source>Network error.</source>
-      <translation type="unfinished">Network error.</translation>
+      <translation>网络错误.</translation>
+    </message>
+    <message>
+      <source>Server error.</source>
+      <translation type="unfinished">Server error.</translation>
     </message>
   </context>
   <context>
@@ -9474,21 +9494,21 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::ui::PluginEventModel</name>
+    <name>nx::vms::client::desktop::ui::PluginDiagnosticEventModel</name>
     <message>
       <source>Any Plugin</source>
       <translation>任何插件</translation>
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::ui::PluginEventWidget</name>
+    <name>nx::vms::client::desktop::ui::PluginDiagnosticEventWidget</name>
     <message>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
       <translation>只有当标题栏位中的文字与输入的任何关键字相符时，事件才会触发</translation>
     </message>
     <message>
       <source>If the field is empty, event will always trigger.</source>
-      <translation>如果该栏位为空白, 事件将维持在触发状态。</translation>
+      <translation>如果该栏位为空白，事件将维持在触发状态</translation>
     </message>
     <message>
       <source>This field is case sensitive.</source>

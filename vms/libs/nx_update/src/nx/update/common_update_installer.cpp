@@ -8,8 +8,8 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/update/update_information.h>
 #include <utils/common/process.h>
-#include <utils/common/app_info.h>
 #include <utils/common/util.h>
+#include <nx/update/update_check.h>
 #include <audit/audit_manager.h>
 #include <api/model/audit/auth_session.h>
 #include <common/common_module.h>
@@ -29,7 +29,14 @@ update::PackageInformation updateInformation(const QString& path)
         return {};
     }
 
-    return QJson::deserialized<update::PackageInformation>(updateInfoFile.readAll());
+    bool ok = false;
+    const auto& result = QJson::deserialized<update::PackageInformation>(
+        updateInfoFile.readAll(), {}, &ok);
+
+    if (!ok || !result.isValid())
+        NX_ERROR(NX_SCOPE_TAG, "Cannot deserialize info from %1", infoFileName);
+
+    return result;
 }
 
 } // namespace
@@ -60,14 +67,14 @@ void CommonUpdateInstaller::prepareAsync(const QString& path)
         if (requiredSpace < -1)
             return setState(CommonUpdateInstaller::State::cantOpenFile);
 
-        if (!checkFreeSpace(dataDirectoryPath(), requiredSpace))
+        if (!checkFreeSpace(dataDirectoryPath(), requiredSpace + update::reservedSpacePadding()))
             return setState(CommonUpdateInstaller::State::noFreeSpace);
     }
 
     m_extractor.extractAsync(
         path,
         workDir(),
-        [this](QnZipExtractor::Error errorCode, const QString& outputPath)
+        [this](QnZipExtractor::Error errorCode, const QString& outputPath, qint64 bytesExtracted)
         {
             auto cleanupGuard = nx::utils::makeScopeGuard(
                 [this, errorCode]()
@@ -79,10 +86,10 @@ void CommonUpdateInstaller::prepareAsync(const QString& path)
                     m_condition.wakeOne();
                 });
 
-            NX_DEBUG(
-                this,
-                lm("ZipExtractor for a path (%1) finished with the code %2")
-                    .args(QnZipExtractor::errorToString(errorCode)));
+            NX_DEBUG(this, "ZipExtractor for a path (%1) finished with the code %2",
+                outputPath, QnZipExtractor::errorToString(errorCode));
+
+            m_bytesExtracted = bytesExtracted;
 
             switch (errorCode)
             {
@@ -125,18 +132,15 @@ CommonUpdateInstaller::State CommonUpdateInstaller::state() const
 
 bool CommonUpdateInstaller::checkFreeSpace(const QString& path, qint64 bytes) const
 {
-    constexpr qint64 kReservedSpace = 50 * 1024 * 1024;
-
-    const qint64 required = bytes + kReservedSpace;
     const qint64 free = freeSpace(path);
 
-    const auto requiredMb = required / (1024 * 1024);
+    const auto requiredMb = bytes / (1024 * 1024);
     const auto freeMb = free / (1024 * 1024);
 
     NX_DEBUG(this, "Checking free space in %1. Required: %2MB, Free: %3MB",
         path, requiredMb, freeMb);
 
-    if (free < required)
+    if (free < bytes)
     {
         NX_WARNING(this, "Not enough free space in %1. Required: %2MB, Free: %3MB",
             path, requiredMb, freeMb);
@@ -144,6 +148,16 @@ bool CommonUpdateInstaller::checkFreeSpace(const QString& path, qint64 bytes) co
     }
 
     return true;
+}
+
+bool CommonUpdateInstaller::checkFreeSpaceForInstallation() const
+{
+    const qint64 required = m_freeSpaceRequiredToUpdate > 0
+        ? m_freeSpaceRequiredToUpdate
+        : m_bytesExtracted / 10;
+
+    return checkFreeSpace(
+        QCoreApplication::applicationDirPath(), required + update::reservedSpacePadding());
 }
 
 CommonUpdateInstaller::State CommonUpdateInstaller::checkContents(const QString& outputPath) const
@@ -180,6 +194,7 @@ CommonUpdateInstaller::State CommonUpdateInstaller::checkContents(const QString&
     }
 
     m_version = info.version;
+    m_freeSpaceRequiredToUpdate = info.freeSpaceRequired;
 
     return CommonUpdateInstaller::State::ok;
 }

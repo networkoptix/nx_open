@@ -9,7 +9,7 @@
 #include <plugins/plugin_tools.h>
 
 #include <nx/network/abstract_socket.h>
-#include <utils/memory/cyclic_allocator.h>
+#include <nx/utils/memory/cyclic_allocator.h>
 
 extern "C" {
 
@@ -72,7 +72,6 @@ private:
     bool isPacketTimestampOk(const AVPacket& packet) const;
 
     nxcip::UsecUTCTimestamp packetTimestamp(const AVPacket& packet) const;
-    unsigned int packetChannelNumber(const AVPacket& packet) const;
     unsigned int packetFlags(const AVPacket& packet) const;
     nxcip::DataPacketType packetDataType(const AVPacket& packet) const;
 
@@ -85,8 +84,6 @@ private:
     CyclicAllocator m_allocator;
 
     AVFormatContext* m_formatContext = nullptr;
-    std::map<int64_t, int64_t> m_streamIndexToChannelNumber;
-    int m_firstVideoIndex = 0;
 
     nxcip::AudioFormat m_audioFormat;
     bool m_audioEnabled = false;

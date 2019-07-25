@@ -944,6 +944,14 @@ nähdäksesi lisää kirjanmerkkejä</translation>
       <source>Objects Frames and Info...</source>
       <translation>Objektien kuvat ja tiedot...</translation>
     </message>
+    <message>
+      <source>Pin Calendar</source>
+      <translation type="unfinished">Pin Calendar</translation>
+    </message>
+    <message>
+      <source>Unpin Calendar</source>
+      <translation type="unfinished">Unpin Calendar</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -3581,7 +3589,7 @@ to %1</source>
     </message>
     <message>
       <source>Channels</source>
-      <translation type="unfinished">Channels</translation>
+      <translation>Kanavat</translation>
     </message>
   </context>
   <context>
@@ -4241,6 +4249,10 @@ to %1</source>
     <message>
       <source>Virtual Camera %1</source>
       <translation>Virtuaalikamera %1</translation>
+    </message>
+    <message>
+      <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
+      <translation>&quot;Virtuaalikamera&quot; on virtuaalinen tallennustila videotiedostoille, jotka voidaan ladata mihin tahansa järjestelmän palvelimeen, ja jokainen käyttäjä voi käyttää sitä.</translation>
     </message>
   </context>
   <context>
@@ -5104,7 +5116,7 @@ to %1</source>
     </message>
     <message>
       <source>Plugins</source>
-      <translation type="unfinished">Plugins</translation>
+      <translation>Liitännäiset</translation>
     </message>
   </context>
   <context>
@@ -5581,13 +5593,13 @@ to %1</source>
     </message>
     <message>
       <source>What to do with current analytics data?</source>
-      <translation type="unfinished">What to do with current analytics data?</translation>
+      <translation>Mitä tehdä nykyisten analyysitietojen kanssa?</translation>
     </message>
     <message>
       <source>Current analytics data will not be automatically moved to another location and will become unaccessible. You can keep it and manually move later, or delete permanently.
 If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
-      <translation type="unfinished">Current analytics data will not be automatically moved to another location and will become unaccessible. You can keep it and manually move later, or delete permanently.
-If you intended to move analytics data to another storage location, please contact support before proceeding.</translation>
+      <translation>Nykyisiä analyysitietoja ei siirretä automaattisesti toiseen paikkaan ja ne eivät ole käytettävissä. Voit säilyttää sen ja siirtää sen manuaalisesti myöhemmin tai poistaa pysyvästi.
+Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä tukeen ennen jatkamista.</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -5650,11 +5662,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Use to store analytics data</source>
-      <translation type="unfinished">Use to store analytics data</translation>
+      <translation>Käytä tallentamaan analytiikkatietoja</translation>
     </message>
     <message>
       <source>Stores analytics data</source>
-      <translation type="unfinished">Stores analytics data</translation>
+      <translation>Tallentaa analyysitiedot</translation>
     </message>
   </context>
   <context>
@@ -5743,7 +5755,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Plugins</source>
-      <translation type="unfinished">Plugins</translation>
+      <translation>Liitännäiset</translation>
     </message>
   </context>
   <context>
@@ -7342,12 +7354,12 @@ If you intended to move analytics data to another storage location, please conta
   <context>
     <name>nx::vms::client::desktop::AnalyticsSearchListModel::Private</name>
     <message>
-      <source>Unknown object</source>
-      <translation>Tuntematon kohde</translation>
-    </message>
-    <message>
       <source>deleted camera</source>
       <translation>poistettu kamera</translation>
+    </message>
+    <message>
+      <source>Unknown track</source>
+      <translation type="unfinished">Unknown track</translation>
     </message>
   </context>
   <context>
@@ -7518,7 +7530,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Multicast</source>
-      <translation type="unfinished">Multicast</translation>
+      <translation>Multicast</translation>
     </message>
   </context>
   <context>
@@ -7579,6 +7591,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>This action cannot be undone.</source>
       <translation>Tätä toimintoa ei voi peruuttaa.</translation>
+    </message>
+    <message>
+      <source>Motion detection stream is disabled</source>
+      <translation type="unfinished">Motion detection stream is disabled</translation>
     </message>
   </context>
   <context>
@@ -7715,7 +7731,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Plugins</source>
-      <translation type="unfinished">Plugins</translation>
+      <translation>Liitännäiset</translation>
     </message>
   </context>
   <context>
@@ -7991,7 +8007,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Objects</source>
       <comment>Analytics tab title</comment>
-      <translation type="unfinished">Objects</translation>
+      <translation>Objektit</translation>
     </message>
   </context>
   <context>
@@ -8435,8 +8451,8 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Määritetyllä IP-osoitealueella on yli 255 osoitetta.</translation>
     </message>
     <message>
-      <source>Can&apos;t start searching process</source>
-      <translation>Voiko&apos;t aloittaa hakuprosessin</translation>
+      <source>Can not start the search process</source>
+      <translation type="unfinished">Can not start the search process</translation>
     </message>
   </context>
   <context>
@@ -8693,24 +8709,20 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Ei yhteydessä olevia palvelimia päivitettäväksi.</translation>
     </message>
     <message>
-      <source>Some servers haven&apos;t completed update process. Finish it anyway?</source>
-      <translation>Joidenkin palvelinten&apos;t päivitykset eivät ole valmiit. Viimeistele se joka tapauksessa?</translation>
-    </message>
-    <message>
       <source>Cancel update and delete all downloaded data?</source>
       <translation>Peruuta päivitys ja poista kaikki ladatut tiedot?</translation>
     </message>
     <message>
       <source>There was an error while installing updates:</source>
-      <translation type="unfinished">There was an error while installing updates:</translation>
+      <translation>Päivitysten asennuksessa tapahtui virhe:</translation>
     </message>
     <message>
       <source>Some servers have gone offline. Please wait until they become online to continue.</source>
-      <translation type="unfinished">Some servers have gone offline. Please wait until they become online to continue.</translation>
+      <translation>Jotkin palvelimet ovat menneet offline-tilaan. Odota, kunnes niihin voidaan muodostaa taas yhteys.</translation>
     </message>
     <message>
       <source>Update completed, but some components have failed an update</source>
-      <translation type="unfinished">Update completed, but some components have failed an update</translation>
+      <translation>Päivitys on valmis, mutta jotkin komponentit eivät ole päivittyneet</translation>
     </message>
     <message>
       <source>Please update %1 manually using an installation package.</source>
@@ -8722,35 +8734,47 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Failed to download update packages to some components</source>
-      <translation type="unfinished">Failed to download update packages to some components</translation>
+      <translation>Joidenkin komponenttien päivityspakettien lataaminen epäonnistui</translation>
     </message>
     <message>
       <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
-      <translation type="unfinished">OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</translation>
+      <translation>Joidenkin komponenttien käyttöjärjestelmän versioita ei enää tueta. Poista ne järjestelmästä tai päivitä käyttöjärjestelmä tuettuun versioon.</translation>
     </message>
     <message>
       <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
-      <translation type="unfinished">OS version of the client is no longer supported. Please update its OS to a supported version.</translation>
+      <translation>Asiakkaan käyttöjärjestelmän versiota ei enää tueta. Päivitä sen käyttöjärjestelmä tuettuun versioon.</translation>
     </message>
     <message>
       <source>Failed to start update</source>
-      <translation type="unfinished">Failed to start update</translation>
+      <translation>Päivityksen käynnistäminen epäonnistui</translation>
     </message>
     <message>
       <source>Starting update to ...</source>
-      <translation type="unfinished">Starting update to ...</translation>
-    </message>
-    <message>
-      <source>Some servers have no package available</source>
-      <translation type="unfinished">Some servers have no package available</translation>
+      <translation>Päivityksen aloittaminen ...</translation>
     </message>
     <message>
       <source>Failed to cancel update</source>
-      <translation type="unfinished">Failed to cancel update</translation>
+      <translation>Päivityksen peruuttaminen epäonnistui</translation>
     </message>
     <message>
       <source>Failed to start installation</source>
-      <translation type="unfinished">Failed to start installation</translation>
+      <translation>Asennuksen aloittaminen epäonnistui</translation>
+    </message>
+    <message>
+      <source>Some servers have no update packages available.</source>
+      <translation type="unfinished">Some servers have no update packages available.</translation>
+    </message>
+    <message>
+      <source>Some servers have encountered an internal error.</source>
+      <translation type="unfinished">Some servers have encountered an internal error.</translation>
+    </message>
+    <message>
+      <source>Please please contact Customer Support.</source>
+      <translation type="unfinished">Please please contact Customer Support.</translation>
+    </message>
+    <message>
+      <source>Some servers have not completed the update process. Finish it anyway?</source>
+      <translation type="unfinished">Some servers have not completed the update process. Finish it anyway?</translation>
     </message>
   </context>
   <context>
@@ -8795,7 +8819,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Unknown Plugin Diagnostic Event</source>
-      <translation type="unfinished">Unknown Plugin Diagnostic Event</translation>
+      <translation>Tuntematon plugin-diagnostiikkatapahtuma</translation>
     </message>
   </context>
   <context>
@@ -8807,10 +8831,6 @@ If you intended to move analytics data to another storage location, please conta
   </context>
   <context>
     <name>nx::vms::client::desktop::OpenLayoutActionWidget</name>
-    <message>
-      <source>Some users don&apos;t have access to the selected layout. Action will not work for them.</source>
-      <translation>Joillakin käyttäjillä &apos;1 ei pääsyä valittuun asetteluun. Toiminto ei ole mahdollista.</translation>
-    </message>
     <message>
       <source>None of selected users have access to the selected layout. Action will not work.</source>
       <translation>Yksikään valituista käyttäjistä ei pääse valittuun asetteluun. Toiminto ei toimi.</translation>
@@ -8830,6 +8850,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>None of selected user roles contain users. Action will not work.</source>
       <translation>Yksikään valituista käyttäjärooleista ei sisällä käyttäjiä. Toiminto ei toimi.</translation>
+    </message>
+    <message>
+      <source>Some users do not have access to the selected layout. Action will not work for them.</source>
+      <translation type="unfinished">Some users do not have access to the selected layout. Action will not work for them.</translation>
     </message>
   </context>
   <context>
@@ -8867,44 +8891,40 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Päivityksen lataaminen epäonnistui</translation>
     </message>
     <message>
-      <source>Failed to install update</source>
-      <translation>Päivityksen asentaminen epäonnistui</translation>
-    </message>
-    <message>
       <source>Waiting for peer data</source>
-      <translation type="unfinished">Waiting for peer data</translation>
+      <translation>Odotetaan vertailtavia tietoja</translation>
     </message>
     <message>
       <source>There is not enough space to download update files.</source>
-      <translation type="unfinished">There is not enough space to download update files.</translation>
+      <translation>Päivitystiedostojen lataamiseen ei ole tarpeeksi tilaa.</translation>
     </message>
     <message>
       <source>There is not enough space to extract update files.</source>
-      <translation type="unfinished">There is not enough space to extract update files.</translation>
+      <translation>Päivitystiedostojen purkamiseen ei ole tarpeeksi tilaa.</translation>
     </message>
     <message>
       <source>Failed to download update packages.</source>
-      <translation type="unfinished">Failed to download update packages.</translation>
+      <translation>Päivityspaketin lataaminen epäonnistui.</translation>
     </message>
     <message>
       <source>Update contents are invalid.</source>
-      <translation type="unfinished">Update contents are invalid.</translation>
+      <translation>Päivityksen sisältö on virheellinen.</translation>
     </message>
     <message>
       <source>Update archive is corrupted.</source>
-      <translation type="unfinished">Update archive is corrupted.</translation>
+      <translation>Päivitysarkisto on vioittunut.</translation>
     </message>
     <message>
       <source>Update files cannot be extracted.</source>
-      <translation type="unfinished">Update files cannot be extracted.</translation>
+      <translation>Päivitystiedostoja ei voida purkaa.</translation>
     </message>
     <message>
       <source>Internal downloader error.</source>
-      <translation type="unfinished">Internal downloader error.</translation>
+      <translation>Sisäinen latausvirhe.</translation>
     </message>
     <message>
       <source>Internal client error.</source>
-      <translation type="unfinished">Internal client error.</translation>
+      <translation>Sisäinen asiakasvirhe.</translation>
     </message>
     <message>
       <source>Unknown error.</source>
@@ -8912,23 +8932,27 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Unexpected error code.</source>
-      <translation type="unfinished">Unexpected error code.</translation>
+      <translation>Odottamaton virhe.</translation>
     </message>
     <message>
       <source>Ready to install update</source>
-      <translation type="unfinished">Ready to install update</translation>
+      <translation>Valmis päivityksen asennukseen</translation>
     </message>
     <message>
       <source>Update package is not found.</source>
-      <translation type="unfinished">Update package is not found.</translation>
+      <translation>Päivityspakettia ei löydy.</translation>
     </message>
     <message>
       <source>There is not enough space to install update.</source>
-      <translation type="unfinished">There is not enough space to install update.</translation>
+      <translation>Päivityksen asentamiseen ei ole tarpeeksi tilaa.</translation>
     </message>
     <message>
       <source>Internal server error.</source>
-      <translation type="unfinished">Internal server error.</translation>
+      <translation>Sisäinen palvelinvirhe.</translation>
+    </message>
+    <message>
+      <source>This OS version is no longer supported.</source>
+      <translation>Tätä käyttöjärjestelmän versiota ei enää tueta.</translation>
     </message>
   </context>
   <context>
@@ -9035,28 +9059,12 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Lisää asetuksia</translation>
     </message>
     <message>
-      <source>Dual-Streaming not supported for this camera</source>
-      <translation>Tämä kamera ei tue Dual-Streamingia</translation>
+      <source>Motion detection is disabled or not supported</source>
+      <translation type="unfinished">Motion detection is disabled or not supported</translation>
     </message>
     <message>
-      <source>Dual-Streaming and motion detection not supported for this camera</source>
-      <translation>Dual-Streaming- ja liikkeentunnistus ei ole tuettu tässä kamerassa</translation>
-    </message>
-    <message>
-      <source>Motion detection disabled</source>
-      <translation>Liikkeentunnistus on poistettu käytöstä</translation>
-    </message>
-    <message>
-      <source>To enable or adjust it, go to the &quot;Motion&quot; tab in Camera Settings</source>
-      <translation>Jos haluat ottaa sen käyttöön tai muuttaa sitä, siirry kameran asetuksiin &quot;Liike&quot; -välilehdelle</translation>
-    </message>
-    <message>
-      <source>Motion detection disabled or not supported</source>
-      <translation>Liikkeentunnistus on poistettu käytöstä tai sitä ei tueta</translation>
-    </message>
-    <message>
-      <source>To ensure it is supported and to enable it, go to the &quot;Motion&quot; tab in Camera Settings.</source>
-      <translation>Varmista, että se on tuettu ja otettu käyttöön, siirry kameran asetuksiin &quot;Motion&quot; -välilehdelle.</translation>
+      <source>Dual-streaming is disabled or not supported</source>
+      <translation type="unfinished">Dual-streaming is disabled or not supported</translation>
     </message>
   </context>
   <context>
@@ -9084,16 +9092,20 @@ If you intended to move analytics data to another storage location, please conta
       <source>Users will be automatically logged out if their session exceeds the specified duration.</source>
       <translation>Käyttäjät kirjautuvat automaattisesti ulos, jos istunnon kesto ylittää määrätyn ajan.</translation>
     </message>
+    <message>
+      <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
+      <translation>Vesileimat näkyvät reaaliaikaisen, arkistoitujen ja vietyjen videoiden kautta vain muille kuin hallinnollisille käyttäjille. Sinä ja muut ylläpitäjät eivät näe niitä.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerSettingsDialogStore</name>
     <message>
       <source>Library</source>
-      <translation type="unfinished">Library</translation>
+      <translation>Kirjasto</translation>
     </message>
     <message>
       <source>Version</source>
-      <translation type="unfinished">Version</translation>
+      <translation>Versio</translation>
     </message>
     <message>
       <source>Vendor</source>
@@ -9101,51 +9113,55 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>no error</source>
-      <translation type="unfinished">no error</translation>
+      <translation>ei virheitä</translation>
     </message>
     <message>
       <source>library file cannot be loaded</source>
-      <translation type="unfinished">library file cannot be loaded</translation>
+      <translation>kirjastotiedostoa ei voi ladata</translation>
     </message>
     <message>
       <source>invalid or incompatible plugin library</source>
-      <translation type="unfinished">invalid or incompatible plugin library</translation>
+      <translation>virheellinen tai yhteensopimaton laajennuskirjasto</translation>
     </message>
     <message>
       <source>plugin library failed to initialize</source>
-      <translation type="unfinished">plugin library failed to initialize</translation>
+      <translation>plugin-kirjasto ei käynnistynyt</translation>
     </message>
     <message>
       <source>plugin returned bad manifest</source>
-      <translation type="unfinished">plugin returned bad manifest</translation>
+      <translation>plugin palautti virheellisen ilmoituksen</translation>
     </message>
     <message>
       <source>plugin API version is no longer supported</source>
-      <translation type="unfinished">plugin API version is no longer supported</translation>
+      <translation>laajennuksen API-versiota ei enää tueta</translation>
     </message>
     <message>
       <source>unknown error</source>
-      <translation type="unfinished">unknown error</translation>
+      <translation>tuntematon virhe</translation>
     </message>
     <message>
       <source>Not loaded</source>
-      <translation type="unfinished">Not loaded</translation>
+      <translation>Ei ladattu</translation>
     </message>
     <message>
       <source>Loaded</source>
-      <translation type="unfinished">Loaded</translation>
+      <translation>Ladattu</translation>
     </message>
     <message>
       <source>plugin is in the black list</source>
-      <translation type="unfinished">plugin is in the black list</translation>
+      <translation>plugin on mustalla listalla</translation>
     </message>
     <message>
       <source>Status</source>
-      <translation type="unfinished">Status</translation>
+      <translation>Tila</translation>
     </message>
     <message>
       <source>plugin is optional and is not in the white list</source>
-      <translation type="unfinished">plugin is optional and is not in the white list</translation>
+      <translation>plugin on valinnainen eikä se ole valkoisessa luettelossa</translation>
+    </message>
+    <message>
+      <source>internal error</source>
+      <translation>sisäinen virhe</translation>
     </message>
   </context>
   <context>
@@ -9179,7 +9195,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Network error.</source>
-      <translation type="unfinished">Network error.</translation>
+      <translation>Verkkovirhe.</translation>
+    </message>
+    <message>
+      <source>Server error.</source>
+      <translation type="unfinished">Server error.</translation>
     </message>
   </context>
   <context>
@@ -9599,14 +9619,14 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::ui::PluginEventModel</name>
+    <name>nx::vms::client::desktop::ui::PluginDiagnosticEventModel</name>
     <message>
       <source>Any Plugin</source>
       <translation>Kaikki laajennukset</translation>
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::ui::PluginEventWidget</name>
+    <name>nx::vms::client::desktop::ui::PluginDiagnosticEventWidget</name>
     <message>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
       <translation>Tapahtuma käynnistyy vain, jos otsikko sisältää yhtään syötettyä avainsanaa.</translation>
@@ -9795,7 +9815,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Layout is locked and cannot be changed</source>
-      <translation type="unfinished">Layout is locked and cannot be changed</translation>
+      <translation>Asettelu on lukittu eikä sitä voi muuttaa</translation>
     </message>
     <message>
       <source>Open File</source>
@@ -9955,7 +9975,7 @@ You can change storage location in the &quot;Storage Management&quot; tab in the
     <message>
       <source>Switch by</source>
       <comment>Arrows will follow</comment>
-      <translation type="unfinished">Switch by</translation>
+      <translation>Vaihda</translation>
     </message>
     <message>
       <source>Display for</source>

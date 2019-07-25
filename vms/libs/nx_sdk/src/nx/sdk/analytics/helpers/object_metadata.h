@@ -22,7 +22,7 @@ class ObjectMetadata: public RefCountable<IObjectMetadata>
 public:
     virtual const char* typeId() const override;
     virtual float confidence() const override;
-    virtual Uuid id() const override;
+    virtual Uuid trackId() const override;
     virtual const char* subtype() const override;
     virtual const IAttribute* attribute(int index) const override;
     virtual int attributeCount() const override;
@@ -30,7 +30,7 @@ public:
 
     void setTypeId(std::string typeId);
     void setConfidence(float confidence);
-    void setId(const Uuid& value);
+    void setTrackId(const Uuid& value);
     void setSubtype(const std::string& value);
     void addAttribute(nx::sdk::Ptr<Attribute> attribute);
     void addAttributes(const std::vector<nx::sdk::Ptr<Attribute>>& value);
@@ -39,7 +39,7 @@ public:
 private:
     std::string m_typeId;
     float m_confidence = 1.0;
-    Uuid m_id;
+    Uuid m_trackId;
     std::string m_subtype;
     std::vector<nx::sdk::Ptr<Attribute>> m_attributes;
     Rect m_rect;

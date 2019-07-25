@@ -29,11 +29,11 @@ LocalFileAnalyticsMetadataProvider::LocalFileAnalyticsMetadataProvider(
     if (metadataFile.open(QIODevice::ReadOnly))
     {
         m_metadata =
-            QJson::deserialized<std::vector<DetectionMetadataPacket>>(metadataFile.readAll());
+            QJson::deserialized<std::vector<ObjectMetadataPacket>>(metadataFile.readAll());
     }
 }
 
-DetectionMetadataPacketPtr LocalFileAnalyticsMetadataProvider::metadata(
+ObjectMetadataPacketPtr LocalFileAnalyticsMetadataProvider::metadata(
     microseconds timestamp, int channel) const
 {
     const auto& metadataList = metadataRange(timestamp, timestamp + 1us, channel, 1);
@@ -43,7 +43,7 @@ DetectionMetadataPacketPtr LocalFileAnalyticsMetadataProvider::metadata(
     return metadataList.first();
 }
 
-QList<DetectionMetadataPacketPtr> LocalFileAnalyticsMetadataProvider::metadataRange(
+QList<ObjectMetadataPacketPtr> LocalFileAnalyticsMetadataProvider::metadataRange(
     microseconds startTimestamp,
     microseconds endTimestamp,
     int channel,
@@ -52,20 +52,20 @@ QList<DetectionMetadataPacketPtr> LocalFileAnalyticsMetadataProvider::metadataRa
     if (channel != 0)
         return {};
 
-    QList<DetectionMetadataPacketPtr> result;
+    QList<ObjectMetadataPacketPtr> result;
 
     auto it = std::lower_bound(m_metadata.cbegin(), m_metadata.cend(), startTimestamp);
 
-    if (it->timestampUsec > startTimestamp.count() && it != m_metadata.cbegin())
+    if (it->timestampUs > startTimestamp.count() && it != m_metadata.cbegin())
     {
         --it;
-        if (it->durationUsec > 0 && it->timestampUsec + it->durationUsec < startTimestamp.count())
+        if (it->durationUs > 0 && it->timestampUs + it->durationUs < startTimestamp.count())
             ++it;
     }
 
-    while (maximumCount > 0 && it != m_metadata.end() && it->timestampUsec < endTimestamp.count())
+    while (maximumCount > 0 && it != m_metadata.end() && it->timestampUs < endTimestamp.count())
     {
-        result.append(std::make_shared<DetectionMetadataPacket>(*it));
+        result.append(std::make_shared<ObjectMetadataPacket>(*it));
 
         ++it;
         --maximumCount;

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QtWidgets/QWidget>
+#include <QtCore/QElapsedTimer>
 #include "screen_grabber.h"
 #include "nx/utils/thread/long_runnable.h"
 #include "utils/common/threadqueue.h"
@@ -29,15 +30,14 @@ public:
     int height() const         { return m_grabber.height(); }
     int screenWidth() const    { return m_grabber.screenWidth(); }
     int screenHeight() const         { return m_grabber.screenHeight(); }
-    qint64 currentTime() const { return m_grabber.currentTime(); }
 
     bool capturedDataToFrame(CaptureInfoPtr data, AVFrame* frame) { return m_grabber.capturedDataToFrame(data, frame); }
     void setLogo(const QPixmap& logo) { m_grabber.setLogo(logo); }
     virtual void pleaseStop() override;
-
+    void setTimer(QElapsedTimer* timer);
 protected:
     virtual void run();
-
+    qint64 currentTime() const { return m_timer->elapsed(); }
 private:
     QnScreenGrabber m_grabber;
     int m_frameRate;
@@ -48,4 +48,5 @@ private:
     int m_currentFrameNum;
     static QnMutex m_instanceMutex;
     static int m_aeroInstanceCounter;
+    QElapsedTimer* m_timer = nullptr;
 };

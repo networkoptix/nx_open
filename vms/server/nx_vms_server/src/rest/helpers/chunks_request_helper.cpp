@@ -69,11 +69,12 @@ QnTimePeriodList QnChunksRequestHelper::loadAnalyticsTimePeriods(
         return QnTimePeriodList();
 
     Filter filter;
-    if (request.analyticsStorageFilter)
-        filter = *request.analyticsStorageFilter;
+    if (!request.filter.isEmpty())
+        filter = QJson::deserialized<Filter>(request.filter.toUtf8());
+
     filter.timePeriod.setStartTime(milliseconds(request.startTimeMs));
     filter.timePeriod.setDuration(milliseconds(request.endTimeMs - request.startTimeMs));
-    filter.maxObjectsToSelect = request.limit;
+    filter.maxObjectTracksToSelect = request.limit;
     filter.sortOrder = request.sortOrder;
 
     filter.deviceIds.clear();
@@ -82,14 +83,6 @@ QnTimePeriodList QnChunksRequestHelper::loadAnalyticsTimePeriods(
 
     TimePeriodsLookupOptions options;
     options.detailLevel = request.detailLevel;
-
-    if (!request.filter.isEmpty())
-    {
-        const auto regions = QJson::deserialized<QList<QRegion>>(request.filter.toUtf8());
-        if (!regions.isEmpty())
-            options.region = regions.front();
-        // TODO: #ak Not sure why using only first region. Done as in AnalyticsHelper::matchImage.
-    }
 
     std::promise<std::tuple<ResultCode, QnTimePeriodList>> done;
     serverModule()->analyticsEventsStorage()->lookupTimePeriods(

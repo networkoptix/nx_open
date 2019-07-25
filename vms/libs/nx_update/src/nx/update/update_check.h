@@ -8,6 +8,7 @@
 #include <nx/update/update_information.h>
 #include <nx/utils/os_info.h>
 #include <common/common_module.h>
+#include <api/server_rest_connection_fwd.h>
 
 namespace nx::update {
 
@@ -106,8 +107,26 @@ std::future<UpdateContents> checkSpecificChangeset(
     const QString& build,
     UpdateCheckCallback&& callback = {});
 
+/**
+ * Checks update for specific build. It checks from the internet, then if it has failed,
+ * it checks for update through mediaserver connection.
+ * @param proxyConenction - connection to mediaserver to be used if internet request fails.
+ * @param engineVersion -
+ * @param updateUrl Url to update server. It should lead directly to updates.json file,
+ *     like http://vms_updates:8080/updates/updates.json.
+ * @param build Build number, like "28057".
+ * @return UpdateContents with update information.
+ */
+
+nx::update::UpdateContents checkSpecificChangesetProxied(
+        rest::QnConnectionPtr proxyConnection,
+        const nx::utils::SoftwareVersion& engineVersion,
+        const QString& updateUrl, const QString& build);
+
 QString rootUpdatesDirectoryForDownloader();
 QString updatesDirectoryForDownloader(const QString& publicationKey);
 QString updateFilePathForDownloader(const QString& publicationKey, const QString& fileName);
+
+qint64 reservedSpacePadding();
 
 } // namespace nx::update
