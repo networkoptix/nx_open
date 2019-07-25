@@ -3,6 +3,7 @@
 #include <array>
 
 #include <api/model/api_model_fwd.h>
+#include <api/model/recording_stats_reply.h>
 
 #include <client_core/connection_context_aware.h>
 
@@ -16,6 +17,8 @@
 
 #include <nx/utils/singleton.h>
 #include <utils/common/connective.h>
+
+struct QnStorageStatusReply;
 
 /** Client-side class to monitor server-related storages state: rebuild and backup process. */
 class QnServerStorageManager:
@@ -52,7 +55,16 @@ public:
      * Response data can be retrieved from signal `storageSpaceRecieved`
      * @returns request handle. It is zero if something goes wrong. 
      */
-    int sendStorageSpaceRequest(const QnMediaServerResourcePtr& server);
+    int requestStorageSpace(const QnMediaServerResourcePtr& server);
+
+    int requestStorageStatus(
+        const QnMediaServerResourcePtr& server,
+        const QString& storageUrl,
+        std::function<void (bool, int, const QnStorageStatusReply&)> callback);
+
+    int requestRecordingStatistics(const QnMediaServerResourcePtr& server,
+        qint64 bitrateAnalyzePeriodMs,
+        std::function<void (bool, int, const QnRecordingStatsReply&)> callback);
 
 signals:
     void serverProtocolsChanged(const QnMediaServerResourcePtr &server, const QSet<QString> &protocols);
@@ -66,7 +78,8 @@ signals:
     void storageChanged(const QnStorageResourcePtr &storage);
     void storageRemoved(const QnStorageResourcePtr &storage);
 
-    void storageSpaceRecieved(bool success, int handle, const QnStorageSpaceReply& reply);
+    void storageSpaceRecieved(QnMediaServerResourcePtr server,
+        bool success, int handle, const QnStorageSpaceReply& reply);
 
 private:
     void invalidateRequests();

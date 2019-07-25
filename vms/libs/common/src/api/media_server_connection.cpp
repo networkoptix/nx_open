@@ -54,9 +54,9 @@ namespace {
 
 // TODO: Introduce constants for API methods registered in media_server_process.cpp.
 QN_DEFINE_LEXICAL_ENUM(RequestObject,
+    (checkCamerasObject, "checkDiscovery")
     (PingSystemObject, "pingSystem")
     (GetNonceObject, "getRemoteNonce")
-    (RecordingStatsObject, "recStats")
     (TestLdapSettingsObject, "testLdapSettings")
 );
 
@@ -92,14 +92,14 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse& response
     trace(m_serverId, handle, object(), lit("Received reply (%1ms)").arg(timer.elapsed()));
     switch (object())
     {
+        case checkCamerasObject:
+            processJsonReply<QnCameraListReply>(this, response, handle);
+            break;
         case PingSystemObject:
             processJsonReply<nx::vms::api::ModuleInformation>(this, response, handle);
             break;
         case GetNonceObject:
             processJsonReply<QnGetNonceReply>(this, response, handle);
-            break;
-        case RecordingStatsObject:
-            processJsonReply<QnRecordingStatsReply>(this, response, handle);
             break;
         case TestLdapSettingsObject:
             processJsonReply<QnLdapUsers>(this, response, handle);
@@ -224,6 +224,21 @@ void QnMediaServerConnection::trace(int handle, int obj, const QString& message 
     ::trace(m_serverId, handle, obj, message);
 }
 
+int QnMediaServerConnection::checkCameraList(
+    const QnNetworkResourceList& cameras, QObject* target, const char* slot)
+{
+    QnCameraListReply camList;
+    for (const QnResourcePtr& c: cameras)
+        camList.uniqueIdList << c->getUniqueId();
+
+    nx::network::http::HttpHeaders headers;
+    headers.emplace(nx::network::http::header::kContentType, "application/json");
+
+    return sendAsyncPostRequestLogged(checkCamerasObject,
+        std::move(headers), QnRequestParamList(), QJson::serialized(camList),
+        QN_STRINGIZE_TYPE(QnCameraListReply), target, slot);
+}
+
 int QnMediaServerConnection::testLdapSettingsAsync(
     const QnLdapSettings& settings, QObject* target, const char* slot)
 {
@@ -234,3 +249,24 @@ int QnMediaServerConnection::testLdapSettingsAsync(
         QnRequestParamList(), QJson::serialized(settings),
         QN_STRINGIZE_TYPE(QnLdapUsers), target, slot, timeout);
 }
+
+int QnMediaServerConnection::pingSystemAsync(
+    const nx::utils::Url& url, const QString& getKey, QObject* target, const char* slot)
+{
+    QnRequestParamList params;
+    params.insert("url", url.toString());
+    params.insert("getKey", getKey);
+
+    return sendAsyncGetRequestLogged(PingSystemObject,
+        params, QN_STRINGIZE_TYPE(nx::vms::api::ModuleInformation), target, slot);
+}
+
+int QnMediaServerConnection::getNonceAsync(const nx::utils::Url& url, QObject* target, const char* slot)
+{
+    QnRequestParamList params;
+    params.insert("url", url.toString());
+
+    return sendAsyncGetRequest(GetNonceObject,
+        params, QN_STRINGIZE_TYPE(QnGetNonceReply), target, slot);
+}
+
