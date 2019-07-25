@@ -1,12 +1,24 @@
 #include "aws_signature_v4.h"
 
 #include <algorithm>
+#include <set>
+#include <string_view>
 
 #include <openssl/sha.h>
 
 #include <nx/utils/cryptographic_hash.h>
 
 namespace nx::cloud::aws {
+
+static const std::set<std::string_view> kAllowedCanonicalHeaders {
+    "content-encoding",
+    "content-type",
+    "date",
+    "host",
+    "user-agent",
+    "x-amz-content-sha256",
+    "x-amz-date"
+};
 
 static const nx::String kAwsAuthName = "AWS4-HMAC-SHA256";
 static const nx::String kAws4Request = "aws4_request";
@@ -193,10 +205,14 @@ void SignatureCalculator::hashCanonicalHeaders(
     lowCaseHeaderNames->reserve(headers.size());
     for (const auto& header: headers)
     {
-        if (header.first.toLower() == "authorization")
-            continue; //< Ignoring Authorization header which may be present in case of server-side usage.
+        const auto lowerName = header.first.toLower();
+        if (kAllowedCanonicalHeaders.count(
+               std::string_view(lowerName.data(), lowerName.size())) == 0)
+        {
+            continue;
+        }
 
-        lowCaseHeaderNames->push_back(header.first.toLower());
+        lowCaseHeaderNames->push_back(lowerName);
 
         hash->addData(lowCaseHeaderNames->back());
         hash->addData(":");
