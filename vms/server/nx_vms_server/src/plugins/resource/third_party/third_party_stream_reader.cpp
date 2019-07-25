@@ -55,6 +55,8 @@ bool isIFrame(const QnAbstractMediaDataPtr& packet)
 
 } // namespace
 
+using namespace nx::sdk;
+
 ThirdPartyStreamReader::ThirdPartyStreamReader(
     QnThirdPartyResourcePtr res,
     nxcip::BaseCameraManager* camManager )
@@ -118,7 +120,7 @@ void ThirdPartyStreamReader::updateSoftwareMotion()
     if( m_thirdPartyRes->getVideoLayout()->channelCount() == 0 )
         return;
 
-    auto camManager2 = nx::sdk::queryInterfacePtr<nxcip::BaseCameraManager2>(
+    auto camManager2 = queryInterfacePtr<nxcip::BaseCameraManager2>(
         m_camManager.getRef(), nxcip::IID_BaseCameraManager2);
     if( !camManager2 )
         return;
@@ -177,7 +179,7 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(
         if (camera->getCameraCapabilities().testFlag(Qn::CustomMediaUrlCapability))
         {
             const auto mediaUrl = camera->sourceUrl(getRole());
-            if (const auto mediaEncoder4 = nx::sdk::queryInterfacePtr<nxcip::CameraMediaEncoder4>(
+            if (const auto mediaEncoder4 = queryInterfacePtr<nxcip::CameraMediaEncoder4>(
                 intf, nxcip::IID_CameraMediaEncoder4))
             {
                 mediaEncoder4->setMediaUrl(mediaUrl.toUtf8().constData());
@@ -188,10 +190,10 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(
     QAuthenticator auth = m_thirdPartyRes->getAuth();
     m_camManager.setCredentials( auth.user(), auth.password() );
 
-    m_mediaEncoder2 = nx::sdk::queryInterfacePtr<nxcip::CameraMediaEncoder2>(intf,
+    m_mediaEncoder2 = queryInterfacePtr<nxcip::CameraMediaEncoder2>(intf,
         nxcip::IID_CameraMediaEncoder2);
 
-    if (const auto mediaEncoder3 = nx::sdk::queryInterfacePtr<nxcip::CameraMediaEncoder3>(intf,
+    if (const auto mediaEncoder3 = queryInterfacePtr<nxcip::CameraMediaEncoder3>(intf,
         nxcip::IID_CameraMediaEncoder3)) //< One-call config.
     {
         if (isCameraControlRequired)
@@ -283,7 +285,7 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(
         {
             nxcip::AudioFormat audioFormat;
             Extras extras;
-            auto mediaEncoder5 = nx::sdk::queryInterfacePtr<nxcip::CameraMediaEncoder5>(
+            auto mediaEncoder5 = queryInterfacePtr<nxcip::CameraMediaEncoder5>(
                 intf, nxcip::IID_CameraMediaEncoder5);
             if (mediaEncoder5 && mediaEncoder5->audioExtradata() != nullptr)
             {
@@ -635,11 +637,11 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::readStreamReader(
     if( errorCode != nxcip::NX_NO_ERROR || !packet)
         return QnAbstractMediaDataPtr();    //error reading data
 
-    auto packetAp = nx::sdk::toPtr(packet);
+    auto packetAp = toPtr(packet);
 
     QnAbstractMediaDataPtr mediaPacket;
 
-    if (const auto mediaDataPacket2 = nx::sdk::queryInterfacePtr<nxcip::MediaDataPacket2>(
+    if (const auto mediaDataPacket2 = queryInterfacePtr<nxcip::MediaDataPacket2>(
         packet, nxcip::IID_MediaDataPacket2))
     {
         outExtras->extradataBlob.resize(mediaDataPacket2->extradataSize());
@@ -653,7 +655,7 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::readStreamReader(
         {
             QnThirdPartyCompressedVideoData* videoPacket = nullptr;
 
-            if (const auto srcVideoPacket = nx::sdk::queryInterfacePtr<nxcip::VideoDataPacket>(
+            if (const auto srcVideoPacket = queryInterfacePtr<nxcip::VideoDataPacket>(
                 packet, nxcip::IID_VideoDataPacket))
             {
                 videoPacket = new QnThirdPartyCompressedVideoData(srcVideoPacket.get());
