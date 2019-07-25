@@ -8,38 +8,42 @@
 #include <nx/utils/move_only_func.h>
 
 #include "result_code.h"
+#include "types.h"
 
 namespace nx::cloud::storage::client {
 
-enum class ChunkOperation
+/**
+ * Allows to upload files to the storage by chunks, without having the whole file in the memory.
+ * Internally, chunks are queued and written in the same order they were provided to the write call.
+ */
+class NX_CLOUD_STORAGE_CLIENT_API AbstractUploader:
+    public nx::network::aio::BasicPollable
 {
-    none = 0,
-    add,
-    remove,
-};
-
-struct ChunkLogEntry
-{
-    ChunkOperation action = ChunkOperation::none;
-    std::string deviceId;
-    std::chrono::system_clock::time_point timestamp;
+public:
+    virtual ~AbstractUploader() = default;
 
     /**
-     * Stream index used when uploading chunks.
-     * E.g., 0 - high-quality stream, 1 - low-quality stream.
+     * Buffers are queued internally, so the next write can be invoked without waiting
+     * for the previous one to complete.
      */
-    int streamIndex = 0;
+    virtual void write(
+        nx::Buffer data,
+        nx::utils::MoveOnlyFunc<void(ResultCode)> handler) = 0;
 
-    /** Specified only for ChunkOperation::add. */
-    std::size_t size = 0;
+    /**
+     * This function should be called to finish the upload gracefully.
+     * Otherwise, the resulting file may be incomplete.
+     * @param handler Invoked after all data has been successfully uploaded.
+     */
+    virtual void finish(nx::utils::MoveOnlyFunc<void(ResultCode)> handler) = 0;
 };
 
-using DeviceDescription = std::vector<std::pair<std::string, std::string>>;
+//-------------------------------------------------------------------------------------------------
 
 /**
  * NOTE: Chunk log is modified automatically when uploading/removing chunks.
  */
-class AbstractContentClient:
+class NX_CLOUD_STORAGE_CLIENT_API AbstractContentClient:
     public nx::network::aio::BasicPollable
 {
 public:
@@ -57,12 +61,24 @@ public:
     //---------------------------------------------------------------------------------------------
     // Uploading chunks.
 
+    /**
+     * Upload file by pieces.
+     */
+    virtual std::unique_ptr<AbstractUploader> startUpload(
+        const std::string& deviceId,
+        int streamIndex,
+        std::chrono::system_clock::time_point timestamp) = 0;
+
+    /**
+     * The default implemetation is a wrapper on top of AbstractContentClient::startUpload call.
+     * The derived class may choose to reimplement it in a more efficient way.
+     */
     virtual void uploadMediaChunk(
         const std::string& deviceId,
         int streamIndex,
         std::chrono::system_clock::time_point timestamp,
         const nx::Buffer& data,
-        Handler handler) = 0;
+        Handler handler);
 
     //---------------------------------------------------------------------------------------------
     // Fetching chunks.

@@ -22,6 +22,11 @@ public:
 
     virtual void bindToAioThread(network::aio::AbstractAioThread* aioThread) override;
 
+    virtual std::unique_ptr<AbstractUploader> startUpload(
+        const std::string& deviceId,
+        int streamIndex,
+        std::chrono::system_clock::time_point timestamp) override;
+
     virtual void uploadMediaChunk(
         const std::string& deviceId,
         int streamIndex,

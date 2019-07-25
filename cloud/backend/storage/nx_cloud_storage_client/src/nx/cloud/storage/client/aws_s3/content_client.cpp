@@ -26,6 +26,15 @@ void ContentClient::bindToAioThread(network::aio::AbstractAioThread* aioThread)
     m_awsClient.bindToAioThread(aioThread);
 }
 
+std::unique_ptr<AbstractUploader> ContentClient::startUpload(
+    const std::string& /*deviceId*/,
+    int /*streamIndex*/,
+    std::chrono::system_clock::time_point /*timestamp*/)
+{
+    // TODO
+    return nullptr;
+}
+
 void ContentClient::uploadMediaChunk(
     const std::string& deviceId,
     int streamIndex,
