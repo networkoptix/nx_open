@@ -48,7 +48,6 @@ struct RequestContext
 {
     AbstractPeerManager::RequestContextPtr<T> context;
     UserData data;
-    int chunkIndex = -1;
 
     RequestContext(const UserData& data, AbstractPeerManager::RequestContextPtr<T> context):
         context(std::move(context)),
@@ -698,7 +697,11 @@ void Worker::handleDownloadChunkReply(
         decreasePeerRank(peer);
 
         if (auto& info = m_peerInfoByPeer[peer]; info.isBanned())
-            info.downloadedChunks.clear(); //< The peer probably lost the file. Need to re-check.
+        {
+            // The peer probably lost the file. Need to re-check.
+            info.isInternet = false;
+            info.downloadedChunks.clear();
+        }
 
         return;
     }
