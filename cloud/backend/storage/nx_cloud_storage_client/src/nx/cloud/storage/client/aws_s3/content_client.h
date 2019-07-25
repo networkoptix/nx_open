@@ -3,18 +3,24 @@
 #include <nx/network/http/auth_tools.h>
 #include <nx/utils/url.h>
 
+#include <nx/cloud/aws/api_client.h>
+
 #include "../abstract_content_client.h"
 
 namespace nx::cloud::storage::client::aws_s3 {
 
-class ContentClient:
+class NX_CLOUD_STORAGE_CLIENT_API ContentClient:
     public AbstractContentClient
 {
 public:
+    using base_type = AbstractContentClient;
+
     ContentClient(
         const std::string& storageClientId,
         const nx::utils::Url& url,
         const nx::network::http::Credentials& credentials);
+
+    virtual void bindToAioThread(network::aio::AbstractAioThread* aioThread) override;
 
     virtual void uploadMediaChunk(
         const std::string& deviceId,
@@ -47,6 +53,24 @@ public:
     virtual void getDeviceDescription(
         const std::string& cameraId,
         GetDeviceDescriptionHandler handler) override;
+
+    //---------------------------------------------------------------------------------------------
+
+    static std::string generateChunkPath(
+        const std::string& cameraId,
+        int streamIndex,
+        std::chrono::system_clock::time_point timestamp);
+
+    static std::string generateCameraInfoFilePath(
+        const std::string& cameraId);
+
+protected:
+    virtual void stopWhileInAioThread() override;
+
+private:
+    nx::cloud::aws::ApiClient m_awsClient;
+
+    static ResultCode toResultCode(aws::Result result);
 };
 
 } // namespace nx::cloud::storage::client::aws_s3
