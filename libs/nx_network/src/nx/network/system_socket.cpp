@@ -224,7 +224,7 @@ bool Socket<SocketInterfaceToImplement>::setReusePortFlag(
     const int on = value ? 1 : 0;
     return ::setsockopt(m_fd, SOL_SOCKET, SO_REUSEPORT, (const char*) &on, sizeof(on)) == 0;
 #else
-    nx::utils::unused(value);
+    /*unused*/ (void) value;
     SystemError::setLastErrorCode(SystemError::unknownProtocolOption);
     return false;
 #endif
@@ -245,7 +245,7 @@ bool Socket<SocketInterfaceToImplement>::getReusePortFlag(
     *value = reuseAddrVal > 0;
     return true;
 #else
-    nx::utils::unused(value);
+    /*unused*/ (void) value;
     SystemError::setLastErrorCode(SystemError::unknownProtocolOption);
     return false;
 #endif
