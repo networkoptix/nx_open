@@ -153,7 +153,10 @@ ScopedEventTypeIds EventTypeDescriptorManager::compatibleEventTypeIds(
     ScopedEventTypeIds result;
     for (const auto& engine: compatibleEngines)
     {
-        if (engine->isDeviceDependent())
+        const bool engineIsEnabled =
+            device->enabledAnalyticsEngines().contains(engine->getId());
+
+        if (engineIsEnabled || engine->isDeviceDependent())
         {
             auto supported = supportedEventTypeIds(device);
             MapHelper::merge(&result, supported, mergeEventTypeIds);
