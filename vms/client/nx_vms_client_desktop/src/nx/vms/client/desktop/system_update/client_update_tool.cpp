@@ -454,7 +454,8 @@ bool ClientUpdateTool::installUpdateAsync()
     if (!applauncher::api::checkOnline())
     {
         NX_VERBOSE(this) << "installUpdate can not install update - applauncher is offline" << error;
-        setApplauncherError("applauncher is offline");
+        auto errorText = applauncherErrorToString(ResultType::otherError);
+        setApplauncherError(errorText);
         return false;
     }
 

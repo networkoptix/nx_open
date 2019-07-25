@@ -943,6 +943,14 @@ to view more bookmarks</source>
       <source>Objects Frames and Info...</source>
       <translation>Nesne Çerçeveleri ve Bilgi...</translation>
     </message>
+    <message>
+      <source>Pin Calendar</source>
+      <translation>Takvimi Tuttur</translation>
+    </message>
+    <message>
+      <source>Unpin Calendar</source>
+      <translation>Takvimi Bırak</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -4242,7 +4250,7 @@ to %1</source>
     </message>
     <message>
       <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
-      <translation type="unfinished">&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</translation>
+      <translation>&quot;Sanal Kamera&quot;, sisteminizdeki herhangi bir sunucuya yüklenebilen ve herhangi bir kullanıcı tarafından erişilebilen video dosyaları için sanal bir depolamadır.</translation>
     </message>
   </context>
   <context>
@@ -7581,6 +7589,10 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
       <source>This action cannot be undone.</source>
       <translation>Bu işlem geri alınamaz.</translation>
     </message>
+    <message>
+      <source>Motion detection stream is disabled</source>
+      <translation type="unfinished">Motion detection stream is disabled</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraScheduleWidget</name>
@@ -8436,8 +8448,8 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
       <translation>Belirtilen Adres Dizisi 255'ten Fazla Adres İçeriyor.</translation>
     </message>
     <message>
-      <source>Can&apos;t start searching process</source>
-      <translation>Can&apos;t işlemini aramaya başlar</translation>
+      <source>Can not start the search process</source>
+      <translation type="unfinished">Can not start the search process</translation>
     </message>
   </context>
   <context>
@@ -8694,10 +8706,6 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
       <translation>Güncelleme yapılacak çevrimiçi sunucu yok.</translation>
     </message>
     <message>
-      <source>Some servers haven&apos;t completed update process. Finish it anyway?</source>
-      <translation>Bazı sunucular güncelleme işlemini tamamlamadı. Yine de sonlandırılsın mı?</translation>
-    </message>
-    <message>
       <source>Cancel update and delete all downloaded data?</source>
       <translation>Güncellemeyi iptal et ve tüm indirilmiş verileri sil?</translation>
     </message>
@@ -8761,6 +8769,10 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
       <source>Please please contact Customer Support.</source>
       <translation type="unfinished">Please please contact Customer Support.</translation>
     </message>
+    <message>
+      <source>Some servers have not completed the update process. Finish it anyway?</source>
+      <translation type="unfinished">Some servers have not completed the update process. Finish it anyway?</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::MultipleLayoutSelectionDialog</name>
@@ -8817,10 +8829,6 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
   <context>
     <name>nx::vms::client::desktop::OpenLayoutActionWidget</name>
     <message>
-      <source>Some users don&apos;t have access to the selected layout. Action will not work for them.</source>
-      <translation>Bazı kullanıcılar don&apos;t seçilen düzeni erişebilir. Eylem onlar için çalışmayacak.</translation>
-    </message>
-    <message>
       <source>None of selected users have access to the selected layout. Action will not work.</source>
       <translation>Seçilen kullanıcıların hiçbiri seçilen yerleşime erişemez. Eylem çalışmayacak.</translation>
     </message>
@@ -8839,6 +8847,10 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     <message>
       <source>None of selected user roles contain users. Action will not work.</source>
       <translation>Seçilen kullanıcı rollerinden hiçbiri kullanıcı içermiyor. Eylem işe yaramayacak.</translation>
+    </message>
+    <message>
+      <source>Some users do not have access to the selected layout. Action will not work for them.</source>
+      <translation type="unfinished">Some users do not have access to the selected layout. Action will not work for them.</translation>
     </message>
   </context>
   <context>
@@ -8937,7 +8949,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>This OS version is no longer supported.</source>
-      <translation type="unfinished">This OS version is no longer supported.</translation>
+      <translation>Bu işletim sistemi artık desteklenmiyor.</translation>
     </message>
   </context>
   <context>
@@ -9044,28 +9056,12 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
       <translation>Daha Fazla Ayar</translation>
     </message>
     <message>
-      <source>Dual-Streaming not supported for this camera</source>
-      <translation>Bu kamera için birden fazla akış desteklenmiyor</translation>
+      <source>Motion detection is disabled or not supported</source>
+      <translation type="unfinished">Motion detection is disabled or not supported</translation>
     </message>
     <message>
-      <source>Dual-Streaming and motion detection not supported for this camera</source>
-      <translation>Bu kamera için birden fazla akış ve hareket algılama desteklenmiyor</translation>
-    </message>
-    <message>
-      <source>Motion detection disabled</source>
-      <translation>Hareket algılama devre dışı</translation>
-    </message>
-    <message>
-      <source>To enable or adjust it, go to the &quot;Motion&quot; tab in Camera Settings</source>
-      <translation>Etkinleştirmek ve ayarlamak için kamera ayarlarında &quot;hareket&quot; algılama sekmesine gidin</translation>
-    </message>
-    <message>
-      <source>Motion detection disabled or not supported</source>
-      <translation>Hareket algılama devre dışı veya desteklenmiyor</translation>
-    </message>
-    <message>
-      <source>To ensure it is supported and to enable it, go to the &quot;Motion&quot; tab in Camera Settings.</source>
-      <translation>Kamera ayarlarında &quot;haraket&quot; algılama sekmesine gidin. Kameranın desteklediğine emin olun ve aktif hale getirin.</translation>
+      <source>Dual-streaming is disabled or not supported</source>
+      <translation type="unfinished">Dual-streaming is disabled or not supported</translation>
     </message>
   </context>
   <context>
@@ -9095,7 +9091,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
-      <translation type="unfinished">Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</translation>
+      <translation>Filigranlar, yalnızca yönetici olmayan kullanıcılar için canlı, arşivlenmiş ve dışa aktarılan videolar üzerinden gösterilir. Siz ve diğer yöneticiler onları görmeyeceksiniz.</translation>
     </message>
   </context>
   <context>
@@ -9159,6 +9155,10 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     <message>
       <source>plugin is optional and is not in the white list</source>
       <translation type="unfinished">plugin is optional and is not in the white list</translation>
+    </message>
+    <message>
+      <source>internal error</source>
+      <translation>dahili hata</translation>
     </message>
   </context>
   <context>
@@ -9619,26 +9619,26 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     <name>nx::vms::client::desktop::ui::PluginDiagnosticEventModel</name>
     <message>
       <source>Any Plugin</source>
-      <translation type="unfinished">Any Plugin</translation>
+      <translation>Herhangi bir eklenti</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ui::PluginDiagnosticEventWidget</name>
     <message>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the caption with any of the entered keywords.</translation>
+      <translation>Etkinlik, yalnızca girilen anahtar kelimelerden herhangi biriyle açıklama başlığında eşleşme varsa tetiklenecektir.</translation>
     </message>
     <message>
       <source>If the field is empty, event will always trigger.</source>
-      <translation type="unfinished">If the field is empty, event will always trigger.</translation>
+      <translation>Alan boşsa, etkinlik her zaman tetiklenir.</translation>
     </message>
     <message>
       <source>This field is case sensitive.</source>
-      <translation type="unfinished">This field is case sensitive.</translation>
+      <translation>Arama büyük/küçük harfe duyarlı.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the description field with any of the entered keywords.</translation>
+      <translation>Etkinlik, yalnızca girilen anahtar kelimelerden herhangi biriyle açıklama alanında eşleşme varsa tetiklenecektir.</translation>
     </message>
   </context>
   <context>

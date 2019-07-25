@@ -944,6 +944,14 @@ több könyvjelző megjelenítéséhez</translation>
       <source>Objects Frames and Info...</source>
       <translation type="unfinished">Objects Frames and Info...</translation>
     </message>
+    <message>
+      <source>Pin Calendar</source>
+      <translation>Naptár rögzítése</translation>
+    </message>
+    <message>
+      <source>Unpin Calendar</source>
+      <translation>Naptár feloldása</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -7585,6 +7593,10 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
       <source>This action cannot be undone.</source>
       <translation>Ez a művelet nem visszavonható.</translation>
     </message>
+    <message>
+      <source>Motion detection stream is disabled</source>
+      <translation type="unfinished">Motion detection stream is disabled</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraScheduleWidget</name>
@@ -8440,8 +8452,8 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
       <translation>Az IP tartomány több mint 255 címet tartalmaz.</translation>
     </message>
     <message>
-      <source>Can&apos;t start searching process</source>
-      <translation>Keresési folyamat nem indítható</translation>
+      <source>Can not start the search process</source>
+      <translation type="unfinished">Can not start the search process</translation>
     </message>
   </context>
   <context>
@@ -8698,10 +8710,6 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
       <translation type="unfinished">There are no online servers to update.</translation>
     </message>
     <message>
-      <source>Some servers haven&apos;t completed update process. Finish it anyway?</source>
-      <translation type="unfinished">Some servers haven&apos;t completed update process. Finish it anyway?</translation>
-    </message>
-    <message>
       <source>Cancel update and delete all downloaded data?</source>
       <translation type="unfinished">Cancel update and delete all downloaded data?</translation>
     </message>
@@ -8765,6 +8773,10 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
       <source>Please please contact Customer Support.</source>
       <translation type="unfinished">Please please contact Customer Support.</translation>
     </message>
+    <message>
+      <source>Some servers have not completed the update process. Finish it anyway?</source>
+      <translation type="unfinished">Some servers have not completed the update process. Finish it anyway?</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::MultipleLayoutSelectionDialog</name>
@@ -8821,10 +8833,6 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
   <context>
     <name>nx::vms::client::desktop::OpenLayoutActionWidget</name>
     <message>
-      <source>Some users don&apos;t have access to the selected layout. Action will not work for them.</source>
-      <translation>Néhány felhasználó nem férhet hozzá a kiválasztott elrendezéshez. A művelet nem fog működni számukra.</translation>
-    </message>
-    <message>
       <source>None of selected users have access to the selected layout. Action will not work.</source>
       <translation>Egyetlen kiválasztott felhasználó sem fér hozzá a kiválasztott elrendezéshez. A művelet nem fog működni.</translation>
     </message>
@@ -8843,6 +8851,10 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
     <message>
       <source>None of selected user roles contain users. Action will not work.</source>
       <translation type="unfinished">None of selected user roles contain users. Action will not work.</translation>
+    </message>
+    <message>
+      <source>Some users do not have access to the selected layout. Action will not work for them.</source>
+      <translation type="unfinished">Some users do not have access to the selected layout. Action will not work for them.</translation>
     </message>
   </context>
   <context>
@@ -8941,7 +8953,7 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
     </message>
     <message>
       <source>This OS version is no longer supported.</source>
-      <translation type="unfinished">This OS version is no longer supported.</translation>
+      <translation>Ez az operációs rendszer verziója már nem támogatott.</translation>
     </message>
   </context>
   <context>
@@ -9048,28 +9060,12 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
       <translation>Több beállítási lehetőség</translation>
     </message>
     <message>
-      <source>Dual-Streaming not supported for this camera</source>
-      <translation>Dual-stream nem támogatott ennél a kameránál</translation>
+      <source>Motion detection is disabled or not supported</source>
+      <translation type="unfinished">Motion detection is disabled or not supported</translation>
     </message>
     <message>
-      <source>Dual-Streaming and motion detection not supported for this camera</source>
-      <translation>Dual-stream és mozgásérzékelés nem támogatott ennél a kameránál</translation>
-    </message>
-    <message>
-      <source>Motion detection disabled</source>
-      <translation>Mozgásérzékelés kikaplcsolva</translation>
-    </message>
-    <message>
-      <source>To enable or adjust it, go to the &quot;Motion&quot; tab in Camera Settings</source>
-      <translation>Bekapcsoláshoz és paraméterezéshez kattintson a &quot;Mozgás&quot; fülre a kamerabeállítások lapon</translation>
-    </message>
-    <message>
-      <source>Motion detection disabled or not supported</source>
-      <translation>Mozgásérzékelés kikapcsolva, vagy nem támogatott</translation>
-    </message>
-    <message>
-      <source>To ensure it is supported and to enable it, go to the &quot;Motion&quot; tab in Camera Settings.</source>
-      <translation>A támogatottság ellenőrzéséhez és bekapcsolásához és bekapcsolásá a &quot;Mozgás&quot; fülre a kamerabeállítások lapon.</translation>
+      <source>Dual-streaming is disabled or not supported</source>
+      <translation type="unfinished">Dual-streaming is disabled or not supported</translation>
     </message>
   </context>
   <context>
@@ -9163,6 +9159,10 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
     <message>
       <source>plugin is optional and is not in the white list</source>
       <translation type="unfinished">plugin is optional and is not in the white list</translation>
+    </message>
+    <message>
+      <source>internal error</source>
+      <translation>belső hiba</translation>
     </message>
   </context>
   <context>
@@ -9630,19 +9630,19 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
     <name>nx::vms::client::desktop::ui::PluginDiagnosticEventWidget</name>
     <message>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the caption with any of the entered keywords.</translation>
+      <translation>Az esemény csak akkor jelenik meg, ha a forrás a megadott kulcsszavak bármelyikével megegyezik.</translation>
     </message>
     <message>
       <source>If the field is empty, event will always trigger.</source>
-      <translation type="unfinished">If the field is empty, event will always trigger.</translation>
+      <translation>Ha a mező üres, az esemény bekapcsolva marad.</translation>
     </message>
     <message>
       <source>This field is case sensitive.</source>
-      <translation type="unfinished">This field is case sensitive.</translation>
+      <translation>Ez a szűrő kis és nagy karaktereket megkülönböztet.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the description field with any of the entered keywords.</translation>
+      <translation>Az esemény csak akkor jelenik meg, ha a leírásban a megadott kulcsszavak bármelyikével megegyezik.</translation>
     </message>
   </context>
   <context>

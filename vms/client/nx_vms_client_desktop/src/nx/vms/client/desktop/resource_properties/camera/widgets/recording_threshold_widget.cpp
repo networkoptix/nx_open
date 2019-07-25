@@ -48,8 +48,7 @@ void RecordingThresholdWidget::loadState(const CameraSettingsDialogState& state)
     if (!state.supportsSchedule())
         return;
 
-    const bool hasMotion = state.hasMotion();
-
+    const bool hasMotion = state.isMotionDetectionEnabled();
     ui->recordBeforeSpinBox->setEnabled(hasMotion);
     ui->recordAfterSpinBox->setEnabled(hasMotion);
     if (hasMotion)

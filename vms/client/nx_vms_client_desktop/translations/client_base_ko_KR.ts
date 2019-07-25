@@ -943,6 +943,14 @@ to view more bookmarks</source>
       <source>Objects Frames and Info...</source>
       <translation>개체 프레임 및 정보...</translation>
     </message>
+    <message>
+      <source>Pin Calendar</source>
+      <translation>달력고정</translation>
+    </message>
+    <message>
+      <source>Unpin Calendar</source>
+      <translation>달력 숨김</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -2701,7 +2709,7 @@ to %1</source>
     </message>
     <message>
       <source>Download &amp;&amp; Install</source>
-      <translation type="unfinished">Download &amp;&amp; Install</translation>
+      <translation>다운로드 및 설치</translation>
     </message>
     <message>
       <source>Failed to enter compatibility mode for version %1</source>
@@ -7115,7 +7123,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>This OS version is no longer supported</source>
-      <translation type="unfinished">This OS version is no longer supported</translation>
+      <translation>이 OS 버전은 더 이상 지원되지 않습니다</translation>
     </message>
     <message>
       <source>This %1 version is no longer supported</source>
@@ -7250,7 +7258,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Unknown track</source>
-      <translation type="unfinished">Unknown track</translation>
+      <translation>알 수없는 트랙</translation>
     </message>
   </context>
   <context>
@@ -7478,6 +7486,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>This action cannot be undone.</source>
       <translation>이 작업은 취소할 수 없습니다.</translation>
+    </message>
+    <message>
+      <source>Motion detection stream is disabled</source>
+      <translation type="unfinished">Motion detection stream is disabled</translation>
     </message>
   </context>
   <context>
@@ -7832,7 +7844,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Add all Devices</source>
-      <translation type="unfinished">Add all Devices</translation>
+      <translation>모든 장치 추가</translation>
     </message>
     <message numerus="yes">
       <source>Add %n Devices</source>
@@ -8321,8 +8333,8 @@ If you intended to move analytics data to another storage location, please conta
       <translation>지정된 IP주소의 범위가 255이상을 포함하고 있습니다.</translation>
     </message>
     <message>
-      <source>Can&apos;t start searching process</source>
-      <translation type="unfinished">Can&apos;t start searching process</translation>
+      <source>Can not start the search process</source>
+      <translation type="unfinished">Can not start the search process</translation>
     </message>
   </context>
   <context>
@@ -8477,7 +8489,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Download &amp;&amp; Install</source>
-      <translation type="unfinished">Download &amp;&amp; Install</translation>
+      <translation>다운로드 및 설치</translation>
     </message>
     <message>
       <source>Select Another Build</source>
@@ -8578,10 +8590,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation type="unfinished">There are no online servers to update.</translation>
     </message>
     <message>
-      <source>Some servers haven&apos;t completed update process. Finish it anyway?</source>
-      <translation type="unfinished">Some servers haven&apos;t completed update process. Finish it anyway?</translation>
-    </message>
-    <message>
       <source>Cancel update and delete all downloaded data?</source>
       <translation type="unfinished">Cancel update and delete all downloaded data?</translation>
     </message>
@@ -8635,15 +8643,19 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Some servers have no update packages available.</source>
-      <translation type="unfinished">Some servers have no update packages available.</translation>
+      <translation>일부 서버에는 사용 가능한 업데이트 패키지가 없습니다.</translation>
     </message>
     <message>
       <source>Some servers have encountered an internal error.</source>
-      <translation type="unfinished">Some servers have encountered an internal error.</translation>
+      <translation>일부 서버에서 내부 오류가 발생했습니다.</translation>
     </message>
     <message>
       <source>Please please contact Customer Support.</source>
-      <translation type="unfinished">Please please contact Customer Support.</translation>
+      <translation>고객 지원팀으로 문의해 주세요.</translation>
+    </message>
+    <message>
+      <source>Some servers have not completed the update process. Finish it anyway?</source>
+      <translation type="unfinished">Some servers have not completed the update process. Finish it anyway?</translation>
     </message>
   </context>
   <context>
@@ -8700,10 +8712,6 @@ If you intended to move analytics data to another storage location, please conta
   <context>
     <name>nx::vms::client::desktop::OpenLayoutActionWidget</name>
     <message>
-      <source>Some users don&apos;t have access to the selected layout. Action will not work for them.</source>
-      <translation type="unfinished">Some users don&apos;t have access to the selected layout. Action will not work for them.</translation>
-    </message>
-    <message>
       <source>None of selected users have access to the selected layout. Action will not work.</source>
       <translation type="unfinished">None of selected users have access to the selected layout. Action will not work.</translation>
     </message>
@@ -8722,6 +8730,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>None of selected user roles contain users. Action will not work.</source>
       <translation type="unfinished">None of selected user roles contain users. Action will not work.</translation>
+    </message>
+    <message>
+      <source>Some users do not have access to the selected layout. Action will not work for them.</source>
+      <translation type="unfinished">Some users do not have access to the selected layout. Action will not work for them.</translation>
     </message>
   </context>
   <context>
@@ -8820,7 +8832,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>This OS version is no longer supported.</source>
-      <translation type="unfinished">This OS version is no longer supported.</translation>
+      <translation>이 OS 버전은 더 이상 지원되지 않습니다.</translation>
     </message>
   </context>
   <context>
@@ -8926,28 +8938,12 @@ If you intended to move analytics data to another storage location, please conta
       <translation>더 많은 설정</translation>
     </message>
     <message>
-      <source>Dual-Streaming not supported for this camera</source>
-      <translation>듀얼 스트리밍이 카메라에 대 한 지원 되지 않습니다</translation>
+      <source>Motion detection is disabled or not supported</source>
+      <translation type="unfinished">Motion detection is disabled or not supported</translation>
     </message>
     <message>
-      <source>Dual-Streaming and motion detection not supported for this camera</source>
-      <translation>듀얼 스트리밍 및 모션 검출이이 카메라에 대 한 지원 되지 않습니다</translation>
-    </message>
-    <message>
-      <source>Motion detection disabled</source>
-      <translation>모션 감지 비활성화</translation>
-    </message>
-    <message>
-      <source>To enable or adjust it, go to the &quot;Motion&quot; tab in Camera Settings</source>
-      <translation>활성하거나 조정하려면 카메라 설정의 &quot;Motion&quot; 탭으로 이동하십시오</translation>
-    </message>
-    <message>
-      <source>Motion detection disabled or not supported</source>
-      <translation>모션 감지 사용 하지 않거나 지원 되지 않습니다</translation>
-    </message>
-    <message>
-      <source>To ensure it is supported and to enable it, go to the &quot;Motion&quot; tab in Camera Settings.</source>
-      <translation>지원되는지 확인하고 사용하려면 카메라 설정의 &quot;Motion&quot; 탭으로 이동하십시오.</translation>
+      <source>Dual-streaming is disabled or not supported</source>
+      <translation type="unfinished">Dual-streaming is disabled or not supported</translation>
     </message>
   </context>
   <context>
@@ -8977,7 +8973,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
-      <translation type="unfinished">Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</translation>
+      <translation>관리자가 아님 사용자 만 라이브, 아카이브 및 내 보낸 비디오 위에 워터 마크가 표시됩니다. 당신과 다른 관리자에게는 보이지 않습니다.</translation>
     </message>
   </context>
   <context>
@@ -9042,6 +9038,10 @@ If you intended to move analytics data to another storage location, please conta
       <source>plugin is optional and is not in the white list</source>
       <translation type="unfinished">plugin is optional and is not in the white list</translation>
     </message>
+    <message>
+      <source>internal error</source>
+      <translation>내부 오류</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerStatusItemDelegate</name>
@@ -9078,7 +9078,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Server error.</source>
-      <translation type="unfinished">Server error.</translation>
+      <translation>서버 오류.</translation>
     </message>
   </context>
   <context>
@@ -9496,26 +9496,26 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::ui::PluginDiagnosticEventModel</name>
     <message>
       <source>Any Plugin</source>
-      <translation type="unfinished">Any Plugin</translation>
+      <translation>모든 플러그인</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ui::PluginDiagnosticEventWidget</name>
     <message>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the caption with any of the entered keywords.</translation>
+      <translation>캡션에 입력 한 키워드 중 하나와 일치하는 것이있는 경우에만 이벤트가 트리거됩니다.</translation>
     </message>
     <message>
       <source>If the field is empty, event will always trigger.</source>
-      <translation type="unfinished">If the field is empty, event will always trigger.</translation>
+      <translation>필드가 비어 있으면 이벤트가 항상 트리거됩니다.</translation>
     </message>
     <message>
       <source>This field is case sensitive.</source>
-      <translation type="unfinished">This field is case sensitive.</translation>
+      <translation>이 필드는 대소 문자를 구분합니다.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the description field with any of the entered keywords.</translation>
+      <translation>설명 필드에 입력 한 키워드 중 하나와 일치하는 항목이있는 경우에만 이벤트가 트리거됩니다.</translation>
     </message>
   </context>
   <context>

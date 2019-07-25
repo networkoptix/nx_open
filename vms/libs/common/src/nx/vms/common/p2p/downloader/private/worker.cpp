@@ -67,7 +67,7 @@ struct RequestContext
             auto it = contexts.begin();
             while (it != contexts.end() && !worker->needToStop())
             {
-                if (it->context->future.wait_for(2s) == std::future_status::ready)
+                if (it->context->future.wait_for(30ms) == std::future_status::ready)
                     break;
                 ++it;
             }
@@ -606,7 +606,10 @@ void Worker::downloadChunks()
 
     while (chunksLeft > 0)
     {
-        for (int i = 0; i < kMaxSimultaneousDownloads && chunksLeft > 0; ++i)
+        for (int i = 0;
+            contexts.size() < kMaxSimultaneousDownloads && i < kMaxSimultaneousDownloads
+                && chunksLeft > 0;
+            ++i)
         {
             const int chunk = selectNextChunk(downloadingChunks);
             if (chunk < 0)
@@ -650,7 +653,7 @@ void Worker::downloadChunks()
             {
                 if (data)
                 {
-                    const bool lastChunk = ctx.chunkIndex < m_availableChunks.size() - 1;
+                    const bool lastChunk = ctx.chunkIndex == m_availableChunks.size() - 1;
                     if (!lastChunk)
                     {
                         // Last chunk is usually smaller than others, so skip it.

@@ -943,6 +943,14 @@ to view more bookmarks</source>
       <source>Objects Frames and Info...</source>
       <translation>Objectframe en Info...</translation>
     </message>
+    <message>
+      <source>Pin Calendar</source>
+      <translation>Kalender vastzetten</translation>
+    </message>
+    <message>
+      <source>Unpin Calendar</source>
+      <translation>Kalender losmaken</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -4242,7 +4250,7 @@ to %1</source>
     </message>
     <message>
       <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
-      <translation type="unfinished">&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</translation>
+      <translation>&quot;Virtual Camera&quot; is een virtuele opslag voor videobestanden, die kunnen worden geüpload naar elke server op uw systeem en door elke gebruiker kunnen worden geopend.</translation>
     </message>
   </context>
   <context>
@@ -7582,6 +7590,10 @@ Als u analysegegevens naar een andere opslaglocatie wilt verplaatsen, neemt u co
       <source>This action cannot be undone.</source>
       <translation>Deze actie kan niet ongedaan worden gemaakt.</translation>
     </message>
+    <message>
+      <source>Motion detection stream is disabled</source>
+      <translation type="unfinished">Motion detection stream is disabled</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraScheduleWidget</name>
@@ -8437,8 +8449,8 @@ Als u analysegegevens naar een andere opslaglocatie wilt verplaatsen, neemt u co
       <translation>Het opgegeven IP-adresbereik heeft meer dan 255 adressen.</translation>
     </message>
     <message>
-      <source>Can&apos;t start searching process</source>
-      <translation>&apos;t start zoekproces</translation>
+      <source>Can not start the search process</source>
+      <translation type="unfinished">Can not start the search process</translation>
     </message>
   </context>
   <context>
@@ -8695,10 +8707,6 @@ Als u analysegegevens naar een andere opslaglocatie wilt verplaatsen, neemt u co
       <translation>Er zijn geen online servers om bij te werken.</translation>
     </message>
     <message>
-      <source>Some servers haven&apos;t completed update process. Finish it anyway?</source>
-      <translation>Sommige servers hebben het updateproces nog niet voltooid. Toch afronden?</translation>
-    </message>
-    <message>
       <source>Cancel update and delete all downloaded data?</source>
       <translation>Update annuleren en alle gedownloade gegevens verwijderen?</translation>
     </message>
@@ -8762,6 +8770,10 @@ Als u analysegegevens naar een andere opslaglocatie wilt verplaatsen, neemt u co
       <source>Please please contact Customer Support.</source>
       <translation type="unfinished">Please please contact Customer Support.</translation>
     </message>
+    <message>
+      <source>Some servers have not completed the update process. Finish it anyway?</source>
+      <translation type="unfinished">Some servers have not completed the update process. Finish it anyway?</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::MultipleLayoutSelectionDialog</name>
@@ -8818,10 +8830,6 @@ Als u analysegegevens naar een andere opslaglocatie wilt verplaatsen, neemt u co
   <context>
     <name>nx::vms::client::desktop::OpenLayoutActionWidget</name>
     <message>
-      <source>Some users don&apos;t have access to the selected layout. Action will not work for them.</source>
-      <translation>Sommige gebruikers don&apos;t hebben toegang tot de geselecteerde indeling. Actie zal niet werken voor hen.</translation>
-    </message>
-    <message>
       <source>None of selected users have access to the selected layout. Action will not work.</source>
       <translation>Geselecteerde gebruikers hebben geen toegang tot de geselecteerde indeling. Actie zal niet werken.</translation>
     </message>
@@ -8840,6 +8848,10 @@ Als u analysegegevens naar een andere opslaglocatie wilt verplaatsen, neemt u co
     <message>
       <source>None of selected user roles contain users. Action will not work.</source>
       <translation>Geen van de geselecteerde gebruikersrollen bevatten gebruikers. Actie zal niet werken.</translation>
+    </message>
+    <message>
+      <source>Some users do not have access to the selected layout. Action will not work for them.</source>
+      <translation type="unfinished">Some users do not have access to the selected layout. Action will not work for them.</translation>
     </message>
   </context>
   <context>
@@ -8938,7 +8950,7 @@ Als u analysegegevens naar een andere opslaglocatie wilt verplaatsen, neemt u co
     </message>
     <message>
       <source>This OS version is no longer supported.</source>
-      <translation type="unfinished">This OS version is no longer supported.</translation>
+      <translation>Deze OS-versie wordt niet langer ondersteund.</translation>
     </message>
   </context>
   <context>
@@ -9045,28 +9057,12 @@ Als u analysegegevens naar een andere opslaglocatie wilt verplaatsen, neemt u co
       <translation>Meer instellingen</translation>
     </message>
     <message>
-      <source>Dual-Streaming not supported for this camera</source>
-      <translation>Dual-streaming wordt niet ondersteund door deze camera</translation>
+      <source>Motion detection is disabled or not supported</source>
+      <translation type="unfinished">Motion detection is disabled or not supported</translation>
     </message>
     <message>
-      <source>Dual-Streaming and motion detection not supported for this camera</source>
-      <translation>Dual-streaming en motion detectie worden niet ondersteund door deze camera</translation>
-    </message>
-    <message>
-      <source>Motion detection disabled</source>
-      <translation>Bewegingsdetectie uitgeschakeld</translation>
-    </message>
-    <message>
-      <source>To enable or adjust it, go to the &quot;Motion&quot; tab in Camera Settings</source>
-      <translation>Als u deze wilt inschakelen of aanpassen, gaat u naar het tabblad &quot;Motion&quot; in camera-instellingen</translation>
-    </message>
-    <message>
-      <source>Motion detection disabled or not supported</source>
-      <translation>Bewegingsdetectie is uitgeschakeld of niet ondersteund</translation>
-    </message>
-    <message>
-      <source>To ensure it is supported and to enable it, go to the &quot;Motion&quot; tab in Camera Settings.</source>
-      <translation>Om ervoor te zorgen dat het wordt ondersteund en om het te activeren, gaat u naar het tabblad &quot;Motion&quot; in camera-instellingen.</translation>
+      <source>Dual-streaming is disabled or not supported</source>
+      <translation type="unfinished">Dual-streaming is disabled or not supported</translation>
     </message>
   </context>
   <context>
@@ -9096,7 +9092,7 @@ Als u analysegegevens naar een andere opslaglocatie wilt verplaatsen, neemt u co
     </message>
     <message>
       <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
-      <translation type="unfinished">Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</translation>
+      <translation>Watermerken worden alleen weergegeven voor live, gearchiveerde en geëxporteerde video's voor niet-beheerdersgebruikers. U en andere beheerders zullen ze niet zien.</translation>
     </message>
   </context>
   <context>
@@ -9160,6 +9156,10 @@ Als u analysegegevens naar een andere opslaglocatie wilt verplaatsen, neemt u co
     <message>
       <source>plugin is optional and is not in the white list</source>
       <translation>plugin is optioneel en staat niet in de witte lijst</translation>
+    </message>
+    <message>
+      <source>internal error</source>
+      <translation>interne fout</translation>
     </message>
   </context>
   <context>
@@ -9620,26 +9620,26 @@ Als u analysegegevens naar een andere opslaglocatie wilt verplaatsen, neemt u co
     <name>nx::vms::client::desktop::ui::PluginDiagnosticEventModel</name>
     <message>
       <source>Any Plugin</source>
-      <translation type="unfinished">Any Plugin</translation>
+      <translation>Elke Plugin</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ui::PluginDiagnosticEventWidget</name>
     <message>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the caption with any of the entered keywords.</translation>
+      <translation>De gebeurtenis wordt alleen geactiveerd als er overeenkomsten zijn in de titel met één van de gekozen trefwoorden.</translation>
     </message>
     <message>
       <source>If the field is empty, event will always trigger.</source>
-      <translation type="unfinished">If the field is empty, event will always trigger.</translation>
+      <translation>Als het veld leeg is, wordt de gebeurtenis altijd geactiveerd.</translation>
     </message>
     <message>
       <source>This field is case sensitive.</source>
-      <translation type="unfinished">This field is case sensitive.</translation>
+      <translation>Dit veld is hoofdlettergevoelig.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the description field with any of the entered keywords.</translation>
+      <translation>De gebeurtenis wordt alleen geactiveerd als er overeenkomsten zijn in de Omschrijving met een van de gekozen trefwoorden.</translation>
     </message>
   </context>
   <context>

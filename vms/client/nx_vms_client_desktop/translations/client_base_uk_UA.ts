@@ -943,6 +943,14 @@ to view more bookmarks</source>
       <source>Objects Frames and Info...</source>
       <translation>Кадри об'єктів та інформація...</translation>
     </message>
+    <message>
+      <source>Pin Calendar</source>
+      <translation>Налаштувати календар</translation>
+    </message>
+    <message>
+      <source>Unpin Calendar</source>
+      <translation>Відкріпити календар</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -4342,7 +4350,7 @@ to %1</source>
     </message>
     <message>
       <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
-      <translation type="unfinished">&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</translation>
+      <translation>&quot;віртуальна камера&quot; - це віртуальне сховище для відеофайлів, яке може бути завантажене на будь-який сервер вашої системи і доступно будь-якому користувачеві.</translation>
     </message>
   </context>
   <context>
@@ -7551,7 +7559,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Unknown track</source>
-      <translation type="unfinished">Unknown track</translation>
+      <translation>Невідомий трек</translation>
     </message>
   </context>
   <context>
@@ -7791,6 +7799,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>This action cannot be undone.</source>
       <translation>Цю дію не можна відмінити.</translation>
+    </message>
+    <message>
+      <source>Motion detection stream is disabled</source>
+      <translation>Виявлення руху вимкнено</translation>
     </message>
   </context>
   <context>
@@ -8673,8 +8685,8 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Обраний діапазон містить більше 255 ІР-адрес.</translation>
     </message>
     <message>
-      <source>Can&apos;t start searching process</source>
-      <translation>Не&apos;можливо почати процес пошуку</translation>
+      <source>Can not start the search process</source>
+      <translation type="unfinished">Can not start the search process</translation>
     </message>
   </context>
   <context>
@@ -8933,10 +8945,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Немає серверів для оновлення, які знаходяться онлайн.</translation>
     </message>
     <message>
-      <source>Some servers haven&apos;t completed update process. Finish it anyway?</source>
-      <translation>Деякі сервери &apos;не завершили процес оновлення. Закінчити його все одно?</translation>
-    </message>
-    <message>
       <source>Cancel update and delete all downloaded data?</source>
       <translation>Скасувати оновлення та видалити всі завантажені дані?</translation>
     </message>
@@ -8990,15 +8998,19 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Some servers have no update packages available.</source>
-      <translation type="unfinished">Some servers have no update packages available.</translation>
+      <translation>Деякі сервери не мають доступних пакетів оновлень.</translation>
     </message>
     <message>
       <source>Some servers have encountered an internal error.</source>
-      <translation type="unfinished">Some servers have encountered an internal error.</translation>
+      <translation>На деяких серверах виникла внутрішня помилка.</translation>
     </message>
     <message>
       <source>Please please contact Customer Support.</source>
-      <translation type="unfinished">Please please contact Customer Support.</translation>
+      <translation>Будь ласка, зверніться до команди підтримки.</translation>
+    </message>
+    <message>
+      <source>Some servers have not completed the update process. Finish it anyway?</source>
+      <translation type="unfinished">Some servers have not completed the update process. Finish it anyway?</translation>
     </message>
   </context>
   <context>
@@ -9058,10 +9070,6 @@ If you intended to move analytics data to another storage location, please conta
   <context>
     <name>nx::vms::client::desktop::OpenLayoutActionWidget</name>
     <message>
-      <source>Some users don&apos;t have access to the selected layout. Action will not work for them.</source>
-      <translation>Деякі користувачі н&apos;е мають доступ до вибраної розкладки. Дія для них не буде працювати.</translation>
-    </message>
-    <message>
       <source>None of selected users have access to the selected layout. Action will not work.</source>
       <translation>Жоден із вибраних користувачів не має доступу до обраної розкладки. Дія не буде працювати.</translation>
     </message>
@@ -9080,6 +9088,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>None of selected user roles contain users. Action will not work.</source>
       <translation>Жодна з вибраних ролей не містить користувачів. Дія не спрацює.</translation>
+    </message>
+    <message>
+      <source>Some users do not have access to the selected layout. Action will not work for them.</source>
+      <translation type="unfinished">Some users do not have access to the selected layout. Action will not work for them.</translation>
     </message>
   </context>
   <context>
@@ -9178,7 +9190,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>This OS version is no longer supported.</source>
-      <translation type="unfinished">This OS version is no longer supported.</translation>
+      <translation>Ця версія ОС більше не підтримується.</translation>
     </message>
   </context>
   <context>
@@ -9287,28 +9299,12 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Більше налаштувань</translation>
     </message>
     <message>
-      <source>Dual-Streaming not supported for this camera</source>
-      <translation>Подвійний потік не підтримується для цієї камери</translation>
-    </message>
-    <message>
-      <source>Dual-Streaming and motion detection not supported for this camera</source>
-      <translation>Подвійний потік та детектор руху не підтримуються для цієї камери</translation>
-    </message>
-    <message>
-      <source>Motion detection disabled</source>
-      <translation>Виявлення руху вимкнено</translation>
-    </message>
-    <message>
-      <source>To enable or adjust it, go to the &quot;Motion&quot; tab in Camera Settings</source>
-      <translation>Щоб увімкнути або налаштувати його, перейдіть на вкладку &quot;Рух&quot; в розділі Параметри камери</translation>
-    </message>
-    <message>
-      <source>Motion detection disabled or not supported</source>
+      <source>Motion detection is disabled or not supported</source>
       <translation>Виявлення руху вимкнено або не підтримується</translation>
     </message>
     <message>
-      <source>To ensure it is supported and to enable it, go to the &quot;Motion&quot; tab in Camera Settings.</source>
-      <translation>Щоб переконатися, що воно підтримується і включити його, перейдіть на вкладку &quot;Рух&quot; в налаштуваннях камери.</translation>
+      <source>Dual-streaming is disabled or not supported</source>
+      <translation>Подвійне потокове відключення або не підтримується</translation>
     </message>
   </context>
   <context>
@@ -9338,7 +9334,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
-      <translation type="unfinished">Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</translation>
+      <translation>Водяні знаки відображаються, архівуються та експортуються лише для неадміністраторів через відео в реальному часі. Ви та інші адміністратори не побачите їх.</translation>
     </message>
   </context>
   <context>
@@ -9403,6 +9399,10 @@ If you intended to move analytics data to another storage location, please conta
       <source>plugin is optional and is not in the white list</source>
       <translation>плагін є опціональним і не входить у білий список</translation>
     </message>
+    <message>
+      <source>internal error</source>
+      <translation>внутрішня помилка</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerStatusItemDelegate</name>
@@ -9439,7 +9439,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Server error.</source>
-      <translation type="unfinished">Server error.</translation>
+      <translation>Помилка сервера.</translation>
     </message>
   </context>
   <context>
@@ -9872,26 +9872,26 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::ui::PluginDiagnosticEventModel</name>
     <message>
       <source>Any Plugin</source>
-      <translation type="unfinished">Any Plugin</translation>
+      <translation>Будь-який плагін</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ui::PluginDiagnosticEventWidget</name>
     <message>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the caption with any of the entered keywords.</translation>
+      <translation>Подія буде спрацьовувати тільки в тому випадку, якщо в заголовку є збіги з будь-яким з введених ключових слів.</translation>
     </message>
     <message>
       <source>If the field is empty, event will always trigger.</source>
-      <translation type="unfinished">If the field is empty, event will always trigger.</translation>
+      <translation>Якщо поле пусте, подія завжди буде викликатися.</translation>
     </message>
     <message>
       <source>This field is case sensitive.</source>
-      <translation type="unfinished">This field is case sensitive.</translation>
+      <translation>Цей поле чутливе до регістру.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the description field with any of the entered keywords.</translation>
+      <translation>Подія буде спрацьовувати тільки в тому випадку, якщо в описі є збіги з будь-яким з введених ключових слів.</translation>
     </message>
   </context>
   <context>

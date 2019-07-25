@@ -243,7 +243,8 @@ std::future<nx::update::UpdateContents> ServerUpdateTool::checkMediaserverUpdate
                         if (tool)
                         {
                             tool->m_timeStartedInstall = contents.info.lastInstallationRequestTime;
-                            tool->m_serversAreInstalling = contents.info.participants.toSet();
+                            if (contents.info.lastInstallationRequestTime > 0)
+                                tool->m_serversAreInstalling = contents.info.participants.toSet();
                         }
                     }
                 }
@@ -894,6 +895,7 @@ bool ServerUpdateTool::requestInstallAction(
                 if (!success)
                 {
                     error = InternalError::networkError;
+                    tool->m_serversAreInstalling = {};
                 }
                 else if (result.error != QnRestResult::NoError)
                 {
@@ -1026,7 +1028,10 @@ void ServerUpdateTool::requestRemoteUpdateStateAsync()
                     if (tool->m_skippedRequests.contains((handle)))
                         return;
                     tool->m_remoteUpdateManifest = response.data;
-                    tool->m_serversAreInstalling = QSet<QnUuid>::fromList(response.data.participants);
+                    if (response.data.lastInstallationRequestTime > 0)
+                        tool->m_serversAreInstalling = QSet<QnUuid>::fromList(response.data.participants);
+                    else
+                        tool->m_serversAreInstalling = {};
                 }
             }, thread());
         m_activeRequests.insert(handle);

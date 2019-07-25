@@ -943,6 +943,14 @@ to view more bookmarks</source>
       <source>Objects Frames and Info...</source>
       <translation type="unfinished">Objects Frames and Info...</translation>
     </message>
+    <message>
+      <source>Pin Calendar</source>
+      <translation>การตรึงปฏิทิน</translation>
+    </message>
+    <message>
+      <source>Unpin Calendar</source>
+      <translation>ยกเลิกการตรึงปฏิทิน</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -4194,7 +4202,7 @@ to %1</source>
     </message>
     <message>
       <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
-      <translation type="unfinished">&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</translation>
+      <translation>&quot;Wearable Camera&quot; เป็นที่เก็บข้อมูลเสมือนจริงสำหรับไฟล์วิดีโอซึ่งสามารถอัพโหลดไปยังเซิร์ฟเวอร์ใดก็ได้ในระบบของคุณและเข้าถึงได้โดยผู้ใช้รายใด</translation>
     </message>
   </context>
   <context>
@@ -7478,6 +7486,10 @@ If you intended to move analytics data to another storage location, please conta
       <source>This action cannot be undone.</source>
       <translation>ไม่สามารถดำเนินการดังกล่าวให้ได้</translation>
     </message>
+    <message>
+      <source>Motion detection stream is disabled</source>
+      <translation type="unfinished">Motion detection stream is disabled</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraScheduleWidget</name>
@@ -8320,8 +8332,8 @@ If you intended to move analytics data to another storage location, please conta
       <translation>ระบุช่วงที่อยู่ IP ห้ามมากกว่า 255.</translation>
     </message>
     <message>
-      <source>Can&apos;t start searching process</source>
-      <translation>สามารถเริ่มการค้นหา&apos;t</translation>
+      <source>Can not start the search process</source>
+      <translation type="unfinished">Can not start the search process</translation>
     </message>
   </context>
   <context>
@@ -8577,10 +8589,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>ไม่มีเซิร์ฟเวอร์ออนไลน์ที่จะอัปเดต</translation>
     </message>
     <message>
-      <source>Some servers haven&apos;t completed update process. Finish it anyway?</source>
-      <translation>เซิร์ฟเวอร์บางตัวยังไม่เสร็จสิ้นกระบวนการอัพเดต&apos;ครั้ง เสร็จแล้วหรือยัง?</translation>
-    </message>
-    <message>
       <source>Cancel update and delete all downloaded data?</source>
       <translation>ยกเลิกการอัปเดตและลบข้อมูลที่ดาวน์โหลดทั้งหมดหรือไม่?</translation>
     </message>
@@ -8644,6 +8652,10 @@ If you intended to move analytics data to another storage location, please conta
       <source>Please please contact Customer Support.</source>
       <translation type="unfinished">Please please contact Customer Support.</translation>
     </message>
+    <message>
+      <source>Some servers have not completed the update process. Finish it anyway?</source>
+      <translation type="unfinished">Some servers have not completed the update process. Finish it anyway?</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::MultipleLayoutSelectionDialog</name>
@@ -8699,10 +8711,6 @@ If you intended to move analytics data to another storage location, please conta
   <context>
     <name>nx::vms::client::desktop::OpenLayoutActionWidget</name>
     <message>
-      <source>Some users don&apos;t have access to the selected layout. Action will not work for them.</source>
-      <translation>ผู้ใช้บางคนสวม&apos;t มีการเข้าถึงรูปแบบที่เลือก การดำเนินการจะไม่ทำงานสำหรับพวกเขา</translation>
-    </message>
-    <message>
       <source>None of selected users have access to the selected layout. Action will not work.</source>
       <translation>ไม่มีผู้ใช้ที่เลือกมีสิทธิ์ในการเลือกเค้าโครงที่เลือก การกระทำจะไม่ทำงาน</translation>
     </message>
@@ -8721,6 +8729,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>None of selected user roles contain users. Action will not work.</source>
       <translation>ไม่มีบทบาทผู้ใช้ที่เลือกไว้ประกอบด้วยผู้ใช้ การกระทำจะไม่ทำงาน</translation>
+    </message>
+    <message>
+      <source>Some users do not have access to the selected layout. Action will not work for them.</source>
+      <translation type="unfinished">Some users do not have access to the selected layout. Action will not work for them.</translation>
     </message>
   </context>
   <context>
@@ -8819,7 +8831,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>This OS version is no longer supported.</source>
-      <translation type="unfinished">This OS version is no longer supported.</translation>
+      <translation>รุ่นนี้ไม่สนับสนุน.</translation>
     </message>
   </context>
   <context>
@@ -8925,28 +8937,12 @@ If you intended to move analytics data to another storage location, please conta
       <translation>การตั้งค่าเพิ่มเติม</translation>
     </message>
     <message>
-      <source>Dual-Streaming not supported for this camera</source>
-      <translation>ไม่สนับสนุนสตรีมมิงแบบคู่สำหรับกล้องนี้</translation>
+      <source>Motion detection is disabled or not supported</source>
+      <translation type="unfinished">Motion detection is disabled or not supported</translation>
     </message>
     <message>
-      <source>Dual-Streaming and motion detection not supported for this camera</source>
-      <translation>ไม่สนับสนุนการสตรีมแบบคู่และการตรวจจับการเคลื่อนไหวสำหรับกล้องนี้</translation>
-    </message>
-    <message>
-      <source>Motion detection disabled</source>
-      <translation>การตรวจจับการเคลื่อนไหวถูกปิดใช้งาน</translation>
-    </message>
-    <message>
-      <source>To enable or adjust it, go to the &quot;Motion&quot; tab in Camera Settings</source>
-      <translation>เพื่อให้มั่นใจว่าได้รับการสนับสนุนและเปิดใช้งานได้ให้ไปที่แท็บ &quot;Motion&quot; ในการตั้งค่ากล้อง</translation>
-    </message>
-    <message>
-      <source>Motion detection disabled or not supported</source>
-      <translation>การตรวจจับการเคลื่อนไหวถูกปิดใช้งานหรือไม่รองรับ</translation>
-    </message>
-    <message>
-      <source>To ensure it is supported and to enable it, go to the &quot;Motion&quot; tab in Camera Settings.</source>
-      <translation>เพื่อให้มั่นใจว่าได้รับการสนับสนุนและเปิดใช้งานได้ให้ไปที่แท็บ &quot;Motion&quot; ในการตั้งค่ากล้อง</translation>
+      <source>Dual-streaming is disabled or not supported</source>
+      <translation type="unfinished">Dual-streaming is disabled or not supported</translation>
     </message>
   </context>
   <context>
@@ -8976,7 +8972,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
-      <translation type="unfinished">Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</translation>
+      <translation>ลายน้ำจะปรากฏบนวิดีโอสดที่เก็บถาวรและส่งออกสำหรับผู้ใช้ที่ไม่ใช่ผู้ดูแลระบบเท่านั้น คุณและผู้ดูแลระบบคนอื่นจะไม่เห็นพวกเขา</translation>
     </message>
   </context>
   <context>
@@ -9040,6 +9036,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>plugin is optional and is not in the white list</source>
       <translation type="unfinished">plugin is optional and is not in the white list</translation>
+    </message>
+    <message>
+      <source>internal error</source>
+      <translation>ข้อผิดพลาดภายใน</translation>
     </message>
   </context>
   <context>
@@ -9502,19 +9502,19 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::ui::PluginDiagnosticEventWidget</name>
     <message>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the caption with any of the entered keywords.</translation>
+      <translation>เหตุการณ์จะทริกเกอร์เฉพาะกรณีที่มีการจับคู่ในแหล่งที่มากับคำหลักที่ป้อนไว้</translation>
     </message>
     <message>
       <source>If the field is empty, event will always trigger.</source>
-      <translation type="unfinished">If the field is empty, event will always trigger.</translation>
+      <translation>หากช่องว่างกิจกรรมจะเรียกใช้เสมอ</translation>
     </message>
     <message>
       <source>This field is case sensitive.</source>
-      <translation type="unfinished">This field is case sensitive.</translation>
+      <translation>ฟิลด์นี้เป็นตัวพิมพ์เล็กและใหญ่</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the description field with any of the entered keywords.</translation>
+      <translation>เหตุการณ์จะทริกเกอร์เฉพาะกรณีที่มีการจับคู่ในแหล่งที่มากับคำหลักที่ป้อนไว้</translation>
     </message>
   </context>
   <context>

@@ -130,4 +130,14 @@ std::ostream& operator<<(std::ostream& os, StreamQuality value)
     return os << ::toString(value).toStdString();
 }
 
+QString toString(RecordingType value)
+{
+    return QnLexical::serialized(value);
+}
+
+std::ostream& operator<<(std::ostream& os, RecordingType value)
+{
+    return os << ::toString(value).toStdString();
+}
+
 } // namespace nx::vms::api

@@ -195,13 +195,18 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
 
     if (auto horizontalHeader = ui->tableView->horizontalHeader())
     {
-        horizontalHeader->setSectionResizeMode(QHeaderView::ResizeToContents);
+        horizontalHeader->setSectionResizeMode(ServerUpdatesModel::NameColumn,
+            QHeaderView::ResizeToContents);
+        horizontalHeader->setSectionResizeMode(ServerUpdatesModel::VersionColumn,
+            QHeaderView::ResizeToContents);
         horizontalHeader->setSectionResizeMode(ServerUpdatesModel::ProgressColumn,
             QHeaderView::Stretch);
         horizontalHeader->setSectionResizeMode(ServerUpdatesModel::StatusMessageColumn,
             QHeaderView::Stretch);
         horizontalHeader->setSectionsClickable(false);
+        horizontalHeader->setStretchLastSection(true);
     }
+    ui->tableView->setColumnHidden(ServerUpdatesModel::Columns::ProgressColumn, false);
 
     connect(m_serverUpdateTool.get(), &ServerUpdateTool::packageDownloaded,
         this, &MultiServerUpdatesWidget::atServerPackageDownloaded);
@@ -1098,7 +1103,8 @@ bool MultiServerUpdatesWidget::atCancelCurrentAction()
         QScopedPointer<QnSessionAwareMessageBox> messageBox(new QnSessionAwareMessageBox(this));
         // 3. All other cases. Some servers have failed
         messageBox->setIcon(QnMessageBoxIcon::Question);
-        messageBox->setText(tr("Some servers haven't completed update process. Finish it anyway?"));
+        messageBox->setText(
+            tr("Some servers have not completed the update process. Finish it anyway?"));
         messageBox->setStandardButtons(QDialogButtonBox::Yes | QDialogButtonBox::No);
         messageBox->setDefaultButton(QDialogButtonBox::Yes, Qn::ButtonAccent::Warning);
 
@@ -1194,6 +1200,7 @@ void MultiServerUpdatesWidget::atCancelUpdateComplete(bool success, const QStrin
         m_clientUpdateTool->resetState();
         if (success)
         {
+            repeatUpdateValidation();
             setTargetState(WidgetUpdateState::ready, {});
         }
         else
@@ -1208,6 +1215,9 @@ void MultiServerUpdatesWidget::atCancelUpdateComplete(bool success, const QStrin
             setTargetState(WidgetUpdateState::readyInstall, {});
         }
     }
+
+    if (m_updateRemoteStateChanged)
+        loadDataToUi();
 }
 
 void MultiServerUpdatesWidget::atStartInstallComplete(bool success, const QString& error)
@@ -1239,6 +1249,8 @@ void MultiServerUpdatesWidget::atStartInstallComplete(bool success, const QStrin
             }
         }
     }
+    if (m_updateRemoteStateChanged)
+        loadDataToUi();
 }
 
 void MultiServerUpdatesWidget::atFinishUpdateComplete(bool success, const QString& error)
@@ -1276,6 +1288,9 @@ void MultiServerUpdatesWidget::atFinishUpdateComplete(bool success, const QStrin
             setTargetState(WidgetUpdateState::installingStalled, targets);
         }
     }
+
+    if (m_updateRemoteStateChanged)
+        loadDataToUi();
 }
 
 void MultiServerUpdatesWidget::repeatUpdateValidation()
@@ -2389,7 +2404,8 @@ void MultiServerUpdatesWidget::syncRemoteUpdateStateToUi()
         ui->spaceErrorLabel->hide();
     }
 
-    if (errorTooltips.isEmpty() && !hasSpaceIssues)
+    if (errorTooltips.isEmpty() && !hasSpaceIssues
+        && m_widgetState != WidgetUpdateState::cancelingReadyInstall)
     {
         ui->downloadButton->setEnabled(true);
         ui->downloadButton->setToolTip("");
@@ -2587,12 +2603,11 @@ void MultiServerUpdatesWidget::syncStatusVisibility()
         statusMode = StatusMode::hidden;
 
     m_statusItemDelegate->setStatusMode(statusMode);
-    // This will force delegate update all its widgets.
-    ui->tableView->update();
-    m_updatesModel->forceUpdateColumn(ServerUpdatesModel::Columns::ProgressColumn);
-    //forceUpdateColumn()
     ui->tableView->setColumnHidden(ServerUpdatesModel::Columns::ProgressColumn,
         statusMode == StatusMode::hidden);
+    m_updatesModel->forceUpdateColumn(ServerUpdatesModel::Columns::ProgressColumn);
+    // This will force delegate update all its widgets.
+    ui->tableView->update();
 }
 
 void MultiServerUpdatesWidget::atModelDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int>& /*unused*/)

@@ -943,6 +943,14 @@ to view more bookmarks</source>
       <source>Objects Frames and Info...</source>
       <translation>מסגרות אובייקטים ומידע...</translation>
     </message>
+    <message>
+      <source>Pin Calendar</source>
+      <translation>הצמד לוח שנה</translation>
+    </message>
+    <message>
+      <source>Unpin Calendar</source>
+      <translation>בטל הצמדה של לוח השנה</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -4339,7 +4347,7 @@ to %1</source>
     </message>
     <message>
       <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
-      <translation type="unfinished">&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</translation>
+      <translation>&quot;מצלמה וירטואלית&quot; היא אחסון וירטואלי עבור קבצי וידאו, אשר יכול להיות נטען על כל שרת. על המערכת שלך להיות נגישה על ידי כל משתמש.</translation>
     </message>
   </context>
   <context>
@@ -7548,7 +7556,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Unknown track</source>
-      <translation type="unfinished">Unknown track</translation>
+      <translation>מסלול לא ידוע</translation>
     </message>
   </context>
   <context>
@@ -7788,6 +7796,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>This action cannot be undone.</source>
       <translation>פעולה זו אינה הפיכה.</translation>
+    </message>
+    <message>
+      <source>Motion detection stream is disabled</source>
+      <translation type="unfinished">Motion detection stream is disabled</translation>
     </message>
   </context>
   <context>
@@ -8670,8 +8682,8 @@ If you intended to move analytics data to another storage location, please conta
       <translation>טווח הIP שהוגדר מכיל יותר מ255 כתובות.</translation>
     </message>
     <message>
-      <source>Can&apos;t start searching process</source>
-      <translation>לא ניתן להתחיל בתהליך החיפוש</translation>
+      <source>Can not start the search process</source>
+      <translation type="unfinished">Can not start the search process</translation>
     </message>
   </context>
   <context>
@@ -8930,10 +8942,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>אין שרתים מקוונים לעדכון.</translation>
     </message>
     <message>
-      <source>Some servers haven&apos;t completed update process. Finish it anyway?</source>
-      <translation>חלק מהשרתים לא השלימו את העדכון, לסיים בכל מקרה?</translation>
-    </message>
-    <message>
       <source>Cancel update and delete all downloaded data?</source>
       <translation>האם לבטל את העדכון ולמחוק את כל הנתונים שהורדו?</translation>
     </message>
@@ -8987,15 +8995,19 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Some servers have no update packages available.</source>
-      <translation type="unfinished">Some servers have no update packages available.</translation>
+      <translation>לחלק מהשרתים אין חבילת עדכון זמינה.</translation>
     </message>
     <message>
       <source>Some servers have encountered an internal error.</source>
-      <translation type="unfinished">Some servers have encountered an internal error.</translation>
+      <translation>חלק מהשרתים נתקלו בשגיאה פנימית.</translation>
     </message>
     <message>
       <source>Please please contact Customer Support.</source>
-      <translation type="unfinished">Please please contact Customer Support.</translation>
+      <translation>צור קשר עם שירות הלקוחות.</translation>
+    </message>
+    <message>
+      <source>Some servers have not completed the update process. Finish it anyway?</source>
+      <translation type="unfinished">Some servers have not completed the update process. Finish it anyway?</translation>
     </message>
   </context>
   <context>
@@ -9055,10 +9067,6 @@ If you intended to move analytics data to another storage location, please conta
   <context>
     <name>nx::vms::client::desktop::OpenLayoutActionWidget</name>
     <message>
-      <source>Some users don&apos;t have access to the selected layout. Action will not work for them.</source>
-      <translation>לחלק מהמשתמשים אין גיה לפריסה שנבחרה. הפעולה לא תעבוד עבורם.</translation>
-    </message>
-    <message>
       <source>None of selected users have access to the selected layout. Action will not work.</source>
       <translation>לאף אחד מהמשתמשים שנבחרו אין גישה לפריסה שנבחרה. הפעולה לא תעבוד.</translation>
     </message>
@@ -9077,6 +9085,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>None of selected user roles contain users. Action will not work.</source>
       <translation>אף אחד מהתפקידים שנבחרו אינו מכיל משתמשים. הפעולה לא תעבוד.</translation>
+    </message>
+    <message>
+      <source>Some users do not have access to the selected layout. Action will not work for them.</source>
+      <translation type="unfinished">Some users do not have access to the selected layout. Action will not work for them.</translation>
     </message>
   </context>
   <context>
@@ -9175,7 +9187,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>This OS version is no longer supported.</source>
-      <translation type="unfinished">This OS version is no longer supported.</translation>
+      <translation>גירסת מערכת הפעלה זו אינה נתמכת עוד.</translation>
     </message>
   </context>
   <context>
@@ -9284,28 +9296,12 @@ If you intended to move analytics data to another storage location, please conta
       <translation>הגדרות נוספות</translation>
     </message>
     <message>
-      <source>Dual-Streaming not supported for this camera</source>
-      <translation>הזרמה כפולה אינה נתמכת עבור מצלמה זו</translation>
+      <source>Motion detection is disabled or not supported</source>
+      <translation type="unfinished">Motion detection is disabled or not supported</translation>
     </message>
     <message>
-      <source>Dual-Streaming and motion detection not supported for this camera</source>
-      <translation>הזרמה כפולה וגילוי תנועה אינם נתמכים עבור מצלמה זו</translation>
-    </message>
-    <message>
-      <source>Motion detection disabled</source>
-      <translation>זיהוי תנועה לא זמין</translation>
-    </message>
-    <message>
-      <source>To enable or adjust it, go to the &quot;Motion&quot; tab in Camera Settings</source>
-      <translation>כדי להפעיל או להתאים אותו, גש ללשונית &quot;תנועה&quot; בהגדרות המצלמה</translation>
-    </message>
-    <message>
-      <source>Motion detection disabled or not supported</source>
-      <translation>זיהוי תנועה מבטול או אינו נתמך</translation>
-    </message>
-    <message>
-      <source>To ensure it is supported and to enable it, go to the &quot;Motion&quot; tab in Camera Settings.</source>
-      <translation>כדי להבטיח שהוא נתמך וכדי להפוך אותה לזמינה, גש ללשונית &quot;תנועה&quot; בהגדרות המצלמה.</translation>
+      <source>Dual-streaming is disabled or not supported</source>
+      <translation type="unfinished">Dual-streaming is disabled or not supported</translation>
     </message>
   </context>
   <context>
@@ -9335,7 +9331,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
-      <translation type="unfinished">Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</translation>
+      <translation>חתימות מים (Watermarks) יוצגו על שידורים ישירים, הקלטות וסרטונים מיוצאים עבור משתמשים שלא הוגדרו כמנהלים, אתה ומנהלי מערכת אחרים לא תראו חתימות מים אלה.</translation>
     </message>
   </context>
   <context>
@@ -9400,6 +9396,10 @@ If you intended to move analytics data to another storage location, please conta
       <source>plugin is optional and is not in the white list</source>
       <translation>התוסף הוא אופציונלי ולא ברשימה הלבנה</translation>
     </message>
+    <message>
+      <source>internal error</source>
+      <translation>שגיאה פנימית</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerStatusItemDelegate</name>
@@ -9436,7 +9436,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Server error.</source>
-      <translation type="unfinished">Server error.</translation>
+      <translation>שגיאת שרת.</translation>
     </message>
   </context>
   <context>
@@ -9869,26 +9869,26 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::ui::PluginDiagnosticEventModel</name>
     <message>
       <source>Any Plugin</source>
-      <translation type="unfinished">Any Plugin</translation>
+      <translation>כל תוסף</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ui::PluginDiagnosticEventWidget</name>
     <message>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the caption with any of the entered keywords.</translation>
+      <translation>האירוע יופעל רק אם יש התאמות בכיתוב עם כל אחת ממילות המפתח שהוזנו.</translation>
     </message>
     <message>
       <source>If the field is empty, event will always trigger.</source>
-      <translation type="unfinished">If the field is empty, event will always trigger.</translation>
+      <translation>אם שדה זה ריק, האירוע יופעל תמיד.</translation>
     </message>
     <message>
       <source>This field is case sensitive.</source>
-      <translation type="unfinished">This field is case sensitive.</translation>
+      <translation>This field is case sensitive.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the description field with any of the entered keywords.</translation>
+      <translation>האירוע יופעל רק אם יש התאמות בשדה התיאור עם כל אחת ממילות המפתח שהוזנו.</translation>
     </message>
   </context>
   <context>
