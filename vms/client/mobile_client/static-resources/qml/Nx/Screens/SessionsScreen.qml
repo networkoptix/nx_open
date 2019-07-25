@@ -119,9 +119,10 @@ Page
         model: OrderedSystemsModel
         {
             id: systemsModel
+
             minimalVersion: "2.5"
             filterCaseSensitivity: Qt.CaseInsensitive
-            filterRole: 257 // Search role
+            filterRole: searchRoleId()
         }
 
         delegate: Item
