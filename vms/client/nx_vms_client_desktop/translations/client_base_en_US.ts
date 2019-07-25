@@ -8447,8 +8447,8 @@ If you intended to move analytics data to another storage location, please conta
         <translation></translation>
     </message>
     <message>
-        <source>Can&apos;t start searching process</source>
-        <translation></translation>
+        <source>Can not start the search process</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8705,10 +8705,6 @@ If you intended to move analytics data to another storage location, please conta
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Some servers haven&apos;t completed update process. Finish it anyway?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Cancel update and delete all downloaded data?</source>
         <translation type="unfinished"></translation>
     </message>
@@ -8772,6 +8768,10 @@ If you intended to move analytics data to another storage location, please conta
         <source>Please please contact Customer Support.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Some servers have not completed the update process. Finish it anyway?</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::MultipleLayoutSelectionDialog</name>
@@ -8828,10 +8828,6 @@ If you intended to move analytics data to another storage location, please conta
 <context>
     <name>nx::vms::client::desktop::OpenLayoutActionWidget</name>
     <message>
-        <source>Some users don&apos;t have access to the selected layout. Action will not work for them.</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>None of selected users have access to the selected layout. Action will not work.</source>
         <translation></translation>
     </message>
@@ -8850,6 +8846,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
         <source>None of selected user roles contain users. Action will not work.</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Some users do not have access to the selected layout. Action will not work for them.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

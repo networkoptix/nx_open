@@ -1103,7 +1103,8 @@ bool MultiServerUpdatesWidget::atCancelCurrentAction()
         QScopedPointer<QnSessionAwareMessageBox> messageBox(new QnSessionAwareMessageBox(this));
         // 3. All other cases. Some servers have failed
         messageBox->setIcon(QnMessageBoxIcon::Question);
-        messageBox->setText(tr("Some servers haven't completed update process. Finish it anyway?"));
+        messageBox->setText(
+            tr("Some servers have not completed the update process. Finish it anyway?"));
         messageBox->setStandardButtons(QDialogButtonBox::Yes | QDialogButtonBox::No);
         messageBox->setDefaultButton(QDialogButtonBox::Yes, Qn::ButtonAccent::Warning);
 
