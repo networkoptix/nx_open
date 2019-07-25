@@ -13,15 +13,15 @@ TextInput
 
     property bool showError: false
 
-    property bool mobileMode: Utils.isMobile()
+    property bool enableCustomHandlers: Qt.platform.os == "android"
 
     property color inactiveColor: showError ? ColorTheme.red_d1 : ColorTheme.base10
     property color activeColor: showError ? ColorTheme.red_main : ColorTheme.brand_main
     property color placeholderColor: ColorTheme.base10
     property color cursorColor: activeColor
     property bool selectionAllowed: true
-    scrollByMouse: mobileMode
-    selectByMouse: !mobileMode
+    scrollByMouse: Utils.isMobile()
+    selectByMouse: !Utils.isMobile()
     color: showError ? ColorTheme.red_main : ColorTheme.windowText
 
     leftPadding: 8
@@ -124,7 +124,7 @@ TextInput
 
         function showCursorHandle()
         {
-            if (!mobileMode)
+            if (!enableCustomHandlers)
                 return
 
             cursorHandle.opacity = 0.0
@@ -134,7 +134,7 @@ TextInput
 
         function hideCursorHandle()
         {
-            if (!mobileMode)
+            if (!enableCustomHandlers)
                 return
 
             cursorHandle.opacity = 0.0
@@ -149,7 +149,7 @@ TextInput
 
         function updateSelectionHandles()
         {
-            if (!mobileMode)
+            if (!enableCustomHandlers)
                 return
 
             if (cursorHandle.pressed)
@@ -197,6 +197,9 @@ TextInput
 
         function selectWordAndOpenContextMenu(event, autoSelect)
         {
+            if (!enableCustomHandlers)
+                return
+
             selectAndOpenMenuTimer.x = event.x
             selectAndOpenMenuTimer.y = event.y
             selectAndOpenMenuTimer.autoSelect = autoSelect
@@ -214,7 +217,7 @@ TextInput
 
     onClicked:
     {
-        if (!selectAndOpenMenuTimer.running)
+        if (!selectAndOpenMenuTimer.running && enableCustomHandlers)
             openMenuTimer.restart()
         if (displayText && selectionStart == selectionEnd)
             d.showCursorHandle()
@@ -399,7 +402,7 @@ TextInput
             x = leftPadding + positionToRectangle(
                 selectionStart == selectionEnd
                     ? cursorPosition : selectionStart).x
-            var yOffset = cursorRectangle.height + (mobileMode ? 28 : 4)
+            var yOffset = cursorRectangle.height + (enableCustomHandlers ? 28 : 4)
             y = cursorRectangle.y + yOffset
 
             var window = control.ApplicationWindow.window
