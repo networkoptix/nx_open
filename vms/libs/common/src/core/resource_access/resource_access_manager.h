@@ -142,7 +142,6 @@ public:
         const nx::vms::api::UserData& update) const;
     bool canModifyResource(const QnResourceAccessSubject& subject, const QnResourcePtr& target,
         const nx::vms::api::VideowallData& update) const;
-
 signals:
     void permissionsChanged(const QnResourceAccessSubject& subject, const QnResourcePtr& resource,
         Qn::Permissions permissions);

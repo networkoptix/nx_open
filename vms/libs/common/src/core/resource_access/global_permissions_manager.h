@@ -52,6 +52,7 @@ public:
     bool hasGlobalPermission(const Qn::UserAccessData& accessRights,
         GlobalPermission requiredPermission) const;
 
+    bool canSeeAnotherUsers(const Qn::UserAccessData& accessRights) const;
 signals:
     void globalPermissionsChanged(const QnResourceAccessSubject& subject,
         GlobalPermissions permissions);

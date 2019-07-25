@@ -518,9 +518,9 @@ bool ServerMessageBus::readFullInfoData(
 {
     ErrorCode errorCode;
     if (remotePeer.peerType == vms::api::PeerType::mobileClient)
-        errorCode = dbManager(m_db, userAccess).readFullInfoDataForMobileClient(outData, userAccess.userId);
+        errorCode = dbManager(m_db, userAccess).readFullInfoDataForMobileClient(outData, userAccess);
     else
-        errorCode = dbManager(m_db, userAccess).readFullInfoDataComplete(outData);
+        errorCode = dbManager(m_db, userAccess).readFullInfoDataComplete(outData, userAccess);
 
     if (errorCode != ErrorCode::ok)
         NX_WARNING(this, lm("Cannot execute query for FullInfoData: %1").arg(errorCode));

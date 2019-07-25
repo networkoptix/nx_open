@@ -76,6 +76,11 @@ bool QnGlobalPermissionsManager::hasGlobalPermission(const QnResourceAccessSubje
     return globalPermissions(subject).testFlag(requiredPermission);
 }
 
+bool QnGlobalPermissionsManager::canSeeAnotherUsers(const Qn::UserAccessData& accessRights) const
+{
+    return hasGlobalPermission(accessRights, nx::vms::api::GlobalPermission::admin);
+}
+
 bool QnGlobalPermissionsManager::hasGlobalPermission(const Qn::UserAccessData& accessRights,
     GlobalPermission requiredPermission) const
 {
