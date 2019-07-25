@@ -11,7 +11,7 @@
 #include <ui/workbench/workbench_context.h>
 
 #include <nx/utils/log/log.h>
-#include <nx/vms/client/desktop/ui/scene/resource_icon_provider.h>
+#include <nx/vms/client/desktop/ui/image_providers/resource_icon_provider.h>
 
 namespace nx::vms::client::desktop {
 namespace ui {

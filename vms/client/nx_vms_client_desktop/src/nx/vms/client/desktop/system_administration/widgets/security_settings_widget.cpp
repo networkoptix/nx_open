@@ -13,6 +13,8 @@
 
 #include <ui/workaround/widgets_signals_workaround.h>
 
+#include <QtGui/QResizeEvent>
+
 namespace nx::vms::client::desktop {
 
 SecuritySettingsWidget::SecuritySettingsWidget(QWidget* parent):
@@ -207,6 +209,18 @@ void SecuritySettingsWidget::setReadOnlyInternal(bool readOnly)
     setReadOnly(ui->displayWatermarkCheckBox, readOnly);
     setReadOnly(ui->watermarkSettingsButton, readOnly);
     setReadOnly(ui->limitSessionLengthWidget, readOnly);
+}
+
+void SecuritySettingsWidget::resizeEvent(QResizeEvent* resizeEvent)
+{
+    base_type::resizeEvent(resizeEvent);
+    // Workaround for layout issues caused by incorrect size hint of word-wrapped QLabel.
+    if (ui->watermarkExplanationLabel->isVisible())
+    {
+        ui->watermarkExplanationLabel->setMinimumHeight(0);
+        ui->watermarkExplanationLabel->setMinimumHeight(
+            ui->watermarkExplanationLabel->heightForWidth(resizeEvent->size().width()));
+    }
 }
 
 } // namespace nx::vms::client::desktop

@@ -12,7 +12,7 @@
 #include <nx/utils/app_info.h>
 #include <utils/common/app_info.h>
 
-#include "update_contents.h"
+#include "update_verification.h"
 
 using nx::update::UpdateContents;
 
@@ -138,7 +138,7 @@ bool verifyUpdateContents(
     nx::update::Information& info = contents.info;
     if (contents.error != nx::update::InformationError::noError)
     {
-        NX_ERROR(typeid(UpdateContents)) << "verifyUpdateManifest("
+        NX_ERROR(typeid(UpdateContents)) << "verifyUpdateContents("
             << contents.info.version << ") has an error before verification:"
             << nx::update::toString(contents.error);
         return false;
@@ -152,8 +152,17 @@ bool verifyUpdateContents(
 
     nx::utils::SoftwareVersion targetVersion(info.version);
 
+    if (contents.info.version.isEmpty() || targetVersion.isNull())
+    {
+        NX_ERROR(typeid(UpdateContents),
+            "verifyUpdateContents(...) - missing or invalid version.");
+        contents.error = nx::update::InformationError::jsonError;
+        return false;
+    }
+
     contents.invalidVersion.clear();
     contents.missingUpdate.clear();
+    contents.unsuportedSystemsReport.clear();
 
     // Check if some packages from manifest do not exist.
     if (contents.sourceType == nx::update::UpdateSourceType::file && !contents.packagesGenerated)
@@ -218,7 +227,7 @@ bool verifyUpdateContents(
                 break;
 
             case update::FindPackageResult::osVersionNotSupported:
-                NX_ERROR(NX_SCOPE_TAG, "verifyUpdateManifest(%1) OS version is not supported: %2",
+                NX_ERROR(typeid(UpdateContents), "verifyUpdateManifest(%1) OS version is not supported: %2",
                     contents.info.version, clientData.osInfo);
                 contents.unsuportedSystemsReport.insert(
                     clientData.clientId,
@@ -227,7 +236,7 @@ bool verifyUpdateContents(
 
             case update::FindPackageResult::otherError:
             default:
-                NX_ERROR(NX_SCOPE_TAG, "verifyUpdateManifest(%1) Update package is missing for %2",
+                NX_ERROR(typeid(UpdateContents), "verifyUpdateManifest(%1) Update package is missing for %2",
                     contents.info.version, clientData.osInfo);
                 contents.missingUpdate.insert(clientData.clientId);
                 break;
@@ -258,7 +267,7 @@ bool verifyUpdateContents(
         const auto& osInfo = server->getOsInfo();
         if (!osInfo.isValid())
         {
-            NX_WARNING(NX_SCOPE_TAG,
+            NX_WARNING(typeid(UpdateContents),
                 "verifyUpdateManifest(%1) - server %2 has invalid osInfo",
                 contents.info.version, id);
         }
@@ -267,7 +276,7 @@ bool verifyUpdateContents(
         // Prohibiting updates to previous version.
         if (serverVersion >= targetVersion)
         {
-            NX_WARNING(NX_SCOPE_TAG, "verifyUpdateManifest(%1) Server %2 has a newer version %3",
+            NX_WARNING(typeid(UpdateContents), "verifyUpdateManifest(%1) Server %2 has a newer version %3",
                 contents.info.version, id, serverVersion);
             serversWithNewerVersion.insert(id);
             continue;
@@ -286,7 +295,7 @@ bool verifyUpdateContents(
                     break;
 
                 case update::FindPackageResult::osVersionNotSupported:
-                    NX_ERROR(NX_SCOPE_TAG,
+                    NX_ERROR(typeid(UpdateContents),
                         "verifyUpdateManifest(%1) OS version is not supported: %2",
                         contents.info.version, osInfo);
                     contents.unsuportedSystemsReport.insert(
@@ -295,7 +304,7 @@ bool verifyUpdateContents(
 
                 case update::FindPackageResult::otherError:
                 default:
-                    NX_ERROR(NX_SCOPE_TAG,
+                    NX_ERROR(typeid(UpdateContents),
                         "verifyUpdateManifest(%1) Update package is missing for %2",
                         contents.info.version, osInfo);
                     contents.missingUpdate.insert(id);

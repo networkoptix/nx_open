@@ -637,8 +637,10 @@ void GdiHandleTracer::checkGdiHandlesCount()
     auto gdiHandlesCount = GetGuiResources(GetCurrentProcess(), GR_GDIOBJECTS);
     if (gdiHandlesCount >= m_gdiTraceLimit)
     {
-        saveReportToFile(m_reportPath);
-        m_reportCreated = true;
+        if (m_traceLimitCallback)
+            m_traceLimitCallback();
+
+        m_traceLimitCallbackInvoked = true;
         clear();
     }
 }
@@ -654,14 +656,14 @@ void GdiHandleTracer::clear()
     m_regionHandles.clear();
 }
 
-bool GdiHandleTracer::isReportCreated() const
-{
-    return m_reportCreated;
-}
-
 GdiHandleTracer::GdiHandleTracer()
 {
     m_callStackProvider.reset(new CallStackProvider);
+}
+
+bool GdiHandleTracer::isTraceLimitCallbackInvoked() const
+{
+    return m_traceLimitCallbackInvoked;
 }
 
 GdiHandleTracer* GdiHandleTracer::getInstance()
@@ -789,14 +791,14 @@ void GdiHandleTracer::detachGdiDetours()
     DetourTransactionCommit();
 }
 
-void GdiHandleTracer::setReportPath(const std::filesystem::path& path)
-{
-    m_reportPath = path;
-}
-
 void GdiHandleTracer::setGdiTraceLimit(int handleCount)
 {
     m_gdiTraceLimit = handleCount;
+}
+
+void GdiHandleTracer::setGdiTraceLimitCallback(const std::function<void()>& callback)
+{
+    m_traceLimitCallback = callback;
 }
 
 std::string GdiHandleTracer::getReport() const
@@ -840,21 +842,9 @@ std::string GdiHandleTracer::getReport() const
     return stream.str();
 }
 
-void GdiHandleTracer::saveReportToFile(const std::filesystem::path& path) const
-{
-    if (path.empty())
-        return;
-    std::ofstream outFileStream(path, std::ofstream::out | std::ofstream::trunc);
-    if (outFileStream.is_open())
-    {
-        outFileStream << getReport();
-        outFileStream.close();
-    }
-}
-
 void GdiHandleTracer::traceBitmap(HBITMAP handle)
 {
-    if (!isReportCreated())
+    if (!isTraceLimitCallbackInvoked())
     {
         m_bitmapHandles[handle] = m_callStackProvider->getCallStack(kTopEntriesStripCount);
         checkGdiHandlesCount();
@@ -863,7 +853,7 @@ void GdiHandleTracer::traceBitmap(HBITMAP handle)
 
 void GdiHandleTracer::traceBrush(HBRUSH handle)
 {
-    if (!isReportCreated())
+    if (!isTraceLimitCallbackInvoked())
     {
         m_brushHandles[handle] = m_callStackProvider->getCallStack(kTopEntriesStripCount);
         checkGdiHandlesCount();
@@ -872,7 +862,7 @@ void GdiHandleTracer::traceBrush(HBRUSH handle)
 
 void GdiHandleTracer::tracePalette(HPALETTE handle)
 {
-    if (!isReportCreated())
+    if (!isTraceLimitCallbackInvoked())
     {
         m_paletteHandles[handle] = m_callStackProvider->getCallStack(kTopEntriesStripCount);
         checkGdiHandlesCount();
@@ -881,7 +871,7 @@ void GdiHandleTracer::tracePalette(HPALETTE handle)
 
 void GdiHandleTracer::traceFont(HFONT handle)
 {
-    if (!isReportCreated())
+    if (!isTraceLimitCallbackInvoked())
     {
         m_fontHandles[handle] = m_callStackProvider->getCallStack(kTopEntriesStripCount);
         checkGdiHandlesCount();
@@ -890,7 +880,7 @@ void GdiHandleTracer::traceFont(HFONT handle)
 
 void GdiHandleTracer::traceRegion(HRGN handle)
 {
-    if (!isReportCreated())
+    if (!isTraceLimitCallbackInvoked())
     {
         m_regionHandles[handle] = m_callStackProvider->getCallStack(kTopEntriesStripCount);
         checkGdiHandlesCount();
@@ -899,7 +889,7 @@ void GdiHandleTracer::traceRegion(HRGN handle)
 
 void GdiHandleTracer::removeGdiObject(HGDIOBJ handle)
 {
-    if (!isReportCreated())
+    if (!isTraceLimitCallbackInvoked())
     {
         m_bitmapHandles.erase(static_cast<HBITMAP>(handle));
         m_brushHandles.erase(static_cast<HBRUSH>(handle));
@@ -912,7 +902,7 @@ void GdiHandleTracer::removeGdiObject(HGDIOBJ handle)
 
 void GdiHandleTracer::traceMetafile(HDC handle)
 {
-    if (!isReportCreated())
+    if (!isTraceLimitCallbackInvoked())
     {
         m_metafileHandles[handle] = m_callStackProvider->getCallStack(kTopEntriesStripCount);
         checkGdiHandlesCount();
@@ -921,13 +911,13 @@ void GdiHandleTracer::traceMetafile(HDC handle)
 
 void GdiHandleTracer::removeMetafile(HDC handle)
 {
-    if (!isReportCreated())
+    if (!isTraceLimitCallbackInvoked())
         m_metafileHandles.erase(handle);
 }
 
 void GdiHandleTracer::traceDc(HDC handle)
 {
-    if (!isReportCreated())
+    if (!isTraceLimitCallbackInvoked())
     {
         m_dcHandles[handle] = m_callStackProvider->getCallStack(kTopEntriesStripCount);
         checkGdiHandlesCount();
@@ -936,7 +926,7 @@ void GdiHandleTracer::traceDc(HDC handle)
 
 void GdiHandleTracer::removeDc(HDC handle)
 {
-    if (!isReportCreated())
+    if (!isTraceLimitCallbackInvoked())
         m_dcHandles.erase(handle);
 }
 

@@ -290,16 +290,16 @@ TEST_F(CameraSettingsDialogStateReducerTest, disableMotionBrushIfDualStreamingIs
 
     State initial = Reducer::loadCameras(std::move(enableDeviceOptimization), { camera });
     ASSERT_TRUE(initial.hasMotion());
-    ASSERT_TRUE(initial.supportsDualStreamRecording());
+    ASSERT_TRUE(initial.hasDualStreaming());
 
     State disabledDualStreaming = Reducer::setDualStreamingDisabled(std::move(initial), true);
     ASSERT_FALSE(disabledDualStreaming.hasMotion());
-    ASSERT_FALSE(disabledDualStreaming.supportsDualStreamRecording());
+    ASSERT_FALSE(disabledDualStreaming.hasDualStreaming());
 
     State enabledDualStreaming = Reducer::setDualStreamingDisabled(
         std::move(disabledDualStreaming), false);
     ASSERT_TRUE(enabledDualStreaming.hasMotion());
-    ASSERT_TRUE(enabledDualStreaming.supportsDualStreamRecording());
+    ASSERT_TRUE(enabledDualStreaming.hasDualStreaming());
 }
 
 // "Motion" and "Motion + Lo-Res" recording type must always be available if camera settings
@@ -314,17 +314,17 @@ TEST_F(CameraSettingsDialogStateReducerTest, enableMotionBrushIfDeviceOptimizati
 
     State initial = Reducer::loadCameras(std::move(enableDeviceOptimization), { camera });
     ASSERT_TRUE(initial.hasMotion());
-    ASSERT_TRUE(initial.supportsDualStreamRecording());
+    ASSERT_TRUE(initial.hasDualStreaming());
 
     State disabledDualStreaming = Reducer::setDualStreamingDisabled(std::move(initial), true);
     ASSERT_FALSE(disabledDualStreaming.hasMotion());
-    ASSERT_FALSE(disabledDualStreaming.supportsDualStreamRecording());
+    ASSERT_FALSE(disabledDualStreaming.hasDualStreaming());
 
     State disableDeviceOptimization = Reducer::setSettingsOptimizationEnabled(
         std::move(disabledDualStreaming), false);
 
     ASSERT_TRUE(disableDeviceOptimization.hasMotion());
-    ASSERT_TRUE(disableDeviceOptimization.supportsDualStreamRecording());
+    ASSERT_TRUE(disableDeviceOptimization.hasDualStreaming());
 }
 
 // "Motion" recording type must be available if user forces MD on the primary stream.

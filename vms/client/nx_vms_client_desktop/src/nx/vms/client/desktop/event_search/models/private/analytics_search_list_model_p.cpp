@@ -189,7 +189,7 @@ QVariant AnalyticsSearchListModel::Private::data(const QModelIndex& index, int r
 
         case Qn::PreviewStreamSelectionRole:
             return QVariant::fromValue(
-                nx::api::CameraImageRequest::StreamSelectionMode::sameAsAnalytics);
+                nx::api::ImageRequest::StreamSelectionMode::sameAsAnalytics);
 
         case Qn::DurationRole:
             return QVariant::fromValue(objectDuration(object));

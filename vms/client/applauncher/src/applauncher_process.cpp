@@ -48,8 +48,7 @@ ApplauncherProcess::ApplauncherProcess(
     :
     m_settings(settings),
     m_installationManager(installationManager),
-    m_startupParameters(startupParameters),
-    m_taskServer(this)
+    m_startupParameters(startupParameters)
 {
 }
 
@@ -71,71 +70,82 @@ void ApplauncherProcess::pleaseStop()
     m_killProcessTasks.clear();
 }
 
-void ApplauncherProcess::processRequest(
-    const std::shared_ptr<BaseTask>& request,
-    Response** const response)
+void ApplauncherProcess::initChannels()
 {
-    switch (request->type)
-    {
-        case TaskType::quit:
+    m_taskServer.subscribe(serializeTaskType(TaskType::quit),
+        [this](const QByteArray& /*data*/) -> bool
+        {
+            NX_INFO(this, "processRequest() - received a command to stop. Exiting.");
+            m_taskServer.pleaseStop();
             pleaseStop();
-            break;
+            return true;
+        });
 
-        case TaskType::startApplication:
+    subscribe<PingRequest, PingResponse>(TaskType::pingApplauncher,
+        [](const PingRequest& request, PingResponse& response)
+        {
+            response.pingId = request.pingId;
+            response.pingRequestStamp = request.pingStamp;
+        });
+
+    subscribe<StartApplicationTask, Response>(TaskType::startApplication,
+        [this](const StartApplicationTask& request, Response& response)
+        {
             m_installationManager->updateInstalledVersionsInformation();
-            *response = new Response();
-            startApplication(
-                std::static_pointer_cast<StartApplicationTask>(request),
-                *response);
-            break;
+            startApplication(request, response);
+        });
 
-        case TaskType::installZip:
-            *response = new Response();
-            installZip(
-                std::static_pointer_cast<InstallZipTask>(request),
-                *response);
-            break;
-
-        case TaskType::startZipInstallation:
-            *response = new Response();
-            installZipAsync(
-                std::static_pointer_cast<InstallZipTaskAsync>(request),
-                *response);
-            break;
-
-        case TaskType::checkZipProgress:
-            *response = new InstallZipCheckStatusResponse();
-            checkInstallationProgress(
-                std::static_pointer_cast<InstallZipCheckStatus>(request),
-                static_cast<InstallZipCheckStatusResponse*>(*response));
-            break;
-
-        case TaskType::isVersionInstalled:
+    subscribe<StartApplicationTask, Response>(TaskType::startApplication,
+        [this](const StartApplicationTask& request, Response& response)
+        {
             m_installationManager->updateInstalledVersionsInformation();
-            *response = new IsVersionInstalledResponse();
-            isVersionInstalled(
-                std::static_pointer_cast<IsVersionInstalledRequest>(request),
-                static_cast<IsVersionInstalledResponse*>(*response));
-            break;
+            startApplication(request, response);
+        });
 
-        case TaskType::getInstalledVersions:
+    subscribe<InstallZipTask, Response>(
+        TaskType::installZip,
+        [this](const InstallZipTask& request, Response& response)
+        {
+            installZip(request, response);
+        });
+
+    subscribe<InstallZipTaskAsync, Response>(
+        TaskType::startZipInstallation,
+        [this](const InstallZipTaskAsync& request, Response& response)
+        {
+            installZipAsync(request, response);
+        });
+
+    subscribe<InstallZipCheckStatus, InstallZipCheckStatusResponse>(
+        TaskType::checkZipProgress,
+        [this](const InstallZipCheckStatus& request, InstallZipCheckStatusResponse& response)
+        {
+            checkInstallationProgress(request, response);
+        });
+
+    subscribe<IsVersionInstalledRequest, IsVersionInstalledResponse>(
+        TaskType::isVersionInstalled,
+        [this](const IsVersionInstalledRequest& request, IsVersionInstalledResponse& response)
+        {
             m_installationManager->updateInstalledVersionsInformation();
-            *response = new GetInstalledVersionsResponse();
-            getInstalledVersions(
-                std::static_pointer_cast<GetInstalledVersionsRequest>(request),
-                static_cast<GetInstalledVersionsResponse*>(*response));
-            break;
+            isVersionInstalled(request, response);
+        });
 
-        case TaskType::addProcessKillTimer:
-            *response = new AddProcessKillTimerResponse();
-            addProcessKillTimer(
-                std::static_pointer_cast<AddProcessKillTimerRequest>(request),
-                static_cast<AddProcessKillTimerResponse*>(*response));
-            break;
+    subscribe<GetInstalledVersionsRequest, GetInstalledVersionsResponse>(
+        TaskType::getInstalledVersions,
+        [this](const GetInstalledVersionsRequest& request, GetInstalledVersionsResponse& response)
+        {
+            m_installationManager->updateInstalledVersionsInformation();
+            getInstalledVersions(request, response);
+        });
 
-        default:
-            break;
-    }
+    subscribe<AddProcessKillTimerRequest, AddProcessKillTimerResponse>(
+        TaskType::addProcessKillTimer,
+        [this](const AddProcessKillTimerRequest& request, AddProcessKillTimerResponse& response)
+        {
+            m_installationManager->updateInstalledVersionsInformation();
+            addProcessKillTimer(request, response);
+        });
 }
 
 void ApplauncherProcess::launchClient()
@@ -148,10 +158,9 @@ void ApplauncherProcess::launchClient()
     enum { kTriesCount = 2 };
     for (int i = 0; i < kTriesCount; ++i)
     {
-        const auto startAppTask = std::make_shared<StartApplicationTask>(
-            versionToLaunch,
+        StartApplicationTask startAppTask(versionToLaunch,
             m_startupParameters.clientCommandLineParameters);
-        if (startApplication(startAppTask, &response))
+        if (startApplication(startAppTask, response))
             break;
     }
 }
@@ -206,17 +215,17 @@ nx::utils::SoftwareVersion ApplauncherProcess::getVersionToLaunch() const
 }
 
 bool ApplauncherProcess::startApplication(
-    const std::shared_ptr<StartApplicationTask>& task,
-    Response* const response)
+    const StartApplicationTask& task,
+    Response& response)
 {
     NX_VERBOSE(this, "Entered LaunchingApplication");
 
-    auto installation = m_installationManager->installationForVersion(task->version);
+    auto installation = m_installationManager->installationForVersion(task.version);
 
     if (!installation)
     {
         installation = m_installationManager->installationForVersion(
-            m_installationManager->nearestInstalledVersion(task->version));
+            m_installationManager->nearestInstalledVersion(task.version));
     }
 
     if (!installation)
@@ -227,19 +236,19 @@ bool ApplauncherProcess::startApplication(
 
     if (installation.isNull())
     {
-        NX_DEBUG(this, "Failed to find installed version %1", task->version);
-        response->result = ResultType::versionNotInstalled;
+        NX_DEBUG(this, "Failed to find installed version %1", task.version);
+        response.result = ResultType::versionNotInstalled;
         return false;
     }
 
-    task->version = installation->version();
+    auto targetVersion = installation->version();
 
     //TODO/IMPL start process asynchronously ?
 
     const QString binPath = installation->executableFilePath();
     QStringList environment = QProcess::systemEnvironment();
 
-    auto arguments = task->arguments;
+    auto arguments = task.arguments;
 
     if (QnAppInfo::applicationPlatform() == "linux")
     {
@@ -293,7 +302,7 @@ bool ApplauncherProcess::startApplication(
         }
     }
 
-    NX_VERBOSE(this, "Launching version %1 (path %2)", task->version, binPath);
+    NX_VERBOSE(this, "Launching version %1 (path %2)", targetVersion, binPath);
 
     const QFileInfo info(binPath);
     if (ProcessUtils::startProcessDetached(
@@ -304,38 +313,36 @@ bool ApplauncherProcess::startApplication(
         info.absolutePath(),
         environment))
     {
-        NX_DEBUG(this, "Successfully launched version %1 (path %2)", task->version, binPath);
+        NX_DEBUG(this, "Successfully launched version %1 (path %2)", targetVersion, binPath);
         m_settings->sync();
-        response->result = ResultType::ok;
+        response.result = ResultType::ok;
         return true;
     }
 
-    NX_DEBUG(this, "Failed to launch version %1 (path %2)", task->version, binPath);
-    response->result = ResultType::ioError;
+    NX_DEBUG(this, "Failed to launch version %1 (path %2)", targetVersion, binPath);
+    response.result = ResultType::ioError;
     return false;
 }
 
-bool ApplauncherProcess::installZip(
-    const std::shared_ptr<InstallZipTask>& request,
-    Response* const response)
+bool ApplauncherProcess::installZip(const InstallZipTask& request, Response& response)
 {
-    response->result = m_installationManager->installZip(request->version, request->zipFileName);
-    return response->result == ResultType::ok;
+    response.result = m_installationManager->installZip(request.version, request.zipFileName);
+    return response.result == ResultType::ok;
 }
 
 bool ApplauncherProcess::installZipAsync(
-    const std::shared_ptr<InstallZipTaskAsync>& request,
-    Response* const response)
+    const InstallZipTaskAsync& request,
+    Response& response)
 {
     bool canStartInstallation = false;
     if (!m_process.isEmpty())
     {
         // It is ok if we are already installing the same file and version.
-        if (m_process.equals(request->version, request->zipFileName))
+        if (m_process.equals(request.version, request.zipFileName))
         {
             NX_INFO(this, "installZipAsync() - already installing version %1 from file %2",
-                request->version, request->zipFileName);
-            response->result = ResultType::ok;
+                request.version, request.zipFileName);
+            response.result = ResultType::ok;
         }
         else if (
             m_process.result.wait_for(std::chrono::milliseconds(1)) == std::future_status::ready)
@@ -348,9 +355,9 @@ bool ApplauncherProcess::installZipAsync(
         else
         {
             NX_ERROR(this, "installZipAsync() - can not start installing version %1 from %2: "
-                    "already installing from %3", request->version, request->zipFileName,
+                    "already installing from %3", request.version, request.zipFileName,
                     m_process.getFile());
-            response->result = ResultType::busy;
+            response.result = ResultType::busy;
         }
     }
     else
@@ -361,97 +368,97 @@ bool ApplauncherProcess::installZipAsync(
     if (canStartInstallation)
     {
         NX_VERBOSE(this, "Starting async installation for version %1 from file %2",
-            request->version, request->zipFileName);
+            request.version, request.zipFileName);
         m_process.result = std::async(std::launch::async,
             [this, request]() -> ResultType
             {
                 {
                     std::scoped_lock<std::mutex> lock(m_process.mutex);
-                    m_process.version = request->version;
-                    m_process.fileName = request->zipFileName;
+                    m_process.version = request.version;
+                    m_process.fileName = request.zipFileName;
                 }
-                auto result = m_installationManager->installZip(request->version, request->zipFileName);
+                auto result = m_installationManager->installZip(request.version, request.zipFileName);
                 m_process.reset();
                 return result;
             });
-        response->result = ResultType::ok;
+        response.result = ResultType::ok;
         NX_INFO(this, "Started async installation for version %1 from file %2",
-            request->version, request->zipFileName);
+            request.version, request.zipFileName);
     }
 
-    return response->result == ResultType::ok;
+    return response.result == ResultType::ok;
 }
 
 bool ApplauncherProcess::checkInstallationProgress(
-    const std::shared_ptr<nx::vms::applauncher::api::InstallZipCheckStatus>& /*request*/,
-    applauncher::api::InstallZipCheckStatusResponse* const response)
+    const nx::vms::applauncher::api::InstallZipCheckStatus& /*request*/,
+    applauncher::api::InstallZipCheckStatusResponse& response)
 {
     if (!m_process.isEmpty())
     {
         if (m_process.result.wait_for(std::chrono::milliseconds(1)) == std::future_status::ready)
         {
-            response->result = m_process.result.get();
+            response.result = m_process.result.get();
             NX_DEBUG(this,
                 "checkInstallationProgress() - complete, result=%1",
-                response->result);
+                response.result);
         }
         else
         {
             QString fileName = m_process.getFile();
-            response->result = ResultType::unpackingZip;
+            response.result = ResultType::unpackingZip;
             NX_DEBUG(this,
                 "checkInstallationProgress() - still installing %1", fileName);
         }
 
-        response->total = m_installationManager->getBytesTotal();
-        response->extracted = m_installationManager->getBytesExtracted();
+        response.total = m_installationManager->getBytesTotal();
+        response.extracted = m_installationManager->getBytesExtracted();
     }
     else
     {
-        response->result = ResultType::ok;
+        response.result = ResultType::ok;
         NX_DEBUG(this,
             "checkInstallationProgress() - there is no active installation");
     }
 
-    return response->result == ResultType::ok;
+    return response.result == ResultType::ok;
 }
 
 bool ApplauncherProcess::isVersionInstalled(
-    const std::shared_ptr<IsVersionInstalledRequest>& request,
-    IsVersionInstalledResponse* const response)
+    const IsVersionInstalledRequest& request,
+    IsVersionInstalledResponse& response)
 {
-    response->installed = m_installationManager->isVersionInstalled(request->version);
+    response.installed = m_installationManager->isVersionInstalled(request.version);
     return true;
 }
 
 bool ApplauncherProcess::getInstalledVersions(
-    const std::shared_ptr<GetInstalledVersionsRequest>& /*request*/,
-    GetInstalledVersionsResponse* const response)
+    const GetInstalledVersionsRequest& /*request*/,
+    GetInstalledVersionsResponse& response)
 {
-    response->versions = m_installationManager->installedVersions();
+    response.versions = m_installationManager->installedVersions();
     return true;
 }
 
 bool ApplauncherProcess::addProcessKillTimer(
-    const std::shared_ptr<AddProcessKillTimerRequest>& request,
-    AddProcessKillTimerResponse* const response)
+    const AddProcessKillTimerRequest& request,
+    AddProcessKillTimerResponse& response)
 {
     KillProcessTask task;
-    task.processID = request->processId;
+    task.processID = request.processId;
     {
         std::lock_guard<std::mutex> lk(m_mutex);
         if (m_terminated)
         {
-            response->result = ResultType::otherError;
+            response.result = ResultType::otherError;
             return true;
         }
 
         m_killProcessTasks[nx::utils::TimerManager::instance()->addTimer(
             this,
-            std::chrono::milliseconds(request->timeoutMillis))] = task;
+            std::chrono::milliseconds(request.timeoutMillis))] = task;
     }
 
-    response->result = ResultType::ok;
+    response.result = ResultType::ok;
     return true;
 }
 

@@ -1,5 +1,6 @@
 #include "storage_provider.h"
 
+#include <nx/fusion/serialization/lexical.h>
 #include <core/resource_management/resource_pool.h>
 #include <media_server/media_server_module.h>
 

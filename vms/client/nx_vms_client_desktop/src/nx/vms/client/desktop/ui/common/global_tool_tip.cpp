@@ -216,7 +216,7 @@ void GlobalToolTipAttached::Private::adjustPosition()
 {
     auto toolTip = instance();
 
-    if (!item || !toolTip)
+    if (!item || !toolTip || !item->window())
         return;
 
     QQuickItem* root = item->window()->contentItem();

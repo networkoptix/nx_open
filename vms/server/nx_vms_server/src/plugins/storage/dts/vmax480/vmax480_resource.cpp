@@ -269,4 +269,13 @@ Qn::LicenseType QnPlVmax480Resource::calculateLicenseType() const
     return Qn::LC_VMAX;
 }
 
+void QnPlVmax480Resource::stopChunkReaders()
+{
+    QnMutexLocker lock(&m_chunkReaderMutex);
+    for (const auto& reader: m_chunkReaderMap)
+        reader->pleaseStop();
+    for (const auto& reader: m_chunkReaderMap)
+        reader->stop();
+}
+
 #endif // #ifdef ENABLE_VMAX

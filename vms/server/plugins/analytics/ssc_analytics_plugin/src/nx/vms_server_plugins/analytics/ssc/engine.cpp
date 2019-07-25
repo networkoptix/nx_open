@@ -200,7 +200,7 @@ void Engine::readAllowedPortNames()
     {
         NX_PRINT << "Failed to read configuration file. Default configuration will be used";
         const bool created = iniFile.open(QFile::WriteOnly);
-        if (created)
+        if (!created)
         {
             NX_PRINT << "Failed to create configuration file with default settings";
         }

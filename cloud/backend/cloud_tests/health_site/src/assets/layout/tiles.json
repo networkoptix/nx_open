@@ -95,7 +95,7 @@
                             "key"      : "relay-la",
                             "caption"  : "Los Angeles",
                             "messages" : {
-                                "error": "Connect to remote systems may not work for clients in Asia and Antarctica."
+                                "error": "Connect to remote systems may not work for clients on US West Coast."
                             }
                         },
                         {
@@ -104,6 +104,14 @@
                             "caption"  : "Sydney",
                             "messages" : {
                                 "error": "Connect to remote systems may not work for clients in Oceania."
+                            }
+                        },
+                        {
+                            "dimension": "traffic_relay_failure",
+                            "key"      : "relay-si",
+                            "caption"  : "Singapore",
+                            "messages" : {
+                                "error": "Connect to remote systems may not work for clients in Asia."
                             }
                         }
                     ],
@@ -118,11 +126,15 @@
                         },
                         {
                             "key"    : "relay-la",
-                            "message": "Connect to remote systems may not work for clients in Asia and Antarctica."
+                            "message": "Connect to remote systems may not work for clients on US West Coast."
                         },
                         {
                             "key"    : "relay-sy",
                             "message": "Connect to remote systems may not work for clients in Oceania."
+                        },
+                        {
+                            "key"    : "relay-si",
+                            "message": "Connect to remote systems may not work for clients in Asia."
                         }
                     ]
                 }

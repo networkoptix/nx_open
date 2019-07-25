@@ -35,7 +35,7 @@ public:
 
     QString text(int index) const;
     QString toolTip(int index) const;
-    QPixmap pixmap(int index) const;
+    QString decorationPath(int index) const;
     QColor color(int index) const;
     QnResourceList displayedResourceList(int index) const;
     int helpId(int index) const;
@@ -58,7 +58,7 @@ private:
     void clear();
 
     static int priority(QnSystemHealth::MessageType message);
-    static QPixmap pixmap(QnSystemHealth::MessageType message);
+    static QString decorationPath(QnSystemHealth::MessageType message);
 
 private:
     struct Item

@@ -3,6 +3,7 @@
 #include <memory>
 #include <unordered_map>
 #include <filesystem>
+#include <functional>
 #include <windows.h>
 
 namespace nx {
@@ -14,11 +15,12 @@ class GdiHandleTracer
 {
 public:
     static GdiHandleTracer* getInstance();
+    std::string getReport() const;
 
     void attachGdiDetours();
     void detachGdiDetours();
-    void setReportPath(const std::filesystem::path& path);
     void setGdiTraceLimit(int handleCount);
+    void setGdiTraceLimitCallback(const std::function<void()>& callback);
 
     void traceBitmap(HBITMAP handle);
     void traceBrush(HBRUSH handle);
@@ -35,9 +37,7 @@ public:
 
 private:
     GdiHandleTracer();
-    bool isReportCreated() const;
-    std::string getReport() const;
-    void saveReportToFile(const std::filesystem::path& path) const;
+    bool isTraceLimitCallbackInvoked() const;
     void checkGdiHandlesCount();
     void clear();
 
@@ -54,10 +54,10 @@ private:
     std::unordered_map<HFONT, std::string> m_fontHandles;
     std::unordered_map<HDC, std::string> m_metafileHandles;
     std::unordered_map<HRGN, std::string> m_regionHandles;
-    std::filesystem::path m_reportPath;
-    int m_gdiTraceLimit = 5000;
-    bool m_reportCreated = false;
 
+    int m_gdiTraceLimit = 5000;
+    bool m_traceLimitCallbackInvoked = false;
+    std::function<void()> m_traceLimitCallback;
 };
 
 } // namespace gdi_tracer
