@@ -46,7 +46,7 @@ if [ -d "$SOURCE_DIR/../.hg" ]; then
     hg log -r . --repository "$SOURCE_DIR/.." > static/version.txt
 elif [ -d "$SOURCE_DIR/../.git" ]; then
     format="changeset: %H%nrefs: %D%nparents: %P%nauthor: %aN <%aE>%ndate: %ad%nsummary: %s"
-    git -C "$SOURCE_DIR/.." show -s --format=$format > static/version.txt
+    git -C "$SOURCE_DIR/.." show -s --format="$format" > static/version.txt
 else
     echo "Error: Used VCS is not detected. Building without repository is not supported." >&2
     exit 1
