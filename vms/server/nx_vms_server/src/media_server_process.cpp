@@ -2433,7 +2433,7 @@ void MediaServerProcess::registerRestHandlers(
      *     string with search input;
      *     </li>
      *     </ul>
-     *     </br>Example of JSON object:
+     *     <br/>Example of JSON object:
      *     <code>{"boundingBox":{"height":0,"width":0.1,"x":0.,"y":1.},"freeText":"Test"}</code>
      * %param[proprietary]:enum format Data format. Default value is "json".
      *     %value ubjson Universal Binary JSON data format.
