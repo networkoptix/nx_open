@@ -20,6 +20,8 @@ public:
 
     virtual void forceUpdate() override;
 
+    Q_INVOKABLE int searchRoleId() const;
+
 signals:
     void minimalVersionChanged();
 

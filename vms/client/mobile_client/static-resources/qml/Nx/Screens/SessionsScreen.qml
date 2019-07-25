@@ -11,7 +11,9 @@ Page
     objectName: "sessionsScreen"
 
     leftButtonIcon.source: lp("/images/menu.png")
-    padding: 16
+
+    leftPadding: 12
+    rightPadding: 12
 
     onLeftButtonClicked: sideNavigation.open()
 
@@ -30,12 +32,81 @@ Page
         }
     ]
 
+    MouseArea
+    {
+        id: searchCanceller
+
+        z: 1
+        anchors.fill: parent
+
+        onPressed:
+        {
+            mouse.accepted = false
+            searchEdit.focus = false
+        }
+    }
+
+    Rectangle
+    {
+        id: searchPanel
+
+        color: sessionsScreen.backgroundColor
+
+        readonly property bool searching:
+            visible && (searchEdit.activeFocus || searchEdit.text.length)
+
+        readonly property point searchPanelPosition:
+        {
+            if (searchPanel.searching)
+                return Qt.point(0, 0)
+
+            return sessionsList.mapToItem(
+                searchPanel.parent,
+                sessionsList.originX - sessionsList.contentX,
+                sessionsList.originY - sessionsList.contentY)
+        }
+
+        x: searchPanelPosition.x
+        y: searchPanelPosition.y
+        z: 2
+
+        height: searchEdit.y + searchEdit.height + 12
+        width: sessionsList.width
+        visible: sessionsList.model.sourceRowsCount > 8
+
+        SearchEdit
+        {
+            id: searchEdit
+
+            property Item placeholder: searchPanel.searching ? null : placeholderHolder
+            property Item placeholderHolder: null
+
+            y: 4
+            height: 40
+            width: parent.width
+            onTextChanged:
+            {
+                sessionsList.model.filterWildcard = text
+                if (!text.length)
+                    sessionsList.positionViewAtBeginning()
+            }
+        }
+    }
+
     GridView
     {
         id: sessionsList
 
-        anchors.fill: parent
-        anchors.margins: -4
+        clip: true
+        width: parent.width
+        height: parent.height
+
+        header: Item
+        {
+            width: sessionsList.width
+            height: searchPanel.searching || searchPanel.visible ? searchPanel.height : 16
+            Component.onCompleted: searchEdit.placeholderHolder = this
+        }
 
         property real horizontalSpacing: 8
         property real verticalSpacing: cellsInRow > 1 ? 8 : 1
@@ -48,7 +119,10 @@ Page
         model: OrderedSystemsModel
         {
             id: systemsModel
+
             minimalVersion: "2.5"
+            filterCaseSensitivity: Qt.CaseInsensitive
+            filterRole: searchRoleId()
         }
 
         delegate: Item
@@ -58,11 +132,20 @@ Page
 
             SessionItem
             {
+                readonly property bool firstRowItem: index < sessionsList.cellsInRow
+                readonly property bool lastRowItem: sessionsList.count - index < sessionsList.cellsInRow
+                readonly property real verticalMargin: Math.floor(sessionsList.verticalSpacing / 2)
+                readonly property real horizontalMargin: sessionsList.horizontalSpacing / 2
+
                 anchors.fill: parent
-                anchors.leftMargin: sessionsList.horizontalSpacing / 2
-                anchors.rightMargin: sessionsList.horizontalSpacing / 2
-                anchors.topMargin: Math.floor(sessionsList.verticalSpacing / 2)
-                anchors.bottomMargin: sessionsList.verticalSpacing - anchors.topMargin
+                anchors.leftMargin: horizontalMargin
+                anchors.rightMargin: horizontalMargin
+                anchors.topMargin: firstRowItem
+                    ? 0
+                    : verticalMargin
+                anchors.bottomMargin: lastRowItem
+                    ? 16
+                    : sessionsList.verticalSpacing - verticalMargin
 
                 systemName: model.systemName
                 systemId: model.systemId
@@ -88,9 +171,6 @@ Page
             visible: liteMode
         }
         highlightMoveDuration: 0
-
-        displayMarginBeginning: 16
-        displayMarginEnd: 16 + mainWindow.bottomPadding
 
         focus: liteMode
 
@@ -137,14 +217,19 @@ Page
     {
         id: dummyMessage
 
-        anchors.fill: parent
-        anchors.topMargin: -16
-        anchors.bottomMargin: -24
-        title: qsTr("No Systems found")
-        description: qsTr(
-             "Check your network connection or press \"%1\" button "
-                 + "to enter a known server address.",
+        readonly property string kCheckNetworkMessage:
+            qsTr("Check your network connection or press \"%1\" button to enter a known server address.",
              "%1 is a button name").arg(customConnectionButton.text)
+
+        anchors.fill: parent
+        anchors.bottomMargin: -8
+
+        readonly property bool emptySearchMode:
+            searchPanel.searching && sessionsList.model.sourceRowsCount > 0
+
+        title: emptySearchMode ? qsTr("Nothing found") : qsTr("No Systems found")
+        description: emptySearchMode ? "" : kCheckNetworkMessage
+
         visible: false
 
         Timer
@@ -165,5 +250,23 @@ Page
                     qsTr("Cannot connect to Server")
         Workflow.openStandardDialog(
             message, qsTr("Check your network connection or contact a system administrator"))
+    }
+
+    Object
+    {
+        id: d
+
+        readonly property bool connectingState:
+        {
+            var state = connectionManager.connectionState
+            return state == QnConnectionManager.Connecting
+                || (state == QnConnectionManager.Connected && !connectionManager.online)
+        }
+
+        onConnectingStateChanged:
+        {
+            if (connectingState)
+                searchEdit.text = ""
+        }
     }
 }

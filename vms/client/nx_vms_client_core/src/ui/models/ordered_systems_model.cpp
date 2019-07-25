@@ -185,6 +185,11 @@ void QnOrderedSystemsModel::forceUpdate()
         NX_ASSERT(false, "Wrong source model!");
 }
 
+int QnOrderedSystemsModel::searchRoleId() const
+{
+    return QnSystemsModel::SearchRoleId;
+}
+
 WeightData QnOrderedSystemsModel::getWeight(const QModelIndex& modelIndex) const
 {
     WeightData result;

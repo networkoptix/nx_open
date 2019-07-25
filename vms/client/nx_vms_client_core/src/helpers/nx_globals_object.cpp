@@ -65,29 +65,29 @@ nx::vms::api::SoftwareVersion NxGlobalsObject::softwareVersion(const QString& ve
     return nx::vms::api::SoftwareVersion(version);
 }
 
-void NxGlobalsObject::ensureFlickableChildVisible(QQuickItem* item)
+bool NxGlobalsObject::ensureFlickableChildVisible(QQuickItem* item)
 {
     if (!item)
-        return;
+        return false;
 
     auto flickable = findFlickable(item);
     if (!flickable)
-        return;
+        return false;
 
     static const auto kDenyPositionCorrectionPropertyName = "denyFlickableVisibleAreaCorrection";
     const auto denyCorrection = flickable->property(kDenyPositionCorrectionPropertyName);
     if (denyCorrection.isValid() && denyCorrection.toBool())
-        return;
+        return false;
 
     const auto contentItem = flickable->contentItem();
     if (!contentItem || !itemIsAncestorOf(item, contentItem))
-        return;
+        return false;
 
     const auto rect = item->mapRectToItem(contentItem,
         QRect(0, 0, static_cast<int>(item->width()), static_cast<int>(item->height())));
 
     auto adjustContentPosition =
-        [](qreal position, qreal contentSize, qreal flickableSize,
+        [](qreal position, qreal origin, qreal contentSize, qreal flickableSize,
             qreal startMargin, qreal endMargin,
             qreal itemPosition, qreal itemSize)
         {
@@ -101,17 +101,21 @@ void NxGlobalsObject::ensureFlickableChildVisible(QQuickItem* item)
 
             position = qBound(-startMargin, position, contentSize - flickableSize + endMargin);
 
-            return position;
+            return position + origin;
         };
 
     flickable->setContentX(adjustContentPosition(
-        flickable->contentX(), flickable->contentWidth(), flickable->width(),
+        flickable->contentX(), flickable->originX(),
+        flickable->contentWidth(), flickable->width(),
         flickable->leftMargin(), flickable->rightMargin(),
         rect.x(), rect.width()));
     flickable->setContentY(adjustContentPosition(
-        flickable->contentY(), flickable->contentHeight(), flickable->height(),
+        flickable->contentY(), flickable->originY(),
+        flickable->contentHeight(), flickable->height(),
         flickable->topMargin(), flickable->bottomMargin(),
         rect.y(), rect.height()));
+
+    return true;
 }
 
 QnUuid NxGlobalsObject::uuid(const QString& uuid) const
