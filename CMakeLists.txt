@@ -9,7 +9,8 @@ nx_option(beta "Whether this build is a beta build" ON)
 set(buildNumber "0" CACHE STRING "Build number")
 set(eulaVersionOverride "" CACHE STRING "Overriden EULA version")
 
-# Remember to reset the in-version protocol number when updating the project version
+# Remember to reset the in-version protocol number in (cmake/vms_protocol_version.cmake) when
+# updating the project version.
 set(releaseVersion 4.1.0)
 
 nx_option(developerBuild
