@@ -13,8 +13,6 @@
 
 #include <ui/workaround/widgets_signals_workaround.h>
 
-#include <QtGui/QResizeEvent>
-
 namespace nx::vms::client::desktop {
 
 SecuritySettingsWidget::SecuritySettingsWidget(QWidget* parent):
@@ -22,6 +20,9 @@ SecuritySettingsWidget::SecuritySettingsWidget(QWidget* parent):
     ui(new Ui::SecuritySettingsWidget)
 {
     ui->setupUi(this);
+    ui->watermarkExplanationLabel->setText(tr(
+        "Watermarks will be displayed over live, archive and exported videos for non-admin users"
+        " only. You and other administrators will not see them."));
 
     setHelpTopic(ui->auditTrailCheckBox, Qn::AuditTrail_Help);
     setHelpTopic(ui->auditTrailHint, Qn::AuditTrail_Help);
@@ -209,18 +210,6 @@ void SecuritySettingsWidget::setReadOnlyInternal(bool readOnly)
     setReadOnly(ui->displayWatermarkCheckBox, readOnly);
     setReadOnly(ui->watermarkSettingsButton, readOnly);
     setReadOnly(ui->limitSessionLengthWidget, readOnly);
-}
-
-void SecuritySettingsWidget::resizeEvent(QResizeEvent* resizeEvent)
-{
-    base_type::resizeEvent(resizeEvent);
-    // Workaround for layout issues caused by incorrect size hint of word-wrapped QLabel.
-    if (ui->watermarkExplanationLabel->isVisible())
-    {
-        ui->watermarkExplanationLabel->setMinimumHeight(0);
-        ui->watermarkExplanationLabel->setMinimumHeight(
-            ui->watermarkExplanationLabel->heightForWidth(resizeEvent->size().width()));
-    }
 }
 
 } // namespace nx::vms::client::desktop

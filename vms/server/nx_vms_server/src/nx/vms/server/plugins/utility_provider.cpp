@@ -29,10 +29,7 @@ int64_t UtilityProvider::vmsSystemTimeSinceEpochMs() const
 
 const nx::sdk::IString* UtilityProvider::homeDir() const
 {
-    if (const auto pluginInfo = m_pluginManager->pluginInfo(m_plugin))
-        return new nx::sdk::String(pluginInfo->homeDir.toStdString());
-
-    return new nx::sdk::String(""); //< The error is already logged.
+    return new nx::sdk::String(m_pluginManager->pluginInfo(m_plugin)->homeDir.toStdString());
 }
 
 } // namespace nx::vms::server::plugins

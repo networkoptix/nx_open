@@ -5,75 +5,85 @@
 #include <nx/kit/utils.h>
 
 #include <utils/common/synctime.h>
-#include <nx/utils/placeholder_binder.h>
-#include <nx/utils/debug_helpers/debug_helpers.h>
 #include <nx/analytics/analytics_logging_ini.h>
-#include <nx/analytics/frame_info.h>
+#include <nx/utils/debug_helpers/debug_helpers.h>
+#include <nx/utils/log/to_string.h>
 
 namespace nx::analytics {
 
 using namespace std::chrono;
+using namespace nx::common::metadata;
 
 namespace {
 
-static const QString kCurrentTimeMsPlaceholder = "currentTimeMs";
+QString makeLogFileName(
+    const QString& analyticsLoggingPath,
+    const QString& logFilePrefix,
+    QnUuid deviceId,
+    QnUuid engineId,
+    nx::vms::api::StreamIndex streamIndex)
+{
+    if (analyticsLoggingPath.isEmpty())
+        return QString();
 
-static const QString kFrameTimestampMsPlaceholder = "frame_timestampMs";
-static const QString kFrameDiffFromCurrentTimeMsPlaceholder = "frame_diffFromCurrentTimeMs";
-static const QString kFrameDiffFromPrevMsPlaceholder = "frame_diffFromPrevMs";
+    QString fileName = logFilePrefix;
+    if (!deviceId.isNull())
+        fileName += QString("device_") + deviceId.toSimpleString();
 
-static const QString kMetadataTimestampMsPlaceholder = "metadata_timestampMs";
-static const QString kMetadataDiffFromCurrentTimeMsPlaceholder = "metadata_diffFromCurrentTimeMs";
-static const QString kMetadataDiffFromPrevMsPlaceholder = "metadata_diffFromPrevMs";
-static const QString kMetadataObjectCountPlaceholder = "metadata_objectCount";
-static const QString kMetadataObjectsPlaceholder = "metadata_objects";
-static const QString kAdditionalFrameInfoPlaceholder = "additional_frame_info";
-static const QString kAdditionalObjectMetadataInfoPlaceholder = "additional_object_metadata_info";
+    if (!engineId.isNull())
+    {
+        if (!deviceId.isNull())
+            fileName.append("_");
 
-static const QString kAdditionalFrameInfoPattern =
-    ", additionalInfo: {:" + kAdditionalFrameInfoPlaceholder + "}";
+        fileName += QString("engine_") + engineId.toSimpleString();
+    }
 
-static const QString kAdditionalObjectMetadataInfoPattern =
-    ", additionalInfo: {:" + kAdditionalObjectMetadataInfoPlaceholder + "}";
+    if (streamIndex != nx::vms::api::StreamIndex::undefined)
+    {
+        fileName.append("_");
+        fileName.append(streamIndex == nx::vms::api::StreamIndex::primary ? "high" : "low");
+    }
 
-static const QString kFrameLogPattern =
-    "frameTimestampMs {:" + kFrameTimestampMsPlaceholder + "}, "
-    "currentTimeMs {:" + kCurrentTimeMsPlaceholder + "}, "
-    "diffFromPrevMs {:" + kFrameDiffFromPrevMsPlaceholder + "}, "
-    "diffFromCurrentTimeMs {:" + kFrameDiffFromCurrentTimeMsPlaceholder + "}";
+    fileName.append(".log");
 
-static const QString kObjectMetadataLogPatternBase =
-    "metadataTimestampMs {:" + kMetadataTimestampMsPlaceholder + "}, "
-    "currentTimeMs {:" + kCurrentTimeMsPlaceholder + "}, "
-    "diffFromPrevMs {:" + kMetadataDiffFromPrevMsPlaceholder + "}, "
-    "diffFromCurrentTimeMs {:" + kMetadataDiffFromCurrentTimeMsPlaceholder + "}";
+    const QString logDirectoryPath = nx::utils::debug_helpers::debugFilesDirectoryPath(
+        loggingIni().analyticsLogPath);
 
-static const QString kObjectInfoPattern =
-    ", objects: {:" + kMetadataObjectCountPlaceholder + "}"
-    "{:" + kMetadataObjectsPlaceholder + "}";
+    if (logDirectoryPath.isEmpty())
+        return QString();
+
+    const QDir dir(logDirectoryPath);
+    return dir.absoluteFilePath(fileName);
+}
 
 static QString makeObjectsLogLines(
-    const std::vector<nx::common::metadata::DetectedObject>& objects)
+    const std::vector<nx::common::metadata::ObjectMetadata>& objectMetadataList)
 {
     static const QString kIndent = "    ";
 
-    if (objects.empty())
+    if (objectMetadataList.empty())
         return "";
 
     QString result = ":\n"; //< The previous line ends with object count.
 
-    for (int i = 0; i < (int) objects.size(); ++i)
+    for (int i = 0; i < (int) objectMetadataList.size(); ++i)
     {
-        const auto& object = objects.at(i);
+        const auto& object = objectMetadataList.at(i);
         result.append(kIndent);
 
         result.append(toString(object));
 
-        if (i < (int) objects.size() - 1) //< Not the last object.
+        if (i < (int) objectMetadataList.size() - 1) //< Not the last object metadata.
             result.append("\n");
     }
 
     return result;
+}
+
+template<typename Time>
+static QString toMsString(Time time)
+{
+    return QString::number(duration_cast<milliseconds>(time).count());
 }
 
 } // namespace
@@ -116,186 +126,95 @@ void MetadataLogger::pushData(
 
     if (data->dataType == QnAbstractMediaData::DataType::VIDEO)
     {
-        pushFrameInfo(
-            std::make_unique<nx::analytics::FrameInfo>(data->timestamp), additionalInfo);
+        pushFrameInfo({microseconds(data->timestamp)}, additionalInfo);
     }
     else if (data->dataType == QnAbstractMediaData::DataType::GENERIC_METADATA)
     {
-        nx::common::metadata::DetectionMetadataPacketPtr objectMetadata =
-            nx::common::metadata::fromMetadataPacket(
-                std::dynamic_pointer_cast<const QnCompressedMetadata>(data));
+        const ConstObjectMetadataPacketPtr objectMetadata =
+            fromCompressedMetadataPacket(std::dynamic_pointer_cast<const QnCompressedMetadata>(data));
 
         if (objectMetadata)
-            pushObjectMetadata(std::move(*objectMetadata), additionalInfo);
+            pushObjectMetadata(*objectMetadata, additionalInfo);
     }
 }
 
 void MetadataLogger::pushFrameInfo(
-    std::unique_ptr<IFrameInfo> frameInfo,
+    const FrameInfo& frameInfo,
     const QString& additionalFrameInfo)
 {
     if (!loggingIni().isLoggingEnabled())
         return;
 
-    m_prevFrameTimestamp = m_currentFrameTimestamp;
-    m_currentFrameTimestamp = frameInfo->timestamp();
-    m_additionalFrameInfo = additionalFrameInfo;
-
-    doLogging(kFrameLogPattern
-        + (m_additionalFrameInfo.isEmpty() ? QString() : kAdditionalFrameInfoPattern));
+    log(buildFrameLogString(frameInfo, additionalFrameInfo).toUtf8());
+    m_prevFrameTimestamp = frameInfo.timestamp;
 }
 
 void MetadataLogger::pushObjectMetadata(
-    nx::common::metadata::DetectionMetadataPacket metadataPacket,
+    const ObjectMetadataPacket& metadataPacket,
     const QString& additionalMetadataInfo)
 {
     if (!loggingIni().isLoggingEnabled())
         return;
 
     m_isLoggingBestShot = false;
-    if (metadataPacket.objects.size() == 1)
+    if (metadataPacket.objectMetadataList.size() == 1)
     {
-        if (metadataPacket.objects[0].bestShot)
+        if (metadataPacket.objectMetadataList[0].bestShot)
             m_isLoggingBestShot = true;
     }
 
+    log(buildObjectMetadataLogString(metadataPacket, additionalMetadataInfo).toUtf8());
     if (!m_isLoggingBestShot)
-    {
-        m_prevObjectMetadataPacket = std::move(m_currentObjectMetadataPacket);
-        m_currentObjectMetadataPacket = std::move(metadataPacket);
-    }
-    else
-    {
-        m_currentBestShotMetadataPacket = std::move(metadataPacket);
-    }
-
-    m_additionalObjectMetadataInfo = additionalMetadataInfo;
-    doLogging(kObjectMetadataLogPatternBase
-        + (m_additionalObjectMetadataInfo.isEmpty()
-            ? QString()
-            : kAdditionalObjectMetadataInfoPattern)
-        + (loggingIni().logObjectMetadataDetails ? kObjectInfoPattern : QString()));
+        m_prevObjectMetadataPacketTimestamp = microseconds(metadataPacket.timestampUs);
 }
 
-MetadataLogger::PlaceholderMap MetadataLogger::placeholderMap() const
+QString MetadataLogger::buildFrameLogString(
+    const FrameInfo& frameInfo,
+    const QString& additionalInfo)
 {
-    PlaceholderMap result;
-    const microseconds currentTime(qnSyncTime->currentUSecsSinceEpoch());
+    const microseconds currentTime{qnSyncTime->currentUSecsSinceEpoch()};
 
-    const auto& currentMetadataPacket = m_isLoggingBestShot
-        ? m_currentBestShotMetadataPacket
-        : m_currentObjectMetadataPacket;
+    QString result = QString("frameTimestampMs ") + toMsString(frameInfo.timestamp) + ", "
+        + "currentTimeMs " + toMsString(currentTime) + ", "
+        + "diffFromPrevMs " + toMsString(frameInfo.timestamp - m_prevFrameTimestamp) + ", "
+        + "diffFromCurrentTimeMs " + toMsString(frameInfo.timestamp - currentTime);
 
-    const auto& previousMetadataPacket = m_isLoggingBestShot
-        ? m_currentObjectMetadataPacket
-        : m_prevObjectMetadataPacket;
+    if (!additionalInfo.isEmpty())
+        result += ", additonalInfo: " + additionalInfo;
 
-    return {
-        {
-            kCurrentTimeMsPlaceholder,
-            QString::number(duration_cast<milliseconds>(currentTime).count())
-        },
-        {
-            kFrameTimestampMsPlaceholder,
-            QString::number(duration_cast<milliseconds>(m_currentFrameTimestamp).count())
-        },
-        {
-            kFrameDiffFromPrevMsPlaceholder,
-            QString::number(duration_cast<milliseconds>(
-                m_currentFrameTimestamp - m_prevFrameTimestamp).count())
-        },
-        {
-            kFrameDiffFromCurrentTimeMsPlaceholder,
-            QString::number(duration_cast<milliseconds>(
-                m_currentFrameTimestamp - currentTime).count())
-        },
-        {
-            kMetadataTimestampMsPlaceholder,
-            QString::number(currentMetadataPacket.timestampUsec / 1000)
-        },
-        {
-            kMetadataDiffFromCurrentTimeMsPlaceholder,
-            QString::number(duration_cast<milliseconds>(
-                microseconds(currentMetadataPacket.timestampUsec) - currentTime).count())
-        },
-        {
-            kMetadataDiffFromPrevMsPlaceholder,
-            QString::number((currentMetadataPacket.timestampUsec
-                - previousMetadataPacket.timestampUsec) / 1000)
-        },
-        {
-            kMetadataObjectCountPlaceholder,
-            QString::number(currentMetadataPacket.objects.size())
-        },
-        {
-            kMetadataObjectsPlaceholder,
-            makeObjectsLogLines(currentMetadataPacket.objects)
-        },
-        {
-            kAdditionalFrameInfoPlaceholder,
-            m_additionalFrameInfo
-        },
-        {
-            kAdditionalObjectMetadataInfoPlaceholder,
-            m_additionalObjectMetadataInfo
-        },
-    };
+    return result;
 }
 
-void MetadataLogger::doLogging(const QString& logPattern)
+QString MetadataLogger::buildObjectMetadataLogString(
+    const ObjectMetadataPacket& metadataPacket,
+    const QString& additionalInfo)
 {
-    if (logPattern.isEmpty())
-        return;
+    const microseconds currentTime{ qnSyncTime->currentUSecsSinceEpoch() };
+    const microseconds currentPacketTimestamp = microseconds(metadataPacket.timestampUs);
+    const microseconds diffFromPrev = currentPacketTimestamp - m_prevObjectMetadataPacketTimestamp;
 
-    nx::utils::PlaceholderBinder binder(logPattern);
-    const auto placeholders = placeholderMap();
-    binder.bind(placeholders);
+    QString result = QString("metadataTimestampMs ") + toMsString(currentPacketTimestamp) + ", "
+        + "currentTimeMs " + toMsString(currentTime) + ", "
+        + "diffFromPrevMs " + toMsString(diffFromPrev) + ", "
+        + "diffFromCurrentTimeMs " + toMsString(currentPacketTimestamp - currentTime);
 
-    QString logLine = binder.str();
+    if (!additionalInfo.isEmpty())
+        result += ", additonalInfo: " + additionalInfo;
+
+    result += ", objects: " + QString::number(metadataPacket.objectMetadataList.size());
+
+    if (!loggingIni().logObjectMetadataDetails)
+        result += makeObjectsLogLines(metadataPacket.objectMetadataList);
+
+    return result;
+}
+
+void MetadataLogger::log(QString logLine)
+{
     if (!logLine.isEmpty() && logLine.back() != '\n')
         logLine.append('\n');
 
     m_outputFile.write(logLine.toUtf8());
-}
-
-QString MetadataLogger::makeLogFileName(
-    const QString& analyticsLoggingPath,
-    const QString& logFilePrefix,
-    QnUuid deviceId,
-    QnUuid engineId,
-    nx::vms::api::StreamIndex streamIndex)
-{
-    if (analyticsLoggingPath.isEmpty())
-        return QString();
-
-    QString fileName = logFilePrefix;
-    if (!deviceId.isNull())
-        fileName += QString("device_") + deviceId.toSimpleString();
-
-    if (!engineId.isNull())
-    {
-        if (!deviceId.isNull())
-            fileName.append("_");
-
-        fileName += QString("engine_") + engineId.toSimpleString();
-    }
-
-    if (streamIndex != nx::vms::api::StreamIndex::undefined)
-    {
-        fileName.append("_");
-        fileName.append(streamIndex == nx::vms::api::StreamIndex::primary ? "high" : "low");
-    }
-
-    fileName.append(".log");
-
-    const QString logDirectoryPath = nx::utils::debug_helpers::debugFilesDirectoryPath(
-        loggingIni().analyticsLogPath);
-
-    if (logDirectoryPath.isEmpty())
-        return QString();
-
-    const QDir dir(logDirectoryPath);
-    return dir.absoluteFilePath(fileName);
 }
 
 } // namespace nx::analytics

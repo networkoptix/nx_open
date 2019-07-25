@@ -47,18 +47,30 @@ not address all the requirements of the plugin author, it may be subclassed or n
 the plugin can always implement everything from scratch using just interfaces from the header
 files.
 
-Also, some tools are provided with this SDK in `helpers` folders, which are recommended though not
-required to be used by a plugin:
+Also, some tools are provided with this SDK, which are recommended though not required to be used
+by a plugin:
 
-- `src/nx/sdk/ptr.h` - `class nx::sdk::Ptr`: Smart Pointer to objects implementing interfaces.
+- `src/nx/sdk/helpers/` - utilities and typical/base classes implementing interfaces, including:
+    - `ref_countable.h` - `class nx::sdk::RefCountable`: base class for objects implementing
+        `IRefCountable` interface.
+    - `ptr.h` - `class nx::sdk::Ptr`: Smart Pointer to reference-countable objects.
+    - `to_string.h` and `src/nx/sdk/helpers/uuid_helper.h`: Conversion functions.
 
-- `src/nx/sdk/to_string.h` and `src/nx/sdk/uuid_helper.h`: Conversion and other helper functions
-    for various SDK classes.
+- `src/nx/sdk/analytics/helpers/` - Analytics-related utilities and typical/base classes
+    implementing interfaces, including:
+    - `plugin.h` - `class nx::sdk::analytics::Plugin`: Base class for a typical implementation of
+        the `nx::sdk::analytics::IPlugin` interface; use it to start developing an Analytics
+        Plugin.
+    - `pixel_format.h`: Utilities for `enum IUncompressedFrame::PixelFormat`.
 
 - Pure C++ library `nx_kit` (which itself is an independent project with its own documentation)
     that offers convenient debug output (logging) and support for .ini files with options for
     experimenting (e.g. switching alternative implementations, or parameterizing the code), and a
     rudimentary framework for simple unit tests (used by the SDK itself, and plugin samples).
+
+The recommended way to start developing a plugin is the following: inherit your classes from
+`nx::sdk::analytics::Plugin`, `nx::sdk::analytics::Engine` and `nx::sdk::analytics::DeviceAgent`
+according to the Doxygen comments in those classes and interfaces they implement.
 
 ---------------------------------------------------------------------------------------------------
 ## Sample: building and installing

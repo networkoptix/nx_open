@@ -168,6 +168,9 @@ public:
      */
     QDir getDownloadDir() const;
 
+    /** Get available space in downloads folder. */
+    uint64_t getAvailableSpace() const;
+
     /**
      * Report-like object to describe a progress for a current action.
      */

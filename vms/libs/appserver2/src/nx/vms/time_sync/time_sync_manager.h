@@ -58,6 +58,14 @@ class TimeSyncManager: public AbstractTimeSyncManager, public /*mixin*/ QnCommon
 {
     Q_OBJECT
 public:
+
+    enum class Result
+    {
+        ok,
+        error,
+        incompatibleServer
+    };
+
     static const std::chrono::milliseconds kMaxJitterForLocalClock;
 
     static const QString kTimeSyncUrlPath;
@@ -86,7 +94,7 @@ public:
 protected:
     using AbstractStreamSocketPtr = std::unique_ptr<nx::network::AbstractStreamSocket>;
 
-    bool loadTimeFromServer(const QnRoute& route);
+    Result loadTimeFromServer(const QnRoute& route);
     void loadTimeFromLocalClock();
 
     virtual void updateTime() = 0;

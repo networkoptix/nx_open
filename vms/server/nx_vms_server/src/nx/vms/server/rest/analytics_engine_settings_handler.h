@@ -9,8 +9,11 @@ class AnalyticsEngineSettingsHandler: public nx::network::rest::Handler, public 
 {
 public:
     AnalyticsEngineSettingsHandler(QnMediaServerModule* serverModule);
-    virtual nx::network::rest::Response executeGet(const nx::network::rest::Request& request);
-    virtual nx::network::rest::Response executePost(const nx::network::rest::Request& request);
+    virtual nx::network::rest::Response executeGet(
+        const nx::network::rest::Request& request);
+
+    virtual nx::network::rest::Response executePost(
+        const nx::network::rest::Request& request);
 };
 
 } // namespace nx::vms::server

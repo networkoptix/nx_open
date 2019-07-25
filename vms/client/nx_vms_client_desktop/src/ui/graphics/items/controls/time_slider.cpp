@@ -628,6 +628,8 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem* parent, QGraphicsItem* tooltipParent):
 {
     setAutoHideToolTip(false);
 
+    setSkipUpdateOnSliderChange({ SliderRangeChange, SliderStepsChange, SliderValueChange, SliderMappingChange });
+
     /* Prepare thumbnail update timer. */
     m_thumbnailsUpdateTimer = new QTimer(this);
     connect(m_thumbnailsUpdateTimer, SIGNAL(timeout()), this, SLOT(updateThumbnailsStepSizeTimer()));

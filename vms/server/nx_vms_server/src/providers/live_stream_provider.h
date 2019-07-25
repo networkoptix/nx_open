@@ -117,7 +117,7 @@ private:
     size_t m_totalVideoFrames;
     size_t m_totalAudioFrames;
 
-    QnMotionEstimation m_motionEstimation[CL_MAX_CHANNELS];
+    std::vector<std::unique_ptr<QnMotionEstimation>> m_motionEstimation;
 
     QSize m_videoResolutionByChannelNumber[CL_MAX_CHANNELS];
     int m_softMotionLastChannel;

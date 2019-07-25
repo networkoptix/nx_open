@@ -1822,6 +1822,8 @@ void initialize(Manager* manager, Action* root)
 
     factory(PinCalendarAction)
         .flags(NoTarget)
+        .text(ContextMenu::tr("Pin Calendar")) //< To be displayed on the button tooltip
+        .toggledText(ContextMenu::tr("Unpin Calendar"))
         .checkable();
 
     factory(MinimizeDayTimeViewAction)

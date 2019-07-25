@@ -174,10 +174,12 @@ namespace ResourceDataKey
     static const QString kMultiresourceVideoChannelMapping("multiresourceVideoChannelMapping");
 
     static const QString kParseOnvifNotificationsWithHttpReader("parseOnvifNotificationsWithHttpReader");
+    static const QString kPullInputEventsAsOdm("pullInputEventsAsOdm");
+    static const QString kRenewIntervalForPullingAsOdm("renewIntervalForPullingAsOdm");
+
     static const QString kDisableHevc("disableHevc");
 
     static const QString DO_UPDATE_PORT_IN_SUBSCRIPTION_ADDRESS = lit("doUpdatePortInSubscriptionAddress");
-
 
     static const QString kDoUpdatePortInSubscriptionAddress("doUpdatePortInSubscriptionAddress");
 

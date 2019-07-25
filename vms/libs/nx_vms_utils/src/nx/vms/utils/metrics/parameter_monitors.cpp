@@ -3,7 +3,7 @@
 namespace nx::vms::utils::metrics {
 
 std::optional<Values> AbstractParameterMonitor::timeline(
-    uint64_t /*nowSecsSinceEpoch*/, std::chrono::milliseconds /*length*/)
+    std::chrono::milliseconds /*length*/) const
 {
     return std::nullopt;
 }

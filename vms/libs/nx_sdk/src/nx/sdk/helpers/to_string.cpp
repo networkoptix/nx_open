@@ -5,6 +5,8 @@
 #include <nx/kit/debug.h>
 #include <nx/kit/utils.h>
 
+#include <nx/sdk/helpers/ptr.h>
+
 namespace nx {
 namespace sdk {
 
@@ -13,6 +15,30 @@ static const int kLevelIndent = 4;
 static std::string indent(int overallIndent, int level)
 {
     return std::string(overallIndent, ' ') + std::string(kLevelIndent * level, ' ');
+}
+
+std::string toString(const IString* string)
+{
+    if (!string)
+        return std::string();
+
+    return std::string(string->str());
+}
+
+std::string toString(const IStringMap* map, int overallIndent)
+{
+    if (!map || map->count() == 0)
+        return std::string();
+
+    std::string result;
+    for (int i = 0; i < map->count(); ++i)
+    {
+        result += indent(overallIndent, 0)
+            + "[" + nx::kit::utils::toString(map->key(i)) + "]: "
+            + nx::kit::utils::toString(map->value(i)) + "\n";
+    }
+
+    return result;
 }
 
 std::string toJsonString(const IStringMap* map, int overallIndent)
@@ -60,6 +86,21 @@ std::string toJsonString(const IDeviceInfo* deviceInfo, int overallIndent)
 
     result += indent(overallIndent, 0) + "}";
     return result;
+}
+
+std::string toString(ErrorCode errorCode)
+{
+    switch (errorCode)
+    {
+        case ErrorCode::noError: return "noError";
+        case ErrorCode::otherError: return "otherError";
+        case ErrorCode::networkError: return "networkError";
+        case ErrorCode::unauthorized: return "unauthorized";
+        case ErrorCode::internalError: return "internalError";
+        case ErrorCode::invalidParams: return "invalidParams";
+        case ErrorCode::notImplemented: return "notImplemented";
+        default: return "<unsupported Error>";
+    }
 }
 
 } // namespace sdk

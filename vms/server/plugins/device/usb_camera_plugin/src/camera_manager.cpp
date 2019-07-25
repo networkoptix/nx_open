@@ -17,7 +17,7 @@ namespace usb_cam {
 CameraManager::CameraManager(const std::shared_ptr<Camera> camera):
     m_camera(camera),
     m_refManager(this),
-    m_pluginRef(Plugin::instance()),
+    m_pluginRef(nx::sdk::toPtr(Plugin::instance())),
     m_capabilities(
             nxcip::BaseCameraManager::nativeMediaStreamCapability |
             nxcip::BaseCameraManager::primaryStreamSoftMotionCapability |

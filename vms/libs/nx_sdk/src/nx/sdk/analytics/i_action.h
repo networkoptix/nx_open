@@ -15,7 +15,7 @@ namespace sdk {
 namespace analytics {
 
 /**
- * Object supplied to IEngine::executeAction().
+ * Data supplied to IEngine::executeAction().
  */
 class IAction: public Interface<IAction>
 {
@@ -25,13 +25,13 @@ public:
     /** Id of the action being triggered. */
     virtual const char* actionId() const = 0;
 
-    /** Id of a metadata object for which the action has been triggered. */
-    virtual Uuid objectId() const = 0;
+    /** Id of an object track for which the action has been triggered. */
+    virtual Uuid objectTrackId() const = 0;
 
     /** Id of a device from which the action has been triggered. */
     virtual Uuid deviceId() const = 0;
 
-    /** Info about an object track this action has been triggered from. */
+    /** Info about an object track this action has been triggered for. */
     virtual IObjectTrackInfo* objectTrackInfo() const = 0;
 
     /** Timestamp of a video frame from which the action has been triggered. */

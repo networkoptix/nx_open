@@ -8,7 +8,6 @@
 #include <nx/utils/system_error.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/platform/win32_syscall_resolver.h>
-#include <nx/utils/unused.h>
 
 #ifdef _WIN32
 #  include <iphlpapi.h>
@@ -1098,7 +1097,7 @@ bool TCPSocket::getNoDelay(bool* value) const
     return true;
 }
 
-bool TCPSocket::toggleStatisticsCollection(bool val)
+bool TCPSocket::toggleStatisticsCollection([[maybe_unused]] bool val)
 {
 #ifdef _WIN32
     //dynamically resolving functions that require win >= vista we want to use here
@@ -1144,15 +1143,13 @@ bool TCPSocket::toggleStatisticsCollection(bool val)
     }
     return true;
 #elif defined(__linux__)
-    nx::utils::unused(val);
     return true;
 #else
-    nx::utils::unused(val);
     return false;
 #endif
 }
 
-bool TCPSocket::getConnectionStatistics(StreamSocketInfo* info)
+bool TCPSocket::getConnectionStatistics([[maybe_unused]] StreamSocketInfo* info)
 {
 #ifdef _WIN32
     Win32TcpSocketImpl* d = static_cast<Win32TcpSocketImpl*>(impl());
@@ -1174,7 +1171,6 @@ bool TCPSocket::getConnectionStatistics(StreamSocketInfo* info)
     info->rttVar = tcpinfo.tcpi_rttvar / USEC_PER_MSEC;
     return true;
 #else
-    nx::utils::unused(info);
     return false;
 #endif
 }

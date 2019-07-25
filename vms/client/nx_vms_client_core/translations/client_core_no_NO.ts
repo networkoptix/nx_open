@@ -111,20 +111,20 @@
     <message>
       <source>Internal %1 error. Please contact support team.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Internal %1 error. Please contact support team.</translation>
+      <translation>Intern %1 feil. Ta kontakt med brukerstøtten.</translation>
     </message>
     <message>
       <source>Too many attempts. Try again in a minute.</source>
-      <translation type="unfinished">Too many attempts. Try again in a minute.</translation>
+      <translation>For mange forsøk. Prøv igjen om et minutt.</translation>
     </message>
     <message>
       <source>%1 is temporary unavailable. Please try again later.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">%1 is temporary unavailable. Please try again later.</translation>
+      <translation>%1 er midlertidig utilgjengelig. Prøv igjen senere.</translation>
     </message>
     <message>
       <source>Network error. Please check your Internet connection and try again.</source>
-      <translation type="unfinished">Network error. Please check your Internet connection and try again.</translation>
+      <translation>Nettverksfeil. Sjekk Internett-tilkoblingen din og prøv igjen.</translation>
     </message>
   </context>
   <context>
