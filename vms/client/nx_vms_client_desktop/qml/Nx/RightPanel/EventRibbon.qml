@@ -1,10 +1,18 @@
 import QtQuick 2.6
 import QtQuick.Controls 2.4
 
+import Nx.Controls 1.0
+
 ListView
 {
     id: view
+
+    boundsBehavior: Flickable.StopAtBounds
+    hoverHighlightColor: "transparent"
     spacing: 1
+    clip: true
+
+    ScrollBar.vertical: ScrollBar {}
 
     delegate: Loader
     {
@@ -12,7 +20,7 @@ ListView
 
         x: 8
         height: implicitHeight
-        width: parent.width - x - 8
+        width: parent.width - x - 16
 
         source:
         {
@@ -26,10 +34,67 @@ ListView
         {
             target: loader.item
             ignoreUnknownSignals: true
-            onCloseRequested: view.model.removeRow(index)
+
+            onCloseRequested:
+                view.model.removeRow(index)
         }
     }
 
+    add: Transition
+    {
+        id: addTransition
+
+        NumberAnimation
+        {
+            property: "opacity"
+            from: 0
+            to: 1
+            duration: 320
+            easing.type: Easing.OutQuad
+        }
+    }
+
+    remove: Transition
+    {
+        id: removeTransition
+
+        SequentialAnimation
+        {
+            ScriptAction
+            {
+                script: removeTransition.ViewTransition.item.enabled = false
+            }
+
+            NumberAnimation
+            {
+                property: "opacity"
+                to: 0
+                duration: 320
+                easing.type: Easing.OutQuad
+            }
+        }
+    }
+
+    displaced: Transition
+    {
+        id: displayTransition
+
+        NumberAnimation
+        {
+            property: "y"
+            duration: 320
+            easing.type: Easing.OutCubic
+        }
+
+        // Finish possibly unfinished add animation.
+        NumberAnimation
+        {
+            property: "opacity"
+            to: 1.0
+        }
+    }
+
+    // Paddings inside viewport.
     header: Item { height: 8; width: parent.width }
     footer: Item { height: 8; width: parent.width }
 }
