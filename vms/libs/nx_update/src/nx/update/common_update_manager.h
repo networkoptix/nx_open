@@ -22,6 +22,12 @@ class CommonUpdateManager: public QObject, public /*mixin*/ QnCommonModuleAware
     Q_OBJECT
 
 public:
+    enum class InformationCategory
+    {
+        target,
+        installed
+    };
+
     CommonUpdateManager(QnCommonModule* commonModule);
     void connectToSignals();
     update::Status status();
@@ -29,11 +35,20 @@ public:
     void retry(bool forceRedownload = false);
     void startUpdate(const QByteArray& content);
     void install(const QnAuthSession& authInfo);
-    bool participants(QList<QnUuid>* outParticipants) const;
-    bool setParticipants(const QList<QnUuid>& participants);
-    bool updateLastInstallationRequestTime();
+
+    update::Information updateInformation(InformationCategory category) const noexcept(false);
+    update::Information updateInformation(InformationCategory category, bool* ok) const;
+
+    void setUpdateInformation(
+        InformationCategory category,
+        const update::Information& information) noexcept(false);
+
+    void setUpdateInformation(
+        InformationCategory category,
+        const update::Information& information,
+        bool* ok);
+
     void finish();
-    vms::api::SoftwareVersion targetVersion() const;
 
 private:
     enum class DownloaderFailDetail
@@ -60,9 +75,6 @@ private:
     bool statusAppropriateForDownload(nx::update::Package* outPackage, update::Status* outStatus);
     bool installerState(update::Status* outUpdateStatus, const QnUuid& peerId);
     update::Status start();
-    bool deserializedUpdateInformation(update::Information* outUpdateInformation,
-        const QString& caller) const;
-    void setUpdateInformation(const update::Information& updateInformation);
 
     virtual vms::common::p2p::downloader::Downloader* downloader() = 0;
     virtual CommonUpdateInstaller* installer() = 0;

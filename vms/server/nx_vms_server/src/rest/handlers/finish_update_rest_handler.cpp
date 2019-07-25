@@ -20,21 +20,35 @@ bool QnFinishUpdateRestHandler::allPeersUpdatedSuccessfully() const
     const auto ifParticipantPredicate =
         makeIfParticipantPredicate(serverModule()->updateManager());
 
-    return ifParticipantPredicate && std::all_of(servers.cbegin(), servers.cend(),
-        [&ifParticipantPredicate,
-        targetVersion = serverModule()->updateManager()->targetVersion()](const auto& server)
-        {
-            const auto serverVersion = server->getModuleInformation().version;
-            switch (ifParticipantPredicate(server->getId(), serverVersion))
-            {
-                case ParticipationStatus::participant:
-                    return serverVersion == targetVersion;
-                case ParticipationStatus::notInList:
-                case ParticipationStatus::incompatibleVersion:
-                    return true;
-            }
-            return false;
-        });
+    try
+    {
+        const auto updateInfo = serverModule()->updateManager()->updateInformation(
+            nx::CommonUpdateManager::InformationCategory::target);
+
+        return ifParticipantPredicate
+            && std::all_of(
+                    servers.cbegin(),
+                    servers.cend(),
+                    [&ifParticipantPredicate, &updateInfo](const auto& server)
+                    {
+                        const auto serverVersion = server->getModuleInformation().version;
+                        switch (ifParticipantPredicate(server->getId(), serverVersion))
+                        {
+                            case ParticipationStatus::participant:
+                                return serverVersion == nx::vms::api::SoftwareVersion(updateInfo.version);
+                            case ParticipationStatus::notInList:
+                            case ParticipationStatus::incompatibleVersion:
+                                return true;
+                        }
+                        return false;
+                    });
+
+    }
+    catch (const std::exception& e)
+    {
+        NX_DEBUG(this, e.what());
+        return false;
+    }
 }
 
 int QnFinishUpdateRestHandler::executePost(
