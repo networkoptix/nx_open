@@ -2639,10 +2639,11 @@ void MediaServerProcess::registerRestHandlers(
      *     milliseconds since epoch, or a local time formatted like
      *     <code>"<i>YYYY</i>-<i>MM</i>-<i>DD</i>T<i>HH</i>:<i>mm</i>:<i>ss</i>.<i>zzz</i>"</code>
      *     - the format is auto-detected).
-     * %param[opt]:arrayJson filter This parameter is used for motion search ("periodsType" must
-     *     be 1). Match motion on a video by specified rectangle.
-     *     <br/>Format: string with a JSON list of <i>sensors</i>,
-     *     each <i>sensor</i> is a JSON list of <i>rects</i>, each <i>rect</i> is:
+     * %param[opt]:arrayJson filter This parameter is used for motion and analytics search
+     *     ("periodsType" must be set to 1 or 2). Search motion on a video according to specified
+     *     attributes.
+     *     <br/>Motion Search Format: string with a JSON list of <i>sensors</i>,
+     *     each <i>sensor</i> is a JSON list of <i>rectangles</i>, each <i>rectangle</i> is:
      *     <br/>
      *     <code>
      *         {"x": <i>x</i>, "y": <i>y</i>, "width": <i>width</i>,"height": <i>height</i>}
@@ -2654,6 +2655,24 @@ void MediaServerProcess::registerRestHandlers(
      *     <code>[[{"x":0,"y":0,"width":43,"height":31}]]</code>
      *     <br/>Example of two rectangles for a single-sensor camera:
      *     <code>[[{"x":0,"y":0,"width":5,"height":7},{"x":12,"y":10,"width":8,"height":6}]]</code>
+     *
+     *     <br/>Analytics Search Format: string with a JSON object that might take the following attributes
+     *     as an input:
+     *     <br/>
+     *     <ul>
+     *     <li>"boundingBox" key represents a <i>rectangle</i>. Value is a dictionary with same format
+     *     as for Motion Search rectangle;</li>
+     *     <li>"freeText" key for full-text search over analytics data attributes. Value is expected to be
+     *     string with search input;
+     *     </li>
+     *     <li>"timePeriod" key represents time range for analytics search. Value is expected to be dictionary
+     *     with keys "durationMs"(value is integer, duration in milliseconds) and "startTimeMs"(value is integer, start
+     *     position in milliseconds since epoch).
+     *     </li>
+     *     </ul>
+     *     </br>Example of JSON object:
+     *     <code>{"boundingBox":{"height":0,"width":0.1,"x":0.,"y":1.},"freeText":"Test",
+     *     "timePeriod":{"durationMs":"1000","startTimeMs":"1564065908000"}}</code>
      * %param[proprietary]:enum format Data format. Default value is "json".
      *     %value ubjson Universal Binary JSON data format.
      *     %value json JSON data format.
@@ -2663,7 +2682,8 @@ void MediaServerProcess::registerRestHandlers(
      *     amount of microseconds per screen pixel.
      * %param[opt]:integer periodsType Chunk type.
      *     %value 0 All records.
-     *     %value 1 Only chunks with motion (parameter "filter" is required).
+     *     %value 1 Only chunks with motion (parameter "filter" might be applied).
+     *     %value 2 Only chunks with analytics event(parameter "filter" might be applied).
      * %param[opt]:option keepSmallChunks If specified, standalone chunks smaller than the detail
      *     level are not removed from the result.
      * %param[opt]:integer limit Maximum number of chunks to return.
