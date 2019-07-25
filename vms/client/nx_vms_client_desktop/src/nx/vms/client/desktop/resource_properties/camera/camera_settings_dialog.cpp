@@ -129,6 +129,10 @@ struct CameraSettingsDialog::Private: public QObject
                 CameraSettingsDialogStateConversionFunctions::applyStateToCameras(state, cameras);
                 if (advancedSettingsWidget->hasChanges())
                     advancedSettingsWidget->submitToResource();
+
+                for (const auto& camera: cameras)
+                    camera->updatePreferredServerId();
+
                 resetChanges();
             };
 
