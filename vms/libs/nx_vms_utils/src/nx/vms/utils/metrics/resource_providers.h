@@ -11,6 +11,10 @@ struct ResourceDescription
     QString id;
     QString parent;
     QString name;
+    bool isLocal = true;
+
+    ResourceDescription(QString id, QString parent, QString name, bool isLocal = true):
+        id(std::move(id)), parent(std::move(parent)), name(std::move(name)), isLocal(isLocal) {}
 };
 
 class AbstractResourceProvider
@@ -22,12 +26,12 @@ public:
     virtual const api::metrics::ResourceManifest& manifest() const = 0;
 
     /** Starts monitoring for new resources. dataBaseAccess should be used to store their values. */
-    virtual void startMonitoring(DataBase::Access dataBaseAccess) = 0;
+    virtual void startMonitoring(DataBase::Writer dbWriter) = 0;
 
     /** Returns current resources with parameter values. */
-    virtual api::metrics::ResourceGroupValues values() const = 0;
+    virtual api::metrics::ResourceGroupValues values(bool includeRemote) const = 0;
     virtual api::metrics::ResourceGroupValues timeline(
-        uint64_t nowSecsSinceEpoch, std::chrono::milliseconds length) const = 0;
+        bool includeRemote, uint64_t nowSecsSinceEpoch, std::chrono::milliseconds length) const = 0;
 };
 
 /**
@@ -45,11 +49,11 @@ public:
     using ParameterProviderPtr = std::unique_ptr<AbstractParameterProvider<Resource>>;
 
     const api::metrics::ResourceManifest& manifest() const final;
-    void startMonitoring(DataBase::Access dbAccess) final;
+    void startMonitoring(DataBase::Writer dbWriter) final;
 
-    api::metrics::ResourceGroupValues values() const final;
+    api::metrics::ResourceGroupValues values(bool includeRemote) const final;
     api::metrics::ResourceGroupValues timeline(
-        uint64_t nowSecsSinceEpoch, std::chrono::milliseconds length) const final;
+        bool includeRemote, uint64_t nowSecsSinceEpoch, std::chrono::milliseconds length) const final;
 
 protected:
     /** Should be implemented in inheritors to begin resource discovery process. */
@@ -81,7 +85,7 @@ protected:
 private:
     const ParameterGroupProvider<Resource> m_parameters;
     mutable nx::utils::Mutex m_mutex;
-    DataBase::Access m_dbAccess;
+    DataBase::Writer m_dbWriter;
     std::map<Resource, ParameterMonitorPtr> m_resources;
 };
 
@@ -100,20 +104,23 @@ const api::metrics::ResourceManifest& ResourceProvider<ResourceType>::manifest()
 }
 
 template<typename ResourceType>
-void ResourceProvider<ResourceType>::startMonitoring(DataBase::Access dbAccess)
+void ResourceProvider<ResourceType>::startMonitoring(DataBase::Writer dbWriter)
 {
-    m_dbAccess = dbAccess;
+    m_dbWriter = dbWriter;
     startMonitoring();
 }
 
 template<typename ResourceType>
-api::metrics::ResourceGroupValues ResourceProvider<ResourceType>::values() const
+api::metrics::ResourceGroupValues ResourceProvider<ResourceType>::values(bool includeRemote) const
 {
     api::metrics::ResourceGroupValues groupValues;
     for (const auto& [resource, monitor]: m_resources)
     {
         if (auto description = describe(resource))
         {
+            if (!includeRemote && !description->isLocal)
+                continue;
+
             auto parameterValues = monitor->current();
             NX_ASSERT(!parameterValues.group.empty());
 
@@ -130,13 +137,16 @@ api::metrics::ResourceGroupValues ResourceProvider<ResourceType>::values() const
 
 template<typename ResourceType>
 api::metrics::ResourceGroupValues ResourceProvider<ResourceType>::timeline(
-    uint64_t nowSecsSinceEpoch, std::chrono::milliseconds length) const
+    bool includeRemote, uint64_t nowSecsSinceEpoch, std::chrono::milliseconds length) const
 {
     api::metrics::ResourceGroupValues groupValues;
     for (const auto& [resource, monitor]: m_resources)
     {
         if (auto description = describe(resource))
         {
+            if (!includeRemote && !description->isLocal)
+                continue;
+
             auto parameterValues = monitor->timeline(nowSecsSinceEpoch, length);
             if (!parameterValues)
                 continue;
@@ -182,11 +192,10 @@ void ResourceProvider<ResourceType>::changed(const Resource& resource)
     auto& monitor = m_resources[resource];
     if (const auto description = describe(resource))
     {
-        const auto& id = description->id;
         if (!monitor)
         {
             NX_DEBUG(this, "Start monitoring %1", resource);
-            monitor = m_parameters.monitor(resource, m_dbAccess[id]);
+            monitor = m_parameters.monitor(resource, m_dbWriter[description->id]);
         }
     }
     else

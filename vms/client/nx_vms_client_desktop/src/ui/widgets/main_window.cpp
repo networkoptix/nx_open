@@ -168,9 +168,14 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     setFullscreenTransitionHandler(this,
         [this](bool inProgress)
         {
-            setUpdatesEnabled(!inProgress);
-            if (!inProgress)
-                repaint();
+            if (inProgress)
+            {
+                setUpdatesEnabled(false);
+                return;
+            }
+
+            static constexpr int kSomeSmallDelay = 50;
+            executeDelayedParented([this]() { setUpdatesEnabled(true); }, kSomeSmallDelay, this);
         });
 
     // Since we have patch qt563_macos_window_level.patch we have to discard hidesOnDeactivate

@@ -122,6 +122,7 @@ public:
 
 signals:
     void started();
+    void startedWithSignalsProcessed();
 
 public slots:
     void stopAsync();
@@ -140,7 +141,6 @@ private slots:
     void at_storageManager_rebuildFinished(QnSystemHealth::MessageType msgType);
     void at_archiveBackupFinished(qint64 backedUpToMs, nx::vms::api::EventReason code);
     void at_timer();
-    void at_connectionOpened();
     void at_serverModuleConflict(nx::vms::discovery::ModuleEndpoint module);
 
     void at_appStarted();
@@ -153,6 +153,7 @@ private slots:
     void at_serverPropertyChanged(const QnResourcePtr& resource, const QString& key);
 
 private:
+    void writeServerStartedEvent();
     void updateDisabledVendorsIfNeeded();
     void updateAllowCameraChangesIfNeeded();
     void moveHandlingCameras();

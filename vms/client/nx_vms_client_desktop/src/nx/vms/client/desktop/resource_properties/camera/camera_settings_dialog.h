@@ -39,6 +39,7 @@ public:
     virtual void reject() override;
 
 protected:
+    virtual void showEvent(QShowEvent* event) override;
     virtual void buttonBoxClicked(QDialogButtonBox::StandardButton button) override;
 
 private:

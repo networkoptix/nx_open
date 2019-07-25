@@ -23,6 +23,7 @@ TreeView
     model: ResourceTreeModel
     {
         id: resourceTreeModel
+        context: workbenchContext
     }
 
     ModelDataAccessor

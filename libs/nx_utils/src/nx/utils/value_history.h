@@ -43,15 +43,31 @@ public:
     class Access
     {
     public:
-        explicit Access(Node* node = nullptr);
-        ValueHistory<Value>* operator->() const;
-        Access operator[](const Id& id) const;
+        explicit Access(Node* node = nullptr): m_node(node) {}
+        operator bool() const { return m_node; }
 
-    private:
-        Node* node = nullptr;
+    protected:
+        Node* m_node = nullptr;
     };
 
-    Access access(std::optional<Id> id = {});
+    class Reader: public Access
+    {
+    public:
+        using Access::Access;
+        const ValueHistory<Value>* operator->() const;
+        Reader operator[](const Id& id) const;
+    };
+
+    class Writer: public Access
+    {
+    public:
+        using Access::Access;
+        ValueHistory<Value>* operator->() const;
+        Writer operator[](const Id& id) const;
+    };
+
+    Reader reader(std::optional<Id> id = {});
+    Writer writer(std::optional<Id> id = {});
 
 private:
     struct Node
@@ -112,35 +128,63 @@ std::vector<TimedValue<Value>> ValueHistory<Value>::last(std::chrono::millisecon
     return values;
 }
 
-
 template<typename Id, typename Value>
-TreeValueHistory<Id, Value>::Access::Access(Node* node):
-    node(node)
+const ValueHistory<Value>* TreeValueHistory<Id, Value>::Reader::operator->() const
 {
+    static const ValueHistory<Value> kEmptyHistory;
+    if (!this->m_node)
+        return &kEmptyHistory;
+
+    NX_MUTEX_LOCKER locker(&this->m_node->mutex);
+    if (!this->m_node->history)
+        return &kEmptyHistory;
+
+    return this->m_node->history.get();
 }
 
 template<typename Id, typename Value>
-ValueHistory<Value>* TreeValueHistory<Id, Value>::Access::operator->() const
+ValueHistory<Value>* TreeValueHistory<Id, Value>::Writer::operator->() const
 {
-    NX_MUTEX_LOCKER locker(&node->mutex);
-    if (!node->history)
-        node->history = std::make_unique<ValueHistory<Value>>();
-    return node->history.get();
+    NX_MUTEX_LOCKER locker(&this->m_node->mutex);
+    if (!this->m_node->history)
+        this->m_node->history = std::make_unique<ValueHistory<Value>>();
+
+    return this->m_node->history.get();
 }
 
 template<typename Id, typename Value>
-typename TreeValueHistory<Id, Value>::Access TreeValueHistory<Id, Value>::Access::operator[](
+typename TreeValueHistory<Id, Value>::Reader TreeValueHistory<Id, Value>::Reader::operator[](
     const Id& id) const
 {
-    NX_MUTEX_LOCKER locker(&node->mutex);
-    return Access(&node->subNodes[id]);
+    NX_MUTEX_LOCKER locker(&this->m_node->mutex);
+    if (!this->m_node)
+        return Reader(nullptr);
+
+    const auto it = this->m_node->subNodes.find(id);
+    return (it != this->m_node->subNodes.end()) ? Reader(&it->second) : Reader(nullptr);
 }
 
 template<typename Id, typename Value>
-typename TreeValueHistory<Id, Value>::Access TreeValueHistory<Id, Value>::access(
+typename TreeValueHistory<Id, Value>::Writer TreeValueHistory<Id, Value>::Writer::operator[](
+    const Id& id) const
+{
+    NX_MUTEX_LOCKER locker(&this->m_node->mutex);
+    return Writer(&this->m_node->subNodes[id]);
+}
+
+template<typename Id, typename Value>
+typename TreeValueHistory<Id, Value>::Reader TreeValueHistory<Id, Value>::reader(
     std::optional<Id> id)
 {
-    const Access root(&m_root);
+    const Reader root(&m_root);
+    return id ? root[*id] : root;
+}
+
+template<typename Id, typename Value>
+typename TreeValueHistory<Id, Value>::Writer TreeValueHistory<Id, Value>::writer(
+    std::optional<Id> id)
+{
+    const Writer root(&m_root);
     return id ? root[*id] : root;
 }
 

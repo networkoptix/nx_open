@@ -1,9 +1,10 @@
 #pragma once
 
 #include <type_traits>
+
 #include <QtCore/QAbstractItemModel>
 
-
+#include <nx/utils/log/assert.h>
 #include <nx/utils/scope_guard.h>
 
 template<class BaseModel>
@@ -122,14 +123,12 @@ protected:
             int sourceFirst, int sourceLast, const QModelIndex& destinationParent,
             int destinationPos, bool condition = true)
             :
-            base_type(condition
-                ? nx::utils::SharedGuardCallback([model]() { model->endMoveColumns(); })
-                : nx::utils::SharedGuardCallback([]() {}))
+            base_type(nx::utils::SharedGuardCallback([model]() { model->endMoveColumns(); }))
         {
-            if (condition)
+            if (!condition || !NX_ASSERT(model->beginMoveColumns(sourceParent, sourceFirst,
+                sourceLast, destinationParent, destinationPos)))
             {
-                model->beginMoveColumns(sourceParent, sourceFirst, sourceLast,
-                    destinationParent, destinationPos);
+                disarm();
             }
         }
 
@@ -150,14 +149,12 @@ protected:
             int sourceFirst, int sourceLast, const QModelIndex& destinationParent,
             int destinationPos, bool condition = true)
             :
-            base_type(condition
-                ? nx::utils::SharedGuardCallback([model]() { model->endMoveRows(); })
-                : nx::utils::SharedGuardCallback([]() {}))
+            base_type(nx::utils::SharedGuardCallback([model]() { model->endMoveRows(); }))
         {
-            if (condition)
+            if (!condition || !NX_ASSERT(model->beginMoveRows(sourceParent, sourceFirst,
+                sourceLast, destinationParent, destinationPos)))
             {
-                model->beginMoveRows(sourceParent, sourceFirst, sourceLast,
-                    destinationParent, destinationPos);
+                disarm();
             }
         }
 

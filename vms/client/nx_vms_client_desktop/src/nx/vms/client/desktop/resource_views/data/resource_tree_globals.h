@@ -11,7 +11,7 @@ Q_NAMESPACE
 /**
  * Type of a node in resource tree. Ordered as it should be displayed.
  */
-    enum class NodeType
+enum class NodeType
 {
     // Single-occurrence nodes.
 

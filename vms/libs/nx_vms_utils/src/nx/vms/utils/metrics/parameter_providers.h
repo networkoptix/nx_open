@@ -16,7 +16,7 @@ public:
 
     const api::metrics::ParameterGroupManifest& manifest() const;
     virtual ParameterMonitorPtr monitor(
-        const ResourceType& resource, DataBase::Access dbAccess) const = 0;
+        const ResourceType& resource, DataBase::Writer dbWriter) const = 0;
 
 private:
     const api::metrics::ParameterGroupManifest m_manifest;
@@ -36,7 +36,7 @@ public:
         Watch<ResourceType> watch = nullptr);
 
     ParameterMonitorPtr monitor(
-        const ResourceType& resource, DataBase::Access dbAccess) const override;
+        const ResourceType& resource, DataBase::Writer dbWriter) const override;
 
 private:
     const Getter<ResourceType> m_getter;
@@ -60,7 +60,7 @@ public:
         ResourceParameterProviders<ResourceType> providers);
 
     ParameterMonitorPtr monitor(
-        const ResourceType& resource, DataBase::Access dbAccess) const override;
+        const ResourceType& resource, DataBase::Writer dbWriter) const override;
 
 private:
     static api::metrics::ParameterGroupManifest makeManifest(
@@ -103,12 +103,12 @@ SingleParameterProvider<ResourceType>::SingleParameterProvider(
 
 template<typename ResourceType>
 ParameterMonitorPtr SingleParameterProvider<ResourceType>::monitor(
-    const ResourceType& resource, DataBase::Access dbAccess) const
+    const ResourceType& resource, DataBase::Writer dbWriter) const
 {
     if (m_watch)
     {
         return std::make_unique<DataBaseParameterMonitor<ResourceType>>(
-            resource, m_getter, dbAccess, m_watch);
+            resource, m_getter, dbWriter, m_watch);
     }
     else
     {
@@ -129,13 +129,13 @@ ParameterGroupProvider<ResourceType>::ParameterGroupProvider(
 
 template<typename ResourceType>
 ParameterMonitorPtr ParameterGroupProvider<ResourceType>::monitor(
-    const ResourceType& resource, DataBase::Access dbAccess) const
+    const ResourceType& resource, DataBase::Writer dbWriter) const
 {
     std::map<QString, ParameterMonitorPtr> monitors;
     for (const auto& provider: m_providers)
     {
         const auto id = provider->manifest().id;
-        monitors[id] = provider->monitor(resource, dbAccess[id]);
+        monitors[id] = provider->monitor(resource, dbWriter[id]);
     }
 
     return std::make_unique<ParameterGroupMonitor<ResourceType>>(std::move(monitors));

@@ -328,10 +328,10 @@ void EventRibbon::Private::updateTilePreview(int index)
     request.roundMethod = precisePreview
         ? nx::api::ImageRequest::RoundMethod::precise
         : nx::api::ImageRequest::RoundMethod::iFrameAfter;
+    request.streamSelectionMode = modelIndex.data(Qn::PreviewStreamSelectionRole)
+        .value<nx::api::ImageRequest::StreamSelectionMode>();
 
     bool forceUpdate = true;
-    const auto streamSelectionMode = modelIndex.data(Qn::PreviewStreamSelectionRole)
-        .value<nx::api::CameraImageRequest::StreamSelectionMode>();
 
     auto& previewProvider = m_tiles[index]->preview;
     if (!previewProvider || request.resource != previewProvider->requestData().resource)
@@ -340,13 +340,12 @@ void EventRibbon::Private::updateTilePreview(int index)
     }
     else
     {
-        forceUpdate = previewProvider->requestData().usecSinceEpoch != request.usecSinceEpoch
-            || previewProvider->streamSelectionMode() != streamSelectionMode;
+        const auto oldRequest = previewProvider->requestData();
+        forceUpdate = oldRequest.usecSinceEpoch != request.usecSinceEpoch
+            || oldRequest.streamSelectionMode != request.streamSelectionMode;
 
         previewProvider->setRequestData(request);
     }
-
-    previewProvider->setStreamSelectionMode(streamSelectionMode);
 
     widget->setPreview(previewProvider.get(), forceUpdate);
     widget->setPreviewCropRect(previewCropRect);

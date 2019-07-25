@@ -1,5 +1,6 @@
 #include "storage_provider.h"
 
+#include <nx/fusion/serialization/lexical.h>
 #include <core/resource_management/resource_pool.h>
 #include <media_server/media_server_module.h>
 
@@ -39,11 +40,10 @@ std::optional<utils::metrics::ResourceDescription> StorageProvider::describe(
     if (resource->getParentId() != moduleGUID())
         return std::nullopt;
 
-    return utils::metrics::ResourceDescription{
+    return utils::metrics::ResourceDescription(
         resource->getId().toSimpleString(),
         resource->getParentId().toSimpleString(),
-        resource->getName()
-    };
+        resource->getName());
 }
 
 StorageProvider::ParameterProviders StorageProvider::makeProviders()

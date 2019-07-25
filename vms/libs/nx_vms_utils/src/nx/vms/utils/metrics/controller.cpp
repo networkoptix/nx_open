@@ -1,5 +1,6 @@
 #include "controller.h"
 
+#include <stdexcept>
 #include <QtCore/QJsonObject>
 
 namespace nx::vms::utils::metrics {
@@ -25,7 +26,7 @@ void Controller::startMonitoring()
 {
     NX_MUTEX_LOCKER locker(&m_mutex);
     for (const auto& [name, provider]: m_resourceProviders)
-        provider->startMonitoring(m_dataBase.access(name));
+        provider->startMonitoring(m_dataBase.writer(name));
 }
 
 api::metrics::SystemRules Controller::rules() const
@@ -40,7 +41,7 @@ void Controller::setRules(api::metrics::SystemRules rules)
     m_rules = rules;
 }
 
-api::metrics::SystemManifest Controller::manifest(bool applyRules) const
+api::metrics::SystemManifest Controller::manifest(RequestFlags flags) const
 {
     NX_MUTEX_LOCKER locker(&m_mutex);
     api::metrics::SystemManifest systemManifest;
@@ -50,7 +51,7 @@ api::metrics::SystemManifest Controller::manifest(bool applyRules) const
         groupManifest = provider->manifest();
 
         const auto groupRules = m_rules.find(name);
-        if (groupRules != m_rules.end() && applyRules)
+        if (groupRules != m_rules.end() && (flags & applyRules))
             applyRulesUnlocked(&groupManifest, groupRules->second);
     }
 
@@ -58,7 +59,7 @@ api::metrics::SystemManifest Controller::manifest(bool applyRules) const
 }
 
 api::metrics::SystemValues Controller::values(
-    bool applyRules, std::optional<std::chrono::milliseconds> timeline) const
+    RequestFlags flags, std::optional<std::chrono::milliseconds> timeline) const
 {
     NX_MUTEX_LOCKER locker(&m_mutex);
     api::metrics::SystemValues systemValues;
@@ -67,19 +68,20 @@ api::metrics::SystemValues Controller::values(
         auto& groupValues = systemValues[name];
         if (timeline)
         {
-            groupValues = provider->timeline(m_currentSecsSinceEpoch(), *timeline);
+            groupValues = provider->timeline(
+                flags & includeRemote, m_currentSecsSinceEpoch(), *timeline);
             continue;
         }
 
-        groupValues = provider->values();
-        if (!applyRules)
+        groupValues = provider->values(flags & includeRemote);
+        if (!(flags & applyRules))
             continue;
 
         const auto groupRules = m_rules.find(name);
         if (groupRules == m_rules.end())
             continue;
 
-        const auto groupDb = m_dataBase.access(name);
+        const auto groupDb = m_dataBase.reader(name);
         for (auto& [resourceId, resourceValues]: groupValues)
             applyRulesUnlocked(&resourceValues.values, groupDb[resourceId], groupRules->second);
     }
@@ -94,14 +96,30 @@ static double sum(const std::vector<nx::utils::TimedValue<Value>>& timeline)
         [](double current, const auto& point) { return current + point.value.toDouble(); });
 }
 
-static Value calculate(DataBase::Access access, const QStringList& formula)
+template<typename... Args>
+std::domain_error error(Args... args)
+{
+    return std::domain_error(nx::utils::log::makeMessage(std::forward<Args>(args)...).toStdString());
+}
+
+static Value calculate(DataBase::Reader reader, const QStringList& formula)
 {
     if (formula.isEmpty())
-        return "ERROR: No function";
+        throw error("no function name");
 
     const auto function = formula[0];
     const auto arg =
-        [&](int index) { return access[index <= formula.size() ? formula[index] : QString()]; };
+        [&](int index) 
+        { 
+            if (index >= formula.size())
+                throw error("%1 arg is missing", index);
+
+            const auto name = formula[index];
+            if (const auto argReader = reader[name])
+                return argReader;
+
+            throw error("parameter %1 is not is DB", name);
+        };
 
     if (function == "+" || formula[0] == "add")
         return arg(1)->current().toDouble() + arg(2)->current().toDouble();
@@ -124,7 +142,7 @@ static Value calculate(DataBase::Access access, const QStringList& formula)
         return timeline.empty() ? 0 : (sum(timeline) / timeline.size());
     }
 
-    return "ERROR: unknown function: " + function;
+    throw error("unknown function %1", function);
 }
 
 static bool isAlarmed(const Value& value, const Value& alarmValue)
@@ -166,24 +184,9 @@ static bool isAlarmed(const Value& value, const Value& alarmValue)
     return value == alarmValue;
 }
 
-static api::metrics::Status checkStatus(
-    const Value& value, const std::map<api::metrics::Status, Value>& alarmRules)
-{
-    if (value.isNull() || value.toString().startsWith("ERROR: "))
-        return "error";
-
-    for (const auto& [level, alarmValue]: alarmRules)
-    {
-        if (isAlarmed(value, alarmValue))
-            return level;
-    }
-
-    return {};
-}
-
 void Controller::applyRulesUnlocked(
     std::map<QString /*id*/, api::metrics::ParameterGroupValues>* group,
-    DataBase::Access groupAccess,
+    DataBase::Reader reader,
     const std::map<QString /*id*/, api::metrics::ParameterGroupRules>& rules) const
 {
     for (const auto& [id, rule]: rules)
@@ -191,14 +194,32 @@ void Controller::applyRulesUnlocked(
         auto& parameter = (*group)[id];
         if (!parameter.group.empty())
         {
-            applyRulesUnlocked(&parameter.group, groupAccess[id], rule.group);
+            applyRulesUnlocked(&parameter.group, reader[id], rule.group);
             continue;
         }
 
         if (!rule.calculate.isEmpty())
-            parameter.value = calculate(groupAccess, rule.calculate.split(" "));
+        {
+            try
+            {
+                parameter.value = calculate(reader, rule.calculate.split(" "));
+            }
+            catch(const std::domain_error& error)
+            {
+                parameter.value = QString(error.what());
+                parameter.status = QString("error");
+                continue;
+            }
+        }
 
-        parameter.status = checkStatus(parameter.value, rule.alarms);
+        for (const auto& [level, alarmValue]: rule.alarms)
+        {
+            if (isAlarmed(parameter.value, alarmValue))
+            {
+                parameter.status = level;
+                continue;
+            }
+        }
     }
 }
 

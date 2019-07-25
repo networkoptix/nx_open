@@ -15,17 +15,22 @@ public:
     api::metrics::SystemRules rules() const;
     void setRules(api::metrics::SystemRules rules);
 
-    api::metrics::SystemManifest manifest(
-        bool applyRules = true) const;
+    enum RequestFlag
+    { 
+        none = 0,
+        applyRules = (1 << 0), 
+        includeRemote = (1 << 1)
+    };
+    using RequestFlags = QFlags<RequestFlag>;
 
+    api::metrics::SystemManifest manifest(RequestFlags flags) const;
     api::metrics::SystemValues values(
-        bool applyRules = true,
-        std::optional<std::chrono::milliseconds> timeline = {}) const;
+        RequestFlags flags, std::optional<std::chrono::milliseconds> timeline = {}) const;
 
 private:
     void applyRulesUnlocked(
         std::map<QString /*id*/, api::metrics::ParameterGroupValues>* group,
-        DataBase::Access dataBaseAccess,
+        DataBase::Reader reader,
         const std::map<QString /*id*/, api::metrics::ParameterGroupRules>& rules) const;
 
     void applyRulesUnlocked(

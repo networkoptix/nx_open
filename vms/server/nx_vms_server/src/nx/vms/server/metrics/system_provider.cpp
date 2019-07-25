@@ -25,11 +25,11 @@ std::optional<utils::metrics::ResourceDescription> SystemProvider::describe(cons
     if (systemId.isNull())
         systemId = globalSettings()->localSystemId();
 
-    return utils::metrics::ResourceDescription{
+    return utils::metrics::ResourceDescription(
         systemId.toSimpleString(),
         QnUuid().toSimpleString(),
-        globalSettings()->systemName()
-    };
+        globalSettings()->systemName(),
+        /*isLocal*/ false); //< System resource is not local for any server.
 }
 
 SystemProvider::ParameterProviders SystemProvider::makeProviders()

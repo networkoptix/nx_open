@@ -1,37 +1,54 @@
 #include "resource_tree_model_adapter.h"
 
 #include <QtQml/QtQml>
-#include <QtWidgets/QApplication>
-#include <QtWidgets/QWidget>
-
-#include <QtSingleApplication>
 
 #include <client/client_globals.h>
 #include <client/client_module.h>
 #include <core/resource/camera_resource.h>
 #include <ui/models/resource/resource_tree_model.h>
+#include <ui/workbench/workbench_context.h>
 
 #include <nx/vms/client/desktop/utils/wearable_manager.h>
 #include <nx/vms/client/desktop/utils/wearable_state.h>
 
 namespace nx::vms::client::desktop {
 
-ResourceTreeModelAdapter::ResourceTreeModelAdapter(QObject* parent): base_type(parent)
+ResourceTreeModelAdapter::ResourceTreeModelAdapter(QObject* parent):
+    base_type(parent)
 {
-    // TODO: #vkutin This is a hack, refactor the context awareness mechanic of the source model.
-    const auto contextAwareParent = static_cast<QtSingleApplication*>(qApp)->activationWindow();
-
-    const auto model = new QnResourceTreeModel(QnResourceTreeModel::FullScope, contextAwareParent);
-
-    setSourceModel(model);
-    model->setParent(this);
-
     setDynamicSortFilter(true);
     setFilterCaseSensitivity(Qt::CaseInsensitive);
     setFilterKeyColumn(Qn::NameColumn);
     setSortRole(Qt::DisplayRole);
     setSortCaseSensitivity(Qt::CaseInsensitive);
     sort(Qn::NameColumn);
+}
+
+QnWorkbenchContext* ResourceTreeModelAdapter::context() const
+{
+    return m_context;
+}
+
+void ResourceTreeModelAdapter::setContext(QnWorkbenchContext* context)
+{
+    if (m_context == context)
+        return;
+
+    const auto oldSourceModel = sourceModel();
+    setSourceModel(nullptr);
+
+    if (oldSourceModel && oldSourceModel->parent() == this)
+        delete oldSourceModel;
+
+    m_context = context;
+    if (m_context)
+    {
+        const auto model = new QnResourceTreeModel(QnResourceTreeModel::FullScope, m_context);
+        model->setParent(this);
+        setSourceModel(model);
+    }
+
+    emit contextChanged();
 }
 
 QVariant ResourceTreeModelAdapter::data(const QModelIndex& index, int role) const

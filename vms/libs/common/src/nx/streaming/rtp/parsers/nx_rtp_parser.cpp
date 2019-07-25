@@ -55,25 +55,8 @@ void QnNxRtpParser::logMediaData(const QnAbstractMediaDataPtr& data)
     const bool isSecondaryProvider = data->flags & QnAbstractMediaData::MediaFlags_LowQuality;
     auto logger = isSecondaryProvider ? &m_secondaryLogger : &m_primaryLogger;
 
-    if (data->dataType == QnAbstractMediaData::VIDEO)
-    {
-        logger->pushFrameInfo(
-            std::make_unique<nx::analytics::FrameInfo>(data->timestamp));
-    }
-    else if (data->dataType == QnAbstractMediaData::GENERIC_METADATA)
-    {
-        nx::common::metadata::DetectionMetadataPacketPtr objectMetadata =
-            nx::common::metadata::fromMetadataPacket(
-                std::dynamic_pointer_cast<QnCompressedMetadata>(data));
-
-        if (!objectMetadata)
-        {
-            NX_ERROR(this, "Unable to deserialize metadata");
-            return;
-        }
-
-        logger->pushObjectMetadata(*objectMetadata);
-    }
+    if (logger)
+        logger->pushData(data);
 }
 
 bool QnNxRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int dataSize, bool& gotData)

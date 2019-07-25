@@ -589,7 +589,7 @@ CLVideoDecoderOutputPtr  QnExecuteAnalyticsActionRestHandler::imageByTimestamp(
 
     nx::api::CameraImageRequest cameraImageRequest(device, imageRequest);
     cameraImageRequest.streamSelectionMode =
-        nx::api::CameraImageRequest::StreamSelectionMode::sameAsAnalytics;
+        nx::api::ImageRequest::StreamSelectionMode::sameAsAnalytics;
 
     QnGetImageHelper helper(serverModule());
     CLVideoDecoderOutputPtr result = helper.getImage(cameraImageRequest);

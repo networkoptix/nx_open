@@ -32,6 +32,8 @@
 #include <nx/vms/server/resource/camera.h>
 #include <utils/media/utils.h>
 
+#include <nx/analytics/analytics_logging_ini.h>
+
 using nx::vms::server::analytics::AbstractVideoDataReceptorPtr;
 
 static const int CHECK_MEDIA_STREAM_ONCE_PER_N_FRAMES = 1000;
@@ -150,6 +152,17 @@ void QnLiveStreamProvider::setRole(Qn::ConnectionRole role)
 
         serverModule()->analyticsManager()->registerMetadataSink(
             getResource(), m_dataReceptorMultiplexer.toWeakRef());
+    }
+
+    if (nx::analytics::loggingIni().isLoggingEnabled() && !m_metadataLogger)
+    {
+        m_metadataLogger = std::make_unique<nx::analytics::MetadataLogger>(
+            "live_stream_provider_",
+            m_cameraRes->getId(),
+            /*engineId*/ QnUuid(),
+            role == Qn::ConnectionRole::CR_LiveVideo
+                ? nx::vms::api::StreamIndex::primary
+                : nx::vms::api::StreamIndex::secondary);
     }
 }
 
@@ -503,6 +516,14 @@ QnAbstractCompressedMetadataPtr QnLiveStreamProvider::getMetadata()
     {
         QnAbstractCompressedMetadataPtr metadata;
         m_metadataReceptor->metadataQueue.pop(metadata);
+
+        if (m_metadataLogger)
+        {
+            m_metadataLogger->pushData(
+                metadata,
+                lm("Queue size: %1").args(m_metadataReceptor->metadataQueue.size()));
+        }
+
         return metadata;
     }
 

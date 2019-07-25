@@ -142,7 +142,7 @@ QVariant MotionSearchListModel::Private::data(const QModelIndex& index, int role
 
         case Qn::PreviewStreamSelectionRole:
             return QVariant::fromValue(
-                nx::api::CameraImageRequest::StreamSelectionMode::sameAsMotion);
+                nx::api::ImageRequest::StreamSelectionMode::sameAsMotion);
 
         case Qn::ContextMenuRole:
             return QVariant::fromValue(contextMenu(chunk));

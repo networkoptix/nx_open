@@ -2121,9 +2121,15 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged()
 
         qint64 time = widget->item()->data<qint64>(Qn::ItemTimeRole, -1);
 
+        QnResourcePtr resource = widget->resource()->toResourcePtr();
+
+        // Item reported DATETIME_NOW position in milliseconds, but it does not have live.
+        // Jump to 0 (default position).
+        if ((time == DATETIME_NOW / 1000) && !resource->hasFlags(Qn::live))
+            time = -1;
+
         if (!thumbnailed)
         {
-            QnResourcePtr resource = widget->resource()->toResourcePtr();
             if (time > 0)
             {
                 qint64 timeUSec = time == DATETIME_NOW ? DATETIME_NOW : time * 1000;
