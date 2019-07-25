@@ -2423,7 +2423,6 @@ void MediaServerProcess::registerRestHandlers(
      *     <code>[[{"x":0,"y":0,"width":43,"height":31}]]</code>
      *     <br/>Example of two rectangles for a single-sensor camera:
      *     <code>[[{"x":0,"y":0,"width":5,"height":7},{"x":12,"y":10,"width":8,"height":6}]]</code>
-     *
      *     <br/>Analytics Search Format: string with a JSON object that might take the following attributes
      *     as an input:
      *     <br/>
@@ -2705,7 +2704,6 @@ void MediaServerProcess::registerRestHandlers(
      *         %param reply[].actions[].pluginId Id of a analytics plugin which offers the actions.
      */
     reg("api/getAnalyticsActions", new QnGetAnalyticsActionsRestHandler());
-
 
     /**%apidoc POST /api/executeAnalyticsAction
      * Execute analytics action from the particular analytics plugin on this server. The action is
@@ -3774,7 +3772,6 @@ void MediaServerProcess::stopObjects()
     commonModule()->deleteMessageProcessor(); // stop receiving notifications
 
     commonModule()->resourcePool()->clear();
-
 
     //disconnecting from EC2
     QnAppServerConnectionFactory::setEc2Connection(ec2::AbstractECConnectionPtr());
