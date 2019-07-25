@@ -809,8 +809,14 @@ CameraDiagnostics::Result QnPlOnvifResource::initOnvifCapabilitiesAndUrls(
     if (getMediaUrl().isEmpty())
         return CameraDiagnostics::CameraInvalidParams("ONVIF media URL is not filled by camera");
 
-    auto doIgnoreMedia2 = resourceData().value<bool>("ignoreMedia2", false);
-    if (!doIgnoreMedia2)
+    const auto doIgnoreMedia2byPropertyKeyAsString = getProperty(
+        ResourcePropertyKey::Onvif::kIgnoreMedia2);
+    const bool doIgnoreMedia2byPropertyKey = doIgnoreMedia2byPropertyKeyAsString.toInt() > 0;
+
+    const auto doIgnoreMedia2byDataKey = resourceData().value<bool>(
+        ResourceDataKey::kIgnoreMedia2, false);
+
+    if (! (doIgnoreMedia2byPropertyKey || doIgnoreMedia2byDataKey))
     {
         QString media2ServiceUrl;
         fetchOnvifMedia2Url(&media2ServiceUrl); //< We ignore the result,

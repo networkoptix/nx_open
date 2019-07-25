@@ -90,6 +90,7 @@ namespace ResourcePropertyKey
         static const QString kMediaUrl("MediaUrl");
         static const QString kDeviceUrl("DeviceUrl");
         static const QString kDeviceID("DeviceID");
+        static const QString kIgnoreMedia2("ignoreMedia2");
     }
 
     namespace Server
@@ -201,6 +202,8 @@ namespace ResourceDataKey
 
     static const QString kRepeatIntervalForSendVideoEncoderMS("repeatIntervalForSendVideoEncoderMS");
     static const QString kMulticastIsSupported("multicastIsSupported");
+    static const QString kIgnoreMedia2("ignoreMedia2");
+
 } // namespace ResourceDataKey
 
 //-------------------------------------------------------------------------------------------------
