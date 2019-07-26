@@ -1227,15 +1227,16 @@ bool PeerStateTracker::updateServerData(QnMediaServerResourcePtr server, UpdateI
             // TODO: Should track online->offline changes for task sets
             item->lastOnlineTime = UpdateItem::Clock::now();
             item->statusUnknown = false;
+            NX_VERBOSE(this, "updateServerData() - peer %1 goes offline", item->id);
+        }
+        else
+        {
             if (item->state == StatusCode::readyToInstall)
             {
                 NX_VERBOSE(this,
                     "updateServerData() - peer %1 gone offline from state readyInstall.");
                 item->state = StatusCode::preparing;
             }
-        }
-        else
-        {
             // TODO: Should track offline->online changes for task sets:
             //  - peersActive
             //  - peersFailed
