@@ -8,12 +8,15 @@
 namespace nx::cloud {
 namespace storage::service {
 
-namespace conf {
+namespace conf { class Settings; }
 
-struct Aws;
-class Settings;
+namespace model {
 
-} // namespace conf
+namespace dao { class AbstractBucketDao; }
+class Database;
+class Model;
+
+} // namespace model
 
 namespace controller {
 
