@@ -7,6 +7,8 @@ ListView
 {
     id: view
 
+    property bool brief: false //< Only resource list and preview.
+
     boundsBehavior: Flickable.StopAtBounds
     hoverHighlightColor: "transparent"
     spacing: 1
@@ -30,7 +32,9 @@ ListView
             if (model.progressValue !== undefined)
                 return "tiles/ProgressTile.qml"
 
-            return "tiles/InfoTile.qml"
+            return brief
+                ? "tiles/BriefTile.qml"
+                : "tiles/InfoTile.qml"
         }
 
         Connections

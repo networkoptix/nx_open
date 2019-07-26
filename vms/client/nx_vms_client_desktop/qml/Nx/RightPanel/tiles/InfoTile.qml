@@ -2,11 +2,11 @@ import QtQuick 2.6
 import QtQuick.Controls.impl 2.4
 import QtQuick.Layouts 1.11
 
+import "private"
+
 TileBase
 {
     id: tile
-
-    property int maxDisplayedResourceCount: 3
 
     signal closeRequested()
 
@@ -74,38 +74,10 @@ TileBase
                 }
             }
 
-            ColumnLayout
+            ResourceList
             {
                 id: resourceList
-
-                spacing: 0
-                readonly property var lines: model.resourceList
-                readonly property int count: Math.min(lines.length, maxDisplayedResourceCount)
-                readonly property int remainder: lines.length - count
-
-                Repeater
-                {
-                    model: resourceList.count
-
-                    delegate: Text
-                    {
-                        color: tile.palette.light
-                        elide: Text.ElideRight
-                        text: resourceList.lines[index]
-                        font { pixelSize: 11; weight: Font.Medium }
-                    }
-                }
-
-                Text
-                {
-                    id: andMore
-
-                    color: tile.palette.windowText
-                    text: qsTr("...and %n more", "", resourceList.remainder)
-                    visible: resourceList.remainder > 0
-                    topPadding: 4
-                    font { pixelSize: 11; weight: Font.Normal }
-                }
+                resourceNames: model && model.resourceList
             }
         }
     }
