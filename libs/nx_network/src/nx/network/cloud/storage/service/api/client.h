@@ -2,11 +2,11 @@
 
 #include <nx/network/http/generic_api_client.h>
 
-#include "add_storage.h"
-#include "storage.h"
-#include "result.h"
 #include "add_bucket.h"
+#include "add_storage.h"
 #include "bucket.h"
+#include "result.h"
+#include "storage.h"
 
 namespace nx::cloud::storage::service::api {
 

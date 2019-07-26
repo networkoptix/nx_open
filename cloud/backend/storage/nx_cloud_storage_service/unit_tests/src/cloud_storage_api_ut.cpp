@@ -101,7 +101,7 @@ protected:
 
     void thenRequestSucceeds()
     {
-        ASSERT_EQ(api::Client::ResultCode::ok, m_response.pop());
+        ASSERT_EQ(api::ResultCode::ok, m_response.pop().resultCode);
     }
 
 private:
