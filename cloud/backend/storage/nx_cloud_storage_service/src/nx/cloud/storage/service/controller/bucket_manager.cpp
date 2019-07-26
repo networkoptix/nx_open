@@ -5,6 +5,9 @@
 #include <nx/cloud/aws/api_client.h>
 
 #include "nx/cloud/storage/service/settings.h"
+#include "nx/cloud/storage/service/model/model.h"
+#include "nx/cloud/storage/service/model/database.h"
+
 
 namespace nx::cloud::storage::service::controller {
 
