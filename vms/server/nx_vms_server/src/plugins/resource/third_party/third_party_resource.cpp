@@ -84,7 +84,6 @@ QnThirdPartyResource::QnThirdPartyResource(
 
 QnThirdPartyResource::~QnThirdPartyResource()
 {
-    m_cameraManager3.reset();
     stopInputPortStatesMonitoring();
 }
 
