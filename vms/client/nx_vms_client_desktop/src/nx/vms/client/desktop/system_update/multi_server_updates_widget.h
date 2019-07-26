@@ -140,9 +140,15 @@ public:
      *
      * RevisionStorage requires `operator ==` to be available for the type `Data`.
      */
-    template<class Data> struct RevisionStorage
+    template<class Data>
+    struct RevisionStorage
     {
-        RevisionStorage(const Data& data) : currentData(data), referenceData(data) {}
+        RevisionStorage(const Data& data):
+            currentData(data),
+            referenceData(data)
+        {
+        }
+
         RevisionStorage() = default;
 
         /** Checks if there are changes to the data. */
@@ -187,12 +193,17 @@ public:
             return &currentData;
         }
 
-        bool operator == (const Data& other) const
+        bool operator==(const Data& other) const
         {
             return currentData == other;
         }
 
-        Data& operator = (const Data& other)
+        bool operator!=(const Data& other) const
+        {
+            return currentData != other;
+        }
+
+        Data& operator= (const Data& other)
         {
             if (currentData == other)
                 return currentData;
