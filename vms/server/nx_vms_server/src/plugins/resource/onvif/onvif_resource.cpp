@@ -4315,7 +4315,8 @@ bool QnPlOnvifResource::RenewSubscriptionAsOdmThreadSafe()
 
     _oasisWsnB2__Renew request;
 
-    auto interval = resourceData().value<QString>("renewIntervalForPullingAsOdm", "PT2M");
+    auto interval = resourceData().value<QString>(ResourceDataKey::kRenewIntervalForPullingAsOdm,
+        "PT2M");
     std::string odmRenewTerminationTime = interval.toStdString();
     request.TerminationTime = &odmRenewTerminationTime;
 
