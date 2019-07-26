@@ -252,7 +252,7 @@ private:
     {
         decltype(this->m_handler) handler;
         handler.swap(this->m_handler);
-        processHttpResponse(
+        this->processHttpResponse(
             std::move(handler),
             client->failed() ? client->lastSysErrorCode() : SystemError::noError,
             client->response(),
@@ -282,7 +282,7 @@ private:
     {
         decltype(this->m_handler) handler;
         handler.swap(this->m_handler);
-        processHttpResponse(
+        this->processHttpResponse(
             std::move(handler),
             client->failed() ? client->lastSysErrorCode() : SystemError::noError,
             client->response(),
