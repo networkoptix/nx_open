@@ -12,15 +12,10 @@ using namespace std::placeholders;
 
 namespace {
 
-static nx::utils::Url makeBucketUrl(const std::string& bucketName)
-{
-    static constexpr char kBucketUrlTemplate[] = "https://%1.s3.amazonaws.com";
-    return lm(kBucketUrlTemplate).arg(bucketName).toQString();
-}
-
-} // namespace
-
-BucketManager::BucketManager(const conf::Aws& /*settings*/)
+BucketManager::BucketManager(const conf::Settings& /*settings*/, model::Model* /*model*/)/*:
+    m_settings(settings),
+    m_database(model->database()),
+    m_bucketDao(model->bucketDao())*/
 {
 }
 

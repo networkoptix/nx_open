@@ -20,7 +20,7 @@ namespace controller {
 class BucketManager
 {
 public:
-    BucketManager(const conf::Aws& settings);
+    BucketManager(const conf::Settings& settings, model::Model* model);
 
    void addBucket(
         const api::AddBucketRequest& request,
