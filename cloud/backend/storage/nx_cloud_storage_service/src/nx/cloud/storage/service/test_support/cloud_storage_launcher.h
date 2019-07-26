@@ -10,6 +10,7 @@ class CloudStorageLauncher:
 {
 public:
     CloudStorageLauncher();
+    ~CloudStorageLauncher();
 
     nx::utils::Url httpUrl() const;
 };
