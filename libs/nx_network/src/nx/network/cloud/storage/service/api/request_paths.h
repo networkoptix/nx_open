@@ -9,6 +9,6 @@ static constexpr char kStorageId[] = "/storage/{id}";
 static constexpr char kCameras[] = "/storage/{id}/cameras";
 
 static constexpr char kAwsBuckets[] = "/aws_buckets/";
-static constexpr char kAwsBucketName[] = "/aws_buckets/{bucket_name}";
+static constexpr char kAwsBucketName[] = "/aws_buckets/{name}";
 
 } // namespace nx::cloud::storage::service::api
