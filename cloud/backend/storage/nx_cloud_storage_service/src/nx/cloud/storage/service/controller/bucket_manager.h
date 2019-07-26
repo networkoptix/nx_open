@@ -24,7 +24,7 @@ public:
 
    void addBucket(
         const api::AddBucketRequest& request,
-        const nx::utils::MoveOnlyFunc<void(api::Result, api::Error)> handler);
+        const nx::utils::MoveOnlyFunc<void(api::Result, api::Bucket)> handler);
 
     void listBuckets(
         nx::utils::MoveOnlyFunc<void(api::Result, std::vector<api::Bucket>)> handler);

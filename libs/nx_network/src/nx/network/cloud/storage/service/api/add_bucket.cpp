@@ -5,7 +5,7 @@
 namespace nx::cloud::storage::service::api {
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (AddBucketRequest)(Error),
+    (AddBucketRequest),
     (json),
     _Fields)
 

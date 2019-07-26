@@ -26,7 +26,7 @@ BucketManager::BucketManager(const conf::Aws& /*settings*/)
 
 void BucketManager::addBucket(
     const api::AddBucketRequest& /*request*/,
-    const nx::utils::MoveOnlyFunc<void(api::Result, api::Error)> /*handler*/)
+    const nx::utils::MoveOnlyFunc<void(api::Result, api::Bucket)> /*handler*/)
 {
 }
 
