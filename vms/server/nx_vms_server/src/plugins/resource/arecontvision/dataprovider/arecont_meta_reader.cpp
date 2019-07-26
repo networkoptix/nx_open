@@ -63,7 +63,8 @@ ArecontMetaReader::ArecontMetaReader(
 
 ArecontMetaReader::~ArecontMetaReader()
 {
-    m_metaDataClient->pleaseStopSync();
+    if (m_metaDataClient)
+        m_metaDataClient->pleaseStopSync();
 }
 
 bool ArecontMetaReader::hasData()
@@ -114,18 +115,20 @@ void ArecontMetaReader::requestAsync(QnPlAreconVisionResource* resource)
         resource->getProperty(lit("MaxSensorHeight")).toInt()
     };
 
-    if (!m_metaDataClient->socket())
+    QnMutexLocker lock(&m_httpClientMutex);
+    if (!m_metaDataClient)
         m_metaDataClient = nx::network::http::AsyncHttpClient::create();
 
     m_metaDataClientBusy = true;
     m_metaDataClient->doGet(url,
         [this, info](nx::network::http::AsyncHttpClientPtr)
         {
+            QnMutexLocker lock(&m_httpClientMutex);
             onMetaData(info);
             if (m_channelCount > 1)
                 m_currentChannel = (m_currentChannel + 1) % m_channelCount;
 
-            m_metaDataClient->takeSocket(); //< Close connection.
+            m_metaDataClient.reset(); //< Close connection.
             m_metaDataClientBusy = false;
         }
     );
