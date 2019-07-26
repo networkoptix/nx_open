@@ -16,8 +16,7 @@ public:
 
     void stop();
 
-    nx::sql::AbstractAsyncSqlQueryExecutor& sqlQueryExecutor();
-    nx::clusterdb::engine::SynchronizationEngine& synchronizationEngine();
+    nx::clusterdb::engine::SynchronizationEngine* synchronizationEngine();
 
 private:
     std::unique_ptr<nx::sql::AsyncSqlQueryExecutor> m_sqlExecutor;

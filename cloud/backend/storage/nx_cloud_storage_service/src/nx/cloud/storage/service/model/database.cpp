@@ -13,9 +13,6 @@ static constexpr char kApplicationId[] = "nx_cloud_storage_service";
 Database::Database(const conf::Settings& settings):
     m_sqlExecutor(std::make_unique<nx::sql::AsyncSqlQueryExecutor>(settings.database().sql))
 {
-    if (!m_sqlExecutor->init())
-        throw std::runtime_error("Failed to initialize database");
-
     m_syncEngine =
         std::make_unique<nx::clusterdb::engine::SynchronizationEngine>(
             kApplicationId,
@@ -30,14 +27,9 @@ void Database::stop()
     m_sqlExecutor->pleaseStopSync();
 }
 
-nx::sql::AbstractAsyncSqlQueryExecutor& Database::sqlQueryExecutor()
+nx::clusterdb::engine::SynchronizationEngine* Database::synchronizationEngine()
 {
-    return *m_sqlExecutor;
-}
-
-nx::clusterdb::engine::SynchronizationEngine& Database::synchronizationEngine()
-{
-    return *m_syncEngine;
+    return m_syncEngine.get();
 }
 
 } // namespace nx::cloud::storage::service::model
