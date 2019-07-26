@@ -1,9 +1,9 @@
 #pragma once
 
-#include <nx/utils/basic_factory.h>
 #include <nx/network/cloud/storage/service/api/result.h>
 #include <nx/network/cloud/storage/service/api/add_bucket.h>
 #include <nx/network/cloud/storage/service/api/bucket.h>
+#include <nx/utils/move_only_func.h>
 
 namespace nx::cloud {
 namespace storage::service {
