@@ -9,19 +9,27 @@
 
 namespace nx::cloud::storage::service {
 
-namespace conf {
+namespace conf { class Settings; } // namespace conf
 
-struct Aws;
-class Settings;
+namespace model {
 
-} // namespace conf
+namespace dao { class AbstractStorageDao; }
+class Database;
+class Model;
+
+} // namespace model
 
 namespace controller {
+
+class BucketManager;
 
 class StorageManager
 {
 public:
-    StorageManager(const conf::Aws& settings);
+    StorageManager(
+        const conf::Settings& settings,
+        model::Model* model,
+        BucketManager* bucketManager);
 
     void addStorage(
         const api::AddStorageRequest& request,
@@ -38,6 +46,11 @@ public:
     void listCameras(
         const std::string& storageId,
         nx::utils::MoveOnlyFunc<void(api::Result, std::vector<std::string>)> handler);
+private:
+    /*const conf::Settings& m_settings;
+    model::Database* m_database = nullptr;
+    model::dao::AbstractStorageDao* m_storageDao = nullptr;
+    BucketManager* m_bucketManager = nullptr;*/
 };
 
 } // namespace controller

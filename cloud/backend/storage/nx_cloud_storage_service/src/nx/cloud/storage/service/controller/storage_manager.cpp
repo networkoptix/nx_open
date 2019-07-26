@@ -1,10 +1,21 @@
 #include "storage_manager.h"
 
 #include "nx/cloud/storage/service/settings.h"
+#include "nx/cloud/storage/service/model/model.h"
+#include "nx/cloud/storage/service/model/database.h"
+#include "nx/cloud/storage/service/model/dao/storage_dao.h"
 
 namespace nx::cloud::storage::service::controller {
 
-StorageManager::StorageManager(const conf::Aws& /*settings*/)
+StorageManager::StorageManager(
+    const conf::Settings& /*settings*/,
+    model::Model* /*model*/,
+    BucketManager* /*bucketManager*/)
+    /*:
+    m_settings(settings),
+    m_database(model->database()),
+    m_storageDao(model->storageDao()),
+    m_bucketManager(bucketManager)*/
 {
 }
 
