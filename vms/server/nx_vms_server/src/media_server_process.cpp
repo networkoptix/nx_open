@@ -2562,8 +2562,7 @@ void MediaServerProcess::registerRestHandlers(
      *      as a result.
      * %return:object JSON with the update manifest.
      */
-    reg("ec2/updateInformation", new QnUpdateInformationRestHandler(&serverModule()->settings(),
-        commonModule()->engineVersion()));
+    reg("ec2/updateInformation", new QnUpdateInformationRestHandler(serverModule()));
 
     /**%apidoc POST /ec2/startUpdate
      * Starts an update process.
