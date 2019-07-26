@@ -99,6 +99,7 @@ QHash<int, QByteArray> RightPanelModelsAdapter::roleNames() const
     roles.insert(Qn::ForcePrecisePreviewRole, "precisePreview");
     roles.insert(Qn::RemovableRole, "isCloseable");
     roles.insert(Qn::AlternateColorRole, "isInformer");
+    roles.insert(Qn::ProgressValueRole, "progressValue");
     // TODO: Preview stream
     return roles;
 }

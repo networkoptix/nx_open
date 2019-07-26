@@ -24,6 +24,7 @@ DropArea 1.0 DropArea.qml
 CompactTabButton 1.0 CompactTabButton.qml
 TabBar 1.0 TabBar.qml
 Fader 1.0 Fader.qml
+ProgressBar 1.0 ProgressBar.qml
 
 ArrowIcon 1.0 ArrowIcon.qml
 SwitchIcon 1.0 SwitchIcon.qml

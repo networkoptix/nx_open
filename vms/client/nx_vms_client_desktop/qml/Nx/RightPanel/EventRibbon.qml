@@ -27,6 +27,9 @@ ListView
             if (!model || !model.display)
                 return "tiles/SeparatorTile.qml"
 
+            if (model.progressValue !== undefined)
+                return "tiles/ProgressTile.qml"
+
             return "tiles/InfoTile.qml"
         }
 
