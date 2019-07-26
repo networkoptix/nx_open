@@ -20,7 +20,7 @@ namespace vms::server {
 namespace plugins {
 namespace hikvision {
 
-static const std::chrono::milliseconds kHttpTimeout(5000);
+static const std::chrono::milliseconds kHttpTimeout(10000); //< practice shows: 5000 is not enough
 static const QString kContentType = lit("application/xml");
 
 const QString kStatusCodeOk = lit("1");
