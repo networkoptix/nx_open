@@ -33,13 +33,15 @@ Control
 
         property int status: QnCameraListModel.Offline
 
-        property bool offline: status == QnCameraListModel.Offline ||
+        readonly property bool offline: status == QnCameraListModel.Offline
+        readonly property bool showTumbnailDummy: offline ||
                                status == QnCameraListModel.NotDefined ||
                                status == QnCameraListModel.Unauthorized ||
-                               hasDefaultPassword || hasOldFirmware
-        property bool unauthorized: status == QnCameraListModel.Unauthorized
-        property bool hasDefaultPassword: mediaResourceHelper.hasDefaultCameraPassword
-        property bool hasOldFirmware: mediaResourceHelper.hasOldCameraFirmware
+                               hasDefaultPassword || hasOldFirmware || ioModule
+        readonly property bool unauthorized: status == QnCameraListModel.Unauthorized
+        readonly property bool hasDefaultPassword: mediaResourceHelper.hasDefaultCameraPassword
+        readonly property bool hasOldFirmware: mediaResourceHelper.hasOldCameraFirmware
+        readonly property bool ioModule: !mediaResourceHelper.hasVideo && mediaResourceHelper.isIoModule
 
         // This property prevents video component re-creation while scrolling.
         property bool videoAllowed: false
@@ -77,7 +79,7 @@ Control
 
             width: parent.width
             height: parent.width * 9 / 16
-            color: d.offline ? ColorTheme.base7 : ColorTheme.base4
+            color: d.showTumbnailDummy ? ColorTheme.base7 : ColorTheme.base4
 
             Loader
             {
@@ -86,7 +88,7 @@ Control
                 anchors.centerIn: parent
                 sourceComponent:
                 {
-                    if (d.offline)
+                    if (d.showTumbnailDummy)
                         return thumbnailDummyComponent
 
                     if (!cameraItem.active || !d.videoAllowed || !settings.liveVideoPreviews)
@@ -122,9 +124,9 @@ Control
                 width: parent.width - x - parent.spacing
                 height: 24
                 font.pixelSize: 16
-                font.weight: d.offline ? Font.DemiBold : Font.Normal
+                font.weight: d.showTumbnailDummy ? Font.DemiBold : Font.Normal
                 elide: Text.ElideRight
-                color: d.offline ? ColorTheme.base11 : ColorTheme.windowText
+                color: d.showTumbnailDummy ? ColorTheme.base11 : ColorTheme.windowText
             }
         }
     }
@@ -162,11 +164,13 @@ Control
                 {
                     if (d.unauthorized)
                         return lp("/images/camera_locked.png")
-
                     if (d.hasDefaultPassword || d.hasOldFirmware)
                         return lp("/images/camera_alert.png")
-
-                    return lp("/images/camera_offline.png")
+                    if (d.offline)
+                        return lp("/images/camera_offline.png")
+                    if (d.ioModule)
+                        return lp("/images/alert_io.png")
+                    return ""
                 }
             }
 
@@ -185,7 +189,11 @@ Control
                         return qsTr("Password required")
                     if (d.hasOldFirmware)
                         return qsTr("Unsupported firmware version")
-                    return qsTr("Offline")
+                    if (d.offline)
+                        return qsTr("Offline")
+                    if (d.ioModule)
+                        return qsTr("I/O module")
+                    return ""
                 }
 
                 wrapMode: Text.WordWrap
