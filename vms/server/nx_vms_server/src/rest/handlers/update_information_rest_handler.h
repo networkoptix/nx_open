@@ -23,7 +23,7 @@ public:
         const QnRestConnectionProcessor*processor) override;
 
 private:
-    using HandlerType = std::function<int(
+    using HandlerType = nx::utils::MoveOnlyFunc<int(
         QByteArray* outBody,
         QByteArray* outContentType)>;
 
