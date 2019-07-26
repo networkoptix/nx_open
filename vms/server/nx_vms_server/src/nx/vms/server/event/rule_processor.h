@@ -132,7 +132,7 @@ protected slots:
     */
     virtual bool executeActionInternal(const vms::event::AbstractActionPtr& action);
 
-private slots:
+private:
     void at_broadcastActionFinished(int handle, ec2::ErrorCode errorCode);
     void at_actionDelivered(const vms::event::AbstractActionPtr& action);
     void at_actionDeliveryFailed(const vms::event::AbstractActionPtr& action);
@@ -188,7 +188,7 @@ private:
     bool popProlongedActionStartTime(
         const vms::event::AbstractActionPtr& action,
         qint64& startTimeUsec);
-    void ruleModificationFinishedUnsafe();
+
 protected:
     mutable QnMutex m_mutex;
 
@@ -227,8 +227,8 @@ private:
 
     QHash<QnUuid, qint64> m_runningBookmarkActions;
 
-    QnWaitCondition m_ruleUpdateCond;
-    std::atomic<int> m_updatingRulesCnt{0};
+    QnWaitCondition m_ruleUpdateCondition;
+    std::atomic<int> m_updatingRulesCount{0};
 };
 
 } // namespace event
