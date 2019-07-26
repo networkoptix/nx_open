@@ -37,6 +37,7 @@ private:
             case api::ResultCode::ok:
                 return StatusCode::ok;
             case api::ResultCode::badRequest:
+            case api::ResultCode::awsApiError:
                 return StatusCode::badRequest;
             case api::ResultCode::unauthorized:
                 return StatusCode::unauthorized;
@@ -58,6 +59,7 @@ void RequestHandler<Input, Output, RestArgFetchers...>::processResponseInternal(
     {
         network::http::FusionRequestResult error;
         error.setHttpStatusCode(toHttpStatusCode(result.resultCode));
+        error.resultCode = toString(result.resultCode);
         error.errorText = result.error.c_str();
         return this->requestCompleted(std::move(error), std::move(output)...);
     }
