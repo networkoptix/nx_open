@@ -9,6 +9,7 @@
 #include <core/resource_access/resource_access_manager.h>
 #include <nx/client/core/watchers/user_watcher.h>
 #include <common/common_module.h>
+#include <core/resource_access/resource_access_subject.h>
 
 class QnCameraAccessRightsHelperPrivate : public QObject, public QnConnectionContextAware
 {

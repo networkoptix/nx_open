@@ -1358,7 +1358,7 @@ QnLayoutResourcePtr QnWorkbenchVideoWallHandler::constructLayout(
         sourceLayout->clone() :
         QnLayoutResourcePtr(new QnLayoutResource());
 
-    layout->setId(m_uuidPool->getFreeId());
+    layout->setIdUnsafe(m_uuidPool->getFreeId());
     layout->addFlags(Qn::local); // TODO: #Elric #EC2
 
     if (!sourceLayout)
@@ -1489,7 +1489,7 @@ void QnWorkbenchVideoWallHandler::at_newVideoWallAction_triggered()
     };
 
     QnVideoWallResourcePtr videoWall(new QnVideoWallResource());
-    videoWall->setId(QnUuid::createUuid());
+    videoWall->setIdUnsafe(QnUuid::createUuid());
     videoWall->setName(proposedName);
     videoWall->setAutorun(true);
 
@@ -1598,7 +1598,7 @@ void QnWorkbenchVideoWallHandler::at_deleteVideoWallItemAction_triggered()
             continue;
 
         QnResourcePtr proxyResource(new QnResource());
-        proxyResource->setId(index.uuid());
+        proxyResource->setIdUnsafe(index.uuid());
         proxyResource->setName(index.item().name);
         qnResIconCache->setKey(proxyResource, QnResourceIconCache::VideoWallItem);
         resources.append(proxyResource);
@@ -1841,7 +1841,7 @@ void QnWorkbenchVideoWallHandler::at_openVideoWallReviewAction_triggered()
 
     /* Construct and add a new layout. */
     QnLayoutResourcePtr layout(new QnVideowallReviewLayoutResource(videoWall));
-    layout->setId(QnUuid::createUuid());
+    layout->setIdUnsafe(QnUuid::createUuid());
     if (context()->user())
         layout->setParentId(videoWall->getId());
     if (accessController()->hasGlobalPermission(GlobalPermission::controlVideowall))
@@ -2148,7 +2148,7 @@ void QnWorkbenchVideoWallHandler::at_deleteVideowallMatrixAction_triggered()
             continue;
 
         QnResourcePtr proxyResource(new QnResource());
-        proxyResource->setId(matrix.uuid());
+        proxyResource->setIdUnsafe(matrix.uuid());
         proxyResource->setName(matrix.videowall()->matrices()->getItem(matrix.uuid()).name);
         qnResIconCache->setKey(proxyResource, QnResourceIconCache::VideoWallMatrix);
         resources.append(proxyResource);

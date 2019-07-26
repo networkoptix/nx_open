@@ -686,9 +686,9 @@ void RuleProcessor::at_ruleAddedOrUpdated_impl(const vms::event::RulePtr& rule)
         if (other->id() == rule->id())
         {
             if (!other->isDisabled())
-                notifyResourcesAboutEventIfNeccessary(other, false);
+                notifyResourcesAboutEventIfNeccessary(other, /*isRuleAdded*/ false);
             if (!rule->isDisabled())
-                notifyResourcesAboutEventIfNeccessary(rule, true);
+                notifyResourcesAboutEventIfNeccessary(rule, /*isRuleAdded*/ true);
             terminateRunningRule(other);
             other = rule;
             return;
@@ -698,7 +698,7 @@ void RuleProcessor::at_ruleAddedOrUpdated_impl(const vms::event::RulePtr& rule)
     // Add new rule.
     m_rules << rule;
     if (!rule->isDisabled())
-        notifyResourcesAboutEventIfNeccessary(rule, true);
+        notifyResourcesAboutEventIfNeccessary(rule, /*isRuleAdded*/ true);
 }
 
 void RuleProcessor::at_ruleAddedOrUpdated(const vms::event::RulePtr& rule)

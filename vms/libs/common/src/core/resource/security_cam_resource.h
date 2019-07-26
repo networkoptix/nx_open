@@ -454,8 +454,8 @@ private:
     CachedValue<bool> m_cachedHasVideo;
     CachedValue<MotionStreamIndex> m_cachedMotionStreamIndex;
 
-private slots:
-    void resetCachedValues();
+protected slots:
+    virtual void resetCachedValues();
 };
 
 Q_DECLARE_METATYPE(QnSecurityCamResourcePtr)

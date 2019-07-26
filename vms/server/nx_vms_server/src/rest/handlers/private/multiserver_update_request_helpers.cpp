@@ -69,25 +69,28 @@ void checkUpdateStatusRemotely(
 
 IfParticipantPredicate makeIfParticipantPredicate(nx::CommonUpdateManager* updateManager)
 {
-    QnUuidList participants;
-    if (!updateManager->participants(&participants))
+    try
+    {
+        const auto updateInfo = updateManager->updateInformation(
+            nx::CommonUpdateManager::InformationCategory::target);
+
+        return
+            [updateInfo](
+                const QnUuid& id,
+                const nx::vms::api::SoftwareVersion& version)
+            {
+                if (!updateInfo.participants.isEmpty() && !updateInfo.participants.contains(id))
+                    return ParticipationStatus::notInList;
+
+                return version <= nx::vms::api::SoftwareVersion(updateInfo.version)
+                    ? ParticipationStatus::participant : ParticipationStatus::incompatibleVersion;
+            };
+    }
+    catch (const std::exception& e)
+    {
+        NX_DEBUG(nx::utils::log::Tag(QString("makeIfParticipantPredicate")), e.what());
         return nullptr;
-
-    const auto targetVersion = updateManager->targetVersion();
-    if (targetVersion.isNull())
-        return nullptr;
-
-    return
-        [participants = QSet<QnUuid>::fromList(participants), targetVersion](
-            const QnUuid& id,
-            const nx::vms::api::SoftwareVersion& version)
-        {
-            if (!participants.isEmpty() && !participants.contains(id))
-                return ParticipationStatus::notInList;
-
-            return version <= targetVersion
-                ? ParticipationStatus::participant : ParticipationStatus::incompatibleVersion;
-        };
+    }
 }
 
 } // namespace detail

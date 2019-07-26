@@ -54,7 +54,7 @@ protected:
     QnUserResourcePtr addUser(const QString &name, GlobalPermissions globalPermissions, QnUserType userType = QnUserType::Local)
     {
         QnUserResourcePtr user(new QnUserResource(userType));
-        user->setId(QnUuid::createUuid());
+        user->setIdUnsafe(QnUuid::createUuid());
         user->setName(name);
         user->setRawPermissions(globalPermissions);
         user->addFlags(Qn::remote);
@@ -70,7 +70,7 @@ protected:
             layout.reset(new QnFileLayoutResource());
         else
             layout.reset(new QnLayoutResource());
-        layout->setId(QnUuid::createUuid());
+        layout->setIdUnsafe(QnUuid::createUuid());
         layout->addFlags(flags);
         layout->setLocked(locked);
 

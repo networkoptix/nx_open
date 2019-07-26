@@ -407,7 +407,7 @@ void LayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, const QnUse
     QnLayoutResourcePtr newLayout;
 
     newLayout = QnLayoutResourcePtr(new QnLayoutResource());
-    newLayout->setId(QnUuid::createUuid());
+    newLayout->setIdUnsafe(QnUuid::createUuid());
     newLayout->setName(name);
     newLayout->setParentId(user->getId());
     newLayout->setCellSpacing(layout->cellSpacing());
@@ -837,7 +837,7 @@ void LayoutsHandler::at_newUserLayoutAction_triggered()
     }
 
     QnLayoutResourcePtr layout(new QnLayoutResource());
-    layout->setId(QnUuid::createUuid());
+    layout->setIdUnsafe(QnUuid::createUuid());
     layout->setName(dialog->name());
     layout->setParentId(user->getId());
     resourcePool()->addResource(layout);

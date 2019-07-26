@@ -127,7 +127,7 @@ public:
     {
         QnMediaServerResourcePtr server(new QnMediaServerResource(commonModule()));
         server->setVersion(version);
-        server->setId(QnUuid::createUuid());
+        server->setIdUnsafe(QnUuid::createUuid());
         server->setOsInfo(os::windows);
         server->setStatus(online ? Qn::ResourceStatus::Online : Qn::ResourceStatus::Offline);
 

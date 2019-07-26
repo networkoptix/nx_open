@@ -27,7 +27,7 @@ TEST(ExecActionAccessRightsTest, main) //< Crash on QnDbManager nullptr
     auto createUser = [&launcher](const QString& name, GlobalPermission permissions)
     {
         QnUserResourcePtr user(new QnUserResource(QnUserType::Local));
-        user->setId(QnUuid::createUuid());
+        user->setIdUnsafe(QnUuid::createUuid());
         user->setName(name);
         user->setRawPermissions(permissions);
         launcher.commonModule()->resourcePool()->addResource(user);

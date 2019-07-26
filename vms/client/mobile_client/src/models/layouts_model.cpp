@@ -19,6 +19,7 @@
 #include <watchers/available_cameras_watcher.h>
 #include <watchers/layout_cameras_watcher.h>
 #include <mobile_client/mobile_client_roles.h>
+#include <core/resource_access/resource_access_subject.h>
 
 using namespace nx;
 using nx::client::mobile::LayoutCamerasWatcher;
