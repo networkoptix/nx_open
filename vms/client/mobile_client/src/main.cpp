@@ -384,8 +384,9 @@ void processStartupParams(const QnMobileClientStartupParameters& startupParamete
 
 int main(int argc, char *argv[])
 {
-    // Disables platform-specific text input handles sine we have our custom ones.
-    qputenv("QT_QPA_NO_TEXT_HANDLES", "1");
+    // Disables platform-specific text input handles since we have our custom ones.
+    if (nx::utils::AppInfo::isAndroid())
+        qputenv("QT_QPA_NO_TEXT_HANDLES", "1");
 
 	nx::kit::OutputRedirector::ensureOutputRedirection();
 
