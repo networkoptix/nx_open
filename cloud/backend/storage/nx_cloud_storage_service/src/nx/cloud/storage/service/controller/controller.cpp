@@ -2,27 +2,23 @@
 
 #include "nx/cloud/storage/service/model/model.h"
 #include "nx/cloud/storage/service/settings.h"
-#include "bucket_manager.h"
-#include "storage_manager.h"
 
 namespace nx::cloud::storage::service::controller {
 
-Controller::Controller(const conf::Settings& settings, model::Model* /*model*/):
-    m_bucketManager(std::make_unique<BucketManager>(settings.aws())),
-    m_storageManager(std::make_unique<StorageManager>(settings.aws()))
+Controller::Controller(const conf::Settings& settings, model::Model* model):
+    m_bucketManager(settings, model),
+    m_storageManager(settings, model, &m_bucketManager)
 {
 }
 
-Controller::~Controller() = default;
-
 BucketManager* Controller::bucketManager()
 {
-    return m_bucketManager.get();
+    return &m_bucketManager;
 }
 
 StorageManager* Controller::storageManager()
 {
-    return m_storageManager.get();
+    return &m_storageManager;
 }
 
 } // namespace nx::cloud::storage::service::controller

@@ -1,6 +1,7 @@
 #pragma once
 
-#include <memory>
+#include "bucket_manager.h"
+#include "storage_manager.h"
 
 namespace nx::cloud::storage::service {
 
@@ -16,14 +17,13 @@ class Controller
 {
 public:
     Controller(const conf::Settings& settings, model::Model* model);
-    ~Controller();
 
     BucketManager* bucketManager();
     StorageManager* storageManager();
 
 private:
-    std::unique_ptr<BucketManager> m_bucketManager;
-    std::unique_ptr<StorageManager> m_storageManager;
+    BucketManager m_bucketManager;
+    StorageManager m_storageManager;
 };
 
 } // namespace controller
