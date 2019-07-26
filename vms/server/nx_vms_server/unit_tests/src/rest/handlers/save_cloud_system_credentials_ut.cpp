@@ -41,7 +41,7 @@ private:
     void insertSelfServerResource()
     {
         auto selfServer = QnMediaServerResourcePtr(new QnMediaServerResource(m_serverModule.commonModule()));
-        selfServer->setId(m_serverModule.commonModule()->moduleGUID());
+        selfServer->setIdUnsafe(m_serverModule.commonModule()->moduleGUID());
         selfServer->setServerFlags(nx::vms::api::SF_HasPublicIP);
         m_serverModule.resourcePool()->addResource(selfServer);
     }
@@ -49,7 +49,7 @@ private:
     void insertAdminUser()
     {
         auto admin = QnUserResourcePtr(new QnUserResource(QnUserType::Local));
-        admin->setId(QnUserResource::kAdminGuid);
+        admin->setIdUnsafe(QnUserResource::kAdminGuid);
         admin->setName("admin");
         admin->setPasswordAndGenerateHash("admin");
         admin->setOwner(true);

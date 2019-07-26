@@ -9,6 +9,8 @@
 
 #include <core/resource/user_resource.h>
 #include <common/common_module.h>
+#include <core/resource_access/global_permissions_manager.h>
+#include <nx/vms/api/data/user_role_data.h>
 
 using namespace nx::core::access;
 
@@ -43,19 +45,29 @@ bool QnBaseResourceAccessProvider::hasAccess(const QnResourceAccessSubject& subj
         return false;
 
     if (mode() == Mode::direct)
-        return isSubjectEnabled(subject) && calculateAccess(subject, resource);
+    {
+        return isSubjectEnabled(subject)
+            && calculateAccess(subject, resource,
+                globalPermissionsManager()->globalPermissions(subject));
+    }
 
-    /* We can get cache miss in the following scenario:
+    /**
+     * We can get cache miss in the following scenarios:
      * * new user was added
      * * global permissions manager emits 'changed'
      * * access manager recalculates all permissions
      * * access provider checks 'has access' to this user itself
      */
     QnMutexLocker lk(&m_mutex);
-    if (!m_accessibleResources.contains(subject.id()))
-        return false;
 
-    return m_accessibleResources[subject.id()].contains(resource->getId());
+    const auto iterator = m_accessibleResources.find(subject.id());
+    return iterator == m_accessibleResources.end() ? false : iterator->contains(resource->getId());
+}
+
+QSet<QnUuid> QnBaseResourceAccessProvider::accessibleResources(const QnResourceAccessSubject& subject) const
+{
+    QnMutexLocker lk(&m_mutex);
+    return m_accessibleResources.value(subject.id());
 }
 
 Source QnBaseResourceAccessProvider::accessibleVia(
@@ -86,8 +98,22 @@ void QnBaseResourceAccessProvider::afterUpdate()
     if (mode() == Mode::direct)
         return;
 
-    for (const auto& subject: resourceAccessSubjectsCache()->allSubjects())
-        updateAccessBySubject(subject);
+    const auto& resources = commonModule()->resourcePool()->getResources();
+    const auto& subjects = resourceAccessSubjectsCache()->allSubjects();
+
+    QnMutexLocker lk(&m_mutex);
+    for (const auto& subject: subjects)
+    {
+        if (!isSubjectEnabled(subject))
+            continue;
+        const auto globalPermissions = globalPermissionsManager()->globalPermissions(subject);
+        auto& accessible = m_accessibleResources[subject.id()];
+        for (const auto& resource: resources)
+        {
+            if (calculateAccess(subject, resource, globalPermissions))
+                accessible.insert(resource->getId());
+        }
+    }
 }
 
 bool QnBaseResourceAccessProvider::acceptable(const QnResourceAccessSubject& subject,
@@ -147,7 +173,8 @@ void QnBaseResourceAccessProvider::updateAccess(const QnResourceAccessSubject& s
         auto targetId = resource->getId();
 
         bool oldValue = accessible.contains(targetId);
-        newValue = isSubjectEnabled(subject) && calculateAccess(subject, resource);
+        newValue = isSubjectEnabled(subject) && calculateAccess(
+            subject, resource, globalPermissionsManager()->globalPermissions(subject));
         if (oldValue == newValue)
             return;
 
@@ -161,7 +188,7 @@ void QnBaseResourceAccessProvider::updateAccess(const QnResourceAccessSubject& s
 
     if (subject.isRole())
     {
-        for (const auto& dependent: resourceAccessSubjectsCache()->usersInRole(subject.role().id))
+        for (const auto& dependent: resourceAccessSubjectsCache()->usersInRole(subject.effectiveId()))
             updateAccess(dependent, resource);
     }
 }

@@ -328,7 +328,7 @@ void addFakeVideowallUser(QnCommonModule* commonModule)
     fakeUserData.permissions = GlobalPermission::videowallModePermissions;
 
     auto fakeUser = ec2::fromApiToResource(fakeUserData);
-    fakeUser->setId(Qn::kVideowallUserAccess.userId);
+    fakeUser->setIdUnsafe(Qn::kVideowallUserAccess.userId);
     fakeUser->setName("Video wall");
 
     commonModule->resourcePool()->addResource(fakeUser);
@@ -492,6 +492,7 @@ QnStorageResourcePtr MediaServerProcess::createStorage(const QnUuid& serverId, c
     storage->setName("Initial");
     storage->setParentId(serverId);
     storage->setUrl(path);
+    storage->fillID();
 
     const QString storagePath = QnStorageResource::toNativeDirPath(storage->getPath());
     const auto partitions = m_platform->monitor()->totalPartitionSpaceInfo();
@@ -3600,7 +3601,7 @@ bool MediaServerProcess::setUpMediaServerResource(
         {
             server = QnMediaServerResourcePtr(new QnMediaServerResource(commonModule()));
             const QnUuid serverGuid(serverModule->settings().serverGuid());
-            server->setId(serverGuid);
+            server->setIdUnsafe(serverGuid);
             server->setMaxCameras(nx::utils::AppInfo::isEdgeServer() ? 1 : 128);
 
             QString serverName(getDefaultServerName());

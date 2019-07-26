@@ -497,7 +497,7 @@ QnMediaServerResourcePtr Appserver2Process::addSelfServerResource(
     ec2::AbstractECConnectionPtr ec2Connection, int tcpPort)
 {
     auto server = QnMediaServerResourcePtr(new QnMediaServerResource(m_commonModule.get()));
-    server->setId(commonModule()->moduleGUID());
+    server->setIdUnsafe(commonModule()->moduleGUID());
 
     m_commonModule->resourcePool()->addResource(server);
     server->setServerFlags(nx::vms::api::SF_HasPublicIP);

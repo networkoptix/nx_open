@@ -10,6 +10,7 @@
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/uuid.h>
 #include <nx/client/core/watchers/user_watcher.h>
+#include <core/resource_access/resource_access_subject.h>
 
 namespace {
 
