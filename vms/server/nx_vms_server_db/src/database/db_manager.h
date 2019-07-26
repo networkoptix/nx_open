@@ -340,11 +340,12 @@ namespace detail
             nx::vms::api::ResourceParamWithRefDataList& params);
 
         // FullInfoData
-        ErrorCode readFullInfoDataComplete(nx::vms::api::FullInfoData* data);
+        ErrorCode readFullInfoDataComplete(
+            nx::vms::api::FullInfoData* data, const Qn::UserAccessData& userAccess);
 
         // FullInfoData abridged for Mobile Client
         ErrorCode readFullInfoDataForMobileClient(
-            nx::vms::api::FullInfoData* data, const QnUuid& userId);
+            nx::vms::api::FullInfoData* data, const Qn::UserAccessData& userAccess);
 
         //getLicenses
         ErrorCode doQueryNoLock(
@@ -787,6 +788,9 @@ namespace detail
 
         QMap<int, QnUuid> getGuidList(const QString& request, GuidConversionMethod method, const QByteArray& intHashPostfix = QByteArray());
 
+        ErrorCode  loadUserListFiltered(
+            nx::vms::api::FullInfoData* data, const Qn::UserAccessData& userAccess, bool forceFiltering);
+
         bool updateTableGuids(const QString& tableName, const QString& fieldName, const QMap<int, QnUuid>& guids);
         bool updateResourceTypeGuids();
         bool updateGuids();
@@ -912,13 +916,13 @@ public:
     ErrorCode doQuery(ApiCommand::Value command, std::nullptr_t /*dummy*/, nx::vms::api::FullInfoData& data)
     {
         NX_ASSERT(command == ApiCommand::getFullInfo);
-        return readFullInfoDataComplete(&data);
+        return readFullInfoDataComplete(&data, userAccessData());
     }
 
-    ErrorCode readFullInfoDataComplete(nx::vms::api::FullInfoData* data)
+    ErrorCode readFullInfoDataComplete(nx::vms::api::FullInfoData* data, const Qn::UserAccessData& userAccess)
     {
         const ErrorCode errorCode =
-            m_dbManager->readFullInfoDataComplete(data);
+            m_dbManager->readFullInfoDataComplete(data, userAccess);
         if (errorCode != ErrorCode::ok)
             return errorCode;
 
@@ -948,7 +952,7 @@ public:
     }
 
     ErrorCode readFullInfoDataForMobileClient(
-        nx::vms::api::FullInfoData* data, const QnUuid& userId);
+        nx::vms::api::FullInfoData* data, const Qn::UserAccessData& userAccess);
 
     QnDbHelper::QnDbTransaction* getTransaction();
     ApiObjectType getObjectTypeNoLock(const QnUuid& objectId);

@@ -46,7 +46,7 @@ TEST( QnMulticodecRtpReader, DISABLED_streamFetchingOverRTSP )
     QnSyncTime syncTimeInstance;
 
     QnNetworkResourcePtr resource( new QnNetworkResource() );
-    resource->setId( QUuid::createUuid() );
+    resource->setIdUnsafe( QUuid::createUuid() );
     resource->setName( "DummyRes" );
     QAuthenticator auth;
     auth.setUser( "root" );
@@ -527,7 +527,7 @@ TEST( QnMulticodecRtpReader, DISABLED_rtpParsingPerformance )
     testFile.close();
 
     QnNetworkResourcePtr resource( new QnNetworkResource() );
-    resource->setId( QUuid::createUuid() );
+    resource->setIdUnsafe( QUuid::createUuid() );
     resource->setName( "DummyRes" );
     QAuthenticator auth;
     auth.setUser( "root" );

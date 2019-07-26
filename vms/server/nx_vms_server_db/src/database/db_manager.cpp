@@ -59,6 +59,7 @@
 #include <nx/vms/time_sync/legacy/time_manager.h>
 #include <nx/sql/database.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource_access/global_permissions_manager.h>
 
 static const QString RES_TYPE_MSERVER = "mediaserver";
 static const QString RES_TYPE_CAMERA = "camera";
@@ -4710,7 +4711,8 @@ ec2::database::api::QueryCache::Pool* QnDbManager::queryCachePool()
         return errorCode; \
 } while (0)
 
-ErrorCode QnDbManager::readFullInfoDataComplete(FullInfoData* data)
+ErrorCode QnDbManager::readFullInfoDataComplete(
+    FullInfoData* data, const Qn::UserAccessData& userAccess)
 {
     QnWriteLocker lock(&m_mutex);
 
@@ -4719,7 +4721,13 @@ ErrorCode QnDbManager::readFullInfoDataComplete(FullInfoData* data)
     DB_LOAD(QnUuid(), data->serversUserAttributesList);
     DB_LOAD(QnUuid(), data->cameras);
     DB_LOAD(QnUuid(), data->cameraUserAttributesList);
-    DB_LOAD(QnUuid(), data->users);
+
+    if (auto errorCode = loadUserListFiltered(data, userAccess, /*forceFiltering*/ false);
+        errorCode != ErrorCode::ok)
+    {
+        return errorCode;
+    }
+
     DB_LOAD(QnUuid(), data->userRoles);
     DB_LOAD(QnUuid(), data->layouts);
     DB_LOAD(QnUuid(), data->videowalls);
@@ -4739,8 +4747,21 @@ ErrorCode QnDbManager::readFullInfoDataComplete(FullInfoData* data)
     return ErrorCode::ok;
 }
 
+ErrorCode QnDbManager::loadUserListFiltered(
+    FullInfoData* data, const Qn::UserAccessData& userAccess, bool forceFiltering)
+{
+    const bool useFiltering =
+        forceFiltering || !globalPermissionsManager()->canSeeAnotherUsers(userAccess);
+
+    DB_LOAD(useFiltering ? userAccess.userId : QnUuid(), data->users);
+    // Admin user is required for global properties.
+    if (useFiltering && userAccess.userId != QnUserResource::kAdminGuid)
+        DB_LOAD(QnUserResource::kAdminGuid, data->users);
+    return ErrorCode::ok;
+}
+
 ErrorCode QnDbManager::readFullInfoDataForMobileClient(
-    FullInfoData* data, const QnUuid& userId)
+    FullInfoData* data, const Qn::UserAccessData& userAccess)
 {
     QnWriteLocker lock(&m_mutex);
 
@@ -4749,7 +4770,12 @@ ErrorCode QnDbManager::readFullInfoDataForMobileClient(
     DB_LOAD(QnUuid(), data->cameras);
     DB_LOAD(QnUuid(), data->cameraUserAttributesList);
 
-    DB_LOAD(userId, data->users);
+    if (auto errorCode = loadUserListFiltered(data, userAccess, /*forceFiltering*/ true);
+        errorCode != ErrorCode::ok)
+    {
+        return errorCode;
+    }
+
     const UserData* user = nullptr;
     if (data->users.size() == 1)
         user = &data->users[0];
@@ -4773,10 +4799,6 @@ ErrorCode QnDbManager::readFullInfoDataForMobileClient(
             }),
             data->layouts.end());
     }
-
-    // Admin user is required for global properties.
-    if (userId != QnUserResource::kAdminGuid)
-        DB_LOAD(QnUserResource::kAdminGuid, data->users);
 
     // Event rules are required for software triggers.
     DB_LOAD(QnUuid(), data->rules);
@@ -5591,10 +5613,11 @@ bool QnDbManagerAccess::isTranAllowed(const QnAbstractTransaction& tran) const
     }
 }
 
-ErrorCode QnDbManagerAccess::readFullInfoDataForMobileClient(FullInfoData* data, const QnUuid& userId)
+ErrorCode QnDbManagerAccess::readFullInfoDataForMobileClient(
+    FullInfoData* data, const Qn::UserAccessData& userAccess)
 {
     const ErrorCode errorCode =
-        m_dbManager->readFullInfoDataForMobileClient(data, userId);
+        m_dbManager->readFullInfoDataForMobileClient(data, userAccess);
     if (errorCode != ErrorCode::ok)
         return errorCode;
 

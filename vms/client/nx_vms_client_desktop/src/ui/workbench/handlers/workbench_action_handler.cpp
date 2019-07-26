@@ -1833,7 +1833,7 @@ void ActionHandler::at_thumbnailsSearchAction_triggered()
 
     /* Construct and add a new layout. */
     QnLayoutResourcePtr layout(new QnLayoutResource());
-    layout->setId(QnUuid::createUuid());
+    layout->setIdUnsafe(QnUuid::createUuid());
     layout->setData(Qt::DecorationRole, qnSkin->icon("layouts/preview_search.png"));
     layout->setName(tr("Preview Search for %1").arg(resource->getName()));
     if (context()->user())

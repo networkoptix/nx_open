@@ -38,7 +38,7 @@ bool checkData(const std::array<TestData, size>& data)
     {
         QnAxisOnvifResourcePtr res(new QnAxisOnvifResource(&serverModule));
         res->setPhysicalId(value.physicalId);
-        res->setId(res->physicalIdToId(value.physicalId));
+        res->setIdUnsafe(res->physicalIdToId(value.physicalId));
         res->setUrl(value.url);
         res->setGroupId(value.groupId);
         res->setManuallyAdded(value.isManuallyAdded);

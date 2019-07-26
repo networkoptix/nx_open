@@ -361,7 +361,7 @@ private:
         {
             QnStorageResourcePtr storage = QnStorageResourcePtr(new QnFileStorageResource(serverModule));
             storage->setUrl(m_storageUrls[i]);
-            storage->setId(QnUuid::createUuid());
+            storage->setIdUnsafe(QnUuid::createUuid());
             storage->setUsedForWriting(true);
             ASSERT_EQ(storage->initOrUpdate(), Qn::StorageInit_Ok);
             if (i % 2 == 0)
@@ -471,7 +471,7 @@ public:
     static void SetUpTestCase()
     {
         testCamera.reset(new nx::CameraResourceStub());
-        testCamera->setId(QnUuid::createUuid());
+        testCamera->setIdUnsafe(QnUuid::createUuid());
         testCamera->setPhysicalId(testCamera->getId().toString());
 
         serverModule.reset(new QnMediaServerModule());

@@ -56,7 +56,7 @@ nx::vms::server::resource::StreamCapabilityMap HikvisionResource::getStreamCapab
     StreamIndex streamIndex)
 {
     QnMutexLocker lock(&m_mutex);
-    const auto capabilities = channelCapabilities(toConnectionRole(streamIndex));
+    const auto capabilities = channelCapabilities(toConnectionRole(streamIndex), /*allowBuildFromCapabilityMap*/ false);
     if (!capabilities)
         return base_type::getStreamCapabilityMapFromDriver(streamIndex);
 
@@ -68,8 +68,7 @@ nx::vms::server::resource::StreamCapabilityMap HikvisionResource::getStreamCapab
             auto& capability = result[{QnAvCodecHelper::codecIdToString(codec), resolution}];
             capability.minBitrateKbps = capabilities->bitrateRange.first;
             capability.maxBitrateKbps = capabilities->bitrateRange.second;
-
-            const auto maxFps = capabilities->realMaxFps();
+            capability.maxFps = capabilities->realMaxFps();
         }
     }
 
@@ -118,6 +117,10 @@ QnAbstractPtzController* HikvisionResource::createPtzControllerInternal() const
 CameraDiagnostics::Result HikvisionResource::initializeMedia(
     const _onvifDevice__GetCapabilitiesResponse& onvifCapabilities)
 {
+    auto result = fetchAndSetVideoSource();
+    if (!result)
+        return result;
+
     bool hevcIsDisabled = resourceData().value<bool>(ResourceDataKey::kDisableHevc, false);
 
     if (!hevcIsDisabled && m_integrationProtocols[Protocol::isapi].enabled)
@@ -195,7 +198,7 @@ CameraDiagnostics::Result HikvisionResource::fetchChannelCapabilities(
 {
     auto url = nx::utils::Url(getUrl());
     url.setPath(kCapabilitiesRequestPathTemplate.arg(
-        buildChannelNumber(role, getChannel())));
+        buildChannelNumber(role, hikvisionChannelNumber())));
 
     nx::Buffer response;
     nx::network::http::StatusCode::Value statusCode;
@@ -278,13 +281,29 @@ QnAudioTransmitterPtr HikvisionResource::initializeTwoWayAudio()
 }
 
 boost::optional<ChannelCapabilities> HikvisionResource::channelCapabilities(
-    Qn::ConnectionRole role)
+    Qn::ConnectionRole role, bool allowBuildFromCapabilityMap)
 {
     auto itr = m_channelCapabilitiesByRole.find(role);
-    if (itr == m_channelCapabilitiesByRole.end())
+    if (itr != m_channelCapabilitiesByRole.end())
+        return itr->second;
+    if (!allowBuildFromCapabilityMap)
         return boost::none;
 
-    return itr->second;
+    auto data = base_type::getStreamCapabilityMapFromDriver(toStreamIndex(role));
+    if (data.isEmpty())
+        return boost::none;
+
+    hikvision::ChannelCapabilities result;
+    for (auto itr = data.begin(); itr != data.end(); ++itr)
+    {
+        auto key = itr.key();
+        auto value = itr.value();
+        result.codecs.insert(QnAvCodecHelper::codecIdFromString(key.codec));
+        result.resolutions.push_back(key.resolution);
+        result.bitrateRange = std::make_pair(value.minBitrateKbps, value.maxBitrateKbps);
+        result.fpsInDeviceUnits.push_back(value.maxFps * 100);
+    }
+    return result;
 }
 
 bool HikvisionResource::findDefaultPtzProfileToken()
@@ -365,6 +384,19 @@ ProtocolStates HikvisionResource::tryToEnableIntegrationProtocols(
 CameraDiagnostics::Result HikvisionResource::fetchChannelCount(bool /*limitedByEncoders*/)
 {
     return base_type::fetchChannelCount(/*limitedByEncoders*/ false);
+}
+
+int HikvisionResource::hikvisionChannelNumber() const
+{
+    if (resourceData().value<bool>(lit("extractHikvisionChannelFromVideoSource"), false))
+    {
+        auto token = videoSourceToken();
+        bool ok = false;
+        int tokenNumber = QString::fromStdString(token).right(3).toInt(&ok);
+        if (ok)
+            return tokenNumber;
+    }
+    return getChannel() + 1;
 }
 
 } // namespace plugins

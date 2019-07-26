@@ -4,9 +4,23 @@
 #include <common/common_module.h>
 #include <nx/utils/log/assert.h>
 #include <nx/update/common_update_installer.h>
-#include <utils/common/synctime.h>
 
 namespace nx {
+
+namespace  {
+
+std::string toString(CommonUpdateManager::InformationCategory category)
+{
+    switch (category)
+    {
+        case CommonUpdateManager::InformationCategory::target: return "target";
+        case CommonUpdateManager::InformationCategory::installed: return "installed";
+    }
+
+    return "";
+}
+
+} // namespace
 
 using vms::common::p2p::downloader::FileInformation;
 using vms::common::p2p::downloader::Downloader;
@@ -419,77 +433,94 @@ void CommonUpdateManager::clearDownloader(bool force)
     }
 }
 
-bool CommonUpdateManager::deserializedUpdateInformation(
-    update::Information* outUpdateInformation, const QString& caller) const
+update::Information CommonUpdateManager::updateInformation(
+    InformationCategory category) const noexcept(false)
 {
-    const auto deserializeResult = nx::update::fromByteArray(
-        globalSettings()->targetUpdateInformation(), outUpdateInformation, nullptr);
+    update::Information information;
+    nx::update::FindPackageResult result;
 
-    if (deserializeResult != nx::update::FindPackageResult::ok)
+    switch (category)
     {
-        NX_DEBUG(this, "%1: Failed to deserialize", caller);
-        return false;
+        case InformationCategory::target:
+            result = nx::update::fromByteArray(
+                globalSettings()->targetUpdateInformation(),
+                &information,
+                nullptr);
+            break;
+        case InformationCategory::installed:
+            result = nx::update::fromByteArray(
+                globalSettings()->installedUpdateInformation(),
+                &information,
+                nullptr);
+            break;
     }
 
-    return true;
+    if (result != nx::update::FindPackageResult::ok)
+        throw std::runtime_error("Failed to deserialize " + toString(category) + " update information");
+
+    return information;
 }
 
-bool CommonUpdateManager::participants(QList<QnUuid>* outParticipants) const
+update::Information CommonUpdateManager::updateInformation(
+    InformationCategory category,
+    bool* ok) const
 {
-    nx::update::Information updateInformation;
-    if (!deserializedUpdateInformation(&updateInformation, "participants"))
-        return false;
+    update::Information result;
+    try
+    {
+        result = updateInformation(category);
+        if (ok)
+            *ok = true;
+    }
+    catch(const std::exception& e)
+    {
+        NX_DEBUG(this, e.what());
+        if (ok)
+            *ok = false;
+    }
 
-    *outParticipants = updateInformation.participants;
-    return true;
+    return result;
 }
 
-vms::api::SoftwareVersion CommonUpdateManager::targetVersion() const
+void CommonUpdateManager::setUpdateInformation(
+    InformationCategory category,
+    const update::Information& information) noexcept(false)
 {
-    nx::update::Information updateInformation;
-    if (!deserializedUpdateInformation(&updateInformation, "targetVersion"))
-        return vms::api::SoftwareVersion();
 
-    return vms::api::SoftwareVersion(updateInformation.version);
-}
-
-bool CommonUpdateManager::setParticipants(const QList<QnUuid>& participants)
-{
-    nx::update::Information updateInformation;
-    if (!deserializedUpdateInformation(&updateInformation, "setParticipants"))
-        return false;
-
-    updateInformation.participants = participants;
-    setUpdateInformation(updateInformation);
-
-    return true;
-}
-
-void CommonUpdateManager::setUpdateInformation(const update::Information& updateInformation)
-{
     QByteArray serializedUpdateInformation;
+    QJson::serialize(information, &serializedUpdateInformation);
 
-    QJson::serialize(updateInformation, &serializedUpdateInformation);
-    globalSettings()->setTargetUpdateInformation(serializedUpdateInformation);
-    globalSettings()->synchronizeNowSync();
-}
-
-bool CommonUpdateManager::updateLastInstallationRequestTime()
-{
-    nx::update::Information updateInformation;
-    const auto deserializeResult = nx::update::fromByteArray(globalSettings()->targetUpdateInformation(),
-        &updateInformation, nullptr);
-
-    if (deserializeResult != nx::update::FindPackageResult::ok)
+    switch (category)
     {
-        NX_DEBUG(this, "updateLastInstallationRequestTime: Failed to deserialize");
-        return false;
+        case InformationCategory::target:
+            globalSettings()->setTargetUpdateInformation(serializedUpdateInformation);
+            break;
+        case InformationCategory::installed:
+            globalSettings()->setInstalledUpdateInformation(serializedUpdateInformation);
+            break;
     }
 
-    updateInformation.lastInstallationRequestTime = qnSyncTime->currentMSecsSinceEpoch();
-    setUpdateInformation(updateInformation);
+    if (!globalSettings()->synchronizeNowSync())
+        throw std::runtime_error("Failed to synchronize " + toString(category) + "update information");
+}
 
-    return true;
+void CommonUpdateManager::setUpdateInformation(
+    InformationCategory category,
+    const update::Information& information,
+    bool* ok)
+{
+    try
+    {
+        setUpdateInformation(category, information);
+        if (ok)
+            *ok = true;
+    }
+    catch (const std::exception& e)
+    {
+        NX_DEBUG(this, e.what());
+        if (ok)
+            *ok = false;
+    }
 }
 
 bool CommonUpdateManager::statusAppropriateForDownload(

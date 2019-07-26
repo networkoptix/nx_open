@@ -51,7 +51,7 @@ CameraDiagnostics::Result HikvisionHevcStreamReader::openStreamInternal(
         return m_rtpReader.openStream();
     }
 
-    auto optionalChannelCapabilities = m_hikvisionResource->channelCapabilities(role);
+    auto optionalChannelCapabilities = m_hikvisionResource->channelCapabilities(role, /*allowBuildFromCapabilityMap*/ true);
     if (!optionalChannelCapabilities)
     {
         return CameraDiagnostics::CameraInvalidParams(
@@ -229,12 +229,19 @@ boost::optional<int> HikvisionHevcStreamReader::rescaleQuality(
     return outputQuality[outputIndex];
 }
 
+nx::utils::Url HikvisionHevcStreamReader::buildHikvisionUrl(const QString& requestTemplate) const
+{
+    return hikvisionRequestUrlFromPath(kIsapiChannelStreamingPathTemplate.arg(
+        buildChannelNumber(getRole(), m_hikvisionResource->hikvisionChannelNumber())));
+}
+
 CameraDiagnostics::Result HikvisionHevcStreamReader::fetchChannelProperties(
     ChannelProperties* outChannelProperties) const
 {
     boost::optional<int> rtspPort;
-    auto url = hikvisionRequestUrlFromPath(kIsapiChannelStreamingPathTemplate.arg(
-        buildChannelNumber(getRole(), m_hikvisionResource->getChannel())));
+
+
+    auto url = buildHikvisionUrl(kIsapiChannelStreamingPathTemplate);
 
     auto result = fetchRtspPortViaIsapi(&rtspPort);
     if (result.errorCode == CameraDiagnostics::ErrorCode::notAuthorised)
@@ -251,8 +258,7 @@ CameraDiagnostics::Result HikvisionHevcStreamReader::fetchChannelProperties(
                     m_hikvisionResource->getUserDefinedName(),
                     m_hikvisionResource->getId()));
 
-        url = hikvisionRequestUrlFromPath(kChannelStreamingPathTemplate.arg(
-            buildChannelNumber(getRole(), m_hikvisionResource->getChannel())));
+        url = buildHikvisionUrl(kChannelStreamingPathTemplate);
         result = fetchRtspPortViaOldApi(&rtspPort);
     }
 
@@ -298,8 +304,7 @@ CameraDiagnostics::Result HikvisionHevcStreamReader::fetchRtspPortViaIsapi(
 CameraDiagnostics::Result HikvisionHevcStreamReader::fetchRtspPortViaOldApi(
     boost::optional<int>* outRtspPort) const
 {
-    auto url = hikvisionRequestUrlFromPath(kChannelStreamingPathTemplate.arg(
-        buildChannelNumber(getRole(), m_hikvisionResource->getChannel())));
+    auto url = buildHikvisionUrl(kChannelStreamingPathTemplate);
 
     nx::Buffer response;
     const auto result = fetchResponse(url, &response);

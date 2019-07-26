@@ -30,6 +30,7 @@ ApiCameraDataStatistics::ApiCameraDataStatistics(nx::vms::api::CameraDataEx&& da
         ResourcePropertyKey::Onvif::kDeviceID,
         ResourcePropertyKey::Onvif::kDeviceUrl,
         ResourcePropertyKey::Onvif::kMediaUrl,
+        ResourcePropertyKey::Onvif::kIgnoreMedia2,
         QnVirtualCameraResource::kUserEnabledAnalyticsEnginesProperty,
         QnVirtualCameraResource::kCompatibleAnalyticsEnginesProperty,
         QnVirtualCameraResource::kDeviceAgentsSettingsValuesProperty,

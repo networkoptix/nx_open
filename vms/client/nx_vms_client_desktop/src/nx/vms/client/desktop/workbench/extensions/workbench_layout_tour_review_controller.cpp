@@ -215,7 +215,7 @@ void LayoutTourReviewController::reviewLayoutTour(const nx::vms::api::LayoutTour
     static const float kCellAspectRatio{16.0f / 9.0f};
 
     const auto layout = QnLayoutResourcePtr(new QnLayoutResource());
-    layout->setId(QnUuid::createUuid()); //< Layout is never saved to server.
+    layout->setIdUnsafe(QnUuid::createUuid()); //< Layout is never saved to server.
     layout->setParentId(tour.id);
     layout->setName(tour.name);
     layout->setData(Qn::IsSpecialLayoutRole, true);
