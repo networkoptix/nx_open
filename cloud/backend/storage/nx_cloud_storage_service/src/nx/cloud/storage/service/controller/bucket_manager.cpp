@@ -31,7 +31,7 @@ void BucketManager::addBucket(
 }
 
 void BucketManager::listBuckets(
-    nx::utils::MoveOnlyFunc<void(api::Result, std::vector<api::Bucket>)> /*handler*/)
+    nx::utils::MoveOnlyFunc<void(api::Result, api::Buckets)> /*handler*/)
 {
 }
 
