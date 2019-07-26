@@ -16,9 +16,10 @@ class NX_NETWORK_API Client:
     using base_type = network::http::GenericApiClient<Client>;
 
 public:
-    using ResultCode = api::ResultCode;
+    using ResultCode = api::Result;
 
     Client(const nx::utils::Url& cloudStorageServiceUrl);
+    ~Client();
 
     void addStorage(
         const AddStorageRequest& request,
@@ -36,41 +37,42 @@ public:
         const std::string& storageId,
         nx::utils::MoveOnlyFunc<void(ResultCode, std::vector<std::string>)> handler);
 
-    /**
-     * NOTE: Error is only defined if ResultCode is not ResultCode::ok.
-     * If an error occurs, it contains the information from the underlying service
-     * that generated it.
-     */
     void addBucket(
         const AddBucketRequest& request,
-        nx::utils::MoveOnlyFunc<void(ResultCode, Error)> handler);
+        nx::utils::MoveOnlyFunc<void(ResultCode, Bucket)> handler);
 
     void removeBucket(
         const std::string& bucketName,
         nx::utils::MoveOnlyFunc<void(ResultCode)> handler);
 
     void listBuckets(
-        nx::utils::MoveOnlyFunc<void(ResultCode, std::vector<Bucket>)> handler);
+        nx::utils::MoveOnlyFunc<void(ResultCode, Buckets)> handler);
 
     template<typename... Output>
-    static auto getResultCode(
+    static ResultCode getResultCode(
         SystemError::ErrorCode systemErrorCode,
         const network::http::Response* response,
+        const network::http::FusionRequestResult& fusionRequestResult,
         const Output&... output);
 
 private:
     static ResultCode toResultCode(SystemError::ErrorCode errorCode);
     static ResultCode toResultCode(const network::http::Response* response);
+    static ResultCode toResultCode(const network::http::FusionRequestResult& fusionRequestResult);
 };
 
 template<typename... Output>
-auto Client::getResultCode(
+Client::ResultCode Client::getResultCode(
     SystemError::ErrorCode systemErrorCode,
     const network::http::Response* response,
+    const network::http::FusionRequestResult& fusionRequestResult,
     const Output&... /*output*/)
 {
     if (systemErrorCode != SystemError::noError)
         return toResultCode(systemErrorCode);
+
+    if (!fusionRequestResult.resultCode.isEmpty())
+        return toResultCode(fusionRequestResult);
 
     if (!response)
         return api::ResultCode::networkError;

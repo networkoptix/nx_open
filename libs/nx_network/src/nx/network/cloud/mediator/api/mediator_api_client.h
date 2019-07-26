@@ -42,6 +42,7 @@ public:
     static ResultCode getResultCode(
         SystemError::ErrorCode systemErrorCode,
         const network::http::Response* response,
+        const network::http::FusionRequestResult& /*fusionRequestResult*/,
         const Output&...)
     {
         if (systemErrorCode != SystemError::noError)

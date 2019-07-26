@@ -19,11 +19,13 @@ namespace nx::network::http {
  * - If ResultCode is different from nx::network::http::StatusCode, then following method MUST be
  * defined too:
  * <pre><code>
- * template<typename... Output>
- * auto getResultCode(
- *     SystemError::ErrorCode systemErrorCode,
- *     const network::http::Response* response,
- *     const Output&... output);
+ * public:
+ *     template<typename... Output>
+ *     static auto getResultCode(
+ *         SystemError::ErrorCode systemErrorCode,
+ *         const network::http::Response* response,
+ *         const network::http::FusionRequestResult& fusionRequestResult,
+ *         const Output&... output);
  * </code></pre>
  */
 template<typename ApiResultCodeDescriptor>
@@ -84,9 +86,9 @@ private:
         const std::string& requestPath,
         InputArgs... inputArgs);
 
-    template<typename CompletionHandler, typename... Output>
+    template<typename Request, typename CompletionHandler, typename... Output>
     void processResponse(
-        network::aio::BasicPollable* requestPtr,
+        Request* requestPtr,
         CompletionHandler handler,
         SystemError::ErrorCode error,
         const network::http::Response* response,
@@ -99,6 +101,7 @@ private:
     auto getResultCode(
         SystemError::ErrorCode systemErrorCode,
         const network::http::Response* response,
+        const network::http::FusionRequestResult& fusionRequestResult,
         const Output&... output) const;
 
     template<typename Output, typename ResultTuple, typename... InputArgs>
@@ -234,9 +237,9 @@ auto GenericApiClient<ApiResultCodeDescriptor>::createHttpClient(
 }
 
 template<typename ApiResultCodeDescriptor>
-template<typename CompletionHandler, typename... Output>
+template<typename Request, typename CompletionHandler, typename... Output>
 void GenericApiClient<ApiResultCodeDescriptor>::processResponse(
-    network::aio::BasicPollable* requestPtr,
+    Request* requestPtr,
     CompletionHandler handler,
     SystemError::ErrorCode error,
     const network::http::Response* response,
@@ -244,9 +247,10 @@ void GenericApiClient<ApiResultCodeDescriptor>::processResponse(
 {
     Context context = takeContextOfRequest(requestPtr);
 
-    const auto resultCode = getResultCode(error, response, output...);
+    const auto resultCode =
+        getResultCode(error, response, requestPtr->lastFusionRequestResult(), output...);
 
-    handler(resultCode, std::move(output)...);
+    handler(std::move(resultCode), std::move(output)...);
 }
 
 template<typename ApiResultCodeDescriptor>
@@ -268,6 +272,7 @@ template<typename... Output>
 auto GenericApiClient<ApiResultCodeDescriptor>::getResultCode(
     [[maybe_unused]] SystemError::ErrorCode systemErrorCode,
     const network::http::Response* response,
+    const network::http::FusionRequestResult& fusionRequestResult,
     const Output&... output) const
 {
     if constexpr (std::is_same<
@@ -284,6 +289,7 @@ auto GenericApiClient<ApiResultCodeDescriptor>::getResultCode(
         return ApiResultCodeDescriptor::getResultCode(
             systemErrorCode,
             response,
+            fusionRequestResult,
             output...);
     }
 }
