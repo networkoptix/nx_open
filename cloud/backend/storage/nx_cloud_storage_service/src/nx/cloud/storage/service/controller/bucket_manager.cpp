@@ -8,9 +8,7 @@
 
 namespace nx::cloud::storage::service::controller {
 
-using namespace std::placeholders;
-
-namespace {
+using namespace api;
 
 BucketManager::BucketManager(const conf::Settings& /*settings*/, model::Model* /*model*/)/*:
     m_settings(settings),
