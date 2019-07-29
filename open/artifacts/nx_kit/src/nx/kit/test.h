@@ -23,14 +23,34 @@ namespace test {
 
 extern bool NX_KIT_API verbose; //< Use to control additional output of the unit test framework.
 
-#define TEST(TEST_CASE, TEST_NAME) \
+ /**
+  * Main macro for defining a test function. Calls a helper macro - such trick allows to comment
+  * out all tests except one by redefining TEST to IGNORE_TEST, and changing that one test to use
+  * DEFINE_TEST instead of TEST.
+  *
+  * Usage:
+  * ```
+  *     TEST(MySuite, myTest)
+  *     {
+  *         int var = 42;
+  *         ASSERT_EQ(42, var);
+  *     }
+  * ```
+  */
+#define TEST(TEST_CASE, TEST_NAME) DEFINE_TEST(TEST_CASE, TEST_NAME)
+
+#define DEFINE_TEST(TEST_CASE, TEST_NAME) \
     static void test_##TEST_CASE##_##TEST_NAME(); \
     int unused_##TEST_CASE##_##TEST_NAME /* Not `static const` to suppress "unused" warning. */ = \
         ::nx::kit::test::detail::regTest( \
             {#TEST_CASE, #TEST_NAME, #TEST_CASE "." #TEST_NAME, test_##TEST_CASE##_##TEST_NAME, \
                 /*tempDir*/ ""}); \
     static void test_##TEST_CASE##_##TEST_NAME()
-    // Function body follows the TEST macro.
+    // Function body follows the DEFINE_TEST macro.
+
+#define IGNORE_TEST(TEST_CASE, TEST_NAME) \
+    static void ignored_test_##TEST_CASE##_##TEST_NAME()
+    // Function body follows the IGNORE_TEST macro.
 
 #define ASSERT_TRUE(CONDITION) \
     ::nx::kit::test::detail::assertBool(true, !!(CONDITION), #CONDITION, __FILE__, __LINE__)
