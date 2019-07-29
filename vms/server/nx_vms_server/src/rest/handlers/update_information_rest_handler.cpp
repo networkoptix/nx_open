@@ -26,17 +26,15 @@
 namespace {
 
 static const QString kVersionParamName = "version";
-static const QString KTargetVersion = "target";
-static const QString KInstalledVersion = "installed";
 
 using MaybeUpdateInfoCategory = std::optional<nx::CommonUpdateManager::InformationCategory>;
 
 static MaybeUpdateInfoCategory categoryFromString(const QString& requestedVersion)
 {
-    if (requestedVersion.isNull() || requestedVersion == KTargetVersion)
+    if (requestedVersion.isNull() || requestedVersion == "target")
         return nx::CommonUpdateManager::InformationCategory::target;
 
-    if (requestedVersion == KInstalledVersion)
+    if (requestedVersion == "installed")
         return nx::CommonUpdateManager::InformationCategory::installed;
 
     return std::nullopt;
@@ -177,8 +175,8 @@ int QnUpdateInformationRestHandler::checkInternetForUpdate(
         QnRestResult::CantProcessRequest);
 }
 
-QnUpdateInformationRestHandler::QnUpdateInformationRestHandler(QnMediaServerModule *serverModule)
-    : nx::vms::server::ServerModuleAware(serverModule)
+QnUpdateInformationRestHandler::QnUpdateInformationRestHandler(QnMediaServerModule *serverModule):
+    nx::vms::server::ServerModuleAware(serverModule)
 {
 }
 
@@ -186,14 +184,20 @@ QnUpdateInformationRestHandler::HandlerType QnUpdateInformationRestHandler::crea
     const UpdateInformationRequestData& request) const
 {
     using namespace std::placeholders;
+    auto fromMemFn =
+        [this, &request](auto memFn)
+        {
+            return [this, &request, memFn](auto body, auto contenType)
+                { return (this->*memFn)(request, body, contenType); };
+        };
 
-    if (request.path.endsWith(lit("/freeSpaceForUpdateFiles")))
-        return std::bind(&QnUpdateInformationRestHandler::handleFreeSpace, this, request, _1, _2);
+    if (request.path.endsWith("/freeSpaceForUpdateFiles"))
+        return fromMemFn(&QnUpdateInformationRestHandler::handleFreeSpace);
 
-    if (request.path.endsWith(lit("/checkCloudHost")))
-        return std::bind(&QnUpdateInformationRestHandler::handleCheckCloudHost, this, request, _1, _2);
+    if (request.path.endsWith("/checkCloudHost"))
+        return fromMemFn(&QnUpdateInformationRestHandler::handleCheckCloudHost);
 
-    return std::bind(&QnUpdateInformationRestHandler::handleVersion, this, request, _1, _2);
+    return fromMemFn(&QnUpdateInformationRestHandler::handleVersion);
 }
 
 int QnUpdateInformationRestHandler::handleFreeSpace(
