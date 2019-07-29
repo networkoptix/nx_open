@@ -45,7 +45,7 @@ void AnalyticsSdkEventModel::loadFromCameras(const QnVirtualCameraResourceList& 
         };
 
     auto addItemRecursive = nx::utils::y_combinator(
-        [addItem](auto addItemRecursive, auto parent, auto root) -> void
+        [addItem](auto addItemRecursive, QStandardItem* parent, auto root) -> void
         {
             for (auto node: root->children)
             {
