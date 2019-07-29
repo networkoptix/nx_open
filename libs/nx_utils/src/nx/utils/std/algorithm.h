@@ -215,5 +215,38 @@ void to_lower(StringType* str)
     std::transform(str->begin(), str->end(), str->begin(), &tolower);
 }
 
+namespace detail {
+
+template<class Functor>
+class y_combinator_result
+{
+    Functor functor;
+
+public:
+    template<class T>
+    explicit y_combinator_result(T&& impl): functor(std::forward<T>(impl)) {}
+
+    template<class... Args>
+    decltype(auto) operator()(Args&&... args) const
+    {
+        return functor(std::ref(*this), std::forward<Args>(args)...);
+    }
+};
+
+} // namespace detail
+
+/**
+ * Standard Y-combinator implementation to create recursive lambdas without an explicit declaration
+ * of the std::function arguments and the return type.
+ * Usage example:
+ * auto recursive_lambda = y_combinator([](auto recursive_lambda) { recursive_lambda(); });
+ * Implementation is taken from the P0200R0.
+ */
+template<class Functor>
+decltype(auto) y_combinator(Functor&& functor)
+{
+    return detail::y_combinator_result<std::decay_t<Functor>>(std::forward<Functor>(functor));
+}
+
 } // namespace utils
 } // namespace nx
