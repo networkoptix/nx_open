@@ -10,6 +10,9 @@
 QnClientCameraResource::QnClientCameraResource(const QnUuid& resourceTypeId):
     base_type(resourceTypeId)
 {
+    // Handle situation when flags are added externally after resource is created.
+    connect(this, &QnResource::flagsChanged, this,
+        [this]() { m_cachedFlags.store(calculateFlags()); }, Qt::DirectConnection);
 }
 
 Qn::ResourceFlags QnClientCameraResource::calculateFlags() const
