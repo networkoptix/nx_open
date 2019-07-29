@@ -169,7 +169,7 @@ Control
                     if (d.offline)
                         return lp("/images/camera_offline.png")
                     if (d.ioModule)
-                        return lp("/images/alert_io.png")
+                        return lp("/images/preview_io.svg")
                     return ""
                 }
             }
