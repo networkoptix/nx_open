@@ -9,7 +9,7 @@ set(deb_dependencies_list
     "debconf (>= 0.5) | debconf-2.0"
     "python"
     "psmisc"
-    "systemd"
+    "systemd (>= 229)"
     "cifs-utils"
     "net-tools"
     "libcap2-bin"

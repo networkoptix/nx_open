@@ -23,6 +23,8 @@
 #include "core/resource_management/resource_pool.h"
 #include <core/resource/media_server_resource.h>
 
+#include <client/client_app_info.h>
+
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/resource_views/functional_delegate_utilities.h>
 
@@ -139,8 +141,10 @@ void QnAboutDialog::generateServersReport()
         {
             return QnMediaServerResource::isArmServer(server);
         });
-    ui->armSupportLabel->setVisible(hasArmServers);
-    ui->armSupportTitleLabel->setVisible(hasArmServers);
+
+    const bool showArmSupportPolicy = QnClientAppInfo::armSupportPolicyPresent && hasArmServers;
+    ui->armSupportLabel->setVisible(showArmSupportPolicy);
+    ui->armSupportTitleLabel->setVisible(showArmSupportPolicy);
 }
 
 void QnAboutDialog::retranslateUi()

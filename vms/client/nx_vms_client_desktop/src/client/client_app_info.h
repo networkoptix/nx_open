@@ -37,4 +37,6 @@ struct QnClientAppInfo
     /** Additional MetaVMS version. */
     static QString metaVersion();
 
+    /** If enabled, arm support policy link will be displayed in the "About" dialog. */
+    static bool armSupportPolicyPresent();
 };

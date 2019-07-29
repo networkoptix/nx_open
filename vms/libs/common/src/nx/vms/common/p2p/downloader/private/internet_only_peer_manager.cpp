@@ -71,7 +71,7 @@ AbstractPeerManager::RequestContextPtr<QByteArray> InternetOnlyPeerManager::down
     int chunkIndex,
     int chunkSize)
 {
-    constexpr milliseconds kDownloadRequestTimeout = 10min;
+    constexpr milliseconds kDownloadRequestTimeout = 1min;
 
     if (!peerId.isNull())
         return {};

@@ -7729,6 +7729,14 @@ If you intended to move analytics data to another storage location, please conta
         <source>Plugins</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Motion detection is disabled, all schedule records &quot;Motion&quot; and &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Dual streaming is disabled, all schedule records &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::CameraSettingsLicenseWatcher</name>

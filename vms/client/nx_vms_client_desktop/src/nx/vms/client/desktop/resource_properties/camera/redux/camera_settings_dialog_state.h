@@ -57,6 +57,15 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractReduxState
         motionDetectionTooManySensitivityRectangles
     };
 
+    enum class ScheduleAlert
+    {
+        // "Motion + LQ" schedule records will be changed to "Always" due to no dual streaming.
+        scheduleChangeDueToNoDualStreaming,
+
+        // "Motion" and "Motion + LQ" schedule records will be changed to "Always" due to no motion.
+        scheduleChangeDueToNoMotion,
+    };
+
     bool hasChanges = false;
     bool readOnly = true;
     bool settingsOptimizationEnabled = false;
@@ -241,6 +250,7 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractReduxState
     std::optional<RecordingHint> recordingHint;
     std::optional<RecordingAlert> recordingAlert;
     std::optional<MotionAlert> motionAlert;
+    std::optional<ScheduleAlert> scheduleAlert;
 
     struct ImageControlSettings
     {

@@ -729,9 +729,6 @@ void MultiServerUpdatesWidget::setUpdateTarget(
     auto report = calculateUpdateVersionReport(m_updateInfo, clientId);
     m_updateReport = report;
 
-    m_targetVersion = nx::utils::SoftwareVersion(contents.info.version);
-    m_targetChangeset = m_targetVersion.build();
-
     if (activeUpdate)
     {
         m_haveValidUpdate = true;
@@ -741,13 +738,10 @@ void MultiServerUpdatesWidget::setUpdateTarget(
         m_haveValidUpdate = false;
         if (contents.isValidToInstall() && !contents.alreadyInstalled)
             m_haveValidUpdate = true;
-
-        if (!m_updateInfo.clientPackage.isValid())
-            syncStatusVisibility();
     }
 
     m_stateTracker->setUpdateTarget(contents.getVersion());
-    m_updateLocalStateChanged = true;
+    m_forceUiStateUpdate = true;
     m_updateRemoteStateChanged = true;
     // TODO: We should collect all these changes to a separate state-structure.
     // TODO: We should split state flags more consistenly.
@@ -801,12 +795,23 @@ void MultiServerUpdatesWidget::atUpdateCurrentState()
 
     processRemoteChanges();
 
+    // TODO: we should invoke syncProgress only once inside loadDataToUi()
     if (stateHasProgress(m_widgetState))
         syncProgress();
-    if (m_updateRemoteStateChanged || m_updateLocalStateChanged)
+    if (hasPendingUiChanges())
         loadDataToUi();
 
     syncDebugInfoToUi();
+}
+
+bool MultiServerUpdatesWidget::hasPendingUiChanges() const
+{
+    return m_updateRemoteStateChanged
+        || m_forceUiStateUpdate
+        || m_updateSourceMode.changed()
+        || m_controlPanelState.changed()
+        || m_widgetState.changed()
+        || m_statusColumnMode.changed();
 }
 
 void MultiServerUpdatesWidget::atCheckInstallState()
@@ -846,12 +851,11 @@ void MultiServerUpdatesWidget::forcedUpdate()
 void MultiServerUpdatesWidget::clearUpdateInfo()
 {
     NX_INFO(this, "clearUpdateInfo()");
-    m_targetVersion = nx::utils::SoftwareVersion();
-    m_updateReport = {};
+    m_updateReport = VersionReport();
     m_updateInfo = nx::update::UpdateContents();
     m_updatesModel->setUpdateTarget(nx::utils::SoftwareVersion());
     m_stateTracker->clearVerificationErrors();
-    m_updateLocalStateChanged = true;
+    m_forceUiStateUpdate = true;
     m_updateCheck = std::future<nx::update::UpdateContents>();
 }
 
@@ -866,10 +870,11 @@ void MultiServerUpdatesWidget::pickLocalFile()
         return;
 
     m_updateSourceMode = UpdateSourceType::file;
-    m_updateLocalStateChanged = true;
+    m_forceUiStateUpdate = true;
 
     clearUpdateInfo();
     m_updateCheck = m_serverUpdateTool->checkUpdateFromFile(fileName);
+
     loadDataToUi();
 }
 
@@ -880,14 +885,9 @@ void MultiServerUpdatesWidget::pickSpecificBuild()
         return;
 
     m_updateSourceMode = UpdateSourceType::internetSpecific;
-    m_updateLocalStateChanged = true;
+    m_forceUiStateUpdate = true;
 
     clearUpdateInfo();
-    nx::utils::SoftwareVersion version = commonModule()->engineVersion();
-    auto buildNumber = dialog.buildNumber();
-
-    m_targetVersion = nx::utils::SoftwareVersion(version.major(), version.minor(), version.bugfix(), buildNumber);
-    m_targetChangeset = dialog.changeset();
     QString updateUrl = qnSettings->updateFeedUrl();
     m_updateCheck = m_serverUpdateTool->checkSpecificChangeset(
         updateUrl,
@@ -933,7 +933,8 @@ void MultiServerUpdatesWidget::checkForInternetUpdates(bool initial)
         clearUpdateInfo();
         QString updateUrl = qnSettings->updateFeedUrl();
         m_updateCheck = m_serverUpdateTool->checkLatestUpdate(updateUrl);
-        // Maybe we should call loadDataToUi instead.
+        m_updateReport.compareAndSet(m_updateReport->checking, isChecking());
+        // We have changed 'isChecking' here.
         syncUpdateCheckToUi();
     }
 }
@@ -947,7 +948,7 @@ void MultiServerUpdatesWidget::setUpdateSourceMode(UpdateSourceType mode, bool f
     {
         case UpdateSourceType::internet:
             m_updateSourceMode = mode;
-            m_updateLocalStateChanged = true;
+            m_forceUiStateUpdate = true;
             clearUpdateInfo();
             checkForInternetUpdates();
             loadDataToUi();
@@ -1062,7 +1063,7 @@ void MultiServerUpdatesWidget::atStartUpdateAction()
             toString(m_widgetState));
     }
 
-    if (m_updateRemoteStateChanged)
+    if (hasPendingUiChanges())
         loadDataToUi();
 }
 
@@ -1140,7 +1141,7 @@ bool MultiServerUpdatesWidget::atCancelCurrentAction()
         return false;
     }
 
-    if (m_updateRemoteStateChanged)
+    if (hasPendingUiChanges())
         loadDataToUi();
 
     // Spec says that we can not cancel anything when we began installing stuff.
@@ -1216,7 +1217,7 @@ void MultiServerUpdatesWidget::atCancelUpdateComplete(bool success, const QStrin
         }
     }
 
-    if (m_updateRemoteStateChanged)
+    if (hasPendingUiChanges())
         loadDataToUi();
 }
 
@@ -1249,7 +1250,8 @@ void MultiServerUpdatesWidget::atStartInstallComplete(bool success, const QStrin
             }
         }
     }
-    if (m_updateRemoteStateChanged)
+
+    if (hasPendingUiChanges())
         loadDataToUi();
 }
 
@@ -1289,7 +1291,7 @@ void MultiServerUpdatesWidget::atFinishUpdateComplete(bool success, const QStrin
         }
     }
 
-    if (m_updateRemoteStateChanged)
+    if (hasPendingUiChanges())
         loadDataToUi();
 }
 
@@ -1314,7 +1316,7 @@ void MultiServerUpdatesWidget::repeatUpdateValidation()
         NX_INFO(this, "repeatUpdateValidation() - update info is completely empty. Nothing to recalculate");
     }
 
-    if (m_updateLocalStateChanged)
+    if (m_forceUiStateUpdate)
         loadDataToUi();
 }
 
@@ -1364,6 +1366,12 @@ void MultiServerUpdatesWidget::atServerConfigurationChanged(std::shared_ptr<Upda
     {
         return;
     }
+    /* Possible changes:
+     *  - server goes offline. We should wait it a bit if server was in readyInstall
+     *  - server goes online. We should repeat verification
+     *  - server was removed. We should check if we need to continue update.
+     *  - server was added. We should repeat verification
+     */
 
     if (!item->offline || !item->verificationMessage.isEmpty())
     {
@@ -1373,6 +1381,13 @@ void MultiServerUpdatesWidget::atServerConfigurationChanged(std::shared_ptr<Upda
            "peer %1 has changed online status. We should repeat validation.", item->id);
         repeatUpdateValidation();
     }
+    else if (item->offline)
+    {
+        m_updateRemoteStateChanged = true;
+    }
+
+    if (hasPendingUiChanges())
+        loadDataToUi();
 }
 
 ServerUpdateTool::ProgressInfo MultiServerUpdatesWidget::calculateActionProgress() const
@@ -1478,7 +1493,7 @@ void MultiServerUpdatesWidget::processInitialState()
     m_offlineUpdateCheck = m_serverUpdateTool->takeUpdateCheckFromFile();
 
     setTargetState(WidgetUpdateState::initialCheck, {});
-    // Maybe we should call loadDataToUi instead.
+    // We have changed widgetState and checking. Should update Ui.
     syncUpdateCheckToUi();
 }
 
@@ -1573,7 +1588,7 @@ void MultiServerUpdatesWidget::processInitialCheckState()
         auto serversHaveInstalled = m_stateTracker->peersCompleteInstall();
 
         bool hasClientUpdate = m_clientUpdateTool->shouldInstallThis(updateInfo);
-        m_updateLocalStateChanged = true;
+        m_forceUiStateUpdate = true;
 
         if (!peersAreInstalling.empty() || updateInfo.alreadyInstalled)
         {
@@ -1919,6 +1934,8 @@ bool MultiServerUpdatesWidget::processRemoteChanges()
     {
         processReadyInstallState();
     }
+
+    // TODO: m_widgetState changes are already tracked.
     m_updateRemoteStateChanged = true;
 
     return true;
@@ -1942,7 +1959,7 @@ bool MultiServerUpdatesWidget::processUploaderChanges(bool force)
 void MultiServerUpdatesWidget::setTargetState(
     WidgetUpdateState state, const QSet<QnUuid>& targets, bool runCommands)
 {
-    if (state != m_widgetState)
+    if (m_widgetState != state)
     {
         NX_VERBOSE(this, "setTargetState() from %1 to %2", toString(m_widgetState),
             toString(state));
@@ -2012,8 +2029,7 @@ void MultiServerUpdatesWidget::setTargetState(
     // Should invent something for such case.
     m_widgetState = state;
     m_stateTracker->setTask(targets);
-    m_updateRemoteStateChanged = true;
-    m_updateLocalStateChanged = true;
+    m_forceUiStateUpdate = true;
 }
 
 void MultiServerUpdatesWidget::closePanelNotifications()
@@ -2225,7 +2241,6 @@ void MultiServerUpdatesWidget::syncUpdateCheckToUi()
     ui->manualDownloadButton->setVisible(showButton || ini().alwaysShowGetUpdateFileButton);
 
     syncVersionReport(m_updateReport);
-    m_updateLocalStateChanged = false;
 }
 
 bool MultiServerUpdatesWidget::stateHasProgress(WidgetUpdateState state)
@@ -2285,9 +2300,9 @@ void MultiServerUpdatesWidget::syncProgress()
 
 void MultiServerUpdatesWidget::syncRemoteUpdateStateToUi()
 {
-    // This function gathers state status of update from remote servers and changes
-    // UI state accordingly.
-    syncStatusVisibility();
+    // TODO: We should fill in ControlPanelState structure here,
+    // instead of affecting UI state directly
+
     // Title to be shown for this UI state.
     QString updateTitle;
 
@@ -2356,9 +2371,9 @@ void MultiServerUpdatesWidget::syncRemoteUpdateStateToUi()
     else
         ui->updateStackedWidget->setCurrentWidget(ui->updateControlsPage);
 
+    // TODO: It should be moved to loadDataToUi
     if (stateHasProgress(m_widgetState))
         syncProgress();
-
 
     bool hasVerificationErrors = m_stateTracker->hasVerificationErrors();
     bool hasStatusErrors = m_stateTracker->hasStatusErrors();
@@ -2425,16 +2440,27 @@ void MultiServerUpdatesWidget::syncRemoteUpdateStateToUi()
         ui->tableView->setEditTriggers(QAbstractItemView::AllEditTriggers);
     else
         ui->tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    m_updateRemoteStateChanged = false;
 }
 
 void MultiServerUpdatesWidget::loadDataToUi()
 {
-    // Synchronises internal state and UI widget state.
     NX_ASSERT(m_serverUpdateTool);
 
+    // Dealing with 'status' column inside servers table.
+    m_statusColumnMode = calculateStatusColumnVisibility();
+    if (m_statusColumnMode.changed())
+    {
+        m_statusItemDelegate->setStatusMode(m_statusColumnMode);
+        ui->tableView->setColumnHidden(ServerUpdatesModel::Columns::ProgressColumn,
+            m_statusColumnMode == ServerStatusItemDelegate::StatusMode::hidden);
+        m_updatesModel->forceUpdateColumn(ServerUpdatesModel::Columns::ProgressColumn);
+        // This will force delegate update all its widgets.
+        ui->tableView->update();
+        m_statusColumnMode.acceptChanges();
+    }
+
     // Update UI state to match modes: {SpecificBuild;LatestVersion;LocalFile}
-    if (m_updateLocalStateChanged || m_updateRemoteStateChanged)
+    if (m_forceUiStateUpdate || m_updateRemoteStateChanged)
     {
         // This one depends both on local and remote information.
         syncUpdateCheckToUi();
@@ -2454,6 +2480,8 @@ void MultiServerUpdatesWidget::loadDataToUi()
         layout->activate();
 
     ui->controlsVerticalLayout->activate();
+    m_forceUiStateUpdate = false;
+    m_updateRemoteStateChanged = false;
 }
 
 void MultiServerUpdatesWidget::syncVersionInfoVisibility()
@@ -2583,7 +2611,7 @@ void MultiServerUpdatesWidget::autoCheckForUpdates()
     checkForInternetUpdates();
 }
 
-void MultiServerUpdatesWidget::syncStatusVisibility()
+ServerStatusItemDelegate::StatusMode MultiServerUpdatesWidget::calculateStatusColumnVisibility() const
 {
     using StatusMode = ServerStatusItemDelegate::StatusMode;
     StatusMode statusMode = StatusMode::remoteStatus;
@@ -2602,12 +2630,7 @@ void MultiServerUpdatesWidget::syncStatusVisibility()
     else if (m_updateInfo.alreadyInstalled)
         statusMode = StatusMode::hidden;
 
-    m_statusItemDelegate->setStatusMode(statusMode);
-    ui->tableView->setColumnHidden(ServerUpdatesModel::Columns::ProgressColumn,
-        statusMode == StatusMode::hidden);
-    m_updatesModel->forceUpdateColumn(ServerUpdatesModel::Columns::ProgressColumn);
-    // This will force delegate update all its widgets.
-    ui->tableView->update();
+    return statusMode;
 }
 
 void MultiServerUpdatesWidget::atModelDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int>& /*unused*/)
@@ -2715,7 +2738,7 @@ QString MultiServerUpdatesWidget::toString(nx::update::UpdateSourceType mode)
     return "Unknown update source mode";
 }
 
-bool MultiServerUpdatesWidget::VersionReport::isEqual(const VersionReport& another) const
+bool MultiServerUpdatesWidget::VersionReport::operator==(const VersionReport& another) const
 {
     // Wating for c++20. We could use default comparator there.
     return hasLatestVersion == another.hasLatestVersion
@@ -2725,6 +2748,24 @@ bool MultiServerUpdatesWidget::VersionReport::isEqual(const VersionReport& anoth
         && versionMode == another.versionMode
         && versionHighlight == another.versionHighlight
         && statusHighlight == another.statusHighlight;
+}
+
+bool MultiServerUpdatesWidget::ControlPanelState::operator==(
+    const ControlPanelState& another) const
+{
+    // Wating for c++20. We could use default comparator there.
+    return actionEnabled == another.actionEnabled
+        && actionCaption == another.actionCaption
+        && actionTooltips == another.actionTooltips
+        && cancelEnabled == another.cancelEnabled
+        && showManualDownload == another.showManualDownload
+        && panelMode == another.panelMode
+        && progressCaption == another.progressCaption
+        && cancelProgressCaption == another.cancelProgressCaption
+        && cancelProgressEnabled == another.cancelProgressEnabled
+        && progressMinimum == another.progressMinimum
+        && progressMaximum == another.progressMaximum
+        && progress == another.progress;
 }
 
 } // namespace nx::vms::client::desktop

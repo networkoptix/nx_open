@@ -76,3 +76,7 @@ QString QnClientAppInfo::metaVersion()
     return QStringLiteral("${metaVersion}");
 }
 
+bool QnClientAppInfo::armSupportPolicyPresent()
+{
+    return ${armSupportPolicy};
+}

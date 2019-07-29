@@ -8,6 +8,8 @@
 
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 
+#include <nx/utils/std/algorithm.h>
+
 namespace nx::analytics {
 
 using namespace nx::vms::api::analytics;
@@ -153,7 +155,10 @@ ScopedEventTypeIds EventTypeDescriptorManager::compatibleEventTypeIds(
     ScopedEventTypeIds result;
     for (const auto& engine: compatibleEngines)
     {
-        if (engine->isDeviceDependent())
+        const bool engineIsEnabled =
+            device->enabledAnalyticsEngines().contains(engine->getId());
+
+        if (engineIsEnabled || engine->isDeviceDependent())
         {
             auto supported = supportedEventTypeIds(device);
             MapHelper::merge(&result, supported, mergeEventTypeIds);
@@ -197,6 +202,17 @@ ScopedEventTypeIds EventTypeDescriptorManager::compatibleEventTypeIdsIntersectio
         const auto deviceEventTypeIds = compatibleEventTypeIds(devices[i]);
         MapHelper::intersected(&result, deviceEventTypeIds, intersectEventTypeIds);
     }
+
+    // Remove the engine itself if there are no groups left.
+    nx::utils::remove_if(result,
+        [](const auto& engineId, auto& eventTypeIdsByGroup)
+        {
+            // Cleanup empty groups inside the engine.
+            nx::utils::remove_if(eventTypeIdsByGroup,
+                [](const auto& groupId, const auto& eventTypeIds) { return eventTypeIds.empty(); });
+            return eventTypeIdsByGroup.empty();
+        }
+    );
 
     return result;
 }
