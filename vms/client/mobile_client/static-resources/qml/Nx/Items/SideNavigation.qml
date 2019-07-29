@@ -113,7 +113,7 @@ Drawer
                 id: bottomContent
 
                 width: parent.width
-                bottomPadding: mainWindow.bottomPadding + sideNavigation.y
+                bottomPadding: mainWindow.bottomPadding + 8
                 anchors.bottom: parent.bottom
 
                 BottomSeparator
