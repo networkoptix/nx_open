@@ -20,7 +20,9 @@ namespace vms::server {
 namespace plugins {
 namespace hikvision {
 
-static const std::chrono::milliseconds kHttpTimeout(10000); //< practice shows: 5000 is not enough
+// Some cameras (e.g.Hikvision DS-2CD2132F-IWS) barely fit into 6 seconds.
+static const std::chrono::milliseconds kHttpTimeout(10000);
+
 static const QString kContentType = lit("application/xml");
 
 const QString kStatusCodeOk = lit("1");
