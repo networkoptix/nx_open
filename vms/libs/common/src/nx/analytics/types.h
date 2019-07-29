@@ -1,5 +1,7 @@
 #pragma once
 
+#include <type_traits>
+
 #include <QtCore/QString>
 
 #include <nx/vms/api/analytics/descriptors.h>
@@ -19,6 +21,9 @@ using ObjectTypeId = QString;
 using ActionTypeId = QString;
 using DeviceId = QnUuid;
 using ManifestItemId = QString;
+
+// Client and web api uses group ids in the same filter scenarios as event type ids.
+static_assert(std::is_same<GroupId, EventTypeId>::value);
 
 using PluginDescriptorMap = std::map<PluginId, nx::vms::api::analytics::PluginDescriptor>;
 using EngineDescriptorMap = std::map<EngineId, nx::vms::api::analytics::EngineDescriptor>;
