@@ -80,7 +80,7 @@ private:
  *
  * Supports tracking the ref-countable objects via RefCountableRegistry.
  */
-template <class RefCountableInterface>
+template<class RefCountableInterface>
 class RefCountable: public RefCountableInterface
 {
 public:

@@ -15,7 +15,7 @@ class IUncompressedVideoFrame: public Interface<IUncompressedVideoFrame, IUncomp
 public:
     static auto interfaceId() { return InterfaceId("nx::sdk::analytics::IUncompressedVideoFrame"); }
 
-    enum class PixelFormat
+    enum class PixelFormat: int
     {
         yuv420,
         argb,
@@ -43,6 +43,7 @@ public:
      */
     virtual int height() const = 0;
 
+    // TODO: #mshevchenko: Returning struct by value is not ABI-agnostic.
     /**
      * @return Aspect ratio of a frame pixel.
      */
