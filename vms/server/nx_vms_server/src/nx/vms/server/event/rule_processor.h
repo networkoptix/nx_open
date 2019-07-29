@@ -19,6 +19,7 @@
 #include <nx/vms/server/server_module_aware.h>
 
 class EmailManagerImpl;
+namespace nx::vms::server::resource { class Camera; }
 
 namespace nx {
 namespace vms::server {
@@ -141,7 +142,7 @@ private:
     void at_ruleRemoved(QnUuid id);
     void at_rulesReset(const vms::event::RuleList& rules);
 
-    void toggleInputPortMonitoring(const QnResourcePtr& resource, bool on);
+    void at_resourceMonitor(const QnResourcePtr& resource, bool isAdded);
 
     void at_timer();
 
@@ -229,6 +230,9 @@ private:
 
     QnWaitCondition m_ruleUpdateCondition;
     std::atomic<int> m_updatingRulesCount{0};
+
+    std::map<nx::vms::server::resource::Camera*, QWeakPointer<nx::vms::server::resource::Camera>>
+        m_knownCameras;
 };
 
 } // namespace event

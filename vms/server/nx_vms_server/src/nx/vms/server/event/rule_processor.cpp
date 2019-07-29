@@ -60,11 +60,11 @@ RuleProcessor::RuleProcessor(QnMediaServerModule* serverModule):
     using namespace std::placeholders;
 
     connect(resourcePool(), &QnResourcePool::resourceAdded,
-        this, std::bind(&RuleProcessor::toggleInputPortMonitoring, this, _1, true),
+        this, [this](const QnResourcePtr& r) { at_resourceMonitor(r, /*isAdded*/ true); },
         Qt::QueuedConnection);
 
     connect(resourcePool(), &QnResourcePool::resourceRemoved,
-        this, std::bind(&RuleProcessor::toggleInputPortMonitoring, this, _1, false),
+        this, [this](const QnResourcePtr& r) { at_resourceMonitor(r, /*isAdded*/ false); },
         Qt::QueuedConnection);
 
     const auto connectRuleUpdate =
@@ -731,7 +731,7 @@ void RuleProcessor::at_rulesReset(const vms::event::RuleList& rules)
     for (const auto& rule: m_rules)
     {
         if (!rule->isDisabled())
-            notifyResourcesAboutEventIfNeccessary(rule, false);
+            notifyResourcesAboutEventIfNeccessary(rule, /*isRuleAdded*/ false);
         terminateRunningRule(rule);
     }
     m_rules.clear();
@@ -740,13 +740,20 @@ void RuleProcessor::at_rulesReset(const vms::event::RuleList& rules)
         at_ruleAddedOrUpdated_impl(rule);
 }
 
-void RuleProcessor::toggleInputPortMonitoring(const QnResourcePtr& resource, bool on)
+void RuleProcessor::at_resourceMonitor(const QnResourcePtr& resource,  bool isAdded)
 {
-    QnMutexLocker lock(&m_mutex);
-
     auto camResource = resource.dynamicCast<nx::vms::server::resource::Camera>();
     if (!camResource)
         return;
+
+    QnMutexLocker lock(&m_mutex);
+    if (isAdded)
+        m_knownCameras.emplace(camResource.get(), camResource);
+    else
+        m_knownCameras.erase(camResource.get());
+
+    NX_VERBOSE(this, "Camera %1 %2, %3 total",
+        camResource, isAdded ? "added" : "removed", m_knownCameras.size());
 
     for (const auto& rule: m_rules)
     {
@@ -760,7 +767,7 @@ void RuleProcessor::toggleInputPortMonitoring(const QnResourcePtr& resource, boo
             if (resList.isEmpty() ||            //< Listening to all cameras.
                 resList.contains(camResource))
             {
-                if (on)
+                if (isAdded)
                     camResource->inputPortListenerAttached();
                 else
                     camResource->inputPortListenerDetached();
@@ -818,7 +825,7 @@ void RuleProcessor::at_ruleRemoved(QnUuid id)
         if (m_rules[i]->id() == id)
         {
             if (!m_rules[i]->isDisabled())
-                notifyResourcesAboutEventIfNeccessary(m_rules[i], false);
+                notifyResourcesAboutEventIfNeccessary(m_rules[i], /*isRuleAdded*/ false);
             terminateRunningRule(m_rules[i]);
             m_rules.removeAt(i);
             break;
@@ -833,27 +840,23 @@ void RuleProcessor::notifyResourcesAboutEventIfNeccessary(
     {
         if (businessRule->eventType() == vms::api::EventType::cameraInputEvent)
         {
-            auto camerasToMonitor = resourcePool()
-                ->getResourcesByIds<nx::vms::server::resource::Camera>(
-                    businessRule->eventResources());
-
-            if (camerasToMonitor.isEmpty())
+            const auto eventResources = businessRule->eventResources();
+            decltype(m_knownCameras) filteredCameras;
+            if (!eventResources.isEmpty())
             {
-                for (const auto camera: resourcePool()->getAllCameras(QnResourcePtr(), true))
+                for (const auto& [c, weakPtr]: m_knownCameras)
                 {
-                    if (auto c = camera.dynamicCast<nx::vms::server::resource::Camera>())
-                        camerasToMonitor.push_back(std::move(c));
-                    else
-                        NX_ASSERT(false, lm("Not a server camera in pool: %1").args(camera));
+                    const auto lock = weakPtr.lock();
+                    if (lock && eventResources.contains(c->getId()))
+                        filteredCameras.emplace(c, weakPtr);
                 }
             }
 
-            for (const auto& camera: camerasToMonitor)
+            const auto eventCameras = eventResources.isEmpty() ? &m_knownCameras : &filteredCameras;
+            for (const auto& [c, weakPtr]: *eventCameras)
             {
-                if (isRuleAdded)
-                    camera->inputPortListenerAttached();
-                else
-                    camera->inputPortListenerDetached();
+                if (const auto lock = weakPtr.lock())
+                    isRuleAdded ? c->inputPortListenerAttached() : c->inputPortListenerDetached();
             }
         }
     }
