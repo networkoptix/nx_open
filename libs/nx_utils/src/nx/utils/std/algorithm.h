@@ -223,13 +223,16 @@ class y_combinator_result
     Functor functor;
 
 public:
+    y_combinator_result() = delete;
+    y_combinator_result(const y_combinator_result&) = delete;
+
     template<class T>
     explicit y_combinator_result(T&& impl): functor(std::forward<T>(impl)) {}
 
     template<class... Args>
     decltype(auto) operator()(Args&&... args) const
     {
-        return functor(std::ref(*this), std::forward<Args>(args)...);
+        return functor(std::cref(*this), std::forward<Args>(args)...);
     }
 };
 
