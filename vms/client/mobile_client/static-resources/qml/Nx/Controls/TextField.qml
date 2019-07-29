@@ -13,7 +13,7 @@ TextInput
 
     property bool showError: false
 
-    property bool enableCustomHandlers: Qt.platform.os == "android"
+    property bool enableCustomHandles: Qt.platform.os == "android"
 
     property color inactiveColor: showError ? ColorTheme.red_d1 : ColorTheme.base10
     property color activeColor: showError ? ColorTheme.red_main : ColorTheme.brand_main
@@ -124,7 +124,7 @@ TextInput
 
         function showCursorHandle()
         {
-            if (!enableCustomHandlers)
+            if (!enableCustomHandles)
                 return
 
             cursorHandle.opacity = 0.0
@@ -134,7 +134,7 @@ TextInput
 
         function hideCursorHandle()
         {
-            if (!enableCustomHandlers)
+            if (!enableCustomHandles)
                 return
 
             cursorHandle.opacity = 0.0
@@ -149,7 +149,7 @@ TextInput
 
         function updateSelectionHandles()
         {
-            if (!enableCustomHandlers)
+            if (!enableCustomHandles)
                 return
 
             if (cursorHandle.pressed)
@@ -197,7 +197,7 @@ TextInput
 
         function selectWordAndOpenContextMenu(event, autoSelect)
         {
-            if (!enableCustomHandlers)
+            if (!enableCustomHandles)
                 return
 
             selectAndOpenMenuTimer.x = event.x
@@ -217,7 +217,7 @@ TextInput
 
     onClicked:
     {
-        if (!selectAndOpenMenuTimer.running && enableCustomHandlers)
+        if (!selectAndOpenMenuTimer.running && enableCustomHandles)
             openMenuTimer.restart()
         if (displayText && selectionStart == selectionEnd)
             d.showCursorHandle()
@@ -402,7 +402,7 @@ TextInput
             x = leftPadding + positionToRectangle(
                 selectionStart == selectionEnd
                     ? cursorPosition : selectionStart).x
-            var yOffset = cursorRectangle.height + (enableCustomHandlers ? 28 : 4)
+            var yOffset = cursorRectangle.height + (enableCustomHandles ? 28 : 4)
             y = cursorRectangle.y + yOffset
 
             var window = control.ApplicationWindow.window
