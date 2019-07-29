@@ -241,6 +241,7 @@ Item
     {
         id: navigator
 
+        z: 1
         implicitWidth: parent.width
         implicitHeight: videoNavigation.canViewArchive
             ? timeline.height + playbackController.height - 16
