@@ -178,7 +178,7 @@ static constexpr int kHexDumpBytesPerLine = 16;
 void printHexDump(
     PrintFunc printFunc, const char* caption, const char* const bytes, int size)
 {
-    const std::string header = format("Hex dump \"%s\", %d bytes:", caption, size);
+    const std::string header = format("Hex dump \"%s\", %d bytes @%p:", caption, size, bytes);
 
     if (size <= 8) //< Print in single line.
     {
