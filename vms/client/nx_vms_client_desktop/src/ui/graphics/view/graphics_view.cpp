@@ -56,3 +56,11 @@ void QnGraphicsView::wheelEvent(QWheelEvent* event)
     QApplication::sendEvent(scene(), &wheelEvent);
     event->setAccepted(wheelEvent.isAccepted());
 }
+
+void QnGraphicsView::changeEvent(QEvent* event)
+{
+    base_type::changeEvent(event);
+
+    if (event->type() == QEvent::PaletteChange)
+        setBackgroundBrush(palette().base());
+}
