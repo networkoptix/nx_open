@@ -35,7 +35,7 @@ static std::string parseLocationConstraintResponse(const nx::Buffer& messageBody
     for (int i = end - 1; i >= 0; --i)
     {
         if (messageBody.at(i) == '>')
-            return messageBody.mid(i + 1, end - i - 1).trimmed();
+            return messageBody.mid(i + 1, end - i - 1).trimmed().toStdString();
     }
 
     return {};
@@ -59,7 +59,7 @@ static std::string parseWrongRegionResponse(const nx::Buffer& messageBody)
     if (end <= start)
         return {};
 
-    return messageBody.mid(start, end - start).constData();
+    return messageBody.mid(start, end - start).trimmed().toStdString();
 }
 
 static std::vector<std::function<std::string(const nx::Buffer&)>> kLocationXmlParsers = {

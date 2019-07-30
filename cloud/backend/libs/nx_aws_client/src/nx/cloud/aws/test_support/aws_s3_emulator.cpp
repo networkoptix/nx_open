@@ -28,7 +28,7 @@ std::string randomS3Location()
 }
 
 AwsS3Emulator::AwsS3Emulator(std::string location):
-    m_location(location)
+    m_location(std::move(location))
 {
     registerHttpApi();
 }
