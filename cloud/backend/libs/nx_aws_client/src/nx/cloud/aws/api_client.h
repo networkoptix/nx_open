@@ -52,6 +52,12 @@ public:
         const std::string& path,
         CommonHandler handler);
 
+    /**
+     * Implementation of https://docs.aws.amazon.com/AmazonS3/latest/API/RESTBucketGETlocation.html
+     * Get the location of the bucket specified by the url https://BucketName.s3.amazonaws.com
+     */
+    void getLocation(nx::utils::MoveOnlyFunc<void(Result, std::string/*location*/)> handler);
+
 protected:
     virtual void stopWhileInAioThread() override;
 
@@ -72,6 +78,12 @@ private:
     void doAwsApiCall(
         const nx::network::http::Method::ValueType& method,
         const std::string& path,
+        Handler handler,
+        std::unique_ptr<nx::network::http::AbstractMsgBodySource> body = nullptr);
+
+    template<typename Handler>
+    void doAwsApiCall(const nx::network::http::Method::ValueType& method,
+        const nx::utils::Url& url,
         Handler handler,
         std::unique_ptr<nx::network::http::AbstractMsgBodySource> body = nullptr);
 

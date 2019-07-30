@@ -2,31 +2,50 @@
 
 #include <nx/network/http/buffer_source.h>
 #include <nx/network/url/url_builder.h>
+#include <nx/utils/random.h>
 
 #include <nx/cloud/aws/aws_signature_v4.h>
-
-using namespace nx::network;
+#include <nx/cloud/aws/http_request_paths.h>
 
 namespace nx::cloud::aws::test {
 
-AwsS3Emulator::AwsS3Emulator()
+namespace {
+
+static constexpr char kLocationTemplate[] = R"xml(
+    <?xml version = "1.0" encoding = "UTF-8"?>
+    <LocationConstraint xmlns="http://s3.amazonaws.com/doc/2006-03-01/">%1</LocationConstraint>
+)xml";
+
+static constexpr char kDefaultLocationTemplate[] = R"xml(
+    <LocationConstraint xmlns="http://s3.amazonaws.com/doc/2006-03-01/"/>
+)xml";
+
+} // namespace
+
+std::string randomS3Location()
+{
+    return nx::utils::random::choice(kS3Locations);
+}
+
+AwsS3Emulator::AwsS3Emulator(std::string location):
+    m_location(location)
 {
     registerHttpApi();
 }
 
-bool AwsS3Emulator::bindAndListen(const SocketAddress& endpoint)
+bool AwsS3Emulator::bindAndListen(const network::SocketAddress& endpoint)
 {
     return m_httpServer.bindAndListen(endpoint);
 }
 
-SocketAddress AwsS3Emulator::serverAddress() const
+network::SocketAddress AwsS3Emulator::serverAddress() const
 {
     return m_httpServer.serverAddress();
 }
 
 void AwsS3Emulator::enableAthentication(
     const std::regex& path,
-    http::Credentials credentials)
+    network::http::Credentials credentials)
 {
     m_httpServer.authDispatcher().add(path, &m_awsAuthenticator);
     m_awsAuthenticator.addCredentials(
@@ -36,8 +55,8 @@ void AwsS3Emulator::enableAthentication(
 
 nx::utils::Url AwsS3Emulator::baseApiUrl() const
 {
-    return url::Builder()
-        .setScheme(http::kUrlSchemeName)
+    return network::url::Builder()
+        .setScheme(network::http::kUrlSchemeName)
         .setEndpoint(m_httpServer.serverAddress());
 }
 
@@ -67,27 +86,47 @@ bool AwsS3Emulator::deleteFile(const std::string& path)
     return m_pathToFileContents.erase(path) > 0;
 }
 
+std::string AwsS3Emulator::location() const
+{
+    QnMutexLocker lock(&m_mutex);
+
+    return m_location;
+}
+
+void AwsS3Emulator::setLocation(const std::string& location)
+{
+    QnMutexLocker lock(&m_mutex);
+
+    m_location = location;
+}
+
 void AwsS3Emulator::registerHttpApi()
 {
     m_httpServer.registerRequestProcessorFunc(
-        http::kAnyPath,
+        network::http::kAnyPath,
         [this](auto&&... args) { saveFile(std::forward<decltype(args)>(args)...); },
-        http::Method::put);
+        network::http::Method::put);
 
     m_httpServer.registerRequestProcessorFunc(
-        http::kAnyPath,
+        network::http::kAnyPath,
         [this](auto&& ... args) { getFile(std::forward<decltype(args)>(args)...); },
-        http::Method::get);
+        network::http::Method::get);
 
     m_httpServer.registerRequestProcessorFunc(
-        http::kAnyPath,
+        network::http::kAnyPath,
         [this](auto&& ... args) { deleteFile(std::forward<decltype(args)>(args)...); },
-        http::Method::delete_);
+        network::http::Method::delete_);
+
+    m_httpServer.registerRequestProcessorFunc(
+        /*aws::http::kRootPath,*/
+        "/",
+        [this](auto&& ... args) { getLocation(std::forward<decltype(args)>(args)...); },
+        network::http::Method::get);
 }
 
 void AwsS3Emulator::saveFile(
-    http::RequestContext requestContext,
-    http::RequestProcessedHandler completionHandler)
+    network::http::RequestContext requestContext,
+    network::http::RequestProcessedHandler completionHandler)
 {
     // TODO: #ak Check Content-MD5 if present.
 
@@ -95,44 +134,67 @@ void AwsS3Emulator::saveFile(
         requestContext.request.requestLine.url.path().toStdString(),
         requestContext.request.messageBody);
 
-    completionHandler(http::StatusCode::ok);
+    completionHandler(network::http::StatusCode::ok);
 }
 
 void AwsS3Emulator::getFile(
-    http::RequestContext requestContext,
-    http::RequestProcessedHandler completionHandler)
+    network::http::RequestContext requestContext,
+    network::http::RequestProcessedHandler completionHandler)
 {
     const auto fileContents = getFile(requestContext.request.requestLine.url.path().toStdString());
     if (!fileContents)
-        return completionHandler(http::StatusCode::notFound);
+        return completionHandler(network::http::StatusCode::notFound);
 
     completionHandler(network::http::RequestResult{
-        http::StatusCode::ok,
-        std::make_unique<http::BufferSource>(
+        network::http::StatusCode::ok,
+        std::make_unique<network::http::BufferSource>(
             "application/octet-stream", *fileContents),
         {}});
 }
 
 void AwsS3Emulator::deleteFile(
-    http::RequestContext requestContext,
-    http::RequestProcessedHandler completionHandler)
+    network::http::RequestContext requestContext,
+    network::http::RequestProcessedHandler completionHandler)
 {
     const auto deleted = deleteFile(requestContext.request.requestLine.url.path().toStdString());
     if (!deleted)
-        return completionHandler(http::StatusCode::notFound);
+        return completionHandler(network::http::StatusCode::notFound);
 
-    completionHandler(http::StatusCode::noContent);
+    completionHandler(network::http::StatusCode::noContent);
+}
+
+void AwsS3Emulator::getLocation(
+    network::http::RequestContext requestContext,
+    network::http::RequestProcessedHandler completionHandler)
+{
+    if (requestContext.request.requestLine.url.query() != http::kLocationQuery)
+        return completionHandler(network::http::StatusCode::badRequest);
+
+    auto location = this->location();
+
+    auto buffer =
+        location == kDefaultS3Location
+        ? nx::Buffer(kDefaultLocationTemplate)
+        : lm(kLocationTemplate).arg(location).toUtf8();
+
+    network::http::RequestResult result(network::http::StatusCode::ok);
+    result.dataSource =
+        std::make_unique<network::http::BufferSource>(
+            "application/xml",
+            std::move(buffer));
+    completionHandler(std::move(result));
+
 }
 
 //-------------------------------------------------------------------------------------------------
 
 void AwsSignatureV4Authenticator::authenticate(
-    const http::HttpServerConnection& /*connection*/,
-    const http::Request& request,
-    http::server::AuthenticationCompletionHandler completionHandler)
+    const network::http::HttpServerConnection& /*connection*/,
+    const network::http::Request& request,
+    network::http::server::AuthenticationCompletionHandler completionHandler)
 {
     auto authorizationIt =
-        request.headers.find(http::header::Authorization::NAME);
+        request.headers.find(network::http::header::Authorization::NAME);
     if (authorizationIt == request.headers.end())
         return completionHandler(prepareUnsuccesfulResult());
 
@@ -169,9 +231,9 @@ void AwsSignatureV4Authenticator::authenticate(
 
     const auto [calculatedSignature, result] = SignatureCalculator::calculateSignature(
         request,
-        http::Credentials(
+        network::http::Credentials(
             accessKeyId,
-            http::PasswordAuthToken(accessKeyIter->second.c_str())),
+            network::http::PasswordAuthToken(accessKeyIter->second.c_str())),
         region.toStdString(),
         service.toStdString());
 
@@ -181,7 +243,7 @@ void AwsSignatureV4Authenticator::authenticate(
     if (calculatedSignature != signature)
         return completionHandler(prepareUnsuccesfulResult());
 
-    completionHandler(http::server::SuccessfulAuthenticationResult());
+    completionHandler(network::http::server::SuccessfulAuthenticationResult());
 }
 
 void AwsSignatureV4Authenticator::addCredentials(
@@ -191,10 +253,10 @@ void AwsSignatureV4Authenticator::addCredentials(
     m_credentials[accessKeyId] = secretAccessKey;
 }
 
-http::server::AuthenticationResult
+network::http::server::AuthenticationResult
     AwsSignatureV4Authenticator::prepareUnsuccesfulResult()
 {
-    http::server::AuthenticationResult authenticationResult;
+    network::http::server::AuthenticationResult authenticationResult;
     authenticationResult.isSucceeded = false;
     // authenticationResult.msgBody = std::make
     return authenticationResult;
