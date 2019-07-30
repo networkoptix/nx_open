@@ -51,8 +51,6 @@ def determine_package_versions(
         "server-external": release_version,
         "certificates": customization,
         "customization_pack": customization,
-        "detours": "4.0.1",
-        "stackwalker": "1.0"
     }
 
     if platform == "linux" and box == "none" and target not in ("linux_arm32", "linux_arm64"):
@@ -195,9 +193,6 @@ def sync_dependencies(syncher, platform, arch, box, release_version, options={})
     if have_desktop_client:
         sync("any/help", path_variable="help_directory")
 
-    if (platform == "windows") and have_desktop_client:
-        sync("detours")
-        sync("stackwalker")
     if have_desktop_client or have_mobile_client:
         sync("any/roboto-fonts")
 
