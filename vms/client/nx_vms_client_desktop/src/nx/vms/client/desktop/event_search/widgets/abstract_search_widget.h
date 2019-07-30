@@ -121,6 +121,9 @@ protected:
     /** Creates a child menu with dropdown appearance. */
     QMenu* createDropdownMenu();
 
+    /** Setup bypass graphics proxy widget for the menu. */
+    static void fixMenuFlags(QMenu* menu);
+
     /**
      * Adds specified action to the list of device dependent actions.
      * When connection state becomes "Ready" (initial resources are received) all device dependent

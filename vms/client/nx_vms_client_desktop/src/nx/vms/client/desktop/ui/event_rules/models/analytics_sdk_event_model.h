@@ -16,7 +16,7 @@ public:
     enum DataRole
     {
         EventTypeIdRole = Qt::UserRole + 1,
-        DriverIdRole,
+        EngineIdRole,
         ValidEventRole,
     };
 

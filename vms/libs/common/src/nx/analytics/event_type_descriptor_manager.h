@@ -43,7 +43,7 @@ public:
 
     /**
      * Tree of the event type ids. Root nodes are engines, then groups and event types as leaves.
-     * Includes only all event types, which can theoretically be available on this device, so all
+     * Includes all event types, which can theoretically be available on this device, so all
      * compatible engines are used.
      */
     ScopedEventTypeIds compatibleEventTypeIds(
