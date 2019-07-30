@@ -38,7 +38,7 @@ private:
 public:
     using IRefCountable::queryInterface; //< Enable const overload.
 
-    virtual IRefCountable* queryInterface(IRefCountable::InterfaceId id) override
+    virtual IRefCountable* queryInterface(InterfaceId id) override
     {
         return doQueryInterface(id);
     }
@@ -46,23 +46,25 @@ public:
 protected:
     /** Call from DerivedInterface::queryInterface() to support interface id from the old SDK. */
     IRefCountable* queryInterfaceSupportingDeprecatedId(
-        IRefCountable::InterfaceId id,
+        InterfaceId id,
         const Uuid& deprecatedInterfaceId)
     {
         if (memcmp(id.value, deprecatedInterfaceId.data(), Uuid::kSize) == 0)
         {
             this->addRef();
+// TODO: #mshevchenko: Try to remove the cast.
             return static_cast<DerivedInterface*>(this);
         }
         return doQueryInterface(id);
     }
 
 private:
-    IRefCountable* doQueryInterface(IRefCountable::InterfaceId id)
+    IRefCountable* doQueryInterface(InterfaceId id)
     {
         if (id == DerivedInterface::interfaceId())
         {
             this->addRef();
+// TODO: #mshevchenko: Try to remove the cast.
             return static_cast<DerivedInterface*>(this);
         }
         return BaseInterface::queryInterface(id);

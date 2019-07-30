@@ -13,7 +13,7 @@ class UtilityProvider: public nx::sdk::RefCountable<nx::sdk::IUtilityProvider>
 public:
     UtilityProvider(PluginManager* pluginManager, const nx::sdk::IPlugin* plugin);
 
-    virtual IRefCountable* queryInterface(InterfaceId id) override;
+    virtual IRefCountable* queryInterface(nx::sdk::InterfaceId id) override;
 
     virtual int64_t vmsSystemTimeSinceEpochMs() const override;
 

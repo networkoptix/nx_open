@@ -10,6 +10,87 @@
 namespace nx {
 namespace sdk {
 
+class IRefCountable;
+
+/**
+ * Identifier of an interface, used for queryInterface().
+ *
+ * NOTE: For binary compatibility with plugins compiled with the old SDK, the binary layout of
+ * this struct is identical to the layout of a pointer to the identifier bytes, and the length
+ * of the identifier string should be not less than 15, because queryInterface() of the old SDK
+ * received a const reference to a struct containing a 16-byte array. This also preserves
+ * binary compatibility with plugins compiled using the old SDK (class PluginInterface).
+ */
+struct InterfaceId
+{
+    const char* const value; /**< Statically-allocated, neither null nor empty. */
+
+    /** Enable initialization with a character array only. */
+    template<int len>
+    explicit constexpr InterfaceId(const char (&charArray)[len]): value(charArray)
+    {
+        static_assert(len + /*terminating zero*/ 1 >= 16,
+            "Interface id should contain at least 15 chars");
+        assert(value[0] != '\0');
+        assert(value[1] != '\0');
+        assert(value[2] != '\0');
+        assert(value[3] != '\0');
+        assert(value[4] != '\0');
+        assert(value[5] != '\0');
+        assert(value[6] != '\0');
+        assert(value[7] != '\0');
+        assert(value[8] != '\0');
+        assert(value[9] != '\0');
+        assert(value[10] != '\0');
+        assert(value[11] != '\0');
+        assert(value[12] != '\0');
+        assert(value[13] != '\0');
+        assert(value[14] != '\0');
+    }
+
+    /**
+     * Makes a compound interface id for interface templates like IList<IItem>. Usage:
+     * ```
+     * static auto interfaceId()
+     * {
+     *     return InterfaceId::makeForTemplate<IList<IItem>, IItem>("nx::sdk::IList");
+     * }
+     * ```
+     */
+    template<class TemplateInstance, class TemplateArg>
+    static InterfaceId makeForTemplate(const char* templateInterfaceIdBase)
+    {
+        static constexpr int kMaxStaticInterfaceIdSize = 256;
+
+        static_assert(std::is_base_of<IRefCountable, TemplateInstance>::value,
+            "TemplateInstance should be inherited from IRefCountable");
+        static_assert(std::is_base_of<IRefCountable, TemplateArg>::value,
+            "TemplateArg should be inherited from IRefCountable");
+
+        // The id is stored in a static array because it is unique for the given template args.
+        static char id[kMaxStaticInterfaceIdSize];
+        assert(id[0] == '\0'); //< Assert that the static id has not been initialized yet.
+
+        const int result = snprintf(
+            id,
+            kMaxStaticInterfaceIdSize,
+            "%s<%s>",
+            templateInterfaceIdBase,
+            TemplateArg::interfaceId().value);
+
+        assert(result >= 15 && result < kMaxStaticInterfaceIdSize);
+
+        return InterfaceId(id);
+    }
+
+    InterfaceId() = delete;
+
+    bool operator==(const InterfaceId& other) const { return strcmp(value, other.value) == 0; }
+    bool operator!=(const InterfaceId& other) const { return !(*this == other); }
+};
+
+//-------------------------------------------------------------------------------------------------
+
 /**
  * Base for all interfaces - abstract classes with only pure-virtual non-overloaded functions, so
  * that an object implementing an interface can be passed by pointer between dynamic libraries
@@ -48,83 +129,6 @@ namespace sdk {
 class IRefCountable
 {
 public:
-    /**
-     * Identifier of an interface, used for queryInterface().
-     *
-     * NOTE: For binary compatibility with plugins compiled with the old SDK, the binary layout of
-     * this struct is identical to the layout of a pointer to the identifier bytes, and the length
-     * of the identifier string should be not less than 15, because queryInterface() of the old SDK
-     * received a const reference to a struct containing a 16-byte array. This also preserves
-     * binary compatibility with plugins compiled using the old SDK (class PluginInterface).
-     */
-    struct InterfaceId
-    {
-        const char* const value; /**< Statically-allocated, neither null nor empty. */
-
-        /** Enable initialization with a character array only. */
-        template<int len>
-        explicit constexpr InterfaceId(const char (&charArray)[len]): value(charArray)
-        {
-            static_assert(len + /*terminating zero*/ 1 >= 16,
-                "Interface id should contain at least 15 chars");
-            assert(value[0] != '\0');
-            assert(value[1] != '\0');
-            assert(value[2] != '\0');
-            assert(value[3] != '\0');
-            assert(value[4] != '\0');
-            assert(value[5] != '\0');
-            assert(value[6] != '\0');
-            assert(value[7] != '\0');
-            assert(value[8] != '\0');
-            assert(value[9] != '\0');
-            assert(value[10] != '\0');
-            assert(value[11] != '\0');
-            assert(value[12] != '\0');
-            assert(value[13] != '\0');
-            assert(value[14] != '\0');
-        }
-
-        /**
-         * Makes a compound interface id for interface templates like IList<IItem>. Usage:
-         * ```
-         * static IRefCountable::InterfaceId interfaceId()
-         * {
-         *     return InterfaceId::makeForTemplate<IList<IItem>, IItem>("nx::sdk::IList");
-         * }
-         * ```
-         */
-        template<class TemplateInstance, class TemplateArg>
-        static InterfaceId makeForTemplate(const char* templateInterfaceIdBase)
-        {
-            static constexpr int kMaxStaticInterfaceIdSize = 256;
-
-            static_assert(std::is_base_of<IRefCountable, TemplateInstance>::value,
-                "TemplateInstance should be inherited from IRefCountable");
-            static_assert(std::is_base_of<IRefCountable, TemplateArg>::value,
-                "TemplateArg should be inherited from IRefCountable");
-
-            // The id is stored in a static array because it is unique for the given template args.
-            static char id[kMaxStaticInterfaceIdSize];
-            assert(id[0] == '\0'); //< Assert that the static id has not been initialized yet.
-
-            const int result = snprintf(
-                id,
-                kMaxStaticInterfaceIdSize,
-                "%s<%s>",
-                templateInterfaceIdBase,
-                TemplateArg::interfaceId().value);
-
-            assert(result >= 15 && result < kMaxStaticInterfaceIdSize);
-
-            return InterfaceId(id);
-        }
-
-        InterfaceId() = delete;
-
-        bool operator==(const InterfaceId& other) const { return strcmp(value, other.value) == 0; }
-        bool operator!=(const InterfaceId& other) const { return !(*this == other); }
-    };
-
     /** Each derived interface is expected to implement such static method with its own string. */
     static auto interfaceId() { return InterfaceId("nx::sdk::IRefCountable"); }
 

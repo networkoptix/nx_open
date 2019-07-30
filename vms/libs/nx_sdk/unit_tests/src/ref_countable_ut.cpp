@@ -93,7 +93,7 @@ void testQueryInterface(
 TEST(RefCountable, interfaceId)
 {
     constexpr char kInterfaceIdStr[] = "arbitrary string not shorter than 15 chars";
-    const IRefCountable::InterfaceId interfaceId(kInterfaceIdStr);
+    const InterfaceId interfaceId(kInterfaceIdStr);
     ASSERT_STREQ(kInterfaceIdStr, interfaceId.value);
 }
 
@@ -106,8 +106,8 @@ class IBase: public Interface<IBase, IRefCountable>
 {
 public:
     static auto interfaceId() { return InterfaceId("nx::sdk::test::IBase"); }
-    virtual void* interfaceIdForTest() const = 0;
-    virtual int refCountForTest() const = 0;
+    virtual void* interfaceIdForTest() const = 0; //< VMT #4 - should match old SDK method.
+    virtual int refCountForTest() const = 0; //< VMT #5 - should match old SDK method.
 };
 
 class IData: public Interface<IData, IBase>
@@ -199,39 +199,40 @@ TEST(RefCountable, queryInterfaceConst)
 
 namespace {
 
-#define NEW_INTERFACE_ID "new_interfaceId" //< Has the minimum allowed length: 15 chars.
+/** Defined exactly the same way as in the old SDK (NX_GUID). */
+struct OldInterfaceId
+{
+    unsigned char value[kOldInterfaceIdSize];
+
+    explicit OldInterfaceId(const char (&charArray)[kOldInterfaceIdSize])
+    {
+        // All old interface ids in this test have last byte equal to 0 for easy conversion to
+        // the new interface id.
+        std::copy(charArray, charArray + kOldInterfaceIdSize, value);
+        ASSERT_EQ(0, value[kOldInterfaceIdSize - 1]);
+    }
+
+    InterfaceId asNew() const
+    {
+        ASSERT_EQ(0, value[kOldInterfaceIdSize - 1]);
+        return InterfaceId((const char (&)[kOldInterfaceIdSize]) value);
+    }
+};
+static_assert(sizeof(OldInterfaceId) == kOldInterfaceIdSize,
+    "Old SDK InterfaceId should have 16 bytes");
 
 /**
  * Mock for a base interface from the old SDK - used for compatibility testing.
  *
- * Has the VMT layout starting with all the entries from IRefCountable (and thus as in old SDK).
+ * Has the VMT layout starting with all the entries from IRefCountable (thus, as in the old SDK).
  */
 class OldInterface
 {
 public:
-    /** Defined exactly the same way as in the old SDK (NX_GUID). */
-    struct InterfaceId
+
+    static const OldInterfaceId& interfaceId()
     {
-        unsigned char value[kOldInterfaceIdSize];
-
-        explicit InterfaceId(const char (&charArray)[kOldInterfaceIdSize])
-        {
-            // All old interface ids in this test have last byte equal to 0 for easy conversion to
-            // the new interface id.
-            ASSERT_EQ(0, value[kOldInterfaceIdSize - 1]);
-            std::copy(charArray, charArray + kOldInterfaceIdSize, value);
-        }
-
-        IRefCountable::InterfaceId asNew() const
-        {
-            ASSERT_EQ(0, value[kOldInterfaceIdSize - 1]);
-            return IRefCountable::InterfaceId((const char (&)[kOldInterfaceIdSize]) value);
-        }
-    };
-
-    static const InterfaceId& interfaceId()
-    {
-        static InterfaceId id{"old_interfaceId"}; //< 15 chars, 16 bytes.
+        static OldInterfaceId id{"old_interfaceId"}; //< 15 chars, 16 bytes.
         return id;
     }
 
@@ -239,7 +240,7 @@ public:
     virtual ~OldInterface() = default;
 
     /** #1 in VMT. */
-    virtual void* queryInterface(const InterfaceId& id) = 0;
+    virtual void* queryInterface(const OldInterfaceId& id) = 0;
 
     /** VMT #2. */
     virtual unsigned int addRef() const = 0;
@@ -273,7 +274,7 @@ public:
         s_destructorCalled = true;
     }
 
-    virtual void* queryInterface(const InterfaceId& id) override
+    virtual void* queryInterface(const OldInterfaceId& id) override
     {
         // Compare using memcmp(), as the old-SDK-based VMS and plugins both do.
         if (memcmp(interfaceId().value, id.value, kOldInterfaceIdSize) == 0)
@@ -306,13 +307,18 @@ private:
 };
 bool OldObject::s_destructorCalled = false;
 
-/** Mock for a base interface from the new SDK - used for compatibility testing. */
+#define NEW_INTERFACE_ID "new_interfaceId" //< Has the minimum allowed length: 15 chars.
+
+/**
+ * Mock for a base interface from the new SDK - used for compatibility testing. Supports old
+ * interface id in its queryInterface() in addition to the new interface id.
+ */
 class NewInterface: public Interface<NewInterface, IRefCountable>
 {
 public:
     static auto interfaceId() { return InterfaceId(NEW_INTERFACE_ID); }
 
-    /** Support old SDK interface id. */
+    /** Support for old SDK interface id. */
     virtual IRefCountable* queryInterface(InterfaceId id) override
     {
         ASSERT_TRUE(id.value != nullptr);
@@ -356,10 +362,10 @@ TEST(RefCountable, binaryCompatibilityWithOldSdk)
     OldObject::s_destructorCalled = false;
 
     // Test integrity of the test.
-    ASSERT_EQ(kOldInterfaceIdSize, (int) sizeof(OldInterface::InterfaceId));
+    ASSERT_EQ(kOldInterfaceIdSize, (int) sizeof(OldInterfaceId));
 
     // Test that queryInterface() argument has the same size in the new and old SDK.
-    ASSERT_EQ(sizeof(IRefCountable::InterfaceId), sizeof(const OldObject::InterfaceId*));
+    ASSERT_EQ(sizeof(InterfaceId), sizeof(const OldInterfaceId*));
 
     const auto newObject = new NewObject;
     ASSERT_EQ(1, newObject->refCountForTest());
@@ -370,8 +376,8 @@ TEST(RefCountable, binaryCompatibilityWithOldSdk)
     const auto newObjectAsOldInterface = reinterpret_cast<OldInterface*>(newObject);
     const auto oldObjectAsNewInterface = reinterpret_cast<NewInterface*>(oldObject);
 
-    const IRefCountable::InterfaceId otherNewInterfaceId{NEW_INTERFACE_ID "_WITH_SUFFIX"};
-    const OldObject::InterfaceId otherOldInterfaceId{"old2interfaceId"}; //< 15 chars, 16 bytes.
+    const InterfaceId otherNewInterfaceId{NEW_INTERFACE_ID "_WITH_SUFFIX"};
+    const OldInterfaceId otherOldInterfaceId{"old2interfaceId"}; //< 15 chars, 16 bytes.
 
     // Test the regular queryInterface() behavior in the new SDK.
     TEST_QUERY_INTERFACE(nonNull, newObject, NewObject::interfaceId());

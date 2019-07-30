@@ -13,7 +13,7 @@ class IList: public Interface<IList<IItem>>
 public:
     static auto interfaceId()
     {
-        return IRefCountable::InterfaceId::makeForTemplate<IList<IItem>, IItem>("nx::sdk::IList");
+        return InterfaceId::makeForTemplate<IList<IItem>, IItem>("nx::sdk::IList");
     }
 
     virtual int count() const = 0;
