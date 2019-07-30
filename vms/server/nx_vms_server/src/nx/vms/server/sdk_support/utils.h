@@ -105,10 +105,9 @@ std::optional<Manifest> manifestFromSdkObject(
     std::unique_ptr<AbstractManifestLogger> logger = nullptr)
 {
     using namespace nx::sdk;
-    const ResultHolder<const IString*> result = sdkObject->manifest();
 
     const auto logError =
-        [&logger](const sdk_support::Error& error, const QString& manifestString = QString())
+        [&logger](const Error& error, const QString& manifestString = QString())
         {
             if (logger)
                 logger->log(manifestString, error);
@@ -122,8 +121,13 @@ std::optional<Manifest> manifestFromSdkObject(
             return logError({ErrorCode::internalError, errorMessage}, manifestString);
         };
 
+    if (!NX_ASSERT(sdkObject))
+        return logInternalError("SDK object to request a manifest is null");
+
+    const ResultHolder<const IString*> result = sdkObject->manifest();
+
     if (!result.isOk())
-        return logError(sdk_support::Error::fromResultHolder(result));
+        return logError(Error::fromResultHolder(result));
 
     const auto manifestStr = result.value();
     if (!manifestStr)
@@ -142,7 +146,7 @@ std::optional<Manifest> manifestFromSdkObject(
     if (!success)
         return logInternalError("Unable to deserialize manifest", rawString);
 
-    logError(sdk_support::Error::fromResultHolder(result), rawString);
+    logError(Error::fromResultHolder(result), rawString);
     return deserializedManifest;
 }
 
