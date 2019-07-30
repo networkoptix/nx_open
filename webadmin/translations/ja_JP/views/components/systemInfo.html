@@ -8,8 +8,7 @@
             <tr><td>サーバー</td><td><b>{{settings.name}}</b> <span ng-bind-html="settings.remoteAddressesDisplay"></span></td></tr>
             <tr class="table-spacer"><td>&nbsp;</td><td></td></tr>
             <tr><td>バージョン</td><td><b>{{settings.version}}</b></td></tr>
-            <tr><td>プラットフォーム</td><td><b>{{settings.systemInformation.platform}}</b></td></tr>
-            <tr><td>アーキテクチャ</td><td><b>{{settings.systemInformation.arch}}</b></td></tr>
+            <tr><td>プラットフォーム</td><td><b>{{settings.osInfo.platform}}</b></td></tr>
             <tr ng-if="user.isAdmin" class="table-spacer"><td>&nbsp;</td><td></td></tr>
             <tr ng-if="user.isAdmin"><td>すべてのサーバー</td><td>
                 <div ng-repeat="server in mediaServers" ng-class="{active:server.active}">

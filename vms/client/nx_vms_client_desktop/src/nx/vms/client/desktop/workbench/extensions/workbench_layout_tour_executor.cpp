@@ -249,7 +249,7 @@ void LayoutTourExecutor::processTourStepInternal(bool forward, bool force)
                 return;
             }
 
-            QnWorkbenchItem::sortByGeometry(&items);
+            QnWorkbenchItem::sortByGeometryAndName(items);
             const int index = item ? items.indexOf(item) : -1;
             workbench()->setItem(Qn::ZoomedRole, items[nextIndex(index, items.size())]);
             if (isTimerRunning())

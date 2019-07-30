@@ -278,7 +278,7 @@ void LayoutTourReviewController::updateOrder()
     NX_ASSERT_HEAVY_CONDITION(isLayoutTourReviewMode());
 
     auto items = workbench()->currentLayout()->items().toList();
-    QnWorkbenchItem::sortByGeometry(&items);
+    QnWorkbenchItem::sortByGeometryAndName(items);
 
     int index = 0;
     for (auto item: items)
@@ -383,7 +383,7 @@ void LayoutTourReviewController::updateItemsLayout()
     nx::vms::api::LayoutTourDataList currentItems;
 
     auto layoutItems = wbLayout->items().toList();
-    QnWorkbenchItem::sortByGeometry(&layoutItems);
+    QnWorkbenchItem::sortByGeometryAndName(layoutItems);
 
     for (auto layoutItem : layoutItems)
     {
@@ -507,7 +507,7 @@ bool LayoutTourReviewController::fillTourItems(nx::vms::api::LayoutTourItemDataL
         return false;
 
     auto layoutItems = workbench()->currentLayout()->items().toList();
-    QnWorkbenchItem::sortByGeometry(&layoutItems);
+    QnWorkbenchItem::sortByGeometryAndName(layoutItems);
     for (auto item: layoutItems)
     {
         const auto resource = item->resource();

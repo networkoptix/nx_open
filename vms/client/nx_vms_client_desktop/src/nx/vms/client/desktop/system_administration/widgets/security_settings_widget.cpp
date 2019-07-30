@@ -20,6 +20,9 @@ SecuritySettingsWidget::SecuritySettingsWidget(QWidget* parent):
     ui(new Ui::SecuritySettingsWidget)
 {
     ui->setupUi(this);
+    ui->watermarkExplanationLabel->setText(tr(
+        "Watermarks will be displayed over live, archive and exported videos for non-admin users"
+        " only. You and other administrators will not see them."));
 
     setHelpTopic(ui->auditTrailCheckBox, Qn::AuditTrail_Help);
     setHelpTopic(ui->auditTrailHint, Qn::AuditTrail_Help);

@@ -7,7 +7,6 @@
 
 #include <nx/sql/sql_query_execution_helper.h>
 #include <nx/utils/thread/mutex.h>
-#include <nx/utils/unused.h>
 #include <nx/utils/uuid.h>
 #include <nx/utils/literal.h>
 
@@ -66,32 +65,28 @@ public:
     virtual bool afterInstallUpdate(const QString& updateName);
 
     template <class T>
-    static void assertSorted(std::vector<T> &data)
+    static void assertSorted([[maybe_unused]] std::vector<T> &data)
     {
-#ifdef _DEBUG
-        assertSorted(data, &T::id);
-#else
-        nx::utils::unused(data);
-#endif // DEBUG
+        #ifdef _DEBUG
+            assertSorted(data, &T::id);
+        #endif
     }
 
     template <class T, class Field>
-    static void assertSorted(T &data, QnUuid Field::*idField)
+    static void assertSorted([[maybe_unused]] T &data, [[maybe_unused]] QnUuid Field::*idField)
     {
-#ifdef _DEBUG
-        if (data.empty())
-            return;
+        #ifdef _DEBUG
+            if (data.empty())
+                return;
 
-        QByteArray prev = (data[0].*idField).toRfc4122();
-        for (size_t i = 1; i < data.size(); ++i)
-        {
-            QByteArray next = (data[i].*idField).toRfc4122();
-            NX_ASSERT(next >= prev);
-            prev = next;
-        }
-#else
-        nx::utils::unused(data, idField);
-#endif // DEBUG
+            QByteArray prev = (data[0].*idField).toRfc4122();
+            for (size_t i = 1; i < data.size(); ++i)
+            {
+                QByteArray next = (data[i].*idField).toRfc4122();
+                NX_ASSERT(next >= prev);
+                prev = next;
+            }
+        #endif
     }
 
     /**

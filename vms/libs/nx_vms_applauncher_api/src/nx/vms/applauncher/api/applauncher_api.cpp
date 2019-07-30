@@ -74,22 +74,6 @@ std::optional<QStringList> deserializeResponseParameters(
 
 } // namespace
 
-TaskType deserializeTaskType(const QByteArray& data)
-{
-    static QHash<QByteArray, TaskType> kStringToTaskType{
-        {"run", TaskType::startApplication},
-        {"quit", TaskType::quit},
-        {"installZip", TaskType::installZip},
-        {"startZipInstallation", TaskType::startZipInstallation},
-        {"checkZipProgress", TaskType::checkZipProgress},
-        {"isVersionInstalled", TaskType::isVersionInstalled},
-        {"getInstalledVersions", TaskType::getInstalledVersions},
-        {"addProcessKillTimer", TaskType::addProcessKillTimer},
-    };
-
-    return kStringToTaskType.value(data, TaskType::invalidTaskType);
-}
-
 QByteArray serializeTaskType(TaskType value)
 {
     switch (value)
@@ -110,6 +94,8 @@ QByteArray serializeTaskType(TaskType value)
             return "getInstalledVersions";
         case TaskType::addProcessKillTimer:
             return "addProcessKillTimer";
+        case TaskType::pingApplauncher:
+            return "pingApplauncher";
         default:
             return "unknown";
     }
@@ -183,71 +169,6 @@ QString launcherPipeName()
         baseName += QString::fromLatin1(qgetenv("USER").toBase64());
 
     return baseName;
-}
-
-bool deserializeTask(const QByteArray& data, BaseTask** ptr)
-{
-    const int taskNameEnd = data.indexOf('\n');
-    if (taskNameEnd == -1)
-    {
-        NX_ERROR(NX_SCOPE_TAG, "deserializeTask(): Cannot deserialize task name:\n%1",
-            QString::fromUtf8(data));
-        return false;
-    }
-
-    const QByteArray taskName(data.constData(), taskNameEnd);
-    const TaskType taskType = deserializeTaskType(taskName);
-    switch (taskType)
-    {
-        case TaskType::startApplication:
-            *ptr = new StartApplicationTask();
-            break;
-
-        case TaskType::quit:
-            *ptr = new QuitTask();
-            break;
-
-        case TaskType::installZip:
-            *ptr = new InstallZipTask();
-            break;
-
-        case TaskType::startZipInstallation:
-            *ptr = new InstallZipTaskAsync();
-            break;
-
-        case TaskType::checkZipProgress:
-            *ptr = new InstallZipCheckStatus();
-            break;
-
-        case TaskType::isVersionInstalled:
-            *ptr = new IsVersionInstalledRequest();
-            break;
-
-        case TaskType::getInstalledVersions:
-            *ptr = new GetInstalledVersionsRequest();
-            break;
-
-        case TaskType::addProcessKillTimer:
-            *ptr = new AddProcessKillTimerRequest();
-            break;
-
-        case TaskType::invalidTaskType:
-            NX_ERROR(NX_SCOPE_TAG, "deserializeTask(): Invalid task type: %1",
-                QString::fromUtf8(taskName));
-            return false;
-    }
-
-    if (!(*ptr)->deserialize(data))
-    {
-        NX_ERROR(NX_SCOPE_TAG, "deserializeTask(): Cannot deserialize task:\n%1",
-            QString::fromUtf8(data));
-
-        delete *ptr;
-        *ptr = nullptr;
-        return false;
-    }
-
-    return true;
 }
 
 QByteArray BaseTask::serialize() const
@@ -349,6 +270,21 @@ bool InstallZipTaskAsync::deserialize(const QByteArray& data)
     return false;
 }
 
+QByteArray InstallZipCheckStatus::serialize() const
+{
+    return serializeTaskParameters(type, {version.toString()});
+}
+
+bool InstallZipCheckStatus::deserialize(const QByteArray& data)
+{
+    if (const auto& parameters = deserializeTaskParameters(type, 1, data))
+    {
+        version = nx::utils::SoftwareVersion(parameters->at(0));
+        return true;
+    }
+    return false;
+}
+
 QByteArray InstallZipCheckStatusResponse::serialize() const
 {
     return serializeResponseParameters(result,
@@ -407,6 +343,40 @@ bool GetInstalledVersionsResponse::deserialize(const QByteArray& data)
     {
         for (const QString& versionString: parameters->at(0).split(L','))
             versions.append(nx::utils::SoftwareVersion(versionString));
+        return true;
+    }
+    return false;
+}
+
+QByteArray PingRequest::serialize() const
+{
+    return serializeTaskParameters(type, {QString::number(pingId), QString::number(pingStamp)});
+}
+
+bool PingRequest::deserialize(const QByteArray& data)
+{
+    if (const auto& parameters = deserializeTaskParameters(type, 2, data))
+    {
+        pingId = parameters->at(0).toULongLong();
+        pingStamp = parameters->at(1).toULongLong();
+        return true;
+    }
+    return false;
+}
+
+QByteArray PingResponse::serialize() const
+{
+    return serializeResponseParameters(result, {QString::number(pingId),
+        QString::number(pingRequestStamp), QString::number(pingResponseStamp)});
+}
+
+bool PingResponse::deserialize(const QByteArray& data)
+{
+    if (const auto& parameters = deserializeResponseParameters(&result, 3, data))
+    {
+        pingId = parameters->at(0).toULongLong();
+        pingRequestStamp = parameters->at(1).toULongLong();
+        pingResponseStamp = parameters->at(2).toULongLong();
         return true;
     }
     return false;

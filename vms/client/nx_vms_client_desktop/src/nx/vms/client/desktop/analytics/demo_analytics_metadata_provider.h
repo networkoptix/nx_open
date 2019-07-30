@@ -10,11 +10,11 @@ class DemoAnalyticsMetadataProvider: public core::AbstractAnalyticsMetadataProvi
 public:
     DemoAnalyticsMetadataProvider();
 
-    virtual nx::common::metadata::DetectionMetadataPacketPtr metadata(
+    virtual nx::common::metadata::ObjectMetadataPacketPtr metadata(
         std::chrono::microseconds timestamp,
         int channel) const override;
 
-    virtual QList<nx::common::metadata::DetectionMetadataPacketPtr> metadataRange(
+    virtual QList<nx::common::metadata::ObjectMetadataPacketPtr> metadataRange(
         std::chrono::microseconds startTimestamp,
         std::chrono::microseconds endTimestamp,
         int channel,

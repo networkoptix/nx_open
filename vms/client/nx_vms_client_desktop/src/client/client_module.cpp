@@ -700,7 +700,8 @@ void QnClientModule::initLocalResources()
     resourceDiscoveryManager->setReady(true);
     commonModule->store(new QnSystemsWeightsManager());
     commonModule->store(new QnLocalResourceStatusWatcher());
-    if (!m_startupParameters.skipMediaFolderScan && !isTestingEnvironment())
+    if (!m_startupParameters.skipMediaFolderScan && !m_startupParameters.acsMode 
+        && !isTestingEnvironment())
     {
         auto localFilesSearcher = commonModule->store(new ResourceDirectoryBrowser());
         QStringList paths;

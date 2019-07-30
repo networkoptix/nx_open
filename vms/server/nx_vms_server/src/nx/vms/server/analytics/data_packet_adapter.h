@@ -12,7 +12,7 @@ class DataPacketAdapter: public QnAbstractDataPacket
 {
 public:
     DataPacketAdapter(nx::sdk::analytics::IDataPacket* packet):
-        m_packet(packet)
+        m_packet(toPtr(packet))
     {
         packet->addRef();
     }

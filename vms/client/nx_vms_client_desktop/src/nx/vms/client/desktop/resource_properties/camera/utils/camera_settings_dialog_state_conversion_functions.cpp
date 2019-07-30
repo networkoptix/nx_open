@@ -336,7 +336,7 @@ void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
 
         if (state.devicesDescription.hasMotion == CombinedValue::All)
         {
-            camera->setMotionType(state.singleCameraSettings.enableMotionDetection()
+            camera->setMotionType(state.enableMotionDetection()
                 ? camera->getDefaultMotionType()
                 : Qn::MotionType::MT_NoMotion);
 

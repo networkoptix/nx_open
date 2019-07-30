@@ -122,6 +122,7 @@ public:
 
 signals:
     void started();
+    void startedWithSignalsProcessed();
 
 public slots:
     void stopAsync();
@@ -140,7 +141,6 @@ private slots:
     void at_storageManager_rebuildFinished(QnSystemHealth::MessageType msgType);
     void at_archiveBackupFinished(qint64 backedUpToMs, nx::vms::api::EventReason code);
     void at_timer();
-    void at_connectionOpened();
     void at_serverModuleConflict(nx::vms::discovery::ModuleEndpoint module);
 
     void at_appStarted();
@@ -153,6 +153,7 @@ private slots:
     void at_serverPropertyChanged(const QnResourcePtr& resource, const QString& key);
 
 private:
+    void writeServerStartedEvent();
     void updateDisabledVendorsIfNeeded();
     void updateAllowCameraChangesIfNeeded();
     void moveHandlingCameras();
@@ -164,22 +165,20 @@ private:
         QnUniversalTcpListener* tcpListener,
         ec2::TransactionMessageBusAdapter* messageBus);
 
-    /**
-     * This weird name is an apidoctool requirement.
-     */
-    void reg(
+    void registerRestHandler(
         const QString& path,
         nx::network::rest::Handler* handler,
         GlobalPermission permission = GlobalPermission::none);
 
-    void reg(
+    void registerRestHandler(
         const nx::network::http::Method::ValueType& method,
         const QString& path,
         nx::network::rest::Handler* handler,
         GlobalPermission permission = GlobalPermission::none);
 
-    template<class TcpConnectionProcessor, typename... ExtraParam>
-    void regTcp(const QByteArray& protocol, const QString& path, ExtraParam... extraParam);
+    template<class TcpConnectionProcessor, typename... ExtraParams>
+    void registerTcpHandler(
+        const QByteArray& protocol, const QString& path, ExtraParams... extraParams);
 
     bool initTcpListener(
         TimeBasedNonceProvider* timeBasedNonceProvider,

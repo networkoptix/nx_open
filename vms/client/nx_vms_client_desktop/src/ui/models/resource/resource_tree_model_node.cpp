@@ -1150,6 +1150,20 @@ QnResourceTreeModel* QnResourceTreeModelNode::model() const
     return m_model;
 }
 
+bool QnResourceTreeModelNode::isVisible() const
+{
+    if (!isValid())
+        return false;
+
+    for (auto node = this; node != nullptr; node = node->parent().get())
+    {
+        if (node->isBastard())
+            return false;
+    }
+
+    return true;
+}
+
 void QnResourceTreeModelNode::handlePermissionsChanged()
 {
     m_editable.checked = false;
@@ -1286,7 +1300,7 @@ void QnResourceTreeModelNode::removeChildInternal(const QnResourceTreeModelNodeP
     NX_ASSERT(child->parent() == this);
     NX_ASSERT(m_children.contains(child));
 
-    if (isValid() && !isBastard() && m_model)
+    if (m_model && isVisible())
     {
         QModelIndex index = createIndex(Qn::NameColumn);
         int row = m_children.indexOf(child);
@@ -1311,7 +1325,7 @@ void QnResourceTreeModelNode::addChildInternal(const QnResourceTreeModelNodePtr&
 {
     NX_ASSERT(child->parent() == this);
 
-    if (isValid() && !isBastard() && m_model)
+    if (m_model && isVisible())
     {
         QModelIndex index = createIndex(Qn::NameColumn);
         int row = m_children.size();
@@ -1335,10 +1349,10 @@ void QnResourceTreeModelNode::addChildInternal(const QnResourceTreeModelNodePtr&
 
 void QnResourceTreeModelNode::changeInternal()
 {
-    if (!isValid() || isBastard() || !m_model)
+    if (!m_model || !isVisible())
         return;
 
-    QModelIndex index = createIndex(Qn::NameColumn);
+    const auto index = createIndex(Qn::NameColumn);
     emit m_model->dataChanged(index, index.sibling(index.row(), Qn::ColumnCount - 1));
 }
 

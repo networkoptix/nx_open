@@ -4,6 +4,8 @@
 #include <plugins/vms_server_plugins_ini.h>
 
 #include <nx/vms/server/sdk_support/utils.h>
+#include <nx/vms/server/sdk_support/to_string.h>
+#include <nx/vms/server/sdk_support/result_holder.h>
 #include <nx/vms/server/analytics/debug_helpers.h>
 #include <nx/vms/server/interactive_settings/json_engine.h>
 #include <nx/vms/server/analytics/debug_helpers.h>
@@ -17,6 +19,9 @@
 #include <nx/analytics/descriptor_manager.h>
 
 namespace nx::vms::server::resource {
+
+template<typename T>
+using ResultHolder = nx::vms::server::sdk_support::ResultHolder<T>;
 
 AnalyticsEngineResource::AnalyticsEngineResource(QnMediaServerModule* serverModule):
     base_type(),
@@ -105,8 +110,16 @@ bool AnalyticsEngineResource::sendSettingsToSdkEngine()
                 "_effective_settings.json"));
     }
 
-    engine->setSettings(effectiveSettings.get());
-    return true;
+    const ResultHolder<const nx::sdk::IStringMap*> result =
+        engine->setSettings(effectiveSettings.get());
+
+    if (!result.isOk())
+    {
+        NX_WARNING(this, "Error occured while sending settings to the Engine %1 (%2): %3",
+            getName(), getId(), sdk_support::toErrorString(result));
+    }
+
+    return result.isOk();
 }
 
 std::optional<nx::vms::api::analytics::PluginManifest>

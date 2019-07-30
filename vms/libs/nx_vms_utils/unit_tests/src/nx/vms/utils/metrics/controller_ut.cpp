@@ -23,11 +23,11 @@ static const QByteArray kRulesExample(R"json({
         },
         "g": {
             "group": {
-                "t": { "alarms": { "warning": "text_b1", "error": "=world" } },
-                "tChanges": {
-                    "name": "t changes in 1h",
-                    "calculate": "count t",
-                    "insert": "before t",
+                "gt": { "alarms": { "warning": "text_b1", "error": "=world" } },
+                "gtChanges": {
+                    "name": "gt changes in 1h",
+                    "calculate": "count gt",
+                    "insert": "before gt",
                     "alarms": { "warning": 2, "error": 10 }
                 }
             }
@@ -95,8 +95,8 @@ protected:
         checkParameter(testManifest[1], "t", "text parameter");
 
         checkParameter(testManifest[2], "g", "group in resource", 2);
-        checkParameter(testManifest[2].group[0], "i", "int parameter");
-        checkParameter(testManifest[2].group[1], "t", "text parameter");
+        checkParameter(testManifest[2].group[0], "gi", "int parameter");
+        checkParameter(testManifest[2].group[1], "gt", "text parameter");
     }
 
     void expectManifestWithRules(api::metrics::SystemManifest systemManifest)
@@ -112,9 +112,9 @@ protected:
         checkParameter(testManifest[2], "t", "text parameter");
 
         checkParameter(testManifest[3], "g", "group in resource", 3);
-        checkParameter(testManifest[3].group[0], "i", "int parameter");
-        checkParameter(testManifest[3].group[1], "tChanges", "t changes in 1h");
-        checkParameter(testManifest[3].group[2], "t", "text parameter");
+        checkParameter(testManifest[3].group[0], "gi", "int parameter");
+        checkParameter(testManifest[3].group[1], "gtChanges", "gt changes in 1h");
+        checkParameter(testManifest[3].group[2], "gt", "text parameter");
     }
 
     template<typename Value>
@@ -132,6 +132,7 @@ protected:
 
     void expectCurrentValues(api::metrics::SystemValues systemValues, bool includeRemote)
     {
+
         NX_INFO(this, "%1 includeRemote=%2", __func__, includeRemote);
         EXPECT_EQ(1, systemValues.size());
 
@@ -148,8 +149,8 @@ protected:
 
             auto group = test0.values["g"].group;
             EXPECT_EQ(2, group.size());
-            checkParameter(group, "i", 10);
-            checkParameter(group, "t", "text_b0");
+            checkParameter(group, "gi", 10);
+            checkParameter(group, "gt", "text_b0");
         }
 
         auto test1 = testValues["test_1"];
@@ -163,8 +164,8 @@ protected:
 
             auto group = test1.values["g"].group;
             EXPECT_EQ(2, group.size());
-            checkParameter(group, "i", 11);
-            checkParameter(group, "t", "text_b1");
+            checkParameter(group, "gi", 11);
+            checkParameter(group, "gt", "text_b1");
         }
         else
         {
@@ -194,8 +195,8 @@ protected:
 
             auto group = test0.values["g"].group;
             EXPECT_EQ(2, group.size());
-            checkParameter(group, "i", 10);
-            checkParameter(group, "t", "text_b0");
+            checkParameter(group, "gi", 10);
+            checkParameter(group, "gt", "text_b0");
         }
 
         auto test1 = testValues["test_1"];
@@ -209,8 +210,8 @@ protected:
 
             auto group = test1.values["g"].group;
             EXPECT_EQ(2, group.size());
-            checkParameter(group, "i", 9);
-            checkParameter(group, "t", "world");
+            checkParameter(group, "gi", 9);
+            checkParameter(group, "gt", "world");
         }
         else
         {
@@ -241,9 +242,9 @@ protected:
 
             auto group = test0.values["g"].group;
             EXPECT_EQ(3, group.size());
-            checkParameter(group, "i", 10);
-            checkParameter(group, "tChanges", 0);
-            checkParameter(group, "t", "text_b0");
+            checkParameter(group, "gi", 10);
+            checkParameter(group, "gtChanges", 0);
+            checkParameter(group, "gt", "text_b0");
         }
 
         auto test1 = testValues["test_1"];
@@ -258,9 +259,9 @@ protected:
 
             auto group = test1.values["g"].group;
             EXPECT_EQ(3, group.size());
-            checkParameter(group, "i", 9);
-            checkParameter(group, "tChanges", 1);
-            checkParameter(group, "t", "world", "error");
+            checkParameter(group, "gi", 9);
+            checkParameter(group, "gtChanges", 1);
+            checkParameter(group, "gt", "world", "error");
         }
         else
         {
@@ -285,7 +286,7 @@ protected:
     }
 
     void expectTimelineValues(
-        api::metrics::SystemValues systemValues, 
+        api::metrics::SystemValues systemValues,
         bool isUpdated, bool includeRemote)
     {
         NX_INFO(this, "%1 isUpdated=%2, includeRemote=%3", __func__, isUpdated, includeRemote);
@@ -304,8 +305,8 @@ protected:
 
             auto group = test0.values["g"].group;
             EXPECT_EQ(2, group.size());
-            checkParameterTimeline(group, "i", 1);
-            checkParameterTimeline(group, "t", 1);
+            checkParameterTimeline(group, "gi", 1);
+            checkParameterTimeline(group, "gt", 1);
         }
 
         auto test1 = testValues["test_1"];
@@ -319,8 +320,8 @@ protected:
 
             auto group = test1.values["g"].group;
             EXPECT_EQ(2, group.size());
-            checkParameterTimeline(group, "i", isUpdated ? 2 : 1);
-            checkParameterTimeline(group, "t", isUpdated ? 2 : 1);
+            checkParameterTimeline(group, "gi", isUpdated ? 2 : 1);
+            checkParameterTimeline(group, "gt", isUpdated ? 2 : 1);
         }
         else
         {
@@ -348,14 +349,14 @@ TEST_F(MetricsControllerTest, Manifest)
 TEST_F(MetricsControllerTest, Values)
 {
     expectCurrentValues(
-        controller.values(Controller::none), 
+        controller.values(Controller::none),
         /*includeRemote*/ false);
     expectTimelineValues(
         controller.values(Controller::none, std::chrono::milliseconds::zero()),
         /*isUpdated*/ false, /*includeRemote*/ false);
 
     expectCurrentValues(
-        controller.values(Controller::includeRemote), 
+        controller.values(Controller::includeRemote),
         /*includeRemote*/ true);
     expectTimelineValues(
         controller.values(Controller::includeRemote, std::chrono::milliseconds::zero()),
@@ -366,14 +367,14 @@ TEST_F(MetricsControllerTest, Values)
     updateSomeValues();
 
     expectUpdatedValues(
-        controller.values(Controller::none), 
+        controller.values(Controller::none),
         /*includeRemote*/ false);
     expectTimelineValues(
         controller.values(Controller::none, std::chrono::milliseconds::zero()),
         /*isUpdated*/ true, /*includeRemote*/ false);
 
     expectUpdatedValues(
-        controller.values(Controller::includeRemote), 
+        controller.values(Controller::includeRemote),
         /*includeRemote*/ true);
     expectTimelineValues(
         controller.values(Controller::includeRemote, std::chrono::milliseconds::zero()),
@@ -382,17 +383,17 @@ TEST_F(MetricsControllerTest, Values)
     ASSERT_TRUE(setRules());
 
     expectUpdatedValuesWithRules(
-        controller.values(Controller::applyRules), 
+        controller.values(Controller::applyRules),
         /*includeRemote*/ false);
     expectUpdatedValues(
-        controller.values(Controller::none), 
+        controller.values(Controller::none),
         /*includeRemote*/ false);
 
     expectUpdatedValuesWithRules(
         controller.values({Controller::includeRemote, Controller::applyRules}),
         /*includeRemote*/ true);
     expectUpdatedValues(
-        controller.values(Controller::includeRemote), 
+        controller.values(Controller::includeRemote),
         /*includeRemote*/ true);
 }
 

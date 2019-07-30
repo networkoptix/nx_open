@@ -10,7 +10,6 @@
 #include <nx/update/update_information.h>
 #include <utils/common/connective.h>
 #include <utils/update/zip_utils.h>
-#include "update_contents.h"
 
 namespace nx::vms::applauncher::api { enum class ResultType; }
 
@@ -138,10 +137,14 @@ public:
      */
     void setServerUrl(const nx::utils::Url& serverUrl, const QnUuid& serverId);
 
-    std::future<UpdateContents> requestRemoteUpdateInfo();
-
-    /** Get cached update information from the mediaservers. */
-    UpdateContents getRemoteUpdateInfo() const;
+    std::future<UpdateContents> requestInstalledUpdateInfo();
+    /**
+     * Requests update information from the internet. It can proxy request through mediaserver if
+     * client has no internet.
+     * @param updateUrl - update URL to be used.
+     * @param build - build number to check.
+     */
+    std::future<UpdateContents> requestInternetUpdateInfo(const QString& updateUrl, const QString& build);
 
     /**
      * Get installed versions. It can block up to 500ms until applauncher check it complete.
@@ -149,7 +152,7 @@ public:
      * most of the time.
      * @param includeCurrentVersion Should we include a version of current client instance.
      */
-    std::set<nx::utils::SoftwareVersion> getInstalledVersions(bool includeCurrentVersion = false) const;
+    std::set<nx::utils::SoftwareVersion> getInstalledClientVersions(bool includeCurrentVersion = false) const;
 
     static QString toString(State state);
 
@@ -166,14 +169,13 @@ signals:
      * or its internal state is updated.
      * @param state - current state, corresponds to enum ClientUpdateTool::State;
      * @param percentComplete - progress for this state.
+     * @param message - contains printable error message.
      */
-    void updateStateChanged(int state, int percentComplete);
+    void updateStateChanged(int state, int percentComplete, const QString& message);
 
 protected:
     // Callbacks
     void atDownloaderStatusChanged(const FileInformation& fileInformation);
-    void atRemoteUpdateInformation(nx::update::InformationError error,
-        const nx::update::Information& updateInformation);
     void atDownloadFinished(const QString& fileName);
     void atChunkDownloadFailed(const QString& fileName);
     void atDownloadFailed(const QString& fileName);
@@ -203,14 +205,15 @@ private:
     bool m_stateChanged = false;
     nx::utils::SoftwareVersion m_updateVersion;
 
-    /** Direct connection to the mediaserver. */
+    /**
+     * Direct connection to the mediaserver.
+     * It is used to request update manifest in compatibility mode.
+     */
     rest::QnConnectionPtr m_serverConnection;
     /** Full path to update package. */
     QString m_updateFile;
     QString m_lastError;
 
-    std::promise<UpdateContents> m_remoteUpdateInfoRequest;
-    UpdateContents m_remoteUpdateContents;
     QnMutex m_mutex;
 
     std::future<nx::vms::applauncher::api::ResultType> m_applauncherTask;

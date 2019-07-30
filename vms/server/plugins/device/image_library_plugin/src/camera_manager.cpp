@@ -17,7 +17,7 @@ static const int FRAME_DURATION_USEC = 1*1000*1000;
 CameraManager::CameraManager( const nxcip::CameraInfo& info )
 :
     m_refManager( this ),
-    m_pluginRef( ImageLibraryPlugin::instance() ),
+    m_pluginRef( nx::sdk::toPtr(ImageLibraryPlugin::instance()) ),
     m_info( info ),
     m_capabilities(
         nxcip::BaseCameraManager::dtsArchiveCapability |

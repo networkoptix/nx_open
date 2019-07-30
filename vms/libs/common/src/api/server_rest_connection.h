@@ -387,7 +387,7 @@ public:
     /** Get statistics for server health monitor. */
     Handle getStatistics(GetCallback callback, QThread* targetThread = nullptr);
 
-    Handle lookupDetectedObjects(
+    Handle lookupObjectTracks(
         const nx::analytics::db::Filter& request,
         bool isLocal,
         Result<nx::analytics::db::LookupResult>::type callback,
@@ -461,15 +461,15 @@ public:
         QThread* targetThread = nullptr);
 
     Handle updateActionStop(
-        std::function<void(Handle, bool)>&& callback,
+        std::function<void(bool, Handle)>&& callback,
         QThread* targetThread = nullptr);
 
     Handle updateActionFinish(bool skipActivePeers,
-        std::function<void(Handle, bool)>&& callback,
+        std::function<void(bool, Handle, const QnRestResult&)>&& callback,
         QThread* targetThread = nullptr);
 
     Handle updateActionInstall(const QSet<QnUuid>& participants,
-        std::function<void(Handle, bool)>&& callback,
+        std::function<void(bool, Handle, const QnRestResult&)>&& callback,
         QThread* targetThread = nullptr);
 
     Handle retryUpdate(

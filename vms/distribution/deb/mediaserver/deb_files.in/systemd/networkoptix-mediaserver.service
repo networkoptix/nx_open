@@ -10,7 +10,7 @@ ExecStart=/opt/@deb.customization.company.name@/mediaserver/bin/mediaserver
 Restart=on-failure
 TimeoutStopSec=120
 KillMode=process
-TasksMax=4195
+TasksMax=8191
 
 [Install]
 WantedBy=multi-user.target

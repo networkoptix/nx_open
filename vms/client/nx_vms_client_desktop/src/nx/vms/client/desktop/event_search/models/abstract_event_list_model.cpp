@@ -7,6 +7,7 @@
 #include <translation/datetime_formatter.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/common/synctime.h>
+#include <ui/style/skin.h>
 
 #include <nx/utils/datetime.h>
 
@@ -41,6 +42,12 @@ QVariant AbstractEventListModel::data(const QModelIndex& index, int role) const
 
         case Qt::AccessibleDescriptionRole:
             return index.data(Qn::DescriptionTextRole);
+
+        case Qt::DecorationRole:
+        {
+            const auto path = index.data(Qn::DecorationPathRole).toString();
+            return path.isEmpty() ? QPixmap() : qnSkin->pixmap(path);
+        }
 
         default:
             return QVariant();

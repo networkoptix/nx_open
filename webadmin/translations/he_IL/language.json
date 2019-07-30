@@ -192,18 +192,18 @@
     },
     "common": {
         "voiceCommands": {
-            "search": "find + [text for searchbar]",
+            "search": "מצא + [טקסט עבור סרגל חיפוש]",
             "pause": "השהה",
-            "help": "help | show commands",
+            "help": "עזרה | הצג פקודות",
             "collapse all servers": "כווץ את כל השרתים",
-            "collapse server": "collapse server + [server name]",
+            "collapse server": "כווץ שרת + [שם שרת]",
             "play": "נגן",
             "clear search": "נקה את החיפוש",
-            "live": "go to live | show me live",
+            "live": "עבור שידור חי | הצג לי שידור חי",
             "expand all servers": "הרחב את כל השרתים",
             "stop listening": "עצור האזנה",
-            "expand server": "expand server + [server name]",
-            "view": "view + [camera name]"
+            "expand server": "הרחב שרת + [שם שרת]",
+            "view": "הצג + [שם המצלמה]"
         },
         "systemOffline": "השרת אינו זמין",
         "cameraLinks": {

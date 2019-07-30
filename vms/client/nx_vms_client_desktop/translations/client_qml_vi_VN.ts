@@ -76,7 +76,7 @@
     </message>
     <message>
       <source>Server is offline</source>
-      <translation type="unfinished">Server is offline</translation>
+      <translation>Máy chủ đang ẩn</translation>
     </message>
   </context>
   <context>

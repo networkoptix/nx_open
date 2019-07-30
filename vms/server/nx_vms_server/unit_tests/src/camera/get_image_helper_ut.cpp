@@ -127,7 +127,7 @@ TEST(GetImageHelper, updateDstSize_maxSize)
 TEST(GetImageHelper, determineStreamIndex)
 {
     using StreamIndex = nx::vms::api::StreamIndex;
-    using StreamSelectionMode = nx::api::CameraImageRequest::StreamSelectionMode;
+    using StreamSelectionMode = nx::api::ImageRequest::StreamSelectionMode;
 
     QnMediaServerModule serverModule;
     QnGetImageHelper helper(&serverModule);

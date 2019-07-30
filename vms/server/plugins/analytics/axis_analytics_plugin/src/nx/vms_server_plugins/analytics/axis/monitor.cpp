@@ -6,6 +6,7 @@
 #include <nx/sdk/analytics/helpers/event_metadata.h>
 #include <nx/sdk/analytics/helpers/event_metadata_packet.h>
 #include <nx/sdk/helpers/attribute.h>
+#include <nx/sdk/helpers/error.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/network/system_socket.h>
 
@@ -14,6 +15,9 @@
 #include "device_agent.h"
 
 namespace nx::vms_server_plugins::analytics::axis {
+
+using namespace nx::sdk;
+using namespace nx::sdk::analytics;
 
 namespace {
 
@@ -26,9 +30,6 @@ static const std::chrono::milliseconds kMinTimeBetweenEvents = std::chrono::seco
 nx::sdk::analytics::EventMetadata* createCommonEvent(
     const EventType& eventType, bool active)
 {
-    using namespace nx::sdk;
-    using namespace nx::sdk::analytics;
-
     auto eventMetadata = new EventMetadata();
     eventMetadata->setTypeId(eventType.id.toStdString());
     eventMetadata->setDescription(eventType.name.toStdString());
@@ -37,12 +38,12 @@ nx::sdk::analytics::EventMetadata* createCommonEvent(
     return eventMetadata;
 }
 
-nx::sdk::analytics::EventMetadataPacket* createCommonEventsMetadataPacket(
+EventMetadataPacket* createCommonEventsMetadataPacket(
     const EventType& event, bool active)
 {
     using namespace std::chrono;
     auto commonEvent = toPtr(createCommonEvent(event, active));
-    auto packet = new nx::sdk::analytics::EventMetadataPacket();
+    auto packet = new EventMetadataPacket();
     packet->addItem(commonEvent.get());
     packet->setTimestampUs(
         duration_cast<microseconds>(system_clock::now().time_since_epoch()).count());
@@ -113,7 +114,7 @@ Monitor::Monitor(
     DeviceAgent* deviceAgent,
     const QUrl& url,
     const QAuthenticator& auth,
-    nx::sdk::analytics::IDeviceAgent::IHandler* handler)
+    IDeviceAgent::IHandler* handler)
     :
     m_deviceAgent(deviceAgent),
     m_url(url),
@@ -131,7 +132,7 @@ Monitor::~Monitor()
 
 void Monitor::addRules(
     const nx::network::SocketAddress& localAddress,
-    const nx::sdk::IStringList* eventTypeIds)
+    const IStringList* eventTypeIds)
 {
     removeRules();
 
@@ -196,27 +197,30 @@ void Monitor::removeRules()
     NX_PRINT << "rulesRemoved = " << rulesRemoved << ", actionsRemoved = " << actionsRemoved;
 }
 
+static const char* kGetLocalIpFailureErrorString{
+    "Network connection to camera is broken. Can't detect local IP address for TCP server. "
+    "Event monitoring can not be started"};
+
 nx::network::HostAddress Monitor::getLocalIp(const nx::network::SocketAddress& cameraAddress)
 {
     std::chrono::milliseconds kCameraResponseTimeoutMs(5000);
     nx::network::TCPSocket s;
     if (s.connect(cameraAddress, kCameraResponseTimeoutMs))
-    {
         return s.getLocalAddress().address;
-    }
-    NX_WARNING(this, "Network connection to camera is broken. "
-        "Can't detect local IP address for TCP server. "
-        "Event monitoring can not be started.");
+
+    NX_WARNING(this, kGetLocalIpFailureErrorString);
     return nx::network::HostAddress();
 }
 
-nx::sdk::Error Monitor::startMonitoring(
-    const nx::sdk::analytics::IMetadataTypes* metadataTypes)
+Result<void> Monitor::startMonitoring(const IMetadataTypes* metadataTypes)
 {
     // Assume that the list contains events only, since this plugin produces no objects.
-    nx::sdk::Ptr<const nx::sdk::IStringList> eventTypeList(metadataTypes->eventTypeIds());
-    if (!NX_ASSERT(eventTypeList, "Event type id list is empty"))
-        return sdk::Error::unknownError;
+    const auto eventTypeList = toPtr(metadataTypes->eventTypeIds());
+    if (const char* const kMessage = "Event type id list is empty";
+        !NX_ASSERT(eventTypeList, kMessage))
+    {
+        return error(ErrorCode::internalError, kMessage);
+    }
 
     for (int i = 0; i < eventTypeList->count(); ++i)
     {
@@ -235,10 +239,7 @@ nx::sdk::Error Monitor::startMonitoring(
     nx::network::HostAddress localIp = this->getLocalIp(cameraAddress);
 
     if (localIp == nx::network::HostAddress())
-    {
-        // Warning message is already printed by getLocalIp().
-        return nx::sdk::Error::networkError;
-    }
+        return error(ErrorCode::internalError, kGetLocalIpFailureErrorString);
 
     nx::network::SocketAddress localAddress(localIp);
     m_httpServer = new nx::network::http::TestHttpServer;
@@ -254,7 +255,8 @@ nx::sdk::Error Monitor::startMonitoring(
 
     localAddress = m_httpServer->server().address();
     this->addRules(localAddress, eventTypeList.get());
-    return nx::sdk::Error::noError;
+
+    return {};
 }
 
 void Monitor::stopMonitoring()

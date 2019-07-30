@@ -106,6 +106,8 @@ protected:
 
     bool isInitialized() const;
 
+    bool isVisible() const; //< Valid, not a bastard and not under a bastard.
+
     QnResourceTreeModel* model() const;
 
     virtual int calculateIconKey() const;

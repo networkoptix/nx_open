@@ -12,6 +12,7 @@
 #include <nx/network/http/http_async_client.h>
 #include <nx/network/http/test_http_server.h>
 #include <nx/utils/elapsed_timer_thread_safe.h>
+#include <nx/sdk/analytics/helpers/result_aliases.h>
 
 #include "common.h"
 
@@ -71,8 +72,7 @@ public:
 
     nx::network::HostAddress getLocalIp(const nx::network::SocketAddress& cameraAddress);
 
-    nx::sdk::Error startMonitoring(
-        const nx::sdk::analytics::IMetadataTypes* metadataTypes);
+    nx::sdk::Result<void> startMonitoring(const nx::sdk::analytics::IMetadataTypes* metadataTypes);
 
     void stopMonitoring();
 
@@ -87,7 +87,7 @@ public:
     ElapsedEvents& eventsToCatch() noexcept { return m_eventsToCatch; }
 
  private:
-    DeviceAgent * m_deviceAgent;
+    DeviceAgent* m_deviceAgent;
     const QUrl m_url;
     const QUrl m_endpoint;
     const QAuthenticator m_auth;

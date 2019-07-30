@@ -2051,11 +2051,6 @@
       <source>New Virtual Camera...</source>
       <translation>Nouvelle caméra virtuelle...</translation>
     </message>
-    <message>
-      <location/>
-      <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
-      <translation>&quot;Caméra Virtuelle&quot; est un stockage virtuel pour les fichiers vidéo, qui peut être envoyer sur n'importe quel serveur de votre Système et accessible à tout utilisateur.</translation>
-    </message>
   </context>
   <context>
     <name>OpenLayoutActionWidget</name>
@@ -2099,9 +2094,9 @@
     </message>
   </context>
   <context>
-    <name>PluginEventWidget</name>
+    <name>PluginDiagnosticEventWidget</name>
     <message>
-      <location filename="../src/nx/vms/client/desktop/ui/event_rules/widgets/plugin_event_widget.ui"/>
+      <location filename="../src/nx/vms/client/desktop/ui/event_rules/widgets/plugin_diagnostic_event_widget.ui"/>
       <source>Source:</source>
       <translation>Source:</translation>
     </message>
@@ -2778,11 +2773,6 @@
       <source>Limit session duration</source>
       <translation>Limiter la durée de la session</translation>
     </message>
-    <message>
-      <location/>
-      <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
-      <translation>Les filigranes seront affichés sur des vidéos en direct, archivées et exportées pour les utilisateurs non-administrateurs uniquement. Vous et les autres administrateurs ne les verrons pas.</translation>
-    </message>
   </context>
   <context>
     <name>SendmailBusinessActionWidget</name>
@@ -3074,22 +3064,22 @@
     <message>
       <location/>
       <source>Analytics data will continue to be stored on the disabled storage.</source>
-      <translation type="unfinished">Analytics data will continue to be stored on the disabled storage.</translation>
+      <translation>Les données analytiques continueront d'être stockées sur le stockage désactivé.</translation>
     </message>
     <message>
       <location/>
       <source>Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</source>
-      <translation type="unfinished">Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</translation>
+      <translation>L'enregistrement dans un emplacement de stockage désactivé s'arrêtera. Cependant, la suppression des séquences obsolètes se poursuivra.</translation>
     </message>
     <message>
       <location/>
       <source>Recording was enabled on the USB storage</source>
-      <translation type="unfinished">Recording was enabled on the USB storage</translation>
+      <translation>Enregistrement a été activé sur le stockage USB</translation>
     </message>
     <message>
       <location/>
       <source>Analytics data can occupy tens of gigabytes of storage space. We recommend to choose other location for it instead of the system partition.</source>
-      <translation type="unfinished">Analytics data can occupy tens of gigabytes of storage space. We recommend to choose other location for it instead of the system partition.</translation>
+      <translation>Les données d'analyse peuvent occuper des dizaines de giga-octets d'espace de stockage. Nous recommandons de choisir un autre emplacement au lieu de la partition système.</translation>
     </message>
   </context>
   <context>

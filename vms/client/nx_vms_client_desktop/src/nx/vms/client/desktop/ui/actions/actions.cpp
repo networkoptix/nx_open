@@ -57,7 +57,7 @@ void initialize(Manager* manager, Action* root)
 
     factory(ProcessStartupParametersAction)
         .flags(NoTarget)
-        .mode(DesktopMode | AcsMode);
+        .mode(DesktopMode | AcsMode | VideoWallMode);
 
     factory(MoveCameraAction)
         .flags(ResourceTarget | SingleTarget | MultiTarget)
@@ -291,7 +291,7 @@ void initialize(Manager* manager, Action* root)
 
     factory()
         .flags(Main | TitleBar | Tree | SingleTarget | ResourceTarget)
-        .text(ContextMenu::tr("New..."));
+        .text(ContextMenu::tr("New"));
 
     factory.beginSubMenu();
     {
@@ -390,7 +390,7 @@ void initialize(Manager* manager, Action* root)
     factory()
         .flags(Main | Tree | Scene)
         .mode(DesktopMode)
-        .text(ContextMenu::tr("Open..."))
+        .text(ContextMenu::tr("Open"))
         .condition(!condition::tourIsRunning());
 
     factory.beginSubMenu();
@@ -1091,7 +1091,7 @@ void initialize(Manager* manager, Action* root)
     factory()
         .flags(Scene | SingleTarget)
         .childFactory(new PtzPresetsToursFactory(manager))
-        .text(ContextMenu::tr("PTZ..."))
+        .text(ContextMenu::tr("PTZ"))
         .requiredTargetPermissions(Qn::WritePtzPermission)
         .condition(new PtzCondition(Ptz::PresetsPtzCapability, false));
 
@@ -1178,7 +1178,7 @@ void initialize(Manager* manager, Action* root)
     factory()
         .flags(Scene | SingleTarget | MultiTarget)
         .requiredTargetPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission)
-        .text(ContextMenu::tr("Rotate to..."));
+        .text(ContextMenu::tr("Rotate to"));
 
     factory.beginSubMenu();
     {
@@ -1530,7 +1530,7 @@ void initialize(Manager* manager, Action* root)
     factory()
         .flags(Scene | NoTarget)
         .requiredTargetPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission)
-        .text(ContextMenu::tr("Cell Spacing..."))
+        .text(ContextMenu::tr("Cell Spacing"))
         .condition(ConditionWrapper(new LightModeCondition(Qn::LightModeSingleItem))
             && !condition::isLayoutTourReviewMode()
             && !condition::tourIsRunning());
@@ -1822,6 +1822,8 @@ void initialize(Manager* manager, Action* root)
 
     factory(PinCalendarAction)
         .flags(NoTarget)
+        .text(ContextMenu::tr("Pin Calendar")) //< To be displayed on the button tooltip
+        .toggledText(ContextMenu::tr("Unpin Calendar"))
         .checkable();
 
     factory(MinimizeDayTimeViewAction)

@@ -21,8 +21,6 @@
 
 #include <nx/vms/common/p2p/downloader/downloader.h>
 
-#include "update_contents.h"
-
 namespace nx::vms::client::desktop {
 
 class UploadManager;
@@ -170,6 +168,9 @@ public:
      */
     QDir getDownloadDir() const;
 
+    /** Get available space in downloads folder. */
+    uint64_t getAvailableSpace() const;
+
     /**
      * Report-like object to describe a progress for a current action.
      */
@@ -195,6 +196,7 @@ public:
         noError,
         noConnection,
         networkError,
+        serverError,
     };
 
     void calculateManualDownloadProgress(ProgressInfo& progress);

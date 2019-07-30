@@ -15,16 +15,10 @@
 
 namespace {
 
-using namespace std::chrono;
 using namespace nx::vms::common::p2p::downloader;
 
-constexpr int kDefaultPeersPerOperation = 5;
-constexpr int kSubsequentChunksToDownload = 10;
-static const int kMaxSimultaneousDownloads = 5;
-constexpr milliseconds kDefaultStepDelay = 1min;
-constexpr milliseconds kStallDetectionTimeout = 2min;
-constexpr int kMaxAutoRank = 5;
-constexpr int kMinAutoRank = -1;
+constexpr int kMaxSimultaneousDownloads = 5;
+constexpr milliseconds kDefaultStepDelay = 15s;
 
 QString statusString(bool success)
 {
@@ -65,14 +59,15 @@ struct RequestContext
     static void processRequests(
         Worker* worker,
         std::vector<RequestContext>& contexts,
-        std::function<bool(const UserData&, const std::optional<T>&)> handleReply)
+        std::function<bool(const UserData&, const std::optional<T>&)> handleReply,
+        bool cancelUnprocessedRequests = true)
     {
         while (!contexts.empty() && !worker->needToStop())
         {
             auto it = contexts.begin();
             while (it != contexts.end() && !worker->needToStop())
             {
-                if (it->context->future.wait_for(2s) == std::future_status::ready)
+                if (it->context->future.wait_for(30ms) == std::future_status::ready)
                     break;
                 ++it;
             }
@@ -90,62 +85,18 @@ struct RequestContext
                 break;
         }
 
-        if (!contexts.empty())
-            NX_VERBOSE(worker->logTag(), "Cancelling %1 requests", contexts.size());
+        if (cancelUnprocessedRequests || worker->needToStop())
+        {
+            if (!contexts.empty())
+                NX_VERBOSE(worker->logTag(), "Cancelling %1 requests", contexts.size());
 
-        for (auto& context: contexts)
-            context.context->cancel();
+            for (auto& context: contexts)
+                context.context->cancel();
 
-        contexts.clear();
+            contexts.clear();
+        }
     }
 };
-
-// Take count elements from a sorted circular list of peers.
-QList<QnUuid> takeClosestPeerIds(QList<QnUuid>& peerIds, int count, const QnUuid& referenceId)
-{
-    QList<QnUuid> result;
-
-    const int size = peerIds.size();
-
-    if (size <= count)
-    {
-        result.swap(peerIds);
-        return result;
-    }
-
-    const auto currentIndex = (int) std::distance(
-        peerIds.begin(), std::lower_bound(peerIds.begin(), peerIds.end(), referenceId));
-
-    int index = (currentIndex - (count + 1) / 2 + size) % size;
-    for (int i = 0; i < count; ++i)
-    {
-        result.append(peerIds.takeAt(index));
-
-        if (index == peerIds.size())
-            index = 0;
-    }
-
-    return result;
-}
-
-QList<QnUuid> takeRandomPeers(QList<QnUuid>& peers, int count)
-{
-    QList<QnUuid> result;
-
-    const int size = peers.size();
-
-    if (size <= count)
-    {
-        result = peers;
-        peers.clear();
-        return result;
-    }
-
-    for (int i = 0; i < count; ++i)
-        result.append(peers.takeAt(nx::utils::random::number(0, peers.size() - 1)));
-
-    return result;
-}
 
 } // namespace
 
@@ -160,8 +111,7 @@ Worker::Worker(
     m_selfId(selfId),
     m_storage(storage),
     m_peerManagers(peerManagers),
-    m_fileName(fileName),
-    m_peersPerOperation(kDefaultPeersPerOperation)
+    m_fileName(fileName)
 {
     m_logTag = nx::utils::log::Tag(QStringLiteral("%1 [%2]").arg(::toString(this), m_fileName));
 
@@ -236,16 +186,6 @@ Worker::State Worker::state() const
     return m_state;
 }
 
-int Worker::peersPerOperation() const
-{
-    return m_peersPerOperation;
-}
-
-void Worker::setPeersPerOperation(int peersPerOperation)
-{
-    m_peersPerOperation = peersPerOperation;
-}
-
 bool Worker::haveChunksToDownload()
 {
     const auto& fileInfo = fileInformation();
@@ -254,7 +194,7 @@ bool Worker::haveChunksToDownload()
 
     for (const PeerInformation& peer: m_peerInfoByPeer)
     {
-        if (peer.isInternet && peer.rank > kMinAutoRank)
+        if (peer.isInternet && !peer.isBanned())
             return true;
     }
 
@@ -319,7 +259,7 @@ void Worker::doWork()
                 else if (fileInfo.size < 0 || fileInfo.md5.isEmpty())
                     requestFileInformation();
                 else if (fileInfo.status == FileInformation::Status::corrupted)
-                    requestChecksums();
+                    reDownload();
                 else if (!haveChunksToDownload())
                     requestAvailableChunks();
                 else if (fileInfo.status == FileInformation::Status::downloading)
@@ -361,13 +301,13 @@ void Worker::doWork()
                     break;
 
                 case FileInformation::Status::corrupted:
-                    requestChecksums();
+                    reDownload();
                     break;
 
                 case FileInformation::Status::downloading:
                     if (!haveChunksToDownload())
                         requestAvailableChunks();
-                    else if (needToFindBetterPeers())
+                    else if (needToFindBetterPeersForDownload())
                         requestAvailableChunks();
                     else
                         downloadChunks();
@@ -409,12 +349,14 @@ void Worker::requestAvailableChunks()
 
 void Worker::requestFileInformationInternal()
 {
+    constexpr int kMaxPeersToCheckAtOnce = 10;
+
     NX_VERBOSE(m_logTag, "Trying to get %1.", requestSubjectString(m_state));
 
-    const QList<Peer>& peers = selectPeersForOperation(AbstractPeerManager::FileInfo);
+    const QSet<Peer>& peers = getPeersToCheckInfo();
     if (peers.isEmpty())
     {
-        revivePeersWithMinimalRank();
+        reviveBannedPeers();
         sleep();
         return;
     }
@@ -424,6 +366,7 @@ void Worker::requestFileInformationInternal()
     using Context = RequestContext<FileInformation, Peer>;
     std::vector<Context> contexts;
 
+    int requestCount = 0;
     for (const auto& peer: peers)
     {
         NX_VERBOSE(m_logTag, "Requesting %1 from server %2.",
@@ -431,9 +374,17 @@ void Worker::requestFileInformationInternal()
 
         auto context = peer.manager->requestFileInfo(peer.id, m_fileName, url);
         if (context->isValid())
+        {
             contexts.emplace_back(peer, std::move(context));
+            ++requestCount;
+        }
         else
+        {
             decreasePeerRank(peer);
+        }
+
+        if (requestCount >= kMaxPeersToCheckAtOnce)
+            break;
     }
 
     if (contexts.empty())
@@ -512,10 +463,12 @@ void Worker::handleFileInformationReply(
         setState(State::foundFileInformation);
     }
 
+    const int oldAvailableChunks = m_availableChunks.count(true);
     peerInfo.downloadedChunks = fileInfo->downloadedChunks;
-    updateAvailableChunks();
+    const int newAvailableChunks = updateAvailableChunks();
 
-    increasePeerRank(peer);
+    if (newAvailableChunks > oldAvailableChunks || peerInfo.isInternet)
+        increasePeerRank(peer);
 
     if (m_state == State::requestingAvailableChunks && haveChunksToDownload())
         setState(State::foundAvailableChunks);
@@ -523,49 +476,70 @@ void Worker::handleFileInformationReply(
 
 void Worker::requestChecksums()
 {
+    constexpr int kMaxPeersToCheckAtOnce = 3;
+
     NX_VERBOSE(m_logTag, "requestChecksums()");
 
     setState(State::requestingChecksums);
 
-    const auto peers = selectPeersForOperation(AbstractPeerManager::Checksums);
+    QList<Peer> peers = getPeersToGetCheksums();
     if (peers.isEmpty())
     {
         NX_VERBOSE(m_logTag, "requestChecksums(): No peers selected. Exiting.");
-        revivePeersWithMinimalRank();
+        reviveBannedPeers();
+        m_retryingStep = true;
         sleep();
         return;
     }
 
-    using Context = RequestContext<QVector<QByteArray>, Peer>;
-    std::vector<Context> contexts;
-
-    for (const auto& peer: peers)
+    while (!peers.isEmpty())
     {
-        NX_VERBOSE(m_logTag, "requestChecksums(): Requesting %1 from server %2.",
-            requestSubjectString(State::requestingChecksums), peer);
+        using Context = RequestContext<QVector<QByteArray>, Peer>;
+        std::vector<Context> contexts;
 
-        auto context = peer.manager->requestChecksums(peer.id, m_fileName);
-        if (context->isValid())
-            contexts.emplace_back(peer, std::move(context));
-        else
-            decreasePeerRank(peer);
-    }
-
-    if (contexts.empty())
-    {
-        sleep();
-        return;
-    }
-
-    Context::processRequests(this, contexts,
-        [this](const Worker::Peer& peer, const std::optional<QVector<QByteArray>>& checksums)
+        while (!peers.isEmpty() && contexts.size() < kMaxPeersToCheckAtOnce)
         {
-            handleChecksumsReply(peer, checksums);
-            return m_state != State::requestingChecksums;
-        });
+            const Peer& peer = peers.takeFirst();
+
+            NX_VERBOSE(m_logTag, "requestChecksums(): Requesting %1 from %2.",
+                requestSubjectString(State::requestingChecksums), peer);
+
+            auto context = peer.manager->requestChecksums(peer.id, m_fileName);
+            if (context->isValid())
+                contexts.emplace_back(peer, std::move(context));
+            else
+                decreasePeerRank(peer);
+        }
+
+        if (contexts.empty())
+            break;
+
+        Context::processRequests(this, contexts,
+            [this](const Worker::Peer& peer, const std::optional<QVector<QByteArray>>& checksums)
+            {
+                handleChecksumsReply(peer, checksums);
+                return m_state != State::requestingChecksums;
+            });
+    }
 
     if (m_state == State::requestingChecksums)
+    {
+        if (m_retryingStep)
+        {
+            m_retryingStep = false;
+
+            m_storage->clearFile(m_fileName);
+            updateAvailableChunks();
+            setState(State::downloadingChunks);
+
+            return;
+        }
+
         sleep();
+        return;
+    }
+
+    m_retryingStep = false;
 }
 
 void Worker::handleChecksumsReply(
@@ -606,66 +580,64 @@ void Worker::handleChecksumsReply(
 
 void Worker::downloadChunks()
 {
+    constexpr int kSubsequentChunksToDownload = 15;
+
     NX_VERBOSE(m_logTag, "downloadChunks()");
 
     setState(State::downloadingChunks);
 
     const auto& fileInfo = fileInformation();
 
-    using Context = RequestContext<QByteArray, std::pair<Peer, int>>;
+    struct ContextData
+    {
+        Peer peer;
+        int chunkIndex;
+        time_point<steady_clock> requestTime;
+    };
+
+    using Context = RequestContext<QByteArray, ContextData>;
     std::vector<Context> contexts;
 
     int chunksLeft = kSubsequentChunksToDownload;
     bool chunkRequested = false;
 
+    QSet<int> downloadingChunks;
+    QSet<Peer> busyPeers;
+
     while (chunksLeft > 0)
     {
-        QSet<int> downloadingChunks;
-        QSet<Peer> busyPeers;
-
-        for (int i = 0; i < kMaxSimultaneousDownloads && chunksLeft > 0; ++i, --chunksLeft)
+        for (int i = 0;
+            contexts.size() < kMaxSimultaneousDownloads && i < kMaxSimultaneousDownloads
+                && chunksLeft > 0;
+            ++i)
         {
-            const int chunkIndex = selectNextChunk(downloadingChunks);
-            if (chunkIndex < 0)
+            const int chunk = selectNextChunk(downloadingChunks);
+            if (chunk < 0)
                 break;
 
-            const QSet<Peer>& availablePeers = peersForChunk(chunkIndex);
-            if (availablePeers.isEmpty())
+            const Peer& peer = selectPeerForChunk(chunk, busyPeers);
+            if (peer.isNull())
             {
-                // A chunk to be downloaded from Internet is selected, but we don't have Internet
-                // peers.
-                break;
-            }
-
-            // Trying to avoid busy peers to balance network load. But this is not absolutely
-            // necessary.
-            QSet<Peer> peers = availablePeers - busyPeers;
-            if (peers.isEmpty())
-                peers = availablePeers;
-
-            const QList<Peer> selectedPeers =
-                selectPeersForOperation(AbstractPeerManager::DownloadChunk, 1, peers.toList());
-            if (selectedPeers.isEmpty())
-            {
-                NX_WARNING(m_logTag, "No peers are selected to download chunk %1.", chunkIndex);
+                NX_WARNING(m_logTag, "No peers are selected to download chunk %1.", chunk);
                 continue;
             }
 
-            const auto& peer = selectedPeers.first();
-            NX_VERBOSE(m_logTag, "Selected peer %1, rank: %2, distance: %3",
-                peer,
-                m_peerInfoByPeer[peer].rank,
-                peer.manager->distanceTo(peer.id));
+            const PeerInformation& peerInfo = m_peerInfoByPeer.value(peer);
 
-            NX_VERBOSE(m_logTag, "Requesting chunk %1 from %2...", chunkIndex, peer);
+            NX_VERBOSE(m_logTag,
+                "Selected peer %1 for chunk %2, rank: %3, chunk download time: %4",
+                peer, chunk, peerInfo.rank, peerInfo.averageChunkDownloadTime);
 
             auto context = peer.manager->downloadChunk(
-                peer.id, m_fileName, fileInfo.url, chunkIndex, (int) fileInfo.chunkSize);
+                peer.id, m_fileName, fileInfo.url, chunk, (int) fileInfo.chunkSize);
             if (context->isValid())
             {
                 chunkRequested = true;
-                contexts.emplace_back(std::make_pair(peer, chunkIndex), std::move(context));
-                downloadingChunks.insert(chunkIndex);
+                contexts.emplace_back(
+                    ContextData{peer, chunk, steady_clock::now()}, std::move(context));
+                downloadingChunks.insert(chunk);
+                busyPeers.insert(peer);
+                --chunksLeft;
             }
             else
             {
@@ -677,11 +649,27 @@ void Worker::downloadChunks()
             break;
 
         Context::processRequests(this, contexts,
-            [this](const std::pair<Worker::Peer, int>& ctx, const std::optional<QByteArray>& data)
+            [&, this](const ContextData& ctx, const std::optional<QByteArray>& data)
             {
-                handleDownloadChunkReply(ctx.first, ctx.second, data);
-                return false;
-            });
+                if (data)
+                {
+                    const bool lastChunk = ctx.chunkIndex == m_availableChunks.size() - 1;
+                    if (!lastChunk)
+                    {
+                        // Last chunk is usually smaller than others, so skip it.
+                        m_peerInfoByPeer[ctx.peer].recordChunkDownloadTime(
+                            duration_cast<milliseconds>(steady_clock::now() - ctx.requestTime));
+                    }
+                }
+
+                handleDownloadChunkReply(ctx.peer, ctx.chunkIndex, data);
+
+                busyPeers.remove(ctx.peer);
+                downloadingChunks.remove(ctx.chunkIndex);
+
+                return chunksLeft > 0;
+            },
+            false);
     }
 
     if (!chunkRequested)
@@ -692,7 +680,7 @@ void Worker::downloadChunks()
             return;
         }
 
-        revivePeersWithMinimalRank();
+        reviveBannedPeers();
         sleep();
         return;
     }
@@ -708,6 +696,10 @@ void Worker::handleDownloadChunkReply(
     {
         emit chunkDownloadFailed(m_fileName);
         decreasePeerRank(peer);
+
+        if (auto& info = m_peerInfoByPeer[peer]; info.isBanned())
+            info.downloadedChunks.clear(); //< The peer probably lost the file. Need to re-check.
+
         return;
     }
 
@@ -731,7 +723,7 @@ void Worker::finish(State state)
     emit finished(m_fileName);
 }
 
-void Worker::updateAvailableChunks()
+int Worker::updateAvailableChunks()
 {
     NX_VERBOSE(m_logTag, "Updating available chunks...");
 
@@ -758,22 +750,8 @@ void Worker::updateAvailableChunks()
 
     NX_VERBOSE(m_logTag, "Chunks available: %1/%2",
         availableChunksCount, m_availableChunks.size());
-}
 
-QSet<Worker::Peer> Worker::peersForChunk(int chunkIndex) const
-{
-    QSet<Peer> result;
-
-    for (auto it = m_peerInfoByPeer.begin(); it != m_peerInfoByPeer.end(); ++it)
-    {
-        if (it->isInternet
-            || (it->downloadedChunks.size() > chunkIndex && it->downloadedChunks[chunkIndex]))
-        {
-            result.insert(it.key());
-        }
-    }
-
-    return result;
+    return availableChunksCount;
 }
 
 FileInformation Worker::fileInformation() const
@@ -787,172 +765,116 @@ FileInformation Worker::fileInformation() const
     return fileInfo;
 }
 
-QList<Worker::Peer> Worker::selectPeersForOperation(
-    AbstractPeerManager::Capability capability, int count, const QList<Peer>& allowedPeers) const
+QSet<Worker::Peer> Worker::getPeersToCheckInfo() const
 {
-    QList<Peer> result;
+    QSet<Peer> result;
 
-    if (count <= 0)
-        count = m_peersPerOperation;
+    for (AbstractPeerManager* manager: m_peerManagers)
+    {
+        if (!manager->capabilities.testFlag(AbstractPeerManager::Capability::FileInfo))
+            continue;
 
-    const auto getAllowedPeerIds =
-        [&allowedPeers](AbstractPeerManager* peerManager)
+        for (const QnUuid& peerId: manager->peers())
         {
-            QList<QnUuid> result;
-            for (const Peer& peer: allowedPeers)
+            const Peer peer{peerId, manager};
+
+            const auto it = m_peerInfoByPeer.find(peer);
+            if (it == m_peerInfoByPeer.end())
             {
-                if (peer.manager == peerManager)
-                    result.append(peer.id);
+                result.insert(peer);
+                continue;
             }
-            return result;
+
+            const PeerInformation& info = *it;
+            if (info.isBanned())
+                continue;
+
+            if (info.isInternet)
+                continue;
+
+            if (!info.downloadedChunks.isEmpty()
+                && info.downloadedChunks.count(true) == info.downloadedChunks.size())
+            {
+                continue;
+            }
+
+            result.insert(peer);
+        }
+    }
+
+    return result;
+}
+
+QList<Worker::Peer> Worker::getPeersToGetCheksums() const
+{
+    QList<Peer> preferredPeers;
+    QList<Peer> otherPeers;
+
+    for (AbstractPeerManager* manager: m_peerManagers)
+    {
+        if (!manager->capabilities.testFlag(AbstractPeerManager::Capability::Checksums))
+            continue;
+
+        for (const QnUuid& peerId: manager->peers())
+        {
+            const Peer peer{peerId, manager};
+
+            const auto it = m_peerInfoByPeer.find(peer);
+            if (it == m_peerInfoByPeer.end())
+            {
+                otherPeers.append(peer);
+                continue;
+            }
+
+            if (it->isBanned())
+                continue;
+
+            preferredPeers.append(peer);
+        }
+    }
+
+    return preferredPeers + otherPeers;
+}
+
+Worker::Peer Worker::selectPeerForChunk(int chunk, const QSet<Worker::Peer>& busyPeers) const
+{
+    const auto findBestPeer =
+        [this, chunk, busyPeers](bool freeOnly)
+        {
+            Peer bestPeer;
+            milliseconds bestTime = milliseconds::max();
+
+            for (auto it = m_peerInfoByPeer.begin(); it != m_peerInfoByPeer.end(); ++it)
+            {
+                if (it->isBanned())
+                    continue;
+
+                if (freeOnly && busyPeers.contains(it.key()))
+                    continue;
+
+                if ((it->isInternet || it->hasChunk(chunk))
+                    && it->averageChunkDownloadTime < bestTime)
+                {
+                    bestPeer = it.key();
+                    bestTime = it->averageChunkDownloadTime;
+                }
+            }
+
+            return bestPeer;
         };
 
-    for (AbstractPeerManager* peerManager: m_peerManagers)
-    {
-        if (!peerManager->capabilities.testFlag(capability))
-            continue;
+    if (const Peer& peer = findBestPeer(true); !peer.isNull())
+        return peer;
 
-        QList<QnUuid> peers = allowedPeers.isEmpty()
-            ? peerManager->peers()
-            : getAllowedPeerIds(peerManager);
-
-        if (peers.isEmpty())
-            continue;
-
-        peers = selectPeersForOperation(peerManager, count - result.size(), peers);
-        for (const auto& peerId: peers)
-            result.append(Peer{peerId, peerManager});
-
-        if (result.size() >= count)
-            break;
-    }
-
-    if (result.isEmpty())
-        NX_VERBOSE(m_logTag, "No peers selected.");
-
-    return result;
+    return findBestPeer(false);
 }
 
-QList<QnUuid> Worker::selectPeersForOperation(
-    AbstractPeerManager* peerManager, int count, QList<QnUuid> peers) const
+void Worker::reviveBannedPeers()
 {
-    QList<QnUuid> result;
-
-    if (peers.isEmpty())
-        peers = peerManager->peers();
-
-    if (count <= 0)
-        count = m_peersPerOperation;
-
-    if (peers.size() <= count)
-        result = peers;
-
-    struct ScoredPeer
-    {
-        QnUuid peerId;
-        int score;
-    };
-
-    QList<ScoredPeer> scoredPeers;
-
-    constexpr int kBigDistance = 4;
-
-    for (auto it = peers.begin(); it != peers.end(); /* no increment */)
-    {
-        const QnUuid& peerId = *it;
-        Peer peer{peerId, peerManager};
-
-        const int rank = m_peerInfoByPeer.value(peer).rank;
-        if (rank <= kMinAutoRank)
-        {
-            it = peers.erase(it);
-            continue;
-        }
-
-        ++it;
-
-        const int distance = peerManager->distanceTo(peerId);
-
-        const int score = std::max(0, kBigDistance - distance) * 2 + rank;
-        if (score == 0)
-            continue;
-
-        scoredPeers.append(ScoredPeer{peerId, score});
-    }
-
-    std::sort(scoredPeers.begin(), scoredPeers.end(),
-        [](const ScoredPeer& left, const ScoredPeer& right)
-        {
-            return left.score < right.score;
-        });
-
-    /* The result should contain:
-       1) One of the closest-id peers: thus every server will try to use its
-          guid neighbours which should lead to more uniform peers load in flat networks.
-       2) At least one random peer which wasn't selected in the main selection: this is to avoid
-          overloading peers which started file downloading and obviously contain chunks
-          while other do not yet.
-       3) The rest is the most scored peers having the closest IDs.
-
-       (1) and (2) are additionalPeers, so additionalPeers = 2.
-       If there're not enought high-score peers then the result should contain
-       random peers instead of them.
-    */
-
-    int additionalPeers = 2;
-    const int highestScorePeersNeeded = count > additionalPeers
-        ? count - additionalPeers
-        : 1;
-
-    QList<QnUuid> highestScorePeers;
-
-    constexpr int kScoreThreshold = 1;
-    int previousScore = 0;
-    while (highestScorePeers.size() < highestScorePeersNeeded && !scoredPeers.isEmpty())
-    {
-        const int currentScore = scoredPeers.last().score;
-        if (currentScore < previousScore && previousScore - currentScore > kScoreThreshold)
-            break;
-
-        while (!scoredPeers.isEmpty() && scoredPeers.last().score == currentScore)
-        {
-            const auto peerId = scoredPeers.takeLast().peerId;
-            peers.removeOne(peerId);
-            highestScorePeers.prepend(peerId);
-        }
-
-        previousScore = currentScore;
-    }
-
-    // Take (3) highest-score peers.
-    std::sort(highestScorePeers.begin(), highestScorePeers.end());
-    result = takeClosestPeerIds(highestScorePeers, highestScorePeersNeeded, m_selfId);
-
-    if (result.size() == count)
-        return result;
-
-    additionalPeers = count - result.size();
-
-    peers += highestScorePeers;
-    std::sort(peers.begin(), peers.end());
-
-    // Take (1) one closest-guid peer.
-    result += takeClosestPeerIds(peers, 1, m_selfId);
-    --additionalPeers;
-
-    // Take (2) random peers.
-    while (additionalPeers-- > 0)
-        result += takeRandomPeers(peers, 1);
-
-    return result;
-}
-
-void Worker::revivePeersWithMinimalRank()
-{
-    NX_DEBUG(m_logTag, "revivePeersWithMinimalRank()");
+    NX_DEBUG(m_logTag, "reviveBannedPeers()");
     for (auto& peerInfo: m_peerInfoByPeer)
     {
-        if (peerInfo.rank <= kMinAutoRank)
+        if (peerInfo.isBanned())
             ++peerInfo.rank;
     }
 }
@@ -997,22 +919,32 @@ int Worker::selectNextChunk(const QSet<int>& ignoredChunks) const
     return firstMetNotDownloadedChunk;
 }
 
-bool Worker::needToFindBetterPeers() const
+bool Worker::needToFindBetterPeersForDownload() const
 {
-    for (AbstractPeerManager* peerManager: m_peerManagers)
-    {
-        QList<QnUuid> closestPeers = peerManager->peers();
-        std::sort(closestPeers.begin(), closestPeers.end());
-        closestPeers = takeClosestPeerIds(closestPeers, m_peersPerOperation, m_selfId);
+    constexpr int kGoodDownloadSpeed = 5; //< Megabytes per second.
+    const milliseconds goodChunkDownloadTime{
+        (int) (fileInformation().chunkSize / kGoodDownloadSpeed)}; //< Milliseconds.
 
-        for (const auto& peerId: closestPeers)
-        {
-            if (m_peerInfoByPeer[Peer{peerId, peerManager}].rank < kMaxAutoRank - 1)
-                return true;
-        }
+    int fastPeersCount = 0;
+
+    for (const PeerInformation& info: m_peerInfoByPeer)
+    {
+        if (info.isBanned() || info.averageChunkDownloadTime == 0ms)
+            continue;
+
+        if (info.averageChunkDownloadTime <= goodChunkDownloadTime)
+            ++fastPeersCount;
     }
 
-    return false;
+    if (fastPeersCount > kMaxSimultaneousDownloads)
+        return false;
+
+    int peersCount = 0;
+
+    for (AbstractPeerManager* peerManager: m_peerManagers)
+        peersCount += peerManager->peers().size();
+
+    return m_peerInfoByPeer.size() < peersCount;
 }
 
 void Worker::increasePeerRank(const Peer& peer, int value)
@@ -1043,6 +975,8 @@ void Worker::markActive()
 
 void Worker::checkStalled()
 {
+    constexpr milliseconds kStallDetectionTimeout = 2min;
+
     const bool stalled = m_stallDetectionTimer.hasExpired(kStallDetectionTimeout.count());
 
     if (m_stalled == stalled)
@@ -1058,6 +992,20 @@ void Worker::checkStalled()
     emit stalledChanged(stalled);
 }
 
+void Worker::reDownload()
+{
+    constexpr int kMaxDownloadRetries = 2;
+
+    if (m_downloadRetriesCount >= kMaxDownloadRetries)
+    {
+        finish(State::failed);
+        return;
+    }
+
+    ++m_downloadRetriesCount;
+    requestChecksums();
+}
+
 void Worker::PeerInformation::increaseRank(int value)
 {
     rank = qBound(kMinAutoRank, rank + value, kMaxAutoRank);
@@ -1066,6 +1014,24 @@ void Worker::PeerInformation::increaseRank(int value)
 void Worker::PeerInformation::decreaseRank(int value)
 {
     increaseRank(-value);
+}
+
+void Worker::PeerInformation::recordChunkDownloadTime(milliseconds time)
+{
+    constexpr int kMaxTimesToStore = 5;
+
+    latestChunksDownloadTime.append(time);
+    while (latestChunksDownloadTime.size() > kMaxTimesToStore)
+        latestChunksDownloadTime.removeFirst();
+
+    averageChunkDownloadTime =
+        std::accumulate(latestChunksDownloadTime.begin(), latestChunksDownloadTime.end(), 0ms)
+            / latestChunksDownloadTime.size();
+}
+
+bool Worker::PeerInformation::hasChunk(int chunk) const
+{
+    return isInternet || (chunk < downloadedChunks.size() && downloadedChunks[chunk]);
 }
 
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Worker, State)

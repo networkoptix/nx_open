@@ -11,7 +11,6 @@
 #include <health/system_health_helper.h>
 #include <ui/common/notification_levels.h>
 #include <ui/help/business_help.h>
-#include <ui/style/skin.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/handlers/workbench_notifications_handler.h>
 // TODO: #vkutin Dialogs are included just for tab identifiers. Needs refactoring to avoid it.
@@ -193,9 +192,9 @@ QString SystemHealthListModel::Private::toolTip(int index) const
         QnResourceDisplayInfo(item.resource).toString(qnSettings->extraInfoInTree()));
 }
 
-QPixmap SystemHealthListModel::Private::pixmap(int index) const
+QString SystemHealthListModel::Private::decorationPath(int index) const
 {
-    return pixmap(m_items[index].message);
+    return decorationPath(m_items[index].message);
 }
 
 QColor SystemHealthListModel::Private::color(int index) const
@@ -488,18 +487,18 @@ int SystemHealthListModel::Private::priority(QnSystemHealth::MessageType message
     }
 }
 
-QPixmap SystemHealthListModel::Private::pixmap(QnSystemHealth::MessageType message)
+QString SystemHealthListModel::Private::decorationPath(QnSystemHealth::MessageType message)
 {
     switch (QnNotificationLevel::valueOf(message))
     {
         case QnNotificationLevel::Value::CriticalNotification:
-            return qnSkin->pixmap("events/alert_red.png");
+            return "events/alert_red.png";
 
         case QnNotificationLevel::Value::ImportantNotification:
-            return qnSkin->pixmap("events/alert_yellow.png");
+            return "events/alert_yellow.png";
 
         case QnNotificationLevel::Value::SuccessNotification:
-            return qnSkin->pixmap("events/success_mark.png");
+            return "events/success_mark.png";
 
         default:
             break;
@@ -511,24 +510,24 @@ QPixmap SystemHealthListModel::Private::pixmap(QnSystemHealth::MessageType messa
         case QnSystemHealth::EmailIsEmpty:
         case QnSystemHealth::UsersEmailIsEmpty:
         case QnSystemHealth::EmailSendError:
-            return qnSkin->pixmap("events/email.png");
+            return "events/email.png";
 
         case QnSystemHealth::NoLicenses:
-            return qnSkin->pixmap("events/license.png");
+            return "events/license.png";
 
         case QnSystemHealth::SystemIsReadOnly:
-            return qnSkin->pixmap("tree/system.png");
+            return "tree/system.png";
 
         case QnSystemHealth::StoragesNotConfigured:
         case QnSystemHealth::ArchiveRebuildFinished:
         case QnSystemHealth::ArchiveRebuildCanceled:
-            return qnSkin->pixmap("events/storage.png");
+            return "events/storage.png";
 
         case QnSystemHealth::CloudPromo:
-            return qnSkin->pixmap("cloud/cloud_20.png");
+            return "cloud/cloud_20.png";
 
         default:
-            return QPixmap();
+            return QString();
     }
 }
 

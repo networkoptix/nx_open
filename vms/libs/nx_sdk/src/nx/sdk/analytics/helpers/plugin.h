@@ -6,10 +6,11 @@
 #include <functional>
 
 #include <nx/sdk/i_utility_provider.h>
-#include <nx/sdk/error.h>
 #include <nx/sdk/analytics/i_plugin.h>
 #include <nx/sdk/helpers/ref_countable.h>
 #include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/helpers/result_aliases.h>
+#include <nx/sdk/analytics/helpers/result_aliases.h>
 
 #include "engine.h"
 
@@ -31,10 +32,7 @@ public:
      * @param pluginManifest Plugin manifest to be returned from the manifest method.
      * @param createEngine Functor for engine creation.
      */
-    Plugin(
-        std::string libName,
-        std::string pluginManifest,
-        CreateEngine createEngine);
+    Plugin(std::string pluginManifest, CreateEngine createEngine);
 
     virtual ~Plugin() override;
 
@@ -44,13 +42,11 @@ public:
 // Not intended to be used by a descendant.
 
 public:
-    virtual const char* name() const override;
     virtual void setUtilityProvider(IUtilityProvider* utilityProvider) override;
-    virtual const IString* manifest(Error* outError) const override;
-    virtual IEngine* createEngine(Error* outError) override;
+    virtual StringResult manifest() const override;
+    virtual MutableEngineResult createEngine() override;
 
 private:
-    const std::string m_name;
     const std::string m_jsonManifest;
 
     CreateEngine m_createEngine;

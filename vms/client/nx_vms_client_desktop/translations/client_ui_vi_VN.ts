@@ -1084,7 +1084,7 @@
     <message>
       <location/>
       <source>Add all Devices</source>
-      <translation type="unfinished">Add all Devices</translation>
+      <translation>Thêm tất cả thiết bị</translation>
     </message>
     <message>
       <location/>
@@ -2003,7 +2003,7 @@
     <message>
       <location/>
       <source>Download &amp;&amp; Install</source>
-      <translation type="unfinished">Download &amp;&amp; Install</translation>
+      <translation>Tải xuống &amp; cài đặt</translation>
     </message>
     <message>
       <location/>
@@ -2049,12 +2049,7 @@
     <message>
       <location/>
       <source>New Virtual Camera...</source>
-      <translation type="unfinished">New Virtual Camera...</translation>
-    </message>
-    <message>
-      <location/>
-      <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
-      <translation type="unfinished">&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</translation>
+      <translation>Camera ảo mới...</translation>
     </message>
   </context>
   <context>
@@ -2072,7 +2067,7 @@
     <message>
       <location/>
       <source>Select layout...</source>
-      <translation type="unfinished">Select layout...</translation>
+      <translation>Chọn bố cục...</translation>
     </message>
   </context>
   <context>
@@ -2099,9 +2094,9 @@
     </message>
   </context>
   <context>
-    <name>PluginEventWidget</name>
+    <name>PluginDiagnosticEventWidget</name>
     <message>
-      <location filename="../src/nx/vms/client/desktop/ui/event_rules/widgets/plugin_event_widget.ui"/>
+      <location filename="../src/nx/vms/client/desktop/ui/event_rules/widgets/plugin_diagnostic_event_widget.ui"/>
       <source>Source:</source>
       <translation>Nguồn:</translation>
     </message>
@@ -2778,11 +2773,6 @@
       <source>Limit session duration</source>
       <translation type="unfinished">Limit session duration</translation>
     </message>
-    <message>
-      <location/>
-      <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
-      <translation type="unfinished">Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</translation>
-    </message>
   </context>
   <context>
     <name>SendmailBusinessActionWidget</name>
@@ -3084,7 +3074,7 @@
     <message>
       <location/>
       <source>Recording was enabled on the USB storage</source>
-      <translation type="unfinished">Recording was enabled on the USB storage</translation>
+      <translation>Ghi âm được kích hoạt trên USB lưu trữ</translation>
     </message>
     <message>
       <location/>
@@ -3207,7 +3197,7 @@
     <message>
       <location/>
       <source>VMS Time</source>
-      <translation type="unfinished">VMS Time</translation>
+      <translation>Thời gian VMS</translation>
     </message>
   </context>
   <context>
@@ -3220,7 +3210,7 @@
     <message>
       <location/>
       <source>VMS Time</source>
-      <translation type="unfinished">VMS Time</translation>
+      <translation>Thời gian VMS</translation>
     </message>
     <message>
       <location/>

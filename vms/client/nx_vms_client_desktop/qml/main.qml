@@ -6,6 +6,7 @@ import Nx 1.0
 import Nx.Controls 1.0
 import Nx.Items 1.0
 import Nx.Layout 1.0
+import Nx.RightPanel 1.0
 import nx.client.desktop 1.0
 
 Control

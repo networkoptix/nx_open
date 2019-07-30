@@ -30,12 +30,14 @@
 #include <nx/utils/guarded_callback.h>
 #include <nx/update/update_check.h>
 #include <nx/vms/client/desktop/utils/upload_manager.h>
+#include <nx/vms/common/p2p/downloader/private/internet_only_peer_manager.h>
 
 #include <quazip/quazip.h>
 #include <quazip/quazipfile.h>
 
 #include "server_update_tool.h"
 #include "server_updates_model.h"
+#include "update_verification.h"
 
 using namespace nx::vms::common::p2p::downloader;
 
@@ -107,7 +109,8 @@ ServerUpdateTool::ServerUpdateTool(QObject* parent):
         m_stateTracker.get(), &PeerStateTracker::setVersionInformation);
     m_updatesModel.reset(new ServerUpdatesModel(m_stateTracker, this));
 
-    m_downloader.reset(new Downloader(m_outputDir, commonModule()));
+    m_downloader.reset(new Downloader(
+        m_outputDir, commonModule(), {new InternetOnlyPeerManager()}));
 
     // This object is managed by shared_ptr. So we must sure there is no parent, or this instance
     // can be deleted twice.
@@ -240,7 +243,8 @@ std::future<nx::update::UpdateContents> ServerUpdateTool::checkMediaserverUpdate
                         if (tool)
                         {
                             tool->m_timeStartedInstall = contents.info.lastInstallationRequestTime;
-                            tool->m_serversAreInstalling = contents.info.participants.toSet();
+                            if (contents.info.lastInstallationRequestTime > 0)
+                                tool->m_serversAreInstalling = contents.info.participants.toSet();
                         }
                     }
                 }
@@ -398,6 +402,15 @@ ServerUpdateTool::OfflineUpdateState ServerUpdateTool::getUploaderState() const
 QDir ServerUpdateTool::getDownloadDir() const
 {
     return m_outputDir;
+}
+
+uint64_t ServerUpdateTool::getAvailableSpace() const
+{
+    auto downloadDir = getDownloadDir();
+    QStorageInfo storageInfo(downloadDir);
+    uint64_t space = storageInfo.bytesAvailable();
+    uint64_t spaceReserved = nx::update::reservedSpacePadding();
+    return spaceReserved > space ? 0 : space - spaceReserved;
 }
 
 void ServerUpdateTool::startManualDownloads(const UpdateContents& contents)
@@ -640,7 +653,9 @@ bool ServerUpdateTool::verifyUpdateManifest(
     clientData.fillDefault();
     clientData.clientId = checkClient ? m_stateTracker->getClientPeerId() : QnUuid();
     clientData.installedVersions = clientVersions;
-    return verifyUpdateContents(commonModule(), contents, activeServers, clientData);
+    VerificationOptions options;
+    options.commonModule = commonModule();
+    return verifyUpdateContents(contents, activeServers, clientData, options);
 }
 
 void ServerUpdateTool::calculateManualDownloadProgress(ProgressInfo& progress)
@@ -781,11 +796,27 @@ bool ServerUpdateTool::requestFinishUpdate(bool skipActivePeers)
     {
         NX_VERBOSE(this, "requestFinishUpdate(%1) - sending request", skipActivePeers);
         connection->updateActionFinish(skipActivePeers, nx::utils::guarded(this,
-            [this, skipActivePeers](bool success, rest::Handle /*handle*/)
+            [this, skipActivePeers](
+                bool success, rest::Handle/*handle*/, const QnJsonRestResult& result)
             {
-                NX_VERBOSE(this, "requestFinishUpdate(%1) - got response", skipActivePeers);
+                NX_VERBOSE(this, "requestFinishUpdate(%1) - got response, success=%2",
+                    skipActivePeers, success);
                 m_requestingFinish = false;
-                auto error = success ? InternalError::noError : InternalError::networkError;
+                auto error = InternalError::noError;
+                if (!success)
+                {
+                    error = InternalError::networkError;
+                    NX_ERROR(this, "requestFinishUpdate(%1) - failed to send a request",
+                        skipActivePeers);
+                }
+                else if (result.error != QnRestResult::NoError)
+                {
+                    success = false;
+                    error = InternalError::serverError;
+                    NX_ERROR(this, "requestFinishUpdate(%1) - server responded with %2",
+                        skipActivePeers, result.errorString);
+                }
+
                 emit finishUpdateComplete(success, toString(error));
             }), thread());
         m_stateTracker->clearState();
@@ -853,13 +884,27 @@ bool ServerUpdateTool::requestInstallAction(
     m_timeStartedInstall = qnSyncTime->currentMSecsSinceEpoch();
     m_serversAreInstalling = servers;
 
-    auto callback = [tool = QPointer<ServerUpdateTool>(this)](bool success, rest::Handle handle)
+    auto callback = [tool = QPointer<ServerUpdateTool>(this)](
+            bool success, rest::Handle handle, const QnRestResult& result)
         {
             if (tool)
             {
                 tool->m_requestingInstall.remove(handle);
                 tool->requestRemoteUpdateStateAsync();
-                auto error = success ? InternalError::noError : InternalError::networkError;
+                auto error = InternalError::noError;
+                if (!success)
+                {
+                    error = InternalError::networkError;
+                    tool->m_serversAreInstalling = {};
+                }
+                else if (result.error != QnRestResult::NoError)
+                {
+                    success = false;
+                    error = InternalError::serverError;
+                    NX_ERROR(tool.data(), "requestInstallAction() - server responded with \"%1\"",
+                        result.errorString);
+                }
+
                 emit tool->startInstallComplete(success, tool->toString(error));
             }
         };
@@ -868,7 +913,7 @@ bool ServerUpdateTool::requestInstallAction(
     {
         NX_VERBOSE(this, "requestInstallAction() for %1", servers);
         dropAllRequests("requestInstallAction()");
-        if (auto handle = connection->updateActionInstall(servers, callback, thread()))
+        if (auto handle = connection->updateActionInstall(servers, callback))
             m_requestingInstall.insert(handle);
         return true;
     }
@@ -983,7 +1028,10 @@ void ServerUpdateTool::requestRemoteUpdateStateAsync()
                     if (tool->m_skippedRequests.contains((handle)))
                         return;
                     tool->m_remoteUpdateManifest = response.data;
-                    tool->m_serversAreInstalling = QSet<QnUuid>::fromList(response.data.participants);
+                    if (response.data.lastInstallationRequestTime > 0)
+                        tool->m_serversAreInstalling = QSet<QnUuid>::fromList(response.data.participants);
+                    else
+                        tool->m_serversAreInstalling = {};
                 }
             }, thread());
         m_activeRequests.insert(handle);
@@ -1060,6 +1108,8 @@ QString ServerUpdateTool::toString(InternalError errorCode)
             return tr("No connection to the server.");
         case InternalError::networkError:
             return tr("Network error.");
+        case InternalError::serverError:
+            return tr("Server error.");
     }
     return "Unknown error.";
 }
@@ -1197,62 +1247,17 @@ std::future<ServerUpdateTool::UpdateContents> ServerUpdateTool::checkSpecificCha
     auto engineVersion = commonModule()->engineVersion();
 
     return std::async(
-        [this, updateUrl, connection, engineVersion, changeset]() -> UpdateContents
+        [updateUrl, connection, engineVersion, changeset]() -> UpdateContents
         {
-            UpdateContents contents;
-
-            contents.changeset = changeset;
-            contents.info = nx::update::updateInformation(updateUrl, engineVersion,
-                changeset, &contents.error);
+            auto contents = nx::update::checkSpecificChangesetProxied(
+                connection, engineVersion, updateUrl, changeset);
             if (changeset == kLatestChangeset)
                 contents.sourceType = nx::update::UpdateSourceType::internet;
             else
                 contents.sourceType = nx::update::UpdateSourceType::internetSpecific;
-            contents.source = lit("%1 by serverUpdateTool for build=%2").arg(updateUrl, changeset);
-
-            if (contents.error == nx::update::InformationError::networkError && connection)
-            {
-                NX_WARNING(NX_SCOPE_TAG, "Checking for updates using mediaserver as proxy");
-                auto promise = std::make_shared<std::promise<bool>>();
-                contents.source = lit("%1 by serverUpdateTool for build=%2 proxied by mediaserver").arg(updateUrl, changeset);
-                contents.info = {};
-                auto proxyCheck = promise->get_future();
-                connection->checkForUpdates(changeset,
-                    [this, promise = std::move(promise), &contents](bool success,
-                        rest::Handle /*handle*/, rest::UpdateInformationData response)
-                    {
-                        if (success)
-                        {
-                            if (response.error != QnRestResult::NoError)
-                            {
-                                NX_DEBUG(
-                                    this,
-                                    lm("checkSpecificChangeset: An error in response to the /ec2/updateInformation request: %1")
-                                        .args(response.errorString));
-
-                                QnLexical::deserialize(response.errorString, &contents.error);
-                            }
-                            else
-                            {
-                                contents.error = nx::update::InformationError::noError;
-                                contents.info = response.data;
-                            }
-                        }
-                        else
-                        {
-                            contents.error = nx::update::InformationError::networkError;
-                        }
-
-                        promise->set_value(success);
-                    });
-
-                proxyCheck.wait();
-            }
-
             return contents;
         });
 }
-
 
 nx::utils::SoftwareVersion getCurrentVersion(
     const nx::vms::api::SoftwareVersion& engineVersion,

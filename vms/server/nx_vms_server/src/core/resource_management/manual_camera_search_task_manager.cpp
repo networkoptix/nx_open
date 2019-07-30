@@ -2,7 +2,6 @@
 
 #include <QtCore/QThreadPool>
 
-#include <nx/utils/unused.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/concurrent.h>
 #include <common/common_module.h>
@@ -183,8 +182,7 @@ void QnManualSearchTaskManager::runSomePendingTasks()
     NX_CRITICAL(m_pollable.isInSelfAioThread());
     NX_CRITICAL(m_state == State::running);
 
-    QThreadPool* threadPool = commonModule()->resourceDiscoveryManager()->threadPool();
-
+    const auto threadPool = commonModule()->resourceDiscoveryManager()->threadPool();
     while (canRunTask(threadPool))
     {
         // Take one task from each queue.
@@ -207,7 +205,7 @@ void QnManualSearchTaskManager::runSomePendingTasks()
             if (context.isBlocked)
                 continue;
 
-            bool isTaskBlocking = queue.front().isBlocking();
+            const bool isTaskBlocking = queue.front().isBlocking();
             nx::utils::concurrent::run(threadPool,
                 std::bind(&QnSearchTask::start, std::move(queue.front())));
             queue.pop();
@@ -218,20 +216,19 @@ void QnManualSearchTaskManager::runSomePendingTasks()
             if (isTaskBlocking)
             {
                 context.isBlocked = true;
-                break; // TODO: Why break, not continue?
+                break; //< TODO: Why break, not continue?
             }
         }
-
     }
 }
 
-bool QnManualSearchTaskManager::canRunTask(QThreadPool *threadPool)
+bool QnManualSearchTaskManager::canRunTask(QThreadPool* threadPool)
 {
     NX_CRITICAL(m_pollable.isInSelfAioThread());
     bool allQueuesAreBlocked = true;
     for (const auto& [queueName, queue]: m_searchTasksQueues)
     {
-        nx::utils::unused(queue);
+        /*unused*/ (void) queue;
         auto& context = m_searchQueueContexts[queueName];
         if (!context.isBlocked)
         {

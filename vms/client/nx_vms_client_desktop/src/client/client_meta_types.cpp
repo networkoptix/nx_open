@@ -23,7 +23,7 @@
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_layout.h>
-#include <nx/vms/client/desktop/system_update/update_contents.h>
+#include <nx/update/update_information.h>
 
 #include <utils/color_space/image_correction.h>
 #include <nx/fusion/model_functions.h>
@@ -52,6 +52,8 @@
 #include <nx/vms/client/desktop/ui/common/recording_status_helper.h>
 #include <nx/vms/client/desktop/ui/scene/models/layout_model.h>
 #include <nx/vms/client/desktop/ui/scene/models/resource_tree_model_adapter.h>
+#include <nx/vms/client/desktop/ui/right_panel/right_panel_globals.h>
+#include <nx/vms/client/desktop/ui/right_panel/models/right_panel_models_adapter.h>
 #include <nx/vms/client/desktop/ui/scene/instruments/instrument.h>
 #include <nx/vms/client/desktop/ui/scene/item_model_utils.h>
 #include <nx/vms/client/desktop/utils/cursor_manager.h>
@@ -187,7 +189,9 @@ void QnClientMetaTypes::registerQmlTypes()
     LayoutModel::registerQmlType();
     LinearizationListModel::registerQmlType();
     IndexListModel::registerQmlType();
+    RightPanelModelsAdapter::registerQmlType();
     ResourceTreeModelAdapter::registerQmlType();
+    RightPanel::registerQmlType();
     ResourceTree::registerQmlType();
     ItemModelUtils::registerQmlType();
     ItemGrabber::registerQmlType();

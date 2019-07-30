@@ -302,8 +302,7 @@ int QnFfmpegTranscoder::muxPacket(const QnConstAbstractMediaDataPtr& mediaPacket
 
     AVStream* stream = m_formatCtx->streams[streamIndex];
     AVRational srcRate = {1, 1000000};
-    AVPacket packet;
-    av_init_packet(&packet);
+    QnFfmpegAvPacket packet;
 
     packet.pts = av_rescale_q(mediaPacket->timestamp - m_baseTime, srcRate, stream->time_base);
     packet.data = (uint8_t*)mediaPacket->data();

@@ -47,6 +47,7 @@ private:
     void setupTableView(nx::vms::client::desktop::TableView* table,
         nx::vms::client::desktop::TableView* totalsTable, QAbstractItemModel* model);
     nx::vms::client::desktop::TableView* currentTable() const;
+    nx::vms::client::desktop::TableView* currentTotalsTable() const;
     qint64 currentForecastAveragingPeriod();
 
     // Starts server request.

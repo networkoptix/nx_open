@@ -1,8 +1,17 @@
 #include "object_track_aggregator.h"
 
+#include <analytics/db/config.h>
+
 #include "serializers.h"
 
 namespace nx::analytics::db {
+
+ObjectTrackAggregator::AggregationContext::AggregationContext():
+    rectAggregator(QSize(kTrackSearchResolutionX, kTrackSearchResolutionY))
+{
+}
+
+//-------------------------------------------------------------------------------------------------
 
 ObjectTrackAggregator::ObjectTrackAggregator(
     int resolutionX,
@@ -15,7 +24,7 @@ ObjectTrackAggregator::ObjectTrackAggregator(
 }
 
 void ObjectTrackAggregator::add(
-    const QnUuid& objectId,
+    const QnUuid& trackId,
     std::chrono::milliseconds timestamp,
     const QRectF& box)
 {
@@ -28,7 +37,7 @@ void ObjectTrackAggregator::add(
 
     add(
         &m_aggregations.back(),
-        objectId,
+        trackId,
         timestamp,
         box);
 }
@@ -50,13 +59,13 @@ std::vector<AggregatedTrackData> ObjectTrackAggregator::getAggregatedData(bool f
 
 void ObjectTrackAggregator::add(
     AggregationContext* context,
-    const QnUuid& objectId,
+    const QnUuid& trackId,
     std::chrono::milliseconds timestamp,
     const QRectF& box)
 {
     const auto translatedBox = translateToSearchGrid(box);
 
-    context->rectAggregator.add(translatedBox, objectId);
+    context->rectAggregator.add(translatedBox, trackId);
 
     context->aggregationStartTimestamp = context->aggregationStartTimestamp
         ? std::min(*context->aggregationStartTimestamp, timestamp)
@@ -77,7 +86,7 @@ std::vector<AggregatedTrackData> ObjectTrackAggregator::getAggregatedData(
     {
         result.push_back(AggregatedTrackData());
         result.back().boundingBox = rect.rect;
-        result.back().objectIds = std::exchange(rect.values, {});
+        result.back().trackIds = std::exchange(rect.values, {});
         // TODO: #ak It would be better to use precise timestamp for this region.
         result.back().timestamp = *context->aggregationStartTimestamp;
     }

@@ -133,12 +133,11 @@ static const char DB_INSTANCE_KEY[] = "DB_INSTANCE_ID";
 using std::nullptr_t;
 
 template <class T>
-void assertSorted(std::vector<T> &data) {
-#ifdef _DEBUG
-    assertSorted(data, &T::id);
-#else
-    nx::utils::unused(data);
-#endif // DEBUG
+void assertSorted([[maybe_unused]] std::vector<T> &data)
+{
+    #ifdef _DEBUG
+        assertSorted(data, &T::id);
+    #endif
 }
 
 /**
@@ -2045,7 +2044,7 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
 
     if (updateName.endsWith(lit("/99_20181211_add_default_plugin_event_rules.sql")))
     {
-        return updateDefaultRules(vms::event::Rule::getPluginEventUpdateRules())
+        return updateDefaultRules(vms::event::Rule::getPluginDiagnosticEventUpdateRules())
             && resyncIfNeeded(ResyncRules);
     }
 

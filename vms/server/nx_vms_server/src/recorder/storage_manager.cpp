@@ -667,16 +667,7 @@ public:
     virtual void run() override
     {
         for (const auto& storage: storagesToTest())
-        {
-            auto fileStorage = storage.dynamicCast<QnFileStorageResource>();
-            if (fileStorage && !nx::mserver_aux::isStorageUnmounted(
-                m_owner->serverModule()->platform(),
-                storage,
-                m_settings))
-            {
-                fileStorage->setMounted(true);
-            }
-        }
+            m_owner->updateMountedStatus(storage);
 
         for (const auto& storage : storagesToTest())
         {
@@ -1314,20 +1305,23 @@ bool QnStorageManager::checkIfMyStorage(const QnStorageResourcePtr &storage) con
     return true;
 }
 
+void QnStorageManager::updateMountedStatus(const QnStorageResourcePtr& storage)
+{
+    if (auto fileStorage = storage.dynamicCast<QnFileStorageResource>(); fileStorage)
+    {
+        fileStorage->setMounted(nx::mserver_aux::isStorageMounted(
+            serverModule()->platform(),
+            fileStorage,
+            &serverModule()->settings()));
+    }
+}
+
 void QnStorageManager::onNewResource(const QnResourcePtr &resource)
 {
     QnStorageResourcePtr storage = qSharedPointerDynamicCast<QnStorageResource>(resource);
     if (storage && storage->getParentId() == moduleGUID())
     {
-        auto fileStorage = storage.dynamicCast<QnFileStorageResource>();
-        if (fileStorage && nx::mserver_aux::isStorageUnmounted(
-            serverModule()->platform(),
-            fileStorage,
-            &serverModule()->settings()))
-        {
-            fileStorage->setMounted(false);
-        }
-
+        updateMountedStatus(storage);
         if (checkIfMyStorage(storage))
             addStorage(storage);
     }
