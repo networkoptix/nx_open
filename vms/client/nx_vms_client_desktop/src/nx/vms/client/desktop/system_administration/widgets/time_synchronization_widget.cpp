@@ -28,7 +28,7 @@
 #include <core/resource/resource_display_info.h>
 #include <nx/vms/client/desktop/common/utils/item_view_hover_tracker.h>
 
-
+#include <nx/utils/algorithm/index_of.h>
 #include <nx/vms/time_sync/time_sync_manager.h>
 
 namespace nx::vms::client::desktop {
@@ -77,7 +77,7 @@ TimeSynchronizationWidget::TimeSynchronizationWidget(QWidget* parent):
     auto updateDelegate =
         [this]
         {
-            m_delegate->setBaseRow(-1);
+            setBaseOffsetIndex(-1);
         };
 
     connect(ui->syncWithInternetCheckBox, &QCheckBox::clicked, this, updateDelegate);
@@ -91,7 +91,7 @@ TimeSynchronizationWidget::TimeSynchronizationWidget(QWidget* parent):
                 case State::Status::notSynchronized:
                 case State::Status::noInternetConnection:
                 case State::Status::selectedServerIsOffline:
-                    m_delegate->setBaseRow(-1);
+                    setBaseOffsetIndex(-1);
                 default:
                     break;
             }
@@ -104,7 +104,7 @@ TimeSynchronizationWidget::TimeSynchronizationWidget(QWidget* parent):
                 case State::Status::notSynchronized:
                 case State::Status::noInternetConnection:
                 case State::Status::selectedServerIsOffline:
-                    m_delegate->setBaseRow(row);
+                    setBaseOffsetIndex(row);
                 default:
                     break;
             }
@@ -124,7 +124,7 @@ TimeSynchronizationWidget::TimeSynchronizationWidget(QWidget* parent):
             {
                 m_store->selectServer(serverId);
                 if (m_store->state().status ==  State::Status::synchronizedWithSelectedServer)
-                    m_delegate->setBaseRow(row);
+                    setBaseOffsetIndex(row);
             }
         };
 
@@ -179,6 +179,19 @@ void TimeSynchronizationWidget::loadDataToUi()
         servers);
 
     m_store->setBaseTime(milliseconds(qnSyncTime->currentMSecsSinceEpoch()));
+
+    const auto& state = m_store->state();
+    if (state.status ==  State::Status::synchronizedWithSelectedServer)
+    {
+        const auto idx = nx::utils::algorithm::index_of(state.servers,
+            [&state](const State::ServerInfo& serverInfo)
+            {
+                return serverInfo.id == state.primaryServer;
+            });
+        setBaseOffsetIndex(idx);
+    }
+    else
+        setBaseOffsetIndex(-1);
 }
 
 void TimeSynchronizationWidget::applyChanges()
@@ -266,6 +279,12 @@ void TimeSynchronizationWidget::setupUi()
 
     auto vHeader = ui->serversTable->verticalHeader();
     vHeader->setSectionResizeMode(QHeaderView::ResizeToContents);
+}
+
+void TimeSynchronizationWidget::setBaseOffsetIndex(int row)
+{
+    m_delegate->setBaseRow(row);
+    ui->serversTable->update();
 }
 
 void TimeSynchronizationWidget::loadState(const State& state)
