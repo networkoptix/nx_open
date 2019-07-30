@@ -955,7 +955,7 @@ bool Worker::needToFindBetterPeersForDownload() const
     int checkedPeersCount = 0;
     for (const PeerInformation& info: m_peerInfoByPeer)
     {
-        if (info.downloadedChunks.isEmpty() && !info.isInternet)
+        if (!info.downloadedChunks.isEmpty() || info.isInternet)
             ++checkedPeersCount;
     }
 
