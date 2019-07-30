@@ -3,6 +3,7 @@
 #include <nx/utils/basic_service_settings.h>
 
 #include <nx/clusterdb/engine/p2p_sync_settings.h>
+#include <nx/network/http/auth_tools.h>
 #include <nx/network/http/server/settings.h>
 #include <nx/sql/types.h>
 #include <nx/utils/url.h>
@@ -29,7 +30,7 @@ struct CloudDb
 
 struct Aws
 {
-    std::string user;
+    nx::network::http::Credentials credentials;
 };
 
 struct Database

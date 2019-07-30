@@ -15,6 +15,7 @@ namespace nx::cloud::storage::service::view::http {
 namespace {
 
 static constexpr char kStorageIdParam[] = "id";
+static constexpr char kBucketNameParam[] = "name";
 
 } // namespace
 
@@ -121,7 +122,38 @@ void Server::registerStorageApiHandlers()
 
 void Server::registerBucketApiHandlers()
 {
-    // TODO
+    using namespace std::placeholders;
+    using namespace nx::network::http::server::rest;
+
+    using AddBucketHandler = RequestHandler<api::AddBucketRequest, api::Bucket>;
+    m_messageDispatcher.registerRequestProcessor<AddBucketHandler>(
+        api::kAwsBuckets,
+        [this]()
+        {
+            return std::make_unique<AddBucketHandler>(
+                std::bind(&controller::BucketManager::addBucket, m_bucketManager, _1, _2));
+        },
+        network::http::Method::put);
+
+    using ListBucketsHandler = RequestHandler<void, api::Buckets>;
+    m_messageDispatcher.registerRequestProcessor<ListBucketsHandler>(
+        api::kAwsBuckets,
+        [this]()
+        {
+            return std::make_unique<ListBucketsHandler>(
+                std::bind(&controller::BucketManager::listBuckets, m_bucketManager, _1));
+        },
+        network::http::Method::get);
+
+    using RemoveBucketHandler = RequestHandler<void, void, RestArgFetcher<kBucketNameParam>>;
+    m_messageDispatcher.registerRequestProcessor<RemoveBucketHandler>(
+        api::kAwsBucketName,
+        [this]()
+        {
+            return std::make_unique<RemoveBucketHandler>(
+                std::bind(&controller::BucketManager::removeBucket, m_bucketManager, _1, _2));
+        },
+        network::http::Method::delete_);
 }
 
 } // namespace nx::cloud::storage::service::view::http

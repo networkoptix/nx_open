@@ -3,6 +3,8 @@
 #include <nx/clusterdb/engine/synchronization_engine.h>
 #include <nx/sql/async_sql_query_executor.h>
 
+#include "dao/structure_updater.h"
+
 namespace nx::cloud::storage::service {
 
 namespace conf { class Settings; }
@@ -21,6 +23,7 @@ public:
 private:
     std::unique_ptr<nx::sql::AsyncSqlQueryExecutor> m_sqlExecutor;
     std::unique_ptr<nx::clusterdb::engine::SynchronizationEngine> m_syncEngine;
+    dao::StructureUpdater m_updater;
 };
 
 } // namespace model

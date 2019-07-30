@@ -8,6 +8,13 @@ namespace conf { class Settings; }
 
 namespace model {
 
+namespace dao {
+
+class AbstractBucketDao;
+class AbstractStorageDao;
+
+} // namespace
+
 class Database;
 
 class Model
@@ -19,9 +26,13 @@ public:
     void stop();
 
     Database* database();
+    dao::AbstractBucketDao* bucketDao();
+    dao::AbstractStorageDao* storageDao();
 
 private:
     std::unique_ptr<Database> m_database;
+    std::unique_ptr<dao::AbstractBucketDao> m_bucketDao;
+    std::unique_ptr<dao::AbstractStorageDao> m_storageDao;
 };
 
 } // namespace model

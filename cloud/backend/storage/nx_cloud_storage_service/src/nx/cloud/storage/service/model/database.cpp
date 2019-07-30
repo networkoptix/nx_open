@@ -11,7 +11,8 @@ static constexpr char kApplicationId[] = "nx_cloud_storage_service";
 } // namespace
 
 Database::Database(const conf::Settings& settings):
-    m_sqlExecutor(std::make_unique<nx::sql::AsyncSqlQueryExecutor>(settings.database().sql))
+    m_sqlExecutor(std::make_unique<nx::sql::AsyncSqlQueryExecutor>(settings.database().sql)),
+    m_updater(m_sqlExecutor.get())
 {
     m_syncEngine =
         std::make_unique<nx::clusterdb::engine::SynchronizationEngine>(

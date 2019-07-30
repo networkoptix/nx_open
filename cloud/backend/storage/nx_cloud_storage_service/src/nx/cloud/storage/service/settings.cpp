@@ -46,8 +46,8 @@ static constexpr char kDefaultUrl[] = "";
 namespace aws {
 
 static constexpr char kGroupName[] = "aws";
-static constexpr char kUser[] = "user";
-static constexpr char kDefaultUser[] = "";
+static constexpr char kUserName[] = "userName";
+static constexpr char kAuthToken[] = "authToken";
 
 } // namespace aws
 
@@ -78,6 +78,7 @@ void Settings::loadSettings()
     loadHttp();
     loadServer();
     loadCloudDb();
+    loadAws();
     loadDatabase();
     loadStatistics();
 }
@@ -106,8 +107,13 @@ void Settings::loadCloudDb()
 void Settings::loadAws()
 {
     using namespace aws;
-    m_aws.user = settings().value(
-        lm("%1/%2").args(kGroupName, kUser), kDefaultUser).toString().toStdString();
+
+    QString accessKeyId = settings().value(
+        lm("%1/%2").args(kGroupName, kUserName)).toString();
+    network::http::Ha1AuthToken secretAccessKey(
+        settings().value(lm("%1/%2").args(kGroupName, kAuthToken)).toByteArray());
+
+    m_aws.credentials = network::http::Credentials(accessKeyId, secretAccessKey);
 }
 
 void Settings::loadDatabase()
