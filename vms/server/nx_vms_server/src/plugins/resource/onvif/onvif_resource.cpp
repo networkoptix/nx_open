@@ -816,7 +816,7 @@ CameraDiagnostics::Result QnPlOnvifResource::initOnvifCapabilitiesAndUrls(
     const auto doIgnoreMedia2byDataKey = resourceData().value<bool>(
         ResourceDataKey::kIgnoreMedia2, false);
 
-    if (! (doIgnoreMedia2byPropertyKey || doIgnoreMedia2byDataKey))
+    if (!(doIgnoreMedia2byPropertyKey || doIgnoreMedia2byDataKey))
     {
         QString media2ServiceUrl;
         fetchOnvifMedia2Url(&media2ServiceUrl); //< We ignore the result,
