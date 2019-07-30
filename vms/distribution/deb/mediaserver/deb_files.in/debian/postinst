@@ -170,7 +170,7 @@ installModificationSpecificConfig()
 {
     local -r config_file_path="${BASE_DIR}/share/configs/mediaserver.conf.$TARGET_DEVICE.template"
 
-    if [[ -f ${config_file_path} ]]
+    if [[ -f ${config_file_path} ]] && [[ ! -f "${BASE_DIR}/etc/mediaserver.conf" ]]
     then
         cp  "${config_file_path}" "${BASE_DIR}/etc/mediaserver.conf"
     fi
@@ -179,7 +179,7 @@ installModificationSpecificConfig()
 # This is necessary because changed configuration options should take effect
 # immediately.
 
-if [[ $RUNTIME == "real" ]] 
+if [[ $RUNTIME == "real" ]]
 then
     systemctl stop $COMPANY_NAME-mediaserver || true
 
@@ -316,7 +316,7 @@ startServer()
         echo "ERROR: Server process not found though 'systemd ... start' reported success." >&2
         exit 1
     fi
-    
+
     echo "Started service with PID $PID."
 }
 
