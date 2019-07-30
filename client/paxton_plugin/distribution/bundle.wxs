@@ -29,8 +29,13 @@
 
         <Variable Name="InstallerTitle" Value="$(var.productName) Installer"/>
 
+        <!-- Name must must not contain the build number - otherwise updates won't work. -->
         <Chain DisableSystemRestore="no">
-            <MsiPackage Id="MainPackage" SourceFile="$(var.installerMsiFile)" Vital="yes" />
+            <MsiPackage
+                Id="MainPackage"
+                SourceFile="$(var.installerMsiFile)"
+                Name="$(var.productName).msi"
+                Vital="yes" />
         </Chain>
     </Bundle>
 </Wix>
