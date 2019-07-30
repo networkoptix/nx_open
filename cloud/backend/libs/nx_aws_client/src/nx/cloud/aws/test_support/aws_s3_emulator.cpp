@@ -11,13 +11,13 @@ namespace nx::cloud::aws::test {
 
 namespace {
 
+static constexpr char kDefaultLocationTemplate[] = R"xml(
+    <LocationConstraint xmlns="http://s3.amazonaws.com/doc/2006-03-01/"/>
+)xml";
+
 static constexpr char kLocationTemplate[] = R"xml(
     <?xml version = "1.0" encoding = "UTF-8"?>
     <LocationConstraint xmlns="http://s3.amazonaws.com/doc/2006-03-01/">%1</LocationConstraint>
-)xml";
-
-static constexpr char kDefaultLocationTemplate[] = R"xml(
-    <LocationConstraint xmlns="http://s3.amazonaws.com/doc/2006-03-01/"/>
 )xml";
 
 } // namespace
@@ -118,8 +118,7 @@ void AwsS3Emulator::registerHttpApi()
         network::http::Method::delete_);
 
     m_httpServer.registerRequestProcessorFunc(
-        /*aws::http::kRootPath,*/
-        "/",
+        aws::http::kRootPath,
         [this](auto&& ... args) { getLocation(std::forward<decltype(args)>(args)...); },
         network::http::Method::get);
 }
