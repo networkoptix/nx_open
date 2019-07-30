@@ -44,7 +44,7 @@ protected:
     /**
      * @param enableOutput Enables NX_OUTPUT. Typically, use NX_DEBUG_ENABLE_OUTPUT as a value.
      * @param printPrefix Prefix for NX_PRINT and NX_OUTPUT. If empty, will be made from Engine's
-     * libName().
+     *     libName().
      */
     VideoFrameProcessingDeviceAgent(
         IEngine* engine,
@@ -57,9 +57,7 @@ protected:
     /**
      * Override to accept next compressed video frame for processing. Should not block the caller
      * thread for long.
-     * @param videoFrame Contains a pointer to the compressed video frame raw bytes. The lifetime
-     *     (validity) of this pointer is the same as of videoFrame. Thus, it can be extended by
-     *     addRef() or queryInterface() inside this method.
+     * @param videoFrame Contains a pointer to the compressed video frame raw bytes.
      */
     virtual bool pushCompressedVideoFrame(const ICompressedVideoPacket* /*videoFrame*/)
     {
@@ -68,9 +66,7 @@ protected:
 
     /**
      * Override to accept next uncompressed video frame for processing.
-     * @param videoFrame Contains a pointer to the compressed video frame raw bytes. The lifetime
-     *     (validity) of this pointer is the same as of videoFrame. Thus, it can be extended by
-     *     addRef() or queryInterface() inside this method.
+     * @param videoFrame Contains a pointer to the compressed video frame raw bytes.
      */
     virtual bool pushUncompressedVideoFrame(const IUncompressedVideoFrame* /*videoFrame*/)
     {
