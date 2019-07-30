@@ -2,6 +2,7 @@
 
 #include <QtCore/QIdentityProxyModel>
 
+#include <nx/utils/impl_ptr.h>
 #include <nx/vms/client/desktop/ui/right_panel/right_panel_globals.h>
 
 class QnWorkbenchContext;
@@ -19,15 +20,18 @@ class RightPanelModelsAdapter: public QIdentityProxyModel
 
 public:
     RightPanelModelsAdapter(QObject* parent = nullptr);
-    virtual ~RightPanelModelsAdapter() override = default;
+    virtual ~RightPanelModelsAdapter() override;
 
     QnWorkbenchContext* context() const;
-    void setContext(QnWorkbenchContext* context);
+    void setContext(QnWorkbenchContext* value);
 
     RightPanel::Tab type() const;
     void setType(RightPanel::Tab value);
 
     Q_INVOKABLE bool removeRow(int row);
+
+    Q_INVOKABLE void setRead(int row);
+    Q_INVOKABLE void setAutoClosePaused(int row, bool value);
 
     virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
     virtual QHash<int, QByteArray> roleNames() const override;
@@ -39,11 +43,8 @@ signals:
     void typeChanged();
 
 private:
-    void recreateSourceModel();
-
-private:
-    QnWorkbenchContext* m_context = nullptr;
-    RightPanel::Tab m_type = RightPanel::Tab::invalid;
+    class Private;
+    nx::utils::ImplPtr<Private> d;
 };
 
 } // namespace nx::vms::client::desktop

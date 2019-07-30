@@ -37,6 +37,15 @@ ListView
                 : "tiles/InfoTile.qml"
         }
 
+        function updateBeingRead()
+        {
+            if (visible)
+                view.model.setRead(index)
+        }
+
+        Component.onCompleted: updateBeingRead()
+        onVisibleChanged: updateBeingRead()
+
         Connections
         {
             target: loader.item
@@ -44,6 +53,9 @@ ListView
 
             onCloseRequested:
                 view.model.removeRow(index)
+
+            onHoveredChanged:
+                view.model.setAutoClosePaused(index, loader.item.hovered)
         }
     }
 
