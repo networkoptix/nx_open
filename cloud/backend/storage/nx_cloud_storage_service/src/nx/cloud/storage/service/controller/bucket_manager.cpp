@@ -9,6 +9,7 @@
 #include "nx/cloud/storage/service/model/database.h"
 #include "nx/cloud/storage/service/model/dao/bucket_dao.h"
 #include "nx/cloud/storage/service/utils.h"
+#include "command.h"
 #include "utils.h"
 
 namespace nx::cloud::storage::service::controller {
@@ -24,6 +25,21 @@ BucketManager::BucketManager(const conf::Settings& settings, model::Model* model
     m_database(model->database()),
     m_bucketDao(model->bucketDao())
 {
+    m_database->synchronizationEngine()->incomingCommandDispatcher().
+        registerCommandHandler<command::SaveBucket>(
+            [this](auto&& ... args)
+            {
+                insertReceivedRecord(std::forward<decltype(args)>(args)...);
+                return nx::sql::DBResult::ok;
+            });
+
+    m_database->synchronizationEngine()->incomingCommandDispatcher().
+        registerCommandHandler<command::RemoveBucket>(
+            [this](auto&& ... args)
+            {
+                removeReceivedRecord(std::forward<decltype(args)>(args)...);
+                return nx::sql::DBResult::ok;
+            });
 }
 
 void BucketManager::addBucket(
@@ -140,7 +156,11 @@ nx::sql::DBResult BucketManager::addBucketInternal(
 {
     m_bucketDao->addBucket(queryContext, bucket);
 
-    // TODO clusterdb sync command
+    m_database->synchronizationEngine()->transactionLog()
+        .generateTransactionAndSaveToLog<command::SaveBucket>(
+            queryContext,
+            m_settings.database().synchronization.clusterId,
+            Bucket{bucket.name, bucket.region});
 
     return nx::sql::DBResult::ok;
 }
@@ -151,9 +171,33 @@ nx::sql::DBResult BucketManager::removeBucketInternal(
 {
     m_bucketDao->removeBucket(queryContext, bucketName);
 
-    // TODO clusterdb sync command
+    m_database->synchronizationEngine()->transactionLog()
+        .generateTransactionAndSaveToLog<command::RemoveBucket>(
+            queryContext,
+            m_settings.database().synchronization.clusterId,
+            bucketName);
 
     return nx::sql::DBResult::ok;
+}
+
+void BucketManager::insertReceivedRecord(
+    nx::sql::QueryContext* queryContext,
+    const std::string& /*clusterId*/,
+    clusterdb::engine::Command<Bucket> command)
+{
+    m_bucketDao->addBucket(
+        queryContext,
+        api::Bucket{
+            command.params.name,
+            command.params.region});
+}
+
+void BucketManager::removeReceivedRecord(
+    nx::sql::QueryContext* queryContext,
+    const std::string& /*clusterId*/,
+    clusterdb::engine::Command<std::string> command)
+{
+    m_bucketDao->removeBucket(queryContext, command.params);
 }
 
 } // namespace nx::cloud::storage::service::controller

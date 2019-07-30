@@ -5,6 +5,7 @@
 #include <nx/network/cloud/storage/service/api/bucket.h>
 #include <nx/sql/types.h>
 
+#include "command.h"
 #include "s3_permissions_tester.h"
 
 namespace nx::sql { class QueryContext; }
@@ -51,6 +52,16 @@ private:
     nx::sql::DBResult removeBucketInternal(
         nx::sql::QueryContext* queryContext,
         const std::string& bucketName);
+
+    void insertReceivedRecord(
+        nx::sql::QueryContext* queryContext,
+        const std::string& /*clusterId*/,
+        clusterdb::engine::Command<Bucket> command);
+
+    void removeReceivedRecord(
+        nx::sql::QueryContext* queryContext,
+        const std::string& /*clusterId*/,
+        clusterdb::engine::Command<std::string> command);
 
 private:
     const conf::Settings& m_settings;

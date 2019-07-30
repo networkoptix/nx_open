@@ -28,6 +28,9 @@ protected:
     virtual int serviceMain(const utils::AbstractServiceSettings& settings) override;
 
 private:
+    void registerThisInstanceInCluster();
+
+private:
     const conf::Settings* m_settings = nullptr;
     model::Model* m_model = nullptr;
     controller::Controller* m_controller = nullptr;

@@ -1,8 +1,13 @@
 #include "storage_service.h"
 
+#include <nx/clusterdb/engine/http/http_paths.h>
+#include <nx/network/url/url_builder.h>
+#include <nx/network/http/rest/http_rest_client.h>
+
 #include "settings.h"
 #include "controller/controller.h"
 #include "model/model.h"
+#include "model/database.h"
 #include "view/view.h"
 
 namespace nx::cloud::storage::service {
@@ -50,6 +55,8 @@ int StorageService::serviceMain(const utils::AbstractServiceSettings& settings)
 
     NX_INFO(this, "Starting Cloud Storage Service...");
 
+    registerThisInstanceInCluster();
+
     int result = runMainLoop();
 
     view.stop();
@@ -58,6 +65,34 @@ int StorageService::serviceMain(const utils::AbstractServiceSettings& settings)
     NX_INFO(this, "Cloud Storage Service stopped");
 
     return result;
+}
+
+void StorageService::registerThisInstanceInCluster()
+{
+    using namespace nx::network;
+
+    if (m_settings->server().name.empty())
+    {
+        NX_INFO(this, "Server name is empty, discovery will not start");
+        return;
+    }
+
+    m_model->database()->synchronizationEngine()->registerHttpApi(
+        clusterdb::engine::kBaseSynchronizationPath,
+        &m_view->httpServer()->messageDispatcher());
+
+    const auto& clusterId = m_settings->database().synchronization.clusterId;
+
+    nx::utils::Url syncEngineUrl = url::Builder()
+        .setScheme(http::kUrlSchemeName)
+        .setHost(m_settings->server().name.c_str())
+        .setPath(
+            http::rest::substituteParameters(
+                clusterdb::engine::kBaseSynchronizationPath, {clusterId}));
+
+    m_model->database()->synchronizationEngine()->discoveryManager().start(
+        clusterId,
+        syncEngineUrl);
 }
 
 } // namespace nx::cloud::storage::service
