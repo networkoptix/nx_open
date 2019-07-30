@@ -1,9 +1,8 @@
 cmake_minimum_required(VERSION 3.10.0 FATAL_ERROR)
 
-project(paxton_plugin VERSION 3.2.0 LANGUAGES CSharp)
+set(releaseVersion 3.2.0)
 
-set(releaseVersion ${PROJECT_VERSION})
-set(releaseVersion.full ${releaseVersion}.${buildNumber})
+project(paxton_plugin VERSION ${releaseVersion} LANGUAGES CSharp)
 
 set(customization "default" CACHE STRING "Product customization")
 set(dotNetFramework "v4.6.2" CACHE STRING "Target .NET Framework version. Allowed: v4.0, v4.6.2")
@@ -12,33 +11,27 @@ set(buildNumber "0" CACHE STRING "Build number")
 option(codeSigning "Enable code signing" OFF)
 
 set(signKey "${CMAKE_CURRENT_SOURCE_DIR}/src/Sign.snk")
+set(repositoryRootDir ${PROJECT_SOURCE_DIR}/../..)
+set(releaseVersion.full ${releaseVersion}.${buildNumber})
+
+if("${dotNetFramework}" STREQUAL "v4.0")
+    set(net2Version "Net2v5")
+elseif("${dotNetFramework}" STREQUAL "v4.6.2")
+    set(net2Version "Net2v6")
+else()
+    message(FATAL_ERROR "Unknown .Net framework version ${dotNetFramework}")
+endif()
 
 list(APPEND CMAKE_MODULE_PATH
-    ${PROJECT_SOURCE_DIR}/../../cmake
+    ${repositoryRootDir}/cmake
 )
 
-set(build_utils_dir "${PROJECT_SOURCE_DIR}/../../build_utils" CACHE PATH "Path to build utils")
+set(build_utils_dir "${repositoryRootDir}/build_utils" CACHE PATH "Path to build utils")
 set(rdep_dir "${build_utils_dir}/python" CACHE PATH "Path to rdep scripts")
 include(find_python)
+
 include(rdep)
 nx_rdep_configure()
-
-set(customization_dir "${PROJECT_SOURCE_DIR}/../../customization/${customization}")
-
-include(CMakeDependentOption)
-include(utils)
-include(${customization_dir}/../default-values.cmake)
-include(${customization_dir}/customization.cmake)
-include(cloud_host)
-include(output_directories)
-include(distribution_names)
-include(option)
-include(windows_signing)
-
-set(minilauncher.binary.name "${product.name} Launcher.exe") # Cannot include properties.cmake.
-set(paxtonDriverOutputName "${paxtonLibraryName}.OemDvrMiniDriver")
-set(paxtonDriverIntermediateName "${paxtonLibraryName}.OemDvrMiniDriver.mini")
-set(paxtonPluginName "${display.product.name} Paxton Plugin")
 
 set(ENV{PYTHONPATH} ${rdep_dir})
 set(depenencies_cmake_file ${CMAKE_BINARY_DIR}/dependencies.cmake)
@@ -50,6 +43,25 @@ execute_process(
         --dot-net-framework=${dotNetFramework}
     RESULT_VARIABLE sync_result
 )
+# Load generated dependencies.cmake, containing packages path variables.
+include(${depenencies_cmake_file})
+
+include(CMakeDependentOption)
+include(utils)
+include(customization_package)
+include(${repositoryRootDir}/customization/default-values.cmake)
+include(${customization_dir}/customization.cmake)
+
+include(cloud_host)
+include(output_directories)
+include(distribution_names)
+include(option)
+include(windows_signing)
+
+set(minilauncher.binary.name "${product.name} Launcher.exe") #< Cannot include properties.cmake.
+set(paxtonDriverOutputName "${paxtonLibraryName}.OemDvrMiniDriver")
+set(paxtonDriverIntermediateName "${paxtonLibraryName}.OemDvrMiniDriver.mini")
+set(paxtonPluginName "${display.product.name} Paxton Plugin")
 
 if(NOT sync_result STREQUAL "0")
     message(FATAL_ERROR "error: Packages sync failed")

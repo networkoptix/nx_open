@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-
 from __future__ import print_function
 import argparse
 from rdep_cmake import RdepSyncher
@@ -17,12 +16,15 @@ def main():
 
     syncher = RdepSyncher(args.packages_dir)
     syncher.versions = {
-        "paxton_plugin_references": args.dot_net_framework
+        "paxton_plugin_references": args.dot_net_framework,
+        "customization_pack": args.customization,
     }
 
     def sync(package, **kwargs):
         return syncher.sync(package, **kwargs)
 
+    sync("any/cloud_hosts")
+    sync("any/customization_pack", path_variable="customization_package_directory")
     sync("windows/wix-3.11", path_variable="wix_directory")
     sync("windows/ilmerge", path_variable="ilmerge_directory")
     sync("windows/paxton_plugin_references", path_variable="references_directory")
