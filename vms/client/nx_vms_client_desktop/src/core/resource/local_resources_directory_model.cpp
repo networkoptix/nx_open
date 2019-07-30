@@ -18,9 +18,8 @@ QString getResourceFilePath(const QnResourcePtr& resource)
 {
     if (auto aviResource = resource.dynamicCast<QnAviResource>())
     {
-        if (aviResource->isEmbedded()) //< Do not watch embedded videos, they are governed by layouts.
-            return QString();
-        return aviResource->getUrl();
+        // Do not return path to embedded videos, they are governed by layouts.
+        return aviResource->isEmbedded() ? QString() : aviResource->getUrl();
     }
     if (auto fileLayoutResource = resource.dynamicCast<QnFileLayoutResource>())
     {
