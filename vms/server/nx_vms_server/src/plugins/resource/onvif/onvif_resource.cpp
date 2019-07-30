@@ -3801,6 +3801,9 @@ void QnPlOnvifResource::stopInputPortStatesMonitoring()
         }
     }
 
+    if (serverModule()->isStopping())
+        return;
+
     if (QnSoapServer::instance() && QnSoapServer::instance()->getService())
         QnSoapServer::instance()->getService()->removeResourceRegistration(toSharedPointer(this));
 
