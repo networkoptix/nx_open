@@ -12,10 +12,13 @@
 #include <nx/utils/cryptographic_hash.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/random.h>
+#include <utils/common/delayed.h>
 #include <nx/vms/common/p2p/downloader/file_information.h>
 #include <nx/vms/common/p2p/downloader/result_code.h>
 
 namespace nx::vms::client::desktop {
+
+using nx::vms::common::p2p::downloader::FileInformation;
 
 struct UploadWorker::Private
 {
@@ -252,6 +255,144 @@ void UploadWorker::emitProgress()
     emit progress(d->upload);
 }
 
+
+void UploadWorker::createUpload()
+{
+    d->upload.status = UploadState::CreatingUpload;
+
+    const auto callback = nx::utils::guarded(this,
+        [this](bool success, rest::Handle handle, const QnJsonRestResult & result)
+        {
+            {
+                QnMutexLocker lock(&d->mutex);
+                d->requests.releaseHandle(handle);
+            }
+            RemoteResult code = RemoteResult::ok;
+            if (!success)
+            {
+                if (result.reply.isNull())
+                    code = RemoteResult::ioError;
+                else
+                    code = result.deserialized<RemoteResult>();
+            }
+
+            QMetaObject::invokeMethod(this, [this, success, code, error=result.errorString]()
+                {
+                    handleFileUploadCreated(success, code, error);
+                });
+            //handleFileUploadCreated(success, code, result.errorString);
+        });
+
+    auto handle = d->connection()->addFileUpload(
+        d->upload.destination,
+        d->upload.size,
+        d->chunkSize,
+        d->md5.toHex(),
+        d->upload.ttl,
+        d->upload.recreateFile,
+        callback, thread());
+    // We have a race condition around this handle.
+    d->requests.storeHandle(handle);
+}
+
+void UploadWorker::handleWaitForFileOnServer(
+    bool success, int handle, const QnJsonRestResult &result)
+{
+    {
+        QnMutexLocker lock(&d->mutex);
+        d->requests.releaseHandle(handle);
+    }
+
+    if (d->upload.status != UploadState::WaitingFileOnServer)
+        return;
+    if (success)
+    {
+        auto information = result.deserialized<FileInformation>();
+        switch(information.status)
+        {
+            case FileInformation::Status::notFound:
+                // Try again later.
+                executeDelayed([this]()
+                {
+                    checkRemoteFile();
+                }, 1000);
+                break;
+            case FileInformation::Status::corrupted:
+                // try to recreate if allowed
+                if (d->upload.recreateFile)
+                {
+                    NX_WARNING(this, "Remote file \"%1\" was corrupted. Recreating its contents",
+                        d->file->fileName());
+                    createUpload();
+                }
+                else
+                {
+                    handleError(tr("Remote file \"%1\" is corrupted and I am not told "
+                        " to recreate it").arg(d->file->fileName()));
+                }
+                break;
+            case FileInformation::Status::downloaded:
+            case FileInformation::Status::downloading:
+            case FileInformation::Status::uploading:
+                if (information.md5 == d->md5)
+                {
+                    if (information.status == FileInformation::Status::downloaded)
+                    {
+                        NX_DEBUG(this, "Remote file \"%1\" is already downloaded. "
+                            "No need to upload anything.", d->file->fileName());
+                        handleCheckFinished(true, true);
+                    }
+                    else
+                    {
+                        NX_DEBUG(this, "Remote file \"%1\" has appeared. I can start uploading.",
+                            d->file->fileName());
+                        // TODO: We can reuse information about current chunks
+                        // and save some time requesting it again.
+                        d->upload.status = UploadState::Uploading;
+                        emitProgress();
+                        handleUpload();
+                    }
+                }
+                else if (d->upload.recreateFile)
+                {
+                    NX_WARNING(this, "There is md5 mismatch with server file \"%1\" "
+                        "and I am told to recreate it.", d->file->fileName());
+                    createUpload();
+                }
+                else
+                {
+                    handleError(tr("Server already has this file failed for file \"%1\". "
+                        "I will stop trying to upload it.").arg(d->file->fileName()));
+                }
+                break;
+        }
+    }
+    else
+    {
+        //handleError(tr("fileDownloadStatus failed for file \"%1\". "
+        //    "I will stop trying to upload it.").arg(d->file->fileName()));
+
+        // Try again later.
+        executeDelayed([this]()
+        {
+            checkRemoteFile();
+        }, 1000);
+    }
+}
+
+void UploadWorker::checkRemoteFile()
+{
+    d->upload.status = UploadState::WaitingFileOnServer;
+    auto callback =
+        [this](bool success, rest::Handle handle, const QnJsonRestResult& result)
+        {
+            handleWaitForFileOnServer(success, handle, result);
+        };
+    auto handle = d->connection()->fileDownloadStatus(
+        d->upload.destination, callback, thread());
+    d->requests.storeHandle(handle);
+}
+
 void UploadWorker::handleStop()
 {
     NX_INFO(this, "Stopping upload for %1", d->upload.destination);
@@ -289,48 +430,18 @@ void UploadWorker::handleMd5Calculated()
     }
 
     d->md5 = md5;
-    d->upload.status = UploadState::CreatingUpload;
+
+    if (!d->upload.allowFileCreation)
+        checkRemoteFile();
+    else
+        createUpload();
 
     emitProgress();
-
-    const auto callback = nx::utils::guarded(this,
-        [this](bool success, rest::Handle handle, const QnJsonRestResult & result)
-        {
-            {
-                QnMutexLocker lock(&d->mutex);
-                d->requests.releaseHandle(handle);
-            }
-            RemoteResult code = RemoteResult::ok;
-            if (!success)
-            {
-                if (result.reply.isNull())
-                    code = RemoteResult::ioError;
-                else
-                    code = result.deserialized<RemoteResult>();
-            }
-
-            QMetaObject::invokeMethod(this, [this, success, code, error=result.errorString]()
-                {
-                    handleFileUploadCreated(success, code, error);
-                });
-            //handleFileUploadCreated(success, code, result.errorString);
-        });
-
-    auto handle = d->connection()->addFileUpload(
-        d->upload.destination,
-        d->upload.size,
-        d->chunkSize,
-        d->md5.toHex(),
-        d->upload.ttl,
-        d->upload.recreateFile,
-        callback, thread());
-    // We have a race condition around this handle.
-    d->requests.storeHandle(handle);
 }
 
 void UploadWorker::handleFileUploadCreated(bool success, RemoteResult code, QString error)
 {
-    NX_VERBOSE(this, "Upload for %1 was created: %2, %3", d->upload.destination, success, code);
+    NX_DEBUG(this, "Upload for %1 was created: %2, %3", d->upload.destination, success, code);
 
     if (!success)
     {
@@ -445,7 +556,7 @@ void UploadWorker::handleAllUploaded()
                 QnMutexLocker lock(&d->mutex);
                 d->requests.releaseHandle(handle);
             }
-            using namespace nx::vms::common::p2p::downloader;
+
             FileInformation info = result.deserialized<FileInformation>();
             const bool fileStatusOk = info.status == FileInformation::Status::downloaded;
             handleCheckFinished(success, fileStatusOk);
