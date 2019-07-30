@@ -48,17 +48,15 @@ LocalResourcesDirectoryModel::LocalResourcesDirectoryModel(QObject* parent):
 
     auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
 
-    connect(resourcePool, &QnResourcePool::resourceAdded,
-        this, [this](const QnResourcePtr& resource)
-        {
+    connect(resourcePool, &QnResourcePool::resourceAdded, this,
+        [this](const QnResourcePtr& resource) {
             const auto path = getResourceFilePath(resource);
             if (FileTypeSupport::isMovieFileExt(path) || FileTypeSupport::isValidLayoutFile(path))
                 m_fileSystemWatcher.addPath(path);
         });
 
-    connect(resourcePool, &QnResourcePool::resourceRemoved,
-        this, [this](const QnResourcePtr& resource)
-        {
+    connect(resourcePool, &QnResourcePool::resourceRemoved, this,
+        [this](const QnResourcePtr& resource) {
             const auto path = getResourceFilePath(resource);
             if (!path.isNull())
                 m_fileSystemWatcher.removePath(path);
