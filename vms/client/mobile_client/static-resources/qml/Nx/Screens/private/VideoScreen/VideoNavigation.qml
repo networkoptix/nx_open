@@ -208,40 +208,10 @@ Item
         onTriggered: cameraChunkProvider.update()
     }
 
-    Button
-    {
-        y: 56 / 2 - height / 2
-        padding: 8
-        labelPadding: 0
-        width: 56
-        height: width
-        color: ColorTheme.transparent(ColorTheme.base1, 0.2)
-        icon.source: lp("/images/previous.png")
-        radius: width / 2
-        z: 1
-        onClicked: videoNavigation.switchToPreviousCamera()
-    }
-
-    Button
-    {
-        y: 56 / 2 - height / 2
-        anchors.right: parent.right
-        padding: 8
-        labelPadding: 0
-        width: 56
-        height: width
-        color: ColorTheme.transparent(ColorTheme.base1, 0.2)
-        icon.source: lp("/images/next.png")
-        radius: width / 2
-        z: 1
-        onClicked: videoNavigation.switchToNextCamera()
-    }
-
     Item
     {
         id: navigator
 
-        z: 1
         implicitWidth: parent.width
         implicitHeight: videoNavigation.canViewArchive
             ? timeline.height + playbackController.height - 16
@@ -301,6 +271,35 @@ Item
                         drag.target.y = drag.maximumY
                 }
             }
+        }
+
+        Button
+        {
+            y: 56 / 2 - height / 2
+            padding: 8
+            labelPadding: 0
+            width: 56
+            height: width
+            color: ColorTheme.transparent(ColorTheme.base1, 0.2)
+            icon.source: lp("/images/previous.png")
+            radius: width / 2
+            z: 1
+            onClicked: videoNavigation.switchToPreviousCamera()
+        }
+
+        Button
+        {
+            y: 56 / 2 - height / 2
+            anchors.right: parent.right
+            padding: 8
+            labelPadding: 0
+            width: 56
+            height: width
+            color: ColorTheme.transparent(ColorTheme.base1, 0.2)
+            icon.source: lp("/images/next.png")
+            radius: width / 2
+            z: 1
+            onClicked: videoNavigation.switchToNextCamera()
         }
 
         MotionPlaybackMaskWatcher
