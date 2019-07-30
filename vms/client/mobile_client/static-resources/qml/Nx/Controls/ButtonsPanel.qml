@@ -207,6 +207,8 @@ ListView
             if (wasActive)
                 control.actionCancelled(index)
         }
+
+        Component.onDestruction: handleCancelled()
     }
 
     QtObject
