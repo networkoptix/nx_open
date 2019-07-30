@@ -426,9 +426,9 @@ void RuleProcessor::processEvent(const vms::event::AbstractEventPtr& event)
     // If we wait within event loop, will freeze forever...
     if (thread() != QThread::currentThread())
     {
-        // This is a dirty huck, which makes sure that no actions are executed, until rule update
-        // request is complete. This is mostly important for HTTP requests, which do not have a way
-        // to detect that change is complete.
+        // This is a dirty huck, which makes sure that no actions are executed until rule update
+        // request is complete. This is mostly important for HTTP requests which do not have a way
+        // to detect if change is complete.
         // TODO: Remove and notify HTTP requests some other way.
         while (m_updatingRulesCount > 0)
             m_ruleUpdateCondition.wait(&m_mutex);
