@@ -17,7 +17,7 @@ namespace test {
 #define FIXED_UUID {0xd4,0xbb,0x55,0xa4,0xa8,0x7a,0x41,0x99,0xbb,0xd1,0x80,0x00,0xa4,0x80,0xa5,0xad}
 static constexpr char kFixedUuidString[]{"{D4BB55A4-A87A-4199-BBD1-8000A480A5AD}"};
 static constexpr uint8_t kFixedUuidBytes[Uuid::size()] FIXED_UUID;
-static constexpr Uuid kFixedUuid FIXED_UUID;
+static const Uuid kFixedUuid FIXED_UUID; //< NOTE: Here constexpr does not work in MSVC 2015.
 
 static constexpr char kNullUuidString[]{"{00000000-0000-0000-0000-000000000000}"};
 static constexpr uint8_t kNullUuidBytes[Uuid::size()]{};
@@ -42,7 +42,8 @@ TEST(UuidHelper, uuidBasics)
     ASSERT_FALSE(kFixedUuid == kNullUuid); //< operator==() for different uuids
 
     // Test that the default constructor yields an all-zeros uuid.
-    constexpr Uuid kAllZerosUuid{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+    // NOTE: Here constexpr does not work in MSVC 2015.
+    const Uuid kAllZerosUuid{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
     ASSERT_TRUE(kAllZerosUuid.isNull());
     constexpr Uuid kDefaultUuid = Uuid(); //< default constructor
     ASSERT_TRUE(kDefaultUuid.isNull());
