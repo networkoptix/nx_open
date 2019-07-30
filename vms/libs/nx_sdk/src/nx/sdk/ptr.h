@@ -148,11 +148,23 @@ private:
     RefCountable* m_ptr = nullptr;
 };
 
-template<class RefCountable>
-bool operator==(const Ptr<RefCountable>& ptr, std::nullptr_t) { return ! (bool) ptr; }
+template<class RefCountable, typename Pointer>
+bool operator==(const Ptr<RefCountable>& ptr, Pointer* p) { return ptr.get() == p; }
+
+template<typename Pointer, class RefCountable>
+bool operator==(Pointer* p, const Ptr<RefCountable>& ptr) { return p == ptr.get(); }
+
+template<class RefCountable, typename Pointer>
+bool operator!=(const Ptr<RefCountable>& ptr, Pointer* p) { return ptr.get() != p; }
+
+template<typename Pointer, class RefCountable>
+bool operator!=(Pointer* p, const Ptr<RefCountable>& ptr) { return p != ptr.get(); }
 
 template<class RefCountable>
-bool operator==(std::nullptr_t, const Ptr<RefCountable>& ptr) { return ! (bool) ptr; }
+bool operator==(const Ptr<RefCountable>& ptr, std::nullptr_t) { return !ptr; }
+
+template<class RefCountable>
+bool operator==(std::nullptr_t, const Ptr<RefCountable>& ptr) { return !ptr; }
 
 template<class RefCountable>
 bool operator!=(const Ptr<RefCountable>& ptr, std::nullptr_t) { return (bool) ptr; }
@@ -219,29 +231,101 @@ int refCount(const Ptr<RefCountable>& ptr)
 
 //-------------------------------------------------------------------------------------------------
 
+/**
+ * Non-owning pointer to objects that implement IRefCountable: it neither calls addRef() in the
+ * constructor, nor calls releaseRef() in the destructor. It can be created from both raw and smart
+ * pointers (without altering the reference counter), and can be implicitly converted to a smart
+ * pointer Ptr<>(), which is the only case when it calls addRef().
+ *
+ * The above features allow to use RawPtr for function arguments, because by the SDK guidelines,
+ * functions are supplied objects with their original reference counter values, and should
+ * increment them only when the object is intended to survive the function call, e.g. being
+ * assigned to a smart pointer.
+ */
 template<class RefCountable>
 class RawPtr
 {
 public:
-    RawPtr(std::nullptr_t = nullptr): m_refCountable(nullptr) {}
+    RawPtr(std::nullptr_t = nullptr): m_ptr(nullptr) {}
 
-    RawPtr(RefCountable* refCountable): m_refCountable(refCountable) {}
+    RawPtr(RefCountable* refCountable): m_ptr(refCountable) {}
 
-    RawPtr(const Ptr<RefCountable>& ptr): m_refCountable(ptr.get()) {}
+    RawPtr(const Ptr<RefCountable>& ptr): m_ptr(ptr.get()) {}
 
-    RefCountable* operator->() const { return m_refCountable; }
-    RefCountable& operator*() const { return *m_refCountable; }
-    RefCountable* get() const { return m_refCountable; }
+    /** Sfinae: Compiles if OtherRefCountable* is convertible to RefCountable*. */
+    template<class OtherRefCountable>
+    using IsConvertibleFrom =
+        std::enable_if_t<std::is_base_of<RefCountable, OtherRefCountable>::value, int /*dummy*/>;
+
+    template<class OtherRefCountable, IsConvertibleFrom<OtherRefCountable> = 0>
+    RawPtr(const RawPtr<OtherRefCountable>& other): m_ptr(other.get()) {}
+
+    /** Defined because the template above does not suppress generation of such member. */
+    RawPtr(const RawPtr& other): m_ptr(other.get()) {}
+
+    template<class OtherRefCountable, IsConvertibleFrom<OtherRefCountable> = 0>
+    RawPtr(RawPtr<OtherRefCountable>&& other): m_ptr(other.get()) {}
+
+    /** Defined because the template above does not suppress generation of such member. */
+    RawPtr(RawPtr&& other): m_ptr(other.get()) {}
+
+    template<class OtherRefCountable, IsConvertibleFrom<OtherRefCountable> = 0>
+    RawPtr& operator=(const RawPtr<OtherRefCountable>& other) { m_ptr = other.get(); return *this; }
+
+    /** Defined because the template above does not work for same-type assignment. */
+    RawPtr& operator=(const RawPtr& other) { m_ptr = other.get(); return *this; }
+
+    template<class OtherRefCountable, IsConvertibleFrom<OtherRefCountable> = 0>
+    RawPtr& operator=(RawPtr<OtherRefCountable>&& other) { m_ptr = other.get(); return *this; }
+
+    /** Defined because the template above does not work for same-type assignment. */
+    RawPtr& operator=(RawPtr&& other) { m_ptr = other.get(); return *this; }
+
+    template<class OtherRefCountable, IsConvertibleFrom<OtherRefCountable> = 0>
+    bool operator==(const RawPtr<OtherRefCountable>& other) const { return m_ptr == other.get(); }
+
+    template<class OtherRefCountable, IsConvertibleFrom<OtherRefCountable> = 0>
+    bool operator!=(const RawPtr<OtherRefCountable>& other) const { return !operator==(other); }
+
+    RefCountable* operator->() const { return m_ptr; }
+    RefCountable& operator*() const { return *m_ptr; }
+    RefCountable* get() const { return m_ptr; }
+
+    operator bool() const { return m_ptr != nullptr; }
 
     operator Ptr<RefCountable>() const
     {
-        m_refCountable->addRef();
-        return toPtr(m_refCountable);
+        m_ptr->addRef();
+        return toPtr(m_ptr);
     }
 
 private:
-    RefCountable* const m_refCountable;
+    RefCountable* const m_ptr;
 };
+
+template<class RefCountable, typename Pointer>
+bool operator==(const RawPtr<RefCountable>& ptr, Pointer* p) { return ptr.get() == p; }
+
+template<typename Pointer, class RefCountable>
+bool operator==(Pointer* p, const RawPtr<RefCountable>& ptr) { return p == ptr.get(); }
+
+template<class RefCountable, typename Pointer>
+bool operator!=(const RawPtr<RefCountable>& ptr, Pointer* p) { return ptr.get() != p; }
+
+template<typename Pointer, class RefCountable>
+bool operator!=(Pointer* p, const RawPtr<RefCountable>& ptr) { return p != ptr.get(); }
+
+template<class RefCountable>
+bool operator==(const RawPtr<RefCountable>& ptr, std::nullptr_t) { return !ptr; }
+
+template<class RefCountable>
+bool operator==(std::nullptr_t, const RawPtr<RefCountable>& ptr) { return !ptr; }
+
+template<class RefCountable>
+bool operator!=(const RawPtr<RefCountable>& ptr, std::nullptr_t) { return (bool) ptr; }
+
+template<class RefCountable>
+bool operator!=(std::nullptr_t, const RawPtr<RefCountable>& ptr) { return (bool) ptr; }
 
 } // namespace sdk
 } // namespace nx
