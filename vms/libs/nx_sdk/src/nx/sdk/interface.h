@@ -49,10 +49,10 @@ protected:
         InterfaceId id,
         const Uuid& deprecatedInterfaceId)
     {
-        if (memcmp(id.value, deprecatedInterfaceId.data(), Uuid::kSize) == 0)
+        if (memcmp(id.value, deprecatedInterfaceId.data(), Uuid::size()) == 0)
         {
             this->addRef();
-// TODO: #mshevchenko: Try to remove the cast.
+            // The cast is needed to shift the pointer in case of multiple inheritance.
             return static_cast<DerivedInterface*>(this);
         }
         return doQueryInterface(id);
@@ -64,7 +64,7 @@ private:
         if (id == DerivedInterface::interfaceId())
         {
             this->addRef();
-// TODO: #mshevchenko: Try to remove the cast.
+            // The cast is needed to shift the pointer in case of multiple inheritance.
             return static_cast<DerivedInterface*>(this);
         }
         return BaseInterface::queryInterface(id);
