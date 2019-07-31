@@ -7,7 +7,8 @@
 namespace nx::cloud::storage::service::controller {
 
 GeoIpResolverFactory::GeoIpResolverFactory():
-    base_type(std::bind(&GeoIpResolverFactory::instance, this, std::placeholders::_1))
+    base_type(
+        std::bind(&GeoIpResolverFactory::defaultFactoryFunction, this, std::placeholders::_1))
 {
 }
 
@@ -17,7 +18,8 @@ GeoIpResolverFactory& GeoIpResolverFactory::instance()
     return factory;
 }
 
-std::unique_ptr<geo_ip::AbstractResolver> GeoIpResolverFactory::defaultFactoryFunction(const conf::Settings& settings)
+std::unique_ptr<geo_ip::AbstractResolver> GeoIpResolverFactory::defaultFactoryFunction(
+    const conf::Settings& settings)
 {
     return std::make_unique<geo_ip::Resolver>(settings.geoIp().dbPath);
 }
