@@ -32,7 +32,6 @@ def determine_package_versions(
         "qt": "5.11.3",
         "boost": "1.67.0",
         "openssl": "1.0.2q",
-        "ffmpeg": "3.1.9-3",
         "sigar": "1.7",
         "sasl2": "2.1.26",
         "openal": "1.16",
@@ -53,50 +52,56 @@ def determine_package_versions(
         "customization_pack": customization,
     }
 
+    # Desktop Linux.
     if platform == "linux" and box == "none" and target not in ("linux_arm32", "linux_arm64"):
         v["festival"] = "2.4-1"
         v["festival-vox"] = "2.4"
-        v["sysroot"] = "xenial-1"
         v["ffmpeg"] = "3.1.9-4"
+        v["sysroot"] = "xenial-1"
 
     if platform == "macosx":
         v["festival"] = "2.1"
+        v["ffmpeg"] = "3.1.9-3"
 
     if platform == "android":
-        v["openal"] = "1.17.2"
         v["ffmpeg"] = "3.1.1"
+        v["openal"] = "1.17.2"
 
     if platform == "ios":
-        v["libjpeg-turbo"] = "1.4.1"
         v["ffmpeg"] = "3.1.1"
-
-    if box == "bpi":
-        v["festival"] = "2.4-1"
-        v["festival-vox"] = "2.4"
-        v["sysroot"] = "wheezy"
+        v["libjpeg-turbo"] = "1.4.1"
 
     if target == "linux_arm32":
         v["festival"] = "2.4-1"
         v["festival-vox"] = "2.4"
-        v["sysroot"] = "jessie"
-
-    if box == "edge1":
+        v["ffmpeg"] = "3.1.9-6"
+        v["openssl"] = "1.0.2q-2"
         v["sysroot"] = "jessie"
 
     if target == "linux_arm64":
         v["festival"] = "2.4-1"
         v["festival-vox"] = "2.4"
-        v["sysroot"] = "xenial"
         v["ffmpeg"] = "3.1.9-6"
-
-    if target in ("linux_arm32", "linux_arm64") or box in ("edge1", "bpi"):
         v["openssl"] = "1.0.2q-2"
+        v["sysroot"] = "xenial"
+
+    if box == "bpi":
+        v["festival"] = "2.4-1"
+        v["festival-vox"] = "2.4"
         v["ffmpeg"] = "3.1.9-6"
+        v["openssl"] = "1.0.2q-2"
+        v["sysroot"] = "wheezy"
+
+    if box == "edge1":
+        v["ffmpeg"] = "3.1.9-6"
+        v["openssl"] = "1.0.2q-2"
+        v["sysroot"] = "jessie"
 
     if "festival-vox" not in v:
         v["festival-vox"] = v["festival"]
 
     if platform == "windows" and debug:
+        v["ffmpeg"] = "3.1.9-3"
         for package in ("qt", "festival", "openal", "openssl", "sigar", "icu"):
             v[package] += "-debug"
 
