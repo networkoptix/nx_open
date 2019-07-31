@@ -44,6 +44,8 @@ public:
             QnMutexLocker lock(&m_mutex);
             if (m_cached)
                 return m_cachedContainer;
+
+            m_signalHasBeenCaught = false;
         }
 
         const auto serialized = m_resource->getProperty(m_propertyName);
