@@ -53,7 +53,7 @@ public:
                 continue;
 
             // It is safe to treat new SDK plugins as if they were old SDK plugins for the purpose
-            // of calling queryInterface().
+            // of calling queryInterface(), hence querying all plugins - old and new.
             auto oldSdkPlugin = reinterpret_cast<nxpl::PluginInterface*>(plugin.get());
             if (const auto ptr = oldSdkPlugin->queryInterface(oldSdkInterfaceId))
                 foundPlugins.push_back(static_cast<Interface*>(ptr));
