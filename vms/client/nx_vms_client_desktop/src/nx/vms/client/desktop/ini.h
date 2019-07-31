@@ -191,7 +191,8 @@ struct Ini: nx::kit::IniConfig
     NX_INI_INT(0, systemsToHide,
         "Hide systems on welcome screen, bitwise combination of flags:\n"
         " * 1 - Incompatible systems.\n"
-        " * 2 - Not connectable cloud systems.\n");
+        " * 2 - Not connectable cloud systems.\n"
+        " * 4 - Compatible systems which require compatibility mode.\n");
 };
 
 inline Ini& ini()

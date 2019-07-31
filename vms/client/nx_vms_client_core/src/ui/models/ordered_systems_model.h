@@ -47,7 +47,8 @@ public:
     enum HiddenSystemsFlags {
         None = 0x0,
         Incompatible = 0x1,
-        NotConnectableCloud = 0x2
+        NotConnectableCloud = 0x2,
+        CompatibleVersion = 0x4
     };
     Q_DECLARE_FLAGS(HiddenSystems, HiddenSystemsFlags)
     Q_FLAG(HiddenSystems)

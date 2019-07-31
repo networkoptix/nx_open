@@ -264,6 +264,10 @@ bool QnOrderedSystemsModel::isHidden(const QModelIndex& dataIndex) const
         && !dataIndex.data(QnSystemsModel::IsConnectableRoleId).toBool())
         return true;
 
+    if (m_systemsToHide.testFlag(CompatibleVersion)
+        && !dataIndex.data(QnSystemsModel::CompatibleVersionRoleId).isNull())
+        return true;
+
     return false;
 }
 
@@ -278,6 +282,8 @@ void QnOrderedSystemsModel::setHiddenSystems(int flags)
         m_systemsToHide |= Incompatible;
     if (flags & NotConnectableCloud)
         m_systemsToHide |= NotConnectableCloud;
+    if (flags & CompatibleVersion)
+        m_systemsToHide |= CompatibleVersion;
 
     emit hiddenSystemsChanged(m_systemsToHide);
 }
