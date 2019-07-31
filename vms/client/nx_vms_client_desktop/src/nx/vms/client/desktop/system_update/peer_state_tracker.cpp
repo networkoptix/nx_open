@@ -812,6 +812,103 @@ void PeerStateTracker::processDownloadTaskSet()
     }
 }
 
+void PeerStateTracker::processReadyInstallTaskSet()
+{
+    QnMutexLocker locker(&m_dataLock);
+    for (const auto& item: m_items)
+    {
+        StatusCode state = item->state;
+        auto id = item->id;
+
+        if (item->incompatible)
+            continue;
+
+        if (m_peersFailed.contains(id)
+            && state != StatusCode::error)
+        {
+            m_peersFailed.remove(id);
+        }
+
+        if (item->offline && state != StatusCode::offline)
+        {
+            if (m_peersActive.contains(id))
+            {
+                NX_VERBOSE(this,
+                    "processReadyInstallTaskSet() - peer %1 just went offline from readyInstall. "
+                    "I will wait a bit for its return.", id);
+                m_peersActive.remove(id);
+            }
+        }
+        else
+        {
+            switch (state)
+            {
+                case StatusCode::readyToInstall:
+                    if (!m_peersIssued.contains(id))
+                    {
+                        NX_VERBOSE(this,
+                            "processReadyInstallTaskSet() - peer %1 is ready to install, "
+                            "but was not tracked. Adding it to task set.", id);
+                        m_peersActive.insert(id);
+                        m_peersIssued.insert(id);
+                    }
+                    if (m_peersIssued.contains(id) && !m_peersActive.contains(id))
+                    {
+                        NX_VERBOSE(this,
+                            "processReadyInstallTaskSet() - peer %1 ready to start installation", id);
+                        m_peersActive.insert(id);
+                    }
+                    // Nothing to do here.
+                    break;
+                case StatusCode::preparing:
+                case StatusCode::downloading:
+                case StatusCode::idle:
+                    if (m_peersActive.contains(id))
+                    {
+                        NX_VERBOSE(this,
+                            "processReadyInstallTaskSet() - peer %1 has changed state to %2 and "
+                            "no longer is ready to start installation", id, toString(state));
+                        m_peersActive.remove(id);
+                    }
+                    break;
+                case StatusCode::offline:
+                    if (item->offline && m_peersIssued.contains(id))
+                    {
+                        NX_VERBOSE(this,
+                            "processReadyInstallTaskSet() - peer %1 is completely offline. "
+                            "I will not wait for it.", id);
+                        m_peersIssued.remove(id);
+                        m_peersActive.remove(id);
+                    }
+                    // NOTE: When this server returns online, its 'idle' state will be ignored.
+                    // Though when it goes to 'preparing' or 'downloading', client will switch
+                    // to 'downloading' state as well, so this server will be properly tracked.
+                    break;
+                case StatusCode::error:
+                    if (m_peersIssued.contains(id))
+                    {
+                        m_peersActive.remove(id);
+                        m_peersFailed.insert(id);
+                        NX_VERBOSE(this,
+                            "processReadyInstallTaskSet() - peer %1 has an error \"%2\".",
+                            id, item->statusMessage);
+                    }
+                    break;
+                case StatusCode::latestUpdateInstalled:
+                    if (m_peersIssued.contains(id))
+                    {
+                        NX_VERBOSE(this,
+                            "processReadyInstallTaskSet() - peer %1 has completed an update somehow.",
+                            id);
+                        m_peersActive.remove(id);
+                        m_peersIssued.remove(id);
+                    }
+                    break;
+            }
+        }
+    }
+}
+
 void PeerStateTracker::processInstallTaskSet()
 {
     NX_ASSERT(!m_peersIssued.isEmpty());
@@ -1237,6 +1334,8 @@ bool PeerStateTracker::updateServerData(QnMediaServerResourcePtr server, UpdateI
                     "updateServerData() - peer %1 gone offline from state readyInstall.");
                 item->state = StatusCode::preparing;
             }
+            // We need to get /ec2/updateStatus to get a proper status.
+            item->statusUnknown = true;
             // TODO: Should track offline->online changes for task sets:
             //  - peersActive
             //  - peersFailed

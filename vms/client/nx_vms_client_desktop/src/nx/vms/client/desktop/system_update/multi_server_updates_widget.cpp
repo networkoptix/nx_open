@@ -558,7 +558,8 @@ MultiServerUpdatesWidget::VersionReport MultiServerUpdatesWidget::calculateUpdat
     QString internalError = nx::update::toString(contents.error);
     // We have different error messages for each update source. So we should check
     // every combination of update source and nx::update::InformationError values.
-    if (contents.alreadyInstalled && source != SourceType::internet)
+    if (contents.alreadyInstalled && source != SourceType::internet
+        && contents.error != Error::incompatibleVersion)
     {
         report.versionMode = VersionReport::VersionMode::build;
         report.statusHighlight = VersionReport::HighlightMode::regular;
@@ -1046,8 +1047,11 @@ void MultiServerUpdatesWidget::atStartUpdateAction()
 
         // We will not track client state during download. But we still may restart to the new
         // version.
-        if (m_clientUpdateTool->isVersionInstalled(m_updateInfo.getVersion()))
+        if (m_clientUpdateTool->isVersionInstalled(m_updateInfo.getVersion())
+            || !m_updateInfo.needClientUpdate)
+        {
             targets.remove(m_stateTracker->getClientPeerId());
+        }
 
         m_stateTracker->setUpdateTarget(m_updateInfo.getVersion());
         m_stateTracker->markStatusUnknown(targets);
@@ -1213,7 +1217,8 @@ void MultiServerUpdatesWidget::atCancelUpdateComplete(bool success, const QStrin
             messageBox->setInformativeText(error);
             messageBox->setStandardButtons(QDialogButtonBox::Ok);
             messageBox->exec();
-            setTargetState(WidgetUpdateState::readyInstall, {});
+            QSet<QnUuid> peersIssued = m_stateTracker->peersIssued();
+            setTargetState(WidgetUpdateState::readyInstall, peersIssued);
         }
     }
 
@@ -1238,15 +1243,15 @@ void MultiServerUpdatesWidget::atStartInstallComplete(bool success, const QStrin
             messageBox->setInformativeText(error);
             messageBox->setStandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Retry);
             messageBox->setDefaultButton(QDialogButtonBox::Ok);
+            QSet<QnUuid> servers = m_stateTracker->peersIssued();
             if (messageBox->exec() == QDialogButtonBox::Retry)
             {
-                QSet<QnUuid> servers = m_stateTracker->peersIssued();
                 servers.remove(m_stateTracker->getClientPeerId());
                 m_serverUpdateTool->requestInstallAction(servers);
             }
             else
             {
-                setTargetState(WidgetUpdateState::readyInstall, {});
+                setTargetState(WidgetUpdateState::readyInstall, servers);
             }
         }
     }
@@ -1386,8 +1391,8 @@ void MultiServerUpdatesWidget::atServerConfigurationChanged(std::shared_ptr<Upda
         m_updateRemoteStateChanged = true;
     }
 
-    if (hasPendingUiChanges())
-        loadDataToUi();
+    // TODO: We need task sets to be processed here and then to call loadDataToUi();
+    atUpdateCurrentState();
 }
 
 ServerUpdateTool::ProgressInfo MultiServerUpdatesWidget::calculateActionProgress() const
@@ -1623,7 +1628,7 @@ void MultiServerUpdatesWidget::processInitialCheckState()
             NX_INFO(this,
                 "processInitialCheckState() - servers %1 have already downloaded an update",
                 serversHaveDownloaded);
-            setTargetState(WidgetUpdateState::readyInstall, {});
+            setTargetState(WidgetUpdateState::readyInstall, serversHaveDownloaded);
         }
         else if (!serversHaveInstalled.empty())
         {
@@ -1737,6 +1742,8 @@ void MultiServerUpdatesWidget::processDownloadingState()
 
 void MultiServerUpdatesWidget::processReadyInstallState()
 {
+    m_stateTracker->processReadyInstallTaskSet();
+
     auto idle = m_stateTracker->peersInState(StatusCode::idle);
     auto all = m_stateTracker->allPeers();
     auto downloading = m_stateTracker->peersInState(StatusCode::downloading)
@@ -2384,9 +2391,12 @@ void MultiServerUpdatesWidget::syncRemoteUpdateStateToUi()
     if (m_widgetState == WidgetUpdateState::readyInstall
         || m_widgetState == WidgetUpdateState::ready)
     {
-        auto readyAndOnline = m_stateTracker->onlineAndInState(LocalStatusCode::readyToInstall);
-        auto readyAndOffline = m_stateTracker->offlineAndInState(LocalStatusCode::readyToInstall);
-        bool hasInstallIssues = (readyAndOnline.empty() || !readyAndOffline.empty())
+        auto peersIssued = m_stateTracker->peersIssued();
+        auto peersActive = m_stateTracker->peersActive();
+        //auto readyAndOnline = m_stateTracker->onlineAndInState(LocalStatusCode::readyToInstall);
+        //auto readyAndOffline = m_stateTracker->offlineAndInState(LocalStatusCode::readyToInstall);
+        bool hasInstallIssues = (peersIssued.empty() || (peersActive.size() < peersIssued.size())
+            || !m_stateTracker->peersFailed().empty())
             && m_widgetState == WidgetUpdateState::readyInstall;
 
         if (hasInstallIssues || hasStatusErrors || hasVerificationErrors)
@@ -2522,11 +2532,23 @@ void MultiServerUpdatesWidget::syncDebugInfoToUi()
 
         debugState << QString("lowestVersion=%1").arg(m_stateTracker->lowestInstalledVersion().toString());
 
-        QStringList serversReport;
+        QStringList report;
         for (auto server: m_serverUpdateTool->getServersInstalling())
-            serversReport << server.toString();
-        if (!serversReport.empty())
-            debugState << QString("installing=%1").arg(serversReport.join(","));
+            report << server.toString();
+        if (!report.empty())
+            debugState << QString("installing=%1").arg(report.join(","));
+
+        report.clear();
+        for (auto peer: m_stateTracker->peersIssued())
+            report << peer.toString();
+        if (!report.empty())
+            debugState << QString("issued=%1").arg(report.join(","));
+
+        report.clear();
+        for (auto peer: m_stateTracker->peersFailed())
+            report << peer.toString();
+        if (!report.empty())
+            debugState << QString("failed=%1").arg(report.join(","));
 
         if (m_updateInfo.error != nx::update::InformationError::noError)
         {

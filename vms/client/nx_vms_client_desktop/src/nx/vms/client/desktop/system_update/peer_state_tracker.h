@@ -198,6 +198,7 @@ public:
      * These functions should only affect task sets and do not change state for each item.
      */
     void processDownloadTaskSet();
+    void processReadyInstallTaskSet();
     void processInstallTaskSet();
 
     void skipFailedPeers();
