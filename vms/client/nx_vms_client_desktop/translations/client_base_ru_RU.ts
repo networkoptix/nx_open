@@ -866,7 +866,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Cancel Upload...</source>
-      <translation type="unfinished">Cancel Upload...</translation>
+      <translation>Отменить загрузку...</translation>
     </message>
     <message>
       <source>Copy Schedule...</source>
@@ -898,7 +898,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>New Virtual Camera...</source>
-      <translation type="unfinished">New Virtual Camera...</translation>
+      <translation>Новая виртуальная камера...</translation>
     </message>
     <message>
       <source>Show Tree</source>
@@ -943,6 +943,14 @@ to view more bookmarks</source>
     <message>
       <source>Objects Frames and Info...</source>
       <translation type="unfinished">Objects Frames and Info...</translation>
+    </message>
+    <message>
+      <source>Pin Calendar</source>
+      <translation>Прикрепить календарь</translation>
+    </message>
+    <message>
+      <source>Unpin Calendar</source>
+      <translation>Открепить календарь</translation>
     </message>
   </context>
   <context>
@@ -2793,7 +2801,7 @@ to %1</source>
     </message>
     <message>
       <source>Download &amp;&amp; Install</source>
-      <translation type="unfinished">Download &amp;&amp; Install</translation>
+      <translation>Загрузить и установить</translation>
     </message>
     <message>
       <source>Failed to enter compatibility mode for version %1</source>
@@ -7793,6 +7801,10 @@ If you intended to move analytics data to another storage location, please conta
       <source>This action cannot be undone.</source>
       <translation>Это действие нельзя будет отменить.</translation>
     </message>
+    <message>
+      <source>Motion detection stream is disabled</source>
+      <translation type="unfinished">Motion detection stream is disabled</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraScheduleWidget</name>
@@ -8233,7 +8245,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Analytics events</source>
-      <translation type="unfinished">Analytics events</translation>
+      <translation>События аналитики</translation>
     </message>
     <message>
       <source>Any device issue</source>
@@ -8674,8 +8686,8 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Выбранный диапазон содержит более 255 адресов.</translation>
     </message>
     <message>
-      <source>Can&apos;t start searching process</source>
-      <translation type="unfinished">Can&apos;t start searching process</translation>
+      <source>Can not start the search process</source>
+      <translation type="unfinished">Can not start the search process</translation>
     </message>
   </context>
   <context>
@@ -8830,7 +8842,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Download &amp;&amp; Install</source>
-      <translation type="unfinished">Download &amp;&amp; Install</translation>
+      <translation>Загрузить и установить</translation>
     </message>
     <message>
       <source>Select Another Build</source>
@@ -8934,12 +8946,8 @@ If you intended to move analytics data to another storage location, please conta
       <translation type="unfinished">There are no online servers to update.</translation>
     </message>
     <message>
-      <source>Some servers haven&apos;t completed update process. Finish it anyway?</source>
-      <translation type="unfinished">Some servers haven&apos;t completed update process. Finish it anyway?</translation>
-    </message>
-    <message>
       <source>Cancel update and delete all downloaded data?</source>
-      <translation type="unfinished">Cancel update and delete all downloaded data?</translation>
+      <translation>Отменить обновление и удалить все загруженные данные?</translation>
     </message>
     <message>
       <source>There was an error while installing updates:</source>
@@ -8983,7 +8991,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Failed to cancel update</source>
-      <translation type="unfinished">Failed to cancel update</translation>
+      <translation>Не удалось отменить обновление</translation>
     </message>
     <message>
       <source>Failed to start installation</source>
@@ -9000,6 +9008,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Please please contact Customer Support.</source>
       <translation type="unfinished">Please please contact Customer Support.</translation>
+    </message>
+    <message>
+      <source>Some servers have not completed the update process. Finish it anyway?</source>
+      <translation type="unfinished">Some servers have not completed the update process. Finish it anyway?</translation>
     </message>
   </context>
   <context>
@@ -9059,10 +9071,6 @@ If you intended to move analytics data to another storage location, please conta
   <context>
     <name>nx::vms::client::desktop::OpenLayoutActionWidget</name>
     <message>
-      <source>Some users don&apos;t have access to the selected layout. Action will not work for them.</source>
-      <translation>У некоторых пользователей нет доступа к выбранной раскладке. Действие не будет работать для них.</translation>
-    </message>
-    <message>
       <source>None of selected users have access to the selected layout. Action will not work.</source>
       <translation>Ни один из выбранных пользователей не имеет доступа к выбранной раскладке. Действие не будет работать.</translation>
     </message>
@@ -9081,6 +9089,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>None of selected user roles contain users. Action will not work.</source>
       <translation type="unfinished">None of selected user roles contain users. Action will not work.</translation>
+    </message>
+    <message>
+      <source>Some users do not have access to the selected layout. Action will not work for them.</source>
+      <translation type="unfinished">Some users do not have access to the selected layout. Action will not work for them.</translation>
     </message>
   </context>
   <context>
@@ -9175,7 +9187,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Internal server error.</source>
-      <translation type="unfinished">Internal server error.</translation>
+      <translation>Внутренняя ошибка сервера.</translation>
     </message>
     <message>
       <source>This OS version is no longer supported.</source>
@@ -9288,28 +9300,12 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Больше настроек</translation>
     </message>
     <message>
-      <source>Dual-Streaming not supported for this camera</source>
-      <translation>Многопоточность не поддерживается для этой камеры</translation>
+      <source>Motion detection is disabled or not supported</source>
+      <translation type="unfinished">Motion detection is disabled or not supported</translation>
     </message>
     <message>
-      <source>Dual-Streaming and motion detection not supported for this camera</source>
-      <translation>Данная камера не поддерживает многопоточность и детекцию движения</translation>
-    </message>
-    <message>
-      <source>Motion detection disabled</source>
-      <translation>Обнаружение движения отключено</translation>
-    </message>
-    <message>
-      <source>To enable or adjust it, go to the &quot;Motion&quot; tab in Camera Settings</source>
-      <translation>Чтобы включить или настроить его, перейдите на вкладку &quot;Движение&quot; в настройках камеры</translation>
-    </message>
-    <message>
-      <source>Motion detection disabled or not supported</source>
-      <translation>Обнаружение движения отключено или не поддерживается</translation>
-    </message>
-    <message>
-      <source>To ensure it is supported and to enable it, go to the &quot;Motion&quot; tab in Camera Settings.</source>
-      <translation>Чтобы убедиться, что оно поддерживается, и включить его, перейдите на вкладку &quot;Движение&quot; в настройках камеры.</translation>
+      <source>Dual-streaming is disabled or not supported</source>
+      <translation type="unfinished">Dual-streaming is disabled or not supported</translation>
     </message>
   </context>
   <context>
@@ -9403,6 +9399,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>plugin is optional and is not in the white list</source>
       <translation type="unfinished">plugin is optional and is not in the white list</translation>
+    </message>
+    <message>
+      <source>internal error</source>
+      <translation>внутренняя ошибка</translation>
     </message>
   </context>
   <context>
@@ -9537,11 +9537,11 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::SystemHealthListModel::Private</name>
     <message numerus="yes">
       <source>Email address is not set for %n users</source>
-      <translation type="unfinished">
-        <numerusform>Email address is not set for %n users</numerusform>
-        <numerusform>Email address is not set for %n users</numerusform>
-        <numerusform>Email address is not set for %n users</numerusform>
-        <numerusform>Email address is not set for %n users</numerusform>
+      <translation>
+        <numerusform>Адрес электронной почты не установлен для %n пользователя</numerusform>
+        <numerusform>Адрес электронной почты не установлен для %n пользователей</numerusform>
+        <numerusform>Адрес электронной почты не установлен для %n пользователей</numerusform>
+        <numerusform>Адрес электронной почты не установлен для %n пользователей</numerusform>
       </translation>
     </message>
     <message>
@@ -9562,16 +9562,16 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Double click to add cameras to the current layout or ctrl+click to open in a new tab</source>
-      <translation type="unfinished">
-        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
-        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
-        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
-        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
+      <translation>
+        <numerusform>Дважды щелкните чтобы добавить камеры на текущую раскладку или нажмите Ctrl и щелкните чтобы открыть в новой вкладке</numerusform>
+        <numerusform>Дважды щелкните чтобы добавить камеры на текущую раскладку или нажмите Ctrl и щелкните чтобы открыть в новой вкладке</numerusform>
+        <numerusform>Дважды щелкните чтобы добавить камеры на текущую раскладку или нажмите Ctrl и щелкните чтобы открыть в новой вкладке</numerusform>
+        <numerusform>Дважды щелкните чтобы добавить камеры на текущую раскладку или нажмите Ctrl и щелкните чтобы открыть в новой вкладке</numerusform>
       </translation>
     </message>
     <message>
       <source>No available archive</source>
-      <translation type="unfinished">No available archive</translation>
+      <translation>Нет доступного архива</translation>
     </message>
   </context>
   <context>
@@ -9594,7 +9594,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>VMS Time</source>
-      <translation type="unfinished">VMS Time</translation>
+      <translation>Время VMS</translation>
     </message>
   </context>
   <context>
@@ -9779,23 +9779,23 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Saving layout</source>
-      <translation type="unfinished">Saving layout</translation>
+      <translation>Сохранение раскладки</translation>
     </message>
     <message>
       <source>Stop Saving</source>
-      <translation type="unfinished">Stop Saving</translation>
+      <translation>Остановить сохранение</translation>
     </message>
     <message>
       <source>Saving failed</source>
-      <translation type="unfinished">Saving failed</translation>
+      <translation>Ошибка сохранения</translation>
     </message>
     <message>
       <source>Starting saving...</source>
-      <translation type="unfinished">Starting saving...</translation>
+      <translation>Начинается сохранение...</translation>
     </message>
     <message>
       <source>We are preparing files for the export process. Please wait for a few seconds.</source>
-      <translation type="unfinished">We are preparing files for the export process. Please wait for a few seconds.</translation>
+      <translation>Мы готовим файлы для экспорта. Пожалуйста, подождите несколько секунд.</translation>
     </message>
   </context>
   <context>
@@ -9832,7 +9832,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::integrations::entropix::ReconstructResolutionIntegration</name>
     <message>
       <source>Reconstruct Resolution</source>
-      <translation type="unfinished">Reconstruct Resolution</translation>
+      <translation>Восстановить разрешение</translation>
     </message>
   </context>
   <context>
@@ -9873,26 +9873,26 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::ui::PluginDiagnosticEventModel</name>
     <message>
       <source>Any Plugin</source>
-      <translation type="unfinished">Any Plugin</translation>
+      <translation>Любой плагин</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ui::PluginDiagnosticEventWidget</name>
     <message>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the caption with any of the entered keywords.</translation>
+      <translation>Событие будет срабатывать только в том случае, если в заголовке есть совпадения с любым из введенных ключевых слов.</translation>
     </message>
     <message>
       <source>If the field is empty, event will always trigger.</source>
-      <translation type="unfinished">If the field is empty, event will always trigger.</translation>
+      <translation>Если поле пустое, событие всегда будет вызываться.</translation>
     </message>
     <message>
       <source>This field is case sensitive.</source>
-      <translation type="unfinished">This field is case sensitive.</translation>
+      <translation>Это поле чувствительно к регистру.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the description field with any of the entered keywords.</translation>
+      <translation>Событие будет срабатывать только в том случае, если в описании есть совпадения с любым из введенных ключевых слов.</translation>
     </message>
   </context>
   <context>

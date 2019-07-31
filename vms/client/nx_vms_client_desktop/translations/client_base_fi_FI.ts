@@ -944,6 +944,14 @@ nähdäksesi lisää kirjanmerkkejä</translation>
       <source>Objects Frames and Info...</source>
       <translation>Objektien kuvat ja tiedot...</translation>
     </message>
+    <message>
+      <source>Pin Calendar</source>
+      <translation type="unfinished">Pin Calendar</translation>
+    </message>
+    <message>
+      <source>Unpin Calendar</source>
+      <translation type="unfinished">Unpin Calendar</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -4244,7 +4252,7 @@ to %1</source>
     </message>
     <message>
       <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
-      <translation type="unfinished">&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</translation>
+      <translation>&quot;Virtuaalikamera&quot; on virtuaalinen tallennustila videotiedostoille, jotka voidaan ladata mihin tahansa järjestelmän palvelimeen, ja jokainen käyttäjä voi käyttää sitä.</translation>
     </message>
   </context>
   <context>
@@ -7584,6 +7592,10 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
       <source>This action cannot be undone.</source>
       <translation>Tätä toimintoa ei voi peruuttaa.</translation>
     </message>
+    <message>
+      <source>Motion detection stream is disabled</source>
+      <translation type="unfinished">Motion detection stream is disabled</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraScheduleWidget</name>
@@ -8439,8 +8451,8 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
       <translation>Määritetyllä IP-osoitealueella on yli 255 osoitetta.</translation>
     </message>
     <message>
-      <source>Can&apos;t start searching process</source>
-      <translation>Voiko&apos;t aloittaa hakuprosessin</translation>
+      <source>Can not start the search process</source>
+      <translation type="unfinished">Can not start the search process</translation>
     </message>
   </context>
   <context>
@@ -8697,10 +8709,6 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
       <translation>Ei yhteydessä olevia palvelimia päivitettäväksi.</translation>
     </message>
     <message>
-      <source>Some servers haven&apos;t completed update process. Finish it anyway?</source>
-      <translation>Joidenkin palvelinten&apos;t päivitykset eivät ole valmiit. Viimeistele se joka tapauksessa?</translation>
-    </message>
-    <message>
       <source>Cancel update and delete all downloaded data?</source>
       <translation>Peruuta päivitys ja poista kaikki ladatut tiedot?</translation>
     </message>
@@ -8764,6 +8772,10 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
       <source>Please please contact Customer Support.</source>
       <translation type="unfinished">Please please contact Customer Support.</translation>
     </message>
+    <message>
+      <source>Some servers have not completed the update process. Finish it anyway?</source>
+      <translation type="unfinished">Some servers have not completed the update process. Finish it anyway?</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::MultipleLayoutSelectionDialog</name>
@@ -8820,10 +8832,6 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
   <context>
     <name>nx::vms::client::desktop::OpenLayoutActionWidget</name>
     <message>
-      <source>Some users don&apos;t have access to the selected layout. Action will not work for them.</source>
-      <translation>Joillakin käyttäjillä &apos;1 ei pääsyä valittuun asetteluun. Toiminto ei ole mahdollista.</translation>
-    </message>
-    <message>
       <source>None of selected users have access to the selected layout. Action will not work.</source>
       <translation>Yksikään valituista käyttäjistä ei pääse valittuun asetteluun. Toiminto ei toimi.</translation>
     </message>
@@ -8842,6 +8850,10 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
     <message>
       <source>None of selected user roles contain users. Action will not work.</source>
       <translation>Yksikään valituista käyttäjärooleista ei sisällä käyttäjiä. Toiminto ei toimi.</translation>
+    </message>
+    <message>
+      <source>Some users do not have access to the selected layout. Action will not work for them.</source>
+      <translation type="unfinished">Some users do not have access to the selected layout. Action will not work for them.</translation>
     </message>
   </context>
   <context>
@@ -8940,7 +8952,7 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
     </message>
     <message>
       <source>This OS version is no longer supported.</source>
-      <translation type="unfinished">This OS version is no longer supported.</translation>
+      <translation>Tätä käyttöjärjestelmän versiota ei enää tueta.</translation>
     </message>
   </context>
   <context>
@@ -9047,28 +9059,12 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
       <translation>Lisää asetuksia</translation>
     </message>
     <message>
-      <source>Dual-Streaming not supported for this camera</source>
-      <translation>Tämä kamera ei tue Dual-Streamingia</translation>
+      <source>Motion detection is disabled or not supported</source>
+      <translation type="unfinished">Motion detection is disabled or not supported</translation>
     </message>
     <message>
-      <source>Dual-Streaming and motion detection not supported for this camera</source>
-      <translation>Dual-Streaming- ja liikkeentunnistus ei ole tuettu tässä kamerassa</translation>
-    </message>
-    <message>
-      <source>Motion detection disabled</source>
-      <translation>Liikkeentunnistus on poistettu käytöstä</translation>
-    </message>
-    <message>
-      <source>To enable or adjust it, go to the &quot;Motion&quot; tab in Camera Settings</source>
-      <translation>Jos haluat ottaa sen käyttöön tai muuttaa sitä, siirry kameran asetuksiin &quot;Liike&quot; -välilehdelle</translation>
-    </message>
-    <message>
-      <source>Motion detection disabled or not supported</source>
-      <translation>Liikkeentunnistus on poistettu käytöstä tai sitä ei tueta</translation>
-    </message>
-    <message>
-      <source>To ensure it is supported and to enable it, go to the &quot;Motion&quot; tab in Camera Settings.</source>
-      <translation>Varmista, että se on tuettu ja otettu käyttöön, siirry kameran asetuksiin &quot;Motion&quot; -välilehdelle.</translation>
+      <source>Dual-streaming is disabled or not supported</source>
+      <translation type="unfinished">Dual-streaming is disabled or not supported</translation>
     </message>
   </context>
   <context>
@@ -9098,7 +9094,7 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
     </message>
     <message>
       <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
-      <translation type="unfinished">Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</translation>
+      <translation>Vesileimat näkyvät reaaliaikaisen, arkistoitujen ja vietyjen videoiden kautta vain muille kuin hallinnollisille käyttäjille. Sinä ja muut ylläpitäjät eivät näe niitä.</translation>
     </message>
   </context>
   <context>
@@ -9162,6 +9158,10 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
     <message>
       <source>plugin is optional and is not in the white list</source>
       <translation>plugin on valinnainen eikä se ole valkoisessa luettelossa</translation>
+    </message>
+    <message>
+      <source>internal error</source>
+      <translation>sisäinen virhe</translation>
     </message>
   </context>
   <context>
@@ -9622,26 +9622,26 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
     <name>nx::vms::client::desktop::ui::PluginDiagnosticEventModel</name>
     <message>
       <source>Any Plugin</source>
-      <translation type="unfinished">Any Plugin</translation>
+      <translation>Kaikki laajennukset</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ui::PluginDiagnosticEventWidget</name>
     <message>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the caption with any of the entered keywords.</translation>
+      <translation>Tapahtuma käynnistyy vain, jos otsikko sisältää yhtään syötettyä avainsanaa.</translation>
     </message>
     <message>
       <source>If the field is empty, event will always trigger.</source>
-      <translation type="unfinished">If the field is empty, event will always trigger.</translation>
+      <translation>Jos kenttä on tyhjä, tapahtuma käynnistyy aina.</translation>
     </message>
     <message>
       <source>This field is case sensitive.</source>
-      <translation type="unfinished">This field is case sensitive.</translation>
+      <translation>Tämä kenttä on merkkikokoriippuvainen.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the description field with any of the entered keywords.</translation>
+      <translation>Tapahtuma käynnistyy vain, jos kuvaus sisältää yhtään syötettyä avainsanaa.</translation>
     </message>
   </context>
   <context>

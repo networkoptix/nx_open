@@ -2098,22 +2098,22 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/ui/event_rules/widgets/plugin_diagnostic_event_widget.ui"/>
       <source>Source:</source>
-      <translation type="unfinished">Source:</translation>
+      <translation>Nguồn:</translation>
     </message>
     <message>
       <location/>
       <source>Caption contains:</source>
-      <translation type="unfinished">Caption contains:</translation>
+      <translation>Chú thích có chứa:</translation>
     </message>
     <message>
       <location/>
       <source>Keywords separated by space</source>
-      <translation type="unfinished">Keywords separated by space</translation>
+      <translation>Từ khóa ngăn cách bởi không gian</translation>
     </message>
     <message>
       <location/>
       <source>Description contains:</source>
-      <translation type="unfinished">Description contains:</translation>
+      <translation>Mô tả chứa:</translation>
     </message>
     <message>
       <location/>

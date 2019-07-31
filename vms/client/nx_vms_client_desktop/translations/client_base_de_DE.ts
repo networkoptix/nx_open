@@ -943,6 +943,14 @@ to view more bookmarks</source>
       <source>Objects Frames and Info...</source>
       <translation>Objekte Frames und Info...</translation>
     </message>
+    <message>
+      <source>Pin Calendar</source>
+      <translation>Kalendar anpinnen</translation>
+    </message>
+    <message>
+      <source>Unpin Calendar</source>
+      <translation>Kalendar abdocken</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -4242,7 +4250,7 @@ to %1</source>
     </message>
     <message>
       <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
-      <translation type="unfinished">&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</translation>
+      <translation>&quot;Virtuelle Kamera&quot; ist ein virtueller Speicher für Videodateien, der auf jeden Server auf Ihrem System hochgeladen werden kann und von jedem Benutzer zugänglich ist.</translation>
     </message>
   </context>
   <context>
@@ -7349,7 +7357,7 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     </message>
     <message>
       <source>Unknown track</source>
-      <translation type="unfinished">Unknown track</translation>
+      <translation>Unbekannter Titel</translation>
     </message>
   </context>
   <context>
@@ -7581,6 +7589,10 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     <message>
       <source>This action cannot be undone.</source>
       <translation>Diese Aktion kann nicht rückgängig gemacht werden.</translation>
+    </message>
+    <message>
+      <source>Motion detection stream is disabled</source>
+      <translation type="unfinished">Motion detection stream is disabled</translation>
     </message>
   </context>
   <context>
@@ -8437,8 +8449,8 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
       <translation>Der definierte Adressbereich umfasst mehr als 255 Adressen.</translation>
     </message>
     <message>
-      <source>Can&apos;t start searching process</source>
-      <translation>Kann den Suchvorgang nicht starten</translation>
+      <source>Can not start the search process</source>
+      <translation type="unfinished">Can not start the search process</translation>
     </message>
   </context>
   <context>
@@ -8695,10 +8707,6 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
       <translation>Es gibt keine Onlineserver zum Aktualisieren.</translation>
     </message>
     <message>
-      <source>Some servers haven&apos;t completed update process. Finish it anyway?</source>
-      <translation>Einige Server haben den Updateprozess nicht abgeschlossen. Trotzdem beenden?</translation>
-    </message>
-    <message>
       <source>Cancel update and delete all downloaded data?</source>
       <translation>Update abbrechen und alle heruntergeladenen Daten löschen?</translation>
     </message>
@@ -8752,15 +8760,19 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     </message>
     <message>
       <source>Some servers have no update packages available.</source>
-      <translation type="unfinished">Some servers have no update packages available.</translation>
+      <translation>Auf einigen Servern sind keine Aktualisierungspakete verfügbar.</translation>
     </message>
     <message>
       <source>Some servers have encountered an internal error.</source>
-      <translation type="unfinished">Some servers have encountered an internal error.</translation>
+      <translation>Bei einigen Servern ist ein interner Fehler aufgetreten.</translation>
     </message>
     <message>
       <source>Please please contact Customer Support.</source>
-      <translation type="unfinished">Please please contact Customer Support.</translation>
+      <translation>Bitte kontaktieren Sie den Kundensupport.</translation>
+    </message>
+    <message>
+      <source>Some servers have not completed the update process. Finish it anyway?</source>
+      <translation type="unfinished">Some servers have not completed the update process. Finish it anyway?</translation>
     </message>
   </context>
   <context>
@@ -8818,10 +8830,6 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
   <context>
     <name>nx::vms::client::desktop::OpenLayoutActionWidget</name>
     <message>
-      <source>Some users don&apos;t have access to the selected layout. Action will not work for them.</source>
-      <translation>Einige Benutzer haben keinen Zugriff auf das ausgewählte Layout. Aktion wird für sie nicht funktionieren.</translation>
-    </message>
-    <message>
       <source>None of selected users have access to the selected layout. Action will not work.</source>
       <translation>Keiner der ausgewählten Benutzer hat Zugriff auf das ausgewählte Layout. Aktion wird nicht funktionieren.</translation>
     </message>
@@ -8840,6 +8848,10 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     <message>
       <source>None of selected user roles contain users. Action will not work.</source>
       <translation>Keine der ausgewählten Benutzerrollen enthält Benutzer. Aktion wird nicht funktionieren.</translation>
+    </message>
+    <message>
+      <source>Some users do not have access to the selected layout. Action will not work for them.</source>
+      <translation type="unfinished">Some users do not have access to the selected layout. Action will not work for them.</translation>
     </message>
   </context>
   <context>
@@ -8938,7 +8950,7 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     </message>
     <message>
       <source>This OS version is no longer supported.</source>
-      <translation type="unfinished">This OS version is no longer supported.</translation>
+      <translation>Diese Betriebssystemversion wird nicht mehr unterstützt.</translation>
     </message>
   </context>
   <context>
@@ -9045,28 +9057,12 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
       <translation>Weitere Einstellungen</translation>
     </message>
     <message>
-      <source>Dual-Streaming not supported for this camera</source>
-      <translation>Dual-Streaming wird von dieser Kamera nicht unterstützt</translation>
+      <source>Motion detection is disabled or not supported</source>
+      <translation type="unfinished">Motion detection is disabled or not supported</translation>
     </message>
     <message>
-      <source>Dual-Streaming and motion detection not supported for this camera</source>
-      <translation>Dual-Streaming und Bewegungserkennung werden für diese Kamera nicht unterstützt</translation>
-    </message>
-    <message>
-      <source>Motion detection disabled</source>
-      <translation>Bewegungserkennung ist deaktiviert</translation>
-    </message>
-    <message>
-      <source>To enable or adjust it, go to the &quot;Motion&quot; tab in Camera Settings</source>
-      <translation>Um es zu aktivieren/anzupassen, wechseln Sie zur Registerkarte &quot;Motion&quot; in den Kameraeinstellungen</translation>
-    </message>
-    <message>
-      <source>Motion detection disabled or not supported</source>
-      <translation>Bewegungserkennung ist deaktiviert oder wird nicht unterstützt</translation>
-    </message>
-    <message>
-      <source>To ensure it is supported and to enable it, go to the &quot;Motion&quot; tab in Camera Settings.</source>
-      <translation>Um sicherzustellen, dass es unterstützt wird und um es zu aktivieren, wechseln Sie zur Registerkarte &quot;Motion&quot; in den Kameraeinstellungen.</translation>
+      <source>Dual-streaming is disabled or not supported</source>
+      <translation type="unfinished">Dual-streaming is disabled or not supported</translation>
     </message>
   </context>
   <context>
@@ -9096,7 +9092,7 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     </message>
     <message>
       <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
-      <translation type="unfinished">Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</translation>
+      <translation>Wasserzeichen werden nur für Nicht-Administratoren über Livevideos angezeigt, archiviert und exportiert. Sie und andere Administratoren werden sie nicht sehen.</translation>
     </message>
   </context>
   <context>
@@ -9161,6 +9157,10 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
       <source>plugin is optional and is not in the white list</source>
       <translation>Plugin ist optional und nicht in der Whitelist</translation>
     </message>
+    <message>
+      <source>internal error</source>
+      <translation>interner Fehler</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerStatusItemDelegate</name>
@@ -9197,7 +9197,7 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     </message>
     <message>
       <source>Server error.</source>
-      <translation type="unfinished">Server error.</translation>
+      <translation>Serverfehler.</translation>
     </message>
   </context>
   <context>
@@ -9620,26 +9620,26 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     <name>nx::vms::client::desktop::ui::PluginDiagnosticEventModel</name>
     <message>
       <source>Any Plugin</source>
-      <translation type="unfinished">Any Plugin</translation>
+      <translation>Jedes Plugin</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ui::PluginDiagnosticEventWidget</name>
     <message>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the caption with any of the entered keywords.</translation>
+      <translation>Das Ereignis wird nur ausgelöst, wenn es Übereinstimmungen mit einem der eingegebenen Schlüsselwörter gibt.</translation>
     </message>
     <message>
       <source>If the field is empty, event will always trigger.</source>
-      <translation type="unfinished">If the field is empty, event will always trigger.</translation>
+      <translation>Wenn das Feld leer ist, wird immer ein Ereignis ausgelöst.</translation>
     </message>
     <message>
       <source>This field is case sensitive.</source>
-      <translation type="unfinished">This field is case sensitive.</translation>
+      <translation>In diesem Feld wird zwischen Groß- und Kleinschreibung unterschieden.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the description field with any of the entered keywords.</translation>
+      <translation>Das Ereignis wird nur ausgelöst, wenn im Beschreibungsfeld Übereinstimmungen mit einem der eingegebenen Schlüsselwörter vorhanden sind.</translation>
     </message>
   </context>
   <context>

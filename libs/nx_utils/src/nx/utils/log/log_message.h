@@ -41,7 +41,7 @@ public:
     Message args(const Values& ... values) const
     {
         using ::toString;
-        return m_str.arg(toString(values) ...);
+        return m_str.arg(toString(toString(values)) ...);
     }
 
     template<typename ... Arguments>
@@ -51,6 +51,7 @@ public:
     }
 
     // QString number format compatibility.
+    Message arg(const std::string& s) const { return arg(s.c_str()); };
     Message arg(int value, int width = 0, int base = 10, const QChar& fill = kSpace) const;
     Message arg(uint value, int width = 0, int base = 10, const QChar& fill = kSpace) const;
     Message arg(long value, int width = 0, int base = 10, const QChar& fill = kSpace) const;

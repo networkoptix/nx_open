@@ -192,17 +192,17 @@
     },
     "common": {
         "voiceCommands": {
-            "search": "find + [text for searchbar]",
+            "search": "trouver + [texte barre de recherche]",
             "pause": "pause",
-            "help": "help | show commands",
+            "help": "aide | afficher commandes",
             "collapse all servers": "réduire tous les serveurs",
-            "collapse server": "collapse server + [server name]",
+            "collapse server": "réduire serveur + [nom serveur]",
             "play": "lecture",
             "clear search": "effacer la recherche",
-            "live": "go to live | show me live",
+            "live": "aller en direct | M'afficher le direct",
             "expand all servers": "développer tous les serveurs",
             "stop listening": "arrêter l’écoute",
-            "expand server": "expand server + [server name]",
+            "expand server": "étendre le serveur + [nom du serveur]",
             "view": "vue + [nom de la caméra]"
         },
         "systemOffline": "System Hors ligne",

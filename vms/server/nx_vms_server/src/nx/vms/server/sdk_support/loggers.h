@@ -11,6 +11,8 @@
 
 #include <nx/utils/log/log.h>
 
+class PluginManager;
+
 namespace nx::vms::server::sdk_support {
 
 class AbstractManifestLogger
@@ -65,7 +67,8 @@ class StartupPluginManifestLogger: public AbstractManifestLogger
 public:
     StartupPluginManifestLogger(
         nx::utils::log::Tag logTag,
-        const nx::sdk::analytics::IPlugin* plugin);
+        const nx::sdk::analytics::IPlugin* plugin,
+        const PluginManager* pluginManager);
 
     virtual void log(
         const QString& manifestStr,
@@ -74,6 +77,7 @@ public:
 private:
     nx::utils::log::Tag m_logTag;
     const nx::sdk::analytics::IPlugin* m_plugin = nullptr;
+    const PluginManager* const m_pluginManager;
 };
 
 } // namespace nx::vms::server::sdk_support

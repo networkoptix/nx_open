@@ -873,7 +873,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Analytics Engine Settings...</source>
-      <translation>解析エンジンの設定...</translation>
+      <translation>分析エンジンの設定...</translation>
     </message>
     <message>
       <source>Show Thumbnails</source>
@@ -942,6 +942,14 @@ to view more bookmarks</source>
     <message>
       <source>Objects Frames and Info...</source>
       <translation>オブジェクトフレームと情報...</translation>
+    </message>
+    <message>
+      <source>Pin Calendar</source>
+      <translation>カレンダー固定</translation>
+    </message>
+    <message>
+      <source>Unpin Calendar</source>
+      <translation>カレンダー固定解除</translation>
     </message>
   </context>
   <context>
@@ -2014,7 +2022,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Force Acknowledgement will only work for Generic Events if camera modifiers are used in the Generic Event URL</source>
-      <translation>カメライベントが汎用イベントで使用されている場合、強制承認は汎用イベントに対してのみ機能します</translation>
+      <translation>カメライベントが一般イベントで使用されている場合、強制承認は一般的イベントに対してのみ機能します</translation>
     </message>
   </context>
   <context>
@@ -2103,7 +2111,7 @@ to view more bookmarks</source>
     <name>QnCameraAnalyticsPolicy</name>
     <message>
       <source>Analytics is not available for %1</source>
-      <translation>%1では解析を利用できません</translation>
+      <translation>%1では分析を利用できません</translation>
     </message>
   </context>
   <context>
@@ -2751,7 +2759,7 @@ to %1</source>
     </message>
     <message>
       <source>To generate Generic Event, please refer to %1.</source>
-      <translation>汎用イベントを生成するには、 %1を参照してください。</translation>
+      <translation>一般的イベントを生成するには、 %1を参照してください。</translation>
     </message>
   </context>
   <context>
@@ -2915,7 +2923,7 @@ to %1</source>
     <message>
       <source>All %1 users will be deleted.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>すべての %1 ユーザーが削除されます</translation>
+      <translation>すべての %1 ユーザーが削除されます。</translation>
     </message>
     <message>
       <source>You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</source>
@@ -2924,14 +2932,14 @@ to %1</source>
     </message>
     <message>
       <source>Too many attempts. Try again in a minute.</source>
-      <translation>試行回数が多すぎます。暫くしてからもう一度お試しください</translation>
+      <translation>試行回数が多すぎます。しばらくしてからもう一度お試しください。</translation>
     </message>
   </context>
   <context>
     <name>QnEmptyBusinessActionWidget</name>
     <message>
       <source>Panic Recording mode switches recording settings for all cameras to maximum FPS and quality.</source>
-      <translation>パニック録画モードは、すべてのカメラの録画設定を最大FPSと品質に切り替えます</translation>
+      <translation>パニック録画モードは、すべてのカメラの録画設定を最大FPSと品質に切り替えます。</translation>
     </message>
   </context>
   <context>
@@ -2972,14 +2980,14 @@ to %1</source>
       <source>Event log for period from %1 to %2 - %n events found</source>
       <comment>Dates are substituted</comment>
       <translation>
-        <numerusform>%1 から %2 - %n の期間のイベント ログ</numerusform>
+        <numerusform>%1 から %2 までの期間のイベントログ - %n イベントが見つかりました</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Event log for %1 - %n events found</source>
       <comment>Date is substituted</comment>
       <translation>
-        <numerusform>%1 - %n イベントログが見つかりました</numerusform>
+        <numerusform>イベントログ%1 - %n イベントが見つかりました</numerusform>
       </translation>
     </message>
   </context>
@@ -3137,11 +3145,11 @@ to %1</source>
     <name>QnFullscreenCameraActionWidget</name>
     <message>
       <source>This camera is not currently on the selected layout. Action will work if camera is added before action triggers.</source>
-      <translation>このカメラは現在選択されているレイアウトに含まれていません　アクションが実行される前にカメラを追加すればアクションは動作します</translation>
+      <translation>このカメラは現在選択されているレイアウトに含まれていません　アクションが実行される前にカメラを追加すればアクションは動作します。</translation>
     </message>
     <message>
       <source>This camera is not currently on some of the selected layouts. Action will work if camera is added before action triggers.</source>
-      <translation>このカメラは現在選択されているレイアウトに含まれていません。アクションが実行される前にカメラを追加すればアクションは動作します</translation>
+      <translation>このカメラは現在選択されているレイアウトに含まれていません。アクションが実行される前にカメラを追加すればアクションは動作します。</translation>
     </message>
   </context>
   <context>
@@ -3368,7 +3376,7 @@ to %1</source>
     </message>
     <message>
       <source>Changing any LDAP settings other than &quot;Search Filter&quot; will result in connectivity loss for all LDAP fetched users.</source>
-      <translation>&quot;検索フィルター&quot; 以外のLDAP設定を変更すると、すべてのLDAPフェッチユーザーの接続が失われます</translation>
+      <translation>&quot;検索フィルター&quot; 以外のLDAP設定を変更すると、すべてのLDAPフェッチユーザーの接続が失われます。</translation>
     </message>
   </context>
   <context>
@@ -3468,7 +3476,7 @@ to %1</source>
     </message>
     <message>
       <source>Locked to Hardware ID</source>
-      <translation>ハードウェアID</translation>
+      <translation>ハードウェアIDのロック</translation>
     </message>
   </context>
   <context>
@@ -3722,11 +3730,11 @@ to %1</source>
     </message>
     <message>
       <source>This license is already activated and linked to Hardware ID %1</source>
-      <translation>このライセンスは既にアクティベートされハードウェア ID %1 にリンクされています</translation>
+      <translation>このライセンスは既に有効化され、ハードウェア ID %1 にリンクされています</translation>
     </message>
     <message>
       <source>This license is already activated and linked to Hardware ID %1 on %2</source>
-      <translation>このライセンスは既にアクティベートされ %2 のハードウェア ID %1 にリンクされています</translation>
+      <translation>このライセンスは既に有効化され、%2 のハードウェア ID %1 にリンクされています</translation>
     </message>
     <message>
       <source>Every license can be deactivated only a few times.</source>
@@ -3736,14 +3744,14 @@ to %1</source>
       <source>%1 are currently in use</source>
       <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
       <translation>
-        <numerusform>%1 が現在使用中</numerusform>
+        <numerusform>%1 は現在使用中です</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>At least %1 are required</source>
       <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
       <translation>
-        <numerusform>最低 %1 が必要</numerusform>
+        <numerusform>少なくとも%1 が必要</numerusform>
       </translation>
     </message>
   </context>
@@ -3767,11 +3775,11 @@ to %1</source>
     </message>
     <message>
       <source>Please send email with License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
-      <translation>アクティベーションキー ファイルを取得するにはライセンス キーと %1 で提供されたハードウェア ID を送信してください</translation>
+      <translation>アクティベーションキーファイルを取得するには、ライセンスキーと %1 で提供されたハードウェア IDを送信してください</translation>
     </message>
     <message>
       <source>Please send License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
-      <translation>アクティベーションキー ファイルを取得するにはライセンス キーと %1 で提供されたハードウェア ID を送信してください</translation>
+      <translation>アクティベーションキーファイルを取得するには、ライセンスキーと %1 で提供されたハードウェア ID を送信してください</translation>
     </message>
   </context>
   <context>
@@ -3953,11 +3961,11 @@ to %1</source>
     </message>
     <message>
       <source>Displays IP addresses for cameras and servers and roles for users.</source>
-      <translation>カメラとサーバーのIPアドレスとユーザーの役割を表示</translation>
+      <translation>カメラとサーバーのIPアドレスとユーザーの役割を表示する。</translation>
     </message>
     <message>
       <source>Length of time each camera on layout will be displayed if you start a Tour.</source>
-      <translation>レイアウトツアー開始後にレイアウトに表示する各カメラの時間</translation>
+      <translation>ツアー開始後にレイアウトに表示される各カメラの時間</translation>
     </message>
   </context>
   <context>
@@ -4182,7 +4190,7 @@ to %1</source>
     </message>
     <message>
       <source>Name cannot be empty</source>
-      <translation>名前を空にすることはできません</translation>
+      <translation>名前を入力してください</translation>
     </message>
     <message>
       <source>Virtual Camera</source>
@@ -4194,7 +4202,7 @@ to %1</source>
     </message>
     <message>
       <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
-      <translation type="unfinished">&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</translation>
+      <translation>&quot;バーチャルカメラ&quot; はビデオファイル用の仮想ストレージで、システム上のどのサーバーにもアップロードでき、どのユーザーでもアクセスできます。</translation>
     </message>
   </context>
   <context>
@@ -4666,7 +4674,7 @@ to %1</source>
     </message>
     <message>
       <source>open all</source>
-      <translation>すべてを開く</translation>
+      <translation>すべて開く</translation>
     </message>
     <message>
       <source>All types</source>
@@ -4706,7 +4714,7 @@ to %1</source>
     </message>
     <message>
       <source>Cameras &amp; Devices</source>
-      <translation>カメラ &amp; デバイス</translation>
+      <translation>カメラとデバイス</translation>
     </message>
   </context>
   <context>
@@ -4779,7 +4787,7 @@ to %1</source>
     </message>
     <message>
       <source>Cameras &amp; Devices</source>
-      <translation>カメラ &amp; デバイス</translation>
+      <translation>カメラとデバイス</translation>
     </message>
     <message>
       <source>Videowalls</source>
@@ -4787,7 +4795,7 @@ to %1</source>
     </message>
     <message>
       <source>Analytics Engines</source>
-      <translation>解析エンジン</translation>
+      <translation>分析エンジン</translation>
     </message>
   </context>
   <context>
@@ -5084,7 +5092,7 @@ to %1</source>
     </message>
     <message>
       <source>Servers with failover enabled will automatically take cameras from offline servers.</source>
-      <translation>フェイルオーバーが有効になっているサーバーは、自動的にオフラインサーバーからカメラを引き継ぎます</translation>
+      <translation>フェイルオーバーが有効になっているサーバーは、自動的にオフラインサーバーからカメラを引き継ぎます。</translation>
     </message>
   </context>
   <context>
@@ -5339,7 +5347,7 @@ to %1</source>
     </message>
     <message>
       <source>PASSWORD REQUIRED</source>
-      <translation>パスワードが必要</translation>
+      <translation>パスワードが必要です</translation>
     </message>
     <message>
       <source>Set for this Camera</source>
@@ -5517,7 +5525,7 @@ to %1</source>
     </message>
     <message>
       <source>Reindexing can fix problems with archive or backup if they have been lost or damaged, or if some hardware has been replaced.</source>
-      <translation>アーカイブの再インデックスは、アーカイブやバックアップが紛失または破損した場合、または一部のハードウェアが交換された場合の問題を解決できます</translation>
+      <translation>アーカイブの再インデックスは、アーカイブやバックアップが紛失または破損した場合、または一部のハードウェアが交換された場合に問題を解決できます。</translation>
     </message>
     <message>
       <source>What to do with current analytics data?</source>
@@ -5816,7 +5824,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Some cameras require passwords to be set</source>
-      <translation>幾つかのカメラでパスワードを設定する必要があります</translation>
+      <translation>一部のカメラにパスワードの設定が必要です</translation>
     </message>
     <message>
       <source>No server has internet access for time synchronization</source>
@@ -5832,11 +5840,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>No online server in the System has internet access for time synchronization.</source>
-      <translation>システム内のどのオンラインサーバーにも時間同期のためのインターネットアクセスはありません</translation>
+      <translation>システム内のどのオンラインサーバーにも時間同期のためのインターネットアクセスはありません。</translation>
     </message>
     <message>
       <source>The System is running in safe mode.</source>
-      <translation>システムがセーフ モードで実行されています</translation>
+      <translation>システムがセーフ モードで実行されています。</translation>
     </message>
     <message>
       <source>Error occurred during remote archive synchronization</source>
@@ -5855,11 +5863,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Includes information about system, such as cameras models and firmware versions, number of servers, etc.</source>
-      <translation>カメラのモデルやファームウェアのバージョン、サーバーの数など、システムに関する情報が含まれます</translation>
+      <translation>カメラのモデルやファームウェアのバージョン、サーバーの数など、システムに関する情報が含まれます。</translation>
     </message>
     <message>
       <source>Does not include any personal information and is completely anonymous.</source>
-      <translation>個人情報は含まず、完全に匿名です</translation>
+      <translation>いかなる個人情報も含まず、完全に匿名です。</translation>
     </message>
     <message>
       <source>Failover server measures may still request camera status updates regardless of this setting.</source>
@@ -5928,11 +5936,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>VMS time is synchronized with the Internet and does not depend on local time on servers.</source>
-      <translation>VMSの時間はインターネットと同期しており、サーバーの現地時間には依存しません</translation>
+      <translation>VMSの時間はインターネットと同期しており、サーバーの現地時間には依存しません。</translation>
     </message>
     <message>
       <source>VMS time is synchronized with local time on the selected server and does not depend on local time on other servers.</source>
-      <translation>VMS時間は選択したサーバーの現地時間と同期され、他のサーバーの現地時間には依存しません</translation>
+      <translation>VMSの時間は選択したサーバーの現地時間と同期され、他のサーバーの現地時間には依存しません。</translation>
     </message>
   </context>
   <context>
@@ -6044,7 +6052,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Users can be imported from an LDAP server. They will be able to log in only if LDAP server is online and their accounts are active on it.</source>
-      <translation>ユーザーはLDAPサーバーからインポートできます　 LDAPサーバーがオンラインで、アカウントがアクティブな場合のみ、ログインできます</translation>
+      <translation>ユーザーはLDAPサーバーからインポートできます。 LDAPサーバーがオンラインで、アカウントがアクティブな場合のみ、ログインできます。</translation>
     </message>
   </context>
   <context>
@@ -6234,26 +6242,26 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>%1 user with specified email already exists.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>%1 ユーザーのemailは既に存在します</translation>
+      <translation>指定されたメールアドレスを持つ%1 ユーザーは既に存在します。</translation>
     </message>
     <message>
       <source>Local users</source>
-      <translation>ローカル ユーザー</translation>
+      <translation>ローカルユーザー</translation>
     </message>
     <message>
       <source>%1 users</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>ユーザー %1</translation>
+      <translation>%1ユーザー</translation>
     </message>
     <message>
       <source>%1 belong to this system only and are fully managed by system administrators.</source>
       <comment>%1 is local users definition, e.g. &apos;Local users&apos;</comment>
-      <translation>%1 はこのシステムに属し、システム管理者によって完全に管理されます</translation>
+      <translation>%1 はこのシステムにのみ属し、システム管理者によって完全に管理されています。</translation>
     </message>
     <message>
       <source>%1 can have access to many Systems. Administrators can manage their rights only.</source>
       <comment>%1 is cloud users definition, e.g. &apos;Cloud users&apos;</comment>
-      <translation>%1 は、多くのシステムへアクセスできます。管理者は、自分の権利のみを管理できます</translation>
+      <translation>%1 は、多くのシステムへアクセスできます。管理者は、自分の権利のみを管理できます。</translation>
     </message>
   </context>
   <context>
@@ -6405,7 +6413,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Video Wall is removed on the server and will be closed.</source>
-      <translation>ビデオウォールは削除され、終了します</translation>
+      <translation>ビデオウォールはサーバーから削除され、終了します。</translation>
     </message>
   </context>
   <context>
@@ -6449,15 +6457,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>%1 has been successfully configured.</source>
-      <translation>%1 は正常に構成されました</translation>
+      <translation>%1 は正常に設定されました。</translation>
     </message>
     <message>
       <source>To complete the process, please connect to it with Client and update to version %1.</source>
-      <translation>プロセスを完了するには、クライアントで接続してバージョン %1にアップデートしてください</translation>
+      <translation>プロセスを完了するには、クライアントで接続してバージョン %1にアップデートしてください。</translation>
     </message>
     <message>
       <source>Failed to merge %1 to our system.</source>
-      <translation>システムに %1 を統合できませんでした</translation>
+      <translation>システムに %1 を統合できませんでした。</translation>
     </message>
   </context>
   <context>
@@ -6677,15 +6685,15 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnWorkbenchWearableHandler</name>
     <message>
       <source>Only video files with correct timestamp are supported.</source>
-      <translation>正しいタイムスタンプを持つビデオファイルのみがサポートされます</translation>
+      <translation>正しいタイムスタンプを持つビデオファイルのみがサポートされています。</translation>
     </message>
     <message>
       <source>Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</source>
-      <translation>別のユーザー &quot;%1&quot; が現在このカメラに映像をアップロードしているため、アップロードを開始できませんでした</translation>
+      <translation>別のユーザー &quot;%1&quot; が現在このカメラに映像をアップロードしているため、アップロードを開始できませんでした。</translation>
     </message>
     <message>
       <source>Could not start upload as another user is currently uploading footage to this camera.</source>
-      <translation>別のユーザーが現在このカメラに映像をアップロードしているため、アップロードを開始できませんでした</translation>
+      <translation>別のユーザーが現在このカメラに映像をアップロードしているため、アップロードを開始できませんでした。</translation>
     </message>
     <message>
       <source>No video files found in selected folder</source>
@@ -6699,7 +6707,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Use .MKV, .AVI, .MP4 or other video files.</source>
-      <translation>MKV、AVI、MP4、またはその他のビデオファイルを使用してください</translation>
+      <translation>MKV、AVI、MP4、またはその他のビデオファイルを使用してください。</translation>
     </message>
     <message numerus="yes">
       <source>Selected files do not have timestamps</source>
@@ -6740,30 +6748,30 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
       <translation>
-        <numerusform>選択したファイルは %1に記録されましたが、最後の %n 日に録画されたファイルのみをアップロードできます。これはカメラのアーカイブ設定で変更できます</numerusform>
+        <numerusform>選択したファイルは %1に記録されましたが、最後の %n 日に録画されたファイルのみをアップロードできます。これはカメラのアーカイブ設定で変更できます。</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
       <translation>
-        <numerusform>選択したファイルは %1 から %2の間で記録されましたが、最後の %n 日に記録されたファイルのみをアップロードできます。これはカメラのアーカイブ設定で変更できます</numerusform>
+        <numerusform>選択したファイルは %1 から %2の間で記録されましたが、最後の %n 日に記録されたファイルのみをアップロードできます。これはカメラのアーカイブ設定で変更できます。</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Some footage may be deleted after uploading these files</source>
       <translation>
-        <numerusform>これらのファイルをアップロードした後に一部の映像が削除されることがあります</numerusform>
+        <numerusform>これらのファイルをアップロードした後、一部の映像が削除されることがあります</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</source>
       <translation>
-        <numerusform>サーバーストレージには空き容量がほとんどありません。いくつかの古い映像は、空き容量を増やすために削除されることがあります。選択したファイルがサーバー上で最も古いファイルの場合は、アップロードされた直後に削除されます</numerusform>
+        <numerusform>サーバーストレージには空き容量がほとんどありません。一部の古い映像は空き容量を増やすために削除されることがあります。選択したファイルがサーバー上で最も古いファイルの場合は、アップロードされた直後に削除されます。</numerusform>
       </translation>
     </message>
     <message>
       <source>To prevent this you can add additional storage. You can also control which footage will be deleted first by changing archive keep time in camera settings.</source>
-      <translation>これを防ぐために、追加のストレージを追加することができます。また、カメラ設定でアーカイブの保持時間を変更することで、最初に削除する映像を制御することもできます</translation>
+      <translation>これを防ぐために、追加のストレージを追加することができます。また、カメラ設定でアーカイブの保持時間を変更することで、最初に削除する映像を制御することもできます。</translation>
     </message>
     <message>
       <source>Upload anyway?</source>
@@ -6775,7 +6783,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Make sure there is enough space on server storage.</source>
-      <translation>サーバーストレージに十分なスペースがあることを確認してください</translation>
+      <translation>サーバーストレージに十分なスペースがあることを確認してください。</translation>
     </message>
     <message>
       <source>Not enough space on server storage</source>
@@ -6787,7 +6795,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Already uploaded files will be kept.</source>
-      <translation>既にアップロードされたファイルは保管されます</translation>
+      <translation>既にアップロードされたファイルは保管されます。</translation>
     </message>
     <message>
       <source>Uploading footage</source>
@@ -6804,33 +6812,33 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>You can upload these files to a different instance of a Virtual Camera.</source>
       <translation>
-        <numerusform>これらのファイルは別のバーチャルカメラにアップロードできます</numerusform>
+        <numerusform>これらのファイルは別のバーチャルカメラにアップロードできます。</numerusform>
       </translation>
     </message>
     <message>
       <source>%1 has unsupported format.</source>
       <comment>Filename will be substituted</comment>
-      <translation>%1 - サポートされていないフォーマット</translation>
+      <translation>%1 はサポートされていないフォーマットです。</translation>
     </message>
     <message>
       <source>%1 does not have timestamp.</source>
       <comment>Filename will be substituted</comment>
-      <translation>%1 - タイムスタンプがありません</translation>
+      <translation>%1には タイムスタンプがありません。</translation>
     </message>
     <message>
       <source>%1 is older than allowed in camera archive settings.</source>
       <comment>Filename will be substituted</comment>
-      <translation>%1 - カメラのアーカイブ設定より古いです</translation>
+      <translation>%1はカメラのアーカイブ設定より古いです。</translation>
     </message>
     <message>
       <source>%1 covers period for which video has already been uploaded.</source>
       <comment>Filename will be substituted</comment>
-      <translation>ファイル %1 は既にアップロードされているビデオの期間と重複します</translation>
+      <translation>%1 は既にアップロードされているビデオの期間と重複します。</translation>
     </message>
     <message>
       <source>%1 covers period for which video is being uploaded.</source>
       <comment>Filename will be substituted</comment>
-      <translation>ファイル %1 は既にアップロードされているビデオの期間と重複します</translation>
+      <translation>%1 は既にアップロードされているビデオの期間と重複します。</translation>
     </message>
   </context>
   <context>
@@ -7175,7 +7183,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Last day</source>
-      <translation>過去1日間</translation>
+      <translation>過去24時間</translation>
     </message>
     <message>
       <source>Last 7 days</source>
@@ -7250,7 +7258,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Unknown track</source>
-      <translation type="unfinished">Unknown track</translation>
+      <translation>不明なトラック</translation>
     </message>
   </context>
   <context>
@@ -7287,7 +7295,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>unnamed analytics engine</source>
-      <translation>名前のない解析エンジン</translation>
+      <translation>無名の分析エンジン</translation>
     </message>
     <message>
       <source>Failed to execute plugin action</source>
@@ -7324,7 +7332,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Select some period on timeline and click with right mouse button on it to create a bookmark.</source>
-      <translation>タイムラインで期間を選択し、右クリックでブックマークを作成します</translation>
+      <translation>タイムラインで期間を選択し、右クリックでブックマークを作成します。</translation>
     </message>
     <message numerus="yes">
       <source>%n bookmarks</source>
@@ -7390,7 +7398,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</source>
-      <translation>いくつかのカメラの画質の問題を修正することができますがビットレート増加の原因となります</translation>
+      <translation>一部のカメラで画質の問題を解決するのに役立ちますが、他のカメラのビットレート増価の原因になります。</translation>
     </message>
     <message>
       <source>Custom number that can be assigned to a camera for quick identification and access</source>
@@ -7414,7 +7422,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Server will not change any cameras settings, it will receive and use camera stream as-is.</source>
-      <translation>サーバーはカメラ設定を変更しません。そのままカメラストリームを受信して​​使用します</translation>
+      <translation>サーバーはカメラ設定を変更しません。そのままカメラストリームを受信して​​使用します。</translation>
     </message>
     <message>
       <source>Multicast</source>
@@ -7479,6 +7487,10 @@ If you intended to move analytics data to another storage location, please conta
       <source>This action cannot be undone.</source>
       <translation>この操作は元に戻せません</translation>
     </message>
+    <message>
+      <source>Motion detection stream is disabled</source>
+      <translation type="unfinished">Motion detection stream is disabled</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraScheduleWidget</name>
@@ -7540,7 +7552,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>I/O Ports</source>
-      <translation>I/O ポート</translation>
+      <translation>I/Oポート</translation>
     </message>
     <message>
       <source>Motion</source>
@@ -7619,7 +7631,7 @@ If you intended to move analytics data to another storage location, please conta
       <source>%1 are used</source>
       <comment>Text like &apos;5/10 Professional Licenses&apos; will be substituted</comment>
       <translation>
-        <numerusform>%1 が使用</numerusform>
+        <numerusform>%1 が使用されます</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -7664,19 +7676,19 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>This update is already installed.</source>
-      <translation>この更新プログラムは既にインストールされています</translation>
+      <translation>この更新プログラムは既にインストールされています。</translation>
     </message>
     <message>
       <source>This version is not installed.</source>
-      <translation>このバージョンはインストールされていません</translation>
+      <translation>このバージョンはインストールされていません。</translation>
     </message>
     <message>
       <source>Invalid version format.</source>
-      <translation>無効なバージョン形式です</translation>
+      <translation>無効なバージョン形式です。</translation>
     </message>
     <message>
       <source>Broken update package.</source>
-      <translation>壊れた更新プログラム パッケージ</translation>
+      <translation>更新プログラムパッケージが壊れています。</translation>
     </message>
     <message>
       <source>Internal error.</source>
@@ -7684,11 +7696,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Not enough space on disk to install the client update.</source>
-      <translation>クライアント更新プログラムをインストールするためのディスク容量が足りません</translation>
+      <translation>クライアント更新プログラムをインストールするにはディスク容量が足りません</translation>
     </message>
     <message>
       <source>Installation package has been lost.</source>
-      <translation>インストールパッケージが失われました</translation>
+      <translation>インストールパッケージが失われました。</translation>
     </message>
   </context>
   <context>
@@ -7737,11 +7749,11 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::DefaultPasswordAlertBar</name>
     <message>
       <source>This camera requires password to be set up.</source>
-      <translation>このカメラはパスワードを設定する必要があります</translation>
+      <translation>このカメラにはパスワードを設定する必要があります。</translation>
     </message>
     <message>
       <source>Some of selected cameras require password to be set up.</source>
-      <translation>選択されたカメラの中には、パスワードの設定が必要なものがあります</translation>
+      <translation>選択されたカメラの中には、パスワードの設定が必要なものがあります。</translation>
     </message>
     <message>
       <source>Ask your system administrator to do it.</source>
@@ -7802,7 +7814,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Checking host...</source>
-      <translation>ホストの確認...</translation>
+      <translation>ホストを確認しています...</translation>
     </message>
     <message>
       <source>Finished</source>
@@ -7827,7 +7839,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>%n devices are being added. You can close this dialog or start a new search</source>
       <translation>
-        <numerusform>%n デバイスが追加されています　このダイアログ ボックスを閉じるか、新しい検索を開始</numerusform>
+        <numerusform>%n デバイスが追加されています。このダイアログ ボックスを閉じるか、新しい検索を開始できます。</numerusform>
       </translation>
     </message>
     <message>
@@ -7892,7 +7904,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Analytics events</source>
-      <translation>解析イベント</translation>
+      <translation>分析イベント</translation>
     </message>
     <message>
       <source>Any device issue</source>
@@ -7904,7 +7916,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Any server event</source>
-      <translation>全サーバー イベント</translation>
+      <translation>全サーバーイベント</translation>
     </message>
     <message>
       <source>Device issues</source>
@@ -7920,7 +7932,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Any analytics event</source>
-      <translation>全解析イベント</translation>
+      <translation>全分析イベント</translation>
     </message>
     <message>
       <source>No events</source>
@@ -7934,11 +7946,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>unnamed analytics engine</source>
-      <translation>名前のない解析エンジン</translation>
+      <translation>無名の分析エンジン</translation>
     </message>
     <message>
       <source>No events occurred</source>
-      <translation>イベントは発生していません</translation>
+      <translation>イベントは発生しませんでした</translation>
     </message>
   </context>
   <context>
@@ -7954,7 +7966,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::ExportPasswordWidget</name>
     <message>
       <source>Please enter the password.</source>
-      <translation>パスワードを入力してください</translation>
+      <translation>パスワードを入力してください。</translation>
     </message>
   </context>
   <context>
@@ -7965,7 +7977,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Selected format is not supported by FFMPEG library.</source>
-      <translation>選択した形式は、FFMPEG ライブラリでサポートされていません</translation>
+      <translation>選択した形式は、FFMPEG ライブラリでサポートされていません。</translation>
     </message>
     <message>
       <source>FFMPEG library error.</source>
@@ -7973,7 +7985,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Video or audio codec is incompatible with selected format.</source>
-      <translation>ビデオまたはオーディオコーデックが選択された形式と互換性がありません</translation>
+      <translation>ビデオまたはオーディオコーデックは選択された形式と互換性がありません。</translation>
     </message>
     <message>
       <source>File write error.</source>
@@ -7981,7 +7993,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>No data exported.</source>
-      <translation>データはエクスポートされませんでした</translation>
+      <translation>データはエクスポートされませんでした。</translation>
     </message>
     <message>
       <source>Internal error</source>
@@ -8079,31 +8091,31 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Chosen settings require transcoding. It will increase CPU usage and may take significant time.</source>
-      <translation>選択した設定にはトランスコードが必要です　 CPU使用量が増加し、時間がかかることがあります</translation>
+      <translation>選択した設定にはトランスコードが必要です。CPU使用量が増加し、時間がかかることがあります。</translation>
     </message>
     <message>
       <source>AVI format is not recommended to export a non-continuous recording with audio track.</source>
-      <translation>オーディオ トラックと非連続記録をエクスポートするのには、AVI 形式は推奨出来ません</translation>
+      <translation>AVI形式は、オーディオトラック付きの非連続録画をエクスポートするのにはお勧めできません。</translation>
     </message>
     <message>
       <source>We recommend to export video from this camera as &quot;Multi Video&quot; to avoid downscaling.</source>
-      <translation>ダウンスケールを避けるため、&quot;マルチビデオ&quot;としてエクスポートする事を推奨します</translation>
+      <translation>ダウンスケールを避けるため、&quot;マルチビデオ&quot;としてエクスポートする事を推奨します。</translation>
     </message>
     <message>
       <source>Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</source>
-      <translation>エクスポートされた.EXEファイルのサイズは4 GBを超えるのでWindowsで開くことはできません %1 Clientでのみ再生できます</translation>
+      <translation>エクスポートされた.EXEファイルのサイズは4 GBを超えるため、Windowsで開くことはできません。%1 Clientでのみ再生できます。</translation>
     </message>
     <message>
       <source>Settings are not available for .NOV and .EXE files.</source>
-      <translation>.NOVと.EXEファイルでは設定を使用できません</translation>
+      <translation>.NOVファイルおよび.EXEファイルでは設定を使用できません。</translation>
     </message>
     <message>
       <source>Local files, server monitor widgets and webpages will not be exported.</source>
-      <translation>ローカルファイル、サーバーモニターウィジェット、およびWebページはエクスポートされません</translation>
+      <translation>ローカルファイル、サーバーモニターウィジェット、Webページはエクスポートされません。</translation>
     </message>
     <message>
       <source>You are about to export a long video. It may require a lot of storage space and take significant time.</source>
-      <translation>長いビデオをエクスポートしようとしています　多くの記憶領域を必要とし時間を要します</translation>
+      <translation>長いビデオをエクスポートしようとしています。多くの記憶領域を必要とし、時間がかかります。</translation>
     </message>
   </context>
   <context>
@@ -8137,15 +8149,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Image is not round</source>
-      <translation>イメージは円形ではありません</translation>
+      <translation>画像は円形ではありません</translation>
     </message>
     <message>
       <source>Image might be too dim</source>
-      <translation>イメージが暗すぎます</translation>
+      <translation>画像が暗すぎます</translation>
     </message>
     <message>
       <source>Invalid input image</source>
-      <translation>無効な入力イメージ</translation>
+      <translation>入力画像が無効です</translation>
     </message>
     <message>
       <source>Internal error</source>
@@ -8156,7 +8168,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::FisheyeSettingsWidget</name>
     <message>
       <source>Use this setting to compensate for distortion if camera is not mounted exactly vertically or horizontally.</source>
-      <translation>カメラが垂直または水平に正確に取り付けられていない場合は、この設定を使用して歪みを補正します</translation>
+      <translation>カメラが垂直または水平に正確に取り付けられていない場合は、この設定を使用して歪みを補正します。</translation>
     </message>
   </context>
   <context>
@@ -8216,7 +8228,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Image cannot be loaded.</source>
-      <translation>画像を読み取ることができません</translation>
+      <translation>画像を読み取ることができません。</translation>
     </message>
   </context>
   <context>
@@ -8321,8 +8333,8 @@ If you intended to move analytics data to another storage location, please conta
       <translation>IPアドレス範囲を255以内にしてください.</translation>
     </message>
     <message>
-      <source>Can&apos;t start searching process</source>
-      <translation>検索処理を開始できません</translation>
+      <source>Can not start the search process</source>
+      <translation type="unfinished">Can not start the search process</translation>
     </message>
   </context>
   <context>
@@ -8384,7 +8396,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Unable to check updates on the internet</source>
-      <translation>インターネット上の更新を確認できません</translation>
+      <translation>インターネットで更新を確認できません</translation>
     </message>
     <message>
       <source>Build not found</source>
@@ -8408,11 +8420,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Upgrade package is broken</source>
-      <translation>アップグレードパッケージが壊れています</translation>
+      <translation>更新パッケージが壊れています</translation>
     </message>
     <message>
       <source>Missing update package for some servers</source>
-      <translation>一部のサーバー用のアップデートパッケージがありません</translation>
+      <translation>一部のサーバー用の更新パッケージがありません</translation>
     </message>
     <message>
       <source>Incompatible %1 instance. To update disconnect System from %1 first.</source>
@@ -8421,7 +8433,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>No update package available</source>
-      <translation>利用可能なアップデートはありません</translation>
+      <translation>利用可能な更新パッケージはありません</translation>
     </message>
     <message>
       <source>Select Update File...</source>
@@ -8433,7 +8445,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Some servers are offline and will not be updated. Skip them?</source>
-      <translation>一部のサーバーはオフラインであり、更新されません。それらをスキップしますか？</translation>
+      <translation>一部のサーバーはオフラインであり、更新されません。スキップしますか？</translation>
     </message>
     <message>
       <source>If the problem persists, please contact Customer Support.</source>
@@ -8453,7 +8465,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Nx Witness Client will be restarted to the updated version.</source>
-      <translation>Nx Witness Clientがアップデートされたバージョンに再起動されます</translation>
+      <translation>Nx Witness Clientはアップデートされたバージョンに再起動されます。</translation>
     </message>
     <message>
       <source>OK</source>
@@ -8469,7 +8481,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Upload &amp;&amp; Install</source>
-      <translation>アップロード＆インストール</translation>
+      <translation>アップロードとインストール</translation>
     </message>
     <message>
       <source>Download</source>
@@ -8517,7 +8529,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Install update</source>
-      <translation>アップデートをインストール</translation>
+      <translation>更新をインストール</translation>
     </message>
     <message>
       <source>System updated to</source>
@@ -8550,12 +8562,12 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>Missing update package for the client and %n servers</source>
       <translation>
-        <numerusform>クライアントおよび %n サーバー用のアップデートパッケージがありません</numerusform>
+        <numerusform>クライアントおよび %n サーバー用の更新パッケージがありません</numerusform>
       </translation>
     </message>
     <message>
       <source>Missing update package for the client</source>
-      <translation>クライアント用のアップデートパッケージがありません</translation>
+      <translation>クライアント用の更新パッケージがありません</translation>
     </message>
     <message>
       <source>Finish Update</source>
@@ -8575,11 +8587,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>There are no online servers to update.</source>
-      <translation>更新するオンラインサーバーはありません</translation>
-    </message>
-    <message>
-      <source>Some servers haven&apos;t completed update process. Finish it anyway?</source>
-      <translation>一部のサーバーでは更新処理が完了していませんが終了しますか？</translation>
+      <translation>更新するオンラインサーバーはありません。</translation>
     </message>
     <message>
       <source>Cancel update and delete all downloaded data?</source>
@@ -8607,7 +8615,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Failed to download update packages to some components</source>
-      <translation>一部のコンポーネントにアップデートパッケージをダウンロードできませんでした</translation>
+      <translation>一部のコンポーネントに更新パッケージをダウンロードできませんでした</translation>
     </message>
     <message>
       <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
@@ -8635,15 +8643,19 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Some servers have no update packages available.</source>
-      <translation type="unfinished">Some servers have no update packages available.</translation>
+      <translation>利用可能な更新パッケージがないサーバもあります。</translation>
     </message>
     <message>
       <source>Some servers have encountered an internal error.</source>
-      <translation type="unfinished">Some servers have encountered an internal error.</translation>
+      <translation>一部のサーバーで内部エラーが発生しました。</translation>
     </message>
     <message>
       <source>Please please contact Customer Support.</source>
-      <translation type="unfinished">Please please contact Customer Support.</translation>
+      <translation>カスタマサポートにお問い合わせください。</translation>
+    </message>
+    <message>
+      <source>Some servers have not completed the update process. Finish it anyway?</source>
+      <translation type="unfinished">Some servers have not completed the update process. Finish it anyway?</translation>
     </message>
   </context>
   <context>
@@ -8700,12 +8712,8 @@ If you intended to move analytics data to another storage location, please conta
   <context>
     <name>nx::vms::client::desktop::OpenLayoutActionWidget</name>
     <message>
-      <source>Some users don&apos;t have access to the selected layout. Action will not work for them.</source>
-      <translation>一部のユーザーには選択したレイアウトへのアクセス権がありません。アクションは動作しません</translation>
-    </message>
-    <message>
       <source>None of selected users have access to the selected layout. Action will not work.</source>
-      <translation>選択したレイアウトにアクセスできるユーザーが選択されていません。アクションは動作しません</translation>
+      <translation>選択したユーザーは選択したレイアウトにアクセスできません。アクションは機能しません。</translation>
     </message>
     <message>
       <source>Select layout...</source>
@@ -8717,11 +8725,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Local layouts can only be shown to their owners.</source>
-      <translation>ローカルレイアウトは所有者にのみ表示できます</translation>
+      <translation>ローカルレイアウトは所有者にのみ表示できます。</translation>
     </message>
     <message>
       <source>None of selected user roles contain users. Action will not work.</source>
-      <translation>選択されたユーザー役割にユーザーが含まれていません　アクションは動作しません</translation>
+      <translation>選択されたユーザー役割にユーザーが含まれていません。アクションは動作しません。</translation>
+    </message>
+    <message>
+      <source>Some users do not have access to the selected layout. Action will not work for them.</source>
+      <translation type="unfinished">Some users do not have access to the selected layout. Action will not work for them.</translation>
     </message>
   </context>
   <context>
@@ -8772,7 +8784,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Failed to download update packages.</source>
-      <translation>アップデートパッケージのダウンロードに失敗しました。</translation>
+      <translation>更新パッケージのダウンロードに失敗しました。</translation>
     </message>
     <message>
       <source>Update contents are invalid.</source>
@@ -8820,18 +8832,18 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>This OS version is no longer supported.</source>
-      <translation type="unfinished">This OS version is no longer supported.</translation>
+      <translation>このOSバージョンはサポートされなくなりました。</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::PresentedStateDelegate</name>
     <message>
       <source>Added</source>
-      <translation>追加</translation>
+      <translation>追加しました</translation>
     </message>
     <message>
       <source>Adding</source>
-      <translation>追加する</translation>
+      <translation>追加中</translation>
     </message>
   </context>
   <context>
@@ -8857,7 +8869,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::RadassActionHandler</name>
     <message>
       <source>Set layout resolution to &quot;Auto&quot; to increase performance.</source>
-      <translation>パフォーマンスを向上させるには、レイアウトの解像度を&quot;自動&quot;に設定します</translation>
+      <translation>パフォーマンスを向上させるには、レイアウトの解像度を &quot;自動&quot; に設定します。</translation>
     </message>
   </context>
   <context>
@@ -8865,7 +8877,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>For exporting as Rapid Review video length should be at least %n seconds.</source>
       <translation>
-        <numerusform>ラピッドレビューとしてエクスポートするにはビデオの長さは、最低 %n 秒が必要です</numerusform>
+        <numerusform>ラピッドレビューとしてエクスポートするには、ビデオの長さが最低 %n 秒必要です。</numerusform>
       </translation>
     </message>
   </context>
@@ -8911,7 +8923,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::ScheduleSettingsWidget</name>
     <message>
       <source>Quality setting determines the compression rate only, and does not affect resolution. Low, Medium, High and Best are preset bitrate values.</source>
-      <translation>画質設定は圧縮率を決定し、解像度には影響しません。低、中、高、最高は、プリセットのビットレート値です</translation>
+      <translation>画質設定は圧縮率を決定し、解像度には影響しません。低、中、高、最高は、プリセットのビットレート値です。</translation>
     </message>
     <message>
       <source>Mbit/s</source>
@@ -8926,28 +8938,12 @@ If you intended to move analytics data to another storage location, please conta
       <translation>詳細設定</translation>
     </message>
     <message>
-      <source>Dual-Streaming not supported for this camera</source>
-      <translation>デュアル ストリーミングがこのカメラでサポートされていません</translation>
+      <source>Motion detection is disabled or not supported</source>
+      <translation type="unfinished">Motion detection is disabled or not supported</translation>
     </message>
     <message>
-      <source>Dual-Streaming and motion detection not supported for this camera</source>
-      <translation>デュアル ストリーミングおよびモーション検知がこのカメラではサポートされていません</translation>
-    </message>
-    <message>
-      <source>Motion detection disabled</source>
-      <translation>モーション検知無効</translation>
-    </message>
-    <message>
-      <source>To enable or adjust it, go to the &quot;Motion&quot; tab in Camera Settings</source>
-      <translation>有効または調整するには、カメラ設定のモーションタブに移動します</translation>
-    </message>
-    <message>
-      <source>Motion detection disabled or not supported</source>
-      <translation>モーション検出は無効またはサポートされていません</translation>
-    </message>
-    <message>
-      <source>To ensure it is supported and to enable it, go to the &quot;Motion&quot; tab in Camera Settings.</source>
-      <translation>サポートされていることを確認して有効にするには、カメラ設定の&quot;Motion&quot;タブにアクセスしてください</translation>
+      <source>Dual-streaming is disabled or not supported</source>
+      <translation type="unfinished">Dual-streaming is disabled or not supported</translation>
     </message>
   </context>
   <context>
@@ -8977,7 +8973,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
-      <translation type="unfinished">Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</translation>
+      <translation>透かし模様は、管理者以外のユーザーのライブ、アーカイブ、エクスポートされたビデオに表示されます。あなたや他の管理者が透かし模様を見ることはありません。</translation>
     </message>
   </context>
   <context>
@@ -9042,12 +9038,16 @@ If you intended to move analytics data to another storage location, please conta
       <source>plugin is optional and is not in the white list</source>
       <translation>プラグインはオプションであり、ホワイトリストにはありません</translation>
     </message>
+    <message>
+      <source>internal error</source>
+      <translation>内部エラー</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerStatusItemDelegate</name>
     <message>
       <source>Skipped</source>
-      <translation>スキップ</translation>
+      <translation>スキップしました</translation>
     </message>
     <message>
       <source>Installed</source>
@@ -9078,7 +9078,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Server error.</source>
-      <translation type="unfinished">Server error.</translation>
+      <translation>サーバーエラー</translation>
     </message>
   </context>
   <context>
@@ -9216,7 +9216,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Server OS Time</source>
-      <translation>サーバー時間</translation>
+      <translation>サーバーOS時間</translation>
     </message>
     <message>
       <source>VMS Time</source>
@@ -9227,7 +9227,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::TimeSynchronizationWidget</name>
     <message>
       <source>Time, common and synchronized between all servers. Can be different with OS time on any particular server.</source>
-      <translation>時間、すべてのサーバー間の同期　特定のサーバーのOS時間によって異なる場合があります</translation>
+      <translation>時間、すべてのサーバー間の同期。特定のサーバーのOS時間によって異なる場合があります。</translation>
     </message>
     <message>
       <source>Synchronized with the Internet</source>
@@ -9239,19 +9239,19 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Not synchronized. Each server uses its own local time.</source>
-      <translation>同期されません　各サーバーは、独自のローカル時間を使用します</translation>
+      <translation>同期されません。各サーバーは、独自のローカル時間を使用します。</translation>
     </message>
     <message>
       <source>Equal to the server local time</source>
-      <translation>サーバのローカル時刻に等しい</translation>
+      <translation>サーバーのローカル時刻に等しい</translation>
     </message>
     <message>
       <source>No Internet connection. Time is not being synchronized.</source>
-      <translation>インターネットに接続できません　時間が同期されていません</translation>
+      <translation>インターネットに接続できません。時刻が同期されていません。</translation>
     </message>
     <message>
       <source>Time Server is offline. Time is not being synchronized.</source>
-      <translation>タイムサーバーはオフラインです　時間が同期されていません</translation>
+      <translation>タイムサーバーはオフラインです。時間が同期されていません。</translation>
     </message>
   </context>
   <context>
@@ -9285,7 +9285,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Could not check uploaded file on the server</source>
-      <translation>サーバーにアップロードされたファイルをチェックできませんでした</translation>
+      <translation>サーバーにアップロードされたファイルを確認できませんでした</translation>
     </message>
     <message>
       <source>File was corrupted while being uploaded to the server</source>
@@ -9296,27 +9296,27 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::WearableCameraMotionWidget</name>
     <message>
       <source>Motion is being detected only during video uploading.</source>
-      <translation>ビデオのアップロード中にのみモーションが検出されました</translation>
+      <translation>動画のアップロード中にのみモーションが検出されています。</translation>
     </message>
     <message>
       <source>Enabling or disabling this setting does not change anything in the existing archive.</source>
-      <translation>この設定を有効または無効にしても、既存のアーカイブのは変更されません</translation>
+      <translation>この設定を有効または無効にしても、既存のアーカイブの内容は変更されません。</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::WearableCameraUploadWidget</name>
     <message>
       <source>Another user is currently uploading footage to this camera.</source>
-      <translation>別のユーザーが現在このカメラに映像をアップロードしています</translation>
+      <translation>別のユーザーが現在このカメラに映像をアップロードしています。</translation>
     </message>
     <message>
       <source>User %1 is currently uploading footage to this camera.</source>
-      <translation>ユーザー %1 は現在このカメラに映像をアップロードしています</translation>
+      <translation>ユーザー %1 は現在このカメラに映像をアップロードしています。</translation>
     </message>
     <message>
       <source>(%1 of %2)</source>
       <comment>Uploaded and total number of files will be substituted</comment>
-      <translation>(%1 / %2)</translation>
+      <translation>(%2の%1)</translation>
     </message>
     <message>
       <source>Finalizing %1...</source>
@@ -9333,7 +9333,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::WearableWorker</name>
     <message>
       <source>Failed to send request to the server.</source>
-      <translation>サーバーへのリクエストに失敗しました</translation>
+      <translation>サーバーに要求を送信できませんでした。</translation>
     </message>
   </context>
   <context>
@@ -9370,7 +9370,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>%1 is in use by another export.</source>
       <comment>%1 is file name</comment>
-      <translation>%1は別のエクスポートによって使用されています</translation>
+      <translation>%1は別のエクスポートによって使用されています。</translation>
     </message>
     <message>
       <source>Export completed</source>
@@ -9386,7 +9386,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Several bookmarks can be exported as layout only.</source>
-      <translation>いくつかのブックマークはレイアウトのみエクスポートされます</translation>
+      <translation>一部のブックマークはレイアウトのみエクスポートされます。</translation>
     </message>
     <message>
       <source>Local files not allowed for Multi-Video export</source>
@@ -9462,15 +9462,15 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::ui::AnalyticsSdkEventWidget</name>
     <message>
       <source>Analytics events can be set up on a certain cameras.</source>
-      <translation>解析イベントは特定のカメラで設定できます</translation>
+      <translation>分析イベントは特定のカメラで設定できます。</translation>
     </message>
     <message>
       <source>Choose cameras using the button above to see the list of supported events.</source>
-      <translation>上のボタンを使用して、サポートされるイベントの一覧を表示するカメラを選択します</translation>
+      <translation>サポートされているイベントのリストを表示するには、上のボタンを使用してカメラを選択してください。</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation>キャプションフィールドに入力したキーワードのいずれかと一致するものがある場合にのみ、イベントが発生します</translation>
+      <translation>キャプションフィールドに入力したキーワードのいずれかと一致するものがある場合にのみ、イベントが発生します。</translation>
     </message>
     <message>
       <source>If the field is empty, event will always trigger.</source>
@@ -9478,11 +9478,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>This field is case sensitive.</source>
-      <translation>このフィールドは大文字と小文字を区別します</translation>
+      <translation>このフィールドは大文字と小文字を区別します。</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
-      <translation>説明フィールドに入力したキーワードのいずれかと一致するものがある場合にのみ、イベントが発生します</translation>
+      <translation>説明フィールドに入力したキーワードのいずれかと一致するものがある場合にのみ、イベントが発生します。</translation>
     </message>
   </context>
   <context>
@@ -9496,26 +9496,26 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::ui::PluginDiagnosticEventModel</name>
     <message>
       <source>Any Plugin</source>
-      <translation type="unfinished">Any Plugin</translation>
+      <translation>任意のプラグイン</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ui::PluginDiagnosticEventWidget</name>
     <message>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the caption with any of the entered keywords.</translation>
+      <translation>キャプションに入力したキーワードのいずれかと一致するものがある場合にのみ、イベントが発生します。</translation>
     </message>
     <message>
       <source>If the field is empty, event will always trigger.</source>
-      <translation type="unfinished">If the field is empty, event will always trigger.</translation>
+      <translation>フィールドが空の場合、イベントは常にトリガーされます。</translation>
     </message>
     <message>
       <source>This field is case sensitive.</source>
-      <translation type="unfinished">This field is case sensitive.</translation>
+      <translation>このフィールドでは大文字と小文字が区別されます。</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the description field with any of the entered keywords.</translation>
+      <translation>説明フィールドに入力したキーワードのいずれかと一致するものがある場合にのみ、イベントが発生します。</translation>
     </message>
   </context>
   <context>
@@ -9800,7 +9800,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>This build is for testing purposes only.</source>
-      <translation>このビルドはテスト専用です</translation>
+      <translation>このビルドはテスト専用です。</translation>
     </message>
     <message>
       <source>Open Server Settings</source>
@@ -9819,8 +9819,8 @@ If you intended to move analytics data to another storage location, please conta
 Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
 By default analytics data will be stored in mediaserver&apos;s installation directory.
 You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</source>
-      <translation>Analyticsデータベースはローカルストレージに保存する必要があり、最大100ギガバイトを占めることがあります。
-分析データを保存する場所を選択した後は、既存のデータを失うことなく簡単に変更することはできません。重度のシステム誤動作を避けるために、慎重に位置を選択し、システムパーティションを使用しないことをお勧めします。
+      <translation>分析データベースはローカルストレージに保存する必要があり、最大100ギガバイトを占めることがあります。
+分析データの保存場所を選択した後は、既存のデータを失うことなく簡単に変更することはできません。重度のシステム誤動作を避けるために、慎重に場所を選択し、システムパーティションを使用しないことをお勧めします。
 デフォルトでは、分析データはメディアサーバー&apos;のインストールディレクトリに保存されます。
 [サーバー設定]ダイアログの[ &quot;Storage Management&quot;]タブで、保存場所を変更できます。</translation>
     </message>

@@ -194,7 +194,7 @@ void ManualDeviceSearcher::searchForDevices(
 
             if (!success || result.error != QnRestResult::NoError)
             {
-                setLastErrorText(tr("Can't start searching process"));
+                setLastErrorText(tr("Can not start the search process"));
                 abort();
             }
             else

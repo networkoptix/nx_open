@@ -943,6 +943,14 @@ to view more bookmarks</source>
       <source>Objects Frames and Info...</source>
       <translation>Obiekty i informacje...</translation>
     </message>
+    <message>
+      <source>Pin Calendar</source>
+      <translation>Przypnij kalendarz</translation>
+    </message>
+    <message>
+      <source>Unpin Calendar</source>
+      <translation>Odepnij kalendarz</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -4338,7 +4346,7 @@ to %1</source>
     </message>
     <message>
       <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
-      <translation type="unfinished">&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</translation>
+      <translation>&quot;Wirtualna Kamera&quot; to wirtualna przestrzeń dostępna dla plików wideo, które można przesłać na dowolny z serwerów w systemie i udostępnić je dowolnym użytkownikom.</translation>
     </message>
   </context>
   <context>
@@ -7546,7 +7554,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Unknown track</source>
-      <translation type="unfinished">Unknown track</translation>
+      <translation>Nieznana ścieżka</translation>
     </message>
   </context>
   <context>
@@ -7786,6 +7794,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>This action cannot be undone.</source>
       <translation>Nie można cofnąć tej czynności.</translation>
+    </message>
+    <message>
+      <source>Motion detection stream is disabled</source>
+      <translation>Strumień detekcji ruchu jest wyłączony</translation>
     </message>
   </context>
   <context>
@@ -8668,7 +8680,7 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Wprowadzony zakres adresów IP zawiera więcej niż 255 adresów.</translation>
     </message>
     <message>
-      <source>Can&apos;t start searching process</source>
+      <source>Can not start the search process</source>
       <translation>Nie można rozpocząć procesu wyszukiwania</translation>
     </message>
   </context>
@@ -8928,10 +8940,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Brak dostępnych serwerów do aktualizacji.</translation>
     </message>
     <message>
-      <source>Some servers haven&apos;t completed update process. Finish it anyway?</source>
-      <translation>Niektóre serwery nie zakończyły jeszcze procesu aktualizacji, czy na pewno zamknąć?</translation>
-    </message>
-    <message>
       <source>Cancel update and delete all downloaded data?</source>
       <translation>Anulować aktualizację i usunąć wszystkie pobrane dane?</translation>
     </message>
@@ -8985,15 +8993,19 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Some servers have no update packages available.</source>
-      <translation type="unfinished">Some servers have no update packages available.</translation>
+      <translation>Niektóre serwery nie mają dostępnych pakietów aktualizacji.</translation>
     </message>
     <message>
       <source>Some servers have encountered an internal error.</source>
-      <translation type="unfinished">Some servers have encountered an internal error.</translation>
+      <translation>Niektóre serwery napotkały błąd wewnętrzny.</translation>
     </message>
     <message>
       <source>Please please contact Customer Support.</source>
-      <translation type="unfinished">Please please contact Customer Support.</translation>
+      <translation>Proszę skontaktować się z działem wsparcia technicznego.</translation>
+    </message>
+    <message>
+      <source>Some servers have not completed the update process. Finish it anyway?</source>
+      <translation>Niektóre serwery nie zakończyły jeszcze procesu aktualizacji, czy na pewno zamknąć?</translation>
     </message>
   </context>
   <context>
@@ -9053,10 +9065,6 @@ If you intended to move analytics data to another storage location, please conta
   <context>
     <name>nx::vms::client::desktop::OpenLayoutActionWidget</name>
     <message>
-      <source>Some users don&apos;t have access to the selected layout. Action will not work for them.</source>
-      <translation>Niektórzy użytkownicy nie mają dostępu do wybranego układu. Akcja nie zadziała w ich przypadku.</translation>
-    </message>
-    <message>
       <source>None of selected users have access to the selected layout. Action will not work.</source>
       <translation>Żaden z wybranych użytkowników nie ma dostępu do wybranego układu. Akcja nie zadziała.</translation>
     </message>
@@ -9075,6 +9083,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>None of selected user roles contain users. Action will not work.</source>
       <translation>Żadna z wybranych grup uprawnień nie zawiera użytkowników. Akcja nie zadziała.</translation>
+    </message>
+    <message>
+      <source>Some users do not have access to the selected layout. Action will not work for them.</source>
+      <translation>Niektórzy użytkownicy nie mają dostępu do wybranego układu. Akcja nie zadziała w ich przypadku.</translation>
     </message>
   </context>
   <context>
@@ -9173,7 +9185,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>This OS version is no longer supported.</source>
-      <translation type="unfinished">This OS version is no longer supported.</translation>
+      <translation>Ta wersja systemu operacyjnego nie jest już obsługiwana.</translation>
     </message>
   </context>
   <context>
@@ -9282,28 +9294,12 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Więcej ustawień</translation>
     </message>
     <message>
-      <source>Dual-Streaming not supported for this camera</source>
-      <translation>Podwójne strumieniowanie nie jest obsługiwane przez tę kamerę</translation>
-    </message>
-    <message>
-      <source>Dual-Streaming and motion detection not supported for this camera</source>
-      <translation>Podwójne strumieniowanie i detekcja ruchu nie są obsługiwane przez tę kamerę</translation>
-    </message>
-    <message>
-      <source>Motion detection disabled</source>
-      <translation>Detekcja ruchu wyłączona</translation>
-    </message>
-    <message>
-      <source>To enable or adjust it, go to the &quot;Motion&quot; tab in Camera Settings</source>
-      <translation>Aby to włączyć lub skonfigurować, przejdź na kartę &quot;Ruch&quot; w ustawieniach kamery</translation>
-    </message>
-    <message>
-      <source>Motion detection disabled or not supported</source>
+      <source>Motion detection is disabled or not supported</source>
       <translation>Detekcja ruchu jest wyłączona lub nie jest obsługiwana</translation>
     </message>
     <message>
-      <source>To ensure it is supported and to enable it, go to the &quot;Motion&quot; tab in Camera Settings.</source>
-      <translation>Aby spróbować to włączyć, przejdź na kartę &quot;Ruch&quot; w ustawieniach kamery.</translation>
+      <source>Dual-streaming is disabled or not supported</source>
+      <translation>Podwójne strumieniowanie jest wyłączone lub nie jest obsługiwane</translation>
     </message>
   </context>
   <context>
@@ -9333,7 +9329,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
-      <translation type="unfinished">Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</translation>
+      <translation>Znaki wodne będą wyświetlane w obrazach na żywo, w archiwizowanych i eksportowanych nagraniach tylko dla użytkowników nie będących administratorami. Ty i inni administratorzy ich nie zobaczycie.</translation>
     </message>
   </context>
   <context>
@@ -9398,6 +9394,10 @@ If you intended to move analytics data to another storage location, please conta
       <source>plugin is optional and is not in the white list</source>
       <translation>wtyczka jest opcjonalna i nie znajduje się na białej liście</translation>
     </message>
+    <message>
+      <source>internal error</source>
+      <translation>błąd wewnętrzny</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerStatusItemDelegate</name>
@@ -9434,7 +9434,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Server error.</source>
-      <translation type="unfinished">Server error.</translation>
+      <translation>Błąd serwera.</translation>
     </message>
   </context>
   <context>
@@ -9867,26 +9867,26 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::ui::PluginDiagnosticEventModel</name>
     <message>
       <source>Any Plugin</source>
-      <translation type="unfinished">Any Plugin</translation>
+      <translation>Dowolna wtyczka</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ui::PluginDiagnosticEventWidget</name>
     <message>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the caption with any of the entered keywords.</translation>
+      <translation>Zdarzenie uruchomi się tylko wtedy, gdy w polu nagłówka zdarzenia znajdują się dowolne z wprowadzonych słów kluczowych.</translation>
     </message>
     <message>
       <source>If the field is empty, event will always trigger.</source>
-      <translation type="unfinished">If the field is empty, event will always trigger.</translation>
+      <translation>Jeśli pole jest puste, zdarzenie zawsze będzie wyzwalane.</translation>
     </message>
     <message>
       <source>This field is case sensitive.</source>
-      <translation type="unfinished">This field is case sensitive.</translation>
+      <translation>W tym polu wielkość liter jest istotna.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the description field with any of the entered keywords.</translation>
+      <translation>Zdarzenie uruchomi się tylko wtedy, gdy w polu opisu zdarzenia znajdują się dowolne z wprowadzonych słów kluczowych.</translation>
     </message>
   </context>
   <context>

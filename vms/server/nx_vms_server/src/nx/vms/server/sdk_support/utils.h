@@ -36,6 +36,7 @@
 
 #include <nx/sdk/helpers/device_info.h>
 #include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/helpers/to_string.h>
 
 #include <plugins/settings.h>
 #include <plugins/vms_server_plugins_ini.h>
@@ -242,7 +243,7 @@ std::map<QString, QString> attributesMap(
 template<typename Value>
 QString toErrorString(const ResultHolder<Value>& result)
 {
-    const auto errorMessage = result.errorMessage();
+    const QString errorMessage = result.errorMessage();
     return lm("[%1]: %2").args(
         result.errorCode(),
         errorMessage.isEmpty() ? errorMessage : QString("no error message"));

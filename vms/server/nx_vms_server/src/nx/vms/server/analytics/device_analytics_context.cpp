@@ -257,33 +257,33 @@ static QString getEngineLogLabel(QnMediaServerModule* serverModule, QnUuid engin
     const auto& engineResource =
         serverModule->resourcePool()->getResourceById<resource::AnalyticsEngineResource>(
             engineId);
-    if (!NX_ASSERT(engineResource)
-        || !NX_ASSERT(engineResource->sdkEngine()))
-    {
+    if (!NX_ASSERT(engineResource) || !NX_ASSERT(engineResource->sdkEngine()))
         return "unknown Analytics Engine";
-    }
 
-    if (!NX_ASSERT(engineResource->sdkEngine()->plugin())
-        || !NX_ASSERT(engineResource->sdkEngine()->plugin()->name()))
-    {
+    if (!NX_ASSERT(engineResource->sdkEngine()->plugin()))
         return lm("Analytics Engine %1 of unknown Plugin").arg(engineResource->getName());
-    }
 
     return lm("Analytics Engine %1 of Plugin %2").args(
         engineResource->getName(), engineResource->plugin()->manifest().id);
 }
 
-static std::optional<nx::sdk::analytics::IUncompressedVideoFrame::PixelFormat> pixelFormatForEngine(
-    QnMediaServerModule* serverModule,
-    QnUuid engineId,
-    const std::shared_ptr<nx::vms::server::analytics::DeviceAnalyticsBinding>& binding,
-    bool* outSuccess)
+static std::optional<nx::sdk::analytics::IUncompressedVideoFrame::PixelFormat>
+    pixelFormatForEngine(
+        QnMediaServerModule* serverModule,
+        QnUuid engineId,
+        const std::shared_ptr<nx::vms::server::analytics::DeviceAnalyticsBinding>& binding,
+        bool* outSuccess)
 {
     *outSuccess = false;
     const QString engineLogLabel = getEngineLogLabel(serverModule, engineId);
-    const auto engineManifest = binding->engineManifest();
-    if (!NX_ASSERT(engineManifest, lm("Engine %1").arg(engineLogLabel)))
+
+    if (!NX_ASSERT(binding, engineLogLabel))
         return std::nullopt;
+
+    const auto engineManifest = binding->engineManifest();
+    if (!NX_ASSERT(engineManifest, engineLogLabel))
+        return std::nullopt;
+
     *outSuccess = true;
     return sdk_support::pixelFormatFromEngineManifest(*engineManifest, engineLogLabel);
 }

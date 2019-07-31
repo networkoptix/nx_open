@@ -943,6 +943,14 @@ to view more bookmarks</source>
         <source>Objects Frames and Info...</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Pin Calendar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unpin Calendar</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Deactivator</name>
@@ -7580,6 +7588,10 @@ If you intended to move analytics data to another storage location, please conta
         <source>This action cannot be undone.</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Motion detection stream is disabled</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::CameraScheduleWidget</name>
@@ -7715,6 +7727,14 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>Plugins</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Motion detection is disabled, all schedule records &quot;Motion&quot; and &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Dual streaming is disabled, all schedule records &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -8435,8 +8455,8 @@ If you intended to move analytics data to another storage location, please conta
         <translation></translation>
     </message>
     <message>
-        <source>Can&apos;t start searching process</source>
-        <translation></translation>
+        <source>Can not start the search process</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8693,10 +8713,6 @@ If you intended to move analytics data to another storage location, please conta
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Some servers haven&apos;t completed update process. Finish it anyway?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Cancel update and delete all downloaded data?</source>
         <translation type="unfinished"></translation>
     </message>
@@ -8760,6 +8776,10 @@ If you intended to move analytics data to another storage location, please conta
         <source>Please please contact Customer Support.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Some servers have not completed the update process. Finish it anyway?</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::MultipleLayoutSelectionDialog</name>
@@ -8816,10 +8836,6 @@ If you intended to move analytics data to another storage location, please conta
 <context>
     <name>nx::vms::client::desktop::OpenLayoutActionWidget</name>
     <message>
-        <source>Some users don&apos;t have access to the selected layout. Action will not work for them.</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>None of selected users have access to the selected layout. Action will not work.</source>
         <translation></translation>
     </message>
@@ -8838,6 +8854,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
         <source>None of selected user roles contain users. Action will not work.</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Some users do not have access to the selected layout. Action will not work for them.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -9043,28 +9063,12 @@ If you intended to move analytics data to another storage location, please conta
         <translation></translation>
     </message>
     <message>
-        <source>Dual-Streaming not supported for this camera</source>
-        <translation></translation>
+        <source>Motion detection is disabled or not supported</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Dual-Streaming and motion detection not supported for this camera</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Motion detection disabled</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>To enable or adjust it, go to the &quot;Motion&quot; tab in Camera Settings</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Motion detection disabled or not supported</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>To ensure it is supported and to enable it, go to the &quot;Motion&quot; tab in Camera Settings.</source>
-        <translation></translation>
+        <source>Dual-streaming is disabled or not supported</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -9157,6 +9161,10 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>plugin is optional and is not in the white list</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>internal error</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

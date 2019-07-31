@@ -2098,22 +2098,22 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/ui/event_rules/widgets/plugin_diagnostic_event_widget.ui"/>
       <source>Source:</source>
-      <translation type="unfinished">Source:</translation>
+      <translation>Origem:</translation>
     </message>
     <message>
       <location/>
       <source>Caption contains:</source>
-      <translation type="unfinished">Caption contains:</translation>
+      <translation>Captura contém:</translation>
     </message>
     <message>
       <location/>
       <source>Keywords separated by space</source>
-      <translation type="unfinished">Keywords separated by space</translation>
+      <translation>Palavras chave separados por espaço</translation>
     </message>
     <message>
       <location/>
       <source>Description contains:</source>
-      <translation type="unfinished">Description contains:</translation>
+      <translation>Descrição Contém:</translation>
     </message>
     <message>
       <location/>

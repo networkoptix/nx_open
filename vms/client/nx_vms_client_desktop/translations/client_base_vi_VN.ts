@@ -943,6 +943,14 @@ to view more bookmarks</source>
       <source>Objects Frames and Info...</source>
       <translation>Khung Đối tượng và Thông tin...</translation>
     </message>
+    <message>
+      <source>Pin Calendar</source>
+      <translation>pin Lịch</translation>
+    </message>
+    <message>
+      <source>Unpin Calendar</source>
+      <translation>Lịch Unpin</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -7478,6 +7486,10 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
       <source>This action cannot be undone.</source>
       <translation>Không thể hoàn tác thao tác này.</translation>
     </message>
+    <message>
+      <source>Motion detection stream is disabled</source>
+      <translation type="unfinished">Motion detection stream is disabled</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraScheduleWidget</name>
@@ -8320,8 +8332,8 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
       <translation>Các địa chỉ IP được chỉ định là lớn hơn 255 địa chỉ.</translation>
     </message>
     <message>
-      <source>Can&apos;t start searching process</source>
-      <translation>&apos;t bắt đầu quá trình tìm kiếm</translation>
+      <source>Can not start the search process</source>
+      <translation type="unfinished">Can not start the search process</translation>
     </message>
   </context>
   <context>
@@ -8577,10 +8589,6 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
       <translation type="unfinished">There are no online servers to update.</translation>
     </message>
     <message>
-      <source>Some servers haven&apos;t completed update process. Finish it anyway?</source>
-      <translation type="unfinished">Some servers haven&apos;t completed update process. Finish it anyway?</translation>
-    </message>
-    <message>
       <source>Cancel update and delete all downloaded data?</source>
       <translation type="unfinished">Cancel update and delete all downloaded data?</translation>
     </message>
@@ -8644,6 +8652,10 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
       <source>Please please contact Customer Support.</source>
       <translation type="unfinished">Please please contact Customer Support.</translation>
     </message>
+    <message>
+      <source>Some servers have not completed the update process. Finish it anyway?</source>
+      <translation type="unfinished">Some servers have not completed the update process. Finish it anyway?</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::MultipleLayoutSelectionDialog</name>
@@ -8699,10 +8711,6 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
   <context>
     <name>nx::vms::client::desktop::OpenLayoutActionWidget</name>
     <message>
-      <source>Some users don&apos;t have access to the selected layout. Action will not work for them.</source>
-      <translation type="unfinished">Some users don&apos;t have access to the selected layout. Action will not work for them.</translation>
-    </message>
-    <message>
       <source>None of selected users have access to the selected layout. Action will not work.</source>
       <translation type="unfinished">None of selected users have access to the selected layout. Action will not work.</translation>
     </message>
@@ -8721,6 +8729,10 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <message>
       <source>None of selected user roles contain users. Action will not work.</source>
       <translation type="unfinished">None of selected user roles contain users. Action will not work.</translation>
+    </message>
+    <message>
+      <source>Some users do not have access to the selected layout. Action will not work for them.</source>
+      <translation type="unfinished">Some users do not have access to the selected layout. Action will not work for them.</translation>
     </message>
   </context>
   <context>
@@ -8925,28 +8937,12 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
       <translation>Cài đặt Khác</translation>
     </message>
     <message>
-      <source>Dual-Streaming not supported for this camera</source>
-      <translation>Không hỗ trợ Dual-Streaming cho camera này</translation>
+      <source>Motion detection is disabled or not supported</source>
+      <translation type="unfinished">Motion detection is disabled or not supported</translation>
     </message>
     <message>
-      <source>Dual-Streaming and motion detection not supported for this camera</source>
-      <translation>Dual-Streaming và phát hiện chuyển động không được hỗ trợ cho camera này</translation>
-    </message>
-    <message>
-      <source>Motion detection disabled</source>
-      <translation>Đã tắt tính năng phát hiện chuyển động</translation>
-    </message>
-    <message>
-      <source>To enable or adjust it, go to the &quot;Motion&quot; tab in Camera Settings</source>
-      <translation>Để bật hoặc điều chỉnh nó, đi tới tab &quot;Motion&quot; trong Cài đặt camera</translation>
-    </message>
-    <message>
-      <source>Motion detection disabled or not supported</source>
-      <translation>Phát hiện chuyển động bị vô hiệu hoặc không được hỗ trợ</translation>
-    </message>
-    <message>
-      <source>To ensure it is supported and to enable it, go to the &quot;Motion&quot; tab in Camera Settings.</source>
-      <translation>Để chắc chắn tính năng phát hiện chuyển động đã được kích hoạt, đi tới tab &quot;Motion&quot; trong Cài đặt Camera.</translation>
+      <source>Dual-streaming is disabled or not supported</source>
+      <translation type="unfinished">Dual-streaming is disabled or not supported</translation>
     </message>
   </context>
   <context>
@@ -9040,6 +9036,10 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <message>
       <source>plugin is optional and is not in the white list</source>
       <translation>plugin là tùy chọn và không có trong danh sách trắng</translation>
+    </message>
+    <message>
+      <source>internal error</source>
+      <translation>lỗi bên trong</translation>
     </message>
   </context>
   <context>
@@ -9495,26 +9495,26 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <name>nx::vms::client::desktop::ui::PluginDiagnosticEventModel</name>
     <message>
       <source>Any Plugin</source>
-      <translation type="unfinished">Any Plugin</translation>
+      <translation>Tất cả Plugin</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ui::PluginDiagnosticEventWidget</name>
     <message>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the caption with any of the entered keywords.</translation>
+      <translation>Sự kiện sẽ kích hoạt chỉ khi có những trận đấu trong chú thích với bất kỳ từ khóa đã nhập.</translation>
     </message>
     <message>
       <source>If the field is empty, event will always trigger.</source>
-      <translation type="unfinished">If the field is empty, event will always trigger.</translation>
+      <translation>Nếu lĩnh vực này là trống rỗng, sự kiện sẽ luôn luôn kích hoạt.</translation>
     </message>
     <message>
       <source>This field is case sensitive.</source>
-      <translation type="unfinished">This field is case sensitive.</translation>
+      <translation>Lĩnh vực này là trường hợp nhạy cảm.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the description field with any of the entered keywords.</translation>
+      <translation>Sự kiện sẽ kích hoạt chỉ khi có những trận đấu trong trường mô tả với bất kỳ từ khóa đã nhập.</translation>
     </message>
   </context>
   <context>

@@ -1,6 +1,8 @@
 #ifndef ABSTRACTGRAPHICSSLIDER_H
 #define ABSTRACTGRAPHICSSLIDER_H
 
+#include <QSet>
+
 #include "graphics_widget.h"
 
 class AbstractGraphicsSliderPrivate;
@@ -114,6 +116,8 @@ protected:
         SliderMappingChange
     };
     virtual void sliderChange(SliderChange change);
+
+    void setSkipUpdateOnSliderChange(const QSet<SliderChange>& set);
 
     virtual void initStyleOption(QStyleOption* option) const override;
 

@@ -139,6 +139,7 @@ private:
         std::atomic<bool> generatePreviews{true};
 
         std::atomic<bool> throwPluginDiagnosticEvents{false};
+        std::atomic<bool> leakFrames{false};
     };
 
     DeviceAgentSettings m_deviceAgentSettings;

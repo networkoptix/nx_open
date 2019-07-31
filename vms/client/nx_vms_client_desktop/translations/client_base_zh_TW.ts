@@ -944,6 +944,14 @@ to view more bookmarks</source>
       <source>Objects Frames and Info...</source>
       <translation>物件影像幀數和信息...</translation>
     </message>
+    <message>
+      <source>Pin Calendar</source>
+      <translation>鎖定月曆</translation>
+    </message>
+    <message>
+      <source>Unpin Calendar</source>
+      <translation>解鎖月曆</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -4199,7 +4207,7 @@ to %1</source>
     </message>
     <message>
       <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
-      <translation type="unfinished">&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</translation>
+      <translation>&quot;虛擬攝影機&quot; 是一個影像資料專用的虛擬空間, 可上傳到系統中的任一伺服器並讓所有使用者存取.</translation>
     </message>
   </context>
   <context>
@@ -7484,6 +7492,10 @@ If you intended to move analytics data to another storage location, please conta
       <source>This action cannot be undone.</source>
       <translation>此操作無法被復原.</translation>
     </message>
+    <message>
+      <source>Motion detection stream is disabled</source>
+      <translation type="unfinished">Motion detection stream is disabled</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraScheduleWidget</name>
@@ -8326,8 +8338,8 @@ If you intended to move analytics data to another storage location, please conta
       <translation>指定的 IP 位址不可大於 255.</translation>
     </message>
     <message>
-      <source>Can&apos;t start searching process</source>
-      <translation>可以&apos;t開始搜索過程</translation>
+      <source>Can not start the search process</source>
+      <translation type="unfinished">Can not start the search process</translation>
     </message>
   </context>
   <context>
@@ -8583,10 +8595,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>沒有要更新的在線伺服器。</translation>
     </message>
     <message>
-      <source>Some servers haven&apos;t completed update process. Finish it anyway?</source>
-      <translation>有些伺服器&apos;未完成更新。繼續完成？</translation>
-    </message>
-    <message>
       <source>Cancel update and delete all downloaded data?</source>
       <translation>取消更新並刪除所有下載數據？</translation>
     </message>
@@ -8650,6 +8658,10 @@ If you intended to move analytics data to another storage location, please conta
       <source>Please please contact Customer Support.</source>
       <translation type="unfinished">Please please contact Customer Support.</translation>
     </message>
+    <message>
+      <source>Some servers have not completed the update process. Finish it anyway?</source>
+      <translation type="unfinished">Some servers have not completed the update process. Finish it anyway?</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::MultipleLayoutSelectionDialog</name>
@@ -8705,10 +8717,6 @@ If you intended to move analytics data to another storage location, please conta
   <context>
     <name>nx::vms::client::desktop::OpenLayoutActionWidget</name>
     <message>
-      <source>Some users don&apos;t have access to the selected layout. Action will not work for them.</source>
-      <translation>某些使用者&apos;t 對所選佈局不具有存取權限。佈局操作將無法正常執行。</translation>
-    </message>
-    <message>
       <source>None of selected users have access to the selected layout. Action will not work.</source>
       <translation>所有使用者對所選佈局均不具有存取權限。佈局操作將無法正常執行。</translation>
     </message>
@@ -8727,6 +8735,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>None of selected user roles contain users. Action will not work.</source>
       <translation>所選使用者角色均不包含使用者。操作不起作用。</translation>
+    </message>
+    <message>
+      <source>Some users do not have access to the selected layout. Action will not work for them.</source>
+      <translation type="unfinished">Some users do not have access to the selected layout. Action will not work for them.</translation>
     </message>
   </context>
   <context>
@@ -8825,7 +8837,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>This OS version is no longer supported.</source>
-      <translation type="unfinished">This OS version is no longer supported.</translation>
+      <translation>不再支援此作業系統版本.</translation>
     </message>
   </context>
   <context>
@@ -8931,28 +8943,12 @@ If you intended to move analytics data to another storage location, please conta
       <translation>更多設定</translation>
     </message>
     <message>
-      <source>Dual-Streaming not supported for this camera</source>
-      <translation>此攝影機不支援雙串流</translation>
+      <source>Motion detection is disabled or not supported</source>
+      <translation type="unfinished">Motion detection is disabled or not supported</translation>
     </message>
     <message>
-      <source>Dual-Streaming and motion detection not supported for this camera</source>
-      <translation>此攝影機不支援雙串流及位移偵測</translation>
-    </message>
-    <message>
-      <source>Motion detection disabled</source>
-      <translation>位移偵測已停用</translation>
-    </message>
-    <message>
-      <source>To enable or adjust it, go to the &quot;Motion&quot; tab in Camera Settings</source>
-      <translation>到攝影機設置中的&quot;位移偵測&quot;啟用或設置位移偵測.</translation>
-    </message>
-    <message>
-      <source>Motion detection disabled or not supported</source>
-      <translation>位移偵測停用或不支援</translation>
-    </message>
-    <message>
-      <source>To ensure it is supported and to enable it, go to the &quot;Motion&quot; tab in Camera Settings.</source>
-      <translation>請至攝影機設定的 &quot;位移偵測&quot; 頁面中確認系統支援並啟用.</translation>
+      <source>Dual-streaming is disabled or not supported</source>
+      <translation type="unfinished">Dual-streaming is disabled or not supported</translation>
     </message>
   </context>
   <context>
@@ -8982,7 +8978,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
-      <translation type="unfinished">Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</translation>
+      <translation>水印僅顯示在非管理員使用者的即時影像，存檔和匯出影片上。您和其他管理員並不會看到。</translation>
     </message>
   </context>
   <context>
@@ -9046,6 +9042,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>plugin is optional and is not in the white list</source>
       <translation>插件是可選的且不在白名單中</translation>
+    </message>
+    <message>
+      <source>internal error</source>
+      <translation>內部錯誤</translation>
     </message>
   </context>
   <context>
@@ -9501,26 +9501,26 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::ui::PluginDiagnosticEventModel</name>
     <message>
       <source>Any Plugin</source>
-      <translation type="unfinished">Any Plugin</translation>
+      <translation>任何插件</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ui::PluginDiagnosticEventWidget</name>
     <message>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the caption with any of the entered keywords.</translation>
+      <translation>只有當標題欄位中的文字與輸入的任何關鍵字相符時, 事件才會觸發</translation>
     </message>
     <message>
       <source>If the field is empty, event will always trigger.</source>
-      <translation type="unfinished">If the field is empty, event will always trigger.</translation>
+      <translation>如果該欄位為空白, 事件將維持在觸發狀態</translation>
     </message>
     <message>
       <source>This field is case sensitive.</source>
-      <translation type="unfinished">This field is case sensitive.</translation>
+      <translation>此欄位有大小寫之區分</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the description field with any of the entered keywords.</translation>
+      <translation>只有當敘述欄位中的文字與輸入的任何關鍵字相符時, 事件才會觸發。</translation>
     </message>
   </context>
   <context>

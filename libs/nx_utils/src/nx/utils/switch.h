@@ -21,7 +21,7 @@ auto switch_(const Value&, const Default&, const Action& defaultAction)
  *  const std::string line = nx::utils::switch_(count,
  *      0, [] { return "none"; },
  *      1, [] { return "single"; },
- *      nx::utils::default_, []{ return "many"; }
+ *      nx::utils::default_, [] { return "many"; }
  *  );
  * ```
  * Equivalent of:

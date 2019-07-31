@@ -137,15 +137,16 @@ bool SdkObjectFactory::initPluginResources()
     std::map<QnUuid, Ptr<nx::sdk::analytics::IPlugin>> sdkPluginsById;
     for (const auto& analyticsPlugin: analyticsPlugins)
     {
+        const QString pluginLibName = pluginManager->pluginInfo(analyticsPlugin.get())->libName;
+
         const auto pluginManifest = sdk_support::manifest<nx::vms::api::analytics::PluginManifest>(
             analyticsPlugin,
-            debug_helpers::nameOfFileToDumpOrLoadData(analyticsPlugin.get(), "_manifest.json"),
+            debug_helpers::nameOfFileToDumpOrLoadData(pluginLibName, "_manifest.json"),
             makeLogger(analyticsPlugin.get()));
 
         if (!pluginManifest)
         {
-            NX_ERROR(this, "Can't fetch a manifest from the analytics plugin %1",
-                analyticsPlugin->name());
+            NX_ERROR(this, "Can't fetch a manifest from the analytics plugin %1", pluginLibName);
             continue;
         }
 
@@ -381,7 +382,8 @@ std::unique_ptr<sdk_support::AbstractManifestLogger> SdkObjectFactory::makeLogge
 {
     return std::make_unique<sdk_support::StartupPluginManifestLogger>(
         typeid(*this), //< Using the same tag for all instances.
-        plugin);
+        plugin,
+        serverModule()->pluginManager());
 }
 
 } // namespace nx::vms::server::analytics

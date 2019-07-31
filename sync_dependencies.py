@@ -44,15 +44,13 @@ def determine_package_versions(
         "doxygen": "1.8.14",
         "gstreamer": "1.0",
         "icu": "60.2",
-        "deepstream": "0.1",
+        "deepstream": "0.2",
         "android-sdk": "28",
         "android-ndk": "r17",
         "help": customization + "-4.0",
         "server-external": release_version,
         "certificates": customization,
         "customization_pack": customization,
-        "detours": "4.0.1",
-        "stackwalker": "1.0",
     }
 
     if platform == "linux" and box == "none" and target not in ("linux_arm32", "linux_arm64"):
@@ -163,8 +161,8 @@ def sync_dependencies(syncher, platform, arch, box, release_version, options={})
         sync("sysroot", path_variable="sysroot_directory")
 
     if (platform, arch) == ("linux", "arm64"):
-        sync("tegra_video")
-        sync("jetpack")
+        sync("tegra_video", path_variable="tegra_video_directory")
+        sync("jetpack", path_variable="jetpack_directory")
         sync("deepstream")
 
     if platform in ("android", "windows") or box == "bpi":
@@ -192,9 +190,6 @@ def sync_dependencies(syncher, platform, arch, box, release_version, options={})
     if have_desktop_client:
         sync("any/help", path_variable="help_directory")
 
-    if (platform == "windows") and have_desktop_client:
-        sync("detours")
-        sync("stackwalker")
     if have_desktop_client or have_mobile_client:
         sync("any/roboto-fonts")
 

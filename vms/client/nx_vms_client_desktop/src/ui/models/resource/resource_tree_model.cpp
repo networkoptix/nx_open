@@ -60,6 +60,7 @@
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
 #include <ui/workbench/workbench_access_controller.h>
 
+#include <nx/utils/debug_helpers/model_transaction_checker.h>
 #include <nx/vms/client/desktop/utils/mime_data.h>
 
 using namespace nx::vms::client::desktop;
@@ -131,6 +132,9 @@ QnResourceTreeModel::QnResourceTreeModel(
     m_nodeManager(new QnResourceTreeModelNodeManager(this)),
     m_layoutNodeManager(new QnResourceTreeModelLayoutNodeManager(this))
 {
+    if (ini().developerMode)
+        nx::utils::ModelTransactionChecker::install(this);
+
     /* Create top-level nodes. */
     for (NodeType nodeType: rootNodeTypes())
         m_rootNodes[nodeType] =

@@ -203,9 +203,10 @@ void ScheduleSettingsWidget::loadState(const CameraSettingsDialogState& state)
     ui->recordAlwaysButton->setChecked(brush.recordingType == Qn::RecordingType::always);
     setReadOnly(ui->recordAlwaysButton, state.readOnly);
 
-    const bool hasMotion = state.hasMotion();
+    const bool hasMotion = state.isMotionDetectionEnabled();
     ui->recordMotionButton->setEnabled(hasMotion);
     ui->labelMotionOnly->setEnabled(hasMotion);
+
     if (hasMotion)
     {
         ui->recordMotionButton->setChecked(brush.recordingType == Qn::RecordingType::motionOnly);
@@ -218,9 +219,9 @@ void ScheduleSettingsWidget::loadState(const CameraSettingsDialogState& state)
     }
 
     const bool supportsMotionPlusLQ = state.supportsMotionPlusLQ();
-
     ui->recordMotionPlusLQButton->setEnabled(supportsMotionPlusLQ);
     ui->labelMotionPlusLQ->setEnabled(supportsMotionPlusLQ);
+
     if (supportsMotionPlusLQ)
     {
         ui->recordMotionPlusLQButton->setChecked(brush.recordingType == Qn::RecordingType::motionAndLow);
@@ -340,38 +341,11 @@ void ScheduleSettingsWidget::loadState(const CameraSettingsDialogState& state)
 
 QString ScheduleSettingsWidget::motionOptionHint(const CameraSettingsDialogState& state)
 {
-    const bool devicesHaveMotion = state.devicesDescription.hasMotion == CombinedValue::All;
-    const bool devicesHaveDualStreaming =
-        state.devicesDescription.hasDualStreamingCapability == CombinedValue::All;
+    if (!state.isMotionDetectionEnabled())
+        return tr("Motion detection is disabled or not supported");
 
-    // TODO: #vkutin #gdm Should we check whether dual-streaming is disabled?
-
-    if (state.isSingleCamera())
-    {
-        if (devicesHaveMotion && !devicesHaveDualStreaming)
-            return tr("Dual-Streaming not supported for this camera");
-
-        if (!devicesHaveMotion && !devicesHaveDualStreaming)
-            return tr("Dual-Streaming and motion detection not supported for this camera");
-
-        const bool motionDetectionEnabled = state.singleCameraSettings.enableMotionDetection();
-        if (!motionDetectionEnabled)
-        {
-            return tr("Motion detection disabled")
-                + L'\n'
-                + tr("To enable or adjust it, go to the \"Motion\" tab in Camera Settings");
-        }
-
-        return QString();
-    }
-
-    if (!devicesHaveMotion || !devicesHaveDualStreaming)
-    {
-        return tr("Motion detection disabled or not supported")
-            + L'\n'
-            + tr("To ensure it is supported and to enable it, "
-                "go to the \"Motion\" tab in Camera Settings.");
-    }
+    if (!state.supportsMotionPlusLQ())
+        return tr("Dual-streaming is disabled or not supported");
 
     return QString();
 }

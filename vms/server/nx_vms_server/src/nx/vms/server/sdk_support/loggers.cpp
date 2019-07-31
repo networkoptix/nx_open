@@ -7,6 +7,7 @@
 #include <nx/vms/server/analytics/debug_helpers.h>
 #include <nx/vms/server/sdk_support/utils.h>
 #include <nx/vms/server/sdk_support/to_string.h>
+#include <plugins/plugin_manager.h>
 #include <nx/utils/placeholder_binder.h>
 
 namespace nx::vms::server::sdk_support {
@@ -121,12 +122,15 @@ void ManifestLogger::log(
 
 StartupPluginManifestLogger::StartupPluginManifestLogger(
     nx::utils::log::Tag logTag,
-    const nx::sdk::analytics::IPlugin* plugin)
+    const nx::sdk::analytics::IPlugin* plugin,
+    const PluginManager* pluginManager)
     :
     m_logTag(std::move(logTag)),
-    m_plugin(plugin)
+    m_plugin(plugin),
+    m_pluginManager(pluginManager)
 {
     NX_ASSERT(plugin);
+    NX_ASSERT(pluginManager);
 }
 
 void StartupPluginManifestLogger::log(
@@ -140,14 +144,14 @@ void StartupPluginManifestLogger::log(
             manifestStr,
             QString(pluginsIni().analyticsManifestOutputPath),
             analytics::debug_helpers::nameOfFileToDumpOrLoadData(
-                m_plugin,
+                m_pluginManager->pluginInfo(m_plugin)->libName,
                 kManifestFilenamePostfix));
     }
 
     if (!error.isOk())
     {
         NX_WARNING(m_logTag, "Error obtaining manifest from Plugin %1: %2",
-            m_plugin->name(),
+            m_pluginManager->pluginInfo(m_plugin)->libName,
             error);
     }
 }
