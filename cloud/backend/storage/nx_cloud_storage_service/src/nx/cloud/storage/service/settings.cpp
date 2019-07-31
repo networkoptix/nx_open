@@ -27,14 +27,6 @@ static constexpr char kName[] = "name";
 
 } // namespace server
 
-namespace statistics {
-
-static constexpr char kGroupName[] = "statistics";
-static constexpr char kEnabled[] = "enabled";
-static constexpr bool kDefaultEnabled = false;
-
-} // namespace statistics
-
 namespace cloud_db {
 
 static constexpr char kGroupName[] = "cloud_db";
@@ -51,6 +43,13 @@ static constexpr char kAuthToken[] = "authToken";
 
 } // namespace aws
 
+namespace geo_ip {
+
+static constexpr char kGroupName[] = "geoIp";
+static constexpr char kDbPath[] = "dbPath";
+
+} // namespace aws
+
 namespace database {
 
 static constexpr char kGroupName[] = "database";
@@ -58,6 +57,14 @@ static constexpr char kSqlGroupName[] = "sql";
 static constexpr char kSynchronizationGroupName[] = "p2pDb";
 
 }
+
+namespace statistics {
+
+static constexpr char kGroupName[] = "statistics";
+static constexpr char kEnabled[] = "enabled";
+static constexpr bool kDefaultEnabled = false;
+
+} // namespace statistics
 
 Http::Http(const char* groupName):
     network::http::server::Settings(groupName)
@@ -79,6 +86,7 @@ void Settings::loadSettings()
     loadServer();
     loadCloudDb();
     loadAws();
+    loadGeoIp();
     loadDatabase();
     loadStatistics();
 }
@@ -114,6 +122,14 @@ void Settings::loadAws()
         settings().value(lm("%1/%2").args(kGroupName, kAuthToken)).toByteArray());
 
     m_aws.credentials = network::http::Credentials(accessKeyId, secretAccessKey);
+}
+
+void Settings::loadGeoIp()
+{
+    using namespace geo_ip;
+
+    m_geoIp.dbPath = settings().value(
+        lm("%1/%2").args(kGroupName, kDbPath)).toString().toStdString();
 }
 
 void Settings::loadDatabase()
@@ -152,6 +168,11 @@ const CloudDb& Settings::cloudDb() const
 const Aws& Settings::aws() const
 {
     return m_aws;
+}
+
+const GeoIp& Settings::geoIp() const
+{
+    return m_geoIp;
 }
 
 const Database& Settings::database() const

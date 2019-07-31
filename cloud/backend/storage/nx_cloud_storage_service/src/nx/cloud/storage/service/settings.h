@@ -33,6 +33,11 @@ struct Aws
     nx::network::http::Credentials credentials;
 };
 
+struct GeoIp
+{
+    std::string dbPath;
+};
+
 struct Database
 {
     nx::sql::ConnectionOptions sql;
@@ -56,6 +61,7 @@ public:
     const Server& server() const;
     const CloudDb& cloudDb() const;
     const Aws& aws() const;
+    const GeoIp& geoIp() const;
     const Database& database() const;
     const Statistics& statistics() const;
 
@@ -67,6 +73,7 @@ private:
     void loadServer();
     void loadCloudDb();
     void loadAws();
+    void loadGeoIp();
     void loadDatabase();
     void loadStatistics();
 
@@ -75,6 +82,7 @@ private:
     Server m_server;
     CloudDb m_cloudDb;
     Aws m_aws;
+    GeoIp m_geoIp;
     Database m_database;
     Statistics m_statistics;
 };
