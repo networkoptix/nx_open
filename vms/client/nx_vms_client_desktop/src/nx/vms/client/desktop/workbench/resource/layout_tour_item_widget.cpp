@@ -34,6 +34,7 @@
 
 #include <utils/common/event_processors.h>
 
+#include <nx/utils/pending_operation.h>
 #include <nx/utils/string.h>
 
 namespace nx::vms::client::desktop {
@@ -80,6 +81,9 @@ static const int kMargin = 8; //< Pixels.
 static const int kSpacing = 8; //< Pixels.
 
 static constexpr int kMaxTitleLength = 30; //< symbols
+
+// Save showreel once per second if delay is changed.
+static constexpr auto kSaveInteval = std::chrono::seconds(1);
 
 } // namespace
 
@@ -254,15 +258,20 @@ void LayoutTourItemWidget::initOverlay()
     const auto delayMs = item()->data(Qn::LayoutTourItemDelayMsRole).toInt();
     delayEdit->setValue(delayMs / 1000);
 
+    auto saveChanges = new nx::utils::PendingOperation(
+        [this] { menu()->trigger(action::SaveCurrentLayoutTourAction); },
+        kSaveInteval,
+        this);
+
     connect(delayEdit, QnSpinboxIntValueChanged, this,
-        [this](int value)
+        [this, saveChanges](int value)
         {
             if (m_updating)
                 return;
 
             QScopedValueRollback<bool> guard(m_updating, true);
             item()->setData(Qn::LayoutTourItemDelayMsRole, value * 1000);
-            menu()->trigger(action::SaveCurrentLayoutTourAction);
+            saveChanges->requestOperation();
         });
 
     connect(qnResourceRuntimeDataManager, &QnResourceRuntimeDataManager::layoutItemDataChanged,
