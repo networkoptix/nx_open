@@ -129,7 +129,7 @@ TEST_F(ResourceTreeModelTest, shouldShowPinnedNodesIfLoggedIn)
     ItemModelStateSnapshotHelper::SnapshotParams params;
     params.depth = 0;
     params.rowCount = 3;
-    const auto referenceSnapshot = QJsonDocument::fromJson(QString(R"(
+    const auto referenceSnapshot = QJsonDocument::fromJson(QString(R"json(
         [
             {
                 "data": {
@@ -143,7 +143,7 @@ TEST_F(ResourceTreeModelTest, shouldShowPinnedNodesIfLoggedIn)
             },
             {
             }
-        ])")
+        ])json")
         .arg(systemName)
         .arg(userName)
         .toUtf8());
@@ -167,14 +167,14 @@ TEST_F(ResourceTreeModelTest, singleServerShouldBeTopLevelNode)
     params.depth = 1;
     params.startRow = 3;
     params.rowCount = 1;
-    const auto referenceSnapshot = QJsonDocument::fromJson(QString(R"(
+    const auto referenceSnapshot = QJsonDocument::fromJson(QString(R"json(
         [
             {
                 "data": {
                     "display": "%1"
                 }
             }
-        ])")
+        ])json")
         .arg(serverName1)
         .toUtf8());
 
@@ -198,7 +198,7 @@ TEST_F(ResourceTreeModelTest, shouldGroupServersIfNotSingle)
     params.depth = 1;
     params.startRow = 3;
     params.rowCount = 1;
-    const auto referenceSnapshot = QJsonDocument::fromJson(QString(R"(
+    const auto referenceSnapshot = QJsonDocument::fromJson(QString(R"json(
         [
             {
                 "children": [
@@ -217,7 +217,7 @@ TEST_F(ResourceTreeModelTest, shouldGroupServersIfNotSingle)
                     "display": "Servers"
                 }
             }
-        ])")
+        ])json")
         .arg(serverName1)
         .arg(serverName2)
         .toUtf8());
