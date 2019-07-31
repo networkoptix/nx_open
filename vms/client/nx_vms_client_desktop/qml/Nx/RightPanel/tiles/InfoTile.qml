@@ -23,12 +23,12 @@ TileBase
 
             width: 20
             height: 20
-            fillMode: Image.Pad
+            sourceSize: Qt.size(width, height)
             Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
 
             readonly property string decorationPath: (model && model.decorationPath) || ""
             source: decorationPath.length ? ("qrc:/skin/" + decorationPath) : ""
-            color: (model && model.foregroundColor) || tile.palette.light
+            color: caption.color
         }
 
         ColumnLayout
@@ -50,7 +50,7 @@ TileBase
                     Layout.alignment: Qt.AlignLeft | Qt.AlignTop
                     Layout.fillWidth: true
                     wrapMode: Text.Wrap
-                    color: icon.color
+                    color: (model && model.foregroundColor) || tile.palette.light
                     font { pixelSize: 13; weight: Font.Medium }
 
                     rightPadding: (isCloseable && !timestamp.text.length)

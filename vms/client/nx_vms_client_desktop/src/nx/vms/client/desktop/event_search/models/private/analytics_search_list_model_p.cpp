@@ -18,7 +18,6 @@
 #include <ui/dialogs/common/message_box.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/helper.h>
-#include <ui/style/skin.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_navigator.h>
@@ -172,8 +171,8 @@ QVariant AnalyticsSearchListModel::Private::data(const QModelIndex& index, int r
                 : objectTypeDescriptor->name;
         }
 
-        case Qt::DecorationRole:
-            return QVariant::fromValue(qnSkin->pixmap("text_buttons/analytics.png"));
+        case Qn::DecorationPathRole:
+            return "text_buttons/analytics.png";
 
         case Qn::DescriptionTextRole:
             return description(track);
