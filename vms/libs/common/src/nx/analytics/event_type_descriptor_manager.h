@@ -57,9 +57,9 @@ public:
         const nx::vms::api::analytics::DeviceAgentManifest& manifest);
 
 private:
-    GroupId eventTypeGroupForEngine(
-        const EngineId& engineId,
-        const EventTypeId& eventTypeId) const;
+    ScopedEventTypeIds eventTypeGroupsByEngines(
+        const std::set<EngineId>& engineIds,
+        const std::set<EventTypeId>& eventTypeIds) const;
 
 private:
     EventTypeDescriptorContainer m_eventTypeDescriptorContainer;
