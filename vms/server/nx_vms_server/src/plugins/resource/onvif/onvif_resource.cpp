@@ -810,11 +810,11 @@ CameraDiagnostics::Result QnPlOnvifResource::initOnvifCapabilitiesAndUrls(
         return CameraDiagnostics::CameraInvalidParams("ONVIF media URL is not filled by camera");
 
     const auto doIgnoreMedia2byPropertyKeyAsString = getProperty(
-        ResourcePropertyKey::Onvif::kIgnoreMedia2);
+        ResourcePropertyKey::kOnvifIgnoreMedia2);
     const bool doIgnoreMedia2byPropertyKey = doIgnoreMedia2byPropertyKeyAsString.toInt() > 0;
 
     const auto doIgnoreMedia2byDataKey = resourceData().value<bool>(
-        ResourceDataKey::kIgnoreMedia2, false);
+        ResourceDataKey::kOnvifIgnoreMedia2, false);
 
     if (!(doIgnoreMedia2byPropertyKey || doIgnoreMedia2byDataKey))
     {
