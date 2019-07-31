@@ -2600,7 +2600,7 @@ void ActionHandler::confirmAnalyticsStorageLocation()
                 });
 
             const auto defaultDir = storages.empty()
-                ? tr("the largest available partition.") //< Should be unreachable, but...
+                ? tr("the largest available partition") //< Should be unreachable, but...
                 : storages.front()->getPath();
             QnMessageBox msgBox(
                 QnMessageBoxIcon::Warning,
@@ -2613,7 +2613,7 @@ void ActionHandler::confirmAnalyticsStorageLocation()
                     "We recommend to choose the location carefully and to avoid using"
                     " the system partition as it may cause severe system malfunction."
                     "\n"
-                    "By default analytics data will be stored on %1"
+                    "By default analytics data will be stored on %1."
                     "\n"
                     "You can select another storage location in the \"Storage Management\" tab"
                     " of the Server Settings dialog."
