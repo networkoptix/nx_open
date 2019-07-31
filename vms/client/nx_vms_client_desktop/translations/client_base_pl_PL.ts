@@ -5718,11 +5718,6 @@ to %1</source>
       <translation>Co zrobić z aktualnymi danymi analitycznymi?</translation>
     </message>
     <message>
-      <source>Current analytics data will not be automatically moved to another location and will become unaccessible. You can keep it and manually move later, or delete permanently.
-If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
-      <translation>Aktualne dane analityczne nie zostaną automatycznie przeniesione do innej lokalizacji i staną się niedostępne. Możesz je zachować i ręcznie przenieść później lub usunąć na stałe. Jeśli chcesz przenieść dane analityczne do innej lokalizacji, skontaktuj się najpierw z pomocą techniczną.</translation>
-    </message>
-    <message>
       <source>Delete</source>
       <translation>Usuń</translation>
     </message>
@@ -5733,6 +5728,12 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Cancel</source>
       <translation>Anuluj</translation>
+    </message>
+    <message>
+      <source>Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
+If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
+      <translation type="unfinished">Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
+If you intended to move analytics data to another storage location, please contact support before proceeding.</translation>
     </message>
   </context>
   <context>
@@ -7944,6 +7945,14 @@ If you intended to move analytics data to another storage location, please conta
       <source>Plugins</source>
       <translation>Wtyczki</translation>
     </message>
+    <message>
+      <source>Motion detection is disabled, all schedule records &quot;Motion&quot; and &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
+      <translation>Detekcja ruchu jest wyłączona. Ustawienia harmonogramu nagrywania w trybie &quot;Ruch&quot; i &quot;Ruch + Niska rozdzielczość&quot; zostaną zamienione na tryb &quot;Zawsze&quot;</translation>
+    </message>
+    <message>
+      <source>Dual streaming is disabled, all schedule records &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
+      <translation>Podwójne strumieniowanie jest wyłączone. Ustawienia harmonogramu nagrywania w trybie &quot;Ruch + Niska rozdzielczość&quot; zostaną zamienione na tryb &quot;Zawsze&quot;</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraSettingsLicenseWatcher</name>
@@ -8281,10 +8290,6 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>%n zdarzeń</numerusform>
         <numerusform>%n zdarzeń</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>unnamed analytics engine</source>
-      <translation>nieznany silnik analityczny</translation>
     </message>
     <message>
       <source>No events occurred</source>
@@ -9659,6 +9664,14 @@ If you intended to move analytics data to another storage location, please conta
       <source>File was corrupted while being uploaded to the server</source>
       <translation>Plik został uszkodzony podczas przesyłania na serwer</translation>
     </message>
+    <message>
+      <source>Remote file &quot;%1&quot; is corrupted</source>
+      <translation type="unfinished">Remote file &quot;%1&quot; is corrupted</translation>
+    </message>
+    <message>
+      <source>Server already has this file &quot;%1&quot;</source>
+      <translation type="unfinished">Server already has this file &quot;%1&quot;</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::WearableCameraMotionWidget</name>
@@ -10206,18 +10219,22 @@ If you intended to move analytics data to another storage location, please conta
       <translation>OK</translation>
     </message>
     <message>
-      <source>Confirm storage location to store analytics data on &apos;%1&apos;</source>
-      <translation>Potwierdź przechowywanie archiwum danych analitycznych na &apos;%1&apos;</translation>
+      <source>Confirm storage location for the analytics data on &quot;%1&quot;</source>
+      <translation type="unfinished">Confirm storage location for the analytics data on &quot;%1&quot;</translation>
     </message>
     <message>
-      <source>Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
-Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
-By default analytics data will be stored in mediaserver&apos;s installation directory.
-You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</source>
-      <translation>Baza danych analitycznych powinna być przechowywana w lokalnej pamięci masowej i może zajmować do stu gigabajtów.
-Po wybraniu lokalizacji do przechowywania danych analitycznych nie można jej łatwo zmienić bez utraty danych. Zalecamy ostrożne wybranie lokalizacji i nieużywanie partycji systemowej, aby uniknąć awarii systemu.
-Domyślnie dane analityczne będą przechowywane w katalogu instalacyjnym serwera.
-Możesz zmienić lokalizację przechowywania danych w ustawieniach serwera.</translation>
+      <source>the largest available partition</source>
+      <translation type="unfinished">the largest available partition</translation>
+    </message>
+    <message>
+      <source>The analytics database should only be stored on a local drive and can take up large amounts of space.
+Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
+By default analytics data will be stored on %1.
+You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</source>
+      <translation type="unfinished">The analytics database should only be stored on a local drive and can take up large amounts of space.
+Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
+By default analytics data will be stored on %1.
+You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</translation>
     </message>
   </context>
   <context>

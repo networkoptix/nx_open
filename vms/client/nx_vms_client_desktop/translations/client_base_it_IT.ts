@@ -945,11 +945,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Pin Calendar</source>
-      <translation type="unfinished">Pin Calendar</translation>
+      <translation>Calendario appuntato</translation>
     </message>
     <message>
       <source>Unpin Calendar</source>
-      <translation type="unfinished">Unpin Calendar</translation>
+      <translation>Sblocca calendario</translation>
     </message>
   </context>
   <context>
@@ -5595,12 +5595,6 @@ to %1</source>
       <translation>Cosa fare con i dati analitici correnti?</translation>
     </message>
     <message>
-      <source>Current analytics data will not be automatically moved to another location and will become unaccessible. You can keep it and manually move later, or delete permanently.
-If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
-      <translation>I dati di analisi attuali non verranno automaticamente spostati in un'altra posizione e diventeranno inaccessibili. E' possibile mantenerli e muoverli manualmente in un secondo momento o eliminarli definitivamente.
-Se si intende spostare i dati di analisi in un'altra posizione di memoria, contattare l'assistenza prima di procedere.</translation>
-    </message>
-    <message>
       <source>Delete</source>
       <translation>Elimina</translation>
     </message>
@@ -5611,6 +5605,12 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
     <message>
       <source>Cancel</source>
       <translation>Annulla</translation>
+    </message>
+    <message>
+      <source>Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
+If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
+      <translation type="unfinished">Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
+If you intended to move analytics data to another storage location, please contact support before proceeding.</translation>
     </message>
   </context>
   <context>
@@ -7593,7 +7593,7 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
     </message>
     <message>
       <source>Motion detection stream is disabled</source>
-      <translation type="unfinished">Motion detection stream is disabled</translation>
+      <translation>Il flusso di rilevamento del movimento è disabilitato</translation>
     </message>
   </context>
   <context>
@@ -7731,6 +7731,14 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
     <message>
       <source>Plugins</source>
       <translation>Plugins</translation>
+    </message>
+    <message>
+      <source>Motion detection is disabled, all schedule records &quot;Motion&quot; and &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
+      <translation>Il rilevamento del movimento è disabilitato, tutte le pianificazioni registrate &quot;Motion&quot; e &quot;Motion + Lo-Res&quot; saranno modificati in &quot;Sempre&quot;</translation>
+    </message>
+    <message>
+      <source>Dual streaming is disabled, all schedule records &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
+      <translation>Lo streaming doppio è disabilitato, tutte le registrazioni programmate &quot;Motion + Lo-Res&quot; saranno cambiate in &quot;Sempre&quot;</translation>
     </message>
   </context>
   <context>
@@ -8057,10 +8065,6 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
         <numerusform>%n eventi</numerusform>
         <numerusform>%n eventi</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>unnamed analytics engine</source>
-      <translation>motore analisi senza nome</translation>
     </message>
     <message>
       <source>No events occurred</source>
@@ -8451,7 +8455,7 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
     </message>
     <message>
       <source>Can not start the search process</source>
-      <translation type="unfinished">Can not start the search process</translation>
+      <translation>Impossibile avviare il processo di ricerca</translation>
     </message>
   </context>
   <context>
@@ -8773,7 +8777,7 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
     </message>
     <message>
       <source>Some servers have not completed the update process. Finish it anyway?</source>
-      <translation type="unfinished">Some servers have not completed the update process. Finish it anyway?</translation>
+      <translation>Alcuni server non hanno completato il processo di aggiornamento. Finirlo comunque?</translation>
     </message>
   </context>
   <context>
@@ -8852,7 +8856,7 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
     </message>
     <message>
       <source>Some users do not have access to the selected layout. Action will not work for them.</source>
-      <translation type="unfinished">Some users do not have access to the selected layout. Action will not work for them.</translation>
+      <translation>Alcuni utenti non hanno accesso al layout selezionato. L'azione non funzionerà per loro.</translation>
     </message>
   </context>
   <context>
@@ -9059,11 +9063,11 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
     </message>
     <message>
       <source>Motion detection is disabled or not supported</source>
-      <translation type="unfinished">Motion detection is disabled or not supported</translation>
+      <translation>Il rilevamento del movimento è disabilitato o non supportato</translation>
     </message>
     <message>
       <source>Dual-streaming is disabled or not supported</source>
-      <translation type="unfinished">Dual-streaming is disabled or not supported</translation>
+      <translation>Dual-streaming è disabilitato o non supportato</translation>
     </message>
   </context>
   <context>
@@ -9414,6 +9418,14 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
     <message>
       <source>File was corrupted while being uploaded to the server</source>
       <translation>Il file è stato danneggiato durante il caricamento sul server</translation>
+    </message>
+    <message>
+      <source>Remote file &quot;%1&quot; is corrupted</source>
+      <translation type="unfinished">Remote file &quot;%1&quot; is corrupted</translation>
+    </message>
+    <message>
+      <source>Server already has this file &quot;%1&quot;</source>
+      <translation type="unfinished">Server already has this file &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
@@ -9944,19 +9956,22 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
       <translation>Ok</translation>
     </message>
     <message>
-      <source>Confirm storage location to store analytics data on &apos;%1&apos;</source>
-      <translation>Confermare la posizione di archiviazione per memorizzare i dati di analisi</translation>
+      <source>Confirm storage location for the analytics data on &quot;%1&quot;</source>
+      <translation type="unfinished">Confirm storage location for the analytics data on &quot;%1&quot;</translation>
     </message>
     <message>
-      <source>Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
-Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
-By default analytics data will be stored in mediaserver&apos;s installation directory.
-You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</source>
-      <translation>Il database dei dati di analisi, deve essere memorizzato su una memoria locale e può occupare fino a centinaia di gigabyte.
-
-Una volta selezionata la posizione in cui archiviare i dati di analisi, non è possibile modificarli facilmente senza perdere i dati esistenti. Raccomandiamo di scegliere con cura la posizione e di non utilizzare la partizione di sistema per evitare gravi malfunzionamenti del sistema.
-L'impostazione iniziale dei dati di analisi e' all'interno della cartella d'installazione mediaserver&apos;s
-È possibile modificare la posizione di archiviazione nella scheda &quot;Gestione archiviazione&quot; nella finestra di dialogo Impostazioni server.</translation>
+      <source>the largest available partition</source>
+      <translation type="unfinished">the largest available partition</translation>
+    </message>
+    <message>
+      <source>The analytics database should only be stored on a local drive and can take up large amounts of space.
+Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
+By default analytics data will be stored on %1.
+You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</source>
+      <translation type="unfinished">The analytics database should only be stored on a local drive and can take up large amounts of space.
+Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
+By default analytics data will be stored on %1.
+You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</translation>
     </message>
   </context>
   <context>

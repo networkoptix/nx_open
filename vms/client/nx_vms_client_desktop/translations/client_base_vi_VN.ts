@@ -9,7 +9,7 @@
     </message>
     <message>
       <source>Backup newly added cameras</source>
-      <translation>Máy ảnh mới được thêm vào bản sao lưu</translation>
+      <translation>Camera mới được thêm vào bản sao lưu</translation>
     </message>
     <message>
       <source>Cannot add new devices while backup process is running.</source>
@@ -17,7 +17,7 @@
     </message>
     <message>
       <source>Cannot add new cameras while backup process is running.</source>
-      <translation>Không thể thêm máy ảnh mới trong khi quá trình sao lưu đang chạy.</translation>
+      <translation>Không thể thêm camera mới trong khi quá trình sao lưu đang chạy.</translation>
     </message>
     <message>
       <source>Cannot add new devices because they store archive on external storage.</source>
@@ -25,7 +25,7 @@
     </message>
     <message>
       <source>Cannot add new cameras because they store archive on external storage.</source>
-      <translation>Không thể thêm máy ảnh mới vì chỉ lưu trữ trong bộ nhớ ngoài.</translation>
+      <translation>Không thể thêm camera mới vì chỉ lưu trữ trong bộ nhớ ngoài.</translation>
     </message>
   </context>
   <context>
@@ -114,7 +114,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Cameras to Backup...</source>
-      <translation>Máy ảnh để sao lưu...</translation>
+      <translation>Camera để sao lưu...</translation>
     </message>
     <message>
       <source>Control Video Wall</source>
@@ -321,7 +321,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Cameras List</source>
-      <translation>Danh sách máy ảnh</translation>
+      <translation>Danh sách camera</translation>
     </message>
     <message>
       <source>Merge Systems...</source>
@@ -581,7 +581,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Check Cameras Issues...</source>
-      <translation>Kiểm tra vấn đề Máy ảnh...</translation>
+      <translation>Kiểm tra vấn đề camera...</translation>
     </message>
     <message>
       <source>Check I/O Module Issues...</source>
@@ -605,7 +605,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Cameras Rules...</source>
-      <translation>Máy ảnh quy tắc...</translation>
+      <translation>Camera quy tắc...</translation>
     </message>
     <message>
       <source>I/O Module Rules...</source>
@@ -629,7 +629,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Cameras Settings...</source>
-      <translation>Cài đặt máy ảnh...</translation>
+      <translation>Cài đặt camera...</translation>
     </message>
     <message>
       <source>I/O Module Settings...</source>
@@ -661,7 +661,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Cameras List by Server...</source>
-      <translation>Máy ảnh Danh sách bởi máy chủ...</translation>
+      <translation>Camera Danh sách bởi máy chủ...</translation>
     </message>
     <message>
       <source>Server Logs...</source>
@@ -829,7 +829,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Some cameras require passwords to be set</source>
-      <translation>Một số máy ảnh yêu cầu mật khẩu được thiết lập</translation>
+      <translation>Một số camera yêu cầu mật khẩu được thiết lập</translation>
     </message>
     <message>
       <source>Export Video...</source>
@@ -1525,7 +1525,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>No cameras</source>
-      <translation>Không có Camera</translation>
+      <translation>Không có camera</translation>
     </message>
     <message>
       <source>Select sessions to see their details</source>
@@ -1757,7 +1757,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Select Cameras to Backup...</source>
-      <translation>Chọn ảnh để sao lưu...</translation>
+      <translation>Chọn camera để Sao lưu...</translation>
     </message>
     <message>
       <source>If the backup is not set up on the current server of the cameras, their archive will not be backed up.</source>
@@ -1950,7 +1950,7 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>Source and %n more cameras</source>
       <translation>
-        <numerusform>Nguồn và %n máy ảnh hơn</numerusform>
+        <numerusform>Nguồn và %n camera hơn</numerusform>
       </translation>
     </message>
     <message>
@@ -2249,7 +2249,7 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>%n cameras found</source>
       <translation>
-        <numerusform>%n máy ảnh được tìm thấy</numerusform>
+        <numerusform>%n camera được tìm thấy</numerusform>
       </translation>
     </message>
     <message>
@@ -2258,7 +2258,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Export selected cameras to a file.</source>
-      <translation>Xuất khẩu chọn lọc máy ảnh vào một tập tin.</translation>
+      <translation>Xuất khẩu chọn lọc camera vào một tập tin.</translation>
     </message>
     <message numerus="yes">
       <source>%n I/O modules found</source>
@@ -2278,7 +2278,7 @@ to view more bookmarks</source>
     <message>
       <source>Cameras List for %1</source>
       <comment>%1 will be substituted with a server name</comment>
-      <translation>Máy ảnh Danh sách cho %1</translation>
+      <translation>Camera Danh sách cho %1</translation>
     </message>
   </context>
   <context>
@@ -2939,7 +2939,7 @@ to %1</source>
     <name>QnEmptyBusinessActionWidget</name>
     <message>
       <source>Panic Recording mode switches recording settings for all cameras to maximum FPS and quality.</source>
-      <translation>Chế độ Ghi âm Panic sẽ chuyển cài đặt ghi hình cho tất cả các máy ảnh thành FPS và chất lượng tối đa.</translation>
+      <translation>Chế độ Ghi âm Panic sẽ chuyển cài đặt ghi hình cho tất cả các camera thành FPS và chất lượng tối đa.</translation>
     </message>
   </context>
   <context>
@@ -3127,7 +3127,7 @@ to %1</source>
     </message>
     <message>
       <source>Select cameras to setup failover priority</source>
-      <translation>Chọn máy ảnh để thiết lập ưu tiên chuyển đổi dự phòng</translation>
+      <translation>Chọn camera để thiết lập ưu tiên chuyển đổi dự phòng</translation>
     </message>
   </context>
   <context>
@@ -3249,7 +3249,7 @@ to %1</source>
     </message>
     <message>
       <source>Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</source>
-      <translation>Bản sao lưu bao gồm cài đặt máy chủ và máy ảnh, người dùng, trang web, quy tắc sự kiện, v. v. Video không được lưu.</translation>
+      <translation>Bản sao lưu bao gồm cài đặt máy chủ và camera, người dùng, trang web, quy tắc sự kiện, v. v. Video không được lưu.</translation>
     </message>
     <message>
       <source>Creates a backup of System configuration that can be restored in case of failure.</source>
@@ -3961,7 +3961,7 @@ to %1</source>
     </message>
     <message>
       <source>Displays IP addresses for cameras and servers and roles for users.</source>
-      <translation>Hiển thị địa chỉ IP cho máy ảnh và máy chủ và vai trò cho người dùng.</translation>
+      <translation>Hiển thị địa chỉ IP cho camera và máy chủ và vai trò cho người dùng.</translation>
     </message>
     <message>
       <source>Length of time each camera on layout will be displayed if you start a Tour.</source>
@@ -4164,7 +4164,7 @@ to %1</source>
     </message>
     <message>
       <source>NVR cameras do not support not-synchronized playback</source>
-      <translation>NVR không hỗ trợ không đồng bộ khi phát lại</translation>
+      <translation>Camera NVR không hỗ trợ phát lại không đồng bộ</translation>
     </message>
   </context>
   <context>
@@ -4202,7 +4202,7 @@ to %1</source>
     </message>
     <message>
       <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
-      <translation type="unfinished">&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</translation>
+      <translation>&quot;Camera ảo&quot; là bộ lưu trữ ảo cho các tệp video, có thể được tải lên bất kỳ máy chủ nào trên Hệ thống của bạn và được truy cập bởi bất kỳ người dùng nào.</translation>
     </message>
   </context>
   <context>
@@ -4542,7 +4542,7 @@ to %1</source>
     <name>QnRecordingStats</name>
     <message>
       <source>Cameras from other servers and removed cameras</source>
-      <translation>Máy ảnh từ các máy chủ khác và camera loại bỏ</translation>
+      <translation>Camera từ các máy chủ khác và camera loại bỏ</translation>
     </message>
     <message numerus="yes">
       <source>Total %1 %n devices</source>
@@ -4732,7 +4732,7 @@ to %1</source>
     </message>
     <message>
       <source>Select Cameras...</source>
-      <translation>Chọn Máy ảnh...</translation>
+      <translation>Chọn camera...</translation>
     </message>
   </context>
   <context>
@@ -5068,7 +5068,7 @@ to %1</source>
     </message>
     <message>
       <source>Max cameras on this server:</source>
-      <translation>Máy ảnh tối đa trên máy chủ này:</translation>
+      <translation>Camera tối đa trên máy chủ này:</translation>
     </message>
     <message>
       <source>This server already has more than max devices</source>
@@ -5076,7 +5076,7 @@ to %1</source>
     </message>
     <message>
       <source>This server already has more than max cameras</source>
-      <translation>Máy chủ này đã có hơn máy ảnh max</translation>
+      <translation>Máy chủ này đã có hơn camera max</translation>
     </message>
     <message>
       <source>To avoid issues adjust max number of devices</source>
@@ -5084,7 +5084,7 @@ to %1</source>
     </message>
     <message>
       <source>To avoid issues adjust max number of cameras</source>
-      <translation>Để tránh các vấn đề điều chỉnh số lượng tối đa của máy ảnh</translation>
+      <translation>Để tránh các vấn đề điều chỉnh số lượng tối đa của camera</translation>
     </message>
     <message>
       <source>Failover</source>
@@ -5092,7 +5092,7 @@ to %1</source>
     </message>
     <message>
       <source>Servers with failover enabled will automatically take cameras from offline servers.</source>
-      <translation>Máy chủ có chuyển đổi dự phòng được bật sẽ tự động lấy máy ảnh từ máy chủ ngoại tuyến.</translation>
+      <translation>Máy chủ có chuyển đổi dự phòng được bật sẽ tự động lấy camera từ máy chủ ngoại tuyến.</translation>
     </message>
   </context>
   <context>
@@ -5413,7 +5413,7 @@ to %1</source>
     </message>
     <message>
       <source>Forecast available only for cameras with enabled recording.</source>
-      <translation>Dự báo chỉ có sẵn cho Camera có kích hoạt ghi.</translation>
+      <translation>Dự báo chỉ có sẵn cho camera có kích hoạt ghi.</translation>
     </message>
   </context>
   <context>
@@ -5531,12 +5531,6 @@ to %1</source>
       <translation>Cần làm gì với dữ liệu phân tích hiện tại?</translation>
     </message>
     <message>
-      <source>Current analytics data will not be automatically moved to another location and will become unaccessible. You can keep it and manually move later, or delete permanently.
-If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
-      <translation>Dữ liệu phân tích hiện tại sẽ không được tự động chuyển đến vị trí khác và sẽ không thể truy cập được. Bạn có thể giữ và di chuyển thủ công sau đó, hoặc xóa vĩnh viễn.
-Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị trí lưu trữ khác, vui lòng liên hệ với bộ phận hỗ trợ trước khi tiếp tục.</translation>
-    </message>
-    <message>
       <source>Delete</source>
       <translation>Xóa bỏ</translation>
     </message>
@@ -5547,6 +5541,12 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <message>
       <source>Cancel</source>
       <translation>Hủy bỏ</translation>
+    </message>
+    <message>
+      <source>Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
+If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
+      <translation type="unfinished">Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
+If you intended to move analytics data to another storage location, please contact support before proceeding.</translation>
     </message>
   </context>
   <context>
@@ -5741,7 +5741,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>You cannot record video from cameras.</source>
-      <translation>Bạn không có thể ghi lại video từ máy ảnh.</translation>
+      <translation>Bạn không có thể ghi lại video từ camera.</translation>
     </message>
     <message>
       <source>Rebuilding archive index is completed on the following Server:</source>
@@ -5862,7 +5862,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Includes information about system, such as cameras models and firmware versions, number of servers, etc.</source>
-      <translation>Bao gồm các thông tin về hệ thống, chẳng hạn như mô hình máy ảnh và các phiên bản phần vững, số lượng máy chủ, vv.</translation>
+      <translation>Bao gồm các thông tin về hệ thống, chẳng hạn như mô hình camera và các phiên bản phần vững, số lượng máy chủ, vv.</translation>
     </message>
     <message>
       <source>Does not include any personal information and is completely anonymous.</source>
@@ -5870,19 +5870,19 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Failover server measures may still request camera status updates regardless of this setting.</source>
-      <translation type="unfinished">Failover server measures may still request camera status updates regardless of this setting.</translation>
+      <translation>Các biện pháp máy chủ chuyển đổi dự phòng vẫn có thể yêu cầu cập nhật trạng thái camera bất kể cài đặt này.</translation>
     </message>
     <message>
       <source>Enable devices and servers autodiscovery and automated device status check</source>
-      <translation type="unfinished">Enable devices and servers autodiscovery and automated device status check</translation>
+      <translation>Cho phép tự động phát hiện thiết bị và máy chủ và kiểm tra trạng thái thiết bị tự động</translation>
     </message>
     <message>
       <source>Enable cameras and servers autodiscovery and automated camera status check</source>
-      <translation type="unfinished">Enable cameras and servers autodiscovery and automated camera status check</translation>
+      <translation>Cho phép tự động phát hiện camera và máy chủ và kiểm tra trạng thái camera tự động</translation>
     </message>
     <message>
       <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
-      <translation type="unfinished">When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</translation>
+      <translation>Khi được bật, hệ thống liên tục phát hiện các camera và máy chủ mới và gửi yêu cầu khám phá tới các camera để cập nhật trạng thái.</translation>
     </message>
   </context>
   <context>
@@ -5935,11 +5935,11 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>VMS time is synchronized with the Internet and does not depend on local time on servers.</source>
-      <translation type="unfinished">VMS time is synchronized with the Internet and does not depend on local time on servers.</translation>
+      <translation>Thời gian VMS được đồng bộ hóa với Internet và không phụ thuộc vào giờ địa phương trên các máy chủ.</translation>
     </message>
     <message>
       <source>VMS time is synchronized with local time on the selected server and does not depend on local time on other servers.</source>
-      <translation type="unfinished">VMS time is synchronized with local time on the selected server and does not depend on local time on other servers.</translation>
+      <translation>Thời gian VMS được đồng bộ hóa với giờ địa phương trên máy chủ được chọn và không phụ thuộc vào giờ địa phương trên các máy chủ khác.</translation>
     </message>
   </context>
   <context>
@@ -6456,15 +6456,15 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>%1 has been successfully configured.</source>
-      <translation type="unfinished">%1 has been successfully configured.</translation>
+      <translation>%1 đã được cấu hình thành công.</translation>
     </message>
     <message>
       <source>To complete the process, please connect to it with Client and update to version %1.</source>
-      <translation type="unfinished">To complete the process, please connect to it with Client and update to version %1.</translation>
+      <translation>Để hoàn tất quy trình, vui lòng kết nối với Máy khách và cập nhật lên phiên bản %1.</translation>
     </message>
     <message>
       <source>Failed to merge %1 to our system.</source>
-      <translation type="unfinished">Failed to merge %1 to our system.</translation>
+      <translation>Không thể hợp nhất %1 vào hệ thống của chúng tôi.</translation>
     </message>
   </context>
   <context>
@@ -6535,7 +6535,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>AVI (Audio/Video Interleaved)</source>
-      <translation type="unfinished">AVI (Audio/Video Interleaved)</translation>
+      <translation>AVI (Tập tin hình ảnh âm thanh)</translation>
     </message>
   </context>
   <context>
@@ -6810,8 +6810,8 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message numerus="yes">
       <source>You can upload these files to a different instance of a Virtual Camera.</source>
-      <translation type="unfinished">
-        <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
+      <translation>
+        <numerusform>Bạn có thể tải các tệp này lên một phiên bản khác của camera ảo.</numerusform>
       </translation>
     </message>
     <message>
@@ -7021,8 +7021,8 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message numerus="yes">
       <source>Some video files are still being uploaded to %n virtual cameras:</source>
-      <translation type="unfinished">
-        <numerusform>Some video files are still being uploaded to %n virtual cameras:</numerusform>
+      <translation>
+        <numerusform>Một số tệp video vẫn đang được tải lên %n camera ảo:</numerusform>
       </translation>
     </message>
   </context>
@@ -7030,11 +7030,11 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <name>SessionExpiredDialog</name>
     <message>
       <source>Your session has expired</source>
-      <translation type="unfinished">Your session has expired</translation>
+      <translation>Phiên của bạn đã hết hạn</translation>
     </message>
     <message>
       <source>Session duration limit can be changed by the system administrators</source>
-      <translation type="unfinished">Session duration limit can be changed by the system administrators</translation>
+      <translation>Quản trị viên hệ thống có thể thay đổi giới hạn thời lượng phiên</translation>
     </message>
   </context>
   <context>
@@ -7118,21 +7118,21 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <name>UpdateStrings</name>
     <message>
       <source>This Linux platform is no longer supported</source>
-      <translation type="unfinished">This Linux platform is no longer supported</translation>
+      <translation>Nền tảng Linux này không còn được hỗ trợ</translation>
     </message>
     <message>
       <source>This OS version is no longer supported</source>
-      <translation type="unfinished">This OS version is no longer supported</translation>
+      <translation>Phiên bản HĐH này không còn được hỗ trợ</translation>
     </message>
     <message>
       <source>This %1 version is no longer supported</source>
       <comment>%1 is OS name, e.g. Windows</comment>
-      <translation type="unfinished">This %1 version is no longer supported</translation>
+      <translation>Phiên bản %1 này không còn được hỗ trợ</translation>
     </message>
     <message>
       <source>%1 %2 is no longer supported</source>
       <comment>%1 %2 are OS name and version, e.g. Windows 7</comment>
-      <translation type="unfinished">%1 %2 is no longer supported</translation>
+      <translation>%1 %2 không còn được hỗ trợ</translation>
     </message>
   </context>
   <context>
@@ -7166,7 +7166,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <name>nx::vms::client::desktop::AbstractSearchWidget::Private</name>
     <message>
       <source>Hide information</source>
-      <translation type="unfinished">Hide information</translation>
+      <translation>Ẩn thông tin</translation>
     </message>
     <message>
       <source>Show information</source>
@@ -7211,7 +7211,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Cameras on layout</source>
-      <translation>Các Camera trên bố cục</translation>
+      <translation>Các camera trên bố cục</translation>
     </message>
     <message>
       <source>Any device</source>
@@ -7238,7 +7238,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Show Only with &quot;Objects&quot; Tab</source>
-      <translation type="unfinished">Show Only with &quot;Objects&quot; Tab</translation>
+      <translation>Chỉ hiển thị với &quot;Đối tượng&quot; Tab</translation>
     </message>
     <message>
       <source>Show</source>
@@ -7397,7 +7397,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</source>
-      <translation>Giúp sửa các vấn đề về chất lượng hình ảnh trên một số máy ảnh; cho những người khác sẽ làm tăng đáng kể tốc độ bitrate.</translation>
+      <translation>Giúp sửa các vấn đề về chất lượng hình ảnh trên một số camera; cho những người khác sẽ làm tăng đáng kể tốc độ bitrate.</translation>
     </message>
     <message>
       <source>Custom number that can be assigned to a camera for quick identification and access</source>
@@ -7421,7 +7421,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Server will not change any cameras settings, it will receive and use camera stream as-is.</source>
-      <translation>Máy chủ sẽ không thay đổi bất kỳ cài đặt máy ảnh nào, nó sẽ nhận và sử dụng luồng máy ảnh như hiện tại.</translation>
+      <translation>Máy chủ sẽ không thay đổi bất kỳ cài đặt camera nào, nó sẽ nhận và sử dụng luồng camera như hiện tại.</translation>
     </message>
     <message>
       <source>Multicast</source>
@@ -7488,7 +7488,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Motion detection stream is disabled</source>
-      <translation type="unfinished">Motion detection stream is disabled</translation>
+      <translation>Luồng phát hiện chuyển động bị vô hiệu hóa</translation>
     </message>
   </context>
   <context>
@@ -7582,7 +7582,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <message numerus="yes">
       <source>Changes to the following %n cameras are not saved:</source>
       <translation>
-        <numerusform>Những thay đổi dưới đây%n không được lưu trên thiết bị:</numerusform>
+        <numerusform>Thay đổi đối với %n camera sau không được lưu:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -7609,7 +7609,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Cameras Settings</source>
-      <translation>Cài đặt Camera</translation>
+      <translation>Cài đặt camera</translation>
     </message>
     <message>
       <source>I/O Module Settings</source>
@@ -7622,6 +7622,14 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <message>
       <source>Plugins</source>
       <translation>Plugins</translation>
+    </message>
+    <message>
+      <source>Motion detection is disabled, all schedule records &quot;Motion&quot; and &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
+      <translation>Phát hiện chuyển động bị tắt, tất cả các bản ghi lịch biểu &quot;Chuyển động&quot; và &quot;Chuyển động + Lo-Res&quot; sẽ được thay đổi thành &quot;Luôn&quot;</translation>
+    </message>
+    <message>
+      <source>Dual streaming is disabled, all schedule records &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
+      <translation>Truyền phát kép bị vô hiệu hóa, tất cả các bản ghi lịch biểu &quot;Chuyển động + Lo-Res&quot; sẽ được thay đổi thành &quot;Luôn&quot;</translation>
     </message>
   </context>
   <context>
@@ -7667,15 +7675,15 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Failed to download update package: %1</source>
-      <translation type="unfinished">Failed to download update package: %1</translation>
+      <translation>Không thể tải xuống gói cập nhật: %1</translation>
     </message>
     <message>
       <source>Update package is corrupted: %1</source>
-      <translation type="unfinished">Update package is corrupted: %1</translation>
+      <translation>Gói cập nhật bị hỏng: %1</translation>
     </message>
     <message>
       <source>This update is already installed.</source>
-      <translation type="unfinished">This update is already installed.</translation>
+      <translation>Bản cập nhật này đã được cài đặt.</translation>
     </message>
     <message>
       <source>This version is not installed.</source>
@@ -7944,10 +7952,6 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
       </translation>
     </message>
     <message>
-      <source>unnamed analytics engine</source>
-      <translation>công cụ phân tích không tên</translation>
-    </message>
-    <message>
       <source>No events occurred</source>
       <translation>Không có sự kiện nào xảy ra</translation>
     </message>
@@ -8007,11 +8011,11 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Schedule motion type is not supported by some cameras.</source>
-      <translation>Loại lịch trình chuyển động không được hỗ trợ bởi một số máy ảnh.</translation>
+      <translation>Loại lịch trình chuyển động không được hỗ trợ bởi một số camera.</translation>
     </message>
     <message>
       <source>Recording cannot be enabled for some cameras.</source>
-      <translation>Ghi âm không thể được kích hoạt cho một số máy ảnh.</translation>
+      <translation>Ghi âm không thể được kích hoạt cho một số camera.</translation>
     </message>
     <message>
       <source>Schedule settings are not compatible with some devices.</source>
@@ -8333,7 +8337,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Can not start the search process</source>
-      <translation type="unfinished">Can not start the search process</translation>
+      <translation>Không thể bắt đầu quá trình tìm kiếm</translation>
     </message>
   </context>
   <context>
@@ -8586,23 +8590,23 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>There are no online servers to update.</source>
-      <translation type="unfinished">There are no online servers to update.</translation>
+      <translation>Không có máy chủ trực tuyến để cập nhật.</translation>
     </message>
     <message>
       <source>Cancel update and delete all downloaded data?</source>
-      <translation type="unfinished">Cancel update and delete all downloaded data?</translation>
+      <translation>Hủy cập nhật và xóa tất cả dữ liệu đã tải xuống?</translation>
     </message>
     <message>
       <source>There was an error while installing updates:</source>
-      <translation type="unfinished">There was an error while installing updates:</translation>
+      <translation>Có lỗi trong khi cài đặt bản cập nhật:</translation>
     </message>
     <message>
       <source>Some servers have gone offline. Please wait until they become online to continue.</source>
-      <translation type="unfinished">Some servers have gone offline. Please wait until they become online to continue.</translation>
+      <translation>Một số máy chủ đã ngoại tuyến. Xin vui lòng chờ cho đến khi họ trở nên trực tuyến để tiếp tục.</translation>
     </message>
     <message>
       <source>Update completed, but some components have failed an update</source>
-      <translation type="unfinished">Update completed, but some components have failed an update</translation>
+      <translation>Cập nhật hoàn tất, nhưng một số thành phần đã không cập nhật</translation>
     </message>
     <message>
       <source>Please update %1 manually using an installation package.</source>
@@ -8614,47 +8618,47 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Failed to download update packages to some components</source>
-      <translation type="unfinished">Failed to download update packages to some components</translation>
+      <translation>Không thể tải xuống các gói cập nhật cho một số thành phần</translation>
     </message>
     <message>
       <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
-      <translation type="unfinished">OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</translation>
+      <translation>Phiên bản hệ điều hành của một số thành phần không còn được hỗ trợ. Vui lòng xóa chúng khỏi Hệ thống hoặc cập nhật HĐH của chúng lên phiên bản được hỗ trợ.</translation>
     </message>
     <message>
       <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
-      <translation type="unfinished">OS version of the client is no longer supported. Please update its OS to a supported version.</translation>
+      <translation>Phiên bản hệ điều hành của máy khách không còn được hỗ trợ. Vui lòng cập nhật hệ điều hành của nó lên phiên bản được hỗ trợ.</translation>
     </message>
     <message>
       <source>Failed to start update</source>
-      <translation type="unfinished">Failed to start update</translation>
+      <translation>Không thể bắt đầu cập nhật</translation>
     </message>
     <message>
       <source>Starting update to ...</source>
-      <translation type="unfinished">Starting update to ...</translation>
+      <translation>Bắt đầu cập nhật lên ...</translation>
     </message>
     <message>
       <source>Failed to cancel update</source>
-      <translation type="unfinished">Failed to cancel update</translation>
+      <translation>Không thể hủy cập nhật</translation>
     </message>
     <message>
       <source>Failed to start installation</source>
-      <translation type="unfinished">Failed to start installation</translation>
+      <translation>Không thể bắt đầu cài đặt</translation>
     </message>
     <message>
       <source>Some servers have no update packages available.</source>
-      <translation type="unfinished">Some servers have no update packages available.</translation>
+      <translation>Một số máy chủ không có gói cập nhật có sẵn.</translation>
     </message>
     <message>
       <source>Some servers have encountered an internal error.</source>
-      <translation type="unfinished">Some servers have encountered an internal error.</translation>
+      <translation>Một số máy chủ đã gặp lỗi nội bộ.</translation>
     </message>
     <message>
       <source>Please please contact Customer Support.</source>
-      <translation type="unfinished">Please please contact Customer Support.</translation>
+      <translation>Vui lòng liên hệ Hỗ trợ Khách hàng.</translation>
     </message>
     <message>
       <source>Some servers have not completed the update process. Finish it anyway?</source>
-      <translation type="unfinished">Some servers have not completed the update process. Finish it anyway?</translation>
+      <translation>Một số máy chủ chưa hoàn thành quá trình cập nhật. Kết thúc nó bằng cách nào?</translation>
     </message>
   </context>
   <context>
@@ -8667,7 +8671,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>You do not have any layouts</source>
-      <translation type="unfinished">You do not have any layouts</translation>
+      <translation>Bạn không có bất kỳ bố trí</translation>
     </message>
   </context>
   <context>
@@ -8686,15 +8690,15 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Device was disconnected</source>
-      <translation type="unfinished">Device was disconnected</translation>
+      <translation>Thiết bị đã được ngắt kết nối</translation>
     </message>
     <message>
       <source>Camera was disconnected</source>
-      <translation type="unfinished">Camera was disconnected</translation>
+      <translation>Máy ảnh đã được ngắt kết nối</translation>
     </message>
     <message>
       <source>I/O Module was disconnected</source>
-      <translation type="unfinished">I/O Module was disconnected</translation>
+      <translation>I / O Module đã bị ngắt kết nối</translation>
     </message>
     <message>
       <source>Unknown Plugin Diagnostic Event</source>
@@ -8705,14 +8709,14 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <name>nx::vms::client::desktop::NotificationListWidget::Private</name>
     <message>
       <source>No new notifications</source>
-      <translation type="unfinished">No new notifications</translation>
+      <translation>Không có thông báo mới</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::OpenLayoutActionWidget</name>
     <message>
       <source>None of selected users have access to the selected layout. Action will not work.</source>
-      <translation type="unfinished">None of selected users have access to the selected layout. Action will not work.</translation>
+      <translation>Không người dùng nào được chọn có quyền truy cập vào bố cục đã chọn. Hành động sẽ không hoạt động.</translation>
     </message>
     <message>
       <source>Select layout...</source>
@@ -8724,30 +8728,30 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Local layouts can only be shown to their owners.</source>
-      <translation type="unfinished">Local layouts can only be shown to their owners.</translation>
+      <translation>Bố cục địa phương chỉ có thể được hiển thị cho chủ sở hữu của họ.</translation>
     </message>
     <message>
       <source>None of selected user roles contain users. Action will not work.</source>
-      <translation type="unfinished">None of selected user roles contain users. Action will not work.</translation>
+      <translation>Không có vai trò người dùng được chọn nào chứa người dùng. Hành động sẽ không hoạt động.</translation>
     </message>
     <message>
       <source>Some users do not have access to the selected layout. Action will not work for them.</source>
-      <translation type="unfinished">Some users do not have access to the selected layout. Action will not work for them.</translation>
+      <translation>Một số người dùng không có quyền truy cập vào bố trí đã chọn. Hành động sẽ không làm việc cho họ.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::PeerStateTracker</name>
     <message>
       <source>The server is taking too long to respond</source>
-      <translation type="unfinished">The server is taking too long to respond</translation>
+      <translation>Máy chủ mất quá nhiều thời gian để phản hồi</translation>
     </message>
     <message>
       <source>No update task</source>
-      <translation type="unfinished">No update task</translation>
+      <translation>Không có nhiệm vụ cập nhật</translation>
     </message>
     <message>
       <source>Ready to download update</source>
-      <translation type="unfinished">Ready to download update</translation>
+      <translation>Sẵn sàng để tải về cập nhật</translation>
     </message>
     <message>
       <source>Downloading update</source>
@@ -8823,15 +8827,15 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>There is not enough space to install update.</source>
-      <translation type="unfinished">There is not enough space to install update.</translation>
+      <translation>Không có đủ không gian để cài đặt cập nhật.</translation>
     </message>
     <message>
       <source>Internal server error.</source>
-      <translation type="unfinished">Internal server error.</translation>
+      <translation>Lỗi máy chủ nội bộ.</translation>
     </message>
     <message>
       <source>This OS version is no longer supported.</source>
-      <translation type="unfinished">This OS version is no longer supported.</translation>
+      <translation>Phiên bản HĐH này không còn được hỗ trợ.</translation>
     </message>
   </context>
   <context>
@@ -8938,11 +8942,11 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Motion detection is disabled or not supported</source>
-      <translation type="unfinished">Motion detection is disabled or not supported</translation>
+      <translation>Phát hiện chuyển động bị vô hiệu hóa hoặc không được hỗ trợ</translation>
     </message>
     <message>
       <source>Dual-streaming is disabled or not supported</source>
-      <translation type="unfinished">Dual-streaming is disabled or not supported</translation>
+      <translation>Truyền phát kép bị vô hiệu hóa hoặc không được hỗ trợ</translation>
     </message>
   </context>
   <context>
@@ -8972,7 +8976,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
-      <translation type="unfinished">Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</translation>
+      <translation>Hình mờ sẽ được hiển thị qua các video trực tiếp, lưu trữ và xuất cho những người dùng không phải là quản trị viên. Bạn và các quản trị viên khác sẽ không nhìn thấy họ.</translation>
     </message>
   </context>
   <context>
@@ -9069,7 +9073,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <name>nx::vms::client::desktop::ServerUpdateTool</name>
     <message>
       <source>No connection to the server.</source>
-      <translation type="unfinished">No connection to the server.</translation>
+      <translation>Không có kết nối với máy chủ.</translation>
     </message>
     <message>
       <source>Network error.</source>
@@ -9077,7 +9081,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Server error.</source>
-      <translation type="unfinished">Server error.</translation>
+      <translation>Lỗi máy chủ.</translation>
     </message>
   </context>
   <context>
@@ -9171,8 +9175,8 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <name>nx::vms::client::desktop::SystemHealthListModel::Private</name>
     <message numerus="yes">
       <source>Email address is not set for %n users</source>
-      <translation type="unfinished">
-        <numerusform>Email address is not set for %n users</numerusform>
+      <translation>
+        <numerusform>Địa chỉ email không được đặt cho %n người dùng</numerusform>
       </translation>
     </message>
     <message>
@@ -9226,19 +9230,19 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <name>nx::vms::client::desktop::TimeSynchronizationWidget</name>
     <message>
       <source>Time, common and synchronized between all servers. Can be different with OS time on any particular server.</source>
-      <translation type="unfinished">Time, common and synchronized between all servers. Can be different with OS time on any particular server.</translation>
+      <translation>Thời gian, phổ biến và đồng bộ giữa tất cả các máy chủ. Có thể khác với thời gian hệ điều hành trên bất kỳ máy chủ cụ thể.</translation>
     </message>
     <message>
       <source>Synchronized with the Internet</source>
-      <translation type="unfinished">Synchronized with the Internet</translation>
+      <translation>Đồng bộ hóa với Internet</translation>
     </message>
     <message>
       <source>Synchronized with the local time at the selected server</source>
-      <translation type="unfinished">Synchronized with the local time at the selected server</translation>
+      <translation>Đồng bộ hóa với giờ địa phương tại máy chủ được chọn</translation>
     </message>
     <message>
       <source>Not synchronized. Each server uses its own local time.</source>
-      <translation type="unfinished">Not synchronized. Each server uses its own local time.</translation>
+      <translation>Không đồng bộ. Mỗi máy chủ sử dụng giờ địa phương của riêng mình.</translation>
     </message>
     <message>
       <source>Equal to the server local time</source>
@@ -9276,7 +9280,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Could not create upload on the server side: %1</source>
-      <translation type="unfinished">Could not create upload on the server side: %1</translation>
+      <translation>Không thể tạo tải lên ở phía máy chủ: %1</translation>
     </message>
     <message>
       <source>Could not upload file chunk to the server</source>
@@ -9290,16 +9294,24 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
       <source>File was corrupted while being uploaded to the server</source>
       <translation>Tệp bị hỏng trong khi tải lên máy chủ</translation>
     </message>
+    <message>
+      <source>Remote file &quot;%1&quot; is corrupted</source>
+      <translation type="unfinished">Remote file &quot;%1&quot; is corrupted</translation>
+    </message>
+    <message>
+      <source>Server already has this file &quot;%1&quot;</source>
+      <translation type="unfinished">Server already has this file &quot;%1&quot;</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::WearableCameraMotionWidget</name>
     <message>
       <source>Motion is being detected only during video uploading.</source>
-      <translation type="unfinished">Motion is being detected only during video uploading.</translation>
+      <translation>Chuyển động chỉ được phát hiện trong quá trình tải lên video.</translation>
     </message>
     <message>
       <source>Enabling or disabling this setting does not change anything in the existing archive.</source>
-      <translation type="unfinished">Enabling or disabling this setting does not change anything in the existing archive.</translation>
+      <translation>Kích hoạt hoặc vô hiệu hóa cài đặt này không thay đổi bất cứ điều gì trong kho lưu trữ hiện có.</translation>
     </message>
   </context>
   <context>
@@ -9339,7 +9351,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <name>nx::vms::client::desktop::WebWidget</name>
     <message>
       <source>Failed to load page</source>
-      <translation type="unfinished">Failed to load page</translation>
+      <translation>Không thể tải trang</translation>
     </message>
   </context>
   <context>
@@ -9397,7 +9409,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Starting export...</source>
-      <translation type="unfinished">Starting export...</translation>
+      <translation>Bắt đầu xuất khẩu...</translation>
     </message>
     <message>
       <source>Saving layout</source>
@@ -9417,7 +9429,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>We are preparing files for the export process. Please wait for a few seconds.</source>
-      <translation type="unfinished">We are preparing files for the export process. Please wait for a few seconds.</translation>
+      <translation>Chúng tôi đang chuẩn bị các tập tin cho quá trình xuất khẩu. Xin vui lòng chờ trong vài giây.</translation>
     </message>
   </context>
   <context>
@@ -9454,18 +9466,18 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <name>nx::vms::client::desktop::integrations::entropix::ReconstructResolutionIntegration</name>
     <message>
       <source>Reconstruct Resolution</source>
-      <translation type="unfinished">Reconstruct Resolution</translation>
+      <translation>Tái thiết Nghị quyết</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ui::AnalyticsSdkEventWidget</name>
     <message>
       <source>Analytics events can be set up on a certain cameras.</source>
-      <translation>Phân tích sự kiện có thể được thiết lập trên một máy ảnh nhất định.</translation>
+      <translation>Phân tích sự kiện có thể được thiết lập trên một camera nhất định.</translation>
     </message>
     <message>
       <source>Choose cameras using the button above to see the list of supported events.</source>
-      <translation>Chọn máy ảnh bằng cách sử dụng nút ở trên để xem danh sách các sự kiện được hỗ trợ.</translation>
+      <translation>Chọn camera bằng cách sử dụng nút ở trên để xem danh sách các sự kiện được hỗ trợ.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
@@ -9626,7 +9638,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <name>nx::vms::client::desktop::ui::workbench::ActionHandler</name>
     <message>
       <source>Layout is full</source>
-      <translation type="unfinished">Layout is full</translation>
+      <translation>Bố cục đầy đủ</translation>
     </message>
     <message>
       <source>Failed to change password</source>
@@ -9663,7 +9675,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <message numerus="yes">
       <source>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</source>
       <translation>
-        <numerusform>Máy chủ &quot;%1&quot; không thể truy cập vào %n máy ảnh. Di chuyển chúng anyway?</numerusform>
+        <numerusform>Máy chủ &quot;%1&quot; không thể truy cập vào %n camera. Di chuyển chúng anyway?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -9678,7 +9690,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Virtual Cameras cannot be moved between servers</source>
-      <translation type="unfinished">Virtual Cameras cannot be moved between servers</translation>
+      <translation>Camera ảo không thể được di chuyển giữa các máy chủ</translation>
     </message>
     <message>
       <source>Layout is locked and cannot be changed</source>
@@ -9793,35 +9805,39 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <message numerus="yes">
       <source>Failed to change password on %n cameras of %1</source>
       <comment>Total number of cameras will be substituted as %1</comment>
-      <translation type="unfinished">
-        <numerusform>Failed to change password on %n cameras of %1</numerusform>
+      <translation>
+        <numerusform>Không thể thay đổi mật khẩu trên %n camera của %1</numerusform>
       </translation>
     </message>
     <message>
       <source>This build is for testing purposes only.</source>
-      <translation type="unfinished">This build is for testing purposes only.</translation>
+      <translation>Bản dựng này chỉ dành cho mục đích thử nghiệm.</translation>
     </message>
     <message>
       <source>Open Server Settings</source>
-      <translation type="unfinished">Open Server Settings</translation>
+      <translation>Mở cài đặt máy chủ</translation>
     </message>
     <message>
       <source>OK</source>
       <translation>Kác định</translation>
     </message>
     <message>
-      <source>Confirm storage location to store analytics data on &apos;%1&apos;</source>
-      <translation type="unfinished">Confirm storage location to store analytics data on &apos;%1&apos;</translation>
+      <source>Confirm storage location for the analytics data on &quot;%1&quot;</source>
+      <translation type="unfinished">Confirm storage location for the analytics data on &quot;%1&quot;</translation>
     </message>
     <message>
-      <source>Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
-Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
-By default analytics data will be stored in mediaserver&apos;s installation directory.
-You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</source>
-      <translation type="unfinished">Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
-Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
-By default analytics data will be stored in mediaserver&apos;s installation directory.
-You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</translation>
+      <source>the largest available partition</source>
+      <translation type="unfinished">the largest available partition</translation>
+    </message>
+    <message>
+      <source>The analytics database should only be stored on a local drive and can take up large amounts of space.
+Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
+By default analytics data will be stored on %1.
+You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</source>
+      <translation type="unfinished">The analytics database should only be stored on a local drive and can take up large amounts of space.
+Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
+By default analytics data will be stored on %1.
+You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</translation>
     </message>
   </context>
   <context>

@@ -698,7 +698,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Date Modified</source>
-      <translation>Datum aangepast</translation>
+      <translation>Datum gewijzigd</translation>
     </message>
     <message>
       <source>My Computer</source>
@@ -721,7 +721,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>&amp;Save</source>
-      <translation>&amp;Opslaan</translation>
+      <translation>&amp;Save</translation>
     </message>
     <message>
       <source>&amp;Cancel</source>
@@ -856,7 +856,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Delete</source>
-      <translation>Verwijderen</translation>
+      <translation>Verwijder</translation>
     </message>
     <message>
       <source>Select All</source>
@@ -1158,7 +1158,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>&amp;Paste</source>
-      <translation>Plakken</translation>
+      <translation>&amp;Plakken</translation>
     </message>
     <message>
       <source>Delete</source>

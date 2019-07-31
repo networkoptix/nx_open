@@ -9,11 +9,11 @@
     </message>
     <message>
       <source>Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</source>
-      <translation type="unfinished">Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</translation>
+      <translation>Analytiky budou fungovat pouze když je kamera zobrazena. Aktivujte nahrávání, aby mohli analytiky pracovat po celou dobu.</translation>
     </message>
     <message>
       <source>This is the built-in functionality</source>
-      <translation type="unfinished">This is the built-in functionality</translation>
+      <translation>Toto je vestavěná funkce</translation>
     </message>
   </context>
   <context>
@@ -72,7 +72,7 @@
     <name>PluginsInformation</name>
     <message>
       <source>No plugins installed</source>
-      <translation type="unfinished">No plugins installed</translation>
+      <translation>Žádné nainstalované pluginy</translation>
     </message>
     <message>
       <source>Server is offline</source>

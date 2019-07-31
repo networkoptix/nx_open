@@ -5594,12 +5594,6 @@ to %1</source>
       <translation>Wat te doen met de huidige analysegegevens?</translation>
     </message>
     <message>
-      <source>Current analytics data will not be automatically moved to another location and will become unaccessible. You can keep it and manually move later, or delete permanently.
-If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
-      <translation>Huidige analysegegevens worden niet automatisch verplaatst naar een andere locatie en worden niet meer toegankelijk. U kunt het bewaren en later handmatig verplaatsen of permanent verwijderen.
-Als u analysegegevens naar een andere opslaglocatie wilt verplaatsen, neemt u contact op met de ondersteuning voordat u doorgaat.</translation>
-    </message>
-    <message>
       <source>Delete</source>
       <translation>Verwijder</translation>
     </message>
@@ -5610,6 +5604,12 @@ Als u analysegegevens naar een andere opslaglocatie wilt verplaatsen, neemt u co
     <message>
       <source>Cancel</source>
       <translation>Annuleren</translation>
+    </message>
+    <message>
+      <source>Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
+If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
+      <translation type="unfinished">Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
+If you intended to move analytics data to another storage location, please contact support before proceeding.</translation>
     </message>
   </context>
   <context>
@@ -7357,7 +7357,7 @@ Als u analysegegevens naar een andere opslaglocatie wilt verplaatsen, neemt u co
     </message>
     <message>
       <source>Unknown track</source>
-      <translation type="unfinished">Unknown track</translation>
+      <translation>Onbekend nummer</translation>
     </message>
   </context>
   <context>
@@ -7592,7 +7592,7 @@ Als u analysegegevens naar een andere opslaglocatie wilt verplaatsen, neemt u co
     </message>
     <message>
       <source>Motion detection stream is disabled</source>
-      <translation type="unfinished">Motion detection stream is disabled</translation>
+      <translation>Bewegingsdetectie stream is uitgeschakeld</translation>
     </message>
   </context>
   <context>
@@ -7730,6 +7730,14 @@ Als u analysegegevens naar een andere opslaglocatie wilt verplaatsen, neemt u co
     <message>
       <source>Plugins</source>
       <translation>Plugins</translation>
+    </message>
+    <message>
+      <source>Motion detection is disabled, all schedule records &quot;Motion&quot; and &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
+      <translation>Bewegingsdetectie is uitgeschakeld, alle opnameschemas &quot;Beweging&quot; en &quot;Motion + Lo-Res&quot; worden gewijzigd in &quot;Altijd&quot;</translation>
+    </message>
+    <message>
+      <source>Dual streaming is disabled, all schedule records &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
+      <translation>Dual streaming is uitgeschakeld, alle opnameschemas &quot;Motion + Lo-Res&quot; zullen worden gewijzigd naar &quot;Altijd&quot;</translation>
     </message>
   </context>
   <context>
@@ -8056,10 +8064,6 @@ Als u analysegegevens naar een andere opslaglocatie wilt verplaatsen, neemt u co
         <numerusform>%n evenementen</numerusform>
         <numerusform>%n evenementen</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>unnamed analytics engine</source>
-      <translation>naamloze analytics engine</translation>
     </message>
     <message>
       <source>No events occurred</source>
@@ -8450,7 +8454,7 @@ Als u analysegegevens naar een andere opslaglocatie wilt verplaatsen, neemt u co
     </message>
     <message>
       <source>Can not start the search process</source>
-      <translation type="unfinished">Can not start the search process</translation>
+      <translation>Kan het zoekproces niet starten</translation>
     </message>
   </context>
   <context>
@@ -8760,19 +8764,19 @@ Als u analysegegevens naar een andere opslaglocatie wilt verplaatsen, neemt u co
     </message>
     <message>
       <source>Some servers have no update packages available.</source>
-      <translation type="unfinished">Some servers have no update packages available.</translation>
+      <translation>Sommige servers hebben geen update pakketten beschikbaar.</translation>
     </message>
     <message>
       <source>Some servers have encountered an internal error.</source>
-      <translation type="unfinished">Some servers have encountered an internal error.</translation>
+      <translation>Sommige servers hebben een interne fout ondervonden.</translation>
     </message>
     <message>
       <source>Please please contact Customer Support.</source>
-      <translation type="unfinished">Please please contact Customer Support.</translation>
+      <translation>Neem contact op met Customer Support.</translation>
     </message>
     <message>
       <source>Some servers have not completed the update process. Finish it anyway?</source>
-      <translation type="unfinished">Some servers have not completed the update process. Finish it anyway?</translation>
+      <translation>Sommige servers hebben het update proces niet voltooid. Toch afronden?</translation>
     </message>
   </context>
   <context>
@@ -8851,7 +8855,7 @@ Als u analysegegevens naar een andere opslaglocatie wilt verplaatsen, neemt u co
     </message>
     <message>
       <source>Some users do not have access to the selected layout. Action will not work for them.</source>
-      <translation type="unfinished">Some users do not have access to the selected layout. Action will not work for them.</translation>
+      <translation>Sommige gebruikers hebben geen toegang tot de geselecteerde schermindeling. Actie werkt niet voor hen.</translation>
     </message>
   </context>
   <context>
@@ -9058,11 +9062,11 @@ Als u analysegegevens naar een andere opslaglocatie wilt verplaatsen, neemt u co
     </message>
     <message>
       <source>Motion detection is disabled or not supported</source>
-      <translation type="unfinished">Motion detection is disabled or not supported</translation>
+      <translation>Bewegingsdetectie is uitgeschakeld of niet ondersteund</translation>
     </message>
     <message>
       <source>Dual-streaming is disabled or not supported</source>
-      <translation type="unfinished">Dual-streaming is disabled or not supported</translation>
+      <translation>Dual-streaming is uitgeschakeld of wordt niet ondersteund</translation>
     </message>
   </context>
   <context>
@@ -9197,7 +9201,7 @@ Als u analysegegevens naar een andere opslaglocatie wilt verplaatsen, neemt u co
     </message>
     <message>
       <source>Server error.</source>
-      <translation type="unfinished">Server error.</translation>
+      <translation>Serverfout.</translation>
     </message>
   </context>
   <context>
@@ -9413,6 +9417,14 @@ Als u analysegegevens naar een andere opslaglocatie wilt verplaatsen, neemt u co
     <message>
       <source>File was corrupted while being uploaded to the server</source>
       <translation>Bestand is beschadigd tijdens uploaden naar de server</translation>
+    </message>
+    <message>
+      <source>Remote file &quot;%1&quot; is corrupted</source>
+      <translation type="unfinished">Remote file &quot;%1&quot; is corrupted</translation>
+    </message>
+    <message>
+      <source>Server already has this file &quot;%1&quot;</source>
+      <translation type="unfinished">Server already has this file &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
@@ -9943,18 +9955,22 @@ Als u analysegegevens naar een andere opslaglocatie wilt verplaatsen, neemt u co
       <translation>Oké</translation>
     </message>
     <message>
-      <source>Confirm storage location to store analytics data on &apos;%1&apos;</source>
-      <translation>Bevestig opslag locatie om analytics gegevens op te slaan naar &apos;%1&apos;</translation>
+      <source>Confirm storage location for the analytics data on &quot;%1&quot;</source>
+      <translation type="unfinished">Confirm storage location for the analytics data on &quot;%1&quot;</translation>
     </message>
     <message>
-      <source>Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
-Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
-By default analytics data will be stored in mediaserver&apos;s installation directory.
-You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</source>
-      <translation>Analytics-database moet worden opgeslagen op een lokale opslag en kan maximaal honderd gigabytes beslaan.
-Nadat de locatie voor het opslaan van analysegegevens is geselecteerd, kan deze niet eenvoudig worden gewijzigd zonder verlies van gegevens. We raden aan om de locatie zorgvuldig te kiezen en de systeempartitie niet te gebruiken om ernstige systeemstoringen te voorkomen.
-Standaard worden analysegegevens opgeslagen in de installatiemap van mediaserver&apos;.
-U kunt de opslaglocatie wijzigen op het tabblad &quot;Storage Management&quot; in het dialoogvenster Serverinstellingen.</translation>
+      <source>the largest available partition</source>
+      <translation type="unfinished">the largest available partition</translation>
+    </message>
+    <message>
+      <source>The analytics database should only be stored on a local drive and can take up large amounts of space.
+Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
+By default analytics data will be stored on %1.
+You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</source>
+      <translation type="unfinished">The analytics database should only be stored on a local drive and can take up large amounts of space.
+Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
+By default analytics data will be stored on %1.
+You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</translation>
     </message>
   </context>
   <context>

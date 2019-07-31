@@ -5596,12 +5596,6 @@ a %1</translation>
       <translation>¿Qué hacer con los datos analíticos actuales?</translation>
     </message>
     <message>
-      <source>Current analytics data will not be automatically moved to another location and will become unaccessible. You can keep it and manually move later, or delete permanently.
-If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
-      <translation>Los datos de análisis actuales no se moverán automáticamente a otra ubicación y se volverán inaccesibles. Puede mantenerlos y moverlos manualmente más tarde, o eliminarlos permanentemente.
-Si usted pretende mover datos analíticos a otra ubicación de almacenamiento, por favor contacte con el soporte antes de continuar.</translation>
-    </message>
-    <message>
       <source>Delete</source>
       <translation>Borrar</translation>
     </message>
@@ -5612,6 +5606,12 @@ Si usted pretende mover datos analíticos a otra ubicación de almacenamiento, p
     <message>
       <source>Cancel</source>
       <translation>Cancelar</translation>
+    </message>
+    <message>
+      <source>Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
+If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
+      <translation type="unfinished">Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
+If you intended to move analytics data to another storage location, please contact support before proceeding.</translation>
     </message>
   </context>
   <context>
@@ -7594,7 +7594,7 @@ Si usted pretende mover datos analíticos a otra ubicación de almacenamiento, p
     </message>
     <message>
       <source>Motion detection stream is disabled</source>
-      <translation type="unfinished">Motion detection stream is disabled</translation>
+      <translation>El flujo de detección de movimiento está deshabilitado</translation>
     </message>
   </context>
   <context>
@@ -7732,6 +7732,14 @@ Si usted pretende mover datos analíticos a otra ubicación de almacenamiento, p
     <message>
       <source>Plugins</source>
       <translation>Plugins</translation>
+    </message>
+    <message>
+      <source>Motion detection is disabled, all schedule records &quot;Motion&quot; and &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
+      <translation>Detección de movimiento desactivada, todos los registros de programación &quot;Motion&quot; y &quot;Motion + Lo-Res&quot; se cambiarán a &quot;Siempre&quot;</translation>
+    </message>
+    <message>
+      <source>Dual streaming is disabled, all schedule records &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
+      <translation>La transmisión dual está desactivada, todos los registros de programación &quot;Motion + Lo-Res&quot; se cambiarán a &quot;Siempre&quot;</translation>
     </message>
   </context>
   <context>
@@ -8058,10 +8066,6 @@ Si usted pretende mover datos analíticos a otra ubicación de almacenamiento, p
         <numerusform>%n eventos</numerusform>
         <numerusform>%n eventos</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>unnamed analytics engine</source>
-      <translation>motor analítico sin nombre</translation>
     </message>
     <message>
       <source>No events occurred</source>
@@ -8452,7 +8456,7 @@ Si usted pretende mover datos analíticos a otra ubicación de almacenamiento, p
     </message>
     <message>
       <source>Can not start the search process</source>
-      <translation type="unfinished">Can not start the search process</translation>
+      <translation>No se puede iniciar el proceso de búsqueda</translation>
     </message>
   </context>
   <context>
@@ -8774,7 +8778,7 @@ Si usted pretende mover datos analíticos a otra ubicación de almacenamiento, p
     </message>
     <message>
       <source>Some servers have not completed the update process. Finish it anyway?</source>
-      <translation type="unfinished">Some servers have not completed the update process. Finish it anyway?</translation>
+      <translation>Algunos servidores no han completado el proceso de actualización. ¿Terminar de todos modos?</translation>
     </message>
   </context>
   <context>
@@ -8853,7 +8857,7 @@ Si usted pretende mover datos analíticos a otra ubicación de almacenamiento, p
     </message>
     <message>
       <source>Some users do not have access to the selected layout. Action will not work for them.</source>
-      <translation type="unfinished">Some users do not have access to the selected layout. Action will not work for them.</translation>
+      <translation>Algunos usuarios no tienen acceso al diseño seleccionado. La acción no funcionará para ellos.</translation>
     </message>
   </context>
   <context>
@@ -9060,11 +9064,11 @@ Si usted pretende mover datos analíticos a otra ubicación de almacenamiento, p
     </message>
     <message>
       <source>Motion detection is disabled or not supported</source>
-      <translation type="unfinished">Motion detection is disabled or not supported</translation>
+      <translation>La detección de movimiento está deshabilitada o no es compatible</translation>
     </message>
     <message>
       <source>Dual-streaming is disabled or not supported</source>
-      <translation type="unfinished">Dual-streaming is disabled or not supported</translation>
+      <translation>El streaming dual está desactivado o no es compatible</translation>
     </message>
   </context>
   <context>
@@ -9415,6 +9419,14 @@ Si usted pretende mover datos analíticos a otra ubicación de almacenamiento, p
     <message>
       <source>File was corrupted while being uploaded to the server</source>
       <translation>El archivo se corrompió mientras se cargaba en el servidor</translation>
+    </message>
+    <message>
+      <source>Remote file &quot;%1&quot; is corrupted</source>
+      <translation type="unfinished">Remote file &quot;%1&quot; is corrupted</translation>
+    </message>
+    <message>
+      <source>Server already has this file &quot;%1&quot;</source>
+      <translation type="unfinished">Server already has this file &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
@@ -9945,18 +9957,22 @@ Si usted pretende mover datos analíticos a otra ubicación de almacenamiento, p
       <translation>OK</translation>
     </message>
     <message>
-      <source>Confirm storage location to store analytics data on &apos;%1&apos;</source>
-      <translation>Confirmar ubicación de almacenamiento para almacenar datos analíticos en &apos;%1&apos;</translation>
+      <source>Confirm storage location for the analytics data on &quot;%1&quot;</source>
+      <translation type="unfinished">Confirm storage location for the analytics data on &quot;%1&quot;</translation>
     </message>
     <message>
-      <source>Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
-Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
-By default analytics data will be stored in mediaserver&apos;s installation directory.
-You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</source>
-      <translation>La base de datos analítica debe almacenarse en un almacenamiento local y puede ocupar hasta cien gigabytes.
-Una vez que se selecciona la ubicación para almacenar los datos analíticos, no se puede cambiar fácilmente sin perder los datos existentes. Recomendamos elegir la ubicación con cuidado y no usar la partición del sistema para evitar un mal funcionamiento grave del sistema.
-Por defecto, los datos analíticos se almacenarán en el directorio de instalación de mediaserver&apos;.
-Puede cambiar la ubicación de almacenamiento en la pestaña &quot;Storage Management&quot; en el cuadro de diálogo Configuración del servidor.</translation>
+      <source>the largest available partition</source>
+      <translation type="unfinished">the largest available partition</translation>
+    </message>
+    <message>
+      <source>The analytics database should only be stored on a local drive and can take up large amounts of space.
+Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
+By default analytics data will be stored on %1.
+You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</source>
+      <translation type="unfinished">The analytics database should only be stored on a local drive and can take up large amounts of space.
+Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
+By default analytics data will be stored on %1.
+You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</translation>
     </message>
   </context>
   <context>

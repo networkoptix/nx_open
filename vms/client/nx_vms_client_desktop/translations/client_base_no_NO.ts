@@ -5599,12 +5599,6 @@ til %1</translation>
       <translation>Hva gjør du med gjeldende analysedata?</translation>
     </message>
     <message>
-      <source>Current analytics data will not be automatically moved to another location and will become unaccessible. You can keep it and manually move later, or delete permanently.
-If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
-      <translation>Gjeldende analysedata blir ikke automatisk flyttet til et annet sted og vil bli utilgjengelige. Du kan beholde den og flytte manuelt senere, eller slette permanent.
-Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kontakte support før du fortsetter.</translation>
-    </message>
-    <message>
       <source>Delete</source>
       <translation>Slett</translation>
     </message>
@@ -5615,6 +5609,12 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     <message>
       <source>Cancel</source>
       <translation>Avbryt</translation>
+    </message>
+    <message>
+      <source>Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
+If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
+      <translation type="unfinished">Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
+If you intended to move analytics data to another storage location, please contact support before proceeding.</translation>
     </message>
   </context>
   <context>
@@ -7597,7 +7597,7 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     </message>
     <message>
       <source>Motion detection stream is disabled</source>
-      <translation type="unfinished">Motion detection stream is disabled</translation>
+      <translation>Videostrømmen for bevegelsesdeteksjon er deaktivert</translation>
     </message>
   </context>
   <context>
@@ -7735,6 +7735,14 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     <message>
       <source>Plugins</source>
       <translation>Plugins</translation>
+    </message>
+    <message>
+      <source>Motion detection is disabled, all schedule records &quot;Motion&quot; and &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
+      <translation>Bevegelsesdeteksjon er deaktivert, alle tidsplanen med &quot;Bevegelse&quot; og &quot;Bevegelse + Lo-Res&quot; vil bli endret til &quot;Alltid&quot;</translation>
+    </message>
+    <message>
+      <source>Dual streaming is disabled, all schedule records &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
+      <translation>Dobbelstrømming er deaktivert, alle tidsplanen med Bevegelse og &quot;Bevegelse + Lo-Res&quot; vil bli endret til &quot;Alltid&quot;</translation>
     </message>
   </context>
   <context>
@@ -8061,10 +8069,6 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
         <numerusform>%n hendelse</numerusform>
         <numerusform>%n hendelser</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>unnamed analytics engine</source>
-      <translation>ikke navngitt analysemotor</translation>
     </message>
     <message>
       <source>No events occurred</source>
@@ -8455,7 +8459,7 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     </message>
     <message>
       <source>Can not start the search process</source>
-      <translation type="unfinished">Can not start the search process</translation>
+      <translation>Kan ikke starte søkeprosessen</translation>
     </message>
   </context>
   <context>
@@ -8777,7 +8781,7 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     </message>
     <message>
       <source>Some servers have not completed the update process. Finish it anyway?</source>
-      <translation type="unfinished">Some servers have not completed the update process. Finish it anyway?</translation>
+      <translation>Noen servere har ikke fullført oppdateringsprosessen. Fullfør likevel?</translation>
     </message>
   </context>
   <context>
@@ -8856,7 +8860,7 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     </message>
     <message>
       <source>Some users do not have access to the selected layout. Action will not work for them.</source>
-      <translation type="unfinished">Some users do not have access to the selected layout. Action will not work for them.</translation>
+      <translation>Noen brukere har ikke tilgang til valgt visning. Handling vil ikke fungere for dem.</translation>
     </message>
   </context>
   <context>
@@ -9063,11 +9067,11 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     </message>
     <message>
       <source>Motion detection is disabled or not supported</source>
-      <translation type="unfinished">Motion detection is disabled or not supported</translation>
+      <translation>Bevegelsesdeteksjon er deaktivert eller støttes ikke</translation>
     </message>
     <message>
       <source>Dual-streaming is disabled or not supported</source>
-      <translation type="unfinished">Dual-streaming is disabled or not supported</translation>
+      <translation>Dobbeltstrømming er deaktivert eller støttes ikke</translation>
     </message>
   </context>
   <context>
@@ -9418,6 +9422,14 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     <message>
       <source>File was corrupted while being uploaded to the server</source>
       <translation>Filen ble ødelagt mens den ble lastet opp til serveren</translation>
+    </message>
+    <message>
+      <source>Remote file &quot;%1&quot; is corrupted</source>
+      <translation type="unfinished">Remote file &quot;%1&quot; is corrupted</translation>
+    </message>
+    <message>
+      <source>Server already has this file &quot;%1&quot;</source>
+      <translation type="unfinished">Server already has this file &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
@@ -9948,18 +9960,22 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
       <translation>OK</translation>
     </message>
     <message>
-      <source>Confirm storage location to store analytics data on &apos;%1&apos;</source>
-      <translation>Bekreft lagringssted for å lagre analysedata på &apos;%1&apos;</translation>
+      <source>Confirm storage location for the analytics data on &quot;%1&quot;</source>
+      <translation type="unfinished">Confirm storage location for the analytics data on &quot;%1&quot;</translation>
     </message>
     <message>
-      <source>Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
-Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
-By default analytics data will be stored in mediaserver&apos;s installation directory.
-You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</source>
-      <translation>Analytics-databasen bør lagres på en lokal lagring og kan ta opptil hundre gigabyte.
-Når en plassering for å lagre analysedata er valgt, kan de ikke lett endres uten å miste eksisterende data. Vi anbefalte å velge plassering nøye og ikke bruke systempartisjon for å unngå alvorlig systemfeil.
-Analysedata blir som standard lagret i mediaserver&apos;installasjonskatalog.
-Du kan endre lagringssted i fanen &quot;Storage Management&quot; i dialogboksen Serverinnstillinger.</translation>
+      <source>the largest available partition</source>
+      <translation type="unfinished">the largest available partition</translation>
+    </message>
+    <message>
+      <source>The analytics database should only be stored on a local drive and can take up large amounts of space.
+Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
+By default analytics data will be stored on %1.
+You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</source>
+      <translation type="unfinished">The analytics database should only be stored on a local drive and can take up large amounts of space.
+Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
+By default analytics data will be stored on %1.
+You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</translation>
     </message>
   </context>
   <context>

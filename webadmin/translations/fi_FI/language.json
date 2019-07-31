@@ -1,7 +1,7 @@
 {
-    "language_name": "Finnish",
+    "language_name": "Suomi",
     "dialogs": {
-        "okButton": "Ok",
+        "okButton": "OK",
         "openLink": "Käytä tätä linkkiä",
         "openLinkWithTitle": "Voit käydä tällä linkillä osoitteessa {{title}}"
     },

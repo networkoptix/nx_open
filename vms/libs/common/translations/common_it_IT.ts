@@ -124,7 +124,7 @@
     <name>QnCameraDiagnosticsErrorCodeStrings</name>
     <message>
       <source>OK</source>
-      <translation>Ok</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <source>Server has been stopped.</source>
@@ -824,7 +824,7 @@
     </message>
     <message>
       <source>I/O Module</source>
-      <translation>Moduli I / O</translation>
+      <translation>Modulo I / O</translation>
     </message>
     <message>
       <source>I/O module</source>
