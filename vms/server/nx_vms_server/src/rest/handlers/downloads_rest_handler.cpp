@@ -1,3 +1,7 @@
+#include "downloads_rest_handler.h"
+
+#include <chrono>
+
 #include <nx/network/http/http_types.h>
 #include <nx/network/http/http_client.h>
 #include <nx/fusion/model_functions.h>
@@ -8,7 +12,8 @@
 #include <nx/utils/file_system.h>
 #include <nx/fusion/serialization/lexical.h>
 #include <recorder/storage_manager.h>
-#include "downloads_rest_handler.h"
+
+using namespace std::chrono;
 
 using nx::vms::common::p2p::downloader::Downloader;
 using nx::vms::common::p2p::downloader::FileInformation;
@@ -18,7 +23,6 @@ namespace {
 
 static const QByteArray kJsonContentType("application/json");
 static const QByteArray kOctetStreamContentType("application/octet-stream");
-static const int kDownloadRequestTimeoutMs = 10 * 60 * 1000;
 static const int kMaxChunkSize = 10 * 1024 * 1024;
 
 struct Request
@@ -370,14 +374,15 @@ int Helper::handleDownloadChunkFromInternet(const QString& fileName, int chunkIn
         }
     }
 
+    constexpr milliseconds kDownloadRequestTimeout = 1min;
     nx::network::http::HttpClient httpClient;
-    httpClient.setResponseReadTimeout(std::chrono::milliseconds(kDownloadRequestTimeoutMs));
-    httpClient.setSendTimeout(std::chrono::milliseconds(kDownloadRequestTimeoutMs));
-    httpClient.setMessageBodyReadTimeout(std::chrono::milliseconds(kDownloadRequestTimeoutMs));
+    httpClient.setResponseReadTimeout(kDownloadRequestTimeout);
+    httpClient.setSendTimeout(kDownloadRequestTimeout);
+    httpClient.setMessageBodyReadTimeout(kDownloadRequestTimeout);
 
     const qint64 pos = chunkIndex * chunkSize;
     httpClient.addAdditionalHeader("Range",
-        lit("bytes=%1-%2").arg(pos).arg(pos + chunkSize - 1).toLatin1());
+        QStringLiteral("bytes=%1-%2").arg(pos).arg(pos + chunkSize - 1).toLatin1());
 
     if (!httpClient.doGet(url) || !httpClient.response())
         return nx::network::http::StatusCode::internalServerError;
@@ -419,8 +424,8 @@ int Helper::handleUploadChunk(
         return makeError(
             nx::network::http::StatusCode::badRequest,
             QnRestResult::CantProcessRequest,
-            lit("Only %1 Content-Type is supported.").arg(
-                QLatin1String(kOctetStreamContentType)));
+            QString("Only %1 Content-Type is supported.").arg(
+                kOctetStreamContentType.constData()));
     }
 
     const auto errorCode = downloader->writeFileChunk(fileName, chunkIndex, body);

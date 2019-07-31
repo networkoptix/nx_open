@@ -545,7 +545,7 @@ bool ClientUpdateTool::installUpdateAsync()
                 }
                 if (stopInstallationAttempts)
                     break;
-            }while(--installationAttempts > 0);
+            } while (--installationAttempts > 0);
 
             return ResultType::otherError;
         }, m_updateFile, m_updateVersion);

@@ -1727,8 +1727,8 @@ void MultiServerUpdatesWidget::processDownloadingState()
         }
         else if (clicked == cancelUpdate)
         {
+            setTargetState(WidgetUpdateState::cancelingDownload, {});
             m_serverUpdateTool->requestStopAction();
-            setTargetState(WidgetUpdateState::ready, {});
         }
     }
 

@@ -924,6 +924,8 @@ int Worker::selectNextChunk(const QSet<int>& ignoredChunks) const
 
 bool Worker::needToFindBetterPeersForDownload() const
 {
+    NX_VERBOSE(m_logTag, "Checking if need to find better peers...");
+
     constexpr int kGoodDownloadSpeed = 5; //< Megabytes per second.
     const milliseconds goodChunkDownloadTime{
         (int) (fileInformation().chunkSize / kGoodDownloadSpeed)}; //< Milliseconds.
@@ -940,14 +942,35 @@ bool Worker::needToFindBetterPeersForDownload() const
     }
 
     if (fastPeersCount > kMaxSimultaneousDownloads)
+    {
+        NX_VERBOSE(m_logTag, "Don't need to find better peers. Found %1 fast peers.",
+            fastPeersCount);
         return false;
+    }
 
     int peersCount = 0;
-
     for (AbstractPeerManager* peerManager: m_peerManagers)
         peersCount += peerManager->peers().size();
 
-    return m_peerInfoByPeer.size() < peersCount;
+    int checkedPeersCount = 0;
+    for (const PeerInformation& info: m_peerInfoByPeer)
+    {
+        if (!info.downloadedChunks.isEmpty() || info.isInternet)
+            ++checkedPeersCount;
+    }
+
+    const bool result = m_peerInfoByPeer.size() < peersCount;
+    if (result)
+    {
+        NX_VERBOSE(m_logTag, "Need to find better peers. Fast peers: %1, checked: %2, total: %3",
+            fastPeersCount, checkedPeersCount, peersCount);
+    }
+    else
+    {
+        NX_VERBOSE(m_logTag, "Don't need to find better peers. Checked all %1 peers.", peersCount);
+    }
+
+    return result;
 }
 
 void Worker::increasePeerRank(const Peer& peer, int value)

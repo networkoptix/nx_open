@@ -499,9 +499,12 @@ int ServerUpdateTool::uploadPackage(
 
     UploadState config;
     config.source = storageDir.absoluteFilePath(localFile);
-    config.destination = package.file;
     // Updates should land to updates/publication_key/file_name.
-    config.ttl = -1; //< This should mean 'infinite time'
+    config.destination = package.file;
+    // This should mean 'infinite time'.
+    config.ttl = -1;
+    // Server should create file by itself.
+    config.allowFileCreation = false;
 
     for (const auto& serverId: targets)
     {
@@ -522,13 +525,15 @@ int ServerUpdateTool::uploadPackage(
 
         if (!id.isEmpty())
         {
+            NX_INFO(this, "uploadPackage(%1) - started uploading file to server %2",
+                package.file, serverId);
             m_uploadStateById[id] = config;
             m_activeUploads.insert(id);
             toUpload++;
         }
         else
         {
-            NX_VERBOSE(this, "uploadPackage(%1) - failed to start uploading file=%2 reason=%3",
+            NX_WARNING(this, "uploadPackage(%1) - failed to start uploading file=%2 reason=%3",
                 package.file, localFile, config.errorMessage);
             m_completedUploads.insert(id);
         }
@@ -553,10 +558,10 @@ void ServerUpdateTool::atUploadWorkerState(QnUuid serverId, const UploadState& s
             markUploadCompleted(state.id);
             break;
         case UploadState::Uploading:
-            NX_VERBOSE(this) << "atUploadWorkerState() uploading file="
-                << state.destination << "bytes"
-                << state.uploaded << "of" << state.size
-                << "server:" << serverId;
+            //NX_VERBOSE(this) << "atUploadWorkerState() uploading file="
+            //    << state.destination << "bytes"
+            //    << state.uploaded << "of" << state.size
+            //    << "server:" << serverId;
             break;
         case UploadState::Error:
             NX_VERBOSE(this) << "atUploadWorkerState() error with file="
