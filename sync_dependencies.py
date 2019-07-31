@@ -59,6 +59,7 @@ def determine_package_versions(
         v["festival"] = "2.4-1"
         v["festival-vox"] = "2.4"
         v["sysroot"] = "xenial-1"
+        v["ffmpeg"] = "3.1.9-4"
 
     if platform == "macosx":
         v["festival"] = "2.1"
@@ -75,28 +76,24 @@ def determine_package_versions(
         v["festival"] = "2.4-1"
         v["festival-vox"] = "2.4"
         v["sysroot"] = "wheezy"
-        # Bpi original version is build with vdpau support which is no longer needed since lite
-        # client is disasbled for bpi.
-        v["ffmpeg"] = "3.1.9-5"
 
     if target == "linux_arm32":
         v["festival"] = "2.4-1"
         v["festival-vox"] = "2.4"
         v["sysroot"] = "jessie"
-        v["ffmpeg"] = "3.1.9-5"
 
     if box == "edge1":
         v["sysroot"] = "jessie"
-        v["ffmpeg"] = "3.1.9-5"
 
     if target == "linux_arm64":
         v["festival"] = "2.4-1"
         v["festival-vox"] = "2.4"
         v["sysroot"] = "xenial"
-        v["ffmpeg"] = "3.1.9-5"
+        v["ffmpeg"] = "3.1.9-6"
 
     if target in ("linux_arm32", "linux_arm64") or box in ("edge1", "bpi"):
         v["openssl"] = "1.0.2q-2"
+        v["ffmpeg"] = "3.1.9-6"
 
     if "festival-vox" not in v:
         v["festival-vox"] = v["festival"]
