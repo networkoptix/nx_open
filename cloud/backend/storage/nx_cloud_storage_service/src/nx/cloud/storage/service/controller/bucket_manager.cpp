@@ -14,12 +14,6 @@
 
 namespace nx::cloud::storage::service::controller {
 
-namespace {
-
-static constexpr char kDefaultBucketLocation[] = "us-east-1";
-
-} // namespace
-
 BucketManager::BucketManager(const conf::Settings& settings, model::Model* model):
     m_settings(settings),
     m_database(model->database()),
