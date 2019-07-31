@@ -118,8 +118,15 @@ ListView
     header: Item { height: 8; width: parent.width }
     footer: Item { height: 8; width: parent.width }
 
-    onVisibleChanged: requestFetchIfNeeded()
     onContentYChanged: requestFetchIfNeeded()
+
+    onVisibleChanged:
+    {
+        requestFetchIfNeeded()
+
+        if (view.model)
+            view.model.setLivePaused(!visible)
+    }
 
     Connections
     {

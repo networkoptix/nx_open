@@ -192,6 +192,12 @@ void RightPanelModelsAdapter::setFetchDirection(RightPanel::FetchDirection value
         model->setFetchDirection(value);
 }
 
+void RightPanelModelsAdapter::setLivePaused(bool value)
+{
+    if (auto model = d->searchModel())
+        model->setLivePaused(value);
+}
+
 void RightPanelModelsAdapter::requestFetch()
 {
     d->requestFetch();

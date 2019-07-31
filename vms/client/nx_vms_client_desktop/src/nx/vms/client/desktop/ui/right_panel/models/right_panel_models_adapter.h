@@ -39,6 +39,8 @@ public:
     Q_INVOKABLE void setFetchDirection(nx::vms::client::desktop::RightPanel::FetchDirection value);
     Q_INVOKABLE void requestFetch();
 
+    Q_INVOKABLE void setLivePaused(bool value);
+
     static void registerQmlType();
 
 signals:
