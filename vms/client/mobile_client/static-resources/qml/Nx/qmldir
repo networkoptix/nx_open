@@ -8,3 +8,4 @@ Utils 1.0 Utils.js
 Utils3D 1.0 Utils3D.js
 LoginUtils 1.0 LoginUtils.js
 Workflow 1.0 Workflow.js
+singleton ConnectionController 1.0 ConnectionController.qml

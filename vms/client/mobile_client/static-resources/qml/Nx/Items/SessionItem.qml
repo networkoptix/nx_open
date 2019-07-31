@@ -186,17 +186,11 @@ Pane
         {
             if (!hostsModel.isEmpty)
             {
-                if (!connectionManager.connectToServer(
+                ConnectionController.connectToServerByParams(
                     hostsModelAccessor.defaultAddress,
                     cloudStatusWatcher.credentials.user,
                     cloudStatusWatcher.credentials.password,
-                    true))
-                {
-                    sessionsScreen.openConnectionWarningDialog(systemName)
-                    return
-                }
-
-                Workflow.openResourcesScreen(systemName)
+                    true)
             }
         }
         else
@@ -205,17 +199,11 @@ Pane
             {
                 if (authenticationDataModel.hasStoredPassword)
                 {
-                    if (!connectionManager.connectToServer(
+                    ConnectionController.connectToServerByParams(
                         hostsModelAccessor.defaultAddress,
                         authenticationDataModel.defaultCredentials.user,
                         authenticationDataModel.defaultCredentials.password,
-                        false))
-                    {
-                        sessionsScreen.openConnectionWarningDialog(systemName)
-                        return
-                    }
-
-                    Workflow.openResourcesScreen(systemName)
+                        false)
                 }
                 else
                 {

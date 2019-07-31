@@ -75,6 +75,8 @@ ApplicationWindow
         }
         onWidthChanged: autoScrollDelayTimer.restart()
         onHeightChanged: autoScrollDelayTimer.restart()
+
+        Component.onCompleted: ConnectionController.stackView = this
     }
 
     UiController {}
@@ -110,18 +112,10 @@ ApplicationWindow
 
             if (!url.isEmpty())
             {
-                Workflow.openResourcesScreen(systemName)
-                connectionManager.connectToServer(url)
+                ConnectionController.connectToServerByUrl(url)
                 return
             }
         }
-
-        // TODO: #dklychkov Check if need it in #3.1 and uncomment.
-        // if (cloudStatusWatcher.status == QnCloudStatusWatcher.LoggedOut)
-        // {
-        //     Workflow.openCloudWelcomeScreen()
-        //     return
-        // }
 
         Workflow.openSessionsScreen()
 
@@ -226,8 +220,8 @@ ApplicationWindow
 
         property bool cloudOfflineDelayed: false
         property bool showCloudOfflineWarning:
-            stackView.currentItem.objectName == "sessionsScreen" && cloudOfflineDelayed
-        readonly property bool reconnecting: connectionManager.restoringConnection
+            stackView.currentItem && stackView.currentItem.objectName == "sessionsScreen" && cloudOfflineDelayed
+        readonly property bool reconnecting: ConnectionController.reconnecting
 
         readonly property string warningText:
         {

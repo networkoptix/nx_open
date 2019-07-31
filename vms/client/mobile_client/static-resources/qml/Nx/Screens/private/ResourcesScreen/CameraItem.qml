@@ -281,7 +281,7 @@ Control
 
         interval: initialLoadDelay
         repeat: true
-        running: active && connectionManager.connectionState === QnConnectionManager.Ready
+        running: active && ConnectionController.ready
 
         onTriggered:
         {

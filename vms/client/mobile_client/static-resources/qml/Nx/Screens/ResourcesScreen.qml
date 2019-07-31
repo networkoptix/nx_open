@@ -24,8 +24,8 @@ Page
         {
             padding: 0
             icon.source: lp("/images/search.png")
-            enabled: d.enabled
-            opacity: !connectionManager.restoringConnection ? 1.0 : 0.2
+            enabled: camerasGrid.enabled
+            opacity: ConnectionController.reconnecting ? 0.2 : 1.0
             onClicked:
             {
                 sideNavigation.close()
@@ -47,15 +47,7 @@ Page
         target: resourcesScreen
         property: "title"
         value: layout.name || connectionManager.systemName
-        when: connectionManager.online
-    }
-
-    QtObject
-    {
-        id: d
-
-        readonly property bool enabled: !connectionManager.restoringConnection
-            && !loadingDummy.visible
+        when: ConnectionController.online
     }
 
     SearchToolBar
@@ -79,12 +71,11 @@ Page
         }
         displayMarginBeginning: anchors.topMargin
         displayMarginEnd: anchors.bottomMargin
-        enabled: d.enabled
+        enabled: !ConnectionController.reconnecting && !loadingDummy.visible
 
         layoutId: uiController.layoutId
 
-        keepStatuses: !connectionManager.restoringConnection
-            && connectionManager.connectionState !== QnConnectionManager.Ready
+        keepStatuses: !ConnectionController.reconnecting && !ConnectionController.ready
 
         active: activePage
 
@@ -103,7 +94,7 @@ Page
         onButtonClicked: uiController.layoutId = ""
         visible: camerasGrid.count == 0
                  && uiController.layoutId != ""
-                 && connectionManager.online
+                 && ConnectionController.online
     }
 
     Loader
@@ -112,7 +103,7 @@ Page
         anchors.fill: parent
         active: searchToolBar.text && searchToolBar.opacity == 1.0
         sourceComponent: searchListComponent
-        enabled: d.enabled
+        enabled: camerasGrid.enabled
     }
 
     Component
@@ -159,7 +150,7 @@ Page
         color: ColorTheme.transparent(ColorTheme.base5, 0.8)
 
         Behavior on opacity { NumberAnimation { duration: 200 } }
-        opacity: connectionManager.restoringConnection ? 1.0 : 0.0
+        opacity: ConnectionController.reconnecting ? 1.0 : 0.0
         visible: opacity > 0
     }
 
@@ -171,7 +162,7 @@ Page
         color: ColorTheme.windowBackground
         Behavior on opacity { NumberAnimation { duration: 200 } }
         visible: opacity > 0
-        opacity: connectionManager.online || connectionManager.restoringConnection ? 0.0 : 1.0
+        opacity: ConnectionController.online || ConnectionController.reconnecting ? 0.0 : 1.0
 
         Column
         {
@@ -190,27 +181,11 @@ Page
             {
                 anchors.horizontalCenter: parent.horizontalCenter
                 topPadding: 26
-                text: connectionManager.connectionState === QnConnectionManager.Connected
+                text: ConnectionController.connected
                     ? qsTr("Loading...") : qsTr("Connecting...")
                 font.pixelSize: 22
                 color: ColorTheme.contrast16
             }
-        }
-    }
-
-    Connections
-    {
-        target: connectionManager
-
-        onConnectionFailed:
-        {
-            if (stackView.currentItem !== resourcesScreen)
-                return
-
-            var systemName = title ? title : getLastUsedSystemName()
-            Workflow.openSessionsScreenWithWarning(
-                connectionManager.connectionType == QnConnectionManager.LiteClientConnection
-                    ? "" : systemName)
         }
     }
 }

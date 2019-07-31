@@ -10,8 +10,7 @@ Object
         onConnectRequested:
         {
             sideNavigation.close()
-            Workflow.openResourcesScreen()
-            connectionManager.connectToServer(url)
+            ConnectionController.connectToServerByUrl(url)
         }
 
         onDisconnectRequested:
@@ -34,9 +33,7 @@ Object
         onResourcesScreenRequested:
             Workflow.openResourcesScreen(connectionManager.systemName, filterIds)
         onVideoScreenRequested:
-        {
             Workflow.openVideoScreen(cameraId, undefined, undefined, undefined, timestamp)
-        }
         onLoginToCloudScreenRequested:
             Workflow.openCloudScreen(user, password, connectOperationId)
     }
