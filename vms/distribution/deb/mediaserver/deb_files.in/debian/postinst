@@ -179,7 +179,7 @@ installModificationSpecificConfig()
 # This is necessary because changed configuration options should take effect
 # immediately.
 
-if [[ $RUNTIME == "real" ]]
+if [[ $RUNTIME != "docker" ]]
 then
     systemctl stop $COMPANY_NAME-mediaserver || true
 
@@ -271,7 +271,7 @@ esac
 # Dirty hack to prevent apport from catching our crash dumps.
 systemctl disable apport &>/dev/null || true
 
-if [[ $RUNTIME == "real" ]]
+if [[ $RUNTIME != "docker" ]]
 then
     systemctl stop apport &>/dev/null || true
 fi
@@ -320,7 +320,7 @@ startServer()
     echo "Started service with PID $PID."
 }
 
-if [[ $RUNTIME == "real" ]]
+if [[ $RUNTIME != "docker" ]]
 then
     if ! startServer
     then
