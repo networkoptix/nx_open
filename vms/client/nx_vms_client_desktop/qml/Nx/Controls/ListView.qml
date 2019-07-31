@@ -50,13 +50,12 @@ ListView
     ScrollBar.vertical: ScrollBar
     {
         id: scrollBar
-        stepSize: scrollStepSize / listView.height
+        stepSize: scrollStepSize / listView.contentHeight
     }
 
     MouseArea
     {
         acceptedButtons: Qt.LeftButton
-        parent: listView.contentItem
         anchors.fill: parent
         hoverEnabled: true
 
