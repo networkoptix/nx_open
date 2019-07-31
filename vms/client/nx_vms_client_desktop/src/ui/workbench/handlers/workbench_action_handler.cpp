@@ -2559,24 +2559,65 @@ void ActionHandler::confirmAnalyticsStorageLocation()
         if (server->metadataStorageId().isNull()
             && nx::analytics::hasActiveObjectEngines(commonModule(), server->getId()))
         {
-            const auto name = server->getName();
+            const auto serverName = server->getName();
+            auto storages = server->getStorages();
+
+            std::sort(storages.begin(), storages.end(),
+                [](const QnStorageResourcePtr& a, const QnStorageResourcePtr& b)
+                {
+                    // TODO: #spanasenko use proper enums
+                    bool aIsLocal = a->getStorageType() == "local";
+                    bool bIsLocal = b->getStorageType() == "local";
+                    bool aIsSystem = a->statusFlag() & Qn::StorageStatus::system;
+                    bool bIsSystem = b->statusFlag() & Qn::StorageStatus::system;
+
+                    // Only local storages should be used.
+                    if (aIsLocal && !bIsLocal)
+                        return true;
+                    if (!aIsLocal && bIsLocal)
+                        return false;
+
+                    // System disk is the worst option.
+                    if (!aIsSystem && bIsSystem)
+                        return true;
+                    if (aIsSystem && !bIsSystem)
+                        return false;
+
+                    // Prefer storages enabled for writing.
+                    if (a->isUsedForWriting() && !b->isUsedForWriting())
+                        return true;
+                    if (!a->isUsedForWriting() && b->isUsedForWriting())
+                        return false;
+
+                    // Than prefer storages that aren't used for backup.
+                    if (!a->isBackup() && b->isBackup())
+                        return true;
+                    if (a->isBackup() && !b->isBackup())
+                        return false;
+
+                    // Take the storage with the most space avaliable first.
+                    return a->getFreeSpace() > b->getFreeSpace();
+                });
+
+            const auto defaultDir = storages.empty()
+                ? tr("the largest available partition.") //< Should be unreachable, but...
+                : storages.front()->getPath();
             QnMessageBox msgBox(
                 QnMessageBoxIcon::Warning,
-                tr("Confirm storage location to store analytics data on '%1'").arg(name),
-                tr("Analytics database should be stored on a local storage"
-                    " and can occupy up to hundred gigabytes."
+                tr("Confirm storage location for the analytics data on \"%1\"").arg(serverName),
+                tr("The analytics database should only be stored on a local drive"
+                    " and can take up large amounts of space."
                     "\n"
-                    "Once location to store analytics data is selected,"
-                    " it cannot be easily changed without loosing exitsing data. "
-                    "We recommed to choose location carefully and not to use"
-                    " system partition to avoid severe system malfunction."
+                    "Once a location to store analytics data is selected,"
+                    " it cannot be easily changed without losing existing data. "
+                    "We recommend to choose the location carefully and to avoid using"
+                    " the system partition as it may cause severe system malfunction."
                     "\n"
-                    "By default analytics data will be stored"
-                    " in mediaserver's installation directory."
+                    "By default analytics data will be stored on %1"
                     "\n"
-                    "You can change storage location in the \"Storage Management\""
-                    " tab in the Server Settings dialog."
-                ),
+                    "You can select another storage location in the \"Storage Management\" tab"
+                    " of the Server Settings dialog."
+                ).arg(defaultDir),
                 QDialogButtonBox::StandardButtons(),
                 QDialogButtonBox::NoButton,
                 mainWindowWidget());

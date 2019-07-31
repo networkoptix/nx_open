@@ -1031,7 +1031,7 @@ void QnStorageConfigWidget::confirmNewMetadataStorage(const QnUuid& storageId)
             QnMessageBoxIcon::Question,
             tr("What to do with current analytics data?"),
             tr("Current analytics data will not be automatically moved to another location"
-                " and will become unaccessible. You can keep it and manually move later,"
+                " and will become inaccessible. You can keep it and manually move later,"
                 " or delete permanently."
                 "\n"
                 "If you intended to move analytics data to another storage location,"
