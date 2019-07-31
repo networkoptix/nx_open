@@ -360,7 +360,7 @@ void UploadWorker::handleWaitForFileOnServer(
                 }
                 else
                 {
-                    handleError(tr("Server already has this file\"%1\"").arg(
+                    handleError(tr("Server already has this file \"%1\"").arg(
                         d->file->fileName()));
                 }
                 break;
