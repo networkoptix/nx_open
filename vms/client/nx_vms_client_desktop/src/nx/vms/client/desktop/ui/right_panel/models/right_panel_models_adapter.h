@@ -3,7 +3,7 @@
 #include <QtCore/QIdentityProxyModel>
 
 #include <nx/utils/impl_ptr.h>
-#include <nx/vms/client/desktop/ui/right_panel/right_panel_globals.h>
+#include <nx/vms/client/desktop/event_search/right_panel_globals.h>
 
 class QnWorkbenchContext;
 
@@ -36,11 +36,15 @@ public:
     virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
     virtual QHash<int, QByteArray> roleNames() const override;
 
+    Q_INVOKABLE void setFetchDirection(nx::vms::client::desktop::RightPanel::FetchDirection value);
+    Q_INVOKABLE void requestFetch();
+
     static void registerQmlType();
 
 signals:
     void contextChanged();
     void typeChanged();
+    void dataNeeded();
 
 private:
     class Private;

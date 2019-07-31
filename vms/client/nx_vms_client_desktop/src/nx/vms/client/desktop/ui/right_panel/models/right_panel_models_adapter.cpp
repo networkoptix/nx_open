@@ -11,6 +11,7 @@
 #include <ui/workbench/workbench_context.h>
 #include <utils/common/html.h>
 
+#include <nx/utils/pending_operation.h>
 #include <nx/utils/range_adapters.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/vms/client/desktop/event_search/models/analytics_search_list_model.h>
@@ -18,6 +19,7 @@
 #include <nx/vms/client/desktop/event_search/models/event_search_list_model.h>
 #include <nx/vms/client/desktop/event_search/models/simple_motion_search_list_model.h>
 #include <nx/vms/client/desktop/event_search/models/notification_tab_model.h>
+#include <nx/vms/client/desktop/utils/managed_camera_set.h>
 
 namespace nx::vms::client::desktop {
 
@@ -35,6 +37,8 @@ namespace {
  */
 static constexpr milliseconds kVisibleAutoCloseDelay = 20s;
 static constexpr milliseconds kInvisibleAutoCloseDelay = 80s;
+
+static constexpr milliseconds kQueuedFetchDelay = 50ms;
 
 } // namespace
 
@@ -54,6 +58,10 @@ public:
     void setRead(int row);
     void setAutoClosePaused(int row, bool value);
 
+    void requestFetch();
+
+    AbstractSearchListModel* searchModel();
+
 private:
     void recreateSourceModel();
     void initDeadlines(int first, int last);
@@ -71,6 +79,8 @@ private:
 
     QHash<QPersistentModelIndex, Deadline> m_deadlines;
     const QScopedPointer<QTimer> m_autoCloseTimer;
+
+    nx::utils::PendingOperation m_fetchOperation;
 };
 
 // ------------------------------------------------------------------------------------------------
@@ -176,6 +186,17 @@ void RightPanelModelsAdapter::setAutoClosePaused(int row, bool value)
     d->setAutoClosePaused(row, value);
 }
 
+void RightPanelModelsAdapter::setFetchDirection(RightPanel::FetchDirection value)
+{
+    if (auto model = d->searchModel())
+        model->setFetchDirection(value);
+}
+
+void RightPanelModelsAdapter::requestFetch()
+{
+    d->requestFetch();
+}
+
 void RightPanelModelsAdapter::registerQmlType()
 {
     qmlRegisterType<RightPanelModelsAdapter>("nx.vms.client.desktop", 1, 0, "RightPanelModel");
@@ -210,6 +231,15 @@ RightPanelModelsAdapter::Private::Private(RightPanelModelsAdapter* q):
 
     connect(m_autoCloseTimer.get(), &QTimer::timeout, this, &Private::closeExpired);
     m_autoCloseTimer->start(1s);
+
+    m_fetchOperation.setFlags(nx::utils::PendingOperation::FireOnlyWhenIdle);
+    m_fetchOperation.setInterval(kQueuedFetchDelay);
+    m_fetchOperation.setCallback(
+        [this]()
+        {
+            if (const auto model = searchModel(); model && model->canFetchMore())
+                model->fetchMore();
+        });
 }
 
 void RightPanelModelsAdapter::Private::setContext(QnWorkbenchContext* value)
@@ -237,8 +267,13 @@ void RightPanelModelsAdapter::Private::recreateSourceModel()
     const auto oldSourceModel = q->sourceModel();
     q->setSourceModel(nullptr);
 
-    if (oldSourceModel && oldSourceModel->parent() == this)
-        delete oldSourceModel;
+    if (oldSourceModel)
+    {
+        if (oldSourceModel->parent() == this)
+            delete oldSourceModel;
+        else
+            oldSourceModel->disconnect(q);
+    }
 
     if (!m_context)
         return;
@@ -267,6 +302,14 @@ void RightPanelModelsAdapter::Private::recreateSourceModel()
         case RightPanel::Tab::analytics:
             q->setSourceModel(new AnalyticsSearchListModel(m_context, this));
             break;
+    }
+
+    if (auto model = searchModel())
+    {
+        model->cameraSet()->setAllCameras();
+
+        connect(model, &AbstractSearchListModel::dataNeeded,
+            q, &RightPanelModelsAdapter::dataNeeded);
     }
 }
 
@@ -320,6 +363,16 @@ void RightPanelModelsAdapter::Private::setAutoClosePaused(int row, bool value)
         if (!value)
             iter->timer.setRemainingTime(kVisibleAutoCloseDelay);
     }
+}
+
+void RightPanelModelsAdapter::Private::requestFetch()
+{
+    m_fetchOperation.requestOperation();
+}
+
+AbstractSearchListModel* RightPanelModelsAdapter::Private::searchModel()
+{
+    return qobject_cast<AbstractSearchListModel*>(q->sourceModel());
 }
 
 } // namespace nx::vms::client::desktop

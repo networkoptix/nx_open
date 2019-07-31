@@ -8,6 +8,8 @@ TileBase
 {
     id: tile
 
+    readonly property bool isCloseable: (model && model.isCloseable) || false
+
     signal closeRequested()
 
     contentItem: RowLayout
@@ -51,7 +53,7 @@ TileBase
                     color: icon.color
                     font { pixelSize: 13; weight: Font.Medium }
 
-                    rightPadding: (model.isCloseable && !timestamp.text.length)
+                    rightPadding: (isCloseable && !timestamp.text.length)
                         ? closeButton.width
                         : 0
 
@@ -67,7 +69,7 @@ TileBase
 
                     topPadding: 2
                     color: tile.palette.windowText
-                    visible: text.length && !tile.hovered
+                    visible: implicitWidth && implicitHeight && !closeButton.visible
                     font { pixelSize: 11; weight: Font.Normal }
 
                     text: (model && model.timestamp) || ""
@@ -79,6 +81,34 @@ TileBase
                 id: resourceList
                 resourceNames: model && model.resourceList
             }
+
+            Text
+            {
+                id: description
+
+                Layout.fillWidth: true
+                wrapMode: Text.Wrap
+                color: tile.palette.light
+                font { pixelSize: 11; weight: Font.Normal }
+                visible: implicitWidth && implicitHeight
+                textFormat: Text.RichText
+
+                text: (model && model.description) || ""
+            }
+
+            Text
+            {
+                id: footer
+
+                Layout.fillWidth: true
+                wrapMode: Text.Wrap
+                color: tile.palette.light
+                font { pixelSize: 11; weight: Font.Normal }
+                visible: implicitWidth && implicitHeight
+                textFormat: Text.RichText
+
+                text: (model && model.additionalText) || ""
+            }
         }
     }
 
@@ -86,7 +116,7 @@ TileBase
     {
         id: closeButton
 
-        visible: tile.hovered && model.isCloseable
+        visible: isCloseable && tile.hovered
 
         anchors.right: parent.right
         anchors.rightMargin: 2

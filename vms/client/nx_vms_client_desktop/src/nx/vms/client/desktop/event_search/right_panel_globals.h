@@ -18,6 +18,22 @@ enum class Tab
 };
 Q_ENUM_NS(Tab)
 
+enum class FetchDirection
+{
+    earlier,
+    later
+};
+Q_ENUM_NS(FetchDirection)
+
+enum class FetchResult
+{
+    complete, //< Successful. There's no more data to fetch.
+    incomplete, //< Successful. There's more data to fetch.
+    failed, //< Unsuccessful.
+    cancelled //< Cancelled.
+};
+Q_ENUM_NS(FetchResult)
+
 void registerQmlType();
 
 } // namespace RightPanel
