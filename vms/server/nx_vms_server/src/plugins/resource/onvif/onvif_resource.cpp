@@ -810,13 +810,13 @@ CameraDiagnostics::Result QnPlOnvifResource::initOnvifCapabilitiesAndUrls(
         return CameraDiagnostics::CameraInvalidParams("ONVIF media URL is not filled by camera");
 
     const auto doIgnoreMedia2byPropertyKeyAsString = getProperty(
-        ResourcePropertyKey::Onvif::kIgnoreMedia2);
+        ResourcePropertyKey::kOnvifIgnoreMedia2);
     const bool doIgnoreMedia2byPropertyKey = doIgnoreMedia2byPropertyKeyAsString.toInt() > 0;
 
     const auto doIgnoreMedia2byDataKey = resourceData().value<bool>(
-        ResourceDataKey::kIgnoreMedia2, false);
+        ResourceDataKey::kOnvifIgnoreMedia2, false);
 
-    if (! (doIgnoreMedia2byPropertyKey || doIgnoreMedia2byDataKey))
+    if (!(doIgnoreMedia2byPropertyKey || doIgnoreMedia2byDataKey))
     {
         QString media2ServiceUrl;
         fetchOnvifMedia2Url(&media2ServiceUrl); //< We ignore the result,
@@ -3801,6 +3801,9 @@ void QnPlOnvifResource::stopInputPortStatesMonitoring()
         }
     }
 
+    if (serverModule()->isStopping())
+        return;
+
     if (QnSoapServer::instance() && QnSoapServer::instance()->getService())
         QnSoapServer::instance()->getService()->removeResourceRegistration(toSharedPointer(this));
 
@@ -4315,7 +4318,8 @@ bool QnPlOnvifResource::RenewSubscriptionAsOdmThreadSafe()
 
     _oasisWsnB2__Renew request;
 
-    auto interval = resourceData().value<QString>("renewIntervalForPullingAsOdm", "PT2M");
+    auto interval = resourceData().value<QString>(ResourceDataKey::kRenewIntervalForPullingAsOdm,
+        "PT2M");
     std::string odmRenewTerminationTime = interval.toStdString();
     request.TerminationTime = &odmRenewTerminationTime;
 

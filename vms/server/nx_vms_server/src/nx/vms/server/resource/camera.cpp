@@ -690,19 +690,8 @@ int Camera::getMaxChannels() const
 void Camera::inputPortListenerAttached()
 {
     QnMutexLocker lk(&m_initMutex);
-    if (!isInitialized())
-    {
-        // While camera is not uninitialized yet, several signals may cause this function
-        // (e.g. RuleManager::rulesReset and QnResourcePool::resourceAdded).
-        // As they duplicate each other, we increment the counter only once.
-        if (m_inputPortListenerCount == 0)
-            ++m_inputPortListenerCount;
-    }
-    else
-    {
-        ++m_inputPortListenerCount;
-        fixInputPortMonitoring();
-    }
+    ++m_inputPortListenerCount;
+    fixInputPortMonitoring();
 }
 
 void Camera::inputPortListenerDetached()
@@ -738,6 +727,7 @@ bool Camera::setOutputPortState(
 
 void Camera::fixInputPortMonitoring()
 {
+    NX_VERBOSE(this, "Input port listener count %1", m_inputPortListenerCount);
     if (isInitialized() && m_inputPortListenerCount)
     {
         if (!m_inputPortListeningInProgress && hasCameraCapabilities(Qn::InputPortCapability))

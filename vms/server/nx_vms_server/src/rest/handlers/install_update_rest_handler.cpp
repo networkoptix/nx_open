@@ -111,12 +111,12 @@ void sendInstallRequest(
 static QList<QnUuid> peersFromParams(const QnRequestParamList& params)
 {
     if (!params.contains("peers"))
-        throw Exception("Missing required parameter 'peers'", QnRestResult::MissingParameter);
+        throw Exception("Missing required parameter \"peers\"", QnRestResult::MissingParameter);
 
     QList<QnUuid> participants;
     if (!params.value("peers").isEmpty())
     {
-        for (const auto& idString : params.value("peers").split(','))
+        for (const auto& idString: params.value("peers").split(','))
             participants.append(QnUuid::fromStringSafe(idString));
     }
 

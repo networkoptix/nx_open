@@ -82,7 +82,7 @@ void requestRemotePeers(
                 NX_DEBUG(
                     kMultiRequestLogTag,
                     "Received a response for the multiserver request %1 to %2. "
-                    "Success: %3, reply: %4", path, serverId, success, body);
+                    "Success: %3, reply size: %4", path, serverId, success, body.size());
 
                 const auto updateOutputDataCallback =
                     [&reply, success, &outputReply, context, &serverId, &mergeFunction]()
@@ -94,11 +94,15 @@ void requestRemotePeers(
                 context->executeGuarded(updateOutputDataCallback);
             };
 
-        const nx::utils::Url apiUrl = getServerApiUrl(path, server, context);
-        runMultiserverDownloadRequest(commonModule->router(), apiUrl, server, completionFunc,
+        runMultiserverDownloadRequest(
+            commonModule->router(),
+            getServerApiUrl(path, server, context),
+            server,
+            completionFunc,
             context);
-        context->waitForDone();
     }
+
+    context->waitForDone();
 }
 
 bool verifyPasswordOrSetError(
