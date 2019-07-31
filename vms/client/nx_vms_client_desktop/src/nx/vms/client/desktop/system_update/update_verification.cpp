@@ -214,7 +214,7 @@ bool verifyUpdateContents(
     if (!clientData.clientId.isNull()
         && (clientData.currentVersion < targetVersion
             || (clientData.currentVersion > targetVersion && options.compatibilityMode))
-        && clientData.installedVersions.find(targetVersion) == clientData.installedVersions.end())
+        && clientData.installedVersions.count(targetVersion) == 0)
     {
         contents.alreadyInstalled = false;
 
@@ -241,6 +241,10 @@ bool verifyUpdateContents(
                 contents.missingUpdate.insert(clientData.clientId);
                 break;
         }
+    }
+    else
+    {
+        contents.needClientUpdate = false;
     }
 
     QHash<nx::utils::OsInfo, update::Package*> serverPackages;
