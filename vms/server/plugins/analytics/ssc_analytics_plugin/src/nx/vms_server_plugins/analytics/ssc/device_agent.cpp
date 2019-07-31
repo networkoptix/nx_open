@@ -27,7 +27,7 @@ using namespace nx::sdk::analytics;
 namespace {
 
 EventMetadataPacket* createCommonEventMetadataPacket(
-    const EventType& eventType, int logicalId)
+    const EventType& eventType, int /*logicalId*/)
 {
     using namespace std::chrono;
 

@@ -242,9 +242,6 @@ void QnArecontPanoramicResource::initializeVideoLayoutUnsafe() const
 QnConstResourceVideoLayoutPtr QnArecontPanoramicResource::getVideoLayout(
     const QnAbstractStreamDataProvider* /*dataProvider*/) const
 {
-    // Saving id before locking m_layoutMutex to avoid potential deadlock.
-    const auto resourceId = getId();
-
     QnMutexLocker lock(&m_layoutMutex);
     if (!m_customVideoLayout)
         initializeVideoLayoutUnsafe();

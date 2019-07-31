@@ -324,7 +324,7 @@ std::vector<ObjectTrack> ObjectTrackSearcher::lookupTracksUsingArchive(
         auto matchResult = m_analyticsArchive->matchObjects(
             m_filter.deviceIds,
             archiveFilter);
-        const auto fetchedObjectGroupsCount = matchResult.trackGroups.size();
+        const int fetchedObjectGroupsCount = matchResult.trackGroups.size();
 
         matchResult.trackGroups.erase(
             std::remove_if(
@@ -337,10 +337,10 @@ std::vector<ObjectTrack> ObjectTrackSearcher::lookupTracksUsingArchive(
 
         fetchTracksFromDb(queryContext, matchResult.trackGroups, &result);
 
-        if (result.size() >= m_filter.maxObjectTracksToSelect ||
+        if ((int) result.size() >= m_filter.maxObjectTracksToSelect ||
             fetchedObjectGroupsCount < archiveFilter.limit)
         {
-            if (result.size() > m_filter.maxObjectTracksToSelect)
+            if ((int) result.size() > m_filter.maxObjectTracksToSelect)
                 result.erase(result.begin() + m_filter.maxObjectTracksToSelect, result.end());
             return result;
         }

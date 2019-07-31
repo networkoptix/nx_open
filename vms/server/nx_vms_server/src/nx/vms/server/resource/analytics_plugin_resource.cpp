@@ -14,20 +14,6 @@
 
 namespace nx::vms::server::resource {
 
-namespace {
-
-nx::vms::api::analytics::PluginDescriptor descriptorFromManifest(
-    const nx::vms::api::analytics::PluginManifest& manifest)
-{
-    nx::vms::api::analytics::PluginDescriptor descriptor;
-    descriptor.id = manifest.id;
-    descriptor.name = manifest.name;
-
-    return descriptor;
-}
-
-} // namespace
-
 AnalyticsPluginResource::AnalyticsPluginResource(QnMediaServerModule* serverModule):
     base_type(),
     ServerModuleAware(serverModule)

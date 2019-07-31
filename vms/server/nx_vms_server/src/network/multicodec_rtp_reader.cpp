@@ -355,7 +355,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
         if (bytesRead < 1)
         {
             const bool isInvalidTrack = trackIndexIter == m_trackIndices.end();
-            const bool isBufferAllocated = m_demuxedData.size() > rtpChannelNum
+            const bool isBufferAllocated = (int) m_demuxedData.size() > rtpChannelNum
                 && m_demuxedData[rtpChannelNum];
 
             if (isInvalidTrack && isBufferAllocated)

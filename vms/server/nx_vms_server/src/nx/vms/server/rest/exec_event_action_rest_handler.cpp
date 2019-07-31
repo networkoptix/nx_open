@@ -13,7 +13,7 @@ QnExecuteEventActionRestHandler::QnExecuteEventActionRestHandler(QnMediaServerMo
 }
 
 JsonRestResponse QnExecuteEventActionRestHandler::executePost(
-    const JsonRestRequest& request, const QByteArray& body)
+    const JsonRestRequest& /*request*/, const QByteArray& body)
 {
     JsonRestResponse response(nx::network::http::StatusCode::ok);
 
