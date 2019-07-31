@@ -88,6 +88,11 @@ bool QnSystemSortFilterListModel::isForgotten(const QString& /* id */) const
     return false;
 }
 
+bool QnSystemSortFilterListModel::isHidden(const QModelIndex& /* dataIndex */) const
+{
+    return false;
+}
+
 bool QnSystemSortFilterListModel::filterAcceptsRow(
     int sourceRow,
     const QModelIndex& /* sourceParent */) const
@@ -96,6 +101,9 @@ bool QnSystemSortFilterListModel::filterAcceptsRow(
     // Filters out offline non-cloud systems with last connection more than N (defined) days ago
     if (!dataIndex.isValid())
         return true;
+
+    if (isHidden(dataIndex))
+        return false;
 
     if (dataIndex.data(QnSystemsModel::IsConnectableRoleId).toBool())
         return true;    //< Skips every connectable system
@@ -243,6 +251,40 @@ QnOrderedSystemsModel::QnOrderedSystemsModel(QObject* parent) :
 bool QnOrderedSystemsModel::isForgotten(const QString& id) const
 {
     return qnForgottenSystemsManager && qnForgottenSystemsManager->isForgotten(id);
+}
+
+bool QnOrderedSystemsModel::isHidden(const QModelIndex& dataIndex) const
+{
+    if (m_systemsToHide.testFlag(Incompatible)
+        && !dataIndex.data(QnSystemsModel::IsCompatibleVersionRoleId).toBool())
+        return true;
+
+    if (m_systemsToHide.testFlag(NotConnectableCloud)
+        && dataIndex.data(QnSystemsModel::IsCloudSystemRoleId).toBool()
+        && !dataIndex.data(QnSystemsModel::IsConnectableRoleId).toBool())
+        return true;
+
+    return false;
+}
+
+void QnOrderedSystemsModel::setHiddenSystems(int flags)
+{
+    if (m_systemsToHide == flags)
+        return;
+
+    m_systemsToHide = None;
+
+    if (flags & Incompatible)
+        m_systemsToHide |= Incompatible;
+    if (flags & NotConnectableCloud)
+        m_systemsToHide |= NotConnectableCloud;
+
+    emit hiddenSystemsChanged(m_systemsToHide);
+}
+
+int QnOrderedSystemsModel::hiddenSystems() const
+{
+    return m_systemsToHide;
 }
 
 QString QnOrderedSystemsModel::minimalVersion() const

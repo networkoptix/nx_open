@@ -187,6 +187,11 @@ struct Ini: nx::kit::IniConfig
         "Override detected OS variant value (e.g. \"ubuntu\").");
     NX_INI_STRING("", currentOsVariantVersionOverride,
         "Override detected OS variant version value (e.g. \"16.04\").");
+
+    NX_INI_INT(0, systemsToHide,
+        "Hide systems on welcome screen, bitwise combination of flags:\n"
+        " * 1 - Incompatible systems.\n"
+        " * 2 - Not connectable cloud systems.\n");
 };
 
 inline Ini& ini()

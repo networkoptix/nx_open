@@ -319,6 +319,11 @@ QString QnWorkbenchWelcomeScreen::message() const
     return m_message;
 }
 
+int QnWorkbenchWelcomeScreen::systemsToHide() const
+{
+    return ini().systemsToHide;
+}
+
 bool QnWorkbenchWelcomeScreen::isAcceptableDrag(const QList<QUrl>& urls)
 {
     return !extractResources(urls).isEmpty();
