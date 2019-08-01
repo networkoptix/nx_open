@@ -27,6 +27,12 @@ struct InterfaceId
 {
     const char* const value; /**< Statically-allocated, neither null nor empty. */
 
+    /**
+     * Default copy constructor is needed to enable passing by value as a raw pointer for
+     * compatibility with old SDK.
+     */
+    InterfaceId(const InterfaceId& other) = default;
+
     /** Enable initialization with a character array only. */
     template<int len>
     explicit constexpr InterfaceId(const char (&charArray)[len]): value(charArray)

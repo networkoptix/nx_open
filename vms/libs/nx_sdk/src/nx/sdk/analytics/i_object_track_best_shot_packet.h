@@ -29,7 +29,7 @@ public:
     virtual int64_t timestampUs() const = 0;
 
     /** Id of the track the best shot belongs to. */
-    virtual nx::sdk::Uuid trackId() const = 0;
+    virtual Uuid trackId() const = 0;
 
     /**
      * Bounding box of the best shot. If the rectangle returned by this method is invalid then

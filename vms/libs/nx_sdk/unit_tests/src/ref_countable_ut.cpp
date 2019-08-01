@@ -243,6 +243,8 @@ static_assert(sizeof(OldInterfaceId) == kOldInterfaceIdSize,
  * Mock for a base interface from the old SDK - used for compatibility testing.
  *
  * Has the VMT layout starting with all the entries from IRefCountable (thus, as in the old SDK).
+ *
+ * Defined exactly the same way as in the old SDK (nxpl::PluginInterface).
  */
 class OldInterface
 {
