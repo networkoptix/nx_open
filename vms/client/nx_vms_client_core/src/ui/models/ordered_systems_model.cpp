@@ -255,6 +255,11 @@ void QnOrderedSystemsModel::setMinimalVersion(const QString& minimalVersion)
     m_systemsModel->setMinimalVersion(minimalVersion);
 }
 
+int QnOrderedSystemsModel::searchRoleId()
+{
+    return QnSystemsModel::SearchRoleId;
+}
+
 void QnOrderedSystemsModel::handleWeightsChanged()
 {
     setWeights(qnSystemWeightsManager->weights(), qnSystemWeightsManager->unknownSystemsWeight());

@@ -72,7 +72,7 @@ Page
 
         height: searchEdit.y + searchEdit.height + 12
         width: sessionsList.width
-        visible: sessionsList.model.sourceRowsCount > 8
+        visible: sessionsList.model.acceptedRowCount > 8
 
         SearchEdit
         {
