@@ -60,26 +60,33 @@ RuleProcessor::RuleProcessor(QnMediaServerModule* serverModule):
     using namespace std::placeholders;
 
     connect(resourcePool(), &QnResourcePool::resourceAdded,
-        this, std::bind(&RuleProcessor::toggleInputPortMonitoring, this, _1, true),
+        this, [this](const QnResourcePtr& r) { at_resourceMonitor(r, /*isAdded*/ true); },
         Qt::QueuedConnection);
 
     connect(resourcePool(), &QnResourcePool::resourceRemoved,
-        this, std::bind(&RuleProcessor::toggleInputPortMonitoring, this, _1, false),
+        this, [this](const QnResourcePtr& r) { at_resourceMonitor(r, /*isAdded*/ false); },
         Qt::QueuedConnection);
 
-    auto ruleModificationStarted = [this]() {++m_updatingRulesCnt; };
+    const auto connectRuleUpdate =
+        [this](auto signal, auto slot)
+        {
+            // Make sure event processing is stopped until rule change is complete.
+            connect(eventRuleManager(), signal, [this]() {++m_updatingRulesCount; });
+            connect(eventRuleManager(), signal, this,
+                [this, slot](auto arg)
+                {
+                    (this->*slot)(arg);
+                    const auto currentValue = --m_updatingRulesCount;
+                    NX_ASSERT(currentValue >= 0, currentValue);
+                    if (currentValue == 0)
+                        m_ruleUpdateCondition.wakeAll(); //< // Resume event processing.
+                },
+                Qt::QueuedConnection);
+        };
 
-    connect(eventRuleManager(), &vms::event::RuleManager::ruleAddedOrUpdated, ruleModificationStarted);
-    connect(eventRuleManager(), &vms::event::RuleManager::ruleAddedOrUpdated,
-            this, &RuleProcessor::at_ruleAddedOrUpdated); //< Queued connection.
-
-    connect(eventRuleManager(), &vms::event::RuleManager::ruleRemoved, ruleModificationStarted);
-    connect(eventRuleManager(), &vms::event::RuleManager::ruleRemoved,
-            this, &RuleProcessor::at_ruleRemoved); //< Queued connection.
-
-    connect(eventRuleManager(), &vms::event::RuleManager::ruleRemoved, ruleModificationStarted);
-    connect(eventRuleManager(), &vms::event::RuleManager::rulesReset,
-            this, &RuleProcessor::at_rulesReset); //< Queued connection.
+    connectRuleUpdate(&vms::event::RuleManager::ruleAddedOrUpdated, &RuleProcessor::at_ruleAddedOrUpdated);
+    connectRuleUpdate(&vms::event::RuleManager::ruleRemoved, &RuleProcessor::at_ruleRemoved);
+    connectRuleUpdate(&vms::event::RuleManager::rulesReset, &RuleProcessor::at_rulesReset);
 
     connect(&m_timer, &QTimer::timeout, this, &RuleProcessor::at_timer, Qt::QueuedConnection);
     m_timer.start(1000);
@@ -88,8 +95,9 @@ RuleProcessor::RuleProcessor(QnMediaServerModule* serverModule):
 
 RuleProcessor::~RuleProcessor()
 {
-    m_updatingRulesCnt = 0;
-    m_ruleUpdateCond.wakeAll();
+    NX_ASSERT(m_updatingRulesCount == 0, m_updatingRulesCount);
+    m_updatingRulesCount = 0;
+    m_ruleUpdateCondition.wakeAll();
 }
 
 QnMediaServerResourcePtr RuleProcessor::getDestinationServer(
@@ -415,10 +423,18 @@ void RuleProcessor::processEvent(const vms::event::AbstractEventPtr& event)
     NX_VERBOSE(this, "Processing event [%1]", event->getEventType());
 
     QnMutexLocker lock(&m_mutex);
-    while (m_updatingRulesCnt > 0)
-        m_ruleUpdateCond.wait(&m_mutex);
+    // If we wait within event loop, will freeze forever...
+    if (thread() != QThread::currentThread())
+    {
+        // This is a dirty huck, which makes sure that no actions are executed until rule update
+        // request is complete. This is mostly important for HTTP requests which do not have a way
+        // to detect if change is complete.
+        // TODO: Remove and notify HTTP requests some other way.
+        while (m_updatingRulesCount > 0)
+            m_ruleUpdateCondition.wait(&m_mutex);
+    }
 
-    // Get pairs of {rule, action} for event
+    // Get pairs of {rule, action} for event.
     const auto actions = matchActions(event);
     for (const auto& action: actions)
         executeAction(action);
@@ -705,7 +721,6 @@ void RuleProcessor::at_ruleAddedOrUpdated(const vms::event::RulePtr& rule)
 {
     QnMutexLocker lock(&m_mutex);
     at_ruleAddedOrUpdated_impl(rule);
-    ruleModificationFinishedUnsafe();
 }
 
 void RuleProcessor::at_rulesReset(const vms::event::RuleList& rules)
@@ -716,24 +731,29 @@ void RuleProcessor::at_rulesReset(const vms::event::RuleList& rules)
     for (const auto& rule: m_rules)
     {
         if (!rule->isDisabled())
-            notifyResourcesAboutEventIfNeccessary(rule, false);
+            notifyResourcesAboutEventIfNeccessary(rule, /*isRuleAdded*/ false);
         terminateRunningRule(rule);
     }
     m_rules.clear();
 
     for (const auto& rule: rules)
         at_ruleAddedOrUpdated_impl(rule);
-
-    ruleModificationFinishedUnsafe();
 }
 
-void RuleProcessor::toggleInputPortMonitoring(const QnResourcePtr& resource, bool on)
+void RuleProcessor::at_resourceMonitor(const QnResourcePtr& resource,  bool isAdded)
 {
-    QnMutexLocker lock(&m_mutex);
-
     auto camResource = resource.dynamicCast<nx::vms::server::resource::Camera>();
     if (!camResource)
         return;
+
+    QnMutexLocker lock(&m_mutex);
+    if (isAdded)
+        m_knownCameras.emplace(camResource.get(), camResource);
+    else
+        m_knownCameras.erase(camResource.get());
+
+    NX_VERBOSE(this, "Camera %1 %2, %3 total",
+        camResource, isAdded ? "added" : "removed", m_knownCameras.size());
 
     for (const auto& rule: m_rules)
     {
@@ -747,7 +767,7 @@ void RuleProcessor::toggleInputPortMonitoring(const QnResourcePtr& resource, boo
             if (resList.isEmpty() ||            //< Listening to all cameras.
                 resList.contains(camResource))
             {
-                if (on)
+                if (isAdded)
                     camResource->inputPortListenerAttached();
                 else
                     camResource->inputPortListenerDetached();
@@ -805,21 +825,12 @@ void RuleProcessor::at_ruleRemoved(QnUuid id)
         if (m_rules[i]->id() == id)
         {
             if (!m_rules[i]->isDisabled())
-                notifyResourcesAboutEventIfNeccessary(m_rules[i], false);
+                notifyResourcesAboutEventIfNeccessary(m_rules[i], /*isRuleAdded*/ false);
             terminateRunningRule(m_rules[i]);
             m_rules.removeAt(i);
             break;
         }
     }
-
-    ruleModificationFinishedUnsafe();
-}
-
-void RuleProcessor::ruleModificationFinishedUnsafe()
-{
-    if (m_updatingRulesCnt > 0)
-        --m_updatingRulesCnt;
-    m_ruleUpdateCond.wakeAll();
 }
 
 void RuleProcessor::notifyResourcesAboutEventIfNeccessary(
@@ -829,27 +840,23 @@ void RuleProcessor::notifyResourcesAboutEventIfNeccessary(
     {
         if (businessRule->eventType() == vms::api::EventType::cameraInputEvent)
         {
-            auto camerasToMonitor = resourcePool()
-                ->getResourcesByIds<nx::vms::server::resource::Camera>(
-                    businessRule->eventResources());
-
-            if (camerasToMonitor.isEmpty())
+            const auto eventResources = businessRule->eventResources();
+            decltype(m_knownCameras) filteredCameras;
+            if (!eventResources.isEmpty())
             {
-                for (const auto camera: resourcePool()->getAllCameras(QnResourcePtr(), true))
+                for (const auto& [c, weakPtr]: m_knownCameras)
                 {
-                    if (auto c = camera.dynamicCast<nx::vms::server::resource::Camera>())
-                        camerasToMonitor.push_back(std::move(c));
-                    else
-                        NX_ASSERT(false, lm("Not a server camera in pool: %1").args(camera));
+                    const auto lock = weakPtr.lock();
+                    if (lock && eventResources.contains(c->getId()))
+                        filteredCameras.emplace(c, weakPtr);
                 }
             }
 
-            for (const auto& camera: camerasToMonitor)
+            const auto eventCameras = eventResources.isEmpty() ? &m_knownCameras : &filteredCameras;
+            for (const auto& [c, weakPtr]: *eventCameras)
             {
-                if (isRuleAdded)
-                    camera->inputPortListenerAttached();
-                else
-                    camera->inputPortListenerDetached();
+                if (const auto lock = weakPtr.lock())
+                    isRuleAdded ? c->inputPortListenerAttached() : c->inputPortListenerDetached();
             }
         }
     }

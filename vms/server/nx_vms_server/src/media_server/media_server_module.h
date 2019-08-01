@@ -162,6 +162,7 @@ public:
     void initializeP2PDownloader();
 
     QString metadataDatabaseDir() const;
+    bool isStopping() const { return m_isStopping.load(); }
 private:
     void registerResourceDataProviders();
     /**
@@ -221,4 +222,10 @@ private:
     nx::vms::server::hls::SessionPool* m_hlsSessionPool = nullptr;
     nx::vms::server::network::MulticastAddressRegistry* m_multicastAddressRegistry = nullptr;
     StreamingChunkTranscoder* m_streamingChunkTranscoder = nullptr;
+
+    // When server stops, QnResourcePropertyDictionary is destroyed before QnResource objects
+    // (at least some of them) because of unknown reasons. So QnResource can not make soap requests
+    // in its destructor. To prevent them the special flag is added.
+    // This behavior should be fixed in 4.2.
+    std::atomic<bool> m_isStopping{ false };
 };

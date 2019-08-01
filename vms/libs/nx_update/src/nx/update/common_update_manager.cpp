@@ -437,7 +437,7 @@ update::Information CommonUpdateManager::updateInformation(
     InformationCategory category) const noexcept(false)
 {
     update::Information information;
-    nx::update::FindPackageResult result;
+    std::optional<nx::update::FindPackageResult> result;
 
     switch (category)
     {
@@ -455,8 +455,9 @@ update::Information CommonUpdateManager::updateInformation(
             break;
     }
 
-    if (result != nx::update::FindPackageResult::ok)
-        throw std::runtime_error("Failed to deserialize " + toString(category) + " update information");
+    NX_ASSERT(result);
+    if (*result != nx::update::FindPackageResult::ok)
+        throw std::runtime_error("Failed to deserialize \"" + toString(category) + "\" update information");
 
     return information;
 }
@@ -472,7 +473,7 @@ update::Information CommonUpdateManager::updateInformation(
         if (ok)
             *ok = true;
     }
-    catch(const std::exception& e)
+    catch (const std::exception& e)
     {
         NX_DEBUG(this, e.what());
         if (ok)
@@ -501,7 +502,7 @@ void CommonUpdateManager::setUpdateInformation(
     }
 
     if (!globalSettings()->synchronizeNowSync())
-        throw std::runtime_error("Failed to synchronize " + toString(category) + "update information");
+        throw std::runtime_error("Failed to synchronize \"" + toString(category) + "\" update information");
 }
 
 void CommonUpdateManager::setUpdateInformation(

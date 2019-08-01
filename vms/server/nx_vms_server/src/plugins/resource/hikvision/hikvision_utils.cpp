@@ -16,7 +16,7 @@ boost::optional<ChannelStatusResponse> parseChannelElement(const QDomElement& ch
     ChannelStatusResponse response;
     bool status = false;
 
-    if (!channelRoot.isNull() && channelRoot.tagName() == lit("TwoWayAudioChannel"))
+    if (!channelRoot.isNull() && channelRoot.tagName() == "TwoWayAudioChannel")
     {
         auto childParameter = channelRoot.firstChild();
         QDomElement childElement;
@@ -28,23 +28,23 @@ boost::optional<ChannelStatusResponse> parseChannelElement(const QDomElement& ch
 
             auto nodeName = childElement.nodeName();
 
-            if (nodeName == lit("id"))
+            if (nodeName == "id")
                 response.id = childElement.text();
-            else if (nodeName == lit("enabled"))
-                response.enabled = childElement.text() == lit("true");
-            else if (nodeName == lit("audioCompressionType"))
+            else if (nodeName == "enabled")
+                response.enabled = childElement.text() == "true";
+            else if (nodeName == "audioCompressionType")
                 response.audioCompression = childElement.text();
-            else if (nodeName == lit("audioInputType"))
+            else if (nodeName == "audioInputType")
                 response.audioInputType = childElement.text();
-            else if (nodeName == lit("speakerVolume"))
+            else if (nodeName == "speakerVolume")
             {
                 response.speakerVolume = childElement.text().toInt(&status);
                 if (!status)
                     return boost::none;
             }
-            else if (nodeName == lit("noisereduce"))
-                response.noiseReduce = childElement.text() == lit("true");
-            else if (nodeName == lit("audioSamplingRate"))
+            else if (nodeName == "noisereduce")
+                response.noiseReduce = childElement.text() == "true";
+            else if (nodeName == "audioSamplingRate")
             {
                 /* They forgot to add round to std in arm! So we need a hack here.*/
                 using namespace std;
@@ -67,27 +67,27 @@ boost::optional<ChannelStatusResponse> parseChannelElement(const QDomElement& ch
 QnAudioFormat toAudioFormat(const QString& codecName, int sampleRateHz)
 {
     QnAudioFormat result;
-    if (codecName == lit("G.711alaw"))
+    if (codecName == "G.711alaw")
     {
         result.setSampleRate(8000);
         result.setCodec("ALAW");
     }
-    else if (codecName == lit("G.711ulaw"))
+    else if (codecName == "G.711ulaw")
     {
         result.setSampleRate(8000);
         result.setCodec("MULAW");
     }
-    else if (codecName == lit("G.726"))
+    else if (codecName == "G.726")
     {
         result.setSampleRate(8000);
         result.setCodec("G726");
     }
-    else if (codecName == lit("AAC"))
+    else if (codecName == "AAC")
     {
         result.setSampleRate(16000);
         result.setCodec("AAC");
     }
-    else if (codecName == lit("PCM"))
+    else if (codecName == "PCM")
     {
         result.setCodec("AV_CODEC_ID_PCM_U16LE");
     }
@@ -110,7 +110,7 @@ std::vector<ChannelStatusResponse> parseAvailableChannelsResponse(
     while (!node.isNull())
     {
         QDomElement element = node.toElement();
-        if (!element.isNull() && element.tagName() == lit("TwoWayAudioChannel"))
+        if (!element.isNull() && element.tagName() == "TwoWayAudioChannel")
         {
             auto channel = parseChannelElement(element);
             if (channel)
@@ -140,7 +140,7 @@ boost::optional<OpenChannelResponse> parseOpenChannelResponse(nx::network::http:
     doc.setContent(message);
 
     auto element = doc.documentElement();
-    if (!element.isNull() && element.tagName() == lit("TwoWayAudioSession"))
+    if (!element.isNull() && element.tagName() == "TwoWayAudioSession")
     {
         auto sessionIdNode = element.firstChild();
         if (sessionIdNode.isNull() || !sessionIdNode.isElement())
@@ -148,7 +148,7 @@ boost::optional<OpenChannelResponse> parseOpenChannelResponse(nx::network::http:
 
         auto sessionId = sessionIdNode.toElement();
 
-        if (sessionId.tagName() != lit("sessionId"))
+        if (sessionId.tagName() != "sessionId")
             return boost::none;
 
         response.sessionId = sessionId.text();
@@ -168,7 +168,7 @@ boost::optional<CommonResponse> parseCommonResponse(nx::network::http::StringTyp
     doc.setContent(message);
 
     auto element = doc.documentElement();
-    if (!element.isNull() && element.tagName() == lit("ResponseStatus"))
+    if (!element.isNull() && element.tagName() == "ResponseStatus")
     {
         auto params = element.firstChild();
         while (!params.isNull())
@@ -179,11 +179,11 @@ boost::optional<CommonResponse> parseCommonResponse(nx::network::http::StringTyp
 
             auto nodeName = element.nodeName();
 
-            if (nodeName == lit("statusCode"))
+            if (nodeName == "statusCode")
                 response.statusCode = element.text();
-            else if (nodeName == lit("statusString"))
+            else if (nodeName == "statusString")
                 response.statusString = element.text();
-            else if (nodeName == lit("subStatusCode"))
+            else if (nodeName == "subStatusCode")
                 response.subStatusCode = element.text();
 
             params = params.nextSibling();
@@ -243,7 +243,7 @@ bool parseChannelCapabilitiesResponse(
     const nx::Buffer& response,
     ChannelCapabilities* outCapabilities)
 {
-    NX_ASSERT(outCapabilities, lit("Output capabilities should be provided."));
+    NX_ASSERT(outCapabilities, "Output capabilities should be provided.");
     if (!outCapabilities)
         return false;
 
@@ -323,7 +323,7 @@ bool parseVideoElement(const QDomElement& videoElement, ChannelCapabilities* out
 
 bool parseCodecList(const QString& raw, std::set<AVCodecID>* outCodecs)
 {
-    NX_ASSERT(outCodecs, lit("Output codec set should be provided"));
+    NX_ASSERT(outCodecs, "Output codec set should be provided");
     if (!outCodecs)
         return false;
 
@@ -342,7 +342,7 @@ bool parseCodecList(const QString& raw, std::set<AVCodecID>* outCodecs)
 
 bool parseIntegerList(const QString& raw, std::vector<int>* outIntegerList)
 {
-    NX_ASSERT(outIntegerList, lit("Output vector should be provided."));
+    NX_ASSERT(outIntegerList, "Output vector should be provided.");
     if (!outIntegerList)
         return false;
 
@@ -366,7 +366,7 @@ bool makeResolutionList(
     const std::vector<int>& heights,
     std::vector<QSize>* outResolutions)
 {
-    NX_ASSERT(outResolutions, lit("Output vector should be provided."));
+    NX_ASSERT(outResolutions, "Output vector should be provided.");
     if (!outResolutions)
         return false;
 
@@ -395,7 +395,7 @@ bool makeResolutionList(
 
 bool parseChannelPropertiesResponse(nx::Buffer& response, ChannelProperties* outChannelProperties)
 {
-    NX_ASSERT(outChannelProperties, lit("Output channel properties should be provided."));
+    NX_ASSERT(outChannelProperties, "Output channel properties should be provided.");
     if (!outChannelProperties)
         return false;
 
@@ -436,7 +436,7 @@ bool doGetRequest(
     nx::Buffer* outBuffer,
     nx::network::http::StatusCode::Value* outStatusCode)
 {
-    NX_ASSERT(outBuffer, lit("Output buffer should be set."));
+    NX_ASSERT(outBuffer, "Output buffer should be set.");
     if (!outBuffer)
         return false;
 
@@ -510,7 +510,7 @@ bool doRequest(
 
 bool tuneHttpClient(nx::network::http::HttpClient* outHttpClient, const QAuthenticator& auth)
 {
-    NX_ASSERT(outHttpClient, lit("Output http client should be provided."));
+    NX_ASSERT(outHttpClient, "Output http client should be provided.");
     if (!outHttpClient)
         return false;
 
