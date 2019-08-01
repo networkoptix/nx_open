@@ -26,30 +26,25 @@ public:
             "Ptr layout should be the same as of a raw pointer.");
     }
 
-    /** Sfinae: Compiles if OtherRefCountable* is convertible to RefCountable*. */
     template<class OtherRefCountable>
-    using IsConvertibleFrom =
-        std::enable_if_t<std::is_base_of<RefCountable, OtherRefCountable>::value, int /*dummy*/>;
-
-    template<class OtherRefCountable, IsConvertibleFrom<OtherRefCountable> = 0>
     Ptr(const Ptr<OtherRefCountable>& other): m_ptr(other.get()) { addRef(); }
 
     /** Defined because the template above does not suppress generation of such member. */
     Ptr(const Ptr& other): m_ptr(other.get()) { addRef(); }
 
-    template<class OtherRefCountable, IsConvertibleFrom<OtherRefCountable> = 0>
+    template<class OtherRefCountable>
     Ptr(Ptr<OtherRefCountable>&& other): m_ptr(other.releasePtr()) {}
 
     /** Defined because the template above does not suppress generation of such member. */
     Ptr(Ptr&& other): m_ptr(other.releasePtr()) {}
 
-    template<class OtherRefCountable, IsConvertibleFrom<OtherRefCountable> = 0>
+    template<class OtherRefCountable>
     Ptr& operator=(const Ptr<OtherRefCountable>& other) { return assignConst(other); }
 
     /** Defined because the template above does not work for same-type assignment. */
     Ptr& operator=(const Ptr& other) { return assignConst(other); }
 
-    template<class OtherRefCountable, IsConvertibleFrom<OtherRefCountable> = 0>
+    template<class OtherRefCountable>
     Ptr& operator=(Ptr<OtherRefCountable>&& other) { return assignRvalue(std::move(other)); }
 
     /** Defined because the template above does not work for same-type assignment. */
@@ -57,10 +52,10 @@ public:
 
     ~Ptr() { releaseRef(); }
 
-    template<class OtherRefCountable, IsConvertibleFrom<OtherRefCountable> = 0>
+    template<class OtherRefCountable>
     bool operator==(const Ptr<OtherRefCountable>& other) const { return m_ptr == other.get(); }
 
-    template<class OtherRefCountable, IsConvertibleFrom<OtherRefCountable> = 0>
+    template<class OtherRefCountable>
     bool operator!=(const Ptr<OtherRefCountable>& other) const { return !operator==(other); }
 
     /**
@@ -77,7 +72,7 @@ public:
      * Decrements the reference counter of the owned object (will be deleted if reaches 0), and
      * starts owning the specified object, leaving its reference counter intact.
      */
-    template<class OtherRefCountable, IsConvertibleFrom<OtherRefCountable> = 0>
+    template<class OtherRefCountable>
     void reset(OtherRefCountable* ptr)
     {
         releaseRef();
@@ -108,7 +103,7 @@ private:
 
     explicit Ptr(RefCountable* ptr): m_ptr(ptr) {}
 
-    template<class OtherRefCountable, IsConvertibleFrom<OtherRefCountable> = 0>
+    template<class OtherRefCountable>
     explicit Ptr(OtherRefCountable* ptr): m_ptr(ptr) {}
 
     void addRef()
@@ -238,41 +233,37 @@ public:
 
     RawPtr(RefCountable* refCountable): m_ptr(refCountable) {}
 
-    RawPtr(const Ptr<RefCountable>& ptr): m_ptr(ptr.get()) {}
-
-    /** Sfinae: Compiles if OtherRefCountable* is convertible to RefCountable*. */
     template<class OtherRefCountable>
-    using IsConvertibleFrom =
-        std::enable_if_t<std::is_base_of<RefCountable, OtherRefCountable>::value, int /*dummy*/>;
+    RawPtr(const Ptr<OtherRefCountable>& ptr): m_ptr(ptr.get()) {}
 
-    template<class OtherRefCountable, IsConvertibleFrom<OtherRefCountable> = 0>
+    template<class OtherRefCountable>
     RawPtr(const RawPtr<OtherRefCountable>& other): m_ptr(other.get()) {}
 
     /** Defined because the template above does not suppress generation of such member. */
     RawPtr(const RawPtr& other): m_ptr(other.get()) {}
 
-    template<class OtherRefCountable, IsConvertibleFrom<OtherRefCountable> = 0>
+    template<class OtherRefCountable>
     RawPtr(RawPtr<OtherRefCountable>&& other): m_ptr(other.get()) {}
 
     /** Defined because the template above does not suppress generation of such member. */
     RawPtr(RawPtr&& other): m_ptr(other.get()) {}
 
-    template<class OtherRefCountable, IsConvertibleFrom<OtherRefCountable> = 0>
+    template<class OtherRefCountable>
     RawPtr& operator=(const RawPtr<OtherRefCountable>& other) { m_ptr = other.get(); return *this; }
 
     /** Defined because the template above does not work for same-type assignment. */
     RawPtr& operator=(const RawPtr& other) { m_ptr = other.get(); return *this; }
 
-    template<class OtherRefCountable, IsConvertibleFrom<OtherRefCountable> = 0>
+    template<class OtherRefCountable>
     RawPtr& operator=(RawPtr<OtherRefCountable>&& other) { m_ptr = other.get(); return *this; }
 
     /** Defined because the template above does not work for same-type assignment. */
     RawPtr& operator=(RawPtr&& other) { m_ptr = other.get(); return *this; }
 
-    template<class OtherRefCountable, IsConvertibleFrom<OtherRefCountable> = 0>
+    template<class OtherRefCountable>
     bool operator==(const RawPtr<OtherRefCountable>& other) const { return m_ptr == other.get(); }
 
-    template<class OtherRefCountable, IsConvertibleFrom<OtherRefCountable> = 0>
+    template<class OtherRefCountable>
     bool operator!=(const RawPtr<OtherRefCountable>& other) const { return !operator==(other); }
 
     RefCountable* operator->() const { return m_ptr; }
