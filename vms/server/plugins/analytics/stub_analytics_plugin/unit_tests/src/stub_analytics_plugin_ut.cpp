@@ -356,8 +356,7 @@ TEST(stub_analytics_plugin, test)
     const auto plugin = pluginObject->queryInterface<nx::sdk::analytics::IPlugin>();
     ASSERT_TRUE(plugin);
 
-    const auto utilityProvider = makePtr<UtilityProvider>();
-    plugin->setUtilityProvider(utilityProvider.get());
+    plugin->setUtilityProvider(makePtr<UtilityProvider>().get());
 
     const ResultHolder<IEngine*> result = plugin->createEngine();
     ASSERT_TRUE(result.isOk());
