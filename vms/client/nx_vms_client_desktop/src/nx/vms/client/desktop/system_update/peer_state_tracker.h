@@ -89,7 +89,7 @@ using UpdateItemPtr = std::shared_ptr<UpdateItem>;
  * ServerUpdatesModel uses it as a data source, by subscribing to itemChanged/itemAdded/... events.
  * ServerUpdateTool passes mediaserver responses here.
  */
-class PeerStateTracker:
+class NX_VMS_CLIENT_DESKTOP_API PeerStateTracker:
     public Connective<QObject>
 {
     Q_OBJECT
