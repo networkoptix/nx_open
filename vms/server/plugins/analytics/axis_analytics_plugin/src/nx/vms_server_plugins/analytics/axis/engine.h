@@ -24,8 +24,6 @@ class Engine: public nx::sdk::RefCountable<nx::sdk::analytics::IEngine>
 public:
     Engine(nx::sdk::analytics::Plugin* plugin);
 
-    virtual nx::sdk::analytics::Plugin* plugin() const override { return m_plugin; }
-
     virtual void setEngineInfo(const nx::sdk::analytics::IEngineInfo* engineInfo) override;
 
     virtual nx::sdk::StringMapResult setSettings(const nx::sdk::IStringMap* settings) override;

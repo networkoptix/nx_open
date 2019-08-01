@@ -23,9 +23,9 @@ class Engine: public nx::sdk::analytics::Engine
 {
 public:
     using PixelFormat = nx::sdk::analytics::IUncompressedVideoFrame::PixelFormat;
-    using Plugin = nx::sdk::analytics::Plugin;
 
-    Engine(Plugin* plugin);
+    Engine(nx::sdk::analytics::Plugin* plugin);
+
     virtual ~Engine() override;
 
     virtual nx::sdk::analytics::MutableDeviceAgentResult obtainDeviceAgent(
@@ -34,8 +34,6 @@ public:
     // Capabilities.
     bool needUncompressedVideoFrames() const { return m_needUncompressedVideoFrames; }
     PixelFormat pixelFormat() const { return m_pixelFormat; }
-
-    virtual Plugin* plugin() const override { return pluginCasted<Plugin>(); }
 
 protected:
     virtual std::string manifestString() const override;
@@ -58,6 +56,8 @@ private:
     void generatePluginDiagnosticEvents();
 
 private:
+    nx::sdk::analytics::Plugin* const m_plugin;
+
     mutable std::mutex m_pluginDiagnosticEventGenerationLoopMutex;
     mutable std::condition_variable m_pluginDiagnosticEventGenerationLoopCondition;
     std::unique_ptr<std::thread> m_pluginDiagnosticEventThread;

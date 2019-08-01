@@ -47,7 +47,6 @@ protected:
      *     libName().
      */
     VideoFrameProcessingDeviceAgent(
-        IEngine* engine,
         const IDeviceInfo* deviceInfo,
         bool enableOutput,
         const std::string& printPrefix = "");
@@ -121,32 +120,17 @@ protected:
 public:
     virtual ~VideoFrameProcessingDeviceAgent() override;
 
-    /**
-     * Intended to be called from a method of a derived class overriding engine().
-     * @return Parent Engine, casted to the specified type.
-     */
-    template<typename DerivedEngine>
-    DerivedEngine* engineCasted() const
-    {
-        const auto engine = dynamic_cast<DerivedEngine*>(m_engine);
-        assertEngineCasted(engine);
-        return engine;
-    }
-
-    virtual IEngine* engine() const override { return m_engine; }
-
 //-------------------------------------------------------------------------------------------------
 // Not intended to be used by the descendant.
 
 public:
-    virtual void setHandler(IDeviceAgent::IHandler* handler) override;
+    virtual void setHandler(IHandler* handler) override;
     virtual Result<void> pushDataPacket(IDataPacket* dataPacket) override;
     virtual StringResult manifest() const override;
     virtual StringMapResult setSettings(const IStringMap* settings) override;
     virtual SettingsResponseResult pluginSideSettings() const override;
 
 private:
-    void assertEngineCasted(void* engine) const;
     void logMetadataPacketIfNeeded(
         const IMetadataPacket* metadataPacket,
         const std::string& packetIndexName) const;
@@ -155,7 +139,6 @@ private:
 
 private:
     mutable std::mutex m_mutex;
-    IEngine* const m_engine;
     Ptr<IDeviceAgent::IHandler> m_handler;
     std::map<std::string, std::string> m_settings;
 };

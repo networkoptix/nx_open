@@ -47,8 +47,6 @@ protected:
         std::vector<nx::sdk::analytics::IMetadataPacket*>* metadataPackets) override;
 
 private:
-    virtual Engine* engine() const override { return engineCasted<Engine>(); }
-
     nx::sdk::analytics::IMetadataPacket* cookSomeEvents();
     std::vector<nx::sdk::analytics::IMetadataPacket*> cookSomeObjects();
 
@@ -98,6 +96,8 @@ private:
     void updateEventGenerationParameters();
 
 private:
+    Engine* const m_engine;
+
     std::atomic<bool> m_terminated{false};
 
     std::unique_ptr<std::thread> m_pluginDiagnosticEventThread;

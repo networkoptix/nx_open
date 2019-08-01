@@ -25,8 +25,6 @@ public:
 
     virtual ~DeviceAgent() override;
 
-    virtual Engine* engine() const override { return m_engine; }
-
     virtual nx::sdk::StringMapResult setSettings(const nx::sdk::IStringMap* settings) override;
 
     virtual nx::sdk::SettingsResponseResult pluginSideSettings() const override;

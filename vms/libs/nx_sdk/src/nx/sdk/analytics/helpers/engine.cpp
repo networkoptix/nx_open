@@ -23,39 +23,26 @@ namespace nx {
 namespace sdk {
 namespace analytics {
 
-class PrintPrefixMaker
+static std::string makePrintPrefix(
+    const std::string& overridingPrintPrefix,
+    const IEngineInfo* engineInfo = nullptr)
 {
-public:
-    std::string makePrintPrefix(
-        const std::string& overridingPrintPrefix,
-        const IEngineInfo* engineInfo = nullptr)
-    {
-        if (!overridingPrintPrefix.empty())
-            return overridingPrintPrefix;
+    if (!overridingPrintPrefix.empty())
+        return overridingPrintPrefix;
 
-        std::string printPrefix = std::string("[") + libContext().name() + "_engine";
-        if (engineInfo)
-            printPrefix += std::string("_") + engineInfo->id();
+    std::string printPrefix = std::string("[") + libContext().name() + "_engine";
+    if (engineInfo)
+        printPrefix += std::string("_") + engineInfo->id();
 
-        printPrefix += "] ";
-        return printPrefix;
-    }
-
-private:
-    /** Used by the above NX_KIT_ASSERT (via NX_PRINT). */
-    struct
-    {
-        const std::string printPrefix = "nx::sdk::analytics::Engine(): ";
-    } logUtils;
-};
+    printPrefix += "] ";
+    return printPrefix;
+}
 
 Engine::Engine(
-    IPlugin* plugin,
     bool enableOutput,
     const std::string& printPrefix)
     :
-    logUtils(enableOutput, PrintPrefixMaker().makePrintPrefix(printPrefix)),
-    m_plugin(plugin),
+    logUtils(enableOutput, makePrintPrefix(printPrefix)),
     m_overridingPrintPrefix(printPrefix)
 {
     NX_PRINT << "Created " << this << ": \"" << libContext().name() << "\"";
@@ -91,8 +78,7 @@ Engine::~Engine()
 
 void Engine::setEngineInfo(const IEngineInfo* engineInfo)
 {
-    logUtils.setPrintPrefix(
-        PrintPrefixMaker().makePrintPrefix(m_overridingPrintPrefix, engineInfo));
+    logUtils.setPrintPrefix(makePrintPrefix(m_overridingPrintPrefix, engineInfo));
 }
 
 StringMapResult Engine::setSettings(const IStringMap* settings)
@@ -171,14 +157,6 @@ void Engine::setHandler(IEngine::IHandler* handler)
 bool Engine::isCompatible(const IDeviceInfo* /*deviceInfo*/) const
 {
     return true;
-}
-
-void Engine::assertPluginCasted(void* plugin) const
-{
-    // This method is placed in .cpp to allow NX_KIT_ASSERT() use the correct NX_PRINT() prefix.
-    NX_KIT_ASSERT(plugin,
-        "nx::sdk::analytics::Engine " + nx::kit::utils::toString(this)
-        + " has m_plugin of incorrect runtime type " + typeid(*m_plugin).name());
 }
 
 } // namespace analytics

@@ -368,8 +368,6 @@ TEST(stub_analytics_plugin, test)
     ASSERT_TRUE(engine);
     ASSERT_TRUE(engine->queryInterface<IEngine>());
 
-    ASSERT_EQ(plugin.get(), engine->plugin());
-
     testEngineManifest(engine);
     testEngineSettings(engine);
 

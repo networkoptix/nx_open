@@ -31,8 +31,6 @@ public:
 
     virtual ~DeviceAgent();
 
-    virtual Engine* engine() const override { return m_engine; }
-
     virtual void setHandler(nx::sdk::analytics::IDeviceAgent::IHandler* handler) override;
 
     virtual nx::sdk::Result<void> setNeededMetadataTypes(

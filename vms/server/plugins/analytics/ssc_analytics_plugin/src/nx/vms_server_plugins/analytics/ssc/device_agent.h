@@ -28,8 +28,6 @@ public:
 
     virtual ~DeviceAgent();
 
-    virtual Engine* engine() const override { return m_engine; }
-
     void sendEventPacket(const EventType& event) const;
 
     virtual nx::sdk::StringResult manifest() const override;

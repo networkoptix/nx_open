@@ -27,7 +27,8 @@ using namespace std::chrono;
 using namespace std::literals::chrono_literals;
 
 Engine::Engine(nx::sdk::analytics::Plugin* plugin):
-    nx::sdk::analytics::Engine(plugin, NX_DEBUG_ENABLE_OUTPUT)
+    nx::sdk::analytics::Engine(NX_DEBUG_ENABLE_OUTPUT),
+    m_plugin(plugin)
 {
     obtainPluginHomeDir();
     initCapabilities();
@@ -89,7 +90,7 @@ MutableDeviceAgentResult Engine::obtainDeviceAgent(const IDeviceInfo* deviceInfo
 
 void Engine::obtainPluginHomeDir()
 {
-    const auto utilityProvider = plugin()->utilityProvider();
+    const auto utilityProvider = m_plugin->utilityProvider();
     NX_KIT_ASSERT(utilityProvider);
 
     m_pluginHomeDir = utilityProvider->homeDir();

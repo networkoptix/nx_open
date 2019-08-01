@@ -47,13 +47,11 @@ private:
 };
 
 VideoFrameProcessingDeviceAgent::VideoFrameProcessingDeviceAgent(
-    IEngine* engine,
     const IDeviceInfo* deviceInfo,
     bool enableOutput,
     const std::string& printPrefix)
     :
-    logUtils(enableOutput, PrintPrefixMaker().makePrintPrefix(printPrefix, deviceInfo)),
-    m_engine(engine)
+    logUtils(enableOutput, PrintPrefixMaker().makePrintPrefix(printPrefix, deviceInfo))
 {
     NX_PRINT << "Created " << this;
 }
@@ -213,15 +211,6 @@ void VideoFrameProcessingDeviceAgent::pushPluginDiagnosticEvent(
 std::string VideoFrameProcessingDeviceAgent::settingValue(const std::string& paramName)
 {
     return m_settings[paramName];
-}
-
-void VideoFrameProcessingDeviceAgent::assertEngineCasted(void* engine) const
-{
-    // This method is placed in .cpp to allow NX_KIT_ASSERT() use the correct NX_PRINT() prefix.
-    NX_KIT_ASSERT(engine,
-        "nx::sdk::analytics::VideoFrameProcessingDeviceAgent "
-        + nx::kit::utils::toString(this)
-        + " has m_engine of incorrect runtime type " + typeid(*m_engine).name());
 }
 
 void VideoFrameProcessingDeviceAgent::logMetadataPacketIfNeeded(

@@ -52,8 +52,6 @@ public:
 
     virtual ~DeviceAgent();
 
-    virtual Engine* engine() const override { return m_engine; }
-
     void treatAlarmPairs(const QList<AlarmPair>& alarmPairs);
 
     void sendEventStartedPacket(const EventType& event) const;

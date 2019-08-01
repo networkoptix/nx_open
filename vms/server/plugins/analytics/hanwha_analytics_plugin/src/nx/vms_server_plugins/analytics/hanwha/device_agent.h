@@ -26,8 +26,6 @@ public:
     DeviceAgent(Engine* engine);
     virtual ~DeviceAgent();
 
-    virtual Engine* engine() const override { return m_engine; }
-
     virtual void setHandler(
         nx::sdk::analytics::IDeviceAgent::IHandler* IHandler) override;
 

@@ -44,9 +44,6 @@ public:
         virtual void handlePluginDiagnosticEvent(IPluginDiagnosticEvent* event) = 0;
     };
 
-    /** @return Parent Engine. */
-    virtual IEngine* engine() const = 0;
-
     /**
      * Called before other methods. Server provides the set of settings stored in its database,
      * combined with the values received from the plugin via pluginSideSettings() (if any), for

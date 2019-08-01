@@ -28,7 +28,6 @@ public:
     using CreateEngine = std::function<IEngine*(Plugin* plugin)>;
 
     /**
-     * @param libName Name of the plugin library. It's needed for the logging.
      * @param pluginManifest Plugin manifest to be returned from the manifest method.
      * @param createEngine Functor for engine creation.
      */

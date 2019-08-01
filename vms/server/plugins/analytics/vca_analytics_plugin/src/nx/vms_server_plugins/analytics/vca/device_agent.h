@@ -53,8 +53,6 @@ public:
 
     virtual ~DeviceAgent();
 
-    virtual Engine* engine() const override { return m_engine; }
-
     void treatMessage(int size);
 
     void onReceive(SystemError::ErrorCode, size_t);

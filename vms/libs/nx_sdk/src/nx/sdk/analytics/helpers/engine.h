@@ -43,7 +43,6 @@ protected:
      * @param printPrefix Prefix for NX_PRINT and NX_OUTPUT. If empty, will be made from libName.
      */
     Engine(
-        IPlugin* plugin,
         bool enableOutput,
         const std::string& printPrefix = "");
 
@@ -100,24 +99,10 @@ protected:
         std::string caption,
         std::string description);
 
-    /**
-     * Intended to be called from a method of a derived class overriding plugin().
-     * @return Parent Plugin, casted to the specified type.
-     */
-    template<typename DerivedPlugin>
-    DerivedPlugin* pluginCasted() const
-    {
-        const auto plugin = dynamic_cast<DerivedPlugin*>(m_plugin);
-        assertPluginCasted(plugin);
-        return plugin;
-    }
-
     IHandler* handler() const { return m_handler.get(); }
 
 public:
     virtual ~Engine() override;
-
-    virtual IPlugin* plugin() const override { return m_plugin; }
 
 //-------------------------------------------------------------------------------------------------
 // Not intended to be used by a descendant.
@@ -132,11 +117,7 @@ public:
     virtual bool isCompatible(const IDeviceInfo* deviceInfo) const override;
 
 private:
-    void assertPluginCasted(void* plugin) const;
-
-private:
     mutable std::mutex m_mutex;
-    IPlugin* const m_plugin;
     const std::string m_overridingPrintPrefix;
     std::map<std::string, std::string> m_settings;
     Ptr<IEngine::IHandler> m_handler;

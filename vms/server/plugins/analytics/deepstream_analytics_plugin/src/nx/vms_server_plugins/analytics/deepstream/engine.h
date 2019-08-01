@@ -27,8 +27,6 @@ public:
     Engine(nx::sdk::analytics::Plugin* plugin);
     virtual ~Engine() override;
 
-    virtual nx::sdk::analytics::Plugin* plugin() const override { return m_plugin; }
-    
     virtual void setEngineInfo(const nx::sdk::analytics::IEngineInfo* engineInfo) override;
 
     virtual nx::sdk::StringMapResult setSettings(const nx::sdk::IStringMap* settings) override;
@@ -59,6 +57,7 @@ private:
 
 private:
     nx::sdk::analytics::Plugin* const m_plugin;
+    
     mutable std::vector<ObjectClassDescription> m_objectClassDescritions;
     mutable std::string m_manifest;
     nx::sdk::analytics::IDeviceAgent* m_deviceAgent = nullptr;

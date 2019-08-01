@@ -48,9 +48,6 @@ public:
         virtual void handlePluginDiagnosticEvent(IPluginDiagnosticEvent* event) = 0;
     };
 
-    /** @return Parent Plugin. */
-    virtual IPlugin* plugin() const = 0;
-
     /**
      * Called right after the Engine creation (before all other methods) or when some
      * Engine-related change occurs on the Server side (e.g. Engine name is changed).

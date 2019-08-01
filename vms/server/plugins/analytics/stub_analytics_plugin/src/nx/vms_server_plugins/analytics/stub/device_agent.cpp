@@ -97,7 +97,8 @@ static const std::vector<EventDescriptor> kEventsToFire = {
 } // namespace
 
 DeviceAgent::DeviceAgent(Engine* engine, const nx::sdk::IDeviceInfo* deviceInfo):
-    VideoFrameProcessingDeviceAgent(engine, deviceInfo, NX_DEBUG_ENABLE_OUTPUT)
+    VideoFrameProcessingDeviceAgent(deviceInfo, NX_DEBUG_ENABLE_OUTPUT),
+    m_engine(engine)
 {
     m_pluginDiagnosticEventThread =
         std::make_unique<std::thread>([this]() { processPluginDiagnosticEvents(); });
@@ -210,7 +211,7 @@ void DeviceAgent::processVideoFrame(const IDataPacket* videoFrame, const char* f
 
 bool DeviceAgent::pushCompressedVideoFrame(const ICompressedVideoPacket* videoFrame)
 {
-    if (engine()->needUncompressedVideoFrames())
+    if (m_engine->needUncompressedVideoFrames())
     {
         NX_PRINT << "ERROR: Received compressed video frame, contrary to manifest.";
         return false;
@@ -222,7 +223,7 @@ bool DeviceAgent::pushCompressedVideoFrame(const ICompressedVideoPacket* videoFr
 
 bool DeviceAgent::pushUncompressedVideoFrame(const IUncompressedVideoFrame* videoFrame)
 {
-    if (!engine()->needUncompressedVideoFrames())
+    if (!m_engine->needUncompressedVideoFrames())
     {
         NX_PRINT << "ERROR: Received uncompressed video frame, contrary to manifest.";
         return false;
@@ -510,12 +511,12 @@ int64_t DeviceAgent::usSinceEpoch() const
 
 bool DeviceAgent::checkVideoFrame(const IUncompressedVideoFrame* frame) const
 {
-    if (frame->pixelFormat() != engine()->pixelFormat())
+    if (frame->pixelFormat() != m_engine->pixelFormat())
     {
         NX_PRINT << __func__ << "() ERROR: Video frame has pixel format "
             << pixelFormatToStdString(frame->pixelFormat())
             << " instead of "
-            << pixelFormatToStdString(engine()->pixelFormat());
+            << pixelFormatToStdString(m_engine->pixelFormat());
         return false;
     }
 

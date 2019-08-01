@@ -24,6 +24,7 @@ class DeviceAgent: public nx::sdk::analytics::VideoFrameProcessingDeviceAgent
 {
 public:
     DeviceAgent(Engine* engine, const nx::sdk::IDeviceInfo* deviceInfo);
+
     virtual ~DeviceAgent() override;
 
     virtual nx::sdk::Result<void> setNeededMetadataTypes(
@@ -70,6 +71,8 @@ private:
         const std::map<std::string, std::vector<std::string>>& options);
 
 private:
+    nx::sdk::analytics::Engine* const m_engine;
+
     int m_counter = 0;
     int m_counterObjects = 0;
     std::string m_eventTypeId;
