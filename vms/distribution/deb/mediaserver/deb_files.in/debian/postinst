@@ -179,14 +179,11 @@ installModificationSpecificConfig()
 # This is necessary because changed configuration options should take effect
 # immediately.
 
-if [[ $RUNTIME != "docker" ]]
-then
-    systemctl stop $COMPANY_NAME-mediaserver || true
+systemctl stop $COMPANY_NAME-mediaserver || true
 
-    if [[ $WITH_ROOT_TOOL == 'true' ]]
-    then
-        systemctl stop $COMPANY_NAME-root-tool || true
-    fi
+if [[ $WITH_ROOT_TOOL == 'true' ]]
+then
+    systemctl stop $COMPANY_NAME-root-tool || true
 fi
 
 case "$1" in
@@ -271,10 +268,7 @@ esac
 # Dirty hack to prevent apport from catching our crash dumps.
 systemctl disable apport &>/dev/null || true
 
-if [[ $RUNTIME != "docker" ]]
-then
-    systemctl stop apport &>/dev/null || true
-fi
+systemctl stop apport &>/dev/null || true
 
 [[ -L "${BASE_DIR}/lib/ffmpeg" ]] && unlink "${BASE_DIR}/lib/ffmpeg"
 
