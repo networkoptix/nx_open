@@ -160,7 +160,7 @@ bool businessRuleObjectUpdater(EventRuleData& data)
 
 bool QnDbManager::QnDbTransactionExt::beginLazyTran()
 {
-    m_mutex.lockForWrite();
+    m_mutex.lockForWrite(__FILE__, __LINE__);
 
     if (!m_lazyTranInProgress)
         m_database.transaction();
@@ -179,7 +179,7 @@ bool QnDbManager::QnDbTransactionExt::commitLazyTran()
 
 bool QnDbManager::QnDbTransactionExt::beginTran()
 {
-    m_mutex.lockForWrite();
+    m_mutex.lockForWrite(__FILE__, __LINE__);
 
     if (m_lazyTranInProgress)
         dbCommit(lit("lazy before new"));
