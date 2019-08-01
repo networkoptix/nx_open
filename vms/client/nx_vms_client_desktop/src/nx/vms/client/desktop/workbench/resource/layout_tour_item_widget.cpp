@@ -81,9 +81,6 @@ static const int kSpacing = 8; //< Pixels.
 
 static constexpr int kMaxTitleLength = 30; //< symbols
 
-// Save showreel once per second if delay is changed.
-static constexpr auto kSaveInteval = std::chrono::seconds(1);
-
 } // namespace
 
 LayoutTourItemWidget::LayoutTourItemWidget(
