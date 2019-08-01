@@ -31,7 +31,8 @@ QJsonObject::const_iterator findField(
     const QJsonObject& jsonObject,
     const QString& fieldName,
     DeprecatedFieldNames* deprecatedFieldNames,
-    const std::type_info& structTypeInfo);
+    const std::type_info& structTypeInfo,
+    bool optional);
 
 } // namespace QJsonDetail
 
@@ -203,7 +204,7 @@ bool deserialize(
     const std::type_info& structTypeInfo = typeid(std::nullptr_t))
 {
     QJsonObject::const_iterator pos = QJsonDetail::findField(
-        value, key, deprecatedFieldNames, structTypeInfo);
+        value, key, deprecatedFieldNames, structTypeInfo, optional);
     if (pos == value.end())
     {
         if (outFound != nullptr)

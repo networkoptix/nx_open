@@ -327,8 +327,7 @@ void UploadWorker::handleWaitForFileOnServer(
                 }
                 else
                 {
-                    handleError(tr("Remote file \"%1\" is corrupted and I am not told "
-                        " to recreate it").arg(d->file->fileName()));
+                    handleError(tr("Remote file \"%1\" is corrupted").arg(d->file->fileName()));
                 }
                 break;
             case FileInformation::Status::downloaded:
@@ -361,17 +360,14 @@ void UploadWorker::handleWaitForFileOnServer(
                 }
                 else
                 {
-                    handleError(tr("Server already has this file failed for file \"%1\". "
-                        "I will stop trying to upload it.").arg(d->file->fileName()));
+                    handleError(tr("Server already has this file \"%1\"").arg(
+                        d->file->fileName()));
                 }
                 break;
         }
     }
     else
     {
-        //handleError(tr("fileDownloadStatus failed for file \"%1\". "
-        //    "I will stop trying to upload it.").arg(d->file->fileName()));
-
         // Try again later.
         executeDelayed([this]()
         {

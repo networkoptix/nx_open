@@ -921,35 +921,35 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Switch to Notifications tab</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Switch to Motion tab</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Switch to Bookmarks tab</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Switch to Events tab</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Switch to Objects tab</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Objects Frames and Info...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Pin Calendar</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Unpin Calendar</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -1330,7 +1330,7 @@ to view more bookmarks</source>
     <name>PtzInstrument</name>
     <message>
         <source>Layout is locked</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -2301,12 +2301,12 @@ to view more bookmarks</source>
     <message>
         <source>Devices List for %1</source>
         <comment>%1 will be substituted with a server name</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Cameras List for %1</source>
         <comment>%1 will be substituted with a server name</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -2349,7 +2349,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Logical ID</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -2584,7 +2584,7 @@ to %1</source>
     </message>
     <message>
         <source>Internal server error. Please try again later.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -2784,11 +2784,11 @@ to %1</source>
     </message>
     <message>
         <source>Server API</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>To generate Generic Event, please refer to %1.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -3199,11 +3199,11 @@ to %1</source>
     <name>QnGLCheckerInstrument</name>
     <message>
         <source>Video card drivers are outdated or not installed</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>%1 may not work properly.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -3218,11 +3218,11 @@ to %1</source>
     </message>
     <message>
         <source>None</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Auto (%1)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -3587,7 +3587,7 @@ to %1</source>
     </message>
     <message>
         <source>Channels</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -4250,7 +4250,7 @@ to %1</source>
     </message>
     <message>
         <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -5114,7 +5114,7 @@ to %1</source>
     </message>
     <message>
         <source>Plugins</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -5475,7 +5475,7 @@ to %1</source>
     </message>
     <message>
         <source>Forecast available only for cameras with enabled recording.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -5590,24 +5590,24 @@ to %1</source>
     </message>
     <message>
         <source>What to do with current analytics data?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Current analytics data will not be automatically moved to another location and will become unaccessible. You can keep it and manually move later, or delete permanently.
-If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Keep</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
+If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -5658,11 +5658,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>Use to store analytics data</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Stores analytics data</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -5751,7 +5751,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>Plugins</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -5908,7 +5908,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>Error occurred during remote archive synchronization</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -5931,19 +5931,19 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>Failover server measures may still request camera status updates regardless of this setting.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Enable devices and servers autodiscovery and automated device status check</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Enable cameras and servers autodiscovery and automated camera status check</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -6014,19 +6014,19 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnTwoWayAudioWidget::Private</name>
     <message>
         <source>Input device is not selected</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Streaming is not ready yet</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Network error</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Hold to Speak</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -6520,15 +6520,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>%1 has been successfully configured.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>To complete the process, please connect to it with Client and update to version %1.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Failed to merge %1 to our system.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -6888,7 +6888,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
         <source>You can upload these files to a different instance of a Virtual Camera.</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>You can upload this file to a different instance of a Virtual Camera.</numerusform>
             <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
         </translation>
@@ -7127,11 +7127,11 @@ If you intended to move analytics data to another storage location, please conta
     <name>SessionExpiredDialog</name>
     <message>
         <source>Your session has expired</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Session duration limit can be changed by the system administrators</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -7321,30 +7321,30 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>Selected device</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Selected camera</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::AnalyticsMenuActionFactory</name>
     <message>
         <source>Show Always</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Show Only with &quot;Objects&quot; Tab</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Show</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Do Not Show</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -7355,7 +7355,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>Unknown track</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -7393,19 +7393,19 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>unnamed analytics engine</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Failed to execute plugin action</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Enter parameters</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Action requires some parameters to be filled.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -7522,11 +7522,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>Server will not change any cameras settings, it will receive and use camera stream as-is.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Multicast</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -7590,7 +7590,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>Motion detection stream is disabled</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -7727,15 +7727,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>Plugins</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Motion detection is disabled, all schedule records &quot;Motion&quot; and &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Dual streaming is disabled, all schedule records &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -7811,11 +7811,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>Not enough space on disk to install the client update.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Installation package has been lost.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -7853,11 +7853,11 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::ConnectToCurrentSystemTool</name>
     <message>
         <source>Configuring Server</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Updating Server</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -7979,11 +7979,11 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::EulaDialog</name>
     <message>
         <source>Please review and agree to the %1 in order to proceed</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>To use the software you must agree with the end user license agreement</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -8064,12 +8064,8 @@ If you intended to move analytics data to another storage location, please conta
         </translation>
     </message>
     <message>
-        <source>unnamed analytics engine</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>No events occurred</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -8235,7 +8231,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>You are about to export a long video. It may require a lot of storage space and take significant time.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -8357,11 +8353,11 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::LabelSelectionManager</name>
     <message>
         <source>Copy</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Copy Link Location</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -8456,7 +8452,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>Can not start the search process</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -8569,6 +8565,58 @@ If you intended to move analytics data to another storage location, please conta
         <source>Some servers are offline and will not be updated. Skip them?</source>
         <translation></translation>
     </message>
+    <message numerus="yes">
+        <source>Missing update package for the client and %n servers</source>
+        <translation>
+            <numerusform>Missing update package for the client and %n server</numerusform>
+            <numerusform>Missing update package for the client and %n servers</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Missing update package for the client</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>There are no online servers to update.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Cancel update and delete all downloaded data?</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Failed to start update</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Failed to cancel update</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Failed to start installation</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Some servers have not completed the update process. Finish it anyway?</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>%1 will be restarted to the updated version.</source>
+        <comment>Application name will be substituted</comment>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Failed to download update packages to some components</source>
+        <translation></translation>
+    </message>
     <message>
         <source>If the problem persists, please contact Customer Support.</source>
         <translation></translation>
@@ -8586,7 +8634,15 @@ If you intended to move analytics data to another storage location, please conta
         <translation></translation>
     </message>
     <message>
-        <source>Nx Witness Client will be restarted to the updated version.</source>
+        <source>Update completed, but some components have failed an update</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Please update %1 manually using an installation package.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>%1 will be restarted to the updated version.</source>
         <translation></translation>
     </message>
     <message>
@@ -8594,7 +8650,31 @@ If you intended to move analytics data to another storage location, please conta
         <translation></translation>
     </message>
     <message>
+        <source>There was an error while installing updates:</source>
+        <translation></translation>
+    </message>
+    <message>
         <source>Downloading updates...</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Finish Update</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>The latest version is already installed</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>This version is already installed</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Install update</source>
         <translation></translation>
     </message>
     <message>
@@ -8614,11 +8694,11 @@ If you intended to move analytics data to another storage location, please conta
         <translation></translation>
     </message>
     <message>
-        <source>Select Another Build</source>
+        <source>Browse for Another File...</source>
         <translation></translation>
     </message>
     <message>
-        <source>Browse for Another File...</source>
+        <source>Select Another Build</source>
         <translation></translation>
     </message>
     <message>
@@ -8642,6 +8722,10 @@ If you intended to move analytics data to another storage location, please conta
         <translation></translation>
     </message>
     <message>
+        <source>Starting update to ...</source>
+        <translation></translation>
+    </message>
+    <message>
         <source>Updating to ...</source>
         <translation></translation>
     </message>
@@ -8650,11 +8734,23 @@ If you intended to move analytics data to another storage location, please conta
         <translation></translation>
     </message>
     <message>
-        <source>Install update</source>
+        <source>System updated to</source>
         <translation></translation>
     </message>
     <message>
-        <source>System updated to</source>
+        <source>Some servers have no update packages available.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Some servers have encountered an internal error.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Please contact Customer Support.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Some servers have gone offline. Please wait until they become online to continue.</source>
         <translation></translation>
     </message>
     <message>
@@ -8663,6 +8759,10 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>Continue in Background</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Latest Available Update</source>
         <translation></translation>
     </message>
     <message>
@@ -8676,109 +8776,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
         <source>Update from mediaservers</source>
         <translation></translation>
-    </message>
-    <message>
-        <source>Latest Available Update</source>
-        <translation></translation>
-    </message>
-    <message numerus="yes">
-        <source>Missing update package for the client and %n servers</source>
-        <translation>
-            <numerusform>Missing update package for the client and %n server</numerusform>
-            <numerusform>Missing update package for the client and %n servers</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Missing update package for the client</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Finish Update</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>The latest version is already installed</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This version is already installed</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>There are no online servers to update.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Cancel update and delete all downloaded data?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>There was an error while installing updates:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Some servers have gone offline. Please wait until they become online to continue.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Update completed, but some components have failed an update</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Please update %1 manually using an installation package.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>%1 will be restarted to the updated version.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Failed to download update packages to some components</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Failed to start update</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Starting update to ...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Failed to cancel update</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Failed to start installation</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Some servers have no update packages available.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Some servers have encountered an internal error.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Please please contact Customer Support.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Some servers have not completed the update process. Finish it anyway?</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8807,23 +8804,23 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>Generic Event</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Device was disconnected</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Camera was disconnected</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>I/O Module was disconnected</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Unknown Plugin Diagnostic Event</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -8857,106 +8854,106 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>Some users do not have access to the selected layout. Action will not work for them.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::PeerStateTracker</name>
     <message>
         <source>The server is taking too long to respond</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>No update task</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Ready to download update</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Downloading update</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Ready to restart to the new version</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Installing update</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Installed</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Failed to download update</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Waiting for peer data</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>There is not enough space to download update files.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>There is not enough space to extract update files.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Failed to download update packages.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Update contents are invalid.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Update archive is corrupted.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Update files cannot be extracted.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Internal downloader error.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Internal client error.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Unknown error.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Unexpected error code.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Ready to install update</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Update package is not found.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>There is not enough space to install update.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Internal server error.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>This OS version is no longer supported.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -9064,11 +9061,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>Motion detection is disabled or not supported</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Dual-streaming is disabled or not supported</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -9094,78 +9091,78 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>Users will be automatically logged out if their session exceeds the specified duration.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::ServerSettingsDialogStore</name>
     <message>
         <source>Library</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Version</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Vendor</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>no error</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>library file cannot be loaded</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>invalid or incompatible plugin library</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>plugin library failed to initialize</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>plugin returned bad manifest</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>plugin API version is no longer supported</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>unknown error</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Not loaded</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Loaded</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>plugin is in the black list</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Status</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>plugin is optional and is not in the white list</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>internal error</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -9188,22 +9185,22 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>Waiting for server to respond...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::ServerUpdateTool</name>
     <message>
         <source>No connection to the server.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Network error.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Server error.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -9226,11 +9223,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>Component</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Installed Version</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -9271,20 +9268,20 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>Selected camera</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Selected device</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Selected media</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>none</source>
         <comment>No currently selected camera</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -9319,14 +9316,14 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
         <source>Double click to add cameras to the current layout or ctrl+click to open in a new tab</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>Double click to add camera to the current layout or ctrl+click to open in a new tab</numerusform>
             <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
         </translation>
     </message>
     <message>
         <source>No available archive</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -9420,16 +9417,24 @@ If you intended to move analytics data to another storage location, please conta
         <source>File was corrupted while being uploaded to the server</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Remote file &quot;%1&quot; is corrupted</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Server already has this file &quot;%1&quot;</source>
+        <translation></translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::WearableCameraMotionWidget</name>
     <message>
         <source>Motion is being detected only during video uploading.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Enabling or disabling this setting does not change anything in the existing archive.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -9528,50 +9533,50 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>Starting export...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Saving layout</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Stop Saving</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Saving failed</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Starting saving...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>We are preparing files for the export process. Please wait for a few seconds.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::WorkbenchUpdateWatcher</name>
     <message>
         <source>%1 version available</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Release Notes</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Major issues have been fixed. Update is strongly recommended.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Update...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Do not notify again about this update</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -9585,7 +9590,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::integrations::entropix::ReconstructResolutionIntegration</name>
     <message>
         <source>Reconstruct Resolution</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -9626,26 +9631,26 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::ui::PluginDiagnosticEventModel</name>
     <message>
         <source>Any Plugin</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::ui::PluginDiagnosticEventWidget</name>
     <message>
         <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>If the field is empty, event will always trigger.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>This field is case sensitive.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -9938,26 +9943,30 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>This build is for testing purposes only.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Open Server Settings</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>OK</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <source>Confirm storage location to store analytics data on &apos;%1&apos;</source>
-        <translation type="unfinished"></translation>
+        <source>Confirm storage location for the analytics data on &quot;%1&quot;</source>
+        <translation></translation>
     </message>
     <message>
-        <source>Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
-Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
-By default analytics data will be stored in mediaserver&apos;s installation directory.
-You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</source>
-        <translation type="unfinished"></translation>
+        <source>the largest available partition</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>The analytics database should only be stored on a local drive and can take up large amounts of space.
+Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
+By default analytics data will be stored on %1.
+You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</source>
+        <translation></translation>
     </message>
 </context>
 <context>

@@ -5718,11 +5718,6 @@ to %1</source>
       <translation>Co zrobić z aktualnymi danymi analitycznymi?</translation>
     </message>
     <message>
-      <source>Current analytics data will not be automatically moved to another location and will become unaccessible. You can keep it and manually move later, or delete permanently.
-If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
-      <translation>Aktualne dane analityczne nie zostaną automatycznie przeniesione do innej lokalizacji i staną się niedostępne. Możesz je zachować i ręcznie przenieść później lub usunąć na stałe. Jeśli chcesz przenieść dane analityczne do innej lokalizacji, skontaktuj się najpierw z pomocą techniczną.</translation>
-    </message>
-    <message>
       <source>Delete</source>
       <translation>Usuń</translation>
     </message>
@@ -5733,6 +5728,11 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Cancel</source>
       <translation>Anuluj</translation>
+    </message>
+    <message>
+      <source>Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
+If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
+      <translation>Aktualne dane analityczne nie zostaną automatycznie przeniesione do innej lokalizacji i staną się niedostępne. Możesz je zachować i ręcznie przenieść później lub usunąć na stałe. Jeśli chcesz przenieść dane analityczne do innej lokalizacji, skontaktuj się najpierw z pomocą techniczną.</translation>
     </message>
   </context>
   <context>
@@ -7944,6 +7944,14 @@ If you intended to move analytics data to another storage location, please conta
       <source>Plugins</source>
       <translation>Wtyczki</translation>
     </message>
+    <message>
+      <source>Motion detection is disabled, all schedule records &quot;Motion&quot; and &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
+      <translation>Detekcja ruchu jest wyłączona. Ustawienia harmonogramu nagrywania w trybie &quot;Ruch&quot; i &quot;Ruch + Niska rozdzielczość&quot; zostaną zamienione na tryb &quot;Zawsze&quot;</translation>
+    </message>
+    <message>
+      <source>Dual streaming is disabled, all schedule records &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
+      <translation>Podwójne strumieniowanie jest wyłączone. Ustawienia harmonogramu nagrywania w trybie &quot;Ruch + Niska rozdzielczość&quot; zostaną zamienione na tryb &quot;Zawsze&quot;</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraSettingsLicenseWatcher</name>
@@ -8281,10 +8289,6 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>%n zdarzeń</numerusform>
         <numerusform>%n zdarzeń</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>unnamed analytics engine</source>
-      <translation>nieznany silnik analityczny</translation>
     </message>
     <message>
       <source>No events occurred</source>
@@ -8794,6 +8798,60 @@ If you intended to move analytics data to another storage location, please conta
       <source>Some servers are offline and will not be updated. Skip them?</source>
       <translation>Niektóre serwery są w trybie offline i nie zostaną zaktualizowane. Pominąć je?</translation>
     </message>
+    <message numerus="yes">
+      <source>Missing update package for the client and %n servers</source>
+      <translation>
+        <numerusform>Brakuje pakietu aktualizacji dla klienta i serwera</numerusform>
+        <numerusform>Brakuje pakietu aktualizacji dla klienta i %n serwerów</numerusform>
+        <numerusform>Brakuje pakietu aktualizacji dla klienta i %n serwerów</numerusform>
+        <numerusform>Brakuje pakietu aktualizacji dla klienta i %n serwerów</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Missing update package for the client</source>
+      <translation>Brakuje pakietu aktualizacji dla klienta</translation>
+    </message>
+    <message>
+      <source>There are no online servers to update.</source>
+      <translation>Brak dostępnych serwerów do aktualizacji.</translation>
+    </message>
+    <message>
+      <source>Cancel update and delete all downloaded data?</source>
+      <translation>Anulować aktualizację i usunąć wszystkie pobrane dane?</translation>
+    </message>
+    <message>
+      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
+      <translation>Wersje niektórych komponentów nie są już obsługiwane. Proszę je usunąć z systemu lub zaktualizować system operacyjny do obsługiwanej wersji.</translation>
+    </message>
+    <message>
+      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
+      <translation>Wersja systemu operacyjnego klienta nie jest już obsługiwana. Proszę zaktualizować jego system operacyjny do obsługiwanej wersji.</translation>
+    </message>
+    <message>
+      <source>Failed to start update</source>
+      <translation>Nie udało się rozpocząć aktualizacji</translation>
+    </message>
+    <message>
+      <source>Failed to cancel update</source>
+      <translation>Nie udało się anulować aktualizacji</translation>
+    </message>
+    <message>
+      <source>Failed to start installation</source>
+      <translation>Nie udało się uruchomić instalacji</translation>
+    </message>
+    <message>
+      <source>Some servers have not completed the update process. Finish it anyway?</source>
+      <translation>Niektóre serwery nie zakończyły jeszcze procesu aktualizacji, czy na pewno zamknąć?</translation>
+    </message>
+    <message>
+      <source>%1 will be restarted to the updated version.</source>
+      <comment>Application name will be substituted</comment>
+      <translation>%1 zostanie uruchomiony ponownie w zaktualizowanej wersji.</translation>
+    </message>
+    <message>
+      <source>Failed to download update packages to some components</source>
+      <translation>Nie udało się pobrać aktualizacji do niektórych komponentów</translation>
+    </message>
     <message>
       <source>If the problem persists, please contact Customer Support.</source>
       <translation>Jeśli problem nie ustąpi, skontaktuj się z działem obsługi klienta.</translation>
@@ -8811,16 +8869,48 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Aktualizacja zakończona</translation>
     </message>
     <message>
-      <source>Nx Witness Client will be restarted to the updated version.</source>
-      <translation>Klient Nx Witness zostanie ponownie uruchomiony do zaktualizowanej wersji.</translation>
+      <source>Update completed, but some components have failed an update</source>
+      <translation>Zakończono aktualizację, ale niektóre elementy nie zostały zaktualizowane.</translation>
+    </message>
+    <message>
+      <source>Please update %1 manually using an installation package.</source>
+      <translation>Proszę zaktualizować %1 ręcznie przy użyciu pakietu instalacyjnego.</translation>
+    </message>
+    <message>
+      <source>%1 will be restarted to the updated version.</source>
+      <translation>%1 zostanie uruchomiony ponownie w zaktualizowanej wersji.</translation>
     </message>
     <message>
       <source>OK</source>
       <translation>OK</translation>
     </message>
     <message>
+      <source>There was an error while installing updates:</source>
+      <translation>Wystąpił błąd podczas instalowania aktualizacji:</translation>
+    </message>
+    <message>
       <source>Downloading updates...</source>
       <translation>Pobieranie aktualizacji...</translation>
+    </message>
+    <message>
+      <source>Finish Update</source>
+      <translation>Zakończ aktualizację</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>Anuluj</translation>
+    </message>
+    <message>
+      <source>The latest version is already installed</source>
+      <translation>Najnowsza wersja jest już zainstalowana</translation>
+    </message>
+    <message>
+      <source>This version is already installed</source>
+      <translation>Ta wersja jest już zainstalowana</translation>
+    </message>
+    <message>
+      <source>Install update</source>
+      <translation>Zainstaluj aktualizację</translation>
     </message>
     <message>
       <source>Upload</source>
@@ -8839,12 +8929,12 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Pobierz i zainstaluj</translation>
     </message>
     <message>
-      <source>Select Another Build</source>
-      <translation>Wybierz inną kompilację</translation>
-    </message>
-    <message>
       <source>Browse for Another File...</source>
       <translation>Przeglądaj inne pliki...</translation>
+    </message>
+    <message>
+      <source>Select Another Build</source>
+      <translation>Wybierz inną kompilację</translation>
     </message>
     <message>
       <source>Update to Specific Build</source>
@@ -8867,6 +8957,10 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Instalowanie aktualizacji klienta...</translation>
     </message>
     <message>
+      <source>Starting update to ...</source>
+      <translation>Rozpoczynanie aktualizacji...</translation>
+    </message>
+    <message>
       <source>Updating to ...</source>
       <translation>Aktualizacja do...</translation>
     </message>
@@ -8875,12 +8969,24 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Gotowy do aktualizacji do</translation>
     </message>
     <message>
-      <source>Install update</source>
-      <translation>Zainstaluj aktualizację</translation>
-    </message>
-    <message>
       <source>System updated to</source>
       <translation>System zaktualizowany do</translation>
+    </message>
+    <message>
+      <source>Some servers have no update packages available.</source>
+      <translation>Niektóre serwery nie mają dostępnych pakietów aktualizacji.</translation>
+    </message>
+    <message>
+      <source>Some servers have encountered an internal error.</source>
+      <translation>Niektóre serwery napotkały błąd wewnętrzny.</translation>
+    </message>
+    <message>
+      <source>Please contact Customer Support.</source>
+      <translation>Skontaktuj się z działem obsługi klienta.</translation>
+    </message>
+    <message>
+      <source>Some servers have gone offline. Please wait until they become online to continue.</source>
+      <translation>Niektóre serwery zostały odłączone. Proszę zaczekać, aż będą dostępne.</translation>
     </message>
     <message>
       <source>System update in process</source>
@@ -8889,6 +8995,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Continue in Background</source>
       <translation>Kontynuuj w tle</translation>
+    </message>
+    <message>
+      <source>Latest Available Update</source>
+      <translation>Najnowsza dostępna aktualizacja</translation>
     </message>
     <message>
       <source>Specific Build</source>
@@ -8901,111 +9011,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Update from mediaservers</source>
       <translation>Aktualizacja z serwerów media</translation>
-    </message>
-    <message>
-      <source>Latest Available Update</source>
-      <translation>Najnowsza dostępna aktualizacja</translation>
-    </message>
-    <message numerus="yes">
-      <source>Missing update package for the client and %n servers</source>
-      <translation>
-        <numerusform>Brakuje pakietu aktualizacji dla klienta i serwera</numerusform>
-        <numerusform>Brakuje pakietu aktualizacji dla klienta i %n serwerów</numerusform>
-        <numerusform>Brakuje pakietu aktualizacji dla klienta i %n serwerów</numerusform>
-        <numerusform>Brakuje pakietu aktualizacji dla klienta i %n serwerów</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Missing update package for the client</source>
-      <translation>Brakuje pakietu aktualizacji dla klienta</translation>
-    </message>
-    <message>
-      <source>Finish Update</source>
-      <translation>Zakończ aktualizację</translation>
-    </message>
-    <message>
-      <source>Cancel</source>
-      <translation>Anuluj</translation>
-    </message>
-    <message>
-      <source>The latest version is already installed</source>
-      <translation>Najnowsza wersja jest już zainstalowana</translation>
-    </message>
-    <message>
-      <source>This version is already installed</source>
-      <translation>Ta wersja jest już zainstalowana</translation>
-    </message>
-    <message>
-      <source>There are no online servers to update.</source>
-      <translation>Brak dostępnych serwerów do aktualizacji.</translation>
-    </message>
-    <message>
-      <source>Cancel update and delete all downloaded data?</source>
-      <translation>Anulować aktualizację i usunąć wszystkie pobrane dane?</translation>
-    </message>
-    <message>
-      <source>There was an error while installing updates:</source>
-      <translation>Wystąpił błąd podczas instalowania aktualizacji:</translation>
-    </message>
-    <message>
-      <source>Some servers have gone offline. Please wait until they become online to continue.</source>
-      <translation>Niektóre serwery zostały odłączone. Proszę zaczekać, aż będą dostępne.</translation>
-    </message>
-    <message>
-      <source>Update completed, but some components have failed an update</source>
-      <translation>Zakończono aktualizację, ale niektóre elementy nie zostały zaktualizowane.</translation>
-    </message>
-    <message>
-      <source>Please update %1 manually using an installation package.</source>
-      <translation>Proszę zaktualizować %1 ręcznie przy użyciu pakietu instalacyjnego.</translation>
-    </message>
-    <message>
-      <source>%1 will be restarted to the updated version.</source>
-      <translation>%1 zostanie uruchomiony ponownie w zaktualizowanej wersji.</translation>
-    </message>
-    <message>
-      <source>Failed to download update packages to some components</source>
-      <translation>Nie udało się pobrać aktualizacji do niektórych komponentów</translation>
-    </message>
-    <message>
-      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
-      <translation>Wersje niektórych komponentów nie są już obsługiwane. Proszę je usunąć z systemu lub zaktualizować system operacyjny do obsługiwanej wersji.</translation>
-    </message>
-    <message>
-      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
-      <translation>Wersja systemu operacyjnego klienta nie jest już obsługiwana. Proszę zaktualizować jego system operacyjny do obsługiwanej wersji.</translation>
-    </message>
-    <message>
-      <source>Failed to start update</source>
-      <translation>Nie udało się rozpocząć aktualizacji</translation>
-    </message>
-    <message>
-      <source>Starting update to ...</source>
-      <translation>Rozpoczynanie aktualizacji...</translation>
-    </message>
-    <message>
-      <source>Failed to cancel update</source>
-      <translation>Nie udało się anulować aktualizacji</translation>
-    </message>
-    <message>
-      <source>Failed to start installation</source>
-      <translation>Nie udało się uruchomić instalacji</translation>
-    </message>
-    <message>
-      <source>Some servers have no update packages available.</source>
-      <translation>Niektóre serwery nie mają dostępnych pakietów aktualizacji.</translation>
-    </message>
-    <message>
-      <source>Some servers have encountered an internal error.</source>
-      <translation>Niektóre serwery napotkały błąd wewnętrzny.</translation>
-    </message>
-    <message>
-      <source>Please please contact Customer Support.</source>
-      <translation>Proszę skontaktować się z działem wsparcia technicznego.</translation>
-    </message>
-    <message>
-      <source>Some servers have not completed the update process. Finish it anyway?</source>
-      <translation>Niektóre serwery nie zakończyły jeszcze procesu aktualizacji, czy na pewno zamknąć?</translation>
     </message>
   </context>
   <context>
@@ -9659,6 +9664,14 @@ If you intended to move analytics data to another storage location, please conta
       <source>File was corrupted while being uploaded to the server</source>
       <translation>Plik został uszkodzony podczas przesyłania na serwer</translation>
     </message>
+    <message>
+      <source>Remote file &quot;%1&quot; is corrupted</source>
+      <translation>Plik zdalny &quot;%1&quot; jest uszkodzony</translation>
+    </message>
+    <message>
+      <source>Server already has this file &quot;%1&quot;</source>
+      <translation>Serwer ma już ten plik &quot;%1&quot;</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::WearableCameraMotionWidget</name>
@@ -10206,17 +10219,21 @@ If you intended to move analytics data to another storage location, please conta
       <translation>OK</translation>
     </message>
     <message>
-      <source>Confirm storage location to store analytics data on &apos;%1&apos;</source>
-      <translation>Potwierdź przechowywanie archiwum danych analitycznych na &apos;%1&apos;</translation>
+      <source>Confirm storage location for the analytics data on &quot;%1&quot;</source>
+      <translation>Potwierdź przechowywanie archiwum danych analitycznych na &quot;%1&quot;</translation>
     </message>
     <message>
-      <source>Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
-Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
-By default analytics data will be stored in mediaserver&apos;s installation directory.
-You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</source>
+      <source>the largest available partition</source>
+      <translation>największa dostępna partycja</translation>
+    </message>
+    <message>
+      <source>The analytics database should only be stored on a local drive and can take up large amounts of space.
+Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
+By default analytics data will be stored on %1.
+You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</source>
       <translation>Baza danych analitycznych powinna być przechowywana w lokalnej pamięci masowej i może zajmować do stu gigabajtów.
 Po wybraniu lokalizacji do przechowywania danych analitycznych nie można jej łatwo zmienić bez utraty danych. Zalecamy ostrożne wybranie lokalizacji i nieużywanie partycji systemowej, aby uniknąć awarii systemu.
-Domyślnie dane analityczne będą przechowywane w katalogu instalacyjnym serwera.
+Domyślnie dane analityczne będą przechowywane w %1.
 Możesz zmienić lokalizację przechowywania danych w ustawieniach serwera.</translation>
     </message>
   </context>

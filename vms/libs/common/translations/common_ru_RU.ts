@@ -520,234 +520,234 @@
     </message>
     <message numerus="yes">
       <source>%n Time Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Time Licenses</numerusform>
-        <numerusform>%n Time Licenses</numerusform>
-        <numerusform>%n Time Licenses</numerusform>
-        <numerusform>%n Time Licenses</numerusform>
+      <translation>
+        <numerusform>%n Возобновляемая лицензия</numerusform>
+        <numerusform>%n Возобновляемые лицензии</numerusform>
+        <numerusform>%n Возобновляемых лицензий</numerusform>
+        <numerusform>%n Возобновляемых лицензий</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Analog Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Analog Licenses</numerusform>
-        <numerusform>%n Analog Licenses</numerusform>
-        <numerusform>%n Analog Licenses</numerusform>
-        <numerusform>%n Analog Licenses</numerusform>
+      <translation>
+        <numerusform>%n Лицензия на аналоговую камеру</numerusform>
+        <numerusform>%n Лицензии на аналоговые камеры</numerusform>
+        <numerusform>%n Лицензий на аналоговый камеры</numerusform>
+        <numerusform>%n Лицензий на аналоговый камеры</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Professional Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Professional Licenses</numerusform>
-        <numerusform>%n Professional Licenses</numerusform>
-        <numerusform>%n Professional Licenses</numerusform>
-        <numerusform>%n Professional Licenses</numerusform>
+      <translation>
+        <numerusform>%n Профессиональная лицензия</numerusform>
+        <numerusform>%n Профессиональные лицензии</numerusform>
+        <numerusform>%n Профессиональных лицензий</numerusform>
+        <numerusform>%n Профессиональных лицензий</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Edge Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Edge Licenses</numerusform>
-        <numerusform>%n Edge Licenses</numerusform>
-        <numerusform>%n Edge Licenses</numerusform>
-        <numerusform>%n Edge Licenses</numerusform>
+      <translation>
+        <numerusform>%n лицензия Edge</numerusform>
+        <numerusform>%n лицензии Edge</numerusform>
+        <numerusform>%n лицензий Edge</numerusform>
+        <numerusform>%n лицензий Edge</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Vmax Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Vmax Licenses</numerusform>
-        <numerusform>%n Vmax Licenses</numerusform>
-        <numerusform>%n Vmax Licenses</numerusform>
-        <numerusform>%n Vmax Licenses</numerusform>
+      <translation>
+        <numerusform>%n лицензия Vmax</numerusform>
+        <numerusform>%n лицензии Vmax</numerusform>
+        <numerusform>%n лицензий Vmax</numerusform>
+        <numerusform>%n лицензий Vmax</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Analog Encoder Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Analog Encoder Licenses</numerusform>
-        <numerusform>%n Analog Encoder Licenses</numerusform>
-        <numerusform>%n Analog Encoder Licenses</numerusform>
-        <numerusform>%n Analog Encoder Licenses</numerusform>
+      <translation>
+        <numerusform>%n лицензия на аналоговые кодировщики</numerusform>
+        <numerusform>%n лицензии на аналоговые кодировщики</numerusform>
+        <numerusform>%n лицензий на аналоговые кодировщики</numerusform>
+        <numerusform>%n лицензий на аналоговые кодировщики</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Video Wall Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Video Wall Licenses</numerusform>
-        <numerusform>%n Video Wall Licenses</numerusform>
-        <numerusform>%n Video Wall Licenses</numerusform>
-        <numerusform>%n Video Wall Licenses</numerusform>
+      <translation>
+        <numerusform>%n лицензия на видеостены</numerusform>
+        <numerusform>%n лицензии на видеостены</numerusform>
+        <numerusform>%n лицензий на видеостены</numerusform>
+        <numerusform>%n лицензий на видеостены</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O Module Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n I/O Module Licenses</numerusform>
-        <numerusform>%n I/O Module Licenses</numerusform>
-        <numerusform>%n I/O Module Licenses</numerusform>
-        <numerusform>%n I/O Module Licenses</numerusform>
+      <translation>
+        <numerusform>%n лицензия на модули ввода/вывода</numerusform>
+        <numerusform>%n лицензии на модули ввода/вывода</numerusform>
+        <numerusform>%n лицензий на модули ввода/вывода</numerusform>
+        <numerusform>%n лицензий на модули ввода/вывода</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Start Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Start Licenses</numerusform>
-        <numerusform>%n Start Licenses</numerusform>
-        <numerusform>%n Start Licenses</numerusform>
-        <numerusform>%n Start Licenses</numerusform>
+      <translation>
+        <numerusform>%n лицензия Start</numerusform>
+        <numerusform>%n лицензии Start</numerusform>
+        <numerusform>%n лицензий Start</numerusform>
+        <numerusform>%n лицензий Start</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Bridge Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Bridge Licenses</numerusform>
-        <numerusform>%n Bridge Licenses</numerusform>
-        <numerusform>%n Bridge Licenses</numerusform>
-        <numerusform>%n Bridge Licenses</numerusform>
+      <translation>
+        <numerusform>%n лицензия Bridge</numerusform>
+        <numerusform>%n лицензии Bridge</numerusform>
+        <numerusform>%n лицензий Bridge</numerusform>
+        <numerusform>%n лицензий Bridge</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Invalid Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Invalid Licenses</numerusform>
-        <numerusform>%n Invalid Licenses</numerusform>
-        <numerusform>%n Invalid Licenses</numerusform>
-        <numerusform>%n Invalid Licenses</numerusform>
+      <translation>
+        <numerusform>%n недействительная лицензия</numerusform>
+        <numerusform>%n недействительные лицензии</numerusform>
+        <numerusform>%n недействительных лицензий</numerusform>
+        <numerusform>%n недействительных лицензий</numerusform>
       </translation>
     </message>
     <message>
       <source>Free Licenses</source>
-      <translation type="unfinished">Free Licenses</translation>
+      <translation>Бесплатные лицензии</translation>
     </message>
     <message numerus="yes">
       <source>%n Free Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Free Licenses</numerusform>
-        <numerusform>%n Free Licenses</numerusform>
-        <numerusform>%n Free Licenses</numerusform>
-        <numerusform>%n Free Licenses</numerusform>
+      <translation>
+        <numerusform>%n бесплатная лицензия</numerusform>
+        <numerusform>%n бесплатные лицензии</numerusform>
+        <numerusform>%n бесплатных лицензий</numerusform>
+        <numerusform>%n бесплатных лицензий</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Time Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Time Licenses</numerusform>
-        <numerusform>%n/%1 Time Licenses</numerusform>
-        <numerusform>%n/%1 Time Licenses</numerusform>
-        <numerusform>%n/%1 Time Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 возобновляемая лицензия</numerusform>
+        <numerusform>%n/%1 возобновляемые лицензии</numerusform>
+        <numerusform>%n/%1 возобновляемых лицензий</numerusform>
+        <numerusform>%n/%1 возобновляемых лицензий</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Analog Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Analog Licenses</numerusform>
-        <numerusform>%n/%1 Analog Licenses</numerusform>
-        <numerusform>%n/%1 Analog Licenses</numerusform>
-        <numerusform>%n/%1 Analog Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 лицензия на аналоговую камеру</numerusform>
+        <numerusform>%n/%1 лицензии на аналоговые камеры</numerusform>
+        <numerusform>%n/%1 лицензий на аналоговые камеры</numerusform>
+        <numerusform>%n/%1 лицензий на аналоговые камеры</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Professional Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Professional Licenses</numerusform>
-        <numerusform>%n/%1 Professional Licenses</numerusform>
-        <numerusform>%n/%1 Professional Licenses</numerusform>
-        <numerusform>%n/%1 Professional Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 профессиональная лицензия</numerusform>
+        <numerusform>%n/%1 профессиональные лицензии</numerusform>
+        <numerusform>%n/%1 профессиональных лицензий</numerusform>
+        <numerusform>%n/%1 профессиональных лицензий</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Edge Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Edge Licenses</numerusform>
-        <numerusform>%n/%1 Edge Licenses</numerusform>
-        <numerusform>%n/%1 Edge Licenses</numerusform>
-        <numerusform>%n/%1 Edge Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 лицензия Edge</numerusform>
+        <numerusform>%n/%1 лицензии Edge</numerusform>
+        <numerusform>%n/%1 лицензий Edge</numerusform>
+        <numerusform>%n/%1 лицензий Edge</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Vmax Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Vmax Licenses</numerusform>
-        <numerusform>%n/%1 Vmax Licenses</numerusform>
-        <numerusform>%n/%1 Vmax Licenses</numerusform>
-        <numerusform>%n/%1 Vmax Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 лицензия Vmax</numerusform>
+        <numerusform>%n/%1 лицензии Vmax</numerusform>
+        <numerusform>%n/%1 лицензий Vmax</numerusform>
+        <numerusform>%n/%1 лицензий Vmax</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Analog Encoder Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Analog Encoder Licenses</numerusform>
-        <numerusform>%n/%1 Analog Encoder Licenses</numerusform>
-        <numerusform>%n/%1 Analog Encoder Licenses</numerusform>
-        <numerusform>%n/%1 Analog Encoder Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 лицензия на аналоговые кодировщики</numerusform>
+        <numerusform>%n/%1 лицензии на аналоговые кодировщики</numerusform>
+        <numerusform>%n/%1 лицензий на аналоговые кодировщики</numerusform>
+        <numerusform>%n/%1 лицензий на аналоговые кодировщики</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Video Wall Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Video Wall Licenses</numerusform>
-        <numerusform>%n/%1 Video Wall Licenses</numerusform>
-        <numerusform>%n/%1 Video Wall Licenses</numerusform>
-        <numerusform>%n/%1 Video Wall Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 лицензия на видеостену</numerusform>
+        <numerusform>%n/%1 лицензии на видеостены</numerusform>
+        <numerusform>%n/%1 лицензий на видеостены</numerusform>
+        <numerusform>%n/%1 лицензий на видеостены</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 I/O Module Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 I/O Module Licenses</numerusform>
-        <numerusform>%n/%1 I/O Module Licenses</numerusform>
-        <numerusform>%n/%1 I/O Module Licenses</numerusform>
-        <numerusform>%n/%1 I/O Module Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 лицензия на модули ввода/вывода</numerusform>
+        <numerusform>%n/%1 лицензии на модули ввода/вывода</numerusform>
+        <numerusform>%n/%1 лицензий на модули ввода/вывода</numerusform>
+        <numerusform>%n/%1 лицензий на модули ввода/вывода</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Start Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Start Licenses</numerusform>
-        <numerusform>%n/%1 Start Licenses</numerusform>
-        <numerusform>%n/%1 Start Licenses</numerusform>
-        <numerusform>%n/%1 Start Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 лицензия Start</numerusform>
+        <numerusform>%n/%1 лицензии Start</numerusform>
+        <numerusform>%n/%1 лицензий Start</numerusform>
+        <numerusform>%n/%1 лицензий Start</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Free Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Free Licenses</numerusform>
-        <numerusform>%n/%1 Free Licenses</numerusform>
-        <numerusform>%n/%1 Free Licenses</numerusform>
-        <numerusform>%n/%1 Free Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 бесплатная лицензия</numerusform>
+        <numerusform>%n/%1 бесплатные лицензии</numerusform>
+        <numerusform>%n/%1 бесплатных лицензий</numerusform>
+        <numerusform>%n/%1 бесплатных лицензий</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Bridge Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Bridge Licenses</numerusform>
-        <numerusform>%n/%1 Bridge Licenses</numerusform>
-        <numerusform>%n/%1 Bridge Licenses</numerusform>
-        <numerusform>%n/%1 Bridge Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 лицензия Bridge</numerusform>
+        <numerusform>%n/%1 лицензии Bridge</numerusform>
+        <numerusform>%n/%1 лицензий Bridge</numerusform>
+        <numerusform>%n/%1 лицензий Bridge</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Invalid Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Invalid Licenses</numerusform>
-        <numerusform>%n/%1 Invalid Licenses</numerusform>
-        <numerusform>%n/%1 Invalid Licenses</numerusform>
-        <numerusform>%n/%1 Invalid Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 недействительная лицензия</numerusform>
+        <numerusform>%n/%1 недействительные лицензии</numerusform>
+        <numerusform>%n/%1 недействительных лицензий</numerusform>
+        <numerusform>%n/%1 недействительных лицензий</numerusform>
       </translation>
     </message>
   </context>
@@ -822,11 +822,11 @@
     </message>
     <message>
       <source>Only one starter license is allowed per System.</source>
-      <translation type="unfinished">Only one starter license is allowed per System.</translation>
+      <translation>На Систему допускается только одна лицензия Start.</translation>
     </message>
     <message>
       <source>You already have one active starter license.</source>
-      <translation type="unfinished">You already have one active starter license.</translation>
+      <translation>У вас уже есть одна активная лицензия Start.</translation>
     </message>
   </context>
   <context>
@@ -888,56 +888,56 @@
     </message>
     <message numerus="yes">
       <source>%n Cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n Cameras</numerusform>
-        <numerusform>%n Cameras</numerusform>
-        <numerusform>%n Cameras</numerusform>
-        <numerusform>%n Cameras</numerusform>
+      <translation>
+        <numerusform>%n камера</numerusform>
+        <numerusform>%n камеры</numerusform>
+        <numerusform>%n камер</numerusform>
+        <numerusform>%n камер</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n cameras</numerusform>
-        <numerusform>%n cameras</numerusform>
-        <numerusform>%n cameras</numerusform>
-        <numerusform>%n cameras</numerusform>
+      <translation>
+        <numerusform>%n камера</numerusform>
+        <numerusform>%n камеры</numerusform>
+        <numerusform>%n камер</numerusform>
+        <numerusform>%n камер</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O Modules</source>
-      <translation type="unfinished">
-        <numerusform>%n I/O Modules</numerusform>
-        <numerusform>%n I/O Modules</numerusform>
-        <numerusform>%n I/O Modules</numerusform>
-        <numerusform>%n I/O Modules</numerusform>
+      <translation>
+        <numerusform>%n модуль ввода/вывода</numerusform>
+        <numerusform>%n модуля ввода/вывода</numerusform>
+        <numerusform>%n модулей ввода/вывода</numerusform>
+        <numerusform>%n модулей ввода/вывода</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O modules</source>
-      <translation type="unfinished">
-        <numerusform>%n I/O modules</numerusform>
-        <numerusform>%n I/O modules</numerusform>
-        <numerusform>%n I/O modules</numerusform>
-        <numerusform>%n I/O modules</numerusform>
+      <translation>
+        <numerusform>%n модуль ввода/вывода</numerusform>
+        <numerusform>%n модуля ввода/вывода</numerusform>
+        <numerusform>%n модулей ввода/вывода</numerusform>
+        <numerusform>%n модулей ввода/вывода</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Devices</source>
-      <translation type="unfinished">
-        <numerusform>%n Devices</numerusform>
-        <numerusform>%n Devices</numerusform>
-        <numerusform>%n Devices</numerusform>
-        <numerusform>%n Devices</numerusform>
+      <translation>
+        <numerusform>%n устройство</numerusform>
+        <numerusform>%n устройства</numerusform>
+        <numerusform>%n устройств</numerusform>
+        <numerusform>%n устройств</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n devices</source>
-      <translation type="unfinished">
-        <numerusform>%n devices</numerusform>
-        <numerusform>%n devices</numerusform>
-        <numerusform>%n devices</numerusform>
-        <numerusform>%n devices</numerusform>
+      <translation>
+        <numerusform>%n устройство</numerusform>
+        <numerusform>%n устройства</numerusform>
+        <numerusform>%n устройств</numerusform>
+        <numerusform>%n устройств</numerusform>
       </translation>
     </message>
   </context>
@@ -1096,19 +1096,19 @@
     <name>QnZipExtractor</name>
     <message>
       <source>Zip file is corrupted.</source>
-      <translation type="unfinished">Zip file is corrupted.</translation>
+      <translation>Zip-файл поврежден.</translation>
     </message>
     <message>
       <source>Could not find target dir.</source>
-      <translation type="unfinished">Could not find target dir.</translation>
+      <translation>Не удалось найти целевой каталог.</translation>
     </message>
     <message>
       <source>Could not open file for writing.</source>
-      <translation type="unfinished">Could not open file for writing.</translation>
+      <translation>Невозможно открыть файл для записи.</translation>
     </message>
     <message>
       <source>There is no free space on the disk.</source>
-      <translation type="unfinished">There is no free space on the disk.</translation>
+      <translation>На диске нет свободного места.</translation>
     </message>
     <message>
       <source>Unknown error.</source>
@@ -1120,18 +1120,18 @@
     </message>
     <message>
       <source>Extractor is busy.</source>
-      <translation type="unfinished">Extractor is busy.</translation>
+      <translation>Распаковщик занят</translation>
     </message>
   </context>
   <context>
     <name>nx::utils::CryptedFileStream</name>
     <message>
       <source>Wrong crypted stream size.</source>
-      <translation type="unfinished">Wrong crypted stream size.</translation>
+      <translation>Неправильный размер зашифрованного потока.</translation>
     </message>
     <message>
       <source>Damaged crypted stream header.</source>
-      <translation type="unfinished">Damaged crypted stream header.</translation>
+      <translation>Поврежденный заголовок зашифрованного потока.</translation>
     </message>
   </context>
   <context>
@@ -1643,43 +1643,43 @@
     </message>
     <message>
       <source>Failed to force using camera time, it lags too much, system time will be used</source>
-      <translation type="unfinished">Failed to force using camera time, it lags too much, system time will be used</translation>
+      <translation>Не удалось принудительно использовать время камеры, оно слишком сильно отстает, будет использовано системное время</translation>
     </message>
     <message>
       <source>Camera time is back to normal</source>
-      <translation type="unfinished">Camera time is back to normal</translation>
+      <translation>Время камеры возвращено к нормальному</translation>
     </message>
     <message>
       <source>Multiple %1 events have occurred</source>
-      <translation type="unfinished">Multiple %1 events have occurred</translation>
+      <translation>Произошло несколько событий %1</translation>
     </message>
     <message>
       <source>Multicast address conflict detected. Address %1 is already in use by %2 on %3 stream</source>
-      <translation type="unfinished">Multicast address conflict detected. Address %1 is already in use by %2 on %3 stream</translation>
+      <translation>Обнаружен конфликт адреса multicast. Адрес %1 уже используется %2 на потоке %3</translation>
     </message>
     <message>
       <source>Network address %1 is not a multicast address</source>
-      <translation type="unfinished">Network address %1 is not a multicast address</translation>
+      <translation>Сетевой адрес %1 не является multicast</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; is offline.</source>
-      <translation type="unfinished">Analytics storage &quot;%1&quot; is offline.</translation>
+      <translation>Хранилище аналитики &quot;%1&quot; не в сети.</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; is almost full.</source>
-      <translation type="unfinished">Analytics storage &quot;%1&quot; is almost full.</translation>
+      <translation>Хранилище аналитики &quot;%1&quot; почти заполнено.</translation>
     </message>
     <message>
       <source>Plugin Diagnostic Event</source>
-      <translation type="unfinished">Plugin Diagnostic Event</translation>
+      <translation>Событие диагностики плагина</translation>
     </message>
     <message>
       <source>Unknown Plugin Diagnostic Event</source>
-      <translation type="unfinished">Unknown Plugin Diagnostic Event</translation>
+      <translation>Неизвестное событие диагностики плагинов</translation>
     </message>
     <message>
       <source>RAID error. %1.</source>
-      <translation type="unfinished">RAID error. %1.</translation>
+      <translation>Ошибка RAID. %1.</translation>
     </message>
   </context>
   <context>

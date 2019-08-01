@@ -147,7 +147,7 @@
     </message>
     <message>
       <source>Could not initialize audio encoder.</source>
-      <translation>Kunne ikke initialisere lydenkoderen.</translation>
+      <translation>Kunne ikke initialisere lydkoderen.</translation>
     </message>
     <message>
       <source>Sample format of input device %1 is not supported.</source>
