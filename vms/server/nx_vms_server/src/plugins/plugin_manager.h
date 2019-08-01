@@ -77,7 +77,7 @@ public:
             if (!plugin)
                 continue;
 
-            if (const auto ptr = nx::sdk::queryInterfacePtr<Interface>(plugin))
+            if (const auto ptr = plugin->queryInterface<Interface>())
                 foundPlugins.push_back(ptr);
         }
         return foundPlugins;

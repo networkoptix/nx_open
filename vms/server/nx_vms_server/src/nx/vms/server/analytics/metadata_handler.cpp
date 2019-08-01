@@ -56,27 +56,27 @@ std::optional<EventTypeDescriptor> MetadataHandler::eventTypeDescriptor(
 
 void MetadataHandler::handleMetadata(IMetadataPacket* metadataPacket)
 {
-    if (metadataPacket == nullptr)
+    if (!metadataPacket)
     {
         NX_VERBOSE(this, "%1(): Received null metadata packet; ignoring", __func__);
         return;
     }
 
     bool handled = false;
-    if (const auto eventsPacket = queryInterfacePtr<IEventMetadataPacket>(metadataPacket))
+    if (const auto eventsPacket = metadataPacket->queryInterface<IEventMetadataPacket>())
     {
         handleEventMetadataPacket(eventsPacket);
         handled = true;
     }
 
-    if (const auto objectsPacket = queryInterfacePtr<IObjectMetadataPacket>(metadataPacket))
+    if (const auto objectsPacket = metadataPacket->queryInterface<IObjectMetadataPacket>())
     {
         handleObjectMetadataPacket(objectsPacket);
         handled = true;
     }
 
     if (const auto objectTrackBestShotPacket =
-        queryInterfacePtr<IObjectTrackBestShotPacket>(metadataPacket))
+        metadataPacket->queryInterface<IObjectTrackBestShotPacket>())
     {
         handleObjectTrackBestShotPacket(objectTrackBestShotPacket);
         handled = true;

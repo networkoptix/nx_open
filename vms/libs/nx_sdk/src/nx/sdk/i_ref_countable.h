@@ -7,6 +7,8 @@
 #include <cassert>
 #include <type_traits>
 
+#include <nx/sdk/ptr.h>
+
 namespace nx {
 namespace sdk {
 
@@ -78,6 +80,7 @@ struct InterfaceId
             templateInterfaceIdBase,
             TemplateArg::interfaceId().value);
 
+        /*unused*/ (void) result; //< If assert() is wiped out in Release, `result` will be unused.
         assert(result >= 15 && result < kMaxStaticInterfaceIdSize);
 
         return InterfaceId(id);
@@ -135,8 +138,11 @@ public:
     /** VMT #0. */
     virtual ~IRefCountable() = default;
 
+protected:
     /**
      * VMT #1.
+     *
+     * Intended to be called indirectly, via queryInterface<Interface>(), hence `protected`.
      * @return Object that requires releaseRef() by the caller when it no longer needs it, or null
      *     if the requested interface is not implemented.
      */
@@ -150,21 +156,18 @@ public:
         return nullptr;
     }
 
-    const IRefCountable* queryInterface(InterfaceId id) const
+public:
+    template<class Interface>
+    Ptr<Interface> queryInterface()
     {
-        return const_cast<IRefCountable*>(this)->queryInterface(id);
+        return toPtr(static_cast<Interface*>(queryInterface(Interface::interfaceId())));
     }
 
     template<class Interface>
-    Interface* queryInterface()
+    Ptr<const Interface> queryInterface() const
     {
-        return static_cast<Interface*>(queryInterface(Interface::interfaceId()));
-    }
-
-    template<class Interface>
-    const Interface* queryInterface() const
-    {
-        return static_cast<const Interface*>(queryInterface(Interface::interfaceId()));
+        return toPtr(static_cast<const Interface*>(
+            const_cast<IRefCountable*>(this)->queryInterface(Interface::interfaceId())));
     }
 
     /**

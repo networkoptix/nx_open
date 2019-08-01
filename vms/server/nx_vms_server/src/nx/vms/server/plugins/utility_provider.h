@@ -10,10 +10,11 @@ namespace nx::vms::server::plugins {
 
 class UtilityProvider: public nx::sdk::RefCountable<nx::sdk::IUtilityProvider>
 {
+protected:
+    virtual IRefCountable* queryInterface(nx::sdk::InterfaceId id) override;
+
 public:
     UtilityProvider(PluginManager* pluginManager, const nx::sdk::IPlugin* plugin);
-
-    virtual IRefCountable* queryInterface(nx::sdk::InterfaceId id) override;
 
     virtual int64_t vmsSystemTimeSinceEpochMs() const override;
 

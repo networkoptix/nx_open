@@ -194,24 +194,12 @@ static Ptr<RefCountable> makePtr(Args&&... args)
 }
 
 /**
- * Calls queryInterface() and returns a smart pointer to its result, possibly null.
- * @param refCountable Can be null, then null will be returned.
- */
-template</*explicit*/ class Interface, /*deduced*/ class RefCountablePtr>
-static Ptr<Interface> queryInterfacePtr(RefCountablePtr refCountable)
-{
-    return refCountable
-        ? toPtr(static_cast<Interface*>(refCountable->queryInterface(Interface::interfaceId())))
-        : nullptr;
-}
-
-/**
  * Calls queryInterface() from old SDK and returns a smart pointer to its result, possibly null.
  * @param refCountable Can be null, then null will be returned.
  */
 template</*explicit*/ class Interface, /*deduced*/ class RefCountablePtr,
     /*deduced*/ typename InterfaceId>
-static Ptr<Interface> queryInterfacePtr(
+static Ptr<Interface> queryInterfaceOfOldSdk(
     RefCountablePtr refCountable, const InterfaceId& interfaceId)
 {
     return refCountable

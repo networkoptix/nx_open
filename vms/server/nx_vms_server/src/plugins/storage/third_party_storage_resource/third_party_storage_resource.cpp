@@ -196,7 +196,7 @@ void QnThirdPartyStorageResource::openStorage(
     if (!storage)
         throw std::runtime_error("Couldn't create Storage");
 
-    if (!queryInterfacePtr<nx_spl::Storage>(storage, nx_spl::IID_Storage))
+    if (!queryInterfaceOfOldSdk<nx_spl::Storage>(storage, nx_spl::IID_Storage))
         throw std::logic_error("Unknown storage interface version");
 
     m_storage = storage;
@@ -225,7 +225,7 @@ QIODevice *QnThirdPartyStorageResource::open(
         &errorCode));
 
     if (!ioDevice || errorCode != nx_spl::error::NoError
-        || !queryInterfacePtr<nx_spl::IODevice>(ioDevice, nx_spl::IID_IODevice))
+        || !queryInterfaceOfOldSdk<nx_spl::IODevice>(ioDevice, nx_spl::IID_IODevice))
     {
         return nullptr;
     }
@@ -341,7 +341,7 @@ QnAbstractStorageResource::FileInfoList QnThirdPartyStorageResource::getFileList
 
     if (!fileInfoIterator
         || errorCode != nx_spl::error::NoError
-        || !queryInterfacePtr<nx_spl::FileInfoIterator>(
+        || !queryInterfaceOfOldSdk<nx_spl::FileInfoIterator>(
             fileInfoIterator, nx_spl::IID_FileInfoIterator))
     {
         return FileInfoList();

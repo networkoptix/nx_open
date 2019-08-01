@@ -207,46 +207,6 @@ TEST(Ptr, releasePtrAndReset)
     ASSERT_EQ(nullptr, data2.get());
 }
 
-TEST(Ptr, queryInterfacePtrNonConst)
-{
-    Data::s_destructorCalled = false;
-    {
-        Data* const nullDataPtr = nullptr;
-        ASSERT_FALSE(queryInterfacePtr<IData>(nullDataPtr));
-
-        // NOTE: `auto` is not used to ensure proper return types of the tested functions.
-
-        const Ptr<Data> dataPtr = makePtr<Data>(42);
-
-        const Ptr<IData> iDataPtrFromData{queryInterfacePtr<IData>(dataPtr.get())};
-        ASSERT_EQ(dataPtr, iDataPtrFromData);
-
-        const Ptr<IData> iDataPtrFromIData{queryInterfacePtr<IData>(dataPtr)};
-        ASSERT_EQ(dataPtr, iDataPtrFromIData);
-    }
-    ASSERT_TRUE(Data::s_destructorCalled);
-}
-
-TEST(Ptr, queryInterfacePtrConst)
-{
-    Data::s_destructorCalled = false;
-    {
-        const Data* const nullDataPtr = nullptr;
-        ASSERT_FALSE(queryInterfacePtr<const IData>(nullDataPtr));
-
-        // NOTE: `auto` is not used to ensure proper return types of the tested functions.
-
-        const Ptr<const Data> dataPtr = makePtr<const Data>(42);
-
-        const Ptr<const IData> iDataPtrFromData{queryInterfacePtr<const IData>(dataPtr.get())};
-        ASSERT_EQ(dataPtr, iDataPtrFromData);
-
-        const Ptr<const IData> iDataPtrFromIData{queryInterfacePtr<const IData>(dataPtr)};
-        ASSERT_EQ(dataPtr, iDataPtrFromIData);
-    }
-    ASSERT_TRUE(Data::s_destructorCalled);
-}
-
 TEST(Ptr, rawPtrBasic)
 {
     Data* const data = new Data(42);

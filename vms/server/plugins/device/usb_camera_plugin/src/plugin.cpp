@@ -97,8 +97,8 @@ void Plugin::setSettings(const nxpl::Setting* /*settings*/, int /*count*/)
 
 void Plugin::setPluginContainer(nxpl::PluginInterface* pluginContainer)
 {
-    m_timeProvider =
-        nx::sdk::queryInterfacePtr<nxpl::TimeProvider>(pluginContainer, nxpl::IID_TimeProvider);
+    m_timeProvider = nx::sdk::queryInterfaceOfOldSdk<nxpl::TimeProvider>(
+        pluginContainer, nxpl::IID_TimeProvider);
 }
 
 nxpt::CommonRefManager* Plugin::refManager()

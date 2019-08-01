@@ -351,9 +351,9 @@ TEST(stub_analytics_plugin, test)
 
     const auto pluginObject = toPtr(createNxPlugin());
     ASSERT_TRUE(pluginObject);
-    ASSERT_TRUE(queryInterfacePtr<IRefCountable>(pluginObject));
-    ASSERT_TRUE(queryInterfacePtr<nx::sdk::IPlugin>(pluginObject));
-    const auto plugin = queryInterfacePtr<nx::sdk::analytics::IPlugin>(pluginObject);
+    ASSERT_TRUE(pluginObject->queryInterface<IRefCountable>());
+    ASSERT_TRUE(pluginObject->queryInterface<nx::sdk::IPlugin>());
+    const auto plugin = pluginObject->queryInterface<nx::sdk::analytics::IPlugin>();
     ASSERT_TRUE(plugin);
 
     const auto utilityProvider = makePtr<UtilityProvider>();
@@ -364,7 +364,7 @@ TEST(stub_analytics_plugin, test)
 
     const auto engine = result.result.value;
     ASSERT_TRUE(engine);
-    ASSERT_TRUE(queryInterfacePtr<IEngine>(engine));
+    ASSERT_TRUE(engine->queryInterface<IEngine>());
 
     ASSERT_EQ(plugin.get(), engine->plugin());
 
@@ -382,8 +382,8 @@ TEST(stub_analytics_plugin, test)
 
     const auto baseDeviceAgent = deviceAgentResult.result.value;
     ASSERT_TRUE(baseDeviceAgent);
-    ASSERT_TRUE(queryInterfacePtr<IDeviceAgent>(baseDeviceAgent));
-    const auto deviceAgent = queryInterfacePtr<IConsumingDeviceAgent>(baseDeviceAgent);
+    ASSERT_TRUE(baseDeviceAgent->queryInterface<IDeviceAgent>());
+    const auto deviceAgent = baseDeviceAgent->queryInterface<IConsumingDeviceAgent>();
     ASSERT_TRUE(deviceAgent);
 
     deviceAgent->setHandler(makePtr<DeviceAgentHandler>().get());

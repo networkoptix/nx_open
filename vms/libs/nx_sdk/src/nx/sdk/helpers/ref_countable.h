@@ -95,8 +95,6 @@ public:
             refCountableRegistry->notifyDestroyed(this, refCount());
     }
 
-    using IRefCountable::queryInterface; //< Enable const overload.
-
     virtual int addRef() const override { return m_refCountableHolder.addRef(); }
     virtual int releaseRef() const override { return m_refCountableHolder.releaseRef(); }
 

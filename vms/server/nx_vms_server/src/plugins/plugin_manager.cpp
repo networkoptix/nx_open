@@ -334,12 +334,12 @@ bool PluginManager::processPluginEntryPointForNewSdk(
     if (!plugin)
         return error("Entry point function returned null");
 
-    if (!queryInterfacePtr<IPlugin>(plugin))
+    if (!plugin->queryInterface<IPlugin>())
         return error("Interface nx::sdk::IPlugin is not supported");
 
     pluginInfo->mainInterface = MainInterface::nx_sdk_IPlugin;
 
-    if (const auto analyticsPlugin = queryInterfacePtr<nx::sdk::analytics::IPlugin>(plugin))
+    if (const auto analyticsPlugin = plugin->queryInterface<nx::sdk::analytics::IPlugin>())
     {
         pluginInfo->mainInterface = MainInterface::nx_sdk_analytics_IPlugin;
 
@@ -380,7 +380,7 @@ bool PluginManager::processPluginEntryPointForOldSdk(
 
     pluginInfo->mainInterface = MainInterface::nxpl_PluginInterface;
 
-    if (const auto plugin1 = queryInterfacePtr<nxpl::Plugin>(plugin, nxpl::IID_Plugin))
+    if (const auto plugin1 = queryInterfaceOfOldSdk<nxpl::Plugin>(plugin, nxpl::IID_Plugin))
     {
         pluginInfo->mainInterface = MainInterface::nxpl_Plugin;
 
@@ -398,7 +398,7 @@ bool PluginManager::processPluginEntryPointForOldSdk(
             plugin1->setSettings(settingsHolder.array(), settingsHolder.size());
     }
 
-    if (const auto plugin2 = queryInterfacePtr<nxpl::Plugin2>(plugin, nxpl::IID_Plugin2))
+    if (const auto plugin2 = queryInterfaceOfOldSdk<nxpl::Plugin2>(plugin, nxpl::IID_Plugin2))
     {
         pluginInfo->mainInterface = MainInterface::nxpl_Plugin2;
 

@@ -27,23 +27,15 @@ namespace sdk {
 template<class DerivedInterface, class BaseInterface = IRefCountable>
 class Interface: public BaseInterface
 {
-private:
-    static_assert(std::is_base_of<IRefCountable, BaseInterface>::value,
-        "Template parameter BaseInterface should be derived from IRefCountable");
-
-    // Statically assure that DerivedInterface is inherited from this class.
-    Interface() = default;
-    friend DerivedInterface;
-
 public:
-    using IRefCountable::queryInterface; //< Enable const overload.
+    using IRefCountable::queryInterface; //< Needed to enable overloaded template versions.
 
+protected:
     virtual IRefCountable* queryInterface(InterfaceId id) override
     {
         return doQueryInterface(id);
     }
 
-protected:
     /** Call from DerivedInterface::queryInterface() to support interface id from the old SDK. */
     IRefCountable* queryInterfaceSupportingDeprecatedId(
         InterfaceId id,
@@ -59,6 +51,13 @@ protected:
     }
 
 private:
+    static_assert(std::is_base_of<IRefCountable, BaseInterface>::value,
+        "Template parameter BaseInterface should be derived from IRefCountable");
+
+    // Statically assure that DerivedInterface is inherited from this class.
+    Interface() = default;
+    friend DerivedInterface;
+
     IRefCountable* doQueryInterface(InterfaceId id)
     {
         if (id == DerivedInterface::interfaceId())

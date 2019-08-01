@@ -373,7 +373,7 @@ nx::sdk::Ptr<IUncompressedVideoFrame> createUncompressedVideoFrame(
     if (!dataPacket)
         return nullptr;
 
-    return nx::sdk::queryInterfacePtr<IUncompressedVideoFrame>(dataPacket);
+    return dataPacket->queryInterface<IUncompressedVideoFrame>();
 }
 
 std::map<QString, QString> attributesMap(

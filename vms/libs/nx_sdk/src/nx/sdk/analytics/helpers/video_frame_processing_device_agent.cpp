@@ -94,12 +94,12 @@ Result<void> VideoFrameProcessingDeviceAgent::pushDataPacket(IDataPacket* dataPa
             + nx::kit::utils::toString(dataPacket->timestampUs()) + "; discarding the packet.");
     }
 
-    if (const auto compressedFrame = queryInterfacePtr<ICompressedVideoPacket>(dataPacket))
+    if (const auto compressedFrame = dataPacket->queryInterface<ICompressedVideoPacket>())
     {
         if (!pushCompressedVideoFrame(compressedFrame.get()))
             return logError(ErrorCode::otherError, "pushCompressedVideoFrame() failed.");
     }
-    else if (const auto uncompressedFrame = queryInterfacePtr<IUncompressedVideoFrame>(dataPacket))
+    else if (const auto uncompressedFrame = dataPacket->queryInterface<IUncompressedVideoFrame>())
     {
         if (!pushUncompressedVideoFrame(uncompressedFrame.get()))
             return logError(ErrorCode::otherError, "pushUncompressedVideoFrame() failed.");
@@ -228,15 +228,15 @@ void VideoFrameProcessingDeviceAgent::logMetadataPacketIfNeeded(
     const IMetadataPacket* metadataPacket,
     const std::string& packetIndexName) const
 {
-    if (!NX_DEBUG_ENABLE_OUTPUT)
+    if (!NX_DEBUG_ENABLE_OUTPUT || !NX_KIT_ASSERT(metadataPacket))
         return;
 
     std::string packetName;
-    if (queryInterfacePtr<const IObjectMetadataPacket>(metadataPacket))
+    if (metadataPacket->queryInterface<const IObjectMetadataPacket>())
     {
         packetName = "Object";
     }
-    else if (queryInterfacePtr<const IEventMetadataPacket>(metadataPacket))
+    else if (metadataPacket->queryInterface<const IEventMetadataPacket>())
     {
         packetName = "Event";
     }
@@ -248,8 +248,8 @@ void VideoFrameProcessingDeviceAgent::logMetadataPacketIfNeeded(
     }
     packetName += " metadata packet" + packetIndexName;
 
-    auto compoundMetadataPacket = queryInterfacePtr<const ICompoundMetadataPacket>(metadataPacket);
-    if (compoundMetadataPacket)
+    if (const auto compoundMetadataPacket =
+        metadataPacket->queryInterface<const ICompoundMetadataPacket>())
     {
         if (compoundMetadataPacket->count() == 0)
         {

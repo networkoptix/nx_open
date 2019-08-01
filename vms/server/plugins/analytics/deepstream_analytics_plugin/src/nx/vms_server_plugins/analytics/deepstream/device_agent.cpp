@@ -88,7 +88,7 @@ Result<void> DeviceAgent::pushDataPacket(IDataPacket* dataPacket)
 {
 // TODO: Investigate why this code is commented out.
 #if 0
-    if (!queryInterfacePtr<ICompressedVideoPacket>(dataPacket))
+    if (!dataPacket || !dataPacket->queryInterface<ICompressedVideoPacket>())
         return Error::noError;
 
     NX_OUTPUT << __func__ << " Frame timestamp is: " << dataPacket->timestampUs();
