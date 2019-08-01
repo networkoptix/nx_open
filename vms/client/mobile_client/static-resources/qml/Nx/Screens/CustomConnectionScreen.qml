@@ -192,13 +192,12 @@ Page
     {
         d.connecting = false
 
-        if (result === QnConnectionManager.UnauthorizedConnectionResult)
+        var lockedOut = result == QnConnectionManager.UserTemporaryLockedOut
+        if (lockedOut || result === QnConnectionManager.UnauthorizedConnectionResult)
         {
-            credentialsEditor.loginErrorText = ""
-            credentialsEditor.passwordErrorText =
-                LoginUtils.connectionErrorText(QnConnectionManager.UnauthorizedConnectionResult)
-            credentialsEditor.displayLoginError = true
-            credentialsEditor.displayPasswordError = true
+            credentialsEditor.passwordErrorText = LoginUtils.connectionErrorText(result)
+            credentialsEditor.displayLoginError = !lockedOut
+            credentialsEditor.displayPasswordError = !lockedOut
         }
         else
         {
@@ -215,6 +214,9 @@ Page
         credentialsEditor.displayLoginError = false
         credentialsEditor.displayPasswordError = false
         credentialsEditor.displayAddressError = false
+        credentialsEditor.addressErrorText = ""
+        credentialsEditor.loginErrorText = ""
+        credentialsEditor.passwordErrorText = ""
     }
 
     function focusHostField()
