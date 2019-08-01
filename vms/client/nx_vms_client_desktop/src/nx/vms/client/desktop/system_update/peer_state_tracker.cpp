@@ -30,7 +30,6 @@ namespace nx::vms::client::desktop {
 
 PeerStateTracker::PeerStateTracker(QObject* parent):
     base_type(parent),
-    QnWorkbenchContextAware(parent),
     m_dataLock(QnMutex::Recursive)
 {
     if (ini().massSystemUpdateWaitForServerOnlineSecOverride)
@@ -44,11 +43,13 @@ PeerStateTracker::PeerStateTracker(QObject* parent):
     }
 }
 
-bool PeerStateTracker::setResourceFeed(QnResourcePool* pool)
+bool PeerStateTracker::setResourceFeed(QnResourcePool* pool,
+    std::function<bool (const QnMediaServerResourcePtr&)> filter)
 {
     QObject::disconnect(m_onAddedResource);
     QObject::disconnect(m_onRemovedResource);
 
+    m_resourcePool = nullptr;
     auto itemsCache = m_items;
     /// Reversing item list just to make sure we remove rows from the table from last to first.
     for (auto it = m_items.rbegin(); it != m_items.rend(); ++it)
@@ -70,16 +71,12 @@ bool PeerStateTracker::setResourceFeed(QnResourcePool* pool)
         return false;
     }
 
-    auto systemId = helpers::currentSystemLocalId(commonModule());
-    if (systemId.isNull())
-    {
-        NX_DEBUG(this, "setResourceFeed() got null system id");
-        return false;
-    }
+    m_resourcePool = pool;
+    m_serverFilter = filter;
 
-    NX_DEBUG(this, "setResourceFeed() attaching to resource pool. Current systemId=%1", systemId);
+    NX_DEBUG(this, "setResourceFeed() attaching to resource pool.");
 
-    addItemForClient();
+    addItemForClient(pool->commonModule());
 
     const auto allServers = pool->getAllServers(Qn::AnyStatus);
     for (const QnMediaServerResourcePtr& server: allServers)
@@ -121,11 +118,11 @@ int PeerStateTracker::peersCount() const
 
 QnMediaServerResourcePtr PeerStateTracker::getServer(const UpdateItemPtr& item) const
 {
-    if (!item)
+    if (!item || !m_resourcePool)
         return QnMediaServerResourcePtr();
-    QnMediaServerResourcePtr result = resourcePool()->getResourceById<QnMediaServerResource>(item->id);
+    QnMediaServerResourcePtr result = m_resourcePool->getResourceById<QnMediaServerResource>(item->id);
     if (!result && item->incompatible)
-        return resourcePool()->getIncompatibleServerById(item->id);
+        return m_resourcePool->getIncompatibleServerById(item->id);
     return result;
 }
 
@@ -134,12 +131,13 @@ QnMediaServerResourcePtr PeerStateTracker::getServer(QnUuid id) const
     return getServer(findItemById(id));
 }
 
-QnUuid PeerStateTracker::getClientPeerId() const
+QnUuid PeerStateTracker::getClientPeerId(QnCommonModule* commonModule) const
 {
     // This ID is much more easy to distinguish.
     if (ini().massSystemUpdateDebugInfo)
         return QnUuid("cccccccc-cccc-cccc-cccc-cccccccccccc");
-    return commonModule()->globalSettings()->localSystemId();
+    NX_ASSERT(commonModule);
+    return commonModule->globalSettings()->localSystemId();
 }
 
 nx::utils::SoftwareVersion PeerStateTracker::lowestInstalledVersion()
@@ -1086,13 +1084,8 @@ void PeerStateTracker::atResourceAdded(const QnResourcePtr& resource)
     if (!server)
         return;
 
-    if (!helpers::serverBelongsToCurrentSystem(server))
-    {
-        //auto systemId = helpers::currentSystemLocalId(commonModule());
-        //NX_VERBOSE(this, "atResourceAdded(%1) server does not belong to the system %2",
-        //     server->getName(), systemId);
+    if (m_serverFilter && !m_serverFilter(server))
         return;
-    }
 
     //NX_VERBOSE(this, "atResourceAdded(%1)", resource->getName());
     const auto status = server->getStatus();
@@ -1267,11 +1260,11 @@ UpdateItemPtr PeerStateTracker::addItemForServer(QnMediaServerResourcePtr server
     return item;
 }
 
-UpdateItemPtr PeerStateTracker::addItemForClient()
+UpdateItemPtr PeerStateTracker::addItemForClient(QnCommonModule* commonModule)
 {
     UpdateItemPtr item = std::make_shared<UpdateItem>();
 
-    item->id = getClientPeerId();
+    item->id = getClientPeerId(commonModule);
     item->component = UpdateItem::Component::client;
     item->row = m_items.size();
     item->protocol = nx::vms::api::protocolVersion();

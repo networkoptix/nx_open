@@ -39,6 +39,7 @@
 #include <ui/widgets/views/resource_list_view.h>
 #include <ui/models/resource/resource_list_model.h>
 
+#include <network/system_helpers.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/dialogs/eula_dialog.h>
 #include <nx/vms/client/desktop/workbench/extensions/workbench_progress_manager.h>
@@ -123,6 +124,11 @@ QTableView* injectResourceList(
     return resourceList;
 }
 
+auto kMediaServerFilter = [](const QnMediaServerResourcePtr& server) -> bool
+    {
+        return helpers::serverBelongsToCurrentSystem(server);
+    };
+
 } // anonymous namespace
 
 namespace nx::vms::client::desktop
@@ -155,7 +161,7 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
 
     m_updatesModel = m_serverUpdateTool->getModel();
     m_stateTracker = m_serverUpdateTool->getStateTracker();
-    m_stateTracker->setResourceFeed(resourcePool());
+    m_stateTracker->setResourceFeed(resourcePool(), kMediaServerFilter);
 
     QFont versionLabelFont;
     versionLabelFont.setPixelSize(kVersionLabelFontSizePixels);
@@ -322,9 +328,15 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
     connect(qnGlobalSettings, &QnGlobalSettings::localSystemIdChanged, this,
         [this]()
         {
-            NX_DEBUG(this, "detected change in localSystemId. Need to refresh server list");
-
-            if (m_stateTracker && m_stateTracker->setResourceFeed(resourcePool()))
+            auto systemId = helpers::currentSystemLocalId(resourcePool()->commonModule());
+            NX_DEBUG(this, "localSystemId is changed to %1. Need to refresh server list", systemId);
+            if (systemId.isNull())
+            {
+                NX_DEBUG(this, "localSystemIdChanged() we have disconnected. Detaching resource pool");
+                m_stateTracker->setResourceFeed(nullptr);
+                return;
+            }
+            else if (m_stateTracker && m_stateTracker->setResourceFeed(resourcePool(), kMediaServerFilter))
             {
                 // We will be here when we connected to another system.
                 // We should run update check again. This should fix VMS-13037.
@@ -700,7 +712,7 @@ bool MultiServerUpdatesWidget::checkSpaceRequirements(
 {
     bool checkClient = m_clientUpdateTool->shouldInstallThis(contents);
     auto spaceForManualPackages = contents.getClientSpaceRequirements(checkClient);
-    if (spaceForManualPackages > 0 )
+    if (spaceForManualPackages > 0)
     {
         auto downloadDir = m_serverUpdateTool->getDownloadDir();
         auto spaceAvailable = m_serverUpdateTool->getAvailableSpace();
@@ -726,7 +738,7 @@ void MultiServerUpdatesWidget::setUpdateTarget(
             contents.missingUpdate, tr("No update package available"));
     }
 
-    auto clientId = m_stateTracker->getClientPeerId();
+    auto clientId = clientPeerId();
     auto report = calculateUpdateVersionReport(m_updateInfo, clientId);
     m_updateReport = report;
 
@@ -746,6 +758,11 @@ void MultiServerUpdatesWidget::setUpdateTarget(
     m_updateRemoteStateChanged = true;
     // TODO: We should collect all these changes to a separate state-structure.
     // TODO: We should split state flags more consistenly.
+}
+
+QnUuid MultiServerUpdatesWidget::clientPeerId() const
+{
+    return m_stateTracker->getClientPeerId(commonModule());
 }
 
 void MultiServerUpdatesWidget::atUpdateCurrentState()
@@ -1050,7 +1067,7 @@ void MultiServerUpdatesWidget::atStartUpdateAction()
         if (m_clientUpdateTool->isVersionInstalled(m_updateInfo.getVersion())
             || !m_updateInfo.needClientUpdate)
         {
-            targets.remove(m_stateTracker->getClientPeerId());
+            targets.remove(clientPeerId());
         }
 
         m_stateTracker->setUpdateTarget(m_updateInfo.getVersion());
@@ -1246,7 +1263,7 @@ void MultiServerUpdatesWidget::atStartInstallComplete(bool success, const QStrin
             QSet<QnUuid> servers = m_stateTracker->peersIssued();
             if (messageBox->exec() == QDialogButtonBox::Retry)
             {
-                servers.remove(m_stateTracker->getClientPeerId());
+                servers.remove(clientPeerId());
                 m_serverUpdateTool->requestInstallAction(servers);
             }
             else
@@ -1605,7 +1622,7 @@ void MultiServerUpdatesWidget::processInitialCheckState()
                 peersAreInstalling);
 
             if (hasClientUpdate)
-                peersAreInstalling.insert(m_stateTracker->getClientPeerId());
+                peersAreInstalling.insert(clientPeerId());
             setTargetState(WidgetUpdateState::installing, peersAreInstalling + serversHaveInstalled, false);
         }
         else if (!serversAreDownloading.empty() || !serversWithDownloadingError.empty())
@@ -1814,7 +1831,7 @@ void MultiServerUpdatesWidget::processInstallingState()
             if (m_clientUpdateTool->shouldRestartTo(m_updateInfo.getVersion()))
             {
                 QString appName = QnClientAppInfo::applicationDisplayName();
-                if (peersFailed.contains(m_stateTracker->getClientPeerId()))
+                if (peersFailed.contains(clientPeerId()))
                 {
                     informativeText += tr(
                         "Please update %1 manually using an installation package.").arg(appName);
@@ -1866,7 +1883,7 @@ void MultiServerUpdatesWidget::processInstallingState()
     }
     if (!readyToInstall.empty())
     {
-        auto clientId = m_stateTracker->getClientPeerId();
+        auto clientId = clientPeerId();
         if (readyToInstall.contains(clientId))
             m_clientUpdateTool->installUpdateAsync();
         // We should not do anything with servers in this state.
@@ -1999,7 +2016,7 @@ void MultiServerUpdatesWidget::setTargetState(
                 if (runCommands && !targets.empty())
                 {
                     QSet<QnUuid> servers = targets;
-                    servers.remove(m_stateTracker->getClientPeerId());
+                    servers.remove(clientPeerId());
                     m_serverUpdateTool->requestInstallAction(servers);
                 }
                 // The rest will be done in a handler for WidgetUpdateState::installing.
@@ -2009,7 +2026,7 @@ void MultiServerUpdatesWidget::setTargetState(
                 if (runCommands && !targets.empty())
                 {
                     QSet<QnUuid> servers = targets;
-                    servers.remove(m_stateTracker->getClientPeerId());
+                    servers.remove(clientPeerId());
                     if (!servers.empty())
                         qnClientMessageProcessor->setHoldConnection(true);
                 }

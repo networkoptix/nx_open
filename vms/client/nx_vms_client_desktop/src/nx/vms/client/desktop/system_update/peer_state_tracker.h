@@ -1,5 +1,6 @@
 #pragma once
 
+#include <map>
 #include <memory>
 #include <chrono>
 
@@ -89,8 +90,7 @@ using UpdateItemPtr = std::shared_ptr<UpdateItem>;
  * ServerUpdateTool passes mediaserver responses here.
  */
 class PeerStateTracker:
-    public Connective<QObject>,
-    public QnWorkbenchContextAware
+    public Connective<QObject>
 {
     Q_OBJECT
     using base_type = Connective<QObject>;
@@ -101,9 +101,11 @@ public:
     /**
      * Attaches state tracker to a resource pool. All previous attachments are discarded.
      * @param pool Pointer to the resource pool.
+     * @param filter Filter for mediaservers
      * @return False if got empty resource pool or systemId.
      */
-    bool setResourceFeed(QnResourcePool* pool);
+    bool setResourceFeed(QnResourcePool* pool,
+        std::function<bool (const QnMediaServerResourcePtr&)> filter = {});
 
     UpdateItemPtr findItemById(QnUuid id) const;
     UpdateItemPtr findItemByRow(int row) const;
@@ -121,7 +123,7 @@ public:
      */
     QnMediaServerResourcePtr getServer(QnUuid id) const;
 
-    QnUuid getClientPeerId() const;
+    QnUuid getClientPeerId(QnCommonModule* commonModule) const;
 
     nx::utils::SoftwareVersion lowestInstalledVersion();
     void setUpdateTarget(const nx::utils::SoftwareVersion& version);
@@ -264,7 +266,7 @@ protected:
 
 protected:
     UpdateItemPtr addItemForServer(QnMediaServerResourcePtr server);
-    UpdateItemPtr addItemForClient();
+    UpdateItemPtr addItemForClient(QnCommonModule* commonModule);
     /** Reads data from resource to UpdateItem. */
     bool updateServerData(QnMediaServerResourcePtr server, UpdateItemPtr item);
     bool updateClientData();
@@ -299,6 +301,10 @@ private:
      * this time expires.
      */
     UpdateItem::Clock::duration m_timeForServerToReturn;
+
+    QPointer<QnResourcePool> m_resourcePool;
+
+    std::function<bool (const QnMediaServerResourcePtr&)> m_serverFilter;
 };
 
 } // namespace nx::vms::client::desktop

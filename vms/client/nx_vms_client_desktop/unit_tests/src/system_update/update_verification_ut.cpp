@@ -1,21 +1,9 @@
-#include <gtest/gtest.h>
-
 #include <common/common_module.h>
 #include <common/static_common_module.h>
 
-#include <client/client_runtime_settings.h>
-#include <client/client_startup_parameters.h>
-#include <client_core/client_core_module.h>
-
-#include <core/resource_management/resource_pool.h>
-#include <core/resource_management/resource_runtime_data.h>
-#include <core/resource/media_server_resource.h>
-
-#include <ui/workbench/workbench_access_controller.h>
-#include <ui/workbench/workbench_context.h>
-
-#include "nx/vms/client/desktop/system_update/update_verification.h"
 #include "nx/vms/client/desktop/system_update/multi_server_updates_widget.h"
+
+#include "client_update_test_environment.h"
 
 namespace {
 
@@ -77,88 +65,13 @@ const QString packagesForSystemSupportTest = R"(
     ]
 })";
 
-namespace os
-{
-    const nx::utils::OsInfo ubuntu("linux_x64", "ubuntu");
-    const nx::utils::OsInfo ubuntu14("linux_x64", "ubuntu", "14.04");
-    const nx::utils::OsInfo ubuntu16("linux_x64", "ubuntu", "16.04");
-    const nx::utils::OsInfo ubuntu18("linux_x64", "ubuntu", "18.04");
-    const nx::utils::OsInfo windows("windows_x64");
-};
-
 } // namespace
+
 
 namespace nx::vms::client::desktop {
 
-class UpdateVerificationTest: public testing::Test
+class UpdateVerificationTest: public ClientUpdateTestEnvironment
 {
-public:
-    // virtual void SetUp() will be called before each test is run.
-    virtual void SetUp()
-    {
-        m_runtime.reset(new QnClientRuntimeSettings(QnStartupParameters()));
-        m_staticCommon.reset(new QnStaticCommonModule());
-        m_module.reset(new QnClientCoreModule());
-        m_resourceRuntime.reset(new QnResourceRuntimeDataManager(m_module->commonModule()));
-        m_accessController.reset(new QnWorkbenchAccessController(m_module->commonModule()));
-    }
-
-    // virtual void TearDown() will be called after each test is run.
-    virtual void TearDown()
-    {
-        m_currentUser.clear();
-        m_accessController.clear();
-        m_resourceRuntime.clear();
-        m_module.clear();
-        m_staticCommon.reset();
-        m_runtime.clear();
-    }
-
-    ClientVerificationData makeClientData(nx::utils::SoftwareVersion version)
-    {
-        ClientVerificationData data;
-        data.osInfo = os::windows;
-        data.currentVersion = version;
-        data.clientId = QnUuid("cccccccc-cccc-cccc-cccc-cccccccccccc");
-        return data;
-    }
-
-    QnMediaServerResourcePtr makeServer(nx::utils::SoftwareVersion version, bool online = true)
-    {
-        QnMediaServerResourcePtr server(new QnMediaServerResource(commonModule()));
-        server->setVersion(version);
-        server->setIdUnsafe(QnUuid::createUuid());
-        server->setOsInfo(os::windows);
-        server->setStatus(online ? Qn::ResourceStatus::Online : Qn::ResourceStatus::Offline);
-
-        resourcePool()->addResource(server);
-        return server;
-    }
-
-    std::map<QnUuid, QnMediaServerResourcePtr> getAllServers()
-    {
-        std::map<QnUuid, QnMediaServerResourcePtr> result;
-        for (auto server: resourcePool()->getAllServers(Qn::ResourceStatus::AnyStatus))
-            result[server->getId()] = server;
-        return result;
-    }
-
-    void removeAllServers()
-    {
-        auto servers = resourcePool()->getAllServers(Qn::ResourceStatus::AnyStatus);
-        resourcePool()->removeResources(servers);
-    }
-
-    QnCommonModule* commonModule() const { return m_module->commonModule(); }
-    QnResourcePool* resourcePool() const { return commonModule()->resourcePool(); }
-
-    // Declares the variables your tests want to use.
-    QScopedPointer<QnStaticCommonModule> m_staticCommon;
-    QSharedPointer<QnClientCoreModule> m_module;
-    QSharedPointer<QnWorkbenchAccessController> m_accessController;
-    QSharedPointer<QnClientRuntimeSettings> m_runtime;
-    QSharedPointer<QnResourceRuntimeDataManager> m_resourceRuntime;
-    QnUserResourcePtr m_currentUser;
 };
 
 TEST_F(UpdateVerificationTest, testAlreadyInstalled)
@@ -189,7 +102,7 @@ TEST_F(UpdateVerificationTest, testAlreadyInstalled)
     {
         const auto report = MultiServerUpdatesWidget::calculateUpdateVersionReport(
             contents, clientData.clientId);
-        EXPECT_TRUE(report.hasLatestVersion);
+        EXPECT_FALSE(report.hasLatestVersion);
     }
     contents.resetVerification();
     removeAllServers();
@@ -229,7 +142,7 @@ TEST_F(UpdateVerificationTest, testAlreadyInstalled)
     removeAllServers();
 }
 
-TEST_F(UpdateVerificationTest, testForkedVersion)
+TEST_F(ClientUpdateTestEnvironment, testForkedVersion)
 {
     /**
      * According to VMS-7768, verification should ignore servers newer than target update version
