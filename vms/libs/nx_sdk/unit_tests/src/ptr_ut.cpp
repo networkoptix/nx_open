@@ -207,55 +207,6 @@ TEST(Ptr, releasePtrAndReset)
     ASSERT_EQ(nullptr, data2.get());
 }
 
-TEST(Ptr, rawPtrBasic)
-{
-    Data* const data = new Data(42);
-    Data::s_destructorCalled = false;
-    {
-        const RawPtr<IData> raw{data};
-        ASSERT_EQ(1, data->refCount()); //< RawPtr constructors do not call addRef().
-        ASSERT_EQ(42, raw->number()); //< operator->()
-        ASSERT_EQ(42, (*raw).number()); //< operator*()
-        ASSERT_EQ(data, raw.get()); //< get()
-    }
-    ASSERT_FALSE(Data::s_destructorCalled);
-    ASSERT_EQ(1, data->refCount());
-    delete data;
-}
-
-TEST(Ptr, rawPtrComparison)
-{
-    Data* const data = new Data(42);
-
-    const RawPtr<IData> raw{data};
-    ASSERT_TRUE(data == raw);
-    ASSERT_TRUE(raw == data);
-    ASSERT_FALSE(data != raw);
-    ASSERT_FALSE(raw != data);
-    ASSERT_TRUE(nullptr != raw);
-    ASSERT_TRUE(raw != nullptr);
-    ASSERT_FALSE(nullptr == raw);
-    ASSERT_FALSE(raw == nullptr);
-
-    delete data;
-}
-
-TEST(Ptr, rawPtrConversion)
-{
-    Data* const data = new Data(42);
-    Data::s_destructorCalled = false;
-    {
-        const RawPtr<IData> raw{data};
-        const Ptr<IData> ptr{raw}; //< operator Ptr<>()
-        ASSERT_EQ(2, data->refCount()); //< operator Ptr<>() calls addRef().
-        ASSERT_EQ(data, raw.get());
-    }
-    ASSERT_FALSE(Data::s_destructorCalled);
-    ASSERT_EQ(1, data->refCount()); //< Prt<> destructor called releaseRef().
-    data->releaseRef();
-    ASSERT_TRUE(Data::s_destructorCalled);
-}
-
 } // namespace test
 } // namespace sdk
 } // namespace nx
