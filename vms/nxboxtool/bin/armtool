@@ -1,0 +1,62 @@
+#!/usr/bin/python3 -b
+
+import platform
+import signal
+import sys
+
+# This block ensures that ^C interrupts are handled quietly.
+try:
+    def exithandler(signum, _frame):
+        signal.signal(signal.SIGINT, signal.SIG_IGN)
+        signal.signal(signal.SIGTERM, signal.SIG_IGN)
+        sys.exit(128 + signum)
+
+    signal.signal(signal.SIGINT, exithandler)
+    signal.signal(signal.SIGTERM, exithandler)
+    # Prevent "[Errno 32] Broken pipe" exceptions when
+    # writing to a pipe.
+    signal.signal(signal.SIGPIPE, signal.SIG_DFL)
+
+except KeyboardInterrupt:
+    sys.exit(128 + signal.SIGINT)
+
+def debug_signal(_signum, _frame):
+    import pdb
+    pdb.set_trace()
+
+if platform.python_implementation() == 'Jython':
+    debug_signum = signal.SIGUSR2 # bug #424259
+else:
+    debug_signum = signal.SIGUSR1
+
+signal.signal(debug_signum, debug_signal)
+
+from os import path as osp
+
+project_root = osp.dirname(osp.dirname(osp.realpath(__file__)))
+if osp.isfile(osp.join(project_root, ".not_installed")):
+    sys.path.insert(0, osp.join(project_root, "lib"))
+
+from armtool.server_connection import ServerConnection
+
+server = ServerConnection(
+    ip='10.0.3.135',
+    port=22,
+    login='mpodstrechny',
+    password='qweasd234'
+)
+
+stdout, stderr = '', ''
+res = server.sh('cat /proc/cpuinfo', stdout=stdout, stderr=stderr)
+
+if not res:
+    print(f'Failed to execute command on Server: {res.message}', file=sys.stderr)
+    exit(1)
+
+print(
+    f"Command successfuly executed, return code={res.return_code}\n" +
+    "stdout:\n" +
+    stdout +
+    "stderr:\n" +
+    stderr
+)

@@ -100,10 +100,11 @@ def determine_package_versions(
     if "festival-vox" not in v:
         v["festival-vox"] = v["festival"]
 
-    if platform == "windows" and debug:
+    if platform == "windows":
         v["ffmpeg"] = "3.1.9-3"
-        for package in ("qt", "festival", "openal", "openssl", "sigar", "icu"):
-            v[package] += "-debug"
+        if debug:
+            for package in ("qt", "festival", "openal", "openssl", "sigar", "icu"):
+                v[package] += "-debug"
 
     return v
 
