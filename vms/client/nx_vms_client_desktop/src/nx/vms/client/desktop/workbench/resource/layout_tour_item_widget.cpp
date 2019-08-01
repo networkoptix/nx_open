@@ -34,7 +34,6 @@
 
 #include <utils/common/event_processors.h>
 
-#include <nx/utils/pending_operation.h>
 #include <nx/utils/string.h>
 
 namespace nx::vms::client::desktop {
@@ -258,20 +257,17 @@ void LayoutTourItemWidget::initOverlay()
     const auto delayMs = item()->data(Qn::LayoutTourItemDelayMsRole).toInt();
     delayEdit->setValue(delayMs / 1000);
 
-    auto saveChanges = new nx::utils::PendingOperation(
-        [this] { menu()->trigger(action::SaveCurrentLayoutTourAction); },
-        kSaveInteval,
-        this);
-
     connect(delayEdit, QnSpinboxIntValueChanged, this,
-        [this, saveChanges](int value)
+        [this](int value)
         {
             if (m_updating)
                 return;
 
             QScopedValueRollback<bool> guard(m_updating, true);
             item()->setData(Qn::LayoutTourItemDelayMsRole, value * 1000);
-            saveChanges->requestOperation();
+
+            // Store visual data to the tour and then add it to the save queue.
+            menu()->trigger(action::SaveCurrentLayoutTourAction);
         });
 
     connect(qnResourceRuntimeDataManager, &QnResourceRuntimeDataManager::layoutItemDataChanged,
