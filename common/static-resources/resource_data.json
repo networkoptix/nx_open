@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0.1.91",
+    "version": "1.0.1.93",
     "data": [
         {
             "keys": [
@@ -866,7 +866,38 @@
                 "dhi-nvr52a16-*|private",
                 "ds-6716huhi*|bldg c hik-encoder",
                 "ds-7216hqhi*|embedded net dvr",
-                "dahua|dh-xvr*"
+                "dahua|dh-xvr*",
+                "onvif|ltn8716k-ht",
+                "hisi|vi-m-4-1000",
+                "onvif|ds-7204hqhi-f1%2fn",
+                "dahua|dhi-nvr5832-16p-4ks2",
+                "dh-nvr4232-4k|private",
+                "har324-16|embedded net dvr",
+                "dh-nvr4216-8p-4k|private",
+                "dhi-nvr52a16-16p-4ks2|private",
+                "ds-6716huhi-k|bldg c hik-encoder",
+                "ds-7216hqhi-f2/n|embedded net dvr",
+                "ds-7716ni-i4/16p|network video recorder",
+                "2d|eli-sip-eb21-4r",
+                "dahua|ipc-hdbw13a0e",
+                "hangzhou hikvision digital technology co., ltd|ds-7616ni-i2",
+                "zkd408a|embedded net dvr",
+                "zkd608a|embedded net dvr",
+                "mam-6me1012mta|encoder2",
+                "mam-6me1012mta|encoder4",
+                "ds-7332hghi-sh|embedded_net_dvr",
+                "hik/ds-7116hgh-f1/n/-af-dvr--a/16-1|embedded net xvr",
+                "ev1016turbox|embedded net dvr",
+                "crt1200en|crt1200en-demo",
+                "dvr16-4500|16ch digital video recorder",
+                "ds-7216hui-k2|it rm 16cam dvr",
+                "ds-7108hghi-f1|embedded net dvr",
+                "dahua|x52a3a",
+                "general|dh-xvr5108hs-x",
+                "dahua|dh-xvr4108hs-x",
+                "ds-7204hghi-f1/n|embedded net dvr",
+                "zkd408b|embedded net dvr",
+                "dahua|dhi-nvr4416-16p-4ks2"
             ],
             "analogEncoder": true
         },
@@ -3092,7 +3123,8 @@
             "flir|FLIR DH-390*",
             "DH-390*|FLIR DH-390*",
             "flir|DH-390*",
-            "ONVIF|SHS-2215IZ*"
+            "ONVIF|SHS-2215IZ*",
+            "dahua|ipc-pdb4830-b360"
             ],
             "canShareLicenseGroup": true
         },
