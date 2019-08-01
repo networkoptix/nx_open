@@ -7,6 +7,7 @@
 #include <core/resource/resource_fwd.h>
 #include <core/resource_management/resource_pool.h>
 #include <ui/customization/customized.h>
+#include <client/client_globals.h>
 
 class CameraThumbnailManager;
 class QnResourcePool;
@@ -52,6 +53,7 @@ public:
 private:
     void at_updateThumbnailStatus(Qn::ThumbnailStatus status);
     void at_updateThumbnailImage(const QImage& image);
+
 private:
     QnLayoutResourcePtr m_layout;
 

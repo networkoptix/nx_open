@@ -22,6 +22,7 @@ import { NxRibbonComponent }         from './ribbon/ribbon.component';
 import { NxRibbonService }           from './ribbon/ribbon.service';
 import { NxVendorListComponent }     from './vendor-list/vendor-list.component';
 import { NxSearchComponent }         from './search/search.component';
+import { NxFooterComponent }         from './footer/footer.component';
 import { NxGenericDropdown }         from './dropdowns/generic/dropdown.component';
 import { NxLanguageDropdown }        from './dropdowns/language/language.component';
 import { NxAccountSettingsDropdown } from './dropdowns/account-settings/account-settings.component';
@@ -29,6 +30,7 @@ import { NxActiveSystemDropdown }    from './dropdowns/active-system/active-syst
 import { NxSystemsDropdown }         from './dropdowns/systems/systems.component';
 import { NxPermissionsDropdown }     from './dropdowns/permissions/permissions.component';
 import { NxMultiSelectDropdown }     from './dropdowns/multi-select/multi-select.component';
+import { NxLandingDisplayComponent } from './landing-display/landing-display.component';
 
 @NgModule({
     imports        : [
@@ -61,6 +63,8 @@ import { NxMultiSelectDropdown }     from './dropdowns/multi-select/multi-select
         NxRibbonComponent,
         NxVendorListComponent,
         NxSearchComponent,
+        NxFooterComponent,
+        NxLandingDisplayComponent,
     ],
     entryComponents: [
         NxGenericDropdown,
@@ -84,6 +88,8 @@ import { NxMultiSelectDropdown }     from './dropdowns/multi-select/multi-select
         NxRibbonComponent,
         NxVendorListComponent,
         NxSearchComponent,
+        NxFooterComponent,
+        NxLandingDisplayComponent,
     ],
     providers      : [
         NxProcessButtonComponent,
@@ -99,6 +105,8 @@ import { NxMultiSelectDropdown }     from './dropdowns/multi-select/multi-select
         NxRibbonComponent,
         NxVendorListComponent,
         NxSearchComponent,
+        NxFooterComponent,
+        NxLandingDisplayComponent,
 
         NxRibbonService,
     ],
@@ -124,6 +132,8 @@ import { NxMultiSelectDropdown }     from './dropdowns/multi-select/multi-select
         NxRibbonComponent,
         NxVendorListComponent,
         NxSearchComponent,
+        NxFooterComponent,
+        NxLandingDisplayComponent,
         MenuModule,
     ]
 })
@@ -142,7 +152,9 @@ angular
         .directive('nxPermissions', downgradeComponent({ component: NxPermissionsDropdown }) as angular.IDirectiveFactory)
         .directive('nxProcessButton', downgradeComponent({ component: NxProcessButtonComponent }) as angular.IDirectiveFactory)
         .directive('nxPreLoader', downgradeComponent({ component: NxPreLoaderComponent }) as angular.IDirectiveFactory)
-        .directive('nxRibbon', downgradeComponent({ component: NxRibbonComponent }) as angular.IDirectiveFactory);
+        .directive('nxRibbon', downgradeComponent({ component: NxRibbonComponent }) as angular.IDirectiveFactory)
+        .directive('nxFooter', downgradeComponent({component: NxFooterComponent}) as angular.IDirectiveFactory)
+        .directive('nxLandingDisplay', downgradeComponent({component: NxLandingDisplayComponent}) as angular.IDirectiveFactory);
 
 angular
         .module('cloudApp.services')

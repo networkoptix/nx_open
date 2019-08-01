@@ -25,6 +25,8 @@
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonDocument>
 #include <QtCore/QSettings>
+#include <QtCore/QFile>
+#include <QtCore/QDateTime>
 
 #include <QtGui/QDesktopServices>
 #include <QtGui/QWindow>
@@ -34,11 +36,10 @@
 #include <QtNetwork/QNetworkRequest>
 #include <QtNetwork/QNetworkReply>
 
-#include <QtOpenGL/QGLWidget>
-
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QDesktopWidget>
+#include <QtWidgets/QOpenGLWidget>
 
 #include <QtSingleApplication>
 
@@ -67,6 +68,8 @@
 #include <nx/utils/crash_dump/systemexcept.h>
 
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/ui/dialogs/eula_dialog.h>
+#include <nx/vms/client/desktop/director/director.h>
 #include <ui/help/help_handler.h>
 #include <ui/widgets/main_window.h>
 #include <ui/workbench/workbench_context.h>
@@ -78,7 +81,7 @@
 
 #include <ui/workaround/combobox_wheel_filter.h>
 
-#include <nx_speech_synthesizer/text_to_wav.h>
+#include <nx/speech_synthesizer/text_to_wave_server.h>
 #include <nx/utils/file_system.h>
 
 #include <utils/common/app_info.h>
@@ -88,6 +91,12 @@
 #include <plugins/io_device/joystick/joystick_manager.h>
 
 #include <nx/utils/app_info.h>
+
+#if defined(Q_OS_WIN)
+    #include <nx/vms/client/desktop/ini.h>
+    #include <nx/gdi_tracer/gdi_handle_tracer.h>
+    #include <nx/vms/client/desktop/debug_utils/instruments/widget_profiler.h>
+#endif
 
 namespace {
 
@@ -190,8 +199,9 @@ int runApplicationInternal(QtSingleApplication* application, const QnStartupPara
     {
         int accepted = qnSettings->acceptedEulaVersion();
         int current = QnClientAppInfo::eulaVersion();
-        const bool showEula =  accepted < current;
-        if (showEula && !context->showEulaFromFile())
+        const bool showEula = accepted < current;
+        if (showEula
+            && !EulaDialog::acceptEulaFromFile(":/license.html", current, context->mainWindow()))
         {
             // We should exit completely.
             return 0;
@@ -216,19 +226,28 @@ int runApplicationInternal(QtSingleApplication* application, const QnStartupPara
 
     nx::media::DecoderRegistrar::registerDecoders({}, true, true);
 
-    QDesktopWidget *desktop = qApp->desktop();
+    const auto desktop = qApp->desktop();
     bool customScreen = startupParams.screen != QnStartupParameters::kInvalidScreen
         && startupParams.screen < desktop->screenCount();
-    if (customScreen)
+    const bool customWindowGeometry = !startupParams.windowGeometry.isEmpty();
+
+    if (customWindowGeometry)
+    {
+        // We must handle all 'WindowScreenChange' events _before_ we move window.
+        qApp->processEvents();
+        mainWindow->move(startupParams.windowGeometry.topLeft());
+        mainWindow->resize(startupParams.windowGeometry.size());
+    }
+    else if (customScreen)
     {
         NX_INFO(kMainWindow) << "Running application on a custom screen" << startupParams.screen;
         const auto windowHandle = mainWindow->windowHandle();
         if (windowHandle && (desktop->screenCount() > 0))
         {
-            /* We must handle all 'WindowScreenChange' events _before_ we changing screen. */
+            // We must handle all 'WindowScreenChange' events _before_ we change screen.
             qApp->processEvents();
 
-            /* Set target screen for fullscreen mode. */
+            // Set target screen for fullscreen mode.
             const auto screen = QGuiApplication::screens().value(startupParams.screen, 0);
             NX_INFO(kMainWindow) << "Target screen geometry is" << screen->geometry();
             windowHandle->setScreen(screen);
@@ -248,18 +267,21 @@ int runApplicationInternal(QtSingleApplication* application, const QnStartupPara
 
     mainWindow->show();
     joystickManager->start(mainWindow->winId());
-    if (customScreen)
-    {
-        /* We must handle 'move' event _before_ we activate fullscreen. */
-        qApp->processEvents();
-    }
 
-    const bool instantlyMaximize = !startupParams.fullScreenDisabled && qnRuntime->isDesktopMode();
+    const bool instantlyMaximize = !startupParams.fullScreenDisabled
+        && !customWindowGeometry
+        && qnRuntime->isDesktopMode();
 
     if (instantlyMaximize)
+    {
+        // We must handle 'move' event _before_ we activate fullscreen.
+        qApp->processEvents();
         context->action(nx::vms::client::desktop::ui::action::EffectiveMaximizeAction)->trigger();
+    }
     else
+    {
         mainWindow->updateDecorationsState();
+    }
 
     if (!allowMultipleClientInstances)
     {
@@ -267,14 +289,48 @@ int runApplicationInternal(QtSingleApplication* application, const QnStartupPara
             &MainWindow::handleOpenFile);
     }
 
-    client.initDesktopCamera(dynamic_cast<QGLWidget*>(mainWindow->viewport()));
+    client.initDesktopCamera(qobject_cast<QOpenGLWidget*>(mainWindow->viewport()));
     client.startLocalSearchers();
 
-    const auto code = context->handleStartupParameters(startupParams);
-    if (code != QnWorkbenchContext::success)
-        return code == QnWorkbenchContext::forcedExit ? kSuccessCode : kInvalidParametersCode;
+    context->handleStartupParameters(startupParams);
+
+    #if defined(Q_OS_WIN)
+        if (ini().enableGdiTrace)
+        {
+            const auto traceLimitCallback =
+                []()
+                {
+                    const auto reportFileName = lit("/log/gdi_handles_report_%1.txt")
+                        .arg(QDateTime::currentDateTime().toString("dd.MM.yyyy_hh.mm.ss"));
+
+                    const auto reportPathString =
+                        QStandardPaths::writableLocation(QStandardPaths::DataLocation)
+                        + reportFileName;
+
+                    QFile reportFile(reportPathString);
+                    if (reportFile.open(QFile::WriteOnly | QFile::Truncate))
+                    {
+                        const auto gdiTracer = gdi_tracer::GdiHandleTracer::getInstance();
+                        QTextStream textStream(&reportFile);
+                        textStream.setCodec("UTF-8");
+                        textStream << QString::fromStdString(gdiTracer->getReport());
+                        textStream << WidgetProfiler::getWidgetHierarchy();
+                    }
+                };
+
+            auto gdiTracer = gdi_tracer::GdiHandleTracer::getInstance();
+            gdiTracer->setGdiTraceLimit(ini().gdiTraceLimit);
+            gdiTracer->setGdiTraceLimitCallback(traceLimitCallback);
+            gdiTracer->attachGdiDetours();
+        }
+    #endif
 
     int result = application->exec();
+
+    #if defined(Q_OS_WIN)
+        if (ini().enableGdiTrace)
+            gdi_tracer::GdiHandleTracer::getInstance()->detachGdiDetours();
+    #endif
 
     /* Write out settings. */
     qnSettings->setAudioVolume(nx::audio::AudioDevice::instance()->volume());
@@ -302,7 +358,7 @@ int runApplication(int argc, char** argv)
 
     nx::utils::rlimit::setMaxFileDescriptors(8000);
 
-    std::unique_ptr<TextToWaveServer> textToWaveServer = std::make_unique<TextToWaveServer>(
+    auto textToWaveServer = std::make_unique<nx::speech_synthesizer::TextToWaveServer>(
         nx::utils::file_system::applicationDirPath(argc, argv));
 
     textToWaveServer->start();

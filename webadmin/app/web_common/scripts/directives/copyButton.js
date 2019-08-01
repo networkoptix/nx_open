@@ -1,3 +1,5 @@
+'use strict';
+
 angular.module('nxCommon')
 	.directive('copyButton', ['$timeout', '$log', function ($timeout, $log) {
 		return{

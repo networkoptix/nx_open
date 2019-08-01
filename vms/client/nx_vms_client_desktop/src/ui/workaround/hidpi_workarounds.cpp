@@ -14,6 +14,7 @@
 #include <QtGui/QWheelEvent>
 #include <QtGui/QContextMenuEvent>
 
+#include <QtWidgets/QDialog>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QGraphicsProxyWidget>

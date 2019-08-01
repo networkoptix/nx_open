@@ -46,6 +46,10 @@ Trailing Space Password                               ${BASE PASSWORD}${SPACE}
     [tags]    C41876
 Empty New Password                                    ${EMPTY}
     [tags]    C26260
+Fair New Password                                     ${fair password}
+    [tags]    C41876
+Good New Password                                     ${BASE PASSWORD}
+    [tags]    C41876
 
 *** Keywords ***
 Restart
@@ -72,8 +76,8 @@ Test Password Invalid
     Wait Until Elements Are Visible    ${RESET PASSWORD INPUT}    ${SAVE PASSWORD}
     Input Text    ${RESET PASSWORD INPUT}    ${new pw}
     Check New Password Badge    ${new pw}
-    Click Button    ${SAVE PASSWORD}
-    Check New Password Outline    ${new pw}
+    Run Keyword Unless    '''${new pw}'''=='''${fair password}''' or '''${new pw}'''=='''${BASE PASSWORD}'''    Click Button    ${SAVE PASSWORD}
+    Run Keyword Unless    '''${new pw}'''=='''${fair password}''' or '''${new pw}'''=='''${BASE PASSWORD}'''    Check New Password Outline    ${new pw}
 
 Check New Password Badge
     [arguments]    ${pass}

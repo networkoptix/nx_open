@@ -12,7 +12,7 @@ export class ApiService {
 
     getHealthStatus(): Observable<any> {
         return this.http
-                   .get('https://api.status.nxvms.com/health');
+                   .get('https://api.status-sla.nxvms.com/health');
     }
 
     getJSON(): Observable<any> {

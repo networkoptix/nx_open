@@ -27,7 +27,6 @@ require('./downgraded-providers.ts');
 
 //Directives
 require('./directives/autofocus.js');
-require('./directives/footer.js');
 require('./directives/header.js');
 require('./directives/openClientButton.js');
 require('./directives/passwordInput.js');
@@ -62,7 +61,6 @@ require('./controllers/account.js');
 require('./controllers/activateRestore.js');
 require('./controllers/debug.js');
 require('./controllers/register.js');
-require('./controllers/startPage.js');
 require('./controllers/static.js');
 require('./controllers/system.js');
 require('./controllers/systems.js');

@@ -1,5 +1,9 @@
 #include "shadow_item.h"
 
+#include <QtGui/QOpenGLContext>
+#include <QtGui/QOpenGLFunctions>
+#include <QtWidgets/QOpenGLWidget>
+
 #include <utils/common/scoped_painter_rollback.h>
 
 #include <ui/graphics/opengl/gl_shortcuts.h>
@@ -20,8 +24,8 @@ QnShadowItem::QnShadowItem(QGraphicsItem *parent):
     m_positionBuffer(QOpenGLBuffer::VertexBuffer)
 {
     setAcceptedMouseButtons(0);
-    
-    /* Don't disable this item here. When disabled, it starts accepting wheel events 
+
+    /* Don't disable this item here. When disabled, it starts accepting wheel events
      * (and probably other events too). Looks like a Qt bug. */
 }
 
@@ -77,8 +81,9 @@ void QnShadowItem::ensureShadowShape() const {
     m_shapeValid = m_shadowShape.size() > 0;
 }
 
-void QnShadowItem::initializeVao() {
-    if (!m_shapeValid) 
+void QnShadowItem::initializeVao(QOpenGLWidget* glWidget)
+{
+    if (!m_shapeValid)
         return;
 
     /* Generate vertex data. */
@@ -99,7 +104,7 @@ void QnShadowItem::initializeVao() {
     const int VERTEX_POS_SIZE = 2; // x, y
     const int VERTEX_POS_INDX = 0;
 
-    auto shader = QnOpenGLRendererManager::instance(QGLContext::currentContext())->getColorShader();
+    auto shader = QnOpenGLRendererManager::instance(glWidget)->getColorShader();
 
     m_positionBuffer.create();
     m_positionBuffer.setUsagePattern( QOpenGLBuffer::StaticDraw );
@@ -148,28 +153,33 @@ QPainterPath QnShadowItem::shape() const {
     return QPainterPath();
 }
 
-void QnShadowItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
+void QnShadowItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget* widget)
+{
     ensureShadowShape();
 
     if (!m_shapeValid)
         return;
 
     if (!m_vaoInitialized)
-        initializeVao();
+        initializeVao(qobject_cast<QOpenGLWidget*>(widget));
 
     /* Color for drawing the shadow. */
     QColor color = m_color;
     color.setAlpha(color.alpha() * effectiveOpacity());
-    
-    QnGlNativePainting::begin(QGLContext::currentContext(),painter);
-    glEnable(GL_BLEND); 
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); 
-   
-    QnOpenGLRendererManager::instance(QGLContext::currentContext())->setColor(color);
-    auto shader = QnOpenGLRendererManager::instance(QGLContext::currentContext())->getColorShader();
-    /* Draw shadowed rect. */
-    QnOpenGLRendererManager::instance(QGLContext::currentContext())->drawArraysVao(&m_vertices, GL_TRIANGLE_FAN, m_shadowShape.size(), shader);
 
-    glDisable(GL_BLEND); 
+    const auto glWidget = qobject_cast<QOpenGLWidget*>(widget);
+    QnGlNativePainting::begin(glWidget, painter);
+
+    const auto functions = glWidget->context()->functions();
+    functions->glEnable(GL_BLEND);
+    functions->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    const auto renderer = QnOpenGLRendererManager::instance(glWidget);
+    renderer->setColor(color);
+    auto shader = renderer->getColorShader();
+    /* Draw shadowed rect. */
+    renderer->drawArraysVao(&m_vertices, GL_TRIANGLE_FAN, m_shadowShape.size(), shader);
+
+    functions->glDisable(GL_BLEND);
     QnGlNativePainting::end(painter);
 }

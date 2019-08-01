@@ -184,6 +184,21 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddr(
     return checkHostAddrInternal(url, auth, isSearchAction);
 }
 
+void OnvifResourceSearcher::setupResourceGroupIfNeed(
+    const QnPlOnvifResourcePtr& resource, const QString& groupId)
+{
+    auto resData = resource->resourceData();
+
+    bool shouldAppearAsSingleChannel = resData.value<bool>(
+        ResourceDataKey::kShouldAppearAsSingleChannel);
+
+    if (!shouldAppearAsSingleChannel)
+    {
+        resource->setGroupId(groupId);
+        resource->setDefaultGroupName(resource->getModel() + QLatin1String(" ") + resource->getHostAddress());
+    }
+}
+
 QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(
     const nx::utils::Url& url, const QAuthenticator& auth, bool isSearchAction)
 {
@@ -238,15 +253,8 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(
         if (channel > 0)
             resource->updateToChannel(channel-1);
 
-        auto resData = commonModule()->resourceDataPool()
-            ->data(rpResource->getVendor(), rpResource->getModel());
-
         if (rpResource->getMaxChannels() > 1)
-        {
-            resource->setGroupId(rpResource->getPhysicalId());
-            resource->setDefaultGroupName(resource->getModel() + QString(" ")
-                + resource->getHostAddress());
-        }
+            setupResourceGroupIfNeed(resource, rpResource->getPhysicalId());
 
         resList << resource;
         return resList;
@@ -326,10 +334,9 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(
 
         if(!resource->getUniqueId().isEmpty())
         {
-            auto maxChannels = resource->getMaxChannels();
             resource->fetchChannelCount();
-            //if (channel > 0)
-            //    resource->updateToChannel(channel-1);
+            if (resource->getMaxChannels() > 1)
+                setupResourceGroupIfNeed(resource, resource->getPhysicalId());
             resList << resource;
 
             // checking for multichannel encoders

@@ -18,6 +18,8 @@ ResultCode fromStunErrorToResultCode(
             return ResultCode::notAuthorized;
         case nx::network::stun::extension::error::notFound:
             return ResultCode::notFound;
+        case nx::network::stun::error::tryAlternate:
+            return ResultCode::tryAlternate;
         default:
             return ResultCode::otherLogicError;
     }
@@ -33,6 +35,8 @@ int resultCodeToStunErrorCode(ResultCode resultCode)
             return nx::network::stun::error::unauthtorized;
         case ResultCode::notFound:
             return nx::network::stun::extension::error::notFound;
+        case ResultCode::tryAlternate:
+            return nx::network::stun::error::tryAlternate;
         default:
             return nx::network::stun::error::serverError;
     }
@@ -43,6 +47,11 @@ QString toString(ResultCode code)
     QString s;
     serialize(code, &s);
     return s;
+}
+
+void PrintTo(ResultCode val, ::std::ostream* os)
+{
+    *os << toString(val).toStdString();
 }
 
 } // namespace api

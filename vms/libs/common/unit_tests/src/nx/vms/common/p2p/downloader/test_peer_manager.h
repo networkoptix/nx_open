@@ -9,11 +9,7 @@
 #include <nx/vms/common/p2p/downloader/private/abstract_peer_manager.h>
 #include <nx/utils/thread/long_runnable.h>
 
-namespace nx {
-namespace vms {
-namespace common {
-namespace p2p {
-namespace downloader {
+namespace nx::vms::common::p2p::downloader {
 
 class Storage;
 class TestPeerManager;
@@ -47,12 +43,6 @@ private:
     mutable QnMutex m_mutex;
 };
 
-class TestPeerManagerHandler
-{
-public:
-    virtual void onRequestFileInfo() = 0;
-};
-
 class TestPeerManager: public AbstractPeerManager, public QnLongRunnable
 {
 public:
@@ -66,8 +56,8 @@ public:
         QVector<QByteArray> checksums;
     };
 
-    TestPeerManager(TestPeerManagerHandler* handler);
-    ~TestPeerManager() { stop(); }
+    TestPeerManager();
+    virtual ~TestPeerManager() override { stop(); }
 
     void setPeerList(const QList<QnUuid>& peerList) { m_peerList = peerList; }
     void addPeer(const QnUuid& peerId, const QString& peerName = QString());
@@ -78,6 +68,7 @@ public:
 
     void setPeerStorage(const QnUuid& peerId, Storage* storage);
     void setHasInternetConnection(const QnUuid& peerId, bool hasInternetConnection = true);
+    bool hasInternetConnection(const QnUuid& peerId) const;
 
     QStringList peerGroups(const QnUuid& peerId) const;
     QList<QnUuid> peersInGroup(const QString& group) const;
@@ -88,42 +79,31 @@ public:
     const RequestCounter* requestCounter() const;
 
     using WaitCallback = std::function<void()>;
-    void requestWait(const QnUuid& peerId, qint64 waitTime, WaitCallback callback);
+
+    void setIndirectInternetRequestsAllowed(bool allow);
 
     // AbstractPeerManager implementation
-    virtual QnUuid selfId() const override;
-    virtual QString peerString(const QnUuid& peerId) const;
+    virtual QString peerString(const QnUuid& peerId) const override;
     virtual QList<QnUuid> getAllPeers() const override;
     virtual QList<QnUuid> peers() const override { return m_peerList; }
     virtual int distanceTo(const QnUuid&) const override;
-    virtual bool hasInternetConnection(const QnUuid& peerId) const override;
 
-    virtual rest::Handle requestFileInfo(
+    virtual RequestContextPtr<downloader::FileInformation> requestFileInfo(
         const QnUuid& peer,
         const QString& fileName,
-        FileInfoCallback callback) override;
+        const nx::utils::Url& url) override;
 
-    virtual rest::Handle requestChecksums(
-        const QnUuid& peerId,
-        const QString& fileName,
-        ChecksumsCallback callback) override;
+    virtual RequestContextPtr<QVector<QByteArray>> requestChecksums(
+        const QnUuid& peerId, const QString& fileName) override;
 
-    virtual rest::Handle downloadChunk(
-        const QnUuid& peerId,
-        const QString& fileName,
-        int chunkIndex,
-        ChunkCallback callback) override;
-
-    virtual rest::Handle downloadChunkFromInternet(
+    virtual RequestContextPtr<QByteArray> downloadChunk(
         const QnUuid& peerId,
         const QString& fileName,
         const nx::utils::Url& url,
         int chunkIndex,
-        int chunkSize,
-        ChunkCallback callback) override;
+        int chunkSize) override;
 
-    virtual void cancelRequest(const QnUuid& peerId, rest::Handle handle) override;
-    virtual bool hasAccessToTheUrl(const QString& /*url*/) const override { return false; }
+    virtual void cancelRequest(const QnUuid& peerId, rest::Handle handle);
 
     virtual void pleaseStop() override;
     virtual void run() override;
@@ -149,13 +129,14 @@ private:
         bool hasInternetConnection = false;
     };
 
-    TestPeerManagerHandler* m_handler = nullptr;
     QHash<QnUuid, PeerInfo> m_peers;
     QMultiHash<QString, QnUuid> m_peersByGroup;
     int m_requestIndex = 0;
 
     QHash<nx::utils::Url, QString> m_fileByUrl;
     QList<QnUuid> m_peerList;
+
+    bool m_allowIndirectInternetRequests = false;
 
     struct Request
     {
@@ -186,54 +167,34 @@ public:
 
     const RequestCounter* requestCounter() const;
 
-    void requestWait(qint64 waitTime, TestPeerManager::WaitCallback callback);
     void setPeerList(const QList<QnUuid>& peerList) { m_peerList = peerList; }
 
     // AbstractPeerManager implementation
-    virtual QnUuid selfId() const override;
     virtual QString peerString(const QnUuid& peerId) const override;
     virtual QList<QnUuid> getAllPeers() const override;
     virtual QList<QnUuid> peers() const override { return m_peerList; }
     virtual int distanceTo(const QnUuid&) const override;
-    virtual bool hasInternetConnection(const QnUuid& peerId) const override;
 
-    virtual rest::Handle requestFileInfo(
+    virtual RequestContextPtr<FileInformation> requestFileInfo(
         const QnUuid& peer,
         const QString& fileName,
-        FileInfoCallback callback) override;
+        const nx::utils::Url& url) override;
 
-    virtual rest::Handle requestChecksums(
-        const QnUuid& peer,
-        const QString& fileName,
-        ChecksumsCallback callback) override;
+    virtual RequestContextPtr<QVector<QByteArray>> requestChecksums(
+        const QnUuid& peer, const QString& fileName) override;
 
-    virtual rest::Handle downloadChunk(
-        const QnUuid& peer,
-        const QString& fileName,
-        int chunkIndex,
-        ChunkCallback callback) override;
-
-    virtual rest::Handle downloadChunkFromInternet(
+    virtual RequestContextPtr<QByteArray> downloadChunk(
         const QnUuid& peerId,
         const QString& fileName,
         const nx::utils::Url& url,
         int chunkIndex,
-        int chunkSize,
-        ChunkCallback callback) override;
-
-    virtual void cancelRequest(const QnUuid& peerId, rest::Handle handle) override;
-    virtual bool hasAccessToTheUrl(const QString& /*url*/) const override { return false; }
+        int chunkSize) override;
 
 private:
     TestPeerManager* m_peerManager;
-    QnUuid m_selfId;
     QHash<QnUuid, int> m_distances;
     RequestCounter m_requestCounter;
     QList<QnUuid> m_peerList;
 };
 
-} // namespace downloader
-} // namespace p2p
-} // namespace common
-} // namespace vms
-} // namespace nx
+} // namespace nx::vms::common::p2p::downloader

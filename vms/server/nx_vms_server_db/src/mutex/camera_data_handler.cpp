@@ -1,6 +1,8 @@
 #include "camera_data_handler.h"
 
-#include <nx/network/nettools.h> /* For MAC_ADDR_LEN and getMacFromPrimaryIF. */
+#include <nx/network/nettools.h> //< For MAC_ADDR_LEN and getMacFromPrimaryIF.
+
+#include <nx/utils/app_info.h>
 
 #include "core/resource_management/resource_pool.h"
 #include "core/resource/camera_resource.h"
@@ -22,23 +24,32 @@ QnMutexCameraDataHandler::QnMutexCameraDataHandler(QnCommonModule* commonModule)
 
 QByteArray QnMutexCameraDataHandler::getUserData(const QString& name)
 {
-#ifdef EDGE_SERVER
-    char  mac[nx::network::MAC_ADDR_LEN];
-    char* host = 0;
-    nx::network::getMacFromPrimaryIF(mac, &host);
-
-    if (name.startsWith(CAM_INS_PREFIX) || name.startsWith(CAM_UPD_PREFIX))
+    if (nx::utils::AppInfo::isEdgeServer())
     {
-        QnMediaServerResourcePtr ownServer = resourcePool()->getResourceById<QnMediaServerResource>(commonModule()->moduleGUID());
-        if (ownServer && !ownServer->isRedundancy()) {
-            QString cameraName = name.mid(CAM_INS_PREFIX.length());
-            if (cameraName.toLocal8Bit() == QByteArray(mac))
-                return commonModule()->moduleGUID().toRfc4122(); // block edge camera discovered from other PC
-            else
-                return QByteArray();
+        char mac[nx::network::MAC_ADDR_LEN];
+        char* host = nullptr;
+        nx::network::getMacFromPrimaryIF(mac, &host);
+
+        if (name.startsWith(CAM_INS_PREFIX) || name.startsWith(CAM_UPD_PREFIX))
+        {
+            const QnMediaServerResourcePtr ownServer =
+                resourcePool()->getResourceById<QnMediaServerResource>(
+                    commonModule()->moduleGUID());
+            if (ownServer && !ownServer->isRedundancy())
+            {
+                const QString cameraName = name.mid(CAM_INS_PREFIX.length());
+                if (cameraName.toLocal8Bit() == QByteArray(mac))
+                {
+                    // Block edge camera discovered from other server.
+                    return commonModule()->moduleGUID().toRfc4122();
+                }
+                else
+                {
+                    return QByteArray();
+                }
+            }
         }
     }
-#endif
 
     const auto& resPool = commonModule()->resourcePool();
 

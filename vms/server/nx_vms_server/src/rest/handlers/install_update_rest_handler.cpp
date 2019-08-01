@@ -67,8 +67,8 @@ void sendInstallRequest(
                 {
                     NX_WARNING(
                         typeid(QnInstallUpdateRestHandler),
-                        lm("installUpdate request to server %1 failed with http code")
-                        .args(server->getId(), httpStatusCode));
+                        "installUpdate request to server %1 failed with http status %2",
+                        server->getId(), nx::network::http::StatusCode::toString(httpStatusCode));
                 }
 
                 context->executeGuarded([context]() { context->requestProcessed(); });
@@ -156,6 +156,12 @@ int QnInstallUpdateRestHandler::executePost(
 
     sendInstallRequest(ifParticipantPredicate, serverModule()->commonModule(), path,
         srcBodyContentType, &context);
+
+    // Client expects json object in all cases or response is considered failed.
+    QnRestResult restResult;
+    restResult.setError(QnRestResult::Error::NoError);
+    QnFusionRestHandlerDetail::serialize(
+        restResult, result, resultContentType, Qn::JsonFormat);
 
     return nx::network::http::StatusCode::ok;
 }

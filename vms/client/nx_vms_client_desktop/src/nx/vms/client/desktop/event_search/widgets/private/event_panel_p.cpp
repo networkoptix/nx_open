@@ -12,6 +12,7 @@
 #include <ui/style/skin.h>
 #include <ui/workaround/hidpi_workarounds.h>
 #include <ui/workbench/workbench_access_controller.h>
+#include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_navigator.h>
 
 #include <nx/vms/client/desktop/common/widgets/animated_tab_widget.h>
@@ -78,7 +79,11 @@ EventPanel::Private::Private(EventPanel* q):
     for (auto [tab, synchronizer]: nx::utils::keyValueRange(m_synchronizers))
     {
         connect(synchronizer, &AbstractSearchSynchronizer::activeChanged, this,
-            [this, tab = tab](bool isActive) { setTabCurrent(tab, isActive); });
+            [this, tab = tab](bool isActive)
+            {
+                if (tab->isAllowed())
+                    setTabCurrent(tab, isActive);
+            });
     }
 
     connect(m_tabs, &QTabWidget::currentChanged, this,
@@ -145,6 +150,12 @@ EventPanel::Private::Private(EventPanel* q):
     q->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(q, &EventPanel::customContextMenuRequested,
         this, &EventPanel::Private::showContextMenu);
+
+    const auto resetCurrentTab =
+        [this]() { m_tabs->setCurrentIndex(0); };
+
+    connect(context(), &QnWorkbenchContext::userChanged, this, resetCurrentTab);
+    connect(action(ui::action::ResourcesModeAction), &QAction::toggled, this, resetCurrentTab);
 }
 
 EventPanel::Private::~Private()

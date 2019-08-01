@@ -21,7 +21,7 @@ public:
     virtual Qt::ItemFlags flags(int column) const override;
 
 protected:
-    virtual QIcon calculateIcon() const override;
+    virtual int calculateIconKey() const override;
 
 private:
     QnSystemDescriptionPtr m_system;

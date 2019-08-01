@@ -18,9 +18,7 @@ namespace nx {
 namespace network {
 namespace websocket {
 
-class NX_NETWORK_API WebSocket :
-    public aio::AbstractAsyncChannel,
-    private websocket::ParserHandler
+class NX_NETWORK_API WebSocket : public aio::AbstractAsyncChannel
 {
 public:
     /**
@@ -29,14 +27,17 @@ public:
      */
     WebSocket(
         std::unique_ptr<AbstractStreamSocket> streamSocket,
-        SendMode sendMode = SendMode::singleMessage,
-        ReceiveMode receiveMode = ReceiveMode::message,
-        Role role = Role::undefined,
-        FrameType frameType= FrameType::binary);
+        SendMode sendMode,
+        ReceiveMode receiveMode,
+        Role role,
+        FrameType frameType,
+        network::websocket::CompressionType compressionType);
 
     WebSocket(
         std::unique_ptr<AbstractStreamSocket> streamSocket,
-        FrameType frameType);
+        Role role,
+        FrameType frameType,
+        network::websocket::CompressionType compressionType);
 
     ~WebSocket();
 
@@ -69,6 +70,13 @@ public:
     AbstractStreamSocket* socket() { return m_socket.get(); }
     const AbstractStreamSocket* socket() const { return m_socket.get(); }
 
+    /**
+     * Disable PONG responses.
+     * NOTE: Don't call it unless you are completely sure what you are doing.
+     * NOTE: Should be called before start().
+     */
+    void disablePingPong();
+
 private:
     struct UserReadContext
     {
@@ -95,34 +103,27 @@ private:
     nx::Buffer m_controlBuffer;
     nx::Buffer m_readBuffer;
     std::unique_ptr<nx::network::aio::Timer> m_pingTimer;
+    std::unique_ptr<nx::network::aio::Timer> m_pongTimer;
     std::chrono::milliseconds m_aliveTimeout;
     nx::utils::InterruptionFlag m_destructionFlag;
     bool m_failed = false;
     FrameType m_frameType;
+    network::websocket::CompressionType m_compressionType;
     bool m_readingCeased = false;
+    bool m_pingPongDisabled = false;
 
     virtual void stopWhileInAioThread() override;
 
     /** Parser handler implementation */
-    virtual void frameStarted(FrameType type, bool fin) override;
-    virtual void framePayload(const char* data, int len) override;
-    virtual void frameEnded() override;
-    virtual void messageEnded() override;
-    virtual void handleError(Error err) override;
+    void gotFrame(FrameType type, const nx::Buffer& data, bool fin);
 
     /** Own helper functions*/
-    void processReadData();
-    bool isDataFrame() const;
     void sendMessage(const nx::Buffer& message, int writeSize, IoCompletionHandler handler);
     void sendControlResponse(FrameType type);
     void sendControlRequest(FrameType type);
-    void readWithoutAddingToQueueSync();
-    void readWithoutAddingToQueue();
     void onPingTimer();
     void onRead(SystemError::ErrorCode ecode, size_t transferred);
     void onWrite(SystemError::ErrorCode ecode, size_t transferred);
-    void handleSocketWrite(SystemError::ErrorCode ecode, size_t bytesSent);
-    std::chrono::milliseconds pingTimeout() const;
     void callOnReadhandler(SystemError::ErrorCode error, size_t transferred);
     void callOnWriteHandler(SystemError::ErrorCode error, size_t transferred);
 };

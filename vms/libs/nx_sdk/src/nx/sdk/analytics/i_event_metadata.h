@@ -1,3 +1,5 @@
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+
 #pragma once
 
 #include <nx/sdk/interface.h>
@@ -22,11 +24,6 @@ public:
      * @return Description of the event, in UTF-8.
      */
     virtual const char* description() const = 0;
-
-    /**
-     * @return User-side data in json format, in UTF-8.
-     */
-    virtual const char* auxiliaryData() const = 0;
 
     /**
      * @return Whether the event is in active state.

@@ -38,7 +38,7 @@
 
 namespace {
 
-const QString kLiteClientConnectionScheme = lit("liteclient");
+const QString kLiteClientConnectionScheme = "liteclient";
 enum { kInvalidHandle = -1 };
 
 QnConnectionManager::ConnectionType connectionTypeForUrl(const nx::utils::Url& url)
@@ -83,7 +83,7 @@ void callCallback(
 }
 } // namespace
 
-const QString QnConnectionManager::kCloudConnectionScheme = lit("cloud");
+const QString QnConnectionManager::kCloudConnectionScheme = "cloud";
 
 class QnConnectionManagerPrivate : public Connective<QObject>, public QnConnectionContextAware
 {
@@ -223,7 +223,9 @@ nx::utils::Url QnConnectionManager::currentUrl() const
 QString QnConnectionManager::currentHost() const
 {
     Q_D(const QnConnectionManager);
-    return d->url.isValid() ? lit("%1:%2").arg(d->url.host()).arg(d->url.port(defaultServerPort())) : QString();
+    return d->url.isValid()
+        ? QString("%1:%2").arg(d->url.host()).arg(d->url.port(defaultServerPort()))
+        : QString();
 }
 
 QString QnConnectionManager::currentLogin() const
@@ -375,13 +377,13 @@ bool QnConnectionManagerPrivate::doConnect(
     bool restoringConnection,
     CallbackType callback)
 {
-    NX_DEBUG(this, lm("doConnect() BEGIN: url: %1").arg(url.toString()));
+    NX_DEBUG(this, "doConnect() BEGIN: url: %1", url);
     if (!url.isValid() || url.host().isEmpty())
     {
         Q_Q(QnConnectionManager);
         updateConnectionState();
         emit q->connectionFailed(Qn::NetworkErrorConnectionResult, QVariant());
-        NX_DEBUG(this, lm("doConnect() END: Invalid URL"));
+        NX_DEBUG(this, "doConnect() END: Invalid URL");
 
         callCallback(
             callback,
@@ -422,7 +424,7 @@ bool QnConnectionManagerPrivate::doConnect(
 
             if (connectionHandle != result->handle())
             {
-                NX_DEBUG(this, lm("doConnect() Invalid handle"));
+                NX_DEBUG(this, "doConnect() Invalid handle");
                 callCallback(
                     callback,
                     QnConnectionManager::State::Disconnected,
@@ -466,7 +468,7 @@ bool QnConnectionManagerPrivate::doConnect(
                     callCallback(callback, QnConnectionManager::State::Disconnected, status);
 
 
-                NX_DEBUG(this, lm("doConnect() END: Bad status"));
+                NX_DEBUG(this, "doConnect() END: Bad status");
                 return;
             }
 
@@ -542,7 +544,7 @@ bool QnConnectionManagerPrivate::doConnect(
             emit q->connectionVersionChanged();
         });
 
-    NX_DEBUG(this, lm("doConnect() END"));
+    NX_DEBUG(this, "doConnect() END");
     return true;
 }
 

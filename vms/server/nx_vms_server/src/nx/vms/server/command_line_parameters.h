@@ -31,6 +31,7 @@ public:
     bool showVersion = false;
     bool showHelp = false;
     QString engineVersion;
+    int vmsProtocolVersion = 0;
     QString enforceSocketType;
     QString enforcedMediatorEndpoint;
     QString ipVersion;

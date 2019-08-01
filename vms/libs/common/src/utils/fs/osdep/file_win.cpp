@@ -4,10 +4,12 @@
 * Date: 5 dec 2006
 ***********************************************************************/
 
+#include "../file.h"
+
 #ifdef Q_OS_WIN
 
 #include <QtCore/QDebug>
-#include "../file.h"
+#include <QtCore/QDir>
 
 #include <sstream>
 #include <io.h>
@@ -60,27 +62,23 @@ bool QnFile::open(const QIODevice::OpenMode& openMode, unsigned int systemDepend
     if (systemDependentFlags == 0)
         systemDependentFlags = FILE_ATTRIBUTE_NORMAL;
 
+    // Using prefix \\?\ here to support long paths handling.
+    // https://docs.microsoft.com/en-us/windows/win32/fileio/naming-a-file
+    QString fileName = QString("\\\\?\\") + QDir::toNativeSeparators(m_fileName);
+
     // Create the file handle.
-    m_impl = CreateFile((const wchar_t*)m_fileName.constData(),
-        accessRights,
-        shareMode,
-        &securityAtts,
-        creationDisp,
-        (DWORD) systemDependentFlags,
-        NULL);
+    m_impl = CreateFileW(
+        (const wchar_t*)fileName.constData(), accessRights, shareMode, &securityAtts, creationDisp,
+        (DWORD) systemDependentFlags, NULL);
 
     if (m_impl == INVALID_HANDLE_VALUE && (openMode & QIODevice::WriteOnly) && GetLastError() == ERROR_PATH_NOT_FOUND)
     {
         QDir dir;
         if (dir.mkpath(QnFile::absolutePath(m_fileName)))
         {
-            m_impl = CreateFile((const wchar_t*)m_fileName.constData(),
-                accessRights,
-                shareMode,
-                &securityAtts,
-                creationDisp,
-                (DWORD) systemDependentFlags,
-                NULL);
+            m_impl = CreateFileW(
+                (const wchar_t*)fileName.constData(), accessRights, shareMode, &securityAtts,
+                creationDisp, (DWORD) systemDependentFlags, NULL);
         }
     }
 

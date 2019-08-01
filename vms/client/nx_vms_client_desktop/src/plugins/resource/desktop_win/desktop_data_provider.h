@@ -7,8 +7,6 @@
 
 #include <nx/streaming/audio_data_packet.h>
 
-#include <ui/screen_recording/qnaudio_device_info.h>
-
 #include <dsp_effects/speex/speex_preprocess.h>
 
 #include "screen_grabber.h"

@@ -1,10 +1,12 @@
+#include <test_support/mediaserver_with_storage_fixture.h>
+#include <recorder/camera_info.h>
+#include <recorder/device_file_catalog.h>
+
 #include <functional>
 #include <thread>
 #include <algorithm>
 #include <array>
 #include <gtest/gtest.h>
-#include <recorder/camera_info.h>
-#include <recorder/device_file_catalog.h>
 
 class ComposerTestHandler : public nx::caminfo::ComposerHandler
 {
@@ -266,7 +268,7 @@ TEST_F(WriterTest, AllFilesWritten)
 {
     when(StoragesCount::Two, CamerasCount::Three);
 
-    writer.write();
+    writer.writeAll();
 
     thenWrittenFiles(12);
     thenAllPossiblePathAndCameraIdsCombinationsExist();
@@ -277,21 +279,74 @@ TEST_F(WriterTest, DontWriteSameData)
 {
     when(StoragesCount::Two, CamerasCount::Three);
 
-    writer.write();
+    writer.writeAll();
 
     thenWrittenFiles(12);
     resetWrittenData();
     thenWrittenFiles(0);
 
-    writer.write();
+    writer.writeAll();
     thenWrittenFiles(0);
+}
+
+static const QString kCameraId("cameraId");
+static const QString kFilePath("/some/" + kCameraId);
+
+TEST_F(WriterTest, WriteSingleFile)
+{
+    when(StoragesCount::Two, CamerasCount::Three);
+
+    writer.writeFile(kCameraId, QnServer::LowQualityCatalog);
+    writer.writeFile(kCameraId, QnServer::HiQualityCatalog);
+
+    thenWrittenFiles(/* StoragesCount(2) * qualities(2) */4);
+}
+
+using namespace nx::vms::server::test;
+
+class FtCameraInfo: public test_support::MediaserverWithStorageFixture
+{
+public:
+    void thenInfoFileShouldBeCreated()
+    {
+        const auto cameraFolders = mediaCatalogPaths();
+        ASSERT_FALSE(cameraFolders.isEmpty());
+        for (const auto& folderPath: cameraFolders)
+        {
+            const auto fileName = QDir(folderPath).absoluteFilePath("info.txt");
+            QFile file(fileName);
+            ASSERT_TRUE(file.open(QIODevice::ReadOnly));
+            ASSERT_FALSE(file.readAll().isEmpty());
+        }
+    }
+
+private:
+};
+
+TEST_F(FtCameraInfo, CameraInfoFileCreated)
+{
+    whenAcquiringServerCatalogs(false);
+    whenServerStarted();
+    thenArchiveShouldBeScannedCorreclty();
+
+    whenCameraSaved(test_support::kCamera1Name);
+    whenCameraSaved(test_support::kCamera2Name);
+
+    // These calls are part of recording process.
+    whenAcquiringServerCatalogs(true);
+    emulateGetFileCatalogCall(test_support::kCamera1Name);
+    emulateGetFileCatalogCall(test_support::kCamera2Name);
+
+    // Populating camera folders with media files.
+    givenSomeArchiveOnHdd();
+    whenReindexRequestIssued();
+    thenArchiveShouldBeScannedCorreclty();
+
+    thenInfoFileShouldBeCreated();
 }
 
 const QnUuid kModuleGuid = QnUuid::fromStringSafe(lit("{95a380a7-f7d7-4a4a-906f-b9c101a33ef1}"));
 const QnUuid kArchiveCamTypeGuid = QnUuid::fromStringSafe(lit("{1d250fa0-ce88-4358-9bc9-4f39d0ce3b12}"));
-
-QString kCameraId("cameraId");
-QString kFilePath("/some/" + kCameraId);
 
 struct ExpectedInResult
 {
@@ -488,14 +543,14 @@ TEST_F(ReaderTest, HandlerError_typeIdNotFound)
     then(ResultIs::Empty);
 }
 
-TEST_F(ReaderTest, HandlerError_getFileDataError)
+TEST_F(ReaderTest, HandlerError_getFileDataError_shouldNotPreventFromCreatingArchiveCameras)
 {
     when(CameraPresence::NotInTheResourcePool,
          ModuleGuid::Found,
          ArchiveCamTypeId::Found,
          GetFileData::Failed);
     nx::caminfo::Reader(&readerHandler, fileInfo, getDataFunc)(&camDataList);
-    then(ResultIs::Empty);
+    then(ResultIs::NotEmpty);
 }
 
 TEST_F(ReaderTest, ErrorsInData)

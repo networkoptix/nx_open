@@ -26,6 +26,7 @@ namespace hpm {
 
 namespace conf { class Settings; }
 namespace http { class Server; }
+class ListeningPeerDb;
 
 class Controller;
 class ListeningPeerPool;
@@ -48,9 +49,14 @@ public:
     Controller& controller();
     const Controller& controller() const;
 
+    ListeningPeerDb& listeningPeerDb();
+
 protected:
     virtual std::unique_ptr<nx::utils::AbstractServiceSettings> createSettings() override;
     virtual int serviceMain(const nx::utils::AbstractServiceSettings& settings) override;
+
+private:
+    void registerThisInstanceNameInCluster(const conf::Settings& settings);
 
 private:
     Controller* m_controller = nullptr;

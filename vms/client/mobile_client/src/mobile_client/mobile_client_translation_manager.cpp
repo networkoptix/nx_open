@@ -2,11 +2,13 @@
 
 #include <QtCore/QLocale>
 
+#include <nx/utils/log/log.h>
+
 QnMobileClientTranslationManager::QnMobileClientTranslationManager(QObject *parent) :
     base_type(parent)
 {
-    addPrefix(lit("mobile_client_base"));
-    addPrefix(lit("mobile_client_qml"));
+    addPrefix("mobile_client_base");
+    addPrefix("mobile_client_qml");
 }
 
 QnMobileClientTranslationManager::~QnMobileClientTranslationManager()
@@ -31,8 +33,9 @@ void QnMobileClientTranslationManager::updateTranslation()
         }
     }
 
-    if (!bestTranslation.isEmpty()) {
-        qDebug() << "Installing translation: " << bestTranslation.localeCode();
+    if (!bestTranslation.isEmpty())
+    {
+        NX_DEBUG(this, "Installing translation: %1", bestTranslation.localeCode());
         installTranslation(bestTranslation);
     }
 }

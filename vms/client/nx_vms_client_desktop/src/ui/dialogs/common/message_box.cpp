@@ -193,7 +193,7 @@ int QnMessageBoxPrivate::execReturnCode(QAbstractButton* button) const
 
 QnMessageBox::QnMessageBox(QWidget* parent):
     base_type(parent, Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint),
-    ui(new Ui::MessageBox),
+    ui(new Ui::QnMessageBox),
     d_ptr(new QnMessageBoxPrivate(this))
 {
     initialize();
@@ -615,6 +615,16 @@ void QnMessageBox::addCustomWidget(QWidget* widget, Layout layout, int stretch,
         case QnMessageBox::Layout::AfterMainLabel:
             ui->verticalLayout->insertWidget(
                 ui->verticalLayout->indexOf(ui->mainLabel) + 1,
+                widget,
+                stretch,
+                alignment);
+            break;
+        case QnMessageBox::Layout::BeforeAdditionalInfo:
+            // It differs from Layout::AfterMainLabel for some reason. If we addCustomWidget and
+            // then setInformativeText, then customWidget will land before informative text in
+            // this case.
+            ui->verticalLayout->insertWidget(
+                /*index=*/1,
                 widget,
                 stretch,
                 alignment);

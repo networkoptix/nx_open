@@ -31,7 +31,7 @@ private:
 
     void onSystemStatusChanged(
         const std::string& systemId,
-        clusterdb::engine::SystemStatusDescriptor statusDescription);
+        clusterdb::engine::NodeStatusDescriptor statusDescription);
 };
 
 } // namespace nx::cloud::db

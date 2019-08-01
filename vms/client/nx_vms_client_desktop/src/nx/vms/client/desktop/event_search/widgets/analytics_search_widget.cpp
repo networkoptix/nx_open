@@ -1,6 +1,7 @@
 #include "analytics_search_widget.h"
 
 #include <algorithm>
+#include <chrono>
 
 #include <QtCore/QJsonObject>
 #include <QtCore/QPointer>
@@ -24,18 +25,24 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_changes_listener.h>
 #include <ui/style/skin.h>
+#include <ui/workbench/workbench_access_controller.h>
+#include <ui/dialogs/common/message_box.h>
 
 #include <nx/analytics/descriptor_manager.h>
 #include <nx/vms/api/analytics/descriptors.h>
 #include <nx/vms/client/desktop/common/dialogs/web_view_dialog.h>
 #include <nx/vms/client/desktop/common/widgets/selectable_text_button.h>
 #include <nx/vms/client/desktop/event_search/models/analytics_search_list_model.h>
+#include <nx/vms/client/desktop/utils/widget_utils.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/math/fuzzy.h>
+#include <nx/utils/pending_operation.h>
 #include <nx/utils/string.h>
 
 namespace nx::vms::client::desktop {
+
+using namespace std::chrono;
 
 // ------------------------------------------------------------------------------------------------
 // AnalyticsSearchWidget::Private
@@ -57,7 +64,7 @@ public:
     void executePluginAction(
         const QnUuid& engineId,
         const QString& actionTypeId,
-        const analytics::storage::DetectedObject& object,
+        const analytics::db::DetectedObject& object,
         const QnVirtualCameraResourcePtr& camera) const;
 
 private:
@@ -82,6 +89,7 @@ private:
     QMenu* const m_objectTypeMenu;
     QPointer<QAction> m_defaultAction;
     bool m_areaSelectionEnabled = false;
+    nx::utils::PendingOperation m_updateObjectTypesOperation;
 
     using ObjectTypeDescriptors = std::map<QString, nx::vms::api::analytics::ObjectTypeDescriptor>;
     struct EngineInfo
@@ -110,8 +118,10 @@ AnalyticsSearchWidget::AnalyticsSearchWidget(QnWorkbenchContext* context, QWidge
     setPlaceholderPixmap(qnSkin->pixmap("events/placeholders/analytics.png"));
     selectCameras(AbstractSearchWidget::Cameras::layout);
 
-    connect(model(), &AbstractSearchListModel::isOnlineChanged,
-        this, &AnalyticsSearchWidget::updateAllowance);
+    connect(model(), &AbstractSearchListModel::isOnlineChanged, this,
+        &AnalyticsSearchWidget::updateAllowance);
+    connect(accessController(), &QnWorkbenchAccessController::globalPermissionsChanged, this,
+        &AnalyticsSearchWidget::updateAllowance);
 }
 
 AnalyticsSearchWidget::~AnalyticsSearchWidget()
@@ -152,7 +162,10 @@ QString AnalyticsSearchWidget::itemCounterText(int count) const
 
 bool AnalyticsSearchWidget::calculateAllowance() const
 {
-    if (!model()->isOnline())
+    const bool hasPermissions = model()->isOnline()
+        && accessController()->hasGlobalPermission(GlobalPermission::viewArchive);
+
+    if (!hasPermissions)
         return false;
 
     const nx::analytics::ObjectTypeDescriptorManager manager(commonModule());
@@ -170,6 +183,15 @@ AnalyticsSearchWidget::Private::Private(AnalyticsSearchWidget* q):
     m_objectTypeMenu(q->createDropdownMenu())
 {
     NX_CRITICAL(m_model);
+
+    m_updateObjectTypesOperation.setFlags(nx::utils::PendingOperation::FireOnlyWhenIdle);
+    m_updateObjectTypesOperation.setInterval(1ms);
+    m_updateObjectTypesOperation.setCallback(
+        [this]()
+        {
+            this->q->updateAllowance();
+            updateTypeMenu();
+        });
 
     setupTypeSelection();
     setupAreaSelection();
@@ -239,8 +261,7 @@ void AnalyticsSearchWidget::Private::resetFilters()
 
 void AnalyticsSearchWidget::Private::updateAvailableObjectTypes()
 {
-    q->updateAllowance();
-    updateTypeMenu();
+    m_updateObjectTypesOperation.requestOperation();
 }
 
 void AnalyticsSearchWidget::Private::setupTypeSelection()
@@ -272,7 +293,10 @@ void AnalyticsSearchWidget::Private::updateTypeMenu()
     nx::analytics::EngineDescriptorManager engineDescriptorManager(q->commonModule());
     const auto objectTypeDescriptors = objectTypeDescriptorManager.descriptors();
     const auto engineDescriptors = engineDescriptorManager.descriptors();
-    m_objectTypeMenu->clear();
+
+    WidgetUtils::clearMenu(m_objectTypeMenu);
+
+    m_defaultAction = addMenuAction(m_objectTypeMenu, tr("Any type"), {});
 
     const auto cameras = q->resourcePool()->getResources<QnVirtualCameraResource>();
     QSet<QnUuid> enabledEngines;
@@ -281,6 +305,8 @@ void AnalyticsSearchWidget::Private::updateTypeMenu()
 
     if (!objectTypeDescriptors.empty())
     {
+        m_objectTypeMenu->addSeparator();
+
         QHash<QnUuid, EngineInfo> engineById;
         for (const auto& [engineId, engineDescriptor]: engineDescriptors)
         {
@@ -337,9 +363,6 @@ void AnalyticsSearchWidget::Private::updateTypeMenu()
         }
     }
 
-    m_objectTypeMenu->addSeparator();
-    m_defaultAction = addMenuAction(m_objectTypeMenu, tr("Any type"), {});
-
     if (!currentSelectionStillAvailable)
         m_model->setSelectedObjectType({});
 }
@@ -352,7 +375,12 @@ void AnalyticsSearchWidget::Private::setupAreaSelection()
     m_areaSelectionButton->hide();
 
     connect(q, &AbstractSearchWidget::cameraSetChanged, this,
-        [this]() { setAreaSelectionEnabled(q->selectedCameras() == Cameras::current); });
+        [this](const QnVirtualCameraResourceSet& cameras)
+        {
+            setAreaSelectionEnabled(!cameras.empty());
+            if (q->selectedCameras() != Cameras::current)
+                m_areaSelectionButton->deactivate();
+        });
 
     connect(m_areaSelectionButton, &SelectableTextButton::stateChanged,
         [this](SelectableTextButton::State state)
@@ -367,6 +395,7 @@ void AnalyticsSearchWidget::Private::setupAreaSelection()
             m_areaSelectionButton->setText(tr("Select some area on the video..."));
             m_areaSelectionButton->setAccented(true);
             m_areaSelectionButton->setState(SelectableTextButton::State::unselected);
+            q->selectCameras(Cameras::current);
             emit q->areaSelectionRequested({});
         });
 }
@@ -383,9 +412,6 @@ void AnalyticsSearchWidget::Private::setAreaSelectionEnabled(bool value)
 
 void AnalyticsSearchWidget::Private::updateAreaButtonAppearance()
 {
-    if (!m_areaSelectionEnabled)
-        return;
-
     m_areaSelectionButton->setState(m_model->filterRect().isValid()
         ? SelectableTextButton::State::unselected
         : SelectableTextButton::State::deactivated);
@@ -415,7 +441,7 @@ QAction* AnalyticsSearchWidget::Private::addMenuAction(
 void AnalyticsSearchWidget::Private::executePluginAction(
     const QnUuid& engineId,
     const QString& actionTypeId,
-    const analytics::storage::DetectedObject& object,
+    const analytics::db::DetectedObject& object,
     const QnVirtualCameraResourcePtr& camera) const
 {
     const auto server = q->commonModule()->currentServer();

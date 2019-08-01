@@ -1,3 +1,5 @@
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+
 #pragma once
 
 #include <string>
@@ -5,6 +7,7 @@
 #include <mutex>
 
 #include <nx/sdk/helpers/ref_countable.h>
+#include <nx/sdk/helpers/ptr.h>
 #include <nx/sdk/uuid.h>
 #include <nx/sdk/helpers/log_utils.h>
 #include <nx/sdk/i_string_map.h>
@@ -53,7 +56,7 @@ protected:
      * @return Param value, or an empty string if such param does not exist, having logged the
      * error.
      */
-    std::string getParamValue(const char* paramName);
+    std::string getParamValue(const std::string& paramName);
 
     /**
      * Action handler. Called when some action defined by this engine is triggered by Server.
@@ -70,6 +73,7 @@ protected:
         Uuid /*objectId*/,
         Uuid /*deviceId*/,
         int64_t /*timestampUs*/,
+        nx::sdk::Ptr<IObjectTrackInfo> /*trackInfo*/,
         const std::map<std::string, std::string>& /*params*/,
         std::string* /*outActionUrl*/,
         std::string* /*outMessageToUser*/,
@@ -91,14 +95,14 @@ protected:
      * @return Parent Plugin, casted to the specified type.
      */
     template<typename DerivedPlugin>
-    DerivedPlugin* pluginCasted()
+    DerivedPlugin* pluginCasted() const
     {
         const auto plugin = dynamic_cast<DerivedPlugin*>(m_plugin);
         assertPluginCasted(plugin);
         return plugin;
     }
 
-    IEngine::IHandler* handler() const { return m_handler; }
+    IHandler* handler() const { return m_handler.get(); }
 
 public:
     virtual ~Engine() override;
@@ -126,7 +130,7 @@ private:
     IPlugin* const m_plugin;
     const std::string m_overridingPrintPrefix;
     std::map<std::string, std::string> m_settings;
-    IEngine::IHandler* m_handler = nullptr;
+    nx::sdk::Ptr<IEngine::IHandler> m_handler;
 };
 
 } // namespace analytics

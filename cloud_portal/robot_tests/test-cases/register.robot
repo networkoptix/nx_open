@@ -154,13 +154,14 @@ should respond to Tab key
     Press Key    ${PRIVACY POLICY LINK}    ${ENTER}
     ${tabs}    Get Window Handles
     Select Window    @{tabs}[2]
-    Location Should Be    ${PRIVACY POLICY URL}
+    Location Should Be    ${WEBSITE URL}${PRIVACY POLICY URL}
     Select Window    @{tabs}[0]
 
     Clear Register Fields
     Press Key    ${PRIVACY POLICY LINK}    ${TAB}
     Element Should Be Focused    ${CREATE ACCOUNT BUTTON}
     Press Key    ${CREATE ACCOUNT BUTTON}    ${ENTER}
+    Run Keyword If    "${LANGUAGE}"=="he_IL"    Set Suite Variable    ${EMAIL IS REQUIRED}    //span[@ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.required" and contains(text(),'${EMAIL IS REQUIRED TEXT}')]
     Wait Until Elements Are Visible    ${FIRST NAME IS REQUIRED}    ${LAST NAME IS REQUIRED}    ${EMAIL IS REQUIRED}    ${PASSWORD IS REQUIRED}
 
 should open Terms and conditions in a new page
@@ -181,7 +182,7 @@ should open Privacy Policy in a new page
     Sleep    2    #This is specifically for Firefox
     ${windows}    Get Window Handles
     Select Window    @{windows}[1]
-    Location Should Be    ${PRIVACY POLICY URL}
+    Location Should Be    ${WEBSITE URL}${PRIVACY POLICY URL}
 
 should suggest user to log out, if he was logged in and goes to registration link
     Log In    ${EMAIL VIEWER}    ${password}

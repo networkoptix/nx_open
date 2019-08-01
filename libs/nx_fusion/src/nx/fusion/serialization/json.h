@@ -40,8 +40,13 @@ class QnJsonContext: public QnSerializationContext<QnJsonSerializer>
 public:
     bool areSomeFieldsNotFound() const { return m_someFieldsNotFound; }
     void setSomeFieldsNotFound(bool value) { m_someFieldsNotFound = value; }
+
+    bool areStringConvesionsAllowed() const { return m_allowStringConversions; }
+    void setAllowStringConvesions(bool value) { m_allowStringConversions = value; }
+
 private:
     bool m_someFieldsNotFound{false};
+    bool m_allowStringConversions{false};
 };
 
 class QnJsonSerializer:
@@ -217,9 +222,8 @@ bool deserialize(
     bool ok = QJson::deserialize(ctx, *pos, outTarget);
     if (!ok && !optional)
     {
-        qCritical() << QString(QLatin1String(
-            "Can't deserialize field \"%1\" from value \"%2\""))
-            .arg(key).arg(pos.value().toString());
+        qWarning() << QString("Can't deserialize field \"%1\" from value \"%2\"").arg(
+            key, pos.value().toString());
     }
     return ok || optional;
 }
@@ -343,5 +347,7 @@ T deserialized(const QByteArray& value, const T& defaultValue, bool* success)
 
     return defaultValue;
 }
+
+QString toString(QJsonValue::Type jsonType);
 
 } // namespace QJson

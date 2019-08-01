@@ -43,12 +43,6 @@ QSet<QString> parseDisabledVendors(const QString& disabledVendors)
     return updatedVendorList.toSet();
 }
 
-bool isHanwhaEnabledCustomization()
-{
-    const auto customization = nx::utils::AppInfo::customizationName();
-    return customization == "hanwha" || customization == "default";
-}
-
 const int kEc2ConnectionKeepAliveTimeoutDefault = 5;
 const int kEc2KeepAliveProbeCountDefault = 3;
 const QString kEc2AliveUpdateInterval("ec2AliveUpdateIntervalSec");
@@ -96,21 +90,6 @@ const std::chrono::seconds kMaxDifferenceBetweenSynchronizedAndInternetDefault(2
 const std::chrono::seconds kMaxDifferenceBetweenSynchronizedAndLocalTimeDefault(5);
 const std::chrono::seconds kOsTimeChangeCheckPeriodDefault(1);
 const std::chrono::minutes kSyncTimeExchangePeriodDefault(10);
-
-const QString kHanwhaDeleteProfilesOnInitIfNeeded("hanwhaDeleteProfilesOnInitIfNeeded");
-const bool kHanwhaDeleteProfilesOnInitIfNeededDefault = false;
-
-const QString kShowHanwhaAlternativePtzControlsOnTile(
-    "showHanwhaAlternativePtzControlsOnTile");
-const bool kShowHanwhaAlternativePtzControlsOnTileDefault = false;
-
-const QString kHanwhaChunkReaderResponseTimeoutSeconds(
-    "hanwhaChunkReaderResponseTimeoutSeconds");
-const std::chrono::minutes kHanwhaChunkReaderResponseTimeoutDefault(5);
-
-const QString kHanwhaChunkReaderMessageBodyTimeoutSeconds(
-    "hanwhaChunkReaderMessageBodyTimeoutSeconds");
-const std::chrono::minutes kHanwhaChunkReaderMessageBodyTimeoutDefault(30);
 
 const QString kEnableEdgeRecording(lit("enableEdgeRecording"));
 const bool kEnableEdgeRecordingDefault(true);
@@ -510,6 +489,15 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         QString(),
         this);
 
+    m_lastMergeMasterIdAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
+        kNameLastMergeMasterId,
+        QString(),
+        this);
+    m_lastMergeSlaveIdAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
+        kNameLastMergeSlaveId,
+        QString(),
+        this);
+
     m_disabledVendorsAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
         kNameDisabledVendors,
         QString(),
@@ -648,29 +636,6 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         kCloudConnectRelayingEnabledDefault,
         this);
 
-    if (isHanwhaEnabledCustomization())
-    {
-        m_hanwhaDeleteProfilesOnInitIfNeeded = new QnLexicalResourcePropertyAdaptor<bool>(
-            kHanwhaDeleteProfilesOnInitIfNeeded,
-            kHanwhaDeleteProfilesOnInitIfNeededDefault,
-            this);
-
-        m_showHanwhaAlternativePtzControlsOnTile = new QnLexicalResourcePropertyAdaptor<bool>(
-            kShowHanwhaAlternativePtzControlsOnTile,
-            kShowHanwhaAlternativePtzControlsOnTileDefault,
-            this);
-
-        m_hanwhaChunkReaderResponseTimeoutSeconds = new QnLexicalResourcePropertyAdaptor<int>(
-            kHanwhaChunkReaderResponseTimeoutSeconds,
-            duration_cast<seconds>(kHanwhaChunkReaderResponseTimeoutDefault).count(),
-            this);
-
-        m_hanwhaChunkReaderMessageBodyTimeoutSeconds = new QnLexicalResourcePropertyAdaptor<int>(
-            kHanwhaChunkReaderMessageBodyTimeoutSeconds,
-            duration_cast<seconds>(kHanwhaChunkReaderMessageBodyTimeoutDefault).count(),
-            this);
-    }
-
     m_edgeRecordingEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
         kEnableEdgeRecording,
         kEnableEdgeRecordingDefault,
@@ -726,9 +691,34 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         "mpeg2video",
         this);
 
+    m_licenseServerUrlAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
+        "licenseServer",
+        "http://licensing.vmsproxy.com", //< Licensing server does not support https.
+        this);
+
     m_maxEventLogRecordsAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
         "maxEventLogRecords",
         100 * 1000, //< Default value.
+        this);
+
+    m_forceLiveCacheForPrimaryStreamAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
+        kForceLiveCacheForPrimaryStream,
+        "auto",
+        this);
+
+    m_metadataStorageChangePolicyAdaptor = new QnLexicalResourcePropertyAdaptor<nx::vms::api::MetadataStorageChangePolicy>(
+        kMetadataStorageChangePolicyName,
+        nx::vms::api::MetadataStorageChangePolicy::keep,
+        this);
+
+    m_targetPersistentUpdateStorageAdaptor = new QnLexicalResourcePropertyAdaptor<QByteArray>(
+        kTargetPersistentUpdateStorageName,
+        QByteArray(),
+        this);
+
+    m_installedPersistentUpdateStorageAdaptor = new QnLexicalResourcePropertyAdaptor<QByteArray>(
+        kInstalledPersistentUpdateStorageName,
+        QByteArray(),
         this);
 
     connect(
@@ -907,10 +897,26 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         &QnGlobalSettings::downloaderPeersChanged,
         Qt::QueuedConnection);
 
+    connect(
+        m_targetPersistentUpdateStorageAdaptor,
+        &QnAbstractResourcePropertyAdaptor::valueChanged,
+        this,
+        &QnGlobalSettings::targetPersistentUpdateStorageChanged,
+        Qt::QueuedConnection);
+
+    connect(
+        m_installedPersistentUpdateStorageAdaptor,
+        &QnAbstractResourcePropertyAdaptor::valueChanged,
+        this,
+        &QnGlobalSettings::installedPersistentUpdateStorageChanged,
+        Qt::QueuedConnection);
+
     AdaptorList result;
     result
         << m_systemNameAdaptor
         << m_localSystemIdAdaptor
+        << m_lastMergeMasterIdAdaptor
+        << m_lastMergeSlaveIdAdaptor
         << m_disabledVendorsAdaptor
         << m_cameraSettingsOptimizationAdaptor
         << m_autoUpdateThumbnailsAdaptor
@@ -948,16 +954,14 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         << m_defaultExportVideoCodecAdaptor
         << m_downloaderPeersAdaptor
         << m_lowQualityScreenVideoCodecAdaptor
+        << m_licenseServerUrlAdaptor
         << m_maxWebMTranscoders
-        << m_maxEventLogRecordsAdaptor;
-
-    if (isHanwhaEnabledCustomization())
-    {
-        result << m_hanwhaDeleteProfilesOnInitIfNeeded;
-        result << m_showHanwhaAlternativePtzControlsOnTile;
-        result << m_hanwhaChunkReaderResponseTimeoutSeconds;
-        result << m_hanwhaChunkReaderMessageBodyTimeoutSeconds;
-    }
+        << m_maxEventLogRecordsAdaptor
+        << m_forceLiveCacheForPrimaryStreamAdaptor
+        << m_metadataStorageChangePolicyAdaptor
+        << m_targetPersistentUpdateStorageAdaptor
+        << m_installedPersistentUpdateStorageAdaptor
+    ;
 
     return result;
 }
@@ -1390,6 +1394,26 @@ void QnGlobalSettings::setLocalSystemId(const QnUuid& value)
     m_localSystemIdAdaptor->setValue(value.toString());
 }
 
+QnUuid QnGlobalSettings::lastMergeMasterId() const
+{
+    return QnUuid(m_lastMergeMasterIdAdaptor->value());
+}
+
+void QnGlobalSettings::setLastMergeMasterId(const QnUuid& value)
+{
+    m_lastMergeMasterIdAdaptor->setValue(value.toString());
+}
+
+QnUuid QnGlobalSettings::lastMergeSlaveId() const
+{
+    return QnUuid(m_lastMergeSlaveIdAdaptor->value());
+}
+
+void QnGlobalSettings::setLastMergeSlaveId(const QnUuid& value)
+{
+    m_lastMergeSlaveIdAdaptor->setValue(value.toString());
+}
+
 QString QnGlobalSettings::clientStatisticsSettingsUrl() const
 {
     return m_clientStatisticsSettingsUrlAdaptor->value();
@@ -1634,72 +1658,6 @@ int QnGlobalSettings::maxRecorderQueueSizePackets() const
     return m_maxRecorderQueueSizePackets->value();
 }
 
-bool QnGlobalSettings::hanwhaDeleteProfilesOnInitIfNeeded() const
-{
-    if (!m_hanwhaDeleteProfilesOnInitIfNeeded)
-        return kHanwhaDeleteProfilesOnInitIfNeededDefault;
-
-    return m_hanwhaDeleteProfilesOnInitIfNeeded->value();
-}
-
-void QnGlobalSettings::setHanwhaDeleteProfilesOnInitIfNeeded(bool deleteProfiles)
-{
-    if (!m_hanwhaDeleteProfilesOnInitIfNeeded)
-        return;
-
-    m_hanwhaDeleteProfilesOnInitIfNeeded->setValue(deleteProfiles);
-}
-
-bool QnGlobalSettings::showHanwhaAlternativePtzControlsOnTile() const
-{
-    if (!m_showHanwhaAlternativePtzControlsOnTile)
-        return kShowHanwhaAlternativePtzControlsOnTileDefault;
-
-    return m_showHanwhaAlternativePtzControlsOnTile->value();
-}
-
-void QnGlobalSettings::setShowHanwhaAlternativePtzControlsOnTile(bool showPtzControls)
-{
-    if (!m_showHanwhaAlternativePtzControlsOnTile)
-        return;
-
-    m_showHanwhaAlternativePtzControlsOnTile->setValue(showPtzControls);
-}
-
-int QnGlobalSettings::hanwhaChunkReaderResponseTimeoutSeconds() const
-{
-    using namespace std::chrono;
-    if (!m_hanwhaChunkReaderResponseTimeoutSeconds)
-        return duration_cast<seconds>(kHanwhaChunkReaderResponseTimeoutDefault).count();
-
-    return m_hanwhaChunkReaderResponseTimeoutSeconds->value();
-}
-
-void QnGlobalSettings::setHanwhaChunkReaderResponseTimeoutSeconds(int value)
-{
-    if (!m_hanwhaChunkReaderResponseTimeoutSeconds)
-        return;
-
-    m_hanwhaChunkReaderResponseTimeoutSeconds->setValue(value);
-}
-
-int QnGlobalSettings::hanwhaChunkReaderMessageBodyTimeoutSeconds() const
-{
-    using namespace std::chrono;
-    if (!m_hanwhaChunkReaderMessageBodyTimeoutSeconds)
-        return duration_cast<seconds>(kHanwhaChunkReaderMessageBodyTimeoutDefault).count();
-
-    return m_hanwhaChunkReaderMessageBodyTimeoutSeconds->value();
-}
-
-void QnGlobalSettings::setHanwhaChunkReaderMessageBodyTimeoutSeconds(int value)
-{
-    if (!m_hanwhaChunkReaderMessageBodyTimeoutSeconds)
-        return;
-
-    m_hanwhaChunkReaderMessageBodyTimeoutSeconds->setValue(value);
-}
-
 bool QnGlobalSettings::isEdgeRecordingEnabled() const
 {
     return m_edgeRecordingEnabledAdaptor->value();
@@ -1718,6 +1676,28 @@ QByteArray QnGlobalSettings::targetUpdateInformation() const
 void QnGlobalSettings::setTargetUpdateInformation(const QByteArray& updateInformation)
 {
     m_targetUpdateInformationAdaptor->setValue(updateInformation);
+}
+
+QByteArray QnGlobalSettings::targetPersistentUpdateStorage() const
+{
+    return m_targetPersistentUpdateStorageAdaptor->value();
+}
+
+void QnGlobalSettings::setTargetPersistentUpdateStorage(
+    const QByteArray& persistentUpdateStorageSerializedData)
+{
+    m_targetPersistentUpdateStorageAdaptor->setValue(persistentUpdateStorageSerializedData);
+}
+
+QByteArray QnGlobalSettings::installedPersistentUpdateStorage() const
+{
+    return m_installedPersistentUpdateStorageAdaptor->value();
+}
+
+void QnGlobalSettings::setInstalledPersistentUpdateStorage(
+    const QByteArray& persistentUpdateStorageSerializedData)
+{
+    m_installedPersistentUpdateStorageAdaptor->setValue(persistentUpdateStorageSerializedData);
 }
 
 QByteArray QnGlobalSettings::installedUpdateInformation() const
@@ -1825,9 +1805,29 @@ QString QnGlobalSettings::lowQualityScreenVideoCodec() const
     return m_lowQualityScreenVideoCodecAdaptor->value();
 }
 
+void QnGlobalSettings::setLicenseServerUrl(const QString& value)
+{
+    m_licenseServerUrlAdaptor->setValue(value);
+}
+
+QString QnGlobalSettings::licenseServerUrl() const
+{
+    return m_licenseServerUrlAdaptor->value();
+}
+
 void QnGlobalSettings::setLowQualityScreenVideoCodec(const QString& value)
 {
     m_lowQualityScreenVideoCodecAdaptor->setValue(value);
+}
+
+QString QnGlobalSettings::forceLiveCacheForPrimaryStream() const
+{
+    return m_forceLiveCacheForPrimaryStreamAdaptor->value();
+}
+
+void QnGlobalSettings::setForceLiveCacheForPrimaryStream(const QString& value)
+{
+    m_forceLiveCacheForPrimaryStreamAdaptor->setValue(value);
 }
 
 const QList<QnAbstractResourcePropertyAdaptor*>& QnGlobalSettings::allSettings() const
@@ -1838,4 +1838,14 @@ const QList<QnAbstractResourcePropertyAdaptor*>& QnGlobalSettings::allSettings()
 bool QnGlobalSettings::isGlobalSetting(const nx::vms::api::ResourceParamWithRefData& param)
 {
     return QnUserResource::kAdminGuid == param.resourceId;
+}
+
+nx::vms::api::MetadataStorageChangePolicy QnGlobalSettings::metadataStorageChangePolicy() const
+{
+    return m_metadataStorageChangePolicyAdaptor->value();
+}
+
+void QnGlobalSettings::setMetadataStorageChangePolicy(nx::vms::api::MetadataStorageChangePolicy value)
+{
+    m_metadataStorageChangePolicyAdaptor->setValue(value);
 }

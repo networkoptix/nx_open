@@ -7,31 +7,45 @@
 
 namespace {
 
-void trace(const QString& message)
+class Http1NetworkAccessManager: public QNetworkAccessManager
 {
-#ifdef _DEBUG
-    for (const QString& line : message.split(lit("\n"), QString::SkipEmptyParts))
-        qDebug() << line;
-#endif
-    NX_INFO(typeid(QnWebPage), message);
-}
+public:
+    using QNetworkAccessManager::QNetworkAccessManager;
 
-}
+    static Http1NetworkAccessManager* instance()
+    {
+        static Http1NetworkAccessManager instance;
+        return &instance;
+    }
 
-QnWebPage::QnWebPage(QObject* parent):
-    base_type(parent)
+protected:
+    virtual QNetworkReply* createRequest(Operation op, const QNetworkRequest& request,
+        QIODevice* outgoingData = nullptr)
+    {
+        QNetworkRequest copy(request);
+        copy.setAttribute(QNetworkRequest::HTTP2AllowedAttribute, false);
+        return QNetworkAccessManager::createRequest(op, copy, outgoingData);
+    }
+};
+
+} // namespace
+
+QnWebPage::QnWebPage(QObject* parent): base_type(parent)
 {
-    connect(this->networkAccessManager(), &QNetworkAccessManager::sslErrors, this,
-        [](QNetworkReply* reply, const QList<QSslError>& errors)
+    setNetworkAccessManager(Http1NetworkAccessManager::instance());
+
+    connect(networkAccessManager(), &QNetworkAccessManager::sslErrors, this,
+        [this](QNetworkReply* reply, const QList<QSslError>& errors)
         {
             for (auto e: errors)
-                trace(e.errorString());
+                NX_DEBUG(this, "SSL error: %1 (%2)", e, int(e.error()));
+
             reply->ignoreSslErrors();
         });
 }
 
-void QnWebPage::javaScriptConsoleMessage(const QString& message, int lineNumber, const QString& sourceID)
+void QnWebPage::javaScriptConsoleMessage(
+    const QString& message, int lineNumber, const QString& sourceID)
 {
-    QString logMessage = lit("JS Console: %1:%2 %3").arg(sourceID, QString::number(lineNumber), message);
-    trace(logMessage);
+    NX_DEBUG(this, "JS Console: %1:%2 %3", sourceID, lineNumber, message);
 }

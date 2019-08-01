@@ -18,6 +18,7 @@
 #include <utils/common/app_info.h>
 #include <utils/common/id.h>
 
+#include <nx_ec/ec_api.h>
 #include <nx/vms/api/analytics/engine_manifest.h>
 #include <nx/vms/api/analytics/descriptors.h>
 
@@ -28,6 +29,7 @@
 #include <nx/utils/log/assert.h>
 
 #include <nx/analytics/descriptor_manager.h>
+#include <nx/fusion/model_functions.h>
 
 namespace nx {
 namespace vms {
@@ -102,7 +104,7 @@ QString StringsHelper::eventName(EventType value, int count) const
         case EventType::licenseIssueEvent:    return tr("License Issue");
         case EventType::backupFinishedEvent:  return tr("Archive backup finished");
         case EventType::analyticsSdkEvent:    return tr("Analytics Event");
-        case EventType::pluginEvent:          return tr("Plugin Event");
+        case EventType::pluginEvent:          return tr("Plugin Diagnostic Event");
 
         case EventType::anyServerEvent:       return tr("Any Server Issue");
         case EventType::anyEvent:             return tr("Any Event");
@@ -220,7 +222,7 @@ QString StringsHelper::eventAtResource(const EventParameters& params,
         case EventType::pluginEvent:
         {
             const QString caption = params.caption.isEmpty()
-                ? tr("Unknown plugin event")
+                ? tr("Unknown Plugin Diagnostic Event")
                 : params.caption;
 
             return lm("%1 - %2").args(resourceName, caption);
@@ -238,7 +240,7 @@ QString StringsHelper::eventAtResources(const EventParameters& params) const
             .arg(getSoftwareTriggerName(params));
     }
 
-    return tr("Multiple %1 events have occured").arg(eventName(params.eventType));
+    return tr("Multiple %1 events have occurred").arg(eventName(params.eventType));
 }
 
 QString StringsHelper::getResoureNameFromParams(const EventParameters& params,
@@ -450,12 +452,7 @@ QString StringsHelper::eventReason(const EventParameters& params) const
         }
         case EventReason::networkRtpPacketLoss:
         {
-            NetworkIssueEvent::PacketLossSequence seq = NetworkIssueEvent::decodePacketLossSequence(reasonParamsEncoded);
-            if (seq.valid)
-                result = tr("RTP packet loss detected, prev seq.=%1 next seq.=%2.").arg(seq.prev).arg(seq.next);
-            else
-                result = tr("RTP packet loss detected.");
-            break;
+            return tr("RTP packet loss detected.");
         }
         case EventReason::networkBadCameraTime:
         {
@@ -468,6 +465,25 @@ QString StringsHelper::eventReason(const EventParameters& params) const
         case EventReason::networkNoResponseFromDevice:
         {
             return tr("Device does not respond to network requests.");
+        }
+        case EventReason::networkMulticastAddressConflict:
+        {
+            const auto params =
+                QJson::deserialized<NetworkIssueEvent::MulticastAddressConflictParameters>(
+                    reasonParamsEncoded.toUtf8());
+
+            return tr("Multicast address conflict detected. "
+                "Address %1 is already in use by %2 on %3 stream")
+                    .arg(params.address.toString())
+                    .arg(params.deviceName)
+                    .arg(QnLexical::serialized(params.stream));
+        }
+        case EventReason::networkMulticastAddressIsInvalid:
+        {
+            const auto params = QJson::deserialized<nx::network::SocketAddress>(
+                reasonParamsEncoded.toUtf8());
+
+            return tr("Network address %1 is not a multicast address").arg(params.toString());
         }
         case EventReason::serverTerminated:
         {
@@ -501,6 +517,23 @@ QString StringsHelper::eventReason(const EventParameters& params) const
         {
             QString storageUrl = reasonParamsEncoded;
             result = tr("System disk \"%1\" is almost full.").arg(storageUrl);
+            break;
+        }
+        case EventReason::metadataStorageOffline:
+        {
+            QString storageUrl = reasonParamsEncoded;
+            result = tr("Analytics storage \"%1\" is offline.").arg(storageUrl);
+            break;
+        }
+        case EventReason::metadataStorageFull:
+        {
+            QString storageUrl = reasonParamsEncoded;
+            result = tr("Analytics storage \"%1\" is almost full.").arg(storageUrl);
+            break;
+        }
+        case EventReason::raidStorageError:
+        {
+            result = tr("RAID error. %1.").arg(reasonParamsEncoded);
             break;
         }
         case EventReason::backupFailedNoBackupStorageError:

@@ -185,7 +185,10 @@ inline bool Settings::Option<QString>::fromQVariant(const QVariant& value, QStri
     if (!value.isValid())
         return false;
 
-    *result = value.toString();
+    if (value.type() == QVariant::StringList)
+        *result = value.toStringList().join(",");
+    else
+        *result = value.toString();
     return true;
 }
 

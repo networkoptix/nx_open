@@ -12,6 +12,8 @@
 typedef std::shared_ptr<QnAbstractAudioTransmitter> QnAudioTransmitterPtr;
 class QnAbstractPtzController;
 
+namespace nx::vms::server::resource { struct MulticastParameters; }
+
 namespace nx {
 namespace vms::server {
 namespace resource {
@@ -169,6 +171,8 @@ public:
     /** Override for IO modules. */
     virtual QnIOStateDataList ioPortStates() const;
 
+    void reopenStream(nx::vms::api::StreamIndex streamIndex);
+
     nx::streaming::rtp::TimeOffsetPtr getTimeOffset() { return m_timeOffset; }
 
     /*
@@ -189,6 +193,10 @@ public:
     };
     void setRole(Role role) { m_role = role; }
     Role getRole() const { return m_role; }
+
+    bool fixMulticastParametersIfNeeded(
+        nx::vms::server::resource::MulticastParameters* inOutMulticastParameters,
+        nx::vms::api::StreamIndex streamIndex);
 
 signals:
     /** Emit on camera or IO module input change. */
@@ -240,13 +248,14 @@ protected:
 private:
     CameraDiagnostics::Result initializeAdvancedParametersProviders();
     void fixInputPortMonitoring();
+    void handlePtzConfigurationChange(const QString& key);
 
 protected:
     QnAudioTransmitterPtr m_audioTransmitter;
 
 private:
     using StreamCapabilityAdvancedParameterProviders = std::map<
-        nx::vms::api::StreamIndex, 
+        nx::vms::api::StreamIndex,
         std::unique_ptr<StreamCapabilityAdvancedParametersProvider>>;
 
     int m_channelNumber; // video/audio source number

@@ -69,11 +69,7 @@ QUrl QnThumbnailCacheAccessor::thumbnailUrl() const
     if (d->thumbnailId.isEmpty())
         return QUrl();
 
-    QUrl result;
-    result.setScheme(lit("image"));
-    result.setHost(lit("thumbnail"));
-    result.setPath(lit("/") + d->thumbnailId);
-    return result;
+    return QUrl("image://thumbnail/" + d->thumbnailId);
 }
 
 void QnThumbnailCacheAccessor::refreshThumbnail()

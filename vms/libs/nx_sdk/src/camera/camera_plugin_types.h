@@ -1,3 +1,5 @@
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+
 
 #ifndef CAMERA_PLUGIN_TYPES_H
 #define CAMERA_PLUGIN_TYPES_H

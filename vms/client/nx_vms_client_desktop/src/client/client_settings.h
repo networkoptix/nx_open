@@ -105,6 +105,16 @@ public:
         /** Last used path for the layout backgrounds */
         BACKGROUNDS_FOLDER,
 
+        /**
+         * When "Info" mode is enabled on cameras, full info will be displayed even without hover.
+         */
+        SHOW_FULL_INFO,
+
+        /**
+         * "Info" mode will be enabled by default on newly opened cameras.
+         */
+        SHOW_INFO_BY_DEFAULT,
+
         /** Allow double buffering for openGL context */
         GL_DOUBLE_BUFFER,
 
@@ -130,6 +140,9 @@ public:
         LAST_LOCAL_CONNECTION_URL,
         KNOWN_SERVER_URLS,
 
+        // Force client to reconnect only to the same server it was connected to.
+        STICKY_RECONNECT,
+
         EXPORT_MEDIA_SETTINGS,
         EXPORT_LAYOUT_SETTINGS,
         EXPORT_BOOKMARK_SETTINGS,
@@ -139,6 +152,7 @@ public:
 
         /** Version of the latest read and accepted EULA. */
         ACCEPTED_EULA_VERSION,
+        ALLOW_MT_DECODING,
 
         ALL_LAYOUTS_SELECTION_DIALOG_MODE, //< Tree mode in MultipleLayoutSelectionDialog.
 
@@ -152,7 +166,7 @@ public:
     virtual ~QnClientSettings();
 
     void load();
-    void save();
+    bool save();
 
     /**
      * @brief isWritable    Check if settings storage is available for writing.
@@ -160,6 +174,11 @@ public:
      */
     bool isWritable() const;
     QSettings* rawSettings();
+
+    /**
+     * Execute settings migration.
+     */
+    void migrate();
 
 signals:
     void saved();
@@ -216,6 +235,8 @@ private:
         QN_DECLARE_R_PROPERTY (int,                         statisticsNetworkFilter,                            STATISTICS_NETWORK_FILTER,  1)
         QN_DECLARE_RW_PROPERTY(bool,                        layoutKeepAspectRatio,  setLayoutKeepAspectRatio,   LAYOUT_KEEP_ASPECT_RATIO,   true)
         QN_DECLARE_RW_PROPERTY(QString,                     backgroundsFolder,      setBackgroundsFolder,       BACKGROUNDS_FOLDER,         QString())
+        QN_DECLARE_RW_PROPERTY(bool,                        showFullInfo,           setShowFullInfo,            SHOW_FULL_INFO,             false);
+        QN_DECLARE_RW_PROPERTY(bool,                        showInfoByDefault,      setShowInfoByDefault,       SHOW_INFO_BY_DEFAULT,       false);
         QN_DECLARE_RW_PROPERTY(bool,                        isGlDoubleBuffer,       setGLDoubleBuffer,          GL_DOUBLE_BUFFER,           true)
         QN_DECLARE_RW_PROPERTY(bool,                        isGlBlurEnabled,        setGlBlurEnabled,           GL_BLUR,                    true)
         QN_DECLARE_RW_PROPERTY(quint64,                     userIdleTimeoutMSecs,   setUserIdleTimeoutMSecs,    USER_IDLE_TIMEOUT_MSECS,    0)
@@ -225,6 +246,7 @@ private:
         QN_DECLARE_RW_PROPERTY(QString,                     lastExportMode,         setLastExportMode,          LAST_EXPORT_MODE,           lit("media"))
         QN_DECLARE_RW_PROPERTY(QnBackgroundImage,           backgroundImage,        setBackgroundImage,         BACKGROUND_IMAGE,           QnBackgroundImage())
         QN_DECLARE_RW_PROPERTY(QnUuid,                      pcUuid,                 setPcUuid,                  PC_UUID,                    QnUuid())
+        QN_DECLARE_R_PROPERTY(bool,                         stickReconnectToServer,                             STICKY_RECONNECT,           false)
         QN_DECLARE_RW_PROPERTY(QString,                     logLevel,               setLogLevel,                LOG_LEVEL,                  QLatin1String("none"))
         QN_DECLARE_RW_PROPERTY(int,                         initialLiveBufferMs,    setInitialLiveBufferMs,     INITIAL_LIVE_BUFFER_MSECS,  50)
         QN_DECLARE_RW_PROPERTY(int,                         maximumLiveBufferMs,    setMaximumLiveBufferMs,     MAXIMUM_LIVE_BUFFER_MSECS,  500)
@@ -236,6 +258,7 @@ private:
 
         QN_DECLARE_RW_PROPERTY(bool, allLayoutsSelectionDialogMode, setAllLayoutsSelectionDialogMode, ALL_LAYOUTS_SELECTION_DIALOG_MODE, 0)
         QN_DECLARE_RW_PROPERTY(QString, systemUpdaterState, setSystemUpdaterState, SYSTEM_UPDATER_STATE, 0)
+        QN_DECLARE_R_PROPERTY(bool,                         allowMtDecoding,                                    ALLOW_MT_DECODING,          true)
     QN_END_PROPERTY_STORAGE()
 
     void migrateKnownServerConnections();

@@ -2,6 +2,8 @@
 
 #include <QtCore/QCoreApplication> //for Q_DECLARE_TR_FUNCTIONS
 
+#include <QtGui/QValidator>
+
 #include <QtWidgets/QLayout>
 #include <QtWidgets/QLabel>
 

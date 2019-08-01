@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QtCore/QSize>
+#include <QtCore/QRectF>
 
 #include <core/resource/resource_fwd.h>
 
@@ -41,6 +42,15 @@ struct ImageRequest
         source, /**< Use actual image aspect ratio. */
     };
 
+    enum class StreamSelectionMode
+    {
+        auto_,
+        forcedPrimary,
+        forcedSecondary,
+        sameAsMotion,
+        sameAsAnalytics,
+    };
+
     static const qint64 kLatestThumbnail = -1;
     static const int kDefaultRotation = -1;
 
@@ -72,6 +82,11 @@ struct ImageRequest
     RoundMethod roundMethod = RoundMethod::iFrameAfter;
 
     AspectRatio aspectRatio = AspectRatio::auto_;
+
+    /** Crop image. Values in range [0..1] */
+    QRectF crop;
+
+    StreamSelectionMode streamSelectionMode = StreamSelectionMode::auto_;
 };
 
 struct ResourceImageRequest: ImageRequest
@@ -81,18 +96,7 @@ struct ResourceImageRequest: ImageRequest
 
 struct CameraImageRequest: ImageRequest
 {
-    enum class StreamSelectionMode
-    {
-        auto_,
-        forcedPrimary,
-        forcedSecondary,
-        sameAsMotion,
-        sameAsAnalytics,
-    };
-
     QnVirtualCameraResourcePtr camera;
-
-    StreamSelectionMode streamSelectionMode = StreamSelectionMode::auto_;
 
     CameraImageRequest() = default;
 
@@ -109,7 +113,7 @@ struct CameraImageRequest: ImageRequest
     static const int kMaximumSize = 4096;
 };
 
-QString toString(CameraImageRequest::StreamSelectionMode value);
+QString toString(ImageRequest::StreamSelectionMode value);
 
 inline QString toString(ImageRequest::RoundMethod value)
 {
@@ -132,4 +136,4 @@ inline QString toString(ImageRequest::RoundMethod value)
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(QN_THUMBNAIL_ENUM_TYPES, (lexical))
 
-QN_FUSION_DECLARE_FUNCTIONS(nx::api::CameraImageRequest::StreamSelectionMode, (metatype)(lexical))
+QN_FUSION_DECLARE_FUNCTIONS(nx::api::ImageRequest::StreamSelectionMode, (metatype)(lexical))

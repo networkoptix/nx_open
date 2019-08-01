@@ -16,7 +16,7 @@
 #include <boost/multi_index/member.hpp>
 #include <boost/multi_index/ordered_index.hpp>
 
-#include <nx/clusterdb/engine/transaction_log.h>
+#include <nx/clusterdb/engine/command_log.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/timer_manager.h>
 #include <nx/utils/counter.h>
@@ -39,7 +39,7 @@
 #include "../data/data_filter.h"
 #include "../data/system_data.h"
 
-namespace nx::clusterdb::engine { class SyncronizationEngine; }
+namespace nx::clusterdb::engine { class SynchronizationEngine; }
 
 namespace nx::cloud::db {
 
@@ -116,9 +116,9 @@ public:
         nx::utils::StandaloneTimerManager* const timerManager,
         AbstractAccountManager* const accountManager,
         const AbstractSystemHealthInfoProvider& systemHealthInfoProvider,
-        nx::sql::AsyncSqlQueryExecutor* const dbManager,
+        nx::sql::AbstractAsyncSqlQueryExecutor* const dbManager,
         AbstractEmailManager* const emailManager,
-        clusterdb::engine::SyncronizationEngine* const ec2SyncronizationEngine) noexcept(false);
+        clusterdb::engine::SynchronizationEngine* const ec2SynchronizationEngine) noexcept(false);
     virtual ~SystemManager();
 
     virtual void authenticateByName(
@@ -288,9 +288,9 @@ private:
     nx::utils::StandaloneTimerManager* const m_timerManager;
     AbstractAccountManager* const m_accountManager;
     const AbstractSystemHealthInfoProvider& m_systemHealthInfoProvider;
-    nx::sql::AsyncSqlQueryExecutor* const m_dbManager;
+    nx::sql::AbstractAsyncSqlQueryExecutor* const m_dbManager;
     AbstractEmailManager* const m_emailManager;
-    clusterdb::engine::SyncronizationEngine* const m_ec2SyncronizationEngine;
+    clusterdb::engine::SynchronizationEngine* const m_ec2SynchronizationEngine;
     SystemsDict m_systems;
     mutable QnMutex m_mutex;
     AccountSystemAccessRoleDict m_accountAccessRoleForSystem;

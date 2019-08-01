@@ -16,7 +16,21 @@
                     </a>
                 </div>
 
-                <ul ng-if="activeSystem" class="nav navbar-nav auth-visible d-none d-sm-flex">
+                <ul ng-if="active.integrations" class="nav navbar-nav d-none d-sm-flex">
+                    <li class="active">
+                        <a class="inset" href=1>Integrations</a>
+                    </li>
+                </ul>
+
+                <ul ng-if="active.campage" class="nav navbar-nav d-none d-sm-flex">
+                    <li class="active">
+                        <a class="inset" href=1>Supported IP Video Devices</a>
+                    </li>
+                </ul>
+
+                <ul ng-if="activeSystem && !active.integrations && !active.campage"
+                    class="nav navbar-nav auth-visible d-none d-sm-flex">
+
                     <li ng-class="{ 'active' :active.view }">
                         <a class="inset" ng-href="/systems/{{activeSystem.id}}/view">Xem</a>
                     </li>

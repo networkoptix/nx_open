@@ -104,7 +104,10 @@ private:
 };
 
 
-
+/**
+ * This one is needed for QnMediaServerConnection.
+ * It should be removed when all methods from QnMediaServerConnection are moved to rest::ServerConnection.
+ */
 class QnAbstractConnection: public Connective<QObject>, public /*mixin*/ QnCommonModuleAware
 {
     Q_OBJECT
@@ -116,10 +119,8 @@ public:
         const QnResourcePtr& targetRes = QnResourcePtr());
     virtual ~QnAbstractConnection();
 
-    nx::utils::Url url() const;
-    void setUrl(const nx::utils::Url &url);
-
 protected:
+    virtual nx::utils::Url url() const = 0;
     virtual QnAbstractReplyProcessor *newReplyProcessor(int object, const QString& serverId) = 0;
 
     QnLexicalSerializer *serializer() const;
@@ -202,7 +203,7 @@ protected:
     template<class T>
     int sendSyncGetRequest(int object, const QnRequestParamList &params, T *reply, std::optional<std::chrono::milliseconds> timeout = std::nullopt)
     {
-        return sendSyncGetRequest(object, QnRequestHeaderList(), params, reply, timeout);
+        return sendSyncGetRequest(object, {}, params, reply, timeout);
     }
 
     QnResourcePtr targetResource() const;
@@ -212,7 +213,6 @@ private:
     static bool connectProcessor(QnAbstractReplyProcessor *sender, const char *signal, QObject *receiver, const char *method, Qt::ConnectionType connectionType = Qt::AutoConnection);
 
 private:
-    nx::utils::Url m_url;
     QScopedPointer<QnLexicalSerializer> m_serializer;
     nx::network::http::HttpHeaders m_extraHeaders;
     QnRequestParamList m_extraQueryParameters;

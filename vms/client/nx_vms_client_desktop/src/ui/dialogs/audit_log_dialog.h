@@ -39,7 +39,7 @@ protected:
 private slots:
     void reset();
     void updateData();
-    void at_gotdata(int httpStatus, const QnAuditRecordList& data, int requestNum);
+    void at_gotdata(bool success, int requestNum, const QnAuditRecordList& data);
     void at_customContextMenuRequested(const QPoint& screenPos);
     void at_clipboardAction_triggered();
     void at_exportAction_triggered();

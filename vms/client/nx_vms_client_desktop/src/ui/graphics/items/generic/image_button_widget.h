@@ -3,9 +3,11 @@
 #include <array>
 
 #include <QtGui/QPixmap>
+#include <QtGui/QIcon>
 #include <QtGui/QOpenGLBuffer>
 #include <QtGui/QOpenGLFunctions>
 #include <QtGui/QOpenGLVertexArrayObject>
+#include <QtGui/QOpenGLTexture>
 
 #include <ui/processors/clickable.h>
 #include <ui/animation/animated.h>
@@ -15,7 +17,7 @@
 class QAction;
 class QMenu;
 class QIcon;
-class QGLWidget;
+class QOpenGLWidget;
 
 class VariantAnimator;
 
@@ -113,7 +115,7 @@ protected:
 
     virtual QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
 
-    virtual void paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QGLWidget *widget, const QRectF &rect);
+    virtual void paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QOpenGLWidget *widget, const QRectF &rect);
 
 protected:
     void updateState(StateFlags state);
@@ -121,7 +123,7 @@ protected:
 
     StateFlags validPixmapState(StateFlags flags) const;
 
-    void initializeVao(const QRectF &rect);
+    void initializeVao(const QRectF &rect, QOpenGLWidget* openGLWidget);
     void updateVao(const QRectF &rect);
 
     bool skipHoverEvent(QGraphicsSceneHoverEvent *event);
@@ -134,6 +136,13 @@ protected:
 
 private:
     friend class QnImageButtonHoverProgressAccessor;
+
+    using TexturePtr = QSharedPointer<QOpenGLTexture>;
+    using TextureHash = QHash<StateFlags, TexturePtr>;
+
+    bool safeBindTexture(StateFlags flags);
+
+    TextureHash m_textures;
 
     std::array<QPixmap, MaxState + 1> m_pixmaps;
 
@@ -180,7 +189,7 @@ public:
     void setRotationSpeed(qreal rotationSpeed);
 
 protected:
-    virtual void paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QGLWidget *widget, const QRectF &rect) override;
+    virtual void paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QOpenGLWidget *widget, const QRectF &rect) override;
     virtual void tick(int deltaMSecs) override;
 
 private:

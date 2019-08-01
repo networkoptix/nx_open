@@ -7,6 +7,8 @@
 #include <QtCore/QRegExp>
 #include <QtGui/QColor>
 
+#include <ui/style/skin.h>
+
 #include <nx/utils/log/log.h>
 
 static uint qHash(const QColor& color)
@@ -16,11 +18,11 @@ static uint qHash(const QColor& color)
 
 namespace nx::vms::client::desktop {
 
-static const auto kSkinFileName = lit(":/skin/customization_common.json");
+static const auto kBaseSkinFileName = "customization_common.json";
+static const auto kCustomSkinFileName = "skin.json";
 
-class ColorTheme::Private
+struct ColorTheme::Private
 {
-public:
     QVariantMap colors;
 
     QHash<QString, QList<QColor>> groups;
@@ -36,18 +38,23 @@ public:
 
     QHash<QColor, ColorInfo> colorInfoByColor;
 
-public:
     void loadColors();
+    void loadColorsFromFile(const QString& filename);
 };
 
 void ColorTheme::Private::loadColors()
 {
-    QFile file(kSkinFileName);
-    if (!file.open(QFile::ReadOnly))
-    {
-        NX_ERROR(this, lm("Cannot read skin file %1").arg(kSkinFileName));
+    // Load base colors and override them with the actual skin values.
+    loadColorsFromFile(kBaseSkinFileName);
+    loadColorsFromFile(kCustomSkinFileName);
+}
+
+void ColorTheme::Private::loadColorsFromFile(const QString& filename)
+{
+    QFile file(qnSkin->path(filename));
+    const bool opened = file.open(QFile::ReadOnly);
+    if (!NX_ASSERT(opened, "Cannot read skin file %1", filename))
         return;
-    }
 
     const auto& jsonData = file.readAll();
 
@@ -56,24 +63,16 @@ void ColorTheme::Private::loadColors()
     QJsonParseError error;
     const auto& json = QJsonDocument::fromJson(jsonData, &error);
 
-    if (error.error != QJsonParseError::NoError)
-    {
-        NX_ERROR(this, lm("JSON parse error: %1").arg(error.errorString()));
+    const bool parsed = error.error == QJsonParseError::NoError;
+    if (!NX_ASSERT(parsed, "JSON parse error: %1", error.errorString()))
         return;
-    }
 
-    if (!json.isObject())
-    {
-        NX_ERROR(this, lm("Not an object"));
+    if (!NX_ASSERT(json.isObject(), "Invalid JSON structure"))
         return;
-    }
 
-    const auto& globals = json.object().value(lit("globals")).toObject();
+    const auto& globals = json.object().value("globals").toObject();
     if (globals.isEmpty())
-    {
-        NX_ERROR(this, lm("\"globals\" key is empty"));
         return;
-    }
 
     QRegExp groupRegExp(lit("([^_\\d]+)[_\\d].*"));
 
@@ -84,13 +83,19 @@ void ColorTheme::Private::loadColors()
 
         const auto& colorName = it.key();
         const auto& color = QColor(it.value().toString());
-        if (color.isValid())
-            colors[colorName] = color;
+        if (!color.isValid())
+            continue;
+
+        const QColor oldColor = colors[colorName].value<QColor>();
+        colors[colorName] = color;
 
         if (groupRegExp.exactMatch(colorName))
         {
-            const auto& group = groupRegExp.cap(1);
-            groups[group].append(color);
+            const QString& groupName = groupRegExp.cap(1);
+            QList<QColor>& group = groups[groupName];
+            if (oldColor.isValid())
+                group.removeOne(oldColor);
+            groups[groupName].append(color);
         }
     }
 

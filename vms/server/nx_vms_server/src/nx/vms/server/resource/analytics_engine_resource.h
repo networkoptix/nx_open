@@ -48,7 +48,7 @@ protected:
 
 private:
     // ATTENTION: The field order is essential: EngineHandler must survive IEngine.
-    std::unique_ptr<analytics::EngineHandler> m_handler;
+    nx::sdk::Ptr<analytics::EngineHandler> m_handler;
     nx::sdk::Ptr<nx::sdk::analytics::IEngine> m_sdkEngine;
 };
 

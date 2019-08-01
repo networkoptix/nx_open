@@ -164,17 +164,16 @@ void CrossNatConnector::issueConnectRequestToMediator()
 {
     NX_ASSERT(isInSelfAioThread());
 
-    auto mediatorUdpClient = prepareForUdpHolePunching();
+    auto [resultCode, mediatorUdpClient] = prepareForUdpHolePunching();
     if (!mediatorUdpClient)
     {
-        const auto errorCode = SystemError::getLastOSErrorCode();
         NX_WARNING(this, lm("cross-nat %1. Failed to prepare mediator udp client. %2")
-            .args(m_connectSessionId, SystemError::getLastOSErrorText()));
+            .args(m_connectSessionId, SystemError::toString(resultCode)));
         post(
-            [this, errorCode]() mutable
+            [this, resultCode = resultCode]() mutable
             {
                 s_mediatorResponseCounter.addResult(hpm::api::ResultCode::badTransport);
-                nx::utils::swapAndCall(m_completionHandler, errorCode, nullptr);
+                nx::utils::swapAndCall(m_completionHandler, resultCode, nullptr);
             });
         return;
     }
@@ -205,7 +204,7 @@ void CrossNatConnector::issueConnectRequestToMediator()
         [this](auto&&... args) { onConnectResponse(std::move(args)...); });
 }
 
-std::unique_ptr<hpm::api::MediatorClientUdpConnection> 
+std::tuple<SystemError::ErrorCode, std::unique_ptr<hpm::api::MediatorClientUdpConnection>>
     CrossNatConnector::prepareForUdpHolePunching()
 {
     auto mediatorUdpClient =
@@ -216,10 +215,10 @@ std::unique_ptr<hpm::api::MediatorClientUdpConnection>
     if (!mediatorUdpClient->socket()->setReuseAddrFlag(true) ||
         !mediatorUdpClient->socket()->bind(SocketAddress::anyAddress))
     {
-        return nullptr;
+        return std::make_tuple(SystemError::getLastOSErrorCode(), nullptr);
     }
 
-    return mediatorUdpClient;
+    return std::make_tuple(SystemError::noError, std::move(mediatorUdpClient));
 }
 
 void CrossNatConnector::onConnectResponse(
@@ -345,6 +344,8 @@ void CrossNatConnector::holePunchingDone(
     // After message has been sent - reporting result to client.
     m_connectResultReport.connectSessionId = m_connectSessionId.c_str();
     m_connectResultReport.resultCode = resultCode;
+    if (m_connection)
+        m_connectResultReport.connectType = m_connection->connectType();
 
     m_connectResultReportSender = std::make_unique<stun::UnreliableMessagePipeline>(this);
     m_connectResultReportSender->bindToAioThread(getAioThread());
@@ -407,7 +408,7 @@ hpm::api::ConnectRequest CrossNatConnector::prepareConnectRequest(
 
     connectRequest.originatingPeerId = m_cloudConnectController->outgoingTunnelPool().ownPeerId();
     connectRequest.connectSessionId = m_connectSessionId.c_str();
-    connectRequest.connectionMethods = 
+    connectRequest.connectionMethods =
         api::ConnectionMethod::udpHolePunching | api::ConnectionMethod::proxy;
     connectRequest.destinationHostName = m_targetPeerAddress.host.toString().toUtf8();
     if (m_originatingHostAddressReplacement)

@@ -10,7 +10,15 @@
     "loginButton": "Anmelden",
     "logoutAuthorisedTitle": "Sie sind bereits eingeloggt",
     "logoutAuthorisedContinueButton": "Fortfahren",
-    "logoutAuthorisedLogoutButton": "Abmelden"
+    "logoutAuthorisedLogoutButton": "Abmelden",
+    "messageFailed": "Message has failed to send.",
+    "messageSent": "Message has been sent."
+  },
+  "messageType": {
+    "ipvd_feedback": "Feedback about {{product}}",
+    "sales_inquiry": "Inquiry for {{product}}",
+    "request_support": "Request Support for {{product}}",
+    "unknown": "Unknown Message Type"
   },
   "pageTitles": {
     "template": "{{title}} %PRODUCT_NAME%",
@@ -37,8 +45,9 @@
     "pageNotFound": "Seite nicht gefunden"
   },
   "systemStatuses": {
-    "notActivated": "nicht aktiviert",
     "activated": "aktiviert",
+    "merging": "merging",
+    "notActivated": "nicht aktiviert",
     "online": "online",
     "offline": "offline",
     "unavailable": "nicht verfügbar"
@@ -138,8 +147,9 @@
     "lostConnection": "Verbindung zu {{systemName}} verloren",
     "thisSystem": "das System",
     "oldSafariNotSupported": "Versionen von Safari älter als 10 werden nicht unterstützt",
-    "DUPLICATE_MEDIASERVER_FOUND": "Duplicate servers were found on one of the systems.<br>Remove old servers from each system that you are trying to merge and try again.",
-    "mergedSystemIsOffline": "One of the systems being merged is offline. Make sure they are online and try again."
+    "DUPLICATE_MEDIASERVER_FOUND": "Doppelte Server wurden auf einem der Systeme gefunden.<br>Entfernen Sie alte Server von jedem System, das Sie zusammenführen möchten, und versuchen Sie es erneut.",
+    "mergedSystemIsOffline": "Eines der zusammenzuführenden Systeme ist offline. Stellen Sie sicher, dass sie online sind und versuchen Sie es erneut.",
+    "INCOMPATIBLE": "Versions for systems are incompatible. To fix this problem make sure the systems have the same version."
   },
   "passwordRequirements": {
     "good": "gut",
@@ -185,8 +195,9 @@
     "confirmUnshareAction": "Löschen",
     "successDisconnected": "Das System wurde erfoglreich von %PRODUCT_NAME% getrennt",
     "successDeleted": "Das System {{systemName}} wurde erfolgreich von Ihrem Account gelöscht",
-    "successMerge": "System merge completed",
-    "permissionsRemoved": "Berechtigungen wurden von {{email}} entfernt"
+    "successMerge": "Systemzusammenführung abgeschlossen",
+    "permissionsRemoved": "Berechtigungen wurden von {{email}} entfernt",
+    "unknownName": "Unknown Name for System (Caused by cloud merge)"
   },
   "account": {
     "accountSavedSuccess": "Ihr Account wurde erfolgreich gespeichert",

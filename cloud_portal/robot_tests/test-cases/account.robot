@@ -30,7 +30,7 @@ Reset DB and Open New Browser On Failure
 
 *** Test Cases ***
 Can access the account page from dropdown
-    [tags]    C41573    Threaded
+    [tags]    Threaded
     Log In    ${EMAIL NOPERM}    ${password}
     Validate Log In
     Wait Until Element Is Visible    ${ACCOUNT DROPDOWN}
@@ -40,21 +40,21 @@ Can access the account page from dropdown
     Verify in account page
 
 Can access the account page from direct link while logged in
-    [tags]    C41573    Threaded
+    [tags]    Threaded
     Log In    ${EMAIL NOPERM}    ${password}
     Validate Log In
     Go To    ${url}/account
     Verify in account page
 
 Accessing the account page from a direct link while logged out asks for login, closing log in takes you to main page
-    [tags]    C41573    Threaded
+    [tags]    Threaded
     Go To    ${url}/account
     Wait Until Element Is Visible    ${LOG IN CLOSE BUTTON}
     Click Button    ${LOG IN CLOSE BUTTON}
     Location Should Be    ${url}/
 
 Accessing the account page from a direct link while logged out asks for login, on valid login takes you to account page
-    [tags]    C41573    Threaded
+    [tags]    Threaded
     Go To    ${url}/account
     Log In    ${EMAIL NOPERM}    ${password}    button=None
     Validate Log In
@@ -172,8 +172,8 @@ Should respond to tab and go in the correct order
     Element Should Be Focused    ${ACCOUNT LANGUAGE DROPDOWN}
     Press Key    ${ACCOUNT LANGUAGE DROPDOWN}    ${ENTER}
     Press Key    ${ACCOUNT LANGUAGE DROPDOWN}    ${TAB}
-    Element Should Be Focused    //form[@name="accountForm"]//a//span[text()="English (US)"]/..
-    Press Key    //form[@name="accountForm"]//a//span[text()="English (US)"]/..    ${ENTER}
+    Element Should Be Focused    //form[@name="accountForm"]//a//span[1]/..
+    Press Key    //form[@name="accountForm"]//a//span[1]/..    ${ENTER}
     Press Key    ${ACCOUNT LANGUAGE DROPDOWN}    ${TAB}
     Element Should Be Focused    ${ACCOUNT SAVE}
     Press Key    ${ACCOUNT SAVE}    ${ENTER}
@@ -196,8 +196,8 @@ Langauge is changeable on the account page
     \  Run Keyword Unless    "${lang}"=="${LANGUAGE}"    Wait Until Element Is Visible    //h1[text()='${account}']
     Wait Until Element Is Visible    ${ACCOUNT LANGUAGE DROPDOWN}
     Click Button    ${ACCOUNT LANGUAGE DROPDOWN}
-    Wait Until Element Is Visible    //form[@name='accountForm']//button/following-sibling::ul//span[@lang='${LANGUAGE}']
-    Click Element    //form[@name='accountForm']//button/following-sibling::ul//span[@lang='${LANGUAGE}']
+    Wait Until Element Is Visible    //form[@name='accountForm']//button/following-sibling::ul//span[@lang='${LANGUAGE}']/..
+    Click Element    //form[@name='accountForm']//button/following-sibling::ul//span[@lang='${LANGUAGE}']/..
     Click Button    ${ACCOUNT SAVE}
     Sleep    1
     Verify In Account Page
@@ -210,7 +210,7 @@ Language changed in account is new default
     Validate Log In
     Verify In Account Page
     Click Button    ${ACCOUNT LANGUAGE DROPDOWN}
-    Wait Until Element Is Visible    //form[@name='accountForm']//button/following-sibling::ul//span[@lang='en_US']
+    Wait Until Element Is Visible    //form[@name='accountForm']//button/following-sibling::ul//span[@lang='en_US']/..
     Click Element    //form[@name='accountForm']//button/following-sibling::ul//span[@lang='en_US']/..
     Click Button    ${ACCOUNT SAVE}
     Wait Until Element Is Visible    //h1[text()='Account']
@@ -232,4 +232,30 @@ Language changed in account is new default
     Wait Until Page Contains Element    ${AUTHORIZED BODY}
     Wait Until Elements Are Visible    ${ACCOUNT DROPDOWN}
     Wait Until Element Is Visible    //h1[text()='Account']
+
+Language change in account page affects emails
+    [tags]    C41575
+    ${russian subject}    Set Variable    Восстановление пароля
+    Go To    ${url}/account
+    Log In    ${EMAIL NOPERM}    ${password}    button=None
+    Validate Log In
+    Verify In Account Page
+    Click Button    ${ACCOUNT LANGUAGE DROPDOWN}
+    Wait Until Element Is Visible    //form[@name='accountForm']//button/following-sibling::ul//span[@lang='ru_RU']/..
+    Click Element    //form[@name='accountForm']//button/following-sibling::ul//span[@lang='ru_RU']/..
+    Click Button    ${ACCOUNT SAVE}
+    Sleep    5
+    Close Browser
+
+    Open Browser and go to URL    ${url}
+    Go To    ${url}/restore_password
+    Wait Until Elements Are Visible    ${RESTORE PASSWORD EMAIL INPUT}    ${RESET PASSWORD BUTTON}
+    Input Text    ${RESTORE PASSWORD EMAIL INPUT}    ${EMAIL NOPERM}
+    Click Button    ${RESET PASSWORD BUTTON}
+    Wait Until Element Is Visible    ${RESET EMAIL SENT MESSAGE}
+    Open Mailbox    host=${BASE HOST}    password=${BASE EMAIL PASSWORD}    port=${BASE PORT}    user=${BASE EMAIL}    is_secure=True
+    ${email}    Wait For Email    recipient=${EMAIL NOPERM}    timeout=120    status=UNSEEN
+    Check Email Subject    ${email}    ${russian subject}    ${BASE EMAIL}    ${BASE EMAIL PASSWORD}    ${BASE HOST}    ${BASE PORT}
+    Delete All Emails
+    Close Mailbox
     Check Language

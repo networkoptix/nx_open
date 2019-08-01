@@ -1,5 +1,9 @@
 #include "business_resource_validation.h"
 
+#include <boost/algorithm/cxx11/all_of.hpp>
+
+#include <QtCore/QCryptographicHash>
+
 #include <QtWidgets/QLayout>
 
 #include <nx/vms/event/events/abstract_event.h>

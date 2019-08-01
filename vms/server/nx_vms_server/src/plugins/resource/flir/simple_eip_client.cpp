@@ -1,8 +1,12 @@
 #include "simple_eip_client.h"
-#include <QtEndian>
+
+#include <QtCore/QtEndian>
+#include <QtCore/QDataStream>
+
+#include <nx/network/socket_factory.h>
+#include <nx/utils/log/log.h>
 
 #include "eip_cip.h"
-#include <nx/network/socket_factory.h>
 
 SimpleEIPClient::SimpleEIPClient(QString addr) :
     m_hostAddress(addr),
@@ -28,6 +32,12 @@ bool SimpleEIPClient::initSocket()
 
 bool SimpleEIPClient::sendAll(nx::network::AbstractStreamSocket* socket, QByteArray& data)
 {
+    if (!socket)
+    {
+        NX_ASSERT(false, lm("%1(): socket is nullptr").args(__func__));
+        return false;
+    }
+
     int totalBytesSent = 0;
     int dataSize = data.size();
     auto rawData = data.data();
@@ -37,10 +47,8 @@ bool SimpleEIPClient::sendAll(nx::network::AbstractStreamSocket* socket, QByteAr
         auto bytesSent = socket->send(rawData + totalBytesSent, dataSize);
         if (bytesSent <= 0)
         {
-            qDebug()
-                << "SimpleEIPCLient, error while sending data"
-                << SystemError::getLastOSErrorText()
-                << SystemError::getLastOSErrorCode();
+            NX_DEBUG(this, lm("Error while sending data: [%1] %2").args(
+                SystemError::getLastOSErrorCode(), SystemError::getLastOSErrorText()));
 
             return false;
         }
@@ -54,8 +62,19 @@ bool SimpleEIPClient::sendAll(nx::network::AbstractStreamSocket* socket, QByteAr
 
 bool SimpleEIPClient::receiveMessage(nx::network::AbstractStreamSocket* socket, char* const buffer)
 {
-    int totalBytesRead = 0;
+    if (!socket)
+    {
+        NX_ASSERT(false, lm("%1(): socket is nullptr").args(__func__));
+        return false;
+    }
 
+    if (!buffer)
+    {
+        NX_ASSERT(false, lm("%1(): buffer is nullptr").args(__func__));
+        return false;
+    }
+
+    int totalBytesRead = 0;
     while (totalBytesRead < EIPEncapsulationHeader::SIZE)
     {
         auto bytesRead = m_eipSocket->recv(
@@ -248,14 +267,16 @@ MessageRouterResponse SimpleEIPClient::doServiceRequest(const MessageRouterReque
     if (!connectIfNeeded())
         return MessageRouterResponse();
 
-    bool success = tryGetResponse(request, response, &status);
-    if (!success)
+    if (!tryGetResponse(request, response, &status))
         return MessageRouterResponse();
 
     if(status == EIPStatus::kEipStatusInvalidSessionHandle)
     {
-        registerSessionUnsafe();
-        tryGetResponse(request, response, &status);
+        if (!registerSessionUnsafe())
+            return MessageRouterResponse();
+
+        if (!tryGetResponse(request, response, &status))
+            return MessageRouterResponse();
     }
 
     return getServiceResponseData(response);
@@ -332,7 +353,7 @@ bool SimpleEIPClient::registerSessionUnsafe()
 
     if(encPacketHeader.status != EIPStatus::kEipStatusSuccess)
     {
-        qDebug() << "Sync Ethernet/IP client session registration error:" << encPacketHeader.status;
+        NX_DEBUG(this, lm("Sync Ethernet/IP client session registration error: ").args(encPacketHeader.status));
         return false;
     }
 

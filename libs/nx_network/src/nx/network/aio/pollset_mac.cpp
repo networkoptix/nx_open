@@ -10,6 +10,7 @@
 #include <sys/time.h>
 #include <unistd.h>
 
+#include "../common_socket_impl.h"
 #include "../system_socket.h"
 
 //TODO #ak get rid of PollSetImpl::monitoredEvents due to performance cosiderations

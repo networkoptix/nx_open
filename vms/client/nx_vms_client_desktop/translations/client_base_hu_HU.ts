@@ -234,10 +234,6 @@ több könyvjelző megjelenítéséhez</translation>
       <translation>Videofal nézet mentése</translation>
     </message>
     <message>
-      <source>Drop Resources</source>
-      <translation>Eszköz bedobása</translation>
-    </message>
-    <message>
       <source>Start Screen Recording</source>
       <translation>Képernyőfelvétel indítása</translation>
     </message>
@@ -1019,9 +1015,9 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message numerus="yes">
       <source>%n layouts</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n elrendezések</numerusform>
-        <numerusform>%n layouts</numerusform>
+        <numerusform>%n elrendezések</numerusform>
       </translation>
     </message>
   </context>
@@ -1087,9 +1083,9 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message numerus="yes">
       <source>%n layouts</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n elrendezések</numerusform>
-        <numerusform>%n layouts</numerusform>
+        <numerusform>%n elrendezések</numerusform>
       </translation>
     </message>
     <message>
@@ -1185,9 +1181,9 @@ több könyvjelző megjelenítéséhez</translation>
     <message numerus="yes">
       <source>File name must not contain the following reserved characters:</source>
       <comment>Plural relates to the word _characters_ here, not _file name_.</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>A fájlnév nem tartalmazhatja a következő karaktereket:</numerusform>
-        <numerusform>File name must not contain the following reserved characters:</numerusform>
+        <numerusform>A fájlnév nem tartalmazhatja a következő karaktereket:</numerusform>
       </translation>
     </message>
   </context>
@@ -2587,17 +2583,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnConnectToCurrentSystemTool</name>
-    <message>
-      <source>Configuring Server</source>
-      <translation>Szerverkonfigurálás</translation>
-    </message>
-    <message>
-      <source>Updating Server</source>
-      <translation>Szerverfrissítés</translation>
-    </message>
-  </context>
-  <context>
     <name>QnConnectionDiagnosticsHelper</name>
     <message>
       <source>You are trying to connect to incompatible Server.</source>
@@ -2901,10 +2886,6 @@ to %1</source>
     <message>
       <source>44.1 kHz and 48 kHz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
       <translation>44.1kHz és 48 kHz-es formátumok audio formátumok rögzítését az eszköz nem támogatja. Válasszon más audio eszközt, vagy &quot;semmi&quot; gombot, a képernyő felvétel-beállítások megnyitásához.</translation>
-    </message>
-    <message>
-      <source>Configured codec: %1 not found, h263p will used</source>
-      <translation type="unfinished">Configured codec: %1 not found, h263p will used</translation>
     </message>
   </context>
   <context>
@@ -3210,6 +3191,17 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnGLCheckerInstrument</name>
+    <message>
+      <source>Video card drivers are outdated or not installed</source>
+      <translation>Videokártya-illesztőprogram elavult, vagy nincs telepítve</translation>
+    </message>
+    <message>
+      <source>%1 may not work properly.</source>
+      <translation>%1 nem működik megfelelően.</translation>
+    </message>
+  </context>
+  <context>
     <name>QnGeneralPreferencesWidget</name>
     <message>
       <source>Select folder...</source>
@@ -3218,6 +3210,14 @@ to %1</source>
     <message>
       <source>Folder already added</source>
       <translation>Mappa már hozzáadva</translation>
+    </message>
+    <message>
+      <source>None</source>
+      <translation>Semmi</translation>
+    </message>
+    <message>
+      <source>Auto (%1)</source>
+      <translation type="unfinished">Auto (%1)</translation>
     </message>
   </context>
   <context>
@@ -3285,17 +3285,6 @@ to %1</source>
     <message>
       <source>Creates a backup of System configuration that can be restored in case of failure.</source>
       <translation>Létrehoz egy biztonsági másolatot a rendszer konfigurációjáról, amely hiba esetén visszaállítható.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnGlHardwareChecker</name>
-    <message>
-      <source>Video card drivers are outdated or not installed</source>
-      <translation>Videokártya-illesztőprogram elavult, vagy nincs telepítve</translation>
-    </message>
-    <message>
-      <source>%1 may not work properly.</source>
-      <translation>%1 nem működik megfelelően.</translation>
     </message>
   </context>
   <context>
@@ -3592,8 +3581,8 @@ to %1</source>
       </translation>
     </message>
     <message>
-      <source>Qty</source>
-      <translation>menny.</translation>
+      <source>Channels</source>
+      <translation type="unfinished">Channels</translation>
     </message>
   </context>
   <context>
@@ -5114,6 +5103,10 @@ to %1</source>
       <source>Server Web Page</source>
       <translation>Szerver weboldala</translation>
     </message>
+    <message>
+      <source>Plugins</source>
+      <translation type="unfinished">Plugins</translation>
+    </message>
   </context>
   <context>
     <name>QnServerSettingsWidget</name>
@@ -5152,220 +5145,6 @@ to %1</source>
     <message>
       <source>Servers with failover enabled will automatically take cameras from offline servers.</source>
       <translation>A failover funkcióval rendelkező szerverek automatikusan átveszik a kamerákat az offline szerverekről.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnServerUpdatesModel</name>
-    <message>
-      <source>Server</source>
-      <translation>Szerver</translation>
-    </message>
-    <message>
-      <source>Status</source>
-      <translation>Állapot</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnServerUpdatesWidget</name>
-    <message>
-      <source>Select Update File...</source>
-      <translation>Válasszon frissítő fájlt...</translation>
-    </message>
-    <message>
-      <source>Release notes</source>
-      <translation>Megjegyzések</translation>
-    </message>
-    <message>
-      <source>You will have to update the client manually using an installer.</source>
-      <translation>A klienst kézzel kell frissítenie a telepítő segítségével.</translation>
-    </message>
-    <message>
-      <source>Cannot update from this file.</source>
-      <translation>Nem lehet frissíteni ebből a fájlból.</translation>
-    </message>
-    <message>
-      <source>Latest Available Update</source>
-      <translation>Legutolsó elérhető frissítés</translation>
-    </message>
-    <message>
-      <source>Download the Latest Version Update File</source>
-      <translation>A legutolsó frissítés letöltése</translation>
-    </message>
-    <message>
-      <source>Selected Version</source>
-      <translation>A kiválasztott verzió</translation>
-    </message>
-    <message>
-      <source>Download Update File</source>
-      <translation>Frissítőfájl letöltése</translation>
-    </message>
-    <message>
-      <source>Browse for Update File...</source>
-      <translation>Frissítőfájl tallózása...</translation>
-    </message>
-    <message>
-      <source>Selected Update File</source>
-      <translation>A kiválasztott frissítőfájl</translation>
-    </message>
-    <message>
-      <source>Download in External Browser</source>
-      <translation>Megnyitás külső böngészőben</translation>
-    </message>
-    <message>
-      <source>Copy Link to Clipboard</source>
-      <translation>Link másolása vágólapra</translation>
-    </message>
-    <message>
-      <source>Unable to check updates on the Internet.</source>
-      <translation>Frissítések ellenőrzése az Interneten nem lehetséges.</translation>
-    </message>
-    <message>
-      <source>Unknown build number.</source>
-      <translation>Ismeretlen verzió.</translation>
-    </message>
-    <message>
-      <source>Downgrade to an earlier version is prohibited.</source>
-      <translation>Downgrade nem lehetséges.</translation>
-    </message>
-    <message>
-      <source>Updates for one or more servers were not found.</source>
-      <translation>Egy vagy több szerver frissítője nem található.</translation>
-    </message>
-    <message>
-      <source>Client update was not found.</source>
-      <translation>Kliens frissítő nem található.</translation>
-    </message>
-    <message>
-      <source>Unable to extract update file. No free space left on the disk.</source>
-      <translation>A frissítőfájl kicsomagolása nem sikerült. Nincs elég szabad hely a lemezen.</translation>
-    </message>
-    <message>
-      <source>Update Finished...</source>
-      <translation>Frissítés kész...</translation>
-    </message>
-    <message>
-      <source>Checking for updates...</source>
-      <translation>Frissítések keresése...</translation>
-    </message>
-    <message>
-      <source>Downloading updates...</source>
-      <translation>Frissítések letöltése...</translation>
-    </message>
-    <message>
-      <source>Installing client update...</source>
-      <translation>Kliens frissítés telepítése...</translation>
-    </message>
-    <message>
-      <source>Installing updates to incompatible servers...</source>
-      <translation>Frissítések telepítése nem kompatibilis szerverekre...</translation>
-    </message>
-    <message>
-      <source>Pushing updates to servers...</source>
-      <translation>Frissítések továbbítása a szervereknek...</translation>
-    </message>
-    <message>
-      <source>Installing updates...</source>
-      <translation>Frissítések telepítése...</translation>
-    </message>
-    <message>
-      <source>Specific Build...</source>
-      <translation>Speciális verzió...</translation>
-    </message>
-    <message>
-      <source>Update to Specific Build</source>
-      <translation>Frissítés speciális verzióra</translation>
-    </message>
-    <message>
-      <source>Update System</source>
-      <translation>Rendszer frissítése</translation>
-    </message>
-    <message>
-      <source>System update in process</source>
-      <translation>Rendszerfrissítés folyamatban</translation>
-    </message>
-    <message>
-      <source>Cancel Update</source>
-      <translation>Frissítés megszakítása</translation>
-    </message>
-    <message>
-      <source>Continue in Background</source>
-      <translation>Folytatás a háttérben</translation>
-    </message>
-    <message numerus="yes">
-      <source>Not enough free space at %n Servers:</source>
-      <translation>
-        <numerusform>Nincs elég hely %n szerveren:</numerusform>
-        <numerusform>Nincs elég hely %n szerveren:</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Attempt to update may fail or cause Server malfunction.</source>
-      <translation>Frissítés megkísérlése hibát okozhat a szerveren.</translation>
-    </message>
-    <message>
-      <source>Force Update</source>
-      <translation>Frissítés kényszerítése</translation>
-    </message>
-    <message>
-      <source>Server update completed</source>
-      <translation>A szerverfrissítés megtörtént</translation>
-    </message>
-    <message>
-      <source>Update completed</source>
-      <translation>A frissítés befejeződött</translation>
-    </message>
-    <message>
-      <source>Update canceled</source>
-      <translation>A frissítés megszakítva</translation>
-    </message>
-    <message>
-      <source>All Servers already updated</source>
-      <translation>Minden szerver naprakész</translation>
-    </message>
-    <message>
-      <source>Update failed</source>
-      <translation>Sikertelen frissítés</translation>
-    </message>
-    <message>
-      <source>Please update %1 manually using an installation package.</source>
-      <translation>Kérjük frissítsen %1 verzióra manuálisan egy telepítőcsomaggal.</translation>
-    </message>
-    <message>
-      <source>%1 will be restarted to the updated version.</source>
-      <translation>%1 a frissítés miatt újra fog indulni.</translation>
-    </message>
-    <message>
-      <source>Update cannot be canceled at this stage</source>
-      <translation>A frissítés ebben az állapotban nem visszavonható</translation>
-    </message>
-    <message>
-      <source>Please wait until it is finished.</source>
-      <translation>Várjon, amíg befejeződik.</translation>
-    </message>
-    <message>
-      <source>All components in your System are up to date.</source>
-      <translation>A rendszer minden összetevője frissítve.</translation>
-    </message>
-    <message>
-      <source>All components in your System are up to this version.</source>
-      <translation>A rendszer minden összetevője megegyezik ezzel a verzióval.</translation>
-    </message>
-    <message>
-      <source>Incompatible %1 instance. To update disconnect System from %1 first.</source>
-      <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation>%1 inkompatibilis elem. A frissítéshez szakítsa meg a kapcsolatot %1 felhővel.</translation>
-    </message>
-    <message>
-      <source>Update Files</source>
-      <translation>Fájl frissítése</translation>
-    </message>
-    <message>
-      <source>Validating the update...</source>
-      <translation>A frissítés érvényesítése...</translation>
-    </message>
-    <message>
-      <source>Checking for free space...</source>
-      <translation>Szabad hely keresése...</translation>
     </message>
   </context>
   <context>
@@ -5798,16 +5577,30 @@ to %1</source>
       <translation>Biztonsági mentés kész</translation>
     </message>
     <message>
-      <source>Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</source>
-      <translation>Rögzítés a lekapcsolt tárolóra leáll. A lejáró felvételek továbbra is törlésre kerülnek.</translation>
-    </message>
-    <message>
-      <source>Recording was enabled on the USB storage</source>
-      <translation>A felvétel engedélyezve volt az USB-táron</translation>
-    </message>
-    <message>
       <source>Reindexing can fix problems with archive or backup if they have been lost or damaged, or if some hardware has been replaced.</source>
       <translation>Az újraindexelés az archiválással vagy a biztonsági mentéssel kapcsolatos problémákat javíthatja, ha elveszett vagy megsérült, vagy ha valamilyen hardvert kicseréltek.</translation>
+    </message>
+    <message>
+      <source>What to do with current analytics data?</source>
+      <translation type="unfinished">What to do with current analytics data?</translation>
+    </message>
+    <message>
+      <source>Current analytics data will not be automatically moved to another location and will become unaccessible. You can keep it and manually move later, or delete permanently.
+If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
+      <translation type="unfinished">Current analytics data will not be automatically moved to another location and will become unaccessible. You can keep it and manually move later, or delete permanently.
+If you intended to move analytics data to another storage location, please contact support before proceeding.</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>Törlés</translation>
+    </message>
+    <message>
+      <source>Keep</source>
+      <translation>Megtart</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>Mégsem</translation>
     </message>
   </context>
   <context>
@@ -5855,6 +5648,14 @@ to %1</source>
     <message>
       <source>Too small and system partitions are reserved and not used for writing if there is enough other storage space available.</source>
       <translation>A fenntartott rendszerpartíciók túl kicsik, nem használhatók írásra, ha nem áll rendelkezésre elegendő tárhely.</translation>
+    </message>
+    <message>
+      <source>Use to store analytics data</source>
+      <translation type="unfinished">Use to store analytics data</translation>
+    </message>
+    <message>
+      <source>Stores analytics data</source>
+      <translation type="unfinished">Stores analytics data</translation>
     </message>
   </context>
   <context>
@@ -5942,8 +5743,8 @@ to %1</source>
       <translation>Felhasználók</translation>
     </message>
     <message>
-      <source>Analytics</source>
-      <translation>analitika</translation>
+      <source>Plugins</source>
+      <translation type="unfinished">Plugins</translation>
     </message>
   </context>
   <context>
@@ -6049,10 +5850,6 @@ to %1</source>
       <translation>A rögzített videók távoli szinkronizálása folyamatban</translation>
     </message>
     <message>
-      <source>Error occured during remote archive synchronization</source>
-      <translation>Hiba történt a rögzített videók távoli szinkronizálása közben</translation>
-    </message>
-    <message>
       <source>Remote archive synchronization has been started for the following device:</source>
       <translation>A rögzített videók távoli szinkronizálása elindult a következő eszközön:</translation>
     </message>
@@ -6102,17 +5899,13 @@ to %1</source>
       <source>The System is running in safe mode.</source>
       <translation type="unfinished">The System is running in safe mode.</translation>
     </message>
+    <message>
+      <source>Error occurred during remote archive synchronization</source>
+      <translation type="unfinished">Error occurred during remote archive synchronization</translation>
+    </message>
   </context>
   <context>
     <name>QnSystemSettingsWidget</name>
-    <message>
-      <source>Enable devices and servers auto discovery</source>
-      <translation>Eszközök és szerverek automatikus felderítésének engedélyezése</translation>
-    </message>
-    <message>
-      <source>Enable cameras and servers auto discovery</source>
-      <translation>Kamerák és szerverek automatikus felderítésének engedélyezése</translation>
-    </message>
     <message>
       <source>Allow System to optimize device settings</source>
       <translation>Eszköz beállítások optimalizálásának engedélyezése a rendszer számára</translation>
@@ -6128,6 +5921,22 @@ to %1</source>
     <message>
       <source>Does not include any personal information and is completely anonymous.</source>
       <translation>Nem tartalmaz személyes adatokat, és teljesen névtelen.</translation>
+    </message>
+    <message>
+      <source>Failover server measures may still request camera status updates regardless of this setting.</source>
+      <translation type="unfinished">Failover server measures may still request camera status updates regardless of this setting.</translation>
+    </message>
+    <message>
+      <source>Enable devices and servers autodiscovery and automated device status check</source>
+      <translation type="unfinished">Enable devices and servers autodiscovery and automated device status check</translation>
+    </message>
+    <message>
+      <source>Enable cameras and servers autodiscovery and automated camera status check</source>
+      <translation type="unfinished">Enable cameras and servers autodiscovery and automated camera status check</translation>
+    </message>
+    <message>
+      <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
+      <translation type="unfinished">When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</translation>
     </message>
   </context>
   <context>
@@ -6211,84 +6020,6 @@ to %1</source>
     <message>
       <source>Hold to Speak</source>
       <translation>Tartsa lenyomva a beszédhez</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnUpdateResult</name>
-    <message>
-      <source>Update has been successfully finished.</source>
-      <translation>A frissítés sikeresen befejeződött.</translation>
-    </message>
-    <message>
-      <source>Update has been cancelled.</source>
-      <translation>A frissítés meg lett szakítva.</translation>
-    </message>
-    <message>
-      <source>Another user has already started an update.</source>
-      <translation>Valaki már elindított egy frissítést.</translation>
-    </message>
-    <message>
-      <source>All servers are already updated.</source>
-      <translation>Minden szerver naprakész.</translation>
-    </message>
-    <message>
-      <source>Could not download updates.</source>
-      <translation>Nem lehet letölteni a frissítéseket.</translation>
-    </message>
-    <message>
-      <source>No free space left on the disk.</source>
-      <translation>Nincs szabad hely a lemezen.</translation>
-    </message>
-    <message>
-      <source>Could not push updates to servers.</source>
-      <translation>Nem lehet áttölteni a frissítéseket a szerverekre.</translation>
-    </message>
-    <message numerus="yes">
-      <source>The problem is caused by %n servers:</source>
-      <translation>
-        <numerusform>A problémát a %n szerver okozza:</numerusform>
-        <numerusform>A problémát a %n szerver okozza:</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>No free space left on %n servers:</source>
-      <translation>
-        <numerusform>Nincs szabad hely a %n szerveren:</numerusform>
-        <numerusform>Nincs szabad hely a %n szerveren:</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n servers are not responding:</source>
-      <translation>
-        <numerusform>A %n szerver nem válaszol:</numerusform>
-        <numerusform>A %n szerver nem válaszol:</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n servers have gone offline:</source>
-      <translation>
-        <numerusform>A %n szerver nem elérhető:</numerusform>
-        <numerusform>A %n szerver nem elérhető:</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Authentication failed for %n servers:</source>
-      <translation>
-        <numerusform>Sikertelen bejelentkezés %n szerveren:</numerusform>
-        <numerusform>Sikertelen bejelentkezés %n szerveren:</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Could not install an update to the client.</source>
-      <translation>Egy frissítést nem lehet feltelepíteni a kliensre.</translation>
-    </message>
-    <message>
-      <source>Could not install updates on one or more servers.</source>
-      <translation>A frissítéseket nem lehet felteleoíteni egy vagy több szerverre.</translation>
-    </message>
-    <message>
-      <source>Update has been cancelled silently.</source>
-      <translation type="unfinished">Update has been cancelled silently.</translation>
     </message>
   </context>
   <context>
@@ -6742,25 +6473,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnWorkbenchContext</name>
-    <message>
-      <source>Please review and agree to the %1 in order to proceed</source>
-      <translation type="unfinished">Please review and agree to the %1 in order to proceed</translation>
-    </message>
-    <message>
-      <source>To use the software you must agree with the end user license agreement</source>
-      <translation type="unfinished">To use the software you must agree with the end user license agreement</translation>
-    </message>
-    <message>
-      <source>I Agree</source>
-      <translation type="unfinished">I Agree</translation>
-    </message>
-    <message>
-      <source>I Do Not Agree</source>
-      <translation type="unfinished">I Do Not Agree</translation>
-    </message>
-  </context>
-  <context>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
     <message>
       <source>Systems will be merged shortly</source>
@@ -6769,10 +6481,6 @@ to %1</source>
     <message>
       <source>Servers from the other System will appear in the resource tree.</source>
       <translation>A másik rendszer szervei is meg fognak jelenni a forrásfában.</translation>
-    </message>
-    <message>
-      <source>Failed to update Server</source>
-      <translation>A szerver frissítése sikertelen</translation>
     </message>
     <message>
       <source>Total amount of licenses will decrease</source>
@@ -6946,29 +6654,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnWorkbenchUpdateWatcher</name>
-    <message>
-      <source>Release Notes</source>
-      <translation>Megjegyzések</translation>
-    </message>
-    <message>
-      <source>%1 version available</source>
-      <translation>%1 verzió elérhető</translation>
-    </message>
-    <message>
-      <source>Major issues have been fixed. Update is strongly recommended.</source>
-      <translation>Főbb problémák javítása. Frissítés ajánlott.</translation>
-    </message>
-    <message>
-      <source>Update...</source>
-      <translation>Frissítés...</translation>
-    </message>
-    <message>
-      <source>Do not notify again about this update</source>
-      <translation>Ne küldjön több figyelmeztést erről a frissítésről</translation>
-    </message>
-  </context>
-  <context>
     <name>QnWorkbenchVideoWallHandler</name>
     <message>
       <source>Video Wall</source>
@@ -7077,9 +6762,9 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Selected file formats are not supported</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>A kiválasztott fájlformátumok nem támogatottak</numerusform>
-        <numerusform>Selected file formats are not supported</numerusform>
+        <numerusform>A kiválasztott fájlformátumok nem támogatottak</numerusform>
       </translation>
     </message>
     <message>
@@ -7088,23 +6773,23 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Selected files do not have timestamps</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>A kiválasztott fájlok nem tartalmaznak időbélyegzőket</numerusform>
-        <numerusform>Selected files do not have timestamps</numerusform>
+        <numerusform>A kiválasztott fájlok nem tartalmaznak időbélyegzőket</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files cover periods for which videos are already being uploaded</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>A kiválasztott fájlok olyan időszakokat tartalmaznak, amelyekre a videókat már korábban feltöltöttek</numerusform>
-        <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
+        <numerusform>A kiválasztott fájlok olyan időszakokat tartalmaznak, amelyekre a videókat már korábban feltöltöttek</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files cover periods for which videos have already been uploaded</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>A kiválasztott fájlok olyan időszakokat tartalmaznak, amelyekre a videókat már korábban feltöltöttek</numerusform>
-        <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
+        <numerusform>A kiválasztott fájlok olyan időszakokat tartalmaznak, amelyekre a videókat már korábban feltöltöttek</numerusform>
       </translation>
     </message>
     <message>
@@ -7121,37 +6806,37 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Selected files are too old</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>A kijelölt fájlok túl régiek</numerusform>
-        <numerusform>Selected files are too old</numerusform>
+        <numerusform>A kijelölt fájlok túl régiek</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>A kiválasztott fájlt %1 on rögzítették, de csak az utolsó %n napban rögzített fájlok tölthetők fel. Ezt megváltoztathatja a kamera archív beállításaiban.</numerusform>
-        <numerusform>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
+        <numerusform>A kiválasztott fájlt %1 on rögzítették, de csak az utolsó %n napban rögzített fájlok tölthetők fel. Ezt megváltoztathatja a kamera archív beállításaiban.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>A kiválasztott fájlt %1 és %2 között rögzítették, de csak az utolsó %n napban rögzített fájlok tölthetők fel. Ezt megváltoztathatja a kamera archív beállításaiban.</numerusform>
-        <numerusform>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
+        <numerusform>A kiválasztott fájlt %1 és %2 között rögzítették, de csak az utolsó %n napban rögzített fájlok tölthetők fel. Ezt megváltoztathatja a kamera archív beállításaiban.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Some footage may be deleted after uploading these files</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Néhány felvétel törlődhet ezen fájlok feltöltése után</numerusform>
-        <numerusform>Some footage may be deleted after uploading these files</numerusform>
+        <numerusform>Néhány felvétel törlődhet ezen fájlok feltöltése után</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Nincs túl sok szabad hely a szerver tárhelyén. Egyes régi felvételek törlődhetnek, hogy helyet szabadítsanak fel. Ne feledje, hogy ha a kiválasztott fájlok a legrégebbiek a szerveren, akkor a feltöltés után azonnal törlődnek.</numerusform>
-        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
+        <numerusform>Nincs túl sok szabad hely a szerver tárhelyén. Egyes régi felvételek törlődhetnek, hogy helyet szabadítsanak fel. Ne feledje, hogy ha a kiválasztott fájlok a legrégebbiek a szerveren, akkor a feltöltés után azonnal törlődnek.</numerusform>
       </translation>
     </message>
     <message>
@@ -7432,6 +7117,17 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>SessionExpiredDialog</name>
+    <message>
+      <source>Your session has expired</source>
+      <translation type="unfinished">Your session has expired</translation>
+    </message>
+    <message>
+      <source>Session duration limit can be changed by the system administrators</source>
+      <translation type="unfinished">Session duration limit can be changed by the system administrators</translation>
+    </message>
+  </context>
+  <context>
     <name>StreamQualityStrings</name>
     <message>
       <source>Lowest</source>
@@ -7635,6 +7331,14 @@ to %1</source>
       <source>Show Only with &quot;Objects&quot; Tab</source>
       <translation type="unfinished">Show Only with &quot;Objects&quot; Tab</translation>
     </message>
+    <message>
+      <source>Show</source>
+      <translation>Megjelenítés</translation>
+    </message>
+    <message>
+      <source>Do Not Show</source>
+      <translation type="unfinished">Do Not Show</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::AnalyticsSearchListModel::Private</name>
@@ -7785,10 +7489,6 @@ to %1</source>
       <translation>Natív</translation>
     </message>
     <message>
-      <source>Server will not change any cameras settings, it will receive and use camera stream as-is. </source>
-      <translation>A szerver nem változtatja meg a kamera beállításait, hanem a kamera előre beállított adatfolyamát fogja használni. </translation>
-    </message>
-    <message>
       <source>Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</source>
       <translation>Segít megoldani a képminőségi problémákat bizonyos kamerák esetében; a többi számára jelentős bitráta növekedést fog okozni.</translation>
     </message>
@@ -7812,6 +7512,14 @@ to %1</source>
         <numerusform>Ez az azonosító már használatban van a következő %n kameráknál:</numerusform>
         <numerusform>Ez az azonosító már használatban van a következő %n kameráknál:</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Server will not change any cameras settings, it will receive and use camera stream as-is.</source>
+      <translation>A szerver nem változtatja meg a kamera beállításait, hanem a kamera előre beállított adatfolyamát fogja használni.</translation>
+    </message>
+    <message>
+      <source>Multicast</source>
+      <translation type="unfinished">Multicast</translation>
     </message>
   </context>
   <context>
@@ -7954,10 +7662,6 @@ to %1</source>
       <translation>Weboldal</translation>
     </message>
     <message>
-      <source>Analytics</source>
-      <translation>analitika</translation>
-    </message>
-    <message>
       <source>Expert</source>
       <translation>Szakértő</translation>
     </message>
@@ -8009,6 +7713,10 @@ to %1</source>
     <message>
       <source>I/O Modules Settings</source>
       <translation>I/O modulok beállítása</translation>
+    </message>
+    <message>
+      <source>Plugins</source>
+      <translation type="unfinished">Plugins</translation>
     </message>
   </context>
   <context>
@@ -8079,16 +7787,16 @@ to %1</source>
       <translation type="unfinished">Broken update package.</translation>
     </message>
     <message>
-      <source>Not enough space on disk to install client update.</source>
-      <translation type="unfinished">Not enough space on disk to install client update.</translation>
-    </message>
-    <message>
-      <source>Install package has been lost.</source>
-      <translation type="unfinished">Install package has been lost.</translation>
-    </message>
-    <message>
       <source>Internal error.</source>
       <translation>Belső hiba.</translation>
+    </message>
+    <message>
+      <source>Not enough space on disk to install the client update.</source>
+      <translation type="unfinished">Not enough space on disk to install the client update.</translation>
+    </message>
+    <message>
+      <source>Installation package has been lost.</source>
+      <translation type="unfinished">Installation package has been lost.</translation>
     </message>
   </context>
   <context>
@@ -8120,6 +7828,17 @@ to %1</source>
       <source>Pasted</source>
       <comment>from Clipboard</comment>
       <translation>Beillesztve</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ConnectToCurrentSystemTool</name>
+    <message>
+      <source>Configuring Server</source>
+      <translation>Szerverkonfigurálás</translation>
+    </message>
+    <message>
+      <source>Updating Server</source>
+      <translation>Szerverfrissítés</translation>
     </message>
   </context>
   <context>
@@ -8238,6 +7957,17 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::EulaDialog</name>
+    <message>
+      <source>Please review and agree to the %1 in order to proceed</source>
+      <translation type="unfinished">Please review and agree to the %1 in order to proceed</translation>
+    </message>
+    <message>
+      <source>To use the software you must agree with the end user license agreement</source>
+      <translation type="unfinished">To use the software you must agree with the end user license agreement</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::EventPanel::Private</name>
     <message>
       <source>Notifications</source>
@@ -8307,10 +8037,6 @@ to %1</source>
       <source>No events</source>
       <translation>Nincsenek események</translation>
     </message>
-    <message>
-      <source>No events occured</source>
-      <translation>Nem történt esemény</translation>
-    </message>
     <message numerus="yes">
       <source>%n events</source>
       <translation>
@@ -8321,6 +8047,10 @@ to %1</source>
     <message>
       <source>unnamed analytics engine</source>
       <translation type="unfinished">unnamed analytics engine</translation>
+    </message>
+    <message>
+      <source>No events occurred</source>
+      <translation type="unfinished">No events occurred</translation>
     </message>
   </context>
   <context>
@@ -8821,30 +8551,6 @@ to %1</source>
       <translation>Egyes kiszolgálók offline állapotban vannak, és nem frissülnek. Kihagyja őket?</translation>
     </message>
     <message>
-      <source>Ready to install client updates</source>
-      <translation type="unfinished">Ready to install client updates</translation>
-    </message>
-    <message>
-      <source>Install now</source>
-      <translation>Telepítés most</translation>
-    </message>
-    <message>
-      <source>Later</source>
-      <translation>Később</translation>
-    </message>
-    <message>
-      <source>Updates downloaded</source>
-      <translation>Letöltött frissítések</translation>
-    </message>
-    <message>
-      <source>Failed to download update packages</source>
-      <translation>Nem sikerült letölteni a frissítési csomagokat</translation>
-    </message>
-    <message>
-      <source>Please make sure there is enough free storage space and network connection is stable.</source>
-      <translation>Győződjön meg róla, hogy elegendő szabad tárhely van, és a hálózati kapcsolat stabil.</translation>
-    </message>
-    <message>
       <source>If the problem persists, please contact Customer Support.</source>
       <translation>Ha a probléma továbbra is fennáll, kérjük, forduljon az ügyfélszolgálathoz.</translation>
     </message>
@@ -8857,20 +8563,8 @@ to %1</source>
       <translation>Frissítés megszakítása</translation>
     </message>
     <message>
-      <source>Failed to download update packages to some servers</source>
-      <translation>Nem sikerült letölteni a frissítési csomagokat egyes kiszolgálókhoz</translation>
-    </message>
-    <message>
-      <source>Please make sure they have enough free storage space and stable network connection.</source>
-      <translation>Győződjön meg róla, hogy elegendő szabad tárhelyük van van, és a hálózati kapcsolat stabil.</translation>
-    </message>
-    <message>
       <source>Update completed</source>
       <translation>A frissítés befejeződött</translation>
-    </message>
-    <message>
-      <source>Update completed, but some servers have failed an update</source>
-      <translation type="unfinished">Update completed, but some servers have failed an update</translation>
     </message>
     <message>
       <source>Nx Witness Client will be restarted to the updated version.</source>
@@ -8881,16 +8575,8 @@ to %1</source>
       <translation>OK</translation>
     </message>
     <message>
-      <source>Failed to install updates to servers:</source>
-      <translation type="unfinished">Failed to install updates to servers:</translation>
-    </message>
-    <message>
       <source>Downloading updates...</source>
       <translation>Frissítések letöltése...</translation>
-    </message>
-    <message>
-      <source>Pushing updates...</source>
-      <translation type="unfinished">Pushing updates...</translation>
     </message>
     <message>
       <source>Upload</source>
@@ -9007,14 +8693,74 @@ to %1</source>
       <source>There are no online servers to update.</source>
       <translation type="unfinished">There are no online servers to update.</translation>
     </message>
+    <message>
+      <source>Some servers haven&apos;t completed update process. Finish it anyway?</source>
+      <translation type="unfinished">Some servers haven&apos;t completed update process. Finish it anyway?</translation>
+    </message>
+    <message>
+      <source>Cancel update and delete all downloaded data?</source>
+      <translation type="unfinished">Cancel update and delete all downloaded data?</translation>
+    </message>
+    <message>
+      <source>There was an error while installing updates:</source>
+      <translation type="unfinished">There was an error while installing updates:</translation>
+    </message>
+    <message>
+      <source>Some servers have gone offline. Please wait until they become online to continue.</source>
+      <translation type="unfinished">Some servers have gone offline. Please wait until they become online to continue.</translation>
+    </message>
+    <message>
+      <source>Update completed, but some components have failed an update</source>
+      <translation type="unfinished">Update completed, but some components have failed an update</translation>
+    </message>
+    <message>
+      <source>Please update %1 manually using an installation package.</source>
+      <translation>Kérjük frissítsen %1 verzióra manuálisan egy telepítőcsomaggal.</translation>
+    </message>
+    <message>
+      <source>%1 will be restarted to the updated version.</source>
+      <translation>%1 a frissítés miatt újra fog indulni.</translation>
+    </message>
+    <message>
+      <source>Failed to download update packages to some components</source>
+      <translation type="unfinished">Failed to download update packages to some components</translation>
+    </message>
+    <message>
+      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
+      <translation type="unfinished">OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</translation>
+    </message>
+    <message>
+      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
+      <translation type="unfinished">OS version of the client is no longer supported. Please update its OS to a supported version.</translation>
+    </message>
+    <message>
+      <source>Failed to start update</source>
+      <translation type="unfinished">Failed to start update</translation>
+    </message>
+    <message>
+      <source>Starting update to ...</source>
+      <translation type="unfinished">Starting update to ...</translation>
+    </message>
+    <message>
+      <source>Some servers have no package available</source>
+      <translation type="unfinished">Some servers have no package available</translation>
+    </message>
+    <message>
+      <source>Failed to cancel update</source>
+      <translation type="unfinished">Failed to cancel update</translation>
+    </message>
+    <message>
+      <source>Failed to start installation</source>
+      <translation type="unfinished">Failed to start installation</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::MultipleLayoutSelectionDialog</name>
     <message numerus="yes">
       <source>%n layouts</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n elrendezések</numerusform>
-        <numerusform>%n layouts</numerusform>
+        <numerusform>%n elrendezések</numerusform>
       </translation>
     </message>
     <message>
@@ -9031,6 +8777,26 @@ to %1</source>
     <message>
       <source>Acknowledge</source>
       <translation>Nyugtázás</translation>
+    </message>
+    <message>
+      <source>Generic Event</source>
+      <translation>Általános esemény</translation>
+    </message>
+    <message>
+      <source>Device was disconnected</source>
+      <translation type="unfinished">Device was disconnected</translation>
+    </message>
+    <message>
+      <source>Camera was disconnected</source>
+      <translation type="unfinished">Camera was disconnected</translation>
+    </message>
+    <message>
+      <source>I/O Module was disconnected</source>
+      <translation type="unfinished">I/O Module was disconnected</translation>
+    </message>
+    <message>
+      <source>Unknown Plugin Diagnostic Event</source>
+      <translation type="unfinished">Unknown Plugin Diagnostic Event</translation>
     </message>
   </context>
   <context>
@@ -9051,10 +8817,6 @@ to %1</source>
       <translation>Egyetlen kiválasztott felhasználó sem fér hozzá a kiválasztott elrendezéshez. A művelet nem fog működni.</translation>
     </message>
     <message>
-      <source>Local layouts can only be shown to their owners. </source>
-      <translation>A helyi elrendezések csak a tulajdonosok számára jelennek meg. </translation>
-    </message>
-    <message>
       <source>Select layout...</source>
       <translation>Elrendezés kiválasztása...</translation>
     </message>
@@ -9069,6 +8831,105 @@ to %1</source>
     <message>
       <source>None of selected user roles contain users. Action will not work.</source>
       <translation type="unfinished">None of selected user roles contain users. Action will not work.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::PeerStateTracker</name>
+    <message>
+      <source>The server is taking too long to respond</source>
+      <translation type="unfinished">The server is taking too long to respond</translation>
+    </message>
+    <message>
+      <source>No update task</source>
+      <translation type="unfinished">No update task</translation>
+    </message>
+    <message>
+      <source>Ready to download update</source>
+      <translation type="unfinished">Ready to download update</translation>
+    </message>
+    <message>
+      <source>Downloading update</source>
+      <translation type="unfinished">Downloading update</translation>
+    </message>
+    <message>
+      <source>Ready to restart to the new version</source>
+      <translation type="unfinished">Ready to restart to the new version</translation>
+    </message>
+    <message>
+      <source>Installing update</source>
+      <translation type="unfinished">Installing update</translation>
+    </message>
+    <message>
+      <source>Installed</source>
+      <translation type="unfinished">Installed</translation>
+    </message>
+    <message>
+      <source>Failed to download update</source>
+      <translation type="unfinished">Failed to download update</translation>
+    </message>
+    <message>
+      <source>Failed to install update</source>
+      <translation type="unfinished">Failed to install update</translation>
+    </message>
+    <message>
+      <source>Waiting for peer data</source>
+      <translation type="unfinished">Waiting for peer data</translation>
+    </message>
+    <message>
+      <source>There is not enough space to download update files.</source>
+      <translation type="unfinished">There is not enough space to download update files.</translation>
+    </message>
+    <message>
+      <source>There is not enough space to extract update files.</source>
+      <translation type="unfinished">There is not enough space to extract update files.</translation>
+    </message>
+    <message>
+      <source>Failed to download update packages.</source>
+      <translation type="unfinished">Failed to download update packages.</translation>
+    </message>
+    <message>
+      <source>Update contents are invalid.</source>
+      <translation type="unfinished">Update contents are invalid.</translation>
+    </message>
+    <message>
+      <source>Update archive is corrupted.</source>
+      <translation type="unfinished">Update archive is corrupted.</translation>
+    </message>
+    <message>
+      <source>Update files cannot be extracted.</source>
+      <translation type="unfinished">Update files cannot be extracted.</translation>
+    </message>
+    <message>
+      <source>Internal downloader error.</source>
+      <translation type="unfinished">Internal downloader error.</translation>
+    </message>
+    <message>
+      <source>Internal client error.</source>
+      <translation type="unfinished">Internal client error.</translation>
+    </message>
+    <message>
+      <source>Unknown error.</source>
+      <translation>Ismeretlen hiba.</translation>
+    </message>
+    <message>
+      <source>Unexpected error code.</source>
+      <translation type="unfinished">Unexpected error code.</translation>
+    </message>
+    <message>
+      <source>Ready to install update</source>
+      <translation type="unfinished">Ready to install update</translation>
+    </message>
+    <message>
+      <source>Update package is not found.</source>
+      <translation type="unfinished">Update package is not found.</translation>
+    </message>
+    <message>
+      <source>There is not enough space to install update.</source>
+      <translation type="unfinished">There is not enough space to install update.</translation>
+    </message>
+    <message>
+      <source>Internal server error.</source>
+      <translation type="unfinished">Internal server error.</translation>
     </message>
   </context>
   <context>
@@ -9213,16 +9074,79 @@ to %1</source>
       <translation>Az összes felhasználói műveletet nyomon követi és naplózza.</translation>
     </message>
     <message>
-      <source>User will be automatically logged out after this period of time.</source>
-      <translation type="unfinished">User will be automatically logged out after this period of time.</translation>
-    </message>
-    <message>
       <source>minutes</source>
       <translation>perc</translation>
     </message>
     <message>
       <source>hours</source>
       <translation>órák</translation>
+    </message>
+    <message>
+      <source>Users will be automatically logged out if their session exceeds the specified duration.</source>
+      <translation type="unfinished">Users will be automatically logged out if their session exceeds the specified duration.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ServerSettingsDialogStore</name>
+    <message>
+      <source>Library</source>
+      <translation type="unfinished">Library</translation>
+    </message>
+    <message>
+      <source>Version</source>
+      <translation type="unfinished">Version</translation>
+    </message>
+    <message>
+      <source>Vendor</source>
+      <translation>Gyártó</translation>
+    </message>
+    <message>
+      <source>no error</source>
+      <translation type="unfinished">no error</translation>
+    </message>
+    <message>
+      <source>library file cannot be loaded</source>
+      <translation type="unfinished">library file cannot be loaded</translation>
+    </message>
+    <message>
+      <source>invalid or incompatible plugin library</source>
+      <translation type="unfinished">invalid or incompatible plugin library</translation>
+    </message>
+    <message>
+      <source>plugin library failed to initialize</source>
+      <translation type="unfinished">plugin library failed to initialize</translation>
+    </message>
+    <message>
+      <source>plugin returned bad manifest</source>
+      <translation type="unfinished">plugin returned bad manifest</translation>
+    </message>
+    <message>
+      <source>plugin API version is no longer supported</source>
+      <translation type="unfinished">plugin API version is no longer supported</translation>
+    </message>
+    <message>
+      <source>unknown error</source>
+      <translation type="unfinished">unknown error</translation>
+    </message>
+    <message>
+      <source>Not loaded</source>
+      <translation type="unfinished">Not loaded</translation>
+    </message>
+    <message>
+      <source>Loaded</source>
+      <translation type="unfinished">Loaded</translation>
+    </message>
+    <message>
+      <source>plugin is in the black list</source>
+      <translation type="unfinished">plugin is in the black list</translation>
+    </message>
+    <message>
+      <source>Status</source>
+      <translation type="unfinished">Status</translation>
+    </message>
+    <message>
+      <source>plugin is optional and is not in the white list</source>
+      <translation type="unfinished">plugin is optional and is not in the white list</translation>
     </message>
   </context>
   <context>
@@ -9243,13 +9167,24 @@ to %1</source>
       <source>Downloaded</source>
       <translation>Letöltve</translation>
     </message>
+    <message>
+      <source>Waiting for server to respond...</source>
+      <translation type="unfinished">Waiting for server to respond...</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ServerUpdateTool</name>
+    <message>
+      <source>No connection to the server.</source>
+      <translation type="unfinished">No connection to the server.</translation>
+    </message>
+    <message>
+      <source>Network error.</source>
+      <translation type="unfinished">Network error.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerUpdatesModel</name>
-    <message>
-      <source>Current Version</source>
-      <translation>Jelenlegi verzió</translation>
-    </message>
     <message>
       <source>Status</source>
       <translation>Állapot</translation>
@@ -9269,6 +9204,10 @@ to %1</source>
     <message>
       <source>Component</source>
       <translation type="unfinished">Component</translation>
+    </message>
+    <message>
+      <source>Installed Version</source>
+      <translation type="unfinished">Installed Version</translation>
     </message>
   </context>
   <context>
@@ -9568,12 +9507,62 @@ to %1</source>
       <source>Starting export...</source>
       <translation type="unfinished">Starting export...</translation>
     </message>
+    <message>
+      <source>Saving layout</source>
+      <translation type="unfinished">Saving layout</translation>
+    </message>
+    <message>
+      <source>Stop Saving</source>
+      <translation type="unfinished">Stop Saving</translation>
+    </message>
+    <message>
+      <source>Saving failed</source>
+      <translation type="unfinished">Saving failed</translation>
+    </message>
+    <message>
+      <source>Starting saving...</source>
+      <translation type="unfinished">Starting saving...</translation>
+    </message>
+    <message>
+      <source>We are preparing files for the export process. Please wait for a few seconds.</source>
+      <translation type="unfinished">We are preparing files for the export process. Please wait for a few seconds.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::WorkbenchUpdateWatcher</name>
+    <message>
+      <source>%1 version available</source>
+      <translation>%1 verzió elérhető</translation>
+    </message>
+    <message>
+      <source>Release Notes</source>
+      <translation>Megjegyzések</translation>
+    </message>
+    <message>
+      <source>Major issues have been fixed. Update is strongly recommended.</source>
+      <translation>Főbb problémák javítása. Frissítés ajánlott.</translation>
+    </message>
+    <message>
+      <source>Update...</source>
+      <translation>Frissítés...</translation>
+    </message>
+    <message>
+      <source>Do not notify again about this update</source>
+      <translation>Ne küldjön több figyelmeztést erről a frissítésről</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::detail::BaseInputField</name>
     <message>
       <source>multiple values</source>
       <translation>több érték</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::integrations::entropix::ReconstructResolutionIntegration</name>
+    <message>
+      <source>Reconstruct Resolution</source>
+      <translation type="unfinished">Reconstruct Resolution</translation>
     </message>
   </context>
   <context>
@@ -9927,6 +9916,28 @@ to %1</source>
     <message>
       <source>This build is for testing purposes only.</source>
       <translation type="unfinished">This build is for testing purposes only.</translation>
+    </message>
+    <message>
+      <source>Open Server Settings</source>
+      <translation type="unfinished">Open Server Settings</translation>
+    </message>
+    <message>
+      <source>OK</source>
+      <translation>OK</translation>
+    </message>
+    <message>
+      <source>Confirm storage location to store analytics data on &apos;%1&apos;</source>
+      <translation type="unfinished">Confirm storage location to store analytics data on &apos;%1&apos;</translation>
+    </message>
+    <message>
+      <source>Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
+Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
+By default analytics data will be stored in mediaserver&apos;s installation directory.
+You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</source>
+      <translation type="unfinished">Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
+Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
+By default analytics data will be stored in mediaserver&apos;s installation directory.
+You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</translation>
     </message>
   </context>
   <context>

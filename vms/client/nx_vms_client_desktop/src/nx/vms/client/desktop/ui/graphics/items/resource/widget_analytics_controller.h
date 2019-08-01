@@ -21,8 +21,6 @@ public:
     void updateAreas(std::chrono::microseconds timestamp, int channel);
     void clearAreas();
 
-    void updateAreaForZoomWindow();
-
     void setAnalyticsMetadataProvider(const core::AbstractAnalyticsMetadataProviderPtr& provider);
     void setAreaHighlightOverlayWidget(AreaHighlightOverlayWidget* widget);
 

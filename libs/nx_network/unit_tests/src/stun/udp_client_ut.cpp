@@ -6,6 +6,7 @@
 
 #include <nx/network/address_resolver.h>
 #include <nx/network/dns_resolver.h>
+#include <nx/network/socket_factory.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/stun/message_dispatcher.h>
 #include <nx/network/stun/udp_client.h>
@@ -193,7 +194,7 @@ protected:
             std::move(requestMessage),
             std::bind(&UdpClient::saveRequestResult, this, _1, _2));
     }
-    
+
     void thenRequestFailed()
     {
         ASSERT_NE(SystemError::noError, std::get<0>(m_requestResults.pop()));

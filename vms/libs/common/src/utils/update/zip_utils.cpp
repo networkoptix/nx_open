@@ -83,6 +83,7 @@ QnZipExtractor::Error QnZipExtractor::extractZip()
     if (!m_zip->open(QuaZip::mdUnzip))
         return BrokenZip;
 
+    m_extracted = 0;
     QList<QPair<QString, QString>> symlinks;
 
     QuaZipFile file(m_zip.get());
@@ -130,6 +131,7 @@ QnZipExtractor::Error QnZipExtractor::extractZip()
                     file.close();
                     return NoFreeSpace;
                 }
+                m_extracted += read;
             }
 
             auto permissions = info.getPermissions();
@@ -173,21 +175,27 @@ QStringList QnZipExtractor::fileList()
     return result;
 }
 
-size_t QnZipExtractor::estimateUnpackedSize() const
+qint64 QnZipExtractor::estimateUnpackedSize() const
 {
-    size_t result = 0;
-    if (m_zip->open(QuaZip::mdUnzip))
-    {
-        auto fileList = m_zip->getFileInfoList64();
-        m_zip->close();
+    int64_t result = 0;
+    if (!m_zip->open(QuaZip::mdUnzip))
+        return -1;
 
-        for (const auto& file: fileList)
-            result += file.uncompressedSize;
-    }
+    QList<QuaZipFileInfo64> fileList = m_zip->getFileInfoList64();
+    m_zip->close();
+
+    for (const QuaZipFileInfo64& file: fileList)
+        result += file.uncompressedSize;
+
     // It is quite hard to predict accurate size of unpacked data. This size will be
     // affected by the block size of a filesystem.
-    auto constexpr padding = 1.2;
-    return result * padding;
+    auto constexpr kMultipler = 1.1;
+    return static_cast<qint64>(result * kMultipler);
+}
+
+qint64 QnZipExtractor::bytesExtracted() const
+{
+    return m_extracted;
 }
 
 #endif

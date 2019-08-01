@@ -6,6 +6,7 @@
 #include <nx/network/cloud/tunnel/connector_factory.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/cloud/mediator_connector.h>
+#include <nx/network/system_socket.h>
 #include <nx/utils/random.h>
 #include <nx/utils/std/future.h>
 #include <nx/utils/thread/sync_queue.h>
@@ -195,7 +196,7 @@ private:
         const AddressEntry& targetAddress,
         const std::string& /*connectSessionId*/,
         const hpm::api::ConnectResponse& /*response*/,
-        std::unique_ptr<UDPSocket> /*udpSocket*/)
+        std::unique_ptr<AbstractDatagramSocket> /*udpSocket*/)
     {
         CloudConnectors connectors;
 

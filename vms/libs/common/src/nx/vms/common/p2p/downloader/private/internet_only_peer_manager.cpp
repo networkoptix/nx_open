@@ -1,7 +1,5 @@
 #include "internet_only_peer_manager.h"
 
-#include <memory>
-
 #include <utils/common/delayed.h>
 #include <nx/network/http/http_async_client.h>
 #include <nx/utils/guarded_callback.h>
@@ -13,32 +11,13 @@ using namespace std::chrono;
 
 namespace nx::vms::common::p2p::downloader {
 
-namespace {
-
-static const milliseconds kDownloadRequestTimeout = 10min;
-
-} // namespace
-
-class InternetOnlyPeerManager::Private
-{
-public:
-    QnMutex mutex;
-    rest::Handle nextRequestId = 1;
-    QHash<rest::Handle, std::shared_ptr<nx::network::http::AsyncClient>> requestClients;
-};
-
 InternetOnlyPeerManager::InternetOnlyPeerManager():
-    d(new Private())
+    AbstractPeerManager(Capabilities(FileInfo | DownloadChunk))
 {
 }
 
 InternetOnlyPeerManager::~InternetOnlyPeerManager()
 {
-}
-
-QnUuid InternetOnlyPeerManager::selfId() const
-{
-    return {};
 }
 
 QString InternetOnlyPeerManager::peerString(const QnUuid& peerId) const
@@ -48,12 +27,12 @@ QString InternetOnlyPeerManager::peerString(const QnUuid& peerId) const
 
 QList<QnUuid> InternetOnlyPeerManager::getAllPeers() const
 {
-    return {};
+    return {QnUuid()};
 }
 
 QList<QnUuid> InternetOnlyPeerManager::peers() const
 {
-    return {};
+    return {QnUuid()};
 }
 
 int InternetOnlyPeerManager::distanceTo(const QnUuid& /*peerId*/) const
@@ -61,49 +40,43 @@ int InternetOnlyPeerManager::distanceTo(const QnUuid& /*peerId*/) const
     return 0;
 }
 
-bool InternetOnlyPeerManager::hasInternetConnection(const QnUuid& peerId) const
+AbstractPeerManager::RequestContextPtr<FileInformation> InternetOnlyPeerManager::requestFileInfo(
+    const QnUuid& peerId,
+    const QString& fileName,
+    const nx::utils::Url& url)
 {
-    // TODO: Actually check Internet connection.
-    return peerId.isNull();
+    if (!peerId.isNull())
+        return {};
+
+    std::promise<std::optional<FileInformation>> promise;
+    if (url.isValid())
+        promise.set_value(FileInformation(fileName));
+    else
+        promise.set_value({});
+
+    return std::make_unique<InternetRequestContext<FileInformation>>(
+        nullptr, promise.get_future());
 }
 
-rest::Handle InternetOnlyPeerManager::requestFileInfo(
-    const QnUuid& /*peerId*/,
-    const QString& /*fileName*/,
-    AbstractPeerManager::FileInfoCallback /*callback*/)
+AbstractPeerManager::RequestContextPtr<QVector<QByteArray>> InternetOnlyPeerManager::requestChecksums(
+    const QnUuid& /*peerId*/, const QString& /*fileName*/)
 {
-    return -1;
+    return std::make_unique<InternetRequestContext<QVector<QByteArray>>>();
 }
 
-rest::Handle InternetOnlyPeerManager::requestChecksums(
-    const QnUuid& /*peerId*/,
-    const QString& /*fileName*/,
-    AbstractPeerManager::ChecksumsCallback /*callback*/)
-{
-    return -1;
-}
-
-rest::Handle InternetOnlyPeerManager::downloadChunk(
-    const QnUuid& /*peerId*/,
-    const QString& /*fileName*/,
-    int /*chunkIndex*/,
-    AbstractPeerManager::ChunkCallback /*callback*/)
-{
-    return -1;
-}
-
-rest::Handle InternetOnlyPeerManager::downloadChunkFromInternet(
+AbstractPeerManager::RequestContextPtr<QByteArray> InternetOnlyPeerManager::downloadChunk(
     const QnUuid& peerId,
     const QString& /*fileName*/,
     const utils::Url& url,
     int chunkIndex,
-    int chunkSize,
-    AbstractPeerManager::ChunkCallback callback)
+    int chunkSize)
 {
-    if (!peerId.isNull())
-        return -1;
+    constexpr milliseconds kDownloadRequestTimeout = 10min;
 
-    auto httpClient = std::make_shared<nx::network::http::AsyncClient>();
+    if (!peerId.isNull())
+        return {};
+
+    auto httpClient = std::make_unique<nx::network::http::AsyncClient>();
     httpClient->bindToAioThread(m_aioTimer.getAioThread());
     httpClient->setResponseReadTimeout(kDownloadRequestTimeout);
     httpClient->setSendTimeout(kDownloadRequestTimeout);
@@ -113,66 +86,22 @@ rest::Handle InternetOnlyPeerManager::downloadChunkFromInternet(
     httpClient->addAdditionalHeader("Range",
         QString("bytes=%1-%2").arg(pos).arg(pos + chunkSize - 1).toLatin1());
 
-    const auto requestId = d->nextRequestId;
-
-    {
-        NX_MUTEX_LOCKER lock(&d->mutex);
-        d->requestClients[requestId] = httpClient;
-    }
-
-    ++d->nextRequestId;
+    auto promise = std::make_shared<std::promise<std::optional<QByteArray>>>();
 
     httpClient->doGet(url,
-        nx::utils::guarded(this,
-            [this, callback, requestId, thread = thread()]()
-            {
-                executeInThread(thread, nx::utils::guarded(this,
-                    [this, callback, requestId]()
-                    {
-                        NX_MUTEX_LOCKER lock(&d->mutex);
-                        const auto httpClient = d->requestClients.take(requestId);
-                        lock.unlock();
+        [promise, httpClient = httpClient.get(), thread = thread()]()
+        {
+            if (httpClient->hasRequestSucceeded())
+                setPromiseValueIfEmpty(promise, {httpClient->fetchMessageBodyBuffer()});
+            else
+                setPromiseValueIfEmpty(promise, {});
+        });
 
-                        if (!httpClient)
-                            return;
+    std::function<void()> cancelRequest =
+        [promise, httpClient = httpClient.get()]() { setPromiseValueIfEmpty(promise, {}); };
 
-                        const bool success = httpClient->hasRequestSucceeded();
-
-                        QByteArray result;
-                        if (success)
-                            result = httpClient->fetchMessageBodyBuffer();
-
-                        httpClient->pleaseStopSync();
-                        callback(success, requestId, result);
-                    }));
-            }));
-
-    return requestId;
-}
-
-void InternetOnlyPeerManager::cancelRequest(const QnUuid& peerId, rest::Handle handle)
-{
-    if (!peerId.isNull())
-        return;
-
-    NX_MUTEX_LOCKER lock(&d->mutex);
-    auto httpClient = d->requestClients.take(handle);
-    httpClient->pleaseStopSync();
-}
-
-bool InternetOnlyPeerManager::hasAccessToTheUrl(const QString& url) const
-{
-    if (url.isEmpty())
-        return false;
-
-    return Downloader::validate(url, /* onlyConnectionCheck */ true, /* expectedSize */ 0);
-}
-
-AbstractPeerManager* InternetOnlyPeerManagerFactory::createPeerManager(
-    FileInformation::PeerSelectionPolicy /*peerPolicy*/,
-    const QList<QnUuid>& /*additionalPeers*/)
-{
-    return new InternetOnlyPeerManager();
+    return std::make_unique<InternetRequestContext<QByteArray>>(
+        std::move(httpClient), promise->get_future(), cancelRequest);
 }
 
 } // namespace nx::vms::common::p2p::downloader

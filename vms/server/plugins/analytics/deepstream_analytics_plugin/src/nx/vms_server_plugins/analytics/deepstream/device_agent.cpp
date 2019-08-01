@@ -62,7 +62,16 @@ Error DeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
 {
     NX_OUTPUT << __func__ << " Setting metadata handler";
     std::lock_guard<std::mutex> lock(m_mutex);
-    m_handler = handler;
+
+    if (!handler)
+    {
+        m_handler.reset();
+        return Error::noError;
+    }
+
+    handler->addRef();
+    m_handler.reset(handler);
+    
     m_pipeline->setMetadataCallback(
         [this](IMetadataPacket* packet)
         {
@@ -126,7 +135,7 @@ const IString* DeviceAgent::manifest(Error* error) const
     static const std::string kIndent = "        ";
     if (ini().pipelineType == kOpenAlprPipeline)
     {
-        objectTypeIds += kIndent + "\"" + kLicensePlateGuid +"\"";
+        objectTypeIds += kIndent + "\"" + kLicensePlateObjectTypeId +"\"";
     }
     else
     {
@@ -143,6 +152,9 @@ const IString* DeviceAgent::manifest(Error* error) const
 {
     "supportedObjectTypeIds": [
 )json" + objectTypeIds + R"json(
+    ],
+    "supportedEventTypeIds": [
+        ")json" + kLicensePlateDetectedEventTypeId + R"json("
     ]
 }
 )json";

@@ -28,6 +28,22 @@ ResultCode toResultCode(nx::sql::DBResult dbResult)
     }
 }
 
+template<typename OptionalType>
+nx::sql::DBResult filterDbResult(
+    const std::optional<OptionalType>& optional,
+    nx::sql::DBResult result)
+{
+    return !optional.has_value() && result == nx::sql::DBResult::ok
+        ? nx::sql::DBResult::notFound
+        : result;
+}
+
+template<typename OptionalType>
+OptionalType getValue(const std::optional<OptionalType>& optional)
+{
+    return optional.has_value() ? *optional : OptionalType();
+}
+
 std::optional<std::string> calculateUpperBound(const std::string& keyPrefix)
 {
     if (!keyPrefix.empty())
@@ -44,15 +60,34 @@ std::optional<std::string> calculateUpperBound(const std::string& keyPrefix)
 
 } // namespace
 
+const char * toString(ResultCode result)
+{
+    switch (result)
+    {
+        case ok:
+            return "ok";
+        case notFound:
+            return "not found";
+        case logicError:
+            return "logic error";
+        case unknownError:
+        default:
+            return "unknown error";
+    }
+}
+
+//-------------------------------------------------------------------------------------------------
+// DataManager
+
 DataManager::DataManager(
-    nx::clusterdb::engine::SyncronizationEngine* syncronizationEngine,
+    nx::clusterdb::engine::SynchronizationEngine* synchronizationEngine,
     nx::sql::AsyncSqlQueryExecutor* queryExecutor,
-    const std::string& systemId,
+    const std::string& clusterId,
     EventProvider* eventProvider)
     :
-    m_syncEngine(syncronizationEngine),
+    m_syncEngine(synchronizationEngine),
     m_queryExecutor(queryExecutor),
-    m_systemId(systemId),
+    m_clusterId(clusterId),
     m_eventProvider(eventProvider)
 {
     m_syncEngine->incomingCommandDispatcher()
@@ -90,7 +125,7 @@ void DataManager::insertOrUpdate(
         return completionHandler(ResultCode::logicError);
 
     m_syncEngine->transactionLog().startDbTransaction(
-        m_systemId,
+        m_clusterId,
         [this, key, value](nx::sql::QueryContext* queryContext)
         {
             insertToOrUpdateDb(queryContext, key, value);
@@ -111,7 +146,7 @@ void DataManager::remove(
         return completionHandler(ResultCode::logicError);
 
     m_syncEngine->transactionLog().startDbTransaction(
-        m_systemId,
+        m_clusterId,
         [this, key](nx::sql::QueryContext* queryContext)
         {
             removeFromDb(queryContext, key);
@@ -131,24 +166,20 @@ void DataManager::get(
     if (key.empty())
         return completionHandler(ResultCode::logicError, std::string());
 
-    auto value = std::make_shared<std::optional<std::string>>();
+    auto sharedValue = std::make_shared<std::optional<std::string>>();
 
     m_queryExecutor->executeSelect(
-        [this, key, value](nx::sql::QueryContext* queryContext) mutable
+        [this, key, sharedValue](nx::sql::QueryContext* queryContext) mutable
         {
-            *value = getFromDb(queryContext, key);
-
-            // Sql db doesn't throw notFound error if key lookup fails, so return it manually.
-            return value->has_value()
-                ? nx::sql::DBResult::ok
-                : nx::sql::DBResult::notFound;
+            *sharedValue = getFromDb(queryContext, key);
+            return nx::sql::DBResult::ok;
         },
-        [value, completionHandler = std::move(completionHandler)](
+        [sharedValue, completionHandler = std::move(completionHandler)](
             nx::sql::DBResult dbResult) mutable
         {
             completionHandler(
-                toResultCode(dbResult),
-                value->has_value() ? std::move(*(*value)) : std::string());
+                toResultCode(filterDbResult(*sharedValue, dbResult)),
+                getValue(*sharedValue));
         }
     );
 }
@@ -164,16 +195,14 @@ void DataManager::lowerBound(const std::string& key, LookupCompletionHandler com
         [this, key, sharedKey](nx::sql::QueryContext* queryContext) mutable
         {
             *sharedKey = getLowerBoundFromDb(queryContext, key);
-            return sharedKey->has_value()
-                ? nx::sql::DBResult::ok
-                : nx::sql::DBResult::notFound;
+            return nx::sql::DBResult::ok;
         },
         [sharedKey, completionHandler = std::move(completionHandler)](
             nx::sql::DBResult dbResult)
         {
             completionHandler(
-                toResultCode(dbResult),
-                sharedKey->has_value() ? std::move(*(*sharedKey)) : std::string());
+                toResultCode(filterDbResult(*sharedKey, dbResult)),
+                getValue(*sharedKey));
         });
 }
 
@@ -188,16 +217,14 @@ void DataManager::upperBound(const std::string& key, LookupCompletionHandler com
         [this, key, sharedKey](nx::sql::QueryContext* queryContext) mutable
         {
             *sharedKey = getUpperBoundFromDb(queryContext, key);
-            return sharedKey->has_value()
-                ? nx::sql::DBResult::ok
-                : nx::sql::DBResult::notFound;
+            return nx::sql::DBResult::ok;
         },
         [sharedKey, completionHandler = std::move(completionHandler)](
                 nx::sql::DBResult dbResult)
         {
             completionHandler(
-                toResultCode(dbResult),
-                sharedKey->has_value() ? std::move(*(*sharedKey)) : std::string());
+                toResultCode(filterDbResult(*sharedKey, dbResult)),
+                getValue(*sharedKey));
         });
 }
 
@@ -209,21 +236,21 @@ void DataManager::getRange(
     if (keyLowerBound > keyUpperBound || keyLowerBound.empty() || keyUpperBound.empty())
         return completionHandler(ResultCode::logicError, std::map<std::string, std::string>());
 
-    auto sharedPairs = std::make_shared<std::map<std::string, std::string>>();
+    auto sharedPairs = std::make_shared<std::optional<std::map<std::string, std::string>>>();
 
     m_queryExecutor->executeSelect(
         [this, keyLowerBound, keyUpperBound, sharedPairs](
             nx::sql::QueryContext* queryContext) mutable
         {
             *sharedPairs = getRangeFromDb(queryContext, keyLowerBound, keyUpperBound);
-            return sharedPairs->empty()
-                ? nx::sql::DBResult::notFound
-                : nx::sql::DBResult::ok;
+            return nx::sql::DBResult::ok;
         },
         [sharedPairs, completionHandler = std::move(completionHandler)](
             nx::sql::DBResult dbResult)
         {
-            completionHandler(toResultCode(dbResult), std::move(*sharedPairs));
+            completionHandler(
+                toResultCode(filterDbResult(*sharedPairs, dbResult)),
+                getValue(*sharedPairs));
         });
 }
 
@@ -234,21 +261,21 @@ void DataManager::getRange(
     if (keyLowerBound.empty())
         return completionHandler(ResultCode::logicError, std::map<std::string, std::string>());
 
-    auto sharedPairs = std::make_shared<std::map<std::string, std::string>>();
+    auto sharedPairs = std::make_shared<std::optional<std::map<std::string, std::string>>>();
 
     m_queryExecutor->executeSelect(
         [this, keyLowerBound, sharedPairs](
             nx::sql::QueryContext* queryContext) mutable
         {
             *sharedPairs = getRangeFromDb(queryContext, keyLowerBound);
-            return sharedPairs->empty()
-                ? nx::sql::DBResult::notFound
-                : nx::sql::DBResult::ok;
+            return nx::sql::DBResult::ok;
         },
         [sharedPairs, completionHandler = std::move(completionHandler)](
                 nx::sql::DBResult dbResult)
         {
-            completionHandler(toResultCode(dbResult), std::move(*sharedPairs));
+            completionHandler(
+                toResultCode(filterDbResult(*sharedPairs, dbResult)),
+                getValue(*sharedPairs));
         });
 }
 
@@ -277,7 +304,7 @@ void DataManager::insertToOrUpdateDb(
 
     m_syncEngine->transactionLog()
         .generateTransactionAndSaveToLog<command::SaveKeyValuePair>(
-            queryContext, m_systemId, KeyValuePair{key, value});
+            queryContext, m_clusterId, KeyValuePair{key, value});
 }
 
 std::optional<std::string> DataManager::getFromDb(
@@ -303,19 +330,21 @@ std::optional<std::string> DataManager::getUpperBoundFromDb(
     return m_keyValueDao.upperBound(queryContext, key);
 }
 
-std::map<std::string, std::string> DataManager::getRangeFromDb(
+std::optional<std::map<std::string, std::string>> DataManager::getRangeFromDb(
     nx::sql::QueryContext* queryContext,
     const std::string& keyLowerBound,
     const std::string& keyUpperBound)
 {
-    return m_keyValueDao.getRange(queryContext, keyLowerBound, keyUpperBound);
+    auto range = m_keyValueDao.getRange(queryContext, keyLowerBound, keyUpperBound);
+    return range.empty() ? std::nullopt : std::optional<decltype(range)>(range);
 }
 
-std::map<std::string, std::string> DataManager::getRangeFromDb(
+std::optional<std::map<std::string, std::string>> DataManager::getRangeFromDb(
     nx::sql::QueryContext* queryContext,
     const std::string& keyLowerBound)
 {
-    return m_keyValueDao.getRange(queryContext, keyLowerBound);
+    auto range = m_keyValueDao.getRange(queryContext, keyLowerBound);
+    return range.empty() ? std::nullopt : std::optional<decltype(range)>(range);
 }
 
 void DataManager::removeFromDb(
@@ -327,12 +356,12 @@ void DataManager::removeFromDb(
 
     m_syncEngine->transactionLog()
         .generateTransactionAndSaveToLog<command::RemoveKeyValuePair>(
-            queryContext, m_systemId, Key{key});
+            queryContext, m_clusterId, Key{key});
 }
 
 void DataManager::insertOrUpdateReceivedRecord(
     nx::sql::QueryContext* queryContext,
-    const std::string& /*systemId*/,
+    const std::string& /*clusterId*/,
     clusterdb::engine::Command<KeyValuePair> command)
 {
     m_keyValueDao.insertOrUpdate(queryContext, command.params.key, command.params.value);
@@ -341,7 +370,7 @@ void DataManager::insertOrUpdateReceivedRecord(
 
 void DataManager::removeReceivedRecord(
     nx::sql::QueryContext* queryContext,
-    const std::string& /*systemId*/,
+    const std::string& /*clusterId*/,
     clusterdb::engine::Command<Key> command)
 {
     m_keyValueDao.remove(queryContext, command.params.key);

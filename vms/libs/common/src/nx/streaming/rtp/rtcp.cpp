@@ -6,12 +6,16 @@
 
 namespace nx::streaming::rtp {
 
-static const uint32_t kSsrcConst = 0x2a55a9e8;
-static const uint32_t kCsrcConst = 0xe8a9552a;
+constexpr uint8_t kRtcpSenderReport = 200;
+constexpr uint8_t kRtcpReceiverReport = 201;
+constexpr uint8_t kRtcpSourceDesciption = 202;
 
-static const uint8_t kRtpVersion = 2;
-static const std::chrono::microseconds kRtcpInterval(5000000);
-static const std::chrono::microseconds kRtcpDiscontinuityThreshold(1000000);
+constexpr uint32_t kSsrcConst = 0x2a55a9e8;
+constexpr uint32_t kCsrcConst = 0xe8a9552a;
+
+constexpr uint8_t kRtpVersion = 2;
+constexpr std::chrono::microseconds kRtcpInterval(5000000);
+constexpr std::chrono::microseconds kRtcpDiscontinuityThreshold(1000000);
 
 int buildClientRtcpReport(uint8_t* dstBuffer, int bufferLen)
 {
@@ -120,15 +124,15 @@ void RtcpSenderReporter::onPacket(uint32_t size)
     ++m_report.packetCount;
 }
 
-bool RtcpSenderReporter::needReport(uint64_t ntpTimestamp, uint32_t rtpTimestamp)
+bool RtcpSenderReporter::needReport(uint64_t ntpTimestampUSec, uint32_t rtpTimestamp)
 {
-    m_report.ntpTimestamp = ntpTimestamp;
+    m_report.ntpTimestamp = ntpTimestampUSec;
     m_report.rtpTimestamp = rtpTimestamp;
-    std::chrono::microseconds nextNtpTimestamp(ntpTimestamp);
+    std::chrono::microseconds ntpTimestamp(ntpTimestampUSec);
     bool needReport =
-        nextNtpTimestamp - m_lastTimestamp > kRtcpDiscontinuityThreshold ||
-        nextNtpTimestamp - m_lastReportTimestamp > kRtcpInterval;
-    m_lastTimestamp = nextNtpTimestamp;
+        ntpTimestamp - m_lastTimestamp > kRtcpDiscontinuityThreshold ||
+        ntpTimestamp - m_lastReportTimestamp > kRtcpInterval;
+    m_lastTimestamp = ntpTimestamp;
     return needReport;
 }
 

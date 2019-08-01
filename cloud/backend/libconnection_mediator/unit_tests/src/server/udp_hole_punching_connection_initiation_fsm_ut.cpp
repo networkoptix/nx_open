@@ -28,13 +28,15 @@ class TestRelayClusterClient:
 public:
     virtual void selectRelayInstanceForListeningPeer(
         const std::string& /*peerId*/,
-        RelayInstanceSearchCompletionHandler /*completionHandler*/)
+        const nx::network::HostAddress& /*serverHost*/,
+        RelayInstanceSelectCompletionHandler /*completionHandler*/)
     {
         // Unused.
     }
 
-    virtual void findRelayInstancePeerIsListeningOn(
+    virtual void findRelayInstanceForClient(
         const std::string& /*peerId*/,
+        const nx::network::HostAddress& /*clientHost*/,
         RelayInstanceSearchCompletionHandler completionHandler)
     {
         m_pendingRequestHandler = std::move(completionHandler);
@@ -47,7 +49,7 @@ public:
             nx::utils::swapAndCall(
                 m_pendingRequestHandler,
                 cloud::relay::api::ResultCode::networkError,
-                QUrl());
+                nx::utils::Url());
         }
     }
 
@@ -346,7 +348,7 @@ TEST_F(UDPHolePunchingConnectionInitiationFsm, find_a_relay_instance_takes_a_lon
 TEST_F(UDPHolePunchingConnectionInitiationFsm, connect_over_tcp)
 {
     whenIssueConnectRequestOverTcp();
-    
+
     thenConnectResultIsReported();
     andConnectionResultIsSuccess();
     andResponseContainsRelayInfo();

@@ -1169,6 +1169,12 @@ void QnCamDisplay::putData(const QnAbstractDataPacketPtr& data)
     }
     else if (const auto& metadata = std::dynamic_pointer_cast<QnAbstractCompressedMetadata>(data))
     {
+        if (m_lastQueuedVideoTime != AV_NOPTS_VALUE)
+        {
+            NX_VERBOSE(this, "Metadata lag behing last video packet: %1ms",
+                (m_lastQueuedVideoTime - metadata->timestamp) / 1000);
+        }
+
         processMetadata(metadata);
         return;
     }
@@ -1273,6 +1279,22 @@ void QnCamDisplay::processFillerPacket(
 
 void QnCamDisplay::processMetadata(const QnAbstractCompressedMetadataPtr& metadata)
 {
+    if (metadata->metadataType == MetadataType::MediaStreamEvent)
+    {
+        QByteArray data = QByteArray::fromRawData(metadata->data(), metadata->dataSize());
+        auto mediaEvent = QnLexical::deserialized<Qn::MediaStreamEvent>(
+            QString::fromLatin1(data));
+
+        m_lastMediaEvent = mediaEvent;
+        if (!m_lastMediaEventTimeout.isValid())
+            m_lastMediaEventTimeout.restart();
+
+        processFillerPacket(
+            m_speed >= 0 ? DATETIME_NOW : 0,
+            metadata->dataProvider,
+            QnAbstractMediaData::MediaFlags_None);
+    }
+
     QnMutexLocker lock(&m_metadataConsumersHashMutex);
     const auto consumers = m_metadataConsumerByType;
     lock.unlock();
@@ -1287,9 +1309,8 @@ void QnCamDisplay::processMetadata(const QnAbstractCompressedMetadataPtr& metada
         }
     }
 
-    NX_VERBOSE(this)
-        << lm("Metadata [%2] processed by %3 consumers")
-            .arg(static_cast<int>(metadata->metadataType)).arg(consumersCount);
+    NX_VERBOSE(this, "Metadata [%1] processed by %2 consumers",
+        (int) metadata->metadataType, consumersCount);
 }
 
 bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)

@@ -9,7 +9,7 @@
 
 #include <nx/utils/singleton.h>
 
-class QGLWidget;
+class QOpenGLWidget;
 class QnClientCoreModule;
 class QnNetworkProxyFactory;
 class QnStaticCommonModule;
@@ -22,6 +22,7 @@ namespace nx::vms::client::desktop {
 class AnalyticsMetadataProviderFactory;
 class UploadManager;
 class WearableManager;
+class VideoCache;
 
 } // namespace nx::vms::client::desktop
 
@@ -33,7 +34,7 @@ public:
     explicit QnClientModule(const QnStartupParameters& startupParams, QObject* parent = nullptr);
     virtual ~QnClientModule();
 
-    void initDesktopCamera(QGLWidget* window);
+    void initDesktopCamera(QOpenGLWidget* window);
     void startLocalSearchers();
 
     QnNetworkProxyFactory* networkProxyFactory() const;
@@ -46,7 +47,7 @@ public:
     QnStartupParameters startupParameters() const;
     nx::vms::client::desktop::UploadManager* uploadManager() const;
     nx::vms::client::desktop::WearableManager* wearableManager() const;
-
+    nx::vms::client::desktop::VideoCache* videoCache() const;
 private:
     void initApplication();
     void initThread();
@@ -55,6 +56,7 @@ private:
     void initSingletons();
     void initRuntimeParams(const QnStartupParameters& startupParams);
     void initLog();
+    bool initLogFromFile(const QString& filename, const QString& suffix = QString());
     void initNetwork();
     void initSkin();
     void initLocalResources();
@@ -73,6 +75,7 @@ private:
     nx::vms::client::desktop::RadassController* m_radassController = nullptr;
     nx::vms::client::desktop::UploadManager* m_uploadManager = nullptr;
     nx::vms::client::desktop::WearableManager* m_wearableManager = nullptr;
+    nx::vms::client::desktop::VideoCache* m_videoCache = nullptr;
 };
 
 #define qnClientModule QnClientModule::instance()

@@ -45,6 +45,7 @@ Yunhong Gu, last updated 01/27/2011
 #include <vector>
 
 #include "common.h"
+#include "socket_addresss.h"
 #include "udt.h"
 
 class CCacheItem
@@ -286,7 +287,7 @@ public:
     // Returned value:
     //    None.
 
-    static void convert(const sockaddr* addr, int ver, uint32_t ip[]);
+    static void convert(const detail::SocketAddress& addr, uint32_t ip[]);
 };
 
 

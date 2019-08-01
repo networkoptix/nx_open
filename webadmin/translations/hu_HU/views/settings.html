@@ -108,9 +108,9 @@ Kérjük csatlakozzon a hálózatra, vagy állítsa be a helyes IP-címet.
                                 <a ng-if="!mode.liteClient"
                                    ng-href="{{Config.cloud.portalUrl}}"
                                    target="_blank">Learn more</a></uib-alert>
-                            <uib-alert type="error" ng-if="!hasInternetOnServer">{{Config.cloud.productName}} beállításainak elvégzéséhez csatlakozzon az Internetre</uib-alert>
-                            <uib-alert type="error" ng-if="hasInternetOnServer && !hasInternetOnClient">Internet kapcsolat szükséges {{Config.cloud.productName}} felhőhöz való csatlakozáshoz</uib-alert>
-                            <p ng-if="canConnectToCloud"  ><button
+                            <uib-alert type="danger" ng-if="!hasInternetOnServer">{{Config.cloud.productName}} beállításainak elvégzéséhez csatlakozzon az Internetre</uib-alert>
+                            <uib-alert type="danger" ng-if="hasInternetOnServer && !hasInternetOnClient">Internet kapcsolat szükséges {{Config.cloud.productName}} felhőhöz való csatlakozáshoz</uib-alert>
+                            <p ng-if="canConnectToCloud"><button
                                     class="btn btn-default"
                                     ng-click="connectToCloud()" ng-disabled="!hasInternetOnServer || !hasInternetOnClient">Csatlakozás {{Config.cloud.productName}} felhőhöz</button>
                                 <a ng-if="!mode.liteClient"  class="btn btn-default"
@@ -121,12 +121,12 @@ Kérjük csatlakozzon a hálózatra, vagy állítsa be a helyes IP-címet.
 
 
                     <div>
-                        <h3>Traffic encryption</h3>
+                        <h3>Forgalom titkosítás</h3>
                         <form novalidate name="trafficSettingsForm" class="form-horizontal" role="form" >
                             <div class="checkbox">
                                 <label>
                                     <input type="checkbox" ng-model="trafficSettings.trafficEncryptionForced"
-                                           ng-change="checkTrafficEncryption()"> Force Traffic Encryption
+                                           ng-change="checkTrafficEncryption()"> Kényszerített forgalom titkosítás
                                 </label>
                             </div>
                             <div class="checkbox">
@@ -134,7 +134,7 @@ Kérjük csatlakozzon a hálózatra, vagy állítsa be a helyes IP-címet.
                                     <input type="checkbox"
                                            ng-disabled="!trafficSettings.trafficEncryptionForced"
                                            ng-model="trafficSettings.videoTrafficEncryptionForced">
-                                    Force Video Traffic Encryption
+                                    Kényszerített videó forgalom titkosítás
                                 </label>
                             </div>
                             <button type="button" class="btn btn-primary" ng-click="saveTrafficSettings()">Mentés</button>

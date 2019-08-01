@@ -1,10 +1,17 @@
 #include "network_issue_event.h"
 
+#include <nx/fusion/model_functions.h>
+
 #include <core/resource/resource.h>
+
+#include <nx/fusion/model_functions.h>
 
 namespace nx {
 namespace vms {
 namespace event {
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(NetworkIssueEvent::MulticastAddressConflictParameters, (json),
+    MulticastAddressConflictParameters_Fields, (brief, true))
 
 NetworkIssueEvent::NetworkIssueEvent(
     const QnResourcePtr& resource,
@@ -41,27 +48,6 @@ bool NetworkIssueEvent::decodePrimaryStream(const QString& encoded, const bool d
 
 QString NetworkIssueEvent::encodePrimaryStream(bool isPrimary) {
     return QString::number(isPrimary);
-}
-
-NetworkIssueEvent::PacketLossSequence NetworkIssueEvent::decodePacketLossSequence(const QString& encoded)
-{
-    NetworkIssueEvent::PacketLossSequence result;
-    result.valid = false;
-
-    QStringList seqs = encoded.split(L';');
-    if (seqs.size() != 2)
-        return result;
-
-    bool ok1, ok2;
-    result.prev = seqs[0].toInt(&ok1);
-    result.next = seqs[1].toInt(&ok2);
-    result.valid = ok1 && ok2;
-    return result;
-}
-
-QString NetworkIssueEvent::encodePacketLossSequence(int prev, int next)
-{
-    return QString(QLatin1String("%1;%2")).arg(prev).arg(next);
 }
 
 } // namespace event

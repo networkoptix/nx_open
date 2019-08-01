@@ -1,8 +1,14 @@
 #include "global_tool_tip.h"
 
+#include <QtCore/QPointF>
+#include <QtCore/QRectF>
 #include <QtCore/QTimer>
+
+#include <QtQml/QtQml>
+
 #include <QtQuick/QQuickWindow>
 #include <QtQuick/QQuickItem>
+
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QStyle>
 
@@ -210,7 +216,7 @@ void GlobalToolTipAttached::Private::adjustPosition()
 {
     auto toolTip = instance();
 
-    if (!item || !toolTip)
+    if (!item || !toolTip || !item->window())
         return;
 
     QQuickItem* root = item->window()->contentItem();
@@ -294,6 +300,10 @@ bool GlobalToolTipAttached::Private::eventFilter(QObject* watched, QEvent* event
             const auto hover = static_cast<QHoverEvent*>(event);
             hoverPos = hover->pos();
 
+            // Avoid restarting the tooltip show timer when there is no movement.
+            if (event->type() == QEvent::HoverMove && hoverPos == hover->oldPos())
+                break;
+
             if (event->type() == QEvent::HoverLeave)
                 q->hide();
             else
@@ -301,6 +311,10 @@ bool GlobalToolTipAttached::Private::eventFilter(QObject* watched, QEvent* event
 
             break;
         }
+        case QEvent::KeyPress:
+        case QEvent::MouseButtonPress:
+            q->hide();
+            break;
         default:
             break;
     }

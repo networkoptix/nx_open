@@ -18,6 +18,7 @@ endif()
 
 if(withDesktopClient)
     add_subdirectory(qtsingleapplication)
+    add_subdirectory(qthttpserver)
 endif()
 
 if((withDesktopClient OR withMobileClient) AND NOT (ANDROID OR IOS))
@@ -30,4 +31,8 @@ endif()
 
 if(withTests)
     add_subdirectory(googletest)
+endif()
+
+if(withClouds)
+    add_subdirectory(libmaxminddb)
 endif()

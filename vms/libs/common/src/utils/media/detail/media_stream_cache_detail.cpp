@@ -53,10 +53,15 @@ void MediaStreamCache::putData(const QnAbstractDataPacketPtr& data)
 
     const QnAbstractMediaData* mediaPacket = dynamic_cast<QnAbstractMediaData*>(data.get());
     NX_CRITICAL(mediaPacket);
+    if (mediaPacket->dataType != QnAbstractMediaData::DataType::VIDEO &&
+        mediaPacket->dataType != QnAbstractMediaData::DataType::AUDIO)
+    {
+        return;
+    }
 
     const bool isKeyFrame = mediaPacket->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey);
-    NX_VERBOSE(this, "Got frame [%1], channel [%2], isKeyFrame [%3]",
-        data->timestamp, mediaPacket->channelNumber, isKeyFrame);
+    NX_VERBOSE(this, "Got frame [%1], channel [%2], isKeyFrame [%3], dataType [%4]",
+        data->timestamp, mediaPacket->channelNumber, isKeyFrame, mediaPacket->dataType);
 
     if (m_packetsByTimestamp.empty() && !isKeyFrame)
         return; // Cache data MUST start with key frame.
@@ -65,7 +70,11 @@ void MediaStreamCache::putData(const QnAbstractDataPacketPtr& data)
         m_prevPacketSrcTimestamp = data->timestamp;
 
     if (qAbs(data->timestamp - m_prevPacketSrcTimestamp) > MAX_ALLOWED_TIMESTAMP_DIFF)
+    {
+        NX_DEBUG(this, "media cache discontinuty prev timestamp %1, current timestamp %2",
+            data->timestamp, m_prevPacketSrcTimestamp);
         eventsToDeliver.push_back([this]() { m_onDiscontinue.notify(); });
+    }
 
     m_prevPacketSrcTimestamp = data->timestamp;
 
@@ -144,9 +153,19 @@ void MediaStreamCache::clearCacheIfNeeded(QnMutexLockerBase* const /*lk*/)
         } );
     if( lastItToRemove != m_packetsByTimestamp.begin() )
         --lastItToRemove;
-    //iterating to first key frame to the left from lastItToRemove
-    for( ; lastItToRemove != m_packetsByTimestamp.begin() && !lastItToRemove->isKeyFrame; --lastItToRemove ) {}
-    //updating cache size (in bytes)
+
+    // Iterating to first key frame to the left from lastItToRemove or until hardlimit reached.
+    for (;; --lastItToRemove)
+    {
+       if (lastItToRemove == m_packetsByTimestamp.begin())
+           break;
+       if (lastItToRemove->isKeyFrame)
+           break;
+       if ((maxTimestamp - lastItToRemove->timestamp) > m_maxCacheSizeUsec)
+           break;
+    }
+
+    // Updating cache size (in bytes).
     for( PacketContainerType::const_iterator
         it = m_packetsByTimestamp.cbegin();
         it != lastItToRemove;

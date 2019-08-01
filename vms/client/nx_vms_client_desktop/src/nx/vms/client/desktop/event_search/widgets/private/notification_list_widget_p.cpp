@@ -19,19 +19,14 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/workaround/hidpi_workarounds.h>
-#include <ui/models/sort_filter_list_model.h>
 #include <ui/statistics/modules/controls_statistics_module.h>
 #include <ui/style/skin.h>
 #include <ui/workbench/workbench_context.h>
 
-#include <nx/vms/client/desktop/common/models/subset_list_model.h>
-#include <nx/vms/client/desktop/common/models/concatenation_list_model.h>
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>
 #include <nx/vms/client/desktop/event_search/widgets/event_ribbon.h>
 #include <nx/vms/client/desktop/event_search/widgets/event_tile.h>
-#include <nx/vms/client/desktop/event_search/models/system_health_list_model.h>
-#include <nx/vms/client/desktop/event_search/models/notification_list_model.h>
-#include <nx/vms/client/desktop/event_search/models/progress_list_model.h>
+#include <nx/vms/client/desktop/event_search/models/notification_tab_model.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
@@ -45,34 +40,6 @@ namespace nx::vms::client::desktop {
 
 namespace {
 
-class SystemHealthSortFilterModel: public QnSortFilterListModel
-{
-public:
-    using QnSortFilterListModel::QnSortFilterListModel;
-
-    bool lessThan(const QModelIndex& sourceLeft, const QModelIndex& sourceRight) const
-    {
-        return sourceLeft.data(Qn::PriorityRole).toInt()
-            > sourceRight.data(Qn::PriorityRole).toInt();
-    }
-};
-
-class SeparatorListModel: public QAbstractListModel
-{
-public:
-    using QAbstractListModel::QAbstractListModel; //< Forward constructors.
-
-    virtual int rowCount(const QModelIndex& parent) const override
-    {
-        return parent.isValid() ? 0 : 1;
-    }
-
-    virtual QVariant data(const QModelIndex& index, int role) const override
-    {
-        return QVariant();
-    }
-};
-
 static constexpr int kPlaceholderFontPixelSize = 15;
 
 } // namespace
@@ -84,8 +51,7 @@ NotificationListWidget::Private::Private(NotificationListWidget* q) :
     q(q),
     m_eventRibbon(new EventRibbon(q)),
     m_placeholder(new QWidget(q)),
-    m_systemHealthModel(new SystemHealthListModel(context(), this)),
-    m_notificationsModel(new NotificationListModel(context(), this))
+    m_model(new NotificationTabModel(context(), this))
 {
     m_placeholder->setMinimumSize(QSize(0, 100));
     anchorWidgetToParent(m_placeholder);
@@ -116,16 +82,7 @@ NotificationListWidget::Private::Private(NotificationListWidget* q) :
     setPaletteColor(m_eventRibbon->scrollBar(), QPalette::Disabled, QPalette::Midlight,
         colorTheme()->color("dark5"));
 
-    auto sortModel = new SystemHealthSortFilterModel(this);
-    auto systemHealthListModel = new SubsetListModel(sortModel, 0, QModelIndex(), this);
-    sortModel->setSourceModel(m_systemHealthModel);
-
-    auto progressModel = new ProgressListModel(this);
-
-    auto separatorModel = new SeparatorListModel(this);
-
-    m_eventRibbon->setModel(new ConcatenationListModel(
-        {systemHealthListModel, progressModel, separatorModel, m_notificationsModel}, this));
+    m_eventRibbon->setModel(m_model);
 
     connect(m_eventRibbon, &EventRibbon::hovered, q, &NotificationListWidget::tileHovered);
 

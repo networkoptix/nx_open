@@ -15,14 +15,14 @@ SystemCapabilitiesProvider::SystemCapabilitiesProvider(
 
     m_systemManager->addExtension(this);
 
-    m_ec2ConnectionManager->systemStatusChangedSubscription().subscribe(
+    m_ec2ConnectionManager->clusterStatusChangedSubscription().subscribe(
         std::bind(&SystemCapabilitiesProvider::onSystemStatusChanged, this, _1, _2),
         &m_systemStatusChangedSubscriptionId);
 }
 
 SystemCapabilitiesProvider::~SystemCapabilitiesProvider()
 {
-    m_ec2ConnectionManager->systemStatusChangedSubscription().removeSubscription(
+    m_ec2ConnectionManager->clusterStatusChangedSubscription().removeSubscription(
         m_systemStatusChangedSubscriptionId);
 
     m_systemManager->removeExtension(this);
@@ -43,7 +43,7 @@ void SystemCapabilitiesProvider::modifySystemBeforeProviding(
 
 void SystemCapabilitiesProvider::onSystemStatusChanged(
     const std::string& systemId,
-    clusterdb::engine::SystemStatusDescriptor statusDescription)
+    clusterdb::engine::NodeStatusDescriptor statusDescription)
 {
     QnMutexLocker lock(&m_mutex);
 

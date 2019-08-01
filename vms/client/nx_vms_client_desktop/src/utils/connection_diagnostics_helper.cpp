@@ -28,6 +28,7 @@
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/socket_global.h>
 #include <nx/vms/api/data/software_version.h>
+#include <nx/vms/api/protocol_version.h>
 
 using namespace nx::vms::client::desktop;
 
@@ -80,16 +81,16 @@ QString QnConnectionDiagnosticsHelper::getErrorDescription(
 
     addRow(tr("Client version: %1.").arg(engineVersion.toString()));
 
-    if (qnRuntime->isDevMode())
+    if (ini().developerMode)
     {
         addRow(lit("Protocol: %1, Cloud: %2")
-            .arg(QnAppInfo::ec2ProtoVersion())
+            .arg(nx::vms::api::protocolVersion())
             .arg(nx::network::SocketGlobals::cloud().cloudHost()));
     }
 
     addRow(tr("Server version: %1.").arg(connectionInfo.version.toString()));
 
-    if (qnRuntime->isDevMode())
+    if (ini().developerMode)
     {
         addRow(lit("Brand: %1, Customization: %2")
             .arg(connectionInfo.brand)
@@ -217,7 +218,7 @@ void QnConnectionDiagnosticsHelper::showValidateConnectionErrorMessage(
         case Qn::IncompatibleInternalConnectionResult:
         {
             QString message = tr("Incompatible Server");
-            if (qnRuntime->isDevMode())
+            if (ini().developerMode)
                 message += L'\n' + lit("Protocol: %1").arg(connectionInfo.nxClusterProtoVersion);
             QnMessageBox::warning(parentWidget, message);
             break;
@@ -225,7 +226,7 @@ void QnConnectionDiagnosticsHelper::showValidateConnectionErrorMessage(
         case Qn::IncompatibleCloudHostConnectionResult:
         {
             QString message = tr("Incompatible Server");
-            if (qnRuntime->isDevMode())
+            if (ini().developerMode)
                 message += L'\n' + lit("Cloud host: %1").arg(connectionInfo.cloudHost);
             QnMessageBox::warning(parentWidget, message);
             break;
@@ -275,16 +276,15 @@ QnConnectionDiagnosticsHelper::validateConnectionTest(
 }
 
 bool QnConnectionDiagnosticsHelper::getInstalledVersions(
-    const nx::vms::api::SoftwareVersion& engineVersion,
     QList<nx::utils::SoftwareVersion>* versions)
 {
-    using namespace applauncher::api;
+    using nx::vms::applauncher::api::ResultType;
 
     /* Try to run applauncher if it is not running. */
-    if (!checkOnline())
+    if (!nx::vms::applauncher::api::checkOnline())
         return false;
 
-    const auto result = applauncher::api::getInstalledVersions(versions);
+    const auto result = nx::vms::applauncher::api::getInstalledVersions(versions);
     if (result == ResultType::ok)
         return true;
 
@@ -293,21 +293,10 @@ bool QnConnectionDiagnosticsHelper::getInstalledVersions(
     {
         QThread::msleep(100);
         qApp->processEvents();
-        if (applauncher::api::getInstalledVersions(versions) == ResultType::ok)
+        if (nx::vms::applauncher::api::getInstalledVersions(versions) == ResultType::ok)
             return true;
     }
     return false;
-}
-
-Qn::ConnectionResult QnConnectionDiagnosticsHelper::handleApplauncherError(QWidget* parentWidget)
-{
-    QnMessageBox::critical(parentWidget,
-        tr("Failed to restart %1 in compatibility mode")
-            .arg(QnClientAppInfo::applicationDisplayName()),
-        tr("Please close %1 and start it again using the shortcut in the start menu.")
-            .arg(QnClientAppInfo::applicationDisplayName()));
-
-    return Qn::IncompatibleVersionConnectionResult;
 }
 
 QString QnConnectionDiagnosticsHelper::getDiffVersionFullExtras(
@@ -318,17 +307,37 @@ QString QnConnectionDiagnosticsHelper::getDiffVersionFullExtras(
     const QString clientVersion = engineVersion.toString();
     const QString serverVersion = serverInfo.version.toString();
 
-    QString devModeText;
-    if (qnRuntime->isDevMode())
+    QString developerModeText;
+    if (ini().developerMode)
     {
-        devModeText += L'\n' + lit("Client Protocol: %1").arg(QnAppInfo::ec2ProtoVersion());
-        devModeText += L'\n' + lit("Server Protocol: %1").arg(serverInfo.nxClusterProtoVersion);
-        devModeText += L'\n' + lit("Client Cloud Host: %1").arg(nx::network::SocketGlobals::cloud().cloudHost());
-        devModeText += L'\n' + lit("Server Cloud Host: %1").arg(serverInfo.cloudHost);
+        developerModeText =
+            "\n<p style=\"text-indent: 0; font-size: 8px; color: #CCC;\">Developer info:<br/>";
+
+        const bool protocolDiffers =
+            nx::vms::api::protocolVersion() != serverInfo.nxClusterProtoVersion;
+        if (protocolDiffers)
+        {
+            developerModeText +=
+                QString("Protocol differs: <b>%1</b> on client, <b>%2</b> on server<br/>")
+                    .arg(nx::vms::api::protocolVersion())
+                    .arg(serverInfo.nxClusterProtoVersion);
+        }
+
+        const bool cloudHostDiffers =
+            nx::network::SocketGlobals::cloud().cloudHost() != serverInfo.cloudHost;
+        if (cloudHostDiffers)
+        {
+            developerModeText +=
+                QString("Cloud Host differs: <b>%1</b> on client, <b>%2</b> on server<br/>")
+                .arg(nx::network::SocketGlobals::cloud().cloudHost())
+                .arg(serverInfo.cloudHost);
+        }
+
+        developerModeText += "</p>";
     }
 
     return getDiffVersionsFullText(clientVersion, serverVersion)
-        + L'\n' + extraText + devModeText;
+        + "\n" + extraText + developerModeText;
 }
 
 QString QnConnectionDiagnosticsHelper::getDiffVersionsText()
@@ -341,14 +350,14 @@ QString QnConnectionDiagnosticsHelper::getDiffVersionsExtra(
     const QString& serverVersion)
 {
     return tr("Client - %1", "%1 is version").arg(clientVersion)
-        + L'\n' + tr("Server - %1", "%1 is version").arg(serverVersion);
+        + "<br/>" + tr("Server - %1", "%1 is version").arg(serverVersion);
 }
 
 QString QnConnectionDiagnosticsHelper::getDiffVersionsFullText(
     const QString& clientVersion,
     const QString& serverVersion)
 {
-    return getDiffVersionsText() + lit(":\n")
+    return getDiffVersionsText() + ":<br/>"
         + getDiffVersionsExtra(clientVersion, serverVersion);
 }
 
@@ -357,16 +366,35 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::handleCompatibilityMode(
     QWidget* parentWidget,
     const nx::vms::api::SoftwareVersion& engineVersion)
 {
+    auto handleApplauncherError =
+        [&]()
+        {
+            auto extras = getDiffVersionFullExtras(connectionInfo,
+                tr("Please close %1 and start it again using the shortcut in the start menu.")
+                .arg(QnClientAppInfo::applicationDisplayName()),
+                engineVersion);
+
+            QnMessageBox::critical(parentWidget,
+                tr("Failed to restart %1 in compatibility mode")
+                .arg(QnClientAppInfo::applicationDisplayName()),
+                extras);
+
+            return Qn::IncompatibleVersionConnectionResult;
+        };
+
+
     using namespace Qn;
+    using namespace nx::vms::applauncher::api;
+
     using Dialog = CompatibilityVersionInstallationDialog;
     QList<nx::utils::SoftwareVersion> versions;
-    if (!getInstalledVersions(engineVersion, &versions))
-        return handleApplauncherError(parentWidget);
+    if (!getInstalledVersions(&versions))
+        return handleApplauncherError();
 
     QList<QString> versionStrings;
     for (auto version: versions)
         versionStrings.append(version.toString());
-    NX_INFO(NX_SCOPE_TAG,
+    NX_VERBOSE(NX_SCOPE_TAG,
         "handleCompatibilityMode() - have the following versions installed: %1", versionStrings);
     bool isInstalled = versions.contains(connectionInfo.version);
     bool shouldAutoRestart = false;
@@ -438,13 +466,13 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::handleCompatibilityMode(
         QString authString = QnStartupParameters::createAuthenticationString(serverUrl,
             connectionInfo.version);
 
-        switch (applauncher::api::restartClient(connectionInfo.version, authString))
+        switch (restartClient(connectionInfo.version, authString))
         {
-            case applauncher::api::ResultType::ok:
+            case ResultType::ok:
                 return Qn::IncompatibleProtocolConnectionResult;
 
-            case applauncher::api::ResultType::connectError:
-                return handleApplauncherError(parentWidget);
+            case ResultType::connectError:
+                return handleApplauncherError();
 
             default:
             {

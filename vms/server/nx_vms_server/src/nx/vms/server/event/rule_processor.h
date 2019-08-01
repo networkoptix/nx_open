@@ -188,7 +188,7 @@ private:
     bool popProlongedActionStartTime(
         const vms::event::AbstractActionPtr& action,
         qint64& startTimeUsec);
-
+    void ruleModificationFinishedUnsafe();
 protected:
     mutable QnMutex m_mutex;
 
@@ -226,6 +226,9 @@ private:
     void notifyResourcesAboutEventIfNeccessary(const vms::event::RulePtr& rule, bool isRuleAdded);
 
     QHash<QnUuid, qint64> m_runningBookmarkActions;
+
+    QnWaitCondition m_ruleUpdateCond;
+    std::atomic<int> m_updatingRulesCnt{0};
 };
 
 } // namespace event

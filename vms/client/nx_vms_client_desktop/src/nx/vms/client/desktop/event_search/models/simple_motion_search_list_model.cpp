@@ -80,6 +80,13 @@ bool SimpleMotionSearchListModel::isConstrained() const
     return !isFilterEmpty() || base_type::isConstrained();
 }
 
+bool SimpleMotionSearchListModel::hasAccessRights() const
+{
+    // Panel is hidden for live viewers but should be visible when browsing local files offline.
+    return !isOnline()
+        || accessController()->hasGlobalPermission(GlobalPermission::viewArchive);
+}
+
 int SimpleMotionSearchListModel::rowCount(const QModelIndex& parent) const
 {
     return parent.isValid() ? 0 : int(m_data.size());
@@ -135,7 +142,7 @@ QVariant SimpleMotionSearchListModel::data(const QModelIndex& index, int role) c
 
         case Qn::PreviewStreamSelectionRole:
             return QVariant::fromValue(
-                nx::api::CameraImageRequest::StreamSelectionMode::sameAsMotion);
+                nx::api::ImageRequest::StreamSelectionMode::sameAsMotion);
 
         case Qn::ContextMenuRole:
             return QVariant::fromValue(contextMenu(chunk));
@@ -187,7 +194,7 @@ void SimpleMotionSearchListModel::requestFetch()
     const int oldCount = int(m_data.size());
     FetchResult result = FetchResult::complete;
 
-    ScopedFetchCommit scopedFetch(this, fetchDirection(), result /*by reference*/);
+    ScopedFetchCommit scopedFetch(this, fetchDirection(), &result);
 
     QnTimePeriod fetchedPeriod(relevantTimePeriod());
     if (periods.empty())

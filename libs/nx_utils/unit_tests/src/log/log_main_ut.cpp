@@ -1,14 +1,16 @@
 #include <gtest/gtest.h>
 
+#include <thread>
+
 #define NX_DEBUG_ENABLE_OUTPUT false //< Set to true to enable verbose output of this test.
 #include <nx/kit/debug.h>
 
-#include <nx/utils/unused.h>
 #include <nx/utils/log/log_initializer.h>
 #include <nx/utils/log/log_main.h>
 #include <nx/utils/log/log_settings.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/test_support/test_options.h>
+#include <nx/utils/unused.h>
 
 #include <QtCore/QSize>
 
@@ -71,35 +73,34 @@ public:
                  Qt::CaseSensitive, QRegExp::Wildcard);
 
              EXPECT_TRUE(regExp.exactMatch(messages[i]))
-                 << "Line [" << messages[i].toStdString() << "]" << std::endl
+                 << "    Line [" << messages[i].toStdString() << "]" << std::endl
                  << "    does not match pattern [" << patterns[i] << "]";
         }
     }
 
     Buffer* buffer = nullptr;
     const Level initialLevel;
+    nx::kit::IniConfig::Tweaks iniTweaks;
 };
 
 TEST_F(LogMainTest, ExplicitTag)
 {
-    NX_ALWAYS(kTestTag, "Always");
     NX_ERROR(kTestTag, "Error");
     NX_WARNING(kTestTag, "Warning");
     NX_INFO(kTestTag, "Info");
     NX_DEBUG(kTestTag, "Debug");
     NX_VERBOSE(kTestTag, "Verbose");
     expectMessages({
-        "* ALWAYS TestTag: Always",
         "* ERROR TestTag: Error",
         "* WARNING TestTag: Warning",
         "* INFO TestTag: Info"});
 
     const int kSeven = 7;
-    NX_ALWAYS(kTestTag) << "Always" << kSeven;
+    NX_ERROR(kTestTag) << "Error" << kSeven;
     NX_INFO(kTestTag) << "Info" << kSeven;
     NX_VERBOSE(kTestTag) << "Verbose" << kSeven;
     expectMessages({
-        "* ALWAYS TestTag: Always 7",
+        "* ERROR TestTag: Error 7",
         "* INFO TestTag: Info 7"});
 
     NX_ERROR(kTestTag, "Value %1 = %2", "error_count", 1);
@@ -112,14 +113,12 @@ TEST_F(LogMainTest, ExplicitTag)
 
 TEST_F(LogMainTest, This)
 {
-    NX_ALWAYS(this, "Always");
     NX_ERROR(this, "Error");
     NX_WARNING(this, "Warning");
     NX_INFO(this, "Info");
     NX_DEBUG(this, "Debug");
     NX_VERBOSE(this, "Verbose");
     expectMessages({
-        "* ALWAYS nx::utils::log::test::*LogMain*(0x*): Always",
         "* ERROR nx::utils::log::test::*LogMain*(0x*): Error",
         "* WARNING nx::utils::log::test::*LogMain*(0x*): Warning",
         "* INFO nx::utils::log::test::*LogMain*(0x*): Info",
@@ -127,11 +126,11 @@ TEST_F(LogMainTest, This)
         "* VERBOSE nx::utils::log::test::*LogMain*(0x*): Verbose"});
 
     const QSize kSize(2, 3);
-    NX_ALWAYS(this) << "Always" << kSize;
+    NX_ERROR(this) << "Error" << kSize;
     NX_INFO(this) << "Info" << kSize;
     NX_VERBOSE(this) << "Verbose" << kSize;
     expectMessages({
-        "* ALWAYS nx::utils::log::test::*LogMain*(0x*): Always QSize(2, 3)",
+        "* ERROR nx::utils::log::test::*LogMain*(0x*): Error QSize(2, 3)",
         "* INFO nx::utils::log::test::*LogMain*(0x*): Info QSize(2, 3)",
         "* VERBOSE nx::utils::log::test::*LogMain*(0x*): Verbose QSize(2, 3)"});
 
@@ -142,6 +141,83 @@ TEST_F(LogMainTest, This)
         "* ERROR nx::utils::log::test::*LogMain*(0x*): Value error_count = 1",
         "* WARNING nx::utils::log::test::*LogMain*(0x*): Value error_count = 2",
         "* DEBUG nx::utils::log::test::*LogMain*(0x*): Value error_count = 3"});
+}
+
+TEST_F(LogMainTest, LevelReducer)
+{
+    nx::utils::test::ScopedTimeShift timeShift(nx::utils::test::ClockType::steady);
+
+    const auto logError = [this]() { NX_ERROR(this, "Error"); };
+    const auto logWarning = [this]() { NX_WARNING(this, "Warning"); };
+    const auto logInfo = [this]() { NX_INFO(this, "Info"); };
+    const auto logDebug = [this]() { NX_DEBUG(this, "Debug"); };
+
+    iniTweaks.set(&ini().logLevelReducerPassLimit, 2);
+    iniTweaks.set(&ini().logLevelReducerWindowSizeS, 60);
+
+    for (int i = 0; i != 4; ++i)
+        logWarning();
+
+    expectMessages({
+        "* WARNING *: Warning",
+        "* WARNING *: TOO MANY SIMILAR MESSAGES: Warning",
+        "* DEBUG *: Warning",
+        "* DEBUG *: Warning"
+    });
+
+    logWarning();
+    timeShift.applyRelativeShift(std::chrono::minutes(1));
+    logWarning();
+
+    expectMessages({
+        "* DEBUG *: Warning",
+        "* WARNING *: Warning",
+    });
+
+    for (int i = 0; i != 3; ++i)
+    {
+        logError();
+        logInfo();
+        logDebug();
+    }
+
+    expectMessages({
+        "* ERROR *: Error",
+        "* INFO *: Info",
+        "* DEBUG *: Debug",
+        "* ERROR *: TOO MANY SIMILAR MESSAGES: Error",
+        "* INFO *: TOO MANY SIMILAR MESSAGES: Info",
+        "* DEBUG *: Debug",
+        "* DEBUG *: Error",
+        "* DEBUG *: Info",
+        "* DEBUG *: Debug",
+    });
+}
+
+TEST_F(LogMainTest, LevelReducerWithStream)
+{
+    nx::utils::test::ScopedTimeShift timeShift(nx::utils::test::ClockType::steady);
+    const auto logWarning = [this]() { NX_WARNING(this) << "Warn"; };
+
+    iniTweaks.set(&ini().logLevelReducerPassLimit, 1);
+    iniTweaks.set(&ini().logLevelReducerWindowSizeS, 60);
+
+    logWarning();
+    logWarning();
+
+    expectMessages({
+        "* WARNING *: TOO MANY SIMILAR MESSAGES: Warn",
+        "* DEBUG *: Warn",
+    });
+
+    logWarning();
+    timeShift.applyRelativeShift(std::chrono::minutes(1));
+    logWarning();
+
+    expectMessages({
+        "* DEBUG *: Warn",
+        "* WARNING *: TOO MANY SIMILAR MESSAGES: Warn",
+    });
 }
 
 //-------------------------------------------------------------------------------------------------

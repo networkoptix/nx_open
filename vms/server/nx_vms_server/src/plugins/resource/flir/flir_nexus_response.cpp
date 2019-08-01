@@ -1,5 +1,7 @@
 #include "flir_nexus_response.h"
 
+#include <nx/utils/log/assert.h>
+
 using namespace nx::plugins::flir::nexus;
 
 CommandResponse::CommandResponse():

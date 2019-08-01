@@ -1,4 +1,7 @@
 #include "flir_nexus_string_builder.h"
+
+#include <QtCore/QUrlQuery>
+
 #include "flir_parsing_utils.h"
 #include "flir_nexus_common.h"
 

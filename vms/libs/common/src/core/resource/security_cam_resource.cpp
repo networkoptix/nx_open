@@ -168,13 +168,6 @@ QnSecurityCamResource::QnSecurityCamResource(QnCommonModule* commonModule):
             {
                 emit licenseTypeChanged(toSharedPointer(this));
             }
-            else if (key == ResourcePropertyKey::kUserPreferredPtzPresetType
-                || key == ResourcePropertyKey::kDefaultPreferredPtzPresetType
-                || key == ResourcePropertyKey::kPtzCapabilitiesAddedByUser
-                || key == ResourcePropertyKey::kPtzCapabilitiesUserIsAllowedToModify)
-            {
-                emit ptzConfigurationChanged(toSharedPointer(this));
-            }
         });
 
     QnMediaResource::initMediaResource();
@@ -819,11 +812,13 @@ bool QnSecurityCamResource::isRecordingEventAttached() const
 void QnSecurityCamResource::recordingEventAttached()
 {
     m_recActionCnt++;
+    emit recordingActionChanged(toSharedPointer(this));
 }
 
 void QnSecurityCamResource::recordingEventDetached()
 {
     m_recActionCnt = qMax(0, m_recActionCnt-1);
+    emit recordingActionChanged(toSharedPointer(this));
 }
 
 QString QnSecurityCamResource::getUserDefinedName() const
@@ -919,6 +914,7 @@ void QnSecurityCamResource::setModel(const QString &model)
 {
     QnMutexLocker lk(&m_mutex);
     m_model = model;
+    emit modelChanged(::toSharedPointer(this));
 }
 
 QString QnSecurityCamResource::getFirmware() const
@@ -961,6 +957,7 @@ QString QnSecurityCamResource::getVendor() const
 void QnSecurityCamResource::setVendor(const QString& value)
 {
     SAFE(m_vendor = value)
+    emit vendorChanged(::toSharedPointer(this));
 }
 
 int QnSecurityCamResource::logicalId() const

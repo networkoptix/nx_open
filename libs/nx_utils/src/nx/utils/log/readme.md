@@ -18,7 +18,7 @@ Recommended way to add a log record is the followind macro:
 NX_<LEVEL>(<TAG>, <FORMAT>[, <ARGS> ... ]);
 ```
 Where:
-- **LEVEL** - One of log levels: ALWAYS, ERROR, WARNING, INFO, DEBUG, VERBOSE.
+- **LEVEL** - One of log levels: ERROR, WARNING, INFO, DEBUG, VERBOSE.
 - **TAG** - `nx::utils::log::Tag` object. See [Tags](#tags) for details.
 - **FORMAT** - String text message, which can contain placeholders: %1..%9.
 - **ARGS** - List of any convertible to string objects. See [To string](#tostring) for details.
@@ -32,7 +32,7 @@ NX_<LEVEL>(<TAG>) << <MESSAGE> [<< <MESSAGE> ... ];
 ```
 
 Where:
-- **LEVEL** - One of log levels: ALWAYS, ERROR, WARNING, INFO, DEBUG, VERBOSE.
+- **LEVEL** - One of log levels: ERROR, WARNING, INFO, DEBUG, VERBOSE.
 - **TAG** - `nx::utils::log::Tag` object. See [Tags](#tags) for details.
 - **MESSAGE** - Any convertible to string object. See [To string](#tostring) for details.
 

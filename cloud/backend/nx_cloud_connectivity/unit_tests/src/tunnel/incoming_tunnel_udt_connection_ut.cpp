@@ -83,7 +83,7 @@ protected:
         NX_CRITICAL(socket->setRecvTimeout(kSocketTimeout.count()));
         NX_CRITICAL(socket->setNonBlockingMode(true));
         NX_CRITICAL(socket->bind(nx::network::SocketAddress(nx::network::HostAddress::localhost, 0)));
-        return std::move(socket);
+        return socket;
     }
 
     void acceptForever()
@@ -243,7 +243,7 @@ TEST_F(UdpIncomingTunnelConnectionTest, SynAck)
                 buffer.reserve(1);
                 m_freeSocket->readSomeAsync(
                     &buffer,
-                    [&buffer, &promise](SystemError::ErrorCode code, size_t size)
+                    [&promise](SystemError::ErrorCode code, size_t size)
                     {
                         ASSERT_TRUE(code != SystemError::noError || size == 0);
                         promise.set_value();

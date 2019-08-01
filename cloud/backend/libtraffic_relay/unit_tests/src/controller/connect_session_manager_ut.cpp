@@ -44,23 +44,33 @@ public:
         return true;
     }
 
-    virtual cf::future<std::string> findRelayByDomain(
-        const std::string& /*domainName*/) const override
+    virtual void findRelayByDomain(
+        const std::string& /*domainName*/,
+        nx::utils::MoveOnlyFunc<void(std::string /*relay hostname/ip*/)> handler) const override
     {
-        return cf::make_ready_future(std::string());
+        return handler(std::string());
     }
 
-    virtual cf::future<bool> addPeer(const std::string& /*domainName*/) override
+    virtual void addPeer(
+        const std::string& /*domainName*/,
+        nx::utils::MoveOnlyFunc<void(bool /*result*/)> handler) override
     {
-        return cf::make_ready_future(true);
+        return handler(true);
     }
 
-    virtual cf::future<bool> removePeer(const std::string& /*domainName*/) override
+    virtual void removePeer(
+        const std::string& /*domainName*/,
+        nx::utils::MoveOnlyFunc<void(bool /*result*/)> handler) override
     {
-        return cf::make_ready_future(true);
+        return handler(true);
     }
 
-    virtual void setNodeId(const std::string& /*nodeId*/) override {}
+    virtual void setPublicUrl(const nx::utils::Url& /*publicUrl*/) override {}
+
+    virtual void registerHttpApi(
+        nx::network::http::server::rest::MessageDispatcher* /*messageDispatcher*/) override {}
+
+    virtual void pleaseStopSync() override {}
 };
 
 class TrafficRelayStub:
@@ -136,6 +146,7 @@ public:
     {
         nx::utils::to_lower(&m_peerName);
 
+        addArg("-listeningPeerDb/connectionRetryDelay", "1ms");
         addArg("-listeningPeer/maxPreemptiveConnectionCount", "7");
         addArg("-listeningPeer/recommendedPreemptiveConnectionCount", "4");
         addArg("-listeningPeer/internalTimerPeriod", "1ms");

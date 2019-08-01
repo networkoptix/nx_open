@@ -18,6 +18,7 @@ def short_release_version(version):
 
 
 def determine_package_versions(
+    target,
     platform,
     box,
     release_version,
@@ -26,11 +27,12 @@ def determine_package_versions(
 ):
     v = {
         "gcc": "8.1",
-        "clang": "6.0.0",
+        "clang": "8.0.0",
         "qt": "5.11.3",
         "boost": "1.67.0",
+	"geolite": "2",
         "openssl": "1.0.2q",
-        "ffmpeg": "3.1.1",
+        "ffmpeg": "3.1.9-3",
         "sigar": "1.7",
         "sasl2": "2.1.26",
         "openal": "1.16",
@@ -49,50 +51,52 @@ def determine_package_versions(
         "server-external": release_version,
         "certificates": customization,
         "customization_pack": customization,
+        "detours": "4.0.1",
+        "stackwalker": "1.0",
     }
 
-    if platform == "windows":
-        v["ffmpeg"] = "3.1.9"
-
-    if platform == "linux" and box == "none":
+    if platform == "linux" and box == "none" and target not in ("linux_arm32", "linux_arm64"):
         v["festival"] = "2.4-1"
         v["festival-vox"] = "2.4"
         v["sysroot"] = "xenial-1"
-        v["ffmpeg"] = "3.1.9-2"
 
     if platform == "macosx":
-        v["ffmpeg"] = "3.1.9"
         v["festival"] = "2.1"
 
     if platform == "android":
         v["openal"] = "1.17.2"
+        v["ffmpeg"] = "3.1.1"
 
     if platform == "ios":
         v["libjpeg-turbo"] = "1.4.1"
+        v["ffmpeg"] = "3.1.1"
 
-    if box in ("bpi", "bananapi"):
+    if box == "bpi":
         v["festival"] = "2.4-1"
         v["festival-vox"] = "2.4"
         v["sysroot"] = "wheezy"
-
-    if box in ("bpi", "bananapi"):
         # Bpi original version is build with vdpau support which is no longer needed since lite
         # client is disasbled for bpi.
-        v["ffmpeg"] = "3.1.1-bananapi"
+        v["ffmpeg"] = "3.1.9-5"
 
-    if box == "rpi":
+    if target == "linux_arm32":
         v["festival"] = "2.4-1"
         v["festival-vox"] = "2.4"
         v["sysroot"] = "jessie"
-        v["ffmpeg"] = "3.1.9"
+        v["ffmpeg"] = "3.1.9-5"
 
     if box == "edge1":
         v["sysroot"] = "jessie"
+        v["ffmpeg"] = "3.1.9-5"
 
-    if box == "tx1":
+    if target == "linux_arm64":
         v["festival"] = "2.4-1"
         v["festival-vox"] = "2.4"
         v["sysroot"] = "xenial"
+        v["ffmpeg"] = "3.1.9-5"
+
+    if target in ("linux_arm32", "linux_arm64") or box in ("edge1", "bpi"):
+        v["openssl"] = "1.0.2q-2"
 
     if "festival-vox" not in v:
         v["festival-vox"] = v["festival"]
@@ -107,7 +111,7 @@ def determine_package_versions(
 def sync_dependencies(syncher, platform, arch, box, release_version, options={}):
     have_mediaserver = platform not in ("android", "ios", "macosx")
     have_desktop_client = platform in ("windows", "macosx") \
-        or (platform == "linux" and box in ("none", "tx1"))
+        or (platform == "linux" and (box == "none" or arch == "arm64"))
     have_mobile_client = have_desktop_client or platform in ("android", "ios")
 
     sync = syncher.sync
@@ -115,6 +119,8 @@ def sync_dependencies(syncher, platform, arch, box, release_version, options={})
     if platform == "linux":
         if box == "bpi":
             sync("bpi/gcc")
+        elif arch == "arm64":
+            sync("linux_arm64/gcc")
         else:
             sync("linux-%s/gcc" % arch)
 
@@ -126,25 +132,33 @@ def sync_dependencies(syncher, platform, arch, box, release_version, options={})
         if "ANDROID_NDK" not in os.environ:
             sync("android/android-ndk")
 
+    sync("any/cloud_hosts")
     sync("qt", path_variable="QT_DIR")
     sync("any/boost")
+    sync("any/geolite")
 
     sync("any/detection_plugin_interface")
 
-    if box in ("rpi", "bpi", "bananapi", "edge1", "tx1"):
-        sync("linux-%s/openssl" % arch)
+    if box in ("bpi", "edge1"):
+        sync("linux_arm32/openssl")
     else:
         sync("openssl")
 
-    sync("ffmpeg")
+    if box in ("bpi", "edge1"):
+        sync("linux_arm32/ffmpeg")
+    else:
+        sync("ffmpeg")
+
+    if (platform, arch, box) == ("linux", "arm", "none"):
+        sync("rpi/ffmpeg", do_not_include=True)
 
     if platform == "linux":
         sync("sysroot", path_variable="sysroot_directory")
 
-    if box == "rpi":
-        sync("cifs-utils")
+    # if box == "rpi":
+    #     sync("cifs-utils")
 
-    if box == "tx1":
+    if (platform, arch) == ("linux", "arm64"):
         sync("tegra_video")
         sync("jetpack")
         sync("deepstream")
@@ -152,8 +166,8 @@ def sync_dependencies(syncher, platform, arch, box, release_version, options={})
     if platform in ("android", "windows") or box == "bpi":
         sync("openal")
 
-    if (platform == "linux" and box == "none") or (box == "tx1"):
-        sync("cifs-utils")
+    # if platform == "linux" and box != "edge1":
+    #     sync("cifs-utils")
 
     if platform == "windows":
         sync("icu", path_variable="icu_directory")
@@ -177,8 +191,11 @@ def sync_dependencies(syncher, platform, arch, box, release_version, options={})
     if have_desktop_client:
         sync("any/help", path_variable="help_directory")
 
+    if (platform == "windows") and have_desktop_client:
+        sync("detours")
+        sync("stackwalker")
     if have_desktop_client or have_mobile_client:
-        sync("any/roboto-fonts", path_variable="fonts_directory")
+        sync("any/roboto-fonts")
 
     if (have_mediaserver or have_desktop_client) and box != "edge1":
         sync("festival")
@@ -217,7 +234,15 @@ def parse_target(target):
     arch = None
     box = "none"
 
-    if len(components) > 1:
+    if target == "linux_arm32":
+        platform = "linux"
+        arch = "arm"
+        box = "none"
+    elif target == "linux_arm64":
+        platform = "linux"
+        arch = "arm64"
+        box = "none"
+    elif len(components) > 1:
         platform, arch = components
 
         if platform == "android":
@@ -229,11 +254,7 @@ def parse_target(target):
             platform = "ios"
         else:
             platform = "linux"
-
-            if box == "tx1":
-                arch = "aarch64"
-            else:
-                arch = "arm"
+            arch = "arm"
 
     return platform, arch, box
 
@@ -295,11 +316,9 @@ def main():
     options = parse_options(args.options)
 
     syncher = RdepSyncher(args.packages_dir)
-    if args.target == "bananapi":
-        syncher.rdep_target = "bpi"
-    else:
-        syncher.rdep_target = args.target
+    syncher.rdep_target = args.target
     syncher.versions = determine_package_versions(
+        args.target,
         platform,
         box,
         args.release_version,

@@ -4,7 +4,6 @@
     "fr_FR"    :    "French",
     "ru_RU"    :    "Russian",
     "uk_UA"    :    "Ukranian",
-    "fi_FI"    :    "Finnish",
     "de_DE"    :    "German",
     "es_ES"    :    "Spanish",
     "hu_HU"    :    "Hungarian",
@@ -17,13 +16,8 @@
     "he_IL"    :    "Hebrew",
     "pl_PL"    :    "Polish",
     "vi_VN"    :    "Vietnamese",
-    "it_IT"    :    "Italian",
     "cs_CZ"    :    "Czech",
     "sv_SE"    :    "Sweedish",
-    "da_DK"    :    "Danish",
-    "no_NO"    :    "Norwegian",
-    "ro_RO"    :    "Romanian",
-    "nl_BE"    :    "Flemish",
-    "pt_PT"    :    "Protuguese"
-
+    "pt_PT"    :    "Protuguese",
+    "it_IT"    :    "Italian"
 }

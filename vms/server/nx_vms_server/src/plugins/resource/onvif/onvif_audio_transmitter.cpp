@@ -39,9 +39,11 @@ void OnvifAudioTransmitter::prepare()
     m_rtspConnection->setAuth(m_resource->getAuth(), nx::network::http::header::AuthScheme::digest);
 
     // DW cameras have issues with this attribute in current firmware. It change channel URL in SETUP response
-    // if this attribute is specified.
-    m_rtspConnection->setAdditionAttribute("Require", "www.onvif.org/ver20/backchannel");
-    m_rtspConnection->setTransport(RtspTransport::tcp);
+    auto resourceData = m_resource->resourceData();
+    if (!resourceData.value<bool>("dontSendBackChannelRtspAttribute"))
+        m_rtspConnection->setAdditionAttribute("Require", "www.onvif.org/ver20/backchannel");
+
+    m_rtspConnection->setTransport(nx::vms::api::RtpTransportType::tcp);
 
     const QString url = m_resource->sourceUrl(Qn::CR_LiveVideo);
     const CameraDiagnostics::Result result = m_rtspConnection->open(url);
@@ -117,7 +119,8 @@ bool OnvifAudioTransmitter::sendData(const QnAbstractMediaDataPtr& audioData)
 {
     QByteArray sendBuffer;
     const static int kRtpTcpHeaderSize = 4;
-    sendBuffer.resize(audioData->dataSize() + nx::streaming::rtp::RtpHeader::kSize + kRtpTcpHeaderSize);
+    sendBuffer.resize((int) audioData->dataSize()
+        + nx::streaming::rtp::RtpHeader::kSize + kRtpTcpHeaderSize);
     char* rtpHeaderPtr = sendBuffer.data() + kRtpTcpHeaderSize;
 
     AVRational srcTimeBase = { 1, 1000000 };
@@ -129,7 +132,7 @@ bool OnvifAudioTransmitter::sendData(const QnAbstractMediaDataPtr& audioData)
     nx::streaming::rtp::buildRtpHeader(
         rtpHeaderPtr,
         0, //< ssrc
-        audioData->dataSize(),
+        audioData->dataSize() > 0,
         timestamp,
         m_trackInfo.sdpMedia.payloadType,
         m_sequence++);

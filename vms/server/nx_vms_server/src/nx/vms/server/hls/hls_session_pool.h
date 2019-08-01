@@ -37,7 +37,7 @@ public:
         std::chrono::milliseconds targetDuration,
         bool _isLive,
         MediaQuality streamQuality,
-        const QnVideoCameraPtr& videoCamera,
+        const nx::vms::server::VideoCameraPtr& videoCamera,
         const QnAuthSession& authSession);
     ~Session();
 

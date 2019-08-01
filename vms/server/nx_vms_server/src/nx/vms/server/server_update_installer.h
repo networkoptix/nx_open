@@ -10,8 +10,11 @@ class ServerUpdateInstaller: public CommonUpdateInstaller, public ServerModuleAw
 {
 public:
     ServerUpdateInstaller(QnMediaServerModule* serverModule);
-private:
     virtual QString dataDirectoryPath() const override;
+    virtual QString component() const override;
+    virtual int64_t freeSpace(const QString& path) const override;
+
+private:
     virtual bool initializeUpdateLog(const QString& targetVersion, QString* logFileName) const override;
 };
 

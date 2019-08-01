@@ -3,7 +3,7 @@
 
 #include <nx/utils/thread/mutex.h>
 
-#include <analytics/detected_objects_storage/detected_objects_streamer.h>
+#include <nx/vms/server/analytics/db/detected_objects_streamer.h>
 #include <server/server_globals.h>
 
 #include "nx/streaming/video_data_packet.h"
@@ -138,23 +138,20 @@ bool QnServerArchiveDelegate::open(
     if (m_opened)
         return true;
     m_resource = resource;
-    QnNetworkResourcePtr netResource =
-        qSharedPointerDynamicCast<QnNetworkResource>(resource);
+    QnNetworkResourcePtr netResource = qSharedPointerDynamicCast<QnNetworkResource>(resource);
 
     NX_ASSERT(netResource != 0);
     m_dialQualityHelper.setResource(netResource);
 
     setCatalogs();
 
-    m_currentChunkCatalog[QnServer::StoragePool::Normal] =
-        isLowMediaQuality(m_quality) ?
-                m_catalogLow[QnServer::StoragePool::Normal] :
-                m_catalogHi[QnServer::StoragePool::Normal];
+    m_currentChunkCatalog[QnServer::StoragePool::Normal] = isLowMediaQuality(m_quality)
+        ? m_catalogLow[QnServer::StoragePool::Normal]
+        : m_catalogHi[QnServer::StoragePool::Normal];
 
-    m_currentChunkCatalog[QnServer::StoragePool::Backup] =
-        isLowMediaQuality(m_quality) ?
-                m_catalogLow[QnServer::StoragePool::Backup] :
-                m_catalogHi[QnServer::StoragePool::Backup];
+    m_currentChunkCatalog[QnServer::StoragePool::Backup] = isLowMediaQuality(m_quality)
+        ? m_catalogLow[QnServer::StoragePool::Backup]
+        : m_catalogHi[QnServer::StoragePool::Backup];
 
     m_opened = true;
     return true;
@@ -166,7 +163,7 @@ void QnServerArchiveDelegate::close()
 
     m_currentChunkCatalog[QnServer::StoragePool::Normal].clear();
     m_currentChunkCatalog[QnServer::StoragePool::Backup].clear();
-    m_currentChunk = DeviceFileCatalog::Chunk();
+    m_currentChunk = nx::vms::server::Chunk();
 
     m_aviDelegate->close();
 
@@ -189,7 +186,7 @@ qint64 QnServerArchiveDelegate::seekInternal(qint64 time, bool findIFrame, bool 
     //QTime t;
     //t.start();
 
-    DeviceFileCatalog::UniqueChunkCont ignoreChunks;
+    nx::vms::server::UniqueChunkCont ignoreChunks;
     qint64 seekTimeMs = time/1000;
     static const int kSeekStep = 75 * 1000; // 75 seconds
 
@@ -198,7 +195,7 @@ qint64 QnServerArchiveDelegate::seekInternal(qint64 time, bool findIFrame, bool 
         m_newQualityTmpData.reset();
         m_newQualityAviDelegate.clear();
 
-        DeviceFileCatalog::TruncableChunk newChunk;
+        nx::vms::server::TruncableChunk newChunk;
         DeviceFileCatalogPtr newChunkCatalog;
 
         DeviceFileCatalog::FindMethod findMethod = m_reverseMode ? DeviceFileCatalog::OnRecordHole_PrevChunk : DeviceFileCatalog::OnRecordHole_NextChunk;
@@ -231,7 +228,7 @@ qint64 QnServerArchiveDelegate::seekInternal(qint64 time, bool findIFrame, bool 
             // do not seek over live chunk because it's very slow (seek always going to begin of file because mkv seek catalog is't ready)
             chunkOffset = qBound(0ll, time - newChunk.startTimeMs*1000, BACKWARD_SEEK_STEP);
 
-            // New condition: Also, last file may has zerro size (because of file write buffering), and read operation will return fail
+            // New condition: Also, last file may has zero size (because of file write buffering), and read operation will return fail
             // It is contains some troubles for REF from live. So avoid seek to last file at all.
             if (m_reverseMode && recursive)
                 return seekInternal(newChunk.startTimeMs*1000 - BACKWARD_SEEK_STEP, findIFrame, false);
@@ -261,9 +258,9 @@ qint64 QnServerArchiveDelegate::seekInternal(qint64 time, bool findIFrame, bool 
                     // every time we find file that can not be opened.
                     // In forward mode - same, but opposite direction
                     if (m_reverseMode) {
-                        seekTimeMs = std::min(seekTimeMs, newChunk.endTimeMs() + kSeekStep);
+                        seekTimeMs = std::min<int64_t>(seekTimeMs, newChunk.endTimeMs() + kSeekStep);
                     } else {
-                        seekTimeMs = std::max(seekTimeMs, newChunk.startTimeMs - kSeekStep);
+                        seekTimeMs = std::max<int64_t>(seekTimeMs, newChunk.startTimeMs - kSeekStep);
                     }
                     continue;
                 }
@@ -308,15 +305,17 @@ qint64 QnServerArchiveDelegate::seek(qint64 time, bool findIFrame)
     return seekInternal(time, findIFrame, true);
 }
 
-DeviceFileCatalog::Chunk QnServerArchiveDelegate::findChunk(DeviceFileCatalogPtr catalog, qint64 time, DeviceFileCatalog::FindMethod findMethod)
+nx::vms::server::Chunk QnServerArchiveDelegate::findChunk(
+    DeviceFileCatalogPtr catalog,  qint64 time, DeviceFileCatalog::FindMethod findMethod)
 {
     int index = catalog->findFileIndex(time, findMethod);
     return catalog->chunkAt(index);
 }
 
-bool QnServerArchiveDelegate::getNextChunk(DeviceFileCatalog::TruncableChunk& chunk,
-                                           DeviceFileCatalogPtr& chunkCatalog,
-                                           DeviceFileCatalog::UniqueChunkCont &ignoreChunks)
+bool QnServerArchiveDelegate::getNextChunk(
+    nx::vms::server::TruncableChunk& chunk,
+    DeviceFileCatalogPtr& chunkCatalog,
+    nx::vms::server::UniqueChunkCont &ignoreChunks)
 {
     QnMutexLocker lk( &m_mutex );
 
@@ -325,6 +324,7 @@ bool QnServerArchiveDelegate::getNextChunk(DeviceFileCatalog::TruncableChunk& ch
         m_currentChunkCatalog[QnServer::StoragePool::Normal]->updateChunkDuration(m_currentChunk); // may be opened chunk already closed. Update duration if needed
         m_currentChunkCatalog[QnServer::StoragePool::Backup]->updateChunkDuration(m_currentChunk);
     }
+
     if (m_currentChunk.durationMs == -1) {
         if (!m_reverseMode)
             m_eof = true;
@@ -360,13 +360,13 @@ begin_label:
     while (!data || (m_currentChunk.durationMs != -1 && data->timestamp >= m_currentChunk.durationMs*1000))
     {
         DeviceFileCatalogPtr chunkCatalog;
-        DeviceFileCatalog::UniqueChunkCont ignoreChunks;
+        nx::vms::server::UniqueChunkCont ignoreChunks;
         bool switchResult;
-        DeviceFileCatalog::Chunk fallbackChunk;
+        nx::vms::server::Chunk fallbackChunk;
 
         do
         {
-            DeviceFileCatalog::TruncableChunk chunk;
+            nx::vms::server::TruncableChunk chunk;
             if (!getNextChunk(chunk, chunkCatalog, ignoreChunks))
             {
                 if (m_reverseMode) {
@@ -474,7 +474,7 @@ QnAbstractMotionArchiveConnectionPtr QnServerArchiveDelegate::getAnalyticsConnec
 {
     QnMutexLocker lock(&m_mutex);
 
-    return std::make_shared<nx::analytics::storage::DetectedObjectsStreamer>(
+    return std::make_shared<nx::analytics::db::DetectedObjectsStreamer>(
         m_mediaServerModule->analyticsEventsStorage(),
         m_resource->getId());
 }
@@ -514,7 +514,9 @@ bool QnServerArchiveDelegate::setAudioChannel(unsigned num)
     return m_aviDelegate->setAudioChannel(num);
 }
 
-bool QnServerArchiveDelegate::switchToChunk(const DeviceFileCatalog::TruncableChunk &newChunk, const DeviceFileCatalogPtr& newCatalog)
+bool QnServerArchiveDelegate::switchToChunk(
+    const nx::vms::server::TruncableChunk &newChunk,
+    const DeviceFileCatalogPtr& newCatalog)
 {
     if (newChunk.startTimeMs == -1)
         return false;
@@ -522,7 +524,25 @@ bool QnServerArchiveDelegate::switchToChunk(const DeviceFileCatalog::TruncableCh
     m_currentChunk = newChunk;
     m_currentChunkStoragePool = newCatalog->getStoragePool();
 
-    m_currentChunkCatalog[newCatalog->getStoragePool()] = newCatalog;
+    QnServer::StoragePool alternativeStoragePool;
+    QnStorageManager* alternativeStorageManager;
+
+    if (m_currentChunkStoragePool == QnServer::StoragePool::Backup)
+    {
+        alternativeStoragePool = QnServer::StoragePool::Normal;
+        alternativeStorageManager = m_serverModule->normalStorageManager();
+    }
+    else
+    {
+        alternativeStoragePool = QnServer::StoragePool::Backup;
+        alternativeStorageManager = m_serverModule->backupStorageManager();
+    }
+
+    m_currentChunkCatalog[m_currentChunkStoragePool] = newCatalog;
+    m_currentChunkCatalog[alternativeStoragePool] = alternativeStorageManager->getFileCatalog(
+        newCatalog->cameraUniqueId(),
+        newCatalog->getRole());
+
     m_lastChunkQuality = newCatalog->getRole();
     QString url = newCatalog->fullFileName(newChunk.toBaseChunk());
 

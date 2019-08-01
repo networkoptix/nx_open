@@ -87,7 +87,7 @@ private:
     nx::network::aio::Timer m_timer;
     ConnectionWeakRef m_serverConnectionWeakRef;
     ConnectCompletionHandler m_connectResponseSender;
-    const std::list<network::SocketAddress> m_serverPeerEndpoints;
+    const std::vector<network::SocketAddress> m_serverPeerEndpoints;
     const nx::String m_serverPeerHostName;
     const api::CloudConnectVersion m_serverPeerCloudConnectVersion;
     api::ConnectionMethods m_serverPeerConnectionMethods;
@@ -98,8 +98,9 @@ private:
     std::function<void(api::ResultCode)> m_connectionAckCompletionHandler;
     api::CloudConnectVersion m_originatingPeerCloudConnectVersion;
     nx::network::aio::AsyncOperationWrapper<
-        decltype(&AbstractRelayClusterClient::findRelayInstancePeerIsListeningOn)
+        decltype(&AbstractRelayClusterClient::findRelayInstanceForClient)
     > m_findRelayInstanceFunc;
+    nx::network::SocketAddress m_clientEndpoint;
 
     virtual void stopWhileInAioThread() override;
 
@@ -142,7 +143,8 @@ private:
         api::ConnectionAckRequest request,
         std::function<void(api::ResultCode)> completionHandler);
 
-    bool initiateCloudConnect(api::ConnectionAckRequest connectionAck);
+    bool initiateCloudConnect(
+        api::ConnectionAckRequest connectionAck);
 
     void initiateRelayInstanceSearch();
 
@@ -151,17 +153,17 @@ private:
 
     void finishConnect();
 
-    void onRelayInstanceSearchCompletion(std::optional<QUrl> relayInstanceUrl);
+    void onRelayInstanceSearchCompletion(std::optional<nx::utils::Url> relayInstanceUrl);
 
     api::ConnectResponse prepareConnectResponse(
         const api::ConnectionAckRequest& connectionAckRequest,
-        std::list<network::SocketAddress> tcpEndpoints,
-        std::optional<QUrl> relayInstanceUrl);
+        std::vector<network::SocketAddress> tcpEndpoints,
+        std::optional<nx::utils::Url> relayInstanceUrl);
 
     void sendConnectResponse(
         api::ResultCode resultCode,
         api::ConnectResponse connectResponse);
-    
+
     void fixConnectResponseForBuggyClient(
         api::ResultCode resultCode,
         api::ConnectResponse* const connectResponse);
@@ -175,7 +177,7 @@ private:
     static const char* toString(State);
 
     UDPHolePunchingConnectionInitiationFsm(UDPHolePunchingConnectionInitiationFsm&&) = delete;
-    
+
     UDPHolePunchingConnectionInitiationFsm&
         operator=(UDPHolePunchingConnectionInitiationFsm&&) = delete;
 };

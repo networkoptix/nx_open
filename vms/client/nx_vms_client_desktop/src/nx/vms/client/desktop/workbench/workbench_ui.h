@@ -4,6 +4,8 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QTimer>
+#include <QtCore/QMargins>
+#include <QtCore/QRect>
 
 #include <utils/common/disconnective.h>
 
@@ -215,9 +217,6 @@ private:
 
     /** Instrument manager for the scene. */
     QPointer<InstrumentManager> m_instrumentManager;
-
-    /** Fps counting instrument. */
-    QPointer<DebugInfoInstrument> m_debugInfoInstrument;
 
     /** Activity listener instrument. */
     QPointer<ActivityListenerInstrument> m_controlsActivityInstrument;

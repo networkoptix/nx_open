@@ -12,6 +12,7 @@
 #include <api/global_settings.h>
 #include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <nx_ec/dummy_handler.h>
 #include <nx_ec/data/api_conversion_functions.h>
@@ -52,6 +53,13 @@ CloudUserAuthenticator::~CloudUserAuthenticator()
 
 QnResourcePtr CloudUserAuthenticator::findResByName(const QByteArray& nxUserName) const
 {
+    if (auto commonModule = m_cloudConnectionManager->commonModule();
+        nxUserName == commonModule->globalSettings()->cloudSystemId().toUtf8())
+    {
+        return commonModule->resourcePool()->getResourceById<QnMediaServerResource>(
+            commonModule->moduleGUID());
+    }
+
     // NOTE: This method returns NULL for cloud login.
     //  This is OK, since NULL from this method does not signal authentication failure.
     return m_defaultAuthenticator->findResByName(nxUserName);
@@ -91,6 +99,25 @@ std::tuple<Qn::AuthResult, QnResourcePtr> CloudUserAuthenticator::authorize(
     const auto& commonModule = m_cloudConnectionManager->commonModule();
 
     const QByteArray userName = authorizationHeader.userid().toLower();
+
+    if (auto commonModule = m_cloudConnectionManager->commonModule();
+        userName == commonModule->globalSettings()->cloudSystemId().toUtf8() &&
+        authorizationHeader.authScheme == nx::network::http::header::AuthScheme::digest)
+    {
+        if (nx::network::http::validateAuthorization(
+                method,
+                nx::network::http::Credentials(
+                    commonModule->globalSettings()->cloudSystemId(),
+                    nx::network::http::PasswordAuthToken(
+                        commonModule->globalSettings()->cloudAuthKey().toUtf8())),
+                *authorizationHeader.digest))
+        {
+            return std::make_tuple(
+                Qn::AuthResult::Auth_OK,
+                commonModule->resourcePool()->getResourceById<QnMediaServerResource>(
+                    commonModule->moduleGUID()));
+        }
+    }
 
     auto cloudUsers = commonModule->resourcePool()->getResources<QnUserResource>().filtered(
         [userName](const QnUserResourcePtr& user)

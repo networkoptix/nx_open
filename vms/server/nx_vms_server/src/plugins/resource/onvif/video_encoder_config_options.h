@@ -28,7 +28,7 @@ enum class SupportedVideoEncoding
 };
 /*
  FYI: this is how video encoders are enumerated in onvif:
- enum class onvifXsd__VideoEncodingMimeNames
+ enum class tt__VideoEncodingMimeNames
  { JPEG = 0, MPV4_ES = 1, H264 = 2, H265 = 3 };
 */
 
@@ -58,8 +58,8 @@ std::string supportedVideoCodecFlavorToVmsString(SupportedVideoEncoding codec);
  * form the <xs:simpleType name="H264Profile"> type description.
  * All other values are not correct and can not pass xsd validation.
  */
-std::optional<onvifXsd__H264Profile> h264ProfileFromOnvifString(const std::string& name);
-std::string h264ProfileToOnvifString(onvifXsd__H264Profile profile);
+std::optional<tt__H264Profile> h264ProfileFromOnvifString(const std::string& name);
+std::string h264ProfileToOnvifString(tt__H264Profile profile);
 
 /**
  * Transfer h264/h265 profile string to enum and backward.
@@ -68,8 +68,8 @@ std::string h264ProfileToOnvifString(onvifXsd__H264Profile profile);
  * form the <xs:simpleType name="VideoEncodingProfiles"> type description.
  * All other values are not correct and can not pass xsd validation.
  */
-std::optional<onvifXsd__VideoEncodingProfiles> videoEncodingProfilesFromOnvifString(const std::string& name);
-std::string videoEncodingProfilesToString(onvifXsd__VideoEncodingProfiles profile);
+std::optional<tt__VideoEncodingProfiles> videoEncodingProfilesFromOnvifString(const std::string& name);
+std::string videoEncodingProfilesToString(tt__VideoEncodingProfiles profile);
 
 // This class should be moved somewhere into utils.
 template<class T>
@@ -81,7 +81,7 @@ struct Range
     Range(T low, T high) : low(low), high(high) {}
 };
 
-// this is a wrapper over onvifXsd__VideoEncoder2ConfigurationOptions class
+// this is a wrapper over tt__VideoEncoder2ConfigurationOptions class
 struct VideoEncoderConfigOptions
 {
     //required elements
@@ -93,13 +93,13 @@ struct VideoEncoderConfigOptions
     std::optional<Range<int>> govLengthRange;
     std::vector<QSize> resolutions;
     std::vector<int> frameRates; //< may be empty
-    std::vector<onvifXsd__VideoEncodingProfiles> encoderProfiles; //< may be empty
+    std::vector<tt__VideoEncodingProfiles> encoderProfiles; //< may be empty
 
     VideoEncoderConfigOptions() = default;
-    VideoEncoderConfigOptions(const onvifXsd__JpegOptions& options);
-    VideoEncoderConfigOptions(const onvifXsd__Mpeg4Options& options);
-    VideoEncoderConfigOptions(const onvifXsd__H264Options& options);
-    VideoEncoderConfigOptions(const onvifXsd__VideoEncoder2ConfigurationOptions& options);
+    VideoEncoderConfigOptions(const tt__JpegOptions& options);
+    VideoEncoderConfigOptions(const tt__Mpeg4Options& options);
+    VideoEncoderConfigOptions(const tt__H264Options& options);
+    VideoEncoderConfigOptions(const tt__VideoEncoder2ConfigurationOptions& options);
     bool operator < (const VideoEncoderConfigOptions& rhs) const { return encoder < rhs.encoder; }
 };
 

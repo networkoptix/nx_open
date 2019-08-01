@@ -1,13 +1,15 @@
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+
 #include <iostream>
 
 #include <nx/kit/test.h>
 #include <nx/kit/debug.h>
 
-int main(int argc, const char* const argv[])
+int main()
 {
     int failedTestsCount = 0;
 
-    failedTestsCount += nx::kit::test::runAllTests("nx_sdk", argc, argv);
+    failedTestsCount += nx::kit::test::runAllTests("nx_sdk");
 
     std::cerr << std::endl;
 

@@ -436,7 +436,7 @@
       },
       {
         "name": "Settings",
-        "is_global": false,
+        "is_global": true,
         "description": "Settings for product",
         "hidden": true,
         "translatable": false,
@@ -481,7 +481,7 @@
       },
       {
         "name": "Camera page",
-        "is_global": false,
+        "is_global": true,
         "description": "Settings for camera page",
         "hidden": true,
         "translatable": false,
@@ -498,6 +498,10 @@
           {
             "label": "Supported Resolutions",
             "name": "%SUPPORTED_RESOLUTIONS%",
+            "description": "Defines supported resolutions",
+            "advanced": true,
+            "optional": false,
+            "type": "array",
             "value": [
               {
                 "value": "0",
@@ -554,36 +558,82 @@
               {
                 "value": "10039296",
                 "name": "10mp"
-              },
-              {
-                "value": "15824256",
-                "name": "16mp"
               }
             ]
           },
           {
             "label": "Supported hardware types",
             "name": "%SUPPORTED_HARDWARE_TYPES%",
+            "description": "Defines supported hardware types",
+            "advanced": true,
+            "optional": false,
+            "type": "array",
             "value": [
               {
-                "id": "Camera",
-                "label": "camera"
+                "id": "camera",
+                "label": "Camera"
               },
               {
-                "id": "Multi-Sensor Camera",
-                "label": "multi_sensor_camera"
+                "id": "multiSensorCamera",
+                "label": "Multi-Sensor Camera"
               },
               {
-                "id": "Encoder",
-                "label": "encoder"
+                "id": "encoder",
+                "label": "Encoder"
               },
               {
-                "id": "DVR",
-                "label": "dvr"
+                "id": "dvr",
+                "label": "DVR"
               },
               {
-                "id": "Other",
-                "label": "other"
+                "id": "other",
+                "label": "Other"
+              }
+            ]
+          },
+          {
+            "label": "Search tags",
+            "name": "%SEARCH_TAGS%",
+            "description": "Defines search tags",
+            "advanced": true,
+            "optional": false,
+            "type": "array",
+            "value": [
+              {
+                "id": "isAudioSupported",
+                "value": false
+              },
+              {
+                "id": "isTwAudioSupported",
+                "value": false
+              },
+              {
+                "id": "isPtzSupported",
+                "value": false
+              },
+              {
+                "id": "isAptzSupported",
+                "value": false
+              },
+              {
+                "id": "isFisheye",
+                "value": false
+              },
+              {
+                "id": "isMdSupported",
+                "value": false
+              },
+              {
+                "id": "isIoSupported",
+                "value": false
+              },
+              {
+                "id": "isH265",
+                "value": false
+              },
+              {
+                "id": "isMultiSensor",
+                "value": false
               }
             ]
           }
@@ -591,17 +641,17 @@
       },
       {
         "name": "Footer Menu",
-        "is_global": false,
+        "is_global": true,
         "description": "Footer Menu",
         "hidden": true,
-        "translatable": true,
+        "translatable": false,
         "values": [
           {
             "label": "Footer Items",
             "name": "%FOOTER_ITEMS%",
             "value": [
               {
-                "name": "About <span class=\"product-name\">%PRODUCT_NAME%</span>",
+                "name": "About %PRODUCT_NAME%",
                 "url": "/content/about",
                 "newWindow": false,
                 "enabled": true

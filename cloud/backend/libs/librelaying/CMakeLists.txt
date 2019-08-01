@@ -4,6 +4,7 @@ if(WINDOWS)
 endif()
 
 nx_add_target(nx_relaying LIBRARY ${library_type} NO_MOC
+    WERROR_IF NOT WINDOWS
     PUBLIC_LIBS
         nx_network nx_fusion nx_utils)
 

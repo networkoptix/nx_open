@@ -5,6 +5,7 @@
 
 #include <nx/sdk/analytics/helpers/event_metadata.h>
 #include <nx/sdk/analytics/helpers/event_metadata_packet.h>
+#include <nx/sdk/helpers/attribute.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/network/system_socket.h>
 
@@ -25,12 +26,14 @@ static const std::chrono::milliseconds kMinTimeBetweenEvents = std::chrono::seco
 nx::sdk::analytics::EventMetadata* createCommonEvent(
     const EventType& eventType, bool active)
 {
-    auto eventMetadata = new nx::sdk::analytics::EventMetadata();
+    using namespace nx::sdk;
+    using namespace nx::sdk::analytics;
+
+    auto eventMetadata = new EventMetadata();
     eventMetadata->setTypeId(eventType.id.toStdString());
     eventMetadata->setDescription(eventType.name.toStdString());
     eventMetadata->setIsActive(active);
     eventMetadata->setConfidence(1.0);
-    eventMetadata->setAuxiliaryData(eventType.topic.toStdString());
     return eventMetadata;
 }
 
@@ -211,7 +214,10 @@ nx::sdk::Error Monitor::startMonitoring(
     const nx::sdk::analytics::IMetadataTypes* metadataTypes)
 {
     // Assume that the list contains events only, since this plugin produces no objects.
-    const auto eventTypeList = metadataTypes->eventTypeIds();
+    nx::sdk::Ptr<const nx::sdk::IStringList> eventTypeList(metadataTypes->eventTypeIds());
+    if (!NX_ASSERT(eventTypeList, "Event type id list is empty"))
+        return sdk::Error::unknownError;
+
     for (int i = 0; i < eventTypeList->count(); ++i)
     {
         const QString id = eventTypeList->at(i);
@@ -247,7 +253,7 @@ nx::sdk::Error Monitor::startMonitoring(
     m_aioTimer.start(kMinTimeBetweenEvents, [this](){ onTimer(); });
 
     localAddress = m_httpServer->server().address();
-    this->addRules(localAddress, eventTypeList);
+    this->addRules(localAddress, eventTypeList.get());
     return nx::sdk::Error::noError;
 }
 

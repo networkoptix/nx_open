@@ -1,6 +1,7 @@
 #include "storage_config_widget.h"
 #include "ui_storage_config_widget.h"
 
+#include <boost/algorithm/cxx11/any_of.hpp>
 #include <boost/range/algorithm/count_if.hpp>
 
 #include <QtGui/QKeyEvent>
@@ -36,6 +37,7 @@
 #include <ui/widgets/storage_space_slider.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 #include <ui/workaround/hidpi_workarounds.h>
+#include <ui/workbench/workbench_context.h>
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
 #include <utils/common/scoped_painter_rollback.h>
@@ -44,13 +46,17 @@
 #include <utils/math/color_transformations.h>
 
 #include <nx/client/core/utils/human_readable.h>
+#include <nx/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/common/utils/item_view_hover_tracker.h>
 #include <nx/vms/client/desktop/common/delegates/switch_item_delegate.h>
+#include <nx/analytics/utils.h>
 #include <nx/utils/unused.h>
 
 using namespace nx;
 using namespace nx::vms::client::desktop;
+
+using ServerTimeWatcher = nx::vms::client::core::ServerTimeWatcher;
 
 namespace
 {
@@ -119,15 +125,24 @@ namespace
             bool hovered = m_hoverTracker && m_hoverTracker->hoveredIndex() == index;
             bool beingEdited = m_editedRow == index.row();
 
+            bool hoveredRow = m_hoverTracker && m_hoverTracker->hoveredIndex().row() == index.row();
+            bool hasActiveAction = index.column() == QnStorageListModel::ActionsColumn
+                && index.data(Qn::ItemMouseCursorRole).toInt() == Qt::PointingHandCursor;
+                // TODO: add a separate data role for such cases?
+
+            // Hide actions when their row is not hovered.
+            if (hasActiveAction && !hoveredRow)
+                return;
+
             auto storage = index.data(Qn::StorageInfoDataRole).value<QnStorageModelInfo>();
 
             /* Set disabled style for unchecked rows: */
             if (!index.sibling(index.row(), QnStorageListModel::CheckBoxColumn).data(Qt::CheckStateRole).toBool())
                 opt.state &= ~QStyle::State_Enabled;
 
-            /* Set proper color for links: */
-            if (index.column() == QnStorageListModel::RemoveActionColumn && !opt.text.isEmpty())
-                opt.palette.setColor(QPalette::Text, style::linkColor(opt.palette, hovered));
+            // Set proper color for actions when they are hovered.
+            if (hasActiveAction && hovered)
+                opt.palette.setColor(QPalette::Text, opt.palette.color(QPalette::ButtonText));
 
             /* Set warning color for inaccessible storages: */
             if (index.column() == QnStorageListModel::StoragePoolColumn && !storage.isOnline)
@@ -179,6 +194,31 @@ namespace
         int m_editedRow;
     };
 
+    class ColumnResizer: public QObject
+    {
+    public:
+        using QObject::QObject;
+
+    protected:
+        bool eventFilter(QObject* object, QEvent* event)
+        {
+            auto view = qobject_cast<nx::vms::client::desktop::TreeView *>(object);
+
+            if (view && event->type() == QEvent::Resize)
+            {
+                int occupiedWidth = 0;
+                for (int i = 1; i < view->model()->columnCount(); ++i)
+                    occupiedWidth += view->sizeHintForColumn(i);
+
+                int urlWidth = view->sizeHintForColumn(QnStorageListModel::UrlColumn);
+                view->setColumnWidth(QnStorageListModel::UrlColumn,
+                    qMin(urlWidth, view->width() - occupiedWidth));
+            }
+
+            return false;
+        }
+    };
+
     QnVirtualCameraResourceList getCurrentSelectedCameras(QnResourcePool* resourcePool)
     {
         const auto isSelectedForBackup = [](const QnVirtualCameraResourcePtr& camera)
@@ -209,6 +249,7 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent) :
     ui(new Ui::StorageConfigWidget()),
     m_server(),
     m_model(new QnStorageListModel()),
+    m_columnResizer(new ColumnResizer(this)),
     m_updateStatusTimer(new QTimer(this)),
     m_updateLabelsTimer(new QTimer(this)),
     m_storagePoolMenu(new QMenu(this)),
@@ -241,8 +282,6 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent) :
     ui->backupSettingsButtonDuplicate->setText(ui->backupSettingsButton->text());
     connect(ui->backupSettingsButtonDuplicate, &QPushButton::clicked, ui->backupSettingsButton, &QPushButton::clicked);
 
-    setWarningStyle(ui->storagesWarningLabel);
-
     ui->progressBarBackup->setFormat(lit("%1\t%p%").arg(tr("Backup is in progress...")));
 
     m_storagePoolMenu->setProperty(style::Properties::kMenuAsDropdown, true);
@@ -273,8 +312,10 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent) :
     ui->storageView->sortByColumn(0, Qt::AscendingOrder);
     ui->storageView->header()->setStretchLastSection(false);
     ui->storageView->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
-    ui->storageView->header()->setSectionResizeMode(QnStorageListModel::UrlColumn, QHeaderView::Stretch);
+    ui->storageView->header()->setSectionResizeMode(QnStorageListModel::UrlColumn, QHeaderView::Fixed);
+    ui->storageView->header()->setSectionResizeMode(QnStorageListModel::SeparatorColumn, QHeaderView::Stretch);
     ui->storageView->setMouseTracking(true);
+    ui->storageView->installEventFilter(m_columnResizer.data());
 
     auto itemClicked = [this, itemDelegate](const QModelIndex& index)
     {
@@ -491,7 +532,7 @@ void QnStorageConfigWidget::loadDataToUi()
     m_backupSchedule = m_server->getBackupSchedule();
     m_camerasToBackup = getCurrentSelectedCameras(resourcePool());
 
-    setWarningText(QString());
+    updateWarnings();
 
     updateRebuildInfo();
     updateBackupInfo();
@@ -545,14 +586,26 @@ void QnStorageConfigWidget::at_storageView_clicked(const QModelIndex& index)
         record.isBackup = isBackup;
         m_model->updateStorage(record);
     }
-    else if (index.column() == QnStorageListModel::RemoveActionColumn)
+    else if (index.column() == QnStorageListModel::ActionsColumn)
     {
         if (m_model->canRemoveStorage(record))
+        {
+            // Network storage.
             m_model->removeStorage(record);
+        }
+        else if (m_model->canStoreAnalytics(record))
+        {
+            // Local storage, may be used to store analytics.
+            if (record.id != m_model->metadataStorageId())
+            {
+                const auto storageId = record.id;
+                confirmNewMetadataStorage(storageId);
+            }
+        }
     }
     else if (index.column() == QnStorageListModel::CheckBoxColumn)
     {
-        setWarningText(calculateWarningMessage());
+        updateWarnings();
     }
 
     emit hasChangesChanged();
@@ -564,7 +617,7 @@ void QnStorageConfigWidget::setServer(const QnMediaServerResourcePtr& server)
         return;
 
     if (m_server)
-        disconnect(m_server, &QnMediaServerResource::backupScheduleChanged, this, nullptr);
+        m_server->disconnect(this);
 
     m_server = server;
     m_model->setServer(server);
@@ -579,6 +632,16 @@ void QnStorageConfigWidget::setServer(const QnMediaServerResourcePtr& server)
                 m_backupSchedule = m_server->getBackupSchedule();
                 emit hasChangesChanged();
             });
+
+        connect(m_server, &QnMediaServerResource::propertyChanged, this,
+            [this](const QnResourcePtr&, const QString& key)
+            {
+                if (key == QnMediaServerResource::kMetadataStorageIdKey)
+                {
+                    m_model->setMetadataStorageId(m_server->metadataStorageId());
+                // Now metadata storage is changed instantly, so we don't fire hasChangedChanged().
+                }
+        });
     }
 }
 
@@ -680,11 +743,14 @@ void QnStorageConfigWidget::applyChanges()
 
     if (m_backupSchedule != m_server->getBackupSchedule())
     {
-        qnResourcesChangesManager->saveServer(m_server, [this](const QnMediaServerResourcePtr& server)
-            { server->setBackupSchedule(m_backupSchedule); });
+        qnResourcesChangesManager->saveServer(m_server,
+            [this](const QnMediaServerResourcePtr& server)
+            {
+                server->setBackupSchedule(m_backupSchedule);
+            });
     }
 
-    setWarningText(QString());
+    updateWarnings();
     emit hasChangesChanged();
 }
 
@@ -818,8 +884,9 @@ quint64 QnStorageConfigWidget::nextScheduledBackupTimeMs() const
     if (m_backupSchedule.backupType != vms::api::BackupType::scheduled || !m_backupSchedule.isValid())
         return 0;
 
-    QDateTime current = qnSyncTime->currentDateTime();
-    qint64 currentTimeMs = current.toMSecsSinceEpoch();
+    // Backup schedule struct always contains server time.
+    const QDateTime current = ServerTimeWatcher::serverTime(m_server, qnSyncTime->currentMSecsSinceEpoch());
+    const qint64 currentTimeMs = current.toMSecsSinceEpoch();
 
     static const int kDaysPerWeek = 7;
     int currentDayOfWeek = current.date().dayOfWeek() - 1; // zero-based
@@ -846,7 +913,10 @@ quint64 QnStorageConfigWidget::nextScheduledBackupTimeMs() const
 
 QString QnStorageConfigWidget::backupPositionToString(qint64 backupTimeMs)
 {
-    return datetime::toString(backupTimeMs);
+    QDateTime backupDateTime = ServerTimeWatcher::serverTime(m_server, backupTimeMs);
+    if (context()->instance<ServerTimeWatcher>()->timeMode() == ServerTimeWatcher::clientTimeMode)
+        backupDateTime = backupDateTime.toLocalTime();
+    return datetime::toString(backupDateTime);
 }
 
 QString QnStorageConfigWidget::intervalToString(qint64 backupTimeMs)
@@ -936,15 +1006,107 @@ void QnStorageConfigWidget::updateBackupUi(const QnBackupStatusData& reply, int 
     }
 }
 
-QString QnStorageConfigWidget::calculateWarningMessage() const
+void QnStorageConfigWidget::confirmNewMetadataStorage(const QnUuid& storageId)
 {
+    const auto updateServerSettings =
+        [this](
+            const nx::vms::api::MetadataStorageChangePolicy policy,
+            const QnUuid& storageId)
+        {
+            qnGlobalSettings->setMetadataStorageChangePolicy(policy);
+            qnGlobalSettings->synchronizeNow();
+
+            qnResourcesChangesManager->saveServer(m_server,
+                [storageId](const QnMediaServerResourcePtr& server)
+                {
+                    server->setMetadataStorageId(storageId);
+                });
+        };
+
+    if (nx::analytics::hasActiveObjectEngines(commonModule(), m_server->getId()))
+    {
+        // Metadata storage has been changed, we need to do something with database.
+
+        QnMessageBox msgBox(
+            QnMessageBoxIcon::Question,
+            tr("What to do with current analytics data?"),
+            tr("Current analytics data will not be automatically moved to another location"
+                " and will become unaccessible. You can keep it and manually move later,"
+                " or delete permanently."
+                "\n"
+                "If you intended to move analytics data to another storage location,"
+                " please contact support before proceeding."),
+            QDialogButtonBox::StandardButtons(),
+            QDialogButtonBox::NoButton,
+            this);
+
+        const auto deleteButton = msgBox.addButton(tr("Delete"),
+            QDialogButtonBox::ButtonRole::AcceptRole, Qn::ButtonAccent::Warning);
+        const auto keepButton = msgBox.addButton(tr("Keep"),
+            QDialogButtonBox::ButtonRole::AcceptRole, Qn::ButtonAccent::NoAccent);
+
+        // This dialog uses non-standard layout, so we can't use ButtonRole::CancelRole.
+        const auto cancelButton = msgBox.addButton(tr("Cancel"),
+            QDialogButtonBox::ButtonRole::AcceptRole, Qn::ButtonAccent::NoAccent);
+
+        cancelButton->setFocus();
+
+        // Since we don't have a button with CancelRole, we need to set it manually.
+        msgBox.setEscapeButton(cancelButton);
+
+        msgBox.exec();
+
+        if (msgBox.clickedButton() == deleteButton)
+        {
+            updateServerSettings(
+                nx::vms::api::MetadataStorageChangePolicy::remove,
+                storageId);
+            updateWarnings();
+        }
+
+        if (msgBox.clickedButton() == keepButton)
+        {
+            updateServerSettings(
+                nx::vms::api::MetadataStorageChangePolicy::keep,
+                storageId);
+            updateWarnings();
+        }
+
+        // If the cancel button has been clicked, do nothing...
+    }
+    else
+    {
+        // We don't have analytics database yet, so just assign a new storage.
+
+        updateServerSettings(
+            nx::vms::api::MetadataStorageChangePolicy::keep, //< Just to be sure...
+            storageId);
+        updateWarnings();
+    }
+
+}
+
+void QnStorageConfigWidget::updateWarnings()
+{
+    bool analyticsIsOnSystemDrive = false;
+    bool analyticsIsOnDisabledStorage = false;
     bool hasDisabledStorage = false;
     bool hasUsbStorage = false;
+
     for (const auto& storageData: m_model->storages())
     {
         const auto storage = resourcePool()->getResourceById<QnStorageResource>(storageData.id);
         if (!storage || storage->getParentId() != m_server->getId())
             continue;
+
+        if (storageData.id == m_model->metadataStorageId())
+        {
+            if (storage->statusFlag() & Qn::StorageStatus::system)
+                analyticsIsOnSystemDrive = true;
+
+            if (!storageData.isUsed)
+                analyticsIsOnDisabledStorage = true;
+        }
 
         // Storage was not modified.
         if (storageData.isUsed == storage->isUsedForWriting())
@@ -953,29 +1115,15 @@ QString QnStorageConfigWidget::calculateWarningMessage() const
         if (!storageData.isUsed)
             hasDisabledStorage = true;
 
+        //TODO: use PartitionType enum value here instead of the serialized literal
         if (storageData.isUsed && storageData.storageType == lit("usb"))
             hasUsbStorage = true;
     }
 
-    QStringList errorMessages;
-    if (hasDisabledStorage)
-    {
-        errorMessages << tr("Recording to disabled storage will stop. "
-            "However, deleting outdated footage from it will continue.");
-    }
-    if (hasUsbStorage)
-        errorMessages << tr("Recording was enabled on the USB storage");
-
-    return errorMessages.join(L'\n');
-}
-
-void QnStorageConfigWidget::setWarningText(const QString& message)
-{
-    const bool wasHidden = ui->storagesWarningLabel->isHidden();
-    ui->storagesWarningLabel->setHidden(message.isEmpty());
-    ui->storagesWarningLabel->setText(message);
-    if (wasHidden != ui->storagesWarningLabel->isHidden())
-        ui->storagesGroupBox->layout()->activate();
+    ui->analyticsOnSystemDriveWarningLabel->setVisible(analyticsIsOnSystemDrive);
+    ui->analyticsOnDisabledStorageWarningLabel->setVisible(analyticsIsOnDisabledStorage);
+    ui->storagesWarningLabel->setVisible(hasDisabledStorage);
+    ui->usbWarningLabel->setVisible(hasUsbStorage);
 }
 
 void QnStorageConfigWidget::updateIntervalLabels()

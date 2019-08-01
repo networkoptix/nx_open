@@ -5,6 +5,12 @@
 
 #include <utils/media/frame_info.h>
 #include <utils/color_space/yuvconvert.h>
+#include "utils/common/app_info.h"
+#include <nx/utils/log/log_main.h>
+
+extern "C" {
+#include <libswscale/swscale.h>
+} // extern "C"
 
 namespace {
 
@@ -59,6 +65,8 @@ ImageToFramePainter::ImageToFramePainter()
 
 ImageToFramePainter::~ImageToFramePainter()
 {
+    sws_freeContext(m_toImageContext);
+    sws_freeContext(m_fromImageContext);
 }
 
 void ImageToFramePainter::setImage(
@@ -74,22 +82,70 @@ void ImageToFramePainter::setImage(
     updateTargetImage();
 }
 
-void ImageToFramePainter::updateSourceSize(const QSize& sourceSize)
+void ImageToFramePainter::updateTargetImage(const QSize& sourceSize, AVPixelFormat pixelFormat)
 {
-    if (sourceSize == m_sourceSize)
+    if (sourceSize == m_sourceSize && m_pixelFormat == pixelFormat)
         return;
 
     m_sourceSize = sourceSize;
+    m_pixelFormat = pixelFormat;
     updateTargetImage();
 }
 
-CLVideoDecoderOutputPtr ImageToFramePainter::drawTo(const CLVideoDecoderOutputPtr& frame)
+CLVideoDecoderOutputPtr ImageToFramePainter::drawToFfmpeg(const CLVideoDecoderOutputPtr& frame)
 {
-    updateSourceSize(QSize(frame->width, frame->height));
+    const int yPlaneOffset = m_bufferOffset.x() + m_bufferOffset.y() * frame->linesize[0];
+    const int uvPlaneOffset = (m_bufferOffset.x() + m_bufferOffset.y() * frame->linesize[1]) / 2;
 
-    if (m_croppedImage.isNull())
+    if (!m_toImageContext)
+    {
+        m_toImageContext = sws_getContext(
+            m_finalImage.width(), m_finalImage.height(), (AVPixelFormat)frame->format,
+            m_finalImage.width(), m_finalImage.height(), AV_PIX_FMT_BGRA,
+            SWS_BILINEAR, nullptr, nullptr, nullptr);
+    }
+    if (!m_fromImageContext)
+    {
+        m_fromImageContext = sws_getContext(
+            m_finalImage.width(), m_finalImage.height(), AV_PIX_FMT_BGRA,
+            m_finalImage.width(), m_finalImage.height(), (AVPixelFormat)frame->format,
+            SWS_BILINEAR, nullptr, nullptr, nullptr);
+    }
+
+    if (!m_toImageContext || !m_fromImageContext)
+    {
+        NX_WARNING(this, "Can't allocate sws scale context for color conversion");
         return frame;
+    }
 
+    quint8* frameData[4] = {
+        frame->data[0] + yPlaneOffset,
+        frame->data[1] + uvPlaneOffset,
+        frame->data[2] + uvPlaneOffset,
+        nullptr
+    };
+
+    quint8* dstData[4] = { (quint8*)m_finalImage.bits(), nullptr, nullptr, nullptr };
+    int dstStride[4] = { m_finalImage.bytesPerLine(), 0, 0, 0 };
+    sws_scale(
+        m_toImageContext, frameData, frame->linesize,
+        0, m_finalImage.height(),
+        dstData, dstStride);
+
+    QPainter painter(&m_finalImage);
+    painter.drawImage(m_imageOffsetInBuffer, m_croppedImage);
+    painter.end();
+
+    sws_scale(
+        m_fromImageContext, dstData, dstStride,
+        0, m_finalImage.height(),
+        frameData, frame->linesize);
+
+    return frame;
+}
+
+CLVideoDecoderOutputPtr ImageToFramePainter::drawToSse(const CLVideoDecoderOutputPtr& frame)
+{
     const int yPlaneOffset = m_bufferOffset.x() + m_bufferOffset.y() * frame->linesize[0];
     const int uvPlaneOffset = (m_bufferOffset.x() + m_bufferOffset.y() * frame->linesize[1]) / 2;
 
@@ -122,6 +178,19 @@ CLVideoDecoderOutputPtr ImageToFramePainter::drawTo(const CLVideoDecoderOutputPt
     return frame;
 }
 
+CLVideoDecoderOutputPtr ImageToFramePainter::drawTo(const CLVideoDecoderOutputPtr& frame)
+{
+    updateTargetImage(QSize(frame->width, frame->height), (AVPixelFormat) frame->format);
+
+    if (m_croppedImage.isNull())
+        return frame;
+
+    if (frame->format != AV_PIX_FMT_YUV420P || QnAppInfo::isArm())
+        return drawToFfmpeg(frame);
+    else
+        return drawToSse(frame);
+}
+
 void ImageToFramePainter::clearImages()
 {
     m_croppedImage = QImage();
@@ -131,6 +200,11 @@ void ImageToFramePainter::clearImages()
 
 void ImageToFramePainter::updateTargetImage()
 {
+    sws_freeContext(m_toImageContext);
+    sws_freeContext(m_fromImageContext);
+    m_toImageContext = nullptr;
+    m_fromImageContext = nullptr;
+
     if (!m_sourceSize.isValid() || m_image.isNull())
     {
         clearImages();

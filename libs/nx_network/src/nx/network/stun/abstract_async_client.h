@@ -29,7 +29,8 @@ public:
                 nx::network::RetryPolicy::kInfiniteRetries,
                 std::chrono::milliseconds(500),
                 nx::network::RetryPolicy::kDefaultDelayMultiplier,
-                std::chrono::minutes(1))
+                std::chrono::minutes(1),
+                nx::network::RetryPolicy::kDefaultRandomRatio)
         {}
     };
 
@@ -117,6 +118,12 @@ public:
      */
     virtual void cancelHandlers(
         void* client, utils::MoveOnlyFunc<void()> handler) = 0;
+
+    /**
+     * If called in object's AIO thread then cancels immediately and without blocking.
+     * If called from any other thread, then it can block.
+     */
+    virtual void cancelHandlersSync(void* client) = 0;
 
     /**
      * Configures connection keep-alive options.

@@ -25,9 +25,9 @@
         </p>
 
         <p ng-if="system.permissions.isAdmin">
-            <button class="btn btn-default" ng-click="rename()">System umbenennen</button>
+            <button class="btn btn-default" ng-click="rename()" ng-disabled="currentlyMerging && !isMaster">System umbenennen</button>
         </p>
-        <button class="btn btn-default" ng-click="delete()">Von meinem Account trennen</button>
+        <button class="btn btn-default" ng-click="delete()" ng-disabled="currentlyMerging">Von meinem Account trennen</button>
     </div>
 </div>
 <div class="mt-3 card card-default" ng-if="currentlyMerging">

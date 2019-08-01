@@ -91,7 +91,12 @@ void TestHttpServer::registerUserCredentials(
     const nx::String& userName,
     const nx::String& password)
 {
-    m_credentialsProvider.addCredentials(userName, password);
+    registerUserCredentials(Credentials(userName, PasswordAuthToken(password)));
+}
+
+void TestHttpServer::registerUserCredentials(const Credentials& credentials)
+{
+    m_credentialsProvider.addCredentials(credentials);
 }
 
 bool TestHttpServer::registerStaticProcessor(
@@ -233,6 +238,11 @@ RandomlyFailingHttpServer::RandomlyFailingHttpServer(
     :
     base_type(sslRequired, natTraversalSupport)
 {
+}
+
+RandomlyFailingHttpServer::~RandomlyFailingHttpServer()
+{
+    pleaseStopSync();
 }
 
 void RandomlyFailingHttpServer::setResponseBuffer(const QByteArray& buf)

@@ -26,25 +26,13 @@ Qn::ResourceStatus QnLayoutResource::getStatus() const
 void QnLayoutResource::setStatus(Qn::ResourceStatus newStatus,
     Qn::StatusChangeReason reason /*= Qn::StatusChangeReason::Local*/)
 {
+    Q_UNUSED(newStatus);
+    Q_UNUSED(reason);
     NX_ASSERT(false, "Not implemented");
 }
 
-QnLayoutResourcePtr QnLayoutResource::clone(QHash<QnUuid, QnUuid>* remapHash) const
+void QnLayoutResource::cloneItems(QnLayoutResourcePtr target, QHash<QnUuid, QnUuid>* remapHash) const
 {
-    QnLayoutResourcePtr result(new QnLayoutResource(commonModule()));
-
-    {
-        QnMutexLocker locker(&m_mutex);
-        result->setId(QnUuid::createUuid());
-        result->setName(m_name);
-        result->setParentId(m_parentId);
-        result->setCellSpacing(m_cellSpacing);
-        result->setCellAspectRatio(m_cellAspectRatio);
-        result->setBackgroundImageFilename(m_backgroundImageFilename);
-        result->setBackgroundOpacity(m_backgroundOpacity);
-        result->setBackgroundSize(m_backgroundSize);
-    }
-
     QnLayoutItemDataList items = m_items->getItems().values();
     QHash<QnUuid, QnUuid> newUuidByOldUuid;
     for (int i = 0; i < items.size(); i++)
@@ -58,7 +46,28 @@ QnLayoutResourcePtr QnLayoutResource::clone(QHash<QnUuid, QnUuid>* remapHash) co
     if (remapHash)
         *remapHash = newUuidByOldUuid;
 
-    result->setItems(items);
+    target->setItems(items);
+}
+
+QnLayoutResourcePtr QnLayoutResource::clone(QHash<QnUuid, QnUuid>* remapHash) const
+{
+    QnLayoutResourcePtr result(new QnLayoutResource(commonModule()));
+
+    {
+        QnMutexLocker locker(&m_mutex);
+        result->setId(QnUuid::createUuid());
+        result->setUrl(m_url);
+        result->setName(m_name);
+        result->setParentId(m_parentId);
+        result->setCellSpacing(m_cellSpacing);
+        result->setCellAspectRatio(m_cellAspectRatio);
+        result->setBackgroundImageFilename(m_backgroundImageFilename);
+        result->setBackgroundOpacity(m_backgroundOpacity);
+        result->setBackgroundSize(m_backgroundSize);
+    }
+
+    cloneItems(result, remapHash);
+
     return result;
 }
 
@@ -73,22 +82,33 @@ QnLayoutResourcePtr QnLayoutResource::createFromResource(const QnResourcePtr& re
     layout->setName(resource->getName());
     if (const auto camera = resource.dynamicCast<QnVirtualCameraResource>())
     {
-        const auto ar = camera->aspectRatio();
+        const auto ar = camera->aspectRatioRotated();
         if (ar.isValid())
-            layout->setCellAspectRatio(ar.toFloat());
+            layout->setCellAspectRatio(QnAspectRatio::closestStandardRatio(ar.toFloat()).toFloat());
+    }
+
+    QRect cellGeometry = QRect(0, 0, 1, 1);
+    qreal rotation = 0;
+    if (const auto media = resource.dynamicCast<QnMediaResource>())
+    {
+        // If video occupies several cells, remember this.
+        if (media->getVideoLayout() && media->getVideoLayout()->size().isValid())
+            cellGeometry.setSize(media->getVideoLayout()->size());
+        // Set rotation.
+        rotation = media->defaultRotation();
+        // Transpose cell configuration if 90 degree rotated.
+        if (QnAspectRatio::isRotated90(rotation))
+            cellGeometry = cellGeometry.transposed();
     }
 
     QnLayoutItemData item;
     item.flags = 0x1; // Layout data item flags is declared in client module. // TODO: #GDM move to api
     item.uuid = QnUuid::createUuid();
-    item.combinedGeometry = QRect(0, 0, 1, 1);
+    item.combinedGeometry = cellGeometry;
+    item.rotation = rotation;
     item.resource.id = resource->getId();
     if (resource->hasFlags(Qn::local_media))
         item.resource.uniqueId = resource->getUniqueId();
-
-    QString forcedRotation = resource->getProperty(QnMediaResource::rotationKey());
-    if (!forcedRotation.isEmpty())
-        item.rotation = forcedRotation.toInt();
 
     layout->addItem(item);
 
@@ -213,6 +233,33 @@ void QnLayoutResource::updateInternal(const QnResourcePtr &other, Qn::NotifierLi
             notifiers << [r = toSharedPointer(this)]{ emit r->logicalIdChanged(r); };
         }
 
+        m_localRange = localOther->m_localRange;
+
+        // IMPORTANT: According to current update() usage practice, "data" should not be updated.
+        // Do not expect update() to work like assignment operator.
+        /*
+        // Remove extra data.
+        const auto oldDataKeys = m_dataByRole.keys();
+        for (int role: oldDataKeys)
+        {
+            if (!localOther->m_dataByRole.contains(role))
+            {
+                m_dataByRole.remove(role);
+                notifiers << [r = toSharedPointer(this), role]{ emit r->dataChanged(role); };
+            }
+        }
+
+        // Add essential data.
+        for (int role: localOther->m_dataByRole.keys())
+        {
+            if(m_dataByRole.value(role) != localOther->m_dataByRole.value(role))
+            {
+                m_dataByRole[role] = localOther->m_dataByRole.value(role);
+                notifiers << [r = toSharedPointer(this), role]{ emit r->dataChanged(role); };
+            }
+        }
+        */
+
         setItemsUnderLockInternal(m_items.data(), localOther->m_items.data(), notifiers);
     }
 }
@@ -239,11 +286,13 @@ void QnLayoutResource::updateItem(const QnLayoutItemData &item)
 
 QnTimePeriod QnLayoutResource::getLocalRange() const
 {
+    QnMutexLocker locker(&m_mutex);
     return m_localRange;
 }
 
 void QnLayoutResource::setLocalRange(const QnTimePeriod& value)
 {
+    QnMutexLocker locker(&m_mutex);
     m_localRange = value;
 }
 
@@ -523,44 +572,6 @@ QSet<QnResourcePtr> QnLayoutResource::layoutResources(QnResourcePool* resourcePo
             result << resource;
     }
     return result;
-}
-
-void QnLayoutResource::usePasswordForRecordings(const QString& password)
-{
-    NX_ASSERT(isFile());
-
-    auto items = layoutResources();
-
-    for (auto item: items)
-    {
-        if (auto aviItem = item.objectCast<QnAviResource>())
-            aviItem->usePasswordToRead(password);
-    }
-}
-
-void QnLayoutResource::forgetPasswordForRecordings()
-{
-    NX_ASSERT(isFile());
-
-    const auto items = getItems();
-    const auto pool = resourcePool();
-
-    for (const auto& item : items)
-    {
-        if (item.uuid.isNull()) // Check purpose unknown; copied from layoutResources().
-            continue;
-
-        if (auto resource = pool->getResourceByDescriptor(item.resource))
-        {
-            // Remove password from protected video streams.
-            if (auto aviItem = resource.dynamicCast<QnAviResource>())
-                aviItem->forgetPassword();
-
-            // Remove freshly added cameras from the layout.
-            if (auto cameraItem = resource.objectCast<QnVirtualCameraResource>())
-                removeItem(item);
-        }
-    }
 }
 
 // The one who requests to remove this function will become a permanent maintainer of this class.

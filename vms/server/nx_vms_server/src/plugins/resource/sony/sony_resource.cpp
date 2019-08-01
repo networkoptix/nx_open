@@ -60,16 +60,16 @@ CameraDiagnostics::Result QnPlSonyResource::updateResourceCapabilities()
     switch (capabilities.encoding)
     {
         case SupportedVideoEncoding::JPEG:
-            request.Configuration->Encoding = onvifXsd__VideoEncoding::JPEG;
+            request.Configuration->Encoding = tt__VideoEncoding::JPEG;
             break;
         case SupportedVideoEncoding::H264:
-            request.Configuration->Encoding = onvifXsd__VideoEncoding::H264;
+            request.Configuration->Encoding = tt__VideoEncoding::H264;
             break;
         default:
             // ONVIF Media1 interface doesn't support other codecs
             // (except MPEG4, but VMS doesn't support it), so we use JPEG in this case,
             // because it is usually supported by all devices
-            request.Configuration->Encoding = onvifXsd__VideoEncoding::JPEG;
+            request.Configuration->Encoding = tt__VideoEncoding::JPEG;
     }
 
     request.ForcePersistence = false;

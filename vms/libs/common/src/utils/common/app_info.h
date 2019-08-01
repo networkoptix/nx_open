@@ -13,8 +13,6 @@ class QnAppInfo: public QObject
 public:
     QnAppInfo(QObject* parent = nullptr);
 
-    static Q_INVOKABLE int ec2ProtoVersion();
-
     static Q_INVOKABLE QString organizationName();
     static Q_INVOKABLE QString linuxOrganizationName();
 
@@ -65,7 +63,6 @@ public:
     static Q_INVOKABLE bool freeLicenseIsTrial();
 
     static Q_INVOKABLE bool isArm();
-    static Q_INVOKABLE bool isBpi();
     static Q_INVOKABLE bool isNx1();
     static Q_INVOKABLE bool isAndroid();
     static Q_INVOKABLE bool isIos();

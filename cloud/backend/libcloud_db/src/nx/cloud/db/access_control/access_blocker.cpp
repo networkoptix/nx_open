@@ -1,6 +1,7 @@
 #include "access_blocker.h"
 
 #include <QtCore/QJsonDocument>
+#include <QtCore/QJsonObject>
 
 #include <nx/cloud/db/client/cdb_request_path.h>
 
@@ -10,8 +11,6 @@ namespace nx::cloud::db {
 
 AccessBlocker::AccessBlocker(
     const conf::Settings& settings)
-    :
-    m_settings(settings)
 {
     if (auto userLockerSettings = settings.security().loginLockout)
         m_userLocker = std::make_unique<CloudUserLockerPool>(*userLockerSettings);

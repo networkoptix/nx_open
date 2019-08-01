@@ -26,7 +26,19 @@ struct AlwaysTrueChecker
 struct BriefChecker
 {
     template<class T>
-    bool operator()(const T &) const { return false; }
+    bool operator()(const T& value) const
+    {
+        if constexpr (std::is_same<T, std::string>::value)
+            return value.empty();
+        else if constexpr (std::is_same<T, QString>::value)
+            return value.isEmpty();
+        else if constexpr (std::is_same<T, QColor>::value)
+            return !value.isValid();
+        else if constexpr (std::is_same<T, QnUuid>::value)
+            return value.isNull();
+        else
+            return false;
+    }
 
     template<class U>
     bool operator()(const std::vector<U>& value) const { return value.empty(); }
@@ -36,10 +48,6 @@ struct BriefChecker
 
     template<class U>
     bool operator()(const QList<U>& value) const { return value.empty(); }
-
-    bool operator()(const std::string& value) const { return value.empty(); }
-    bool operator()(const QString& value) const { return value.isEmpty(); }
-    bool operator()(const QnUuid& value) const { return value.isNull(); }
 };
 
 class SerializationVisitor

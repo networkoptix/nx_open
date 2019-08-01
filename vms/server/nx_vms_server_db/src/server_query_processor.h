@@ -23,6 +23,7 @@
 #include <transaction/message_bus_adapter.h>
 #include <transaction/amend_transaction_data.h>
 #include <nx/utils/thread/long_runnable.h>
+#include <nx/network/app_info.h>
 
 namespace ec2 {
 
@@ -60,14 +61,14 @@ public:
 
     void enqueData(Command command);
 
-    virtual void stop() override;
+    virtual void pleaseStop() override;
     virtual void run() override;
 
 private:
     QnDbManager* m_db;
     QnMutex m_mutex;
     QnWaitCondition m_waitCondition;
-    std::vector<Command> m_commandQueue;
+    std::deque<Command> m_commandQueue;
 };
 
 }
@@ -192,6 +193,8 @@ inline void fixRequestDataIfNeeded(nx::vms::api::UserDataEx* const userDataEx)
         userDataEx->digest = hashes.passwordDigest;
         userDataEx->cryptSha512Hash = hashes.cryptSha512Hash;
     }
+    if(userDataEx->realm.isEmpty())
+        userDataEx->realm = nx::network::AppInfo::realm();
 
     fixRequestDataIfNeeded(static_cast<nx::vms::api::UserData* const>(userDataEx));
 }
@@ -202,6 +205,21 @@ inline void fixRequestDataIfNeeded(nx::vms::api::ResourceParamData* const paramD
     || paramData->name == ResourcePropertyKey::kDefaultCredentials)
     {
         paramData->value = nx::utils::encodeHexStringFromStringAES128CBC(paramData->value);
+    }
+}
+
+inline void fixRequestDataIfNeeded(nx::vms::api::EventRuleData* const paramData)
+{
+    nx::vms::event::ActionParameters params;
+    if (!QJson::deserialize(paramData->actionParams, &params))
+        return;
+
+    nx::utils::Url url = params.url;
+    if (!url.password().isEmpty())
+    {
+        url.setPassword(nx::utils::encodeHexStringFromStringAES128CBC(url.password()));
+        params.url = url.toString();
+        paramData->actionParams = QJson::serialized(params);
     }
 }
 
@@ -237,6 +255,15 @@ inline QnTransaction<nx::vms::api::ResourceParamWithRefData> amendTranIfNeeded(
 {
     auto resultTran = originalTran;
     fixRequestDataIfNeeded(static_cast<nx::vms::api::ResourceParamData* const>(&resultTran.params));
+
+    return resultTran;
+}
+
+inline QnTransaction<nx::vms::api::EventRuleData> amendTranIfNeeded(
+    const QnTransaction<nx::vms::api::EventRuleData>& originalTran)
+{
+    auto resultTran = originalTran;
+    fixRequestDataIfNeeded(static_cast<nx::vms::api::EventRuleData* const>(&resultTran.params));
 
     return resultTran;
 }
@@ -463,11 +490,13 @@ public:
     {
         QnDbManagerAccess accessDataCopy(m_db);
         nx::utils::concurrent::run(Ec2ThreadPool::instance(),
-            [self = *this, accessDataCopy, input, handler, cmdCode]() mutable
+            [self = *this, accessDataCopy, input, handler, cmdCode,
+             resourceAccessManager = m_owner->commonModule()->resourceAccessManager()]() mutable
             {
                 OutputData output;
                 const ErrorCode errorCode = accessDataCopy.doQuery(cmdCode, input, output);
-                amendOutputDataIfNeeded(self.m_db.userAccessData(), &output);
+                amendOutputDataIfNeeded(self.m_db.userAccessData(),
+                    resourceAccessManager, &output);
                 handler(errorCode, output);
             });
     }
@@ -498,8 +527,9 @@ private:
         const auto descriptor = getTransactionDescriptorByTransaction(tran);
         if (!descriptor)
             return ErrorCode::forbidden;
-        if (!descriptor->checkSavePermissionFunc(m_owner->commonModule(), m_db.userAccessData(), tran.params))
-            return ErrorCode::forbidden;
+        auto errorCode = descriptor->checkSavePermissionFunc(m_owner->commonModule(), m_db.userAccessData(), tran.params);
+        if (errorCode != ErrorCode::ok)
+            return errorCode;
 
         postProcessList->push_back(std::bind(
             PostProcessTransactionFunction(), m_owner->messageBus(), createAuditDataCopy(), tran));
@@ -509,8 +539,7 @@ private:
     ErrorCode removeHelper(
         const QnUuid& id,
         ApiCommand::Value command,
-        PostProcessList* const transactionsPostProcessList,
-        TransactionType::Value transactionType = TransactionType::Regular);
+        PostProcessList* const transactionsPostProcessList);
 
     ErrorCode removeObjAttrHelper(
         const QnUuid& id,
@@ -528,8 +557,7 @@ private:
 
     ErrorCode removeResourceStatusHelper(
         const QnUuid& id,
-        PostProcessList* const transactionsPostProcessList,
-        TransactionType::Value transactionType = TransactionType::Regular);
+        PostProcessList* const transactionsPostProcessList);
 
     class AccessRightGrant
     {
@@ -635,8 +663,7 @@ private:
                 RUN_AND_CHECK_ERROR(
                     removeResourceStatusHelper(
                         tran.params.id,
-                        transactionsPostProcessList,
-                        TransactionType::Local),
+                        transactionsPostProcessList),
                     lit("Remove resource status failed"));
 
                 break;
@@ -651,8 +678,7 @@ private:
                 RUN_AND_CHECK_ERROR(
                     removeResourceStatusHelper(
                         tran.params.id,
-                        transactionsPostProcessList,
-                        tran.transactionType),
+                        transactionsPostProcessList),
                     lit("Remove resource status failed"));
 
                 break;
@@ -877,7 +903,7 @@ public:
                         updatedTran.command = ApiCommand::removeAnalyticsEngine;
                         break;
                     default:
-                        return processUpdateSync(tran, transactionsPostProcessList, 0);
+                        return ErrorCode::badRequest;
                 }
                 return processUpdateSync(updatedTran, transactionsPostProcessList); //< calling recursively
             }
@@ -958,7 +984,8 @@ void PostProcessTransactionFunction::operator()(
 {
     messageBus->sendTransaction(tran);
     auto amendedTran = tran;
-    amendOutputDataIfNeeded(Qn::kSystemAccess, &amendedTran.params);
+    amendOutputDataIfNeeded(Qn::kSystemAccess,
+        messageBus->commonModule()->resourceAccessManager(), &amendedTran.params);
     aux::triggerNotification(auditData, amendedTran);
 }
 

@@ -18,6 +18,7 @@
 #include <nx/utils/password_analyzer.h>
 #include <utils/common/synctime.h>
 #include <utils/common/util.h>
+#include <nx/utils/std/algorithm.h>
 
 namespace nx {
 namespace vms {
@@ -70,8 +71,15 @@ bool configureLocalPeerAsPartOfASystem(
     }
 
     // apply remote settings
-    const auto& settings = commonModule->globalSettings()->allSettings();
-    for (const auto& foreignSetting : data.foreignSettings)
+    auto settings = commonModule->globalSettings()->allSettings();
+    nx::utils::remove_if(settings,
+        [](const auto& adaptor)
+        {
+            return adaptor->key() == nx::settings_names::kNameLastMergeMasterId
+                || adaptor->key() == nx::settings_names::kNameLastMergeSlaveId;
+        });
+
+    for (const auto& foreignSetting: data.foreignSettings)
     {
         for (QnAbstractResourcePropertyAdaptor* setting : settings)
         {

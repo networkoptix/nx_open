@@ -1,8 +1,5 @@
 #pragma once
 
-#include <QtOpenGL/QGLShaderProgram>
-#include <QtOpenGL/QtOpenGL>
-
 #include <core/ptz/media_dewarping_params.h>
 
 #include "shader_source.h"
@@ -12,8 +9,10 @@
 
 #include <utils/color_space/image_correction.h>
 
-class QnAbstractYv12ToRgbShaderProgram : public QnGLShaderProgram {
+class QnAbstractYv12ToRgbShaderProgram : public QnGLShaderProgram
+{
     Q_OBJECT
+
 public:
     QnAbstractYv12ToRgbShaderProgram(QObject *parent = NULL);
 

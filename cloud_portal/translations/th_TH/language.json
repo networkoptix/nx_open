@@ -10,7 +10,15 @@
     "loginButton": "ลงชื่อเข้าสู่ระบบ",
     "logoutAuthorisedTitle": "คุณกำลังอยู่ในระบบ",
     "logoutAuthorisedContinueButton": "ดำเนิน​การ",
-    "logoutAuthorisedLogoutButton": "ออกจากระบบ"
+    "logoutAuthorisedLogoutButton": "ออกจากระบบ",
+    "messageFailed": "Message has failed to send.",
+    "messageSent": "Message has been sent."
+  },
+  "messageType": {
+    "ipvd_feedback": "Feedback about {{product}}",
+    "sales_inquiry": "Inquiry for {{product}}",
+    "request_support": "Request Support for {{product}}",
+    "unknown": "Unknown Message Type"
   },
   "pageTitles": {
     "template": "{{title}} %PRODUCT_NAME%",
@@ -37,8 +45,9 @@
     "pageNotFound": "ไม่พบหน้านี้"
   },
   "systemStatuses": {
-    "notActivated": "ยังไม่ถูกเปิดใช้งาน",
     "activated": "เปิดใช้งาน",
+    "merging": "merging",
+    "notActivated": "ยังไม่ถูกเปิดใช้งาน",
     "online": "ออนไลน์",
     "offline": "ออฟไลน์",
     "unavailable": "ไม่พร้อมใช้งาน"
@@ -139,7 +148,8 @@
     "thisSystem": "ระบบ",
     "oldSafariNotSupported": "ไม่สนับสนุน Safari ที่เก่ากว่าเวอร์ชั่น 10",
     "DUPLICATE_MEDIASERVER_FOUND": "Duplicate servers were found on one of the systems.<br>Remove old servers from each system that you are trying to merge and try again.",
-    "mergedSystemIsOffline": "One of the systems being merged is offline. Make sure they are online and try again."
+    "mergedSystemIsOffline": "One of the systems being merged is offline. Make sure they are online and try again.",
+    "INCOMPATIBLE": "Versions for systems are incompatible. To fix this problem make sure the systems have the same version."
   },
   "passwordRequirements": {
     "good": "ดี",
@@ -186,7 +196,8 @@
     "successDisconnected": "ระบบถูกตัดการเชื่อมต่อเรียบร้อยแล้วจาก %PRODUCT_NAME%",
     "successDeleted": "ระบบ {{systemName}} จะถูกลบออกจากบัญชีของคุณเรียบร้อยแล้ว",
     "successMerge": "System merge completed",
-    "permissionsRemoved": "สิทธิ์ถูกนำออกจาก {{email}}"
+    "permissionsRemoved": "สิทธิ์ถูกนำออกจาก {{email}}",
+    "unknownName": "Unknown Name for System (Caused by cloud merge)"
   },
   "account": {
     "accountSavedSuccess": "บันทึกบัญชีของคุณเรียบร้อยแล้ว",

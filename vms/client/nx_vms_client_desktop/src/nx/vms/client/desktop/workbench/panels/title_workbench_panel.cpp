@@ -1,5 +1,7 @@
 #include "title_workbench_panel.h"
 
+#include <QtCore/QScopedValueRollback>
+
 #include <QtWidgets/QAction>
 
 #include <nx/vms/client/desktop/workbench/workbench_animations.h>

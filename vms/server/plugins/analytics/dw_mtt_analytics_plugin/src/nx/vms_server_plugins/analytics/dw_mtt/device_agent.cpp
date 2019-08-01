@@ -55,7 +55,6 @@ EventMetadata* createCommonEvent(const EventType& eventType, bool active)
     eventMetadata->setDescription(eventType.name.toStdString());
     eventMetadata->setIsActive(active);
     eventMetadata->setConfidence(1.0);
-    eventMetadata->setAuxiliaryData(eventType.internalName.toStdString());
     return eventMetadata;
 }
 
@@ -88,8 +87,7 @@ DeviceAgent::DeviceAgent(
     nx::vms::api::analytics::DeviceAgentManifest typedCameraManifest;
     for (const auto& eventType: typedManifest.eventTypes)
     {
-        if(!eventType.unsupported)
-            typedCameraManifest.supportedEventTypeIds.push_back(eventType.id);
+        typedCameraManifest.supportedEventTypeIds.push_back(eventType.id);
     }
     m_cameraManifest = QJson::serialized(typedCameraManifest);
 
@@ -208,7 +206,7 @@ void DeviceAgent::readNextNotificationAsync()
 }
 
 /*
-* New metadata have been received from camera. We try to find there information abount
+* New metadata have been received from camera. We try to find there information about
 * event occurred. If so, we treat this event.
 */
 void DeviceAgent::onReceive(SystemError::ErrorCode code, size_t size)
@@ -382,18 +380,31 @@ QByteArray DeviceAgent::extractRequestFromBuffer()
     m_buffer.remove(0, size);
     m_buffer.reserve(kBufferCapacity);
 
+    // The request may contain leading zeros. They hinder to debug. Let's eliminate them.
+    size_t nonZeroIndex = 0;
+    while (nonZeroIndex < request.size() && request.at(nonZeroIndex) == '\0')
+        ++nonZeroIndex;
+
+    if (nonZeroIndex)
+        request.remove(0, nonZeroIndex);
+
     return request;
 }
 
 Error DeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
 {
-    m_handler = handler;
+    handler->addRef();
+    m_handler.reset(handler);
     return Error::noError;
 }
 
 Error DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes)
 {
-    if (metadataTypes->eventTypeIds()->count() == 0)
+    nx::sdk::Ptr<const nx::sdk::IStringList> eventTypeIds(metadataTypes->eventTypeIds());
+    if (!NX_ASSERT(eventTypeIds, "Event type id list is nullptr"))
+        return Error::unknownError;
+
+    if (eventTypeIds->count() == 0)
     {
         stopFetchingMetadata();
         return Error::noError;
@@ -404,15 +415,20 @@ Error DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes)
 
 Error DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTypes)
 {
+    m_terminated = false;
+
     const QByteArray host = m_url.host().toLatin1();
     m_cameraController.setIp(m_url.host().toLatin1());
     m_cameraController.setCredentials(m_auth.user().toLatin1(), m_auth.password().toLatin1());
 
     // Assuming that the list contains only events, since this plugin does not produce objects.
-    const auto eventTypeList = metadataTypes->eventTypeIds();
-    for (int i = 0; i < eventTypeList->count(); ++i)
+    nx::sdk::Ptr<const IStringList> eventTypeIdList(metadataTypes->eventTypeIds());
+    if (!NX_ASSERT(eventTypeIdList, "Event type id list is nullptr"))
+        return Error::unknownError;
+
+    for (int i = 0; i < eventTypeIdList->count(); ++i)
     {
-        const QString id(eventTypeList->at(i));
+        const QString id(eventTypeIdList->at(i));
         const EventType* eventType = m_engine->eventTypeById(id);
         if (!eventType)
             NX_URL_PRINT << "Unknown event type. TypeId = " << id.toStdString();

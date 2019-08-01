@@ -3,7 +3,7 @@
 #include <core/resource_access/resource_access_subject.h>
 
 #include <ui/models/resource/resource_tree_model_fwd.h>
-#include <nx/vms/client/desktop/resource_views/data/node_type.h>
+#include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 
 #include <ui/workbench/workbench_context_aware.h>
 
@@ -15,7 +15,7 @@
 class QnResourceTreeModelUserNodes: public Connective<QObject>, public QnWorkbenchContextAware
 {
     using base_type = Connective<QObject>;
-    using NodeType = nx::vms::client::desktop::ResourceTreeNodeType;
+    using NodeType = nx::vms::client::desktop::ResourceTree::NodeType;
 
 public:
     QnResourceTreeModelUserNodes(QObject* parent = nullptr);

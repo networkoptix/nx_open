@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QtCore/QThreadPool>
+
 #include <core/resource/resource_fwd.h>
 #include <nx/vms/server/event/rule_processor.h>
 #include <nx/vms/event/actions/actions_fwd.h>
@@ -28,6 +30,8 @@ public:
     virtual QnUuid getGuid() const override;
 
     virtual void prepareAdditionActionParams(const vms::event::AbstractActionPtr& action) override;
+
+    void stop();
 
 protected slots:
     virtual bool executeActionInternal(const vms::event::AbstractActionPtr& action) override;

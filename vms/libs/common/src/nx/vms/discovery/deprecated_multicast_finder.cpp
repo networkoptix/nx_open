@@ -120,7 +120,7 @@ void DeprecatedMulticastFinder::updateInterfaces()
                 }
                 else
                 {
-                    NX_WARNING(this, lm("Joined multicast group %1 on interface %2")
+                    NX_DEBUG(this, lm("Joined multicast group %1 on interface %2")
                         .args(m_multicastGroupAddress, address));
                 }
             }

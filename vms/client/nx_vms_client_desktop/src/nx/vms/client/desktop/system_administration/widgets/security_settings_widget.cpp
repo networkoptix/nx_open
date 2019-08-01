@@ -13,6 +13,8 @@
 
 #include <ui/workaround/widgets_signals_workaround.h>
 
+#include <QtGui/QResizeEvent>
+
 namespace nx::vms::client::desktop {
 
 SecuritySettingsWidget::SecuritySettingsWidget(QWidget* parent):
@@ -26,7 +28,7 @@ SecuritySettingsWidget::SecuritySettingsWidget(QWidget* parent):
     ui->auditTrailHint->setHint(tr("Tracks and logs all user actions."));
 
     ui->limitSessionLengthHint->setHint(
-        tr("User will be automatically logged out after this period of time."));
+        tr("Users will be automatically logged out if their session exceeds the specified duration."));
 
     connect(ui->watermarkSettingsButton, &QPushButton::pressed, this,
         [this]
@@ -47,6 +49,7 @@ SecuritySettingsWidget::SecuritySettingsWidget(QWidget* parent):
         [this](int state)
         {
             m_watermarkSettings.useWatermark = (state == Qt::Checked);
+            ui->watermarkExplanationLabel->setVisible(state == Qt::Checked);
             ui->watermarkSettingsButton->setVisible(state == Qt::Checked);
         };
     connect(ui->displayWatermarkCheckBox, &QCheckBox::stateChanged,
@@ -54,6 +57,18 @@ SecuritySettingsWidget::SecuritySettingsWidget(QWidget* parent):
     // Need to sync checkbox to button, loadDataToUi() will do the rest.
     updateWatermarkState(ui->displayWatermarkCheckBox->checkState());
 
+    ui->limitSessionUnitsComboBox->addItem(tr("minutes"), 1);
+    ui->limitSessionUnitsComboBox->addItem(tr("hours"), 60);
+    ui->limitSessionUnitsComboBox->setCurrentIndex(1);
+
+    const auto updateLimitSessionControls =
+        [this](bool enabled) { ui->limitSessionDetailsWidget->setVisible(enabled); };
+
+    connect(ui->limitSessionLengthCheckBox, &QCheckBox::toggled,
+        this, updateLimitSessionControls);
+    updateLimitSessionControls(ui->limitSessionLengthCheckBox->isChecked());
+
+    // All hasChangesChanged connections should go after initial control updates.
     connect(ui->auditTrailCheckBox, &QCheckBox::stateChanged, this,
         &QnAbstractPreferencesWidget::hasChangesChanged);
 
@@ -68,6 +83,13 @@ SecuritySettingsWidget::SecuritySettingsWidget(QWidget* parent):
         &SecuritySettingsWidget::forceVideoTrafficEncryptionChanged);
 
     connect(ui->displayWatermarkCheckBox, &QCheckBox::stateChanged, this,
+        &QnAbstractPreferencesWidget::hasChangesChanged);
+
+    connect(ui->limitSessionLengthCheckBox, &QCheckBox::clicked, this,
+        &QnAbstractPreferencesWidget::hasChangesChanged);
+    connect(ui->limitSessionValueSpinBox, QnSpinboxIntValueChanged, this,
+        &QnAbstractPreferencesWidget::hasChangesChanged);
+    connect(ui->limitSessionUnitsComboBox, QnComboboxCurrentIndexChanged, this,
         &QnAbstractPreferencesWidget::hasChangesChanged);
 
     /* Let suggest these options are changes so rare, so we can safely drop unsaved changes. */
@@ -87,27 +109,6 @@ SecuritySettingsWidget::SecuritySettingsWidget(QWidget* parent):
         ui->watermarkSettingsButton->hide();
         ui->displayWatermarkCheckBox->hide();
     }
-
-    ui->limitSessionUnitsComboBox->addItem(tr("minutes"), 1);
-    ui->limitSessionUnitsComboBox->addItem(tr("hours"), 60);
-    ui->limitSessionUnitsComboBox->setCurrentIndex(1);
-
-    const auto updateLimitSessionControls =
-        [this](bool enabled)
-        {
-            ui->limitSessionUnitsComboBox->setEnabled(enabled);
-            ui->limitSessionValueSpinBox->setEnabled(enabled);
-        };
-
-    connect(ui->limitSessionLengthCheckBox, &QCheckBox::toggled, this, updateLimitSessionControls);
-    updateLimitSessionControls(ui->limitSessionLengthCheckBox->isChecked());
-
-    connect(ui->limitSessionLengthCheckBox, &QCheckBox::clicked, this,
-        &QnAbstractPreferencesWidget::hasChangesChanged);
-    connect(ui->limitSessionValueSpinBox, QnSpinboxIntValueChanged, this,
-        &QnAbstractPreferencesWidget::hasChangesChanged);
-    connect(ui->limitSessionUnitsComboBox, QnComboboxCurrentIndexChanged, this,
-        &QnAbstractPreferencesWidget::hasChangesChanged);
 
     if (!ini().enableSessionTimeout)
         ui->limitSessionLengthWidget->hide();
@@ -208,6 +209,18 @@ void SecuritySettingsWidget::setReadOnlyInternal(bool readOnly)
     setReadOnly(ui->displayWatermarkCheckBox, readOnly);
     setReadOnly(ui->watermarkSettingsButton, readOnly);
     setReadOnly(ui->limitSessionLengthWidget, readOnly);
+}
+
+void SecuritySettingsWidget::resizeEvent(QResizeEvent* resizeEvent)
+{
+    base_type::resizeEvent(resizeEvent);
+    // Workaround for layout issues caused by incorrect size hint of word-wrapped QLabel.
+    if (ui->watermarkExplanationLabel->isVisible())
+    {
+        ui->watermarkExplanationLabel->setMinimumHeight(0);
+        ui->watermarkExplanationLabel->setMinimumHeight(
+            ui->watermarkExplanationLabel->heightForWidth(resizeEvent->size().width()));
+    }
 }
 
 } // namespace nx::vms::client::desktop

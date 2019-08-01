@@ -18,7 +18,7 @@ static constexpr char kHttpTransportPathBase[] = "/events";
 HttpCommandPipelineConnector::HttpCommandPipelineConnector(
     const ProtocolVersionRange& protocolVersionRange,
     const nx::utils::Url& nodeUrl,
-    const std::string& systemId,
+    const std::string& clusterId,
     const std::string& nodeId)
     :
     m_protocolVersionRange(protocolVersionRange),
@@ -27,11 +27,11 @@ HttpCommandPipelineConnector::HttpCommandPipelineConnector(
         .setQuery(lm("guid=%1").args(nodeId)).toUrl()),
     m_postCommandsNodeUrl(nx::network::url::Builder(nodeUrl)
         .appendPath(kPushEc2TransactionPathWithoutSequence)),
-    m_systemId(systemId),
+    m_clusterId(clusterId),
     m_connectionGuardSharedState(std::make_shared<::ec2::ConnectionGuardSharedState>())
 {
     m_peerData.id = QnUuid::fromStringSafe(nodeId.c_str());
-    m_peerData.persistentId = QnUuid::fromArbitraryData(systemId);
+    m_peerData.persistentId = QnUuid::fromArbitraryData(clusterId);
     m_peerData.instanceId = m_peerData.id;
     m_peerData.peerType = nx::vms::api::PeerType::server;
     m_peerData.dataFormat = Qn::SerializationFormat::UbjsonFormat;
@@ -42,7 +42,8 @@ void HttpCommandPipelineConnector::bindToAioThread(
 {
     base_type::bindToAioThread(aioThread);
 
-    m_connection->bindToAioThread(aioThread);
+    if (m_connection)
+        m_connection->bindToAioThread(aioThread);
 }
 
 void HttpCommandPipelineConnector::connect(Handler completionHandler)
@@ -50,7 +51,7 @@ void HttpCommandPipelineConnector::connect(Handler completionHandler)
     m_completionHandler = std::move(completionHandler);
 
     m_connection = std::make_unique<::ec2::QnTransactionTransportBase>(
-        QnUuid::fromStringSafe(m_systemId),
+        QnUuid::fromStringSafe(m_clusterId),
         &*m_connectionGuardSharedState,
         m_peerData,
         kTcpKeepAliveTimeout,
@@ -77,7 +78,7 @@ void HttpCommandPipelineConnector::onStateChanged(
 {
     using State = ::ec2::QnTransactionTransportBase::State;
 
-    // TODO: Have to do post here since onStateChanged is called by
+    // NOTE: Have to do post here since onStateChanged is called by
     // QnTransactionTransportBase with mutex locked.
     post(
         [this, newState]()
@@ -113,9 +114,8 @@ void HttpCommandPipelineConnector::processSuccessfulConnect()
     auto commandPipeline = std::make_unique<CommonHttpConnection>(
         m_protocolVersionRange,
         std::exchange(m_connection, nullptr),
-        //getAioThread(),
         m_connectionGuardSharedState,
-        m_systemId,
+        m_clusterId,
         nx::network::url::getEndpoint(m_getCommandsNodeUrl));
 
     nx::utils::swapAndCall(
@@ -140,20 +140,21 @@ HttpTransportConnector::HttpTransportConnector(
     const ProtocolVersionRange& protocolVersionRange,
     CommandLog* transactionLog,
     const OutgoingCommandFilter& outgoingCommandFilter,
-    const nx::utils::Url& nodeUrl,
-    const std::string& systemId,
-    const std::string& nodeId)
+    const std::string& clusterId,
+    const std::string& nodeId,
+    const nx::utils::Url& nodeUrl)
     :
     m_protocolVersionRange(protocolVersionRange),
     m_commandLog(transactionLog),
     m_outgoingCommandFilter(outgoingCommandFilter),
-    m_systemId(systemId),
+    m_clusterId(clusterId),
     m_pipelineConnector(
         protocolVersionRange,
         nodeUrl,
-        systemId,
+        clusterId,
         nodeId)
 {
+    bindToAioThread(getAioThread());
 }
 
 void HttpTransportConnector::bindToAioThread(
@@ -205,7 +206,7 @@ void HttpTransportConnector::onPipelineConnectCompleted(
         m_protocolVersionRange,
         m_commandLog,
         m_outgoingCommandFilter,
-        m_systemId,
+        m_clusterId,
         connectionRequestAttributes,
         transport->localPeer(),
         std::move(connection));

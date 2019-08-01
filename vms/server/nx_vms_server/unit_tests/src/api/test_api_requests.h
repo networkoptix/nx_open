@@ -23,6 +23,8 @@ PreprocessRequestFunc keepOnlyJsonFields(const QSet<QString>& fields);
 
 PreprocessRequestFunc removeJsonFields(const QSet<QString>& fields);
 
+inline QJsonObject jsonParams(const nx::network::rest::Params& params) { return params.toJson(); }
+
 /** Perform Rest API POST request synchronously. See args in the function definition. */
 #define NX_TEST_API_POST(...) ASSERT_NO_FATAL_FAILURE(api_requests_detail::executePost(__VA_ARGS__))
 
@@ -47,7 +49,8 @@ void doExecutePost(
     int httpStatus,
     const QString& authName,
     const QString& authPassword,
-    QByteArray* responseBody);
+    QByteArray* responseBody,
+    const QByteArray& contentType);
 
 /**
  * @param urlStr Part of the URL after the origin - staring with a slash, path and query.
@@ -61,8 +64,17 @@ void executePost(
     int httpStatus = nx::network::http::StatusCode::ok,
     const QString& authName = "admin",
     const QString& authPassword = "admin",
-    QByteArray* responseBody = nullptr)
+    QByteArray* responseBody = nullptr,
+    const QByteArray& contentType = "application/json")
 {
+    if constexpr (std::is_same_v<RequestData, QByteArray>)
+    {
+        ASSERT_NO_FATAL_FAILURE(doExecutePost(
+            launcher, urlStr, requestData, std::move(preprocessRequestFunc), httpStatus, authName,
+            authPassword, responseBody, contentType));
+        return;
+    }
+
     QByteArray request;
     if constexpr (std::is_same<QByteArray, RequestData>::value)
         request = requestData;
@@ -71,7 +83,7 @@ void executePost(
 
     ASSERT_NO_FATAL_FAILURE(doExecutePost(
         launcher, urlStr, request, std::move(preprocessRequestFunc), httpStatus, authName,
-        authPassword, responseBody));
+        authPassword, responseBody, contentType));
 }
 
 void doExecuteGet(
@@ -105,7 +117,9 @@ void executeGet(
     ASSERT_NO_FATAL_FAILURE(doExecuteGet(launcher, urlStr, &response, httpStatus, authName,
         authPassword));
     if (responseData)
+    {
         ASSERT_TRUE(QJson::deserialize(response, responseData));
+    }
 }
 
 void executeGet(
@@ -125,7 +139,9 @@ void executeGet(
     nx::network::http::BufferType response;
     ASSERT_NO_FATAL_FAILURE(doExecuteGet(url, &response, httpStatus));
     if (responseData)
+    {
         ASSERT_TRUE(QJson::deserialize(response, responseData));
+    }
 }
 
 void executeGet(

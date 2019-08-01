@@ -8,20 +8,29 @@ import { Component, EventEmitter, Input, OnInit, Output, SimpleChange, SimpleCha
 export class CamViewComponent implements OnInit {
 
   @Input() activeCamera: any;
-  private _activeCamera: any;
-  @Output()
-   public onCloseView: EventEmitter<any> = new EventEmitter<any>();
-  @Output()
-   public onFeedbackClick: EventEmitter<any> = new EventEmitter<any>();
+  // private _activeCamera: any;
+  @Output() public onCloseView: EventEmitter<any> = new EventEmitter<any>();
+  @Output() public onFeedbackClick: EventEmitter<any> = new EventEmitter<any>();
 
   constructor() { }
 
   ngOnInit() {
   }
 
-  ngOnChanges(changes: SimpleChanges) {
-    const activeCamera: SimpleChange = changes.activeCamera;
-    this._activeCamera = activeCamera.currentValue;
+  // ngOnChanges(changes: SimpleChanges) {
+  //     if (changes.activeCamera) {
+  //         this._activeCamera = changes.activeCamera.currentValue;
+  //     }
+  // }
+
+    sendFeedback() {
+        this.onFeedbackClick.emit(this.activeCamera);
+        return false;
+    }
+
+  closeView() {
+      this.activeCamera = undefined;
+      this.onCloseView.emit(this.activeCamera);
   }
 
   firmwarePercentage (count, total) {
@@ -31,8 +40,7 @@ export class CamViewComponent implements OnInit {
 
   firmwareLength (count, maxFirmware) {
       // Make sure we don't return 0
-      var pow = maxFirmware > 200 ? Math.log2(200) / Math.log2(maxFirmware) : 1;
+      const pow = maxFirmware > 200 ? Math.log2(200) / Math.log2(maxFirmware) : 1;
       return Math.round(100 * Math.pow(count / maxFirmware, pow));
-  };
-
+  }
 }

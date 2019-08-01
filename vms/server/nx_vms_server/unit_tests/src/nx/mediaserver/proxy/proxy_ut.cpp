@@ -26,10 +26,16 @@ enum class SslMode
 {
     noSsl,
     withSsl,
-    withSslAndRedirect //< Turn on encryption but send HTTP request to cause redirect on 1-st host.
+    withSslAndRedirect, //< Turn on encryption but send HTTP request to cause redirect on 1-st host.
 };
 
-class ProxyTest: public ::testing::TestWithParam<SslMode>
+struct TestMode
+{
+    SslMode sslMode;
+    bool useReverseConnect = false;
+};
+
+class ProxyTest: public ::testing::TestWithParam<TestMode>
 {
 public:
     ProxyTest()
@@ -51,6 +57,8 @@ public:
         {
             auto peer = std::make_unique<MediaServerLauncher>();
             peer->start();
+            NX_VERBOSE(this, "Server#%1 (%2) started on %3",
+                m_peers.size(), peer->commonModule()->moduleGUID(), peer->endpoint());
 
             auto settings = peer->serverModule()->globalSettings();
             settings->setTrafficEncriptionForced(sslMode != SslMode::noSsl);
@@ -60,10 +68,18 @@ public:
         }
     }
 
-    void connectPeers(SslMode sslMode)
+    void connectPeers(SslMode sslMode, bool reverseOrder)
     {
-        for (int i = 0; i < m_peers.size() - 1; ++i)
-            m_peers[i]->connectTo(m_peers[i + 1].get(), sslMode != SslMode::noSsl);
+        if (reverseOrder)
+        {
+            for (int i = 0; i < m_peers.size() - 1; ++i)
+                m_peers[i+1]->connectTo(m_peers[i].get(), sslMode != SslMode::noSsl);
+        }
+        else
+        {
+            for (int i = 0; i < m_peers.size() - 1; ++i)
+                m_peers[i]->connectTo(m_peers[i + 1].get(), sslMode != SslMode::noSsl);
+        }
     }
 
     nx::utils::Url serverUrl(int index, const QString& path, SslMode sslMode)
@@ -79,9 +95,9 @@ public:
 
 TEST_P(ProxyTest, proxyToAnotherThenToThemself)
 {
-    const SslMode sslMode = GetParam();
-    startPeers(3, sslMode);
-    connectPeers(sslMode);
+    const TestMode testMode = GetParam();
+    startPeers(3, testMode.sslMode);
+    connectPeers(testMode.sslMode, testMode.useReverseConnect);
 
     auto messageBus = m_peers[0]->serverModule()->ec2Connection()->messageBus();
     auto server2Id = m_peers[m_peers.size() - 1]->commonModule()->moduleGUID();
@@ -94,7 +110,7 @@ TEST_P(ProxyTest, proxyToAnotherThenToThemself)
 
     auto client = std::make_unique<nx::network::http::HttpClient>();
 
-    ASSERT_TRUE(client->doGet(serverUrl(0, "/api/moduleInformation", sslMode)));
+    ASSERT_TRUE(client->doGet(serverUrl(0, "/api/moduleInformation", testMode.sslMode)));
     ASSERT_TRUE(client->response());
     ASSERT_EQ(nx::network::http::StatusCode::ok, client->response()->statusLine.statusCode);
 
@@ -105,7 +121,11 @@ TEST_P(ProxyTest, proxyToAnotherThenToThemself)
         // Media server should proxy to itself if header is missing.
         if (i > 0)
             client->addAdditionalHeader(Qn::SERVER_GUID_HEADER_NAME, guid.toByteArray());
-        ASSERT_TRUE(client->doGet(serverUrl(0, "/api/moduleInformation", sslMode)));
+
+        const auto requestUrl =
+            serverUrl(0, "/api/moduleInformation", testMode.sslMode);
+        NX_VERBOSE(this, "Sending request %1 to server#%2", requestUrl, i);
+        ASSERT_TRUE(client->doGet(requestUrl));
         ASSERT_TRUE(client->response());
         ASSERT_EQ(nx::network::http::StatusCode::ok, client->response()->statusLine.statusCode);
 
@@ -121,12 +141,21 @@ TEST_P(ProxyTest, proxyToAnotherThenToThemself)
     int totalRequests = client->totalRequestsSent();
     int viaCurrentConnection = client->totalRequestsSentViaCurrentConnection();
 
-    if (sslMode != SslMode::withSslAndRedirect)
-        ASSERT_EQ(totalRequests, viaCurrentConnection);
+    if (testMode.sslMode != SslMode::withSslAndRedirect)
+    {
+        if (totalRequests == m_peers.size() + 1)
+            ASSERT_EQ(totalRequests, viaCurrentConnection);
+    }
 }
 
-INSTANTIATE_TEST_CASE_P(SslMode, ProxyTest,
-    ::testing::Values(SslMode::noSsl, SslMode::withSsl, SslMode::withSslAndRedirect));
+INSTANTIATE_TEST_CASE_P(TestMode, ProxyTest,
+    ::testing::Values(
+        TestMode{SslMode::noSsl},
+        TestMode{SslMode::withSsl},
+        TestMode{SslMode::withSslAndRedirect},
+        TestMode{SslMode::noSsl, /*reverseConnect*/ true},
+        TestMode{SslMode::withSsl, /*reverseConnect*/ true},
+        TestMode{SslMode::withSslAndRedirect, /*reverseConnect*/ true}));
 
 } // namespace test
 } // namespace proxy

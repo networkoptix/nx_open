@@ -233,10 +233,6 @@ to view more bookmarks</source>
       <translation>שמור תצוגת קיר וידאו</translation>
     </message>
     <message>
-      <source>Drop Resources</source>
-      <translation>שחרר משאבים</translation>
-    </message>
-    <message>
       <source>Start Screen Recording</source>
       <translation>התחל הקלטת מסך</translation>
     </message>
@@ -2639,18 +2635,7 @@ to %1</source>
     </message>
     <message>
       <source>Internal server error. Please try again later.</source>
-      <translation type="unfinished">Internal server error. Please try again later.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnConnectToCurrentSystemTool</name>
-    <message>
-      <source>Configuring Server</source>
-      <translation>מגדיר שרת/ים</translation>
-    </message>
-    <message>
-      <source>Updating Server</source>
-      <translation>מעדכן שרת/ים</translation>
+      <translation>שגיאת שרת, אנא נסה שוב מאוחר יותר.</translation>
     </message>
   </context>
   <context>
@@ -2957,10 +2942,6 @@ to %1</source>
     <message>
       <source>44.1 kHz and 48 kHz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
       <translation>תבניות שמע 44.1kHz ו- 48kHz אינן נתמכות על-ידי התקן לכידת שמע. בחר התקן שמע אחר או &quot;ללא&quot; בהגדרות הקלטת המסך.</translation>
-    </message>
-    <message>
-      <source>Configured codec: %1 not found, h263p will used</source>
-      <translation>קידוד מוגדר: %1 לא נמצא, ייעשה שימוש ב- h263p</translation>
     </message>
   </context>
   <context>
@@ -3280,6 +3261,17 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnGLCheckerInstrument</name>
+    <message>
+      <source>Video card drivers are outdated or not installed</source>
+      <translation>מנהלי כרטיס המסך מיושנים או שאינם מותקנים</translation>
+    </message>
+    <message>
+      <source>%1 may not work properly.</source>
+      <translation>ייתכן ש- %1 לא יפעל כראוי.</translation>
+    </message>
+  </context>
+  <context>
     <name>QnGeneralPreferencesWidget</name>
     <message>
       <source>Select folder...</source>
@@ -3288,6 +3280,14 @@ to %1</source>
     <message>
       <source>Folder already added</source>
       <translation>התיקייה כבר נוספה</translation>
+    </message>
+    <message>
+      <source>None</source>
+      <translation>ללא</translation>
+    </message>
+    <message>
+      <source>Auto (%1)</source>
+      <translation type="unfinished">Auto (%1)</translation>
     </message>
   </context>
   <context>
@@ -3355,17 +3355,6 @@ to %1</source>
     <message>
       <source>Creates a backup of System configuration that can be restored in case of failure.</source>
       <translation>יוצר גיבוי של תצורת המערכת שניתן לשחזר במקרה של כשל.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnGlHardwareChecker</name>
-    <message>
-      <source>Video card drivers are outdated or not installed</source>
-      <translation>מנהלי כרטיס המסך מיושנים או שאינם מותקנים</translation>
-    </message>
-    <message>
-      <source>%1 may not work properly.</source>
-      <translation>ייתכן ש- %1 לא יפעל כראוי.</translation>
     </message>
   </context>
   <context>
@@ -3666,8 +3655,8 @@ to %1</source>
       </translation>
     </message>
     <message>
-      <source>Qty</source>
-      <translation>כמות</translation>
+      <source>Channels</source>
+      <translation type="unfinished">Channels</translation>
     </message>
   </context>
   <context>
@@ -5234,6 +5223,10 @@ to %1</source>
       <source>Server Web Page</source>
       <translation>דף אינטרנט של השרת</translation>
     </message>
+    <message>
+      <source>Plugins</source>
+      <translation type="unfinished">Plugins</translation>
+    </message>
   </context>
   <context>
     <name>QnServerSettingsWidget</name>
@@ -5272,222 +5265,6 @@ to %1</source>
     <message>
       <source>Servers with failover enabled will automatically take cameras from offline servers.</source>
       <translation>שרתים עם כשל מופעלים באופן אוטומטי לקחת מצלמות משרתים לא מקוונים.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnServerUpdatesModel</name>
-    <message>
-      <source>Server</source>
-      <translation>שרת</translation>
-    </message>
-    <message>
-      <source>Status</source>
-      <translation>מצב</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnServerUpdatesWidget</name>
-    <message>
-      <source>Select Update File...</source>
-      <translation>בחר קובץ עדכון...</translation>
-    </message>
-    <message>
-      <source>Release notes</source>
-      <translation>הערות מוצר</translation>
-    </message>
-    <message>
-      <source>You will have to update the client manually using an installer.</source>
-      <translation>עליך לעדכן את הקליינט ידנית על ידי שימוש במנהל התקנה.</translation>
-    </message>
-    <message>
-      <source>Cannot update from this file.</source>
-      <translation>לא ניתן לעדכן מקובץ זה.</translation>
-    </message>
-    <message>
-      <source>Latest Available Update</source>
-      <translation>העדכון האחרון הזמין</translation>
-    </message>
-    <message>
-      <source>Download the Latest Version Update File</source>
-      <translation>הורד את הקובץ עדכון הגרסה העדכנית ביותר</translation>
-    </message>
-    <message>
-      <source>Selected Version</source>
-      <translation>הגירסה שנבחרה</translation>
-    </message>
-    <message>
-      <source>Download Update File</source>
-      <translation>הורד קובץ עדכון</translation>
-    </message>
-    <message>
-      <source>Browse for Update File...</source>
-      <translation>אתר קובץ עדכון...</translation>
-    </message>
-    <message>
-      <source>Selected Update File</source>
-      <translation>קובץ העדכון שנבחר</translation>
-    </message>
-    <message>
-      <source>Download in External Browser</source>
-      <translation>הורדה בדפדפן חיצוני</translation>
-    </message>
-    <message>
-      <source>Copy Link to Clipboard</source>
-      <translation>העתק קישור ללוח</translation>
-    </message>
-    <message>
-      <source>Unable to check updates on the Internet.</source>
-      <translation>אין אפשרות לבדוק עדכונים באינטרנט.</translation>
-    </message>
-    <message>
-      <source>Unknown build number.</source>
-      <translation>מספר Build לא ידוע.</translation>
-    </message>
-    <message>
-      <source>Downgrade to an earlier version is prohibited.</source>
-      <translation>שנמוך לגירסה מוקדמת אסורה.</translation>
-    </message>
-    <message>
-      <source>Updates for one or more servers were not found.</source>
-      <translation>עדכונים עבור שרת אחד או יותר לא נמצאו.</translation>
-    </message>
-    <message>
-      <source>Client update was not found.</source>
-      <translation>עדכון לקוח לא נמצא.</translation>
-    </message>
-    <message>
-      <source>Unable to extract update file. No free space left on the disk.</source>
-      <translation>אין אפשרות לחלץ קובץ העדכון. לא נותר על הדיסק שטח פנוי.</translation>
-    </message>
-    <message>
-      <source>Update Finished...</source>
-      <translation>העדכון הסתיים...</translation>
-    </message>
-    <message>
-      <source>Checking for updates...</source>
-      <translation>בודק עדכונים...</translation>
-    </message>
-    <message>
-      <source>Downloading updates...</source>
-      <translation>מוריד עדכונים...</translation>
-    </message>
-    <message>
-      <source>Installing client update...</source>
-      <translation>התקנת עדכון הלקוח...</translation>
-    </message>
-    <message>
-      <source>Installing updates to incompatible servers...</source>
-      <translation>מתקין עדכונים לשרתים לא תואמים...</translation>
-    </message>
-    <message>
-      <source>Pushing updates to servers...</source>
-      <translation>טוען עדכונים לשרתים...</translation>
-    </message>
-    <message>
-      <source>Installing updates...</source>
-      <translation>מתקין עדכונים...</translation>
-    </message>
-    <message>
-      <source>Specific Build...</source>
-      <translation>Bulid ספציפי...</translation>
-    </message>
-    <message>
-      <source>Update to Specific Build</source>
-      <translation>עדכון לגרסה ספציפית</translation>
-    </message>
-    <message>
-      <source>Update System</source>
-      <translation>עדכון מערכת</translation>
-    </message>
-    <message>
-      <source>System update in process</source>
-      <translation>בתהליך עדכון המערכת</translation>
-    </message>
-    <message>
-      <source>Cancel Update</source>
-      <translation>בטל עדכון</translation>
-    </message>
-    <message>
-      <source>Continue in Background</source>
-      <translation>המשך ברקע</translation>
-    </message>
-    <message numerus="yes">
-      <source>Not enough free space at %n Servers:</source>
-      <translation>
-        <numerusform>אין מספיק מקום פנוי ב- %n שרתים:</numerusform>
-        <numerusform>אין מספיק מקום פנוי ב- %n שרתים:</numerusform>
-        <numerusform>אין מספיק מקום פנוי ב- %n שרתים:</numerusform>
-        <numerusform>אין מספיק מקום פנוי ב- %n שרתים:</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Attempt to update may fail or cause Server malfunction.</source>
-      <translation>ניסיון לעדכן עלול להיכשל או לגרום לתקלה בשרת.</translation>
-    </message>
-    <message>
-      <source>Force Update</source>
-      <translation>כפה עדכון</translation>
-    </message>
-    <message>
-      <source>Server update completed</source>
-      <translation>עדכון השרת הושלם</translation>
-    </message>
-    <message>
-      <source>Update completed</source>
-      <translation>העדכון הושלם</translation>
-    </message>
-    <message>
-      <source>Update canceled</source>
-      <translation>העדכון בוטל</translation>
-    </message>
-    <message>
-      <source>All Servers already updated</source>
-      <translation>כל השרתים כבר מעודכנים</translation>
-    </message>
-    <message>
-      <source>Update failed</source>
-      <translation>עידכון נכשל</translation>
-    </message>
-    <message>
-      <source>Please update %1 manually using an installation package.</source>
-      <translation>אנא עדכן את %1 ידנית באמצעות חבילת התקנה.</translation>
-    </message>
-    <message>
-      <source>%1 will be restarted to the updated version.</source>
-      <translation>%1 יופעל מחדש לגרסה המעודכנת.</translation>
-    </message>
-    <message>
-      <source>Update cannot be canceled at this stage</source>
-      <translation>בשלב זה לא ניתן לבטל את העדכון</translation>
-    </message>
-    <message>
-      <source>Please wait until it is finished.</source>
-      <translation>המתן עד לסיום התהליך.</translation>
-    </message>
-    <message>
-      <source>All components in your System are up to date.</source>
-      <translation>כל הרכיבים במערכת שלך מעודכנים.</translation>
-    </message>
-    <message>
-      <source>All components in your System are up to this version.</source>
-      <translation>כל הרכיבים במערכת מעודכנים עד לגירסה זו.</translation>
-    </message>
-    <message>
-      <source>Incompatible %1 instance. To update disconnect System from %1 first.</source>
-      <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation>מופע לא תואם %1. כדי לעדכן נתק את המערכת מ- %1 תחילה.</translation>
-    </message>
-    <message>
-      <source>Update Files</source>
-      <translation>עדכון קבצים</translation>
-    </message>
-    <message>
-      <source>Validating the update...</source>
-      <translation>מאמת את העדכון...</translation>
-    </message>
-    <message>
-      <source>Checking for free space...</source>
-      <translation>בודק מקום פנוי...</translation>
     </message>
   </context>
   <context>
@@ -5922,16 +5699,30 @@ to %1</source>
       <translation>הגיבוי הושלם</translation>
     </message>
     <message>
-      <source>Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</source>
-      <translation>ההקלטה לאחסון המושבת תיפסק. עם זאת, מחיקת צילומים מיושנים ממנו תמשיך.</translation>
-    </message>
-    <message>
-      <source>Recording was enabled on the USB storage</source>
-      <translation>ההקלטה אופשרה באחסון ה- USB</translation>
-    </message>
-    <message>
       <source>Reindexing can fix problems with archive or backup if they have been lost or damaged, or if some hardware has been replaced.</source>
       <translation>Reindexing יכול לתקן בעיות עם ארכיון או גיבוי אם הם אבדו או ניזוקו, או אם כמה חומרה הוחלף.</translation>
+    </message>
+    <message>
+      <source>What to do with current analytics data?</source>
+      <translation type="unfinished">What to do with current analytics data?</translation>
+    </message>
+    <message>
+      <source>Current analytics data will not be automatically moved to another location and will become unaccessible. You can keep it and manually move later, or delete permanently.
+If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
+      <translation type="unfinished">Current analytics data will not be automatically moved to another location and will become unaccessible. You can keep it and manually move later, or delete permanently.
+If you intended to move analytics data to another storage location, please contact support before proceeding.</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>מחק</translation>
+    </message>
+    <message>
+      <source>Keep</source>
+      <translation>שמור</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>ביטול</translation>
     </message>
   </context>
   <context>
@@ -5979,6 +5770,14 @@ to %1</source>
     <message>
       <source>Too small and system partitions are reserved and not used for writing if there is enough other storage space available.</source>
       <translation>מחיצות קטנות מדי ומחיצות מערכת שמורות ולא משמשות לכתיבה אם יש מספיק שטח אחסון זמין.</translation>
+    </message>
+    <message>
+      <source>Use to store analytics data</source>
+      <translation type="unfinished">Use to store analytics data</translation>
+    </message>
+    <message>
+      <source>Stores analytics data</source>
+      <translation type="unfinished">Stores analytics data</translation>
     </message>
   </context>
   <context>
@@ -6066,8 +5865,8 @@ to %1</source>
       <translation>משתמשים</translation>
     </message>
     <message>
-      <source>Analytics</source>
-      <translation>Analytics</translation>
+      <source>Plugins</source>
+      <translation type="unfinished">Plugins</translation>
     </message>
   </context>
   <context>
@@ -6173,10 +5972,6 @@ to %1</source>
       <translation>סינכרון הארכיון מרחוק מתבצע</translation>
     </message>
     <message>
-      <source>Error occured during remote archive synchronization</source>
-      <translation>אירעה שגיאה במהלך סנכרון ארכיון מרוחק</translation>
-    </message>
-    <message>
       <source>Remote archive synchronization has been started for the following device:</source>
       <translation>סינכרון הארכיון מרחוק מופעל עבור ההתקן הבא:</translation>
     </message>
@@ -6226,17 +6021,13 @@ to %1</source>
       <source>The System is running in safe mode.</source>
       <translation>המערכת פועלת במצב בטוח.</translation>
     </message>
+    <message>
+      <source>Error occurred during remote archive synchronization</source>
+      <translation type="unfinished">Error occurred during remote archive synchronization</translation>
+    </message>
   </context>
   <context>
     <name>QnSystemSettingsWidget</name>
-    <message>
-      <source>Enable devices and servers auto discovery</source>
-      <translation>אפשר גילוי אוטומטי של התקנים ושרתים</translation>
-    </message>
-    <message>
-      <source>Enable cameras and servers auto discovery</source>
-      <translation>אפשר גילוי אוטומטי של מצלמות ושרתים</translation>
-    </message>
     <message>
       <source>Allow System to optimize device settings</source>
       <translation>אפשר למערכת לשפר את הגדרות ההתקן</translation>
@@ -6252,6 +6043,22 @@ to %1</source>
     <message>
       <source>Does not include any personal information and is completely anonymous.</source>
       <translation>אינו כולל מידע אישי והוא אנונימי לחלוטין.</translation>
+    </message>
+    <message>
+      <source>Failover server measures may still request camera status updates regardless of this setting.</source>
+      <translation type="unfinished">Failover server measures may still request camera status updates regardless of this setting.</translation>
+    </message>
+    <message>
+      <source>Enable devices and servers autodiscovery and automated device status check</source>
+      <translation type="unfinished">Enable devices and servers autodiscovery and automated device status check</translation>
+    </message>
+    <message>
+      <source>Enable cameras and servers autodiscovery and automated camera status check</source>
+      <translation type="unfinished">Enable cameras and servers autodiscovery and automated camera status check</translation>
+    </message>
+    <message>
+      <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
+      <translation type="unfinished">When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</translation>
     </message>
   </context>
   <context>
@@ -6335,94 +6142,6 @@ to %1</source>
     <message>
       <source>Hold to Speak</source>
       <translation>לחץ לדיבור</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnUpdateResult</name>
-    <message>
-      <source>Update has been successfully finished.</source>
-      <translation>העדכון בוצע בהצלחה.</translation>
-    </message>
-    <message>
-      <source>Update has been cancelled.</source>
-      <translation>העדכון בוטל.</translation>
-    </message>
-    <message>
-      <source>Another user has already started an update.</source>
-      <translation>משתמש אחר כבר החל בעדכון.</translation>
-    </message>
-    <message>
-      <source>All servers are already updated.</source>
-      <translation>כל השרתים כבר מעודכנים.</translation>
-    </message>
-    <message>
-      <source>Could not download updates.</source>
-      <translation>הורדת העדכונים נכשלה.</translation>
-    </message>
-    <message>
-      <source>No free space left on the disk.</source>
-      <translation>לא נותר מקום פנוי בדיסק הקשיח.</translation>
-    </message>
-    <message>
-      <source>Could not push updates to servers.</source>
-      <translation>לא ניתן להעלות עדכונים לשרת.</translation>
-    </message>
-    <message numerus="yes">
-      <source>The problem is caused by %n servers:</source>
-      <translation>
-        <numerusform>הבעיה נגרמה על ידי שרת %n:</numerusform>
-        <numerusform>הבעיה נגרמה על ידי %n שרתים:</numerusform>
-        <numerusform>הבעיה נגרמה על ידי %n שרתים:</numerusform>
-        <numerusform>הבעיה נגרמה על ידי %n שרתים:</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>No free space left on %n servers:</source>
-      <translation>
-        <numerusform>לא נותר מקום פנוי על שרת %n:</numerusform>
-        <numerusform>לא נותר מקום פנוי על %n שרתים:</numerusform>
-        <numerusform>לא נותר מקום פנוי על %n שרתים:</numerusform>
-        <numerusform>לא נותר מקום פנוי על %n שרתים:</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n servers are not responding:</source>
-      <translation>
-        <numerusform>שרת %n איננו מגיב:</numerusform>
-        <numerusform>%n שרתים אינם מגיבים:</numerusform>
-        <numerusform>%n שרתים אינם מגיבים:</numerusform>
-        <numerusform>%n שרתים אינם מגיבים:</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n servers have gone offline:</source>
-      <translation>
-        <numerusform>שרת %n איננו מקוון:</numerusform>
-        <numerusform>%n שרתים אינם מקוונים:</numerusform>
-        <numerusform>%n שרתים אינם מקוונים:</numerusform>
-        <numerusform>%n שרתים אינם מקוונים:</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Authentication failed for %n servers:</source>
-      <translation>
-        <numerusform>אימות נכשל עבור %n שרת:</numerusform>
-        <numerusform>אימות נכשל עבור %n שרתים:</numerusform>
-        <numerusform>אימות נכשל עבור %n שרתים:</numerusform>
-        <numerusform>אימות נכשל עבור %n שרתים:</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Could not install an update to the client.</source>
-      <translation>התקנת העדכון לקליינט נכשלה.</translation>
-    </message>
-    <message>
-      <source>Could not install updates on one or more servers.</source>
-      <translation>התקנת עדכונים לשרת אחד או יותר נכשלה.</translation>
-    </message>
-    <message>
-      <source>Update has been cancelled silently.</source>
-      <translation>העדכון בוטל בשקט.</translation>
     </message>
   </context>
   <context>
@@ -6882,25 +6601,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnWorkbenchContext</name>
-    <message>
-      <source>Please review and agree to the %1 in order to proceed</source>
-      <translation>נא לעיין ולהסכים ל %1 בכדי להמשיך</translation>
-    </message>
-    <message>
-      <source>To use the software you must agree with the end user license agreement</source>
-      <translation>כדי להשתמש בתוכנה עליך לקבל את הסכם הרישיון למשתמש קצה</translation>
-    </message>
-    <message>
-      <source>I Agree</source>
-      <translation>אני מסכים</translation>
-    </message>
-    <message>
-      <source>I Do Not Agree</source>
-      <translation>אני לא מסכים</translation>
-    </message>
-  </context>
-  <context>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
     <message>
       <source>Systems will be merged shortly</source>
@@ -6909,10 +6609,6 @@ to %1</source>
     <message>
       <source>Servers from the other System will appear in the resource tree.</source>
       <translation>שרתים מהמערכת השנייה יופיעו בעץ המשאבים.</translation>
-    </message>
-    <message>
-      <source>Failed to update Server</source>
-      <translation>עדכון השרת נכשל</translation>
     </message>
     <message>
       <source>Total amount of licenses will decrease</source>
@@ -6945,15 +6641,15 @@ to %1</source>
     </message>
     <message>
       <source>%1 has been successfully configured.</source>
-      <translation type="unfinished">%1 has been successfully configured.</translation>
+      <translation>%1 הוגדר בהצלחה.</translation>
     </message>
     <message>
       <source>To complete the process, please connect to it with Client and update to version %1.</source>
-      <translation type="unfinished">To complete the process, please connect to it with Client and update to version %1.</translation>
+      <translation>כדי להשלים את התהליך, התחבר אליו עם תוכנת הלקוח ועדכן לגרסה %1.</translation>
     </message>
     <message>
       <source>Failed to merge %1 to our system.</source>
-      <translation type="unfinished">Failed to merge %1 to our system.</translation>
+      <translation>מיזוג של %1 למערכת נכשל.</translation>
     </message>
   </context>
   <context>
@@ -7089,29 +6785,6 @@ to %1</source>
     <message>
       <source>JPEG Image</source>
       <translation>קובץ JPEG</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnWorkbenchUpdateWatcher</name>
-    <message>
-      <source>Release Notes</source>
-      <translation>הערות מוצר</translation>
-    </message>
-    <message>
-      <source>%1 version available</source>
-      <translation>גרסה %1 זמינה</translation>
-    </message>
-    <message>
-      <source>Major issues have been fixed. Update is strongly recommended.</source>
-      <translation>תקלות חשובות תוקנו. העדכון מומלץ מאוד.</translation>
-    </message>
-    <message>
-      <source>Update...</source>
-      <translation>עדכן...</translation>
-    </message>
-    <message>
-      <source>Do not notify again about this update</source>
-      <translation>אל תודיע שוב על עדכון זה</translation>
     </message>
   </context>
   <context>
@@ -7638,6 +7311,17 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>SessionExpiredDialog</name>
+    <message>
+      <source>Your session has expired</source>
+      <translation type="unfinished">Your session has expired</translation>
+    </message>
+    <message>
+      <source>Session duration limit can be changed by the system administrators</source>
+      <translation type="unfinished">Session duration limit can be changed by the system administrators</translation>
+    </message>
+  </context>
+  <context>
     <name>StreamQualityStrings</name>
     <message>
       <source>Lowest</source>
@@ -7843,6 +7527,14 @@ to %1</source>
       <source>Show Only with &quot;Objects&quot; Tab</source>
       <translation>הצג רק עם לשונית &quot;אובייקטים&quot;</translation>
     </message>
+    <message>
+      <source>Show</source>
+      <translation>הצג</translation>
+    </message>
+    <message>
+      <source>Do Not Show</source>
+      <translation type="unfinished">Do Not Show</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::AnalyticsSearchListModel::Private</name>
@@ -7997,10 +7689,6 @@ to %1</source>
       <translation>מקורי</translation>
     </message>
     <message>
-      <source>Server will not change any cameras settings, it will receive and use camera stream as-is. </source>
-      <translation>השרת לא ישנה הגדרות מצלמה, השרת ישתמש בזרם המצלמה כפי שהוא. </translation>
-    </message>
-    <message>
       <source>Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</source>
       <translation>מסייע לתקן בעיות באיכות תמונה בכמה מצלמות; עבור מצלמות אחרות עלול לגרום יגרום לעלייה משמעותית בBITRATE.</translation>
     </message>
@@ -8026,6 +7714,14 @@ to %1</source>
         <numerusform>קוד זיהוי זה כבר בשימוש ב %n מצלמות אחרות:</numerusform>
         <numerusform>קוד זיהוי זה כבר בשימוש ב %n מצלמות אחרות:</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Server will not change any cameras settings, it will receive and use camera stream as-is.</source>
+      <translation>השרת לא ישנה הגדרות מצלמה, השרת ישתמש בזרם המצלמה כפי שהוא.</translation>
+    </message>
+    <message>
+      <source>Multicast</source>
+      <translation type="unfinished">Multicast</translation>
     </message>
   </context>
   <context>
@@ -8172,10 +7868,6 @@ to %1</source>
       <translation>דף אינטרנט</translation>
     </message>
     <message>
-      <source>Analytics</source>
-      <translation>Analytics</translation>
-    </message>
-    <message>
       <source>Expert</source>
       <translation>מומחה</translation>
     </message>
@@ -8233,6 +7925,10 @@ to %1</source>
     <message>
       <source>I/O Modules Settings</source>
       <translation>הגדרות מודולי קלט/פלט</translation>
+    </message>
+    <message>
+      <source>Plugins</source>
+      <translation type="unfinished">Plugins</translation>
     </message>
   </context>
   <context>
@@ -8307,16 +8003,16 @@ to %1</source>
       <translation>חבילת עדכון אינה תקינה.</translation>
     </message>
     <message>
-      <source>Not enough space on disk to install client update.</source>
-      <translation>אין מספיק מקום בדיסק כדי להתקין את עדכון הלקוח.</translation>
-    </message>
-    <message>
-      <source>Install package has been lost.</source>
-      <translation>חבילת ההתקנה אבדה.</translation>
-    </message>
-    <message>
       <source>Internal error.</source>
       <translation>שגיאה פנימית.</translation>
+    </message>
+    <message>
+      <source>Not enough space on disk to install the client update.</source>
+      <translation type="unfinished">Not enough space on disk to install the client update.</translation>
+    </message>
+    <message>
+      <source>Installation package has been lost.</source>
+      <translation type="unfinished">Installation package has been lost.</translation>
     </message>
   </context>
   <context>
@@ -8348,6 +8044,17 @@ to %1</source>
       <source>Pasted</source>
       <comment>from Clipboard</comment>
       <translation>הודבק</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ConnectToCurrentSystemTool</name>
+    <message>
+      <source>Configuring Server</source>
+      <translation>מגדיר שרת/ים</translation>
+    </message>
+    <message>
+      <source>Updating Server</source>
+      <translation>מעדכן שרת/ים</translation>
     </message>
   </context>
   <context>
@@ -8472,6 +8179,17 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::EulaDialog</name>
+    <message>
+      <source>Please review and agree to the %1 in order to proceed</source>
+      <translation>נא לעיין ולהסכים ל %1 בכדי להמשיך</translation>
+    </message>
+    <message>
+      <source>To use the software you must agree with the end user license agreement</source>
+      <translation>כדי להשתמש בתוכנה עליך לקבל את הסכם הרישיון למשתמש קצה</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::EventPanel::Private</name>
     <message>
       <source>Notifications</source>
@@ -8541,10 +8259,6 @@ to %1</source>
       <source>No events</source>
       <translation>אין אירועים</translation>
     </message>
-    <message>
-      <source>No events occured</source>
-      <translation>לא הוקלטו אירועים</translation>
-    </message>
     <message numerus="yes">
       <source>%n events</source>
       <translation>
@@ -8557,6 +8271,10 @@ to %1</source>
     <message>
       <source>unnamed analytics engine</source>
       <translation>מנוע אנליטיקה ללא שם</translation>
+    </message>
+    <message>
+      <source>No events occurred</source>
+      <translation type="unfinished">No events occurred</translation>
     </message>
   </context>
   <context>
@@ -9063,30 +8781,6 @@ to %1</source>
       <translation>חלק מהשרתים אינם מקוונים ולא יעודכנו. לדלג עליהם?</translation>
     </message>
     <message>
-      <source>Ready to install client updates</source>
-      <translation>מוכן להתקנת עדכוני לקוח</translation>
-    </message>
-    <message>
-      <source>Install now</source>
-      <translation>התקן עכשיו</translation>
-    </message>
-    <message>
-      <source>Later</source>
-      <translation>מאוחר יותר</translation>
-    </message>
-    <message>
-      <source>Updates downloaded</source>
-      <translation>עדכונים הורדו</translation>
-    </message>
-    <message>
-      <source>Failed to download update packages</source>
-      <translation>הורדת חבילות העדכון נכשלה</translation>
-    </message>
-    <message>
-      <source>Please make sure there is enough free storage space and network connection is stable.</source>
-      <translation>ודא שיש מספיק שטח אחסון פנוי וחיבור הרשת יציב.</translation>
-    </message>
-    <message>
       <source>If the problem persists, please contact Customer Support.</source>
       <translation>אם הבעיה נמשכת, פנה אל שירות הלקוחות.</translation>
     </message>
@@ -9099,20 +8793,8 @@ to %1</source>
       <translation>בטל עדכון</translation>
     </message>
     <message>
-      <source>Failed to download update packages to some servers</source>
-      <translation>הורדת חבילות העדכון לשרתים מסוימים נכשלה</translation>
-    </message>
-    <message>
-      <source>Please make sure they have enough free storage space and stable network connection.</source>
-      <translation>ודא שיש מספיק שטח אחסון פנוי וחיבור הרשת יציב.</translation>
-    </message>
-    <message>
       <source>Update completed</source>
       <translation>העדכון הושלם</translation>
-    </message>
-    <message>
-      <source>Update completed, but some servers have failed an update</source>
-      <translation>העדכון הושלם, אך חלק מהשרתים נכשלו בעדכון</translation>
     </message>
     <message>
       <source>Nx Witness Client will be restarted to the updated version.</source>
@@ -9123,16 +8805,8 @@ to %1</source>
       <translation>אישור</translation>
     </message>
     <message>
-      <source>Failed to install updates to servers:</source>
-      <translation>התקנת עדכונים נכשלה לשרתים:</translation>
-    </message>
-    <message>
       <source>Downloading updates...</source>
       <translation>מוריד עדכונים...</translation>
-    </message>
-    <message>
-      <source>Pushing updates...</source>
-      <translation>מתקין עדכונים...</translation>
     </message>
     <message>
       <source>Upload</source>
@@ -9249,7 +8923,67 @@ to %1</source>
     </message>
     <message>
       <source>There are no online servers to update.</source>
-      <translation type="unfinished">There are no online servers to update.</translation>
+      <translation>אין שרתים מקוונים לעדכון.</translation>
+    </message>
+    <message>
+      <source>Some servers haven&apos;t completed update process. Finish it anyway?</source>
+      <translation type="unfinished">Some servers haven&apos;t completed update process. Finish it anyway?</translation>
+    </message>
+    <message>
+      <source>Cancel update and delete all downloaded data?</source>
+      <translation type="unfinished">Cancel update and delete all downloaded data?</translation>
+    </message>
+    <message>
+      <source>There was an error while installing updates:</source>
+      <translation type="unfinished">There was an error while installing updates:</translation>
+    </message>
+    <message>
+      <source>Some servers have gone offline. Please wait until they become online to continue.</source>
+      <translation type="unfinished">Some servers have gone offline. Please wait until they become online to continue.</translation>
+    </message>
+    <message>
+      <source>Update completed, but some components have failed an update</source>
+      <translation type="unfinished">Update completed, but some components have failed an update</translation>
+    </message>
+    <message>
+      <source>Please update %1 manually using an installation package.</source>
+      <translation>אנא עדכן את %1 ידנית באמצעות חבילת התקנה.</translation>
+    </message>
+    <message>
+      <source>%1 will be restarted to the updated version.</source>
+      <translation>%1 יופעל מחדש לגרסה המעודכנת.</translation>
+    </message>
+    <message>
+      <source>Failed to download update packages to some components</source>
+      <translation type="unfinished">Failed to download update packages to some components</translation>
+    </message>
+    <message>
+      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
+      <translation type="unfinished">OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</translation>
+    </message>
+    <message>
+      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
+      <translation type="unfinished">OS version of the client is no longer supported. Please update its OS to a supported version.</translation>
+    </message>
+    <message>
+      <source>Failed to start update</source>
+      <translation type="unfinished">Failed to start update</translation>
+    </message>
+    <message>
+      <source>Starting update to ...</source>
+      <translation type="unfinished">Starting update to ...</translation>
+    </message>
+    <message>
+      <source>Some servers have no package available</source>
+      <translation type="unfinished">Some servers have no package available</translation>
+    </message>
+    <message>
+      <source>Failed to cancel update</source>
+      <translation type="unfinished">Failed to cancel update</translation>
+    </message>
+    <message>
+      <source>Failed to start installation</source>
+      <translation type="unfinished">Failed to start installation</translation>
     </message>
   </context>
   <context>
@@ -9278,6 +9012,26 @@ to %1</source>
       <source>Acknowledge</source>
       <translation>אשר</translation>
     </message>
+    <message>
+      <source>Generic Event</source>
+      <translation>אירוע כללי</translation>
+    </message>
+    <message>
+      <source>Device was disconnected</source>
+      <translation type="unfinished">Device was disconnected</translation>
+    </message>
+    <message>
+      <source>Camera was disconnected</source>
+      <translation type="unfinished">Camera was disconnected</translation>
+    </message>
+    <message>
+      <source>I/O Module was disconnected</source>
+      <translation type="unfinished">I/O Module was disconnected</translation>
+    </message>
+    <message>
+      <source>Unknown Plugin Diagnostic Event</source>
+      <translation type="unfinished">Unknown Plugin Diagnostic Event</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::NotificationListWidget::Private</name>
@@ -9297,10 +9051,6 @@ to %1</source>
       <translation>לאף אחד מהמשתמשים שנבחרו אין גישה לפריסה שנבחרה. הפעולה לא תעבוד.</translation>
     </message>
     <message>
-      <source>Local layouts can only be shown to their owners. </source>
-      <translation>פריסות מקומיות יכולות להופיע רק לבעלים שלהן. </translation>
-    </message>
-    <message>
       <source>Select layout...</source>
       <translation>בחר פריסה...</translation>
     </message>
@@ -9315,6 +9065,105 @@ to %1</source>
     <message>
       <source>None of selected user roles contain users. Action will not work.</source>
       <translation>אף אחד מהתפקידים שנבחרו אינו מכיל משתמשים. הפעולה לא תעבוד.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::PeerStateTracker</name>
+    <message>
+      <source>The server is taking too long to respond</source>
+      <translation type="unfinished">The server is taking too long to respond</translation>
+    </message>
+    <message>
+      <source>No update task</source>
+      <translation type="unfinished">No update task</translation>
+    </message>
+    <message>
+      <source>Ready to download update</source>
+      <translation type="unfinished">Ready to download update</translation>
+    </message>
+    <message>
+      <source>Downloading update</source>
+      <translation type="unfinished">Downloading update</translation>
+    </message>
+    <message>
+      <source>Ready to restart to the new version</source>
+      <translation type="unfinished">Ready to restart to the new version</translation>
+    </message>
+    <message>
+      <source>Installing update</source>
+      <translation type="unfinished">Installing update</translation>
+    </message>
+    <message>
+      <source>Installed</source>
+      <translation>מותקן</translation>
+    </message>
+    <message>
+      <source>Failed to download update</source>
+      <translation type="unfinished">Failed to download update</translation>
+    </message>
+    <message>
+      <source>Failed to install update</source>
+      <translation type="unfinished">Failed to install update</translation>
+    </message>
+    <message>
+      <source>Waiting for peer data</source>
+      <translation type="unfinished">Waiting for peer data</translation>
+    </message>
+    <message>
+      <source>There is not enough space to download update files.</source>
+      <translation type="unfinished">There is not enough space to download update files.</translation>
+    </message>
+    <message>
+      <source>There is not enough space to extract update files.</source>
+      <translation type="unfinished">There is not enough space to extract update files.</translation>
+    </message>
+    <message>
+      <source>Failed to download update packages.</source>
+      <translation type="unfinished">Failed to download update packages.</translation>
+    </message>
+    <message>
+      <source>Update contents are invalid.</source>
+      <translation type="unfinished">Update contents are invalid.</translation>
+    </message>
+    <message>
+      <source>Update archive is corrupted.</source>
+      <translation type="unfinished">Update archive is corrupted.</translation>
+    </message>
+    <message>
+      <source>Update files cannot be extracted.</source>
+      <translation type="unfinished">Update files cannot be extracted.</translation>
+    </message>
+    <message>
+      <source>Internal downloader error.</source>
+      <translation type="unfinished">Internal downloader error.</translation>
+    </message>
+    <message>
+      <source>Internal client error.</source>
+      <translation type="unfinished">Internal client error.</translation>
+    </message>
+    <message>
+      <source>Unknown error.</source>
+      <translation>שגיאה לא ידועה.</translation>
+    </message>
+    <message>
+      <source>Unexpected error code.</source>
+      <translation type="unfinished">Unexpected error code.</translation>
+    </message>
+    <message>
+      <source>Ready to install update</source>
+      <translation type="unfinished">Ready to install update</translation>
+    </message>
+    <message>
+      <source>Update package is not found.</source>
+      <translation type="unfinished">Update package is not found.</translation>
+    </message>
+    <message>
+      <source>There is not enough space to install update.</source>
+      <translation type="unfinished">There is not enough space to install update.</translation>
+    </message>
+    <message>
+      <source>Internal server error.</source>
+      <translation type="unfinished">Internal server error.</translation>
     </message>
   </context>
   <context>
@@ -9461,16 +9310,79 @@ to %1</source>
       <translation>עוקב ומבצע את כל פעולות המשתמש.</translation>
     </message>
     <message>
-      <source>User will be automatically logged out after this period of time.</source>
-      <translation>המשתמש יתנתק באופן אוטומטי לאחר פרק זמן זה.</translation>
-    </message>
-    <message>
       <source>minutes</source>
       <translation>דקות</translation>
     </message>
     <message>
       <source>hours</source>
       <translation>שעות</translation>
+    </message>
+    <message>
+      <source>Users will be automatically logged out if their session exceeds the specified duration.</source>
+      <translation type="unfinished">Users will be automatically logged out if their session exceeds the specified duration.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ServerSettingsDialogStore</name>
+    <message>
+      <source>Library</source>
+      <translation type="unfinished">Library</translation>
+    </message>
+    <message>
+      <source>Version</source>
+      <translation type="unfinished">Version</translation>
+    </message>
+    <message>
+      <source>Vendor</source>
+      <translation>ספק:</translation>
+    </message>
+    <message>
+      <source>no error</source>
+      <translation type="unfinished">no error</translation>
+    </message>
+    <message>
+      <source>library file cannot be loaded</source>
+      <translation type="unfinished">library file cannot be loaded</translation>
+    </message>
+    <message>
+      <source>invalid or incompatible plugin library</source>
+      <translation type="unfinished">invalid or incompatible plugin library</translation>
+    </message>
+    <message>
+      <source>plugin library failed to initialize</source>
+      <translation type="unfinished">plugin library failed to initialize</translation>
+    </message>
+    <message>
+      <source>plugin returned bad manifest</source>
+      <translation type="unfinished">plugin returned bad manifest</translation>
+    </message>
+    <message>
+      <source>plugin API version is no longer supported</source>
+      <translation type="unfinished">plugin API version is no longer supported</translation>
+    </message>
+    <message>
+      <source>unknown error</source>
+      <translation type="unfinished">unknown error</translation>
+    </message>
+    <message>
+      <source>Not loaded</source>
+      <translation type="unfinished">Not loaded</translation>
+    </message>
+    <message>
+      <source>Loaded</source>
+      <translation type="unfinished">Loaded</translation>
+    </message>
+    <message>
+      <source>plugin is in the black list</source>
+      <translation type="unfinished">plugin is in the black list</translation>
+    </message>
+    <message>
+      <source>Status</source>
+      <translation type="unfinished">Status</translation>
+    </message>
+    <message>
+      <source>plugin is optional and is not in the white list</source>
+      <translation type="unfinished">plugin is optional and is not in the white list</translation>
     </message>
   </context>
   <context>
@@ -9491,13 +9403,24 @@ to %1</source>
       <source>Downloaded</source>
       <translation>הורד</translation>
     </message>
+    <message>
+      <source>Waiting for server to respond...</source>
+      <translation type="unfinished">Waiting for server to respond...</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ServerUpdateTool</name>
+    <message>
+      <source>No connection to the server.</source>
+      <translation type="unfinished">No connection to the server.</translation>
+    </message>
+    <message>
+      <source>Network error.</source>
+      <translation type="unfinished">Network error.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerUpdatesModel</name>
-    <message>
-      <source>Current Version</source>
-      <translation>גרסה נוכחית</translation>
-    </message>
     <message>
       <source>Status</source>
       <translation>מצב</translation>
@@ -9517,6 +9440,10 @@ to %1</source>
     <message>
       <source>Component</source>
       <translation>רכיב</translation>
+    </message>
+    <message>
+      <source>Installed Version</source>
+      <translation type="unfinished">Installed Version</translation>
     </message>
   </context>
   <context>
@@ -9826,12 +9753,62 @@ to %1</source>
       <source>Starting export...</source>
       <translation>מתחיל ייצוא...</translation>
     </message>
+    <message>
+      <source>Saving layout</source>
+      <translation type="unfinished">Saving layout</translation>
+    </message>
+    <message>
+      <source>Stop Saving</source>
+      <translation type="unfinished">Stop Saving</translation>
+    </message>
+    <message>
+      <source>Saving failed</source>
+      <translation type="unfinished">Saving failed</translation>
+    </message>
+    <message>
+      <source>Starting saving...</source>
+      <translation type="unfinished">Starting saving...</translation>
+    </message>
+    <message>
+      <source>We are preparing files for the export process. Please wait for a few seconds.</source>
+      <translation type="unfinished">We are preparing files for the export process. Please wait for a few seconds.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::WorkbenchUpdateWatcher</name>
+    <message>
+      <source>%1 version available</source>
+      <translation>גרסה %1 זמינה</translation>
+    </message>
+    <message>
+      <source>Release Notes</source>
+      <translation>הערות מוצר</translation>
+    </message>
+    <message>
+      <source>Major issues have been fixed. Update is strongly recommended.</source>
+      <translation>תקלות חשובות תוקנו. העדכון מומלץ מאוד.</translation>
+    </message>
+    <message>
+      <source>Update...</source>
+      <translation>עדכן...</translation>
+    </message>
+    <message>
+      <source>Do not notify again about this update</source>
+      <translation>אל תודיע שוב על עדכון זה</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::detail::BaseInputField</name>
     <message>
       <source>multiple values</source>
       <translation>ערכים מרובים</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::integrations::entropix::ReconstructResolutionIntegration</name>
+    <message>
+      <source>Reconstruct Resolution</source>
+      <translation type="unfinished">Reconstruct Resolution</translation>
     </message>
   </context>
   <context>
@@ -10201,6 +10178,28 @@ to %1</source>
     <message>
       <source>This build is for testing purposes only.</source>
       <translation>גרסה זו היא למטרות בדיקה בלבד.</translation>
+    </message>
+    <message>
+      <source>Open Server Settings</source>
+      <translation type="unfinished">Open Server Settings</translation>
+    </message>
+    <message>
+      <source>OK</source>
+      <translation>אישור</translation>
+    </message>
+    <message>
+      <source>Confirm storage location to store analytics data on &apos;%1&apos;</source>
+      <translation type="unfinished">Confirm storage location to store analytics data on &apos;%1&apos;</translation>
+    </message>
+    <message>
+      <source>Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
+Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
+By default analytics data will be stored in mediaserver&apos;s installation directory.
+You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</source>
+      <translation type="unfinished">Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
+Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
+By default analytics data will be stored in mediaserver&apos;s installation directory.
+You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</translation>
     </message>
   </context>
   <context>

@@ -1,3 +1,5 @@
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+
 #pragma once
 
 /**@file
@@ -13,6 +15,7 @@
 #include <memory>
 #include <string>
 #include <sstream>
+#include <vector>
 
 #if defined(QT_CORE_LIB)
     // To be supported in toString().
@@ -38,6 +41,17 @@ inline bool isAsciiPrintable(int c)
 }
 
 /**
+ * @return Last path component: text after the last path separator. On Windows, possible `<drive>:`
+ * prefix is excluded and both `/` and `\` are supported. If path is empty, the result is empty.
+ */
+NX_KIT_API std::string baseName(std::string path);
+
+/**
+ * @return Process name, without .exe in Windows.
+ */
+NX_KIT_API std::string getProcessName();
+
+/**
  * Convert a value to its report-friendly text representation, e.g. a quoted and escaped string.
  */
 template<typename T>
@@ -54,6 +68,19 @@ std::string format(const std::string& formatStr, Args... args)
     result.resize(size - /* trailing '\0' */ 1);
     return result;
 }
+
+NX_KIT_API bool fromString(const std::string& s, int* value);
+NX_KIT_API bool fromString(const std::string& s, double* value);
+NX_KIT_API bool fromString(const std::string& s, float* value);
+
+//-------------------------------------------------------------------------------------------------
+// OS support.
+
+/**
+ * @return Command line arguments of the process, cached after the first call. If arguments are
+ *     not available, then returns a single empty string.
+ */
+NX_KIT_API const std::vector<std::string>& getProcessCmdLineArgs();
 
 //-------------------------------------------------------------------------------------------------
 // Aligned allocation.
@@ -104,7 +131,9 @@ void* mallocAligned(size_t size, size_t alignment, MallocFunc mallocFunc)
 /** Calls mallocAligned() passing standard malloc() as mallocFunc. */
 inline void* mallocAligned(size_t size, size_t alignment)
 {
-    return mallocAligned<>(size, alignment, ::malloc);
+    // NOTE: Lambda is used to suppress a warning that some ::malloc() implementations are using
+    // deprecated exception specification.
+    return mallocAligned<>(size, alignment, [](size_t size) { return ::malloc(size); });
 }
 
 /**
@@ -131,7 +160,9 @@ void freeAligned(void* ptr, FreeFunc freeFunc)
 /** Calls freeAligned() passing standard free() as freeFunc. */
 inline void freeAligned(void* ptr)
 {
-    return freeAligned<>(ptr, ::free);
+    // NOTE: Lambda is used to suppress a warning that some ::free() implementations are using
+    // deprecated exception specification.
+    return freeAligned<>(ptr, [](void* ptr) { return ::free(ptr); });
 }
 
 //-------------------------------------------------------------------------------------------------

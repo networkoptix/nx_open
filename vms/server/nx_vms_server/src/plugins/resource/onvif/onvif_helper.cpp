@@ -244,20 +244,14 @@ void PasswordHelper::printPasswords() const
 #endif
 }
 
-//
-// SoapErrorHelper
-//
-
 const QString SoapErrorHelper::fetchDescription(const SOAP_ENV__Fault* faultInfo)
 {
     if (!faultInfo) {
-#ifdef ONVIF_DEBUG
-        qDebug() << "SoapErrorHelper::fetchDescription: fault info is null";
-#endif
-        return lit("unknown_error");
+        NX_DEBUG(typeid(SoapErrorHelper), "Failed to get error description");
+        return "unknown_error";
     }
 
-    QByteArray result("Fault Info. ");
+    QByteArray result("Fault info. ");
 
     if (faultInfo->faultcode) {
         result += "Code: ";
@@ -338,7 +332,7 @@ NameHelper::NameHelper()
 
         normalizedName = normalizedName.replace(normalizedManufacturer, QString());
 
-        camerasNames.insert(normalizedName);
+        m_camerasNames.insert(normalizedName);
     }
 }
 
@@ -359,8 +353,8 @@ bool NameHelper::isSupported(const QString& cameraName) const
 
     QString normalizedCameraName = cameraName.toLower().replace(UNNEEDED_CHARACTERS, QString());
     do {
-        QSet<QString>::ConstIterator it = camerasNames.constFind(normalizedCameraName);
-        if (it != camerasNames.constEnd())
+        std::set<QString>::const_iterator it = m_camerasNames.find(normalizedCameraName);
+        if (it != m_camerasNames.cend())
             return true;
         normalizedCameraName.chop(1);
     } while (normalizedCameraName.length() >= 4);

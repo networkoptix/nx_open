@@ -54,6 +54,7 @@ public:
     QnControlsStatisticsModule* statisticsModule() const;
 
     nx::vms::client::desktop::MainWindow* mainWindow() const;
+    QWidget* mainWindowWidget() const;
     void setMainWindow(nx::vms::client::desktop::MainWindow* mainWindow);
 
     nx::core::Watermark watermark() const;
@@ -63,21 +64,17 @@ public:
     QnUserResourcePtr user() const;
     void setUserName(const QString &userName);
 
-    bool showEulaFromFile(QString eulaPath = "") const;
-    bool showEulaFromString(QString eulaText) const;
-
     /** Check if application is closing down. Replaces QApplication::closingDown(). */
     bool closingDown() const;
     void setClosingDown(bool value);
 
-    enum StartupParametersCode {
-        success,
-        wrongParameters,
-        forcedExit
-    };
+    /**
+     * Process startup parameters and call related actions.
+     */
+    void handleStartupParameters(const QnStartupParameters& startupParams);
 
-    /** Process startup parameters and call related actions. Returns false if something goes critically wrong. */
-    StartupParametersCode handleStartupParameters(const QnStartupParameters& startupParams);
+    /** Whether the scene is visible in the main window. */
+    bool isWorkbenchVisible() const;
 
 signals:
     /**
@@ -98,9 +95,7 @@ signals:
 private:
     void initWorkarounds();
 
-    bool connectUsingCustomUri(const nx::vms::utils::SystemUri& uri);
 
-    bool connectUsingCommandLineAuth(const QnStartupParameters& startupParams);
 
 private:
     QScopedPointer<QnWorkbench> m_workbench;

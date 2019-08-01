@@ -10,9 +10,10 @@
 
 class QnHttpConnectionListener;
 
+// TODO: This class should also be moved into nx::network::rest.
 class QnRestProcessorPool
 {
-    using HandlersByPath = QMap<QString, QnRestRequestHandlerPtr>;
+    using HandlersByPath = QMap<QString, std::shared_ptr<nx::network::rest::Handler>>;
     using Handlers = std::map<nx::network::http::Method::ValueType, HandlersByPath>;
     using RedirectRules = QMap<QString, QString>;
 
@@ -22,16 +23,16 @@ public:
 
     void registerHandler(
         const QString& path,
-        QnRestRequestHandler* handler,
+        nx::network::rest::Handler* handler,
         GlobalPermission permission = GlobalPermission::none);
 
     void registerHandler(
         nx::network::http::Method::ValueType httpMethod,
         const QString& path,
-        QnRestRequestHandler* handler,
+        nx::network::rest::Handler* handler,
         GlobalPermission permission = GlobalPermission::none);
 
-    QnRestRequestHandlerPtr findHandler(
+    std::shared_ptr<nx::network::rest::Handler> findHandler(
         const nx::network::http::Method::ValueType& httpMethod,
         const QString& path) const;
 
@@ -39,11 +40,11 @@ public:
     boost::optional<QString> getRedirectRule(const QString& path);
 
 private:
-    QnRestRequestHandlerPtr findHandlerForSpecificMethod(
+    std::shared_ptr<nx::network::rest::Handler> findHandlerForSpecificMethod(
         const nx::network::http::Method::ValueType& httpMethod,
         const QString& path) const;
 
-    QnRestRequestHandlerPtr findHandlerByPath(
+    std::shared_ptr<nx::network::rest::Handler> findHandlerByPath(
         const HandlersByPath& handlersByPath,
         const QString& path) const;
 
@@ -57,6 +58,7 @@ private:
 
 //-------------------------------------------------------------------------------------------------
 
+// TODO: This class should also be moved into nx::network::rest.
 class QnRestConnectionProcessor: public QnTCPConnectionProcessor
 {
     Q_OBJECT

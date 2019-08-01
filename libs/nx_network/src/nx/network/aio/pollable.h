@@ -3,7 +3,6 @@
 #include <memory>
 
 #include "../abstract_socket.h"
-#include "../common_socket_impl.h"
 
 namespace nx::network {
 
@@ -12,6 +11,8 @@ class Pollable;
 #ifndef _WIN32
 static const int INVALID_SOCKET = -1;
 #endif
+
+class CommonSocketImpl;
 
 /**
  * Encapsulates system object that can be polled with PollSet.
@@ -23,16 +24,18 @@ public:
      * @param fd File descriptor (optional, can be INVALID_SOCKET).
      * It is not closed on object destruction!
      */
+    Pollable(AbstractSocket::SOCKET_HANDLE fd);
+
     Pollable(
         AbstractSocket::SOCKET_HANDLE fd,
-        std::unique_ptr<CommonSocketImpl> impl = std::unique_ptr<CommonSocketImpl>());
+        std::unique_ptr<CommonSocketImpl> impl);
 
     Pollable(const Pollable&) = delete;
     Pollable& operator=(const Pollable&) = delete;
     Pollable(Pollable&&) = delete;
     Pollable& operator=(Pollable&&) = delete;
 
-    virtual ~Pollable() = default;
+    virtual ~Pollable();
 
     AbstractSocket::SOCKET_HANDLE handle() const;
     /**
@@ -61,9 +64,11 @@ public:
 
 protected:
     AbstractSocket::SOCKET_HANDLE m_fd = INVALID_SOCKET;
-    std::unique_ptr<CommonSocketImpl> m_impl;
     unsigned int m_readTimeoutMS = 0;
     unsigned int m_writeTimeoutMS = 0;
+
+private:
+    std::unique_ptr<CommonSocketImpl> m_impl;
 };
 
 } // namespace nx::network

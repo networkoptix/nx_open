@@ -7,21 +7,20 @@
 
 namespace nx::clusterdb::map {
 
-namespace {
-
-static constexpr char kSystemId[] = "c484573f-8b0d-4458-b86c-1da31188884b";
-
-} // namespace
-
 Database::Database(
-    nx::clusterdb::engine::SyncronizationEngine* syncEngine,
-    nx::sql::AsyncSqlQueryExecutor* dbManager)
+    nx::clusterdb::engine::SynchronizationEngine* syncEngine,
+    nx::sql::AsyncSqlQueryExecutor* dbManager,
+    const std::string& clusterId)
     :
-    m_systemId(kSystemId),
     m_syncEngine(syncEngine),
     m_structureUpdater(dbManager),
-    m_dataManager(m_syncEngine, dbManager, kSystemId, &m_eventProvider)
+    m_clusterId(clusterId),
+    m_dataManager(m_syncEngine, dbManager, m_clusterId, &m_eventProvider)
 {
+    if (clusterId.empty())
+        NX_DEBUG(this, "clusterId is empty, cluster db map laoded in standalone mode");
+    else
+        NX_DEBUG(this, "cluster db map loaded with clusterId: %1", clusterId);
 }
 
 DataManager& Database::dataManager()
@@ -34,9 +33,9 @@ EventProvider& Database::eventProvider()
     return m_eventProvider;
 }
 
-std::string Database::systemId() const
+std::string Database::clusterId() const
 {
-    return m_systemId.toSimpleString().toStdString();
+    return m_clusterId;
 }
 
 } // namespace nx::clusterdb::map

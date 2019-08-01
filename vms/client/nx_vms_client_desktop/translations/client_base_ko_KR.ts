@@ -233,10 +233,6 @@ to view more bookmarks</source>
       <translation>비디어월 화면 저장</translation>
     </message>
     <message>
-      <source>Drop Resources</source>
-      <translation>리스소 삭제</translation>
-    </message>
-    <message>
       <source>Start Screen Recording</source>
       <translation>화면녹화 시작</translation>
     </message>
@@ -857,11 +853,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Screen Settings...</source>
-      <translation type="unfinished">Screen Settings...</translation>
+      <translation>화면 설정</translation>
     </message>
     <message>
       <source>Export Bookmarks...</source>
-      <translation type="unfinished">Export Bookmarks...</translation>
+      <translation>북마크 내보내기</translation>
     </message>
     <message>
       <source>Forget password</source>
@@ -2478,7 +2474,7 @@ to %1</source>
     </message>
     <message>
       <source>Too many attempts. Try again in a minute.</source>
-      <translation type="unfinished">Too many attempts. Try again in a minute.</translation>
+      <translation>시도 횟수가 너무 많습니다. 1 분 후에 다시 시도하십시오.</translation>
     </message>
   </context>
   <context>
@@ -2552,17 +2548,6 @@ to %1</source>
     <message>
       <source>Internal server error. Please try again later.</source>
       <translation type="unfinished">Internal server error. Please try again later.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnConnectToCurrentSystemTool</name>
-    <message>
-      <source>Configuring Server</source>
-      <translation>서버 설정</translation>
-    </message>
-    <message>
-      <source>Updating Server</source>
-      <translation>서버 업데이트</translation>
     </message>
   </context>
   <context>
@@ -2712,7 +2697,7 @@ to %1</source>
     </message>
     <message>
       <source>Too many attempts. Try again in a minute.</source>
-      <translation type="unfinished">Too many attempts. Try again in a minute.</translation>
+      <translation>시도 횟수가 너무 많습니다. 1 분 후에 다시 시도하십시오.</translation>
     </message>
     <message>
       <source>Download &amp;&amp; Install</source>
@@ -2870,10 +2855,6 @@ to %1</source>
       <source>44.1 kHz and 48 kHz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
       <translation>44.1 khz와 48 Khz 오디오 포맷 오디오 캡처 장치에서 지원 되지 않습니다. 다른 오디오 장치 또는 화면 녹화 설정에서 "없음"을 선택 하십시오</translation>
     </message>
-    <message>
-      <source>Configured codec: %1 not found, h263p will used</source>
-      <translation type="unfinished">Configured codec: %1 not found, h263p will used</translation>
-    </message>
   </context>
   <context>
     <name>QnDisconnectFromCloudDialogPrivate</name>
@@ -2943,7 +2924,7 @@ to %1</source>
     </message>
     <message>
       <source>Too many attempts. Try again in a minute.</source>
-      <translation type="unfinished">Too many attempts. Try again in a minute.</translation>
+      <translation>시도 횟수가 너무 많습니다. 1 분 후에 다시 시도하십시오.</translation>
     </message>
   </context>
   <context>
@@ -3171,6 +3152,17 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnGLCheckerInstrument</name>
+    <message>
+      <source>Video card drivers are outdated or not installed</source>
+      <translation>비디오 카드 드라이버가 오래 된 또는 설치 되어 있지 않은</translation>
+    </message>
+    <message>
+      <source>%1 may not work properly.</source>
+      <translation>%1 제대로 작동 하지 않을 수 있습니다.</translation>
+    </message>
+  </context>
+  <context>
     <name>QnGeneralPreferencesWidget</name>
     <message>
       <source>Select folder...</source>
@@ -3179,6 +3171,14 @@ to %1</source>
     <message>
       <source>Folder already added</source>
       <translation>이미 추가 폴더</translation>
+    </message>
+    <message>
+      <source>None</source>
+      <translation>없음</translation>
+    </message>
+    <message>
+      <source>Auto (%1)</source>
+      <translation type="unfinished">Auto (%1)</translation>
     </message>
   </context>
   <context>
@@ -3246,17 +3246,6 @@ to %1</source>
     <message>
       <source>Creates a backup of System configuration that can be restored in case of failure.</source>
       <translation>오류가 발생할 경우 복원할 수 있는 시스템 구성에 대 한 백업을 만듭니다.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnGlHardwareChecker</name>
-    <message>
-      <source>Video card drivers are outdated or not installed</source>
-      <translation>비디오 카드 드라이버가 오래 된 또는 설치 되어 있지 않은</translation>
-    </message>
-    <message>
-      <source>%1 may not work properly.</source>
-      <translation>%1 제대로 작동 하지 않을 수 있습니다.</translation>
     </message>
   </context>
   <context>
@@ -3551,8 +3540,8 @@ to %1</source>
       </translation>
     </message>
     <message>
-      <source>Qty</source>
-      <translation>수량</translation>
+      <source>Channels</source>
+      <translation type="unfinished">Channels</translation>
     </message>
   </context>
   <context>
@@ -4858,7 +4847,7 @@ to %1</source>
     </message>
     <message>
       <source>Export Bookmarks...</source>
-      <translation type="unfinished">Export Bookmarks...</translation>
+      <translation>북마크 내보내기</translation>
     </message>
   </context>
   <context>
@@ -5050,6 +5039,10 @@ to %1</source>
       <source>Server Web Page</source>
       <translation>서버 웹 페이지</translation>
     </message>
+    <message>
+      <source>Plugins</source>
+      <translation type="unfinished">Plugins</translation>
+    </message>
   </context>
   <context>
     <name>QnServerSettingsWidget</name>
@@ -5088,219 +5081,6 @@ to %1</source>
     <message>
       <source>Servers with failover enabled will automatically take cameras from offline servers.</source>
       <translation>장애조치가 활성화 된 서버는 자동으로 오프라인 서버에서 카메라를 가져옵니다.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnServerUpdatesModel</name>
-    <message>
-      <source>Server</source>
-      <translation>서버</translation>
-    </message>
-    <message>
-      <source>Status</source>
-      <translation>상태</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnServerUpdatesWidget</name>
-    <message>
-      <source>Select Update File...</source>
-      <translation>업데이트 파일 선택...</translation>
-    </message>
-    <message>
-      <source>Release notes</source>
-      <translation>업데이트 내용</translation>
-    </message>
-    <message>
-      <source>You will have to update the client manually using an installer.</source>
-      <translation>설치 파일을 사용하여 클라이언트의 수동 업데이트가 필요합니다.</translation>
-    </message>
-    <message>
-      <source>Cannot update from this file.</source>
-      <translation>업데이트 할 수 없는 파일입니다.</translation>
-    </message>
-    <message>
-      <source>Latest Available Update</source>
-      <translation>최신 사용할 수 있는 업데이트</translation>
-    </message>
-    <message>
-      <source>Download the Latest Version Update File</source>
-      <translation>최신 버전 업데이트 파일 다운로드</translation>
-    </message>
-    <message>
-      <source>Selected Version</source>
-      <translation>선택한 버전</translation>
-    </message>
-    <message>
-      <source>Download Update File</source>
-      <translation>업데이트 다운로드</translation>
-    </message>
-    <message>
-      <source>Browse for Update File...</source>
-      <translation>업데이트 파일에 대 한 탐색...</translation>
-    </message>
-    <message>
-      <source>Selected Update File</source>
-      <translation>업데이트 파일 선택...</translation>
-    </message>
-    <message>
-      <source>Download in External Browser</source>
-      <translation>외부 브라우저에서 다운로드</translation>
-    </message>
-    <message>
-      <source>Copy Link to Clipboard</source>
-      <translation>클립보드에 링크 복사</translation>
-    </message>
-    <message>
-      <source>Unable to check updates on the Internet.</source>
-      <translation>인터넷에서 업데이트를 확인할 수 없습니다.</translation>
-    </message>
-    <message>
-      <source>Unknown build number.</source>
-      <translation>알 수 없는 빌드 번호입니다.</translation>
-    </message>
-    <message>
-      <source>Downgrade to an earlier version is prohibited.</source>
-      <translation>이전 버전으로 다운 그레이드를 권하지 않습니다.</translation>
-    </message>
-    <message>
-      <source>Updates for one or more servers were not found.</source>
-      <translation>하나 이상의 서버에 대 한 업데이트 된 찾을 수 없습니다.</translation>
-    </message>
-    <message>
-      <source>Client update was not found.</source>
-      <translation>클라이언트 업데이트를 찾지 못했습니다.</translation>
-    </message>
-    <message>
-      <source>Unable to extract update file. No free space left on the disk.</source>
-      <translation>업데이트 파일을 추출할 수 없습니다. 여유 공간이 남아 있지 않습니다.</translation>
-    </message>
-    <message>
-      <source>Update Finished...</source>
-      <translation>업데이트 완료...</translation>
-    </message>
-    <message>
-      <source>Checking for updates...</source>
-      <translation>업데이트 확인 중...</translation>
-    </message>
-    <message>
-      <source>Downloading updates...</source>
-      <translation>업데이트 다운로드 중...</translation>
-    </message>
-    <message>
-      <source>Installing client update...</source>
-      <translation>클라이언트 업데이트를 설치...</translation>
-    </message>
-    <message>
-      <source>Installing updates to incompatible servers...</source>
-      <translation>호환 되지 않는 서버에 업데이트를 설치...</translation>
-    </message>
-    <message>
-      <source>Pushing updates to servers...</source>
-      <translation>서버로 강제 업데이트 진행</translation>
-    </message>
-    <message>
-      <source>Installing updates...</source>
-      <translation>업데이트 설치 중...</translation>
-    </message>
-    <message>
-      <source>Specific Build...</source>
-      <translation>특정 빌드...</translation>
-    </message>
-    <message>
-      <source>Update to Specific Build</source>
-      <translation>특정 빌드를 업데이트</translation>
-    </message>
-    <message>
-      <source>Update System</source>
-      <translation>업데이트 시스템</translation>
-    </message>
-    <message>
-      <source>System update in process</source>
-      <translation>시스템 업데이트 진행 중입니다.</translation>
-    </message>
-    <message>
-      <source>Cancel Update</source>
-      <translation>업데이트 취소</translation>
-    </message>
-    <message>
-      <source>Continue in Background</source>
-      <translation>백그라운드에서 계속</translation>
-    </message>
-    <message numerus="yes">
-      <source>Not enough free space at %n Servers:</source>
-      <translation>
-        <numerusform>%n 서버에 여유 공간 부족</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Attempt to update may fail or cause Server malfunction.</source>
-      <translation>업데이트 실패시 서버 오동작의 원인이 될 수있습니다.</translation>
-    </message>
-    <message>
-      <source>Force Update</source>
-      <translation>강제 업데이트</translation>
-    </message>
-    <message>
-      <source>Server update completed</source>
-      <translation>서버 업데이트 완료</translation>
-    </message>
-    <message>
-      <source>Update completed</source>
-      <translation>업데이트 완료</translation>
-    </message>
-    <message>
-      <source>Update canceled</source>
-      <translation>업데이트 취소</translation>
-    </message>
-    <message>
-      <source>All Servers already updated</source>
-      <translation>모든서버가 업데이트된 상태입니다.</translation>
-    </message>
-    <message>
-      <source>Update failed</source>
-      <translation>업데이트 실패!</translation>
-    </message>
-    <message>
-      <source>Please update %1 manually using an installation package.</source>
-      <translation>%1 설치 패키지를 사용 하 여 수동으로 업데이트 하십시오.</translation>
-    </message>
-    <message>
-      <source>%1 will be restarted to the updated version.</source>
-      <translation>%1 업데이트 버전을 다시 시작 됩니다.</translation>
-    </message>
-    <message>
-      <source>Update cannot be canceled at this stage</source>
-      <translation>이 단계에서 업데이트를 취소할 수 없습니다.</translation>
-    </message>
-    <message>
-      <source>Please wait until it is finished.</source>
-      <translation>완료 전까지 대기 해주세요</translation>
-    </message>
-    <message>
-      <source>All components in your System are up to date.</source>
-      <translation>시스템의 모든 구성 요소는 최신 버전입니다.</translation>
-    </message>
-    <message>
-      <source>All components in your System are up to this version.</source>
-      <translation>시스템의 모든 구성 요소는 최신 버전입니다.</translation>
-    </message>
-    <message>
-      <source>Incompatible %1 instance. To update disconnect System from %1 first.</source>
-      <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation>Incompatible %1 instance. To update disconnect System from %1 first.</translation>
-    </message>
-    <message>
-      <source>Update Files</source>
-      <translation>업데이트 파일</translation>
-    </message>
-    <message>
-      <source>Validating the update...</source>
-      <translation>업데이트 확인 중...</translation>
-    </message>
-    <message>
-      <source>Checking for free space...</source>
-      <translation>여유 공간 확인 중...</translation>
     </message>
   </context>
   <context>
@@ -5732,16 +5512,30 @@ to %1</source>
       <translation>백업 완료</translation>
     </message>
     <message>
-      <source>Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</source>
-      <translation>사용 중지 된 저장 공간에 대한 녹음이 중지됩니다. 그러나 오래된 장면을 삭제하면 계속됩니다.</translation>
-    </message>
-    <message>
-      <source>Recording was enabled on the USB storage</source>
-      <translation>USB 저장소에서 저장이 활성화되었습니다.</translation>
-    </message>
-    <message>
       <source>Reindexing can fix problems with archive or backup if they have been lost or damaged, or if some hardware has been replaced.</source>
       <translation>색인 재생성은 아카이브 또는 백업이 손실되거나 손상된 경우 또는 일부 하드웨어가 교체 된 경우 문제를 해결할 수 있습니다.</translation>
+    </message>
+    <message>
+      <source>What to do with current analytics data?</source>
+      <translation type="unfinished">What to do with current analytics data?</translation>
+    </message>
+    <message>
+      <source>Current analytics data will not be automatically moved to another location and will become unaccessible. You can keep it and manually move later, or delete permanently.
+If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
+      <translation type="unfinished">Current analytics data will not be automatically moved to another location and will become unaccessible. You can keep it and manually move later, or delete permanently.
+If you intended to move analytics data to another storage location, please contact support before proceeding.</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>삭제</translation>
+    </message>
+    <message>
+      <source>Keep</source>
+      <translation>유지</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>취소</translation>
     </message>
   </context>
   <context>
@@ -5789,6 +5583,14 @@ to %1</source>
     <message>
       <source>Too small and system partitions are reserved and not used for writing if there is enough other storage space available.</source>
       <translation>충분한 다른 저장 공간이 있으면 너무 작거나 시스템 파티션은 저장하는 용도로 사용되지 않습니다.</translation>
+    </message>
+    <message>
+      <source>Use to store analytics data</source>
+      <translation type="unfinished">Use to store analytics data</translation>
+    </message>
+    <message>
+      <source>Stores analytics data</source>
+      <translation type="unfinished">Stores analytics data</translation>
     </message>
   </context>
   <context>
@@ -5876,8 +5678,8 @@ to %1</source>
       <translation>사용자</translation>
     </message>
     <message>
-      <source>Analytics</source>
-      <translation>분석</translation>
+      <source>Plugins</source>
+      <translation type="unfinished">Plugins</translation>
     </message>
   </context>
   <context>
@@ -5983,10 +5785,6 @@ to %1</source>
       <translation>원격 보관 파일 동기화가 진행 중입니다.</translation>
     </message>
     <message>
-      <source>Error occured during remote archive synchronization</source>
-      <translation>원격 보관 파일 동기화 중 오류가 발생 했습니다.</translation>
-    </message>
-    <message>
       <source>Remote archive synchronization has been started for the following device:</source>
       <translation>다음 장치에 대 한 원격 보관 파일 동기화 시작 되었습니다.</translation>
     </message>
@@ -6036,17 +5834,13 @@ to %1</source>
       <source>The System is running in safe mode.</source>
       <translation type="unfinished">The System is running in safe mode.</translation>
     </message>
+    <message>
+      <source>Error occurred during remote archive synchronization</source>
+      <translation type="unfinished">Error occurred during remote archive synchronization</translation>
+    </message>
   </context>
   <context>
     <name>QnSystemSettingsWidget</name>
-    <message>
-      <source>Enable devices and servers auto discovery</source>
-      <translation>장치 자동 추가 설정</translation>
-    </message>
-    <message>
-      <source>Enable cameras and servers auto discovery</source>
-      <translation>카메라 자동 추가 설정</translation>
-    </message>
     <message>
       <source>Allow System to optimize device settings</source>
       <translation>장치 설정을 최적화 하는 시스템을 허용</translation>
@@ -6062,6 +5856,22 @@ to %1</source>
     <message>
       <source>Does not include any personal information and is completely anonymous.</source>
       <translation>개인 정보는 포함되지 않으며 완전히 익명입니다.</translation>
+    </message>
+    <message>
+      <source>Failover server measures may still request camera status updates regardless of this setting.</source>
+      <translation type="unfinished">Failover server measures may still request camera status updates regardless of this setting.</translation>
+    </message>
+    <message>
+      <source>Enable devices and servers autodiscovery and automated device status check</source>
+      <translation type="unfinished">Enable devices and servers autodiscovery and automated device status check</translation>
+    </message>
+    <message>
+      <source>Enable cameras and servers autodiscovery and automated camera status check</source>
+      <translation type="unfinished">Enable cameras and servers autodiscovery and automated camera status check</translation>
+    </message>
+    <message>
+      <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
+      <translation type="unfinished">When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</translation>
     </message>
   </context>
   <context>
@@ -6145,79 +5955,6 @@ to %1</source>
     <message>
       <source>Hold to Speak</source>
       <translation>말하기 위해 잡고 계세요.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnUpdateResult</name>
-    <message>
-      <source>Update has been successfully finished.</source>
-      <translation>업데이트가 성공적으로 완료 되었습니다.</translation>
-    </message>
-    <message>
-      <source>Update has been cancelled.</source>
-      <translation>업데이트가 취소 되었습니다.</translation>
-    </message>
-    <message>
-      <source>Another user has already started an update.</source>
-      <translation>업데이트가 이미 시작되었습니다.</translation>
-    </message>
-    <message>
-      <source>All servers are already updated.</source>
-      <translation>모든서버가 업데이트된 상태입니다.</translation>
-    </message>
-    <message>
-      <source>Could not download updates.</source>
-      <translation>업데이트를 다운 받을 수 없습니다.</translation>
-    </message>
-    <message>
-      <source>No free space left on the disk.</source>
-      <translation>여유 공간이 디스크에 남아있지 않습니다.</translation>
-    </message>
-    <message>
-      <source>Could not push updates to servers.</source>
-      <translation>서버에 업데이트를 할 수 없습니다.</translation>
-    </message>
-    <message numerus="yes">
-      <source>The problem is caused by %n servers:</source>
-      <translation>
-        <numerusform>%n 서버에 문제 발생:</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>No free space left on %n servers:</source>
-      <translation>
-        <numerusform>%n 서버에 여유 공간이 없음:</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n servers are not responding:</source>
-      <translation>
-        <numerusform>%n 서버가 응답이 없음:</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n servers have gone offline:</source>
-      <translation>
-        <numerusform>%n 서버가 오프라인 상태:</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Authentication failed for %n servers:</source>
-      <translation>
-        <numerusform>%n 서버들의 인증 실패</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Could not install an update to the client.</source>
-      <translation>클라이언트에 업데이트를 설치 할 수 없습니다.</translation>
-    </message>
-    <message>
-      <source>Could not install updates on one or more servers.</source>
-      <translation>하나 이상의 서버에 업데이트를 설치 할 수 없습니다.</translation>
-    </message>
-    <message>
-      <source>Update has been cancelled silently.</source>
-      <translation type="unfinished">Update has been cancelled silently.</translation>
     </message>
   </context>
   <context>
@@ -6668,25 +6405,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnWorkbenchContext</name>
-    <message>
-      <source>Please review and agree to the %1 in order to proceed</source>
-      <translation type="unfinished">Please review and agree to the %1 in order to proceed</translation>
-    </message>
-    <message>
-      <source>To use the software you must agree with the end user license agreement</source>
-      <translation type="unfinished">To use the software you must agree with the end user license agreement</translation>
-    </message>
-    <message>
-      <source>I Agree</source>
-      <translation type="unfinished">I Agree</translation>
-    </message>
-    <message>
-      <source>I Do Not Agree</source>
-      <translation type="unfinished">I Do Not Agree</translation>
-    </message>
-  </context>
-  <context>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
     <message>
       <source>Systems will be merged shortly</source>
@@ -6695,10 +6413,6 @@ to %1</source>
     <message>
       <source>Servers from the other System will appear in the resource tree.</source>
       <translation>다른 시스템의 서바가 서버 리소스 트리에 곧 표시 됩니다.</translation>
-    </message>
-    <message>
-      <source>Failed to update Server</source>
-      <translation>서버를 업데이트 하지 못했습니다.</translation>
     </message>
     <message>
       <source>Total amount of licenses will decrease</source>
@@ -6866,29 +6580,6 @@ to %1</source>
     <message>
       <source>JPEG Image</source>
       <translation type="unfinished">JPEG Image</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnWorkbenchUpdateWatcher</name>
-    <message>
-      <source>Release Notes</source>
-      <translation>업데이트 내용</translation>
-    </message>
-    <message>
-      <source>%1 version available</source>
-      <translation>%1 버전 사용 가능</translation>
-    </message>
-    <message>
-      <source>Major issues have been fixed. Update is strongly recommended.</source>
-      <translation>주요 문제 해결 되었습니다. 업데이트 하는 것이 좋습니다.</translation>
-    </message>
-    <message>
-      <source>Update...</source>
-      <translation>업데이트...</translation>
-    </message>
-    <message>
-      <source>Do not notify again about this update</source>
-      <translation>이 업데이트에 대 한 다시 통지 하지 마십시오</translation>
     </message>
   </context>
   <context>
@@ -7325,6 +7016,17 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>SessionExpiredDialog</name>
+    <message>
+      <source>Your session has expired</source>
+      <translation type="unfinished">Your session has expired</translation>
+    </message>
+    <message>
+      <source>Session duration limit can be changed by the system administrators</source>
+      <translation type="unfinished">Session duration limit can be changed by the system administrators</translation>
+    </message>
+  </context>
+  <context>
     <name>StreamQualityStrings</name>
     <message>
       <source>Lowest</source>
@@ -7348,41 +7050,41 @@ to %1</source>
     </message>
     <message>
       <source>Preset</source>
-      <translation type="unfinished">Preset</translation>
+      <translation>프리셋</translation>
     </message>
     <message>
       <source>Undefined</source>
-      <translation type="unfinished">Undefined</translation>
+      <translation>한정되지 않은</translation>
     </message>
     <message>
       <source>Lst</source>
       <extracomment>Short for &apos;Lowest&apos;</extracomment>
-      <translation type="unfinished">Lst</translation>
+      <translation>최저</translation>
     </message>
     <message>
       <source>Lo</source>
       <extracomment>Short for &apos;Low&apos;</extracomment>
-      <translation type="unfinished">Lo</translation>
+      <translation>낮은</translation>
     </message>
     <message>
       <source>Me</source>
       <extracomment>Short for &apos;Medium&apos;</extracomment>
-      <translation type="unfinished">Me</translation>
+      <translation>일반</translation>
     </message>
     <message>
       <source>Hi</source>
       <extracomment>Short for &apos;High&apos;</extracomment>
-      <translation type="unfinished">Hi</translation>
+      <translation>높은</translation>
     </message>
     <message>
       <source>Bst</source>
       <extracomment>Short for &apos;Best&apos;</extracomment>
-      <translation type="unfinished">Bst</translation>
+      <translation>최적</translation>
     </message>
     <message>
       <source>Ps</source>
       <extracomment>Short for &apos;Preset&apos;</extracomment>
-      <translation type="unfinished">Ps</translation>
+      <translation>프리셋</translation>
     </message>
   </context>
   <context>
@@ -7527,6 +7229,14 @@ to %1</source>
       <source>Show Only with &quot;Objects&quot; Tab</source>
       <translation type="unfinished">Show Only with &quot;Objects&quot; Tab</translation>
     </message>
+    <message>
+      <source>Show</source>
+      <translation>보이기</translation>
+    </message>
+    <message>
+      <source>Do Not Show</source>
+      <translation type="unfinished">Do Not Show</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::AnalyticsSearchListModel::Private</name>
@@ -7614,8 +7324,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n bookmarks</source>
-      <translation type="unfinished">
-        <numerusform>%n bookmarks</numerusform>
+      <translation>
+        <numerusform>북마크 %n</numerusform>
       </translation>
     </message>
   </context>
@@ -7675,10 +7385,6 @@ to %1</source>
       <translation>네이티브</translation>
     </message>
     <message>
-      <source>Server will not change any cameras settings, it will receive and use camera stream as-is. </source>
-      <translation type="unfinished">Server will not change any cameras settings, it will receive and use camera stream as-is. </translation>
-    </message>
-    <message>
       <source>Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</source>
       <translation>일부 카메라에서 이미지 품질 문제를 해결하는 데 도움이되고 다른 것들은 상당한 비트 전송률 증가를 야기 할 것이다.</translation>
     </message>
@@ -7698,24 +7404,32 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>This ID is already used on the following %n cameras:</source>
-      <translation type="unfinished">
-        <numerusform>This ID is already used on the following %n cameras:</numerusform>
+      <translation>
+        <numerusform>이 ID는 이미 %n 카메라에서 사용되었습니다:</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Server will not change any cameras settings, it will receive and use camera stream as-is.</source>
+      <translation>서버는 어떤 카메라 설정도 변경하지 않고 그대로 카메라 스트림을 수신하여 사용합니다.</translation>
+    </message>
+    <message>
+      <source>Multicast</source>
+      <translation type="unfinished">Multicast</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraInfoWidget</name>
     <message>
       <source>Device Rules</source>
-      <translation type="unfinished">Device Rules</translation>
+      <translation>장치 설정</translation>
     </message>
     <message>
       <source>Camera Rules</source>
-      <translation type="unfinished">Camera Rules</translation>
+      <translation>카메라 설정</translation>
     </message>
     <message>
       <source>I/O Module Rules</source>
-      <translation type="unfinished">I/O Module Rules</translation>
+      <translation>I/O 모듈 규칙</translation>
     </message>
     <message>
       <source>More Info</source>
@@ -7826,11 +7540,11 @@ to %1</source>
     </message>
     <message>
       <source>Motion</source>
-      <translation type="unfinished">Motion</translation>
+      <translation>움직임</translation>
     </message>
     <message>
       <source>Fisheye</source>
-      <translation type="unfinished">Fisheye</translation>
+      <translation>Fisheye</translation>
     </message>
     <message>
       <source>Advanced</source>
@@ -7841,12 +7555,8 @@ to %1</source>
       <translation>웹페이지:</translation>
     </message>
     <message>
-      <source>Analytics</source>
-      <translation>분석</translation>
-    </message>
-    <message>
       <source>Expert</source>
-      <translation type="unfinished">Expert</translation>
+      <translation>전문가</translation>
     </message>
     <message numerus="yes">
       <source>Changes to the following %n devices are not saved:</source>
@@ -7893,6 +7603,10 @@ to %1</source>
     <message>
       <source>I/O Modules Settings</source>
       <translation>여러개 I/O모듈 설정</translation>
+    </message>
+    <message>
+      <source>Plugins</source>
+      <translation type="unfinished">Plugins</translation>
     </message>
   </context>
   <context>
@@ -7961,16 +7675,16 @@ to %1</source>
       <translation type="unfinished">Broken update package.</translation>
     </message>
     <message>
-      <source>Not enough space on disk to install client update.</source>
-      <translation type="unfinished">Not enough space on disk to install client update.</translation>
-    </message>
-    <message>
-      <source>Install package has been lost.</source>
-      <translation type="unfinished">Install package has been lost.</translation>
-    </message>
-    <message>
       <source>Internal error.</source>
       <translation>내부 오류</translation>
+    </message>
+    <message>
+      <source>Not enough space on disk to install the client update.</source>
+      <translation type="unfinished">Not enough space on disk to install the client update.</translation>
+    </message>
+    <message>
+      <source>Installation package has been lost.</source>
+      <translation type="unfinished">Installation package has been lost.</translation>
     </message>
   </context>
   <context>
@@ -8002,6 +7716,17 @@ to %1</source>
       <source>Pasted</source>
       <comment>from Clipboard</comment>
       <translation>붙여넣기</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ConnectToCurrentSystemTool</name>
+    <message>
+      <source>Configuring Server</source>
+      <translation>서버 설정</translation>
+    </message>
+    <message>
+      <source>Updating Server</source>
+      <translation>서버 업데이트</translation>
     </message>
   </context>
   <context>
@@ -8057,7 +7782,7 @@ to %1</source>
     </message>
     <message>
       <source>Scan</source>
-      <translation type="unfinished">Scan</translation>
+      <translation>검색</translation>
     </message>
     <message>
       <source>Search</source>
@@ -8117,6 +7842,17 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::EulaDialog</name>
+    <message>
+      <source>Please review and agree to the %1 in order to proceed</source>
+      <translation type="unfinished">Please review and agree to the %1 in order to proceed</translation>
+    </message>
+    <message>
+      <source>To use the software you must agree with the end user license agreement</source>
+      <translation type="unfinished">To use the software you must agree with the end user license agreement</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::EventPanel::Private</name>
     <message>
       <source>Notifications</source>
@@ -8126,7 +7862,7 @@ to %1</source>
     <message>
       <source>Motion</source>
       <comment>Motion tab title</comment>
-      <translation type="unfinished">Motion</translation>
+      <translation>움직임</translation>
     </message>
     <message>
       <source>Bookmarks</source>
@@ -8136,7 +7872,7 @@ to %1</source>
     <message>
       <source>Events</source>
       <comment>Events tab title</comment>
-      <translation type="unfinished">Events</translation>
+      <translation>이벤트</translation>
     </message>
     <message>
       <source>Objects</source>
@@ -8186,10 +7922,6 @@ to %1</source>
       <source>No events</source>
       <translation>이벤트 없음</translation>
     </message>
-    <message>
-      <source>No events occured</source>
-      <translation type="unfinished">No events occured</translation>
-    </message>
     <message numerus="yes">
       <source>%n events</source>
       <translation type="unfinished">
@@ -8199,6 +7931,10 @@ to %1</source>
     <message>
       <source>unnamed analytics engine</source>
       <translation type="unfinished">unnamed analytics engine</translation>
+    </message>
+    <message>
+      <source>No events occurred</source>
+      <translation type="unfinished">No events occurred</translation>
     </message>
   </context>
   <context>
@@ -8423,7 +8159,7 @@ to %1</source>
     <name>nx::vms::client::desktop::FoundDevicesModel</name>
     <message>
       <source>Brand</source>
-      <translation type="unfinished">Brand</translation>
+      <translation>브랜드</translation>
     </message>
     <message>
       <source>Model</source>
@@ -8589,7 +8325,7 @@ to %1</source>
     <name>nx::vms::client::desktop::MotionSearchListModel::Private</name>
     <message>
       <source>Motion</source>
-      <translation type="unfinished">Motion</translation>
+      <translation>움직임</translation>
     </message>
     <message>
       <source>deleted camera</source>
@@ -8696,56 +8432,20 @@ to %1</source>
       <translation type="unfinished">Some servers are offline and will not be updated. Skip them?</translation>
     </message>
     <message>
-      <source>Ready to install client updates</source>
-      <translation type="unfinished">Ready to install client updates</translation>
-    </message>
-    <message>
-      <source>Install now</source>
-      <translation type="unfinished">Install now</translation>
-    </message>
-    <message>
-      <source>Later</source>
-      <translation type="unfinished">Later</translation>
-    </message>
-    <message>
-      <source>Updates downloaded</source>
-      <translation type="unfinished">Updates downloaded</translation>
-    </message>
-    <message>
-      <source>Failed to download update packages</source>
-      <translation type="unfinished">Failed to download update packages</translation>
-    </message>
-    <message>
-      <source>Please make sure there is enough free storage space and network connection is stable.</source>
-      <translation type="unfinished">Please make sure there is enough free storage space and network connection is stable.</translation>
-    </message>
-    <message>
       <source>If the problem persists, please contact Customer Support.</source>
       <translation>문제가 계속 되 면 고객 지원에 문의 하시기 바랍니다.</translation>
     </message>
     <message>
       <source>Try again</source>
-      <translation type="unfinished">Try again</translation>
+      <translation>재시도</translation>
     </message>
     <message>
       <source>Cancel Update</source>
       <translation>업데이트 취소</translation>
     </message>
     <message>
-      <source>Failed to download update packages to some servers</source>
-      <translation type="unfinished">Failed to download update packages to some servers</translation>
-    </message>
-    <message>
-      <source>Please make sure they have enough free storage space and stable network connection.</source>
-      <translation type="unfinished">Please make sure they have enough free storage space and stable network connection.</translation>
-    </message>
-    <message>
       <source>Update completed</source>
       <translation>업데이트 완료</translation>
-    </message>
-    <message>
-      <source>Update completed, but some servers have failed an update</source>
-      <translation type="unfinished">Update completed, but some servers have failed an update</translation>
     </message>
     <message>
       <source>Nx Witness Client will be restarted to the updated version.</source>
@@ -8756,16 +8456,8 @@ to %1</source>
       <translation>확인</translation>
     </message>
     <message>
-      <source>Failed to install updates to servers:</source>
-      <translation type="unfinished">Failed to install updates to servers:</translation>
-    </message>
-    <message>
       <source>Downloading updates...</source>
       <translation>업데이트 다운로드 중...</translation>
-    </message>
-    <message>
-      <source>Pushing updates...</source>
-      <translation type="unfinished">Pushing updates...</translation>
     </message>
     <message>
       <source>Upload</source>
@@ -8813,7 +8505,7 @@ to %1</source>
     </message>
     <message>
       <source>Updating to ...</source>
-      <translation type="unfinished">Updating to ...</translation>
+      <translation>업데이트 ...</translation>
     </message>
     <message>
       <source>Ready to update to</source>
@@ -8881,6 +8573,66 @@ to %1</source>
       <source>There are no online servers to update.</source>
       <translation type="unfinished">There are no online servers to update.</translation>
     </message>
+    <message>
+      <source>Some servers haven&apos;t completed update process. Finish it anyway?</source>
+      <translation type="unfinished">Some servers haven&apos;t completed update process. Finish it anyway?</translation>
+    </message>
+    <message>
+      <source>Cancel update and delete all downloaded data?</source>
+      <translation type="unfinished">Cancel update and delete all downloaded data?</translation>
+    </message>
+    <message>
+      <source>There was an error while installing updates:</source>
+      <translation type="unfinished">There was an error while installing updates:</translation>
+    </message>
+    <message>
+      <source>Some servers have gone offline. Please wait until they become online to continue.</source>
+      <translation type="unfinished">Some servers have gone offline. Please wait until they become online to continue.</translation>
+    </message>
+    <message>
+      <source>Update completed, but some components have failed an update</source>
+      <translation type="unfinished">Update completed, but some components have failed an update</translation>
+    </message>
+    <message>
+      <source>Please update %1 manually using an installation package.</source>
+      <translation>%1 설치 패키지를 사용 하 여 수동으로 업데이트 하십시오.</translation>
+    </message>
+    <message>
+      <source>%1 will be restarted to the updated version.</source>
+      <translation>%1 업데이트 버전을 다시 시작 됩니다.</translation>
+    </message>
+    <message>
+      <source>Failed to download update packages to some components</source>
+      <translation type="unfinished">Failed to download update packages to some components</translation>
+    </message>
+    <message>
+      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
+      <translation type="unfinished">OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</translation>
+    </message>
+    <message>
+      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
+      <translation type="unfinished">OS version of the client is no longer supported. Please update its OS to a supported version.</translation>
+    </message>
+    <message>
+      <source>Failed to start update</source>
+      <translation type="unfinished">Failed to start update</translation>
+    </message>
+    <message>
+      <source>Starting update to ...</source>
+      <translation type="unfinished">Starting update to ...</translation>
+    </message>
+    <message>
+      <source>Some servers have no package available</source>
+      <translation type="unfinished">Some servers have no package available</translation>
+    </message>
+    <message>
+      <source>Failed to cancel update</source>
+      <translation type="unfinished">Failed to cancel update</translation>
+    </message>
+    <message>
+      <source>Failed to start installation</source>
+      <translation type="unfinished">Failed to start installation</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::MultipleLayoutSelectionDialog</name>
@@ -8905,6 +8657,26 @@ to %1</source>
       <source>Acknowledge</source>
       <translation>확인함</translation>
     </message>
+    <message>
+      <source>Generic Event</source>
+      <translation>일반 이벤트</translation>
+    </message>
+    <message>
+      <source>Device was disconnected</source>
+      <translation type="unfinished">Device was disconnected</translation>
+    </message>
+    <message>
+      <source>Camera was disconnected</source>
+      <translation type="unfinished">Camera was disconnected</translation>
+    </message>
+    <message>
+      <source>I/O Module was disconnected</source>
+      <translation type="unfinished">I/O Module was disconnected</translation>
+    </message>
+    <message>
+      <source>Unknown Plugin Diagnostic Event</source>
+      <translation type="unfinished">Unknown Plugin Diagnostic Event</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::NotificationListWidget::Private</name>
@@ -8924,16 +8696,12 @@ to %1</source>
       <translation type="unfinished">None of selected users have access to the selected layout. Action will not work.</translation>
     </message>
     <message>
-      <source>Local layouts can only be shown to their owners. </source>
-      <translation type="unfinished">Local layouts can only be shown to their owners. </translation>
-    </message>
-    <message>
       <source>Select layout...</source>
       <translation>레이아웃 선택...</translation>
     </message>
     <message>
       <source>Select some single user in &quot;Show to&quot; line to display his local layouts in this list</source>
-      <translation type="unfinished">Select some single user in &quot;Show to&quot; line to display his local layouts in this list</translation>
+      <translation>자신의 로컬 레이아웃을 보여지게 하려면 &quot;Show to&quot;에서 한 사용자를 선택</translation>
     </message>
     <message>
       <source>Local layouts can only be shown to their owners.</source>
@@ -8942,6 +8710,105 @@ to %1</source>
     <message>
       <source>None of selected user roles contain users. Action will not work.</source>
       <translation type="unfinished">None of selected user roles contain users. Action will not work.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::PeerStateTracker</name>
+    <message>
+      <source>The server is taking too long to respond</source>
+      <translation type="unfinished">The server is taking too long to respond</translation>
+    </message>
+    <message>
+      <source>No update task</source>
+      <translation type="unfinished">No update task</translation>
+    </message>
+    <message>
+      <source>Ready to download update</source>
+      <translation type="unfinished">Ready to download update</translation>
+    </message>
+    <message>
+      <source>Downloading update</source>
+      <translation type="unfinished">Downloading update</translation>
+    </message>
+    <message>
+      <source>Ready to restart to the new version</source>
+      <translation type="unfinished">Ready to restart to the new version</translation>
+    </message>
+    <message>
+      <source>Installing update</source>
+      <translation type="unfinished">Installing update</translation>
+    </message>
+    <message>
+      <source>Installed</source>
+      <translation type="unfinished">Installed</translation>
+    </message>
+    <message>
+      <source>Failed to download update</source>
+      <translation type="unfinished">Failed to download update</translation>
+    </message>
+    <message>
+      <source>Failed to install update</source>
+      <translation type="unfinished">Failed to install update</translation>
+    </message>
+    <message>
+      <source>Waiting for peer data</source>
+      <translation type="unfinished">Waiting for peer data</translation>
+    </message>
+    <message>
+      <source>There is not enough space to download update files.</source>
+      <translation type="unfinished">There is not enough space to download update files.</translation>
+    </message>
+    <message>
+      <source>There is not enough space to extract update files.</source>
+      <translation type="unfinished">There is not enough space to extract update files.</translation>
+    </message>
+    <message>
+      <source>Failed to download update packages.</source>
+      <translation type="unfinished">Failed to download update packages.</translation>
+    </message>
+    <message>
+      <source>Update contents are invalid.</source>
+      <translation type="unfinished">Update contents are invalid.</translation>
+    </message>
+    <message>
+      <source>Update archive is corrupted.</source>
+      <translation type="unfinished">Update archive is corrupted.</translation>
+    </message>
+    <message>
+      <source>Update files cannot be extracted.</source>
+      <translation type="unfinished">Update files cannot be extracted.</translation>
+    </message>
+    <message>
+      <source>Internal downloader error.</source>
+      <translation type="unfinished">Internal downloader error.</translation>
+    </message>
+    <message>
+      <source>Internal client error.</source>
+      <translation type="unfinished">Internal client error.</translation>
+    </message>
+    <message>
+      <source>Unknown error.</source>
+      <translation>알수없는 오류</translation>
+    </message>
+    <message>
+      <source>Unexpected error code.</source>
+      <translation type="unfinished">Unexpected error code.</translation>
+    </message>
+    <message>
+      <source>Ready to install update</source>
+      <translation type="unfinished">Ready to install update</translation>
+    </message>
+    <message>
+      <source>Update package is not found.</source>
+      <translation type="unfinished">Update package is not found.</translation>
+    </message>
+    <message>
+      <source>There is not enough space to install update.</source>
+      <translation type="unfinished">There is not enough space to install update.</translation>
+    </message>
+    <message>
+      <source>Internal server error.</source>
+      <translation type="unfinished">Internal server error.</translation>
     </message>
   </context>
   <context>
@@ -9060,7 +8927,7 @@ to %1</source>
     </message>
     <message>
       <source>To enable or adjust it, go to the &quot;Motion&quot; tab in Camera Settings</source>
-      <translation type="unfinished">To enable or adjust it, go to the &quot;Motion&quot; tab in Camera Settings</translation>
+      <translation>활성하거나 조정하려면 카메라 설정의 &quot;Motion&quot; 탭으로 이동하십시오</translation>
     </message>
     <message>
       <source>Motion detection disabled or not supported</source>
@@ -9085,16 +8952,79 @@ to %1</source>
       <translation>모든 사용자 작업을 추적하고 기록합니다.</translation>
     </message>
     <message>
-      <source>User will be automatically logged out after this period of time.</source>
-      <translation type="unfinished">User will be automatically logged out after this period of time.</translation>
-    </message>
-    <message>
       <source>minutes</source>
       <translation>분</translation>
     </message>
     <message>
       <source>hours</source>
       <translation>시간</translation>
+    </message>
+    <message>
+      <source>Users will be automatically logged out if their session exceeds the specified duration.</source>
+      <translation type="unfinished">Users will be automatically logged out if their session exceeds the specified duration.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ServerSettingsDialogStore</name>
+    <message>
+      <source>Library</source>
+      <translation type="unfinished">Library</translation>
+    </message>
+    <message>
+      <source>Version</source>
+      <translation type="unfinished">Version</translation>
+    </message>
+    <message>
+      <source>Vendor</source>
+      <translation>수요자</translation>
+    </message>
+    <message>
+      <source>no error</source>
+      <translation type="unfinished">no error</translation>
+    </message>
+    <message>
+      <source>library file cannot be loaded</source>
+      <translation type="unfinished">library file cannot be loaded</translation>
+    </message>
+    <message>
+      <source>invalid or incompatible plugin library</source>
+      <translation type="unfinished">invalid or incompatible plugin library</translation>
+    </message>
+    <message>
+      <source>plugin library failed to initialize</source>
+      <translation type="unfinished">plugin library failed to initialize</translation>
+    </message>
+    <message>
+      <source>plugin returned bad manifest</source>
+      <translation type="unfinished">plugin returned bad manifest</translation>
+    </message>
+    <message>
+      <source>plugin API version is no longer supported</source>
+      <translation type="unfinished">plugin API version is no longer supported</translation>
+    </message>
+    <message>
+      <source>unknown error</source>
+      <translation type="unfinished">unknown error</translation>
+    </message>
+    <message>
+      <source>Not loaded</source>
+      <translation type="unfinished">Not loaded</translation>
+    </message>
+    <message>
+      <source>Loaded</source>
+      <translation type="unfinished">Loaded</translation>
+    </message>
+    <message>
+      <source>plugin is in the black list</source>
+      <translation type="unfinished">plugin is in the black list</translation>
+    </message>
+    <message>
+      <source>Status</source>
+      <translation type="unfinished">Status</translation>
+    </message>
+    <message>
+      <source>plugin is optional and is not in the white list</source>
+      <translation type="unfinished">plugin is optional and is not in the white list</translation>
     </message>
   </context>
   <context>
@@ -9115,13 +9045,24 @@ to %1</source>
       <source>Downloaded</source>
       <translation type="unfinished">Downloaded</translation>
     </message>
+    <message>
+      <source>Waiting for server to respond...</source>
+      <translation type="unfinished">Waiting for server to respond...</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ServerUpdateTool</name>
+    <message>
+      <source>No connection to the server.</source>
+      <translation type="unfinished">No connection to the server.</translation>
+    </message>
+    <message>
+      <source>Network error.</source>
+      <translation type="unfinished">Network error.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerUpdatesModel</name>
-    <message>
-      <source>Current Version</source>
-      <translation type="unfinished">Current Version</translation>
-    </message>
     <message>
       <source>Status</source>
       <translation>상태</translation>
@@ -9142,12 +9083,16 @@ to %1</source>
       <source>Component</source>
       <translation type="unfinished">Component</translation>
     </message>
+    <message>
+      <source>Installed Version</source>
+      <translation type="unfinished">Installed Version</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::SimpleMotionSearchListModel</name>
     <message>
       <source>Motion</source>
-      <translation type="unfinished">Motion</translation>
+      <translation>움직임</translation>
     </message>
     <message>
       <source>Bookmark it...</source>
@@ -9346,7 +9291,7 @@ to %1</source>
     </message>
     <message>
       <source>User %1 is currently uploading footage to this camera.</source>
-      <translation type="unfinished">User %1 is currently uploading footage to this camera.</translation>
+      <translation>사용자 %1 는 이 카메라로 촬영영상을 업로드하고 있습니다.</translation>
     </message>
     <message>
       <source>(%1 of %2)</source>
@@ -9382,8 +9327,8 @@ to %1</source>
     <name>nx::vms::client::desktop::WorkbenchExportHandler</name>
     <message numerus="yes">
       <source>%n bookmarks</source>
-      <translation type="unfinished">
-        <numerusform>%n bookmarks</numerusform>
+      <translation>
+        <numerusform>북마크 %n</numerusform>
       </translation>
     </message>
     <message>
@@ -9421,7 +9366,7 @@ to %1</source>
     </message>
     <message>
       <source>Several bookmarks can be exported as layout only.</source>
-      <translation type="unfinished">Several bookmarks can be exported as layout only.</translation>
+      <translation>여러 북마크들은 레이아웃으로 만 내보낼 수 있습니다.</translation>
     </message>
     <message>
       <source>Local files not allowed for Multi-Video export</source>
@@ -9435,12 +9380,62 @@ to %1</source>
       <source>Starting export...</source>
       <translation type="unfinished">Starting export...</translation>
     </message>
+    <message>
+      <source>Saving layout</source>
+      <translation type="unfinished">Saving layout</translation>
+    </message>
+    <message>
+      <source>Stop Saving</source>
+      <translation type="unfinished">Stop Saving</translation>
+    </message>
+    <message>
+      <source>Saving failed</source>
+      <translation type="unfinished">Saving failed</translation>
+    </message>
+    <message>
+      <source>Starting saving...</source>
+      <translation type="unfinished">Starting saving...</translation>
+    </message>
+    <message>
+      <source>We are preparing files for the export process. Please wait for a few seconds.</source>
+      <translation type="unfinished">We are preparing files for the export process. Please wait for a few seconds.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::WorkbenchUpdateWatcher</name>
+    <message>
+      <source>%1 version available</source>
+      <translation>%1 버전 사용 가능</translation>
+    </message>
+    <message>
+      <source>Release Notes</source>
+      <translation>업데이트 내용</translation>
+    </message>
+    <message>
+      <source>Major issues have been fixed. Update is strongly recommended.</source>
+      <translation>주요 문제 해결 되었습니다. 업데이트 하는 것이 좋습니다.</translation>
+    </message>
+    <message>
+      <source>Update...</source>
+      <translation>업데이트...</translation>
+    </message>
+    <message>
+      <source>Do not notify again about this update</source>
+      <translation>이 업데이트에 대 한 다시 통지 하지 마십시오</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::detail::BaseInputField</name>
     <message>
       <source>multiple values</source>
       <translation>여러 값</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::integrations::entropix::ReconstructResolutionIntegration</name>
+    <message>
+      <source>Reconstruct Resolution</source>
+      <translation type="unfinished">Reconstruct Resolution</translation>
     </message>
   </context>
   <context>
@@ -9786,6 +9781,28 @@ to %1</source>
     <message>
       <source>This build is for testing purposes only.</source>
       <translation type="unfinished">This build is for testing purposes only.</translation>
+    </message>
+    <message>
+      <source>Open Server Settings</source>
+      <translation type="unfinished">Open Server Settings</translation>
+    </message>
+    <message>
+      <source>OK</source>
+      <translation>확인</translation>
+    </message>
+    <message>
+      <source>Confirm storage location to store analytics data on &apos;%1&apos;</source>
+      <translation type="unfinished">Confirm storage location to store analytics data on &apos;%1&apos;</translation>
+    </message>
+    <message>
+      <source>Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
+Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
+By default analytics data will be stored in mediaserver&apos;s installation directory.
+You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</source>
+      <translation type="unfinished">Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
+Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
+By default analytics data will be stored in mediaserver&apos;s installation directory.
+You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</translation>
     </message>
   </context>
   <context>

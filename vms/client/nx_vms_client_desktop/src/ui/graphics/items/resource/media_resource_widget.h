@@ -61,6 +61,9 @@ class QnTwoWayAudioWidget;
 
 struct QnHtmlTextItemOptions;
 
+/**
+ * Widget to show media from a camera or disk file (from QnMediaResource). 
+ */
 class QnMediaResourceWidget: public Customized<QnResourceWidget>
 {
     Q_OBJECT
@@ -114,7 +117,7 @@ public:
     /**
      * Clears this widget's motion selection region.
      */
-    void clearMotionSelection();
+    void clearMotionSelection(bool sendMotionChanged = true);
 
     bool isMotionSelectionEmpty() const;
 
@@ -196,6 +199,7 @@ signals:
     void zoomWindowRectangleVisibleChanged();
     void licenseStatusChanged();
     void ptzControllerChanged();
+    void analyticsSupportChanged();
 
 protected:
     virtual int helpTopicAt(const QPointF& pos) const override;
@@ -390,6 +394,10 @@ private:
 
     void resetTriggers();
 
+    int triggerIndex(const QnUuid& ruleId) const;
+
+    void removeTrigger(int index);
+
     void updateTriggersAvailability();
     void updateTriggerAvailability(const nx::vms::event::RulePtr& rule);
 
@@ -410,9 +418,6 @@ private:
         Qn::WidgetButtons buttonId,
         const QString& buttonName,
         ButtonHandler executor);
-
-    using TriggerDataList = QList<SoftwareTrigger>;
-    TriggerDataList::iterator lowerBoundbyTriggerName(const nx::vms::event::RulePtr& rule);
 
     void updateSelectedArea();
     void handleSelectedAreaChanged();
@@ -471,7 +476,7 @@ private:
     AreaType m_areaSelectionType{AreaType::none};
     QRectF m_analyticsFilterRect;
 
-    TriggerDataList m_triggers;
+    QList<SoftwareTrigger> m_triggers;
 
     QScopedPointer<nx::vms::client::desktop::EntropixImageEnhancer> m_entropixEnhancer;
     QImage m_entropixEnhancedImage;

@@ -115,24 +115,14 @@ WorkbenchUi::WorkbenchUi(QObject *parent):
 
     /* Install and configure instruments. */
 
-    m_debugInfoInstrument = new DebugInfoInstrument(this);
-
     m_controlsActivityInstrument = new ActivityListenerInstrument(true, kHideControlsTimeoutMs, this);
 
-    m_instrumentManager->installInstrument(m_debugInfoInstrument, InstallationMode::InstallBefore,
-        display()->paintForwardingInstrument());
     m_instrumentManager->installInstrument(m_controlsActivityInstrument);
 
     connect(m_controlsActivityInstrument, &ActivityListenerInstrument::activityStopped, this,
         &WorkbenchUi::at_activityStopped);
     connect(m_controlsActivityInstrument, &ActivityListenerInstrument::activityResumed, this,
         &WorkbenchUi::at_activityStarted);
-    connect(m_debugInfoInstrument, &DebugInfoInstrument::debugInfoChanged, this,
-        [this](const QString& text)
-        {
-            m_fpsItem->setText(text);
-            m_fpsItem->resize(m_fpsItem->effectiveSizeHint(Qt::PreferredSize));
-        });
 
     /* Create controls. */
     createControlsWidget();
@@ -260,12 +250,8 @@ WorkbenchUi::WorkbenchUi(QObject *parent):
 
         });
 
-    connect(qnRuntime, &QnClientRuntimeSettings::valueChanged, this,
-        [this](int id)
-        {
-           if (id == QnClientRuntimeSettings::VIDEO_WALL_WITH_TIMELINE)
-               updateControlsVisibility(false);
-        });
+    connect(action(action::ShowTimeLineOnVideowallAction), &QAction::triggered,
+        this, [this] { updateControlsVisibility(false); });
 }
 
 WorkbenchUi::~WorkbenchUi()
@@ -361,12 +347,12 @@ action::ActionScope WorkbenchUi::currentScope() const
     if (focusItem == m_timeline->item)
         return action::TimelineScope;
 
-    if (!focusItem || dynamic_cast<QnResourceWidget*>(focusItem))
-        return action::SceneScope;
-
     /* We should not handle any button as an action while the item was focused. */
     if (dynamic_cast<QnGraphicsWebView*>(focusItem))
         return action::InvalidScope;
+
+    if (display()->scene()->hasFocus())
+        return action::SceneScope;
 
     return action::MainScope;
 }
@@ -1451,6 +1437,7 @@ void WorkbenchUi::createFpsWidget()
     m_fpsItem->setAcceptedMouseButtons(0);
     m_fpsItem->setAcceptHoverEvents(false);
     m_fpsItem->setText(lit("...."));
+    m_fpsItem->setTextFormat(Qt::RichText);
     updateFpsGeometry();
     setPaletteColor(m_fpsItem, QPalette::Window, Qt::transparent);
     setPaletteColor(m_fpsItem, QPalette::WindowText, QColor(63, 159, 216));
@@ -1458,7 +1445,14 @@ void WorkbenchUi::createFpsWidget()
 
     connect(action(action::ShowFpsAction), &QAction::toggled, this, &WorkbenchUi::setFpsVisible);
     connect(m_fpsItem, &QGraphicsWidget::geometryChanged, this, &WorkbenchUi::updateFpsGeometry);
-    setFpsVisible(qnRuntime->isProfilerMode());
+    setFpsVisible(ini().profilerMode);
+
+    connect(display()->debugInfoInstrument(), &DebugInfoInstrument::debugInfoChanged, this,
+        [this](const QString& richText)
+        {
+            m_fpsItem->setText(richText);
+            m_fpsItem->resize(m_fpsItem->effectiveSizeHint(Qt::PreferredSize));
+        });
 }
 
 #pragma endregion Fps widget methods

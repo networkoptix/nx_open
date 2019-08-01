@@ -12,17 +12,19 @@ set(_withRootTool OFF)
 set(_withP2PConnectionTestingUtility OFF)
 
 if("${platform}" STREQUAL "linux")
-    if("${arch}" MATCHES "arm|aarch64")
+    if("${arch}" STREQUAL "arm")
         set(_withDesktopClient OFF)
         set(_withMobileClient OFF)
         set(_withTests OFF)
 
-        if("${box}" STREQUAL "bpi")
-            set(_withTests ON)
-        elseif("${box}" STREQUAL "tx1")
-            set(_withDesktopClient ON)
+        if("${box}" STREQUAL "none"
+            OR "${box}" STREQUAL "bpi")
             set(_withTests ON)
         endif()
+    elseif("${arch}" STREQUAL "arm64")
+        set(_withDesktopClient ON)
+        set(_withMobileClient OFF)
+        set(_withTests ON)
     elseif("${arch}" STREQUAL "x86")
         set(_withTests OFF)
         set(_withClouds OFF)
@@ -58,7 +60,9 @@ if(targetDevice STREQUAL "edge1")
     set(_withTestCamera OFF)
 endif()
 
-if(LINUX AND box MATCHES "none" AND NOT developerBuild)
+if(LINUX AND box MATCHES "none" AND NOT developerBuild
+    AND NOT "${arch}" STREQUAL "arm64" AND NOT "${arch}" STREQUAL "arm"
+)
     set(_withRootTool ON)
 endif()
 
@@ -73,8 +77,7 @@ option(withTestCamera "Enable test camera" ${_withTestCamera})
 option(withTests "Enable unit tests" ${_withTests})
 option(withCassandraTests "Enable cassandra related tests" ${_withCassandraTests})
 option(withMiniLauncher "Enable minilauncher" ${_withMiniLauncher})
-option(withScreenChecker "Enable screen checker" OFF)
-option(withNovBrowser "Enable Nov Browser" OFF)
+option(withVmsTools "Enable utility VMS tools" OFF)
 nx_option(withRootTool "Enable root tool" ${_withRootTool})
 nx_option(
     withP2PConnectionTestingUtility

@@ -92,7 +92,7 @@ public:
     void stop();
     bool isCameraRecoring(const QnResourcePtr& camera) const;
 
-    Recorders findRecorders(const QnResourcePtr& res) const;
+    Recorders findRecorders(const QnNetworkResourcePtr& res) const;
 
     bool startForcedRecording(
         const QnSecurityCamResourcePtr& camRes,
@@ -121,7 +121,7 @@ private:
 
     QnServerStreamRecorder* createRecorder(const QnResourcePtr &res, const QSharedPointer<QnAbstractMediaStreamDataProvider>& reader,
                                            QnServer::ChunksCatalog catalog, const QSharedPointer<QnDualStreamingHelper>& dualStreamingHelper);
-    bool startOrStopRecording(const QnResourcePtr& res, const QnVideoCameraPtr& camera, QnServerStreamRecorder* recorderHiRes, QnServerStreamRecorder* recorderLowRes);
+    bool startOrStopRecording(const QnResourcePtr& res, const nx::vms::server::VideoCameraPtr& camera, QnServerStreamRecorder* recorderHiRes, QnServerStreamRecorder* recorderLowRes);
     bool isResourceDisabled(const QnResourcePtr& res) const;
     QnVirtualCameraResourceList getLocalControlledCameras() const;
 

@@ -1,14 +1,12 @@
 #include "retry_timer.h"
 
-#include <nx/utils/std/cpp14.h>
-
 namespace nx::network {
 
 //-------------------------------------------------------------------------------------------------
 // class RetryPolicy
 
 const RetryPolicy RetryPolicy::kNoRetries(
-    0, kDefaultInitialDelay, kDefaultDelayMultiplier, kDefaultMaxDelay);
+    0, kDefaultInitialDelay, kDefaultDelayMultiplier, kDefaultMaxDelay, kDefaultRandomRatio);
 
 RetryPolicy::RetryPolicy():
     maxRetryCount(kDefaultMaxRetryCount)
@@ -19,9 +17,10 @@ RetryPolicy::RetryPolicy(
     unsigned int maxRetryCount,
     std::chrono::milliseconds initialDelay,
     unsigned int delayMultiplier,
-    std::chrono::milliseconds maxDelay)
+    std::chrono::milliseconds maxDelay,
+    double randomRatio)
 :
-    base_type(initialDelay, delayMultiplier, maxDelay),
+    base_type(initialDelay, delayMultiplier, maxDelay, randomRatio),
     maxRetryCount(maxRetryCount)
 {
 }
@@ -30,6 +29,12 @@ bool RetryPolicy::operator==(const RetryPolicy& rhs) const
 {
     return static_cast<const ProgressiveDelayPolicy&>(*this) == rhs
         && maxRetryCount == rhs.maxRetryCount;
+}
+
+QString RetryPolicy::toString() const
+{
+    return lm("RetryPolicy(%1, %2, %3, %4, %5)").args(
+        maxRetryCount, initialDelay, delayMultiplier, maxDelay, randomRatio);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -61,9 +66,7 @@ bool RetryTimer::scheduleNextTry(nx::utils::MoveOnlyFunc<void()> doAnotherTryFun
     if (retriesLeft() == 0)
         return false;
 
-    m_timer->start(
-        m_delayCalculator.calculateNewDelay(),
-        std::move(doAnotherTryFunc));
+    m_timer->start(m_delayCalculator.calculateNewDelay(), std::move(doAnotherTryFunc));
     return true;
 }
 
@@ -82,7 +85,6 @@ boost::optional<std::chrono::nanoseconds> RetryTimer::timeToEvent() const
 
 std::chrono::milliseconds RetryTimer::currentDelay() const
 {
-    //return m_currentDelay;
     return m_delayCalculator.currentDelay();
 }
 

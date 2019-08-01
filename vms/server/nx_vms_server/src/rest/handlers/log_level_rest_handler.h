@@ -1,12 +1,13 @@
 #pragma once
 
-#include <rest/server/json_rest_handler.h>
+#include <nx/network/rest/handler.h>
 
-class QnLogLevelRestHandler: public QnJsonRestHandler
+class QnLogLevelRestHandler: public nx::network::rest::Handler
 {
 public:
-    virtual JsonRestResponse executeGet(const JsonRestRequest& request) override;
+    nx::network::rest::Response executeGet(const nx::network::rest::Request& request) override;
 
 private:
-    virtual JsonRestResponse manageLogLevelById(const JsonRestRequest& request);
+    virtual nx::network::rest::Response manageLogLevelById(
+        const nx::network::rest::Request& request);
 };

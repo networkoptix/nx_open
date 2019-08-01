@@ -1,5 +1,7 @@
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+
 #include <algorithm>
-#include <cstring>
+#include <climits>
 
 #include <nx/kit/test.h>
 #include <nx/kit/utils.h>
@@ -8,6 +10,41 @@ namespace nx {
 namespace kit {
 namespace utils {
 namespace test {
+
+TEST(utils, getProcessCmdLineArgs)
+{
+    const auto& args = getProcessCmdLineArgs();
+
+    ASSERT_FALSE(args.empty());
+    ASSERT_TRUE(args[0].find("nx_kit_ut") != std::string::npos);
+
+    std::cerr << "Process has " << args.size() << " arg(s):" << std::endl;
+    for (const auto& arg: args)
+        std::cerr << nx::kit::utils::toString(arg) << std::endl;
+}
+
+TEST(utils, baseName)
+{
+    ASSERT_STREQ("", baseName(""));
+    ASSERT_STREQ("", baseName("/"));
+    ASSERT_STREQ("bar", baseName("/foo/bar"));
+    ASSERT_STREQ("bar", baseName("foo/bar"));
+
+    #if defined(_WIN32)
+        ASSERT_STREQ("bar", baseName("d:bar"));
+        ASSERT_STREQ("bar", baseName("X:\\bar"));
+    #endif
+}
+
+TEST(utils, getProcessName)
+{
+    const std::string processName = getProcessName();
+
+    ASSERT_FALSE(processName.empty());
+    ASSERT_TRUE(processName.find(".exe") == std::string::npos);
+    ASSERT_TRUE(processName.find('/') == std::string::npos);
+    ASSERT_TRUE(processName.find('\\') == std::string::npos);
+}
 
 TEST(utils, alignUp)
 {
@@ -78,6 +115,67 @@ TEST(utils, toString_char_ptr)
     ASSERT_STREQ(R"("str\x7Fwith_127")", toString("str\x7Fwith_127"));
     ASSERT_STREQ(R"("str\x1Fwith_31")", toString("str\x1Fwith_31"));
     ASSERT_STREQ(R"("str\xFFwith_255")", toString("str\xFFwith_255"));
+}
+
+TEST(utils, fromString_int)
+{
+    int value = 0;
+
+    ASSERT_TRUE(fromString("-3", &value));
+    ASSERT_EQ(-3, value);
+
+    ASSERT_TRUE(fromString("42", &value));
+    ASSERT_EQ(42, value);
+
+    ASSERT_TRUE(fromString(toString(INT_MAX), &value));
+    ASSERT_EQ(INT_MAX, value);
+
+    ASSERT_TRUE(fromString(toString(INT_MIN), &value));
+    ASSERT_EQ(INT_MIN, value);
+
+    ASSERT_FALSE(fromString(/* INT_MAX * 10 */ toString(INT_MAX) + "0", &value));
+    ASSERT_FALSE(fromString(/* INT_MIN * 10 */ toString(INT_MIN) + "0", &value));
+
+    ASSERT_FALSE(fromString("text", &value));
+    ASSERT_FALSE(fromString("42-some-suffix", &value));
+    ASSERT_FALSE(fromString("2.0", &value));
+    ASSERT_FALSE(fromString("", &value));
+}
+
+TEST(utils, fromString_double)
+{
+    double value = 0;
+
+    ASSERT_TRUE(fromString("-3", &value));
+    ASSERT_EQ(-3.0, value);
+
+    ASSERT_TRUE(fromString("42", &value));
+    ASSERT_EQ(42.0, value);
+
+    ASSERT_TRUE(fromString("3.14", &value));
+    ASSERT_EQ(3.14, value);
+
+    ASSERT_FALSE(fromString("text", &value));
+    ASSERT_FALSE(fromString("42-some-suffix", &value));
+    ASSERT_FALSE(fromString("", &value));
+}
+
+TEST(utils, fromString_float)
+{
+    float value = 0;
+
+    ASSERT_TRUE(fromString("-3", &value));
+    ASSERT_EQ(-3.0F, value);
+
+    ASSERT_TRUE(fromString("42", &value));
+    ASSERT_EQ(42.0F, value);
+
+    ASSERT_TRUE(fromString("3.14", &value));
+    ASSERT_EQ(3.14F, value);
+
+    ASSERT_FALSE(fromString("text", &value));
+    ASSERT_FALSE(fromString("42-some-suffix", &value));
+    ASSERT_FALSE(fromString("", &value));
 }
 
 } // namespace test

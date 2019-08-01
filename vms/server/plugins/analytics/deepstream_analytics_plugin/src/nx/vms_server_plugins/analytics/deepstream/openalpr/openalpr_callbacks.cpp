@@ -20,12 +20,47 @@ extern "C" {
 
 #include <nx/sdk/analytics/helpers/object_metadata.h>
 #include <nx/sdk/analytics/helpers/object_metadata_packet.h>
+#include <nx/sdk/analytics/helpers/event_metadata.h>
+#include <nx/sdk/analytics/helpers/event_metadata_packet.h>
 #include <nx/sdk/analytics/i_compressed_video_packet.h>
+#include <nx/sdk/analytics/rect.h>
 
 namespace nx {
 namespace vms_server_plugins {
 namespace analytics {
 namespace deepstream {
+
+namespace {
+
+nx::sdk::Ptr<nx::sdk::analytics::EventMetadataPacket> makeEventMetadataPacket(
+    const std::vector<LicensePlateInfo>& licensePlateInfos,
+    int64_t timestamp,
+    const std::string& postfix)
+{
+    auto eventMetadataPacket = nx::sdk::makePtr<nx::sdk::analytics::EventMetadataPacket>();
+    eventMetadataPacket->setTimestampUs(timestamp);
+    // TODO: #dmishin calculate duration or take it from buffer.
+    eventMetadataPacket->setDurationUs(ini().openAlprDefaultMetadataDurationMs * 1000);
+
+    for (const auto& licensePlate: licensePlateInfos)
+    {
+        auto detectionEvent = nx::sdk::makePtr<nx::sdk::analytics::EventMetadata>();
+        detectionEvent->setTypeId(kLicensePlateDetectedEventTypeId);
+        detectionEvent->setConfidence(1.0);
+
+        const std::string caption = std::string("License Plate: ")
+            + licensePlate.plateNumber
+            + postfix;
+        detectionEvent->setCaption(caption);
+        detectionEvent->setDescription(caption);
+
+        eventMetadataPacket->addItem(detectionEvent.get());
+    }
+
+    return eventMetadataPacket;
+}
+
+} // namespaces
 
 gboolean handleOpenAlprMetadata(GstBuffer* buffer, GstMeta** meta, gpointer userData)
 {
@@ -50,9 +85,10 @@ gboolean handleOpenAlprMetadata(GstBuffer* buffer, GstMeta** meta, gpointer user
     if (bboxes->gie_type != 3)
         return true;
 
-    auto packet = new nx::sdk::analytics::ObjectMetadataPacket();
-    packet->setTimestampUs(GST_BUFFER_PTS(buffer));
-    packet->setDurationUs(30000); //< TODO: #dmishin calculate duration or take it from buffer.
+    auto objectMetadataPacket = nx::sdk::makePtr<nx::sdk::analytics::ObjectMetadataPacket>();
+    objectMetadataPacket->setTimestampUs(GST_BUFFER_PTS(buffer));
+    // TODO: #dmishin calculate duration or take it from buffer.
+    objectMetadataPacket->setDurationUs(ini().openAlprDefaultMetadataDurationMs * 1000);
 
     auto pipeline = (deepstream::OpenAlprPipeline*) userData;
     auto licensePlateTracker = pipeline->licensePlateTracker();
@@ -78,7 +114,7 @@ gboolean handleOpenAlprMetadata(GstBuffer* buffer, GstMeta** meta, gpointer user
         }
 
         auto detectedObject = nx::sdk::makePtr<nx::sdk::analytics::ObjectMetadata>();
-        nx::sdk::analytics::IObjectMetadata::Rect rectangle;
+        nx::sdk::analytics::Rect rectangle;
 
         rectangle.x = roiMeta.rect_params.left / (double) frameWidth;
         rectangle.y = roiMeta.rect_params.top / (double) frameHeight;
@@ -92,11 +128,15 @@ gboolean handleOpenAlprMetadata(GstBuffer* buffer, GstMeta** meta, gpointer user
             << "width: " << rectangle.width << ", "
             << "height: " << rectangle.height;
 
-        std::deque<nx::sdk::analytics::Attribute> attributes;
-
-        const auto& info = licensePlateTracker->licensePlateInfo(displayText);
+        std::deque<nx::sdk::Ptr<nx::sdk::Attribute>> attributes;
 
         auto encodedAttributes = split(displayText, '%');
+        if (encodedAttributes.empty())
+            continue;
+
+        const auto& info = licensePlateTracker->licensePlateInfo(
+            /*License plate number*/ encodedAttributes[0]);
+
         for (int i = 0; i < (int) encodedAttributes.size(); ++i)
         {
             switch (i)
@@ -104,25 +144,28 @@ gboolean handleOpenAlprMetadata(GstBuffer* buffer, GstMeta** meta, gpointer user
                 case 0:
                 {
                     attributes.emplace_back(
-                        nx::sdk::IAttribute::Type::string,
-                        "Number",
-                        encodedAttributes[i]);
+                        nx::sdk::makePtr<nx::sdk::Attribute>(
+                            nx::sdk::IAttribute::Type::string,
+                            "Number",
+                            encodedAttributes[i]));
                     break;
                 }
                 case 1:
                 {
                     attributes.emplace_back(
-                        nx::sdk::IAttribute::Type::string,
-                        "Country",
-                        encodedAttributes[i]);
+                        nx::sdk::makePtr<nx::sdk::Attribute>(
+                            nx::sdk::IAttribute::Type::string,
+                            "Country",
+                            encodedAttributes[i]));
                     break;
                 }
                 case 2:
                 {
                     attributes.emplace_back(
-                        nx::sdk::IAttribute::Type::string,
-                        "Region",
-                        encodedAttributes[i]);
+                        nx::sdk::makePtr<nx::sdk::Attribute>(
+                            nx::sdk::IAttribute::Type::string,
+                            "Region",
+                            encodedAttributes[i]));
                     break;
 
                 }
@@ -137,33 +180,77 @@ gboolean handleOpenAlprMetadata(GstBuffer* buffer, GstMeta** meta, gpointer user
         detectedObject->setId(info.uuid);
         detectedObject->setBoundingBox(rectangle);
         detectedObject->setConfidence(1.0);
-        detectedObject->setTypeId(kLicensePlateGuid);
+        detectedObject->setTypeId(kLicensePlateObjectTypeId);
 
         if (ini().showGuids)
         {
             attributes.emplace_front(
-                nx::sdk::IAttribute::Type::string,
-                "GUID",
-                nx::sdk::UuidHelper::toStdString(info.uuid));
+                nx::sdk::makePtr<nx::sdk::Attribute>(
+                    nx::sdk::IAttribute::Type::string,
+                    "GUID",
+                    nx::sdk::UuidHelper::toStdString(info.uuid)));
         }
 
         detectedObject->addAttributes(
-            std::vector<nx::sdk::analytics::Attribute>(
+            std::vector<nx::sdk::Ptr<nx::sdk::Attribute>>(
                 attributes.begin(),
                 attributes.end()));
 
-        packet->addItem(detectedObject.get());
+        objectMetadataPacket->addItem(detectedObject.get());
     }
 
-    pipeline->handleMetadata(packet);
+    pipeline->handleMetadata(objectMetadataPacket.get());
     return true;
 }
 
 GstPadProbeReturn processOpenAlprResult(GstPad* /*pad*/, GstPadProbeInfo* info, gpointer userData)
 {
     NX_OUTPUT << __func__ << " Calling OpenALPR process result probe";
+
+    auto pipeline = (deepstream::OpenAlprPipeline*) userData;
+    auto licensePlateTracker = pipeline->licensePlateTracker();
+
+    licensePlateTracker->onNewFrame();
+
     auto* buffer = (GstBuffer*) info->data;
     gst_buffer_foreach_meta(buffer, handleOpenAlprMetadata, userData);
+
+    const int64_t timestamp = (int64_t) GST_BUFFER_PTS(buffer);
+
+    if (ini().generateEventWhenLicensePlateDisappears)
+    {
+        const auto outdatedLicensePlates = licensePlateTracker->takeOutdatedLicensePlateInfos();
+        if (!outdatedLicensePlates.empty())
+        {
+            NX_OUTPUT << __func__
+                << " Generating an event metadata packet for outdated license plates";
+
+            auto eventMetadataPacket = makeEventMetadataPacket(
+                outdatedLicensePlates,
+                timestamp,
+                " disappeared");
+
+            pipeline->handleMetadata(eventMetadataPacket.get());
+        }
+    }
+    else
+    {
+        licensePlateTracker->cleanUpOutdatedLicensePlateInfos();
+    }
+
+    const auto justDetectedLicensePlates = licensePlateTracker->getJustDetectedLicensePlates();
+    if (!justDetectedLicensePlates.empty())
+    {
+        NX_OUTPUT << __func__
+            << " Generating an event metadata packet for newly detected license plates";
+
+        auto eventMetadataPacket = makeEventMetadataPacket(
+            justDetectedLicensePlates,
+            timestamp,
+            " appeared");
+
+        pipeline->handleMetadata(eventMetadataPacket.get());
+    }
 
     return GST_PAD_PROBE_OK;
 }

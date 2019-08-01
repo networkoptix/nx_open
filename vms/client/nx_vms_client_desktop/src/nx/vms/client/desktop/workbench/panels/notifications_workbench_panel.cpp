@@ -1,5 +1,6 @@
 #include "notifications_workbench_panel.h"
 
+#include <QtCore/QModelIndex>
 #include <QtCore/QTimer>
 
 #include <QtWidgets/QAction>
@@ -33,8 +34,10 @@
 #include <ui/workaround/hidpi_workarounds.h>
 #include <ui/workbench/workbench_ui_globals.h>
 #include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_pane_settings.h>
 
+#include <nx/vms/client/desktop/common/widgets/async_image_widget.h>
 #include <nx/vms/client/desktop/event_search/widgets/event_panel.h>
 #include <nx/vms/client/desktop/event_search/widgets/event_ribbon.h>
 #include <nx/vms/client/desktop/event_search/widgets/event_tile.h>
@@ -51,7 +54,7 @@ namespace {
 static constexpr int kNarrowWidth = 280;
 static constexpr int kWideWidth = 430;
 
-static const QSize kToolTipMaxThumbnailSize(480, 480);
+static const QSize kToolTipMaxThumbnailSize(240, 180);
 static constexpr int kToolTipShowDelayMs = 250;
 static constexpr int kToolTipHideDelayMs = 250;
 static constexpr qreal kToolTipFadeSpeedFactor = 2.0;
@@ -223,6 +226,8 @@ NotificationsWorkbenchPanel::NotificationsWorkbenchPanel(
 
 NotificationsWorkbenchPanel::~NotificationsWorkbenchPanel()
 {
+    if (m_eventPanelContainer)
+        m_eventPanelContainer->setWidget(nullptr);
 }
 
 bool NotificationsWorkbenchPanel::isPinned() const
@@ -378,6 +383,7 @@ void NotificationsWorkbenchPanel::createEventPanel(QGraphicsWidget* parentWidget
     m_eventPanelContainer = new QnMaskedProxyWidget(parentWidget);
     m_eventPanelContainer->setProperty(Qn::NoHandScrollOver, true);
     m_eventPanelContainer->setProperty(Qn::BlockMotionSelection, true);
+    m_eventPanelContainer->setFocusPolicy(Qt::ClickFocus);
 
     auto eventPanelResizer = new ResizerWidget(item, m_eventPanelContainer);
     auto dragProcessor = new DragProcessor(this);
@@ -416,7 +422,7 @@ void NotificationsWorkbenchPanel::createEventPanel(QGraphicsWidget* parentWidget
     connect(m_eventPanel.data(), &EventPanel::currentTabChanged, this,
         [this](EventPanel::Tab tab)
         {
-            if (tab == EventPanel::Tab::motion)
+            if (tab == EventPanel::Tab::motion && !display()->widget(Qn::ZoomedRole))
                 setOpened();
         });
 }
@@ -443,7 +449,7 @@ void NotificationsWorkbenchPanel::at_eventTileHovered(
 
     const auto parentWidget = m_eventPanel->graphicsProxyWidget();
     const auto imageProvider = tile->preview();
-    const auto text = tile->toolTip().isEmpty() ? tile->title() : tile->toolTip();
+    const auto text = tile->toolTip();
     if (text.isEmpty())
         return;
 
@@ -463,6 +469,10 @@ void NotificationsWorkbenchPanel::at_eventTileHovered(
     toolTip->setFlag(QGraphicsItem::ItemIgnoresParentOpacity, true);
     toolTip->updateTailPos();
     toolTip->pointTo(tooltipPos);
+
+    toolTip->setCropMode(ini().rightPanelHoverPreviewCrop
+        ? AsyncImageWidget::CropMode::notHovered
+        : AsyncImageWidget::CropMode::never);
 
     // TODO: #vkutin Refactor tooltip clicks, now it looks hackish.
     connect(toolTip.data(), &QnNotificationToolTipWidget::thumbnailClicked, tile,
@@ -499,9 +509,9 @@ void NotificationsWorkbenchPanel::at_eventTileHovered(
                 return;
 
             auto animator = opacityAnimator(toolTip, kToolTipFadeSpeedFactor);
-            animator->animateTo(0.0);
             connect(animator, &VariantAnimator::finished,
                 toolTip.data(), &QObject::deleteLater);
+            animator->animateTo(0.0);
         });
 
     m_eventPanelHoverProcessor->forceHoverEnter();

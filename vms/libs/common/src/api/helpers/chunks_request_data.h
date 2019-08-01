@@ -6,12 +6,14 @@
 
 #include <QUrlQuery>
 
-#include <analytics/detected_objects_storage/analytics_events_storage_types.h>
+#include <analytics/db/analytics_db_types.h>
 #include <core/resource/resource_fwd.h>
 #include <utils/common/request_param.h>
 #include <common/common_globals.h>
 #include <nx/utils/datetime.h>
 #include <nx/fusion/model_functions_fwd.h>
+
+class QnCommonModule;
 
 struct QnChunksRequestData
 {
@@ -38,6 +40,12 @@ struct QnChunksRequestData
     QUrlQuery toUrlQuery() const;
     bool isValid() const;
 
+    /**
+     * Picks a proper requestVersion using version from ec2Connection.
+     * 28.06.2019: Mobile client still should support 2.6 version.
+     */
+    void pickRequestVersion(QnCommonModule* commonModule);
+
     RequestVersion requestVersion = RequestVersion::current;
 
     Qn::TimePeriodContent periodsType = Qn::RecordingContent;
@@ -54,7 +62,7 @@ struct QnChunksRequestData
     GroupBy groupBy = GroupBy::serverId;
     Qt::SortOrder sortOrder = Qt::SortOrder::AscendingOrder;
 
-    boost::optional<nx::analytics::storage::Filter> analyticsStorageFilter;
+    boost::optional<nx::analytics::db::Filter> analyticsStorageFilter;
 };
 
 QN_FUSION_DECLARE_FUNCTIONS(QnChunksRequestData::GroupBy, (lexical))

@@ -21,6 +21,10 @@ public:
         const QByteArray& script,
         nx::sql::QueryContext* const queryContext)> CustomExecSqlScriptFunc;
 
+    virtual void pleaseStopSync() override
+    {
+    }
+
     TestAsyncSqlQueryExecutor(AbstractAsyncSqlQueryExecutor* _delegate):
         m_delegate(_delegate)
     {
@@ -30,6 +34,20 @@ public:
     virtual const ConnectionOptions& connectionOptions() const override
     {
         return m_connectionOptions;
+    }
+
+    virtual void setQueryPriority(QueryType queryType, int newPriority) override
+    {
+        m_delegate->setQueryPriority(queryType, newPriority);
+    }
+
+    virtual void setConcurrentModificationQueryLimit(int /*limit*/) override
+    {
+    }
+
+    virtual int pendingQueryCount() const override
+    {
+        return m_delegate->pendingQueryCount();
     }
 
     //---------------------------------------------------------------------------------------------
@@ -73,6 +91,30 @@ public:
         return m_delegate->execSqlScriptSync(script, queryContext);
     }
 
+    //---------------------------------------------------------------------------------------------
+
+    virtual void createCursorImpl(
+        std::unique_ptr<detail::AbstractCursorHandler> cursorHandler) override
+    {
+        m_delegate->createCursorImpl(std::move(cursorHandler));
+    }
+
+    virtual void fetchNextRecordFromCursorImpl(
+        std::unique_ptr<detail::AbstractFetchNextRecordFromCursorTask> task) override
+    {
+        m_delegate->fetchNextRecordFromCursorImpl(std::move(task));
+    }
+
+    virtual void removeCursor(QnUuid id) override
+    {
+        m_delegate->removeCursor(id);
+    }
+
+    virtual int openCursorCount() const override
+    {
+        return m_delegate->openCursorCount();
+    }
+
     ConnectionOptions& connectionOptions()
     {
         return m_connectionOptions;
@@ -97,7 +139,8 @@ class BasicDbStructureUpdaterTestSetup:
     using base_type = FixtureWithQueryExecutorOnly;
 
 public:
-    BasicDbStructureUpdaterTestSetup()
+    BasicDbStructureUpdaterTestSetup():
+        base_type(kModuleName)
     {
         using namespace std::placeholders;
 

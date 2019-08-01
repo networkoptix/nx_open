@@ -1,6 +1,5 @@
 set(nx_enable_werror ON)
 
-add_subdirectory(libs)
 add_subdirectory(cloud_db_client)
 add_subdirectory(nx_cloud_connectivity)
 
@@ -9,7 +8,7 @@ if(withClouds OR withDesktopClient)
 endif()
 
 if(withClouds)
-    add_subdirectory(vms_gateway)
+    add_subdirectory(libs)
     add_subdirectory(libconnection_mediator)
     add_subdirectory(connection_mediator)
     add_subdirectory(discovery)
@@ -25,4 +24,4 @@ if(withClouds)
     endif()
 endif()
 
-add_custom_target(cloud-backend DEPENDS cloud_db_client vms_gateway connection_mediator cloud_db traffic_relay time_server cloud_connect_test_util)
+add_custom_target(cloud-backend DEPENDS cloud_db_client connection_mediator cloud_db traffic_relay time_server cloud_connect_test_util)

@@ -1,0 +1,4 @@
+[General]
+secureAppserverConnection=1
+minStorageSpace=1000000000
+resourceInitThreadsCount=8

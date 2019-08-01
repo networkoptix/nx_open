@@ -14,7 +14,6 @@ QnRtpStreamReader::QnRtpStreamReader(
     CLServerPushStreamReader(res),
     m_rtpReader(res, res->getTimeOffset()),
     m_request(request),
-    m_rtpTransport(RtspTransport::notDefined),
     m_camera(res)
 {
 }
@@ -24,9 +23,9 @@ QnRtpStreamReader::~QnRtpStreamReader()
     stop();
 }
 
-void QnRtpStreamReader::setRtpTransport(const RtspTransport& transport)
+void QnRtpStreamReader::setRtpTransport(nx::vms::api::RtpTransportType transport)
 {
-    m_rtpTransport = transport;
+    m_rtpReader.setRtpTransport(transport);
 }
 
 void QnRtpStreamReader::setRequest(const QString& request)
@@ -57,7 +56,7 @@ QnAbstractMediaDataPtr QnRtpStreamReader::getNextData()
 
     if (!result)
     {
-        NX_VERBOSE(this, lm("Next data: end of stream %1")
+        NX_VERBOSE(this, lm("Next data: end of stream %1. Closing stream")
             .args(m_rtpReader.getCurrentStreamUrl()));
         closeStream();
     }
@@ -77,7 +76,6 @@ CameraDiagnostics::Result QnRtpStreamReader::openStreamInternal(bool /*isCameraC
 {
     m_rtpReader.setRole(getRole());
     m_rtpReader.setRequest(m_request);
-    m_rtpReader.setRtpTransport(m_rtpTransport);
 
     m_camera->updateSourceUrl(m_rtpReader.getCurrentStreamUrl(), getRole());
 

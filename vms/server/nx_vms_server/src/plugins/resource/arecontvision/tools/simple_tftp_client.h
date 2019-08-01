@@ -35,7 +35,7 @@ public:
     int read(const QString& fn, QnByteArray& data);
     const unsigned char* getLastPacket(int& size) const
     {
-        size = m_last_packet.size();
+        size = (int) m_last_packet.size();
         return m_last_packet.data();
     }
     CameraDiagnostics::Result prevIOResult() const;
@@ -43,7 +43,7 @@ public:
 private:
     int form_read_request(const QString& fn, char* buff);
     int form_ack(unsigned short blk, char* buff);
-    int parseBlockSize(const char* const responseBuffer, std::size_t responseLength);
+    int parseBlockSize(const char* const responseBuffer, int responseLength);
 
 private:
 

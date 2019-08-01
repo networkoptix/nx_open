@@ -5,6 +5,7 @@
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QLabel>
 
+#include <nx/utils/log/assert.h>
 #include <nx/utils/string.h>
 
 namespace {

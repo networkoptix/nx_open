@@ -83,7 +83,7 @@ static void createData(const Appserver2Ptr& server)
 
 }
 
-TEST(SympleSyncTest, main)
+TEST(SimpleSyncTest, main)
 {
     static const int kInstanceCount = 2;
     static const int kMaxSyncTimeoutMs = 1000 * 5 * 1000;

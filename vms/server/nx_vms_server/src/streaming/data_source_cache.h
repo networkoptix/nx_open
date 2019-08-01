@@ -55,7 +55,7 @@ public:
         const StreamingChunkCacheKey& endKey);
 
     virtual void onTimer(const quint64& timerID) override;
-
+    void clear();
 private:
     nx::utils::StandaloneTimerManager* m_timerManager;
     mutable QnMutex m_mutex;

@@ -1,3 +1,5 @@
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+
 #if defined(_WIN32)
     #include <stdio.h>
     #include <io.h>
@@ -14,6 +16,7 @@
 #include <string>
 #include <cstring>
 
+#include <nx/kit/utils.h>
 #include <nx/kit/test.h>
 #include <nx/kit/output_redirector.h>
 
@@ -25,11 +28,6 @@ public:
     static void redirectStdoutAndStderrIfNeeded(const char *overridingLogFilesDir)
     {
         OutputRedirector::redirectStdoutAndStderrIfNeeded(overridingLogFilesDir);
-    }
-
-    static std::string getProcessName()
-    {
-        return OutputRedirector::getProcessName();
     }
 };
 
@@ -67,7 +65,7 @@ public:
     }
 
     const std::string testDir = nx::kit::test::staticTempDir();
-    const std::string processName = OutputRedirectorAdapter::getProcessName();
+    const std::string processName = nx::kit::utils::getProcessName();
     const std::string stdoutFilePath = testDir + processName + std::string("_stdout.log");
     const std::string stderrFilePath = testDir + processName + std::string("_stderr.log");
 };
@@ -102,6 +100,6 @@ TEST(outputRedirector, check)
     stdoutLogStream.close();
     stderrLogStream.close();
 
-    ASSERT_EQ("stdout is redirected to this file\nstdout test\ncout test\n", stdoutLogContent);
-    ASSERT_EQ("stderr is redirected to this file\nstderr test\ncerr test\n", stderrLogContent);
+    ASSERT_STREQ("stdout is redirected to this file\nstdout test\ncout test\n", stdoutLogContent);
+    ASSERT_STREQ("stderr is redirected to this file\nstderr test\ncerr test\n", stderrLogContent);
 }

@@ -35,7 +35,7 @@ CLVideoDecoderOutputPtr QnTiledImageFilter::updateImage(const CLVideoDecoderOutp
         {
             m_tiledFrame = CLVideoDecoderOutputPtr(new CLVideoDecoderOutput());
             m_tiledFrame->reallocate(newSize, frame->format);
-            m_tiledFrame->memZerro();
+            m_tiledFrame->memZero();
         }
     }
     m_tiledFrame->assignMiscData(frame.data());
@@ -46,11 +46,11 @@ CLVideoDecoderOutputPtr QnTiledImageFilter::updateImage(const CLVideoDecoderOutp
     const QRect rect(pos.x() * m_size.width(), pos.y() * m_size.height(),
         m_size.width(), m_size.height());
     auto croppedFrame = QnCropImageFilter(rect).updateImage(m_tiledFrame);
-    CLVideoDecoderOutput::copy(frame.data(), croppedFrame.data());
+    croppedFrame->copyFrom(frame.data());
 
     // Make sure overlays will be painter on frame copy, not on the combined frame itself.
     auto result = CLVideoDecoderOutputPtr(new CLVideoDecoderOutput());
-    CLVideoDecoderOutput::copy(m_tiledFrame.data(), result.data());
+    result->copyFrom(m_tiledFrame.data());
     return result;
 }
 

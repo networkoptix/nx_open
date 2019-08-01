@@ -12,8 +12,6 @@ namespace test {
 
 using nx::hpm::MediaServerEmulator;
 
-constexpr const std::chrono::seconds kDefaultTestTimeout = std::chrono::seconds(15);
-
 TunnelConnector::~TunnelConnector()
 {
     if (m_oldFactoryFunc)

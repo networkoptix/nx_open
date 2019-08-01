@@ -139,8 +139,9 @@ void ConnectionBase::pleaseStopSync()
         NX_ASSERT(m_startedClassId == typeid(*this).hash_code(),
             "Please call pleaseStopSync() in the destructor of the nested class.");
         m_startedClassId = 0;
-        m_timer.executeInAioThreadSync([this]() { stopWhileInAioThread(); });
     }
+
+    m_timer.executeInAioThreadSync([this]() { stopWhileInAioThread(); });
 }
 
 ConnectionBase::~ConnectionBase()
@@ -208,10 +209,11 @@ void ConnectionBase::onHttpClientDone()
     {
         // try next credential source
         m_credentialsSource = (CredentialsSource)((int)m_credentialsSource + 1);
-        if (m_credentialsSource < CredentialsSource::none)
+        using namespace std::placeholders;
+        if (m_httpClient->url().userName().isEmpty()
+            && m_credentialsSource < CredentialsSource::none
+            && fillAuthInfo(m_httpClient.get(), m_credentialsSource == CredentialsSource::serverKey))
         {
-            using namespace std::placeholders;
-            fillAuthInfo(m_httpClient.get(), m_credentialsSource == CredentialsSource::serverKey);
             m_httpClient->doGet(
                 m_httpClient->url(),
                 std::bind(&ConnectionBase::onHttpClientDone, this));
@@ -239,6 +241,15 @@ void ConnectionBase::onHttpClientDone()
                 std::bind(&ConnectionBase::onHttpClientDone, this));
         else
             cancelConnecting(State::Error, lm("tryAcquireConnecting failed"));
+        return;
+    }
+
+    if (statusCode == nx::network::http::StatusCode::forbidden)
+    {
+        cancelConnecting(
+            State::Error,
+            lm("Remote peer forbid connection with message: %1")
+            .arg(m_httpClient->fetchMessageBodyBuffer()));
         return;
     }
 
@@ -300,11 +311,15 @@ void ConnectionBase::onHttpClientDone()
     websocket::FrameType frameType = remotePeer.dataFormat == Qn::JsonFormat
         ? websocket::FrameType::text
         : websocket::FrameType::binary;
+
+    auto compressionType = websocket::compressionType(m_httpClient->response()->headers);
+
     if (useWebsocketMode)
     {
         auto socket = m_httpClient->takeSocket();
         socket->setNonBlockingMode(true);
-        m_p2pTransport.reset(new P2PWebsocketTransport(std::move(socket), frameType));
+        m_p2pTransport.reset(new P2PWebsocketTransport(
+            std::move(socket), nx::network::websocket::Role::client, frameType, compressionType));
     }
     else
     {
@@ -329,7 +344,8 @@ void ConnectionBase::startConnection()
      m_startedClassId = typeid(*this).hash_code();
 
     auto headers = m_additionalRequestHeaders;
-    nx::network::websocket::addClientHeaders(&headers, kP2pProtoName);
+    nx::network::websocket::addClientHeaders(
+        &headers, kP2pProtoName, nx::network::websocket::CompressionType::perMessageDeflate);
     m_connectionGuid = QnUuid::createUuid().toByteArray();
     headers.emplace(Qn::EC2_CONNECTION_GUID_HEADER_NAME, m_connectionGuid);
     m_httpClient->addRequestHeaders(headers);
@@ -344,16 +360,8 @@ void ConnectionBase::startConnection()
 
     m_httpClient->bindToAioThread(m_timer.getAioThread());
 
-    if (requestUrl.userName().isEmpty())
-    {
+    if (requestUrl.password().isEmpty())
         fillAuthInfo(m_httpClient.get(), m_credentialsSource == CredentialsSource::serverKey);
-    }
-    else
-    {
-        m_credentialsSource = CredentialsSource::remoteUrl;
-        m_httpClient->setUserName(requestUrl.userName());
-        m_httpClient->setUserPassword(requestUrl.password());
-    }
 
     m_httpClient->doGet(
         requestUrl,
@@ -500,8 +508,7 @@ void ConnectionBase::onNewMessageRead(SystemError::ErrorCode errorCode, size_t b
         return; //< connection closed
     }
 
-    if (errorCode != SystemError::noError ||
-        !handleMessage(m_readBuffer))
+    if (errorCode != SystemError::noError || !handleMessage(m_readBuffer))
     {
         setState(State::Error);
         return;
@@ -564,6 +571,7 @@ void ConnectionBase::bindToAioThread(nx::network::aio::AbstractAioThread* aioThr
     if (m_p2pTransport)
         m_p2pTransport->bindToAioThread(aioThread);
 }
+
 
 } // namespace p2p
 } // namespace nx

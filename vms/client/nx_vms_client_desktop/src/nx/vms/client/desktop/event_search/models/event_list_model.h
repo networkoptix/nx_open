@@ -38,6 +38,7 @@ public:
         QnNotificationLevel::Value level = QnNotificationLevel::Value::NoNotification;
         QnVirtualCameraResourcePtr previewCamera;
         QnVirtualCameraResourceList cameras;
+        QnResourcePtr source;
         std::chrono::microseconds previewTime{0}; //< The latest thumbnail's used if previewTime <= 0.
         ui::action::IDType actionId = ui::action::NoAction;
         ui::action::Parameters actionParameters;

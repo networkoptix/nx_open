@@ -12,7 +12,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/user_resource.h>
 
-#include <nx/vms/client/desktop/resource_views/data/node_type.h>
+#include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 
 #include <ui/common/palette.h>
 #include <ui/delegates/resource_item_delegate.h>
@@ -125,7 +125,7 @@ void QnResourceSelectionDialog::initModel()
     m_resourceModel = new QnResourceTreeModel(QnResourceTreeModel::CamerasScope, this);
 
     // Auto expand if and only if server count <= 1 or cameras count <= 50.
-    if (auto treeRoot = m_resourceModel->rootNode(ResourceTreeNodeType::servers))
+    if (auto treeRoot = m_resourceModel->rootNode(ResourceTree::NodeType::servers))
     {
         int numServers = treeRoot->children().size();
         int numResources = treeRoot->childrenRecursive().size() - numServers;
@@ -199,7 +199,7 @@ QSet<QnUuid> QnResourceSelectionDialog::selectedResourcesInternal(const QModelIn
         if (!checked)
             continue;
 
-        auto nodeType = idx.data(Qn::NodeTypeRole).value<ResourceTreeNodeType>();
+        auto nodeType = idx.data(Qn::NodeTypeRole).value<ResourceTree::NodeType>();
         auto resource = idx.data(Qn::ResourceRole).value<QnResourcePtr>();
         auto id = idx.data(Qn::UuidRole).value<QnUuid>();
 

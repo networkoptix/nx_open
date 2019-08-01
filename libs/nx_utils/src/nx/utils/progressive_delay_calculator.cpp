@@ -1,5 +1,8 @@
 #include "progressive_delay_calculator.h"
 
+#include <nx/utils/random.h>
+#include <nx/utils/log/assert.h>
+
 namespace nx::utils {
 
 constexpr std::chrono::milliseconds ProgressiveDelayPolicy::kNoMaxDelay;
@@ -9,26 +12,31 @@ constexpr std::chrono::milliseconds ProgressiveDelayPolicy::kDefaultMaxDelay;
 ProgressiveDelayPolicy::ProgressiveDelayPolicy():
     initialDelay(kDefaultInitialDelay),
     delayMultiplier(kDefaultDelayMultiplier),
-    maxDelay(kDefaultMaxDelay)
+    maxDelay(kDefaultMaxDelay),
+    randomRatio(kDefaultRandomRatio)
 {
 }
 
 ProgressiveDelayPolicy::ProgressiveDelayPolicy(
     std::chrono::milliseconds initialDelay,
     unsigned int delayMultiplier,
-    std::chrono::milliseconds maxDelay)
+    std::chrono::milliseconds maxDelay,
+    double randomRatio)
     :
     initialDelay(initialDelay),
     delayMultiplier(delayMultiplier),
-    maxDelay(maxDelay)
+    maxDelay(maxDelay),
+    randomRatio(randomRatio)
 {
+    NX_ASSERT(randomRatio >= 0 && randomRatio <= 1);
 }
 
 bool ProgressiveDelayPolicy::operator==(const ProgressiveDelayPolicy& rhs) const
 {
     return initialDelay == rhs.initialDelay
         && delayMultiplier == rhs.delayMultiplier
-        && maxDelay == rhs.maxDelay;
+        && maxDelay == rhs.maxDelay
+        && randomRatio == rhs.randomRatio;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -63,12 +71,19 @@ std::chrono::milliseconds ProgressiveDelayCalculator::calculateNewDelay()
 
     ++m_triesMade;
 
-    return m_currentDelay;
+    if (m_delayPolicy.randomRatio != 0)
+        m_currentRandomBias = nx::utils::random::numberDelta(1.0, m_delayPolicy.randomRatio);
+
+    return currentDelay();
 }
 
 std::chrono::milliseconds ProgressiveDelayCalculator::currentDelay() const
 {
-    return m_currentDelay;
+    if (m_delayPolicy.randomRatio == 0)
+        return m_currentDelay;
+
+    return std::chrono::milliseconds(static_cast<std::chrono::milliseconds::rep>(
+        m_currentRandomBias * m_currentDelay.count()));
 }
 
 unsigned int ProgressiveDelayCalculator::triesMade() const

@@ -3,6 +3,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/system_error.h>
+#include <nx/utils/app_info.h>
 
 namespace nx {
 namespace network {
@@ -63,6 +64,29 @@ SystemError::ErrorCode SystemResolver::resolve(
     int ipVersion,
     std::deque<AddressEntry>* resolvedEntries)
 {
+    // This is a workaround for buggy systems where /etc/hosts does not work, thus localhost is
+    // inaccessible. Currenty only DW Edge1 is known for this problem.
+    // TODO: Proper workaround: manual /etc/hosts parsing.
+    if (nx::utils::AppInfo::isEdgeServer())
+    {
+        if (hostNameOriginal == HostAddress::localhost.toString())
+        {
+            if (ipVersion == AF_INET)
+            {
+                resolvedEntries->push_back({{AddressEntry(
+                    AddressType::direct,
+                    *HostAddress::localhost.ipV4())}});
+            }
+            else
+            {
+                resolvedEntries->push_back({{AddressEntry(
+                    AddressType::direct,
+                    *HostAddress::localhost.ipV6().first)}});
+            }
+            return SystemError::noError;
+        }
+    }
+
     auto resultCode = SystemError::noError;
     const auto guard = nx::utils::makeScopeGuard([&]() { SystemError::setLastErrorCode(resultCode); });
     QString hostName = hostNameOriginal.trimmed();

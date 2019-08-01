@@ -24,7 +24,7 @@ public:
     SystemManager():
         m_streeManager(m_settings.auth().rulesXmlPath),
         m_emailManager(nullptr),
-        m_ec2SyncronizationEngine(
+        m_ec2SynchronizationEngine(
             std::string(),
             m_settings.p2pDb(),
             nx::clusterdb::engine::ProtocolVersionRange(
@@ -137,7 +137,7 @@ private:
     AccountManagerStub m_accountManagerStub;
     SystemHealthInfoProviderStub m_systemHealthInfoProvider;
     TestEmailManager m_emailManager;
-    clusterdb::engine::SyncronizationEngine m_ec2SyncronizationEngine;
+    clusterdb::engine::SynchronizationEngine m_ec2SynchronizationEngine;
     std::unique_ptr<nx::cloud::db::SystemManager> m_systemManager;
     std::string m_systemId;
     api::AccountData m_ownerAccount;
@@ -165,7 +165,7 @@ private:
             m_systemHealthInfoProvider,
             &persistentDbManager()->queryExecutor(),
             &m_emailManager,
-            &m_ec2SyncronizationEngine);
+            &m_ec2SynchronizationEngine);
     }
 };
 

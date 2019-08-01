@@ -1,26 +1,34 @@
 #include "test_peer_manager.h"
 
 #include <thread>
+
 #include <QtCore/QTextStream>
 
 #include <nx/utils/log/assert.h>
 #include <nx/vms/common/p2p/downloader/private/storage.h>
 
-namespace nx {
-namespace vms {
-namespace common {
-namespace p2p {
-namespace downloader {
+namespace nx::vms::common::p2p::downloader {
 
 namespace {
 
 static const auto kNullGuid = QnUuid();
 static constexpr int kDefaultRequestTime = 200;
 
+template<typename SharedPromise>
+std::function<void()> makeCanceller(
+    TestPeerManager* manager, const QnUuid& peerId, rest::Handle handle, SharedPromise promise)
+{
+    return [manager, peerId, handle, promise]()
+        {
+            manager->cancelRequest(peerId, handle);
+            AbstractPeerManager::setPromiseValueIfEmpty(promise, {});
+        };
+}
+
 } // namespace
 
-TestPeerManager::TestPeerManager(TestPeerManagerHandler* handler):
-    m_handler(handler)
+TestPeerManager::TestPeerManager():
+    AbstractPeerManager(AllCapabilities)
 {
 }
 
@@ -71,6 +79,11 @@ void TestPeerManager::setHasInternetConnection(const QnUuid& peerId, bool hasInt
     m_peers[peerId].hasInternetConnection = hasInternetConnection;
 }
 
+bool TestPeerManager::hasInternetConnection(const QnUuid& peerId) const
+{
+    return m_peers[peerId].hasInternetConnection;
+}
+
 QStringList TestPeerManager::peerGroups(const QnUuid& peerId) const
 {
     return m_peers[peerId].groups;
@@ -93,19 +106,11 @@ void TestPeerManager::addInternetFile(const nx::utils::Url& url, const QString& 
     m_fileByUrl[url] = fileName;
 }
 
-QnUuid TestPeerManager::selfId() const
-{
-    return QnUuid();
-}
-
 QString TestPeerManager::peerString(const QnUuid& peerId) const
 {
     auto result = m_peers[peerId].name;
     if (result.isEmpty())
         result = peerId.toString();
-
-    if (peerId == selfId())
-        result += " (self)";
 
     return result;
 }
@@ -120,148 +125,177 @@ int TestPeerManager::distanceTo(const QnUuid& /*peerId*/) const
     return std::numeric_limits<int>::max();
 }
 
-bool TestPeerManager::hasInternetConnection(const QnUuid& peerId) const
-{
-    return m_peers[peerId].hasInternetConnection;
-}
-
-rest::Handle TestPeerManager::requestFileInfo(
+AbstractPeerManager::RequestContextPtr<FileInformation> TestPeerManager::requestFileInfo(
     const QnUuid& peerId,
     const QString& fileName,
-    AbstractPeerManager::FileInfoCallback callback)
+    const nx::utils::Url& url)
 {
     m_requestCounter.incrementCounters(peerId, RequestCounter::FileInfoRequest);
 
     if (!m_peers.contains(peerId))
-        return 0;
+        return std::make_unique<BaseRequestContext<downloader::FileInformation>>();
 
-    return enqueueRequest(peerId, kDefaultRequestTime,
-        [this, fileInfo = fileInformation(peerId, fileName), callback](rest::Handle handle)
+    auto promise = std::make_shared<std::promise<std::optional<downloader::FileInformation>>>();
+
+    rest::Handle handle = enqueueRequest(peerId, kDefaultRequestTime,
+        [this,
+            fileInfo = fileInformation(peerId, fileName),
+            url,
+            peerId,
+            promise](
+                rest::Handle /*handle*/) mutable
         {
-            callback(fileInfo.isValid(), handle, fileInfo);
-            m_handler->onRequestFileInfo();
+            if (m_allowIndirectInternetRequests && m_peers[peerId].hasInternetConnection)
+            {
+                fileInfo.downloadedChunks.clear();
+                if (url.isValid())
+                    setPromiseValueIfEmpty(promise, {fileInfo});
+                else
+                    setPromiseValueIfEmpty(promise, {});
+            }
+            else
+            {
+                if (fileInfo.isValid())
+                    setPromiseValueIfEmpty(promise, {fileInfo});
+                else
+                    setPromiseValueIfEmpty(promise, {});
+            }
         });
+
+    return std::make_unique<BaseRequestContext<downloader::FileInformation>>(
+        promise->get_future(), makeCanceller(this, peerId, handle, promise));
 }
 
-rest::Handle TestPeerManager::requestChecksums(
-    const QnUuid& peerId,
-    const QString& fileName,
-    AbstractPeerManager::ChecksumsCallback callback)
+AbstractPeerManager::RequestContextPtr<QVector<QByteArray>> TestPeerManager::requestChecksums(
+    const QnUuid& peerId, const QString& fileName)
 {
     m_requestCounter.incrementCounters(peerId, RequestCounter::ChecksumsRequest);
 
     auto it = m_peers.find(peerId);
     if (it == m_peers.end())
-        return 0;
+        return {};
 
-    return enqueueRequest(peerId, kDefaultRequestTime,
-        [this,
-            fileInfo = fileInformation(peerId, fileName),
-            storage = it->storage,
-            callback]
-            (rest::Handle handle)
+    auto promise = std::make_shared<std::promise<std::optional<QVector<QByteArray>>>>();
+
+    rest::Handle handle = enqueueRequest(peerId, kDefaultRequestTime,
+        [promise, fileInfo = fileInformation(peerId, fileName), storage = it->storage](
+            rest::Handle /*handle*/)
         {
-            callback(fileInfo.isValid(), handle,
-                storage
+            if (!fileInfo.isValid())
+            {
+                setPromiseValueIfEmpty(promise, {});
+                return;
+            }
+
+            setPromiseValueIfEmpty(promise,
+                {storage
                     ? storage->getChunkChecksums(fileInfo.name)
-                    : fileInfo.checksums);
+                    : fileInfo.checksums});
         });
+
+    return std::make_unique<BaseRequestContext<QVector<QByteArray>>>(
+        promise->get_future(), makeCanceller(this, peerId, handle, promise));
+
 }
 
-rest::Handle TestPeerManager::downloadChunk(
+AbstractPeerManager::RequestContextPtr<QByteArray> TestPeerManager::downloadChunk(
     const QnUuid& peerId,
     const QString& fileName,
+    const utils::Url &url,
     int chunkIndex,
-    AbstractPeerManager::ChunkCallback callback)
+    int chunkSize)
 {
     m_requestCounter.incrementCounters(peerId, RequestCounter::DownloadChunkRequest);
 
     if (!m_peers.contains(peerId))
-        return 0;
+        return {};
 
-    return enqueueRequest(peerId, kDefaultRequestTime,
-        [this, fileInfo = fileInformation(peerId, fileName), chunkIndex, callback](
-            rest::Handle handle)
-        {
-            if (m_downloadFailed)
+    auto promise = std::make_shared<std::promise<std::optional<QByteArray>>>();
+    rest::Handle handle = -1;
+
+    if (m_allowIndirectInternetRequests)
+    {
+        handle = enqueueRequest(peerId, kDefaultRequestTime,
+            [this, promise, peerId, fileName, url, chunkIndex, chunkSize](rest::Handle /*handle*/)
             {
-                callback(false, handle, QByteArray());
-                m_downloadFailed = false;
-                return;
-            }
+                Storage* storage = nullptr;
+                downloader::FileInformation storageFileInfo;
 
-            QByteArray result;
-            if (fileInfo.isValid())
-                result = readFileChunk(fileInfo, chunkIndex);
-
-            callback(!result.isNull(), handle, result);
-        });
-}
-
-rest::Handle TestPeerManager::downloadChunkFromInternet(const QnUuid& peerId,
-    const QString& fileName,
-    const utils::Url &url,
-    int chunkIndex,
-    int chunkSize,
-    AbstractPeerManager::ChunkCallback callback)
-{
-    m_requestCounter.incrementCounters(peerId, RequestCounter::DownloadChunkFromInternetRequest);
-
-    if (!m_peers.contains(peerId))
-        return 0;
-
-    return enqueueRequest(peerId, kDefaultRequestTime,
-        [this, peerId, fileName, url, chunkIndex, chunkSize, callback](rest::Handle handle)
-        {
-            Storage* storage = nullptr;
-            downloader::FileInformation storageFileInfo;
-
-            auto it = m_peers.find(peerId);
-            if (it != m_peers.end() && it->storage)
-            {
-                storageFileInfo = it->storage->fileInformation(fileName);
-                if (storageFileInfo.isValid()
-                    && storageFileInfo.url == url
-                    && storageFileInfo.chunkSize == chunkSize
-                    && chunkIndex < storageFileInfo.downloadedChunks.size())
+                auto it = m_peers.find(peerId);
+                if (it != m_peers.end() && it->storage)
                 {
-                    storage = it->storage;
+                    storageFileInfo = it->storage->fileInformation(fileName);
+                    if (storageFileInfo.isValid() && storageFileInfo.url == url
+                        && storageFileInfo.chunkSize == chunkSize
+                        && chunkIndex < storageFileInfo.downloadedChunks.size())
+                    {
+                        storage = it->storage;
+                    }
                 }
-            }
 
-            if (storage && storageFileInfo.downloadedChunks[chunkIndex])
-            {
-                QByteArray result;
-                if (storage->readFileChunk(fileName, chunkIndex, result) == ResultCode::ok)
+                if (storage && storageFileInfo.downloadedChunks[chunkIndex])
                 {
-                    callback(true, handle, result);
+                    QByteArray result;
+                    if (storage->readFileChunk(fileName, chunkIndex, result) == ResultCode::ok)
+                    {
+                        setPromiseValueIfEmpty(promise, {result});
+                        return;
+                    }
+                }
+
+                if (!hasInternetConnection(peerId))
+                {
+                    setPromiseValueIfEmpty(promise, {});
                     return;
                 }
-            }
 
-            if (!hasInternetConnection(peerId))
+                const auto filePath = m_fileByUrl.value(url);
+                if (filePath.isEmpty())
+                {
+                    setPromiseValueIfEmpty(promise, {});
+                    return;
+                }
+
+                FileInformation fileInfo;
+                fileInfo.filePath = filePath;
+                fileInfo.chunkSize = chunkSize;
+
+                auto result = readFileChunk(fileInfo, chunkIndex);
+                m_requestCounter.incrementCounters(
+                    peerId, RequestCounter::InternetDownloadRequestsPerformed);
+
+                if (result.isNull())
+                    setPromiseValueIfEmpty(promise, {});
+                else
+                    setPromiseValueIfEmpty(promise, {result});
+            });
+    }
+    else
+    {
+        handle = enqueueRequest(peerId, kDefaultRequestTime,
+            [this, promise, fileInfo = fileInformation(peerId, fileName), chunkIndex](
+                rest::Handle /*handle*/)
             {
-                callback(false, handle, QByteArray());
-                return;
-            }
+                if (m_downloadFailed)
+                {
+                    setPromiseValueIfEmpty(promise, {});
+                    m_downloadFailed = false;
+                    return;
+                }
 
-            const auto filePath = m_fileByUrl.value(url);
-            if (filePath.isEmpty())
-            {
-                callback(false, handle, QByteArray());
-                return;
-            }
+                QByteArray result;
+                if (fileInfo.isValid())
+                    result = readFileChunk(fileInfo, chunkIndex);
 
-            FileInformation fileInfo;
-            fileInfo.filePath = filePath;
-            fileInfo.chunkSize = chunkSize;
+                if (result.isNull())
+                    setPromiseValueIfEmpty(promise, {});
+                else
+                    setPromiseValueIfEmpty(promise, {result});
+            });
+    }
 
-            auto result = readFileChunk(fileInfo, chunkIndex);
-            m_requestCounter.incrementCounters(peerId,
-                RequestCounter::InternetDownloadRequestsPerformed);
-
-            callback(!result.isNull(), handle, result);
-        });
+    return std::make_unique<BaseRequestContext<QByteArray>>(
+        promise->get_future(), makeCanceller(this, peerId, handle, promise));
 }
 
 void TestPeerManager::setValidateShouldFail()
@@ -295,12 +329,9 @@ const RequestCounter* TestPeerManager::requestCounter() const
     return &m_requestCounter;
 }
 
-void TestPeerManager::requestWait(const QnUuid& peerId, qint64 waitTime, WaitCallback callback)
+void TestPeerManager::setIndirectInternetRequestsAllowed(bool allow)
 {
-    if (!m_peers.contains(peerId))
-        return;
-
-    enqueueRequest(peerId, waitTime, [this, callback](rest::Handle) { callback(); });
+    m_allowIndirectInternetRequests = allow;
 }
 
 rest::Handle TestPeerManager::getRequestHandle()
@@ -386,8 +417,8 @@ ProxyTestPeerManager::ProxyTestPeerManager(TestPeerManager* peerManager, const Q
 ProxyTestPeerManager::ProxyTestPeerManager(
     TestPeerManager* peerManager, const QnUuid& id, const QString& peerName)
     :
-    m_peerManager(peerManager),
-    m_selfId(id)
+    AbstractPeerManager(AllCapabilities),
+    m_peerManager(peerManager)
 {
     NX_ASSERT(peerManager);
     peerManager->addPeer(id, peerName);
@@ -398,8 +429,8 @@ void ProxyTestPeerManager::calculateDistances()
     for (const auto& peerId: m_peerManager->getAllPeers())
         m_distances[peerId] = std::numeric_limits<int>::max();
 
-    QList<QnUuid> peersToCheck{m_selfId};
-    QSet<QnUuid> checkedPeers{m_selfId};
+    QList<QnUuid> peersToCheck{QnUuid()};
+    QSet<QnUuid> checkedPeers{QnUuid()};
 
     int distance = 0;
     while (!peersToCheck.isEmpty())
@@ -432,16 +463,6 @@ const RequestCounter* ProxyTestPeerManager::requestCounter() const
     return &m_requestCounter;
 }
 
-void ProxyTestPeerManager::requestWait(qint64 waitTime, TestPeerManager::WaitCallback callback)
-{
-    m_peerManager->requestWait(m_selfId, waitTime, callback);
-}
-
-QnUuid ProxyTestPeerManager::selfId() const
-{
-    return m_selfId;
-}
-
 QString ProxyTestPeerManager::peerString(const QnUuid& peerId) const
 {
     return m_peerManager->peerString(peerId);
@@ -449,9 +470,7 @@ QString ProxyTestPeerManager::peerString(const QnUuid& peerId) const
 
 QList<QnUuid> ProxyTestPeerManager::getAllPeers() const
 {
-    auto result = m_peerManager->getAllPeers();
-    result.removeOne(m_selfId);
-    return result;
+    return m_peerManager->getAllPeers();
 }
 
 int ProxyTestPeerManager::distanceTo(const QnUuid& peerId) const
@@ -459,53 +478,31 @@ int ProxyTestPeerManager::distanceTo(const QnUuid& peerId) const
     return m_distances.value(peerId, std::numeric_limits<int>::max());
 }
 
-bool ProxyTestPeerManager::hasInternetConnection(const QnUuid& peerId) const
-{
-    return m_peerManager->hasInternetConnection(peerId);
-}
-
-rest::Handle ProxyTestPeerManager::requestFileInfo(
+AbstractPeerManager::RequestContextPtr<FileInformation> ProxyTestPeerManager::requestFileInfo(
     const QnUuid& peer,
     const QString& fileName,
-    AbstractPeerManager::FileInfoCallback callback)
+    const nx::utils::Url& url)
 {
     m_requestCounter.incrementCounters(peer, RequestCounter::FileInfoRequest);
-    return m_peerManager->requestFileInfo(peer, fileName, callback);
+    return m_peerManager->requestFileInfo(peer, fileName, url);
 }
 
-rest::Handle ProxyTestPeerManager::requestChecksums(
-    const QnUuid& peer,
-    const QString& fileName,
-    AbstractPeerManager::ChecksumsCallback callback)
+AbstractPeerManager::RequestContextPtr<QVector<QByteArray>> ProxyTestPeerManager::requestChecksums(
+    const QnUuid& peer, const QString& fileName)
 {
     m_requestCounter.incrementCounters(peer, RequestCounter::ChecksumsRequest);
-    return m_peerManager->requestChecksums(peer, fileName, callback);
+    return m_peerManager->requestChecksums(peer, fileName);
 }
 
-rest::Handle ProxyTestPeerManager::downloadChunk(
-    const QnUuid& peer,
+AbstractPeerManager::RequestContextPtr<QByteArray> ProxyTestPeerManager::downloadChunk(
+    const QnUuid& peerId,
     const QString& fileName,
-    int chunkIndex,
-    AbstractPeerManager::ChunkCallback callback)
-{
-    m_requestCounter.incrementCounters(peer, RequestCounter::DownloadChunkRequest);
-    return m_peerManager->downloadChunk(peer, fileName, chunkIndex, callback);
-}
-
-rest::Handle ProxyTestPeerManager::downloadChunkFromInternet(const QnUuid& peerId, const QString& fileName,
     const utils::Url &url,
     int chunkIndex,
-    int chunkSize,
-    AbstractPeerManager::ChunkCallback callback)
+    int chunkSize)
 {
-    m_requestCounter.incrementCounters(peerId, RequestCounter::DownloadChunkFromInternetRequest);
-    return m_peerManager->downloadChunkFromInternet(
-        peerId, fileName, url, chunkIndex, chunkSize, callback);
-}
-
-void ProxyTestPeerManager::cancelRequest(const QnUuid& peerId, rest::Handle handle)
-{
-    m_peerManager->cancelRequest(peerId, handle);
+    m_requestCounter.incrementCounters(peerId, RequestCounter::DownloadChunkRequest);
+    return m_peerManager->downloadChunk(peerId, fileName, url, chunkIndex, chunkSize);
 }
 
 TestPeerManager::FileInformation::FileInformation(const downloader::FileInformation& fileInfo):
@@ -588,8 +585,4 @@ QString RequestCounter::requestTypeShortName(RequestCounter::RequestType request
     return QString();
 }
 
-} // namespace downloader
-} // namespace p2p
-} // namespace common
-} // namespace vms
-} // namespace nx
+} // namespace nx::vms::common::p2p::downloader

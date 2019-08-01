@@ -8,7 +8,8 @@ class QnCommonModule;
 struct CloudCredentialsData;
 struct DetachFromCloudData;
 struct DetachFromCloudReply;
-struct QnJsonRestResult;
+namespace nx::network::rest { struct JsonResult; }
+using QnJsonRestResult = nx::network::rest::JsonResult;
 struct QnAuthSession;
 struct SetupCloudSystemData;
 
@@ -61,7 +62,8 @@ private:
 
     bool fetchCloudUserOfflineAuthInfo(
         const CloudCredentialsData& data,
-        nx::cloud::db::api::AuthInfo* cloudOwnerOfflineAuthInfo);
+        nx::cloud::db::api::AuthInfo* cloudOwnerOfflineAuthInfo,
+        QnJsonRestResult* result);
 
     bool saveCloudData(
         const CloudCredentialsData& data,

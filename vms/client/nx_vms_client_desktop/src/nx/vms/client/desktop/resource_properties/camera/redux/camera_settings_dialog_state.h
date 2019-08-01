@@ -137,6 +137,7 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractReduxState
         CombinedValue supportsMotionStreamOverride = CombinedValue::None;
         CombinedValue hasCustomMediaPortCapability = CombinedValue::None;
         CombinedValue supportsRecording = CombinedValue::None;
+        CombinedValue isUdpMulticastTransportAllowed = CombinedValue::None;
 
         int maxFps = 0;
         int maxDualStreamingFps = 0;
@@ -251,8 +252,12 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractReduxState
 
     struct AnalyticsSettings
     {
+        // Engines, actual for the selected single camera.
         QList<AnalyticsEngineInfo> engines;
+
+        // Engines, which are enabled by the user.
         UserEditable<QSet<QnUuid>> enabledEngines;
+
         QHash<QnUuid, UserEditable<QVariantMap>> settingsValuesByEngineId;
         bool loading = false;
         QnUuid currentEngineId;
@@ -288,9 +293,28 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractReduxState
     bool hasMotion() const
     {
         bool result = devicesDescription.hasMotion == CombinedValue::All;
+
         if (isSingleCamera())
             result &= singleCameraSettings.enableMotionDetection();
+
+        if (settingsOptimizationEnabled)
+        {
+            if (expert.forcedMotionStreamType() != nx::vms::api::StreamIndex::primary)
+                result &= !expert.dualStreamingDisabled();
+        }
+
         return result;
+    }
+
+    bool hasDualStreaming() const
+    {
+        return devicesDescription.hasDualStreamingCapability == CombinedValue::All
+            && !(settingsOptimizationEnabled && expert.dualStreamingDisabled());
+    }
+
+    bool supportsMotionPlusLQ() const
+    {
+        return hasMotion() && hasDualStreaming();
     }
 
     bool supportsSchedule() const

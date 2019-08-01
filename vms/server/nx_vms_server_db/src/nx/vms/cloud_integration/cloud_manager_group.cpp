@@ -35,6 +35,11 @@ CloudManagerGroup::CloudManagerGroup(
 {
 }
 
+void CloudManagerGroup::init()
+{
+    connectionManager.init();
+}
+
 void CloudManagerGroup::setCloudDbUrl(const nx::utils::Url& cdbUrl)
 {
     connectionManager.setCloudDbUrl(cdbUrl);

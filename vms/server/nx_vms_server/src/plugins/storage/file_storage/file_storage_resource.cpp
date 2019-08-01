@@ -571,12 +571,13 @@ Qn::StorageInitResult QnFileStorageResource::updatePermissions(const QString& ur
         lit("WORKGROUP\\") + initialUserName,
     };
 
-    LPWSTR password = (LPWSTR) storageUrl.password().constData();
+    const auto password = storageUrl.password();
     bool wrongAuth = false;
 
     for (const auto& userName : userNamesToTest)
     {
-        auto result = updatePermissionsHelper((LPWSTR) userName.constData(), password, &netRes);
+        auto result = updatePermissionsHelper(
+            (LPWSTR) userName.constData(), (LPWSTR) password.constData(), &netRes);
         switch (result)
         {
             case Qn::StorageInit_Ok:
@@ -712,9 +713,6 @@ qint64 QnFileStorageResource::getFreeSpace()
 
 qint64 QnFileStorageResource::getTotalSpace() const
 {
-    if (!m_valid)
-        return QnStorageResource::kUnknownSize;
-
     QString path;
     {
         QnMutexLocker lock(&m_mutex);
@@ -852,9 +850,11 @@ QString QnFileStorageResource::removeProtocolPrefix(const QString& url)
 }
 
 QnStorageResource* QnFileStorageResource::instance(
-    QnMediaServerModule* serverModule, const QString&)
+    QnMediaServerModule* serverModule, const QString& path)
 {
-    return new QnFileStorageResource(serverModule);
+    auto result = new QnFileStorageResource(serverModule);
+    result->setUrl(path);
+    return result;
 }
 
 qint64 QnFileStorageResource::calcInitialSpaceLimit()

@@ -20,7 +20,7 @@
 #include <network/universal_request_processor.h>
 #include <common/common_module.h>
 
-#include <mediaserver_ini.h>
+#include <nx_vms_server_ini.h>
 #include <nx/vms/network/proxy_connection.h>
 
 static const qint64 kUsPerMs = 1000;
@@ -31,7 +31,7 @@ QnAutoRequestForwarder::QnAutoRequestForwarder(QnCommonModule* commonModule):
     if (ini().verboseAutoRequestForwarder)
     {
         using namespace nx::utils::log;
-        static const Filter kFilter(Tag(typeid(this)));
+        static const Filter kFilter(Tag(typeid(*this)));
 
         addLogger(
             std::make_unique<Logger>(
@@ -333,7 +333,7 @@ bool QnAutoRequestForwarder::findCameraInUrlQuery(
 
     NX_VERBOSE(this) << lm("Looking for camera id in url params [%1]").args(paramNames);
 
-    const QnRequestParams params = requestParamsFromUrl(request.requestLine.url);
+    const auto params = QnRequestParams::fromUrlQuery(QUrlQuery(request.requestLine.url.query()));
     QString notFoundCameraId;
     *outCamera = nx::camera_id_helper::findCameraByFlexibleIds(
         resourcePool(), &notFoundCameraId, params, paramNames);
@@ -377,8 +377,8 @@ qint64 QnAutoRequestForwarder::fetchTimestamp(
         auto rangeIter = request.headers.find(nx::network::rtsp::header::Range::NAME);
         if (rangeIter != request.headers.end())
         {
-            qint64 startTimestamp = 0;
-            qint64 endTimestamp = 0;
+            int64_t startTimestamp = 0;
+            int64_t endTimestamp = 0;
             if (nx::network::rtsp::parseRangeHeader(rangeIter->second, &startTimestamp, &endTimestamp))
                 return startTimestamp / kUsPerMs;
         }

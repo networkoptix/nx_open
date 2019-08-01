@@ -11,7 +11,7 @@ namespace udp {
 
 TunnelAcceptor::TunnelAcceptor(
     const SocketAddress& mediatorUdpEndpoint,
-    std::list<SocketAddress> peerAddresses,
+    std::vector<SocketAddress> peerAddresses,
     nx::hpm::api::ConnectionParameters connectionParametes)
 :
     m_peerAddresses(std::move(peerAddresses)),
@@ -124,7 +124,7 @@ void TunnelAcceptor::connectionAckResult(
         udtSocket->bindToAioThread(m_mediatorConnection->getAioThread());
 
         if ((udpSocket
-                ? udtSocket->bindToUdpSocket(std::move(*udpSocket))
+                ? udtSocket->bindToUdpSocket(udpSocket.get())
                 : udtSocket->bind(localAddress)) &&
             udtSocket->setRendezvous(true) &&
             udtSocket->setSendTimeout(timeout) &&

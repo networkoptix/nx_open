@@ -22,7 +22,7 @@
 #include <nx/utils/pending_operation.h>
 #include <nx/vms/client/desktop/common/widgets/item_view_auto_hider.h>
 #include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
-#include <nx/vms/client/desktop/resource_views/data/node_type.h>
+#include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 
 using namespace std::chrono;
@@ -212,7 +212,7 @@ void QnCameraListDialog::at_camerasView_customContextMenuRequested(const QPoint&
     if (!resources.isEmpty())
     {
         action::Parameters parameters(resources);
-        parameters.setArgument(Qn::NodeTypeRole, ResourceTreeNodeType::resource);
+        parameters.setArgument(Qn::NodeTypeRole, ResourceTree::NodeType::resource);
 
         // We'll be changing hotkeys, so we cannot reuse global actions.
         menu.reset(context()->menu()->newMenu(action::TreeScope, nullptr,

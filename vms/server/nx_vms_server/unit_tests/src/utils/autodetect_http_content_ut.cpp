@@ -15,7 +15,7 @@ TEST(AutodetectHttpContentType, main)
     QByteArray kInvalidJsonText =
         "{ \"data\": [ \"keys\": [\"Sony|SNC-VM772R\"] }] }";
     result = Utils::autoDetectHttpContentType(kInvalidJsonText);
-    ASSERT_EQ(result, QByteArray("text/plain"));
+    ASSERT_EQ(result, QByteArray("text/plain; charset=utf-8"));
 
     QByteArray kXMLText =
         "<resources> <oem name = \"Axis\"> <resource name = \"AXISP7216Group1\" public = \"AXIS_ENCODER\"/> </oem> </resources>";
@@ -25,7 +25,7 @@ TEST(AutodetectHttpContentType, main)
     QByteArray kInvalidXMLText =
         "<resources <oem name = \"Axis\"> <resource name = \"AXISP7216Group1\" public = \"AXIS_ENCODER\"/> </oem> </resources>";
     result = Utils::autoDetectHttpContentType(kInvalidXMLText);
-    ASSERT_EQ(result, QByteArray("text/plain"));
+    ASSERT_EQ(result, QByteArray("text/plain; charset=utf-8"));
 
     QByteArray kHTMLText =
         "<html lang=\"en_US\"> <body> test </body> </html>";

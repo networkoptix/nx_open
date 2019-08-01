@@ -4,8 +4,6 @@
 
 #include <gtest/gtest.h>
 
-#include <nx/clusterdb/engine/transport/connector_factory.h>
-
 #include "../cluster_test_fixture.h"
 
 namespace nx::clusterdb::engine::transport::test {
@@ -18,14 +16,7 @@ class ConnectionAcceptance:
 public:
     ConnectionAcceptance()
     {
-        m_factoryFunctionBak =
-            ConnectorTypeInstaller::configureFactory(&ConnectorFactory::instance());
-    }
-
-    ~ConnectionAcceptance()
-    {
-        ConnectorFactory::instance().setCustomFunc(
-            std::exchange(m_factoryFunctionBak, nullptr));
+        setConnectorTypeKey(ConnectorTypeInstaller::kConnectorTypeKey);
     }
 
 protected:
@@ -69,7 +60,6 @@ protected:
     }
 
 private:
-    ConnectorFactory::Function m_factoryFunctionBak;
     std::optional<std::future<void>> m_asyncDataGenerationFuture;
 };
 

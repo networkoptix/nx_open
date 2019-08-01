@@ -8,7 +8,6 @@
 #include <transaction/ubjson_transaction_serializer.h>
 #include <transaction/json_transaction_serializer.h>
 #include <api/global_settings.h>
-#include <nx_ec/ec_proto_version.h>
 #include <utils/math/math.h>
 #include <api/runtime_info_manager.h>
 
@@ -18,7 +17,9 @@
 #include <nx/network/url/url_parse_helper.h>
 #include <nx/utils/std/cmath.h>
 #include <nx/utils/random.h>
+#include <nx/vms/api/protocol_version.h>
 #include <nx/vms/api/data/update_sequence_data.h>
+#include <utils/common/delayed.h>
 
 namespace nx {
 namespace p2p {
@@ -188,6 +189,8 @@ void MessageBus::addOutgoingConnectionToPeer(
 
     int pos = nx::utils::random::number((int) 0, (int) m_remoteUrls.size());
     m_remoteUrls.insert(m_remoteUrls.begin() + pos, RemoteConnection(peer, url));
+
+    executeInThread(m_thread, [this]() {doPeriodicTasks();});
 }
 
 void MessageBus::deleteRemoveUrlById(const QnUuid& id)
@@ -252,6 +255,12 @@ void MessageBus::createOutgoingConnections(
             !m_outgoingConnections.contains(remoteConnection.peerId))
         {
             if (!needStartConnection(remoteConnection.peerId, currentSubscription))
+            {
+                continue;
+            }
+
+            if (remoteConnection.unauthorizedTimer.isValid() &&
+                !remoteConnection.unauthorizedTimer.hasExpired(m_intervals.unauthorizedConnectTimeout))
             {
                 continue;
             }
@@ -423,7 +432,7 @@ vms::api::PeerDataEx MessageBus::localPeerEx() const
     result.identityTime = commonModule()->systemIdentityTime();
     result.aliveUpdateIntervalMs = std::chrono::duration_cast<std::chrono::milliseconds>
         (commonModule()->globalSettings()->aliveUpdateInterval()).count();
-    result.protoVersion = nx_ec::EC2_PROTO_VERSION;
+    result.protoVersion = nx::vms::api::protocolVersion();
     result.dataFormat =
         m_localPeerType == PeerType::mobileClient ?  Qn::JsonFormat : Qn::UbjsonFormat;
     return result;
@@ -506,6 +515,11 @@ void MessageBus::at_stateChanged(
 
             break;
         case Connection::State::Unauthorized:
+            for (auto& removeUrlInfo: m_remoteUrls)
+            {
+                if (removeUrlInfo.peerId == remoteId)
+                    removeUrlInfo.unauthorizedTimer.restart();
+            }
         case Connection::State::Error:
         {
             removeConnectionUnsafe(weakRef);
@@ -926,7 +940,7 @@ void MessageBus::processRuntimeInfo(
     if (localPeer().isServer() && !isSubscribedTo(connection->remotePeer()))
         return; // Ignore deprecated transaction.
 
-    PersistentIdData peerId(tran.peerID, tran.params.peer.persistentId);
+    PersistentIdData peerId(tran.params.peer);
 
     if (m_lastRuntimeInfo[peerId] == tran.params)
         return; //< Already processed. Ignore same transaction.

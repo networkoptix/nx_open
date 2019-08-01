@@ -50,7 +50,7 @@ void ConnectionMediationInitiator::start(
         [this]() mutable { initiateConnectOverTcp(); });
 }
 
-std::unique_ptr<UDPSocket> ConnectionMediationInitiator::takeUdpSocket()
+std::unique_ptr<AbstractDatagramSocket> ConnectionMediationInitiator::takeUdpSocket()
 {
     return std::exchange(m_udpHolePunchingSocket, nullptr);
 }

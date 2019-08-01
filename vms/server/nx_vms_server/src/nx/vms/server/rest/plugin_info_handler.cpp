@@ -1,0 +1,30 @@
+#include "plugin_info_handler.h"
+
+#include <media_server/media_server_module.h>
+#include <plugins/plugin_manager.h>
+
+#include <nx/vms/api/data/analytics_data.h>
+
+namespace nx::vms::server::rest {
+
+PluginInfoHandler::PluginInfoHandler(QnMediaServerModule* serverModule):
+    ServerModuleAware(serverModule)
+{
+}
+
+nx::network::rest::Response PluginInfoHandler::executeGet(const nx::network::rest::Request& /*request*/)
+{
+    using namespace nx::network::http;
+
+    auto pluginManager = serverModule()->pluginManager();
+    if (!NX_ASSERT(pluginManager, "Unable to access plugin manager"))
+    {
+        return nx::network::rest::Response::error(
+            StatusCode::internalServerError,
+            QnRestResult::Error::InternalServerError);
+    }
+
+    return nx::network::rest::Response::reply(pluginManager->pluginInfoList());
+}
+
+} // namespace nx::vms::server::rest

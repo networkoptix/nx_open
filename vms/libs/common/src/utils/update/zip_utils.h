@@ -1,5 +1,4 @@
-#ifndef ZIP_UTILS_H
-#define ZIP_UTILS_H
+#pragma once
 
 #include <future>
 
@@ -30,14 +29,15 @@ public:
     QnZipExtractor(QIODevice *ioDevice, const QDir &targetDir);
 
     QnZipExtractor();
-    ~QnZipExtractor();
+    virtual ~QnZipExtractor() override;
 
     static QString errorToString(Error error);
 
     Error error() const;
     QDir dir() const;
 
-    size_t estimateUnpackedSize() const;
+    qint64 estimateUnpackedSize() const;
+    qint64 bytesExtracted() const;
 
     Error extractZip();
     QStringList fileList();
@@ -51,7 +51,6 @@ protected:
 private:
     QDir m_dir;
     QScopedPointer<QuaZip> m_zip;
+    std::atomic_int64_t m_extracted;
     Error m_lastError;
 };
-
-#endif // ZIP_UTILS_H

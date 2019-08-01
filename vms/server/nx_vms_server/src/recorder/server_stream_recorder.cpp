@@ -1,6 +1,9 @@
+#include "server_stream_recorder.h"
+
 #include <limits>
 #include <cstdint>
-#include "server_stream_recorder.h"
+
+#include <boost/algorithm/cxx11/any_of.hpp>
 
 #include <api/global_settings.h>
 
@@ -36,6 +39,8 @@
 #include <utils/media/h264_utils.h>
 #include <utils/media/nalUnits.h>
 #include <utils/media/hevc_common.h>
+#include <nx/vms/event/rule.h>
+#include <nx/vms/event/rule_manager.h>
 
 namespace {
 
@@ -575,6 +580,26 @@ void QnServerStreamRecorder::stopForcedRecording()
     updateScheduleInfo(qnSyncTime->currentMSecsSinceEpoch());
 }
 
+qint64 QnServerStreamRecorder::calculatePrebufferingSizeFromRulesUsec() const
+{
+    qint64 prerecordingDurationUsec = 0;
+    for (const auto& rule: commonModule()->eventRuleManager()->rules())
+    {
+        if (!rule->isDisabled() && rule->actionType() == nx::vms::api::ActionType::cameraRecordingAction)
+        {
+            for (const auto& resourceId: rule->actionResources())
+            {
+                if (resourceId == m_resource->getId())
+                {
+                    prerecordingDurationUsec = std::max(prerecordingDurationUsec, rule->actionParams().recordBeforeMs * 1000LL);
+                    break;
+                }
+            }
+        }
+    }
+    return prerecordingDurationUsec;
+}
+
 void QnServerStreamRecorder::updateRecordingType(const ScheduleTaskWithThresholds& scheduleTask)
 {
     if (!isMotionRec(scheduleTask.recordingType))
@@ -585,9 +610,9 @@ void QnServerStreamRecorder::updateRecordingType(const ScheduleTaskWithThreshold
         bool isNoRec = scheduleTask.recordingType == Qn::RecordingType::never;
         bool usedInRecordAction = camRes && camRes->isRecordingEventAttached();
 
-        // prebuffer 1 usec if camera used in recording action (for keeping last GOP)
-        int prebuffer = usedInRecordAction && isNoRec && !camRes->isIOModule() ? 1 : 0;
-        setPrebufferingUsec(prebuffer);
+        int prebufferUsec = usedInRecordAction && isNoRec && !camRes->isIOModule()
+            ? calculatePrebufferingSizeFromRulesUsec() : 0;
+        setPrebufferingUsec(prebufferUsec);
     }
     else if (getPrebufferingUsec() != 0 || !isMotionRec(m_currentScheduleTask.recordingType)) {
         // do not change prebuffer if previous recording is motion and motion in progress
@@ -606,11 +631,11 @@ void QnServerStreamRecorder::setSpecialRecordingMode(const ScheduleTaskWithThres
 bool QnServerStreamRecorder::isPanicMode() const
 {
     const auto onlineServers = resourcePool()->getAllServers(Qn::Online);
-    return boost::algorithm::any_of(onlineServers
-        , [](const QnMediaServerResourcePtr& server)
-    {
-        return (server->getPanicMode() != Qn::PM_None);
-    });
+    return boost::algorithm::any_of(onlineServers,
+        [](const QnMediaServerResourcePtr& server)
+        {
+            return server->getPanicMode() != Qn::PM_None;
+        });
 }
 
 void QnServerStreamRecorder::updateScheduleInfo(qint64 timeMs)
@@ -952,7 +977,7 @@ bool QnServerStreamRecorder::mediaHasBuiltinContext(const QnConstAbstractMediaDa
                 else if (codecId == AV_CODEC_ID_HEVC)
                 {
                     hevc::NalUnitHeader header;
-                    header.decode(nalu.first, nalu.second);
+                    header.decode(nalu.first, (int) nalu.second);
                     if (hevc::isParameterSet(header.unitType))
                         return true;
                 }

@@ -1,0 +1,88 @@
+#include "mediator_scalability_test_fixture.h"
+
+#include <nx/cloud/mediator/relay/relay_cluster_client_factory.h>
+#include <nx/cloud/mediator/relay/online_relays_cluster_client.h>
+
+namespace nx::hpm::test {
+
+MediatorScalabilityTestFixture::~MediatorScalabilityTestFixture()
+{
+    for (auto& connection : m_serverConnections)
+        connection->pleaseStopSync();
+
+    m_mediatorCluster->stop();
+}
+
+std::optional<nx::hpm::api::SystemCredentials> MediatorScalabilityTestFixture::getSystemCredentials() const
+{
+    nx::hpm::api::SystemCredentials systemCredentials;
+    systemCredentials.systemId = m_system.id;
+    systemCredentials.serverId = m_mediaServer->serverId();
+    systemCredentials.key = m_system.authKey;
+    return systemCredentials;
+}
+
+void MediatorScalabilityTestFixture::SetUp()
+{
+    ASSERT_TRUE(m_discoveryServer.bindAndListen());
+    m_mediatorCluster = std::make_unique<MediatorCluster>(m_discoveryServer.url());
+}
+
+void MediatorScalabilityTestFixture::addMediator()
+{
+    auto& mediator = m_mediatorCluster->addMediator({
+        "-https/listenOn", "127.0.0.1",
+        "-http/connectionInactivityTimeout", "10m"});
+
+    ASSERT_TRUE(mediator.startAndWaitUntilStarted());
+}
+
+void MediatorScalabilityTestFixture::givenMultipleMediators()
+{
+    for (int i = 0; i < kMaxMediators; ++i)
+        addMediator();
+}
+
+void MediatorScalabilityTestFixture::givenSynchronizedClusterWithListeningServer()
+{
+    givenMultipleMediators();
+
+    whenAddServer();
+
+    thenServerInfoIsSynchronized();
+}
+
+void MediatorScalabilityTestFixture::whenAddServer(int mediatorIndex)
+{
+    m_system = m_mediatorCluster->addRandomSystem();
+    m_mediaServer = m_mediatorCluster->mediator(mediatorIndex).addRandomServer(m_system);
+    m_mediaServerFullName = m_mediaServer->fullName().toStdString();
+
+    auto resultCodeAndResponse = m_mediaServer->listen();
+    ASSERT_EQ(api::ResultCode::ok, resultCodeAndResponse.first);
+}
+
+void MediatorScalabilityTestFixture::whenMediaServerGoesOffline()
+{
+    m_mediaServer.reset();
+}
+
+void MediatorScalabilityTestFixture::thenServerInfoIsSynchronized()
+{
+    while (!m_mediatorCluster->peerInformationSynchronizedInCluster(m_mediaServerFullName))
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+}
+
+void MediatorScalabilityTestFixture::thenServerInfoIsDroppedFromCluster()
+{
+    while (!m_mediatorCluster->peerInformationIsAbsentFromCluster(m_mediaServerFullName))
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+}
+
+void MediatorScalabilityTestFixture::thenRequestIsRedirected()
+{
+    auto resultCodeAndResponse = m_connectResponseQueue.pop();
+    ASSERT_EQ(api::ResultCode::ok, std::get<api::ResultCode>(resultCodeAndResponse));
+}
+
+} // namespace nx::hpm::test

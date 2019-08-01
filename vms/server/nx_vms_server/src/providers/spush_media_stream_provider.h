@@ -11,6 +11,8 @@
 
 #include <nx/vms/server/resource/resource_fwd.h>
 
+#include <nx/analytics/metadata_logger.h>
+
 struct QnAbstractMediaData;
 
 class CLServerPushStreamReader
@@ -37,8 +39,6 @@ private:
     void at_audioEnabledChanged(const QnResourcePtr& res);
 
 protected:
-    QnLiveStreamParams m_currentLiveParams;
-
     virtual void pleaseReopenStream() override;
     virtual void beforeRun() override;
     virtual void afterRun() override;
@@ -64,6 +64,9 @@ private:
     QnMutex m_openStreamMutex;
     QElapsedTimer m_needControlTimer;
     bool m_openedWithStreamCtrl = false;
+    QnLiveStreamParams m_currentLiveParams;
+
+    std::unique_ptr<nx::analytics::MetadataLogger> m_metadataLogger;
 };
 
 #endif // ENABLE_DATA_PROVIDERS

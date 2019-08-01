@@ -1,5 +1,7 @@
 #include "model_data_accessor.h"
 
+#include <nx/utils/log/assert.h>
+
 namespace nx {
 namespace client {
 
@@ -63,17 +65,21 @@ int ModelDataAccessor::count() const
 
 QVariant ModelDataAccessor::getData(int row, const QString& roleName) const
 {
-    if (!m_model)
-        return QVariant();
+    return m_model && m_model->hasIndex(row, 0)
+        ? getData(m_model->index(row, 0), roleName)
+        : QVariant();
+}
 
-    if (!m_model->hasIndex(row, 0))
+QVariant ModelDataAccessor::getData(const QModelIndex& index, const QString& roleName) const
+{
+    if (!m_model || !index.isValid() || !NX_ASSERT(m_model->checkIndex(index)))
         return QVariant();
 
     const auto role = m_model->roleNames().key(roleName.toUtf8(), -1);
     if (role == -1)
         return QVariant();
 
-    return m_model->data(m_model->index(row, 0), role);
+    return m_model->data(index, role);
 }
 
 } // namespace client

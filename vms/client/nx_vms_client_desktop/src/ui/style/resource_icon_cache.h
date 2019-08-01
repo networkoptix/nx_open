@@ -62,6 +62,8 @@ public:
 
         Client,
 
+        CloudSystem,
+
         TypeMask        = 0xFF,
 
         Offline         = 1 << 8,

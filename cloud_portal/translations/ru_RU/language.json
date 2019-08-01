@@ -10,7 +10,15 @@
     "loginButton": "Войти",
     "logoutAuthorisedTitle": "Вы уже выполнили вход",
     "logoutAuthorisedContinueButton": "Продолжить",
-    "logoutAuthorisedLogoutButton": "Выход"
+    "logoutAuthorisedLogoutButton": "Выход",
+    "messageFailed": "Message has failed to send.",
+    "messageSent": "Message has been sent."
+  },
+  "messageType": {
+    "ipvd_feedback": "Feedback about {{product}}",
+    "sales_inquiry": "Inquiry for {{product}}",
+    "request_support": "Request Support for {{product}}",
+    "unknown": "Unknown Message Type"
   },
   "pageTitles": {
     "template": "{{title}} %PRODUCT_NAME%",
@@ -37,8 +45,9 @@
     "pageNotFound": "Страница не найдена"
   },
   "systemStatuses": {
-    "notActivated": "не активирован",
     "activated": "активирован",
+    "merging": "merging",
+    "notActivated": "не активирован",
     "online": "в сети",
     "offline": "не в сети",
     "unavailable": "недоступен"
@@ -139,7 +148,8 @@
     "thisSystem": "система",
     "oldSafariNotSupported": "Версии Safari старше 10 не поддерживаются",
     "DUPLICATE_MEDIASERVER_FOUND": "В одной из систем были обнаружены дубликаты серверов.<br>Удалите старые серверы из каждой системы, которую вы пытаетесь объединить, и повторите попытку.",
-    "mergedSystemIsOffline": "Одна из объединяемых систем находится в автономном режиме. Убедитесь, что они в сети, и попробуйте еще раз."
+    "mergedSystemIsOffline": "Одна из объединяемых систем находится в автономном режиме. Убедитесь, что они в сети, и попробуйте еще раз.",
+    "INCOMPATIBLE": "Versions for systems are incompatible. To fix this problem make sure the systems have the same version."
   },
   "passwordRequirements": {
     "good": "хорошее",
@@ -186,7 +196,8 @@
     "successDisconnected": "Система успешно отключена от %PRODUCT_NAME%",
     "successDeleted": "Система {{systemName}} успешно удалена из вашей учетной записи",
     "successMerge": "Слияние системы завершено",
-    "permissionsRemoved": "{{email}} был лишен полномочий"
+    "permissionsRemoved": "{{email}} был лишен полномочий",
+    "unknownName": "Unknown Name for System (Caused by cloud merge)"
   },
   "account": {
     "accountSavedSuccess": "Ваша учетная запись успешно сохранена",

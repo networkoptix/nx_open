@@ -35,7 +35,7 @@ public:
 
     QString text(int index) const;
     QString toolTip(int index) const;
-    QPixmap pixmap(int index) const;
+    QString decorationPath(int index) const;
     QColor color(int index) const;
     QnResourceList displayedResourceList(int index) const;
     int helpId(int index) const;
@@ -49,6 +49,7 @@ public:
     void remove(int first, int count);
 
 private:
+    void doAddItem(QnSystemHealth::MessageType message, const QVariant& params, bool initial);
     void addItem(QnSystemHealth::MessageType message, const QVariant& params);
     void removeItem(QnSystemHealth::MessageType message, const QVariant& params);
     void toggleItem(QnSystemHealth::MessageType message, bool isOn);
@@ -57,7 +58,7 @@ private:
     void clear();
 
     static int priority(QnSystemHealth::MessageType message);
-    static QPixmap pixmap(QnSystemHealth::MessageType message);
+    static QString decorationPath(QnSystemHealth::MessageType message);
 
 private:
     struct Item

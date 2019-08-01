@@ -9,6 +9,7 @@
 
 #include <memory>
 
+#include <QtCore/QtGlobal>
 #include <QtCore/QIODevice>
 #include <QtCore/QString>
 #include <fcntl.h>

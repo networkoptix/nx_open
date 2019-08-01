@@ -15,6 +15,7 @@ extern "C" {
 
 #include <nx/gstreamer/gstreamer_common.h>
 #include <nx/sdk/helpers/string.h>
+#include <nx/sdk/i_utility_provider.h>
 
 #include "device_agent.h"
 #include "utils.h"
@@ -61,9 +62,6 @@ Engine::Engine(Plugin* plugin): m_plugin(plugin)
         m_objectClassDescritions = loadObjectClasses();
 
     NX_OUTPUT << __func__ << " Setting timeProvider";
-
-    m_timeUtilityProvider = queryInterfacePtr<ITimeUtilityProvider>(m_plugin->utilityProvider());
-    NX_KIT_ASSERT(m_timeUtilityProvider);
 }
 
 Engine::~Engine()
@@ -108,7 +106,7 @@ const IString* Engine::manifest(Error* error) const
         ObjectClassDescription licensePlateDescription(
             "License Plate",
             "",
-            kLicensePlateGuid);
+            kLicensePlateObjectTypeId);
 
         objectTypesManifest += buildManifestObectTypeString(licensePlateDescription);
     }
@@ -124,15 +122,14 @@ const IString* Engine::manifest(Error* error) const
 
     m_manifest = /*suppress newline*/1 + R"json(
 {
-    "pluginId": "nx.deepstream",
-    "pluginName": {
-        "value": "DeepStream Driver",
-        "localization": {
-            "ru_RU": "DeepStream driver (translated to Russian)"
-        }
-    },
     "objectTypes": [
 )json" + objectTypesManifest + R"json(
+    ],
+    "eventTypes": [
+        {
+            "id": ")json" + kLicensePlateDetectedEventTypeId + R"json(",
+            "name": "License Plate Detected"
+        }
     ],
     "capabilities": ""
 }
@@ -173,7 +170,8 @@ std::vector<ObjectClassDescription> Engine::objectClassDescritions() const
 
 std::chrono::microseconds Engine::currentTimeUs() const
 {
-    return std::chrono::microseconds(m_timeUtilityProvider->vmsSystemTimeSinceEpochMs() * 1000);
+    return std::chrono::microseconds(
+        m_plugin->utilityProvider()->vmsSystemTimeSinceEpochMs() * 1000);
 }
 
 std::vector<ObjectClassDescription> Engine::loadObjectClasses() const
@@ -259,10 +257,7 @@ std::string Engine::buildManifestObectTypeString(const ObjectClassDescription& d
     return /*suppress newline*/1 + R"json(
         {
             "id": ")json" + description.typeId + R"json(",
-            "name": {
-                "value": ")json" + description.name + R"json(",
-                "localization": {}
-            }
+            "name": ")json" + description.name + R"json("
         })json";
 }
 

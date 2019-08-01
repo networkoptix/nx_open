@@ -4,7 +4,7 @@
 
 #include <nx/vms/client/desktop/event_search/models/abstract_async_search_list_model.h>
 
-namespace nx::analytics::storage { struct DetectedObject; }
+namespace nx::analytics::db { struct DetectedObject; }
 
 namespace nx::vms::client::desktop {
 
@@ -31,7 +31,7 @@ public:
 
 signals:
     void pluginActionRequested(const QnUuid& engineId, const QString& actionTypeId,
-        const analytics::storage::DetectedObject& object, const QnVirtualCameraResourcePtr& camera,
+        const analytics::db::DetectedObject& object, const QnVirtualCameraResourcePtr& camera,
         QPrivateSignal);
 
 protected:

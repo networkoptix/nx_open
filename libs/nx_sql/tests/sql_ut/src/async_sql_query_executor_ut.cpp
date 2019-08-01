@@ -1,3 +1,5 @@
+#include <fstream>
+
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
@@ -93,11 +95,11 @@ constexpr int kDefaultMaxConnectionCount = 29;
 class DbAsyncSqlQueryExecutor:
     public test::BaseDbTest
 {
+    using base_type = test::BaseDbTest;
+
 public:
     DbAsyncSqlQueryExecutor():
-        m_eventsReceiver(nullptr),
-        m_maxNumberOfConcurrentDataModificationRequests(0),
-        m_concurrentDataModificationRequests(0)
+        base_type(kModuleName)
     {
         using namespace std::placeholders;
 
@@ -110,6 +112,8 @@ public:
 
     ~DbAsyncSqlQueryExecutor()
     {
+        closeDatabase();
+
         detail::RequestExecutorFactory::instance().setCustomFunc(
             std::move(m_requestExecutorFactoryBak));
     }
@@ -134,6 +138,12 @@ protected:
         generatedData.push_back(Company{"NetworkOptix", 2010});
 
         return generatedData;
+    }
+
+    void whenInitializeDbWithInaccessibleFilePath()
+    {
+        connectionOptions().dbName += "/raz-raz-raz.sqlite";
+        m_lastDbOpenResult = initializeQueryExecutor(connectionOptions());
     }
 
     void whenIssueMultipleReads()
@@ -194,7 +204,7 @@ protected:
 
                 std::for_each(
                     queries.begin(), queries.end(),
-                    [this, queryContext](std::unique_ptr<SqlQuery>& query)
+                    [this](std::unique_ptr<SqlQuery>& query)
                     {
                         saveQueryResult(query->next() ? DBResult::ok : DBResult::ioError);
                     });
@@ -202,6 +212,11 @@ protected:
                 return DBResult::ok;
             },
             nullptr);
+    }
+
+    void thenDbInitializationFailed()
+    {
+        ASSERT_FALSE(m_lastDbOpenResult);
     }
 
     void thenEveryQuerySucceeded()
@@ -286,13 +301,14 @@ protected:
     }
 
 private:
-    DbConnectionEventsReceiver* m_eventsReceiver;
+    DbConnectionEventsReceiver* m_eventsReceiver = nullptr;
     nx::utils::SyncQueue<DBResult> m_queryResults;
     int m_issuedRequestCount = 0;
     nx::utils::promise<void> m_finishHangingQuery;
-    std::atomic<int> m_maxNumberOfConcurrentDataModificationRequests;
-    std::atomic<int> m_concurrentDataModificationRequests;
+    std::atomic<int> m_maxNumberOfConcurrentDataModificationRequests = 0;
+    std::atomic<int> m_concurrentDataModificationRequests = 0;
     detail::RequestExecutorFactory::Function m_requestExecutorFactoryBak;
+    bool m_lastDbOpenResult = false;
 
     void emulateQueryError(DBResult dbResultToEmulate)
     {
@@ -437,6 +453,12 @@ TEST_F(DbAsyncSqlQueryExecutor, many_recoverable_errors_in_a_row_cause_reconnect
     ASSERT_EQ(2U, companies.size());
 
     closeDatabase();
+}
+
+TEST_F(DbAsyncSqlQueryExecutor, initial_error_to_open_a_connection_is_reported)
+{
+    whenInitializeDbWithInaccessibleFilePath();
+    thenDbInitializationFailed();
 }
 
 //-------------------------------------------------------------------------------------------------

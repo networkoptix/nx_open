@@ -138,7 +138,7 @@ void AioTaskQueue::processPollSetModificationQueue(TaskType taskFilter)
                 NX_ASSERT(!task.taskCompletionEvent && !task.taskCompletionHandler);
                 m_postedCalls.push_back(std::move(task));
                 // This task differs from every else in a way that it is not processed here,
-                // just moved to another container. 
+                // just moved to another container.
                 // TODO #ak Is it really needed to move to another container?
                 it = m_pollSetModificationQueue.erase(it);
                 continue;
@@ -264,7 +264,7 @@ bool AioTaskQueue::removeReverseTask(
             m_pollSetModificationQueue.erase(it);
             return true;
         }
-        else if (taskType == TaskType::tRemoving && 
+        else if (taskType == TaskType::tRemoving &&
             (it->type == TaskType::tAdding || it->type == TaskType::tChangingTimeout))
         {
             //if( it->type == TaskType::tChangingTimeout ) cancelling scheduled tasks, since socket removal from poll is requested

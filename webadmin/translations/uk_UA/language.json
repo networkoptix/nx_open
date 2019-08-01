@@ -119,15 +119,13 @@
         "upnpPortMappingEnabled": "Зіставлення портів UPNP включено",
         "useTextEmailFormat": "Відправка листів простим текстом",
         "useWindowsEmailLineFeed": "Використовуйте лінію каналу Windows у електронних листах",
-        "hanwhaChunkReaderMessageBodyTimeoutSeconds": "Hanwha: обмеження часу для фрагментації повідомлень",
-        "hanwhaChunkReaderResponseTimeoutSeconds": "Hanwha: часовий інтервал для відповіді на фрагмент",
-        "showHanwhaAlternativePtzControlsOnTile": "Hanwha: Показати альтернативний елемент керування PTZ на зображенні",
         "trafficEncryptionForced": "Забезпечити шифрування передачі",
         "videoTrafficEncryptionForced": "Забезпечити шифрування передачі відеосигналу",
         "updateStatus": "Оновити статус",
         "watermarkSettings": "Налаштування водяного знака",
         "maxWebMTranscoders": "Максимальна кількість WEBM-з'єднань для сервера. Chrome одночасно відкриває 2 з'єднання, потім закриває перше. Отже, рекомендується встановити значення> = 2 для цього параметра.",
-        "maxEventLogRecords": "Максимум запису журналу подій для зберігання в базі даних. Реальний обсяг відновлених записів може становити до 20% вище вказаного значення."
+        "maxEventLogRecords": "Максимум запису журналу подій для зберігання в базі даних. Реальний обсяг відновлених записів може становити до 20% вище вказаного значення.",
+        "forceLiveCacheForPrimaryStream": "Чи потрібно кешувати деякі кадри для первинного потоку. Значення: \"так\" - завжди включений (може використовувати багато оперативної пам'яті), \"ні\" - завжди вимикається, за винятком випадків, коли це вимагається відтворенням (наприклад, HLS), \"авто\" - схожена \"ні\", але увімкнено, коли покращується користувальницький досвід (наприклад, коли деякий плагін Analytics працює на камері)."
     },
     "info": {
         "tabs": {
@@ -194,18 +192,18 @@
     },
     "common": {
         "voiceCommands": {
-            "search": "find + [text for searchbar]",
+            "search": "знайти + [текст для панелі пошуку]",
             "pause": "пауза",
-            "help": "help | show commands",
+            "help": "допомога | показати команди",
             "collapse all servers": "згорнути всі сервери",
-            "collapse server": "collapse server + [server name]",
+            "collapse server": "сховати сервер + [назва сервера]",
             "play": "відтворити",
             "clear search": "очистити вікно пошуку",
-            "live": "go to live | show me live",
+            "live": "live | show me live",
             "expand all servers": "розгорнути всі сервери",
             "stop listening": "припинити прослуховування",
-            "expand server": "expand server + [server name]",
-            "view": "view + [camera name]"
+            "expand server": "розширити сервер + [назва сервера]",
+            "view": "перегляд + [назва камери]"
         },
         "systemOffline": "Система знаходиться поза мережею",
         "cameraLinks": {

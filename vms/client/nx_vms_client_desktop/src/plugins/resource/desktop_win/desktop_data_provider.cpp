@@ -75,16 +75,17 @@ QnDesktopDataProvider::EncodedAudioInfo::~EncodedAudioInfo()
 int QnDesktopDataProvider::EncodedAudioInfo::nameToWaveIndex()
 {
     int iNumDevs = waveInGetNumDevs();
-    QString name;
-    int devNum = 1;
-    m_audioDevice.splitFullName(name, devNum);
-    for(int i = 0; i < iNumDevs; ++i)
+    QString name = m_audioDevice.name();
+    int devNum = m_audioDevice.deviceNumber();
+    for (int i = 0; i < iNumDevs; ++i)
     {
         WAVEINCAPS wic;
         if(waveInGetDevCaps(i, &wic, sizeof(WAVEINCAPS)) == MMSYSERR_NOERROR)
         {
+            // This may look like "Microphone (Realtec Hi".
             QString tmp = QString((const QChar *) wic.szPname);
-            if (name.startsWith(tmp)) {
+            if (name.startsWith(tmp))
+            {
                 if (--devNum == 0)
                     return i;
             }
@@ -360,10 +361,11 @@ bool QnDesktopDataProvider::init()
         videoCodecName = getResource()->commonModule()->globalSettings()->lowQualityScreenVideoCodec();
     else
         videoCodecName = getResource()->commonModule()->globalSettings()->defaultExportVideoCodec();
+
     AVCodec* videoCodec = avcodec_find_encoder_by_name(videoCodecName.toLatin1().data());
     if (!videoCodec)
     {
-        NX_WARNING(this, tr("Configured codec: %1 not found, h263p will used").arg(videoCodecName));
+        NX_WARNING(this, "Configured codec: %1 not found, h263p will used", videoCodecName);
         videoCodec = avcodec_find_encoder(AV_CODEC_ID_H263P);
     }
     if(videoCodec == 0)
@@ -725,6 +727,8 @@ bool QnDesktopDataProvider::needVideoData() const
 
 void QnDesktopDataProvider::run()
 {
+    QThread::currentThread()->setPriority(QThread::HighPriority);
+
     while (!needToStop() || m_grabber->dataExist())
     {
         if (needVideoData())

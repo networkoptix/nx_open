@@ -1,5 +1,5 @@
 <div class="container campage">
-    <div class="row p-3">
+    <div class="row p-3" [style.display]="mobileDetailMode ? 'none' : 'block'">
         <div class="col">
             <nx-search
                     name="filterModel"
@@ -10,8 +10,13 @@
         </div>
     </div>
 
-    <div class="row pl-3 pr-3 d-flex" *ngIf="camerasTable.length">
-        <div class="order-1 order-lg-0" [ngClass]="{'col-12': !toggleCamview, 'col-lg-8 col-xl-9' : toggleCamview}">
+    <div class="row pl-3 pr-3 d-flex"
+         *ngIf="camerasTable.length">
+
+        <div class="order-1 order-lg-0"
+             [ngClass]="{'toggle': toggleCamview, 'col-12': !toggleCamview, 'col-lg-8 col-xl-9' : toggleCamview}"
+             [style.display]="mobileDetailMode ? 'none' : 'block'">
+
             <nx-cam-table
                     [elements]="camerasTable"
                     [allowedParameters]="allowedParameters"
@@ -23,21 +28,36 @@
                 <p>This list is limited to actual devices auto-reporting data to {{company}}, as
                     approved by anonymous system users.
                     The complete list of supported manufacturers and models is greater in scope.
-                    Please <a href (click)="open()">submit a request</a> for additional
+                    Please <a href (click)="openFeedback('page')">submit a request</a> for additional
                     questions/concerns regarding supported devices.
                 </p>
             </div>
+        </div>
+
+        <div class="row m-0 pt-3 pb-3 pl-2"
+             [style.display]="!mobileDetailMode ? 'none' : 'block'">
+
+            <button class="btn btn-default btn-back" (click)="resetActiveCamera()">
+                <span class="back-arrow"></span>
+                <span translate>All results</span>
+            </button>
         </div>
 
         <div class="order-0 order-lg-1 pb-3 col-12 col-lg-4 col-xl-3">
             <nx-block *ngIf="activeCamera">
                 <nx-cam-view
                         [activeCamera]="activeCamera"
-                        (onCloseView)="resetActiveCamera($event)"
-                        (onFeedbackClick)="open($event)">
+                        (onCloseView)="resetActiveCamera()"
+                        (onFeedbackClick)="openFeedback('device')">
                 </nx-cam-view>
             </nx-block>
         </div>
+    </div>
+
+    <div class="col ml-2 text-placeholder d-flex align-items-center"
+         *ngIf="!camerasTable.length && vendors && !vendors.length"
+         translate>
+        Nothing Found
     </div>
 
     <nx-vendor-list

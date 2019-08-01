@@ -2,15 +2,13 @@
 
 #include "applauncher_api.h"
 
-namespace applauncher {
-namespace api {
+namespace nx::vms::applauncher::api {
 
 static constexpr int kDefaultTimeoutMs = 3000;
 
-NX_VMS_APPLAUNCHER_API_API ResultType::Value sendCommandToApplauncher(
+NX_VMS_APPLAUNCHER_API_API ResultType sendCommandToApplauncher(
     const api::BaseTask& commandToSend,
     api::Response* const response = nullptr,
     int timeoutMs = kDefaultTimeoutMs);
 
-} // namespace api
-} // namespace applauncher
+} // namespace nx::vms::applauncher::api

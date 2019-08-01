@@ -8,6 +8,8 @@
 #include <nx/network/socket_global.h>
 #include <nx/utils/log/log.h>
 
+#include "util.h"
+
 namespace test {
 
 Cloud::~Cloud()
@@ -242,18 +244,18 @@ void CloudSystemFixture::waitUntilVmsTransactionLogMatchesCloudOne(
             ::ec2::ErrorCode::ok,
             mediaServerClient->ec2GetTransactionLog(filter, &vmsTransactionLog));
 
-        ::ec2::ApiTransactionDataList cloudTransactionLog;
+        nx::clusterdb::engine::CommandDataList cloudCommandLog;
         m_cloud.cdb().getTransactionLog(
             account.email,
             account.password,
             cloudSystemId,
-            &cloudTransactionLog);
+            &cloudCommandLog);
 
-        if (vmsTransactionLog == cloudTransactionLog)
+        if (nx::test::compare(vmsTransactionLog, cloudCommandLog))
             break;
 
         NX_VERBOSE(this, "VMS transaction log: %1", QJson::serialized(vmsTransactionLog));
-        NX_VERBOSE(this, "Cloud transaction log: %1", QJson::serialized(cloudTransactionLog));
+        NX_VERBOSE(this, "Cloud transaction log: %1", QJson::serialized(cloudCommandLog));
 
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
