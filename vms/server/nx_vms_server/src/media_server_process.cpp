@@ -2175,7 +2175,7 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg("api/ifconfig", new QnIfConfigRestHandler(), kAdmin);
 
-    reg("api/downloads/", new QnDownloadsRestHandler(serverModule()));
+    reg("api/downloads/", new nx::vms::server::rest::handlers::Downloads(serverModule()));
 
     /**%apidoc[proprietary] GET /api/settime
      * Set current time on the server machine. Can be called only if server flags include

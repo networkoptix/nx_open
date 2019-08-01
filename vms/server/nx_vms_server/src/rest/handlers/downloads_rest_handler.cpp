@@ -19,6 +19,8 @@ using nx::vms::common::p2p::downloader::Downloader;
 using nx::vms::common::p2p::downloader::FileInformation;
 using nx::vms::common::p2p::downloader::ResultCode;
 
+namespace nx::vms::server::rest::handlers {
+
 namespace {
 
 static const QByteArray kJsonContentType("application/json");
@@ -102,7 +104,7 @@ class Helper
 {
 public:
     Helper(
-        QnDownloadsRestHandler* handler,
+        Downloads* handler,
         const QnRequestParamList& params,
         QByteArray& result,
         QByteArray& resultContentType);
@@ -147,15 +149,14 @@ public:
     ResultCode addFile(const FileInformation& fileInfo);
 
 private:
-    QnDownloadsRestHandler* handler;
+    Downloads* handler;
     Downloader* const downloader;
     const QnRequestParamList& params;
     QByteArray& result;
     QByteArray& resultContentType;
 };
 
-Helper::Helper(
-    QnDownloadsRestHandler* handler,
+Helper::Helper(Downloads* handler,
     const QnRequestParamList& params,
     QByteArray& result,
     QByteArray& resultContentType)
@@ -170,6 +171,7 @@ Helper::Helper(
 
 int Helper::handleAddDownload(const QString& fileName)
 {
+    NX_VERBOSE(handler, "Creating download: %1", fileName);
     FileInformation fileInfo(fileName);
 
     const auto sizeString = params.value("size");
@@ -213,11 +215,13 @@ int Helper::handleAddDownload(const QString& fileName)
     if (errorCode != ResultCode::ok)
         return makeDownloaderError(errorCode);
 
+    NX_VERBOSE(handler, "Download created: %1", fileName);
     return nx::network::http::StatusCode::ok;
 }
 
 int Helper::handleAddUpload(const QString& fileName)
 {
+    NX_VERBOSE(handler, "Creating upload: %1", fileName);
     FileInformation fileInfo(fileName);
 
     const auto sizeString = params.value("size");
@@ -299,22 +303,28 @@ int Helper::handleAddUpload(const QString& fileName)
     QnJsonRestResult restResult;
     restResult.setReply(errorCode);
     QnFusionRestHandlerDetail::serialize(restResult, result, resultContentType, Qn::JsonFormat, false);
+    NX_VERBOSE(handler, "Upload created: %1", fileName);
     return nx::network::http::StatusCode::ok;
 }
 
 int Helper::handleRemoveDownload(const QString& fileName)
 {
+    NX_VERBOSE(handler, "Removing download: %1", fileName);
+
     const bool deleteData = params.value("deleteData", "true") != "false";
 
     const auto errorCode = downloader->deleteFile(fileName, deleteData);
     if (errorCode != ResultCode::ok)
         return makeDownloaderError(errorCode);
 
+    NX_VERBOSE(handler, "Download removed: %1", fileName);
     return nx::network::http::StatusCode::ok;
 }
 
 int Helper::handleGetChunkChecksums(const QString& fileName)
 {
+    NX_VERBOSE(handler, "Checksums requested for: %1", fileName);
+
     const auto& fileInfo = downloader->fileInformation(fileName);
     if (!fileInfo.isValid())
         return makeFileError(fileName, "handleGetChunkChecksums");
@@ -323,11 +333,15 @@ int Helper::handleGetChunkChecksums(const QString& fileName)
 
     QnFusionRestHandlerDetail::serializeJsonRestReply(
         checksums, params, result, resultContentType, QnRestResult());
+
+    NX_VERBOSE(handler, "Read checksums for %1 chunks of %2", checksums.size(), fileName);
     return nx::network::http::StatusCode::ok;
 }
 
 int Helper::handleDownloadChunk(const QString& fileName, int chunkIndex)
 {
+    NX_VERBOSE(handler, "Chunk %1 requested for: %2", chunkIndex, fileName);
+
     if (params.value("fromInternet", "false") == "true")
         return handleDownloadChunkFromInternet(fileName, chunkIndex);
 
@@ -338,11 +352,15 @@ int Helper::handleDownloadChunk(const QString& fileName, int chunkIndex)
 
     result = data;
     resultContentType = kOctetStreamContentType;
+
+    NX_VERBOSE(handler, "Successfully returned chunk %1 for: %2", chunkIndex, fileName);
     return nx::network::http::StatusCode::ok;
 }
 
 int Helper::handleDownloadChunkFromInternet(const QString& fileName, int chunkIndex)
 {
+    NX_VERBOSE(handler, "Chunk %1 requested for: %2 from Internet", chunkIndex, fileName);
+
     const nx::utils::Url url = params.value("url");
     if (url.isEmpty())
         return makeInvalidParameterError("url", QnRestResult::MissingParameter);
@@ -370,6 +388,7 @@ int Helper::handleDownloadChunkFromInternet(const QString& fileName, int chunkIn
         {
             result = data;
             resultContentType = kOctetStreamContentType;
+            NX_VERBOSE(handler, "Chunk %1 was read from the local file %2", chunkIndex, fileName);
             return nx::network::http::StatusCode::ok;
         }
     }
@@ -381,8 +400,14 @@ int Helper::handleDownloadChunkFromInternet(const QString& fileName, int chunkIn
     httpClient.setMessageBodyReadTimeout(kDownloadRequestTimeout);
 
     const qint64 pos = chunkIndex * chunkSize;
+    const qint64 end = pos + chunkSize - 1;
     httpClient.addAdditionalHeader("Range",
-        QStringLiteral("bytes=%1-%2").arg(pos).arg(pos + chunkSize - 1).toLatin1());
+        QStringLiteral("bytes=%1-%2").arg(pos).arg(end).toLatin1());
+
+    NX_VERBOSE(handler, "Requesting data [%1-%2] from %3 for chunk %4 of %5",
+        pos, end, url, chunkIndex, fileName);
+
+    const auto requestStartTime = steady_clock::now();
 
     if (!httpClient.doGet(url) || !httpClient.response())
         return nx::network::http::StatusCode::internalServerError;
@@ -392,6 +417,7 @@ int Helper::handleDownloadChunkFromInternet(const QString& fileName, int chunkIn
     if (status != nx::network::http::StatusCode::ok
         && status != nx::network::http::StatusCode::partialContent)
     {
+        NX_VERBOSE(handler, "Request failed for %1 with status %2", fileName, status);
         return status;
     }
 
@@ -402,14 +428,22 @@ int Helper::handleDownloadChunkFromInternet(const QString& fileName, int chunkIn
     if (!httpClient.isValid())
     {
         result.clear();
+        NX_VERBOSE(handler, "Request failed for %1", fileName);
         return nx::network::http::StatusCode::internalServerError;
     }
+
+    NX_VERBOSE(handler, "Successfully downloaded chunk %1 of %2 in %3",
+        chunkIndex, fileName, steady_clock::now() - requestStartTime);
 
     resultContentType = kOctetStreamContentType;
 
     if (useDownloader)
+    {
+        NX_VERBOSE(handler, "Writing chunk %1 of %2", chunkIndex, fileName);
         downloader->writeFileChunk(fileName, chunkIndex, result);
+    }
 
+    NX_VERBOSE(handler, "Successfully returned chunk %1 for: %2", chunkIndex, fileName);
     return nx::network::http::StatusCode::ok;
 }
 
@@ -419,6 +453,8 @@ int Helper::handleUploadChunk(
     const QByteArray& body,
     const QByteArray& contentType)
 {
+    NX_VERBOSE(handler, "Upload requested for chunk %1 of %2", chunkIndex, fileName);
+
     if (contentType != kOctetStreamContentType)
     {
         return makeError(
@@ -432,6 +468,7 @@ int Helper::handleUploadChunk(
     if (errorCode != ResultCode::ok)
         return makeDownloaderError(errorCode);
 
+    NX_VERBOSE(handler, "Successfully wrote chunk %1 of %2", chunkIndex, fileName);
     return nx::network::http::StatusCode::ok;
 }
 
@@ -439,20 +476,28 @@ int Helper::handleStatus(const QString& fileName)
 {
     if (!fileName.isEmpty())
     {
+        NX_VERBOSE(handler, "Status requested for %1", fileName);
+
         const auto& fileInfo = downloader->fileInformation(fileName);
         if (!fileInfo.isValid())
             return makeFileError(fileName, "handleStatus");
 
         QnFusionRestHandlerDetail::serializeJsonRestReply(
             fileInfo, params, result, resultContentType, QnRestResult());
+
+        NX_VERBOSE(handler, "Returned status for %1: %2", fileName, fileInfo.status);
     }
     else
     {
+        NX_VERBOSE(handler, "Status requested for all files");
+
         QList<FileInformation> infoList;
         for (const auto& fileName: downloader->files())
         {
             const auto& fileInfo = downloader->fileInformation(fileName);
             infoList.append(fileInfo);
+
+            NX_VERBOSE(handler, "Returned status for %1: %2", fileName, fileInfo.status);
         }
 
         QnFusionRestHandlerDetail::serializeJsonRestReply(
@@ -485,19 +530,19 @@ int Helper::makeInvalidParameterError(
 
 int Helper::makeFileError(const QString& fileName, const QString& at)
 {
-    NX_ERROR(this) << at << "(" << fileName << ") - bad filename";
+    NX_ERROR(handler, "Bad file name: %1", fileName);
     return makeError(
         nx::network::http::StatusCode::badRequest,
         QnRestResult::CantProcessRequest,
-        lit("%1(%2): file does not exist.").arg(at, fileName));
+        QString("%1(%2): file does not exist.").arg(at, fileName));
 }
 
 int Helper::makeDownloaderError(ResultCode errorCode)
 {
     QnJsonRestResult restResult;
-    QString errorMessage = lit("DistributedFileDownloader returned error: %1").arg(
+    const auto errorMessage = QString("DistributedFileDownloader returned error: %1").arg(
         QnLexical::serialized(errorCode));
-    NX_ERROR(this) << "makeDownloaderError(" << errorMessage << ")";
+    NX_ERROR(handler, "makeDownloaderError: %1", errorMessage);
     restResult.setError(QnRestResult::CantProcessRequest, errorMessage);
     restResult.setReply(errorCode);
 
@@ -550,12 +595,12 @@ boost::optional<int> hasError(const Request& request, Helper& helper)
 
 } // namespace
 
-QnDownloadsRestHandler::QnDownloadsRestHandler(QnMediaServerModule* serverModule):
+Downloads::Downloads(QnMediaServerModule* serverModule):
     nx::vms::server::ServerModuleAware(serverModule)
 {
 }
 
-int QnDownloadsRestHandler::executeGet(
+int Downloads::executeGet(
     const QString& path,
     const QnRequestParamList& params,
     QByteArray& result,
@@ -580,7 +625,7 @@ int QnDownloadsRestHandler::executeGet(
     }
 }
 
-int QnDownloadsRestHandler::executePost(
+int Downloads::executePost(
     const QString& path,
     const QnRequestParamList& params,
     const QByteArray& body,
@@ -607,11 +652,9 @@ int QnDownloadsRestHandler::executePost(
         default:
             return nx::network::http::StatusCode::badRequest;
     }
-
-    return nx::network::http::StatusCode::ok;
 }
 
-int QnDownloadsRestHandler::executePut(
+int Downloads::executePut(
     const QString& path,
     const QnRequestParamList& params,
     const QByteArray& body,
@@ -623,7 +666,7 @@ int QnDownloadsRestHandler::executePut(
     return executePost(path, params, body, bodyContentType, result, resultContentType, processor);
 }
 
-int QnDownloadsRestHandler::executeDelete(
+int Downloads::executeDelete(
     const QString& path,
     const QnRequestParamList& params,
     QByteArray& result,
@@ -637,3 +680,5 @@ int QnDownloadsRestHandler::executeDelete(
 
     return helper.handleRemoveDownload(request.fileName);
 }
+
+} // namespace nx::vms::server::rest::handlers
