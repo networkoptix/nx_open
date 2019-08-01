@@ -1278,7 +1278,10 @@ void MultiServerUpdatesWidget::atFinishUpdateComplete(bool success, const QStrin
                 QScopedPointer<QnMessageBox> messageBox(new QnMessageBox(this));
                 // 1. Everything is complete
                 messageBox->setIcon(QnMessageBoxIcon::Success);
-                messageBox->setText(tr("Nx Witness Client will be restarted to the updated version."));
+                messageBox->setText(
+                    tr("%1 will be restarted to the updated version.",
+                            "Application name will be substituted")
+                        .arg(QnClientAppInfo::applicationDisplayName()));
                 messageBox->setStandardButtons(QDialogButtonBox::Ok);
                 messageBox->exec();
                 completeInstallation(true);
@@ -2408,7 +2411,7 @@ void MultiServerUpdatesWidget::syncRemoteUpdateStateToUi()
             else if (hasStatusErrors)
             {
                 errorTooltips << tr("Some servers have encountered an internal error.");
-                errorTooltips << tr("Please please contact Customer Support.");
+                errorTooltips << tr("Please contact Customer Support.");
             }
             else if (hasInstallIssues)
             {

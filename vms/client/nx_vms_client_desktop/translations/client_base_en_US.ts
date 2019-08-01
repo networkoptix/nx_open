@@ -8565,6 +8565,58 @@ If you intended to move analytics data to another storage location, please conta
         <source>Some servers are offline and will not be updated. Skip them?</source>
         <translation></translation>
     </message>
+    <message numerus="yes">
+        <source>Missing update package for the client and %n servers</source>
+        <translation>
+            <numerusform>Missing update package for the client and %n server</numerusform>
+            <numerusform>Missing update package for the client and %n servers</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Missing update package for the client</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>There are no online servers to update.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Cancel update and delete all downloaded data?</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Failed to start update</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Failed to cancel update</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Failed to start installation</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Some servers have not completed the update process. Finish it anyway?</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>%1 will be restarted to the updated version.</source>
+        <comment>Application name will be substituted</comment>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Failed to download update packages to some components</source>
+        <translation></translation>
+    </message>
     <message>
         <source>If the problem persists, please contact Customer Support.</source>
         <translation></translation>
@@ -8582,7 +8634,15 @@ If you intended to move analytics data to another storage location, please conta
         <translation></translation>
     </message>
     <message>
-        <source>Nx Witness Client will be restarted to the updated version.</source>
+        <source>Update completed, but some components have failed an update</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Please update %1 manually using an installation package.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>%1 will be restarted to the updated version.</source>
         <translation></translation>
     </message>
     <message>
@@ -8590,7 +8650,31 @@ If you intended to move analytics data to another storage location, please conta
         <translation></translation>
     </message>
     <message>
+        <source>There was an error while installing updates:</source>
+        <translation></translation>
+    </message>
+    <message>
         <source>Downloading updates...</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Finish Update</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>The latest version is already installed</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>This version is already installed</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Install update</source>
         <translation></translation>
     </message>
     <message>
@@ -8610,11 +8694,11 @@ If you intended to move analytics data to another storage location, please conta
         <translation></translation>
     </message>
     <message>
-        <source>Select Another Build</source>
+        <source>Browse for Another File...</source>
         <translation></translation>
     </message>
     <message>
-        <source>Browse for Another File...</source>
+        <source>Select Another Build</source>
         <translation></translation>
     </message>
     <message>
@@ -8638,6 +8722,10 @@ If you intended to move analytics data to another storage location, please conta
         <translation></translation>
     </message>
     <message>
+        <source>Starting update to ...</source>
+        <translation></translation>
+    </message>
+    <message>
         <source>Updating to ...</source>
         <translation></translation>
     </message>
@@ -8646,11 +8734,23 @@ If you intended to move analytics data to another storage location, please conta
         <translation></translation>
     </message>
     <message>
-        <source>Install update</source>
+        <source>System updated to</source>
         <translation></translation>
     </message>
     <message>
-        <source>System updated to</source>
+        <source>Some servers have no update packages available.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Some servers have encountered an internal error.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Please contact Customer Support.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Some servers have gone offline. Please wait until they become online to continue.</source>
         <translation></translation>
     </message>
     <message>
@@ -8659,6 +8759,10 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>Continue in Background</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Latest Available Update</source>
         <translation></translation>
     </message>
     <message>
@@ -8671,109 +8775,6 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>Update from mediaservers</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Latest Available Update</source>
-        <translation></translation>
-    </message>
-    <message numerus="yes">
-        <source>Missing update package for the client and %n servers</source>
-        <translation>
-            <numerusform>Missing update package for the client and %n server</numerusform>
-            <numerusform>Missing update package for the client and %n servers</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Missing update package for the client</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Finish Update</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>The latest version is already installed</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>This version is already installed</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>There are no online servers to update.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Cancel update and delete all downloaded data?</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>There was an error while installing updates:</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Some servers have gone offline. Please wait until they become online to continue.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Update completed, but some components have failed an update</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Please update %1 manually using an installation package.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>%1 will be restarted to the updated version.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Failed to download update packages to some components</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Failed to start update</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Starting update to ...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Failed to cancel update</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Failed to start installation</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Some servers have no update packages available.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Some servers have encountered an internal error.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Please please contact Customer Support.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Some servers have not completed the update process. Finish it anyway?</source>
         <translation></translation>
     </message>
 </context>
