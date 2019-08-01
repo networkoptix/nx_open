@@ -227,7 +227,7 @@ QVariantMap DeviceAnalyticsBinding::getSettings() const
             return jsonEngine.values();
         }
 
-        const auto values = toPtr(settingsResponse->values());
+        const auto values = settingsResponse->values();
         if (!values)
         {
             NX_DEBUG(this,

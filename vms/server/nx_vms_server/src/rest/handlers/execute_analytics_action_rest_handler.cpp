@@ -102,7 +102,19 @@ public:
 
     virtual nx::sdk::Uuid deviceId() const override { return m_deviceId; }
 
-    virtual nx::sdk::analytics::IObjectTrackInfo* objectTrackInfo() const override
+    virtual int64_t timestampUs() const
+    {
+        return m_timestampUs;
+    }
+
+    virtual void handleResult(const char* actionUrl, const char* messageToUser) override
+    {
+        m_actionResult->actionUrl = actionUrl;
+        m_actionResult->messageToUser = messageToUser;
+    }
+
+protected:
+    virtual nx::sdk::analytics::IObjectTrackInfo* getObjectTrackInfo() const override
     {
         if (!m_objectTrackInfo)
             return nullptr;
@@ -111,21 +123,10 @@ public:
         return m_objectTrackInfo.get();
     }
 
-    virtual int64_t timestampUs() const
-    {
-        return m_timestampUs;
-    }
-
-    virtual const nx::sdk::IStringMap* params() const override
+    virtual const nx::sdk::IStringMap* getParams() const override
     {
         m_params->addRef();
         return m_params.get();
-    }
-
-    virtual void handleResult(const char* actionUrl, const char* messageToUser) override
-    {
-        m_actionResult->actionUrl = actionUrl;
-        m_actionResult->messageToUser = messageToUser;
     }
 
 private:

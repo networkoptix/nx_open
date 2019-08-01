@@ -31,9 +31,9 @@ const char* TimestampedObjectMetadata::subtype() const
     return m_objectMetadata->subtype();
 }
 
-const IAttribute* TimestampedObjectMetadata::attribute(int index) const
+const IAttribute* TimestampedObjectMetadata::getAttribute(int index) const
 {
-    return m_objectMetadata->attribute(index);
+    return m_objectMetadata->attribute(index).get();
 }
 
 int TimestampedObjectMetadata::attributeCount() const

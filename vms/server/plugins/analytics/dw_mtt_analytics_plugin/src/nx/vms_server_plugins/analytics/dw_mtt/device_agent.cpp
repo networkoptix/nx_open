@@ -401,7 +401,7 @@ void DeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
 
 Result<void> DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes)
 {
-    const auto eventTypeIds = toPtr(metadataTypes->eventTypeIds());
+    const auto eventTypeIds = metadataTypes->eventTypeIds();
     if (const char* const kMessage = "Event type id list is nullptr";
         !NX_ASSERT(eventTypeIds, kMessage))
     {
@@ -423,7 +423,7 @@ Result<void> DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTy
     m_cameraController.setCredentials(m_auth.user().toLatin1(), m_auth.password().toLatin1());
 
     // Assuming that the list contains only events, since this plugin does not produce objects.
-    const auto eventTypeIdList = toPtr(metadataTypes->eventTypeIds());
+    const auto eventTypeIdList = metadataTypes->eventTypeIds();
     if (const char* const message = "Event type id list is nullptr";
         !NX_ASSERT(eventTypeIdList, message))
     {

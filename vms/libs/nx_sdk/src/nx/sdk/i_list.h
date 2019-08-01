@@ -19,7 +19,8 @@ public:
     virtual int count() const = 0;
 
     /** @return Element at the zero-based index, or null if the index is invalid. */
-    virtual IItem* at(int index) const = 0;
+    protected: virtual IItem* getAt(int index) const = 0;
+    public: Ptr<IItem> at(int index) const { return toPtr(getAt(index)); }
 };
 
 } // namespace sdk

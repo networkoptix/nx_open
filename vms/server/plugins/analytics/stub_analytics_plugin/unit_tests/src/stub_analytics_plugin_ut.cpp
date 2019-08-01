@@ -163,10 +163,9 @@ public:
     virtual const char* actionId() const override { return m_actionId.c_str(); }
     virtual Uuid objectTrackId() const override { return m_objectTrackId; }
     virtual Uuid deviceId() const override { return m_deviceId; }
-    virtual IObjectTrackInfo* objectTrackInfo() const override { return nullptr; }
     virtual int64_t timestampUs() const override { return m_timestampUs; }
 
-    virtual const IStringMap* params() const override
+    virtual const IStringMap* getParams() const override
     {
         if (!m_params)
             return nullptr;
@@ -202,7 +201,6 @@ public:
         }
     }
 
-public:
     void assertExpectedState() const
     {
         ASSERT_FALSE(
@@ -216,6 +214,9 @@ public:
         for (const auto& param: params)
             m_params->setItem(param.first, param.second);
     }
+
+protected:
+    virtual IObjectTrackInfo* getObjectTrackInfo() const override { return nullptr; }
 
 public:
     std::string m_actionId;
@@ -312,11 +313,13 @@ public:
     virtual const char* codec() const override { return "test_stub_codec"; }
     virtual const char* data() const override { return m_data.data(); }
     virtual int dataSize() const override { return (int) m_data.size(); }
-    virtual const IMediaContext* context() const override { return nullptr; }
     virtual MediaFlags flags() const override { return MediaFlags::none; }
 
     virtual int width() const override { return 256; }
     virtual int height() const override { return 128; }
+
+protected:
+    virtual const IMediaContext* getContext() const override { return nullptr; }
 
 private:
     const std::vector<char> m_data = std::vector<char>(width() * height(), /*dummy*/ 42);
@@ -326,7 +329,7 @@ class UtilityProvider: public RefCountable<IUtilityProvider>
 {
 public:
     virtual int64_t vmsSystemTimeSinceEpochMs() const override { return 0; }
-    virtual const nx::sdk::IString* homeDir() const override { return new nx::sdk::String(); }
+    virtual const nx::sdk::IString* getHomeDir() const override { return new nx::sdk::String(); }
 };
 
 class Handler: public nx::sdk::RefCountable<nx::sdk::analytics::IDeviceAgent::IHandler>

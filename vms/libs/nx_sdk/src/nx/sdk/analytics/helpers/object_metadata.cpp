@@ -30,7 +30,7 @@ const char* ObjectMetadata::subtype() const
     return m_subtype.data();
 }
 
-const IAttribute* ObjectMetadata::attribute(int index) const
+const IAttribute* ObjectMetadata::getAttribute(int index) const
 {
     if (index >= (int) m_attributes.size() || index < 0)
         return nullptr;

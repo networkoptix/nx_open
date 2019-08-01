@@ -27,7 +27,7 @@ int64_t UtilityProvider::vmsSystemTimeSinceEpochMs() const
     return qnSyncTime->currentMSecsSinceEpoch();
 }
 
-const nx::sdk::IString* UtilityProvider::homeDir() const
+const nx::sdk::IString* UtilityProvider::getHomeDir() const
 {
     return new nx::sdk::String(m_pluginManager->pluginInfo(m_plugin)->homeDir.toStdString());
 }

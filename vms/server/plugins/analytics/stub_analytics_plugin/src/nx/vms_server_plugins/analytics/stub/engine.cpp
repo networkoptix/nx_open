@@ -92,7 +92,7 @@ void Engine::obtainPluginHomeDir()
     const auto utilityProvider = plugin()->utilityProvider();
     NX_KIT_ASSERT(utilityProvider);
 
-    m_pluginHomeDir = toPtr(utilityProvider->homeDir())->str();
+    m_pluginHomeDir = utilityProvider->homeDir();
 
     if (m_pluginHomeDir.empty())
         NX_PRINT << "Plugin home dir: absent";
@@ -394,7 +394,8 @@ StringMapResult Engine::settingsReceived()
     return nullptr;
 }
 
-static std::string timestampedObjectMetadataToString(const ITimestampedObjectMetadata* metadata)
+static std::string timestampedObjectMetadataToString(
+    Ptr<const ITimestampedObjectMetadata> metadata)
 {
     if (!metadata)
         return "null";
@@ -404,7 +405,7 @@ static std::string timestampedObjectMetadataToString(const ITimestampedObjectMet
 }
 
 static std::string objectTrackToString(
-    const IList<ITimestampedObjectMetadata>* track,
+    Ptr<const IList<ITimestampedObjectMetadata>> track,
     Uuid expectedTrackId)
 {
     using nx::kit::utils::format;
@@ -422,14 +423,14 @@ static std::string objectTrackToString(
     {
         const auto timestampedObjectMetadata = track->at(i);
         trackld = timestampedObjectMetadata->trackId();
-        if (trackld != toPtr(track->at(0))->trackId())
+        if (trackld != track->at(0)->trackId())
         {
             if (!result.empty())
                 result += "; ";
             result += format("INTERNAL ERROR: Track id #%d %s does not equal track id #0 %s",
                 i,
                 UuidHelper::toStdString(trackld).c_str(),
-                UuidHelper::toStdString(toPtr(track->at(0))->trackId()).c_str());
+                UuidHelper::toStdString(track->at(0)->trackId()).c_str());
             break;
         }
     }
@@ -446,7 +447,7 @@ static std::string objectTrackToString(
     return result;
 }
 
-static std::string uncompressedVideoFrameToString(const IUncompressedVideoFrame* frame)
+static std::string uncompressedVideoFrameToString(Ptr<const IUncompressedVideoFrame> frame)
 {
     if (!frame)
         return "null";

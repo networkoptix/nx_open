@@ -446,7 +446,7 @@ Result<void> DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTy
     if (auto error = prepare(vcaCameraConrtoller))
         return std::move(error.value());
 
-    const auto eventTypeIds = toPtr(metadataTypes->eventTypeIds());
+    const auto eventTypeIds = metadataTypes->eventTypeIds();
     if (const char* const kMessage = "Event type id list is nullptr";
         !NX_ASSERT(eventTypeIds, kMessage))
     {

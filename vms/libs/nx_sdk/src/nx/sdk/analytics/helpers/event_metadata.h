@@ -20,7 +20,6 @@ class EventMetadata: public RefCountable<IEventMetadata>
 public:
     virtual const char* typeId() const override;
     virtual float confidence() const override;
-    virtual const IAttribute* attribute(int index) const override;
     virtual int attributeCount() const override;
     virtual const char* caption() const override;
     virtual const char* description() const override;
@@ -33,6 +32,9 @@ public:
     void setIsActive(bool isActive);
     void addAttribute(nx::sdk::Ptr<Attribute> attribute);
     void addAttributes(const std::vector<nx::sdk::Ptr<Attribute>>& value);
+
+protected:
+    virtual const IAttribute* getAttribute(int index) const override;
 
 private:
     std::string m_typeId;

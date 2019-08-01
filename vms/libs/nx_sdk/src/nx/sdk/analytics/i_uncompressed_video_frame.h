@@ -43,7 +43,7 @@ public:
      */
     virtual int height() const = 0;
 
-    // TODO: #mshevchenko: Returning struct by value is not ABI-agnostic.
+    // TODO: #mshevchenko: PixelAspectRatio
     /**
      * @return Aspect ratio of a frame pixel.
      */

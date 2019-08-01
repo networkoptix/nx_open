@@ -21,6 +21,7 @@ class IObjectMetadata: public Interface<IObjectMetadata, IMetadata>
 public:
     static auto interfaceId() { return InterfaceId("nx::sdk::analytics::IObjectMetadata"); }
 
+    // TODO: #mshevchenko: Uuid
     /**
      * @return Id of the object track. Object track is a sequence of object detections from its
      *     first appearance on the scene till its disappearing. The same object can have multiple
@@ -33,6 +34,7 @@ public:
      */
     virtual const char* subtype() const = 0;
 
+    // TODO: #mshevchenko: Rect
     /**
      * @return Bounding box of an object detected in a video frame.
      */

@@ -130,7 +130,7 @@ Result<void> Engine::executeAction(IAction* action)
     NX_OUTPUT << "    deviceId: " << action->deviceId();
     NX_OUTPUT << "    timestampUs: " << action->timestampUs();
 
-    const auto actionParams = toPtr(action->params());
+    const auto actionParams = action->params();
 
     if (!logUtils.convertAndOutputStringMap(
         &params, actionParams.get(), "params", /*outputIndent*/ 4))
@@ -149,7 +149,7 @@ Result<void> Engine::executeAction(IAction* action)
         action->objectTrackId(),
         action->deviceId(),
         action->timestampUs(),
-        nx::sdk::toPtr(action->objectTrackInfo()),
+        action->objectTrackInfo(),
         params,
         &actionUrl,
         &messageToUser);

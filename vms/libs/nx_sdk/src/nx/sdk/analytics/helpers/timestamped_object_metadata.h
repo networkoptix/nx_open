@@ -21,19 +21,11 @@ public:
     TimestampedObjectMetadata();
 
     virtual Uuid trackId() const override;
-
     virtual const char* subtype() const override;
-
-    virtual const IAttribute* attribute(int index) const override;
-
     virtual int attributeCount() const override;
-
     virtual Rect boundingBox() const override;
-
     virtual int64_t timestampUs() const override;
-
     virtual const char* typeId() const override;
-
     virtual float confidence() const override;
 
     void setTypeId(std::string typeId);
@@ -44,6 +36,9 @@ public:
     void addAttributes(const std::vector<nx::sdk::Ptr<Attribute>>& value);
     void setBoundingBox(const Rect& rect);
     void setTimestampUs(int64_t timestampUs);
+
+protected:
+    virtual const IAttribute* getAttribute(int index) const override;
 
 private:
     nx::sdk::Ptr<nx::sdk::analytics::ObjectMetadata> m_objectMetadata;

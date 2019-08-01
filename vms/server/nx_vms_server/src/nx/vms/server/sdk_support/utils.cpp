@@ -385,7 +385,7 @@ std::map<QString, QString> attributesMap(
     std::map<QString, QString> result;
     for (int i = 0; i < metadata->attributeCount(); ++i)
     {
-        const auto attribute = toPtr(metadata->attribute(i));
+        const auto attribute = metadata->attribute(i);
         result.emplace(
             QString::fromStdString(attribute->name()),
             QString::fromStdString(attribute->value()));

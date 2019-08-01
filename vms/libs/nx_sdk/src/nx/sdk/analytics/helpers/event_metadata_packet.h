@@ -19,12 +19,14 @@ public:
     virtual int64_t durationUs() const override;
 
     virtual int count() const override;
-    virtual const IEventMetadata* at(int index) const override;
 
     void setTimestampUs(int64_t timestampUs);
     void setDurationUs(int64_t durationUs);
     void addItem(const IEventMetadata* event);
     void clear();
+
+protected:
+    virtual const IEventMetadata* getAt(int index) const override;
 
 private:
     int64_t m_timestampUs = -1;

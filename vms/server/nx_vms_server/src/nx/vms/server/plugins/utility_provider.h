@@ -10,15 +10,14 @@ namespace nx::vms::server::plugins {
 
 class UtilityProvider: public nx::sdk::RefCountable<nx::sdk::IUtilityProvider>
 {
-protected:
-    virtual IRefCountable* queryInterface(nx::sdk::InterfaceId id) override;
-
 public:
     UtilityProvider(PluginManager* pluginManager, const nx::sdk::IPlugin* plugin);
 
     virtual int64_t vmsSystemTimeSinceEpochMs() const override;
 
-    virtual const nx::sdk::IString* homeDir() const override;
+protected:
+    virtual IRefCountable* queryInterface(nx::sdk::InterfaceId id) override;
+    virtual const nx::sdk::IString* getHomeDir() const override;
 
 private:
     PluginManager* const m_pluginManager; /**< Never null (asserted in the constructor). */

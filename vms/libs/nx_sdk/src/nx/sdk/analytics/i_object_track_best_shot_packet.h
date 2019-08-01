@@ -26,11 +26,13 @@ public:
      * Timestamp of the frame (in microseconds) the best shot belongs to. Should be a non-negative
      * number.
      */
-    virtual int64_t timestampUs() const = 0;
+    virtual int64_t timestampUs() const override = 0;
 
+    // TODO: #mshevchenko: Uuid
     /** Id of the track the best shot belongs to. */
     virtual Uuid trackId() const = 0;
 
+    // TODO: #mshevchenko: Rect
     /**
      * Bounding box of the best shot. If the rectangle returned by this method is invalid then
      * a bounding box from the frame with the timestamp equal to the timestampUs() will be used.

@@ -17,14 +17,15 @@ public:
     SettingsResponse() = default;
     SettingsResponse(Ptr<StringMap> values, Ptr<StringMap> errors = nullptr);
 
-    virtual IStringMap* values() const override;
-    virtual IStringMap* errors() const override;
-
     void setValue(std::string key, std::string value);
     void setError(std::string key, std::string value);
 
     void setValues(Ptr<StringMap> values);
     void setErrors(Ptr<StringMap> errors);
+
+protected:
+    virtual IStringMap* getValues() const override;
+    virtual IStringMap* getErrors() const override;
 
 private:
     Ptr<StringMap> m_values;

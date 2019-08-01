@@ -24,7 +24,6 @@ public:
     virtual float confidence() const override;
     virtual Uuid trackId() const override;
     virtual const char* subtype() const override;
-    virtual const IAttribute* attribute(int index) const override;
     virtual int attributeCount() const override;
     virtual Rect boundingBox() const override;
 
@@ -35,6 +34,9 @@ public:
     void addAttribute(nx::sdk::Ptr<Attribute> attribute);
     void addAttributes(const std::vector<nx::sdk::Ptr<Attribute>>& value);
     void setBoundingBox(const Rect& rect);
+
+protected:
+    virtual const IAttribute* getAttribute(int index) const override;
 
 private:
     std::string m_typeId;

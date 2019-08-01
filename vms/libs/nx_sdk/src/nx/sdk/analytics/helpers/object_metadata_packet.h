@@ -18,12 +18,14 @@ public:
     virtual int64_t timestampUs() const override;
     virtual int64_t durationUs() const override;
     virtual int count() const override;
-    virtual const IObjectMetadata* at(int index) const override;
 
     void setTimestampUs(int64_t timestampUs);
     void setDurationUs(int64_t durationUs);
     void addItem(const IObjectMetadata* object);
     void clear();
+
+protected:
+    virtual const IObjectMetadata* getAt(int index) const override;
 
 private:
     int64_t m_timestampUs = -1;
