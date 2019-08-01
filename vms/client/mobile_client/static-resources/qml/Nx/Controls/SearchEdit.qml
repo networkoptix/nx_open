@@ -30,7 +30,7 @@ TextField
         Behavior on opacity { NumberAnimation { duration: 100 } }
         alwaysCompleteHighlightAnimation: false
 
-        anchors.right: parent.right
-        anchors.verticalCenter: parent.verticalCenter
+        anchors.right: parent ? parent.right : undefined
+        anchors.verticalCenter: parent ? parent.verticalCenter : undefined
     }
 }
