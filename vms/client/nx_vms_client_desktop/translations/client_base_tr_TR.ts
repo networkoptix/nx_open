@@ -5607,8 +5607,8 @@ to %1</source>
     <message>
       <source>Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
 If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
-      <translation type="unfinished">Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
-If you intended to move analytics data to another storage location, please contact support before proceeding.</translation>
+      <translation>Mevcut analitik verileri otomatik olarak başka bir yere taşınmayacak ve erişilemez hale gelecektir. Onu daha sonra manuel olarak hareket ettirebilir veya kalıcı olarak silebilirsiniz.
+Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam etmeden önce lütfen desteğe başvurun.</translation>
     </message>
   </context>
   <context>
@@ -8566,6 +8566,58 @@ If you intended to move analytics data to another storage location, please conta
       <source>Some servers are offline and will not be updated. Skip them?</source>
       <translation>Bazı sunucular çevrimdışıdır ve güncellenmez. Onları atla?</translation>
     </message>
+    <message numerus="yes">
+      <source>Missing update package for the client and %n servers</source>
+      <translation>
+        <numerusform>Client ve %n sunucuları için güncelleme paketleri kayıp</numerusform>
+        <numerusform>Client ve %n sunucuları için güncelleme paketleri kayıp</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Missing update package for the client</source>
+      <translation>Client için güncelleme paketi eksik</translation>
+    </message>
+    <message>
+      <source>There are no online servers to update.</source>
+      <translation>Güncelleme yapılacak çevrimiçi sunucu yok.</translation>
+    </message>
+    <message>
+      <source>Cancel update and delete all downloaded data?</source>
+      <translation>Güncellemeyi iptal et ve tüm indirilmiş verileri sil?</translation>
+    </message>
+    <message>
+      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
+      <translation>Bazı bileşenlerin işletim sistemi sürümleri artık desteklenmemektedir. Lütfen bunları Sistemden kaldırın veya işletim sistemlerini desteklenen bir sürüme güncelleyin.</translation>
+    </message>
+    <message>
+      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
+      <translation>İstemcinin işletim sistemi sürümü artık desteklenmiyor. Lütfen işletim sisteminizi desteklenen bir sürüme güncelleyin.</translation>
+    </message>
+    <message>
+      <source>Failed to start update</source>
+      <translation>Güncelleme yüklenemedi</translation>
+    </message>
+    <message>
+      <source>Failed to cancel update</source>
+      <translation>Güncelleyici başlatılamadı</translation>
+    </message>
+    <message>
+      <source>Failed to start installation</source>
+      <translation>Yükleme başlatılamadı</translation>
+    </message>
+    <message>
+      <source>Some servers have not completed the update process. Finish it anyway?</source>
+      <translation>Bazı sunucular güncelleme işlemini tamamlamadı. Yine de sonlandırılsın mı?</translation>
+    </message>
+    <message>
+      <source>%1 will be restarted to the updated version.</source>
+      <comment>Application name will be substituted</comment>
+      <translation>%1 güncellenmiş versiyonda yeniden başlatılacak.</translation>
+    </message>
+    <message>
+      <source>Failed to download update packages to some components</source>
+      <translation>Güncelleme paketinin bazı bileşenleri indirilemedi</translation>
+    </message>
     <message>
       <source>If the problem persists, please contact Customer Support.</source>
       <translation>Eğer problem devam ederse Müşteri Hizmetleri ile iletişime geçin.</translation>
@@ -8583,16 +8635,48 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Güncelleştirme tamamlandı</translation>
     </message>
     <message>
-      <source>Nx Witness Client will be restarted to the updated version.</source>
-      <translation>Nx Witness Client'ı güncellenen versiyonda yeniden başlatılacak.</translation>
+      <source>Update completed, but some components have failed an update</source>
+      <translation>Güncelleme tamamlandı ancak bazı sunucular güncellenemedi</translation>
+    </message>
+    <message>
+      <source>Please update %1 manually using an installation package.</source>
+      <translation>Lütfen %1 i yükleme dosyası kullanarak güncelleyin.</translation>
+    </message>
+    <message>
+      <source>%1 will be restarted to the updated version.</source>
+      <translation>%1 güncellenmiş versiyonda yeniden başlatılacak.</translation>
     </message>
     <message>
       <source>OK</source>
       <translation>TAMAM</translation>
     </message>
     <message>
+      <source>There was an error while installing updates:</source>
+      <translation>Güncelleme yüklenirken bir hata oluştu {0}:</translation>
+    </message>
+    <message>
       <source>Downloading updates...</source>
       <translation>Güncellemeker indiriliyor...</translation>
+    </message>
+    <message>
+      <source>Finish Update</source>
+      <translation>Güncellemeyi Bitir</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>İptal</translation>
+    </message>
+    <message>
+      <source>The latest version is already installed</source>
+      <translation>En son versiyon zaten yüklü</translation>
+    </message>
+    <message>
+      <source>This version is already installed</source>
+      <translation>Bu versiyon zaten yüklü</translation>
+    </message>
+    <message>
+      <source>Install update</source>
+      <translation>Güncellemeyi yükle</translation>
     </message>
     <message>
       <source>Upload</source>
@@ -8611,12 +8695,12 @@ If you intended to move analytics data to another storage location, please conta
       <translation>İndir &amp;&amp; Yükle</translation>
     </message>
     <message>
-      <source>Select Another Build</source>
-      <translation>Başka Yapı Seçin</translation>
-    </message>
-    <message>
       <source>Browse for Another File...</source>
       <translation>Başka Dosyaya Göz At...</translation>
+    </message>
+    <message>
+      <source>Select Another Build</source>
+      <translation>Başka Yapı Seçin</translation>
     </message>
     <message>
       <source>Update to Specific Build</source>
@@ -8639,6 +8723,10 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Client güncellemesi yükleniyor...</translation>
     </message>
     <message>
+      <source>Starting update to ...</source>
+      <translation>İçin güncelleme başlatılıyor ...</translation>
+    </message>
+    <message>
       <source>Updating to ...</source>
       <translation>Güncelleniyor ...</translation>
     </message>
@@ -8647,12 +8735,24 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Güncellemeye hazır</translation>
     </message>
     <message>
-      <source>Install update</source>
-      <translation>Güncellemeyi yükle</translation>
-    </message>
-    <message>
       <source>System updated to</source>
       <translation>Sistem güncellenecek</translation>
+    </message>
+    <message>
+      <source>Some servers have no update packages available.</source>
+      <translation>Bazı sunucuların güncelleme paketi yok.</translation>
+    </message>
+    <message>
+      <source>Some servers have encountered an internal error.</source>
+      <translation>Bazı sunucular dahili bir hatayla karşılaştı.</translation>
+    </message>
+    <message>
+      <source>Please contact Customer Support.</source>
+      <translation>Lütfen Destek Birimiyle İletişime Geçin.</translation>
+    </message>
+    <message>
+      <source>Some servers have gone offline. Please wait until they become online to continue.</source>
+      <translation>Bazı sunucular çevrimdışı oldu. Lütfen devam etmek için çevrimiçi olana kadar bekleyin.</translation>
     </message>
     <message>
       <source>System update in process</source>
@@ -8661,6 +8761,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Continue in Background</source>
       <translation>Arka planda devam et</translation>
+    </message>
+    <message>
+      <source>Latest Available Update</source>
+      <translation>Kullanılabilir Son Güncelleme</translation>
     </message>
     <message>
       <source>Specific Build</source>
@@ -8673,109 +8777,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Update from mediaservers</source>
       <translation>Mediaserverdan güncelleme</translation>
-    </message>
-    <message>
-      <source>Latest Available Update</source>
-      <translation>Kullanılabilir Son Güncelleme</translation>
-    </message>
-    <message numerus="yes">
-      <source>Missing update package for the client and %n servers</source>
-      <translation>
-        <numerusform>Client ve %n sunucuları için güncelleme paketleri kayıp</numerusform>
-        <numerusform>Client ve %n sunucuları için güncelleme paketleri kayıp</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Missing update package for the client</source>
-      <translation>Client için güncelleme paketi eksik</translation>
-    </message>
-    <message>
-      <source>Finish Update</source>
-      <translation>Güncellemeyi Bitir</translation>
-    </message>
-    <message>
-      <source>Cancel</source>
-      <translation>İptal</translation>
-    </message>
-    <message>
-      <source>The latest version is already installed</source>
-      <translation>En son versiyon zaten yüklü</translation>
-    </message>
-    <message>
-      <source>This version is already installed</source>
-      <translation>Bu versiyon zaten yüklü</translation>
-    </message>
-    <message>
-      <source>There are no online servers to update.</source>
-      <translation>Güncelleme yapılacak çevrimiçi sunucu yok.</translation>
-    </message>
-    <message>
-      <source>Cancel update and delete all downloaded data?</source>
-      <translation>Güncellemeyi iptal et ve tüm indirilmiş verileri sil?</translation>
-    </message>
-    <message>
-      <source>There was an error while installing updates:</source>
-      <translation>Güncelleme yüklenirken bir hata oluştu {0}:</translation>
-    </message>
-    <message>
-      <source>Some servers have gone offline. Please wait until they become online to continue.</source>
-      <translation>Bazı sunucular çevrimdışı oldu. Lütfen devam etmek için çevrimiçi olana kadar bekleyin.</translation>
-    </message>
-    <message>
-      <source>Update completed, but some components have failed an update</source>
-      <translation>Güncelleme tamamlandı ancak bazı sunucular güncellenemedi</translation>
-    </message>
-    <message>
-      <source>Please update %1 manually using an installation package.</source>
-      <translation>Lütfen %1 i yükleme dosyası kullanarak güncelleyin.</translation>
-    </message>
-    <message>
-      <source>%1 will be restarted to the updated version.</source>
-      <translation>%1 güncellenmiş versiyonda yeniden başlatılacak.</translation>
-    </message>
-    <message>
-      <source>Failed to download update packages to some components</source>
-      <translation>Güncelleme paketinin bazı bileşenleri indirilemedi</translation>
-    </message>
-    <message>
-      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
-      <translation>Bazı bileşenlerin işletim sistemi sürümleri artık desteklenmemektedir. Lütfen bunları Sistemden kaldırın veya işletim sistemlerini desteklenen bir sürüme güncelleyin.</translation>
-    </message>
-    <message>
-      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
-      <translation>İstemcinin işletim sistemi sürümü artık desteklenmiyor. Lütfen işletim sisteminizi desteklenen bir sürüme güncelleyin.</translation>
-    </message>
-    <message>
-      <source>Failed to start update</source>
-      <translation>Güncelleme yüklenemedi</translation>
-    </message>
-    <message>
-      <source>Starting update to ...</source>
-      <translation>İçin güncelleme başlatılıyor ...</translation>
-    </message>
-    <message>
-      <source>Failed to cancel update</source>
-      <translation>Güncelleyici başlatılamadı</translation>
-    </message>
-    <message>
-      <source>Failed to start installation</source>
-      <translation>Yükleme başlatılamadı</translation>
-    </message>
-    <message>
-      <source>Some servers have no update packages available.</source>
-      <translation>Bazı sunucuların güncelleme paketi yok.</translation>
-    </message>
-    <message>
-      <source>Some servers have encountered an internal error.</source>
-      <translation>Bazı sunucular dahili bir hatayla karşılaştı.</translation>
-    </message>
-    <message>
-      <source>Please please contact Customer Support.</source>
-      <translation>Lütfen Destek Birimiyle İletişime Geçin.</translation>
-    </message>
-    <message>
-      <source>Some servers have not completed the update process. Finish it anyway?</source>
-      <translation>Bazı sunucular güncelleme işlemini tamamlamadı. Yine de sonlandırılsın mı?</translation>
     </message>
   </context>
   <context>
@@ -9419,11 +9420,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Remote file &quot;%1&quot; is corrupted</source>
-      <translation type="unfinished">Remote file &quot;%1&quot; is corrupted</translation>
+      <translation>Uzak dosya &quot;%1&quot; bozuk</translation>
     </message>
     <message>
       <source>Server already has this file &quot;%1&quot;</source>
-      <translation type="unfinished">Server already has this file &quot;%1&quot;</translation>
+      <translation>Sunucu zaten bu dosyada &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
@@ -9955,21 +9956,22 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Confirm storage location for the analytics data on &quot;%1&quot;</source>
-      <translation type="unfinished">Confirm storage location for the analytics data on &quot;%1&quot;</translation>
+      <translation>Analytics verilerini depolamak için depolama konumunu onaylayın &quot;%1&quot;</translation>
     </message>
     <message>
       <source>the largest available partition</source>
-      <translation type="unfinished">the largest available partition</translation>
+      <translation>mevcut en büyük bölüm</translation>
     </message>
     <message>
       <source>The analytics database should only be stored on a local drive and can take up large amounts of space.
 Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
 By default analytics data will be stored on %1.
 You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</source>
-      <translation type="unfinished">The analytics database should only be stored on a local drive and can take up large amounts of space.
-Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
-By default analytics data will be stored on %1.
-You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</translation>
+      <translation>Analytics veritabanı yerel bir depolama biriminde depolanmalı ve yüz gigabayt'ı kaplayabilir.
+
+Analitik verilerini depolamak için konum seçildiğinde, çıkış verilerini kaybetmeden kolayca değiştirilemez. Konumun dikkatlice seçilmesi ve ciddi sistem arızalarının önlenmesi için sistem bölümünün kullanılmaması önerilir.%1.
+
+Depolama yerini, Sunucu Ayarları iletişim kutusundaki &quot;Depolama Yönetimi&quot; sekmesinden değiştirebilirsiniz.</translation>
     </message>
   </context>
   <context>

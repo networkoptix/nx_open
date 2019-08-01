@@ -5613,8 +5613,8 @@ till %1</translation>
     <message>
       <source>Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
 If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
-      <translation type="unfinished">Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
-If you intended to move analytics data to another storage location, please contact support before proceeding.</translation>
+      <translation>Aktuella analysdata flyttas inte automatiskt till en annan plats och blir otillgängliga. Du kan behålla det och manuellt flytta senare eller radera permanent.
+Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta support innan du fortsätter.</translation>
     </message>
   </context>
   <context>
@@ -8572,6 +8572,58 @@ If you intended to move analytics data to another storage location, please conta
       <source>Some servers are offline and will not be updated. Skip them?</source>
       <translation>Vissa servrar är offline och uppdateras inte. Hoppa över dem?</translation>
     </message>
+    <message numerus="yes">
+      <source>Missing update package for the client and %n servers</source>
+      <translation>
+        <numerusform>Saknar uppdateringspaket för klienten och %n servrar</numerusform>
+        <numerusform>Saknar uppdateringspaket för klienten och %n servrar</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Missing update package for the client</source>
+      <translation>Saknar uppdateringspaket för klienten</translation>
+    </message>
+    <message>
+      <source>There are no online servers to update.</source>
+      <translation>Det finns inga online-servrar att uppdatera.</translation>
+    </message>
+    <message>
+      <source>Cancel update and delete all downloaded data?</source>
+      <translation>Avbryt uppdatering och radera alla nedladdade data?</translation>
+    </message>
+    <message>
+      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
+      <translation>OS-versioner av vissa komponenter stöds inte längre. Ta bort dem från systemet eller uppdatera deras operativsystem till en stödd version.</translation>
+    </message>
+    <message>
+      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
+      <translation>OS-versionen av klienten stöds inte längre. Vänligen uppdatera dess operativsystem till en stödd version.</translation>
+    </message>
+    <message>
+      <source>Failed to start update</source>
+      <translation>Misslyckades med att starta uppdateringen</translation>
+    </message>
+    <message>
+      <source>Failed to cancel update</source>
+      <translation>Misslyckades med att avbryta uppdateringen</translation>
+    </message>
+    <message>
+      <source>Failed to start installation</source>
+      <translation>Misslyckades med att starta installationen</translation>
+    </message>
+    <message>
+      <source>Some servers have not completed the update process. Finish it anyway?</source>
+      <translation>Vissa servrar har ej slutförda uppdateringsprocesser. Slutför det ändå?</translation>
+    </message>
+    <message>
+      <source>%1 will be restarted to the updated version.</source>
+      <comment>Application name will be substituted</comment>
+      <translation>%1 kommer att startas om till den uppdaterade versionen.</translation>
+    </message>
+    <message>
+      <source>Failed to download update packages to some components</source>
+      <translation>Misslyckades med att hämta uppdateringspaket till vissa komponenter</translation>
+    </message>
     <message>
       <source>If the problem persists, please contact Customer Support.</source>
       <translation>Om problemet kvarstår vänligen kontakta kundsupport.</translation>
@@ -8589,16 +8641,48 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Uppdatering slutförd</translation>
     </message>
     <message>
-      <source>Nx Witness Client will be restarted to the updated version.</source>
-      <translation>Nx Witness Client startas om till den uppdaterade versionen.</translation>
+      <source>Update completed, but some components have failed an update</source>
+      <translation>Uppdatering slutförd, men vissa komponenter har misslyckats med en uppdatering</translation>
+    </message>
+    <message>
+      <source>Please update %1 manually using an installation package.</source>
+      <translation>Uppdatera %1 manuellt med hjälp av en installationsfil.</translation>
+    </message>
+    <message>
+      <source>%1 will be restarted to the updated version.</source>
+      <translation>%1 kommer att startas om till den uppdaterade versionen.</translation>
     </message>
     <message>
       <source>OK</source>
       <translation>OK</translation>
     </message>
     <message>
+      <source>There was an error while installing updates:</source>
+      <translation>Det uppstod ett fel när du installerade uppdateringar:</translation>
+    </message>
+    <message>
       <source>Downloading updates...</source>
       <translation>Hämtar uppdateringar...</translation>
+    </message>
+    <message>
+      <source>Finish Update</source>
+      <translation>Slutför uppdatering</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>Avbryt</translation>
+    </message>
+    <message>
+      <source>The latest version is already installed</source>
+      <translation>Senaste version är redan installerad</translation>
+    </message>
+    <message>
+      <source>This version is already installed</source>
+      <translation>Den här versionen är redan installerad</translation>
+    </message>
+    <message>
+      <source>Install update</source>
+      <translation>Installera uppdatering</translation>
     </message>
     <message>
       <source>Upload</source>
@@ -8617,12 +8701,12 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Hämta &amp;&amp; Installera</translation>
     </message>
     <message>
-      <source>Select Another Build</source>
-      <translation>Välj en annan uppdatering</translation>
-    </message>
-    <message>
       <source>Browse for Another File...</source>
       <translation>Bläddra efter en annan fil...</translation>
+    </message>
+    <message>
+      <source>Select Another Build</source>
+      <translation>Välj en annan uppdatering</translation>
     </message>
     <message>
       <source>Update to Specific Build</source>
@@ -8645,6 +8729,10 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Installera klientuppdateringar...</translation>
     </message>
     <message>
+      <source>Starting update to ...</source>
+      <translation>Börjar uppdatering till ...</translation>
+    </message>
+    <message>
       <source>Updating to ...</source>
       <translation>Uppdaterar till ...</translation>
     </message>
@@ -8653,12 +8741,24 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Klar att uppdatera till</translation>
     </message>
     <message>
-      <source>Install update</source>
-      <translation>Installera uppdatering</translation>
-    </message>
-    <message>
       <source>System updated to</source>
       <translation>System uppdaterat till</translation>
+    </message>
+    <message>
+      <source>Some servers have no update packages available.</source>
+      <translation>Vissa servrar har inga tillgängliga uppdateringspaket.</translation>
+    </message>
+    <message>
+      <source>Some servers have encountered an internal error.</source>
+      <translation>Vissa servrar har stött på ett internt fel.</translation>
+    </message>
+    <message>
+      <source>Please contact Customer Support.</source>
+      <translation>Var vänlig kontakta support.</translation>
+    </message>
+    <message>
+      <source>Some servers have gone offline. Please wait until they become online to continue.</source>
+      <translation>Vissa servrar har gått offline. Vänta tills de blir online för att fortsätta.</translation>
     </message>
     <message>
       <source>System update in process</source>
@@ -8667,6 +8767,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Continue in Background</source>
       <translation>Fortsätt i bakgrunden</translation>
+    </message>
+    <message>
+      <source>Latest Available Update</source>
+      <translation>Senaste tillgängliga version</translation>
     </message>
     <message>
       <source>Specific Build</source>
@@ -8679,109 +8783,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Update from mediaservers</source>
       <translation>Uppdatering från mediaservers</translation>
-    </message>
-    <message>
-      <source>Latest Available Update</source>
-      <translation>Senaste tillgängliga version</translation>
-    </message>
-    <message numerus="yes">
-      <source>Missing update package for the client and %n servers</source>
-      <translation>
-        <numerusform>Saknar uppdateringspaket för klienten och %n servrar</numerusform>
-        <numerusform>Saknar uppdateringspaket för klienten och %n servrar</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Missing update package for the client</source>
-      <translation>Saknar uppdateringspaket för klienten</translation>
-    </message>
-    <message>
-      <source>Finish Update</source>
-      <translation>Slutför uppdatering</translation>
-    </message>
-    <message>
-      <source>Cancel</source>
-      <translation>Avbryt</translation>
-    </message>
-    <message>
-      <source>The latest version is already installed</source>
-      <translation>Senaste version är redan installerad</translation>
-    </message>
-    <message>
-      <source>This version is already installed</source>
-      <translation>Den här versionen är redan installerad</translation>
-    </message>
-    <message>
-      <source>There are no online servers to update.</source>
-      <translation>Det finns inga online-servrar att uppdatera.</translation>
-    </message>
-    <message>
-      <source>Cancel update and delete all downloaded data?</source>
-      <translation>Avbryt uppdatering och radera alla nedladdade data?</translation>
-    </message>
-    <message>
-      <source>There was an error while installing updates:</source>
-      <translation>Det uppstod ett fel när du installerade uppdateringar:</translation>
-    </message>
-    <message>
-      <source>Some servers have gone offline. Please wait until they become online to continue.</source>
-      <translation>Vissa servrar har gått offline. Vänta tills de blir online för att fortsätta.</translation>
-    </message>
-    <message>
-      <source>Update completed, but some components have failed an update</source>
-      <translation>Uppdatering slutförd, men vissa komponenter har misslyckats med en uppdatering</translation>
-    </message>
-    <message>
-      <source>Please update %1 manually using an installation package.</source>
-      <translation>Uppdatera %1 manuellt med hjälp av en installationsfil.</translation>
-    </message>
-    <message>
-      <source>%1 will be restarted to the updated version.</source>
-      <translation>%1 kommer att startas om till den uppdaterade versionen.</translation>
-    </message>
-    <message>
-      <source>Failed to download update packages to some components</source>
-      <translation>Misslyckades med att hämta uppdateringspaket till vissa komponenter</translation>
-    </message>
-    <message>
-      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
-      <translation>OS-versioner av vissa komponenter stöds inte längre. Ta bort dem från systemet eller uppdatera deras operativsystem till en stödd version.</translation>
-    </message>
-    <message>
-      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
-      <translation>OS-versionen av klienten stöds inte längre. Vänligen uppdatera dess operativsystem till en stödd version.</translation>
-    </message>
-    <message>
-      <source>Failed to start update</source>
-      <translation>Misslyckades med att starta uppdateringen</translation>
-    </message>
-    <message>
-      <source>Starting update to ...</source>
-      <translation>Börjar uppdatering till ...</translation>
-    </message>
-    <message>
-      <source>Failed to cancel update</source>
-      <translation>Misslyckades med att avbryta uppdateringen</translation>
-    </message>
-    <message>
-      <source>Failed to start installation</source>
-      <translation>Misslyckades med att starta installationen</translation>
-    </message>
-    <message>
-      <source>Some servers have no update packages available.</source>
-      <translation>Vissa servrar har inga tillgängliga uppdateringspaket.</translation>
-    </message>
-    <message>
-      <source>Some servers have encountered an internal error.</source>
-      <translation>Vissa servrar har stött på ett internt fel.</translation>
-    </message>
-    <message>
-      <source>Please please contact Customer Support.</source>
-      <translation>Vänligen kontakta kundsupport.</translation>
-    </message>
-    <message>
-      <source>Some servers have not completed the update process. Finish it anyway?</source>
-      <translation>Vissa servrar har ej slutförda uppdateringsprocesser. Slutför det ändå?</translation>
     </message>
   </context>
   <context>
@@ -9425,11 +9426,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Remote file &quot;%1&quot; is corrupted</source>
-      <translation type="unfinished">Remote file &quot;%1&quot; is corrupted</translation>
+      <translation>Fjärrfil &quot;%1&quot; är skadad</translation>
     </message>
     <message>
       <source>Server already has this file &quot;%1&quot;</source>
-      <translation type="unfinished">Server already has this file &quot;%1&quot;</translation>
+      <translation>Servern har redan den här filen &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
@@ -9961,21 +9962,21 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Confirm storage location for the analytics data on &quot;%1&quot;</source>
-      <translation type="unfinished">Confirm storage location for the analytics data on &quot;%1&quot;</translation>
+      <translation>Bekräfta lagringsplats för att lagra analysdata på &quot;%1&quot;</translation>
     </message>
     <message>
       <source>the largest available partition</source>
-      <translation type="unfinished">the largest available partition</translation>
+      <translation>den största tillgängliga partitionen</translation>
     </message>
     <message>
       <source>The analytics database should only be stored on a local drive and can take up large amounts of space.
 Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
 By default analytics data will be stored on %1.
 You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</source>
-      <translation type="unfinished">The analytics database should only be stored on a local drive and can take up large amounts of space.
-Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
-By default analytics data will be stored on %1.
-You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</translation>
+      <translation>Analysdatabasen ska bara lagras på en lokal enhet och kan ta stora mängder utrymme.
+När en plats för lagring av analysdata har valts kan den inte enkelt ändras utan att förlora befintliga data. Vi rekommenderar att du väljer plats noggrant och undvik att använda systempartitionen eftersom det kan orsaka allvarligt systemfel.
+Analysdata lagras som standard den %1.
+Du kan välja en annan lagringsplats på fliken &quot;Storage Management&quot; i dialogrutan Serverinställningar.</translation>
     </message>
   </context>
   <context>

@@ -8450,6 +8450,57 @@ If you intended to move analytics data to another storage location, please conta
       <source>Some servers are offline and will not be updated. Skip them?</source>
       <translation>เซิร์ฟเวอร์บางเครื่องอยู่ในสถานะออฟไลน์และจะไม่ได้รับการอัพเดท ข้ามไปได้หรือไม่</translation>
     </message>
+    <message numerus="yes">
+      <source>Missing update package for the client and %n servers</source>
+      <translation>
+        <numerusform>ไม่มีแพ็คเกจการอัปเดตสำหรับไคลเอ็นต์และเซิร์ฟเวอร์ %n</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Missing update package for the client</source>
+      <translation>ไม่มีแพ็คเกจการอัปเดตสำหรับไคลเอ็นต์</translation>
+    </message>
+    <message>
+      <source>There are no online servers to update.</source>
+      <translation>ไม่มีเซิร์ฟเวอร์ออนไลน์ที่จะอัปเดต</translation>
+    </message>
+    <message>
+      <source>Cancel update and delete all downloaded data?</source>
+      <translation>ยกเลิกการอัปเดตและลบข้อมูลที่ดาวน์โหลดทั้งหมดหรือไม่?</translation>
+    </message>
+    <message>
+      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
+      <translation>ส่วนประกอบบางอย่างในเวอร์ชั่นระบบปฏิบัติการไม่รองรับ โปรดลบออกจากระบบหรืออัปเดตระบบปฏิบัติการเป็นรุ่นที่รองรับ</translation>
+    </message>
+    <message>
+      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
+      <translation>ไคลเอ็นต์เวอร์ชัน OS ไม่ได้รับการสนับสนุน โปรดอัปเดตระบบปฏิบัติการเป็นเวอร์ชันที่รองรับ</translation>
+    </message>
+    <message>
+      <source>Failed to start update</source>
+      <translation>ไม่สามารถติดตั้งการอัปเดต</translation>
+    </message>
+    <message>
+      <source>Failed to cancel update</source>
+      <translation>ไม่สามารถติดตั้งการอัปเดต</translation>
+    </message>
+    <message>
+      <source>Failed to start installation</source>
+      <translation>ไม่สามารถเริ่มการติดตั้งได้</translation>
+    </message>
+    <message>
+      <source>Some servers have not completed the update process. Finish it anyway?</source>
+      <translation>เซิร์ฟเวอร์บางตัวยังไม่เสร็จสิ้นกระบวนการอัพเดต เสร็จแล้วหรือยัง?</translation>
+    </message>
+    <message>
+      <source>%1 will be restarted to the updated version.</source>
+      <comment>Application name will be substituted</comment>
+      <translation>%1 จะเริ่มต้นใหม่เป็นเวอร์ชันที่ได้รับการปรับปรุง</translation>
+    </message>
+    <message>
+      <source>Failed to download update packages to some components</source>
+      <translation>ไม่สามารถดาวน์โหลดแพ็คเกจการอัพเดทไปยังส่วนประกอบบางอย่างได้</translation>
+    </message>
     <message>
       <source>If the problem persists, please contact Customer Support.</source>
       <translation>หากปัญหายังคงมีอยู่โปรดติดต่อฝ่ายบริการลูกค้า</translation>
@@ -8467,16 +8518,48 @@ If you intended to move analytics data to another storage location, please conta
       <translation>อัปเดตเสร็จสมบูรณ์แล้ว</translation>
     </message>
     <message>
-      <source>Nx Witness Client will be restarted to the updated version.</source>
-      <translation>Nx Witness Client จะถูกรีสตาร์ทเป็นเวอร์ชั่นที่อัพเดต</translation>
+      <source>Update completed, but some components have failed an update</source>
+      <translation>การอัปเดตเสร็จสมบูรณ์ แต่ส่วนประกอบบางตัวไม่สามารถอัปเดตได้</translation>
+    </message>
+    <message>
+      <source>Please update %1 manually using an installation package.</source>
+      <translation>โปรดอัปเดต %1 ด้วยตนเองโดยใช้แพ็คเกจการติดตั้ง</translation>
+    </message>
+    <message>
+      <source>%1 will be restarted to the updated version.</source>
+      <translation>%1 จะเริ่มต้นใหม่เป็นเวอร์ชันที่ได้รับการปรับปรุง</translation>
     </message>
     <message>
       <source>OK</source>
       <translation>ตกลง</translation>
     </message>
     <message>
+      <source>There was an error while installing updates:</source>
+      <translation>มีข้อผิดพลาดขณะติดตั้งการอัปเดต:</translation>
+    </message>
+    <message>
       <source>Downloading updates...</source>
       <translation>กำลังดาวน์โหลดการอัปเดต...</translation>
+    </message>
+    <message>
+      <source>Finish Update</source>
+      <translation>เสร็จสิ้นการอัพเดท</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>ยกเลิก</translation>
+    </message>
+    <message>
+      <source>The latest version is already installed</source>
+      <translation>ติดตั้งเวอร์ชันล่าสุดแล้ว</translation>
+    </message>
+    <message>
+      <source>This version is already installed</source>
+      <translation>ติดตั้งเวอร์ชันล่าสุดแล้ว</translation>
+    </message>
+    <message>
+      <source>Install update</source>
+      <translation>ติดตั้งการปรับปรุง</translation>
     </message>
     <message>
       <source>Upload</source>
@@ -8495,12 +8578,12 @@ If you intended to move analytics data to another storage location, please conta
       <translation>ดาวน์โหลด &amp;&amp; ติดตั้ง</translation>
     </message>
     <message>
-      <source>Select Another Build</source>
-      <translation>เลือกอีกหมวดหมู่</translation>
-    </message>
-    <message>
       <source>Browse for Another File...</source>
       <translation>เรียกดูไฟล์อื่น ...</translation>
+    </message>
+    <message>
+      <source>Select Another Build</source>
+      <translation>เลือกอีกหมวดหมู่</translation>
     </message>
     <message>
       <source>Update to Specific Build</source>
@@ -8523,6 +8606,10 @@ If you intended to move analytics data to another storage location, please conta
       <translation>กำลังติดตั้งการอัปเดตไคลเอ็นต์...</translation>
     </message>
     <message>
+      <source>Starting update to ...</source>
+      <translation>กำลังเริ่มอัปเดตเป็น ...</translation>
+    </message>
+    <message>
       <source>Updating to ...</source>
       <translation>กำลังอัพเดทเป็น</translation>
     </message>
@@ -8531,12 +8618,24 @@ If you intended to move analytics data to another storage location, please conta
       <translation>พร้อมอัพเดทแล้ว</translation>
     </message>
     <message>
-      <source>Install update</source>
-      <translation>ติดตั้งการปรับปรุง</translation>
-    </message>
-    <message>
       <source>System updated to</source>
       <translation>อัพเดทระบบ</translation>
+    </message>
+    <message>
+      <source>Some servers have no update packages available.</source>
+      <translation>เซิร์ฟเวอร์บางตัวไม่มีแพ็คเกจการอัพเดท</translation>
+    </message>
+    <message>
+      <source>Some servers have encountered an internal error.</source>
+      <translation>เซิร์ฟเวอร์บางตัวพบข้อผิดพลาดภายใน</translation>
+    </message>
+    <message>
+      <source>Please contact Customer Support.</source>
+      <translation>กรุณาติดต่อฝ่ายสนับสนุน</translation>
+    </message>
+    <message>
+      <source>Some servers have gone offline. Please wait until they become online to continue.</source>
+      <translation>เซิร์ฟเวอร์บางเครื่องออฟไลน์ โปรดรอจนกว่าจะออนไลน์เพื่อดำเนินการต่อ</translation>
     </message>
     <message>
       <source>System update in process</source>
@@ -8545,6 +8644,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Continue in Background</source>
       <translation>ดำเนินการต่อในเบื้องหลัง</translation>
+    </message>
+    <message>
+      <source>Latest Available Update</source>
+      <translation>อัพเดตล่าสุดที่มีให้</translation>
     </message>
     <message>
       <source>Specific Build</source>
@@ -8557,108 +8660,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Update from mediaservers</source>
       <translation>อัปเดตจากสื่อกลาง</translation>
-    </message>
-    <message>
-      <source>Latest Available Update</source>
-      <translation>อัพเดตล่าสุดที่มีให้</translation>
-    </message>
-    <message numerus="yes">
-      <source>Missing update package for the client and %n servers</source>
-      <translation>
-        <numerusform>ไม่มีแพ็คเกจการอัปเดตสำหรับไคลเอ็นต์และเซิร์ฟเวอร์ %n</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Missing update package for the client</source>
-      <translation>ไม่มีแพ็คเกจการอัปเดตสำหรับไคลเอ็นต์</translation>
-    </message>
-    <message>
-      <source>Finish Update</source>
-      <translation>เสร็จสิ้นการอัพเดท</translation>
-    </message>
-    <message>
-      <source>Cancel</source>
-      <translation>ยกเลิก</translation>
-    </message>
-    <message>
-      <source>The latest version is already installed</source>
-      <translation>ติดตั้งเวอร์ชันล่าสุดแล้ว</translation>
-    </message>
-    <message>
-      <source>This version is already installed</source>
-      <translation>ติดตั้งเวอร์ชันล่าสุดแล้ว</translation>
-    </message>
-    <message>
-      <source>There are no online servers to update.</source>
-      <translation>ไม่มีเซิร์ฟเวอร์ออนไลน์ที่จะอัปเดต</translation>
-    </message>
-    <message>
-      <source>Cancel update and delete all downloaded data?</source>
-      <translation>ยกเลิกการอัปเดตและลบข้อมูลที่ดาวน์โหลดทั้งหมดหรือไม่?</translation>
-    </message>
-    <message>
-      <source>There was an error while installing updates:</source>
-      <translation>มีข้อผิดพลาดขณะติดตั้งการอัปเดต:</translation>
-    </message>
-    <message>
-      <source>Some servers have gone offline. Please wait until they become online to continue.</source>
-      <translation>เซิร์ฟเวอร์บางเครื่องออฟไลน์ โปรดรอจนกว่าจะออนไลน์เพื่อดำเนินการต่อ</translation>
-    </message>
-    <message>
-      <source>Update completed, but some components have failed an update</source>
-      <translation>การอัปเดตเสร็จสมบูรณ์ แต่ส่วนประกอบบางตัวไม่สามารถอัปเดตได้</translation>
-    </message>
-    <message>
-      <source>Please update %1 manually using an installation package.</source>
-      <translation>โปรดอัปเดต %1 ด้วยตนเองโดยใช้แพ็คเกจการติดตั้ง</translation>
-    </message>
-    <message>
-      <source>%1 will be restarted to the updated version.</source>
-      <translation>%1 จะเริ่มต้นใหม่เป็นเวอร์ชันที่ได้รับการปรับปรุง</translation>
-    </message>
-    <message>
-      <source>Failed to download update packages to some components</source>
-      <translation>ไม่สามารถดาวน์โหลดแพ็คเกจการอัพเดทไปยังส่วนประกอบบางอย่างได้</translation>
-    </message>
-    <message>
-      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
-      <translation>ส่วนประกอบบางอย่างในเวอร์ชั่นระบบปฏิบัติการไม่รองรับ โปรดลบออกจากระบบหรืออัปเดตระบบปฏิบัติการเป็นรุ่นที่รองรับ</translation>
-    </message>
-    <message>
-      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
-      <translation>ไคลเอ็นต์เวอร์ชัน OS ไม่ได้รับการสนับสนุน โปรดอัปเดตระบบปฏิบัติการเป็นเวอร์ชันที่รองรับ</translation>
-    </message>
-    <message>
-      <source>Failed to start update</source>
-      <translation>ไม่สามารถติดตั้งการอัปเดต</translation>
-    </message>
-    <message>
-      <source>Starting update to ...</source>
-      <translation>กำลังเริ่มอัปเดตเป็น ...</translation>
-    </message>
-    <message>
-      <source>Failed to cancel update</source>
-      <translation>ไม่สามารถติดตั้งการอัปเดต</translation>
-    </message>
-    <message>
-      <source>Failed to start installation</source>
-      <translation>ไม่สามารถเริ่มการติดตั้งได้</translation>
-    </message>
-    <message>
-      <source>Some servers have no update packages available.</source>
-      <translation>เซิร์ฟเวอร์บางตัวไม่มีแพ็คเกจการอัพเดท</translation>
-    </message>
-    <message>
-      <source>Some servers have encountered an internal error.</source>
-      <translation>เซิร์ฟเวอร์บางตัวพบข้อผิดพลาดภายใน</translation>
-    </message>
-    <message>
-      <source>Please please contact Customer Support.</source>
-      <translation>กรุณาติดต่อฝ่ายบริการลูกค้า</translation>
-    </message>
-    <message>
-      <source>Some servers have not completed the update process. Finish it anyway?</source>
-      <translation>เซิร์ฟเวอร์บางตัวยังไม่เสร็จสิ้นกระบวนการอัพเดต เสร็จแล้วหรือยัง?</translation>
     </message>
   </context>
   <context>

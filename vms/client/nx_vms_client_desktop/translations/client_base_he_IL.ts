@@ -8800,6 +8800,60 @@ If you intended to move analytics data to another storage location, please conta
       <source>Some servers are offline and will not be updated. Skip them?</source>
       <translation>חלק מהשרתים אינם מקוונים ולא יעודכנו. לדלג עליהם?</translation>
     </message>
+    <message numerus="yes">
+      <source>Missing update package for the client and %n servers</source>
+      <translation>
+        <numerusform>חסרה חבילת העדכון עבור תוכנת הקליינט ו %n שרתים</numerusform>
+        <numerusform>חסרה חבילת העדכון עבור תוכנת הקליינט ו %n שרתים</numerusform>
+        <numerusform>חסרה חבילת העדכון עבור תוכנת הקליינט ו %n שרתים</numerusform>
+        <numerusform>חסרה חבילת העדכון עבור תוכנת הקליינט ו %n שרתים</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Missing update package for the client</source>
+      <translation>חסרה חבילת העדכון עבור תוכנת הקליינט</translation>
+    </message>
+    <message>
+      <source>There are no online servers to update.</source>
+      <translation>אין שרתים מקוונים לעדכון.</translation>
+    </message>
+    <message>
+      <source>Cancel update and delete all downloaded data?</source>
+      <translation>האם לבטל את העדכון ולמחוק את כל הנתונים שהורדו?</translation>
+    </message>
+    <message>
+      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
+      <translation>גרסאות מערכת ההפעלה של רכיבים מסוימים אינן נתמכות עוד. הסר אותם מהמערכת או עדכן את מערכת ההפעלה שלהם לגירסה נתמכת.</translation>
+    </message>
+    <message>
+      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
+      <translation>גרסת מערכת ההפעלה של הקליינט אינה נתמכת עוד. אנא עדכנו את מערכת ההפעלה לגירסה נתמכת.</translation>
+    </message>
+    <message>
+      <source>Failed to start update</source>
+      <translation>העדכון נכשל</translation>
+    </message>
+    <message>
+      <source>Failed to cancel update</source>
+      <translation>נכשל ביטול העדכון</translation>
+    </message>
+    <message>
+      <source>Failed to start installation</source>
+      <translation>הפעלת ההתקנה נכשלה</translation>
+    </message>
+    <message>
+      <source>Some servers have not completed the update process. Finish it anyway?</source>
+      <translation>חלק מהשרתים לא השלימו את העדכון, לסיים בכל מקרה?</translation>
+    </message>
+    <message>
+      <source>%1 will be restarted to the updated version.</source>
+      <comment>Application name will be substituted</comment>
+      <translation>%1 יופעל מחדש לגרסה המעודכנת.</translation>
+    </message>
+    <message>
+      <source>Failed to download update packages to some components</source>
+      <translation>הורדת העדכון לרכיבים מסוימים נכשלה</translation>
+    </message>
     <message>
       <source>If the problem persists, please contact Customer Support.</source>
       <translation>אם הבעיה נמשכת, פנה אל שירות הלקוחות.</translation>
@@ -8817,16 +8871,48 @@ If you intended to move analytics data to another storage location, please conta
       <translation>העדכון הושלם</translation>
     </message>
     <message>
-      <source>Nx Witness Client will be restarted to the updated version.</source>
-      <translation>תוכנת הקליינט תופעל מחדש לגרסה המעודכנת.</translation>
+      <source>Update completed, but some components have failed an update</source>
+      <translation>העדכון הושלם, אך חלק מהשרתים לא עודכנו</translation>
+    </message>
+    <message>
+      <source>Please update %1 manually using an installation package.</source>
+      <translation>אנא עדכן את %1 ידנית באמצעות חבילת התקנה.</translation>
+    </message>
+    <message>
+      <source>%1 will be restarted to the updated version.</source>
+      <translation>%1 יופעל מחדש לגרסה המעודכנת.</translation>
     </message>
     <message>
       <source>OK</source>
       <translation>אישור</translation>
     </message>
     <message>
+      <source>There was an error while installing updates:</source>
+      <translation>אירעה שגיאה בעת התקנת העדכונים:</translation>
+    </message>
+    <message>
       <source>Downloading updates...</source>
       <translation>מוריד עדכונים...</translation>
+    </message>
+    <message>
+      <source>Finish Update</source>
+      <translation>סיים עדכון</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>ביטול</translation>
+    </message>
+    <message>
+      <source>The latest version is already installed</source>
+      <translation>הגירסה האחרונה כבר מותקנת</translation>
+    </message>
+    <message>
+      <source>This version is already installed</source>
+      <translation>גירסה זו כבר מותקנת</translation>
+    </message>
+    <message>
+      <source>Install update</source>
+      <translation>התקן עדכון</translation>
     </message>
     <message>
       <source>Upload</source>
@@ -8845,12 +8931,12 @@ If you intended to move analytics data to another storage location, please conta
       <translation>הורד והתקן</translation>
     </message>
     <message>
-      <source>Select Another Build</source>
-      <translation>בחר גרסה אחרת</translation>
-    </message>
-    <message>
       <source>Browse for Another File...</source>
       <translation>בחר קובץ אחר...</translation>
+    </message>
+    <message>
+      <source>Select Another Build</source>
+      <translation>בחר גרסה אחרת</translation>
     </message>
     <message>
       <source>Update to Specific Build</source>
@@ -8873,6 +8959,10 @@ If you intended to move analytics data to another storage location, please conta
       <translation>מתקין עדכון לקליינט...</translation>
     </message>
     <message>
+      <source>Starting update to ...</source>
+      <translation>מתחיל עדכון ל ...</translation>
+    </message>
+    <message>
       <source>Updating to ...</source>
       <translation>מעדכן ל ...</translation>
     </message>
@@ -8881,12 +8971,24 @@ If you intended to move analytics data to another storage location, please conta
       <translation>מוכן לעדכן ל</translation>
     </message>
     <message>
-      <source>Install update</source>
-      <translation>התקן עדכון</translation>
-    </message>
-    <message>
       <source>System updated to</source>
       <translation>המערכת עודכנה ל</translation>
+    </message>
+    <message>
+      <source>Some servers have no update packages available.</source>
+      <translation>לחלק מהשרתים אין חבילת עדכון זמינה.</translation>
+    </message>
+    <message>
+      <source>Some servers have encountered an internal error.</source>
+      <translation>חלק מהשרתים נתקלו בשגיאה פנימית.</translation>
+    </message>
+    <message>
+      <source>Please contact Customer Support.</source>
+      <translation>צור קשר עם תמיכת הלקוחות.</translation>
+    </message>
+    <message>
+      <source>Some servers have gone offline. Please wait until they become online to continue.</source>
+      <translation>חלק מהשרתים אינם מחוברים. המתן עד שיתחברו כדי להמשיך.</translation>
     </message>
     <message>
       <source>System update in process</source>
@@ -8895,6 +8997,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Continue in Background</source>
       <translation>המשך ברקע</translation>
+    </message>
+    <message>
+      <source>Latest Available Update</source>
+      <translation>העדכון האחרון הזמין</translation>
     </message>
     <message>
       <source>Specific Build</source>
@@ -8907,111 +9013,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Update from mediaservers</source>
       <translation>עדכון משרתים אחרים</translation>
-    </message>
-    <message>
-      <source>Latest Available Update</source>
-      <translation>העדכון האחרון הזמין</translation>
-    </message>
-    <message numerus="yes">
-      <source>Missing update package for the client and %n servers</source>
-      <translation>
-        <numerusform>חסרה חבילת העדכון עבור תוכנת הקליינט ו %n שרתים</numerusform>
-        <numerusform>חסרה חבילת העדכון עבור תוכנת הקליינט ו %n שרתים</numerusform>
-        <numerusform>חסרה חבילת העדכון עבור תוכנת הקליינט ו %n שרתים</numerusform>
-        <numerusform>חסרה חבילת העדכון עבור תוכנת הקליינט ו %n שרתים</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Missing update package for the client</source>
-      <translation>חסרה חבילת העדכון עבור תוכנת הקליינט</translation>
-    </message>
-    <message>
-      <source>Finish Update</source>
-      <translation>סיים עדכון</translation>
-    </message>
-    <message>
-      <source>Cancel</source>
-      <translation>ביטול</translation>
-    </message>
-    <message>
-      <source>The latest version is already installed</source>
-      <translation>הגירסה האחרונה כבר מותקנת</translation>
-    </message>
-    <message>
-      <source>This version is already installed</source>
-      <translation>גירסה זו כבר מותקנת</translation>
-    </message>
-    <message>
-      <source>There are no online servers to update.</source>
-      <translation>אין שרתים מקוונים לעדכון.</translation>
-    </message>
-    <message>
-      <source>Cancel update and delete all downloaded data?</source>
-      <translation>האם לבטל את העדכון ולמחוק את כל הנתונים שהורדו?</translation>
-    </message>
-    <message>
-      <source>There was an error while installing updates:</source>
-      <translation>אירעה שגיאה בעת התקנת העדכונים:</translation>
-    </message>
-    <message>
-      <source>Some servers have gone offline. Please wait until they become online to continue.</source>
-      <translation>חלק מהשרתים אינם מחוברים. המתן עד שיתחברו כדי להמשיך.</translation>
-    </message>
-    <message>
-      <source>Update completed, but some components have failed an update</source>
-      <translation>העדכון הושלם, אך חלק מהשרתים לא עודכנו</translation>
-    </message>
-    <message>
-      <source>Please update %1 manually using an installation package.</source>
-      <translation>אנא עדכן את %1 ידנית באמצעות חבילת התקנה.</translation>
-    </message>
-    <message>
-      <source>%1 will be restarted to the updated version.</source>
-      <translation>%1 יופעל מחדש לגרסה המעודכנת.</translation>
-    </message>
-    <message>
-      <source>Failed to download update packages to some components</source>
-      <translation>הורדת העדכון לרכיבים מסוימים נכשלה</translation>
-    </message>
-    <message>
-      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
-      <translation>גרסאות מערכת ההפעלה של רכיבים מסוימים אינן נתמכות עוד. הסר אותם מהמערכת או עדכן את מערכת ההפעלה שלהם לגירסה נתמכת.</translation>
-    </message>
-    <message>
-      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
-      <translation>גרסת מערכת ההפעלה של הקליינט אינה נתמכת עוד. אנא עדכנו את מערכת ההפעלה לגירסה נתמכת.</translation>
-    </message>
-    <message>
-      <source>Failed to start update</source>
-      <translation>העדכון נכשל</translation>
-    </message>
-    <message>
-      <source>Starting update to ...</source>
-      <translation>מתחיל עדכון ל ...</translation>
-    </message>
-    <message>
-      <source>Failed to cancel update</source>
-      <translation>נכשל ביטול העדכון</translation>
-    </message>
-    <message>
-      <source>Failed to start installation</source>
-      <translation>הפעלת ההתקנה נכשלה</translation>
-    </message>
-    <message>
-      <source>Some servers have no update packages available.</source>
-      <translation>לחלק מהשרתים אין חבילת עדכון זמינה.</translation>
-    </message>
-    <message>
-      <source>Some servers have encountered an internal error.</source>
-      <translation>חלק מהשרתים נתקלו בשגיאה פנימית.</translation>
-    </message>
-    <message>
-      <source>Please please contact Customer Support.</source>
-      <translation>צור קשר עם שירות הלקוחות.</translation>
-    </message>
-    <message>
-      <source>Some servers have not completed the update process. Finish it anyway?</source>
-      <translation>חלק מהשרתים לא השלימו את העדכון, לסיים בכל מקרה?</translation>
     </message>
   </context>
   <context>

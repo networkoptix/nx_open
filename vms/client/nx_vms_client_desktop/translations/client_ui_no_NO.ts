@@ -3079,7 +3079,7 @@
     <message>
       <location/>
       <source>Analytics data can take up large amounts of space. We recommend to choose another location for it instead of the system partition.</source>
-      <translation type="unfinished">Analytics data can take up large amounts of space. We recommend to choose another location for it instead of the system partition.</translation>
+      <translation>Analytics-data kan ta store mengder plass. Vi anbefaler å velge et annet sted for det i stedet for systempartisjonen.</translation>
     </message>
   </context>
   <context>

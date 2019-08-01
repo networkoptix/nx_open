@@ -8451,6 +8451,57 @@ If you intended to move analytics data to another storage location, please conta
       <source>Some servers are offline and will not be updated. Skip them?</source>
       <translation>一部のサーバーはオフラインであり、更新されません。スキップしますか？</translation>
     </message>
+    <message numerus="yes">
+      <source>Missing update package for the client and %n servers</source>
+      <translation>
+        <numerusform>クライアントおよび %n サーバー用の更新パッケージがありません</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Missing update package for the client</source>
+      <translation>クライアント用の更新パッケージがありません</translation>
+    </message>
+    <message>
+      <source>There are no online servers to update.</source>
+      <translation>更新するオンラインサーバーはありません。</translation>
+    </message>
+    <message>
+      <source>Cancel update and delete all downloaded data?</source>
+      <translation>更新をキャンセルしてダウンロードしたデータをすべて削除しますか？</translation>
+    </message>
+    <message>
+      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
+      <translation>一部のコンポーネントのOSバージョンはサポートが終了しました。システムから削除するか、サポートされているバージョンにOSを更新してください。</translation>
+    </message>
+    <message>
+      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
+      <translation>クライアントのOSバージョンはサポートが終了しました。 OSをサポートされているバージョンに更新してください。</translation>
+    </message>
+    <message>
+      <source>Failed to start update</source>
+      <translation>更新を開始できませんでした</translation>
+    </message>
+    <message>
+      <source>Failed to cancel update</source>
+      <translation>更新をキャンセルできませんでした</translation>
+    </message>
+    <message>
+      <source>Failed to start installation</source>
+      <translation>インストールを開始できませんでした</translation>
+    </message>
+    <message>
+      <source>Some servers have not completed the update process. Finish it anyway?</source>
+      <translation>一部のサーバーでは更新プロセスが完了しませんでした。終了しますか？</translation>
+    </message>
+    <message>
+      <source>%1 will be restarted to the updated version.</source>
+      <comment>Application name will be substituted</comment>
+      <translation>%1 は、更新されたバージョンで再起動します</translation>
+    </message>
+    <message>
+      <source>Failed to download update packages to some components</source>
+      <translation>一部のコンポーネントに更新パッケージをダウンロードできませんでした</translation>
+    </message>
     <message>
       <source>If the problem persists, please contact Customer Support.</source>
       <translation>問題が解決しない場合は、カスタマー サポートに連絡してください</translation>
@@ -8468,16 +8519,48 @@ If you intended to move analytics data to another storage location, please conta
       <translation>更新が完了しました</translation>
     </message>
     <message>
-      <source>Nx Witness Client will be restarted to the updated version.</source>
-      <translation>Nx Witness Clientはアップデートされたバージョンに再起動されます。</translation>
+      <source>Update completed, but some components have failed an update</source>
+      <translation>アップデートは完了しましたが、一部のコンポーネントがアップデートに失敗しました</translation>
+    </message>
+    <message>
+      <source>Please update %1 manually using an installation package.</source>
+      <translation>インストール パッケージを使用して手動で %1 を更新してください</translation>
+    </message>
+    <message>
+      <source>%1 will be restarted to the updated version.</source>
+      <translation>%1 は、更新されたバージョンで再起動します</translation>
     </message>
     <message>
       <source>OK</source>
       <translation>OK</translation>
     </message>
     <message>
+      <source>There was an error while installing updates:</source>
+      <translation>アップデートのインストール中にエラーが発生しました。</translation>
+    </message>
+    <message>
       <source>Downloading updates...</source>
       <translation>アップデートをダウンロードしています…</translation>
+    </message>
+    <message>
+      <source>Finish Update</source>
+      <translation>更新終了</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>キャンセル</translation>
+    </message>
+    <message>
+      <source>The latest version is already installed</source>
+      <translation>お使いのソフトウェアは最新版です</translation>
+    </message>
+    <message>
+      <source>This version is already installed</source>
+      <translation>このバージョンは既にインストールされています</translation>
+    </message>
+    <message>
+      <source>Install update</source>
+      <translation>更新をインストール</translation>
     </message>
     <message>
       <source>Upload</source>
@@ -8496,12 +8579,12 @@ If you intended to move analytics data to another storage location, please conta
       <translation>ダウンロードとインストール</translation>
     </message>
     <message>
-      <source>Select Another Build</source>
-      <translation>別のビルドを選択</translation>
-    </message>
-    <message>
       <source>Browse for Another File...</source>
       <translation>他のファイルを参照しています...</translation>
+    </message>
+    <message>
+      <source>Select Another Build</source>
+      <translation>別のビルドを選択</translation>
     </message>
     <message>
       <source>Update to Specific Build</source>
@@ -8524,6 +8607,10 @@ If you intended to move analytics data to another storage location, please conta
       <translation>クライアントアップデートをインストールしています...</translation>
     </message>
     <message>
+      <source>Starting update to ...</source>
+      <translation>更新を開始中...</translation>
+    </message>
+    <message>
       <source>Updating to ...</source>
       <translation>更新しています...</translation>
     </message>
@@ -8532,12 +8619,24 @@ If you intended to move analytics data to another storage location, please conta
       <translation>更新の準備ができました</translation>
     </message>
     <message>
-      <source>Install update</source>
-      <translation>更新をインストール</translation>
-    </message>
-    <message>
       <source>System updated to</source>
       <translation>システム更新</translation>
+    </message>
+    <message>
+      <source>Some servers have no update packages available.</source>
+      <translation>利用可能な更新パッケージがないサーバもあります。</translation>
+    </message>
+    <message>
+      <source>Some servers have encountered an internal error.</source>
+      <translation>一部のサーバーで内部エラーが発生しました。</translation>
+    </message>
+    <message>
+      <source>Please contact Customer Support.</source>
+      <translation>サポートにお問合せください.</translation>
+    </message>
+    <message>
+      <source>Some servers have gone offline. Please wait until they become online to continue.</source>
+      <translation>一部のサーバーがオフラインになりました。オンラインになるまで待ってください。</translation>
     </message>
     <message>
       <source>System update in process</source>
@@ -8546,6 +8645,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Continue in Background</source>
       <translation>バック グラウンドで続行</translation>
+    </message>
+    <message>
+      <source>Latest Available Update</source>
+      <translation>最新の利用可能な更新プログラム</translation>
     </message>
     <message>
       <source>Specific Build</source>
@@ -8558,108 +8661,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Update from mediaservers</source>
       <translation>メディアサーバーからの更新</translation>
-    </message>
-    <message>
-      <source>Latest Available Update</source>
-      <translation>最新の利用可能な更新プログラム</translation>
-    </message>
-    <message numerus="yes">
-      <source>Missing update package for the client and %n servers</source>
-      <translation>
-        <numerusform>クライアントおよび %n サーバー用の更新パッケージがありません</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Missing update package for the client</source>
-      <translation>クライアント用の更新パッケージがありません</translation>
-    </message>
-    <message>
-      <source>Finish Update</source>
-      <translation>更新終了</translation>
-    </message>
-    <message>
-      <source>Cancel</source>
-      <translation>キャンセル</translation>
-    </message>
-    <message>
-      <source>The latest version is already installed</source>
-      <translation>お使いのソフトウェアは最新版です</translation>
-    </message>
-    <message>
-      <source>This version is already installed</source>
-      <translation>このバージョンは既にインストールされています</translation>
-    </message>
-    <message>
-      <source>There are no online servers to update.</source>
-      <translation>更新するオンラインサーバーはありません。</translation>
-    </message>
-    <message>
-      <source>Cancel update and delete all downloaded data?</source>
-      <translation>更新をキャンセルしてダウンロードしたデータをすべて削除しますか？</translation>
-    </message>
-    <message>
-      <source>There was an error while installing updates:</source>
-      <translation>アップデートのインストール中にエラーが発生しました。</translation>
-    </message>
-    <message>
-      <source>Some servers have gone offline. Please wait until they become online to continue.</source>
-      <translation>一部のサーバーがオフラインになりました。オンラインになるまで待ってください。</translation>
-    </message>
-    <message>
-      <source>Update completed, but some components have failed an update</source>
-      <translation>アップデートは完了しましたが、一部のコンポーネントがアップデートに失敗しました</translation>
-    </message>
-    <message>
-      <source>Please update %1 manually using an installation package.</source>
-      <translation>インストール パッケージを使用して手動で %1 を更新してください</translation>
-    </message>
-    <message>
-      <source>%1 will be restarted to the updated version.</source>
-      <translation>%1 は、更新されたバージョンで再起動します</translation>
-    </message>
-    <message>
-      <source>Failed to download update packages to some components</source>
-      <translation>一部のコンポーネントに更新パッケージをダウンロードできませんでした</translation>
-    </message>
-    <message>
-      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
-      <translation>一部のコンポーネントのOSバージョンはサポートが終了しました。システムから削除するか、サポートされているバージョンにOSを更新してください。</translation>
-    </message>
-    <message>
-      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
-      <translation>クライアントのOSバージョンはサポートが終了しました。 OSをサポートされているバージョンに更新してください。</translation>
-    </message>
-    <message>
-      <source>Failed to start update</source>
-      <translation>更新を開始できませんでした</translation>
-    </message>
-    <message>
-      <source>Starting update to ...</source>
-      <translation>更新を開始中...</translation>
-    </message>
-    <message>
-      <source>Failed to cancel update</source>
-      <translation>更新をキャンセルできませんでした</translation>
-    </message>
-    <message>
-      <source>Failed to start installation</source>
-      <translation>インストールを開始できませんでした</translation>
-    </message>
-    <message>
-      <source>Some servers have no update packages available.</source>
-      <translation>利用可能な更新パッケージがないサーバもあります。</translation>
-    </message>
-    <message>
-      <source>Some servers have encountered an internal error.</source>
-      <translation>一部のサーバーで内部エラーが発生しました。</translation>
-    </message>
-    <message>
-      <source>Please please contact Customer Support.</source>
-      <translation>カスタマサポートにお問い合わせください。</translation>
-    </message>
-    <message>
-      <source>Some servers have not completed the update process. Finish it anyway?</source>
-      <translation>一部のサーバーでは更新プロセスが完了しませんでした。終了しますか？</translation>
     </message>
   </context>
   <context>

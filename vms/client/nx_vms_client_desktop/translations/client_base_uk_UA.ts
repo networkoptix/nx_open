@@ -8803,6 +8803,60 @@ If you intended to move analytics data to another storage location, please conta
       <source>Some servers are offline and will not be updated. Skip them?</source>
       <translation>Деякі сервери знаходяться поза мережею і не будуть оновлюватися. Пропустити їх?</translation>
     </message>
+    <message numerus="yes">
+      <source>Missing update package for the client and %n servers</source>
+      <translation>
+        <numerusform>Відсутній пакет оновлення для клієнта і %n серверів</numerusform>
+        <numerusform>Відсутній пакет оновлення для клієнта і %n серверів</numerusform>
+        <numerusform>Відсутній пакет оновлення для клієнта і %n серверів</numerusform>
+        <numerusform>Відсутній пакет оновлення для клієнта і %n серверів</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Missing update package for the client</source>
+      <translation>Відсутній пакет оновлення для клієнта</translation>
+    </message>
+    <message>
+      <source>There are no online servers to update.</source>
+      <translation>Немає серверів для оновлення, які знаходяться онлайн.</translation>
+    </message>
+    <message>
+      <source>Cancel update and delete all downloaded data?</source>
+      <translation>Скасувати оновлення та видалити всі завантажені дані?</translation>
+    </message>
+    <message>
+      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
+      <translation>Деякі версії компонентів ОС більше не підтримуються. Видаліть їх із системи або оновіть до підтримуваної версії.</translation>
+    </message>
+    <message>
+      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
+      <translation>Версія ОС клієнта більше не підтримується. Оновіть його ОС до підтримуваної версії.</translation>
+    </message>
+    <message>
+      <source>Failed to start update</source>
+      <translation>Не вдалося розпочати оновлення</translation>
+    </message>
+    <message>
+      <source>Failed to cancel update</source>
+      <translation>Не вдалося скасувати оновлення</translation>
+    </message>
+    <message>
+      <source>Failed to start installation</source>
+      <translation>Не вдалося розпочати встановлення</translation>
+    </message>
+    <message>
+      <source>Some servers have not completed the update process. Finish it anyway?</source>
+      <translation>Деякі сервери не завершили процес оновлення. Закінчити його все одно?</translation>
+    </message>
+    <message>
+      <source>%1 will be restarted to the updated version.</source>
+      <comment>Application name will be substituted</comment>
+      <translation>%1 буде перезапущено до оновленої версії.</translation>
+    </message>
+    <message>
+      <source>Failed to download update packages to some components</source>
+      <translation>Не вдалося завантажити пакети оновлення для деяких компонентів</translation>
+    </message>
     <message>
       <source>If the problem persists, please contact Customer Support.</source>
       <translation>Якщо проблема залишається невирішеною, зверніться в службу підтримки.</translation>
@@ -8820,16 +8874,48 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Оновлення завершено</translation>
     </message>
     <message>
-      <source>Nx Witness Client will be restarted to the updated version.</source>
-      <translation>Nx Witness Client буде перезапущено до оновленої версії.</translation>
+      <source>Update completed, but some components have failed an update</source>
+      <translation>Оновлення завершено, але деякі компоненти не вдалося оновити</translation>
+    </message>
+    <message>
+      <source>Please update %1 manually using an installation package.</source>
+      <translation>Будь ласка, оновіть %1 вручну за допомогою інсталятора.</translation>
+    </message>
+    <message>
+      <source>%1 will be restarted to the updated version.</source>
+      <translation>%1 буде перезапущено до оновленої версії.</translation>
     </message>
     <message>
       <source>OK</source>
       <translation>ОК</translation>
     </message>
     <message>
+      <source>There was an error while installing updates:</source>
+      <translation>Відбулася помилка при встановленні:</translation>
+    </message>
+    <message>
       <source>Downloading updates...</source>
       <translation>Завантаження оновлень...</translation>
+    </message>
+    <message>
+      <source>Finish Update</source>
+      <translation>Завершити оновлення</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>Відміна</translation>
+    </message>
+    <message>
+      <source>The latest version is already installed</source>
+      <translation>Встановлено найновішу версію</translation>
+    </message>
+    <message>
+      <source>This version is already installed</source>
+      <translation>Ця версія вже встановлена</translation>
+    </message>
+    <message>
+      <source>Install update</source>
+      <translation>Встановити оновлення</translation>
     </message>
     <message>
       <source>Upload</source>
@@ -8848,12 +8934,12 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Звантажити і Встановити</translation>
     </message>
     <message>
-      <source>Select Another Build</source>
-      <translation>Обрати інше місце</translation>
-    </message>
-    <message>
       <source>Browse for Another File...</source>
       <translation>Знайти файл оновлення...</translation>
+    </message>
+    <message>
+      <source>Select Another Build</source>
+      <translation>Обрати інше місце</translation>
     </message>
     <message>
       <source>Update to Specific Build</source>
@@ -8876,6 +8962,10 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Встановлення оновлення клієнта...</translation>
     </message>
     <message>
+      <source>Starting update to ...</source>
+      <translation>Починається оновлення до ...</translation>
+    </message>
+    <message>
       <source>Updating to ...</source>
       <translation>Оновлення до...</translation>
     </message>
@@ -8884,12 +8974,24 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Готовий оновитись до</translation>
     </message>
     <message>
-      <source>Install update</source>
-      <translation>Встановити оновлення</translation>
-    </message>
-    <message>
       <source>System updated to</source>
       <translation>Система оновлена до</translation>
+    </message>
+    <message>
+      <source>Some servers have no update packages available.</source>
+      <translation>Деякі сервери не мають доступних пакетів оновлень.</translation>
+    </message>
+    <message>
+      <source>Some servers have encountered an internal error.</source>
+      <translation>На деяких серверах виникла внутрішня помилка.</translation>
+    </message>
+    <message>
+      <source>Please contact Customer Support.</source>
+      <translation>Будь ласка, зверніться до команди підтримки.</translation>
+    </message>
+    <message>
+      <source>Some servers have gone offline. Please wait until they become online to continue.</source>
+      <translation>Деякі сервери перейшли в офлайн. Будь ласка, зачекайте, поки вони стануть онлайн, щоб продовжити.</translation>
     </message>
     <message>
       <source>System update in process</source>
@@ -8898,6 +9000,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Continue in Background</source>
       <translation>Продовжити у фоновому режимі</translation>
+    </message>
+    <message>
+      <source>Latest Available Update</source>
+      <translation>Останнє доступне оновлення</translation>
     </message>
     <message>
       <source>Specific Build</source>
@@ -8910,111 +9016,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Update from mediaservers</source>
       <translation>Оновлення від медіасерверів</translation>
-    </message>
-    <message>
-      <source>Latest Available Update</source>
-      <translation>Останнє доступне оновлення</translation>
-    </message>
-    <message numerus="yes">
-      <source>Missing update package for the client and %n servers</source>
-      <translation>
-        <numerusform>Відсутній пакет оновлення для клієнта і %n серверів</numerusform>
-        <numerusform>Відсутній пакет оновлення для клієнта і %n серверів</numerusform>
-        <numerusform>Відсутній пакет оновлення для клієнта і %n серверів</numerusform>
-        <numerusform>Відсутній пакет оновлення для клієнта і %n серверів</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Missing update package for the client</source>
-      <translation>Відсутній пакет оновлення для клієнта</translation>
-    </message>
-    <message>
-      <source>Finish Update</source>
-      <translation>Завершити оновлення</translation>
-    </message>
-    <message>
-      <source>Cancel</source>
-      <translation>Відміна</translation>
-    </message>
-    <message>
-      <source>The latest version is already installed</source>
-      <translation>Встановлено найновішу версію</translation>
-    </message>
-    <message>
-      <source>This version is already installed</source>
-      <translation>Ця версія вже встановлена</translation>
-    </message>
-    <message>
-      <source>There are no online servers to update.</source>
-      <translation>Немає серверів для оновлення, які знаходяться онлайн.</translation>
-    </message>
-    <message>
-      <source>Cancel update and delete all downloaded data?</source>
-      <translation>Скасувати оновлення та видалити всі завантажені дані?</translation>
-    </message>
-    <message>
-      <source>There was an error while installing updates:</source>
-      <translation>Відбулася помилка при встановленні:</translation>
-    </message>
-    <message>
-      <source>Some servers have gone offline. Please wait until they become online to continue.</source>
-      <translation>Деякі сервери перейшли в офлайн. Будь ласка, зачекайте, поки вони стануть онлайн, щоб продовжити.</translation>
-    </message>
-    <message>
-      <source>Update completed, but some components have failed an update</source>
-      <translation>Оновлення завершено, але деякі компоненти не вдалося оновити</translation>
-    </message>
-    <message>
-      <source>Please update %1 manually using an installation package.</source>
-      <translation>Будь ласка, оновіть %1 вручну за допомогою інсталятора.</translation>
-    </message>
-    <message>
-      <source>%1 will be restarted to the updated version.</source>
-      <translation>%1 буде перезапущено до оновленої версії.</translation>
-    </message>
-    <message>
-      <source>Failed to download update packages to some components</source>
-      <translation>Не вдалося завантажити пакети оновлення для деяких компонентів</translation>
-    </message>
-    <message>
-      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
-      <translation>Деякі версії компонентів ОС більше не підтримуються. Видаліть їх із системи або оновіть до підтримуваної версії.</translation>
-    </message>
-    <message>
-      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
-      <translation>Версія ОС клієнта більше не підтримується. Оновіть його ОС до підтримуваної версії.</translation>
-    </message>
-    <message>
-      <source>Failed to start update</source>
-      <translation>Не вдалося розпочати оновлення</translation>
-    </message>
-    <message>
-      <source>Starting update to ...</source>
-      <translation>Починається оновлення до ...</translation>
-    </message>
-    <message>
-      <source>Failed to cancel update</source>
-      <translation>Не вдалося скасувати оновлення</translation>
-    </message>
-    <message>
-      <source>Failed to start installation</source>
-      <translation>Не вдалося розпочати встановлення</translation>
-    </message>
-    <message>
-      <source>Some servers have no update packages available.</source>
-      <translation>Деякі сервери не мають доступних пакетів оновлень.</translation>
-    </message>
-    <message>
-      <source>Some servers have encountered an internal error.</source>
-      <translation>На деяких серверах виникла внутрішня помилка.</translation>
-    </message>
-    <message>
-      <source>Please please contact Customer Support.</source>
-      <translation>Будь ласка, зверніться до команди підтримки.</translation>
-    </message>
-    <message>
-      <source>Some servers have not completed the update process. Finish it anyway?</source>
-      <translation>Деякі сервери не завершили процес оновлення. Закінчити його все одно?</translation>
     </message>
   </context>
   <context>

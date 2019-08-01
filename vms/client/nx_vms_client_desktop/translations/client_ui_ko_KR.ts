@@ -3079,7 +3079,7 @@
     <message>
       <location/>
       <source>Analytics data can take up large amounts of space. We recommend to choose another location for it instead of the system partition.</source>
-      <translation type="unfinished">Analytics data can take up large amounts of space. We recommend to choose another location for it instead of the system partition.</translation>
+      <translation>웹 로그 분석 데이터는 많은 양의 공간을 차지합니다. 시스템 파티션 대신 다른 위치를 선택하는 것이 권장합니다.</translation>
     </message>
   </context>
   <context>

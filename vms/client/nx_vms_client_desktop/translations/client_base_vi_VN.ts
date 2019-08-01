@@ -8450,6 +8450,57 @@ If you intended to move analytics data to another storage location, please conta
       <source>Some servers are offline and will not be updated. Skip them?</source>
       <translation>Một số máy chủ đang ngoại tuyến và sẽ không được cập nhật. Bỏ qua chúng?</translation>
     </message>
+    <message numerus="yes">
+      <source>Missing update package for the client and %n servers</source>
+      <translation>
+        <numerusform>Thiếu gói cập nhật cho máy khách và %n máy chủ</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Missing update package for the client</source>
+      <translation>Thiếu gói cập nhật cho máy khách</translation>
+    </message>
+    <message>
+      <source>There are no online servers to update.</source>
+      <translation>Không có máy chủ trực tuyến để cập nhật.</translation>
+    </message>
+    <message>
+      <source>Cancel update and delete all downloaded data?</source>
+      <translation>Hủy cập nhật và xóa tất cả dữ liệu đã tải xuống?</translation>
+    </message>
+    <message>
+      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
+      <translation>Phiên bản hệ điều hành của một số thành phần không còn được hỗ trợ. Vui lòng xóa chúng khỏi Hệ thống hoặc cập nhật HĐH của chúng lên phiên bản được hỗ trợ.</translation>
+    </message>
+    <message>
+      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
+      <translation>Phiên bản hệ điều hành của máy khách không còn được hỗ trợ. Vui lòng cập nhật hệ điều hành của nó lên phiên bản được hỗ trợ.</translation>
+    </message>
+    <message>
+      <source>Failed to start update</source>
+      <translation>Không thể bắt đầu cập nhật</translation>
+    </message>
+    <message>
+      <source>Failed to cancel update</source>
+      <translation>Không thể hủy cập nhật</translation>
+    </message>
+    <message>
+      <source>Failed to start installation</source>
+      <translation>Không thể bắt đầu cài đặt</translation>
+    </message>
+    <message>
+      <source>Some servers have not completed the update process. Finish it anyway?</source>
+      <translation>Một số máy chủ chưa hoàn thành quá trình cập nhật. Kết thúc nó bằng cách nào?</translation>
+    </message>
+    <message>
+      <source>%1 will be restarted to the updated version.</source>
+      <comment>Application name will be substituted</comment>
+      <translation>%1 sẽ được khởi động lại để cập nhật phiên bản.</translation>
+    </message>
+    <message>
+      <source>Failed to download update packages to some components</source>
+      <translation>Không thể tải xuống các gói cập nhật cho một số thành phần</translation>
+    </message>
     <message>
       <source>If the problem persists, please contact Customer Support.</source>
       <translation>Nếu vấn đề kích hoạt lỗi, xin vui lòng liên hệ với hỗ trợ khách hàng.</translation>
@@ -8467,16 +8518,48 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Cập nhật hoàn tất</translation>
     </message>
     <message>
-      <source>Nx Witness Client will be restarted to the updated version.</source>
-      <translation>Nx Witness Client sẽ được khởi động lại để chạy lên phiên bản cập nhật.</translation>
+      <source>Update completed, but some components have failed an update</source>
+      <translation>Cập nhật hoàn tất, nhưng một số thành phần đã không cập nhật</translation>
+    </message>
+    <message>
+      <source>Please update %1 manually using an installation package.</source>
+      <translation>Hãy cập nhật %1 sử dụng gói cài đặt bằng tay.</translation>
+    </message>
+    <message>
+      <source>%1 will be restarted to the updated version.</source>
+      <translation>%1 sẽ được khởi động lại để cập nhật phiên bản.</translation>
     </message>
     <message>
       <source>OK</source>
       <translation>Kác định</translation>
     </message>
     <message>
+      <source>There was an error while installing updates:</source>
+      <translation>Có lỗi trong khi cài đặt bản cập nhật:</translation>
+    </message>
+    <message>
       <source>Downloading updates...</source>
       <translation>Đang tải xuống bản Cập Nhật...</translation>
+    </message>
+    <message>
+      <source>Finish Update</source>
+      <translation>Kết thúc cập nhật</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>Hủy bỏ</translation>
+    </message>
+    <message>
+      <source>The latest version is already installed</source>
+      <translation>Phiên bản mới nhất đã được cài đặt</translation>
+    </message>
+    <message>
+      <source>This version is already installed</source>
+      <translation>Phiên bản này đã được cài đặt</translation>
+    </message>
+    <message>
+      <source>Install update</source>
+      <translation>Cài đặt cập nhật</translation>
     </message>
     <message>
       <source>Upload</source>
@@ -8495,12 +8578,12 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Tải xuống cài đặt</translation>
     </message>
     <message>
-      <source>Select Another Build</source>
-      <translation>Chọn bản dựng khác</translation>
-    </message>
-    <message>
       <source>Browse for Another File...</source>
       <translation>Duyệt tìm tệp khác...</translation>
+    </message>
+    <message>
+      <source>Select Another Build</source>
+      <translation>Chọn bản dựng khác</translation>
     </message>
     <message>
       <source>Update to Specific Build</source>
@@ -8523,6 +8606,10 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Cài đặt bản cập nhật máy khách...</translation>
     </message>
     <message>
+      <source>Starting update to ...</source>
+      <translation>Bắt đầu cập nhật lên ...</translation>
+    </message>
+    <message>
       <source>Updating to ...</source>
       <translation>Đang cập nhật tới ...</translation>
     </message>
@@ -8531,12 +8618,24 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Sẵn sàng cập nhật lên</translation>
     </message>
     <message>
-      <source>Install update</source>
-      <translation>Cài đặt cập nhật</translation>
-    </message>
-    <message>
       <source>System updated to</source>
       <translation>Hệ thống được cập nhật lên</translation>
+    </message>
+    <message>
+      <source>Some servers have no update packages available.</source>
+      <translation>Một số máy chủ không có gói cập nhật có sẵn.</translation>
+    </message>
+    <message>
+      <source>Some servers have encountered an internal error.</source>
+      <translation>Một số máy chủ đã gặp lỗi nội bộ.</translation>
+    </message>
+    <message>
+      <source>Please contact Customer Support.</source>
+      <translation>Vui lòng liên hệ Hỗ trợ Khách hàng.</translation>
+    </message>
+    <message>
+      <source>Some servers have gone offline. Please wait until they become online to continue.</source>
+      <translation>Một số máy chủ đã ngoại tuyến. Xin vui lòng chờ cho đến khi họ trở nên trực tuyến để tiếp tục.</translation>
     </message>
     <message>
       <source>System update in process</source>
@@ -8545,6 +8644,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Continue in Background</source>
       <translation>Tiếp tục trong bối cảnh</translation>
+    </message>
+    <message>
+      <source>Latest Available Update</source>
+      <translation>Cập nhật mới nhất có sẵn</translation>
     </message>
     <message>
       <source>Specific Build</source>
@@ -8557,108 +8660,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Update from mediaservers</source>
       <translation>Cập nhật từ server trung gian</translation>
-    </message>
-    <message>
-      <source>Latest Available Update</source>
-      <translation>Cập nhật mới nhất có sẵn</translation>
-    </message>
-    <message numerus="yes">
-      <source>Missing update package for the client and %n servers</source>
-      <translation>
-        <numerusform>Thiếu gói cập nhật cho máy khách và %n máy chủ</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Missing update package for the client</source>
-      <translation>Thiếu gói cập nhật cho máy khách</translation>
-    </message>
-    <message>
-      <source>Finish Update</source>
-      <translation>Kết thúc cập nhật</translation>
-    </message>
-    <message>
-      <source>Cancel</source>
-      <translation>Hủy bỏ</translation>
-    </message>
-    <message>
-      <source>The latest version is already installed</source>
-      <translation>Phiên bản mới nhất đã được cài đặt</translation>
-    </message>
-    <message>
-      <source>This version is already installed</source>
-      <translation>Phiên bản này đã được cài đặt</translation>
-    </message>
-    <message>
-      <source>There are no online servers to update.</source>
-      <translation>Không có máy chủ trực tuyến để cập nhật.</translation>
-    </message>
-    <message>
-      <source>Cancel update and delete all downloaded data?</source>
-      <translation>Hủy cập nhật và xóa tất cả dữ liệu đã tải xuống?</translation>
-    </message>
-    <message>
-      <source>There was an error while installing updates:</source>
-      <translation>Có lỗi trong khi cài đặt bản cập nhật:</translation>
-    </message>
-    <message>
-      <source>Some servers have gone offline. Please wait until they become online to continue.</source>
-      <translation>Một số máy chủ đã ngoại tuyến. Xin vui lòng chờ cho đến khi họ trở nên trực tuyến để tiếp tục.</translation>
-    </message>
-    <message>
-      <source>Update completed, but some components have failed an update</source>
-      <translation>Cập nhật hoàn tất, nhưng một số thành phần đã không cập nhật</translation>
-    </message>
-    <message>
-      <source>Please update %1 manually using an installation package.</source>
-      <translation>Hãy cập nhật %1 sử dụng gói cài đặt bằng tay.</translation>
-    </message>
-    <message>
-      <source>%1 will be restarted to the updated version.</source>
-      <translation>%1 sẽ được khởi động lại để cập nhật phiên bản.</translation>
-    </message>
-    <message>
-      <source>Failed to download update packages to some components</source>
-      <translation>Không thể tải xuống các gói cập nhật cho một số thành phần</translation>
-    </message>
-    <message>
-      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
-      <translation>Phiên bản hệ điều hành của một số thành phần không còn được hỗ trợ. Vui lòng xóa chúng khỏi Hệ thống hoặc cập nhật HĐH của chúng lên phiên bản được hỗ trợ.</translation>
-    </message>
-    <message>
-      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
-      <translation>Phiên bản hệ điều hành của máy khách không còn được hỗ trợ. Vui lòng cập nhật hệ điều hành của nó lên phiên bản được hỗ trợ.</translation>
-    </message>
-    <message>
-      <source>Failed to start update</source>
-      <translation>Không thể bắt đầu cập nhật</translation>
-    </message>
-    <message>
-      <source>Starting update to ...</source>
-      <translation>Bắt đầu cập nhật lên ...</translation>
-    </message>
-    <message>
-      <source>Failed to cancel update</source>
-      <translation>Không thể hủy cập nhật</translation>
-    </message>
-    <message>
-      <source>Failed to start installation</source>
-      <translation>Không thể bắt đầu cài đặt</translation>
-    </message>
-    <message>
-      <source>Some servers have no update packages available.</source>
-      <translation>Một số máy chủ không có gói cập nhật có sẵn.</translation>
-    </message>
-    <message>
-      <source>Some servers have encountered an internal error.</source>
-      <translation>Một số máy chủ đã gặp lỗi nội bộ.</translation>
-    </message>
-    <message>
-      <source>Please please contact Customer Support.</source>
-      <translation>Vui lòng liên hệ Hỗ trợ Khách hàng.</translation>
-    </message>
-    <message>
-      <source>Some servers have not completed the update process. Finish it anyway?</source>
-      <translation>Một số máy chủ chưa hoàn thành quá trình cập nhật. Kết thúc nó bằng cách nào?</translation>
     </message>
   </context>
   <context>

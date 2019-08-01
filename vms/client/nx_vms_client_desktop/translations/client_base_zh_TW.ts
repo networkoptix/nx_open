@@ -8456,6 +8456,57 @@ If you intended to move analytics data to another storage location, please conta
       <source>Some servers are offline and will not be updated. Skip them?</source>
       <translation>某些伺服器處於離線狀態，不會更新。請問決定忽略？</translation>
     </message>
+    <message numerus="yes">
+      <source>Missing update package for the client and %n servers</source>
+      <translation>
+        <numerusform>缺少客戶端和 %n 個伺服器的更新套件</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Missing update package for the client</source>
+      <translation>缺少客戶端的更新套件</translation>
+    </message>
+    <message>
+      <source>There are no online servers to update.</source>
+      <translation>沒有要更新的在線伺服器。</translation>
+    </message>
+    <message>
+      <source>Cancel update and delete all downloaded data?</source>
+      <translation>取消更新並刪除所有下載數據？</translation>
+    </message>
+    <message>
+      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
+      <translation>不再支援某些組件的操作系統。請從系統中刪除或將其操作系統更新為支援版本。</translation>
+    </message>
+    <message>
+      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
+      <translation>不再支援客戶端的操作系統。請將操作系統更新為支援的版本。</translation>
+    </message>
+    <message>
+      <source>Failed to start update</source>
+      <translation>啟動更新失敗。</translation>
+    </message>
+    <message>
+      <source>Failed to cancel update</source>
+      <translation>無法取消更新</translation>
+    </message>
+    <message>
+      <source>Failed to start installation</source>
+      <translation>無法啟動安裝</translation>
+    </message>
+    <message>
+      <source>Some servers have not completed the update process. Finish it anyway?</source>
+      <translation>某些伺服器未完成更新。繼續完成？</translation>
+    </message>
+    <message>
+      <source>%1 will be restarted to the updated version.</source>
+      <comment>Application name will be substituted</comment>
+      <translation>%1 將重新啟動到更新的版本.</translation>
+    </message>
+    <message>
+      <source>Failed to download update packages to some components</source>
+      <translation>更新套件無法下載至所有組件</translation>
+    </message>
     <message>
       <source>If the problem persists, please contact Customer Support.</source>
       <translation>如果問題仍然存在, 請與客戶支援連絡.</translation>
@@ -8473,16 +8524,48 @@ If you intended to move analytics data to another storage location, please conta
       <translation>更新完成。</translation>
     </message>
     <message>
-      <source>Nx Witness Client will be restarted to the updated version.</source>
-      <translation>Nx Witness 客戶端將重新啟動到更新的版本.</translation>
+      <source>Update completed, but some components have failed an update</source>
+      <translation>更新完成，但某些組件未更新</translation>
+    </message>
+    <message>
+      <source>Please update %1 manually using an installation package.</source>
+      <translation>請使用安裝包手動更新 %1.</translation>
+    </message>
+    <message>
+      <source>%1 will be restarted to the updated version.</source>
+      <translation>%1 將重新啟動到更新的版本.</translation>
     </message>
     <message>
       <source>OK</source>
       <translation>確定</translation>
     </message>
     <message>
+      <source>There was an error while installing updates:</source>
+      <translation>安裝更新時出錯：</translation>
+    </message>
+    <message>
       <source>Downloading updates...</source>
       <translation>正在下載更新...</translation>
+    </message>
+    <message>
+      <source>Finish Update</source>
+      <translation>完成更新</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>取消</translation>
+    </message>
+    <message>
+      <source>The latest version is already installed</source>
+      <translation>已安裝最新版本</translation>
+    </message>
+    <message>
+      <source>This version is already installed</source>
+      <translation>已安裝此版本</translation>
+    </message>
+    <message>
+      <source>Install update</source>
+      <translation>安裝更新</translation>
     </message>
     <message>
       <source>Upload</source>
@@ -8501,12 +8584,12 @@ If you intended to move analytics data to another storage location, please conta
       <translation>下載並安裝</translation>
     </message>
     <message>
-      <source>Select Another Build</source>
-      <translation>選取另一個版本</translation>
-    </message>
-    <message>
       <source>Browse for Another File...</source>
       <translation>瀏覽另一個檔案...</translation>
+    </message>
+    <message>
+      <source>Select Another Build</source>
+      <translation>選取另一個版本</translation>
     </message>
     <message>
       <source>Update to Specific Build</source>
@@ -8529,6 +8612,10 @@ If you intended to move analytics data to another storage location, please conta
       <translation>正在安裝客戶端更新...</translation>
     </message>
     <message>
+      <source>Starting update to ...</source>
+      <translation>開始更新到......</translation>
+    </message>
+    <message>
       <source>Updating to ...</source>
       <translation>更新到...</translation>
     </message>
@@ -8537,12 +8624,24 @@ If you intended to move analytics data to another storage location, please conta
       <translation>已可更新至</translation>
     </message>
     <message>
-      <source>Install update</source>
-      <translation>安裝更新</translation>
-    </message>
-    <message>
       <source>System updated to</source>
       <translation>系統更新至</translation>
+    </message>
+    <message>
+      <source>Some servers have no update packages available.</source>
+      <translation>某些伺服器沒有可用的更新套件.</translation>
+    </message>
+    <message>
+      <source>Some servers have encountered an internal error.</source>
+      <translation>某些伺服器發生內部錯誤。</translation>
+    </message>
+    <message>
+      <source>Please contact Customer Support.</source>
+      <translation>請連絡客戶支援部門.</translation>
+    </message>
+    <message>
+      <source>Some servers have gone offline. Please wait until they become online to continue.</source>
+      <translation>有些伺服器已離線。請等待連線後再繼續。</translation>
     </message>
     <message>
       <source>System update in process</source>
@@ -8551,6 +8650,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Continue in Background</source>
       <translation>在背景執行</translation>
+    </message>
+    <message>
+      <source>Latest Available Update</source>
+      <translation>最新的可用更新</translation>
     </message>
     <message>
       <source>Specific Build</source>
@@ -8563,108 +8666,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Update from mediaservers</source>
       <translation>從媒體伺服器更新</translation>
-    </message>
-    <message>
-      <source>Latest Available Update</source>
-      <translation>最新的可用更新</translation>
-    </message>
-    <message numerus="yes">
-      <source>Missing update package for the client and %n servers</source>
-      <translation>
-        <numerusform>缺少客戶端和 %n 個伺服器的更新套件</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Missing update package for the client</source>
-      <translation>缺少客戶端的更新套件</translation>
-    </message>
-    <message>
-      <source>Finish Update</source>
-      <translation>完成更新</translation>
-    </message>
-    <message>
-      <source>Cancel</source>
-      <translation>取消</translation>
-    </message>
-    <message>
-      <source>The latest version is already installed</source>
-      <translation>已安裝最新版本</translation>
-    </message>
-    <message>
-      <source>This version is already installed</source>
-      <translation>已安裝此版本</translation>
-    </message>
-    <message>
-      <source>There are no online servers to update.</source>
-      <translation>沒有要更新的在線伺服器。</translation>
-    </message>
-    <message>
-      <source>Cancel update and delete all downloaded data?</source>
-      <translation>取消更新並刪除所有下載數據？</translation>
-    </message>
-    <message>
-      <source>There was an error while installing updates:</source>
-      <translation>安裝更新時出錯：</translation>
-    </message>
-    <message>
-      <source>Some servers have gone offline. Please wait until they become online to continue.</source>
-      <translation>有些伺服器已離線。請等待連線後再繼續。</translation>
-    </message>
-    <message>
-      <source>Update completed, but some components have failed an update</source>
-      <translation>更新完成，但某些組件未更新</translation>
-    </message>
-    <message>
-      <source>Please update %1 manually using an installation package.</source>
-      <translation>請使用安裝包手動更新 %1.</translation>
-    </message>
-    <message>
-      <source>%1 will be restarted to the updated version.</source>
-      <translation>%1 將重新啟動到更新的版本.</translation>
-    </message>
-    <message>
-      <source>Failed to download update packages to some components</source>
-      <translation>更新套件無法下載至所有組件</translation>
-    </message>
-    <message>
-      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
-      <translation>不再支援某些組件的操作系統。請從系統中刪除或將其操作系統更新為支援版本。</translation>
-    </message>
-    <message>
-      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
-      <translation>不再支援客戶端的操作系統。請將操作系統更新為支援的版本。</translation>
-    </message>
-    <message>
-      <source>Failed to start update</source>
-      <translation>啟動更新失敗。</translation>
-    </message>
-    <message>
-      <source>Starting update to ...</source>
-      <translation>開始更新到......</translation>
-    </message>
-    <message>
-      <source>Failed to cancel update</source>
-      <translation>無法取消更新</translation>
-    </message>
-    <message>
-      <source>Failed to start installation</source>
-      <translation>無法啟動安裝</translation>
-    </message>
-    <message>
-      <source>Some servers have no update packages available.</source>
-      <translation>某些伺服器沒有可用的更新套件.</translation>
-    </message>
-    <message>
-      <source>Some servers have encountered an internal error.</source>
-      <translation>某些伺服器發生內部錯誤。</translation>
-    </message>
-    <message>
-      <source>Please please contact Customer Support.</source>
-      <translation>請連絡客戶支援部門.</translation>
-    </message>
-    <message>
-      <source>Some servers have not completed the update process. Finish it anyway?</source>
-      <translation>某些伺服器未完成更新。繼續完成？</translation>
     </message>
   </context>
   <context>

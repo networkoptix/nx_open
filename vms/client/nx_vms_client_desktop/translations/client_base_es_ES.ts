@@ -8569,6 +8569,58 @@ If you intended to move analytics data to another storage location, please conta
       <source>Some servers are offline and will not be updated. Skip them?</source>
       <translation>Algunos servidores están fuera de línea y no se actualizarán. Omitirlos?</translation>
     </message>
+    <message numerus="yes">
+      <source>Missing update package for the client and %n servers</source>
+      <translation>
+        <numerusform>Falta el paquete de actualización para el cliente y %n servidores</numerusform>
+        <numerusform>Falta el paquete de actualización para el cliente y %n servidores</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Missing update package for the client</source>
+      <translation>Falta el paquete de actualización para el cliente</translation>
+    </message>
+    <message>
+      <source>There are no online servers to update.</source>
+      <translation>No hay servidores en línea para actualizar.</translation>
+    </message>
+    <message>
+      <source>Cancel update and delete all downloaded data?</source>
+      <translation>¿Cancelar actualización y eliminar todos los datos descargados?</translation>
+    </message>
+    <message>
+      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
+      <translation>Las versiones del sistema operativo de algunos componentes ya no son compatibles. Por favor, eliminarlos del sistema o actualizar su sistema operativo a una versión compatible.</translation>
+    </message>
+    <message>
+      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
+      <translation>La versión del sistema operativo del cliente ya no es compatible. Por favor, actualice su sistema operativo a una versión compatible.</translation>
+    </message>
+    <message>
+      <source>Failed to start update</source>
+      <translation>Error al iniciar la actualización</translation>
+    </message>
+    <message>
+      <source>Failed to cancel update</source>
+      <translation>Error al cancelar la actualización</translation>
+    </message>
+    <message>
+      <source>Failed to start installation</source>
+      <translation>Error al iniciar la instalación</translation>
+    </message>
+    <message>
+      <source>Some servers have not completed the update process. Finish it anyway?</source>
+      <translation>Algunos servidores no han completado el proceso de actualización. ¿Terminar de todos modos?</translation>
+    </message>
+    <message>
+      <source>%1 will be restarted to the updated version.</source>
+      <comment>Application name will be substituted</comment>
+      <translation>%1 se reiniciará a la versión actualizada.</translation>
+    </message>
+    <message>
+      <source>Failed to download update packages to some components</source>
+      <translation>Error al descargar los paquetes a algunos componentes</translation>
+    </message>
     <message>
       <source>If the problem persists, please contact Customer Support.</source>
       <translation>Si el problema persiste, póngase en contacto con el servicio de atención al cliente.</translation>
@@ -8586,16 +8638,48 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Actualización completada</translation>
     </message>
     <message>
-      <source>Nx Witness Client will be restarted to the updated version.</source>
-      <translation>Nx Witness Client se reiniciará a la versión actualizada.</translation>
+      <source>Update completed, but some components have failed an update</source>
+      <translation>Actualización finalizada, pero algunos componentes han fallado en una actualización</translation>
+    </message>
+    <message>
+      <source>Please update %1 manually using an installation package.</source>
+      <translation>Actualice %1 manualmente utilizando un paquete de instalación.</translation>
+    </message>
+    <message>
+      <source>%1 will be restarted to the updated version.</source>
+      <translation>%1 se reiniciará a la versión actualizada.</translation>
     </message>
     <message>
       <source>OK</source>
       <translation>OK</translation>
     </message>
     <message>
+      <source>There was an error while installing updates:</source>
+      <translation>Se ha producido un error al instalar las actualizaciones:</translation>
+    </message>
+    <message>
       <source>Downloading updates...</source>
       <translation>Descargando Actualización...</translation>
+    </message>
+    <message>
+      <source>Finish Update</source>
+      <translation>Finalizar actualización</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>Cancelar</translation>
+    </message>
+    <message>
+      <source>The latest version is already installed</source>
+      <translation>La última versión ya está instalada</translation>
+    </message>
+    <message>
+      <source>This version is already installed</source>
+      <translation>Esta versión ya está instalada</translation>
+    </message>
+    <message>
+      <source>Install update</source>
+      <translation>Instalar actualización</translation>
     </message>
     <message>
       <source>Upload</source>
@@ -8614,12 +8698,12 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Descargar &amp; Instalar</translation>
     </message>
     <message>
-      <source>Select Another Build</source>
-      <translation>Seleccione otro Build</translation>
-    </message>
-    <message>
       <source>Browse for Another File...</source>
       <translation>Buscar otro archivo...</translation>
+    </message>
+    <message>
+      <source>Select Another Build</source>
+      <translation>Seleccione otro Build</translation>
     </message>
     <message>
       <source>Update to Specific Build</source>
@@ -8642,6 +8726,10 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Instalando actualizaciones de cliente...</translation>
     </message>
     <message>
+      <source>Starting update to ...</source>
+      <translation>Iniciando actualización a ...</translation>
+    </message>
+    <message>
       <source>Updating to ...</source>
       <translation>Actualizando a ...</translation>
     </message>
@@ -8650,12 +8738,24 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Listo para actualizar a</translation>
     </message>
     <message>
-      <source>Install update</source>
-      <translation>Instalar actualización</translation>
-    </message>
-    <message>
       <source>System updated to</source>
       <translation>Sistema actualizado a</translation>
+    </message>
+    <message>
+      <source>Some servers have no update packages available.</source>
+      <translation>Algunos servidores no tienen paquetes de actualización disponibles.</translation>
+    </message>
+    <message>
+      <source>Some servers have encountered an internal error.</source>
+      <translation>Algunos servidores han encontrado un error interno.</translation>
+    </message>
+    <message>
+      <source>Please contact Customer Support.</source>
+      <translation>Póngase en contacto con el servicio técnico.</translation>
+    </message>
+    <message>
+      <source>Some servers have gone offline. Please wait until they become online to continue.</source>
+      <translation>Algunos servidores se han desconectado. Por favor, espere hasta que estén en línea para continuar.</translation>
     </message>
     <message>
       <source>System update in process</source>
@@ -8664,6 +8764,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Continue in Background</source>
       <translation>Continuar en el fondo</translation>
+    </message>
+    <message>
+      <source>Latest Available Update</source>
+      <translation>La última Actualización disponible</translation>
     </message>
     <message>
       <source>Specific Build</source>
@@ -8676,109 +8780,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Update from mediaservers</source>
       <translation>Actualizar desde servidores</translation>
-    </message>
-    <message>
-      <source>Latest Available Update</source>
-      <translation>La última Actualización disponible</translation>
-    </message>
-    <message numerus="yes">
-      <source>Missing update package for the client and %n servers</source>
-      <translation>
-        <numerusform>Falta el paquete de actualización para el cliente y %n servidores</numerusform>
-        <numerusform>Falta el paquete de actualización para el cliente y %n servidores</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Missing update package for the client</source>
-      <translation>Falta el paquete de actualización para el cliente</translation>
-    </message>
-    <message>
-      <source>Finish Update</source>
-      <translation>Finalizar actualización</translation>
-    </message>
-    <message>
-      <source>Cancel</source>
-      <translation>Cancelar</translation>
-    </message>
-    <message>
-      <source>The latest version is already installed</source>
-      <translation>La última versión ya está instalada</translation>
-    </message>
-    <message>
-      <source>This version is already installed</source>
-      <translation>Esta versión ya está instalada</translation>
-    </message>
-    <message>
-      <source>There are no online servers to update.</source>
-      <translation>No hay servidores en línea para actualizar.</translation>
-    </message>
-    <message>
-      <source>Cancel update and delete all downloaded data?</source>
-      <translation>¿Cancelar actualización y eliminar todos los datos descargados?</translation>
-    </message>
-    <message>
-      <source>There was an error while installing updates:</source>
-      <translation>Se ha producido un error al instalar las actualizaciones:</translation>
-    </message>
-    <message>
-      <source>Some servers have gone offline. Please wait until they become online to continue.</source>
-      <translation>Algunos servidores se han desconectado. Por favor, espere hasta que estén en línea para continuar.</translation>
-    </message>
-    <message>
-      <source>Update completed, but some components have failed an update</source>
-      <translation>Actualización finalizada, pero algunos componentes han fallado en una actualización</translation>
-    </message>
-    <message>
-      <source>Please update %1 manually using an installation package.</source>
-      <translation>Actualice %1 manualmente utilizando un paquete de instalación.</translation>
-    </message>
-    <message>
-      <source>%1 will be restarted to the updated version.</source>
-      <translation>%1 se reiniciará a la versión actualizada.</translation>
-    </message>
-    <message>
-      <source>Failed to download update packages to some components</source>
-      <translation>Error al descargar los paquetes a algunos componentes</translation>
-    </message>
-    <message>
-      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
-      <translation>Las versiones del sistema operativo de algunos componentes ya no son compatibles. Por favor, eliminarlos del sistema o actualizar su sistema operativo a una versión compatible.</translation>
-    </message>
-    <message>
-      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
-      <translation>La versión del sistema operativo del cliente ya no es compatible. Por favor, actualice su sistema operativo a una versión compatible.</translation>
-    </message>
-    <message>
-      <source>Failed to start update</source>
-      <translation>Error al iniciar la actualización</translation>
-    </message>
-    <message>
-      <source>Starting update to ...</source>
-      <translation>Iniciando actualización a ...</translation>
-    </message>
-    <message>
-      <source>Failed to cancel update</source>
-      <translation>Error al cancelar la actualización</translation>
-    </message>
-    <message>
-      <source>Failed to start installation</source>
-      <translation>Error al iniciar la instalación</translation>
-    </message>
-    <message>
-      <source>Some servers have no update packages available.</source>
-      <translation>Algunos servidores no tienen paquetes de actualización disponibles.</translation>
-    </message>
-    <message>
-      <source>Some servers have encountered an internal error.</source>
-      <translation>Algunos servidores han encontrado un error interno.</translation>
-    </message>
-    <message>
-      <source>Please please contact Customer Support.</source>
-      <translation>Por favor, póngase en contacto con el servicio de atención al cliente.</translation>
-    </message>
-    <message>
-      <source>Some servers have not completed the update process. Finish it anyway?</source>
-      <translation>Algunos servidores no han completado el proceso de actualización. ¿Terminar de todos modos?</translation>
     </message>
   </context>
   <context>

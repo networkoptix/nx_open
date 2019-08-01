@@ -5608,8 +5608,8 @@ to %1</source>
     <message>
       <source>Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
 If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
-      <translation type="unfinished">Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
-If you intended to move analytics data to another storage location, please contact support before proceeding.</translation>
+      <translation>Huidige analytics gegevens worden niet automatisch verplaatst naar een andere locatie en worden niet toegankelijk. U kunt het behouden en handmatig verplaatsen, of permanent verwijderen.
+Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem dan contact op met support voordat u verder gaat.</translation>
     </message>
   </context>
   <context>
@@ -8567,6 +8567,58 @@ If you intended to move analytics data to another storage location, please conta
       <source>Some servers are offline and will not be updated. Skip them?</source>
       <translation>Sommige servers zijn offline en worden niet bijgewerkt. Deze overslaan?</translation>
     </message>
+    <message numerus="yes">
+      <source>Missing update package for the client and %n servers</source>
+      <translation>
+        <numerusform>Update pakket ontbreekt voor de client en %n servers</numerusform>
+        <numerusform>Update pakket ontbreekt voor de client en %n servers</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Missing update package for the client</source>
+      <translation>Update pakket voor de client ontbreekt</translation>
+    </message>
+    <message>
+      <source>There are no online servers to update.</source>
+      <translation>Er zijn geen online servers om bij te werken.</translation>
+    </message>
+    <message>
+      <source>Cancel update and delete all downloaded data?</source>
+      <translation>Update annuleren en alle gedownloade gegevens verwijderen?</translation>
+    </message>
+    <message>
+      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
+      <translation>OS versies van sommige componenten worden niet langer ondersteund. Verwijder ze uit het systeem of update hun OS naar een ondersteunde versie.</translation>
+    </message>
+    <message>
+      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
+      <translation>OS versie van de client wordt niet langer ondersteund. Update het OS naar een ondersteunde versie.</translation>
+    </message>
+    <message>
+      <source>Failed to start update</source>
+      <translation>Update starten mislukt</translation>
+    </message>
+    <message>
+      <source>Failed to cancel update</source>
+      <translation>Update annuleren mislukt</translation>
+    </message>
+    <message>
+      <source>Failed to start installation</source>
+      <translation>Kan de installatie niet starten</translation>
+    </message>
+    <message>
+      <source>Some servers have not completed the update process. Finish it anyway?</source>
+      <translation>Sommige servers hebben het update proces niet voltooid. Toch afronden?</translation>
+    </message>
+    <message>
+      <source>%1 will be restarted to the updated version.</source>
+      <comment>Application name will be substituted</comment>
+      <translation>%1 wordt opnieuw gestart naar de bijgewerkte versie.</translation>
+    </message>
+    <message>
+      <source>Failed to download update packages to some components</source>
+      <translation>Downloaden van updatepakketten naar sommige componenten is mislukt</translation>
+    </message>
     <message>
       <source>If the problem persists, please contact Customer Support.</source>
       <translation>Als het probleem aanhoudt, neem contact op met customer support.</translation>
@@ -8584,16 +8636,48 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Update voltooid</translation>
     </message>
     <message>
-      <source>Nx Witness Client will be restarted to the updated version.</source>
-      <translation>Nx Witness Client zal opnieuw worden gestart naar de bijgewerkte versie.</translation>
+      <source>Update completed, but some components have failed an update</source>
+      <translation>Update voltooid, maar voor sommige componenten is de update mislukt</translation>
+    </message>
+    <message>
+      <source>Please update %1 manually using an installation package.</source>
+      <translation>Update alstublieft %1 handmatig met behulp van een installatiepakket.</translation>
+    </message>
+    <message>
+      <source>%1 will be restarted to the updated version.</source>
+      <translation>%1 wordt opnieuw gestart naar de bijgewerkte versie.</translation>
     </message>
     <message>
       <source>OK</source>
       <translation>Oké</translation>
     </message>
     <message>
+      <source>There was an error while installing updates:</source>
+      <translation>Er is een fout opgetreden tijdens het installeren van updates:</translation>
+    </message>
+    <message>
       <source>Downloading updates...</source>
       <translation>Updates aan het downloaden...</translation>
+    </message>
+    <message>
+      <source>Finish Update</source>
+      <translation>Update voltooien</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>Annuleren</translation>
+    </message>
+    <message>
+      <source>The latest version is already installed</source>
+      <translation>De nieuwste versie is al geïnstalleerd</translation>
+    </message>
+    <message>
+      <source>This version is already installed</source>
+      <translation>Deze versie is al geïnstalleerd</translation>
+    </message>
+    <message>
+      <source>Install update</source>
+      <translation>Update installeren</translation>
     </message>
     <message>
       <source>Upload</source>
@@ -8612,12 +8696,12 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Download &amp;&amp; Installeren</translation>
     </message>
     <message>
-      <source>Select Another Build</source>
-      <translation>Selecteer een andere Build</translation>
-    </message>
-    <message>
       <source>Browse for Another File...</source>
       <translation>Zoeken naar een ander bestand...</translation>
+    </message>
+    <message>
+      <source>Select Another Build</source>
+      <translation>Selecteer een andere Build</translation>
     </message>
     <message>
       <source>Update to Specific Build</source>
@@ -8640,6 +8724,10 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Clientupdates installeren...</translation>
     </message>
     <message>
+      <source>Starting update to ...</source>
+      <translation>Update starten naar ...</translation>
+    </message>
+    <message>
       <source>Updating to ...</source>
       <translation>Updaten naar ...</translation>
     </message>
@@ -8648,12 +8736,24 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Klaar om te updaten naar</translation>
     </message>
     <message>
-      <source>Install update</source>
-      <translation>Update installeren</translation>
-    </message>
-    <message>
       <source>System updated to</source>
       <translation>Systeem bijgewerkt naar</translation>
+    </message>
+    <message>
+      <source>Some servers have no update packages available.</source>
+      <translation>Sommige servers hebben geen update pakketten beschikbaar.</translation>
+    </message>
+    <message>
+      <source>Some servers have encountered an internal error.</source>
+      <translation>Sommige servers hebben een interne fout ondervonden.</translation>
+    </message>
+    <message>
+      <source>Please contact Customer Support.</source>
+      <translation>Neem contact op met Customer Support.</translation>
+    </message>
+    <message>
+      <source>Some servers have gone offline. Please wait until they become online to continue.</source>
+      <translation>Sommige servers zijn offline gegaan. Wacht tot ze online worden om door te gaan.</translation>
     </message>
     <message>
       <source>System update in process</source>
@@ -8662,6 +8762,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Continue in Background</source>
       <translation>Doorgaan in de achtergrond</translation>
+    </message>
+    <message>
+      <source>Latest Available Update</source>
+      <translation>Laatst beschikbare versie</translation>
     </message>
     <message>
       <source>Specific Build</source>
@@ -8674,109 +8778,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Update from mediaservers</source>
       <translation>Update van mediaservers</translation>
-    </message>
-    <message>
-      <source>Latest Available Update</source>
-      <translation>Laatst beschikbare versie</translation>
-    </message>
-    <message numerus="yes">
-      <source>Missing update package for the client and %n servers</source>
-      <translation>
-        <numerusform>Update pakket ontbreekt voor de client en %n servers</numerusform>
-        <numerusform>Update pakket ontbreekt voor de client en %n servers</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Missing update package for the client</source>
-      <translation>Update pakket voor de client ontbreekt</translation>
-    </message>
-    <message>
-      <source>Finish Update</source>
-      <translation>Update voltooien</translation>
-    </message>
-    <message>
-      <source>Cancel</source>
-      <translation>Annuleren</translation>
-    </message>
-    <message>
-      <source>The latest version is already installed</source>
-      <translation>De nieuwste versie is al geïnstalleerd</translation>
-    </message>
-    <message>
-      <source>This version is already installed</source>
-      <translation>Deze versie is al geïnstalleerd</translation>
-    </message>
-    <message>
-      <source>There are no online servers to update.</source>
-      <translation>Er zijn geen online servers om bij te werken.</translation>
-    </message>
-    <message>
-      <source>Cancel update and delete all downloaded data?</source>
-      <translation>Update annuleren en alle gedownloade gegevens verwijderen?</translation>
-    </message>
-    <message>
-      <source>There was an error while installing updates:</source>
-      <translation>Er is een fout opgetreden tijdens het installeren van updates:</translation>
-    </message>
-    <message>
-      <source>Some servers have gone offline. Please wait until they become online to continue.</source>
-      <translation>Sommige servers zijn offline gegaan. Wacht tot ze online worden om door te gaan.</translation>
-    </message>
-    <message>
-      <source>Update completed, but some components have failed an update</source>
-      <translation>Update voltooid, maar voor sommige componenten is de update mislukt</translation>
-    </message>
-    <message>
-      <source>Please update %1 manually using an installation package.</source>
-      <translation>Update alstublieft %1 handmatig met behulp van een installatiepakket.</translation>
-    </message>
-    <message>
-      <source>%1 will be restarted to the updated version.</source>
-      <translation>%1 wordt opnieuw gestart naar de bijgewerkte versie.</translation>
-    </message>
-    <message>
-      <source>Failed to download update packages to some components</source>
-      <translation>Downloaden van updatepakketten naar sommige componenten is mislukt</translation>
-    </message>
-    <message>
-      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
-      <translation>OS versies van sommige componenten worden niet langer ondersteund. Verwijder ze uit het systeem of update hun OS naar een ondersteunde versie.</translation>
-    </message>
-    <message>
-      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
-      <translation>OS versie van de client wordt niet langer ondersteund. Update het OS naar een ondersteunde versie.</translation>
-    </message>
-    <message>
-      <source>Failed to start update</source>
-      <translation>Update starten mislukt</translation>
-    </message>
-    <message>
-      <source>Starting update to ...</source>
-      <translation>Update starten naar ...</translation>
-    </message>
-    <message>
-      <source>Failed to cancel update</source>
-      <translation>Update annuleren mislukt</translation>
-    </message>
-    <message>
-      <source>Failed to start installation</source>
-      <translation>Kan de installatie niet starten</translation>
-    </message>
-    <message>
-      <source>Some servers have no update packages available.</source>
-      <translation>Sommige servers hebben geen update pakketten beschikbaar.</translation>
-    </message>
-    <message>
-      <source>Some servers have encountered an internal error.</source>
-      <translation>Sommige servers hebben een interne fout ondervonden.</translation>
-    </message>
-    <message>
-      <source>Please please contact Customer Support.</source>
-      <translation>Neem contact op met Customer Support.</translation>
-    </message>
-    <message>
-      <source>Some servers have not completed the update process. Finish it anyway?</source>
-      <translation>Sommige servers hebben het update proces niet voltooid. Toch afronden?</translation>
     </message>
   </context>
   <context>
@@ -9420,11 +9421,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Remote file &quot;%1&quot; is corrupted</source>
-      <translation type="unfinished">Remote file &quot;%1&quot; is corrupted</translation>
+      <translation>Extern bestand &quot;%1&quot; is beschadigd</translation>
     </message>
     <message>
       <source>Server already has this file &quot;%1&quot;</source>
-      <translation type="unfinished">Server already has this file &quot;%1&quot;</translation>
+      <translation>Server heeft dit bestand al &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
@@ -9956,21 +9957,21 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Confirm storage location for the analytics data on &quot;%1&quot;</source>
-      <translation type="unfinished">Confirm storage location for the analytics data on &quot;%1&quot;</translation>
+      <translation>Bevestig opslag locatie om de analytics data op te slaan op &quot;%1&quot;</translation>
     </message>
     <message>
       <source>the largest available partition</source>
-      <translation type="unfinished">the largest available partition</translation>
+      <translation>de grootste beschikbare partitie</translation>
     </message>
     <message>
       <source>The analytics database should only be stored on a local drive and can take up large amounts of space.
 Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
 By default analytics data will be stored on %1.
 You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</source>
-      <translation type="unfinished">The analytics database should only be stored on a local drive and can take up large amounts of space.
-Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
-By default analytics data will be stored on %1.
-You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</translation>
+      <translation>De analytics database mag alleen op een lokale schijf worden opgeslagen en kan grote hoeveelheden ruimte gebruiken.
+Zodra een locatie om analytische gegevens op te slaan is geselecteerd, kan deze niet eenvoudig worden gewijzigd zonder bestaande gegevens te verliezen. We raden aan om de locatie zorgvuldig te kiezen en om te voorkomen dat de systeem partitie wordt gebruikt omdat het ernstige systeemstoringen kan veroorzaken.
+Standaard worden analytics gegevens opgeslagen op %1.
+U kunt een andere opslaglocatie selecteren in het tabblad &quot;Opslagbeheer&quot; van het Server Instellingen menu.</translation>
     </message>
   </context>
   <context>

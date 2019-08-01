@@ -8569,6 +8569,58 @@ If you intended to move analytics data to another storage location, please conta
       <source>Some servers are offline and will not be updated. Skip them?</source>
       <translation>Jotkin palvelimet ovat offline-tilassa ja niitä ei päivitetä. Ohita ne?</translation>
     </message>
+    <message numerus="yes">
+      <source>Missing update package for the client and %n servers</source>
+      <translation>
+        <numerusform>Client-sovelluksen ja %n palvelimen päivityspaketti puuttuu</numerusform>
+        <numerusform>Client-sovelluksen ja %n palvelimen päivityspaketti puuttuu</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Missing update package for the client</source>
+      <translation>Client-sovelluksen päivityspaketti puuttuu</translation>
+    </message>
+    <message>
+      <source>There are no online servers to update.</source>
+      <translation>Ei yhteydessä olevia palvelimia päivitettäväksi.</translation>
+    </message>
+    <message>
+      <source>Cancel update and delete all downloaded data?</source>
+      <translation>Peruuta päivitys ja poista kaikki ladatut tiedot?</translation>
+    </message>
+    <message>
+      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
+      <translation>Joidenkin komponenttien käyttöjärjestelmän versioita ei enää tueta. Poista ne järjestelmästä tai päivitä käyttöjärjestelmä tuettuun versioon.</translation>
+    </message>
+    <message>
+      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
+      <translation>Asiakkaan käyttöjärjestelmän versiota ei enää tueta. Päivitä sen käyttöjärjestelmä tuettuun versioon.</translation>
+    </message>
+    <message>
+      <source>Failed to start update</source>
+      <translation>Päivityksen käynnistäminen epäonnistui</translation>
+    </message>
+    <message>
+      <source>Failed to cancel update</source>
+      <translation>Päivityksen peruuttaminen epäonnistui</translation>
+    </message>
+    <message>
+      <source>Failed to start installation</source>
+      <translation>Asennuksen aloittaminen epäonnistui</translation>
+    </message>
+    <message>
+      <source>Some servers have not completed the update process. Finish it anyway?</source>
+      <translation type="unfinished">Some servers have not completed the update process. Finish it anyway?</translation>
+    </message>
+    <message>
+      <source>%1 will be restarted to the updated version.</source>
+      <comment>Application name will be substituted</comment>
+      <translation>%1 käynnistetään uudelleen päivitettyyn versioon.</translation>
+    </message>
+    <message>
+      <source>Failed to download update packages to some components</source>
+      <translation>Joidenkin komponenttien päivityspakettien lataaminen epäonnistui</translation>
+    </message>
     <message>
       <source>If the problem persists, please contact Customer Support.</source>
       <translation>Jos ongelma jatkuu, ota yhteyttä asiakastukeen.</translation>
@@ -8586,16 +8638,48 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Päivitys suoritettu</translation>
     </message>
     <message>
-      <source>Nx Witness Client will be restarted to the updated version.</source>
-      <translation>Nx Witness Client käynnistetään uudelleen päivitetyllä versiolla.</translation>
+      <source>Update completed, but some components have failed an update</source>
+      <translation>Päivitys on valmis, mutta jotkin komponentit eivät ole päivittyneet</translation>
+    </message>
+    <message>
+      <source>Please update %1 manually using an installation package.</source>
+      <translation>Päivitä %1 manuaalisesti käyttämällä asennuspakettia.</translation>
+    </message>
+    <message>
+      <source>%1 will be restarted to the updated version.</source>
+      <translation>%1 käynnistetään uudelleen päivitettyyn versioon.</translation>
     </message>
     <message>
       <source>OK</source>
       <translation>OK</translation>
     </message>
     <message>
+      <source>There was an error while installing updates:</source>
+      <translation>Päivitysten asennuksessa tapahtui virhe:</translation>
+    </message>
+    <message>
       <source>Downloading updates...</source>
       <translation>Ladataan päivityksiä...</translation>
+    </message>
+    <message>
+      <source>Finish Update</source>
+      <translation>Viimeistele päivitys</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>Peruuta</translation>
+    </message>
+    <message>
+      <source>The latest version is already installed</source>
+      <translation>Viimeisin versio on jo asennettu</translation>
+    </message>
+    <message>
+      <source>This version is already installed</source>
+      <translation>Tämä versio on jo asennettu</translation>
+    </message>
+    <message>
+      <source>Install update</source>
+      <translation>Asenna päivitys</translation>
     </message>
     <message>
       <source>Upload</source>
@@ -8614,12 +8698,12 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Lataa ja asenna</translation>
     </message>
     <message>
-      <source>Select Another Build</source>
-      <translation>Valitse Toinen Versio</translation>
-    </message>
-    <message>
       <source>Browse for Another File...</source>
       <translation>Selaa toista tiedostoa...</translation>
+    </message>
+    <message>
+      <source>Select Another Build</source>
+      <translation>Valitse Toinen Versio</translation>
     </message>
     <message>
       <source>Update to Specific Build</source>
@@ -8642,6 +8726,10 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Client-sovellusta päivitetään...</translation>
     </message>
     <message>
+      <source>Starting update to ...</source>
+      <translation>Päivityksen aloittaminen ...</translation>
+    </message>
+    <message>
       <source>Updating to ...</source>
       <translation>Päivitetään ...</translation>
     </message>
@@ -8650,12 +8738,24 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Valmis päivittämään</translation>
     </message>
     <message>
-      <source>Install update</source>
-      <translation>Asenna päivitys</translation>
-    </message>
-    <message>
       <source>System updated to</source>
       <translation>Järjestelmä päivitetty</translation>
+    </message>
+    <message>
+      <source>Some servers have no update packages available.</source>
+      <translation type="unfinished">Some servers have no update packages available.</translation>
+    </message>
+    <message>
+      <source>Some servers have encountered an internal error.</source>
+      <translation type="unfinished">Some servers have encountered an internal error.</translation>
+    </message>
+    <message>
+      <source>Please contact Customer Support.</source>
+      <translation>Ota yhteyttä asiakastukeen.</translation>
+    </message>
+    <message>
+      <source>Some servers have gone offline. Please wait until they become online to continue.</source>
+      <translation>Jotkin palvelimet ovat menneet offline-tilaan. Odota, kunnes niihin voidaan muodostaa taas yhteys.</translation>
     </message>
     <message>
       <source>System update in process</source>
@@ -8664,6 +8764,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Continue in Background</source>
       <translation>Jatka taustalla</translation>
+    </message>
+    <message>
+      <source>Latest Available Update</source>
+      <translation>Viimeisin saatavilla oleva päivitys</translation>
     </message>
     <message>
       <source>Specific Build</source>
@@ -8676,109 +8780,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Update from mediaservers</source>
       <translation>Päivitä mediapalvelimista</translation>
-    </message>
-    <message>
-      <source>Latest Available Update</source>
-      <translation>Viimeisin saatavilla oleva päivitys</translation>
-    </message>
-    <message numerus="yes">
-      <source>Missing update package for the client and %n servers</source>
-      <translation>
-        <numerusform>Client-sovelluksen ja %n palvelimen päivityspaketti puuttuu</numerusform>
-        <numerusform>Client-sovelluksen ja %n palvelimen päivityspaketti puuttuu</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Missing update package for the client</source>
-      <translation>Client-sovelluksen päivityspaketti puuttuu</translation>
-    </message>
-    <message>
-      <source>Finish Update</source>
-      <translation>Viimeistele päivitys</translation>
-    </message>
-    <message>
-      <source>Cancel</source>
-      <translation>Peruuta</translation>
-    </message>
-    <message>
-      <source>The latest version is already installed</source>
-      <translation>Viimeisin versio on jo asennettu</translation>
-    </message>
-    <message>
-      <source>This version is already installed</source>
-      <translation>Tämä versio on jo asennettu</translation>
-    </message>
-    <message>
-      <source>There are no online servers to update.</source>
-      <translation>Ei yhteydessä olevia palvelimia päivitettäväksi.</translation>
-    </message>
-    <message>
-      <source>Cancel update and delete all downloaded data?</source>
-      <translation>Peruuta päivitys ja poista kaikki ladatut tiedot?</translation>
-    </message>
-    <message>
-      <source>There was an error while installing updates:</source>
-      <translation>Päivitysten asennuksessa tapahtui virhe:</translation>
-    </message>
-    <message>
-      <source>Some servers have gone offline. Please wait until they become online to continue.</source>
-      <translation>Jotkin palvelimet ovat menneet offline-tilaan. Odota, kunnes niihin voidaan muodostaa taas yhteys.</translation>
-    </message>
-    <message>
-      <source>Update completed, but some components have failed an update</source>
-      <translation>Päivitys on valmis, mutta jotkin komponentit eivät ole päivittyneet</translation>
-    </message>
-    <message>
-      <source>Please update %1 manually using an installation package.</source>
-      <translation>Päivitä %1 manuaalisesti käyttämällä asennuspakettia.</translation>
-    </message>
-    <message>
-      <source>%1 will be restarted to the updated version.</source>
-      <translation>%1 käynnistetään uudelleen päivitettyyn versioon.</translation>
-    </message>
-    <message>
-      <source>Failed to download update packages to some components</source>
-      <translation>Joidenkin komponenttien päivityspakettien lataaminen epäonnistui</translation>
-    </message>
-    <message>
-      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
-      <translation>Joidenkin komponenttien käyttöjärjestelmän versioita ei enää tueta. Poista ne järjestelmästä tai päivitä käyttöjärjestelmä tuettuun versioon.</translation>
-    </message>
-    <message>
-      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
-      <translation>Asiakkaan käyttöjärjestelmän versiota ei enää tueta. Päivitä sen käyttöjärjestelmä tuettuun versioon.</translation>
-    </message>
-    <message>
-      <source>Failed to start update</source>
-      <translation>Päivityksen käynnistäminen epäonnistui</translation>
-    </message>
-    <message>
-      <source>Starting update to ...</source>
-      <translation>Päivityksen aloittaminen ...</translation>
-    </message>
-    <message>
-      <source>Failed to cancel update</source>
-      <translation>Päivityksen peruuttaminen epäonnistui</translation>
-    </message>
-    <message>
-      <source>Failed to start installation</source>
-      <translation>Asennuksen aloittaminen epäonnistui</translation>
-    </message>
-    <message>
-      <source>Some servers have no update packages available.</source>
-      <translation type="unfinished">Some servers have no update packages available.</translation>
-    </message>
-    <message>
-      <source>Some servers have encountered an internal error.</source>
-      <translation type="unfinished">Some servers have encountered an internal error.</translation>
-    </message>
-    <message>
-      <source>Please please contact Customer Support.</source>
-      <translation type="unfinished">Please please contact Customer Support.</translation>
-    </message>
-    <message>
-      <source>Some servers have not completed the update process. Finish it anyway?</source>
-      <translation type="unfinished">Some servers have not completed the update process. Finish it anyway?</translation>
     </message>
   </context>
   <context>

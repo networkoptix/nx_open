@@ -5613,8 +5613,8 @@ to %1</source>
     <message>
       <source>Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
 If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
-      <translation type="unfinished">Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
-If you intended to move analytics data to another storage location, please contact support before proceeding.</translation>
+      <translation>Les données d'analyse actuelles ne seront pas automatiquement déplacées vers un autre emplacement et deviendront inaccessibles. Vous pouvez le conserver et le déplacer manuellement ultérieurement ou le supprimer définitivement.
+Si vous avez l'intention de déplacer les données d'analyse vers un autre emplacement de stockage, contactez le support avant de continuer.</translation>
     </message>
   </context>
   <context>
@@ -8572,6 +8572,58 @@ If you intended to move analytics data to another storage location, please conta
       <source>Some servers are offline and will not be updated. Skip them?</source>
       <translation>Certains serveurs sont hors ligne et ne seront pas mis à jour. Les ignorer?</translation>
     </message>
+    <message numerus="yes">
+      <source>Missing update package for the client and %n servers</source>
+      <translation>
+        <numerusform>Paquet de mise à jour manquant pour le client et %n serveur</numerusform>
+        <numerusform>Paquet de mise à jour manquant pour le client et %n serveurs</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Missing update package for the client</source>
+      <translation>Paquet de mise à jour manquant pour le client</translation>
+    </message>
+    <message>
+      <source>There are no online servers to update.</source>
+      <translation>Il n'y a pas de serveurs en ligne à mettre à jour.</translation>
+    </message>
+    <message>
+      <source>Cancel update and delete all downloaded data?</source>
+      <translation>Annuler la mise à jour et supprimer toutes les données téléchargées?</translation>
+    </message>
+    <message>
+      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
+      <translation>Versions d'OS de certains composants ne sont plus prises en charge. Veuillez les supprimer du système ou mettre à jour leur OS vers une version prise en charge.</translation>
+    </message>
+    <message>
+      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
+      <translation>Version OS du client n'est plus prise en charge. Veuillez mettre à jour son OS avec une version prise en charge.</translation>
+    </message>
+    <message>
+      <source>Failed to start update</source>
+      <translation>Échec du démarrage de la mise à jour</translation>
+    </message>
+    <message>
+      <source>Failed to cancel update</source>
+      <translation>Échec de l'annulation de la mise à jour</translation>
+    </message>
+    <message>
+      <source>Failed to start installation</source>
+      <translation>Échec du démarrage de l'installation</translation>
+    </message>
+    <message>
+      <source>Some servers have not completed the update process. Finish it anyway?</source>
+      <translation>Certains serveurs n'ont pas terminé le processus de mise à jour. Terminer quand même?</translation>
+    </message>
+    <message>
+      <source>%1 will be restarted to the updated version.</source>
+      <comment>Application name will be substituted</comment>
+      <translation>%1 sera redémarré à la version mise à jour.</translation>
+    </message>
+    <message>
+      <source>Failed to download update packages to some components</source>
+      <translation>Échec du téléchargement de paquets de mise à jour pour certains composants</translation>
+    </message>
     <message>
       <source>If the problem persists, please contact Customer Support.</source>
       <translation>Si le problème persiste, contactez le support client.</translation>
@@ -8589,16 +8641,48 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Mise à jour terminée</translation>
     </message>
     <message>
-      <source>Nx Witness Client will be restarted to the updated version.</source>
-      <translation>Nx Witness Client sera redémarré à la version mis à jour.</translation>
+      <source>Update completed, but some components have failed an update</source>
+      <translation>Mise à jour terminée, mais certains composants ont échoué</translation>
+    </message>
+    <message>
+      <source>Please update %1 manually using an installation package.</source>
+      <translation>Veuillez mettre à jour %1 manuellement à l’aide d’un paquet d'installation.</translation>
+    </message>
+    <message>
+      <source>%1 will be restarted to the updated version.</source>
+      <translation>%1 sera redémarré à la version mise à jour.</translation>
     </message>
     <message>
       <source>OK</source>
       <translation>OK</translation>
     </message>
     <message>
+      <source>There was an error while installing updates:</source>
+      <translation>Une erreur s'est produite lors de l'installation des mises à jour:</translation>
+    </message>
+    <message>
       <source>Downloading updates...</source>
       <translation>Téléchargement des mises à jour...</translation>
+    </message>
+    <message>
+      <source>Finish Update</source>
+      <translation>Terminer mise à jour</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>Annuler</translation>
+    </message>
+    <message>
+      <source>The latest version is already installed</source>
+      <translation>La dernière version est déjà installée</translation>
+    </message>
+    <message>
+      <source>This version is already installed</source>
+      <translation>Cette version est déjà installée</translation>
+    </message>
+    <message>
+      <source>Install update</source>
+      <translation>Installer mise à jour</translation>
     </message>
     <message>
       <source>Upload</source>
@@ -8617,12 +8701,12 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Télécharger et installer</translation>
     </message>
     <message>
-      <source>Select Another Build</source>
-      <translation>Sélectionnez une autre version</translation>
-    </message>
-    <message>
       <source>Browse for Another File...</source>
       <translation>Parcourir pour un autre fichier...</translation>
+    </message>
+    <message>
+      <source>Select Another Build</source>
+      <translation>Sélectionnez une autre version</translation>
     </message>
     <message>
       <source>Update to Specific Build</source>
@@ -8645,6 +8729,10 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Installation des mises à jour client...</translation>
     </message>
     <message>
+      <source>Starting update to ...</source>
+      <translation>Démarrage de la mise à jour à ...</translation>
+    </message>
+    <message>
       <source>Updating to ...</source>
       <translation>Mise à jour vers ...</translation>
     </message>
@@ -8653,12 +8741,24 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Prêt à mettre à jour vers</translation>
     </message>
     <message>
-      <source>Install update</source>
-      <translation>Installer mise à jour</translation>
-    </message>
-    <message>
       <source>System updated to</source>
       <translation>Système mis à jour à</translation>
+    </message>
+    <message>
+      <source>Some servers have no update packages available.</source>
+      <translation>Certains serveurs n'ont pas de paquets de mise à jour disponibles.</translation>
+    </message>
+    <message>
+      <source>Some servers have encountered an internal error.</source>
+      <translation>Certains serveurs ont rencontré une erreur interne.</translation>
+    </message>
+    <message>
+      <source>Please contact Customer Support.</source>
+      <translation>Veuillez contacter le Support Client.</translation>
+    </message>
+    <message>
+      <source>Some servers have gone offline. Please wait until they become online to continue.</source>
+      <translation>Certains serveurs sont hors ligne. S.V.P. attendez jusqu'à ce qu'ils revient en ligne pour continuer.</translation>
     </message>
     <message>
       <source>System update in process</source>
@@ -8667,6 +8767,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Continue in Background</source>
       <translation>Continuer en arrière-plan</translation>
+    </message>
+    <message>
+      <source>Latest Available Update</source>
+      <translation>Dernière mise à jour disponible</translation>
     </message>
     <message>
       <source>Specific Build</source>
@@ -8679,109 +8783,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Update from mediaservers</source>
       <translation>Mise à jour de mediaservers</translation>
-    </message>
-    <message>
-      <source>Latest Available Update</source>
-      <translation>Dernière mise à jour disponible</translation>
-    </message>
-    <message numerus="yes">
-      <source>Missing update package for the client and %n servers</source>
-      <translation>
-        <numerusform>Paquet de mise à jour manquant pour le client et %n serveur</numerusform>
-        <numerusform>Paquet de mise à jour manquant pour le client et %n serveurs</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Missing update package for the client</source>
-      <translation>Paquet de mise à jour manquant pour le client</translation>
-    </message>
-    <message>
-      <source>Finish Update</source>
-      <translation>Terminer mise à jour</translation>
-    </message>
-    <message>
-      <source>Cancel</source>
-      <translation>Annuler</translation>
-    </message>
-    <message>
-      <source>The latest version is already installed</source>
-      <translation>La dernière version est déjà installée</translation>
-    </message>
-    <message>
-      <source>This version is already installed</source>
-      <translation>Cette version est déjà installée</translation>
-    </message>
-    <message>
-      <source>There are no online servers to update.</source>
-      <translation>Il n'y a pas de serveurs en ligne à mettre à jour.</translation>
-    </message>
-    <message>
-      <source>Cancel update and delete all downloaded data?</source>
-      <translation>Annuler la mise à jour et supprimer toutes les données téléchargées?</translation>
-    </message>
-    <message>
-      <source>There was an error while installing updates:</source>
-      <translation>Une erreur s'est produite lors de l'installation des mises à jour:</translation>
-    </message>
-    <message>
-      <source>Some servers have gone offline. Please wait until they become online to continue.</source>
-      <translation>Certains serveurs sont hors ligne. S.V.P. attendez jusqu'à ce qu'ils revient en ligne pour continuer.</translation>
-    </message>
-    <message>
-      <source>Update completed, but some components have failed an update</source>
-      <translation>Mise à jour terminée, mais certains composants ont échoué</translation>
-    </message>
-    <message>
-      <source>Please update %1 manually using an installation package.</source>
-      <translation>Veuillez mettre à jour %1 manuellement à l’aide d’un paquet d'installation.</translation>
-    </message>
-    <message>
-      <source>%1 will be restarted to the updated version.</source>
-      <translation>%1 sera redémarré à la version mise à jour.</translation>
-    </message>
-    <message>
-      <source>Failed to download update packages to some components</source>
-      <translation>Échec du téléchargement de paquets de mise à jour pour certains composants</translation>
-    </message>
-    <message>
-      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
-      <translation>Versions d'OS de certains composants ne sont plus prises en charge. Veuillez les supprimer du système ou mettre à jour leur OS vers une version prise en charge.</translation>
-    </message>
-    <message>
-      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
-      <translation>Version OS du client n'est plus prise en charge. Veuillez mettre à jour son OS avec une version prise en charge.</translation>
-    </message>
-    <message>
-      <source>Failed to start update</source>
-      <translation>Échec du démarrage de la mise à jour</translation>
-    </message>
-    <message>
-      <source>Starting update to ...</source>
-      <translation>Démarrage de la mise à jour à ...</translation>
-    </message>
-    <message>
-      <source>Failed to cancel update</source>
-      <translation>Échec de l'annulation de la mise à jour</translation>
-    </message>
-    <message>
-      <source>Failed to start installation</source>
-      <translation>Échec du démarrage de l'installation</translation>
-    </message>
-    <message>
-      <source>Some servers have no update packages available.</source>
-      <translation>Certains serveurs n'ont pas de paquets de mise à jour disponibles.</translation>
-    </message>
-    <message>
-      <source>Some servers have encountered an internal error.</source>
-      <translation>Certains serveurs ont rencontré une erreur interne.</translation>
-    </message>
-    <message>
-      <source>Please please contact Customer Support.</source>
-      <translation>S.V.P. contactez le support client.</translation>
-    </message>
-    <message>
-      <source>Some servers have not completed the update process. Finish it anyway?</source>
-      <translation>Certains serveurs n'ont pas terminé le processus de mise à jour. Terminer quand même?</translation>
     </message>
   </context>
   <context>
@@ -9425,11 +9426,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Remote file &quot;%1&quot; is corrupted</source>
-      <translation type="unfinished">Remote file &quot;%1&quot; is corrupted</translation>
+      <translation>Fichier distant &quot;%1&quot; corrompu</translation>
     </message>
     <message>
       <source>Server already has this file &quot;%1&quot;</source>
-      <translation type="unfinished">Server already has this file &quot;%1&quot;</translation>
+      <translation>Le serveur a déjà ce fichier &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
@@ -9961,21 +9962,21 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Confirm storage location for the analytics data on &quot;%1&quot;</source>
-      <translation type="unfinished">Confirm storage location for the analytics data on &quot;%1&quot;</translation>
+      <translation>Confirmer l'emplacement de stockage pour les données d'analyse sur &quot;%1&quot;</translation>
     </message>
     <message>
       <source>the largest available partition</source>
-      <translation type="unfinished">the largest available partition</translation>
+      <translation>la plus grande partition disponible</translation>
     </message>
     <message>
       <source>The analytics database should only be stored on a local drive and can take up large amounts of space.
 Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
 By default analytics data will be stored on %1.
 You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</source>
-      <translation type="unfinished">The analytics database should only be stored on a local drive and can take up large amounts of space.
-Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
-By default analytics data will be stored on %1.
-You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</translation>
+      <translation>La base de données d'analyse ne doit être stockée que sur un lecteur local et peut occuper de grandes quantités d'espace.
+Une fois qu'un emplacement pour stocker des données d'analyse est sélectionné, il ne peut pas être facilement modifié sans perdre les données existantes. Nous vous recommandons de choisir l’emplacement avec soin et d’éviter d’utiliser la partition système car cela pourrait entraîner un dysfonctionnement grave du système.
+Par défaut, les données analytiques seront stockées sur %1.
+Vous pouvez sélectionner un autre emplacement de stockage dans l'onglet &quot;Sgestion de stockage&quot; de la boîte de dialogue Paramètres serveur.</translation>
     </message>
   </context>
   <context>
