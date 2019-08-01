@@ -218,7 +218,7 @@ Item
                             filterWildcard: searchEdit.query
                             filterCaseSensitivity: Qt.CaseInsensitive;
                             filterRole: 257;    // Search text role
-                            hiddenSystems: context.systemsToHide
+                            tileHideOptions: context.tileHideOptions
                         }
                     }
 

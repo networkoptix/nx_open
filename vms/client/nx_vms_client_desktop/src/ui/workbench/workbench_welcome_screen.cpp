@@ -319,9 +319,9 @@ QString QnWorkbenchWelcomeScreen::message() const
     return m_message;
 }
 
-int QnWorkbenchWelcomeScreen::systemsToHide() const
+int QnWorkbenchWelcomeScreen::tileHideOptions() const
 {
-    return ini().systemsToHide;
+    return ini().tileHideOptions;
 }
 
 bool QnWorkbenchWelcomeScreen::isAcceptableDrag(const QList<QUrl>& urls)

@@ -255,42 +255,42 @@ bool QnOrderedSystemsModel::isForgotten(const QString& id) const
 
 bool QnOrderedSystemsModel::isHidden(const QModelIndex& dataIndex) const
 {
-    if (m_systemsToHide.testFlag(Incompatible)
+    if (m_tileHideOptions.testFlag(Incompatible)
         && !dataIndex.data(QnSystemsModel::IsCompatibleVersionRoleId).toBool())
         return true;
 
-    if (m_systemsToHide.testFlag(NotConnectableCloud)
+    if (m_tileHideOptions.testFlag(NotConnectableCloud)
         && dataIndex.data(QnSystemsModel::IsCloudSystemRoleId).toBool()
         && !dataIndex.data(QnSystemsModel::IsConnectableRoleId).toBool())
         return true;
 
-    if (m_systemsToHide.testFlag(CompatibleVersion)
+    if (m_tileHideOptions.testFlag(CompatibleVersion)
         && !dataIndex.data(QnSystemsModel::CompatibleVersionRoleId).isNull())
         return true;
 
     return false;
 }
 
-void QnOrderedSystemsModel::setHiddenSystems(int flags)
+void QnOrderedSystemsModel::setTileHideOptions(int flags)
 {
-    if (m_systemsToHide == flags)
+    if (m_tileHideOptions == flags)
         return;
 
-    m_systemsToHide = None;
+    m_tileHideOptions = None;
 
     if (flags & Incompatible)
-        m_systemsToHide |= Incompatible;
+        m_tileHideOptions |= Incompatible;
     if (flags & NotConnectableCloud)
-        m_systemsToHide |= NotConnectableCloud;
+        m_tileHideOptions |= NotConnectableCloud;
     if (flags & CompatibleVersion)
-        m_systemsToHide |= CompatibleVersion;
+        m_tileHideOptions |= CompatibleVersion;
 
-    emit hiddenSystemsChanged(m_systemsToHide);
+    emit tileHideOptionsChanged(m_tileHideOptions);
 }
 
-int QnOrderedSystemsModel::hiddenSystems() const
+int QnOrderedSystemsModel::tileHideOptions() const
 {
-    return m_systemsToHide;
+    return m_tileHideOptions;
 }
 
 QString QnOrderedSystemsModel::minimalVersion() const

@@ -40,7 +40,7 @@ class QnOrderedSystemsModel: public QnSystemSortFilterListModel
 {
     Q_OBJECT
     Q_PROPERTY(QString minimalVersion READ minimalVersion WRITE setMinimalVersion NOTIFY minimalVersionChanged)
-    Q_PROPERTY(int hiddenSystems READ hiddenSystems WRITE setHiddenSystems NOTIFY hiddenSystemsChanged)
+    Q_PROPERTY(int tileHideOptions READ tileHideOptions WRITE setTileHideOptions NOTIFY tileHideOptionsChanged)
     using base_type = QnSystemSortFilterListModel;
 
 public:
@@ -65,14 +65,14 @@ public:
 
     void setMinimalVersion(const QString& minimalVersion);
 
-    void setHiddenSystems(int flags);
+    void setTileHideOptions(int flags);
 
-    int hiddenSystems() const;
+    int tileHideOptions() const;
 
 signals:
     void minimalVersionChanged();
 
-    void hiddenSystemsChanged(int);
+    void tileHideOptionsChanged(int);
 
 private:
     void handleWeightsChanged();
@@ -80,7 +80,7 @@ private:
 private:
 
     const QScopedPointer<QnSystemsModel> m_systemsModel;
-    QFlags<HiddenSystemsFlags> m_systemsToHide;
+    QFlags<HiddenSystemsFlags> m_tileHideOptions;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnOrderedSystemsModel::HiddenSystems)

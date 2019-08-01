@@ -29,7 +29,7 @@ class QnWorkbenchWelcomeScreen: public Connective<QQuickWidget>, public QnWorkbe
 
     Q_PROPERTY(QString message READ message WRITE setMessage NOTIFY messageChanged)
 
-    Q_PROPERTY(int systemsToHide READ systemsToHide CONSTANT)
+    Q_PROPERTY(int tileHideOptions READ tileHideOptions CONSTANT)
 
 public:
     QnWorkbenchWelcomeScreen(QWidget* parent = nullptr);
@@ -67,7 +67,7 @@ public: // Properties
 
     QString message() const;
 
-    int systemsToHide() const;
+    int tileHideOptions() const;
 
 public:
     void setupFactorySystem(const QString& serverUrl);
