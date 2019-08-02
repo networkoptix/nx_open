@@ -128,6 +128,7 @@ protected:
     {
         auto [result, storage] = m_addStorageResponse.pop();
         ASSERT_EQ(resultCode, result.resultCode);
+        m_addedStorages.push_back(storage);
         m_lastStorageAdded = std::move(storage);
     }
 
@@ -155,6 +156,16 @@ protected:
         const auto& buckets = m_lastBucketsListed.buckets;
         auto it = std::find(buckets.begin(), buckets.end(), expectedBucket);
         ASSERT_NE(it, buckets.end());
+    }
+
+    void andStorageServiceHasMultipleStorages()
+    {
+        for (const auto& storage : m_addedStorages)
+        {
+            readStorage(storage.id);
+            thenReadStorageSucceeds();
+            ASSERT_EQ(storage.id, m_lastStorageRead.id);
+        }
     }
 
     void andReadStorageContainsAddedStorage()
@@ -202,6 +213,7 @@ private:
     nx::utils::SyncQueue<std::pair<Result, Storage>> m_readStorageResponse;
     nx::utils::SyncQueue<Result> m_removeStorageResponse;
     Storage m_lastStorageAdded;
+    std::vector<Storage> m_addedStorages;
     Storage m_lastStorageRead;
     Storage m_lastStorageRemoved;
     service::test::S3Bucket* m_expectedBucket = nullptr;
@@ -243,6 +255,7 @@ TEST_F(StorageApi, add_multiple_storages_to_the_same_bucket)
     thenAddStorageResponseIs(ResultCode::ok);
 
     andBucketHasCloudStorageCountUpdated(2);
+    andStorageServiceHasMultipleStorages();
 }
 
 TEST_F(StorageApi, fails_to_add_storage_with_unknown_region)
