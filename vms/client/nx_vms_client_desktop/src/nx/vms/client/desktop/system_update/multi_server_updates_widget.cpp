@@ -1311,7 +1311,7 @@ void MultiServerUpdatesWidget::atFinishUpdateComplete(bool success, const QStrin
         else
         {
             NX_ERROR(this, "atFinishUpdateComplete(%1) - %2", success, error);
-            auto targets = m_stateTracker->peersIssued();
+            auto targets = m_stateTracker->peersIssued() + m_stateTracker->peersInstalling();
             setTargetState(WidgetUpdateState::installingStalled, targets);
         }
     }
