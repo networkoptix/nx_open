@@ -12,9 +12,11 @@ class MultiresourceDescriptorContainer
 public:
     using StorageFactory = StorageFactoryType;
     using MergeExecutor = MergeExecutorType;
-
     using Container = DescriptorContainer<
-        typename decltype(std::declval<StorageFactory>()(QnResourcePtr()))::element_type,
+        typename decltype(
+            std::declval<StorageFactory>()(
+                QnResourcePtr(),
+                std::function<void()>()))::element_type,
         MergeExecutor>;
 
     using DescriptorMap = typename decltype(std::declval<Container>().descriptors())::value_type;
@@ -30,16 +32,17 @@ public:
             [this]() { return mergedDescriptorsInternal(); },
             &m_mutex)
     {
+        const auto notifyWhenUpdated = [this]() { m_cachedMergedDescriptors.reset(); };
         for (auto& resource: resourceList)
         {
-            auto storage = storageFactory(resource);
+            auto storage = storageFactory(resource, notifyWhenUpdated);
             m_containers[resource->getId()] = std::make_unique<Container>(std::move(storage));
         }
 
         if (!ownResource)
             return;
 
-        auto writableStorage = storageFactory(ownResource);
+        auto writableStorage = storageFactory(ownResource, notifyWhenUpdated);
         m_ownResourceId = ownResource->getId();
         m_containers[m_ownResourceId] =
             std::make_unique<Container>(std::move(writableStorage));

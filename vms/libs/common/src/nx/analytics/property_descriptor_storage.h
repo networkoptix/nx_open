@@ -22,18 +22,27 @@ public:
         std::map,
         Scopes...,
         DescriptorType>;
-
+    using NotifyWhenUpdated = std::function<void()>;
 public:
-    PropertyDescriptorStorage(QnResourcePtr serverResource, QString propertyName):
+    PropertyDescriptorStorage(
+        QnResourcePtr serverResource,
+        QString propertyName,
+        NotifyWhenUpdated notifier)
+        :
         m_resource(std::move(serverResource)),
         m_propertyName(std::move(propertyName)),
         m_cachedContainer(
             [this]() { return fetchInternal(); },
             &m_mutex),
+        m_notifier(std::move(notifier)),
         m_helper(
             m_resource,
             m_propertyName,
-            [this]() { m_cachedContainer.reset(); })
+            [this]()
+            {
+                m_cachedContainer.reset();
+                m_notifier();
+            })
     {
     }
 
@@ -71,6 +80,7 @@ private:
     mutable QnMutex m_mutex;
     mutable CachedValue<Container> m_cachedContainer;
 
+    NotifyWhenUpdated m_notifier;
     PropertyDescriptorStorageHelper m_helper;
 };
 

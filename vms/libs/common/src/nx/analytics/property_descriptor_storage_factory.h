@@ -8,15 +8,19 @@ template<typename Descriptor, typename... Scopes>
 class PropertyDescriptorStorageFactory
 {
     using Storage = PropertyDescriptorStorage<Descriptor, Scopes...>;
+    using NotifyWhenUpdated = std::function<void()>;
 public:
     PropertyDescriptorStorageFactory(QString propertyName):
         m_propertyName(std::move(propertyName))
     {
     }
 
-    std::unique_ptr<Storage> operator()(QnResourcePtr resource) const
+    std::unique_ptr<Storage> operator()(QnResourcePtr resource, NotifyWhenUpdated notifier) const
     {
-        return std::make_unique<Storage>(std::move(resource), m_propertyName);
+        return std::make_unique<Storage>(
+            std::move(resource),
+            m_propertyName,
+            std::move(notifier));
     }
 
 private:
