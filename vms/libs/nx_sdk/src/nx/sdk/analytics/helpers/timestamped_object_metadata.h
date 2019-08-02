@@ -20,10 +20,8 @@ class TimestampedObjectMetadata: public RefCountable<ITimestampedObjectMetadata>
 public:
     TimestampedObjectMetadata();
 
-    virtual Uuid trackId() const override;
     virtual const char* subtype() const override;
     virtual int attributeCount() const override;
-    virtual Rect boundingBox() const override;
     virtual int64_t timestampUs() const override;
     virtual const char* typeId() const override;
     virtual float confidence() const override;
@@ -39,9 +37,11 @@ public:
 
 protected:
     virtual const IAttribute* getAttribute(int index) const override;
+    virtual void getTrackId(Uuid* outValue) const override;
+    virtual void getBoundingBox(Rect* outValue) const override;
 
 private:
-    nx::sdk::Ptr<nx::sdk::analytics::ObjectMetadata> m_objectMetadata;
+    const nx::sdk::Ptr<nx::sdk::analytics::ObjectMetadata> m_objectMetadata;
     int64_t m_timestampUs = 0;
 };
 

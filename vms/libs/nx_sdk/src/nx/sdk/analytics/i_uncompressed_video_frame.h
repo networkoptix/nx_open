@@ -43,11 +43,16 @@ public:
      */
     virtual int height() const = 0;
 
-    // TODO: #mshevchenko: PixelAspectRatio
     /**
      * @return Aspect ratio of a frame pixel.
      */
-    virtual PixelAspectRatio pixelAspectRatio() const = 0;
+    protected: virtual void getPixelAspectRatio(PixelAspectRatio* outValue) const = 0;
+    public: PixelAspectRatio pixelAspectRatio() const
+    {
+        PixelAspectRatio value;
+        getPixelAspectRatio(&value);
+        return value;
+    }
 
     virtual PixelFormat pixelFormat() const = 0;
 

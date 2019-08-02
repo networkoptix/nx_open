@@ -20,9 +20,9 @@ float ObjectMetadata::confidence() const
     return m_confidence;
 }
 
-Uuid ObjectMetadata::trackId() const
+void ObjectMetadata::getTrackId(Uuid* outValue) const
 {
-    return m_trackId;
+    *outValue = m_trackId;
 }
 
 const char* ObjectMetadata::subtype() const
@@ -44,9 +44,9 @@ int ObjectMetadata::attributeCount() const
     return (int) m_attributes.size();
 }
 
-Rect ObjectMetadata::boundingBox() const
+void ObjectMetadata::getBoundingBox(Rect* outValue) const
 {
-    return m_rect;
+    *outValue = m_rect;
 }
 
 void ObjectMetadata::setTypeId(std::string typeId)

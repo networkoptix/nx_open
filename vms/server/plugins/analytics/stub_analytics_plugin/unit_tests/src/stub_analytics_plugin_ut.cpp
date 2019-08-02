@@ -161,8 +161,7 @@ public:
     Action(): m_params(makePtr<StringMap>()) {}
 
     virtual const char* actionId() const override { return m_actionId.c_str(); }
-    virtual Uuid objectTrackId() const override { return m_objectTrackId; }
-    virtual Uuid deviceId() const override { return m_deviceId; }
+
     virtual int64_t timestampUs() const override { return m_timestampUs; }
 
     virtual const IStringMap* getParams() const override
@@ -217,6 +216,8 @@ public:
 
 protected:
     virtual IObjectTrackInfo* getObjectTrackInfo() const override { return nullptr; }
+    virtual void getObjectTrackId(Uuid* outValue) const override { *outValue = m_objectTrackId; }
+    virtual void getDeviceId(Uuid* outValue) const override { *outValue = m_deviceId; }
 
 public:
     std::string m_actionId;

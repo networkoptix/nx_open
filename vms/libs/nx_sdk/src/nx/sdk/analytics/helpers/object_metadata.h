@@ -22,10 +22,8 @@ class ObjectMetadata: public RefCountable<IObjectMetadata>
 public:
     virtual const char* typeId() const override;
     virtual float confidence() const override;
-    virtual Uuid trackId() const override;
     virtual const char* subtype() const override;
     virtual int attributeCount() const override;
-    virtual Rect boundingBox() const override;
 
     void setTypeId(std::string typeId);
     void setConfidence(float confidence);
@@ -37,6 +35,8 @@ public:
 
 protected:
     virtual const IAttribute* getAttribute(int index) const override;
+    virtual void getTrackId(Uuid* outValue) const override;
+    virtual void getBoundingBox(Rect* outValue) const override;
 
 private:
     std::string m_typeId;

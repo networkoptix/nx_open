@@ -5,6 +5,8 @@
 
 namespace nx::vms::server::analytics {
 
+using namespace nx::sdk;
+
 UncompressedVideoFrame::UncompressedVideoFrame(
     CLConstVideoDecoderOutputPtr clVideoDecoderOutput)
     :
@@ -177,12 +179,16 @@ int UncompressedVideoFrame::height() const
     return !assertValid(__func__) ? 0 : m_avFrame->height;
 }
 
-UncompressedVideoFrame::PixelAspectRatio UncompressedVideoFrame::pixelAspectRatio() const
+void UncompressedVideoFrame::getPixelAspectRatio(PixelAspectRatio* outValue) const
 {
     if (!assertValid(__func__))
-        return {0, 1};
+    {
+        *outValue = PixelAspectRatio{0, 1};
+        return;
+    }
 
-    return {m_avFrame->sample_aspect_ratio.num, m_avFrame->sample_aspect_ratio.den};
+    *outValue =
+        PixelAspectRatio{m_avFrame->sample_aspect_ratio.num, m_avFrame->sample_aspect_ratio.den};
 }
 
 UncompressedVideoFrame::PixelFormat UncompressedVideoFrame::pixelFormat() const

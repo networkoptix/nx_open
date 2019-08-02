@@ -25,13 +25,13 @@ public:
     /** Id of the action being triggered. */
     virtual const char* actionId() const = 0;
 
-    // TODO: #mshevchenko: Uuid
     /** Id of an object track for which the action has been triggered. */
-    virtual Uuid objectTrackId() const = 0;
+    protected: virtual void getObjectTrackId(Uuid* outValue) const = 0;
+    public: Uuid objectTrackId() const { Uuid value; getObjectTrackId(&value); return value; }
 
-    // TODO: #mshevchenko: Uuid
     /** Id of a device from which the action has been triggered. */
-    virtual Uuid deviceId() const = 0;
+    protected: virtual void getDeviceId(Uuid* outValue) const = 0;
+    public: Uuid deviceId() const { Uuid value; getDeviceId(&value); return value; }
 
     /** Info about an object track this action has been triggered for. */
     protected: virtual IObjectTrackInfo* getObjectTrackInfo() const = 0;

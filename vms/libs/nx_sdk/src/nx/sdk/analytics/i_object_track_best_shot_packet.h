@@ -28,16 +28,16 @@ public:
      */
     virtual int64_t timestampUs() const override = 0;
 
-    // TODO: #mshevchenko: Uuid
     /** Id of the track the best shot belongs to. */
-    virtual Uuid trackId() const = 0;
+    protected: virtual void getTrackId(Uuid* outValue) const = 0;
+    public: Uuid trackId() const { Uuid value; getTrackId(&value); return value; }
 
-    // TODO: #mshevchenko: Rect
     /**
      * Bounding box of the best shot. If the rectangle returned by this method is invalid then
      * a bounding box from the frame with the timestamp equal to the timestampUs() will be used.
      */
-    virtual Rect boundingBox() const = 0;
+    protected: virtual void getBoundingBox(Rect* outValue) const = 0;
+    public: Rect boundingBox() const { Rect value; getBoundingBox(&value); return value; }
 };
 
 } // namespace analytics

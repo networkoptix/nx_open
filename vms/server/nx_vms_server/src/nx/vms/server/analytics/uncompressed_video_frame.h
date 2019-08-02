@@ -51,12 +51,14 @@ public:
     virtual int64_t timestampUs() const override;
     virtual int width() const override;
     virtual int height() const override;
-    virtual PixelAspectRatio pixelAspectRatio() const override;
     virtual PixelFormat pixelFormat() const override;
     virtual int planeCount() const override;
     virtual int dataSize(int plane) const override;
     virtual const char* data(int plane) const override;
     virtual int lineSize(int plane) const override;
+
+protected:
+    virtual void getPixelAspectRatio(PixelAspectRatio* outValue) const override;
 
 private:
     void acceptAvFrame(const AVFrame* avFrame);

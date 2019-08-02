@@ -17,11 +17,11 @@ class ObjectTrackBestShotPacket: public RefCountable<IObjectTrackBestShotPacket>
 public:
     ObjectTrackBestShotPacket(Uuid trackId, int64_t timestampUs, Rect boundingBox = Rect());
 
-    virtual Uuid trackId() const override;
-
     virtual int64_t timestampUs() const override;
 
-    virtual Rect boundingBox() const override;
+protected:
+    virtual void getTrackId(Uuid* outValue) const override;
+    virtual void getBoundingBox(Rect* outValue) const override;
 
 private:
     Uuid m_trackId;
