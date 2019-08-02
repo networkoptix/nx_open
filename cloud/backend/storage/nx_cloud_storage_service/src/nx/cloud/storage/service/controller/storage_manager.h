@@ -75,6 +75,16 @@ private:
 
     std::optional<nx::geo_ip::Location> resolveLocation(const std::string& ipAddress);
 
+    void insertReceivedRecord(
+        nx::sql::QueryContext* queryContext,
+        const std::string& /*clusterId*/,
+        clusterdb::engine::Command<api::Storage> command);
+
+    void removeReceivedRecord(
+        nx::sql::QueryContext* queryContext,
+        const std::string& /*clusterId*/,
+        clusterdb::engine::Command<std::string> command);
+
 private:
     struct AddStorageContext
     {

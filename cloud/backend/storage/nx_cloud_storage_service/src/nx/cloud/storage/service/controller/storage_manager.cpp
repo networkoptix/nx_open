@@ -68,6 +68,21 @@ StorageManager::StorageManager(
     m_bucketManager(bucketManager),
     m_geoIpResolver(GeoIpResolverFactory::instance().create(settings))
 {
+    m_database->synchronizationEngine()->incomingCommandDispatcher()
+        .registerCommandHandler<command::SaveStorage>(
+            [this](auto&& ... args)
+            {
+                insertReceivedRecord(std::forward<decltype(args)>(args)...);
+                return nx::sql::DBResult::ok;
+            });
+
+    m_database->synchronizationEngine()->incomingCommandDispatcher()
+        .registerCommandHandler<command::RemoveStorage>(
+            [this](auto&& ... args)
+            {
+                removeReceivedRecord(std::forward<decltype(args)>(args)...);
+                return nx::sql::DBResult::ok;
+            });
 }
 
 StorageManager::~StorageManager() = default;
@@ -206,7 +221,11 @@ nx::sql::DBResult StorageManager::addStorageInternal(
 {
     m_storageDao->addStorage(queryContext, storage);
 
-    // TODO add sync commands
+    m_database->synchronizationEngine()->transactionLog()
+        .generateTransactionAndSaveToLog<command::SaveStorage>(
+            queryContext,
+            m_settings.database().synchronization.clusterId,
+            storage);
 
     return nx::sql::DBResult::ok;
 }
@@ -221,7 +240,11 @@ std::optional<api::Storage> StorageManager::removeStorageInternal(
 
     m_storageDao->removeStorage(queryContext, storageId);
 
-    // TODO add sync commands
+    m_database->synchronizationEngine()->transactionLog()
+        .generateTransactionAndSaveToLog<command::RemoveStorage>(
+            queryContext,
+            m_settings.database().synchronization.clusterId,
+            storageId);
 
     return storage;
 }
@@ -301,6 +324,22 @@ std::optional<nx::geo_ip::Location> StorageManager::resolveLocation(const std::s
     }
 
     return std::nullopt;
+}
+
+void StorageManager::insertReceivedRecord(
+    nx::sql::QueryContext* queryContext,
+    const std::string& /*clusterId*/,
+    clusterdb::engine::Command<api::Storage> command)
+{
+    m_storageDao->addStorage(queryContext, command.params);
+}
+
+void StorageManager::removeReceivedRecord(
+    nx::sql::QueryContext* queryContext,
+    const std::string& /*clusterId*/,
+    clusterdb::engine::Command<std::string> command)
+{
+    m_storageDao->removeStorage(queryContext, command.params);
 }
 
 } // namespace nx::cloud::storage::service::controller

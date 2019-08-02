@@ -33,6 +33,6 @@ struct NX_NETWORK_API Storage
 
 #define Storage_Fields (id)(region)(totalSpace)(freeSpace)(ioDevice)
 
-QN_FUSION_DECLARE_FUNCTIONS(Storage, (json), NX_NETWORK_API)
+QN_FUSION_DECLARE_FUNCTIONS(Storage, (ubjson)(json), NX_NETWORK_API)
 
 } // namespace nx::cloud::storage::service::api

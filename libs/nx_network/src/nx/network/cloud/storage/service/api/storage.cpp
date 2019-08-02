@@ -6,7 +6,7 @@ namespace nx::cloud::storage::service::api {
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (Device)(Storage),
-    (json),
+    (ubjson)(json),
     _Fields)
 
 bool Device::operator==(const Device& other) const
