@@ -207,14 +207,12 @@ void QnWorkbenchContext::setMainWindow(MainWindow* mainWindow)
 
 nx::core::Watermark QnWorkbenchContext::watermark() const
 {
-    if (ini().enableWatermark)
+    if (globalSettings()->watermarkSettings().useWatermark
+        && !accessController()->hasGlobalPermission(nx::vms::api::GlobalPermission::admin)
+        && user()
+        && !user()->getName().isEmpty())
     {
-        if (globalSettings()->watermarkSettings().useWatermark
-            && !accessController()->hasGlobalPermission(nx::vms::api::GlobalPermission::admin)
-            && user() && !user()->getName().isEmpty())
-        {
-            return {globalSettings()->watermarkSettings(), user()->getName()};
-        }
+        return {globalSettings()->watermarkSettings(), user()->getName()};
     }
     return {};
 }

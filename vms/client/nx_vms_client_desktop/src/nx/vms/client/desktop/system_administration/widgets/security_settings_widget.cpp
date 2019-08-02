@@ -104,15 +104,6 @@ SecuritySettingsWidget::SecuritySettingsWidget(QWidget* parent):
         &SecuritySettingsWidget::loadDataToUi);
     connect(qnGlobalSettings, &QnGlobalSettings::sessionTimeoutChanged, this,
         &SecuritySettingsWidget::loadDataToUi);
-
-    if (!ini().enableWatermark)
-    {
-        ui->watermarkSettingsButton->hide();
-        ui->displayWatermarkCheckBox->hide();
-    }
-
-    if (!ini().enableSessionTimeout)
-        ui->limitSessionLengthWidget->hide();
 }
 
 SecuritySettingsWidget::~SecuritySettingsWidget()

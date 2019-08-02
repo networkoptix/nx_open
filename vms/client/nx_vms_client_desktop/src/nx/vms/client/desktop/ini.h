@@ -104,16 +104,8 @@ struct Ini: nx::kit::IniConfig
         "timeline.\n"
         "\n"
         "Is currently used for demo purposes only (does not work in some specific scenarios).");
-    NX_INI_FLAG(1, enableWatermark,
-        "Enables watermarks preview and setup.");
-    NX_INI_FLAG(1, enableCaseExport,
-        "Enables case export.");
-    NX_INI_FLAG(1, enableSessionTimeout,
-        "Enables admin-configurable absolute session timeout.");
     NX_INI_STRING("press", passwordPreviewActivationMode,
         "Specifies one of password preview activation modes: \"press\", \"hover\" or \"toggle\".");
-    NX_INI_FLAG(1, redesignedTimeSynchronization,
-        "Enables redesigned time synchronization widget in the System Adminstration dialog.");
     NX_INI_FLAG(1, automaticFilterByTimelineSelection,
         "Allows to automatically switch Right Panel time selection to \"Selected on Timeline\"\n"
         "mode when such selection exists.");

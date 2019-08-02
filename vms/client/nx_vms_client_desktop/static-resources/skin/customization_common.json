@@ -814,20 +814,6 @@
         ]
     },
 
-    "QnTimeServerSelectionModel": {
-        "colors": [
-            "light12",
-            "#acac87",
-            "#c6b15c",
-            "#e0b730",
-            "yellow_core",
-            "#f8990f",
-            "#f67419",
-            "#f35022",
-            "red_l2"
-        ]
-    },
-
     "nx::vms::client::desktop::FisheyeCalibrationWidget": {
         "palette": { "default": { "window": "dark4" } }
     },
