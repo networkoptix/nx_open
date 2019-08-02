@@ -48,6 +48,7 @@
 #include <nx/client/core/utils/human_readable.h>
 #include <nx/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/common/utils/item_view_hover_tracker.h>
 #include <nx/vms/client/desktop/common/delegates/switch_item_delegate.h>
 #include <nx/analytics/utils.h>
@@ -140,9 +141,17 @@ namespace
             if (!index.sibling(index.row(), QnStorageListModel::CheckBoxColumn).data(Qt::CheckStateRole).toBool())
                 opt.state &= ~QStyle::State_Enabled;
 
-            // Set proper color for actions when they are hovered.
-            if (hasActiveAction && hovered)
-                opt.palette.setColor(QPalette::Text, opt.palette.color(QPalette::ButtonText));
+            // Set proper color for action text buttons.
+            if (index.column() == QnStorageListModel::ActionsColumn)
+            {
+                if (hasActiveAction && hovered)
+                    opt.palette.setColor(QPalette::Text, ColorTheme::instance()->color("light14"));
+                else if (hasActiveAction)
+                    opt.palette.setColor(QPalette::Text, opt.palette.color(QPalette::WindowText));
+                else // Either hidden (has no text) or selected, we can use 'Selected' style for both.
+                    opt.palette.setColor(QPalette::Text, opt.palette.color(QPalette::Light));
+            }
+
 
             /* Set warning color for inaccessible storages: */
             if (index.column() == QnStorageListModel::StoragePoolColumn && !storage.isOnline)
