@@ -2044,8 +2044,8 @@ to view more bookmarks</source>
         <translation></translation>
     </message>
     <message>
-        <source>Force Acknowledgement will only work for Generic Events if camera modifiers are used in the Generic Event URL</source>
-        <translation></translation>
+        <source>Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
