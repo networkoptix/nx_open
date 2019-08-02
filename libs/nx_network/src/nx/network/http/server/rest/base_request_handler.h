@@ -1,6 +1,7 @@
 #pragma once
 
 #include <nx/network/http/server/abstract_fusion_request_handler.h>
+#include <nx/network/socket_common.h>
 
 namespace nx::network::http::server::rest {
 
@@ -14,6 +15,18 @@ public:
         const network::http::RequestContext& requestContext) const
     {
         return requestContext.requestPathParams.getByName(name);
+    }
+};
+
+class ClientEndpointFetcher
+{
+public:
+    using type = network::SocketAddress;
+
+    network::SocketAddress operator()(
+        const network::http::RequestContext& requestContext) const
+    {
+        return requestContext.connection->clientEndpoint();
     }
 };
 
