@@ -2,7 +2,7 @@
 
 namespace nx::cloud::storage::service::api::test {
 
-namespace {
+namespace{
 
 class CloudDBAuthenticationForwarderStub:
     public network::http::server::AbstractAuthenticationManager
@@ -57,6 +57,12 @@ protected:
         base_type::SetUp();
     }
 
+    void givenMultipleAddedBuckets()
+    {
+        m_expectedBucket = givenAddedBucket("us-east-1"); // <North America
+        givenAddedBucket("eu-west-1"); //< Europe
+    }
+
     void givenAddedStorage()
     {
         whenAddStorageWithRegion();
@@ -65,9 +71,22 @@ protected:
         andBucketHasCloudStorageCountUpdated(1);
     }
 
-    void whenAddStorageWithRegion(int storageSize = 1000)
+    void whenAddStorageWithRegion()
     {
-        addStorage({storageSize, m_lastBucketCreated->location()});
+        addStorage({1000, m_lastBucketCreated->location()});
+    }
+
+    void whenAddStorageWithoutRegion()
+    {
+        using namespace nx::geo_ip;
+        m_geoIpResolver->add("127.0.0.1", Location(Continent::northAmerica));
+
+        addStorage({1000, {}});
+    }
+
+    void whenAddStorageWithInvalidSize()
+    {
+        addStorage({0, m_lastBucketCreated->location()});
     }
 
     void whenAddStorageWithUnknownRegion()
@@ -142,6 +161,11 @@ protected:
         ASSERT_EQ(ResultCode::notFound, result.resultCode);
     }
 
+    void andBucketChosenForStorageIsClosestToClient()
+    {
+        ASSERT_EQ(m_expectedBucket->url(), m_lastStorageAdded.ioDevice.dataUrl);
+    }
+
 private:
     void readStorage(const std::string& storageId)
     {
@@ -171,13 +195,13 @@ private:
     Storage m_lastStorageRead;
     Storage m_lastStorageRemoved;
     int m_lastCloudStorageCount = 0;
+    service::test::S3Bucket* m_expectedBucket = nullptr;
 
     nx::utils::SyncQueue<bool> m_cloudDbAuthenticationEvent;
     view::http::CloudDbAuthenticationFactory::Function m_cloudDBAuthenticationFactoryFuncBak;
 };
 
-
-TEST_F(StorageApi, add_storage)
+TEST_F(StorageApi, add_storage_by_region)
 {
     givenAddedBucket();
 
@@ -187,6 +211,17 @@ TEST_F(StorageApi, add_storage)
     thenAddStorageResponseIs(ResultCode::ok);
 
     andBucketHasCloudStorageCountUpdated(1);
+}
+
+TEST_F(StorageApi, add_storage_by_client_location)
+{
+    givenMultipleAddedBuckets();
+
+    whenAddStorageWithoutRegion();
+
+    thenAddStorageResponseIs(ResultCode::ok);
+
+    andBucketChosenForStorageIsClosestToClient();
 }
 
 TEST_F(StorageApi, fails_to_add_storage_with_unknown_region)
@@ -201,7 +236,7 @@ TEST_F(StorageApi, rejects_add_storage_with_invalid_storage_size)
 {
     givenAddedBucket();
 
-    whenAddStorageWithRegion(0);
+    whenAddStorageWithInvalidSize();
 
     thenAddStorageResponseIs(ResultCode::badRequest);
 }

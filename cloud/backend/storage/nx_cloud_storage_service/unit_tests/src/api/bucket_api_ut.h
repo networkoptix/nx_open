@@ -25,7 +25,7 @@ protected:
     virtual void SetUp() override;
 
     void givenExistingBucket();
-    void givenAddedBucket();
+    service::test::S3Bucket* givenAddedBucket(std::string region = {});
     void whenAddBucket(std::string bucketName = {});
     void whenAddUnknownBucket();
     void whenListBuckets();
@@ -38,10 +38,11 @@ protected:
     void andBucketIsNotInService();
 
 private:
-    service::test::S3Bucket* createBucket();
+    service::test::S3Bucket* createBucket(std::string location = {});
     void addBucket(const AddBucketRequest& request);
 
 protected:
+    nx::geo_ip::test::MemoryResolver* m_geoIpResolver = nullptr;
     std::unique_ptr<Client> m_cloudStorageClient;
     service::test::S3Bucket* m_lastBucketCreated = nullptr;
     std::unique_ptr<service::test::CloudStorageLauncher> m_cloudStorage;

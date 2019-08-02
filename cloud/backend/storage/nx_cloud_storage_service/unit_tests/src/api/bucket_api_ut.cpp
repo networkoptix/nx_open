@@ -15,9 +15,11 @@ void BucketApi::SetUp()
 {
     m_geoIpFactoryFuncBak =
         controller::GeoIpResolverFactory::instance().setCustomFunc(
-            [](auto&& ... /*args*/)
+            [this](auto&& ... /*args*/)
             {
-                return std::make_unique<nx::geo_ip::test::MemoryResolver>();
+                auto resolver = std::make_unique<nx::geo_ip::test::MemoryResolver>();
+                m_geoIpResolver = resolver.get();
+                return resolver;
             });
 
     m_credentials.username = nx::utils::generateRandomName(7);
@@ -37,12 +39,13 @@ void BucketApi::givenExistingBucket()
     createBucket();
 }
 
-void BucketApi::givenAddedBucket()
+service::test::S3Bucket* BucketApi::givenAddedBucket(std::string region)
 {
-    givenExistingBucket();
+    auto bucket = createBucket(region);
     whenAddBucket();
     thenAddBucketResponseIs(ResultCode::ok);
     andAddedBucketMatchesExpectedBucket();
+    return bucket;
 }
 
 void BucketApi::whenAddBucket(std::string bucketName)
@@ -128,11 +131,14 @@ void BucketApi::andBucketIsNotInService()
 }
 
 
-service::test::S3Bucket* BucketApi::createBucket()
+service::test::S3Bucket* BucketApi::createBucket(std::string location)
 {
+    if (location.empty())
+        location = aws::test::randomS3Location();
+
     std::string bucketName = lm("bucket-%1").arg(m_buckets.size()).toStdString();
     m_buckets[bucketName] =
-        std::make_unique<service::test::S3Bucket>(bucketName, aws::test::randomS3Location());
+        std::make_unique<service::test::S3Bucket>(bucketName, location);
 
     m_buckets[bucketName]->enableAthentication(std::regex(".*"), m_credentials);
 

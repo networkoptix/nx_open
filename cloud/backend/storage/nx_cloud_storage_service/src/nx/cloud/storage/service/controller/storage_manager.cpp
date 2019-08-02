@@ -21,6 +21,7 @@ static api::Result badRequest(QString message)
 }
 
 static const std::map<std::string, nx::geo_ip::Geopoint> kAwsGeopoints = {
+    {"us-east-1", {39, -78}},
     {"us-east-2", {40, -83}},
     {"us-west-2", {44, -121}},
     {"us-west-1", {37, -121}},
