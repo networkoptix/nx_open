@@ -42,7 +42,7 @@ void BucketApi::givenExistingBucket()
 service::test::S3Bucket* BucketApi::givenAddedBucket(std::string region)
 {
     auto bucket = createBucket(region);
-    whenAddBucket();
+    whenAddBucket(bucket->name());
     thenAddBucketResponseIs(ResultCode::ok);
     andAddedBucketMatchesExpectedBucket();
     return bucket;

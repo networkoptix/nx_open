@@ -9,11 +9,12 @@ struct NX_NETWORK_API Device
 {
     std::string type;
     nx::utils::Url dataUrl;
+    std::string region;
 
     bool operator==(const Device& other) const;
 };
 
-#define Device_Fields (type)(dataUrl)
+#define Device_Fields (type)(dataUrl)(region)
 
 QN_FUSION_DECLARE_FUNCTIONS(Device, (json), NX_NETWORK_API)
 
@@ -23,15 +24,14 @@ QN_FUSION_DECLARE_FUNCTIONS(Device, (json), NX_NETWORK_API)
 struct NX_NETWORK_API Storage
 {
     std::string id;
-    std::string region;
     int totalSpace = 0;
     int freeSpace = 0;
-    Device ioDevice;
+    std::vector<Device> ioDevices;
 
     bool operator==(const Storage& other) const;
 };
 
-#define Storage_Fields (id)(region)(totalSpace)(freeSpace)(ioDevice)
+#define Storage_Fields (id)(totalSpace)(freeSpace)(ioDevices)
 
 QN_FUSION_DECLARE_FUNCTIONS(Storage, (ubjson)(json), NX_NETWORK_API)
 

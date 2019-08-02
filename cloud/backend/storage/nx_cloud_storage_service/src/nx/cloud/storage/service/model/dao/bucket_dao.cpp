@@ -15,6 +15,7 @@ static constexpr char kStorageCount[] = "storage_count";
 static constexpr char kNameBinding[] = ":name";
 static constexpr char kRegionBinding[] = ":region";
 static constexpr char kUrlBinding[] = ":url";
+static constexpr char kBucketNameBinding[] = ":bucket_name";
 
 static constexpr char kAddBucket[] = R"sql(
 
@@ -37,7 +38,11 @@ DELETE FROM buckets WHERE name=:name
 
 static constexpr char kCountStorages[] = R"sql(
 
-SELECT COUNT(id) AS storage_count FROM storages WHERE url=:url
+SELECT COUNT(storage_id) AS storage_count
+FROM
+    storage_bucket_relation
+WHERE
+    bucket_name=:bucket_name
 
 )sql";
 
@@ -56,14 +61,15 @@ static std::vector<api::Bucket> toVector(nx::sql::AbstractSqlQuery* query)
     return buckets;
 }
 
-static void updateStorageCount(nx::sql::QueryContext* queryContext, api::Bucket* outBucket)
+static int getStorageCount(
+    nx::sql::QueryContext* queryContext,
+    const std::string& bucketName)
 {
     auto query = queryContext->connection()->createQuery();
     query->prepare(kCountStorages);
-    query->bindValue(kUrlBinding, service::utils::bucketUrl(outBucket->name).toString());
+    query->bindValue(kBucketNameBinding, bucketName);
     query->exec();
-    if (query->next())
-        outBucket->cloudStorageCount = query->value(kStorageCount).toInt();
+    return  query->next() ? query->value(kStorageCount).toInt() : -1;
 }
 
 } // namespace
@@ -91,7 +97,7 @@ std::vector<api::Bucket> BucketDao::fetchBuckets(
     if (withStorageCount)
     {
         for (auto& bucket : buckets)
-            updateStorageCount(queryContext, &bucket);
+            bucket.cloudStorageCount = getStorageCount(queryContext, bucket.name);
     }
 
     return buckets;

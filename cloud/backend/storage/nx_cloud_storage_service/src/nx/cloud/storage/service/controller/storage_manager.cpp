@@ -1,6 +1,7 @@
 #include "storage_manager.h"
 
 #include <nx/network/socket_common.h>
+#include <nx/network/url/url_builder.h>
 
 #include "nx/cloud/storage/service/settings.h"
 #include "nx/cloud/storage/service/utils.h"
@@ -47,12 +48,19 @@ static const std::map<std::string, nx::geo_ip::Geopoint> kAwsGeopoints = {
 
 } // namespace
 
-StorageManager::AddStorageContext::AddStorageContext(const api::AddStorageRequest& request)
+void StorageManager::AddStorageContext::initializeStorage(
+    const api::Bucket& bucket,
+    const api::AddStorageRequest& request)
 {
-    storage.id = QnUuid::createUuid().toSimpleString().toStdString();
-    storage.ioDevice.type = kStorageType;
-    storage.totalSpace = request.totalSpace;
-    storage.freeSpace = request.totalSpace;
+    storage = api::Storage{};
+    storage->id = QnUuid::createUuid().toSimpleString().toStdString();
+    storage->totalSpace = request.totalSpace;
+    storage->freeSpace = request.totalSpace;
+    storage->ioDevices.emplace_back(api::Device{});
+    storage->ioDevices.back().type = kStorageType;
+    storage->ioDevices.back().dataUrl =
+        network::url::Builder(service::utils::bucketUrl(bucket.name)).setPath(storage->id);
+    storage->ioDevices.back().region = bucket.region;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -100,7 +108,7 @@ void StorageManager::addStorage(
             api::Storage{});
     }
 
-    auto addStorageContext = std::make_shared<AddStorageContext>(request);
+    auto addStorageContext = std::make_shared<AddStorageContext>();
 
     m_database->synchronizationEngine()->transactionLog().startDbTransaction(
         m_settings.database().synchronization.clusterId,
@@ -112,14 +120,13 @@ void StorageManager::addStorage(
                 ? findClosestBucket(buckets, clientEndpoint)
                 : findBucketByRegion(buckets, request.region);
 
-            addStorageContext->result = std::move(result);
-            if (addStorageContext->result.resultCode != api::ResultCode::ok)
+            addStorageContext->bucketLookupResult = std::move(result);
+            if (addStorageContext->bucketLookupResult.resultCode != api::ResultCode::ok)
                 return nx::sql::DBResult::ok;
 
-            addStorageContext->storage.region = bucket.region;
-            addStorageContext->storage.ioDevice.dataUrl = service::utils::bucketUrl(bucket.name);
+            addStorageContext->initializeStorage(bucket, request);
 
-            return addStorageInternal(queryContext, addStorageContext->storage);
+            return addStorageInternal(queryContext, *addStorageContext->storage);
         },
         [this, handler = std::move(handler), addStorageContext](auto dbResult)
         {
@@ -132,10 +139,10 @@ void StorageManager::addStorage(
                 return handler(std::move(error), api::Storage{});
             }
 
-            if (addStorageContext->result.resultCode != api::ResultCode::ok)
-                return handler(std::move(addStorageContext->result), api::Storage{});
+            if (addStorageContext->bucketLookupResult.resultCode != api::ResultCode::ok)
+                return handler(std::move(addStorageContext->bucketLookupResult), api::Storage{});
 
-            handler(api::Result(), std::move(addStorageContext->storage));
+            handler(api::Result(), std::move(*addStorageContext->storage));
         });
 }
 
@@ -169,7 +176,9 @@ void StorageManager::readStorage(
             if (!*storage)
                 return handler(api::Result(api::ResultCode::notFound), api::Storage{});
 
-            (*storage)->ioDevice.type = kStorageType;
+            // TODO where to information about storage type?
+            for (auto& device: (*storage)->ioDevices)
+                device.type = kStorageType;
 
             handler(api::Result(), std::move(**storage));
         });

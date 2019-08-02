@@ -12,16 +12,16 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
 bool Device::operator==(const Device& other) const
 {
     return type == other.type
-        && dataUrl == other.dataUrl;
+        && dataUrl == other.dataUrl
+        && region == other.region;
 }
 
 bool Storage::operator==(const Storage& other) const
 {
     return id == other.id
-        && region == other.region
         && totalSpace == other.totalSpace
         && freeSpace == other.freeSpace
-        && ioDevice == other.ioDevice;
+        && ioDevices == other.ioDevices;
 }
 
 } // namespace nx::cloud::storage::service::api

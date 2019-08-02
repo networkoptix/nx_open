@@ -15,6 +15,9 @@ class AbstractStorageDao
 public:
     virtual ~AbstractStorageDao() = default;
 
+    /**
+     * NOTE: Throws exception if storage.ioDevices does not contain at least one entry
+     */
     virtual void addStorage(
         nx::sql::QueryContext* queryContext,
         const api::Storage& storage) = 0;
@@ -46,6 +49,19 @@ public:
     virtual void removeStorage(
         nx::sql::QueryContext* queryContext,
         const std::string& storageId) override;
+
+private:
+    void addStorageBucketRelation(
+        nx::sql::QueryContext* queryContext,
+        const api::Storage& storage);
+
+    std::vector<api::Device> getStorageDevices(
+        nx::sql::QueryContext* queryContext,
+        const std::string& storageId);
+
+    void removeStorageBucketRelations(
+        nx::sql::QueryContext* queryContext,
+        const std::string& storageId);
 };
 
 //-------------------------------------------------------------------------------------------------

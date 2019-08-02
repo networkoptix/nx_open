@@ -1,5 +1,7 @@
 #include "bucket_api_ut.h"
 
+#include <nx/network/url/url_builder.h>
+
 namespace nx::cloud::storage::service::api::test {
 
 namespace{
@@ -74,6 +76,12 @@ protected:
     void whenAddStorageWithRegion()
     {
         addStorage({1000, m_lastBucketCreated->location()});
+    }
+
+    void whenAddMultipleStorages(int count = 2)
+    {
+        for (int i = 0; i < count; ++i)
+            whenAddStorageWithRegion();
     }
 
     void whenAddStorageWithoutRegion()
@@ -163,7 +171,9 @@ protected:
 
     void andBucketChosenForStorageIsClosestToClient()
     {
-        ASSERT_EQ(m_expectedBucket->url(), m_lastStorageAdded.ioDevice.dataUrl);
+        ASSERT_EQ(
+            m_expectedBucket->url(),
+            network::url::Builder(m_lastStorageAdded.ioDevices.back().dataUrl).setPath({}));
     }
 
 private:
@@ -221,6 +231,18 @@ TEST_F(StorageApi, add_storage_by_client_location)
     thenAddStorageResponseIs(ResultCode::ok);
 
     andBucketChosenForStorageIsClosestToClient();
+}
+
+TEST_F(StorageApi, add_multiple_storages_to_the_same_bucket)
+{
+    givenAddedBucket();
+
+    whenAddMultipleStorages(2);
+
+    thenRequestIsForwardedToCloudDb();
+    thenAddStorageResponseIs(ResultCode::ok);
+
+    andBucketHasCloudStorageCountUpdated(2);
 }
 
 TEST_F(StorageApi, fails_to_add_storage_with_unknown_region)

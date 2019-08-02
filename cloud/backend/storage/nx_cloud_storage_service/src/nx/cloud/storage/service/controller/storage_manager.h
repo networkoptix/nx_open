@@ -88,10 +88,12 @@ private:
 private:
     struct AddStorageContext
     {
-        api::Result result;
-        api::Storage storage;
+        api::Result bucketLookupResult;
+        std::optional<api::Storage> storage;
 
-        AddStorageContext(const api::AddStorageRequest& request);
+        void initializeStorage(
+            const api::Bucket& bucket,
+            const api::AddStorageRequest& request);
     };
 
 private:

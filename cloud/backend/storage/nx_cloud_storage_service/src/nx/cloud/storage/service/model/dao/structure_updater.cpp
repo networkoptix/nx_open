@@ -12,19 +12,27 @@ constexpr char kCreateTables[] = R"sql(
 
 CREATE TABLE buckets(
     name    VARCHAR(256) PRIMARY KEY,
-    region  VARCHAR(256) NOT NULL
+    region  VARCHAR(128) NOT NULL
 );
 
 CREATE TABLE storages(
     id VARCHAR(256) PRIMARY KEY,
-    total_space INT NOT NULL,
-    region VARCHAR(256) NOT NULL,
-    url TEXT NOT NULL
+    total_space INT NOT NULL
 );
+
+CREATE TABLE storage_bucket_relation(
+    url TEXT PRIMARY KEY,
+    storage_id VARCHAR(256) NOT NULL,
+    bucket_name VARCHAR(256) NOT NULL,
+    region VARCHAR(128) NOT NULL
+);
+
+CREATE INDEX idx_storage_id ON `storage_bucket_relation`(storage_id);
+CREATE INDEX idx_bucket_name ON `storage_bucket_relation`(bucket_name);
 
 )sql";
 
-// NOTE: folders table exists to handle storage merging. when two storages are merged
+// NOTE: storage_bucket_relation exists to handle storage merging.
 
 } // namespace
 
