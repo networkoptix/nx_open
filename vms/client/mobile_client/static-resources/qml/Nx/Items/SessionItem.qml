@@ -190,7 +190,7 @@ Pane
                     hostsModelAccessor.defaultAddress,
                     cloudStatusWatcher.credentials.user,
                     cloudStatusWatcher.credentials.password,
-                    true)
+                    systemName, true)
             }
         }
         else
@@ -203,7 +203,7 @@ Pane
                         hostsModelAccessor.defaultAddress,
                         authenticationDataModel.defaultCredentials.user,
                         authenticationDataModel.defaultCredentials.password,
-                        false)
+                        systemName, false)
                 }
                 else
                 {

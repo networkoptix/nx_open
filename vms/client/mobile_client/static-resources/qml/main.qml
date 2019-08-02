@@ -76,7 +76,33 @@ ApplicationWindow
         onWidthChanged: autoScrollDelayTimer.restart()
         onHeightChanged: autoScrollDelayTimer.restart()
 
-        Component.onCompleted: ConnectionController.stackView = this
+        Component.onCompleted:
+        {
+            ConnectionController.stackView = this
+
+            if (autoLoginEnabled)
+            {
+                var url = getInitialUrl()
+                var systemName = ""
+
+                if (url.isEmpty())
+                {
+                    url = getLastUsedUrl()
+                    systemName = getLastUsedSystemName()
+                }
+
+                if (!url.isEmpty())
+                {
+                    ConnectionController.connectToServerByUrl(url, systemName)
+                    return
+                }
+            }
+
+            Workflow.openSessionsScreen()
+
+            if (initialTest)
+                Workflow.startTest(initialTest)
+        }
     }
 
     UiController {}
@@ -98,29 +124,6 @@ ApplicationWindow
     {
         updateCustomMargins()
         androidBarPositionWorkaround.tryUpdateBarPosition()
-
-        if (autoLoginEnabled)
-        {
-            var url = getInitialUrl()
-            var systemName = ""
-
-            if (url.isEmpty())
-            {
-                url = getLastUsedUrl()
-                systemName = getLastUsedSystemName()
-            }
-
-            if (!url.isEmpty())
-            {
-                ConnectionController.connectToServerByUrl(url)
-                return
-            }
-        }
-
-        Workflow.openSessionsScreen()
-
-        if (initialTest)
-            Workflow.startTest(initialTest)
     }
 
     Connections

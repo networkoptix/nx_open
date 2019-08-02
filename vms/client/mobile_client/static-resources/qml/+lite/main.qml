@@ -58,7 +58,7 @@ ApplicationWindow
 
             if (!url.isEmpty())
             {
-                ConnectionController.connectToServerByUrl(url)
+                ConnectionController.connectToServerByUrl(url, systemName)
                 return
             }
         }

@@ -178,7 +178,7 @@ Page
         connectButton.forceActiveFocus()
 
         ConnectionController.connectByUserInput(
-            address, login, password,
+            address, login, password, systemName,
             handleConnectionFailed,
             handleConnected)
     }

@@ -19,31 +19,28 @@ Object
 
     property StackView stackView
 
-    function connectToServerByUrl(url)
+    function connectToServerByUrl(url, forcedSystemName)
     {
-        console.log(">>>>>>>>>>>>>>>>> CONNECT BY URL")
-        d.showConnectionPreloader()
+        d.showConnectionPreloader(forcedSystemName)
         connectionManager.connectToServer(url,
             function(state, result, extraInfo)
             {
-                d.connectionCallback(state, result, extraInfo)
+                d.connectionCallback(state, result, extraInfo, forcedSystemName)
             })
-
     }
 
-    function connectToServerByParams(address, user, password, cloudConnection)
+    function connectToServerByParams(address, user, password, forcedSystemName, cloudConnection)
     {
-        console.log(">>>>>>>>>>>>>>>>> CONNECT BY PARAMS")
-        d.showConnectionPreloader()
+        d.showConnectionPreloader(forcedSystemName)
         connectionManager.connectToServer(address, user, password, cloudConnection,
             function(state, result, extraInfo)
             {
-                d.connectionCallback(state, result, extraInfo)
+                d.connectionCallback(state, result, extraInfo, forcedSystemName)
             })
     }
 
     function connectByUserInput(
-        url, user, password,
+        url, user, password, forcedSystemName,
         failedCallback,
         connectedCallback)
     {
@@ -51,7 +48,7 @@ Object
             function(state, result, extraInfo)
             {
                 d.connectionCallback(
-                    state, result, extraInfo, failedCallback, connectedCallback)
+                    state, result, extraInfo, forcedSystemName, failedCallback, connectedCallback)
             })
     }
 
@@ -77,7 +74,7 @@ Object
         }
 
         function connectionCallback(
-            state, result, extraInfo, failedCallback, connectedCallback)
+            state, result, extraInfo, forcedSystemName, failedCallback, connectedCallback)
         {
             switch (state)
             {
@@ -92,20 +89,22 @@ Object
                     break
 
                 case QnConnectionManager.Connected: //< Connected and loading resources now.
-                    showConnectionPreloader()
+                    showConnectionPreloader(forcedSystemName)
                     if (connectedCallback)
                         connectedCallback()
                     break
             }
         }
 
-        function showConnectionPreloader()
+        function showConnectionPreloader(forcedSystemName)
         {
-            if (!stackView)
+            var currentItem = stackView ? stackView.currentItem : undefined
+            if (currentItem && currentItem.objectName === "resourcesScreen")
                 return
 
-            if (!stackView.currentItem || stackView.currentItem.objectName !== "resourcesScreen")
-                Workflow.openResourcesScreen(connectionManager.systemName)
+            Workflow.openResourcesScreen(forcedSystemName
+                ? forcedSystemName
+                : connectionManager.systemName)
         }
     }
 }
