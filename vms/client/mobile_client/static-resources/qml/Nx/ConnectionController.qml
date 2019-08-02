@@ -22,10 +22,11 @@ Object
     function connectToServerByUrl(url)
     {
         console.log(">>>>>>>>>>>>>>>>> CONNECT BY URL")
+        d.showConnectionPreloader()
         connectionManager.connectToServer(url,
             function(state, result, extraInfo)
             {
-                d.connectionCallback(state, result, extraInfo, true)
+                d.connectionCallback(state, result, extraInfo)
             })
 
     }
@@ -33,6 +34,7 @@ Object
     function connectToServerByParams(address, user, password, cloudConnection)
     {
         console.log(">>>>>>>>>>>>>>>>> CONNECT BY PARAMS")
+        d.showConnectionPreloader()
         connectionManager.connectToServer(address, user, password, cloudConnection,
             function(state, result, extraInfo)
             {
@@ -45,12 +47,11 @@ Object
         failedCallback,
         connectedCallback)
     {
-        console.log(">>>>>>>>>>>>>>>>> CONNECT BY USER INPUT")
         connectionManager.connectByUserInput(url, user, password,
             function(state, result, extraInfo)
             {
                 d.connectionCallback(
-                    state, result, extraInfo, false, failedCallback, connectedCallback)
+                    state, result, extraInfo, failedCallback, connectedCallback)
             })
     }
 
@@ -76,29 +77,21 @@ Object
         }
 
         function connectionCallback(
-            state, result, extraInfo, showPreloader, failedCallback, connectedCallback)
+            state, result, extraInfo, failedCallback, connectedCallback)
         {
             switch (state)
             {
                 case QnConnectionManager.Disconnected: //< Connection failed.
-                    console.log(">>> DISCONNECTED")
-                    if (stackView.depth > 1)
-                        stackView.pop(stackView.currentItem)
-                    else
+                    if (!failedCallback || stackView.depth <= 1)
                         Workflow.openSessionsScreenWithWarning(connectionManager.systemName)
+                    else
+                        stackView.pop(stackView.currentItem)
 
                     if (failedCallback)
                         failedCallback(result, extraInfo)
                     break
 
-                case QnConnectionManager.Connecting:
-                    console.log(">>> CONNECTING")
-                    if (showPreloader || !stackView.depth)
-                        showConnectionPreloader()
-                    break
-
                 case QnConnectionManager.Connected: //< Connected and loading resources now.
-                    console.log(">>> CONNECTED")
                     showConnectionPreloader()
                     if (connectedCallback)
                         connectedCallback()
@@ -108,6 +101,9 @@ Object
 
         function showConnectionPreloader()
         {
+            if (!stackView)
+                return
+
             if (!stackView.currentItem || stackView.currentItem.objectName !== "resourcesScreen")
                 Workflow.openResourcesScreen(connectionManager.systemName)
         }
