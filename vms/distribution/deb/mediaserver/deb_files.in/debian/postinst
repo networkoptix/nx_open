@@ -37,7 +37,7 @@ WITH_ROOT_TOOL='@withRootTool@'
 
 # Acquire the runtime type (real, docker, chroot and so on) and store its name to the variable
 # named outputVariableName.
-getRuntimeType() #< outputVariableName
+getRuntimeType() # outputVariableName
 {
     local -r outputVariableName="$1"; shift
     local -r runtime=$(systemd-detect-virt)
