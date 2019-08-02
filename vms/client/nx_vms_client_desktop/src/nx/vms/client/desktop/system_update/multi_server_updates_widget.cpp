@@ -124,11 +124,6 @@ QTableView* injectResourceList(
     return resourceList;
 }
 
-auto kMediaServerFilter = [](const QnMediaServerResourcePtr& server) -> bool
-    {
-        return helpers::serverBelongsToCurrentSystem(server);
-    };
-
 } // anonymous namespace
 
 namespace nx::vms::client::desktop
@@ -161,7 +156,12 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
 
     m_updatesModel = m_serverUpdateTool->getModel();
     m_stateTracker = m_serverUpdateTool->getStateTracker();
-    m_stateTracker->setResourceFeed(resourcePool(), kMediaServerFilter);
+    m_stateTracker->setServerFilter(
+        [](const QnMediaServerResourcePtr& server) -> bool
+        {
+            return helpers::serverBelongsToCurrentSystem(server);
+        });
+    m_stateTracker->setResourceFeed(resourcePool());
 
     QFont versionLabelFont;
     versionLabelFont.setPixelSize(kVersionLabelFontSizePixels);
@@ -336,7 +336,7 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
                 m_stateTracker->setResourceFeed(nullptr);
                 return;
             }
-            else if (m_stateTracker && m_stateTracker->setResourceFeed(resourcePool(), kMediaServerFilter))
+            else if (m_stateTracker && m_stateTracker->setResourceFeed(resourcePool()))
             {
                 // We will be here when we connected to another system.
                 // We should run update check again. This should fix VMS-13037.

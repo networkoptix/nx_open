@@ -24,6 +24,8 @@ template<class Type> bool compareAndSet(const Type& from, Type& to)
     return true;
 }
 
+const auto kDebugSampleUuid = QnUuid("cccccccc-cccc-cccc-cccc-cccccccccccc");
+
 } // anonymous namespace
 
 namespace nx::vms::client::desktop {
@@ -43,8 +45,12 @@ PeerStateTracker::PeerStateTracker(QObject* parent):
     }
 }
 
-bool PeerStateTracker::setResourceFeed(QnResourcePool* pool,
-    std::function<bool (const QnMediaServerResourcePtr&)> filter)
+void PeerStateTracker::setServerFilter(ServerFilter filter)
+{
+    m_serverFilter = filter;
+}
+
+bool PeerStateTracker::setResourceFeed(QnResourcePool* pool)
 {
     QObject::disconnect(m_onAddedResource);
     QObject::disconnect(m_onRemovedResource);
@@ -72,7 +78,6 @@ bool PeerStateTracker::setResourceFeed(QnResourcePool* pool,
     }
 
     m_resourcePool = pool;
-    m_serverFilter = filter;
 
     NX_DEBUG(this, "setResourceFeed() attaching to resource pool.");
 
@@ -135,7 +140,7 @@ QnUuid PeerStateTracker::getClientPeerId(QnCommonModule* commonModule) const
 {
     // This ID is much more easy to distinguish.
     if (ini().massSystemUpdateDebugInfo)
-        return QnUuid("cccccccc-cccc-cccc-cccc-cccccccccccc");
+        return kDebugSampleUuid;
     NX_ASSERT(commonModule);
     return commonModule->globalSettings()->localSystemId();
 }
