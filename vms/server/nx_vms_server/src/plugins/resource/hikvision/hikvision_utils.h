@@ -192,7 +192,7 @@ bool doRequest(
 bool tuneHttpClient(nx::network::http::HttpClient* outHttpClient, const QAuthenticator& auth);
 
 // Hikvision channel number is in range [1..N]
-QString buildChannelNumber(Qn::ConnectionRole role, int hikvisionChannelNumber);
+QString buildChannelNumber(Qn::ConnectionRole role, int streamApiChannel);
 
 bool codecSupported(AVCodecID codecId, const ChannelCapabilities& channelCapabilities);
 

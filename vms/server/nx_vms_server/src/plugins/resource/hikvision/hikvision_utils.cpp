@@ -523,9 +523,9 @@ bool tuneHttpClient(nx::network::http::HttpClient* outHttpClient, const QAuthent
     return true;
 }
 
-QString buildChannelNumber(Qn::ConnectionRole role, int hikvisionChannelNumber)
+QString buildChannelNumber(Qn::ConnectionRole role, int streamApiChannel)
 {
-    auto channel = QString::number(hikvisionChannelNumber);
+    auto channel = QString::number(streamApiChannel);
     auto streamNumber = role == Qn::ConnectionRole::CR_LiveVideo
         ? kPrimaryStreamNumber
         : kSecondaryStreamNumber;

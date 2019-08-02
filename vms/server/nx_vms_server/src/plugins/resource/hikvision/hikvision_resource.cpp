@@ -198,7 +198,7 @@ CameraDiagnostics::Result HikvisionResource::fetchChannelCapabilities(
 {
     auto url = nx::utils::Url(getUrl());
     url.setPath(kCapabilitiesRequestPathTemplate.arg(
-        buildChannelNumber(role, hikvisionChannelNumber())));
+        buildChannelNumber(role, streamApiChannel())));
 
     nx::Buffer response;
     nx::network::http::StatusCode::Value statusCode;
@@ -386,7 +386,7 @@ CameraDiagnostics::Result HikvisionResource::fetchChannelCount(bool /*limitedByE
     return base_type::fetchChannelCount(/*limitedByEncoders*/ false);
 }
 
-int HikvisionResource::hikvisionChannelNumber() const
+int HikvisionResource::streamApiChannel() const
 {
     if (resourceData().value<bool>(lit("extractHikvisionChannelFromVideoSource"), false))
     {
