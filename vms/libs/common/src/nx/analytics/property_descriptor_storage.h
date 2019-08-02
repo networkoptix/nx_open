@@ -4,6 +4,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/data_structures/map_helper.h>
 #include <core/resource/resource.h>
+#include <utils/common/value_cache.h>
 
 #include <nx/fusion/model_functions.h>
 
@@ -26,46 +27,19 @@ public:
     PropertyDescriptorStorage(QnResourcePtr serverResource, QString propertyName):
         m_resource(std::move(serverResource)),
         m_propertyName(std::move(propertyName)),
+        m_cachedContainer(
+            [this]() { return fetchInternal(); },
+            &m_mutex),
         m_helper(
             m_resource,
             m_propertyName,
-            [this]()
-            {
-                QnMutexLocker lock(&m_mutex);
-                m_cached = false;
-                m_signalHasBeenCaught = true;
-            })
+            [this]() { m_cachedContainer.reset(); })
     {
     }
 
     Container fetch() const
     {
-        {
-            QnMutexLocker lock(&m_mutex);
-            if (m_cached)
-                return m_cachedContainer;
-
-            m_signalHasBeenCaught = false;
-        }
-
-        const auto serialized = m_resource->getProperty(m_propertyName);
-        if (serialized.isEmpty())
-            return Container();
-
-        if (!QJson::deserialize(serialized, &m_cachedContainer))
-        {
-            NX_WARNING(this, "Unable to deserialize descriptor container from: %1", serialized);
-            return Container();
-        }
-
-        {
-            QnMutexLocker lock(&m_mutex);
-            if (!m_signalHasBeenCaught)
-                m_cached = true;
-
-            m_signalHasBeenCaught = false;
-        }
-        return m_cachedContainer;
+        return m_cachedContainer.get();
     }
 
     void save(const Container& container)
@@ -77,14 +51,27 @@ public:
     }
 
 private:
+    Container fetchInternal() const
+    {
+        const auto serialized = m_resource->getProperty(m_propertyName);
+        if (serialized.isEmpty())
+            return Container();
+
+        Container container;
+        if (!QJson::deserialize(serialized, &container))
+            NX_WARNING(this, "Unable to deserialize descriptor container from: %1", serialized);
+
+        return container;
+    }
+
+private:
     const QnResourcePtr m_resource;
     const QString m_propertyName;
-    PropertyDescriptorStorageHelper m_helper;
 
     mutable QnMutex m_mutex;
-    mutable bool m_cached = false;
-    mutable bool m_signalHasBeenCaught = false;
-    mutable Container m_cachedContainer;
+    mutable CachedValue<Container> m_cachedContainer;
+
+    PropertyDescriptorStorageHelper m_helper;
 };
 
 } // namespace nx::analytics
