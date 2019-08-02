@@ -220,6 +220,30 @@ TEST_F(UpdateVerificationTest, packagesForSystemSupportTest)
     removeAllServers();
 }
 
+TEST_F(UpdateVerificationTest, regularUpdateWithoutErrors)
+{
+    nx::update::UpdateContents contents;
+    contents.sourceType = nx::update::UpdateSourceType::internetSpecific;
+    ASSERT_TRUE(QJson::deserialize<nx::update::Information>(packageRawData, &contents.info));
+    ASSERT_FALSE(contents.isEmpty());
+    EXPECT_EQ(contents.getVersion(), Version("4.0.0.28524"));
+    VerificationOptions options;
+
+    // Update to 4.0.0.28524
+    // client = 4.0.0.28523
+    // server1 = 4.0.0.28523
+    ClientVerificationData clientData = makeClientData(Version("4.0.0.28523"));
+    makeServer(Version("4.0.0.28523"));
+
+    // Expecting that both client and server should be updatedm without any verification errors.
+    verifyUpdateContents(contents, getAllServers(), clientData, options);
+    EXPECT_EQ(contents.error, nx::update::InformationError::noError);
+    EXPECT_TRUE(contents.needClientUpdate);
+    EXPECT_TRUE(contents.clientPackage.isValid());
+    EXPECT_EQ(contents.peersWithUpdate.size(), 2);
+}
+
+
 TEST_F(UpdateVerificationTest, bestVariantVersionSelection)
 {
     const auto& info = QJson::deserialized<nx::update::Information>(
