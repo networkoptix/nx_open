@@ -22,9 +22,9 @@ Engine::Engine(nx::sdk::analytics::Plugin* plugin):
 {
 }
 
-MutableDeviceAgentResult Engine::obtainDeviceAgent(const IDeviceInfo* deviceInfo)
+void Engine::doObtainDeviceAgent(Result<IDeviceAgent*>* outResult, const IDeviceInfo* deviceInfo)
 {
-    return new DeviceAgent(this, deviceInfo);
+    *outResult = new DeviceAgent(this, deviceInfo);
 }
 
 std::string Engine::manifestString() const

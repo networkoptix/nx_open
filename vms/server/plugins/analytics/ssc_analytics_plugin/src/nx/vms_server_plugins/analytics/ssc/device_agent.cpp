@@ -85,9 +85,9 @@ void DeviceAgent::stopFetchingMetadata()
     m_engine->unregisterCamera(m_cameraLogicalId);
 }
 
-StringResult DeviceAgent::manifest() const
+void DeviceAgent::getManifest(Result<const IString*>* outResult) const
 {
-    return new nx::sdk::String(m_deviceAgentManifest);
+    *outResult = new nx::sdk::String(m_deviceAgentManifest);
 }
 
 void DeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
@@ -96,31 +96,32 @@ void DeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
     m_handler.reset(handler);
 }
 
-Result<void> DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes)
+void DeviceAgent::doSetNeededMetadataTypes(
+    Result<void>* outResult, const IMetadataTypes* neededMetadataTypes)
 {
-    const auto eventTypeIds = metadataTypes->eventTypeIds();
+    const auto eventTypeIds = neededMetadataTypes->eventTypeIds();
     if (const char* const kMessage = "Event type id list is nullptr";
         !NX_ASSERT(eventTypeIds, kMessage))
     {
-        return error(ErrorCode::internalError, kMessage);
+        *outResult = error(ErrorCode::internalError, kMessage);
+        return;
     }
 
     if (eventTypeIds->count() == 0)
         stopFetchingMetadata();
 
-    startFetchingMetadata(metadataTypes);
-    return {};
+    startFetchingMetadata(neededMetadataTypes);
 }
 
-StringMapResult DeviceAgent::setSettings(const IStringMap* /*settings*/)
+void DeviceAgent::doSetSettings(
+    Result<const IStringMap*>* /*outResult*/, const IStringMap* /*settings*/)
 {
     // There are no DeviceAgent settings for this plugin.
-    return nullptr;
 }
 
-SettingsResponseResult DeviceAgent::pluginSideSettings() const
+void DeviceAgent::getPluginSideSettings(
+    Result<const ISettingsResponse*>* /*outResult*/) const
 {
-    return nullptr;
 }
 
 } // namespace ssc

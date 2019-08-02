@@ -175,7 +175,7 @@ std::string DeviceAgent::manifestString() const
 )json";
 }
 
-StringMapResult DeviceAgent::settingsReceived()
+Result<const IStringMap*> DeviceAgent::settingsReceived()
 {
     parseSettings();
     updateObjectGenerationParameters();
@@ -258,13 +258,13 @@ bool DeviceAgent::pullMetadataPackets(std::vector<IMetadataPacket*>* metadataPac
     return true;
 }
 
-Result<void> DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes)
+void DeviceAgent::doSetNeededMetadataTypes(
+    Result<void>* /*outResult*/, const IMetadataTypes* neededMetadataTypes)
 {
-    if (metadataTypes->isEmpty())
+    if (neededMetadataTypes->isEmpty())
         stopFetchingMetadata();
 
-    startFetchingMetadata(metadataTypes);
-    return {};
+    startFetchingMetadata(neededMetadataTypes);
 }
 
 void DeviceAgent::startFetchingMetadata(const IMetadataTypes* /*metadataTypes*/)
@@ -338,12 +338,13 @@ void DeviceAgent::processPluginDiagnosticEvents()
     }
 }
 
-SettingsResponseResult DeviceAgent::pluginSideSettings() const
+void DeviceAgent::getPluginSideSettings(
+    Result<const ISettingsResponse*>* outResult) const
 {
-    auto response = new SettingsResponse();
+    const auto response = new SettingsResponse();
     response->setValue("pluginSideTestSpinBox", "100");
 
-    return response;
+    *outResult = response;
 }
 
 //-------------------------------------------------------------------------------------------------

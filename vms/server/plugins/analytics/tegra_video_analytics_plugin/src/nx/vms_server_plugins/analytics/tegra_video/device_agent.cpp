@@ -71,10 +71,10 @@ DeviceAgent::~DeviceAgent()
     NX_OUTPUT << __func__ << "(" << this << ") END";
 }
 
-Result<void> DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* /*metadataTypes*/)
+void DeviceAgent::doSetNeededMetadataTypes(
+    Result<void>* /*outResult*/, const IMetadataTypes* /*neededMetadataTypes*/)
 {
     NX_OUTPUT << __func__ << "() has been called";
-    return {};
 }
 
 std::string DeviceAgent::manifestString() const

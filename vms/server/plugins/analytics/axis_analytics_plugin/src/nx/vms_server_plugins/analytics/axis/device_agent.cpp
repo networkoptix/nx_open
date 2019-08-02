@@ -47,24 +47,25 @@ void DeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
     m_handler.reset(handler);
 }
 
-Result<void> DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes)
+void DeviceAgent::doSetNeededMetadataTypes(
+    Result<void>* outResult, const IMetadataTypes* neededMetadataTypes)
 {
-    const auto neededEventTypeIds = metadataTypes->eventTypeIds();
+    const auto neededEventTypeIds = neededMetadataTypes->eventTypeIds();
     if (!neededEventTypeIds || !neededEventTypeIds->count())
         stopFetchingMetadata();
 
-    return startFetchingMetadata(metadataTypes);
+    *outResult = startFetchingMetadata(neededMetadataTypes);
 }
 
-nx::sdk::StringMapResult DeviceAgent::setSettings(const IStringMap* /*settings*/)
+void DeviceAgent::doSetSettings(
+    Result<const IStringMap*>* /*outResult*/, const IStringMap* /*settings*/)
 {
     // There are no DeviceAgent settings for this plugin.
-    return nullptr;
 }
 
-SettingsResponseResult DeviceAgent::pluginSideSettings() const
+void DeviceAgent::getPluginSideSettings(
+    Result<const ISettingsResponse*>* /*outResult*/) const
 {
-    return nullptr;
 }
 
 Result<void> DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTypes)
@@ -79,12 +80,12 @@ void DeviceAgent::stopFetchingMetadata()
     m_monitor = nullptr;
 }
 
-StringResult DeviceAgent::manifest() const
+void DeviceAgent::getManifest(Result<const IString*>* outResult) const
 {
     if (m_jsonManifest.isEmpty())
-        return error(ErrorCode::internalError, "DeviceAgent manifest is empty");
-
-    return new nx::sdk::String(m_jsonManifest);
+        *outResult = error(ErrorCode::internalError, "DeviceAgent manifest is empty");
+    else
+        *outResult = new nx::sdk::String(m_jsonManifest);
 }
 
 const EventType* DeviceAgent::eventTypeById(const QString& id) const noexcept

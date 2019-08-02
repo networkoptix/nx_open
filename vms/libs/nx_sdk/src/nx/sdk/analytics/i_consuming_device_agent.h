@@ -25,7 +25,13 @@ public:
      *
      * @param dataPacket Never null. Has a valid timestamp >= 0.
      */
-    virtual Result<void> pushDataPacket(IDataPacket* dataPacket) = 0;
+    protected: virtual void doPushDataPacket(Result<void>* outResult, IDataPacket* dataPacket) = 0;
+    public: Result<void> pushDataPacket(IDataPacket* dataPacket)
+    {
+        Result<void> result;
+        doPushDataPacket(&result, dataPacket);
+        return result;
+    }
 };
 
 } // namespace analytics

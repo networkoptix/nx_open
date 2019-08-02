@@ -1,7 +1,6 @@
 #pragma once
 
 #include <nx/sdk/analytics/helpers/engine.h>
-#include <nx/sdk/analytics/helpers/result_aliases.h>
 
 namespace nx { namespace sdk { namespace analytics { class Plugin; }}}
 
@@ -15,10 +14,11 @@ class Engine: public nx::sdk::analytics::Engine
 public:
     Engine(nx::sdk::analytics::Plugin* plugin);
 
-    virtual nx::sdk::analytics::MutableDeviceAgentResult obtainDeviceAgent(
+protected:
+    virtual void doObtainDeviceAgent(
+        nx::sdk::Result<nx::sdk::analytics::IDeviceAgent*>* outResult,
         const nx::sdk::IDeviceInfo* deviceInfo) override;
 
-protected:
     virtual std::string manifestString() const override;
 
 private:

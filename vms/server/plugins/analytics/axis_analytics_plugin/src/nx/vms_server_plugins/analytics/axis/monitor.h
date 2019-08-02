@@ -12,7 +12,6 @@
 #include <nx/network/http/http_async_client.h>
 #include <nx/network/http/test_http_server.h>
 #include <nx/utils/elapsed_timer_thread_safe.h>
-#include <nx/sdk/analytics/helpers/result_aliases.h>
 
 #include "common.h"
 

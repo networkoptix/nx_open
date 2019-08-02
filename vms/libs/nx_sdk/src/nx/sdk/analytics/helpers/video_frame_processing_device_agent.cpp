@@ -71,14 +71,16 @@ void VideoFrameProcessingDeviceAgent::setHandler(IDeviceAgent::IHandler* handler
     m_handler.reset(handler);
 }
 
-Result<void> VideoFrameProcessingDeviceAgent::pushDataPacket(IDataPacket* dataPacket)
+void VideoFrameProcessingDeviceAgent::doPushDataPacket(
+    Result<void>* outResult, IDataPacket* dataPacket)
 {
     const auto logError =
-        [this, func = __func__](ErrorCode errorCode, const std::string& message)
+        [this, outResult, func = __func__](ErrorCode errorCode, const std::string& message)
         {
             NX_PRINT << func << "() " << ((NX_DEBUG_ENABLE_OUTPUT) ? "END " : "") << "-> "
                 << errorCode << ": " << message;
-            return error(errorCode, message);
+            *outResult = error(errorCode, message);
+            return;
         };
 
     NX_OUTPUT << __func__ << "() BEGIN";
@@ -117,7 +119,6 @@ Result<void> VideoFrameProcessingDeviceAgent::pushDataPacket(IDataPacket* dataPa
     processMetadataPackets(metadataPackets);
 
     NX_OUTPUT << __func__ << "() END";
-    return {};
 }
 
 void VideoFrameProcessingDeviceAgent::processMetadataPackets(
@@ -159,23 +160,23 @@ void VideoFrameProcessingDeviceAgent::processMetadataPacket(
     m_handler->handleMetadata(metadataPacket);
 }
 
-StringResult VideoFrameProcessingDeviceAgent::manifest() const
+void VideoFrameProcessingDeviceAgent::getManifest(Result<const IString*>* outResult) const
 {
-    return new String(manifestString());
+    *outResult = new String(manifestString());
 }
 
-StringMapResult VideoFrameProcessingDeviceAgent::setSettings(
-    const IStringMap* settings)
+void VideoFrameProcessingDeviceAgent::doSetSettings(
+    Result<const IStringMap*>* outResult, const IStringMap* settings)
 {
     if (!logUtils.convertAndOutputStringMap(&m_settings, settings, "Received settings"))
-        return error(ErrorCode::invalidParams, "Settings are invalid");
-
-    return settingsReceived();
+        *outResult = error(ErrorCode::invalidParams, "Settings are invalid");
+    else
+        *outResult = settingsReceived();
 }
 
-SettingsResponseResult VideoFrameProcessingDeviceAgent::pluginSideSettings() const
+void VideoFrameProcessingDeviceAgent::getPluginSideSettings(
+    Result<const ISettingsResponse*>* /*outResult*/) const
 {
-    return nullptr;
 }
 
 //-------------------------------------------------------------------------------------------------

@@ -10,7 +10,6 @@
 #include <nx/sdk/helpers/ref_countable.h>
 #include <nx/sdk/helpers/log_utils.h>
 #include <nx/sdk/ptr.h>
-#include <nx/sdk/helpers/result_aliases.h>
 
 #include <nx/sdk/analytics/i_engine.h>
 #include <nx/sdk/analytics/i_consuming_device_agent.h>
@@ -104,7 +103,7 @@ protected:
      * Should perform any required (re)initialization. Called even if the settings model is empty.
      * @return Error messages per setting (if any), as in IDeviceAgent::setSettings().
      */
-    virtual StringMapResult settingsReceived() { return nullptr; }
+    virtual nx::sdk::Result<const nx::sdk::IStringMap*> settingsReceived() { return nullptr; }
 
     /**
      * Provides access to the DeviceAgent settings stored by the Server for the particular Device.
@@ -125,10 +124,13 @@ public:
 
 public:
     virtual void setHandler(IHandler* handler) override;
-    virtual Result<void> pushDataPacket(IDataPacket* dataPacket) override;
-    virtual StringResult manifest() const override;
-    virtual StringMapResult setSettings(const IStringMap* settings) override;
-    virtual SettingsResponseResult pluginSideSettings() const override;
+    
+protected:
+    virtual void doPushDataPacket(Result<void>* outResult, IDataPacket* dataPacket) override;
+    virtual void doSetSettings(
+        Result<const IStringMap*>* outResult, const IStringMap* settings) override;
+    virtual void getPluginSideSettings(Result<const ISettingsResponse*>* outResult) const override;
+    virtual void getManifest(Result<const IString*>* outResult) const override;
 
 private:
     void logMetadataPacketIfNeeded(

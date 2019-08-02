@@ -29,6 +29,8 @@
 
 using namespace nx::vms::server;
 using namespace nx::analytics::db;
+using namespace nx::sdk;
+using namespace nx::sdk::analytics;
 
 template<typename T>
 using ResultHolder = nx::vms::server::sdk_support::ResultHolder<T>;
@@ -37,11 +39,11 @@ namespace {
 
 const QString kBestShotAttribute("nx.sys.preview.timestampUs");
 
-nx::sdk::Ptr<nx::sdk::analytics::IObjectTrackInfo> makeObjectTrackInfo(
+Ptr<IObjectTrackInfo> makeObjectTrackInfo(
     const ExtendedAnalyticsActionData& actionData)
 {
     using namespace nx::vms::server::sdk_support;
-    auto objectTrackInfo = nx::sdk::makePtr<nx::sdk::analytics::ObjectTrackInfo>();
+    const auto objectTrackInfo = makePtr<ObjectTrackInfo>();
 
     if (actionData.objectTrack)
     {
@@ -66,10 +68,9 @@ nx::sdk::Ptr<nx::sdk::analytics::IObjectTrackInfo> makeObjectTrackInfo(
 
     if (actionData.bestShotVideoFrame)
     {
-        nx::sdk::Ptr<nx::sdk::analytics::IUncompressedVideoFrame> bestShotVideoFrame =
-            createUncompressedVideoFrame(
-                actionData.bestShotVideoFrame,
-                actionData.actionTypeDescriptor.requirements.bestShotVideoFramePixelFormat);
+        const Ptr<IUncompressedVideoFrame> bestShotVideoFrame = createUncompressedVideoFrame(
+            actionData.bestShotVideoFrame,
+            actionData.actionTypeDescriptor.requirements.bestShotVideoFramePixelFormat);
 
         if (!bestShotVideoFrame)
             return nullptr;
@@ -80,7 +81,7 @@ nx::sdk::Ptr<nx::sdk::analytics::IObjectTrackInfo> makeObjectTrackInfo(
     return objectTrackInfo;
 }
 
-class Action: public nx::sdk::RefCountable<nx::sdk::analytics::IAction>
+class Action: public RefCountable<IAction>
 {
 public:
     Action(const ExtendedAnalyticsActionData& actionData, AnalyticsActionResult* actionResult):
@@ -98,10 +99,6 @@ public:
 
     virtual const char* actionId() const override { return m_actionId.c_str(); }
 
-    virtual nx::sdk::Uuid objectTrackId() const override { return m_objectTrackId; }
-
-    virtual nx::sdk::Uuid deviceId() const override { return m_deviceId; }
-
     virtual int64_t timestampUs() const
     {
         return m_timestampUs;
@@ -114,7 +111,11 @@ public:
     }
 
 protected:
-    virtual nx::sdk::analytics::IObjectTrackInfo* getObjectTrackInfo() const override
+    virtual void getObjectTrackId(Uuid* outValue) const override { *outValue = m_objectTrackId; }
+
+    virtual void getDeviceId(Uuid* outValue) const override { *outValue = m_deviceId; }
+
+    virtual IObjectTrackInfo* getObjectTrackInfo() const override
     {
         if (!m_objectTrackInfo)
             return nullptr;
@@ -123,22 +124,22 @@ protected:
         return m_objectTrackInfo.get();
     }
 
-    virtual const nx::sdk::IStringMap* getParams() const override
+    virtual const IStringMap* getParams() const override
     {
         m_params->addRef();
         return m_params.get();
     }
 
 private:
-    std::string m_actionId;
-    nx::sdk::Uuid m_objectTrackId;
-    nx::sdk::Uuid m_deviceId;
-    int64_t m_timestampUs;
+    const std::string m_actionId;
+    const Uuid m_objectTrackId;
+    const Uuid m_deviceId;
+    const int64_t m_timestampUs;
 
-    nx::sdk::Ptr<nx::sdk::analytics::IObjectTrackInfo> m_objectTrackInfo;
-    const nx::sdk::Ptr<nx::sdk::IStringMap> m_params;
+    const Ptr<IObjectTrackInfo> m_objectTrackInfo;
+    const Ptr<const IStringMap> m_params;
 
-    AnalyticsActionResult* m_actionResult = nullptr;
+    AnalyticsActionResult* const m_actionResult;
 };
 
 } // namespace
@@ -235,7 +236,7 @@ QString QnExecuteAnalyticsActionRestHandler::checkInputParameters(
 {
     using namespace nx::vms::server;
 
-    auto makeErrorMessage =
+    const auto makeErrorMessage =
         [](const QString& missingField)
         {
             return lm("Missing required field '%1'").args(missingField);
@@ -390,7 +391,7 @@ QString QnExecuteAnalyticsActionRestHandler::executeAction(
     if (!NX_ASSERT(actionData.engine, kNoEngineToExecuteActionMessage))
         return kNoEngineToExecuteActionMessage;
 
-    auto action = nx::sdk::makePtr<Action>(actionData, outActionResult);
+    const auto action = makePtr<Action>(actionData, outActionResult);
     static const QString kNoSdkEngineToExecuteActionMessage(
         "No SDK engine to execute the action has been provided");
 

@@ -81,30 +81,30 @@ void Engine::setEngineInfo(const IEngineInfo* engineInfo)
     logUtils.setPrintPrefix(makePrintPrefix(m_overridingPrintPrefix, engineInfo));
 }
 
-StringMapResult Engine::setSettings(const IStringMap* settings)
+void Engine::doSetSettings(Result<const IStringMap*>* outResult, const IStringMap* settings)
 {
     if (!logUtils.convertAndOutputStringMap(&m_settings, settings, "Received settings"))
-        return error(ErrorCode::invalidParams, "Unable to convert the input string map");
-
-    return settingsReceived();
+        *outResult = error(ErrorCode::invalidParams, "Unable to convert the input string map");
+    else
+        *outResult = settingsReceived();
 }
 
-SettingsResponseResult Engine::pluginSideSettings() const
+void Engine::getPluginSideSettings(Result<const ISettingsResponse*>* /*outResult*/) const
 {
-    return nullptr;
 }
 
-StringResult Engine::manifest() const
+void Engine::getManifest(Result<const IString*>* outResult) const
 {
-    return new String(manifestString());
+    *outResult = new String(manifestString());
 }
 
-Result<void> Engine::executeAction(IAction* action)
+void Engine::doExecuteAction(Result<void>* outResult, IAction* action)
 {
     if (!action)
     {
         NX_PRINT << __func__ << "(): INTERNAL ERROR: action is null";
-        return error(ErrorCode::invalidParams, "Action is null");
+        *outResult = error(ErrorCode::invalidParams, "Action is null");
+        return;
     }
 
     std::map<std::string, std::string> params;
@@ -122,7 +122,8 @@ Result<void> Engine::executeAction(IAction* action)
         &params, actionParams.get(), "params", /*outputIndent*/ 4))
     {
         // The error is already logged.
-        return error(ErrorCode::invalidParams, "Invalid action parameters");
+        *outResult = error(ErrorCode::invalidParams, "Invalid action parameters");
+        return;
     }
 
     NX_OUTPUT << "}";
@@ -130,7 +131,7 @@ Result<void> Engine::executeAction(IAction* action)
     std::string actionUrl;
     std::string messageToUser;
 
-    auto result = executeAction(
+    const auto result = executeAction(
         action->actionId(),
         action->objectTrackId(),
         action->deviceId(),
@@ -144,7 +145,7 @@ Result<void> Engine::executeAction(IAction* action)
     const char* const messageToUserPtr = messageToUser.empty() ? nullptr : messageToUser.c_str();
     action->handleResult(actionUrlPtr, messageToUserPtr);
 
-    return result;
+    *outResult = result;
 }
 
 void Engine::setHandler(IEngine::IHandler* handler)

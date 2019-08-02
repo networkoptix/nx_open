@@ -19,41 +19,85 @@ enum class ErrorCode: int
     otherError = -100,
 };
 
-struct Error
+class Error
 {
+public:
     Error(ErrorCode errorCode, const IString* errorMessage):
-        errorCode(errorCode), errorMessage(errorMessage)
+        m_errorCode(errorCode), m_errorMessage(errorMessage)
     {
     }
 
     bool isOk() const
     {
-        return errorCode == ErrorCode::noError && errorMessage == nullptr;
+        return m_errorCode == ErrorCode::noError && m_errorMessage == nullptr;
     }
 
-    const ErrorCode errorCode;
-    const IString* const errorMessage;
+    ErrorCode errorCode() const { return m_errorCode; }
+    const IString* errorMessage() const { return m_errorMessage; }
+
+    Error(Error&&) = default;
+    Error& operator=(const Error&) = default;
+
+private:
+    ErrorCode m_errorCode;
+    const IString* m_errorMessage;
 };
 
 template<typename Value>
-struct Result
+class Result
 {
-    Result(Value value): error(ErrorCode::noError, nullptr), value(std::move(value)) {}
-    Result(Error&& error): error(std::move(error)) {}
-    bool isOk() const { return error.isOk(); }
+public:
+    Result(): m_error(ErrorCode::noError, nullptr) {}
 
-    const Error error;
-    const Value value{};
+    // TODO: #mshevchenko: REMOVE
+    Result(Value value): m_error(ErrorCode::noError, nullptr), m_value(std::move(value)) {}
+    Result(Error&& error): m_error(std::move(error)) {}
+
+    Result& operator=(Error&& error)
+    {
+        m_error = std::move(error);
+        m_value = Value{};
+        return *this;
+    }
+
+    Result& operator=(Value value)
+    {
+        m_error = Error{ErrorCode::noError, nullptr};
+        m_value = value;
+        return *this;
+    }
+
+    bool isOk() const { return m_error.isOk(); }
+
+    const Error& error() const { return m_error; }
+    Value value() const { return m_value; }
+
+private:
+    Error m_error;
+    Value m_value{};
 };
 
 template<>
-struct Result<void>
+class Result<void>
 {
-    Result(): error(ErrorCode::noError, nullptr) {}
-    Result(Error&& error): error(std::move(error)) {}
-    bool isOk() const { return error.isOk(); }
+public:
+    Result(): m_error(ErrorCode::noError, nullptr) {}
 
-    const Error error;
+    // TODO: #mshevchenko: REMOVE
+    Result(Error&& error): m_error(std::move(error)) {}
+
+    Result& operator=(Error&& error)
+    {
+        m_error = std::move(error);
+        return *this;
+    }
+
+    bool isOk() const { return m_error.isOk(); }
+
+    const Error& error() const { return m_error; }
+
+private:
+    Error m_error;
 };
 
 } // namespace sdk

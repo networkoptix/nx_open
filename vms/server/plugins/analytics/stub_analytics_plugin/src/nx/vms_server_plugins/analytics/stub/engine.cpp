@@ -83,9 +83,9 @@ void Engine::generatePluginDiagnosticEvents()
     }
 }
 
-MutableDeviceAgentResult Engine::obtainDeviceAgent(const IDeviceInfo* deviceInfo)
+void Engine::doObtainDeviceAgent(Result<IDeviceAgent*>* outResult, const IDeviceInfo* deviceInfo)
 {
-    return new DeviceAgent(this, deviceInfo);
+    *outResult = new DeviceAgent(this, deviceInfo);
 }
 
 void Engine::obtainPluginHomeDir()
@@ -375,7 +375,7 @@ std::string Engine::manifestString() const
 )json";
 }
 
-StringMapResult Engine::settingsReceived()
+Result<const IStringMap*> Engine::settingsReceived()
 {
     m_needToThrowPluginDiagnosticEvents = toBool(
         settingValue(kThrowPluginDiagnosticEventsFromEngineSetting));

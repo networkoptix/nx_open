@@ -11,7 +11,6 @@
 #include <nx/sdk/uuid.h>
 #include <nx/sdk/analytics/helpers/plugin.h>
 #include <nx/sdk/analytics/helpers/engine.h>
-#include <nx/sdk/analytics/helpers/result_aliases.h>
 #include <nx/sdk/analytics/i_uncompressed_video_frame.h>
 
 namespace nx {
@@ -28,9 +27,6 @@ public:
 
     virtual ~Engine() override;
 
-    virtual nx::sdk::analytics::MutableDeviceAgentResult obtainDeviceAgent(
-        const nx::sdk::IDeviceInfo* deviceInfo) override;
-
     // Capabilities.
     bool needUncompressedVideoFrames() const { return m_needUncompressedVideoFrames; }
     PixelFormat pixelFormat() const { return m_pixelFormat; }
@@ -38,7 +34,12 @@ public:
 protected:
     virtual std::string manifestString() const override;
 
-    virtual nx::sdk::StringMapResult settingsReceived() override;
+    virtual nx::sdk::Result<const nx::sdk::IStringMap*> settingsReceived() override;
+
+protected:
+    virtual void doObtainDeviceAgent(
+        nx::sdk::Result<nx::sdk::analytics::IDeviceAgent*>* outResult,
+        const nx::sdk::IDeviceInfo* deviceInfo) override;
 
     virtual nx::sdk::Result<void> executeAction(
         const std::string& actionId,
