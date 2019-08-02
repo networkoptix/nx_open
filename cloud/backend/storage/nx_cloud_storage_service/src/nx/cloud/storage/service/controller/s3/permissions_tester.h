@@ -11,18 +11,18 @@ namespace nx::cloud::storage::service {
 
 namespace conf { struct Aws; }
 
-namespace controller {
+namespace controller::s3 {
 
-class S3PermissionsTester:
+class PermissionsTester:
     public nx::network::aio::BasicPollable
 {
     using base_type = nx::network::aio::BasicPollable;
 
 public:
-    S3PermissionsTester(
+    PermissionsTester(
         const network::http::Credentials& credentials,
         const nx::utils::Url& bucketUrl);
-    ~S3PermissionsTester();
+    ~PermissionsTester();
 
     void doTest(nx::utils::MoveOnlyFunc<void(api::Result, std::string /*location*/)> handler);
 
@@ -50,5 +50,5 @@ private:
     nx::utils::MoveOnlyFunc<void(api::Result, std::string)> m_handler;
 };
 
-} // namespace controller
+} // namespace controller::s3
 } // namespace nx::cloud::storage::service

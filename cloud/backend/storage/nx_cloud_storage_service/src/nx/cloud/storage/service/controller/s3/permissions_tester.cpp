@@ -1,19 +1,19 @@
-#include "s3_permissions_tester.h"
+#include "permissions_tester.h"
 
 #include "nx/cloud/storage/service/settings.h"
 
-namespace nx::cloud::storage::service::controller {
+namespace nx::cloud::storage::service::controller::s3 {
 
 using namespace std::placeholders;
 
 namespace {
 
 static constexpr char kDefaultBucketLocation[] = "us-east-1";
-static constexpr char kFileData[] = "s3permissionstest";
+static constexpr char kFileData[] = "Permissionstest";
 
 } // namespace
 
-S3PermissionsTester::S3PermissionsTester(
+PermissionsTester::PermissionsTester(
     const network::http::Credentials& credentials,
     const nx::utils::Url& bucketUrl)
     :
@@ -23,12 +23,12 @@ S3PermissionsTester::S3PermissionsTester(
 {
 }
 
-S3PermissionsTester::~S3PermissionsTester()
+PermissionsTester::~PermissionsTester()
 {
     pleaseStopSync();
 }
 
-void S3PermissionsTester::doTest(nx::utils::MoveOnlyFunc<void(api::Result, std::string)> handler)
+void PermissionsTester::doTest(nx::utils::MoveOnlyFunc<void(api::Result, std::string)> handler)
 {
     dispatch(
         [this, handler = std::move(handler)]() mutable
@@ -36,23 +36,23 @@ void S3PermissionsTester::doTest(nx::utils::MoveOnlyFunc<void(api::Result, std::
             m_handler = std::move(handler);
             initializeS3Client();
             m_s3Client->getLocation(
-                std::bind(&S3PermissionsTester::onLocationResolved, this, _1, _2));
+                std::bind(&PermissionsTester::onLocationResolved, this, _1, _2));
         });
 }
 
-void S3PermissionsTester::bindToAioThread(nx::network::aio::AbstractAioThread* aioThread)
+void PermissionsTester::bindToAioThread(nx::network::aio::AbstractAioThread* aioThread)
 {
     base_type::bindToAioThread(aioThread);
     if (m_s3Client)
         m_s3Client->bindToAioThread(aioThread);
 }
 
-void S3PermissionsTester::stopWhileInAioThread()
+void PermissionsTester::stopWhileInAioThread()
 {
     m_s3Client.reset();
 }
 
-void S3PermissionsTester::initializeS3Client()
+void PermissionsTester::initializeS3Client()
 {
     m_s3Client = std::make_unique<aws::ApiClient>(
         std::string() /*storageClientId*/,
@@ -62,7 +62,7 @@ void S3PermissionsTester::initializeS3Client()
     m_s3Client->bindToAioThread(getAioThread());
 }
 
-void S3PermissionsTester::onLocationResolved(aws::Result result, std::string location)
+void PermissionsTester::onLocationResolved(aws::Result result, std::string location)
 {
     if (!result.ok())
         return testFailed("Location resolution", result);
@@ -82,25 +82,25 @@ void S3PermissionsTester::onLocationResolved(aws::Result result, std::string loc
         });
 }
 
-void S3PermissionsTester::doPermissionsTest()
+void PermissionsTester::doPermissionsTest()
 {
     m_s3Client->uploadFile(
         kFileData,
         kFileData,
-        std::bind(&S3PermissionsTester::onUploadFileDone, this, _1));
+        std::bind(&PermissionsTester::onUploadFileDone, this, _1));
 }
 
-void S3PermissionsTester::onUploadFileDone(aws::Result result)
+void PermissionsTester::onUploadFileDone(aws::Result result)
 {
     if (!result.ok())
         return testFailed("File upload", result);
 
     m_s3Client->downloadFile(
         kFileData,
-        std::bind(&S3PermissionsTester::onDownloadFileDone, this, _1, _2));
+        std::bind(&PermissionsTester::onDownloadFileDone, this, _1, _2));
 }
 
-void S3PermissionsTester::onDownloadFileDone(aws::Result result, nx::Buffer fileData)
+void PermissionsTester::onDownloadFileDone(aws::Result result, nx::Buffer fileData)
 {
     if (!result.ok())
         return testFailed("File download", result);
@@ -115,10 +115,10 @@ void S3PermissionsTester::onDownloadFileDone(aws::Result result, nx::Buffer file
 
     m_s3Client->deleteFile(
         kFileData,
-        std::bind(&S3PermissionsTester::onDeleteFileDone, this, _1));
+        std::bind(&PermissionsTester::onDeleteFileDone, this, _1));
 }
 
-void S3PermissionsTester::onDeleteFileDone(aws::Result result)
+void PermissionsTester::onDeleteFileDone(aws::Result result)
 {
     if (!result.ok())
         return testFailed("File deletion", result);
@@ -126,7 +126,7 @@ void S3PermissionsTester::onDeleteFileDone(aws::Result result)
     nx::utils::swapAndCall(m_handler, api::Result(), m_bucketLocation);
 }
 
-void S3PermissionsTester::testFailed(std::string_view operation, const aws::Result& result)
+void PermissionsTester::testFailed(std::string_view operation, const aws::Result& result)
 {
     NX_ERROR(this, "%1 failed: %2, %3",
         operation.data(), aws::toString(result.code()).data(), result.text());
@@ -138,4 +138,4 @@ void S3PermissionsTester::testFailed(std::string_view operation, const aws::Resu
 
 
 
-} // namespace nx::cloud::storage::service::controller
+} // namespace nx::cloud::storage::service::controller::s3

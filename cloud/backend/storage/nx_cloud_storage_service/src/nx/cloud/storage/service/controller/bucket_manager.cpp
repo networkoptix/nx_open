@@ -36,10 +36,17 @@ BucketManager::BucketManager(const conf::Settings& settings, model::Model* model
             });
 }
 
-void BucketManager::addBucket(
-    const api::AddBucketRequest& request,
-    nx::utils::MoveOnlyFunc<void(api::Result, api::Bucket)> handler)
+BucketManager::~BucketManager()
 {
+    QnMutexLocker lock(&m_mutex);
+    for (auto& permissionsTester: m_permissionsTesters)
+        permissionsTester->pleaseStopSync();
+}
+
+void BucketManager::addBucket(const api::AddBucketRequest& request, AddBucketHandler handler)
+{
+    using namespace std::placeholders;
+
     if (request.name.empty())
     {
         return handler(
@@ -47,16 +54,15 @@ void BucketManager::addBucket(
             api::Bucket{});
     }
 
-    auto permissionsTester = std::make_unique<S3PermissionsTester>(
-        m_settings.aws().credentials,
-        service::utils::bucketUrl(request.name));
+    auto permissionsTester = createPermissionsTest(request.name);
 
     permissionsTester->doTest(
-        [this, permissionsTester = std::move(permissionsTester), request,
-            handler = std::move(handler)](
-                api::Result result,
-                std::string region) mutable
+        [this, request, handler = std::move(handler), permissionsTester](
+            auto result,
+            auto region) mutable
         {
+            removePermissionsTest(permissionsTester);
+
             if (result.resultCode != api::ResultCode::ok)
             {
                 NX_ERROR(this, "S3 permissions test failed: %1, %2",
@@ -64,31 +70,7 @@ void BucketManager::addBucket(
                 return handler(std::move(result), api::Bucket{});
             }
 
-            auto bucket = std::make_shared<api::Bucket>();
-            bucket->name = request.name;
-            bucket->region = region;
-            bucket->cloudStorageCount = 0;
-
-            m_database->synchronizationEngine()->transactionLog().startDbTransaction(
-                m_settings.database().synchronization.clusterId,
-                [this, bucket](nx::sql::QueryContext* queryContext)
-                {
-                    return addBucketInternal(queryContext, *bucket);
-                },
-                [this, handler = std::move(handler), bucket](
-                    nx::sql::DBResult dbResult)
-                {
-                    if (dbResult != nx::sql::DBResult::ok)
-                    {
-                        api::Result error(utils::toResultCode(dbResult));
-                        error.error =
-                            std::string("addBucket failed with sql error: ") + toString(dbResult);
-                        NX_VERBOSE(this, error.error);
-                        return handler(std::move(error), api::Bucket{});
-                    }
-
-                    handler(api::Result(), std::move(*bucket));
-                });
+            addBucketToDb(std::move(region), std::move(request), std::move(handler));
         });
 }
 
@@ -99,12 +81,12 @@ void BucketManager::listBuckets(
 
     m_database->synchronizationEngine()->transactionLog().startDbTransaction(
         m_settings.database().synchronization.clusterId,
-        [this, buckets](nx::sql::QueryContext* queryContext)
+        [this, buckets](auto queryContext)
         {
             buckets->buckets = fetchBuckets(queryContext, true /*withStorageCount*/);
             return nx::sql::DBResult::ok;
         },
-        [this, handler = std::move(handler), buckets](nx::sql::DBResult dbResult)
+        [this, handler = std::move(handler), buckets](auto dbResult)
         {
             if (dbResult != nx::sql::DBResult::ok)
             {
@@ -125,7 +107,7 @@ void BucketManager::removeBucket(
 {
     m_database->synchronizationEngine()->transactionLog().startDbTransaction(
         m_settings.database().synchronization.clusterId,
-        [this, bucketName](nx::sql::QueryContext* queryContext)
+        [this, bucketName](auto queryContext)
         {
             return removeBucketInternal(queryContext, bucketName);
         },
@@ -195,6 +177,60 @@ void BucketManager::removeReceivedRecord(
     clusterdb::engine::Command<std::string> command)
 {
     m_bucketDao->removeBucket(queryContext, command.params);
+}
+
+void BucketManager::addBucketToDb(
+    std::string region,
+    api::AddBucketRequest request,
+    AddBucketHandler handler)
+{
+    auto bucket = std::make_shared<api::Bucket>();
+    bucket->name = std::move(request.name);
+    bucket->region = std::move(region);
+    bucket->cloudStorageCount = 0;
+
+    m_database->synchronizationEngine()->transactionLog().startDbTransaction(
+        m_settings.database().synchronization.clusterId,
+        [this, bucket](auto queryContext)
+        {
+            return addBucketInternal(queryContext, *bucket);
+        },
+        [this, handler = std::move(handler), bucket](auto dbResult)
+        {
+            if (dbResult != nx::sql::DBResult::ok)
+            {
+                api::Result error(utils::toResultCode(dbResult));
+                error.error =
+                    std::string("addBucket failed with sql error: ") + toString(dbResult);
+                NX_VERBOSE(this, error.error);
+                return handler(std::move(error), api::Bucket{});
+            }
+
+            handler(api::Result(), std::move(*bucket));
+        });
+}
+
+std::shared_ptr<s3::PermissionsTester> BucketManager::createPermissionsTest(
+    const std::string& bucketName)
+{
+    auto permissionsTester =
+        std::make_shared<s3::PermissionsTester>(
+            m_settings.aws().credentials,
+            service::utils::bucketUrl(bucketName));
+
+    {
+        QnMutexLocker lock(&m_mutex);
+        m_permissionsTesters.emplace(permissionsTester);
+    }
+
+    return permissionsTester;
+}
+
+void BucketManager::removePermissionsTest(
+    const std::shared_ptr<s3::PermissionsTester>& permissionsTester)
+{
+    QnMutexLocker lock(&m_mutex);
+    m_permissionsTesters.erase(permissionsTester);
 }
 
 } // namespace nx::cloud::storage::service::controller
