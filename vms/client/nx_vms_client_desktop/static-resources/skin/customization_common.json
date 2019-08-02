@@ -780,25 +780,6 @@
         }
     },
 
-    "QnNotificationsCollectionWidget": {
-        "palette": {
-            "default": {
-                "mid": "dark8",
-                "windowText": "light10"
-            }
-        }
-    },
-
-    "QnNotificationWidget" : {
-        "_": "'dark' is used to paint horizontal line, 'alternateBase' - to paint More Notifications",
-        "palette": {
-            "default": {
-                "dark": "dark6",
-                "alternateBase": "dark17"
-            }
-        }
-    },
-
     "nx::vms::client::desktop::CameraMotionSettingsWidget": {
         "sensitivityColors": [
             "light16",
