@@ -90,16 +90,16 @@ ScopedEventTypeIds EventTypeDescriptorManager::supportedEventTypeIds(
     ScopedEventTypeIds result;
 
     const auto& eventTypeIdsByEngine = device->supportedEventTypes();
+
+    std::set<EngineId> allEngineIds;
+    std::set<EventTypeId> allEventTypeIds;
     for (const auto& [engineId, eventTypeIds]: eventTypeIdsByEngine)
     {
-        for (const auto& eventTypeId: eventTypeIds)
-        {
-            const auto groupId = eventTypeGroupForEngine(engineId, eventTypeId);
-            result[engineId][groupId].insert(eventTypeId);
-        }
+        allEngineIds.insert(engineId);
+        allEventTypeIds.insert(eventTypeIds.begin(), eventTypeIds.end());
     }
 
-    return result;
+    return eventTypeGroupsByEngines(allEngineIds, allEventTypeIds);
 }
 
 ScopedEventTypeIds EventTypeDescriptorManager::supportedEventTypeIdsUnion(
@@ -223,21 +223,22 @@ void EventTypeDescriptorManager::updateFromDeviceAgentManifest(
         fromManifestItemListToDescriptorMap<EventTypeDescriptor>(engineId, manifest.eventTypes));
 }
 
-GroupId EventTypeDescriptorManager::eventTypeGroupForEngine(
-    const EngineId& engineId,
-    const EventTypeId& eventTypeId) const
+ScopedEventTypeIds EventTypeDescriptorManager::eventTypeGroupsByEngines(
+    const std::set<EngineId>& engineIds,
+    const std::set<EventTypeId>& eventTypeIds) const
 {
-    const auto descriptor = m_eventTypeDescriptorContainer.mergedDescriptors(eventTypeId);
-    if (!descriptor)
-        return GroupId();
-
-    for (const auto& scope: descriptor->scopes)
+    ScopedEventTypeIds result;
+    const auto descriptors = this->descriptors(eventTypeIds);
+    for (const auto& [eventTypeId, descriptor]: descriptors)
     {
-        if (scope.engineId == engineId)
-            return scope.groupId;
+        for (const auto& scope: descriptor.scopes)
+        {
+            if (engineIds.find(scope.engineId) != engineIds.cend())
+                result[scope.engineId][scope.groupId].insert(eventTypeId);
+        }
     }
 
-    return GroupId();
+    return result;
 }
 
 } // namespace nx::analytics

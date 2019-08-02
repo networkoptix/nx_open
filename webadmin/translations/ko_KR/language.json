@@ -1,7 +1,7 @@
 {
     "language_name": "한국어",
     "dialogs": {
-        "okButton": "Ok",
+        "okButton": "승인",
         "openLink": "이 링크를 방문",
         "openLinkWithTitle": "{{title}} 링크를 방문"
     },

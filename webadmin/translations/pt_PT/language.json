@@ -20,7 +20,7 @@
     "settings": {
         "tabs": {
             "server": "Servidor",
-            "system": "System",
+            "system": "Sistema",
             "device": "Dispositivo"
         },
         "confirmRestart": "Reiniciar o servidor?",
@@ -182,7 +182,7 @@
         "selectFiles": "Selecione os ficheiros"
     },
     "advanced": {
-        "free": "Livre",
+        "free": "Gratuito",
         "total": "Total",
         "occupied": "Ocupado",
         "reserved": "Reservado"

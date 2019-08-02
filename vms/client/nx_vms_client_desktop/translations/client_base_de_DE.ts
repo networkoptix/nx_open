@@ -5594,12 +5594,6 @@ to %1</source>
       <translation>Was tun mit aktuellen Analysedaten?</translation>
     </message>
     <message>
-      <source>Current analytics data will not be automatically moved to another location and will become unaccessible. You can keep it and manually move later, or delete permanently.
-If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
-      <translation>Aktuelle Analysedaten werden nicht automatisch an einen anderen Speicherort verschoben und sind nicht mehr verfügbar. Sie können es behalten und später manuell verschieben oder dauerhaft löschen.
-Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden Sie sich an den Support, bevor Sie fortfahren.</translation>
-    </message>
-    <message>
       <source>Delete</source>
       <translation>Löschen</translation>
     </message>
@@ -5610,6 +5604,12 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     <message>
       <source>Cancel</source>
       <translation>Abbrechen</translation>
+    </message>
+    <message>
+      <source>Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
+If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
+      <translation>Aktuelle Analysedaten werden nicht automatisch an einen anderen Speicherort verschoben und sind nicht mehr verfügbar. Sie können es behalten und später manuell verschieben oder dauerhaft löschen.
+Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden Sie sich an den Support, bevor Sie fortfahren.</translation>
     </message>
   </context>
   <context>
@@ -7592,7 +7592,7 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     </message>
     <message>
       <source>Motion detection stream is disabled</source>
-      <translation type="unfinished">Motion detection stream is disabled</translation>
+      <translation>Bewegungserkennungsstream ist deaktiviert</translation>
     </message>
   </context>
   <context>
@@ -7730,6 +7730,14 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     <message>
       <source>Plugins</source>
       <translation>Plugins</translation>
+    </message>
+    <message>
+      <source>Motion detection is disabled, all schedule records &quot;Motion&quot; and &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
+      <translation>Die Bewegungserkennung ist deaktiviert, alle Zeitpläne &quot;Bewegung&quot; und &quot;Bewegung + Lo-Res&quot; werden in &quot;Immer&quot;geändert</translation>
+    </message>
+    <message>
+      <source>Dual streaming is disabled, all schedule records &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
+      <translation>Dual Streaming ist deaktiviert, alle Zeitpläne &quot;Motion + Lo-Res&quot; werden in &quot;Immer&quot;geändert</translation>
     </message>
   </context>
   <context>
@@ -8056,10 +8064,6 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
         <numerusform>%n Ereignis</numerusform>
         <numerusform>%n Ereignisse</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>unnamed analytics engine</source>
-      <translation>unbenannte Analytik-Engine</translation>
     </message>
     <message>
       <source>No events occurred</source>
@@ -8450,7 +8454,7 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     </message>
     <message>
       <source>Can not start the search process</source>
-      <translation type="unfinished">Can not start the search process</translation>
+      <translation>Der Suchvorgang kann nicht gestartet werden</translation>
     </message>
   </context>
   <context>
@@ -8563,6 +8567,58 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
       <source>Some servers are offline and will not be updated. Skip them?</source>
       <translation>Einige Server sind offline und werden nicht aktualisiert. Überspringen?</translation>
     </message>
+    <message numerus="yes">
+      <source>Missing update package for the client and %n servers</source>
+      <translation>
+        <numerusform>Fehlendes Updatepaket für den Client und %n Server</numerusform>
+        <numerusform>Fehlendes Updatepaket für den Client und %n Server</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Missing update package for the client</source>
+      <translation>Fehlendes Updatepaket für den Client</translation>
+    </message>
+    <message>
+      <source>There are no online servers to update.</source>
+      <translation>Es gibt keine Onlineserver zum Aktualisieren.</translation>
+    </message>
+    <message>
+      <source>Cancel update and delete all downloaded data?</source>
+      <translation>Update abbrechen und alle heruntergeladenen Daten löschen?</translation>
+    </message>
+    <message>
+      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
+      <translation>Betriebssystemversionen einiger Komponenten werden nicht mehr unterstützt. Bitte entfernen Sie sie aus dem System oder aktualisieren Sie ihr Betriebssystem auf eine unterstützte Version.</translation>
+    </message>
+    <message>
+      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
+      <translation>Die Betriebssystemversion des Clients wird nicht mehr unterstützt. Bitte aktualisieren Sie das Betriebssystem auf eine unterstützte Version.</translation>
+    </message>
+    <message>
+      <source>Failed to start update</source>
+      <translation>Update konnte nicht gestartet werden</translation>
+    </message>
+    <message>
+      <source>Failed to cancel update</source>
+      <translation>Aktualisierung konnte nicht abgebrochen werden</translation>
+    </message>
+    <message>
+      <source>Failed to start installation</source>
+      <translation>Installation konnte nicht gestartet werden</translation>
+    </message>
+    <message>
+      <source>Some servers have not completed the update process. Finish it anyway?</source>
+      <translation>Einige Server haben den Aktualisierungsvorgang nicht abgeschlossen. Trotzdem beenden?</translation>
+    </message>
+    <message>
+      <source>%1 will be restarted to the updated version.</source>
+      <comment>Application name will be substituted</comment>
+      <translation>%1 wird auf die aktualisierte Version neu gestartet werden.</translation>
+    </message>
+    <message>
+      <source>Failed to download update packages to some components</source>
+      <translation>Aktualisierungspakete für einige Komponenten konnten nicht heruntergeladen werden</translation>
+    </message>
     <message>
       <source>If the problem persists, please contact Customer Support.</source>
       <translation>Wenn das Problem weiterhin besteht, kontaktieren Sie den Kundensupport.</translation>
@@ -8580,16 +8636,48 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
       <translation>Update abgeschlossen</translation>
     </message>
     <message>
-      <source>Nx Witness Client will be restarted to the updated version.</source>
-      <translation>Der Nx Witness Client wird mit der aktualisierten Version neu gestartet.</translation>
+      <source>Update completed, but some components have failed an update</source>
+      <translation>Update abgeschlossen, aber einige Komponenten haben ein Update nicht bestanden</translation>
+    </message>
+    <message>
+      <source>Please update %1 manually using an installation package.</source>
+      <translation>Updaten Sie %1 bitte manuell mit einem Installationspaket.</translation>
+    </message>
+    <message>
+      <source>%1 will be restarted to the updated version.</source>
+      <translation>%1 wird auf die aktualisierte Version neu gestartet werden.</translation>
     </message>
     <message>
       <source>OK</source>
       <translation>Ok</translation>
     </message>
     <message>
+      <source>There was an error while installing updates:</source>
+      <translation>Beim Installieren der Updates ist ein Fehler aufgetreten:</translation>
+    </message>
+    <message>
       <source>Downloading updates...</source>
       <translation>Herunterladen von Updates...</translation>
+    </message>
+    <message>
+      <source>Finish Update</source>
+      <translation>Update abschließen</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>Abbrechen</translation>
+    </message>
+    <message>
+      <source>The latest version is already installed</source>
+      <translation>Die neueste Version ist bereits installiert</translation>
+    </message>
+    <message>
+      <source>This version is already installed</source>
+      <translation>Diese Version ist bereits installiert</translation>
+    </message>
+    <message>
+      <source>Install update</source>
+      <translation>Update installieren</translation>
     </message>
     <message>
       <source>Upload</source>
@@ -8608,12 +8696,12 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
       <translation>Herunterladen &amp;&amp; Installieren</translation>
     </message>
     <message>
-      <source>Select Another Build</source>
-      <translation>Wählen Sie ein anderes Build aus</translation>
-    </message>
-    <message>
       <source>Browse for Another File...</source>
       <translation>Nach einer anderen Datei suchen...</translation>
+    </message>
+    <message>
+      <source>Select Another Build</source>
+      <translation>Wählen Sie ein anderes Build aus</translation>
     </message>
     <message>
       <source>Update to Specific Build</source>
@@ -8636,6 +8724,10 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
       <translation>Installiere Clientupdates...</translation>
     </message>
     <message>
+      <source>Starting update to ...</source>
+      <translation>Update wird gestartet auf ...</translation>
+    </message>
+    <message>
       <source>Updating to ...</source>
       <translation>Update auf...</translation>
     </message>
@@ -8644,12 +8736,24 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
       <translation>Bereit zum Aktualisieren auf</translation>
     </message>
     <message>
-      <source>Install update</source>
-      <translation>Update installieren</translation>
-    </message>
-    <message>
       <source>System updated to</source>
       <translation>System aktualisiert auf</translation>
+    </message>
+    <message>
+      <source>Some servers have no update packages available.</source>
+      <translation>Auf einigen Servern sind keine Aktualisierungspakete verfügbar.</translation>
+    </message>
+    <message>
+      <source>Some servers have encountered an internal error.</source>
+      <translation>Bei einigen Servern ist ein interner Fehler aufgetreten.</translation>
+    </message>
+    <message>
+      <source>Please contact Customer Support.</source>
+      <translation>Bitte kontaktieren Sie den Kundensupport.</translation>
+    </message>
+    <message>
+      <source>Some servers have gone offline. Please wait until they become online to continue.</source>
+      <translation>Einige Server sind offline gegangen. Bitte warten Sie, bis sie online sind, um fortzufahren.</translation>
     </message>
     <message>
       <source>System update in process</source>
@@ -8658,6 +8762,10 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     <message>
       <source>Continue in Background</source>
       <translation>Im Hintergrund fortführen</translation>
+    </message>
+    <message>
+      <source>Latest Available Update</source>
+      <translation>Neuestes verfügbares Update</translation>
     </message>
     <message>
       <source>Specific Build</source>
@@ -8670,109 +8778,6 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     <message>
       <source>Update from mediaservers</source>
       <translation>Update von Medienservern</translation>
-    </message>
-    <message>
-      <source>Latest Available Update</source>
-      <translation>Neuestes verfügbares Update</translation>
-    </message>
-    <message numerus="yes">
-      <source>Missing update package for the client and %n servers</source>
-      <translation>
-        <numerusform>Fehlendes Updatepaket für den Client und %n Server</numerusform>
-        <numerusform>Fehlendes Updatepaket für den Client und %n Server</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Missing update package for the client</source>
-      <translation>Fehlendes Updatepaket für den Client</translation>
-    </message>
-    <message>
-      <source>Finish Update</source>
-      <translation>Update abschließen</translation>
-    </message>
-    <message>
-      <source>Cancel</source>
-      <translation>Abbrechen</translation>
-    </message>
-    <message>
-      <source>The latest version is already installed</source>
-      <translation>Die neueste Version ist bereits installiert</translation>
-    </message>
-    <message>
-      <source>This version is already installed</source>
-      <translation>Diese Version ist bereits installiert</translation>
-    </message>
-    <message>
-      <source>There are no online servers to update.</source>
-      <translation>Es gibt keine Onlineserver zum Aktualisieren.</translation>
-    </message>
-    <message>
-      <source>Cancel update and delete all downloaded data?</source>
-      <translation>Update abbrechen und alle heruntergeladenen Daten löschen?</translation>
-    </message>
-    <message>
-      <source>There was an error while installing updates:</source>
-      <translation>Beim Installieren der Updates ist ein Fehler aufgetreten:</translation>
-    </message>
-    <message>
-      <source>Some servers have gone offline. Please wait until they become online to continue.</source>
-      <translation>Einige Server sind offline gegangen. Bitte warten Sie, bis sie online sind, um fortzufahren.</translation>
-    </message>
-    <message>
-      <source>Update completed, but some components have failed an update</source>
-      <translation>Update abgeschlossen, aber einige Komponenten haben ein Update nicht bestanden</translation>
-    </message>
-    <message>
-      <source>Please update %1 manually using an installation package.</source>
-      <translation>Updaten Sie %1 bitte manuell mit einem Installationspaket.</translation>
-    </message>
-    <message>
-      <source>%1 will be restarted to the updated version.</source>
-      <translation>%1 wird auf die aktualisierte Version neu gestartet werden.</translation>
-    </message>
-    <message>
-      <source>Failed to download update packages to some components</source>
-      <translation>Aktualisierungspakete für einige Komponenten konnten nicht heruntergeladen werden</translation>
-    </message>
-    <message>
-      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
-      <translation>Betriebssystemversionen einiger Komponenten werden nicht mehr unterstützt. Bitte entfernen Sie sie aus dem System oder aktualisieren Sie ihr Betriebssystem auf eine unterstützte Version.</translation>
-    </message>
-    <message>
-      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
-      <translation>Die Betriebssystemversion des Clients wird nicht mehr unterstützt. Bitte aktualisieren Sie das Betriebssystem auf eine unterstützte Version.</translation>
-    </message>
-    <message>
-      <source>Failed to start update</source>
-      <translation>Update konnte nicht gestartet werden</translation>
-    </message>
-    <message>
-      <source>Starting update to ...</source>
-      <translation>Update wird gestartet auf ...</translation>
-    </message>
-    <message>
-      <source>Failed to cancel update</source>
-      <translation>Aktualisierung konnte nicht abgebrochen werden</translation>
-    </message>
-    <message>
-      <source>Failed to start installation</source>
-      <translation>Installation konnte nicht gestartet werden</translation>
-    </message>
-    <message>
-      <source>Some servers have no update packages available.</source>
-      <translation>Auf einigen Servern sind keine Aktualisierungspakete verfügbar.</translation>
-    </message>
-    <message>
-      <source>Some servers have encountered an internal error.</source>
-      <translation>Bei einigen Servern ist ein interner Fehler aufgetreten.</translation>
-    </message>
-    <message>
-      <source>Please please contact Customer Support.</source>
-      <translation>Bitte kontaktieren Sie den Kundensupport.</translation>
-    </message>
-    <message>
-      <source>Some servers have not completed the update process. Finish it anyway?</source>
-      <translation type="unfinished">Some servers have not completed the update process. Finish it anyway?</translation>
     </message>
   </context>
   <context>
@@ -8851,7 +8856,7 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     </message>
     <message>
       <source>Some users do not have access to the selected layout. Action will not work for them.</source>
-      <translation type="unfinished">Some users do not have access to the selected layout. Action will not work for them.</translation>
+      <translation>Einige Benutzer haben keinen Zugriff auf das ausgewählte Layout. Aktion wird für sie nicht funktionieren.</translation>
     </message>
   </context>
   <context>
@@ -9058,11 +9063,11 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     </message>
     <message>
       <source>Motion detection is disabled or not supported</source>
-      <translation type="unfinished">Motion detection is disabled or not supported</translation>
+      <translation>Bewegungserkennung ist deaktiviert oder wird nicht unterstützt</translation>
     </message>
     <message>
       <source>Dual-streaming is disabled or not supported</source>
-      <translation type="unfinished">Dual-streaming is disabled or not supported</translation>
+      <translation>Dual-Streaming ist deaktiviert oder wird nicht unterstützt</translation>
     </message>
   </context>
   <context>
@@ -9413,6 +9418,14 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     <message>
       <source>File was corrupted while being uploaded to the server</source>
       <translation>Die Datei wurde beschädigt, während sie auf den Server hochgeladen wurde</translation>
+    </message>
+    <message>
+      <source>Remote file &quot;%1&quot; is corrupted</source>
+      <translation>Remotedatei &quot;%1&quot; ist beschädigt</translation>
+    </message>
+    <message>
+      <source>Server already has this file &quot;%1&quot;</source>
+      <translation>Server hat bereits diese Datei &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
@@ -9943,15 +9956,22 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
       <translation>Ok</translation>
     </message>
     <message>
-      <source>Confirm storage location to store analytics data on &apos;%1&apos;</source>
-      <translation>Bestätigen Sie den Speicherort, um die Analysedaten auf &apos;%1&apos; zu speichern</translation>
+      <source>Confirm storage location for the analytics data on &quot;%1&quot;</source>
+      <translation>Bestätigen Sie den Speicherort für die Analysedaten auf &quot;%1&quot;</translation>
     </message>
     <message>
-      <source>Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
-Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
-By default analytics data will be stored in mediaserver&apos;s installation directory.
-You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</source>
-      <translation>Die Analysedatenbank sollte auf einem lokalen Speicher gespeichert werden und kann bis zu hundert Gigabyte belegen. Sobald der Standort für die Speicherung von Analysedaten ausgewählt wurde, können diese nicht mehr so einfach geändert werden, ohne dass die Daten verloren gehen. Wir empfehlen, den Standort sorgfältig zu wählen und keine Systempartition zu verwenden, um schwere Systemfehler zu vermeiden. Standardmäßig werden die Analysedaten im Installationsverzeichnis des Mediaservers gespeichert. Sie können den Speicherort auf der Registerkarte &quot;Speichermanagement&quot; im Dialogfeld Servereinstellungen ändern.</translation>
+      <source>the largest available partition</source>
+      <translation>die größte verfügbare Partition</translation>
+    </message>
+    <message>
+      <source>The analytics database should only be stored on a local drive and can take up large amounts of space.
+Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
+By default analytics data will be stored on %1.
+You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</source>
+      <translation>Die Analysedatenbank sollte nur auf einem lokalen Laufwerk gespeichert werden und kann viel Platz in Anspruch nehmen.
+Sobald ein Ort zum Speichern von Analysedaten ausgewählt wurde, können diese nicht mehr so einfach geändert werden, ohne bestehende Daten zu verlieren. Wir empfehlen, den Speicherort sorgfältig auszuwählen und die Systempartition nicht zu verwenden, da dies zu schweren Fehlfunktionen des Systems führen kann.
+Standardmäßig werden die Analysedaten auf %1 gespeichert.
+Sie können einen anderen Speicherort auf der Registerkarte &quot;Speicherverwaltung&quot; im Dialogfeld Servereinstellungen auswählen.</translation>
     </message>
   </context>
   <context>

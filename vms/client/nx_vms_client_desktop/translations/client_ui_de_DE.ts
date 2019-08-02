@@ -3078,8 +3078,8 @@
     </message>
     <message>
       <location/>
-      <source>Analytics data can occupy tens of gigabytes of storage space. We recommend to choose other location for it instead of the system partition.</source>
-      <translation>Analyticsdaten können zig Gigabyte Speicherplatz belegen. Wir empfehlen, statt der Systempartition einen anderen Speicherort zu wählen.</translation>
+      <source>Analytics data can take up large amounts of space. We recommend to choose another location for it instead of the system partition.</source>
+      <translation>Analysedaten können große Mengen an Platz beanspruchen. Wir empfehlen, anstelle der Systempartition einen anderen Speicherort für sie zu wählen.</translation>
     </message>
   </context>
   <context>

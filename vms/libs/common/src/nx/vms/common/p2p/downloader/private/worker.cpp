@@ -647,6 +647,14 @@ void Worker::downloadChunks()
         if (contexts.empty())
             break;
 
+        if (chunksLeft == 0 && !needToFindBetterPeersForDownload())
+        {
+            // We'll get here with no change in this case. But this way we'll not wait when the
+            // latest single chunk is downloaded. Instead we'll keep operating with maximum
+            // cuncurrent chunks.
+            chunksLeft = kSubsequentChunksToDownload;
+        }
+
         Context::processRequests(this, contexts,
             [&, this](const ContextData& ctx, const std::optional<QByteArray>& data)
             {

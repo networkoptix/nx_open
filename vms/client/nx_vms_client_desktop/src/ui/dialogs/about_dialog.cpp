@@ -135,16 +135,6 @@ void QnAboutDialog::generateServersReport()
 
     m_serverListModel->setResources(servers);
     ui->serversGroupBox->setVisible(!servers.empty());
-
-    const bool hasArmServers = std::any_of(servers.cbegin(), servers.cend(),
-		[](const QnMediaServerResourcePtr& server)
-        {
-            return QnMediaServerResource::isArmServer(server);
-        });
-
-    const bool showArmSupportPolicy = QnClientAppInfo::armSupportPolicyPresent && hasArmServers;
-    ui->armSupportLabel->setVisible(showArmSupportPolicy);
-    ui->armSupportTitleLabel->setVisible(showArmSupportPolicy);
 }
 
 void QnAboutDialog::retranslateUi()
@@ -210,14 +200,6 @@ void QnAboutDialog::retranslateUi()
         supportLink = makeHref(supportAddress);
 
     ui->customerSupportLabel->setText(supportLink);
-
-    QnCloudUrlHelper cloudUrlHelper(
-        nx::vms::utils::SystemUri::ReferralSource::DesktopClient,
-        nx::vms::utils::SystemUri::ReferralContext::SettingsDialog);
-
-    ui->armSupportLabel->setText(makeHref(
-        cloudUrlHelper.armPolicyUrl().toDisplayString(QUrl::RemoveQuery),
-        cloudUrlHelper.armPolicyUrl()));
 }
 
 // -------------------------------------------------------------------------- //

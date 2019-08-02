@@ -5593,12 +5593,6 @@ to %1</source>
       <translation>Mevcut analiz verileriyle ne yapmalı?</translation>
     </message>
     <message>
-      <source>Current analytics data will not be automatically moved to another location and will become unaccessible. You can keep it and manually move later, or delete permanently.
-If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
-      <translation>Mevcut analitik verileri otomatik olarak başka bir yere taşınmayacak ve erişilemez hale gelecektir. Onu daha sonra manuel olarak hareket ettirebilir veya kalıcı olarak silebilirsiniz.
-Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam etmeden önce lütfen desteğe başvurun.</translation>
-    </message>
-    <message>
       <source>Delete</source>
       <translation>Sil</translation>
     </message>
@@ -5609,6 +5603,12 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     <message>
       <source>Cancel</source>
       <translation>İptal</translation>
+    </message>
+    <message>
+      <source>Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
+If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
+      <translation>Mevcut analitik verileri otomatik olarak başka bir yere taşınmayacak ve erişilemez hale gelecektir. Onu daha sonra manuel olarak hareket ettirebilir veya kalıcı olarak silebilirsiniz.
+Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam etmeden önce lütfen desteğe başvurun.</translation>
     </message>
   </context>
   <context>
@@ -7356,7 +7356,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>Unknown track</source>
-      <translation type="unfinished">Unknown track</translation>
+      <translation>Bilinmeyen parça</translation>
     </message>
   </context>
   <context>
@@ -7591,7 +7591,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>Motion detection stream is disabled</source>
-      <translation type="unfinished">Motion detection stream is disabled</translation>
+      <translation>Hareket algılama devre dışı</translation>
     </message>
   </context>
   <context>
@@ -7729,6 +7729,14 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     <message>
       <source>Plugins</source>
       <translation>Eklentiler</translation>
+    </message>
+    <message>
+      <source>Motion detection is disabled, all schedule records &quot;Motion&quot; and &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
+      <translation>Hareket algılama devre dışı, tüm program kayıtları &quot;Hareket&quot; ve &quot;Motion + Lo-Res&quot; &quot;Her Zaman&quot;olarak değiştirilecek</translation>
+    </message>
+    <message>
+      <source>Dual streaming is disabled, all schedule records &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
+      <translation>İkili akış devre dışı bırakıldı, tüm program kayıtları &quot;Motion + Lo-Res&quot; &quot;Her Zaman&quot;olarak değiştirilecek</translation>
     </message>
   </context>
   <context>
@@ -8055,10 +8063,6 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
         <numerusform>%n etkinlik</numerusform>
         <numerusform>%n etkinlik</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>unnamed analytics engine</source>
-      <translation>isim verilmemiş analitik motoru</translation>
     </message>
     <message>
       <source>No events occurred</source>
@@ -8449,7 +8453,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>Can not start the search process</source>
-      <translation type="unfinished">Can not start the search process</translation>
+      <translation>Arama işlemi başlatılamıyor</translation>
     </message>
   </context>
   <context>
@@ -8562,6 +8566,58 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
       <source>Some servers are offline and will not be updated. Skip them?</source>
       <translation>Bazı sunucular çevrimdışıdır ve güncellenmez. Onları atla?</translation>
     </message>
+    <message numerus="yes">
+      <source>Missing update package for the client and %n servers</source>
+      <translation>
+        <numerusform>Client ve %n sunucuları için güncelleme paketleri kayıp</numerusform>
+        <numerusform>Client ve %n sunucuları için güncelleme paketleri kayıp</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Missing update package for the client</source>
+      <translation>Client için güncelleme paketi eksik</translation>
+    </message>
+    <message>
+      <source>There are no online servers to update.</source>
+      <translation>Güncelleme yapılacak çevrimiçi sunucu yok.</translation>
+    </message>
+    <message>
+      <source>Cancel update and delete all downloaded data?</source>
+      <translation>Güncellemeyi iptal et ve tüm indirilmiş verileri sil?</translation>
+    </message>
+    <message>
+      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
+      <translation>Bazı bileşenlerin işletim sistemi sürümleri artık desteklenmemektedir. Lütfen bunları Sistemden kaldırın veya işletim sistemlerini desteklenen bir sürüme güncelleyin.</translation>
+    </message>
+    <message>
+      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
+      <translation>İstemcinin işletim sistemi sürümü artık desteklenmiyor. Lütfen işletim sisteminizi desteklenen bir sürüme güncelleyin.</translation>
+    </message>
+    <message>
+      <source>Failed to start update</source>
+      <translation>Güncelleme yüklenemedi</translation>
+    </message>
+    <message>
+      <source>Failed to cancel update</source>
+      <translation>Güncelleyici başlatılamadı</translation>
+    </message>
+    <message>
+      <source>Failed to start installation</source>
+      <translation>Yükleme başlatılamadı</translation>
+    </message>
+    <message>
+      <source>Some servers have not completed the update process. Finish it anyway?</source>
+      <translation>Bazı sunucular güncelleme işlemini tamamlamadı. Yine de sonlandırılsın mı?</translation>
+    </message>
+    <message>
+      <source>%1 will be restarted to the updated version.</source>
+      <comment>Application name will be substituted</comment>
+      <translation>%1 güncellenmiş versiyonda yeniden başlatılacak.</translation>
+    </message>
+    <message>
+      <source>Failed to download update packages to some components</source>
+      <translation>Güncelleme paketinin bazı bileşenleri indirilemedi</translation>
+    </message>
     <message>
       <source>If the problem persists, please contact Customer Support.</source>
       <translation>Eğer problem devam ederse Müşteri Hizmetleri ile iletişime geçin.</translation>
@@ -8579,16 +8635,48 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
       <translation>Güncelleştirme tamamlandı</translation>
     </message>
     <message>
-      <source>Nx Witness Client will be restarted to the updated version.</source>
-      <translation>Nx Witness Client'ı güncellenen versiyonda yeniden başlatılacak.</translation>
+      <source>Update completed, but some components have failed an update</source>
+      <translation>Güncelleme tamamlandı ancak bazı sunucular güncellenemedi</translation>
+    </message>
+    <message>
+      <source>Please update %1 manually using an installation package.</source>
+      <translation>Lütfen %1 i yükleme dosyası kullanarak güncelleyin.</translation>
+    </message>
+    <message>
+      <source>%1 will be restarted to the updated version.</source>
+      <translation>%1 güncellenmiş versiyonda yeniden başlatılacak.</translation>
     </message>
     <message>
       <source>OK</source>
       <translation>TAMAM</translation>
     </message>
     <message>
+      <source>There was an error while installing updates:</source>
+      <translation>Güncelleme yüklenirken bir hata oluştu {0}:</translation>
+    </message>
+    <message>
       <source>Downloading updates...</source>
       <translation>Güncellemeker indiriliyor...</translation>
+    </message>
+    <message>
+      <source>Finish Update</source>
+      <translation>Güncellemeyi Bitir</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>İptal</translation>
+    </message>
+    <message>
+      <source>The latest version is already installed</source>
+      <translation>En son versiyon zaten yüklü</translation>
+    </message>
+    <message>
+      <source>This version is already installed</source>
+      <translation>Bu versiyon zaten yüklü</translation>
+    </message>
+    <message>
+      <source>Install update</source>
+      <translation>Güncellemeyi yükle</translation>
     </message>
     <message>
       <source>Upload</source>
@@ -8607,12 +8695,12 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
       <translation>İndir &amp;&amp; Yükle</translation>
     </message>
     <message>
-      <source>Select Another Build</source>
-      <translation>Başka Yapı Seçin</translation>
-    </message>
-    <message>
       <source>Browse for Another File...</source>
       <translation>Başka Dosyaya Göz At...</translation>
+    </message>
+    <message>
+      <source>Select Another Build</source>
+      <translation>Başka Yapı Seçin</translation>
     </message>
     <message>
       <source>Update to Specific Build</source>
@@ -8635,6 +8723,10 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
       <translation>Client güncellemesi yükleniyor...</translation>
     </message>
     <message>
+      <source>Starting update to ...</source>
+      <translation>İçin güncelleme başlatılıyor ...</translation>
+    </message>
+    <message>
       <source>Updating to ...</source>
       <translation>Güncelleniyor ...</translation>
     </message>
@@ -8643,12 +8735,24 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
       <translation>Güncellemeye hazır</translation>
     </message>
     <message>
-      <source>Install update</source>
-      <translation>Güncellemeyi yükle</translation>
-    </message>
-    <message>
       <source>System updated to</source>
       <translation>Sistem güncellenecek</translation>
+    </message>
+    <message>
+      <source>Some servers have no update packages available.</source>
+      <translation>Bazı sunucuların güncelleme paketi yok.</translation>
+    </message>
+    <message>
+      <source>Some servers have encountered an internal error.</source>
+      <translation>Bazı sunucular dahili bir hatayla karşılaştı.</translation>
+    </message>
+    <message>
+      <source>Please contact Customer Support.</source>
+      <translation>Lütfen Destek Birimiyle İletişime Geçin.</translation>
+    </message>
+    <message>
+      <source>Some servers have gone offline. Please wait until they become online to continue.</source>
+      <translation>Bazı sunucular çevrimdışı oldu. Lütfen devam etmek için çevrimiçi olana kadar bekleyin.</translation>
     </message>
     <message>
       <source>System update in process</source>
@@ -8657,6 +8761,10 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     <message>
       <source>Continue in Background</source>
       <translation>Arka planda devam et</translation>
+    </message>
+    <message>
+      <source>Latest Available Update</source>
+      <translation>Kullanılabilir Son Güncelleme</translation>
     </message>
     <message>
       <source>Specific Build</source>
@@ -8669,109 +8777,6 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     <message>
       <source>Update from mediaservers</source>
       <translation>Mediaserverdan güncelleme</translation>
-    </message>
-    <message>
-      <source>Latest Available Update</source>
-      <translation>Kullanılabilir Son Güncelleme</translation>
-    </message>
-    <message numerus="yes">
-      <source>Missing update package for the client and %n servers</source>
-      <translation>
-        <numerusform>Client ve %n sunucuları için güncelleme paketleri kayıp</numerusform>
-        <numerusform>Client ve %n sunucuları için güncelleme paketleri kayıp</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Missing update package for the client</source>
-      <translation>Client için güncelleme paketi eksik</translation>
-    </message>
-    <message>
-      <source>Finish Update</source>
-      <translation>Güncellemeyi Bitir</translation>
-    </message>
-    <message>
-      <source>Cancel</source>
-      <translation>İptal</translation>
-    </message>
-    <message>
-      <source>The latest version is already installed</source>
-      <translation>En son versiyon zaten yüklü</translation>
-    </message>
-    <message>
-      <source>This version is already installed</source>
-      <translation>Bu versiyon zaten yüklü</translation>
-    </message>
-    <message>
-      <source>There are no online servers to update.</source>
-      <translation>Güncelleme yapılacak çevrimiçi sunucu yok.</translation>
-    </message>
-    <message>
-      <source>Cancel update and delete all downloaded data?</source>
-      <translation>Güncellemeyi iptal et ve tüm indirilmiş verileri sil?</translation>
-    </message>
-    <message>
-      <source>There was an error while installing updates:</source>
-      <translation>Güncelleme yüklenirken bir hata oluştu {0}:</translation>
-    </message>
-    <message>
-      <source>Some servers have gone offline. Please wait until they become online to continue.</source>
-      <translation>Bazı sunucular çevrimdışı oldu. Lütfen devam etmek için çevrimiçi olana kadar bekleyin.</translation>
-    </message>
-    <message>
-      <source>Update completed, but some components have failed an update</source>
-      <translation>Güncelleme tamamlandı ancak bazı sunucular güncellenemedi</translation>
-    </message>
-    <message>
-      <source>Please update %1 manually using an installation package.</source>
-      <translation>Lütfen %1 i yükleme dosyası kullanarak güncelleyin.</translation>
-    </message>
-    <message>
-      <source>%1 will be restarted to the updated version.</source>
-      <translation>%1 güncellenmiş versiyonda yeniden başlatılacak.</translation>
-    </message>
-    <message>
-      <source>Failed to download update packages to some components</source>
-      <translation>Güncelleme paketinin bazı bileşenleri indirilemedi</translation>
-    </message>
-    <message>
-      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
-      <translation type="unfinished">OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</translation>
-    </message>
-    <message>
-      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
-      <translation type="unfinished">OS version of the client is no longer supported. Please update its OS to a supported version.</translation>
-    </message>
-    <message>
-      <source>Failed to start update</source>
-      <translation type="unfinished">Failed to start update</translation>
-    </message>
-    <message>
-      <source>Starting update to ...</source>
-      <translation type="unfinished">Starting update to ...</translation>
-    </message>
-    <message>
-      <source>Failed to cancel update</source>
-      <translation type="unfinished">Failed to cancel update</translation>
-    </message>
-    <message>
-      <source>Failed to start installation</source>
-      <translation type="unfinished">Failed to start installation</translation>
-    </message>
-    <message>
-      <source>Some servers have no update packages available.</source>
-      <translation type="unfinished">Some servers have no update packages available.</translation>
-    </message>
-    <message>
-      <source>Some servers have encountered an internal error.</source>
-      <translation type="unfinished">Some servers have encountered an internal error.</translation>
-    </message>
-    <message>
-      <source>Please please contact Customer Support.</source>
-      <translation type="unfinished">Please please contact Customer Support.</translation>
-    </message>
-    <message>
-      <source>Some servers have not completed the update process. Finish it anyway?</source>
-      <translation type="unfinished">Some servers have not completed the update process. Finish it anyway?</translation>
     </message>
   </context>
   <context>
@@ -8850,7 +8855,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>Some users do not have access to the selected layout. Action will not work for them.</source>
-      <translation type="unfinished">Some users do not have access to the selected layout. Action will not work for them.</translation>
+      <translation>Seçilen kullanıcıların hiçbiri seçilen yerleşime erişemez. Eylem çalışmayacak.</translation>
     </message>
   </context>
   <context>
@@ -8937,11 +8942,11 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>Update package is not found.</source>
-      <translation type="unfinished">Update package is not found.</translation>
+      <translation>Güncelleme dosyası bulunamadı.</translation>
     </message>
     <message>
       <source>There is not enough space to install update.</source>
-      <translation type="unfinished">There is not enough space to install update.</translation>
+      <translation>Güncelleme dosyalarını indirmek için yeterli alan yok.</translation>
     </message>
     <message>
       <source>Internal server error.</source>
@@ -9057,11 +9062,11 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>Motion detection is disabled or not supported</source>
-      <translation type="unfinished">Motion detection is disabled or not supported</translation>
+      <translation>Hareket algılama devre dışı veya desteklenmiyor</translation>
     </message>
     <message>
       <source>Dual-streaming is disabled or not supported</source>
-      <translation type="unfinished">Dual-streaming is disabled or not supported</translation>
+      <translation>Çift akış devre dışı bırakıldı veya desteklenmiyor</translation>
     </message>
   </context>
   <context>
@@ -9110,27 +9115,27 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>no error</source>
-      <translation type="unfinished">no error</translation>
+      <translation>hata yok</translation>
     </message>
     <message>
       <source>library file cannot be loaded</source>
-      <translation type="unfinished">library file cannot be loaded</translation>
+      <translation>kütüphane dosyası yüklenemiyor</translation>
     </message>
     <message>
       <source>invalid or incompatible plugin library</source>
-      <translation type="unfinished">invalid or incompatible plugin library</translation>
+      <translation>geçersiz veya uyumsuz bir eklenti kütüphanesi</translation>
     </message>
     <message>
       <source>plugin library failed to initialize</source>
-      <translation type="unfinished">plugin library failed to initialize</translation>
+      <translation>eklenti kütüphanesi başlatılamadı</translation>
     </message>
     <message>
       <source>plugin returned bad manifest</source>
-      <translation type="unfinished">plugin returned bad manifest</translation>
+      <translation>eklentisi hatalı bildirim döndürdü</translation>
     </message>
     <message>
       <source>plugin API version is no longer supported</source>
-      <translation type="unfinished">plugin API version is no longer supported</translation>
+      <translation>bu işletim sistemi artık desteklenmiyor</translation>
     </message>
     <message>
       <source>unknown error</source>
@@ -9138,15 +9143,15 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>Not loaded</source>
-      <translation type="unfinished">Not loaded</translation>
+      <translation>Yüklü değil</translation>
     </message>
     <message>
       <source>Loaded</source>
-      <translation type="unfinished">Loaded</translation>
+      <translation>Yüklendi</translation>
     </message>
     <message>
       <source>plugin is in the black list</source>
-      <translation type="unfinished">plugin is in the black list</translation>
+      <translation>eklentisi kara listede</translation>
     </message>
     <message>
       <source>Status</source>
@@ -9154,7 +9159,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>plugin is optional and is not in the white list</source>
-      <translation type="unfinished">plugin is optional and is not in the white list</translation>
+      <translation>eklentisi isteğe bağlıdır ve beyaz listede değildir</translation>
     </message>
     <message>
       <source>internal error</source>
@@ -9188,7 +9193,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     <name>nx::vms::client::desktop::ServerUpdateTool</name>
     <message>
       <source>No connection to the server.</source>
-      <translation type="unfinished">No connection to the server.</translation>
+      <translation>Sunucuya bağlantı yok.</translation>
     </message>
     <message>
       <source>Network error.</source>
@@ -9196,7 +9201,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>Server error.</source>
-      <translation type="unfinished">Server error.</translation>
+      <translation>Sunucu Hatası.</translation>
     </message>
   </context>
   <context>
@@ -9412,6 +9417,14 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     <message>
       <source>File was corrupted while being uploaded to the server</source>
       <translation>Sunucuya yüklenirken dosya bozulmuş</translation>
+    </message>
+    <message>
+      <source>Remote file &quot;%1&quot; is corrupted</source>
+      <translation>Uzak dosya &quot;%1&quot; bozuk</translation>
+    </message>
+    <message>
+      <source>Server already has this file &quot;%1&quot;</source>
+      <translation>Sunucu zaten bu dosyada &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
@@ -9942,17 +9955,21 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
       <translation>TAMAM</translation>
     </message>
     <message>
-      <source>Confirm storage location to store analytics data on &apos;%1&apos;</source>
-      <translation>Analytics verilerini depolamak için depolama konumunu onaylayın</translation>
+      <source>Confirm storage location for the analytics data on &quot;%1&quot;</source>
+      <translation>Analytics verilerini depolamak için depolama konumunu onaylayın &quot;%1&quot;</translation>
     </message>
     <message>
-      <source>Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
-Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
-By default analytics data will be stored in mediaserver&apos;s installation directory.
-You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</source>
+      <source>the largest available partition</source>
+      <translation>mevcut en büyük bölüm</translation>
+    </message>
+    <message>
+      <source>The analytics database should only be stored on a local drive and can take up large amounts of space.
+Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
+By default analytics data will be stored on %1.
+You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</source>
       <translation>Analytics veritabanı yerel bir depolama biriminde depolanmalı ve yüz gigabayt'ı kaplayabilir.
 
-Analitik verilerini depolamak için konum seçildiğinde, çıkış verilerini kaybetmeden kolayca değiştirilemez. Konumun dikkatlice seçilmesi ve ciddi sistem arızalarının önlenmesi için sistem bölümünün kullanılmaması önerilir.
+Analitik verilerini depolamak için konum seçildiğinde, çıkış verilerini kaybetmeden kolayca değiştirilemez. Konumun dikkatlice seçilmesi ve ciddi sistem arızalarının önlenmesi için sistem bölümünün kullanılmaması önerilir.%1.
 
 Depolama yerini, Sunucu Ayarları iletişim kutusundaki &quot;Depolama Yönetimi&quot; sekmesinden değiştirebilirsiniz.</translation>
     </message>

@@ -30,7 +30,6 @@ namespace nx::vms::client::desktop {
 
 PeerStateTracker::PeerStateTracker(QObject* parent):
     base_type(parent),
-    QnWorkbenchContextAware(parent),
     m_dataLock(QnMutex::Recursive)
 {
     if (ini().massSystemUpdateWaitForServerOnlineSecOverride)
@@ -44,11 +43,13 @@ PeerStateTracker::PeerStateTracker(QObject* parent):
     }
 }
 
-bool PeerStateTracker::setResourceFeed(QnResourcePool* pool)
+bool PeerStateTracker::setResourceFeed(QnResourcePool* pool,
+    std::function<bool (const QnMediaServerResourcePtr&)> filter)
 {
     QObject::disconnect(m_onAddedResource);
     QObject::disconnect(m_onRemovedResource);
 
+    m_resourcePool = nullptr;
     auto itemsCache = m_items;
     /// Reversing item list just to make sure we remove rows from the table from last to first.
     for (auto it = m_items.rbegin(); it != m_items.rend(); ++it)
@@ -70,16 +71,12 @@ bool PeerStateTracker::setResourceFeed(QnResourcePool* pool)
         return false;
     }
 
-    auto systemId = helpers::currentSystemLocalId(commonModule());
-    if (systemId.isNull())
-    {
-        NX_DEBUG(this, "setResourceFeed() got null system id");
-        return false;
-    }
+    m_resourcePool = pool;
+    m_serverFilter = filter;
 
-    NX_DEBUG(this, "setResourceFeed() attaching to resource pool. Current systemId=%1", systemId);
+    NX_DEBUG(this, "setResourceFeed() attaching to resource pool.");
 
-    addItemForClient();
+    addItemForClient(pool->commonModule());
 
     const auto allServers = pool->getAllServers(Qn::AnyStatus);
     for (const QnMediaServerResourcePtr& server: allServers)
@@ -121,11 +118,11 @@ int PeerStateTracker::peersCount() const
 
 QnMediaServerResourcePtr PeerStateTracker::getServer(const UpdateItemPtr& item) const
 {
-    if (!item)
+    if (!item || !m_resourcePool)
         return QnMediaServerResourcePtr();
-    QnMediaServerResourcePtr result = resourcePool()->getResourceById<QnMediaServerResource>(item->id);
+    QnMediaServerResourcePtr result = m_resourcePool->getResourceById<QnMediaServerResource>(item->id);
     if (!result && item->incompatible)
-        return resourcePool()->getIncompatibleServerById(item->id);
+        return m_resourcePool->getIncompatibleServerById(item->id);
     return result;
 }
 
@@ -134,12 +131,13 @@ QnMediaServerResourcePtr PeerStateTracker::getServer(QnUuid id) const
     return getServer(findItemById(id));
 }
 
-QnUuid PeerStateTracker::getClientPeerId() const
+QnUuid PeerStateTracker::getClientPeerId(QnCommonModule* commonModule) const
 {
     // This ID is much more easy to distinguish.
     if (ini().massSystemUpdateDebugInfo)
         return QnUuid("cccccccc-cccc-cccc-cccc-cccccccccccc");
-    return commonModule()->globalSettings()->localSystemId();
+    NX_ASSERT(commonModule);
+    return commonModule->globalSettings()->localSystemId();
 }
 
 nx::utils::SoftwareVersion PeerStateTracker::lowestInstalledVersion()
@@ -812,6 +810,103 @@ void PeerStateTracker::processDownloadTaskSet()
     }
 }
 
+void PeerStateTracker::processReadyInstallTaskSet()
+{
+    QnMutexLocker locker(&m_dataLock);
+    for (const auto& item: m_items)
+    {
+        StatusCode state = item->state;
+        auto id = item->id;
+
+        if (item->incompatible)
+            continue;
+
+        if (m_peersFailed.contains(id)
+            && state != StatusCode::error)
+        {
+            m_peersFailed.remove(id);
+        }
+
+        if (item->offline && state != StatusCode::offline)
+        {
+            if (m_peersActive.contains(id))
+            {
+                NX_VERBOSE(this,
+                    "processReadyInstallTaskSet() - peer %1 just went offline from readyInstall. "
+                    "I will wait a bit for its return.", id);
+                m_peersActive.remove(id);
+            }
+        }
+        else
+        {
+            switch (state)
+            {
+                case StatusCode::readyToInstall:
+                    if (!m_peersIssued.contains(id))
+                    {
+                        NX_VERBOSE(this,
+                            "processReadyInstallTaskSet() - peer %1 is ready to install, "
+                            "but was not tracked. Adding it to task set.", id);
+                        m_peersActive.insert(id);
+                        m_peersIssued.insert(id);
+                    }
+                    if (m_peersIssued.contains(id) && !m_peersActive.contains(id))
+                    {
+                        NX_VERBOSE(this,
+                            "processReadyInstallTaskSet() - peer %1 ready to start installation", id);
+                        m_peersActive.insert(id);
+                    }
+                    // Nothing to do here.
+                    break;
+                case StatusCode::preparing:
+                case StatusCode::downloading:
+                case StatusCode::idle:
+                    if (m_peersActive.contains(id))
+                    {
+                        NX_VERBOSE(this,
+                            "processReadyInstallTaskSet() - peer %1 has changed state to %2 and "
+                            "no longer is ready to start installation", id, toString(state));
+                        m_peersActive.remove(id);
+                    }
+                    break;
+                case StatusCode::offline:
+                    if (item->offline && m_peersIssued.contains(id))
+                    {
+                        NX_VERBOSE(this,
+                            "processReadyInstallTaskSet() - peer %1 is completely offline. "
+                            "I will not wait for it.", id);
+                        m_peersIssued.remove(id);
+                        m_peersActive.remove(id);
+                    }
+                    // NOTE: When this server returns online, its 'idle' state will be ignored.
+                    // Though when it goes to 'preparing' or 'downloading', client will switch
+                    // to 'downloading' state as well, so this server will be properly tracked.
+                    break;
+                case StatusCode::error:
+                    if (m_peersIssued.contains(id))
+                    {
+                        m_peersActive.remove(id);
+                        m_peersFailed.insert(id);
+                        NX_VERBOSE(this,
+                            "processReadyInstallTaskSet() - peer %1 has an error \"%2\".",
+                            id, item->statusMessage);
+                    }
+                    break;
+                case StatusCode::latestUpdateInstalled:
+                    if (m_peersIssued.contains(id))
+                    {
+                        NX_VERBOSE(this,
+                            "processReadyInstallTaskSet() - peer %1 has completed an update somehow.",
+                            id);
+                        m_peersActive.remove(id);
+                        m_peersIssued.remove(id);
+                    }
+                    break;
+            }
+        }
+    }
+}
+
 void PeerStateTracker::processInstallTaskSet()
 {
     NX_ASSERT(!m_peersIssued.isEmpty());
@@ -989,13 +1084,8 @@ void PeerStateTracker::atResourceAdded(const QnResourcePtr& resource)
     if (!server)
         return;
 
-    if (!helpers::serverBelongsToCurrentSystem(server))
-    {
-        //auto systemId = helpers::currentSystemLocalId(commonModule());
-        //NX_VERBOSE(this, "atResourceAdded(%1) server does not belong to the system %2",
-        //     server->getName(), systemId);
+    if (m_serverFilter && !m_serverFilter(server))
         return;
-    }
 
     //NX_VERBOSE(this, "atResourceAdded(%1)", resource->getName());
     const auto status = server->getStatus();
@@ -1170,11 +1260,11 @@ UpdateItemPtr PeerStateTracker::addItemForServer(QnMediaServerResourcePtr server
     return item;
 }
 
-UpdateItemPtr PeerStateTracker::addItemForClient()
+UpdateItemPtr PeerStateTracker::addItemForClient(QnCommonModule* commonModule)
 {
     UpdateItemPtr item = std::make_shared<UpdateItem>();
 
-    item->id = getClientPeerId();
+    item->id = getClientPeerId(commonModule);
     item->component = UpdateItem::Component::client;
     item->row = m_items.size();
     item->protocol = nx::vms::api::protocolVersion();
@@ -1237,6 +1327,8 @@ bool PeerStateTracker::updateServerData(QnMediaServerResourcePtr server, UpdateI
                     "updateServerData() - peer %1 gone offline from state readyInstall.");
                 item->state = StatusCode::preparing;
             }
+            // We need to get /ec2/updateStatus to get a proper status.
+            item->statusUnknown = true;
             // TODO: Should track offline->online changes for task sets:
             //  - peersActive
             //  - peersFailed

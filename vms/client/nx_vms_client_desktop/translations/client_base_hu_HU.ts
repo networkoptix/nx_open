@@ -5597,12 +5597,6 @@ to %1</source>
       <translation>Mi a teendő az aktuális elemzési adatokkal?</translation>
     </message>
     <message>
-      <source>Current analytics data will not be automatically moved to another location and will become unaccessible. You can keep it and manually move later, or delete permanently.
-If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
-      <translation>Az aktuális elemzési adatok nem kerülnek automatikusan áthelyezésre egy másik helyre, és elérhetetlenné válnak. Megtarthatja és kézzel továbbíthatja, vagy véglegesen törölheti.
-Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérjük, lépjen kapcsolatba a supporttal mielőtt folytatná.</translation>
-    </message>
-    <message>
       <source>Delete</source>
       <translation>Törlés</translation>
     </message>
@@ -5613,6 +5607,12 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
     <message>
       <source>Cancel</source>
       <translation>Mégsem</translation>
+    </message>
+    <message>
+      <source>Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
+If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
+      <translation type="unfinished">Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
+If you intended to move analytics data to another storage location, please contact support before proceeding.</translation>
     </message>
   </context>
   <context>
@@ -7734,6 +7734,14 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
       <source>Plugins</source>
       <translation>Pluginok</translation>
     </message>
+    <message>
+      <source>Motion detection is disabled, all schedule records &quot;Motion&quot; and &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
+      <translation type="unfinished">Motion detection is disabled, all schedule records &quot;Motion&quot; and &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</translation>
+    </message>
+    <message>
+      <source>Dual streaming is disabled, all schedule records &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
+      <translation type="unfinished">Dual streaming is disabled, all schedule records &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraSettingsLicenseWatcher</name>
@@ -8059,10 +8067,6 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
         <numerusform>%n események</numerusform>
         <numerusform>%n események</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>unnamed analytics engine</source>
-      <translation type="unfinished">unnamed analytics engine</translation>
     </message>
     <message>
       <source>No events occurred</source>
@@ -8566,6 +8570,58 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
       <source>Some servers are offline and will not be updated. Skip them?</source>
       <translation>Egyes kiszolgálók offline állapotban vannak, és nem frissülnek. Kihagyja őket?</translation>
     </message>
+    <message numerus="yes">
+      <source>Missing update package for the client and %n servers</source>
+      <translation type="unfinished">
+        <numerusform>Missing update package for the client and %n servers</numerusform>
+        <numerusform>Missing update package for the client and %n servers</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Missing update package for the client</source>
+      <translation type="unfinished">Missing update package for the client</translation>
+    </message>
+    <message>
+      <source>There are no online servers to update.</source>
+      <translation type="unfinished">There are no online servers to update.</translation>
+    </message>
+    <message>
+      <source>Cancel update and delete all downloaded data?</source>
+      <translation type="unfinished">Cancel update and delete all downloaded data?</translation>
+    </message>
+    <message>
+      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
+      <translation type="unfinished">OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</translation>
+    </message>
+    <message>
+      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
+      <translation type="unfinished">OS version of the client is no longer supported. Please update its OS to a supported version.</translation>
+    </message>
+    <message>
+      <source>Failed to start update</source>
+      <translation type="unfinished">Failed to start update</translation>
+    </message>
+    <message>
+      <source>Failed to cancel update</source>
+      <translation type="unfinished">Failed to cancel update</translation>
+    </message>
+    <message>
+      <source>Failed to start installation</source>
+      <translation type="unfinished">Failed to start installation</translation>
+    </message>
+    <message>
+      <source>Some servers have not completed the update process. Finish it anyway?</source>
+      <translation type="unfinished">Some servers have not completed the update process. Finish it anyway?</translation>
+    </message>
+    <message>
+      <source>%1 will be restarted to the updated version.</source>
+      <comment>Application name will be substituted</comment>
+      <translation>%1 a frissítés miatt újra fog indulni.</translation>
+    </message>
+    <message>
+      <source>Failed to download update packages to some components</source>
+      <translation type="unfinished">Failed to download update packages to some components</translation>
+    </message>
     <message>
       <source>If the problem persists, please contact Customer Support.</source>
       <translation>Ha a probléma továbbra is fennáll, kérjük, forduljon az ügyfélszolgálathoz.</translation>
@@ -8583,16 +8639,48 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
       <translation>A frissítés befejeződött</translation>
     </message>
     <message>
-      <source>Nx Witness Client will be restarted to the updated version.</source>
-      <translation type="unfinished">Nx Witness Client will be restarted to the updated version.</translation>
+      <source>Update completed, but some components have failed an update</source>
+      <translation type="unfinished">Update completed, but some components have failed an update</translation>
+    </message>
+    <message>
+      <source>Please update %1 manually using an installation package.</source>
+      <translation>Kérjük frissítsen %1 verzióra manuálisan egy telepítőcsomaggal.</translation>
+    </message>
+    <message>
+      <source>%1 will be restarted to the updated version.</source>
+      <translation>%1 a frissítés miatt újra fog indulni.</translation>
     </message>
     <message>
       <source>OK</source>
       <translation>OK</translation>
     </message>
     <message>
+      <source>There was an error while installing updates:</source>
+      <translation type="unfinished">There was an error while installing updates:</translation>
+    </message>
+    <message>
       <source>Downloading updates...</source>
       <translation>Frissítések letöltése...</translation>
+    </message>
+    <message>
+      <source>Finish Update</source>
+      <translation type="unfinished">Finish Update</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>Mégsem</translation>
+    </message>
+    <message>
+      <source>The latest version is already installed</source>
+      <translation type="unfinished">The latest version is already installed</translation>
+    </message>
+    <message>
+      <source>This version is already installed</source>
+      <translation type="unfinished">This version is already installed</translation>
+    </message>
+    <message>
+      <source>Install update</source>
+      <translation>Frissítés telepítése</translation>
     </message>
     <message>
       <source>Upload</source>
@@ -8611,12 +8699,12 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
       <translation type="unfinished">Download &amp;&amp; Install</translation>
     </message>
     <message>
-      <source>Select Another Build</source>
-      <translation type="unfinished">Select Another Build</translation>
-    </message>
-    <message>
       <source>Browse for Another File...</source>
       <translation type="unfinished">Browse for Another File...</translation>
+    </message>
+    <message>
+      <source>Select Another Build</source>
+      <translation type="unfinished">Select Another Build</translation>
     </message>
     <message>
       <source>Update to Specific Build</source>
@@ -8639,6 +8727,10 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
       <translation type="unfinished">Installing client updates...</translation>
     </message>
     <message>
+      <source>Starting update to ...</source>
+      <translation type="unfinished">Starting update to ...</translation>
+    </message>
+    <message>
       <source>Updating to ...</source>
       <translation>Frissítés...</translation>
     </message>
@@ -8647,12 +8739,24 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
       <translation>Készen áll a frissítésre</translation>
     </message>
     <message>
-      <source>Install update</source>
-      <translation>Frissítés telepítése</translation>
-    </message>
-    <message>
       <source>System updated to</source>
       <translation type="unfinished">System updated to</translation>
+    </message>
+    <message>
+      <source>Some servers have no update packages available.</source>
+      <translation type="unfinished">Some servers have no update packages available.</translation>
+    </message>
+    <message>
+      <source>Some servers have encountered an internal error.</source>
+      <translation type="unfinished">Some servers have encountered an internal error.</translation>
+    </message>
+    <message>
+      <source>Please contact Customer Support.</source>
+      <translation>Kérjük forduljon az ügyfélszolgálathoz.</translation>
+    </message>
+    <message>
+      <source>Some servers have gone offline. Please wait until they become online to continue.</source>
+      <translation type="unfinished">Some servers have gone offline. Please wait until they become online to continue.</translation>
     </message>
     <message>
       <source>System update in process</source>
@@ -8661,6 +8765,10 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
     <message>
       <source>Continue in Background</source>
       <translation>Folytatás a háttérben</translation>
+    </message>
+    <message>
+      <source>Latest Available Update</source>
+      <translation>Legutolsó elérhető frissítés</translation>
     </message>
     <message>
       <source>Specific Build</source>
@@ -8673,109 +8781,6 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
     <message>
       <source>Update from mediaservers</source>
       <translation type="unfinished">Update from mediaservers</translation>
-    </message>
-    <message>
-      <source>Latest Available Update</source>
-      <translation>Legutolsó elérhető frissítés</translation>
-    </message>
-    <message numerus="yes">
-      <source>Missing update package for the client and %n servers</source>
-      <translation type="unfinished">
-        <numerusform>Missing update package for the client and %n servers</numerusform>
-        <numerusform>Missing update package for the client and %n servers</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Missing update package for the client</source>
-      <translation type="unfinished">Missing update package for the client</translation>
-    </message>
-    <message>
-      <source>Finish Update</source>
-      <translation type="unfinished">Finish Update</translation>
-    </message>
-    <message>
-      <source>Cancel</source>
-      <translation>Mégsem</translation>
-    </message>
-    <message>
-      <source>The latest version is already installed</source>
-      <translation type="unfinished">The latest version is already installed</translation>
-    </message>
-    <message>
-      <source>This version is already installed</source>
-      <translation type="unfinished">This version is already installed</translation>
-    </message>
-    <message>
-      <source>There are no online servers to update.</source>
-      <translation type="unfinished">There are no online servers to update.</translation>
-    </message>
-    <message>
-      <source>Cancel update and delete all downloaded data?</source>
-      <translation type="unfinished">Cancel update and delete all downloaded data?</translation>
-    </message>
-    <message>
-      <source>There was an error while installing updates:</source>
-      <translation type="unfinished">There was an error while installing updates:</translation>
-    </message>
-    <message>
-      <source>Some servers have gone offline. Please wait until they become online to continue.</source>
-      <translation type="unfinished">Some servers have gone offline. Please wait until they become online to continue.</translation>
-    </message>
-    <message>
-      <source>Update completed, but some components have failed an update</source>
-      <translation type="unfinished">Update completed, but some components have failed an update</translation>
-    </message>
-    <message>
-      <source>Please update %1 manually using an installation package.</source>
-      <translation>Kérjük frissítsen %1 verzióra manuálisan egy telepítőcsomaggal.</translation>
-    </message>
-    <message>
-      <source>%1 will be restarted to the updated version.</source>
-      <translation>%1 a frissítés miatt újra fog indulni.</translation>
-    </message>
-    <message>
-      <source>Failed to download update packages to some components</source>
-      <translation type="unfinished">Failed to download update packages to some components</translation>
-    </message>
-    <message>
-      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
-      <translation type="unfinished">OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</translation>
-    </message>
-    <message>
-      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
-      <translation type="unfinished">OS version of the client is no longer supported. Please update its OS to a supported version.</translation>
-    </message>
-    <message>
-      <source>Failed to start update</source>
-      <translation type="unfinished">Failed to start update</translation>
-    </message>
-    <message>
-      <source>Starting update to ...</source>
-      <translation type="unfinished">Starting update to ...</translation>
-    </message>
-    <message>
-      <source>Failed to cancel update</source>
-      <translation type="unfinished">Failed to cancel update</translation>
-    </message>
-    <message>
-      <source>Failed to start installation</source>
-      <translation type="unfinished">Failed to start installation</translation>
-    </message>
-    <message>
-      <source>Some servers have no update packages available.</source>
-      <translation type="unfinished">Some servers have no update packages available.</translation>
-    </message>
-    <message>
-      <source>Some servers have encountered an internal error.</source>
-      <translation type="unfinished">Some servers have encountered an internal error.</translation>
-    </message>
-    <message>
-      <source>Please please contact Customer Support.</source>
-      <translation type="unfinished">Please please contact Customer Support.</translation>
-    </message>
-    <message>
-      <source>Some servers have not completed the update process. Finish it anyway?</source>
-      <translation type="unfinished">Some servers have not completed the update process. Finish it anyway?</translation>
     </message>
   </context>
   <context>
@@ -9417,6 +9422,14 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
       <source>File was corrupted while being uploaded to the server</source>
       <translation>A fájl sérült a szerverre történő feltöltés közben</translation>
     </message>
+    <message>
+      <source>Remote file &quot;%1&quot; is corrupted</source>
+      <translation type="unfinished">Remote file &quot;%1&quot; is corrupted</translation>
+    </message>
+    <message>
+      <source>Server already has this file &quot;%1&quot;</source>
+      <translation type="unfinished">Server already has this file &quot;%1&quot;</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::WearableCameraMotionWidget</name>
@@ -9946,18 +9959,22 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
       <translation>OK</translation>
     </message>
     <message>
-      <source>Confirm storage location to store analytics data on &apos;%1&apos;</source>
-      <translation type="unfinished">Confirm storage location to store analytics data on &apos;%1&apos;</translation>
+      <source>Confirm storage location for the analytics data on &quot;%1&quot;</source>
+      <translation type="unfinished">Confirm storage location for the analytics data on &quot;%1&quot;</translation>
     </message>
     <message>
-      <source>Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
-Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
-By default analytics data will be stored in mediaserver&apos;s installation directory.
-You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</source>
-      <translation type="unfinished">Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
-Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
-By default analytics data will be stored in mediaserver&apos;s installation directory.
-You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</translation>
+      <source>the largest available partition</source>
+      <translation type="unfinished">the largest available partition</translation>
+    </message>
+    <message>
+      <source>The analytics database should only be stored on a local drive and can take up large amounts of space.
+Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
+By default analytics data will be stored on %1.
+You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</source>
+      <translation type="unfinished">The analytics database should only be stored on a local drive and can take up large amounts of space.
+Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
+By default analytics data will be stored on %1.
+You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</translation>
     </message>
   </context>
   <context>

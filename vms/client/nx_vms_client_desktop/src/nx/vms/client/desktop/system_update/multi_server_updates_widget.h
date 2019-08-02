@@ -403,6 +403,8 @@ private:
      */
     void setUpdateTarget(const nx::update::UpdateContents& contents, bool activeUpdate);
 
+    QnUuid clientPeerId() const;
+
 private:
     QScopedPointer<Ui::MultiServerUpdatesWidget> ui;
     QScopedPointer<QMenu> m_selectUpdateTypeMenu;

@@ -149,7 +149,7 @@
         "licenceError": "Varning! Du håller på att slå samman system med startlicenser. Endast en startlicens är tillåten per system, så den andra licensen kommer att inaktiveras. Sammanfoga ändå?",
         "duplicateServersError": "Kan inte slå samman system eftersom de har minst en server med samma ID. Ta bort den här servern och försök igen.",
         "connectionFailed": "Anslutningen misslyckades: ",
-        "unknownError": "Okänt Fel",
+        "unknownError": "Okänt fel",
         "mergeFailed": "Sammanslagning misslyckades",
         "mergeSucceed": "Sammanfogan lyckades.",
         "newSystemDisplayName": "Nytt system",
@@ -182,7 +182,7 @@
         "selectFiles": "Välj filer"
     },
     "advanced": {
-        "free": "Fri",
+        "free": "Gratis",
         "total": "Totalt",
         "occupied": "Upptagen",
         "reserved": "Reserverad"

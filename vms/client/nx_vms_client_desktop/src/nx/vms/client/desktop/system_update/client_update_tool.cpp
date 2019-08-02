@@ -236,6 +236,13 @@ void ClientUpdateTool::setUpdateTarget(const UpdateContents& contents)
 {
     m_clientPackage = contents.clientPackage;
     m_updateVersion = contents.getVersion();
+    if (!contents.needClientUpdate)
+    {
+        NX_INFO(this, "setUpdateTarget(%1) - no need to install this version",
+            contents.info.version);
+        setState(State::complete);
+        return;
+    }
 
     if (isVersionInstalled(m_updateVersion))
     {

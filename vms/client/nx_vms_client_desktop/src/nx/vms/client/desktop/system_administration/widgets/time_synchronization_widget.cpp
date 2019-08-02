@@ -191,7 +191,9 @@ void TimeSynchronizationWidget::loadDataToUi()
         setBaseOffsetIndex(idx);
     }
     else
+    {
         setBaseOffsetIndex(-1);
+    }
 }
 
 void TimeSynchronizationWidget::applyChanges()

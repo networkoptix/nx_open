@@ -20,7 +20,7 @@
 <div class="panel-body text-center" ng-if="stepIs('brokenSystem')">
     <div class="master-icon"><span class="icon-fail"></span></div>
     <h2>无法安装系统</h2>
-    <p class="master-description">The System cannot be configured. <br>
+    <p class="master-description">系统无法配置。 <br>
         <span ng-bind-html="settings.localError"></span>
     </p>
     <p class="master-controls">
@@ -142,7 +142,7 @@
     </div>
     <h2>{{Config.cloud.productName}} 帐户</h2>
     <p class="master-description">
-        An account is required to use the cloud System {{Config.cloud.productName}}
+        使用云系统 {{Config.cloud.productName}} 所需的帐户
     </p>
     <p class="master-controls">
         <button class="btn btn-primary" ng-click="createAccount()" auto-focus>创建一个新帐户</button>&nbsp;&nbsp;
@@ -280,7 +280,7 @@
 </div>
 
 <div class="panel-body text-center" ng-hide="!stepIs('merge')">
-    <h2>Connect the server to the existing System</h2>
+    <h2>将服务器连接到现有的系统</h2>
     <form class="master-controls wide text-left" name="forms.remoteSystemForm" novalidate disable-autocomplete>
         <div class="form-group" validate-field>
 
@@ -292,7 +292,7 @@
                    uib-typeahead-show-hint="true"
                    uib-typeahead-focus-first="false"
                    uib-typeahead-focus
- placeholder="Existing System URL (https://host:port)"
+ placeholder="现有系统 URL (https://host:port)"
                    ng-change="clearRemoteError()"
                    required
  class="form-control">
@@ -339,13 +339,13 @@
 <div class="panel-body text-center" ng-if="stepIs('retryMergeCredentials')">
     <div class="master-icon"><span class="preloader"></span></div>
     <h2>系统联网 ...</h2>
-    <p class="master-description">Trying to connect to the System</p>
+    <p class="master-description">试图连接到系统</p>
 </div>
 
 
 <div class="panel-body text-center" ng-if="stepIs('mergeFailure')">
     <div class="master-icon"><span class="icon-fail"></span></div>
-    <h2>Cannot merge Systems</h2>
+    <h2>不能合并系统</h2>
     <p class="master-description">
         {{settings.remoteError}}
     </p>

@@ -24,7 +24,7 @@
         <span ng-bind-html="settings.localError"></span>
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-if="canRetry()" ng-click="retry()">Tente Novamente</button>
+        <button class="btn btn-default" ng-if="canRetry()" ng-click="retry()">Tente novamente</button>
     </p>
 </div>
 
@@ -228,12 +228,12 @@
                      forms.localForm.localPasswordConfirmation.$touched &&
                      settings.localPasswordConfirmation != settings.localPassword}">
             <input ng-model="settings.localPasswordConfirmation" name="localPasswordConfirmation" class="form-control"
-                   type="password" autocomplete="new-password" placeholder="Repetir a senha" required>
+                   type="password" autocomplete="new-password" placeholder="Repetir senha" required>
         </div>
         <div class="checkbox text-left" ng-if="settings.thickClient">
             <labe>
                 <input ng-model="settings.savePassword" type="checkbox">
-                Guardar password
+                Guardar senha
             </labe>
         </div>
 
@@ -265,7 +265,7 @@
                     forms.localForm.localPasswordConfirmation.$touched &&
                     forms.localForm.localPasswordConfirmation.$error.required)">
             <div class="help-block">
-                Todos os campos são obrigatórios
+                Todos os campos são necessários
             </div>
         </div>
 
@@ -273,7 +273,7 @@
              ng-if= "forms.localForm.$valid &&
                      (settings.localPasswordConfirmation != settings.localPassword)">
             <div class="help-block">
-                As passwords não conferem
+                As senhas não coincidem
             </div>
         </div>
     </form>
@@ -317,7 +317,7 @@
                     forms.remoteSystemForm.remoteLogin.$touched && forms.remoteSystemForm.remoteLogin.$error.required ||
                     forms.remoteSystemForm.remotePassword.$touched && forms.remoteSystemForm.remotePassword.$error.required">
             <div class="help-block">
-                Todos os campos são obrigatórios
+                Todos os campos são necessários
             </div>
         </div>
 
@@ -362,7 +362,7 @@
         {{settings.remoteError}}
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-click="retry()">Tente Novamente</button>
+        <button class="btn btn-default" ng-click="retry()">Tente novamente</button>
     </p>
 </div>
 
@@ -456,7 +456,7 @@
         Descrição do erro:{{settings.localError}}
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-click="retry()">Tente Novamente</button>
+        <button class="btn btn-default" ng-click="retry()">Tente novamente</button>
     </p>
 </div>
 
