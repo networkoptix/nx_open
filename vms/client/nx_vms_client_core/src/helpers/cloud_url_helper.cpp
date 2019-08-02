@@ -64,11 +64,6 @@ QUrl QnCloudUrlHelper::viewSystemUrl() const
     return makeUrl(lit("/systems/%1/view").arg(systemId));
 }
 
-QUrl QnCloudUrlHelper::armPolicyUrl() const
-{
-    return makeUrl(lit("/content/arm"), /*auth*/ false);
-}
-
 QUrl QnCloudUrlHelper::makeUrl(const QString& path, bool auth) const
 {
     SystemUri uri(nx::network::AppInfo::defaultCloudPortalUrl(
