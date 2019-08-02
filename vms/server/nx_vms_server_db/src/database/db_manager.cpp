@@ -158,9 +158,9 @@ bool businessRuleObjectUpdater(EventRuleData& data)
 //-------------------------------------------------------------------------------------------------
 // QnDbTransactionExt
 
-bool QnDbManager::QnDbTransactionExt::beginLazyTran()
+bool QnDbManager::QnDbTransactionExt::beginLazyTran(const char* sourceFile, int sourceLine)
 {
-    m_mutex.lockForWrite(__FILE__, __LINE__);
+    m_mutex.lockForWrite(sourceFile, sourceLine);
 
     if (!m_lazyTranInProgress)
         m_database.transaction();
@@ -177,9 +177,9 @@ bool QnDbManager::QnDbTransactionExt::commitLazyTran()
     return true;
 }
 
-bool QnDbManager::QnDbTransactionExt::beginTran()
+bool QnDbManager::QnDbTransactionExt::beginTran(const char* sourceFile, int sourceLine)
 {
-    m_mutex.lockForWrite(__FILE__, __LINE__);
+    m_mutex.lockForWrite(sourceFile, sourceLine);
 
     if (m_lazyTranInProgress)
         dbCommit(lit("lazy before new"));
@@ -223,11 +223,13 @@ void QnDbManager::QnDbTransactionExt::physicalCommitLazyData()
     }
 }
 
-QnDbManager::QnLazyTransactionLocker::QnLazyTransactionLocker(QnDbTransactionExt* tran) :
+QnDbManager::QnLazyTransactionLocker::QnLazyTransactionLocker(
+    QnDbTransactionExt* tran, const char* sourceFile, int sourceLine)
+:
     m_committed(false),
     m_tran(tran)
 {
-    m_tran->beginLazyTran();
+    m_tran->beginLazyTran(sourceFile, sourceLine);
 }
 
 QnDbManager::QnLazyTransactionLocker::~QnLazyTransactionLocker()
@@ -510,7 +512,7 @@ bool QnDbManager::init(const nx::utils::Url& dbUrl)
             return false;
         }
 
-        QnDbManager::QnDbTransactionLocker locker(getTransaction());
+        QnDbManager::QnDbTransactionLocker locker(getTransaction(), __FILE__, __LINE__);
 
         if (!commonModule()->obsoleteServerGuid().isNull())
         {
@@ -586,10 +588,6 @@ bool QnDbManager::init(const nx::utils::Url& dbUrl)
             licenseOverflowTime = query.value(0).toByteArray().toLongLong();
             m_licenseOverflowMarked = licenseOverflowTime > 0;
         }
-        const auto& runtimeInfoManager = commonModule()->runtimeInfoManager();
-        QnPeerRuntimeInfo localInfo = runtimeInfoManager->localInfo();
-        if (localInfo.data.prematureLicenseExperationDate != licenseOverflowTime)
-            localInfo.data.prematureLicenseExperationDate = licenseOverflowTime;
 
         query.addBindValue(DB_INSTANCE_KEY);
         if (!m_resyncFlags.testFlag(ResyncLog) && query.exec() && query.next())
@@ -609,9 +607,6 @@ bool QnDbManager::init(const nx::utils::Url& dbUrl)
                 return false;
             }
         }
-
-        localInfo.data.peer.persistentId = m_dbInstanceId;
-        runtimeInfoManager->updateLocalItem(localInfo);
 
         if (m_tranLog)
             if (!m_tranLog->init())
@@ -907,6 +902,14 @@ bool QnDbManager::init(const nx::utils::Url& dbUrl)
 
         if (!locker.commit())
             return false;
+
+        const auto& runtimeInfoManager = commonModule()->runtimeInfoManager();
+        QnPeerRuntimeInfo localInfo = runtimeInfoManager->localInfo();
+        if (localInfo.data.prematureLicenseExperationDate != licenseOverflowTime)
+            localInfo.data.prematureLicenseExperationDate = licenseOverflowTime;
+
+        localInfo.data.peer.persistentId = m_dbInstanceId;
+        runtimeInfoManager->updateLocalItem(localInfo);
     } // end of DB update
 
     m_queryCachePool.reset();
@@ -2137,7 +2140,7 @@ bool QnDbManager::fixDefaultBusinessRuleGuids()
 
 bool QnDbManager::createDatabase()
 {
-    QnDbTransactionLocker lock(m_tran.get());
+    QnDbTransactionLocker lock(m_tran.get(), __FILE__, __LINE__);
 
     m_dbJustCreated = false;
 
@@ -2179,7 +2182,7 @@ bool QnDbManager::createDatabase()
             return false;
     }
 
-    QnDbTransactionLocker lockStatic(&m_tranStatic);
+    QnDbTransactionLocker lockStatic(&m_tranStatic, __FILE__, __LINE__);
 
     if (!isObjectExists(lit("table"), lit("vms_license"), m_sdbStatic))
     {
@@ -4839,7 +4842,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, DiscoveryDataList& data)
 
 ErrorCode QnDbManager::saveLicense(const LicenseData& license)
 {
-    QnDbTransactionLocker lockStatic(&m_tranStatic);
+    QnDbTransactionLocker lockStatic(&m_tranStatic, __FILE__, __LINE__);
     auto result = saveLicense(license, m_sdbStatic);
     if (result == ErrorCode::ok)
     {
@@ -4867,7 +4870,7 @@ ErrorCode QnDbManager::saveLicense(const LicenseData& license, QSqlDatabase& dat
 
 ErrorCode QnDbManager::removeLicense(const LicenseData& license)
 {
-    QnDbTransactionLocker lockStatic(&m_tranStatic);
+    QnDbTransactionLocker lockStatic(&m_tranStatic, __FILE__, __LINE__);
     auto result = removeLicense(license, m_sdbStatic);
     if (result == ErrorCode::ok)
     {

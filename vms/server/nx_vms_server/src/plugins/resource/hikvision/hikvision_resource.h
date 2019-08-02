@@ -28,7 +28,7 @@ public:
     boost::optional<hikvision::ChannelCapabilities>
     channelCapabilities(Qn::ConnectionRole role, bool allowBuildFromCapabilityMap);
     bool findDefaultPtzProfileToken();
-    int hikvisionChannelNumber() const;
+    int streamApiChannel() const;
 
     static hikvision::ProtocolStates tryToEnableIntegrationProtocols(
         const nx::utils::Url& url,

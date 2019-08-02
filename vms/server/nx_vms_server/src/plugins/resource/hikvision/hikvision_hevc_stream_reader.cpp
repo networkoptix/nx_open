@@ -42,7 +42,7 @@ CameraDiagnostics::Result HikvisionHevcStreamReader::openStreamInternal(
         m_hikvisionResource->findDefaultPtzProfileToken();
     }
 
-    auto streamingUrl = buildHikvisionStreamUrl(channelProperties);
+    auto streamingUrl = makeStreamUrl(channelProperties);
     m_hikvisionResource->updateSourceUrl(streamingUrl.toString(), getRole());
     if (!isCameraControlRequired)
     {
@@ -81,7 +81,7 @@ CameraDiagnostics::Result HikvisionHevcStreamReader::openStreamInternal(
     return m_rtpReader.openStream();
 }
 
-nx::utils::Url HikvisionHevcStreamReader::buildHikvisionStreamUrl(
+nx::utils::Url HikvisionHevcStreamReader::makeStreamUrl(
     const hikvision::ChannelProperties& properties) const
 {
     auto url = properties.httpUrl;
@@ -91,7 +91,7 @@ nx::utils::Url HikvisionHevcStreamReader::buildHikvisionStreamUrl(
     return url;
 }
 
-nx::utils::Url HikvisionHevcStreamReader::hikvisionRequestUrlFromPath(const QString& path) const
+nx::utils::Url HikvisionHevcStreamReader::makeApiUrl(const QString& path) const
 {
     auto url = nx::utils::Url(m_hikvisionResource->getUrl());
     url.setPath(path);
@@ -229,10 +229,10 @@ boost::optional<int> HikvisionHevcStreamReader::rescaleQuality(
     return outputQuality[outputIndex];
 }
 
-nx::utils::Url HikvisionHevcStreamReader::buildHikvisionUrl(const QString& requestTemplate) const
+nx::utils::Url HikvisionHevcStreamReader::makeStreamApiUrl(const QString& requestTemplate) const
 {
-    return hikvisionRequestUrlFromPath(kIsapiChannelStreamingPathTemplate.arg(
-        buildChannelNumber(getRole(), m_hikvisionResource->hikvisionChannelNumber())));
+    return makeApiUrl(kIsapiChannelStreamingPathTemplate.arg(
+        buildChannelNumber(getRole(), m_hikvisionResource->streamApiChannel())));
 }
 
 CameraDiagnostics::Result HikvisionHevcStreamReader::fetchChannelProperties(
@@ -241,7 +241,7 @@ CameraDiagnostics::Result HikvisionHevcStreamReader::fetchChannelProperties(
     boost::optional<int> rtspPort;
 
 
-    auto url = buildHikvisionUrl(kIsapiChannelStreamingPathTemplate);
+    auto url = makeStreamApiUrl(kIsapiChannelStreamingPathTemplate);
 
     auto result = fetchRtspPortViaIsapi(&rtspPort);
     if (result.errorCode == CameraDiagnostics::ErrorCode::notAuthorised)
@@ -258,7 +258,7 @@ CameraDiagnostics::Result HikvisionHevcStreamReader::fetchChannelProperties(
                     m_hikvisionResource->getUserDefinedName(),
                     m_hikvisionResource->getId()));
 
-        url = buildHikvisionUrl(kChannelStreamingPathTemplate);
+        url = makeStreamApiUrl(kChannelStreamingPathTemplate);
         result = fetchRtspPortViaOldApi(&rtspPort);
     }
 
@@ -285,7 +285,7 @@ CameraDiagnostics::Result HikvisionHevcStreamReader::fetchRtspPortViaIsapi(
     boost::optional<int>* outRtspPort) const
 {
     static const QString kAdminAccessPath("/ISAPI/Security/adminAccesses");
-    const auto url = hikvisionRequestUrlFromPath(kAdminAccessPath);
+    const auto url = makeApiUrl(kAdminAccessPath);
 
     nx::Buffer response;
     const auto result = fetchResponse(url, &response);
@@ -304,7 +304,7 @@ CameraDiagnostics::Result HikvisionHevcStreamReader::fetchRtspPortViaIsapi(
 CameraDiagnostics::Result HikvisionHevcStreamReader::fetchRtspPortViaOldApi(
     boost::optional<int>* outRtspPort) const
 {
-    auto url = buildHikvisionUrl(kChannelStreamingPathTemplate);
+    auto url = makeStreamApiUrl(kChannelStreamingPathTemplate);
 
     nx::Buffer response;
     const auto result = fetchResponse(url, &response);

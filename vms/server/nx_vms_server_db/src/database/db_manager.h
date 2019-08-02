@@ -145,7 +145,7 @@ namespace detail
         ErrorCode executeTransaction(const QnTransaction<T>& tran, const QByteArray& serializedTran)
         {
             NX_ASSERT(!tran.persistentInfo.isNull(), "You must register transaction command in persistent command list!");
-            QnDbTransactionLocker lock(getTransaction());
+            QnDbTransactionLocker lock(getTransaction(), __FILE__, __LINE__);
             ErrorCode result = executeTransactionNoLock(tran, serializedTran);
             if (result == ErrorCode::ok) {
                 if (!lock.commit())
@@ -728,11 +728,11 @@ namespace detail
             {
             }
 
-            virtual bool beginTran() override;
+            virtual bool beginTran(const char* sourceFile, int sourceLine) override;
             virtual void rollback() override;
             virtual bool commit() override;
 
-            bool beginLazyTran();
+            bool beginLazyTran(const char* sourceFile, int sourceLine);
             bool commitLazyTran();
         private:
             void physicalCommitLazyData();
@@ -747,7 +747,7 @@ namespace detail
         class QnLazyTransactionLocker: public QnAbstractTransactionLocker
         {
         public:
-            QnLazyTransactionLocker(QnDbTransactionExt* tran);
+            QnLazyTransactionLocker(QnDbTransactionExt* tran, const char* sourceFile, int sourceLine);
             virtual ~QnLazyTransactionLocker();
             virtual bool commit() override;
 
