@@ -85,7 +85,8 @@ public:
         layout->setContentsMargins(QMargins());
         layout->addWidget(m_urlLineEdit);
         layout->addWidget(m_webView);
-        connect(m_urlLineEdit, &QLineEdit::returnPressed, this, [this]()
+        connect(m_urlLineEdit, &QLineEdit::returnPressed, this,
+            [this]
             {
                 m_webView->load(m_urlLineEdit->text());
             });
@@ -110,9 +111,9 @@ public:
     }
 
 private:
-    QnWebPage* m_page;
-    QWebView* m_webView;
-    QLineEdit* m_urlLineEdit;
+    QnWebPage* const m_page;
+    QWebView* const m_webView;
+    QLineEdit* const m_urlLineEdit;
 };
 
 #if defined(NX_ENABLE_WEBENGINE)
@@ -150,9 +151,9 @@ private:
         }
 
     private:
-        const QWebEnginePage* m_page;
-        const QWebEngineView* m_webView;
-        const QLineEdit* m_urlLineEdit;
+        QWebEnginePage* const m_page;
+        QWebEngineView* const m_webView;
+        QLineEdit* const m_urlLineEdit;
     };
 
 #endif
