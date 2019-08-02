@@ -27,9 +27,10 @@ protected:
     void givenExistingBucket();
     void givenAddedBucket();
     void whenAddBucket(std::string bucketName = {});
+    void whenAddUnknownBucket();
     void whenListBuckets();
     void whenRemoveBucket(std::string bucketName = {});
-    void thenAddBucketSucceeds();
+    void thenAddBucketResponseIs(ResultCode resultCode);
     void thenListBucketsSucceeds();
     void thenRemoveBucketSucceeds();
     void andAddedBucketMatchesExpectedBucket();
@@ -38,6 +39,7 @@ protected:
 
 private:
     service::test::S3Bucket* createBucket();
+    void addBucket(const AddBucketRequest& request);
 
 protected:
     std::unique_ptr<Client> m_cloudStorageClient;

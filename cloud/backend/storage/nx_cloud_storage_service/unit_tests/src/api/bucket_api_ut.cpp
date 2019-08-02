@@ -41,7 +41,7 @@ void BucketApi::givenAddedBucket()
 {
     givenExistingBucket();
     whenAddBucket();
-    thenAddBucketSucceeds();
+    thenAddBucketResponseIs(ResultCode::ok);
     andAddedBucketMatchesExpectedBucket();
 }
 
@@ -50,12 +50,12 @@ void BucketApi::whenAddBucket(std::string bucketName)
     if (bucketName.empty())
         bucketName = m_lastBucketCreated->name();
 
-    m_cloudStorageClient->addBucket(
-        AddBucketRequest{bucketName},
-        [this](auto result, auto bucket)
-        {
-            m_addBucketResponse.push({std::move(result), std::move(bucket)});
-        });
+    addBucket({bucketName});
+}
+
+void BucketApi::whenAddUnknownBucket()
+{
+    addBucket({"bucket-unknown"});
 }
 
 void BucketApi::whenListBuckets()
@@ -80,10 +80,10 @@ void BucketApi::whenRemoveBucket(std::string bucketName)
         });
 }
 
-void BucketApi::thenAddBucketSucceeds()
+void BucketApi::thenAddBucketResponseIs(ResultCode resultCode)
 {
     auto [result, bucket] = m_addBucketResponse.pop();
-    ASSERT_EQ(ResultCode::ok, result.resultCode);
+    ASSERT_EQ(resultCode, result.resultCode);
     m_lastBucketAdded = std::move(bucket);
 }
 
@@ -141,15 +141,32 @@ service::test::S3Bucket* BucketApi::createBucket()
     return m_lastBucketCreated;
 }
 
+void BucketApi::addBucket(const AddBucketRequest& request)
+{
+    m_cloudStorageClient->addBucket(
+        request,
+        [this](auto result, auto bucket)
+        {
+            m_addBucketResponse.push({std::move(result), std::move(bucket)});
+        });
+}
+
 TEST_F(BucketApi, add_bucket)
 {
     givenExistingBucket();
 
     whenAddBucket();
 
-    thenAddBucketSucceeds();
+    thenAddBucketResponseIs(ResultCode::ok);
 
     andAddedBucketMatchesExpectedBucket();
+}
+
+TEST_F(BucketApi, fails_to_add_unknown_bucket)
+{
+    whenAddUnknownBucket();
+
+    thenAddBucketResponseIs(ResultCode::awsApiError);
 }
 
 
