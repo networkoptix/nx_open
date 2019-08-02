@@ -8,9 +8,6 @@ namespace nx::cloud::storage::service::model::dao {
 
 namespace {
 
-// TODO should this type by put into the database?
-static constexpr char kStorageType[] = "awss3";
-
 static constexpr char kId[] = "id";
 static constexpr char kRegion[] = "region";
 static constexpr char kTotalSpace[] = "total_space";
@@ -47,7 +44,6 @@ api::Storage toStorage(nx::sql::AbstractSqlQuery* query)
     storage.totalSpace = query->value(kTotalSpace).toInt();
     storage.region = query->value(kRegion).toByteArray().toStdString();
     storage.ioDevice.dataUrl = query->value(kUrl).toString();
-    storage.ioDevice.type = kStorageType; //< TODO put this in the DB?
     return storage;
 }
 
@@ -66,7 +62,7 @@ void StorageDao::addStorage(
     query->exec();
 }
 
-api::Storage StorageDao::readStorage(
+std::optional<api::Storage> StorageDao::readStorage(
     nx::sql::QueryContext* queryContext,
     const std::string& storageId)
 {
@@ -75,9 +71,15 @@ api::Storage StorageDao::readStorage(
     query->bindValue(kIdBinding, storageId);
     query->exec();
 
+    if (!query->next())
+        return std::nullopt;
+
     auto storage = toStorage(query.get());
     // TODO request actual storage free space from S3, probably in controller code
     storage.freeSpace = storage.totalSpace;
+
+    if (storage.id != storageId)
+        return std::nullopt;
 
     return storage;
 }

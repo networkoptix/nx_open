@@ -9,6 +9,8 @@ struct NX_NETWORK_API Device
 {
     std::string type;
     nx::utils::Url dataUrl;
+
+    bool operator==(const Device& other) const;
 };
 
 #define Device_Fields (type)(dataUrl)
@@ -25,6 +27,8 @@ struct NX_NETWORK_API Storage
     int totalSpace = 0;
     int freeSpace = 0;
     Device ioDevice;
+
+    bool operator==(const Storage& other) const;
 };
 
 #define Storage_Fields (id)(region)(totalSpace)(freeSpace)(ioDevice)

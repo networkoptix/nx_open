@@ -18,7 +18,7 @@ struct NX_NETWORK_API Bucket
 
 #define Bucket_Fields (name)(region)(cloudStorageCount)
 
-QN_FUSION_DECLARE_FUNCTIONS(Bucket, (json), NX_NETWORK_API)
+QN_FUSION_DECLARE_FUNCTIONS(Bucket, (ubjson)(json), NX_NETWORK_API)
 
 //-------------------------------------------------------------------------------------------------
 // Buckets

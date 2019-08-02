@@ -5,7 +5,12 @@
 namespace nx::cloud::storage::service::api {
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (Bucket)(Buckets),
+    (Bucket),
+    (ubjson)(json),
+    _Fields)
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
+    (Buckets),
     (json),
     _Fields)
 

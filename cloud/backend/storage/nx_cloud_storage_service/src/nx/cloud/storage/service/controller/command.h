@@ -2,25 +2,11 @@
 
 #include <string>
 
-#include <nx/network/buffer.h>
-#include <nx/fusion/model_functions_fwd.h>
 #include <nx/clusterdb/engine/command_descriptor.h>
+#include <nx/network/buffer.h>
+#include <nx/network/cloud/storage/service/api/bucket.h>
 
 namespace nx::cloud::storage::service::controller {
-
-struct Bucket
-{
-    std::string name;
-    std::string region;
-};
-
-#define Bucket_sync_Fields (name)(region)
-
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (Bucket),
-    (json)(ubjson))
-
-//-------------------------------------------------------------------------------------------------
 
 namespace command {
 
@@ -32,7 +18,7 @@ enum Code
 
 struct SaveBucket
 {
-    using Data = Bucket;
+    using Data = api::Bucket;
     static constexpr int code = Code::saveBucket;
     static constexpr char name[] = "saveBucket";
 

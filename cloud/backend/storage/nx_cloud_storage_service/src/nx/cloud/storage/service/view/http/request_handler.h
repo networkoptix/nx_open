@@ -6,6 +6,31 @@
 
 namespace nx::cloud::storage::service::view::http {
 
+namespace detail {
+
+network::http::FusionRequestErrorClass toFusionRequestErrorClass(api::ResultCode resultCode)
+{
+    using namespace nx::network::http;
+    switch (resultCode)
+    {
+        case api::ResultCode::ok:
+            return FusionRequestErrorClass::noError;
+        case api::ResultCode::badRequest:
+        case api::ResultCode::awsApiError:
+            return FusionRequestErrorClass::badRequest;
+        case api::ResultCode::unauthorized:
+            return FusionRequestErrorClass::unauthorized;
+        case api::ResultCode::notFound:
+            return FusionRequestErrorClass::logicError;
+        case api::ResultCode::internalError:
+        default:
+            return FusionRequestErrorClass::internalError;
+    }
+}
+
+
+} // namespace detail
+
 template<typename Input, typename Output, typename... RestArgFetchers>
 class RequestHandler:
     public nx::network::http::server::rest::BaseRequestHandler<
@@ -27,27 +52,6 @@ public:
     template<typename... OutputData>
     void processResponseInternal(
         api::Result result, OutputData... output);
-
-private:
-    static network::http::StatusCode::Value toHttpStatusCode(api::ResultCode resultCode)
-    {
-        using namespace nx::network::http;
-        switch (resultCode)
-        {
-            case api::ResultCode::ok:
-                return StatusCode::ok;
-            case api::ResultCode::badRequest:
-            case api::ResultCode::awsApiError:
-                return StatusCode::badRequest;
-            case api::ResultCode::unauthorized:
-                return StatusCode::unauthorized;
-            case api::ResultCode::notFound:
-                return StatusCode::notFound;
-            case api::ResultCode::internalError:
-            default:
-                return StatusCode::internalServerError;
-        }
-    }
 };
 
 template<typename Input, typename Output, typename... RestArgFetchers>
@@ -58,7 +62,7 @@ void RequestHandler<Input, Output, RestArgFetchers...>::processResponseInternal(
     if (result.resultCode != api::ResultCode::ok)
     {
         network::http::FusionRequestResult error;
-        error.setHttpStatusCode(toHttpStatusCode(result.resultCode));
+        error.errorClass = detail::toFusionRequestErrorClass(result.resultCode);
         error.resultCode = toString(result.resultCode);
         error.errorText = result.error.c_str();
         return this->requestCompleted(std::move(error), std::move(output)...);

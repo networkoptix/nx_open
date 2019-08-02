@@ -4,6 +4,8 @@
 #include <nx/cloud/storage/service/test_support/cloud_storage_launcher.h>
 
 #include <nx/cloud/storage/service/settings.h>
+#include <nx/cloud/storage/service/controller/geo_ip_resolver.h>
+#include <nx/geo_ip/test_support/memory_resolver.h>
 
 namespace nx::cloud::storage::service::test {
 
@@ -11,9 +13,25 @@ class CloudStorageService:
     public testing::Test,
     public nx::utils::test::TestWithTemporaryDirectory
 {
+public:
+    ~CloudStorageService()
+    {
+        if (m_geoIpFactoryFuncBak)
+        {
+            controller::GeoIpResolverFactory::instance().setCustomFunc(
+                std::move(m_geoIpFactoryFuncBak));
+        }
+    }
 protected:
     virtual void SetUp() override
     {
+        m_geoIpFactoryFuncBak =
+            controller::GeoIpResolverFactory::instance().setCustomFunc(
+                [](auto&& ... /*args*/)
+                {
+                    return std::make_unique<nx::geo_ip::test::MemoryResolver>();
+                });
+
         m_cloudStorage = std::make_unique<CloudStorageLauncher>();
     }
 
@@ -53,6 +71,7 @@ protected:
 private:
     std::unique_ptr<CloudStorageLauncher> m_cloudStorage;
     std::string m_htdigestPath;
+    controller::GeoIpResolverFactory::Function m_geoIpFactoryFuncBak;
 };
 
 TEST_F(CloudStorageService, loads_all_settings)

@@ -88,13 +88,13 @@ void Server::registerStorageApiHandlers()
     using namespace std::placeholders;
     using namespace nx::network::http::server::rest;
 
-    using AddStorageHandler = RequestHandler<api::AddStorageRequest, api::Storage>;
+    using AddStorageHandler = RequestHandler<api::AddStorageRequest, api::Storage, ClientEndpointFetcher>;
     m_messageDispatcher.registerRequestProcessor<AddStorageHandler>(
         api::kStorages,
         [this]()
         {
             return std::make_unique<AddStorageHandler>(
-                std::bind(&controller::StorageManager::addStorage, m_storageManager, _1, _2));
+                std::bind(&controller::StorageManager::addStorage, m_storageManager, _1, _2, _3));
         },
         network::http::Method::put);
 

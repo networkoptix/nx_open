@@ -16,8 +16,9 @@ public:
         nx::sql::QueryContext* queryContext,
         const api::Bucket& bucket) = 0;
 
-    virtual std::vector<api::Bucket> listBuckets(
-        nx::sql::QueryContext* queryContext) = 0;
+    virtual std::vector<api::Bucket> fetchBuckets(
+        nx::sql::QueryContext* queryContext,
+        bool withStorageCount) = 0;
 
     virtual void removeBucket(
         nx::sql::QueryContext* queryContext,
@@ -35,8 +36,9 @@ public:
         nx::sql::QueryContext* queryContext,
         const api::Bucket& bucket) override;
 
-    virtual std::vector<api::Bucket> listBuckets(
-        nx::sql::QueryContext* queryContext) override;
+    virtual std::vector<api::Bucket> fetchBuckets(
+        nx::sql::QueryContext* queryContext,
+        bool withStorageCount) override;
 
     virtual void removeBucket(
         nx::sql::QueryContext* queryContext,

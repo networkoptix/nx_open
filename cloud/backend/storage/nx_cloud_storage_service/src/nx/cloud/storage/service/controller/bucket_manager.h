@@ -3,12 +3,10 @@
 #include <nx/network/cloud/storage/service/api/result.h>
 #include <nx/network/cloud/storage/service/api/add_bucket.h>
 #include <nx/network/cloud/storage/service/api/bucket.h>
-#include <nx/sql/types.h>
+#include <nx/sql/query_context.h>
 
 #include "command.h"
 #include "s3_permissions_tester.h"
-
-namespace nx::sql { class QueryContext; }
 
 namespace nx::cloud {
 
@@ -44,6 +42,10 @@ public:
         const std::string& bucketName,
         nx::utils::MoveOnlyFunc<void(api::Result)> handler);
 
+    std::vector<api::Bucket> fetchBuckets(
+        nx::sql::QueryContext* queryContext,
+        bool withStorageCount = false);
+
 private:
     nx::sql::DBResult addBucketInternal(
         nx::sql::QueryContext* queryContext,
@@ -56,7 +58,7 @@ private:
     void insertReceivedRecord(
         nx::sql::QueryContext* queryContext,
         const std::string& /*clusterId*/,
-        clusterdb::engine::Command<Bucket> command);
+        clusterdb::engine::Command<api::Bucket> command);
 
     void removeReceivedRecord(
         nx::sql::QueryContext* queryContext,

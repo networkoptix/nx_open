@@ -67,6 +67,7 @@ void BucketManager::addBucket(
             auto bucket = std::make_shared<api::Bucket>();
             bucket->name = request.name;
             bucket->region = region;
+            bucket->cloudStorageCount = 0;
 
             m_database->synchronizationEngine()->transactionLog().startDbTransaction(
                 m_settings.database().synchronization.clusterId,
@@ -100,7 +101,7 @@ void BucketManager::listBuckets(
         m_settings.database().synchronization.clusterId,
         [this, buckets](nx::sql::QueryContext* queryContext)
         {
-            buckets->buckets = m_bucketDao->listBuckets(queryContext);
+            buckets->buckets = fetchBuckets(queryContext, true /*withStorageCount*/);
             return nx::sql::DBResult::ok;
         },
         [this, handler = std::move(handler), buckets](nx::sql::DBResult dbResult)
@@ -108,8 +109,8 @@ void BucketManager::listBuckets(
             if (dbResult != nx::sql::DBResult::ok)
             {
                 api::Result error(utils::toResultCode(dbResult));
-                error.error =
-                    std::string("listBuckets failed with sql error: ") + toString(dbResult);
+                error.error = lm("listBuckets failed with sql error: %1")
+                    .arg(toString(dbResult)).toStdString();
                 NX_VERBOSE(this, error.error);
                 return handler(std::move(error), api::Buckets{});
             }
@@ -133,15 +134,21 @@ void BucketManager::removeBucket(
             if (dbResult != nx::sql::DBResult::ok)
             {
                 api::Result error(utils::toResultCode(dbResult));
-                error.error =
-                    lm("removeBucket(%1) failed with sql error: %2")
-                        .args(bucketName, toString(dbResult)).toStdString();
+                error.error = lm("removeBucket(%1) failed with sql error: %2")
+                    .args(bucketName, toString(dbResult)).toStdString();
                 NX_VERBOSE(this, error.error);
                 return handler(std::move(error));
             }
 
             handler(api::Result());
         });
+}
+
+std::vector<api::Bucket> BucketManager::fetchBuckets(
+    nx::sql::QueryContext* queryContext,
+    bool withStorageCount)
+{
+    return m_bucketDao->fetchBuckets(queryContext, withStorageCount);
 }
 
 nx::sql::DBResult BucketManager::addBucketInternal(
@@ -154,7 +161,7 @@ nx::sql::DBResult BucketManager::addBucketInternal(
         .generateTransactionAndSaveToLog<command::SaveBucket>(
             queryContext,
             m_settings.database().synchronization.clusterId,
-            Bucket{bucket.name, bucket.region});
+            bucket);
 
     return nx::sql::DBResult::ok;
 }
@@ -177,13 +184,9 @@ nx::sql::DBResult BucketManager::removeBucketInternal(
 void BucketManager::insertReceivedRecord(
     nx::sql::QueryContext* queryContext,
     const std::string& /*clusterId*/,
-    clusterdb::engine::Command<Bucket> command)
+    clusterdb::engine::Command<api::Bucket> command)
 {
-    m_bucketDao->addBucket(
-        queryContext,
-        api::Bucket{
-            command.params.name,
-            command.params.region});
+    m_bucketDao->addBucket(queryContext, command.params);
 }
 
 void BucketManager::removeReceivedRecord(

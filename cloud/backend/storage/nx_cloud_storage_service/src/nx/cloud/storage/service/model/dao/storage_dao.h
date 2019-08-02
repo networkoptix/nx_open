@@ -19,7 +19,7 @@ public:
         nx::sql::QueryContext* queryContext,
         const api::Storage& storage) = 0;
 
-    virtual api::Storage readStorage(
+    virtual std::optional<api::Storage> readStorage(
         nx::sql::QueryContext* queryContext,
         const std::string& storageId) = 0;
 
@@ -39,7 +39,7 @@ public:
         nx::sql::QueryContext* queryContext,
         const api::Storage& storage) override;
 
-    virtual api::Storage readStorage(
+    virtual std::optional<api::Storage> readStorage(
         nx::sql::QueryContext* queryContext,
         const std::string& storageId) override;
 
