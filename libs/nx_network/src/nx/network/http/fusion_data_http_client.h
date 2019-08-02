@@ -152,6 +152,19 @@ protected:
 
     virtual void requestDone(nx::network::http::AsyncClient* client) = 0;
 
+    void deserializeFusionRequestResult(
+        SystemError::ErrorCode errCode,
+        const nx::network::http::Response* response,
+        const nx::network::http::BufferType& msgBody)
+    {
+        if (errCode != SystemError::noError ||
+            !response ||
+            !StatusCode::isSuccessCode(response->statusLine.statusCode))
+        {
+            m_lastFusionRequestResult = QJson::deserialized<FusionRequestResult>(msgBody);
+        }
+    }
+
     template<typename OutputData>
     void processHttpResponse(
         nx::utils::MoveOnlyFunc<void(
@@ -168,7 +181,7 @@ protected:
             !response ||
             !StatusCode::isSuccessCode(response->statusLine.statusCode))
         {
-            m_lastFusionRequestResult = QJson::deserialized<FusionRequestResult>(msgBody);
+            deserializeFusionRequestResult(errCode, response, msgBody);
             handler(errCode, response, OutputData());
             return;
         }
@@ -317,6 +330,11 @@ public:
 private:
     virtual void requestDone(nx::network::http::AsyncClient* client) override
     {
+        deserializeFusionRequestResult(
+            client->lastSysErrorCode(),
+            client->response(),
+            client->fetchMessageBodyBuffer());
+
         decltype(this->m_handler) handler;
         handler.swap(this->m_handler);
         handler(
@@ -345,6 +363,11 @@ public:
 private:
     virtual void requestDone(nx::network::http::AsyncClient* client) override
     {
+        deserializeFusionRequestResult(
+            client->lastSysErrorCode(),
+            client->response(),
+            client->fetchMessageBodyBuffer());
+
         decltype(this->m_handler) handler;
         handler.swap(this->m_handler);
         handler(
