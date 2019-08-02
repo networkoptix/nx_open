@@ -56,7 +56,7 @@ const void* callQueryInterface(int line, ObjectPtr objectPtr, int sfinaeDummy = 
 {
     /*unused*/ (void) sfinaeDummy;
 
-    const Ptr<Interface> ptr = objectPtr->IRefCountable::queryInterface<Interface>();
+    const Ptr<Interface> ptr = objectPtr->IRefCountable::template queryInterface<Interface>();
 
     // Increase result's ref-count because the caller will call releaseRef() when finished.
     if (ptr)
