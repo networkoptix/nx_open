@@ -49,7 +49,6 @@ protected:
 private:
     std::map<std::string, std::unique_ptr<service::test::S3Bucket>> m_buckets;
     nx::network::http::Credentials m_credentials;
-    std::string m_lastBucketRemoved;
     nx::utils::SyncQueue<std::pair<Result, Bucket>> m_addBucketResponse;
     nx::utils::SyncQueue<std::pair<Result, Buckets>> m_listBucketsResponse;
     nx::utils::SyncQueue<Result> m_removeBucketResponse;

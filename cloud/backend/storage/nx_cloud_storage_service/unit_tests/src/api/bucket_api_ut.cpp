@@ -72,8 +72,6 @@ void BucketApi::whenRemoveBucket(std::string bucketName)
     if (bucketName.empty())
         bucketName = m_lastBucketCreated->name();
 
-    m_lastBucketRemoved = bucketName;
-
     m_cloudStorageClient->removeBucket(
         bucketName,
         [this](auto result)
