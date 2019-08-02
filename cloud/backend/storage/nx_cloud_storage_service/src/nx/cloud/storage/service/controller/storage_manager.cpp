@@ -297,9 +297,10 @@ std::optional<nx::geo_ip::Location> StorageManager::resolveLocation(const std::s
     }
     catch (const std::exception& e)
     {
-        return std::nullopt;
         NX_VERBOSE(this, "Failed to resolve IP %1: %2", ipAddress, e.what());
     }
+
+    return std::nullopt;
 }
 
 } // namespace nx::cloud::storage::service::controller
