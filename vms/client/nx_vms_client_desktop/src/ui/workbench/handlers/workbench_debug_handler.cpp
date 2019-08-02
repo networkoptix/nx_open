@@ -134,11 +134,12 @@ private:
         {
             m_webView->setPage(m_page);
 
-            QVBoxLayout* layout = new QVBoxLayout(this);
+            auto layout = new QVBoxLayout(this);
             layout->setContentsMargins(QMargins());
             layout->addWidget(m_urlLineEdit);
             layout->addWidget(m_webView, 1);
-            connect(m_urlLineEdit, &QLineEdit::returnPressed, this, [this]()
+            connect(m_urlLineEdit, &QLineEdit::returnPressed, this,
+                [this]
                 {
                     m_webView->load(m_urlLineEdit->text());
                 });
@@ -153,9 +154,9 @@ private:
         }
 
     private:
-        QWebEnginePage* m_page;
-        QWebEngineView* m_webView;
-        QLineEdit* m_urlLineEdit;
+        const QWebEnginePage* m_page;
+        const QWebEngineView* m_webView;
+        const QLineEdit* m_urlLineEdit;
     };
 
 #endif
@@ -220,9 +221,9 @@ public:
 
         #if defined(NX_ENABLE_WEBENGINE)
             addButton("Web Engine View",
-                [this]()
+                [this]
                 {
-                    auto dialog(new WebEngineViewDialog(this));
+                    auto dialog = new WebEngineViewDialog(this);
                     //dialog->setUrl("http://localhost:7001");
                     dialog->show();
                 });
