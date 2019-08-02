@@ -194,7 +194,6 @@ private:
     Storage m_lastStorageAdded;
     Storage m_lastStorageRead;
     Storage m_lastStorageRemoved;
-    int m_lastCloudStorageCount = 0;
     service::test::S3Bucket* m_expectedBucket = nullptr;
 
     nx::utils::SyncQueue<bool> m_cloudDbAuthenticationEvent;
