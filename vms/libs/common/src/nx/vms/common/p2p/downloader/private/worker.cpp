@@ -651,7 +651,7 @@ void Worker::downloadChunks()
         {
             // We'll get here with no change in this case. But this way we'll not wait when the
             // latest single chunk is downloaded. Instead we'll keep operating with maximum
-            // cuncurrent chunks.
+            // concurrent chunks.
             chunksLeft = kSubsequentChunksToDownload;
         }
 
