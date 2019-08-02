@@ -6,6 +6,8 @@
 #include <nx/utils/log/log.h>
 #include <utils/common/synctime.h>
 
+using namespace nx::vms::server;
+
 namespace {
 
 struct Exception
@@ -137,16 +139,16 @@ static int makeSuccessfulResponse(QByteArray& result, QByteArray& resultContentT
 }
 
 void updateAndSetUpdateInformation(
-    nx::CommonUpdateManager* updateManager,
+    UpdateManager* updateManager,
     const QList<QnUuid>& participants,
     qint64 lastInstallationRequestTime)
 {
     auto currentInfo = updateManager->updateInformation(
-        nx::CommonUpdateManager::InformationCategory::target);
+        UpdateManager::InformationCategory::target);
     currentInfo.participants = participants;
     currentInfo.lastInstallationRequestTime = lastInstallationRequestTime;
     updateManager->setUpdateInformation(
-        nx::CommonUpdateManager::InformationCategory::target,
+        UpdateManager::InformationCategory::target,
         currentInfo);
 }
 
@@ -181,7 +183,7 @@ void QnInstallUpdateRestHandler::storeUpdateState()
     try
     {
         const auto updateInfo = serverModule()->updateManager()->updateInformation(
-            nx::CommonUpdateManager::InformationCategory::target);
+            UpdateManager::InformationCategory::target);
 
         m_participants = updateInfo.participants;
         m_updateInstallTime = updateInfo.lastInstallationRequestTime;

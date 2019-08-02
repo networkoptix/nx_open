@@ -14,7 +14,6 @@
 
 #include <utils/common/id.h>
 #include <nx/vms/common/p2p/downloader/downloader.h>
-#include <nx/update/common_update_manager.h>
 
 #include "server_update_tool.h"
 #include "client_update_tool.h"

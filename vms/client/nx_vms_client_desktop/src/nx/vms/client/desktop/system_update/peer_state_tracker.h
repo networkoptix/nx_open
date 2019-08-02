@@ -4,12 +4,11 @@
 #include <memory>
 #include <chrono>
 
-#include <QtCore/QAbstractTableModel>
-
 #include <utils/common/connective.h>
 #include <core/resource/resource_fwd.h>
 #include <nx/vms/api/data/software_version.h>
-#include <nx/update/common_update_manager.h>
+#include <nx/update/update_information.h>
+#include <common/common_module.h>
 
 struct QnUpdateFreeSpaceReply;
 

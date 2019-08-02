@@ -23,19 +23,21 @@
 #include <nx/vms/server/settings.h>
 #include <nx/system_commands.h>
 
+using namespace nx::vms::server;
+
 namespace {
 
 static const QString kVersionParamName = "version";
 
-using MaybeUpdateInfoCategory = std::optional<nx::CommonUpdateManager::InformationCategory>;
+using MaybeUpdateInfoCategory = std::optional<UpdateManager::InformationCategory>;
 
 static MaybeUpdateInfoCategory categoryFromString(const QString& requestedVersion)
 {
     if (requestedVersion.isNull() || requestedVersion == "target")
-        return nx::CommonUpdateManager::InformationCategory::target;
+        return UpdateManager::InformationCategory::target;
 
     if (requestedVersion == "installed")
-        return nx::CommonUpdateManager::InformationCategory::installed;
+        return UpdateManager::InformationCategory::installed;
 
     return std::nullopt;
 }
