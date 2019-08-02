@@ -13,7 +13,6 @@ static constexpr char kId[] = "id";
 static constexpr char kRegion[] = "region";
 static constexpr char kTotalSpace[] = "total_space";
 static constexpr char kUrl[] = "url";
-static constexpr char kStorageId[] = "storage_id";
 
 static constexpr char kIdBinding[] = ":id";
 static constexpr char kTotalSpaceBinding[] = ":total_space";

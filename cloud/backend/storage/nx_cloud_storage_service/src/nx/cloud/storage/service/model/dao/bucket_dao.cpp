@@ -14,7 +14,6 @@ static constexpr char kStorageCount[] = "storage_count";
 
 static constexpr char kNameBinding[] = ":name";
 static constexpr char kRegionBinding[] = ":region";
-static constexpr char kUrlBinding[] = ":url";
 static constexpr char kBucketNameBinding[] = ":bucket_name";
 
 static constexpr char kAddBucket[] = R"sql(
