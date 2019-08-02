@@ -2,6 +2,7 @@
 
 #include <nx/analytics/descriptor_container.h>
 #include <nx/analytics/property_descriptor_storage.h>
+#include <utils/common/value_cache.h>
 
 namespace nx::analytics {
 
@@ -24,6 +25,10 @@ public:
         StorageFactory storageFactory,
         const QnResourceList& resourceList,
         QnResourcePtr ownResource)
+        :
+        m_cachedMergedDescriptors(
+            [this]() { return mergedDescriptorsInternal(); },
+            &m_mutex)
     {
         for (auto& resource: resourceList)
         {
@@ -83,30 +88,7 @@ public:
     auto mergedDescriptors(const Scopes&... scopes) const
         ->std::optional<MapHelper::MappedTypeOnLevel<DescriptorMap, sizeof...(Scopes)>>
     {
-        MergeExecutor mergeExecutor;
-        std::optional<MapHelper::MappedTypeOnLevel<DescriptorMap, sizeof...(Scopes)>> result;
-        for (const auto& [resourceId, container]: m_containers)
-        {
-            auto descriptors = container->descriptors(scopes...);
-            if (!descriptors)
-                continue;
-
-            if (!result)
-            {
-                result = descriptors;
-                continue;
-            }
-
-            if constexpr (MapHelper::isMap(*descriptors))
-                MapHelper::merge(&*result, *descriptors, mergeExecutor);
-            else
-                result = mergeExecutor(&*result, &*descriptors);
-        }
-
-        if (!result)
-            return std::nullopt;
-
-        return result;
+        return MapHelper::getOptional(m_cachedMergedDescriptors.get(), scopes...);
     }
 
     /**
@@ -155,6 +137,22 @@ public:
     }
 
 private:
+    DescriptorMap mergedDescriptorsInternal()
+    {
+        MergeExecutor mergeExecutor;
+        DescriptorMap result;
+        for (const auto& [resourceId, container]: m_containers)
+        {
+            auto descriptors = container->descriptors();
+            if (!descriptors)
+                continue;
+
+            MapHelper::merge(&result, *descriptors, mergeExecutor);
+        }
+
+        return result;
+    }
+
     Container* ownResourceContainer()
     {
         auto itr = m_containers.find(m_ownResourceId);
@@ -167,6 +165,9 @@ private:
 private:
     QnUuid m_ownResourceId;
     std::map<QnUuid, std::unique_ptr<Container>> m_containers;
+
+    mutable QnMutex m_mutex;
+    CachedValue<DescriptorMap> m_cachedMergedDescriptors;
 };
 
 } // namespace nx::analytics
