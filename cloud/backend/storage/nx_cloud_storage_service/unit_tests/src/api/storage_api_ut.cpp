@@ -61,18 +61,18 @@ protected:
     {
         whenAddStorageWithRegion();
         thenRequestIsForwardedToCloudDb();
-        thenAddStorageSucceeds();
+        thenAddStorageResponseIs(ResultCode::ok);
         andBucketHasCloudStorageCountUpdated(1);
     }
 
-    void whenAddStorageWithRegion()
+    void whenAddStorageWithRegion(int storageSize = 1000)
     {
-        m_cloudStorageClient->addStorage(
-            AddStorageRequest{1000, m_lastBucketCreated->location()},
-            [this](auto result, auto storage)
-            {
-                m_addStorageResponse.push({std::move(result), std::move(storage)});
-            });
+        addStorage({storageSize, m_lastBucketCreated->location()});
+    }
+
+    void whenAddStorageWithUnknownRegion()
+    {
+        addStorage({1000, "unkown-aws-region"});
     }
 
     void whenReadStorage()
@@ -97,10 +97,10 @@ protected:
         ASSERT_TRUE(m_cloudDbAuthenticationEvent.pop());
     }
 
-    void thenAddStorageSucceeds()
+    void thenAddStorageResponseIs(ResultCode resultCode)
     {
         auto [result, storage] = m_addStorageResponse.pop();
-        ASSERT_EQ(ResultCode::ok, result.resultCode);
+        ASSERT_EQ(resultCode, result.resultCode);
         m_lastStorageAdded = std::move(storage);
     }
 
@@ -153,6 +153,16 @@ private:
             });
     }
 
+    void addStorage(const AddStorageRequest& request)
+    {
+        m_cloudStorageClient->addStorage(
+            request,
+            [this](auto result, auto storage)
+            {
+                m_addStorageResponse.push({std::move(result), std::move(storage)});
+            });
+    }
+
 private:
     nx::utils::SyncQueue<std::pair<Result, Storage>> m_addStorageResponse;
     nx::utils::SyncQueue<std::pair<Result, Storage>> m_readStorageResponse;
@@ -174,9 +184,26 @@ TEST_F(StorageApi, add_storage)
     whenAddStorageWithRegion();
 
     thenRequestIsForwardedToCloudDb();
-    thenAddStorageSucceeds();
+    thenAddStorageResponseIs(ResultCode::ok);
 
     andBucketHasCloudStorageCountUpdated(1);
+}
+
+TEST_F(StorageApi, fails_to_add_storage_with_unknown_region)
+{
+    whenAddStorageWithUnknownRegion();
+
+    thenRequestIsForwardedToCloudDb();
+    thenAddStorageResponseIs(ResultCode::notFound);
+}
+
+TEST_F(StorageApi, rejects_add_storage_with_invalid_storage_size)
+{
+    givenAddedBucket();
+
+    whenAddStorageWithRegion(0);
+
+    thenAddStorageResponseIs(ResultCode::badRequest);
 }
 
 TEST_F(StorageApi, read_storage)
