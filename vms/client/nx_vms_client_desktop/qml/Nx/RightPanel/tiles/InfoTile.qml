@@ -82,6 +82,18 @@ TileBase
                 resourceNames: model && model.resourceList
             }
 
+            Preview
+            {
+                id: preview
+
+                Layout.fillWidth: true
+
+                previewId: (model && model.previewId) || ""
+                previewState: (model && model.previewState) || 0
+                previewAspectRatio: (model && model.previewAspectRatio) || 1
+                visible: (model && model.previewResource) || false
+            }
+
             Text
             {
                 id: description

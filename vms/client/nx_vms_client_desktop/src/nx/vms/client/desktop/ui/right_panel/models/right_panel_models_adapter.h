@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QtCore/QIdentityProxyModel>
+#include <QtQuick/QQuickImageProvider>
 
 #include <nx/utils/impl_ptr.h>
 #include <nx/vms/client/desktop/event_search/right_panel_globals.h>
@@ -30,10 +31,10 @@ public:
 
     Q_INVOKABLE bool removeRow(int row);
 
-    Q_INVOKABLE void setRead(int row);
     Q_INVOKABLE void setAutoClosePaused(int row, bool value);
 
     virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
+    virtual bool setData(const QModelIndex& index, const QVariant& value, int role) override;
     virtual QHash<int, QByteArray> roleNames() const override;
 
     Q_INVOKABLE void setFetchDirection(nx::vms::client::desktop::RightPanel::FetchDirection value);
@@ -51,6 +52,13 @@ signals:
 private:
     class Private;
     nx::utils::ImplPtr<Private> d;
+};
+
+class RightPanelImageProvider: public QQuickImageProvider
+{
+public:
+    RightPanelImageProvider(): QQuickImageProvider(Image) {}
+    virtual QImage requestImage(const QString& id, QSize* size, const QSize& requestedSize);
 };
 
 } // namespace nx::vms::client::desktop

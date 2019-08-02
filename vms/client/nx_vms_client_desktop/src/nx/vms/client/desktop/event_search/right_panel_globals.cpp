@@ -13,6 +13,7 @@ void registerQmlType()
     qRegisterMetaType<Tab>();
     qRegisterMetaType<FetchDirection>();
     qRegisterMetaType<FetchResult>();
+    qRegisterMetaType<PreviewState>();
 }
 
 } // namespace RightPanel

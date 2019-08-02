@@ -34,6 +34,15 @@ enum class FetchResult
 };
 Q_ENUM_NS(FetchResult)
 
+enum class PreviewState
+{
+    initial,
+    busy,
+    ready,
+    missing
+};
+Q_ENUM_NS(PreviewState)
+
 void registerQmlType();
 
 } // namespace RightPanel

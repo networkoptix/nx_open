@@ -246,6 +246,9 @@ namespace Qn
         ForcePrecisePreviewRole,                    /**< Role for forcing precise preview frame (bool). */
         PreviewStreamSelectionRole,                 /**< Role for camera preview stream (ImageRequest::StreamSelectionMode). */
         DecorationPathRole,                         /**< Role for icon path (QString). */
+        PreviewIdRole,                              /**< Role for cached right panel preview id (QString). */
+        PreviewStateRole,                           /**< Role for right panel preview state (RightPanel::PreviewState). */
+        PreviewAspectRatioRole,                     /**< Role for preview aspect ratio (qreal). */
 
         SelectOnOpeningRole,                        /**< Role for single-selecting an item (or first of multiple items) added to current layout (bool). */
         RaiseSelectionRole,                         /**< Role for raising a single-selected item (bool). */

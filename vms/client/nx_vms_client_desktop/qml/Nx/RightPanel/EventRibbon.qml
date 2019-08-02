@@ -37,14 +37,9 @@ ListView
                 : "tiles/InfoTile.qml"
         }
 
-        function updateBeingRead()
-        {
-            if (visible)
-                view.model.setRead(index)
-        }
-
-        Component.onCompleted: updateBeingRead()
-        onVisibleChanged: updateBeingRead()
+        onVisibleChanged: model.visible = visible
+        Component.onCompleted: model.visible = visible
+        Component.onDestruction: model.visible = false
 
         Connections
         {
