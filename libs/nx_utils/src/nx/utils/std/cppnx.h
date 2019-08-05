@@ -24,8 +24,8 @@ namespace utils {
  * kinds of details concerning cv-decay, R-value references and so on. And committee is still
  * improving it. Here is much more simple implementation that is enough for most cases.
  */
-template<typename... Ts>
-constexpr std::array<std::common_type_t<Ts...>, sizeof...(Ts)> make_array(Ts&&... ts)
+template<typename D, typename... Ts>
+constexpr std::array<D, sizeof...(Ts)> make_array(Ts&&... ts)
 {
     return {std::forward<Ts>(ts)...};
 }

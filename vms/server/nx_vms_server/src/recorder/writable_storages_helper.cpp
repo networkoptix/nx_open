@@ -66,7 +66,7 @@ int64_t WritableStoragesHelper::SpaceInfo::getOrThrow(
     if (value < 0)
     {
         std::stringstream ss;
-        ss << "Failed to get " << description << " for the storage " << url;
+        ss << "Failed to get " << description << " for the storage " << url << " value "<< value;
         throw std::runtime_error(ss.str());
     }
 

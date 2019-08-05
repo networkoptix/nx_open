@@ -35,6 +35,9 @@
 #   include <unistd.h>
 #   include <errno.h>
 #   include <dirent.h>
+#   ifdef __APPLE__
+#      include <sys/mount.h>
+#   endif
 #endif
 
 #ifdef WIN32
@@ -88,7 +91,7 @@ static QString sysDrivePath(QnMediaServerModule* /*serverModule*/)
     return deviceString;
 }
 
-#elif defined(Q_OS_LINUX)
+#elif defined(Q_OS_LINUX) || defined(Q_OS_MAC)
 
 static QString getDevicePath(QnMediaServerModule* serverModule, const QString& path)
 {
@@ -929,7 +932,7 @@ float QnFileStorageResource::getAvarageWritingUsage() const
     return writer ? writer->getAvarageUsage() : 0;
 }
 
-#ifdef _WIN32
+#if defined(_WIN32) || defined(__APPLE__)
 bool QnFileStorageResource::isStorageDirMounted() const
 {
     return true;    //common check is enough on mswin
