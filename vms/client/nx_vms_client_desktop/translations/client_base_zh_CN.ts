@@ -2022,8 +2022,8 @@ to view more bookmarks</source>
       <translation>所有摄像机</translation>
     </message>
     <message>
-      <source>Force Acknowledgement will only work for Generic Events if camera modifiers are used in the Generic Event URL</source>
-      <translation>如在通用事件URL中使用了摄像机修改器，则强制确认仅适用于通用事件</translation>
+      <source>Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</source>
+      <translation>如在通用事件URL中使用了摄像机识别码，则强制确认仅适用于通用事件</translation>
     </message>
   </context>
   <context>
@@ -5547,8 +5547,8 @@ to %1</source>
     <message>
       <source>Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
 If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
-      <translation type="unfinished">Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
-If you intended to move analytics data to another storage location, please contact support before proceeding.</translation>
+      <translation>当前的分析数据不会自动移动到其他位置，并且将无法读取。您可以保留它并稍后手动移动，或永久删除。
+如果您决定将其移至另一个存储位置，请在继续操作前与支援部门联系。</translation>
     </message>
   </context>
   <context>
@@ -9299,11 +9299,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Remote file &quot;%1&quot; is corrupted</source>
-      <translation type="unfinished">Remote file &quot;%1&quot; is corrupted</translation>
+      <translation>远程文档&quot;%1&quot; 已损坏</translation>
     </message>
     <message>
       <source>Server already has this file &quot;%1&quot;</source>
-      <translation type="unfinished">Server already has this file &quot;%1&quot;</translation>
+      <translation>服务器已存在此文件&quot;%1&quot;</translation>
     </message>
   </context>
   <context>
@@ -9826,21 +9826,21 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Confirm storage location for the analytics data on &quot;%1&quot;</source>
-      <translation type="unfinished">Confirm storage location for the analytics data on &quot;%1&quot;</translation>
+      <translation>请确认储存位置以将分析数据存于 &quot;%1&quot;</translation>
     </message>
     <message>
       <source>the largest available partition</source>
-      <translation type="unfinished">the largest available partition</translation>
+      <translation>最大的可用分区</translation>
     </message>
     <message>
       <source>The analytics database should only be stored on a local drive and can take up large amounts of space.
 Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
 By default analytics data will be stored on %1.
 You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</source>
-      <translation type="unfinished">The analytics database should only be stored on a local drive and can take up large amounts of space.
-Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
-By default analytics data will be stored on %1.
-You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</translation>
+      <translation>分析资料库应仅存储于本地端上，并且可能占用大量空间。
+一旦选择存储分析数据的位置后，如不删除现有资料，将无法轻易更改。建议您仔细选择储存位置并避免使用系统分区，以免发生严重的系统故障。
+在初始设定下，分析数据将存储在 %1。
+您可以在“服务器设定”对话框分页“中的 &quot;Storage Management&quot; 选择另一个存储位置。</translation>
     </message>
   </context>
   <context>

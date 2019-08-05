@@ -38,11 +38,6 @@
       <source>Customer Support</source>
       <translation>用户支持</translation>
     </message>
-    <message>
-      <location/>
-      <source>ARM support policy</source>
-      <translation>ARM支持政策</translation>
-    </message>
   </context>
   <context>
     <name>AccessibleResourcesWidget</name>
@@ -3079,7 +3074,7 @@
     <message>
       <location/>
       <source>Analytics data can take up large amounts of space. We recommend to choose another location for it instead of the system partition.</source>
-      <translation type="unfinished">Analytics data can take up large amounts of space. We recommend to choose another location for it instead of the system partition.</translation>
+      <translation>分析数据可能会占用大量空间。建议选择其他位置, 不要存放於系统分区。</translation>
     </message>
   </context>
   <context>

@@ -2021,8 +2021,8 @@ to view more bookmarks</source>
       <translation>全カメラ</translation>
     </message>
     <message>
-      <source>Force Acknowledgement will only work for Generic Events if camera modifiers are used in the Generic Event URL</source>
-      <translation>カメライベントが一般イベントで使用されている場合、強制承認は一般的イベントに対してのみ機能します</translation>
+      <source>Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</source>
+      <translation type="unfinished">Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</translation>
     </message>
   </context>
   <context>

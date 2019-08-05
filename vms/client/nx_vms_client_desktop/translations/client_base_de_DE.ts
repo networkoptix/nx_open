@@ -2044,8 +2044,8 @@ to view more bookmarks</source>
       <translation>Jede Kamera</translation>
     </message>
     <message>
-      <source>Force Acknowledgement will only work for Generic Events if camera modifiers are used in the Generic Event URL</source>
-      <translation>Bestätigung erzwingen funktioniert nur für generische Ereignisse, wenn in der URL für generische Ereignisse Kameramodifizierer verwendet werden</translation>
+      <source>Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</source>
+      <translation>Bestätigung erzwingen funktioniert nur für generische Ereignisse, wenn Kamerakennungen in der URL für generische Ereignisse verwendet werden</translation>
     </message>
   </context>
   <context>

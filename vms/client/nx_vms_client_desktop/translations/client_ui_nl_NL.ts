@@ -38,11 +38,6 @@
       <source>Customer Support</source>
       <translation>Klantenservice</translation>
     </message>
-    <message>
-      <location/>
-      <source>ARM support policy</source>
-      <translation>ARM ondersteuningsbeleid</translation>
-    </message>
   </context>
   <context>
     <name>AccessibleResourcesWidget</name>
