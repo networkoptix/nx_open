@@ -352,7 +352,7 @@ uint64_t DirIterator::entrySize() const
 #elif defined(__APPLE__)
     if( m_impl->entrySize == (uint64_t)-1 )
     {
-        //performing stat here, because unneeded stat64 call can greately slow down directory traversal
+        //performing stat here, because unneeded stat call can greately slow down directory traversal
         struct stat st;
         memset( &st, 0, sizeof(st) );
         if( ::stat( (m_impl->dir + "/" + m_impl->entryPath).c_str(), &st ) )
