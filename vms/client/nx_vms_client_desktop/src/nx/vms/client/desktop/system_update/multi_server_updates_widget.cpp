@@ -150,6 +150,8 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
 
     auto watcher = context()->instance<nx::vms::client::desktop::WorkbenchUpdateWatcher>();
     m_serverUpdateTool = watcher->getServerUpdateTool();
+    NX_ASSERT(m_serverUpdateTool);
+
     m_clientUpdateTool.reset(new ClientUpdateTool(this));
 
     m_updateCheck = watcher->takeUpdateCheck();
@@ -214,10 +216,10 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
     }
     ui->tableView->setColumnHidden(ServerUpdatesModel::Columns::ProgressColumn, false);
 
-    connect(m_serverUpdateTool.get(), &ServerUpdateTool::packageDownloaded,
+    connect(m_serverUpdateTool.data(), &ServerUpdateTool::packageDownloaded,
         this, &MultiServerUpdatesWidget::atServerPackageDownloaded);
 
-    connect(m_serverUpdateTool.get(), &ServerUpdateTool::packageDownloadFailed,
+    connect(m_serverUpdateTool.data(), &ServerUpdateTool::packageDownloadFailed,
         this, &MultiServerUpdatesWidget::atServerPackageDownloadFailed);
 
     connect(m_clientUpdateTool.get(), &ClientUpdateTool::updateStateChanged,
@@ -313,16 +315,16 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
     connect(m_stateTracker.get(), &PeerStateTracker::itemOnlineStatusChanged, this,
         &MultiServerUpdatesWidget::atServerConfigurationChanged);
 
-    connect(m_serverUpdateTool.get(), &ServerUpdateTool::startUpdateComplete,
+    connect(m_serverUpdateTool.data(), &ServerUpdateTool::startUpdateComplete,
         this, &MultiServerUpdatesWidget::atStartUpdateComplete);
 
-    connect(m_serverUpdateTool.get(), &ServerUpdateTool::finishUpdateComplete,
+    connect(m_serverUpdateTool.data(), &ServerUpdateTool::finishUpdateComplete,
         this, &MultiServerUpdatesWidget::atFinishUpdateComplete);
 
-    connect(m_serverUpdateTool.get(), &ServerUpdateTool::cancelUpdateComplete,
+    connect(m_serverUpdateTool.data(), &ServerUpdateTool::cancelUpdateComplete,
         this, &MultiServerUpdatesWidget::atCancelUpdateComplete);
 
-    connect(m_serverUpdateTool.get(), &ServerUpdateTool::startInstallComplete,
+    connect(m_serverUpdateTool.data(), &ServerUpdateTool::startInstallComplete,
         this, &MultiServerUpdatesWidget::atStartInstallComplete);
 
     connect(qnGlobalSettings, &QnGlobalSettings::localSystemIdChanged, this,
