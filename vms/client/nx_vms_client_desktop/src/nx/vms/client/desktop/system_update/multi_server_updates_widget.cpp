@@ -124,11 +124,6 @@ QTableView* injectResourceList(
     return resourceList;
 }
 
-auto kMediaServerFilter = [](const QnMediaServerResourcePtr& server) -> bool
-    {
-        return helpers::serverBelongsToCurrentSystem(server);
-    };
-
 } // anonymous namespace
 
 namespace nx::vms::client::desktop
@@ -155,13 +150,20 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
 
     auto watcher = context()->instance<nx::vms::client::desktop::WorkbenchUpdateWatcher>();
     m_serverUpdateTool = watcher->getServerUpdateTool();
+    NX_ASSERT(m_serverUpdateTool);
+
     m_clientUpdateTool.reset(new ClientUpdateTool(this));
 
     m_updateCheck = watcher->takeUpdateCheck();
 
     m_updatesModel = m_serverUpdateTool->getModel();
     m_stateTracker = m_serverUpdateTool->getStateTracker();
-    m_stateTracker->setResourceFeed(resourcePool(), kMediaServerFilter);
+    m_stateTracker->setServerFilter(
+        [](const QnMediaServerResourcePtr& server) -> bool
+        {
+            return helpers::serverBelongsToCurrentSystem(server);
+        });
+    m_stateTracker->setResourceFeed(resourcePool());
 
     QFont versionLabelFont;
     versionLabelFont.setPixelSize(kVersionLabelFontSizePixels);
@@ -214,10 +216,10 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
     }
     ui->tableView->setColumnHidden(ServerUpdatesModel::Columns::ProgressColumn, false);
 
-    connect(m_serverUpdateTool.get(), &ServerUpdateTool::packageDownloaded,
+    connect(m_serverUpdateTool.data(), &ServerUpdateTool::packageDownloaded,
         this, &MultiServerUpdatesWidget::atServerPackageDownloaded);
 
-    connect(m_serverUpdateTool.get(), &ServerUpdateTool::packageDownloadFailed,
+    connect(m_serverUpdateTool.data(), &ServerUpdateTool::packageDownloadFailed,
         this, &MultiServerUpdatesWidget::atServerPackageDownloadFailed);
 
     connect(m_clientUpdateTool.get(), &ClientUpdateTool::updateStateChanged,
@@ -313,16 +315,16 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
     connect(m_stateTracker.get(), &PeerStateTracker::itemOnlineStatusChanged, this,
         &MultiServerUpdatesWidget::atServerConfigurationChanged);
 
-    connect(m_serverUpdateTool.get(), &ServerUpdateTool::startUpdateComplete,
+    connect(m_serverUpdateTool.data(), &ServerUpdateTool::startUpdateComplete,
         this, &MultiServerUpdatesWidget::atStartUpdateComplete);
 
-    connect(m_serverUpdateTool.get(), &ServerUpdateTool::finishUpdateComplete,
+    connect(m_serverUpdateTool.data(), &ServerUpdateTool::finishUpdateComplete,
         this, &MultiServerUpdatesWidget::atFinishUpdateComplete);
 
-    connect(m_serverUpdateTool.get(), &ServerUpdateTool::cancelUpdateComplete,
+    connect(m_serverUpdateTool.data(), &ServerUpdateTool::cancelUpdateComplete,
         this, &MultiServerUpdatesWidget::atCancelUpdateComplete);
 
-    connect(m_serverUpdateTool.get(), &ServerUpdateTool::startInstallComplete,
+    connect(m_serverUpdateTool.data(), &ServerUpdateTool::startInstallComplete,
         this, &MultiServerUpdatesWidget::atStartInstallComplete);
 
     connect(qnGlobalSettings, &QnGlobalSettings::localSystemIdChanged, this,
@@ -336,7 +338,7 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
                 m_stateTracker->setResourceFeed(nullptr);
                 return;
             }
-            else if (m_stateTracker && m_stateTracker->setResourceFeed(resourcePool(), kMediaServerFilter))
+            else if (m_stateTracker && m_stateTracker->setResourceFeed(resourcePool()))
             {
                 // We will be here when we connected to another system.
                 // We should run update check again. This should fix VMS-13037.
@@ -1311,7 +1313,7 @@ void MultiServerUpdatesWidget::atFinishUpdateComplete(bool success, const QStrin
         else
         {
             NX_ERROR(this, "atFinishUpdateComplete(%1) - %2", success, error);
-            auto targets = m_stateTracker->peersIssued();
+            auto targets = m_stateTracker->peersIssued() + m_stateTracker->peersInstalling();
             setTargetState(WidgetUpdateState::installingStalled, targets);
         }
     }
@@ -1695,12 +1697,12 @@ void MultiServerUpdatesWidget::processDownloadingState()
             && peersFailed.isEmpty()
             && m_updateSourceMode == UpdateSourceType::file)
         {
-            NX_VERBOSE(this, "processStartingDownload() - starting uploads");
+            NX_VERBOSE(this, "processDownloadingState() - starting uploads");
             m_serverUpdateTool->startUpload(m_updateInfo);
         }
         else
         {
-            NX_ERROR(this, "processStartingDownload() - no servers downloading or an error.");
+            NX_ERROR(this, "processDownloadingState() - no servers downloading or an error.");
         }
     }
 
@@ -1708,7 +1710,7 @@ void MultiServerUpdatesWidget::processDownloadingState()
         return;
 
     // No peers are doing anything. So we consider current state transition is complete
-    NX_INFO(this) << "processRemoteDownloading() - download has stopped";
+    NX_INFO(this) << "processDownloadingState() - download has stopped";
 
     if (peersComplete.size() >= peersIssued.size())
     {
@@ -2782,7 +2784,6 @@ QString MultiServerUpdatesWidget::toString(nx::update::UpdateSourceType mode)
 
 bool MultiServerUpdatesWidget::VersionReport::operator==(const VersionReport& another) const
 {
-    // Wating for c++20. We could use default comparator there.
     return hasLatestVersion == another.hasLatestVersion
         && checking == another.checking
         && version == another.version
@@ -2795,7 +2796,6 @@ bool MultiServerUpdatesWidget::VersionReport::operator==(const VersionReport& an
 bool MultiServerUpdatesWidget::ControlPanelState::operator==(
     const ControlPanelState& another) const
 {
-    // Wating for c++20. We could use default comparator there.
     return actionEnabled == another.actionEnabled
         && actionCaption == another.actionCaption
         && actionTooltips == another.actionTooltips

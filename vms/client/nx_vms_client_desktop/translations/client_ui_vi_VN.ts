@@ -38,11 +38,6 @@
       <source>Customer Support</source>
       <translation>Hỗ trợ khách hàng</translation>
     </message>
-    <message>
-      <location/>
-      <source>ARM support policy</source>
-      <translation>Chính sách hỗ trợ của ARM</translation>
-    </message>
   </context>
   <context>
     <name>AccessibleResourcesWidget</name>

@@ -2044,8 +2044,8 @@ to view more bookmarks</source>
       <translation>Herhangi bir kamera</translation>
     </message>
     <message>
-      <source>Force Acknowledgement will only work for Generic Events if camera modifiers are used in the Generic Event URL</source>
-      <translation>Force Acknowledgement will only work for Generic Events if camera modifiers are used in the Generic Event URL</translation>
+      <source>Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</source>
+      <translation>Zorla Onaylama, yalnızca Genel Olay URL'sinde kamera tanımlayıcıları kullanılıyorsa çalışır</translation>
     </message>
   </context>
   <context>

@@ -4,6 +4,8 @@
 #include <common/common_module.h>
 #include <rest/server/json_rest_result.h>
 
+using namespace nx::vms::server;
+
 namespace detail {
 
 void checkUpdateStatusRemotely(
@@ -67,12 +69,12 @@ void checkUpdateStatusRemotely(
     }
 }
 
-IfParticipantPredicate makeIfParticipantPredicate(nx::CommonUpdateManager* updateManager)
+IfParticipantPredicate makeIfParticipantPredicate(UpdateManager* updateManager)
 {
     try
     {
         const auto updateInfo = updateManager->updateInformation(
-            nx::CommonUpdateManager::InformationCategory::target);
+            UpdateManager::InformationCategory::target);
 
         return
             [updateInfo](

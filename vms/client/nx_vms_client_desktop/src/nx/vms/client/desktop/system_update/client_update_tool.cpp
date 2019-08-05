@@ -236,13 +236,6 @@ void ClientUpdateTool::setUpdateTarget(const UpdateContents& contents)
 {
     m_clientPackage = contents.clientPackage;
     m_updateVersion = contents.getVersion();
-    if (!contents.needClientUpdate)
-    {
-        NX_INFO(this, "setUpdateTarget(%1) - no need to install this version",
-            contents.info.version);
-        setState(State::complete);
-        return;
-    }
 
     if (isVersionInstalled(m_updateVersion))
     {
@@ -262,6 +255,13 @@ void ClientUpdateTool::setUpdateTarget(const UpdateContents& contents)
                 << m_clientPackage.localFile;
             setState(State::complete);
         }
+    }
+    else if (!contents.needClientUpdate)
+    {
+        NX_INFO(this, "setUpdateTarget(%1) - no need to install this version",
+            contents.info.version);
+        setState(State::initial);
+        return;
     }
     else if (contents.sourceType == nx::update::UpdateSourceType::file)
     {

@@ -38,11 +38,6 @@
       <source>Customer Support</source>
       <translation>Müşteri Hizmetleri</translation>
     </message>
-    <message>
-      <location/>
-      <source>ARM support policy</source>
-      <translation>ARM destek politikası</translation>
-    </message>
   </context>
   <context>
     <name>AccessibleResourcesWidget</name>

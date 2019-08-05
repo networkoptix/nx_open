@@ -14,7 +14,6 @@
 
 #include <utils/common/id.h>
 #include <nx/vms/common/p2p/downloader/downloader.h>
-#include <nx/update/common_update_manager.h>
 
 #include "server_update_tool.h"
 #include "client_update_tool.h"
@@ -203,7 +202,7 @@ public:
             return currentData != other;
         }
 
-        Data& operator= (const Data& other)
+        Data& operator=(const Data& other)
         {
             if (currentData == other)
                 return currentData;
@@ -425,7 +424,7 @@ private:
      */
     bool m_showDebugData = false;
 
-    std::shared_ptr<ServerUpdateTool> m_serverUpdateTool;
+    QPointer<ServerUpdateTool> m_serverUpdateTool;
     std::unique_ptr<ClientUpdateTool> m_clientUpdateTool;
     std::shared_ptr<ServerUpdatesModel> m_updatesModel;
     std::shared_ptr<PeerStateTracker> m_stateTracker;

@@ -51,7 +51,7 @@
 #include <nx/vms/server/resource/shared_context_pool.h>
 #include <nx/vms/server/resource/camera.h>
 #include <nx/vms/server/root_fs.h>
-#include <nx/vms/server/server_update_manager.h>
+#include <nx/vms/server/update/update_manager.h>
 #include <nx/vms/server/meta_types.h>
 #include <nx/vms/server/network/multicast_address_registry.h>
 
@@ -83,7 +83,7 @@
 #include <recorder/schedule_sync.h>
 #include "media_server_process.h"
 #include <camera/camera_error_processor.h>
-#include <nx/vms/server/server_update_manager.h>
+#include <nx/vms/server/update/update_manager.h>
 #include "media_server_resource_searchers.h"
 #include <plugins/resource/upnp/global_settings_to_device_searcher_settings_adapter.h>
 #include <core/resource_management/mserver_resource_discovery_manager.h>
@@ -275,7 +275,7 @@ QnMediaServerModule::QnMediaServerModule(
 
     m_sharedContextPool = store(new nx::vms::server::resource::SharedContextPool(this));
     m_archiveIntegrityWatcher = store(new nx::vms::server::ServerArchiveIntegrityWatcher(this));
-    m_updateManager = store(new nx::vms::server::ServerUpdateManager(this));
+    m_updateManager = store(new nx::vms::server::UpdateManager(this));
     auto dataDir = closeDirPath(settings().dataDir()) + QString("record_catalog");
     m_motionHelper = store(new QnMotionHelper(dataDir, this));
 
@@ -512,7 +512,7 @@ void QnMediaServerModule::registerResourceDataProviders()
     m_resourceDataProviderFactory->registerResourceType<nx::vms::server::resource::Camera>();
 }
 
-nx::vms::server::ServerUpdateManager* QnMediaServerModule::updateManager() const
+nx::vms::server::UpdateManager* QnMediaServerModule::updateManager() const
 {
     return m_updateManager;
 }

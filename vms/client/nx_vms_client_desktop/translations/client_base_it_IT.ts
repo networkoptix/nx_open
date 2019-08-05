@@ -2044,8 +2044,8 @@ to view more bookmarks</source>
       <translation>Qualsiasi telecamera</translation>
     </message>
     <message>
-      <source>Force Acknowledgement will only work for Generic Events if camera modifiers are used in the Generic Event URL</source>
-      <translation>La notifica forzato funziona solo per gli eventi generici se i modificatori della telecamera vengono utilizzati nell'URL dell'evento generico</translation>
+      <source>Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</source>
+      <translation type="unfinished">Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</translation>
     </message>
   </context>
   <context>

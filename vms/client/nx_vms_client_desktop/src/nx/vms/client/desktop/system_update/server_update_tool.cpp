@@ -112,10 +112,6 @@ ServerUpdateTool::ServerUpdateTool(QObject* parent):
     m_downloader.reset(new Downloader(
         m_outputDir, commonModule(), {new InternetOnlyPeerManager()}));
 
-    // This object is managed by shared_ptr. So we must sure there is no parent, or this instance
-    // can be deleted twice.
-    setParent(nullptr);
-
     connect(m_downloader.get(), &Downloader::fileStatusChanged,
         this, &ServerUpdateTool::atDownloaderStatusChanged);
 

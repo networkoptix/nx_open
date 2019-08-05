@@ -38,11 +38,6 @@
       <source>Customer Support</source>
       <translation>Технічна підтримка</translation>
     </message>
-    <message>
-      <location/>
-      <source>ARM support policy</source>
-      <translation>Політика підтримки ARM</translation>
-    </message>
   </context>
   <context>
     <name>AccessibleResourcesWidget</name>
@@ -3079,7 +3074,7 @@
     <message>
       <location/>
       <source>Analytics data can take up large amounts of space. We recommend to choose another location for it instead of the system partition.</source>
-      <translation type="unfinished">Analytics data can take up large amounts of space. We recommend to choose another location for it instead of the system partition.</translation>
+      <translation>Дані Analytics можуть займати велику кількість місця. Ми рекомендуємо вибрати інше місце для нього замість системного розділу.</translation>
     </message>
   </context>
   <context>

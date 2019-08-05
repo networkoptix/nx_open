@@ -244,7 +244,7 @@ private:
         QN_DECLARE_RW_PROPERTY(ExportLayoutSettings,        exportLayoutSettings,   setExportLayoutSettings,    EXPORT_LAYOUT_SETTINGS,     ExportLayoutSettings())
         QN_DECLARE_RW_PROPERTY(ExportMediaSettings,         exportBookmarkSettings, setExportBookmarkSettings,  EXPORT_BOOKMARK_SETTINGS,   ExportMediaSettings({nx::vms::client::desktop::ExportOverlayType::bookmark}))
         QN_DECLARE_RW_PROPERTY(QString,                     lastExportMode,         setLastExportMode,          LAST_EXPORT_MODE,           lit("media"))
-        QN_DECLARE_RW_PROPERTY(QnBackgroundImage,           backgroundImage,        setBackgroundImage,         BACKGROUND_IMAGE,           QnBackgroundImage())
+        QN_DECLARE_RW_PROPERTY(QnBackgroundImage,           backgroundImage,        setBackgroundImage,         BACKGROUND_IMAGE,           QnBackgroundImage::defaultBackground())
         QN_DECLARE_RW_PROPERTY(QnUuid,                      pcUuid,                 setPcUuid,                  PC_UUID,                    QnUuid())
         QN_DECLARE_R_PROPERTY(bool,                         stickReconnectToServer,                             STICKY_RECONNECT,           false)
         QN_DECLARE_RW_PROPERTY(QString,                     logLevel,               setLogLevel,                LOG_LEVEL,                  QLatin1String("none"))

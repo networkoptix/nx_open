@@ -90,8 +90,8 @@ TEST_F(UpdateVerificationTest, testAlreadyInstalled)
     // client = 4.0.0.28524
     // server = 4.0.0.28525
     // Showing version + 'You have already installed this version' message.
-    makeServer(nx::utils::SoftwareVersion("4.0.0.28525"));
-    clientData = makeClientData(nx::utils::SoftwareVersion("4.0.0.28524"));
+    makeServer(Version("4.0.0.28525"));
+    clientData = makeClientData(Version("4.0.0.28524"));
 
     verifyUpdateContents(contents, getAllServers(), clientData, options);
     EXPECT_EQ(contents.alreadyInstalled, true);
@@ -111,9 +111,9 @@ TEST_F(UpdateVerificationTest, testAlreadyInstalled)
     // client = 4.0.0.28525
     // server = 4.0.0.28524
     // Showing page 'This version is already installed'.
-    makeServer(nx::utils::SoftwareVersion("4.0.0.28524"));
-    clientData = makeClientData(nx::utils::SoftwareVersion("4.0.0.28525"));
-    clientData.installedVersions.insert(nx::utils::SoftwareVersion("4.0.0.28524"));
+    makeServer(Version("4.0.0.28524"));
+    clientData = makeClientData(Version("4.0.0.28525"));
+    clientData.installedVersions.insert(Version("4.0.0.28524"));
     verifyUpdateContents(contents, getAllServers(), clientData, options);
     EXPECT_EQ(contents.error, nx::update::InformationError::noError);
     {
@@ -130,9 +130,9 @@ TEST_F(UpdateVerificationTest, testAlreadyInstalled)
     // server = 4.0.0.28523 offline
     // Showing page 'This version is already installed', even when we have offline server with
     // lower version.
-    makeServer(nx::utils::SoftwareVersion("4.0.0.28524"));
-    makeServer(nx::utils::SoftwareVersion("4.0.0.28523"), /*online=*/false);
-    clientData = makeClientData(nx::utils::SoftwareVersion("4.0.0.28524"));
+    makeServer(Version("4.0.0.28524"));
+    makeServer(Version("4.0.0.28523"), /*online=*/false);
+    clientData = makeClientData(Version("4.0.0.28524"));
     verifyUpdateContents(contents, getAllServers(), clientData, options);
     EXPECT_EQ(contents.alreadyInstalled, true);
     {
@@ -154,16 +154,16 @@ TEST_F(ClientUpdateTestEnvironment, testForkedVersion)
     contents.sourceType = nx::update::UpdateSourceType::internetSpecific;
     ASSERT_TRUE(QJson::deserialize<nx::update::Information>(packageRawData, &contents.info));
     ASSERT_FALSE(contents.isEmpty());
-    EXPECT_EQ(contents.getVersion(), nx::utils::SoftwareVersion("4.0.0.28524"));
+    EXPECT_EQ(contents.getVersion(), Version("4.0.0.28524"));
     VerificationOptions options;
 
     // Update to 4.0.0.28524
     // client = 4.0.0.28523
     // server1 = 4.0.0.28523
     // server2 = 4.0.0.28525
-    ClientVerificationData clientData = makeClientData(nx::utils::SoftwareVersion("4.0.0.28523"));
-    makeServer(nx::utils::SoftwareVersion("4.0.0.28523"));
-    makeServer(nx::utils::SoftwareVersion("4.0.0.28525"));
+    ClientVerificationData clientData = makeClientData(Version("4.0.0.28523"));
+    makeServer(Version("4.0.0.28523"));
+    makeServer(Version("4.0.0.28525"));
 
     verifyUpdateContents(contents, getAllServers(), clientData, options);
     EXPECT_EQ(contents.error, nx::update::InformationError::noError);
@@ -172,8 +172,8 @@ TEST_F(ClientUpdateTestEnvironment, testForkedVersion)
 
     // Both servers are newer, but the client is older.
     // It should be fine to start update only for a client.
-    makeServer(nx::utils::SoftwareVersion("4.0.0.28525"));
-    makeServer(nx::utils::SoftwareVersion("4.0.0.28525"));
+    makeServer(Version("4.0.0.28525"));
+    makeServer(Version("4.0.0.28525"));
     verifyUpdateContents(contents, getAllServers(), clientData, options);
     EXPECT_EQ(contents.error, nx::update::InformationError::noError);
     removeAllServers();
@@ -181,9 +181,9 @@ TEST_F(ClientUpdateTestEnvironment, testForkedVersion)
 
     // Both servers and a client are newer.
     // According to VMS-14814, we should show 'downgrade is not possible'
-    clientData = makeClientData(nx::utils::SoftwareVersion("4.0.0.28525"));
-    makeServer(nx::utils::SoftwareVersion("4.0.0.28525"));
-    makeServer(nx::utils::SoftwareVersion("4.0.0.28525"));
+    clientData = makeClientData(Version("4.0.0.28525"));
+    makeServer(Version("4.0.0.28525"));
+    makeServer(Version("4.0.0.28525"));
     verifyUpdateContents(contents, getAllServers(), clientData, options);
     EXPECT_EQ(contents.error, nx::update::InformationError::incompatibleVersion);
     EXPECT_TRUE(contents.alreadyInstalled);
@@ -202,9 +202,9 @@ TEST_F(UpdateVerificationTest, packagesForSystemSupportTest)
     // Update to 4.0.0.29069
     // client = 4.0.0.29067
     // server = 4.0.0.29067
-    auto server = makeServer(nx::utils::SoftwareVersion("4.0.0.29067"));
+    auto server = makeServer(Version("4.0.0.29067"));
     server->setOsInfo(os::ubuntu16);
-    ClientVerificationData clientData = makeClientData(nx::utils::SoftwareVersion("4.0.0.29067"));
+    ClientVerificationData clientData = makeClientData(Version("4.0.0.29067"));
     clientData.osInfo = os::windows;
     auto servers = getAllServers();
     verifyUpdateContents(contents, servers, clientData, options);
@@ -219,6 +219,30 @@ TEST_F(UpdateVerificationTest, packagesForSystemSupportTest)
     EXPECT_EQ(report.statusHighlight, MultiServerUpdatesWidget::VersionReport::HighlightMode::red);
     removeAllServers();
 }
+
+TEST_F(UpdateVerificationTest, regularUpdateWithoutErrors)
+{
+    nx::update::UpdateContents contents;
+    contents.sourceType = nx::update::UpdateSourceType::internetSpecific;
+    ASSERT_TRUE(QJson::deserialize<nx::update::Information>(packageRawData, &contents.info));
+    ASSERT_FALSE(contents.isEmpty());
+    EXPECT_EQ(contents.getVersion(), Version("4.0.0.28524"));
+    VerificationOptions options;
+
+    // Update to 4.0.0.28524
+    // client = 4.0.0.28523
+    // server1 = 4.0.0.28523
+    ClientVerificationData clientData = makeClientData(Version("4.0.0.28523"));
+    makeServer(Version("4.0.0.28523"));
+
+    // Expecting that both client and server should be updatedm without any verification errors.
+    verifyUpdateContents(contents, getAllServers(), clientData, options);
+    EXPECT_EQ(contents.error, nx::update::InformationError::noError);
+    EXPECT_TRUE(contents.needClientUpdate);
+    EXPECT_TRUE(contents.clientPackage.isValid());
+    EXPECT_EQ(contents.peersWithUpdate.size(), 2);
+}
+
 
 TEST_F(UpdateVerificationTest, bestVariantVersionSelection)
 {

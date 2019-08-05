@@ -271,7 +271,7 @@
 #include <nx/vms/server/root_fs.h>
 #include <system_log/raid_event_ini_config.h>
 
-#include <nx/vms/server/server_update_manager.h>
+#include <nx/vms/server/update/update_manager.h>
 #include <nx_vms_server_ini.h>
 #include <proxy/2wayaudio/proxy_audio_receiver.h>
 #include <local_connection_factory.h>

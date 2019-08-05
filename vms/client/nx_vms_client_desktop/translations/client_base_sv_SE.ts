@@ -2045,7 +2045,7 @@ om du vill visa fler bokmärken</translation>
       <translation>Valfri kamera</translation>
     </message>
     <message>
-      <source>Force Acknowledgement will only work for Generic Events if camera modifiers are used in the Generic Event URL</source>
+      <source>Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</source>
       <translation>Forcerad kvittering fungerar bara för generiska händelser om kamerans modifierare används i generiska händelse URL-er</translation>
     </message>
   </context>

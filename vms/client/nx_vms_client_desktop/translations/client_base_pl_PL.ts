@@ -2090,8 +2090,8 @@ to view more bookmarks</source>
       <translation>Dowolna kamera</translation>
     </message>
     <message>
-      <source>Force Acknowledgement will only work for Generic Events if camera modifiers are used in the Generic Event URL</source>
-      <translation>Wymuszanie potwierdzenia działa dla zdarzeń generowanych tylko wtedy, gdy użyto modyfikatorów kamer w URL generującym zdarzenie</translation>
+      <source>Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</source>
+      <translation>Wymuszanie potwierdzenia działa dla zdarzeń generowanych tylko wtedy, gdy użyto identyfikatorów kamer w poleceniach URL generujących te zdarzenia</translation>
     </message>
   </context>
   <context>
