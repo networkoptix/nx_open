@@ -12,7 +12,7 @@
 
 #include <nx/sdk/result.h>
 #include <nx/sdk/i_string.h>
-#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/ptr.h>
 #include <nx/sdk/analytics/i_engine.h>
 #include <nx/sdk/analytics/i_consuming_device_agent.h>
 

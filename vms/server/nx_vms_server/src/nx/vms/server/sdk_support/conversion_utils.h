@@ -10,7 +10,7 @@
 #include <nx/sdk/analytics/i_metadata_types.h>
 #include <nx/sdk/analytics/i_uncompressed_video_frame.h>
 
-#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/ptr.h>
 #include <nx/sdk/helpers/string.h>
 #include <nx/sdk/helpers/string_list.h>
 

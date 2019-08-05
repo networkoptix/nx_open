@@ -4,7 +4,7 @@
 
 #include <utils/common/synctime.h>
 
-#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/ptr.h>
 
 #include <nx/vms/event/events/events_fwd.h>
 #include <nx/vms/event/events/plugin_diagnostic_event.h>

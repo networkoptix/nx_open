@@ -41,10 +41,10 @@ MetadataTypes fromSdkMetadataTypes(const Ptr<const IMetadataTypes>& sdkMetadataT
 {
     sdk_support::MetadataTypes metadataTypes;
     metadataTypes.eventTypeIds = fromSdkStringList<std::set<QString>>(
-        toPtr(sdkMetadataTypes->eventTypeIds()));
+        sdkMetadataTypes->eventTypeIds());
 
     metadataTypes.objectTypeIds = fromSdkStringList<std::set<QString>>(
-        toPtr(sdkMetadataTypes->objectTypeIds()));
+        sdkMetadataTypes->objectTypeIds());
 
     return metadataTypes;
 }

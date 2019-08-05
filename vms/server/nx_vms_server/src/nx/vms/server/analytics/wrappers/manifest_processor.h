@@ -3,7 +3,7 @@
 #include <core/resource/camera_resource.h>
 
 #include <nx/sdk/i_string.h>
-#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/ptr.h>
 
 #include <nx/vms/server/sdk_support/file_utils.h>
 #include <nx/vms/server/sdk_support/conversion_utils.h>

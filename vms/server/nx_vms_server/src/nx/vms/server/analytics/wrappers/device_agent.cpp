@@ -41,8 +41,7 @@ DeviceAgent::DeviceAgent(
     base_type(serverModule, sdkDeviceAgent, libraryName),
     m_engineResource(engineResource),
     m_device(device),
-    m_consumingDeviceAgent(
-        sdk::queryInterfacePtr<sdk::analytics::IConsumingDeviceAgent>(sdkDeviceAgent))
+    m_consumingDeviceAgent(sdkDeviceAgent->queryInterface<sdk::analytics::IConsumingDeviceAgent>())
 {
 }
 

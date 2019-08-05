@@ -2,7 +2,7 @@
 
 #include <optional>
 
-#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/ptr.h>
 #include <nx/sdk/helpers/string_map.h>
 #include <nx/sdk/helpers/to_string.h>
 
@@ -52,7 +52,7 @@ public:
             return std::nullopt;
         }
 
-        const auto settingValues = toPtr(sdkSettingsResponse->values());
+        const auto settingValues = sdkSettingsResponse->values();
         if (!settingValues)
         {
             NX_DEBUG(
@@ -63,8 +63,7 @@ public:
 
         sdk_support::SettingsResponse settingsResponse{
             sdk_support::fromSdkStringMap<sdk_support::SettingMap>(settingValues),
-            sdk_support::fromSdkStringMap<sdk_support::ErrorMap>(
-                toPtr(sdkSettingsResponse->errors()))};
+            sdk_support::fromSdkStringMap<sdk_support::ErrorMap>(sdkSettingsResponse->errors())};
 
         if (!settingsResponse.errors.isEmpty())
         {

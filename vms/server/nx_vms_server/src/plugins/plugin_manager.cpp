@@ -308,7 +308,7 @@ bool PluginManager::processPluginEntryPointForNewSdk(
     pluginInfo->mainInterface = MainInterface::nx_sdk_IPlugin;
 
     NX_ASSERT(!pluginInfo->libName.isEmpty());
-    if (const auto analyticsPlugin = queryInterfacePtr<nx::sdk::analytics::IPlugin>(plugin))
+    if (const auto analyticsPlugin = plugin->queryInterface<nx::sdk::analytics::IPlugin>())
     {
         const auto plugin = std::make_shared<wrappers::Plugin>(
             serverModule(),

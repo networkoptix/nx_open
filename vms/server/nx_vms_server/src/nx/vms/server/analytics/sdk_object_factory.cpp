@@ -139,7 +139,11 @@ bool SdkObjectFactory::initPluginResources()
     std::map<QnUuid, Ptr<nx::sdk::analytics::IPlugin>> sdkPluginsById;
     for (const auto& analyticsPlugin: analyticsPlugins)
     {
-        const QString pluginLibName = pluginManager->pluginInfo(analyticsPlugin.get())->libName;
+        const auto pluginInfo = pluginManager->pluginInfo(analyticsPlugin.get());
+        if (!NX_ASSERT(pluginInfo))
+            continue;
+
+        const QString pluginLibName = pluginInfo->libName;
         const auto pluginWrapper = std::make_shared<wrappers::Plugin>(
             serverModule(),
             analyticsPlugin,
@@ -195,8 +199,12 @@ bool SdkObjectFactory::initPluginResources()
             continue;
         }
 
+        const auto pluginInfo = pluginManager->pluginInfo(sdkPluginItr->second.get());
+        if (!NX_ASSERT(pluginInfo))
+            continue;
+
         pluginResource->setSdkPlugin(std::make_shared<wrappers::Plugin>(
-            serverModule(), pluginResource, sdkPluginItr->second, pluginResource->libName()));
+            serverModule(), pluginResource, sdkPluginItr->second, pluginInfo->libName));
 
         const bool result = pluginResource->init();
         if (!result)
