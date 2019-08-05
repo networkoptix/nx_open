@@ -311,8 +311,6 @@ private:
         startingDownload,
         /** Mediaservers have started downloading update packages. */
         downloading,
-        /** Pushing local update package to the servers. */
-        //pushing,
         /**
          * Waiting server to respond to /ec2/cancelUpdate from 'downloading' or 'pushing'
          * state.
@@ -336,7 +334,6 @@ private:
 
     static QString toString(nx::update::UpdateSourceType mode);
     static QString toString(WidgetUpdateState state);
-    static QString toString(LocalStatusCode stage);
     static QString toString(ServerUpdateTool::OfflineUpdateState state);
 
     /**
@@ -391,7 +388,7 @@ private:
     /** Advances UI FSM towards selected state. */
     void setTargetState(WidgetUpdateState state, const QSet<QnUuid>& targets = {},
         bool runCommands = true);
-    void completeInstallation(bool clientUpdated);
+    void completeClientInstallation(bool clientUpdated);
     static bool stateHasProgress(WidgetUpdateState state);
     void syncDebugInfoToUi();
     /**
