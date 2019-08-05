@@ -49,8 +49,8 @@ class Result
 public:
     Result(): m_error(ErrorCode::noError, nullptr) {}
 
-    // TODO: #mshevchenko: REMOVE
     Result(Value value): m_error(ErrorCode::noError, nullptr), m_value(std::move(value)) {}
+
     Result(Error&& error): m_error(std::move(error)) {}
 
     Result& operator=(Error&& error)
