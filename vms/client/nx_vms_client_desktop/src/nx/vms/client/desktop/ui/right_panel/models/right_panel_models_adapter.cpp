@@ -507,7 +507,7 @@ void RightPanelModelsAdapter::Private::createPreviewProviders(int first, int cou
 
 void RightPanelModelsAdapter::Private::updatePreviewProvider(int row)
 {
-    if (!NX_ASSERT(row >= 0 && row < m_previews.size()))
+    if (!NX_ASSERT(row >= 0 && row < m_previews.size() && m_previews.size() == q->rowCount()))
         return;
 
     const auto index = q->index(row, 0);
@@ -663,7 +663,8 @@ void RightPanelModelsAdapter::Private::loadNextPreview()
     int row = std::numeric_limits<int>::max();
     for (const auto& index: m_visibleItems)
     {
-        if (NX_ASSERT(index.isValid()) && index.row() < row
+        if (NX_ASSERT(index.isValid())
+            && index.row() < row
             && requiresLoading(m_previews[index.row()]))
         {
             row = index.row();
@@ -731,7 +732,7 @@ AbstractSearchListModel* RightPanelModelsAdapter::Private::searchModel()
 // ------------------------------------------------------------------------------------------------
 
 QImage RightPanelImageProvider::requestImage(
-    const QString& id, QSize* size, [[maybe_unused]] const QSize& requestedSize)
+    const QString& id, QSize* size, const QSize& /*requestedSize*/)
 {
     const auto provider = previewsById().value(id.toLongLong());
     return provider ? provider->image() : QImage();

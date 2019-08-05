@@ -26,8 +26,11 @@ Control
 
     contentItem: Item
     {
-        readonly property real kMinimumAspectRatio: 16.0 / 9.0
-        implicitHeight: width / Math.max(previewAspectRatio, kMinimumAspectRatio)
+        // Preview item should not have aspect ratio lesser than this value, by design.
+        // Actual preview image is fit into these bounds keeping its own aspect ratio.
+        readonly property real kItemMinimumAspectRatio: 16.0 / 9.0
+
+        implicitHeight: width / Math.max(previewAspectRatio, kItemMinimumAspectRatio)
 
         Image
         {
