@@ -25,8 +25,8 @@ extern bool NX_KIT_API verbose; //< Use to control additional output of the unit
 
  /**
   * Main macro for defining a test function. Calls a helper macro - such trick allows to comment
-  * out all tests except one by redefining TEST to IGNORE_TEST, and changing that one test to use
-  * DEFINE_TEST instead of TEST.
+  * out all tests except one by redefining TEST to DISABLED_TEST, and changing that one test to use
+  * ENABLED_TEST instead of TEST.
   *
   * Usage:
   * ```
@@ -37,9 +37,9 @@ extern bool NX_KIT_API verbose; //< Use to control additional output of the unit
   *     }
   * ```
   */
-#define TEST(TEST_CASE, TEST_NAME) DEFINE_TEST(TEST_CASE, TEST_NAME)
+#define TEST(TEST_CASE, TEST_NAME) ENABLED_TEST(TEST_CASE, TEST_NAME)
 
-#define DEFINE_TEST(TEST_CASE, TEST_NAME) \
+#define ENABLED_TEST(TEST_CASE, TEST_NAME) \
     static void test_##TEST_CASE##_##TEST_NAME(); \
     int unused_##TEST_CASE##_##TEST_NAME /* Not `static const` to suppress "unused" warning. */ = \
         ::nx::kit::test::detail::regTest( \
@@ -48,9 +48,9 @@ extern bool NX_KIT_API verbose; //< Use to control additional output of the unit
     static void test_##TEST_CASE##_##TEST_NAME()
     // Function body follows the DEFINE_TEST macro.
 
-#define IGNORE_TEST(TEST_CASE, TEST_NAME) \
-    static void ignored_test_##TEST_CASE##_##TEST_NAME()
-    // Function body follows the IGNORE_TEST macro.
+#define DISABLED_TEST(TEST_CASE, TEST_NAME) \
+    static void disabled_test_##TEST_CASE##_##TEST_NAME() /* The function will be unused. */
+    // Function body follows the DISABLED_TEST macro.
 
 #define ASSERT_TRUE(CONDITION) \
     ::nx::kit::test::detail::assertBool(true, !!(CONDITION), #CONDITION, __FILE__, __LINE__)
