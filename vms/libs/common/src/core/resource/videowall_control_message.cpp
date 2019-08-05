@@ -2,9 +2,15 @@
 
 #include <nx/fusion/model_functions.h>
 
+#include <nx/utils/range_adapters.h>
+
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(QnVideoWallControlMessage, Operation)
 
-QDebug operator<<(QDebug dbg, const QnVideoWallControlMessage &message) {
-    dbg.nospace() << "QnVideoWallControlMessage(" << QnLexical::serialized(message.operation) << ") seq:" << message[lit("sequence")];
-    return dbg.space();
+std::string QnVideoWallControlMessage::toString() const
+{
+    QStringList result;
+    result << QnLexical::serialized(operation);
+    for (auto [key, value]: nx::utils::constKeyValueRange(params))
+        result << "  [" + key + ": " + value + "]";
+    return result.join('\n').toStdString();
 }
