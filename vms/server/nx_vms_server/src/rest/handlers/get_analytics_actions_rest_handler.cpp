@@ -7,6 +7,7 @@
 #include <rest/helpers/permissions_helper.h>
 #include <rest/server/rest_connection_processor.h>
 #include <nx/vms/server/resource/analytics_engine_resource.h>
+#include <nx/vms/server/analytics/wrappers/engine.h>
 #include "api/model/analytics_actions.h"
 #include "media_server/media_server_module.h"
 
@@ -32,7 +33,8 @@ int QnGetAnalyticsActionsRestHandler::executeGet(
 
     for (const auto& engine: engineResources)
     {
-        if (!engine->sdkEngine()) //< It is not a local engine.
+        const auto sdkEngine = engine->sdkEngine();
+        if (!sdkEngine || !sdkEngine->isValid()) //< It is not a local engine.
             continue;
 
         AvailableAnalyticsActionsOfEngine actionsOfEngine;

@@ -23,9 +23,10 @@
 #include <nx/analytics/utils.h>
 
 #include <nx/vms/server/analytics/data_packet_adapter.h>
-#include <nx/vms/server/analytics/debug_helpers.h>
 #include <nx/vms/server/analytics/device_agent_handler.h>
 #include <nx/vms/server/analytics/event_rule_watcher.h>
+#include <nx/vms/server/analytics/wrappers/plugin.h>
+#include <nx/vms/server/analytics/wrappers/engine.h>
 #include <nx/vms/server/sdk_support/utils.h>
 #include <nx/vms/server/sdk_support/to_string.h>
 #include <nx/vms/server/sdk_support/result_holder.h>
@@ -156,7 +157,7 @@ void DeviceAnalyticsBinding::stopAnalyticsUnsafe()
     if (!m_deviceAgent)
         return;
 
-    m_deviceAgent->setNeededMetadataTypes(wrappers::MetadataTypes());
+    m_deviceAgent->setNeededMetadataTypes(sdk_support::MetadataTypes());
 }
 
 QVariantMap DeviceAnalyticsBinding::getSettings() const
@@ -229,7 +230,9 @@ bool DeviceAnalyticsBinding::updatePluginInfo() const
         if (!NX_ASSERT(serverPlugin))
             return false;
 
-        pluginManager->setIsActive(serverPlugin->sdkPlugin().get(), /*isActive*/ true);
+        pluginManager->setIsActive(
+            serverPlugin->sdkPlugin()->sdkObject().get(),
+            /*isActive*/ true);
     }
 
     return true;
@@ -289,13 +292,8 @@ std::shared_ptr<wrappers::DeviceAgent> DeviceAnalyticsBinding::createDeviceAgent
         return nullptr;
     }
 
-    const auto deviceAgent = std::make_shared<wrappers::DeviceAgent>(
-        serverModule(),
-        sdkEngine->obtainDeviceAgent(deviceInfo.get()),
-        m_engine,
-        m_device);
-
-    if (!deviceAgent->isValid())
+    const auto deviceAgent = sdkEngine->obtainDeviceAgent(m_device);
+    if (!deviceAgent || !deviceAgent->isValid())
         return nullptr;
 
     return deviceAgent;
@@ -340,7 +338,7 @@ bool DeviceAnalyticsBinding::updateDescriptorsWithManifest(
     return true;
 }
 
-wrappers::MetadataTypes DeviceAnalyticsBinding::neededMetadataTypes() const
+sdk_support::MetadataTypes DeviceAnalyticsBinding::neededMetadataTypes() const
 {
     const auto deviceAgentManifest = m_deviceAgent->manifest();
 
@@ -351,7 +349,7 @@ wrappers::MetadataTypes DeviceAnalyticsBinding::neededMetadataTypes() const
     if (!NX_ASSERT(ruleWatcher, "Can't access analytics rule watcher"))
         return {};
 
-    wrappers::MetadataTypes result;
+    sdk_support::MetadataTypes result;
 
     result.eventTypeIds = nx::analytics::supportedEventTypeIdsFromManifest(*deviceAgentManifest);
     result.objectTypeIds = nx::analytics::supportedObjectTypeIdsFromManifest(*deviceAgentManifest);

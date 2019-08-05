@@ -90,7 +90,7 @@ public:
     {
     }
 
-    nx::sdk::Ptr<Value> value() const { return m_value; }
+    Value value() const { return m_value; }
 
 private:
     const Value m_value;

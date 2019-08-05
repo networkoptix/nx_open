@@ -6,11 +6,12 @@
 #include <nx/vms/api/analytics/engine_manifest.h>
 #include <nx/vms/api/analytics/plugin_manifest.h>
 #include <nx/vms/server/analytics/engine_handler.h>
+#include <nx/vms/server/analytics/wrappers/fwd.h>
+#include <nx/vms/server/resource/resource_fwd.h>
 
 #include <nx/sdk/analytics/i_engine.h>
 #include <nx/sdk/ptr.h>
 
-#include <nx/vms/server/sdk_support/loggers.h>
 #include <nx/vms/server/server_module_aware.h>
 
 namespace nx::vms::server::resource {
@@ -26,22 +27,24 @@ class AnalyticsEngineResource:
 public:
     AnalyticsEngineResource(QnMediaServerModule* serverModule);
 
-    // TODO: #dmishin: Rename sdkEngine to engine.
-    void setSdkEngine(nx::sdk::Ptr<nx::sdk::analytics::IEngine> sdkEngine);
+    void setSdkEngine(analytics::wrappers::EnginePtr sdkEngine);
 
-    nx::sdk::Ptr<nx::sdk::analytics::IEngine> sdkEngine() const;
+    analytics::wrappers::EnginePtr sdkEngine() const;
 
     virtual QVariantMap settingsValues() const override;
     virtual void setSettingsValues(const QVariantMap& values) override;
 
     bool sendSettingsToSdkEngine();
 
+    QString libName() const;
+
 signals:
     void engineInitialized(const AnalyticsEngineResourcePtr& engine);
 
 private:
     std::optional<nx::vms::api::analytics::PluginManifest> pluginManifest() const;
-    std::unique_ptr<sdk_support::AbstractManifestLogger> makeLogger() const;
+
+    std::optional<QVariantMap> loadSettingsFromFile() const;
 
 protected:
     virtual CameraDiagnostics::Result initInternal() override;
@@ -49,7 +52,7 @@ protected:
 private:
     // ATTENTION: The field order is essential: EngineHandler must survive IEngine.
     nx::sdk::Ptr<analytics::EngineHandler> m_handler;
-    nx::sdk::Ptr<nx::sdk::analytics::IEngine> m_sdkEngine;
+    analytics::wrappers::EnginePtr m_sdkEngine;
 };
 
 } // namespace nx::vms::server::resource

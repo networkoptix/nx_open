@@ -3,13 +3,11 @@
 #include <media_server/media_server_module.h>
 #include <plugins/vms_server_plugins_ini.h>
 
-#include <nx/vms/server/analytics/wrappers/helpers.h>
 #include <nx/vms/server/sdk_support/utils.h>
 #include <nx/vms/server/sdk_support/to_string.h>
 #include <nx/vms/server/sdk_support/result_holder.h>
-#include <nx/vms/server/analytics/debug_helpers.h>
 #include <nx/vms/server/interactive_settings/json_engine.h>
-#include <nx/vms/server/analytics/debug_helpers.h>
+#include <nx/vms/server/analytics/wrappers/engine.h>
 #include <nx/vms/api/analytics/descriptors.h>
 
 #include <nx/sdk/analytics/i_plugin.h>
@@ -21,6 +19,8 @@
 
 namespace nx::vms::server::resource {
 
+using namespace nx::vms::server::analytics;
+
 template<typename T>
 using ResultHolder = nx::vms::server::sdk_support::ResultHolder<T>;
 
@@ -30,13 +30,12 @@ AnalyticsEngineResource::AnalyticsEngineResource(QnMediaServerModule* serverModu
 {
 }
 
-void AnalyticsEngineResource::setSdkEngine(
-    nx::sdk::Ptr<nx::sdk::analytics::IEngine> sdkEngine)
+void AnalyticsEngineResource::setSdkEngine(wrappers::EnginePtr sdkEngine)
 {
     m_sdkEngine = std::move(sdkEngine);
 }
 
-nx::sdk::Ptr<nx::sdk::analytics::IEngine> AnalyticsEngineResource::sdkEngine() const
+wrappers::EnginePtr AnalyticsEngineResource::sdkEngine() const
 {
     return m_sdkEngine;
 }
@@ -82,48 +81,22 @@ bool AnalyticsEngineResource::sendSettingsToSdkEngine()
 
     NX_DEBUG(this, "Sending settings to the Engine %1 (%2)", getName(), getId());
 
-    nx::sdk::Ptr<nx::sdk::IStringMap> effectiveSettings;
+    std::optional<QVariantMap> effectiveSettings;
     if (pluginsIni().analyticsSettingsSubstitutePath[0] != '\0')
     {
         NX_WARNING(this, "Trying to load settings for the Engine %1 (%2) from a file as per %3",
             getName(), getId(), pluginsIni().iniFile());
 
-        auto settingsFromFile = analytics::debug_helpers::loadEngineSettingsFromFile(
-            toSharedPointer(this), pluginsIni().analyticsSettingsSubstitutePath);
-
-        if (settingsFromFile)
-            effectiveSettings = sdk_support::toIStringMap(*settingsFromFile);
+        effectiveSettings = loadSettingsFromFile();
     }
 
     if (!effectiveSettings)
-        effectiveSettings = sdk_support::toIStringMap(settingsValues());
+        effectiveSettings = settingsValues();
 
     if (!NX_ASSERT(effectiveSettings, lm("Engine %1 (%2)").args(getName(), getId())))
         return false;
 
-    if (pluginsIni().analyticsSettingsOutputPath[0] != '\0')
-    {
-        analytics::debug_helpers::dumpStringToFile(
-            this,
-            QString::fromStdString(nx::sdk::toJsonString(effectiveSettings.get())),
-            pluginsIni().analyticsSettingsOutputPath,
-            analytics::debug_helpers::nameOfFileToDumpOrLoadData(
-                QnVirtualCameraResourcePtr(),
-                toSharedPointer(this),
-                nx::vms::server::resource::AnalyticsPluginResourcePtr(),
-                "_effective_settings.json"));
-    }
-
-    const ResultHolder<const nx::sdk::IStringMap*> result =
-        engine->setSettings(effectiveSettings.get());
-
-    if (!result.isOk())
-    {
-        NX_WARNING(this, "Error occured while sending settings to the Engine %1 (%2): %3",
-            getName(), getId(), sdk_support::toErrorString(result));
-    }
-
-    return result.isOk();
+    return engine->setSettings(*effectiveSettings).has_value();
 }
 
 std::optional<nx::vms::api::analytics::PluginManifest>
@@ -134,17 +107,6 @@ std::optional<nx::vms::api::analytics::PluginManifest>
         return std::nullopt;
 
     return parentPlugin->manifest();
-}
-
-std::unique_ptr<sdk_support::AbstractManifestLogger> AnalyticsEngineResource::makeLogger() const
-{
-    const QString messageTemplate(
-        "Error occurred while fetching Engine manifest for engine: {:engine}: {:error}");
-
-    return std::make_unique<sdk_support::ManifestLogger>(
-        typeid(*this), //< Using the same tag for all instances.
-        messageTemplate,
-        toSharedPointer(this));
 }
 
 CameraDiagnostics::Result AnalyticsEngineResource::initInternal()
@@ -159,23 +121,17 @@ CameraDiagnostics::Result AnalyticsEngineResource::initInternal()
     auto engineInfo = nx::sdk::makePtr<nx::sdk::analytics::EngineInfo>();
     engineInfo->setId(getId().toStdString());
     engineInfo->setName(getName().toStdString());
-    m_sdkEngine->setEngineInfo(engineInfo.get());
+    m_sdkEngine->setEngineInfo(engineInfo);
 
     m_handler = nx::sdk::makePtr<analytics::EngineHandler>(serverModule(), getId());
-    m_sdkEngine->setHandler(m_handler.get());
+    m_sdkEngine->setHandler(m_handler);
 
     if (!sendSettingsToSdkEngine())
         return CameraDiagnostics::InternalServerErrorResult("Unable to send settings to Engine");
 
-    const auto manifest = sdk_support::manifest<nx::vms::api::analytics::EngineManifest>(
-        m_sdkEngine,
-        /*device*/ QnVirtualCameraResourcePtr(),
-        /*engine*/ toSharedPointer(this),
-        plugin().dynamicCast<nx::vms::server::resource::AnalyticsPluginResource>(),
-        makeLogger());
-
+    const auto manifest = m_sdkEngine->manifest();
     if (!manifest)
-        return CameraDiagnostics::PluginErrorResult("Can't deserialize engine manifest");
+        return CameraDiagnostics::PluginErrorResult("Can't obtain engine manifest");
 
     auto parentPlugin = plugin().dynamicCast<resource::AnalyticsPluginResource>();
     if (!parentPlugin)
@@ -192,6 +148,44 @@ CameraDiagnostics::Result AnalyticsEngineResource::initInternal()
     emit engineInitialized(toSharedPointer(this));
 
     return CameraDiagnostics::NoErrorResult();
+}
+
+QString AnalyticsEngineResource::libName() const
+{
+    if (!NX_ASSERT(m_sdkEngine))
+        return QString();
+
+    return m_sdkEngine->libName();
+}
+
+std::optional<QVariantMap> AnalyticsEngineResource::loadSettingsFromFile() const
+{
+    const auto loadSettings =
+        [this](bool isEngineSpecificFilename) -> std::optional<QVariantMap>
+        {
+            const QString settingsFilename = sdk_support::debugFileAbsolutePath(
+                pluginsIni().analyticsSettingsSubstitutePath,
+                sdk_support::baseNameOfFileToDumpOrLoadData(
+                    plugin().dynamicCast<resource::AnalyticsPluginResource>(),
+                    toSharedPointer(this),
+                    QnVirtualCameraResourcePtr(),
+                    isEngineSpecificFilename)) + "_settings.json";
+
+            std::optional<QString> settingsString = sdk_support::loadStringFromFile(
+                nx::utils::log::Tag(typeid(this)),
+                settingsFilename);
+
+            if (!settingsString)
+                return std::nullopt;
+
+            return sdk_support::toQVariantMap(*settingsString);
+        };
+
+    const std::optional<QVariantMap> result = loadSettings(/*isEngineSpecificFilename*/ true);
+    if (result)
+        return result;
+
+    return loadSettings(/*isEngineSpecificFilename*/ false);
 }
 
 } // nx::vms::server::resource

@@ -8,6 +8,7 @@
 #include <nx/vms/server/sdk_support/utils.h>
 
 #include <nx/vms/server/analytics/sdk_object_factory.h>
+#include <nx/vms/server/analytics/wrappers/plugin.h>
 
 #include <nx/vms/api/analytics/descriptors.h>
 #include <nx/analytics/descriptor_manager.h>
@@ -20,25 +21,14 @@ AnalyticsPluginResource::AnalyticsPluginResource(QnMediaServerModule* serverModu
 {
 }
 
-void AnalyticsPluginResource::setSdkPlugin(nx::sdk::Ptr<nx::sdk::analytics::IPlugin> plugin)
+void AnalyticsPluginResource::setSdkPlugin(std::shared_ptr<analytics::wrappers::Plugin> plugin)
 {
     m_sdkPlugin = std::move(plugin);
 }
 
-nx::sdk::Ptr<nx::sdk::analytics::IPlugin> AnalyticsPluginResource::sdkPlugin() const
+std::shared_ptr<analytics::wrappers::Plugin> AnalyticsPluginResource::sdkPlugin() const
 {
     return m_sdkPlugin;
-}
-
-std::unique_ptr<sdk_support::AbstractManifestLogger> AnalyticsPluginResource::makeLogger() const
-{
-    const QString messageTemplate(
-        "Error occurred while fetching Engine manifest for engine: {:engine}: {:error}");
-
-    return std::make_unique<sdk_support::ManifestLogger>(
-        typeid(*this), //< Using the same tag for all instances.
-        messageTemplate,
-        toSharedPointer(this));
 }
 
 CameraDiagnostics::Result AnalyticsPluginResource::initInternal()
@@ -48,13 +38,7 @@ CameraDiagnostics::Result AnalyticsPluginResource::initInternal()
     if (!m_sdkPlugin)
         return CameraDiagnostics::InternalServerErrorResult("SDK plugin object is not set");
 
-    const auto manifest = sdk_support::manifest<nx::vms::api::analytics::PluginManifest>(
-        m_sdkPlugin,
-        /*device*/ QnVirtualCameraResourcePtr(),
-        /*engine*/ AnalyticsEngineResourcePtr(),
-        /*plugin*/ toSharedPointer(this),
-        makeLogger());
-
+    const auto manifest = m_sdkPlugin->manifest();
     if (!manifest)
         return CameraDiagnostics::PluginErrorResult("Can't deserialize engine manifest");
 
@@ -65,6 +49,14 @@ CameraDiagnostics::Result AnalyticsPluginResource::initInternal()
     saveProperties();
 
     return CameraDiagnostics::NoErrorResult();
+}
+
+QString AnalyticsPluginResource::libName() const
+{
+    if (!NX_ASSERT(m_sdkPlugin))
+        return QString();
+
+    return m_sdkPlugin->libName();
 }
 
 } // namespace nx::vms::server::resource

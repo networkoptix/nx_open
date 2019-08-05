@@ -7,7 +7,9 @@
 #include <nx/vms/server/resource/analytics_engine_resource.h>
 #include <nx/vms/server/server_module_aware.h>
 #include <nx/vms/server/analytics/wrappers/types.h>
+#include <nx/vms/server/analytics/wrappers/base_engine.h>
 #include <nx/vms/server/sdk_support/error.h>
+#include <nx/vms/server/sdk_support/types.h>
 
 #include <nx/sdk/result.h>
 #include <nx/sdk/i_string.h>
@@ -23,76 +25,40 @@
 namespace nx::vms::server::analytics::wrappers {
 
 class DeviceAgent:
-    public QObject,
-    public /*mixin*/ nx::vms::server::ServerModuleAware
+    public BaseEngine<sdk::analytics::IDeviceAgent, api::analytics::DeviceAgentManifest>
 {
-    Q_OBJECT;
+    using base_type =
+        BaseEngine<sdk::analytics::IDeviceAgent, api::analytics::DeviceAgentManifest>;
 public:
-    DeviceAgent(QnMediaServerModule* serverModule);
-
-    DeviceAgent(const DeviceAgent& other) = default;
-    DeviceAgent(DeviceAgent&& other) = default;
-    DeviceAgent& operator=(const DeviceAgent& other) = default;
-    DeviceAgent& operator=(DeviceAgent&& other) = default;
-
     DeviceAgent(
         QnMediaServerModule* serverModule,
-        sdk::Result<sdk::analytics::IDeviceAgent*> deviceAgentResult,
-        resource::AnalyticsEngineResourcePtr engine,
-        QnVirtualCameraResourcePtr device);
+        QWeakPointer<resource::AnalyticsEngineResource> engine,
+        QWeakPointer<QnVirtualCameraResource> device,
+        sdk::Ptr<sdk::analytics::IDeviceAgent> sdkDeviceAgent,
+        QString libraryName);
 
-    sdk::Ptr<sdk::analytics::IEngine> engine() const;
-    std::optional<ErrorMap> setSettings(const SettingMap& settings);
-    std::optional<SettingsResponse> pluginSideSettings() const;
-    std::optional<api::analytics::DeviceAgentManifest> manifest() const;
     void setHandler(sdk::Ptr<sdk::analytics::IDeviceAgent::IHandler> handler);
-    bool setNeededMetadataTypes(const MetadataTypes& metadataTypes);
+    bool setNeededMetadataTypes(const sdk_support::MetadataTypes& metadataTypes);
     bool pushDataPacket(sdk::Ptr<sdk::analytics::IDataPacket> data);
 
     bool isConsumer() const { return m_consumingDeviceAgent; }
-    bool isValid() const { return m_deviceAgent; }
-    operator bool() const { return m_deviceAgent; }
 
-signals:
-    void pluginDiagnosticEventTriggered(
-        nx::vms::event::PluginDiagnosticEventPtr pluginDiagnosticEvent) const;
+protected:
+    virtual DebugSettings makeProcessorSettings() const override;
 
-private:
-    QString makeCaption(api::PredefinedPluginEventType violationType) const;
-    QString makeDescription(api::PredefinedPluginEventType violationType) const;
-
-    QString makeCaption(const sdk_support::Error& error) const;
-    QString makeDescription(const sdk_support::Error& error) const;
-
-    template<typename ReturnType>
-    ReturnType handleContractViolation(
-        api::PredefinedPluginEventType violationType,
-        const QString& prefix = QString()) const;
-
-    template<typename ReturnType>
-    ReturnType handleError(
-        const sdk_support::Error& error,
-        const QString& prefix = QString()) const;
-
-    void logError(const sdk_support::Error& error, const QString& prefix) const;
-    void logContractViolation(
-        api::PredefinedPluginEventType violationType,
-        const QString& prefix) const;
-
-    void throwPluginEvent(const QString& caption, const QString& description) const;
-
-    sdk::Ptr<const sdk::IStringMap> prepareSettings(const SettingMap& settingsFromUser) const;
-
-    sdk::Ptr<const sdk::IString> loadManifestFromFile() const;
-    sdk::Ptr<const sdk::IString> loadManifestFromDeviceAgent() const;
-    void dumpManifestToFileIfNeeded(const sdk::Ptr<const sdk::IString>) const;
-    std::optional<api::analytics::DeviceAgentManifest> validateManifest(
-        const sdk::Ptr<const sdk::IString> manfiestString) const;
+    virtual SdkObjectDescription sdkObjectDescription() const override;
 
 private:
-    resource::AnalyticsEngineResourcePtr m_engine;
-    QnVirtualCameraResourcePtr m_device;
-    sdk::Ptr<sdk::analytics::IDeviceAgent> m_deviceAgent;
+    resource::AnalyticsEngineResourcePtr engineResource() const;
+
+    resource::AnalyticsPluginResourcePtr pluginResource() const;
+
+    QnVirtualCameraResourcePtr device() const;
+
+private:
+    QWeakPointer<resource::AnalyticsEngineResource> m_engineResource;
+    QWeakPointer<QnVirtualCameraResource> m_device;
+
     sdk::Ptr<sdk::analytics::IConsumingDeviceAgent> m_consumingDeviceAgent;
 };
 

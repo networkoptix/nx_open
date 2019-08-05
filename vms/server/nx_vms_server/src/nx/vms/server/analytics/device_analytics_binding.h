@@ -22,7 +22,6 @@
 #include <nx/vms/server/analytics/device_agent_handler.h>
 
 #include <nx/vms/server/analytics/wrappers/device_agent.h>
-#include <nx/vms/server/sdk_support/loggers.h>
 #include <nx/analytics/metadata_logger.h>
 
 namespace nx::vms::server::analytics {
@@ -71,7 +70,7 @@ private:
     bool updateDescriptorsWithManifest(
         const nx::vms::api::analytics::DeviceAgentManifest& manifest);
 
-    wrappers::MetadataTypes neededMetadataTypes() const;
+    sdk_support::MetadataTypes neededMetadataTypes() const;
 
     void setSettingsInternal(const QVariantMap& settings);
 

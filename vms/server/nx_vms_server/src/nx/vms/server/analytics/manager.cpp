@@ -14,7 +14,7 @@
 #include <core/dataconsumer/abstract_data_receptor.h>
 
 #include <nx/vms/server/analytics/metadata_handler.h>
-#include <nx/vms/server/analytics/debug_helpers.h>
+#include <nx/vms/server/analytics/wrappers/engine.h>
 #include <nx/vms/server/resource/analytics_engine_resource.h>
 #include <nx/vms/server/sdk_support/utils.h>
 
@@ -421,7 +421,7 @@ nx::vms::server::resource::AnalyticsEngineResourceList Manager::localEngines() c
 {
     using namespace nx::vms::server::resource;
     return resourcePool()->getResources<AnalyticsEngineResource>(
-            [](const AnalyticsEngineResourcePtr& engine) { return engine->sdkEngine(); });
+        [](const AnalyticsEngineResourcePtr& engine) { return !!engine->sdkEngine(); });
 }
 
 QnVirtualCameraResourceList Manager::localDevices() const
@@ -448,16 +448,7 @@ QSet<QnUuid> Manager::compatibleEngineIds(const QnVirtualCameraResourcePtr& devi
         if (!NX_ASSERT(sdkEngine))
             continue;
 
-        auto deviceInfo = sdk_support::deviceInfoFromResource(device);
-        if (!deviceInfo)
-        {
-            NX_WARNING(this, "Unable to build device info for device %1 (%2)",
-                device->getUserDefinedName(), device->getId());
-
-            continue;
-        }
-
-        if (sdkEngine->isCompatible(deviceInfo.get()))
+        if (sdkEngine->isCompatible(device))
             result.insert(engine->getId());
     }
 
@@ -473,7 +464,7 @@ void Manager::updateCompatibilityWithEngines(const QnVirtualCameraResourcePtr& d
 void Manager::updateCompatibilityWithDevices(const AnalyticsEngineResourcePtr& engine)
 {
     const auto sdkEngine = engine->sdkEngine();
-    if (!sdkEngine)
+    if (!sdkEngine || !sdkEngine->isValid())
     {
         NX_DEBUG(this, "Engine resource %1 (%2) has no assigned SDK engine",
             engine->getName(), engine->getId());
@@ -487,16 +478,8 @@ void Manager::updateCompatibilityWithDevices(const AnalyticsEngineResourcePtr& e
 
     for (auto& device: devices)
     {
-        auto deviceInfo = sdk_support::deviceInfoFromResource(device);
-        if (!deviceInfo)
-        {
-            NX_WARNING(this, "Unable to build device info for device %1 (%2)",
-                device->getUserDefinedName(), device->getId());
-            continue;
-        }
-
         auto compatibleEngineIds = device->compatibleAnalyticsEngines();
-        if (sdkEngine->isCompatible(deviceInfo.get()))
+        if (sdkEngine->isCompatible(device))
             compatibleEngineIds.insert(engineId);
         else
             compatibleEngineIds.remove(engineId);

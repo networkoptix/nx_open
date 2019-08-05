@@ -53,6 +53,9 @@ private:
     void at_devicePropertyChanged(const QnResourcePtr& resource, const QString& propertyName);
     void at_rulesUpdated(const QSet<QnUuid>& affectedResources);
 
+    std::optional<QVariantMap> loadSettingsFromFile(
+        const resource::AnalyticsEngineResourcePtr& engine) const;
+
 private:
     void subscribeToDeviceChanges();
     void subscribeToRulesChanges();

@@ -9,7 +9,6 @@
 #include <nx/vms/server/analytics/device_analytics_binding.h>
 #include <nx/vms/server/analytics/frame_converter.h>
 #include <nx/vms/server/analytics/data_packet_adapter.h>
-#include <nx/vms/server/analytics/debug_helpers.h>
 #include <nx/vms/server/analytics/event_rule_watcher.h>
 #include <nx/vms/server/sdk_support/utils.h>
 #include <nx/vms/server/interactive_settings/json_engine.h>
@@ -151,7 +150,8 @@ QVariantMap DeviceAnalyticsContext::prepareSettings(
     using namespace nx::sdk;
     const auto engine = serverModule()
         ->resourcePool()
-        ->getResourceById<nx::vms::server::resource::AnalyticsEngineResource>(engineId);
+        ->getResourceById<nx::vms::server::resource::AnalyticsEngineResource>(engineId)
+        .dynamicCast<resource::AnalyticsEngineResource>();
 
     if (!engine)
     {
@@ -170,8 +170,7 @@ QVariantMap DeviceAnalyticsContext::prepareSettings(
             engine->getName(),
             engine->getId());
 
-        effectiveSettings = debug_helpers::loadDeviceAgentSettingsFromFile(
-            m_device, engine, pluginsIni().analyticsSettingsSubstitutePath);
+        effectiveSettings = loadSettingsFromFile(engine);
     }
 
     if (!effectiveSettings)
@@ -185,6 +184,50 @@ QVariantMap DeviceAnalyticsContext::prepareSettings(
     }
 
     return *effectiveSettings;
+}
+
+std::optional<QVariantMap> DeviceAnalyticsContext::loadSettingsFromFile(
+    const resource::AnalyticsEngineResourcePtr& engine) const
+{
+    const auto loadSettings =
+        [this, &engine](
+            bool isEngineSpecificFilename,
+            bool isDeviceSpecificFilename) -> std::optional<QVariantMap>
+        {
+            const QString settingsFilename = sdk_support::debugFileAbsolutePath(
+                pluginsIni().analyticsSettingsSubstitutePath,
+                sdk_support::baseNameOfFileToDumpOrLoadData(
+                    engine->plugin().dynamicCast<resource::AnalyticsPluginResource>(),
+                    engine,
+                    m_device,
+                    isEngineSpecificFilename,
+                    isDeviceSpecificFilename)) + "_settings.json";
+
+            std::optional<QString> settingsString = sdk_support::loadStringFromFile(
+                nx::utils::log::Tag(typeid(this)),
+                settingsFilename);
+
+            if (!settingsString)
+                return std::nullopt;
+
+            return sdk_support::toQVariantMap(*settingsString);
+        };
+
+    std::optional<QVariantMap> result = loadSettings(
+        /*isEngineSpecificFilename*/ true,
+        /*isDeviceSpecificFilename*/ true);
+    if (result)
+        return result;
+
+    result = loadSettings(/*isEngineSpecificFilename*/ false, /*isDeviceSpecificFilename*/ true);
+    if (result)
+        return result;
+
+    result = loadSettings(/*isEngineSpecificFilename*/ true, /*isDeviceSpecificFilename*/ false);
+    if (result)
+        return result;
+
+    return loadSettings(/*isEngineSpecificFilename*/ false, /*isDeviceSpecificFilename*/ false);
 }
 
 QVariantMap DeviceAnalyticsContext::getSettings(const QString& engineId) const
@@ -242,11 +285,16 @@ static QString getEngineLogLabel(QnMediaServerModule* serverModule, QnUuid engin
     const auto& engineResource =
         serverModule->resourcePool()->getResourceById<resource::AnalyticsEngineResource>(
             engineId);
-    if (!NX_ASSERT(engineResource) || !NX_ASSERT(engineResource->sdkEngine()))
+
+    if (!NX_ASSERT(engineResource))
         return "unknown Analytics Engine";
 
+    const auto parentPlugin = engineResource->plugin();
+    if (!NX_ASSERT(parentPlugin))
+        return lm("Analytics Engine %1 of unknown Plugin").arg(engineResource->getName());
+        
     return lm("Analytics Engine %1 of Plugin %2").args(
-        engineResource->getName(), engineResource->plugin()->manifest().id);
+        engineResource->getName(), parentPlugin->manifest().id);
 }
 
 static std::optional<nx::sdk::analytics::IUncompressedVideoFrame::PixelFormat>
