@@ -3,9 +3,32 @@
 #include <QtCore/QSet>
 #include <QtCore/QDir>
 
+#include <common/common_module.h>
+#include <client_core/client_core_module.h>
 #include <core/resource/avi/filetypesupport.h>
+#include <core/resource/avi/avi_resource.h>
+#include <core/resource/file_layout_resource.h>
+#include <core/resource_management/resource_pool.h>
 
 using namespace std::literals::chrono_literals;
+
+namespace {
+
+QString getResourceFilePath(const QnResourcePtr& resource)
+{
+    if (auto aviResource = resource.dynamicCast<QnAviResource>())
+    {
+        // Do not return path to embedded videos, they are governed by layouts.
+        return aviResource->isEmbedded() ? QString() : aviResource->getUrl();
+    }
+    if (auto fileLayoutResource = resource.dynamicCast<QnFileLayoutResource>())
+    {
+        return fileLayoutResource->getUrl();
+    }
+    return QString();
+}
+
+}
 
 namespace nx::vms::client::desktop {
 
@@ -22,6 +45,22 @@ LocalResourcesDirectoryModel::LocalResourcesDirectoryModel(QObject* parent):
 
     connect(&m_deferredDirectoryChangeHandlerTimer, &QTimer::timeout,
         this, &LocalResourcesDirectoryModel::processPendingDirectoryChanges);
+
+    auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
+
+    connect(resourcePool, &QnResourcePool::resourceAdded, this,
+        [this](const QnResourcePtr& resource) {
+            const auto path = getResourceFilePath(resource);
+            if (FileTypeSupport::isMovieFileExt(path) || FileTypeSupport::isValidLayoutFile(path))
+                m_fileSystemWatcher.addPath(path);
+        });
+
+    connect(resourcePool, &QnResourcePool::resourceRemoved, this,
+        [this](const QnResourcePtr& resource) {
+            const auto path = getResourceFilePath(resource);
+            if (!path.isNull())
+                m_fileSystemWatcher.removePath(path);
+        });
 }
 
 QStringList LocalResourcesDirectoryModel::getLocalResourcesDirectories() const
@@ -69,16 +108,6 @@ void LocalResourcesDirectoryModel::addWatchedDirectory(const QString& path)
 
     m_childFiles.insert(canonicalPath, childFiles);
     m_childDirectories.insert(canonicalPath, childDirectories);
-
-    for (auto& childFile: childFiles)
-    {
-        childFile = dir.absoluteFilePath(childFile);
-        if (FileTypeSupport::isValidLayoutFile(childFile)
-            || FileTypeSupport::isMovieFileExt(childFile))
-        {
-            m_fileSystemWatcher.addPath(childFile);
-        }
-    }
 
     for (const auto& childDirectory: childDirectories)
         addWatchedDirectory(dir.absoluteFilePath(childDirectory));
@@ -143,16 +172,6 @@ void LocalResourcesDirectoryModel::processPendingDirectoryChanges()
 
         for (const auto& newChildDirectory: newChildDirectories)
             addWatchedDirectory(dir.absoluteFilePath(newChildDirectory));
-
-        for (auto& newChildFile: newChildFiles)
-        {
-            newChildFile = dir.absoluteFilePath(newChildFile);
-            if (FileTypeSupport::isValidLayoutFile(newChildFile)
-                || FileTypeSupport::isMovieFileExt(newChildFile))
-            {
-                m_fileSystemWatcher.addPath(newChildFile);
-            }
-        }
 
         if (!newChildFiles.empty())
             emit filesAdded(newChildFiles);

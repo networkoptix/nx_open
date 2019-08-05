@@ -74,10 +74,11 @@ public:
     void update();
 
     NodeType type() const ;
-    QnResourcePtr resource() const;
+    const QnResourcePtr& resource() const;
     Qn::ResourceFlags resourceFlags() const;
     QnUuid uuid() const;
 
+    QSet<QnResourceTreeModelNodePtr> allChildren() const;
     QList<QnResourceTreeModelNodePtr> children() const;
     QList<QnResourceTreeModelNodePtr> childrenRecursive() const;
 
@@ -108,10 +109,22 @@ protected:
 
     bool isInitialized() const;
 
+    bool isVisible() const; //< Valid, not a bastard and not under a bastard.
+
     QnResourceTreeModel* model() const;
 
     virtual QIcon calculateIcon() const;
     virtual nx::vms::client::desktop::CameraExtraStatus calculateCameraExtraStatus() const;
+
+    /**
+     * Adds a child link into the all children list.
+     */
+    void addChildLink(const QnResourceTreeModelNodePtr& child);
+
+    /**
+     * Removes a child link from the all children list.
+     */
+    void removeChildLink(const QnResourceTreeModelNodePtr& child);
 
     virtual void addChildInternal(const QnResourceTreeModelNodePtr& child);
     virtual void removeChildInternal(const QnResourceTreeModelNodePtr& child);
@@ -167,15 +180,22 @@ private:
     /** State of this node. */
     State m_state;
 
-    /** Whether this node is a bastard node. Bastard nodes do not appear in
-     * their parent's children list and do not inherit their parent's state. */
+    /**
+     * Whether this node is a bastard node. Bastard nodes do not appear in their parent's children
+     * list and do not inherit their parent's state.
+     */
     bool m_bastard;
 
     /** Parent of this node. */
     QnResourceTreeModelNodePtr m_parent;
 
-    /** Children of this node. */
+    /** Children of this node, which are actually displayed (not bastard). */
     QList<QnResourceTreeModelNodePtr> m_children;
+
+    /**
+     * All children of the node (including bastard).
+     */
+    QSet<QnResourceTreeModelNodePtr> m_allChildren;
 
     /* Resource-related state. */
 

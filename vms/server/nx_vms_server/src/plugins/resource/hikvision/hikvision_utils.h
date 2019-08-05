@@ -20,41 +20,42 @@ namespace vms::server {
 namespace plugins {
 namespace hikvision {
 
-static const std::chrono::milliseconds kHttpTimeout(5000);
-static const QString kContentType = lit("application/xml");
+// Some cameras (e.g.Hikvision DS-2CD2132F-IWS) barely fit into 6 seconds.
+static const std::chrono::milliseconds kHttpTimeout(10000);
 
-const QString kStatusCodeOk = lit("1");
-const QString kSubStatusCodeOk = lit("ok");
-static const QString kVideoElementTag = lit("Video");
-static const QString kTransportElementTag = lit("Transport");
-static const QString kChannelRootElementTag = lit("StreamingChannel");
-static const QString kAdminAccessElementTag = lit("AdminAccessProtocolList");
-static const QString kAdminAccessProtocolElementTag = lit("AdminAccessProtocol");
-static const QString kOptionsAttribute = lit("opt");
+static const QString kContentType("application/xml");
 
-static const QString kVideoCodecTypeTag = lit("videoCodecType");
-static const QString kVideoResolutionWidthTag = lit("videoResolutionWidth");
-static const QString kVideoResolutionHeightTag = lit("videoResolutionHeight");
-static const QString kFixedQualityTag = lit("fixedQuality");
-static const QString kBitrateControlTypeTag = lit("videoQualityControlType");
-static const QString kFixedBitrateTag = lit("constantBitRate");
-static const QString kVariableBitrateTag = lit("vbrUpperCap");
-static const QString kMaxFrameRateTag = lit("maxFrameRate");
+const QString kStatusCodeOk("1");
+const QString kSubStatusCodeOk("ok");
+static const QString kVideoElementTag("Video");
+static const QString kTransportElementTag("Transport");
+static const QString kChannelRootElementTag("StreamingChannel");
+static const QString kAdminAccessElementTag("AdminAccessProtocolList");
+static const QString kAdminAccessProtocolElementTag("AdminAccessProtocol");
+static const QString kOptionsAttribute("opt");
 
-static const QString kRtspPortNumberTag = lit("rtspPortNo");
+static const QString kVideoCodecTypeTag("videoCodecType");
+static const QString kVideoResolutionWidthTag("videoResolutionWidth");
+static const QString kVideoResolutionHeightTag("videoResolutionHeight");
+static const QString kFixedQualityTag("fixedQuality");
+static const QString kBitrateControlTypeTag("videoQualityControlType");
+static const QString kFixedBitrateTag("constantBitRate");
+static const QString kVariableBitrateTag("vbrUpperCap");
+static const QString kMaxFrameRateTag("maxFrameRate");
 
-static const QString kPrimaryStreamNumber = lit("01");
-static const QString kSecondaryStreamNumber = lit("02");
+static const QString kRtspPortNumberTag("rtspPortNo");
 
-static const QString kVariableBitrateValue = lit("VBR");
-static const QString kConstantBitrateValue = lit("CBR");
+static const QString kPrimaryStreamNumber("01");
+static const QString kSecondaryStreamNumber("02");
 
-static const QString kCapabilitiesRequestPathTemplate =
-    lit("/ISAPI/Streaming/channels/%1/capabilities");
+static const QString kVariableBitrateValue("VBR");
+static const QString kConstantBitrateValue("CBR");
+
+static const QString kCapabilitiesRequestPathTemplate("/ISAPI/Streaming/channels/%1/capabilities");
 
 // TODO: Find out if we have to try both paths.
-static const QString kChannelStreamingPathTemplate = lit("/Streaming/Channels/%1");
-static const QString kIsapiChannelStreamingPathTemplate = lit("/ISAPI/Streaming/channels/%1");
+static const QString kChannelStreamingPathTemplate("/Streaming/Channels/%1");
+static const QString kIsapiChannelStreamingPathTemplate("/ISAPI/Streaming/channels/%1");
 
 static const int kFpsThreshold = 200;
 
@@ -68,11 +69,11 @@ static const std::array<QString, 6> kVideoChannelProperties = {
 };
 
 static const std::map<QString, AVCodecID> kCodecMap = {
-    {lit("MJPEG"), AVCodecID::AV_CODEC_ID_MJPEG},
-    {lit("MPEG4"), AVCodecID::AV_CODEC_ID_MPEG4},
-    {lit("MPNG"), AVCodecID::AV_CODEC_ID_APNG}, //< Not sure about this one.
-    {lit("H.264"), AVCodecID::AV_CODEC_ID_H264},
-    {lit("H.265"), AVCodecID::AV_CODEC_ID_HEVC}};
+    {"MJPEG", AVCodecID::AV_CODEC_ID_MJPEG},
+    {"MPEG4", AVCodecID::AV_CODEC_ID_MPEG4},
+    {"MPNG", AVCodecID::AV_CODEC_ID_APNG}, //< Not sure about this one.
+    {"H.264", AVCodecID::AV_CODEC_ID_H264},
+    {"H.265", AVCodecID::AV_CODEC_ID_HEVC}};
 
 struct ChannelCapabilities
 {
@@ -190,7 +191,8 @@ bool doRequest(
 
 bool tuneHttpClient(nx::network::http::HttpClient* outHttpClient, const QAuthenticator& auth);
 
-QString buildChannelNumber(Qn::ConnectionRole role, int channelNumber);
+// Hikvision channel number is in range [1..N]
+QString buildChannelNumber(Qn::ConnectionRole role, int streamApiChannel);
 
 bool codecSupported(AVCodecID codecId, const ChannelCapabilities& channelCapabilities);
 

@@ -14,6 +14,7 @@
 #include <nx/network/app_info.h>
 #include <nx/utils/string.h>
 #include <nx/vms/api/data/user_role_data.h>
+#include <core/resource_access/resource_access_subject.h>
 
 class QnUserListModelPrivate:
     public Connective<QObject>,

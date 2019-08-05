@@ -701,7 +701,7 @@ Do you want to delete it anyway?</source>
     <message>
       <source>Type</source>
       <comment>All other platforms</comment>
-      <translation>Type</translation>
+      <translation>Skriv</translation>
     </message>
     <message>
       <source>Date Modified</source>
@@ -905,7 +905,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Open</source>
-      <translation>Åpen</translation>
+      <translation>Åpne</translation>
     </message>
     <message>
       <source>&amp;Yes</source>
@@ -1131,7 +1131,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Scroll Right</source>
-      <translation>Rulle til høyre</translation>
+      <translation>Rull til høyre</translation>
     </message>
   </context>
   <context>
@@ -1149,15 +1149,15 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>&amp;Redo</source>
-      <translation>&amp;Gjenta</translation>
+      <translation>&amp;Gjøre om</translation>
     </message>
     <message>
       <source>Cu&amp;t</source>
-      <translation>Kl&amp;ipp</translation>
+      <translation>Cu&amp;t</translation>
     </message>
     <message>
       <source>&amp;Copy</source>
-      <translation>&amp;Kopiér</translation>
+      <translation>&amp;Kopier</translation>
     </message>
     <message>
       <source>Copy &amp;Link Location</source>

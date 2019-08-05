@@ -259,6 +259,11 @@ public:
     void setPreferredServerId(const QnUuid& value);
     QnUuid preferredServerId() const;
 
+    /**
+     * If preferred server is not set, assigns current server as preferred.
+     */
+    void updatePreferredServerId();
+
     //!Returns list of time periods of DTS archive, containing motion at specified \a regions with timestamp in region [\a msStartTime; \a msEndTime)
     /*!
         \param detailLevel Minimal time period gap (usec) that is of interest to the caller.
@@ -449,8 +454,8 @@ private:
     CachedValue<bool> m_cachedHasVideo;
     CachedValue<MotionStreamIndex> m_cachedMotionStreamIndex;
 
-private slots:
-    void resetCachedValues();
+protected slots:
+    virtual void resetCachedValues();
 };
 
 Q_DECLARE_METATYPE(QnSecurityCamResourcePtr)

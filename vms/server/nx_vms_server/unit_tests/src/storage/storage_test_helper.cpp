@@ -33,7 +33,7 @@ QnStorageResourcePtr FileStorageTestHelper::createStorage(
     QnStorageResourcePtr result(new QnFileStorageResource(serverModule));
     result->setUrl(url);
     result->setSpaceLimit(spaceLimit);
-    result->setId(QnUuid::createUuid());
+    result->setIdUnsafe(QnUuid::createUuid());
 
     return result;
 }

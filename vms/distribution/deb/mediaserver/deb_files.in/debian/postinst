@@ -30,13 +30,36 @@ CAMERA_SETTINGS_OPTIMIZATION_DEFAULT=true
 STATISTICS_REPORT_ALLOWED_DEFAULT=true
 SYSTEM_USER=$COMPANY_NAME
 
+declare RUNTIME #< The assignment is placed hereinafter.
+
 TARGET_DEVICE='@targetDevice@'
 WITH_ROOT_TOOL='@withRootTool@'
 
-isInDockerContainer()
+# Acquire the runtime type (real, docker, chroot and so on) and store its name to the variable
+# named outputVariableName.
+getRuntimeType() # outputVariableName
 {
-    [[ $(cat "/var/run/systemd/container" 2>/dev/null) == "docker" ]]
+    local -r outputVariableName="$1"; shift
+    local -r runtime=$(systemd-detect-virt)
+
+    if [[ $runtime == "" ]]
+    then
+        echo "Error detecting type of runtime." >&2
+        return 1
+    fi
+
+    if [[ $runtime != "none" ]]
+    then
+        echo "Detected runtime type: $runtime." >&2
+        eval "${outputVariableName}=$runtime"
+    else
+        eval "${outputVariableName}=real"
+    fi
+
+    return 0
 }
+
+getRuntimeType RUNTIME
 
 isRpi()
 {
@@ -147,7 +170,7 @@ installModificationSpecificConfig()
 {
     local -r config_file_path="${BASE_DIR}/share/configs/mediaserver.conf.$TARGET_DEVICE.template"
 
-    if [[ -f ${config_file_path} ]]
+    if [[ -f ${config_file_path} ]] && [[ ! -f "${BASE_DIR}/etc/mediaserver.conf" ]]
     then
         cp  "${config_file_path}" "${BASE_DIR}/etc/mediaserver.conf"
     fi
@@ -156,14 +179,11 @@ installModificationSpecificConfig()
 # This is necessary because changed configuration options should take effect
 # immediately.
 
-if ! isInDockerContainer
-then
-    systemctl stop $COMPANY_NAME-mediaserver || true
+systemctl stop $COMPANY_NAME-mediaserver || true
 
-    if [[ $WITH_ROOT_TOOL == 'true' ]]
-    then
-        systemctl stop $COMPANY_NAME-root-tool || true
-    fi
+if [[ $WITH_ROOT_TOOL == 'true' ]]
+then
+    systemctl stop $COMPANY_NAME-root-tool || true
 fi
 
 case "$1" in
@@ -248,10 +268,7 @@ esac
 # Dirty hack to prevent apport from catching our crash dumps.
 systemctl disable apport &>/dev/null || true
 
-if ! isInDockerContainer
-then
-    systemctl stop apport &>/dev/null || true
-fi
+systemctl stop apport &>/dev/null || true
 
 [[ -L "${BASE_DIR}/lib/ffmpeg" ]] && unlink "${BASE_DIR}/lib/ffmpeg"
 
@@ -293,11 +310,11 @@ startServer()
         echo "ERROR: Server process not found though 'systemd ... start' reported success." >&2
         exit 1
     fi
-    
+
     echo "Started service with PID $PID."
 }
 
-if ! isInDockerContainer
+if [[ $RUNTIME != "docker" ]]
 then
     if ! startServer
     then

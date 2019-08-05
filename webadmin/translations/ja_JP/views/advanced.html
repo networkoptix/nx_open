@@ -109,7 +109,7 @@
             書き込みのための主記憶装置ドライブが選択されていません - ビデオはこのサーバーに記録されません。
         </div>
         <div id="reduceArchiveAlert"         class="alert alert-warning" ng-class="{hidden:!reduceArchiveWarning}">
-            予約済みスペースの量が、残りの空きスペースより大きくなっています。 現在のビデオ映像は、領域を確保する為に削除される可能性があります
+            予約済みスペースの量が、残りの空きスペースより大きくなっています。 現在のビデオ映像は、領域を確保する為に削除される可能性があります。
         </div>
         <div class="alert alert-danger"  ng-class="{hidden:form.$valid}">すべての強調表示されている設定を修正して保存します</div>
 
@@ -120,16 +120,16 @@
     <h2>ログ設定</h2>
     <form class="form" role="form" name="logLevels" novalidate>
         <div ng-repeat="(name, level) in loggers" class="form-group">
-            <label class="col-sm-4">{{name}} ログ レベル</label>
+            <label class="col-sm-4">{{name}} ログレベル</label>
             <div class="col-sm-8">
                 <select class="form-control" name="{{name}}LogLevel" id="{{name}}LogLevel" ng-model="loggers[name]">
                     <option value="none">なし: ログを無効にします</option>
                     <option value="always">常に: エラー、警告および最も重要なメッセージをログに記録します</option>
                     <option value="error">エラー: ログ エラーのみ</option>
                     <option value="warning">警告: 警告およびエラーをログに記録します</option>
-                    <option value="info">情報: エラー、警告、およびすべてのメッセージをログに記録します</option>
-                    <option value="debug">デバッグ: システム メッセージとデバッグ情報をログに記録します</option>
-                    <option value="verbose">詳細：利用可能なすべての情報をログに記録します</option>
+                    <option value="info">情報: エラー、警告、およびすべてのメッセージをログに記録します。</option>
+                    <option value="debug">デバッグ: すべてのシステムメッセージとデバッグ情報を記録します。</option>
+                    <option value="verbose">詳細：利用可能なすべての情報を記録します。</option>
                 </select>
             </div>
         </div>

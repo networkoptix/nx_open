@@ -41,6 +41,8 @@ enum class RecordingType
     motionAndLow = 3,
 };
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(RecordingType)
+NX_VMS_API QString toString(RecordingType value);
+NX_VMS_API std::ostream& operator<<(std::ostream& os, RecordingType value);
 
 enum class StreamQuality
 {

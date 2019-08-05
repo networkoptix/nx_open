@@ -5,7 +5,7 @@
 QnFakeMediaServerResource::QnFakeMediaServerResource(QnCommonModule* commonModule):
     QnMediaServerResource(commonModule)
 {
-    setId(QnUuid::createUuid());
+    setIdUnsafe(QnUuid::createUuid());
     addFlags(Qn::fake_server);
 }
 

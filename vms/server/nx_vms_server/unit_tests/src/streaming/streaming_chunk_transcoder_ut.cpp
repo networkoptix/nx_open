@@ -36,7 +36,7 @@ protected:
         m_cameraResourceId = QnUuid::createUuid();
 
         auto cameraResource = QnResourcePtr(new CameraResourceStub());
-        cameraResource->setId(m_cameraResourceId);
+        cameraResource->setIdUnsafe(m_cameraResourceId);
         m_serverModule.resourcePool()->addResource(cameraResource);
         ASSERT_TRUE(m_serverModule.videoCameraPool()->addVideoCamera(
             cameraResource, QnVideoCameraPtr(new MediaServerVideoCameraMock())));

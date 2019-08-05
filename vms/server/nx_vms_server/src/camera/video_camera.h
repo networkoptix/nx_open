@@ -147,6 +147,11 @@ public:
 
     virtual QnResourcePtr resource() const override;
 
+    // Workaround, should be fixed in 4.1, keep key frame to generate SDP for external
+    // RTSP clients.
+    QnConstCompressedVideoDataPtr getLastVideoFrameRtsp(StreamIndex streamIndex, int channel) const;
+    QnConstCompressedAudioDataPtr getLastAudioFrameRtsp(StreamIndex streamIndex) const;
+
 private:
     void createReader(QnServer::ChunksCatalog catalog);
     QnLiveStreamProviderPtr readerByQuality(MediaQuality streamQuality) const;

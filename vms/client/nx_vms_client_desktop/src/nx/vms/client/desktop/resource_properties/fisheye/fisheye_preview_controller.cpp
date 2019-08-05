@@ -33,7 +33,12 @@ void FisheyePreviewController::preview(
     {
         const auto mediaWidget = qobject_cast<QnMediaResourceWidget*>(widget);
         if (NX_ASSERT(mediaWidget))
+        {
+            if (mediaWidget->dewarpingParams() == params)
+                continue;
+
             mediaWidget->setDewarpingParams(params);
+        }
 
         const auto item = widget->item();
         auto itemParams = item->dewarpingParams();

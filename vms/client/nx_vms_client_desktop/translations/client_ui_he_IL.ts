@@ -38,11 +38,6 @@
       <source>Customer Support</source>
       <translation>שירות לקוחות</translation>
     </message>
-    <message>
-      <location/>
-      <source>ARM support policy</source>
-      <translation>מדיניות תמיכה ב- ARM</translation>
-    </message>
   </context>
   <context>
     <name>AccessibleResourcesWidget</name>
@@ -2098,42 +2093,42 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/ui/event_rules/widgets/plugin_diagnostic_event_widget.ui"/>
       <source>Source:</source>
-      <translation type="unfinished">Source:</translation>
+      <translation>מקור:</translation>
     </message>
     <message>
       <location/>
       <source>Caption contains:</source>
-      <translation type="unfinished">Caption contains:</translation>
+      <translation>הכתובית מכילה:</translation>
     </message>
     <message>
       <location/>
       <source>Keywords separated by space</source>
-      <translation type="unfinished">Keywords separated by space</translation>
+      <translation>מילות מפתח מופרדות ע"י רווח</translation>
     </message>
     <message>
       <location/>
       <source>Description contains:</source>
-      <translation type="unfinished">Description contains:</translation>
+      <translation>התיאור מכיל:</translation>
     </message>
     <message>
       <location/>
       <source>Level:</source>
-      <translation type="unfinished">Level:</translation>
+      <translation>רמה:</translation>
     </message>
     <message>
       <location/>
       <source>ERROR</source>
-      <translation type="unfinished">ERROR</translation>
+      <translation>שגיאה</translation>
     </message>
     <message>
       <location/>
       <source>WARNING</source>
-      <translation type="unfinished">WARNING</translation>
+      <translation>אזהרה</translation>
     </message>
     <message>
       <location/>
       <source>INFO</source>
-      <translation type="unfinished">INFO</translation>
+      <translation>מידע</translation>
     </message>
   </context>
   <context>
@@ -3078,8 +3073,8 @@
     </message>
     <message>
       <location/>
-      <source>Analytics data can occupy tens of gigabytes of storage space. We recommend to choose other location for it instead of the system partition.</source>
-      <translation>נתוני אנליטיקה יכולים להכיל עשרות ג 'יגה בייט של שטח אחסון. אנו ממליצים לבחור במקום אחר עבורו במקום במחיצה של מערכת ההפעלה.</translation>
+      <source>Analytics data can take up large amounts of space. We recommend to choose another location for it instead of the system partition.</source>
+      <translation>נתוני אנליטיקה יכולים להכיל גדלים מסיבים של שטח אחסון. אנו ממליצים לבחור במקום אחר עבורו במקום במחיצה של מערכת ההפעלה.</translation>
     </message>
   </context>
   <context>

@@ -34,6 +34,7 @@
 
 #include <nx/update/update_information.h>
 #include <nx/update/update_check.h>
+#include <ui/workbench/workbench_context.h>
 
 #include "server_update_tool.h"
 #include "update_verification.h"
@@ -58,7 +59,7 @@ struct WorkbenchUpdateWatcher::Private
 {
     UpdateContents updateContents;
     std::future<UpdateContents> updateCheck;
-    std::shared_ptr<ServerUpdateTool> serverUpdateTool;
+    QPointer<ServerUpdateTool> serverUpdateTool;
 };
 
 WorkbenchUpdateWatcher::WorkbenchUpdateWatcher(QObject* parent):
@@ -69,7 +70,9 @@ WorkbenchUpdateWatcher::WorkbenchUpdateWatcher(QObject* parent):
     m_notifiedVersion(),
     m_private(new Private())
 {
-    m_private->serverUpdateTool.reset(new ServerUpdateTool(this));
+    m_private->serverUpdateTool = context()->instance<ServerUpdateTool>();
+    NX_ASSERT(m_private->serverUpdateTool);
+
     m_autoChecksEnabled = qnGlobalSettings->isUpdateNotificationsEnabled();
 
     connect(qnGlobalSettings, &QnGlobalSettings::updateNotificationsChanged, this,
@@ -133,7 +136,7 @@ void WorkbenchUpdateWatcher::atUpdateCurrentState()
     }
 }
 
-std::shared_ptr<ServerUpdateTool> WorkbenchUpdateWatcher::getServerUpdateTool()
+ServerUpdateTool* WorkbenchUpdateWatcher::getServerUpdateTool()
 {
     NX_ASSERT(m_private);
     return m_private->serverUpdateTool;

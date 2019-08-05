@@ -520,30 +520,30 @@
     </message>
     <message numerus="yes">
       <source>%n Time Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Demolisenser</numerusform>
-        <numerusform>%n Time Licenses</numerusform>
+      <translation>
+        <numerusform>%n Tidslisenser</numerusform>
+        <numerusform>%n Tidslisenser</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Analog Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Enkoder lisenser</numerusform>
-        <numerusform>%n Analog Licenses</numerusform>
+      <translation>
+        <numerusform>%n Analog lisens</numerusform>
+        <numerusform>%n Analoge lisenser</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Professional Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Pro lisenser</numerusform>
-        <numerusform>%n Professional Licenses</numerusform>
+      <translation>
+        <numerusform>%n Pro lisens</numerusform>
+        <numerusform>%n/ Pro lisenser</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Edge Licenses</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n Edge-lisenser</numerusform>
-        <numerusform>%n Edge Licenses</numerusform>
+        <numerusform>%n Edge-lisenser</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -562,9 +562,9 @@
     </message>
     <message numerus="yes">
       <source>%n Video Wall Licenses</source>
-      <translation type="unfinished">
+      <translation>
+        <numerusform>%n Videovegg Lisens</numerusform>
         <numerusform>%n Videovegg Lisenser</numerusform>
-        <numerusform>%n Video Wall Licenses</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -576,8 +576,8 @@
     </message>
     <message numerus="yes">
       <source>%n Start Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Start Licenses</numerusform>
+      <translation>
+        <numerusform>%n Start lisens</numerusform>
         <numerusform>%n Start lisenser</numerusform>
       </translation>
     </message>
@@ -601,17 +601,17 @@
     </message>
     <message numerus="yes">
       <source>%n Free Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Free Licenses</numerusform>
+      <translation>
+        <numerusform>%n Demo lisens</numerusform>
         <numerusform>%n Demo lisenser</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Time Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n/%1 Demolisens</numerusform>
-        <numerusform>%n/%1 Time Licenses</numerusform>
+        <numerusform>%n/%1 Demolisenser</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -649,8 +649,8 @@
     <message numerus="yes">
       <source>%n/%1 Analog Encoder Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Analog Encoder Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 Analog Enkoder lisens</numerusform>
         <numerusform>%n/%1 Analog Enkoder lisenser</numerusform>
       </translation>
     </message>
@@ -681,8 +681,8 @@
     <message numerus="yes">
       <source>%n/%1 Free Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Free Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 Demo lisens</numerusform>
         <numerusform>%n/%1 Demo lisenser</numerusform>
       </translation>
     </message>
@@ -824,7 +824,7 @@
     </message>
     <message>
       <source>I/O Module</source>
-      <translation>I / O-Modul</translation>
+      <translation>I / O-modul</translation>
     </message>
     <message>
       <source>I/O module</source>
@@ -846,15 +846,15 @@
     </message>
     <message numerus="yes">
       <source>%n I/O Modules</source>
-      <translation type="unfinished">
-        <numerusform>%n I/O Modules</numerusform>
+      <translation>
+        <numerusform>%n I / O-modul</numerusform>
         <numerusform>%n I / O-moduler</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O modules</source>
-      <translation type="unfinished">
-        <numerusform>%n I/O modules</numerusform>
+      <translation>
+        <numerusform>%n I/O-modul</numerusform>
         <numerusform>%n I/O-moduler</numerusform>
       </translation>
     </message>

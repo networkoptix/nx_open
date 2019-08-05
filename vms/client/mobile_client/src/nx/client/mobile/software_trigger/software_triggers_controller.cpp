@@ -15,6 +15,7 @@
 #include <nx/utils/guarded_callback.h>
 #include <nx/vms/event/rule.h>
 #include <nx/vms/event/rule_manager.h>
+#include <core/resource_access/resource_access_subject.h>
 
 namespace nx {
 namespace client {

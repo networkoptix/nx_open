@@ -49,6 +49,7 @@ public:
     static QString urlToPath(const QString &url);
     static QString urlWithoutCredentials(const QString& url);
 
+    void fillID();
     static QnUuid fillID(const QnUuid& mserverId, const QString& url);
     bool isExternal() const;
     virtual bool isSystem() const { return false; }

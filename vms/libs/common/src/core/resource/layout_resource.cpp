@@ -53,7 +53,7 @@ QnLayoutResourcePtr QnLayoutResource::clone(QHash<QnUuid, QnUuid>* remapHash) co
 
     {
         QnMutexLocker locker(&m_mutex);
-        result->setId(QnUuid::createUuid());
+        result->setIdUnsafe(QnUuid::createUuid());
         result->setUrl(m_url);
         result->setName(m_name);
         result->setParentId(m_parentId);

@@ -24,6 +24,11 @@ public:
     EventTypeDescriptorMap descriptors(
         const std::set<EventTypeId>& eventTypeIds = {}) const;
 
+    /**
+     * Tree of the event type ids. Root nodes are engines, then groups and event types as leaves.
+     * Includes only those event types, which are actually available, so only compatible, enabled
+     * and running engines are used.
+     */
     ScopedEventTypeIds supportedEventTypeIds(
         const QnVirtualCameraResourcePtr& device) const;
 
@@ -36,6 +41,11 @@ public:
     EventTypeDescriptorMap supportedEventTypeDescriptors(
         const QnVirtualCameraResourcePtr& device) const;
 
+    /**
+     * Tree of the event type ids. Root nodes are engines, then groups and event types as leaves.
+     * Includes all event types, which can theoretically be available on this device, so all
+     * compatible engines are used.
+     */
     ScopedEventTypeIds compatibleEventTypeIds(
         const QnVirtualCameraResourcePtr& device) const;
 

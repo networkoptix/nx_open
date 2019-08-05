@@ -38,11 +38,6 @@
       <source>Customer Support</source>
       <translation>カスタマーサポート</translation>
     </message>
-    <message>
-      <location/>
-      <source>ARM support policy</source>
-      <translation>ARMサポートポリシー</translation>
-    </message>
   </context>
   <context>
     <name>AccessibleResourcesWidget</name>
@@ -580,7 +575,7 @@
     <message>
       <location/>
       <source>Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</source>
-      <translation>システムパフォーマンスに対する影響を理解せずに変更は行わないでください</translation>
+      <translation>システムパフォーマンスに対する影響を理解せずに変更は行わないでください。</translation>
     </message>
     <message>
       <location/>
@@ -595,17 +590,17 @@
     <message>
       <location/>
       <source>Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant.</source>
-      <translation>録画スケジュールの品質とフレームレート (FPS) 設定は無関係になります</translation>
+      <translation>録画スケジュールの品質とフレームレート (FPS) 設定は無関係になります。</translation>
     </message>
     <message>
       <location/>
       <source>Calculate bitrate per GOP instead of bitrate per second</source>
-      <translation>毎秒のビットレートの代わりにGOPあたりのビットレートを計算する</translation>
+      <translation>1秒あたりのビットレートではなくGOPあたりのビットレートを計算する</translation>
     </message>
     <message>
       <location/>
       <source>It will increase bitrate for camera.</source>
-      <translation>それはカメラのビットレートを増加させます</translation>
+      <translation>カメラのビットレートが上がります。</translation>
     </message>
     <message>
       <location/>
@@ -615,7 +610,7 @@
     <message>
       <location/>
       <source>Disable secondary stream</source>
-      <translation>セカンダリ ストリームを無効にする</translation>
+      <translation>セカンダリストリームを無効にする</translation>
     </message>
     <message>
       <location/>
@@ -630,7 +625,7 @@
     <message>
       <location/>
       <source>Media Streaming</source>
-      <translation>メディア ストリーム</translation>
+      <translation>メディアストリーム</translation>
     </message>
     <message>
       <location/>
@@ -640,7 +635,7 @@
     <message>
       <location/>
       <source>Generate</source>
-      <translation>生成</translation>
+      <translation>一般</translation>
     </message>
     <message>
       <location/>
@@ -655,12 +650,12 @@
     <message>
       <location/>
       <source>Force motion detection for stream</source>
-      <translation>ストリームのモーション検出を使用</translation>
+      <translation>ストリームのモーション検知を使用</translation>
     </message>
     <message>
       <location/>
       <source>RTP transport</source>
-      <translation>RTP</translation>
+      <translation>RTPトランスポート</translation>
     </message>
     <message>
       <location/>
@@ -675,7 +670,7 @@
     <message>
       <location/>
       <source>Preferred PTZ preset type:</source>
-      <translation>PTZプリセットタイプ：</translation>
+      <translation>優先されるPTZプリセットタイプ：</translation>
     </message>
     <message>
       <location/>
@@ -690,7 +685,7 @@
     <message>
       <location/>
       <source>Native camera presets will not be avaliable.</source>
-      <translation>カメラのプリセットは使用できません</translation>
+      <translation>ネイティブカメラのプリセットは利用できません。</translation>
     </message>
     <message>
       <location/>
@@ -738,7 +733,7 @@
     <message>
       <location/>
       <source>Camera ID</source>
-      <translation>カメラ ID</translation>
+      <translation>カメラID</translation>
     </message>
     <message>
       <location/>
@@ -748,7 +743,7 @@
     <message>
       <location/>
       <source>Primary Stream</source>
-      <translation>プライマリ ストリーム</translation>
+      <translation>プライマリストリーム</translation>
     </message>
     <message>
       <location/>
@@ -902,12 +897,12 @@
     <message>
       <location/>
       <source>Enable audio</source>
-      <translation>オーディオ有効</translation>
+      <translation>音声を有効にする</translation>
     </message>
     <message>
       <location/>
       <source>Edit Streams...</source>
-      <translation>ストリームの編集...</translation>
+      <translation>ストリームを編集...</translation>
     </message>
   </context>
   <context>
@@ -1089,7 +1084,7 @@
     <message>
       <location/>
       <source>Add Devices</source>
-      <translation> デバイスを 追加</translation>
+      <translation>デバイスを追加</translation>
     </message>
     <message>
       <location/>
@@ -1212,7 +1207,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/export/widgets/export_layout_settings_widget.ui"/>
       <source>Export Settings</source>
-      <translation>エクスポート設定</translation>
+      <translation>設定をエクスポート</translation>
     </message>
     <message>
       <location/>
@@ -1225,7 +1220,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/export/widgets/export_media_settings_widget.ui"/>
       <source>Export Settings</source>
-      <translation>エクスポート設定</translation>
+      <translation>設定をエクスポート</translation>
     </message>
     <message>
       <location/>
@@ -1235,12 +1230,12 @@
     <message>
       <location/>
       <source>Rotation, Dewarping, Image Enhancement etc.</source>
-      <translation>回転、歪補正、イメージ拡張など</translation>
+      <translation>回転、歪み補正、イメージ強調など</translation>
     </message>
     <message>
       <location/>
       <source>Applying filters and adding overlays require transcoding which will increase CPU usage and may take significant time.</source>
-      <translation>フィルタを適用してオーバーレイを追加するにはトランスコードが必要となり、CPU使用率が高くなり、時間がかかることがあります</translation>
+      <translation>フィルタを適用してオーバーレイを追加するにはトランスコードが必要です。これにより、CPU使用率が高くなり、時間がかかることがあります。</translation>
     </message>
   </context>
   <context>
@@ -1261,7 +1256,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/export/dialogs/export_settings_dialog.ui"/>
       <source>Export Video</source>
-      <translation>ビデオエクスポート</translation>
+      <translation>ビデオをエクスポート</translation>
     </message>
     <message>
       <location/>
@@ -1271,7 +1266,7 @@
     <message>
       <location/>
       <source>Export Settings</source>
-      <translation>エクスポート設定</translation>
+      <translation>設定をエクスポート</translation>
     </message>
     <message>
       <location/>
@@ -1363,7 +1358,7 @@
     <message>
       <location/>
       <source>Source camera</source>
-      <translation>ソースカメラをフルスクリーン表示する</translation>
+      <translation>ソースカメラ</translation>
     </message>
   </context>
   <context>
@@ -1444,7 +1439,7 @@
     <message>
       <location/>
       <source>Encrypting video traffic will significantly increase CPU usage.</source>
-      <translation>ビデオトラフィックを暗号化すると、CPU使用率が大幅に増加します</translation>
+      <translation>ビデオトラフィックを暗号化すると、CPU使用率が大幅に増加します。</translation>
     </message>
   </context>
   <context>
@@ -1602,7 +1597,7 @@
     <message>
       <location/>
       <source>Generate</source>
-      <translation>生成</translation>
+      <translation>一般</translation>
     </message>
     <message>
       <location/>
@@ -1739,7 +1734,7 @@
     <message>
       <location/>
       <source>Locked to Hardware ID:</source>
-      <translation>ハードウェアID:</translation>
+      <translation>ハードウェアIDのロック:</translation>
     </message>
   </context>
   <context>
@@ -1998,7 +1993,7 @@
     <message>
       <location/>
       <source>Browse</source>
-      <translation>参照</translation>
+      <translation>閲覧</translation>
     </message>
     <message>
       <location/>
@@ -2098,42 +2093,42 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/ui/event_rules/widgets/plugin_diagnostic_event_widget.ui"/>
       <source>Source:</source>
-      <translation type="unfinished">Source:</translation>
+      <translation>ソース：</translation>
     </message>
     <message>
       <location/>
       <source>Caption contains:</source>
-      <translation type="unfinished">Caption contains:</translation>
+      <translation>キャプションが含まれています：</translation>
     </message>
     <message>
       <location/>
       <source>Keywords separated by space</source>
-      <translation type="unfinished">Keywords separated by space</translation>
+      <translation>スペースで区切られたキーワード</translation>
     </message>
     <message>
       <location/>
       <source>Description contains:</source>
-      <translation type="unfinished">Description contains:</translation>
+      <translation>説明に含まれる:</translation>
     </message>
     <message>
       <location/>
       <source>Level:</source>
-      <translation type="unfinished">Level:</translation>
+      <translation>レベル：</translation>
     </message>
     <message>
       <location/>
       <source>ERROR</source>
-      <translation type="unfinished">ERROR</translation>
+      <translation>エラー</translation>
     </message>
     <message>
       <location/>
       <source>WARNING</source>
-      <translation type="unfinished">WARNING</translation>
+      <translation>警告</translation>
     </message>
     <message>
       <location/>
       <source>INFO</source>
-      <translation type="unfinished">INFO</translation>
+      <translation>情報</translation>
     </message>
   </context>
   <context>
@@ -2497,12 +2492,12 @@
     <message>
       <location/>
       <source>Initial video length</source>
-      <translation>イニシャルビデオ長</translation>
+      <translation>イニシャルビデオの長さ</translation>
     </message>
     <message>
       <location/>
       <source>Exported video length</source>
-      <translation>エクスポートビデオ長</translation>
+      <translation>エクスポートされたビデオの長さ</translation>
     </message>
     <message>
       <location/>
@@ -2517,7 +2512,7 @@
     <message>
       <location/>
       <source>Reset Speed</source>
-      <translation>スピードリセット</translation>
+      <translation>スピードをリセット</translation>
     </message>
   </context>
   <context>
@@ -2756,12 +2751,12 @@
     <message>
       <location/>
       <source>Display watermark with username over video</source>
-      <translation>ユーザー名のウォーターマーク表示</translation>
+      <translation>ビデオの上にユーザー名で透かしを表示する</translation>
     </message>
     <message>
       <location/>
       <source>Watermark Preview</source>
-      <translation>ウォーターマーク表示</translation>
+      <translation>透かし表示</translation>
     </message>
     <message>
       <location/>
@@ -3016,7 +3011,7 @@
     <message>
       <location/>
       <source>Base forecast on data recorded during</source>
-      <translation>期間中に記録されたデータの予測</translation>
+      <translation>期間中に記録されたデータの基本予測</translation>
     </message>
   </context>
   <context>
@@ -3078,8 +3073,8 @@
     </message>
     <message>
       <location/>
-      <source>Analytics data can occupy tens of gigabytes of storage space. We recommend to choose other location for it instead of the system partition.</source>
-      <translation>分析データは、数十ギガバイトのストレージスペースを占めることがあります。システムパーティションではなく、他の場所を選択することをお勧めします。</translation>
+      <source>Analytics data can take up large amounts of space. We recommend to choose another location for it instead of the system partition.</source>
+      <translation type="unfinished">Analytics data can take up large amounts of space. We recommend to choose another location for it instead of the system partition.</translation>
     </message>
   </context>
   <context>
@@ -3287,7 +3282,7 @@
     <message>
       <location/>
       <source>Click &quot;New role&quot; button to create one.</source>
-      <translation>&quot;新しい役割&quot; ボタンをクリックして作成します</translation>
+      <translation>作成するには、 &quot;役割&quot; ボタンをクリックしてください。</translation>
     </message>
   </context>
   <context>
@@ -3323,7 +3318,7 @@
     <message>
       <location/>
       <source>Detect motion</source>
-      <translation>モーション検出</translation>
+      <translation>動きを検知する</translation>
     </message>
   </context>
   <context>
@@ -3390,7 +3385,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/watermark/private/watermark_preview_dialog.ui"/>
       <source>Watermark preview</source>
-      <translation>ウォーターマーク表示</translation>
+      <translation>透かし表示</translation>
     </message>
     <message>
       <location/>

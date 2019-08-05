@@ -137,19 +137,19 @@
     <name>QnDesktopAudioOnlyDataProvider</name>
     <message>
       <source>Could not find audio encoder &quot;%1&quot;.</source>
-      <translation>オーディオエンコーダ&quot;%1&quot; が見つかりませんでした</translation>
+      <translation>オーディオエンコーダ&quot;%1&quot; が見つかりませんでした。</translation>
     </message>
     <message>
       <source>Could not initialize audio encoder.</source>
-      <translation>オーディオエンコーダーを初期化できませんでした</translation>
+      <translation>オーディオエンコーダーをイニシャライズできません.</translation>
     </message>
     <message>
       <source>Sample format of input device %1 is not supported.</source>
-      <translation>入力デバイス %1 のサンプルフォーマットはサポートされていません</translation>
+      <translation>入力デバイス %1 のサンプルフォーマットはサポートされていません。</translation>
     </message>
     <message>
       <source>Primary audio device is not selected.</source>
-      <translation>プライマリーオーディオ デバイスが選択されていません</translation>
+      <translation>プライマリーオーディオ デバイスが選択されていません。</translation>
     </message>
   </context>
   <context>

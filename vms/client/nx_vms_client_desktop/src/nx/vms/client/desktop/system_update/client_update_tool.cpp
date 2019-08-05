@@ -256,6 +256,13 @@ void ClientUpdateTool::setUpdateTarget(const UpdateContents& contents)
             setState(State::complete);
         }
     }
+    else if (!contents.needClientUpdate)
+    {
+        NX_INFO(this, "setUpdateTarget(%1) - no need to install this version",
+            contents.info.version);
+        setState(State::initial);
+        return;
+    }
     else if (contents.sourceType == nx::update::UpdateSourceType::file)
     {
         // Expecting that file is stored at:
@@ -454,7 +461,8 @@ bool ClientUpdateTool::installUpdateAsync()
     if (!applauncher::api::checkOnline())
     {
         NX_VERBOSE(this) << "installUpdate can not install update - applauncher is offline" << error;
-        setApplauncherError("applauncher is offline");
+        auto errorText = applauncherErrorToString(ResultType::otherError);
+        setApplauncherError(errorText);
         return false;
     }
 
@@ -544,7 +552,7 @@ bool ClientUpdateTool::installUpdateAsync()
                 }
                 if (stopInstallationAttempts)
                     break;
-            }while(--installationAttempts > 0);
+            } while (--installationAttempts > 0);
 
             return ResultType::otherError;
         }, m_updateFile, m_updateVersion);
