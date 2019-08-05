@@ -46,7 +46,9 @@ public:
     void setHandler(sdk::Ptr<sdk::analytics::IEngine::IHandler> handler);
 
 protected:
-    virtual DebugSettings makeProcessorSettings() const override;
+    virtual DebugSettings makeManifestProcessorSettings() const override;
+
+    virtual DebugSettings makeSettingsProcessorSettings() const override;
 
     virtual SdkObjectDescription sdkObjectDescription() const override;
 

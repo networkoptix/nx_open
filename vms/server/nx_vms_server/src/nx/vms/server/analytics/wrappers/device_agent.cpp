@@ -45,11 +45,21 @@ DeviceAgent::DeviceAgent(
 {
 }
 
-DebugSettings DeviceAgent::makeProcessorSettings() const
+DebugSettings DeviceAgent::makeManifestProcessorSettings() const
 {
     DebugSettings settings;
     settings.outputPath = pluginsIni().analyticsManifestOutputPath;
     settings.substitutePath = pluginsIni().analyticsManifestSubstitutePath;
+    settings.logTag = nx::utils::log::Tag(typeid(this));
+
+    return settings;
+}
+
+DebugSettings DeviceAgent::makeSettingsProcessorSettings() const
+{
+    DebugSettings settings;
+    settings.outputPath = pluginsIni().analyticsSettingsOutputPath;
+    settings.substitutePath = pluginsIni().analyticsSettingsSubstitutePath;
     settings.logTag = nx::utils::log::Tag(typeid(this));
 
     return settings;

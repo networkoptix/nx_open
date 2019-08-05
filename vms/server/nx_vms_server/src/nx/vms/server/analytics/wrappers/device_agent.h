@@ -44,7 +44,9 @@ public:
     bool isConsumer() const { return m_consumingDeviceAgent; }
 
 protected:
-    virtual DebugSettings makeProcessorSettings() const override;
+    virtual DebugSettings makeManifestProcessorSettings() const override;
+
+    virtual DebugSettings makeSettingsProcessorSettings() const override;
 
     virtual SdkObjectDescription sdkObjectDescription() const override;
 

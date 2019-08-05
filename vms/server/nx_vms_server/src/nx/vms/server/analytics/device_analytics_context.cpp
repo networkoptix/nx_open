@@ -292,7 +292,7 @@ static QString getEngineLogLabel(QnMediaServerModule* serverModule, QnUuid engin
     const auto parentPlugin = engineResource->plugin();
     if (!NX_ASSERT(parentPlugin))
         return lm("Analytics Engine %1 of unknown Plugin").arg(engineResource->getName());
-        
+
     return lm("Analytics Engine %1 of Plugin %2").args(
         engineResource->getName(), parentPlugin->manifest().id);
 }

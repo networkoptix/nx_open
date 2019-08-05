@@ -69,7 +69,7 @@ std::shared_ptr<wrappers::Engine> Plugin::createEngine(
         libName());
 }
 
-DebugSettings Plugin::makeProcessorSettings() const
+DebugSettings Plugin::makeManifestProcessorSettings() const
 {
     DebugSettings settings;
     settings.outputPath = pluginsIni().analyticsManifestOutputPath;

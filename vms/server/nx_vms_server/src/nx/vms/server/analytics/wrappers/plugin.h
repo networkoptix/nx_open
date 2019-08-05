@@ -28,7 +28,7 @@ public:
         const resource::AnalyticsEngineResourcePtr engineResource);
 
 protected:
-    virtual DebugSettings makeProcessorSettings() const override;
+    virtual DebugSettings makeManifestProcessorSettings() const override;
 
     virtual SdkObjectDescription sdkObjectDescription() const override;
 

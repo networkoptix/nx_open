@@ -32,7 +32,7 @@ public:
     std::optional<sdk_support::ErrorMap> setSettings(const sdk_support::SettingMap& settings)
     {
         SettingsProcessor settingsProcessor(
-            makeProcessorSettings(),
+            makeSettingsProcessorSettings(),
             sdkObjectDescription(),
             [this](const sdk_support::Error& error)
             {
@@ -44,9 +44,9 @@ public:
 
     std::optional<sdk_support::SettingsResponse> pluginSideSettings() const
     {
-        DebugSettings settings = makeProcessorSettings();
+        DebugSettings settings = makeSettingsProcessorSettings();
         SettingsProcessor settingsProcessor(
-            makeProcessorSettings(),
+            makeSettingsProcessorSettings(),
             sdkObjectDescription(),
             [this](const sdk_support::Error& error)
             {
@@ -55,6 +55,9 @@ public:
 
         return settingsProcessor.pluginSideSettings(sdkObject());
     }
+
+protected:
+    virtual DebugSettings makeSettingsProcessorSettings() const = 0;
 };
 
 } // namespace nx::vms::server::analytics::wrappers

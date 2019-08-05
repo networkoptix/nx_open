@@ -118,15 +118,18 @@ private:
         for (const auto& [key, value]: nx::utils::constKeyValueRange(settings))
             sdkSettings->setItem(key.toStdString(), value.toString().toStdString());
 
-        const auto baseFilename = m_sdkObjectDescription.baseInputOutputFilename();
-        const auto absoluteFilename = sdk_support::debugFileAbsolutePath(
-            m_debugSettings.outputPath,
-            baseFilename + "_effective_settings.json");
+        if (!m_debugSettings.outputPath.isEmpty())
+        {
+            const auto baseFilename = m_sdkObjectDescription.baseInputOutputFilename();
+            const auto absoluteFilename = sdk_support::debugFileAbsolutePath(
+                m_debugSettings.outputPath,
+                baseFilename + "_effective_settings.json");
 
-        const bool dumpIsSuccessful = sdk_support::dumpStringToFile(
-            m_debugSettings.logTag,
-            absoluteFilename,
-            QString::fromStdString(sdk::toJsonString(sdkSettings.get())));
+            const bool dumpIsSuccessful = sdk_support::dumpStringToFile(
+                m_debugSettings.logTag,
+                absoluteFilename,
+                QString::fromStdString(sdk::toJsonString(sdkSettings.get())));
+        }
 
         return sdkSettings;
     }

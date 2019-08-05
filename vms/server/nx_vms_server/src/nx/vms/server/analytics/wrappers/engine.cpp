@@ -29,7 +29,7 @@ Engine::Engine(
 {
 }
 
-DebugSettings Engine::makeProcessorSettings() const
+DebugSettings Engine::makeManifestProcessorSettings() const
 {
     const auto engineResource = this->engineResource();
     if (!engineResource)
@@ -38,6 +38,20 @@ DebugSettings Engine::makeProcessorSettings() const
     DebugSettings settings;
     settings.outputPath = pluginsIni().analyticsManifestOutputPath;
     settings.substitutePath = pluginsIni().analyticsManifestSubstitutePath;
+    settings.logTag = nx::utils::log::Tag(typeid(this));
+
+    return settings;
+}
+
+DebugSettings Engine::makeSettingsProcessorSettings() const
+{
+    const auto engineResource = this->engineResource();
+    if (!engineResource)
+        return DebugSettings();
+
+    DebugSettings settings;
+    settings.outputPath = pluginsIni().analyticsSettingsOutputPath;
+    settings.substitutePath = pluginsIni().analyticsSettingsSubstitutePath;
     settings.logTag = nx::utils::log::Tag(typeid(this));
 
     return settings;

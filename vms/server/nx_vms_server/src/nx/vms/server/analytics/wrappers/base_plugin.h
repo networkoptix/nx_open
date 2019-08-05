@@ -42,7 +42,7 @@ public:
             return std::nullopt;
 
         ManifestProcessor<ManifestType> manifestProcessor(
-            makeProcessorSettings(),
+            makeManifestProcessorSettings(),
             sdkObjectDescription(),
             [this](Violation violation)
             {
@@ -63,7 +63,7 @@ public:
     QString libName() const { return m_libName; }
 
 protected:
-    virtual DebugSettings makeProcessorSettings() const = 0;
+    virtual DebugSettings makeManifestProcessorSettings() const = 0;
 
     virtual SdkObjectDescription sdkObjectDescription() const = 0;
 

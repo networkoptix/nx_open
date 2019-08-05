@@ -68,7 +68,7 @@ enum class Violation
     deserializationError,
 
     nullEngine,
-    nullDeviceAgent
+    nullDeviceAgent,
 };
 
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Violation);
