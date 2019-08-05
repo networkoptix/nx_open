@@ -187,6 +187,7 @@ int VideoStream::initializeInput()
 
     setInputFormatOptions(inputFormat);
 
+    NX_DEBUG(this, "open video device: [%1]", ffmpegUrlPlatformDependent());
     result = inputFormat->open(ffmpegUrlPlatformDependent().c_str());
     if (result < 0)
         return result;

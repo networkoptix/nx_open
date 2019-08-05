@@ -38,11 +38,6 @@
       <source>Customer Support</source>
       <translation>שירות לקוחות</translation>
     </message>
-    <message>
-      <location/>
-      <source>ARM support policy</source>
-      <translation>מדיניות תמיכה ב- ARM</translation>
-    </message>
   </context>
   <context>
     <name>AccessibleResourcesWidget</name>
@@ -3078,8 +3073,8 @@
     </message>
     <message>
       <location/>
-      <source>Analytics data can occupy tens of gigabytes of storage space. We recommend to choose other location for it instead of the system partition.</source>
-      <translation>נתוני אנליטיקה יכולים להכיל עשרות ג 'יגה בייט של שטח אחסון. אנו ממליצים לבחור במקום אחר עבורו במקום במחיצה של מערכת ההפעלה.</translation>
+      <source>Analytics data can take up large amounts of space. We recommend to choose another location for it instead of the system partition.</source>
+      <translation>נתוני אנליטיקה יכולים להכיל גדלים מסיבים של שטח אחסון. אנו ממליצים לבחור במקום אחר עבורו במקום במחיצה של מערכת ההפעלה.</translation>
     </message>
   </context>
   <context>

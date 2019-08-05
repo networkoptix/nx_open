@@ -271,6 +271,8 @@ struct UpdateContents
     /** We have already installed this version. Widget will show appropriate status.*/
     bool alreadyInstalled = false;
 
+    bool needClientUpdate = false;
+
     /** Resets data from verification. */
     void resetVerification();
 

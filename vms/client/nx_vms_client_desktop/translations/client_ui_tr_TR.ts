@@ -38,11 +38,6 @@
       <source>Customer Support</source>
       <translation>Müşteri Hizmetleri</translation>
     </message>
-    <message>
-      <location/>
-      <source>ARM support policy</source>
-      <translation>ARM destek politikası</translation>
-    </message>
   </context>
   <context>
     <name>AccessibleResourcesWidget</name>
@@ -3078,8 +3073,8 @@
     </message>
     <message>
       <location/>
-      <source>Analytics data can occupy tens of gigabytes of storage space. We recommend to choose other location for it instead of the system partition.</source>
-      <translation type="unfinished">Analytics data can occupy tens of gigabytes of storage space. We recommend to choose other location for it instead of the system partition.</translation>
+      <source>Analytics data can take up large amounts of space. We recommend to choose another location for it instead of the system partition.</source>
+      <translation>Analytics verileri, onlarca gigabaytlık depolama alanını kaplayabilir. Sistem bölümü yerine başka bir yer seçmenizi öneririz.</translation>
     </message>
   </context>
   <context>

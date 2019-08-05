@@ -57,7 +57,7 @@ QnResourceTreeModelUserNodes::QnResourceTreeModelUserNodes(
     connect(userRolesManager(), &QnUserRolesManager::userRoleAddedOrUpdated, this,
         [this](const nx::vms::api::UserRoleData& role)
         {
-            ensureRoleNode(role)->update();
+            ensureRoleNode(role.id)->update();
         });
 
     connect(userRolesManager(), &QnUserRolesManager::userRoleRemoved, this,
@@ -268,24 +268,24 @@ QnResourceTreeModelNodePtr QnResourceTreeModelUserNodes::ensureSubjectNode(
     if (subject.user())
         return ensureUserNode(subject.user());
 
-    return ensureRoleNode(subject.role());
+    return ensureRoleNode(subject.effectiveId());
 }
 
 QnResourceTreeModelNodePtr QnResourceTreeModelUserNodes::ensureRoleNode(
-    const nx::vms::api::UserRoleData& role)
+    const QnUuid& roleId)
 {
-    auto pos = m_roles.find(role.id);
+    auto pos = m_roles.find(roleId);
     if (pos == m_roles.end())
     {
-        NX_ASSERT(!role.isNull());
+        NX_ASSERT(!roleId.isNull());
 
-        QnResourceTreeModelNodePtr node(new QnResourceTreeModelNode(m_model, role.id,
+        QnResourceTreeModelNodePtr node(new QnResourceTreeModelNode(m_model, roleId,
             NodeType::role));
         node->initialize();
         node->setParent(m_rootNode);
         m_allNodes.append(node);
 
-        pos = m_roles.insert(role.id, node);
+        pos = m_roles.insert(roleId, node);
     }
     return *pos;
 }
@@ -307,7 +307,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModelUserNodes::ensureUserNode(
         {
             auto role = userRolesManager()->userRole(user->userRoleId());
             if (!role.isNull())
-                parent = ensureRoleNode(role);
+                parent = ensureRoleNode(role.id);
         }
         node->setParent(parent);
         m_allNodes.append(node);

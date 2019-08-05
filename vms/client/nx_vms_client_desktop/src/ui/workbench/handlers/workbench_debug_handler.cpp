@@ -61,10 +61,6 @@
 
 #include <nx/fusion/model_functions.h>
 
-//#if defined(_DEBUG)
-    #define DEBUG_ACTIONS
-//#endif
-
 using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::ui;
 
@@ -89,7 +85,8 @@ public:
         layout->setContentsMargins(QMargins());
         layout->addWidget(m_urlLineEdit);
         layout->addWidget(m_webView);
-        connect(m_urlLineEdit, &QLineEdit::returnPressed, this, [this]()
+        connect(m_urlLineEdit, &QLineEdit::returnPressed, this,
+            [this]
             {
                 m_webView->load(m_urlLineEdit->text());
             });
@@ -114,9 +111,9 @@ public:
     }
 
 private:
-    QnWebPage* m_page;
-    QWebView* m_webView;
-    QLineEdit* m_urlLineEdit;
+    QnWebPage* const m_page;
+    QWebView* const m_webView;
+    QLineEdit* const m_urlLineEdit;
 };
 
 #if defined(NX_ENABLE_WEBENGINE)
@@ -134,11 +131,12 @@ private:
         {
             m_webView->setPage(m_page);
 
-            QVBoxLayout* layout = new QVBoxLayout(this);
+            auto layout = new QVBoxLayout(this);
             layout->setContentsMargins(QMargins());
             layout->addWidget(m_urlLineEdit);
             layout->addWidget(m_webView, 1);
-            connect(m_urlLineEdit, &QLineEdit::returnPressed, this, [this]()
+            connect(m_urlLineEdit, &QLineEdit::returnPressed, this,
+                [this]
                 {
                     m_webView->load(m_urlLineEdit->text());
                 });
@@ -153,9 +151,9 @@ private:
         }
 
     private:
-        QWebEnginePage* m_page;
-        QWebEngineView* m_webView;
-        QLineEdit* m_urlLineEdit;
+        QWebEnginePage* const m_page;
+        QWebEngineView* const m_webView;
+        QLineEdit* const m_urlLineEdit;
     };
 
 #endif
@@ -220,9 +218,9 @@ public:
 
         #if defined(NX_ENABLE_WEBENGINE)
             addButton("Web Engine View",
-                [this]()
+                [this]
                 {
-                    auto dialog(new WebEngineViewDialog(this));
+                    auto dialog = new WebEngineViewDialog(this);
                     //dialog->setUrl("http://localhost:7001");
                     dialog->show();
                 });
@@ -379,16 +377,12 @@ QnWorkbenchDebugHandler::QnWorkbenchDebugHandler(QObject *parent):
     base_type(parent),
     QnWorkbenchContextAware(parent)
 {
-    #if defined(DEBUG_ACTIONS)
-        // TODO: #sivanov #High Remove before release.
-        qDebug() << "------------- Debug actions ARE ACTIVE -------------";
-        connect(action(action::DebugControlPanelAction), &QAction::triggered, this,
-            &QnWorkbenchDebugHandler::at_debugControlPanelAction_triggered);
-        connect(action(action::DebugIncrementCounterAction), &QAction::triggered, this,
-            &QnWorkbenchDebugHandler::at_debugIncrementCounterAction_triggered);
-        connect(action(action::DebugDecrementCounterAction), &QAction::triggered, this,
-            &QnWorkbenchDebugHandler::at_debugDecrementCounterAction_triggered);
-    #endif
+    connect(action(action::DebugControlPanelAction), &QAction::triggered, this,
+        &QnWorkbenchDebugHandler::at_debugControlPanelAction_triggered);
+    connect(action(action::DebugIncrementCounterAction), &QAction::triggered, this,
+        &QnWorkbenchDebugHandler::at_debugIncrementCounterAction_triggered);
+    connect(action(action::DebugDecrementCounterAction), &QAction::triggered, this,
+        &QnWorkbenchDebugHandler::at_debugDecrementCounterAction_triggered);
 
     if (const int port = ini().clientWebServerPort; port > 0 && port < 65536)
     {
@@ -397,7 +391,7 @@ QnWorkbenchDebugHandler::QnWorkbenchDebugHandler(QObject *parent):
         director->setListenAddress(host, port);
         bool started = director->start();
         if (!started)
-            NX_ERROR(this, QString("Cannot start client webserver - port %1 already occupied?").arg(port));
+            NX_ERROR(this, "Cannot start client webserver - port %1 already occupied?", port);
     }
 }
 

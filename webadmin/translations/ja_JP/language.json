@@ -149,7 +149,7 @@
         "licenceError": "警告！システムとスターターライセンスを統合しようとしています。システムごとに許可されるスターターライセンスは1つのみで、2番目のライセンスは無効になります。統合しますか？",
         "duplicateServersError": "同じIDを持つサーバーが少なくとも1つあるため、システムを統合できません。このサーバーを削除してやり直してください。",
         "connectionFailed": "接続失敗: ",
-        "unknownError": "不明なエラー",
+        "unknownError": "未知のエラー",
         "mergeFailed": "統合に失敗",
         "mergeSucceed": "統合成功",
         "newSystemDisplayName": "新規システム",

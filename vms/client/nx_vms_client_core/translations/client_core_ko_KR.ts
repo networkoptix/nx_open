@@ -141,7 +141,7 @@
     </message>
     <message>
       <source>Could not initialize audio encoder.</source>
-      <translation>오디오 인코더를 초기화 할 수 없습니다.</translation>
+      <translation>오디오 인코더를 초기화할 수 없습니다.</translation>
     </message>
     <message>
       <source>Sample format of input device %1 is not supported.</source>

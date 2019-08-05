@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0.1.93",
+    "version": "1.0.1.96",
     "data": [
         {
             "keys": [
@@ -507,6 +507,12 @@
             "unauthorizedTimeoutSec": 185,
             "additionalInputSourceNames": [ "alarmintoken" ],
             "additionalNotificationTopics":[ "Trigger/AlarmIn" ]
+        },
+        {
+            "keys": [
+                "*Hikvision*|DS-7716NI-K4"
+            ],
+            "extractHikvisionChannelFromVideoSource": true
         },
         {
             "keys": [
@@ -3548,6 +3554,13 @@
                     }
                 }
             }
+        },
+        {
+            "_comment1": "Cameras that should not use Media2 (and should not try to detect Media2 support)",
+            "keys": [
+                "Geovision|GV-BX2700"
+            ],
+            "onvifIgnoreMedia2":  true
         }
     ]
 }

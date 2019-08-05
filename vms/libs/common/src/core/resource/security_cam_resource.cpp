@@ -1014,6 +1014,12 @@ QnUuid QnSecurityCamResource::preferredServerId() const
     return (*userAttributesLock)->preferredServerId;
 }
 
+void QnSecurityCamResource::updatePreferredServerId()
+{
+    if (preferredServerId().isNull())
+        setPreferredServerId(getParentId());
+}
+
 void QnSecurityCamResource::setMinDays(int value)
 {
     NX_ASSERT(!getId().isNull());

@@ -38,11 +38,6 @@
       <source>Customer Support</source>
       <translation>カスタマーサポート</translation>
     </message>
-    <message>
-      <location/>
-      <source>ARM support policy</source>
-      <translation>ARMサポートポリシー</translation>
-    </message>
   </context>
   <context>
     <name>AccessibleResourcesWidget</name>
@@ -3078,8 +3073,8 @@
     </message>
     <message>
       <location/>
-      <source>Analytics data can occupy tens of gigabytes of storage space. We recommend to choose other location for it instead of the system partition.</source>
-      <translation>分析データは、数十ギガバイトのストレージスペースを占めることがあります。システムパーティションではなく、他の場所を選択することをお勧めします。</translation>
+      <source>Analytics data can take up large amounts of space. We recommend to choose another location for it instead of the system partition.</source>
+      <translation type="unfinished">Analytics data can take up large amounts of space. We recommend to choose another location for it instead of the system partition.</translation>
     </message>
   </context>
   <context>

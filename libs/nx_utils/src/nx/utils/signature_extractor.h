@@ -28,9 +28,9 @@ template<typename t, std::size_t n, typename = void> struct FunctionArgumentType
  * ```
  * void someFunction(SomeClassA argument0, const SomeClassB& argument1);
  * ...
- * using A = FunctionArgumentType<decltype(someFunction), 0>; // Maps to a type `SomeClassA`
- * using B = FunctionArgumentType<decltype(someFunction), 1>; // Maps to a type `const SomeClassB&`
- * using RawB = FunctionArgumentType<decltype(someFunction), 1>; // Maps to a type `SomeClassB`
+ * using A = FunctionArgumentType<decltype(someFunction), 0>::Type; // Maps to a type `SomeClassA`
+ * using B = FunctionArgumentType<decltype(someFunction), 1>::Type; // Maps to a type `const SomeClassB&`
+ * using RawB = FunctionArgumentType<decltype(someFunction), 1>::RawType; // Maps to a type `SomeClassB`
  * ```
  */
 template<typename r, typename ... a, std::size_t n>
@@ -53,12 +53,16 @@ struct FunctionArgumentType<r (c::*)(a ...) const, n>: FunctionArgumentType<r (c
 {
 };
 
-/** Specialization for functor-objects with `operator()` */
-template<typename ftor, std::size_t n>
-struct FunctionArgumentType<ftor, n,
-    typename std::conditional<false, decltype(& ftor::operator ()), void>::type>: FunctionArgumentType<
-    decltype( & ftor::operator () ), n>
+/** Specialization for functor objects with `operator()`. */
+template<typename functor, std::size_t n>
+struct FunctionArgumentType<
+    functor,
+    n,
+    typename std::conditional<false, decltype(& functor::operator ()), void>::type
+>
+: FunctionArgumentType<decltype(& functor::operator ()), n>
 {
+    using Functor = functor;
 };
 
 } // namespace utils

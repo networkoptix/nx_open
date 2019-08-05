@@ -109,7 +109,7 @@
     <message>
       <source>Cloud systems have different owners. Merge is not allowed.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>クラウドシステムのオーナーが異なります。統合は許可されていません。</translation>
+      <translation>クラウドシステムのオーナーが異なります。統合は許可されていません</translation>
     </message>
   </context>
   <context>
@@ -152,7 +152,7 @@
     </message>
     <message>
       <source>Received bad response from Server %1: &quot;%2&quot;.</source>
-      <translation>サーバー%1から不正な応答を受信：&quot;%2&quot;。</translation>
+      <translation>サーバー%1から不正な応答を受信：&quot;%2&quot;.</translation>
     </message>
     <message>
       <source>Check if Server is up and has the proper version.</source>
@@ -200,7 +200,7 @@
     </message>
     <message>
       <source>Device request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-      <translation>デバイス要求&quot;%1&quot; は、エラー&quot;%2&quot; により失敗しました。</translation>
+      <translation>デバイス要求&quot;%1&quot; は、エラー&quot;%2&quot; により失敗しました.</translation>
     </message>
     <message>
       <source>Camera request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
@@ -316,7 +316,7 @@
     </message>
     <message>
       <source>Camera was restored from archive. Delete the camera and add it again to view Live video.</source>
-      <translation>カメラはアーカイブから復元されました。カメラを削除して再度登録すると、ライブ映像が表示されます。</translation>
+      <translation>カメラはアーカイブから復元されました。カメラを削除して再度登録すると、ライブビデオが表示されます。</translation>
     </message>
     <message>
       <source>First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</source>
@@ -730,7 +730,7 @@
     </message>
     <message>
       <source>Unknown error</source>
-      <translation>不明なエラー</translation>
+      <translation>未知のエラー</translation>
     </message>
     <message>
       <source>Server with matching Hardware ID not found</source>
@@ -843,7 +843,7 @@
     <name>QnSignHelper</name>
     <message>
       <source>Unknown</source>
-      <translation>未知の値</translation>
+      <translation>不明</translation>
     </message>
     <message>
       <source>FREE License</source>
@@ -902,7 +902,7 @@
     </message>
     <message>
       <source>No data exported.</source>
-      <translation>データはエクスポートされませんでした。</translation>
+      <translation>データはエクスポートされませんでした.</translation>
     </message>
   </context>
   <context>
@@ -994,7 +994,7 @@
     <name>QnZipExtractor</name>
     <message>
       <source>Zip file is corrupted.</source>
-      <translation>Zipファイルが壊れています</translation>
+      <translation>Zip ファイルが壊れています</translation>
     </message>
     <message>
       <source>Could not find target dir.</source>
@@ -1014,11 +1014,11 @@
     </message>
     <message>
       <source>Extraction was cancelled.</source>
-      <translation>抽出はキャンセルされました</translation>
+      <translation>抽出は取り消されました</translation>
     </message>
     <message>
       <source>Extractor is busy.</source>
-      <translation>抽出はビジーです</translation>
+      <translation>抽出が忙しい</translation>
     </message>
   </context>
   <context>
@@ -1315,12 +1315,12 @@
     <message numerus="yes">
       <source>No data received during last %n seconds.</source>
       <translation>
-        <numerusform>%n 秒間データを受信していません。</numerusform>
+        <numerusform>%n 秒間データを受信していません.</numerusform>
       </translation>
     </message>
     <message>
       <source>Connection to device was unexpectedly closed.</source>
-      <translation>デバイスとの通信が予期せずに閉じられました。</translation>
+      <translation>デバイスとの通信が予期せずに閉じられました.</translation>
     </message>
     <message>
       <source>Connection to camera (primary stream) was unexpectedly closed.</source>
@@ -1332,11 +1332,11 @@
     </message>
     <message>
       <source>RTP packet loss detected.</source>
-      <translation>RTPパケット損失が検出されました。</translation>
+      <translation>RTPパケットロスが検知されました.</translation>
     </message>
     <message>
       <source>Device does not respond to network requests.</source>
-      <translation>デバイスがネットワーク要求に応答しません。</translation>
+      <translation>デバイスがネットワーク要求に応答しません.</translation>
     </message>
     <message>
       <source>Connection to server is lost.</source>
@@ -1392,19 +1392,19 @@
     </message>
     <message>
       <source>Archive backup is canceled by user. Data is backed up to %1</source>
-      <translation>アーカイブのバックアップはユーザーによってキャンセルされました　データは %1 にバックアップされます</translation>
+      <translation>アーカイブバックアップはユーザーによってキャンセルされました。データは %1 にバックアップされます。</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on following devices:</source>
-      <translation>ライセンスが不足しています　記録は次のデバイスで無効になっています:</translation>
+      <translation>ライセンスが不足しています。記録は次のデバイスで無効になっています:</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on following cameras:</source>
-      <translation>ライセンスが不足しています　記録は次のカメラで無効になっています:</translation>
+      <translation>ライセンスが不足しています。記録は次のカメラで無効になっています:</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on following I/O modules:</source>
-      <translation>ライセンスが不足しています　記録は次のI/Oモジュールで無効になっています:</translation>
+      <translation>ライセンスが不足しています。記録は次のI/Oモジュールで無効になっています:</translation>
     </message>
     <message>
       <source>start</source>

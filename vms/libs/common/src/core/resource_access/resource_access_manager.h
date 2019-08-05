@@ -6,7 +6,6 @@
 #include <common/common_module_aware.h>
 
 #include <nx/core/core_fwd.h>
-#include <core/resource_access/resource_access_subject.h>
 #include <core/resource_access/user_access_data.h>
 
 #include <core/resource/resource_fwd.h>
@@ -18,6 +17,8 @@
 
 #include <utils/common/connective.h>
 #include <utils/common/updatable.h>
+
+class QnResourceAccessSubject;
 
 class QnResourceAccessManager:
     public Connective<QObject>,
@@ -141,7 +142,6 @@ public:
         const nx::vms::api::UserData& update) const;
     bool canModifyResource(const QnResourceAccessSubject& subject, const QnResourcePtr& target,
         const nx::vms::api::VideowallData& update) const;
-
 signals:
     void permissionsChanged(const QnResourceAccessSubject& subject, const QnResourcePtr& resource,
         Qn::Permissions permissions);
@@ -161,23 +161,40 @@ private:
     void handleResourceRemoved(const QnResourcePtr& resource);
     void handleSubjectRemoved(const QnResourceAccessSubject& subject);
 
-    Qn::Permissions calculatePermissions(const QnResourceAccessSubject& subject,
-        const QnResourcePtr& target) const;
+    Qn::Permissions calculatePermissions(
+        const QnResourceAccessSubject& subject,
+        const QnResourcePtr& target,
+        GlobalPermissions* globalPermissionsHint = nullptr,
+        bool* hasAccessToResourceHint = nullptr) const;
 
     Qn::Permissions calculatePermissionsInternal(const QnResourceAccessSubject& subject,
-        const QnVirtualCameraResourcePtr& camera) const;
+        const QnVirtualCameraResourcePtr& camera,
+        GlobalPermissions globalPermissions,
+        bool hasAccessToResource) const;
     Qn::Permissions calculatePermissionsInternal(const QnResourceAccessSubject& subject,
-        const QnMediaServerResourcePtr& server) const;
+        const QnMediaServerResourcePtr& server,
+        GlobalPermissions globalPermissions,
+        bool hasAccessToResource) const;
     Qn::Permissions calculatePermissionsInternal(const QnResourceAccessSubject& subject,
-        const QnStorageResourcePtr& storage) const;
+        const QnStorageResourcePtr& storage,
+        GlobalPermissions globalPermissions,
+        bool hasAccessToResource) const;
     Qn::Permissions calculatePermissionsInternal(const QnResourceAccessSubject& subject,
-        const QnVideoWallResourcePtr& videoWall) const;
+        const QnVideoWallResourcePtr& videoWall,
+        GlobalPermissions globalPermissions,
+        bool hasAccessToResource) const;
     Qn::Permissions calculatePermissionsInternal(const QnResourceAccessSubject& subject,
-        const QnWebPageResourcePtr& webPage) const;
+        const QnWebPageResourcePtr& webPage,
+        GlobalPermissions globalPermissions,
+        bool hasAccessToResource) const;
     Qn::Permissions calculatePermissionsInternal(const QnResourceAccessSubject& subject,
-        const QnLayoutResourcePtr& layout) const;
+        const QnLayoutResourcePtr& layout,
+        GlobalPermissions globalPermissions,
+        bool hasAccessToResource) const;
     Qn::Permissions calculatePermissionsInternal(const QnResourceAccessSubject& subject,
-        const QnUserResourcePtr& targetUser) const;
+        const QnUserResourcePtr& targetUser,
+        GlobalPermissions globalPermissions,
+        bool hasAccessToResource) const;
 
     void setPermissionsInternal(const QnResourceAccessSubject& subject,
         const QnResourcePtr& resource, Qn::Permissions permissions);
@@ -200,11 +217,18 @@ private:
             return subjectId == other.subjectId && resourceId == other.resourceId;
         }
 
+        bool operator<(const PermissionKey& other) const
+        {
+            if (subjectId != other.subjectId)
+                return subjectId < other.subjectId;
+            return resourceId < other.resourceId;
+        }
+
         friend uint qHash(const PermissionKey& key)
         {
             return qHash(key.subjectId) ^ qHash(key.resourceId);
         }
     };
 
-    QHash<PermissionKey, Qn::Permissions> m_permissionsCache;
+    QMap<PermissionKey, Qn::Permissions> m_permissionsCache;
 };

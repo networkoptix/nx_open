@@ -2090,7 +2090,7 @@ to view more bookmarks</source>
       <translation>כל מצלמה</translation>
     </message>
     <message>
-      <source>Force Acknowledgement will only work for Generic Events if camera modifiers are used in the Generic Event URL</source>
+      <source>Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</source>
       <translation>כפיית אישור תעבוד רק לאירועים גנריים אם במשתני המצלמה נעשה שימוש ב-URL של האירוע הגנרי</translation>
     </message>
   </context>
@@ -5719,12 +5719,6 @@ to %1</source>
       <translation>מה לעשות בנתוני אנליטיקה הנוכחיים?</translation>
     </message>
     <message>
-      <source>Current analytics data will not be automatically moved to another location and will become unaccessible. You can keep it and manually move later, or delete permanently.
-If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
-      <translation>נתוני האנליטיקה הנוכחיים לא יועברו אוטומטית למיקום אחר ויהפכו לבלתי ניתנים לגישה. אתה יכול להשאיר אותם ולהעביר אותם ידנית, או למחוק אותם לצמיתות.
-אם התכוונת להעביר נתוני האנליטיקה למיקום אחסון אחר, צור קשר עם התמיכה לפני שתמשיך.</translation>
-    </message>
-    <message>
       <source>Delete</source>
       <translation>מחק</translation>
     </message>
@@ -5735,6 +5729,12 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Cancel</source>
       <translation>ביטול</translation>
+    </message>
+    <message>
+      <source>Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
+If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
+      <translation>נתוני האנליטיקה הנוכחיים לא יועברו אוטומטית למיקום אחר ויהפכו לבלתי ניתנים לגישה. אתה יכול להשאיר אותם ולהעביר אותם ידנית, או למחוק אותם לצמיתות.
+אם התכוונת להעביר נתוני האנליטיקה למיקום אחסון אחר, צור קשר עם התמיכה לפני שתמשיך.</translation>
     </message>
   </context>
   <context>
@@ -7799,7 +7799,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Motion detection stream is disabled</source>
-      <translation type="unfinished">Motion detection stream is disabled</translation>
+      <translation>סטרים עבור גילוי תנועה מושבת</translation>
     </message>
   </context>
   <context>
@@ -7945,6 +7945,14 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Plugins</source>
       <translation>תוספים</translation>
+    </message>
+    <message>
+      <source>Motion detection is disabled, all schedule records &quot;Motion&quot; and &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
+      <translation>גילוי תנועה מבוטל, כל לוחות הזמנים של של הקלטה בזמן תנועה והקלטה בזמן תנועה (איכות נמוכה) יועברו להקלטה קבועה (תמיד)</translation>
+    </message>
+    <message>
+      <source>Dual streaming is disabled, all schedule records &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
+      <translation>הקלטה בסטרים כפול מבוטלת, כל לוחות הזמנים של של הקלטה בזמן תנועה והקלטה בזמן תנועה (איכות נמוכה) יועברו להקלטה קבועה (תמיד)</translation>
     </message>
   </context>
   <context>
@@ -8283,10 +8291,6 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>%n אירועים</numerusform>
         <numerusform>%n אירועים</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>unnamed analytics engine</source>
-      <translation>מנוע אנליטיקה ללא שם</translation>
     </message>
     <message>
       <source>No events occurred</source>
@@ -8683,7 +8687,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Can not start the search process</source>
-      <translation type="unfinished">Can not start the search process</translation>
+      <translation>לא ניתן להתחיל את תהליך החיפוש</translation>
     </message>
   </context>
   <context>
@@ -8796,6 +8800,60 @@ If you intended to move analytics data to another storage location, please conta
       <source>Some servers are offline and will not be updated. Skip them?</source>
       <translation>חלק מהשרתים אינם מקוונים ולא יעודכנו. לדלג עליהם?</translation>
     </message>
+    <message numerus="yes">
+      <source>Missing update package for the client and %n servers</source>
+      <translation>
+        <numerusform>חסרה חבילת העדכון עבור תוכנת הקליינט ו %n שרתים</numerusform>
+        <numerusform>חסרה חבילת העדכון עבור תוכנת הקליינט ו %n שרתים</numerusform>
+        <numerusform>חסרה חבילת העדכון עבור תוכנת הקליינט ו %n שרתים</numerusform>
+        <numerusform>חסרה חבילת העדכון עבור תוכנת הקליינט ו %n שרתים</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Missing update package for the client</source>
+      <translation>חסרה חבילת העדכון עבור תוכנת הקליינט</translation>
+    </message>
+    <message>
+      <source>There are no online servers to update.</source>
+      <translation>אין שרתים מקוונים לעדכון.</translation>
+    </message>
+    <message>
+      <source>Cancel update and delete all downloaded data?</source>
+      <translation>האם לבטל את העדכון ולמחוק את כל הנתונים שהורדו?</translation>
+    </message>
+    <message>
+      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
+      <translation>גרסאות מערכת ההפעלה של רכיבים מסוימים אינן נתמכות עוד. הסר אותם מהמערכת או עדכן את מערכת ההפעלה שלהם לגירסה נתמכת.</translation>
+    </message>
+    <message>
+      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
+      <translation>גרסת מערכת ההפעלה של הקליינט אינה נתמכת עוד. אנא עדכנו את מערכת ההפעלה לגירסה נתמכת.</translation>
+    </message>
+    <message>
+      <source>Failed to start update</source>
+      <translation>העדכון נכשל</translation>
+    </message>
+    <message>
+      <source>Failed to cancel update</source>
+      <translation>נכשל ביטול העדכון</translation>
+    </message>
+    <message>
+      <source>Failed to start installation</source>
+      <translation>הפעלת ההתקנה נכשלה</translation>
+    </message>
+    <message>
+      <source>Some servers have not completed the update process. Finish it anyway?</source>
+      <translation>חלק מהשרתים לא השלימו את העדכון, לסיים בכל מקרה?</translation>
+    </message>
+    <message>
+      <source>%1 will be restarted to the updated version.</source>
+      <comment>Application name will be substituted</comment>
+      <translation>%1 יופעל מחדש לגרסה המעודכנת.</translation>
+    </message>
+    <message>
+      <source>Failed to download update packages to some components</source>
+      <translation>הורדת העדכון לרכיבים מסוימים נכשלה</translation>
+    </message>
     <message>
       <source>If the problem persists, please contact Customer Support.</source>
       <translation>אם הבעיה נמשכת, פנה אל שירות הלקוחות.</translation>
@@ -8813,16 +8871,48 @@ If you intended to move analytics data to another storage location, please conta
       <translation>העדכון הושלם</translation>
     </message>
     <message>
-      <source>Nx Witness Client will be restarted to the updated version.</source>
-      <translation>תוכנת הקליינט תופעל מחדש לגרסה המעודכנת.</translation>
+      <source>Update completed, but some components have failed an update</source>
+      <translation>העדכון הושלם, אך חלק מהשרתים לא עודכנו</translation>
+    </message>
+    <message>
+      <source>Please update %1 manually using an installation package.</source>
+      <translation>אנא עדכן את %1 ידנית באמצעות חבילת התקנה.</translation>
+    </message>
+    <message>
+      <source>%1 will be restarted to the updated version.</source>
+      <translation>%1 יופעל מחדש לגרסה המעודכנת.</translation>
     </message>
     <message>
       <source>OK</source>
       <translation>אישור</translation>
     </message>
     <message>
+      <source>There was an error while installing updates:</source>
+      <translation>אירעה שגיאה בעת התקנת העדכונים:</translation>
+    </message>
+    <message>
       <source>Downloading updates...</source>
       <translation>מוריד עדכונים...</translation>
+    </message>
+    <message>
+      <source>Finish Update</source>
+      <translation>סיים עדכון</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>ביטול</translation>
+    </message>
+    <message>
+      <source>The latest version is already installed</source>
+      <translation>הגירסה האחרונה כבר מותקנת</translation>
+    </message>
+    <message>
+      <source>This version is already installed</source>
+      <translation>גירסה זו כבר מותקנת</translation>
+    </message>
+    <message>
+      <source>Install update</source>
+      <translation>התקן עדכון</translation>
     </message>
     <message>
       <source>Upload</source>
@@ -8841,12 +8931,12 @@ If you intended to move analytics data to another storage location, please conta
       <translation>הורד והתקן</translation>
     </message>
     <message>
-      <source>Select Another Build</source>
-      <translation>בחר גרסה אחרת</translation>
-    </message>
-    <message>
       <source>Browse for Another File...</source>
       <translation>בחר קובץ אחר...</translation>
+    </message>
+    <message>
+      <source>Select Another Build</source>
+      <translation>בחר גרסה אחרת</translation>
     </message>
     <message>
       <source>Update to Specific Build</source>
@@ -8869,6 +8959,10 @@ If you intended to move analytics data to another storage location, please conta
       <translation>מתקין עדכון לקליינט...</translation>
     </message>
     <message>
+      <source>Starting update to ...</source>
+      <translation>מתחיל עדכון ל ...</translation>
+    </message>
+    <message>
       <source>Updating to ...</source>
       <translation>מעדכן ל ...</translation>
     </message>
@@ -8877,12 +8971,24 @@ If you intended to move analytics data to another storage location, please conta
       <translation>מוכן לעדכן ל</translation>
     </message>
     <message>
-      <source>Install update</source>
-      <translation>התקן עדכון</translation>
-    </message>
-    <message>
       <source>System updated to</source>
       <translation>המערכת עודכנה ל</translation>
+    </message>
+    <message>
+      <source>Some servers have no update packages available.</source>
+      <translation>לחלק מהשרתים אין חבילת עדכון זמינה.</translation>
+    </message>
+    <message>
+      <source>Some servers have encountered an internal error.</source>
+      <translation>חלק מהשרתים נתקלו בשגיאה פנימית.</translation>
+    </message>
+    <message>
+      <source>Please contact Customer Support.</source>
+      <translation>צור קשר עם תמיכת הלקוחות.</translation>
+    </message>
+    <message>
+      <source>Some servers have gone offline. Please wait until they become online to continue.</source>
+      <translation>חלק מהשרתים אינם מחוברים. המתן עד שיתחברו כדי להמשיך.</translation>
     </message>
     <message>
       <source>System update in process</source>
@@ -8891,6 +8997,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Continue in Background</source>
       <translation>המשך ברקע</translation>
+    </message>
+    <message>
+      <source>Latest Available Update</source>
+      <translation>העדכון האחרון הזמין</translation>
     </message>
     <message>
       <source>Specific Build</source>
@@ -8903,111 +9013,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Update from mediaservers</source>
       <translation>עדכון משרתים אחרים</translation>
-    </message>
-    <message>
-      <source>Latest Available Update</source>
-      <translation>העדכון האחרון הזמין</translation>
-    </message>
-    <message numerus="yes">
-      <source>Missing update package for the client and %n servers</source>
-      <translation>
-        <numerusform>חסרה חבילת העדכון עבור תוכנת הקליינט ו %n שרתים</numerusform>
-        <numerusform>חסרה חבילת העדכון עבור תוכנת הקליינט ו %n שרתים</numerusform>
-        <numerusform>חסרה חבילת העדכון עבור תוכנת הקליינט ו %n שרתים</numerusform>
-        <numerusform>חסרה חבילת העדכון עבור תוכנת הקליינט ו %n שרתים</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Missing update package for the client</source>
-      <translation>חסרה חבילת העדכון עבור תוכנת הקליינט</translation>
-    </message>
-    <message>
-      <source>Finish Update</source>
-      <translation>סיים עדכון</translation>
-    </message>
-    <message>
-      <source>Cancel</source>
-      <translation>ביטול</translation>
-    </message>
-    <message>
-      <source>The latest version is already installed</source>
-      <translation>הגירסה האחרונה כבר מותקנת</translation>
-    </message>
-    <message>
-      <source>This version is already installed</source>
-      <translation>גירסה זו כבר מותקנת</translation>
-    </message>
-    <message>
-      <source>There are no online servers to update.</source>
-      <translation>אין שרתים מקוונים לעדכון.</translation>
-    </message>
-    <message>
-      <source>Cancel update and delete all downloaded data?</source>
-      <translation>האם לבטל את העדכון ולמחוק את כל הנתונים שהורדו?</translation>
-    </message>
-    <message>
-      <source>There was an error while installing updates:</source>
-      <translation>אירעה שגיאה בעת התקנת העדכונים:</translation>
-    </message>
-    <message>
-      <source>Some servers have gone offline. Please wait until they become online to continue.</source>
-      <translation>חלק מהשרתים אינם מחוברים. המתן עד שיתחברו כדי להמשיך.</translation>
-    </message>
-    <message>
-      <source>Update completed, but some components have failed an update</source>
-      <translation>העדכון הושלם, אך חלק מהשרתים לא עודכנו</translation>
-    </message>
-    <message>
-      <source>Please update %1 manually using an installation package.</source>
-      <translation>אנא עדכן את %1 ידנית באמצעות חבילת התקנה.</translation>
-    </message>
-    <message>
-      <source>%1 will be restarted to the updated version.</source>
-      <translation>%1 יופעל מחדש לגרסה המעודכנת.</translation>
-    </message>
-    <message>
-      <source>Failed to download update packages to some components</source>
-      <translation>הורדת העדכון לרכיבים מסוימים נכשלה</translation>
-    </message>
-    <message>
-      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
-      <translation>גרסאות מערכת ההפעלה של רכיבים מסוימים אינן נתמכות עוד. הסר אותם מהמערכת או עדכן את מערכת ההפעלה שלהם לגירסה נתמכת.</translation>
-    </message>
-    <message>
-      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
-      <translation>גרסת מערכת ההפעלה של הקליינט אינה נתמכת עוד. אנא עדכנו את מערכת ההפעלה לגירסה נתמכת.</translation>
-    </message>
-    <message>
-      <source>Failed to start update</source>
-      <translation>העדכון נכשל</translation>
-    </message>
-    <message>
-      <source>Starting update to ...</source>
-      <translation>מתחיל עדכון ל ...</translation>
-    </message>
-    <message>
-      <source>Failed to cancel update</source>
-      <translation>נכשל ביטול העדכון</translation>
-    </message>
-    <message>
-      <source>Failed to start installation</source>
-      <translation>הפעלת ההתקנה נכשלה</translation>
-    </message>
-    <message>
-      <source>Some servers have no update packages available.</source>
-      <translation>לחלק מהשרתים אין חבילת עדכון זמינה.</translation>
-    </message>
-    <message>
-      <source>Some servers have encountered an internal error.</source>
-      <translation>חלק מהשרתים נתקלו בשגיאה פנימית.</translation>
-    </message>
-    <message>
-      <source>Please please contact Customer Support.</source>
-      <translation>צור קשר עם שירות הלקוחות.</translation>
-    </message>
-    <message>
-      <source>Some servers have not completed the update process. Finish it anyway?</source>
-      <translation type="unfinished">Some servers have not completed the update process. Finish it anyway?</translation>
     </message>
   </context>
   <context>
@@ -9088,7 +9093,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Some users do not have access to the selected layout. Action will not work for them.</source>
-      <translation type="unfinished">Some users do not have access to the selected layout. Action will not work for them.</translation>
+      <translation>לחלק מהמשתמשים אין גישה לפריסה שנבחרה. הפעולה לא תעבוד עבורם.</translation>
     </message>
   </context>
   <context>
@@ -9297,11 +9302,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Motion detection is disabled or not supported</source>
-      <translation type="unfinished">Motion detection is disabled or not supported</translation>
+      <translation>זיהוי תנועה מבטול או אינו נתמך</translation>
     </message>
     <message>
       <source>Dual-streaming is disabled or not supported</source>
-      <translation type="unfinished">Dual-streaming is disabled or not supported</translation>
+      <translation>סטרים כפול מבוטל או לא נתמך</translation>
     </message>
   </context>
   <context>
@@ -9660,6 +9665,14 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>File was corrupted while being uploaded to the server</source>
       <translation>הקובץ נפגם בעת העלאה לשרת</translation>
+    </message>
+    <message>
+      <source>Remote file &quot;%1&quot; is corrupted</source>
+      <translation>הקובץ המרוחק &quot;%1&quot; פגום</translation>
+    </message>
+    <message>
+      <source>Server already has this file &quot;%1&quot;</source>
+      <translation>לשרת כבר יש קובץ זה &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
@@ -10208,14 +10221,18 @@ If you intended to move analytics data to another storage location, please conta
       <translation>אישור</translation>
     </message>
     <message>
-      <source>Confirm storage location to store analytics data on &apos;%1&apos;</source>
+      <source>Confirm storage location for the analytics data on &quot;%1&quot;</source>
       <translation>אשר את מיקום האחסון כדי לאחסן נתוני אנליטיקה ב- %1</translation>
     </message>
     <message>
-      <source>Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
-Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
-By default analytics data will be stored in mediaserver&apos;s installation directory.
-You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</source>
+      <source>the largest available partition</source>
+      <translation>המחיצה הזמינה הגדולה ביותר</translation>
+    </message>
+    <message>
+      <source>The analytics database should only be stored on a local drive and can take up large amounts of space.
+Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
+By default analytics data will be stored on %1.
+You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</source>
       <translation>נתוני אנליטיקה אמורים להיות מאוחסנים מקומית ועשויים לצרוך מאות ג'יגבייטים.
 כשאשר מיקום האחסון נבחר, החלפת מיקום זה אינה פשוטה ותהיה כרוכה לרוב באיבוד הנתונים הקיימים. אנו ממליצים לבחור בקפידה את מקום האחסון ושיהיה במחיצה שונה משל מערכת ההפעלה על מנת להימנע מכשלי מערכת פוטנציאלים.
 כברירת מחדל, נתוני האנליטיקה מאוחסנים בתיקיית שרת המדיה.

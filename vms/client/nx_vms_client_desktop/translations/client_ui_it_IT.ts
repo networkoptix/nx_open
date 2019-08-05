@@ -38,11 +38,6 @@
       <source>Customer Support</source>
       <translation>Servizio Clienti</translation>
     </message>
-    <message>
-      <location/>
-      <source>ARM support policy</source>
-      <translation>Politica di supporto ARM</translation>
-    </message>
   </context>
   <context>
     <name>AccessibleResourcesWidget</name>
@@ -3078,8 +3073,8 @@
     </message>
     <message>
       <location/>
-      <source>Analytics data can occupy tens of gigabytes of storage space. We recommend to choose other location for it instead of the system partition.</source>
-      <translation>I dati di analisi possono occupare decine di gigabyte di spazio di archiviazione. Raccomandiamo di scegliere un'altra posizione anziché la partizione di sistema.</translation>
+      <source>Analytics data can take up large amounts of space. We recommend to choose another location for it instead of the system partition.</source>
+      <translation>I dati di Analytics possono occupare grandi quantità di spazio. Si consiglia di scegliere un altro percorso per l'archiviazione invece della partizione di sistema.</translation>
     </message>
   </context>
   <context>

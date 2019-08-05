@@ -38,11 +38,6 @@
       <source>Customer Support</source>
       <translation>Hỗ trợ khách hàng</translation>
     </message>
-    <message>
-      <location/>
-      <source>ARM support policy</source>
-      <translation type="unfinished">ARM support policy</translation>
-    </message>
   </context>
   <context>
     <name>AccessibleResourcesWidget</name>
@@ -189,12 +184,12 @@
     <message>
       <location/>
       <source>Max. days</source>
-      <translation type="unfinished">Max. days</translation>
+      <translation>Tối đa ngày</translation>
     </message>
     <message>
       <location/>
       <source>Min. days</source>
-      <translation type="unfinished">Min. days</translation>
+      <translation>Tối thiểu ngày</translation>
     </message>
   </context>
   <context>
@@ -320,7 +315,7 @@
     <message>
       <location/>
       <source>on the next day</source>
-      <translation type="unfinished">on the next day</translation>
+      <translation>vào ngày tiếp theo</translation>
     </message>
   </context>
   <context>
@@ -552,7 +547,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_properties/camera/dialogs/camera_credentials_dialog.ui"/>
       <source>Authentication credentials</source>
-      <translation type="unfinished">Authentication credentials</translation>
+      <translation>Thông tin xác thực</translation>
     </message>
   </context>
   <context>
@@ -665,12 +660,12 @@
     <message>
       <location/>
       <source>Custom Media Port</source>
-      <translation type="unfinished">Custom Media Port</translation>
+      <translation>Cổng truyền thông tùy chỉnh</translation>
     </message>
     <message>
       <location/>
       <source>Trust camera timestamp</source>
-      <translation type="unfinished">Trust camera timestamp</translation>
+      <translation>Tin cậy dấu thời gian máy ảnh</translation>
     </message>
     <message>
       <location/>
@@ -690,7 +685,7 @@
     <message>
       <location/>
       <source>Native camera presets will not be avaliable.</source>
-      <translation type="unfinished">Native camera presets will not be avaliable.</translation>
+      <translation>Cài đặt gốc camera trước sẽ không có sẵn.</translation>
     </message>
     <message>
       <location/>
@@ -705,7 +700,7 @@
     <message>
       <location/>
       <source>Detect motion during archive import</source>
-      <translation type="unfinished">Detect motion during archive import</translation>
+      <translation>Phát hiện chuyển động trong quá trình nhập kho</translation>
     </message>
   </context>
   <context>
@@ -763,7 +758,7 @@
     <message>
       <location/>
       <source>Show on layout</source>
-      <translation type="unfinished">Show on layout</translation>
+      <translation>Hiển thị trên Layout</translation>
     </message>
     <message>
       <location/>
@@ -773,7 +768,7 @@
     <message>
       <location/>
       <source>Camera rules</source>
-      <translation type="unfinished">Camera rules</translation>
+      <translation>Nội quy Camera</translation>
     </message>
     <message>
       <location/>
@@ -866,7 +861,7 @@
     <message>
       <location/>
       <source>Copy Schedule to...</source>
-      <translation type="unfinished">Copy Schedule to...</translation>
+      <translation>Sao chép lịch biểu vào...</translation>
     </message>
   </context>
   <context>
@@ -879,7 +874,7 @@
     <message>
       <location/>
       <source>Select Cameras</source>
-      <translation>Chọn Máy ảnh</translation>
+      <translation>Chọn camera</translation>
     </message>
   </context>
   <context>
@@ -892,7 +887,7 @@
     <message>
       <location/>
       <source>Edit Credentials</source>
-      <translation type="unfinished">Edit Credentials</translation>
+      <translation>Chỉnh sửa thông tin xác thực</translation>
     </message>
     <message>
       <location/>
@@ -902,7 +897,7 @@
     <message>
       <location/>
       <source>Enable audio</source>
-      <translation type="unfinished">Enable audio</translation>
+      <translation>Cho phép âm thanh</translation>
     </message>
     <message>
       <location/>
@@ -990,7 +985,7 @@
     <message>
       <location/>
       <source>Omit Logging</source>
-      <translation type="unfinished">Omit Logging</translation>
+      <translation>Bỏ qua ghi nhật ký</translation>
     </message>
   </context>
   <context>
@@ -1024,12 +1019,12 @@
     <message>
       <location/>
       <source>SELECT SERVER</source>
-      <translation type="unfinished">SELECT SERVER</translation>
+      <translation>CHỌN MÁY CHỦ</translation>
     </message>
     <message>
       <location/>
       <source>Known Address</source>
-      <translation type="unfinished">Known Address</translation>
+      <translation>Địa chỉ đã biết</translation>
     </message>
     <message>
       <location/>
@@ -1044,7 +1039,7 @@
     <message>
       <location/>
       <source>Hint</source>
-      <translation type="unfinished">Hint</translation>
+      <translation>Gợi ý</translation>
     </message>
     <message>
       <location/>
@@ -1089,7 +1084,7 @@
     <message>
       <location/>
       <source>Add Devices</source>
-      <translation type="unfinished">Add Devices</translation>
+      <translation>Thêm thiết bị</translation>
     </message>
     <message>
       <location/>
@@ -1107,12 +1102,12 @@
     <message>
       <location/>
       <source>I Do Not Agree</source>
-      <translation type="unfinished">I Do Not Agree</translation>
+      <translation>Tôi không đồng ý</translation>
     </message>
     <message>
       <location/>
       <source>I Agree</source>
-      <translation type="unfinished">I Agree</translation>
+      <translation>Tôi đồng ý</translation>
     </message>
   </context>
   <context>
@@ -1248,7 +1243,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/export/widgets/export_password_widget.ui"/>
       <source>Protect with password</source>
-      <translation type="unfinished">Protect with password</translation>
+      <translation>Bảo vệ bằng mật khẩu</translation>
     </message>
     <message>
       <location/>
@@ -1444,7 +1439,7 @@
     <message>
       <location/>
       <source>Encrypting video traffic will significantly increase CPU usage.</source>
-      <translation type="unfinished">Encrypting video traffic will significantly increase CPU usage.</translation>
+      <translation>Mã hóa lưu lượng video sẽ tăng đáng kể việc sử dụng CPU.</translation>
     </message>
   </context>
   <context>
@@ -1457,12 +1452,12 @@
     <message>
       <location/>
       <source>Aspect ratio</source>
-      <translation type="unfinished">Aspect ratio</translation>
+      <translation>Tỷ lệ khía cạnh</translation>
     </message>
     <message>
       <location/>
       <source>Default rotation</source>
-      <translation type="unfinished">Default rotation</translation>
+      <translation>Xoay mặc định</translation>
     </message>
   </context>
   <context>
@@ -1612,7 +1607,7 @@
     <message>
       <location/>
       <source>Minimum Grid Size</source>
-      <translation type="unfinished">Minimum Grid Size</translation>
+      <translation>Kích thước lưới điện tối thiểu</translation>
     </message>
   </context>
   <context>
@@ -1678,7 +1673,7 @@
     <message>
       <location/>
       <source>Admin DN or CN</source>
-      <translation type="unfinished">Admin DN or CN</translation>
+      <translation>Quản trị DN hoặc CN</translation>
     </message>
   </context>
   <context>
@@ -1957,7 +1952,7 @@
     <message>
       <location/>
       <source>IP addresses for cameras, and servers, groups for users, etc.</source>
-      <translation>Địa chỉ IP cho các máy ảnh và máy chủ, nhóm người sử dụng, vv.</translation>
+      <translation>Địa chỉ IP cho các camera và máy chủ, nhóm người sử dụng, vv.</translation>
     </message>
   </context>
   <context>
@@ -1978,7 +1973,7 @@
     <message>
       <location/>
       <source>Check for update</source>
-      <translation type="unfinished">Check for update</translation>
+      <translation>Kiểm tra cập nhật</translation>
     </message>
     <message>
       <location/>
@@ -2018,7 +2013,7 @@
     <message>
       <location/>
       <source>Advanced Update Settings</source>
-      <translation type="unfinished">Advanced Update Settings</translation>
+      <translation>Cài đặt cập nhật nâng cao</translation>
     </message>
     <message>
       <location/>
@@ -2031,12 +2026,12 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_dialogs/multiple_layout_selection_dialog.ui"/>
       <source>Show all layouts</source>
-      <translation type="unfinished">Show all layouts</translation>
+      <translation>Hiển thị tất cả các bố trí</translation>
     </message>
     <message>
       <location/>
       <source>Select Layouts</source>
-      <translation type="unfinished">Select Layouts</translation>
+      <translation>Chọn bố cục</translation>
     </message>
   </context>
   <context>
@@ -2057,12 +2052,12 @@
     <message>
       <location filename="../src/ui/widgets/business/open_layout_action_widget.ui"/>
       <source>Layout</source>
-      <translation type="unfinished">Layout</translation>
+      <translation>Bố cục</translation>
     </message>
     <message>
       <location/>
       <source>Show to</source>
-      <translation type="unfinished">Show to</translation>
+      <translation>Cho Đến</translation>
     </message>
     <message>
       <location/>
@@ -2118,22 +2113,22 @@
     <message>
       <location/>
       <source>Level:</source>
-      <translation type="unfinished">Level:</translation>
+      <translation>Mức độ:</translation>
     </message>
     <message>
       <location/>
       <source>ERROR</source>
-      <translation type="unfinished">ERROR</translation>
+      <translation>LỖI</translation>
     </message>
     <message>
       <location/>
       <source>WARNING</source>
-      <translation type="unfinished">WARNING</translation>
+      <translation>CẢNH BÁO</translation>
     </message>
     <message>
       <location/>
       <source>INFO</source>
-      <translation type="unfinished">INFO</translation>
+      <translation>THÔNG TIN</translation>
     </message>
   </context>
   <context>
@@ -2282,7 +2277,7 @@
     <message>
       <location/>
       <source>Restart to the updated version when ready</source>
-      <translation type="unfinished">Restart to the updated version when ready</translation>
+      <translation>Khởi động lại phiên bản cập nhật khi sẵn sàng</translation>
     </message>
   </context>
   <context>
@@ -2484,7 +2479,7 @@
     <message>
       <location/>
       <source>Enable timeline on video wall</source>
-      <translation type="unfinished">Enable timeline on video wall</translation>
+      <translation>Kích hoạt dòng thời gian trên tường video</translation>
     </message>
   </context>
   <context>
@@ -2535,7 +2530,7 @@
     <message>
       <location/>
       <source>Server name</source>
-      <translation type="unfinished">Server name</translation>
+      <translation>Tên máy chủ</translation>
     </message>
   </context>
   <context>
@@ -2652,7 +2647,7 @@
     <message>
       <location/>
       <source>Drag any image or video file to the application window to play them</source>
-      <translation type="unfinished">Drag any image or video file to the application window to play them</translation>
+      <translation>Kéo bất kỳ tệp hình ảnh hoặc video vào cửa sổ ứng dụng để phát chúng</translation>
     </message>
   </context>
   <context>
@@ -2746,22 +2741,22 @@
     <message>
       <location/>
       <source>Allow only secure connections</source>
-      <translation type="unfinished">Allow only secure connections</translation>
+      <translation>Chỉ cho phép kết nối an toàn</translation>
     </message>
     <message>
       <location/>
       <source>Encrypt video traffic</source>
-      <translation type="unfinished">Encrypt video traffic</translation>
+      <translation>Mã hóa lưu lượng video</translation>
     </message>
     <message>
       <location/>
       <source>Display watermark with username over video</source>
-      <translation type="unfinished">Display watermark with username over video</translation>
+      <translation>Hiển thị hình mờ với tên người dùng qua video</translation>
     </message>
     <message>
       <location/>
       <source>Watermark Preview</source>
-      <translation type="unfinished">Watermark Preview</translation>
+      <translation>Xem trước hình mờ</translation>
     </message>
     <message>
       <location/>
@@ -2771,7 +2766,7 @@
     <message>
       <location/>
       <source>Limit session duration</source>
-      <translation type="unfinished">Limit session duration</translation>
+      <translation>Giới hạn thời lượng phiên</translation>
     </message>
   </context>
   <context>
@@ -3016,7 +3011,7 @@
     <message>
       <location/>
       <source>Base forecast on data recorded during</source>
-      <translation type="unfinished">Base forecast on data recorded during</translation>
+      <translation>Dự báo cơ sở về dữ liệu được ghi lại trong</translation>
     </message>
   </context>
   <context>
@@ -3064,12 +3059,12 @@
     <message>
       <location/>
       <source>Analytics data will continue to be stored on the disabled storage.</source>
-      <translation type="unfinished">Analytics data will continue to be stored on the disabled storage.</translation>
+      <translation>Dữ liệu phân tích sẽ tiếp tục được lưu trữ trên bộ nhớ bị vô hiệu hóa.</translation>
     </message>
     <message>
       <location/>
       <source>Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</source>
-      <translation type="unfinished">Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</translation>
+      <translation>Ghi vào vị trí lưu trữ bị vô hiệu hóa sẽ dừng lại. Tuy nhiên, việc xóa các đoạn phim lỗi thời khỏi nó sẽ tiếp tục.</translation>
     </message>
     <message>
       <location/>
@@ -3078,8 +3073,8 @@
     </message>
     <message>
       <location/>
-      <source>Analytics data can occupy tens of gigabytes of storage space. We recommend to choose other location for it instead of the system partition.</source>
-      <translation type="unfinished">Analytics data can occupy tens of gigabytes of storage space. We recommend to choose other location for it instead of the system partition.</translation>
+      <source>Analytics data can take up large amounts of space. We recommend to choose another location for it instead of the system partition.</source>
+      <translation type="unfinished">Analytics data can take up large amounts of space. We recommend to choose another location for it instead of the system partition.</translation>
     </message>
   </context>
   <context>
@@ -3205,7 +3200,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/system_administration/widgets/time_synchronization_widget.ui"/>
       <source>Sync Time with the Internet</source>
-      <translation type="unfinished">Sync Time with the Internet</translation>
+      <translation>Đồng bộ hóa thời gian với Internet</translation>
     </message>
     <message>
       <location/>
@@ -3215,7 +3210,7 @@
     <message>
       <location/>
       <source>Do not sync time among servers</source>
-      <translation type="unfinished">Do not sync time among servers</translation>
+      <translation>Không đồng bộ hóa thời gian giữa các máy chủ</translation>
     </message>
   </context>
   <context>
@@ -3323,7 +3318,7 @@
     <message>
       <location/>
       <source>Detect motion</source>
-      <translation type="unfinished">Detect motion</translation>
+      <translation>Phát hiện chuyển động</translation>
     </message>
   </context>
   <context>
@@ -3336,7 +3331,7 @@
     <message>
       <location/>
       <source>Upload Footage</source>
-      <translation type="unfinished">Upload Footage</translation>
+      <translation>Tải lên đoạn phim</translation>
     </message>
     <message>
       <location/>
@@ -3354,7 +3349,7 @@
     <message>
       <location filename="../src/ui/dialogs/webpage_dialog.ui"/>
       <source>This web page is for C2P integration</source>
-      <translation type="unfinished">This web page is for C2P integration</translation>
+      <translation>Trang web này là để tích hợp C2P</translation>
     </message>
   </context>
   <context>
@@ -3390,7 +3385,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/watermark/private/watermark_preview_dialog.ui"/>
       <source>Watermark preview</source>
-      <translation type="unfinished">Watermark preview</translation>
+      <translation>Xem trước hình mờ</translation>
     </message>
     <message>
       <location/>

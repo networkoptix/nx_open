@@ -200,7 +200,7 @@ void QnLdapUsersDialog::importUsers(const QnLdapUsers &users)
         QnUserResourcePtr user(new QnUserResource(QnUserType::Ldap));
         user->setName(ldapUser.login);
         user->setEmail(ldapUser.email);
-        user->fillId();
+        user->fillIdUnsafe();
         user->setEnabled(enableUsers);
         if (selectedRole == Qn::UserRole::customUserRole)
             user->setUserRoleId(selectedUserRoleId);

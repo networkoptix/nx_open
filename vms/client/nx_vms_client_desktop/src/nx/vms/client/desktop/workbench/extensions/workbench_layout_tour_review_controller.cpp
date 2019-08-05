@@ -76,8 +76,6 @@ namespace nx::vms::client::desktop {
 namespace ui {
 namespace workbench {
 
-static bool onlyOnePlaceholder = false;
-
 LayoutTourReviewController::LayoutTourReviewController(QObject* parent):
     base_type(parent),
     QnWorkbenchContextAware(parent)
@@ -127,9 +125,6 @@ LayoutTourReviewController::LayoutTourReviewController(QObject* parent):
 
     connect(qnResourceRuntimeDataManager, &QnResourceRuntimeDataManager::layoutItemDataChanged,
         this, &LayoutTourReviewController::handleItemDataChanged);
-
-    connect(action(action::DebugIncrementCounterAction), &QAction::triggered, this,
-        [this]{ onlyOnePlaceholder = !onlyOnePlaceholder; updatePlaceholders(); });
 }
 
 LayoutTourReviewController::~LayoutTourReviewController()
@@ -215,7 +210,7 @@ void LayoutTourReviewController::reviewLayoutTour(const nx::vms::api::LayoutTour
     static const float kCellAspectRatio{16.0f / 9.0f};
 
     const auto layout = QnLayoutResourcePtr(new QnLayoutResource());
-    layout->setId(QnUuid::createUuid()); //< Layout is never saved to server.
+    layout->setIdUnsafe(QnUuid::createUuid()); //< Layout is never saved to server.
     layout->setParentId(tour.id);
     layout->setName(tour.name);
     layout->setData(Qn::IsSpecialLayoutRole, true);
@@ -341,8 +336,7 @@ void LayoutTourReviewController::updatePlaceholders()
             const QPoint cell(x, y);
             const bool isFree = layout->isFreeSlot(cell, kCellSize);
             const bool placeholderExists = m_dropPlaceholders.contains(cell);
-            const bool mustBePlaceholder = isFree &&
-                (onlyOnePlaceholder ? placeholdersCount == 0 : true);
+            const bool mustBePlaceholder = isFree;
 
             // If cell is empty and there is a placeholder (or vise versa), skip this step.
             if (mustBePlaceholder == placeholderExists)

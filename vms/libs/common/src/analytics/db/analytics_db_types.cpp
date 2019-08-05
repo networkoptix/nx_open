@@ -211,7 +211,8 @@ QString toString(const Filter& filter)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (Filter),
     (json),
-    _analytics_storage_Fields)
+    _analytics_storage_Fields,
+    (brief, true))
 
 //-------------------------------------------------------------------------------------------------
 

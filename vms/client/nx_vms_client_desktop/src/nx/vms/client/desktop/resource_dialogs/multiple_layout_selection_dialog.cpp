@@ -23,6 +23,7 @@
 #include <ui/dialogs/common/message_box.h>
 #include <ui/workbench/workbench_context.h>
 #include <nx_ec/access_helpers.h>
+#include <core/resource_access/resource_access_subject.h>
 
 namespace {
 

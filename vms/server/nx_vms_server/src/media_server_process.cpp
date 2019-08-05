@@ -271,7 +271,7 @@
 #include <nx/vms/server/root_fs.h>
 #include <system_log/raid_event_ini_config.h>
 
-#include <nx/vms/server/server_update_manager.h>
+#include <nx/vms/server/update/update_manager.h>
 #include <nx_vms_server_ini.h>
 #include <proxy/2wayaudio/proxy_audio_receiver.h>
 #include <local_connection_factory.h>
@@ -335,7 +335,7 @@ void addFakeVideowallUser(QnCommonModule* commonModule)
     fakeUserData.permissions = GlobalPermission::videowallModePermissions;
 
     auto fakeUser = ec2::fromApiToResource(fakeUserData);
-    fakeUser->setId(Qn::kVideowallUserAccess.userId);
+    fakeUser->setIdUnsafe(Qn::kVideowallUserAccess.userId);
     fakeUser->setName("Video wall");
 
     commonModule->resourcePool()->addResource(fakeUser);
@@ -499,6 +499,7 @@ QnStorageResourcePtr MediaServerProcess::createStorage(const QnUuid& serverId, c
     storage->setName("Initial");
     storage->setParentId(serverId);
     storage->setUrl(path);
+    storage->fillID();
 
     const QString storagePath = QnStorageResource::toNativeDirPath(storage->getPath());
     const auto partitions = m_platform->monitor()->totalPartitionSpaceInfo();
@@ -2181,7 +2182,7 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg("api/ifconfig", new QnIfConfigRestHandler(), kAdmin);
 
-    reg("api/downloads/", new QnDownloadsRestHandler(serverModule()));
+    reg("api/downloads/", new nx::vms::server::rest::handlers::Downloads(serverModule()));
 
     /**%apidoc[proprietary] GET /api/settime
      * Set current time on the server machine. Can be called only if server flags include
@@ -2414,10 +2415,11 @@ void MediaServerProcess::registerRestHandlers(
      *     milliseconds since epoch, or a local time formatted like
      *     <code>"<i>YYYY</i>-<i>MM</i>-<i>DD</i>T<i>HH</i>:<i>mm</i>:<i>ss</i>.<i>zzz</i>"</code>
      *     - the format is auto-detected).
-     * %param[opt]:arrayJson filter This parameter is used for motion search ("periodsType" must
-     *     be 1). Match motion on a video by specified rectangle.
-     *     <br/>Format: string with a JSON list of <i>sensors</i>,
-     *     each <i>sensor</i> is a JSON list of <i>rects</i>, each <i>rect</i> is:
+     * %param[opt]:arrayJson filter This parameter is used for Motion and Analytics Search
+     *     ("periodsType" must be set to 1 or 2). Search motion or analytics event on a video according
+     *     to specified attributes values.
+     *     <br/>Motion Search Format: string with a JSON list of <i>sensors</i>,
+     *     each <i>sensor</i> is a JSON list of <i>rectangles</i>, each <i>rectangle</i> is:
      *     <br/>
      *     <code>
      *         {"x": <i>x</i>, "y": <i>y</i>, "width": <i>width</i>,"height": <i>height</i>}
@@ -2429,6 +2431,18 @@ void MediaServerProcess::registerRestHandlers(
      *     <code>[[{"x":0,"y":0,"width":43,"height":31}]]</code>
      *     <br/>Example of two rectangles for a single-sensor camera:
      *     <code>[[{"x":0,"y":0,"width":5,"height":7},{"x":12,"y":10,"width":8,"height":6}]]</code>
+     *     <br/>Analytics Search Format: string with a JSON object that might take the following attributes
+     *     as an input:
+     *     <br/>
+     *     <ul>
+     *     <li>"boundingBox" key represents a <i>rectangle</i>. Value is a dictionary with same format
+     *     as for Motion Search rectangle;</li>
+     *     <li>"freeText" key for full-text search over analytics data attributes. Value is expected to be a
+     *     string with search input;
+     *     </li>
+     *     </ul>
+     *     <br/>Example of JSON object:
+     *     <code>{"boundingBox":{"height":0,"width":0.1,"x":0.,"y":1.},"freeText":"Test"}</code>
      * %param[proprietary]:enum format Data format. Default value is "json".
      *     %value ubjson Universal Binary JSON data format.
      *     %value json JSON data format.
@@ -2439,6 +2453,7 @@ void MediaServerProcess::registerRestHandlers(
      * %param[opt]:integer periodsType Chunk type.
      *     %value 0 All records.
      *     %value 1 Only chunks with motion (parameter "filter" is required).
+     *     %value 2 Only chunks with analytics event(parameter "filter" might be applied).
      * %param[opt]:option keepSmallChunks If specified, standalone chunks smaller than the detail
      *     level are not removed from the result.
      * %param[opt]:integer limit Maximum number of chunks to return.
@@ -2554,8 +2569,7 @@ void MediaServerProcess::registerRestHandlers(
      *      as a result.
      * %return:object JSON with the update manifest.
      */
-    reg("ec2/updateInformation", new QnUpdateInformationRestHandler(&serverModule()->settings(),
-        commonModule()->engineVersion()));
+    reg("ec2/updateInformation", new QnUpdateInformationRestHandler(serverModule()));
 
     /**%apidoc POST /ec2/startUpdate
      * Starts an update process.
@@ -2697,7 +2711,6 @@ void MediaServerProcess::registerRestHandlers(
      *         %param reply[].actions[].pluginId Id of a analytics plugin which offers the actions.
      */
     reg("api/getAnalyticsActions", new QnGetAnalyticsActionsRestHandler());
-
 
     /**%apidoc POST /api/executeAnalyticsAction
      * Execute analytics action from the particular analytics plugin on this server. The action is
@@ -3613,7 +3626,7 @@ bool MediaServerProcess::setUpMediaServerResource(
         {
             server = QnMediaServerResourcePtr(new QnMediaServerResource(commonModule()));
             const QnUuid serverGuid(serverModule->settings().serverGuid());
-            server->setId(serverGuid);
+            server->setIdUnsafe(serverGuid);
             server->setMaxCameras(nx::utils::AppInfo::isEdgeServer() ? 1 : 128);
 
             QString serverName(getDefaultServerName());
@@ -3785,7 +3798,6 @@ void MediaServerProcess::stopObjects()
     commonModule()->deleteMessageProcessor(); // stop receiving notifications
 
     commonModule()->resourcePool()->clear();
-
 
     //disconnecting from EC2
     QnAppServerConnectionFactory::setEc2Connection(ec2::AbstractECConnectionPtr());

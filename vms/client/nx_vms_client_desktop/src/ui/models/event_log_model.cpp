@@ -44,6 +44,7 @@
 #include <nx/analytics/descriptor_manager.h>
 #include <nx/vms/api/analytics/descriptors.h>
 #include <common/common_module.h>
+#include <core/resource_access/resource_access_subject.h>
 
 using namespace nx;
 

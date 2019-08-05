@@ -69,7 +69,7 @@ namespace nx::vms::server {
     class RootFileSystem;
     class Settings;
     class ServerTimeSyncManager;
-    class ServerUpdateManager;
+    class UpdateManager;
 }
 
 namespace nx::vms::server::resource { class SharedContextPool; }
@@ -117,7 +117,7 @@ public:
     nx::vms::server::resource::SharedContextPool* sharedContextPool() const;
     AbstractArchiveIntegrityWatcher* archiveIntegrityWatcher() const;
     nx::analytics::db::AbstractEventsStorage* analyticsEventsStorage() const;
-    nx::vms::server::ServerUpdateManager* updateManager() const;
+    nx::vms::server::UpdateManager* updateManager() const;
     QnDataProviderFactory* dataProviderFactory() const;
     QnResourceCommandProcessor* resourceCommandProcessor() const;
 
@@ -162,6 +162,7 @@ public:
     void initializeP2PDownloader();
 
     QString metadataDatabaseDir() const;
+    bool isStopping() const { return m_isStopping.load(); }
 private:
     void registerResourceDataProviders();
     /**
@@ -197,7 +198,7 @@ private:
     mutable boost::optional<std::chrono::milliseconds> m_lastRunningTimeBeforeRestart;
     std::unique_ptr<nx::analytics::db::AbstractEventsStorage> m_analyticsEventsStorage;
     std::unique_ptr<nx::vms::server::RootFileSystem> m_rootFileSystem;
-    nx::vms::server::ServerUpdateManager* m_updateManager = nullptr;
+    nx::vms::server::UpdateManager* m_updateManager = nullptr;
     QnDataProviderFactory* m_resourceDataProviderFactory = nullptr;
     QScopedPointer<QnResourceCommandProcessor> m_resourceCommandProcessor;
     QnMotionHelper* m_motionHelper = nullptr;
@@ -221,4 +222,10 @@ private:
     nx::vms::server::hls::SessionPool* m_hlsSessionPool = nullptr;
     nx::vms::server::network::MulticastAddressRegistry* m_multicastAddressRegistry = nullptr;
     StreamingChunkTranscoder* m_streamingChunkTranscoder = nullptr;
+
+    // When server stops, QnResourcePropertyDictionary is destroyed before QnResource objects
+    // (at least some of them) because of unknown reasons. So QnResource can not make soap requests
+    // in its destructor. To prevent them the special flag is added.
+    // This behavior should be fixed in 4.2.
+    std::atomic<bool> m_isStopping{ false };
 };

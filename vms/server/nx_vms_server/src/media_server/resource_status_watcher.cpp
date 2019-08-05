@@ -18,8 +18,12 @@ static constexpr int kServerCheckStatusTimeoutMs = 1000;
 QnResourceStatusWatcher::QnResourceStatusWatcher(QnCommonModule* commonModule):
     QnCommonModuleAware(commonModule)
 {
-    connect(commonModule->resourcePool(), &QnResourcePool::statusChanged, this, &QnResourceStatusWatcher::at_resource_statusChanged);
-    connect(this, &QnResourceStatusWatcher::statusChanged, this, &QnResourceStatusWatcher::updateResourceStatusInternal, Qt::QueuedConnection);
+    connect(commonModule->resourcePool(), &QnResourcePool::statusChanged,
+        this, &QnResourceStatusWatcher::at_resource_statusChanged);
+
+    connect(this, &QnResourceStatusWatcher::statusChanged,
+        this, &QnResourceStatusWatcher::updateResourceStatusInternal, Qt::QueuedConnection);
+
     connect(&m_checkStatusTimer, &QTimer::timeout, this, &QnResourceStatusWatcher::at_timer);
 }
 
@@ -36,6 +40,7 @@ QnResourceStatusWatcher::~QnResourceStatusWatcher()
 
 void QnResourceStatusWatcher::updateResourceStatus(const QnResourcePtr& resource)
 {
+    NX_VERBOSE(this, "Force update %1 status to %2", resource, resource->getStatus());
     emit statusChanged(resource);
 }
 
@@ -118,9 +123,10 @@ void QnResourceStatusWatcher::at_resource_statusChanged(const QnResourcePtr& res
 void QnResourceStatusWatcher::updateResourceStatusInternal(const QnResourcePtr& resource)
 {
     if (!isSetStatusInProgress(resource))
-        updateResourceStatusAsync(resource);
-    else
-        m_awaitingSetStatus << resource->getId();
+        return updateResourceStatusAsync(resource);
+
+    NX_VERBOSE(this, "Update status for %1 later, update is in progress", resource);
+    m_awaitingSetStatus << resource->getId();
 }
 
 void QnResourceStatusWatcher::updateResourceStatusAsync(const QnResourcePtr& resource)
@@ -128,6 +134,7 @@ void QnResourceStatusWatcher::updateResourceStatusAsync(const QnResourcePtr& res
     if (!resource)
         return;
 
+    NX_VERBOSE(this, "Update status for %1 now", resource);
     m_setStatusInProgress.insert(resource->getId());
     auto connection = commonModule()->ec2Connection();
     auto resourceManager = connection->getResourceManager(Qn::kSystemAccess);

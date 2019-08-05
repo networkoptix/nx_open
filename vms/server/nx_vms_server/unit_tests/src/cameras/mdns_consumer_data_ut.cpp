@@ -5,7 +5,7 @@
 #include <QtCore>
 #include <plugins/resource/mdns/mdns_consumer_data.h>
 #include <nx/utils/random.h>
-
+#include <nx/utils/random_qt_device.h>
 
 namespace nx {
 namespace test {
@@ -82,7 +82,7 @@ private:
     QSet<QByteArray> m_responses;
     int m_visited = 0;
     // Until nx::utils::random::* work well
-    mutable std::random_device m_rd;
+    mutable nx::utils::random::QtDevice m_rd;
     mutable std::mt19937 m_gen;
 
 
