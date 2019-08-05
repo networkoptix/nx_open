@@ -709,7 +709,10 @@ void QnWorkbenchVideoWallHandler::sendMessage(const QnVideoWallControlMessage& m
     {
         apiMessage.videowallGuid = index.videowall()->getId();
         apiMessage.instanceGuid = index.uuid();
-        NX_VERBOSE(this, "SENDER: sending message %1 to %2", message, apiMessage.instanceGuid);
+        NX_VERBOSE(this, "SENDER: sending message %1: %2 to %3",
+            m_controlMode.sequence,
+            message,
+            apiMessage.instanceGuid);
         connection()->sendControlMessage(apiMessage, this, [] {});
     }
 }
