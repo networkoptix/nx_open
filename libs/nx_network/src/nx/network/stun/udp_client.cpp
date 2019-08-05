@@ -53,12 +53,12 @@ void UdpClient::bindToAioThread(network::aio::AbstractAioThread* aioThread)
         requestContext.second.timer->bindToAioThread(aioThread);
 }
 
-const std::unique_ptr<network::UDPSocket>& UdpClient::socket()
+const std::unique_ptr<AbstractDatagramSocket>& UdpClient::socket()
 {
     return m_messagePipeline.socket();
 }
 
-std::unique_ptr<network::UDPSocket> UdpClient::takeSocket()
+std::unique_ptr<AbstractDatagramSocket> UdpClient::takeSocket()
 {
     return m_messagePipeline.takeSocket();
 }

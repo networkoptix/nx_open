@@ -11,6 +11,7 @@
 #include <nx/network/deprecated/simple_http_client.h>
 #include <nx/network/address_resolver.h>
 #include <nx/network/app_info.h>
+#include <nx/vms/api/protocol_version.h>
 
 #include <utils/common/app_info.h>
 #include <nx/utils/concurrent.h>
@@ -30,7 +31,7 @@ namespace ec2 {
 RemoteConnectionFactory::RemoteConnectionFactory(
     QnCommonModule* commonModule,
     api::PeerType peerType,
-    bool isP2pMode)
+    bool /*isP2pMode*/)
 :
     AbstractECConnectionFactory(commonModule),
     m_jsonTranSerializer(new QnJsonTransactionSerializer()),
@@ -286,6 +287,7 @@ void RemoteConnectionFactory::remoteConnectionFinished(
         case ec2::ErrorCode::ldap_temporary_unauthorized:
         case ec2::ErrorCode::cloud_temporary_unauthorized:
         case ec2::ErrorCode::disabled_user_unauthorized:
+        case ec2::ErrorCode::userLockedOut:
             break;
 
         default:
@@ -373,7 +375,7 @@ ErrorCode RemoteConnectionFactory::fillConnectionInfo(
         connectionInfo->box = QnAppInfo::armBox();
     #endif
     connectionInfo->allowSslConnections = m_sslEnabled;
-    connectionInfo->nxClusterProtoVersion = nx_ec::EC2_PROTO_VERSION;
+    connectionInfo->nxClusterProtoVersion = nx::vms::api::protocolVersion();
     connectionInfo->newSystem = commonModule()->globalSettings()->isNewSystem();
     connectionInfo->p2pMode = m_p2pMode;
     if (response)

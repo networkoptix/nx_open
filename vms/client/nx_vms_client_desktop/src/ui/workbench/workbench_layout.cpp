@@ -2,6 +2,8 @@
 
 #include <limits>
 
+#include <boost/algorithm/cxx11/all_of.hpp>
+
 #include <QtWidgets/QGraphicsWidget>
 
 #include <common/common_module.h>
@@ -244,6 +246,11 @@ void QnWorkbenchLayout::submit(const QnLayoutResourcePtr& resource) const
 void QnWorkbenchLayout::notifyTitleChanged()
 {
     emit titleChanged();
+}
+
+bool QnWorkbenchLayout::canAutoAdjustAspectRatio()
+{
+    return items().size() == 1 && !resource()->hasBackground() &&  !hasCellAspectRatio();
 }
 
 void QnWorkbenchLayout::addItem(QnWorkbenchItem* item)

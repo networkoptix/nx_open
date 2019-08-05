@@ -5,6 +5,7 @@
 
 #include <api/model/recording_stats_reply.h>
 #include <client/client_color_types.h>
+#include <client/client_globals.h>
 #include <client_core/connection_context_aware.h>
 #include <ui/customization/customized.h>
 #include <ui/models/recording_stats_adapter.h>

@@ -4,6 +4,7 @@
 
 #include "image_provider.h"
 
+#include <client/client_globals.h>
 #include <nx/utils/scoped_connections.h>
 
 namespace nx::vms::client::desktop {
@@ -33,6 +34,8 @@ public:
 
     AbstractImageProcessor* imageProcessor() const;
     void setImageProcessor(AbstractImageProcessor* imageProcessor); //< Does not take ownership.
+
+    virtual bool tryLoad() override;
 
 protected:
     virtual void doLoadAsync() override;

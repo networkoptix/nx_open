@@ -108,7 +108,7 @@ You will also need:
 - `gsoap/plugin/mecevp.c` compile and link this file (C and C++).
 - compile all sources with `-DWITH_OPENSSL -DWITH_DOM`.
 - if you have zlib installed, compile all sources also with `-DWITH_GZIP`.
-- link with `-lssl -lcrypto -lz -gsoapssl++` (or `-lgsoapssl` for C, or compile `stdsoap2.cpp` for C++ and `stdsoap2.c` for C).
+- link with `-lssl -lcrypto -lz -lgsoapssl++` (or `-lgsoapssl` for C, or compile `stdsoap2.cpp` for C++ and `stdsoap2.c` for C).
 
 The gSOAP header file (generated with wsdl2h, and containing the data binding
 interface for soapcpp2) should import wsse.h (or the older 2002 version
@@ -2182,12 +2182,12 @@ To compute PSHA1 with base64 input strings `client_secret_base64` and
     const char *server_secret = soap_base642s(soap, server_secret_base64, NULL, 0, &m);
     char psha1[psha1len];
     char *psha1_base64;
-    if (n != 16)
-      .. error // HMAC key is 16 bytes
-    if (soap_psha1(soap, client_secret, server_secret, m, psha1, psha1len))
+    if (soap_psha1(soap, client_secret, n, server_secret, m, psha1, psha1len))
       .. error // insufficient memory
     psha1_base64 = soap_s2base64(soap, (unsigned char*)psha1, NULL, psha1len);
 @endcode
+
+Similarly, PSHA256 can be computed by calling `soap_psha256()`.
 */
 
 #include "wsseapi.h"
@@ -2334,6 +2334,8 @@ static int soap_wsse_element_begin_out(struct soap *soap, const char *tag, int i
 static int soap_wsse_element_end_out(struct soap *soap, const char *tag);
 
 static size_t soap_wsse_verify_nested(struct soap *soap, struct soap_dom_element *dom, const char *URI, const char *tag);
+
+static int soap_p_hash(struct soap *soap, const char *hmac_key, size_t hmac_key_len, const char *secret, size_t secretlen, int alg, char HA[], size_t HA_len, char temp[], char *phash, size_t phashlen);
 
 /******************************************************************************\
  *
@@ -3371,7 +3373,7 @@ soap_wsse_add_SignedInfo_Reference(struct soap *soap, const char *URI, unsigned 
       break;
 #endif
     default:
-      return soap_wsse_fault(soap, wsse__UnsupportedAlgorithm, "SHA224/256/384/512 requires OpenSSL 0.9.8");
+      return soap_wsse_fault(soap, wsse__UnsupportedAlgorithm, "SHA224/256/384/512 requires OpenSSL 0.9.8 or greater");
   }
   /* populate the DigestValue element */
   reference->DigestValue = soap_s2base64(soap, (unsigned char*)HA, NULL, soap_smd_size(alg, NULL));
@@ -5866,15 +5868,50 @@ soap_wsse_rand_nonce(char *nonce, size_t noncelen)
 
 /******************************************************************************\
  *
- *      WS-SecureConversation PSHA1
+ *      WS-SecureConversation P_MD5, P_SHA1 and P_SHA256
  *
 \******************************************************************************/
 
 /**
-@fn int soap_psha1(struct soap *soap, char hmac_key[16], char *secret, size_t secretlen, char *psha1, size_t psha1len)
-@brief Computes PSHA1(hmac_key[16], secret[0..secretlen], psha[0..psha1len-1]).
+@fn int soap_pmd5(struct soap *soap, const char *hmac_key, size_t hmac_key_len, char *secret, size_t secretlen, char *pmd5, size_t pmd5len)
+@brief Computes PMD5(hmac_key[0..hmac_key_len-1], secret[0..secretlen-1], pmd5[0..pmd5len-1]).
+@param soap context
+@param[in] hmac_key HMAC key (client secret) 16 raw bytes
+@param[in] secret seed (server secret) raw bytes
+@param[in] secretlen number of bytes
+@param[out] pmd5 points to pmd5 raw bytes to fill with result
+@param[in] pmd5len number of bytes to fill pmd5
+@return SOAP_OK or SOAP_EOM
+
+To compute PMD5 with base64 input and output a base64 encoded pmd5[0..pmd5len-1]:
+@code
+    int pmd5len = 32; // or greater
+    int n, m;
+    const char *client_secret = soap_base642s(soap, client_secret_base64, NULL, 0, &n);
+    const char *server_secret = soap_base642s(soap, server_secret_base64, NULL, 0, &m);
+    char pmd5[pmd5len];
+    char *pmd5_base64;
+    if (soap_pmd5(soap, client_secret, n, server_secret, m, pmd5, pmd5len))
+      .. error // insufficient memory
+    pmd5_base64 = soap_s2base64(soap, (unsigned char*)pmd5, NULL, pmd5len);
+@endcode
+*/
+SOAP_FMAC1
+int
+SOAP_FMAC2
+soap_pmd5(struct soap *soap, const char *hmac_key, size_t hmac_key_len, const char *secret, size_t secretlen, char *pmd5, size_t pmd5len)
+{
+  char HA[SOAP_SMD_MD5_SIZE];
+  char temp[SOAP_SMD_MD5_SIZE];
+  return soap_p_hash(soap, hmac_key, hmac_key_len, secret, secretlen, SOAP_SMD_HMAC_MD5, HA, SOAP_SMD_MD5_SIZE, temp, pmd5, pmd5len);
+}
+
+/**
+@fn int soap_psha1(struct soap *soap, const char *hmac_key, size_t hmac_key_len, char *secret, size_t secretlen, char *psha1, size_t psha1len)
+@brief Computes PSHA1(hmac_key[0..hmac_key_len-1], secret[0..secretlen-1], psha1[0..psha1len-1]).
 @param soap context
 @param[in] hmac_key HMAC key (client secret) raw bytes
+@param[in] hmac_key_len HMAC key length
 @param[in] secret seed (server secret) raw bytes
 @param[in] secretlen number of bytes
 @param[out] psha1 points to psha1 raw bytes to fill with result
@@ -5889,9 +5926,7 @@ To compute PSHA1 with base64 input and output a base64 encoded psha1[0..psha1len
     const char *server_secret = soap_base642s(soap, server_secret_base64, NULL, 0, &m);
     char psha1[psha1len];
     char *psha1_base64;
-    if (n != 16)
-      .. error // HMAC key is 16 bytes
-    if (soap_psha1(soap, client_secret, server_secret, m, psha1, psha1len))
+    if (soap_psha1(soap, client_secret, n, server_secret, m, psha1, psha1len))
       .. error // insufficient memory
     psha1_base64 = soap_s2base64(soap, (unsigned char*)psha1, NULL, psha1len);
 @endcode
@@ -5899,36 +5934,90 @@ To compute PSHA1 with base64 input and output a base64 encoded psha1[0..psha1len
 SOAP_FMAC1
 int
 SOAP_FMAC2
-soap_psha1(struct soap *soap, const char hmac_key[16], const char *secret, size_t secretlen, char *psha1, size_t psha1len)
+soap_psha1(struct soap *soap, const char *hmac_key, size_t hmac_key_len, const char *secret, size_t secretlen, char *psha1, size_t psha1len)
 {
   char HA[SOAP_SMD_SHA1_SIZE];
+  char temp[SOAP_SMD_SHA1_SIZE];
+  return soap_p_hash(soap, hmac_key, hmac_key_len, secret, secretlen, SOAP_SMD_HMAC_SHA1, HA, SOAP_SMD_SHA1_SIZE, temp, psha1, psha1len);
+}
+
+/**
+@fn int soap_psha256(struct soap *soap, const char *hmac_key, size_t hmac_key_len, char *secret, size_t secretlen, char *psha256, size_t psha256len)
+@brief Computes PSHA256(hmac_key[0..hmac_key_len-1], secret[0..secretlen-1], psha256[0..psha256len-1]).
+@param soap context
+@param[in] hmac_key HMAC key (client secret) raw bytes
+@param[in] hmac_key_len HMAC key length
+@param[in] secret seed (server secret) raw bytes
+@param[in] secretlen number of bytes
+@param[out] psha256 points to psha256 raw bytes to fill with result
+@param[in] psha256len number of bytes to fill psha256
+@return SOAP_OK or SOAP_EOM
+
+To compute PSHA256 with base64 input and output a base64 encoded psha256[0..psha256len-1]:
+@code
+    int psha256len = 32; // or greater
+    int n, m;
+    const char *client_secret = soap_base642s(soap, client_secret_base64, NULL, 0, &n);
+    const char *server_secret = soap_base642s(soap, server_secret_base64, NULL, 0, &m);
+    char psha256[psha256len];
+    char *psha256_base64;
+    if (soap_psha256(soap, client_secret, n, server_secret, m, psha256, psha256len))
+      .. error // insufficient memory
+    psha256_base64 = soap_s2base64(soap, (unsigned char*)psha256, NULL, psha256len);
+@endcode
+*/
+SOAP_FMAC1
+int
+SOAP_FMAC2
+soap_psha256(struct soap *soap, const char *hmac_key, size_t hmac_key_len, const char *secret, size_t secretlen, char *psha256, size_t psha256len)
+{
+  char HA[SOAP_SMD_SHA256_SIZE];
+  char temp[SOAP_SMD_SHA256_SIZE];
+  return soap_p_hash(soap, hmac_key, hmac_key_len, secret, secretlen, SOAP_SMD_HMAC_SHA256, HA, SOAP_SMD_SHA256_SIZE, temp, psha256, psha256len);
+}
+
+/**
+@fn static int soap_p_hash(struct soap *soap, const char *hmac_key, size_t hmac_key_len, const char *secret, size_t secretlen, int alg, char HA[], size_t HA_len, char temp[], char *phash, size_t phashlen)
+@brief Computes PSHA256(hmac_key[0..hmac_key_len-1], secret[0..secretlen-1], psha256[0..psha256len-1]).
+@param soap context
+@param[in] hmac_key HMAC key (client secret) raw bytes
+@param[in] hmac_key_len HMAC key length
+@param[in] secret seed (server secret) raw bytes
+@param[in] secretlen number of bytes
+@param[in] alg hash algorithm
+@param HA buffer to contain hash (internally used)
+@param HA_len buffer length to contain hash (internally used)
+@param temp buffer to contain hash (internally used)
+@param[out] psha256 points to psha256 raw bytes to fill with result
+@param[in] psha256len number of bytes to fill psha256
+@return SOAP_OK or SOAP_EOM
+*/
+static int soap_p_hash(struct soap *soap, const char *hmac_key, size_t hmac_key_len, const char *secret, size_t secretlen, int alg, char HA[], size_t HA_len, char temp[], char *phash, size_t phashlen)
+{
   char *buffer;
   size_t i;
-  if (!psha1)
-    return SOAP_OK;
-  buffer = (char*)SOAP_MALLOC(soap, SOAP_SMD_SHA1_SIZE + secretlen);
+  buffer = (char*)SOAP_MALLOC(soap, HA_len + secretlen);
   if (!buffer)
     return soap->error = SOAP_EOM;
   i = 0;
-  while (i < psha1len)
+  while (i < phashlen)
   {
     struct soap_smd_data context;
-    char temp[SOAP_SMD_SHA1_SIZE];
     size_t j;
-    soap_smd_init(soap, &context, SOAP_SMD_HMAC_SHA1, (void*)hmac_key, 16);
+    soap_smd_init(soap, &context, alg, (void*)hmac_key, hmac_key_len);
     if (i == 0)
       soap_smd_update(soap, &context, secret, secretlen);
     else
-      soap_smd_update(soap, &context, HA, SOAP_SMD_SHA1_SIZE);
+      soap_smd_update(soap, &context, HA, HA_len);
     soap_smd_final(soap, &context, HA, NULL);
-    (void)soap_memcpy((void*)buffer, SOAP_SMD_SHA1_SIZE + secretlen, (void*)HA, SOAP_SMD_SHA1_SIZE);
-    (void)soap_memcpy((void*)(buffer + SOAP_SMD_SHA1_SIZE), secretlen, (void*)secret, secretlen);
-    soap_smd_init(soap, &context, SOAP_SMD_HMAC_SHA1, (void*)hmac_key, 16);
-    soap_smd_update(soap, &context, buffer, SOAP_SMD_SHA1_SIZE + secretlen);
+    (void)soap_memcpy((void*)buffer, HA_len + secretlen, (void*)HA, HA_len);
+    (void)soap_memcpy((void*)(buffer + HA_len), secretlen, (void*)secret, secretlen);
+    soap_smd_init(soap, &context, alg, (void*)hmac_key, hmac_key_len);
+    soap_smd_update(soap, &context, buffer, HA_len + secretlen);
     soap_smd_final(soap, &context, temp, NULL);
     j = 0;
-    while (j < SOAP_SMD_SHA1_SIZE && i < psha1len)
-      psha1[i++] = temp[j++];
+    while (j < HA_len && i < phashlen)
+      phash[i++] = temp[j++];
   }
   SOAP_FREE(soap, buffer);
   return SOAP_OK;
@@ -5958,13 +6047,12 @@ soap_wsse(struct soap *soap, struct soap_plugin *p, void *arg)
   p->data = (void*)SOAP_MALLOC(soap, sizeof(struct soap_wsse_data));
   p->fcopy = soap_wsse_copy;
   p->fdelete = soap_wsse_delete;
-  if (p->data)
+  if (!p->data)
+    return SOAP_EOM;
+  if (soap_wsse_init(soap, (struct soap_wsse_data*)p->data, (const void *(*)(struct soap*, int*, const char*, const unsigned char*, int, int*))arg))
   {
-    if (soap_wsse_init(soap, (struct soap_wsse_data*)p->data, (const void *(*)(struct soap*, int*, const char*, const unsigned char*, int, int*))arg))
-    {
-      SOAP_FREE(soap, p->data);
-      return SOAP_EOM;
-    }
+    SOAP_FREE(soap, p->data);
+    return SOAP_EOM;
   }
   return SOAP_OK;
 }

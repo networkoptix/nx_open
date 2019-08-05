@@ -1,8 +1,7 @@
-import { Injectable, OnDestroy }        from '@angular/core';
-import { BehaviorSubject, Observable }  from 'rxjs';
-import { NxCloudApiService }            from '../../services/nx-cloud-api';
-import { NxConfigService }              from '../../services/nx-config';
-
+import { Injectable, OnDestroy }       from '@angular/core';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { NxCloudApiService }           from '../../services/nx-cloud-api';
+import { NxConfigService }             from '../../services/nx-config';
 
 interface Platform {
     file: string;
@@ -15,7 +14,6 @@ interface Platform {
     providedIn: 'root'
 })
 export class IntegrationService implements OnDestroy {
-
     plugins: any;
     pluginsSubject = new BehaviorSubject([]);
     selectedPluginSubject = new BehaviorSubject(undefined);
@@ -23,11 +21,13 @@ export class IntegrationService implements OnDestroy {
 
     constructor(private api: NxCloudApiService,
                 private config: NxConfigService) {
-        this.getIntegrations().subscribe(result => {
-            this.plugins = result.data;
-            this.formatPlugins();
-            this.pluginsSubject.next(this.plugins);
-        });
+
+        this.getIntegrations()
+            .subscribe(result => {
+                this.plugins = result.data;
+                this.formatPlugins();
+                this.pluginsSubject.next(this.plugins);
+            });
     }
 
     private getIntegrations(): Observable<any> {

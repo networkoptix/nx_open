@@ -1,5 +1,7 @@
 #pragma once
 
+#include <nx/geo_ip/abstract_resolver.h>
+
 #include "cloud_data_provider.h"
 #include "discovery/registered_peer_pool.h"
 #include "listening_peer_pool.h"
@@ -8,6 +10,7 @@
 #include "relay/abstract_relay_cluster_client.h"
 #include "server/hole_punching_processor.h"
 #include "statistics/stats_manager.h"
+#include "listening_peer_db.h"
 
 namespace nx {
 namespace hpm {
@@ -26,19 +29,30 @@ public:
     PeerRegistrator& listeningPeerRegistrator();
     const PeerRegistrator& listeningPeerRegistrator() const;
 
+    AbstractCloudDataProvider& cloudDataProvider();
+
     HolePunchingProcessor& cloudConnectProcessor();
 
     nx::cloud::discovery::RegisteredPeerPool& discoveredPeerPool();
     const nx::cloud::discovery::RegisteredPeerPool& discoveredPeerPool() const;
 
+    ListeningPeerDb& listeningPeerDb();
+    const ListeningPeerDb& listeningPeerDb() const;
+
     const stats::StatsManager& statisticsManager() const;
+
+    nx::geo_ip::AbstractResolver& geoIpResolver();
+
+    bool doMandatoryInitialization();
 
     void stop();
 
 private:
     std::unique_ptr<AbstractCloudDataProvider> m_cloudDataProvider;
     MediaserverEndpointTester m_mediaserverEndpointTester;
+    std::unique_ptr<nx::geo_ip::AbstractResolver> m_geoIpResolver;
     std::unique_ptr<AbstractRelayClusterClient> m_relayClusterClient;
+    ListeningPeerDb m_listeningPeerDb;
     ListeningPeerPool m_listeningPeerPool;
     PeerRegistrator m_listeningPeerRegistrator;
     stats::StatsManager m_statsManager;

@@ -13,10 +13,17 @@
 #include <nx/utils/literal.h>
 #include <nx/utils/file_system.h>
 #include <nx/vms/server/fs/partitions/abstract_partitions_information_provider_linux.h>
+#include <nx/utils/log/log.h>
 
 namespace nx::vms::server::fs {
 
 namespace { static const int kMaxLineLength = 512; }
+
+QString PartitionInfo::toString() const
+{
+    return nx::utils::log::makeMessage("%1 -> %2 %3 %4/%5%6",
+        devName, path, fsName, freeBytes, sizeBytes, isUsb ? " usb" : "");
+}
 
 SystemError::ErrorCode readPartitionsInformation(
     AbstractPartitionsInformationProvider* partitionsInfoProvider,
@@ -37,16 +44,10 @@ SystemError::ErrorCode readPartitionsInformation(
         char cDevName[kMaxLineLength];
         char cPath[kMaxLineLength];
         char cFSName[kMaxLineLength];
-        if (partitionsInfoProvider->isScanfLongPattern())
+        if (sscanf(line.constData(), "%s %s %s ", cDevName, cPath, cFSName) != 3)
         {
-            char cTmp[kMaxLineLength];
-            if (sscanf(line.constData(), "%s %s %s %s %s ", cDevName, cTmp, cPath, cTmp, cFSName) != 5)
-                continue; /* Skip unrecognized lines. */
-        }
-        else
-        {
-            if (sscanf(line.constData(), "%s %s %s ", cDevName, cPath, cFSName) != 3)
-                continue; /* Skip unrecognized lines. */
+            NX_DEBUG(NX_SCOPE_TAG, "Skip unrecognized line: %1", line);
+            continue;
         }
 
         decodeOctalEncodedPath(cPath);
@@ -70,16 +71,17 @@ SystemError::ErrorCode readPartitionsInformation(
 
         partitionInfo.fsName = QString::fromLatin1(std::get<fsType>(pathInfo));
         partitionInfo.sizeBytes = partitionsInfoProvider->totalSpace(std::get<fsPath>(pathInfo));
-        if (partitionInfo.sizeBytes == -1)
-            continue;
 
-        partitionInfo.freeBytes = partitionsInfoProvider->freeSpace(std::get<fsPath>(pathInfo));
-        if (partitionInfo.freeBytes == -1)
+        if (partitionInfo.sizeBytes == -1 || partitionInfo.freeBytes == -1)
+        {
+            NX_DEBUG(NX_SCOPE_TAG, "Skip partition %1", partitionInfo);
             continue;
+        }
 
         partitionInfoList->emplace_back(std::move(partitionInfo));
     }
 
+    NX_DEBUG(NX_SCOPE_TAG, "Return %1", containerString(*partitionInfoList));
     return SystemError::noError;
 }
 

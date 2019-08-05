@@ -1,8 +1,8 @@
 #pragma once
 
-namespace nx {
-namespace network {
-namespace cloud {
+#include <nx/fusion/model_functions_fwd.h>
+
+namespace nx::network::cloud {
 
 enum class ConnectType
 {
@@ -14,6 +14,6 @@ enum class ConnectType
     all = forwardedTcpPort | udpHp | tcpHp | proxy,
 };
 
-} // namespace cloud
-} // namespace network
-} // namespace nx
+} // namespace nx::network::cloud
+
+QN_FUSION_DECLARE_FUNCTIONS(nx::network::cloud::ConnectType, (lexical), NX_NETWORK_API)

@@ -209,6 +209,7 @@ CameraDiagnostics::Result QnPlIsdResource::initializeCameraDriver()
 
     setProperty(ResourcePropertyKey::kIsAudioSupported, 1);
     //setMotionType( Qn::MotionType::MT_SoftwareGrid );
+    setCameraCapability(Qn::CameraTimeCapability, true);
     saveProperties();
 
     return CameraDiagnostics::NoErrorResult();

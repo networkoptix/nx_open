@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QtCore/QString>
+
 namespace nx::analytics {
 
 static const QString kPluginDescriptorsProperty("pluginDescriptors");

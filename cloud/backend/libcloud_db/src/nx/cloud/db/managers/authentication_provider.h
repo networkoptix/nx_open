@@ -37,7 +37,7 @@ class AuthenticationProvider:
 public:
     AuthenticationProvider(
         const conf::Settings& settings,
-        nx::sql::AsyncSqlQueryExecutor* sqlQueryExecutor,
+        nx::sql::AbstractAsyncSqlQueryExecutor* sqlQueryExecutor,
         AbstractAccountManager* accountManager,
         AbstractSystemSharingManager* systemSharingManager,
         const AbstractTemporaryAccountPasswordManager& temporaryAccountCredentialsManager,
@@ -79,7 +79,7 @@ private:
     };
 
     const conf::Settings& m_settings;
-    nx::sql::AsyncSqlQueryExecutor* m_sqlQueryExecutor;
+    nx::sql::AbstractAsyncSqlQueryExecutor* m_sqlQueryExecutor;
     AbstractAccountManager* m_accountManager;
     AbstractSystemSharingManager* m_systemSharingManager;
     const AbstractTemporaryAccountPasswordManager& m_temporaryAccountCredentialsManager;

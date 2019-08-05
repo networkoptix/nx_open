@@ -73,8 +73,8 @@ QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget* parent):
             tr("Time Synchronization"));
     }
 
-    addPage(CloudManagement,        new QnCloudManagementWidget(this),      nx::network::AppInfo::cloudName());
-    addPage(Analytics,              new AnalyticsSettingsWidget(this),      tr("Analytics"));
+    addPage(CloudManagement, new QnCloudManagementWidget(this), nx::network::AppInfo::cloudName());
+    addPage(Analytics, new AnalyticsSettingsWidget(this), tr("Plugins"));
 
     loadDataToUi();
     autoResizePagesToContents(ui->tabWidget, {QSizePolicy::Preferred, QSizePolicy::Preferred}, true);

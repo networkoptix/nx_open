@@ -108,9 +108,9 @@
                                 <a ng-if="!mode.liteClient"
                                    ng-href="{{Config.cloud.portalUrl}}"
                                    target="_blank">Learn more</a></uib-alert>
-                            <uib-alert type="error" ng-if="!hasInternetOnServer">Připojte server k Internetu a proveďte nastavení {{Config.cloud.productName}}</uib-alert>
-                            <uib-alert type="error" ng-if="hasInternetOnServer && !hasInternetOnClient">Připojení k Internetu je vyžadované pro připojení systému k {{Config.cloud.productName}}</uib-alert>
-                            <p ng-if="canConnectToCloud"  ><button
+                            <uib-alert type="danger" ng-if="!hasInternetOnServer">Připojte server k Internetu a proveďte nastavení {{Config.cloud.productName}}</uib-alert>
+                            <uib-alert type="danger" ng-if="hasInternetOnServer && !hasInternetOnClient">Připojení k Internetu je vyžadované pro připojení systému k {{Config.cloud.productName}}</uib-alert>
+                            <p ng-if="canConnectToCloud"><button
                                     class="btn btn-default"
                                     ng-click="connectToCloud()" ng-disabled="!hasInternetOnServer || !hasInternetOnClient">Připojit k {{Config.cloud.productName}}</button>
                                 <a ng-if="!mode.liteClient"  class="btn btn-default"
@@ -121,12 +121,12 @@
 
 
                     <div>
-                        <h3>Traffic encryption</h3>
+                        <h3>Šifrovaný přenos</h3>
                         <form novalidate name="trafficSettingsForm" class="form-horizontal" role="form" >
                             <div class="checkbox">
                                 <label>
                                     <input type="checkbox" ng-model="trafficSettings.trafficEncryptionForced"
-                                           ng-change="checkTrafficEncryption()"> Force Traffic Encryption
+                                           ng-change="checkTrafficEncryption()"> Vynutit šifrovaný přenos
                                 </label>
                             </div>
                             <div class="checkbox">
@@ -134,7 +134,7 @@
                                     <input type="checkbox"
                                            ng-disabled="!trafficSettings.trafficEncryptionForced"
                                            ng-model="trafficSettings.videoTrafficEncryptionForced">
-                                    Force Video Traffic Encryption
+                                    Vynutit šifrovaný video přenos
                                 </label>
                             </div>
                             <button type="button" class="btn btn-primary" ng-click="saveTrafficSettings()">Uložit</button>

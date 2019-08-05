@@ -22,7 +22,7 @@ class CustomerManager
 {
 public:
     CustomerManager(
-        SyncronizationEngine* syncronizationEngine,
+        SynchronizationEngine* synchronizationEngine,
         dao::CustomerDao* customerDao,
         const std::string& systemId);
     ~CustomerManager();
@@ -42,7 +42,7 @@ public:
         nx::utils::MoveOnlyFunc<void(ResultCode, Customers /*customers*/)> handler);
 
 private:
-    SyncronizationEngine* m_syncronizationEngine = nullptr;
+    SynchronizationEngine* m_synchronizationEngine = nullptr;
     dao::CustomerDao* m_customerDao = nullptr;
     const std::string m_systemId;
 

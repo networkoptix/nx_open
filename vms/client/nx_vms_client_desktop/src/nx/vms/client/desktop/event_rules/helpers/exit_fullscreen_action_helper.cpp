@@ -28,10 +28,7 @@ QnLayoutResourceList getLayoutsInternal(const QnBusinessRuleViewModel* model)
 
 QSet<QnUuid> toIds(const QnResourceList& resources)
 {
-    QSet<QnUuid> result;
-    for (const auto& resource: resources)
-        result.insert(resource->getId());
-    return result;
+    return resources.ids().toSet();
 }
 
 } // namespace

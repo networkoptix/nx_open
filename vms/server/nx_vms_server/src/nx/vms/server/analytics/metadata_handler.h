@@ -18,9 +18,12 @@
 
 #include <nx/sdk/analytics/i_object_metadata_packet.h>
 #include <nx/sdk/analytics/i_event_metadata_packet.h>
+#include <nx/sdk/analytics/i_object_track_best_shot_packet.h>
 
 #include <nx/debugging/abstract_visual_metadata_debugger.h>
 #include <nx/vms/server/server_module_aware.h>
+
+#include <nx/analytics/metadata_logger.h>
 
 class QnAbstractDataReceptor;
 
@@ -35,12 +38,12 @@ class MetadataHandler:
 public:
     using DescriptorMap = std::map<QString, nx::vms::api::analytics::EventTypeDescriptor>;
 
-    MetadataHandler(QnMediaServerModule* serverModule);
+    MetadataHandler(
+        QnMediaServerModule* serverModule,
+        QnVirtualCameraResourcePtr device,
+        QnUuid engineId);
 
     void handleMetadata(nx::sdk::analytics::IMetadataPacket* metadataPacket);
-
-    void setResource(QnVirtualCameraResourcePtr resource);
-    void setEngineId(QnUuid pluginId);
     void setEventTypeDescriptors(DescriptorMap descriptors);
     void setMetadataSink(QnAbstractDataReceptor* metadataSink);
     void removeMetadataSink(QnAbstractDataReceptor* metadataSink);
@@ -64,6 +67,10 @@ private:
     void handleObjectMetadataPacket(
         const nx::sdk::Ptr<nx::sdk::analytics::IObjectMetadataPacket>& objectMetadataPacket);
 
+    void handleObjectTrackBestShotPacket(
+        const nx::sdk::Ptr<nx::sdk::analytics::IObjectTrackBestShotPacket>&
+            objectTrackBestShotPacket);
+
     void handleEventMetadata(
         const nx::sdk::Ptr<const nx::sdk::analytics::IEventMetadata>& eventMetadata,
         qint64 timestampUsec);
@@ -75,6 +82,7 @@ private:
     QMap<QString, nx::vms::api::EventState> m_eventStateMap;
     QnAbstractDataReceptor* m_metadataSink = nullptr;
     nx::debugging::AbstractVisualMetadataDebugger* m_visualDebugger = nullptr;
+    nx::analytics::MetadataLogger m_metadataLogger;
 };
 
 } // namespace nx::vms::server::analytics

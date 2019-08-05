@@ -32,13 +32,14 @@ signals:
     void progress(const UploadState&);
 
 private:
+    // TODO: Move to PIMPL.
     void emitProgress();
     void handleStop();
     void handleError(const QString& message);
     void handleMd5Calculated();
 
     void handleUpload();
-    void handleChunkUploaded(bool success);
+    void handleChunkUploaded(bool success, int chunkIndex);
     void handleAllUploaded();
     void handleCheckFinished(bool success, bool ok);
     void handleFileUploadCreated(bool success, RemoteResult code, QString error);

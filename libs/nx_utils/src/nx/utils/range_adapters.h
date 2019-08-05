@@ -1,12 +1,10 @@
 #pragma once
 
 #include <iterator>
-#include <functional>
-#include <utility>
-
-#include <nx/utils/log/assert.h>
 
 namespace nx::utils {
+
+// TODO: Add comments with usage examples.
 
 template<typename BeginType, typename EndType>
 class RangeAdapter

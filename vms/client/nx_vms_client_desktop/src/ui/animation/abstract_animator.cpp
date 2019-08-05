@@ -1,7 +1,10 @@
 #include "abstract_animator.h"
-#include <cassert>
+
 #include <QtCore/QMetaType>
 #include <QtCore/QVariant>
+
+#include <nx/utils/log/assert.h>
+
 #include <utils/common/warnings.h>
 
 namespace {
@@ -10,16 +13,10 @@ namespace {
     int minimalDurationMSec = 17;
 }
 
-AbstractAnimator::AbstractAnimator(QObject *parent):
-    QObject(parent),
-    m_group(NULL),
-    m_state(Stopped),
-    m_timeLimitMSec(-1),
-    m_durationOverride(-1),
-    m_durationValid(false),
-    m_duration(-1),
-    m_currentTime(0)
-{}
+AbstractAnimator::AbstractAnimator(QObject* parent):
+    QObject(parent)
+{
+}
 
 AbstractAnimator::~AbstractAnimator() {
     NX_ASSERT(isStopped()); /* Derived class must be sure to stop the animation in its destructor. */

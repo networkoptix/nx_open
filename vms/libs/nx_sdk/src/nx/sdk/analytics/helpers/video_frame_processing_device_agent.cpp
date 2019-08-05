@@ -1,3 +1,5 @@
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+
 #include "video_frame_processing_device_agent.h"
 
 #define NX_PRINT_PREFIX (this->logUtils.printPrefix)
@@ -70,7 +72,8 @@ VideoFrameProcessingDeviceAgent::~VideoFrameProcessingDeviceAgent()
 Error VideoFrameProcessingDeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
-    m_handler = handler;
+    handler->addRef();
+    m_handler.reset(handler);
     return Error::noError;
 }
 
@@ -159,41 +162,8 @@ void VideoFrameProcessingDeviceAgent::processMetadataPacket(
         return;
     }
 
-    if (NX_DEBUG_ENABLE_OUTPUT)
-    {
-        std::string packetName;
-        if (queryInterfacePtr<IObjectMetadataPacket>(metadataPacket))
-        {
-            packetName = "Object";
-        }
-        else if (queryInterfacePtr<IEventMetadataPacket>(metadataPacket))
-        {
-            packetName = "Event";
-        }
-        else
-        {
-            NX_OUTPUT << __func__ << "(): WARNING: Metadata packet" << packetIndexName
-                << " has unknown type.";
-            packetName = "Unknown";
-        }
-        packetName += " metadata packet" + packetIndexName;
-
-        if (metadataPacket->count() == 0)
-            NX_OUTPUT << __func__ << "(): WARNING: " << packetName << " is empty.";
-
-        const std::string itemsName = (metadataPacket->count() == 1)
-            ? (std::string("item of type ") + metadataPacket->at(0)->typeId())
-            : "item(s)";
-
-        NX_OUTPUT << __func__ << "(): " << packetName << " contains "
-            << metadataPacket->count() << " " << itemsName << ".";
-
-        if (metadataPacket->timestampUs() == 0)
-            NX_OUTPUT << __func__ << "(): WARNING: " << packetName << " has timestamp 0.";
-    }
-
+    logMetadataPacketIfNeeded(metadataPacket, packetIndexName);
     NX_KIT_ASSERT(metadataPacket->timestampUs() >= 0);
-
     m_handler->handleMetadata(metadataPacket);
 }
 
@@ -245,7 +215,7 @@ void VideoFrameProcessingDeviceAgent::pushPluginEvent(
 }
 
 // TODO: Consider making a template with param type, checked according to the manifest.
-std::string VideoFrameProcessingDeviceAgent::getParamValue(const char* paramName)
+std::string VideoFrameProcessingDeviceAgent::getParamValue(const std::string& paramName)
 {
     return m_settings[paramName];
 }
@@ -257,6 +227,51 @@ void VideoFrameProcessingDeviceAgent::assertEngineCasted(void* engine) const
         "nx::sdk::analytics::VideoFrameProcessingDeviceAgent "
         + nx::kit::utils::toString(this)
         + " has m_engine of incorrect runtime type " + typeid(*m_engine).name());
+}
+
+void VideoFrameProcessingDeviceAgent::logMetadataPacketIfNeeded(
+    const IMetadataPacket* metadataPacket,
+    const std::string& packetIndexName) const
+{
+    if (!NX_DEBUG_ENABLE_OUTPUT)
+        return;
+
+    std::string packetName;
+    if (queryInterfacePtr<const IObjectMetadataPacket>(metadataPacket))
+    {
+        packetName = "Object";
+    }
+    else if (queryInterfacePtr<const IEventMetadataPacket>(metadataPacket))
+    {
+        packetName = "Event";
+    }
+    else
+    {
+        NX_OUTPUT << __func__ << "(): WARNING: Metadata packet" << packetIndexName
+            << " has unknown type.";
+        packetName = "Unknown";
+    }
+    packetName += " metadata packet" + packetIndexName;
+
+    auto compoundMetadataPacket = queryInterfacePtr<const ICompoundMetadataPacket>(metadataPacket);
+    if (compoundMetadataPacket)
+    {
+        if (compoundMetadataPacket->count() == 0)
+        {
+            NX_OUTPUT << __func__ << "(): WARNING: " << packetName << " is empty.";
+            return;
+        }
+
+        const std::string itemsName = (compoundMetadataPacket->count() == 1)
+            ? (std::string("item of type ") + toPtr(compoundMetadataPacket->at(0))->typeId())
+            : "item(s)";
+
+        NX_OUTPUT << __func__ << "(): " << packetName << " contains "
+            << compoundMetadataPacket->count() << " " << itemsName << ".";
+
+        if (metadataPacket->timestampUs() == 0)
+            NX_OUTPUT << __func__ << "(): WARNING: " << packetName << " has timestamp 0.";
+    }
 }
 
 } // namespace analytics

@@ -1,5 +1,7 @@
 #include "rtsp_perf.h"
 
+#include <random>
+
 #include <nx/streaming/rtsp_client.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/http/custom_headers.h>
@@ -143,7 +145,7 @@ void RtspPerf::run()
                 ++successSessions;
         }
         float bitrate = bitrateCounter.update(totalBytesRead);
-        NX_ALWAYS(this, "Total bitrate %1 MBit/s, worked sessions %2, failed %3, bytes read %4",
+        NX_INFO(this, "Total bitrate %1 MBit/s, worked sessions %2, failed %3, bytes read %4",
             QString::number(bitrate, 'f', 3), successSessions, std::max<int64_t>(m_totalFailed, 0), totalBytesRead);
     }
 }
@@ -168,7 +170,7 @@ void RtspPerf::Session::run(const QString& url, const Config& config, bool live)
     QnRtspClient rtspClient(rtspConfig);
     rtspClient.setTCPTimeout(config.timeout);
     rtspClient.setAuth(auth, nx::network::http::header::AuthScheme::basic);
-    rtspClient.setTransport(RtspTransport::tcp);
+    rtspClient.setTransport(nx::vms::api::RtpTransportType::tcp);
     rtspClient.setAdditionAttribute(Qn::EC2_INTERNAL_RTP_FORMAT, "1");
     CameraDiagnostics::Result result = rtspClient.open(url);
     if (result.errorCode != 0)

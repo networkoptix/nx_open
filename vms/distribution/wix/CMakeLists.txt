@@ -31,23 +31,17 @@ add_subdirectory(custom_actions)
 nx_copy_bin_resources(${CMAKE_CURRENT_SOURCE_DIR}/resources ${CMAKE_CURRENT_BINARY_DIR})
 nx_configure_directory(${CMAKE_CURRENT_SOURCE_DIR}/resources.in ${CMAKE_CURRENT_BINARY_DIR})
 
+nx_generate_package_json(${client_update_files_directory}/package.json
+    COMPONENT client)
+nx_generate_package_json(${server_update_files_directory}/package.json
+    INSTALL_SCRIPT "install.bat")
+
 file(WRITE ${bin_source_dir}/launcher.version "${releaseVersion.full}")
 file(COPY "${CMAKE_SOURCE_DIR}/vms/libs/common/maven/bin-resources/resources/qt/etc/qt.conf"
     DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
 
 set(config_file "${CMAKE_CURRENT_BINARY_DIR}/config.yaml")
 nx_configure_file("${CMAKE_CURRENT_SOURCE_DIR}/config.yaml" "${config_file}")
-
-message(STATUS "Generating license")
-execute_process(
-    COMMAND pandoc -s ${customization.dir}/license.html -o ${CMAKE_CURRENT_BINARY_DIR}/license.rtf
-    WORKING_DIRECTORY ${pandoc_directory}/bin
-    RESULT_VARIABLE pandoc_result
-)
-
-if(NOT pandoc_result STREQUAL "0")
-    message(FATAL_ERROR "error: License generation failed")
-endif()
 
 if (withMediaServer OR withDesktopClient)
     add_custom_target(distribution_wix ALL
@@ -86,12 +80,12 @@ if(withNxTool)
             nxtool
             wix_custom_actions
         COMMENT "Collecting NxTool QML libraries..."
-        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/scripts
-        COMMAND ${PYTHON_EXECUTABLE} collect_qml_dependencies.py
-            "--config" ${config_file}
-            "--source" ${nxtool_executable}
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/build_utils/python
+        COMMAND ${PYTHON_EXECUTABLE} qmldeploy.py
             "--qml-root" ${nxtool_qml_root}
+            "--qt-root" ${qt.dir}
             "--output" ${nxtool_qml_dir}
+            "--skip-styles"
         )
 
     add_custom_target(create_nxtool_installer ALL
@@ -108,19 +102,19 @@ if(withNxTool)
 endif()
 
 if(withDesktopClient)
-    set(desktop_client_qml_root "${CMAKE_SOURCE_DIR}/vms/client/nx_vms_client_desktop/static-resources/qml/")
-    set(desktop_client_executable "${bin_source_dir}/nx_vms_client_desktop.dll")
+    set(desktop_client_qml_root "${CMAKE_SOURCE_DIR}/vms/client/nx_vms_client_desktop/qml/")
 
     add_custom_target(collect_qml_dependencies
         DEPENDS
             desktop_client
         COMMENT "Collecting QML libraries..."
-        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/scripts
-        COMMAND ${PYTHON_EXECUTABLE} collect_qml_dependencies.py
-            "--config" ${config_file}
-            "--source" ${desktop_client_executable}
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/build_utils/python
+        COMMAND ${PYTHON_EXECUTABLE} qmldeploy.py
             "--qml-root" ${desktop_client_qml_root}
+            "--qt-root" ${qt.dir}
             "--output" ${client_qml_dir}
+            "--prefer-compiled"
+            "--skip-styles"
         )
     add_dependencies(distribution_wix collect_qml_dependencies applauncher minilauncher)
 
@@ -177,6 +171,7 @@ if(withDesktopClient OR withMediaServer OR withTestCamera)
             nx_utils
             nx_vms_utils
             nx_vms_api
+            nx_vms_rules
             nx_kit
             udt
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/scripts
@@ -207,7 +202,6 @@ if(withClouds)
             cloud_connect_test_util
             cloud_db
             connection_mediator
-            vms_gateway
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/scripts
         COMMAND ${PYTHON_EXECUTABLE} generate_cloud_debug_package.py
             "--config" ${config_file}

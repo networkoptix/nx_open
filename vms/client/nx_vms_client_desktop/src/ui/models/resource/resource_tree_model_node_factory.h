@@ -10,7 +10,7 @@
 
 class QnResourceTreeModelNodeFactory
 {
-    using NodeType = nx::vms::client::desktop::ResourceTreeNodeType;
+    using NodeType = nx::vms::client::desktop::ResourceTree::NodeType;
 public:
     static QnResourceTreeModelNodePtr createNode(
         NodeType nodeType,

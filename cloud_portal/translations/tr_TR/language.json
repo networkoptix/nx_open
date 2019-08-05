@@ -5,12 +5,20 @@
   "clientProtocol": "%CLIENT_PROTOCOL%:",
   "dialogs": {
     "okButton": "Tamam",
-    "cancelButton": "İptal",
+    "cancelButton": "Vazgeç",
     "loginTitle": "%PRODUCT_NAME% e giriş yapın",
     "loginButton": "Giriş yap",
     "logoutAuthorisedTitle": "Zaten giriş yapılmış",
     "logoutAuthorisedContinueButton": "Devam et",
-    "logoutAuthorisedLogoutButton": "Oturumu Kapat"
+    "logoutAuthorisedLogoutButton": "Oturumu Kapat",
+    "messageFailed": "Message has failed to send.",
+    "messageSent": "Message has been sent."
+  },
+  "messageType": {
+    "ipvd_feedback": "Feedback about {{product}}",
+    "sales_inquiry": "Inquiry for {{product}}",
+    "request_support": "Request Support for {{product}}",
+    "unknown": "Unknown Message Type"
   },
   "pageTitles": {
     "template": "{{title}} %PRODUCT_NAME%",
@@ -37,8 +45,9 @@
     "pageNotFound": "Sayfa bulunamadı"
   },
   "systemStatuses": {
-    "notActivated": "aktif edilmemiş",
     "activated": "aktif edildi",
+    "merging": "merging",
+    "notActivated": "aktif edilmemiş",
     "online": "çevrimiçi",
     "offline": "çevrimdışı",
     "unavailable": "kullanılamaz"
@@ -139,7 +148,8 @@
     "thisSystem": "sistem",
     "oldSafariNotSupported": "Safari 10'dan büyük sürümleri desteklenmez",
     "DUPLICATE_MEDIASERVER_FOUND": "Duplicate servers were found on one of the systems.<br>Remove old servers from each system that you are trying to merge and try again.",
-    "mergedSystemIsOffline": "One of the systems being merged is offline. Make sure they are online and try again."
+    "mergedSystemIsOffline": "One of the systems being merged is offline. Make sure they are online and try again.",
+    "INCOMPATIBLE": "Versions for systems are incompatible. To fix this problem make sure the systems have the same version."
   },
   "passwordRequirements": {
     "good": "iyi",
@@ -186,7 +196,8 @@
     "successDisconnected": "Sistem %PRODUCT_NAME%'den başarıyla çıkarıldı",
     "successDeleted": "{{systemName}} sistemi hesabınızdan başarıyla silindi",
     "successMerge": "System merge completed",
-    "permissionsRemoved": "İzinler {{email}}'den kaldırıldı"
+    "permissionsRemoved": "İzinler {{email}}'den kaldırıldı",
+    "unknownName": "Unknown Name for System (Caused by cloud merge)"
   },
   "account": {
     "accountSavedSuccess": "Hesabınız başarıyla kaydedildi",

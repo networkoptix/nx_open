@@ -17,7 +17,8 @@ static void givenCorrectHeaders(Message* message)
     headers.emplace("Upgrade", "websocket");
 }
 
-static void givenCorrectRequestHeaders(nx::network::http::Request* request)
+static void givenCorrectRequestHeaders(
+    nx::network::http::Request* request, CompressionType compressionType = CompressionType::none)
 {
     givenCorrectHeaders(request);
 
@@ -27,6 +28,9 @@ static void givenCorrectRequestHeaders(nx::network::http::Request* request)
     headers.emplace("Sec-WebSocket-Key", kSecKey);
     headers.emplace("Sec-WebSocket-Protocol", "test");
     headers.emplace("Sec-WebSocket-Version", "13");
+
+    if (compressionType == CompressionType::perMessageDeflate)
+        headers.emplace("Sec-WebSocket-Extensions", "permessage-deflate");
 }
 
 static void givenCorrectRequestLine(nx::network::http::Request* request)
@@ -93,6 +97,21 @@ TEST(WebsocketHandshake, validateRequest_response)
     givenCorrectRequestLine(&request);
     givenCorrectRequestHeaders(&request);
 
+    nx::network::http::Response response;
+    ASSERT_EQ(validateRequest(request, &response), Error::noError);
+
+    ASSERT_EQ(response.headers.find("Sec-WebSocket-Protocol")->second, "test");
+    ASSERT_EQ(response.headers.find("Sec-WebSocket-Accept")->second,
+        detail::makeAcceptKey(request.headers.find("Sec-WebSocket-Key")->second));
+
+    ASSERT_EQ(response.headers.find("Sec-WebSocket-Extensions"), response.headers.cend());
+}
+
+TEST(WebsocketHandshake, validateRequest_response_Compression)
+{
+    nx::network::http::Request request;
+    givenCorrectRequestLine(&request);
+    givenCorrectRequestHeaders(&request, CompressionType::perMessageDeflate);
 
     nx::network::http::Response response;
     ASSERT_EQ(validateRequest(request, &response), Error::noError);
@@ -100,19 +119,32 @@ TEST(WebsocketHandshake, validateRequest_response)
     ASSERT_EQ(response.headers.find("Sec-WebSocket-Protocol")->second, "test");
     ASSERT_EQ(response.headers.find("Sec-WebSocket-Accept")->second,
         detail::makeAcceptKey(request.headers.find("Sec-WebSocket-Key")->second));
+
+    ASSERT_EQ(response.headers.find("Sec-WebSocket-Extensions")->second, "permessage-deflate");
 }
 
 TEST(WebsocketHandshake, addClientHeaders)
 {
     nx::network::http::Request request;
-    addClientHeaders(&request.headers, "test");
+    addClientHeaders(&request.headers, "test", CompressionType::none);
 
     ASSERT_EQ(request.headers.find("Connection")->second, "Upgrade");
     ASSERT_EQ(request.headers.find("Upgrade")->second, "websocket");
     ASSERT_NE(request.headers.find("Sec-WebSocket-Key")->second.size(), 0);
     ASSERT_EQ(request.headers.find("Sec-WebSocket-Protocol")->second, "test");
     ASSERT_EQ(request.headers.find("Sec-WebSocket-Version")->second, "13");
+
+    ASSERT_EQ(request.headers.find("Sec-WebSocket-Extensions"), request.headers.cend());
 }
+
+TEST(WebsocketHandshake, addClientHeaders_Compression)
+{
+    nx::network::http::Request request;
+    addClientHeaders(&request.headers, "test", CompressionType::perMessageDeflate);
+
+    ASSERT_EQ(request.headers.find("Sec-WebSocket-Extensions")->second, "permessage-deflate");
+}
+
 
 TEST(WebsocketHandshake, validateResponse)
 {

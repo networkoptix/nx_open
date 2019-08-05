@@ -10,7 +10,15 @@
     "loginButton": "התחבר",
     "logoutAuthorisedTitle": "אתה כבר מחובר",
     "logoutAuthorisedContinueButton": "המשך",
-    "logoutAuthorisedLogoutButton": "יציאה"
+    "logoutAuthorisedLogoutButton": "יציאה",
+    "messageFailed": "Message has failed to send.",
+    "messageSent": "Message has been sent."
+  },
+  "messageType": {
+    "ipvd_feedback": "Feedback about {{product}}",
+    "sales_inquiry": "Inquiry for {{product}}",
+    "request_support": "Request Support for {{product}}",
+    "unknown": "Unknown Message Type"
   },
   "pageTitles": {
     "template": "{{title}} %PRODUCT_NAME%",
@@ -37,8 +45,9 @@
     "pageNotFound": "דף לא נמצא"
   },
   "systemStatuses": {
-    "notActivated": "לא הופעל",
     "activated": "הופעל",
+    "merging": "merging",
+    "notActivated": "לא הופעל",
     "online": "מקוון",
     "offline": "לא מקוון",
     "unavailable": "לא זמין"
@@ -139,7 +148,8 @@
     "thisSystem": "המערכת",
     "oldSafariNotSupported": "גרסאות של Safari מתחת ל 10 אינן נתמכות",
     "DUPLICATE_MEDIASERVER_FOUND": "שרתים כפולים נמצאו באחת המערכות.<br>הסר שרתים ישנים מכל מערכת שאתה מנסה למזג ונסה שוב.",
-    "mergedSystemIsOffline": "אחת המערכות הממוזגות אינה מקוונת. ודא שהן מקוונות ונסה שוב."
+    "mergedSystemIsOffline": "אחת המערכות הממוזגות אינה מקוונת. ודא שהן מקוונות ונסה שוב.",
+    "INCOMPATIBLE": "Versions for systems are incompatible. To fix this problem make sure the systems have the same version."
   },
   "passwordRequirements": {
     "good": "טוב",
@@ -182,11 +192,12 @@
     "confirmUnshareFromMeAction": "התנתק",
     "confirmUnshare": "משתמש זה לא יוכל לגשת למערכת. האם אתה בטוח?",
     "confirmUnshareTitle": "מחק משתמש?",
-    "confirmUnshareAction": "מחיקה",
+    "confirmUnshareAction": "מחק",
     "successDisconnected": "המערכת מנותקת בהצלחה מ- %PRODUCT_NAME%",
     "successDeleted": "המערכת {{systemName}} נמחקה בהצלחה מהחשבון שלך",
     "successMerge": "מיזוג המערכת הושלם",
-    "permissionsRemoved": "ההרשאות הוסרו מ- {{email}}"
+    "permissionsRemoved": "ההרשאות הוסרו מ- {{email}}",
+    "unknownName": "Unknown Name for System (Caused by cloud merge)"
   },
   "account": {
     "accountSavedSuccess": "החשבון שלך נשמר בהצלחה",

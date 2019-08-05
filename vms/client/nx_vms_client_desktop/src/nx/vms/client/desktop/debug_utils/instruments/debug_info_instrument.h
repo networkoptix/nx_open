@@ -1,5 +1,6 @@
 #pragma once
 
+#include <QtCore/QVector>
 #include <QtCore/QObject>
 #include <QtCore/QString>
 #include <QtGui/QPaintEvent>
@@ -17,8 +18,10 @@ public:
     explicit DebugInfoInstrument(QObject* parent = nullptr);
     virtual ~DebugInfoInstrument() override;
 
+    std::vector<qint64> getFrameTimePoints();
+
 signals:
-    void debugInfoChanged(const QString& text);
+    void debugInfoChanged(const QString& richText);
 
 protected:
     virtual void enabledNotify() override;

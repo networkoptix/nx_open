@@ -1,7 +1,7 @@
 import {
     Component, OnInit, ViewEncapsulation,
     Input, forwardRef, OnChanges, SimpleChanges, ViewChild, ElementRef, Output, EventEmitter
-} from '@angular/core';
+}                                                  from '@angular/core';
 import { TranslateService }                        from '@ngx-translate/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
@@ -9,13 +9,15 @@ const noop = () => {
 };
 
 /* Usage
- <nx-multi-select name="permissions"
+ <nx-multi-select
+     name="permissions"
      canSelectAll?
+     canSearch?
      description="Roles"
      [items]="[{label: 'a', id: 1}, {label: 'b', id:3}]"
      [ngModel]="[1, 3]"       <- selected items id's
      (ngModelChanged)="onChange(result)">
- </nx-select>
+ </nx-multi-select>
  */
 
 @Component({
@@ -35,11 +37,13 @@ const noop = () => {
 export class NxMultiSelectDropdown implements OnInit, ControlValueAccessor, OnChanges {
     @Input('items') itemsOrig: any;
     @Input() canSelectAll: any;
+    @Input() canSearch: any;
 
     private items: any;
     private show: boolean;
     private numSelected: string;
     private innerValue: any;
+    private filter: string;
 
     // Placeholders for the callbacks which are later provided
     // by the Control Value Accessor
@@ -48,20 +52,22 @@ export class NxMultiSelectDropdown implements OnInit, ControlValueAccessor, OnCh
 
     constructor(private translate: TranslateService) {
         this.show = false;
+        this.filter = '';
     }
 
     // TODO: Bind ngModel to the component and eliminate EventEmitter
 
     ngOnInit(): void {
         this.canSelectAll = (this.canSelectAll !== undefined);
+        this.canSearch = (this.canSearch !== undefined);
     }
 
-    selectAll() {
+    clearSelected() {
         this.items.forEach((item) => {
-            item.selected = true;
+            item.selected = false;
             const index = this.innerValue.indexOf(item.id);
-            if (index === -1) {
-                this.innerValue.push(item.id);
+            if (index > -1) {
+                this.innerValue.splice(index, 1);
             }
         });
 
@@ -74,19 +80,26 @@ export class NxMultiSelectDropdown implements OnInit, ControlValueAccessor, OnCh
     }
 
     change(evt, item) {
-        if (!evt.target.checked) {
-            const index = this.innerValue.indexOf(item.id);
-            if (index > -1) {
-                this.innerValue.splice(index, 1);
-            }
+        const index = this.innerValue.indexOf(item.id);
+        if (index > -1) {
+            this.innerValue.splice(index, 1);
         } else {
             this.innerValue.push(item.id);
         }
 
+        item.selected = (this.innerValue.indexOf(item.id) > -1);
         this.updateModel();
 
         // break anchor nav event
         return false;
+    }
+
+    applyLocalFilter(value) {
+        this.filter = value;
+
+        this.items = this.itemsOrig.filter((item) => {
+            return item.id.toLowerCase().includes(value.toLowerCase());
+        });
     }
 
     updateItems() {
@@ -99,13 +112,10 @@ export class NxMultiSelectDropdown implements OnInit, ControlValueAccessor, OnCh
     }
 
     updateLabel() {
-        switch (this.innerValue.length) {
-            case 0: {
-                this.numSelected = 'None selected';
-                break;
-            }
+        switch (this.innerValue && this.innerValue.length) {
+            case 0:
             case this.items.length: {
-                this.numSelected = 'All selected';
+                this.numSelected = 'Any';
                 break;
             }
             default: {

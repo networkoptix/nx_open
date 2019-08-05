@@ -117,8 +117,6 @@ public:
     QnResourceList lastDiscoveredResources() const;
     void addResourcesImmediatly(QnResourceList& resources);
 
-    static QnNetworkResourcePtr findSameResource(const QnNetworkResourcePtr& netRes);
-
     QThreadPool* threadPool();
     DiscoveryMode discoveryMode() const;
 public slots:

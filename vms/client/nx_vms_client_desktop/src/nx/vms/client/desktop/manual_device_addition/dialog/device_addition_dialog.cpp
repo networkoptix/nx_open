@@ -3,6 +3,7 @@
 #include "private/found_devices_model.h"
 #include "private/manual_device_searcher.h"
 #include "private/presented_state_delegate.h"
+#include "private/found_devices_delegate.h"
 
 #include <QtCore/QScopedValueRollback>
 
@@ -101,6 +102,32 @@ void DeviceAdditionDialog::initializeControls()
 
     ui->searchButton->setFocusPolicy(Qt::StrongFocus);
     ui->stopSearchButton->setFocusPolicy(Qt::StrongFocus);
+    ui->addDevicesButton->setFocusPolicy(Qt::StrongFocus);
+    ui->knownAddressAutoPortCheckBox->setFocusPolicy(Qt::StrongFocus);
+    ui->foundDevicesTable->setFocusPolicy(Qt::StrongFocus);
+
+    // Monitor focus and change accent button accodringly.
+    QWidget* const filteredWidgets[] = {
+        ui->searchButton,
+        ui->startAddressEdit,
+        ui->endAddressEdit,
+        ui->addressEdit->lineEdit(),
+        ui->knownAddressAutoPortCheckBox,
+        ui->knownAddressPortSpinBox,
+        ui->subnetScanAutoPortCheckBox,
+        ui->subnetScanPortSpinBox,
+        ui->loginEdit,
+        ui->passwordEdit,
+        ui->stopSearchButton,
+        ui->foundDevicesTable,
+        ui->addDevicesButton
+    };
+    for (auto widget: filteredWidgets)
+        widget->installEventFilter(this);
+
+    ui->searchButton->setAutoDefault(true);
+    ui->stopSearchButton->setAutoDefault(true);
+    ui->addDevicesButton->setAutoDefault(false);
 
     connect(ui->searchButton, &QPushButton::clicked,
         this, &DeviceAdditionDialog::handleStartSearchClicked);
@@ -133,15 +160,14 @@ void DeviceAdditionDialog::initializeControls()
 
     ui->addressEdit->setPlaceholderText(tr("IP / Hostname / RTSP link / UDP link"));
     ui->addressEdit->setExternalControls(ui->addressLabel, ui->addressHint);
-    ui->addressEdit->setHintColor(QPalette().color(QPalette::WindowText));
+    ui->addressEdit->setUseWarningStyleForControl(false);
     ui->addressHint->setVisible(false);
-    ui->explanationLabel->setPixmap(qnSkin->pixmap("buttons/context_info.png"));
-    ui->explanationLabel->setToolTip(tr("Examples:")
-        + lit("\n192.168.1.15\n"
-              "www.example.com:8080\n"
-              "http://example.com:7090/image.jpg\n"
-              "rtsp://example.com:554/video\n"
-              "udp://239.250.5.5:1234"));
+    ui->addressLabel->addHintLine(tr("Examples:"));
+    ui->addressLabel->addHintLine(lit("192.168.1.15"));
+    ui->addressLabel->addHintLine(lit("www.example.com:8080"));
+    ui->addressLabel->addHintLine(lit("http://example.com:7090/image.jpg"));
+    ui->addressLabel->addHintLine(lit("rtsp://example.com:554/video"));
+    ui->addressLabel->addHintLine(lit("udp://239.250.5.5:1234"));
 
     ui->widget->setFixedWidth(ui->addressLabelLayout->minimumSize().width());
     installEventHandler(ui->serverChoosePanel, QEvent::PaletteChange, ui->serverChoosePanel,
@@ -185,8 +211,7 @@ void DeviceAdditionDialog::initializeControls()
     setupPortStuff(ui->knownAddressAutoPortCheckBox, ui->knownAddressPortSpinWidget);
     setupPortStuff(ui->subnetScanAutoPortCheckBox, ui->subnetScanPortSpinWidget);
 
-    setAccentStyle(ui->searchButton);
-    setAccentStyle(ui->addDevicesButton);
+    setAddDevicesAccent(false);
 
     PasswordPreviewButton::createInline(ui->passwordEdit);
 
@@ -205,6 +230,29 @@ void DeviceAdditionDialog::initializeControls()
 
     setPaletteColor(ui->knownAddressPortPlaceholder, QPalette::Text, colorTheme()->color("dark14"));
     setPaletteColor(ui->subnetScanPortPlaceholder, QPalette::Text, colorTheme()->color("dark14"));
+}
+
+void DeviceAdditionDialog::setAddDevicesAccent(bool canAddDevices)
+{
+    const auto accentButton = canAddDevices ? ui->addDevicesButton : ui->searchButton;
+    const auto regularButton = accentButton == ui->addDevicesButton ? ui->searchButton : ui->addDevicesButton;
+
+    regularButton->setDefault(false);
+    resetButtonStyle(regularButton);
+
+    accentButton->setDefault(true);
+    setAccentStyle(accentButton);
+}
+
+bool DeviceAdditionDialog::eventFilter(QObject *object, QEvent *event)
+{
+    if (event->type() == QEvent::FocusIn)
+    {
+        const bool addDevicesFocus = object == ui->foundDevicesTable || object == ui->addDevicesButton;
+        const bool newDevicesPresent = m_model && m_model->deviceCount(FoundDevicesModel::notPresentedState) > 0;
+        setAddDevicesAccent(addDevicesFocus && newDevicesPresent);
+    }
+    return base_type::eventFilter(object, event);
 }
 
 void DeviceAdditionDialog::handleStartAddressFieldTextChanged(const QString& value)
@@ -319,6 +367,7 @@ void DeviceAdditionDialog::setupTable()
     const auto table = ui->foundDevicesTable;
 
     table->setCheckboxColumn(FoundDevicesModel::checkboxColumn);
+    table->setItemDelegate(new FoundDevicesDelegate(table));
     table->setPersistentDelegateForColumn(FoundDevicesModel::presentedStateColumn,
         new PresentedStateDelegate(table));
 }
@@ -648,16 +697,13 @@ void DeviceAdditionDialog::updateResultsWidgetState()
         const int current = status.total ? status.current : 0;
         ui->searchProgressBar->setMaximum(total);
         ui->searchProgressBar->setValue(current);
-        const auto text = m_currentSearch->searching()
+        const bool isSearching = m_currentSearch->searching();
+        const auto text = isSearching
             ? tr("Searching...")
             : tr("No devices found");
+        setAddDevicesAccent(isSearching);
         ui->placeholderLabel->setText(text.toUpper());
     }
-
-    if (empty)
-        setAccentStyle(ui->searchButton);
-    else
-        resetButtonStyle(ui->searchButton);
 
     const bool showSearchProgressControls = m_currentSearch && m_currentSearch->searching();
     ui->searchControls->setCurrentIndex(showSearchProgressControls ? 1 : 0);
@@ -718,12 +764,14 @@ void DeviceAdditionDialog::showAddDevicesButton(const QString& buttonText)
 {
     ui->addDevicesStackedWidget->setCurrentWidget(ui->addDevicesButtonPage);
     ui->addDevicesButton->setText(buttonText);
+    ui->foundDevicesTable->setFocus();
 }
 
 void DeviceAdditionDialog::showAddDevicesPlaceholder(const QString& placeholderText)
 {
     ui->addDevicesStackedWidget->setCurrentWidget(ui->addDevicesPlaceholderPage);
     ui->addDevicesPlaceholder->setText(placeholderText);
+    setAddDevicesAccent(false);
 }
 
 } // namespace nx::vms::client::desktop

@@ -57,11 +57,11 @@ Drawer
 
                     SystemInformationPanel
                     {
-                        visible: connectionManager.online
+                        visible: ConnectionController.online
                     }
                 }
 
-                model: connectionManager.online ? layoutsModel : undefined
+                model: ConnectionController.online ? layoutsModel : undefined
 
                 delegate: LayoutItem
                 {
@@ -105,7 +105,7 @@ Drawer
             {
                 anchors.fill: layoutsList
                 anchors.margins: 16
-                visible: connectionManager.connectionState === QnConnectionManager.Disconnected
+                visible: ConnectionController.disconnected
             }
 
             Column
@@ -118,14 +118,14 @@ Drawer
 
                 BottomSeparator
                 {
-                    visible: connectionManager.online
+                    visible: ConnectionController.online
                 }
 
                 SideNavigationButton
                 {
                     icon: lp("/images/plus.png")
                     text: qsTr("New connection")
-                    visible: connectionManager.connectionState === QnConnectionManager.Disconnected
+                    visible: ConnectionController.disconnected
                     onClicked:
                     {
                         bottomContent.enabled = false
@@ -140,7 +140,7 @@ Drawer
 
                     icon: lp("/images/disconnect.png")
                     text: qsTr("Disconnect from Server")
-                    visible: connectionManager.connectionState !== QnConnectionManager.Disconnected
+                    visible: !ConnectionController.disconnected
                     onClicked:
                     {
                         bottomContent.enabled = false

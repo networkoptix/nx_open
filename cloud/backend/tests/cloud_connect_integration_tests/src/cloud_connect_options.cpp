@@ -15,6 +15,18 @@ class CloudConnectOptionsServerSide:
 {
     using base_type = BasicTestFixture;
 
+public:
+    CloudConnectOptionsServerSide():
+        m_originalConnectionMethods(TunnelAcceptorFactory::instance().enabledConnectionMethods())
+    {
+    }
+
+    ~CloudConnectOptionsServerSide()
+    {
+        TunnelAcceptorFactory::instance().setEnabledConnectionMethods(
+            m_originalConnectionMethods);
+    }
+
 protected:
     void whenDisableUdpHolePunching()
     {
@@ -23,10 +35,12 @@ protected:
 
     void thenConnectionCanBeEstablished()
     {
-        assertConnectionCanBeEstablished();
+        assertCloudConnectionCanBeEstablished();
     }
 
 private:
+    const hpm::api::ConnectionMethods m_originalConnectionMethods;
+
     virtual void SetUp() override
     {
         base_type::SetUp();

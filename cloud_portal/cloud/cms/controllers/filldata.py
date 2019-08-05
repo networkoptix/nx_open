@@ -46,7 +46,7 @@ def process_context_structure(product, context, content, language,
     def replace_in(adict, key, value):
         for dict_key in adict.keys():
             itm_type = type(adict[dict_key])
-            if itm_type not in [str, unicode, dict, list]:
+            if itm_type not in [str, unicode, dict, list] or type(value) in [bool]:
                 continue
 
             if itm_type is list:

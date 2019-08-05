@@ -4,6 +4,8 @@
 
 #include <ui/graphics/items/standard/graphics_widget.h>
 
+class QnResourceWidget;
+
 namespace nx::vms::client::desktop {
 
 class AreaSelectOverlayWidget: public GraphicsWidget
@@ -12,7 +14,7 @@ class AreaSelectOverlayWidget: public GraphicsWidget
     using base_type = GraphicsWidget;
 
 public:
-    AreaSelectOverlayWidget(QGraphicsWidget* parent);
+    AreaSelectOverlayWidget(QGraphicsWidget* parent, QnResourceWidget* resourceWidget);
     virtual ~AreaSelectOverlayWidget() override;
 
     bool active() const;
@@ -25,7 +27,8 @@ public:
     void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) override;
 
 signals:
-    void selectedAreaChanged(const QRectF& selectedArea);
+    void selectionStarted(QPrivateSignal);
+    void selectedAreaChanged(const QRectF& selectedArea, QPrivateSignal);
 
 protected:
     virtual void mouseMoveEvent(QGraphicsSceneMouseEvent* event) override;

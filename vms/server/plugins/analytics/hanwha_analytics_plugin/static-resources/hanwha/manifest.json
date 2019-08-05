@@ -45,7 +45,7 @@
             "regionDescription": " the region #%1"
         },
         {
-            "id": "nx.hanwha.VideoAnalytics.AppearDisappear,VideoAnalytics.Appearing",
+            "id": "nx.hanwha.VideoAnalytics.AppearDisappear",
             "name": "Appearing in the area",
             "internalName": "VideoAnalytics.AppearDisappear,VideoAnalytics.Appearing",
             "description": "Object %1 ",
@@ -165,7 +165,7 @@
             "description": "Queue 1 level %1 ",
             "positiveState": "is high",
             "negativeState": "has decreased to medium",
-            "groupId": "{EC95485E-BC58-4A93-AED9-6A4FC6E4DC9B}"
+            "groupId": "nx.hanwha.Queue"
         },
         {
             "id": "nx.hanwha.Queue.1.Level.Medium",
@@ -174,7 +174,7 @@
             "description": "Queue 1 level %1",
             "positiveState": "is medium",
             "negativeState": "has decreased to low",
-            "groupId": "{EC95485E-BC58-4A93-AED9-6A4FC6E4DC9B}"
+            "groupId": "nx.hanwha.Queue"
         },
         {
             "id": "nx.hanwha.Queue.2.Level.High",
@@ -183,7 +183,7 @@
             "description": "Queue 2 level %1 ",
             "positiveState": "is high",
             "negativeState": "has decreased to medium",
-            "groupId": "{EC95485E-BC58-4A93-AED9-6A4FC6E4DC9B}"
+            "groupId": "nx.hanwha.Queue"
         },
         {
             "id": "nx.hanwha.Queue.2.Level.Medium",
@@ -192,7 +192,7 @@
             "description": "Queue 2 level %1",
             "positiveState": "is medium",
             "negativeState": "has decreased to low",
-            "groupId": "{EC95485E-BC58-4A93-AED9-6A4FC6E4DC9B}"
+            "groupId": "nx.hanwha.Queue"
         },
         {
             "id": "nx.hanwha.Queue.3.Level.High",
@@ -201,7 +201,7 @@
             "description": "Queue 3 level %1 ",
             "positiveState": "is high",
             "negativeState": "has decreased to medium",
-            "groupId": "{EC95485E-BC58-4A93-AED9-6A4FC6E4DC9B}"
+            "groupId": "nx.hanwha.Queue"
         },
         {
             "id": "nx.hanwha.Queue.3.Level.Medium",
@@ -210,12 +210,12 @@
             "description": "Queue 3 level %1",
             "positiveState": "is medium",
             "negativeState": "has decreased to low",
-            "groupId": "{EC95485E-BC58-4A93-AED9-6A4FC6E4DC9B}"
+            "groupId": "nx.hanwha.Queue"
         }
     ],
     "groups": [
         {
-            "id": "{EC95485E-BC58-4A93-AED9-6A4FC6E4DC9B}",
+            "id": "nx.hanwha.Queue",
             "name": "Queue"
         }
     ]

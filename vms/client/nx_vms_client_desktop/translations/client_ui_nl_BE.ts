@@ -41,7 +41,7 @@
     <message>
       <location/>
       <source>ARM support policy</source>
-      <translation type="unfinished">ARM support policy</translation>
+      <translation>ARM ondersteuningsbeleid</translation>
     </message>
   </context>
   <context>
@@ -320,7 +320,7 @@
     <message>
       <location/>
       <source>on the next day</source>
-      <translation type="unfinished">on the next day</translation>
+      <translation>de volgende dag</translation>
     </message>
   </context>
   <context>
@@ -665,47 +665,47 @@
     <message>
       <location/>
       <source>Custom Media Port</source>
-      <translation type="unfinished">Custom Media Port</translation>
+      <translation>Aangepaste mediapoort</translation>
     </message>
     <message>
       <location/>
       <source>Trust camera timestamp</source>
-      <translation type="unfinished">Trust camera timestamp</translation>
+      <translation>Vertrouw camera tijdstempel</translation>
     </message>
     <message>
       <location/>
       <source>Preferred PTZ preset type:</source>
-      <translation type="unfinished">Preferred PTZ preset type:</translation>
+      <translation>Gewenst PTZ-presettype:</translation>
     </message>
     <message>
       <location/>
       <source>System</source>
-      <translation type="unfinished">System</translation>
+      <translation>Systeem</translation>
     </message>
     <message>
       <location/>
       <source>Native</source>
-      <translation type="unfinished">Native</translation>
+      <translation>Oorspronkelijke resolutie</translation>
     </message>
     <message>
       <location/>
       <source>Native camera presets will not be avaliable.</source>
-      <translation type="unfinished">Native camera presets will not be avaliable.</translation>
+      <translation>Oorspronkelijke camera presets zullen niet beschikbaar zijn.</translation>
     </message>
     <message>
       <location/>
       <source>This camera supports pan and tilt</source>
-      <translation type="unfinished">This camera supports pan and tilt</translation>
+      <translation>Deze camera ondersteunt pan en tilt</translation>
     </message>
     <message>
       <location/>
       <source>This camera supports zoom</source>
-      <translation type="unfinished">This camera supports zoom</translation>
+      <translation>Deze camera ondersteunt zoomen</translation>
     </message>
     <message>
       <location/>
       <source>Detect motion during archive import</source>
-      <translation type="unfinished">Detect motion during archive import</translation>
+      <translation>Detecteer beweging tijdens archief import</translation>
     </message>
   </context>
   <context>
@@ -1044,7 +1044,7 @@
     <message>
       <location/>
       <source>Hint</source>
-      <translation type="unfinished">Hint</translation>
+      <translation>Tip</translation>
     </message>
     <message>
       <location/>
@@ -1089,12 +1089,30 @@
     <message>
       <location/>
       <source>Add Devices</source>
-      <translation type="unfinished">Add Devices</translation>
+      <translation>Apparaten toevoegen</translation>
     </message>
     <message>
       <location/>
       <source>Default</source>
       <translation>Standaard</translation>
+    </message>
+  </context>
+  <context>
+    <name>EulaDialog</name>
+    <message>
+      <location filename="../src/nx/vms/client/desktop/ui/dialogs/eula_dialog.ui"/>
+      <source>Copy to Clipboard</source>
+      <translation>Kopiëren naar klembord</translation>
+    </message>
+    <message>
+      <location/>
+      <source>I Do Not Agree</source>
+      <translation>Ik ga niet akkoord</translation>
+    </message>
+    <message>
+      <location/>
+      <source>I Agree</source>
+      <translation>Akkoord</translation>
     </message>
   </context>
   <context>
@@ -1230,7 +1248,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/export/widgets/export_password_widget.ui"/>
       <source>Protect with password</source>
-      <translation type="unfinished">Protect with password</translation>
+      <translation>Bescherm met wachtwoord</translation>
     </message>
     <message>
       <location/>
@@ -1397,11 +1415,6 @@
     </message>
     <message>
       <location/>
-      <source>None</source>
-      <translation>Geen</translation>
-    </message>
-    <message>
-      <location/>
       <source>Second Source</source>
       <translation>Tweede bron</translation>
     </message>
@@ -1504,174 +1517,6 @@
     </message>
   </context>
   <context>
-    <name>InteractiveSettingsTestDialog</name>
-    <message>
-      <location filename="../src/nx/vms/client/desktop/interactive_settings/dialogs/interactive_settings_test_dialog.ui"/>
-      <source>{
-    &quot;items&quot;: [
-        {
-            &quot;type&quot;: &quot;TextField&quot;,
-            &quot;name&quot;: &quot;text&quot;,
-            &quot;caption&quot;: &quot;Text Field&quot;,
-            &quot;description&quot;: &quot;A text field&quot;,
-            &quot;defaultValue&quot;: &quot;a text&quot;,
-            &quot;value&quot;: &quot;a text&quot;
-        },
-        {
-            &quot;type&quot;: &quot;GroupBox&quot;,
-            &quot;name&quot;: &quot;group&quot;,
-            &quot;caption&quot;: &quot;Group Box&quot;,
-            &quot;items&quot;: [
-                {
-                    &quot;type&quot;: &quot;SpinBox&quot;,
-                    &quot;name&quot;: &quot;number&quot;,
-                    &quot;caption&quot;: &quot;Spin Box&quot;,
-                    &quot;description&quot;: &quot;A number&quot;,
-                    &quot;defaultValue&quot;: 42,
-                    &quot;value&quot;: 42,
-                    &quot;minValue&quot;: 0,
-                    &quot;maxValue&quot;: 100
-                },
-                {
-                    &quot;type&quot;: &quot;DoubleSpinBox&quot;,
-                    &quot;name&quot;: &quot;double&quot;,
-                    &quot;caption&quot;: &quot;Double Spin Box&quot;,
-                    &quot;description&quot;: &quot;A real number&quot;,
-                    &quot;defaultValue&quot;: 3.14,
-                    &quot;value&quot;: 3.14,
-                    &quot;minValue&quot;: 0.0,
-                    &quot;maxValue&quot;: 100.0
-                },
-                {
-                    &quot;type&quot;: &quot;ComboBox&quot;,
-                    &quot;name&quot;: &quot;combobox&quot;,
-                    &quot;caption&quot;: &quot;Combo Box&quot;,
-                    &quot;description&quot;: &quot;A choice&quot;,
-                    &quot;defaultValue&quot;: &quot;value2&quot;,
-                    &quot;value&quot;: &quot;value2&quot;,
-                    &quot;range&quot;: [&quot;value1&quot;, &quot;value2&quot;, &quot;value3&quot;]
-                },
-                {
-                    &quot;type&quot;: &quot;CheckBox&quot;,
-                    &quot;name&quot;: &quot;checkbox&quot;,
-                    &quot;caption&quot;: &quot;Check Box&quot;,
-                    &quot;description&quot;: &quot;True or False&quot;,
-                    &quot;defaultValue&quot;: true,
-                    &quot;value&quot;: true
-                },
-                {
-                    &quot;type&quot;: &quot;GroupBox&quot;,
-                    &quot;name&quot;: &quot;buttons&quot;,
-                    &quot;caption&quot;: &quot;Buttons&quot;,
-                    &quot;items&quot;: [
-                        {
-                            &quot;type&quot;: &quot;Row&quot;,
-                            &quot;name&quot;: &quot;row&quot;,
-                            &quot;items&quot;: [
-                                {
-                                    &quot;type&quot;: &quot;Button&quot;,
-                                    &quot;name&quot;: &quot;button1&quot;,
-                                    &quot;caption&quot;: &quot;Button 1&quot;,
-                                    &quot;description&quot;: &quot;Action 1&quot;
-                                },
-                                {
-                                    &quot;type&quot;: &quot;Button&quot;,
-                                    &quot;name&quot;: &quot;button2&quot;,
-                                    &quot;caption&quot;: &quot;Button 2&quot;,
-                                    &quot;description&quot;: &quot;Action 2&quot;
-                                }
-                            ]
-                        }
-                    ]
-                }
-            ]
-        }
-    ]
-}</source>
-      <translation type="unfinished">{
-    &quot;items&quot;: [
-        {
-            &quot;type&quot;: &quot;TextField&quot;,
-            &quot;name&quot;: &quot;text&quot;,
-            &quot;caption&quot;: &quot;Text Field&quot;,
-            &quot;description&quot;: &quot;A text field&quot;,
-            &quot;defaultValue&quot;: &quot;a text&quot;,
-            &quot;value&quot;: &quot;a text&quot;
-        },
-        {
-            &quot;type&quot;: &quot;GroupBox&quot;,
-            &quot;name&quot;: &quot;group&quot;,
-            &quot;caption&quot;: &quot;Group Box&quot;,
-            &quot;items&quot;: [
-                {
-                    &quot;type&quot;: &quot;SpinBox&quot;,
-                    &quot;name&quot;: &quot;number&quot;,
-                    &quot;caption&quot;: &quot;Spin Box&quot;,
-                    &quot;description&quot;: &quot;A number&quot;,
-                    &quot;defaultValue&quot;: 42,
-                    &quot;value&quot;: 42,
-                    &quot;minValue&quot;: 0,
-                    &quot;maxValue&quot;: 100
-                },
-                {
-                    &quot;type&quot;: &quot;DoubleSpinBox&quot;,
-                    &quot;name&quot;: &quot;double&quot;,
-                    &quot;caption&quot;: &quot;Double Spin Box&quot;,
-                    &quot;description&quot;: &quot;A real number&quot;,
-                    &quot;defaultValue&quot;: 3.14,
-                    &quot;value&quot;: 3.14,
-                    &quot;minValue&quot;: 0.0,
-                    &quot;maxValue&quot;: 100.0
-                },
-                {
-                    &quot;type&quot;: &quot;ComboBox&quot;,
-                    &quot;name&quot;: &quot;combobox&quot;,
-                    &quot;caption&quot;: &quot;Combo Box&quot;,
-                    &quot;description&quot;: &quot;A choice&quot;,
-                    &quot;defaultValue&quot;: &quot;value2&quot;,
-                    &quot;value&quot;: &quot;value2&quot;,
-                    &quot;range&quot;: [&quot;value1&quot;, &quot;value2&quot;, &quot;value3&quot;]
-                },
-                {
-                    &quot;type&quot;: &quot;CheckBox&quot;,
-                    &quot;name&quot;: &quot;checkbox&quot;,
-                    &quot;caption&quot;: &quot;Check Box&quot;,
-                    &quot;description&quot;: &quot;True or False&quot;,
-                    &quot;defaultValue&quot;: true,
-                    &quot;value&quot;: true
-                },
-                {
-                    &quot;type&quot;: &quot;GroupBox&quot;,
-                    &quot;name&quot;: &quot;buttons&quot;,
-                    &quot;caption&quot;: &quot;Buttons&quot;,
-                    &quot;items&quot;: [
-                        {
-                            &quot;type&quot;: &quot;Row&quot;,
-                            &quot;name&quot;: &quot;row&quot;,
-                            &quot;items&quot;: [
-                                {
-                                    &quot;type&quot;: &quot;Button&quot;,
-                                    &quot;name&quot;: &quot;button1&quot;,
-                                    &quot;caption&quot;: &quot;Button 1&quot;,
-                                    &quot;description&quot;: &quot;Action 1&quot;
-                                },
-                                {
-                                    &quot;type&quot;: &quot;Button&quot;,
-                                    &quot;name&quot;: &quot;button2&quot;,
-                                    &quot;caption&quot;: &quot;Button 2&quot;,
-                                    &quot;description&quot;: &quot;Action 2&quot;
-                                }
-                            ]
-                        }
-                    ]
-                }
-            ]
-        }
-    ]
-}</translation>
-    </message>
-  </context>
-  <context>
     <name>IoModuleSettingsWidget</name>
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_properties/camera/widgets/io_module_settings_widget.ui"/>
@@ -1767,7 +1612,7 @@
     <message>
       <location/>
       <source>Minimum Grid Size</source>
-      <translation type="unfinished">Minimum Grid Size</translation>
+      <translation>Minimale rastergrootte</translation>
     </message>
   </context>
   <context>
@@ -1828,12 +1673,12 @@
     <message>
       <location/>
       <source>Search Timeout (s)</source>
-      <translation type="unfinished">Search Timeout (s)</translation>
+      <translation>Zoek Timeout (s)</translation>
     </message>
     <message>
       <location/>
       <source>Admin DN or CN</source>
-      <translation type="unfinished">Admin DN or CN</translation>
+      <translation>Beheerder DN of CN</translation>
     </message>
   </context>
   <context>
@@ -2124,14 +1969,6 @@
     </message>
   </context>
   <context>
-    <name>MessageBox</name>
-    <message>
-      <location filename="../src/ui/dialogs/common/message_box.ui"/>
-      <source>Do not show this message again</source>
-      <translation>Toon dit bericht niet opnieuw</translation>
-    </message>
-  </context>
-  <context>
     <name>MultiServerUpdatesWidget</name>
     <message>
       <location filename="../src/nx/vms/client/desktop/system_update/multi_server_updates_widget.ui"/>
@@ -2141,7 +1978,7 @@
     <message>
       <location/>
       <source>Check for update</source>
-      <translation type="unfinished">Check for update</translation>
+      <translation>Controleer op update</translation>
     </message>
     <message>
       <location/>
@@ -2166,7 +2003,7 @@
     <message>
       <location/>
       <source>Download &amp;&amp; Install</source>
-      <translation type="unfinished">Download &amp;&amp; Install</translation>
+      <translation>Downloaden &amp;&amp; installeren</translation>
     </message>
     <message>
       <location/>
@@ -2181,7 +2018,7 @@
     <message>
       <location/>
       <source>Advanced Update Settings</source>
-      <translation type="unfinished">Advanced Update Settings</translation>
+      <translation>Geavanceerde Update instellingen</translation>
     </message>
     <message>
       <location/>
@@ -2194,12 +2031,12 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_dialogs/multiple_layout_selection_dialog.ui"/>
       <source>Show all layouts</source>
-      <translation type="unfinished">Show all layouts</translation>
+      <translation>Toon alle lay-outs</translation>
     </message>
     <message>
       <location/>
       <source>Select Layouts</source>
-      <translation type="unfinished">Select Layouts</translation>
+      <translation>Selecteer Layouts</translation>
     </message>
   </context>
   <context>
@@ -2212,12 +2049,12 @@
     <message>
       <location/>
       <source>New Virtual Camera...</source>
-      <translation type="unfinished">New Virtual Camera...</translation>
+      <translation>Nieuwe virtuele camera...</translation>
     </message>
     <message>
       <location/>
       <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
-      <translation type="unfinished">&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</translation>
+      <translation>&quot;Virtual Camera&quot; is een virtuele opslag voor videobestanden, die kunnen worden geüpload naar elke server op uw systeem en door elke gebruiker kunnen worden geopend.</translation>
     </message>
   </context>
   <context>
@@ -2286,22 +2123,22 @@
     <message>
       <location/>
       <source>Level:</source>
-      <translation type="unfinished">Level:</translation>
+      <translation>Niveau:</translation>
     </message>
     <message>
       <location/>
       <source>ERROR</source>
-      <translation type="unfinished">ERROR</translation>
+      <translation>FOUT</translation>
     </message>
     <message>
       <location/>
       <source>WARNING</source>
-      <translation type="unfinished">WARNING</translation>
+      <translation>WAARSCHUWING</translation>
     </message>
     <message>
       <location/>
       <source>INFO</source>
-      <translation type="unfinished">INFO</translation>
+      <translation>INFO</translation>
     </message>
   </context>
   <context>
@@ -2450,7 +2287,7 @@
     <message>
       <location/>
       <source>Restart to the updated version when ready</source>
-      <translation type="unfinished">Restart to the updated version when ready</translation>
+      <translation>Herstart naar de bijgewerkte versie wanneer gereed</translation>
     </message>
   </context>
   <context>
@@ -2518,6 +2355,14 @@
     </message>
   </context>
   <context>
+    <name>QnMessageBox</name>
+    <message>
+      <location filename="../src/ui/dialogs/common/message_box.ui"/>
+      <source>Do not show this message again</source>
+      <translation>Toon dit bericht niet opnieuw</translation>
+    </message>
+  </context>
+  <context>
     <name>QnNotificationSoundManagerDialog</name>
     <message>
       <location filename="../src/ui/dialogs/notification_sound_manager_dialog.ui"/>
@@ -2566,44 +2411,6 @@
       <location/>
       <source>Removing this connection option could lead to System malfunction.</source>
       <translation>Het verwijderen van deze verbindingsoptie kan leiden tot storingen in het systeem.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnServerUpdatesWidget</name>
-    <message>
-      <location filename="../src/ui/widgets/system_settings/server_updates_widget.ui"/>
-      <source>Cancel</source>
-      <translation>Annuleren</translation>
-    </message>
-    <message>
-      <location/>
-      <source>It looks like the update process is taking more time than usual. Please keep waiting.</source>
-      <translation>Het lijkt er op dat het updateproces meer tijd kost dan normaal. Blijf alsjeblieft wachten.</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Check for updates automatically</source>
-      <translation>Controleer automatisch voor updates</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Updating to...</source>
-      <translation>Bijwerken naar...</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Link copied</source>
-      <translation>Link gekopieerd</translation>
-    </message>
-    <message>
-      <location/>
-      <source>You have the latest version installed</source>
-      <translation>U hebt de nieuwste versie geïnstalleerd</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Applying System updates at the end of the week is not recommended.</source>
-      <translation>Het toepassen van systeemupdates aan het einde van de week wordt niet aanbevolen.</translation>
     </message>
   </context>
   <context>
@@ -2844,18 +2651,13 @@
     </message>
     <message>
       <location/>
-      <source>Filter TEST</source>
-      <translation type="unfinished">Filter TEST</translation>
-    </message>
-    <message>
-      <location/>
       <source>Nothing found</source>
       <translation>Niets gevonden</translation>
     </message>
     <message>
       <location/>
       <source>Drag any image or video file to the application window to play them</source>
-      <translation type="unfinished">Drag any image or video file to the application window to play them</translation>
+      <translation>Sleep een afbeelding of videobestand naar het toepassingsvenster om ze af te spelen</translation>
     </message>
   </context>
   <context>
@@ -2968,13 +2770,18 @@
     </message>
     <message>
       <location/>
-      <source>Limit Session Length</source>
-      <translation type="unfinished">Limit Session Length</translation>
+      <source>to</source>
+      <translation>aan</translation>
     </message>
     <message>
       <location/>
-      <source>to</source>
-      <translation>aan</translation>
+      <source>Limit session duration</source>
+      <translation>Beperk sessiegeduur</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
+      <translation>Watermerken worden alleen weergegeven voor live, gearchiveerde en geëxporteerde video's voor niet-beheerdersgebruikers. U en andere beheerders zullen ze niet zien.</translation>
     </message>
   </context>
   <context>
@@ -3219,7 +3026,7 @@
     <message>
       <location/>
       <source>Base forecast on data recorded during</source>
-      <translation type="unfinished">Base forecast on data recorded during</translation>
+      <translation>Standaard voorspelling op gegevens opgenomen tijdens</translation>
     </message>
   </context>
   <context>
@@ -3263,6 +3070,26 @@
       <location/>
       <source>Backup Settings...</source>
       <translation>Backup-instellingen...</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Analytics data will continue to be stored on the disabled storage.</source>
+      <translation>Analytics-gegevens worden nog steeds opgeslagen op de uitgeschakelde opslag.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</source>
+      <translation>Opname van de uitgeschakelde opslag zal stoppen. Echter, het overschrijven dan de oudste beelden gaat gewoon door.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Recording was enabled on the USB storage</source>
+      <translation>Opname is ingeschakeld op de USB-opslag</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Analytics data can occupy tens of gigabytes of storage space. We recommend to choose other location for it instead of the system partition.</source>
+      <translation>Analytics-gegevens kunnen tientallen gigabytes aan opslagruimte innemen. We raden aan om een andere locatie te kiezen in plaats van de systeempartitie.</translation>
     </message>
   </context>
   <context>
@@ -3380,7 +3207,7 @@
     <message>
       <location/>
       <source>VMS Time</source>
-      <translation type="unfinished">VMS Time</translation>
+      <translation>VMS tijd</translation>
     </message>
   </context>
   <context>
@@ -3388,17 +3215,17 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/system_administration/widgets/time_synchronization_widget.ui"/>
       <source>Sync Time with the Internet</source>
-      <translation type="unfinished">Sync Time with the Internet</translation>
+      <translation>Synchroniseer tijd met internet</translation>
     </message>
     <message>
       <location/>
       <source>VMS Time</source>
-      <translation type="unfinished">VMS Time</translation>
+      <translation>VMS tijd</translation>
     </message>
     <message>
       <location/>
       <source>Do not sync time among servers</source>
-      <translation type="unfinished">Do not sync time among servers</translation>
+      <translation>Synchroniseer geen tijd tussen servers</translation>
     </message>
   </context>
   <context>
@@ -3506,7 +3333,7 @@
     <message>
       <location/>
       <source>Detect motion</source>
-      <translation type="unfinished">Detect motion</translation>
+      <translation>Beweging detecteren</translation>
     </message>
   </context>
   <context>

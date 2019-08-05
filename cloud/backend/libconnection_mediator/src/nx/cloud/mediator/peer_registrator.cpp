@@ -139,11 +139,12 @@ void PeerRegistrator::listen(
 
     m_relayClusterClient->selectRelayInstanceForListeningPeer(
         lm("%1.%2").arg(requestData.serverId).arg(requestData.systemId).toStdString(),
+        serverConnection->getSourceAddress().address,
         [this, serverConnectionAioThread = serverConnection->getAioThread(),
             completionHandler = std::move(completionHandler), mediaserverConnectionKey,
             asyncCallLocker = m_counter.getScopedIncrement()](
                 nx::cloud::relay::api::ResultCode resultCode,
-                QUrl relayInstanceUrl) mutable
+                std::vector<nx::utils::Url> relayInstanceUrls) mutable
         {
             // Sending response from connection's aio thread.
             auto aioCaller = std::make_unique<nx::network::aio::BasicPollable>();
@@ -156,11 +157,11 @@ void PeerRegistrator::listen(
             aioCallerPtr->post(
                 [this, aioCaller = std::move(aioCaller), mediaserverConnectionKey,
                     asyncCallLocker = std::move(asyncCallLocker), resultCode,
-                    relayInstanceUrl, completionHandler = std::move(completionHandler)]() mutable
+                    relayInstanceUrls, completionHandler = std::move(completionHandler)]() mutable
                 {
                     sendListenResponse(
                         resultCode == nx::cloud::relay::api::ResultCode::ok
-                            ? boost::make_optional(relayInstanceUrl)
+                            ? boost::make_optional(relayInstanceUrls)
                             : boost::none,
                         std::move(completionHandler));
 
@@ -328,12 +329,29 @@ int PeerRegistrator::boundClientCount() const
 }
 
 void PeerRegistrator::sendListenResponse(
-    boost::optional<QUrl> trafficRelayInstanceUrl,
+    boost::optional<std::vector <nx::utils::Url>> trafficRelayInstanceUrls,
     std::function<void(api::ResultCode, api::ListenResponse)> responseSender)
 {
     api::ListenResponse response;
-    if (trafficRelayInstanceUrl)
-        response.trafficRelayUrl = trafficRelayInstanceUrl->toString().toUtf8();
+    if (trafficRelayInstanceUrls)
+    {
+        if (trafficRelayInstanceUrls->empty())
+        {
+            NX_ERROR(this, "Received empty traffic relay url list.");
+        }
+        else
+        {
+            // Keeping compatibility between internal 3.1 builds.
+            // *TODO: #ak Remove in 3.2.
+            response.trafficRelayUrl = trafficRelayInstanceUrls->front().toString().toUtf8();
+
+            std::transform(
+                trafficRelayInstanceUrls->begin(),
+                trafficRelayInstanceUrls->end(),
+                std::back_inserter(response.trafficRelayUrls),
+                [](const nx::utils::Url& url) { return url.toString().toUtf8(); });
+        }
+    }
     response.tcpConnectionKeepAlive = m_settings.stun().keepAliveOptions;
     response.cloudConnectOptions = m_settings.general().cloudConnectOptions;
     responseSender(api::ResultCode::ok, std::move(response));
@@ -354,7 +372,7 @@ void PeerRegistrator::reportClientBind(
 
     auto clientBindIndications = prepareClientBindIndications();
     peerConnection->dispatch(
-        [this, clientBindIndications = std::move(clientBindIndications),
+        [clientBindIndications = std::move(clientBindIndications),
             peerConnectionPtr = peerConnection.get()]() mutable
         {
             for (auto& indication: clientBindIndications)

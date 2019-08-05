@@ -819,7 +819,8 @@ void ServerMessageBus::gotTransaction(
     if (m_handler)
     {
         auto amendedTran = tran;
-        amendOutputDataIfNeeded(Qn::kSystemAccess, &amendedTran.params);
+        amendOutputDataIfNeeded(Qn::kSystemAccess,
+            commonModule()->resourceAccessManager(), &amendedTran.params);
         m_handler->triggerNotification(amendedTran, NotificationSource::Remote);
     }
 }
@@ -861,13 +862,13 @@ bool ServerMessageBus::validateRemotePeerData(const vms::api::PeerDataEx& remote
             "current peer. Restarting and resync database with remote peer")
             .arg(remotePeer.id.toString()));
 
-        executeDelayed(
+        executeLaterInThread(
             [this, remotePeer]()
             {
                 stop();
                 commonModule()->setSystemIdentityTime(remotePeer.identityTime, remotePeer.id);
             },
-            0, qApp->thread());
+            qApp->thread());
 
         return false;
     }

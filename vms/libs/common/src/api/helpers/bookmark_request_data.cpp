@@ -70,14 +70,14 @@ QnCameraBookmark bookmarkFromParams(const QnRequestParamList& params, QnResource
     QnSecurityCamResourcePtr camera = nx::camera_id_helper::findCameraByFlexibleIds(
         resourcePool,
         /*outNotFoundCameraId*/ nullptr,
-        params.toHash(),
+        params,
         {kCameraIdParam, kDeprecatedPhysicalIdParam, kDeprecatedMacParam});
     if (!camera)
         bookmark.cameraId = QnUuid();
     else
         bookmark.cameraId = camera->getId();
 
-    bookmark.tags = params.allValues(kTagParam).toSet();
+    bookmark.tags = params.values(kTagParam).toSet();
     return bookmark;
 }
 
@@ -218,7 +218,7 @@ QnRequestParamList QnUpdateBookmarkRequestData::toParams() const
 {
     QnRequestParamList result = QnMultiserverRequestData::toParams();
 
-    result.append(bookmarksToParam(bookmark));
+    result.unite(bookmarksToParam(bookmark));
     result.insert(kEventRuleIdParam, QnLexical::serialized(eventRuleId));
     return result;
 }

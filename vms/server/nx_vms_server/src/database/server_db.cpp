@@ -28,6 +28,8 @@
 #include <api/global_settings.h>
 #include <common/common_module.h>
 
+#include <nx/vms/server/database/update_helpers/update_analytics_records_helper.h>
+
 using std::chrono::milliseconds;
 using namespace std::literals::chrono_literals;
 
@@ -295,7 +297,7 @@ bool QnServerDb::open()
     }
     else
     {
-        qWarning() << "Cannot initialize sqlLite database. Actions log is not created.";
+        NX_WARNING(this, "Cannot create sqlLite database %1", fileName);
         return false;
     }
 
@@ -496,7 +498,7 @@ QnAuditRecordList QnServerDb::getAuditData(const QnTimePeriod& period, const QnU
         "WHERE createdTimeSec BETWEEN ? and ? ");
     if (!sessionId.isNull())
         request += lit("AND authSession like '%1%'").arg(sessionId.toString());
-    request += lit("ORDER BY createdTimeSec");
+    request += lit("ORDER BY id");
 
     QnWriteLocker lock(&m_mutex);
     QSqlQuery query(m_sdb);
@@ -677,6 +679,12 @@ bool QnServerDb::bookmarksUniqueIdToCameraGuid()
         }
     }
     return true;
+}
+
+bool QnServerDb::updateAnalyticsEventRecords()
+{
+    nx::vms::server::database::UpdateAnalyticsRecordsHelper helper(m_sdb);
+    return helper.doUpdate();
 }
 
 bool QnServerDb::createBookmarkTagTriggersUnderTransaction()
@@ -883,7 +891,7 @@ QString QnServerDb::getRequestStr(const QnEventLogFilterData& request,
             .arg(guidToSqlString(request.ruleId));
     }
 
-    requestStr += lit(" ORDER BY timestamp");
+    requestStr += lit(" ORDER BY rowid");
 
     if (order == Qt::DescendingOrder)
         requestStr += lit(" DESC");
@@ -937,8 +945,8 @@ vms::event::ActionDataList QnServerDb::getActions(
             || actionData.actionType == vms::api::ActionType::fullscreenCameraAction
             )
         {
-            QnNetworkResourcePtr camRes =
-                resourcePool()->getResourceById<QnNetworkResource>(actionData.eventParams.eventResourceId);
+            QnNetworkResourcePtr camRes = serverModule()->resourcePool()
+                ->getResourceById<QnNetworkResource>(actionData.eventParams.eventResourceId);
             if (camRes)
             {
                 if (QnStorageManager::isArchiveTimeExists(
@@ -1006,7 +1014,7 @@ void QnServerDb::getAndSerializeActions(const QnEventLogRequestData& request,
         {
             QnUuid eventResId = QnUuid::fromRfc4122(actionsQuery.value(eventResIdx).toByteArray());
             QnNetworkResourcePtr camRes =
-                resourcePool()->getResourceById<QnNetworkResource>(eventResId);
+                serverModule()->resourcePool()->getResourceById<QnNetworkResource>(eventResId);
             if (camRes)
             {
                 if (QnStorageManager::isArchiveTimeExists(
@@ -1047,6 +1055,9 @@ bool QnServerDb::afterInstallUpdate(const QString& updateName)
 
     if (updateName.endsWith(lit("/07_1_bookmarks_unique_id_to_camera_guid.sql")))
         return bookmarksUniqueIdToCameraGuid();
+
+    if (updateName.endsWith("/16_update_analytics_event_records.sql"))
+        return updateAnalyticsEventRecords();
 
     return true;
 }

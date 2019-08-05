@@ -3,6 +3,7 @@
 #include <nx/network/aio/aio_service.h>
 #include <nx/utils/std/future.h>
 
+#include "../common_socket_impl.h"
 #include "../socket_global.h"
 
 namespace nx {
@@ -18,7 +19,7 @@ BasicPollable::BasicPollable(
     aio::AIOService* aioService,
     aio::AbstractAioThread* aioThread)
     :
-    m_pollable(-1, std::make_unique<CommonSocketImpl>()),
+    m_pollable(-1),
     m_aioService(aioService)
 {
     if (!aioThread)

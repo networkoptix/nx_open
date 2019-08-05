@@ -90,15 +90,23 @@ window.L = {};
                     async: false,
                     dataType: 'json'
                 }).done(function(response){
-                    appState.trafficRelayHost = response.trafficRelayHost;
+                    appState.companyLink = response.companyLink;
+                    appState.companyName = response.companyName;
+                    appState.copyrightYear = response.copyrightYear;
+                    appState.footerItems = response.footerItems ? JSON.parse(response.footerItems) : {};
                     appState.publicDownloads = response.publicDownloads;
                     appState.publicReleases = response.publicReleases;
-                    appState.sortSupportedDevices = response.sortSupportedDevices;
-                    appState.supportedResolutions = response.supportedResolutions;
-                    appState.supportedHardwareTypes = response.supportedHardwareTypes;
-                    appState.footerItems = response.footerItems ? JSON.parse(response.footerItems) : {};
+                    appState.trafficRelayHost = response.trafficRelayHost;
+                    appState.supportLink = response.supportLink;
+                    appState.productName = response.productName;
+                    appState.vmsName = response.vmsName;
                     
                     angular.extend(CONFIG, appState);
+                    
+                    CONFIG.campage.sortSupportedDevices = response.sortSupportedDevices;
+                    CONFIG.campage.supportedResolutions = response.supportedResolutions;
+                    CONFIG.campage.supportedHardwareTypes = response.supportedHardwareTypes;
+                    CONFIG.campage.searchTags = response.searchTags;
                 });
 
                 $.ajax({
@@ -316,14 +324,15 @@ window.L = {};
                                 controller: 'DebugCtrl'
                             })
                             .when('/login', {
-                                title: lang.pageTitles.login,
-                                templateUrl: CONFIG.viewsDir + 'startPage.html',
-                                controller: 'StartPageCtrl',
-                                resolve: {
-                                    test: ['$route', function ($route) {
-                                        $route.current.params.callLogin = true;
-                                    }]
-                                }
+                                template: '<landing-component></landing-component>'
+                                // title: lang.pageTitles.login,
+                                // templateUrl: CONFIG.viewsDir + 'startPage.html',
+                                // controller: 'StartPageCtrl',
+                                // resolve: {
+                                //     test: ['$route', function ($route) {
+                                //         $route.current.params.callLogin = true;
+                                //     }]
+                                // }
                             })
                             .when('/admin', {
                                 resolve: {
@@ -356,7 +365,7 @@ window.L = {};
                                 }],
                                 resolve: {
                                     getPlatform: [ '$route', function ($route) {
-                                        return $route.current.params.platform
+                                        return $route.current.params.platform;
                                     }]
                                 }
                             })
@@ -387,9 +396,7 @@ window.L = {};
                                 template: ''
                             })
                             .when('/', {
-                                title: ''/*lang.pageTitles.startPage*/,
-                                templateUrl: CONFIG.viewsDir + 'startPage.html',
-                                controller: 'StartPageCtrl'
+                                template: '<landing-component></landing-component>'
                             })
                             .otherwise({
                                 title: lang.pageTitles.pageNotFound,
@@ -399,8 +406,6 @@ window.L = {};
             }])
         .run(['nxLanguageService', 'languageService', function (nxLanguageService, languageService) {
             // make sure both language services are synchronized
-            // had problem downgrading A6 'nxLanguageService' service to AJS provider so
-            // it's set as regular service and running after 'config' phase --TT
-            nxLanguageService.translate.use(languageService.lang.language);
+            nxLanguageService.setLang(languageService.lang.language);
         }]);
 })();

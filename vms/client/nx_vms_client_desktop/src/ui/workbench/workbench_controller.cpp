@@ -6,7 +6,6 @@
 
 #include <QtWidgets/QGraphicsScene>
 #include <QtWidgets/QGraphicsView>
-#include <QtOpenGL/QGLWidget>
 #include <QtWidgets/QGraphicsLinearLayout>
 #include <QtWidgets/QAction>
 #include <QtWidgets/QMenu>
@@ -221,14 +220,15 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
         [](QGraphicsItem* item)
         {
             const auto widget = dynamic_cast<QnResourceWidget*>(item);
-            if (!widget)
+            if (!widget || widget->options().testFlag(QnResourceWidget::WindowRotationForbidden))
                 return false;
+
             const auto workbenchItem = widget->item();
             if (!workbenchItem)
                 return false;
+
             const auto layout = workbenchItem->layout();
-            return !widget->options().testFlag(QnResourceWidget::WindowRotationForbidden)
-                && !layout->locked();
+            return layout && !layout->locked();
         }));
 
     /* Item instruments. */
@@ -1063,16 +1063,17 @@ void QnWorkbenchController::at_motionSelectionProcessStarted(QGraphicsView* /*vi
     widget->setOption(QnResourceWidget::DisplayMotion, true);
 }
 
-void QnWorkbenchController::at_motionRegionCleared(QGraphicsView *, QnMediaResourceWidget *widget) {
-    widget->clearMotionSelection();
+void QnWorkbenchController::at_motionRegionCleared(QGraphicsView *, QnMediaResourceWidget *widget)
+{
+    widget->clearMotionSelection(false);
 }
 
 void QnWorkbenchController::at_motionRegionSelected(QGraphicsView *, QnMediaResourceWidget *widget, const QRect &region)
 {
+    widget->addToMotionSelection(region); //< This will send changed() because it was not sent on at_motionRegionCleared.
+
     if (region.isEmpty())
         return;
-
-    widget->addToMotionSelection(region);
 
     if (!ini().exclusiveMotionSelection)
         return;
@@ -1474,7 +1475,6 @@ void QnWorkbenchController::at_workbench_currentLayoutChanged()
 {
     if (const auto layout = workbench()->currentLayout()->resource())
     {
-
         connect(layout, &QnLayoutResource::lockedChanged, this,
             &QnWorkbenchController::updateCurrentLayoutInstruments);
     }

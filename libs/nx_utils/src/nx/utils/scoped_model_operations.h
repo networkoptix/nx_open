@@ -1,9 +1,10 @@
 #pragma once
 
 #include <type_traits>
+
 #include <QtCore/QAbstractItemModel>
 
-
+#include <nx/utils/log/assert.h>
 #include <nx/utils/scope_guard.h>
 
 template<class BaseModel>
@@ -35,15 +36,18 @@ protected:
         using base_type = nx::utils::SharedGuard;
     public:
         ScopedInsertColumns(ScopedModelOperations* model, const QModelIndex& parent,
-            int first, int last)
+            int first, int last, bool condition = true)
             :
-            base_type(std::move([model]() { model->endInsertColumns(); }))
+            base_type(condition
+                ? nx::utils::SharedGuardCallback([model]() { model->endInsertColumns(); })
+                : nx::utils::SharedGuardCallback([]() {}))
         {
-            model->beginInsertColumns(parent, first, last);
+            if (condition)
+                model->beginInsertColumns(parent, first, last);
         }
 
-        ScopedInsertColumns(ScopedModelOperations* model, int first, int last):
-            ScopedInsertColumns(model, QModelIndex(), first, last)
+        ScopedInsertColumns(ScopedModelOperations* model, int first, int last, bool condition = true):
+            ScopedInsertColumns(model, QModelIndex(), first, last, condition)
         {
         }
     };
@@ -53,15 +57,18 @@ protected:
         using base_type = nx::utils::SharedGuard;
     public:
         ScopedInsertRows(ScopedModelOperations* model, const QModelIndex& parent,
-            int first, int last)
+            int first, int last, bool condition = true)
             :
-            base_type(std::move([model]() { model->endInsertRows(); }))
+            base_type(condition
+                ? nx::utils::SharedGuardCallback([model]() { model->endInsertRows(); })
+                : nx::utils::SharedGuardCallback([]() {}))
         {
-            model->beginInsertRows(parent, first, last);
+            if (condition)
+                model->beginInsertRows(parent, first, last);
         }
 
-        ScopedInsertRows(ScopedModelOperations* model, int first, int last):
-            ScopedInsertRows(model, QModelIndex(), first, last)
+        ScopedInsertRows(ScopedModelOperations* model, int first, int last, bool condition = true):
+            ScopedInsertRows(model, QModelIndex(), first, last, condition)
         {
         }
     };
@@ -71,15 +78,18 @@ protected:
         using base_type = nx::utils::SharedGuard;
     public:
         ScopedRemoveColumns(ScopedModelOperations* model, const QModelIndex& parent,
-            int first, int last)
+            int first, int last, bool condition = true)
             :
-            base_type(std::move([model]() { model->endRemoveColumns(); }))
+            base_type(condition
+                ? nx::utils::SharedGuardCallback([model]() { model->endRemoveColumns(); })
+                : nx::utils::SharedGuardCallback([]() {}))
         {
-            model->beginRemoveColumns(parent, first, last);
+            if (condition)
+                model->beginRemoveColumns(parent, first, last);
         }
 
-        ScopedRemoveColumns(ScopedModelOperations* model, int first, int last):
-            ScopedRemoveColumns(model, QModelIndex(), first, last)
+        ScopedRemoveColumns(ScopedModelOperations* model, int first, int last, bool condition = true):
+            ScopedRemoveColumns(model, QModelIndex(), first, last, condition)
         {
         }
     };
@@ -89,15 +99,18 @@ protected:
         using base_type = nx::utils::SharedGuard;
     public:
         ScopedRemoveRows(ScopedModelOperations* model, const QModelIndex& parent,
-            int first, int last)
+            int first, int last, bool condition = true)
             :
-            base_type(std::move([model]() { model->endRemoveRows(); }))
+            base_type(condition
+                ? nx::utils::SharedGuardCallback([model]() { model->endRemoveRows(); })
+                : nx::utils::SharedGuardCallback([]() {}))
         {
-            model->beginRemoveRows(parent, first, last);
+            if (condition)
+                model->beginRemoveRows(parent, first, last);
         }
 
-        ScopedRemoveRows(ScopedModelOperations* model, int first, int last):
-            ScopedRemoveRows(model, QModelIndex(), first, last)
+        ScopedRemoveRows(ScopedModelOperations* model, int first, int last, bool condition = true):
+            ScopedRemoveRows(model, QModelIndex(), first, last, condition)
         {
         }
     };
@@ -108,19 +121,22 @@ protected:
     public:
         ScopedMoveColumns(ScopedModelOperations* model, const QModelIndex& sourceParent,
             int sourceFirst, int sourceLast, const QModelIndex& destinationParent,
-            int destinationPos)
+            int destinationPos, bool condition = true)
             :
-            base_type(std::move([model]() { model->endMoveColumns(); }))
+            base_type(nx::utils::SharedGuardCallback([model]() { model->endMoveColumns(); }))
         {
-            model->beginMoveColumns(sourceParent, sourceFirst, sourceLast,
-                destinationParent, destinationPos);
+            if (!condition || !NX_ASSERT(model->beginMoveColumns(sourceParent, sourceFirst,
+                sourceLast, destinationParent, destinationPos)))
+            {
+                disarm();
+            }
         }
 
         ScopedMoveColumns(ScopedModelOperations* model, int sourceFirst, int sourceLast,
-            int destinationPos)
+            int destinationPos, bool condition = true)
             :
             ScopedMoveColumns(model, QModelIndex(), sourceFirst, sourceLast,
-                QModelIndex(), destinationPos)
+                QModelIndex(), destinationPos, condition)
         {
         }
     };
@@ -131,19 +147,22 @@ protected:
     public:
         ScopedMoveRows(ScopedModelOperations* model, const QModelIndex& sourceParent,
             int sourceFirst, int sourceLast, const QModelIndex& destinationParent,
-            int destinationPos)
+            int destinationPos, bool condition = true)
             :
-            base_type(std::move([model]() { model->endMoveRows(); }))
+            base_type(nx::utils::SharedGuardCallback([model]() { model->endMoveRows(); }))
         {
-            model->beginMoveRows(sourceParent, sourceFirst, sourceLast,
-                destinationParent, destinationPos);
+            if (!condition || !NX_ASSERT(model->beginMoveRows(sourceParent, sourceFirst,
+                sourceLast, destinationParent, destinationPos)))
+            {
+                disarm();
+            }
         }
 
         ScopedMoveRows(ScopedModelOperations* model, int sourceFirst, int sourceLast,
-            int destinationPos)
+            int destinationPos, bool condition = true)
             :
             ScopedMoveRows(model, QModelIndex(), sourceFirst, sourceLast,
-                QModelIndex(), destinationPos)
+                QModelIndex(), destinationPos, condition)
         {
         }
     };

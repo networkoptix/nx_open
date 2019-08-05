@@ -274,7 +274,20 @@ bool H264Parser::isPacketStartsNewFrame(
     }
 
     auto nalUnitType = *curPtr & 0x1f;
-    return !NALUnit::isSliceNal(nalUnitType) || isFirstSliceNal(nalUnitType, curPtr, nalLen);
+    if (!NALUnit::isSliceNal(nalUnitType))
+        return true;
+    if (!isFirstSliceNal(nalUnitType, curPtr, nalLen))
+        return false;
+    if (m_spsInitialized && !m_sps.frame_mbs_only_flag)
+    {
+        // Interlaced video.
+        SliceUnit slice;
+        slice.decodeBuffer(curPtr, bufferEnd);
+        slice.deserialize(&m_sps, nullptr /*pps*/);
+        if (slice.bottom_field_flag)
+            return false; //< Bottom field of the video frame.
+    }
+    return true;
 }
 
 bool H264Parser::processData(
@@ -309,6 +322,9 @@ bool H264Parser::processData(
     if (curPtr >= bufferEnd)
         return clearInternalBuffer();
 
+    if (rtpHeader->payloadType != m_rtpChannel)
+        return true; //< Skip data.
+
     bool isPacketLost =
         m_prevSequenceNum != -1 &&
         quint16(m_prevSequenceNum) != quint16(sequenceNum-1) &&
@@ -321,23 +337,12 @@ bool H264Parser::processData(
         isPacketLost = true;
     }
 
-    auto processPacketLost = [this, sequenceNum]()
-    {
-        NX_WARNING(this, "RTP Packet loss detected for camera %1. Old seq=%2, new seq=%3",
-            m_resourceId, m_prevSequenceNum, sequenceNum);
-        clearInternalBuffer();
-        emit packetLostDetected(m_prevSequenceNum, sequenceNum);
-    };
-
     if (isPacketLost)
-        processPacketLost();
+        emit packetLostDetected(m_prevSequenceNum, sequenceNum);
 
     m_prevSequenceNum = sequenceNum;
     if (isPacketLost)
         return false;
-
-    if (rtpHeader->payloadType != m_rtpChannel)
-        return true; // skip data
 
     if (rtpHeader->padding)
     {
@@ -464,10 +469,14 @@ bool H264Parser::processData(
     }
 
     if (gotData)
+    {
         backupCurrentData(rtpBufferBase);
+    }
     else if (isBufferOverflow())
     {
-        processPacketLost();
+        NX_WARNING(this, "RTP parser buffer overflow");
+        clearInternalBuffer();
+        emit packetLostDetected(0, 0);
         return false;
     }
 

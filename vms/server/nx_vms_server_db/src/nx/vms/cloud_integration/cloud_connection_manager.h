@@ -37,6 +37,7 @@ public:
 
     virtual void processCloudErrorCode(nx::cloud::db::api::ResultCode resultCode) = 0;
 
+    virtual void init() = 0;
 signals:
     void cloudBindingStatusChanged(bool boundToCloud);
 };
@@ -77,6 +78,7 @@ public:
 
     bool removeCloudUsers();
 
+    virtual void init() override;
 signals:
     void connectedToCloud();
     void disconnectedFromCloud();

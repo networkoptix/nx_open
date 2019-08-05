@@ -33,7 +33,7 @@ template <std::size_t size>
 bool checkData(const std::array<TestData, size>& data)
 {
     QnMediaServerModule serverModule;
-    QSet<QnNetworkResourcePtr> resList;
+    std::set<nx::vms::server::resource::CameraPtr> resList;
     for (const auto& value: data)
     {
         QnAxisOnvifResourcePtr res(new QnAxisOnvifResource(&serverModule));
@@ -42,7 +42,7 @@ bool checkData(const std::array<TestData, size>& data)
         res->setUrl(value.url);
         res->setGroupId(value.groupId);
         res->setManuallyAdded(value.isManuallyAdded);
-        resList << res;
+        resList.insert(res);
     }
     return QnMServerResourceDiscoveryManager::hasIpConflict(resList);
 }

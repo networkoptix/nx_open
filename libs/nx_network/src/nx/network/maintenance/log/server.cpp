@@ -68,9 +68,17 @@ void Server::serveGetLoggers(
     http::RequestContext /*requestContext*/,
     http::RequestProcessedHandler completionHandler)
 {
+    Loggers loggers;
     auto uniqueLoggers = removeDuplicates(m_loggerCollection->allLoggers());
 
-    Loggers loggers;
+    if (auto mainLogger = m_loggerCollection->main())
+    {
+        loggers.loggers.push_back(utils::toLoggerInfo(
+            mainLogger,
+            mainLogger->filters(),
+            -1));
+    }
+
     for (const auto& loggerContext : uniqueLoggers)
     {
         loggers.loggers.push_back(utils::toLoggerInfo(

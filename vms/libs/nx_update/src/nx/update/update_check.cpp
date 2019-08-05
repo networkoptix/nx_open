@@ -1,5 +1,8 @@
 #include "update_check.h"
-#include <QJsonObject>
+
+#include <QtCore/QJsonObject>
+#include <QtCore/QThread>
+
 #include <nx/fusion/model_functions.h>
 #include <nx/network/http/http_async_client.h>
 #include <nx/utils/std/future.h>
@@ -57,6 +60,8 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
 
 namespace {
 
+const vms::api::SoftwareVersion kPackagesJsonAppearedVersion(4, 0);
+
 static InformationError makeHttpRequest(
     nx::network::http::AsyncClient* httpClient,
     const QString& url)
@@ -69,12 +74,13 @@ static InformationError makeHttpRequest(
         url,
         [&]()
         {
-            if (httpClient->state() != nx::network::http::AsyncClient::State::sDone)
+            auto state = httpClient->state();
+            if (state != nx::network::http::AsyncClient::State::sDone)
             {
                 error = InformationError::networkError;
-                NX_WARNING(
-                    typeid(Information),
-                    lm("Failed to get update info from the internet, url: %1").args(url));
+                auto code = SystemError::toString(httpClient->lastSysErrorCode());
+                NX_WARNING(typeid(Information),
+                    "Failed to get update info from the internet, url: %1, code=%2", url, code);
                 readyPomise.set_value();
                 return;
             }
@@ -85,7 +91,7 @@ static InformationError makeHttpRequest(
                 error = InformationError::httpError;
                 NX_WARNING(
                     typeid(Information),
-                    lm("Http client http error: %1, url: %2").args(statusCode, url));
+                    lm("Http client error: %1, url: %2").args(statusCode, url));
             }
 
             readyPomise.set_value();
@@ -114,7 +120,8 @@ static InformationError findCustomizationInfo(
     result->releaseNotesUrl = customizationInfo->release_notes;
     result->releaseDeliveryDays = customizationInfo->release_delivery;
     result->releaseDateMs = customizationInfo->release_date;
-    result->description = customizationInfo->description;
+    // As of 4.0 we do not use description from customization info.
+    //result->description = customizationInfo->description;
     return InformationError::noError;
 }
 
@@ -131,12 +138,35 @@ static InformationError parsePackages(
     for (const auto& p: packages)
     {
         Package newPackage = p;
-        newPackage.file = "updates/" + publicationKey + '/' + p.file;
+        newPackage.file = updateFilePathForDownloader(publicationKey, p.file);
         newPackage.url = baseUpdateUrl + "/" + p.file;
         result->packages.append(newPackage);
     }
 
     return InformationError::noError;
+}
+
+static utils::OsInfo osInfoFromLegacySystemInformation(
+    const QString& platform, const QString& arch, const QString& modification)
+{
+    if (modification == "bpi")
+        return {"nx1"};
+    if (modification == "edge1")
+        return {modification};
+
+    if (platform == "macosx")
+        return {"macos"};
+    if (platform == "ios")
+        return {platform};
+
+    const QString newArch = arch == "arm" ? "arm32" : arch;
+    const QString newPlatform = platform + L'_' + newArch;
+
+    static QSet<QString> kAllowedModifications{"ubuntu"};
+    const QString variant =
+        kAllowedModifications.contains(modification) ? modification : QString();
+
+    return {newPlatform, variant};
 }
 
 static InformationError parseLegacyPackages(
@@ -184,10 +214,14 @@ static InformationError parseLegacyPackages(
                         return InformationError::jsonError;
 
                     package.component = component;
-                    package.arch = archAndVariant[0];
-                    package.platform = itOs.key();
-                    package.variant = archAndVariant.size() == 2 ? archAndVariant[1] : QString();
-                    // TODO: Do we need to do anything with variantVersion? It does not seem to be used.
+                    const auto& osInfo = osInfoFromLegacySystemInformation(
+                        itOs.key(),
+                        archAndVariant[0],
+                        archAndVariant.size() == 2 ? archAndVariant[1] : QString());
+                    package.platform = osInfo.platform;
+                    // Old update.json didn't contain variant version.
+                    if (!osInfo.variant.isEmpty())
+                        package.variants.append(Variant(osInfo.variant));
                     output.append(package);
                 }
             }
@@ -208,7 +242,7 @@ static InformationError parseLegacyPackages(
     for (const auto& p: packages)
     {
         Package newPackage = p;
-        newPackage.file = "updates/" + publicationKey + '/' + p.file;
+        newPackage.file = updateFilePathForDownloader(publicationKey, p.file);
         newPackage.url = baseUpdateUrl + "/" + p.file;
         result->packages.append(newPackage);
     }
@@ -220,7 +254,6 @@ static InformationError parseLegacyPackages(
 static InformationError parseHeader(
     const QJsonObject& topLevelObject,
     const QString& baseUpdateUrl,
-    bool isLegacyData,
     Information* result)
 {
     if (!QJson::deserialize(topLevelObject, "version", &result->version))
@@ -236,25 +269,12 @@ static InformationError parseHeader(
         NX_WARNING(typeid(Information)) << "no eulaVersion at" << baseUpdateUrl;
     }
 
-    if (!QJson::deserialize(topLevelObject, "eulaLink", &result->eulaLink))
-    {
-        NX_WARNING(typeid(Information)) << "no eulaLink at" << baseUpdateUrl;
-    }
-
     if (!QJson::deserialize(topLevelObject, "eula", &result->eula))
     {
         NX_WARNING(typeid(Information)) << "no eula data at" << baseUpdateUrl;
     }
 
-    QString description;
-    // Legacy updates: e take update's description from the root updates.json and
-    // override it by description in updates.json.
-    // New updates: we take description only from packages.json.
-    if ((QJson::deserialize(topLevelObject, "description", &description) && !description.isEmpty())
-        || !isLegacyData)
-    {
-        result->description = description;
-    }
+    QJson::deserialize(topLevelObject, "description", &result->description);
     return InformationError::noError;
 }
 
@@ -269,9 +289,12 @@ static InformationError parseAndExtractInformation(
     if (parseError.error != QJsonParseError::ParseError::NoError || topLevelObject.isEmpty())
         return InformationError::jsonError;
 
-    auto error = parseHeader(topLevelObject, baseUpdateUrl, /*isLegacyData=*/false, result);
+    auto error = parseHeader(topLevelObject, baseUpdateUrl, result);
     if (error != InformationError::noError)
         return error;
+
+    if (vms::api::SoftwareVersion(result->version) < kPackagesJsonAppearedVersion)
+        return InformationError::incompatibleParser;
 
     error = parsePackages(topLevelObject, baseUpdateUrl, publicationKey, result);
     if (error != InformationError::noError)
@@ -291,9 +314,12 @@ static InformationError parseAndExtractLegacyInformation(
     if (parseError.error != QJsonParseError::ParseError::NoError || topLevelObject.isEmpty())
         return InformationError::jsonError;
 
-    auto error = parseHeader(topLevelObject, baseUpdateUrl, /*isLegacyData=*/true, result);
+    auto error = parseHeader(topLevelObject, baseUpdateUrl, result);
     if (error != InformationError::noError)
         return error;
+
+    if (vms::api::SoftwareVersion(result->version) >= kPackagesJsonAppearedVersion)
+        return InformationError::incompatibleParser;
 
     error = parseLegacyPackages(topLevelObject, baseUpdateUrl, publicationKey, result);
     if (error != InformationError::noError)
@@ -344,21 +370,20 @@ static InformationError fillUpdateInformation(
     }
 
     auto baseUpdateUrl = customizationInfo.updates_prefix + "/" + publicationKey;
-    error = makeHttpRequest(httpClient, baseUpdateUrl + "/packages.json");
 
+    error = makeHttpRequest(httpClient, baseUpdateUrl + "/packages.json");
     if (error == InformationError::noError)
     {
-        return parseAndExtractInformation(
+        error = parseAndExtractInformation(
             httpClient->fetchMessageBodyBuffer(),
             baseUpdateUrl,
             publicationKey,
             result);
+        if (error != InformationError::incompatibleParser)
+            return error;
     }
 
-    // Falling back to previous protocol with update.json
-    if (error == InformationError::httpError)
-        error = makeHttpRequest(httpClient, baseUpdateUrl + "/update.json");
-
+    error = makeHttpRequest(httpClient, baseUpdateUrl + "/update.json");
     if (error == InformationError::noError)
     {
         return parseAndExtractLegacyInformation(
@@ -428,7 +453,7 @@ static void setErrorMessage (const QString& message, QString* outMessage)
 static FindPackageResult findPackage(
     const QnUuid& moduleGuid,
     const nx::vms::api::SoftwareVersion& engineVersion,
-    const vms::api::SystemInformation& systemInformation,
+    const utils::OsInfo& osInfo,
     const nx::update::Information& updateInformation,
     bool isClient,
     const QString& cloudHost,
@@ -478,40 +503,23 @@ static FindPackageResult findPackage(
         return FindPackageResult::otherError;
     }
 
-    for (const auto& package : updateInformation.packages)
+    auto [result, package] = findPackageForVariant(updateInformation, isClient, osInfo);
+    if (result != FindPackageResult::ok)
     {
-        if (isClient != (package.component == update::kComponentClient))
-            continue;
-
-        nx::utils::SoftwareVersion selfOsVariant(systemInformation.version);
-        nx::utils::SoftwareVersion packageOsVariant(package.variantVersion);
-
-        if (package.arch == systemInformation.arch
-            && package.platform == systemInformation.platform
-            && (package.variant == systemInformation.modification || package.variant.isNull())
-            && (packageOsVariant <= selfOsVariant || selfOsVariant.isNull()))
-        {
-            *outPackage = package;
-            return FindPackageResult::ok;
-        }
+        setErrorMessage(
+            QString("Failed to find a suitable update package for %1").arg(toString(osInfo)),
+            outMessage);
+        return result;
     }
 
-    setErrorMessage(QString::fromLatin1(
-        "Failed to find a suitable update package for arch %1, platform %2, " \
-        "modification (variant) %3, version %4")
-            .arg(systemInformation.arch)
-            .arg(systemInformation.platform)
-            .arg(systemInformation.modification)
-            .arg(systemInformation.version),
-        outMessage);
-
-    return FindPackageResult::otherError;
+    *outPackage = *package;
+    return FindPackageResult::ok;
 }
 
 static FindPackageResult findPackage(
     const QnUuid& moduleGuid,
     const nx::vms::api::SoftwareVersion& engineVersion,
-    const vms::api::SystemInformation& systemInformation,
+    const utils::OsInfo& osInfo,
     const QByteArray& serializedUpdateInformation,
     bool isClient,
     const QString& cloudHost,
@@ -520,11 +528,15 @@ static FindPackageResult findPackage(
     QString* outMessage)
 {
     update::Information updateInformation;
+    NX_DEBUG(
+        nx::utils::log::Tag(QString("UpdateCheck")),
+        lm("update::findPackage: serialized update information is empty %1")
+            .args(serializedUpdateInformation.isEmpty()));
     const auto deserializeResult = fromByteArray(serializedUpdateInformation,
         &updateInformation, outMessage);
     if (deserializeResult != FindPackageResult::ok)
         return deserializeResult;
-    return findPackage(moduleGuid, engineVersion, systemInformation, updateInformation, isClient,
+    return findPackage(moduleGuid, engineVersion, osInfo, updateInformation, isClient,
         cloudHost, boundToCloud, outPackage, outMessage);
 }
 
@@ -558,6 +570,47 @@ FindPackageResult fromByteArray(
     return FindPackageResult::ok;
 }
 
+std::pair<FindPackageResult, const Package*> findPackageForVariant(
+    const nx::update::Information& updateInformation,
+    bool isClient,
+    const utils::OsInfo& osInfo)
+{
+    bool variantFound = false;
+    const Package* bestPackage = nullptr;
+
+    for (const Package& package: updateInformation.packages)
+    {
+        if (isClient != (package.component == kComponentClient))
+            continue;
+
+        if (package.isCompatibleTo(osInfo))
+        {
+            if (!bestPackage || package.isNewerThan(osInfo.variant, *bestPackage))
+                bestPackage = &package;
+        }
+        else if (package.isCompatibleTo(osInfo, true))
+        {
+            variantFound = true;
+        }
+    }
+
+    if (bestPackage)
+        return {FindPackageResult::ok, bestPackage};
+    return {
+        variantFound ? FindPackageResult::osVersionNotSupported : FindPackageResult::otherError,
+        nullptr};
+}
+
+std::pair<FindPackageResult, Package*> findPackageForVariant(
+    Information& updateInformation,
+    bool isClient,
+    const utils::OsInfo& osInfo)
+{
+    auto [code, package] = findPackageForVariant(
+        const_cast<const Information&>(updateInformation), isClient, osInfo);
+    return {code, const_cast<Package*>(package)};
+}
+
 FindPackageResult findPackage(
     const QnCommonModule& commonModule,
     nx::update::Package* outPackage,
@@ -566,7 +619,7 @@ FindPackageResult findPackage(
     return findPackage(
         commonModule.moduleGUID(),
         commonModule.engineVersion(),
-        QnAppInfo::currentSystemInformation(),
+        utils::OsInfo::current(),
         commonModule.globalSettings()->targetUpdateInformation(),
         commonModule.runtimeInfoManager()->localInfo().data.peer.isClient(),
         nx::network::SocketGlobals::cloud().cloudHost(),
@@ -584,33 +637,13 @@ FindPackageResult findPackage(
     return findPackage(
         commonModule.moduleGUID(),
         commonModule.engineVersion(),
-        QnAppInfo::currentSystemInformation(),
+        utils::OsInfo::current(),
         updateInformation,
         commonModule.runtimeInfoManager()->localInfo().data.peer.isClient(),
         nx::network::SocketGlobals::cloud().cloudHost(),
         !commonModule.globalSettings()->cloudSystemId().isEmpty(),
         outPackage,
         outMessage);
-}
-
-
-nx::update::Package* findPackage(
-    const QString& component,
-    nx::vms::api::SystemInformation& systemInfo,
-    nx::update::Information& info)
-{
-    for(auto& pkg: info.packages)
-    {
-        if (pkg.component == component)
-        {
-            // Check arch and OS
-            if (pkg.arch == systemInfo.arch
-                && pkg.platform == systemInfo.platform
-                && pkg.variant == systemInfo.modification)
-                return &pkg;
-        }
-    }
-    return nullptr;
 }
 
 std::future<UpdateContents> checkLatestUpdate(
@@ -666,7 +699,22 @@ std::future<UpdateContents> checkSpecificChangeset(
                     });
             }
             return result;
-        });
+    });
+}
+
+QString rootUpdatesDirectoryForDownloader()
+{
+    return QStringLiteral("updates/");
+}
+
+QString updatesDirectoryForDownloader(const QString& publicationKey)
+{
+    return rootUpdatesDirectoryForDownloader() + publicationKey + L'/';
+}
+
+QString updateFilePathForDownloader(const QString& publicationKey, const QString& fileName)
+{
+    return updatesDirectoryForDownloader(publicationKey) + fileName;
 }
 
 } // namespace nx::update

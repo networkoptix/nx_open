@@ -34,7 +34,6 @@ protected:
     virtual void onResourceStatusChanged(const QnResourcePtr& resource, Qn::ResourceStatus,
         ec2::NotificationSource source) override;
     virtual void init(const ec2::AbstractECConnectionPtr& connection) override;
-    void execBusinessActionInternal(const nx::vms::event::AbstractActionPtr& action) override;
     bool isLocalAddress(const QString& addr) const;
 
     /**
@@ -56,9 +55,6 @@ protected:
     virtual QnResourceFactory* getResourceFactory() const override;
 
 private slots:
-    void at_updateChunkReceived(const QString& updateId, const QByteArray& data, qint64 offset);
-    void at_updateInstallationRequested(const QString& updateId);
-
     void at_remotePeerUnauthorized(const QnUuid& id);
 
 private:

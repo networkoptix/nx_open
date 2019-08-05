@@ -170,7 +170,7 @@ public:
     milliseconds windowEnd() const;
     void setWindowEnd(milliseconds windowEnd);
 
-    void setWindow(milliseconds start, milliseconds end, bool animate = false);
+    void setWindow(milliseconds start, milliseconds end, bool animate = false, bool forceResize = false);
     void shiftWindow(milliseconds delta, bool animate = false);
 
     bool windowContains(milliseconds position);
@@ -203,6 +203,7 @@ public:
     void setLiveSupported(bool value);
 
     bool isLive() const;
+    void updateLive();
 
     Q_SLOT void finishAnimations();
     Q_SLOT void hurryKineticAnimations();
@@ -564,6 +565,8 @@ private:
 
     const QScopedPointer<KineticZoomHandler> m_kineticZoomHandler;
     const QScopedPointer<KineticScrollHandler> m_kineticScrollHandler;
+
+    bool m_isLive;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnTimeSlider::Options);

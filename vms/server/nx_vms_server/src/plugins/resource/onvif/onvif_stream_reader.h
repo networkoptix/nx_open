@@ -10,13 +10,13 @@
 
 struct CameraInfoParams;
 struct ProfilePair;
-class onvifXsd__Profile;
-class onvifXsd__VideoEncoderConfiguration;
-class onvifXsd__AudioEncoderConfiguration;
-class onvifXsd__AudioSourceConfiguration;
-class onvifXsd__H264Configuration;
+class tt__Profile;
+class tt__VideoEncoderConfiguration;
+class tt__AudioEncoderConfiguration;
+class tt__AudioSourceConfiguration;
+class tt__H264Configuration;
 
-typedef onvifXsd__AudioEncoderConfiguration AudioEncoder;
+typedef tt__AudioEncoderConfiguration AudioEncoder;
 
 class QnOnvifStreamReader: public CLServerPushStreamReader
 {
@@ -69,30 +69,32 @@ private:
 
     CameraDiagnostics::Result fetchUpdateProfile(
         CameraInfoParams& info, bool isPrimary, bool isCameraControlRequired) const;
-    onvifXsd__Profile* selectExistingProfile(
-        std::vector<onvifXsd__Profile *>& profiles, bool isPrimary, CameraInfoParams& info) const;
-    CameraDiagnostics::Result sendProfileToCamera(CameraInfoParams& info, onvifXsd__Profile* profile) const;
+    tt__Profile* selectExistingProfile(
+        std::vector<tt__Profile *>& profiles, bool isPrimary, CameraInfoParams& info) const;
+    CameraDiagnostics::Result sendProfileToCamera(CameraInfoParams& info, tt__Profile* profile) const;
     CameraDiagnostics::Result createNewProfile(std::string name, std::string token) const;
 
     // Returned pointers are valid while response object is living.
     // (For all functions in the following block.)
-    onvifXsd__VideoEncoderConfiguration* selectVideoEncoderConfig(
-        std::vector<onvifXsd__VideoEncoderConfiguration *>& configs, bool isPrimary) const;
-    onvifXsd__VideoEncoder2Configuration* selectVideoEncoder2Config(
-        std::vector<onvifXsd__VideoEncoder2Configuration *>& configs, bool isPrimary) const;
+    tt__VideoEncoderConfiguration* selectVideoEncoderConfig(
+        std::vector<tt__VideoEncoderConfiguration *>& configs, bool isPrimary) const;
+    tt__VideoEncoder2Configuration* selectVideoEncoder2Config(
+        std::vector<tt__VideoEncoder2Configuration *>& configs, bool isPrimary) const;
 
-    onvifXsd__AudioEncoderConfiguration* selectAudioEncoderConfig(
-        std::vector<onvifXsd__AudioEncoderConfiguration *>& configs, bool isPrimary) const;
+    tt__AudioEncoderConfiguration* selectAudioEncoderConfig(
+        std::vector<tt__AudioEncoderConfiguration *>& configs, bool isPrimary) const;
 
     void updateAudioEncoder(AudioEncoder& encoder) const;
 
     CameraDiagnostics::Result sendAudioEncoderToCamera(
-        onvifXsd__AudioEncoderConfiguration& encoderConfig) const;
+        tt__AudioEncoderConfiguration& encoderConfig) const;
+
+    void fixStreamUrl(QString* mediaUrl, const std::string& profileToken) const;
 
     CameraDiagnostics::Result fetchStreamUrl(MediaSoapWrapper& soapWrapper,
-        const std::string& profileToken, bool isPrimary, QString* const mediaUrl) const;
+        const std::string& profileToken, bool isPrimary, QString* mediaUrl) const;
 
-    void printProfile(const onvifXsd__Profile& profile, bool isPrimary) const;
+    void printProfile(const tt__Profile& profile, bool isPrimary) const;
 
     bool executePreConfigurationRequests();
     CameraDiagnostics::Result bindTwoWayAudioToProfile(

@@ -176,6 +176,7 @@ public:
         const QString& login,
         const QString& password,
         QnRestResult::Error expectedError,
+        Qn::AuthResult expectedAuthResult,
         bool withCsrf = true)
     {
         QnCookieData cookieLogin;
@@ -189,6 +190,10 @@ public:
         nx::network::http::HttpClient client;
         client.doPost(serverUrl("/api/cookieLogin"), "application/json", QJson::serialized(cookieLogin));
         ASSERT_TRUE(client.response());
+
+        const auto authResult = nx::network::http::getHeaderValue(
+            client.response()->headers, Qn::AUTH_RESULT_HEADER_NAME);
+        ASSERT_EQ(QnLexical::serialized(expectedAuthResult), authResult);
 
         const auto result = QJson::deserialized<QnJsonRestResult>(*client.fetchEntireMessageBody());
         ASSERT_EQ(expectedError, result.error);
@@ -391,12 +396,23 @@ TEST_F(AuthenticationTest, noCloudConnect)
 
 }
 
+TEST_F(AuthenticationTest, getNonce)
+{
+    for (const auto& r: {"/api/getNonce?userName=admin", "/web/api/getNonce?userName=admin"})
+    {
+        expectGetResult(r, {});
+        expectGetResult(r, {{"Cookie", "x-runtime-guid=deleted"}});
+        expectGetResult(r, {{"X-Runtime-Guid", "deleted"}});
+        expectGetResult(r, {{"Cookie", "x-runtime-guid=deleted"}, {"X-Runtime-Guid", "deleted"}});
+    }
+}
+
 TEST_F(AuthenticationTest, cookieNoCloudConnect)
 {
     // We have cloud user but not connected to cloud yet.
     testCookieAuth(
         userData.name, "invalid password",
-        QnRestResult::CantProcessRequest);
+        QnRestResult::CantProcessRequest, Qn::Auth_CloudConnectError);
 }
 
 TEST_F(AuthenticationTest, cookieWrongPassword)
@@ -404,17 +420,17 @@ TEST_F(AuthenticationTest, cookieWrongPassword)
     // Check return code for wrong password
     testCookieAuth(
         "admin", "invalid password",
-        QnRestResult::CantProcessRequest);
+        QnRestResult::CantProcessRequest, Qn::Auth_WrongPassword);
 }
 
 TEST_F(AuthenticationTest, cookieCorrectPassword)
 {
-    testCookieAuth("admin", "admin", QnRestResult::NoError);
+    testCookieAuth("admin", "admin", QnRestResult::NoError, Qn::Auth_OK);
 }
 
 TEST_F(AuthenticationTest, cookieWithoutScrf)
 {
-    testCookieAuth("admin", "admin", QnRestResult::NoError, /*withCsrf*/ false);
+    testCookieAuth("admin", "admin", QnRestResult::NoError, Qn::Auth_OK, /*withCsrf*/ false);
 }
 
 TEST_F(AuthenticationTest, localUserWithCloudLikeName)

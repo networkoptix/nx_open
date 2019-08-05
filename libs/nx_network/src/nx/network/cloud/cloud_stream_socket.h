@@ -29,7 +29,7 @@ namespace cloud {
 class NX_NETWORK_API CloudStreamSocket:
     public AbstractStreamSocketAttributesCache<AbstractStreamSocket>
 {
-    using BaseType = AbstractStreamSocketAttributesCache<AbstractStreamSocket>;
+    using base_type = AbstractStreamSocketAttributesCache<AbstractStreamSocket>;
 
 public:
     explicit CloudStreamSocket(int ipVersion = AF_INET);
@@ -46,6 +46,7 @@ public:
     virtual bool isClosed() const override;
     virtual bool shutdown() override;
     virtual AbstractSocket::SOCKET_HANDLE handle() const override;
+    virtual nx::network::Pollable* pollable() override;
 
     virtual bool connect(
         const SocketAddress& remoteAddress,

@@ -19,18 +19,18 @@
 namespace nx::clusterdb::engine::transport::p2p::websocket {
 
 Acceptor::Acceptor(
-    const QnUuid& moduleGuid,
+    const QnUuid& nodeId,
     const ProtocolVersionRange& protocolVersionRange,
-    CommandLog* transactionLog,
+    CommandLog* commandLog,
     ConnectionManager* connectionManager,
     const OutgoingCommandFilter& outgoingCommandFilter)
     :
     m_protocolVersionRange(protocolVersionRange),
-    m_commandLog(transactionLog),
+    m_commandLog(commandLog),
     m_connectionManager(connectionManager),
     m_outgoingCommandFilter(outgoingCommandFilter),
     m_localPeerData(
-        moduleGuid,
+        nodeId,
         QnUuid::createUuid(),
         vms::api::PeerType::cloudServer,
         Qn::UbjsonFormat)
@@ -91,6 +91,7 @@ void Acceptor::createConnection(
     nx::p2p::serializePeerData(*response, localPeer, remotePeerInfo.dataFormat);
 
     auto error = nx::network::websocket::validateRequest(request, response);
+    const auto compressionType = nx::network::websocket::compressionType(request.headers);
     if (error != nx::network::websocket::Error::noError)
     {
         NX_DEBUG(this,
@@ -102,7 +103,7 @@ void Acceptor::createConnection(
     nx::network::http::RequestResult result(nx::network::http::StatusCode::switchingProtocols);
     result.connectionEvents.onResponseHasBeenSent =
         [this, localPeer = std::move(localPeer), remotePeerInfo = std::move(remotePeerInfo),
-            request = std::move(request), systemId](
+            request = std::move(request), systemId, compressionType](
                 network::http::HttpServerConnection* connection) mutable
         {
             addWebSocketTransactionTransport(
@@ -110,7 +111,8 @@ void Acceptor::createConnection(
                 std::move(localPeer),
                 std::move(remotePeerInfo),
                 systemId,
-                network::http::getHeaderValue(request.headers, "User-Agent").toStdString());
+                network::http::getHeaderValue(request.headers, "User-Agent").toStdString(),
+                compressionType);
         };
     completionHandler(std::move(result));
 }
@@ -120,11 +122,13 @@ void Acceptor::addWebSocketTransactionTransport(
     vms::api::PeerDataEx localPeerInfo,
     vms::api::PeerDataEx remotePeerInfo,
     const std::string& systemId,
-    const std::string& userAgent)
+    const std::string& userAgent,
+    nx::network::websocket::CompressionType compressionType)
 {
     const auto remoteAddress = connection->getForeignAddress();
     auto p2pTransport = std::make_unique<nx::p2p::P2PWebsocketTransport>(
-        std::move(connection), network::websocket::FrameType::binary);
+        std::move(connection), network::websocket::Role::server,
+        network::websocket::FrameType::binary, compressionType);
 
     p2pTransport->start();
     const auto connectionId = QnUuid::createUuid().toSimpleString().toStdString();
@@ -139,10 +143,12 @@ void Acceptor::addWebSocketTransactionTransport(
         localPeerInfo,
         remotePeerInfo);
 
+    const auto remoteNodeId = remotePeerInfo.id.toSimpleByteArray().toStdString();
     ConnectionManager::ConnectionContext context{
         std::move(transactionTransport),
+        remoteNodeId,
         connectionId,
-        {systemId, remotePeerInfo.id.toByteArray().toStdString()},
+        {systemId, remoteNodeId},
         userAgent};
 
     if (!m_connectionManager->addNewConnection(std::move(context)))

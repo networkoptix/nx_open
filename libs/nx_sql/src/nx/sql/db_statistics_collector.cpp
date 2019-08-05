@@ -1,35 +1,21 @@
 #include "db_statistics_collector.h"
 
+#include <nx/fusion/model_functions.h>
 #include <nx/utils/time.h>
 
 namespace nx::sql {
 
-QueryExecutionInfo::QueryExecutionInfo():
-    waitForExecutionDuration(std::chrono::milliseconds::zero())
-{
-}
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
+    (DurationStatistics)(QueryStatistics),
+    (json),
+    _sql_Fields)
 
-DurationStatistics::DurationStatistics():
-    min(std::chrono::milliseconds::max()),
-    max(std::chrono::milliseconds::min()),
-    average(std::chrono::milliseconds::zero())
-{
-}
-
-QueryStatistics::QueryStatistics():
-    requestsSucceeded(0),
-    requestsFailed(0),
-    requestsCancelled(0)
-{
-}
+//-------------------------------------------------------------------------------------------------
 
 StatisticsCollector::DurationStatisticsCalculationContext::DurationStatisticsCalculationContext(
     DurationStatistics* result)
     :
-    result(result),
-    currentSum(std::chrono::milliseconds::zero()),
-    count(0),
-    recalcMinMax(false)
+    result(result)
 {
 }
 

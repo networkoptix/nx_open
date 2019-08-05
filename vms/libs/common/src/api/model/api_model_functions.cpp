@@ -16,7 +16,6 @@
 #include "recording_stats_reply.h"
 #include "camera_list_reply.h"
 #include "configure_reply.h"
-#include "upload_update_reply.h"
 #include "update_information_reply.h"
 #include "rebuild_archive_reply.h"
 #include "api_ioport_data.h"
@@ -40,7 +39,6 @@
     (QnStatisticsDataItem)\
     (QnStatisticsReply)\
     (QnTimeReply)\
-    (ApiServerDateTimeData)\
     (SyncTimeData)\
     (ApiServerHardwareIdsData)\
     (QnTestEmailSettingsReply)\
@@ -50,7 +48,6 @@
     (QnSystemSettingsReply)\
     (QnCameraListReply)\
     (QnConfigureReply) \
-    (QnUploadUpdateReply)\
     (QnUpdateFreeSpaceReply)\
     (QnCloudHostCheckReply)\
     (QnRecordingStatsData)\

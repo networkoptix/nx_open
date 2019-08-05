@@ -45,26 +45,25 @@ public:
         bool leftHidden = true;
 
         m_animated = false;
-        if (m_owner->isVerificationErrorVisible())
+        if (m_owner->isVerificationErrorVisible() && !data->verificationMessage.isEmpty())
         {
-            // Not showing any other statuses if there are any verification errors.
-            if (!data->verificationMessage.isEmpty())
-            {
-                m_left->setText(data->verificationMessage);
-                m_left->setIcon(qnSkin->icon("text_buttons/clear_error.png"));
-                leftHidden = false;
-                errorStyle = true;
-            }
-            else
-            {
-                leftHidden = true;
-            }
+            m_left->setText(data->verificationMessage);
+            m_left->setIcon(qnSkin->icon("text_buttons/clear_error.png"));
+            leftHidden = false;
+            errorStyle = true;
         }
         else if (data->skipped)
         {
             m_left->setText(tr("Skipped"));
             m_left->setIcon(qnSkin->icon("text_buttons/ok.png"));
             leftHidden = false;
+        }
+        else if (data->statusUnknown)
+        {
+            m_left->setText(tr("Waiting for server to respond..."));
+            leftHidden = false;
+            m_animated = true;
+            progressHidden = true;
         }
         else if (data->installed)
         {
@@ -75,6 +74,13 @@ public:
         else if (data->installing)
         {
             m_left->setText(tr("Installing..."));
+            leftHidden = false;
+            m_animated = true;
+            progressHidden = true;
+        }
+        else if (data->offline && data->state != StatusCode::offline && !data->incompatible)
+        {
+            m_left->setText(tr("Waiting for server to respond..."));
             leftHidden = false;
             m_animated = true;
             progressHidden = true;
@@ -149,11 +155,6 @@ public:
             m_progress->setHidden(progressHidden);
         if (leftHidden != m_left->isHidden())
             m_left->setHidden(leftHidden);
-
-        if (m_lastItem != data)
-        {
-            m_lastItem = data;
-        }
     }
 
 protected:
@@ -171,7 +172,6 @@ private:
     bool m_animated = false;
 
     QPointer<const ServerStatusItemDelegate> m_owner;
-    UpdateItemPtr m_lastItem;
 };
 
 ServerStatusItemDelegate::ServerStatusItemDelegate(QWidget* parent) :

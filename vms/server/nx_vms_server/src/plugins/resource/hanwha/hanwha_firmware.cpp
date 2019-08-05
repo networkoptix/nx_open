@@ -1,5 +1,8 @@
 #include "hanwha_firmware.h"
 
+#include <QtCore/QRegExp>
+#include <QtCore/QStringList>
+
 namespace nx {
 namespace vms::server {
 namespace plugins {

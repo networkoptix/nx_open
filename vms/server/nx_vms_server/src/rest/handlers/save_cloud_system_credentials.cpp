@@ -15,6 +15,7 @@
 #include <api/global_settings.h>
 #include <api/model/cloud_credentials_data.h>
 #include <common/common_module.h>
+#include <media_server/media_server_module.h>
 #include <rest/helpers/permissions_helper.h>
 #include <rest/server/rest_connection_processor.h>
 
@@ -68,7 +69,7 @@ bool QnSaveCloudSystemCredentialsHandler::authorize(
         *authorizationStatusCode = (StatusCode::Value)QnPermissionsHelper::safeModeError(*result);
         return false;
     }
-    if (!QnPermissionsHelper::hasOwnerPermissions(resourcePool(), accessRights))
+    if (!QnPermissionsHelper::hasOwnerPermissions(serverModule()->resourcePool(), accessRights))
     {
         *authorizationStatusCode = (StatusCode::Value)QnPermissionsHelper::notOwnerError(*result);
         return false;

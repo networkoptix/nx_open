@@ -292,10 +292,26 @@ void QnPlAxisResource::stopInputPortStatesMonitoring()
 
 void QnPlAxisResource::stopInputPortMonitoringSync()
 {
-    m_inputIoMonitor.httpClient.reset();
-    m_outputIoMonitor.httpClient.reset();
-    m_inputPortStateReader.reset();
-    m_timer.cancelSync();
+    std::promise<void> promise;
+    m_timer.dispatch(
+        [this, &promise]()
+        {
+            static const auto removeClient =
+                [](nx::network::http::AsyncHttpClientPtr* client)
+                {
+                    if (*client)
+                        (*client)->pleaseStopSync();
+                    client->reset();
+                };
+
+            m_timer.cancelSync();
+            removeClient(&m_inputIoMonitor.httpClient);
+            removeClient(&m_outputIoMonitor.httpClient);
+            removeClient(&m_inputPortStateReader);
+            promise.set_value();
+        });
+
+    promise.get_future().wait();
 
     auto timeMs = qnSyncTime->currentMSecsSinceEpoch();
     for (const auto& state: ioPortStates())
@@ -672,7 +688,7 @@ CameraDiagnostics::Result QnPlAxisResource::initializeCameraDriver()
     // because mobile client doesn't load resource type information.
     if (isIOModule())
         setProperty(ResourcePropertyKey::kIoConfigCapability, QString("1"));
-
+    setCameraCapability(Qn::CameraTimeCapability, true);
     saveProperties();
 
     return CameraDiagnostics::NoErrorResult();
@@ -1105,6 +1121,7 @@ void QnPlAxisResource::onCurrentIOStateResponseReceived( nx::network::http::Asyn
         }
     }
 
+    m_inputPortStateReader->pleaseStopSync();
     m_inputPortStateReader.reset();
 }
 
@@ -1134,9 +1151,12 @@ void QnPlAxisResource::onMonitorConnectionClosed( nx::network::http::AsyncHttpCl
 {
     if (getParentId() != commonModule()->moduleGUID() || !isInitialized())
         return;
+
     auto ioMonitor = ioMonitorByHttpClient(httpClient);
     if (!ioMonitor)
         return;
+
+    ioMonitor->httpClient->pleaseStopSync();
     ioMonitor->httpClient.reset();
     restartIOMonitorWithDelay();
 }

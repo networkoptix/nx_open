@@ -34,20 +34,34 @@ struct hash<QString>
 
 namespace ec2 {
 
+struct ApiDeviceAnalyticsTypeInfo
+{
+    QString id;
+    QString name;
+    QString provider;
+};
+#define ApiDeviceAnalyticsTypeInfo_Fields (id)(name)(provider)
+
+struct ApiDeviceAnalyticsStatistics
+{
+    std::vector<ApiDeviceAnalyticsTypeInfo> supportedEventTypes;
+    std::vector<ApiDeviceAnalyticsTypeInfo> supportedObjectTypes;
+};
+#define ApiDeviceAnalyticsStatistics_Fields (supportedEventTypes)(supportedObjectTypes)
+
 struct ApiCameraDataStatistics:
     nx::vms::api::CameraDataEx
 {
     ApiCameraDataStatistics();
     ApiCameraDataStatistics(nx::vms::api::CameraDataEx&& data);
 
-    const static std::set<QString> EXCEPT_PARAMS;
-    const static std::set<QString> RESOURCE_PARAMS;
+    ApiDeviceAnalyticsStatistics analyticsInfo;
 };
 #define ApiCameraDataStatistics_Fields (id)(parentId)(status)(addParams) \
     (manuallyAdded)(model)(statusFlags)(vendor) \
     (scheduleEnabled)(motionType)(motionMask)(scheduleTasks)(audioEnabled)(disableDualStreaming) \
     (controlEnabled)(dewarpingParams)(minArchiveDays)(maxArchiveDays)(preferredServerId) \
-    (backupType)
+    (backupType)(analyticsInfo)
 
 struct ApiStorageDataStatistics:
     nx::vms::api::StorageData
@@ -150,7 +164,9 @@ struct ApiStatisticsServerInfo
     (ApiStatisticsReportInfo) \
     (ApiSystemStatistics) \
     (ApiStatisticsServerArguments) \
-    (ApiStatisticsServerInfo)
+    (ApiStatisticsServerInfo) \
+    (ApiDeviceAnalyticsTypeInfo) \
+    (ApiDeviceAnalyticsStatistics)
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES( \
     API_STATISTICS_DATA_TYPES, (ubjson)(xml)(json)(csv_record));

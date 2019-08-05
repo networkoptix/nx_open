@@ -83,15 +83,15 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Getting update information from the server</source>
-      <translation type="unfinished">Getting update information from the server</translation>
+      <translation>サーバーから更新情報を取得</translation>
     </message>
     <message>
       <source>Downloading update package</source>
-      <translation type="unfinished">Downloading update package</translation>
+      <translation>更新プログラム パッケージをダウンロード</translation>
     </message>
     <message>
       <source>Installing</source>
-      <translation type="unfinished">Installing</translation>
+      <translation>インストール中</translation>
     </message>
   </context>
   <context>
@@ -231,10 +231,6 @@ to view more bookmarks</source>
     <message>
       <source>Save Video Wall View</source>
       <translation>ビデオウォールの保存</translation>
-    </message>
-    <message>
-      <source>Drop Resources</source>
-      <translation>ドロップ リソース</translation>
     </message>
     <message>
       <source>Start Screen Recording</source>
@@ -865,7 +861,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Forget password</source>
-      <translation type="unfinished">Forget password</translation>
+      <translation>パスワードを忘れた場合</translation>
     </message>
     <message>
       <source>Cancel Upload...</source>
@@ -877,7 +873,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Analytics Engine Settings...</source>
-      <translation type="unfinished">Analytics Engine Settings...</translation>
+      <translation>解析エンジンの設定...</translation>
     </message>
     <message>
       <source>Show Thumbnails</source>
@@ -897,11 +893,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Virtual Camera...</source>
-      <translation type="unfinished">Virtual Camera...</translation>
+      <translation>バーチャルカメラ</translation>
     </message>
     <message>
       <source>New Virtual Camera...</source>
-      <translation type="unfinished">New Virtual Camera...</translation>
+      <translation>新規バーチャルカメラ</translation>
     </message>
     <message>
       <source>Show Tree</source>
@@ -925,27 +921,27 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Switch to Notifications tab</source>
-      <translation type="unfinished">Switch to Notifications tab</translation>
+      <translation>通知タブに切り替え</translation>
     </message>
     <message>
       <source>Switch to Motion tab</source>
-      <translation type="unfinished">Switch to Motion tab</translation>
+      <translation>モーションタブに切り替え</translation>
     </message>
     <message>
       <source>Switch to Bookmarks tab</source>
-      <translation type="unfinished">Switch to Bookmarks tab</translation>
+      <translation>ブックマークタブに切り替え</translation>
     </message>
     <message>
       <source>Switch to Events tab</source>
-      <translation type="unfinished">Switch to Events tab</translation>
+      <translation>イベントタブに切り替え</translation>
     </message>
     <message>
       <source>Switch to Objects tab</source>
-      <translation type="unfinished">Switch to Objects tab</translation>
+      <translation>オブジェクトタブに切り替え</translation>
     </message>
     <message>
       <source>Objects Frames and Info...</source>
-      <translation type="unfinished">Objects Frames and Info...</translation>
+      <translation>オブジェクトフレームと情報...</translation>
     </message>
   </context>
   <context>
@@ -991,23 +987,23 @@ to view more bookmarks</source>
     <name>EncryptedLayoutStrings</name>
     <message>
       <source>Please enter a valid password</source>
-      <translation type="unfinished">Please enter a valid password</translation>
+      <translation>正しいパスワードを入力してください</translation>
     </message>
     <message>
       <source>The password is not valid.</source>
-      <translation type="unfinished">The password is not valid.</translation>
+      <translation>パスワードが無効です</translation>
     </message>
     <message>
       <source>Encrypted layout</source>
-      <translation type="unfinished">Encrypted layout</translation>
+      <translation>暗号化されたレイアウト</translation>
     </message>
     <message>
       <source>The file %1 is encrypted. Please enter the password:</source>
-      <translation type="unfinished">The file %1 is encrypted. Please enter the password:</translation>
+      <translation>ファイル %1 は暗号化されています　パスワードを入力してください：</translation>
     </message>
     <message>
       <source>Please re-enter password for layout %1:</source>
-      <translation type="unfinished">Please re-enter password for layout %1:</translation>
+      <translation>レイアウト %1 のパスワードを再入力してください</translation>
     </message>
   </context>
   <context>
@@ -1031,11 +1027,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Video</source>
-      <translation type="unfinished">Video</translation>
+      <translation>ビデオ</translation>
     </message>
     <message>
       <source>All Files</source>
-      <translation type="unfinished">All Files</translation>
+      <translation>全てのファイル</translation>
     </message>
   </context>
   <context>
@@ -1318,7 +1314,7 @@ to view more bookmarks</source>
     <name>PtzInstrument</name>
     <message>
       <source>Layout is locked</source>
-      <translation type="unfinished">Layout is locked</translation>
+      <translation>レイアウトはロックされています</translation>
     </message>
   </context>
   <context>
@@ -1572,15 +1568,15 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>Details for %n sessions of %1</source>
       <comment>Total number will be substituted as %1</comment>
-      <translation type="unfinished">
-        <numerusform>Details for %n sessions of %1</numerusform>
+      <translation>
+        <numerusform>%1 の %n セッションの詳細</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Details for %n cameras of %1</source>
       <comment>Total number will be substituted as %1</comment>
-      <translation type="unfinished">
-        <numerusform>Details for %n cameras of %1</numerusform>
+      <translation>
+        <numerusform>%1 の %n カメラの詳細</numerusform>
       </translation>
     </message>
   </context>
@@ -1736,12 +1732,12 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Update installed</source>
-      <translation type="unfinished">Update installed</translation>
+      <translation>アップデートのインストール完了</translation>
     </message>
     <message numerus="yes">
       <source>%n actions</source>
-      <translation type="unfinished">
-        <numerusform>%n actions</numerusform>
+      <translation>
+        <numerusform>%n アクション</numerusform>
       </translation>
     </message>
   </context>
@@ -2018,7 +2014,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Force Acknowledgement will only work for Generic Events if camera modifiers are used in the Generic Event URL</source>
-      <translation type="unfinished">Force Acknowledgement will only work for Generic Events if camera modifiers are used in the Generic Event URL</translation>
+      <translation>カメライベントが一般的イベントで使用されている場合、強制承認は一般的イベントに対してのみ機能します</translation>
     </message>
   </context>
   <context>
@@ -2551,18 +2547,7 @@ to %1</source>
     </message>
     <message>
       <source>Internal server error. Please try again later.</source>
-      <translation type="unfinished">Internal server error. Please try again later.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnConnectToCurrentSystemTool</name>
-    <message>
-      <source>Configuring Server</source>
-      <translation>サーバー構成</translation>
-    </message>
-    <message>
-      <source>Updating Server</source>
-      <translation>サーバー更新</translation>
+      <translation>内部サーバーエラーです　後で再試行してください</translation>
     </message>
   </context>
   <context>
@@ -2716,11 +2701,11 @@ to %1</source>
     </message>
     <message>
       <source>Download &amp;&amp; Install</source>
-      <translation type="unfinished">Download &amp;&amp; Install</translation>
+      <translation>ダウンロードとインストール</translation>
     </message>
     <message>
       <source>Failed to enter compatibility mode for version %1</source>
-      <translation type="unfinished">Failed to enter compatibility mode for version %1</translation>
+      <translation>バージョン %1互換モードに失敗しました</translation>
     </message>
   </context>
   <context>
@@ -2870,10 +2855,6 @@ to %1</source>
       <source>44.1 kHz and 48 kHz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
       <translation>44.1 kHzと48 kHzのオーディオ形式は、オーディオキャプチャデバイスではサポートされていません　別のオーディオデバイスを選択するか、スクリーン録画設定で&quot;なし&quot;を選択してください</translation>
     </message>
-    <message>
-      <source>Configured codec: %1 not found, h263p will used</source>
-      <translation type="unfinished">Configured codec: %1 not found, h263p will used</translation>
-    </message>
   </context>
   <context>
     <name>QnDisconnectFromCloudDialogPrivate</name>
@@ -2990,15 +2971,15 @@ to %1</source>
     <message numerus="yes">
       <source>Event log for period from %1 to %2 - %n events found</source>
       <comment>Dates are substituted</comment>
-      <translation type="unfinished">
-        <numerusform>Event log for period from %1 to %2 - %n events found</numerusform>
+      <translation>
+        <numerusform>%1 から %2 - %n の期間のイベント ログ</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Event log for %1 - %n events found</source>
       <comment>Date is substituted</comment>
-      <translation type="unfinished">
-        <numerusform>Event log for %1 - %n events found</numerusform>
+      <translation>
+        <numerusform>%1 - %n イベントログが見つかりました</numerusform>
       </translation>
     </message>
   </context>
@@ -3072,8 +3053,8 @@ to %1</source>
     <message numerus="yes">
       <source>%1 (%n cameras)</source>
       <comment>%1 is description of event. Will be replaced in runtime</comment>
-      <translation type="unfinished">
-        <numerusform>%1 (%n cameras)</numerusform>
+      <translation>
+        <numerusform>%1 (%n カメラ)</numerusform>
       </translation>
     </message>
   </context>
@@ -3156,11 +3137,11 @@ to %1</source>
     <name>QnFullscreenCameraActionWidget</name>
     <message>
       <source>This camera is not currently on the selected layout. Action will work if camera is added before action triggers.</source>
-      <translation type="unfinished">This camera is not currently on the selected layout. Action will work if camera is added before action triggers.</translation>
+      <translation>このカメラは現在選択されているレイアウトに含まれていません　アクションが実行される前にカメラを追加すればアクションは動作します</translation>
     </message>
     <message>
       <source>This camera is not currently on some of the selected layouts. Action will work if camera is added before action triggers.</source>
-      <translation type="unfinished">This camera is not currently on some of the selected layouts. Action will work if camera is added before action triggers.</translation>
+      <translation>このカメラは現在選択されているレイアウトに含まれていません。アクションが実行される前にカメラを追加すればアクションは動作します</translation>
     </message>
   </context>
   <context>
@@ -3168,6 +3149,17 @@ to %1</source>
     <message>
       <source>Select exactly one camera</source>
       <translation>1台のカメラを選択してください</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnGLCheckerInstrument</name>
+    <message>
+      <source>Video card drivers are outdated or not installed</source>
+      <translation>ビデオ カードのドライバーが古いかインストールされていません</translation>
+    </message>
+    <message>
+      <source>%1 may not work properly.</source>
+      <translation>%1 が正しく動作しない場合があります</translation>
     </message>
   </context>
   <context>
@@ -3179,6 +3171,14 @@ to %1</source>
     <message>
       <source>Folder already added</source>
       <translation>フィールドはすでに追加されています</translation>
+    </message>
+    <message>
+      <source>None</source>
+      <translation>なし</translation>
+    </message>
+    <message>
+      <source>Auto (%1)</source>
+      <translation type="unfinished">Auto (%1)</translation>
     </message>
   </context>
   <context>
@@ -3246,17 +3246,6 @@ to %1</source>
     <message>
       <source>Creates a backup of System configuration that can be restored in case of failure.</source>
       <translation>障害発生時に復元可能なシステム構成のバックアップを作成します</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnGlHardwareChecker</name>
-    <message>
-      <source>Video card drivers are outdated or not installed</source>
-      <translation>ビデオ カードのドライバーが古いかインストールされていません</translation>
-    </message>
-    <message>
-      <source>%1 may not work properly.</source>
-      <translation>%1 が正しく動作しない場合があります</translation>
     </message>
   </context>
   <context>
@@ -3347,7 +3336,7 @@ to %1</source>
     <name>QnInputDialog</name>
     <message>
       <source>Please enter a value.</source>
-      <translation type="unfinished">Please enter a value.</translation>
+      <translation>値を入力してください</translation>
     </message>
   </context>
   <context>
@@ -3551,8 +3540,8 @@ to %1</source>
       </translation>
     </message>
     <message>
-      <source>Qty</source>
-      <translation>数</translation>
+      <source>Channels</source>
+      <translation type="unfinished">Channels</translation>
     </message>
   </context>
   <context>
@@ -3741,7 +3730,7 @@ to %1</source>
     </message>
     <message>
       <source>Every license can be deactivated only a few times.</source>
-      <translation type="unfinished">Every license can be deactivated only a few times.</translation>
+      <translation>すべてのライセンスは数回しか無効にできません</translation>
     </message>
     <message numerus="yes">
       <source>%1 are currently in use</source>
@@ -4042,7 +4031,7 @@ to %1</source>
     </message>
     <message>
       <source>Area Zoom</source>
-      <translation type="unfinished">Area Zoom</translation>
+      <translation>エリアズーム</translation>
     </message>
   </context>
   <context>
@@ -4197,11 +4186,11 @@ to %1</source>
     </message>
     <message>
       <source>Virtual Camera</source>
-      <translation type="unfinished">Virtual Camera</translation>
+      <translation>バーチャルカメラ</translation>
     </message>
     <message>
       <source>Virtual Camera %1</source>
-      <translation type="unfinished">Virtual Camera %1</translation>
+      <translation>バーチャルカメラ%1</translation>
     </message>
   </context>
   <context>
@@ -4424,8 +4413,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>about %n minutes</source>
-      <translation type="unfinished">
-        <numerusform>about %n minutes</numerusform>
+      <translation>
+        <numerusform>約%n分</numerusform>
       </translation>
     </message>
   </context>
@@ -4605,11 +4594,11 @@ to %1</source>
     </message>
     <message>
       <source>Current Bitrate</source>
-      <translation type="unfinished">Current Bitrate</translation>
+      <translation>現在のビットレート</translation>
     </message>
     <message>
       <source>no data for forecast</source>
-      <translation type="unfinished">no data for forecast</translation>
+      <translation>予測データがありません</translation>
     </message>
   </context>
   <context>
@@ -4653,11 +4642,11 @@ to %1</source>
     <name>QnResourceBrowserWidget</name>
     <message>
       <source>Local files</source>
-      <translation type="unfinished">Local files</translation>
+      <translation>ローカルファイル</translation>
     </message>
     <message>
       <source>No local files</source>
-      <translation type="unfinished">No local files</translation>
+      <translation>ローカルファイルなし</translation>
     </message>
     <message>
       <source>Nothing found</source>
@@ -4673,7 +4662,7 @@ to %1</source>
     </message>
     <message>
       <source>open all</source>
-      <translation type="unfinished">open all</translation>
+      <translation>すべてを開く</translation>
     </message>
     <message>
       <source>All types</source>
@@ -4794,7 +4783,7 @@ to %1</source>
     </message>
     <message>
       <source>Analytics Engines</source>
-      <translation type="unfinished">Analytics Engines</translation>
+      <translation>解析エンジン</translation>
     </message>
   </context>
   <context>
@@ -4812,7 +4801,7 @@ to %1</source>
     </message>
     <message>
       <source>Information</source>
-      <translation>情報（ビデオテクニカ株式会社ローカライズ版）</translation>
+      <translation>情報</translation>
     </message>
     <message>
       <source>Rotate</source>
@@ -5050,6 +5039,10 @@ to %1</source>
       <source>Server Web Page</source>
       <translation>サーバーウェブページ...</translation>
     </message>
+    <message>
+      <source>Plugins</source>
+      <translation type="unfinished">Plugins</translation>
+    </message>
   </context>
   <context>
     <name>QnServerSettingsWidget</name>
@@ -5088,219 +5081,6 @@ to %1</source>
     <message>
       <source>Servers with failover enabled will automatically take cameras from offline servers.</source>
       <translation>フェイルオーバーが有効になっているサーバーは、自動的にオフラインサーバーからカメラを引き継ぎます</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnServerUpdatesModel</name>
-    <message>
-      <source>Server</source>
-      <translation>サーバー</translation>
-    </message>
-    <message>
-      <source>Status</source>
-      <translation>ステータス</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnServerUpdatesWidget</name>
-    <message>
-      <source>Select Update File...</source>
-      <translation>更新ファイル選択...</translation>
-    </message>
-    <message>
-      <source>Release notes</source>
-      <translation>リリースノート</translation>
-    </message>
-    <message>
-      <source>You will have to update the client manually using an installer.</source>
-      <translation>クライアントをマニュアルで更新してください.</translation>
-    </message>
-    <message>
-      <source>Cannot update from this file.</source>
-      <translation>このファイルから更新できません.</translation>
-    </message>
-    <message>
-      <source>Latest Available Update</source>
-      <translation>最新の利用可能な更新プログラム</translation>
-    </message>
-    <message>
-      <source>Download the Latest Version Update File</source>
-      <translation>最新バージョンの更新ファイルをダウンロードします</translation>
-    </message>
-    <message>
-      <source>Selected Version</source>
-      <translation>バージョンの選択</translation>
-    </message>
-    <message>
-      <source>Download Update File</source>
-      <translation>更新ファイルをダウンロード</translation>
-    </message>
-    <message>
-      <source>Browse for Update File...</source>
-      <translation>更新ファイルの参照.</translation>
-    </message>
-    <message>
-      <source>Selected Update File</source>
-      <translation>更新ファイル選択...</translation>
-    </message>
-    <message>
-      <source>Download in External Browser</source>
-      <translation>外部ブラウザーでダウンロード</translation>
-    </message>
-    <message>
-      <source>Copy Link to Clipboard</source>
-      <translation>クリップボードにリンクをコピー</translation>
-    </message>
-    <message>
-      <source>Unable to check updates on the Internet.</source>
-      <translation>インターネット上の更新プログラムをチェックできません</translation>
-    </message>
-    <message>
-      <source>Unknown build number.</source>
-      <translation>不明なビルド番号</translation>
-    </message>
-    <message>
-      <source>Downgrade to an earlier version is prohibited.</source>
-      <translation>以前のバージョンへのダウン グレードは禁止されています</translation>
-    </message>
-    <message>
-      <source>Updates for one or more servers were not found.</source>
-      <translation>1 つまたは複数のサーバーの更新プログラムが見つかりませんでした</translation>
-    </message>
-    <message>
-      <source>Client update was not found.</source>
-      <translation>クライアント用更新プログラムが見つかりませんでした</translation>
-    </message>
-    <message>
-      <source>Unable to extract update file. No free space left on the disk.</source>
-      <translation>更新プログラム ファイルを抽出することができません　ディスクに空き領域が残っていません</translation>
-    </message>
-    <message>
-      <source>Update Finished...</source>
-      <translation>更新が終了しました...</translation>
-    </message>
-    <message>
-      <source>Checking for updates...</source>
-      <translation>アップデートを確認しています…</translation>
-    </message>
-    <message>
-      <source>Downloading updates...</source>
-      <translation>アップデートをダウンロードしています…</translation>
-    </message>
-    <message>
-      <source>Installing client update...</source>
-      <translation>クライアント用更新プログラムをインストールしています...</translation>
-    </message>
-    <message>
-      <source>Installing updates to incompatible servers...</source>
-      <translation>互換性のないサーバーに更新プログラムをインストールしています...</translation>
-    </message>
-    <message>
-      <source>Pushing updates to servers...</source>
-      <translation>サーバーに更新プログラムをプッシュ...</translation>
-    </message>
-    <message>
-      <source>Installing updates...</source>
-      <translation>更新をインストール中...</translation>
-    </message>
-    <message>
-      <source>Specific Build...</source>
-      <translation>特定のビルド...</translation>
-    </message>
-    <message>
-      <source>Update to Specific Build</source>
-      <translation>特定のビルドを更新</translation>
-    </message>
-    <message>
-      <source>Update System</source>
-      <translation>更新システム</translation>
-    </message>
-    <message>
-      <source>System update in process</source>
-      <translation>処理中のシステム更新</translation>
-    </message>
-    <message>
-      <source>Cancel Update</source>
-      <translation>更新をキャンセル</translation>
-    </message>
-    <message>
-      <source>Continue in Background</source>
-      <translation>バック グラウンドで続行</translation>
-    </message>
-    <message numerus="yes">
-      <source>Not enough free space at %n Servers:</source>
-      <translation>
-        <numerusform>%n サーバー 空き領域不足:</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Attempt to update may fail or cause Server malfunction.</source>
-      <translation>更新すると、失敗または誤動作の原因となります</translation>
-    </message>
-    <message>
-      <source>Force Update</source>
-      <translation>強制アップデート</translation>
-    </message>
-    <message>
-      <source>Server update completed</source>
-      <translation>サーバーの更新が完了しました</translation>
-    </message>
-    <message>
-      <source>Update completed</source>
-      <translation>更新が完了しました</translation>
-    </message>
-    <message>
-      <source>Update canceled</source>
-      <translation>更新のキャンセル</translation>
-    </message>
-    <message>
-      <source>All Servers already updated</source>
-      <translation>全サーバーは既に更新されています</translation>
-    </message>
-    <message>
-      <source>Update failed</source>
-      <translation>更新失敗</translation>
-    </message>
-    <message>
-      <source>Please update %1 manually using an installation package.</source>
-      <translation>インストール パッケージを使用して手動で %1 を更新してください</translation>
-    </message>
-    <message>
-      <source>%1 will be restarted to the updated version.</source>
-      <translation>%1 は、更新されたバージョンで再起動します</translation>
-    </message>
-    <message>
-      <source>Update cannot be canceled at this stage</source>
-      <translation>この段階で更新を取り消すことができません</translation>
-    </message>
-    <message>
-      <source>Please wait until it is finished.</source>
-      <translation>終了するまでお待ちください</translation>
-    </message>
-    <message>
-      <source>All components in your System are up to date.</source>
-      <translation>お使いのシステムのすべてのコンポーネントが最新の状態です</translation>
-    </message>
-    <message>
-      <source>All components in your System are up to this version.</source>
-      <translation>お使いのシステムのすべてのコンポーネントが最新の状態です</translation>
-    </message>
-    <message>
-      <source>Incompatible %1 instance. To update disconnect System from %1 first.</source>
-      <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation>互換性のない %1 インスタンス　更新は最初に %1 からシステムを切断します</translation>
-    </message>
-    <message>
-      <source>Update Files</source>
-      <translation>ファイルを更新</translation>
-    </message>
-    <message>
-      <source>Validating the update...</source>
-      <translation>更新の検証中...</translation>
-    </message>
-    <message>
-      <source>Checking for free space...</source>
-      <translation>空き容量を確認しています...</translation>
     </message>
   </context>
   <context>
@@ -5606,23 +5386,23 @@ to %1</source>
     </message>
     <message>
       <source>Last 5 minutes</source>
-      <translation type="unfinished">Last 5 minutes</translation>
+      <translation>直近の5分</translation>
     </message>
     <message>
       <source>Last 60 minutes</source>
-      <translation type="unfinished">Last 60 minutes</translation>
+      <translation>直近の60分</translation>
     </message>
     <message>
       <source>Last 24 hours</source>
-      <translation type="unfinished">Last 24 hours</translation>
+      <translation>直近の24時間</translation>
     </message>
     <message>
       <source>Longest period available</source>
-      <translation type="unfinished">Longest period available</translation>
+      <translation>利用可能な最長期間</translation>
     </message>
     <message>
       <source>Forecast available only for cameras with enabled recording.</source>
-      <translation type="unfinished">Forecast available only for cameras with enabled recording.</translation>
+      <translation>録画が有効になっているカメラでのみ使用可能な予測</translation>
     </message>
   </context>
   <context>
@@ -5732,16 +5512,30 @@ to %1</source>
       <translation>バックアップ完了</translation>
     </message>
     <message>
-      <source>Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</source>
-      <translation>無効になっているストレージへの記録は停止しますが古い記録の削除は実行されます</translation>
-    </message>
-    <message>
-      <source>Recording was enabled on the USB storage</source>
-      <translation>USBストレージで録画が有効になりました</translation>
-    </message>
-    <message>
       <source>Reindexing can fix problems with archive or backup if they have been lost or damaged, or if some hardware has been replaced.</source>
       <translation>アーカイブの再インデックスは、アーカイブやバックアップが紛失または破損した場合、または一部のハードウェアが交換された場合の問題を解決できます</translation>
+    </message>
+    <message>
+      <source>What to do with current analytics data?</source>
+      <translation type="unfinished">What to do with current analytics data?</translation>
+    </message>
+    <message>
+      <source>Current analytics data will not be automatically moved to another location and will become unaccessible. You can keep it and manually move later, or delete permanently.
+If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
+      <translation type="unfinished">Current analytics data will not be automatically moved to another location and will become unaccessible. You can keep it and manually move later, or delete permanently.
+If you intended to move analytics data to another storage location, please contact support before proceeding.</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>削除</translation>
+    </message>
+    <message>
+      <source>Keep</source>
+      <translation>維持</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>キャンセル</translation>
     </message>
   </context>
   <context>
@@ -5789,6 +5583,14 @@ to %1</source>
     <message>
       <source>Too small and system partitions are reserved and not used for writing if there is enough other storage space available.</source>
       <translation>容量が小さくて、他に十分な領域があるストレージがある場合には書込み先として使用されません</translation>
+    </message>
+    <message>
+      <source>Use to store analytics data</source>
+      <translation type="unfinished">Use to store analytics data</translation>
+    </message>
+    <message>
+      <source>Stores analytics data</source>
+      <translation type="unfinished">Stores analytics data</translation>
     </message>
   </context>
   <context>
@@ -5876,8 +5678,8 @@ to %1</source>
       <translation>ユーザー</translation>
     </message>
     <message>
-      <source>Analytics</source>
-      <translation>解析</translation>
+      <source>Plugins</source>
+      <translation type="unfinished">Plugins</translation>
     </message>
   </context>
   <context>
@@ -5983,10 +5785,6 @@ to %1</source>
       <translation>リモートアーカイブの同期が進行中です</translation>
     </message>
     <message>
-      <source>Error occured during remote archive synchronization</source>
-      <translation>リモートアーカイブの同期中にエラーが発生しました</translation>
-    </message>
-    <message>
       <source>Remote archive synchronization has been started for the following device:</source>
       <translation>次のデバイスのリモートアーカイブ同期が開始されました：</translation>
     </message>
@@ -6018,35 +5816,31 @@ to %1</source>
     </message>
     <message>
       <source>No server has internet access for time synchronization</source>
-      <translation type="unfinished">No server has internet access for time synchronization</translation>
+      <translation>どのサーバーも時間同期のためのインターネットアクセスがありません</translation>
     </message>
     <message>
       <source>The System is in safe mode</source>
-      <translation type="unfinished">The System is in safe mode</translation>
+      <translation>システムはセーフモードになっています</translation>
     </message>
     <message>
       <source>The System has no internet access for time synchronization</source>
-      <translation type="unfinished">The System has no internet access for time synchronization</translation>
+      <translation>システムには時間同期のためのインターネットアクセスがありません</translation>
     </message>
     <message>
       <source>No online server in the System has internet access for time synchronization.</source>
-      <translation type="unfinished">No online server in the System has internet access for time synchronization.</translation>
+      <translation>システム内のどのオンラインサーバーにも時間同期のためのインターネットアクセスはありません</translation>
     </message>
     <message>
       <source>The System is running in safe mode.</source>
-      <translation type="unfinished">The System is running in safe mode.</translation>
+      <translation>システムがセーフ モードで実行されています</translation>
+    </message>
+    <message>
+      <source>Error occurred during remote archive synchronization</source>
+      <translation>リモートアーカイブの同期中にエラーが発生しました</translation>
     </message>
   </context>
   <context>
     <name>QnSystemSettingsWidget</name>
-    <message>
-      <source>Enable devices and servers auto discovery</source>
-      <translation>サーバーとデバイスの自動検索有効</translation>
-    </message>
-    <message>
-      <source>Enable cameras and servers auto discovery</source>
-      <translation>サーバーとカメラの自動検索有効</translation>
-    </message>
     <message>
       <source>Allow System to optimize device settings</source>
       <translation>デバイス設定の最適化有効</translation>
@@ -6063,6 +5857,22 @@ to %1</source>
       <source>Does not include any personal information and is completely anonymous.</source>
       <translation>個人情報は含まず、完全に匿名です</translation>
     </message>
+    <message>
+      <source>Failover server measures may still request camera status updates regardless of this setting.</source>
+      <translation type="unfinished">Failover server measures may still request camera status updates regardless of this setting.</translation>
+    </message>
+    <message>
+      <source>Enable devices and servers autodiscovery and automated device status check</source>
+      <translation type="unfinished">Enable devices and servers autodiscovery and automated device status check</translation>
+    </message>
+    <message>
+      <source>Enable cameras and servers autodiscovery and automated camera status check</source>
+      <translation type="unfinished">Enable cameras and servers autodiscovery and automated camera status check</translation>
+    </message>
+    <message>
+      <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
+      <translation type="unfinished">When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</translation>
+    </message>
   </context>
   <context>
     <name>QnTableExportHelper</name>
@@ -6076,11 +5886,11 @@ to %1</source>
     </message>
     <message>
       <source>HTML file</source>
-      <translation type="unfinished">HTML file</translation>
+      <translation>HTMLファイル</translation>
     </message>
     <message>
       <source>Spread Sheet (CSV) File</source>
-      <translation type="unfinished">Spread Sheet (CSV) File</translation>
+      <translation>スプレッドシート（CSV）ファイル</translation>
     </message>
   </context>
   <context>
@@ -6114,11 +5924,11 @@ to %1</source>
     </message>
     <message>
       <source>VMS time is synchronized with the Internet and does not depend on local time on servers.</source>
-      <translation type="unfinished">VMS time is synchronized with the Internet and does not depend on local time on servers.</translation>
+      <translation>VMSの時間はインターネットと同期しており、サーバーの現地時間には依存しません</translation>
     </message>
     <message>
       <source>VMS time is synchronized with local time on the selected server and does not depend on local time on other servers.</source>
-      <translation type="unfinished">VMS time is synchronized with local time on the selected server and does not depend on local time on other servers.</translation>
+      <translation>VMS時間は選択したサーバーの現地時間と同期され、他のサーバーの現地時間には依存しません</translation>
     </message>
   </context>
   <context>
@@ -6145,79 +5955,6 @@ to %1</source>
     <message>
       <source>Hold to Speak</source>
       <translation>押して話す</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnUpdateResult</name>
-    <message>
-      <source>Update has been successfully finished.</source>
-      <translation>更新は正常に終了しました.</translation>
-    </message>
-    <message>
-      <source>Update has been cancelled.</source>
-      <translation>更新はキャンセルされました.</translation>
-    </message>
-    <message>
-      <source>Another user has already started an update.</source>
-      <translation>既に更新が開始されています.</translation>
-    </message>
-    <message>
-      <source>All servers are already updated.</source>
-      <translation>全サーバーは既に更新されています.</translation>
-    </message>
-    <message>
-      <source>Could not download updates.</source>
-      <translation>更新ファイルがダウンロードされません.</translation>
-    </message>
-    <message>
-      <source>No free space left on the disk.</source>
-      <translation>ディスクに空き容量がありません.</translation>
-    </message>
-    <message>
-      <source>Could not push updates to servers.</source>
-      <translation>サーバーに更新ができません.</translation>
-    </message>
-    <message numerus="yes">
-      <source>The problem is caused by %n servers:</source>
-      <translation>
-        <numerusform>問題の原因は %n サーバー:</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>No free space left on %n servers:</source>
-      <translation>
-        <numerusform>サーバー %n に空き容量がありません:</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n servers are not responding:</source>
-      <translation>
-        <numerusform>%n サーバー応答なし:</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n servers have gone offline:</source>
-      <translation>
-        <numerusform>%n サーバーオフライン:</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Authentication failed for %n servers:</source>
-      <translation>
-        <numerusform>%n サーバーで認証エラー:</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Could not install an update to the client.</source>
-      <translation>クライアントを更新できませｄん.</translation>
-    </message>
-    <message>
-      <source>Could not install updates on one or more servers.</source>
-      <translation>1台か複数台のサーバーの更新ができません.</translation>
-    </message>
-    <message>
-      <source>Update has been cancelled silently.</source>
-      <translation type="unfinished">Update has been cancelled silently.</translation>
     </message>
   </context>
   <context>
@@ -6668,25 +6405,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnWorkbenchContext</name>
-    <message>
-      <source>Please review and agree to the %1 in order to proceed</source>
-      <translation type="unfinished">Please review and agree to the %1 in order to proceed</translation>
-    </message>
-    <message>
-      <source>To use the software you must agree with the end user license agreement</source>
-      <translation type="unfinished">To use the software you must agree with the end user license agreement</translation>
-    </message>
-    <message>
-      <source>I Agree</source>
-      <translation type="unfinished">I Agree</translation>
-    </message>
-    <message>
-      <source>I Do Not Agree</source>
-      <translation type="unfinished">I Do Not Agree</translation>
-    </message>
-  </context>
-  <context>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
     <message>
       <source>Systems will be merged shortly</source>
@@ -6695,10 +6413,6 @@ to %1</source>
     <message>
       <source>Servers from the other System will appear in the resource tree.</source>
       <translation>他のシステムのサーバーはリソース ツリーに表示されます</translation>
-    </message>
-    <message>
-      <source>Failed to update Server</source>
-      <translation>サーバーを更新できませんでした</translation>
     </message>
     <message>
       <source>Total amount of licenses will decrease</source>
@@ -6731,15 +6445,15 @@ to %1</source>
     </message>
     <message>
       <source>%1 has been successfully configured.</source>
-      <translation type="unfinished">%1 has been successfully configured.</translation>
+      <translation>%1 は正常に構成されました</translation>
     </message>
     <message>
       <source>To complete the process, please connect to it with Client and update to version %1.</source>
-      <translation type="unfinished">To complete the process, please connect to it with Client and update to version %1.</translation>
+      <translation>プロセスを完了するには、クライアントで接続してバージョン %1にアップデートしてください</translation>
     </message>
     <message>
       <source>Failed to merge %1 to our system.</source>
-      <translation type="unfinished">Failed to merge %1 to our system.</translation>
+      <translation>システムに %1 を統合できませんでした</translation>
     </message>
   </context>
   <context>
@@ -6810,7 +6524,7 @@ to %1</source>
     </message>
     <message>
       <source>AVI (Audio/Video Interleaved)</source>
-      <translation type="unfinished">AVI (Audio/Video Interleaved)</translation>
+      <translation>AVI (オーディオ/ビデオ インタリーブ)</translation>
     </message>
   </context>
   <context>
@@ -6861,34 +6575,11 @@ to %1</source>
     </message>
     <message>
       <source>PNG Image</source>
-      <translation type="unfinished">PNG Image</translation>
+      <translation>PNG画像</translation>
     </message>
     <message>
       <source>JPEG Image</source>
-      <translation type="unfinished">JPEG Image</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnWorkbenchUpdateWatcher</name>
-    <message>
-      <source>Release Notes</source>
-      <translation>リリースノート</translation>
-    </message>
-    <message>
-      <source>%1 version available</source>
-      <translation>%1 バージョンが利用可能</translation>
-    </message>
-    <message>
-      <source>Major issues have been fixed. Update is strongly recommended.</source>
-      <translation>主要な問題が修正されました　更新を強く推奨します</translation>
-    </message>
-    <message>
-      <source>Update...</source>
-      <translation>更新...</translation>
-    </message>
-    <message>
-      <source>Do not notify again about this update</source>
-      <translation>この更新プログラムについて再度通知しない</translation>
+      <translation>JPEG画像</translation>
     </message>
   </context>
   <context>
@@ -7100,16 +6791,16 @@ to %1</source>
     </message>
     <message>
       <source>Failed to add virtual camera</source>
-      <translation type="unfinished">Failed to add virtual camera</translation>
+      <translation>バーチャルカメラの追加に失敗しました</translation>
     </message>
     <message>
       <source>Open Virtual Camera Recordings...</source>
-      <translation type="unfinished">Open Virtual Camera Recordings...</translation>
+      <translation>バーチャルカメラ録画を開く...</translation>
     </message>
     <message numerus="yes">
       <source>You can upload these files to a different instance of a Virtual Camera.</source>
-      <translation type="unfinished">
-        <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
+      <translation>
+        <numerusform>これらのファイルは別のバーチャルカメラにアップロードできます</numerusform>
       </translation>
     </message>
     <message>
@@ -7319,9 +7010,20 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Some video files are still being uploaded to %n virtual cameras:</source>
-      <translation type="unfinished">
-        <numerusform>Some video files are still being uploaded to %n virtual cameras:</numerusform>
+      <translation>
+        <numerusform>一部のビデオファイルはバーチャルカメラ %n にアップロードされています</numerusform>
       </translation>
+    </message>
+  </context>
+  <context>
+    <name>SessionExpiredDialog</name>
+    <message>
+      <source>Your session has expired</source>
+      <translation type="unfinished">Your session has expired</translation>
+    </message>
+    <message>
+      <source>Session duration limit can be changed by the system administrators</source>
+      <translation type="unfinished">Session duration limit can be changed by the system administrators</translation>
     </message>
   </context>
   <context>
@@ -7405,21 +7107,21 @@ to %1</source>
     <name>UpdateStrings</name>
     <message>
       <source>This Linux platform is no longer supported</source>
-      <translation type="unfinished">This Linux platform is no longer supported</translation>
+      <translation>このLinuxプラットフォームはサポートされなくなりました</translation>
     </message>
     <message>
       <source>This OS version is no longer supported</source>
-      <translation type="unfinished">This OS version is no longer supported</translation>
+      <translation>このOSバージョンはサポートされなくなりました</translation>
     </message>
     <message>
       <source>This %1 version is no longer supported</source>
       <comment>%1 is OS name, e.g. Windows</comment>
-      <translation type="unfinished">This %1 version is no longer supported</translation>
+      <translation>この %1 バージョンはサポートされなくなりました</translation>
     </message>
     <message>
       <source>%1 %2 is no longer supported</source>
       <comment>%1 %2 are OS name and version, e.g. Windows 7</comment>
-      <translation type="unfinished">%1 %2 is no longer supported</translation>
+      <translation>%1 %2 はサポートされなくなりました</translation>
     </message>
   </context>
   <context>
@@ -7494,23 +7196,23 @@ to %1</source>
     </message>
     <message>
       <source>Devices on layout</source>
-      <translation type="unfinished">Devices on layout</translation>
+      <translation>レイアウト上のデバイス</translation>
     </message>
     <message>
       <source>Cameras on layout</source>
-      <translation type="unfinished">Cameras on layout</translation>
+      <translation>レイアウト上のカメラ</translation>
     </message>
     <message>
       <source>Any device</source>
-      <translation type="unfinished">Any device</translation>
+      <translation>全デバイス</translation>
     </message>
     <message>
       <source>Any camera</source>
-      <translation type="unfinished">Any camera</translation>
+      <translation>全カメラ</translation>
     </message>
     <message>
       <source>Selected device</source>
-      <translation type="unfinished">Selected device</translation>
+      <translation>選択したデバイス</translation>
     </message>
     <message>
       <source>Selected camera</source>
@@ -7521,11 +7223,19 @@ to %1</source>
     <name>nx::vms::client::desktop::AnalyticsMenuActionFactory</name>
     <message>
       <source>Show Always</source>
-      <translation type="unfinished">Show Always</translation>
+      <translation>常に表示</translation>
     </message>
     <message>
       <source>Show Only with &quot;Objects&quot; Tab</source>
-      <translation type="unfinished">Show Only with &quot;Objects&quot; Tab</translation>
+      <translation>&quot;オブジェクト&quot; タブでのみ表示</translation>
+    </message>
+    <message>
+      <source>Show</source>
+      <translation>表示</translation>
+    </message>
+    <message>
+      <source>Do Not Show</source>
+      <translation type="unfinished">Do Not Show</translation>
     </message>
   </context>
   <context>
@@ -7536,7 +7246,7 @@ to %1</source>
     </message>
     <message>
       <source>deleted camera</source>
-      <translation type="unfinished">deleted camera</translation>
+      <translation>削除されたカメラ</translation>
     </message>
   </context>
   <context>
@@ -7551,8 +7261,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n objects</source>
-      <translation type="unfinished">
-        <numerusform>%n objects</numerusform>
+      <translation>
+        <numerusform>%n オブジェクト</numerusform>
       </translation>
     </message>
     <message>
@@ -7561,11 +7271,11 @@ to %1</source>
     </message>
     <message>
       <source>Select area</source>
-      <translation type="unfinished">Select area</translation>
+      <translation>エリア選択</translation>
     </message>
     <message>
       <source>Select some area on the video...</source>
-      <translation type="unfinished">Select some area on the video...</translation>
+      <translation>ビデオ上のエリアを選択してください</translation>
     </message>
     <message>
       <source>In selected area</source>
@@ -7573,7 +7283,7 @@ to %1</source>
     </message>
     <message>
       <source>unnamed analytics engine</source>
-      <translation type="unfinished">unnamed analytics engine</translation>
+      <translation>名前のない解析エンジン</translation>
     </message>
     <message>
       <source>Failed to execute plugin action</source>
@@ -7581,11 +7291,11 @@ to %1</source>
     </message>
     <message>
       <source>Enter parameters</source>
-      <translation type="unfinished">Enter parameters</translation>
+      <translation>パラメータを入力</translation>
     </message>
     <message>
       <source>Action requires some parameters to be filled.</source>
-      <translation type="unfinished">Action requires some parameters to be filled.</translation>
+      <translation>アクションにはいくつかのパラメータ入力が必要です</translation>
     </message>
   </context>
   <context>
@@ -7599,7 +7309,7 @@ to %1</source>
     <name>nx::vms::client::desktop::BookmarkSearchListModel::Private</name>
     <message>
       <source>deleted camera</source>
-      <translation type="unfinished">deleted camera</translation>
+      <translation>削除されたカメラ</translation>
     </message>
   </context>
   <context>
@@ -7675,10 +7385,6 @@ to %1</source>
       <translation>Native</translation>
     </message>
     <message>
-      <source>Server will not change any cameras settings, it will receive and use camera stream as-is. </source>
-      <translation>サーバーはカメラ設定を変更しません。そのままカメラストリームを受信して​​使用します </translation>
-    </message>
-    <message>
       <source>Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</source>
       <translation>いくつかのカメラの画質の問題を修正することができますがビットレート増加の原因となります</translation>
     </message>
@@ -7701,6 +7407,14 @@ to %1</source>
       <translation>
         <numerusform>このIDは次の %n カメラで既に使用されています：</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Server will not change any cameras settings, it will receive and use camera stream as-is.</source>
+      <translation>サーバーはカメラ設定を変更しません。そのままカメラストリームを受信して​​使用します</translation>
+    </message>
+    <message>
+      <source>Multicast</source>
+      <translation type="unfinished">Multicast</translation>
     </message>
   </context>
   <context>
@@ -7801,13 +7515,13 @@ to %1</source>
     <name>nx::vms::client::desktop::CameraSelectionDialog</name>
     <message numerus="yes">
       <source>%n cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n cameras</numerusform>
+      <translation>
+        <numerusform>%n カメラ</numerusform>
       </translation>
     </message>
     <message>
       <source>You do not have any cameras</source>
-      <translation type="unfinished">You do not have any cameras</translation>
+      <translation>カメラがありません</translation>
     </message>
   </context>
   <context>
@@ -7839,10 +7553,6 @@ to %1</source>
     <message>
       <source>Web Page</source>
       <translation>ウェブページ:</translation>
-    </message>
-    <message>
-      <source>Analytics</source>
-      <translation>解析</translation>
     </message>
     <message>
       <source>Expert</source>
@@ -7894,6 +7604,10 @@ to %1</source>
       <source>I/O Modules Settings</source>
       <translation>IOモジュール設定</translation>
     </message>
+    <message>
+      <source>Plugins</source>
+      <translation type="unfinished">Plugins</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraSettingsLicenseWatcher</name>
@@ -7930,47 +7644,47 @@ to %1</source>
     <name>nx::vms::client::desktop::ClientUpdateTool</name>
     <message>
       <source>Update file is not found</source>
-      <translation type="unfinished">Update file is not found</translation>
+      <translation>更新ファイルが見つかりません</translation>
     </message>
     <message>
       <source>Update package is corrupted</source>
-      <translation type="unfinished">Update package is corrupted</translation>
+      <translation>更新パッケージが破損しています</translation>
     </message>
     <message>
       <source>Failed to download update package: %1</source>
-      <translation type="unfinished">Failed to download update package: %1</translation>
+      <translation>アップデートパッケージのダウンロードに失敗しました： %1</translation>
     </message>
     <message>
       <source>Update package is corrupted: %1</source>
-      <translation type="unfinished">Update package is corrupted: %1</translation>
+      <translation>アップデートパッケージが破損しています： %1</translation>
     </message>
     <message>
       <source>This update is already installed.</source>
-      <translation type="unfinished">This update is already installed.</translation>
+      <translation>この更新プログラムは既にインストールされています</translation>
     </message>
     <message>
       <source>This version is not installed.</source>
-      <translation type="unfinished">This version is not installed.</translation>
+      <translation>このバージョンはインストールされていません</translation>
     </message>
     <message>
       <source>Invalid version format.</source>
-      <translation type="unfinished">Invalid version format.</translation>
+      <translation>無効なバージョン形式です</translation>
     </message>
     <message>
       <source>Broken update package.</source>
-      <translation type="unfinished">Broken update package.</translation>
-    </message>
-    <message>
-      <source>Not enough space on disk to install client update.</source>
-      <translation type="unfinished">Not enough space on disk to install client update.</translation>
-    </message>
-    <message>
-      <source>Install package has been lost.</source>
-      <translation type="unfinished">Install package has been lost.</translation>
+      <translation>壊れた更新プログラム パッケージ</translation>
     </message>
     <message>
       <source>Internal error.</source>
       <translation>内部エラー</translation>
+    </message>
+    <message>
+      <source>Not enough space on disk to install the client update.</source>
+      <translation>クライアント更新プログラムをインストールするためのディスク容量が足りません</translation>
+    </message>
+    <message>
+      <source>Installation package has been lost.</source>
+      <translation>インストールパッケージが失われました</translation>
     </message>
   </context>
   <context>
@@ -8005,6 +7719,17 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::ConnectToCurrentSystemTool</name>
+    <message>
+      <source>Configuring Server</source>
+      <translation>サーバー構成</translation>
+    </message>
+    <message>
+      <source>Updating Server</source>
+      <translation>サーバー更新</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::DefaultPasswordAlertBar</name>
     <message>
       <source>This camera requires password to be set up.</source>
@@ -8012,7 +7737,7 @@ to %1</source>
     </message>
     <message>
       <source>Some of selected cameras require password to be set up.</source>
-      <translation type="unfinished">Some of selected cameras require password to be set up.</translation>
+      <translation>選択されたカメラの中には、パスワードの設定が必要なものがあります</translation>
     </message>
     <message>
       <source>Ask your system administrator to do it.</source>
@@ -8093,12 +7818,12 @@ to %1</source>
     </message>
     <message>
       <source>All devices are already added</source>
-      <translation type="unfinished">All devices are already added</translation>
+      <translation>すべてのデバイスはすでに追加されています</translation>
     </message>
     <message numerus="yes">
       <source>%n devices are being added. You can close this dialog or start a new search</source>
-      <translation type="unfinished">
-        <numerusform>%n devices are being added. You can close this dialog or start a new search</numerusform>
+      <translation>
+        <numerusform>%n デバイスが追加されています　このダイアログ ボックスを閉じるか、新しい検索を開始</numerusform>
       </translation>
     </message>
     <message>
@@ -8113,7 +7838,18 @@ to %1</source>
     </message>
     <message>
       <source>Address field cannot be empty</source>
-      <translation type="unfinished">Address field cannot be empty</translation>
+      <translation>アドレス フィールドは空白にできません</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::EulaDialog</name>
+    <message>
+      <source>Please review and agree to the %1 in order to proceed</source>
+      <translation>続行するには %1 に同意してください</translation>
+    </message>
+    <message>
+      <source>To use the software you must agree with the end user license agreement</source>
+      <translation>ソフトウェアを使用するには、エンドユーザー使用許諾契約書に同意する必要があります</translation>
     </message>
   </context>
   <context>
@@ -8148,47 +7884,43 @@ to %1</source>
     <name>nx::vms::client::desktop::EventSearchWidget</name>
     <message>
       <source>Server events</source>
-      <translation type="unfinished">Server events</translation>
+      <translation>サーバーイベント</translation>
     </message>
     <message>
       <source>Analytics events</source>
-      <translation type="unfinished">Analytics events</translation>
+      <translation>解析イベント</translation>
     </message>
     <message>
       <source>Any device issue</source>
-      <translation type="unfinished">Any device issue</translation>
+      <translation>全デバイス障害</translation>
     </message>
     <message>
       <source>Any camera issue</source>
-      <translation type="unfinished">Any camera issue</translation>
+      <translation>全カメラ障害</translation>
     </message>
     <message>
       <source>Any server event</source>
-      <translation type="unfinished">Any server event</translation>
+      <translation>全サーバー イベント</translation>
     </message>
     <message>
       <source>Device issues</source>
-      <translation type="unfinished">Device issues</translation>
+      <translation>デバイスの問題</translation>
     </message>
     <message>
       <source>Camera issues</source>
-      <translation type="unfinished">Camera issues</translation>
+      <translation>カメラの問題</translation>
     </message>
     <message>
       <source>Any event</source>
-      <translation type="unfinished">Any event</translation>
+      <translation>全イベント</translation>
     </message>
     <message>
       <source>Any analytics event</source>
-      <translation type="unfinished">Any analytics event</translation>
+      <translation>全解析イベント</translation>
     </message>
     <message>
       <source>No events</source>
       <translation>イベントなし</translation>
-    </message>
-    <message>
-      <source>No events occured</source>
-      <translation>イベントは発生していません</translation>
     </message>
     <message numerus="yes">
       <source>%n events</source>
@@ -8198,7 +7930,11 @@ to %1</source>
     </message>
     <message>
       <source>unnamed analytics engine</source>
-      <translation type="unfinished">unnamed analytics engine</translation>
+      <translation>名前のない解析エンジン</translation>
+    </message>
+    <message>
+      <source>No events occurred</source>
+      <translation>イベントは発生していません</translation>
     </message>
   </context>
   <context>
@@ -8214,7 +7950,7 @@ to %1</source>
     <name>nx::vms::client::desktop::ExportPasswordWidget</name>
     <message>
       <source>Please enter the password.</source>
-      <translation type="unfinished">Please enter the password.</translation>
+      <translation>パスワードを入力してください</translation>
     </message>
   </context>
   <context>
@@ -8363,7 +8099,7 @@ to %1</source>
     </message>
     <message>
       <source>You are about to export a long video. It may require a lot of storage space and take significant time.</source>
-      <translation type="unfinished">You are about to export a long video. It may require a lot of storage space and take significant time.</translation>
+      <translation>長いビデオをエクスポートしようとしています　多くの記憶領域を必要とし時間を要します</translation>
     </message>
   </context>
   <context>
@@ -8397,15 +8133,15 @@ to %1</source>
     </message>
     <message>
       <source>Image is not round</source>
-      <translation type="unfinished">Image is not round</translation>
+      <translation>イメージは円形ではありません</translation>
     </message>
     <message>
       <source>Image might be too dim</source>
-      <translation type="unfinished">Image might be too dim</translation>
+      <translation>イメージが暗すぎます</translation>
     </message>
     <message>
       <source>Invalid input image</source>
-      <translation type="unfinished">Invalid input image</translation>
+      <translation>無効な入力イメージ</translation>
     </message>
     <message>
       <source>Internal error</source>
@@ -8435,14 +8171,14 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n new</source>
-      <translation type="unfinished">
-        <numerusform>%n new</numerusform>
+      <translation>
+        <numerusform>%n 新規</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n devices total</source>
-      <translation type="unfinished">
-        <numerusform>%n devices total</numerusform>
+      <translation>
+        <numerusform>%n デバイスの合計</numerusform>
       </translation>
     </message>
   </context>
@@ -8487,7 +8223,7 @@ to %1</source>
     </message>
     <message>
       <source>Copy Link Location</source>
-      <translation type="unfinished">Copy Link Location</translation>
+      <translation>リンクの場所をコピー</translation>
     </message>
   </context>
   <context>
@@ -8593,7 +8329,7 @@ to %1</source>
     </message>
     <message>
       <source>deleted camera</source>
-      <translation type="unfinished">deleted camera</translation>
+      <translation>削除されたカメラ</translation>
     </message>
     <message>
       <source>Bookmark it...</source>
@@ -8608,27 +8344,27 @@ to %1</source>
     </message>
     <message>
       <source>Checking for updates automatically</source>
-      <translation type="unfinished">Checking for updates automatically</translation>
+      <translation>更新を自動で確認する</translation>
     </message>
     <message>
       <source>Check for updates</source>
-      <translation type="unfinished">Check for updates</translation>
+      <translation>更新の確認</translation>
     </message>
     <message>
       <source>Force check</source>
-      <translation type="unfinished">Force check</translation>
+      <translation>強制確認</translation>
     </message>
     <message>
       <source>Disable Automatically Checking</source>
-      <translation type="unfinished">Disable Automatically Checking</translation>
+      <translation>自動確認を無効にする</translation>
     </message>
     <message>
       <source>Check Once</source>
-      <translation type="unfinished">Check Once</translation>
+      <translation>一度のみ確認</translation>
     </message>
     <message>
       <source>Check Automatically</source>
-      <translation type="unfinished">Check Automatically</translation>
+      <translation>自動で確認</translation>
     </message>
     <message>
       <source>Download in External Browser</source>
@@ -8640,39 +8376,39 @@ to %1</source>
     </message>
     <message>
       <source>You have already installed this version.</source>
-      <translation type="unfinished">You have already installed this version.</translation>
+      <translation>このバージョンは既にインストールされています</translation>
     </message>
     <message>
       <source>Unable to check updates on the internet</source>
-      <translation type="unfinished">Unable to check updates on the internet</translation>
+      <translation>インターネット上の更新を確認できません</translation>
     </message>
     <message>
       <source>Build not found</source>
-      <translation type="unfinished">Build not found</translation>
+      <translation>ビルドが見つかりません</translation>
     </message>
     <message>
       <source>Cannot update from the selected file</source>
-      <translation type="unfinished">Cannot update from the selected file</translation>
+      <translation>選択したファイルから更新できません</translation>
     </message>
     <message>
       <source>Invalid update information</source>
-      <translation type="unfinished">Invalid update information</translation>
+      <translation>無効な更新情報</translation>
     </message>
     <message>
       <source>Downgrade to earlier versions is not possible</source>
-      <translation type="unfinished">Downgrade to earlier versions is not possible</translation>
+      <translation>以前のバージョンにダウングレードすることはできません</translation>
     </message>
     <message>
       <source>Update file is not found</source>
-      <translation type="unfinished">Update file is not found</translation>
+      <translation>更新プログラム ファイルが見つかりませんでした</translation>
     </message>
     <message>
       <source>Upgrade package is broken</source>
-      <translation type="unfinished">Upgrade package is broken</translation>
+      <translation>アップグレードパッケージが壊れています</translation>
     </message>
     <message>
       <source>Missing update package for some servers</source>
-      <translation type="unfinished">Missing update package for some servers</translation>
+      <translation>一部のサーバー用のアップデートパッケージがありません</translation>
     </message>
     <message>
       <source>Incompatible %1 instance. To update disconnect System from %1 first.</source>
@@ -8681,7 +8417,7 @@ to %1</source>
     </message>
     <message>
       <source>No update package available</source>
-      <translation type="unfinished">No update package available</translation>
+      <translation>利用可能なアップデートはありません</translation>
     </message>
     <message>
       <source>Select Update File...</source>
@@ -8696,30 +8432,6 @@ to %1</source>
       <translation>一部のサーバーはオフラインであり、更新されません。それらをスキップしますか？</translation>
     </message>
     <message>
-      <source>Ready to install client updates</source>
-      <translation type="unfinished">Ready to install client updates</translation>
-    </message>
-    <message>
-      <source>Install now</source>
-      <translation>今すぐインストール</translation>
-    </message>
-    <message>
-      <source>Later</source>
-      <translation>あとで</translation>
-    </message>
-    <message>
-      <source>Updates downloaded</source>
-      <translation>更新プログラムのダウンロードが完了しました</translation>
-    </message>
-    <message>
-      <source>Failed to download update packages</source>
-      <translation>アップデートパッケージのダウンロードに失敗しました</translation>
-    </message>
-    <message>
-      <source>Please make sure there is enough free storage space and network connection is stable.</source>
-      <translation>十分な空き容量があり、ネットワーク接続が安定していることを確認してください</translation>
-    </message>
-    <message>
       <source>If the problem persists, please contact Customer Support.</source>
       <translation>問題が解決しない場合は、カスタマー サポートに連絡してください</translation>
     </message>
@@ -8732,48 +8444,28 @@ to %1</source>
       <translation>更新をキャンセル</translation>
     </message>
     <message>
-      <source>Failed to download update packages to some servers</source>
-      <translation>一部のサーバーに更新パッケージをダウンロードできませんでした</translation>
-    </message>
-    <message>
-      <source>Please make sure they have enough free storage space and stable network connection.</source>
-      <translation>十分な空き容量があり、ネットワーク接続が安定していることを確認してください</translation>
-    </message>
-    <message>
       <source>Update completed</source>
       <translation>更新が完了しました</translation>
     </message>
     <message>
-      <source>Update completed, but some servers have failed an update</source>
-      <translation type="unfinished">Update completed, but some servers have failed an update</translation>
-    </message>
-    <message>
       <source>Nx Witness Client will be restarted to the updated version.</source>
-      <translation type="unfinished">Nx Witness Client will be restarted to the updated version.</translation>
+      <translation>Nx Witness Clientがアップデートされたバージョンに再起動されます</translation>
     </message>
     <message>
       <source>OK</source>
       <translation>OK</translation>
     </message>
     <message>
-      <source>Failed to install updates to servers:</source>
-      <translation type="unfinished">Failed to install updates to servers:</translation>
-    </message>
-    <message>
       <source>Downloading updates...</source>
       <translation>アップデートをダウンロードしています…</translation>
     </message>
     <message>
-      <source>Pushing updates...</source>
-      <translation type="unfinished">Pushing updates...</translation>
-    </message>
-    <message>
       <source>Upload</source>
-      <translation type="unfinished">Upload</translation>
+      <translation>アップロード</translation>
     </message>
     <message>
       <source>Upload &amp;&amp; Install</source>
-      <translation type="unfinished">Upload &amp;&amp; Install</translation>
+      <translation>アップロード＆インストール</translation>
     </message>
     <message>
       <source>Download</source>
@@ -8781,15 +8473,15 @@ to %1</source>
     </message>
     <message>
       <source>Download &amp;&amp; Install</source>
-      <translation type="unfinished">Download &amp;&amp; Install</translation>
+      <translation>ダウンロードとインストール</translation>
     </message>
     <message>
       <source>Select Another Build</source>
-      <translation type="unfinished">Select Another Build</translation>
+      <translation>別のビルドを選択</translation>
     </message>
     <message>
       <source>Browse for Another File...</source>
-      <translation type="unfinished">Browse for Another File...</translation>
+      <translation>他のファイルを参照しています...</translation>
     </message>
     <message>
       <source>Update to Specific Build</source>
@@ -8797,11 +8489,11 @@ to %1</source>
     </message>
     <message>
       <source>Uploading updates...</source>
-      <translation type="unfinished">Uploading updates...</translation>
+      <translation>更新をアップロードしています...</translation>
     </message>
     <message>
       <source>Downloading client package...</source>
-      <translation type="unfinished">Downloading client package...</translation>
+      <translation>クライアントパッケージをダウンロードしています...</translation>
     </message>
     <message>
       <source>Installing updates...</source>
@@ -8809,7 +8501,7 @@ to %1</source>
     </message>
     <message>
       <source>Installing client updates...</source>
-      <translation type="unfinished">Installing client updates...</translation>
+      <translation>クライアントアップデートをインストールしています...</translation>
     </message>
     <message>
       <source>Updating to ...</source>
@@ -8825,7 +8517,7 @@ to %1</source>
     </message>
     <message>
       <source>System updated to</source>
-      <translation type="unfinished">System updated to</translation>
+      <translation>システム更新</translation>
     </message>
     <message>
       <source>System update in process</source>
@@ -8841,11 +8533,11 @@ to %1</source>
     </message>
     <message>
       <source>Browse for Update File</source>
-      <translation type="unfinished">Browse for Update File</translation>
+      <translation>更新ファイルの参照</translation>
     </message>
     <message>
       <source>Update from mediaservers</source>
-      <translation type="unfinished">Update from mediaservers</translation>
+      <translation>メディアサーバーからの更新</translation>
     </message>
     <message>
       <source>Latest Available Update</source>
@@ -8853,17 +8545,17 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Missing update package for the client and %n servers</source>
-      <translation type="unfinished">
-        <numerusform>Missing update package for the client and %n servers</numerusform>
+      <translation>
+        <numerusform>クライアントおよび %n サーバー用のアップデートパッケージがありません</numerusform>
       </translation>
     </message>
     <message>
       <source>Missing update package for the client</source>
-      <translation type="unfinished">Missing update package for the client</translation>
+      <translation>クライアント用のアップデートパッケージがありません</translation>
     </message>
     <message>
       <source>Finish Update</source>
-      <translation type="unfinished">Finish Update</translation>
+      <translation>更新終了</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -8871,15 +8563,75 @@ to %1</source>
     </message>
     <message>
       <source>The latest version is already installed</source>
-      <translation type="unfinished">The latest version is already installed</translation>
+      <translation>お使いのソフトウェアは最新版です</translation>
     </message>
     <message>
       <source>This version is already installed</source>
-      <translation type="unfinished">This version is already installed</translation>
+      <translation>このバージョンは既にインストールされています</translation>
     </message>
     <message>
       <source>There are no online servers to update.</source>
-      <translation type="unfinished">There are no online servers to update.</translation>
+      <translation>更新するオンラインサーバーはありません</translation>
+    </message>
+    <message>
+      <source>Some servers haven&apos;t completed update process. Finish it anyway?</source>
+      <translation>一部のサーバーでは更新処理が完了していませんが終了しますか？</translation>
+    </message>
+    <message>
+      <source>Cancel update and delete all downloaded data?</source>
+      <translation>更新をキャンセルしてダウンロードしたデータをすべて削除しますか？</translation>
+    </message>
+    <message>
+      <source>There was an error while installing updates:</source>
+      <translation type="unfinished">There was an error while installing updates:</translation>
+    </message>
+    <message>
+      <source>Some servers have gone offline. Please wait until they become online to continue.</source>
+      <translation type="unfinished">Some servers have gone offline. Please wait until they become online to continue.</translation>
+    </message>
+    <message>
+      <source>Update completed, but some components have failed an update</source>
+      <translation type="unfinished">Update completed, but some components have failed an update</translation>
+    </message>
+    <message>
+      <source>Please update %1 manually using an installation package.</source>
+      <translation>インストール パッケージを使用して手動で %1 を更新してください</translation>
+    </message>
+    <message>
+      <source>%1 will be restarted to the updated version.</source>
+      <translation>%1 は、更新されたバージョンで再起動します</translation>
+    </message>
+    <message>
+      <source>Failed to download update packages to some components</source>
+      <translation type="unfinished">Failed to download update packages to some components</translation>
+    </message>
+    <message>
+      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
+      <translation type="unfinished">OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</translation>
+    </message>
+    <message>
+      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
+      <translation type="unfinished">OS version of the client is no longer supported. Please update its OS to a supported version.</translation>
+    </message>
+    <message>
+      <source>Failed to start update</source>
+      <translation type="unfinished">Failed to start update</translation>
+    </message>
+    <message>
+      <source>Starting update to ...</source>
+      <translation type="unfinished">Starting update to ...</translation>
+    </message>
+    <message>
+      <source>Some servers have no package available</source>
+      <translation type="unfinished">Some servers have no package available</translation>
+    </message>
+    <message>
+      <source>Failed to cancel update</source>
+      <translation type="unfinished">Failed to cancel update</translation>
+    </message>
+    <message>
+      <source>Failed to start installation</source>
+      <translation type="unfinished">Failed to start installation</translation>
     </message>
   </context>
   <context>
@@ -8892,7 +8644,7 @@ to %1</source>
     </message>
     <message>
       <source>You do not have any layouts</source>
-      <translation type="unfinished">You do not have any layouts</translation>
+      <translation>レイアウトがありません</translation>
     </message>
   </context>
   <context>
@@ -8905,12 +8657,32 @@ to %1</source>
       <source>Acknowledge</source>
       <translation>承認</translation>
     </message>
+    <message>
+      <source>Generic Event</source>
+      <translation>一般的イベント</translation>
+    </message>
+    <message>
+      <source>Device was disconnected</source>
+      <translation type="unfinished">Device was disconnected</translation>
+    </message>
+    <message>
+      <source>Camera was disconnected</source>
+      <translation type="unfinished">Camera was disconnected</translation>
+    </message>
+    <message>
+      <source>I/O Module was disconnected</source>
+      <translation type="unfinished">I/O Module was disconnected</translation>
+    </message>
+    <message>
+      <source>Unknown Plugin Diagnostic Event</source>
+      <translation type="unfinished">Unknown Plugin Diagnostic Event</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::NotificationListWidget::Private</name>
     <message>
       <source>No new notifications</source>
-      <translation type="unfinished">No new notifications</translation>
+      <translation>新しい通知はありません</translation>
     </message>
   </context>
   <context>
@@ -8924,10 +8696,6 @@ to %1</source>
       <translation>選択したレイアウトにアクセスできるユーザーが選択されていません。アクションは動作しません</translation>
     </message>
     <message>
-      <source>Local layouts can only be shown to their owners. </source>
-      <translation>ローカルレイアウトは所有者にのみ表示できます </translation>
-    </message>
-    <message>
       <source>Select layout...</source>
       <translation>少なくとも一つのレイアウトを選択してください</translation>
     </message>
@@ -8937,11 +8705,110 @@ to %1</source>
     </message>
     <message>
       <source>Local layouts can only be shown to their owners.</source>
-      <translation type="unfinished">Local layouts can only be shown to their owners.</translation>
+      <translation>ローカルレイアウトは所有者にのみ表示できます</translation>
     </message>
     <message>
       <source>None of selected user roles contain users. Action will not work.</source>
-      <translation type="unfinished">None of selected user roles contain users. Action will not work.</translation>
+      <translation>選択されたユーザー役割にユーザーが含まれていません　アクションは動作しません</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::PeerStateTracker</name>
+    <message>
+      <source>The server is taking too long to respond</source>
+      <translation type="unfinished">The server is taking too long to respond</translation>
+    </message>
+    <message>
+      <source>No update task</source>
+      <translation type="unfinished">No update task</translation>
+    </message>
+    <message>
+      <source>Ready to download update</source>
+      <translation type="unfinished">Ready to download update</translation>
+    </message>
+    <message>
+      <source>Downloading update</source>
+      <translation type="unfinished">Downloading update</translation>
+    </message>
+    <message>
+      <source>Ready to restart to the new version</source>
+      <translation type="unfinished">Ready to restart to the new version</translation>
+    </message>
+    <message>
+      <source>Installing update</source>
+      <translation type="unfinished">Installing update</translation>
+    </message>
+    <message>
+      <source>Installed</source>
+      <translation>インストール済み</translation>
+    </message>
+    <message>
+      <source>Failed to download update</source>
+      <translation type="unfinished">Failed to download update</translation>
+    </message>
+    <message>
+      <source>Failed to install update</source>
+      <translation type="unfinished">Failed to install update</translation>
+    </message>
+    <message>
+      <source>Waiting for peer data</source>
+      <translation type="unfinished">Waiting for peer data</translation>
+    </message>
+    <message>
+      <source>There is not enough space to download update files.</source>
+      <translation type="unfinished">There is not enough space to download update files.</translation>
+    </message>
+    <message>
+      <source>There is not enough space to extract update files.</source>
+      <translation type="unfinished">There is not enough space to extract update files.</translation>
+    </message>
+    <message>
+      <source>Failed to download update packages.</source>
+      <translation type="unfinished">Failed to download update packages.</translation>
+    </message>
+    <message>
+      <source>Update contents are invalid.</source>
+      <translation type="unfinished">Update contents are invalid.</translation>
+    </message>
+    <message>
+      <source>Update archive is corrupted.</source>
+      <translation type="unfinished">Update archive is corrupted.</translation>
+    </message>
+    <message>
+      <source>Update files cannot be extracted.</source>
+      <translation type="unfinished">Update files cannot be extracted.</translation>
+    </message>
+    <message>
+      <source>Internal downloader error.</source>
+      <translation type="unfinished">Internal downloader error.</translation>
+    </message>
+    <message>
+      <source>Internal client error.</source>
+      <translation type="unfinished">Internal client error.</translation>
+    </message>
+    <message>
+      <source>Unknown error.</source>
+      <translation>不明なエラー</translation>
+    </message>
+    <message>
+      <source>Unexpected error code.</source>
+      <translation type="unfinished">Unexpected error code.</translation>
+    </message>
+    <message>
+      <source>Ready to install update</source>
+      <translation type="unfinished">Ready to install update</translation>
+    </message>
+    <message>
+      <source>Update package is not found.</source>
+      <translation type="unfinished">Update package is not found.</translation>
+    </message>
+    <message>
+      <source>There is not enough space to install update.</source>
+      <translation type="unfinished">There is not enough space to install update.</translation>
+    </message>
+    <message>
+      <source>Internal server error.</source>
+      <translation type="unfinished">Internal server error.</translation>
     </message>
   </context>
   <context>
@@ -9018,7 +8885,7 @@ to %1</source>
     </message>
     <message>
       <source>Motion + Low-Res</source>
-      <translation type="unfinished">Motion + Low-Res</translation>
+      <translation>モーション + 低解像度</translation>
     </message>
   </context>
   <context>
@@ -9085,16 +8952,79 @@ to %1</source>
       <translation>すべてのユーザーアクションを追跡して記録する</translation>
     </message>
     <message>
-      <source>User will be automatically logged out after this period of time.</source>
-      <translation type="unfinished">User will be automatically logged out after this period of time.</translation>
-    </message>
-    <message>
       <source>minutes</source>
       <translation>分</translation>
     </message>
     <message>
       <source>hours</source>
       <translation>時</translation>
+    </message>
+    <message>
+      <source>Users will be automatically logged out if their session exceeds the specified duration.</source>
+      <translation type="unfinished">Users will be automatically logged out if their session exceeds the specified duration.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ServerSettingsDialogStore</name>
+    <message>
+      <source>Library</source>
+      <translation type="unfinished">Library</translation>
+    </message>
+    <message>
+      <source>Version</source>
+      <translation type="unfinished">Version</translation>
+    </message>
+    <message>
+      <source>Vendor</source>
+      <translation>ベンダー</translation>
+    </message>
+    <message>
+      <source>no error</source>
+      <translation type="unfinished">no error</translation>
+    </message>
+    <message>
+      <source>library file cannot be loaded</source>
+      <translation type="unfinished">library file cannot be loaded</translation>
+    </message>
+    <message>
+      <source>invalid or incompatible plugin library</source>
+      <translation type="unfinished">invalid or incompatible plugin library</translation>
+    </message>
+    <message>
+      <source>plugin library failed to initialize</source>
+      <translation type="unfinished">plugin library failed to initialize</translation>
+    </message>
+    <message>
+      <source>plugin returned bad manifest</source>
+      <translation type="unfinished">plugin returned bad manifest</translation>
+    </message>
+    <message>
+      <source>plugin API version is no longer supported</source>
+      <translation type="unfinished">plugin API version is no longer supported</translation>
+    </message>
+    <message>
+      <source>unknown error</source>
+      <translation type="unfinished">unknown error</translation>
+    </message>
+    <message>
+      <source>Not loaded</source>
+      <translation type="unfinished">Not loaded</translation>
+    </message>
+    <message>
+      <source>Loaded</source>
+      <translation type="unfinished">Loaded</translation>
+    </message>
+    <message>
+      <source>plugin is in the black list</source>
+      <translation type="unfinished">plugin is in the black list</translation>
+    </message>
+    <message>
+      <source>Status</source>
+      <translation type="unfinished">Status</translation>
+    </message>
+    <message>
+      <source>plugin is optional and is not in the white list</source>
+      <translation type="unfinished">plugin is optional and is not in the white list</translation>
     </message>
   </context>
   <context>
@@ -9105,23 +9035,34 @@ to %1</source>
     </message>
     <message>
       <source>Installed</source>
-      <translation type="unfinished">Installed</translation>
+      <translation>インストール済み</translation>
     </message>
     <message>
       <source>Installing...</source>
-      <translation type="unfinished">Installing...</translation>
+      <translation>インストール中...</translation>
     </message>
     <message>
       <source>Downloaded</source>
       <translation>ダウンロード完了</translation>
     </message>
+    <message>
+      <source>Waiting for server to respond...</source>
+      <translation type="unfinished">Waiting for server to respond...</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ServerUpdateTool</name>
+    <message>
+      <source>No connection to the server.</source>
+      <translation type="unfinished">No connection to the server.</translation>
+    </message>
+    <message>
+      <source>Network error.</source>
+      <translation type="unfinished">Network error.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerUpdatesModel</name>
-    <message>
-      <source>Current Version</source>
-      <translation>現在のバージョン</translation>
-    </message>
     <message>
       <source>Status</source>
       <translation>ステータス</translation>
@@ -9132,7 +9073,7 @@ to %1</source>
     </message>
     <message>
       <source>Store Update Files</source>
-      <translation type="unfinished">Store Update Files</translation>
+      <translation>更新ファイルを保存する</translation>
     </message>
     <message>
       <source>Client</source>
@@ -9140,7 +9081,11 @@ to %1</source>
     </message>
     <message>
       <source>Component</source>
-      <translation type="unfinished">Component</translation>
+      <translation>コンポーネント</translation>
+    </message>
+    <message>
+      <source>Installed Version</source>
+      <translation type="unfinished">Installed Version</translation>
     </message>
   </context>
   <context>
@@ -9158,7 +9103,7 @@ to %1</source>
     <name>nx::vms::client::desktop::SimpleMotionSearchWidget</name>
     <message>
       <source>Select area on the video to filter results</source>
-      <translation type="unfinished">Select area on the video to filter results</translation>
+      <translation>結果をフィルター処理するためにビデオのエリアを選択します</translation>
     </message>
     <message>
       <source>In selected area</source>
@@ -9184,11 +9129,11 @@ to %1</source>
     </message>
     <message>
       <source>Selected device</source>
-      <translation type="unfinished">Selected device</translation>
+      <translation>選択したデバイス</translation>
     </message>
     <message>
       <source>Selected media</source>
-      <translation type="unfinished">Selected media</translation>
+      <translation>選択したメディア</translation>
     </message>
     <message>
       <source>none</source>
@@ -9207,8 +9152,8 @@ to %1</source>
     <name>nx::vms::client::desktop::SystemHealthListModel::Private</name>
     <message numerus="yes">
       <source>Email address is not set for %n users</source>
-      <translation type="unfinished">
-        <numerusform>Email address is not set for %n users</numerusform>
+      <translation>
+        <numerusform>Emailアドレスがユーザー %n に設定されていません</numerusform>
       </translation>
     </message>
     <message>
@@ -9226,13 +9171,13 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Double click to add cameras to the current layout or ctrl+click to open in a new tab</source>
-      <translation type="unfinished">
-        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
+      <translation>
+        <numerusform>ダブルクリックして現在のレイアウトにカメラを追加するか、Ctrl +クリックして新しいタブを開きます</numerusform>
       </translation>
     </message>
     <message>
       <source>No available archive</source>
-      <translation type="unfinished">No available archive</translation>
+      <translation>利用可能なアーカイブがありません</translation>
     </message>
   </context>
   <context>
@@ -9243,7 +9188,7 @@ to %1</source>
     </message>
     <message>
       <source>Time Zone</source>
-      <translation type="unfinished">Time Zone</translation>
+      <translation>タイムゾーン</translation>
     </message>
     <message>
       <source>Date</source>
@@ -9251,42 +9196,42 @@ to %1</source>
     </message>
     <message>
       <source>Server OS Time</source>
-      <translation type="unfinished">Server OS Time</translation>
+      <translation>サーバー時間</translation>
     </message>
     <message>
       <source>VMS Time</source>
-      <translation type="unfinished">VMS Time</translation>
+      <translation>VMS時間</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::TimeSynchronizationWidget</name>
     <message>
       <source>Time, common and synchronized between all servers. Can be different with OS time on any particular server.</source>
-      <translation type="unfinished">Time, common and synchronized between all servers. Can be different with OS time on any particular server.</translation>
+      <translation>時間、すべてのサーバー間の同期　特定のサーバーのOS時間によって異なる場合があります</translation>
     </message>
     <message>
       <source>Synchronized with the Internet</source>
-      <translation type="unfinished">Synchronized with the Internet</translation>
+      <translation>インターネットで時刻同期</translation>
     </message>
     <message>
       <source>Synchronized with the local time at the selected server</source>
-      <translation type="unfinished">Synchronized with the local time at the selected server</translation>
+      <translation>選択したサーバーのローカル時刻と同期</translation>
     </message>
     <message>
       <source>Not synchronized. Each server uses its own local time.</source>
-      <translation type="unfinished">Not synchronized. Each server uses its own local time.</translation>
+      <translation>同期されません　各サーバーは、独自のローカル時間を使用します</translation>
     </message>
     <message>
       <source>Equal to the server local time</source>
-      <translation type="unfinished">Equal to the server local time</translation>
+      <translation>サーバのローカル時刻に等しい</translation>
     </message>
     <message>
       <source>No Internet connection. Time is not being synchronized.</source>
-      <translation type="unfinished">No Internet connection. Time is not being synchronized.</translation>
+      <translation>インターネットに接続できません　時間が同期されていません</translation>
     </message>
     <message>
       <source>Time Server is offline. Time is not being synchronized.</source>
-      <translation type="unfinished">Time Server is offline. Time is not being synchronized.</translation>
+      <translation>タイムサーバーはオフラインです　時間が同期されていません</translation>
     </message>
   </context>
   <context>
@@ -9312,7 +9257,7 @@ to %1</source>
     </message>
     <message>
       <source>Could not create upload on the server side: %1</source>
-      <translation type="unfinished">Could not create upload on the server side: %1</translation>
+      <translation>サーバー側にアップロードを作成できませんでした: %1</translation>
     </message>
     <message>
       <source>Could not upload file chunk to the server</source>
@@ -9331,11 +9276,11 @@ to %1</source>
     <name>nx::vms::client::desktop::WearableCameraMotionWidget</name>
     <message>
       <source>Motion is being detected only during video uploading.</source>
-      <translation type="unfinished">Motion is being detected only during video uploading.</translation>
+      <translation>ビデオのアップロード中にのみモーションが検出されました</translation>
     </message>
     <message>
       <source>Enabling or disabling this setting does not change anything in the existing archive.</source>
-      <translation type="unfinished">Enabling or disabling this setting does not change anything in the existing archive.</translation>
+      <translation>この設定を有効または無効にしても、既存のアーカイブのは変更されません</translation>
     </message>
   </context>
   <context>
@@ -9433,7 +9378,50 @@ to %1</source>
     </message>
     <message>
       <source>Starting export...</source>
-      <translation type="unfinished">Starting export...</translation>
+      <translation>エクスポートを開始しています...</translation>
+    </message>
+    <message>
+      <source>Saving layout</source>
+      <translation type="unfinished">Saving layout</translation>
+    </message>
+    <message>
+      <source>Stop Saving</source>
+      <translation type="unfinished">Stop Saving</translation>
+    </message>
+    <message>
+      <source>Saving failed</source>
+      <translation type="unfinished">Saving failed</translation>
+    </message>
+    <message>
+      <source>Starting saving...</source>
+      <translation type="unfinished">Starting saving...</translation>
+    </message>
+    <message>
+      <source>We are preparing files for the export process. Please wait for a few seconds.</source>
+      <translation type="unfinished">We are preparing files for the export process. Please wait for a few seconds.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::WorkbenchUpdateWatcher</name>
+    <message>
+      <source>%1 version available</source>
+      <translation>%1 バージョンが利用可能</translation>
+    </message>
+    <message>
+      <source>Release Notes</source>
+      <translation>リリースノート</translation>
+    </message>
+    <message>
+      <source>Major issues have been fixed. Update is strongly recommended.</source>
+      <translation>主要な問題が修正されました　更新を強く推奨します</translation>
+    </message>
+    <message>
+      <source>Update...</source>
+      <translation>更新...</translation>
+    </message>
+    <message>
+      <source>Do not notify again about this update</source>
+      <translation>この更新プログラムについて再度通知しない</translation>
     </message>
   </context>
   <context>
@@ -9441,6 +9429,13 @@ to %1</source>
     <message>
       <source>multiple values</source>
       <translation>複数の値</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::integrations::entropix::ReconstructResolutionIntegration</name>
+    <message>
+      <source>Reconstruct Resolution</source>
+      <translation>解像度を再構築</translation>
     </message>
   </context>
   <context>
@@ -9481,7 +9476,7 @@ to %1</source>
     <name>nx::vms::client::desktop::ui::PluginEventModel</name>
     <message>
       <source>Any Plugin</source>
-      <translation type="unfinished">Any Plugin</translation>
+      <translation>すべてのプラグイン</translation>
     </message>
   </context>
   <context>
@@ -9612,7 +9607,7 @@ to %1</source>
     <name>nx::vms::client::desktop::ui::workbench::ActionHandler</name>
     <message>
       <source>Layout is full</source>
-      <translation type="unfinished">Layout is full</translation>
+      <translation>レイアウトがいっぱいです</translation>
     </message>
     <message>
       <source>Failed to change password</source>
@@ -9664,7 +9659,7 @@ to %1</source>
     </message>
     <message>
       <source>Virtual Cameras cannot be moved between servers</source>
-      <translation type="unfinished">Virtual Cameras cannot be moved between servers</translation>
+      <translation>バーチャルカメラはサーバー間で移動できません</translation>
     </message>
     <message>
       <source>Layout is locked and cannot be changed</source>
@@ -9676,7 +9671,7 @@ to %1</source>
     </message>
     <message>
       <source>All Supported</source>
-      <translation type="unfinished">All Supported</translation>
+      <translation>すべてサポート</translation>
     </message>
     <message>
       <source>Select folder...</source>
@@ -9779,13 +9774,35 @@ to %1</source>
     <message numerus="yes">
       <source>Failed to change password on %n cameras of %1</source>
       <comment>Total number of cameras will be substituted as %1</comment>
-      <translation type="unfinished">
-        <numerusform>Failed to change password on %n cameras of %1</numerusform>
+      <translation>
+        <numerusform>%1 カメラの %n のパスワードを変更できませんでした</numerusform>
       </translation>
     </message>
     <message>
       <source>This build is for testing purposes only.</source>
-      <translation type="unfinished">This build is for testing purposes only.</translation>
+      <translation>このビルドはテスト専用です</translation>
+    </message>
+    <message>
+      <source>Open Server Settings</source>
+      <translation type="unfinished">Open Server Settings</translation>
+    </message>
+    <message>
+      <source>OK</source>
+      <translation>OK</translation>
+    </message>
+    <message>
+      <source>Confirm storage location to store analytics data on &apos;%1&apos;</source>
+      <translation type="unfinished">Confirm storage location to store analytics data on &apos;%1&apos;</translation>
+    </message>
+    <message>
+      <source>Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
+Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
+By default analytics data will be stored in mediaserver&apos;s installation directory.
+You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</source>
+      <translation type="unfinished">Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
+Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
+By default analytics data will be stored in mediaserver&apos;s installation directory.
+You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</translation>
     </message>
   </context>
   <context>
@@ -9804,7 +9821,7 @@ to %1</source>
     <message>
       <source>Switch by</source>
       <comment>Arrows will follow</comment>
-      <translation type="unfinished">Switch by</translation>
+      <translation>切り替え</translation>
     </message>
     <message>
       <source>Display for</source>

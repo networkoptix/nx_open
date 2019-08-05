@@ -13,6 +13,7 @@
 #include <nx/utils/thread/mutex.h>
 
 #include "pollable.h"
+#include "../common_socket_impl.h"
 
 namespace nx {
 namespace network {

@@ -20,10 +20,8 @@
 #include <api/model/manual_camera_seach_reply.h>
 #include <api/model/camera_list_reply.h>
 #include <api/model/configure_reply.h>
-#include <api/model/upload_update_reply.h>
 #include "model/getnonce_reply.h"
 
-#include "media_server_connection.h"
 #include "model/recording_stats_reply.h"
 #include "api/model/audit/audit_record.h"
 
@@ -66,7 +64,6 @@ signals:
     void finished(int status, const QnCameraBookmarkTagList &reply, int handle, const QString &errorString);
     void finished(int status, const QnConfigureReply &reply, int handle, const QString &errorString);
     void finished(int status, const QnGetNonceReply &reply, int handle, const QString &errorString);
-    void finished(int status, const QnUploadUpdateReply &reply, int handle, const QString &errorString);
     void finished(int status, const nx::vms::api::ModuleInformation &reply, int handle, const QString &errorString);
     void finished(int status, const QList<nx::vms::api::ModuleInformation> &reply, int handle, const QString &errorString);
     void finished(int status, const MultiServerPeriodDataList &reply, int handle, const QString &errorString);

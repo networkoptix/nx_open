@@ -525,6 +525,7 @@ void fromResourceToApi(const QnLicensePtr& src, DetailedLicenseData& dst)
     dst.version = src->version();
     dst.brand = src->brand();
     dst.expiration = src->expiration();
+    dst.orderType = src->orderType();
 }
 
 void fromResourceListToApi(const QnLicenseList& src, LicenseDataList& dst)
@@ -605,7 +606,7 @@ void fromResourceToApi(const QnMediaServerResourcePtr& src, MediaServerData& dst
     dst.networkAddresses = serializeNetAddrList(src->getNetAddrList());
     dst.flags = src->getServerFlags();
     dst.version = src->getVersion().toString();
-    dst.systemInfo = src->getSystemInfo().toString();
+    dst.osInfo = src->getOsInfo().toString();
     dst.authKey = src->getAuthKey();
 }
 
@@ -619,7 +620,7 @@ void fromApiToResource(const MediaServerData& src, QnMediaServerResourcePtr& dst
     dst->setNetAddrList(resNetAddrList);
     dst->setServerFlags(src.flags);
     dst->setVersion(nx::utils::SoftwareVersion(src.version));
-    dst->setSystemInfo(nx::vms::api::SystemInformation(src.systemInfo));
+    dst->setOsInfo(nx::utils::OsInfo::fromString(src.osInfo));
     dst->setAuthKey(src.authKey);
 }
 

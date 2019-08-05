@@ -16,8 +16,6 @@ using nx::vms::common::p2p::downloader::ResultCode;
 
 namespace {
 
-static const QByteArray kJsonContentType("application/json");
-static const QByteArray kOctetStreamContentType("application/octet-stream");
 static const int kDownloadRequestTimeoutMs = 10 * 60 * 1000;
 static const int kMaxChunkSize = 10 * 1024 * 1024;
 
@@ -265,6 +263,8 @@ int Helper::handleAddUpload(const QString& fileName)
             return makeInvalidParameterError("ttl");
     }
 
+    const bool recreate = params.value("recreate") == "true";
+
     fileInfo.status = FileInformation::Status::uploading;
     auto errorCode = addFile(fileInfo);
 
@@ -274,7 +274,7 @@ int Helper::handleAddUpload(const QString& fileName)
         {
             const auto info = downloader->fileInformation(fileInfo.name);
             NX_ASSERT(info.isValid());
-            if (info.status != FileInformation::Status::downloaded)
+            if (info.status != FileInformation::Status::downloaded && recreate)
             {
                 downloader->deleteFile(fileInfo.name);
                 errorCode = addFile(fileInfo);
@@ -331,7 +331,7 @@ int Helper::handleDownloadChunk(const QString& fileName, int chunkIndex)
         return makeDownloaderError(errorCode);
 
     result = data;
-    resultContentType = kOctetStreamContentType;
+    resultContentType = nx::network::http::header::ContentType::kBinary;
     return nx::network::http::StatusCode::ok;
 }
 
@@ -343,11 +343,11 @@ int Helper::handleDownloadChunkFromInternet(const QString& fileName, int chunkIn
     else if (!url.isValid())
         return makeInvalidParameterError("url", QnRestResult::InvalidParameter);
 
-    bool ok = false;
-    const qint64 chunkSize = params.value("chunkSize").toLongLong(&ok);
-    if (!ok)
+    const QString chunkSizeString = params.value("chunkSize");
+    if (chunkSizeString.isEmpty())
         return makeInvalidParameterError("chunkSize", QnRestResult::MissingParameter);
-    if (chunkSize > kMaxChunkSize)
+    const qint64 chunkSize = chunkSizeString.toLongLong();
+    if (chunkSize <= 0 || chunkSize > kMaxChunkSize)
         return makeInvalidParameterError("chunkSize", QnRestResult::InvalidParameter);
 
     const auto fileInfo = downloader->fileInformation(fileName);
@@ -363,7 +363,7 @@ int Helper::handleDownloadChunkFromInternet(const QString& fileName, int chunkIn
         if (errorCode == ResultCode::ok)
         {
             result = data;
-            resultContentType = kOctetStreamContentType;
+            resultContentType = nx::network::http::header::ContentType::kBinary;
             return nx::network::http::StatusCode::ok;
         }
     }
@@ -382,8 +382,11 @@ int Helper::handleDownloadChunkFromInternet(const QString& fileName, int chunkIn
 
     const auto status = httpClient.response()->statusLine.statusCode;
 
-    if (status != nx::network::http::StatusCode::ok && status != nx::network::http::StatusCode::partialContent)
+    if (status != nx::network::http::StatusCode::ok
+        && status != nx::network::http::StatusCode::partialContent)
+    {
         return status;
+    }
 
     result.clear();
     while (!httpClient.eof())
@@ -395,7 +398,7 @@ int Helper::handleDownloadChunkFromInternet(const QString& fileName, int chunkIn
         return nx::network::http::StatusCode::internalServerError;
     }
 
-    resultContentType = kOctetStreamContentType;
+    resultContentType = nx::network::http::header::ContentType::kBinary;
 
     if (useDownloader)
         downloader->writeFileChunk(fileName, chunkIndex, result);
@@ -409,13 +412,13 @@ int Helper::handleUploadChunk(
     const QByteArray& body,
     const QByteArray& contentType)
 {
-    if (contentType != kOctetStreamContentType)
+    if (contentType != nx::network::http::header::ContentType::kBinary)
     {
         return makeError(
             nx::network::http::StatusCode::badRequest,
             QnRestResult::CantProcessRequest,
-            lit("Only %1 Content-Type is supported.").arg(
-                QLatin1String(kOctetStreamContentType)));
+            lm("Only %1 Content-Type is supported.").arg(
+                nx::network::http::header::ContentType::kBinary));
     }
 
     const auto errorCode = downloader->writeFileChunk(fileName, chunkIndex, body);

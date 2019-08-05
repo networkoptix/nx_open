@@ -2,6 +2,7 @@
 * 27 aug 2013
 * a.kolesnikov
 ***********************************************************/
+#include <QtCore/QCoreApplication>
 
 #include <nx/cloud/mediator/mediator_process_public.h>
 #include <nx/network/socket_global.h>
@@ -32,6 +33,7 @@ BOOL WINAPI stopServer_WIN(DWORD dwCtrlType)
 
 int main(int argc, char* argv[])
 {
+    QCoreApplication app(argc, argv);
     nx::network::SocketGlobals::InitGuard sgGuard(
         nx::network::InitializationFlags::disableUdt);
 

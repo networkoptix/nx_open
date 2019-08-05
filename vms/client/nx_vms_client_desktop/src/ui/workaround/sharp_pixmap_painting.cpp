@@ -2,6 +2,8 @@
 
 #include <utils/common/scoped_painter_rollback.h>
 
+#include <nx/utils/log/assert.h>
+
 namespace {
     const qreal kSharpnessEps = 0.0001;
 } // namespace

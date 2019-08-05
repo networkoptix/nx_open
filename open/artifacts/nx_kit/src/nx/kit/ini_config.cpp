@@ -1,8 +1,10 @@
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+
 #include "ini_config.h"
 
+#include "utils.h"
+
 #include <algorithm>
-#include <cerrno>
-#include <climits>
 #include <cstdlib>
 #include <cstring>
 #include <fstream>
@@ -10,7 +12,6 @@
 #include <memory>
 #include <sstream>
 #include <string>
-#include <vector>
 #include <unordered_set>
 
 #if !defined(NX_INI_CONFIG_DEFAULT_OUTPUT)
@@ -178,8 +179,8 @@ static std::string determineIniFilesDir()
 
 struct AbstractParam
 {
-    const char* const name;
-    const char* const description;
+    const std::string name;
+    const std::string description;
 
     AbstractParam(const char* name, const char* description):
         name(name), description(description)
@@ -205,9 +206,9 @@ struct AbstractParam
         {
             const char* const prefix = (error[0] != '\0') ? "!!! " : (eqDefault ? "    " : "  * ");
             std::string descriptionStr;
-            if (description[0])
+            if (!description.empty())
             {
-                descriptionStr = std::string(" # ") + description;
+                descriptionStr = " # " + description;
                 stringReplaceAllChars(&descriptionStr, '\n', ' ');
             }
             *output << prefix << value << valueNameSeparator << name << error << descriptionStr
@@ -247,6 +248,27 @@ struct Param: AbstractParam
     }
 };
 
+template<typename Value>
+bool Param<Value>::reload(const std::string* value, std::ostream* output)
+{
+    const auto oldValue = *pValue;
+    *pValue = defaultValue;
+    const char* error = "";
+    if (value && !value->empty()) //< Existing but empty values are treated as default.
+    {
+        if (!nx::kit::utils::fromString(*value, pValue))
+            error = " [invalid value]";
+    }
+    printValueLine(output, *pValue, " = ", error, *pValue == defaultValue);
+    return oldValue != *pValue;
+}
+
+template<typename Value>
+std::string Param<Value>::defaultValueStr() const
+{
+    return toString(defaultValue);
+}
+
 template<>
 bool Param<bool>::reload(const std::string* value, std::ostream* output)
 {
@@ -270,88 +292,6 @@ template<>
 std::string Param<bool>::defaultValueStr() const
 {
     return defaultValue ? "1" : "0";
-}
-
-template<>
-bool Param<int>::reload(const std::string* value, std::ostream* output)
-{
-    const int oldValue = *pValue;
-    *pValue = defaultValue;
-    const char* error = "";
-    if (value && !value->empty()) //< Existing but empty int values are treated as default.
-    {
-        // NOTE: std::stoi() is missing on Android.
-        char* pEnd = nullptr;
-        errno = 0; //< Required before strtol().
-        const long v = std::strtol(value->c_str(), &pEnd, /*base*/ 0);
-        if (v > INT_MAX || v < INT_MIN || errno != 0 || *pEnd != '\0')
-            error = " [invalid value]";
-        else
-            *pValue = (int) v;
-    }
-    printValueLine(output, *pValue, " = ", error, *pValue == defaultValue);
-    return oldValue != *pValue;
-}
-
-template<>
-bool Param<float>::reload(const std::string* value, std::ostream* output)
-{
-    const float oldValue = *pValue;
-    *pValue = defaultValue;
-    const char* error = "";
-    if (value && !value->empty()) //< Existing but empty float values are treated as default.
-    {
-        // NOTE: std::stof() is missing on Android.
-        char* pEnd = nullptr;
-        errno = 0; //< Required before strtof().
-        // Android NDK does not support std::strtof.
-        const float v = (float) std::strtod(value->c_str(), &pEnd);
-        if (errno == ERANGE || *pEnd != '\0')
-            error = " [invalid value]";
-        else
-            *pValue = (float) v;
-    }
-    printValueLine(output, *pValue, " = ", error, *pValue == defaultValue);
-    return oldValue != *pValue;
-}
-
-template<>
-bool Param<double>::reload(const std::string* value, std::ostream* output)
-{
-    const double oldValue = *pValue;
-    *pValue = defaultValue;
-    const char* error = "";
-    if (value && !value->empty()) //< Existing but empty double values are treated as default.
-    {
-        // NOTE: std::stof() is missing on Android.
-        char* pEnd = nullptr;
-        errno = 0; //< Required before strtod().
-        const double v = std::strtod(value->c_str(), &pEnd);
-        if (errno == ERANGE || *pEnd != '\0')
-            error = " [invalid value]";
-        else
-            *pValue = v;
-    }
-    printValueLine(output, *pValue, " = ", error, *pValue == defaultValue);
-    return oldValue != *pValue;
-}
-
-template<>
-std::string Param<int>::defaultValueStr() const
-{
-    return toString(defaultValue);
-}
-
-template<>
-std::string Param<float>::defaultValueStr() const
-{
-    return toString(defaultValue);
-}
-
-template<>
-std::string Param<double>::defaultValueStr() const
-{
-    return toString(defaultValue);
 }
 
 template<>
@@ -407,6 +347,16 @@ public:
     Impl(const char* iniFile):
         iniFile(validateIniFile(iniFile))
     {
+    }
+
+    static bool& isEnabled()
+    {
+        #if defined(NX_INI_CONFIG_DISABLED)
+            static bool isEnabled = false;
+        #else
+            static bool isEnabled = true;
+        #endif
+        return isEnabled;
     }
 
     /**
@@ -644,11 +594,13 @@ void IniConfig::Impl::reload()
 
 /*static*/ bool IniConfig::isEnabled()
 {
-    #if defined(NX_INI_CONFIG_DISABLED)
-        return false;
-    #else
-        return true;
-    #endif
+    return Impl::isEnabled();
+}
+
+
+/*static*/ void IniConfig::setEnabled(bool value)
+{
+    Impl::isEnabled() = value;
 }
 
 /*static*/ const char* IniConfig::iniFilesDir()
@@ -725,6 +677,13 @@ void IniConfig::reload()
 {
     return d->reload();
 }
+
+//-------------------------------------------------------------------------------------------------
+// Tweaks
+
+/*static*/ IniConfig::Tweaks::MutexHolder IniConfig::Tweaks::m_mutexHolder;
+/*static*/ int IniConfig::Tweaks::tweaksInstanceCount = 0;
+/*static*/ bool IniConfig::Tweaks::originalValueOfIsEnabled = 0;
 
 } // namespace kit
 } // namespace nx

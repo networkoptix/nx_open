@@ -1,5 +1,10 @@
 .import com.networkoptix.qml 1.0 as Nx
 
+function lockoutConnectionErrorText()
+{
+    return qsTr("Too many attempts. Try again in a minute.")
+}
+
 function connectionErrorText(status, info)
 {
     if (status == Nx.QnConnectionManager.UnauthorizedConnectionResult)
@@ -14,5 +19,7 @@ function connectionErrorText(status, info)
         return qsTr("Incompatible server version %1").arg(info)
     else if (status == Nx.QnConnectionManager.FactoryServerConnectionResult)
         return qsTr("Connect to this server from web browser or through desktop client to set it up")
+    else if (status == Nx.QnConnectionManager.UserTemporaryLockedOut)
+        return lockoutConnectionErrorText
     return ""
 }

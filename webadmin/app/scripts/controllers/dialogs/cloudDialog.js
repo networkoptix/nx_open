@@ -2,8 +2,8 @@
 
 angular.module('webadminApp')
     .controller('CloudDialogCtrl', ['$scope', '$uibModalInstance', 'mediaserver', 'cloudAPI', 'connect',
-                                    'systemName', 'cloudSystemID', 'cloudAccountName',
-    function ($scope, $uibModalInstance, mediaserver, cloudAPI, connect, systemName, cloudSystemID, cloudAccountName) {
+                                    'systemName', 'cloudSystemID', 'cloudAccountName', '$timeout',
+    function ($scope, $uibModalInstance, mediaserver, cloudAPI, connect, systemName, cloudSystemID, cloudAccountName, $timeout) {
         //1. Detect action: connect or disconnect
         $scope.connect = connect;
         $scope.Config = Config;
@@ -31,7 +31,7 @@ angular.module('webadminApp')
                 $scope.errorMessage += ': ' + result.data.errorString;
                 $scope.succeed = false;
             }else {
-                $uibModalInstance.close('success');
+                $timeout(function (){$uibModalInstance.close('success');}, 2000);
             }
         }
         function errorHandler(result){
@@ -91,6 +91,7 @@ angular.module('webadminApp')
         $scope.action = function(){
             $scope.settings.cloudError = false;
             if(connect){
+                $scope.connecting = true;
                 cloudAPI.connect( $scope.settings.systemName, $scope.settings.cloudEmail, $scope.settings.cloudPassword).then(
                     function(message){
                         //2. Save settings to local server

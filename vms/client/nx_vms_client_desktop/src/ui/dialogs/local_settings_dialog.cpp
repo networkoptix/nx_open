@@ -19,6 +19,7 @@
 #include <ui/widgets/local_settings/recording_settings_widget.h>
 #include <ui/widgets/local_settings/popup_settings_widget.h>
 #include <ui/widgets/local_settings/advanced_settings_widget.h>
+#include <ui/dialogs/common/message_box.h>
 
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/watchers/workbench_desktop_camera_watcher.h>

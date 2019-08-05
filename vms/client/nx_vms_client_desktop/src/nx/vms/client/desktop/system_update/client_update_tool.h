@@ -2,8 +2,6 @@
 
 #include <set>
 
-#include <QtCore>
-
 #include <client_core/connection_context_aware.h>
 
 #include <nx/vms/common/p2p/downloader/downloader.h>
@@ -12,9 +10,14 @@
 #include <nx/update/update_information.h>
 #include <utils/common/connective.h>
 #include <utils/update/zip_utils.h>
-#include "update_contents.h"
 
-namespace nx::vms::common::p2p::downloader { class SingleConnectionPeerManager; }
+namespace nx::vms::applauncher::api { enum class ResultType; }
+
+namespace nx::vms::common::p2p::downloader {
+
+class ResourcePoolPeerManager;
+
+} // namespace nx::vms::common::p2p::downloader
 
 namespace nx::vms::client::desktop {
 
@@ -25,15 +28,13 @@ namespace nx::vms::client::desktop {
  */
 class ClientUpdateTool:
     public Connective<QObject>,
-    public QnConnectionContextAware,
-    public nx::vms::common::p2p::downloader::AbstractPeerManagerFactory
+    public QnConnectionContextAware
 {
     Q_OBJECT
     using base_type = Connective<QObject>;
     using Downloader = vms::common::p2p::downloader::Downloader;
     using FileInformation = vms::common::p2p::downloader::FileInformation;
     using PeerManagerPtr = nx::vms::common::p2p::downloader::AbstractPeerManager*;
-    using SingleConnectionPeerManager = nx::vms::common::p2p::downloader::SingleConnectionPeerManager;
     using UpdateContents = nx::update::UpdateContents;
 
 public:
@@ -58,6 +59,8 @@ public:
         readyRestart,
         /** Installation is complete, client has newest version. */
         complete,
+        /** ClientUpdateTool is being destructed. All async operations should exit ASAP. */
+        exiting,
         /** Got some critical error and can not continue installation. */
         error,
         /** Got an error during installation. */
@@ -83,12 +86,6 @@ public:
      * @param info - update manifest
      */
     void setUpdateTarget(const UpdateContents& contents);
-
-    /**
-     * Returns a progress for downloading client package
-     * @return percents
-     */
-    int getDownloadProgress() const;
 
     /**
      * Resets tool to initial state.
@@ -140,14 +137,7 @@ public:
      */
     void setServerUrl(const nx::utils::Url& serverUrl, const QnUuid& serverId);
 
-    virtual PeerManagerPtr createPeerManager(
-        FileInformation::PeerSelectionPolicy peerPolicy,
-        const QList<QnUuid>& additionalPeers) override;
-
     std::future<UpdateContents> requestRemoteUpdateInfo();
-
-    /** Get cached update information from the mediaservers. */
-    UpdateContents getRemoteUpdateInfo() const;
 
     /**
      * Get installed versions. It can block up to 500ms until applauncher check it complete.
@@ -178,14 +168,13 @@ signals:
 protected:
     // Callbacks
     void atDownloaderStatusChanged(const FileInformation& fileInformation);
-    void atRemoteUpdateInformation(nx::update::InformationError error,
-        const nx::update::Information& updateInformation);
     void atDownloadFinished(const QString& fileName);
     void atChunkDownloadFailed(const QString& fileName);
     void atDownloadFailed(const QString& fileName);
+    void atDownloadStallChanged(const QString& fileName, bool stalled);
     void atExtractFilesFinished(int code);
 
-protected:
+private:
     void setState(State newState);
     void setError(const QString& error);
     void setApplauncherError(const QString& error);
@@ -193,17 +182,18 @@ protected:
     /**
      * Converts applauncher::api::ResultType to a readable string.
      */
-    static QString applauncherErrorToString(int result);
+    static QString applauncherErrorToString(nx::vms::applauncher::api::ResultType result);
 
     std::unique_ptr<Downloader> m_downloader;
     /** Directory to store unpacked files. */
     QDir m_outputDir;
 
-    /** Special peer manager to be used in the downloader. */
-    std::unique_ptr<vms::common::p2p::downloader::SingleConnectionPeerManager> m_peerManager;
+    vms::common::p2p::downloader::ResourcePoolPeerManager* m_peerManager = nullptr;
+    vms::common::p2p::downloader::ResourcePoolPeerManager* m_proxyPeerManager = nullptr;
     nx::update::Package m_clientPackage;
-    State m_state = State::initial;
-    int m_progress = 0;
+
+    std::atomic<State> m_state = State::initial;
+
     bool m_stateChanged = false;
     nx::utils::SoftwareVersion m_updateVersion;
 
@@ -214,10 +204,9 @@ protected:
     QString m_lastError;
 
     std::promise<UpdateContents> m_remoteUpdateInfoRequest;
-    UpdateContents m_remoteUpdateContents;
     QnMutex m_mutex;
 
-    std::future<int> m_applauncherTask;
+    std::future<nx::vms::applauncher::api::ResultType> m_applauncherTask;
 
     mutable std::future<std::set<nx::utils::SoftwareVersion>> m_installedVersionsFuture;
     mutable std::set<nx::utils::SoftwareVersion> m_installedVersions;

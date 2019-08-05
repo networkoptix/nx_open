@@ -46,9 +46,7 @@ std::string toString(NatTraversalResultCode code)
 //-------------------------------------------------------------------------------------------------
 
 ConnectionResultRequest::ConnectionResultRequest():
-    StunRequestData(kMethod),
-    resultCode(NatTraversalResultCode::ok),
-    sysErrorCode(SystemError::noError)
+    StunRequestData(kMethod)
 {
 }
 
@@ -58,18 +56,17 @@ void ConnectionResultRequest::serializeAttributes(nx::network::stun::Message* co
     message->newAttribute<attrs::UdpHolePunchingResultCodeAttr>(
         static_cast<int>(resultCode));
     message->newAttribute<attrs::SystemErrorCodeAttr>(sysErrorCode);
+    message->newAttribute<attrs::ConnectTypeAttr>(connectType);
 }
 
 bool ConnectionResultRequest::parseAttributes(const nx::network::stun::Message& message)
 {
-    return
-        readEnumAttributeValue<attrs::UdpHolePunchingResultCodeAttr>(
-            message, &resultCode) &&
-        readEnumAttributeValue<attrs::SystemErrorCodeAttr>(
-            message, &sysErrorCode) &&
-        readStringAttributeValue<attrs::ConnectionId>(
-            message,
-            &connectSessionId);
+    // connectType is optional for backward compatibility.
+    readEnumAttributeValue<attrs::ConnectTypeAttr>(message, &connectType);
+    
+    return readEnumAttributeValue<attrs::UdpHolePunchingResultCodeAttr>(message, &resultCode)
+        && readEnumAttributeValue<attrs::SystemErrorCodeAttr>(message, &sysErrorCode)
+        && readStringAttributeValue<attrs::ConnectionId>(message, &connectSessionId);
 }
 
 } // namespace api
@@ -83,8 +80,8 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::hpm::api, NatTraversalResultCode,
     (nx::hpm::api::NatTraversalResultCode::targetPeerHasNoUdpAddress, "targetPeerHasNoUdpAddress")
     (nx::hpm::api::NatTraversalResultCode::noSynFromTargetPeer, "noSynFromTargetPeer")
     (nx::hpm::api::NatTraversalResultCode::udtConnectFailed, "udtConnectFailed")
-    (nx::hpm::api::NatTraversalResultCode::udtConnectFailed, "tcpConnectFailed")
-    (nx::hpm::api::NatTraversalResultCode::udtConnectFailed, "endpointVerificationFailure")
+    (nx::hpm::api::NatTraversalResultCode::tcpConnectFailed, "tcpConnectFailed")
+    (nx::hpm::api::NatTraversalResultCode::endpointVerificationFailure, "endpointVerificationFailure")
     (nx::hpm::api::NatTraversalResultCode::errorConnectingToRelay, "errorConnectingToRelay")
     (nx::hpm::api::NatTraversalResultCode::notFoundOnRelay, "notFoundOnRelay")
     (nx::hpm::api::NatTraversalResultCode::noSuitableMethod, "noSuitableMethod")

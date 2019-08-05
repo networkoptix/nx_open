@@ -1,16 +1,18 @@
+#include "compatibility_version_installation_dialog.h"
+#include "ui_compatibility_version_installation_dialog.h"
+
 #include <chrono>
 
 #include <QtWidgets/QPushButton>
-
-#include "compatibility_version_installation_dialog.h"
-#include "ui_compatibility_version_installation_dialog.h"
 
 #include <nx/update/update_check.h>
 #include <nx/vms/client/desktop/system_update/client_update_tool.h>
 #include <client/client_settings.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/guarded_callback.h>
-#include "ui/workbench/handlers/workbench_connect_handler.h"
+#include <ui/workbench/handlers/workbench_connect_handler.h>
+
+#include "update_verification.h"
 
 using namespace std::chrono_literals;
 using ClientUpdateTool = nx::vms::client::desktop::ClientUpdateTool;
@@ -94,22 +96,24 @@ void CompatibilityVersionInstallationDialog::processUpdateContents(
 {
     auto commonModule = m_private->clientUpdateTool->commonModule();
     nx::update::UpdateContents verifiedContents = contents;
-    if (nx::vms::client::desktop::verifyUpdateContents(commonModule, verifiedContents, {}))
+    // We need to supply non-zero Uuid for the client to make verification work.
+    // commonModule->globalSettings()->localSystemId() is zero right now.
+    nx::vms::client::desktop::ClientVerificationData clientData;
+    clientData.clientId = QnUuid("cccccccc-cccc-cccc-cccc-cccccccccccc");
+    clientData.compatibilityMode = true;
+    clientData.fillDefault();
+
+    if (nx::vms::client::desktop::verifyUpdateContents(
+        commonModule, verifiedContents, /*servers=*/{}, clientData))
     {
-        //m_private->clientUpdateTool->setUpdateTarget(verifiedContents);
         if (m_private->updateContents.preferOtherUpdate(verifiedContents))
             m_private->updateContents = verifiedContents;
         else
-        {
             NX_ERROR(this) << "processUpdateContents() rejected update information from" << contents.source;
-        }
     }
     else
     {
         NX_ERROR(this) << "processUpdateContents() got invalid update contents from" << contents.source;
-        //m_installationResult = InstallResult::failedDownload;
-        //setMessage(tr("Installation failed"));
-        //done(QDialogButtonBox::StandardButton::Ok);
     }
 }
 
@@ -198,8 +202,18 @@ void CompatibilityVersionInstallationDialog::atUpdateCurrentState()
         if (m_private->updateInfoMediaserver.valid()
             && m_private->updateInfoMediaserver.wait_for(kWaitForUpdateInfo) == std::future_status::ready)
         {
-            NX_DEBUG(this, "atUpdateCurrentState() - done with updateInfoMediaserver");
-            processUpdateContents(m_private->updateInfoMediaserver.get());
+            auto updateContents = m_private->updateInfoMediaserver.get();
+            if (updateContents.getVersion() != m_versionToInstall)
+            {
+                NX_ERROR(this, "atUpdateCurrentState() - updateInfoMediaserver mismatch. "
+                    "We need %1 but server returned %2.",
+                    m_versionToInstall, updateContents.getVersion());
+            }
+            else
+            {
+                NX_DEBUG(this, "atUpdateCurrentState() - done with updateInfoMediaserver");
+                processUpdateContents(updateContents);
+            }
             --m_private->requestsLeft;
         }
 

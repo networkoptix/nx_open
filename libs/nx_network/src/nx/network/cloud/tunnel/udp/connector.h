@@ -38,7 +38,7 @@ public:
     TunnelConnector(
         AddressEntry targetHostAddress,
         std::string connectSessionId,
-        std::unique_ptr<nx::network::UDPSocket> udpSocket);
+        std::unique_ptr<AbstractDatagramSocket> udpSocket);
     virtual ~TunnelConnector();
 
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
@@ -66,7 +66,7 @@ protected:
 private:
     const AddressEntry m_targetHostAddress;
     const std::string m_connectSessionId;
-    std::unique_ptr<nx::network::UDPSocket> m_udpSocket;
+    std::unique_ptr<AbstractDatagramSocket> m_udpSocket;
     ConnectCompletionHandler m_completionHandler;
     std::unique_ptr<UdtStreamSocket> m_udtConnection;
     std::unique_ptr<nx::network::aio::Timer> m_timer;

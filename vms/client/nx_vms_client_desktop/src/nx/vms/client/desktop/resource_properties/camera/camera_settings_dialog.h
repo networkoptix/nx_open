@@ -36,13 +36,16 @@ public:
 
     bool setCameras(const QnVirtualCameraResourceList& cameras, bool force = false);
 
+    virtual void reject() override;
+
 protected:
+    virtual void showEvent(QShowEvent* event) override;
     virtual void buttonBoxClicked(QDialogButtonBox::StandardButton button) override;
 
 private:
     QDialogButtonBox::StandardButton showConfirmationDialog();
 
-    void updateState();
+    void updateState(const CameraSettingsDialogState& state);
 
     void updateButtonsAvailability();
 

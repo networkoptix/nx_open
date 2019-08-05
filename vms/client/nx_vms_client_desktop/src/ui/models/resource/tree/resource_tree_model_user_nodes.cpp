@@ -137,7 +137,7 @@ QList<QnResourceTreeModelNodePtr> QnResourceTreeModelUserNodes::children(
     return result;
 }
 
-QList<ResourceTreeNodeType> QnResourceTreeModelUserNodes::allPlaceholders() const
+QList<ResourceTree::NodeType> QnResourceTreeModelUserNodes::allPlaceholders() const
 {
     static QList<NodeType> placeholders
     {

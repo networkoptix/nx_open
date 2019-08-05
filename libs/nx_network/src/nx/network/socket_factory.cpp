@@ -9,6 +9,7 @@
 #include <nx/network/socket_global.h>
 #include <nx/network/system_socket.h>
 #include <nx/network/udt/udt_socket.h>
+#include <nx/utils/basic_factory.h>
 #include <nx/utils/std/cpp14.h>
 
 namespace nx {
@@ -21,15 +22,30 @@ SocketFactory::CreateStreamServerSocketFuncType createStreamServerSocketFunc;
 
 } // namespace
 
+class SocketFactoryImpl
+{
+public:
+    using DatagramSocketFactory = nx::utils::BasicAbstractObjectFactory<
+        AbstractDatagramSocket, UDPSocket, int /*e.g., AF_INET*/>;
+
+    DatagramSocketFactory datagramSocketFactory;
+};
+
+//-------------------------------------------------------------------------------------------------
+// Datagram factory.
+
 std::unique_ptr<AbstractDatagramSocket> SocketFactory::createDatagramSocket()
 {
-    return createUdpSocket();
+    return instance().m_impl->datagramSocketFactory.create(s_udpIpVersion.load());
 }
 
-std::unique_ptr<UDPSocket> SocketFactory::createUdpSocket()
+SocketFactory::DatagramSocketFactoryFunc SocketFactory::setCustomDatagramSocketFactoryFunc(
+    DatagramSocketFactoryFunc func)
 {
-    return std::make_unique<UDPSocket>(s_udpIpVersion.load());
+    return instance().m_impl->datagramSocketFactory.setCustomFunc(std::move(func));
 }
+
+//-------------------------------------------------------------------------------------------------
 
 std::unique_ptr<AbstractStreamSocket> SocketFactory::createStreamSocket(
     bool sslRequired,
@@ -180,7 +196,7 @@ void SocketFactory::setIpVersion(const QString& ipVersion)
     if (ipVersion.isEmpty())
         return;
 
-    NX_ALWAYS(typeid(SocketFactory), lm("SocketFactory::setIpVersion(%1)").arg(ipVersion));
+    NX_INFO(typeid(SocketFactory), "%1(%2)", __func__, ipVersion);
 
     if (ipVersion == QLatin1String("4"))
     {
@@ -238,6 +254,21 @@ int SocketFactory::tcpClientIpVersion()
 int SocketFactory::tcpServerIpVersion()
 {
     return s_tcpServerIpVersion;
+}
+
+SocketFactory& SocketFactory::instance()
+{
+    static SocketFactory staticInstance;
+    return staticInstance;
+}
+
+SocketFactory::SocketFactory():
+    m_impl(std::make_unique<SocketFactoryImpl>())
+{
+}
+
+SocketFactory::~SocketFactory()
+{
 }
 
 std::atomic< SocketFactory::SocketType >

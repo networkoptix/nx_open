@@ -1,6 +1,6 @@
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
-from django.core.cache import caches
+from django.core.cache import cache, caches
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from api.helpers.exceptions import handle_exceptions, require_params,\
     APIRequestException, APIForbiddenException, APINotFoundException, ErrorCodes
@@ -12,39 +12,30 @@ import requests
 from cloud import settings
 from django.shortcuts import redirect
 
-from cms.models import DataStructure, get_cloud_portal_product, UserGroupsToProductPermissions
+from cms.models import DataStructure, get_cloud_portal_product,\
+    cloud_portal_customization_cache, UserGroupsToProductPermissions
 
 logger = logging.getLogger(__name__)
 
 
-def get_suported_hardware_types():
-    return DataStructure.objects.get(name="%SUPPORTED_HARDWARE_TYPES%").\
-        find_actual_value(product=get_cloud_portal_product())
-
-
-def get_sorting_supported_devices():
-    return DataStructure.objects.get(name="%SORT_SUPPORTED_DEVICES%").\
-        find_actual_value(product=get_cloud_portal_product())
-
-
-def get_suported_resolutions():
-    return DataStructure.objects.get(name="%SUPPORTED_RESOLUTIONS%").\
-        find_actual_value(product=get_cloud_portal_product())
-
-
-def get_footer_items():
-    return DataStructure.objects.get(name="%FOOTER_ITEMS%").\
-        find_actual_value(product=get_cloud_portal_product())
-
-
-def get_public_downloads_status():
-    return DataStructure.objects.get(name="%PUBLIC_DOWNLOADS%").\
-        find_actual_value(product=get_cloud_portal_product())
-
-
-def get_public_release_history_status():
-    return DataStructure.objects.get(name="%PUBLIC_RELEASE_HISTORY%").\
-        find_actual_value(product=get_cloud_portal_product())
+def get_settings_from_cache():
+    customization_cache = cloud_portal_customization_cache(settings.CUSTOMIZATION, 'config')
+    return {
+        'productName': customization_cache['product_name'],
+        'vmsName': customization_cache['vms_name'],
+        'copyrightYear': customization_cache['copyright_year'],
+        'companyName': customization_cache['company_name'],
+        'companyLink': customization_cache['company_link'],
+        'footerItems': customization_cache['footer_items'],
+        'trafficRelayHost': settings.TRAFFIC_RELAY_HOST,
+        'publicDownloads': customization_cache['public_downloads'],
+        'publicReleases': customization_cache['public_releases'],
+        'sortSupportedDevices': customization_cache['sort_supported_devices'],
+        'supportLink': customization_cache['support_link'],
+        'supportedResolutions': customization_cache['supported_resolutions'],
+        'supportedHardwareTypes': customization_cache['supported_hardware_types'],
+        'searchTags': customization_cache['search_tags']
+    }
 
 
 @api_view(['GET', 'POST'])
@@ -112,7 +103,8 @@ def downloads_history(request):
     # TODO: later we can check specific permissions
     can_view_releases = UserGroupsToProductPermissions.\
         check_customization_permission(request.user, settings.CUSTOMIZATION, 'api.can_view_release')
-    if not get_public_release_history_status() and not can_view_releases:
+    public_release_history = get_settings_from_cache()['publicReleases']
+    if not public_release_history and not can_view_releases:
         raise APIForbiddenException("Not authorized", ErrorCodes.forbidden)
 
     downloads_url = settings.DOWNLOADS_JSON.replace('{{customization}}', settings.CUSTOMIZATION)
@@ -129,8 +121,10 @@ def downloads_history(request):
 def download_build(request, build):
     # TODO: later we can check specific permissions
     customization = settings.CUSTOMIZATION
-    if not get_public_release_history_status() and not UserGroupsToProductPermissions.\
-            check_customization_permission(request.user, customization, 'api.can_view_release'):
+    public_release_history = get_settings_from_cache()['publicReleases']
+    can_view_releases = UserGroupsToProductPermissions.\
+        check_customization_permission(request.user, customization, 'api.can_view_release')
+    if not public_release_history and not can_view_releases:
         raise APIForbiddenException("Not authorized", ErrorCodes.forbidden)
 
     if re.search(r'\D+', build):
@@ -171,7 +165,8 @@ def download_build(request, build):
 def downloads(request):
     global_cache = caches['global']
     customization = settings.CUSTOMIZATION
-    if not get_public_downloads_status() and not request.user.is_authenticated:
+    public_downloads = get_settings_from_cache()['publicDownloads']
+    if not public_downloads and not request.user.is_authenticated:
         raise APIForbiddenException("Not authorized", ErrorCodes.not_authorized)
     cache_key = "downloads_" + customization
     if request.method == 'POST':  # clear cache on POST request - only for this customization
@@ -247,13 +242,7 @@ def downloads(request):
 @permission_classes((AllowAny, ))
 @handle_exceptions
 def get_settings(request):
-    settings_object = {
-        'footerItems': get_footer_items(),
-        'trafficRelayHost': settings.TRAFFIC_RELAY_HOST,
-        'publicDownloads': get_public_downloads_status(),
-        'publicReleases': get_public_release_history_status(),
-        'sortSupportedDevices': get_sorting_supported_devices(),
-        'supportedResolutions': get_suported_resolutions(),
-        'supportedHardwareTypes': get_suported_hardware_types()
-    }
+    settings_object = get_settings_from_cache()
+    if 'version_id' in settings_object:
+        del settings_object['version_id']
     return Response(settings_object)

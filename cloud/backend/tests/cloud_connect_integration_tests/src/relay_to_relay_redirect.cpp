@@ -26,16 +26,19 @@ class RelayToRelayRedirect:
 
 public:
     RelayToRelayRedirect():
-        BasicTestFixture(3, std::chrono::seconds(1)),
-        m_removePeerFuture(m_removePeerPromise.get_future()),
-        m_addPeerFuture(m_addPeerPromise.get_future())
+        BasicTestFixture(3, std::chrono::seconds(1))
     {}
 
     virtual void SetUp() override
     {
         base_type::SetUp();
-        ConnectorFactory::setEnabledCloudConnectMask((int)ConnectType::proxy);
+        m_connectMethodMaskBak = ConnectorFactory::setEnabledCloudConnectMask((int)ConnectType::proxy);
         startServer();
+    }
+
+    virtual void TearDown() override
+    {
+        ConnectorFactory::setEnabledCloudConnectMask(m_connectMethodMaskBak);
     }
 
     void assertServerIsAccessibleFromAnotherRelay()
@@ -53,7 +56,7 @@ public:
             relayClient->startSession(
                 "",
                 serverSocketCloudAddress(),
-                [this, &requestCompletion](
+                [&requestCompletion](
                     api::ResultCode resultCode,
                     api::CreateClientSessionResponse response)
                 {
@@ -78,14 +81,12 @@ public:
 
     virtual void peerAdded(const std::string& domainName) override
     {
-        m_addedPeer = domainName;
-        m_addPeerPromise.set_value();
+        m_peerAddedEvents.push(domainName);
     }
 
     virtual void peerRemoved(const std::string& domainName) override
     {
-        m_removedPeer = domainName;
-        m_removePeerPromise.set_value();
+        m_peerRemovedEvents.push(domainName);
     }
 
     void whenServerGoesOffline()
@@ -100,24 +101,22 @@ public:
 
     void waitForRemovePeerSignal()
     {
-        m_removePeerFuture.wait();
+        m_removedPeer = m_peerRemovedEvents.pop();
     }
 
     void waitForAddPeerSignal()
     {
-        m_addPeerFuture.wait();
+        m_addedPeer = m_peerAddedEvents.pop();
     }
-
 
 private:
     std::string m_addedPeer;
     std::string m_removedPeer;
 
-    nx::utils::promise<void> m_removePeerPromise;
-    nx::utils::future<void> m_removePeerFuture;
+    nx::utils::SyncQueue<std::string> m_peerAddedEvents;
+    nx::utils::SyncQueue<std::string> m_peerRemovedEvents;
 
-    nx::utils::promise<void> m_addPeerPromise;
-    nx::utils::future<void> m_addPeerFuture;
+    int m_connectMethodMaskBak = 0;
 };
 
 TEST_F(RelayToRelayRedirect, RedirectToAnotherRelay)

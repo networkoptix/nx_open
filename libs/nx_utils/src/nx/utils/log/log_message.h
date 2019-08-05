@@ -12,7 +12,7 @@ namespace log {
 /**
  * Universal message formatter with QString::arg interface.
  *
- * NOTE:: Do not add any function overloads for aditional types support. Rather implement a
+ * NOTE: Do not add any function overloads for additional types support. Rather implement a
  * member function 'QString toString() const' or external function 'QString toString(const T&)'
  * so it will be supported automatically.
  */
@@ -64,6 +64,8 @@ public:
 private:
     QString m_str;
 };
+
+inline Message makeMessage() { return Message(); }
 
 template<typename Format>
 Message makeMessage(const Format& format)

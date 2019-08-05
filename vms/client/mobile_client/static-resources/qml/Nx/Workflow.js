@@ -29,7 +29,9 @@ function openSessionsScreen()
 
 function openSessionsScreenWithWarning(systemName)
 {
-    var item = stackView.safeReplace(null, Qt.resolvedUrl("Screens/SessionsScreen.qml"))
+    var item = stackView.currentItem && stackView.currentItem.objectName == "sessionsScreen"
+        ? stackView.currentItem
+        : stackView.safeReplace(null, Qt.resolvedUrl("Screens/SessionsScreen.qml"))
     if (item)
         item.openConnectionWarningDialog(systemName)
 }

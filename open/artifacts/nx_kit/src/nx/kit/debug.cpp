@@ -1,3 +1,5 @@
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+
 #include "debug.h"
 
 #include <chrono>
@@ -101,6 +103,18 @@ std::string printPrefix(const char* file)
 //-------------------------------------------------------------------------------------------------
 // Assertions
 
+void intentionallyCrash(const char* message)
+{
+    #if defined(_WIN32)
+        char messageOnStack[256] = {0};
+        if (message)
+            snprintf(messageOnStack, sizeof(messageOnStack), "%s", message);
+    #endif
+
+    // Crash the process to let a dump/core be generated.
+    *reinterpret_cast<volatile int*>(0) = 0;
+}
+
 namespace detail {
 
 void assertionFailed(
@@ -114,14 +128,7 @@ void assertionFailed(
     ).c_str());
 
     #if !defined(NDEBUG)
-        #if defined(_WIN32)
-            // Copy error text to a stack variable so it is present in the mini-dump.
-            char messageOnStack[256] = {0};
-            snprintf(messageOnStack, sizeof(messageOnStack), "%s", message.c_str());
-        #endif
-
-        // Crash the process to let a dump/core be generated.
-        *reinterpret_cast<volatile int*>(0) = 0;
+        intentionallyCrash(message.c_str());
     #endif
 }
 

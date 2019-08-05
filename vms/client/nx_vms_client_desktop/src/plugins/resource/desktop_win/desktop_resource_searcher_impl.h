@@ -3,17 +3,17 @@
 #include <plugins/resource/desktop_camera/abstract_desktop_resource_searcher_impl.h>
 
 struct IDirect3D9;
-class QGLWidget;
+class QOpenGLWidget;
 
 class QnDesktopResourceSearcherImpl: public QnAbstractDesktopResourceSearcherImpl
 {
 public:
-    QnDesktopResourceSearcherImpl(QGLWidget* mainWidget);
+    QnDesktopResourceSearcherImpl(QOpenGLWidget* mainWidget);
     virtual ~QnDesktopResourceSearcherImpl() override;
 
     virtual QnResourceList findResources() override;
 
 private:
-    IDirect3D9* m_pD3D = nullptr;
-    QGLWidget* m_mainWidget = nullptr;
+    QOpenGLWidget* const m_mainWidget;
+    IDirect3D9* const m_pD3D;
 };

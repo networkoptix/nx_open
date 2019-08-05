@@ -19,6 +19,10 @@
 #include <nx/streaming/rtp/rtp.h>
 #include <media_server/media_server_module.h>
 
+#include <nx/analytics/frame_info.h>
+#include <nx/analytics/analytics_logging_ini.h>
+#include <nx_vms_server_ini.h>
+
 using namespace nx::vms::api;
 
 namespace {
@@ -69,9 +73,6 @@ QnRtspDataConsumer::QnRtspDataConsumer(QnRtspConnectionProcessor* owner):
     m_adaptiveSleep(MAX_FRAME_DURATION_MS*1000),
     m_useUTCTime(true),
     m_fastChannelZappingSize(0),
-    m_firstLiveTime(AV_NOPTS_VALUE),
-    m_lastLiveTime(AV_NOPTS_VALUE),
-    m_allowAdaptiveStreaming(true),
     m_sendBuffer(CL_MEDIA_ALIGNMENT, 1024*256),
     m_someDataIsDropped(false),
     m_previousRtpTimestamp(-1),
@@ -91,6 +92,22 @@ void QnRtspDataConsumer::setResource(const QnResourcePtr& resource)
     QnSecurityCamResourcePtr camera = resource.dynamicCast<QnSecurityCamResource>();
     if (!camera)
         return;
+
+    if (nx::analytics::loggingIni().isLoggingEnabled())
+    {
+        m_primaryLogger = std::make_unique<nx::analytics::MetadataLogger>(
+            "rtsp_consumer_",
+            camera->getId(),
+            /*engineId*/ QnUuid(),
+            nx::vms::api::StreamIndex::primary);
+
+        m_secondaryLogger = std::make_unique<nx::analytics::MetadataLogger>(
+            "rtsp_consumer_",
+            camera->getId(),
+            /*engineId*/ QnUuid(),
+            nx::vms::api::StreamIndex::secondary);
+    }
+
     auto videoLayout = camera->getVideoLayout();
     if (!videoLayout)
         return;
@@ -155,18 +172,6 @@ bool removeItemsCondition(const QnAbstractDataPacketPtr& data)
     return !(std::dynamic_pointer_cast<QnAbstractMediaData>(data)->flags & AV_PKT_FLAG_KEY);
 }
 
-bool QnRtspDataConsumer::isMediaTimingsSlow() const
-{
-    QnMutexLocker lock( &m_liveTimingControlMtx );
-    if (m_lastLiveTime == (qint64)AV_NOPTS_VALUE)
-        return false;
-    NX_ASSERT(m_firstLiveTime != (qint64)AV_NOPTS_VALUE);
-    //qint64 elapsed = m_liveTimer.elapsed()*1000;
-    bool rez = m_lastLiveTime - m_firstLiveTime < m_liveTimer.elapsed()*1000;
-
-    return rez;
-}
-
 void QnRtspDataConsumer::getEdgePackets(
     const QnDataPacketQueue::RandomAccess<>& unsafeQueue,
     qint64& firstVTime,
@@ -216,6 +221,7 @@ static const int MAX_DATA_QUEUE_SIZE = 120;
 
 void QnRtspDataConsumer::cleanupQueueToPos(QnDataPacketQueue::RandomAccess<>& unsafeQueue, int lastIndex, quint32 ch)
 {
+    NX_WARNING(this, "Too long frame queue, cleanup");
     int currentIndex = lastIndex;
     if (m_videoChannels == 1)
     {
@@ -300,11 +306,12 @@ void QnRtspDataConsumer::putData(const QnAbstractDataPacketPtr& nonConstData)
         }
     }
 
-    // Queue to large. Clear data anyway causing video artifacts
+    // Queue too large. Clear data anyway causing video artifacts
     while(m_dataQueue.size() > MAX_DATA_QUEUE_SIZE * (int) m_videoChannels)
     {
         QnAbstractDataPacketPtr tmp;
         m_dataQueue.pop(tmp);
+        NX_WARNING(this, "Too long frame queue, drop frame");
     }
 }
 
@@ -426,7 +433,24 @@ bool QnRtspDataConsumer::needData(const QnAbstractDataPacketPtr& data) const
         case QnAbstractMediaData::META_V1:
             return m_streamDataFilter.testFlag(StreamDataFilter::motion);
         case QnAbstractMediaData::GENERIC_METADATA:
-            return m_streamDataFilter.testFlag(StreamDataFilter::objectDetection);
+        {
+            auto metadata = std::dynamic_pointer_cast<const QnAbstractCompressedMetadata>(data);
+            NX_ASSERT(metadata);
+            if (!metadata)
+                return false;
+            switch (metadata->metadataType)
+            {
+                case MetadataType::MediaStreamEvent:
+                    return true;
+                case MetadataType::Motion:
+                    return m_streamDataFilter.testFlag(StreamDataFilter::motion);
+                case MetadataType::ObjectDetection:
+                    return m_streamDataFilter.testFlag(StreamDataFilter::objectDetection);
+                default:
+                    NX_WARNING(this, "Unknown generic metadata type %1", (int) metadata->metadataType);
+                    return false;
+            }
+        }
         default:
             NX_ASSERT(false, "Unexpected data type");
             return true;
@@ -458,11 +482,12 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
 
     if( (m_streamingSpeed != MAX_STREAMING_SPEED) && (m_streamingSpeed != 1) )
     {
-        NX_ASSERT( !media->flags.testFlag(QnAbstractMediaData::MediaFlags_LIVE) );
         //TODO #ak changing packet's timestamp. It is OK for archive, but generally unsafe.
             //Introduce safe solution
-        if( !media->flags.testFlag(QnAbstractMediaData::MediaFlags_LIVE) )
+        if (!media->flags.testFlag(QnAbstractMediaData::MediaFlags_LIVE))
             (static_cast<QnAbstractMediaData*>(nonConstData.get()))->timestamp /= m_streamingSpeed;
+        else
+            NX_DEBUG(this, "Speed parameter was ignored for live mode");
     }
 
     bool isLive = media->flags & QnAbstractMediaData::MediaFlags_LIVE;
@@ -473,6 +498,12 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
     {
         bool isKeyFrame = media->flags & AV_PKT_FLAG_KEY;
         bool isSecondaryProvider = media->flags & QnAbstractMediaData::MediaFlags_LowQuality;
+
+        if (isSecondaryProvider && m_secondaryLogger)
+            m_secondaryLogger->pushData(media);
+        else if (m_primaryLogger)
+            m_primaryLogger->pushData(media);
+
         {
             QnMutexLocker lock( &m_qualityChangeMutex );
             if (isKeyFrame && isVideo && m_newLiveQuality != MEDIA_Quality_None)
@@ -543,6 +574,12 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
         }
     }
 
+    const auto logger =
+        ini().analyzeSecondaryStream ? m_secondaryLogger.get() : m_primaryLogger.get();
+
+    if (logger)
+        logger->pushData(media);
+
     int trackNum = media->channelNumber;
     if (!m_multiChannelVideo && media->dataType == QnAbstractMediaData::VIDEO)
         trackNum = 0; // multichannel video is going to be transcoded to a single track
@@ -581,15 +618,6 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
 
     if( (m_streamingSpeed != MAX_STREAMING_SPEED) && (!isLive) )
         doRealtimeDelay(media);
-
-    if (isLive && media->dataType == QnAbstractMediaData::VIDEO)
-    {
-        QnMutexLocker lock( &m_liveTimingControlMtx );
-        if (m_firstLiveTime == (qint64)AV_NOPTS_VALUE) {
-            m_liveTimer.restart();
-            m_lastLiveTime = m_firstLiveTime = media->timestamp;
-        }
-    }
 
     QnRtspFfmpegEncoder* ffmpegEncoder = dynamic_cast<QnRtspFfmpegEncoder*>(codecEncoder.get());
     if (ffmpegEncoder)
@@ -663,9 +691,6 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
     if (m_packetSended++ == MAX_PACKETS_AT_SINGLE_SHOT)
         m_singleShotMode = false;
 
-    QnMutexLocker lock( &m_liveTimingControlMtx );
-    if (media->dataType == QnAbstractMediaData::VIDEO && m_lastLiveTime != (qint64)AV_NOPTS_VALUE)
-        m_lastLiveTime = media->timestamp;
 
     return true;
 }
@@ -736,7 +761,7 @@ void QnRtspDataConsumer::addData(const QnAbstractMediaDataPtr& data)
 }
 
 int QnRtspDataConsumer::copyLastGopFromCamera(
-    QnVideoCameraPtr camera,
+    nx::vms::server::VideoCameraPtr camera,
     nx::vms::api::StreamIndex streamIndex,
     qint64 skipTime,
     bool iFramesOnly)
@@ -748,10 +773,6 @@ int QnRtspDataConsumer::copyLastGopFromCamera(
         copySize = camera->copyLastGop(streamIndex, skipTime, m_dataQueue, iFramesOnly);
     m_dataQueue.setMaxSize(m_dataQueue.size()-prevSize + MAX_QUEUE_SIZE);
     m_fastChannelZappingSize = copySize;
-
-    QnMutexLocker lock( &m_liveTimingControlMtx );
-    m_firstLiveTime = AV_NOPTS_VALUE;
-    m_lastLiveTime = AV_NOPTS_VALUE;
 
     return copySize;
 }
@@ -795,14 +816,8 @@ void QnRtspDataConsumer::setUseUTCTime(bool value)
     m_useUTCTime = value;
 }
 
-void QnRtspDataConsumer::setAllowAdaptiveStreaming(bool value)
-{
-    m_allowAdaptiveStreaming = value;
-}
-
 void QnRtspDataConsumer::setLiveQualityInternal(MediaQuality quality)
 {
-    qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
     QHostAddress clientAddress = m_owner->getPeerAddress();
     m_liveQuality = quality;
 }

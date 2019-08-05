@@ -67,7 +67,7 @@ namespace {
     static void getAddresses(const QnMediaServerResourcePtr &server, QSet<nx::utils::Url> &autoUrls, QSet<nx::utils::Url> &additionalUrls, QSet<nx::utils::Url> &ignoredUrls) {
         for (const nx::network::SocketAddress &address: server->getNetAddrList()) {
             nx::utils::Url url;
-            url.setScheme(lit("http"));
+            url.setScheme(nx::network::http::kSecureUrlSchemeName);
             url.setHost(address.address.toString());
             url.setPort(address.port);
             autoUrls.insert(url);
@@ -433,7 +433,7 @@ void QnRoutingManagementWidget::at_addButton_clicked() {
         return;
 
     nx::utils::Url url = nx::utils::Url::fromUserInput(urlString);
-    url.setScheme(lit("http"));
+    url.setScheme(nx::network::http::kSecureUrlSchemeName);
 
     const bool validUrl = url.isValid() && !url.host().isEmpty();
     if (!validUrl)

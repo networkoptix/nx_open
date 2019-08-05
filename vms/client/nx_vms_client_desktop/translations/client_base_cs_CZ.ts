@@ -233,10 +233,6 @@ to view more bookmarks</source>
       <translation>Uložit pohled videostěny</translation>
     </message>
     <message>
-      <source>Drop Resources</source>
-      <translation>Přetažení zdrojů</translation>
-    </message>
-    <message>
       <source>Start Screen Recording</source>
       <translation>Zahájit záznam obrazovky</translation>
     </message>
@@ -1018,11 +1014,11 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%n layouts</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n rozložení</numerusform>
-        <numerusform>%n layouts</numerusform>
-        <numerusform>%n layouts</numerusform>
-        <numerusform>%n layouts</numerusform>
+        <numerusform>%n rozložení</numerusform>
+        <numerusform>%n rozložení</numerusform>
+        <numerusform>%n rozložení</numerusform>
       </translation>
     </message>
   </context>
@@ -1088,11 +1084,11 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%n layouts</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n rozložení</numerusform>
-        <numerusform>%n layouts</numerusform>
-        <numerusform>%n layouts</numerusform>
-        <numerusform>%n layouts</numerusform>
+        <numerusform>%n rozložení</numerusform>
+        <numerusform>%n rozložení</numerusform>
+        <numerusform>%n rozložení</numerusform>
       </translation>
     </message>
     <message>
@@ -1188,11 +1184,11 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>File name must not contain the following reserved characters:</source>
       <comment>Plural relates to the word _characters_ here, not _file name_.</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Název souboru nesmí obsahovat následující vyhrazené znaky:</numerusform>
-        <numerusform>File name must not contain the following reserved characters:</numerusform>
-        <numerusform>File name must not contain the following reserved characters:</numerusform>
-        <numerusform>File name must not contain the following reserved characters:</numerusform>
+        <numerusform>Název souboru nesmí obsahovat následující vyhrazené znaky:</numerusform>
+        <numerusform>Název souboru nesmí obsahovat následující vyhrazené znaky:</numerusform>
+        <numerusform>Název souboru nesmí obsahovat následující vyhrazené znaky:</numerusform>
       </translation>
     </message>
   </context>
@@ -1216,11 +1212,11 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>Password should contain %n different combinations of either characters, symbols, or digits</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Heslo by mělo obsahovat %n různých kombinací znaků, symbolů nebo číslic</numerusform>
-        <numerusform>Password should contain %n different combinations of either characters, symbols, or digits</numerusform>
-        <numerusform>Password should contain %n different combinations of either characters, symbols, or digits</numerusform>
-        <numerusform>Password should contain %n different combinations of either characters, symbols, or digits</numerusform>
+        <numerusform>Heslo by mělo obsahovat %n různých kombinací znaků, symbolů nebo číslic</numerusform>
+        <numerusform>Heslo by mělo obsahovat %n různých kombinací znaků, symbolů nebo číslic</numerusform>
+        <numerusform>Heslo by mělo obsahovat %n různých kombinací znaků, symbolů nebo číslic</numerusform>
       </translation>
     </message>
     <message>
@@ -1229,11 +1225,11 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>Password must be at least %n characters long.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Heslo musí obsahovat nejméně %n znaků.</numerusform>
-        <numerusform>Password must be at least %n characters long.</numerusform>
-        <numerusform>Password must be at least %n characters long.</numerusform>
-        <numerusform>Password must be at least %n characters long.</numerusform>
+        <numerusform>Heslo musí obsahovat nejméně %n znaků.</numerusform>
+        <numerusform>Heslo musí obsahovat nejméně %n znaků.</numerusform>
+        <numerusform>Heslo musí obsahovat nejméně %n znaků.</numerusform>
       </translation>
     </message>
     <message>
@@ -1242,29 +1238,29 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>Password must be no longer than %n characters.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Heslo nesmí být delší než %n znaků.</numerusform>
-        <numerusform>Password must be no longer than %n characters.</numerusform>
-        <numerusform>Password must be no longer than %n characters.</numerusform>
-        <numerusform>Password must be no longer than %n characters.</numerusform>
+        <numerusform>Heslo nesmí být delší než %n znaků.</numerusform>
+        <numerusform>Heslo nesmí být delší než %n znaků.</numerusform>
+        <numerusform>Heslo nesmí být delší než %n znaků.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password should not contain %n or more consecutive characters together.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Heslo by nemělo obsahovat %n nebo více po sobě jdoucích znaků společně.</numerusform>
-        <numerusform>Password should not contain %n or more consecutive characters together.</numerusform>
-        <numerusform>Password should not contain %n or more consecutive characters together.</numerusform>
-        <numerusform>Password should not contain %n or more consecutive characters together.</numerusform>
+        <numerusform>Heslo by nemělo obsahovat %n nebo více po sobě jdoucích znaků společně.</numerusform>
+        <numerusform>Heslo by nemělo obsahovat %n nebo více po sobě jdoucích znaků společně.</numerusform>
+        <numerusform>Heslo by nemělo obsahovat %n nebo více po sobě jdoucích znaků společně.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password should not contain %n or more repeating characters.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Heslo by nemělo obsahovat %n nebo více opakujících se znaků.</numerusform>
-        <numerusform>Password should not contain %n or more repeating characters.</numerusform>
-        <numerusform>Password should not contain %n or more repeating characters.</numerusform>
-        <numerusform>Password should not contain %n or more repeating characters.</numerusform>
+        <numerusform>Heslo by nemělo obsahovat %n nebo více opakujících se znaků.</numerusform>
+        <numerusform>Heslo by nemělo obsahovat %n nebo více opakujících se znaků.</numerusform>
+        <numerusform>Heslo by nemělo obsahovat %n nebo více opakujících se znaků.</numerusform>
       </translation>
     </message>
     <message>
@@ -1444,11 +1440,11 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>...and %n more</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>... a dalších %n</numerusform>
-        <numerusform>...and %n more</numerusform>
-        <numerusform>...and %n more</numerusform>
-        <numerusform>...and %n more</numerusform>
+        <numerusform>... a dalších %n</numerusform>
+        <numerusform>... a dalších %n</numerusform>
+        <numerusform>... a dalších %n</numerusform>
       </translation>
     </message>
   </context>
@@ -1564,47 +1560,47 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>These devices are removed from System</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Tato zařízení jsou ze systému odstraněna</numerusform>
-        <numerusform>These devices are removed from System</numerusform>
-        <numerusform>These devices are removed from System</numerusform>
-        <numerusform>These devices are removed from System</numerusform>
+        <numerusform>Tato zařízení jsou ze systému odstraněna</numerusform>
+        <numerusform>Tato zařízení jsou ze systému odstraněna</numerusform>
+        <numerusform>Tato zařízení jsou ze systému odstraněna</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These cameras are removed from System</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Tyto kamery jsou odebrány ze systému</numerusform>
-        <numerusform>These cameras are removed from System</numerusform>
-        <numerusform>These cameras are removed from System</numerusform>
-        <numerusform>These cameras are removed from System</numerusform>
+        <numerusform>Tyto kamery jsou odebrány ze systému</numerusform>
+        <numerusform>Tyto kamery jsou odebrány ze systému</numerusform>
+        <numerusform>Tyto kamery jsou odebrány ze systému</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These servers are removed from System</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Tyto servery jsou odebrány ze systému</numerusform>
         <numerusform>Tyto servery jsou odebrány ze systému</numerusform>
-        <numerusform>These servers are removed from System</numerusform>
-        <numerusform>These servers are removed from System</numerusform>
+        <numerusform>Tyto servery jsou odebrány ze systému</numerusform>
+        <numerusform>Tyto servery jsou odebrány ze systému</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These users are removed from System</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Tito uživatelé jsou odebráni ze systému</numerusform>
-        <numerusform>These users are removed from System</numerusform>
-        <numerusform>These users are removed from System</numerusform>
-        <numerusform>These users are removed from System</numerusform>
+        <numerusform>Tito uživatelé jsou odebráni ze systému</numerusform>
+        <numerusform>Tito uživatelé jsou odebráni ze systému</numerusform>
+        <numerusform>Tito uživatelé jsou odebráni ze systému</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These resources are removed from System</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Tyto zdroje jsou odebrány ze systému</numerusform>
-        <numerusform>These resources are removed from System</numerusform>
-        <numerusform>These resources are removed from System</numerusform>
-        <numerusform>These resources are removed from System</numerusform>
+        <numerusform>Tyto zdroje jsou odebrány ze systému</numerusform>
+        <numerusform>Tyto zdroje jsou odebrány ze systému</numerusform>
+        <numerusform>Tyto zdroje jsou odebrány ze systému</numerusform>
       </translation>
     </message>
     <message>
@@ -1861,11 +1857,11 @@ to view more bookmarks</source>
     <name>QnBlinkingImageButtonWidget</name>
     <message numerus="yes">
       <source>You have %n notifications</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Máte %n oznámení</numerusform>
-        <numerusform>You have %n notifications</numerusform>
-        <numerusform>You have %n notifications</numerusform>
-        <numerusform>You have %n notifications</numerusform>
+        <numerusform>Máte %n oznámení</numerusform>
+        <numerusform>Máte %n oznámení</numerusform>
+        <numerusform>Máte %n oznámení</numerusform>
       </translation>
     </message>
   </context>
@@ -1923,20 +1919,20 @@ to view more bookmarks</source>
     <name>QnBusinessResourceValidationStrings</name>
     <message numerus="yes">
       <source>%1 of %n devices</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%1 z %n zařízení</numerusform>
-        <numerusform>%1 of %n devices</numerusform>
-        <numerusform>%1 of %n devices</numerusform>
-        <numerusform>%1 of %n devices</numerusform>
+        <numerusform>%1 z %n zařízení</numerusform>
+        <numerusform>%1 z %n zařízení</numerusform>
+        <numerusform>%1 z %n zařízení</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%1 of %n cameras</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%1 z %n kamer</numerusform>
-        <numerusform>%1 of %n cameras</numerusform>
-        <numerusform>%1 of %n cameras</numerusform>
-        <numerusform>%1 of %n cameras</numerusform>
+        <numerusform>%1 z %n kamer</numerusform>
+        <numerusform>%1 z %n kamer</numerusform>
+        <numerusform>%1 z %n kamer</numerusform>
       </translation>
     </message>
     <message>
@@ -1949,11 +1945,11 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%1 of %n I/O modules</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%1 z %n I/O modulů</numerusform>
-        <numerusform>%1 of %n I/O modules</numerusform>
-        <numerusform>%1 of %n I/O modules</numerusform>
-        <numerusform>%1 of %n I/O modules</numerusform>
+        <numerusform>%1 z %n I/O modulů</numerusform>
+        <numerusform>%1 z %n I/O modulů</numerusform>
+        <numerusform>%1 z %n I/O modulů</numerusform>
       </translation>
     </message>
     <message>
@@ -2008,11 +2004,11 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>Source and %n more cameras</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Zdroj a dalších %n kamer</numerusform>
-        <numerusform>Source and %n more cameras</numerusform>
-        <numerusform>Source and %n more cameras</numerusform>
-        <numerusform>Source and %n more cameras</numerusform>
+        <numerusform>Zdroj a dalších %n kamer</numerusform>
+        <numerusform>Zdroj a dalších %n kamer</numerusform>
+        <numerusform>Zdroj a dalších %n kamer</numerusform>
       </translation>
     </message>
     <message>
@@ -2041,11 +2037,11 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%n Servers</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n servery</numerusform>
-        <numerusform>%n Servers</numerusform>
-        <numerusform>%n Servers</numerusform>
-        <numerusform>%n Servers</numerusform>
+        <numerusform>%n servery</numerusform>
+        <numerusform>%n servery</numerusform>
+        <numerusform>%n servery</numerusform>
       </translation>
     </message>
   </context>
@@ -2191,11 +2187,11 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%1 does not support two-way audio</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%1 nepodporuje obousměrný zvuk</numerusform>
-        <numerusform>%1 does not support two-way audio</numerusform>
-        <numerusform>%1 does not support two-way audio</numerusform>
-        <numerusform>%1 does not support two-way audio</numerusform>
+        <numerusform>%1 nepodporuje obousměrný zvuk</numerusform>
+        <numerusform>%1 nepodporuje obousměrný zvuk</numerusform>
+        <numerusform>%1 nepodporuje obousměrný zvuk</numerusform>
       </translation>
     </message>
   </context>
@@ -2281,11 +2277,11 @@ to view more bookmarks</source>
     <name>QnCameraInputPolicy</name>
     <message numerus="yes">
       <source>%1 have no input ports</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%1 nemá žádné vstupní porty</numerusform>
-        <numerusform>%1 have no input ports</numerusform>
-        <numerusform>%1 have no input ports</numerusform>
-        <numerusform>%1 have no input ports</numerusform>
+        <numerusform>%1 nemá žádné vstupní porty</numerusform>
+        <numerusform>%1 nemá žádné vstupní porty</numerusform>
+        <numerusform>%1 nemá žádné vstupní porty</numerusform>
       </translation>
     </message>
   </context>
@@ -2313,20 +2309,20 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%n devices found</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Bylo nalezeno %n zařízení</numerusform>
-        <numerusform>%n devices found</numerusform>
-        <numerusform>%n devices found</numerusform>
-        <numerusform>%n devices found</numerusform>
+        <numerusform>Bylo nalezeno %n zařízení</numerusform>
+        <numerusform>Bylo nalezeno %n zařízení</numerusform>
+        <numerusform>Bylo nalezeno %n zařízení</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n cameras found</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Bylo nalezeno %n kamer</numerusform>
-        <numerusform>%n cameras found</numerusform>
-        <numerusform>%n cameras found</numerusform>
-        <numerusform>%n cameras found</numerusform>
+        <numerusform>Bylo nalezeno %n kamer</numerusform>
+        <numerusform>Bylo nalezeno %n kamer</numerusform>
+        <numerusform>Bylo nalezeno %n kamer</numerusform>
       </translation>
     </message>
     <message>
@@ -2339,11 +2335,11 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%n I/O modules found</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Nalezeno %n I/O modulů</numerusform>
-        <numerusform>%n I/O modules found</numerusform>
-        <numerusform>%n I/O modules found</numerusform>
-        <numerusform>%n I/O modules found</numerusform>
+        <numerusform>Nalezeno %n I/O modulů</numerusform>
+        <numerusform>Nalezeno %n I/O modulů</numerusform>
+        <numerusform>Nalezeno %n I/O modulů</numerusform>
       </translation>
     </message>
     <message>
@@ -2422,11 +2418,11 @@ to view more bookmarks</source>
     <name>QnCameraOutputPolicy</name>
     <message numerus="yes">
       <source>%1 have no output relays</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%1 nemá žádný reléový výstup</numerusform>
-        <numerusform>%1 have no output relays</numerusform>
-        <numerusform>%1 have no output relays</numerusform>
-        <numerusform>%1 have no output relays</numerusform>
+        <numerusform>%1 nemá žádný reléový výstup</numerusform>
+        <numerusform>%1 nemá žádný reléový výstup</numerusform>
+        <numerusform>%1 nemá žádný reléový výstup</numerusform>
       </translation>
     </message>
   </context>
@@ -2641,17 +2637,6 @@ to %1</source>
     <message>
       <source>Internal server error. Please try again later.</source>
       <translation type="unfinished">Internal server error. Please try again later.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnConnectToCurrentSystemTool</name>
-    <message>
-      <source>Configuring Server</source>
-      <translation>Konfigurování serveru</translation>
-    </message>
-    <message>
-      <source>Updating Server</source>
-      <translation>Aktualizování serveru</translation>
     </message>
   </context>
   <context>
@@ -2959,10 +2944,6 @@ to %1</source>
       <source>44.1 kHz and 48 kHz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
       <translation>Zvukové formáty 44.1 kHz a 48 kHz nejsou podporovány zařízením pro záznam zvuku. Zvolte prosím jiné zvukové zařízení nebo &quot;žádné&quot; v nastavení záznamu obrazovky.</translation>
     </message>
-    <message>
-      <source>Configured codec: %1 not found, h263p will used</source>
-      <translation type="unfinished">Configured codec: %1 not found, h263p will used</translation>
-    </message>
   </context>
   <context>
     <name>QnDisconnectFromCloudDialogPrivate</name>
@@ -3134,11 +3115,11 @@ to %1</source>
     <message numerus="yes">
       <source>%1 (%n times)</source>
       <comment>%1 is description of event. Will be replaced in runtime</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%1 (%n krát)</numerusform>
-        <numerusform>%1 (%n times)</numerusform>
-        <numerusform>%1 (%n times)</numerusform>
-        <numerusform>%1 (%n times)</numerusform>
+        <numerusform>%1 (%n krát)</numerusform>
+        <numerusform>%1 (%n krát)</numerusform>
+        <numerusform>%1 (%n krát)</numerusform>
       </translation>
     </message>
     <message>
@@ -3147,29 +3128,29 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>and %n users more...</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>a %n uživatelů více...</numerusform>
-        <numerusform>and %n users more...</numerusform>
-        <numerusform>and %n users more...</numerusform>
-        <numerusform>and %n users more...</numerusform>
+        <numerusform>a %n uživatelů více...</numerusform>
+        <numerusform>a %n uživatelů více...</numerusform>
+        <numerusform>a %n uživatelů více...</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>and %n more...</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>a %n dalších...</numerusform>
-        <numerusform>and %n more...</numerusform>
-        <numerusform>and %n more...</numerusform>
-        <numerusform>and %n more...</numerusform>
+        <numerusform>a %n dalších...</numerusform>
+        <numerusform>a %n dalších...</numerusform>
+        <numerusform>a %n dalších...</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Removed subjects</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n odstraněné objekty</numerusform>
-        <numerusform>%n Removed subjects</numerusform>
-        <numerusform>%n Removed subjects</numerusform>
-        <numerusform>%n Removed subjects</numerusform>
+        <numerusform>%n odstraněné objekty</numerusform>
+        <numerusform>%n odstraněné objekty</numerusform>
+        <numerusform>%n odstraněné objekty</numerusform>
       </translation>
     </message>
     <message>
@@ -3281,6 +3262,17 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnGLCheckerInstrument</name>
+    <message>
+      <source>Video card drivers are outdated or not installed</source>
+      <translation>Ovladače grafické karty jsou zastaralé nebo nejsou nainstalované</translation>
+    </message>
+    <message>
+      <source>%1 may not work properly.</source>
+      <translation>%1 nemusí fungovat správně.</translation>
+    </message>
+  </context>
+  <context>
     <name>QnGeneralPreferencesWidget</name>
     <message>
       <source>Select folder...</source>
@@ -3289,6 +3281,14 @@ to %1</source>
     <message>
       <source>Folder already added</source>
       <translation>Složka již byla přidána</translation>
+    </message>
+    <message>
+      <source>None</source>
+      <translation>Žádný</translation>
+    </message>
+    <message>
+      <source>Auto (%1)</source>
+      <translation type="unfinished">Auto (%1)</translation>
     </message>
   </context>
   <context>
@@ -3356,17 +3356,6 @@ to %1</source>
     <message>
       <source>Creates a backup of System configuration that can be restored in case of failure.</source>
       <translation>Vytvořít zálohu konfigurace systému, která může být obnovena v případě selhání.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnGlHardwareChecker</name>
-    <message>
-      <source>Video card drivers are outdated or not installed</source>
-      <translation>Ovladače grafické karty jsou zastaralé nebo nejsou nainstalované</translation>
-    </message>
-    <message>
-      <source>%1 may not work properly.</source>
-      <translation>%1 nemusí fungovat správně.</translation>
     </message>
   </context>
   <context>
@@ -3483,11 +3472,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Test completed successfully: %n users found.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Test byl úspěšně dokončen: bylo nalezeno %n uživatelů.</numerusform>
-        <numerusform>Test completed successfully: %n users found.</numerusform>
-        <numerusform>Test completed successfully: %n users found.</numerusform>
-        <numerusform>Test completed successfully: %n users found.</numerusform>
+        <numerusform>Test byl úspěšně dokončen: bylo nalezeno %n uživatelů.</numerusform>
+        <numerusform>Test byl úspěšně dokončen: bylo nalezeno %n uživatelů.</numerusform>
+        <numerusform>Test byl úspěšně dokončen: bylo nalezeno %n uživatelů.</numerusform>
       </translation>
     </message>
     <message>
@@ -3659,16 +3648,16 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>License expires in %n days</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Platnost licence končí za %n dní</numerusform>
-        <numerusform>License expires in %n days</numerusform>
-        <numerusform>License expires in %n days</numerusform>
-        <numerusform>License expires in %n days</numerusform>
+        <numerusform>Platnost licence končí za %n dní</numerusform>
+        <numerusform>Platnost licence končí za %n dní</numerusform>
+        <numerusform>Platnost licence končí za %n dní</numerusform>
       </translation>
     </message>
     <message>
-      <source>Qty</source>
-      <translation>Množství</translation>
+      <source>Channels</source>
+      <translation type="unfinished">Channels</translation>
     </message>
   </context>
   <context>
@@ -3755,11 +3744,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Deactivate licenses?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Deaktivovat licence?</numerusform>
-        <numerusform>Deactivate licenses?</numerusform>
-        <numerusform>Deactivate licenses?</numerusform>
-        <numerusform>Deactivate licenses?</numerusform>
+        <numerusform>Deaktivovat licence?</numerusform>
+        <numerusform>Deaktivovat licence?</numerusform>
+        <numerusform>Deaktivovat licence?</numerusform>
       </translation>
     </message>
     <message>
@@ -3768,29 +3757,29 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Failed to deactivate %n licenses</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Deaktivace licence %n se nezdařila</numerusform>
-        <numerusform>Failed to deactivate %n licenses</numerusform>
-        <numerusform>Failed to deactivate %n licenses</numerusform>
-        <numerusform>Failed to deactivate %n licenses</numerusform>
+        <numerusform>Deaktivace licence %n se nezdařila</numerusform>
+        <numerusform>Deaktivace licence %n se nezdařila</numerusform>
+        <numerusform>Deaktivace licence %n se nezdařila</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%1 of %n licenses cannot be deactivated</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%1 z %n licencí nelze deaktivovat</numerusform>
-        <numerusform>%1 of %n licenses cannot be deactivated</numerusform>
-        <numerusform>%1 of %n licenses cannot be deactivated</numerusform>
-        <numerusform>%1 of %n licenses cannot be deactivated</numerusform>
+        <numerusform>%1 z %n licencí nelze deaktivovat</numerusform>
+        <numerusform>%1 z %n licencí nelze deaktivovat</numerusform>
+        <numerusform>%1 z %n licencí nelze deaktivovat</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cannot deactivate licenses</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Nelze deaktivovat licence</numerusform>
-        <numerusform>Cannot deactivate licenses</numerusform>
-        <numerusform>Cannot deactivate licenses</numerusform>
-        <numerusform>Cannot deactivate licenses</numerusform>
+        <numerusform>Nelze deaktivovat licence</numerusform>
+        <numerusform>Nelze deaktivovat licence</numerusform>
+        <numerusform>Nelze deaktivovat licence</numerusform>
       </translation>
     </message>
     <message>
@@ -3811,11 +3800,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n licenses deactivated</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n licencí deaktivováno</numerusform>
-        <numerusform>%n licenses deactivated</numerusform>
-        <numerusform>%n licenses deactivated</numerusform>
-        <numerusform>%n licenses deactivated</numerusform>
+        <numerusform>%n licencí deaktivováno</numerusform>
+        <numerusform>%n licencí deaktivováno</numerusform>
+        <numerusform>%n licencí deaktivováno</numerusform>
       </translation>
     </message>
     <message>
@@ -3828,11 +3817,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n channels.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n kanálů.</numerusform>
-        <numerusform>%n channels.</numerusform>
-        <numerusform>%n channels.</numerusform>
-        <numerusform>%n channels.</numerusform>
+        <numerusform>%n kanálů.</numerusform>
+        <numerusform>%n kanálů.</numerusform>
+        <numerusform>%n kanálů.</numerusform>
       </translation>
     </message>
     <message>
@@ -3841,11 +3830,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Deactivate %n Other</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Deaktivovat %n ostatní</numerusform>
-        <numerusform>Deactivate %n Other</numerusform>
-        <numerusform>Deactivate %n Other</numerusform>
-        <numerusform>Deactivate %n Other</numerusform>
+        <numerusform>Deaktivovat %n ostatní</numerusform>
+        <numerusform>Deaktivovat %n ostatní</numerusform>
+        <numerusform>Deaktivovat %n ostatní</numerusform>
       </translation>
     </message>
     <message>
@@ -3883,21 +3872,21 @@ to %1</source>
     <message numerus="yes">
       <source>%1 are currently in use</source>
       <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%1 jsou aktuálně používány</numerusform>
-        <numerusform>%1 are currently in use</numerusform>
-        <numerusform>%1 are currently in use</numerusform>
-        <numerusform>%1 are currently in use</numerusform>
+        <numerusform>%1 jsou aktuálně používány</numerusform>
+        <numerusform>%1 jsou aktuálně používány</numerusform>
+        <numerusform>%1 jsou aktuálně používány</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>At least %1 are required</source>
       <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Alespoň %1 jsou požadovány</numerusform>
-        <numerusform>At least %1 are required</numerusform>
-        <numerusform>At least %1 are required</numerusform>
-        <numerusform>At least %1 are required</numerusform>
+        <numerusform>Alespoň %1 jsou požadovány</numerusform>
+        <numerusform>Alespoň %1 jsou požadovány</numerusform>
+        <numerusform>Alespoň %1 jsou požadovány</numerusform>
       </translation>
     </message>
   </context>
@@ -4179,11 +4168,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Set for all %n Cameras</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Nastavit pro všechny %n kamery</numerusform>
-        <numerusform>Set for all %n Cameras</numerusform>
-        <numerusform>Set for all %n Cameras</numerusform>
-        <numerusform>Set for all %n Cameras</numerusform>
+        <numerusform>Nastavit pro všechny %n kamery</numerusform>
+        <numerusform>Nastavit pro všechny %n kamery</numerusform>
+        <numerusform>Nastavit pro všechny %n kamery</numerusform>
       </translation>
     </message>
     <message>
@@ -4534,20 +4523,20 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>This preset will be activated after %n minutes of inactivity</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Tato prepozice bude aktivována po %n minutách nečinnosti</numerusform>
-        <numerusform>This preset will be activated after %n minutes of inactivity</numerusform>
-        <numerusform>This preset will be activated after %n minutes of inactivity</numerusform>
-        <numerusform>This preset will be activated after %n minutes of inactivity</numerusform>
+        <numerusform>Tato prepozice bude aktivována po %n minutách nečinnosti</numerusform>
+        <numerusform>Tato prepozice bude aktivována po %n minutách nečinnosti</numerusform>
+        <numerusform>Tato prepozice bude aktivována po %n minutách nečinnosti</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Tour has %n identical positions</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Trasa obsahuje %n identických pozic</numerusform>
-        <numerusform>Tour has %n identical positions</numerusform>
-        <numerusform>Tour has %n identical positions</numerusform>
-        <numerusform>Tour has %n identical positions</numerusform>
+        <numerusform>Trasa obsahuje %n identických pozic</numerusform>
+        <numerusform>Trasa obsahuje %n identických pozic</numerusform>
+        <numerusform>Trasa obsahuje %n identických pozic</numerusform>
       </translation>
     </message>
     <message>
@@ -4701,31 +4690,31 @@ to %1</source>
     <message numerus="yes">
       <source>Total %1 %n devices</source>
       <comment>%1 is long dash, do not replace</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Celkem %1 %n zařízení</numerusform>
-        <numerusform>Total %1 %n devices</numerusform>
-        <numerusform>Total %1 %n devices</numerusform>
-        <numerusform>Total %1 %n devices</numerusform>
+        <numerusform>Celkem %1 %n zařízení</numerusform>
+        <numerusform>Celkem %1 %n zařízení</numerusform>
+        <numerusform>Celkem %1 %n zařízení</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Total %1 %n cameras</source>
       <comment>%1 is long dash, do not replace</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Celkem %1 %n kamer</numerusform>
-        <numerusform>Total %1 %n cameras</numerusform>
-        <numerusform>Total %1 %n cameras</numerusform>
-        <numerusform>Total %1 %n cameras</numerusform>
+        <numerusform>Celkem %1 %n kamer</numerusform>
+        <numerusform>Celkem %1 %n kamer</numerusform>
+        <numerusform>Celkem %1 %n kamer</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Total %1 %n I/O modules</source>
       <comment>%1 is long dash, do not replace</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Celkem %1 %n I/O modulů</numerusform>
-        <numerusform>Total %1 %n I/O modules</numerusform>
-        <numerusform>Total %1 %n I/O modules</numerusform>
-        <numerusform>Total %1 %n I/O modules</numerusform>
+        <numerusform>Celkem %1 %n I/O modulů</numerusform>
+        <numerusform>Celkem %1 %n I/O modulů</numerusform>
+        <numerusform>Celkem %1 %n I/O modulů</numerusform>
       </translation>
     </message>
   </context>
@@ -4791,11 +4780,11 @@ to %1</source>
     <message numerus="yes">
       <source>%n of %1 selected roles have no %2 permission</source>
       <comment>%1 is number of selected roles, %2 is permission name</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n z %1 vybraných rolí nemají %2 oprávnění</numerusform>
-        <numerusform>%n of %1 selected roles have no %2 permission</numerusform>
-        <numerusform>%n of %1 selected roles have no %2 permission</numerusform>
-        <numerusform>%n of %1 selected roles have no %2 permission</numerusform>
+        <numerusform>%n z %1 vybraných rolí nemají %2 oprávnění</numerusform>
+        <numerusform>%n z %1 vybraných rolí nemají %2 oprávnění</numerusform>
+        <numerusform>%n z %1 vybraných rolí nemají %2 oprávnění</numerusform>
       </translation>
     </message>
     <message>
@@ -4811,11 +4800,11 @@ to %1</source>
     <message numerus="yes">
       <source>%n of %1 selected users have no %2 permission</source>
       <comment>%1 is number of selected users, %2 is permission name</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n z %1 vybraných uživatelů nemají %2 oprávnění</numerusform>
-        <numerusform>%n of %1 selected users have no %2 permission</numerusform>
-        <numerusform>%n of %1 selected users have no %2 permission</numerusform>
-        <numerusform>%n of %1 selected users have no %2 permission</numerusform>
+        <numerusform>%n z %1 vybraných uživatelů nemají %2 oprávnění</numerusform>
+        <numerusform>%n z %1 vybraných uživatelů nemají %2 oprávnění</numerusform>
+        <numerusform>%n z %1 vybraných uživatelů nemají %2 oprávnění</numerusform>
       </translation>
     </message>
   </context>
@@ -5105,11 +5094,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n Servers</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n servery</numerusform>
-        <numerusform>%n Servers</numerusform>
-        <numerusform>%n Servers</numerusform>
-        <numerusform>%n Servers</numerusform>
+        <numerusform>%n servery</numerusform>
+        <numerusform>%n servery</numerusform>
+        <numerusform>%n servery</numerusform>
       </translation>
     </message>
   </context>
@@ -5129,11 +5118,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n Users</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n uživatelé</numerusform>
-        <numerusform>%n Users</numerusform>
-        <numerusform>%n Users</numerusform>
-        <numerusform>%n Users</numerusform>
+        <numerusform>%n uživatelé</numerusform>
+        <numerusform>%n uživatelé</numerusform>
+        <numerusform>%n uživatelé</numerusform>
       </translation>
     </message>
   </context>
@@ -5141,11 +5130,11 @@ to %1</source>
     <name>QnSendEmailActionDelegate</name>
     <message numerus="yes">
       <source>%n additional</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n dodatečný</numerusform>
-        <numerusform>%n additional</numerusform>
-        <numerusform>%n additional</numerusform>
-        <numerusform>%n additional</numerusform>
+        <numerusform>%n dodatečný</numerusform>
+        <numerusform>%n dodatečný</numerusform>
+        <numerusform>%n dodatečný</numerusform>
       </translation>
     </message>
     <message>
@@ -5154,11 +5143,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n of %1 users have invalid email address</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n z %1 uživatelů má neplatnou emailovou adresu</numerusform>
-        <numerusform>%n of %1 users have invalid email address</numerusform>
-        <numerusform>%n of %1 users have invalid email address</numerusform>
-        <numerusform>%n of %1 users have invalid email address</numerusform>
+        <numerusform>%n z %1 uživatelů má neplatnou emailovou adresu</numerusform>
+        <numerusform>%n z %1 uživatelů má neplatnou emailovou adresu</numerusform>
+        <numerusform>%n z %1 uživatelů má neplatnou emailovou adresu</numerusform>
       </translation>
     </message>
     <message>
@@ -5167,11 +5156,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n of %1 additional email addresses are invalid</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n z %1 dalších emailových adres je neplatných</numerusform>
-        <numerusform>%n of %1 additional email addresses are invalid</numerusform>
-        <numerusform>%n of %1 additional email addresses are invalid</numerusform>
-        <numerusform>%n of %1 additional email addresses are invalid</numerusform>
+        <numerusform>%n z %1 dalších emailových adres je neplatných</numerusform>
+        <numerusform>%n z %1 dalších emailových adres je neplatných</numerusform>
+        <numerusform>%n z %1 dalších emailových adres je neplatných</numerusform>
       </translation>
     </message>
     <message>
@@ -5235,6 +5224,10 @@ to %1</source>
       <source>Server Web Page</source>
       <translation>Webová stránka serveru</translation>
     </message>
+    <message>
+      <source>Plugins</source>
+      <translation type="unfinished">Plugins</translation>
+    </message>
   </context>
   <context>
     <name>QnServerSettingsWidget</name>
@@ -5273,222 +5266,6 @@ to %1</source>
     <message>
       <source>Servers with failover enabled will automatically take cameras from offline servers.</source>
       <translation>Servery se zapnutou funkcí selhání automaticky převezme kamery z offline serverů.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnServerUpdatesModel</name>
-    <message>
-      <source>Server</source>
-      <translation>Server</translation>
-    </message>
-    <message>
-      <source>Status</source>
-      <translation>Stav</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnServerUpdatesWidget</name>
-    <message>
-      <source>Select Update File...</source>
-      <translation>Vybrat soubor aktualizace...</translation>
-    </message>
-    <message>
-      <source>Release notes</source>
-      <translation>Poznámky k verzi</translation>
-    </message>
-    <message>
-      <source>You will have to update the client manually using an installer.</source>
-      <translation>Klienta budete muset aktualizovat ručně pomocí instalátoru.</translation>
-    </message>
-    <message>
-      <source>Cannot update from this file.</source>
-      <translation>Z tohoto souboru nelze aktualizovat.</translation>
-    </message>
-    <message>
-      <source>Latest Available Update</source>
-      <translation>Nejnovější dostupná aktualizace</translation>
-    </message>
-    <message>
-      <source>Download the Latest Version Update File</source>
-      <translation>Stáhnout soubor s nejnovější verzí aktualizace</translation>
-    </message>
-    <message>
-      <source>Selected Version</source>
-      <translation>Vybraná verze</translation>
-    </message>
-    <message>
-      <source>Download Update File</source>
-      <translation>Stáhnout soubor aktualizace</translation>
-    </message>
-    <message>
-      <source>Browse for Update File...</source>
-      <translation>Procházet soubor aktualizace...</translation>
-    </message>
-    <message>
-      <source>Selected Update File</source>
-      <translation>Vybraný soubor aktualizace</translation>
-    </message>
-    <message>
-      <source>Download in External Browser</source>
-      <translation>Stahnout v externím prohlížeči</translation>
-    </message>
-    <message>
-      <source>Copy Link to Clipboard</source>
-      <translation>Zkopírovat odkaz do schránky</translation>
-    </message>
-    <message>
-      <source>Unable to check updates on the Internet.</source>
-      <translation>Nelze ověřit aktualizace na Internetu.</translation>
-    </message>
-    <message>
-      <source>Unknown build number.</source>
-      <translation>Neznámé číslo sestavení.</translation>
-    </message>
-    <message>
-      <source>Downgrade to an earlier version is prohibited.</source>
-      <translation>Přechod na předchozí verzi není povolen.</translation>
-    </message>
-    <message>
-      <source>Updates for one or more servers were not found.</source>
-      <translation>Aktualizace pro jeden nebo více serverů nebyly nalezeny.</translation>
-    </message>
-    <message>
-      <source>Client update was not found.</source>
-      <translation>Aktualizace klienta nebyla nalezena.</translation>
-    </message>
-    <message>
-      <source>Unable to extract update file. No free space left on the disk.</source>
-      <translation>Nelze rozbalit soubor aktualizace. Na disku není dostatečný volný prostor.</translation>
-    </message>
-    <message>
-      <source>Update Finished...</source>
-      <translation>Aktualizace je dokončena...</translation>
-    </message>
-    <message>
-      <source>Checking for updates...</source>
-      <translation>Kontrola aktualizací...</translation>
-    </message>
-    <message>
-      <source>Downloading updates...</source>
-      <translation>Stahování aktualizací...</translation>
-    </message>
-    <message>
-      <source>Installing client update...</source>
-      <translation>Instalace aktualizace klienta...</translation>
-    </message>
-    <message>
-      <source>Installing updates to incompatible servers...</source>
-      <translation>Instalace aktualizací pro nekompatibilní servery...</translation>
-    </message>
-    <message>
-      <source>Pushing updates to servers...</source>
-      <translation>Odesílání aktualizací na servery...</translation>
-    </message>
-    <message>
-      <source>Installing updates...</source>
-      <translation>Instalace aktualizací...</translation>
-    </message>
-    <message>
-      <source>Specific Build...</source>
-      <translation>Konkrétní sestavení...</translation>
-    </message>
-    <message>
-      <source>Update to Specific Build</source>
-      <translation>Aktualizace na konkrétní sestavení</translation>
-    </message>
-    <message>
-      <source>Update System</source>
-      <translation>Aktualizovat systém</translation>
-    </message>
-    <message>
-      <source>System update in process</source>
-      <translation>Aktualizace systému právě probíhá</translation>
-    </message>
-    <message>
-      <source>Cancel Update</source>
-      <translation>Zrušit aktualizaci</translation>
-    </message>
-    <message>
-      <source>Continue in Background</source>
-      <translation>Pokračovat v pozadí</translation>
-    </message>
-    <message numerus="yes">
-      <source>Not enough free space at %n Servers:</source>
-      <translation type="unfinished">
-        <numerusform>Nedostatek volného místa na serverech %n:</numerusform>
-        <numerusform>Not enough free space at %n Servers:</numerusform>
-        <numerusform>Not enough free space at %n Servers:</numerusform>
-        <numerusform>Not enough free space at %n Servers:</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Attempt to update may fail or cause Server malfunction.</source>
-      <translation>Pokus o aktualizaci může selhat nebo způsobit špatnou funkci serveru.</translation>
-    </message>
-    <message>
-      <source>Force Update</source>
-      <translation>Vynutit aktualizaci</translation>
-    </message>
-    <message>
-      <source>Server update completed</source>
-      <translation>Aktualizace serveru byla dokončena</translation>
-    </message>
-    <message>
-      <source>Update completed</source>
-      <translation>Aktualizace byla dokončena</translation>
-    </message>
-    <message>
-      <source>Update canceled</source>
-      <translation>Aktualizace byla zrušena</translation>
-    </message>
-    <message>
-      <source>All Servers already updated</source>
-      <translation>Všechny servery již byly aktualizovány</translation>
-    </message>
-    <message>
-      <source>Update failed</source>
-      <translation>Aktualizace se nezdařila</translation>
-    </message>
-    <message>
-      <source>Please update %1 manually using an installation package.</source>
-      <translation>Aktualizujte prosím %1 ručně pomocí instalačního balíčku.</translation>
-    </message>
-    <message>
-      <source>%1 will be restarted to the updated version.</source>
-      <translation>%1 bude restartován za účelem aktualizace verze.</translation>
-    </message>
-    <message>
-      <source>Update cannot be canceled at this stage</source>
-      <translation>Aktualizaci nelze v této fázi zrušit</translation>
-    </message>
-    <message>
-      <source>Please wait until it is finished.</source>
-      <translation>Vyčkejte prosím, dokud není proces dokončen.</translation>
-    </message>
-    <message>
-      <source>All components in your System are up to date.</source>
-      <translation>Všechny komponenty ve vašem systému jsou aktuální.</translation>
-    </message>
-    <message>
-      <source>All components in your System are up to this version.</source>
-      <translation>Všechny komponenty ve vašem systému jsou na této verzi.</translation>
-    </message>
-    <message>
-      <source>Incompatible %1 instance. To update disconnect System from %1 first.</source>
-      <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation>Nekompatibilní situace %1. Chcete-li aktualizovat, jako první odpojte systém od %1.</translation>
-    </message>
-    <message>
-      <source>Update Files</source>
-      <translation>Aktualizovat soubory</translation>
-    </message>
-    <message>
-      <source>Validating the update...</source>
-      <translation>Ověření aktualizace...</translation>
-    </message>
-    <message>
-      <source>Checking for free space...</source>
-      <translation>Kontrola volného místa...</translation>
     </message>
   </context>
   <context>
@@ -5783,7 +5560,7 @@ to %1</source>
     <message numerus="yes">
       <source>%n TB</source>
       <comment>TB - terabytes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n TB</numerusform>
         <numerusform>%n TB</numerusform>
         <numerusform>%n TB</numerusform>
@@ -5923,16 +5700,30 @@ to %1</source>
       <translation>Zálohování bylo dokončeno</translation>
     </message>
     <message>
-      <source>Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</source>
-      <translation>Nahrávání na nepovolené úložiště se zastaví. Smazání zastaralých záznamů však bude pokračovat.</translation>
-    </message>
-    <message>
-      <source>Recording was enabled on the USB storage</source>
-      <translation>Záznam byl povolen na USB úložišti</translation>
-    </message>
-    <message>
       <source>Reindexing can fix problems with archive or backup if they have been lost or damaged, or if some hardware has been replaced.</source>
       <translation>Reindexování může vyřešit problémy s archivem nebo zálohováním, pokud byly ztraceny, poškozeny nebo pokud byl nějaký hardware vyměněn.</translation>
+    </message>
+    <message>
+      <source>What to do with current analytics data?</source>
+      <translation type="unfinished">What to do with current analytics data?</translation>
+    </message>
+    <message>
+      <source>Current analytics data will not be automatically moved to another location and will become unaccessible. You can keep it and manually move later, or delete permanently.
+If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
+      <translation type="unfinished">Current analytics data will not be automatically moved to another location and will become unaccessible. You can keep it and manually move later, or delete permanently.
+If you intended to move analytics data to another storage location, please contact support before proceeding.</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>Smazat</translation>
+    </message>
+    <message>
+      <source>Keep</source>
+      <translation>Ponechat</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>Zrušit</translation>
     </message>
   </context>
   <context>
@@ -5980,6 +5771,14 @@ to %1</source>
     <message>
       <source>Too small and system partitions are reserved and not used for writing if there is enough other storage space available.</source>
       <translation>Příliš malé a systémové oddíly jsou vyhrazeny a nepoužívají se pro zápis pokud je k dispozici dostatek úložného prostoru.</translation>
+    </message>
+    <message>
+      <source>Use to store analytics data</source>
+      <translation type="unfinished">Use to store analytics data</translation>
+    </message>
+    <message>
+      <source>Stores analytics data</source>
+      <translation type="unfinished">Stores analytics data</translation>
     </message>
   </context>
   <context>
@@ -6067,8 +5866,8 @@ to %1</source>
       <translation>Uživatelé</translation>
     </message>
     <message>
-      <source>Analytics</source>
-      <translation>Analytika</translation>
+      <source>Plugins</source>
+      <translation type="unfinished">Plugins</translation>
     </message>
   </context>
   <context>
@@ -6174,10 +5973,6 @@ to %1</source>
       <translation>Vzdálená synchronizace archivu probíhá</translation>
     </message>
     <message>
-      <source>Error occured during remote archive synchronization</source>
-      <translation>Při vzdálené synchronizaci archivu došlo k chybě</translation>
-    </message>
-    <message>
       <source>Remote archive synchronization has been started for the following device:</source>
       <translation>Vzdálená synchronizace archivu byla spuštěna pro následující zařízení:</translation>
     </message>
@@ -6227,17 +6022,13 @@ to %1</source>
       <source>The System is running in safe mode.</source>
       <translation type="unfinished">The System is running in safe mode.</translation>
     </message>
+    <message>
+      <source>Error occurred during remote archive synchronization</source>
+      <translation type="unfinished">Error occurred during remote archive synchronization</translation>
+    </message>
   </context>
   <context>
     <name>QnSystemSettingsWidget</name>
-    <message>
-      <source>Enable devices and servers auto discovery</source>
-      <translation>Povolit automatické zjišťování zařízení a serverů</translation>
-    </message>
-    <message>
-      <source>Enable cameras and servers auto discovery</source>
-      <translation>Povolit automatické zjišťování kamer a serverů</translation>
-    </message>
     <message>
       <source>Allow System to optimize device settings</source>
       <translation>Povolit systému optimalizovat nastavení zařízení</translation>
@@ -6253,6 +6044,22 @@ to %1</source>
     <message>
       <source>Does not include any personal information and is completely anonymous.</source>
       <translation>Nezahrnuje žádné osobní údaje a je zcela anonymní.</translation>
+    </message>
+    <message>
+      <source>Failover server measures may still request camera status updates regardless of this setting.</source>
+      <translation type="unfinished">Failover server measures may still request camera status updates regardless of this setting.</translation>
+    </message>
+    <message>
+      <source>Enable devices and servers autodiscovery and automated device status check</source>
+      <translation type="unfinished">Enable devices and servers autodiscovery and automated device status check</translation>
+    </message>
+    <message>
+      <source>Enable cameras and servers autodiscovery and automated camera status check</source>
+      <translation type="unfinished">Enable cameras and servers autodiscovery and automated camera status check</translation>
+    </message>
+    <message>
+      <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
+      <translation type="unfinished">When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</translation>
     </message>
   </context>
   <context>
@@ -6336,94 +6143,6 @@ to %1</source>
     <message>
       <source>Hold to Speak</source>
       <translation>Přidržet hovor</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnUpdateResult</name>
-    <message>
-      <source>Update has been successfully finished.</source>
-      <translation>Aktualizace byla úspěšně dokončena.</translation>
-    </message>
-    <message>
-      <source>Update has been cancelled.</source>
-      <translation>Aktualizace byla zrušena.</translation>
-    </message>
-    <message>
-      <source>Another user has already started an update.</source>
-      <translation>Jiný uživatel již spustil aktualizaci.</translation>
-    </message>
-    <message>
-      <source>All servers are already updated.</source>
-      <translation>Všechny servery jsou již aktualizovány.</translation>
-    </message>
-    <message>
-      <source>Could not download updates.</source>
-      <translation>Nelze stáhnout soubory aktualizace.</translation>
-    </message>
-    <message>
-      <source>No free space left on the disk.</source>
-      <translation>Na disku není ponechaný volný prostor.</translation>
-    </message>
-    <message>
-      <source>Could not push updates to servers.</source>
-      <translation>Nelze odeslat aktualizace na servery.</translation>
-    </message>
-    <message numerus="yes">
-      <source>The problem is caused by %n servers:</source>
-      <translation type="unfinished">
-        <numerusform>Problém je způsoben %n servery:</numerusform>
-        <numerusform>The problem is caused by %n servers:</numerusform>
-        <numerusform>The problem is caused by %n servers:</numerusform>
-        <numerusform>The problem is caused by %n servers:</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>No free space left on %n servers:</source>
-      <translation type="unfinished">
-        <numerusform>Na serverech %n není ponechán volný prostor:</numerusform>
-        <numerusform>No free space left on %n servers:</numerusform>
-        <numerusform>No free space left on %n servers:</numerusform>
-        <numerusform>No free space left on %n servers:</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n servers are not responding:</source>
-      <translation type="unfinished">
-        <numerusform>%n servery neodpovídají:</numerusform>
-        <numerusform>%n servery neodpovídají:</numerusform>
-        <numerusform>%n servers are not responding:</numerusform>
-        <numerusform>%n servers are not responding:</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n servers have gone offline:</source>
-      <translation type="unfinished">
-        <numerusform>%n servery jsou offline:</numerusform>
-        <numerusform>%n servers have gone offline:</numerusform>
-        <numerusform>%n servers have gone offline:</numerusform>
-        <numerusform>%n servers have gone offline:</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Authentication failed for %n servers:</source>
-      <translation type="unfinished">
-        <numerusform>Ověření selhalo na %n serverech:</numerusform>
-        <numerusform>Authentication failed for %n servers:</numerusform>
-        <numerusform>Authentication failed for %n servers:</numerusform>
-        <numerusform>Authentication failed for %n servers:</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Could not install an update to the client.</source>
-      <translation>Nelze nainstalovat aktualizaci klienta.</translation>
-    </message>
-    <message>
-      <source>Could not install updates on one or more servers.</source>
-      <translation>Nelze nainstalovat aktualizace na jeden nebo více serverů.</translation>
-    </message>
-    <message>
-      <source>Update has been cancelled silently.</source>
-      <translation type="unfinished">Update has been cancelled silently.</translation>
     </message>
   </context>
   <context>
@@ -6566,11 +6285,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Please select an action to perform on %n users with this role</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Vyberte prosím akci, která se bude provádět u %n uživatelů s touto rolí</numerusform>
-        <numerusform>Please select an action to perform on %n users with this role</numerusform>
-        <numerusform>Please select an action to perform on %n users with this role</numerusform>
-        <numerusform>Please select an action to perform on %n users with this role</numerusform>
+        <numerusform>Vyberte prosím akci, která se bude provádět u %n uživatelů s touto rolí</numerusform>
+        <numerusform>Vyberte prosím akci, která se bude provádět u %n uživatelů s touto rolí</numerusform>
+        <numerusform>Vyberte prosím akci, která se bude provádět u %n uživatelů s touto rolí</numerusform>
       </translation>
     </message>
   </context>
@@ -6779,11 +6498,11 @@ to %1</source>
     <message numerus="yes">
       <source>PC %1 - Displays %2</source>
       <comment>%2 will be substituted by _list_ of displays</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>PC %1 - Monitory %2</numerusform>
-        <numerusform>PC %1 - Displays %2</numerusform>
-        <numerusform>PC %1 - Displays %2</numerusform>
-        <numerusform>PC %1 - Displays %2</numerusform>
+        <numerusform>PC %1 - Monitory %2</numerusform>
+        <numerusform>PC %1 - Monitory %2</numerusform>
+        <numerusform>PC %1 - Monitory %2</numerusform>
       </translation>
     </message>
   </context>
@@ -6855,11 +6574,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Delete %n bookmarks?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Samzat %n záložek?</numerusform>
-        <numerusform>Delete %n bookmarks?</numerusform>
-        <numerusform>Delete %n bookmarks?</numerusform>
-        <numerusform>Delete %n bookmarks?</numerusform>
+        <numerusform>Samzat %n záložek?</numerusform>
+        <numerusform>Samzat %n záložek?</numerusform>
+        <numerusform>Samzat %n záložek?</numerusform>
       </translation>
     </message>
   </context>
@@ -6883,25 +6602,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnWorkbenchContext</name>
-    <message>
-      <source>Please review and agree to the %1 in order to proceed</source>
-      <translation type="unfinished">Please review and agree to the %1 in order to proceed</translation>
-    </message>
-    <message>
-      <source>To use the software you must agree with the end user license agreement</source>
-      <translation type="unfinished">To use the software you must agree with the end user license agreement</translation>
-    </message>
-    <message>
-      <source>I Agree</source>
-      <translation type="unfinished">I Agree</translation>
-    </message>
-    <message>
-      <source>I Do Not Agree</source>
-      <translation type="unfinished">I Do Not Agree</translation>
-    </message>
-  </context>
-  <context>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
     <message>
       <source>Systems will be merged shortly</source>
@@ -6910,10 +6610,6 @@ to %1</source>
     <message>
       <source>Servers from the other System will appear in the resource tree.</source>
       <translation>Servery z jiného systému se zobrazí ve stromu zdrojů.</translation>
-    </message>
-    <message>
-      <source>Failed to update Server</source>
-      <translation>Aktualizace serveru se nezdařila</translation>
     </message>
     <message>
       <source>Total amount of licenses will decrease</source>
@@ -6961,11 +6657,11 @@ to %1</source>
     <name>QnWorkbenchResourcesChangesWatcher</name>
     <message numerus="yes">
       <source>The following %n items are not saved:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Následující %n položky nejsou uloženy:</numerusform>
-        <numerusform>The following %n items are not saved:</numerusform>
-        <numerusform>The following %n items are not saved:</numerusform>
-        <numerusform>The following %n items are not saved:</numerusform>
+        <numerusform>Následující %n položky nejsou uloženy:</numerusform>
+        <numerusform>Následující %n položky nejsou uloženy:</numerusform>
+        <numerusform>Následující %n položky nejsou uloženy:</numerusform>
       </translation>
     </message>
     <message>
@@ -6978,11 +6674,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>The following %n items are not deleted:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Následující %n položky nejsou smazány:</numerusform>
-        <numerusform>The following %n items are not deleted:</numerusform>
-        <numerusform>The following %n items are not deleted:</numerusform>
-        <numerusform>The following %n items are not deleted:</numerusform>
+        <numerusform>Následující %n položky nejsou smazány:</numerusform>
+        <numerusform>Následující %n položky nejsou smazány:</numerusform>
+        <numerusform>Následující %n položky nejsou smazány:</numerusform>
       </translation>
     </message>
     <message>
@@ -6991,11 +6687,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Failed to delete %n items:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Nepodařilo se odstranit %n položek:</numerusform>
-        <numerusform>Failed to delete %n items:</numerusform>
-        <numerusform>Failed to delete %n items:</numerusform>
-        <numerusform>Failed to delete %n items:</numerusform>
+        <numerusform>Nepodařilo se odstranit %n položek:</numerusform>
+        <numerusform>Nepodařilo se odstranit %n položek:</numerusform>
+        <numerusform>Nepodařilo se odstranit %n položek:</numerusform>
       </translation>
     </message>
     <message>
@@ -7093,29 +6789,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnWorkbenchUpdateWatcher</name>
-    <message>
-      <source>Release Notes</source>
-      <translation>Poznámky k vydání</translation>
-    </message>
-    <message>
-      <source>%1 version available</source>
-      <translation>%1 verze je dostupná</translation>
-    </message>
-    <message>
-      <source>Major issues have been fixed. Update is strongly recommended.</source>
-      <translation>Hlavní problémy byly opraveny. Aktualizace je důrazně doporučena.</translation>
-    </message>
-    <message>
-      <source>Update...</source>
-      <translation>Aktualizace...</translation>
-    </message>
-    <message>
-      <source>Do not notify again about this update</source>
-      <translation>Neupozorňovat znovu na tuto aktualizaci</translation>
-    </message>
-  </context>
-  <context>
     <name>QnWorkbenchVideoWallHandler</name>
     <message>
       <source>Video Wall</source>
@@ -7151,11 +6824,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Delete %n items?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Smazat %n položek?</numerusform>
-        <numerusform>Delete %n items?</numerusform>
-        <numerusform>Delete %n items?</numerusform>
-        <numerusform>Delete %n items?</numerusform>
+        <numerusform>Smazat %n položek?</numerusform>
+        <numerusform>Smazat %n položek?</numerusform>
+        <numerusform>Smazat %n položek?</numerusform>
       </translation>
     </message>
     <message>
@@ -7172,11 +6845,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Delete %n matrices?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Odstranit %n matice?</numerusform>
-        <numerusform>Delete %n matrices?</numerusform>
-        <numerusform>Delete %n matrices?</numerusform>
-        <numerusform>Delete %n matrices?</numerusform>
+        <numerusform>Odstranit %n matice?</numerusform>
+        <numerusform>Odstranit %n matice?</numerusform>
+        <numerusform>Odstranit %n matice?</numerusform>
       </translation>
     </message>
     <message>
@@ -7228,11 +6901,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Selected file formats are not supported</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Vybrané formáty souborů nejsou podporovány</numerusform>
-        <numerusform>Selected file formats are not supported</numerusform>
-        <numerusform>Selected file formats are not supported</numerusform>
-        <numerusform>Selected file formats are not supported</numerusform>
+        <numerusform>Vybrané formáty souborů nejsou podporovány</numerusform>
+        <numerusform>Vybrané formáty souborů nejsou podporovány</numerusform>
+        <numerusform>Vybrané formáty souborů nejsou podporovány</numerusform>
       </translation>
     </message>
     <message>
@@ -7241,29 +6914,29 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Selected files do not have timestamps</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Vybrané soubory nemají časové značky</numerusform>
-        <numerusform>Selected files do not have timestamps</numerusform>
-        <numerusform>Selected files do not have timestamps</numerusform>
-        <numerusform>Selected files do not have timestamps</numerusform>
+        <numerusform>Vybrané soubory nemají časové značky</numerusform>
+        <numerusform>Vybrané soubory nemají časové značky</numerusform>
+        <numerusform>Vybrané soubory nemají časové značky</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files cover periods for which videos are already being uploaded</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Vybrané soubory pokrývají období, pro které jsou videa již nahrávána</numerusform>
-        <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
-        <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
-        <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
+        <numerusform>Vybrané soubory pokrývají období, pro které jsou videa již nahrávána</numerusform>
+        <numerusform>Vybrané soubory pokrývají období, pro které jsou videa již nahrávána</numerusform>
+        <numerusform>Vybrané soubory pokrývají období, pro které jsou videa již nahrávána</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files cover periods for which videos have already been uploaded</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Vybrané soubory pokrývají období, pro které již videa byla nahrána</numerusform>
-        <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
-        <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
-        <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
+        <numerusform>Vybrané soubory pokrývají období, pro které již videa byla nahrána</numerusform>
+        <numerusform>Vybrané soubory pokrývají období, pro které již videa byla nahrána</numerusform>
+        <numerusform>Vybrané soubory pokrývají období, pro které již videa byla nahrána</numerusform>
       </translation>
     </message>
     <message>
@@ -7280,47 +6953,47 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Selected files are too old</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Vybrané soubory jsou příliš staré</numerusform>
-        <numerusform>Selected files are too old</numerusform>
-        <numerusform>Selected files are too old</numerusform>
-        <numerusform>Selected files are too old</numerusform>
+        <numerusform>Vybrané soubory jsou příliš staré</numerusform>
+        <numerusform>Vybrané soubory jsou příliš staré</numerusform>
+        <numerusform>Vybrané soubory jsou příliš staré</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Vybraný soubor byl zaznamenán na %1, ale pouze soubory, které byly zaznamenané v posledních %n dnech mohou být nahrané. Toto nastavení můžete změnit v nastavení archivu kamery.</numerusform>
-        <numerusform>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
-        <numerusform>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
-        <numerusform>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
+        <numerusform>Vybraný soubor byl zaznamenán na %1, ale pouze soubory, které byly zaznamenané v posledních %n dnech mohou být nahrané. Toto nastavení můžete změnit v nastavení archivu kamery.</numerusform>
+        <numerusform>Vybraný soubor byl zaznamenán na %1, ale pouze soubory, které byly zaznamenané v posledních %n dnech mohou být nahrané. Toto nastavení můžete změnit v nastavení archivu kamery.</numerusform>
+        <numerusform>Vybraný soubor byl zaznamenán na %1, ale pouze soubory, které byly zaznamenané v posledních %n dnech mohou být nahrané. Toto nastavení můžete změnit v nastavení archivu kamery.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Vybrané soubory byly zaznamenáné mezi %1 a %2, ale pouze soubory, které byly zaznamenané v posledních %n dnech mohou být nahrané. Toto nastavení můžete změnit v nastavení archivu kamery.</numerusform>
-        <numerusform>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
-        <numerusform>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
-        <numerusform>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
+        <numerusform>Vybrané soubory byly zaznamenáné mezi %1 a %2, ale pouze soubory, které byly zaznamenané v posledních %n dnech mohou být nahrané. Toto nastavení můžete změnit v nastavení archivu kamery.</numerusform>
+        <numerusform>Vybrané soubory byly zaznamenáné mezi %1 a %2, ale pouze soubory, které byly zaznamenané v posledních %n dnech mohou být nahrané. Toto nastavení můžete změnit v nastavení archivu kamery.</numerusform>
+        <numerusform>Vybrané soubory byly zaznamenáné mezi %1 a %2, ale pouze soubory, které byly zaznamenané v posledních %n dnech mohou být nahrané. Toto nastavení můžete změnit v nastavení archivu kamery.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Some footage may be deleted after uploading these files</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Některé záběry mohou být po nahrání těchto souborů smazány</numerusform>
-        <numerusform>Some footage may be deleted after uploading these files</numerusform>
-        <numerusform>Some footage may be deleted after uploading these files</numerusform>
-        <numerusform>Some footage may be deleted after uploading these files</numerusform>
+        <numerusform>Některé záběry mohou být po nahrání těchto souborů smazány</numerusform>
+        <numerusform>Některé záběry mohou být po nahrání těchto souborů smazány</numerusform>
+        <numerusform>Některé záběry mohou být po nahrání těchto souborů smazány</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Na úložišti serveru není dostatek volného místa. Některé staré záběry mohou být smazané, aby se uvolnilo místo. Všimněte si, že pokud se vybrané soubory stanou na serveru nejstaršími, budou po nahrání smazaná.</numerusform>
-        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
-        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
-        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
+        <numerusform>Na úložišti serveru není dostatek volného místa. Některé staré záběry mohou být smazané, aby se uvolnilo místo. Všimněte si, že pokud se vybrané soubory stanou na serveru nejstaršími, budou po nahrání smazaná.</numerusform>
+        <numerusform>Na úložišti serveru není dostatek volného místa. Některé staré záběry mohou být smazané, aby se uvolnilo místo. Všimněte si, že pokud se vybrané soubory stanou na serveru nejstaršími, budou po nahrání smazaná.</numerusform>
+        <numerusform>Na úložišti serveru není dostatek volného místa. Některé staré záběry mohou být smazané, aby se uvolnilo místo. Všimněte si, že pokud se vybrané soubory stanou na serveru nejstaršími, budou po nahrání smazaná.</numerusform>
       </translation>
     </message>
     <message>
@@ -7429,11 +7102,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>User will still have access to %n removed resources:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Uživatel bude mít stále přístup k %n odstraněným zdrojům:</numerusform>
-        <numerusform>User will still have access to %n removed resources:</numerusform>
-        <numerusform>User will still have access to %n removed resources:</numerusform>
-        <numerusform>User will still have access to %n removed resources:</numerusform>
+        <numerusform>Uživatel bude mít stále přístup k %n odstraněným zdrojům:</numerusform>
+        <numerusform>Uživatel bude mít stále přístup k %n odstraněným zdrojům:</numerusform>
+        <numerusform>Uživatel bude mít stále přístup k %n odstraněným zdrojům:</numerusform>
       </translation>
     </message>
     <message>
@@ -7442,11 +7115,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>All users with this role will get access to %n resources:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Všichni uživatelé s touto rolí získají přístup k %n zdrojům:</numerusform>
-        <numerusform>All users with this role will get access to %n resources:</numerusform>
-        <numerusform>All users with this role will get access to %n resources:</numerusform>
-        <numerusform>All users with this role will get access to %n resources:</numerusform>
+        <numerusform>Všichni uživatelé s touto rolí získají přístup k %n zdrojům:</numerusform>
+        <numerusform>Všichni uživatelé s touto rolí získají přístup k %n zdrojům:</numerusform>
+        <numerusform>Všichni uživatelé s touto rolí získají přístup k %n zdrojům:</numerusform>
       </translation>
     </message>
     <message>
@@ -7455,11 +7128,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>All users with this role will still have access to %n removed resources:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Všichni uživatelé s touto rolí budou mít stále přístup k %n odstraněným zdrojům:</numerusform>
-        <numerusform>All users with this role will still have access to %n removed resources:</numerusform>
-        <numerusform>All users with this role will still have access to %n removed resources:</numerusform>
-        <numerusform>All users with this role will still have access to %n removed resources:</numerusform>
+        <numerusform>Všichni uživatelé s touto rolí budou mít stále přístup k %n odstraněným zdrojům:</numerusform>
+        <numerusform>Všichni uživatelé s touto rolí budou mít stále přístup k %n odstraněným zdrojům:</numerusform>
+        <numerusform>Všichni uživatelé s touto rolí budou mít stále přístup k %n odstraněným zdrojům:</numerusform>
       </translation>
     </message>
     <message>
@@ -7472,47 +7145,47 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>User will lose access to %n resources:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Uživatel ztratí přístup k %n zdrojům:</numerusform>
-        <numerusform>User will lose access to %n resources:</numerusform>
-        <numerusform>User will lose access to %n resources:</numerusform>
-        <numerusform>User will lose access to %n resources:</numerusform>
+        <numerusform>Uživatel ztratí přístup k %n zdrojům:</numerusform>
+        <numerusform>Uživatel ztratí přístup k %n zdrojům:</numerusform>
+        <numerusform>Uživatel ztratí přístup k %n zdrojům:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>All users with this role will lose access to %n resources:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Všichni uživatelé s touto rolí ztratí přístup k %n zdrojům:</numerusform>
-        <numerusform>All users with this role will lose access to %n resources:</numerusform>
-        <numerusform>All users with this role will lose access to %n resources:</numerusform>
-        <numerusform>All users with this role will lose access to %n resources:</numerusform>
+        <numerusform>Všichni uživatelé s touto rolí ztratí přístup k %n zdrojům:</numerusform>
+        <numerusform>Všichni uživatelé s touto rolí ztratí přístup k %n zdrojům:</numerusform>
+        <numerusform>Všichni uživatelé s touto rolí ztratí přístup k %n zdrojům:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n shared layouts?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Chcete smazat %n sdílené rozložení?</numerusform>
-        <numerusform>Delete %n shared layouts?</numerusform>
-        <numerusform>Delete %n shared layouts?</numerusform>
-        <numerusform>Delete %n shared layouts?</numerusform>
+        <numerusform>Chcete smazat %n sdílené rozložení?</numerusform>
+        <numerusform>Chcete smazat %n sdílené rozložení?</numerusform>
+        <numerusform>Chcete smazat %n sdílené rozložení?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These %n layouts are shared with other users, so you delete it for them too.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Tyto %n rozložení jsou sdíleny s ostatními uživateli, takže je jim také smažete.</numerusform>
-        <numerusform>These %n layouts are shared with other users, so you delete it for them too.</numerusform>
-        <numerusform>These %n layouts are shared with other users, so you delete it for them too.</numerusform>
-        <numerusform>These %n layouts are shared with other users, so you delete it for them too.</numerusform>
+        <numerusform>Tyto %n rozložení jsou sdíleny s ostatními uživateli, takže je jim také smažete.</numerusform>
+        <numerusform>Tyto %n rozložení jsou sdíleny s ostatními uživateli, takže je jim také smažete.</numerusform>
+        <numerusform>Tyto %n rozložení jsou sdíleny s ostatními uživateli, takže je jim také smažete.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Remove %n items from layout?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Odstranit %n položek z rozložení?</numerusform>
-        <numerusform>Remove %n items from layout?</numerusform>
-        <numerusform>Remove %n items from layout?</numerusform>
-        <numerusform>Remove %n items from layout?</numerusform>
+        <numerusform>Odstranit %n položek z rozložení?</numerusform>
+        <numerusform>Odstranit %n položek z rozložení?</numerusform>
+        <numerusform>Odstranit %n položek z rozložení?</numerusform>
       </translation>
     </message>
     <message>
@@ -7529,74 +7202,74 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Delete %n users?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Smazat %n uživatelů?</numerusform>
-        <numerusform>Delete %n users?</numerusform>
-        <numerusform>Delete %n users?</numerusform>
-        <numerusform>Delete %n users?</numerusform>
+        <numerusform>Smazat %n uživatelů?</numerusform>
+        <numerusform>Smazat %n uživatelů?</numerusform>
+        <numerusform>Smazat %n uživatelů?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n devices?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Smazat %n zařízení?</numerusform>
-        <numerusform>Delete %n devices?</numerusform>
-        <numerusform>Delete %n devices?</numerusform>
-        <numerusform>Delete %n devices?</numerusform>
+        <numerusform>Smazat %n zařízení?</numerusform>
+        <numerusform>Smazat %n zařízení?</numerusform>
+        <numerusform>Smazat %n zařízení?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n cameras?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Smazat %n kamer?</numerusform>
-        <numerusform>Delete %n cameras?</numerusform>
-        <numerusform>Delete %n cameras?</numerusform>
-        <numerusform>Delete %n cameras?</numerusform>
+        <numerusform>Smazat %n kamer?</numerusform>
+        <numerusform>Smazat %n kamer?</numerusform>
+        <numerusform>Smazat %n kamer?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n I/O Modules?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Smazat %n I/O modulů?</numerusform>
-        <numerusform>Delete %n I/O Modules?</numerusform>
-        <numerusform>Delete %n I/O Modules?</numerusform>
-        <numerusform>Delete %n I/O Modules?</numerusform>
+        <numerusform>Smazat %n I/O modulů?</numerusform>
+        <numerusform>Smazat %n I/O modulů?</numerusform>
+        <numerusform>Smazat %n I/O modulů?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n items?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Smazat %n položek?</numerusform>
-        <numerusform>Delete %n items?</numerusform>
-        <numerusform>Delete %n items?</numerusform>
-        <numerusform>Delete %n items?</numerusform>
+        <numerusform>Smazat %n položek?</numerusform>
+        <numerusform>Smazat %n položek?</numerusform>
+        <numerusform>Smazat %n položek?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n of them are auto-discovered.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n z nich je automaticky nalezeno.</numerusform>
-        <numerusform>%n of them are auto-discovered.</numerusform>
-        <numerusform>%n of them are auto-discovered.</numerusform>
-        <numerusform>%n of them are auto-discovered.</numerusform>
+        <numerusform>%n z nich je automaticky nalezeno.</numerusform>
+        <numerusform>%n z nich je automaticky nalezeno.</numerusform>
+        <numerusform>%n z nich je automaticky nalezeno.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n cameras are auto-discovered.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n kamer je automaticky nalezeno.</numerusform>
-        <numerusform>%n cameras are auto-discovered.</numerusform>
-        <numerusform>%n cameras are auto-discovered.</numerusform>
-        <numerusform>%n cameras are auto-discovered.</numerusform>
+        <numerusform>%n kamer je automaticky nalezeno.</numerusform>
+        <numerusform>%n kamer je automaticky nalezeno.</numerusform>
+        <numerusform>%n kamer je automaticky nalezeno.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O modules are auto-discovered.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n I/O modulů je automaticky nalezeno.</numerusform>
-        <numerusform>%n I/O modules are auto-discovered.</numerusform>
-        <numerusform>%n I/O modules are auto-discovered.</numerusform>
-        <numerusform>%n I/O modules are auto-discovered.</numerusform>
+        <numerusform>%n I/O modulů je automaticky nalezeno.</numerusform>
+        <numerusform>%n I/O modulů je automaticky nalezeno.</numerusform>
+        <numerusform>%n I/O modulů je automaticky nalezeno.</numerusform>
       </translation>
     </message>
     <message>
@@ -7613,11 +7286,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Remove %n items from showreel?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Odstranit %n položek z filmového pásu?</numerusform>
-        <numerusform>Remove %n items from showreel?</numerusform>
-        <numerusform>Remove %n items from showreel?</numerusform>
-        <numerusform>Remove %n items from showreel?</numerusform>
+        <numerusform>Odstranit %n položek z filmového pásu?</numerusform>
+        <numerusform>Odstranit %n položek z filmového pásu?</numerusform>
+        <numerusform>Odstranit %n položek z filmového pásu?</numerusform>
       </translation>
     </message>
     <message>
@@ -7636,6 +7309,17 @@ to %1</source>
         <numerusform>Some video files are still being uploaded to %n virtual cameras:</numerusform>
         <numerusform>Some video files are still being uploaded to %n virtual cameras:</numerusform>
       </translation>
+    </message>
+  </context>
+  <context>
+    <name>SessionExpiredDialog</name>
+    <message>
+      <source>Your session has expired</source>
+      <translation type="unfinished">Your session has expired</translation>
+    </message>
+    <message>
+      <source>Session duration limit can be changed by the system administrators</source>
+      <translation type="unfinished">Session duration limit can be changed by the system administrators</translation>
     </message>
   </context>
   <context>
@@ -7703,11 +7387,11 @@ to %1</source>
     <name>SubjectSelectionDialog::RoleListDelegate</name>
     <message numerus="yes">
       <source>%n users</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n uživatelé</numerusform>
-        <numerusform>%n users</numerusform>
-        <numerusform>%n users</numerusform>
-        <numerusform>%n users</numerusform>
+        <numerusform>%n uživatelé</numerusform>
+        <numerusform>%n uživatelé</numerusform>
+        <numerusform>%n uživatelé</numerusform>
       </translation>
     </message>
   </context>
@@ -7844,6 +7528,14 @@ to %1</source>
       <source>Show Only with &quot;Objects&quot; Tab</source>
       <translation type="unfinished">Show Only with &quot;Objects&quot; Tab</translation>
     </message>
+    <message>
+      <source>Show</source>
+      <translation>Zobrazit</translation>
+    </message>
+    <message>
+      <source>Do Not Show</source>
+      <translation type="unfinished">Do Not Show</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::AnalyticsSearchListModel::Private</name>
@@ -7934,11 +7626,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n bookmarks</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n záložky</numerusform>
-        <numerusform>%n bookmarks</numerusform>
-        <numerusform>%n bookmarks</numerusform>
-        <numerusform>%n bookmarks</numerusform>
+        <numerusform>%n záložky</numerusform>
+        <numerusform>%n záložky</numerusform>
+        <numerusform>%n záložky</numerusform>
       </translation>
     </message>
   </context>
@@ -7998,10 +7690,6 @@ to %1</source>
       <translation>Výchozí</translation>
     </message>
     <message>
-      <source>Server will not change any cameras settings, it will receive and use camera stream as-is. </source>
-      <translation>Server nezmění žádné nastavení kamer, bude přijímat a používat stream kamery jak je. </translation>
-    </message>
-    <message>
       <source>Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</source>
       <translation>Pomáhá vyřešit problémy s kvalitou obrazu u některých kamer, u ostatních kamer způsobí významné zvýšení datového toku.</translation>
     </message>
@@ -8021,12 +7709,20 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>This ID is already used on the following %n cameras:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Toto ID se již používá na následujících %n kamerách:</numerusform>
-        <numerusform>This ID is already used on the following %n cameras:</numerusform>
-        <numerusform>This ID is already used on the following %n cameras:</numerusform>
-        <numerusform>This ID is already used on the following %n cameras:</numerusform>
+        <numerusform>Toto ID se již používá na následujících %n kamerách:</numerusform>
+        <numerusform>Toto ID se již používá na následujících %n kamerách:</numerusform>
+        <numerusform>Toto ID se již používá na následujících %n kamerách:</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Server will not change any cameras settings, it will receive and use camera stream as-is.</source>
+      <translation>Server nezmění žádné nastavení kamer, bude přijímat a používat stream kamery jak je.</translation>
+    </message>
+    <message>
+      <source>Multicast</source>
+      <translation type="unfinished">Multicast</translation>
     </message>
   </context>
   <context>
@@ -8056,11 +7752,11 @@ to %1</source>
     <name>nx::vms::client::desktop::CameraLicensePanelWidget</name>
     <message numerus="yes">
       <source>Use License</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Použít licenci</numerusform>
-        <numerusform>Use License</numerusform>
-        <numerusform>Use License</numerusform>
-        <numerusform>Use License</numerusform>
+        <numerusform>Použít licenci</numerusform>
+        <numerusform>Použít licenci</numerusform>
+        <numerusform>Použít licenci</numerusform>
       </translation>
     </message>
   </context>
@@ -8173,38 +7869,34 @@ to %1</source>
       <translation>Webová stránka</translation>
     </message>
     <message>
-      <source>Analytics</source>
-      <translation>Analytika</translation>
-    </message>
-    <message>
       <source>Expert</source>
       <translation>Expert</translation>
     </message>
     <message numerus="yes">
       <source>Changes to the following %n devices are not saved:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Změny v následujících zařízení %n nejsou uloženy:</numerusform>
-        <numerusform>Changes to the following %n devices are not saved:</numerusform>
-        <numerusform>Changes to the following %n devices are not saved:</numerusform>
-        <numerusform>Changes to the following %n devices are not saved:</numerusform>
+        <numerusform>Změny v následujících zařízení %n nejsou uloženy:</numerusform>
+        <numerusform>Změny v následujících zařízení %n nejsou uloženy:</numerusform>
+        <numerusform>Změny v následujících zařízení %n nejsou uloženy:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Changes to the following %n cameras are not saved:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Změny v následujících kamerách %n nejsou uloženy:</numerusform>
-        <numerusform>Changes to the following %n cameras are not saved:</numerusform>
-        <numerusform>Changes to the following %n cameras are not saved:</numerusform>
-        <numerusform>Changes to the following %n cameras are not saved:</numerusform>
+        <numerusform>Změny v následujících kamerách %n nejsou uloženy:</numerusform>
+        <numerusform>Změny v následujících kamerách %n nejsou uloženy:</numerusform>
+        <numerusform>Změny v následujících kamerách %n nejsou uloženy:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Changes to the following %n I/O Modules are not saved:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Změny v následujících I/O modulech %n nejsou uloženy:</numerusform>
-        <numerusform>Changes to the following %n I/O Modules are not saved:</numerusform>
-        <numerusform>Changes to the following %n I/O Modules are not saved:</numerusform>
-        <numerusform>Changes to the following %n I/O Modules are not saved:</numerusform>
+        <numerusform>Změny v následujících I/O modulech %n nejsou uloženy:</numerusform>
+        <numerusform>Změny v následujících I/O modulech %n nejsou uloženy:</numerusform>
+        <numerusform>Změny v následujících I/O modulech %n nejsou uloženy:</numerusform>
       </translation>
     </message>
     <message>
@@ -8235,26 +7927,30 @@ to %1</source>
       <source>I/O Modules Settings</source>
       <translation>Nastavení I/O modulu</translation>
     </message>
+    <message>
+      <source>Plugins</source>
+      <translation type="unfinished">Plugins</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraSettingsLicenseWatcher</name>
     <message numerus="yes">
       <source>%1 are used</source>
       <comment>Text like &apos;5/10 Professional Licenses&apos; will be substituted</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%1 jsou použity</numerusform>
-        <numerusform>%1 are used</numerusform>
-        <numerusform>%1 are used</numerusform>
-        <numerusform>%1 are used</numerusform>
+        <numerusform>%1 jsou použity</numerusform>
+        <numerusform>%1 jsou použity</numerusform>
+        <numerusform>%1 jsou použity</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n more required</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n více požadovaných</numerusform>
-        <numerusform>%n more required</numerusform>
-        <numerusform>%n more required</numerusform>
-        <numerusform>%n more required</numerusform>
+        <numerusform>%n více požadovaných</numerusform>
+        <numerusform>%n více požadovaných</numerusform>
+        <numerusform>%n více požadovaných</numerusform>
       </translation>
     </message>
   </context>
@@ -8308,16 +8004,16 @@ to %1</source>
       <translation type="unfinished">Broken update package.</translation>
     </message>
     <message>
-      <source>Not enough space on disk to install client update.</source>
-      <translation type="unfinished">Not enough space on disk to install client update.</translation>
-    </message>
-    <message>
-      <source>Install package has been lost.</source>
-      <translation type="unfinished">Install package has been lost.</translation>
-    </message>
-    <message>
       <source>Internal error.</source>
       <translation>Vnitřní chyba.</translation>
+    </message>
+    <message>
+      <source>Not enough space on disk to install the client update.</source>
+      <translation type="unfinished">Not enough space on disk to install the client update.</translation>
+    </message>
+    <message>
+      <source>Installation package has been lost.</source>
+      <translation type="unfinished">Installation package has been lost.</translation>
     </message>
   </context>
   <context>
@@ -8349,6 +8045,17 @@ to %1</source>
       <source>Pasted</source>
       <comment>from Clipboard</comment>
       <translation>Vloženo</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ConnectToCurrentSystemTool</name>
+    <message>
+      <source>Configuring Server</source>
+      <translation>Konfigurování serveru</translation>
+    </message>
+    <message>
+      <source>Updating Server</source>
+      <translation>Aktualizování serveru</translation>
     </message>
   </context>
   <context>
@@ -8398,11 +8105,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Failed to add %n devices</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Nepodařilo se přidat %n zařízení</numerusform>
-        <numerusform>Failed to add %n devices</numerusform>
-        <numerusform>Failed to add %n devices</numerusform>
-        <numerusform>Failed to add %n devices</numerusform>
+        <numerusform>Nepodařilo se přidat %n zařízení</numerusform>
+        <numerusform>Nepodařilo se přidat %n zařízení</numerusform>
+        <numerusform>Nepodařilo se přidat %n zařízení</numerusform>
       </translation>
     </message>
     <message>
@@ -8460,16 +8167,27 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Add %n Devices</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Přidat %n zařízení</numerusform>
-        <numerusform>Add %n Devices</numerusform>
-        <numerusform>Add %n Devices</numerusform>
-        <numerusform>Add %n Devices</numerusform>
+        <numerusform>Přidat %n zařízení</numerusform>
+        <numerusform>Přidat %n zařízení</numerusform>
+        <numerusform>Přidat %n zařízení</numerusform>
       </translation>
     </message>
     <message>
       <source>Address field cannot be empty</source>
       <translation type="unfinished">Address field cannot be empty</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::EulaDialog</name>
+    <message>
+      <source>Please review and agree to the %1 in order to proceed</source>
+      <translation type="unfinished">Please review and agree to the %1 in order to proceed</translation>
+    </message>
+    <message>
+      <source>To use the software you must agree with the end user license agreement</source>
+      <translation type="unfinished">To use the software you must agree with the end user license agreement</translation>
     </message>
   </context>
   <context>
@@ -8542,33 +8260,33 @@ to %1</source>
       <source>No events</source>
       <translation>Žádné události</translation>
     </message>
-    <message>
-      <source>No events occured</source>
-      <translation>Žádné události nenastaly</translation>
-    </message>
     <message numerus="yes">
       <source>%n events</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n událostí</numerusform>
-        <numerusform>%n events</numerusform>
-        <numerusform>%n events</numerusform>
-        <numerusform>%n events</numerusform>
+        <numerusform>%n událostí</numerusform>
+        <numerusform>%n událostí</numerusform>
+        <numerusform>%n událostí</numerusform>
       </translation>
     </message>
     <message>
       <source>unnamed analytics engine</source>
       <translation type="unfinished">unnamed analytics engine</translation>
     </message>
+    <message>
+      <source>No events occurred</source>
+      <translation type="unfinished">No events occurred</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::EventTile</name>
     <message numerus="yes">
       <source>...and %n more</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>... a dalších %n</numerusform>
-        <numerusform>...and %n more</numerusform>
-        <numerusform>...and %n more</numerusform>
-        <numerusform>...and %n more</numerusform>
+        <numerusform>... a dalších %n</numerusform>
+        <numerusform>... a dalších %n</numerusform>
+        <numerusform>... a dalších %n</numerusform>
       </translation>
     </message>
   </context>
@@ -9064,30 +8782,6 @@ to %1</source>
       <translation>Některé servery jsou offline a nebudou aktualizovány. Přeskočit je?</translation>
     </message>
     <message>
-      <source>Ready to install client updates</source>
-      <translation type="unfinished">Ready to install client updates</translation>
-    </message>
-    <message>
-      <source>Install now</source>
-      <translation>Instalovat nyní</translation>
-    </message>
-    <message>
-      <source>Later</source>
-      <translation>Později</translation>
-    </message>
-    <message>
-      <source>Updates downloaded</source>
-      <translation>Aktualizace byly staženy</translation>
-    </message>
-    <message>
-      <source>Failed to download update packages</source>
-      <translation>Nepodařilo se stáhnout balíčky aktualizací</translation>
-    </message>
-    <message>
-      <source>Please make sure there is enough free storage space and network connection is stable.</source>
-      <translation>Ujistěte se prosím, že je dostatek volného místa v úložišti a připojení k síti je stabilní.</translation>
-    </message>
-    <message>
       <source>If the problem persists, please contact Customer Support.</source>
       <translation>Pokud problém přetrvává, kontaktujte prosím zákaznickou podporu.</translation>
     </message>
@@ -9100,20 +8794,8 @@ to %1</source>
       <translation>Zrušit aktualizaci</translation>
     </message>
     <message>
-      <source>Failed to download update packages to some servers</source>
-      <translation>Nepodařilo se stáhnout balíčky aktualizací pro některé servery</translation>
-    </message>
-    <message>
-      <source>Please make sure they have enough free storage space and stable network connection.</source>
-      <translation>Ujistěte se prosím, že máte dostatek volného místa v úložišti a připojení k síti je stabilní.</translation>
-    </message>
-    <message>
       <source>Update completed</source>
       <translation>Aktualizace byla dokončena</translation>
-    </message>
-    <message>
-      <source>Update completed, but some servers have failed an update</source>
-      <translation type="unfinished">Update completed, but some servers have failed an update</translation>
     </message>
     <message>
       <source>Nx Witness Client will be restarted to the updated version.</source>
@@ -9124,16 +8806,8 @@ to %1</source>
       <translation>OK</translation>
     </message>
     <message>
-      <source>Failed to install updates to servers:</source>
-      <translation type="unfinished">Failed to install updates to servers:</translation>
-    </message>
-    <message>
       <source>Downloading updates...</source>
       <translation>Stahování aktualizací...</translation>
-    </message>
-    <message>
-      <source>Pushing updates...</source>
-      <translation type="unfinished">Pushing updates...</translation>
     </message>
     <message>
       <source>Upload</source>
@@ -9252,16 +8926,76 @@ to %1</source>
       <source>There are no online servers to update.</source>
       <translation type="unfinished">There are no online servers to update.</translation>
     </message>
+    <message>
+      <source>Some servers haven&apos;t completed update process. Finish it anyway?</source>
+      <translation type="unfinished">Some servers haven&apos;t completed update process. Finish it anyway?</translation>
+    </message>
+    <message>
+      <source>Cancel update and delete all downloaded data?</source>
+      <translation type="unfinished">Cancel update and delete all downloaded data?</translation>
+    </message>
+    <message>
+      <source>There was an error while installing updates:</source>
+      <translation type="unfinished">There was an error while installing updates:</translation>
+    </message>
+    <message>
+      <source>Some servers have gone offline. Please wait until they become online to continue.</source>
+      <translation type="unfinished">Some servers have gone offline. Please wait until they become online to continue.</translation>
+    </message>
+    <message>
+      <source>Update completed, but some components have failed an update</source>
+      <translation type="unfinished">Update completed, but some components have failed an update</translation>
+    </message>
+    <message>
+      <source>Please update %1 manually using an installation package.</source>
+      <translation>Aktualizujte prosím %1 ručně pomocí instalačního balíčku.</translation>
+    </message>
+    <message>
+      <source>%1 will be restarted to the updated version.</source>
+      <translation>%1 bude restartován za účelem aktualizace verze.</translation>
+    </message>
+    <message>
+      <source>Failed to download update packages to some components</source>
+      <translation type="unfinished">Failed to download update packages to some components</translation>
+    </message>
+    <message>
+      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
+      <translation type="unfinished">OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</translation>
+    </message>
+    <message>
+      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
+      <translation type="unfinished">OS version of the client is no longer supported. Please update its OS to a supported version.</translation>
+    </message>
+    <message>
+      <source>Failed to start update</source>
+      <translation type="unfinished">Failed to start update</translation>
+    </message>
+    <message>
+      <source>Starting update to ...</source>
+      <translation type="unfinished">Starting update to ...</translation>
+    </message>
+    <message>
+      <source>Some servers have no package available</source>
+      <translation type="unfinished">Some servers have no package available</translation>
+    </message>
+    <message>
+      <source>Failed to cancel update</source>
+      <translation type="unfinished">Failed to cancel update</translation>
+    </message>
+    <message>
+      <source>Failed to start installation</source>
+      <translation type="unfinished">Failed to start installation</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::MultipleLayoutSelectionDialog</name>
     <message numerus="yes">
       <source>%n layouts</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n rozložení</numerusform>
-        <numerusform>%n layouts</numerusform>
-        <numerusform>%n layouts</numerusform>
-        <numerusform>%n layouts</numerusform>
+        <numerusform>%n rozložení</numerusform>
+        <numerusform>%n rozložení</numerusform>
+        <numerusform>%n rozložení</numerusform>
       </translation>
     </message>
     <message>
@@ -9278,6 +9012,26 @@ to %1</source>
     <message>
       <source>Acknowledge</source>
       <translation>Vzít na vědomí</translation>
+    </message>
+    <message>
+      <source>Generic Event</source>
+      <translation>Obecná událost</translation>
+    </message>
+    <message>
+      <source>Device was disconnected</source>
+      <translation type="unfinished">Device was disconnected</translation>
+    </message>
+    <message>
+      <source>Camera was disconnected</source>
+      <translation type="unfinished">Camera was disconnected</translation>
+    </message>
+    <message>
+      <source>I/O Module was disconnected</source>
+      <translation type="unfinished">I/O Module was disconnected</translation>
+    </message>
+    <message>
+      <source>Unknown Plugin Diagnostic Event</source>
+      <translation type="unfinished">Unknown Plugin Diagnostic Event</translation>
     </message>
   </context>
   <context>
@@ -9298,10 +9052,6 @@ to %1</source>
       <translation>Žádný z vybraných uživatelů nemá přístup k vybranému rozložení. Akce nebude fungovat.</translation>
     </message>
     <message>
-      <source>Local layouts can only be shown to their owners. </source>
-      <translation>Místní rozložení lze zobrazit pouze jejich majitelům. </translation>
-    </message>
-    <message>
       <source>Select layout...</source>
       <translation>Vybrat rozložení...</translation>
     </message>
@@ -9316,6 +9066,105 @@ to %1</source>
     <message>
       <source>None of selected user roles contain users. Action will not work.</source>
       <translation type="unfinished">None of selected user roles contain users. Action will not work.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::PeerStateTracker</name>
+    <message>
+      <source>The server is taking too long to respond</source>
+      <translation type="unfinished">The server is taking too long to respond</translation>
+    </message>
+    <message>
+      <source>No update task</source>
+      <translation type="unfinished">No update task</translation>
+    </message>
+    <message>
+      <source>Ready to download update</source>
+      <translation type="unfinished">Ready to download update</translation>
+    </message>
+    <message>
+      <source>Downloading update</source>
+      <translation type="unfinished">Downloading update</translation>
+    </message>
+    <message>
+      <source>Ready to restart to the new version</source>
+      <translation type="unfinished">Ready to restart to the new version</translation>
+    </message>
+    <message>
+      <source>Installing update</source>
+      <translation type="unfinished">Installing update</translation>
+    </message>
+    <message>
+      <source>Installed</source>
+      <translation type="unfinished">Installed</translation>
+    </message>
+    <message>
+      <source>Failed to download update</source>
+      <translation type="unfinished">Failed to download update</translation>
+    </message>
+    <message>
+      <source>Failed to install update</source>
+      <translation type="unfinished">Failed to install update</translation>
+    </message>
+    <message>
+      <source>Waiting for peer data</source>
+      <translation type="unfinished">Waiting for peer data</translation>
+    </message>
+    <message>
+      <source>There is not enough space to download update files.</source>
+      <translation type="unfinished">There is not enough space to download update files.</translation>
+    </message>
+    <message>
+      <source>There is not enough space to extract update files.</source>
+      <translation type="unfinished">There is not enough space to extract update files.</translation>
+    </message>
+    <message>
+      <source>Failed to download update packages.</source>
+      <translation type="unfinished">Failed to download update packages.</translation>
+    </message>
+    <message>
+      <source>Update contents are invalid.</source>
+      <translation type="unfinished">Update contents are invalid.</translation>
+    </message>
+    <message>
+      <source>Update archive is corrupted.</source>
+      <translation type="unfinished">Update archive is corrupted.</translation>
+    </message>
+    <message>
+      <source>Update files cannot be extracted.</source>
+      <translation type="unfinished">Update files cannot be extracted.</translation>
+    </message>
+    <message>
+      <source>Internal downloader error.</source>
+      <translation type="unfinished">Internal downloader error.</translation>
+    </message>
+    <message>
+      <source>Internal client error.</source>
+      <translation type="unfinished">Internal client error.</translation>
+    </message>
+    <message>
+      <source>Unknown error.</source>
+      <translation>Neznámá chyba.</translation>
+    </message>
+    <message>
+      <source>Unexpected error code.</source>
+      <translation type="unfinished">Unexpected error code.</translation>
+    </message>
+    <message>
+      <source>Ready to install update</source>
+      <translation type="unfinished">Ready to install update</translation>
+    </message>
+    <message>
+      <source>Update package is not found.</source>
+      <translation type="unfinished">Update package is not found.</translation>
+    </message>
+    <message>
+      <source>There is not enough space to install update.</source>
+      <translation type="unfinished">There is not enough space to install update.</translation>
+    </message>
+    <message>
+      <source>Internal server error.</source>
+      <translation type="unfinished">Internal server error.</translation>
     </message>
   </context>
   <context>
@@ -9359,11 +9208,11 @@ to %1</source>
     <name>nx::vms::client::desktop::RapidReviewSettingsWidget</name>
     <message numerus="yes">
       <source>For exporting as Rapid Review video length should be at least %n seconds.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Pro export jako rychlý náhled by délka videa měla být nejméně %n sekund.</numerusform>
-        <numerusform>For exporting as Rapid Review video length should be at least %n seconds.</numerusform>
-        <numerusform>For exporting as Rapid Review video length should be at least %n seconds.</numerusform>
-        <numerusform>For exporting as Rapid Review video length should be at least %n seconds.</numerusform>
+        <numerusform>Pro export jako rychlý náhled by délka videa měla být nejméně %n sekund.</numerusform>
+        <numerusform>Pro export jako rychlý náhled by délka videa měla být nejméně %n sekund.</numerusform>
+        <numerusform>Pro export jako rychlý náhled by délka videa měla být nejméně %n sekund.</numerusform>
       </translation>
     </message>
   </context>
@@ -9462,16 +9311,79 @@ to %1</source>
       <translation>Sledovat a zaznamenávat všechny akce uživatele.</translation>
     </message>
     <message>
-      <source>User will be automatically logged out after this period of time.</source>
-      <translation type="unfinished">User will be automatically logged out after this period of time.</translation>
-    </message>
-    <message>
       <source>minutes</source>
       <translation>minuty</translation>
     </message>
     <message>
       <source>hours</source>
       <translation>hodiny</translation>
+    </message>
+    <message>
+      <source>Users will be automatically logged out if their session exceeds the specified duration.</source>
+      <translation type="unfinished">Users will be automatically logged out if their session exceeds the specified duration.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ServerSettingsDialogStore</name>
+    <message>
+      <source>Library</source>
+      <translation type="unfinished">Library</translation>
+    </message>
+    <message>
+      <source>Version</source>
+      <translation type="unfinished">Version</translation>
+    </message>
+    <message>
+      <source>Vendor</source>
+      <translation>Výrobce</translation>
+    </message>
+    <message>
+      <source>no error</source>
+      <translation type="unfinished">no error</translation>
+    </message>
+    <message>
+      <source>library file cannot be loaded</source>
+      <translation type="unfinished">library file cannot be loaded</translation>
+    </message>
+    <message>
+      <source>invalid or incompatible plugin library</source>
+      <translation type="unfinished">invalid or incompatible plugin library</translation>
+    </message>
+    <message>
+      <source>plugin library failed to initialize</source>
+      <translation type="unfinished">plugin library failed to initialize</translation>
+    </message>
+    <message>
+      <source>plugin returned bad manifest</source>
+      <translation type="unfinished">plugin returned bad manifest</translation>
+    </message>
+    <message>
+      <source>plugin API version is no longer supported</source>
+      <translation type="unfinished">plugin API version is no longer supported</translation>
+    </message>
+    <message>
+      <source>unknown error</source>
+      <translation type="unfinished">unknown error</translation>
+    </message>
+    <message>
+      <source>Not loaded</source>
+      <translation type="unfinished">Not loaded</translation>
+    </message>
+    <message>
+      <source>Loaded</source>
+      <translation type="unfinished">Loaded</translation>
+    </message>
+    <message>
+      <source>plugin is in the black list</source>
+      <translation type="unfinished">plugin is in the black list</translation>
+    </message>
+    <message>
+      <source>Status</source>
+      <translation type="unfinished">Status</translation>
+    </message>
+    <message>
+      <source>plugin is optional and is not in the white list</source>
+      <translation type="unfinished">plugin is optional and is not in the white list</translation>
     </message>
   </context>
   <context>
@@ -9492,13 +9404,24 @@ to %1</source>
       <source>Downloaded</source>
       <translation>Staženo</translation>
     </message>
+    <message>
+      <source>Waiting for server to respond...</source>
+      <translation type="unfinished">Waiting for server to respond...</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ServerUpdateTool</name>
+    <message>
+      <source>No connection to the server.</source>
+      <translation type="unfinished">No connection to the server.</translation>
+    </message>
+    <message>
+      <source>Network error.</source>
+      <translation type="unfinished">Network error.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerUpdatesModel</name>
-    <message>
-      <source>Current Version</source>
-      <translation>Aktuální verze</translation>
-    </message>
     <message>
       <source>Status</source>
       <translation>Stav</translation>
@@ -9518,6 +9441,10 @@ to %1</source>
     <message>
       <source>Component</source>
       <translation type="unfinished">Component</translation>
+    </message>
+    <message>
+      <source>Installed Version</source>
+      <translation type="unfinished">Installed Version</translation>
     </message>
   </context>
   <context>
@@ -9551,11 +9478,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n motion events</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n události pohybu</numerusform>
-        <numerusform>%n motion events</numerusform>
-        <numerusform>%n motion events</numerusform>
-        <numerusform>%n motion events</numerusform>
+        <numerusform>%n události pohybu</numerusform>
+        <numerusform>%n události pohybu</numerusform>
+        <numerusform>%n události pohybu</numerusform>
       </translation>
     </message>
     <message>
@@ -9771,11 +9698,11 @@ to %1</source>
     <name>nx::vms::client::desktop::WorkbenchExportHandler</name>
     <message numerus="yes">
       <source>%n bookmarks</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n záložky</numerusform>
-        <numerusform>%n bookmarks</numerusform>
-        <numerusform>%n bookmarks</numerusform>
-        <numerusform>%n bookmarks</numerusform>
+        <numerusform>%n záložky</numerusform>
+        <numerusform>%n záložky</numerusform>
+        <numerusform>%n záložky</numerusform>
       </translation>
     </message>
     <message>
@@ -9827,12 +9754,62 @@ to %1</source>
       <source>Starting export...</source>
       <translation type="unfinished">Starting export...</translation>
     </message>
+    <message>
+      <source>Saving layout</source>
+      <translation type="unfinished">Saving layout</translation>
+    </message>
+    <message>
+      <source>Stop Saving</source>
+      <translation type="unfinished">Stop Saving</translation>
+    </message>
+    <message>
+      <source>Saving failed</source>
+      <translation type="unfinished">Saving failed</translation>
+    </message>
+    <message>
+      <source>Starting saving...</source>
+      <translation type="unfinished">Starting saving...</translation>
+    </message>
+    <message>
+      <source>We are preparing files for the export process. Please wait for a few seconds.</source>
+      <translation type="unfinished">We are preparing files for the export process. Please wait for a few seconds.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::WorkbenchUpdateWatcher</name>
+    <message>
+      <source>%1 version available</source>
+      <translation>%1 verze je dostupná</translation>
+    </message>
+    <message>
+      <source>Release Notes</source>
+      <translation>Poznámky k vydání</translation>
+    </message>
+    <message>
+      <source>Major issues have been fixed. Update is strongly recommended.</source>
+      <translation>Hlavní problémy byly opraveny. Aktualizace je důrazně doporučena.</translation>
+    </message>
+    <message>
+      <source>Update...</source>
+      <translation>Aktualizace...</translation>
+    </message>
+    <message>
+      <source>Do not notify again about this update</source>
+      <translation>Neupozorňovat znovu na tuto aktualizaci</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::detail::BaseInputField</name>
     <message>
       <source>multiple values</source>
       <translation>více hodnot</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::integrations::entropix::ReconstructResolutionIntegration</name>
+    <message>
+      <source>Reconstruct Resolution</source>
+      <translation type="unfinished">Reconstruct Resolution</translation>
     </message>
   </context>
   <context>
@@ -10012,29 +9989,29 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Failed to move %n devices</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Nepodařilo se přesunout %n zařízení</numerusform>
-        <numerusform>Failed to move %n devices</numerusform>
-        <numerusform>Failed to move %n devices</numerusform>
-        <numerusform>Failed to move %n devices</numerusform>
+        <numerusform>Nepodařilo se přesunout %n zařízení</numerusform>
+        <numerusform>Nepodařilo se přesunout %n zařízení</numerusform>
+        <numerusform>Nepodařilo se přesunout %n zařízení</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Failed to move %n cameras</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Nepodařilo se přesunout %n kamery</numerusform>
-        <numerusform>Failed to move %n cameras</numerusform>
-        <numerusform>Failed to move %n cameras</numerusform>
-        <numerusform>Failed to move %n cameras</numerusform>
+        <numerusform>Nepodařilo se přesunout %n kamery</numerusform>
+        <numerusform>Nepodařilo se přesunout %n kamery</numerusform>
+        <numerusform>Nepodařilo se přesunout %n kamery</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Failed to move %n I/O Modules</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Nepodařilo se přesunout %n I/O moduly</numerusform>
-        <numerusform>Failed to move %n I/O Modules</numerusform>
-        <numerusform>Failed to move %n I/O Modules</numerusform>
-        <numerusform>Failed to move %n I/O Modules</numerusform>
+        <numerusform>Nepodařilo se přesunout %n I/O moduly</numerusform>
+        <numerusform>Nepodařilo se přesunout %n I/O moduly</numerusform>
+        <numerusform>Nepodařilo se přesunout %n I/O moduly</numerusform>
       </translation>
     </message>
     <message>
@@ -10043,29 +10020,29 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Server &quot;%1&quot; nemá přístup k %n zařízením. I přes to je přesunout?</numerusform>
-        <numerusform>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</numerusform>
-        <numerusform>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</numerusform>
-        <numerusform>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</numerusform>
+        <numerusform>Server &quot;%1&quot; nemá přístup k %n zařízením. I přes to je přesunout?</numerusform>
+        <numerusform>Server &quot;%1&quot; nemá přístup k %n zařízením. I přes to je přesunout?</numerusform>
+        <numerusform>Server &quot;%1&quot; nemá přístup k %n zařízením. I přes to je přesunout?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Server &quot;%1&quot; nemá přístup k %n kamerám. I přes to je přesunout?</numerusform>
-        <numerusform>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</numerusform>
-        <numerusform>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</numerusform>
-        <numerusform>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</numerusform>
+        <numerusform>Server &quot;%1&quot; nemá přístup k %n kamerám. I přes to je přesunout?</numerusform>
+        <numerusform>Server &quot;%1&quot; nemá přístup k %n kamerám. I přes to je přesunout?</numerusform>
+        <numerusform>Server &quot;%1&quot; nemá přístup k %n kamerám. I přes to je přesunout?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Server &quot;%1&quot; nemá přístup k %n I/O modulům. I přes to je přesunout?</numerusform>
-        <numerusform>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</numerusform>
-        <numerusform>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</numerusform>
-        <numerusform>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</numerusform>
+        <numerusform>Server &quot;%1&quot; nemá přístup k %n I/O modulům. I přes to je přesunout?</numerusform>
+        <numerusform>Server &quot;%1&quot; nemá přístup k %n I/O modulům. I přes to je přesunout?</numerusform>
+        <numerusform>Server &quot;%1&quot; nemá přístup k %n I/O modulům. I přes to je přesunout?</numerusform>
       </translation>
     </message>
     <message>
@@ -10110,11 +10087,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Are you sure you want to permanently delete these %n files?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Opravdu chcete tyto soubory %n natrvalo odstranit?</numerusform>
-        <numerusform>Are you sure you want to permanently delete these %n files?</numerusform>
-        <numerusform>Are you sure you want to permanently delete these %n files?</numerusform>
-        <numerusform>Are you sure you want to permanently delete these %n files?</numerusform>
+        <numerusform>Opravdu chcete tyto soubory %n natrvalo odstranit?</numerusform>
+        <numerusform>Opravdu chcete tyto soubory %n natrvalo odstranit?</numerusform>
+        <numerusform>Opravdu chcete tyto soubory %n natrvalo odstranit?</numerusform>
       </translation>
     </message>
     <message>
@@ -10202,6 +10179,28 @@ to %1</source>
     <message>
       <source>This build is for testing purposes only.</source>
       <translation type="unfinished">This build is for testing purposes only.</translation>
+    </message>
+    <message>
+      <source>Open Server Settings</source>
+      <translation type="unfinished">Open Server Settings</translation>
+    </message>
+    <message>
+      <source>OK</source>
+      <translation>OK</translation>
+    </message>
+    <message>
+      <source>Confirm storage location to store analytics data on &apos;%1&apos;</source>
+      <translation type="unfinished">Confirm storage location to store analytics data on &apos;%1&apos;</translation>
+    </message>
+    <message>
+      <source>Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
+Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
+By default analytics data will be stored in mediaserver&apos;s installation directory.
+You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</source>
+      <translation type="unfinished">Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
+Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
+By default analytics data will be stored in mediaserver&apos;s installation directory.
+You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</translation>
     </message>
   </context>
   <context>

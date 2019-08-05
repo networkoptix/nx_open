@@ -11,7 +11,9 @@
 
 #include <nx/fusion//model_functions.h>
 
-#include "mediaserver_ini.h"
+#include <nx_vms_server_ini.h>
+#include <nx/analytics/analytics_logging_ini.h>
+#include <nx/analytics/frame_info.h>
 
 namespace {
 static const qint64 CAM_NEED_CONTROL_CHECK_TIME = 1000 * 1;
@@ -53,6 +55,17 @@ CameraDiagnostics::Result CLServerPushStreamReader::diagnoseMediaStreamConnectio
 
 CameraDiagnostics::Result CLServerPushStreamReader::openStream()
 {
+    if (nx::analytics::loggingIni().isLoggingEnabled() && !m_metadataLogger)
+    {
+        m_metadataLogger = std::make_unique<nx::analytics::MetadataLogger>(
+            "spush_media_stream_provider_",
+            m_camera->getId(),
+            /*engineId*/ QnUuid(),
+            getRole() == Qn::ConnectionRole::CR_LiveVideo
+                ? nx::vms::api::StreamIndex::primary
+                : nx::vms::api::StreamIndex::secondary);
+    }
+
     return openStreamWithErrChecking(isCameraControlRequired());
 }
 
@@ -88,7 +101,12 @@ CameraDiagnostics::Result CLServerPushStreamReader::openStreamWithErrChecking(bo
     else
     {
         m_currentLiveParams = getLiveParams();
+        NX_VERBOSE(this, "Openning stream with params: %1", m_currentLiveParams);
+
         m_openStreamResult = openStreamInternal(isControlRequired, m_currentLiveParams);
+        NX_VERBOSE(this, "Open stream result: [%1]",
+            m_openStreamResult.toString(serverModule()->resourcePool()));
+
         m_needControlTimer.restart();
         m_openedWithStreamCtrl = isControlRequired;
     }
@@ -118,7 +136,7 @@ void CLServerPushStreamReader::run()
 {
     initSystemThreadId();
     setPriority(QThread::HighPriority);
-    NX_VERBOSE(this, "stream reader started");
+    NX_VERBOSE(this, "Starting run loop");
 
     beforeRun();
 
@@ -168,6 +186,9 @@ void CLServerPushStreamReader::run()
             data->flags |= QnAbstractMediaData::MediaFlags_LIVE;
 
         checkAndFixTimeFromCamera(data);
+
+        if (m_metadataLogger)
+            m_metadataLogger->pushData(data);
 
         QnCompressedVideoDataPtr videoData = std::dynamic_pointer_cast<QnCompressedVideoData>(data);
         QnCompressedAudioDataPtr audioData = std::dynamic_pointer_cast<QnCompressedAudioData>(data);
@@ -227,7 +248,7 @@ void CLServerPushStreamReader::run()
 
     afterRun();
 
-    NX_VERBOSE(this, "stream reader stopped");
+    NX_VERBOSE(this, "Run loop has finished");
 }
 
 void CLServerPushStreamReader::beforeRun()

@@ -58,13 +58,12 @@ View::View(
         &controller->listeningPeerManager(),
         &model->listeningPeerPool()),
     m_clientConnectionTunnelingServer(&m_controller->connectSessionManager()),
-    m_authenticationManager(m_authRestrictionList),
     m_multiAddressHttpServer(
         &m_authenticationDispatcher,
         &m_httpMessageDispatcher)
 {
+    loadHtdigestAuthenticatorIfNeeded(settings);
     registerApiHandlers();
-    registerAuthenticators();
     initializeProxy();
     loadSslCertificate();
     startAcceptor();
@@ -83,6 +82,9 @@ void View::registerStatisticsApiHandlers(
         api::kRelayStatisticsMetricsPath,
         std::bind(&AbstractStatisticsProvider::getAllStatistics, &statisticsProvider),
         nx::network::http::Method::get);
+
+    addPathToHtdigestAuthenticatorIfLoaded(
+        network::url::joinPath(api::kRelayStatisticsPath, "/.*"));
 }
 
 void View::start()
@@ -99,6 +101,10 @@ void View::start()
             lm("Cannot start listening: %1")
                 .args(SystemError::getLastOSErrorText()).toStdString());
     }
+
+    NX_INFO(this, "HTTP server is listening on %1, ssl: %2",
+        containerString(m_multiAddressHttpServer.endpoints()),
+        containerString(m_multiAddressHttpServer.sslEndpoints()));
 }
 
 std::vector<network::SocketAddress> View::httpEndpoints() const
@@ -116,24 +122,30 @@ const nx::network::http::server::MultiEndpointAcceptor& View::httpServer() const
     return m_multiAddressHttpServer;
 }
 
-void View::registerAuthenticators()
+nx::network::http::server::rest::MessageDispatcher& View::messageDispatcher()
 {
-    if (!m_settings.http().maintenanceHtdigestPath.empty())
+    return m_httpMessageDispatcher;
+}
+
+void View::loadHtdigestAuthenticatorIfNeeded(const conf::Settings& settings)
+{
+    if (!settings.http().maintenanceHtdigestPath.empty())
     {
-        NX_INFO(
-            this,
-            lm("htdigest authentication for traffic relay maintenance server enabled. File path: %1")
-               .arg(m_settings.http().maintenanceHtdigestPath));
+        NX_INFO(this, "Htdigest authentication for traffic relay enabled. File path: %1",
+                m_settings.http().maintenanceHtdigestPath);
 
-        m_maintenanceAuthenticator = std::make_unique<MaintenanceAuthenticator>(
+        m_htdigestAuthenticator = std::make_unique<HtdigestAuthenticator>(
             m_settings.http().maintenanceHtdigestPath);
-
-        m_authenticationDispatcher.add(
-            std::regex(network::url::joinPath(m_maintenanceServer.maintenancePath(), "/.*")),
-            &m_maintenanceAuthenticator->manager);
     }
+}
 
-    m_authenticationDispatcher.add(std::regex(".*"), &m_authenticationManager);
+void View::addPathToHtdigestAuthenticatorIfLoaded(const std::string& regex)
+{
+    if (m_htdigestAuthenticator)
+    {
+        NX_INFO(this, "Adding api path regex: '%1' to htdigest authenticator", regex);
+        m_authenticationDispatcher.add(std::regex(regex), &m_htdigestAuthenticator->manager);
+    }
 }
 
 void View::registerApiHandlers()
@@ -169,6 +181,9 @@ void View::registerApiHandlers()
     m_maintenanceServer.registerRequestHandlers(
         api::kApiPrefix,
         &m_httpMessageDispatcher);
+
+    addPathToHtdigestAuthenticatorIfLoaded(
+        network::url::joinPath(m_maintenanceServer.maintenancePath(), "/.*"));
 }
 
 template<typename Handler, typename ... Args>
@@ -229,7 +244,7 @@ void View::startAcceptor()
     const auto& httpsEndpoints = m_settings.https().endpoints;
     if (httpEndpoints.empty() && httpsEndpoints.empty())
     {
-        NX_ALWAYS(this, "No HTTP address to listen");
+        NX_ERROR(this, "No HTTP address to listen");
         throw std::runtime_error("No HTTP address to listen");
     }
 

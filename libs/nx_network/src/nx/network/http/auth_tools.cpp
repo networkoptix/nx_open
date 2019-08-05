@@ -325,7 +325,22 @@ bool validateAuthorization(
     const boost::optional<BufferType>& predefinedHa1,
     const header::DigestAuthorization& digestAuthorizationHeader)
 {
-    const auto& digestParams = digestAuthorizationHeader.digest->params;
+    return validateAuthorization(
+        method,
+        userName,
+        userPassword,
+        predefinedHa1,
+        *digestAuthorizationHeader.digest);
+}
+
+bool validateAuthorization(
+    const StringType& method,
+    const StringType& userName,
+    const boost::optional<StringType>& userPassword,
+    const boost::optional<BufferType>& predefinedHa1,
+    const header::DigestCredentials& digestAuthorizationHeader)
+{
+    const auto& digestParams = digestAuthorizationHeader.params;
 
     const auto uri = fieldOrEmpty(digestParams, "uri");
     if (uri.isEmpty())
@@ -346,6 +361,34 @@ bool validateAuthorization(
     const auto calculatedResponse = fieldOrEmpty(outputParams, "response");
     const auto response = fieldOrEmpty(digestParams, "response");
     return !response.isEmpty() && response == calculatedResponse;
+}
+
+bool validateAuthorization(
+    const StringType& method,
+    const Credentials& credentials,
+    const header::DigestAuthorization& digestAuthorizationHeader)
+{
+    return validateAuthorization(
+        method,
+        credentials,
+        *digestAuthorizationHeader.digest);
+}
+
+bool validateAuthorization(
+    const StringType& method,
+    const Credentials& credentials,
+    const header::DigestCredentials& digestAuthorizationHeader)
+{
+    return validateAuthorization(
+        method,
+        credentials.username.toUtf8(),
+        credentials.authToken.type == AuthTokenType::password
+            ? boost::make_optional(credentials.authToken.value)
+            : boost::none,
+        credentials.authToken.type == AuthTokenType::ha1
+            ? boost::make_optional(credentials.authToken.value)
+            : boost::none,
+        digestAuthorizationHeader);
 }
 
 static const size_t MD5_CHUNK_LEN = 64;

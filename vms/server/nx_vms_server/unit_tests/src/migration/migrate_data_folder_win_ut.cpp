@@ -25,13 +25,13 @@ TEST(MigrateWinData, NoWinDir)
     MigrateDataTestHandler handler;
     EXPECT_CALL(handler, currentDataDir())
         .Times(1)
-        .WillOnce(Return(lit("c:\\windows\\data")));
+        .WillOnce(Return("c:\\windows\\data"));
 
     EXPECT_CALL(handler, windowsDir())
         .Times(1)
         .WillOnce(Return(QString()));
 
-    ASSERT_EQ(nx::misc::migrateFilesFromWindowsOldDir(&handler), 
+    ASSERT_EQ(nx::misc::migrateFilesFromWindowsOldDir(&handler),
               nx::misc::MigrateDataResult::WinDirNotFound);
 }
 
@@ -40,13 +40,13 @@ TEST(MigrateWinData, CurrentDataDirNotInWindowsFolder)
     MigrateDataTestHandler handler;
     EXPECT_CALL(handler, currentDataDir())
         .Times(1)
-        .WillOnce(Return(lit("c:\\data")));
+        .WillOnce(Return("c:\\data"));
 
     EXPECT_CALL(handler, windowsDir())
         .Times(1)
-        .WillOnce(Return(lit("c:\\windows")));
+        .WillOnce(Return("c:\\windows"));
 
-    ASSERT_EQ(nx::misc::migrateFilesFromWindowsOldDir(&handler), 
+    ASSERT_EQ(nx::misc::migrateFilesFromWindowsOldDir(&handler),
               nx::misc::MigrateDataResult::NoNeedToMigrate);
 }
 
@@ -54,15 +54,15 @@ TEST(MigrateWinData, OldDirDoesntExist)
 {
     MigrateDataTestHandler handler;
     EXPECT_CALL(handler, currentDataDir())
-        .WillRepeatedly(Return(lit("c:\\windows\\data")));
+        .WillRepeatedly(Return("c:\\windows\\data"));
 
     EXPECT_CALL(handler, windowsDir())
-        .WillRepeatedly(Return(lit("c:\\windows")));
+        .WillRepeatedly(Return("c:\\windows"));
 
     EXPECT_CALL(handler, dirExists(_))
         .WillRepeatedly(Return(false));
 
-    ASSERT_EQ(nx::misc::migrateFilesFromWindowsOldDir(&handler), 
+    ASSERT_EQ(nx::misc::migrateFilesFromWindowsOldDir(&handler),
               nx::misc::MigrateDataResult::NoNeedToMigrate);
 }
 
@@ -78,10 +78,10 @@ enum class MoveData
 void whenEverythingAlmostOk(MigrateDataTestHandler& handler, MoveData moveDataFlag, const QString& oldDataDir)
 {
     EXPECT_CALL(handler, currentDataDir())
-        .WillRepeatedly(Return(lit("c:\\windows\\data")));
+        .WillRepeatedly(Return("c:\\windows\\data"));
 
     EXPECT_CALL(handler, windowsDir())
-        .WillRepeatedly(Return(lit("c:\\windows")));
+        .WillRepeatedly(Return("c:\\windows"));
 
     EXPECT_CALL(handler, dirExists(_))
         .WillRepeatedly(Return(false));
@@ -103,15 +103,15 @@ TEST(MigrateWinData, VariousOldDirs)
     MigrateDataTestHandler handler;
 
     std::array<QString, 2> oldDataDirPaths = {
-        lit("c:\\windows.old\\data"),
-        lit("c:\\windows.000\\data")
+        "c:\\windows.old\\data",
+        "c:\\windows.000\\data"
     };
 
     for (const auto oldDataDir: oldDataDirPaths)
     {
         whenEverythingAlmostOk(handler, MoveData::Successfull, oldDataDir);
 
-        ASSERT_EQ(nx::misc::migrateFilesFromWindowsOldDir(&handler), 
+        ASSERT_EQ(nx::misc::migrateFilesFromWindowsOldDir(&handler),
                   nx::misc::MigrateDataResult::Ok);
     }
 }
@@ -119,9 +119,9 @@ TEST(MigrateWinData, VariousOldDirs)
 TEST(MigrateWinData, MoveDataFailed)
 {
     MigrateDataTestHandler handler;
-    whenEverythingAlmostOk(handler, MoveData::Failed, lit("c:\\windows.000\\data"));
+    whenEverythingAlmostOk(handler, MoveData::Failed, "c:\\windows.000\\data");
 
-    ASSERT_EQ(nx::misc::migrateFilesFromWindowsOldDir(&handler), 
+    ASSERT_EQ(nx::misc::migrateFilesFromWindowsOldDir(&handler),
               nx::misc::MigrateDataResult::MoveDataFailed);
 }
 

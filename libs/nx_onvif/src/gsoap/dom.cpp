@@ -1,13 +1,13 @@
 /*
         dom.c[pp]
 
-        DOM API v5 gSOAP 2.8.66
+        DOM API v5 gSOAP 2.8.86
 
         See gsoap/doc/dom/html/index.html for the new DOM API v5 documentation
         Also located in /gsoap/samples/dom/README.md
 
 gSOAP XML Web services tools
-Copyright (C) 2000-2017, Robert van Engelen, Genivia, Inc. All Rights Reserved.
+Copyright (C) 2000-2019, Robert van Engelen, Genivia, Inc. All Rights Reserved.
 This part of the software is released under ONE of the following licenses:
 GPL, or the gSOAP public license, or Genivia's license for commercial use.
 --------------------------------------------------------------------------------
@@ -50,7 +50,7 @@ A commercial use license is available from Genivia, Inc., contact@genivia.com
 */
 
 /** Compatibility requirement with gSOAP engine version */
-#define GSOAP_LIB_VERSION 20866
+#define GSOAP_LIB_VERSION 20886
 
 #include "stdsoap2.h"
 
@@ -86,7 +86,7 @@ namespace SOAP_DOM_EXTERNAL_NAMESPACE {
 SOAP_FMAC3 void SOAP_FMAC4 soap_markelement(struct soap*, const void*, int);
 #endif
 
-SOAP_FMAC3 void * SOAP_FMAC4 soap_getelement(struct soap*, int*);
+SOAP_FMAC3 void * SOAP_FMAC4 soap_getelement(struct soap*, const char*, int*);
 SOAP_FMAC3 int SOAP_FMAC4 soap_putelement(struct soap*, const void*, const char*, int, int);
 SOAP_FMAC3 void * SOAP_FMAC4 soap_dupelement(struct soap*, const void*, int);
 SOAP_FMAC3 void SOAP_FMAC4 soap_delelement(const void*, int);
@@ -103,7 +103,7 @@ extern "C" {
 SOAP_FMAC3 void SOAP_FMAC4 soap_markelement(struct soap*, const void*, int);
 #endif
 
-SOAP_FMAC3 void * SOAP_FMAC4 soap_getelement(struct soap*, int*);
+SOAP_FMAC3 void * SOAP_FMAC4 soap_getelement(struct soap*, const char*, int*);
 SOAP_FMAC3 int SOAP_FMAC4 soap_putelement(struct soap*, const void*, const char*, int, int);
 SOAP_FMAC3 void * SOAP_FMAC4 soap_dupelement(struct soap*, const void*, int);
 SOAP_FMAC3 void SOAP_FMAC4 soap_delelement(const void*, int);
@@ -250,13 +250,16 @@ out_element(struct soap *soap, const struct soap_dom_element *node, const char *
         return soap->error = SOAP_EOM;
       (SOAP_SNPRINTF(s, l + 2, l + 1), "%s:%s", prefix, name);
     }
-    for (p = soap->local_namespaces; p && p->id; p++)
+    if (!(soap->mode & SOAP_DOM_ASIS))
     {
-      if (p->ns && soap_push_prefix(soap, p->id, strlen(p->id), p->ns, 1, 0) == NULL)
+      for (p = soap->local_namespaces; p && p->id; p++)
       {
-        if (s)
-          SOAP_FREE(soap, s);
-        return soap->error;
+        if (p->ns && soap_push_prefix(soap, p->id, strlen(p->id), p->ns, 1, 0) == NULL)
+        {
+          if (s)
+            SOAP_FREE(soap, s);
+          return soap->error;
+        }
       }
     }
 #ifdef SOAP_DOM_EXTERNAL_NAMESPACE
@@ -642,11 +645,11 @@ soap_in_xsd__anyType(struct soap *soap, const char *tag, struct soap_dom_element
   {
     soap->mode = m;
 #ifdef SOAP_DOM_EXTERNAL_NAMESPACE
-    node->node = SOAP_DOM_EXTERNAL_NAMESPACE::soap_getelement(soap, &node->type);
+    node->node = SOAP_DOM_EXTERNAL_NAMESPACE::soap_getelement(soap, NULL, &node->type);
     if ((!node->node || !node->type) && soap->error == SOAP_TAG_MISMATCH)
-      node->node = ::soap_getelement(soap, &node->type);
+      node->node = ::soap_getelement(soap, NULL, &node->type);
 #else
-    node->node = soap_getelement(soap, &node->type);
+    node->node = soap_getelement(soap, NULL, &node->type);
 #endif
     if (node->node && node->type)
     {
@@ -820,7 +823,7 @@ soap_dup_xsd__anyType(struct soap *soap, struct soap_dom_element *d, const struc
     d->node = NULL;
   }
 #else
-  d->node = a->node ? soap_dupelement(soap, a->node, a->type) : NULL;
+  d->node = soap_dupelement(soap, a->node, a->type);
 #endif
   d->type = a->type;
   d->atts = soap_dup_xsd__anyAttribute(soap, NULL, a->atts);
@@ -832,6 +835,7 @@ soap_dup_xsd__anyType(struct soap *soap, struct soap_dom_element *d, const struc
       elt = d->elts = soap_dup_xsd__anyType(soap, NULL, a);
     elt->prnt = d;
   }
+  d->soap = soap;
   return d;
 }
 
@@ -862,8 +866,7 @@ soap_del_xsd__anyType(const struct soap_dom_element *a)
       ::soap_delelement(a->node, a->type);
     }
 #else
-    if (a->node)
-      soap_delelement(a->node, a->type);
+    soap_delelement(a->node, a->type);
 #endif
     if (a->atts)
     {
@@ -907,6 +910,7 @@ soap_dup_xsd__anyAttribute(struct soap *soap, struct soap_dom_attribute *d, cons
       att = att->next;
     }
   }
+  d->soap = soap;
   return d;
 }
 
@@ -980,7 +984,8 @@ soap_push_prefix(struct soap *soap, const char *id, size_t n, const char *ns, in
         for (np = soap->nlist; np; np = np->next)
         {
           DBGLOG(TEST, SOAP_MESSAGE(fdebug, "DOM find binding %s = '%s' level = %d index = %d\n", np->id, np->ns, np->level, np->index));
-          i++;
+          if (np->level)
+            i++;
         }
         (SOAP_SNPRINTF(soap->tag, sizeof(soap->tag), sizeof(SOAP_DOMID_FORMAT) + 20), SOAP_DOMID_FORMAT, i);
         id = soap->tag;
@@ -3290,11 +3295,11 @@ soap_dom_call(struct soap *soap, const char *endpoint, const char *action, const
     if (!soap_begin_recv(soap))
     {
 #ifndef WITH_LEAN
-      (void)soap_get_http_body(soap, NULL);
+      (void)soap_http_get_body(soap, NULL);
 #endif
       (void)soap_end_recv(soap);
     }
-    else if (soap->error == SOAP_NO_DATA || soap->error == 200 || soap->error == 202)
+    else if (soap->error == 200 || soap->error == 201 || soap->error == 202)
       soap->error = SOAP_OK;
     return soap_closesock(soap);
   }

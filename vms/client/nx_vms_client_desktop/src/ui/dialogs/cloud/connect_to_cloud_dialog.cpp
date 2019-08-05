@@ -33,6 +33,7 @@
 #include <nx/vms/client/desktop/common/widgets/busy_indicator_button.h>
 #include <nx/vms/client/desktop/common/widgets/input_field.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/ini.h>
 #include <nx/network/app_info.h>
 #include <nx/utils/guarded_callback.h>
 
@@ -368,7 +369,7 @@ void QnConnectToCloudDialogPrivate::at_bindFinished(
             if (guard && parentGuard && (!success || (reply.error != QnRestResult::NoError)))
             {
                 QString errorMessage = tr("Internal server error. Please try again later.");
-                if (qnRuntime->isDevMode())
+                if (ini().developerMode)
                     errorMessage += '\n' + reply.errorString;
 
                 showFailure(errorMessage);

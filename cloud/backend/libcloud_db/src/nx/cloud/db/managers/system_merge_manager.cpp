@@ -16,7 +16,7 @@ SystemMergeManager::SystemMergeManager(
     AbstractSystemManager* systemManager,
     const AbstractSystemHealthInfoProvider& systemHealthInfoProvider,
     AbstractVmsGateway* vmsGateway,
-    nx::sql::AsyncSqlQueryExecutor* queryExecutor)
+    nx::sql::AbstractAsyncSqlQueryExecutor* queryExecutor)
     :
     m_systemManager(systemManager),
     m_systemHealthInfoProvider(systemHealthInfoProvider),
@@ -347,6 +347,7 @@ void SystemMergeManager::finishMerge(
         const auto it = m_currentRequests.find(mergeRequestContextPtr);
         NX_CRITICAL(it != m_currentRequests.end());
         mergeRequestContext.swap(it->second);
+        m_currentRequests.erase(it);
     }
 
     mergeRequestContext->completionHandler(result);

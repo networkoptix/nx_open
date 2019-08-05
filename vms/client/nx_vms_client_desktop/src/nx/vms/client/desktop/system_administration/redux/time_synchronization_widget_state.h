@@ -33,8 +33,10 @@ struct TimeSynchronizationWidgetState: AbstractReduxState
     // Previous selected time server.
     QnUuid lastPrimaryServer;
 
+    milliseconds baseTime = 0ms;
+    milliseconds elapsedTime = 0ms;
+
     milliseconds commonTimezoneOffset = 0ms;
-    milliseconds vmsTime = 0ms;
     Status status = Status::synchronizedWithInternet;
 
     struct ServerInfo

@@ -1,10 +1,14 @@
 #include "object_detection_metadata.h"
 
+#include <QtCore/QRegularExpression>
+
 #include <nx/kit/debug.h>
 
 #include <nx/fusion/model_functions.h>
 #include <nx/streaming/media_data_packet.h>
 #include <nx/utils/log/log_message.h>
+
+#include <utils/math/math.h>
 
 namespace nx {
 namespace common {
@@ -38,8 +42,46 @@ bool operator==(const DetectedObject& left, const DetectedObject& right)
 {
     return left.objectTypeId == right.objectTypeId
         && left.objectId == right.objectId
-        && left.boundingBox == right.boundingBox
+        && equalWithPrecision(left.boundingBox, right.boundingBox, kCoordinateDecimalDigits)
         && left.labels == right.labels;
+}
+
+QString toString(const DetectedObject& object)
+{
+    QString s =
+        "x " + QString::number(object.boundingBox.x())
+        + ", y " + QString::number(object.boundingBox.y())
+        + ", width " + QString::number(object.boundingBox.width())
+        + ", height " + QString::number(object.boundingBox.height())
+        + ", id " + object.objectId.toString()
+        + ", typeId " + object.objectTypeId
+        + ", attributes {";
+
+    const QRegularExpression kExpectedCharsOnlyRegex("\\A[A-Za-z_0-9.]+\\z");
+
+    bool isFirstAttribute = true;
+    for (const auto& attribute: object.labels)
+    {
+        if (isFirstAttribute)
+            isFirstAttribute = false;
+        else
+            s += ", ";
+
+        // If attribute.name is empty or contains chars other than letters, underscores, digits, or
+        // dots, then properly enquote it with escaping.
+        if (kExpectedCharsOnlyRegex.match(attribute.name).hasMatch())
+            s += attribute.name;
+        else
+            s += nx::kit::utils::toString(attribute.name).c_str();
+
+        s += ": ";
+        // Properly enquote the value string with escaping.
+        s += nx::kit::utils::toString(attribute.value.toUtf8().constData()).c_str();
+    }
+
+    s += "}";
+    s += QString(", isBestShot ") + (object.bestShot ? "true" : "false");
+    return s;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -62,31 +104,7 @@ QString toString(const DetectionMetadataPacket& packet)
         + lit(", objects: ") + QString::number(packet.objects.size()) + lit("\n");
 
     for (const auto& object: packet.objects)
-    {
-        s += lit("    x ") + QString::number(object.boundingBox.x())
-            + lit(", y ") + QString::number(object.boundingBox.y())
-            + lit(", w ") + QString::number(object.boundingBox.width())
-            + lit(", h ") + QString::number(object.boundingBox.height())
-            + lit(", id ") + object.objectId.toString()
-            + lit(", typeId ") + object.objectTypeId
-            + lit(", labels [");
-
-        bool isLabelFirst = true;
-        for (const auto& label: object.labels)
-        {
-            if (isLabelFirst)
-                isLabelFirst = false;
-            else
-                s += lit(", ");
-            s += label.name + lit("=\"")
-                + QString::fromStdString(
-                    //< Properly escape the value string.
-                    nx::kit::utils::toString(label.value.toUtf8().constData()))
-                + lit("\"");
-        }
-
-        s += lit("]\n");
-    }
+        s += "    " + toString(object) + "\n";
 
     return s;
 }

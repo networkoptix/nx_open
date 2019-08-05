@@ -41,7 +41,7 @@
     <message>
       <location/>
       <source>ARM support policy</source>
-      <translation type="unfinished">ARM support policy</translation>
+      <translation>ARM支持政策</translation>
     </message>
   </context>
   <context>
@@ -320,7 +320,7 @@
     <message>
       <location/>
       <source>on the next day</source>
-      <translation type="unfinished">on the next day</translation>
+      <translation>第二天</translation>
     </message>
   </context>
   <context>
@@ -665,47 +665,47 @@
     <message>
       <location/>
       <source>Custom Media Port</source>
-      <translation type="unfinished">Custom Media Port</translation>
+      <translation>自定义媒体端</translation>
     </message>
     <message>
       <location/>
       <source>Trust camera timestamp</source>
-      <translation type="unfinished">Trust camera timestamp</translation>
+      <translation>信任摄像机的时间戳记</translation>
     </message>
     <message>
       <location/>
       <source>Preferred PTZ preset type:</source>
-      <translation type="unfinished">Preferred PTZ preset type:</translation>
+      <translation>首选PTZ预设类型：</translation>
     </message>
     <message>
       <location/>
       <source>System</source>
-      <translation type="unfinished">System</translation>
+      <translation>系统</translation>
     </message>
     <message>
       <location/>
       <source>Native</source>
-      <translation type="unfinished">Native</translation>
+      <translation>原生</translation>
     </message>
     <message>
       <location/>
       <source>Native camera presets will not be avaliable.</source>
-      <translation type="unfinished">Native camera presets will not be avaliable.</translation>
+      <translation>摄像机预置点将无法使用。</translation>
     </message>
     <message>
       <location/>
       <source>This camera supports pan and tilt</source>
-      <translation type="unfinished">This camera supports pan and tilt</translation>
+      <translation>此摄相机支援水平和垂直摇摄</translation>
     </message>
     <message>
       <location/>
       <source>This camera supports zoom</source>
-      <translation type="unfinished">This camera supports zoom</translation>
+      <translation>此摄相机支援變焦</translation>
     </message>
     <message>
       <location/>
       <source>Detect motion during archive import</source>
-      <translation type="unfinished">Detect motion during archive import</translation>
+      <translation>在导入档案时侦测到移动</translation>
     </message>
   </context>
   <context>
@@ -1044,7 +1044,7 @@
     <message>
       <location/>
       <source>Hint</source>
-      <translation type="unfinished">Hint</translation>
+      <translation>提示</translation>
     </message>
     <message>
       <location/>
@@ -1089,12 +1089,30 @@
     <message>
       <location/>
       <source>Add Devices</source>
-      <translation type="unfinished">Add Devices</translation>
+      <translation>添加设备</translation>
     </message>
     <message>
       <location/>
       <source>Default</source>
       <translation>默认</translation>
+    </message>
+  </context>
+  <context>
+    <name>EulaDialog</name>
+    <message>
+      <location filename="../src/nx/vms/client/desktop/ui/dialogs/eula_dialog.ui"/>
+      <source>Copy to Clipboard</source>
+      <translation>复制到剪贴板</translation>
+    </message>
+    <message>
+      <location/>
+      <source>I Do Not Agree</source>
+      <translation>不同意</translation>
+    </message>
+    <message>
+      <location/>
+      <source>I Agree</source>
+      <translation>同意</translation>
     </message>
   </context>
   <context>
@@ -1230,7 +1248,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/export/widgets/export_password_widget.ui"/>
       <source>Protect with password</source>
-      <translation type="unfinished">Protect with password</translation>
+      <translation>使用密码保护</translation>
     </message>
     <message>
       <location/>
@@ -1274,7 +1292,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_dialogs/details/filtered_resource_selection_widget.ui"/>
       <source>Nothing matches your search</source>
-      <translation type="unfinished">Nothing matches your search</translation>
+      <translation>没有项目符合您的搜索。</translation>
     </message>
   </context>
   <context>
@@ -1397,11 +1415,6 @@
     </message>
     <message>
       <location/>
-      <source>None</source>
-      <translation>无</translation>
-    </message>
-    <message>
-      <location/>
       <source>Second Source</source>
       <translation>第二个来源</translation>
     </message>
@@ -1504,174 +1517,6 @@
     </message>
   </context>
   <context>
-    <name>InteractiveSettingsTestDialog</name>
-    <message>
-      <location filename="../src/nx/vms/client/desktop/interactive_settings/dialogs/interactive_settings_test_dialog.ui"/>
-      <source>{
-    &quot;items&quot;: [
-        {
-            &quot;type&quot;: &quot;TextField&quot;,
-            &quot;name&quot;: &quot;text&quot;,
-            &quot;caption&quot;: &quot;Text Field&quot;,
-            &quot;description&quot;: &quot;A text field&quot;,
-            &quot;defaultValue&quot;: &quot;a text&quot;,
-            &quot;value&quot;: &quot;a text&quot;
-        },
-        {
-            &quot;type&quot;: &quot;GroupBox&quot;,
-            &quot;name&quot;: &quot;group&quot;,
-            &quot;caption&quot;: &quot;Group Box&quot;,
-            &quot;items&quot;: [
-                {
-                    &quot;type&quot;: &quot;SpinBox&quot;,
-                    &quot;name&quot;: &quot;number&quot;,
-                    &quot;caption&quot;: &quot;Spin Box&quot;,
-                    &quot;description&quot;: &quot;A number&quot;,
-                    &quot;defaultValue&quot;: 42,
-                    &quot;value&quot;: 42,
-                    &quot;minValue&quot;: 0,
-                    &quot;maxValue&quot;: 100
-                },
-                {
-                    &quot;type&quot;: &quot;DoubleSpinBox&quot;,
-                    &quot;name&quot;: &quot;double&quot;,
-                    &quot;caption&quot;: &quot;Double Spin Box&quot;,
-                    &quot;description&quot;: &quot;A real number&quot;,
-                    &quot;defaultValue&quot;: 3.14,
-                    &quot;value&quot;: 3.14,
-                    &quot;minValue&quot;: 0.0,
-                    &quot;maxValue&quot;: 100.0
-                },
-                {
-                    &quot;type&quot;: &quot;ComboBox&quot;,
-                    &quot;name&quot;: &quot;combobox&quot;,
-                    &quot;caption&quot;: &quot;Combo Box&quot;,
-                    &quot;description&quot;: &quot;A choice&quot;,
-                    &quot;defaultValue&quot;: &quot;value2&quot;,
-                    &quot;value&quot;: &quot;value2&quot;,
-                    &quot;range&quot;: [&quot;value1&quot;, &quot;value2&quot;, &quot;value3&quot;]
-                },
-                {
-                    &quot;type&quot;: &quot;CheckBox&quot;,
-                    &quot;name&quot;: &quot;checkbox&quot;,
-                    &quot;caption&quot;: &quot;Check Box&quot;,
-                    &quot;description&quot;: &quot;True or False&quot;,
-                    &quot;defaultValue&quot;: true,
-                    &quot;value&quot;: true
-                },
-                {
-                    &quot;type&quot;: &quot;GroupBox&quot;,
-                    &quot;name&quot;: &quot;buttons&quot;,
-                    &quot;caption&quot;: &quot;Buttons&quot;,
-                    &quot;items&quot;: [
-                        {
-                            &quot;type&quot;: &quot;Row&quot;,
-                            &quot;name&quot;: &quot;row&quot;,
-                            &quot;items&quot;: [
-                                {
-                                    &quot;type&quot;: &quot;Button&quot;,
-                                    &quot;name&quot;: &quot;button1&quot;,
-                                    &quot;caption&quot;: &quot;Button 1&quot;,
-                                    &quot;description&quot;: &quot;Action 1&quot;
-                                },
-                                {
-                                    &quot;type&quot;: &quot;Button&quot;,
-                                    &quot;name&quot;: &quot;button2&quot;,
-                                    &quot;caption&quot;: &quot;Button 2&quot;,
-                                    &quot;description&quot;: &quot;Action 2&quot;
-                                }
-                            ]
-                        }
-                    ]
-                }
-            ]
-        }
-    ]
-}</source>
-      <translation type="unfinished">{
-    &quot;items&quot;: [
-        {
-            &quot;type&quot;: &quot;TextField&quot;,
-            &quot;name&quot;: &quot;text&quot;,
-            &quot;caption&quot;: &quot;Text Field&quot;,
-            &quot;description&quot;: &quot;A text field&quot;,
-            &quot;defaultValue&quot;: &quot;a text&quot;,
-            &quot;value&quot;: &quot;a text&quot;
-        },
-        {
-            &quot;type&quot;: &quot;GroupBox&quot;,
-            &quot;name&quot;: &quot;group&quot;,
-            &quot;caption&quot;: &quot;Group Box&quot;,
-            &quot;items&quot;: [
-                {
-                    &quot;type&quot;: &quot;SpinBox&quot;,
-                    &quot;name&quot;: &quot;number&quot;,
-                    &quot;caption&quot;: &quot;Spin Box&quot;,
-                    &quot;description&quot;: &quot;A number&quot;,
-                    &quot;defaultValue&quot;: 42,
-                    &quot;value&quot;: 42,
-                    &quot;minValue&quot;: 0,
-                    &quot;maxValue&quot;: 100
-                },
-                {
-                    &quot;type&quot;: &quot;DoubleSpinBox&quot;,
-                    &quot;name&quot;: &quot;double&quot;,
-                    &quot;caption&quot;: &quot;Double Spin Box&quot;,
-                    &quot;description&quot;: &quot;A real number&quot;,
-                    &quot;defaultValue&quot;: 3.14,
-                    &quot;value&quot;: 3.14,
-                    &quot;minValue&quot;: 0.0,
-                    &quot;maxValue&quot;: 100.0
-                },
-                {
-                    &quot;type&quot;: &quot;ComboBox&quot;,
-                    &quot;name&quot;: &quot;combobox&quot;,
-                    &quot;caption&quot;: &quot;Combo Box&quot;,
-                    &quot;description&quot;: &quot;A choice&quot;,
-                    &quot;defaultValue&quot;: &quot;value2&quot;,
-                    &quot;value&quot;: &quot;value2&quot;,
-                    &quot;range&quot;: [&quot;value1&quot;, &quot;value2&quot;, &quot;value3&quot;]
-                },
-                {
-                    &quot;type&quot;: &quot;CheckBox&quot;,
-                    &quot;name&quot;: &quot;checkbox&quot;,
-                    &quot;caption&quot;: &quot;Check Box&quot;,
-                    &quot;description&quot;: &quot;True or False&quot;,
-                    &quot;defaultValue&quot;: true,
-                    &quot;value&quot;: true
-                },
-                {
-                    &quot;type&quot;: &quot;GroupBox&quot;,
-                    &quot;name&quot;: &quot;buttons&quot;,
-                    &quot;caption&quot;: &quot;Buttons&quot;,
-                    &quot;items&quot;: [
-                        {
-                            &quot;type&quot;: &quot;Row&quot;,
-                            &quot;name&quot;: &quot;row&quot;,
-                            &quot;items&quot;: [
-                                {
-                                    &quot;type&quot;: &quot;Button&quot;,
-                                    &quot;name&quot;: &quot;button1&quot;,
-                                    &quot;caption&quot;: &quot;Button 1&quot;,
-                                    &quot;description&quot;: &quot;Action 1&quot;
-                                },
-                                {
-                                    &quot;type&quot;: &quot;Button&quot;,
-                                    &quot;name&quot;: &quot;button2&quot;,
-                                    &quot;caption&quot;: &quot;Button 2&quot;,
-                                    &quot;description&quot;: &quot;Action 2&quot;
-                                }
-                            ]
-                        }
-                    ]
-                }
-            ]
-        }
-    ]
-}</translation>
-    </message>
-  </context>
-  <context>
     <name>IoModuleSettingsWidget</name>
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_properties/camera/widgets/io_module_settings_widget.ui"/>
@@ -1767,7 +1612,7 @@
     <message>
       <location/>
       <source>Minimum Grid Size</source>
-      <translation type="unfinished">Minimum Grid Size</translation>
+      <translation>最小网格尺寸</translation>
     </message>
   </context>
   <context>
@@ -1828,12 +1673,12 @@
     <message>
       <location/>
       <source>Search Timeout (s)</source>
-      <translation type="unfinished">Search Timeout (s)</translation>
+      <translation>允许搜寻连线时间 (秒)</translation>
     </message>
     <message>
       <location/>
       <source>Admin DN or CN</source>
-      <translation type="unfinished">Admin DN or CN</translation>
+      <translation>管理员DN或CN</translation>
     </message>
   </context>
   <context>
@@ -2124,14 +1969,6 @@
     </message>
   </context>
   <context>
-    <name>MessageBox</name>
-    <message>
-      <location filename="../src/ui/dialogs/common/message_box.ui"/>
-      <source>Do not show this message again</source>
-      <translation>不再显示此消息</translation>
-    </message>
-  </context>
-  <context>
     <name>MultiServerUpdatesWidget</name>
     <message>
       <location filename="../src/nx/vms/client/desktop/system_update/multi_server_updates_widget.ui"/>
@@ -2141,7 +1978,7 @@
     <message>
       <location/>
       <source>Check for update</source>
-      <translation type="unfinished">Check for update</translation>
+      <translation>检查更新</translation>
     </message>
     <message>
       <location/>
@@ -2166,7 +2003,7 @@
     <message>
       <location/>
       <source>Download &amp;&amp; Install</source>
-      <translation type="unfinished">Download &amp;&amp; Install</translation>
+      <translation>下载并安装</translation>
     </message>
     <message>
       <location/>
@@ -2181,7 +2018,7 @@
     <message>
       <location/>
       <source>Advanced Update Settings</source>
-      <translation type="unfinished">Advanced Update Settings</translation>
+      <translation>进阶更新设定</translation>
     </message>
     <message>
       <location/>
@@ -2194,12 +2031,12 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_dialogs/multiple_layout_selection_dialog.ui"/>
       <source>Show all layouts</source>
-      <translation type="unfinished">Show all layouts</translation>
+      <translation>显示所有布局</translation>
     </message>
     <message>
       <location/>
       <source>Select Layouts</source>
-      <translation type="unfinished">Select Layouts</translation>
+      <translation>选择布局</translation>
     </message>
   </context>
   <context>
@@ -2212,12 +2049,12 @@
     <message>
       <location/>
       <source>New Virtual Camera...</source>
-      <translation type="unfinished">New Virtual Camera...</translation>
+      <translation>新增虚拟摄像机...</translation>
     </message>
     <message>
       <location/>
       <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
-      <translation type="unfinished">&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</translation>
+      <translation>&quot;虚拟摄像机&quot; 是一个视频资料专用的虚拟空间, 可上传到系统中的任一服务器并让所有用户存取.</translation>
     </message>
   </context>
   <context>
@@ -2286,22 +2123,22 @@
     <message>
       <location/>
       <source>Level:</source>
-      <translation type="unfinished">Level:</translation>
+      <translation>等级：</translation>
     </message>
     <message>
       <location/>
       <source>ERROR</source>
-      <translation type="unfinished">ERROR</translation>
+      <translation>错误</translation>
     </message>
     <message>
       <location/>
       <source>WARNING</source>
-      <translation type="unfinished">WARNING</translation>
+      <translation>警告</translation>
     </message>
     <message>
       <location/>
       <source>INFO</source>
-      <translation type="unfinished">INFO</translation>
+      <translation>信息</translation>
     </message>
   </context>
   <context>
@@ -2450,7 +2287,7 @@
     <message>
       <location/>
       <source>Restart to the updated version when ready</source>
-      <translation type="unfinished">Restart to the updated version when ready</translation>
+      <translation>准备好后请重启至更新版本</translation>
     </message>
   </context>
   <context>
@@ -2518,6 +2355,14 @@
     </message>
   </context>
   <context>
+    <name>QnMessageBox</name>
+    <message>
+      <location filename="../src/ui/dialogs/common/message_box.ui"/>
+      <source>Do not show this message again</source>
+      <translation>不再显示此消息</translation>
+    </message>
+  </context>
+  <context>
     <name>QnNotificationSoundManagerDialog</name>
     <message>
       <location filename="../src/ui/dialogs/notification_sound_manager_dialog.ui"/>
@@ -2566,44 +2411,6 @@
       <location/>
       <source>Removing this connection option could lead to System malfunction.</source>
       <translation>删除此连接项可能导致系统故障。</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnServerUpdatesWidget</name>
-    <message>
-      <location filename="../src/ui/widgets/system_settings/server_updates_widget.ui"/>
-      <source>Cancel</source>
-      <translation>取消</translation>
-    </message>
-    <message>
-      <location/>
-      <source>It looks like the update process is taking more time than usual. Please keep waiting.</source>
-      <translation>升级进度需要花费一些时间，请等候.</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Check for updates automatically</source>
-      <translation>自动检查更新</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Updating to...</source>
-      <translation>更新到...</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Link copied</source>
-      <translation>复制链接</translation>
-    </message>
-    <message>
-      <location/>
-      <source>You have the latest version installed</source>
-      <translation>你有安装最新版本</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Applying System updates at the end of the week is not recommended.</source>
-      <translation>不建议在一周结束时应用系统更新。</translation>
     </message>
   </context>
   <context>
@@ -2844,18 +2651,13 @@
     </message>
     <message>
       <location/>
-      <source>Filter TEST</source>
-      <translation type="unfinished">Filter TEST</translation>
-    </message>
-    <message>
-      <location/>
       <source>Nothing found</source>
       <translation>未找到内容</translation>
     </message>
     <message>
       <location/>
       <source>Drag any image or video file to the application window to play them</source>
-      <translation type="unfinished">Drag any image or video file to the application window to play them</translation>
+      <translation>请拖曳任一图像或视频档案至应用程式窗口播放</translation>
     </message>
   </context>
   <context>
@@ -2968,13 +2770,18 @@
     </message>
     <message>
       <location/>
-      <source>Limit Session Length</source>
-      <translation type="unfinished">Limit Session Length</translation>
+      <source>to</source>
+      <translation>到</translation>
     </message>
     <message>
       <location/>
-      <source>to</source>
-      <translation>到</translation>
+      <source>Limit session duration</source>
+      <translation>限制登入时间</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
+      <translation>水印仅显示在非管理员用户的实时，存档和导出视频上。您和其他管理员并不会看到。</translation>
     </message>
   </context>
   <context>
@@ -3219,7 +3026,7 @@
     <message>
       <location/>
       <source>Base forecast on data recorded during</source>
-      <translation type="unfinished">Base forecast on data recorded during</translation>
+      <translation>基础预测的记录数据</translation>
     </message>
   </context>
   <context>
@@ -3263,6 +3070,26 @@
       <location/>
       <source>Backup Settings...</source>
       <translation>备份设置</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Analytics data will continue to be stored on the disabled storage.</source>
+      <translation>分析数据将续存于已停用的存储中。</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</source>
+      <translation>将停止录影到停用的储存装置上, 而且旧的录影资料将继续被删除.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Recording was enabled on the USB storage</source>
+      <translation>已启用录像于USB储存装置上</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Analytics data can occupy tens of gigabytes of storage space. We recommend to choose other location for it instead of the system partition.</source>
+      <translation>分析數據可佔用數十GB的存儲空間。建議選擇其他位置, 不要存放於系統分區。</translation>
     </message>
   </context>
   <context>
@@ -3380,7 +3207,7 @@
     <message>
       <location/>
       <source>VMS Time</source>
-      <translation type="unfinished">VMS Time</translation>
+      <translation>VMS时间</translation>
     </message>
   </context>
   <context>
@@ -3388,17 +3215,17 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/system_administration/widgets/time_synchronization_widget.ui"/>
       <source>Sync Time with the Internet</source>
-      <translation type="unfinished">Sync Time with the Internet</translation>
+      <translation>与互联网同步时间</translation>
     </message>
     <message>
       <location/>
       <source>VMS Time</source>
-      <translation type="unfinished">VMS Time</translation>
+      <translation>VMS时间</translation>
     </message>
     <message>
       <location/>
       <source>Do not sync time among servers</source>
-      <translation type="unfinished">Do not sync time among servers</translation>
+      <translation>不要在服务器之间同步时间</translation>
     </message>
   </context>
   <context>
@@ -3506,7 +3333,7 @@
     <message>
       <location/>
       <source>Detect motion</source>
-      <translation type="unfinished">Detect motion</translation>
+      <translation>侦测移动</translation>
     </message>
   </context>
   <context>

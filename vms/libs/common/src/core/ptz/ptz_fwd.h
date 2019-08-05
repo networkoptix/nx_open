@@ -32,6 +32,13 @@ struct QnPtzData;
 
 struct QnPtzObject;
 
+namespace nx::core::ptz {
+
+struct Options;
+struct Vector;
+
+} // namespace nx::core::ptz
+
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (QnPtzLimits)(QnPtzTourSpot)(QnPtzTour)(QnPtzData)(QnPtzObject),
     (json)(eq))

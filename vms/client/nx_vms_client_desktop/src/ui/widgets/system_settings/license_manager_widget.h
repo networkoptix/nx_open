@@ -9,6 +9,7 @@
 #include <nx/vms/client/desktop/license/license_helpers.h>
 
 #include <ui/workbench/workbench_context_aware.h>
+#include <ui/dialogs/common/message_box.h>
 
 class QModelIndex;
 class QNetworkAccessManager;
@@ -30,8 +31,8 @@ class QnLicenseManagerWidget:
     typedef Connective<QnAbstractPreferencesWidget> base_type;
 
 public:
-    explicit QnLicenseManagerWidget(QWidget *parent = 0);
-    virtual ~QnLicenseManagerWidget();
+    explicit QnLicenseManagerWidget(QWidget* parent = nullptr);
+    virtual ~QnLicenseManagerWidget() override;
 
     virtual void loadDataToUi() override;
     virtual bool hasChanges() const override;

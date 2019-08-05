@@ -47,6 +47,7 @@
                 // scope.activeSystem = {};
 
                 function updateActive() {
+                    scope.active.campage = isActive('/campage');
                     scope.active.integrations = isActive('/integrations');
                     scope.active.register = isActive('/register');
                     scope.active.view = isActive('/view');
@@ -72,7 +73,7 @@
                     .get()
                     .then(function (account) {
                         scope.account = account;
-                    scope.downloadsHistory = scope.account.permissions.indexOf(CONFIG.permissions.canViewRelease) > -1;
+                        scope.downloadsHistory = scope.account.permissions.indexOf(CONFIG.permissions.canViewRelease) > -1;
 
                         $('body').removeClass('loading');
                         $('body').addClass('authorized');

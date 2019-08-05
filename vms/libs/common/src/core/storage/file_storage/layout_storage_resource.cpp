@@ -60,11 +60,6 @@ bool QnLayoutFileStorageResource::isEncrypted() const
     return m_info.isCrypted;
 }
 
-bool QnLayoutFileStorageResource::requiresPassword() const
-{
-    return m_info.isCrypted && m_password.isEmpty();
-}
-
 bool QnLayoutFileStorageResource::usePasswordToRead(const QString& password)
 {
     if (m_info.isCrypted && checkPassword(password, m_info))
@@ -94,7 +89,7 @@ void QnLayoutFileStorageResource::forgetPassword()
     m_password = QString();
 }
 
-QString QnLayoutFileStorageResource::password()
+QString QnLayoutFileStorageResource::password() const
 {
     return m_password;
 }

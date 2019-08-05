@@ -78,7 +78,7 @@ namespace nxcip_qt
         QVector<nxcip::CameraInfo> cameraInfo1;
         cameraInfo1.resize(nxcip::CAMERA_INFO_ARRAY_SIZE);
 
-        const QByteArray& urlUtf8 = url.toUtf8();
+        const QByteArray urlUtf8 = url.toUtf8();
         const QByteArray loginUtf8 = login ? login->toUtf8() : QByteArray();
         const QByteArray passwordUtf8 = password ? password->toUtf8() : QByteArray();
 

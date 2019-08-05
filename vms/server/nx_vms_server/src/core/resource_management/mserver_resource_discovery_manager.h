@@ -5,6 +5,7 @@
 
 #include "core/resource_management/resource_discovery_manager.h"
 #include <nx/vms/server/server_module_aware.h>
+#include <nx/vms/server/resource/resource_fwd.h>
 
 class QnMServerResourceDiscoveryManager:
     public QnResourceDiscoveryManager
@@ -25,7 +26,9 @@ public:
     virtual QnResourcePtr createResource(
         const QnUuid &resourceTypeId, const QnResourceParams &params) override;
 
-    static bool hasIpConflict(const QSet<QnNetworkResourcePtr>& cameras);
+    static nx::vms::server::resource::CameraPtr
+        findSameResource(const nx::vms::server::resource::CameraPtr& camera);
+    static bool hasIpConflict(const std::set<nx::vms::server::resource::CameraPtr>& cameras);
 
 signals:
     void cameraDisconnected(const QnResourcePtr& camera, qint64 timestamp);
@@ -46,9 +49,12 @@ private:
 
     void markOfflineIfNeeded(QSet<QString>& discoveredResources);
 
-    void updateResourceStatus(const QnNetworkResourcePtr& rpNetRes);
+    void updateResourceStatus(const nx::vms::server::resource::CameraPtr& rpNetRes);
 
     bool shouldAddNewlyDiscoveredResource(const QnNetworkResourcePtr& newResource) const;
+
+    void sendConflictInfo(
+        const std::map<quint32, std::set<nx::vms::server::resource::CameraPtr>>& ipsList);
 
     /**
      * ping resources from time to time to keep OS ARP table updated;

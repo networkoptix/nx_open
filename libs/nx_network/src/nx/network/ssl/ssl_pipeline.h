@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <string>
 
 #include <openssl/ssl.h>
 
@@ -20,6 +21,13 @@ public:
      */
     Pipeline(SSL_CTX* sslContext);
     ~Pipeline() = default;
+
+    /**
+     * If not empty, ClientHello will contain "servername" attribute.
+     */
+    void setServerName(const std::string& serverName);
+
+    std::string serverNameFromClientHello() const;
 
     /**
      * NOTE: SSL pipeline does not recover from any I/O error because openssl supports

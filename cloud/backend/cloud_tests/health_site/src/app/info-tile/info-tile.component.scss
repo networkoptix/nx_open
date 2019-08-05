@@ -40,9 +40,9 @@
             background-color : $white;
         }
 
-        p {
+        .card-text {
             font-size : $font-size-sm;
-            color     : $gray-500;
+            color     : $gray-600;
         }
 
         border-bottom : $card-border-width solid $card-border-color;

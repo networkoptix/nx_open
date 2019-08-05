@@ -1,7 +1,7 @@
-#ifndef QN_CLIENT_COLOR_TYPES_H
-#define QN_CLIENT_COLOR_TYPES_H
+#pragma once
 
 #include <QtCore/QMetaType>
+#include <QtCore/QVector>
 #include <QtGui/QColor>
 
 #include <nx/fusion/model_functions_fwd.h>
@@ -324,5 +324,3 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     QN_CLIENT_COLOR_TYPES,
     (metatype)(json)(eq)
 );
-
-#endif // QN_CLIENT_COLOR_TYPES_H

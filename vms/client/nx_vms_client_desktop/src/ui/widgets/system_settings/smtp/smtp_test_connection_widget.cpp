@@ -1,14 +1,17 @@
 #include "smtp_test_connection_widget.h"
 #include "ui_smtp_test_connection_widget.h"
 
+#include <QtCore/QTimer>
+
 #include <api/model/test_email_settings_reply.h>
-#include <api/media_server_connection.h>
+#include <api/server_rest_connection.h>
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 
 #include <utils/email/email.h>
 #include <common/common_module.h>
+#include <ui/dialogs/common/message_box.h>
 
 namespace {
     const int testSmtpTimeoutMSec = 20 * 1000;
@@ -90,21 +93,21 @@ bool QnSmtpTestConnectionWidget::testSettings(const QnEmailSettings &value)
         return false;
     }
 
-    QnMediaServerConnectionPtr serverConnection;
+    rest::QnConnectionPtr serverConnection;
     const auto onlineServers = resourcePool()->getAllServers(Qn::Online);
     for(const QnMediaServerResourcePtr &server: onlineServers)
     {
         if (!server->getServerFlags().testFlag(nx::vms::api::SF_HasPublicIP))
             continue;
 
-        serverConnection = server->apiConnection();
+        serverConnection = server->restConnection();
         break;
     }
 
     if (!serverConnection)
     {
         if (auto server = commonModule()->currentServer())
-            serverConnection = server->apiConnection();
+            serverConnection = server->restConnection();
     }
 
     if (!serverConnection)
@@ -136,16 +139,21 @@ bool QnSmtpTestConnectionWidget::testSettings(const QnEmailSettings &value)
     m_timeoutTimer->setInterval(testSmtpTimeoutMSec / ui->testProgressBar->maximum());
     m_timeoutTimer->start();
 
-    m_testHandle = serverConnection->testEmailSettingsAsync(result, this, SLOT(at_testEmailSettingsFinished(int, const QnTestEmailSettingsReply& , int)));
+    m_testHandle = serverConnection->testEmailSettings(result,
+        [this](bool success, int handle, const QnTestEmailSettingsReply& reply)
+        {
+            this->at_testEmailSettingsFinished(success, handle, reply);
+        }, thread());
     return m_testHandle > 0;
 }
 
-void QnSmtpTestConnectionWidget::at_testEmailSettingsFinished( int status, const QnTestEmailSettingsReply& reply, int handle ) {
+void QnSmtpTestConnectionWidget::at_testEmailSettingsFinished(bool success, int handle, const QnTestEmailSettingsReply& reply)
+{
     if (handle != m_testHandle)
         return;
 
     QString result;
-    if (status == 0)
+    if (success)
         result = errorString(reply);
     else
         result = tr("Network error");

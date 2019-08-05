@@ -13,6 +13,14 @@
 
 #include <nx/utils/crash_dump/systemexcept.h>
 
+namespace {
+
+// TODO: Move to the common header.
+static const QString kQuitCommand("quit");
+static const QString kActivateCommand("activate");
+
+} // namespace
+
 QString translationPath30ToLocale(const QString& translationPath)
 {
     const QString oldLocale = QnTranslationManager::translationPathToLocaleCode(translationPath);
@@ -21,8 +29,8 @@ QString translationPath30ToLocale(const QString& translationPath)
 
 QString readLocaleFromSettings(const QSettings& settings)
 {
-    static const QString k30TranslationPath = lit("translationPath");
-    static const QString kLocalePath = lit("locale");
+    static const QString k30TranslationPath = "translationPath";
+    static const QString kLocalePath = "locale";
 
     QString compatibleValue = settings.value(k30TranslationPath).toString();
     if (!compatibleValue.isEmpty())
@@ -32,34 +40,34 @@ QString readLocaleFromSettings(const QSettings& settings)
 
 bool readIsFullCrashDumpFromSettings(const QSettings& settings)
 {
-    static const QString kCreateFullCrashDumpPath = lit("createFullCrashDump");
+    static const QString kCreateFullCrashDumpPath = "createFullCrashDump";
     return settings.value(kCreateFullCrashDumpPath).toBool();
 }
 
 void initTranslations(const QSettings& settings)
 {
-
     Q_INIT_RESOURCE(common);
     Q_INIT_RESOURCE(traytool);
 
     QScopedPointer<QnTranslationManager> translationManager(new QnTranslationManager());
-    translationManager->addPrefix(lit("traytool"));
+    translationManager->addPrefix("traytool");
 
     QString locale = readLocaleFromSettings(settings);
     QnTranslation translation = translationManager->loadTranslation(locale);
     QnTranslationManager::installTranslation(translation);
 }
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     static const QString clientName(QnTraytoolAppInfo::clientName());
-    const QSettings clientSettings(QSettings::UserScope, QnAppInfo::organizationName(), clientName);
+    const QSettings clientSettings(
+        QSettings::UserScope,
+        QnAppInfo::organizationName(),
+        clientName);
 
     /* Init crash dumps as early as possible. */
-#ifdef Q_OS_WIN
     win32_exception::installGlobalUnhandledExceptionHandler();
     win32_exception::setCreateFullCrashDump(readIsFullCrashDumpFromSettings(clientSettings));
-#endif
 
     QApplication::setOrganizationName(QnAppInfo::organizationName());
     QApplication::setApplicationName(QnTraytoolAppInfo::applicationName());
@@ -67,15 +75,15 @@ int main(int argc, char *argv[])
 
     // Each user may have it's own traytool running.
     QtSingleApplication app(QnTraytoolAppInfo::applicationName(), argc, argv);
-    QApplication::setWindowIcon(QIcon(lit(":/logo.png")));
+    QApplication::setWindowIcon(QIcon(":/logo.png"));
     QApplication::setQuitOnLastWindowClosed(false);
 
     QDir::setCurrent(QApplication::applicationDirPath());
 
     QString argument = argc > 1 ? QLatin1String(argv[1]) : QString();
-    if (argument == lit("quit"))
+    if (argument == kQuitCommand)
     {
-        app.sendMessage(lit("quit"));
+        app.sendMessage(kQuitCommand);
 
         // Wait for app to finish + 100ms just in case (in may be still running after unlocking QSingleApplication lock file).
         while (app.isRunning())
@@ -89,17 +97,18 @@ int main(int argc, char *argv[])
 
     if (app.isRunning())
     {
-        if (MyIsUserAnAdmin())
+        if (QnElevationChecker::isUserAnAdmin())
         {
-            app.sendMessage(lit("quit"));
+            app.sendMessage(kQuitCommand);
 
             // Need to wait while app quit
             // Otherwise QtSingleApplication behaves incorrectly
             while (app.isRunning())
                 Sleep(100);
         }
-        else {
-            app.sendMessage(lit("activate"));
+        else
+        {
+            app.sendMessage(kActivateCommand);
             return 0;
         }
     }
@@ -111,14 +120,19 @@ int main(int argc, char *argv[])
         QMessageBox::critical(
             NULL,
             QObject::tr("System Tray"),
-            QObject::tr("There is no system tray on this system.") + L'\n' + QObject::tr("Application will now quit.")
-            );
+            QObject::tr("There is no system tray on this system.") + L'\n' + QObject::tr(
+                "Application will now quit.")
+        );
         return 1;
     }
 
     QnSystrayWindow window;
 
-    QObject::connect(&app, &QtSingleApplication::messageReceived, &window, &QnSystrayWindow::handleMessage);
+    QObject::connect(
+        &app,
+        &QtSingleApplication::messageReceived,
+        &window,
+        &QnSystrayWindow::handleMessage);
 
     if (!argument.isEmpty())
         window.executeAction(argument);

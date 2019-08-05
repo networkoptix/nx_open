@@ -5,6 +5,7 @@
 #include <nx/network/retry_timer.h>
 #include <nx/network/system_socket.h>
 #include <nx/network/socket_global.h>
+#include <nx/utils/uuid.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/std/cpp14.h>
@@ -157,7 +158,8 @@ private:
             RetryPolicy::kInfiniteRetries,
             std::chrono::milliseconds(100),
             1,
-            RetryPolicy::kNoMaxDelay));
+            RetryPolicy::kNoMaxDelay,
+            RetryPolicy::kDefaultRandomRatio));
         m_sendRetryTimer->bindToAioThread(m_sender->getAioThread());
 
         issueSendTo(targetEndpoint);

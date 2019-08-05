@@ -1,5 +1,7 @@
 #include "manual_camera_search_task_manager.h"
 
+#include <QtCore/QThreadPool>
+
 #include <nx/utils/unused.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/concurrent.h>
@@ -146,7 +148,7 @@ void QnManualSearchTaskManager::onSearchTaskDone(
 
                 if (taskInterruptProcessing && !results.isEmpty())
                 {
-                    m_remainingTaskCount -= m_searchTasksQueues[taskUrl].size();
+                    m_remainingTaskCount -= int(m_searchTasksQueues[taskUrl].size());
                     context.isInterrupted = true;
                 }
 

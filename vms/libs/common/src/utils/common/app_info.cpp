@@ -73,11 +73,6 @@ bool QnAppInfo::isArm()
     return nx::utils::AppInfo::isArm();
 }
 
-bool QnAppInfo::isBpi()
-{
-    return nx::utils::AppInfo::isBpi();
-}
-
 bool QnAppInfo::isNx1()
 {
     return nx::utils::AppInfo::isNx1();
@@ -106,5 +101,7 @@ bool QnAppInfo::isWindows()
 nx::vms::api::SystemInformation QnAppInfo::currentSystemInformation()
 {
     return nx::vms::api::SystemInformation(
-        applicationPlatform(), applicationArch(), applicationPlatformModification());
+        applicationPlatform(),
+        applicationArch(),
+        applicationPlatformModification());
 }

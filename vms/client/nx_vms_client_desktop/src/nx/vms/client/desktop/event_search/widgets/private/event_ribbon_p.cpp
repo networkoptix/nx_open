@@ -17,8 +17,10 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/style/nx_style_p.h>
 #include <ui/workaround/hidpi_workarounds.h>
+#include <utils/common/delayed.h>
 #include <utils/common/event_processors.h>
 #include <utils/common/scoped_value_rollback.h>
+#include <utils/common/delayed.h>
 #include <utils/math/color_transformations.h>
 
 #include <nx/api/mediaserver/image_request.h>
@@ -27,12 +29,15 @@
 #include <nx/vms/client/desktop/event_search/widgets/event_tile.h>
 #include <nx/vms/client/desktop/workbench/workbench_animations.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <nx/vms/client/desktop/utils/video_cache.h>
 #include <nx/vms/client/desktop/utils/widget_utils.h>
+#include <nx/vms/client/desktop/ini.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/range_adapters.h>
 #include <nx/utils/scoped_connections.h>
+#include <nx/utils/app_info.h>
 
 namespace nx::vms::client::desktop {
 
@@ -44,9 +49,10 @@ static constexpr int kDefaultTileSpacing = 1;
 static constexpr int kScrollBarStep = 16;
 
 static constexpr int kDefaultThumbnailWidth = 224;
-static constexpr int kMaximumThumbnailWidth = 1024;
 
 static constexpr auto kFadeCurtainColorName = "dark3";
+
+static constexpr milliseconds kPreviewCheckInterval = 100ms;
 
 /*
  * Tiles can have optional timed auto-close mode.
@@ -71,14 +77,27 @@ bool shouldAnimateTile(const QModelIndex& index)
     return !index.data(Qt::DisplayRole).toString().isEmpty();
 }
 
+bool isPreviewLoadControlledByRibbon()
+{
+    return ini().tilePreviewLoadIntervalMs > 0;
+}
+
+int maximumThumbnailWidth()
+{
+    return ini().rightPanelMaxThumbnailWidth;
+}
+
 } // namespace
 
 EventRibbon::Private::Private(EventRibbon* q):
     q(q),
     m_scrollBar(new QScrollBar(Qt::Vertical, q)),
     m_viewport(new QWidget(q)),
-    m_autoCloseTimer(new QTimer())
+    m_autoCloseTimer(new QTimer()),
+    m_previewLoad(new nx::utils::PendingOperation())
 {
+    NX_ASSERT(Importance() == Importance::NoNotification);
+
     q->setAttribute(Qt::WA_Hover);
     m_viewport->setAttribute(Qt::WA_Hover);
 
@@ -99,7 +118,12 @@ EventRibbon::Private::Private(EventRibbon* q):
     m_autoCloseTimer->setInterval(1s);
     connect(m_autoCloseTimer.get(), &QTimer::timeout, this, &Private::closeExpiredTiles);
 
-    NX_ASSERT(Importance() == Importance::NoNotification);
+    const auto loadNextPreviewDelayed =
+        [this]() { executeLater([this]() { loadNextPreview(); }, this); };
+
+    m_previewLoad->setInterval(kPreviewCheckInterval);
+    m_previewLoad->setFlags(nx::utils::PendingOperation::FireImmediately);
+    m_previewLoad->setCallback(loadNextPreviewDelayed);
 }
 
 EventRibbon::Private::~Private()
@@ -288,7 +312,7 @@ void EventRibbon::Private::updateTilePreview(int index)
     const auto previewCropRect = modelIndex.data(Qn::ItemZoomRectRole).value<QRectF>();
     const auto thumbnailWidth = previewCropRect.isEmpty()
         ? kDefaultThumbnailWidth
-        : qMin<int>(kDefaultThumbnailWidth / previewCropRect.width(), kMaximumThumbnailWidth);
+        : qMin<int>(kDefaultThumbnailWidth / previewCropRect.width(), maximumThumbnailWidth());
 
     const bool precisePreview = !previewCropRect.isEmpty()
         || modelIndex.data(Qn::ForcePrecisePreviewRole).toBool();
@@ -304,21 +328,26 @@ void EventRibbon::Private::updateTilePreview(int index)
     request.roundMethod = precisePreview
         ? nx::api::ImageRequest::RoundMethod::precise
         : nx::api::ImageRequest::RoundMethod::iFrameAfter;
+    request.streamSelectionMode = modelIndex.data(Qn::PreviewStreamSelectionRole)
+        .value<nx::api::ImageRequest::StreamSelectionMode>();
+
+    bool forceUpdate = true;
 
     auto& previewProvider = m_tiles[index]->preview;
-    if (previewProvider && (request.resource != previewProvider->requestData().resource
-        || request.usecSinceEpoch != previewProvider->requestData().usecSinceEpoch))
+    if (!previewProvider || request.resource != previewProvider->requestData().resource)
     {
-        previewProvider.reset();
+        previewProvider.reset(new ResourceThumbnailProvider(request));
+    }
+    else
+    {
+        const auto oldRequest = previewProvider->requestData();
+        forceUpdate = oldRequest.usecSinceEpoch != request.usecSinceEpoch
+            || oldRequest.streamSelectionMode != request.streamSelectionMode;
+
+        previewProvider->setRequestData(request);
     }
 
-    if (!previewProvider)
-        previewProvider.reset(new ResourceThumbnailProvider(request));
-
-    previewProvider->setStreamSelectionMode(modelIndex.data(Qn::PreviewStreamSelectionRole)
-        .value<nx::api::CameraImageRequest::StreamSelectionMode>());
-
-    widget->setPreview(previewProvider.get());
+    widget->setPreview(previewProvider.get(), forceUpdate);
     widget->setPreviewCropRect(previewCropRect);
 }
 
@@ -335,6 +364,14 @@ void EventRibbon::Private::ensureWidget(int index)
         widget.reset(new EventTile(m_viewport.get()));
         widget->setContextMenuPolicy(Qt::CustomContextMenu);
         widget->installEventFilter(this);
+
+        widget->setAutomaticPreviewLoad(!isPreviewLoadControlledByRibbon());
+
+        if (isPreviewLoadControlledByRibbon())
+        {
+            connect(widget.get(), &EventTile::needsPreviewLoad,
+                m_previewLoad.get(), &nx::utils::PendingOperation::requestOperation);
+        }
 
         connect(widget.get(), &EventTile::closeRequested, this,
             [this]()
@@ -1362,6 +1399,32 @@ int EventRibbon::Private::indexAtPos(const QPoint& pos) const
     return iter != end
         ? m_visible.lower() + std::distance(iter, end) - 1
         : -1;
+}
+
+void EventRibbon::Private::loadNextPreview()
+{
+    if (!m_previewsEnabled)
+        return;
+
+    for (int i = m_visible.lower(); i < m_visible.upper(); ++i)
+    {
+        const auto& tile = m_tiles[i];
+        if (!tile->widget || !tile->widget->isPreviewLoadNeeded() || !NX_ASSERT(tile->preview))
+            continue;
+
+        if (tile->preview->tryLoad())
+            continue;
+
+        if (m_sinceLastPreviewRequest.hasExpired(milliseconds(ini().tilePreviewLoadIntervalMs)))
+        {
+            tile->preview->loadAsync();
+            m_sinceLastPreviewRequest.restart();
+        }
+        else
+        {
+            m_previewLoad->requestOperation();
+        }
+    }
 }
 
 } // namespace nx::vms::client::desktop

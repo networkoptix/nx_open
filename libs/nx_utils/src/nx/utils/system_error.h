@@ -45,6 +45,7 @@ static const ErrorCode messageTooLarge = WSAEMSGSIZE;
 static const ErrorCode dnsServerFailure = DNS_ERROR_RCODE_SERVER_FAILURE;
 static const ErrorCode already = WSAEALREADY;
 static const ErrorCode addressNotAvailable = WSAEADDRNOTAVAIL;
+static const ErrorCode unknownProtocolOption = WSAENOPROTOOPT;
 #else
 static const ErrorCode wouldBlock = EWOULDBLOCK;
 static const ErrorCode inProgress = EINPROGRESS;
@@ -72,6 +73,7 @@ static const ErrorCode messageTooLarge = EMSGSIZE;
 static const ErrorCode dnsServerFailure = 0x0F000001;
 static const ErrorCode already = EALREADY;
 static const ErrorCode addressNotAvailable = EADDRNOTAVAIL;
+static const ErrorCode unknownProtocolOption = ENOPROTOOPT;
 #endif
 
 /**

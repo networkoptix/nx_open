@@ -1,6 +1,11 @@
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+
 #pragma once
 
+#include <functional>
 #include <iostream>
+#include <vector>
+#include <mutex>
 
 #if !defined(NX_KIT_API)
     #define NX_KIT_API
@@ -58,11 +63,13 @@ class NX_KIT_API IniConfig
 {
 public:
     /**
-     * If needed, reading .ini files can be disabled defining a macro at compiling ini_config.cpp:
-     * -DNX_INI_CONFIG_DISABLED - minimizes performance overhead and freezes values at defaults.
-     * @return Whether the macro NX_INI_CONFIG_DISABLED was defined.
+     * @return Whether reading .ini files is enabled. If disabled, the values are frozen at
+     *     defaults. Enabled by default, can be disabled by setEnabled(false) or by defining a macro
+     *     at compiling ini_config.cpp: -DNX_INI_CONFIG_DISABLED to minimize performance overhead.
      */
     static bool isEnabled();
+
+    static void setEnabled(bool value);
 
     /**
      * Change the output stream, affecting all instances, null means silent. Before this call, all
@@ -89,14 +96,18 @@ public:
 
     virtual ~IniConfig();
 
-    IniConfig(const IniConfig& /*other*/) = delete; //< Disable the copy constructor.
-    IniConfig& operator=(const IniConfig& /*other*/) = delete; //< Disable the assignment operator.
+    IniConfig(const IniConfig&) = delete;
+    IniConfig(IniConfig&&) = delete;
+    IniConfig& operator=(const IniConfig&) = delete;
+    IniConfig& operator=(IniConfig&&) = delete;
 
     const char* iniFile() const; /**< @return Stored copy of the string supplied to the ctor. */
     const char* iniFilePath() const; /**< @return iniFilesDir() + iniFile(). */
 
     /** Reload values from .ini file, logging the values first time, or if changed. */
     void reload();
+
+    class Tweaks;
 
 protected:
     #define NX_INI_FLAG(DEFAULT, PARAM, DESCRIPTION) \
@@ -114,7 +125,7 @@ protected:
     #define NX_INI_DOUBLE(DEFAULT, PARAM, DESCRIPTION) \
         const double PARAM = regDoubleParam(&PARAM, DEFAULT, #PARAM, DESCRIPTION)
 
-protected: // Used by macros.
+protected: // Used by the above macros.
     bool regBoolParam(const bool* pValue, bool defaultValue,
         const char* paramName, const char* description);
 
@@ -133,6 +144,79 @@ protected: // Used by macros.
 private:
     class Impl;
     Impl* const d;
+};
+
+//-------------------------------------------------------------------------------------------------
+
+/**
+ * Allows to tweak IniConfig values for the duration defined by this object life time.
+ * Re-reading the values is disabled while at least one Tweaks instance exists. Intended for tests.
+ *
+ * Usage:
+ * ```
+ * {
+ *     IniConfig::Tweaks tweaks;
+ *     tweaks.set(&ini().parameter, value);
+ *     // The value will be altered up to the end of this scope.
+ * }
+ * ```
+ */
+class NX_KIT_API IniConfig::Tweaks
+{
+public:
+    Tweaks()
+    {
+        const std::lock_guard<std::mutex> lock(*m_mutexHolder.mutex);
+
+        if (++tweaksInstanceCount != 0)
+        {
+            originalValueOfIsEnabled = isEnabled();
+            setEnabled(false);
+        }
+    }
+
+    ~Tweaks()
+    {
+        for (const auto& guard: *m_guards)
+            guard();
+
+        {
+            const std::lock_guard<std::mutex> lock(*m_mutexHolder.mutex);
+
+            if (--tweaksInstanceCount == 0)
+                setEnabled(originalValueOfIsEnabled);
+        }
+
+        delete m_guards;
+    }
+
+    Tweaks(const Tweaks&) = delete;
+    Tweaks(Tweaks&&) = delete;
+    Tweaks& operator=(const Tweaks&) = delete;
+    Tweaks& operator=(Tweaks&&) = delete;
+
+    template<typename T>
+    void set(const T* field, T newValue)
+    {
+        const auto oldValue = *field;
+        T* const mutableField = const_cast<T*>(field);
+        m_guards->push_back([=]() { *mutableField = oldValue; });
+        *mutableField = newValue;
+    }
+
+private:
+    struct MutexHolder
+    {
+        std::mutex* const mutex = new std::mutex();
+        ~MutexHolder() { delete mutex; }
+    };
+
+    static MutexHolder m_mutexHolder;
+    static int tweaksInstanceCount;
+    static bool originalValueOfIsEnabled;
+
+    std::vector<std::function<void()>>* const m_guards =
+        new std::vector<std::function<void()>>();
 };
 
 } // namespace kit

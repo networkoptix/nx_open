@@ -2,6 +2,8 @@ import requests
 from requests.auth import HTTPDigestAuth
 from hashlib import md5, sha256
 import base64
+import random
+import string
 from cloud import settings
 from api.helpers.exceptions import validate_response, ErrorCodes, APIRequestException, APINotAuthorisedException
 
@@ -18,13 +20,36 @@ def lower_case_email(func):
     return validator
 
 
+def salt_machine(char_pool=string.ascii_lowercase + string.digits, size=15):
+    return ''.join(random.choice(char_pool) for _ in range(size))
+
+
+def get_wrapper(url, params=None, auth=None, headers=None):
+    default_params = {'salt': salt_machine()}
+
+    if params:
+        default_params.update(params)
+
+    logger.info('\nGET: {}\n Query Parameters: {}'.format(url, default_params))
+
+    return requests.get(url, params=default_params, auth=auth, headers=headers)
+
+
+def post_wrapper(url, params=None, auth=None, json=None, headers=None):
+    default_params = {'salt': salt_machine()}
+
+    if params:
+        default_params.update(params)
+
+    logger.info('\nPOST: {}\nQuery Parameters: {}\nJson: {}'.format(url, default_params, json))
+
+    return requests.post(url, params=default_params, auth=auth, json=json, headers=headers)
+
+
 @validate_response
 def ping():
     url = CLOUD_DB_URL + "/ping"
-    logger.info('Making ping request to {}'.format(url))
-    response = requests.get(url)
-    logger.info('Ping request finished')
-    return response
+    return get_wrapper(url)
 
 
 class System(object):
@@ -32,23 +57,22 @@ class System(object):
     @validate_response
     @lower_case_email
     def list(email, password, one_customization=True):
-        # TODO: create wrappers
         request = CLOUD_DB_URL + "/system/get"
+        params = {}
         if one_customization:
-            request += "?customization=" + settings.CUSTOMIZATION
+            params['customization'] = settings.CUSTOMIZATION
 
-        return requests.get(request, auth=HTTPDigestAuth(email, password))
+        return get_wrapper(request, params=params, auth=HTTPDigestAuth(email, password))
 
     @staticmethod
     @validate_response
     @lower_case_email
     def get(email, password, system_id):
-        # TODO: create wrappers
         request = CLOUD_DB_URL + "/system/get"
         params = {
-           'systemId': system_id
+            'systemId': system_id
         }
-        return requests.get(request, params=params, auth=HTTPDigestAuth(email, password))
+        return get_wrapper(request, params=params, auth=HTTPDigestAuth(email, password))
 
     @staticmethod
     @validate_response
@@ -56,9 +80,9 @@ class System(object):
     def users(email, password, system_id):
         request = CLOUD_DB_URL + "/system/getCloudUsers"
         params = {
-           'systemId': system_id
+            'systemId': system_id
         }
-        return requests.get(request, params=params, auth=HTTPDigestAuth(email, password))
+        return get_wrapper(request, params=params, auth=HTTPDigestAuth(email, password))
 
     @staticmethod
     @validate_response
@@ -71,18 +95,17 @@ class System(object):
             'accountEmail': account_email,
             'accessRole': role
         }
-        return requests.post(request, json=params, auth=HTTPDigestAuth(email, password))
+        return post_wrapper(request, json=params, auth=HTTPDigestAuth(email, password))
 
     @staticmethod
     @validate_response
     @lower_case_email
     def get_nonce(email, password, system_id):
-        # TODO: create wrappers
         request = CLOUD_DB_URL + '/auth/getNonce'
         params = {
             'systemId': system_id
         }
-        return requests.get(request, params=params, auth=HTTPDigestAuth(email, password))
+        return get_wrapper(request, params=params, auth=HTTPDigestAuth(email, password))
 
     @staticmethod
     @validate_response
@@ -93,7 +116,7 @@ class System(object):
             'systemId': system_id,
             'name': system_name
         }
-        return requests.post(request, json=params, auth=HTTPDigestAuth(email, password))
+        return post_wrapper(request, json=params, auth=HTTPDigestAuth(email, password))
 
     @staticmethod
     @validate_response
@@ -101,9 +124,9 @@ class System(object):
     def access_roles(email, password, system_id):
         request = CLOUD_DB_URL + "/system/getAccessRoleList"
         params = {
-           'systemId': system_id
+            'systemId': system_id
         }
-        return requests.get(request, params=params, auth=HTTPDigestAuth(email, password))
+        return get_wrapper(request, params=params, auth=HTTPDigestAuth(email, password))
 
     @staticmethod
     @validate_response
@@ -113,7 +136,7 @@ class System(object):
         params = {
             'systemId': system_id,
         }
-        return requests.post(request, json=params, auth=HTTPDigestAuth(email, password))
+        return post_wrapper(request, json=params, auth=HTTPDigestAuth(email, password))
 
     @staticmethod
     @validate_response
@@ -125,7 +148,7 @@ class System(object):
             'name': name,
             'customization': customization
         }
-        return requests.post(request, json=params, auth=HTTPDigestAuth(email, password))
+        return post_wrapper(request, json=params, auth=HTTPDigestAuth(email, password))
 
     @staticmethod
     @validate_response
@@ -135,7 +158,7 @@ class System(object):
         params = {
             'systemId': slave_system_id
         }
-        return requests.post(request, json=params, auth=HTTPDigestAuth(email, password))
+        return post_wrapper(request, json=params, auth=HTTPDigestAuth(email, password))
 
 
 class Account(object):
@@ -175,13 +198,13 @@ class Account(object):
         def _update(login, password, params):
             request = CLOUD_DB_URL + '/account/update'
             logger.debug('cloud_api.Account.register - making request: ' + request)
-            return requests.post(request, json=params, auth=HTTPDigestAuth(login, password), headers=headers)
+            return post_wrapper(request, json=params, auth=HTTPDigestAuth(login, password), headers=headers)
 
         @validate_response
         def _register(params):
             request = CLOUD_DB_URL + '/account/register'
             logger.debug('cloud_api.Account.register - making request: ' + request)
-            return requests.post(request, json=params, headers=headers)
+            return post_wrapper(request, json=params, headers=headers)
 
         customization = settings.CLOUD_CONNECT['customization']
         password_ha1, password_ha1_sha256 = Account.encode_password(email, password)
@@ -222,7 +245,7 @@ class Account(object):
             'passwordHa1Sha256': password_ha1_sha256
         }
         request = CLOUD_DB_URL + '/account/update'
-        return requests.post(request, json=params, auth=HTTPDigestAuth(email, password))
+        return post_wrapper(request, json=params, auth=HTTPDigestAuth(email, password))
 
     @staticmethod
     @validate_response
@@ -232,7 +255,7 @@ class Account(object):
             'type': type
         }
         request = CLOUD_DB_URL + '/account/createTemporaryCredentials'
-        return requests.post(request, json=params, auth=HTTPDigestAuth(email, password))
+        return post_wrapper(request, json=params, auth=HTTPDigestAuth(email, password))
 
     @staticmethod
     @validate_response
@@ -245,7 +268,7 @@ class Account(object):
             'X-Forwarded-For': ip
         }
         request = CLOUD_DB_URL + '/account/resetPassword'
-        return requests.post(request, json=params, headers=headers)
+        return post_wrapper(request, json=params, headers=headers)
 
     @staticmethod
     @validate_response
@@ -254,7 +277,7 @@ class Account(object):
             'code': code
         }
         request = CLOUD_DB_URL + '/account/activate'
-        return requests.post(request, json=params)
+        return post_wrapper(request, json=params)
 
     @staticmethod
     @validate_response
@@ -264,7 +287,7 @@ class Account(object):
             'email': email
         }
         request = CLOUD_DB_URL + '/account/reactivate'
-        return requests.post(request, json=params)
+        return post_wrapper(request, json=params)
 
     @staticmethod
     @validate_response
@@ -274,13 +297,12 @@ class Account(object):
             'fullName': ' '.join((first_name, last_name))
         }
         request = CLOUD_DB_URL + '/account/update'
-        return requests.post(request, json=params, auth=HTTPDigestAuth(email, password))
+        return post_wrapper(request, json=params, auth=HTTPDigestAuth(email, password))
 
     @staticmethod
     @validate_response
     @lower_case_email
     def get(email=None, password=None, ip=None):
-        # TODO: create wrappers
         # ip is not always provided here because of Zapier integration.
         # If someone fails to login to many times we don't want to block all requests from Zapier.
         headers = {}
@@ -288,5 +310,4 @@ class Account(object):
             headers['X-Forwarded-For'] = ip
 
         request = CLOUD_DB_URL + '/account/get'
-
-        return requests.get(request, auth=HTTPDigestAuth(email, password), headers=headers)
+        return get_wrapper(request, auth=HTTPDigestAuth(email, password), headers=headers)

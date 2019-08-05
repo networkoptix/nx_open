@@ -4,6 +4,8 @@
 
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <common/common_module.h>
+#include <nx_ec/ec_api.h>
 
 #include <nx/fusion/model_functions.h>
 #include <nx/fusion/serialization/lexical.h>
@@ -32,18 +34,21 @@ const QString kGroupByParamName(lit("groupBy"));
 
 bool isValidMotionRect(const QRect& rect)
 {
-    return !rect.isEmpty()
-        && rect.left() >= 0
-        && rect.top() >= 0
-        && rect.right() < Qn::kMotionGridWidth
-        && rect.bottom() < Qn::kMotionGridHeight;
+    return rect.isEmpty()
+        || (rect.left() >= 0 && rect.right() < Qn::kMotionGridWidth
+            && rect.top() >= 0 && rect.bottom() < Qn::kMotionGridHeight);
 };
 
 bool isValidMotionRegion(const QRegion& region)
 {
-    return region.rectCount() > 0
-        && std::all_of(region.cbegin(), region.cend(), isValidMotionRect);
+    return region.isNull()
+        || std::all_of(region.cbegin(), region.cend(), isValidMotionRect);
 };
+
+bool isNullRegion(const QRegion& region)
+{
+    return region.isNull();
+}
 
 } // namespace
 
@@ -96,7 +101,7 @@ QnChunksRequestData QnChunksRequestData::fromParams(QnResourcePool* resourcePool
 
     if (request.periodsType == Qn::TimePeriodContent::AnalyticsContent)
     {
-        request.analyticsStorageFilter = nx::analytics::storage::Filter();
+        request.analyticsStorageFilter = nx::analytics::db::Filter();
         if (!deserializeFromParams(params, &request.analyticsStorageFilter.get()))
             request.analyticsStorageFilter.reset();
     }
@@ -144,12 +149,19 @@ QnRequestParamList QnChunksRequestData::toParams() const
     return result;
 }
 
+void QnChunksRequestData::pickRequestVersion(QnCommonModule* commonModule)
+{
+    nx::utils::SoftwareVersion connectionVersion;
+    if (const auto& connection = commonModule->ec2Connection())
+        connectionVersion = connection->connectionInfo().version;
+
+    if (!connectionVersion.isNull() && connectionVersion < nx::utils::SoftwareVersion(3, 0))
+        requestVersion = QnChunksRequestData::RequestVersion::v2_6;
+}
+
 QUrlQuery QnChunksRequestData::toUrlQuery() const
 {
-    QUrlQuery urlQuery;
-    for (const auto& param: toParams())
-        urlQuery.addQueryItem(param.first, param.second);
-    return urlQuery;
+    return toParams().toUrlQuery();
 }
 
 bool QnChunksRequestData::isValid() const
@@ -164,7 +176,9 @@ bool QnChunksRequestData::isValid() const
     if (periodsType == Qn::MotionContent && !filter.trimmed().isEmpty())
     {
         const auto motionRegions = QJson::deserialized<QList<QRegion>>(filter.toUtf8());
-        if (!std::all_of(motionRegions.cbegin(), motionRegions.cend(), isValidMotionRegion))
+        if (!std::any_of(motionRegions.cbegin(), motionRegions.cend(), isValidMotionRegion))
+            return false;
+        if (std::all_of(motionRegions.cbegin(), motionRegions.cend(), isNullRegion))
             return false;
     }
 

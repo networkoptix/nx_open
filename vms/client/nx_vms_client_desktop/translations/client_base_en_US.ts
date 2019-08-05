@@ -233,10 +233,6 @@ to view more bookmarks</source>
         <translation></translation>
     </message>
     <message>
-        <source>Drop Resources</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Start Screen Recording</source>
         <translation></translation>
     </message>
@@ -2584,17 +2580,6 @@ to %1</source>
     </message>
 </context>
 <context>
-    <name>QnConnectToCurrentSystemTool</name>
-    <message>
-        <source>Configuring Server</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Updating Server</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
     <name>QnConnectionDiagnosticsHelper</name>
     <message>
         <source>You are trying to connect to incompatible Server.</source>
@@ -2897,10 +2882,6 @@ to %1</source>
     </message>
     <message>
         <source>44.1 kHz and 48 kHz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Configured codec: %1 not found, h263p will used</source>
         <translation></translation>
     </message>
 </context>
@@ -3207,6 +3188,17 @@ to %1</source>
     </message>
 </context>
 <context>
+    <name>QnGLCheckerInstrument</name>
+    <message>
+        <source>Video card drivers are outdated or not installed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 may not work properly.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnGeneralPreferencesWidget</name>
     <message>
         <source>Select folder...</source>
@@ -3215,6 +3207,14 @@ to %1</source>
     <message>
         <source>Folder already added</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>None</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto (%1)</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3281,17 +3281,6 @@ to %1</source>
     </message>
     <message>
         <source>Creates a backup of System configuration that can be restored in case of failure.</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
-    <name>QnGlHardwareChecker</name>
-    <message>
-        <source>Video card drivers are outdated or not installed</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>%1 may not work properly.</source>
         <translation></translation>
     </message>
 </context>
@@ -3589,8 +3578,8 @@ to %1</source>
         </translation>
     </message>
     <message>
-        <source>Qty</source>
-        <translation></translation>
+        <source>Channels</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5111,6 +5100,10 @@ to %1</source>
         <source>Server Web Page</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Plugins</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnServerSettingsWidget</name>
@@ -5148,220 +5141,6 @@ to %1</source>
     </message>
     <message>
         <source>Servers with failover enabled will automatically take cameras from offline servers.</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
-    <name>QnServerUpdatesModel</name>
-    <message>
-        <source>Server</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Status</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
-    <name>QnServerUpdatesWidget</name>
-    <message>
-        <source>Select Update File...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Release notes</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>You will have to update the client manually using an installer.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Cannot update from this file.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Latest Available Update</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Download the Latest Version Update File</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Selected Version</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Download Update File</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Browse for Update File...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Selected Update File</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Download in External Browser</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Copy Link to Clipboard</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Unable to check updates on the Internet.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Unknown build number.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Downgrade to an earlier version is prohibited.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Updates for one or more servers were not found.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Client update was not found.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Unable to extract update file. No free space left on the disk.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Update Finished...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Checking for updates...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Downloading updates...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Installing client update...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Installing updates to incompatible servers...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Pushing updates to servers...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Installing updates...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Specific Build...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Update to Specific Build</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Update System</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>System update in process</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Cancel Update</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Continue in Background</source>
-        <translation></translation>
-    </message>
-    <message numerus="yes">
-        <source>Not enough free space at %n Servers:</source>
-        <translation>
-            <numerusform>Not enough free space at %n Server:</numerusform>
-            <numerusform>Not enough free space at %n Servers:</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Attempt to update may fail or cause Server malfunction.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Force Update</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Server update completed</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Update completed</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Update canceled</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>All Servers already updated</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Update failed</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Please update %1 manually using an installation package.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>%1 will be restarted to the updated version.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Update cannot be canceled at this stage</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Please wait until it is finished.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>All components in your System are up to date.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>All components in your System are up to this version.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Incompatible %1 instance. To update disconnect System from %1 first.</source>
-        <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Update Files</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Validating the update...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Checking for free space...</source>
         <translation></translation>
     </message>
 </context>
@@ -5794,16 +5573,29 @@ to %1</source>
         <translation></translation>
     </message>
     <message>
-        <source>Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Recording was enabled on the USB storage</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Reindexing can fix problems with archive or backup if they have been lost or damaged, or if some hardware has been replaced.</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>What to do with current analytics data?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Current analytics data will not be automatically moved to another location and will become unaccessible. You can keep it and manually move later, or delete permanently.
+If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Keep</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5851,6 +5643,14 @@ to %1</source>
     <message>
         <source>Too small and system partitions are reserved and not used for writing if there is enough other storage space available.</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Use to store analytics data</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stores analytics data</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5938,8 +5738,8 @@ to %1</source>
         <translation></translation>
     </message>
     <message>
-        <source>Analytics</source>
-        <translation></translation>
+        <source>Plugins</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6045,10 +5845,6 @@ to %1</source>
         <translation></translation>
     </message>
     <message>
-        <source>Error occured during remote archive synchronization</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Remote archive synchronization has been started for the following device:</source>
         <translation></translation>
     </message>
@@ -6098,17 +5894,13 @@ to %1</source>
         <source>The System is running in safe mode.</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Error occurred during remote archive synchronization</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnSystemSettingsWidget</name>
-    <message>
-        <source>Enable devices and servers auto discovery</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Enable cameras and servers auto discovery</source>
-        <translation></translation>
-    </message>
     <message>
         <source>Allow System to optimize device settings</source>
         <translation></translation>
@@ -6124,6 +5916,22 @@ to %1</source>
     <message>
         <source>Does not include any personal information and is completely anonymous.</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Failover server measures may still request camera status updates regardless of this setting.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable devices and servers autodiscovery and automated device status check</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable cameras and servers autodiscovery and automated camera status check</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6207,84 +6015,6 @@ to %1</source>
     <message>
         <source>Hold to Speak</source>
         <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>QnUpdateResult</name>
-    <message>
-        <source>Update has been successfully finished.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Update has been cancelled.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Another user has already started an update.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>All servers are already updated.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Could not download updates.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>No free space left on the disk.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Could not push updates to servers.</source>
-        <translation></translation>
-    </message>
-    <message numerus="yes">
-        <source>The problem is caused by %n servers:</source>
-        <translation>
-            <numerusform>The problem is caused by %n server:</numerusform>
-            <numerusform>The problem is caused by %n servers:</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>No free space left on %n servers:</source>
-        <translation>
-            <numerusform>No free space left on %n server:</numerusform>
-            <numerusform>No free space left on %n servers:</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n servers are not responding:</source>
-        <translation>
-            <numerusform>%n server is not responding:</numerusform>
-            <numerusform>%n servers are not responding:</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n servers have gone offline:</source>
-        <translation>
-            <numerusform>%n server has gone offline:</numerusform>
-            <numerusform>%n servers have gone offline:</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Authentication failed for %n servers:</source>
-        <translation>
-            <numerusform>Authentication failed for %n server:</numerusform>
-            <numerusform>Authentication failed for %n servers:</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Could not install an update to the client.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Could not install updates on one or more servers.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Update has been cancelled silently.</source>
-        <translation></translation>
     </message>
 </context>
 <context>
@@ -6738,25 +6468,6 @@ to %1</source>
     </message>
 </context>
 <context>
-    <name>QnWorkbenchContext</name>
-    <message>
-        <source>Please review and agree to the %1 in order to proceed</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>To use the software you must agree with the end user license agreement</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>I Agree</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>I Do Not Agree</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
     <message>
         <source>Systems will be merged shortly</source>
@@ -6764,10 +6475,6 @@ to %1</source>
     </message>
     <message>
         <source>Servers from the other System will appear in the resource tree.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Failed to update Server</source>
         <translation></translation>
     </message>
     <message>
@@ -6938,29 +6645,6 @@ to %1</source>
     </message>
     <message>
         <source>JPEG Image</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
-    <name>QnWorkbenchUpdateWatcher</name>
-    <message>
-        <source>Release Notes</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>%1 version available</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Major issues have been fixed. Update is strongly recommended.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Update...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Do not notify again about this update</source>
         <translation></translation>
     </message>
 </context>
@@ -7192,9 +6876,9 @@ to %1</source>
     </message>
     <message numerus="yes">
         <source>You can upload these files to a different instance of a Virtual Camera.</source>
-        <translation>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation type="unfinished">
+            <numerusform>You can upload this file to a different instance of a Virtual Camera.</numerusform>
+            <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
         </translation>
     </message>
     <message>
@@ -7428,6 +7112,17 @@ to %1</source>
     </message>
 </context>
 <context>
+    <name>SessionExpiredDialog</name>
+    <message>
+        <source>Your session has expired</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Session duration limit can be changed by the system administrators</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>StreamQualityStrings</name>
     <message>
         <source>Lowest</source>
@@ -7631,6 +7326,14 @@ to %1</source>
         <source>Show Only with &quot;Objects&quot; Tab</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Show</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Do Not Show</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::AnalyticsSearchListModel::Private</name>
@@ -7781,10 +7484,6 @@ to %1</source>
         <translation></translation>
     </message>
     <message>
-        <source>Server will not change any cameras settings, it will receive and use camera stream as-is. </source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</source>
         <translation></translation>
     </message>
@@ -7808,6 +7507,14 @@ to %1</source>
             <numerusform>This ID is already used on the following camera:</numerusform>
             <numerusform>This ID is already used on the following %n cameras:</numerusform>
         </translation>
+    </message>
+    <message>
+        <source>Server will not change any cameras settings, it will receive and use camera stream as-is.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Multicast</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7950,10 +7657,6 @@ to %1</source>
         <translation></translation>
     </message>
     <message>
-        <source>Analytics</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Expert</source>
         <translation></translation>
     </message>
@@ -8005,6 +7708,10 @@ to %1</source>
     <message>
         <source>I/O Modules Settings</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Plugins</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8075,16 +7782,16 @@ to %1</source>
         <translation></translation>
     </message>
     <message>
-        <source>Not enough space on disk to install client update.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Install package has been lost.</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Internal error.</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Not enough space on disk to install the client update.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Installation package has been lost.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8116,6 +7823,17 @@ to %1</source>
         <source>Pasted</source>
         <comment>from Clipboard</comment>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>nx::vms::client::desktop::ConnectToCurrentSystemTool</name>
+    <message>
+        <source>Configuring Server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Updating Server</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8234,6 +7952,17 @@ to %1</source>
     </message>
 </context>
 <context>
+    <name>nx::vms::client::desktop::EulaDialog</name>
+    <message>
+        <source>Please review and agree to the %1 in order to proceed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>To use the software you must agree with the end user license agreement</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>nx::vms::client::desktop::EventPanel::Private</name>
     <message>
         <source>Notifications</source>
@@ -8303,10 +8032,6 @@ to %1</source>
         <source>No events</source>
         <translation></translation>
     </message>
-    <message>
-        <source>No events occured</source>
-        <translation></translation>
-    </message>
     <message numerus="yes">
         <source>%n events</source>
         <translation>
@@ -8316,6 +8041,10 @@ to %1</source>
     </message>
     <message>
         <source>unnamed analytics engine</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No events occurred</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -8817,30 +8546,6 @@ to %1</source>
         <translation></translation>
     </message>
     <message>
-        <source>Ready to install client updates</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Install now</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Later</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Updates downloaded</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Failed to download update packages</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Please make sure there is enough free storage space and network connection is stable.</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>If the problem persists, please contact Customer Support.</source>
         <translation></translation>
     </message>
@@ -8853,19 +8558,7 @@ to %1</source>
         <translation></translation>
     </message>
     <message>
-        <source>Failed to download update packages to some servers</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Please make sure they have enough free storage space and stable network connection.</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Update completed</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Update completed, but some servers have failed an update</source>
         <translation></translation>
     </message>
     <message>
@@ -8877,15 +8570,7 @@ to %1</source>
         <translation></translation>
     </message>
     <message>
-        <source>Failed to install updates to servers:</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Downloading updates...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Pushing updates...</source>
         <translation></translation>
     </message>
     <message>
@@ -9003,6 +8688,66 @@ to %1</source>
         <source>There are no online servers to update.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Some servers haven&apos;t completed update process. Finish it anyway?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel update and delete all downloaded data?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>There was an error while installing updates:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Some servers have gone offline. Please wait until they become online to continue.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Update completed, but some components have failed an update</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please update %1 manually using an installation package.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 will be restarted to the updated version.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to download update packages to some components</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to start update</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Starting update to ...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Some servers have no package available</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to cancel update</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to start installation</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::MultipleLayoutSelectionDialog</name>
@@ -9028,6 +8773,26 @@ to %1</source>
         <source>Acknowledge</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Generic Event</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Device was disconnected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera was disconnected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Module was disconnected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown Plugin Diagnostic Event</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::NotificationListWidget::Private</name>
@@ -9047,10 +8812,6 @@ to %1</source>
         <translation></translation>
     </message>
     <message>
-        <source>Local layouts can only be shown to their owners. </source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Select layout...</source>
         <translation></translation>
     </message>
@@ -9065,6 +8826,105 @@ to %1</source>
     <message>
         <source>None of selected user roles contain users. Action will not work.</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>nx::vms::client::desktop::PeerStateTracker</name>
+    <message>
+        <source>The server is taking too long to respond</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No update task</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ready to download update</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Downloading update</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ready to restart to the new version</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Installing update</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Installed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to download update</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to install update</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Waiting for peer data</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>There is not enough space to download update files.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>There is not enough space to extract update files.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to download update packages.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Update contents are invalid.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Update archive is corrupted.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Update files cannot be extracted.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Internal downloader error.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Internal client error.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown error.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unexpected error code.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ready to install update</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Update package is not found.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>There is not enough space to install update.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Internal server error.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -9209,16 +9069,79 @@ to %1</source>
         <translation></translation>
     </message>
     <message>
-        <source>User will be automatically logged out after this period of time.</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>minutes</source>
         <translation></translation>
     </message>
     <message>
         <source>hours</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Users will be automatically logged out if their session exceeds the specified duration.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>nx::vms::client::desktop::ServerSettingsDialogStore</name>
+    <message>
+        <source>Library</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Version</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vendor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>no error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>library file cannot be loaded</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>invalid or incompatible plugin library</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>plugin library failed to initialize</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>plugin returned bad manifest</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>plugin API version is no longer supported</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>unknown error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not loaded</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Loaded</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>plugin is in the black list</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Status</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>plugin is optional and is not in the white list</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -9239,13 +9162,24 @@ to %1</source>
         <source>Downloaded</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Waiting for server to respond...</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>nx::vms::client::desktop::ServerUpdateTool</name>
+    <message>
+        <source>No connection to the server.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Network error.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::ServerUpdatesModel</name>
-    <message>
-        <source>Current Version</source>
-        <translation></translation>
-    </message>
     <message>
         <source>Status</source>
         <translation></translation>
@@ -9264,6 +9198,10 @@ to %1</source>
     </message>
     <message>
         <source>Component</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Installed Version</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -9354,8 +9292,8 @@ to %1</source>
     <message numerus="yes">
         <source>Double click to add cameras to the current layout or ctrl+click to open in a new tab</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>Double click to add camera to the current layout or ctrl+click to open in a new tab</numerusform>
+            <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
         </translation>
     </message>
     <message>
@@ -9564,12 +9502,62 @@ to %1</source>
         <source>Starting export...</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Saving layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stop Saving</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Saving failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Starting saving...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>We are preparing files for the export process. Please wait for a few seconds.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>nx::vms::client::desktop::WorkbenchUpdateWatcher</name>
+    <message>
+        <source>%1 version available</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Release Notes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Major issues have been fixed. Update is strongly recommended.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Update...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Do not notify again about this update</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::detail::BaseInputField</name>
     <message>
         <source>multiple values</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>nx::vms::client::desktop::integrations::entropix::ReconstructResolutionIntegration</name>
+    <message>
+        <source>Reconstruct Resolution</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -9922,6 +9910,25 @@ to %1</source>
     </message>
     <message>
         <source>This build is for testing purposes only.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Server Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Confirm storage location to store analytics data on &apos;%1&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
+Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
+By default analytics data will be stored in mediaserver&apos;s installation directory.
+You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

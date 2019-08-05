@@ -9,7 +9,11 @@
 #include <media_server/media_server_module.h>
 #include <media_server/serverutil.h>
 #include <media_server/settings.h>
+#include <nx_ec/ec_api.h>
 #include <nx/utils/log/log.h>
+#include <nx/vms/api/data/camera_data.h>
+#include <nx/vms/api/data/camera_attributes_data.h>
+#include <nx/vms/api/data/layout_data.h>
 #include <nx/vms/server/fs/media_paths/media_paths.h>
 #include <nx/vms/server/fs/media_paths/media_paths_filter_config.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
@@ -252,7 +256,7 @@ public:
     virtual QString getMaxServerKey() const override
     {
         QString serverKey;
-        for (const auto server: resourcePool()->getAllServers(Qn::AnyStatus))
+        for (const auto server: serverModule()->resourcePool()->getAllServers(Qn::AnyStatus))
             serverKey = qMax(serverKey, server->getAuthKey());
 
         return serverKey;

@@ -59,6 +59,9 @@ public:
 
     virtual ~StreamSocket() override;
 
+    StreamSocket(const StreamSocket&) = delete;
+    StreamSocket& operator=(const StreamSocket&) = delete;
+
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
     virtual void pleaseStopSync() override;
 
@@ -88,6 +91,8 @@ public:
 
     virtual void handshakeAsync(
         nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override;
+
+    virtual std::string serverName() const override;
 
 protected:
     virtual void cancelIoInAioThread(nx::network::aio::EventType eventType) override;

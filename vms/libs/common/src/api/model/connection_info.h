@@ -17,9 +17,8 @@
  */
 struct QnConnectionInfo
 {
-    /*!
-        \note considering that servers with no proto version support have version nx_ec::INITIAL_EC2_PROTO_VERSION
-    */
+    // Note that servers with no proto version support have version
+    // nx::vms::api::kInitialProtocolVersion.
     QnConnectionInfo();
 
     nx::utils::Url ecUrl;

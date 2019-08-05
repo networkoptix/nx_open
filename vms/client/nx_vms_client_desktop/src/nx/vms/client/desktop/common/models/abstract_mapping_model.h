@@ -3,6 +3,7 @@
 #include <type_traits>
 
 #include <QtCore/QAbstractItemModel>
+#include <QtCore/QSize>
 
 namespace nx::vms::client::desktop {
 

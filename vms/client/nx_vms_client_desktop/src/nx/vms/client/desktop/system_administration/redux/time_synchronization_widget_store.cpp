@@ -102,12 +102,7 @@ void TimeSynchronizationWidgetStore::selectServer(const QnUuid& serverId)
         [&](State state) { return Reducer::selectServer(std::move(state), serverId); });
 }
 
-void TimeSynchronizationWidgetStore::setVmsTime(std::chrono::milliseconds value)
-{
-    d->executeAction([&](State state) { state.vmsTime = value; return state; });
-}
-
-void TimeSynchronizationWidgetStore::setTimeOffsets(const TimeOffsetInfoList &offsetList)
+void TimeSynchronizationWidgetStore::setTimeOffsets(const TimeOffsetInfoList &offsetList, milliseconds baseTime)
 {
     d->executeAction(
         [&](State state)
@@ -131,6 +126,30 @@ void TimeSynchronizationWidgetStore::setTimeOffsets(const TimeOffsetInfoList &of
 
             // Update cached value
             state.commonTimezoneOffset = state.calcCommonTimezoneOffset();
+            state.baseTime = baseTime;
+
+            return state;
+        });
+}
+
+void TimeSynchronizationWidgetStore::setBaseTime(milliseconds time)
+{
+    d->executeAction(
+        [&](State state)
+        {
+            state.baseTime = time;
+            state.elapsedTime = 0ms;
+
+            return state;
+        });
+}
+
+void TimeSynchronizationWidgetStore::setElapsedTime(milliseconds time)
+{
+    d->executeAction(
+        [&](State state)
+        {
+            state.elapsedTime = time;
 
             return state;
         });

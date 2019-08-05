@@ -27,6 +27,8 @@ def find_or_add_product(name, customization, product_type_name='cloud_portal'):
         product = Product(name=name)
         product.product_type = product_type
         product.save()
+        product.customizations = [customization]
+        product.save()
     return product
 
 
@@ -155,7 +157,7 @@ def update_from_object(cms_structure):
                     data_structure.optional = True
 
                 elif data_structure.type in [DataStructure.DATA_TYPES.object, DataStructure.DATA_TYPES.array]:
-                    value = json.dumps(value)
+                    value = json.dumps(value, indent=4)
 
                 data_structure.meta_settings = meta if meta else {}
                 data_structure.default = value

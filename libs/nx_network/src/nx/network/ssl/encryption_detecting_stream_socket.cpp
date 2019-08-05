@@ -40,6 +40,14 @@ void EncryptionDetectingStreamSocket::handshakeAsync(
         &EncryptionDetectingStreamSocket::proceedWithSslHandshakeIfNeeded, this, _1));
 }
 
+std::string EncryptionDetectingStreamSocket::serverName() const
+{
+    if (!m_sslUsed)
+        return std::string();
+
+    return static_cast<const ssl::StreamSocket&>(actualDataChannel()).serverName();
+}
+
 std::unique_ptr<AbstractStreamSocket> EncryptionDetectingStreamSocket::createSslSocket(
     std::unique_ptr<AbstractStreamSocket> rawDataSource)
 {

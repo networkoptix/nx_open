@@ -85,22 +85,23 @@ UdtSocket<InterfaceToImplement>::UdtSocket(
 {
     NX_CRITICAL((SocketGlobals::initializationFlags() & InitializationFlags::disableUdt) == 0);
 
-    this->m_impl = static_cast<UdtSocketImpl*>(this->Pollable::m_impl.get());
+    this->m_impl = static_cast<UdtSocketImpl*>(this->Pollable::impl());
 }
 
 template<typename InterfaceToImplement>
-bool UdtSocket<InterfaceToImplement>::bindToUdpSocket(UDPSocket&& udpSocket)
+bool UdtSocket<InterfaceToImplement>::bindToUdpSocket(
+    AbstractDatagramSocket* udpSocket)
 {
-    if (!udpSocket.setNonBlockingMode(false))
+    if (!udpSocket->setNonBlockingMode(false))
         return false;
 
     // Taking system socket out of udpSocket.
-    if (UDT::bind2(m_impl->udtHandle, udpSocket.handle()) != 0)
+    if (UDT::bind2(m_impl->udtHandle, udpSocket->pollable()->handle()) != 0)
     {
         detail::setLastSystemErrorCodeAppropriately();
         return false;
     }
-    udpSocket.takeHandle();
+    udpSocket->pollable()->takeHandle();
     return true;
 }
 

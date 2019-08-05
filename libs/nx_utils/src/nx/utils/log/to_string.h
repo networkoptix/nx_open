@@ -63,6 +63,7 @@ NX_UTILS_API QString toString(const std::chrono::minutes& value);
 NX_UTILS_API QString toString(const std::chrono::seconds& value);
 NX_UTILS_API QString toString(const std::chrono::milliseconds& value);
 NX_UTILS_API QString toString(const std::chrono::microseconds& value);
+NX_UTILS_API QString toString(const std::chrono::nanoseconds& value);
 
 //-------------------------------------------------------------------------------------------------
 // Pointers.
@@ -158,7 +159,7 @@ template<std::size_t N>
 QString toString(const std::bitset<N>& value)
 {
     std::ostringstream result;
-    result << "bitset(" << value << ")";
+    result << "0b" << value;
     return QString::fromStdString(result.str());
 }
 

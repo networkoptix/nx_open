@@ -247,8 +247,6 @@ void QnWorkbenchResourcesSettingsHandler::at_copyRecordingScheduleAction_trigger
         parent, recordingEnabled, motionUsed, dualStreamingUsed, hasVideo);
 
     dialog->setDelegate(dialogDelegate);
-
-    dialog->setSelectedResources({camera->getId()});
     setHelpTopic(dialog.data(), Qn::CameraSettings_Recording_Export_Help);
     if (!dialog->exec())
         return;
@@ -291,7 +289,7 @@ void QnWorkbenchResourcesSettingsHandler::at_copyRecordingScheduleAction_trigger
                             sourceCamera,
                             task.streamQuality,
                             task.fps,
-                            QString()); //< Bitrate for default codec.
+                            /*codec*/ QString()); //< Bitrate for default codec.
 
                     const auto bitrateAspect = (bitrate - normalBitrate) / normalBitrate;
                     const auto targetNormalBitrate =
@@ -299,7 +297,7 @@ void QnWorkbenchResourcesSettingsHandler::at_copyRecordingScheduleAction_trigger
                             camera,
                             task.streamQuality,
                             task.fps,
-                            QString()); //< Bitrate for default codec.
+                            /*codec*/ QString()); //< Bitrate for default codec.
 
                     const auto targetBitrate = targetNormalBitrate * bitrateAspect;
                     task.bitrateKbps = targetBitrate;
@@ -311,10 +309,19 @@ void QnWorkbenchResourcesSettingsHandler::at_copyRecordingScheduleAction_trigger
             camera->setRecordBeforeMotionSec(sourceCamera->recordBeforeMotionSec());
             camera->setRecordAfterMotionSec(sourceCamera->recordAfterMotionSec());
             camera->setScheduleTasks(tasks);
+
+            if (copyArchiveLength)
+            {
+                camera->setMinDays(sourceCamera->minDays());
+                camera->setMaxDays(sourceCamera->maxDays());
+            }
         };
 
-    const auto selectedCameras = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
+    auto selectedCameras = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
         dialog->selectedResources());
+
+    // Do not try to copy camera schedule to itself.
+    selectedCameras.removeAll(camera);
 
     qnResourcesChangesManager->saveCameras(selectedCameras, applyChanges);
 }
@@ -325,13 +332,12 @@ void QnWorkbenchResourcesSettingsHandler::at_updateLocalFilesAction_triggered()
 
     // We should update local media directories
     // Is there a better place for it?
-    if (auto localFilesSearcher = commonModule()->instance<QnResourceDirectoryBrowser>())
+    if (auto localFilesSearcher = commonModule()->instance<ResourceDirectoryBrowser>())
     {
-        QStringList dirs;
-        dirs << qnSettings->mediaFolder();
-        dirs << qnSettings->extraMediaFolders();
-        localFilesSearcher->setPathCheckList(dirs);
-        emit localFilesSearcher->startLocalDiscovery();
+        QStringList paths;
+        paths.append(qnSettings->mediaFolder());
+        paths.append(qnSettings->extraMediaFolders());
+        localFilesSearcher->setLocalResourcesDirectories(paths);
     }
 }
 

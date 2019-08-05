@@ -113,6 +113,10 @@ void QnResourceTreeModelLayoutNode::addItem(const QnLayoutItemData& item)
     if (item.uuid.isNull())
         return;
 
+    const auto resource = resourcePool()->getResourceByDescriptor(item.resource);
+    if (!resource)
+        return;
+
     QnResourceTreeModelNodePtr node(new QnResourceTreeModelNode(model(), item.uuid,
         NodeType::layoutItem));
 
@@ -120,10 +124,6 @@ void QnResourceTreeModelLayoutNode::addItem(const QnLayoutItemData& item)
     node->setParent(toSharedPointer());
 
     m_items.insert(item.uuid, node);
-
-    const auto resource = resourcePool()->getResourceByDescriptor(item.resource);
-    if (!resource)
-        return;
 
     node->setResource(resource);
 

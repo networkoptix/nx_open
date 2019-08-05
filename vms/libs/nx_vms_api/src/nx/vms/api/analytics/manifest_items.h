@@ -28,9 +28,10 @@ struct EventType: NamedItem
 {
     EventTypeFlags flags = EventTypeFlag::noFlags;
     QString groupId;
+    QString provider;
     bool isStateful() const noexcept { return flags.testFlag(EventTypeFlag::stateDependent); }
 };
-#define EventType_Fields NamedItem_Fields (flags)(groupId)
+#define EventType_Fields NamedItem_Fields (flags)(groupId)(provider)
 uint NX_VMS_API qHash(const EventType& eventType);
 
 /**
@@ -38,8 +39,9 @@ uint NX_VMS_API qHash(const EventType& eventType);
  */
 struct ObjectType: NamedItem
 {
+    QString provider;
 };
-#define ObjectType_Fields NamedItem_Fields
+#define ObjectType_Fields NamedItem_Fields (provider)
 
 /**
  * Named group which is referenced from a "groupId" attribute of other types to group them.

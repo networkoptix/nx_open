@@ -73,7 +73,7 @@ public:
         settings->synchronizeNowSync();
     }
 
-    nx::utils::Url makeUrl(const Appserver2Ptr& appserver2, const QString& path) const
+    nx::utils::Url makeUrl(const Appserver2Ptr& /*appserver2*/, const QString& path) const
     {
         auto endpoint = server2->moduleInstance()->endpoint();
         return lit("http://%1:%2%3")

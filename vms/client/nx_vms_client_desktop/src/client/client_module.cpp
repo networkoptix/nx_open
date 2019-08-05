@@ -4,11 +4,11 @@
 
 #include <QtCore/QDir>
 #include <QtCore/QFileInfo>
+#include <QtCore/QResource>
 
 #include <QtWidgets/QApplication>
 #include <QtWebKit/QWebSettings>
 #include <QtQml/QQmlEngine>
-#include <QtOpenGL/QtOpenGL>
 #include <QtGui/QSurfaceFormat>
 
 #include <api/app_server_connection.h>
@@ -30,6 +30,7 @@
 #include <client_core/client_core_module.h>
 
 #include <nx/vms/client/desktop/settings/migration.h>
+#include <nx/vms/client/desktop/director/director.h>
 #include <client/client_app_info.h>
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
@@ -106,6 +107,7 @@
 #include <nx/vms/client/desktop/integrations/integrations.h>
 #include <nx/vms/client/desktop/utils/upload_manager.h>
 #include <nx/vms/client/desktop/utils/wearable_manager.h>
+#include <nx/vms/client/desktop/utils/video_cache.h>
 #include <nx/vms/client/desktop/analytics/object_display_settings.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/system_health/system_internet_access_watcher.h>
@@ -138,12 +140,25 @@
 
 #include <nx/vms/client/desktop/ini.h>
 
+#include <nx/vms/utils/external_resources.h>
+#include <nx/vms/api/protocol_version.h>
+
 using namespace nx;
 using namespace nx::vms::client::desktop;
 
 static const QString kQmlRoot = QStringLiteral("qrc:///qml");
 
 namespace {
+
+void initExternalResources()
+{
+    using namespace nx::vms::utils;
+
+    nx::vms::client::core::FontLoader::loadFonts(
+        externalResourcesDirectory().absoluteFilePath("fonts"));
+
+    registerExternalResource("nx_vms_client_desktop.dat");
+}
 
 typedef std::unique_ptr<QnTranslationManager> QnTranslationManagerPtr;
 
@@ -217,9 +232,22 @@ QnClientModule::QnClientModule(const QnStartupParameters& startupParams, QObject
 {
     ini().reload();
 
+#if defined(Q_OS_WIN)
+    // Enable full crash dumps if needed. Do not disable here as it can be enabled elsewhere.
+    if (ini().profilerMode)
+        win32_exception::setCreateFullCrashDump(true);
+#endif
+
     initThread();
     initMetaInfo();
     initApplication();
+
+    // Skip some modules initialization for unit tests.
+    const bool isFullApplicationMode = (qApp != nullptr);
+
+    if (isFullApplicationMode)
+        initExternalResources();
+
     initSingletons();
 
     /* Do not initialize anything else because we must exit immediately if run in self-update mode. */
@@ -227,7 +255,11 @@ QnClientModule::QnClientModule(const QnStartupParameters& startupParams, QObject
         return;
 
     initNetwork();
-    initSkin();
+
+    // Initialize application UI.
+    if (isFullApplicationMode)
+        initSkin();
+
     initLocalResources();
     initSurfaceFormat();
 
@@ -303,7 +335,7 @@ void QnClientModule::initApplication()
         QApplication::setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);
 }
 
-void QnClientModule::initDesktopCamera(QGLWidget* window)
+void QnClientModule::initDesktopCamera(QOpenGLWidget* window)
 {
     /* Initialize desktop camera searcher. */
     auto commonModule = m_clientCoreModule->commonModule();
@@ -343,10 +375,9 @@ void QnClientModule::initSurfaceFormat()
     format.setSwapBehavior(qnSettings->isGlDoubleBuffer()
         ? QSurfaceFormat::DoubleBuffer
         : QSurfaceFormat::SingleBuffer);
-    format.setSwapInterval(qnRuntime->isVSyncEnabled() ? 1 : 0);
+    format.setSwapInterval(ini().limitFrameRate ? 1 : 0);
 
     QSurfaceFormat::setDefaultFormat(format);
-    QGLFormat::setDefaultFormat(QGLFormat::fromSurfaceFormat(format));
 }
 
 void QnClientModule::initSingletons()
@@ -354,9 +385,10 @@ void QnClientModule::initSingletons()
     // Persistent settings are standalone.
     auto clientSettings = std::make_unique<QnClientSettings>(m_startupParameters);
 
-#ifdef Q_OS_WIN
-    // As soon as settings are ready, setup full crash dumps if needed.
-    win32_exception::setCreateFullCrashDump(clientSettings->createFullCrashDump());
+#if defined(Q_OS_WIN)
+    // Enable full crash dumps if needed. Do not disable here as it can be enabled elsewhere.
+    if (clientSettings->createFullCrashDump())
+        win32_exception::setCreateFullCrashDump(true);
 #endif
 
     // Runtime settings are standalone, but some actual values are taken from persistent settings.
@@ -373,10 +405,19 @@ void QnClientModule::initSingletons()
     const auto clientPeerType = m_startupParameters.videoWallGuid.isNull()
         ? nx::vms::api::PeerType::desktopClient
         : nx::vms::api::PeerType::videowallClient;
-    const auto brand = m_startupParameters.isDevMode() ? QString() : QnAppInfo::productNameShort();
-    const auto customization = m_startupParameters.isDevMode()
-        ? QString()
-        : QnAppInfo::customizationName();
+    const auto brand = ini().developerMode ? QString() : QnAppInfo::productNameShort();
+    const auto customization = ini().developerMode ? QString() : QnAppInfo::customizationName();
+
+    // This must be done before QnCommonModule instantiation.
+    nx::utils::OsInfo::currentVariantOverride = ini().currentOsVariantOverride;
+    nx::utils::OsInfo::currentVariantVersionOverride = ini().currentOsVariantVersionOverride;
+
+    if (m_startupParameters.vmsProtocolVersion > 0)
+    {
+        vms::api::protocolVersionOverride = m_startupParameters.vmsProtocolVersion;
+        NX_WARNING(this, "Starting with overridden protocol version: %1",
+            m_startupParameters.vmsProtocolVersion);
+    }
 
     m_staticCommon.reset(new QnStaticCommonModule(
         clientPeerType,
@@ -387,6 +428,7 @@ void QnClientModule::initSingletons()
     m_clientCoreModule.reset(new QnClientCoreModule());
 
     // Settings migration depends on client core settings.
+    clientSettings->migrate(); //< TODO: Combine with the following method.
     nx::vms::client::desktop::settings::migrate();
 
     // We should load translations before major client's services are started to prevent races
@@ -447,9 +489,6 @@ void QnClientModule::initSingletons()
 
     initializeStatisticsManager(commonModule);
 
-    /* Long runnables depend on QnCameraHistoryPool and other singletons. */
-    commonModule->store(new QnLongRunnablePool());
-
     commonModule->store(new QnCloudConnectionProvider());
     m_cloudStatusWatcher = commonModule->store(
         new QnCloudStatusWatcher(commonModule, /*isMobile*/ false));
@@ -460,6 +499,10 @@ void QnClientModule::initSingletons()
 
     m_uploadManager = new UploadManager(commonModule);
     m_wearableManager = new WearableManager(commonModule);
+
+    m_videoCache = new VideoCache(commonModule);
+    if (ini().globalLiveVideoCacheLength > 0)
+        m_videoCache->setCacheSize(std::chrono::seconds(ini().globalLiveVideoCacheLength));
 
     commonModule->store(m_uploadManager);
     commonModule->store(m_wearableManager);
@@ -515,63 +558,78 @@ void QnClientModule::initRuntimeParams(const QnStartupParameters& startupParams)
             ? QUrl(qmlRoot)
             : QUrl::fromLocalFile(qmlRoot));
     m_clientCoreModule->mainQmlEngine()->addImportPath(qmlRoot);
+
+    for (const QString& path: m_startupParameters.qmlImportPaths)
+        m_clientCoreModule->mainQmlEngine()->addImportPath(path);
 }
 
 void QnClientModule::initLog()
 {
+    nx::utils::enableQtMessageAsserts();
+
     using namespace nx::utils::log;
 
     const auto logFileNameSuffix = calculateLogNameSuffix(m_startupParameters);
 
-    static const QString kLogConfig("desktop_client_log.ini");
-    const QDir iniFilesDir(nx::kit::IniConfig::iniFilesDir());
-    const QString logConfigFile(iniFilesDir.absoluteFilePath(kLogConfig));
-    if (QFileInfo(logConfigFile).exists())
-    {
-        NX_ALWAYS(this, "Log is initialized from the %1", logConfigFile);
-        NX_ALWAYS(this, "Log options from settings are ignored!");
-        QSettings logConfig(logConfigFile, QSettings::IniFormat);
-        Settings logSettings(&logConfig);
-        logSettings.updateDirectoryIfEmpty(
-            QStandardPaths::writableLocation(QStandardPaths::DataLocation));
-        for (auto& logger: logSettings.loggers)
-        {
-            if (const auto target = logger.logBaseName; target != '-')
-                logger.logBaseName = target + logFileNameSuffix;
-        }
+    static const QString kLogConfig("desktop_client_log");
 
-        setMainLogger(
-            buildLogger(logSettings, qApp->applicationName(),qApp->applicationFilePath()));
+    if (initLogFromFile(kLogConfig + logFileNameSuffix))
+        return;
+
+    if (initLogFromFile(kLogConfig, logFileNameSuffix))
+        return;
+
+    NX_INFO(this, "Log is initialized from the settings");
+    QSettings rawSettings;
+    const auto maxBackupCount = rawSettings.value("logArchiveSize", 10).toUInt();
+    const auto maxFileSize = rawSettings.value("maxLogFileSize", 10 * 1024 * 1024).toUInt();
+
+    auto logLevel = m_startupParameters.logLevel;
+    auto logFile = m_startupParameters.logFile;
+
+    if (logLevel.isEmpty())
+    {
+        logLevel = qnSettings->logLevel();
+        NX_INFO(this, "Log level is initialized from the settings");
     }
     else
     {
-        QSettings rawSettings;
-        const auto maxBackupCount = rawSettings.value("logArchiveSize", 10).toUInt();
-        const auto maxFileSize = rawSettings.value("maxLogFileSize", 10 * 1024 * 1024).toUInt();
-
-        auto logLevel = m_startupParameters.logLevel;
-        auto logFile = m_startupParameters.logFile;
-
-        if (logLevel.isEmpty())
-            logLevel = qnSettings->logLevel();
-
-        Settings logSettings;
-        logSettings.loggers.resize(1);
-        auto& logger = logSettings.loggers.front();
-        logger.maxBackupCount = maxBackupCount;
-        logger.maxFileSize = maxFileSize;
-        logger.level.parse(logLevel);
-        logger.logBaseName = logFile.isEmpty()
-            ? ("client_log" + logFileNameSuffix)
-            : logFile;
-        logSettings.updateDirectoryIfEmpty(
-            QStandardPaths::writableLocation(QStandardPaths::DataLocation));
-
-        setMainLogger(
-            buildLogger(logSettings, qApp->applicationName(), qApp->applicationFilePath()));
+        NX_INFO(this, "Log level is initialized from the command line");
     }
 
-    nx::utils::enableQtMessageAsserts();
+    Settings logSettings;
+    logSettings.loggers.resize(1);
+    auto& logger = logSettings.loggers.front();
+    logger.maxBackupCount = maxBackupCount;
+    logger.maxFileSize = maxFileSize;
+    logger.level.parse(logLevel);
+    logger.logBaseName = logFile.isEmpty()
+        ? ("client_log" + logFileNameSuffix)
+        : logFile;
+    logSettings.updateDirectoryIfEmpty(
+        QStandardPaths::writableLocation(QStandardPaths::DataLocation));
+
+    setMainLogger(
+        buildLogger(logSettings, qApp->applicationName(), qApp->applicationFilePath()));
+}
+
+bool QnClientModule::initLogFromFile(const QString& filename, const QString& suffix)
+{
+    const QDir iniFilesDir(nx::kit::IniConfig::iniFilesDir());
+    const QString logConfigFile(iniFilesDir.absoluteFilePath(filename + ".ini"));
+
+    if (!QFileInfo(logConfigFile).exists())
+        return false;
+
+    NX_INFO(this, "Log is initialized from the %1", logConfigFile);
+    NX_INFO(this, "Log options from settings are ignored!");
+
+    return nx::utils::log::initializeFromConfigFile(
+        logConfigFile,
+        QStandardPaths::writableLocation(QStandardPaths::DataLocation),
+        qApp->applicationName(),
+        qApp->applicationFilePath(),
+        suffix);
 }
 
 void QnClientModule::initNetwork()
@@ -603,21 +661,10 @@ void QnClientModule::initNetwork()
     commonModule->instance<QnServerInterfaceWatcher>();
 }
 
-//#define ENABLE_DYNAMIC_CUSTOMIZATION
 void QnClientModule::initSkin()
 {
     QStringList paths;
     paths << ":/skin";
-    paths << ":/skin_dark";
-
-#ifdef ENABLE_DYNAMIC_CUSTOMIZATION
-    if (!m_startupParameters.dynamicCustomizationPath.isEmpty())
-    {
-        QDir base(startupParams.dynamicCustomizationPath);
-        paths << base.absoluteFilePath("skin");
-        paths << base.absoluteFilePath("skin_dark");
-    }
-#endif // ENABLE_DYNAMIC_CUSTOMIZATION
 
     QScopedPointer<QnSkin> skin(new QnSkin(paths));
 
@@ -628,16 +675,8 @@ void QnClientModule::initSkin()
     QScopedPointer<QnCustomizer> customizer(new QnCustomizer(customization));
     customizer->customize(qnGlobals);
 
-    /* Initialize application UI. Skip if run in console (e.g. unit-tests). */
-    if (qApp)
-    {
-        nx::vms::client::core::FontLoader::loadFonts(
-            QDir(QApplication::applicationDirPath()).absoluteFilePath(
-                nx::utils::AppInfo::isMacOsX() ? "../Resources/fonts" : "fonts"));
-
-        QApplication::setWindowIcon(qnSkin->icon(":/logo.png"));
-        QApplication::setStyle(skin->newStyle(customizer->genericPalette()));
-    }
+    QApplication::setWindowIcon(qnSkin->icon(":/logo.png"));
+    QApplication::setStyle(skin->newStyle(customizer->genericPalette()));
 
     auto commonModule = m_clientCoreModule->commonModule();
     commonModule->store(skin.take());
@@ -661,20 +700,17 @@ void QnClientModule::initLocalResources()
     resourceProcessor->moveToThread(resourceDiscoveryManager);
     resourceDiscoveryManager->setResourceProcessor(resourceProcessor);
 
-    if (!m_startupParameters.skipMediaFolderScan)
-    {
-        auto localFilesSearcher = commonModule->store(new QnResourceDirectoryBrowser());
-
-        localFilesSearcher->setLocal(true);
-        QStringList dirs;
-        dirs << qnSettings->mediaFolder();
-        dirs << qnSettings->extraMediaFolders();
-        localFilesSearcher->setPathCheckList(dirs);
-        resourceDiscoveryManager->addDeviceServer(localFilesSearcher);
-    }
     resourceDiscoveryManager->setReady(true);
     commonModule->store(new QnSystemsWeightsManager());
     commonModule->store(new QnLocalResourceStatusWatcher());
+    if (!m_startupParameters.skipMediaFolderScan && !m_startupParameters.acsMode)
+    {
+        auto localFilesSearcher = commonModule->store(new ResourceDirectoryBrowser());
+        QStringList paths;
+        paths.append(qnSettings->mediaFolder());
+        paths.append(qnSettings->extraMediaFolders());
+        localFilesSearcher->setLocalResourcesDirectories(paths);
+    }
 }
 
 QnCloudStatusWatcher* QnClientModule::cloudStatusWatcher() const
@@ -712,6 +748,11 @@ WearableManager* QnClientModule::wearableManager() const
     return m_wearableManager;
 }
 
+VideoCache* QnClientModule::videoCache() const
+{
+    return m_videoCache;
+}
+
 void QnClientModule::initLocalInfo()
 {
     auto commonModule = m_clientCoreModule->commonModule();
@@ -724,8 +765,8 @@ void QnClientModule::initLocalInfo()
     runtimeData.peer.id = commonModule->moduleGUID();
     runtimeData.peer.instanceId = commonModule->runningInstanceGUID();
     runtimeData.peer.peerType = clientPeerType;
-    runtimeData.brand = qnRuntime->isDevMode() ? QString() : QnAppInfo::productNameShort();
-    runtimeData.customization = qnRuntime->isDevMode() ? QString() : QnAppInfo::customizationName();
+    runtimeData.brand = ini().developerMode ? QString() : QnAppInfo::productNameShort();
+    runtimeData.customization = ini().developerMode ? QString() : QnAppInfo::customizationName();
     runtimeData.videoWallInstanceGuid = m_startupParameters.videoWallItemGuid;
     commonModule->runtimeInfoManager()->updateLocalItem(runtimeData); // initializing localInfo
 }

@@ -36,6 +36,24 @@ TEST(Url, ipv6_withScopeId)
     checkUrl("http://[fe80::5be3:f02d:21e7:2450%3]", kTestIp);
 }
 
+TEST(Url, setHost)
+{
+    Url url;
+
+    url.setHost("zorz");
+    ASSERT_EQ(url.host(), "zorz");
+    url.setHost("");
+    ASSERT_EQ(url.host(), "");
+
+    url.setHost("zorz-123");
+    ASSERT_EQ(url.host(), "zorz-123");
+    url.setHost("invalid_ho$tname_%");
+    ASSERT_EQ(url.host(), "zorz-123");
+    url.setHost(QString());
+    ASSERT_EQ(url.host(), QString());
+
+}
+
 TEST(Url, url_encoded)
 {
     Url nxUrl(kTestUrl);
@@ -114,6 +132,22 @@ TEST(Url, logging)
     }
 }
 
+TEST(Url, fromUserInput)
+{
+    const auto expectEq =
+        [](const QString& input, const QString& expectedUrl)
+        {
+            EXPECT_EQ(expectedUrl, Url::fromUserInput(input).toString());
+        };
+
+    expectEq("192.168.0.1", "http://192.168.0.1");
+    expectEq("192.168.0.2:7001", "http://192.168.0.2:7001");
+    expectEq("192.168.0.3:7001/api/call", "http://192.168.0.3:7001/api/call");
+
+    expectEq("ya.ru", "http://ya.ru");
+    expectEq("ya.ru:8080", "http://ya.ru:8080");
+    expectEq("ya.ru/index.html", "http://ya.ru/index.html");
+}
 
 } // namespace test
 } // namespace utils

@@ -10,7 +10,15 @@
     "loginButton": "Entrar",
     "logoutAuthorisedTitle": "Já tem sessão iniciada",
     "logoutAuthorisedContinueButton": "Continuar",
-    "logoutAuthorisedLogoutButton": "Terminar sessão"
+    "logoutAuthorisedLogoutButton": "Terminar sessão",
+    "messageFailed": "Message has failed to send.",
+    "messageSent": "Message has been sent."
+  },
+  "messageType": {
+    "ipvd_feedback": "Feedback about {{product}}",
+    "sales_inquiry": "Inquiry for {{product}}",
+    "request_support": "Request Support for {{product}}",
+    "unknown": "Unknown Message Type"
   },
   "pageTitles": {
     "template": "{{title}} %PRODUCT_NAME%",
@@ -37,8 +45,9 @@
     "pageNotFound": "Página não encontrada"
   },
   "systemStatuses": {
-    "notActivated": "não ativado",
     "activated": "ativado",
+    "merging": "merging",
+    "notActivated": "não ativado",
     "online": "online",
     "offline": "desligada",
     "unavailable": "indisponível"
@@ -139,7 +148,8 @@
     "thisSystem": "o sistema",
     "oldSafariNotSupported": "Versões do Safari anteriores à 10 não são suportadas",
     "DUPLICATE_MEDIASERVER_FOUND": "Servidores duplicados foram encontrados em um dos sistemas.<br> Remova servidores antigos de cada sistema que você está tentando mesclar e tente novamente.",
-    "mergedSystemIsOffline": "Um dos sistemas que estão sendo mesclados está offline. Verifique se estão online e tente novamente."
+    "mergedSystemIsOffline": "Um dos sistemas que estão sendo mesclados está offline. Verifique se estão online e tente novamente.",
+    "INCOMPATIBLE": "Versions for systems are incompatible. To fix this problem make sure the systems have the same version."
   },
   "passwordRequirements": {
     "good": "bom",
@@ -186,7 +196,8 @@
     "successDisconnected": "O Sistema foi desconectado de %PRODUCT_NAME% com sucesso",
     "successDeleted": "O sistema {{systemName}} foi apagado com sucesso da sua conta",
     "successMerge": "Mesclagem de sistema concluída",
-    "permissionsRemoved": "As permissões foram removidas de {{email}}"
+    "permissionsRemoved": "As permissões foram removidas de {{email}}",
+    "unknownName": "Unknown Name for System (Caused by cloud merge)"
   },
   "account": {
     "accountSavedSuccess": "A sua conta foi gravada com sucesso",

@@ -1,3 +1,5 @@
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+
 #pragma once
 
 #include <string>
@@ -22,7 +24,7 @@ namespace analytics {
 class Plugin: public RefCountable<IPlugin>
 {
 public:
-    using CreateEngine = std::function<IEngine*(IPlugin* plugin)>;
+    using CreateEngine = std::function<IEngine*(Plugin* plugin)>;
 
     /**
      * @param libName Name of the plugin library. It's needed for the logging.
@@ -36,7 +38,7 @@ public:
 
     virtual ~Plugin() override;
 
-    const Ptr<IUtilityProvider>& utilityProvider() const { return m_utilityProvider; }
+    Ptr<IUtilityProvider> utilityProvider() const { return m_utilityProvider; }
 
 //-------------------------------------------------------------------------------------------------
 // Not intended to be used by a descendant.

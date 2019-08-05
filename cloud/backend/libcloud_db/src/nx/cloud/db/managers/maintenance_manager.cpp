@@ -5,16 +5,16 @@
 #include <nx/cloud/db/managers/managers_types.h>
 #include <nx/clusterdb/engine/synchronization_engine.h>
 
-#include <nx_ec/ec_proto_version.h>
+#include <nx/vms/api/protocol_version.h>
 
 namespace nx::cloud::db {
 
 MaintenanceManager::MaintenanceManager(
-    clusterdb::engine::SyncronizationEngine* const syncronizationEngine,
+    clusterdb::engine::SynchronizationEngine* const synchronizationEngine,
     const nx::sql::InstanceController& dbInstanceController)
     :
-    m_moduleGuid(syncronizationEngine->peerId()),
-    m_syncronizationEngine(syncronizationEngine),
+    m_moduleGuid(synchronizationEngine->peerId()),
+    m_synchronizationEngine(synchronizationEngine),
     m_dbInstanceController(dbInstanceController)
 {
 }
@@ -37,7 +37,7 @@ void MaintenanceManager::getVmsConnections(
             completionHandler = std::move(completionHandler)]()
         {
             const auto ec2Connections =
-                m_syncronizationEngine->connectionManager().getConnections();
+                m_synchronizationEngine->connectionManager().getConnections();
             api::VmsConnectionDataList result;
             result.connections.reserve(ec2Connections.size());
             for (const auto& connection: ec2Connections)
@@ -55,11 +55,11 @@ void MaintenanceManager::getTransactionLog(
     data::SystemId systemId,
     std::function<void(
         api::Result,
-        ::ec2::ApiTransactionDataList)> completionHandler)
+        nx::clusterdb::engine::CommandDataList)> completionHandler)
 {
     using namespace std::placeholders;
 
-    m_syncronizationEngine->transactionLog().readTransactions(
+    m_synchronizationEngine->transactionLog().readTransactions(
         systemId.systemId.c_str(),
         nx::clusterdb::engine::ReadCommandsFilter::kEmptyFilter,
         std::bind(&MaintenanceManager::onTransactionLogRead, this,
@@ -79,7 +79,7 @@ void MaintenanceManager::getStatistics(
         {
             data::Statistics statistics;
             statistics.onlineServerCount =
-                (int)m_syncronizationEngine->connectionManager().getConnectionCount();
+                (int)m_synchronizationEngine->connectionManager().getConnectionCount();
             statistics.dbQueryStatistics =
                 m_dbInstanceController.statisticsCollector().getQueryStatistics();
             statistics.pendingSqlQueryCount =
@@ -94,10 +94,10 @@ void MaintenanceManager::onTransactionLogRead(
     const std::string& systemId,
     clusterdb::engine::ResultCode ec2ResultCode,
     std::vector<clusterdb::engine::dao::TransactionLogRecord> serializedTransactions,
-    vms::api::TranState /*readedUpTo*/,
+    nx::clusterdb::engine::NodeState /*readedUpTo*/,
     std::function<void(
         api::Result,
-        ::ec2::ApiTransactionDataList)> completionHandler)
+        nx::clusterdb::engine::CommandDataList)> completionHandler)
 {
     api::ResultCode resultCode = ec2ResultToResult(ec2ResultCode);
 
@@ -109,16 +109,16 @@ void MaintenanceManager::onTransactionLogRead(
     {
         return completionHandler(
             resultCode,
-            ::ec2::ApiTransactionDataList());
+            nx::clusterdb::engine::CommandDataList());
     }
 
-    ::ec2::ApiTransactionDataList outData;
+    nx::clusterdb::engine::CommandDataList outData;
     for (const auto& transactionContext: serializedTransactions)
     {
-        ::ec2::ApiTransactionData tran(m_moduleGuid);
+        nx::clusterdb::engine::CommandData tran(m_moduleGuid);
         tran.tranGuid = QnUuid::fromStringSafe(transactionContext.hash);
         nx::Buffer serializedTransaction =
-            transactionContext.serializer->serialize(Qn::UbjsonFormat, nx_ec::EC2_PROTO_VERSION);
+            transactionContext.serializer->serialize(Qn::UbjsonFormat, nx::vms::api::protocolVersion());
         tran.dataSize = serializedTransaction.size();
         QnUbjsonReader<nx::Buffer> stream(&serializedTransaction);
         if (QnUbjson::deserialize(&stream, &tran.tran))
@@ -133,7 +133,7 @@ void MaintenanceManager::onTransactionLogRead(
                     .arg(systemId).arg(transactionContext.hash));
             return completionHandler(
                 api::ResultCode::invalidFormat,
-                ::ec2::ApiTransactionDataList());
+                nx::clusterdb::engine::CommandDataList());
         }
     }
 

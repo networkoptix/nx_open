@@ -39,10 +39,7 @@ public:
     static void failedRestartClientMessage(QWidget* parent);
 
 private:
-    static bool getInstalledVersions(
-        const nx::vms::api::SoftwareVersion& engineVersion,
-        QList<nx::utils::SoftwareVersion>* versions);
-    static Qn::ConnectionResult handleApplauncherError(QWidget* parentWidget);
+    static bool getInstalledVersions(QList<nx::utils::SoftwareVersion>* versions);
 
     static QString getDiffVersionsText();
     static QString getDiffVersionsExtra(

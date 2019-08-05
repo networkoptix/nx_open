@@ -16,6 +16,13 @@ from api.helpers.exceptions import APIRequestException, APIException, APILogicEx
 
 logger = logging.getLogger(__name__)
 
+IP_MAX_LENGTH = 255
+
+
+def get_ip(request):
+    ip = request.META.get('HTTP_X_FORWARDED_FOR')
+    return ip if len(ip) <= IP_MAX_LENGTH else ip[:IP_MAX_LENGTH]
+
 
 class AccountBackend(ModelBackend):
     @staticmethod
@@ -135,10 +142,6 @@ class AccountManager(db.models.Manager):
 
 
 
-def get_ip(request):
-    return request.META.get('HTTP_X_FORWARDED_FOR')
-
-
 @receiver(user_logged_in)
 def user_logged_in_callback(sender, request, user, **kwargs):
     ip = get_ip(request)
@@ -149,7 +152,7 @@ def user_logged_in_callback(sender, request, user, **kwargs):
 @receiver(user_logged_out)
 def user_logged_out_callback(sender, request, user, **kwargs):
     ip = get_ip(request)
-    logger.info('User logged our: {}, IP: {}'.format(user.email, ip))
+    logger.info('User logged out: {}, IP: {}'.format(user.email, ip))
     models.AccountLoginHistory.objects.create(action='user_logged_out', ip=ip, email=user.email)
 
 

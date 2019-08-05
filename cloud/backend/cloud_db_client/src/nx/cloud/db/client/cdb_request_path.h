@@ -2,53 +2,50 @@
 
 namespace nx::cloud::db {
 
-extern const char* const kAccountRegisterPath;
-extern const char* const kAccountActivatePath;
-extern const char* const kAccountGetPath;
-extern const char* const kAccountUpdatePath;
-extern const char* const kAccountPasswordResetPath;
-extern const char* const kAccountReactivatePath;
-extern const char* const kAccountCreateTemporaryCredentialsPath;
+static constexpr char kAccountRegisterPath[] = "/cdb/account/register";
+static constexpr char kAccountActivatePath[] = "/cdb/account/activate";
+static constexpr char kAccountGetPath[] = "/cdb/account/get";
+static constexpr char kAccountUpdatePath[] = "/cdb/account/update";
+static constexpr char kAccountPasswordResetPath[] = "/cdb/account/resetPassword";
+static constexpr char kAccountReactivatePath[] = "/cdb/account/reactivate";
+static constexpr char kAccountCreateTemporaryCredentialsPath[] = "/cdb/account/createTemporaryCredentials";
 
-extern const char* const kSystemBindPath;
-extern const char* const kSystemUnbindPath;
-extern const char* const kSystemGetPath;
-extern const char* const kSystemSharePath;
-extern const char* const kSystemGetCloudUsersPath;
-extern const char* const kSystemGetAccessRoleListPath;
-extern const char* const kSystemRenamePath;
-extern const char* const kSystemUpdatePath;
-extern const char* const kSystemRecordUserSessionStartPath;
-extern const char* const kSystemHealthHistoryPath;
-extern const char* const kSystemsMergedToASpecificSystem;
+static constexpr char kSystemBindPath[] = "/cdb/system/bind";
+static constexpr char kSystemUnbindPath[] = "/cdb/system/unbind";
+static constexpr char kSystemGetPath[] = "/cdb/system/get";
+static constexpr char kSystemSharePath[] = "/cdb/system/share";
+static constexpr char kSystemGetCloudUsersPath[] = "/cdb/system/getCloudUsers";
+static constexpr char kSystemGetAccessRoleListPath[] = "/cdb/system/getAccessRoleList";
+static constexpr char kSystemRenamePath[] = "/cdb/system/rename";
+static constexpr char kSystemUpdatePath[] = "/cdb/system/update";
+static constexpr char kSystemRecordUserSessionStartPath[] = "/cdb/system/recordUserSessionStart";
+static constexpr char kSystemHealthHistoryPath[] = "/cdb/system/healthHistory";
+static constexpr char kSystemsMergedToASpecificSystem[] = "/cdb/system/{systemId}/merged_systems/";
 
-extern const char* const kAuthGetNoncePath;
-extern const char* const kAuthGetAuthenticationPath;
+static constexpr char kAuthGetNoncePath[] = "/cdb/auth/getNonce";
+static constexpr char kAuthGetAuthenticationPath[] = "/cdb/auth/getAuthentication";
 
-extern const char* const kSubscribeToSystemEventsPath;
+static constexpr char kSubscribeToSystemEventsPath[] = "/cdb/event/subscribe";
 
-extern const char* const kPingPath;
+static constexpr char kPingPath[] = "/cdb/ping";
 
-extern const char* const kEc2TransactionConnectionPathPrefix;
-extern const char* const kDeprecatedEc2TransactionConnectionPathPrefix;
+static constexpr char kEc2TransactionConnectionPathPrefix[] = "/ec2/";
+static constexpr char kDeprecatedEc2TransactionConnectionPathPrefix[] = "/cdb/ec2/";
 
-// Maintenance.
-extern const char* const kMaintenanceGetVmsConnections;
-extern const char* const kMaintenanceGetTransactionLog;
-extern const char* const kMaintenanceGetStatistics;
+static constexpr char kMaintenanceGetVmsConnections[] = "/cdb/maintenance/vmsConnections";
+static constexpr char kMaintenanceGetTransactionLog[] = "/cdb/maintenance/transactionLog";
+static constexpr char kMaintenanceGetStatistics[] = "/cdb/maintenance/statistics";
 
-// Statistics.
-extern const char* const kStatisticsMetricsPath;
+static constexpr char kStatisticsPath[] = "/cdb/statistics";
+static constexpr char kStatisticsMetricsPath[] = "/cdb/statistics/metrics/";
 
-extern const char* const kDeprecatedCloudModuleXmlPath;
-// TODO: #ak Added because of lack of URL rewrite support in Amazon balancer.
-// Remove kDeprecatedCloudModuleXmlPath after switching to new balancer on every instance.
-extern const char* const kAnotherDeprecatedCloudModuleXmlPath;
+static constexpr char kDeprecatedCloudModuleXmlPath[] = "/cdb/cloud_modules.xml";
+static constexpr char kAnotherDeprecatedCloudModuleXmlPath[] = "/api/cloud_modules.xml";
 
-extern const char* const kDiscoveryCloudModuleXmlPath;
+static constexpr char kDiscoveryCloudModuleXmlPath[] = "/discovery/v1/cloud_modules.xml";
 
-extern const char* const kApiPrefix;
+static constexpr char kApiPrefix[] = "/cdb";
 
-extern const char* const kSystemIdParam;
+static constexpr char kSystemIdParam[] = "systemId";
 
 } // namespace nx::cloud::db

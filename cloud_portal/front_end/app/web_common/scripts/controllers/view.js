@@ -347,7 +347,7 @@
                 };
                 
                 $scope.switchPlaying = function (play) {
-                    if ($scope.playerAPI) {
+                    if ($scope.playerAPI && $scope.playerAPI.video) {
                         if (play) {
                             $scope.playerAPI.play();
                         } else {
@@ -444,6 +444,12 @@
                 });
                 
                 $scope.enableFullScreen = screenfull.enabled;
+                var fullElement = $('.fullscreen-area').get(0);
+    
+                angular.element(fullElement).on('dblclick', function (event) {
+                    screenfull.toggle(fullElement);
+                });
+                
                 $scope.fullScreen = function () {
                     $scope.showSettings = false;
                     if (screenfull.enabled) {
@@ -555,7 +561,9 @@
                     $scope.camerasProvider
                         .getServerTimeOffset($scope.activeCamera.parentId)
                         .then(function (serverOffset) {
-                            window.timeManager.setOffset(serverOffset);
+                            if (serverOffset) {
+                                window.timeManager.setOffset(serverOffset);
+                            }
                             updateVideoSource(timeFromUrl);
                             timeFromUrl = null;
                         });

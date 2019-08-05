@@ -301,7 +301,7 @@ private:
     //!map<key, <value, isDirty>>
     std::map<QString, LocalPropertyValue> m_locallySavedProperties;
     std::atomic<bool> m_initInProgress{false};
-    std::atomic<bool> m_interuptInitialization{false};
+    std::atomic<bool> m_interruptInitialization{false};
     QnCommonModule* m_commonModule;
     bool m_forceUseLocalProperties = false;
 };

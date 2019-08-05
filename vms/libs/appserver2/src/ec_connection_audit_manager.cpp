@@ -209,6 +209,7 @@ void ECConnectionAuditManager::addAuditRecord(
         {
             if (QnResourcePtr res = resPool->getResourceById(params.id))
             {
+                resourceId = params.id;
                 description = m_removedResourceNames.value(params.id);
                 if (description.isNull())
                     description = res->getName();

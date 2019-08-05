@@ -25,23 +25,14 @@
 #include <core/resource/resource_command.h>
 #include <media_server/media_server_module.h>
 #include <core/resource/resource_command_processor.h>
+#include <nx/network/rest/nx_network_rest_ini.h>
 
 static const QString kCameraIdParam = "cameraId";
 static const QString kDeprecatedResIdParam = "res_id";
 static const std::chrono::seconds kMaxWaitTimeout(20);
 
 using StatusCode = nx::network::http::StatusCode::Value;
-using PostBody = QnCameraSettingsRestHandlerPostBody;
-
-struct QnCameraSettingsRestHandlerPostBody
-{
-    QString cameraId;
-    QMap<QString, QString> paramValues;
-};
-#define QnCameraSettingsRestHandlerPostBody_Fields (cameraId)(paramValues)
-
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnCameraSettingsRestHandlerPostBody, (json),
-    QnCameraSettingsRestHandlerPostBody_Fields);
+using PostBody = QnCameraAdvancedParamsPostBody;
 
 namespace {
 
@@ -271,6 +262,9 @@ int QnCameraSettingsRestHandler::executeGet(
     }
     else if (action == "setCameraParam")
     {
+        if (!nx::network::rest::ini().allowModificationsViaGetMethod)
+            return nx::network::http::StatusCode::forbidden;
+
         statusCode = handleSetParamsRequest(owner, camera, values, &outParameterMap);
     }
     else

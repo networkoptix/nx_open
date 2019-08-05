@@ -34,6 +34,10 @@ private:
         const QnVirtualCameraResourcePtr& camera,
         const nx::vms::event::AbstractActionPtr& action);
 
+    QString caption(const nx::vms::event::EventParameters& parameters,
+        const QnVirtualCameraResourcePtr& camera) const;
+    QString description(const nx::vms::event::EventParameters& parameters) const;
+
     QPixmap pixmapForAction(const vms::event::AbstractActionPtr& action,
         const QColor& color = QColor()) const;
 

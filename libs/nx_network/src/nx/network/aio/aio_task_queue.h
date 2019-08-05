@@ -9,6 +9,7 @@
 #include "abstract_pollset.h"
 #include "aio_event_handler.h"
 #include "pollable.h"
+#include "../common_socket_impl.h"
 #include "../detail/socket_sequence.h"
 
 namespace nx::network::aio::detail {

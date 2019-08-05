@@ -14,7 +14,7 @@ namespace {
 const QLatin1String kDataDir("dataDir");
 } // namespace
 
-static const QString kModuleName = lit("time_server");
+static const QString kModuleName = "time_server";
 
 Settings::Settings():
     base_type(

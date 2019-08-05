@@ -3,8 +3,6 @@
 #include <QtCore/QObject>
 #include <QtGui/QRegion>
 
-#include <api/media_server_connection.h>
-
 #include <core/resource/resource_fwd.h>
 #include <core/resource/camera_bookmark_fwd.h>
 
@@ -41,12 +39,14 @@ public:
 
     void updateServer(const QnMediaServerResourcePtr& server);
 
-private slots:
-    void at_timePeriodsReceived(int status, const MultiServerPeriodDataList &timePeriods, int requestHandle);
+private:
+    void at_timePeriodsReceived(bool success,
+        int requestHandle,
+        const MultiServerPeriodDataList &timePeriods);
 
 private:
-    int sendRequest(qint64 startTimeMs);
-    void handleDataLoaded(int status, const QnAbstractCameraDataPtr &data, int requestHandle);
+    int sendRequest(qint64 startTimeMs, qint64 resolutionMs);
+    void handleDataLoaded(bool success, int requestHandle, const QnAbstractCameraDataPtr &data);
 
     void trace(const QString& message);
 

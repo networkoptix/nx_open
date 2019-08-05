@@ -4,6 +4,7 @@
     #include <winsock2.h>
     #include <in6addr.h>
     #include <ws2ipdef.h>
+    #include <ws2tcpip.h>
 
     // Windows does not support this flag, so we emulate it
     #define MSG_DONTWAIT 0x01000000
@@ -162,6 +163,7 @@ private:
 };
 
 NX_NETWORK_API void swap(HostAddress& one, HostAddress& two);
+NX_NETWORK_API void PrintTo(const HostAddress& val, ::std::ostream* os);
 
 QN_FUSION_DECLARE_FUNCTIONS(HostAddress, (json), NX_NETWORK_API)
 
@@ -211,6 +213,8 @@ inline uint qHash(const SocketAddress &address)
     return qHash(address.address.toString(), address.port);
 }
 
+NX_NETWORK_API void PrintTo(const SocketAddress& val, ::std::ostream* os);
+
 QN_FUSION_DECLARE_FUNCTIONS(SocketAddress, (json), NX_NETWORK_API)
 
 //-------------------------------------------------------------------------------------------------
@@ -241,6 +245,8 @@ struct NX_NETWORK_API KeepAliveOptions
 
     static std::optional<KeepAliveOptions> fromString(const QString& string);
 };
+
+NX_NETWORK_API void PrintTo(const KeepAliveOptions& val, ::std::ostream* os);
 
 } // namespace network
 } // namespace nx

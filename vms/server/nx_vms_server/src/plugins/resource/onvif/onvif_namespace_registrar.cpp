@@ -28,7 +28,7 @@ namespace onvif {
         nullptr\
     },\
     {\
-        "onvifXsd",\
+        "tt",\
         "http://www.onvif.org/ver10/schema",\
         nullptr,\
         nullptr\
@@ -44,22 +44,6 @@ RequestTypeId typeId()
 }
 
 static const std::map<RequestTypeId, std::vector<Namespace>> kOverridenNamespaces = {
-    {
-        typeId<_onvifPtz__AbsoluteMove>(),
-        {
-            COMMON_NAMESPACES,
-            {"onvifPtz", "http://www.onvif.org/ver20/ptz/wsdl", nullptr, nullptr},
-            { nullptr, nullptr, nullptr, nullptr }
-        }
-    },
-    {
-        typeId<_onvifMedia__GetVideoSources>(),
-        {
-            COMMON_NAMESPACES,
-            {"onvifMedia", "http://www.onvif.org/ver10/media/wsdl", nullptr, nullptr},
-            { nullptr, nullptr, nullptr, nullptr }
-        }
-    },
     {
         typeId<_onvifEvents__PullMessages>(),
         {

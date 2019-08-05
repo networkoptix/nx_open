@@ -30,12 +30,10 @@ EventMetadataPacket* createCommonEventMetadataPacket(
 {
     using namespace std::chrono;
 
-    auto eventMetadata = makePtr<nx::sdk::analytics::EventMetadata>();
     auto packet = new EventMetadataPacket();
+    auto eventMetadata = makePtr<nx::sdk::analytics::EventMetadata>();
     eventMetadata->setTypeId(eventType.id.toStdString());
     eventMetadata->setDescription(eventType.name.toStdString());
-    eventMetadata->setAuxiliaryData(std::to_string(logicalId));
-
     packet->addItem(eventMetadata.get());
     packet->setTimestampUs(
         duration_cast<microseconds>(system_clock::now().time_since_epoch()).count());
@@ -97,13 +95,18 @@ const IString* DeviceAgent::manifest(Error* error) const
 
 Error DeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
 {
-    m_handler = handler;
+    handler->addRef();
+    m_handler.reset(handler);
     return Error::noError;
 }
 
 Error DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes)
 {
-    if (metadataTypes->eventTypeIds()->count() == 0)
+    nx::sdk::Ptr<const nx::sdk::IStringList> eventTypeIds(metadataTypes->eventTypeIds());
+    if (!NX_ASSERT(eventTypeIds, "Event type id list is nullptr"))
+        return Error::unknownError;
+
+    if (eventTypeIds->count() == 0)
     {
         stopFetchingMetadata();
         return Error::noError;

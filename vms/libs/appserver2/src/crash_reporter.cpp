@@ -168,7 +168,7 @@ void CrashReporter::scanAndReportAsync(QSettings* settings)
         return;
     }
 
-    NX_INFO(this, lit("Start new async report"));
+    NX_DEBUG(this, lit("Start new async scan for reports"));
     m_activeCollection = nx::utils::concurrent::run(Ec2ThreadPool::instance(), [=](){
         // \class nx::utils::concurrent posts a job to \class Ec2ThreadPool rather than create new
         // real thread, we need to reverve a thread to avoid possible deadlock
@@ -181,7 +181,7 @@ void CrashReporter::scanAndReportByTimer(QSettings* settings)
 {
     if (nx::utils::AppInfo::applicationVersion().endsWith(lit(".0")))
     {
-        NX_INFO(this, lm("Sending is disabled for developer builds (buildNumber=0)"));
+        NX_INFO(this, "Crash reports sending is disabled for developer builds (buildNumber=0)");
         return;
     }
 

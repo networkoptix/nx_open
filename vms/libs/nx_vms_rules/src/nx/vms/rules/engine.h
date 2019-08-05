@@ -1,0 +1,107 @@
+#pragma once
+
+#include <QList>
+#include <QObject>
+
+#include <nx/utils/singleton.h>
+
+#include "basic_event.h"
+#include "basic_action.h"
+
+namespace nx::vms::api::rules {
+    struct ActionBuilder;
+    struct EventFilter;
+    struct Field;
+    struct Rule;
+}
+
+namespace nx::vms::rules {
+
+class EventField;
+class ActionField;
+
+class EventConnector;
+class ActionExecutor;
+
+class BasicAction;
+
+class ActionBuilder;
+class EventFilter;
+class Rule;
+
+namespace api = ::nx::vms::api::rules;
+
+class NX_VMS_RULES_API Engine:
+    public QObject,
+    public Singleton<Engine>
+{
+    Q_OBJECT
+
+public:
+    Engine();
+
+    bool addEventConnector(EventConnector* eventConnector);
+    bool addActionExecutor(const QString& actionType, ActionExecutor* actionExecutor);
+
+    bool addRule(const api::Rule& serialized);
+
+    //template<class T>
+    //inline bool registerEventField()
+    //{
+    //    return registerEventField(T::manifest(), T::checker());
+    //}
+
+public:
+    using EventFieldConstructor = std::function<EventField*()>;
+    using ActionFieldConstructor = std::function<ActionField*()>;
+    using ActionConstructor = std::function<BasicAction*()>;
+
+    bool registerActionType(const QString& type, const ActionConstructor& ctor);
+
+    bool registerEventField(const QString& type, const EventFieldConstructor& ctor);
+    bool registerActionField(const QString& type, const ActionFieldConstructor& ctor);
+
+private: //< ?
+    bool registerEventField(
+        const QJsonObject& manifest,
+        const std::function<bool()>& checker);
+
+    bool registerActionField(
+        const QJsonObject& manifest,
+        const std::function<QJsonValue()>& reducer);
+
+    bool registerEventType(
+        const QJsonObject& manifest,
+        const std::function<EventPtr()>& constructor/*, QObject* source*/);
+
+    bool registerActionType(
+        const QJsonObject& manifest,
+        const std::function<EventPtr()>& constructor,
+        QObject* executor);
+
+    Rule* buildRule(const api::Rule& serialized) const;
+
+private:
+    EventFilter* buildEventFilter(const api::EventFilter& serialized) const;
+    ActionBuilder* buildActionBuilder(const api::ActionBuilder& serialized) const;
+
+    EventField* buildEventField(const api::Field& serialized) const;
+    ActionField* buildActionField(const api::Field& serialized) const;
+
+private:
+    void processEvent(const EventPtr& event);
+    void processAction(const ActionPtr& action);
+
+private:
+    QList<EventConnector*> m_connectors;
+    QHash<QString, ActionExecutor*> m_executors;
+
+    QHash<QString, EventFieldConstructor> m_eventFields;
+    QHash<QString, ActionFieldConstructor> m_actionFields;
+
+    QHash<QString, ActionConstructor> m_actionTypes;
+
+    QHash<QnUuid, Rule*> m_rules;
+};
+
+} // namespace nx::vms::rules

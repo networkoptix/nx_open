@@ -655,7 +655,7 @@
     <message>
       <location/>
       <source>Force motion detection for stream</source>
-      <translation type="unfinished">Force motion detection for stream</translation>
+      <translation>스트림에 대 한 강제 모션 감지</translation>
     </message>
     <message>
       <location/>
@@ -675,17 +675,17 @@
     <message>
       <location/>
       <source>Preferred PTZ preset type:</source>
-      <translation type="unfinished">Preferred PTZ preset type:</translation>
+      <translation>선호하는 PTZ 사전 설정 유형:</translation>
     </message>
     <message>
       <location/>
       <source>System</source>
-      <translation type="unfinished">System</translation>
+      <translation>시스템</translation>
     </message>
     <message>
       <location/>
       <source>Native</source>
-      <translation type="unfinished">Native</translation>
+      <translation>기본</translation>
     </message>
     <message>
       <location/>
@@ -695,12 +695,12 @@
     <message>
       <location/>
       <source>This camera supports pan and tilt</source>
-      <translation type="unfinished">This camera supports pan and tilt</translation>
+      <translation>이 카메라는 팬 과 틸트를 지원합니다.</translation>
     </message>
     <message>
       <location/>
       <source>This camera supports zoom</source>
-      <translation type="unfinished">This camera supports zoom</translation>
+      <translation>이 카메라는 줌 기능을 지원합니다.</translation>
     </message>
     <message>
       <location/>
@@ -738,7 +738,7 @@
     <message>
       <location/>
       <source>Camera ID</source>
-      <translation type="unfinished">Camera ID</translation>
+      <translation>카메라 ID</translation>
     </message>
     <message>
       <location/>
@@ -748,7 +748,7 @@
     <message>
       <location/>
       <source>Primary Stream</source>
-      <translation type="unfinished">Primary Stream</translation>
+      <translation>기본 스트림</translation>
     </message>
     <message>
       <location/>
@@ -1019,7 +1019,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/manual_device_addition/dialog/device_addition_dialog.ui"/>
       <source>to</source>
-      <translation type="unfinished">to</translation>
+      <translation>로</translation>
     </message>
     <message>
       <location/>
@@ -1095,6 +1095,24 @@
       <location/>
       <source>Default</source>
       <translation>기본</translation>
+    </message>
+  </context>
+  <context>
+    <name>EulaDialog</name>
+    <message>
+      <location filename="../src/nx/vms/client/desktop/ui/dialogs/eula_dialog.ui"/>
+      <source>Copy to Clipboard</source>
+      <translation>클립보드 복사</translation>
+    </message>
+    <message>
+      <location/>
+      <source>I Do Not Agree</source>
+      <translation type="unfinished">I Do Not Agree</translation>
+    </message>
+    <message>
+      <location/>
+      <source>I Agree</source>
+      <translation type="unfinished">I Agree</translation>
     </message>
   </context>
   <context>
@@ -1397,11 +1415,6 @@
     </message>
     <message>
       <location/>
-      <source>None</source>
-      <translation>없음</translation>
-    </message>
-    <message>
-      <location/>
       <source>Second Source</source>
       <translation>두 번째 소스</translation>
     </message>
@@ -1501,174 +1514,6 @@
       <location/>
       <source>No image</source>
       <translation>이미지 없음</translation>
-    </message>
-  </context>
-  <context>
-    <name>InteractiveSettingsTestDialog</name>
-    <message>
-      <location filename="../src/nx/vms/client/desktop/interactive_settings/dialogs/interactive_settings_test_dialog.ui"/>
-      <source>{
-    &quot;items&quot;: [
-        {
-            &quot;type&quot;: &quot;TextField&quot;,
-            &quot;name&quot;: &quot;text&quot;,
-            &quot;caption&quot;: &quot;Text Field&quot;,
-            &quot;description&quot;: &quot;A text field&quot;,
-            &quot;defaultValue&quot;: &quot;a text&quot;,
-            &quot;value&quot;: &quot;a text&quot;
-        },
-        {
-            &quot;type&quot;: &quot;GroupBox&quot;,
-            &quot;name&quot;: &quot;group&quot;,
-            &quot;caption&quot;: &quot;Group Box&quot;,
-            &quot;items&quot;: [
-                {
-                    &quot;type&quot;: &quot;SpinBox&quot;,
-                    &quot;name&quot;: &quot;number&quot;,
-                    &quot;caption&quot;: &quot;Spin Box&quot;,
-                    &quot;description&quot;: &quot;A number&quot;,
-                    &quot;defaultValue&quot;: 42,
-                    &quot;value&quot;: 42,
-                    &quot;minValue&quot;: 0,
-                    &quot;maxValue&quot;: 100
-                },
-                {
-                    &quot;type&quot;: &quot;DoubleSpinBox&quot;,
-                    &quot;name&quot;: &quot;double&quot;,
-                    &quot;caption&quot;: &quot;Double Spin Box&quot;,
-                    &quot;description&quot;: &quot;A real number&quot;,
-                    &quot;defaultValue&quot;: 3.14,
-                    &quot;value&quot;: 3.14,
-                    &quot;minValue&quot;: 0.0,
-                    &quot;maxValue&quot;: 100.0
-                },
-                {
-                    &quot;type&quot;: &quot;ComboBox&quot;,
-                    &quot;name&quot;: &quot;combobox&quot;,
-                    &quot;caption&quot;: &quot;Combo Box&quot;,
-                    &quot;description&quot;: &quot;A choice&quot;,
-                    &quot;defaultValue&quot;: &quot;value2&quot;,
-                    &quot;value&quot;: &quot;value2&quot;,
-                    &quot;range&quot;: [&quot;value1&quot;, &quot;value2&quot;, &quot;value3&quot;]
-                },
-                {
-                    &quot;type&quot;: &quot;CheckBox&quot;,
-                    &quot;name&quot;: &quot;checkbox&quot;,
-                    &quot;caption&quot;: &quot;Check Box&quot;,
-                    &quot;description&quot;: &quot;True or False&quot;,
-                    &quot;defaultValue&quot;: true,
-                    &quot;value&quot;: true
-                },
-                {
-                    &quot;type&quot;: &quot;GroupBox&quot;,
-                    &quot;name&quot;: &quot;buttons&quot;,
-                    &quot;caption&quot;: &quot;Buttons&quot;,
-                    &quot;items&quot;: [
-                        {
-                            &quot;type&quot;: &quot;Row&quot;,
-                            &quot;name&quot;: &quot;row&quot;,
-                            &quot;items&quot;: [
-                                {
-                                    &quot;type&quot;: &quot;Button&quot;,
-                                    &quot;name&quot;: &quot;button1&quot;,
-                                    &quot;caption&quot;: &quot;Button 1&quot;,
-                                    &quot;description&quot;: &quot;Action 1&quot;
-                                },
-                                {
-                                    &quot;type&quot;: &quot;Button&quot;,
-                                    &quot;name&quot;: &quot;button2&quot;,
-                                    &quot;caption&quot;: &quot;Button 2&quot;,
-                                    &quot;description&quot;: &quot;Action 2&quot;
-                                }
-                            ]
-                        }
-                    ]
-                }
-            ]
-        }
-    ]
-}</source>
-      <translation type="unfinished">{
-    &quot;items&quot;: [
-        {
-            &quot;type&quot;: &quot;TextField&quot;,
-            &quot;name&quot;: &quot;text&quot;,
-            &quot;caption&quot;: &quot;Text Field&quot;,
-            &quot;description&quot;: &quot;A text field&quot;,
-            &quot;defaultValue&quot;: &quot;a text&quot;,
-            &quot;value&quot;: &quot;a text&quot;
-        },
-        {
-            &quot;type&quot;: &quot;GroupBox&quot;,
-            &quot;name&quot;: &quot;group&quot;,
-            &quot;caption&quot;: &quot;Group Box&quot;,
-            &quot;items&quot;: [
-                {
-                    &quot;type&quot;: &quot;SpinBox&quot;,
-                    &quot;name&quot;: &quot;number&quot;,
-                    &quot;caption&quot;: &quot;Spin Box&quot;,
-                    &quot;description&quot;: &quot;A number&quot;,
-                    &quot;defaultValue&quot;: 42,
-                    &quot;value&quot;: 42,
-                    &quot;minValue&quot;: 0,
-                    &quot;maxValue&quot;: 100
-                },
-                {
-                    &quot;type&quot;: &quot;DoubleSpinBox&quot;,
-                    &quot;name&quot;: &quot;double&quot;,
-                    &quot;caption&quot;: &quot;Double Spin Box&quot;,
-                    &quot;description&quot;: &quot;A real number&quot;,
-                    &quot;defaultValue&quot;: 3.14,
-                    &quot;value&quot;: 3.14,
-                    &quot;minValue&quot;: 0.0,
-                    &quot;maxValue&quot;: 100.0
-                },
-                {
-                    &quot;type&quot;: &quot;ComboBox&quot;,
-                    &quot;name&quot;: &quot;combobox&quot;,
-                    &quot;caption&quot;: &quot;Combo Box&quot;,
-                    &quot;description&quot;: &quot;A choice&quot;,
-                    &quot;defaultValue&quot;: &quot;value2&quot;,
-                    &quot;value&quot;: &quot;value2&quot;,
-                    &quot;range&quot;: [&quot;value1&quot;, &quot;value2&quot;, &quot;value3&quot;]
-                },
-                {
-                    &quot;type&quot;: &quot;CheckBox&quot;,
-                    &quot;name&quot;: &quot;checkbox&quot;,
-                    &quot;caption&quot;: &quot;Check Box&quot;,
-                    &quot;description&quot;: &quot;True or False&quot;,
-                    &quot;defaultValue&quot;: true,
-                    &quot;value&quot;: true
-                },
-                {
-                    &quot;type&quot;: &quot;GroupBox&quot;,
-                    &quot;name&quot;: &quot;buttons&quot;,
-                    &quot;caption&quot;: &quot;Buttons&quot;,
-                    &quot;items&quot;: [
-                        {
-                            &quot;type&quot;: &quot;Row&quot;,
-                            &quot;name&quot;: &quot;row&quot;,
-                            &quot;items&quot;: [
-                                {
-                                    &quot;type&quot;: &quot;Button&quot;,
-                                    &quot;name&quot;: &quot;button1&quot;,
-                                    &quot;caption&quot;: &quot;Button 1&quot;,
-                                    &quot;description&quot;: &quot;Action 1&quot;
-                                },
-                                {
-                                    &quot;type&quot;: &quot;Button&quot;,
-                                    &quot;name&quot;: &quot;button2&quot;,
-                                    &quot;caption&quot;: &quot;Button 2&quot;,
-                                    &quot;description&quot;: &quot;Action 2&quot;
-                                }
-                            ]
-                        }
-                    ]
-                }
-            ]
-        }
-    ]
-}</translation>
     </message>
   </context>
   <context>
@@ -1828,7 +1673,7 @@
     <message>
       <location/>
       <source>Search Timeout (s)</source>
-      <translation type="unfinished">Search Timeout (s)</translation>
+      <translation>검색 제한 시간</translation>
     </message>
     <message>
       <location/>
@@ -2072,7 +1917,7 @@
     <message>
       <location/>
       <source>Language</source>
-      <translation>언어:</translation>
+      <translation>언어</translation>
     </message>
     <message>
       <location/>
@@ -2124,14 +1969,6 @@
     </message>
   </context>
   <context>
-    <name>MessageBox</name>
-    <message>
-      <location filename="../src/ui/dialogs/common/message_box.ui"/>
-      <source>Do not show this message again</source>
-      <translation>이 메시지를 다시 표시하지 않음</translation>
-    </message>
-  </context>
-  <context>
     <name>MultiServerUpdatesWidget</name>
     <message>
       <location filename="../src/nx/vms/client/desktop/system_update/multi_server_updates_widget.ui"/>
@@ -2156,7 +1993,7 @@
     <message>
       <location/>
       <source>Download</source>
-      <translation type="unfinished">Download</translation>
+      <translation>다운로드</translation>
     </message>
     <message>
       <location/>
@@ -2235,7 +2072,7 @@
     <message>
       <location/>
       <source>Select layout...</source>
-      <translation type="unfinished">Select layout...</translation>
+      <translation>레이아웃 선택...</translation>
     </message>
   </context>
   <context>
@@ -2518,6 +2355,14 @@
     </message>
   </context>
   <context>
+    <name>QnMessageBox</name>
+    <message>
+      <location filename="../src/ui/dialogs/common/message_box.ui"/>
+      <source>Do not show this message again</source>
+      <translation>이 메시지를 다시 표시하지 않음</translation>
+    </message>
+  </context>
+  <context>
     <name>QnNotificationSoundManagerDialog</name>
     <message>
       <location filename="../src/ui/dialogs/notification_sound_manager_dialog.ui"/>
@@ -2566,44 +2411,6 @@
       <location/>
       <source>Removing this connection option could lead to System malfunction.</source>
       <translation>이 연결 옵션을 제거 시스템 고장이 발생할 수 있습니다.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnServerUpdatesWidget</name>
-    <message>
-      <location filename="../src/ui/widgets/system_settings/server_updates_widget.ui"/>
-      <source>Cancel</source>
-      <translation>취소</translation>
-    </message>
-    <message>
-      <location/>
-      <source>It looks like the update process is taking more time than usual. Please keep waiting.</source>
-      <translation>업데이트 진행에 다소 시간이 소요될 수 있습니다. 잠시만 기다려 주세요.</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Check for updates automatically</source>
-      <translation>자동 업데이트 체크</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Updating to...</source>
-      <translation>업데이트...</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Link copied</source>
-      <translation>링크 복사</translation>
-    </message>
-    <message>
-      <location/>
-      <source>You have the latest version installed</source>
-      <translation>최신버전 입니다</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Applying System updates at the end of the week is not recommended.</source>
-      <translation>금요일에 시스템 업데이트를 적용 하는 것은 권장 하지 않습니다.</translation>
     </message>
   </context>
   <context>
@@ -2682,7 +2489,7 @@
     <message>
       <location/>
       <source>Enable timeline on video wall</source>
-      <translation type="unfinished">Enable timeline on video wall</translation>
+      <translation>비디오 월에 타임 라인 사용</translation>
     </message>
   </context>
   <context>
@@ -2844,11 +2651,6 @@
     </message>
     <message>
       <location/>
-      <source>Filter TEST</source>
-      <translation type="unfinished">Filter TEST</translation>
-    </message>
-    <message>
-      <location/>
       <source>Nothing found</source>
       <translation>결과 없음</translation>
     </message>
@@ -2959,22 +2761,27 @@
     <message>
       <location/>
       <source>Display watermark with username over video</source>
-      <translation type="unfinished">Display watermark with username over video</translation>
+      <translation>비디오에 사용자 이름을 워터마크로 표시</translation>
     </message>
     <message>
       <location/>
       <source>Watermark Preview</source>
-      <translation type="unfinished">Watermark Preview</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Limit Session Length</source>
-      <translation type="unfinished">Limit Session Length</translation>
+      <translation>워터 마크 미리보기</translation>
     </message>
     <message>
       <location/>
       <source>to</source>
-      <translation type="unfinished">to</translation>
+      <translation>로</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Limit session duration</source>
+      <translation type="unfinished">Limit session duration</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
+      <translation type="unfinished">Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</translation>
     </message>
   </context>
   <context>
@@ -3263,6 +3070,26 @@
       <location/>
       <source>Backup Settings...</source>
       <translation>백업 설정</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Analytics data will continue to be stored on the disabled storage.</source>
+      <translation type="unfinished">Analytics data will continue to be stored on the disabled storage.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</source>
+      <translation type="unfinished">Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Recording was enabled on the USB storage</source>
+      <translation type="unfinished">Recording was enabled on the USB storage</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Analytics data can occupy tens of gigabytes of storage space. We recommend to choose other location for it instead of the system partition.</source>
+      <translation type="unfinished">Analytics data can occupy tens of gigabytes of storage space. We recommend to choose other location for it instead of the system partition.</translation>
     </message>
   </context>
   <context>
@@ -3573,7 +3400,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/watermark/private/watermark_preview_dialog.ui"/>
       <source>Watermark preview</source>
-      <translation type="unfinished">Watermark preview</translation>
+      <translation>워터 마크 미리보기</translation>
     </message>
     <message>
       <location/>
@@ -3583,7 +3410,7 @@
     <message>
       <location/>
       <source>Frequency</source>
-      <translation type="unfinished">Frequency</translation>
+      <translation>주파수</translation>
     </message>
   </context>
 </TS>

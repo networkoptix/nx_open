@@ -72,7 +72,7 @@ Page
 
         height: searchEdit.y + searchEdit.height + 12
         width: sessionsList.width
-        visible: sessionsList.model.sourceRowsCount > 8
+        visible: sessionsList.model.acceptedRowCount > 8
 
         SearchEdit
         {
@@ -253,20 +253,12 @@ Page
             message, qsTr("Check your network connection or contact a system administrator"))
     }
 
-    Object
+    Connections
     {
-        id: d
-
-        readonly property bool connectingState:
+        target: ConnectionController
+        onConnectingChanged:
         {
-            var state = connectionManager.connectionState
-            return state == QnConnectionManager.Connecting
-                || (state == QnConnectionManager.Connected && !connectionManager.online)
-        }
-
-        onConnectingStateChanged:
-        {
-            if (connectingState)
+            if (target.connecting)
                 searchEdit.text = ""
         }
     }

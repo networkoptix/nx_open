@@ -1,4 +1,4 @@
-FROM 009544449203.dkr.ecr.us-east-1.amazonaws.com/cloud/base:latest
+FROM python:2.7-alpine3.7
 
 COPY docker/merge_config.py /usr/local/bin/
 COPY docker/pip.conf /root/.config/pip/pip.conf
@@ -8,7 +8,11 @@ COPY stage/cloud /app/app
 ARG CACHE_DATE
 COPY stage/cloud/requirements.txt /app/requirements.txt
 
-RUN pip2 install -r /app/requirements.txt
+RUN set -ex \
+    apk update \
+    && apk add --no-cache bash tini gettext wget ca-certificates mariadb-client   \
+        libcurl libjpeg-turbo libressl2.6-libcrypto libwebp libxml2 libxslt mariadb-client-libs musl openjpeg tiff yaml zlib \
+    && pip install -r /app/requirements.txt
 
 ENV CLOUD_PORTAL_BASE_CONF_DIR /app/app/static
 ENV C_FORCE_ROOT true
@@ -17,7 +21,7 @@ WORKDIR /app/app
 
 RUN CUSTOMIZATION=default ./manage.py collectstatic --noinput
 
-ENTRYPOINT ["/app/entrypoint.sh"]
+ENTRYPOINT ["/sbin/tini", "--", "/app/entrypoint.sh"]
 
 ARG VERSION
 ARG REVISION

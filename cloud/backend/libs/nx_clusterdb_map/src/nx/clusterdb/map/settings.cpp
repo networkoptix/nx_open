@@ -1,10 +1,12 @@
 #include "settings.h"
 
+#include <nx/utils/deprecated_settings.h>
+
 namespace nx::clusterdb::map {
 
-void Settings::load(const QnSettings& settings)
+void Settings::load(const QnSettings& settings, std::string groupName)
 {
-    dataSyncEngineSettings.load(settings);
+    synchronizationSettings.load(settings, groupName);
 }
 
 } // namespace nx::clusterdb::map

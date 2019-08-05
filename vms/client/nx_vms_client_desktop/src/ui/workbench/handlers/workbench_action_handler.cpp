@@ -1,6 +1,6 @@
 #include "workbench_action_handler.h"
 
-#include <cassert>
+#include <boost/algorithm/cxx11/any_of.hpp>
 
 #include <QtCore/QProcess>
 
@@ -22,6 +22,7 @@
 #include <api/network_proxy_factory.h>
 #include <api/global_settings.h>
 #include <api/server_rest_connection.h>
+#include <api/media_server_connection.h>
 
 #include <nx/vms/event/action_parameters.h>
 
@@ -70,7 +71,7 @@
 #include <nx/vms/client/desktop/ui/messages/videowall_messages.h>
 #include <nx/vms/client/desktop/ui/messages/local_files_messages.h>
 #include <nx/vms/client/desktop/resource_views/functional_delegate_utilities.h>
-#include <nx/vms/client/desktop/resource_views/data/node_type.h>
+#include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 
 #include <nx/network/http/http_types.h>
 #include <nx/network/socket_global.h>
@@ -104,6 +105,7 @@
 #include <ui/dialogs/system_administration_dialog.h>
 #include <ui/dialogs/common/non_modal_dialog_constructor.h>
 #include <ui/dialogs/camera_password_change_dialog.h>
+#include <ui/dialogs/resource_properties/server_settings_dialog.h>
 #include <nx/vms/client/desktop/common/delegates/customizable_item_delegate.h>
 
 #include <ui/graphics/items/resource/resource_widget.h>
@@ -168,6 +170,7 @@
 #include <utils/connection_diagnostics_helper.h>
 #include <nx/vms/client/desktop/workbench/layouts/layout_factory.h>
 
+#include <nx/analytics/utils.h>
 #include <nx/utils/app_info.h>
 #include <nx/utils/guarded_callback.h>
 
@@ -371,6 +374,7 @@ ActionHandler::ActionHandler(QObject *parent) :
     connect(action(action::VersionMismatchMessageAction), &QAction::triggered, this, &ActionHandler::at_versionMismatchMessageAction_triggered);
     connect(action(action::BetaVersionMessageAction), SIGNAL(triggered()), this, SLOT(at_betaVersionMessageAction_triggered()));
     connect(action(action::AllowStatisticsReportMessageAction), &QAction::triggered, this, [this] { checkIfStatisticsReportAllowed(); });
+    connect(action(action::ConfirmAnalyticsStorageAction), &QAction::triggered, this, [this] { confirmAnalyticsStorageLocation(); });
 
     connect(action(action::QueueAppRestartAction), SIGNAL(triggered()), this, SLOT(at_queueAppRestartAction_triggered()));
     connect(action(action::SelectTimeServerAction), SIGNAL(triggered()), this, SLOT(at_selectTimeServerAction_triggered()));
@@ -527,7 +531,6 @@ void ActionHandler::openResourcesInNewWindow(const QnResourceList &resources)
 void ActionHandler::openNewWindow(const QStringList &args) {
     QStringList arguments = args;
     arguments << lit("--no-single-application");
-    arguments << lit("--no-version-mismatch-check");
 
     if (context()->user())
     {
@@ -541,9 +544,6 @@ void ActionHandler::openNewWindow(const QStringList &args) {
         int screen = context()->instance<QnScreenManager>()->nextFreeScreen();
         arguments << QnStartupParameters::kScreenKey << QString::number(screen);
     }
-
-    if (qnRuntime->isDevMode())
-        arguments << lit("--dev-mode-key=razrazraz");
 
 #ifdef Q_OS_MACX
     mac_startDetached(qApp->applicationFilePath(), arguments);
@@ -609,14 +609,8 @@ QnSystemAdministrationDialog *ActionHandler::systemAdministrationDialog() const 
 // Handlers
 // -------------------------------------------------------------------------- //
 
-void ActionHandler::at_context_userChanged(const QnUserResourcePtr &user) {
-    if (qnRuntime->isDesktopMode())
-    {
-        if (user)
-            context()->instance<nx::vms::client::desktop::WorkbenchUpdateWatcher>()->start();
-        else
-            context()->instance<nx::vms::client::desktop::WorkbenchUpdateWatcher>()->stop();
-    }
+void ActionHandler::at_context_userChanged(const QnUserResourcePtr& /*user*/)
+{
     m_serverRequests.clear();
 }
 
@@ -2057,7 +2051,7 @@ bool ActionHandler::validateResourceName(const QnResourcePtr& resource, const QS
 
 void ActionHandler::at_renameAction_triggered()
 {
-    using NodeType = ResourceTreeNodeType;
+    using NodeType = ResourceTree::NodeType;
 
     const auto parameters = menu()->currentParameters(sender());
 
@@ -2558,19 +2552,68 @@ void ActionHandler::checkIfStatisticsReportAllowed() {
     qnGlobalSettings->synchronizeNow();
 }
 
+void ActionHandler::confirmAnalyticsStorageLocation()
+{
+    const QnMediaServerResourceList servers = resourcePool()->getResources<QnMediaServerResource>();
+    for (const auto& server: servers)
+    {
+        if (server->metadataStorageId().isNull()
+            && nx::analytics::hasActiveObjectEngines(commonModule(), server->getId()))
+        {
+            const auto name = server->getName();
+            QnMessageBox msgBox(
+                QnMessageBoxIcon::Warning,
+                tr("Confirm storage location to store analytics data on '%1'").arg(name),
+                tr("Analytics database should be stored on a local storage"
+                    " and can occupy up to hundred gigabytes."
+                    "\n"
+                    "Once location to store analytics data is selected,"
+                    " it cannot be easily changed without loosing exitsing data. "
+                    "We recommed to choose location carefully and not to use"
+                    " system partition to avoid severe system malfunction."
+                    "\n"
+                    "By default analytics data will be stored"
+                    " in mediaserver's installation directory."
+                    "\n"
+                    "You can change storage location in the \"Storage Management\""
+                    " tab in the Server Settings dialog."
+                ),
+                QDialogButtonBox::StandardButtons(),
+                QDialogButtonBox::NoButton,
+                mainWindowWidget());
+
+            const auto openSettings = msgBox.addButton(tr("Open Server Settings"),
+                QDialogButtonBox::ButtonRole::ResetRole, Qn::ButtonAccent::NoAccent);
+            msgBox.addButton(tr("OK"),
+                QDialogButtonBox::ButtonRole::AcceptRole, Qn::ButtonAccent::Standard);
+
+            msgBox.exec();
+
+            if (msgBox.clickedButton() == openSettings)
+            {
+                QScopedPointer<QnServerSettingsDialog> dialog(new QnServerSettingsDialog(mainWindowWidget()));
+                dialog->setWindowModality(Qt::ApplicationModal);
+                dialog->setServer(server);
+                dialog->setCurrentPage(QnServerSettingsDialog::StorageManagmentPage);
+                dialog->exec();
+            }
+        }
+    }
+}
+
 void ActionHandler::at_queueAppRestartAction_triggered()
 {
 
     auto tryToRestartClient = [this]
         {
-            using namespace applauncher::api;
+            using namespace nx::vms::applauncher::api;
 
             /* Try to run applauncher if it is not running. */
             if (!checkOnline())
                 return false;
 
             const auto result = restartClient();
-            if (result == ResultType::Value::ok)
+            if (result == ResultType::ok)
                 return true;
 
             static const int kMaxTries = 5;
@@ -2679,7 +2722,7 @@ void ActionHandler::at_nonceReceived(QnAsyncHttpClientReply *reply)
         targetUrl = qnClientModule->networkProxyFactory()->urlToResource(targetUrl, request.server);
 
         auto gateway = nx::cloud::gateway::VmsGatewayEmbeddable::instance();
-        targetUrl = nx::utils::Url(lit("http://%1/%2:%3:%4%5?%6")
+        targetUrl = nx::utils::Url(lit("https://%1/%2:%3:%4%5?%6")
             .arg(gateway->endpoint().toString()).arg(targetUrl.scheme())
             .arg(targetUrl.host()).arg(targetUrl.port())
             .arg(targetUrl.path()).arg(targetUrl.query()));

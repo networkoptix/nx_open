@@ -38,6 +38,12 @@ TEST(ToString, Std)
     assertToString(std::string("string"), "string");
     assertToString(std::string("some long string"), "some long string");
 
+    assertToString(std::chrono::nanoseconds(100), "100ns");
+    assertToString(std::chrono::nanoseconds(3000), "3usec");
+
+    assertToString(std::chrono::microseconds(100), "100usec");
+    assertToString(std::chrono::microseconds(3000), "3ms");
+
     assertToString(std::chrono::milliseconds(100), "100ms");
     assertToString(std::chrono::milliseconds(3000), "3s");
 
@@ -50,8 +56,8 @@ TEST(ToString, Std)
     assertToString(std::chrono::hours(2), "2h");
     assertToString(std::chrono::hours(200), "200h");
 
-    assertToString(std::bitset<8>(), "bitset(00000000)");
-    assertToString(std::bitset<8>(0xFF), "bitset(11111111)");
+    assertToString(std::bitset<8>(), "0b00000000");
+    assertToString(std::bitset<8>(0xFF), "0b11111111");
 }
 
 TEST(ToString, Qt)

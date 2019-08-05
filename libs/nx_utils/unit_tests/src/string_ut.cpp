@@ -17,7 +17,8 @@ void assertStringSplitAsExpected(
     const auto tokens = splitQuotedString(
         input,
         ',',
-        GroupToken::doubleQuotes | GroupToken::roundBraces | GroupToken::squareBraces);
+        GroupToken::singleQuotes | GroupToken::doubleQuotes |
+            GroupToken::roundBraces | GroupToken::squareBraces);
 
     ASSERT_EQ(expectedTokens.size(), tokens.size());
     for (std::size_t i = 0; i < tokens.size(); ++i)
@@ -31,8 +32,8 @@ void assertStringSplitAsExpected(
 TEST(splitQuotedString, separator_in_quotes_is_ignored)
 {
     assertStringSplitAsExpected(
-        "n1=v1,n2=v2,n3=\"raz,raz,raz\"",
-        {"n1=v1", "n2=v2", "n3=\"raz,raz,raz\""});
+        "n1=v1,n2=[v21,v22],n3=\"raz,raz,raz\",n4='x,y,z'",
+        {"n1=v1", "n2=[v21,v22]", "n3=\"raz,raz,raz\"", "n4='x,y,z'"});
 }
 
 TEST(splitQuotedString, separator_in_braces_is_ignored)
@@ -45,6 +46,8 @@ TEST(splitQuotedString, separator_in_braces_is_ignored)
         "n1=v1,n2=(raz,\"raz,raz\",raz),n3=\"raz,[raz,raz],raz\"",
         {"n1=v1", "n2=(raz,\"raz,raz\",raz)", "n3=\"raz,[raz,raz],raz\""});
 }
+
+//-------------------------------------------------------------------------------------------------
 
 TEST(String, maxPrefix)
 {

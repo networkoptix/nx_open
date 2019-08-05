@@ -164,13 +164,11 @@ int QnTCPConnectionProcessor::isFullMessage(
 void QnTCPConnectionProcessor::parseRequest()
 {
     Q_D(QnTCPConnectionProcessor);
-//    qDebug() << "Client request from " << d->socket->getForeignAddress().address.toString();
-//    qDebug() << d->clientRequest;
 
     d->request = nx::network::http::Request();
-    if( !d->request.parse( d->clientRequest ) )
+    if (!d->request.parse(d->clientRequest))
     {
-        qWarning() << Q_FUNC_INFO << "Invalid request format.";
+        NX_DEBUG(this, "Unable to parse request: [%1]", d->clientRequest);
         return;
     }
     d->protocol = d->request.requestLine.version.protocol;
@@ -344,9 +342,11 @@ QByteArray QnTCPConnectionProcessor::createResponse(
     if (displayDebug)
         NX_DEBUG(this, lit("Server response to %1:\n%2").arg(d->socket->getForeignAddress().address.toString()).arg(QString::fromLatin1(response)));
 
-    NX_DEBUG(QnLog::HTTP_LOG_INDEX, QString::fromLatin1("Sending response to %1:\n%2\n-------------------\n\n\n").
-        arg(d->socket->getForeignAddress().toString()).
-        arg(QString::fromLatin1(QByteArray::fromRawData(response.constData(), response.size() - (!contentEncoding.isEmpty() ? d->response.messageBody.size() : 0)))));
+    NX_DEBUG(QnLog::HTTP_LOG_INDEX,
+        "Sending response to %1:\n%2-------------------\n",
+        d->socket->getForeignAddress(),
+        QByteArray::fromRawData(response.constData(), response.size() -
+            (!contentEncoding.isEmpty() ? d->response.messageBody.size() : 0)));
 
     return response;
 }
@@ -432,9 +432,9 @@ bool QnTCPConnectionProcessor::readRequest()
 
             if (messageSize)
             {
-                NX_DEBUG(QnLog::HTTP_LOG_INDEX, QString::fromLatin1("Received request from %1:\n%2-------------------\n\n\n").
-                    arg(d->socket->getForeignAddress().toString()).
-                    arg(QString::fromLatin1(d->clientRequest)));
+                NX_DEBUG(QnLog::HTTP_LOG_INDEX,
+                    "Received request from %1:\n%2~~~~~~~~~~~~~~~~~~~\n",
+                    d->socket->getForeignAddress(), d->clientRequest);
                 return true;
             }
             else if (d->clientRequest.size() > kMaxRequestSize)
@@ -524,10 +524,6 @@ bool QnTCPConnectionProcessor::readSingleRequest()
             if (d->owner)
                 d->owner->applyModToRequest(&d->request);
 
-            //TODO #ak logging
-            //NX_DEBUG(QnLog::HTTP_LOG_INDEX, QString::fromLatin1("Received request from %1:\n%2-------------------\n\n\n").
-            //    arg(d->socket->getForeignAddress().toString()).
-            //    arg(QString::fromLatin1(d->clientRequest)));
             return true;
         }
     }
@@ -612,6 +608,12 @@ bool QnTCPConnectionProcessor::isConnectionCanBePersistent() const
 QnAuthSession QnTCPConnectionProcessor::authSession() const
 {
     Q_D(const QnTCPConnectionProcessor);
+    return authSession(d->accessRights);
+}
+
+QnAuthSession QnTCPConnectionProcessor::authSession(const Qn::UserAccessData& accessRights) const
+{
+    Q_D(const QnTCPConnectionProcessor);
     QnAuthSession result;
 
     QByteArray existSession = nx::network::http::getHeaderValue(d->request.headers, Qn::AUTH_SESSION_HEADER_NAME);
@@ -619,7 +621,7 @@ QnAuthSession QnTCPConnectionProcessor::authSession() const
         result.fromByteArray(existSession);
         return result;
     }
-    if (const auto& userRes = resourcePool()->getResourceById(d->accessRights.userId))
+    if (const auto& userRes = resourcePool()->getResourceById(accessRights.userId))
         result.userName = userRes->getName();
     else if (!nx::network::http::getHeaderValue( d->request.headers,  Qn::VIDEOWALL_GUID_HEADER_NAME).isEmpty())
         result.userName = lit("Video wall");

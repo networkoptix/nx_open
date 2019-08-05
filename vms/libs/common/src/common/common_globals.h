@@ -55,6 +55,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         customMediaPortCapability           = 0x10000, //< Camera's media streams port are editable.
         CameraTimeCapability                = 0x20000, //< Camera sends absolute timestamps in media stream
         FixedQualityCapability              = 0x40000, //< Camera does not allow to change stream quality/fps
+        MulticastStreamCapability           = 0x80000, //< Camera supports multicast streaming.
     };
     Q_DECLARE_FLAGS(CameraCapabilities, CameraCapability)
     Q_DECLARE_OPERATORS_FOR_FLAGS(CameraCapabilities)
@@ -178,6 +179,8 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         CR_Archive
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Qn::ConnectionRole)
+
+    nx::vms::api::StreamIndex toStreamIndex(ConnectionRole role);
 
     // TODO: #GDM split to server-only and client-only flags as they are always local
     enum ResourceFlag
@@ -354,7 +357,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         TimePeriodContentCount
     };
 
-using StreamQuality = nx::vms::api::StreamQuality;
+    using StreamQuality = nx::vms::api::StreamQuality;
 
     enum class BitrateControl {
         undefined,
@@ -734,6 +737,19 @@ using CameraBackupQualities = nx::vms::api::CameraBackupQualities;
     const T &_id(const T &value) { return value; }
 
     const static QLatin1String kWallpapersFolder("wallpapers");
+
+    inline QString toString(nx::vms::api::StreamIndex streamIndex)
+    {
+        switch (streamIndex)
+        {
+            case nx::vms::api::StreamIndex::primary:
+                return "primary";
+            case nx::vms::api::StreamIndex::secondary:
+                return "secondary";
+            default:
+                return "undefined";
+        }
+    }
 
 } // namespace Qn
 

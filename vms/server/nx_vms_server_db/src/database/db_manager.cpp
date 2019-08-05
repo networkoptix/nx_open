@@ -57,6 +57,8 @@
 #include <nx/vms/event/event_fwd.h>
 #include <nx/vms/event/rule.h>
 #include <nx/vms/time_sync/legacy/time_manager.h>
+#include <nx/sql/database.h>
+#include <core/resource/media_server_resource.h>
 
 static const QString RES_TYPE_MSERVER = "mediaserver";
 static const QString RES_TYPE_CAMERA = "camera";
@@ -386,7 +388,7 @@ int QnDbManager::currentBuildNumber(const QString& basePath)
     }
 
     const static QString buildNumberConnectionName = "GetBuildNumberDB";
-    auto sdb = QSqlDatabase::addDatabase(lit("QSQLITE"), "GetBuildNumberDB");
+    auto sdb = nx::sql::Database::addDatabase(lit("QSQLITE"), "GetBuildNumberDB");
     sdb.setDatabaseName(dbFileName);
     if (!sdb.open())
     {
@@ -400,7 +402,7 @@ int QnDbManager::currentBuildNumber(const QString& basePath)
         {
             sdb.close();
             sdb = QSqlDatabase();
-            QSqlDatabase::removeDatabase(buildNumberConnectionName);
+            nx::sql::Database::removeDatabase(buildNumberConnectionName);
         });
 
     QSqlQuery getVersionQuery(sdb);
@@ -446,7 +448,7 @@ bool QnDbManager::init(const nx::utils::Url& dbUrl)
             }
         }
 
-        m_sdbStatic = QSqlDatabase::addDatabase("QSQLITE", getDatabaseName("QnDbManagerStatic"));
+        m_sdbStatic = nx::sql::Database::addDatabase("QSQLITE", getDatabaseName("QnDbManagerStatic"));
         QString path2 = dbFilePathStatic.isEmpty() ? dbFilePath : dbFilePathStatic;
         m_sdbStatic.setDatabaseName(closeDirPath(path2) + QString::fromLatin1("ecs_static.sqlite"));
 
@@ -1495,6 +1497,9 @@ bool QnDbManager::beforeInstallUpdate(const QString& updateName)
     if (updateName.endsWith(lit("/33_history_refactor_dummy.sql")))
         return removeOldCameraHistory();
 
+    if (updateName.endsWith(lit("/99_20190701_move_metadata_storage_id.sql")))
+        return moveAnalyticsStorageIdToProperty();
+
     return true;
 }
 
@@ -1715,6 +1720,62 @@ bool QnDbManager::encryptKvPairs()
             {
                 NX_ERROR(this, lit("Could not execute query %1: %2").arg(insQueryString).arg(insQuery.lastError().text()));
                 return false;
+            }
+        }
+    }
+
+    return true;
+}
+
+bool QnDbManager::encryptBusinessRules()
+{
+    QSqlQuery query(m_sdb);
+    query.setForwardOnly(true);
+    QString queryStr = "SELECT rowid, action_params FROM vms_businessrule";
+
+    if (!query.prepare(queryStr))
+    {
+        NX_ERROR(this, "Could not prepare query %1: %2", queryStr, query.lastError().text());
+        return false;
+    }
+
+    if (!query.exec())
+    {
+        NX_ERROR(this, "Could not execute query %1: %2", queryStr, query.lastError().text());
+        return false;
+    }
+
+    QSqlQuery updQuery(m_sdb);
+    QString updQueryString = "UPDATE vms_businessrule SET action_params = :value WHERE rowid = :rowid";
+    if (!prepareSQLQuery(&updQuery, updQueryString, Q_FUNC_INFO))
+        return false;
+
+    while (query.next())
+    {
+        int rowid = query.value(0).toInt();
+        QByteArray value = query.value(1).toByteArray();
+        bool success = false;
+        auto params = QJson::deserialized<nx::vms::event::ActionParameters>(
+            value,
+            nx::vms::event::ActionParameters(),
+            &success);
+        if (success)
+        {
+            nx::utils::Url url = params.url;
+            if (!url.password().isEmpty())
+            {
+                url.setPassword(nx::utils::encodeHexStringFromStringAES128CBC(url.password()));
+                params.url = url.toString();
+                value = QJson::serialized(params);
+
+                updQuery.addBindValue(value);
+                updQuery.addBindValue(rowid);
+
+                if (!updQuery.exec())
+                {
+                    NX_ERROR(this, lit("Could not execute query %1: %2").arg(updQueryString).arg(updQuery.lastError().text()));
+                    return false;
+                }
             }
         }
     }
@@ -1991,7 +2052,37 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
     if (updateName.endsWith("/99_20190110_improve_layout_api.sql"))
         return resyncIfNeeded(ResyncLayouts);
 
+    if (updateName.endsWith(lit("/99_20190701_move_metadata_storage_id.sql")))
+        return resyncIfNeeded({ ResyncServerAttributes, ResyncResourceProperties });
+
+    if (updateName.endsWith(lit("/99_20190704_encrypt_action_parameters.sql")))
+        return encryptBusinessRules() && resyncIfNeeded({ResyncRules});
+
     NX_DEBUG(this, lit("SQL update %1 does not require post-actions.").arg(updateName));
+    return true;
+}
+
+bool QnDbManager::moveAnalyticsStorageIdToProperty()
+{
+    QSqlQuery query(m_sdb);
+    QString queryStr(lit("SELECT server_guid, metadata_storage_id FROM vms_server_user_attributes"));
+    if (!prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
+        return false;
+    if (!execSQLQuery(&query, Q_FUNC_INFO))
+        return false;
+    while (query.next())
+    {
+        auto metadataStorageId = QnSql::deserialized_field<QnUuid>(query.value(1));
+        if (!metadataStorageId.isNull())
+        {
+            ResourceParamWithRefData param;
+            param.resourceId = QnSql::deserialized_field<QnUuid>(query.value(0));
+            param.name = QnMediaServerResource::kMetadataStorageIdKey;
+            param.value = metadataStorageId.toString();
+            if (insertAddParam(param) != ErrorCode::ok)
+                return false;
+        }
+    }
     return true;
 }
 
@@ -2116,7 +2207,7 @@ QnDbManager::~QnDbManager()
     if (m_sdbStatic.isOpen())
     {
         m_sdbStatic = QSqlDatabase();
-        QSqlDatabase::removeDatabase(getDatabaseName("QnDbManagerStatic"));
+        nx::sql::Database::removeDatabase(getDatabaseName("QnDbManagerStatic"));
     }
 }
 
@@ -2398,8 +2489,8 @@ ErrorCode QnDbManager::insertOrReplaceMediaServer(const MediaServerData& data, q
 {
     QSqlQuery insQuery(m_sdb);
     insQuery.prepare("\
-        INSERT OR REPLACE INTO vms_server (auth_key, version, net_addr_list, system_info, flags, resource_ptr_id) \
-        VALUES (:authKey, :version, :networkAddresses, :systemInfo, :flags, :internalId)\
+        INSERT OR REPLACE INTO vms_server (auth_key, version, net_addr_list, system_info, os_info, flags, resource_ptr_id) \
+        VALUES (:authKey, :version, :networkAddresses, :systemInfo, :osInfo, :flags, :internalId)\
     ");
     QnSql::bind(data, &insQuery);
 
@@ -2529,7 +2620,17 @@ ErrorCode QnDbManager::executeTransactionInternal(
     f.write(tran.params.data);
     f.close();
 
-    QSqlDatabase testDB = QSqlDatabase::addDatabase("QSQLITE", getDatabaseName("QnDbManagerTmp"));
+    QString databaseName = getDatabaseName("QnDbManagerTmp");
+    QSqlDatabase testDB = nx::sql::Database::addDatabase("QSQLITE", databaseName);
+
+    auto dbCloseGuard = nx::utils::makeScopeGuard(
+        [&]()
+    {
+        testDB.close();
+        testDB = QSqlDatabase();
+        nx::sql::Database::removeDatabase(databaseName);
+    });
+
     testDB.setDatabaseName( f.fileName());
     if (!testDB.open() || !isObjectExists(lit("table"), lit("transaction_log"), testDB)) {
         QFile::remove(f.fileName());
@@ -2544,7 +2645,6 @@ ErrorCode QnDbManager::executeTransactionInternal(
         qWarning() << "Skipping bad database dump file";
         return ErrorCode::dbError; // invalid back file
     }
-    testDB.close();
     return ErrorCode::ok;
 }
 
@@ -3285,7 +3385,7 @@ ApiObjectType QnDbManager::getObjectTypeNoLock(const QnUuid& objectId)
         return ApiObject_AnalyticsEngine;
     else
     {
-        NX_ASSERT(false, "Unknown object type");
+        NX_WARNING(this, lm("Unknown object type for object %1").arg(objectId));
         return ApiObject_NotDefined;
     }
 }
@@ -3576,6 +3676,7 @@ ErrorCode QnDbManager::doQueryNoLock(
         SELECT id, timestamp, merged_system_local_id AS mergedSystemLocalId,
             merged_system_cloud_id AS mergedSystemCloudId, username, signature
         FROM system_merge_history
+        ORDER BY id
         )sql");
     if (!fetchMergeHistoryQuery.exec())
     {
@@ -3995,7 +4096,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, MediaServerDataList& serv
     query.prepare(lit("\
         SELECT r.guid as id, r.guid, r.xtype_guid as typeId, r.parent_guid as parentId, r.name, r.url, \
         s.auth_key as authKey, s.version, s.net_addr_list as networkAddresses, s.system_info as systemInfo, \
-        s.flags \
+        s.os_info as osInfo, s.flags \
         FROM vms_resource r \
         LEFT JOIN vms_resource_status rs on rs.guid = r.guid \
         JOIN vms_server s on s.resource_ptr_id = r.id %1 ORDER BY r.guid\

@@ -75,7 +75,7 @@ public:
     bool transcodeAsync(
         const StreamingChunkCacheKey& transcodeParams,
         StreamingChunkPtr chunk);
-
+    void stop();
 protected:
     virtual void onTimer(const quint64& timerID);
 
@@ -104,11 +104,11 @@ private:
 
     DataSourceContextPtr prepareDataSourceContext(
         QnSecurityCamResourcePtr cameraResource,
-        QnVideoCameraPtr camera,
+        nx::vms::server::VideoCameraPtr camera,
         const StreamingChunkCacheKey& transcodeParams);
     AbstractOnDemandDataProviderPtr createLiveMediaDataProvider(
         const VideoCameraLocker& /*locker*/,
-        QnVideoCameraPtr camera,
+        nx::vms::server::VideoCameraPtr camera,
         const StreamingChunkCacheKey& transcodeParams);
     AbstractOnDemandDataProviderPtr createArchiveReader(
         QnSecurityCamResourcePtr cameraResource,

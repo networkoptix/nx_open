@@ -179,7 +179,7 @@ class CloudSession(object):
         log.info('Sleeping 60 seconds')
         time.sleep(60)
 
-    def wait_for_message(self, queue, tries=3, seconds_per_try=20):
+    def wait_for_message(self, queue, tries=6, seconds_per_try=20):
         for i in range(tries):
             for message in queue.receive_messages(WaitTimeSeconds=seconds_per_try):
                 try:
@@ -409,6 +409,10 @@ class CloudSession(object):
     @testmethod(metric='traffic_relay_failure', host='relay-sy', continue_if_fails=True)
     def test_traffic_relay_sy(self):
         self.test_traffic_relay('relay-sy')
+
+    @testmethod(metric='traffic_relay_failure', host='relay-si', continue_if_fails=True)
+    def test_traffic_relay_si(self):
+        self.test_traffic_relay('relay-si')
 
     @testmethod(metric='email_failure', continue_if_fails=True, debug_skip=True)
     def restore_password(self):

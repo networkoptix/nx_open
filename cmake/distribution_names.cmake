@@ -1,10 +1,12 @@
 function(set_distribution_names)
     set(prefix ${installer.name})
 
-    # Allowed values are: win64, win86, linux64, linux86, mac, android, ios,
-    #  bpi, rpi, bananapi, tx1, isd, isd_s2
     set(distribution_platform "${targetDevice}")
-    if(platform STREQUAL "windows")
+    if(targetDevice STREQUAL "linux_arm32")
+        set(distribution_platform "linux_arm32")
+    elseif(targetDevice STREQUAL "linux_arm64")
+        set(distribution_platform "linux_arm64")
+    elseif(platform STREQUAL "windows")
         if(arch STREQUAL "x64")
             set(distribution_platform "win64")
         else()
@@ -29,9 +31,19 @@ function(set_distribution_names)
     if(beta)
         set(beta_suffix "-beta")
         set(suffix "${distribution_platform}${beta_suffix}-${cloudGroup}")
+        set(sdkSuffix "universal${beta_suffix}")
+        if(targetDevice STREQUAL "linux_arm32")
+            set(suffix_rpi "rpi${beta_suffix}-${cloudGroup}")
+            set(suffix_bananapi "bananapi${beta_suffix}-${cloudGroup}")
+        endif()
     else()
         set(beta_suffix)
         set(suffix "${distribution_platform}")
+        set(sdkSuffix "universal")
+        if(targetDevice STREQUAL "linux_arm32")
+            set(suffix_rpi "rpi")
+            set(suffix_bananapi "bananapi")
+        endif()
     endif()
 
     set(client_distribution_name
@@ -46,6 +58,14 @@ function(set_distribution_names)
         "${prefix}-client_update-${releaseVersion.full}-${suffix}" PARENT_SCOPE)
     set(server_update_distribution_name
         "${prefix}-server_update-${releaseVersion.full}-${suffix}" PARENT_SCOPE)
+
+    if(targetDevice STREQUAL "linux_arm32")
+        set(server_update_distribution_name_rpi
+            "${prefix}-server_update-${releaseVersion.full}-${suffix_rpi}" PARENT_SCOPE)
+        set(server_update_distribution_name_bananapi
+            "${prefix}-server_update-${releaseVersion.full}-${suffix_bananapi}" PARENT_SCOPE)
+    endif()
+
     set(cdb_distribution_name
         "${prefix}-cdb-${releaseVersion.full}-${suffix}" PARENT_SCOPE)
     set(hpm_distribution_name
@@ -69,7 +89,7 @@ function(set_distribution_names)
     set(mobile_client_distribution_name
         "${prefix}-client-${mobileClientVersion.full}-${suffix}" PARENT_SCOPE)
     set(analytics_sdk_distribution_name
-        "${prefix}-analytics_sdk-${releaseVersion.full}-${suffix}" PARENT_SCOPE)
+        "${prefix}-analytics_sdk-${releaseVersion.full}-${sdkSuffix}" PARENT_SCOPE)
     set(ssc_analytics_plugin_distribution_name
         "${prefix}-ssc_analytics_plugin-${releaseVersion.full}-${suffix}" PARENT_SCOPE)
     set(product_distribution_name

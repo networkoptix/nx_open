@@ -66,7 +66,6 @@ class QnLayoutTourNotificationManager;
 class QnVideowallNotificationManager;
 class QnWebPageNotificationManager;
 class QnStoredFileNotificationManager;
-class QnUpdatesNotificationManager;
 class QnMiscNotificationManager;
 class QnDiscoveryNotificationManager;
 class AnalyticsNotificationManager;
@@ -83,10 +82,10 @@ namespace detail {
 struct NoneType {};
 
 template<typename ParamType>
-using CheckSavePermissionFuncType = std::function<bool(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, const ParamType&)>;
+using CheckSavePermissionFuncType = std::function<ErrorCode(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, const ParamType&)>;
 
 template<typename ParamType>
-using CheckReadPermissionFuncType = std::function<bool(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, ParamType&)>;
+using CheckReadPermissionFuncType = std::function<ErrorCode(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, ParamType&)>;
 
 template<typename ParamType>
 using FilterByReadPermissionFuncType = std::function<void(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, ParamType&)>;
@@ -121,7 +120,6 @@ struct NotificationParams
     QnVideowallNotificationManager* videowallNotificationManager;
     QnWebPageNotificationManager* webPageNotificationManager;
     QnStoredFileNotificationManager* storedFileNotificationManager;
-    QnUpdatesNotificationManager* updatesNotificationManager;
     QnMiscNotificationManager* miscNotificationManager;
     QnDiscoveryNotificationManager* discoveryNotificationManager;
     AnalyticsNotificationManager* analyticsNotificationManager;

@@ -25,7 +25,7 @@ base_file = json.load(open('app/language_i18n.json', 'r'))
 static_file = json.load(open('app/language_i18n_static.json', 'r'))
 
 with open("./app/language_i18n.json", "wb") as outfile:
-    json.dump(merge_two_json(base_file, static_file), outfile)
+    json.dump(merge_two_json(base_file, static_file), outfile, indent=4)
 
 # update EN lang so we can test on cloud-dev before Boris updates translations
 copyfile('./app/language_i18n.json', '../translations/en_US/language_i18n.json')

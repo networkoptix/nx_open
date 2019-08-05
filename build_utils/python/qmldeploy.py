@@ -9,6 +9,7 @@ import shutil
 import json
 import re
 
+
 class QmlDeployUtil:
     def __init__(self, qt_root):
         self.qt_root = os.path.abspath(qt_root)
@@ -57,6 +58,28 @@ class QmlDeployUtil:
             return
 
         return json.load(process.stdout)
+
+    @staticmethod
+    def has_compiled_file(file, directory_contents):
+        if file.endswith(".qml") or file.endswith(".js"):
+            return (file + "c") in directory_contents
+        return False
+
+    @staticmethod
+    def make_ignore_function(prefer_compiled, skip_styles):
+        styles = {"Fusion", "Imagine", "Material", "Universal"}
+        styles_directory = "Controls.2"
+
+        ignored_always = shutil.ignore_patterns("*.a", "*.prl", "*.pdb", "designer")
+
+        def ignoref(directory, contents):
+            skipped = ignored_always(directory, contents)
+            if skip_styles and directory.endswith(styles_directory):
+                skipped = skipped.union(styles)
+            if prefer_compiled:
+                skipped = skipped.union(f for f in contents if QmlDeployUtil.has_compiled_file(f, contents))
+            return skipped
+        return ignoref
 
     def get_qt_imports(self, imports):
         if not type(imports) is list:
@@ -126,7 +149,7 @@ class QmlDeployUtil:
             "class_name": plugin_class
         }
 
-    def copy_components(self, imports, output_dir):
+    def copy_components(self, imports, output_dir, ignore_function):
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
 
@@ -150,15 +173,15 @@ class QmlDeployUtil:
                 path,
                 dst,
                 symlinks=True,
-                ignore=shutil.ignore_patterns("*.a", "*.prl", "*.pdb", "designer"))
+                ignore=ignore_function)
 
-    def deploy(self, qml_root, output_dir):
+    def deploy(self, qml_root, output_dir, ignore_function):
         imports_dict = self.invoke_qmlimportscanner(qml_root)
         if not imports_dict:
             return
 
         imports = self.get_qt_imports(imports_dict)
-        self.copy_components(imports, output_dir)
+        self.copy_components(imports, output_dir, ignore_function)
 
     def print_static_plugins(self, qml_root, file_name=None, additional_plugins=[]):
         imports_dict = self.invoke_qmlimportscanner(qml_root)
@@ -218,6 +241,7 @@ class QmlDeployUtil:
 
                 out_file.write("Q_IMPORT_PLUGIN({})\n".format(info["class_name"]))
 
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--qmlimportscanner", type=str, help="Custom qmlimportscanner binary.")
@@ -226,6 +250,8 @@ def main():
     parser.add_argument("-o", "--output", type=str, help="Output.")
     parser.add_argument("--print-static-plugins", action="store_true", help="Print static plugins list.")
     parser.add_argument("--generate-import-cpp", action="store_true", help="Generate a file for importing plugins.")
+    parser.add_argument("--prefer-compiled", action="store_true", help="Skip base version if compiled exists")
+    parser.add_argument("--skip-styles", action="store_true", help="Skip QuickControls2 styles")
     parser.add_argument("--additional-plugins", nargs="+", help="Additional plugins to process.")
 
     args = parser.parse_args()
@@ -244,7 +270,11 @@ def main():
         if not args.output:
             exit("Output directory is not specified.")
 
-        deploy_util.deploy(args.qml_root, args.output)
+        deploy_util.deploy(
+            args.qml_root,
+            args.output,
+            deploy_util.make_ignore_function(args.prefer_compiled, args.skip_styles))
+
 
 if __name__ == "__main__":
     main()

@@ -1,8 +1,12 @@
 #pragma once
 
+#include <QtWidgets/QWidget>
+
 #include <client_core/connection_context_aware.h>
 
 #include <utils/email/email_fwd.h>
+
+class QTimer;
 
 namespace Ui {
     class SmtpTestConnectionWidget;
@@ -31,7 +35,7 @@ private:
     QString errorString(const QnTestEmailSettingsReply& result) const;
 
 private slots:
-    void at_testEmailSettingsFinished(int status, const QnTestEmailSettingsReply& reply, int handle);
+    void at_testEmailSettingsFinished(bool success, int handle, const QnTestEmailSettingsReply& reply);
 
 private:
     QScopedPointer<Ui::SmtpTestConnectionWidget> ui;

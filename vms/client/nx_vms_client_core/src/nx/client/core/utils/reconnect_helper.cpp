@@ -11,15 +11,17 @@
 
 namespace nx::vms::client::core {
 
-ReconnectHelper::ReconnectHelper(QObject* parent):
-    QObject(parent)
+ReconnectHelper::ReconnectHelper(bool stickyReconnect, QObject* parent):
+    base_type(parent)
 {
     m_userName = commonModule()->currentUrl().userName();
     m_password = commonModule()->currentUrl().password();
 
-    // List of all known servers. Should not be updated as we are disconnected.
-    for (const auto &server: resourcePool()->getAllServers(Qn::AnyStatus))
-        m_servers.append(server);
+    const auto currentServer = commonModule()->currentServer();
+    if (currentServer && stickyReconnect)
+        m_servers.append(currentServer);
+    else  // List of all known servers. Should not be updated as we are disconnected.
+        m_servers.append(resourcePool()->getAllServers(Qn::AnyStatus));
 
     // Check if there are no servers in the system.
     NX_ASSERT(!m_servers.empty());
@@ -32,11 +34,7 @@ ReconnectHelper::ReconnectHelper(QObject* parent):
             return left->getId() < right->getId();
         });
 
-    m_currentIndex = m_servers.indexOf(commonModule()->currentServer());
-
-    if (m_currentIndex < 0)
-        m_currentIndex = 0;
-
+    m_currentIndex = std::max(m_servers.indexOf(currentServer), 0);
     const auto discoverManager = commonModule()->moduleDiscoveryManager();
 }
 
@@ -47,7 +45,7 @@ QnMediaServerResourceList ReconnectHelper::servers() const
 
 QnMediaServerResourcePtr ReconnectHelper::currentServer() const
 {
-    if (m_currentIndex < 0)
+    if (m_currentIndex < 0 || m_currentIndex >= m_servers.size())
         return QnMediaServerResourcePtr();
 
     return m_servers[m_currentIndex];
@@ -74,7 +72,7 @@ nx::utils::Url ReconnectHelper::currentUrl() const
 
 void ReconnectHelper::next()
 {
-    if (m_servers.isEmpty())
+    if (m_servers.empty())
         return;
 
     m_currentIndex = (m_currentIndex + 1) % m_servers.size();

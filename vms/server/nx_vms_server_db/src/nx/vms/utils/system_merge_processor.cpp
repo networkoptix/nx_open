@@ -11,6 +11,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/std/algorithm.h>
+#include <nx/vms/api/protocol_version.h>
 
 #include <api/global_settings.h>
 #include <api/mediaserver_client.h>
@@ -89,29 +90,31 @@ QnJsonRestResult SystemMergeProcessor::merge(
         return result;
     }
 
-    result.setReply(m_remoteModuleInformation);
+    auto makeError =
+        [&](const QString& logMessage)
+        {
+            NX_DEBUG(this, logMessage);
+            result.setReply(m_remoteModuleInformation);
+            return result;
+        };
 
     result = checkWhetherMergeIsPossible(data);
     if (result.error)
-    {
-        NX_DEBUG(this, lm("Systems cannot be merged"));
-        return result;
-    }
+        return makeError("Systems cannot be merged");
 
-    result = mergeSystems(accessRights, data);
+    QnUuid mergeId = QnUuid::createUuid();
+    result = mergeSystems(accessRights, data, mergeId);
     if (result.error)
-    {
-        NX_DEBUG(this, lm("Failed to merge systems. %1")
-            .args(toString(result.error)));
-        return result;
-    }
+        return makeError(lm("Failed to merge systems. %1").args(toString(result.error)));
+
+    m_commonModule->globalSettings()->setLastMergeMasterId(mergeId);
+    m_commonModule->globalSettings()->synchronizeNowSync();
 
     nx::vms::api::SystemMergeHistoryRecord mergeHistoryRecord;
     if (!addMergeHistoryRecord(data, &mergeHistoryRecord))
     {
-        NX_DEBUG(this, "Failed to add merge history data");
         setMergeError(&result, MergeStatus::unknownError);
-        return result;
+        return makeError("Failed to add merge history data");
     }
     QJson::serialize(mergeHistoryRecord, &result.reply);
 
@@ -217,8 +220,8 @@ QnJsonRestResult SystemMergeProcessor::checkWhetherMergeIsPossible(
     if (connectionResult == Qn::IncompatibleProtocolConnectionResult
         && !data.ignoreIncompatible)
     {
-        NX_DEBUG(this, lm("Incompatible systems protocol. Local %1, remote %2")
-            .args(QnAppInfo::ec2ProtoVersion(), m_remoteModuleInformation.protoVersion));
+        NX_DEBUG(this, "Incompatible systems protocol. Local %1, remote %2",
+            nx::vms::api::protocolVersion(), m_remoteModuleInformation.protoVersion);
         setMergeError(&result, MergeStatus::incompatibleVersion);
         return result;
     }
@@ -348,7 +351,8 @@ QnJsonRestResult SystemMergeProcessor::checkIfCloudSystemsMergeIsPossible(
 
 QnJsonRestResult SystemMergeProcessor::mergeSystems(
     Qn::UserAccessData accessRights,
-    MergeSystemData data)
+    MergeSystemData data,
+    const QnUuid& mergeId)
 {
     QnJsonRestResult result;
     if (m_dbBackupEnabled)
@@ -375,7 +379,8 @@ QnJsonRestResult SystemMergeProcessor::mergeSystems(
                 m_remoteModuleInformation.localSystemId,
                 m_remoteModuleInformation.systemName,
                 data.getKey,
-                data.postKey);
+                data.postKey,
+                mergeId);
         if (result.error)
         {
             NX_DEBUG(this, lit("takeRemoteSettings %1. Failed to apply remote settings")
@@ -387,7 +392,8 @@ QnJsonRestResult SystemMergeProcessor::mergeSystems(
     {
         NX_DEBUG(this, "Applying local settings to a remote peer");
 
-        result = applyCurrentSettings(data.url, data.postKey, data.mergeOneServer);
+        result = applyCurrentSettings(
+            data.url, data.getKey, data.postKey, data.mergeOneServer, mergeId);
         if (result.error)
         {
             NX_DEBUG(this, lit("takeRemoteSettings %1. Failed to apply current settings")
@@ -427,8 +433,10 @@ void SystemMergeProcessor::setMergeError(
 
 QnJsonRestResult SystemMergeProcessor::applyCurrentSettings(
     const nx::utils::Url& remoteUrl,
+    const QString& getKey,
     const QString& postKey,
-    bool oneServer)
+    bool oneServer,
+    const QnUuid& mergeId)
 {
     auto server = m_commonModule->resourcePool()->getResourceById<QnMediaServerResource>(
         m_commonModule->moduleGUID());
@@ -446,6 +454,7 @@ QnJsonRestResult SystemMergeProcessor::applyCurrentSettings(
     ec2::AbstractECConnectionPtr ec2Connection = m_commonModule->ec2Connection();
     data.tranLogTime = ec2Connection->getTransactionLogTime();
     data.wholeSystem = !oneServer;
+    data.mergeId = mergeId;
 
     /**
      * Save current server to the foreign system.
@@ -472,14 +481,85 @@ QnJsonRestResult SystemMergeProcessor::applyCurrentSettings(
     /**
      * Save current system settings to the foreign system.
      */
-    const auto& settings = m_commonModule->globalSettings()->allSettings();
+    auto settings = m_commonModule->globalSettings()->allSettings();
+    nx::utils::remove_if(settings,
+        [](const auto& adaptor)
+        {
+            return adaptor->key() == nx::settings_names::kNameLastMergeMasterId
+                || adaptor->key() == nx::settings_names::kNameLastMergeSlaveId;
+        });
+
     for (QnAbstractResourcePropertyAdaptor* setting: settings)
     {
         nx::vms::api::ResourceParamData param(setting->key(), setting->serializedValue());
         data.foreignSettings.push_back(param);
     }
 
-    return executeRemoteConfigure(data, remoteUrl, postKey);
+    ConfigureSystemData remoteSystemData;
+    QnJsonRestResult result;
+    if (!fetchRemoteData(remoteUrl, getKey, &remoteSystemData))
+    {
+        setMergeError(&result, MergeStatus::configurationFailed);
+        return result;
+    }
+
+    result =  executeRemoteConfigure(data, remoteUrl, postKey);
+    if (result.error)
+        return result;
+
+    if (!shiftSynchronizationTimestamp(remoteSystemData))
+        NX_WARNING(this, lit("applyRemoteSettings. Failed to shift local system timestamp"));
+
+    return result;
+}
+
+bool SystemMergeProcessor::shiftSynchronizationTimestamp(
+    const ConfigureSystemData& remoteSystemData)
+{
+    auto newTranLogTime = std::max(
+        remoteSystemData.tranLogTime,
+        m_commonModule->ec2Connection()->getTransactionLogTime());
+    ++newTranLogTime.sequence;
+
+    NX_DEBUG(this, "Shifting local synchronization timestamp to %1 so that critical data is not "
+        "overwritten by some en-route transactions", newTranLogTime);
+
+    m_commonModule->ec2Connection()->setTransactionLogTime(newTranLogTime);
+
+    auto miscManager = m_commonModule->ec2Connection()->getMiscManager(Qn::kSystemAccess);
+    const auto errorCode = miscManager->changeSystemIdSync(
+        m_commonModule->moduleInformation().localSystemId,
+        m_commonModule->systemIdentityTime(),
+        newTranLogTime);
+    if (errorCode != ec2::ErrorCode::ok)
+    {
+        NX_DEBUG(this, "Failed to save new transaction log timestamp (%1): %2",
+            newTranLogTime, ec2::toString(errorCode));
+        return false;
+    }
+
+    return true;
+}
+
+bool SystemMergeProcessor::changeSystemId(
+    const QnUuid& systemId,
+    const ConfigureSystemData& remoteSystemData)
+{
+    auto miscManager = m_commonModule->ec2Connection()->getMiscManager(Qn::kSystemAccess);
+    const auto errorCode = miscManager->changeSystemIdSync(
+        systemId,
+        remoteSystemData.sysIdTime,
+        m_commonModule->ec2Connection()->getTransactionLogTime());
+
+    NX_ASSERT(errorCode != ec2::ErrorCode::forbidden, "Access check should be implemented before");
+    if (errorCode != ec2::ErrorCode::ok)
+    {
+        NX_DEBUG(this, lit("applyRemoteSettings. Failed to save new system name: %1")
+            .arg(ec2::toString(errorCode)));
+        return false;
+    }
+
+    return true;
 }
 
 QnJsonRestResult SystemMergeProcessor::executeRemoteConfigure(
@@ -537,7 +617,8 @@ QnJsonRestResult SystemMergeProcessor::applyRemoteSettings(
     const QnUuid& systemId,
     const QString& systemName,
     const QString& getKey,
-    const QString& postKey)
+    const QString& postKey,
+    const QnUuid& mergeId)
 {
     ConfigureSystemData remoteSystemData;
     remoteSystemData.localSystemId = systemId;
@@ -554,7 +635,8 @@ QnJsonRestResult SystemMergeProcessor::applyRemoteSettings(
     if (m_dbBackupEnabled)
     {
         QnJsonRestResult backupDBRestResult;
-        if (!executeRequest(remoteUrl, getKey, backupDBRestResult, lit("/api/backupDatabase")))
+        if (!executeRequest(
+            remoteUrl, getKey, backupDBRestResult, "/api/backupDatabase", /*post*/ true))
         {
             setMergeError(&result, MergeStatus::configurationFailed);
             return result;
@@ -570,6 +652,7 @@ QnJsonRestResult SystemMergeProcessor::applyRemoteSettings(
         ec2::AbstractECConnectionPtr ec2Connection = m_commonModule->ec2Connection();
         data.tranLogTime = ec2Connection->getTransactionLogTime();
         data.rewriteLocalSettings = true;
+        data.mergeId = mergeId;
 
         result = executeRemoteConfigure(
             data,
@@ -580,6 +663,13 @@ QnJsonRestResult SystemMergeProcessor::applyRemoteSettings(
     }
 
     // 2. Updating local data.
+
+    if (!shiftSynchronizationTimestamp(remoteSystemData))
+    {
+        NX_DEBUG(this, lit("applyRemoteSettings. Failed to shift local system timestamp"));
+        setMergeError(&result, MergeStatus::configurationFailed);
+        return result;
+    }
 
     if (!nx::vms::utils::configureLocalPeerAsPartOfASystem(m_commonModule, remoteSystemData))
     {
@@ -621,14 +711,8 @@ QnJsonRestResult SystemMergeProcessor::applyRemoteSettings(
         }
     }
 
-    auto miscManager = m_commonModule->ec2Connection()->getMiscManager(Qn::kSystemAccess);
-    const auto errorCode = miscManager->changeSystemIdSync(
-        systemId, remoteSystemData.sysIdTime, remoteSystemData.tranLogTime);
-    NX_ASSERT(errorCode != ec2::ErrorCode::forbidden, "Access check should be implemented before");
-    if (errorCode != ec2::ErrorCode::ok)
+    if (!changeSystemId(systemId, remoteSystemData))
     {
-        NX_DEBUG(this, lit("applyRemoteSettings. Failed to save new system name: %1")
-            .arg(ec2::toString(errorCode)));
         setMergeError(&result, MergeStatus::configurationFailed);
         return result;
     }
@@ -765,7 +849,8 @@ bool SystemMergeProcessor::executeRequest(
     const nx::utils::Url& remoteUrl,
     const QString& getKey,
     ResultDataType& result,
-    const QString& path)
+    const QString& path,
+    bool post)
 {
     nx::network::http::HttpClient client;
     client.setResponseReadTimeout(kRequestTimeout);
@@ -775,7 +860,8 @@ bool SystemMergeProcessor::executeRequest(
     nx::utils::Url requestUrl(remoteUrl);
     requestUrl.setPath(path);
     addAuthToRequest(requestUrl, getKey);
-    if (!client.doGet(requestUrl) || !isResponseOK(client))
+
+    if (!(post ? client.doPost(requestUrl) : client.doGet(requestUrl)) || !isResponseOK(client))
     {
         auto status = getClientResponse(client);
         NX_DEBUG(this, lit("applyRemoteSettings. Failed to invoke %1: %2")

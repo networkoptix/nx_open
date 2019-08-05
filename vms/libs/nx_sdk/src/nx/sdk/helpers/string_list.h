@@ -1,14 +1,17 @@
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+
 #pragma once
 
 #include <vector>
 #include <string>
 
 #include <nx/sdk/i_string_list.h>
+#include <nx/sdk/helpers/ref_countable.h>
 
 namespace nx {
 namespace sdk {
 
-class StringList: public IStringList
+class StringList: public nx::sdk::RefCountable<IStringList>
 {
 public:
     virtual int count() const override;

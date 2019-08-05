@@ -23,14 +23,11 @@ DeviceAgentHandler::DeviceAgentHandler(
     ServerModuleAware(serverModule),
     m_engineResourceId(std::move(engineResourceId)),
     m_device(std::move(device)),
-    m_metadataHandler(serverModule)
+    m_metadataHandler(serverModule, m_device, m_engineResourceId)
 {
     connect(this, &DeviceAgentHandler::pluginEventTriggered,
         serverModule->eventConnector(), &event::EventConnector::at_pluginEvent,
         Qt::QueuedConnection);
-
-    m_metadataHandler.setResource(m_device);
-    m_metadataHandler.setEngineId(m_engineResourceId);
 
     nx::analytics::EventTypeDescriptorManager descriptorManager(serverModule->commonModule());
     m_metadataHandler.setEventTypeDescriptors(

@@ -23,6 +23,7 @@
 #include "aio/aio_service.h"
 #include "aio/async_socket_helper.h"
 #include "compat_poll.h"
+#include "common_socket_impl.h"
 #include "address_resolver.h"
 
 #ifdef _WIN32
@@ -45,6 +46,13 @@ typedef void raw_type;       // Type used for raw data on this platform
 
 #ifndef SOCKET_ERROR
 #define SOCKET_ERROR (-1)
+#endif
+
+// Needed only for bpi build, that use old C Library headers.
+#ifdef __linux__
+    #ifndef IP_MULTICAST_ALL
+        #define IP_MULTICAST_ALL 49
+    #endif
 #endif
 
 namespace nx {
@@ -208,33 +216,39 @@ bool Socket<SocketInterfaceToImplement>::getReuseAddrFlag(bool* val) const
 }
 
 template<typename SocketInterfaceToImplement>
-bool Socket<SocketInterfaceToImplement>::setReusePortFlag(bool value)
+bool Socket<SocketInterfaceToImplement>::setReusePortFlag(
+    bool value)
 {
-#if !defined(Q_OS_WIN) && defined(SO_REUSEPORT)
-    const int on = value ? 1 : 0;
-    if (::setsockopt(m_fd, SOL_SOCKET, SO_REUSEPORT, (const char*)&on, sizeof(on)))
-        return false;
-
-    return true;
-#else
+#if defined(_WIN32)
     return setReuseAddrFlag(value);
+#elif defined(SO_REUSEPORT)
+    const int on = value ? 1 : 0;
+    return ::setsockopt(m_fd, SOL_SOCKET, SO_REUSEPORT, (const char*) &on, sizeof(on)) == 0;
+#else
+    nx::utils::unused(value);
+    SystemError::setLastErrorCode(SystemError::unknownProtocolOption);
+    return false;
 #endif
 }
 
 template<typename SocketInterfaceToImplement>
-bool Socket<SocketInterfaceToImplement>::getReusePortFlag(bool* value) const
+bool Socket<SocketInterfaceToImplement>::getReusePortFlag(
+    bool* value) const
 {
-#if !defined(Q_OS_WIN) && defined(SO_REUSEPORT)
+#if defined(_WIN32)
+    return getReuseAddrFlag(value);
+#elif defined(SO_REUSEPORT)
     int reuseAddrVal = 0;
     socklen_t optLen = sizeof(reuseAddrVal);
-
-    if (::getsockopt(m_fd, SOL_SOCKET, SO_REUSEPORT, (char*)&reuseAddrVal, &optLen))
+    if (::getsockopt(m_fd, SOL_SOCKET, SO_REUSEPORT, (char*) &reuseAddrVal, &optLen))
         return false;
 
     *value = reuseAddrVal > 0;
     return true;
 #else
-    return getReuseAddrFlag(value);
+    nx::utils::unused(value);
+    SystemError::setLastErrorCode(SystemError::unknownProtocolOption);
+    return false;
 #endif
 }
 
@@ -730,7 +744,7 @@ int CommunicatingSocket<SocketInterfaceToImplement>::send(
     int sended = doInterruptableSystemCallWithTimeout<>(
         this,
         std::bind(&::send, this->m_fd, (const void*)buffer, (size_t)bufferLen,
-#ifdef __linux
+#ifdef __linux__
             MSG_NOSIGNAL
 #else
             0
@@ -1301,12 +1315,12 @@ static const int DEFAULT_ACCEPT_TIMEOUT_MSEC = 250;
  * @return fd (>=0) on success, <0 on error (-2 if timed out)
  */
 static int acceptWithTimeout(
-    int m_fd,
+    int fd,
     int timeoutMillis = DEFAULT_ACCEPT_TIMEOUT_MSEC,
     bool nonBlockingMode = false)
 {
     if (nonBlockingMode)
-        return ::accept(m_fd, NULL, NULL);
+        return ::accept(fd, NULL, NULL);
 
     int result = 0;
     if (timeoutMillis == 0)
@@ -1315,7 +1329,7 @@ static int acceptWithTimeout(
 #ifdef _WIN32
     struct pollfd fds[1];
     memset(fds, 0, sizeof(fds));
-    fds[0].fd = m_fd;
+    fds[0].fd = fd;
     fds[0].events |= POLLIN;
     result = poll(fds, sizeof(fds) / sizeof(*fds), timeoutMillis);
     if (result < 0)
@@ -1329,16 +1343,16 @@ static int acceptWithTimeout(
     {
         int errorCode = 0;
         int errorCodeLen = sizeof(errorCode);
-        if (getsockopt(m_fd, SOL_SOCKET, SO_ERROR, reinterpret_cast<char*>(&errorCode), &errorCodeLen) != 0)
+        if (getsockopt(fd, SOL_SOCKET, SO_ERROR, reinterpret_cast<char*>(&errorCode), &errorCodeLen) != 0)
             return -1;
         ::SetLastError(errorCode);
         return -1;
     }
-    return ::accept(m_fd, NULL, NULL);
+    return ::accept(fd, NULL, NULL);
 #else
     struct pollfd sockPollfd;
     memset(&sockPollfd, 0, sizeof(sockPollfd));
-    sockPollfd.fd = m_fd;
+    sockPollfd.fd = fd;
     sockPollfd.events = POLLIN;
 #ifdef _GNU_SOURCE
     sockPollfd.events |= POLLRDHUP;
@@ -1352,10 +1366,8 @@ static int acceptWithTimeout(
         return -1;
     }
     if (sockPollfd.revents & POLLIN)
-    {
-        auto fd = ::accept(m_fd, NULL, NULL);
-        return fd;
-    }
+        return ::accept(fd, NULL, NULL);
+
     if ((sockPollfd.revents & POLLHUP)
 #ifdef _GNU_SOURCE
         || (sockPollfd.revents & POLLRDHUP)
@@ -1369,7 +1381,7 @@ static int acceptWithTimeout(
     {
         int errorCode = 0;
         socklen_t errorCodeLen = sizeof(errorCode);
-        if (getsockopt(m_fd, SOL_SOCKET, SO_ERROR, &errorCode, &errorCodeLen) != 0)
+        if (getsockopt(fd, SOL_SOCKET, SO_ERROR, &errorCode, &errorCodeLen) != 0)
             return -1;
         errno = errorCode;
         return -1;
@@ -1593,10 +1605,13 @@ UDPSocket::UDPSocket(int ipVersion):
     {
         // Ignoring for now.
     }
+
+    ++SocketGlobals::instance().debugCounters().udpSocketCount;
 }
 
 UDPSocket::~UDPSocket()
 {
+    --SocketGlobals::instance().debugCounters().udpSocketCount;
 }
 
 bool UDPSocket::getProtocol(int* protocol) const
@@ -1674,6 +1689,15 @@ bool UDPSocket::setMulticastIF(const QString& multicastIF)
 
 bool UDPSocket::joinGroup(const QString &multicastGroup)
 {
+#ifdef __linux__
+    int mcAll = 0;
+    if (setsockopt(handle(), IPPROTO_IP, IP_MULTICAST_ALL, (raw_type *)&mcAll, sizeof(mcAll)) < 0)
+    {
+        NX_WARNING(this, "Failed to disable IP_MULTICAST_ALL socket option for group %1. %2",
+            multicastGroup, SystemError::getLastOSErrorText());
+        return false;
+    }
+#endif
     struct ip_mreq multicastRequest;
     memset(&multicastRequest, 0, sizeof(multicastRequest));
 
@@ -1691,9 +1715,17 @@ bool UDPSocket::joinGroup(const QString &multicastGroup)
 
 bool UDPSocket::joinGroup(const QString &multicastGroup, const QString& multicastIF)
 {
+#ifdef __linux__
+    int mcAll = 0;
+    if (setsockopt(handle(), IPPROTO_IP, IP_MULTICAST_ALL, (raw_type *)&mcAll, sizeof(mcAll)) < 0)
+    {
+        NX_WARNING(this, "Failed to disable IP_MULTICAST_ALL socket option for group %1. %2",
+            multicastGroup, SystemError::getLastOSErrorText());
+        return false;
+    }
+#endif
     struct ip_mreq multicastRequest;
     memset(&multicastRequest, 0, sizeof(multicastRequest));
-
     multicastRequest.imr_multiaddr.s_addr = inet_addr(multicastGroup.toLatin1());
     multicastRequest.imr_interface.s_addr = inet_addr(multicastIF.toLatin1());
     if (setsockopt(

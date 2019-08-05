@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0.1.14",
+    "version": "1.0.1.82",
     "data": [
         {
             "keys": [
@@ -33,6 +33,12 @@
                 "DWC-MVT4Wi*|ONVIF"
             ],
             "obtainMacFromMulticast": "Never"
+        },
+        {
+            "keys": [
+                "DW|DWC-PF5M1TIR"
+            ],
+            "dontSendBackChannelRtspAttribute": true
         },
         {
             "keys": [
@@ -373,9 +379,8 @@
         },
         {
             "keys":[
-                "Hanwha|*", "Samsung|*"
+                "Hanwha|*", "Samsung|*", "*|XNB-6000"
             ],
-            "ignoreONVIF": true,
             "forcedAdditionalManufacturer": "Hanwha"
         },
         {
@@ -822,22 +827,88 @@
                 "dahua|dhi-nvr4216-4ks2",
                 "DW-ENHD16|DW-ENHD16-*",
                 "DW|DW-ENHD16*",
-                "DW-ENHD16|DW-ENCODWER"
+                "DW-ENHD16|DW-ENCODWER",
+                "dahua|dhi-nvr4216-4ks2",
+                "dahua|hcvr5104h-s2",
+                "hangzhou hikvision digital technology co., ltd|ds-8116hghi*",
+                "dahua|n52b3p",
+                "ds-7208hqhi-k2|embedded net dvr",
+                "tr2116a|embedded net dvr",
+                "vlr-enc-16|vlr-enc-16",
+                "dahua|dh-xvr5104c-x1",
+                "dahua|dhi-nvr5432-16p-4ks2e",
+                "dahua|dhi-nvr4104hs-4ks2",
+                "hangzhou hikvision digital technology co., ltd|ds-9016huhi*",
+                "uniview|nvr308-32r-b",
+                "onvif_encoder|mam-6me1012mta",
+                "costar|mam-6me1012mta",
+                "mam-6me1012mta|mam-6me1012mta-jh",
+                "mam-6me1012mta|hae-012",
+                "mam-6me1012mta|crt1200en",
+                "hangzhou hikvision digital technology co., ltd|ds-8116hqhi*",
+                "dahua|dhi-nvr5432-16p-i",
+                "scw|nvr-admp32p16",
+                "dahua|dhi-nvr4116-4ks2",
+                "ds-7616ni-k2|network video recorder",
+                "dahua|xvr7216a*",
+                "bosch|vip_x16_xf_e",
+                "private|dhi-nvr5216-4ks2",
+                "dh-nvr4208-8p-4k|private",
+                "dh-nvr608-32-4ks2|private",
+                "general|nvr-p16/16p-4va",
+                "dahua|dh-xvr5116he",
+                "rvi-ipn16/2-pro-4k|general",
+                "sth795|cellinx-sth795",
+                "hq-thd1602k-poc|embedded net dvr",
+                "none|nvr302-08e-p8",
+                "uniview|nvr302-16e-p8",
+                "hangzhou hikvision digital technology co., ltd|hik%2fds-7816*",
+                "ltd8308t-ft|embedded_net_dvr",
+                "Hangzhou Hikvision Digital Technology Co., Ltd|DS-6708HQHI-SATA",
+                "DS-6708HQHI-SATA|Hangzhou Hikvision Digital Technology Co., Ltd",
+                "c7413-awr|dvr support center",
+                "ds-7116hqhi-k1|business ddd co,.ltd.",
+                "dahua|dh-xvr5116he-x",
+                "acti|v24",
+                "dahua|dh-xvr7108e-4kl-b-x",
+                "ds-7208hthi-k2|embedded net dvr",
+                "ds-h116g|embedded net dvr",
+                "dahua|dh-xvr5108hs-4kl-x",
+                "yc-r0814|network video recorder",
+                "onvif_encoder|viper-hdaenc16",
+                "dahua|dh-xvr5108hs-x",
+                "dahua|dhi-nvr4432-4ks2",
+                "dahua|dh-xvr7104*",
+                "onvif|ltn8716k-ht",
+                "hisi|vi-m-4-1000",
+                "onvif|ds-7204hqhi*",
+                "dahua|dhi-nvr5832-*",
+                "dh-nvr4232-*|private",
+                "har324-16|embedded net dvr",
+                "dh-nvr4216-*|private",
+                "dhi-nvr52a16-*|private",
+                "ds-6716huhi*|bldg c hik-encoder",
+                "ds-7216hqhi*|embedded net dvr"
             ],
             "analogEncoder": true
+        },
+        {
+            "keys": [
+                "DW-ENHD16|DW-ENHD16*",
+                "DW|DW-ENHD16*"
+            ],
+            "doUpdatePortInSubscriptionAddress": false
         },
         {
             "keys": ["UNIVIEW|DVS4116"],
             "enableAdditionalManufacturerNormalization": true
         },
-
         {
             "keys": [
                 "*|DW-CP04", "*|DW-CP16"
             ],
             "isRebrendedActiCamera": true
         },
-
         {
             "keys": [
                 "ISD|*"
@@ -857,8 +928,7 @@
             "keys": [
                 "ISD|XPM-FL72-48MP",
                 "DW|XPM-FL72-48MP",
-                "DW|DWC-PZV2M72T",
-                "DigitalWatchdog|DWC-PZV2M72T"
+                "DW|DWC-PZV2M72T"
             ],
             "isdDwCam": true,
             "showUrl": true,
@@ -1177,7 +1247,6 @@
                 "HIKVISION|DS-2CD2942F-IS",
                 "HIKVISION|DS-2CD63C2F-IS",
                 "HIKVISION|DS-2DE4A220IW-DE",
-                "Hikvision|DS-2CD2132F-IWS",
                 "Hikvision|DS-2CD2655FWD-IZS",
                 "Hikvision|DS-2CD2742FWD-IS",
                 "Hikvision|DS-2CD2942F-IS",
@@ -1190,9 +1259,12 @@
                 "Hikvision|DS-6708*",
                 "HIKVISION|DS-2CD4A26FWD-*",
                 "HIKVISION|iDS-2CD8426*",
-                "ONVIF|NC328-VBZ",
                 "Hikvision|DS-2DF8223*",
-                "hikvision|DS-2CD2155FWD-IS"
+                "hikvision|DS-2CD2155FWD-IS",
+                "HIKVISION|DS-2CD4026FWD-AP",
+                "HIKVISION|DS-2DE3304W-DE",
+                "ONVIF|NC328-VBZ",
+                "HIKVISION|DS-2TD1217-6/V1"
             ],
             "parseOnvifNotificationsWithHttpReader": true
         },
@@ -1203,7 +1275,6 @@
                 "HIKVISION|DS-2CD2742FWD-IS",
                 "HIKVISION|DS-2CD2942F-IS",
                 "HIKVISION|DS-2DE4A220IW-DE",
-                "Hikvision|DS-2CD2132F-IWS",
                 "Hikvision|DS-2CD2655FWD-IZS",
                 "Hikvision|DS-2CD2742FWD-IS",
                 "Hikvision|DS-2CD2942F-IS",
@@ -1212,38 +1283,40 @@
                 "HIKVISION|DS-2CD2522FWD*",
                 "HIKVISION|DS-2CD4032FWD*",
                 "HIKVISION|DS-2CD2142FWD-IWS",
-                "ONVIF|H47",
-                "ONVIF|IP-2CD4B26FWD-IZS",
-                "*|NC304-WDA",
                 "HIKVISION|DS-2CD2142FWD*",
                 "hikvision|DS-2CD2142FWD*",
                 "HIKVISION|DS-2CD4A26FWD-*",
                 "HIKVISION|iDS-2CD8426*",
                 "Hikvision|DS-2CD2625FWD*",
-                "Hikvision|DS-2TD2166*"
+                "Hikvision|DS-2TD2166*",
+                "Hikvision|DS-2CD4026FWD-AP",
+                "HIKVISION|DS-2DE3304W-DE",
+                "ONVIF|H47",
+                "ONVIF|IP-2CD4B26FWD-IZS",
+                "*|NC304-WDA"
             ],
             "relayOutputInversed": true,
             "portNamePrefixToIgnore": "AlarmOut"
         },
         {
             "keys": [
-            	"DW|DWC-PF5M1TIR",
-            	"DW|DWC-MB45DiA",
-            	"DW|DWC-MV85DiA",
-            	"DW|DWC-PB6M4T"
+                "DW|DWC-PF5M1TIR",
+                "DW|DWC-MB45DiA",
+                "DW|DWC-MV85DiA",
+                "DW|DWC-PB6M4T"
             ],
             "fixWrongInputPortNumber": true
         },
         {
             "keys": [
-            	"DW|DWC-MV85DiA"
+                "DW|DWC-MV85DiA"
             ],
             "repeatIntervalForSendVideoEncoderMS": 1000
         },
         {
             "keys": [
-            	"DW|DWC-MD421D",
-            	"DW|DWC-MV421D"
+                "DW|DWC-MD421D",
+                "DW|DWC-MV421D"
             ],
             "fixWrongOutputPortToken": true
         },
@@ -1617,7 +1690,7 @@
         },
         {
             "keys": [
-                "HITRON|NFX-22153D1", "DigitalWatchdog|DWC-MPTZ30X", "DW|DWC-MPTZ30X"
+                "HITRON|NFX-22153D1", "DW|DWC-MPTZ30X"
             ],
             "ptzMapper": {
                 "fromCamera": {
@@ -1990,6 +2063,20 @@
             }
         },
         {
+            "keys": ["Dahua|22204TNI"],
+            "_comment": "The camera returns the same URI for all videoencoders, so we switch them off.",
+            "forcedOnvifParams":
+            {
+                "videoEncoders": ["000"],
+                "profiles": ["MediaProfile000"]
+            }
+        },
+        {
+            "keys": ["Dahua|IPC-HDBW8241E*"],
+            "_comment": "The camera returns the same URI for all videoencoders, so we fix it.",
+            "fixWrongUri": true
+        },
+        {
             "keys": [
                 "*Grandeye*|EVO-05NxD"
             ],
@@ -2062,6 +2149,13 @@
                 "Pelco|IMM12036"
             ],
             "onvifVendorSubtype": "PelcoOptera"
+        },
+        {
+            "keys": [
+                "DW|*"
+            ],
+            "onvifVendorSubtype": "Digital Watchdog",
+            "_comment": "Used to set typeId of 'Digital Watchdog' for all manufectures that are resolved to 'DW'."
         },
         {
             "keys": [
@@ -2215,20 +2309,17 @@
         {
             "keys":[
                 "DW|DWC-MTT4W*",
-                "DigitalWatchdog|DWC-MTT4W*",
                 "DW|DWC-MVT4W*",
-                "DigitalWatchdog|DWC-MVT4W*",
-                "DW|DWC-MBT4W*",
-                "DigitalWatchdog|DWC-MBT4W*"
+                "DW|DWC-MBT4W*"
              ],
-             "trustToVideoSourceSize": false
+             "trustToVideoSourceSize": false,
+             "forceOnvifAdvancedParameters": true
         },
         {
             "keys":[
-                "Digital_Watchdog|DWC-PF5M1TIR",
-                "DigitalWatchdog|DWC-MD85DiA",
-                "DigitalWatchdog|DWC-MV85DiA",
-                "Digital_Watchdog|DWC-MV85DiA"
+                "DW|DWC-PF5M1TIR",
+                "DW|DWC-MD85DiA",
+                "DW|DWC-MV85DiA"
             ],
             "highStreamBitrateBounds": {
                 "min": 32,
@@ -2282,6 +2373,7 @@
         },
         {
             "keys":["DW|DWC-PB6M4T"],
+            "operationalPtzCapabilities": "NoPtzCapabilities",
             "forcedOnvifParams":
             {
                 "videoEncoders":
@@ -2551,12 +2643,6 @@
         },
         {
             "keys": [
-                "DigitalWatchdog|DWC-MTT4Wi36"
-            ],
-            "forceOnvifAdvancedParameters": true
-        },
-        {
-            "keys": [
                 "UNIVIEW|IPC6253SR-X33*", "Securicorp|SCL-SDM03MVIR-WD3533X", "NONE|SCL-SDM03MVIR-WD3533X"
             ],
             "ptzMapper": {
@@ -2798,7 +2884,11 @@
             }
         },
         {
-            "keys": ["DW|DWC-MPZ20XFM"],
+            "keys":
+            [
+                "DW|DWC-MPZ20XFM",
+                "DW|DWC-MD421D"
+            ],
             "mediaTraits": {
                 "aspectRatioDependent": {
                     "allowedAspectRatioDiff": "0.1"
@@ -3044,11 +3134,19 @@
             "axis|axisp3717*", "axis|p3717*",
             "axis|axis p3717*",
             "vivotek|ma9321-ehtv",
+			"VIVOTEK MA9321-EHTV|MA9321-EHTV",
+			"MA9321-EHTV|VIVOTEK MA9321-EHTV",
             "avigilon|32c-h4a-4mh-360",
             "dahua|psd81602-a360",
             "dahua|IPC-HDBW4231F-E2-M",
             "avigilon|32c-h4a-4mh-360",
-            "dahua|psd81602-a360"
+            "dahua|psd81602-a360",
+            "dahua|ipc-hdbw4233x*",
+            "dahua|ipc-hdbw7233x*",
+            "hikvision|ds-2cd6d24fwd*",
+            "flir|FLIR DH-390*",
+            "DH-390*|FLIR DH-390*",
+            "flir|DH-390*"
             ],
             "canShareLicenseGroup": true
         },
@@ -3059,7 +3157,7 @@
         {
             "keys": [
                 "HIKVISION|iDS-2CD8426*", "hikvision|iDS-2CD8426*",
-                "Hikvision|DS-2DF8223*"
+                "Hikvision|DS-2DF8223*", "ONVIF|K20IC-*"
             ],
             "clearInputsTimeoutSec": 1,
             "comment": "considers input state as 0 after specified timeout"
@@ -3071,14 +3169,6 @@
             ],
             "onvifPtzDigitsAfterDecimalPoint": 2,
             "onvifPtzSpeedBroken": true
-        },
-        {
-            "keys": [
-                "HIKVISION|DS-2CD6A64F-IHS/NFC"
-            ],
-            "disableMultiThreadDecoding": [
-                "hevc"
-            ]
         },
         {
             "keys": ["UNIVIEW|*"],
@@ -3181,7 +3271,7 @@
                 }
             }
         },
-		{
+        {
             "keys": [
                 "VIVOTEK|SD9366*"
             ],
@@ -3291,8 +3381,8 @@
                 }
             }
         },
-		{
-			"_comment1": "Mapping for firmware: IPC_HCMN2108-B0006P10D1711",
+        {
+            "_comment1": "Mapping for firmware: IPC_HCMN2108-B0009P30D1809",
             "keys": [
                 "UNIVIEW|IPC6322SR-X22*"
             ],
@@ -3305,7 +3395,7 @@
                     },
                     "y": {
                         "extrapolationMode": "ConstantExtrapolation",
-                        "device":  [-0.1666667, 1],
+                        "device":  [-1, 1],
                         "logical": [15, -90]
                     },
                     "z": {
@@ -3322,6 +3412,7 @@
             "_comment1": "Mapped for 2.623.0000000.1.R, Build Date 2018-06-27",
             "keys": [
                 "Dahua|DH-SD50225U*", "DH-SD50225U*|Dahua",
+                "Dahua|SD50225U*", "SD50225U*|Dahua",
                 "Dahua|DH-SD59225U*", "DH-SD59225U*|Dahua"
             ],
             "ptzMapper": {
@@ -3374,7 +3465,7 @@
                 }
             }
         },
-		{
+        {
             "_comment1": "Mapped for 2.600.Dahua 00.0.R, build: 2017-06-01",
             "keys": [
                 "Dahua|PDN6CT230*"
@@ -3397,6 +3488,33 @@
                         "device":  [0, 0.25, 0.5, 0.75, 0.775, 0.8125, 0.825, 0.875, 0.9, 0.925, 0.95, 0.975, 0.987, 1],
                         "logical": [1, 7, 13.3, 16.6, 17.6, 18, 18.3, 19, 19.3, 20, 20.6, 21.6, 22.3, 23.6],
                         "logicalMultiplier": 31,
+                        "space": "35MmEquiv"
+                    }
+                }
+            }
+        },
+        {
+            "_comment1": "Mapped for 2.623.0000000.7.R, Build Date 2018-11-24",
+            "keys": [
+                "Dahua|DH-SD49225*"
+            ],
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [  -1,1],
+                        "logical": [-180, 180]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [-1,1],
+                        "logical": [-90, 15]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1],
+                        "logical": [1, 2.26, 3.90, 5.46, 7.13, 8.72, 10.31, 12.21, 13.95, 15.69, 18],
+                        "logicalMultiplier": 33,
                         "space": "35MmEquiv"
                     }
                 }

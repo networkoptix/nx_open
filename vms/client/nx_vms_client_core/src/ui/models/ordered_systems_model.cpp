@@ -1,5 +1,7 @@
 #include "ordered_systems_model.h"
 
+#include <QtCore/QRegularExpression>
+
 #include <ui/models/systems_model.h>
 #include <nx/utils/string.h>
 #include <nx/utils/log/assert.h>
@@ -11,10 +13,12 @@ namespace {
 using namespace nx::vms::client::core;
 
 static const QSet<int> kSortingRoles = {
+    QnSystemsModel::SearchRoleId,
     QnSystemsModel::SystemNameRoleId,
     QnSystemsModel::SystemIdRoleId,
     QnSystemsModel::LocalIdRoleId,
-    QnSystemsModel::IsFactorySystemRoleId};
+    QnSystemsModel::IsFactorySystemRoleId,
+    QnSystemsModel::IsConnectableRoleId};
 
 bool getWeightFromData(
     const QnWeightsDataHash& weights,
@@ -56,48 +60,35 @@ bool getWeightFromData(
     return result;
 }
 
-class FilterModel: public QnSortFilterListModel
-{
-    using base_type = QnSortFilterListModel;
-public:
-    FilterModel(QObject* parent = nullptr);
+} // namespace
 
-    QnSystemsModel* systemsModel();
-
-    bool filterAcceptsRow(
-        int sourceRow,
-        const QModelIndex& sourceParent) const override;
-
-    void setWeights(const QnWeightsDataHash& weights);
-
-private:
-    const QScopedPointer<QnSystemsModel> m_systemsModel;
-    QnWeightsDataHash m_weights;
-};
-
-FilterModel::FilterModel(QObject* parent):
+QnSystemSortFilterListModel::QnSystemSortFilterListModel(QObject* parent):
     base_type(parent),
-    m_systemsModel(new QnSystemsModel())
+    m_weights(),
+    m_unknownSystemsWeight(0.0)
 {
-    setSourceModel(m_systemsModel.data());
     setTriggeringRoles(kSortingRoles);
 }
 
-QnSystemsModel* FilterModel::systemsModel()
+void QnSystemSortFilterListModel::setWeights(const QnWeightsDataHash& weights, qreal unknownSystemsWeight)
 {
-    return m_systemsModel.data();
-}
+    const bool sameUnknownWeight = qFuzzyEquals(m_unknownSystemsWeight, unknownSystemsWeight);
 
-void FilterModel::setWeights(const QnWeightsDataHash& weights)
-{
-    if (m_weights == weights)
+    if (sameUnknownWeight && (weights == m_weights))
         return;
 
+    m_unknownSystemsWeight = unknownSystemsWeight;
     m_weights = weights;
+
     forceUpdate();
 }
 
-bool FilterModel::filterAcceptsRow(
+bool QnSystemSortFilterListModel::isForgotten(const QString& /* id */) const
+{
+    return false;
+}
+
+bool QnSystemSortFilterListModel::filterAcceptsRow(
     int sourceRow,
     const QModelIndex& /* sourceParent */) const
 {
@@ -110,7 +101,7 @@ bool FilterModel::filterAcceptsRow(
         return true;    //< Skips every connectable system
 
     const auto id = dataIndex.data(QnSystemsModel::SystemIdRoleId).toString();
-    if (qnForgottenSystemsManager && qnForgottenSystemsManager->isForgotten(id))
+    if (isForgotten(id))
         return false;
 
     if (dataIndex.data(QnSystemsModel::IsCloudSystemRoleId).toBool())
@@ -124,22 +115,112 @@ bool FilterModel::filterAcceptsRow(
     return (weightData.weight > kMinWeight);
 }
 
-} // namespace
+WeightData QnSystemSortFilterListModel::getWeight(const QModelIndex& modelIndex) const
+{
+    WeightData result;
+    return getWeightFromData(m_weights, modelIndex, result)
+        ? result
+        : WeightData{QnUuid::createUuid(), m_unknownSystemsWeight, 0, false};
+}
+
+bool QnSystemSortFilterListModel::lessThan(
+    const QModelIndex& left,
+    const QModelIndex& right) const
+{
+    // Current sorting order:
+    //
+    // 1) Newly created systems with 127.0.0.1 address then
+    //        By case insesitive system name then by system id
+    // 2) Systems with 127.0.0.1 address then
+    //        By case insesitive system name then by system id
+    // 3) Newly created systems then
+    //        By case insesitive system name then by system id
+    // 4) By weight then
+    //        Near zero weights are sorted by last connection time then
+    //        By case insesitive system name then by system id
+
+    static const auto isLessSystemNameThenSystemId =
+        [](const QModelIndex& left, const QModelIndex& right) -> bool
+        {
+            const auto leftSystemName = left.data(QnSystemsModel::SystemNameRoleId).toString();
+            const auto rightSystemName = right.data(QnSystemsModel::SystemNameRoleId).toString();
+            const auto compareResult = nx::utils::naturalStringCompare(
+                leftSystemName, rightSystemName, Qt::CaseInsensitive);
+            if (compareResult)
+                return (compareResult < 0);
+
+            const auto leftSystemId = left.data(QnSystemsModel::SystemIdRoleId).toString();
+            const auto rightSystemId = right.data(QnSystemsModel::SystemIdRoleId).toString();
+            return (leftSystemId < rightSystemId);
+        };
+
+    static const QRegularExpression localhostRegExp(
+        "\\b(127\\.0\\.0\\.1|localhost)\\b",
+        QRegularExpression::CaseInsensitiveOption | QRegularExpression::DontCaptureOption);
+
+    const auto leftIsLocalhost = left.data(QnSystemsModel::SearchRoleId).toString().contains(localhostRegExp);
+    const auto rightIsLocalhost = right.data(QnSystemsModel::SearchRoleId).toString().contains(localhostRegExp);
+
+    const auto leftIsFactory = left.data(QnSystemsModel::IsFactorySystemRoleId).toBool();
+    const auto rightIsFactory = right.data(QnSystemsModel::IsFactorySystemRoleId).toBool();
+
+    // Localhost systems go first
+    if (leftIsLocalhost && rightIsLocalhost)
+    {
+        // Newly created systems on localhost go first
+        if (leftIsFactory && rightIsFactory)
+            return isLessSystemNameThenSystemId(left, right);
+
+        if (leftIsFactory || rightIsFactory)
+            return leftIsFactory;
+
+        return isLessSystemNameThenSystemId(left, right);
+    }
+
+    if (leftIsLocalhost || rightIsLocalhost)
+        return leftIsLocalhost;
+
+    // Newly created systems go second
+    if (leftIsFactory && rightIsFactory)
+        return isLessSystemNameThenSystemId(left, right);
+
+    if (leftIsFactory || rightIsFactory)
+        return leftIsFactory;
+
+    // The rest are sorted by weight
+    const auto leftData = getWeight(left);
+    const auto rightData = getWeight(right);
+
+    if (leftData.weight == rightData.weight)
+    {
+        // Equal near zero weights are sorted by last connection time
+        if (qFuzzyIsNull(leftData.weight) &&
+            leftData.lastConnectedUtcMs != rightData.lastConnectedUtcMs)
+        {
+            return leftData.lastConnectedUtcMs < rightData.lastConnectedUtcMs;
+        }
+
+        return isLessSystemNameThenSystemId(left, right);
+    }
+
+    // System with greater weight will be placed at beginning
+    return (leftData.weight > rightData.weight);
+}
 
 QnOrderedSystemsModel::QnOrderedSystemsModel(QObject* parent) :
     base_type(parent),
-    m_weights(),
-    m_unknownSystemsWeight(0.0)
+    m_systemsModel(new QnSystemsModel())
 {
     NX_ASSERT(qnSystemWeightsManager, "QnSystemWeightsManager is not available");
     if (!qnSystemWeightsManager)
         return;
 
-    const auto wildcardFilteredModel = new FilterModel(this);
-    setSourceModel(wildcardFilteredModel);
+    setSourceModel(m_systemsModel.data());
 
-    connect(wildcardFilteredModel->systemsModel(), &QnSystemsModel::minimalVersionChanged,
+    connect(m_systemsModel.data(), &QnSystemsModel::minimalVersionChanged,
         this, &QnOrderedSystemsModel::minimalVersionChanged);
+
+    NX_ASSERT(qnSystemWeightsManager, "QnSystemsWeightsManager is not available");
 
     connect(qnSystemWeightsManager, &QnSystemsWeightsManager::weightsChanged,
         this, &QnOrderedSystemsModel::handleWeightsChanged);
@@ -159,105 +240,27 @@ QnOrderedSystemsModel::QnOrderedSystemsModel(QObject* parent) :
     handleWeightsChanged();
 }
 
+bool QnOrderedSystemsModel::isForgotten(const QString& id) const
+{
+    return qnForgottenSystemsManager && qnForgottenSystemsManager->isForgotten(id);
+}
+
 QString QnOrderedSystemsModel::minimalVersion() const
 {
-    if (auto model = dynamic_cast<FilterModel*>(sourceModel()))
-        return model->systemsModel()->minimalVersion();
-
-    NX_ASSERT(false, "Wrong source model!");
-    return QString();
+    return m_systemsModel->minimalVersion();
 }
 
 void QnOrderedSystemsModel::setMinimalVersion(const QString& minimalVersion)
 {
-    if (auto model = dynamic_cast<FilterModel*>(sourceModel()))
-        model->systemsModel()->setMinimalVersion(minimalVersion);
-    else
-        NX_ASSERT(false, "Wrong source model!");
+    m_systemsModel->setMinimalVersion(minimalVersion);
 }
 
-void QnOrderedSystemsModel::forceUpdate()
-{
-    base_type::forceUpdate();
-    if (auto model = dynamic_cast<FilterModel*>(sourceModel()))
-        model->forceUpdate();
-    else
-        NX_ASSERT(false, "Wrong source model!");
-}
-
-int QnOrderedSystemsModel::searchRoleId() const
+int QnOrderedSystemsModel::searchRoleId()
 {
     return QnSystemsModel::SearchRoleId;
 }
 
-WeightData QnOrderedSystemsModel::getWeight(const QModelIndex& modelIndex) const
-{
-    WeightData result;
-    return getWeightFromData(m_weights, modelIndex, result)
-        ? result
-        : WeightData{QnUuid::createUuid(), m_unknownSystemsWeight, 0, false};
-}
-
-bool QnOrderedSystemsModel::lessThan(
-    const QModelIndex& left,
-    const QModelIndex& right) const
-{
-    static const auto finalLess =
-        [](const QModelIndex& left, const QModelIndex& right) -> bool
-        {
-            const auto leftSystemName = left.data(QnSystemsModel::SystemNameRoleId).toString();
-            const auto rightSystemName = right.data(QnSystemsModel::SystemNameRoleId).toString();
-            const auto compareResult = nx::utils::naturalStringCompare(
-                leftSystemName, rightSystemName, Qt::CaseInsensitive);
-            if (compareResult)
-                return (compareResult < 0);
-
-            const auto leftSystemId = left.data(QnSystemsModel::SystemIdRoleId).toString();
-            const auto rightSystemId = right.data(QnSystemsModel::SystemIdRoleId).toString();
-            return (leftSystemId < rightSystemId);
-        };
-
-    const auto leftIsFactory = left.data(QnSystemsModel::IsFactorySystemRoleId).toBool();
-    const auto rightIsFactory = right.data(QnSystemsModel::IsFactorySystemRoleId).toBool();
-    if (leftIsFactory && rightIsFactory)
-        return finalLess(left, right);
-
-    if (leftIsFactory || rightIsFactory)
-        return leftIsFactory;
-
-    // Sort by weight
-    const auto leftData = getWeight(left);
-    const auto rightData = getWeight(right);
-
-    if (leftData.weight == rightData.weight)
-    {
-        if (qFuzzyIsNull(leftData.weight) &&
-            leftData.lastConnectedUtcMs != rightData.lastConnectedUtcMs)
-        {
-            return leftData.lastConnectedUtcMs < rightData.lastConnectedUtcMs;
-        }
-
-        return finalLess(left, right);
-    }
-
-    // System with greater weight will be placed at begin
-    return (leftData.weight > rightData.weight);
-}
-
 void QnOrderedSystemsModel::handleWeightsChanged()
 {
-    const bool sameUnknownWeight = qFuzzyEquals(m_unknownSystemsWeight,
-        qnSystemWeightsManager->unknownSystemsWeight());
-
-    const auto newWeights = qnSystemWeightsManager->weights();
-    if (sameUnknownWeight && (newWeights == m_weights))
-        return;
-
-    m_unknownSystemsWeight = qnSystemWeightsManager->unknownSystemsWeight();
-    m_weights = qnSystemWeightsManager->weights();
-
-    const auto filterModel = static_cast<FilterModel*>(sourceModel());
-    filterModel->setWeights(m_weights);
-
-    forceUpdate();
+    setWeights(qnSystemWeightsManager->weights(), qnSystemWeightsManager->unknownSystemsWeight());
 }

@@ -40,6 +40,7 @@
 #include <QtWidgets/private/qabstractitemview_p.h>
 
 #include <ui/common/indents.h>
+#include <ui/dialogs/common/dialog.h>
 #include <ui/widgets/common/abstract_preferences_widget.h>
 #include <ui/widgets/calendar_widget.h>
 #include <ui/workaround/hidpi_workarounds.h>
@@ -60,6 +61,7 @@
 #include <nx/vms/client/desktop/common/widgets/input_field.h>
 #include <nx/vms/client/desktop/common/widgets/scroll_bar_proxy.h>
 #include <nx/vms/client/desktop/utils/widget_utils.h>
+#include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/math/fuzzy.h>
 #include <nx/utils/string.h>
@@ -3721,6 +3723,8 @@ int QnNxStyle::styleHint(
             return QDialogButtonBox::KdeLayout;
         case SH_ScrollBar_ContextMenu:
             return 0;
+        case SH_LineEdit_PasswordCharacter:
+            return 0x25cf;
         default:
             break;
     }
@@ -4105,6 +4109,20 @@ void QnNxStyle::polish(QWidget *widget)
         auto palette = NxUi::createWebViewPalette();
         widget->setPalette(palette);
     }
+
+    // Workaround of a Qt bug: if a dialog closed by [X] is repositioned to another screen while
+    // hidden, it's not painted after reopening unless resized or programmatically forced to update.
+    if (auto dialog = qobject_cast<QDialog*>(widget))
+    {
+        const auto update = nx::utils::guarded(dialog,
+            [dialog](QObject* /*watched*/, QEvent* /*event*/)
+            {
+                if (auto window = dialog->windowHandle())
+                    window->requestUpdate();
+            });
+
+        installEventHandler(dialog, QEvent::Show, this, update, Qt::QueuedConnection);
+    }
 }
 
 void QnNxStyle::unpolish(QWidget* widget)
@@ -4339,7 +4357,7 @@ bool QnNxStyle::eventFilter(QObject* object, QEvent* event)
                     }
                 };
 
-            executeDelayedParented(updateSectionSizes, 0, header);
+            executeLater(updateSectionSizes, header);
         }
     }
 

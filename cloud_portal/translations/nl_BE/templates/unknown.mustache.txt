@@ -1,6 +1,0 @@
-Nieuw bericht
-
-Type: {{message.type}}
-Gegevens: {{{message.data}}}
-
-Er is geen specifiek sjabloon voor dit type bericht

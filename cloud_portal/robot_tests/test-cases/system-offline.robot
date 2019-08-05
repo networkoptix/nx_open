@@ -44,6 +44,7 @@ should confirm, if owner deletes system (You are going to disconnect your system
     Log in to Autotests 2 System    ${EMAIL OWNER}
     Click Button    ${DISCONNECT FROM NX}
     Wait Until Elements Are Visible    ${DISCONNECT FORM}    ${DISCONNECT FORM HEADER}    ${DISCONNECT FORM CANCEL}
+    Click Element    ${DISCONNECT FORM}
     Click Button    ${DISCONNECT FORM CANCEL}
     Wait Until Page Does Not Contain Element    ${BACKDROP}
 
@@ -167,7 +168,7 @@ does not show Share button to viewer, advanced viewer, live viewer
     \  Element Should Not Be Visible    ${SHARE BUTTON SYSTEMS}
     \  Log Out
 
-should show "your system" for owner and "owner's name" for non-owners
+should show (your system) for owner and (owner's name) for non-owners
     [tags]    C41881    Threaded
     Log in to AutoTests 2 System    ${EMAIL OWNER}
     Wait Until Element Is Visible    //h2[.='${YOUR SYSTEM TEXT}']

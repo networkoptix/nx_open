@@ -9,7 +9,8 @@
 #include <common/common_module_aware.h>
 
 class QnCommonModule;
-struct QnJsonRestResult;
+namespace nx::network::rest { struct JsonResult; }
+using QnJsonRestResult = nx::network::rest::JsonResult;
 
 namespace nx {
 namespace vms {

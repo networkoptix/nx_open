@@ -160,7 +160,7 @@ bool SdkObjectFactory::initPluginResources()
         data.url = QString();
     }
 
-    const auto resPool = resourcePool();
+    const auto resPool = serverModule()->resourcePool();
     if (!resPool)
     {
         NX_ERROR(this, "Can't access the resource pool");
@@ -186,7 +186,8 @@ bool SdkObjectFactory::initPluginResources()
         auto sdkPluginItr = sdkPluginsById.find(pluginData.id);
         if (sdkPluginItr == sdkPluginsById.cend())
         {
-            NX_WARNING(this, "Unable to find a SDK plugin object. Plugin name: %1, plugin Id (%2)",
+            NX_WARNING(this,
+                "Unable to find an SDK plugin object. Plugin name: %1, plugin Id (%2)",
                 pluginData.name, pluginData.id);
             continue;
         }
@@ -231,7 +232,8 @@ bool SdkObjectFactory::initEngineResources()
             .push_back(std::move(databaseAnalyticsEngine));
     }
 
-    auto pluginResources = resourcePool()->getResources<resource::AnalyticsPluginResource>();
+    auto pluginResources =
+        serverModule()->resourcePool()->getResources<resource::AnalyticsPluginResource>();
     for (const auto& plugin: pluginResources)
     {
         const auto& pluginId = plugin->getId();
@@ -250,7 +252,7 @@ bool SdkObjectFactory::initEngineResources()
         for (const auto& engine: engineList)
         {
             analyticsManager->saveSync(engine);
-            auto engineResource = resourcePool()
+            auto engineResource = serverModule()->resourcePool()
                 ->getResourceById<resource::AnalyticsEngineResource>(engine.id);
 
             if (!engineResource)
@@ -355,7 +357,7 @@ std::unique_ptr<sdk_support::AbstractManifestLogger> SdkObjectFactory::makeLogge
 {
     const QString messageTemplate("Error occurred while fetching Plugin manifest: {:error}");
     return std::make_unique<sdk_support::ManifestLogger>(
-        typeid(this), //< Using the same tag for all instances.
+        typeid(*this), //< Using the same tag for all instances.
         messageTemplate,
         std::move(pluginResource));
 }
@@ -364,7 +366,7 @@ std::unique_ptr<sdk_support::AbstractManifestLogger> SdkObjectFactory::makeLogge
     const nx::sdk::analytics::IPlugin* plugin) const
 {
     return std::make_unique<sdk_support::StartupPluginManifestLogger>(
-        nx::utils::log::Tag(typeid(this)),
+        typeid(*this), //< Using the same tag for all instances.
         plugin);
 }
 

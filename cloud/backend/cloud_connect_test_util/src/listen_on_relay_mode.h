@@ -19,14 +19,11 @@ int runInListenOnRelayMode(const nx::utils::ArgumentParser& args);
 class ListenOnRelaySettings
 {
 public:
+    ListenOnRelaySettings() = default;
     ListenOnRelaySettings(const nx::utils::ArgumentParser& args);
 
-    nx::utils::Url baseRelayUrl() const;
-    std::string listeningPeerHostName() const;
-
-private:
-    nx::utils::Url m_baseRelayUrl;
-    std::string m_listeningPeerHostName;
+    nx::utils::Url baseRelayUrl;
+    std::string listeningPeerHostName;
 };
 
 //-------------------------------------------------------------------------------------------------

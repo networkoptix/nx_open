@@ -46,16 +46,16 @@ public:
      */
     bool doPost(
         const nx::utils::Url& url,
-        const nx::network::http::StringType& contentType,
-        nx::network::http::StringType messageBody);
+        const nx::network::http::StringType& contentType = {},
+        nx::network::http::StringType messageBody = {});
 
     /**
      * @return true if response has been received.
      */
     bool doPut(
         const nx::utils::Url& url,
-        const nx::network::http::StringType& contentType,
-        nx::network::http::StringType messageBody);
+        const nx::network::http::StringType& contentType = {},
+        nx::network::http::StringType messageBody = {});
 
     /**
      * @return true if response has been received.
@@ -150,6 +150,7 @@ private:
     bool m_isProxySecure = false;
     std::optional<AuthType> m_authType;
     std::optional<Credentials> m_credentials;
+    std::optional<Response> m_lastResponse;
 
     bool m_precalculatedAuthorizationDisabled = false;
     bool m_expectOnlyBody = false;

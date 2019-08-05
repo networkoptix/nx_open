@@ -1,6 +1,9 @@
 @import '../../../styles/theme_palette';
 @import '../../../styles/theme_variables';
 @import '../../styles/_mixins';
+@import '~bootstrap/scss/functions';
+@import '~bootstrap/scss/variables';
+@import '~bootstrap/scss/mixins/breakpoints';
 
 .nx-search {
     .btn-text {
@@ -37,7 +40,8 @@
     .search-input {
         width         : 200px;
         height        : 40px;
-        padding-left  : 40px;
+        padding-left  : 48px;
+        padding-right : 40px;
         font-size     : 15px;
         font-family   : $font-family-regular;
         color         : $light16;
@@ -72,12 +76,26 @@
     
     .search-clear {
         position    : absolute;
-        right       : 10px;
+        right       : 2px;
         top         : 0;
         bottom      : 0;
         line-height : 40px;
         margin      : auto;
-        cursor      : pointer
+        cursor      : pointer;
+        width       : rem(36px);
+        height      : rem(36px);
+        padding     : 0;
+    }
+    
+    .drop {
+        &:last-of-type {
+            @include media-breakpoint-up(lg) {
+                padding-right : 0 !important;
+            }
+            @include media-breakpoint-up(xxl) {
+                padding-right : 1rem !important;
+            }
+        }
     }
     
     .pagination {

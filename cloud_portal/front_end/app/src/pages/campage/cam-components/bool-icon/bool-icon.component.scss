@@ -1,18 +1,27 @@
 @import '../../../../../styles/theme_palette';
 @import '../../../../../styles/theme_variables';
 
+
+.icon-additional {
+    color       : $dark9;
+    font-family : $font-family-medium;
+    font-size   : rem(10px);
+    float       : right;
+}
+
+
 .icon-positive {
-    font-size : 1rem;
+    font-size : 1.5rem;
     color     : $dark9;
 }
 
 .icon-negative {
-    font-size : 1rem;
+    font-size : 1.5rem;
     color     : $light10;
 }
 
 .icon-unknown {
-    font-size   : 1rem;
+    font-size   : rem(13px);
     font-family : $font-family-medium;
     color       : $dark9;
 }

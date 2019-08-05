@@ -20,20 +20,16 @@
 class QnResourceTreeModelCustomColumnDelegate;
 class QnResourceTreeModelNodeManager;
 class QnResourceTreeModelLayoutNodeManager;
+namespace nx::vms::client::desktop { struct WearableState; }
 
-namespace nx::vms::client::desktop {
-
-struct WearableState;
-enum class ResourceTreeNodeType;
-
-} // namespace nx::vms::client::desktop
-
-class QnResourceTreeModel : public Connective<QAbstractItemModel>, public QnWorkbenchContextAware
+class QnResourceTreeModel:
+    public Connective<QAbstractItemModel>,
+    public QnWorkbenchContextAware
 {
     Q_OBJECT
 
     typedef Connective<QAbstractItemModel> base_type;
-    using NodeType = nx::vms::client::desktop::ResourceTreeNodeType;
+    using NodeType = nx::vms::client::desktop::ResourceTree::NodeType;
 
 public:
     /** Narrowed scope for the minor widgets and dialogs. */

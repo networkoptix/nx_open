@@ -5,6 +5,8 @@
 #include <nx/utils/std/optional.h>
 #include <nx/utils/uuid.h>
 
+#include "async_sql_query_executor.h"
+
 namespace nx::sql {
 
 class AsyncSqlQueryExecutor;
@@ -20,7 +22,7 @@ class Cursor:
     public BaseCursor
 {
 public:
-    Cursor(AsyncSqlQueryExecutor* asyncSqlQueryExecutor, QnUuid id):
+    Cursor(AbstractAsyncSqlQueryExecutor* asyncSqlQueryExecutor, QnUuid id):
         m_asyncSqlQueryExecutor(asyncSqlQueryExecutor),
         m_id(id)
     {
@@ -36,7 +38,7 @@ public:
         std::promise<std::tuple<DBResult, Record>> recordFetched;
         m_asyncSqlQueryExecutor->fetchNextRecordFromCursor<Record>(
             m_id,
-            [this, &recordFetched](DBResult resultCode, Record record)
+            [&recordFetched](DBResult resultCode, Record record)
             {
                 recordFetched.set_value(std::make_tuple(resultCode, std::move(record)));
             });
@@ -49,7 +51,7 @@ public:
     }
 
 private:
-    AsyncSqlQueryExecutor* m_asyncSqlQueryExecutor;
+    AbstractAsyncSqlQueryExecutor* m_asyncSqlQueryExecutor;
     const QnUuid m_id;
 };
 

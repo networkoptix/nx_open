@@ -24,13 +24,15 @@
 #include <nx/streaming/config.h>
 #include <utils/media/hevc_sps.h>
 #include <camera/video_camera.h>
-#include <mediaserver_ini.h>
-#include <analytics/detected_objects_storage/analytics_events_receptor.h>
+#include <nx_vms_server_ini.h>
+#include <nx/vms/server/analytics/db/analytics_events_receptor.h>
 #include <media_server/media_server_module.h>
 #include <nx/vms/server/analytics/manager.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/vms/server/resource/camera.h>
 #include <utils/media/utils.h>
+
+#include <nx/analytics/analytics_logging_ini.h>
 
 using nx::vms::server::analytics::AbstractVideoDataReceptorPtr;
 
@@ -103,7 +105,8 @@ QnLiveStreamProvider::QnLiveStreamProvider(const nx::vms::server::resource::Came
     if (serverModule())
     {
         m_analyticsEventsSaver = QnAbstractDataReceptorPtr(
-            new nx::analytics::storage::AnalyticsEventsReceptor(
+            new nx::analytics::db::AnalyticsEventsReceptor(
+                serverModule()->commonModule(),
                 serverModule()->analyticsEventsStorage()));
         m_analyticsEventsSaver = QnAbstractDataReceptorPtr(
             new ConditionalDataProxy(
@@ -113,8 +116,6 @@ QnLiveStreamProvider::QnLiveStreamProvider(const nx::vms::server::resource::Came
                     return m_cameraRes->getStatus() == Qn::Recording;
                 }));
         m_dataReceptorMultiplexer->add(m_analyticsEventsSaver);
-        serverModule()->analyticsManager()->registerMetadataSink(
-            getResource(), m_dataReceptorMultiplexer.toWeakRef());
     }
 }
 
@@ -148,6 +149,20 @@ void QnLiveStreamProvider::setRole(Qn::ConnectionRole role)
     {
         m_videoDataReceptor = serverModule()->analyticsManager()->registerMediaSource(
             m_cameraRes->getId());
+
+        serverModule()->analyticsManager()->registerMetadataSink(
+            getResource(), m_dataReceptorMultiplexer.toWeakRef());
+    }
+
+    if (nx::analytics::loggingIni().isLoggingEnabled() && !m_metadataLogger)
+    {
+        m_metadataLogger = std::make_unique<nx::analytics::MetadataLogger>(
+            "live_stream_provider_",
+            m_cameraRes->getId(),
+            /*engineId*/ QnUuid(),
+            role == Qn::ConnectionRole::CR_LiveVideo
+                ? nx::vms::api::StreamIndex::primary
+                : nx::vms::api::StreamIndex::secondary);
     }
 }
 
@@ -216,7 +231,7 @@ void QnLiveStreamProvider::setPrimaryStreamParams(const QnLiveStreamParams& para
     if (getRole() != Qn::CR_SecondaryLiveVideo)
     {
         // must be primary, so should inform secondary
-        if (auto owner = getOwner().dynamicCast<QnAbstractMediaServerVideoCamera>())
+        if (auto owner = getOwner().dynamicCast<nx::vms::server::AbstractVideoCamera>())
         {
             QnLiveStreamProviderPtr lp = owner->getSecondaryReader();
             if (lp)
@@ -233,13 +248,10 @@ void QnLiveStreamProvider::onStreamResolutionChanged( int /*channelNumber*/, con
 
 void QnLiveStreamProvider::updateSoftwareMotion()
 {
-    if (needAnalyzeMotion())
+    for (int i = 0; i < m_videoChannels; ++i)
     {
-        for (int i = 0; i < m_videoChannels; ++i)
-        {
-            QnMotionRegion region = m_cameraRes->getMotionRegion(i);
-            m_motionEstimation[i].setMotionMask(region);
-        }
+        QnMotionRegion region = m_cameraRes->getMotionRegion(i);
+        m_motionEstimation[i].setMotionMask(region);
     }
 
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
@@ -504,6 +516,14 @@ QnAbstractCompressedMetadataPtr QnLiveStreamProvider::getMetadata()
     {
         QnAbstractCompressedMetadataPtr metadata;
         m_metadataReceptor->metadataQueue.pop(metadata);
+
+        if (m_metadataLogger)
+        {
+            m_metadataLogger->pushData(
+                metadata,
+                lm("Queue size: %1").args(m_metadataReceptor->metadataQueue.size()));
+        }
+
         return metadata;
     }
 
@@ -640,7 +660,7 @@ void QnLiveStreamProvider::saveBitrateIfNeeded(
     if (m_cameraRes->saveBitrateIfNeeded(info))
     {
         m_cameraRes->savePropertiesAsync();
-        NX_INFO(this, lm("bitrateInfo has been updated for %1 stream")
+        NX_VERBOSE(this, lm("bitrateInfo has been updated for %1 stream")
                 .arg(QnLexical::serialized(info.encoderIndex)));
     }
 }

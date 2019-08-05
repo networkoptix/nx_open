@@ -4,8 +4,6 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QDesktopWidget>
 
-#include <QtOpenGL/QGLWidget>
-
 #include <client_core/client_core_module.h>
 
 #include <client/client_settings.h>
@@ -16,6 +14,7 @@
 #include <ui/style/skin.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
 #include <ui/dialogs/common/file_messages.h>
+#include <ui/dialogs/common/message_box.h>
 #include <ui/screen_recording/video_recorder_settings.h>
 #include <ui/graphics/items/generic/graphics_message_box.h>
 #include <ui/workbench/workbench_display.h>

@@ -7,7 +7,9 @@
 #include <api/test_api_requests.h>
 #include <api/global_settings.h>
 #include <nx/update/update_information.h>
+#include <nx/update/persistent_update_storage.h>
 #include <nx/network/http/test_http_server.h>
+#include <nx/vms/api/data/system_information.h>
 #include <quazip/quazipfile.h>
 #include <rest/server/json_rest_handler.h>
 #include <common/common_module.h>
@@ -18,7 +20,7 @@ static const QString kUpdateFilesPathPostfix = "/test_update_files/";
 
 using namespace nx::test;
 
-class Updates: public ::testing::Test
+class FtUpdates: public ::testing::Test
 {
 protected:
     virtual void SetUp() override
@@ -26,11 +28,11 @@ protected:
         ASSERT_TRUE(m_testHttpServer.bindAndListen());
     }
 
-    void givenConnectedPeers(int count)
+    void givenConnectedPeers(size_t count)
     {
 
         const QnUuid systemId = QnUuid::createUuid();
-        for (int i = 0; i < count; ++i)
+        for (size_t i = 0; i < count; ++i)
         {
             m_peers.emplace_back(std::make_unique<MediaServerLauncher>(QString()));
 
@@ -39,9 +41,9 @@ protected:
             ASSERT_TRUE(m_peers.back()->startAsync());
         }
 
-        for (int i = 0; i < count; ++i)
+        for (size_t i = 0; i < count; ++i)
         {
-            m_peers[i]->waitForStarted();
+            ASSERT_TRUE(m_peers[i]->waitForStarted());
             m_peers[i]->commonModule()->globalSettings()->setLocalSystemId(systemId);
             m_peers[i]->commonModule()->globalSettings()->synchronizeNowSync();
         }
@@ -110,7 +112,7 @@ protected:
         issueInstallUpdateRequest(false, QnUuidList(), QnRestResult::MissingParameter);
     }
 
-    QnUuid peerId(int index)
+    QnUuid peerId(size_t index)
     {
         return m_peers[index]->commonModule()->moduleGUID();
     }
@@ -131,7 +133,9 @@ protected:
         for (const auto& peer: m_peers)
         {
             if (participants.contains(peer->commonModule()->moduleGUID()))
+            {
                 ASSERT_TRUE(peer->mediaServerProcess()->installUpdateRequestReceived());
+            }
         }
     }
 
@@ -171,21 +175,21 @@ protected:
 
     void thenFinishUpdateShouldSucceed()
     {
-        NX_TEST_API_POST(m_peers[0].get(), "/ec2/finishUpdate", "");
+        NX_TEST_API_POST(m_peers[0].get(), "/ec2/finishUpdate", QString());
 
         QnRestResult result;
         NX_TEST_API_GET(m_peers[0].get(), "/ec2/updateInformation", &result);
         ASSERT_NE(QnRestResult::NoError, result.error);
     }
 
-    void whenServerRestartedWithNewVersion(int peerIndex, const std::string& version = "4.0.0.1")
+    void whenServerRestartedWithNewVersion(size_t peerIndex, const std::string& version = "4.0.0.1")
     {
         m_peers[peerIndex]->stop();
         m_peers[peerIndex]->addCmdOption("--override-version=" + version);
         ASSERT_TRUE(m_peers[peerIndex]->start());
     }
 
-    void whenServerRestartedWithOldVersion(int peerIndex)
+    void whenServerRestartedWithOldVersion(size_t peerIndex)
     {
         m_peers[peerIndex]->stop();
         m_peers[peerIndex]->addCmdOption("--override-version=4.0.0.0");
@@ -207,9 +211,30 @@ protected:
         issueFinishUpdateRequestAndAssertResponse(true, QnRestResult::NoError);
     }
 
-    void whenPeerGoesOffline(int peerIndex)
+    void whenPeerGoesOffline(size_t peerIndex)
     {
         m_peers[peerIndex]->stop();
+    }
+
+    void whenPersistentUpdateStorageDataSet(const QString& version)
+    {
+        m_persistentServersData[version] =
+            update::PersistentUpdateStorage({m_peers[0]->commonModule()->moduleGUID()}, true);
+
+        const QString path = "/ec2/updatePersistenStorages?version=" + version;
+        NX_TEST_API_POST(m_peers[0].get(), path, m_persistentServersData[version].servers);
+    }
+
+    void thenPersistentUpdateStorageDataShouldBeRetrievalble(const QString& version)
+    {
+        const QString path = "/ec2/updatePersistenStorages?version=" + version;
+
+        QnJsonRestResult result;
+        NX_TEST_API_GET(m_peers[0].get(), path, &result);
+
+        update::PersistentUpdateStorage persistentStorageData =
+            result.deserialized<update::PersistentUpdateStorage>();
+        ASSERT_EQ(persistentStorageData, m_persistentServersData[version]);
     }
 
 private:
@@ -226,23 +251,24 @@ private:
 
     std::vector<std::unique_ptr<MediaServerLauncher>> m_peers;
     nx::update::Information m_updateInformation;
-    network::http::TestHttpServer m_testHttpServer;
+    nx::network::http::TestHttpServer m_testHttpServer;
+    std::map<QString, update::PersistentUpdateStorage> m_persistentServersData;
 
     void connectPeers()
     {
-        for (int i = 0; i < m_peers.size() - 1; ++i)
+        for (size_t i = 0; i < m_peers.size() - 1; ++i)
         {
             const auto& to = m_peers[i + 1];
-            const auto toUrl = utils::url::parseUrlFields(to->endpoint().toString(),
-                network::http::kUrlSchemeName);
+            const auto toUrl = nx::utils::url::parseUrlFields(to->endpoint().toString(),
+                nx::network::http::kUrlSchemeName);
 
             m_peers[i]->serverModule()->ec2Connection()->messageBus()->addOutgoingConnectionToPeer(
-                to->commonModule()->moduleGUID(), vms::api::PeerType::server, toUrl);
+                to->commonModule()->moduleGUID(), nx::vms::api::PeerType::server, toUrl);
         }
 
         const auto firstPeerMessageBus = m_peers[0]->serverModule()->ec2Connection()->messageBus();
         int distance = std::numeric_limits<int>::max();
-        while (distance > m_peers.size())
+        while (distance > static_cast<int>(m_peers.size()))
         {
             distance = firstPeerMessageBus->distanceToPeer(
                 m_peers[m_peers.size() - 1]->commonModule()->moduleGUID());
@@ -267,8 +293,11 @@ private:
         else
         {
             QnJsonRestResult result;
-            NX_TEST_API_GET(m_peers[0].get(), path, &result);
-            ASSERT_EQ(m_updateInformation.version, result.deserialized<nx::update::Information>().version);
+            do
+            {
+                NX_TEST_API_GET(m_peers[0].get(), path, &result);
+            }
+            while (m_updateInformation.version != result.deserialized<nx::update::Information>().version);
         }
     }
 
@@ -296,11 +325,25 @@ private:
             }
         }
 
-        NX_TEST_API_POST(m_peers[0].get(), path, "", nullptr,
-            network::http::StatusCode::ok, "admin", "admin", &responseBuffer);
-        QnRestResult installResponse;
-        QJson::deserialize(responseBuffer, &installResponse);
-        ASSERT_EQ(expectedRestResult, installResponse.error);
+        while (true)
+        {
+            NX_TEST_API_POST(m_peers[0].get(), path, QString(), nullptr,
+                nx::network::http::StatusCode::ok, "admin", "admin", &responseBuffer);
+
+            QnRestResult installResponse;
+            QJson::deserialize(responseBuffer, &installResponse);
+            if (expectedRestResult != installResponse.error)
+            {
+                NX_DEBUG(
+                    this, "Waiting for  install request to return expected result:",
+                    expectedRestResult);
+                std::this_thread::sleep_for(std::chrono::milliseconds(200));
+            }
+            else
+            {
+                break;
+            }
+        }
     }
 
     void issueFinishUpdateRequestAndAssertResponse(bool ignorePendingPeers,
@@ -311,8 +354,8 @@ private:
             path += "?ignorePendingPeers";
 
         QByteArray responseBuffer;
-        NX_TEST_API_POST(m_peers[0].get(), path, "", nullptr,
-            network::http::StatusCode::ok, "admin", "admin", &responseBuffer);
+        NX_TEST_API_POST(m_peers[0].get(), path, QString(), nullptr,
+            nx::network::http::StatusCode::ok, "admin", "admin", &responseBuffer);
 
         QnRestResult installResponse;
         QJson::deserialize(responseBuffer, &installResponse);
@@ -330,15 +373,16 @@ private:
     update::Package preparePackage(const QString& dataDir)
     {
         update::Package result;
-        result.arch = QnAppInfo::applicationArch();
+
+        const auto& osInfo = nx::utils::OsInfo::current();
+
         result.component = "server";
 
         QString updateFileFullPath;
         result.file = createUpdateZip(dataDir, &result.md5, &result.size, &updateFileFullPath);
-        result.platform = QnAppInfo::applicationPlatform();
         result.url = serveUpdateFile(updateFileFullPath);
-        result.variant = QnAppInfo::applicationPlatformModification();
-        result.variantVersion = QnAppInfo::currentSystemInformation().runtimeOsVersion();
+        result.platform = osInfo.platform;
+        result.variants.append({osInfo.variant, osInfo.variantVersion});
 
         return result;
     }
@@ -355,27 +399,23 @@ private:
     {
         const auto updateFilesPath = dataDir + kUpdateFilesPathPostfix;
         QDir().mkpath(updateFilesPath);
-        const QByteArray updateJsonContent =
-            QString(
-R"JSON({
-    "version" : "4.0.0.1",
-    "platform" : "%1",
-    "arch" : "%2",
-    "modification" : "%3",
-    "cloudHost" : "%4",
-    "executable" : "install"
-}
-)JSON"
-            ).arg(QnAppInfo::applicationPlatform())
-                .arg(QnAppInfo::applicationArch())
-                .arg(QnAppInfo::applicationPlatformModification())
-                .arg(nx::network::SocketGlobals::cloud().cloudHost()).toLocal8Bit();
+
+        const auto& osInfo = nx::utils::OsInfo::current();
+
+        update::PackageInformation packageInfo;
+        packageInfo.version = "4.0.0.1";
+        packageInfo.component = "server";
+        packageInfo.cloudHost = nx::network::SocketGlobals::cloud().cloudHost();
+        packageInfo.platform = osInfo.platform;
+        packageInfo.variants.append({osInfo.variant, osInfo.variantVersion});
+        packageInfo.installScript = "install";
+        const QByteArray& packageInfoJsonContent = QJson::serialized(packageInfo);
 
         const QString zipFileName = "update.zip";
         const QString zipFilePath = updateFilesPath + zipFileName;
 
         QList<ZipContext> zipContextList = {
-            ZipContext("update.json", updateJsonContent),
+            ZipContext("package.json", packageInfoJsonContent),
             ZipContext("install", "hello")
         };
 
@@ -412,7 +452,7 @@ R"JSON({
     }
 };
 
-TEST_F(Updates, updateInformation_onePeer_correctlySet)
+TEST_F(FtUpdates, updateInformation_onePeer_correctlySet)
 {
     givenConnectedPeers(1);
     whenCorrectUpdateInformationWithEmptyParticipantListSet();
@@ -423,7 +463,7 @@ TEST_F(Updates, updateInformation_onePeer_correctlySet)
     thenPeersUpdateStatusShouldBe(expectedStatuses);
 }
 
-TEST_F(Updates, installUpdate_wontWorkWithoutPeersParameter)
+TEST_F(FtUpdates, installUpdate_wontWorkWithoutPeersParameter)
 {
     givenConnectedPeers(1);
     whenCorrectUpdateInformationWithEmptyParticipantListSet();
@@ -436,7 +476,7 @@ TEST_F(Updates, installUpdate_wontWorkWithoutPeersParameter)
     thenInstallUpdateWithoutPeersParameterShouldFail();
 }
 
-TEST_F(Updates, installUpdate_willWorkOnlyWithPeersParameter)
+TEST_F(FtUpdates, installUpdate_willWorkOnlyWithPeersParameter)
 {
     givenConnectedPeers(2);
     whenCorrectUpdateInformationWithEmptyParticipantListSet();
@@ -453,7 +493,7 @@ TEST_F(Updates, installUpdate_willWorkOnlyWithPeersParameter)
     thenOnlyParticipantsShouldHaveReceivedInstallUpdateRequest(participants);
 }
 
-TEST_F(Updates, installUpdate_timestampCorrectlySet)
+TEST_F(FtUpdates, installUpdate_timestampCorrectlySet)
 {
     givenConnectedPeers(1);
     whenCorrectUpdateInformationWithEmptyParticipantListSet();
@@ -467,7 +507,7 @@ TEST_F(Updates, installUpdate_timestampCorrectlySet)
     thenGlobalUpdateInformationShouldContainCorrectLastInstallationRequestTime();
 }
 
-TEST_F(Updates, installUpdate_onlyParticipantsReceiveRequest)
+TEST_F(FtUpdates, installUpdate_onlyParticipantsReceiveRequest)
 {
     givenConnectedPeers(3);
     whenCorrectUpdateInformationWithEmptyParticipantListSet();
@@ -485,7 +525,7 @@ TEST_F(Updates, installUpdate_onlyParticipantsReceiveRequest)
     thenGlobalUpdateInformationShouldContainParticipants(participants);
 }
 
-TEST_F(Updates, installUpdate_participantWithNewerVersionDoesNotReceiveRequest_2peers)
+TEST_F(FtUpdates, installUpdate_participantWithNewerVersionDoesNotReceiveRequest_2peers)
 {
     givenConnectedPeers(2);
     whenServerRestartedWithNewVersion(0, "4.0.0.2");
@@ -502,7 +542,7 @@ TEST_F(Updates, installUpdate_participantWithNewerVersionDoesNotReceiveRequest_2
     thenOnlyParticipantsShouldHaveReceivedInstallUpdateRequest({peerId(0)});
 }
 
-TEST_F(Updates, installUpdate_participantViaNewerPeerReceiveRequest)
+TEST_F(FtUpdates, installUpdate_participantViaNewerPeerReceiveRequest)
 {
     givenConnectedPeers(2);
     whenServerRestartedWithNewVersion(0, "4.0.0.2");
@@ -519,7 +559,7 @@ TEST_F(Updates, installUpdate_participantViaNewerPeerReceiveRequest)
     thenOnlyParticipantsShouldHaveReceivedInstallUpdateRequest({ peerId(0), peerId(1) });
 }
 
-TEST_F(Updates, installUpdate_failIfParticipantIsOffline)
+TEST_F(FtUpdates, installUpdate_failIfParticipantIsOffline)
 {
     givenConnectedPeers(3);
     whenCorrectUpdateInformationWithEmptyParticipantListSet();
@@ -539,7 +579,7 @@ TEST_F(Updates, installUpdate_failIfParticipantIsOffline)
     thenGlobalUpdateInformationShouldContainParticipants(participants);
 }
 
-TEST_F(Updates, installUpdate_fail_emptyUpdateInformation)
+TEST_F(FtUpdates, installUpdate_fail_emptyUpdateInformation)
 {
     givenConnectedPeers(2);
 
@@ -553,7 +593,7 @@ TEST_F(Updates, installUpdate_fail_emptyUpdateInformation)
     thenOnlyParticipantsShouldHaveReceivedInstallUpdateRequest({ peerId(0) });
 }
 
-TEST_F(Updates, updateStatus_nonParticipantsAreNotInStatusesList)
+TEST_F(FtUpdates, updateStatus_nonParticipantsAreNotInStatusesList)
 {
     givenConnectedPeers(2);
     whenCorrectUpdateInformationWithParticipantsSet(QList<QnUuid>{peerId(0)});
@@ -564,7 +604,7 @@ TEST_F(Updates, updateStatus_nonParticipantsAreNotInStatusesList)
     thenPeersUpdateStatusShouldBe(expectedStatuses);
 }
 
-TEST_F(Updates, updateStatus_allParticipantsAreInStatusesList)
+TEST_F(FtUpdates, updateStatus_allParticipantsAreInStatusesList)
 {
     givenConnectedPeers(2);
     whenCorrectUpdateInformationWithParticipantsSet(QList<QnUuid>{peerId(0), peerId(1)});
@@ -576,7 +616,7 @@ TEST_F(Updates, updateStatus_allParticipantsAreInStatusesList)
     thenPeersUpdateStatusShouldBe(expectedStatuses);
 }
 
-TEST_F(Updates, updateStatus_allParticipantsAreInStatusesList_requestToNonParticipant)
+TEST_F(FtUpdates, updateStatus_allParticipantsAreInStatusesList_requestToNonParticipant)
 {
     givenConnectedPeers(2);
     whenCorrectUpdateInformationWithParticipantsSet(QList<QnUuid>{peerId(1)});
@@ -587,7 +627,7 @@ TEST_F(Updates, updateStatus_allParticipantsAreInStatusesList_requestToNonPartic
     thenPeersUpdateStatusShouldBe(expectedStatuses);
 }
 
-TEST_F(Updates, updateStatus_nonParticipantInList_requestisLocal)
+TEST_F(FtUpdates, updateStatus_nonParticipantInList_requestisLocal)
 {
     givenConnectedPeers(2);
     whenCorrectUpdateInformationWithParticipantsSet(QList<QnUuid>{peerId(1)});
@@ -598,7 +638,7 @@ TEST_F(Updates, updateStatus_nonParticipantInList_requestisLocal)
     thenPeersUpdateStatusShouldBe(expectedStatuses, /*isRequestLocal*/ true);
 }
 
-TEST_F(Updates, updateStatus_allParticipantsAreInStatusesList_partcipantsListIsEmpty)
+TEST_F(FtUpdates, updateStatus_allParticipantsAreInStatusesList_partcipantsListIsEmpty)
 {
     givenConnectedPeers(2);
     whenCorrectUpdateInformationWithParticipantsSet(QList<QnUuid>{});
@@ -610,7 +650,7 @@ TEST_F(Updates, updateStatus_allParticipantsAreInStatusesList_partcipantsListIsE
     thenPeersUpdateStatusShouldBe(expectedStatuses);
 }
 
-TEST_F(Updates, updateStatus_participantHasNewerVersion_partcipantsListIsEmpty)
+TEST_F(FtUpdates, updateStatus_participantHasNewerVersion_partcipantsListIsEmpty)
 {
     givenConnectedPeers(2);
     whenCorrectUpdateInformationWithParticipantsSet(QList<QnUuid>{});
@@ -624,7 +664,7 @@ TEST_F(Updates, updateStatus_participantHasNewerVersion_partcipantsListIsEmpty)
     thenPeersUpdateStatusShouldBe(expectedStatuses);
 }
 
-TEST_F(Updates, updateStatus_partcipantsListIsEmpty_serversHaveNewerVersion)
+TEST_F(FtUpdates, updateStatus_partcipantsListIsEmpty_serversHaveNewerVersion)
 {
     givenConnectedPeers(2);
     whenServerRestartedWithNewVersion(0, "4.0.0.2");
@@ -638,7 +678,7 @@ TEST_F(Updates, updateStatus_partcipantsListIsEmpty_serversHaveNewerVersion)
     thenPeersUpdateStatusShouldBe(expectedStatuses);
 }
 
-TEST_F(Updates, updateStatus_partcipantsListIsEmpty_serversHaveNewerVersion_isLocal)
+TEST_F(FtUpdates, updateStatus_partcipantsListIsEmpty_serversHaveNewerVersion_isLocal)
 {
     givenConnectedPeers(2);
     whenServerRestartedWithNewVersion(0, "4.0.0.2");
@@ -653,7 +693,7 @@ TEST_F(Updates, updateStatus_partcipantsListIsEmpty_serversHaveNewerVersion_isLo
     thenPeersUpdateStatusShouldBe(expectedStatuses, /*isLocal*/ true);
 }
 
-TEST_F(Updates, updateStatus_emptyUpdateInformation_allShouldBeInList)
+TEST_F(FtUpdates, updateStatus_emptyUpdateInformation_allShouldBeInList)
 {
     givenConnectedPeers(2);
     QMap<QnUuid, update::Status::Code> expectedStatuses{
@@ -663,7 +703,7 @@ TEST_F(Updates, updateStatus_emptyUpdateInformation_allShouldBeInList)
     thenPeersUpdateStatusShouldBe(expectedStatuses);
 }
 
-TEST_F(Updates, finishUpdate_success_updateInformationCleared)
+TEST_F(FtUpdates, finishUpdate_success_updateInformationCleared)
 {
     givenConnectedPeers(2);
     whenCorrectUpdateInformationWithEmptyParticipantListSet();
@@ -679,7 +719,7 @@ TEST_F(Updates, finishUpdate_success_updateInformationCleared)
     thenFinishUpdateShouldSucceed();
 }
 
-TEST_F(Updates, finishUpdate_fail_notAllUpdated)
+TEST_F(FtUpdates, finishUpdate_fail_notAllUpdated)
 {
     givenConnectedPeers(2);
     whenCorrectUpdateInformationWithEmptyParticipantListSet();
@@ -697,7 +737,7 @@ TEST_F(Updates, finishUpdate_fail_notAllUpdated)
     thenFinishUpdateShouldFail(QnRestResult::CantProcessRequest);
 }
 
-TEST_F(Updates, finishUpdate_fail_participantWithOldVersionIsOffline)
+TEST_F(FtUpdates, finishUpdate_fail_participantWithOldVersionIsOffline)
 {
     givenConnectedPeers(2);
     whenCorrectUpdateInformationWithEmptyParticipantListSet();
@@ -715,7 +755,7 @@ TEST_F(Updates, finishUpdate_fail_participantWithOldVersionIsOffline)
     thenFinishUpdateShouldFail(QnRestResult::CantProcessRequest);
 }
 
-TEST_F(Updates, finishUpdate_success_participantWithNewVersionIsOffline)
+TEST_F(FtUpdates, finishUpdate_success_participantWithNewVersionIsOffline)
 {
     givenConnectedPeers(2);
     whenCorrectUpdateInformationWithEmptyParticipantListSet();
@@ -734,7 +774,7 @@ TEST_F(Updates, finishUpdate_success_participantWithNewVersionIsOffline)
     thenFinishUpdateShouldFail(QnRestResult::CantProcessRequest);
 }
 
-TEST_F(Updates, finishUpdate_success_notAllUpdated_ignorePendingPeers)
+TEST_F(FtUpdates, finishUpdate_success_notAllUpdated_ignorePendingPeers)
 {
     givenConnectedPeers(2);
     whenCorrectUpdateInformationWithEmptyParticipantListSet();
@@ -752,7 +792,7 @@ TEST_F(Updates, finishUpdate_success_notAllUpdated_ignorePendingPeers)
     thenFinishUpdateWithIgnorePendingPeersShouldSucceed();
 }
 
-TEST_F(Updates, finishUpdate_success_participantsHaveVersionNewerThanTarget)
+TEST_F(FtUpdates, finishUpdate_success_participantsHaveVersionNewerThanTarget)
 {
     givenConnectedPeers(2);
     whenServerRestartedWithNewVersion(0, "4.0.0.2");
@@ -770,7 +810,7 @@ TEST_F(Updates, finishUpdate_success_participantsHaveVersionNewerThanTarget)
     thenFinishUpdateWithIgnorePendingPeersShouldSucceed();
 }
 
-TEST_F(Updates, finishUpdate_success_oneParticipantHasVersionNewerThanTarget)
+TEST_F(FtUpdates, finishUpdate_success_oneParticipantHasVersionNewerThanTarget)
 {
     givenConnectedPeers(2);
     whenServerRestartedWithNewVersion(0, "4.0.0.2");
@@ -788,7 +828,7 @@ TEST_F(Updates, finishUpdate_success_oneParticipantHasVersionNewerThanTarget)
     thenFinishUpdateWithIgnorePendingPeersShouldSucceed();
 }
 
-TEST_F(Updates, finishUpdate_success_installedUpdateInformationSetCorrectly)
+TEST_F(FtUpdates, finishUpdate_success_installedUpdateInformationSetCorrectly)
 {
     givenConnectedPeers(2);
 
@@ -811,6 +851,16 @@ TEST_F(Updates, finishUpdate_success_installedUpdateInformationSetCorrectly)
     thenInstalledtUpdateInformationShouldBeRetrievable(/*shouldBeEmpty*/ false);
     thenTargetUpdateInformationShouldBeRetrievable(/*shouldBeEmpty*/ true, QString());
     thenTargetUpdateInformationShouldBeRetrievable(/*shouldBeEmpty*/ true, "target");
+}
+
+TEST_F(FtUpdates, PersistentUpdateStorage_Properties_GetSet)
+{
+    givenConnectedPeers(1);
+    whenPersistentUpdateStorageDataSet(update::kTargetKey);
+    whenPersistentUpdateStorageDataSet(update::kInstalledKey);
+
+    thenPersistentUpdateStorageDataShouldBeRetrievalble(update::kTargetKey);
+    thenPersistentUpdateStorageDataShouldBeRetrievalble(update::kInstalledKey);
 }
 
 } // namespace nx::vms::server::test

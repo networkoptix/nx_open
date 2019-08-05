@@ -197,8 +197,8 @@ void QnStreamRecorder::updateSignatureAttr(StreamRecorderContext* context)
     QByteArray signPlaceholder = signPattern;
 
     NX_ASSERT(signPattern.indexOf(placeholder) >= 0, "Sign magic must be present in metadata");
-    signPattern.replace(QnSignHelper::getSignMagic(),
-        QnSignHelper::getSignFromDigest(getSignature()));
+    signPattern.replace(
+        QnSignHelper::getSignMagic(), QnSignHelper::getSignFromDigest(getSignature()));
 
     metadata.signature = QnSignHelper::makeSignature(signPattern);
 
@@ -628,15 +628,14 @@ void QnStreamRecorder::writeData(const QnConstAbstractMediaDataPtr& md, int stre
 
         NX_ASSERT(md->timestamp >= 0);
 
-        AVPacket avPkt;
-        av_init_packet(&avPkt);
+        QnFfmpegAvPacket avPkt;
         qint64 dts = av_rescale_q(getPacketTimeUsec(md), srcRate, stream->time_base);
         if (stream->cur_dts > 0)
             avPkt.dts = qMax((qint64)stream->cur_dts + 1, dts);
         else
             avPkt.dts = dts;
         const QnCompressedVideoData* video = dynamic_cast<const QnCompressedVideoData*>(md.get());
-        if (video && video->pts != AV_NOPTS_VALUE)
+        if (video && video->pts != AV_NOPTS_VALUE && !video->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey))
             avPkt.pts = av_rescale_q(video->pts - m_startDateTimeUs, srcRate, stream->time_base) + (avPkt.dts - dts);
         else
             avPkt.pts = avPkt.dts;
@@ -684,7 +683,7 @@ void QnStreamRecorder::writeData(const QnConstAbstractMediaDataPtr& md, int stre
 
         if (ret < 0)
         {
-            NX_WARNING(this, "AV packet write error");
+            NX_WARNING(this, "AV packet write error %1", QnFfmpegHelper::getErrorStr(ret));
         }
         else
         {
@@ -705,6 +704,11 @@ void QnStreamRecorder::writeData(const QnConstAbstractMediaDataPtr& md, int stre
 void QnStreamRecorder::endOfRun()
 {
     close();
+}
+
+void QnStreamRecorder::setTranscoderFixedFrameRate(int value)
+{
+    m_transcoderFixedFrameRate = value;
 }
 
 bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& mediaData)
@@ -858,9 +862,14 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
                     }
 
                     m_videoTranscoder = new QnFfmpegVideoTranscoder(
-                        DecoderConfig::fromResource(m_resource), commonModule()->metrics(), m_dstVideoCodec);
-                    m_videoTranscoder->setMTMode(true);
+                        DecoderConfig(), commonModule()->metrics(), m_dstVideoCodec);
+                    m_videoTranscoder->setUseMultiThreadEncode(true);
+                    m_videoTranscoder->setUseMultiThreadDecode(true);
                     m_videoTranscoder->setQuality(m_transcodeQuality);
+                    if (m_transcoderFixedFrameRate)
+                        m_videoTranscoder->setFixedFrameRate(m_transcoderFixedFrameRate);
+                    m_videoTranscoder->setParams(
+                        QnTranscoder::suggestMediaStreamParams(m_dstVideoCodec, m_transcodeQuality));
 
                     m_videoTranscoder->open(videoData);
                     m_transcodeFilters->prepare(mediaDev, m_videoTranscoder->getResolution());
@@ -879,8 +888,8 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
                     // determine real width and height
                     QSharedPointer<CLVideoDecoderOutput> outFrame(new CLVideoDecoderOutput());
                     QnFfmpegVideoDecoder decoder(
-                        DecoderConfig::fromResource(m_resource),
-                        mediaData->compressionType, videoData, false);
+                        DecoderConfig(),
+                        mediaData->compressionType, videoData);
                     decoder.decode(videoData, &outFrame);
                     if (m_role == StreamRecorderRole::fileExport)
                     {

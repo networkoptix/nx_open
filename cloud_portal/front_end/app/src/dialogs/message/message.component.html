@@ -9,24 +9,60 @@
     </div>
 
     <div class="modal-body">
-        <div class="form-group" validate-field>
-            <textarea class="form-control"
-                   [(ngModel)]="message"
-                   id="message"
-                   name="message" type="text"
-                      required nxFocusMe></textarea>
-            <p class="help-block"
-               *ngIf="!messageForm.controls['message']?.valid && messageForm.controls['message']?.touched">
-                    <span class="input-error"
-                          translate>
-                        A message is required
-                    </span>
-            </p>
-        </div>
+        <form #feedbackForm="ngForm" name="feedbackForm" novalidate>
+
+            <div class="form-group">
+                <label for="user_name" translate>Your Name</label>
+                <input type="email" class="form-control"
+                       placeholder="{{ 'John Doe' | translate}}"
+                       id="user_name" name="user_name" #user_name="ngModel"
+                       [(ngModel)]="userName"
+                       maxlength="255"
+                       required>
+            </div>
+            <div class="form-group">
+                <label for="user_email" translate>Email</label>
+                <input type="email" class="form-control"
+                       placeholder="{{ 'john@doe.com' | translate}}"
+                       id="user_email" name="user_email" #user_email="ngModel"
+                       [(ngModel)]="userEmail"
+                       pattern="{{ config.emailRegex }}" maxlength="255"
+                       required>
+            </div>
+            <div class="form-group" >
+                <label for="user_name" translate>Message</label>
+                <textarea class="form-control"
+                          [(ngModel)]="message"
+                          rows="5" id="message"
+                          placeholder="{{ 'Make sure you include your camera model and manufacture...' | translate}}"
+                          name="message" type="text"
+                          required nxFocusMe></textarea>
+            </div>
+            <div class="form-group mb-0">
+                <nx-checkbox
+                        name="contact"
+                        componentId="contact"
+                        [(ngModel)]="contact"
+                        [checked]="true">
+                </nx-checkbox>
+
+                <label for="contact" translate>I want you to contact me</label>
+            </div>
+            <div class="form-group">
+                <nx-checkbox
+                        name="agree"
+                        componentId="agree"
+                        [(ngModel)]="agree"
+                        required>
+                </nx-checkbox>
+
+                <label for="agree" translate>I agree to the <a target="_blank" href="/content/privacy">Privacy Policy</a></label>
+            </div>
+        </form>
     </div>
     <div class="modal-footer">
         <nx-process-button [process]="sendMessage"
-                           [form]="messageForm"
+                           [form]="feedbackForm"
                            action-type="'primary'"
                            buttonText="{{ 'Send' | translate }}"></nx-process-button>
 
