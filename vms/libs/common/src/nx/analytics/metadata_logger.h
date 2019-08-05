@@ -26,23 +26,28 @@ public:
 
     void pushFrameInfo(
         const FrameInfo& frameInfo,
-        const QString& additionalFrameInfo = QString());
+        const QString& additionalInfo = QString());
 
     void pushObjectMetadata(
         const nx::common::metadata::ObjectMetadataPacket& metadataPacket,
-        const QString& additionalObjectMetadataInfo = QString());
+        const QString& additionalInfo = QString());
 
 private:
-    void log(QString logLine);
+    void logLine(QString lineStr);
 
-    QString buildFrameLogString(const FrameInfo& frameInfo, const QString& additionalInfo);
+    QString buildFrameLogString(const FrameInfo& frameInfo, const QString& additionalInfo) const;
+
     QString buildObjectMetadataLogString(
+        const nx::common::metadata::ObjectMetadataPacket& metadataPacket,
+        const QString& additionalInfo) const;
+
+    void doPushObjectMetadata(
+        const char* func,
         const nx::common::metadata::ObjectMetadataPacket& metadataPacket,
         const QString& additionalInfo);
 
 private:
     QFile m_outputFile;
-    nx::vms::api::StreamIndex m_streamIndex;
 
     bool m_isLoggingBestShot = false;
 
