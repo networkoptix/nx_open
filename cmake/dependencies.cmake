@@ -21,6 +21,10 @@ set(sync_command ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/sync_dependencies.py
     --cmake-include-file=${cmake_include_file}
 )
 
+if(NOT rdepSync)
+    list(APPEND sync_command "--use-local")
+endif()
+
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     list(APPEND sync_command "--debug")
 endif()
@@ -73,25 +77,27 @@ function(copy_system_libraries)
     nx_store_known_files(${files})
 endfunction()
 
+macro(load_generated_dependencies_file)
+    include(${cmake_include_file})
+endmacro()
+
 macro(load_dependencies)
     if(WIN32)
         set(nxKitLibraryType "SHARED" CACHE STRING "" FORCE)
     endif()
-
-    include(${cmake_include_file})
 
     foreach(package_dir ${synched_package_dirs})
         if(EXISTS ${package_dir}/.nocopy)
             continue()
         endif()
 
-        if(targetDevice STREQUAL "linux_arm32" AND package_dir MATCHES "ffmpeg-arm32")
-            nx_copy_package_separately(${package_dir} "ffmpeg-arm32")
-            continue()
-        endif()
+        if(targetDevice STREQUAL "linux_arm32" AND package_dir MATCHES "ffmpeg")
+            if(package_dir MATCHES "rpi")
+                nx_copy_package_separately(${package_dir} "ffmpeg-rpi")
+            else()
+                nx_copy_package_separately(${package_dir} "ffmpeg-arm32")
+            endif()
 
-        if(targetDevice STREQUAL "linux_arm32" AND package_dir MATCHES "ffmpeg-rpi")
-            nx_copy_package_separately(${package_dir} "ffmpeg-rpi")
             continue()
         endif()
 

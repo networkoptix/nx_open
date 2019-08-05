@@ -402,7 +402,7 @@ void NotificationListModel::Private::setupAcknowledgeAction(EventData& eventData
     eventData.removable = false;
     eventData.level = QnNotificationLevel::Value::CriticalNotification;
 
-    eventData.extraAction = CommandActionPtr(new CommandAction(this));
+    eventData.extraAction = CommandActionPtr(new CommandAction());
     eventData.extraAction->setIcon(qnSkin->icon("buttons/acknowledge.png"));
     eventData.extraAction->setText(tr("Acknowledge"));
 
@@ -420,7 +420,7 @@ void NotificationListModel::Private::setupAcknowledgeAction(EventData& eventData
         };
 
     connect(eventData.extraAction.data(), &QAction::triggered,
-        [this, actionHandler]() { executeDelayedParented(actionHandler, 0, this); });
+        [this, actionHandler]() { executeLater(actionHandler, this); });
 }
 
 QString NotificationListModel::Private::caption(const nx::vms::event::EventParameters& parameters,
@@ -442,7 +442,7 @@ QString NotificationListModel::Private::caption(const nx::vms::event::EventParam
 
         case EventType::pluginEvent:
             return parameters.caption.isEmpty()
-                ? tr("Unknown Plugin Event")
+                ? tr("Unknown Plugin Diagnostic Event")
                 : parameters.caption;
 
         case EventType::analyticsSdkEvent:

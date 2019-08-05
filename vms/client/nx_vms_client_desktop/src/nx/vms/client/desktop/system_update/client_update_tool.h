@@ -2,8 +2,6 @@
 
 #include <set>
 
-#include <QtCore>
-
 #include <client_core/connection_context_aware.h>
 
 #include <nx/vms/common/p2p/downloader/downloader.h>
@@ -12,7 +10,8 @@
 #include <nx/update/update_information.h>
 #include <utils/common/connective.h>
 #include <utils/update/zip_utils.h>
-#include "update_contents.h"
+
+namespace nx::vms::applauncher::api { enum class ResultType; }
 
 namespace nx::vms::common::p2p::downloader {
 
@@ -60,6 +59,8 @@ public:
         readyRestart,
         /** Installation is complete, client has newest version. */
         complete,
+        /** ClientUpdateTool is being destructed. All async operations should exit ASAP. */
+        exiting,
         /** Got some critical error and can not continue installation. */
         error,
         /** Got an error during installation. */
@@ -85,12 +86,6 @@ public:
      * @param info - update manifest
      */
     void setUpdateTarget(const UpdateContents& contents);
-
-    /**
-     * Returns a progress for downloading client package
-     * @return percents
-     */
-    int getDownloadProgress() const;
 
     /**
      * Resets tool to initial state.
@@ -144,9 +139,6 @@ public:
 
     std::future<UpdateContents> requestRemoteUpdateInfo();
 
-    /** Get cached update information from the mediaservers. */
-    UpdateContents getRemoteUpdateInfo() const;
-
     /**
      * Get installed versions. It can block up to 500ms until applauncher check it complete.
      * The check is initiated when ClientUpdateTool is created, so there will be no block
@@ -176,11 +168,10 @@ signals:
 protected:
     // Callbacks
     void atDownloaderStatusChanged(const FileInformation& fileInformation);
-    void atRemoteUpdateInformation(nx::update::InformationError error,
-        const nx::update::Information& updateInformation);
     void atDownloadFinished(const QString& fileName);
     void atChunkDownloadFailed(const QString& fileName);
     void atDownloadFailed(const QString& fileName);
+    void atDownloadStallChanged(const QString& fileName, bool stalled);
     void atExtractFilesFinished(int code);
 
 private:
@@ -191,7 +182,7 @@ private:
     /**
      * Converts applauncher::api::ResultType to a readable string.
      */
-    static QString applauncherErrorToString(int result);
+    static QString applauncherErrorToString(nx::vms::applauncher::api::ResultType result);
 
     std::unique_ptr<Downloader> m_downloader;
     /** Directory to store unpacked files. */
@@ -200,8 +191,9 @@ private:
     vms::common::p2p::downloader::ResourcePoolPeerManager* m_peerManager = nullptr;
     vms::common::p2p::downloader::ResourcePoolPeerManager* m_proxyPeerManager = nullptr;
     nx::update::Package m_clientPackage;
-    State m_state = State::initial;
-    int m_progress = 0;
+
+    std::atomic<State> m_state = State::initial;
+
     bool m_stateChanged = false;
     nx::utils::SoftwareVersion m_updateVersion;
 
@@ -212,10 +204,9 @@ private:
     QString m_lastError;
 
     std::promise<UpdateContents> m_remoteUpdateInfoRequest;
-    UpdateContents m_remoteUpdateContents;
     QnMutex m_mutex;
 
-    std::future<int> m_applauncherTask;
+    std::future<nx::vms::applauncher::api::ResultType> m_applauncherTask;
 
     mutable std::future<std::set<nx::utils::SoftwareVersion>> m_installedVersionsFuture;
     mutable std::set<nx::utils::SoftwareVersion> m_installedVersions;

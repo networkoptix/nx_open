@@ -1,17 +1,12 @@
 #pragma once
 
-#include <memory>
-#include <boost/optional.hpp>
+#include <thread>
+#include <chrono>
 
-#include <QtCore/QObject>
 #include <QtCore/QBitArray>
+#include <QtCore/QElapsedTimer>
 
-#include <nx/utils/log/log_level.h>
-#include <nx/utils/uuid.h>
-#include <nx/utils/thread/mutex.h>
-#include <nx/utils/thread/wait_condition.h>
 #include <nx/utils/thread/long_runnable.h>
-#include <nx/utils/timer_manager.h>
 #include <api/server_rest_connection_fwd.h>
 
 #include "../file_information.h"
@@ -20,7 +15,6 @@
 namespace nx::vms::common::p2p::downloader {
 
 class Storage;
-class AbstractPeerManager;
 
 class Worker: public QnLongRunnable
 {
@@ -79,11 +73,16 @@ public:
 
     bool haveChunksToDownload();
 
+    nx::utils::log::Tag logTag() const;
+
+    bool isStalled() const;
+
 signals:
     void finished(const QString& fileName);
     void failed(const QString& fileName);
     void chunkDownloadFailed(const QString& fileName);
     void stateChanged(State state);
+    void stalledChanged(bool stalled);
 
 private:
     struct RequestHandle
@@ -113,31 +112,24 @@ private:
     void requestFileInformation();
     void requestAvailableChunks();
     void handleFileInformationReply(
-        bool success, RequestHandle handle, const FileInformation& fileInfo);
+        const Peer& peer, const std::optional<FileInformation>& fileInfo);
     void requestChecksums();
     void handleChecksumsReply(
-        bool success, RequestHandle handle, const QVector<QByteArray>& checksums);
-    void downloadNextChunk();
+        const Peer& peer, const std::optional<QVector<QByteArray>>& checksums);
+    void downloadChunks();
     void handleDownloadChunkReply(
-        bool success, RequestHandle handle, int chunkIndex, const QByteArray& data);
-
-    void cancelRequests();
-    void cancelRequestsByType(State type);
-    bool hasPendingRequestsByType(State type) const;
+        const Peer& peer, int chunkIndex, const std::optional<QByteArray>& data);
 
     void finish(State state = State::finished);
 
-    bool addAvailableChunksInfo(const QBitArray& chunks);
-    QList<Peer> peersForChunk(int chunkIndex) const;
+    void updateAvailableChunks();
+    QSet<Peer> peersForChunk(int chunkIndex) const;
 
-    void setShouldWait(bool value);
-    void setShouldWaitForAsyncOperationCompletion();
+    void sleep();
+    void wake();
     virtual void run() override;
     virtual void pleaseStop() override;
-    void pleaseStopUnsafe();
-    bool haveChunksToDownloadUnsafe();
-    virtual qint64 delayMs() const;
-    bool hasNotDownloadingChunks() const;
+    virtual std::chrono::milliseconds delay() const;
 
 protected:
     FileInformation fileInformation() const;
@@ -148,51 +140,35 @@ protected:
     QList<QnUuid> selectPeersForOperation(
         AbstractPeerManager* peerManagers, int count = -1, QList<QnUuid> peers = {}) const;
     void revivePeersWithMinimalRank();
-    int selectNextChunk() const;
+    int selectNextChunk(const QSet<int>& ignoredChunks) const;
 
     bool needToFindBetterPeers() const;
-
-    virtual void waitBeforeNextIteration(QnMutexLockerBase* lock);
 
     void increasePeerRank(const Peer& peer, int value = 1);
     void decreasePeerRank(const Peer& peer, int value = 1);
 
-    static qint64 defaultStepDelay();
     QList<AbstractPeerManager*> peerManagers() const;
 
+    void markActive();
+    void checkStalled();
+
 private:
-    struct RequestContext
-    {
-        Peer peer;
-        State type = State::failed;
-
-        RequestContext(const Peer& peerId, State type):
-            peer(peerId),
-            type(type)
-        {}
-
-        RequestContext() = default;
-    };
-
     QnUuid m_selfId;
-    bool m_shouldWait = false;
-    mutable QnMutex m_mutex;
-    QnWaitCondition m_waitCondition;
     Storage* m_storage = nullptr;
     QList<AbstractPeerManager*> m_peerManagers;
     const QString m_fileName;
 
     nx::utils::log::Tag m_logTag;
 
+    bool m_sleeping = false;
+    std::mutex m_sleepMutex;
+    std::condition_variable m_sleepCondition;
+
     State m_state = State::initial;
 
     bool m_started = false;
-    utils::StandaloneTimerManager m_stepDelayTimer;
-
-    QHash<RequestHandle, RequestContext> m_contextByHandle;
 
     QBitArray m_availableChunks;
-    QBitArray m_downloadingChunks;
 
     int m_peersPerOperation = 1;
     struct PeerInformation
@@ -206,9 +182,8 @@ private:
     };
     QHash<Peer, PeerInformation> m_peerInfoByPeer;
 
-    int m_subsequentChunksToDownload;
-    bool m_usingInternet = false;
-    bool m_fileInfoValidated = false;
+    QElapsedTimer m_stallDetectionTimer;
+    bool m_stalled = false;
 };
 
 } // namespace nx::vms::common::p2p::downloader

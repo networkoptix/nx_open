@@ -69,16 +69,15 @@ private:
     std::chrono::seconds m_vacuumInterval;
     nx::utils::StandaloneTimerManager m_vacuumTimer;
 
-    bool createDatabase(const QString &fileName);
     QVector<DeviceFileCatalogPtr> loadChunksFileCatalog();
     void addCatalogFromMediaFolder(const QString& postfix,
         QnServer::ChunksCatalog catalog,
         QVector<DeviceFileCatalogPtr>& result);
-    bool resetIoDevice();
+    bool openDbFile();
     // returns cameraId (hash for cameraUniqueId)
     boost::optional<nx::media_db::CameraOperation> createCameraOperation(
         const QString& cameraUniqueId);
-    bool startDbFile();
+    bool startDbFile(const QString& basePath, bool incVersion);
     int getOrGenerateCameraIdHash(const QString &cameraUniqueId);
     bool writeVacuumedData(
         std::unique_ptr<nx::media_db::DbReader::Data> readData,
@@ -100,6 +99,9 @@ private:
         VacuumCompletionHandler completionHandler,
         QVector<DeviceFileCatalogPtr> *data = nullptr);
     void onVacuumFinished(bool success);
+    bool readDbHeader() const;
+    QStringList allDbFiles(const QString& basePath) const;
+    QString baseFileName(int64_t seqId);
 };
 
 typedef std::shared_ptr<QnStorageDb> QnStorageDbPtr;

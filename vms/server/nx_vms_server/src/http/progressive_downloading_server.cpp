@@ -29,6 +29,7 @@
 
 #include "transcoding/transcoder.h"
 #include "transcoding/ffmpeg_transcoder.h"
+#include "transcoding/ffmpeg_video_transcoder.h"
 #include "camera/video_camera.h"
 #include "camera/camera_pool.h"
 #include "streaming/streaming_params.h"
@@ -51,14 +52,14 @@ static const int CONNECTION_TIMEOUT = 1000 * 5;
 static const int MAX_QUEUE_SIZE = 30;
 static const unsigned int DEFAULT_MAX_FRAMES_TO_CACHE_BEFORE_DROP = 1;
 
-AVCodecID getPrefferedVideoCodec(const QByteArray& streamingFormat)
+AVCodecID getPrefferedVideoCodec(const QByteArray& streamingFormat, const QString& defaultCodec)
 {
     if (streamingFormat == "webm")
         return AV_CODEC_ID_VP8;
     if (streamingFormat == "mpjpeg")
         return AV_CODEC_ID_MJPEG;
 
-    return AV_CODEC_ID_MPEG4;
+    return findVideoEncoder(defaultCodec);
 }
 
 bool isCodecCompatibleWithFormat(AVCodecID codec, const QByteArray& streamingFormat)
@@ -452,7 +453,7 @@ QByteArray QnProgressiveDownloadingConsumer::getMimeType(const QByteArray& strea
 {
     if (streamingFormat == "webm")
         return "video/webm";
-    else if (streamingFormat == "mpegts" || streamingFormat == "ts")
+    else if (streamingFormat == "mpegts")
         return "video/mp2t";
     else if (streamingFormat == "mp4")
         return "video/mp4";
@@ -495,16 +496,6 @@ void QnProgressiveDownloadingConsumer::sendJsonResponse(const QString& errorStri
     sendResponse(
         nx::network::http::StatusCode::ok,
         Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::JsonFormat));
-}
-
-QByteArray QnProgressiveDownloadingConsumer::buildSignature()
-{
-    Q_D(QnProgressiveDownloadingConsumer);
-    QByteArray signature = QnSignHelper::getSignPattern(licensePool());
-    d->transcoder->updateSignatureHash((uint8_t*)signature.data(), signature.size());
-    signature.replace(QnSignHelper::getSignMagic(),
-        QnSignHelper::getSignFromDigest(d->transcoder->getSignatureHash()));
-    return QnSignHelper::buildSignatureFileEnd(signature);
 }
 
 void QnProgressiveDownloadingConsumer::run()
@@ -618,8 +609,7 @@ void QnProgressiveDownloadingConsumer::run()
         }
 
         QnFfmpegTranscoder::Config config;
-        config.computeSignatureHash = true;
-        config.decoderConfig = DecoderConfig::fromResource(resource);
+        config.computeSignature = true;
         d->transcoder = std::make_unique<QnFfmpegTranscoder>(config, commonModule()->metrics());
 
         QnMediaResourcePtr mediaRes = resource.dynamicCast<QnMediaResource>();
@@ -668,7 +658,8 @@ void QnProgressiveDownloadingConsumer::run()
         {
             qualityToUse = QnServer::HiQualityCatalog;
             transcodeMethod = QnTranscoder::TM_FfmpegTranscode;
-            videoCodec = getPrefferedVideoCodec(streamingFormat);
+            videoCodec = getPrefferedVideoCodec(
+                streamingFormat, commonModule()->globalSettings()->defaultExportVideoCodec());
             NX_DEBUG(this,
                 "Compatible video stream not found, transcoding will used, codec id[%1]",
                 videoCodec);
@@ -887,7 +878,8 @@ void QnProgressiveDownloadingConsumer::run()
 
         dataConsumer.pleaseStop();
 
-        sendChunk(buildSignature());
+        auto signature = d->transcoder->getSignature(licensePool());
+        sendChunk(QnSignHelper::buildSignatureFileEnd(signature));
 
         QnByteArray emptyChunk((unsigned)0,0);
         sendChunk(emptyChunk);

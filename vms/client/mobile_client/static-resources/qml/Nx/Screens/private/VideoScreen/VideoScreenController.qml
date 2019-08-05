@@ -11,7 +11,7 @@ Object
 
     property alias resourceId: resourceHelper.resourceId
 
-    readonly property bool serverOffline: connectionManager.restoringConnection
+    readonly property bool serverOffline: ConnectionController.reconnecting
     readonly property bool cameraOffline:
         mediaPlayer.liveMode
             && resourceHelper.resourceStatus === MediaResourceHelper.Offline

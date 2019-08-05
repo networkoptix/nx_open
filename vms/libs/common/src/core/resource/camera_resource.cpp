@@ -151,11 +151,14 @@ void QnVirtualCameraResource::updateSourceUrl(const nx::utils::Url& tempUrl,
     if (!storeUrlForRole(role))
         return;
 
-    auto cachedUrl = m_cachedStreamUrls.find(role);
-    bool cachedUrlExists = cachedUrl != m_cachedStreamUrls.end();
+    {
+        QnMutexLocker lock(&m_mutex);
+        auto cachedUrl = m_cachedStreamUrls.find(role);
+        bool cachedUrlExists = cachedUrl != m_cachedStreamUrls.end();
 
-    if (cachedUrlExists && cachedUrl->second == url)
-        return;
+        if (cachedUrlExists && cachedUrl->second == url)
+            return;
+    }
 
     auto urlUpdater =
         [url, role](QString oldValue)
@@ -249,10 +252,8 @@ QnAspectRatio QnVirtualCameraResource::aspectRatio() const
 {
     using nx::vms::common::core::resource::SensorDescription;
 
-    const auto customAr = customAspectRatio();
-
-    if (customAr.isValid())
-        return customAr;
+    if (auto aspectRatio = customAspectRatio(); aspectRatio.isValid())
+        return aspectRatio;
 
     // The rest of the code deals with auto aspect ratio.
     // Aspect ration should be forced to AS of the first stream. Note: primary stream AR could be
@@ -270,6 +271,8 @@ QnAspectRatio QnVirtualCameraResource::aspectRatio() const
     if (size.isEmpty())
         return QnAspectRatio();
 
+    // Following logic only applies to Entropix cameras that have video from two sensors
+    // in one video stream.
     const auto& sensor = combinedSensorsDescription().mainSensor();
     if (!sensor.isValid())
         return QnAspectRatio(size);
@@ -281,6 +284,13 @@ QnAspectRatio QnVirtualCameraResource::aspectRatio() const
         static_cast<int>(size.height() * sensorSize.height()));
 
     return QnAspectRatio(realSensorSize);
+}
+
+QnAspectRatio QnVirtualCameraResource::aspectRatioRotated() const
+{
+    return QnAspectRatio::isRotated90(defaultRotation())
+        ? aspectRatio().inverted()
+        : aspectRatio();
 }
 
 static bool isParamsCompatible(const CameraMediaStreamInfo& newParams, const CameraMediaStreamInfo& oldParams)
@@ -483,6 +493,11 @@ void QnVirtualCameraResource::emitPropertyChanged(const QString& key)
         m_cachedSupportedEventTypes.reset();
         m_cachedSupportedObjectTypes.reset();
         emit deviceAgentManifestsChanged(toSharedPointer(this));
+    }    
+    
+    if (key == ResourcePropertyKey::kIoConfigCapability)
+    {
+        emit isIOModuleChanged(::toSharedPointer(this));
     }
 
     base_type::emitPropertyChanged(key);

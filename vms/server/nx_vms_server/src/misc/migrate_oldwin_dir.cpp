@@ -1,7 +1,11 @@
+#include "migrate_oldwin_dir.h"
+
 #ifdef Q_OS_WIN32
 
 #include <array>
-#include "migrate_oldwin_dir.h"
+
+#include <QtCore/QDir>
+
 #include <nx/utils/log/log.h>
 
 namespace nx {

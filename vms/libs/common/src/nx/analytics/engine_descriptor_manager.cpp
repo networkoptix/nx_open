@@ -37,7 +37,7 @@ void EngineDescriptorManager::updateFromEngineManifest(
     const EngineManifest& manifest)
 {
     m_engineDescriptorContainer.mergeWithDescriptors(
-        EngineDescriptor(engineId, engineName, pluginId),
+        EngineDescriptor(engineId, engineName, pluginId, manifest),
         engineId);
 }
 

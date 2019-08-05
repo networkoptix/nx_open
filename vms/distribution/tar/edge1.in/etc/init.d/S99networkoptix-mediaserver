@@ -44,7 +44,7 @@ RUN_ARGS="\
 
 source "$INSTALL_DIR/build_info.txt"
 FULL_VERSION="$version-$changeSet-$customization"
-[ ! -z "$beta" ] && FULL_VERSION+="-beta"
+[ ! -z "$beta" ] && FULL_VERSION="${FULL_VERSION}-beta"
 
 #--------------------------------------------------------------------------------------------------
 

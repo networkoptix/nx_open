@@ -17,8 +17,6 @@
 
 namespace nx::vms_server_plugins::analytics::axis {
 
-class MetadataHandler;
-
 class DeviceAgent: public nx::sdk::RefCountable<nx::sdk::analytics::IDeviceAgent>
 {
 public:
@@ -65,7 +63,7 @@ private:
     QAuthenticator m_auth;
     Monitor* m_monitor = nullptr;
 
-    nx::sdk::analytics::IDeviceAgent::IHandler* m_handler = nullptr;
+    nx::sdk::Ptr<nx::sdk::analytics::IDeviceAgent::IHandler> m_handler;
 };
 
 } // nx::vms_server_plugins::analytics::axis

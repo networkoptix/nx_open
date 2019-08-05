@@ -11,6 +11,8 @@ namespace test {
 
 namespace api_requests_detail {
 
+static const std::chrono::seconds kHttpTimeout(10);
+
 struct FunctionsTag{};
 
 /**
@@ -55,6 +57,8 @@ std::unique_ptr<nx::network::http::HttpClient> createHttpClient(const QString &a
     auto httpClient = std::make_unique<nx::network::http::HttpClient>();
     httpClient->setUserName(authName);
     httpClient->setUserPassword(authPassword);
+    httpClient->setResponseReadTimeout(kHttpTimeout);
+    httpClient->setMessageBodyReadTimeout(kHttpTimeout);
     return httpClient;
 }
 
@@ -68,7 +72,8 @@ nx::utils::Url createUrl(const MediaServerLauncher* const launcher, const QStrin
 
 void doExecutePost(const MediaServerLauncher* const launcher, const QString& urlStr,
     const QByteArray& request, PreprocessRequestFunc preprocessRequestFunc,
-    int httpStatus, const QString &authName, const QString &authPassword, QByteArray* responseBody)
+    int httpStatus, const QString &authName, const QString &authPassword, QByteArray* responseBody,
+    const QByteArray& contentType)
 {
     auto httpClient = createHttpClient(authName, authPassword);
     nx::utils::Url url = createUrl(launcher, urlStr);
@@ -78,7 +83,7 @@ void doExecutePost(const MediaServerLauncher* const launcher, const QString& url
     NX_INFO(typeid(FunctionsTag), lm("POST %1").arg(urlStr));
     NX_INFO(typeid(FunctionsTag), lm("POST_REQUEST: %2").arg(actualRequest));
 
-    httpClient->doPost(url, "application/json", actualRequest);
+    httpClient->doPost(url, contentType, actualRequest);
 
     const auto response = readResponseBody(httpClient.get());
     NX_INFO(typeid(FunctionsTag), lm("POST_RESPONSE: %1").arg(response));

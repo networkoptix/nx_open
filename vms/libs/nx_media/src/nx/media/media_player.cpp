@@ -1059,6 +1059,7 @@ void Player::play()
 void Player::pause()
 {
     Q_D(Player);
+    checkReadyToPlay(); //< We need to be sure we are able to show paused frame on camera switch.
     d->log("pause()");
     d->setState(State::Paused);
     d->execTimer->stop(); //< stop next frame displaying
@@ -1136,8 +1137,13 @@ void Player::setSource(const QUrl& url)
         d->resource = commonModule()->resourcePool()->getResourceById(QnUuid(path));
     }
 
-    if (d->resource && currentState == State::Playing)
-        play();
+    if (d->resource)
+    {
+        if (currentState == State::Playing)
+            play();
+        else if (currentState == State::Paused)
+            pause();
+    }
 
     d->log("emit sourceChanged()");
     emit sourceChanged();

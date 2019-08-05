@@ -1,6 +1,6 @@
 #include "resource_tree_model_cloud_system_node.h"
 
-#include <ui/style/skin.h>
+#include <ui/style/resource_icon_cache.h>
 
 QnResourceTreeModelCloudSystemNode::QnResourceTreeModelCloudSystemNode(
     const QnSystemDescriptionPtr& system,
@@ -26,14 +26,11 @@ void QnResourceTreeModelCloudSystemNode::initialize()
             setName(m_system->name());
         });
 
-    connect(m_system, &QnBaseSystemDescription::connectableStateChanged, this,
-        [this]
-        {
-            setIcon(calculateIcon());
-        });
+    connect(m_system, &QnBaseSystemDescription::connectableStateChanged,
+        this, &QnResourceTreeModelCloudSystemNode::updateIcon);
 
     setName(m_system->name());
-    setIcon(calculateIcon());
+    updateIcon();
 }
 
 void QnResourceTreeModelCloudSystemNode::deinitialize()
@@ -58,9 +55,8 @@ Qt::ItemFlags QnResourceTreeModelCloudSystemNode::flags(int column) const
     return result;
 }
 
-QIcon QnResourceTreeModelCloudSystemNode::calculateIcon() const
+int QnResourceTreeModelCloudSystemNode::calculateIconKey() const
 {
-    return m_system->isConnectable()
-        ? qnSkin->icon("cloud/cloud_20.png")
-        : qnSkin->icon("cloud/cloud_20_disabled.png");
+    return QnResourceIconCache::CloudSystem
+        | (m_system->isConnectable() ? 0 : QnResourceIconCache::ReadOnly);
 }

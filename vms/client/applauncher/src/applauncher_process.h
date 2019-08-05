@@ -4,6 +4,7 @@
 #include <condition_variable>
 #include <memory>
 #include <mutex>
+#include <future>
 
 #include <QObject>
 #include <QSettings>
@@ -12,7 +13,6 @@
 #include <nx/utils/thread/stoppable.h>
 #include <nx/utils/timer_manager.h>
 
-#include "abstract_request_processor.h"
 #include "installation_manager.h"
 #include "task_server_new.h"
 
@@ -20,11 +20,11 @@
 
 #include <nx/utils/software_version.h>
 
+namespace nx::vms::applauncher {
 
 class ApplauncherProcess:
     public QObject,
     public QnStoppable,
-    public AbstractRequestProcessor,
     public nx::utils::TimerEventHandler
 {
     Q_OBJECT
@@ -53,12 +53,8 @@ public:
     //!Implementation of \a ApplauncherProcess::pleaseStop()
     virtual void pleaseStop() override;
 
-    //!Implementation of \a AbstractRequestProcessor::processRequest()
-    virtual void processRequest(
-        const std::shared_ptr<applauncher::api::BaseTask>& request,
-        applauncher::api::Response** const response) override;
-
     int run();
+    void initChannels();
 
 private:
     void launchClient();
@@ -73,22 +69,35 @@ private:
     nx::utils::SoftwareVersion getVersionToLaunch() const;
 
     bool startApplication(
-        const std::shared_ptr<applauncher::api::StartApplicationTask>& task,
-        applauncher::api::Response* const response);
+        const applauncher::api::StartApplicationTask& task,
+        applauncher::api::Response& response);
     bool installZip(
-        const std::shared_ptr<applauncher::api::InstallZipTask>& request,
-        applauncher::api::Response* const response);
+        const applauncher::api::InstallZipTask& request,
+        applauncher::api::Response& response);
+    bool installZipAsync(
+        const applauncher::api::InstallZipTaskAsync& request,
+        applauncher::api::Response& response);
+    bool checkInstallationProgress(
+        const applauncher::api::InstallZipCheckStatus& request,
+        applauncher::api::InstallZipCheckStatusResponse& response);
     bool isVersionInstalled(
-        const std::shared_ptr<applauncher::api::IsVersionInstalledRequest>& request,
-        applauncher::api::IsVersionInstalledResponse* const response);
+        const applauncher::api::IsVersionInstalledRequest& request,
+        applauncher::api::IsVersionInstalledResponse& response);
     bool getInstalledVersions(
-        const std::shared_ptr<applauncher::api::GetInstalledVersionsRequest>& request,
-        applauncher::api::GetInstalledVersionsResponse* const response);
+        const applauncher::api::GetInstalledVersionsRequest& request,
+        applauncher::api::GetInstalledVersionsResponse& response);
     bool addProcessKillTimer(
-        const std::shared_ptr<applauncher::api::AddProcessKillTimerRequest>& request,
-        applauncher::api::AddProcessKillTimerResponse* const response);
+        const applauncher::api::AddProcessKillTimerRequest& request,
+        applauncher::api::AddProcessKillTimerResponse& response);
 
     virtual void onTimer(const quint64& timerID) override;
+
+    template<class RequestType, class ResponseType>
+    bool subscribe(applauncher::api::TaskType task,
+        std::function<void (const RequestType&, ResponseType&)>&& callback)
+    {
+        return m_taskServer.subscribe(serializeTaskType(task), std::move(callback));
+    }
 
 private:
     struct KillProcessTask
@@ -105,4 +114,29 @@ private:
     mutable std::mutex m_mutex;
     std::condition_variable m_cond;
     std::map<qint64, KillProcessTask> m_killProcessTasks;
+
+    /**
+     * Wraps up information about active installation process.
+     * Notice: We should not run another installation process until current one is finished.
+     */
+    struct InstallationProcess
+    {
+        /** Client version being installed. */
+        nx::utils::SoftwareVersion version;
+        /** Path to a zip file to be installed. */
+        QString fileName;
+
+        mutable std::mutex mutex;
+
+        std::future<api::ResultType> result;
+
+        QString getFile() const;
+        void reset();
+        bool isEmpty() const;
+        bool equals(const nx::utils::SoftwareVersion& version, const QString& fileName) const;
+    };
+
+    InstallationProcess m_process;
 };
+
+} // namespace nx::vms::applauncher

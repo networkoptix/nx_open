@@ -101,6 +101,15 @@ QString toString(const std::chrono::microseconds& value)
     return QString(QLatin1String("%1usec")).arg(value.count());
 }
 
+QString toString(const std::chrono::nanoseconds &value)
+{
+    if (value.count() % 1000 == 0)
+        return toString(std::chrono::duration_cast<std::chrono::microseconds>(value));
+
+    return QString(QLatin1String("%1ns")).arg(value.count());
+
+}
+
 QString toString(const std::type_info& value)
 {
     #if defined NX_UTILS_TO_STRING_CACHE

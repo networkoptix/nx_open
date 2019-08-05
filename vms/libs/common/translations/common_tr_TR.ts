@@ -1288,10 +1288,6 @@
       <translation>Bilinmeyen Bir Durum Oluştu</translation>
     </message>
     <message>
-      <source>Multiple %1 events have occured</source>
-      <translation>Birden çok %1 etkinliği meydana geldi</translation>
-    </message>
-    <message>
       <source>Event: %1</source>
       <translation>Durum: %1</translation>
     </message>
@@ -1377,10 +1373,6 @@
     <message>
       <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
       <translation>Kamerayla Bağlantı (ikincil akış) Beklenmedik Bir Şekilde Kapandı.</translation>
-    </message>
-    <message>
-      <source>RTP packet loss detected, prev seq.=%1 next seq.=%2.</source>
-      <translation>RTP Veri Kaybı Algılandı. prev seq.=%1 next seq.=%2.</translation>
     </message>
     <message>
       <source>RTP packet loss detected.</source>
@@ -1558,20 +1550,44 @@
       <translation>Ekranı Aç</translation>
     </message>
     <message>
-      <source>Plugin Event</source>
-      <translation>Eklenti Etkinliği</translation>
-    </message>
-    <message>
-      <source>Unknown plugin event</source>
-      <translation>Bilinmeyen eklenti olayı</translation>
-    </message>
-    <message>
       <source>Failed to force using camera time, it lags too much, system time will be used</source>
       <translation>Kamera saati kullanmaya zorlanırken hata oluştu, çok fazla lag var, sistem saati kullanılacak</translation>
     </message>
     <message>
       <source>Camera time is back to normal</source>
       <translation>Kamera saati normale döndü</translation>
+    </message>
+    <message>
+      <source>Multiple %1 events have occurred</source>
+      <translation>Birden fazla %1 etkinliği gerçekleşti</translation>
+    </message>
+    <message>
+      <source>Multicast address conflict detected. Address %1 is already in use by %2 on %3 stream</source>
+      <translation>Çok noktaya yayın adres çakışması algılandı. %1 adresi zaten %3 akışta %2 tarafından kullanılıyor</translation>
+    </message>
+    <message>
+      <source>Network address %1 is not a multicast address</source>
+      <translation>Ağ adresi %1 çok noktaya yayın adresi değil</translation>
+    </message>
+    <message>
+      <source>Analytics storage &quot;%1&quot; is offline.</source>
+      <translation>Analytics depolama &quot;%1&quot; çevrimdışı.</translation>
+    </message>
+    <message>
+      <source>Analytics storage &quot;%1&quot; is almost full.</source>
+      <translation>Analytics depolama &quot;%1&quot; çevrimdışı.</translation>
+    </message>
+    <message>
+      <source>Plugin Diagnostic Event</source>
+      <translation>Bilinmeyen Eklenti Teşhis Olayı</translation>
+    </message>
+    <message>
+      <source>Unknown Plugin Diagnostic Event</source>
+      <translation>Bilinmeyen Eklenti Teşhis Olayı</translation>
+    </message>
+    <message>
+      <source>RAID error. %1.</source>
+      <translation type="unfinished">RAID error. %1.</translation>
     </message>
   </context>
   <context>

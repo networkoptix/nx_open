@@ -6,11 +6,7 @@
 
 namespace nx::analytics::db {
 
-/** Enables META-225. */
-static constexpr bool kUseTrackAggregation = true;
-
-/** Enabled META-254. */
-static constexpr bool kSaveTimePeriodsToFile = false;
+static constexpr bool kLookupObjectsInAnalyticsArchive = true;
 
 // Using 14 bits for coordinates. That allows using only 2 bytes when compressing the value.
 static constexpr int kCoordinatesBits = 14;

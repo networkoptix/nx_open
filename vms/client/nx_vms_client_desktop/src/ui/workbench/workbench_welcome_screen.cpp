@@ -5,6 +5,7 @@
 #include <QtQuick/QQuickView>
 #include <QtQuick/QQuickItem>
 #include <QtQml/QQmlContext>
+#include <QtQml/QQmlEngine>
 
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
@@ -26,6 +27,7 @@
 #include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/common/utils/connection_url_parser.h>
+#include <nx/vms/client/desktop/system_logon/data/logon_parameters.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/style/nx_style.h>
 #include <ui/dialogs/login_dialog.h>
@@ -64,26 +66,21 @@ QnResourceList extractResources(const QList<QUrl>& urls)
 } // namespace
 
 QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QWidget* parent):
-    base_type(parent),
-    QnWorkbenchContextAware(parent),
-    m_view(new QQuickView(qnClientCoreModule->mainQmlEngine(), nullptr))
+    base_type(qnClientCoreModule->mainQmlEngine(), parent),
+    QnWorkbenchContextAware(parent)
 {
     NX_ASSERT(qnRuntime->isDesktopMode());
 
-    m_view->rootContext()->setContextProperty(lit("context"), this);
-    m_view->setSource(lit("Nx/WelcomeScreen/WelcomeScreen.qml"));
-    m_view->setResizeMode(QQuickView::SizeRootObjectToView);
+    rootContext()->setContextProperty(lit("context"), this);
+    setSource(lit("Nx/WelcomeScreen/WelcomeScreen.qml"));
+    setResizeMode(QQuickWidget::SizeRootObjectToView);
 
-    if (m_view->status() == QQuickView::Error)
+    if (status() == QQuickWidget::Error)
     {
-        for (const auto& error: m_view->errors())
+        for (const auto& error: errors())
             NX_ERROR(this, error.toString());
         NX_CRITICAL(false, "Welcome screen loading failed.");
     }
-
-    const auto layout = new QVBoxLayout(this);
-    layout->setContentsMargins(QMargins());
-    layout->addWidget(QWidget::createWindowContainer(m_view), 1);
 
     NX_CRITICAL(qnStartupTileManager, "Startup tile manager does not exists");
     NX_CRITICAL(qnCloudStatusWatcher, "Cloud watcher does not exist");
@@ -104,6 +101,19 @@ QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QWidget* parent):
 
     connect(qnStartupTileManager, &QnStartupTileManager::tileActionRequested,
         this, &QnWorkbenchWelcomeScreen::handleStartupTileAction);
+}
+
+void QnWorkbenchWelcomeScreen::resizeEvent(QResizeEvent* event)
+{
+    base_type::resizeEvent(event);
+
+    // Resize offscreen QQuickWindow content item here because
+    // it does not get resized when offscreen QQuickWindow size is changed.
+    // This content item is a parent for popup mouse grab overlay.
+    // The overlay should be the same size as the window in order to
+    // correctly hide popups when mouse button is pressed.
+    if (auto contentItem = quickWindow()->contentItem())
+        contentItem->setSize(quickWindow()->size());
 }
 
 QnWorkbenchWelcomeScreen::~QnWorkbenchWelcomeScreen()
@@ -173,7 +183,7 @@ void QnWorkbenchWelcomeScreen::handleStartupTileAction(const QString& systemId, 
     }
 
     // Just expand online local tile
-    executeDelayedParented([this, system]() { emit openTile(system->id());  }, 0, this);
+    executeLater([this, system]() { emit openTile(system->id());  }, this);
 }
 
 void QnWorkbenchWelcomeScreen::showEvent(QShowEvent* event)
@@ -196,7 +206,7 @@ void QnWorkbenchWelcomeScreen::hideEvent(QHideEvent* event)
 void QnWorkbenchWelcomeScreen::changeEvent(QEvent* event)
 {
     if (event->type() == QEvent::PaletteChange)
-        m_view->setColor(palette().color(QPalette::Window));
+        quickWindow()->setColor(palette().color(QPalette::Window));
 
     base_type::changeEvent(event);
 }
@@ -241,7 +251,7 @@ void QnWorkbenchWelcomeScreen::openConnectingTile()
     if (systemId.isEmpty())
         return;
 
-    executeDelayedParented([this, systemId]() { emit openTile(systemId);  }, 0, this);
+    executeLater([this, systemId]() { emit openTile(systemId);  }, this);
 }
 void QnWorkbenchWelcomeScreen::handleDisconnectedFromSystem()
 {
@@ -297,7 +307,7 @@ void QnWorkbenchWelcomeScreen::setMessage(const QString& message)
     // Repainting the widget to guarantee that started screen recording won't contain the visible
     // message.
     // TODO: Find a better way to achieve the same effect.
-    m_view->update();
+    update();
     repaint();
 
     qApp->flush();
@@ -307,11 +317,6 @@ void QnWorkbenchWelcomeScreen::setMessage(const QString& message)
 QString QnWorkbenchWelcomeScreen::message() const
 {
     return m_message;
-}
-
-void QnWorkbenchWelcomeScreen::activateView() const
-{
-    return m_view->requestActivate();
 }
 
 bool QnWorkbenchWelcomeScreen::isAcceptableDrag(const QList<QUrl>& urls)
@@ -376,12 +381,12 @@ void QnWorkbenchWelcomeScreen::forgetPassword(
             nx::vms::client::core::settings()->systemAuthenticationData = authData;
         };
 
-    executeDelayedParented(callback, 0, this);
+    executeLater(callback, this);
 }
 
 void QnWorkbenchWelcomeScreen::forceActiveFocus()
 {
-    if (const auto rootItem = m_view->rootObject())
+    if (const auto rootItem = rootObject())
         rootItem->forceActiveFocus();
 }
 
@@ -409,12 +414,11 @@ void QnWorkbenchWelcomeScreen::connectToSystemInternal(
             if (!credentials.user.isEmpty())
                 url.setUserName(credentials.user);
 
-            action::Parameters params;
-            params.setArgument(Qn::UrlRole, url);
-            params.setArgument(Qn::StorePasswordRole, storePassword);
-            params.setArgument(Qn::AutoLoginRole, autoLogin);
-            params.setArgument(Qn::StoreSessionRole, true);
-            menu()->trigger(action::ConnectAction, params);
+            LogonParameters parameters(url);
+            parameters.autoLogin = autoLogin;
+            parameters.storePassword = storePassword;
+            menu()->trigger(action::ConnectAction,
+                action::Parameters().withArgument(Qn::LogonParametersRole, parameters));
         };
 
     enum { kMinimalDelay = 1};

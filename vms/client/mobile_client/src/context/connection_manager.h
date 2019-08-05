@@ -3,6 +3,7 @@
 #include <QtCore/QObject>
 #include <QtCore/QVariant>
 #include <QtCore/QUrl>
+#include <QtQml/QJSValue>
 
 #include <client_core/connection_context_aware.h>
 #include <client/client_connection_status.h>
@@ -86,14 +87,23 @@ signals:
     void restoringConnectionChanged();
 
 public slots:
-    bool connectToServer(const nx::utils::Url& url);
+    bool connectToServer(
+        const nx::utils::Url& url,
+        QJSValue callback = QJSValue());
+
     bool connectToServer(
         const nx::utils::Url& url,
         const QString& userName,
         const QString& password,
-        bool cloudConnection);
+        bool cloudConnection,
+        QJSValue callback = QJSValue());
+
     bool connectByUserInput(
-        const QString& address, const QString& userName, const QString& password);
+        const QString& address,
+        const QString& userName,
+        const QString& password,
+        QJSValue callback = QJSValue());
+
     void disconnectFromServer();
 
 private:

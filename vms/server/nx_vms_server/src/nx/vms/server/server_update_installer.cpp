@@ -3,6 +3,7 @@
 #include <media_server/settings.h>
 #include <media_server/serverutil.h>
 #include <common/static_common_module.h>
+#include <nx/vms/server/root_fs.h>
 
 namespace nx {
 namespace vms::server {
@@ -15,7 +16,17 @@ ServerUpdateInstaller::ServerUpdateInstaller(QnMediaServerModule* serverModule):
 
 QString ServerUpdateInstaller::dataDirectoryPath() const
 {
-     return QDir::temp().absolutePath();
+    return QDir::temp().absolutePath();
+}
+
+QString ServerUpdateInstaller::component() const
+{
+    return QStringLiteral("server");
+}
+
+int64_t ServerUpdateInstaller::freeSpace(const QString& path) const
+{
+    return serverModule()->rootFileSystem()->freeSpace(path);
 }
 
 bool ServerUpdateInstaller::initializeUpdateLog(const QString& targetVersion, QString* logFileName) const

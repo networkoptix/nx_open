@@ -233,10 +233,6 @@ to view more bookmarks</source>
       <translation>Зберегти розкладку відеостіни</translation>
     </message>
     <message>
-      <source>Drop Resources</source>
-      <translation>Покласти ресурси</translation>
-    </message>
-    <message>
       <source>Start Screen Recording</source>
       <translation>Почати запис екрану</translation>
     </message>
@@ -2950,10 +2946,6 @@ to %1</source>
       <source>44.1 kHz and 48 kHz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
       <translation>Формати 44 і 48 кГц не підтримуються пристроєм захвату звуку. Будь ласка, виберіть інший пристрій або значення &quot;ні&quot; в налаштуваннях захоплення екрану.</translation>
     </message>
-    <message>
-      <source>Configured codec: %1 not found, h263p will used</source>
-      <translation>Налаштований кодек: %1 не знайдено, h263p буде використано</translation>
-    </message>
   </context>
   <context>
     <name>QnDisconnectFromCloudDialogPrivate</name>
@@ -3272,6 +3264,17 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnGLCheckerInstrument</name>
+    <message>
+      <source>Video card drivers are outdated or not installed</source>
+      <translation>Драйвери відеокарти застаріли або не встановлені</translation>
+    </message>
+    <message>
+      <source>%1 may not work properly.</source>
+      <translation>%1 може не працювати належним чином.</translation>
+    </message>
+  </context>
+  <context>
     <name>QnGeneralPreferencesWidget</name>
     <message>
       <source>Select folder...</source>
@@ -3355,17 +3358,6 @@ to %1</source>
     <message>
       <source>Creates a backup of System configuration that can be restored in case of failure.</source>
       <translation>Створює резервну копію системних налаштувань для відновлення в разі краху системи.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnGlHardwareChecker</name>
-    <message>
-      <source>Video card drivers are outdated or not installed</source>
-      <translation>Драйвери відеокарти застаріли або не встановлені</translation>
-    </message>
-    <message>
-      <source>%1 may not work properly.</source>
-      <translation>%1 може не працювати належним чином.</translation>
     </message>
   </context>
   <context>
@@ -3666,8 +3658,8 @@ to %1</source>
       </translation>
     </message>
     <message>
-      <source>Qty</source>
-      <translation>К-сть</translation>
+      <source>Channels</source>
+      <translation>Каналів</translation>
     </message>
   </context>
   <context>
@@ -5234,6 +5226,10 @@ to %1</source>
       <source>Server Web Page</source>
       <translation>Веб-сторінка сервера</translation>
     </message>
+    <message>
+      <source>Plugins</source>
+      <translation>Плагіни</translation>
+    </message>
   </context>
   <context>
     <name>QnServerSettingsWidget</name>
@@ -5706,16 +5702,30 @@ to %1</source>
       <translation>Резервне копіювання завершено</translation>
     </message>
     <message>
-      <source>Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</source>
-      <translation>Запис на відключене сховище припиниться. Однак, видалення застарілих записів триватиме.</translation>
-    </message>
-    <message>
-      <source>Recording was enabled on the USB storage</source>
-      <translation>Запис було увімкнено на USB-накопичувачі</translation>
-    </message>
-    <message>
       <source>Reindexing can fix problems with archive or backup if they have been lost or damaged, or if some hardware has been replaced.</source>
       <translation>Переіндексація може виправити проблеми з архівом або резервною копією, якщо вони були втрачені або пошкоджені, або якщо деяке обладнання було замінено.</translation>
+    </message>
+    <message>
+      <source>What to do with current analytics data?</source>
+      <translation>Що робити з поточними даними аналізу?</translation>
+    </message>
+    <message>
+      <source>Current analytics data will not be automatically moved to another location and will become unaccessible. You can keep it and manually move later, or delete permanently.
+If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
+      <translation>Поточні дані аналітики не будуть автоматично переміщені в інше місце і стануть недоступними. Ви можете зберегти його та перемістити вручну пізніше, або видалити назавжди.
+Якщо ви плануєте перенести аналітичні дані в інше місце зберігання, зверніться до служби підтримки, перш ніж продовжити.</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>Видалити</translation>
+    </message>
+    <message>
+      <source>Keep</source>
+      <translation>Залишити</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>Відміна</translation>
     </message>
   </context>
   <context>
@@ -5763,6 +5773,14 @@ to %1</source>
     <message>
       <source>Too small and system partitions are reserved and not used for writing if there is enough other storage space available.</source>
       <translation>Занадто малі та системні розділи зарезервовані та не використовуються для записупри достатньому місці зберігання.</translation>
+    </message>
+    <message>
+      <source>Use to store analytics data</source>
+      <translation>Використовується для зберігання аналітичних даних</translation>
+    </message>
+    <message>
+      <source>Stores analytics data</source>
+      <translation>Зберігає дані аналітики</translation>
     </message>
   </context>
   <context>
@@ -5850,8 +5868,8 @@ to %1</source>
       <translation>Користувачі</translation>
     </message>
     <message>
-      <source>Analytics</source>
-      <translation>Аналітика</translation>
+      <source>Plugins</source>
+      <translation>Плагіни</translation>
     </message>
   </context>
   <context>
@@ -7701,12 +7719,12 @@ to %1</source>
       </translation>
     </message>
     <message>
-      <source>UDP Multicast</source>
-      <translation>UDP Multicast</translation>
-    </message>
-    <message>
       <source>Server will not change any cameras settings, it will receive and use camera stream as-is.</source>
       <translation>Сервер не буде змінювати налаштування камер, він буде отримувати і використовувати потік з камери як є.</translation>
+    </message>
+    <message>
+      <source>Multicast</source>
+      <translation>Мультикаст</translation>
     </message>
   </context>
   <context>
@@ -7853,10 +7871,6 @@ to %1</source>
       <translation>Веб сторінка</translation>
     </message>
     <message>
-      <source>Analytics</source>
-      <translation>Аналітика</translation>
-    </message>
-    <message>
       <source>Expert</source>
       <translation>Експрет</translation>
     </message>
@@ -7914,6 +7928,10 @@ to %1</source>
     <message>
       <source>I/O Modules Settings</source>
       <translation>Налаштування модулів вводу-виводу</translation>
+    </message>
+    <message>
+      <source>Plugins</source>
+      <translation>Плагіни</translation>
     </message>
   </context>
   <context>
@@ -8766,10 +8784,6 @@ to %1</source>
       <translation>Деякі сервери знаходяться поза мережею і не будуть оновлюватися. Пропустити їх?</translation>
     </message>
     <message>
-      <source>Please make sure there is enough free storage space and network connection is stable.</source>
-      <translation>Переконайтеся, що вільного місця для зберігання достатньо, а мережеве з'єднання стабільне.</translation>
-    </message>
-    <message>
       <source>If the problem persists, please contact Customer Support.</source>
       <translation>Якщо проблема залишається невирішеною, зверніться в службу підтримки.</translation>
     </message>
@@ -8782,16 +8796,8 @@ to %1</source>
       <translation>Скасувати оновлення</translation>
     </message>
     <message>
-      <source>Please make sure they have enough free storage space and stable network connection.</source>
-      <translation>Переконайтеся, що вільного місця для зберігання достатньо, а мережеве з'єднання стабільне.</translation>
-    </message>
-    <message>
       <source>Update completed</source>
       <translation>Оновлення завершено</translation>
-    </message>
-    <message>
-      <source>Update completed, but some servers have failed an update</source>
-      <translation>Оновлення завершено, але деякі сервери не отримали оновлення</translation>
     </message>
     <message>
       <source>Nx Witness Client will be restarted to the updated version.</source>
@@ -8802,16 +8808,8 @@ to %1</source>
       <translation>ОК</translation>
     </message>
     <message>
-      <source>Failed to install updates to servers:</source>
-      <translation>Не вдалося встановити оновлення на сервери:</translation>
-    </message>
-    <message>
       <source>Downloading updates...</source>
       <translation>Завантаження оновлень...</translation>
-    </message>
-    <message>
-      <source>Pushing updates...</source>
-      <translation>Встановлення оновлень...</translation>
     </message>
     <message>
       <source>Upload</source>
@@ -8939,8 +8937,56 @@ to %1</source>
       <translation>Скасувати оновлення та видалити всі завантажені дані?</translation>
     </message>
     <message>
+      <source>There was an error while installing updates:</source>
+      <translation>Відбулася помилка при встановленні:</translation>
+    </message>
+    <message>
+      <source>Some servers have gone offline. Please wait until they become online to continue.</source>
+      <translation>Деякі сервери перейшли в офлайн. Будь ласка, зачекайте, поки вони стануть онлайн, щоб продовжити.</translation>
+    </message>
+    <message>
+      <source>Update completed, but some components have failed an update</source>
+      <translation>Оновлення завершено, але деякі компоненти не вдалося оновити</translation>
+    </message>
+    <message>
+      <source>Please update %1 manually using an installation package.</source>
+      <translation>Будь ласка, оновіть %1 вручну за допомогою інсталятора.</translation>
+    </message>
+    <message>
+      <source>%1 will be restarted to the updated version.</source>
+      <translation>%1 буде перезапущено до оновленої версії.</translation>
+    </message>
+    <message>
       <source>Failed to download update packages to some components</source>
       <translation>Не вдалося завантажити пакети оновлення для деяких компонентів</translation>
+    </message>
+    <message>
+      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
+      <translation>Деякі версії компонентів ОС більше не підтримуються. Видаліть їх із системи або оновіть до підтримуваної версії.</translation>
+    </message>
+    <message>
+      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
+      <translation>Версія ОС клієнта більше не підтримується. Оновіть його ОС до підтримуваної версії.</translation>
+    </message>
+    <message>
+      <source>Failed to start update</source>
+      <translation>Не вдалося розпочати оновлення</translation>
+    </message>
+    <message>
+      <source>Starting update to ...</source>
+      <translation>Починається оновлення до ...</translation>
+    </message>
+    <message>
+      <source>Some servers have no package available</source>
+      <translation>Деякі сервери не мають доступного пакету</translation>
+    </message>
+    <message>
+      <source>Failed to cancel update</source>
+      <translation type="unfinished">Failed to cancel update</translation>
+    </message>
+    <message>
+      <source>Failed to start installation</source>
+      <translation type="unfinished">Failed to start installation</translation>
     </message>
   </context>
   <context>
@@ -8974,10 +9020,6 @@ to %1</source>
       <translation>Загальні події</translation>
     </message>
     <message>
-      <source>Unknown Plugin Event</source>
-      <translation>Невідомий плагін події</translation>
-    </message>
-    <message>
       <source>Device was disconnected</source>
       <translation>Пристрій було відключено</translation>
     </message>
@@ -8988,6 +9030,10 @@ to %1</source>
     <message>
       <source>I/O Module was disconnected</source>
       <translation>Модуль вводу-виводу був відключений</translation>
+    </message>
+    <message>
+      <source>Unknown Plugin Diagnostic Event</source>
+      <translation>Невідома подія діагностики плагіна</translation>
     </message>
   </context>
   <context>
@@ -9061,6 +9107,66 @@ to %1</source>
     <message>
       <source>Failed to install update</source>
       <translation>Не вдалося інсталювати оновлення</translation>
+    </message>
+    <message>
+      <source>Waiting for peer data</source>
+      <translation>Очікування однорангових даних</translation>
+    </message>
+    <message>
+      <source>There is not enough space to download update files.</source>
+      <translation>Не вистачає місця для завантаження файлів оновлення.</translation>
+    </message>
+    <message>
+      <source>There is not enough space to extract update files.</source>
+      <translation>Не вистачає місця для видобування файлів оновлень.</translation>
+    </message>
+    <message>
+      <source>Failed to download update packages.</source>
+      <translation>Не вдалося завантажити пакети оновлень.</translation>
+    </message>
+    <message>
+      <source>Update contents are invalid.</source>
+      <translation>Вміст оновлення недійсний.</translation>
+    </message>
+    <message>
+      <source>Update archive is corrupted.</source>
+      <translation>Архів оновлення пошкоджено.</translation>
+    </message>
+    <message>
+      <source>Update files cannot be extracted.</source>
+      <translation>Неможливо витягти файли оновлення.</translation>
+    </message>
+    <message>
+      <source>Internal downloader error.</source>
+      <translation>Внутрішня помилка завантажувача.</translation>
+    </message>
+    <message>
+      <source>Internal client error.</source>
+      <translation>Внутрішня помилка клієнта.</translation>
+    </message>
+    <message>
+      <source>Unknown error.</source>
+      <translation>Невідома помилка.</translation>
+    </message>
+    <message>
+      <source>Unexpected error code.</source>
+      <translation>Сталася неочікувана помилка.</translation>
+    </message>
+    <message>
+      <source>Ready to install update</source>
+      <translation>Готовий до встановлення оновлення</translation>
+    </message>
+    <message>
+      <source>Update package is not found.</source>
+      <translation>Пакет оновлення не знайдено.</translation>
+    </message>
+    <message>
+      <source>There is not enough space to install update.</source>
+      <translation>Не вистачає місця для встановлення оновлення.</translation>
+    </message>
+    <message>
+      <source>Internal server error.</source>
+      <translation>Внутрішня помилка сервера.</translation>
     </message>
   </context>
   <context>
@@ -9220,6 +9326,69 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::ServerSettingsDialogStore</name>
+    <message>
+      <source>Library</source>
+      <translation>Бібліотека</translation>
+    </message>
+    <message>
+      <source>Version</source>
+      <translation>Версія</translation>
+    </message>
+    <message>
+      <source>Vendor</source>
+      <translation>Виробник</translation>
+    </message>
+    <message>
+      <source>no error</source>
+      <translation>немає помилки</translation>
+    </message>
+    <message>
+      <source>library file cannot be loaded</source>
+      <translation>файл бібліотеки не можна завантажити</translation>
+    </message>
+    <message>
+      <source>invalid or incompatible plugin library</source>
+      <translation>недійсний або несумісний плагін бібліотеки</translation>
+    </message>
+    <message>
+      <source>plugin library failed to initialize</source>
+      <translation>плагін бібліотеки не вдалося ініціалізувати</translation>
+    </message>
+    <message>
+      <source>plugin returned bad manifest</source>
+      <translation>плагін повернув поганий маніфест</translation>
+    </message>
+    <message>
+      <source>plugin API version is no longer supported</source>
+      <translation>версія АРІ плагіна більше не підтримується</translation>
+    </message>
+    <message>
+      <source>unknown error</source>
+      <translation>невідома помилка</translation>
+    </message>
+    <message>
+      <source>Not loaded</source>
+      <translation>Не завантажено</translation>
+    </message>
+    <message>
+      <source>Loaded</source>
+      <translation>Завантажено</translation>
+    </message>
+    <message>
+      <source>plugin is in the black list</source>
+      <translation>плагін знаходиться у чорному списку</translation>
+    </message>
+    <message>
+      <source>Status</source>
+      <translation>Статус</translation>
+    </message>
+    <message>
+      <source>plugin is optional and is not in the white list</source>
+      <translation>плагін є опціональним і не входить у білий список</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::ServerStatusItemDelegate</name>
     <message>
       <source>Skipped</source>
@@ -9240,6 +9409,17 @@ to %1</source>
     <message>
       <source>Waiting for server to respond...</source>
       <translation>Очікування відповіді сервера...</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ServerUpdateTool</name>
+    <message>
+      <source>No connection to the server.</source>
+      <translation type="unfinished">No connection to the server.</translation>
+    </message>
+    <message>
+      <source>Network error.</source>
+      <translation type="unfinished">Network error.</translation>
     </message>
   </context>
   <context>
@@ -10001,6 +10181,26 @@ to %1</source>
     <message>
       <source>This build is for testing purposes only.</source>
       <translation>Ця збірка призначена для тестування.</translation>
+    </message>
+    <message>
+      <source>Open Server Settings</source>
+      <translation>Відкрити Налаштування Серверу</translation>
+    </message>
+    <message>
+      <source>OK</source>
+      <translation>ОК</translation>
+    </message>
+    <message>
+      <source>Confirm storage location to store analytics data on &apos;%1&apos;</source>
+      <translation>Підтвердьте місце зберігання, щоб зберігати дані аналітики на &apos;%1&apos;</translation>
+    </message>
+    <message>
+      <source>Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
+Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
+By default analytics data will be stored in mediaserver&apos;s installation directory.
+You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</source>
+      <translation>База даних Analytics повинна зберігатися на локальному сховищі і може займати до ста гігабайт. Після вибору розташування для зберігання аналітичних даних його не можна змінити не втративши вихідні дані. Ми рекомендуємо ретельно вибирати місце розташування та не використовувати системний розділ, щоб уникнути серйозних несправностей системи. За замовчуванням лані аналітики зберігатимуться у каталозі установки &apos;
+Ви можете змінити місце зберігання на вкладці &quot;Управління зберіганнями&quot; у діалоговому вікні Параметри сервера.</translation>
     </message>
   </context>
   <context>

@@ -46,7 +46,7 @@ bool isUrlSheme(const QString& scheme)
 
 namespace {
 
-bool extractNptTime(const nx::network::http::StringType& strValue, qint64* dst)
+bool extractNptTime(const nx::network::http::StringType& strValue, int64_t* dst)
 {
     if (strValue == "now")
     {
@@ -54,7 +54,7 @@ bool extractNptTime(const nx::network::http::StringType& strValue, qint64* dst)
         return true;
     }
 
-    static qint64 kUsecInSec = 1000000;
+    static int64_t kUsecInSec = 1000000;
     bool ok = false;
     double val = strValue.toDouble(&ok);
     if (ok)
@@ -83,8 +83,8 @@ const nx::network::http::StringType Range::NAME = "Range";
 
 bool parseRangeHeader(
     const nx::network::http::StringType& rangeStr,
-    qint64* startTime,
-    qint64* endTime)
+    int64_t* startTime,
+    int64_t* endTime)
 {
     const auto rangeType = rangeStr.trimmed().split('=');
     if (rangeType.size() != 2)

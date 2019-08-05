@@ -40,8 +40,8 @@ QVariant SystemHealthListModel::data(const QModelIndex& index, int role) const
         case Qt::DisplayRole:
             return d->text(index.row());
 
-        case Qt::DecorationRole:
-            return d->pixmap(index.row());
+        case Qn::DecorationPathRole:
+            return d->decorationPath(index.row());
 
         case Qn::ResourceListRole:
             return QVariant::fromValue(d->displayedResourceList(index.row()));

@@ -293,9 +293,28 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractReduxState
     bool hasMotion() const
     {
         bool result = devicesDescription.hasMotion == CombinedValue::All;
+
         if (isSingleCamera())
             result &= singleCameraSettings.enableMotionDetection();
+
+        if (settingsOptimizationEnabled)
+        {
+            if (expert.forcedMotionStreamType() != nx::vms::api::StreamIndex::primary)
+                result &= !expert.dualStreamingDisabled();
+        }
+
         return result;
+    }
+
+    bool hasDualStreaming() const
+    {
+        return devicesDescription.hasDualStreamingCapability == CombinedValue::All
+            && !(settingsOptimizationEnabled && expert.dualStreamingDisabled());
+    }
+
+    bool supportsMotionPlusLQ() const
+    {
+        return hasMotion() && hasDualStreaming();
     }
 
     bool supportsSchedule() const

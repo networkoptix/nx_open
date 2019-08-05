@@ -105,6 +105,16 @@ public:
         /** Last used path for the layout backgrounds */
         BACKGROUNDS_FOLDER,
 
+        /**
+         * When "Info" mode is enabled on cameras, full info will be displayed even without hover.
+         */
+        SHOW_FULL_INFO,
+
+        /**
+         * "Info" mode will be enabled by default on newly opened cameras.
+         */
+        SHOW_INFO_BY_DEFAULT,
+
         /** Allow double buffering for openGL context */
         GL_DOUBLE_BUFFER,
 
@@ -156,7 +166,7 @@ public:
     virtual ~QnClientSettings();
 
     void load();
-    void save();
+    bool save();
 
     /**
      * @brief isWritable    Check if settings storage is available for writing.
@@ -164,6 +174,11 @@ public:
      */
     bool isWritable() const;
     QSettings* rawSettings();
+
+    /**
+     * Execute settings migration.
+     */
+    void migrate();
 
 signals:
     void saved();
@@ -220,6 +235,8 @@ private:
         QN_DECLARE_R_PROPERTY (int,                         statisticsNetworkFilter,                            STATISTICS_NETWORK_FILTER,  1)
         QN_DECLARE_RW_PROPERTY(bool,                        layoutKeepAspectRatio,  setLayoutKeepAspectRatio,   LAYOUT_KEEP_ASPECT_RATIO,   true)
         QN_DECLARE_RW_PROPERTY(QString,                     backgroundsFolder,      setBackgroundsFolder,       BACKGROUNDS_FOLDER,         QString())
+        QN_DECLARE_RW_PROPERTY(bool,                        showFullInfo,           setShowFullInfo,            SHOW_FULL_INFO,             false);
+        QN_DECLARE_RW_PROPERTY(bool,                        showInfoByDefault,      setShowInfoByDefault,       SHOW_INFO_BY_DEFAULT,       false);
         QN_DECLARE_RW_PROPERTY(bool,                        isGlDoubleBuffer,       setGLDoubleBuffer,          GL_DOUBLE_BUFFER,           true)
         QN_DECLARE_RW_PROPERTY(bool,                        isGlBlurEnabled,        setGlBlurEnabled,           GL_BLUR,                    true)
         QN_DECLARE_RW_PROPERTY(quint64,                     userIdleTimeoutMSecs,   setUserIdleTimeoutMSecs,    USER_IDLE_TIMEOUT_MSECS,    0)

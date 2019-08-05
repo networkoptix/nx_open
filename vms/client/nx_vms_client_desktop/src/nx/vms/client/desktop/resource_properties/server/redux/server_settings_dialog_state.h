@@ -13,14 +13,14 @@ struct NX_VMS_CLIENT_DESKTOP_API ServerSettingsDialogState: AbstractReduxState
 
     struct PluginsInformation
     {
-        nx::vms::api::PluginModuleDataList modules;
+        nx::vms::api::PluginInfoList modules;
         bool loading = false;
         int current = -1;
     };
 
     PluginsInformation plugins;
 
-    std::optional<nx::vms::api::PluginModuleData> currentPlugin() const
+    std::optional<nx::vms::api::PluginInfo> currentPlugin() const
     {
         if (plugins.current < 0 || plugins.current > plugins.modules.size())
             return {};

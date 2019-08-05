@@ -1,3 +1,5 @@
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+
 #include <iostream>
 #include <vector>
 
@@ -10,8 +12,10 @@
 #include <nx/sdk/helpers/ptr.h>
 #include <nx/sdk/helpers/string_map.h>
 #include <nx/sdk/helpers/device_info.h>
+#include <nx/sdk/helpers/string.h>
 #include <nx/sdk/analytics/helpers/metadata_types.h>
 #include <nx/sdk/uuid.h>
+#include <nx/sdk/i_utility_provider.h>
 
 #include <nx/sdk/analytics/i_consuming_device_agent.h>
 #include <nx/sdk/analytics/i_uncompressed_video_frame.h>
@@ -222,7 +226,7 @@ static void testExecuteActionAddPerson(IEngine* engine)
     action->assertExpectedState();
 }
 
-class DeviceAgentHandler: public IDeviceAgent::IHandler
+class DeviceAgentHandler: public nx::sdk::RefCountable<IDeviceAgent::IHandler>
 {
 public:
     virtual void handleMetadata(IMetadataPacket* metadata) override
@@ -244,7 +248,7 @@ public:
     }
 };
 
-class EngineHandler: public IEngine::IHandler
+class EngineHandler: public nx::sdk::RefCountable<IEngine::IHandler>
 {
 public:
     virtual void handlePluginEvent(IPluginEvent* event) override
@@ -274,11 +278,18 @@ private:
     const std::vector<char> m_data = std::vector<char>(width() * height(), /*dummy*/ 42);
 };
 
+class UtilityProvider: public RefCountable<IUtilityProvider>
+{
+public:
+    virtual int64_t vmsSystemTimeSinceEpochMs() const override { return 0; }
+    virtual const nx::sdk::IString* homeDir() const override { return new nx::sdk::String(); }
+};
+
 TEST(stub_analytics_plugin, test)
 {
     // These handlers should be destroyed after the Plugin, Engine and DeviceAgent objects.
-    const auto engineHandler = std::make_unique<EngineHandler>();
-    const auto deviceAgentHandler = std::make_unique<DeviceAgentHandler>();
+    const auto engineHandler = nx::sdk::makePtr<EngineHandler>();
+    const auto deviceAgentHandler = nx::sdk::makePtr<DeviceAgentHandler>();
 
     Error error = Error::noError;
 
@@ -288,6 +299,9 @@ TEST(stub_analytics_plugin, test)
     ASSERT_TRUE(queryInterfacePtr<nx::sdk::IPlugin>(pluginObject));
     const auto plugin = queryInterfacePtr<nx::sdk::analytics::IPlugin>(pluginObject);
     ASSERT_TRUE(plugin);
+
+    const auto utilityProvider = makePtr<UtilityProvider>();
+    plugin->setUtilityProvider(utilityProvider.get());
 
     const auto engine = toPtr(plugin->createEngine(&error));
     ASSERT_EQ(Error::noError, error);

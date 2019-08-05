@@ -14,8 +14,4 @@ typedef QHash<QnUuid, QnResourceTreeModelNodePtr> ItemHash;
 typedef QHash<QnResourcePtr, QnResourceTreeModelNodePtr> ResourceHash;
 typedef QList<QnResourceTreeModelNodePtr> NodeList;
 
-namespace nx::vms::client::desktop {
-
-enum class ResourceTreeNodeType;
-
-} // namespace nx::vms::client::desktop
+namespace nx::vms::client::desktop::ResourceTree { enum class NodeType; }

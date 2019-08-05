@@ -11,6 +11,9 @@
 #include <nx/vms/server/analytics/abstract_video_data_receptor.h>
 #include <nx/sdk/analytics/i_device_agent.h>
 
+#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/i_string_map.h>
+
 class QnAbstractDataReceptor;
 
 namespace nx::vms::server::analytics {
@@ -45,8 +48,9 @@ public:
         const CLConstVideoDecoderOutputPtr& uncompressedFrame) override;
 
 private:
-    void at_deviceUpdated(const QnResourcePtr& device);
-    void at_devicePropertyChanged(const QnResourcePtr& device, const QString& propertyName);
+    void at_deviceStatusChanged(const QnResourcePtr& resource);
+    void at_deviceUpdated(const QnResourcePtr& resource);
+    void at_devicePropertyChanged(const QnResourcePtr& resource, const QString& propertyName);
     void at_rulesUpdated(const QSet<QnUuid>& affectedResources);
 
 private:
@@ -61,6 +65,10 @@ private:
     bool isEngineAlreadyBound(const QnUuid& engineId) const;
     bool isEngineAlreadyBound(const resource::AnalyticsEngineResourcePtr& engine) const;
 
+    nx::sdk::Ptr<nx::sdk::IStringMap> prepareSettings(
+        const QnUuid& engineId,
+        const QVariantMap& settings);
+
 private:
     mutable QnMutex m_mutex;
     QnVirtualCameraResourcePtr m_device;
@@ -70,6 +78,7 @@ private:
     bool m_cachedNeedCompressedFrames{false};
     AbstractVideoDataReceptor::NeededUncompressedPixelFormats m_cachedUncompressedPixelFormats;
     bool m_missingUncompressedFrameWarningIssued = false;
+    Qn::ResourceStatus m_previousDeviceStatus = Qn::ResourceStatus::NotDefined;
 };
 
 } // namespace nx::vms::server::analytics

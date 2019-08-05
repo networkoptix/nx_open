@@ -1,3 +1,5 @@
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+
 #pragma once
 
 #include <string>
@@ -50,8 +52,6 @@ protected: //< Intended for unit tests.
     OutputRedirector();
 
     static void redirectStdoutAndStderrIfNeeded(const char* overridingLogFilesDir = nullptr);
-
-    static std::string getProcessName();
 };
 
 } // namespace kit

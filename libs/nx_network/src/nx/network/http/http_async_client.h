@@ -73,7 +73,7 @@ public:
         constexpr static const std::chrono::milliseconds kDefaultResponseReadTimeout =
             std::chrono::milliseconds(3002);
         constexpr static const std::chrono::milliseconds kDefaultMessageBodyReadTimeout =
-            std::chrono::milliseconds::zero();  //no timeout
+            std::chrono::milliseconds(10003);
 
         std::chrono::milliseconds sendTimeout;
         std::chrono::milliseconds responseReadTimeout;
@@ -96,7 +96,7 @@ public:
      */
     AsyncClient(std::unique_ptr<AbstractStreamSocket> socket);
 
-    virtual ~AsyncClient();
+    virtual ~AsyncClient() override;
 
     AsyncClient(const AsyncClient&) = delete;
     AsyncClient& operator=(const AsyncClient&) = delete;
@@ -323,15 +323,15 @@ public:
      * until HttpClient::resumeReading() is called.
      * NOTE: Should be called only within the same AIO thread with the HttpClient socket.
      */
-    void stopReadingWhileInAioThread();
+    void stopReading();
 
     /**
      * Resume reading stopped by the HttpClient::stopReading() function. If
      * HttpClient::stopReading() hasn't been called this function will have no effect.
      * NOTE: Should be called only within the same AIO thread with the HttpClient socket.
      */
-    void resumeReadingWhileInAioThread();
-    bool isReadingWhileInAioThread();
+    void resumeReading();
+    bool isReading();
 
 private:
     enum class Result

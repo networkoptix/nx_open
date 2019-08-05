@@ -66,7 +66,6 @@ class QnLayoutTourNotificationManager;
 class QnVideowallNotificationManager;
 class QnWebPageNotificationManager;
 class QnStoredFileNotificationManager;
-class QnUpdatesNotificationManager;
 class QnMiscNotificationManager;
 class QnDiscoveryNotificationManager;
 class AnalyticsNotificationManager;
@@ -121,7 +120,6 @@ struct NotificationParams
     QnVideowallNotificationManager* videowallNotificationManager;
     QnWebPageNotificationManager* webPageNotificationManager;
     QnStoredFileNotificationManager* storedFileNotificationManager;
-    QnUpdatesNotificationManager* updatesNotificationManager;
     QnMiscNotificationManager* miscNotificationManager;
     QnDiscoveryNotificationManager* discoveryNotificationManager;
     AnalyticsNotificationManager* analyticsNotificationManager;

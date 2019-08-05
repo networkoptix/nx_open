@@ -1,3 +1,5 @@
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+
 #pragma once
 
 #include <nx/sdk/interface.h>
@@ -20,7 +22,10 @@ public:
         return InterfaceId("nx::sdk::analytics::IObjectTrackBestShotPacket");
     }
 
-    /** Timestamp of the frame the best shot belongs to. */
+    /**
+     * Timestamp of the frame (in microseconds) the best shot belongs to. Should be a non-negative
+     * number.
+     */
     virtual int64_t timestampUs() const = 0;
 
     /** Id of the track the best shot belongs to. */

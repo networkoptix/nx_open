@@ -1,11 +1,14 @@
 #include "metadata_logger.h"
 
+#include <QtCore/QDir>
+
 #include <nx/kit/utils.h>
 
 #include <utils/common/synctime.h>
 #include <nx/utils/placeholder_binder.h>
 #include <nx/utils/debug_helpers/debug_helpers.h>
 #include <nx/analytics/analytics_logging_ini.h>
+#include <nx/analytics/frame_info.h>
 
 namespace nx::analytics {
 
@@ -24,22 +27,30 @@ static const QString kMetadataDiffFromCurrentTimeMsPlaceholder = "metadata_diffF
 static const QString kMetadataDiffFromPrevMsPlaceholder = "metadata_diffFromPrevMs";
 static const QString kMetadataObjectCountPlaceholder = "metadata_objectCount";
 static const QString kMetadataObjectsPlaceholder = "metadata_objects";
+static const QString kAdditionalFrameInfoPlaceholder = "additional_frame_info";
+static const QString kAdditionalObjectMetadataInfoPlaceholder = "additional_object_metadata_info";
+
+static const QString kAdditionalFrameInfoPattern =
+    ", additionalInfo: {:" + kAdditionalFrameInfoPlaceholder + "}";
+
+static const QString kAdditionalObjectMetadataInfoPattern =
+    ", additionalInfo: {:" + kAdditionalObjectMetadataInfoPlaceholder + "}";
 
 static const QString kFrameLogPattern =
     "frameTimestampMs {:" + kFrameTimestampMsPlaceholder + "}, "
     "currentTimeMs {:" + kCurrentTimeMsPlaceholder + "}, "
     "diffFromPrevMs {:" + kFrameDiffFromPrevMsPlaceholder + "}, "
-    "diffFromCurrentTimeMs {:" + kFrameDiffFromCurrentTimeMsPlaceholder + "}"
-;
+    "diffFromCurrentTimeMs {:" + kFrameDiffFromCurrentTimeMsPlaceholder + "}";
 
-static const QString kObjectMetadataLogPattern =
+static const QString kObjectMetadataLogPatternBase =
     "metadataTimestampMs {:" + kMetadataTimestampMsPlaceholder + "}, "
     "currentTimeMs {:" + kCurrentTimeMsPlaceholder + "}, "
     "diffFromPrevMs {:" + kMetadataDiffFromPrevMsPlaceholder + "}, "
-    "diffFromCurrentTimeMs {:" + kMetadataDiffFromCurrentTimeMsPlaceholder + "}, "
-    "objects: {:" + kMetadataObjectCountPlaceholder + "}"
-    "{:" + kMetadataObjectsPlaceholder + "}"
-;
+    "diffFromCurrentTimeMs {:" + kMetadataDiffFromCurrentTimeMsPlaceholder + "}";
+
+static const QString kObjectInfoPattern =
+    ", objects: {:" + kMetadataObjectCountPlaceholder + "}"
+    "{:" + kMetadataObjectsPlaceholder + "}";
 
 static QString makeObjectsLogLines(
     const std::vector<nx::common::metadata::DetectedObject>& objects)
@@ -93,33 +104,91 @@ MetadataLogger::MetadataLogger(
         NX_WARNING(this, "Unable to open output file %1 for logging", logFileName);
 }
 
-void MetadataLogger::pushFrameInfo(std::unique_ptr<IFrameInfo> frameInfo)
+void MetadataLogger::pushData(
+    const QnConstAbstractMediaDataPtr& data,
+    const QString& additionalInfo)
+{
+    if (!data)
+        return;
+
+    if (!loggingIni().isLoggingEnabled())
+        return;
+
+    if (data->dataType == QnAbstractMediaData::DataType::VIDEO)
+    {
+        pushFrameInfo(
+            std::make_unique<nx::analytics::FrameInfo>(data->timestamp), additionalInfo);
+    }
+    else if (data->dataType == QnAbstractMediaData::DataType::GENERIC_METADATA)
+    {
+        nx::common::metadata::DetectionMetadataPacketPtr objectMetadata =
+            nx::common::metadata::fromMetadataPacket(
+                std::dynamic_pointer_cast<const QnCompressedMetadata>(data));
+
+        if (objectMetadata)
+            pushObjectMetadata(std::move(*objectMetadata), additionalInfo);
+    }
+}
+
+void MetadataLogger::pushFrameInfo(
+    std::unique_ptr<IFrameInfo> frameInfo,
+    const QString& additionalFrameInfo)
 {
     if (!loggingIni().isLoggingEnabled())
         return;
 
     m_prevFrameTimestamp = m_currentFrameTimestamp;
     m_currentFrameTimestamp = frameInfo->timestamp();
+    m_additionalFrameInfo = additionalFrameInfo;
 
-    doLogging(kFrameLogPattern);
+    doLogging(kFrameLogPattern
+        + (m_additionalFrameInfo.isEmpty() ? QString() : kAdditionalFrameInfoPattern));
 }
 
 void MetadataLogger::pushObjectMetadata(
-    nx::common::metadata::DetectionMetadataPacket metadataPacket)
+    nx::common::metadata::DetectionMetadataPacket metadataPacket,
+    const QString& additionalMetadataInfo)
 {
     if (!loggingIni().isLoggingEnabled())
         return;
 
-    m_prevObjectMetadataPacket = std::move(m_currentObjectMetadataPacket);
-    m_currentObjectMetadataPacket = std::move(metadataPacket);
+    m_isLoggingBestShot = false;
+    if (metadataPacket.objects.size() == 1)
+    {
+        if (metadataPacket.objects[0].bestShot)
+            m_isLoggingBestShot = true;
+    }
 
-    doLogging(kObjectMetadataLogPattern);
+    if (!m_isLoggingBestShot)
+    {
+        m_prevObjectMetadataPacket = std::move(m_currentObjectMetadataPacket);
+        m_currentObjectMetadataPacket = std::move(metadataPacket);
+    }
+    else
+    {
+        m_currentBestShotMetadataPacket = std::move(metadataPacket);
+    }
+
+    m_additionalObjectMetadataInfo = additionalMetadataInfo;
+    doLogging(kObjectMetadataLogPatternBase
+        + (m_additionalObjectMetadataInfo.isEmpty()
+            ? QString()
+            : kAdditionalObjectMetadataInfoPattern)
+        + (loggingIni().logObjectMetadataDetails ? kObjectInfoPattern : QString()));
 }
 
 MetadataLogger::PlaceholderMap MetadataLogger::placeholderMap() const
 {
     PlaceholderMap result;
     const microseconds currentTime(qnSyncTime->currentUSecsSinceEpoch());
+
+    const auto& currentMetadataPacket = m_isLoggingBestShot
+        ? m_currentBestShotMetadataPacket
+        : m_currentObjectMetadataPacket;
+
+    const auto& previousMetadataPacket = m_isLoggingBestShot
+        ? m_currentObjectMetadataPacket
+        : m_prevObjectMetadataPacket;
 
     return {
         {
@@ -142,25 +211,33 @@ MetadataLogger::PlaceholderMap MetadataLogger::placeholderMap() const
         },
         {
             kMetadataTimestampMsPlaceholder,
-            QString::number(m_currentObjectMetadataPacket.timestampUsec / 1000)
+            QString::number(currentMetadataPacket.timestampUsec / 1000)
         },
         {
             kMetadataDiffFromCurrentTimeMsPlaceholder,
             QString::number(duration_cast<milliseconds>(
-                microseconds(m_currentObjectMetadataPacket.timestampUsec) - currentTime).count())
+                microseconds(currentMetadataPacket.timestampUsec) - currentTime).count())
         },
         {
             kMetadataDiffFromPrevMsPlaceholder,
-            QString::number((m_currentObjectMetadataPacket.timestampUsec
-                - m_prevObjectMetadataPacket.timestampUsec) / 1000)
+            QString::number((currentMetadataPacket.timestampUsec
+                - previousMetadataPacket.timestampUsec) / 1000)
         },
         {
             kMetadataObjectCountPlaceholder,
-            QString::number(m_currentObjectMetadataPacket.objects.size())
+            QString::number(currentMetadataPacket.objects.size())
         },
         {
             kMetadataObjectsPlaceholder,
-            makeObjectsLogLines(m_currentObjectMetadataPacket.objects)
+            makeObjectsLogLines(currentMetadataPacket.objects)
+        },
+        {
+            kAdditionalFrameInfoPlaceholder,
+            m_additionalFrameInfo
+        },
+        {
+            kAdditionalObjectMetadataInfoPlaceholder,
+            m_additionalObjectMetadataInfo
         },
     };
 }

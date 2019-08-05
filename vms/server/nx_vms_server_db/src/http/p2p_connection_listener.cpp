@@ -3,7 +3,7 @@
 #include <QtCore/QUrlQuery>
 
 #include <api/global_settings.h>
-#include <nx_ec/ec_proto_version.h>
+#include <nx/vms/api/protocol_version.h>
 
 #include "network/tcp_connection_priv.h"
 #include <database/db_manager.h>
@@ -58,7 +58,7 @@ vms::api::PeerDataEx ConnectionProcessor::localPeer(const vms::api::PeerDataEx& 
     localPeer.identityTime = commonModule()->systemIdentityTime();
     localPeer.aliveUpdateIntervalMs = std::chrono::duration_cast<std::chrono::milliseconds>(
         commonModule()->globalSettings()->aliveUpdateInterval()).count();
-    localPeer.protoVersion = nx_ec::EC2_PROTO_VERSION;
+    localPeer.protoVersion = nx::vms::api::protocolVersion();
     localPeer.connectionGuid = remotePeer.connectionGuid;
     return localPeer;
 }
@@ -91,14 +91,14 @@ bool ConnectionProcessor::isPeerCompatible(const vms::api::PeerDataEx& remotePee
     }
     if (remotePeer.dataFormat == Qn::UbjsonFormat)
     {
-        if (nx_ec::EC2_PROTO_VERSION != remotePeer.protoVersion)
+        if (nx::vms::api::protocolVersion() != remotePeer.protoVersion)
         {
             NX_WARNING(this,
                 lm("Reject incoming P2P connection using UBJSON "
                     "from peer %1 because of different EC2 proto version. "
                     "Local peer version: %2, remote peer version: %3")
                 .arg(d->socket->getForeignAddress().address.toString())
-                .arg(nx_ec::EC2_PROTO_VERSION)
+                .arg(nx::vms::api::protocolVersion())
                 .arg(remotePeer.protoVersion));
             return false;
         }
@@ -145,6 +145,13 @@ Qn::UserAccessData ConnectionProcessor::userAccessData(const vms::api::PeerDataE
     return access;
 }
 
+void ConnectionProcessor::sendForbiddenResponse(const QByteArray& messageBody)
+{
+    Q_D(QnTCPConnectionProcessor);
+    d->response.messageBody = messageBody;
+    sendResponse(nx::network::http::StatusCode::forbidden, "text/plain");
+}
+
 bool ConnectionProcessor::canAcceptConnection(const vms::api::PeerDataEx& remotePeer)
 {
     Q_D(QnTCPConnectionProcessor);
@@ -154,14 +161,13 @@ bool ConnectionProcessor::canAcceptConnection(const vms::api::PeerDataEx& remote
         NX_DEBUG(this,
             "Incoming messageBus connections are temporary disabled. Ignore new incoming "
             "connection.");
-        sendResponse(nx::network::http::StatusCode::forbidden,
-            "The media server is running in standalone mode");
+        sendForbiddenResponse("The media server is running in standalone mode");
         return false;
     }
 
     if (!isPeerCompatible(remotePeer))
     {
-        sendResponse(nx::network::http::StatusCode::forbidden, "Peer is not compatible");
+        sendForbiddenResponse("Peer is not compatible");
         return false;
     }
 
@@ -170,15 +176,13 @@ bool ConnectionProcessor::canAcceptConnection(const vms::api::PeerDataEx& remote
     auto messageBus = (connection->messageBus()->dynamicCast<ServerMessageBus*>());
     if (!messageBus)
     {
-        sendResponse(
-            nx::network::http::StatusCode::forbidden, "The media server is not is in P2p mode");
+        sendForbiddenResponse("The media server is not is in P2p mode");
         return false;
     }
 
     if (!messageBus->validateRemotePeerData(remotePeer))
     {
-        sendResponse(nx::network::http::StatusCode::forbidden,
-            "The media server is going to restart to replace its database");
+        sendForbiddenResponse("The media server is going to restart to replace its database");
         return false;
     }
     return true;
@@ -252,7 +256,7 @@ bool ConnectionProcessor::tryAcquireConnecting(
 
     if (!lockOK)
     {
-        sendResponse(nx::network::http::StatusCode::forbidden,
+        sendForbiddenResponse(
             lm("Connection from peer %1 already established").arg(remotePeer.id).toUtf8());
         return false;
     }
@@ -273,7 +277,7 @@ bool ConnectionProcessor::tryAcquireConnected(
         remotePeer.id == commonModule()->moduleGUID() || //< can't connect to itself
         isDisabledPeer(remotePeer))                      //< allowed peers are strict
     {
-        sendResponse(nx::network::http::StatusCode::forbidden,
+        sendForbiddenResponse(
             lm("The connection from the peer %1 is already established")
                 .arg(remotePeer.id)
                 .toUtf8());
@@ -352,10 +356,14 @@ void ConnectionProcessor::run()
     P2pTransportPtr p2pTransport;
     const auto dataFormat = remotePeer.dataFormat == Qn::JsonFormat
         ? websocket::FrameType::text : websocket::FrameType::binary;
+    auto compressionType = websocket::compressionType(d->request.headers);
+
 
     if (useWebSocket)
     {
-        p2pTransport = std::make_unique<P2PWebsocketTransport>(std::move(d->socket), dataFormat);
+        p2pTransport = std::make_unique<P2PWebsocketTransport>(
+            std::move(d->socket), nx::network::websocket::Role::server, dataFormat,
+            compressionType);
         p2pTransport->start();
 
         messageBus->gotConnectionFromRemotePeer(

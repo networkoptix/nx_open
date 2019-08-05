@@ -80,3 +80,11 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
 } // namespace api
 } // namespace vms
 } // namespace nx
+
+namespace nx::utils {
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(OsInfo,
+     (ubjson)(json)(xml)(csv_record),
+     (platform)(variant)(variantVersion))
+
+} // namespace nx::utils

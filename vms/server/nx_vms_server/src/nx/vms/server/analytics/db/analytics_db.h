@@ -1,12 +1,9 @@
 #pragma once
 
+#include <atomic>
 #include <chrono>
 #include <map>
 #include <vector>
-
-#include <boost/multi_index_container.hpp>
-#include <boost/multi_index/ordered_index.hpp>
-#include <boost/multi_index/member.hpp>
 
 #include <nx/sql/filter.h>
 #include <nx/sql/query.h>
@@ -22,9 +19,11 @@
 #include "device_dao.h"
 #include "detection_data_saver.h"
 #include "object_cache.h"
+#include "object_group_dao.h"
 #include "object_track_aggregator.h"
 #include "object_type_dao.h"
-#include "time_period_dao.h"
+
+class QnMediaServerModule;
 
 namespace nx::analytics::db {
 
@@ -32,7 +31,7 @@ class EventsStorage:
     public AbstractEventsStorage
 {
 public:
-    EventsStorage();
+    EventsStorage(QnMediaServerModule* mediaServerModule);
     virtual ~EventsStorage();
 
     virtual bool initialize(const Settings& settings) override;
@@ -42,8 +41,6 @@ public:
     virtual void createLookupCursor(
         Filter filter,
         CreateCursorCompletionHandler completionHandler) override;
-
-    virtual void closeCursor(const std::shared_ptr<AbstractCursor>& cursor) override;
 
     virtual void lookup(
         Filter filter,
@@ -60,9 +57,12 @@ public:
 
     virtual void flush(StoreCompletionHandler completionHandler) override;
 
+    virtual bool readMinimumEventTimestamp(std::chrono::milliseconds* outResult) override;
+
 private:
-    std::shared_ptr<DbController> m_dbController;
-    std::list<std::shared_ptr<AbstractCursor>> m_openedCursors;
+    QnMediaServerModule* m_mediaServerModule = nullptr;
+    std::unique_ptr<DbController> m_dbController;
+    std::list<AbstractCursor*> m_openedCursors;
     QnMutex m_dbControllerMutex;
     QnMutex m_cursorsMutex;
     std::atomic<bool> m_closingDbController {false};
@@ -71,19 +71,16 @@ private:
     AttributesDao m_attributesDao;
     ObjectTypeDao m_objectTypeDao;
     DeviceDao m_deviceDao;
-    TimePeriodDao m_timePeriodDao;
     std::unique_ptr<AnalyticsArchiveDirectory> m_analyticsArchiveDirectory;
-
     ObjectCache m_objectCache;
     ObjectTrackAggregator m_trackAggregator;
+    ObjectGroupDao m_objectGroupDao;
+
+    bool ensureDbDirIsWritable(const QString& path);
 
     bool readMaximumEventTimestamp();
 
     bool loadDictionaries();
-
-    nx::sql::DBResult savePacket(
-        nx::sql::QueryContext*,
-        common::metadata::ConstDetectionMetadataPacketPtr packet);
 
     /**
      * @return Inserted event id.
@@ -93,8 +90,8 @@ private:
         nx::sql::QueryContext* queryContext,
         const common::metadata::DetectionMetadataPacket& packet,
         const common::metadata::DetectedObject& detectedObject,
-        long long attributesId,
-        long long timePeriodId);
+        int64_t attributesId,
+        int64_t timePeriodId);
 
     void updateDictionariesIfNeeded(
         nx::sql::QueryContext* queryContext,
@@ -107,77 +104,14 @@ private:
 
     DetectionDataSaver takeDataToSave(const QnMutexLockerBase& /*lock*/, bool flushData);
 
-    void prepareCursorQuery(const Filter& filter, nx::sql::SqlQuery* query);
-
-    nx::sql::DBResult selectObjects(
-        nx::sql::QueryContext* queryContext,
-        const Filter& filter,
-        std::vector<DetectedObject>* result);
-
-    void prepareLookupQuery(const Filter& filter, nx::sql::SqlQuery* query);
-
-    nx::sql::Filter prepareSqlFilterExpression(
-        const Filter& filter,
-        QString* eventsFilteredByFreeTextSubQuery);
-
-    void loadObjects(
-        nx::sql::SqlQuery& selectEventsQuery,
-        const Filter& filter,
-        std::vector<DetectedObject>* result);
-
-    void loadObject(
-        nx::sql::SqlQuery* selectEventsQuery,
-        DetectedObject* object);
-
-    void mergeObjects(DetectedObject from, DetectedObject* to, bool loadTrack);
-
-    void queryTrackInfo(
-        nx::sql::QueryContext* queryContext,
-        std::vector<DetectedObject>* result);
-
     void reportCreateCursorCompletion(
         sql::DBResult resultCode,
         QnUuid dbCursorId,
         CreateCursorCompletionHandler completionHandler);
 
-    nx::sql::DBResult selectTimePeriods(
-        nx::sql::QueryContext* queryContext,
-        const Filter& filter,
-        const TimePeriodsLookupOptions& options,
-        QnTimePeriodList* result);
-
-    void prepareSelectTimePeriodsUnfilteredQuery(
-        nx::sql::AbstractSqlQuery* query,
-        const std::vector<QnUuid>& deviceIds,
-        const QnTimePeriod& timePeriod,
-        const TimePeriodsLookupOptions& options);
-
-    void prepareSelectTimePeriodsFilteredQuery(
-        nx::sql::AbstractSqlQuery* query,
-        const Filter& filter,
-        const TimePeriodsLookupOptions& options);
-
-    void loadTimePeriods(
-        nx::sql::AbstractSqlQuery* query,
-        const QnTimePeriod& timePeriod,
-        const TimePeriodsLookupOptions& options,
-        QnTimePeriodList* result);
-
     void scheduleDataCleanup(
         QnUuid deviceId,
         std::chrono::milliseconds oldestDataToKeepTimestamp);
-
-    nx::sql::DBResult cleanupData(
-        nx::sql::QueryContext* queryContext,
-        const QnUuid& deviceId,
-        std::chrono::milliseconds oldestDataToKeepTimestamp);
-
-    void cleanupEvents(
-        nx::sql::QueryContext* queryContext,
-        const QnUuid& deviceId,
-        std::chrono::milliseconds oldestDataToKeepTimestamp);
-
-    void cleanupEventProperties(nx::sql::QueryContext* queryContext);
 
     void logCleanupResult(
         sql::DBResult resultCode,
@@ -193,7 +127,7 @@ private:
 //-------------------------------------------------------------------------------------------------
 
 using EventsStorageFactoryFunction =
-    std::unique_ptr<AbstractEventsStorage>();
+    std::unique_ptr<AbstractEventsStorage>(QnMediaServerModule*);
 
 class EventsStorageFactory:
     public nx::utils::BasicFactory<EventsStorageFactoryFunction>
@@ -206,7 +140,7 @@ public:
     static EventsStorageFactory& instance();
 
 private:
-    std::unique_ptr<AbstractEventsStorage> defaultFactoryFunction();
+    std::unique_ptr<AbstractEventsStorage> defaultFactoryFunction(QnMediaServerModule*);
 };
 
 } // namespace nx::analytics::db

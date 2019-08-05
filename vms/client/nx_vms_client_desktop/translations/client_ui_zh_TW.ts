@@ -41,7 +41,7 @@
     <message>
       <location/>
       <source>ARM support policy</source>
-      <translation type="unfinished">ARM support policy</translation>
+      <translation>ARM支援政策</translation>
     </message>
   </context>
   <context>
@@ -320,7 +320,7 @@
     <message>
       <location/>
       <source>on the next day</source>
-      <translation type="unfinished">on the next day</translation>
+      <translation>第二天</translation>
     </message>
   </context>
   <context>
@@ -665,47 +665,47 @@
     <message>
       <location/>
       <source>Custom Media Port</source>
-      <translation type="unfinished">Custom Media Port</translation>
+      <translation>自訂媒體端</translation>
     </message>
     <message>
       <location/>
       <source>Trust camera timestamp</source>
-      <translation type="unfinished">Trust camera timestamp</translation>
+      <translation>信任攝影機的時間戳記</translation>
     </message>
     <message>
       <location/>
       <source>Preferred PTZ preset type:</source>
-      <translation type="unfinished">Preferred PTZ preset type:</translation>
+      <translation>首選PTZ預設類型：</translation>
     </message>
     <message>
       <location/>
       <source>System</source>
-      <translation type="unfinished">System</translation>
+      <translation>系統</translation>
     </message>
     <message>
       <location/>
       <source>Native</source>
-      <translation type="unfinished">Native</translation>
+      <translation>原生</translation>
     </message>
     <message>
       <location/>
       <source>Native camera presets will not be avaliable.</source>
-      <translation type="unfinished">Native camera presets will not be avaliable.</translation>
+      <translation>攝影機內建預設點將無法使用.</translation>
     </message>
     <message>
       <location/>
       <source>This camera supports pan and tilt</source>
-      <translation type="unfinished">This camera supports pan and tilt</translation>
+      <translation>此攝影機支援水平和垂直搖攝</translation>
     </message>
     <message>
       <location/>
       <source>This camera supports zoom</source>
-      <translation type="unfinished">This camera supports zoom</translation>
+      <translation>此攝影機支援變焦</translation>
     </message>
     <message>
       <location/>
       <source>Detect motion during archive import</source>
-      <translation type="unfinished">Detect motion during archive import</translation>
+      <translation>在匯入檔案時偵測到移動</translation>
     </message>
   </context>
   <context>
@@ -1044,7 +1044,7 @@
     <message>
       <location/>
       <source>Hint</source>
-      <translation type="unfinished">Hint</translation>
+      <translation>提示</translation>
     </message>
     <message>
       <location/>
@@ -1089,7 +1089,7 @@
     <message>
       <location/>
       <source>Add Devices</source>
-      <translation type="unfinished">Add Devices</translation>
+      <translation>新增設備</translation>
     </message>
     <message>
       <location/>
@@ -1107,12 +1107,12 @@
     <message>
       <location/>
       <source>I Do Not Agree</source>
-      <translation type="unfinished">I Do Not Agree</translation>
+      <translation>不同意</translation>
     </message>
     <message>
       <location/>
       <source>I Agree</source>
-      <translation type="unfinished">I Agree</translation>
+      <translation>同意</translation>
     </message>
   </context>
   <context>
@@ -1248,7 +1248,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/export/widgets/export_password_widget.ui"/>
       <source>Protect with password</source>
-      <translation type="unfinished">Protect with password</translation>
+      <translation>使用密碼保護</translation>
     </message>
     <message>
       <location/>
@@ -1612,7 +1612,7 @@
     <message>
       <location/>
       <source>Minimum Grid Size</source>
-      <translation type="unfinished">Minimum Grid Size</translation>
+      <translation>最小網格尺寸</translation>
     </message>
   </context>
   <context>
@@ -1673,12 +1673,12 @@
     <message>
       <location/>
       <source>Search Timeout (s)</source>
-      <translation type="unfinished">Search Timeout (s)</translation>
+      <translation>允許搜尋連線時間 (秒)</translation>
     </message>
     <message>
       <location/>
       <source>Admin DN or CN</source>
-      <translation type="unfinished">Admin DN or CN</translation>
+      <translation>管理者DN或CN</translation>
     </message>
   </context>
   <context>
@@ -1969,14 +1969,6 @@
     </message>
   </context>
   <context>
-    <name>MessageBox</name>
-    <message>
-      <location filename="../src/ui/dialogs/common/message_box.ui"/>
-      <source>Do not show this message again</source>
-      <translation>別再顯示此訊息</translation>
-    </message>
-  </context>
-  <context>
     <name>MultiServerUpdatesWidget</name>
     <message>
       <location filename="../src/nx/vms/client/desktop/system_update/multi_server_updates_widget.ui"/>
@@ -1986,7 +1978,7 @@
     <message>
       <location/>
       <source>Check for update</source>
-      <translation type="unfinished">Check for update</translation>
+      <translation>檢查更新</translation>
     </message>
     <message>
       <location/>
@@ -2011,7 +2003,7 @@
     <message>
       <location/>
       <source>Download &amp;&amp; Install</source>
-      <translation type="unfinished">Download &amp;&amp; Install</translation>
+      <translation>下載並安裝</translation>
     </message>
     <message>
       <location/>
@@ -2026,7 +2018,7 @@
     <message>
       <location/>
       <source>Advanced Update Settings</source>
-      <translation type="unfinished">Advanced Update Settings</translation>
+      <translation>進階更新設定</translation>
     </message>
     <message>
       <location/>
@@ -2039,12 +2031,12 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_dialogs/multiple_layout_selection_dialog.ui"/>
       <source>Show all layouts</source>
-      <translation type="unfinished">Show all layouts</translation>
+      <translation>顯示所有佈局</translation>
     </message>
     <message>
       <location/>
       <source>Select Layouts</source>
-      <translation type="unfinished">Select Layouts</translation>
+      <translation>選取佈局</translation>
     </message>
   </context>
   <context>
@@ -2057,12 +2049,12 @@
     <message>
       <location/>
       <source>New Virtual Camera...</source>
-      <translation type="unfinished">New Virtual Camera...</translation>
+      <translation>新增虛擬攝影機...</translation>
     </message>
     <message>
       <location/>
       <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
-      <translation type="unfinished">&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</translation>
+      <translation>&quot;虛擬攝影機&quot; 是一個影像資料專用的虛擬空間, 可上傳到系統中的任一伺服器並讓所有使用者存取.</translation>
     </message>
   </context>
   <context>
@@ -2131,22 +2123,22 @@
     <message>
       <location/>
       <source>Level:</source>
-      <translation type="unfinished">Level:</translation>
+      <translation>級別:</translation>
     </message>
     <message>
       <location/>
       <source>ERROR</source>
-      <translation type="unfinished">ERROR</translation>
+      <translation>錯誤</translation>
     </message>
     <message>
       <location/>
       <source>WARNING</source>
-      <translation type="unfinished">WARNING</translation>
+      <translation>警告</translation>
     </message>
     <message>
       <location/>
       <source>INFO</source>
-      <translation type="unfinished">INFO</translation>
+      <translation>信息</translation>
     </message>
   </context>
   <context>
@@ -2295,7 +2287,7 @@
     <message>
       <location/>
       <source>Restart to the updated version when ready</source>
-      <translation type="unfinished">Restart to the updated version when ready</translation>
+      <translation>準備好後請重啟至更新版本</translation>
     </message>
   </context>
   <context>
@@ -2360,6 +2352,14 @@
       <location/>
       <source>The new System will have password and name from System:</source>
       <translation>新系統將從以下系統取得密碼和名稱:</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnMessageBox</name>
+    <message>
+      <location filename="../src/ui/dialogs/common/message_box.ui"/>
+      <source>Do not show this message again</source>
+      <translation>別再顯示此訊息</translation>
     </message>
   </context>
   <context>
@@ -2651,18 +2651,13 @@
     </message>
     <message>
       <location/>
-      <source>Filter TEST</source>
-      <translation type="unfinished">Filter TEST</translation>
-    </message>
-    <message>
-      <location/>
       <source>Nothing found</source>
       <translation>未找到任何內容</translation>
     </message>
     <message>
       <location/>
       <source>Drag any image or video file to the application window to play them</source>
-      <translation type="unfinished">Drag any image or video file to the application window to play them</translation>
+      <translation>請拖曳任一圖像或影像檔案至應用程式窗口播放</translation>
     </message>
   </context>
   <context>
@@ -2781,12 +2776,12 @@
     <message>
       <location/>
       <source>Limit session duration</source>
-      <translation type="unfinished">Limit session duration</translation>
+      <translation>限制登入時間</translation>
     </message>
     <message>
       <location/>
       <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
-      <translation type="unfinished">Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</translation>
+      <translation>水印僅顯示在非管理員使用者的即時影像，存檔和匯出影片上。您和其他管理員並不會看到。</translation>
     </message>
   </context>
   <context>
@@ -3031,7 +3026,7 @@
     <message>
       <location/>
       <source>Base forecast on data recorded during</source>
-      <translation type="unfinished">Base forecast on data recorded during</translation>
+      <translation>基礎預測的記錄數據</translation>
     </message>
   </context>
   <context>
@@ -3075,6 +3070,26 @@
       <location/>
       <source>Backup Settings...</source>
       <translation>備份設置...</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Analytics data will continue to be stored on the disabled storage.</source>
+      <translation>分析數據將續存於已停用的存儲中。</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</source>
+      <translation>將停止錄影到停用的儲存裝置上, 而且舊的錄影資料將繼續被刪除.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Recording was enabled on the USB storage</source>
+      <translation>已啟用錄影於USB儲存裝置上</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Analytics data can occupy tens of gigabytes of storage space. We recommend to choose other location for it instead of the system partition.</source>
+      <translation>分析數據可佔用數十GB的存儲空間。建議選擇其他位置, 不要存放於系統分區。</translation>
     </message>
   </context>
   <context>
@@ -3192,7 +3207,7 @@
     <message>
       <location/>
       <source>VMS Time</source>
-      <translation type="unfinished">VMS Time</translation>
+      <translation>VMS時間</translation>
     </message>
   </context>
   <context>
@@ -3200,17 +3215,17 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/system_administration/widgets/time_synchronization_widget.ui"/>
       <source>Sync Time with the Internet</source>
-      <translation type="unfinished">Sync Time with the Internet</translation>
+      <translation>與網路校時</translation>
     </message>
     <message>
       <location/>
       <source>VMS Time</source>
-      <translation type="unfinished">VMS Time</translation>
+      <translation>VMS時間</translation>
     </message>
     <message>
       <location/>
       <source>Do not sync time among servers</source>
-      <translation type="unfinished">Do not sync time among servers</translation>
+      <translation>不要在伺服器之間校時</translation>
     </message>
   </context>
   <context>
@@ -3318,7 +3333,7 @@
     <message>
       <location/>
       <source>Detect motion</source>
-      <translation type="unfinished">Detect motion</translation>
+      <translation>偵測移動</translation>
     </message>
   </context>
   <context>

@@ -297,6 +297,10 @@ private:
 
     void updatePlaybackMask();
 
+    void syncIfOutOfSyncWithLive(QnResourceWidget *widget);
+
+    void setTimeSliderWindowFromCalendar(milliseconds startMSec, milliseconds endMSec, bool extend);
+
 private:
     QPointer<QnWorkbenchStreamSynchronizer> m_streamSynchronizer;
     QTime m_updateSliderTimer;

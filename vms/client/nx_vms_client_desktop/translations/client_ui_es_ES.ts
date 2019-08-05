@@ -1969,14 +1969,6 @@
     </message>
   </context>
   <context>
-    <name>MessageBox</name>
-    <message>
-      <location filename="../src/ui/dialogs/common/message_box.ui"/>
-      <source>Do not show this message again</source>
-      <translation>No volver a mostrar este mensaje</translation>
-    </message>
-  </context>
-  <context>
     <name>MultiServerUpdatesWidget</name>
     <message>
       <location filename="../src/nx/vms/client/desktop/system_update/multi_server_updates_widget.ui"/>
@@ -2363,6 +2355,14 @@
     </message>
   </context>
   <context>
+    <name>QnMessageBox</name>
+    <message>
+      <location filename="../src/ui/dialogs/common/message_box.ui"/>
+      <source>Do not show this message again</source>
+      <translation>No volver a mostrar este mensaje</translation>
+    </message>
+  </context>
+  <context>
     <name>QnNotificationSoundManagerDialog</name>
     <message>
       <location filename="../src/ui/dialogs/notification_sound_manager_dialog.ui"/>
@@ -2651,11 +2651,6 @@
     </message>
     <message>
       <location/>
-      <source>Filter TEST</source>
-      <translation>Filtro PRUEBA</translation>
-    </message>
-    <message>
-      <location/>
       <source>Nothing found</source>
       <translation>No hubo resultado</translation>
     </message>
@@ -2781,12 +2776,12 @@
     <message>
       <location/>
       <source>Limit session duration</source>
-      <translation type="unfinished">Limit session duration</translation>
+      <translation>Limitar duración de la sesión</translation>
     </message>
     <message>
       <location/>
       <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
-      <translation type="unfinished">Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</translation>
+      <translation>Las marcas de agua se mostrarán a través de videos en vivo, archivados y exportados para usuarios no administradores. Usted y otros administradores no las verán.</translation>
     </message>
   </context>
   <context>
@@ -3075,6 +3070,26 @@
       <location/>
       <source>Backup Settings...</source>
       <translation>Configuración de copia de seguridad...</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Analytics data will continue to be stored on the disabled storage.</source>
+      <translation>Los datos analíticos seguirán almacenándose en el almacenamiento desactivado.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</source>
+      <translation>La grabación en la ubicación de almacenamiento deshabilitada se detendrá. Sin embargo, la eliminación de imágenes obsoletas continuará.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Recording was enabled on the USB storage</source>
+      <translation>La grabación fue habilitada en el almacenamiento USB</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Analytics data can occupy tens of gigabytes of storage space. We recommend to choose other location for it instead of the system partition.</source>
+      <translation>Los datos analíticos pueden ocupar decenas de gigabytes de espacio de almacenamiento. Recomendamos elegir otra ubicación para él en lugar de la partición del sistema.</translation>
     </message>
   </context>
   <context>

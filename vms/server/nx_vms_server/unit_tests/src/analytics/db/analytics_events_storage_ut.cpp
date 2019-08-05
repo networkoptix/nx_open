@@ -1,4 +1,5 @@
 #include <memory>
+#include <optional>
 
 #include <gtest/gtest.h>
 
@@ -12,6 +13,7 @@
 #include <analytics/db/config.h>
 
 #include <nx/vms/server/analytics/db/analytics_db.h>
+#include <nx/vms/server/analytics/db/object_searcher.h>
 #include <nx/vms/server/analytics/db/serializers.h>
 
 #include "analytics_storage_types.h"
@@ -35,6 +37,9 @@ public:
         m_settings.dbConnectionOptions.maxConnectionCount = 17;
 
         m_attributeDictionary.initialize(5, 2);
+
+        for (int i = 0; i < 3; ++i)
+            m_allowedDeviceIds.push_back(QnUuid::createUuid());
     }
 
 protected:
@@ -66,11 +71,10 @@ protected:
     {
         std::vector<nx::common::metadata::DetectionMetadataPacketPtr> packets;
 
-        packets.push_back(generateRandomPacket(1));
+        packets.push_back(generateRandomPacket());
         packets.push_back(std::make_shared<nx::common::metadata::DetectionMetadataPacket>(
             *packets.back()));
 
-        packets.back()->timestampUsec += 1000000;
         packets.back()->objects.front().bestShot = true;
 
         saveAnalyticsDataPackets(std::move(packets));
@@ -101,10 +105,12 @@ protected:
 
     void thenAllEventsCanBeRead()
     {
-        whenLookupObjects(Filter());
+        auto filter = buildEmptyFilter();
+
+        whenLookupObjects(filter);
 
         thenLookupSucceded();
-        andLookupResultMatches(Filter(), m_analyticsDataPackets);
+        andLookupResultMatches(filter, m_analyticsDataPackets);
     }
 
     void andLookupResultMatches(
@@ -140,8 +146,7 @@ protected:
 
         convertPacketsToObjects(analyticsDataPackets, &objects);
         groupObjects(&objects);
-        if (kUseTrackAggregation)
-            removeDuplicateAttributes(&objects);
+        removeDuplicateAttributes(&objects);
 
         return objects;
     }
@@ -152,7 +157,7 @@ protected:
     {
         for (auto objectIter = objects.begin(); objectIter != objects.end(); )
         {
-            if (!satisfiesFilter(filter, *objectIter))
+            if (!ObjectSearcher::satisfiesFilter(filter, *objectIter))
             {
                 objectIter = objects.erase(objectIter);
                 continue;
@@ -300,7 +305,7 @@ protected:
         {
             for (int i = 0; i < eventsPerDevice; ++i)
             {
-                auto packet = generateRandomPacket(1, &m_attributeDictionary);
+                auto packet = generateRandomPacket(&m_attributeDictionary);
                 packet->deviceId = deviceId;
                 if (m_allowedTimeRange.second > m_allowedTimeRange.first)
                 {
@@ -318,7 +323,7 @@ protected:
         if (analyticsDataPackets.empty())
         {
             for (int i = 0; i < 101; ++i)
-                analyticsDataPackets.push_back(generateRandomPacket(1));
+                analyticsDataPackets.push_back(generateRandomPacket());
         }
 
         std::sort(
@@ -387,6 +392,44 @@ protected:
         }
     }
 
+    common::metadata::DetectionMetadataPacketPtr generateRandomPacket(
+        AttributeDictionary* attributeDictionary = nullptr)
+    {
+        auto packet = test::generateRandomPacket(1, attributeDictionary);
+        if (m_lastTimestamp)
+        {
+            packet->timestampUsec =
+                *m_lastTimestamp + nx::utils::random::number<qint64>(1, 60000000);
+        }
+
+        NX_ASSERT(!m_allowedDeviceIds.empty());
+        packet->deviceId = nx::utils::random::choice(m_allowedDeviceIds);
+
+        m_lastTimestamp = packet->timestampUsec;
+
+        return packet;
+    }
+
+    void generateRandomPackets(int count)
+    {
+        for (int i = 0; i < count; ++i)
+            m_analyticsDataPackets.push_back(generateRandomPacket());
+
+        std::sort(
+            m_analyticsDataPackets.begin(), m_analyticsDataPackets.end(),
+            [](const auto& left, const auto& right)
+            {
+                return left->timestampUsec < right->timestampUsec;
+            });
+    }
+
+    Filter buildEmptyFilter()
+    {
+        Filter filter;
+        filter.deviceIds = allowedDeviceIds();
+        return filter;
+    }
+
 private:
     struct LookupResult
     {
@@ -398,7 +441,8 @@ private:
     Settings m_settings;
     std::vector<common::metadata::DetectionMetadataPacketPtr> m_analyticsDataPackets;
     nx::utils::SyncQueue<LookupResult> m_lookupResultQueue;
-    boost::optional<LookupResult> m_prevLookupResult;
+    std::optional<LookupResult> m_prevLookupResult;
+    std::optional<qint64> m_lastTimestamp;
 
     std::vector<QnUuid> m_allowedDeviceIds;
     std::pair<std::chrono::system_clock::time_point, std::chrono::system_clock::time_point>
@@ -407,21 +451,8 @@ private:
 
     bool initializeStorage()
     {
-        m_eventsStorage = std::make_unique<EventsStorage>();
+        m_eventsStorage = std::make_unique<EventsStorage>(nullptr);
         return m_eventsStorage->initialize(m_settings);
-    }
-
-    void generateRandomPackets(int count)
-    {
-        for (int i = 0; i < count; ++i)
-            m_analyticsDataPackets.push_back(generateRandomPacket(1));
-
-        std::sort(
-            m_analyticsDataPackets.begin(), m_analyticsDataPackets.end(),
-            [](const auto& left, const auto& right)
-            {
-                return left->timestampUsec < right->timestampUsec;
-            });
     }
 
     void flushData()
@@ -438,12 +469,9 @@ private:
         auto objects = toDetectedObjects(packets);
         objects = filterObjectsAndApplySortOrder(filter, std::move(objects));
 
-        if (kUseTrackAggregation)
-        {
-            // NOTE: Object box is stored in the DB with limited precision.
-            // So, lowering precision to that in the DB.
-            objects = applyTrackBoxPrecision(std::move(objects));
-        }
+        // NOTE: Object box is stored in the DB with limited precision.
+        // So, lowering precision to that in the DB.
+        objects = applyTrackBoxPrecision(std::move(objects));
 
         return objects;
     }
@@ -496,55 +524,16 @@ private:
     }
 
     bool satisfiesFilter(
-        const Filter& filter, const DetectedObject& detectedObject)
-    {
-        if (!filter.objectAppearanceId.isNull() && detectedObject.objectAppearanceId != filter.objectAppearanceId)
-            return false;
-
-        if (!filter.objectTypeId.empty() &&
-            std::find(
-                filter.objectTypeId.begin(), filter.objectTypeId.end(),
-                detectedObject.objectTypeId) == filter.objectTypeId.end())
-        {
-            return false;
-        }
-
-        if (!filter.freeText.isEmpty() &&
-            !matchAttributes(detectedObject.attributes, filter.freeText))
-        {
-            return false;
-        }
-
-        return true;
-    }
-
-    bool satisfiesFilter(
         const Filter& filter,
         const ObjectPosition& data)
     {
         if (!satisfiesCommonConditions(filter, data))
             return false;
 
-        if (filter.boundingBox.isNull())
+        if (!filter.boundingBox)
             return true;
 
-        if (kUseTrackAggregation)
-            return rectsIntersectToPrecision(filter.boundingBox, data.boundingBox);
-        else
-            return filter.boundingBox.intersects(data.boundingBox);
-    }
-
-    bool rectsIntersectToPrecision(const QRectF& one, const QRectF& two)
-    {
-        const auto translatedOne = translate(
-            one,
-            QSize(kTrackSearchResolutionX, kTrackSearchResolutionY));
-
-        const auto translatedTwo = translate(
-            two,
-            QSize(kTrackSearchResolutionX, kTrackSearchResolutionY));
-
-        return translatedOne.intersects(translatedTwo);
+        return rectsIntersectToSearchPrecision(*filter.boundingBox, data.boundingBox);
     }
 
     bool satisfiesFilter(
@@ -560,11 +549,11 @@ private:
                 return false;
         }
 
-        if (!filter.boundingBox.isNull())
+        if (filter.boundingBox)
         {
             bool intersects = false;
             for (const auto& object: data.objects)
-                intersects |= rectsIntersectToPrecision(filter.boundingBox, object.boundingBox);
+                intersects |= rectsIntersectToSearchPrecision(*filter.boundingBox, object.boundingBox);
             if (!intersects)
                 return false;
         }
@@ -586,7 +575,7 @@ private:
         {
             bool isFilterSatisfied = false;
             for (const auto& object: data.objects)
-                isFilterSatisfied |= matchAttributes(object.labels, filter.freeText);
+                isFilterSatisfied |= ObjectSearcher::matchAttributes(object.labels, filter.freeText);
             if (!isFilterSatisfied)
                 return false;
         }
@@ -597,40 +586,11 @@ private:
     template<typename T>
     bool satisfiesCommonConditions(const Filter& filter, const T& data)
     {
-        if (!filter.deviceIds.empty() && !nx::utils::contains(filter.deviceIds, data.deviceId))
+        if (!nx::utils::contains(filter.deviceIds, data.deviceId))
             return false;
 
-        if (!filter.timePeriod.isNull() &&
-            !filter.timePeriod.contains(data.timestampUsec / kUsecInMs))
-        {
+        if (!filter.timePeriod.contains(data.timestampUsec / kUsecInMs))
             return false;
-        }
-
-        return true;
-    }
-
-    bool matchAttributes(
-        const std::vector<nx::common::metadata::Attribute>& attributes,
-        const QString& filter)
-    {
-        const auto filterWords = filter.split(L' ');
-        // Attributes have to contain all words.
-        for (const auto& filterWord: filterWords)
-        {
-            bool found = false;
-            for (const auto& attribute: attributes)
-            {
-                if (attribute.name.indexOf(filterWord) != -1 ||
-                    attribute.value.indexOf(filterWord) != -1)
-                {
-                    found = true;
-                    break;
-                }
-            }
-
-            if (!found)
-                return false;
-        }
 
         return true;
     }
@@ -647,6 +607,7 @@ private:
                 detectedObject.objectAppearanceId = object.objectId;
                 detectedObject.objectTypeId = object.objectTypeId;
                 detectedObject.attributes = object.labels;
+                detectedObject.deviceId = packet->deviceId;
                 detectedObject.track.push_back(ObjectPosition());
                 ObjectPosition& objectPosition = detectedObject.track.back();
                 objectPosition.boundingBox = object.boundingBox;
@@ -715,9 +676,9 @@ private:
             if (!detectedObject.track.empty())
             {
                 detectedObject.firstAppearanceTimeUsec =
-                    detectedObject.track.begin()->timestampUsec;
+                    (detectedObject.track.begin()->timestampUsec / kUsecInMs) * kUsecInMs;
                 detectedObject.lastAppearanceTimeUsec =
-                    detectedObject.track.rbegin()->timestampUsec;
+                    (detectedObject.track.rbegin()->timestampUsec / kUsecInMs) * kUsecInMs;
             }
         }
     }
@@ -753,9 +714,6 @@ TEST_F(AnalyticsDb, storing_multiple_events_concurrently)
 
 TEST_F(AnalyticsDb, objects_best_shot_is_saved_and_reported)
 {
-    if (!kUseTrackAggregation)
-        return; // TODO: #ak Remove it after enabling kUseTrackAggregation in the repository.
-
     whenSaveObjectTrackContainingBestShot();
 
     thenAllEventsCanBeRead();
@@ -778,11 +736,15 @@ protected:
             return;
 
         generateVariousEvents();
+
+        m_filter = buildEmptyFilter();
     }
 
     void addRandomKnownDeviceIdToFilter()
     {
         ASSERT_FALSE(allowedDeviceIds().empty());
+        
+        m_filter.deviceIds.clear();
         m_filter.deviceIds.push_back(
             nx::utils::random::choice(allowedDeviceIds()));
     }
@@ -850,11 +812,19 @@ protected:
             nx::utils::random::number<float>(0, 1),
             nx::utils::random::number<float>(0, 1),
             nx::utils::random::number<float>(0, 1));
+
+        auto bottomRight = m_filter.boundingBox->bottomRight();
+        if (bottomRight.x() > 1.0)
+            bottomRight.setX(1.0);
+        if (bottomRight.y() > 1.0)
+            bottomRight.setY(1.0);
+
+        m_filter.boundingBox->setBottomRight(bottomRight);
     }
 
     void givenEmptyFilter()
     {
-        m_filter = Filter();
+        m_filter = buildEmptyFilter();
     }
 
     void givenRandomFilter()
@@ -889,10 +859,10 @@ protected:
         if (nx::utils::random::number<bool>())
         {
             addRandomBoundingBoxToFilter();
-            if (!m_filter.boundingBox.intersects(randomPacket->objects.front().boundingBox))
+            if (!m_filter.boundingBox->intersects(randomPacket->objects.front().boundingBox))
             {
                 m_filter.boundingBox =
-                    m_filter.boundingBox.united(randomPacket->objects.front().boundingBox);
+                    m_filter.boundingBox->united(randomPacket->objects.front().boundingBox);
             }
         }
 
@@ -916,6 +886,10 @@ protected:
     void givenObjectWithLongTrack()
     {
         using namespace std::chrono;
+
+        const auto startTime = system_clock::from_time_t(
+            analyticsDataPackets().back()->timestampUsec / 1000000) + hours(1);
+        setAllowedTimeRange(startTime, startTime + hours(24));
 
         m_specificObjectAppearanceId = QnUuid::createUuid();
         const auto deviceId = QnUuid::createUuid();
@@ -1065,7 +1039,7 @@ private:
     }
 };
 
-TEST_F(AnalyticsDbLookup, empty_filter_matches_all_events)
+TEST_F(AnalyticsDbLookup, empty_filter_matches_all_objects)
 {
     whenLookupByEmptyFilter();
     thenResultMatchesExpectations();
@@ -1193,14 +1167,21 @@ public:
 protected:
     void givenDetectedObjectsWithSameTimestamp()
     {
+        using namespace std::chrono;
+
+        const auto startTime = system_clock::from_time_t(
+            analyticsDataPackets().back()->timestampUsec / 1000000) + hours(1);
+        setAllowedTimeRange(startTime, startTime + hours(24));
+
         auto newPackets = generateEventsByCriteria();
-        newPackets.erase(std::next(newPackets.begin()), newPackets.end());
 
-        const auto existingPackets = analyticsDataPackets();
-        const auto& existingPacket = nx::utils::random::choice(existingPackets);
-
-        newPackets.front()->deviceId = existingPacket->deviceId;
-        newPackets.front()->timestampUsec = existingPacket->timestampUsec;
+        std::for_each(
+            std::next(newPackets.begin()), newPackets.end(),
+            [existingPacket = newPackets.front()](auto& packet)
+            {
+                packet->deviceId = existingPacket->deviceId;
+                packet->timestampUsec = existingPacket->timestampUsec;
+            });
 
         saveAnalyticsDataPackets(std::move(newPackets));
         aggregateAnalyticsDataPacketsByTimestamp();
@@ -1208,7 +1189,13 @@ protected:
 
     void givenObjectsWithInterleavedTracks()
     {
+        using namespace std::chrono;
+
         constexpr int objectCount = 3;
+
+        const auto startTime = system_clock::from_time_t(
+            analyticsDataPackets().back()->timestampUsec / 1000000) + hours(1);
+        setAllowedTimeRange(startTime, startTime + hours(24));
 
         auto newPackets = generateEventsByCriteria();
 
@@ -1235,21 +1222,41 @@ protected:
         filter().deviceIds = {deviceId};
     }
 
+    void givenRandomCursorFilter()
+    {
+        givenRandomFilter();
+
+        if (filter().deviceIds.size() > 1)
+            filter().deviceIds.erase(std::next(filter().deviceIds.begin()), filter().deviceIds.end());
+
+        filter().objectTypeId.clear();
+        filter().objectAppearanceId = QnUuid();
+        filter().boundingBox = std::nullopt;
+        filter().freeText.clear();
+    }
+
     void whenReadDataUsingCursor()
     {
-        whenCreateCursor();
-        thenCursorIsCreated();
+        m_packetsRead.clear();
+
+        // NOTE: Currently, the cursor is forward only.
+        setSortOrder(Qt::AscendingOrder);
+
+        // NOTE: Limiting object's track when using cursor does not make any sense.
+        // It will just skip data.
+        filter().maxTrackSize = 0;
+
+        if (!m_cursor)
+            createCursor();
 
         readAllDataFromCursor();
     }
 
     void whenCreateCursor()
     {
-        using namespace std::placeholders;
-
         eventsStorage().createLookupCursor(
             filter(),
-            std::bind(&AnalyticsDbCursor::saveCursor, this, _1, _2));
+            [this](auto&&... args) { saveCursor(std::forward<decltype(args)>(args)...); });
     }
 
     void thenCursorIsCreated()
@@ -1260,17 +1267,13 @@ protected:
 
     void thenResultMatchesExpectations()
     {
-        auto filteredPackets = filterPackets(filter(), analyticsDataPackets());
-        filteredPackets = sortPacketsByTimestamp(
-            std::move(filteredPackets),
-            Qt::SortOrder::DescendingOrder);
-
-        if (filter().maxObjectsToSelect > 0 && (int)filteredPackets.size() > filter().maxObjectsToSelect)
-            filteredPackets.erase(filteredPackets.begin() + filter().maxObjectsToSelect, filteredPackets.end());
-
-        auto expected = sortPacketsByTimestamp(
-            std::move(filteredPackets),
+        auto expected = filterPackets(filter(), analyticsDataPackets());
+        expected = sortPacketsByTimestamp(
+            std::move(expected),
             filter().sortOrder);
+
+        if (filter().maxObjectsToSelect > 0 && (int)expected.size() > filter().maxObjectsToSelect)
+            expected.erase(expected.begin() + filter().maxObjectsToSelect, expected.end());
 
         sortObjectsById(&expected);
 
@@ -1294,6 +1297,17 @@ protected:
     void andObjectsWithSameTimestampAreDeliveredInSinglePacket()
     {
         // TODO
+    }
+
+    void createCursor()
+    {
+        whenCreateCursor();
+        thenCursorIsCreated();
+    }
+
+    void addMoreData()
+    {
+        saveAnalyticsDataPackets(generateEventsByCriteria());
     }
 
 private:
@@ -1344,9 +1358,7 @@ TEST_F(AnalyticsDbCursor, reads_all_available_data)
 
 TEST_F(AnalyticsDbCursor, reads_all_matched_data)
 {
-    givenRandomFilter();
-    // NOTE: Currently, the cursor is forward only.
-    setSortOrder(Qt::AscendingOrder);
+    givenRandomCursorFilter();
 
     whenReadDataUsingCursor();
     thenResultMatchesExpectations();
@@ -1369,6 +1381,20 @@ TEST_F(AnalyticsDbCursor, interleaved_tracks_are_reported_interleaved)
     thenResultMatchesExpectations();
 }
 
+TEST_F(AnalyticsDbCursor, recreated_cursor_is_able_to_access_new_data)
+{
+    createCursor();
+
+    addMoreData();
+    whenReadDataUsingCursor();
+
+    addMoreData();
+    createCursor();
+
+    whenReadDataUsingCursor();
+    thenResultMatchesExpectations();
+}
+
 // TEST_F(AnalyticsDbCursor, attribute_change_history_is_preserved)
 
 //-------------------------------------------------------------------------------------------------
@@ -1383,20 +1409,26 @@ protected:
     void givenAggregationPeriodEqualToTheWholeArchivePeriod()
     {
         const auto allTimePeriods = expectedLookupResult();
-        const auto archiveLength =
-            allTimePeriods.back().endTime() - allTimePeriods.front().startTime();
+        if (!allTimePeriods.isEmpty())
+        {
+            const auto archiveLength =
+                allTimePeriods.back().endTime() - allTimePeriods.front().startTime();
 
-        m_lookupOptions.detailLevel = archiveLength;
+            m_lookupOptions.detailLevel = archiveLength;
+        }
     }
 
     void givenFilterWithTimePeriod()
     {
         const auto allTimePeriods = expectedLookupResult();
-        const auto archiveLength =
-            allTimePeriods.back().endTime() - allTimePeriods.front().startTime();
+        if (!allTimePeriods.isEmpty())
+        {
+            const auto archiveLength =
+                allTimePeriods.back().endTime() - allTimePeriods.front().startTime();
 
-        filter().timePeriod.setStartTime(allTimePeriods.front().startTime() + archiveLength / 3);
-        filter().timePeriod.setDuration(archiveLength * 2 / 3);
+            filter().timePeriod.setStartTime(allTimePeriods.front().startTime() + archiveLength / 3);
+            filter().timePeriod.setDuration(archiveLength * 2 / 3);
+        }
     }
 
     void givenRandomLookupOptions()
@@ -1407,7 +1439,10 @@ protected:
 
     void whenLookupTimePeriods()
     {
-        using namespace std::placeholders;
+        if (filter().boundingBox)
+            m_lookupOptions.region += translateToSearchGrid(*filter().boundingBox);
+
+        filter().sortOrder = Qt::AscendingOrder;
 
         eventsStorage().lookupTimePeriods(
             filter(),
@@ -1434,17 +1469,16 @@ protected:
         auto expected = expectedLookupResult();
         auto actualTimePeriods = std::get<1>(m_prevLookupResult);
 
-        if (kUseTrackAggregation &&
-            (!filter().boundingBox.isEmpty() || !filter().freeText.isEmpty() ||
-             !filter().objectAppearanceId.isNull() || !filter().objectTypeId.empty()))
-        {
-            // NOTE: For this type of filters supported precision is the following:
-            // start time - a second
-            // duration - kTrackAggregationPeriod.
+        // NOTE: Time period fetch precision is the following:
+        // start time - a second
+        // duration - kTrackAggregationPeriod.
 
-            roundTimePeriods(&expected);
-            roundTimePeriods(&actualTimePeriods);
-        }
+        roundTimePeriods(&expected);
+        expected = QnTimePeriodList::aggregateTimePeriodsUnconstrained(
+            std::move(expected),
+            std::max<milliseconds>(m_lookupOptions.detailLevel, kMinTimePeriodAggregationPeriod));
+
+        roundTimePeriods(&actualTimePeriods);
 
         assertTimePeriodsMatchUpToAggregationPeriod(expected, actualTimePeriods);
     }
@@ -1456,7 +1490,7 @@ protected:
 
         for (int i = 0; i < left.size(); ++i)
         {
-            ASSERT_LT(
+            ASSERT_LE(
                 std::chrono::abs(left[i].startTime() - right[i].startTime()),
                 kTrackAggregationPeriod);
         }
@@ -1474,19 +1508,28 @@ private:
 
     QnTimePeriodList expectedLookupResult()
     {
-        return filterTimePeriods(
+        auto periods = filterTimePeriods(
             filter(),
             toTimePeriods(
                 filterPackets(filter(), analyticsDataPackets()),
                 m_lookupOptions));
+
+        if (filter().sortOrder == Qt::SortOrder::DescendingOrder)
+        {
+            std::sort(
+                periods.begin(), periods.end(),
+                [](const auto& left, const auto& right) { return left.startTime() > right.startTime(); });
+        }
+
+        if (filter().maxObjectsToSelect > 0 && periods.size() > filter().maxObjectsToSelect)
+            periods.erase(periods.begin() + filter().maxObjectsToSelect, periods.end());
+
+        return periods;
     }
 
     void roundTimePeriods(QnTimePeriodList* periods)
     {
         using namespace std::chrono;
-
-        *periods = QnTimePeriodList::aggregateTimePeriodsUnconstrained(
-            std::move(*periods), kTrackAggregationPeriod);
 
         // Rounding to the aggregation period.
         for (auto& timePeriod: *periods)
@@ -1495,15 +1538,15 @@ private:
             if (timePeriod.duration() < kTrackAggregationPeriod)
                 timePeriod.setDuration(kTrackAggregationPeriod);
         }
+
+        *periods = QnTimePeriodList::aggregateTimePeriodsUnconstrained(
+            std::move(*periods), kTrackAggregationPeriod);
     }
 
     QnTimePeriodList filterTimePeriods(
         const Filter& filter,
         const QnTimePeriodList& timePeriods)
     {
-        if (filter.timePeriod.isEmpty())
-            return timePeriods;
-
         QnTimePeriodList result;
         for (const auto& timePeriod: timePeriods)
         {
@@ -1556,7 +1599,7 @@ TEST_F(AnalyticsDbTimePeriodsLookup, selecting_all_periods_by_device)
 {
     givenEmptyFilter();
     addRandomKnownDeviceIdToFilter();
-    
+
     whenLookupTimePeriods();
     thenResultMatchesExpectations();
 }
@@ -1579,12 +1622,25 @@ TEST_F(
 
 TEST_F(AnalyticsDbTimePeriodsLookup, with_aggregation_period)
 {
+    addRandomKnownDeviceIdToFilter();
     givenRandomLookupOptions();
+
     whenLookupTimePeriods();
+
     thenResultMatchesExpectations();
 }
 
-TEST_F(AnalyticsDbTimePeriodsLookup, DISABLED_with_random_filter)
+TEST_F(AnalyticsDbTimePeriodsLookup, with_region)
+{
+    givenEmptyFilter();
+    addRandomBoundingBoxToFilter();
+
+    whenLookupTimePeriods();
+
+    thenResultMatchesExpectations();
+}
+
+TEST_F(AnalyticsDbTimePeriodsLookup, with_random_filter)
 {
     givenRandomFilter();
     whenLookupTimePeriods();
@@ -1649,20 +1705,22 @@ protected:
     {
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
-        whenLookupObjects(Filter());
+        const auto filter = buildEmptyFilter();
+
+        whenLookupObjects(filter);
         thenLookupSucceded();
-        andLookupResultMatches(Filter(), analyticsDataPackets());
+        andLookupResultMatches(filter, analyticsDataPackets());
     }
 
     void thenDataIsExpected()
     {
-        Filter filter;
+        auto filter = buildEmptyFilter();
         filter.timePeriod.setStartTime(m_oldestAvailableDataTimestamp);
         filter.timePeriod.durationMs = QnTimePeriod::kInfiniteDuration;
 
         for (;;)
         {
-            whenLookupObjects(Filter());
+            whenLookupObjects(buildEmptyFilter());
             thenLookupSucceded();
             if (isLookupResultEquals(filter, analyticsDataPackets()))
                 return;

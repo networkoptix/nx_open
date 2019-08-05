@@ -1,0 +1,7 @@
+module Nx.Motion
+
+singleton MotionDefs 1.0 MotionDefs.qml
+
+MotionSettingsItem 1.0 MotionSettingsItem.qml
+MotionRegionsOverlay 1.0 MotionRegionsOverlay.qml
+MotionOverlay 1.0 MotionOverlay.qml

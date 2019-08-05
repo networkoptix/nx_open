@@ -118,7 +118,7 @@ std::optional<DetectedObject> ObjectCache::getObjectById(const QnUuid& objectGui
     return std::nullopt;
 }
 
-void ObjectCache::setObjectIdInDb(const QnUuid& objectId, long long dbId)
+void ObjectCache::setObjectIdInDb(const QnUuid& objectId, int64_t dbId)
 {
     QnMutexLocker lock(&m_mutex);
 
@@ -129,7 +129,7 @@ void ObjectCache::setObjectIdInDb(const QnUuid& objectId, long long dbId)
     }
 }
 
-long long ObjectCache::dbIdFromObjectId(const QnUuid& objectId) const
+int64_t ObjectCache::dbIdFromObjectId(const QnUuid& objectId) const
 {
     QnMutexLocker lock(&m_mutex);
 
@@ -144,7 +144,7 @@ long long ObjectCache::dbIdFromObjectId(const QnUuid& objectId) const
 
 void ObjectCache::saveObjectGuidToAttributesId(
     const QnUuid& objectId,
-    long long attributesId)
+    int64_t attributesId)
 {
     QnMutexLocker lock(&m_mutex);
 
@@ -155,7 +155,7 @@ void ObjectCache::saveObjectGuidToAttributesId(
     }
 }
 
-long long ObjectCache::getAttributesIdByObjectGuid(const QnUuid& objectId) const
+int64_t ObjectCache::getAttributesIdByObjectGuid(const QnUuid& objectId) const
 {
     QnMutexLocker lock(&m_mutex);
 
@@ -200,8 +200,10 @@ void ObjectCache::updateObject(
 
     if (detectedObject.bestShot)
     {
+        // "Best shot" packet contains only information about the best shot, not a real object movement.
         objectContext.object.bestShot.timestampUsec = packet.timestampUsec;
         objectContext.object.bestShot.rect = detectedObject.boundingBox;
+        return;
     }
 
     objectContext.object.lastAppearanceTimeUsec = packet.timestampUsec;

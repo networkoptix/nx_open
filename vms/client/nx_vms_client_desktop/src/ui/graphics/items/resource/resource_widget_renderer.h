@@ -12,7 +12,7 @@
 #include <utils/color_space/image_correction.h>
 #include <ui/fisheye/fisheye_ptz_controller.h>
 
-class QGLContext;
+class QOpenGLWidget;
 class DecodedPictureToOpenGLUploader;
 class QnGLRenderer;
 
@@ -24,7 +24,7 @@ public:
     /**
      * @param context must not be null.
      */
-    QnResourceWidgetRenderer(QObject* parent, QGLContext* context);
+    QnResourceWidgetRenderer(QObject* parent, QOpenGLWidget* widget);
     virtual ~QnResourceWidgetRenderer() override;
 
     void setChannelCount(int channelCount);
@@ -76,7 +76,7 @@ public:
 
     QSize sourceSize() const;
 
-    const QGLContext* glContext() const;
+    QOpenGLWidget* openGLWidget() const;
 
     bool isDisplaying(const QSharedPointer<CLVideoDecoderOutput>& image) const override;
 
@@ -127,7 +127,7 @@ private:
     /** Current screen size of a single channel, in pixels. */
     QSize m_channelScreenSize;
 
-    QGLContext* m_glContext;
+    QOpenGLWidget* m_openGLWidget;
 
     ScreenshotInterface* m_screenshotInterface = nullptr;
     int m_panoFactor = 1;

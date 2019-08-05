@@ -69,7 +69,14 @@
         if (level) {
           records.push({level: LEVELS.indexOf(level), text: line.trim()})
         } else {
-          records[records.length -1].text += '\n' + line
+          if (!records || //< Stdout preambula.
+            line.indexOf('.ini [') != -1 || //< Ini config.
+            line.indexOf(': Failure') != -1 //< GTest error aoutput.
+          ) {
+            records.push({level: LEVELS.indexOf('ERROR'), text: line.trim()})
+          }else {
+            records[records.length -1].text += '\n' + line
+          }
         }
       }
       return records

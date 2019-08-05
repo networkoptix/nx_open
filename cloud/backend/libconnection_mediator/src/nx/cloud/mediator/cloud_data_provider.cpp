@@ -86,7 +86,7 @@ static nx::cloud::db::api::ConnectionFactory* makeConnectionFactory(
     auto factory = createConnectionFactory();
     if (factory && cdbUrl)
     {
-        NX_ALWAYS(typeid(nx::cloud::db::api::ConnectionFactory), lm("set url %1"), cdbUrl);
+        NX_INFO(typeid(nx::cloud::db::api::ConnectionFactory), "set url %1", cdbUrl);
         factory->setCloudUrl(cdbUrl->toString().toStdString());
     }
     return factory;
@@ -142,7 +142,7 @@ void CloudDataProvider::updateSystemsAsync()
             nx::cloud::db::api::SystemDataExList systems)
         {
             QnMutexLocker lock(&m_mutex);
-        
+
             if (code != nx::cloud::db::api::ResultCode::ok)
             {
                 NX_UTILS_LOG((std::chrono::steady_clock::now() - m_startTime > m_startTimeout)
@@ -154,7 +154,7 @@ void CloudDataProvider::updateSystemsAsync()
             {
                 saveSystems(std::move(systems));
             }
-            
+
             if (!m_terminated)
                 m_timer.start(m_updateInterval, [this]() { updateSystemsAsync(); });
         });

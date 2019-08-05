@@ -1,8 +1,12 @@
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+
 #include "utils.h"
 
 #include <vector>
 #include <string>
 #include <algorithm>
+#include <climits>
+#include <cerrno>
 
 #if defined(_WIN32)
     #define NOMINMAX //< Needed to prevent windows.h define macros min() and max().
@@ -44,6 +48,23 @@ std::string baseName(std::string path)
         const size_t slashPos = path.rfind('/');
         return (slashPos == std::string::npos) ? path : path.substr(slashPos + 1);
     #endif
+}
+
+std::string getProcessName()
+{
+    std::string processName =
+        nx::kit::utils::baseName(nx::kit::utils::getProcessCmdLineArgs()[0]);
+
+    #if defined(_WIN32)
+        const std::string exeExt = ".exe";
+        if (processName.size() > exeExt.size()
+            && processName.substr(processName.size() - exeExt.size()) == exeExt)
+        {
+            processName = processName.substr(0, processName.size() - exeExt.size());
+        }
+    #endif
+
+    return processName;
 }
 
 const std::vector<std::string>& getProcessCmdLineArgs()
@@ -150,6 +171,56 @@ std::string toString(std::nullptr_t ptr)
 std::string toString(bool b)
 {
     return b ? "true" : "false";
+}
+
+bool fromString(const std::string& s, int* value)
+{
+    if (!value || s.empty())
+        return false;
+
+    // NOTE: std::stoi() is missing on Android, thus, using std::strtol().
+    char* pEnd = nullptr;
+    errno = 0; //< Required before std::strtol().
+    const long v = std::strtol(s.c_str(), &pEnd, /*base*/ 0);
+
+    if (v > INT_MAX || v < INT_MIN || errno != 0 || *pEnd != '\0')
+        return false;
+
+    *value = (int) v;
+    return true;
+}
+
+bool fromString(const std::string& s, double* value)
+{
+    if (!value || s.empty())
+        return false;
+
+    // NOTE: std::stod() is missing on Android, thus, using std::strtod().
+    char* pEnd = nullptr;
+    errno = 0; //< Required before std::strtod().
+    const double v = std::strtod(s.c_str(), &pEnd);
+
+    if (errno == ERANGE || *pEnd != '\0')
+        return false;
+
+    *value = v;
+    return true;
+}
+
+bool fromString(const std::string& s, float* value)
+{
+    if (!value || s.empty())
+        return false;
+
+    // NOTE: std::stof() and std::strtof() are missing on Android, thus, using std::strtod().
+    char* pEnd = nullptr;
+    errno = 0; //< Required before std::strtod().
+    const float v = (float) std::strtod(s.c_str(), &pEnd);
+    if (errno == ERANGE || *pEnd != '\0')
+        return false;
+
+    *value = (float) v;
+    return true;
 }
 
 } // namespace utils

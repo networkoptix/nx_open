@@ -71,7 +71,7 @@ Pane
         {
             id: addressErrorPanel
             width: parent.width
-            opened: displayAddressError
+            opened: text.length
         }
 
         Item
@@ -114,7 +114,7 @@ Pane
         {
             id: loginErrorPanel
             width: parent.width
-            opened: displayLoginError && text
+            opened: text.length
         }
 
         TextField
@@ -141,7 +141,7 @@ Pane
         {
             id: passwordErrorPanel
             width: parent.width
-            opened: displayPasswordError && text
+            opened: text.length
         }
     }
 

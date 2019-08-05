@@ -7,6 +7,7 @@
 #include <QtCore/QUrl>
 #include <QtNetwork/QAuthenticator>
 
+#include <nx/sdk/helpers/ptr.h>
 #include <nx/sdk/analytics/i_device_agent.h>
 #include <nx/network/http/http_async_client.h>
 #include <nx/network/http/test_http_server.h>

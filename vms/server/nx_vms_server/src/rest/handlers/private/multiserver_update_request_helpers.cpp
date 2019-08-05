@@ -3,6 +3,7 @@
 #include <media_server/media_server_module.h>
 #include <common/common_module.h>
 #include <rest/server/json_rest_result.h>
+#include <api/model/storage_space_reply.h>
 
 namespace detail {
 
@@ -65,6 +66,37 @@ void checkUpdateStatusRemotely(
         reply->append(nx::update::Status(
             offlineServer->getId(), nx::update::Status::Code::offline));
     }
+}
+
+void getStoragesDataRemotely(
+    const IfParticipantPredicate& ifParticipantPredicate,
+    QnMediaServerModule* serverModule,
+    nx::update::storage::ServerToStoragesList* reply,
+    QnMultiserverRequestContext<QnEmptyRequestData>* context)
+{
+    static const QString kStorageInfoPath = "/api/storageSpace?ownedOnly=true";
+    std::unordered_map<QnUuid, QnStorageSpaceDataList> serverToStorages;
+    auto mergeFunction =
+        [serverModule, reply, &serverToStorages](
+            const QnUuid & serverId,
+            bool success,
+            QnJsonRestResult& result,
+            QnJsonRestResult&)
+    {
+        if (success)
+        {
+            const auto storageReply = result.deserialized<QnStorageSpaceReply>();
+            serverToStorages[serverId].append(storageReply.storages);
+        }
+    };
+
+    QnJsonRestResult result;
+    requestRemotePeers(
+        serverModule->commonModule(), kStorageInfoPath, result, context, mergeFunction,
+        ifParticipantPredicate);
+
+    for (const auto& p: serverToStorages)
+        reply->push_back(nx::update::storage::ServerToStorages(p.first, p.second));
 }
 
 IfParticipantPredicate makeIfParticipantPredicate(nx::CommonUpdateManager* updateManager)

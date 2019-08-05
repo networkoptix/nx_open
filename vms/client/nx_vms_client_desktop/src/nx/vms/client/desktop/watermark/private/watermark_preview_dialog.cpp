@@ -9,6 +9,7 @@
 #include <nx/core/watermark/watermark_images.h>
 
 #include <ui/style/helper.h>
+#include <ui/style/skin.h>
 
 namespace nx::vms::client::desktop {
 
@@ -19,7 +20,7 @@ const QString kPreviewUsername = "username";
 WatermarkPreviewDialog::WatermarkPreviewDialog(QWidget* parent):
     QnButtonBoxDialog(parent),
     ui(new Ui::WatermarkPreviewDialog),
-    m_baseImage(new QPixmap(":/skin/system_settings/watermark_preview.png"))
+    m_baseImage(qnSkin->pixmap(":/skin/system_settings/watermark_preview.jpg"))
 {
     ui->setupUi(this);
 
@@ -70,14 +71,22 @@ void WatermarkPreviewDialog::updateDataFromControls()
 
 void WatermarkPreviewDialog::drawPreview()
 {
-    const QSize imageSize = m_baseImage->size() * devicePixelRatioF();
-    QPixmap image = m_baseImage->scaled(imageSize, Qt::KeepAspectRatio,Qt::SmoothTransformation);
+    QPixmap image = m_baseImage;
     const auto watermark = core::createWatermarkImage({m_settings, kPreviewUsername}, QSize(1920, 1080));
+
+    // Draw watermark in logical coordinates.
+    const QRectF dest(
+        0.0,
+        0.0,
+        image.width() / image.devicePixelRatio(),
+        image.height() / image.devicePixelRatio());
+    const QRectF src(0.0, 0.0, watermark.width(), watermark.height());
+
     QPainter painter(&image);
     painter.setRenderHint(QPainter::SmoothPixmapTransform);
-    painter.drawPixmap(image.rect(), watermark, watermark.rect());
+    painter.drawPixmap(dest, watermark, src);
     painter.end();
-    image.setDevicePixelRatio(devicePixelRatioF()); //< This should go after drawPixmap(watermark).
+
     ui->image->setPixmap(image);
 }
 

@@ -53,7 +53,7 @@ Page
                         [
                             "Keep",
                             { "id": "DELETE", "text": qsTr("Delete") }
-                        ])
+                        ], true)
 
                     dialog.buttonClicked.connect(
                         function(buttonId)

@@ -7,7 +7,7 @@
 #include <QtWidgets/QMenu>
 
 #include <api/helpers/chunks_request_data.h>
-#include <api/media_server_connection.h>
+#include <api/server_rest_connection.h>
 #include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
@@ -30,6 +30,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/log/log_message.h>
 #include <nx/utils/scope_guard.h>
+#include <nx/utils/guarded_callback.h>
 #include <nx/vms/event/event_fwd.h>
 
 #include <nx/vms/client/desktop/ini.h>
@@ -141,7 +142,7 @@ QVariant MotionSearchListModel::Private::data(const QModelIndex& index, int role
 
         case Qn::PreviewStreamSelectionRole:
             return QVariant::fromValue(
-                nx::api::CameraImageRequest::StreamSelectionMode::sameAsMotion);
+                nx::api::ImageRequest::StreamSelectionMode::sameAsMotion);
 
         case Qn::ContextMenuRole:
             return QVariant::fromValue(contextMenu(chunk));
@@ -291,6 +292,7 @@ rest::Handle MotionSearchListModel::Private::getMotion(
     request.groupBy = QnChunksRequestData::GroupBy::cameraId;
     request.sortOrder = order;
     request.limit = limit;
+    request.pickRequestVersion(q->commonModule());
 
     request.filter = q->cameraSet()->type() != ManagedCameraSet::Type::single || q->isFilterEmpty()
         ? QString()
@@ -304,12 +306,23 @@ rest::Handle MotionSearchListModel::Private::getMotion(
         QVariant::fromValue(request.sortOrder).toString(),
         request.limit);
 
-    return server->apiConnection()->recordedTimePeriods(request, this,
-        SLOT(processReceivedTimePeriods(int, const MultiServerPeriodDataList &, int)));
+    if (auto connection = server->restConnection())
+    {
+        return connection->recordedTimePeriods(request, nx::utils::guarded(this,
+            [this](bool status, int handle, MultiServerPeriodDataList response)
+            {
+                processReceivedTimePeriods(status, handle, response);
+            }));
+    }
+    else
+    {
+        NX_ERROR(q, "Server connection is unavailable");
+    }
+    return 0;
 }
 
-void MotionSearchListModel::Private::processReceivedTimePeriods(
-    int status, const MultiServerPeriodDataList& timePeriods, int requestId)
+void MotionSearchListModel::Private::processReceivedTimePeriods(bool success, int requestId,
+    const MultiServerPeriodDataList& timePeriods)
 {
     NX_ASSERT(requestId);
     if (!requestId)
@@ -330,8 +343,6 @@ void MotionSearchListModel::Private::processReceivedTimePeriods(
 
         ++source;
     }
-
-    const bool success = status == 0;
 
     if (requestId == currentRequest().id)
     {
@@ -375,7 +386,7 @@ void MotionSearchListModel::Private::processReceivedTimePeriods(
         auto periodToCommit = QnTimePeriod::fromInterval(
             data.back().period.startTime(), data.front().period.startTime());
 
-        if (data.size() >= m_liveFetch.batchSize)
+        if ((long)data.size() >= m_liveFetch.batchSize)
         {
             periodToCommit.truncateFront(periodToCommit.startTimeMs + 1);
             q->clear(); //< Otherwise there will be a gap between live and archive events.

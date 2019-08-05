@@ -130,7 +130,6 @@ struct ResourceThumbnailProvider::Private
                 const auto camera = value.resource.dynamicCast<QnVirtualCameraResource>();
                 NX_ASSERT(camera);
                 nx::api::CameraImageRequest cameraRequest(camera, request);
-                cameraRequest.streamSelectionMode = streamSelectionMode;
 
                 if (auto provider = qobject_cast<CameraThumbnailProvider*>(baseProvider.get()))
                     provider->setRequestData(cameraRequest);
@@ -217,7 +216,6 @@ struct ResourceThumbnailProvider::Private
 
     QScopedPointer<ImageProvider> baseProvider;
     nx::api::ResourceImageRequest request;
-    nx::api::CameraImageRequest::StreamSelectionMode streamSelectionMode;
 
     static QCache<PlaceholderKey, QImage> placeholders;
 };
@@ -249,24 +247,6 @@ void ResourceThumbnailProvider::setRequestData(const nx::api::ResourceImageReque
     d->updateRequest(this, request);
 }
 
-nx::api::CameraImageRequest::StreamSelectionMode
-    ResourceThumbnailProvider::streamSelectionMode() const
-{
-    return d->streamSelectionMode;
-}
-
-void ResourceThumbnailProvider::setStreamSelectionMode(
-    nx::api::CameraImageRequest::StreamSelectionMode value)
-{
-    if (d->streamSelectionMode == value)
-        return;
-
-    d->streamSelectionMode = value;
-
-    if (d->request.resource.dynamicCast<QnVirtualCameraResource>())
-        d->updateRequest(this, d->request);
-}
-
 QImage ResourceThumbnailProvider::image() const
 {
     return d->baseProvider ? d->baseProvider->image() : QImage();
@@ -280,6 +260,11 @@ QSize ResourceThumbnailProvider::sizeHint() const
 Qn::ThumbnailStatus ResourceThumbnailProvider::status() const
 {
     return d->baseProvider ? d->baseProvider->status() : Qn::ThumbnailStatus::Invalid;
+}
+
+bool ResourceThumbnailProvider::tryLoad()
+{
+    return d->baseProvider ? d->baseProvider->tryLoad() : false;
 }
 
 void ResourceThumbnailProvider::doLoadAsync()

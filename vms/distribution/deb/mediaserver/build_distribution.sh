@@ -9,6 +9,11 @@ distrib_loadConfig "build_distribution.conf"
 WORK_DIR="server_build_distribution_tmp"
 LOG_FILE="$LOGS_DIR/server_build_distribution.log"
 
+filesCountInDir()
+{
+    ls -Aq "$1" |wc -w
+}
+
 # Strip binaries and remove rpath.
 stripIfNeeded() # dir
 {
@@ -123,7 +128,7 @@ copyFiles()
     echo "Copying generic files"
 
     if [[ -d $FILES_DIR/$TARGET_DEVICE ]] \
-        && (( $(ls -Aq "$FILES_DIR/$TARGET_DEVICE" |wc -w) > 0 ))
+        && (( $(filesCountInDir "$FILES_DIR/$TARGET_DEVICE") > 0 ))
     then
        cp -r "$FILES_DIR/$TARGET_DEVICE/"* "$STAGE_MODULE/"
     fi
@@ -276,13 +281,6 @@ createUpdateZip() # file.deb
     echo "  Creating symlink to .deb"
     ln -s "$DEB_FILE" "$ZIP_DIR/"
 
-    local DEB
-    for DEB in "$BUILD_DIR/deb"/*
-    do
-        echo "  Copying $(basename "$DEB")"
-        cp -r "$DEB" "$ZIP_DIR/"
-    done
-
     local FILE="update/install.sh"
     if [[ -f $FILE ]]
     then
@@ -290,7 +288,7 @@ createUpdateZip() # file.deb
         cp -r "$FILE" "$ZIP_DIR/"
     fi
 
-    if [[ -d update/$TARGET_DEVICE ]] && (( $(ls -Aq "update/$TARGET_DEVICE" |wc -w) > 0 ))
+    if [[ -d update/$TARGET_DEVICE ]] && (( $(filesCountInDir "update/$TARGET_DEVICE") > 0 ))
     then
         for FILE in "update/$TARGET_DEVICE/"*
         do
@@ -300,7 +298,9 @@ createUpdateZip() # file.deb
     fi
 
     cp -r "update/update.json" "$ZIP_DIR/update.json"
+    cp "package.json" "$ZIP_DIR/"
     distrib_createArchive "$DISTRIBUTION_OUTPUT_DIR/$UPDATE_ZIP" "$ZIP_DIR" zip -r
+    rm "$ZIP_DIR/package.json" #< Legacy RPI/Bananapi packages does not need this file.
 
     if [[ $TARGET_DEVICE == "linux_arm32" ]]
     then

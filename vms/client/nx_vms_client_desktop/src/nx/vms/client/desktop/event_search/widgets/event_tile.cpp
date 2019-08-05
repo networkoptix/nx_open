@@ -29,9 +29,6 @@ using namespace std::chrono;
 
 namespace {
 
-// Delay after which preview is initially requested.
-static constexpr milliseconds kPreviewLoadDelay = 100ms;
-
 // Delay after which preview is requested again in case of receiving "NO DATA".
 static const milliseconds kPreviewReloadDelay = seconds(ini().rightPanelPreviewReloadDelay);
 
@@ -87,9 +84,9 @@ void setWidgetHolder(QWidget* widget, QWidget* newHolder)
 
 milliseconds previewLoadDelay()
 {
-    return ini().tilePreviewLoadDelayOverrideMs > 0
-        ? milliseconds(ini().tilePreviewLoadDelayOverrideMs)
-        : kPreviewLoadDelay;
+    return ini().tilePreviewLoadDelayOverrideMs < 1
+        ? 1ms
+        : milliseconds(ini().tilePreviewLoadDelayOverrideMs);
 }
 
 } // namespace
@@ -290,7 +287,7 @@ EventTile::EventTile(QWidget* parent):
     ui->narrowHolder->hide();
     ui->wideHolder->hide();
 
-    ui->previewWidget->setAutoScaleDown(false);
+    ui->previewWidget->setAutoScaleUp(true);
     ui->previewWidget->setReloadMode(AsyncImageWidget::ReloadMode::showPreviousImage);
 
     ui->previewWidget->setCropMode(ini().rightPanelHoverPreviewCrop
@@ -538,7 +535,7 @@ void EventTile::setPreview(ImageProvider* value, bool forceUpdate)
     ui->previewWidget->parentWidget()->setHidden(!value);
 
     d->isPreviewLoadNeeded = false;
-    d->forceNextPreviewUpdate = true;
+    d->forceNextPreviewUpdate = forceUpdate;
     d->updatePreview(previewLoadDelay());
 
     if (ini().showDebugTimeInformationInRibbon)

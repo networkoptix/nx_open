@@ -1,6 +1,10 @@
 #include "graphics_view.h"
 
-#include <QtOpenGL/QtOpenGL>
+#include <QtGui/QOpenGLContext>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QOpenGLWidget>
+#include <QtWidgets/QGraphicsSceneWheelEvent>
+#include <QtGui/QWheelEvent>
 
 #include <nx/utils/log/assert.h>
 
@@ -21,7 +25,7 @@ void QnGraphicsView::paintEvent(QPaintEvent* event)
     auto context = QOpenGLContext::currentContext();
     if (!context)
     {
-        if (const auto glWidget = qobject_cast<QGLWidget*>(viewport()))
+        if (const auto glWidget = qobject_cast<QOpenGLWidget*>(viewport()))
             glWidget->makeCurrent();
 
         NX_ASSERT(QOpenGLContext::currentContext());

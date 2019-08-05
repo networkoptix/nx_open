@@ -24,11 +24,15 @@
 #include <rest/server/rest_connection_processor.h>
 #include <media_server/media_server_module.h>
 #include <nx/utils/log/log.h>
+#include "../helpers/storage_space_helper.h"
 
-namespace
-{
-    const QString kFastRequestKey("fast");
-}
+namespace {
+
+static const QString kFastRequestKey("fast");
+
+} // namespace
+
+const QString QnStorageSpaceRestHandler::kOwndedOnlyKey("ownedOnly");
 
 QnStorageSpaceRestHandler::QnStorageSpaceRestHandler(QnMediaServerModule* serverModule):
     nx::vms::server::ServerModuleAware(serverModule)
@@ -44,34 +48,9 @@ int QnStorageSpaceRestHandler::executeGet(
     const bool fastRequest = QnLexical::deserialized(params[kFastRequestKey], false);
 
     QnStorageSpaceReply reply;
+    reply.storages = nx::rest::helpers::availableStorages(serverModule());
 
-    auto enumerate = [fastRequest, &reply, this](
-        const QnStorageResourceList& storages,
-        const QnStorageResourceList& writableStorages)
-        {
-            for (const auto& storage: storages)
-            {
-                QnStorageSpaceData data(storage, fastRequest);
-                data.url = QnStorageResource::urlWithoutCredentials(data.url);
-                if (!fastRequest)
-                    data.isWritable = writableStorages.contains(storage);
-                data.storageStatus = QnStorageManager::storageStatus(serverModule(), storage);
-                reply.storages.push_back(data);
-            }
-        };
-
-    enumerate(
-        serverModule()->normalStorageManager()->getStorages(),
-        fastRequest
-            ? QnStorageResourceList()
-            : serverModule()->normalStorageManager()->getAllWritableStorages());
-    enumerate(
-        serverModule()->backupStorageManager()->getStorages(),
-        fastRequest
-            ? QnStorageResourceList()
-            : serverModule()->backupStorageManager()->getAllWritableStorages());
-
-    if (!fastRequest)
+    if (!fastRequest && !params.contains(kOwndedOnlyKey))
     {
         for (const QnStorageSpaceData& optionalStorage: getOptionalStorages(owner->commonModule()))
             reply.storages.push_back(optionalStorage);
@@ -79,6 +58,9 @@ int QnStorageSpaceRestHandler::executeGet(
 
     reply.storageProtocols = getStorageProtocols();
     result.setReply(reply);
+    NX_DEBUG(this, "Return %1 storages and %2 protocols%3",
+        reply.storages.size(), reply.storageProtocols.size(),
+        fastRequest ? " on fast request" : "");
 
     return nx::network::http::StatusCode::ok;
 }
@@ -132,18 +114,23 @@ QnStorageSpaceDataList QnStorageSpaceRestHandler::getOptionalStorages(
     for(const QnPlatformMonitor::PartitionSpace &partition: partitions)
     {
         if (partition.path.indexOf(NX_TEMP_FOLDER_NAME) != -1)
+        {
+            NX_VERBOSE(this, "Ignore temporary optional partition %1", partition);
             continue;
+        }
 
         bool hasStorage = std::any_of(
-            storagePaths.cbegin(),
-            storagePaths.cend(),
+            storagePaths.cbegin(), storagePaths.cend(),
             [&partition](const QString &storagePath)
             {
                 return closeDirPath(storagePath).startsWith(partition.path);
             });
 
-        if(hasStorage)
+        if (hasStorage)
+        {
+            NX_VERBOSE(this, "Ignore known optional partition %1", partition);
             continue;
+        }
 
         QnStorageSpaceData data;
         data.url = partition.path + QnAppInfo::mediaFolderName();

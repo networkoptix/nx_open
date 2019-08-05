@@ -25,7 +25,7 @@ ListView
     orientation: Qt.Horizontal
     implicitHeight: 56
 
-    interactive: d.allowInteractiveState && scrollable
+    interactive: scrollable
 
     leftMargin: emptyHeaderSize
     rightMargin: emptyHeaderSize
@@ -106,15 +106,24 @@ ListView
         {
             target: control
 
-            onFlickingChanged: handleCancelled()
-            onDraggingChanged: handleCancelled()
+            onFlickingChanged: handleMovementChanged()
+            onDraggingChanged: handleMovementChanged()
+
+            function handleMovementChanged()
+            {
+                if (button.instantAction)
+                    button.handleCancelled()
+
+                var finished = !control.flicking && !control.dragging
+                if (finished && button.active)
+                    button.handleButtonReleased()
+            }
         }
 
         onPressed:
         {
             filteringPressing = false
             buttonLongPressed = false
-            d.allowInteractiveState = false
 
             button.active = true
             control.buttonPressed(index)
@@ -124,15 +133,14 @@ ListView
 
         onReleased:
         {
-            d.allowInteractiveState = true
-
             handleButtonReleased()
             button.active = false
         }
 
         onCanceled:
         {
-            d.allowInteractiveState = true
+            if (control.dragging || control.flicking)
+                return
 
             if (!buttonLongPressed || instantAction)
                 handleCancelled()
@@ -199,6 +207,8 @@ ListView
             if (wasActive)
                 control.actionCancelled(index)
         }
+
+        Component.onDestruction: handleCancelled()
     }
 
     QtObject
@@ -206,7 +216,6 @@ ListView
         id: d
 
         property real offset: control.originX + control.contentWidth
-        property bool allowInteractiveState: true
         property bool prefferToBeInteractive: contentWidth > width
     }
 }

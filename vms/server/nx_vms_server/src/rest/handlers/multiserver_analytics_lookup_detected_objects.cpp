@@ -119,11 +119,6 @@ bool QnMultiserverAnalyticsLookupDetectedObjects::deserializeRequest(
                 body, nx::analytics::db::Filter(), &isParsingSucceded);
             return isParsingSucceded;
 
-        case Qn::UbjsonFormat:
-            *filter = QnUbjson::deserialized(
-                body, nx::analytics::db::Filter(), &isParsingSucceded);
-            return isParsingSucceded;
-
         default:
             return false;
     }

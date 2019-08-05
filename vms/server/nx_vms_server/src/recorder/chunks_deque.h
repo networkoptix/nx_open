@@ -1,6 +1,8 @@
 #pragma once
 
 #include <deque>
+#include <unordered_map>
+
 #include "chunk.h"
 
 namespace nx::vms::server {

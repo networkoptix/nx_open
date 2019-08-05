@@ -7,10 +7,12 @@
 #include <api/session_manager.h>
 #include <api/app_server_connection.h>
 #include <api/global_settings.h>
+#include <api/media_server_connection.h>
 #include <api/model/ping_reply.h>
 #include <api/network_proxy_factory.h>
 #include <api/runtime_info_manager.h>
 #include <api/server_rest_connection.h>
+
 #include <common/common_module.h>
 #include <core/resource/storage_resource.h>
 #include <core/resource/security_cam_resource.h>
@@ -19,7 +21,7 @@
 #include <core/resource_management/server_additional_addresses_dictionary.h>
 #include <core/resource_management/resource_pool.h>
 #include <network/networkoptixmodulerevealcommon.h>
-#include <nx_ec/ec_proto_version.h>
+#include <nx/vms/api/protocol_version.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <rest/server/json_rest_result.h>
 #include <utils/common/app_info.h>
@@ -34,6 +36,7 @@
 #include <nx/network/socket_global.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/network/url/url_parse_helper.h>
+#include <nx/vms/api/data/media_server_data.h>
 
 using namespace nx;
 
@@ -43,6 +46,8 @@ const QString protoVersionPropertyName = lit("protoVersion");
 const QString safeModePropertyName = lit("ecDbReadOnly");
 
 } // namespace
+
+const QString QnMediaServerResource::kMetadataStorageIdKey = "metadataStorageId";
 
 QnMediaServerResource::QnMediaServerResource(QnCommonModule* commonModule):
     base_type(commonModule),
@@ -305,14 +310,11 @@ void QnMediaServerResource::setUrl(const QString& url)
 {
     QnResource::setUrl(url);
 
-    QnMutexLocker lock(&m_mutex);
-    if (!m_primaryAddress.isNull())
-        return;
-
-    if (m_apiConnection)
-        m_apiConnection->setUrl(getApiUrl());
-
-    lock.unlock();
+    {
+        QnMutexLocker lock(&m_mutex);
+        if (!m_primaryAddress.isNull())
+            return;
+    }
 
     emit primaryAddressChanged(toSharedPointer(this));
     emit apiUrlChanged(toSharedPointer(this));
@@ -328,7 +330,7 @@ nx::utils::Url QnMediaServerResource::getApiUrl() const
 QString QnMediaServerResource::getUrl() const
 {
     return nx::network::url::Builder()
-        .setScheme(isSslAllowed() ? "https" : "http")
+        .setScheme(nx::network::http::urlSheme(isSslAllowed()))
         .setEndpoint(getPrimaryAddress()).toUrl().toString();
 }
 
@@ -354,9 +356,6 @@ void QnMediaServerResource::setPrimaryAddress(const nx::network::SocketAddress& 
 
         m_primaryAddress = primaryAddress;
         NX_ASSERT(!m_primaryAddress.address.toString().isEmpty());
-
-        if (m_apiConnection)
-            m_apiConnection->setUrl(buildApiUrl());
     }
 
     emit primaryAddressChanged(toSharedPointer(this));
@@ -365,19 +364,20 @@ void QnMediaServerResource::setPrimaryAddress(const nx::network::SocketAddress& 
 bool QnMediaServerResource::isSslAllowed() const
 {
     QnMutexLocker lock(&m_mutex);
-    return m_sslAllowed || commonModule()->globalSettings()->isTrafficEncriptionForced();
+    return nx::utils::Url(m_url).scheme() != nx::network::http::urlSheme(false)
+        || commonModule()->globalSettings()->isTrafficEncriptionForced();
 }
 
 void QnMediaServerResource::setSslAllowed(bool sslAllowed)
 {
     {
         QnMutexLocker lock(&m_mutex);
-        if (sslAllowed == m_sslAllowed)
+        if (sslAllowed == isSslAllowed())
             return;
 
-        m_sslAllowed = sslAllowed;
-        if (m_apiConnection)
-            m_apiConnection->setUrl(buildApiUrl());
+        nx::utils::Url url(m_url);
+        url.setScheme(nx::network::http::urlSheme(sslAllowed));
+        m_url = url.toString();
     }
 
     emit primaryAddressChanged(toSharedPointer(this));
@@ -466,18 +466,13 @@ void QnMediaServerResource::updateInternal(const QnResourcePtr &other, Qn::Notif
         m_version = localOther->m_version;
         m_serverFlags = localOther->m_serverFlags;
         m_netAddrList = localOther->m_netAddrList;
-        m_systemInfo = localOther->m_systemInfo;
         m_authKey = localOther->m_authKey;
 
     }
 
     const auto currentAddress = getPrimaryAddress();
     if (oldPrimaryAddress != currentAddress)
-    {
-        if (m_apiConnection)
-            m_apiConnection->setUrl(getApiUrl());
         notifiers << [r = toSharedPointer(this)]{ emit r->primaryAddressChanged(r); };
-    }
 }
 
 nx::utils::SoftwareVersion QnMediaServerResource::getVersion() const
@@ -506,14 +501,12 @@ QnMediaServerUserAttributesPtr QnMediaServerResource::userAttributes() const
 
 QnUuid QnMediaServerResource::metadataStorageId() const
 {
-    QnMediaServerUserAttributesPool::ScopedLock lk(commonModule()->mediaServerUserAttributesPool(), getId());
-    return (*lk)->metadataStorageId;
+    return QnUuid::fromStringSafe(getProperty(kMetadataStorageIdKey));
 }
 
 void QnMediaServerResource::setMetadataStorageId(const QnUuid& value)
 {
-    QnMediaServerUserAttributesPool::ScopedLock lk(commonModule()->mediaServerUserAttributesPool(), getId());
-    (*lk)->metadataStorageId = value;
+    setProperty(kMetadataStorageIdKey, value.toString());
 }
 
 QnServerBackupSchedule QnMediaServerResource::getBackupSchedule() const
@@ -549,6 +542,20 @@ bool QnMediaServerResource::isRedundancy() const
     return (*lk)->isRedundancyEnabled;
 }
 
+void QnMediaServerResource::setCompatible(bool value)
+{
+    if (m_isCompatible == value)
+        return;
+
+    m_isCompatible = value;
+    emit compatibilityChanged(::toSharedPointer(this));
+}
+
+bool QnMediaServerResource::isCompatible() const
+{
+    return m_isCompatible;
+}
+
 void QnMediaServerResource::setVersion(const nx::utils::SoftwareVersion& version)
 {
     {
@@ -560,16 +567,16 @@ void QnMediaServerResource::setVersion(const nx::utils::SoftwareVersion& version
     emit versionChanged(::toSharedPointer(this));
 }
 
-nx::vms::api::SystemInformation QnMediaServerResource::getSystemInfo() const
+utils::OsInfo QnMediaServerResource::getOsInfo() const
 {
-    QnMutexLocker lock(&m_mutex);
-    return m_systemInfo;
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    return m_osInfo;
 }
 
-void QnMediaServerResource::setSystemInfo(const nx::vms::api::SystemInformation& systemInfo)
+void QnMediaServerResource::setOsInfo(const utils::OsInfo& osInfo)
 {
-    QnMutexLocker lock(&m_mutex);
-    m_systemInfo = systemInfo;
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    m_osInfo = osInfo;
 }
 
 nx::vms::api::ModuleInformation QnMediaServerResource::getModuleInformation() const
@@ -585,13 +592,13 @@ nx::vms::api::ModuleInformation QnMediaServerResource::getModuleInformation() co
     nx::vms::api::ModuleInformation moduleInformation;
     moduleInformation.type = nx::vms::api::ModuleInformation::nxMediaServerId();
     moduleInformation.customization = QnAppInfo::customizationName();
-    moduleInformation.sslAllowed = m_sslAllowed;
+    moduleInformation.sslAllowed = isSslAllowed();
     moduleInformation.realm = nx::network::AppInfo::realm();
     moduleInformation.cloudHost = nx::network::SocketGlobals::cloud().cloudHost();
     moduleInformation.name = getName();
     moduleInformation.protoVersion = getProperty(protoVersionPropertyName).toInt();
     if (moduleInformation.protoVersion == 0)
-        moduleInformation.protoVersion = nx_ec::EC2_PROTO_VERSION;
+        moduleInformation.protoVersion = nx::vms::api::protocolVersion();
 
     if (hasProperty(safeModePropertyName))
     {
@@ -610,7 +617,7 @@ nx::vms::api::ModuleInformation QnMediaServerResource::getModuleInformation() co
     moduleInformation.id = getId();
     moduleInformation.port = getPort();
     moduleInformation.version = getVersion();
-    moduleInformation.systemInformation = getSystemInfo();
+    moduleInformation.osInfo = getOsInfo();
     moduleInformation.serverFlags = getServerFlags();
 
     return moduleInformation;
@@ -655,17 +662,20 @@ void QnMediaServerResource::setStatus(Qn::ResourceStatus newStatus, Qn::StatusCh
         }
 
         QnResource::setStatus(newStatus, reason);
-        QnResourceList childList = resourcePool()->getResourcesByParentId(getId());
-        for(const QnResourcePtr& res: childList)
+        if (auto pool = resourcePool())
         {
-            if (res->hasFlags(Qn::depend_on_parent_status))
+            QnResourceList childList = pool->getResourcesByParentId(getId());
+            for(const QnResourcePtr& res: childList)
             {
-                NX_VERBOSE(this, lit("%1 Emit statusChanged signal for resource %2, %3, %4")
+                if (res->hasFlags(Qn::depend_on_parent_status))
+                {
+                    NX_VERBOSE(this, lit("%1 Emit statusChanged signal for resource %2, %3, %4")
                         .arg(QString::fromLatin1(Q_FUNC_INFO))
                         .arg(res->getId().toString())
                         .arg(res->getName())
                         .arg(res->getUrl()));
-                emit res->statusChanged(res, Qn::StatusChangeReason::Local);
+                    emit res->statusChanged(res, Qn::StatusChangeReason::Local);
+                }
             }
         }
     }
@@ -734,24 +744,4 @@ void QnMediaServerResource::setResourcePool(QnResourcePool *resourcePool)
         connect(settings, &QnGlobalSettings::cloudSettingsChanged,
             this, &QnMediaServerResource::at_cloudSettingsChanged, Qt::DirectConnection);
     }
-}
-
-nx::utils::Url QnMediaServerResource::buildApiUrl() const
-{
-    nx::utils::Url url;
-    if (m_primaryAddress.isNull())
-    {
-        url = m_apiConnection->url();
-        url.setScheme(nx::network::http::urlSheme(m_sslAllowed));
-    }
-    else
-    {
-        url = nx::network::url::Builder()
-            .setScheme(nx::network::http::urlSheme(m_sslAllowed))
-            .setEndpoint(m_primaryAddress).toUrl();
-    }
-    NX_ASSERT(!url.host().isEmpty());
-    NX_ASSERT(url.isValid());
-
-    return url;
 }

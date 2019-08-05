@@ -97,6 +97,8 @@ private:
     const QSize& getRawDataSize() const {
         return m_rawDataSize;
     }
+
+    MultiThreadDecodePolicy toEncoderPolicy(bool useMtDecoding) const;
 private:
     mutable QnMutex m_mtx;
 

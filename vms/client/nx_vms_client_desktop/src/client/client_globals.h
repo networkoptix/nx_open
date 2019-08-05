@@ -50,7 +50,7 @@ namespace Qn
         FirstItemDataRole = Qt::UserRole,
 
         /* Tree-based. */
-        NodeTypeRole,  /**< Role for node type, see <tt>ResourceTreeNodeType</tt>. */
+        NodeTypeRole,  /**< Role for node type, see <tt>ResourceTree::NodeType</tt>. */
         ResourceTreeScopeRole, //< Role for ResourceTreeScope.
 
         /* Resource-based. */
@@ -63,7 +63,7 @@ namespace Qn
         ResourceNameRole,                           /**< Role for resource name. Value of type QString. */
         ResourceFlagsRole,                          /**< Role for resource flags. Value of type int (Qn::ResourceFlags). */
         ResourceStatusRole,                         /**< Role for resource status. Value of type int (Qn::ResourceStatus). */
-        ResourceIconKeyRole,                        /**< Role for resource custom icon key. Value of type QString. */
+        ResourceIconKeyRole,                        /**< Role for resource custom icon key. Value of type int. */
 
         CameraExtraStatusRole,                      /**< Custom camera status (recording, buggy, etc). Value of CameraExtraStatus. */
 
@@ -116,9 +116,6 @@ namespace Qn
         ItemDisabledButtonsRole,                    /**< Role for buttons that are not to be displayed in item's titlebar. Value of type int (QnResourceWidget::Buttons). */
         ItemHealthMonitoringButtonsRole,            /**< Role for buttons that are checked on each line of Health Monitoring widget. Value of type QnServerResourceWidget::HealthMonitoringButtons. */
 
-        ItemAnalyticsModeSourceRegionRole,          /**< Role for original region in the analytics mode. */
-        ItemAnalyticsModeRegionIdRole,              /**< Role for source region id in the analytics mode. */
-
         /* Ptz-based. */
         PtzPresetRole,                              /**< Role for PTZ preset. Value of type QnPtzPreset. */
         PtzTourRole,                                /**< Role for PTZ tour. Value of type QnPtzTour. */
@@ -158,17 +155,22 @@ namespace Qn
         FileNameRole,                               /**< Role for target filename. Used in TakeScreenshotAction. */
         TextRole,                                   /**< Role for generic text. Used in several places. */
         IntRole,                                    /**< Role for generic integer. Used in several places. */
-        UrlRole,                                    /**< Role for target url. Used in BrowseUrlAction and action::ConnectAction. */
-        AutoLoginRole,                              /**< Role for flag that shows if client should connect with last credentials
-                                                         (or to the last system) automatically next time */
 
-        StoreSessionRole,                          /**< Role for flag that shows if session on successful connection should be stored.
-                                                         Used in action::ConnectAction. */
-        StorePasswordRole,                          /**< Role for flag that shows if password of successful connection should be stored.
-                                                        Used in action::ConnectAction. */
-        CloudSystemIdRole,                          /**< Role for cloud system id (QString). Used in cloud system nodes and ConnectToCloudAction. */
+        /** Role for target url. Used in BrowseUrlAction. */
+        UrlRole,
 
-        ForceRole,                                  /**< Role for 'forced' flag. Used in ConnectAction/DisconnectAction. */
+        /** LogonParameters structure. Used in the ConnectAction. */
+        LogonParametersRole,
+
+        /**
+         * Role for cloud system id (QString). Used in cloud system nodes in the resources tree and
+         * as the ConnectToCloudAction parameter.
+         */
+        CloudSystemIdRole,
+
+        /** Role for 'forced' flag. Used in DisconnectAction. */
+        ForceRole,
+
         CameraBookmarkRole,                         /**< Role for the selected camera bookmark (if any). Used in Edit/RemoveCameraBookmarkAction */
         CameraBookmarkListRole,                     /**< Role for the list of bookmarks. Used in RemoveBookmarksAction */
         BookmarkTagRole,                            /**< Role for bookmark tag. Used in OpenBookmarksSearchAction */
@@ -242,10 +244,13 @@ namespace Qn
         NotificationLevelRole,                      /**< Role for notification level (QnNotificationLevel::Value). */
         ContextMenuRole,                            /**< Role for context menu (QSharedPointer<QMenu>). */
         ForcePrecisePreviewRole,                    /**< Role for forcing precise preview frame (bool). */
-        PreviewStreamSelectionRole,                 /**< Role for camera preview stream (CameraImageRequest::StreamSelectionMode). */
+        PreviewStreamSelectionRole,                 /**< Role for camera preview stream (ImageRequest::StreamSelectionMode). */
+        DecorationPathRole,                         /**< Role for icon path (QString). */
 
         SelectOnOpeningRole,                        /**< Role for single-selecting an item (or first of multiple items) added to current layout (bool). */
         RaiseSelectionRole,                         /**< Role for raising a single-selected item (bool). */
+
+        ExtraResourceInfoRole,                      /**< Role for extra resource information in the tree (QString). */
 
         // Model notification roles. Do not necessarily pass any data but implement
         // item-related view-to-model notifications via setData which can be proxied.

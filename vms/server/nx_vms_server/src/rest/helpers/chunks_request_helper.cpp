@@ -13,6 +13,8 @@
 #include "motion/motion_helper.h"
 #include "recorder/storage_manager.h"
 #include "media_server/media_server_module.h"
+#include <nx/vms/server/metadata/analytics_helper.h>
+#include <nx/utils/log/log_main.h>
 
 static const auto kAllArchive = QList<QnServer::ChunksCatalog>()
     << QnServer::LowQualityCatalog << QnServer::HiQualityCatalog;
@@ -34,11 +36,19 @@ QnTimePeriodList QnChunksRequestHelper::load(const QnChunksRequestData& request)
         case Qn::MotionContent:
         {
             const auto motionPeriods = serverModule()->motionHelper()->matchImage(request);
-            return QnTimePeriodList::intersection(motionPeriods, archivePeriods);
+            auto result = QnTimePeriodList::intersection(motionPeriods, archivePeriods);
+            NX_VERBOSE(this,
+                lm("Find motion periods for camera(s) %1. "
+                    "Before filtering %2, after filtering %3 record(s). Archive periods: %4")
+                .args(request.resList, motionPeriods.size(), result.size()), archivePeriods.size());
+
+            return result;
         }
 
         case Qn::AnalyticsContent:
         {
+            //nx::vms::server::metadata::AnalyticsHelper helper(serverModule()->metadataDatabaseDir());
+            //const auto analiticsPeriods = helper.matchImage(request);
             const auto analiticsPeriods = loadAnalyticsTimePeriods(request);
             return QnTimePeriodList::intersection(analiticsPeriods, archivePeriods);
         }
@@ -58,9 +68,6 @@ QnTimePeriodList QnChunksRequestHelper::loadAnalyticsTimePeriods(
     if (request.resList.empty())
         return QnTimePeriodList();
 
-    nx::utils::SyncQueue<std::tuple<ResultCode, QnTimePeriodList>> resultsPerCamera;
-    int lookupsOngoing = 0;
-
     Filter filter;
     if (request.analyticsStorageFilter)
         filter = *request.analyticsStorageFilter;
@@ -69,51 +76,36 @@ QnTimePeriodList QnChunksRequestHelper::loadAnalyticsTimePeriods(
     filter.maxObjectsToSelect = request.limit;
     filter.sortOrder = request.sortOrder;
 
+    filter.deviceIds.clear();
+    for (const auto& cameraResource: request.resList)
+        filter.deviceIds.push_back(cameraResource->getId());
+
     TimePeriodsLookupOptions options;
     options.detailLevel = request.detailLevel;
 
-    for (const auto& cameraResource: request.resList)
+    if (!request.filter.isEmpty())
     {
-        filter.deviceIds = std::vector<QnUuid>{cameraResource->getId()};
-
-        ++lookupsOngoing;
-        serverModule()->analyticsEventsStorage()->lookupTimePeriods(
-            filter,
-            options,
-            [&resultsPerCamera](
-                ResultCode resultCode,
-                QnTimePeriodList timePeriods)
-            {
-                resultsPerCamera.push(std::make_tuple(resultCode, std::move(timePeriods)));
-            });
+        const auto regions = QJson::deserialized<QList<QRegion>>(request.filter.toUtf8());
+        if (!regions.isEmpty())
+            options.region = regions.front();
+        // TODO: #ak Not sure why using only first region. Done as in AnalyticsHelper::matchImage.
     }
 
-    QnTimePeriodList totalPeriodList;
-    for (int i = 0; i < lookupsOngoing; ++i)
-    {
-        auto result = resultsPerCamera.pop();
-        if (std::get<0>(result) != ResultCode::ok)
+    std::promise<std::tuple<ResultCode, QnTimePeriodList>> done;
+    serverModule()->analyticsEventsStorage()->lookupTimePeriods(
+        filter,
+        options,
+        [&done](ResultCode resultCode, QnTimePeriodList timePeriods)
         {
-            NX_DEBUG(QnLog::MAIN_LOG_ID,
-                lm("Failed to fetch analytics time periods for camera TODO: %1")
-                    .args(QnLexical::serialized(std::get<0>(result))));
-            continue;
-        }
+            done.set_value(std::make_tuple(resultCode, std::move(timePeriods)));
+        });
 
-        auto timePeriodList = std::move(std::get<1>(result));
-        // NOTE: Assuming time periods are sorted by startTime ascending.
-        if (totalPeriodList.empty())
-            totalPeriodList.swap(timePeriodList);
-        else
-            QnTimePeriodList::unionTimePeriods(totalPeriodList, timePeriodList);
-    }
-
-    // We consider intervals with zero (i.e. unspecified) length as intervals with minimal length.
-    for (auto& timePeriod: totalPeriodList)
+    auto [resultCode, timePeriods] = done.get_future().get();
+    if (resultCode != ResultCode::ok)
     {
-        if (timePeriod.isEmpty())
-            timePeriod.setEndTime(timePeriod.startTime() + milliseconds(1));
+        NX_DEBUG(this, "Failed to fetch analytics time periods for camera TODO: %1",
+            QnLexical::serialized(resultCode));
     }
 
-    return totalPeriodList;
+    return timePeriods;
 }

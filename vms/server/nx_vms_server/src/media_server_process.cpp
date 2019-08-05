@@ -70,12 +70,12 @@
 
 #include <nx/vms/auth/time_based_nonce_provider.h>
 #include <nx/vms/server/authenticator.h>
+#include <nx/vms/server/rest/get_merge_status_handler.h>
 #include <network/connection_validator.h>
 #include <network/default_tcp_connection_processor.h>
 #include <network/system_helpers.h>
 
 #include <nx_ec/ec_api.h>
-#include <nx_ec/ec_proto_version.h>
 #include <nx/vms/api/data/user_data.h>
 #include <nx_ec/managers/abstract_user_manager.h>
 #include <nx_ec/managers/abstract_layout_manager.h>
@@ -144,6 +144,7 @@
 #include <rest/handlers/update_status_rest_handler.h>
 #include <rest/handlers/install_update_rest_handler.h>
 #include <rest/handlers/cancel_update_rest_handler.h>
+#include <rest/handlers/retry_update.h>
 #include <rest/handlers/restart_rest_handler.h>
 #include <rest/handlers/module_information_rest_handler.h>
 #include <rest/handlers/iflist_rest_handler.h>
@@ -183,14 +184,15 @@
 #include <rest/handlers/multiserver_get_hardware_ids_rest_handler.h>
 #include <rest/handlers/wearable_camera_rest_handler.h>
 #include <rest/handlers/set_primary_time_server_rest_handler.h>
+#include <rest/handlers/persistent_update_storage_rest_handler.h>
 #ifdef _DEBUG
 #include <rest/handlers/debug_events_rest_handler.h>
 #endif
 #include <nx/vms/server/rest/device_analytics_settings_handler.h>
 #include <nx/vms/server/rest/analytics_engine_settings_handler.h>
-
 #include <nx/vms/server/rest/get_time_handler.h>
 #include <nx/vms/server/rest/server_time_handler.h>
+#include <nx/vms/server/rest/plugin_info_handler.h>
 
 #include <rtsp/rtsp_connection.h>
 
@@ -269,6 +271,8 @@
 #include <nx/vms/server/fs/media_paths/media_paths_filter_config.h>
 #include <nx/vms/common/p2p/downloader/downloader.h>
 #include <nx/vms/server/root_fs.h>
+#include <system_log/raid_event_ini_config.h>
+
 #include <nx/vms/server/server_update_manager.h>
 #include <nx_vms_server_ini.h>
 #include <proxy/2wayaudio/proxy_audio_receiver.h>
@@ -277,6 +281,7 @@
 #include <rest/handlers/sync_time_rest_handler.h>
 #include <rest/handlers/metrics_rest_handler.h>
 #include <nx/vms/server/event/event_connector.h>
+#include <nx/vms/server/event/extended_rule_processor.h>
 #include <nx/network/http/http_client.h>
 #include <core/resource_management/resource_data_pool.h>
 #include <core/resource/storage_plugin_factory.h>
@@ -285,8 +290,17 @@
 #include <nx/utils/file_system.h>
 #include <nx/network/url/url_builder.h>
 
+#include <nx/vms/api/protocol_version.h>
+
 #include "nx/vms/server/system/nx1/info.h"
 #include <atomic>
+
+#include <nx/vms/server/metrics/camera_provider.h>
+#include <nx/vms/server/metrics/network_provider.h>
+#include <nx/vms/server/metrics/rest_handlers.h>
+#include <nx/vms/server/metrics/server_provider.h>
+#include <nx/vms/server/metrics/storage_provider.h>
+#include <nx/vms/server/metrics/system_provider.h>
 
 using namespace nx::vms::server;
 
@@ -469,12 +483,23 @@ QnStorageResourceList getSmallStorages(const QnStorageResourceList& storages)
 QnStorageResourcePtr MediaServerProcess::createStorage(const QnUuid& serverId, const QString& path)
 {
     NX_VERBOSE(kLogTag, lm("Attempting to create storage %1").arg(path));
-    QnStorageResourcePtr storage(serverModule()->storagePluginFactory()->createStorage(
-        commonModule(),
-        "ufile"));
+    QnStorageResourcePtr storage(
+        serverModule()->storagePluginFactory()->createStorage(commonModule(), path));
+    NX_ASSERT(storage, "Failed to create to storage: %1", path);
+
     storage->setName("Initial");
     storage->setParentId(serverId);
     storage->setUrl(path);
+
+    if (!QnStorageManager::canStorageBeUsedByVms(storage))
+    {
+        NX_DEBUG(
+            kLogTag,
+            "Storage with this path (%1) won't be used by MediaServer because total space is"
+            " unknown or total space < space limit. Total space: %2, space limit: %3",
+            path, storage->getTotalSpace(), storage->getSpaceLimit());
+        return QnStorageResourcePtr();
+    }
 
     const QString storagePath = QnStorageResource::toNativeDirPath(storage->getPath());
     const auto partitions = m_platform->monitor()->totalPartitionSpaceInfo();
@@ -486,24 +511,6 @@ QnStorageResourcePtr MediaServerProcess::createStorage(const QnUuid& serverId, c
         ? it->type
         : QnPlatformMonitor::NetworkPartition;
     storage->setStorageType(QnLexical::serialized(storageType));
-
-    if (auto fileStorage = storage.dynamicCast<QnFileStorageResource>())
-    {
-        if (!QnStorageManager::canStorageBeUsedByVms(fileStorage))
-        {
-            NX_DEBUG(
-                kLogTag,
-                "Storage with this path %1 total space is unknown or totalSpace < spaceLimit. "
-                "Total space: %2, Space limit: %3",
-                path, fileStorage->getTotalSpace(), storage->getSpaceLimit());
-            return QnStorageResourcePtr();
-        }
-    }
-    else
-    {
-        NX_ASSERT(false, lm("Failed to create to storage: %1").arg(path));
-        return QnStorageResourcePtr();
-    }
 
     storage->setUsedForWriting(storage->initOrUpdate() == Qn::StorageInit_Ok && storage->isWritable());
     NX_DEBUG(kLogTag, lm("Storage %1 is operational: %2").args(path, storage->isUsedForWriting()));
@@ -718,17 +725,18 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
         for(const QnStorageResourcePtr &storage: modifiedStorages)
             messageProcessor->updateResource(storage, ec2::NotificationSource::Local);
 
-        serverModule()->normalStorageManager()->initDone();
-        serverModule()->backupStorageManager()->initDone();
-
         if (m_mediaServer->metadataStorageId().isNull() && !QFile::exists(getMetadataDatabaseName()))
         {
             m_mediaServer->setMetadataStorageId(selectDefaultStorageForAnalyticsEvents(m_mediaServer));
-            nx::vms::api::MediaServerUserAttributesData userAttrsData;
-            ec2::fromResourceToApi(m_mediaServer->userAttributes(), userAttrsData);
-            saveMediaServerUserAttributes(ec2Connection, userAttrsData);
+            m_mediaServer->saveProperties();
         }
+
+        connect(m_mediaServer.get(), &QnMediaServerResource::propertyChanged, this,
+            &MediaServerProcess::at_serverPropertyChanged);
         initializeAnalyticsEvents();
+
+        serverModule()->normalStorageManager()->initDone();
+        serverModule()->backupStorageManager()->initDone();
     });
 }
 
@@ -984,6 +992,12 @@ MediaServerProcess::MediaServerProcess(int argc, char* argv[], bool serviceMode)
     m_platform->process(NULL)->setPriority(QnPlatformProcess::HighPriority);
     m_platform->setUpdatePeriodMs(
         isStatisticsDisabled ? 0 : QnGlobalMonitor::kDefaultUpdatePeridMs);
+
+    const QString raidEventLogName = system_log::ini().logName;
+    const QString raidEventProviderName = system_log::ini().providerName;
+
+    m_raidEventLogReader.reset(new RaidEventLogReader(
+        raidEventLogName, raidEventProviderName));
     m_enableMultipleInstances = settings->settings().enableMultipleInstances();
 }
 
@@ -1038,9 +1052,10 @@ void MediaServerProcess::at_databaseDumped()
     restartServer(500);
 }
 
-void MediaServerProcess::at_metadataStorageIdChanged(const QnResourcePtr& /*resource*/)
+void MediaServerProcess::at_serverPropertyChanged(const QnResourcePtr& /*resource*/, const QString& key)
 {
-    initializeAnalyticsEvents();
+    if (key == QnMediaServerResource::kMetadataStorageIdKey)
+        initializeAnalyticsEvents();
 }
 
 void MediaServerProcess::at_systemIdentityTimeChanged(qint64 value, const QnUuid& sender)
@@ -1284,7 +1299,7 @@ void MediaServerProcess::at_portMappingChanged(QString address)
         auto it = m_forwardedAddresses.emplace(mappedAddress.address, 0).first;
         if (it->second != mappedAddress.port)
         {
-            NX_ALWAYS(this, "New external address %1 has been mapped", address);
+            NX_INFO(this, "New external address %1 has been mapped", address);
 
             it->second = mappedAddress.port;
             updateAddressesList();
@@ -1295,7 +1310,7 @@ void MediaServerProcess::at_portMappingChanged(QString address)
         const auto oldIp = m_forwardedAddresses.find(mappedAddress.address);
         if (oldIp != m_forwardedAddresses.end())
         {
-            NX_ALWAYS(this, "External address %1:%2 has been unmapped",
+            NX_INFO(this, "External address %1:%2 has been unmapped",
                 oldIp->first.toString(), oldIp->second);
 
             m_forwardedAddresses.erase(oldIp);
@@ -1313,7 +1328,7 @@ void MediaServerProcess::at_serverSaved(int, ec2::ErrorCode err)
         qWarning() << "Error saving server.";
 }
 
-void MediaServerProcess::at_connectionOpened()
+void MediaServerProcess::writeServerStartedEvent()
 {
     if (isStopping())
         return;
@@ -1390,7 +1405,17 @@ void MediaServerProcess::at_storageManager_storageFailure(const QnResourcePtr& s
 {
     if (isStopping())
         return;
-    serverModule()->eventConnector()->at_storageFailure(m_mediaServer, qnSyncTime->currentUSecsSinceEpoch(), reason, storage);
+    serverModule()->eventConnector()->at_storageFailure(
+        m_mediaServer, qnSyncTime->currentUSecsSinceEpoch(), reason, storage);
+}
+
+void MediaServerProcess::at_storageManager_raidStorageFailure(const QString& description,
+    nx::vms::event::EventReason reason)
+{
+    if (isStopping())
+        return;
+    serverModule()->eventConnector()->at_raidStorageFailure(
+        m_mediaServer, qnSyncTime->currentUSecsSinceEpoch(), reason, description);
 }
 
 void MediaServerProcess::at_storageManager_rebuildFinished(QnSystemHealth::MessageType msgType)
@@ -1452,6 +1477,17 @@ void MediaServerProcess::registerRestHandlers(
     reg(nx::vms::time_sync::TimeSyncManager::kTimeSyncUrlPath.mid(1),
         new ::rest::handlers::SyncTimeRestHandler());
 
+    /**%apidoc GET /ec2/mergeStatus
+     * Return information if the last merge request still is in progress.
+     * If merge is not in progress it means all data that belongs to servers on the moment when merge was requested
+     * are synchronized. This functions is a system wide and can be called from any server in the system to check merge status.
+     * %return:object JSON object with an error code, error string, and the reply on success.
+     *     %param:string unique id of the last merge operation.
+     *     %param:boolean true if last merge operation is in progress.
+     */
+    reg(nx::vms::server::rest::GetMergeStatusHandler::kUrlPath,
+        new nx::vms::server::rest::GetMergeStatusHandler(serverModule()));
+
     /**%apidoc POST /ec2/forcePrimaryTimeServer
      * Set primary time server. Requires a JSON object with optional "id" field in the message
      * body. If "id" field is missing, the primary time server is turned off.
@@ -1473,6 +1509,8 @@ void MediaServerProcess::registerRestHandlers(
 
     /**%apidoc GET /api/storageSpace
      * Get the list of all server storages.
+     * %param:string ownedOnly If set, only storages currently owned by Mediaserver will be
+     * included in the response.
      * %return:object JSON data with server storages.
      */
     reg("api/storageSpace", new QnStorageSpaceRestHandler(serverModule()));
@@ -2120,20 +2158,21 @@ void MediaServerProcess::registerRestHandlers(
      * message body with content type "application/json". Example of such object can be seen in
      * the result of GET /api/iflist function. </p>
      * %permissions Owner.
-     * %param:string name Interface name.
-     * %param:string ipAddr IP address with dot-separated decimal components.
-     * %param:string netMask Network mask with dot-separated decimal components.
-     * %param:string  mac MAC address with colon-separated upper-case hex components.
-     * %param:string gateway IP address of the gateway with dot-separated decimal components. Can
-     *     be empty.
-     * %param:boolean dhcp
-     *     %value false DHCP is not used, IP address and other parameters should be specified in
-     *         the respective JSON fields.
-     *     %value true IP address and other parameters assigned via DHCP, the respective JSON
-     *         fields can be empty.
-     * %param:object extraParams JSON object with data in the internal format.
-     * %param:string dns_servers Space-separated list of IP addresses with dot-separated decimal
-     *     components.
+     * %param:array interfaces List of network interfaces settings
+     *     %param:string interfaces[].name  Interface name.
+     *     %param:string interfaces[].ipAddr IP address with dot-separated decimal components.
+     *     %param:string interfaces[].netMask Network mask with dot-separated decimal components.
+     *     %param:string interfaces[].mac MAC address with colon-separated upper-case hex components.
+     *     %param:string interfaces[].gateway IP address of the gateway with dot-separated decimal components. Can
+     *         be empty.
+     *     %param:boolean interfaces[].dhcp
+     *         %value false DHCP is not used, IP address and other parameters should be specified in
+     *             the respective JSON fields.
+     *         %value true IP address and other parameters assigned via DHCP, the respective JSON
+     *             fields can be empty.
+     *     %param:object interfaces[].extraParams JSON object with data in the internal format.
+     *     %param:string interfaces[].dns_servers Space-separated list of IP addresses with dot-separated decimal
+     *         components.
      */
     reg("api/ifconfig", new QnIfConfigRestHandler(), kAdmin);
 
@@ -2521,6 +2560,24 @@ void MediaServerProcess::registerRestHandlers(
     reg("ec2/updateInformation", new QnUpdateInformationRestHandler(&serverModule()->settings(),
         commonModule()->engineVersion()));
 
+    /**%apidoc POST /ec2/updatePersistenStorages
+     * Set a list of servers used for persistent update files storage.
+     * %param:string version Possible values: {target | installed}. Indicates which update files
+     * should be stored on the given servers.
+     * %param:object JSON representation of the list of the servers selected for persistent update
+     *      files storing. If the list is empty, than it is treated as if persistent storage
+     *      selection algorithm  is reset to the initial state - automatic persistent server
+     *      selection.
+     * %return:object JSON with the updated servers list.
+     *
+     **%apidoc GET /ec2/updatePersistenStorages
+     * Retrieves a currently present list of servers IDs used for update files storage.
+     * %param:string version Possible values: {target | installed}. Indicates which list should be
+     * retrieved.
+     * %return:object JSON with the servers list.
+     */
+    reg("ec2/updatePersistenStorages", new QnPersistentUpdateStorageRestHandler(serverModule()));
+
     /**%apidoc POST /ec2/startUpdate
      * Starts an update process.
      * %param:object JSON with the update manifest. This JSON might be requested with the
@@ -2554,6 +2611,13 @@ void MediaServerProcess::registerRestHandlers(
      * manifest is cleared and all downloads are cancelled.
      */
     reg("ec2/cancelUpdate", new QnCancelUpdateRestHandler(serverModule()));
+
+    /**%apidoc POST /ec2/retryUpdate
+     * Retries the latest failed update action. E.g. if one of servers has failed update because
+     * there was not enough free space, it will repty to reserve space and start downloading.
+     * %return:object Update status after retry. See ec2/updateStatus.
+     */
+    reg("ec2/retryUpdate", new nx::vms::server::rest::handlers::RetryUpdate(serverModule()));
 
     /**%apidoc GET /ec2/cameraThumbnail
      * Get the static image from the camera.
@@ -2711,6 +2775,17 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/executeEventAction",
         new nx::vms::server::ExecuteEventActionRestHandler(serverModule()));
 
+    /**%apidoc GET /api/pluginInfo
+     * %return:object JSON object with an error code, error string, and a list with information
+     *     about Server plugins on success.
+     *     %param:string error Error code, "0" means no error.
+     *     %param:string errorString Error message in English, or an empty string.
+     *     %param:array reply List of JSON objects with the following structure:
+     *         %struct PluginInfo
+     */
+    reg("api/pluginInfo",
+        new nx::vms::server::rest::PluginInfoHandler(serverModule()));
+
     /**%apidoc[proprietary] POST /api/saveCloudSystemCredentials
      * Sets or resets cloud credentials (systemId and authorization key) to be used by system
      * %param[opt]:string cloudSystemId
@@ -2774,9 +2849,9 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/settingsDocumentation", new QnSettingsDocumentationHandler(&serverModule()->settings()));
 
     /**%apidoc GET /ec2/analyticsEngineSettings
+     * %param:string analyticsEngineId Id of analytics engine.
      * Return settings values of the specified Engine.
      * %return:object TODO:CHECK JSON object consisting of name-value settings pairs.
-     *      %param:string engineId Id of analytics engine.
      *
      * %apidoc POST /ec2/analyticsEngineSettings
      * Applies passed settings values to correspondent Analytics Engine.
@@ -2787,10 +2862,10 @@ void MediaServerProcess::registerRestHandlers(
         new nx::vms::server::AnalyticsEngineSettingsHandler(serverModule()));
 
     /**%apidoc GET /ec2/deviceAnalyticsSettings
+     * %param:string analyticsEngineId Unique id of an Analytics Engine.
+     * %param:string deviceId Id of a device.
      * Return settings values of the specified device-engine pair.
      * %return:object TODO:CHECK JSON object consisting of name-value settings pairs.
-     *      %param:string engineId Unique id of an Analytics Engine.
-     *      %param:string deviceId Id of a device.
      *
      * %apidoc POST /ec2/deviceAnalyticsSettings
      * Applies passed settings values to the correspondent device-engine pair.
@@ -2805,6 +2880,25 @@ void MediaServerProcess::registerRestHandlers(
         nx::network::http::Method::options,
         QnRestProcessorPool::kAnyPath,
         new OptionsRequestHandler());
+
+    reg("api/metrics/", new nx::vms::server::metrics::LocalRestHandler(
+        m_metricsController.get()));
+
+    /**%apidoc GET /ec2/metrics/rules
+     * %return:object Metric rules, which are currently in use in the system. See metrics.md
+     * for details.
+     *
+     * %apidoc GET /ec2/metrics/manifest
+     * %param:string noRules Do not include parameters fron rules.
+     * %return:object Metrics parameter manifest. See metrics.md for details.
+     *
+     * %apidoc GET /ec2/metrics/values
+     * %param:string noRules Do not include parameters fron rules.
+     * %param:string timeline Return values with timestamps instead of just values, ignores noRules.
+     * %return:object Metrics parameter values according to manifest. See metrics.md for details.
+     */
+    reg("ec2/metrics/", new nx::vms::server::metrics::SystemRestHandler(
+        m_metricsController.get(), serverModule()));
 }
 
 void MediaServerProcess::reg(
@@ -3537,7 +3631,7 @@ bool MediaServerProcess::setUpMediaServerResource(
             nx::network::SocketAddress(nx::network::HostAddress::localhost, m_universalTcpListener->getPort()));
 
         // used for statistics reported
-        server->setSystemInfo(QnAppInfo::currentSystemInformation());
+        server->setOsInfo(nx::utils::OsInfo::current());
         server->setVersion(commonModule()->engineVersion());
 
         SettingsHelper settingsHelper(this->serverModule());
@@ -3590,10 +3684,6 @@ bool MediaServerProcess::setUpMediaServerResource(
     commonModule()->setModuleInformation(selfInformation);
     commonModule()->bindModuleInformation(m_mediaServer);
 
-
-    connect(m_mediaServer.get(), &QnMediaServerResource::metadataStorageIdChanged, this,
-        &MediaServerProcess::at_metadataStorageIdChanged);
-
     return foundOwnServerInDb;
 }
 
@@ -3630,6 +3720,9 @@ void MediaServerProcess::stopObjects()
     safeDisconnect(commonModule()->resourceDiscoveryManager(), this);
     safeDisconnect(serverModule()->normalStorageManager(), this);
     safeDisconnect(serverModule()->backupStorageManager(), this);
+    m_raidEventLogReader->unsubscribe();
+    safeDisconnect(m_raidEventLogReader.get(), this);
+
     safeDisconnect(commonModule(), this);
     safeDisconnect(commonModule()->runtimeInfoManager(), this);
     if (m_ec2Connection)
@@ -3657,8 +3750,6 @@ void MediaServerProcess::stopObjects()
     serverModule()->resourceCommandProcessor()->stop();
     if (m_initStoragesAsyncPromise)
         m_initStoragesAsyncPromise->get_future().wait();
-    // todo: #rvasilenko some undeleted resources left in the QnMain event loop. I stopped TimerManager as temporary solution for it.
-    nx::utils::TimerManager::instance()->stop();
 
     // Remove all stream recorders.
     m_remoteArchiveSynchronizer.reset();
@@ -3668,6 +3759,8 @@ void MediaServerProcess::stopObjects()
     commonModule()->resourceDiscoveryManager()->stop();
     serverModule()->analyticsManager()->stop(); //< Stop processing analytics events.
     serverModule()->pluginManager()->unloadPlugins();
+    serverModule()->eventRuleProcessor()->stop();
+    serverModule()->p2pDownloader()->stopDownloads();
 
     //since mserverResourceDiscoveryManager instance is dead no events can be delivered to serverResourceProcessor: can delete it now
     //TODO refactoring of discoveryManager <-> resourceProcessor interaction is required
@@ -3706,6 +3799,7 @@ void MediaServerProcess::stopObjects()
     m_autoRequestForwarder.reset();
     m_audioStreamerPool.reset();
     m_upnpPortMapper.reset();
+    m_metricsController.reset();
 
     stopAsync();
 }
@@ -3875,15 +3969,12 @@ void MediaServerProcess::doMigrationFrom_2_4()
 }
 
 static QnStorageResource* initSpaceLimitAndTotalSpace(
-    QnStorageResource* storage,
-    QnCommonModule* commonModule)
+    QnStorageResource* storage, QnCommonModule* commonModule)
 {
     if (!storage)
         return storage;
 
-    auto fileStorage = dynamic_cast<QnFileStorageResource*>(storage);
-    if (storage->getTotalSpace() <= 0 && fileStorage)
-        fileStorage->calculateAndSetTotalSpaceWithoutInit();
+    storage->initOrUpdate();
 
     const auto& beforeRestoreData = commonModule->beforeRestoreDbData();
     if (!beforeRestoreData.isEmpty() && beforeRestoreData.hasInfoForStorage(storage->getUrl()))
@@ -3892,6 +3983,7 @@ static QnStorageResource* initSpaceLimitAndTotalSpace(
         return storage;
     }
 
+    auto fileStorage = dynamic_cast<QnFileStorageResource*>(storage);
     if (fileStorage)
         fileStorage->setSpaceLimit(fileStorage->calcInitialSpaceLimit());
     else
@@ -3913,11 +4005,7 @@ void MediaServerProcess::loadPlugins()
             [&settings, storagePlugin](QnCommonModule* commonModule, const QString& path)
             {
                 return initSpaceLimitAndTotalSpace(
-                    QnThirdPartyStorageResource::instance(
-                        commonModule,
-                        path,
-                        storagePlugin,
-                        settings),
+                    QnThirdPartyStorageResource::instance(commonModule, path, storagePlugin, settings),
                     commonModule);
             },
             false);
@@ -3928,9 +4016,7 @@ void MediaServerProcess::loadPlugins()
         [this](QnCommonModule*, const QString& path)
         {
             return initSpaceLimitAndTotalSpace(
-                QnFileStorageResource::instance(
-                    this->serverModule(),
-                    path),
+                QnFileStorageResource::instance(this->serverModule(), path),
                 commonModule());
         }, /*isDefaultProtocol*/ true);
 
@@ -3943,9 +4029,7 @@ void MediaServerProcess::loadPlugins()
         [this](QnCommonModule*, const QString& path)
         {
             return initSpaceLimitAndTotalSpace(
-                QnFileStorageResource::instance(
-                    this->serverModule(),
-                    path),
+                QnFileStorageResource::instance(this->serverModule(), path),
                 commonModule());
         }, /*isDefaultProtocol*/ false);
 }
@@ -4049,6 +4133,14 @@ void MediaServerProcess::connectSignals()
         m_cloudIntegrationManager->cloudManagerGroup().connectionManager.setProxyVia(
             nx::network::SocketAddress(nx::network::HostAddress::localhost, m_universalTcpListener->getPort()));
     });
+
+    connect(m_raidEventLogReader.get(), &RaidEventLogReader::eventOccurred, this,
+        &MediaServerProcess::at_storageManager_raidStorageFailure);
+    m_raidEventLogReader->subscribe();
+
+    connect(
+        this, &MediaServerProcess::started,
+        [this]() { emit MediaServerProcess::startedWithSignalsProcessed(); });
 }
 
 void MediaServerProcess::setUpDataFromSettings()
@@ -4113,6 +4205,8 @@ QnUuid MediaServerProcess::selectDefaultStorageForAnalyticsEvents(QnMediaServerR
             if (fileStorage->isLocal()
                 && !fileStorage->isSystem()
                 && fileStorage->isUsedForWriting()
+                && storage->initOrUpdate() == Qn::StorageInit_Ok
+                && fileStorage->isWritable()
                 && fileStorage->getTotalSpace() > maxTotalSpace)
             {
                 maxTotalSpace = fileStorage->getTotalSpace();
@@ -4126,11 +4220,7 @@ QnUuid MediaServerProcess::selectDefaultStorageForAnalyticsEvents(QnMediaServerR
 
 QString MediaServerProcess::getMetadataDatabaseName() const
 {
-    auto storageResource = commonModule()->resourcePool()->getResourceById<QnStorageResource>(
-        m_mediaServer->metadataStorageId());
-    const auto pathBase = storageResource ? storageResource->getPath()
-        : nx::network::url::normalizePath(serverModule()->settings().dataDir());
-    return closeDirPath(pathBase) + "object_detection.sqlite";
+    return serverModule()->metadataDatabaseDir() + "object_detection.sqlite";
 }
 
 bool MediaServerProcess::initializeAnalyticsEvents()
@@ -4152,11 +4242,13 @@ bool MediaServerProcess::initializeAnalyticsEvents()
         if (policy == nx::vms::api::MetadataStorageChangePolicy::remove)
         {
             if (!QFile::remove(m_oldAnalyticsStoragePath))
-                NX_WARNING(this, "Can not remove database %1", m_oldAnalyticsStoragePath);
+                NX_WARNING(this, "Can't remove analytics database [%1]", m_oldAnalyticsStoragePath);
+            else
+                NX_INFO(this, "Analytics database [%1] removed", m_oldAnalyticsStoragePath);
         }
     }
 
-    m_oldAnalyticsStoragePath = settings.dbConnectionOptions.dbName;
+    m_oldAnalyticsStoragePath = closeDirPath(settings.path) + settings.dbConnectionOptions.dbName;
     return true;
 }
 
@@ -4228,7 +4320,6 @@ void MediaServerProcess::initNewSystemStateIfNeeded(
 
 void MediaServerProcess::startObjects()
 {
-    QTimer::singleShot(3000, this, SLOT(at_connectionOpened()));
     QTimer::singleShot(0, this, SLOT(at_appStarted()));
 
     at_timer();
@@ -4246,9 +4337,16 @@ void MediaServerProcess::startObjects()
     else
     {
         const int64_t dbBackupPeriodMS = serverModule()->settings().dbBackupPeriodMS().count();
-        initialBackupDbPeriodMs = std::max<int64_t>(
-            *lastDbBackupTimestamp + dbBackupPeriodMS - qnSyncTime->currentMSecsSinceEpoch(),
-            0LL);
+        const int64_t nowMs = qnSyncTime->currentMSecsSinceEpoch();
+        if (*lastDbBackupTimestamp >= nowMs) //< Last backup was performed in the future.
+        {
+            initialBackupDbPeriodMs = dbBackupPeriodMS;
+        }
+        else
+        {
+            initialBackupDbPeriodMs =
+                std::max<int64_t>(*lastDbBackupTimestamp + dbBackupPeriodMS - nowMs, 0LL);
+        }
     }
     m_createDbBackupTimer->start(initialBackupDbPeriodMs);
 
@@ -4272,6 +4370,7 @@ void MediaServerProcess::startObjects()
         serverModule()->licenseWatcher()->start();
 
     commonModule()->messageProcessor()->init(commonModule()->ec2Connection()); // start receiving notifications
+    writeServerStartedEvent();
 }
 
 std::map<QString, QVariant> MediaServerProcess::confParamsFromSettings() const
@@ -4352,6 +4451,7 @@ static QByteArray loadDataFromUrl(nx::utils::Url url)
 {
     auto httpClient = std::make_unique<nx::network::http::HttpClient>();
     httpClient->setResponseReadTimeout(kResourceDataReadingTimeout);
+    httpClient->setMessageBodyReadTimeout(kResourceDataReadingTimeout);
     if (httpClient->doGet(url)
         && httpClient->response()->statusLine.statusCode == nx::network::http::StatusCode::ok)
     {
@@ -4453,6 +4553,81 @@ void MediaServerProcess::loadResourceParamsData()
     }
 }
 
+void MediaServerProcess::initMetricsController()
+{
+    m_metricsController = std::make_unique<nx::vms::utils::metrics::Controller>(
+        [](){ return (uint64_t) qnSyncTime->currentMSecsSinceEpoch() / 1000; });
+
+    m_metricsController->registerGroup(
+        "systems",
+        std::make_unique<nx::vms::server::metrics::SystemProvider>(serverModule()));
+
+    m_metricsController->registerGroup(
+        "servers",
+        std::make_unique<nx::vms::server::metrics::ServerProvider>(serverModule()));
+
+    m_metricsController->registerGroup(
+        "cameras",
+        std::make_unique<nx::vms::server::metrics::CameraProvider>(serverModule()));
+
+    m_metricsController->registerGroup(
+        "storages",
+        std::make_unique<nx::vms::server::metrics::StorageProvider>(serverModule()));
+
+    m_metricsController->registerGroup(
+        "networks",
+        std::make_unique<nx::vms::server::metrics::NetworkProvider>(commonModule()->moduleGUID()));
+
+    // TODO: Should be moved into a resource file.
+    static const QByteArray kRules(R"json({
+        "systems": {
+            "servers": { "alarms": { "warning": ">100" } },
+            "offlineServers": { "alarms": { "error": ">0" } },
+            "offlineServerEvents": { "alarms": { "warning": ">10" } }
+        },
+        "servers": {
+            "cpuUsage": { "alarms": { "warning": ">50", "error": ">70" } },
+            "misc": {
+                "group": {
+                    "encoders": { "alarms": { "error": ">2" } }
+                }
+            }
+        },
+        "cameras": {
+            "status": { "alarms": { "warning": "Unauthorized", "error": "Offline" } },
+            "statusChanges": {
+                "name": "status changes in last hour",
+                "calculate": "count status",
+                "insert": "after status",
+                "alarms": { "warning": ">0", "error": ">2" }
+            },
+            "packetLossCount": { "alarms": { "warning": ">0", "error": ">5" } },
+            "conflictCount": { "alarms": { "warning": ">0", "error": ">5" } },
+            "primaryStream": {
+                "group": {
+                    "fpsDrop": {
+                        "name": "fps drop",
+                        "calculate": "sub targetFps actualFps",
+                        "insert": "after actualFps",
+                        "alarms": { "warning": ">2", "error": ">10" }
+                    },
+                    "bitrate": { "alarms": { "warning": "<1" } }
+                }
+            }
+        },
+        "storages": {
+            "status": { "alarms": { "warning": "Unauthorized", "error": "Offline" } },
+            "issues": { "alarms": { "warning": ">0", "error": ">10" } }
+        }
+    })json");
+
+    nx::vms::api::metrics::SystemRules rules;
+    NX_CRITICAL(QJson::deserialize(kRules, &rules));
+    m_metricsController->setRules(std::move(rules));
+
+    m_metricsController->startMonitoring();
+}
+
 void MediaServerProcess::updateRootPassword()
 {
     // TODO: Root password for Nx1 should be updated in case of cloud owner.
@@ -4484,6 +4659,17 @@ void MediaServerProcess::run()
 
     if (m_serviceMode)
         initializeLogging(serverSettings.get());
+
+    // This must be done before QnCommonModule instantiation.
+    nx::utils::OsInfo::currentVariantOverride = ini().currentOsVariantOverride;
+    nx::utils::OsInfo::currentVariantVersionOverride = ini().currentOsVariantVersionOverride;
+
+    if (m_cmdLineArguments.vmsProtocolVersion > 0)
+    {
+        nx::vms::api::protocolVersionOverride = m_cmdLineArguments.vmsProtocolVersion;
+        NX_WARNING(this, "Starting with overridden protocol version: %1",
+            m_cmdLineArguments.vmsProtocolVersion);
+    }
 
     std::shared_ptr<QnMediaServerModule> serverModule(new QnMediaServerModule(
         &m_cmdLineArguments,
@@ -4570,6 +4756,8 @@ void MediaServerProcess::run()
 
     initResourceTypes();
 
+    initMetricsController();
+
     if (needToStop())
         return;
 
@@ -4599,8 +4787,6 @@ void MediaServerProcess::run()
 
     if (needToStop())
         return;
-
-    serverModule->serverUpdateTool()->removeUpdateFiles(m_mediaServer->getVersion().toString());
 
     serverModule->resourcePool()->threadPool()->setMaxThreadCount(
         serverModule->settings().resourceInitThreadsCount());
@@ -4754,6 +4940,7 @@ protected:
             return 0;
 
         int res = application()->exec();
+        qnStaticCommon->instance<QnLongRunnablePool>()->stopAll();
 
         m_main.reset();
 

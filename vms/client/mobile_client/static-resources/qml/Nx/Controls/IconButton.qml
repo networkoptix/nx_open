@@ -105,7 +105,7 @@ Control
         onCanceled:
         {
             d.pressedAndHeld = false
-            d.pressed = false
+            d.down = false
             control.canceled()
         }
 

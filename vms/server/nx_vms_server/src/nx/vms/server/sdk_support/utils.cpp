@@ -8,6 +8,7 @@
 #include <nx/utils/file_system.h>
 
 #include <nx/sdk/i_plugin_event.h>
+#include <nx/sdk/i_attribute.h>
 #include <nx/sdk/analytics/helpers/pixel_format.h>
 #include <nx/sdk/analytics/helpers/object_track_info.h>
 #include <nx/sdk/helpers/ptr.h>
@@ -326,7 +327,7 @@ nx::sdk::Ptr<ITimestampedObjectMetadata> createTimestampedObjectMetadata(
 
     for (const auto& attribute: detectedObject.attributes)
     {
-        Attribute sdkAttribute(
+        auto sdkAttribute = nx::sdk::makePtr<Attribute>(
             // Information about attribute types isn't stored in the database.
             nx::sdk::IAttribute::Type::undefined,
             attribute.name.toStdString(),
@@ -375,6 +376,24 @@ nx::sdk::Ptr<IUncompressedVideoFrame> createUncompressedVideoFrame(
         return nullptr;
 
     return nx::sdk::queryInterfacePtr<IUncompressedVideoFrame>(dataPacket);
+}
+
+std::map<QString, QString> attributesMap(
+    const nx::sdk::Ptr<const nx::sdk::analytics::IMetadata>& metadata)
+{
+    if (!NX_ASSERT(metadata, "Metadata mustn't be null"))
+        return {};
+
+    std::map<QString, QString> result;
+    for (int i = 0; i < metadata->attributeCount(); ++i)
+    {
+        const nx::sdk::Ptr<const nx::sdk::IAttribute> attribute(metadata->attribute(i));
+        result.emplace(
+            QString::fromStdString(attribute->name()),
+            QString::fromStdString(attribute->value()));
+    }
+
+    return result;
 }
 
 } // namespace nx::vms::server::sdk_support

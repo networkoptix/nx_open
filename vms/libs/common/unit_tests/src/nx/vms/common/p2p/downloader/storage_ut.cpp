@@ -588,7 +588,7 @@ TEST_F(DistributedFileDownloaderStorageTest, writeToDownloadedFile)
 
     QByteArray buffer;
     ASSERT_EQ(downloaderStorage->writeFileChunk(testFileName, 0, buffer),
-        ResultCode::ioError);
+        ResultCode::fileAlreadyDownloaded);
 }
 
 TEST_F(DistributedFileDownloaderStorageTest, fileCorruptionDuringDownload)
@@ -712,6 +712,70 @@ TEST_F(DistributedFileDownloaderStorageTest, setChecksumsToDownloadedFile)
         downloaderStorage->setChunkChecksums(
             testFileName, QVector<QByteArray>(fileInfo.downloadedChunks.size())),
         ResultCode::fileAlreadyDownloaded);
+}
+
+TEST_F(DistributedFileDownloaderStorageTest, simpleFullPath)
+{
+    createDefaultTestFile();
+
+    FileInformation fileInfo(testFileName);
+    fileInfo.status = FileInformation::Status::downloaded;
+
+    ASSERT_EQ(downloaderStorage->addFile(fileInfo), ResultCode::ok);
+
+    const QString filePath = downloaderStorage->filePath(kTestFileName);
+    ASSERT_EQ(filePath, testFilePath);
+}
+
+TEST_F(DistributedFileDownloaderStorageTest, foundFileFullPath)
+{
+    createDefaultTestFile();
+
+    FileInformation fileInfo(testFileName);
+    fileInfo.status = FileInformation::Status::downloaded;
+
+    ASSERT_EQ(downloaderStorage->addFile(fileInfo), ResultCode::ok);
+
+    Storage storage(workingDirectory);
+    storage.findDownloads(true);
+
+    const QString filePath = storage.filePath(kTestFileName);
+    ASSERT_EQ(filePath, testFilePath);
+}
+
+TEST_F(DistributedFileDownloaderStorageTest, customDirectoryFullPath)
+{
+    FileInformation fileInfo(testFileName);
+    fileInfo.absoluteDirectoryPath = nx::utils::TestOptions::temporaryDirectoryPath();
+    fileInfo.status = FileInformation::Status::downloaded;
+
+    const QString testFilePath =
+        QDir(fileInfo.absoluteDirectoryPath).absoluteFilePath(kTestFileName);
+    utils::createRandomFile(testFilePath, kTestFileSize);
+
+    ASSERT_EQ(downloaderStorage->addFile(fileInfo), ResultCode::ok);
+
+    const QString filePath = downloaderStorage->filePath(kTestFileName);
+    ASSERT_EQ(filePath, testFilePath);
+}
+
+TEST_F(DistributedFileDownloaderStorageTest, customDirectoryfoundFileFullPath)
+{
+    FileInformation fileInfo(testFileName);
+    fileInfo.absoluteDirectoryPath = nx::utils::TestOptions::temporaryDirectoryPath();
+    fileInfo.status = FileInformation::Status::downloaded;
+
+    const QString testFilePath =
+        QDir(fileInfo.absoluteDirectoryPath).absoluteFilePath(kTestFileName);
+    utils::createRandomFile(testFilePath, kTestFileSize);
+
+    ASSERT_EQ(downloaderStorage->addFile(fileInfo), ResultCode::ok);
+
+    Storage storage(workingDirectory);
+    storage.findDownloads(true);
+
+    const QString filePath = storage.filePath(kTestFileName);
+    ASSERT_EQ(filePath, testFilePath);
 }
 
 } // namespace test

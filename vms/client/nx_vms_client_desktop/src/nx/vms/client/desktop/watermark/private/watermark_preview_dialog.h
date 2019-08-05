@@ -32,7 +32,7 @@ private:
     QScopedPointer<Ui::WatermarkPreviewDialog> ui;
 
     QnWatermarkSettings m_settings;
-    QScopedPointer<QPixmap> m_baseImage;
+    QPixmap m_baseImage;
     bool m_lockUpdate = false;
 };
 

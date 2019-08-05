@@ -1,5 +1,7 @@
 #pragma once
+
 #include <QtCore/QObject>
+#include <QtCore/QTimer>
 
 #include <ui/workbench/workbench_context_aware.h>
 #include <nx/utils/software_version.h>

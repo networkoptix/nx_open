@@ -32,11 +32,11 @@ public:
     void setOnline(bool value);
 
     Q_INVOKABLE QVariantList pluginModules() const;
-    void setPluginModules(const nx::vms::api::PluginModuleDataList& value);
+    void setPluginModules(const nx::vms::api::PluginInfoList& value);
 
     Q_INVOKABLE QVariant currentPlugin() const;
     Q_INVOKABLE QVariantList currentPluginDetails() const;
-    Q_INVOKABLE void selectCurrentPlugin(const QString& libraryName);
+    Q_INVOKABLE void selectCurrentPlugin(const QString& libraryFilename);
 
     Q_INVOKABLE bool pluginsInformationLoading() const;
     void setPluginsInformationLoading(bool value);

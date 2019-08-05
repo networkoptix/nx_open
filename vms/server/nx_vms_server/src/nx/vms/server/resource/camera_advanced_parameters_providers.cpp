@@ -166,26 +166,30 @@ QnLiveStreamParams StreamCapabilityAdvancedParametersProvider::getParameters() c
 
 bool StreamCapabilityAdvancedParametersProvider::setParameters(const QnLiveStreamParams& value)
 {
-    QnMutexLocker lock(&m_mutex);
-    if (m_parameters == value)
-        return true;
-
-    if (value == m_defaults)
     {
-        if (!m_camera->setProperty(proprtyName(), QString()))
+        QnMutexLocker lock(&m_mutex);
+        if (m_parameters == value)
+            return true;
+
+        if (value == m_defaults)
+        {
+            if (!m_camera->setProperty(proprtyName(), QString()))
+                return false;
+        }
+        else
+        {
+            const auto json = QString::fromUtf8(QJson::serialized(value));
+            if (!m_camera->setProperty(proprtyName(), json))
+                return false;
+        }
+
+        m_parameters = value;
+        updateMediaCapabilities();
+        if (!m_camera->saveProperties())
             return false;
     }
-    else
-    {
-        const auto json = QString::fromUtf8(QJson::serialized(value));
-        if (!m_camera->setProperty(proprtyName(), json))
-            return false;
-    }
 
-    m_parameters = value;
-
-    auto videoCameraPool = m_camera->serverModule()->videoCameraPool();
-    if (videoCameraPool)
+    if (auto videoCameraPool = m_camera->serverModule()->videoCameraPool())
     {
         if (const auto camera = videoCameraPool->getVideoCamera(toSharedPointer(m_camera)))
         {
@@ -198,8 +202,8 @@ bool StreamCapabilityAdvancedParametersProvider::setParameters(const QnLiveStrea
                 stream->pleaseReopenStream();
         }
     }
-    updateMediaCapabilities();
-    return m_camera->saveProperties();
+
+    return true;
 }
 
 void StreamCapabilityAdvancedParametersProvider::updateMediaCapabilities()

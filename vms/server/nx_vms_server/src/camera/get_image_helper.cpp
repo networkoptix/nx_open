@@ -28,6 +28,14 @@ static constexpr int kMaxGopLen = 100;
 static constexpr int kRoundFactor = 4;
 static constexpr int kGetFrameExtraTriesPerChannel = 10;
 
+bool isSpecialArchiveTime(qint64 timestampUsec)
+{
+    static const qint64 kZeroPosition = 0;
+    return timestampUsec == DATETIME_NOW
+        || timestampUsec == nx::api::ImageRequest::kLatestThumbnail
+        || timestampUsec == kZeroPosition;
+}
+
 QnCompressedVideoDataPtr getNextArchiveVideoPacket(
     QnAbstractArchiveDelegate* archiveDelegate, qint64 ceilTimeUs)
 {
@@ -272,7 +280,7 @@ CLVideoDecoderOutputPtr QnGetImageHelper::readFrame(
     CLVideoDecoderOutputPtr outFrame(new CLVideoDecoderOutput());
     bool gotFrame = false;
     QnFfmpegVideoDecoder decoder(
-        DecoderConfig::fromResource(resource), video->compressionType, video, false);
+        DecoderConfig(), video->compressionType, video);
 
     if (!isArchiveVideoPacket)
     {
@@ -531,7 +539,7 @@ StreamIndex QnGetImageHelper::determineStreamIndex(
 {
     NX_VERBOSE(this, "%1(%2)", __func__, request.streamSelectionMode);
 
-    using StreamSelectionMode = nx::api::CameraImageRequest::StreamSelectionMode;
+    using StreamSelectionMode = nx::api::ImageRequest::StreamSelectionMode;
     switch (request.streamSelectionMode)
     {
         case StreamSelectionMode::auto_:
@@ -595,6 +603,12 @@ CLVideoDecoderOutputPtr QnGetImageHelper::getImageWithCertainQuality(
         NX_VERBOSE(this, "%1() END -> null: frame not found", __func__);
         return nullptr;
     }
+    else if (!isSpecialArchiveTime(request.usecSinceEpoch)
+        && frame->pkt_dts - request.usecSinceEpoch > std::chrono::microseconds(MAX_FRAME_DURATION).count())
+    {
+        NX_VERBOSE(this, "%1() frame for a requested archive position is not found", __func__);
+        return nullptr;
+    }
 
     QnConstResourceVideoLayoutPtr layout = camera->getVideoLayout();
     const int channelCount = layout->channelCount();
@@ -653,8 +667,8 @@ CLVideoDecoderOutputPtr QnGetImageHelper::decodeFrameSequence(
 
     CLVideoDecoderOutputPtr outFrame(new CLVideoDecoderOutput());
     QnFfmpegVideoDecoder decoder(
-        DecoderConfig::fromResource(resource),
-        firstFrame->compressionType, firstFrame, false);
+        DecoderConfig(),
+        firstFrame->compressionType, firstFrame);
     for (int i = 0; i < randomAccess.size(); ++i)
     {
         auto frame = std::dynamic_pointer_cast<const QnCompressedVideoData>(randomAccess.at(i));

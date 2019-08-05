@@ -72,7 +72,7 @@ bool CameraSelectionDialog::selectCameras(
         };
 
     const auto getText =
-        [](const QnResourceList& resources, bool detailed)
+        [](const QnResourceList& resources, bool /*detailed*/)
         {
             const bool isValid = isResourcesListValid<ResourcePolicy>(resources);
             return isValid ? QString() : ResourcePolicy::getText(resources);

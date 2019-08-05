@@ -21,9 +21,17 @@ public:
         QnUuid engineId,
         nx::vms::api::StreamIndex = nx::vms::api::StreamIndex::undefined);
 
-    void pushFrameInfo(std::unique_ptr<IFrameInfo> frameInfo);
+    void pushData(
+        const QnConstAbstractMediaDataPtr& data,
+        const QString& additionalInfo = QString());
 
-    void pushObjectMetadata(nx::common::metadata::DetectionMetadataPacket metadataPacket);
+    void pushFrameInfo(
+        std::unique_ptr<IFrameInfo> frameInfo,
+        const QString& additionalFrameInfo = QString());
+
+    void pushObjectMetadata(
+        nx::common::metadata::DetectionMetadataPacket metadataPacket,
+        const QString& additionalObjectMetadataInfo = QString());
 
 private:
     using PlaceholderMap = std::map</*PlaceholderName*/ QString, /*PlaceholderValue*/ QString>;
@@ -41,11 +49,17 @@ private:
     QFile m_outputFile;
     nx::vms::api::StreamIndex m_streamIndex;
 
+    bool m_isLoggingBestShot = false;
+
     nx::common::metadata::DetectionMetadataPacket m_currentObjectMetadataPacket;
     nx::common::metadata::DetectionMetadataPacket m_prevObjectMetadataPacket;
 
+    nx::common::metadata::DetectionMetadataPacket m_currentBestShotMetadataPacket;
+    QString m_additionalObjectMetadataInfo;
+
     std::chrono::microseconds m_currentFrameTimestamp{0};
     std::chrono::microseconds m_prevFrameTimestamp{0};
+    QString m_additionalFrameInfo;
 };
 
 } // namespace nx::analytics

@@ -21,13 +21,14 @@ protected:
     virtual void paintEvent(QPaintEvent *event) override;
 
 public slots:
-    void at_gotSignature(QByteArray calculatedSign, QByteArray signFromFrame);
+    void at_gotSignature(QByteArray calculatedSign, QByteArray calculatedSign2, QByteArray signFromFrame);
     void at_gotSignatureDescription(QString version, QString hwId, QString licensedTo);
     void at_calcSignInProgress(QByteArray sign, int progress);
 
 private:
     QnSignHelper m_signHelper;
     QByteArray m_sign;
+    QByteArray m_sign2;
     QByteArray m_signFromFrame;
     QnMutex m_mutex;
     bool m_finished;

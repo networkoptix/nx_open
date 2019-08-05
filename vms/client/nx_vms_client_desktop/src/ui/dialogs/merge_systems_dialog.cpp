@@ -4,6 +4,7 @@
 #include <QtCore/QUrl>
 #include <QtWidgets/QButtonGroup>
 
+#include <nx_ec/ec_api.h>
 #include <api/app_server_connection.h>
 #include <common/common_module.h>
 
@@ -48,7 +49,7 @@ QnMergeSystemsDialog::QnMergeSystemsDialog(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    ui->urlComboBox->lineEdit()->setPlaceholderText("http(s)://host:port");
+    ui->urlComboBox->lineEdit()->setPlaceholderText("https://host:port");
     m_mergeButton = ui->buttonBox->addButton(QString(), QDialogButtonBox::ActionRole);
     setWarningStyle(ui->errorLabel);
     m_mergeButton->hide();

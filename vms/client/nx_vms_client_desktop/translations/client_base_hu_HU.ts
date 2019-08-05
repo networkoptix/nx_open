@@ -234,10 +234,6 @@ több könyvjelző megjelenítéséhez</translation>
       <translation>Videofal nézet mentése</translation>
     </message>
     <message>
-      <source>Drop Resources</source>
-      <translation>Eszköz bedobása</translation>
-    </message>
-    <message>
       <source>Start Screen Recording</source>
       <translation>Képernyőfelvétel indítása</translation>
     </message>
@@ -1019,9 +1015,9 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message numerus="yes">
       <source>%n layouts</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n elrendezések</numerusform>
-        <numerusform>%n layouts</numerusform>
+        <numerusform>%n elrendezések</numerusform>
       </translation>
     </message>
   </context>
@@ -1087,9 +1083,9 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message numerus="yes">
       <source>%n layouts</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n elrendezések</numerusform>
-        <numerusform>%n layouts</numerusform>
+        <numerusform>%n elrendezések</numerusform>
       </translation>
     </message>
     <message>
@@ -1185,9 +1181,9 @@ több könyvjelző megjelenítéséhez</translation>
     <message numerus="yes">
       <source>File name must not contain the following reserved characters:</source>
       <comment>Plural relates to the word _characters_ here, not _file name_.</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>A fájlnév nem tartalmazhatja a következő karaktereket:</numerusform>
-        <numerusform>File name must not contain the following reserved characters:</numerusform>
+        <numerusform>A fájlnév nem tartalmazhatja a következő karaktereket:</numerusform>
       </translation>
     </message>
   </context>
@@ -2891,10 +2887,6 @@ to %1</source>
       <source>44.1 kHz and 48 kHz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
       <translation>44.1kHz és 48 kHz-es formátumok audio formátumok rögzítését az eszköz nem támogatja. Válasszon más audio eszközt, vagy &quot;semmi&quot; gombot, a képernyő felvétel-beállítások megnyitásához.</translation>
     </message>
-    <message>
-      <source>Configured codec: %1 not found, h263p will used</source>
-      <translation type="unfinished">Configured codec: %1 not found, h263p will used</translation>
-    </message>
   </context>
   <context>
     <name>QnDisconnectFromCloudDialogPrivate</name>
@@ -3199,6 +3191,17 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnGLCheckerInstrument</name>
+    <message>
+      <source>Video card drivers are outdated or not installed</source>
+      <translation>Videokártya-illesztőprogram elavult, vagy nincs telepítve</translation>
+    </message>
+    <message>
+      <source>%1 may not work properly.</source>
+      <translation>%1 nem működik megfelelően.</translation>
+    </message>
+  </context>
+  <context>
     <name>QnGeneralPreferencesWidget</name>
     <message>
       <source>Select folder...</source>
@@ -3282,17 +3285,6 @@ to %1</source>
     <message>
       <source>Creates a backup of System configuration that can be restored in case of failure.</source>
       <translation>Létrehoz egy biztonsági másolatot a rendszer konfigurációjáról, amely hiba esetén visszaállítható.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnGlHardwareChecker</name>
-    <message>
-      <source>Video card drivers are outdated or not installed</source>
-      <translation>Videokártya-illesztőprogram elavult, vagy nincs telepítve</translation>
-    </message>
-    <message>
-      <source>%1 may not work properly.</source>
-      <translation>%1 nem működik megfelelően.</translation>
     </message>
   </context>
   <context>
@@ -3589,8 +3581,8 @@ to %1</source>
       </translation>
     </message>
     <message>
-      <source>Qty</source>
-      <translation>menny.</translation>
+      <source>Channels</source>
+      <translation type="unfinished">Channels</translation>
     </message>
   </context>
   <context>
@@ -5111,6 +5103,10 @@ to %1</source>
       <source>Server Web Page</source>
       <translation>Szerver weboldala</translation>
     </message>
+    <message>
+      <source>Plugins</source>
+      <translation type="unfinished">Plugins</translation>
+    </message>
   </context>
   <context>
     <name>QnServerSettingsWidget</name>
@@ -5581,16 +5577,30 @@ to %1</source>
       <translation>Biztonsági mentés kész</translation>
     </message>
     <message>
-      <source>Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</source>
-      <translation>Rögzítés a lekapcsolt tárolóra leáll. A lejáró felvételek továbbra is törlésre kerülnek.</translation>
-    </message>
-    <message>
-      <source>Recording was enabled on the USB storage</source>
-      <translation>A felvétel engedélyezve volt az USB-táron</translation>
-    </message>
-    <message>
       <source>Reindexing can fix problems with archive or backup if they have been lost or damaged, or if some hardware has been replaced.</source>
       <translation>Az újraindexelés az archiválással vagy a biztonsági mentéssel kapcsolatos problémákat javíthatja, ha elveszett vagy megsérült, vagy ha valamilyen hardvert kicseréltek.</translation>
+    </message>
+    <message>
+      <source>What to do with current analytics data?</source>
+      <translation type="unfinished">What to do with current analytics data?</translation>
+    </message>
+    <message>
+      <source>Current analytics data will not be automatically moved to another location and will become unaccessible. You can keep it and manually move later, or delete permanently.
+If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
+      <translation type="unfinished">Current analytics data will not be automatically moved to another location and will become unaccessible. You can keep it and manually move later, or delete permanently.
+If you intended to move analytics data to another storage location, please contact support before proceeding.</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>Törlés</translation>
+    </message>
+    <message>
+      <source>Keep</source>
+      <translation>Megtart</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>Mégsem</translation>
     </message>
   </context>
   <context>
@@ -5638,6 +5648,14 @@ to %1</source>
     <message>
       <source>Too small and system partitions are reserved and not used for writing if there is enough other storage space available.</source>
       <translation>A fenntartott rendszerpartíciók túl kicsik, nem használhatók írásra, ha nem áll rendelkezésre elegendő tárhely.</translation>
+    </message>
+    <message>
+      <source>Use to store analytics data</source>
+      <translation type="unfinished">Use to store analytics data</translation>
+    </message>
+    <message>
+      <source>Stores analytics data</source>
+      <translation type="unfinished">Stores analytics data</translation>
     </message>
   </context>
   <context>
@@ -5725,8 +5743,8 @@ to %1</source>
       <translation>Felhasználók</translation>
     </message>
     <message>
-      <source>Analytics</source>
-      <translation>analitika</translation>
+      <source>Plugins</source>
+      <translation type="unfinished">Plugins</translation>
     </message>
   </context>
   <context>
@@ -6744,9 +6762,9 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Selected file formats are not supported</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>A kiválasztott fájlformátumok nem támogatottak</numerusform>
-        <numerusform>Selected file formats are not supported</numerusform>
+        <numerusform>A kiválasztott fájlformátumok nem támogatottak</numerusform>
       </translation>
     </message>
     <message>
@@ -6755,23 +6773,23 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Selected files do not have timestamps</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>A kiválasztott fájlok nem tartalmaznak időbélyegzőket</numerusform>
-        <numerusform>Selected files do not have timestamps</numerusform>
+        <numerusform>A kiválasztott fájlok nem tartalmaznak időbélyegzőket</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files cover periods for which videos are already being uploaded</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>A kiválasztott fájlok olyan időszakokat tartalmaznak, amelyekre a videókat már korábban feltöltöttek</numerusform>
-        <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
+        <numerusform>A kiválasztott fájlok olyan időszakokat tartalmaznak, amelyekre a videókat már korábban feltöltöttek</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files cover periods for which videos have already been uploaded</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>A kiválasztott fájlok olyan időszakokat tartalmaznak, amelyekre a videókat már korábban feltöltöttek</numerusform>
-        <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
+        <numerusform>A kiválasztott fájlok olyan időszakokat tartalmaznak, amelyekre a videókat már korábban feltöltöttek</numerusform>
       </translation>
     </message>
     <message>
@@ -6788,37 +6806,37 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Selected files are too old</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>A kijelölt fájlok túl régiek</numerusform>
-        <numerusform>Selected files are too old</numerusform>
+        <numerusform>A kijelölt fájlok túl régiek</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>A kiválasztott fájlt %1 on rögzítették, de csak az utolsó %n napban rögzített fájlok tölthetők fel. Ezt megváltoztathatja a kamera archív beállításaiban.</numerusform>
-        <numerusform>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
+        <numerusform>A kiválasztott fájlt %1 on rögzítették, de csak az utolsó %n napban rögzített fájlok tölthetők fel. Ezt megváltoztathatja a kamera archív beállításaiban.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>A kiválasztott fájlt %1 és %2 között rögzítették, de csak az utolsó %n napban rögzített fájlok tölthetők fel. Ezt megváltoztathatja a kamera archív beállításaiban.</numerusform>
-        <numerusform>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
+        <numerusform>A kiválasztott fájlt %1 és %2 között rögzítették, de csak az utolsó %n napban rögzített fájlok tölthetők fel. Ezt megváltoztathatja a kamera archív beállításaiban.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Some footage may be deleted after uploading these files</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Néhány felvétel törlődhet ezen fájlok feltöltése után</numerusform>
-        <numerusform>Some footage may be deleted after uploading these files</numerusform>
+        <numerusform>Néhány felvétel törlődhet ezen fájlok feltöltése után</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Nincs túl sok szabad hely a szerver tárhelyén. Egyes régi felvételek törlődhetnek, hogy helyet szabadítsanak fel. Ne feledje, hogy ha a kiválasztott fájlok a legrégebbiek a szerveren, akkor a feltöltés után azonnal törlődnek.</numerusform>
-        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
+        <numerusform>Nincs túl sok szabad hely a szerver tárhelyén. Egyes régi felvételek törlődhetnek, hogy helyet szabadítsanak fel. Ne feledje, hogy ha a kiválasztott fájlok a legrégebbiek a szerveren, akkor a feltöltés után azonnal törlődnek.</numerusform>
       </translation>
     </message>
     <message>
@@ -7496,12 +7514,12 @@ to %1</source>
       </translation>
     </message>
     <message>
-      <source>UDP Multicast</source>
-      <translation type="unfinished">UDP Multicast</translation>
-    </message>
-    <message>
       <source>Server will not change any cameras settings, it will receive and use camera stream as-is.</source>
       <translation>A szerver nem változtatja meg a kamera beállításait, hanem a kamera előre beállított adatfolyamát fogja használni.</translation>
+    </message>
+    <message>
+      <source>Multicast</source>
+      <translation type="unfinished">Multicast</translation>
     </message>
   </context>
   <context>
@@ -7644,10 +7662,6 @@ to %1</source>
       <translation>Weboldal</translation>
     </message>
     <message>
-      <source>Analytics</source>
-      <translation>analitika</translation>
-    </message>
-    <message>
       <source>Expert</source>
       <translation>Szakértő</translation>
     </message>
@@ -7699,6 +7713,10 @@ to %1</source>
     <message>
       <source>I/O Modules Settings</source>
       <translation>I/O modulok beállítása</translation>
+    </message>
+    <message>
+      <source>Plugins</source>
+      <translation type="unfinished">Plugins</translation>
     </message>
   </context>
   <context>
@@ -8533,10 +8551,6 @@ to %1</source>
       <translation>Egyes kiszolgálók offline állapotban vannak, és nem frissülnek. Kihagyja őket?</translation>
     </message>
     <message>
-      <source>Please make sure there is enough free storage space and network connection is stable.</source>
-      <translation>Győződjön meg róla, hogy elegendő szabad tárhely van, és a hálózati kapcsolat stabil.</translation>
-    </message>
-    <message>
       <source>If the problem persists, please contact Customer Support.</source>
       <translation>Ha a probléma továbbra is fennáll, kérjük, forduljon az ügyfélszolgálathoz.</translation>
     </message>
@@ -8549,16 +8563,8 @@ to %1</source>
       <translation>Frissítés megszakítása</translation>
     </message>
     <message>
-      <source>Please make sure they have enough free storage space and stable network connection.</source>
-      <translation>Győződjön meg róla, hogy elegendő szabad tárhelyük van van, és a hálózati kapcsolat stabil.</translation>
-    </message>
-    <message>
       <source>Update completed</source>
       <translation>A frissítés befejeződött</translation>
-    </message>
-    <message>
-      <source>Update completed, but some servers have failed an update</source>
-      <translation type="unfinished">Update completed, but some servers have failed an update</translation>
     </message>
     <message>
       <source>Nx Witness Client will be restarted to the updated version.</source>
@@ -8569,16 +8575,8 @@ to %1</source>
       <translation>OK</translation>
     </message>
     <message>
-      <source>Failed to install updates to servers:</source>
-      <translation type="unfinished">Failed to install updates to servers:</translation>
-    </message>
-    <message>
       <source>Downloading updates...</source>
       <translation>Frissítések letöltése...</translation>
-    </message>
-    <message>
-      <source>Pushing updates...</source>
-      <translation type="unfinished">Pushing updates...</translation>
     </message>
     <message>
       <source>Upload</source>
@@ -8704,17 +8702,65 @@ to %1</source>
       <translation type="unfinished">Cancel update and delete all downloaded data?</translation>
     </message>
     <message>
+      <source>There was an error while installing updates:</source>
+      <translation type="unfinished">There was an error while installing updates:</translation>
+    </message>
+    <message>
+      <source>Some servers have gone offline. Please wait until they become online to continue.</source>
+      <translation type="unfinished">Some servers have gone offline. Please wait until they become online to continue.</translation>
+    </message>
+    <message>
+      <source>Update completed, but some components have failed an update</source>
+      <translation type="unfinished">Update completed, but some components have failed an update</translation>
+    </message>
+    <message>
+      <source>Please update %1 manually using an installation package.</source>
+      <translation>Kérjük frissítsen %1 verzióra manuálisan egy telepítőcsomaggal.</translation>
+    </message>
+    <message>
+      <source>%1 will be restarted to the updated version.</source>
+      <translation>%1 a frissítés miatt újra fog indulni.</translation>
+    </message>
+    <message>
       <source>Failed to download update packages to some components</source>
       <translation type="unfinished">Failed to download update packages to some components</translation>
+    </message>
+    <message>
+      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
+      <translation type="unfinished">OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</translation>
+    </message>
+    <message>
+      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
+      <translation type="unfinished">OS version of the client is no longer supported. Please update its OS to a supported version.</translation>
+    </message>
+    <message>
+      <source>Failed to start update</source>
+      <translation type="unfinished">Failed to start update</translation>
+    </message>
+    <message>
+      <source>Starting update to ...</source>
+      <translation type="unfinished">Starting update to ...</translation>
+    </message>
+    <message>
+      <source>Some servers have no package available</source>
+      <translation type="unfinished">Some servers have no package available</translation>
+    </message>
+    <message>
+      <source>Failed to cancel update</source>
+      <translation type="unfinished">Failed to cancel update</translation>
+    </message>
+    <message>
+      <source>Failed to start installation</source>
+      <translation type="unfinished">Failed to start installation</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::MultipleLayoutSelectionDialog</name>
     <message numerus="yes">
       <source>%n layouts</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n elrendezések</numerusform>
-        <numerusform>%n layouts</numerusform>
+        <numerusform>%n elrendezések</numerusform>
       </translation>
     </message>
     <message>
@@ -8737,10 +8783,6 @@ to %1</source>
       <translation>Általános esemény</translation>
     </message>
     <message>
-      <source>Unknown Plugin Event</source>
-      <translation type="unfinished">Unknown Plugin Event</translation>
-    </message>
-    <message>
       <source>Device was disconnected</source>
       <translation type="unfinished">Device was disconnected</translation>
     </message>
@@ -8751,6 +8793,10 @@ to %1</source>
     <message>
       <source>I/O Module was disconnected</source>
       <translation type="unfinished">I/O Module was disconnected</translation>
+    </message>
+    <message>
+      <source>Unknown Plugin Diagnostic Event</source>
+      <translation type="unfinished">Unknown Plugin Diagnostic Event</translation>
     </message>
   </context>
   <context>
@@ -8824,6 +8870,66 @@ to %1</source>
     <message>
       <source>Failed to install update</source>
       <translation type="unfinished">Failed to install update</translation>
+    </message>
+    <message>
+      <source>Waiting for peer data</source>
+      <translation type="unfinished">Waiting for peer data</translation>
+    </message>
+    <message>
+      <source>There is not enough space to download update files.</source>
+      <translation type="unfinished">There is not enough space to download update files.</translation>
+    </message>
+    <message>
+      <source>There is not enough space to extract update files.</source>
+      <translation type="unfinished">There is not enough space to extract update files.</translation>
+    </message>
+    <message>
+      <source>Failed to download update packages.</source>
+      <translation type="unfinished">Failed to download update packages.</translation>
+    </message>
+    <message>
+      <source>Update contents are invalid.</source>
+      <translation type="unfinished">Update contents are invalid.</translation>
+    </message>
+    <message>
+      <source>Update archive is corrupted.</source>
+      <translation type="unfinished">Update archive is corrupted.</translation>
+    </message>
+    <message>
+      <source>Update files cannot be extracted.</source>
+      <translation type="unfinished">Update files cannot be extracted.</translation>
+    </message>
+    <message>
+      <source>Internal downloader error.</source>
+      <translation type="unfinished">Internal downloader error.</translation>
+    </message>
+    <message>
+      <source>Internal client error.</source>
+      <translation type="unfinished">Internal client error.</translation>
+    </message>
+    <message>
+      <source>Unknown error.</source>
+      <translation>Ismeretlen hiba.</translation>
+    </message>
+    <message>
+      <source>Unexpected error code.</source>
+      <translation type="unfinished">Unexpected error code.</translation>
+    </message>
+    <message>
+      <source>Ready to install update</source>
+      <translation type="unfinished">Ready to install update</translation>
+    </message>
+    <message>
+      <source>Update package is not found.</source>
+      <translation type="unfinished">Update package is not found.</translation>
+    </message>
+    <message>
+      <source>There is not enough space to install update.</source>
+      <translation type="unfinished">There is not enough space to install update.</translation>
+    </message>
+    <message>
+      <source>Internal server error.</source>
+      <translation type="unfinished">Internal server error.</translation>
     </message>
   </context>
   <context>
@@ -8981,6 +9087,69 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::ServerSettingsDialogStore</name>
+    <message>
+      <source>Library</source>
+      <translation type="unfinished">Library</translation>
+    </message>
+    <message>
+      <source>Version</source>
+      <translation type="unfinished">Version</translation>
+    </message>
+    <message>
+      <source>Vendor</source>
+      <translation>Gyártó</translation>
+    </message>
+    <message>
+      <source>no error</source>
+      <translation type="unfinished">no error</translation>
+    </message>
+    <message>
+      <source>library file cannot be loaded</source>
+      <translation type="unfinished">library file cannot be loaded</translation>
+    </message>
+    <message>
+      <source>invalid or incompatible plugin library</source>
+      <translation type="unfinished">invalid or incompatible plugin library</translation>
+    </message>
+    <message>
+      <source>plugin library failed to initialize</source>
+      <translation type="unfinished">plugin library failed to initialize</translation>
+    </message>
+    <message>
+      <source>plugin returned bad manifest</source>
+      <translation type="unfinished">plugin returned bad manifest</translation>
+    </message>
+    <message>
+      <source>plugin API version is no longer supported</source>
+      <translation type="unfinished">plugin API version is no longer supported</translation>
+    </message>
+    <message>
+      <source>unknown error</source>
+      <translation type="unfinished">unknown error</translation>
+    </message>
+    <message>
+      <source>Not loaded</source>
+      <translation type="unfinished">Not loaded</translation>
+    </message>
+    <message>
+      <source>Loaded</source>
+      <translation type="unfinished">Loaded</translation>
+    </message>
+    <message>
+      <source>plugin is in the black list</source>
+      <translation type="unfinished">plugin is in the black list</translation>
+    </message>
+    <message>
+      <source>Status</source>
+      <translation type="unfinished">Status</translation>
+    </message>
+    <message>
+      <source>plugin is optional and is not in the white list</source>
+      <translation type="unfinished">plugin is optional and is not in the white list</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::ServerStatusItemDelegate</name>
     <message>
       <source>Skipped</source>
@@ -9001,6 +9170,17 @@ to %1</source>
     <message>
       <source>Waiting for server to respond...</source>
       <translation type="unfinished">Waiting for server to respond...</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ServerUpdateTool</name>
+    <message>
+      <source>No connection to the server.</source>
+      <translation type="unfinished">No connection to the server.</translation>
+    </message>
+    <message>
+      <source>Network error.</source>
+      <translation type="unfinished">Network error.</translation>
     </message>
   </context>
   <context>
@@ -9736,6 +9916,28 @@ to %1</source>
     <message>
       <source>This build is for testing purposes only.</source>
       <translation type="unfinished">This build is for testing purposes only.</translation>
+    </message>
+    <message>
+      <source>Open Server Settings</source>
+      <translation type="unfinished">Open Server Settings</translation>
+    </message>
+    <message>
+      <source>OK</source>
+      <translation>OK</translation>
+    </message>
+    <message>
+      <source>Confirm storage location to store analytics data on &apos;%1&apos;</source>
+      <translation type="unfinished">Confirm storage location to store analytics data on &apos;%1&apos;</translation>
+    </message>
+    <message>
+      <source>Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
+Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
+By default analytics data will be stored in mediaserver&apos;s installation directory.
+You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</source>
+      <translation type="unfinished">Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
+Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
+By default analytics data will be stored in mediaserver&apos;s installation directory.
+You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</translation>
     </message>
   </context>
   <context>

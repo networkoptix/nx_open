@@ -20,6 +20,7 @@
 #include <utils/common/delayed.h>
 #include <utils/common/event_processors.h>
 #include <utils/common/scoped_value_rollback.h>
+#include <utils/common/delayed.h>
 #include <utils/math/color_transformations.h>
 
 #include <nx/api/mediaserver/image_request.h>
@@ -28,6 +29,7 @@
 #include <nx/vms/client/desktop/event_search/widgets/event_tile.h>
 #include <nx/vms/client/desktop/workbench/workbench_animations.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <nx/vms/client/desktop/utils/video_cache.h>
 #include <nx/vms/client/desktop/utils/widget_utils.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/utils/guarded_callback.h>
@@ -49,6 +51,8 @@ static constexpr int kScrollBarStep = 16;
 static constexpr int kDefaultThumbnailWidth = 224;
 
 static constexpr auto kFadeCurtainColorName = "dark3";
+
+static constexpr milliseconds kPreviewCheckInterval = 100ms;
 
 /*
  * Tiles can have optional timed auto-close mode.
@@ -117,7 +121,7 @@ EventRibbon::Private::Private(EventRibbon* q):
     const auto loadNextPreviewDelayed =
         [this]() { executeLater([this]() { loadNextPreview(); }, this); };
 
-    m_previewLoad->setIntervalMs(ini().tilePreviewLoadIntervalMs);
+    m_previewLoad->setInterval(kPreviewCheckInterval);
     m_previewLoad->setFlags(nx::utils::PendingOperation::FireImmediately);
     m_previewLoad->setCallback(loadNextPreviewDelayed);
 }
@@ -324,10 +328,10 @@ void EventRibbon::Private::updateTilePreview(int index)
     request.roundMethod = precisePreview
         ? nx::api::ImageRequest::RoundMethod::precise
         : nx::api::ImageRequest::RoundMethod::iFrameAfter;
+    request.streamSelectionMode = modelIndex.data(Qn::PreviewStreamSelectionRole)
+        .value<nx::api::ImageRequest::StreamSelectionMode>();
 
     bool forceUpdate = true;
-    const auto streamSelectionMode = modelIndex.data(Qn::PreviewStreamSelectionRole)
-        .value<nx::api::CameraImageRequest::StreamSelectionMode>();
 
     auto& previewProvider = m_tiles[index]->preview;
     if (!previewProvider || request.resource != previewProvider->requestData().resource)
@@ -336,13 +340,12 @@ void EventRibbon::Private::updateTilePreview(int index)
     }
     else
     {
-        forceUpdate = previewProvider->requestData().usecSinceEpoch != request.usecSinceEpoch
-            || previewProvider->streamSelectionMode() != streamSelectionMode;
+        const auto oldRequest = previewProvider->requestData();
+        forceUpdate = oldRequest.usecSinceEpoch != request.usecSinceEpoch
+            || oldRequest.streamSelectionMode != request.streamSelectionMode;
 
         previewProvider->setRequestData(request);
     }
-
-    previewProvider->setStreamSelectionMode(streamSelectionMode);
 
     widget->setPreview(previewProvider.get(), forceUpdate);
     widget->setPreviewCropRect(previewCropRect);
@@ -1224,14 +1227,7 @@ void EventRibbon::Private::doUpdateView()
     updateHighlightedTiles();
 
     if (!m_animations.empty())
-    {
-        // Sometimes in Mac OS animation has running state but never starts actually.
-        // Looks like processEvents() calls gives a chance to start animations actually.
-        if (nx::utils::AppInfo::isMacOsX())
-            qApp->processEvents();
-
         qApp->postEvent(m_viewport.get(), new QEvent(QEvent::LayoutRequest));
-    }
 }
 
 void EventRibbon::Private::fadeIn(EventTile* widget)
@@ -1413,14 +1409,20 @@ void EventRibbon::Private::loadNextPreview()
     for (int i = m_visible.lower(); i < m_visible.upper(); ++i)
     {
         const auto& tile = m_tiles[i];
-        if (!tile->widget || !tile->widget->isPreviewLoadNeeded())
+        if (!tile->widget || !tile->widget->isPreviewLoadNeeded() || !NX_ASSERT(tile->preview))
             continue;
 
-        if (NX_ASSERT(tile->preview))
+        if (tile->preview->tryLoad())
+            continue;
+
+        if (m_sinceLastPreviewRequest.hasExpired(milliseconds(ini().tilePreviewLoadIntervalMs)))
         {
             tile->preview->loadAsync();
+            m_sinceLastPreviewRequest.restart();
+        }
+        else
+        {
             m_previewLoad->requestOperation();
-            break;
         }
     }
 }

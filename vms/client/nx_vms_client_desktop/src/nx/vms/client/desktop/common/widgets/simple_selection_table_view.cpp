@@ -133,4 +133,24 @@ void SimpleSelectionTableView::setModel(QAbstractItemModel* newModel)
     setupHeader();
 }
 
+void SimpleSelectionTableView::keyPressEvent(QKeyEvent* event)
+{
+    switch(event->key())
+    {
+        case Qt::Key_Tab:
+        case Qt::Key_Enter:
+        case Qt::Key_Return:
+            if (state() != EditingState)
+            {
+                event->ignore();
+                return;
+            }
+            break;
+        default:
+            break;
+    }
+
+    base_type::keyPressEvent(event);
+}
+
 } // namespace nx::vms::client::desktop

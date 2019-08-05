@@ -46,6 +46,7 @@ void QnStorageResource::setStorageType(const QString& type)
 {
     QnMutexLocker lock(&m_mutex);
     m_storageType = type;
+    emit typeChanged(::toSharedPointer(this));
 }
 
 QString QnStorageResource::getStorageType() const

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <nx/sdk/analytics/i_engine.h>
+#include <nx/sdk/helpers/ref_countable.h>
 
 #include <nx/vms/server/server_module_aware.h>
 
@@ -11,7 +12,7 @@ namespace nx::vms::server::analytics {
 class EngineHandler:
     public QObject,
     public /*mixin*/ nx::vms::server::ServerModuleAware,
-    public nx::sdk::analytics::IEngine::IHandler
+    public nx::sdk::RefCountable<nx::sdk::analytics::IEngine::IHandler>
 {
     Q_OBJECT
 

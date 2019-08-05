@@ -1,7 +1,6 @@
 #include "gl_renderer.h"
 
 #include <QtGui/qopengl.h>
-#include <QOpenGLFramebufferObject>
 
 #include <cassert>
 
@@ -107,9 +106,9 @@ bool QnGLRenderer::isPixelFormatSupported(AVPixelFormat pixfmt )
     }
 }
 
-QnGLRenderer::QnGLRenderer( const QGLContext* context, const DecodedPictureToOpenGLUploader& decodedPictureProvider ):
-    QnGlFunctions(context),
-    QOpenGLFunctions(context->contextHandle()),
+QnGLRenderer::QnGLRenderer(QOpenGLWidget* glWidget, const DecodedPictureToOpenGLUploader& decodedPictureProvider ):
+    QnGlFunctions(glWidget),
+    QOpenGLFunctions(glWidget->context()),
     m_decodedPictureProvider( decodedPictureProvider ),
     m_brightness( 0 ),
     m_contrast( 0 ),
@@ -130,11 +129,9 @@ QnGLRenderer::QnGLRenderer( const QGLContext* context, const DecodedPictureToOpe
     m_blurFactor(0.0),
     m_prevBlurFactor(0.0)
 {
-    NX_ASSERT( context );
-
     applyMixerSettings( m_brightness, m_contrast, m_hue, m_saturation );
 
-    m_shaders = qn_glRendererShaders_instanceStorage()->get(context);
+    m_shaders = qn_glRendererShaders_instanceStorage()->get(glWidget);
 }
 
 QnGLRenderer::~QnGLRenderer()
@@ -182,7 +179,7 @@ Qn::RenderStatus QnGLRenderer::prepareBlurBuffers()
     DecodedPictureToOpenGLUploader::ScopedPictureLock picLock(m_decodedPictureProvider);
     if (!picLock.get())
     {
-        return Qn::NothingRendered;
+            return Qn::NothingRendered;
     }
 
     result = QSize(picLock->width(), picLock->height());
@@ -269,7 +266,7 @@ Qn::RenderStatus QnGLRenderer::renderBlurFBO(const QRectF &sourceRect)
     GLint prevViewPort[4];
     glGetIntegerv(GL_VIEWPORT, prevViewPort);
 
-    auto renderer = QnOpenGLRendererManager::instance(QGLContext::currentContext());
+    auto renderer = QnOpenGLRendererManager::instance(glWidget());
     auto prevMatrix = renderer->getModelViewMatrix();
     renderer->setModelViewMatrix(QMatrix4x4());
 
@@ -491,7 +488,7 @@ void QnGLRenderer::drawVideoTextureDirectly(
     glBindTexture(GL_TEXTURE_2D, tex0ID);
     glCheckError("glBindTexture");
 
-    auto renderer = QnOpenGLRendererManager::instance(QGLContext::currentContext());
+    auto renderer = QnOpenGLRendererManager::instance(glWidget());
     auto shader = renderer->getTextureShader();
     shader->bind();
     shader->setColor(QVector4D(1.0f,1.0f,1.0f, opacity));
@@ -808,7 +805,7 @@ void QnGLRenderer::drawBindedTexture( QnGLShaderProgram* shader , const float* v
         shader->markInitialized();
     };
 
-    QnOpenGLRendererManager::instance(QGLContext::currentContext())->drawBindedTextureOnQuadVao(m_vertices.data(), shader);
+    QnOpenGLRendererManager::instance(glWidget())->drawBindedTextureOnQuadVao(m_vertices.data(), shader);
 }
 
 qint64 QnGLRenderer::lastDisplayedTime() const

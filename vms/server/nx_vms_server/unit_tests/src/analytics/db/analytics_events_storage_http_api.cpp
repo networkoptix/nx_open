@@ -58,11 +58,6 @@ public:
             });
     }
 
-    virtual void closeCursor(const std::shared_ptr<AbstractCursor>& /*cursor*/) override
-    {
-
-    }
-
     virtual void lookup(
         Filter filter,
         LookupCompletionHandler completionHandler) override
@@ -97,6 +92,11 @@ public:
     virtual void flush(StoreCompletionHandler /*completionHandler*/) override
     {
         FAIL();
+    }
+
+    virtual bool readMinimumEventTimestamp(std::chrono::milliseconds* outResult) override
+    {
+        return false;
     }
 
 private:

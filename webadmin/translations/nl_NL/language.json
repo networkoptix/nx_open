@@ -118,7 +118,7 @@
         "updateNotificationsEnabled": "Update meldingen ingeschakeld",
         "upnpPortMappingEnabled": "UPNP-poorttoewijzing ingeschakeld",
         "useTextEmailFormat": "Verstuur e-mails met platte tekst",
-        "useWindowsEmailLineFeed": "Gebruik Windows line feed in e-mails",
+        "useWindowsEmailLineFeed": "Gebruik Windows-regelfeed in e-mails",
         "trafficEncryptionForced": "Forceer Dataverkeer Encryptie",
         "videoTrafficEncryptionForced": "Forceer Video Dataverkeer Encryptie",
         "updateStatus": "Status bijwerken",

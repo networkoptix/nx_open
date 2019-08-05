@@ -8,34 +8,56 @@
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/utils/uuid.h>
 #include <nx/utils/software_version.h>
-#include <nx/vms/api/data/system_information.h>
+#include <nx/utils/os_info.h>
 
 namespace nx::update {
+
+struct Variant
+{
+    QString name;
+    QString minimumVersion;
+    QString maximumVersion;
+
+    Variant(const QString& name = {}): name(name) {}
+};
+#define Variant_Fields (name)(minimumVersion)(maximumVersion)
+QN_FUSION_DECLARE_FUNCTIONS(Variant, (ubjson)(json)(eq))
 
 struct Package
 {
     QString component;
-    QString arch;
+
     QString platform;
-    QString variant;
-    QString variantVersion;
+    QList<Variant> variants;
+
     QString file;
+    QString url;
+    QString md5;
+    qint64 size = 0;
+
+    // Internal fields for use by Clients and Servers (should not occur on update servers).
+
     /**
      * Local path to the package. This value is used locally by each peer.
      * Do not add it to fusion until it is really necessary.
      */
     QString localFile;
-    QString url;
-    QString md5;
-    qint64 size = 0;
 
-    /** List of targets that should receive this package. */
-    QList<QnUuid> targets;
+    /**
+     * A set of targets that should receive this package.
+     * This set is used by client to keep track of package uploads.
+     */
+    QSet<QnUuid> targets;
 
     bool isValid() const { return !file.isEmpty(); }
+    bool isServer() const;
+    bool isClient() const;
+
+    bool isCompatibleTo(const utils::OsInfo& osInfo, bool ignoreVersion = false) const;
+    bool isNewerThan(const QString& variant, const Package& other) const;
 };
 
-#define Package_Fields (component)(arch)(platform)(variant)(variantVersion)(file)(url)(size)(md5)
+#define Package_Fields (component)(platform)(variants)(file)(url)(size)(md5)
 QN_FUSION_DECLARE_FUNCTIONS(Package, (ubjson)(json)(eq))
 
 struct Information
@@ -67,6 +89,26 @@ struct Information
 
 QN_FUSION_DECLARE_FUNCTIONS(Information, (ubjson)(json)(eq))
 
+struct PackageInformation
+{
+    QString version;
+    QString component;
+    QString cloudHost;
+    QString platform;
+    QList<Variant> variants;
+    QString installScript;
+
+    bool isValid() const { return !version.isNull(); }
+    bool isServer() const;
+    bool isClient() const;
+    bool isCompatibleTo(const utils::OsInfo& osInfo) const;
+};
+
+#define PackageInformation_Fields (version)(component)(cloudHost)(platform)(variants) \
+    (installScript)
+
+QN_FUSION_DECLARE_FUNCTIONS(PackageInformation, (ubjson)(json)(eq))
+
 enum class InformationError
 {
     noError,
@@ -78,6 +120,13 @@ enum class InformationError
     incompatibleVersion,
     incompatibleCloudHost,
     notFoundError,
+    /** Error when client tried to contact mediaserver for update verification. */
+    serverConnectionError,
+    /**
+     * Error when there's an attempt to parse packages.json for a version < 4.0 or an attempt to
+     * parse update.json for a version >= 4.0.
+     */
+    incompatibleParser,
     noNewVersion,
 };
 
@@ -108,9 +157,12 @@ public:
 
     enum class ErrorCode
     {
+        noError = 0,
         updatePackageNotFound,
+        osVersionNotSupported,
         noFreeSpaceToDownload,
         noFreeSpaceToExtract,
+        noFreeSpaceToInstall,
         downloadFailed,
         invalidUpdateContents,
         corruptedArchive,
@@ -118,7 +170,7 @@ public:
         internalDownloaderError,
         internalError,
         unknownError,
-        noError,
+        applauncherError,
     };
     Q_ENUM(ErrorCode)
 
@@ -140,6 +192,11 @@ public:
         errorCode(errorCode),
         progress(progress)
     {}
+
+    friend inline uint qHash(nx::update::Status::ErrorCode key, uint seed)
+    {
+        return ::qHash(static_cast<uint>(key), seed);
+    }
 };
 
 #define UpdateStatus_Fields (serverId)(code)(errorCode)(progress)(message)
@@ -165,25 +222,6 @@ enum class UpdateSourceType
 };
 
 /**
- * Does comparison for package cache.
- */
-struct SystemInformationComparator
-{
-    bool operator() (
-        const nx::vms::api::SystemInformation& lhs,
-        const nx::vms::api::SystemInformation& rhs) const
-    {
-        if (lhs.arch != rhs.arch)
-            return lhs.arch < rhs.arch;
-
-        if (lhs.platform != rhs.platform)
-            return lhs.platform < rhs.platform;
-
-        return lhs.modification < rhs.modification;
-    }
-};
-
-/**
  * Wraps up update info and summary for its verification.
  * All update tools inside client work with this structure directly,
  * instead of nx::update::Information.
@@ -200,8 +238,8 @@ struct UpdateContents
     QSet<QnUuid> invalidVersion;
     /** A set of peers to be ignored during this update. */
     QSet<QnUuid> ignorePeers;
-    /** A set of servers with update packages verified. */
-    QSet<QnUuid> serversWithUpdate;
+    /** A set of peers with update packages verified. */
+    QSet<QnUuid> peersWithUpdate;
     /**
      * Maps a server id, which OS is no longer supported to an error message.
      * The message is displayed to the user.
@@ -213,17 +251,6 @@ struct UpdateContents
     QDir storageDir;
     /** A list of files to be uploaded. */
     QStringList filesToUpload;
-
-    using SystemInformation = nx::vms::api::SystemInformation;
-
-    using PackageCache =
-        std::map<SystemInformation, QList<nx::update::Package>, SystemInformationComparator>;
-    /**
-     * Maps system information to a set of packages. We use this cache to find and check
-     * if a specific OS variant is supported.
-     */
-    PackageCache serverPackageCache;
-    PackageCache clientPackageCache;
 
     /** Information for the clent update. */
     nx::update::Package clientPackage;
@@ -240,6 +267,9 @@ struct UpdateContents
     bool packagesGenerated = false;
     /** We have already installed this version. Widget will show appropriate status.*/
     bool alreadyInstalled = false;
+
+    /** Resets data from verification. */
+    void resetVerification();
 
     nx::utils::SoftwareVersion getVersion() const;
 
@@ -259,6 +289,17 @@ struct UpdateContents
      */
     bool preferOtherUpdate(const UpdateContents& other) const;
 };
+
+bool isPackageCompatibleTo(
+    const QString& packagePlatform,
+    const QList<Variant>& packageVariants,
+    const utils::OsInfo& osInfo,
+    bool ignoreVersion = false);
+
+bool isPackageNewerForVariant(
+    const QString& variant,
+    const QList<Variant>& packageVariants,
+    const QList<Variant>& otherPackageVariants);
 
 } // namespace nx::update
 

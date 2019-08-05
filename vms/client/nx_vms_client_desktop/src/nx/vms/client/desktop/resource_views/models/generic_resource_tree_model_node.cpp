@@ -7,7 +7,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/user_resource.h>
 
-#include <nx/vms/client/desktop/resource_views/data/node_type.h>
+#include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 
 #include <ui/models/resource/resource_tree_model.h>
 #include <ui/models/resource/tree/resource_tree_model_recorder_node.h>

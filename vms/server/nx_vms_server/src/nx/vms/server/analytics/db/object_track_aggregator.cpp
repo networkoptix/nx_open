@@ -1,8 +1,17 @@
 #include "object_track_aggregator.h"
 
+#include <analytics/db/config.h>
+
 #include "serializers.h"
 
 namespace nx::analytics::db {
+
+ObjectTrackAggregator::AggregationContext::AggregationContext():
+    rectAggregator(QSize(kTrackSearchResolutionX, kTrackSearchResolutionY))
+{
+}
+
+//-------------------------------------------------------------------------------------------------
 
 ObjectTrackAggregator::ObjectTrackAggregator(
     int resolutionX,
@@ -54,7 +63,7 @@ void ObjectTrackAggregator::add(
     std::chrono::milliseconds timestamp,
     const QRectF& box)
 {
-    const auto translatedBox = translate(box, m_resolution);
+    const auto translatedBox = translateToSearchGrid(box);
 
     context->rectAggregator.add(translatedBox, objectId);
 

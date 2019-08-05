@@ -12,6 +12,8 @@
 #include <ui/workbench/workbench_context_aware.h>
 #include <nx/update/common_update_manager.h>
 
+struct QnUpdateFreeSpaceReply;
+
 namespace nx::vms::client::desktop {
 
 using StatusCode = nx::update::Status::Code;
@@ -23,6 +25,7 @@ struct UpdateItem
 {
     using Clock = std::chrono::steady_clock;
     using TimePoint = std::chrono::time_point<Clock>;
+    using ErrorCode = nx::update::Status::ErrorCode;
 
     enum class Component
     {
@@ -33,7 +36,16 @@ struct UpdateItem
     QnUuid id;
     StatusCode state = StatusCode::offline;
     int progress = -1;
+
+    /**
+     * Message generated from nx::update::Status::message.
+     * It is displayed only in debug mode.
+     */
+    QString debugMessage;
+    /** Message generated from nx::update::Status::errorCode. */
     QString statusMessage;
+    ErrorCode errorCode = ErrorCode::noError;
+
     QString verificationMessage;
 
     /** Current version of the component. */
@@ -63,6 +75,9 @@ struct UpdateItem
     TimePoint lastStatusTime;
     /** Row in the table. */
     int row = -1;
+
+    int freeSpace = -1;
+    int requiredSpace = -1;
 };
 
 using UpdateItemPtr = std::shared_ptr<UpdateItem>;
@@ -115,6 +130,7 @@ public:
      * It will return number if peers with changed data.
      */
     int setUpdateStatus(const std::map<QnUuid, nx::update::Status>& statusAll);
+    int setFreeSpaceData(const  QnUpdateFreeSpaceReply& freeSpaceData);
     void markStatusUnknown(const QSet<QnUuid>& targets);
     /**
      * Forcing update for mediaserver versions.
@@ -142,6 +158,18 @@ public:
 
     bool hasStatusErrors() const;
 
+    struct ErrorReport
+    {
+        QString message;
+        QSet<QnUuid> peers;
+    };
+
+    /**
+     * Generates an error report for multiple peers.
+     * This error will be displayed in error dialog from multi_server_updates_widget
+     */
+    bool getErrorReport(ErrorReport& report) const;
+
 public:
     std::map<QnUuid, nx::update::Status::Code> allPeerStates() const;
     std::map<QnUuid, QnMediaServerResourcePtr> activeServers() const;
@@ -151,11 +179,13 @@ public:
     QSet<QnUuid> peersInState(StatusCode state) const;
     QSet<QnUuid> legacyServers() const;
     QSet<QnUuid> offlineServers() const;
-    QSet<QnUuid> offlineNotTooLong() const;
+    QSet<QnUuid> offlineAndInState(StatusCode state) const;
+    QSet<QnUuid> onlineAndInState(StatusCode state) const;
     QSet<QnUuid> peersInstalling() const;
     QSet<QnUuid> peersCompleteInstall() const;
     QSet<QnUuid> serversWithChangedProtocol() const;
     QSet<QnUuid> peersWithUnknownStatus() const;
+    QSet<QnUuid> peersWithDownloaderError() const;
 
     /**
      * Process unknown or offline states. It will change item states.
@@ -192,8 +222,11 @@ public:
      * It will reset all internal task sets.
      */
     void setTask(const QSet<QnUuid>& targets);
-
     void setTaskError(const QSet<QnUuid>& targets, const QString& error);
+    void addToTask(QnUuid id);
+    void removeFromTask(QnUuid id);
+
+    static QString errorString(nx::update::Status::ErrorCode code);
 
 public:
     /**
@@ -245,9 +278,6 @@ private:
 
     QList<UpdateItemPtr> m_items;
     UpdateItemPtr m_clientItem;
-
-    /** Servers we do work with. */
-    std::map<QnUuid, QnMediaServerResourcePtr> m_activeServers;
 
     mutable QnMutex m_dataLock;
 

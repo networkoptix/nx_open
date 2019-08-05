@@ -4,11 +4,11 @@
         <label class="col-sm-2 control-label">{{apiMethod.method}}:</label>
         <div class="col-sm-10">
             <p class="form-control-static">{{activeFunction.url}}</p>
-            <h1> HI{{apiMethod}}</h1>
+            <h1> Hei!{{apiMethod}}</h1>
         </div>
     </div>
     <div ng-if="apiMethod.permissions" class="form-group">
-        <label class="col-sm-2 control-label">Required permissions:</label>
+        <label class="col-sm-2 control-label">Tarvittavat oikeudet:</label>
         <div class="col-sm-10">
             <p class="form-control-static">{{apiMethod.permissions}}</p>
         </div>
@@ -39,7 +39,7 @@
     </div>
 
     <div class="form-group">
-        <label class="col-sm-2 control-label">Requesting URL</label>
+        <label class="col-sm-2 control-label">Pyydetään URL-osoitetta</label>
         <div class="col-sm-10">
             <p class="form-control-static">{{getDebugUrl()}}</p>
         </div>
@@ -54,7 +54,7 @@
         </div>
     </div>
     <div ng-if="apiMethod.permissions" class="form-group">
-        <label class="col-sm-2 control-label">Required permissions:</label>
+        <label class="col-sm-2 control-label">Tarvittavat oikeudet:</label>
         <div class="col-sm-10">
             <p class="form-control-static">{{apiMethod.permissions}}</p>
         </div>
@@ -86,7 +86,7 @@
                     <input type="text"
                            id="{{param.name}}"
                            class="form-control"
-                           placeholder="YYYY-MM-DDTHH:mm:ss"
+                           placeholder="VVVV-KK-PPTtt: mm: ss"
                            uib-datepicker-popup="{{Config.dateInternalFormat}}"
                            ng-model="apiMethod.params[param.name]"
                            ng-required="!param.optional"
@@ -106,7 +106,7 @@
                        ng-model="apiMethod.params[param.name]">
 
                 <p class="help-block" ng-switch-when="timestamp">
-                    <i>Timestamp: {{apiMethod.params[param.name].getTime()}}</i>
+                    <i>Aikaleima: {{apiMethod.params[param.name].getTime()}}</i>
                 </p>
 
                 <input type="text"
@@ -122,7 +122,7 @@
                        uib-typeahead-focus
  class="form-control input-sm">
                 <p class="help-block" ng-switch-when="camera">
-                    <i>Selected camera: {{cameraIds[apiMethod.params[param.name]].name}}</i>
+                    <i>Valittu kamera: {{cameraIds[apiMethod.params[param.name]].name}}</i>
                 </p>
 
                 <input ng-switch-when="option"
@@ -142,7 +142,7 @@
                                id="{{param.name}}_empty"
                                ng-value="null"
                                ng-checked="true">
-                        leave empty
+                        jätä tyhjäksi
                     </label>
                 </div>
                 <div ng-switch-when="boolean" ng-if="param.optional" class="radio">
@@ -152,7 +152,7 @@
                                name="{{param.name}}"
                                id="{{param.name}}_true"
                                ng-value="true">
-                        true
+                        tosi
                     </label>
                 </div>
                 <div ng-switch-when="boolean" ng-if="param.optional" class="radio">
@@ -162,7 +162,7 @@
                                name="{{param.name}}"
                                id="{{param.name}}_false"
                                ng-value="false">
-                        false
+                        väärä
                     </label>
                 </div>
 
@@ -186,24 +186,24 @@
         <div class="col-sm-offset-2 col-sm-10">
             <div class="checkbox">
                 <label>
-                    <input type="checkbox" ng-model="apiMethod.addCredentials"> Use credentials
+                    <input type="checkbox" ng-model="apiMethod.addCredentials"> Käytä tunnuksia
                 </label>
-                <p class="help-block">Add login and password to url</p>
+                <p class="help-block">Lisää käyttäjätunnus ja salasana Url-osoitteeseen</p>
             </div>
         </div>
     </div>
 
     <div class="form-group" ng-if="apiMethod.addCredentials">
-        <label class="col-sm-2 control-label" for="useLogin">Login</label>
+        <label class="col-sm-2 control-label" for="useLogin">Kirjaudu sisään</label>
         <div class="col-sm-10">
             <input id="useLogin" type="text" class="form-control input-sm"
                    ng-model="apiMethod.login">
-            <p class="help-block">It is recommended to create dedicated user for integrations</p>
+            <p class="help-block">On suositeltavaa luoda oma käyttäjätili integraattoreille</p>
         </div>
     </div>
 
     <div class="form-group" ng-if="apiMethod.addCredentials">
-        <label class="col-sm-2 control-label" for="usePassword">Password</label>
+        <label class="col-sm-2 control-label" for="usePassword"> Salasana </label>
         <div class="col-sm-10">
             <input id="usePassword" type="text" class="form-control input-sm"
                    ng-model="apiMethod.password">
@@ -212,18 +212,18 @@
 
 
     <div class="form-group">
-        <label class="col-sm-2 control-label">Requesting URL</label>
+        <label class="col-sm-2 control-label">Pyydetään URL-osoitetta</label>
         <div class="col-sm-10">
             <p class="form-control-static">{{getDebugUrl()}}</p>
             <p class="help-block" ng-if="clipboardSupported">
                 <a clipboard
  supported="clipboardSupported"
-                   text="getDebugUrl()" href="">Copy to clipboard</a>
+                   text="getDebugUrl()" href="">Kopioi leikepöydälle</a>
             </p>
         </div>
     </div>
     <div class="form-group" ng-if="apiMethod.method=='POST'">
-        <label class="col-sm-2 control-label">POST data</label>
+        <label class="col-sm-2 control-label">Lähetettävä tieto</label>
         <div class="col-sm-10">
             <textarea class="form-control" rows="10" readonly>{{getPostData()}}</textarea>
             <p class="help-block">
@@ -236,30 +236,30 @@
         <div class="col-sm-offset-2 col-sm-10">
             <button type="submit"
                     ng-if="apiMethod.method=='GET' || apiMethod.method=='POST'"
-                    class="btn btn-primary" ng-click="testMethod()">Test method</button>
+                    class="btn btn-primary" ng-click="testMethod()"> Testausmenetelmä </button>
             <a class="btn btn-default" ng-if="apiMethod.method=='GET'"
-               ng-href="{{getDebugUrl()}}" target="_blank">Open in a new tab</a>
+               ng-href="{{getDebugUrl()}}" target="_blank"> Avaa uudessa välilehdessä </a>
         </div>
     </div>
 
 
     <div class="form-group" ng-if="result.status" ng-class="{'has-error':result.error}">
-        <label class="col-sm-2 control-label">Status</label>
+        <label class="col-sm-2 control-label">Tila</label>
         <div class="col-sm-10">
             <p class="form-control-static">{{result.status}}</p>
         </div>
     </div>
     <div class="form-group" ng-if="result.image">
-        <label class="col-sm-2 control-label">Response</label>
+        <label class="col-sm-2 control-label">Vastaus</label>
         <div class="col-sm-10">
             <img style="max-width:100%" ng-src="{{result.image}}">
             <div class="col-sm-10">
-                <p class="help-block">Content-type: {{result.contentType}}</p>
+                <p class="help-block">Sisällön tyyppi: {{result.contentType}}</p>
             </div>
         </div>
     </div>
     <div class="form-group" ng-if="result.result" ng-class="{'has-error':result.error}">
-        <label class="col-sm-2 control-label">Response</label>
+        <label class="col-sm-2 control-label">Vastaus</label>
         <div class="col-sm-10">
             <textarea class="form-control" rows="10" readonly>{{result.result}}</textarea>
             <p class="help-block">

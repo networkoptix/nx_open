@@ -11,6 +11,7 @@
 
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/utils/uuid.h>
+#include <nx/utils/os_info.h>
 #include <nx/vms/api/types/resource_types.h>
 
 namespace nx {
@@ -31,7 +32,7 @@ struct NX_VMS_API ModuleInformation: Data
     QString customization;
     QString brand;
     SoftwareVersion version;
-    SystemInformation systemInformation;
+    nx::utils::OsInfo osInfo;
     QString systemName;
     QString name;
     int port = 0;
@@ -69,7 +70,7 @@ struct NX_VMS_API ModuleInformationWithAddresses: ModuleInformation
     (type) \
     (customization) \
     (version) \
-    (systemInformation) \
+    (osInfo) \
     (systemName) \
     (name) \
     (port) \
@@ -98,3 +99,11 @@ Q_DECLARE_METATYPE(nx::vms::api::ModuleInformation)
 Q_DECLARE_METATYPE(nx::vms::api::ModuleInformationWithAddresses)
 
 QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::HwPlatform, (lexical), NX_VMS_API)
+
+namespace nx::utils {
+
+// TODO: Invent a better place for it.
+// So far OsInfo serialization is required only for ModuleInformation.
+QN_FUSION_DECLARE_FUNCTIONS(nx::utils::OsInfo, (ubjson)(json)(xml)(csv_record), NX_VMS_API)
+
+} // namespace nx::utils

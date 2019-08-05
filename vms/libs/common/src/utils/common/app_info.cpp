@@ -101,5 +101,7 @@ bool QnAppInfo::isWindows()
 nx::vms::api::SystemInformation QnAppInfo::currentSystemInformation()
 {
     return nx::vms::api::SystemInformation(
-        applicationPlatform(), applicationArch(), applicationPlatformModification());
+        applicationPlatform(),
+        applicationArch(),
+        applicationPlatformModification());
 }

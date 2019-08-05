@@ -123,8 +123,10 @@ public:
     bool isStorageAvailable(int storage_index) const;
     bool isStorageAvailable(const QnStorageResourcePtr& storage) const;
 
-    DeviceFileCatalogPtr getFileCatalog(const QString& cameraUniqueId, QnServer::ChunksCatalog catalog);
-    DeviceFileCatalogPtr getFileCatalog(const QString& cameraUniqueId, const QString &catalogPrefix);
+    DeviceFileCatalogPtr getFileCatalog(
+        const QString& cameraUniqueId, QnServer::ChunksCatalog catalog);
+    DeviceFileCatalogPtr getFileCatalog(
+        const QString& cameraUniqueId, const QString &catalogPrefix);
 
     static QnTimePeriodList getRecordedPeriods(
         QnMediaServerModule* serverModule,
@@ -186,11 +188,11 @@ public:
     * Return camera list with existing archive. Camera Unique ID is used as camera ID
     */
     std::vector<QnUuid> getCamerasWithArchiveHelper() const;
+    void updateCameraHistory() const;
 
     QnScheduleSync* scheduleSync() const;
     static Qn::StorageStatuses storageStatus(
-        QnMediaServerModule* serverModule,
-        const QnStorageResourcePtr& storage);
+        QnMediaServerModule* serverModule, const QnStorageResourcePtr& storage);
 
     static bool canStorageBeUsedByVms(const QnStorageResourcePtr& storage);
 
@@ -200,12 +202,15 @@ signals:
     void storageFailure(const QnResourcePtr &storageRes, nx::vms::api::EventReason reason);
     void rebuildFinished(QnSystemHealth::MessageType msgType);
     void backupFinished(qint64 backedUpToMs, nx::vms::api::EventReason);
+    void newCatalogCreated(const QString& cameraUniqueId, QnServer::ChunksCatalog quality);
+
 public slots:
     void at_archiveRangeChanged(const QnStorageResourcePtr &resource, qint64 newStartTimeMs, qint64 newEndTimeMs);
     void onNewResource(const QnResourcePtr &resource);
     void onDelResource(const QnResourcePtr &resource);
     void at_storageRoleChanged(const QnResourcePtr &storage);
     void testOfflineStorages();
+
 private:
     friend class TestStorageThread;
 
@@ -250,7 +255,7 @@ private:
 
     void doMigrateCSVCatalog(QnServer::ChunksCatalog catalog, QnStorageResourcePtr extraAllowedStorage);
     QMap<QString, QSet<int>> deserializeStorageFile();
-    void clearUnusedMotion();
+    void clearUnusedMetadata();
     //void clearCameraHistory();
     //void minTimeByCamera(const FileCatalogMap &catalogMap, QMap<QString, qint64>& minTimes);
     void updateRecordedMonths(UsedMonthsMap& usedMonths);
@@ -267,6 +272,7 @@ private:
     // get statistics for the whole archive except of bitrate. It's analyzed for the last records of archive only in range <= bitrateAnalyzePeriodMs
     QnRecordingStatsData mergeStatsFromCatalogs(qint64 bitrateAnalyzePeriodMs, const DeviceFileCatalogPtr& catalogHi, const DeviceFileCatalogPtr& catalogLow);
     void clearAnalyticsEvents(const QMap<QnUuid, qint64>& dataToDelete);
+    void forciblyClearAnalyticsEvents();
     QMap<QnUuid, qint64> calculateOldestDataTimestampByCamera();
     bool getMinTimes(QMap<QString, qint64>& lastTime);
     void processCatalogForMinTime(QMap<QString, qint64>& lastTime, const FileCatalogMap& catalogMap);
@@ -279,7 +285,6 @@ private:
         int64_t                     duration,
         const QnStorageResourcePtr  &storage
     );
-    void updateCameraHistory() const;
     static std::vector<QnUuid> getCamerasWithArchive(QnMediaServerModule* serverModule);
     bool hasArchive(int storageIndex) const;
     int64_t occupiedSpace(int storageIndex) const;

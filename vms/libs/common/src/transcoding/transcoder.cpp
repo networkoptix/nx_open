@@ -151,7 +151,7 @@ bool QnVideoTranscoder::open(const QnConstCompressedVideoDataPtr& video)
 {
     QnFfmpegVideoDecoder decoder(
         DecoderConfig(),
-        video->compressionType, video, false);
+        video->compressionType, video);
     QSharedPointer<CLVideoDecoderOutput> decodedVideoFrame( new CLVideoDecoderOutput() );
     decoder.decode(video, &decodedVideoFrame);
     if (m_resolution.width() == 0 && m_resolution.height() > 0)
@@ -236,6 +236,9 @@ int QnTranscoder::suggestBitrate(
         case Qn::StreamQuality::high:
             hiEnd = 1024 * 3;
             break;
+        case Qn::StreamQuality::rapidReview:
+            hiEnd = 1024 * 10;
+            break;
         case Qn::StreamQuality::highest:
         default:
             hiEnd = 1024 * 5;
@@ -249,10 +252,10 @@ int QnTranscoder::suggestBitrate(
     if (codecName)
     {
         // Increase bitrate due to bad quality of libopenh264 coding.
-        if (strcmp(codecName, "libopenh264") == 0)
+        if (strcmp(codecName, "mpeg4") == 0)
+            codecFactor = 1.2;
+        else if (strcmp(codecName, "libopenh264") == 0)
             codecFactor = 4;
-        else if (strcmp(codecName, "mpeg4") == 0)
-            codecFactor = 1.5;
     }
 
     int result = hiEnd * resolutionFactor * codecFactor;
@@ -285,6 +288,7 @@ QnCodecParams::Value QnTranscoder::suggestMediaStreamParams(
                     qVal = 2;
                     break;
                 case Qn::StreamQuality::highest:
+                case Qn::StreamQuality::rapidReview:
                     qVal = 1;
                     break;
                 default:
@@ -315,6 +319,7 @@ QnCodecParams::Value QnTranscoder::suggestMediaStreamParams(
                     cpuUsed = 1;
                     break;
                 case Qn::StreamQuality::highest:
+                case Qn::StreamQuality::rapidReview:
                     cpuUsed = 0;
                     break;
                 default:
@@ -367,7 +372,7 @@ int QnTranscoder::setVideoCodec(
         case TM_FfmpegTranscode:
         {
             ffmpegTranscoder = new QnFfmpegVideoTranscoder(
-                DecoderConfig::fromMediaResource(m_transcodingSettings.resource),
+                DecoderConfig(),
                 m_metrics,
                 codec);
 
@@ -386,7 +391,7 @@ int QnTranscoder::setVideoCodec(
                 // H263P and MJPEG codecs have bug for multi thread encoding in current ffmpeg version
                 bool isAtom = getCPUString().toLower().contains(QLatin1String("atom"));
                 if (isAtom || resolution.height() >= 1080)
-                    ffmpegTranscoder->setMTMode(true);
+                    ffmpegTranscoder->setUseMultiThreadEncode(true);
             }
             m_vTranscoder = QSharedPointer<QnFfmpegVideoTranscoder>(ffmpegTranscoder);
             break;

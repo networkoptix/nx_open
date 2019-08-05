@@ -12,11 +12,16 @@ class QnRestRequestHandler:
     public QObject //< Required because a lot of implementations have Q_OBJECT macro w/o any reason.
 {
 protected:
-    virtual nx::network::rest::Response executeGet(const nx::network::rest::Request& request);
-    virtual nx::network::rest::Response executeDelete(const nx::network::rest::Request& request);
-    virtual nx::network::rest::Response executePost(const nx::network::rest::Request& request);
-    virtual nx::network::rest::Response executePut(const nx::network::rest::Request& request);
+    nx::network::rest::Response executeGet(const nx::network::rest::Request& request) override;
+    nx::network::rest::Response executeDelete(const nx::network::rest::Request& request) override;
+    nx::network::rest::Response executePost(const nx::network::rest::Request& request) override;
+    nx::network::rest::Response executePut(const nx::network::rest::Request& request) override;
 
+    void afterExecute(
+        const nx::network::rest::Request& request,
+        const nx::network::rest::Response& response) override;
+
+/* deprecated: */
     virtual int executeGet(
         const QString& /*path*/,
         const QnRequestParamList& /*params*/,

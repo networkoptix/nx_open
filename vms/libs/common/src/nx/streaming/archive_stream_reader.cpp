@@ -184,13 +184,10 @@ void QnArchiveStreamReader::setCurrentTime(qint64 value)
     m_currentTime = value;
 }
 
-qint64 QnArchiveStreamReader::currentTime() const
+std::chrono::microseconds QnArchiveStreamReader::currentTime() const
 {
     QnMutexLocker mutex( &m_jumpMtx );
-    if (m_skipFramesToTime)
-        return m_skipFramesToTime;
-    else
-        return m_currentTime;
+    return std::chrono::microseconds(m_skipFramesToTime ? m_skipFramesToTime : m_currentTime);
 }
 
 QnConstResourceVideoLayoutPtr QnArchiveStreamReader::getDPVideoLayout() const
@@ -525,7 +522,7 @@ begin_label:
             str << "setMarker=" << m_newDataMarker
                 << " for Time=" << QDateTime::fromMSecsSinceEpoch(m_requiredJumpTime/1000).toString("hh:mm:ss.zzz");
             str.flush();
-            NX_ALWAYS(this, s);
+            NX_INFO(this, s);
         }
         */
         setSkipFramesToTime(tmpSkipFramesToTime, !exactJumpToSpecifiedFrame);

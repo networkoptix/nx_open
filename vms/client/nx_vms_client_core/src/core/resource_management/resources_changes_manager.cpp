@@ -19,6 +19,7 @@
 #include <core/resource/videowall_resource.h>
 #include <core/resource/webpage_resource.h>
 
+#include <nx_ec/ec_api.h>
 #include <nx_ec/data/api_conversion_functions.h>
 
 #include <nx_ec/managers/abstract_user_manager.h>
@@ -191,8 +192,9 @@ void QnResourcesChangesManager::deleteResources(
             ? resource->getParentId()
             : QnUuid();
         if (!parentToDelete.isNull())
-            idToDelete << parentToDelete;
-        idToDelete << resource->getId();
+            idToDelete << parentToDelete; //< Parent remove its children by server side.
+        else
+            idToDelete << resource->getId();
     }
     connection->getResourceManager(Qn::kSystemAccess)->remove(idToDelete, this,
         makeReplyProcessor(this, handler));

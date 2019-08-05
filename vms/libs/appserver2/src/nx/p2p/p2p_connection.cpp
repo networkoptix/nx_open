@@ -32,7 +32,9 @@ Connection::Connection(QnCommonModule* commonModule,
     m_validateRemotePeerFunc(std::move(validateRemotePeerFunc))
 {
     nx::network::http::HttpHeaders headers;
-    headers.emplace(Qn::EC2_PEER_DATA, QnUbjson::serialized(localPeer).toBase64());
+    const auto serializedPeer = localPeer.dataFormat == Qn::UbjsonFormat
+        ? QnUbjson::serialized(localPeer) : QJson::serialized(localPeer);
+    headers.emplace(Qn::EC2_PEER_DATA, serializedPeer.toBase64());
     headers.emplace(Qn::EC2_RUNTIME_GUID_HEADER_NAME, localPeer.instanceId.toByteArray());
 
     addAdditionalRequestHeaders(std::move(headers));

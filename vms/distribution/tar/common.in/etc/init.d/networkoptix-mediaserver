@@ -42,7 +42,6 @@ FULL_VERSION="$version-$changeSet-$customization"
 
 #--------------------------------------------------------------------------------------------------
 
-# Check whether Systemd is in use.
 is_systemd_used()
 {
     [[ $(readlink -m /sbin/init) =~ systemd$ ]]
@@ -230,10 +229,11 @@ run_watchdog()
 {
     while true
     do
-        service $(basename "$0") status && continue
-
         if is_systemd_used
         then
+            service $(basename "$0") status && continue
+            # "restart" should be used instead of "start", because "start" doesn't really start
+            # in some cases (e.g., in case of error).
             service $(basename "$0") restart
         else
             start

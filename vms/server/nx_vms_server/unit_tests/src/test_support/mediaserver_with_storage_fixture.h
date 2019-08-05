@@ -125,6 +125,48 @@ protected:
         NX_TEST_API_POST(m_server.get(), "/api/rebuildArchive", jsonParams({{"action", "start"}}));
     }
 
+    QStringList mediaCatalogPaths() const
+    {
+        QStringList result;
+        for (auto it = m_generatedArchive.cbegin(); it != m_generatedArchive.cend(); ++it)
+        {
+            const auto cameraUniqueId = it.key();
+            const auto fileCatalog = it.value();
+
+            if (!fileCatalog.lowQualityChunks.empty())
+                result.append(fullCatalogPath(cameraUniqueId, QnServer::LowQualityCatalog));
+
+            if (!fileCatalog.highQualityChunks.empty())
+                result.append(fullCatalogPath(cameraUniqueId, QnServer::HiQualityCatalog));
+        }
+
+        return result;
+    }
+
+    void whenCameraSaved(const QString& cameraName)
+    {
+        vms::api::CameraData cameraData;
+        cameraData.typeId = qnResTypePool->getResourceTypeByName("Camera")->getId();
+        cameraData.physicalId = cameraName;
+        cameraData.vendor = "vendor";
+        cameraData.id = nx::vms::api::CameraData::physicalIdToId(cameraData.physicalId);
+        cameraData.mac = "mac";
+        cameraData.model = "model";
+
+        using namespace nx::test;
+        NX_TEST_API_POST(m_server.get(), "/ec2/saveCamera", cameraData);
+    }
+
+    void emulateGetFileCatalogCall(const QString& cameraName)
+    {
+        acquireServerCatalog(m_server->serverModule()->normalStorageManager(), cameraName);
+    }
+
+    void whenAcquiringServerCatalogs(bool value)
+    {
+        m_acquireServerCatalogs = value;
+    }
+
 protected:
     std::unique_ptr<MediaServerLauncher> m_server;
     test_support::Archive m_generatedArchive;
@@ -133,12 +175,13 @@ protected:
     QnMutex m_reindexMutex;
     QnWaitCondition m_reindexWaitCondition;
     bool m_reindexFinished = false;
+    bool m_acquireServerCatalogs = true;
 
-    void onReindexFinished(QnSystemHealth::MessageType message)
+    void onReindexFinished(QnSystemHealth::MessageType /*message*/)
     {
         NX_MUTEX_LOCKER lock(&m_reindexMutex);
-        acquireServerCatalog(m_server->serverModule()->normalStorageManager(), kCamera1Name);
-        acquireServerCatalog(m_server->serverModule()->normalStorageManager(), kCamera2Name);
+        for (auto it = m_generatedArchive.cbegin(); it != m_generatedArchive.cend(); ++it)
+            acquireServerCatalog(m_server->serverModule()->normalStorageManager(), it.key());
 
         m_reindexFinished = true;
         m_reindexWaitCondition.wakeOne();
@@ -146,6 +189,9 @@ protected:
 
     void acquireServerCatalog(QnStorageManager* storageManager, const QString& cameraName)
     {
+        if (!m_acquireServerCatalogs)
+            return;
+
         for (int i = 0; i < QnServer::ChunksCatalogCount; ++i)
         {
             m_serverCatalog[i][cameraName] = storageManager->getFileCatalog(
@@ -163,8 +209,30 @@ protected:
 
         const auto& serverChunks = serverCatalogIt.value()->getChunksUnsafe();
         ASSERT_EQ(generatedChunks.size(), serverChunks.size());
-        for (int i = 0; i < serverChunks.size(); ++i)
+        for (int i = 0; i < (int) serverChunks.size(); ++i)
             ASSERT_EQ(generatedChunks[i].startTimeMs, serverChunks[i].chunk().startTimeMs);
+    }
+
+    QString fullCatalogPath(const QString& cameraUniqueId, QnServer::ChunksCatalog quality) const
+    {
+        const auto folderPath = QString("%1/%2").arg(qualityString(quality)).arg(cameraUniqueId);
+        return QDir(m_storagePath).absoluteFilePath(folderPath);
+    }
+
+    static QString qualityString(QnServer::ChunksCatalog quality)
+    {
+        switch (quality)
+        {
+            case QnServer::LowQualityCatalog:
+                return "low_quality";
+            case QnServer::HiQualityCatalog:
+                return "hi_quality";
+            default:
+                NX_ASSERT(false);
+                return "";
+        }
+
+        return "";
     }
 };
 } // namespace nx::vms::server::test::test_support

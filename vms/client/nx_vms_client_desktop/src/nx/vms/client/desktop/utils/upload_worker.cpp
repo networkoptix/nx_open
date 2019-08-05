@@ -11,6 +11,7 @@
 
 #include <nx/utils/cryptographic_hash.h>
 #include <nx/utils/guarded_callback.h>
+#include <nx/utils/random.h>
 #include <nx/vms/common/p2p/downloader/file_information.h>
 #include <nx/vms/common/p2p/downloader/result_code.h>
 
@@ -18,7 +19,10 @@ namespace nx::vms::client::desktop {
 
 struct UploadWorker::Private
 {
-    Private(const QnMediaServerResourcePtr& server) :
+    UploadWorker* const q;
+
+    Private(UploadWorker* parent, const QnMediaServerResourcePtr& server):
+        q(parent),
         server(server),
         requests(server)
     {
@@ -34,18 +38,132 @@ struct UploadWorker::Private
     QSharedPointer<QFile> file;
     QByteArray md5;
     int chunkSize = 1024 * 1024;
-    int currentChunk = 0;
-    int totalChunks = 0;
+    int maxSubsequentChunksToUpload = 10;
+    int subsequentChunksToUploadLeft = -1;
+    QBitArray uploadedChunks;
     QnMutex mutex;
 
     QFuture<QByteArray> md5Future;
     QFutureWatcher<QByteArray> md5FutureWatcher;
     ServerRequestStorage requests;
+
+public:
+    void getAvailableChunks();
+    void handleGotAvailableChunks(
+        const common::p2p::downloader::FileInformation& fileInformation);
+    int selectNextChunkToUpload() const;
+    int selectRandomChunkToUpload() const;
+    int selectChunkToUpload() const;
+
+    QByteArray readChunk(int chunkIndex);
 };
 
-UploadWorker::UploadWorker(const QnMediaServerResourcePtr& server, UploadState& config, QObject* parent):
+void UploadWorker::Private::getAvailableChunks()
+{
+    NX_ASSERT(!upload.uploadAllChunks);
+
+    NX_VERBOSE(this, "Getting available chunks for %1", upload.destination);
+
+    const auto callback = nx::utils::guarded(q,
+        [this](bool success, rest::Handle handle, const QnJsonRestResult& result)
+        {
+            {
+                QnMutexLocker lock(&mutex);
+                requests.releaseHandle(handle);
+            }
+
+            if (success)
+            {
+                const auto& fileInfo =
+                    result.deserialized<common::p2p::downloader::FileInformation>();
+                handleGotAvailableChunks(fileInfo);
+            }
+            else
+            {
+                handleGotAvailableChunks({});
+            }
+        });
+
+    requests.storeHandle(connection()->fileDownloadStatus(
+        upload.destination,
+        callback,
+        q->thread()));
+}
+
+void UploadWorker::Private::handleGotAvailableChunks(
+    const common::p2p::downloader::FileInformation& fileInformation)
+{
+    NX_VERBOSE(this, "Got available chunks for %1: %2",
+        upload.destination, fileInformation.isValid());
+
+    if (fileInformation.isValid() && !fileInformation.downloadedChunks.isEmpty()
+        && uploadedChunks.size() == fileInformation.downloadedChunks.size())
+    {
+        uploadedChunks = fileInformation.downloadedChunks;
+    }
+
+    subsequentChunksToUploadLeft = maxSubsequentChunksToUpload;
+    q->handleUpload();
+}
+
+int UploadWorker::Private::selectNextChunkToUpload() const
+{
+    int chunk = 0;
+    while (chunk < uploadedChunks.size() && uploadedChunks[chunk])
+        ++chunk;
+
+    return chunk < uploadedChunks.size() ? chunk : -1;
+}
+
+int UploadWorker::Private::selectRandomChunkToUpload() const
+{
+    const int chunksCount = uploadedChunks.size();
+    const int randomChunk = utils::random::number(0, chunksCount - 1);
+
+    for (int i = randomChunk; i < chunksCount; ++i)
+    {
+        if (!uploadedChunks[i])
+            return i;
+    }
+    for (int i = 0; i < randomChunk; ++i)
+    {
+        if (!uploadedChunks[i])
+            return i;
+    }
+
+    return -1;
+}
+
+int UploadWorker::Private::selectChunkToUpload() const
+{
+    if (upload.uploadAllChunks)
+        return selectNextChunkToUpload();
+    return selectRandomChunkToUpload();
+}
+
+QByteArray UploadWorker::Private::readChunk(int chunkIndex)
+{
+    if (file->seek(static_cast<qint64>(chunkSize) * chunkIndex))
+    {
+        const QByteArray& data = file->read(chunkSize);
+        if (!data.isEmpty())
+            return data;
+    }
+
+    NX_ERROR(this, "Cannot read chunk %1 [offset: %2, size: %3] from %4: %5",
+        chunkIndex, chunkSize * chunkIndex, chunkSize, upload.destination,
+        file->errorString());
+    q->handleError(file->errorString());
+    return {};
+}
+
+UploadWorker::UploadWorker(
+    const QnMediaServerResourcePtr& server,
+    UploadState& config,
+    QObject* parent)
+    :
     QObject(parent),
-    d(new Private(server))
+    d(new Private(this, server))
 {
     NX_ASSERT(server);
 
@@ -70,23 +188,26 @@ void UploadWorker::start()
 {
     NX_ASSERT(d->upload.status == UploadState::Initial);
 
-    d->upload.id = lit("tmp-") + QnUuid::createUuid().toSimpleString();
+    d->upload.id = "tmp-" + QnUuid::createUuid().toSimpleString();
     QFileInfo info(d->file->fileName());
     if (!info.suffix().isEmpty())
-        d->upload.id += lit(".") + info.suffix();
+        d->upload.id += L'.' + info.suffix();
 
     if (d->upload.destination.isEmpty())
         d->upload.destination = d->upload.id;
+
+    NX_INFO(this, "Start uploading %1", d->upload.destination);
 
     if (!d->file->open(QIODevice::ReadOnly))
     {
         d->upload.status = UploadState::Error;
         d->upload.errorMessage = tr("Could not open file \"%1\"").arg(d->file->fileName());
+        NX_ERROR(this, "Cannot open %1", d->upload.destination);
         return;
     }
 
     d->upload.size = d->file->size();
-    d->totalChunks = (d->upload.size + d->chunkSize - 1) / d->chunkSize;
+    d->uploadedChunks.resize((int) ((d->upload.size + d->chunkSize - 1) / d->chunkSize));
 
     d->upload.status = UploadState::CalculatingMD5;
 
@@ -107,6 +228,8 @@ void UploadWorker::start()
 
 void UploadWorker::cancel()
 {
+    NX_INFO(this, "Cancelling upload for %1", d->upload.destination);
+
     UploadState::Status status = d->upload.status;
     if (status == UploadState::Initial || status == UploadState::Done ||
         status == UploadState::Error || status == UploadState::Canceled)
@@ -131,6 +254,8 @@ void UploadWorker::emitProgress()
 
 void UploadWorker::handleStop()
 {
+    NX_INFO(this, "Stopping upload for %1", d->upload.destination);
+
     d->md5FutureWatcher.disconnect(this);
     d->requests.cancelAllRequests();
 
@@ -157,6 +282,8 @@ void UploadWorker::handleMd5Calculated()
     QByteArray md5 = d->md5Future.result();
     if (md5.isEmpty())
     {
+        NX_ERROR(this, "Cannot calculate MD5 for %1", d->file->fileName());
+
         handleError(tr("Could not calculate md5 for file \"%1\"").arg(d->file->fileName()));
         return;
     }
@@ -195,6 +322,7 @@ void UploadWorker::handleMd5Calculated()
         d->chunkSize,
         d->md5.toHex(),
         d->upload.ttl,
+        d->upload.recreateFile,
         callback, thread());
     // We have a race condition around this handle.
     d->requests.storeHandle(handle);
@@ -202,6 +330,8 @@ void UploadWorker::handleMd5Calculated()
 
 void UploadWorker::handleFileUploadCreated(bool success, RemoteResult code, QString error)
 {
+    NX_VERBOSE(this, "Upload for %1 was created: %2, %3", d->upload.destination, success, code);
+
     if (!success)
     {
         switch (code)
@@ -209,10 +339,11 @@ void UploadWorker::handleFileUploadCreated(bool success, RemoteResult code, QStr
             case RemoteResult::ok:
                 // Should not be here. success should be true
                 NX_ASSERT(false);
+                [[fallthrough]];
+            case RemoteResult::fileAlreadyExists:
                 d->upload.status = UploadState::Uploading;
                 handleUpload();
                 break;
-            case RemoteResult::fileAlreadyExists:
             case RemoteResult::fileAlreadyDownloaded:
                 d->upload.status = UploadState::Done;
                 emitProgress();
@@ -239,7 +370,8 @@ void UploadWorker::handleFileUploadCreated(bool success, RemoteResult code, QStr
 
 void UploadWorker::handleUpload()
 {
-    if (d->currentChunk == d->totalChunks)
+    const int chunk = d->selectChunkToUpload();
+    if (chunk == -1)
     {
         handleAllUploaded();
         return;
@@ -247,47 +379,61 @@ void UploadWorker::handleUpload()
 
     emitProgress();
 
-    bool seekOk = d->file->seek(static_cast<qint64>(d->chunkSize) * d->currentChunk);
-    QByteArray bytes = d->file->read(d->chunkSize);
-    if (!seekOk || bytes.isEmpty())
+    if (!d->upload.uploadAllChunks)
     {
-        handleError(d->file->errorString());
-        return;
+        if (d->subsequentChunksToUploadLeft <= 0)
+        {
+            d->getAvailableChunks();
+            return;
+        }
+        --d->subsequentChunksToUploadLeft;
     }
 
+    NX_VERBOSE(this, "Uploading chunk %1 for %2", chunk, d->upload.destination);
+
+    const QByteArray& data = d->readChunk(chunk);
+
     const auto callback = nx::utils::guarded(this,
-        [this](bool success, rest::Handle handle, const rest::ServerConnection::EmptyResponseType&)
+        [this, chunk](
+            bool success, rest::Handle handle, const rest::ServerConnection::EmptyResponseType&)
         {
             {
-                QnMutexLocker lock(&d->mutex);
+                NX_MUTEX_LOCKER lock(&d->mutex);
                 d->requests.releaseHandle(handle);
             }
-            handleChunkUploaded(success);
+            handleChunkUploaded(success, chunk);
         });
 
     d->requests.storeHandle(d->connection()->uploadFileChunk(
         d->upload.destination,
-        d->currentChunk,
-        bytes,
+        chunk,
+        data,
         callback,
         thread()));
-    d->currentChunk++;
 }
 
-void UploadWorker::handleChunkUploaded(bool success)
+void UploadWorker::handleChunkUploaded(bool success, int chunkIndex)
 {
+    NX_VERBOSE(this, "Chunk %1 was uploaded for %2: %3",
+        chunkIndex, d->upload.destination, success);
+
     if (!success)
     {
         handleError(tr("Could not upload file chunk to the server"));
         return;
     }
 
-    d->upload.uploaded = qMin(d->upload.uploaded + d->chunkSize, d->upload.size);
+    d->uploadedChunks[chunkIndex] = true;
+    d->upload.uploaded = std::min<qint64>(
+        d->uploadedChunks.count(true) * d->chunkSize, d->upload.size);
+
     handleUpload();
 }
 
 void UploadWorker::handleAllUploaded()
 {
+    NX_INFO(this, "Upload for %1 is done. Checking...", d->upload.destination);
+
     d->upload.status = UploadState::Checking;
 
     emitProgress();
@@ -312,6 +458,8 @@ void UploadWorker::handleAllUploaded()
 
 void UploadWorker::handleCheckFinished(bool success, bool ok)
 {
+    NX_INFO(this, "The final check finished: %1", success && ok);
+
     if (!success)
     {
         handleError(tr("Could not check uploaded file on the server"));

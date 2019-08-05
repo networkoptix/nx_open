@@ -15,23 +15,22 @@
 
 namespace nx::vms::server::test {
 
-class FtArchiveIntegrityWatcher:
-    public test_support::MediaserverWithStorageFixture,
-    public QnAbstractMediaDataReceptor
+class FtArchiveIntegrityWatcher: public test_support::MediaserverWithStorageFixture
 {
 protected:
     virtual void SetUp() override
     {
         test_support::MediaserverWithStorageFixture::SetUp();
         m_server->addSetting("appserverPassword", "admin");
-        test_support::createTestLogger({ utils::log::Filter(typeid(ServerArchiveIntegrityWatcher)) }, &m_logBuffer);
+        test_support::createTestLogger(
+            { nx::utils::log::Filter(typeid(ServerArchiveIntegrityWatcher)) }, &m_logBuffer);
     }
 
     virtual void TearDown() override
     {
+        ASSERT_TRUE(m_archiveReader);
         m_archiveReader->stop();
-        m_archiveReader->removeDataProcessor(this);
-        utils::log::removeLoggers({ utils::log::Filter(typeid(ServerArchiveIntegrityWatcher)) });
+        nx::utils::log::removeLoggers({ nx::utils::log::Filter(typeid(ServerArchiveIntegrityWatcher)) });
         nx::utils::log::lockConfiguration();
     }
 
@@ -55,35 +54,24 @@ protected:
 
     void thenArchiveShouldBePlayedWithoutGaps()
     {
-        NX_MUTEX_LOCKER lock(&m_archivePlaybackMutex);
-        while (!m_archivePlayedTillTheEnd)
-            m_archivePlaybackWaitCondition.wait(&m_archivePlaybackMutex);
-
-        m_archivePlayedTillTheEnd = false;
+        // Intentionally empty.
     }
 
-    void whenPlayArchiveRequestIsIssued()
+    void whenPlayArchiveRequestIsIssued(bool shouldSucceed = true)
     {
-        const auto allCameras = m_server->serverModule()->resourcePool()->getAllCameras();
-        QnVirtualCameraResourcePtr camera1;
-        for (const auto camera : allCameras)
-        {
-            if (camera->getUniqueId() == test_support::kCamera1Name)
-            {
-                camera1 = camera;
-                break;
-            }
-        }
+        const auto camera = test_support::getCamera(
+            m_server->serverModule()->resourcePool(), test_support::kCamera1Name);
 
-        ASSERT_TRUE((bool)camera1);
-        m_archiveReader = test_support::createArchiveStreamReader(camera1);
-        m_archiveReader->addDataProcessor(this);
-        m_archiveReader->start();
+        ASSERT_TRUE((bool) camera);
+        m_archiveReader = test_support::createArchiveStreamReader(camera);
 
-        m_archiveStartTime =
-            m_generatedArchive[test_support::kCamera1Name].lowQualityChunks.front().startTimeMs;
-        m_archiveEndTime =
-            m_generatedArchive[test_support::kCamera1Name].lowQualityChunks.back().startTimeMs;
+        const auto& chunks = m_generatedArchive[test_support::kCamera1Name].lowQualityChunks;
+        QnTimePeriod periodToCheck(
+            chunks.front().startTimeMs,
+            chunks.back().startTimeMs + chunks.back().durationsMs - chunks.front().startTimeMs);
+        test_support::checkPlaybackCorrecteness(
+            m_archiveReader.get(), {periodToCheck}, test_support::kMediaFileDurationMs,
+            test_support::kMediaFilesGapMs, shouldSucceed);
     }
 
     void whenArchiveIntegritySignalsConnected()
@@ -93,7 +81,8 @@ protected:
 
         connect(
             serverArchiveIntegrityWatcher, &ServerArchiveIntegrityWatcher::fileIntegrityCheckFailed,
-            this, &FtArchiveIntegrityWatcher::onArchiveIntegrityBreached, Qt::DirectConnection);
+            this, &FtArchiveIntegrityWatcher::onArchiveIntegrityBreached,
+            Qt::DirectConnection);
     }
 
     void whenHoursFoldersSwapped(const QString& cameraName, QnServer::ChunksCatalog quality)
@@ -127,10 +116,23 @@ protected:
         ASSERT_TRUE(QDir().rename(folder1Path + "_tmp", folder2Path));
     }
 
+    void whenWholeArchiveErased(const QString& cameraName)
+    {
+        QString pathToDeletePattern = QString(closeDirPath(m_storagePath) + "%1/" + cameraName);
+        const auto hiQualityPath =
+            pathToDeletePattern.arg(DeviceFileCatalog::prefixByCatalog(QnServer::HiQualityCatalog));
+        const auto lowQualityPath =
+            pathToDeletePattern.arg(DeviceFileCatalog::prefixByCatalog(QnServer::LowQualityCatalog));
+
+        ASSERT_TRUE(QDir(hiQualityPath).removeRecursively());
+        ASSERT_TRUE(QDir(lowQualityPath).removeRecursively());
+    }
+
     void thenLogShouldContain(const QString& message)
     {
         bool logContainsMessage = false;
-        for (const auto& m: m_logBuffer->takeMessages())
+        const auto logMessages = m_logBuffer->takeMessages();
+        for (const auto& m: logMessages)
         {
             if (m.contains(message))
             {
@@ -176,48 +178,14 @@ private:
     QnMutex m_archiveIntegrityMutex;
     QnWaitCondition m_archiveIntegrityWaitCondition;
     bool m_archiveIntegritySignalReceived = false;
-    QnMutex m_archivePlaybackMutex;
-    QnWaitCondition m_archivePlaybackWaitCondition;
-    bool m_archivePlayedTillTheEnd = false;
     std::unique_ptr<QnArchiveStreamReader> m_archiveReader;
-    int64_t m_archiveStartTime;
-    int64_t m_archiveEndTime;
-    int64_t m_timeGap = 0;
-    utils::log::Buffer* m_logBuffer = nullptr;
+    nx::utils::log::Buffer* m_logBuffer = nullptr;
 
     void onArchiveIntegrityBreached(const QnStorageResourcePtr& /*storage*/)
     {
         NX_MUTEX_LOCKER lock(&m_archiveIntegrityMutex);
         m_archiveIntegritySignalReceived = true;
         m_archiveIntegrityWaitCondition.wakeOne();
-    }
-
-    virtual bool canAcceptData() const override
-    {
-        return true;
-    }
-
-    virtual void putData(const QnAbstractDataPacketPtr& data) override
-    {
-        {
-            NX_MUTEX_LOCKER lock(&m_archivePlaybackMutex);
-            if (m_archivePlayedTillTheEnd)
-                return;
-        }
-
-        const int64_t currentDataTimestampMs = data->timestamp / 1000;
-        if (m_timeGap < currentDataTimestampMs - m_archiveStartTime)
-            m_timeGap = currentDataTimestampMs - m_archiveStartTime;
-
-        ASSERT_LE(m_timeGap, 1000);
-        m_archiveStartTime = currentDataTimestampMs;
-
-        if (m_archiveStartTime >= m_archiveEndTime && m_archiveStartTime != AV_NOPTS_VALUE)
-        {
-            NX_MUTEX_LOCKER lock(&m_archivePlaybackMutex);
-            m_archivePlayedTillTheEnd = true;
-            m_archivePlaybackWaitCondition.wakeOne();
-        }
     }
 };
 
@@ -240,7 +208,7 @@ TEST_F(FtArchiveIntegrityWatcher, RemovingFiles)
 
 TEST_F(FtArchiveIntegrityWatcher, SwappingHoursFolders)
 {
-    givenSomeArchiveOnHdd({ test_support::CameraChunksInfo(test_support::kCamera1Name, 120) });
+    givenSomeArchiveOnHdd({test_support::CameraChunksInfo(test_support::kCamera1Name, 120)});
     whenServerStarted();
     thenArchiveShouldBeScannedCorreclty();
 
@@ -258,7 +226,7 @@ TEST_F(FtArchiveIntegrityWatcher, SwappingHoursFolders)
 
 TEST_F(FtArchiveIntegrityWatcher, SwappingTwoFiles)
 {
-    givenSomeArchiveOnHdd({ test_support::CameraChunksInfo(test_support::kCamera1Name, 10) });
+    givenSomeArchiveOnHdd({test_support::CameraChunksInfo(test_support::kCamera1Name, 10)});
     whenServerStarted();
     thenArchiveShouldBeScannedCorreclty();
 
@@ -272,6 +240,23 @@ TEST_F(FtArchiveIntegrityWatcher, SwappingTwoFiles)
     thenArchiveShouldBePlayedWithoutGaps();
     thenIntegritySignalShouldBeReceived();
     thenLogShouldContain("integrity problem");
+}
+
+TEST_F(FtArchiveIntegrityWatcher, WholeArchiveErased)
+{
+    givenSomeArchiveOnHdd({test_support::CameraChunksInfo(test_support::kCamera1Name, 10)});
+    whenServerStarted();
+    thenArchiveShouldBeScannedCorreclty();
+
+    whenReindexRequestIssued();
+    thenArchiveShouldBeScannedCorreclty();
+
+    whenArchiveIntegritySignalsConnected();
+
+    whenWholeArchiveErased(test_support::kCamera1Name);
+    whenPlayArchiveRequestIsIssued(/*shouldSucceed*/ false);
+    thenIntegritySignalShouldBeReceived();
+    thenLogShouldContain("File is present in the DB but missing in the archive");
 }
 
 } // namespace nx::vms::server::test
