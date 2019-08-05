@@ -41,7 +41,7 @@ public:
 
     enum Roles
     {
-        UpdateItemRole = Qn::RoleCount,
+        UpdateItemRole = Qn::ItemDataRoleCount,
     };
 
     explicit ServerUpdatesModel(
