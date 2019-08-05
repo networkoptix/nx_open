@@ -15,6 +15,8 @@ namespace nx::vms::server {
 
 class UpdateManager: public QObject, public ServerModuleAware
 {
+    Q_OBJECT
+
 public:
     enum class InformationCategory
     {
