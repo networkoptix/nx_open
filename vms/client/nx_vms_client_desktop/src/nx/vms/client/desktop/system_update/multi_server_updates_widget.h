@@ -202,7 +202,7 @@ public:
             return currentData != other;
         }
 
-        Data& operator= (const Data& other)
+        Data& operator=(const Data& other)
         {
             if (currentData == other)
                 return currentData;

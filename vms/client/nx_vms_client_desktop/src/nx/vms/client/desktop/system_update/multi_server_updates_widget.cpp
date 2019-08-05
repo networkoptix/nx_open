@@ -2784,7 +2784,6 @@ QString MultiServerUpdatesWidget::toString(nx::update::UpdateSourceType mode)
 
 bool MultiServerUpdatesWidget::VersionReport::operator==(const VersionReport& another) const
 {
-    // Wating for c++20. We could use default comparator there.
     return hasLatestVersion == another.hasLatestVersion
         && checking == another.checking
         && version == another.version
@@ -2797,7 +2796,6 @@ bool MultiServerUpdatesWidget::VersionReport::operator==(const VersionReport& an
 bool MultiServerUpdatesWidget::ControlPanelState::operator==(
     const ControlPanelState& another) const
 {
-    // Wating for c++20. We could use default comparator there.
     return actionEnabled == another.actionEnabled
         && actionCaption == another.actionCaption
         && actionTooltips == another.actionTooltips
