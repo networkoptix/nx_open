@@ -168,8 +168,7 @@ bool AnalyticsSearchWidget::calculateAllowance() const
     if (!hasPermissions)
         return false;
 
-    const nx::analytics::ObjectTypeDescriptorManager manager(commonModule());
-    return !manager.descriptors().empty();
+    return !commonModule()->analyticsObjectTypeDescriptorManager()->descriptors().empty();
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -289,10 +288,10 @@ void AnalyticsSearchWidget::Private::updateTypeMenu()
     const QString currentSelection = m_model->selectedObjectType();
     bool currentSelectionStillAvailable = false;
 
-    nx::analytics::ObjectTypeDescriptorManager objectTypeDescriptorManager(q->commonModule());
-    nx::analytics::EngineDescriptorManager engineDescriptorManager(q->commonModule());
-    const auto objectTypeDescriptors = objectTypeDescriptorManager.descriptors();
-    const auto engineDescriptors = engineDescriptorManager.descriptors();
+    const auto objectTypeDescriptors = q->commonModule()->analyticsObjectTypeDescriptorManager()
+        ->descriptors();
+    const auto engineDescriptors = q->commonModule()->analyticsEngineDescriptorManager()
+        ->descriptors();
 
     WidgetUtils::clearMenu(m_objectTypeMenu);
 

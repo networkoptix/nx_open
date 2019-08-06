@@ -13,10 +13,11 @@ const QString kGroupDescriptorTypeName("Engine");
 
 } // namespace
 
-GroupDescriptorManager::GroupDescriptorManager(QnCommonModule* commonModule):
-    base_type(commonModule),
+GroupDescriptorManager::GroupDescriptorManager(QObject* parent):
+    base_type(parent),
+    QnCommonModuleAware(parent),
     m_groupDescriptorContainer(
-        makeContainer<GroupDescriptorContainer>(commonModule, kGroupDescriptorsProperty))
+        makeContainer<GroupDescriptorContainer>(commonModule(), kGroupDescriptorsProperty))
 {
 }
 

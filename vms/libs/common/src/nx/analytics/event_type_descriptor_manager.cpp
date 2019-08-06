@@ -58,14 +58,15 @@ std::optional<std::set<EventTypeId>> intersectEventTypeIds(
 
 } // namespace
 
-EventTypeDescriptorManager::EventTypeDescriptorManager(QnCommonModule* commonModule):
-    base_type(commonModule),
+EventTypeDescriptorManager::EventTypeDescriptorManager(QObject* parent):
+    base_type(parent),
+    QnCommonModuleAware(parent),
     m_eventTypeDescriptorContainer(
-        makeContainer<EventTypeDescriptorContainer>(commonModule, kEventTypeDescriptorsProperty)),
+        makeContainer<EventTypeDescriptorContainer>(commonModule(), kEventTypeDescriptorsProperty)),
     m_engineDescriptorContainer(
-        makeContainer<EngineDescriptorContainer>(commonModule, kEngineDescriptorsProperty)),
+        makeContainer<EngineDescriptorContainer>(commonModule(), kEngineDescriptorsProperty)),
     m_groupDescriptorContainer(
-        makeContainer<GroupDescriptorContainer>(commonModule, kGroupDescriptorsProperty))
+        makeContainer<GroupDescriptorContainer>(commonModule(), kGroupDescriptorsProperty))
 {
 }
 

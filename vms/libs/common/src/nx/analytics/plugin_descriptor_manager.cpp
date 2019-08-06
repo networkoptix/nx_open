@@ -13,10 +13,11 @@ const QString kPluginDescriptorTypeName("Plugin");
 
 } // namespace
 
-PluginDescriptorManager::PluginDescriptorManager(QnCommonModule* commonModule):
-    base_type(commonModule),
+PluginDescriptorManager::PluginDescriptorManager(QObject* parent) :
+    base_type(parent),
+    QnCommonModuleAware(parent),
     m_pluginDescriptorContainer(
-        makeContainer<PluginDescriptorContainer>(commonModule, kPluginDescriptorsProperty))
+        makeContainer<PluginDescriptorContainer>(commonModule(), kPluginDescriptorsProperty))
 {
 }
 
