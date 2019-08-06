@@ -17,21 +17,25 @@ void StdOut::write(Level level, const QString& message)
 }
 
 #if !defined(Q_OS_ANDROID) && !defined(Q_OS_IOS)
-    void StdOut::writeImpl(Level level, const QString& message)
-    {
-        switch (level)
-        {
-            case Level::error:
-            case Level::warning:
-                std::cerr << message.toStdString() << std::endl;
-                break;
 
-            default:
-                std::cout << message.toStdString() << std::endl;
-                break;
-        }
+// For Android and iOS, this method is defined in dedicated files.
+void StdOut::writeImpl(Level level, const QString& message)
+{
+    switch (level)
+    {
+        case Level::error:
+        case Level::warning:
+            std::cerr << message.toStdString() + '\n';
+            break;
+
+        default:
+            std::cout << message.toStdString() + '\n';
+            std::cout.flush();
+            break;
     }
-#endif
+}
+
+#endif // !defined(Q_OS_ANDROID) && !defined(Q_OS_IOS)
 
 File::File(Settings settings):
     m_settings(std::move(settings))
@@ -43,7 +47,7 @@ void File::write(Level /*level*/, const QString& message)
     QnMutexLocker lock(&m_mutex);
     if (!openFile())
     {
-        std::cout << message.toStdString() << std::endl;
+        std::cerr << message.toStdString() + '\n';
         return;
     }
 
@@ -53,15 +57,21 @@ void File::write(Level /*level*/, const QString& message)
 
 QString File::makeFileName(size_t backupNumber) const
 {
+    static constexpr char kExtensionWithSeparator[] = ".log";
+
+    auto baseFileName = m_settings.name;
+    if (baseFileName.endsWith(kExtensionWithSeparator))
+        baseFileName.chop(strlen(kExtensionWithSeparator));
+
     if (backupNumber == 0)
     {
         static const QLatin1String kTemplate("%1.log");
-        return QString(kTemplate).arg(m_settings.name);
+        return QString(kTemplate).arg(baseFileName);
     }
     else
     {
         static const QLatin1String kTemplate("%1_%2.log");
-        return QString(kTemplate).arg(m_settings.name).arg(
+        return QString(kTemplate).arg(baseFileName).arg(
             (int) backupNumber, 3, 10, QLatin1Char('0'));
     }
 }
@@ -71,9 +81,7 @@ bool File::openFile()
     if (m_file.is_open())
         return true;
 
-    std::cout
-        << ::toString(this).toStdString() << ": "
-        << makeFileName().toStdString() << std::endl;
+    std::cerr << ::toString(this).toStdString() + ": " + makeFileName().toStdString() + '\n';
 
     const auto fileNameQString = makeFileName();
     #if defined(Q_OS_WIN)

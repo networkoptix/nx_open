@@ -6,14 +6,14 @@
         "openLinkWithTitle": "Para {{title}} visite este link"
     },
     "setup": {
-        "createAccount": "create account",
+        "createAccount": "criar conta",
         "errorNoHDD": "Este dispositivo destina-se a funcionar com a unidade de disco rígido instalada.<br>Desligue o dispositivo e instale uma unidade de disco rígido.",
         "errorNoNetwork": "Este dispositivo precisa de ligação de rede para funcionar.<br>Por favor, conecte-o à rede local ou Internet"
     },
     "passwordRequirements": {
         "minLengthMessage": "Password must be at least 8 characters long",
-        "requiredMessage": "Only latin letters, numbers and keyboard symbols are allowed",
-        "weakMessage": "Password should contain different types of symbols",
+        "requiredMessage": "Apenas letras latinas, números e símbolos de teclado são permitidos",
+        "weakMessage": "A senha deve conter diferentes tipos de símbolos",
         "strongMessage": "Senha forte!",
         "commonMessage": "Esta senha está na lista das senhas mais populares"
     },
@@ -40,7 +40,7 @@
         "unsafePortConfirm": "Não é seguro usar uma porta inferior a 1025. O servidor pode não estar acessível. Continuar mesmo assim?",
         "confirmDisconnectFromCloud": "Disconnect System from {{CLOUD_NAME}}",
         "confirmDisconnectFromCloudTitle": "<span class='warning-label'>Todos os utilizadores da Cloud serão apagados.</span><br><br>O Sistema estará acessível através da rede local com conta de administrador local.",
-        "confirmDisconnectFromCloudAction": "Disconnect",
+        "confirmDisconnectFromCloudAction": "Desconectar",
         "disconnectedFromCloudSuccess": "O Sistema foi desconectado de {{CLOUD_NAME}} com sucesso",
         "disconnectedFromCloudError": "Cannot disconnect the System",
         "confirmDisconnectFromSystem": "Detach server from current System",

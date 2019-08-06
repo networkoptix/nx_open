@@ -19,7 +19,11 @@ static const QString kUrl(
 
 static const std::chrono::seconds kDefaultDisconnectTimeout(15);
 static const network::RetryPolicy kDefaultRetryPolicy(
-    network::RetryPolicy::kInfiniteRetries, std::chrono::seconds(5), 2, std::chrono::minutes(1));
+    /*maxRetryCount*/ network::RetryPolicy::kInfiniteRetries,
+    /*initialDelay*/ std::chrono::seconds(5),
+    /*delayMultiplier*/ 2,
+    /*maxDelay*/ std::chrono::minutes(1),
+    /*randomRatio*/ 0.2);
 
 ModuleConnector::ModuleConnector(network::aio::AbstractAioThread* thread):
     network::aio::BasicPollable(thread),
@@ -219,10 +223,10 @@ void ModuleConnector::InformationReader::readUntilError()
             return nx::utils::swapAndCall(m_handler, boost::none, restResult.errorString);
         }
 
-        nx::utils::ObjectDestructionFlag::Watcher destructionWatcher(&m_destructionFlag);
+        nx::utils::InterruptionFlag::Watcher destructionWatcher(&m_destructionFlag);
         const auto localHandler = m_handler;
         localHandler(std::move(moduleInformation), QString());
-        if (destructionWatcher.objectDestroyed())
+        if (destructionWatcher.interrupted())
             return;
     }
 
@@ -246,7 +250,7 @@ ModuleConnector::Module::Module(ModuleConnector* parent, const QnUuid& id):
     m_reconnectTimer(parent->m_retryPolicy, parent->getAioThread()),
     m_disconnectTimer(parent->getAioThread())
 {
-    NX_DEBUG(this) << "New";
+    NX_DEBUG(this, "Created with %1", parent->m_retryPolicy);
 }
 
 ModuleConnector::Module::~Module()
@@ -308,11 +312,15 @@ void ModuleConnector::Module::remakeConnection()
 
 void ModuleConnector::Module::setForbiddenEndpoints(std::set<nx::network::SocketAddress> endpoints)
 {
-    NX_VERBOSE(this, lm("Forbid endpoints: %1").container(endpoints));
     NX_ASSERT(!m_id.isNull(), "Does not make sense to block endpoints for unknown servers");
-    if (m_forbiddenEndpoints != endpoints)
+    std::set<QString> newEndpoints;
+    for (const auto& endpoint: endpoints)
+        newEndpoints.insert(endpoint.toString());
+
+    if (m_forbiddenEndpoints != newEndpoints)
     {
-        m_forbiddenEndpoints = std::move(endpoints);
+        NX_DEBUG(this, lm("Forbid endpoints: %1").container(newEndpoints));
+        m_forbiddenEndpoints = std::move(newEndpoints);
         if (m_connectedReader || !m_attemptingReaders.empty())
             remakeConnection();
     }
@@ -381,11 +389,18 @@ void ModuleConnector::Module::connectToGroup(Endpoints::iterator endpointsGroup)
         return;
     }
 
+    // Cancel reconnect timer if the method was called not after timeout.
+    if (m_reconnectTimer.timeToEvent())
+    {
+        NX_VERBOSE(this, "Reconnect was requested %1 before timeout, reseting reconnect delays",
+            m_reconnectTimer.timeToEvent().get());
+        m_reconnectTimer.cancelSync();
+    }
+
     if (endpointsGroup == m_endpoints.end())
     {
         if (!m_id.isNull())
         {
-            m_reconnectTimer.cancelSync();
             m_reconnectTimer.scheduleNextTry([this](){ connectToGroup(m_endpoints.begin()); });
             NX_VERBOSE(this, lm("No more endpoints, retry in %1").arg(m_reconnectTimer.currentDelay()));
             m_parent->m_disconnectedHandler(m_id);
@@ -400,15 +415,15 @@ void ModuleConnector::Module::connectToGroup(Endpoints::iterator endpointsGroup)
     NX_VERBOSE(this, lm("Connect to group %1: %2").args(
         endpointsGroup->first, containerString(endpointsGroup->second)));
 
-    if (m_reconnectTimer.timeToEvent())
-        m_reconnectTimer.cancelSync();
-
     // Initiate parallel connects to each endpoint in a group.
     size_t endpointsInProgress = 0;
     for (const auto& endpoint: endpointsGroup->second)
     {
-        if (m_forbiddenEndpoints.count(endpoint))
+        if (m_forbiddenEndpoints.count(endpoint.toString()))
+        {
+            NX_VERBOSE(this, "Enpoint %1 is forbidden", endpoint);
             continue;
+        }
 
         // TODO: Remove as soon as IPv6 is finally supported.
         if (endpoint.address.isPureIpV6())

@@ -20,7 +20,8 @@ StunServer::StunServer(
     m_tcpStunServer(std::make_unique<nx::network::server::MultiAddressServer<network::stun::SocketServer>>(
         &m_stunMessageDispatcher,
         /* ssl required? */ false,
-        nx::network::NatTraversalSupport::disabled))
+        nx::network::NatTraversalSupport::disabled)),
+    m_stunServerStatisticsProvider({m_tcpStunServer.get(), &m_stunOverHttpServer.stunConnectionPool()})
 {
     if (!bind())
         throw std::runtime_error("Error binding to specified STUN address");
@@ -44,8 +45,8 @@ void StunServer::listen()
                 .arg(containerString(m_udpEndpoints)).toStdString());
     }
 
-    NX_ALWAYS(this, lm("STUN Server is listening on tcp/%1 and udp/%2")
-        .args(containerString(m_tcpEndpoints), containerString(m_udpEndpoints)));
+    NX_INFO(this, "STUN Server is listening on tcp/%1 and udp/%2",
+        containerString(m_tcpEndpoints), containerString(m_udpEndpoints));
 }
 
 void StunServer::stopAcceptingNewRequests()
@@ -76,8 +77,15 @@ const StunServer::MultiAddressStunServer& StunServer::server() const
     return *m_tcpStunServer;
 }
 
+const nx::network::server::AbstractStatisticsProvider& StunServer::statisticsProvider() const
+{
+    return m_stunServerStatisticsProvider;
+}
+
 void StunServer::initializeHttpTunnelling(http::Server* httpServer)
 {
+    m_stunOverHttpServer.setInactivityTimeout(m_settings.stun().connectionInactivityTimeout);
+
     m_stunOverHttpServer.setupHttpTunneling(
         &httpServer->messageDispatcher(),
         network::url::joinPath(api::kMediatorApiPrefix, api::kStunOverHttpTunnelPath).c_str());
@@ -87,7 +95,7 @@ bool StunServer::bind()
 {
     if (m_settings.stun().addrToListenList.empty())
     {
-        NX_ALWAYS(this, "No STUN address to listen");
+        NX_ERROR(this, "No STUN address to listen");
         return false;
     }
 

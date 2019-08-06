@@ -27,7 +27,7 @@ namespace nx::cloud::db {
 TemporaryAccountPasswordManager::TemporaryAccountPasswordManager(
     const conf::AccountManager& settings,
     const nx::utils::stree::ResourceNameSet& attributeNameset,
-    nx::sql::AsyncSqlQueryExecutor* const dbManager,
+    nx::sql::AbstractAsyncSqlQueryExecutor* const dbManager,
     dao::AbstractTemporaryCredentialsDao* const dao) noexcept(false)
 :
     m_settings(settings),
@@ -58,11 +58,11 @@ void TemporaryAccountPasswordManager::authenticateByName(
     const nx::network::http::StringType& username,
     const std::function<bool(const nx::Buffer&)>& checkPasswordHash,
     nx::utils::stree::ResourceContainer* const authProperties,
-    nx::utils::MoveOnlyFunc<void(api::ResultCode)> completionHandler)
+    nx::utils::MoveOnlyFunc<void(api::Result)> completionHandler)
 {
     QnMutexLocker lock(&m_mutex);
 
-    auto authResultCode = api::ResultCode::notAuthorized;
+    api::Result authResultCode(api::ResultCode::notAuthorized);
     const data::TemporaryAccountCredentialsEx* credentials =
         findMatchingCredentials(lock, username.toStdString(), checkPasswordHash, &authResultCode);
 
@@ -84,24 +84,25 @@ void TemporaryAccountPasswordManager::authenticateByName(
 void TemporaryAccountPasswordManager::registerTemporaryCredentials(
     const AuthorizationInfo& /*authzInfo*/,
     data::TemporaryAccountCredentials tmpPasswordData,
-    std::function<void(api::ResultCode)> completionHandler)
+    std::function<void(api::Result)> completionHandler)
 {
     data::TemporaryAccountCredentialsEx tmpPasswordDataInternal(std::move(tmpPasswordData));
     tmpPasswordDataInternal.id = QnUuid::createUuid().toSimpleString().toStdString();
+    const auto accountEmail = tmpPasswordDataInternal.accountEmail;
 
-    m_dbManager->executeUpdate<data::TemporaryAccountCredentialsEx>(
-        [this](auto&&... args) { return insertTempPassword(std::move(args)...); },
-        std::move(tmpPasswordDataInternal),
-        [this, locker = m_startedAsyncCallsCounter.getScopedIncrement(),
+    m_dbManager->executeUpdate(
+        [this, tmpPasswordDataInternal = std::move(tmpPasswordDataInternal)](auto&&... args) mutable
+        {
+            return insertTempPassword(std::move(args)..., std::move(tmpPasswordDataInternal));
+        },
+        [this, accountEmail, locker = m_startedAsyncCallsCounter.getScopedIncrement(),
             completionHandler = std::move(completionHandler)](
-                nx::sql::DBResult dbResult,
-                data::TemporaryAccountCredentialsEx tempPasswordData)
+                nx::sql::DBResult dbResult)
         {
             if (dbResult != nx::sql::DBResult::ok)
             {
-                NX_DEBUG(this, lm("add_temporary_account_password (%1). "
-                        "Failed to save password to DB. DB error: %2")
-                    .arg(tempPasswordData.accountEmail).arg(dbResult));
+                NX_DEBUG(this, "add_temporary_account_password (%1). Failed to save password to DB. "
+                    "DB error: %2", accountEmail, dbResult);
             }
 
             return completionHandler(dbResultToApiResult(dbResult));
@@ -235,13 +236,12 @@ bool TemporaryAccountPasswordManager::isTemporaryPasswordExpired(
 void TemporaryAccountPasswordManager::removeTemporaryCredentialsFromDbDelayed(
     const data::TemporaryAccountCredentialsEx& temporaryCredentials)
 {
-    m_dbManager->executeUpdate<std::string>(
-        [this](auto&&... args)
+    m_dbManager->executeUpdate(
+        [this, id = temporaryCredentials.id](auto&&... args)
         {
-            m_dao->deleteById(std::move(args)...);
+            m_dao->deleteById(std::move(args)..., id);
             return nx::sql::DBResult::ok;
         },
-        temporaryCredentials.id,
         [locker = m_startedAsyncCallsCounter.getScopedIncrement()](auto...) {});
 }
 
@@ -330,7 +330,7 @@ const data::TemporaryAccountCredentialsEx*
         const QnMutexLockerBase& /*lock*/,
         const std::string& username,
         std::function<bool(const nx::Buffer&)> checkPasswordHash,
-        api::ResultCode* authResultCode)
+        api::Result* authResultCode)
 {
     *authResultCode = api::ResultCode::badUsername;
 

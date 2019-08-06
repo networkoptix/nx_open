@@ -18,6 +18,7 @@
 #include <utils/common/app_info.h>
 #include <utils/common/id.h>
 
+#include <nx_ec/ec_api.h>
 #include <nx/vms/api/analytics/engine_manifest.h>
 #include <nx/vms/api/analytics/descriptors.h>
 
@@ -94,21 +95,21 @@ QString StringsHelper::eventName(EventType value, int count) const
 
     switch (value)
     {
-        case EventType::cameraMotionEvent:    return tr("Motion on Cameras", "", count);
-        case EventType::storageFailureEvent:  return tr("Storage Issue");
-        case EventType::networkIssueEvent:    return tr("Network Issue");
-        case EventType::serverFailureEvent:   return tr("Server Failure");
-        case EventType::serverConflictEvent:  return tr("Server Conflict");
-        case EventType::serverStartEvent:     return tr("Server Started");
-        case EventType::licenseIssueEvent:    return tr("License Issue");
-        case EventType::backupFinishedEvent:  return tr("Archive backup finished");
-        case EventType::analyticsSdkEvent:    return tr("Analytics Event");
-        case EventType::pluginEvent:          return tr("Plugin Event");
+        case EventType::cameraMotionEvent:     return tr("Motion on Cameras", "", count);
+        case EventType::storageFailureEvent:   return tr("Storage Issue");
+        case EventType::networkIssueEvent:     return tr("Network Issue");
+        case EventType::serverFailureEvent:    return tr("Server Failure");
+        case EventType::serverConflictEvent:   return tr("Server Conflict");
+        case EventType::serverStartEvent:      return tr("Server Started");
+        case EventType::licenseIssueEvent:     return tr("License Issue");
+        case EventType::backupFinishedEvent:   return tr("Archive backup finished");
+        case EventType::analyticsSdkEvent:     return tr("Analytics Event");
+        case EventType::pluginDiagnosticEvent: return tr("Plugin Diagnostic Event");
 
-        case EventType::anyServerEvent:       return tr("Any Server Issue");
-        case EventType::anyEvent:             return tr("Any Event");
+        case EventType::anyServerEvent:        return tr("Any Server Issue");
+        case EventType::anyEvent:              return tr("Any Event");
 
-        case EventType::softwareTriggerEvent: return tr("Soft Trigger");
+        case EventType::softwareTriggerEvent:  return tr("Soft Trigger");
 
         case EventType::cameraInputEvent:
             return QnDeviceDependentStrings::getDefaultNameFromSet(
@@ -218,10 +219,10 @@ QString StringsHelper::eventAtResource(const EventParameters& params,
                 .arg(getAnalyticsSdkEventName(params))
                 .arg(resourceName);
 
-        case EventType::pluginEvent:
+        case EventType::pluginDiagnosticEvent:
         {
             const QString caption = params.caption.isEmpty()
-                ? tr("Unknown plugin event")
+                ? tr("Unknown Plugin Diagnostic Event")
                 : params.caption;
 
             return lm("%1 - %2").args(resourceName, caption);
@@ -353,7 +354,7 @@ QStringList StringsHelper::eventDetails(const EventParameters& params) const
 
         case EventType::analyticsSdkEvent:
         case EventType::userDefinedEvent:
-        case EventType::pluginEvent:
+        case EventType::pluginDiagnosticEvent:
             if (!params.description.isEmpty())
                 result << params.description;
             break;
@@ -528,6 +529,11 @@ QString StringsHelper::eventReason(const EventParameters& params) const
         {
             QString storageUrl = reasonParamsEncoded;
             result = tr("Analytics storage \"%1\" is almost full.").arg(storageUrl);
+            break;
+        }
+        case EventReason::raidStorageError:
+        {
+            result = tr("RAID error. %1.").arg(reasonParamsEncoded);
             break;
         }
         case EventReason::backupFailedNoBackupStorageError:

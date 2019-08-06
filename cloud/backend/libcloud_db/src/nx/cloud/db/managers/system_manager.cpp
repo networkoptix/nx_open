@@ -45,9 +45,9 @@ SystemManager::SystemManager(
     nx::utils::StandaloneTimerManager* const timerManager,
     AbstractAccountManager* const accountManager,
     const AbstractSystemHealthInfoProvider& systemHealthInfoProvider,
-    nx::sql::AsyncSqlQueryExecutor* const dbManager,
+    nx::sql::AbstractAsyncSqlQueryExecutor* const dbManager,
     AbstractEmailManager* const emailManager,
-    clusterdb::engine::SyncronizationEngine* const ec2SyncronizationEngine) noexcept(false)
+    clusterdb::engine::SynchronizationEngine* const ec2SynchronizationEngine) noexcept(false)
 :
     m_settings(settings),
     m_timerManager(timerManager),
@@ -55,7 +55,7 @@ SystemManager::SystemManager(
     m_systemHealthInfoProvider(systemHealthInfoProvider),
     m_dbManager(dbManager),
     m_emailManager(emailManager),
-    m_ec2SyncronizationEngine(ec2SyncronizationEngine),
+    m_ec2SynchronizationEngine(ec2SynchronizationEngine),
     m_dropSystemsTimerId(0),
     m_dropExpiredSystemsTaskStillRunning(false),
     m_systemDao(dao::SystemDataObjectFactory::create(settings))
@@ -76,20 +76,20 @@ SystemManager::SystemManager(
     // Since it may lead to inconsistence between transactions and data cache (for a quite short period, though).
 
     // Registering transaction handler.
-    m_ec2SyncronizationEngine->incomingCommandDispatcher().registerCommandHandler
+    m_ec2SynchronizationEngine->incomingCommandDispatcher().registerCommandHandler
         <ec2::command::SaveUser>(
             std::bind(&SystemManager::processEc2SaveUser, this, _1, _2, _3));
 
-    m_ec2SyncronizationEngine->incomingCommandDispatcher().registerCommandHandler
+    m_ec2SynchronizationEngine->incomingCommandDispatcher().registerCommandHandler
         <ec2::command::RemoveUser>(
             std::bind(&SystemManager::processEc2RemoveUser, this, _1, _2, _3));
 
     // Currently this transaction can only rename some system.
-    m_ec2SyncronizationEngine->incomingCommandDispatcher().registerCommandHandler
+    m_ec2SynchronizationEngine->incomingCommandDispatcher().registerCommandHandler
         <ec2::command::SetResourceParam>(
             std::bind(&SystemManager::processSetResourceParam, this, _1, _2, _3));
 
-    m_ec2SyncronizationEngine->incomingCommandDispatcher().registerCommandHandler
+    m_ec2SynchronizationEngine->incomingCommandDispatcher().registerCommandHandler
         <ec2::command::RemoveResourceParam>(
             std::bind(&SystemManager::processRemoveResourceParam, this, _1, _2, _3));
 
@@ -98,16 +98,16 @@ SystemManager::SystemManager(
 
 SystemManager::~SystemManager()
 {
-    m_ec2SyncronizationEngine->incomingCommandDispatcher().removeHandler
+    m_ec2SynchronizationEngine->incomingCommandDispatcher().removeHandler
         <ec2::command::RemoveResourceParam>();
 
-    m_ec2SyncronizationEngine->incomingCommandDispatcher().removeHandler
+    m_ec2SynchronizationEngine->incomingCommandDispatcher().removeHandler
         <ec2::command::SetResourceParam>();
 
-    m_ec2SyncronizationEngine->incomingCommandDispatcher().removeHandler
+    m_ec2SynchronizationEngine->incomingCommandDispatcher().removeHandler
         <ec2::command::RemoveUser>();
 
-    m_ec2SyncronizationEngine->incomingCommandDispatcher().removeHandler
+    m_ec2SynchronizationEngine->incomingCommandDispatcher().removeHandler
         <ec2::command::SaveUser>();
 
     m_timerManager->joinAndDeleteTimer(m_dropSystemsTimerId);
@@ -121,7 +121,7 @@ void SystemManager::authenticateByName(
     const nx::network::http::StringType& username,
     const std::function<bool(const nx::Buffer&)>& validateHa1Func,
     nx::utils::stree::ResourceContainer* const authProperties,
-    nx::utils::MoveOnlyFunc<void(api::ResultCode)> completionHandler)
+    nx::utils::MoveOnlyFunc<void(api::Result)> completionHandler)
 {
     api::ResultCode result = api::ResultCode::notAuthorized;
     auto scopedGuard = nx::utils::makeScopeGuard(
@@ -168,7 +168,7 @@ void SystemManager::authenticateByName(
 void SystemManager::bindSystemToAccount(
     const AuthorizationInfo& authzInfo,
     data::SystemRegistrationData registrationData,
-    std::function<void(api::ResultCode, data::SystemData)> completionHandler)
+    std::function<void(api::Result, data::SystemData)> completionHandler)
 {
     QString accountEmail;
     if (!authzInfo.get(nx::cloud::db::attr::authAccountEmail, &accountEmail))
@@ -213,7 +213,7 @@ void SystemManager::bindSystemToAccount(
         };
 
     // Creating db transaction via CommandLog.
-    m_ec2SyncronizationEngine->transactionLog().startDbTransaction(
+    m_ec2SynchronizationEngine->transactionLog().startDbTransaction(
         newSystemDataPtr->systemData.id.c_str(),
         std::move(dbUpdateFunc),
         std::move(onDbUpdateCompletedFunc));
@@ -222,16 +222,15 @@ void SystemManager::bindSystemToAccount(
 void SystemManager::unbindSystem(
     const AuthorizationInfo& /*authzInfo*/,
     data::SystemId systemId,
-    std::function<void(api::ResultCode)> completionHandler)
+    std::function<void(api::Result)> completionHandler)
 {
     using namespace std::placeholders;
-    m_dbManager->executeUpdate<std::string>(
-        std::bind(&SystemManager::markSystemForDeletion, this, _1, _2),
-        std::move(systemId.systemId),
-        [this, locker = m_startedAsyncCallsCounter.getScopedIncrement(),
+
+    m_dbManager->executeUpdate(
+        std::bind(&SystemManager::markSystemForDeletion, this, _1, systemId.systemId),
+        [locker = m_startedAsyncCallsCounter.getScopedIncrement(),
             completionHandler = std::move(completionHandler)](
-                nx::sql::DBResult dbResult,
-                std::string /*systemId*/)
+                nx::sql::DBResult dbResult)
         {
             completionHandler(dbResultToApiResult(dbResult));
         });
@@ -240,7 +239,7 @@ void SystemManager::unbindSystem(
 void SystemManager::getSystems(
     const AuthorizationInfo& authzInfo,
     data::DataFilter filter,
-    std::function<void(api::ResultCode, api::SystemDataExList)> completionHandler)
+    std::function<void(api::Result, api::SystemDataExList)> completionHandler)
 {
     // Always providing only activated systems.
     filter.addFilterValue(
@@ -304,7 +303,7 @@ void SystemManager::getSystems(
 void SystemManager::shareSystem(
     const AuthorizationInfo& authzInfo,
     data::SystemSharing sharing,
-    std::function<void(api::ResultCode)> completionHandler)
+    std::function<void(api::Result)> completionHandler)
 {
     using namespace std::placeholders;
 
@@ -337,15 +336,14 @@ void SystemManager::shareSystem(
         };
 
     auto onDbUpdateCompletedFunc =
-        [this,
-            locker = m_startedAsyncCallsCounter.getScopedIncrement(),
+        [locker = m_startedAsyncCallsCounter.getScopedIncrement(),
             completionHandler = std::move(completionHandler)](
                 nx::sql::DBResult dbResult)
         {
             completionHandler(dbResultToApiResult(dbResult));
         };
 
-    m_ec2SyncronizationEngine->transactionLog().startDbTransaction(
+    m_ec2SynchronizationEngine->transactionLog().startDbTransaction(
         sharing.systemId.c_str(),
         std::move(dbUpdateFunc),
         std::move(onDbUpdateCompletedFunc));
@@ -354,7 +352,7 @@ void SystemManager::shareSystem(
 void SystemManager::getCloudUsersOfSystem(
     const AuthorizationInfo& authzInfo,
     const data::DataFilter& filter,
-    std::function<void(api::ResultCode, api::SystemSharingExList)> completionHandler)
+    std::function<void(api::Result, api::SystemSharingExList)> completionHandler)
 {
     api::SystemSharingExList resultData;
 
@@ -433,7 +431,7 @@ void SystemManager::getCloudUsersOfSystem(
 void SystemManager::getAccessRoleList(
     const AuthorizationInfo& authzInfo,
     data::SystemId systemId,
-    std::function<void(api::ResultCode, api::SystemAccessRoleList)> completionHandler)
+    std::function<void(api::Result, api::SystemAccessRoleList)> completionHandler)
 {
     std::string accountEmail;
     if (!authzInfo.get(attr::authAccountEmail, &accountEmail))
@@ -464,9 +462,9 @@ constexpr const std::size_t kMaxOpaqueDataSize = 1024;
 void SystemManager::updateSystem(
     const AuthorizationInfo& /*authzInfo*/,
     data::SystemAttributesUpdate data,
-    std::function<void(api::ResultCode)> completionHandler)
+    std::function<void(api::Result)> completionHandler)
 {
-    NX_VERBOSE(this, lm("Updating system %1 sttributes").arg(data.systemId));
+    NX_VERBOSE(this, lm("Updating system %1 attributes").arg(data.systemId));
 
     // Validating data received.
     if (data.name && (data.name->empty() || data.name->size() > kMaxSystemNameLength))
@@ -486,15 +484,14 @@ void SystemManager::updateSystem(
     };
 
     auto onDbUpdateCompletedFunc =
-        [this,
-            locker = m_startedAsyncCallsCounter.getScopedIncrement(),
+        [locker = m_startedAsyncCallsCounter.getScopedIncrement(),
             completionHandler = std::move(completionHandler)](
                 nx::sql::DBResult dbResult)
         {
             completionHandler(dbResultToApiResult(dbResult));
         };
 
-    m_ec2SyncronizationEngine->transactionLog().startDbTransaction(
+    m_ec2SynchronizationEngine->transactionLog().startDbTransaction(
         systemId.c_str(),
         std::move(dbUpdateFunc),
         std::move(onDbUpdateCompletedFunc));
@@ -503,7 +500,7 @@ void SystemManager::updateSystem(
 void SystemManager::recordUserSessionStart(
     const AuthorizationInfo& authzInfo,
     data::UserSessionDescriptor userSessionDescriptor,
-    std::function<void(api::ResultCode)> completionHandler)
+    std::function<void(api::Result)> completionHandler)
 {
     NX_ASSERT(userSessionDescriptor.systemId || userSessionDescriptor.accountEmail);
     if (!(userSessionDescriptor.systemId || userSessionDescriptor.accountEmail))
@@ -532,15 +529,16 @@ void SystemManager::recordUserSessionStart(
         }
     }
 
-    using namespace std::placeholders;
-    m_dbManager->executeUpdate<data::UserSessionDescriptor, SaveUserSessionResult>(
-        std::bind(&SystemManager::saveUserSessionStart, this, _1, _2, _3),
-        std::move(userSessionDescriptor),
+    m_dbManager->executeUpdate(
+        [this, userSessionDescriptor = std::move(userSessionDescriptor)](
+            nx::sql::QueryContext* queryContext)
+        {
+            SaveUserSessionResult result;
+            return saveUserSessionStart(queryContext, userSessionDescriptor, &result);
+        },
         [locker = m_startedAsyncCallsCounter.getScopedIncrement(),
             completionHandler = std::move(completionHandler)](
-                nx::sql::DBResult dbResult,
-                data::UserSessionDescriptor /*userSessionDescriptor*/,
-                SaveUserSessionResult /*result*/)
+                nx::sql::DBResult dbResult)
         {
             completionHandler(dbResultToApiResult(dbResult));
         });
@@ -723,7 +721,7 @@ nx::sql::DBResult SystemManager::insertSystemToDB(
     if (dbResult != nx::sql::DBResult::ok)
         return dbResult;
 
-    dbResult = m_ec2SyncronizationEngine->transactionLog().updateTimestampHiForSystem(
+    dbResult = m_ec2SynchronizationEngine->transactionLog().updateTimestampHiForSystem(
         queryContext,
         result->systemData.id.c_str(),
         result->systemData.systemSequence);
@@ -813,7 +811,7 @@ void SystemManager::systemAdded(
     nx::sql::DBResult dbResult,
     data::SystemRegistrationDataWithAccount /*systemRegistrationData*/,
     InsertNewSystemToDbResult resultData,
-    std::function<void(api::ResultCode, data::SystemData)> completionHandler)
+    std::function<void(api::Result, data::SystemData)> completionHandler)
 {
     if (dbResult == nx::sql::DBResult::ok)
     {
@@ -874,7 +872,7 @@ void SystemManager::systemDeleted(
     nx::utils::Counter::ScopedIncrement /*asyncCallLocker*/,
     nx::sql::DBResult dbResult,
     data::SystemId systemId,
-    std::function<void(api::ResultCode)> completionHandler)
+    std::function<void(api::Result)> completionHandler)
 {
     if (dbResult == nx::sql::DBResult::ok)
     {
@@ -1368,7 +1366,7 @@ nx::sql::DBResult SystemManager::generateSaveUserTransaction(
     ec2::convert(sharing, &userData);
     userData.isCloud = true;
     userData.fullName = QString::fromStdString(account.fullName);
-    return m_ec2SyncronizationEngine->transactionLog().generateTransactionAndSaveToLog
+    return m_ec2SynchronizationEngine->transactionLog().generateTransactionAndSaveToLog
         <ec2::command::SaveUser>(
             queryContext,
             sharing.systemId.c_str(),
@@ -1385,7 +1383,7 @@ nx::sql::DBResult SystemManager::generateUpdateFullNameTransaction(
     fullNameData.resourceId = QnUuid(sharing.vmsUserId.c_str());
     fullNameData.name = Qn::USER_FULL_NAME;
     fullNameData.value = QString::fromStdString(newFullName);
-    return m_ec2SyncronizationEngine->transactionLog().generateTransactionAndSaveToLog
+    return m_ec2SynchronizationEngine->transactionLog().generateTransactionAndSaveToLog
         <ec2::command::SetResourceParam>(
             queryContext,
             sharing.systemId.c_str(),
@@ -1398,7 +1396,7 @@ nx::sql::DBResult SystemManager::generateRemoveUserTransaction(
 {
     nx::vms::api::IdData userId;
     ec2::convert(sharing, &userId);
-    return m_ec2SyncronizationEngine->transactionLog().generateTransactionAndSaveToLog
+    return m_ec2SynchronizationEngine->transactionLog().generateTransactionAndSaveToLog
         <ec2::command::RemoveUser>(
             queryContext,
             sharing.systemId.c_str(),
@@ -1412,7 +1410,7 @@ nx::sql::DBResult SystemManager::generateRemoveUserFullNameTransaction(
     nx::vms::api::ResourceParamWithRefData fullNameParam;
     fullNameParam.resourceId = QnUuid(sharing.vmsUserId.c_str());
     fullNameParam.name = Qn::USER_FULL_NAME;
-    return m_ec2SyncronizationEngine->transactionLog().generateTransactionAndSaveToLog
+    return m_ec2SynchronizationEngine->transactionLog().generateTransactionAndSaveToLog
         <ec2::command::RemoveResourceParam>(
             queryContext,
             sharing.systemId.c_str(),
@@ -1525,7 +1523,7 @@ nx::sql::DBResult SystemManager::renameSystem(
     systemNameData.name = nx::settings_names::kNameSystemName;
     systemNameData.value = QString::fromStdString(data.name.get());
 
-    return m_ec2SyncronizationEngine->transactionLog().generateTransactionAndSaveToLog
+    return m_ec2SynchronizationEngine->transactionLog().generateTransactionAndSaveToLog
         <ec2::command::SetResourceParam>(
             queryContext,
             data.systemId.c_str(),
@@ -1558,7 +1556,7 @@ void SystemManager::systemNameUpdated(
     nx::utils::Counter::ScopedIncrement /*asyncCallLocker*/,
     nx::sql::DBResult dbResult,
     data::SystemAttributesUpdate data,
-    std::function<void(api::ResultCode)> completionHandler)
+    std::function<void(api::Result)> completionHandler)
 {
     if (dbResult == nx::sql::DBResult::ok)
     {
@@ -1577,6 +1575,8 @@ void SystemManager::activateSystemIfNeeded(
     SystemDictionary& systemByIdIndex,
     typename SystemDictionary::iterator systemIter)
 {
+    using namespace std::placeholders;
+
     if (systemIter->status == api::SystemStatus::activated &&
         !systemIter->activationInDbNeeded)
     {
@@ -1591,14 +1591,10 @@ void SystemManager::activateSystemIfNeeded(
             system.activationInDbNeeded = false;
         });
 
-    using namespace std::placeholders;
-
-    m_dbManager->executeUpdate<std::string /*systemId*/>(
-        std::bind(&SystemManager::updateSystemStatus, this, _1, _2, api::SystemStatus::activated),
-        systemIter->id,
-        [this, locker = m_startedAsyncCallsCounter.getScopedIncrement()](
-            nx::sql::DBResult dbResult,
-            std::string systemId)
+    m_dbManager->executeUpdate(
+        std::bind(&SystemManager::updateSystemStatus, this, _1, systemIter->id, api::SystemStatus::activated),
+        [this, systemId = systemIter->id, locker = m_startedAsyncCallsCounter.getScopedIncrement()](
+            nx::sql::DBResult dbResult)
         {
             updateSystemInCache(
                 systemId,
@@ -1941,7 +1937,7 @@ nx::sql::DBResult SystemManager::processEc2SaveUser(
     fullNameData.resourceId = vmsUser.id;
     fullNameData.name = Qn::USER_FULL_NAME;
     fullNameData.value = QString::fromStdString(account.fullName);
-    return m_ec2SyncronizationEngine->transactionLog().generateTransactionAndSaveToLog
+    return m_ec2SynchronizationEngine->transactionLog().generateTransactionAndSaveToLog
         <ec2::command::SetResourceParam>(
             queryContext,
             systemId,
@@ -1955,8 +1951,8 @@ nx::sql::DBResult SystemManager::processEc2RemoveUser(
 {
     const auto& data = transaction.params;
 
-    NX_VERBOSE(QnLog::EC2_TRAN_LOG.join(this), lm("Processing vms transaction removeUser. systemId %1, vms user id %2")
-            .arg(systemId).arg(data.id));
+    NX_VERBOSE(this, lm("Processing vms transaction removeUser. systemId %1, vms user id %2")
+        .arg(systemId).arg(data.id));
 
     data::SystemSharing systemSharing;
     systemSharing.systemId = systemId;
@@ -1969,9 +1965,8 @@ nx::sql::DBResult SystemManager::processEc2RemoveUser(
             QnSql::serialized_field(systemSharing.vmsUserId))});
     if (dbResult != nx::sql::DBResult::ok)
     {
-        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("Failed to remove sharing by vms user id. system %1, vms user id %2. %3")
-                .arg(systemId).arg(data.id)
-                .arg(queryContext->connection()->lastErrorText()));
+        NX_DEBUG(this, "Failed to remove sharing by vms user id. system %1, vms user id %2. %3",
+            systemId, data.id, queryContext->connection()->lastErrorText());
         return dbResult;
     }
 
@@ -2005,9 +2000,9 @@ nx::sql::DBResult SystemManager::processSetResourceParam(
     if (data.resourceId != QnUserResource::kAdminGuid ||
         data.name != nx::settings_names::kNameSystemName)
     {
-        NX_VERBOSE(QnLog::EC2_TRAN_LOG.join(this), lm("Ignoring transaction setResourceParam with "
-               "systemId %1, resourceId %2, param name %3, param value %4")
-                .arg(systemId).arg(data.resourceId).arg(data.name).arg(data.value));
+        NX_VERBOSE(this, "Ignoring transaction setResourceParam with "
+            "systemId %1, resourceId %2, param name %3, param value %4",
+            systemId, data.resourceId, data.name, data.value);
         return nx::sql::DBResult::ok;
     }
 
@@ -2032,10 +2027,8 @@ nx::sql::DBResult SystemManager::processRemoveResourceParam(
     clusterdb::engine::Command<nx::vms::api::ResourceParamWithRefData> data)
 {
     // This can only be removal of already-removed user attribute.
-    NX_VERBOSE(QnLog::EC2_TRAN_LOG.join(this), lm("Ignoring transaction %1 with "
-            "systemId %2, resourceId %3, param name %4")
-            .arg(::ec2::ApiCommand::toString(data.command)).arg(systemId)
-            .arg(data.params.resourceId).arg(data.params.name));
+    NX_VERBOSE(this, "Ignoring transaction %1 with systemId %2, resourceId %3, param name %4",
+        data.command, systemId, data.params.resourceId, data.params.name);
     return nx::sql::DBResult::ok;
 }
 

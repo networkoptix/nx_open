@@ -252,11 +252,15 @@ bool FfmpegVideoDecoder::isCompatible(
     if (maxRes.isEmpty())
         return true;
 
-    if (resolution.width() <= maxRes.width() && resolution.height() <= maxRes.height())
+    const auto fixedResolution = resolution.height() > resolution.width()
+        ? resolution.transposed()
+        : resolution;
+
+    if (fixedResolution.width() <= maxRes.width() && fixedResolution.height() <= maxRes.height())
         return true;
 
     NX_WARNING(kLogTag, lm("Max resolution %1 x %2 exceeded: %3 x %4").args(
-        maxRes.width(), maxRes.height(), resolution.width(), resolution.height()));
+        maxRes.width(), maxRes.height(), fixedResolution.width(), fixedResolution.height()));
 
     if (ini().unlimitFfmpegMaxResolution)
     {
@@ -301,11 +305,7 @@ int FfmpegVideoDecoder::decode(
         // It's already guaranteed by QnByteArray that there is an extra space reserved. We must
         // fill the padding bytes according to ffmpeg documentation.
         if (avpkt.data)
-        {
-            static_assert(QN_BYTE_ARRAY_PADDING >= FF_INPUT_BUFFER_PADDING_SIZE,
-                "FfmpegVideoDecoder: Insufficient padding size");
-            memset(avpkt.data + avpkt.size, 0, FF_INPUT_BUFFER_PADDING_SIZE);
-        }
+            memset(avpkt.data + avpkt.size, 0, AV_INPUT_BUFFER_PADDING_SIZE);
 
         d->lastPts = compressedVideoData->timestamp;
     }

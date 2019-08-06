@@ -18,7 +18,7 @@ from requests.packages.urllib3.util.retry import Retry
 
 MEDIASERVER_VERSION = '3.1.0.17256'
 CLOUD_CONNECT_TEST_UTIL_VERSION = '18.3.0.20101'
-RETRY_TIMEOUT = 5  # seconds
+RETRY_TIMEOUT = 10  # seconds
 
 log = logging.getLogger('simple_cloud_test')
 
@@ -179,7 +179,7 @@ class CloudSession(object):
         log.info('Sleeping 60 seconds')
         time.sleep(60)
 
-    def wait_for_message(self, queue, tries=3, seconds_per_try=20):
+    def wait_for_message(self, queue, tries=6, seconds_per_try=20):
         for i in range(tries):
             for message in queue.receive_messages(WaitTimeSeconds=seconds_per_try):
                 try:
@@ -227,8 +227,12 @@ class CloudSession(object):
 
     def _dynamodb_item(self):
         metric_items = []
+        failed = 0
 
         for (metric, host, timestamp), value in self.collected_metrics.items():
+            if value:
+                failed = 1
+
             metric_item = {
                 'name': metric,
                 'timestamp': timestamp.isoformat(),
@@ -246,7 +250,8 @@ class CloudSession(object):
         return {
             'year': timestamp.year,
             'timestamp': timestamp.isoformat(),
-            'metrics': metric_items
+            'metrics': metric_items,
+            'failed': failed
         }
 
     def report_metrics(self):
@@ -404,6 +409,10 @@ class CloudSession(object):
     @testmethod(metric='traffic_relay_failure', host='relay-sy', continue_if_fails=True)
     def test_traffic_relay_sy(self):
         self.test_traffic_relay('relay-sy')
+
+    @testmethod(metric='traffic_relay_failure', host='relay-si', continue_if_fails=True)
+    def test_traffic_relay_si(self):
+        self.test_traffic_relay('relay-si')
 
     @testmethod(metric='email_failure', continue_if_fails=True, debug_skip=True)
     def restore_password(self):

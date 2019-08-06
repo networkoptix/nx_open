@@ -1,6 +1,5 @@
 #include "to_string.h"
 
-#include <nx/utils/unused.h>
 #include <nx/utils/log/log.h>
 
 #include <boost/algorithm/string.hpp>
@@ -101,6 +100,15 @@ QString toString(const std::chrono::microseconds& value)
     return QString(QLatin1String("%1usec")).arg(value.count());
 }
 
+QString toString(const std::chrono::nanoseconds &value)
+{
+    if (value.count() % 1000 == 0)
+        return toString(std::chrono::duration_cast<std::chrono::microseconds>(value));
+
+    return QString(QLatin1String("%1ns")).arg(value.count());
+
+}
+
 QString toString(const std::type_info& value)
 {
     #if defined NX_UTILS_TO_STRING_CACHE
@@ -135,6 +143,9 @@ QString demangleTypeName(const char* type)
         {
             if (boost::starts_with(typeName, prefix))
                 typeName = typeName.substr(prefix.size());
+            // Remove prefixes in template arguments.
+            boost::replace_all(typeName, "<" + prefix, "<");
+            boost::replace_all(typeName, " " + prefix, " ");
         }
     #endif
 
@@ -209,7 +220,7 @@ static void findFunctionScope(
  *     not included.
  */
 std::string scopeOfFunction(
-    const std::type_info& scopeTagTypeInfo, const char* functionMacro)
+    const std::type_info& scopeTagTypeInfo, [[maybe_unused]] const char* functionMacro)
 {
     std::string demangledType;
     #if defined(_MSC_VER)
@@ -226,7 +237,6 @@ std::string scopeOfFunction(
             boost::replace_all(demangledType, "* __ptr64", "*");
         }
     #else
-        nx::utils::unused(functionMacro);
         demangledType = boost::core::demangle(scopeTagTypeInfo.name());
     #endif
 

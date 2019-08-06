@@ -32,6 +32,10 @@
     text-align: center;
 }
 
+.form-row ul {
+    padding-inline-start: 160px;
+}
+
 .text-danger{
     color: red !important;
 }
@@ -98,8 +102,12 @@ img.preview-image{
     color: #333 !important;
 }
 
-.module h2{
+.module h2 {
     background: #35464F;
+}
+
+.custom-block {
+    margin-bottom: 60px !important;
 }
 
 .show-html{

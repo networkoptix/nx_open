@@ -280,7 +280,7 @@ void QnGeneralPreferencesWidget::setPrimaryAudioDeviceName(const QString& name)
 
 QString QnGeneralPreferencesWidget::secondaryAudioDeviceName() const
 {
-    return ui->primaryAudioDeviceComboBox->currentData().toString();
+    return ui->secondaryAudioDeviceComboBox->currentData().toString();
 }
 
 void QnGeneralPreferencesWidget::setSecondaryAudioDeviceName(const QString &name)

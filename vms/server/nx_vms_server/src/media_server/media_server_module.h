@@ -27,7 +27,6 @@ class QnResourceCommandProcessor;
 class QnResourcePool;
 class QnResourcePropertyDictionary;
 class QnCameraHistoryPool;
-class QnServerUpdateTool;
 class QnMotionHelper;
 class QnServerDb;
 class QnAuditManager;
@@ -47,6 +46,7 @@ class QnMediaServerResourceSearchers;
 class QnPlatformAbstraction;
 class QnServerConnector;
 class QnResourceStatusWatcher;
+class StreamingChunkTranscoder;
 
 namespace nx::vms::common::p2p::downloader { class Downloader; }
 namespace nx::vms::server::hls { class SessionPool; }
@@ -133,7 +133,6 @@ public:
     nx::vms::server::event::ExtendedRuleProcessor* eventRuleProcessor() const;
     std::shared_ptr<ec2::AbstractECConnection> ec2Connection() const;
     QnGlobalSettings* globalSettings() const;
-    QnServerUpdateTool* serverUpdateTool() const;
     QnMotionHelper* motionHelper() const;
     nx::vms::common::p2p::downloader::Downloader* p2pDownloader() const;
     QnServerDb* serverDb() const;
@@ -162,6 +161,7 @@ public:
 
     void initializeP2PDownloader();
 
+    QString metadataDatabaseDir() const;
 private:
     void registerResourceDataProviders();
     /**
@@ -198,7 +198,6 @@ private:
     std::unique_ptr<nx::analytics::db::AbstractEventsStorage> m_analyticsEventsStorage;
     std::unique_ptr<nx::vms::server::RootFileSystem> m_rootFileSystem;
     nx::vms::server::ServerUpdateManager* m_updateManager = nullptr;
-    QnServerUpdateTool* m_serverUpdateTool = nullptr;
     QnDataProviderFactory* m_resourceDataProviderFactory = nullptr;
     QScopedPointer<QnResourceCommandProcessor> m_resourceCommandProcessor;
     QnMotionHelper* m_motionHelper = nullptr;
@@ -221,4 +220,5 @@ private:
     nx::vms::server::analytics::SdkObjectFactory* m_sdkObjectFactory;
     nx::vms::server::hls::SessionPool* m_hlsSessionPool = nullptr;
     nx::vms::server::network::MulticastAddressRegistry* m_multicastAddressRegistry = nullptr;
+    StreamingChunkTranscoder* m_streamingChunkTranscoder = nullptr;
 };

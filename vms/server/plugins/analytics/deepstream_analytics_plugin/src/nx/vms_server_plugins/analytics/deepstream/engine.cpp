@@ -9,12 +9,14 @@ extern "C" {
 } // extern "C"
 
 #include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/helpers/lib_context.h>
 
 #define NX_PRINT_PREFIX "deepstream::Engine::"
 #include <nx/kit/debug.h>
 
 #include <nx/gstreamer/gstreamer_common.h>
 #include <nx/sdk/helpers/string.h>
+#include <nx/sdk/i_utility_provider.h>
 
 #include "device_agent.h"
 #include "utils.h"
@@ -55,29 +57,26 @@ Engine::Engine(Plugin* plugin): m_plugin(plugin)
         std::to_string(gstreamerDebugLevel).c_str(), 1);
 
     gst_init(NULL, NULL);
-    NX_PRINT << " Created Engine for " << plugin->name();
+    NX_PRINT << " Created Engine for " << libContext().name();
 
     if (m_objectClassDescritions.empty())
         m_objectClassDescritions = loadObjectClasses();
 
     NX_OUTPUT << __func__ << " Setting timeProvider";
-
-    m_timeUtilityProvider = queryInterfacePtr<ITimeUtilityProvider>(m_plugin->utilityProvider());
-    NX_KIT_ASSERT(m_timeUtilityProvider);
 }
 
 Engine::~Engine()
 {
-    NX_PRINT << " Destroyed Engine for " << m_plugin->name();
+    NX_PRINT << " Destroyed Engine for " << libContext().name();
 }
 
-void Engine::setEngineInfo(const nx::sdk::analytics::IEngineInfo* /*engineInfo*/)
+void Engine::setEngineInfo(const IEngineInfo* /*engineInfo*/)
 {
 }
 
-void Engine::setSettings(const IStringMap* settings)
+StringMapResult Engine::setSettings(const IStringMap* settings)
 {
-    NX_OUTPUT << __func__ << " Received " << m_plugin->name() << " settings:";
+    NX_OUTPUT << __func__ << " Received " << libContext().name() << " settings:";
     NX_OUTPUT << "{";
 
     const auto count = settings->count();
@@ -88,17 +87,16 @@ void Engine::setSettings(const IStringMap* settings)
             << ((i < count - 1) ? "," : "");
     }
     NX_OUTPUT << "}";
+    return nullptr;
 }
 
-IStringMap* Engine::pluginSideSettings() const
+SettingsResponseResult Engine::pluginSideSettings() const
 {
     return nullptr;
 }
 
-const IString* Engine::manifest(Error* error) const
+StringResult Engine::manifest() const
 {
-    *error = Error::noError;
-
     if (!m_manifest.empty())
         return new nx::sdk::String(m_manifest);
 
@@ -140,8 +138,7 @@ const IString* Engine::manifest(Error* error) const
     return new nx::sdk::String(m_manifest);
 }
 
-IDeviceAgent* Engine::obtainDeviceAgent(
-    const IDeviceInfo* deviceInfo, Error* outError)
+MutableDeviceAgentResult Engine::obtainDeviceAgent(const IDeviceInfo* deviceInfo)
 {
     NX_OUTPUT
         << __func__
@@ -149,8 +146,6 @@ IDeviceAgent* Engine::obtainDeviceAgent(
         << deviceInfo->vendor() << ", "
         << deviceInfo->model() << ", "
         << deviceInfo->id();
-
-    *outError = Error::noError;
 
     // Deepstream can't be correctly deinitialized, so we never destroy the DeviceAgent.
     // It's not a production-ready solution, but is OK for demos.
@@ -161,8 +156,9 @@ IDeviceAgent* Engine::obtainDeviceAgent(
     return m_deviceAgent;
 }
 
-void Engine::executeAction(IAction* /*action*/, Error* /*outError*/)
+Result<void> Engine::executeAction(IAction* /*action*/)
 {
+    return {};
 }
 
 std::vector<ObjectClassDescription> Engine::objectClassDescritions() const
@@ -172,7 +168,8 @@ std::vector<ObjectClassDescription> Engine::objectClassDescritions() const
 
 std::chrono::microseconds Engine::currentTimeUs() const
 {
-    return std::chrono::microseconds(m_timeUtilityProvider->vmsSystemTimeSinceEpochMs() * 1000);
+    return std::chrono::microseconds(
+        m_plugin->utilityProvider()->vmsSystemTimeSinceEpochMs() * 1000);
 }
 
 std::vector<ObjectClassDescription> Engine::loadObjectClasses() const
@@ -262,10 +259,9 @@ std::string Engine::buildManifestObectTypeString(const ObjectClassDescription& d
         })json";
 }
 
-Error Engine::setHandler(IHandler* /*handler*/)
+void Engine::setHandler(IHandler* /*handler*/)
 {
     // TODO: Implement.
-    return Error::noError;
 }
 
 bool Engine::isCompatible(const IDeviceInfo* /*deviceInfo*/) const
@@ -279,8 +275,6 @@ bool Engine::isCompatible(const IDeviceInfo* /*deviceInfo*/) const
 } // namespace nx
 
 namespace {
-
-static const std::string kLibName = "deepstream_analytics_plugin";
 
 static const std::string kPluginManifest = /*suppress newline*/1 + R"json(
 {
@@ -297,7 +291,6 @@ extern "C" {
 NX_PLUGIN_API nx::sdk::IPlugin* createNxPlugin()
 {
     return new nx::sdk::analytics::Plugin(
-        kLibName,
         kPluginManifest,
         [](nx::sdk::analytics::IPlugin* plugin)
         {

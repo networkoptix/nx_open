@@ -8,6 +8,7 @@
 #include <nx/network/url/url_parse_helper.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
+#include <nx/network/url/url_builder.h>
 
 #include "get_listening_peer_list_handler.h"
 #include "../controller.h"
@@ -21,10 +22,12 @@ Server::Server(
     const conf::Settings& settings,
     const PeerRegistrator& peerRegistrator,
     nx::cloud::discovery::RegisteredPeerPool* registeredPeerPool,
+    ListeningPeerDb* listeningPeerDb,
     HolePunchingProcessor* holePunchingProcessor)
     :
     m_settings(settings),
-    m_multiAddressHttpServer(nullptr, &m_httpMessageDispatcher),
+    m_multiAddressHttpServer(&m_authenticationDispatcher, &m_httpMessageDispatcher),
+    m_listeningPeerDb(listeningPeerDb),
     m_holePunchingProcessor(holePunchingProcessor)
 {
     NX_ASSERT(!m_settings.http().addrToListenList.empty());
@@ -51,9 +54,9 @@ void Server::listen()
                 .arg(SystemError::toString(osErrorCode)).toStdString());
     }
 
-    NX_ALWAYS(this, lm("HTTP server is listening on %1, ssl: %2")
-        .container(m_multiAddressHttpServer.endpoints())
-        .container(m_multiAddressHttpServer.sslEndpoints()));
+    NX_INFO(this, "HTTP server is listening on %1, ssl: %2",
+        containerString(m_multiAddressHttpServer.endpoints()),
+        containerString(m_multiAddressHttpServer.sslEndpoints()));
 }
 
 void Server::stopAcceptingNewRequests()
@@ -113,6 +116,8 @@ bool Server::launchHttpServerIfNeeded(
 {
     NX_INFO(this, "Bringing up HTTP server");
 
+    loadHtdigestAuthenticatorIfNeeded(settings);
+
     registerApiHandlers(peerRegistrator);
 
     if (!m_multiAddressHttpServer.bind(
@@ -141,6 +146,28 @@ bool Server::launchHttpServerIfNeeded(
     return true;
 }
 
+void Server::loadHtdigestAuthenticatorIfNeeded(const conf::Settings& settings)
+{
+    if (!settings.http().maintenanceHtdigestPath.empty())
+    {
+        NX_INFO(this,
+            lm("Htdigest authentication for connection mediator enabled. File path: %1")
+            .arg(settings.http().maintenanceHtdigestPath));
+
+        m_htdigestAuthenticator =
+            std::make_unique<HtdigestAuthenticator>(settings.http().maintenanceHtdigestPath);
+    }
+}
+
+void Server::addPathToHtdigestAuthenticatorIfNeeded(const std::string& regex)
+{
+    if (m_htdigestAuthenticator)
+    {
+        NX_INFO(this, "Adding api path regex: '%1' to htdigest authenticator", regex);
+        m_authenticationDispatcher.add(std::regex(regex), &m_htdigestAuthenticator->manager);
+    }
+}
+
 void Server::registerApiHandlers(const PeerRegistrator& peerRegistrator)
 {
     m_httpMessageDispatcher.registerRequestProcessor<http::GetListeningPeerListHandler>(
@@ -157,9 +184,20 @@ void Server::registerApiHandlers(const PeerRegistrator& peerRegistrator)
         [this]()
         {
             return std::make_unique<InitiateConnectionRequestHandler>(
-                m_holePunchingProcessor);
+                m_holePunchingProcessor,
+                m_listeningPeerDb);
         },
         network::http::Method::post);
+
+    m_maintenanceServer.registerRequestHandlers(
+        api::kMediatorApiPrefix,
+        &m_httpMessageDispatcher);
+
+    addPathToHtdigestAuthenticatorIfNeeded(
+        network::url::joinPath(api::kMediatorApiPrefix, api::kStatisticsApiPrefix, "/.*"));
+
+    addPathToHtdigestAuthenticatorIfNeeded(
+        network::url::joinPath(m_maintenanceServer.maintenancePath(), "/.*"));
 }
 
 template<typename Handler, typename Arg>
@@ -170,7 +208,7 @@ void Server::registerApiHandler(
 {
     m_httpMessageDispatcher.registerRequestProcessor<Handler>(
         path,
-        [this, arg]() -> std::unique_ptr<Handler>
+        [arg]() -> std::unique_ptr<Handler>
         {
             return std::make_unique<Handler>(arg);
         },
@@ -180,9 +218,11 @@ void Server::registerApiHandler(
 //-------------------------------------------------------------------------------------------------
 
 InitiateConnectionRequestHandler::InitiateConnectionRequestHandler(
-    HolePunchingProcessor* holePunchingProcessor)
+    HolePunchingProcessor* holePunchingProcessor,
+    ListeningPeerDb* listeningPeerDb)
     :
-    m_holePunchingProcessor(holePunchingProcessor)
+    m_holePunchingProcessor(holePunchingProcessor),
+    m_listeningPeerDb(listeningPeerDb)
 {
 }
 
@@ -190,17 +230,38 @@ void InitiateConnectionRequestHandler::processRequest(
     nx::network::http::RequestContext requestContext,
     api::ConnectRequest inputData)
 {
+    CachedRequestContext cachedRequestContext{
+        requestContext.request.requestLine.url,
+        requestContext.connection->isSsl(),
+        requestContext.response,
+    };
+
     m_holePunchingProcessor->connect(
         RequestSourceDescriptor{
             network::TransportProtocol::tcp,
             requestContext.connection->socket()->getForeignAddress()},
         inputData,
-        [this](auto&&... args) { reportResult(std::move(args)...); });
+        [this, cachedRequestContext = std::move(cachedRequestContext),
+            targetServer = inputData.destinationHostName](
+                api::ResultCode resultCode,
+                api::ConnectResponse response)
+        {
+            if (resultCode == api::ResultCode::notFound)
+            {
+                return redirectToRemoteMediator(
+                    std::move(cachedRequestContext),
+                    targetServer,
+                    std::move(response));
+            }
+
+            reportResult(std::move(resultCode), std::move(response));
+        });
 }
 
 void InitiateConnectionRequestHandler::reportResult(
     api::ResultCode resultCode,
-    api::ConnectResponse response)
+    api::ConnectResponse response,
+    const std::optional<nx::network::http::StatusCode::Value>& httpStatusCode)
 {
     network::http::FusionRequestResult result;
     if (resultCode != api::ResultCode::ok)
@@ -208,13 +269,101 @@ void InitiateConnectionRequestHandler::reportResult(
         result.errorClass = network::http::FusionRequestErrorClass::logicError;
         result.errorDetail = static_cast<int>(resultCode);
         result.errorText = api::toString(resultCode);
-        result.setHttpStatusCode(
-            resultCode == api::ResultCode::notFound
-            ? network::http::StatusCode::notFound
-            : network::http::StatusCode::badRequest);
+        if (httpStatusCode.has_value())
+        {
+            result.setHttpStatusCode(*httpStatusCode);
+        }
+        else
+        {
+            result.setHttpStatusCode(
+                resultCode == api::ResultCode::notFound
+                    ? network::http::StatusCode::notFound
+                    : network::http::StatusCode::badRequest);
+        }
     }
 
     this->requestCompleted(std::move(result), std::move(response));
+}
+
+
+void InitiateConnectionRequestHandler::redirectToRemoteMediator(
+    CachedRequestContext requestContext,
+    const nx::String& targetServer,
+    api::ConnectResponse response)
+{
+    m_listeningPeerDb->findMediatorByPeerDomain(
+        targetServer.toStdString(),
+        [this, requestContext = std::move(requestContext), response = std::move(response)](
+            MediatorEndpoint endpoint)
+        {
+            if (!validateMediatorEndpoint(endpoint, requestContext.isSsl))
+                return reportResult(api::ResultCode::notFound, std::move(response));
+
+            auto location = buildMediatorUrl(endpoint, requestContext);
+
+            network::http::insertOrReplaceHeader(
+                &requestContext.response->headers,
+                nx::network::http::HttpHeader("Location", location.toStdString().c_str()));
+
+            reportResult(
+                api::ResultCode::notFound,
+                std::move(response),
+                nx::network::http::StatusCode::temporaryRedirect);
+        });
+}
+
+bool InitiateConnectionRequestHandler::validateMediatorEndpoint(
+    const MediatorEndpoint& endpoint,
+    bool useHttpsPort) const
+{
+    if (endpoint.domainName.empty())
+    {
+        NX_VERBOSE(this,
+            "Redirect to remote mediator failed. attemted to redirect to remote mediator: %1",
+            endpoint);
+        return false;
+    }
+
+    if (endpoint == m_listeningPeerDb->thisMediatorEndpoint())
+    {
+        NX_VERBOSE(this, "Redirecting to this mediator but connection already failed");
+        return false;
+    }
+
+    if (useHttpsPort)
+    {
+        if (endpoint.httpsPort == MediatorEndpoint::kPortUnused)
+        {
+            NX_VERBOSE(this, "Found remote mediator: %1, but no https port is accessible.",
+                endpoint);
+            return false;
+        }
+    }
+    else
+    {
+        if (endpoint.httpPort == MediatorEndpoint::kPortUnused)
+        {
+            NX_VERBOSE(this, "Found remote mediator: %1, but no http port is accessible.",
+                endpoint);
+            return false;
+        }
+    }
+
+    return true;
+}
+
+nx::utils::Url InitiateConnectionRequestHandler::buildMediatorUrl(
+    const MediatorEndpoint& endpoint,
+    const CachedRequestContext& requestContext)
+{
+    return nx::network::url::Builder()
+        .setHost(endpoint.domainName.c_str())
+        .setScheme(
+            requestContext.isSsl
+                ? nx::network::http::kSecureUrlSchemeName
+                : nx::network::http::kUrlSchemeName)
+        .setPort(requestContext.isSsl ? endpoint.httpsPort : endpoint.httpPort).
+        setPath(requestContext.requestUrl.path()).toUrl();
 }
 
 } // namespace http

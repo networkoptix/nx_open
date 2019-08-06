@@ -4,7 +4,22 @@
 
 namespace nx::utils {
 
-// Const-aware pointer to a private implementation.
+/**
+ * Const-aware pointer to a private implementation.
+ *
+ * The main problem with "const QScopedPointer<Private> d" - it's not const-aware,
+ * i.e. we can assign "d->someField = someValue" from a const method.
+ * This class is designed to overcome that problem.
+ *
+ * It should not be const itself, having no copy/move assignment operators it cannot be reassigned.
+ * There is no default constructor as well, so it's not possible to forget to initialize it.
+ *
+ * Typical usage inside a class declaration:
+ *
+ * private:
+ *     class Private;
+ *     nx::utils::ImplPtr<Private> d;
+ */
 template<typename T>
 class ImplPtr final
 {

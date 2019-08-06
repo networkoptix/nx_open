@@ -3,16 +3,16 @@
 #include <memory>
 
 #include "../abstract_socket.h"
-#include "../common_socket_impl.h"
 
-namespace nx {
-namespace network {
+namespace nx::network {
 
 class Pollable;
 
 #ifndef _WIN32
 static const int INVALID_SOCKET = -1;
 #endif
+
+class CommonSocketImpl;
 
 /**
  * Encapsulates system object that can be polled with PollSet.
@@ -21,23 +21,26 @@ class NX_NETWORK_API Pollable
 {
 public:
     /**
-     * @param fd Valid file descriptor. It is not closed on object destruction!
+     * @param fd File descriptor (optional, can be INVALID_SOCKET).
+     * It is not closed on object destruction!
      */
+    Pollable(AbstractSocket::SOCKET_HANDLE fd);
+
     Pollable(
         AbstractSocket::SOCKET_HANDLE fd,
-        std::unique_ptr<CommonSocketImpl> impl = std::unique_ptr<CommonSocketImpl>());
+        std::unique_ptr<CommonSocketImpl> impl);
 
     Pollable(const Pollable&) = delete;
     Pollable& operator=(const Pollable&) = delete;
     Pollable(Pollable&&) = delete;
     Pollable& operator=(Pollable&&) = delete;
 
-    virtual ~Pollable() = default;
+    virtual ~Pollable();
 
     AbstractSocket::SOCKET_HANDLE handle() const;
     /**
-     * Moves ownership pf system socket out of Socket instance.
-     * Leaves Socket instance in undefined state.
+     * Moves ownership of system socket handle out of this object.
+     * Leaves this with handler equal to INVALID_SOCKET.
      * NOTE: Caller MUST ensure that there are no async socket operations on this instance.
      */
     AbstractSocket::SOCKET_HANDLE takeHandle();
@@ -60,11 +63,12 @@ public:
     bool isInSelfAioThread() const;
 
 protected:
-    AbstractSocket::SOCKET_HANDLE m_fd;
+    AbstractSocket::SOCKET_HANDLE m_fd = INVALID_SOCKET;
+    unsigned int m_readTimeoutMS = 0;
+    unsigned int m_writeTimeoutMS = 0;
+
+private:
     std::unique_ptr<CommonSocketImpl> m_impl;
-    unsigned int m_readTimeoutMS;
-    unsigned int m_writeTimeoutMS;
 };
 
-} // namespace network
-} // namespace nx
+} // namespace nx::network

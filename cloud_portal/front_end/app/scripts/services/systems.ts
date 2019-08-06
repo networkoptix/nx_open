@@ -8,12 +8,12 @@ import * as angular from 'angular';
     angular
         .module('cloudApp')
         .service('systemsProvider', [ 'cloudApi', '$interval', '$q', '$poll',
-            'configService', 'languageService', 'account',
+            'nxConfigService', 'languageService', 'account',
 
             function (cloudApi, $interval, $q, $poll,
-                      configService, languageService, account) {
+                      nxConfigService, languageService, account) {
 
-                const CONFIG = configService.config;
+                const CONFIG = nxConfigService.getConfig();
                 this.pollingSystemsUpdate = undefined;
 
                 this.systems = [];
@@ -23,6 +23,13 @@ import * as angular from 'angular';
                         .systems()
                         .then(result => {
                             this.systems = this.sortSystems(result.data);
+                            const currentUserEmail = account.getEmail();
+                            this.systems.forEach((system) => {
+                                system.isMine = system.ownerAccountEmail === currentUserEmail;
+                                system.canMerge = system.isMine && (system.capabilities && system.capabilities.indexOf(CONFIG.systemCapabilities.cloudMerge) > -1
+                                    || CONFIG.allowDebugMode
+                                    || CONFIG.allowBetaMode);
+                            });
                         });
                 };
 

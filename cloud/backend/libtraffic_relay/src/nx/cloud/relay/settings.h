@@ -9,6 +9,8 @@
 #include <nx/utils/std/optional.h>
 
 #include <nx/cloud/relaying/settings.h>
+#include <nx/clusterdb/map/settings.h>
+#include <nx/sql/types.h>
 
 namespace nx {
 namespace cloud {
@@ -29,6 +31,7 @@ struct Http
     int tcpBacklogSize;
     std::optional<std::chrono::milliseconds> connectionInactivityTimeout;
     bool serveOptions;
+    std::string maintenanceHtdigestPath;
 
     Http();
 };
@@ -54,12 +57,14 @@ struct ConnectingPeer
     ConnectingPeer();
 };
 
-struct CassandraConnection
+struct ListeningPeerDb
 {
-    std::string host;
-    std::chrono::milliseconds delayBeforeRetryingInitialConnect;
+    bool enabled;
+    std::chrono::milliseconds connectionRetryDelay;
+    nx::sql::ConnectionOptions sql;
+    nx::clusterdb::map::Settings map;
 
-    CassandraConnection();
+    ListeningPeerDb();
 };
 
 class Settings:
@@ -82,7 +87,7 @@ public:
     const Http& http() const;
     const Https& https() const;
     const Proxy& proxy() const;
-    const CassandraConnection& cassandraConnection() const;
+    const ListeningPeerDb& listeningPeerDb() const;
 
 private:
     utils::log::Settings m_logging;
@@ -92,7 +97,7 @@ private:
     Proxy m_proxy;
     relaying::Settings m_listeningPeer;
     ConnectingPeer m_connectingPeer;
-    CassandraConnection m_cassandraConnection;
+    ListeningPeerDb m_listeningPeerDb;
 
     virtual void loadSettings() override;
 
@@ -106,7 +111,7 @@ private:
     void loadHttps();
     void loadProxy();
     void loadConnectingPeer();
-    void loadCassandraHost();
+    void loadListeningPeerDb();
 };
 
 } // namespace conf

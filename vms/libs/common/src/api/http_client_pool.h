@@ -12,6 +12,11 @@ namespace nx {
 namespace network {
 namespace http {
 
+/**
+ * A pool of http connections.
+ * rest::ServerConnection sends requests through this pool using ClientPool::sendRequest(...)
+ * and catching responses from event ClientPool::void done(...)
+ */
 class ClientPool: public QObject
 {
     Q_OBJECT
@@ -41,6 +46,10 @@ public:
     ClientPool(QObject *parent = nullptr);
     virtual ~ClientPool();
 
+    /**
+     * doGet and doPost are used by the chain QnSessionManager->QnAbstractConnection->QnMediaServerConnection
+     * These methods will become obsolete when we finish QnMediaServerConnection refactoring.
+     */
     int doGet(
         const nx::utils::Url& url,
         nx::network::http::HttpHeaders headers = nx::network::http::HttpHeaders(),
@@ -53,6 +62,9 @@ public:
         nx::network::http::HttpHeaders headers = nx::network::http::HttpHeaders(),
         std::optional<std::chrono::milliseconds> timeout = std::nullopt);
 
+    /**
+     * It is used to run all the requests from rest::ServerConnection.
+     */
     int sendRequest(const Request& request);
 
     void terminate(int handle);
@@ -68,8 +80,10 @@ public:
 
 signals:
     void done(int requestId, AsyncHttpClientPtr httpClient);
+
 private slots:
     void at_HttpClientDone(AsyncHttpClientPtr httpClient);
+
 private:
     AsyncHttpClientPtr createHttpConnection();
 
@@ -84,24 +98,26 @@ private:
 
         AsyncHttpClientPtr client;
         QElapsedTimer idleTimeout;
+        /** Handle of request being served by this connection right now. */
         int handle;
     };
+
 private:
     HttpConnection* getUnusedConnection(const nx::utils::Url &url);
     void sendRequestUnsafe(const Request& request, AsyncHttpClientPtr httpClient);
     void sendNextRequestUnsafe();
     void cleanupDisconnectedUnsafe();
+
 private:
     mutable QnMutex m_mutex;
     typedef std::unique_ptr<HttpConnection> HttpConnectionPtr;
     std::multimap<QString /*endpointWithProtocol*/, HttpConnectionPtr> m_connectionPool;
     std::map<int, Request> m_awaitingRequests;
-    //std::map<AsyncHttpClientPtr, RequestInternal> m_requestInProgress;
     int m_maxPoolSize;
     int m_requestId;
     std::chrono::milliseconds m_defaultRequestTimeout{std::chrono::minutes(1)};
     std::chrono::milliseconds m_defaultResponseTimeout{std::chrono::minutes(1)};
-    std::chrono::milliseconds m_defaultMessageBodyTimeout{std::chrono::minutes(10)};
+    std::chrono::milliseconds m_defaultMessageBodyTimeout{std::chrono::minutes(1)};
 };
 
 } // namespace nx

@@ -16,6 +16,8 @@ namespace api {
 struct BeginListeningRequest
 {
     std::string peerName;
+    /** E.g., 0.1 */
+    std::string protocolVersion;
 };
 
 #define BeginListeningRequest_Fields (peerName)

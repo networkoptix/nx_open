@@ -27,9 +27,11 @@ public:
      * @return Ids of connections created.
      */
     std::vector<int> openTransactionConnectionsOfSpecifiedVersion(int count, int protoVersion);
+
     void waitForConnectionsToMoveToACertainState(
         const std::vector<::ec2::QnTransactionTransportBase::State>& desiredStates,
         std::chrono::milliseconds waitTimeout);
+
     int activeConnectionCount() const;
     void waitUntilActiveConnectionCountReaches(int count);
     void waitUntilClosedConnectionCountReaches(int count);

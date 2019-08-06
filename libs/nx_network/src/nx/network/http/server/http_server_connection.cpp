@@ -5,6 +5,9 @@
 
 #include <QtCore/QDateTime>
 
+#include <nx/network/socket_global.h>
+#include <nx/utils/datetime.h>
+
 #include "http_message_dispatcher.h"
 #include "http_stream_socket_server.h"
 
@@ -13,19 +16,20 @@ namespace network {
 namespace http {
 
 HttpServerConnection::HttpServerConnection(
-    nx::network::server::StreamConnectionHolder<HttpServerConnection>* socketServer,
     std::unique_ptr<AbstractStreamSocket> sock,
     nx::network::http::server::AbstractAuthenticationManager* const authenticationManager,
     nx::network::http::AbstractMessageDispatcher* const httpMessageDispatcher)
     :
-    base_type(
-        [socketServer](auto... args) { socketServer->closeConnection(args...); },
-        std::move(sock)),
+    base_type(std::move(sock)),
     m_authenticationManager(authenticationManager),
-    m_httpMessageDispatcher(httpMessageDispatcher),
-    m_isPersistent(false),
-    m_persistentConnectionEnabled(true)
+    m_httpMessageDispatcher(httpMessageDispatcher)
 {
+    ++SocketGlobals::instance().debugCounters().httpServerConnectionCount;
+}
+
+HttpServerConnection::~HttpServerConnection()
+{
+    --SocketGlobals::instance().debugCounters().httpServerConnectionCount;
 }
 
 SocketAddress HttpServerConnection::clientEndpoint() const
@@ -50,7 +54,7 @@ void HttpServerConnection::processMessage(
         closeConnection(SystemError::invalidData);
         return;
     }
-    
+
     auto requestContext = prepareRequestProcessingContext(
         std::move(*requestMessage.request));
 
@@ -130,12 +134,6 @@ void HttpServerConnection::authenticate(
             if (!strongThis)
                 return;
 
-            if (!socket())  //< Connection has been removed while request authentication was in progress.
-            {
-                closeConnection(SystemError::noError);
-                return;
-            }
-
             strongThis->post(
                 [this,
                     authenticationResult = std::move(authenticationResult),
@@ -158,6 +156,13 @@ void HttpServerConnection::onAuthenticationDone(
     nx::network::http::server::AuthenticationResult authenticationResult,
     std::unique_ptr<RequestContext> requestContext)
 {
+    if (!socket())
+    {
+        // Connection has been removed while request authentication was in progress.
+        closeConnection(SystemError::noError);
+        return;
+    }
+
     if (!authenticationResult.isSucceeded)
     {
         sendUnauthorizedResponse(
@@ -177,7 +182,7 @@ std::unique_ptr<HttpServerConnection::RequestContext>
 {
     auto requestContext = std::make_unique<RequestContext>();
     requestContext->descriptor.sequence = ++m_lastRequestSequence;
-    requestContext->descriptor.httpVersion = request.requestLine.version;
+    requestContext->descriptor.requestLine = request.requestLine;
     requestContext->descriptor.protocolToUpgradeTo =
         nx::network::http::getHeaderValue(request.headers, "Upgrade");
     requestContext->request = std::move(request);
@@ -277,6 +282,13 @@ void HttpServerConnection::processResponse(
             requestDescriptor = std::move(requestDescriptor),
             responseMessageContext = std::move(responseMessageContext)]() mutable
         {
+            if (!socket())
+            {
+                // Connection is closed.
+                closeConnection(SystemError::noError);
+                return;
+            }
+
             prepareAndSendResponse(
                 std::move(requestDescriptor),
                 std::move(responseMessageContext));
@@ -288,7 +300,7 @@ void HttpServerConnection::prepareAndSendResponse(
     std::unique_ptr<ResponseMessageContext> responseMessageContext)
 {
     responseMessageContext->msg.response->statusLine.version =
-        std::move(requestDescriptor.httpVersion);
+        std::move(requestDescriptor.requestLine.version);
 
     responseMessageContext->msg.response->statusLine.reasonPhrase =
         nx::network::http::StatusCode::toString(
@@ -304,6 +316,17 @@ void HttpServerConnection::prepareAndSendResponse(
             responseMessageContext->msgBody.reset();
         }
     }
+
+    std::string responseContentLengthStr = "-";
+    if (responseMessageContext->msgBody && responseMessageContext->msgBody->contentLength())
+        responseContentLengthStr = std::to_string(*responseMessageContext->msgBody->contentLength());
+
+    NX_VERBOSE(this, lm("%1 - %2 [%3] \"%4\" %5 %6")
+        .args(getForeignAddress().address, "?" /*username*/, // TODO: #ak Fetch username.
+            nx::utils::timestampToRfc2822(nx::utils::utcTime()),
+            requestDescriptor.requestLine.toString(),
+            responseMessageContext->msg.response->statusLine.statusCode,
+            responseContentLengthStr));
 
     addResponseHeaders(
         requestDescriptor,

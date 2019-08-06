@@ -12,7 +12,12 @@ class QnResourceAccessManager;
 
 namespace nx::vms::event { class RuleManager; }
 
-namespace nx::vms::client::core { class UserWatcher; }
+namespace nx::vms::client::core {
+
+class UserWatcher;
+class OrderedRequestsManager;
+
+} // namespace nx::vms::client::core
 
 namespace nx::client::mobile {
 
@@ -48,8 +53,10 @@ signals:
 
 private:
     bool setTriggerState(QnUuid id, vms::event::EventState state);
+    void setActiveTrigger(const QnUuid& id);
 
 private:
+    const QScopedPointer<nx::vms::client::core::OrderedRequestsManager> m_requestsManager;
     QnCommonModule* const m_commonModule = nullptr;
     nx::vms::client::core::UserWatcher* const m_userWatcher = nullptr;
     QnResourceAccessManager* const m_accessManager = nullptr;

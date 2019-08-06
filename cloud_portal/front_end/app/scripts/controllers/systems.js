@@ -4,12 +4,12 @@ angular
     .module('cloudApp')
     .controller('SystemsCtrl', ['$scope', 'cloudApi', '$location', 'urlProtocol', 'process',
                                 'account', '$routeParams', 'systemsProvider', 'dialogs',
-                                'authorizationCheckService', 'configService', 'languageService',
+                                'authorizationCheckService', 'nxConfigService', 'languageService',
     function ($scope, cloudApi, $location, urlProtocol, process,
               account, $routeParams, systemsProvider, dialogs,
-              authorizationCheckService, configService, languageService) {
+              authorizationCheckService, nxConfigService, languageService) {
 
-        $scope.Config = configService.config;
+        $scope.Config = nxConfigService.getConfig();
         $scope.Lang = languageService.lang;
 
         authorizationCheckService.requireLogin().then(function(account){

@@ -16,11 +16,13 @@ enum class ResultCode
     error,
 };
 
+std::string toString(ResultCode);
+
 class CustomerManager
 {
 public:
     CustomerManager(
-        SyncronizationEngine* syncronizationEngine,
+        SynchronizationEngine* synchronizationEngine,
         dao::CustomerDao* customerDao,
         const std::string& systemId);
     ~CustomerManager();
@@ -28,6 +30,9 @@ public:
     void saveCustomer(
         const Customer& customer,
         nx::utils::MoveOnlyFunc<void(ResultCode)> handler);
+
+    /** Synchronous version of saveCustomer(). */
+    ResultCode saveCustomer(const Customer& customer);
 
     void removeCustomer(
         const std::string& id,
@@ -37,7 +42,7 @@ public:
         nx::utils::MoveOnlyFunc<void(ResultCode, Customers /*customers*/)> handler);
 
 private:
-    SyncronizationEngine* m_syncronizationEngine = nullptr;
+    SynchronizationEngine* m_synchronizationEngine = nullptr;
     dao::CustomerDao* m_customerDao = nullptr;
     const std::string m_systemId;
 

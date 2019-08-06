@@ -3,8 +3,10 @@
 #include <emmintrin.h>
 
 #include <QtCore/QLibrary>
+#include <QtCore/QtMath>
 
 #include <QtGui/QImage>
+#include <QtGui/QOpenGLContext>
 #include <QtGui/QOpenGLFunctions>
 #include <QtGui/QPainter>
 #include <QtGui/QScreen>
@@ -22,6 +24,7 @@ extern "C" {
 #include <libavformat/avformat.h>
 #include <libavcodec/avcodec.h>
 #include <libavutil/imgutils.h>
+#include <libswscale/swscale.h>
 }
 
 static const int LOGO_CORNER_OFFSET = 8;
@@ -45,7 +48,6 @@ QnScreenGrabber::QnScreenGrabber(
 {
     qRegisterMetaType<CaptureInfoPtr>();
     m_initialized = InitD3D(GetDesktopWindow());
-    m_timer.start();
     moveToThread(qApp->thread()); // to allow correct "InvokeMethod" call
 }
 
@@ -213,21 +215,23 @@ void QnScreenGrabber::allocateTmpFrame(int width, int height, AVPixelFormat form
 
 void QnScreenGrabber::captureFrameOpenGL(CaptureInfoPtr data)
 {
-    QnMutexLocker lock( &m_guiWaitMutex );
+    QnMutexLocker lock(&m_guiWaitMutex);
     if (data->terminated)
         return;
 
-    //CaptureInfo* data = (CaptureInfo*) opaque;
-//    glReadBuffer(GL_FRONT);
-    if (!m_widget) {
+    const auto context = QOpenGLContext::currentContext();
+    if (!m_widget || !context)
+    {
         m_waitCond.wakeOne();
         return;
     }
+
     QRect rect = m_widget->geometry();
     data->width = m_widget->width() & ~31;
     data->height = m_widget->height() & ~1;
     data->pos = QPoint(rect.left(), rect.top());
     QWidget* parent = (QWidget*) m_widget->parent();
+
     while (parent)
     {
         rect = parent->geometry();
@@ -235,7 +239,8 @@ void QnScreenGrabber::captureFrameOpenGL(CaptureInfoPtr data)
         parent = (QWidget*) parent->parent();
     }
 
-    glReadPixels(0, 0, data->width, data->height, GL_BGRA_EXT, GL_UNSIGNED_BYTE, data->opaque);
+    context->functions()->glReadPixels(
+        0, 0, data->width, data->height, GL_BGRA_EXT, GL_UNSIGNED_BYTE, data->opaque);
 
     m_waitCond.wakeOne();
 }
@@ -290,7 +295,7 @@ CaptureInfoPtr QnScreenGrabber::captureFrame()
         rez->height = m_ddm.Height;
 
     }
-    rez->pts = m_timer.elapsed();
+    rez->pts = m_timer->elapsed();
     m_currentIndex = m_currentIndex < m_pSurface.size()-1 ? m_currentIndex+1 : 0;
     return rez;
 }
@@ -622,11 +627,6 @@ bool QnScreenGrabber::capturedDataToFrame(CaptureInfoPtr captureInfo, AVFrame* p
     return rez;
 }
 
-qint64 QnScreenGrabber::currentTime() const
-{
-    return m_timer.elapsed();
-}
-
 int QnScreenGrabber::width() const
 {
     return m_outWidth;
@@ -665,6 +665,5 @@ void QnScreenGrabber::pleaseStop()
 
 void QnScreenGrabber::restart()
 {
-    m_timer.restart();
     m_needStop = false;
 }

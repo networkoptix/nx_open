@@ -233,10 +233,6 @@ to view more bookmarks</source>
       <translation>Зберегти розкладку відеостіни</translation>
     </message>
     <message>
-      <source>Drop Resources</source>
-      <translation>Покласти ресурси</translation>
-    </message>
-    <message>
       <source>Start Screen Recording</source>
       <translation>Почати запис екрану</translation>
     </message>
@@ -946,6 +942,14 @@ to view more bookmarks</source>
     <message>
       <source>Objects Frames and Info...</source>
       <translation>Кадри об'єктів та інформація...</translation>
+    </message>
+    <message>
+      <source>Pin Calendar</source>
+      <translation>Налаштувати календар</translation>
+    </message>
+    <message>
+      <source>Unpin Calendar</source>
+      <translation>Відкріпити календар</translation>
     </message>
   </context>
   <context>
@@ -2950,10 +2954,6 @@ to %1</source>
       <source>44.1 kHz and 48 kHz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
       <translation>Формати 44 і 48 кГц не підтримуються пристроєм захвату звуку. Будь ласка, виберіть інший пристрій або значення &quot;ні&quot; в налаштуваннях захоплення екрану.</translation>
     </message>
-    <message>
-      <source>Configured codec: %1 not found, h263p will used</source>
-      <translation>Налаштований кодек: %1 не знайдено, h263p буде використано</translation>
-    </message>
   </context>
   <context>
     <name>QnDisconnectFromCloudDialogPrivate</name>
@@ -3272,6 +3272,17 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnGLCheckerInstrument</name>
+    <message>
+      <source>Video card drivers are outdated or not installed</source>
+      <translation>Драйвери відеокарти застаріли або не встановлені</translation>
+    </message>
+    <message>
+      <source>%1 may not work properly.</source>
+      <translation>%1 може не працювати належним чином.</translation>
+    </message>
+  </context>
+  <context>
     <name>QnGeneralPreferencesWidget</name>
     <message>
       <source>Select folder...</source>
@@ -3355,17 +3366,6 @@ to %1</source>
     <message>
       <source>Creates a backup of System configuration that can be restored in case of failure.</source>
       <translation>Створює резервну копію системних налаштувань для відновлення в разі краху системи.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnGlHardwareChecker</name>
-    <message>
-      <source>Video card drivers are outdated or not installed</source>
-      <translation>Драйвери відеокарти застаріли або не встановлені</translation>
-    </message>
-    <message>
-      <source>%1 may not work properly.</source>
-      <translation>%1 може не працювати належним чином.</translation>
     </message>
   </context>
   <context>
@@ -3667,7 +3667,7 @@ to %1</source>
     </message>
     <message>
       <source>Channels</source>
-      <translation type="unfinished">Channels</translation>
+      <translation>Каналів</translation>
     </message>
   </context>
   <context>
@@ -4347,6 +4347,10 @@ to %1</source>
     <message>
       <source>Virtual Camera %1</source>
       <translation>Віртуальна камера %1</translation>
+    </message>
+    <message>
+      <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
+      <translation>&quot;віртуальна камера&quot; - це віртуальне сховище для відеофайлів, яке може бути завантажене на будь-який сервер вашої системи і доступно будь-якому користувачеві.</translation>
     </message>
   </context>
   <context>
@@ -5236,7 +5240,7 @@ to %1</source>
     </message>
     <message>
       <source>Plugins</source>
-      <translation type="unfinished">Plugins</translation>
+      <translation>Плагіни</translation>
     </message>
   </context>
   <context>
@@ -5715,13 +5719,13 @@ to %1</source>
     </message>
     <message>
       <source>What to do with current analytics data?</source>
-      <translation type="unfinished">What to do with current analytics data?</translation>
+      <translation>Що робити з поточними даними аналізу?</translation>
     </message>
     <message>
       <source>Current analytics data will not be automatically moved to another location and will become unaccessible. You can keep it and manually move later, or delete permanently.
 If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
-      <translation type="unfinished">Current analytics data will not be automatically moved to another location and will become unaccessible. You can keep it and manually move later, or delete permanently.
-If you intended to move analytics data to another storage location, please contact support before proceeding.</translation>
+      <translation>Поточні дані аналітики не будуть автоматично переміщені в інше місце і стануть недоступними. Ви можете зберегти його та перемістити вручну пізніше, або видалити назавжди.
+Якщо ви плануєте перенести аналітичні дані в інше місце зберігання, зверніться до служби підтримки, перш ніж продовжити.</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -5784,11 +5788,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Use to store analytics data</source>
-      <translation type="unfinished">Use to store analytics data</translation>
+      <translation>Використовується для зберігання аналітичних даних</translation>
     </message>
     <message>
       <source>Stores analytics data</source>
-      <translation type="unfinished">Stores analytics data</translation>
+      <translation>Зберігає дані аналітики</translation>
     </message>
   </context>
   <context>
@@ -5876,8 +5880,8 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Користувачі</translation>
     </message>
     <message>
-      <source>Analytics</source>
-      <translation>Аналітика</translation>
+      <source>Plugins</source>
+      <translation>Плагіни</translation>
     </message>
   </context>
   <context>
@@ -7550,12 +7554,12 @@ If you intended to move analytics data to another storage location, please conta
   <context>
     <name>nx::vms::client::desktop::AnalyticsSearchListModel::Private</name>
     <message>
-      <source>Unknown object</source>
-      <translation>Невідомий об'єкт</translation>
-    </message>
-    <message>
       <source>deleted camera</source>
       <translation>видалена камера</translation>
+    </message>
+    <message>
+      <source>Unknown track</source>
+      <translation>Невідомий трек</translation>
     </message>
   </context>
   <context>
@@ -7732,7 +7736,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Multicast</source>
-      <translation type="unfinished">Multicast</translation>
+      <translation>Мультикаст</translation>
     </message>
   </context>
   <context>
@@ -7795,6 +7799,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>This action cannot be undone.</source>
       <translation>Цю дію не можна відмінити.</translation>
+    </message>
+    <message>
+      <source>Motion detection stream is disabled</source>
+      <translation>Виявлення руху вимкнено</translation>
     </message>
   </context>
   <context>
@@ -7879,10 +7887,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Веб сторінка</translation>
     </message>
     <message>
-      <source>Analytics</source>
-      <translation>Аналітика</translation>
-    </message>
-    <message>
       <source>Expert</source>
       <translation>Експрет</translation>
     </message>
@@ -7940,6 +7944,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>I/O Modules Settings</source>
       <translation>Налаштування модулів вводу-виводу</translation>
+    </message>
+    <message>
+      <source>Plugins</source>
+      <translation>Плагіни</translation>
     </message>
   </context>
   <context>
@@ -8677,8 +8685,8 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Обраний діапазон містить більше 255 ІР-адрес.</translation>
     </message>
     <message>
-      <source>Can&apos;t start searching process</source>
-      <translation>Не&apos;можливо почати процес пошуку</translation>
+      <source>Can not start the search process</source>
+      <translation type="unfinished">Can not start the search process</translation>
     </message>
   </context>
   <context>
@@ -8808,10 +8816,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Оновлення завершено</translation>
     </message>
     <message>
-      <source>Update completed, but some servers have failed an update</source>
-      <translation>Оновлення завершено, але деякі сервери не отримали оновлення</translation>
-    </message>
-    <message>
       <source>Nx Witness Client will be restarted to the updated version.</source>
       <translation>Nx Witness Client буде перезапущено до оновленої версії.</translation>
     </message>
@@ -8822,10 +8826,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Downloading updates...</source>
       <translation>Завантаження оновлень...</translation>
-    </message>
-    <message>
-      <source>Pushing updates...</source>
-      <translation>Встановлення оновлень...</translation>
     </message>
     <message>
       <source>Upload</source>
@@ -8945,24 +8945,72 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Немає серверів для оновлення, які знаходяться онлайн.</translation>
     </message>
     <message>
-      <source>Some servers haven&apos;t completed update process. Finish it anyway?</source>
-      <translation>Деякі сервери &apos;не завершили процес оновлення. Закінчити його все одно?</translation>
-    </message>
-    <message>
       <source>Cancel update and delete all downloaded data?</source>
       <translation>Скасувати оновлення та видалити всі завантажені дані?</translation>
     </message>
     <message>
-      <source>Failed to download update packages to some servers</source>
-      <translation type="unfinished">Failed to download update packages to some servers</translation>
-    </message>
-    <message>
       <source>There was an error while installing updates:</source>
-      <translation type="unfinished">There was an error while installing updates:</translation>
+      <translation>Відбулася помилка при встановленні:</translation>
     </message>
     <message>
       <source>Some servers have gone offline. Please wait until they become online to continue.</source>
-      <translation type="unfinished">Some servers have gone offline. Please wait until they become online to continue.</translation>
+      <translation>Деякі сервери перейшли в офлайн. Будь ласка, зачекайте, поки вони стануть онлайн, щоб продовжити.</translation>
+    </message>
+    <message>
+      <source>Update completed, but some components have failed an update</source>
+      <translation>Оновлення завершено, але деякі компоненти не вдалося оновити</translation>
+    </message>
+    <message>
+      <source>Please update %1 manually using an installation package.</source>
+      <translation>Будь ласка, оновіть %1 вручну за допомогою інсталятора.</translation>
+    </message>
+    <message>
+      <source>%1 will be restarted to the updated version.</source>
+      <translation>%1 буде перезапущено до оновленої версії.</translation>
+    </message>
+    <message>
+      <source>Failed to download update packages to some components</source>
+      <translation>Не вдалося завантажити пакети оновлення для деяких компонентів</translation>
+    </message>
+    <message>
+      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
+      <translation>Деякі версії компонентів ОС більше не підтримуються. Видаліть їх із системи або оновіть до підтримуваної версії.</translation>
+    </message>
+    <message>
+      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
+      <translation>Версія ОС клієнта більше не підтримується. Оновіть його ОС до підтримуваної версії.</translation>
+    </message>
+    <message>
+      <source>Failed to start update</source>
+      <translation>Не вдалося розпочати оновлення</translation>
+    </message>
+    <message>
+      <source>Starting update to ...</source>
+      <translation>Починається оновлення до ...</translation>
+    </message>
+    <message>
+      <source>Failed to cancel update</source>
+      <translation>Не вдалося скасувати оновлення</translation>
+    </message>
+    <message>
+      <source>Failed to start installation</source>
+      <translation>Не вдалося розпочати встановлення</translation>
+    </message>
+    <message>
+      <source>Some servers have no update packages available.</source>
+      <translation>Деякі сервери не мають доступних пакетів оновлень.</translation>
+    </message>
+    <message>
+      <source>Some servers have encountered an internal error.</source>
+      <translation>На деяких серверах виникла внутрішня помилка.</translation>
+    </message>
+    <message>
+      <source>Please please contact Customer Support.</source>
+      <translation>Будь ласка, зверніться до команди підтримки.</translation>
+    </message>
+    <message>
+      <source>Some servers have not completed the update process. Finish it anyway?</source>
+      <translation type="unfinished">Some servers have not completed the update process. Finish it anyway?</translation>
     </message>
   </context>
   <context>
@@ -8996,10 +9044,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Загальні події</translation>
     </message>
     <message>
-      <source>Unknown Plugin Event</source>
-      <translation>Невідомий плагін події</translation>
-    </message>
-    <message>
       <source>Device was disconnected</source>
       <translation>Пристрій було відключено</translation>
     </message>
@@ -9011,6 +9055,10 @@ If you intended to move analytics data to another storage location, please conta
       <source>I/O Module was disconnected</source>
       <translation>Модуль вводу-виводу був відключений</translation>
     </message>
+    <message>
+      <source>Unknown Plugin Diagnostic Event</source>
+      <translation>Невідома подія діагностики плагіна</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::NotificationListWidget::Private</name>
@@ -9021,10 +9069,6 @@ If you intended to move analytics data to another storage location, please conta
   </context>
   <context>
     <name>nx::vms::client::desktop::OpenLayoutActionWidget</name>
-    <message>
-      <source>Some users don&apos;t have access to the selected layout. Action will not work for them.</source>
-      <translation>Деякі користувачі н&apos;е мають доступ до вибраної розкладки. Дія для них не буде працювати.</translation>
-    </message>
     <message>
       <source>None of selected users have access to the selected layout. Action will not work.</source>
       <translation>Жоден із вибраних користувачів не має доступу до обраної розкладки. Дія не буде працювати.</translation>
@@ -9044,6 +9088,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>None of selected user roles contain users. Action will not work.</source>
       <translation>Жодна з вибраних ролей не містить користувачів. Дія не спрацює.</translation>
+    </message>
+    <message>
+      <source>Some users do not have access to the selected layout. Action will not work for them.</source>
+      <translation type="unfinished">Some users do not have access to the selected layout. Action will not work for them.</translation>
     </message>
   </context>
   <context>
@@ -9081,52 +9129,40 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Не вдалося завантажити оновлення</translation>
     </message>
     <message>
-      <source>Failed to install update</source>
-      <translation>Не вдалося інсталювати оновлення</translation>
-    </message>
-    <message>
       <source>Waiting for peer data</source>
-      <translation type="unfinished">Waiting for peer data</translation>
-    </message>
-    <message>
-      <source>Update package can&apos;t be not found.</source>
-      <translation type="unfinished">Update package can&apos;t be not found.</translation>
+      <translation>Очікування однорангових даних</translation>
     </message>
     <message>
       <source>There is not enough space to download update files.</source>
-      <translation type="unfinished">There is not enough space to download update files.</translation>
+      <translation>Не вистачає місця для завантаження файлів оновлення.</translation>
     </message>
     <message>
       <source>There is not enough space to extract update files.</source>
-      <translation type="unfinished">There is not enough space to extract update files.</translation>
+      <translation>Не вистачає місця для видобування файлів оновлень.</translation>
     </message>
     <message>
       <source>Failed to download update packages.</source>
-      <translation type="unfinished">Failed to download update packages.</translation>
+      <translation>Не вдалося завантажити пакети оновлень.</translation>
     </message>
     <message>
       <source>Update contents are invalid.</source>
-      <translation type="unfinished">Update contents are invalid.</translation>
+      <translation>Вміст оновлення недійсний.</translation>
     </message>
     <message>
       <source>Update archive is corrupted.</source>
-      <translation type="unfinished">Update archive is corrupted.</translation>
+      <translation>Архів оновлення пошкоджено.</translation>
     </message>
     <message>
       <source>Update files cannot be extracted.</source>
-      <translation type="unfinished">Update files cannot be extracted.</translation>
+      <translation>Неможливо витягти файли оновлення.</translation>
     </message>
     <message>
       <source>Internal downloader error.</source>
-      <translation type="unfinished">Internal downloader error.</translation>
-    </message>
-    <message>
-      <source>Iternal server error.</source>
-      <translation type="unfinished">Iternal server error.</translation>
+      <translation>Внутрішня помилка завантажувача.</translation>
     </message>
     <message>
       <source>Internal client error.</source>
-      <translation type="unfinished">Internal client error.</translation>
+      <translation>Внутрішня помилка клієнта.</translation>
     </message>
     <message>
       <source>Unknown error.</source>
@@ -9134,11 +9170,27 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Unexpected error code.</source>
-      <translation type="unfinished">Unexpected error code.</translation>
+      <translation>Сталася неочікувана помилка.</translation>
     </message>
     <message>
       <source>Ready to install update</source>
-      <translation type="unfinished">Ready to install update</translation>
+      <translation>Готовий до встановлення оновлення</translation>
+    </message>
+    <message>
+      <source>Update package is not found.</source>
+      <translation>Пакет оновлення не знайдено.</translation>
+    </message>
+    <message>
+      <source>There is not enough space to install update.</source>
+      <translation>Не вистачає місця для встановлення оновлення.</translation>
+    </message>
+    <message>
+      <source>Internal server error.</source>
+      <translation>Внутрішня помилка сервера.</translation>
+    </message>
+    <message>
+      <source>This OS version is no longer supported.</source>
+      <translation>Ця версія ОС більше не підтримується.</translation>
     </message>
   </context>
   <context>
@@ -9247,28 +9299,12 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Більше налаштувань</translation>
     </message>
     <message>
-      <source>Dual-Streaming not supported for this camera</source>
-      <translation>Подвійний потік не підтримується для цієї камери</translation>
-    </message>
-    <message>
-      <source>Dual-Streaming and motion detection not supported for this camera</source>
-      <translation>Подвійний потік та детектор руху не підтримуються для цієї камери</translation>
-    </message>
-    <message>
-      <source>Motion detection disabled</source>
-      <translation>Виявлення руху вимкнено</translation>
-    </message>
-    <message>
-      <source>To enable or adjust it, go to the &quot;Motion&quot; tab in Camera Settings</source>
-      <translation>Щоб увімкнути або налаштувати його, перейдіть на вкладку &quot;Рух&quot; в розділі Параметри камери</translation>
-    </message>
-    <message>
-      <source>Motion detection disabled or not supported</source>
+      <source>Motion detection is disabled or not supported</source>
       <translation>Виявлення руху вимкнено або не підтримується</translation>
     </message>
     <message>
-      <source>To ensure it is supported and to enable it, go to the &quot;Motion&quot; tab in Camera Settings.</source>
-      <translation>Щоб переконатися, що воно підтримується і включити його, перейдіть на вкладку &quot;Рух&quot; в налаштуваннях камери.</translation>
+      <source>Dual-streaming is disabled or not supported</source>
+      <translation>Подвійне потокове відключення або не підтримується</translation>
     </message>
   </context>
   <context>
@@ -9296,20 +9332,76 @@ If you intended to move analytics data to another storage location, please conta
       <source>Users will be automatically logged out if their session exceeds the specified duration.</source>
       <translation>Користувачі будуть автоматично виключені, якщо їхня сесія перевищить вказану тривалість.</translation>
     </message>
+    <message>
+      <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
+      <translation>Водяні знаки відображаються, архівуються та експортуються лише для неадміністраторів через відео в реальному часі. Ви та інші адміністратори не побачите їх.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerSettingsDialogStore</name>
     <message>
       <source>Library</source>
-      <translation type="unfinished">Library</translation>
+      <translation>Бібліотека</translation>
     </message>
     <message>
       <source>Version</source>
-      <translation type="unfinished">Version</translation>
+      <translation>Версія</translation>
     </message>
     <message>
       <source>Vendor</source>
       <translation>Виробник</translation>
+    </message>
+    <message>
+      <source>no error</source>
+      <translation>немає помилки</translation>
+    </message>
+    <message>
+      <source>library file cannot be loaded</source>
+      <translation>файл бібліотеки не можна завантажити</translation>
+    </message>
+    <message>
+      <source>invalid or incompatible plugin library</source>
+      <translation>недійсний або несумісний плагін бібліотеки</translation>
+    </message>
+    <message>
+      <source>plugin library failed to initialize</source>
+      <translation>плагін бібліотеки не вдалося ініціалізувати</translation>
+    </message>
+    <message>
+      <source>plugin returned bad manifest</source>
+      <translation>плагін повернув поганий маніфест</translation>
+    </message>
+    <message>
+      <source>plugin API version is no longer supported</source>
+      <translation>версія АРІ плагіна більше не підтримується</translation>
+    </message>
+    <message>
+      <source>unknown error</source>
+      <translation>невідома помилка</translation>
+    </message>
+    <message>
+      <source>Not loaded</source>
+      <translation>Не завантажено</translation>
+    </message>
+    <message>
+      <source>Loaded</source>
+      <translation>Завантажено</translation>
+    </message>
+    <message>
+      <source>plugin is in the black list</source>
+      <translation>плагін знаходиться у чорному списку</translation>
+    </message>
+    <message>
+      <source>Status</source>
+      <translation>Статус</translation>
+    </message>
+    <message>
+      <source>plugin is optional and is not in the white list</source>
+      <translation>плагін є опціональним і не входить у білий список</translation>
+    </message>
+    <message>
+      <source>internal error</source>
+      <translation>внутрішня помилка</translation>
     </message>
   </context>
   <context>
@@ -9333,6 +9425,21 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Waiting for server to respond...</source>
       <translation>Очікування відповіді сервера...</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ServerUpdateTool</name>
+    <message>
+      <source>No connection to the server.</source>
+      <translation>Зв'язок із сервером відсутній.</translation>
+    </message>
+    <message>
+      <source>Network error.</source>
+      <translation>Помилка мережі.</translation>
+    </message>
+    <message>
+      <source>Server error.</source>
+      <translation>Помилка сервера.</translation>
     </message>
   </context>
   <context>
@@ -9762,14 +9869,14 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::ui::PluginEventModel</name>
+    <name>nx::vms::client::desktop::ui::PluginDiagnosticEventModel</name>
     <message>
       <source>Any Plugin</source>
       <translation>Будь-який плагін</translation>
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::ui::PluginEventWidget</name>
+    <name>nx::vms::client::desktop::ui::PluginDiagnosticEventWidget</name>
     <message>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
       <translation>Подія буде спрацьовувати тільки в тому випадку, якщо в заголовку є збіги з будь-яким з введених ключових слів.</translation>
@@ -10096,28 +10203,24 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Ця збірка призначена для тестування.</translation>
     </message>
     <message>
-      <source>Confirm storage location to store analytics data</source>
-      <translation type="unfinished">Confirm storage location to store analytics data</translation>
-    </message>
-    <message>
-      <source>Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
-
-Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
-
-You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</source>
-      <translation type="unfinished">Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
-
-Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
-
-You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</translation>
-    </message>
-    <message>
       <source>Open Server Settings</source>
-      <translation type="unfinished">Open Server Settings</translation>
+      <translation>Відкрити Налаштування Серверу</translation>
     </message>
     <message>
       <source>OK</source>
       <translation>ОК</translation>
+    </message>
+    <message>
+      <source>Confirm storage location to store analytics data on &apos;%1&apos;</source>
+      <translation>Підтвердьте місце зберігання, щоб зберігати дані аналітики на &apos;%1&apos;</translation>
+    </message>
+    <message>
+      <source>Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
+Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
+By default analytics data will be stored in mediaserver&apos;s installation directory.
+You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</source>
+      <translation>База даних Analytics повинна зберігатися на локальному сховищі і може займати до ста гігабайт. Після вибору розташування для зберігання аналітичних даних його не можна змінити не втративши вихідні дані. Ми рекомендуємо ретельно вибирати місце розташування та не використовувати системний розділ, щоб уникнути серйозних несправностей системи. За замовчуванням лані аналітики зберігатимуться у каталозі установки &apos;
+Ви можете змінити місце зберігання на вкладці &quot;Управління зберіганнями&quot; у діалоговому вікні Параметри сервера.</translation>
     </message>
   </context>
   <context>

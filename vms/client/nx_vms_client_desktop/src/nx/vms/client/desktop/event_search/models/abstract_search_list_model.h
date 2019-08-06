@@ -7,6 +7,7 @@
 
 #include <nx/utils/log/assert.h>
 #include <nx/utils/scope_guard.h>
+#include <nx/vms/client/desktop/event_search/right_panel_globals.h>
 
 namespace nx::vms::client::desktop {
 
@@ -32,12 +33,8 @@ public:
     QnVirtualCameraResourceSet cameras() const;
     bool isOnline() const; //< Connected to server, initial resources received.
 
-    enum class FetchDirection
-    {
-        earlier,
-        later
-    };
-    Q_ENUM(FetchDirection)
+    using FetchDirection = RightPanel::FetchDirection;
+    using FetchResult = RightPanel::FetchResult;
 
     /** In which direction fetchMore expands or shifts fetched data window. */
     FetchDirection fetchDirection() const;
@@ -87,15 +84,6 @@ public:
     virtual bool fetchInProgress() const;
     virtual bool cancelFetch();
 
-    enum class FetchResult
-    {
-        complete, //< Successful. There's no more data to fetch.
-        incomplete, //< Successful. There's more data to fetch.
-        failed, //< Unsuccessful.
-        cancelled //< Cancelled.
-    };
-    Q_ENUM(FetchResult)
-
 signals:
     void fetchCommitStarted(FetchDirection direction, QPrivateSignal);
     void fetchFinished(FetchResult result, QPrivateSignal);
@@ -112,10 +100,19 @@ protected:
     struct ScopedFetchCommit: public nx::utils::SharedGuard
     {
         explicit ScopedFetchCommit(
-            AbstractSearchListModel* model, FetchDirection direction, const FetchResult& result)
+            AbstractSearchListModel* model, FetchDirection direction, FetchResult result)
             :
             nx::utils::SharedGuard(nx::utils::SharedGuardCallback(
-                [model, &result]() { emit model->fetchFinished(result, {}); }))
+                [model, result]() { emit model->fetchFinished(result, {}); }))
+        {
+            emit model->fetchCommitStarted(direction, {});
+        }
+
+        explicit ScopedFetchCommit(
+            AbstractSearchListModel* model, FetchDirection direction, FetchResult* result)
+            :
+            nx::utils::SharedGuard(nx::utils::SharedGuardCallback(
+                [model, result]() { emit model->fetchFinished(*result, {}); }))
         {
             emit model->fetchCommitStarted(direction, {});
         }

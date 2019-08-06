@@ -9,11 +9,11 @@
 
 #include <ui/models/resource/resource_compare_helper.h>
 
-#include <nx/vms/client/desktop/resource_views/data/node_type.h>
+#include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 
 struct QnResourceSearchQuery
 {
-    using NodeType = nx::vms::client::desktop::ResourceTreeNodeType;
+    using NodeType = nx::vms::client::desktop::ResourceTree::NodeType;
 
     static constexpr NodeType kAllowAllNodeTypes = NodeType::root;
 
@@ -53,7 +53,7 @@ class QnResourceSearchProxyModel: public QSortFilterProxyModel, protected QnReso
 {
     Q_OBJECT
     using base_type = QSortFilterProxyModel;
-    using NodeType = nx::vms::client::desktop::ResourceTreeNodeType;
+    using NodeType = nx::vms::client::desktop::ResourceTree::NodeType;
 
 public:
     explicit QnResourceSearchProxyModel(QObject* parent = nullptr);

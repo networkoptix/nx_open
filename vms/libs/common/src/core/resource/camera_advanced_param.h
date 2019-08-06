@@ -236,13 +236,21 @@ struct QnCameraAdvancedParams
 };
 #define QnCameraAdvancedParams_Fields (name)(version)(unique_id)(packet_mode)(groups)
 
+struct QnCameraAdvancedParamsPostBody
+{
+    QString cameraId;
+    QMap<QString, QString> paramValues;
+};
+#define QnCameraAdvancedParamsPostBody_Fields (cameraId)(paramValues)
+
 #define QnCameraAdvancedParameterTypes (QnCameraAdvancedParamValue)\
     (QnCameraAdvancedParameter)\
     (QnCameraAdvancedParamGroup)\
     (QnCameraAdvancedParams)\
     (QnCameraAdvancedParameterDependency)\
     (QnCameraAdvancedParameterCondition)\
-    (QnCameraAdvancedParameterOverload)
+    (QnCameraAdvancedParameterOverload)\
+    (QnCameraAdvancedParamsPostBody)
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     QnCameraAdvancedParameterTypes,

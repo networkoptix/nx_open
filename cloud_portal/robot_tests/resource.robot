@@ -6,36 +6,36 @@ Library           NoptixLibrary/
 Resource          variables.robot
 Resource          ${variables_file}
 
+
 *** variables ***
 ${headless}    false
 ${directory}    ${SCREENSHOTDIRECTORY}
 ${variables_file}    variables-env.robot
-${docker}    false
-@{chrome_arguments}    --disable-infobars    --headless    --disable-gpu    --no-sandbox
+${options}    true
+@{chrome_arguments}    --disable-infobars    --headless    --disable-gpu    --no-sandbox    --log-level=3
+${speed}    0
 
 *** Keywords ***
 Open Browser and go to URL
     [Arguments]    ${url}
-    run keyword if    "${docker}"=="false"    Regular Open Browser    ${url}
-    ...          ELSE    Docker Open Browser    ${url}
-    Set Selenium Speed    0
-    Set Selenium Timeout    10
+    run keyword if    "${options}"=="false"    Regular Open Browser
+    ...          ELSE    Open Browser With Options
+    Set Selenium Speed    ${speed}
+    Set Selenium Timeout    20
     Check Language
     Go To    ${url}
 
 Regular Open Browser
-    [Arguments]    ${url}
     Set Screenshot Directory    ${SCREENSHOT_DIRECTORY}
     Open Browser    ${ENV}    ${BROWSER}
     Set Window Size    1920    1080
 
-Docker Open Browser
-    [Arguments]    ${url}
+Open Browser With Options
     Set Screenshot Directory    ${SCREENSHOT_DIRECTORY}
     ${chrome_options}=    Set Chrome Options
     Create Webdriver    Chrome    chrome_options=${chrome_options}
-    Sleep    20
-    Go to    ${url}
+    Set Window Size    1920    1080
+    Go to    ${ENV}
 
 Set Chrome Options
     [Documentation]    Set Chrome options for headless mode
@@ -47,30 +47,32 @@ Set Chrome Options
 Check Language
 #    Wait Until Page Contains Element    ${LANGUAGE DROPDOWN}/span[@lang='en_US']
     Register Keyword To Run On Failure    NONE
-    ${status}    ${value}=    Run Keyword And Ignore Error    Wait Until Element Is Visible    ${LANGUAGE DROPDOWN}/span[@lang='${LANGUAGE}']    2
+    ${status}=    Run Keyword And Return Status    Wait Until Element Is Visible    ${LANGUAGE DROPDOWN}/span[@lang='${LANGUAGE}']    5
     Register Keyword To Run On Failure    Failure Tasks
-    Run Keyword If    "${status}"=="FAIL"    Set Language
+    Run Keyword If    "${status}"=="False"    Set Language
 
 Set Language
+    [arguments]    ${lang}=${LANGUAGE}
     Wait Until Element Is Visible    ${LANGUAGE DROPDOWN}    20
     Click Button    ${LANGUAGE DROPDOWN}
     Wait Until Element Is Visible    ${LANGUAGE TO SELECT}
     Click Element    ${LANGUAGE TO SELECT}
-    Wait Until Element Is Visible    ${LANGUAGE DROPDOWN}/span[@lang='${LANGUAGE}']    5
-    Sleep    1    #to wait for language to fully change before continuing.  This caused issues with login.
+    Wait Until Element Is Visible    ${LANGUAGE DROPDOWN}/span[@lang='${lang}']    5
+    Sleep    5    #to wait for language to fully change before continuing.  This caused issues with login.
 
 Log In
     [arguments]    ${email}    ${password}    ${button}=${LOG IN NAV BAR}
     Run Keyword Unless    '''${button}''' == "None"    Wait Until Element Is Visible    ${button}
     Run Keyword Unless    '''${button}''' == "None"    Click Link    ${button}
     Wait Until Elements Are Visible    ${EMAIL INPUT}    ${PASSWORD INPUT}    ${REMEMBER ME CHECKBOX VISIBLE}    ${FORGOT PASSWORD}    ${LOG IN CLOSE BUTTON}
+    Sleep    .5
     Input Text    ${EMAIL INPUT}    ${email}
     Input Text    ${PASSWORD INPUT}    ${password}
     Wait Until Element Is Visible    ${LOG IN BUTTON}
     Click Button    ${LOG IN BUTTON}
 
 Validate Log In
-    Wait Until Page Contains Element    ${AUTHORIZED BODY}    20
+    Wait Until Page Contains Element    ${AUTHORIZED BODY}    5
     Wait Until Elements Are Visible    ${ACCOUNT DROPDOWN}
     Check Language
     Sleep    1    #this is a test to see if it eliminates a problem with the login dialog popping up on logout
@@ -87,14 +89,15 @@ Log Out
 
 Validate Log Out
     Wait Until Element Is Not Visible    ${BACKDROP}
-    Wait Until Page Contains Element    ${ANONYMOUS BODY}    20
+    Wait Until Page Contains Element    ${ANONYMOUS BODY}
+    Check Language
 
 Register
     [arguments]    ${first name}    ${last name}    ${email}    ${password}    ${checked}=false
     Wait Until Elements Are Visible    ${REGISTER FIRST NAME INPUT}    ${REGISTER LAST NAME INPUT}    ${REGISTER PASSWORD INPUT}    ${CREATE ACCOUNT BUTTON}
     Input Text    ${REGISTER FIRST NAME INPUT}    ${first name}
     Input Text    ${REGISTER LAST NAME INPUT}    ${last name}
-    ${read only}    Run Keyword And Return Status    Wait Until Element Is Visible    ${REGISTER EMAIL INPUT LOCKED}
+    ${read only}    Run Keyword And Return Status    Wait Until Element Is Visible    ${REGISTER EMAIL INPUT LOCKED}    5
     Run Keyword Unless    ${read only}    Input Text    ${REGISTER EMAIL INPUT}    ${email}
     Input Text    ${REGISTER PASSWORD INPUT}    ${password}
     Run Keyword If    "${checked}"=="false"    Click Element    ${TERMS AND CONDITIONS CHECKBOX VISIBLE}
@@ -111,7 +114,7 @@ Validate Register Email Received
     ${email}    Wait For Email    recipient=${recipient}    timeout=120    status=UNSEEN
     Check Email Subject    ${email}    ${ACTIVATE YOUR ACCOUNT EMAIL SUBJECT}    ${BASE EMAIL}    ${BASE EMAIL PASSWORD}    ${BASE HOST}    ${BASE PORT}
     Should Not Be Equal    ${email}    ${EMPTY}
-    Delete Email    ${email}
+    Delete All Emails
     Close Mailbox
 
 Get Email Link
@@ -121,11 +124,11 @@ Get Email Link
     Run Keyword If    "${link type}"=="activate"    Check Email Subject    ${email}    ${ACTIVATE YOUR ACCOUNT EMAIL SUBJECT}    ${BASE EMAIL}    ${BASE EMAIL PASSWORD}    ${BASE HOST}    ${BASE PORT}
     Run Keyword If    "${link type}"=="restore_password"    Check Email Subject    ${email}    ${RESET PASSWORD EMAIL SUBJECT}    ${BASE EMAIL}    ${BASE EMAIL PASSWORD}    ${BASE HOST}    ${BASE PORT}
     ${INVITED TO SYSTEM EMAIL SUBJECT UNREGISTERED}    Replace String    ${INVITED TO SYSTEM EMAIL SUBJECT UNREGISTERED}    {{message.sharer_name}}    ${TEST FIRST NAME} ${TEST LAST NAME}
-    ${INVITED TO SYSTEM EMAIL SUBJECT UNREGISTERED}    Replace String    ${INVITED TO SYSTEM EMAIL SUBJECT UNREGISTERED}    %PRODUCT_NAME%    Nx Cloud
+    ${INVITED TO SYSTEM EMAIL SUBJECT UNREGISTERED}    Replace String    ${INVITED TO SYSTEM EMAIL SUBJECT UNREGISTERED}    %PRODUCT_NAME%    ${PRODUCT_NAME}
     Run Keyword If    "${link type}"=="register"    Check Email Subject    ${email}    ${INVITED TO SYSTEM EMAIL SUBJECT UNREGISTERED}    ${BASE EMAIL}    ${BASE EMAIL PASSWORD}    ${BASE HOST}    ${BASE PORT}
     ${links}    Get NX Links From Email    ${email}    ${link type}
     log    ${links}
-    Delete Email    ${email}
+    Delete All Emails
     Close Mailbox
     Return From Keyword    ${links}
 
@@ -139,17 +142,22 @@ Activate
 
 Restore password
     [arguments]    ${email}
-    Open Browser and go to URL    ${url}/restore_password
+    #log in to user to make sure their language is set to the current
+    Open Browser and go to URL    ${url}
+    Log In    ${email}    ${password}
+    Validate Log In
+    Log Out
+    Validate Log Out
+    Go To    ${url}/restore_password
     Wait Until Elements Are Visible    ${RESTORE PASSWORD EMAIL INPUT}    ${RESET PASSWORD BUTTON}
     Input Text    ${RESTORE PASSWORD EMAIL INPUT}    ${email}
     Click Button    ${RESET PASSWORD BUTTON}
+    Wait Until Element Is Visible    ${RESET EMAIL SENT MESSAGE}
     ${link}    Get Email Link    ${email}    restore_password
     Go To    ${link}
     Wait Until Elements Are Visible    ${RESET PASSWORD INPUT}    ${SAVE PASSWORD}
-    #sometimes the DB doesn't update with the new code before it's used by the test.  This is to wait for the DB update.
-    Sleep    20
+    Sleep    5
     Input Text    ${RESET PASSWORD INPUT}    ${BASE PASSWORD}
-
     Click Button    ${SAVE PASSWORD}
     Wait Until Elements Are Visible    ${RESET SUCCESS MESSAGE}    ${RESET SUCCESS LOG IN LINK}
     Click Link    ${RESET SUCCESS LOG IN LINK}
@@ -158,16 +166,18 @@ Restore password
     Close Browser
 
 Share To
-    [arguments]    ${random email}    ${permissions}
+    [arguments]    ${email}    ${permissions}
     Wait Until Element Is Enabled    ${SHARE BUTTON SYSTEMS}
     Click Button    ${SHARE BUTTON SYSTEMS}
     Wait Until Elements Are Visible    ${SHARE EMAIL}    ${SHARE BUTTON MODAL}
-    Input Text    ${SHARE EMAIL}    ${random email}
+    Input Text    ${SHARE EMAIL}    ${email}
     Wait Until Element Is Visible    ${SHARE PERMISSIONS DROPDOWN}
     Click Button    ${SHARE PERMISSIONS DROPDOWN}
     Wait Until Element Is Visible    ${SHARE MODAL}//nx-permissions-select//li//span[text()='${permissions}']
     Click Link    ${SHARE MODAL}//nx-permissions-select//li//span[text()='${permissions}']/..
     Click Button    ${SHARE BUTTON MODAL}
+    Check For Alert    ${NEW PERMISSIONS SAVED}
+    Open Mailbox    host=${BASE HOST}    password=${BASE EMAIL PASSWORD}    port=${BASE PORT}    user=${BASE EMAIL}    is_secure=True
 
 Edit User Permissions In Systems
     [arguments]    ${user email}    ${permissions}
@@ -193,7 +203,7 @@ Remove User Permissions
     [arguments]    ${user email}
     Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${user email}')]
     Mouse Over    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${user email}')]
-    Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${user email}')]/following-sibling::td/a[@ng-click='unshare(user)']/span['&nbsp&nbspDelete']
+    Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${user email}')]/following-sibling::td/a[@ng-click='unshare(user)']/span[contains(text(),'${DELETE USER BUTTON TEXT}')]
     Click Element    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${user email}')]/following-sibling::td/a[@ng-click='unshare(user)']/span['&nbsp&nbspDelete']
     Wait Until Element Is Visible    ${DELETE USER BUTTON}
     Click Button    ${DELETE USER BUTTON}
@@ -220,12 +230,18 @@ Verify In System
     Wait Until Element Is Visible    //h1[@ng-if='gettingSystem.success' and contains(text(), '${system name}')]
 
 Failure Tasks
+    [timeout]    5 minutes
+    ${console}    Get Browser Log
+    Log    ${console}
     Capture Page Screenshot    selenium-screenshot-${LANGUAGE}{index}.png
+    Open Mailbox    host=${BASE HOST}    password=${BASE EMAIL PASSWORD}    port=${BASE PORT}    user=${BASE EMAIL}    is_secure=True
+    Delete All Emails
+    Close Mailbox
 
 Wait Until Elements Are Visible
     [arguments]    @{elements}
     :FOR     ${element}  IN  @{elements}
-    \  Wait Until Element Is Visible    ${element}    20
+    \  Wait Until Element Is Visible    ${element}
 
 Elements Should Not Be Visible
     [arguments]    @{elements}

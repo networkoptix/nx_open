@@ -381,6 +381,8 @@ public slots:
     virtual void recordingEventDetached();
 
 signals:
+    void vendorChanged(const QnResourcePtr &resource);
+    void modelChanged(const QnResourcePtr &resource);
     void licenseUsedChanged(const QnResourcePtr &resource);
     void scheduleTasksChanged(const QnResourcePtr &resource);
     void groupIdChanged(const QnResourcePtr &resource);
@@ -393,7 +395,6 @@ signals:
     void capabilitiesChanged(const QnResourcePtr& resource);
     void disableDualStreamingChanged(const QnResourcePtr& resource);
     void audioEnabledChanged(const QnResourcePtr &resource);
-    void ptzConfigurationChanged(const QnResourcePtr &resource);
 
     void networkIssue(const QnResourcePtr&, qint64 timeStamp, nx::vms::api::EventReason reasonCode, const QString& reasonParamsEncoded);
 

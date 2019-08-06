@@ -2,7 +2,7 @@
 
 namespace nx::clusterdb::engine::test::dao {
 
-static constexpr char kSchemaName[] = 
+static constexpr char kSchemaName[] =
     "customer_db_b3ad7d30-bdb6-492e-8be5-aeb1bdaf9c1f";
 
 static constexpr char kInitialDbStructure[] = R"sql(

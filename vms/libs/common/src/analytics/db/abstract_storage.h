@@ -24,7 +24,7 @@ using TimePeriodsLookupCompletionHandler =
 using CreateCursorCompletionHandler =
     nx::utils::MoveOnlyFunc<void(
         ResultCode /*resultCode*/,
-        std::shared_ptr<AbstractCursor> /*cursor*/)>;
+        std::unique_ptr<AbstractCursor> /*cursor*/)>;
 
 /**
  * NOTE: Every method of this class is asynchronous if other not specified.
@@ -45,7 +45,7 @@ public:
      * Packet is saved asynchronously.
      * To make sure the data is written call AbstractEventsStorage::flush.
      */
-    virtual void save(common::metadata::ConstDetectionMetadataPacketPtr packet) = 0;
+    virtual void save(common::metadata::ConstObjectMetadataPacketPtr packet) = 0;
 
     /**
      * Newly-created cursor points just before the first element.
@@ -54,11 +54,6 @@ public:
     virtual void createLookupCursor(
         Filter filter,
         CreateCursorCompletionHandler completionHandler) = 0;
-
-    /**
-     * Close created cursor.
-     */
-    virtual void closeCursor(const std::shared_ptr<AbstractCursor>& cursor) = 0;
 
     /**
      * Selects all objects with non-empty track that satisfy to the filter.
@@ -90,6 +85,11 @@ public:
      * Flushes to the DB all data passed with AbstractEventsStorage::save before this call.
      */
     virtual void flush(StoreCompletionHandler completionHandler) = 0;
+
+    /**
+     * Select minumal timestamp of the data in the database.
+     */
+    virtual bool readMinimumEventTimestamp(std::chrono::milliseconds* outResult) = 0;
 };
 
 } // namespace nx::analytics::db

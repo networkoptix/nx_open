@@ -138,17 +138,17 @@ struct MediaFileOperation: RecordBase
     int getFileTypeIndex() const
     {
         return ((part2 >> 0x3e) & 0x1) == 0
-            ? DeviceFileCatalog::Chunk::FILE_INDEX_WITH_DURATION
-            : DeviceFileCatalog::Chunk::FILE_INDEX_NONE;
+            ? nx::vms::server::Chunk::FILE_INDEX_WITH_DURATION
+            : nx::vms::server::Chunk::FILE_INDEX_NONE;
     }
 
     void setFileTypeIndex(int fileTypeIndex)
     {
         NX_ASSERT_HEAVY_CONDITION(
-            fileTypeIndex == DeviceFileCatalog::Chunk::FILE_INDEX_NONE
-            || fileTypeIndex == DeviceFileCatalog::Chunk::FILE_INDEX_WITH_DURATION);
+            fileTypeIndex == nx::vms::server::Chunk::FILE_INDEX_NONE
+            || fileTypeIndex == nx::vms::server::Chunk::FILE_INDEX_WITH_DURATION);
 
-        quint64 value = fileTypeIndex == DeviceFileCatalog::Chunk::FILE_INDEX_WITH_DURATION ? 0x0LL : 0x1LL;
+        quint64 value = fileTypeIndex == nx::vms::server::Chunk::FILE_INDEX_WITH_DURATION ? 0x0LL : 0x1LL;
         part2 &= ~(0x1ULL << 0x3e);
         part2 |= ((quint64)value & 0x1) << 0x3e;
     }

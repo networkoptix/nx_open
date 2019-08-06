@@ -62,7 +62,7 @@ public:
     static QnTimePeriodList filterTimePeriodsAsc(
         Iterator itr,
         Iterator endItr,
-        int detailLevel,
+        qint64 detailLevel,
         bool keepSmallChunks,
         int limit)
     {
@@ -102,7 +102,7 @@ public:
     static QnTimePeriodList filterTimePeriodsDesc(
         Iterator itr,
         Iterator endItr,
-        int detailLevel,
+        qint64 detailLevel,
         bool keepSmallChunks,
         int limit)
     {
@@ -118,7 +118,7 @@ public:
             if (endItr->endTimeMs() > last.startTimeMs - detailLevel)
             {
                 const qint64 lastEndTime = last.endTimeMs();
-                last.startTimeMs = qMin(last.startTimeMs, endItr->startTimeMs);
+                last.startTimeMs = std::min<int64_t>(last.startTimeMs, endItr->startTimeMs);
                 if (!last.isInfinite())
                     last.durationMs = lastEndTime - last.startTimeMs;
             }
@@ -141,7 +141,7 @@ public:
     static QnTimePeriodList filterTimePeriods(
         Iterator itr,
         Iterator endItr,
-        int detailLevel,
+        qint64 detailLevel,
         bool keepSmalChunks,
         int limit,
         Qt::SortOrder sortOrder)

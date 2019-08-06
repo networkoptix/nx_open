@@ -236,7 +236,7 @@ bool UncompressedVideoFrame::assertPlaneValid(int plane, const char* func) const
     if (!assertValid(func))
         return false;
 
-    return NX_ASSERT(plane >= 0 && plane < m_dataSize.size(),
+    return NX_ASSERT(plane >= 0 && plane < (int) m_dataSize.size(),
         lm("%1(): Requested plane %2 of %3").args(func, plane, m_dataSize.size()));
 }
 

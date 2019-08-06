@@ -1,8 +1,13 @@
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+
 #include "utils.h"
 
 #include <vector>
 #include <string>
 #include <algorithm>
+#include <climits>
+#include <cerrno>
+#include <type_traits>
 
 #if defined(_WIN32)
     #define NOMINMAX //< Needed to prevent windows.h define macros min() and max().
@@ -97,26 +102,31 @@ const std::vector<std::string>& getProcessCmdLineArgs()
     return args;
 }
 
-std::string toString(std::string s)
+template<typename Char>
+static std::string hexFormatString()
 {
-    return toString(s.c_str());
+    static_assert(sizeof(Char) <= 4, "Char type is too large");
+    constexpr int kHexDigitsPerByte = 2;
+    const auto numberOfHexDigitsAsString = std::string(1, '0' + kHexDigitsPerByte * sizeof(Char));
+    return std::string("%0") + numberOfHexDigitsAsString + "X";
 }
 
-std::string toString(uint8_t i)
-{
-    return toString((int) i);
-}
+template<typename Char>
+using Unsigned = typename std::make_unsigned<Char>::type;
 
-std::string toString(char c)
+template<typename Char>
+static std::string toStringFromChar(Char c)
 {
     if (!isAsciiPrintable(c))
-        return format("'\\x%02X'", (unsigned char) c);
+        return format("'\\x" + hexFormatString<Char>() + "'", (Unsigned<Char>) c);
     if (c == '\'')
         return "'\\''";
-    return std::string("'") + c + "'";
+
+    return std::string("'") + (char) c + "'";
 }
 
-std::string toString(const char* s)
+template<typename Char>
+std::string toStringFromPtr(const Char* s)
 {
     std::string result;
     if (s == nullptr)
@@ -126,27 +136,27 @@ std::string toString(const char* s)
     else
     {
         result = "\"";
-        for (const char* p = s; *p != '\0'; ++p)
+        for (const Char* p = s; *p != '\0'; ++p)
         {
             if (*p == '\\' || *p == '"')
-                (result += '\\') += *p;
+                (result += '\\') += (char) *p;
             else if (*p == '\n')
                 result += "\\n";
             else if (*p == '\t')
                 result += "\\t";
             else if (!isAsciiPrintable(*p))
-                result += format("\\x%02X", (unsigned char) *p);
+                result += format("\\x" + hexFormatString<Char>() + "\"\"", (Unsigned<Char>) *p);
             else
-                result += *p;
+                result += (char) *p;
         }
         result += "\"";
     }
     return result;
 }
 
-std::string toString(char* s)
+std::string toString(bool b)
 {
-    return toString(const_cast<const char*>(s));
+    return b ? "true" : "false";
 }
 
 std::string toString(const void* ptr)
@@ -154,19 +164,74 @@ std::string toString(const void* ptr)
     return ptr ? format("%p", ptr) : "null";
 }
 
-std::string toString(void* ptr)
+std::string toString(char c)
 {
-    return toString(const_cast<const void*>(ptr));
+    return toStringFromChar<unsigned char>(c);
 }
 
-std::string toString(std::nullptr_t ptr)
+std::string toString(const char* s)
 {
-    return toString((const void*) ptr);
+    return toStringFromPtr(s);
 }
 
-std::string toString(bool b)
+std::string toString(wchar_t w)
 {
-    return b ? "true" : "false";
+    return toStringFromChar(w);
+}
+
+std::string toString(const wchar_t* w)
+{
+    return toStringFromPtr(w);
+}
+
+bool fromString(const std::string& s, int* value)
+{
+    if (!value || s.empty())
+        return false;
+
+    // NOTE: std::stoi() is missing on Android, thus, using std::strtol().
+    char* pEnd = nullptr;
+    errno = 0; //< Required before std::strtol().
+    const long v = std::strtol(s.c_str(), &pEnd, /*base*/ 0);
+
+    if (v > INT_MAX || v < INT_MIN || errno != 0 || *pEnd != '\0')
+        return false;
+
+    *value = (int) v;
+    return true;
+}
+
+bool fromString(const std::string& s, double* value)
+{
+    if (!value || s.empty())
+        return false;
+
+    // NOTE: std::stod() is missing on Android, thus, using std::strtod().
+    char* pEnd = nullptr;
+    errno = 0; //< Required before std::strtod().
+    const double v = std::strtod(s.c_str(), &pEnd);
+
+    if (errno == ERANGE || *pEnd != '\0')
+        return false;
+
+    *value = v;
+    return true;
+}
+
+bool fromString(const std::string& s, float* value)
+{
+    if (!value || s.empty())
+        return false;
+
+    // NOTE: std::stof() and std::strtof() are missing on Android, thus, using std::strtod().
+    char* pEnd = nullptr;
+    errno = 0; //< Required before std::strtod().
+    const float v = (float) std::strtod(s.c_str(), &pEnd);
+    if (errno == ERANGE || *pEnd != '\0')
+        return false;
+
+    *value = (float) v;
+    return true;
 }
 
 } // namespace utils

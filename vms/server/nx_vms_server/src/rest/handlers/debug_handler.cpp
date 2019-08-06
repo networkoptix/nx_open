@@ -1,6 +1,7 @@
 #include "debug_handler.h"
 
 #include <cstdlib>
+#include <thread>
 
 #include <nx/utils/switch.h>
 #include <nx/utils/crash_dump/systemexcept.h>
@@ -15,9 +16,9 @@ static std::pair<Action, QString> actionFromParams(const QnRequestParamList& par
 {
     Action action = Action::invalid;
     QString value;
-    for (const auto& [stringAction, paramValue]: params)
+    for (auto it = params.begin(); it != params.end(); ++it)
     {
-        const Action paramAction = nx::utils::switch_(stringAction,
+        const Action paramAction = nx::utils::switch_(it.key(),
             "crash", [](){ return Action::crash; },
             "exit", [](){ return Action::exit; },
             "delayS", [](){ return Action::delayS; },
@@ -29,7 +30,7 @@ static std::pair<Action, QString> actionFromParams(const QnRequestParamList& par
                 return {Action::invalid, ""};
 
             action = paramAction;
-            value = paramValue;
+            value = it.value();
         }
     }
     return {action, value};
@@ -100,15 +101,15 @@ int QnDebugHandler::executeGet(
 }
 
 int QnDebugHandler::executePost(
-    const QString& /*path*/,
-    const QnRequestParamList& /*params*/,
+    const QString& path,
+    const QnRequestParamList& params,
     const QByteArray& /*requestBody*/,
     const QByteArray& /*srcBodyContentType*/,
-    QByteArray& /*responseMessageBody*/,
-    QByteArray& /*contentType*/,
-    const QnRestConnectionProcessor* /*owner*/)
+    QByteArray& responseMessageBody,
+    QByteArray& contentType,
+    const QnRestConnectionProcessor* owner)
 {
-    return nx::network::http::StatusCode::notFound;
+    return executeGet(path, params, responseMessageBody, contentType, owner);
 }
 
 /**

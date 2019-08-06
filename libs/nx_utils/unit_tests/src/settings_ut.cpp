@@ -3,11 +3,13 @@
 #include <QtCore/QFile>
 
 #include <nx/utils/settings.h>
+#include <nx/utils/test_support/test_options.h>
 
-const QString kSettingsFilename = "test.conf";
+using namespace nx::utils;
 
 TEST(Settings, getSimpleOption)
 {
+    const QString kSettingsFilename = TestOptions::temporaryDirectoryPath() + "test.conf";
     struct Settings: nx::utils::Settings
     {
         Option<QString> option1{this, "option1", "qwerty", "Option description"};
@@ -27,6 +29,7 @@ TEST(Settings, getSimpleOption)
 
 TEST(Settings, loadSave)
 {
+    const QString kSettingsFilename = TestOptions::temporaryDirectoryPath() + "test.conf";
     struct Settings: nx::utils::Settings
     {
         Option<QString> option1{this, "option1", "qwerty", "Option description"};
@@ -60,6 +63,7 @@ TEST(Settings, loadSave)
 
 TEST(Settings, stringWithCommas)
 {
+    const QString kSettingsFilename = TestOptions::temporaryDirectoryPath() + "test.conf";
     struct Settings: nx::utils::Settings
     {
         Option<QString> option1{this, "option1", "qwerty", "Option description"};
@@ -99,6 +103,7 @@ TEST(Settings, stringWithCommas)
 
 TEST(Settings, getWithLambda)
 {
+    const QString kSettingsFilename = TestOptions::temporaryDirectoryPath() + "test.conf";
     struct Settings: nx::utils::Settings
     {
         Option<QString> option1{this, "option1", "", "Option description",

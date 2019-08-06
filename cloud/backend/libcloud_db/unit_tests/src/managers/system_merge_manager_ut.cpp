@@ -83,8 +83,6 @@ protected:
 
     void whenStartMerge()
     {
-        using namespace std::placeholders;
-
         nx::utils::stree::ResourceContainer rc;
         rc.put(attr::authAccountEmail, QString::fromStdString(m_ownerAccount.email));
         AuthorizationInfo authorizationInfo(std::move(rc));
@@ -92,7 +90,7 @@ protected:
             authorizationInfo,
             m_masterSystem.id,
             m_slaveSystem.id,
-            std::bind(&SystemMergeManager::saveMergeResult, this, _1));
+            [this](auto&&... args) { saveMergeResult(std::move(args)...); });
     }
 
     void whenDestroySystemMergeManagerAsync()
@@ -184,7 +182,7 @@ private:
     SystemManagerStub m_systemManagerStub;
     SystemHealthInfoProviderStub m_systemHealthInfoProviderStub;
     VmsGatewayStub m_vmsGatewayStub;
-    std::unique_ptr<clusterdb::engine::SyncronizationEngine> m_syncronizationEngine;
+    std::unique_ptr<clusterdb::engine::SynchronizationEngine> m_synchronizationEngine;
     std::unique_ptr<nx::cloud::db::SystemMergeManager> m_systemMergeManager;
     nx::utils::SyncQueue<api::ResultCode> m_mergeResults;
     boost::optional<std::future<void>> m_systemMergeManagerDestroyed;
@@ -199,9 +197,8 @@ private:
 
         m_ownerAccount = insertRandomAccount();
 
-        m_syncronizationEngine = std::make_unique<clusterdb::engine::SyncronizationEngine>(
+        m_synchronizationEngine = std::make_unique<clusterdb::engine::SynchronizationEngine>(
             std::string(),
-            QnUuid::createUuid(),
             m_settings.p2pDb(),
             nx::clusterdb::engine::ProtocolVersionRange(
                 kMinSupportedProtocolVersion,
@@ -215,9 +212,9 @@ private:
             &queryExecutor());
     }
 
-    void saveMergeResult(api::ResultCode resultCode)
+    void saveMergeResult(api::Result result)
     {
-        m_mergeResults.push(resultCode);
+        m_mergeResults.push(result.code);
     }
 
     void deliverMergeHistoryRecord(const std::string& authKey)

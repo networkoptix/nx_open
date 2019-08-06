@@ -5,6 +5,7 @@ import {
 }                                                from '@angular/core';
 import { DOCUMENT, Location }                    from '@angular/common';
 import { NgbModal, NgbActiveModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { NxConfigService }                       from '../../services/nx-config';
 
 @Component({
     selector   : 'nx-modal-embed-content',
@@ -17,6 +18,7 @@ export class EmbedModalContent {
     @Input() disconnect;
     @Input() closable;
 
+    config: any;
     auth: any;
     params: any;
     embedUrl: string;
@@ -26,7 +28,7 @@ export class EmbedModalContent {
     constructor(private activeModal: NgbActiveModal,
                 private renderer: Renderer2,
                 private location: Location,
-                @Inject('configService') private configService: any,
+                private configService: NxConfigService,
                 @Inject(DOCUMENT) private document: any) {
 
         this.params = {
@@ -40,6 +42,8 @@ export class EmbedModalContent {
             email   : '',
             password: ''
         };
+
+        this.config = configService.getConfig();
     }
 
     ngOnInit() {
@@ -67,7 +71,8 @@ export class EmbedModalContent {
             }
         }
 
-        uri += '&auth=' + btoa(params.login_email + ':' + params.login_password);
+        uri += (uri === '') ? '?' : '&';
+        uri += 'auth=' + btoa(params.login_email + ':' + params.login_password);
 
         this.embedUrl = '<iframe ' +
                             'src = "' + url + uri + '" >' +
@@ -95,7 +100,13 @@ export class NxModalEmbedComponent implements OnInit {
     }
 
     private dialog() {
-        this.modalRef = this.modalService.open(EmbedModalContent, { backdrop: 'static', centered: true });
+        // TODO: Refactor dialog to use generic dialog
+        // TODO: retire loading ModalContent (CLOUD-2493)
+        this.modalRef = this.modalService.open(EmbedModalContent,
+                {
+                            windowClass: 'modal-holder',
+                            backdrop: 'static'
+                        });
         this.modalRef.componentInstance.language = this.language.lang;
         this.modalRef.componentInstance.closable = true;
 

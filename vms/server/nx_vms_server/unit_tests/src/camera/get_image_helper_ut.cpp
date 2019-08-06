@@ -2,6 +2,7 @@
 #include <gmock/gmock.h>
 #include <ostream>
 
+#include <media_server/media_server_module.h>
 #include <nx_vms_server_ini.h>
 #include <common/common_globals.h>
 #include <camera/get_image_helper.h>
@@ -126,9 +127,10 @@ TEST(GetImageHelper, updateDstSize_maxSize)
 TEST(GetImageHelper, determineStreamIndex)
 {
     using StreamIndex = nx::vms::api::StreamIndex;
-    using StreamSelectionMode = nx::api::CameraImageRequest::StreamSelectionMode;
+    using StreamSelectionMode = nx::api::ImageRequest::StreamSelectionMode;
 
-    QnGetImageHelper helper(/*serverModule*/ nullptr);
+    QnMediaServerModule serverModule;
+    QnGetImageHelper helper(&serverModule);
     nx::api::CameraImageRequest request;
     const auto camera = QnSharedResourcePointer(new MockCameraResource());
     request.camera = camera;

@@ -34,14 +34,12 @@ void StreamProxy::startProxy(
     std::unique_ptr<AbstractStreamSocketAcceptor> source,
     const SocketAddress& destinationEndpoint)
 {
-    using namespace std::placeholders;
-
     m_sourceAcceptor = std::move(source);
     m_destinationEndpoint = destinationEndpoint;
 
     m_timer.bindToAioThread(m_sourceAcceptor->getAioThread());
     m_sourceAcceptor->acceptAsync(
-        std::bind(&StreamProxy::onAcceptCompletion, this, _1, _2));
+        [this](auto&&... args) { onAcceptCompletion(std::move(args)...); });
 }
 
 void StreamProxy::setProxyDestination(
@@ -61,8 +59,6 @@ void StreamProxy::onAcceptCompletion(
     SystemError::ErrorCode systemErrorCode,
     std::unique_ptr<AbstractStreamSocket> connection)
 {
-    using namespace std::placeholders;
-
     if (systemErrorCode != SystemError::noError &&
         systemErrorCode != SystemError::timedOut)
     {
@@ -71,7 +67,7 @@ void StreamProxy::onAcceptCompletion(
     }
 
     m_sourceAcceptor->acceptAsync(
-        std::bind(&StreamProxy::onAcceptCompletion, this, _1, _2));
+        [this](auto&&... args) { onAcceptCompletion(std::move(args)...); });
 
     QnMutexLocker lock(&m_mutex);
 
@@ -87,14 +83,12 @@ void StreamProxy::onAcceptCompletion(
 
 void StreamProxy::retryAcceptAfterTimeout()
 {
-    using namespace std::placeholders;
-
     m_timer.start(
         m_retryAcceptTimeout,
         [this]()
         {
             m_sourceAcceptor->acceptAsync(
-                std::bind(&StreamProxy::onAcceptCompletion, this, _1, _2));
+                [this](auto&&... args) { onAcceptCompletion(std::move(args)...); });
         });
 }
 
@@ -174,8 +168,6 @@ int StreamProxyPool::addProxy(
     std::unique_ptr<AbstractStreamSocketAcceptor> source,
     const SocketAddress& destinationEndpoint)
 {
-    using namespace std::placeholders;
-
     const int proxyId = ++m_lastProxyId;
 
     auto it = m_proxies.emplace(
@@ -276,8 +268,6 @@ void StreamProxyChannel::setDownStreamConverter(
 
 void StreamProxyChannel::start(ProxyCompletionHandler completionHandler)
 {
-    using namespace std::placeholders;
-
     m_completionHandler = std::move(completionHandler);
 
     m_destinationConnection = SocketFactory::createStreamSocket();
@@ -294,7 +284,7 @@ void StreamProxyChannel::start(ProxyCompletionHandler completionHandler)
 
     m_destinationConnection->connectAsync(
         m_destinationEndpoint,
-        std::bind(&StreamProxyChannel::onConnectToTargetCompletion, this, _1));
+        [this](auto&&... args) { onConnectToTargetCompletion(std::move(args)...); });
 }
 
 bool StreamProxyChannel::tuneDestinationConnectionAttributes()
@@ -321,8 +311,6 @@ void StreamProxyChannel::stopWhileInAioThread()
 void StreamProxyChannel::onConnectToTargetCompletion(
     SystemError::ErrorCode systemErrorCode)
 {
-    using namespace std::placeholders;
-
     if (systemErrorCode != SystemError::noError)
     {
         NX_DEBUG(this, lm("Proxy to %1. Failed to connect to the destination. %2")
@@ -336,7 +324,8 @@ void StreamProxyChannel::onConnectToTargetCompletion(
             aio::makeAsyncChannelAdapter(std::move(m_sourceConnection)),
             &m_converter),
         std::move(m_destinationConnection));
-    m_bridge->start(std::bind(&StreamProxyChannel::onBridgeCompleted, this, _1));
+    m_bridge->start(
+        [this](auto&&... args) { onBridgeCompleted(std::move(args)...); });
 }
 
 void StreamProxyChannel::onBridgeCompleted(

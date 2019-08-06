@@ -84,8 +84,7 @@ copyBuildLibs()
         libnx_vms_utils
         libnx_sql
         libnx_vms_api
-        libnx_sdk
-        libnx_plugin_utils
+        libnx_vms_rules
 
         # ffmpeg
         libavcodec
@@ -540,6 +539,7 @@ createUpdateZip() # file.tar.gz
 
     ln -s "$TAR_GZ_FILE" "$ZIP_DIR/"
     cp -r "$CURRENT_BUILD_DIR/update.json" "$ZIP_DIR/"
+    cp -r "$CURRENT_BUILD_DIR/package.json" "$ZIP_DIR/"
     cp -r "$CURRENT_BUILD_DIR/install.sh" "$ZIP_DIR/"
 
     if [ "$BOX" = "rpi" ]

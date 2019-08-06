@@ -33,7 +33,7 @@ ParserState FixedSizeMessageParser::parse(
                 if (readMessageSize(&readBuffer))
                     m_state = State::readingMessage;
                 break;
-        
+
             case State::readingMessage:
                 if (readMessage(&readBuffer))
                 {
@@ -107,7 +107,7 @@ SerializerState FixedSizeMessageSerializer::serialize(
         sizeof(messageSize));
 
     buffer->append(m_message->data);
-    bytesWritten += m_message->data.size();
+    *bytesWritten += m_message->data.size();
 
     return SerializerState::done;
 }

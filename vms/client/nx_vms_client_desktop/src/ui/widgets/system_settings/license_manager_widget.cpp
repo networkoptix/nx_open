@@ -18,6 +18,7 @@
 #include <QtNetwork/QNetworkReply>
 #include <QtNetwork/QNetworkRequest>
 
+#include <nx_ec/ec_api.h>
 #include <api/app_server_connection.h>
 #include <api/runtime_info_manager.h>
 
@@ -843,7 +844,9 @@ void QnLicenseManagerWidget::deactivateLicenses(const QnLicenseList& licenses)
             QnMessageBox::success(this, text);
         };
 
-    Deactivator::deactivateAsync(m_deactivationReason, licenses, handler, parentWidget());
+    Deactivator::deactivateAsync(
+        QnLicenseServer::deactivateUrl(commonModule()),
+        m_deactivationReason, licenses, handler, parentWidget());
 }
 
 void QnLicenseManagerWidget::takeAwaySelectedLicenses()
@@ -870,7 +873,11 @@ void QnLicenseManagerWidget::takeAwaySelectedLicenses()
 
 void QnLicenseManagerWidget::exportLicenses()
 {
-    QnTableExportHelper::exportToFile(ui->gridLicenses, false, this, tr("Export licenses to a file"));
+    QnTableExportHelper::exportToFile(
+        ui->gridLicenses->model(),
+        QnTableExportHelper::getAllIndexes(ui->gridLicenses->model()),
+        this,
+        tr("Export licenses to a file"));
 }
 
 void QnLicenseManagerWidget::updateButtons()
@@ -1030,7 +1037,7 @@ void QnLicenseManagerWidget::at_licenseWidget_stateChanged()
     {
         updateFromServer(
             ui->licenseWidget->serialKey().toLatin1(), /*infoMode*/ true,
-            QnLicenseServer::kActivateUrl.toQUrl());
+            QnLicenseServer::activateUrl(commonModule()).toQUrl());
     }
     else
     {

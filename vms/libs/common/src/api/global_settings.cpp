@@ -691,6 +691,11 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         "mpeg2video",
         this);
 
+    m_licenseServerUrlAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
+        "licenseServer",
+        "http://licensing.vmsproxy.com", //< Licensing server does not support https.
+        this);
+
     m_maxEventLogRecordsAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
         "maxEventLogRecords",
         100 * 1000, //< Default value.
@@ -704,6 +709,16 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
     m_metadataStorageChangePolicyAdaptor = new QnLexicalResourcePropertyAdaptor<nx::vms::api::MetadataStorageChangePolicy>(
         kMetadataStorageChangePolicyName,
         nx::vms::api::MetadataStorageChangePolicy::keep,
+        this);
+
+    m_targetPersistentUpdateStorageAdaptor = new QnLexicalResourcePropertyAdaptor<QByteArray>(
+        kTargetPersistentUpdateStorageName,
+        QByteArray(),
+        this);
+
+    m_installedPersistentUpdateStorageAdaptor = new QnLexicalResourcePropertyAdaptor<QByteArray>(
+        kInstalledPersistentUpdateStorageName,
+        QByteArray(),
         this);
 
     connect(
@@ -882,6 +897,20 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         &QnGlobalSettings::downloaderPeersChanged,
         Qt::QueuedConnection);
 
+    connect(
+        m_targetPersistentUpdateStorageAdaptor,
+        &QnAbstractResourcePropertyAdaptor::valueChanged,
+        this,
+        &QnGlobalSettings::targetPersistentUpdateStorageChanged,
+        Qt::QueuedConnection);
+
+    connect(
+        m_installedPersistentUpdateStorageAdaptor,
+        &QnAbstractResourcePropertyAdaptor::valueChanged,
+        this,
+        &QnGlobalSettings::installedPersistentUpdateStorageChanged,
+        Qt::QueuedConnection);
+
     AdaptorList result;
     result
         << m_systemNameAdaptor
@@ -925,10 +954,13 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         << m_defaultExportVideoCodecAdaptor
         << m_downloaderPeersAdaptor
         << m_lowQualityScreenVideoCodecAdaptor
+        << m_licenseServerUrlAdaptor
         << m_maxWebMTranscoders
         << m_maxEventLogRecordsAdaptor
         << m_forceLiveCacheForPrimaryStreamAdaptor
         << m_metadataStorageChangePolicyAdaptor
+        << m_targetPersistentUpdateStorageAdaptor
+        << m_installedPersistentUpdateStorageAdaptor
     ;
 
     return result;
@@ -1362,7 +1394,7 @@ void QnGlobalSettings::setLocalSystemId(const QnUuid& value)
     m_localSystemIdAdaptor->setValue(value.toString());
 }
 
-QnUuid QnGlobalSettings::LastMergeMasterId() const
+QnUuid QnGlobalSettings::lastMergeMasterId() const
 {
     return QnUuid(m_lastMergeMasterIdAdaptor->value());
 }
@@ -1372,7 +1404,7 @@ void QnGlobalSettings::setLastMergeMasterId(const QnUuid& value)
     m_lastMergeMasterIdAdaptor->setValue(value.toString());
 }
 
-QnUuid QnGlobalSettings::LastMergeSlaveId() const
+QnUuid QnGlobalSettings::lastMergeSlaveId() const
 {
     return QnUuid(m_lastMergeSlaveIdAdaptor->value());
 }
@@ -1646,6 +1678,28 @@ void QnGlobalSettings::setTargetUpdateInformation(const QByteArray& updateInform
     m_targetUpdateInformationAdaptor->setValue(updateInformation);
 }
 
+QByteArray QnGlobalSettings::targetPersistentUpdateStorage() const
+{
+    return m_targetPersistentUpdateStorageAdaptor->value();
+}
+
+void QnGlobalSettings::setTargetPersistentUpdateStorage(
+    const QByteArray& persistentUpdateStorageSerializedData)
+{
+    m_targetPersistentUpdateStorageAdaptor->setValue(persistentUpdateStorageSerializedData);
+}
+
+QByteArray QnGlobalSettings::installedPersistentUpdateStorage() const
+{
+    return m_installedPersistentUpdateStorageAdaptor->value();
+}
+
+void QnGlobalSettings::setInstalledPersistentUpdateStorage(
+    const QByteArray& persistentUpdateStorageSerializedData)
+{
+    m_installedPersistentUpdateStorageAdaptor->setValue(persistentUpdateStorageSerializedData);
+}
+
 QByteArray QnGlobalSettings::installedUpdateInformation() const
 {
     return m_installedUpdateInformationAdaptor->value();
@@ -1749,6 +1803,16 @@ void QnGlobalSettings::setDefaultExportVideoCodec(const QString& value)
 QString QnGlobalSettings::lowQualityScreenVideoCodec() const
 {
     return m_lowQualityScreenVideoCodecAdaptor->value();
+}
+
+void QnGlobalSettings::setLicenseServerUrl(const QString& value)
+{
+    m_licenseServerUrlAdaptor->setValue(value);
+}
+
+QString QnGlobalSettings::licenseServerUrl() const
+{
+    return m_licenseServerUrlAdaptor->value();
 }
 
 void QnGlobalSettings::setLowQualityScreenVideoCodec(const QString& value)

@@ -19,6 +19,7 @@
 #include <core/resource/videowall_resource.h>
 #include <core/resource/webpage_resource.h>
 
+#include <nx_ec/ec_api.h>
 #include <nx_ec/data/api_conversion_functions.h>
 
 #include <nx_ec/managers/abstract_user_manager.h>
@@ -184,15 +185,21 @@ void QnResourcesChangesManager::deleteResources(
     QVector<QnUuid> idToDelete;
     for (const QnResourcePtr& resource: resources)
     {
-        // if we are deleting an edge camera, also delete its server
-        // check for camera to avoid unnecessary parent lookup
-        QnUuid parentToDelete = resource.dynamicCast<QnVirtualCameraResource>() &&
-            QnMediaServerResource::isHiddenServer(resource->getParentResource())
-            ? resource->getParentId()
-            : QnUuid();
+        // If we are deleting an edge camera, also delete its server.
+        // Check for camera to avoid unnecessary parent lookup.
+        QnUuid parentToDelete;
+        if (const auto camera = resource.dynamicCast<QnVirtualCameraResource>())
+        {
+            const bool isHiddenEdgeServer =
+                QnMediaServerResource::isHiddenServer(camera->getParentResource());
+            if (isHiddenEdgeServer && !camera->hasFlags(Qn::wearable_camera))
+                parentToDelete = camera->getParentId();
+        }
+
         if (!parentToDelete.isNull())
-            idToDelete << parentToDelete;
-        idToDelete << resource->getId();
+            idToDelete << parentToDelete; //< Parent remove its children by server side.
+        else
+            idToDelete << resource->getId();
     }
     connection->getResourceManager(Qn::kSystemAccess)->remove(idToDelete, this,
         makeReplyProcessor(this, handler));

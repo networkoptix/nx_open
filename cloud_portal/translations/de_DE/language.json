@@ -1,5 +1,5 @@
 {
-  "language": "en_US",
+  "language": "de_DE",
   "language_name": "Deutsch",
   "productName": "%PRODUCT_NAME%",
   "clientProtocol": "%CLIENT_PROTOCOL%:",
@@ -10,7 +10,15 @@
     "loginButton": "Anmelden",
     "logoutAuthorisedTitle": "Sie sind bereits eingeloggt",
     "logoutAuthorisedContinueButton": "Fortfahren",
-    "logoutAuthorisedLogoutButton": "Abmelden"
+    "logoutAuthorisedLogoutButton": "Abmelden",
+    "messageFailed": "Message has failed to send.",
+    "messageSent": "Message has been sent."
+  },
+  "messageType": {
+    "ipvd_feedback": "Feedback about {{product}}",
+    "sales_inquiry": "Inquiry for {{product}}",
+    "request_support": "Request Support for {{product}}",
+    "unknown": "Unknown Message Type"
   },
   "pageTitles": {
     "template": "{{title}} %PRODUCT_NAME%",
@@ -37,8 +45,9 @@
     "pageNotFound": "Seite nicht gefunden"
   },
   "systemStatuses": {
-    "notActivated": "nicht aktiviert",
     "activated": "aktiviert",
+    "merging": "merging",
+    "notActivated": "nicht aktiviert",
     "online": "online",
     "offline": "offline",
     "unavailable": "nicht verfügbar"
@@ -137,13 +146,22 @@
     "cantOpenClient": "Die Anwendung %VMS_NAME% wurde nicht gefunden. <a href=\"/download\">Download</a>",
     "lostConnection": "Verbindung zu {{systemName}} verloren",
     "thisSystem": "das System",
-    "oldSafariNotSupported": "Versionen von Safari älter als 10 werden nicht unterstützt"
+    "oldSafariNotSupported": "Versionen von Safari älter als 10 werden nicht unterstützt",
+    "DUPLICATE_MEDIASERVER_FOUND": "Doppelte Server wurden auf einem der Systeme gefunden.<br>Entfernen Sie alte Server von jedem System, das Sie zusammenführen möchten, und versuchen Sie es erneut.",
+    "mergedSystemIsOffline": "Eines der zusammenzuführenden Systeme ist offline. Stellen Sie sicher, dass sie online sind und versuchen Sie es erneut.",
+    "INCOMPATIBLE": "Versions for systems are incompatible. To fix this problem make sure the systems have the same version."
   },
   "passwordRequirements": {
+    "good": "gut",
+    "fair": "mittel",
+    "minLength": "zu kurz",
     "minLengthMessage": "Passwort muss mindestens 8 Zeichen enthalten",
+    "required": "falsch",
     "requiredMessage": "Verwenden Sie nur alphanumerische Zeichen und Tastatursymbole, vermeiden Sie führende und nachfolgende Leerzeichen",
+    "weak": "schlecht",
     "weakMessage": "Verwenden Sie Zahlen, Groß- und Kleinbuchstaben und Sonderzeichen, um Ihr Passwort sicherer machen",
     "strongMessage": "Sicheres Passwort!",
+    "common": "zu häufig verwendet",
     "commonMessage": "Dieses Passwort ist eines der beliebtesten Passwörter auf der Welt",
     "missingMessage": "Passwort ist erforderlich"
   },
@@ -177,8 +195,9 @@
     "confirmUnshareAction": "Löschen",
     "successDisconnected": "Das System wurde erfoglreich von %PRODUCT_NAME% getrennt",
     "successDeleted": "Das System {{systemName}} wurde erfolgreich von Ihrem Account gelöscht",
-    "successMerge": "System {{systemName}}} wurde mit {{systemName}}} zusammengeführt",
-    "permissionsRemoved": "Berechtigungen wurden von {{email}} entfernt"
+    "successMerge": "Systemzusammenführung abgeschlossen",
+    "permissionsRemoved": "Berechtigungen wurden von {{email}} entfernt",
+    "unknownName": "Unknown Name for System (Caused by cloud merge)"
   },
   "account": {
     "accountSavedSuccess": "Ihr Account wurde erfolgreich gespeichert",
@@ -275,7 +294,7 @@
       "transcoding": "Umkodierung",
       "unknown": "Unbekannt",
       "copyToClipboard": "in zwischenablage kopieren",
-      "copyDefaultText": "Kopieren",
+      "copyDefaultText": "copieren",
       "copyActiveText": "in die zwischenablage kopiert"
     },
     "systemOffline": "System offline",
@@ -302,8 +321,8 @@
     },
     "chromeCastWarning": "Chromecast ist ressourcenintensiv und kann Probleme auf Ihrem Server verursachen.",
     "voiceCommands": {
-      "play": "Abspielen",
-      "pause": "Pause",
+      "play": "abspielen",
+      "pause": "pause",
       "live": "live gehen | live anzeigen",
       "view": "ansicht + [kameraname]",
       "search": "finden + [text für suchleiste]",

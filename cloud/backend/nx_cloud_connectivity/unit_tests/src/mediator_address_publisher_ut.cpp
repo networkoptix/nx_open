@@ -19,7 +19,7 @@ public:
             stopWhileInAioThread();
     }
 
-    virtual void bindToAioThread(aio::AbstractAioThread* aioThread)
+    virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override
     {
         stun::AbstractAsyncClient::bindToAioThread(aioThread);
     }
@@ -64,7 +64,7 @@ public:
     }
 
     virtual bool addConnectionTimer(
-        std::chrono::milliseconds /*period*/, TimerHandler /*handler*/, void* /*client*/)
+        std::chrono::milliseconds /*period*/, TimerHandler /*handler*/, void* /*client*/) override
     {
         return true;
     }
@@ -160,7 +160,7 @@ protected:
     {
         using namespace std::placeholders;
 
-        std::list<nx::network::SocketAddress> addresses{ nx::network::SocketAddress::anyPrivateAddress };
+        std::vector<nx::network::SocketAddress> addresses{ nx::network::SocketAddress::anyPrivateAddress };
         for (int i = 0; i < requestCount; ++i)
         {
             m_publisher->updateAddresses(

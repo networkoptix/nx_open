@@ -11,6 +11,10 @@
       <source>Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</source>
       <translation>האנליטיקה תפעל רק כאשר המצלמה מוצגת. אפשר הקלטה בכדי לגרום לזה לעבוד כל הזמן.</translation>
     </message>
+    <message>
+      <source>This is the built-in functionality</source>
+      <translation>זוהי פונקציונליות מובנית</translation>
+    </message>
   </context>
   <context>
     <name>EmptyTilesPlaceholder</name>
@@ -68,11 +72,11 @@
     <name>PluginsInformation</name>
     <message>
       <source>No plugins installed</source>
-      <translation type="unfinished">No plugins installed</translation>
+      <translation>לא מותקנים תוספים</translation>
     </message>
     <message>
       <source>Server is offline</source>
-      <translation type="unfinished">Server is offline</translation>
+      <translation>השרת אינו זמין</translation>
     </message>
   </context>
   <context>

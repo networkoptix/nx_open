@@ -2,17 +2,17 @@
     <form name="disconnectForm" novalidate>
         <div class="modal-body">
             <p class="warning-label">
-                All cloud users will be deleted.
+                Alla molnanvändare kommer raderas.
             </p>
             <p>
-                System will be accessible through local network with local administrator account.
+                Systemet kommer att vara tillgängligt via lokalt nätverk med lokalt administratörskonto.
             </p>
             <p>
-                Enter password to continue.
+                Ange lösenord för att fortsätta.
             </p>
 
             <div class="form-group" validate-field>
-                <label for="password">Password</label>
+                <label for="password">Lösenord</label>
                 <input class="form-control" ng-model="model.password" id="password" autocomplete="new-password"
                        name="password" type="password" required autofocus>
                 <p class="help-block" >
@@ -28,7 +28,7 @@
                             action-type="'danger'"
                             button-text="$root.L.system.confirmDisconnectAction"></process-button>
 
-            <button type="button" class="btn btn-default" ng-click="close()" >Cancel</button>
+            <button type="button" class="btn btn-default" ng-click="close()" >Avbryt</button>
         </div>
     </form>
 </div>

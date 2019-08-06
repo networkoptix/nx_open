@@ -47,7 +47,10 @@ public:
     virtual void directJumpToNonKeyFrame(qint64 mksec) override;
 
     virtual bool jumpTo(qint64 mksec, qint64 skipTime) override;
-    bool jumpTo(qint64 mksec, qint64 skipTime, qint64* outJumpTime);
+
+    // Function jumps to the specified time or to the corrected accordingly to the playback
+    // mask position.
+    bool jumpTo(qint64 mksec, qint64 skipTime, bool bindPositionToPlaybackMask, qint64* outJumpTime);
 
     virtual void setSkipFramesToTime(qint64 skipTime) override;
     virtual void nextFrame() override;
@@ -105,6 +108,8 @@ public:
 
     CameraDiagnostics::Result lastError() const;
 
+    virtual std::chrono::microseconds currentTime() const override;
+
 protected:
     virtual bool init();
 
@@ -115,7 +120,6 @@ protected:
     QnAbstractMediaDataPtr createEmptyPacket(bool isReverseMode);
     void beforeJumpInternal(qint64 mksec);
 
-    virtual qint64 currentTime() const override;
 protected:
     qint64 m_currentTime;
     qint64 m_topIFrameTime;

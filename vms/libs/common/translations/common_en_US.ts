@@ -1059,11 +1059,11 @@
     <name>nx::utils::CryptedFileStream</name>
     <message>
         <source>Wrong crypted stream size.</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Damaged crypted stream header.</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1550,14 +1550,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>Plugin Event</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Unknown plugin event</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Failed to force using camera time, it lags too much, system time will be used</source>
         <translation></translation>
     </message>
@@ -1583,6 +1575,18 @@
     </message>
     <message>
         <source>Analytics storage &quot;%1&quot; is almost full.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Plugin Diagnostic Event</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown Plugin Diagnostic Event</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>RAID error. %1.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

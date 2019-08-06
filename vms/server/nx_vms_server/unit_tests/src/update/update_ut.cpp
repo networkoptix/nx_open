@@ -7,7 +7,9 @@
 #include <api/test_api_requests.h>
 #include <api/global_settings.h>
 #include <nx/update/update_information.h>
+#include <nx/update/persistent_update_storage.h>
 #include <nx/network/http/test_http_server.h>
+#include <nx/vms/api/data/system_information.h>
 #include <quazip/quazipfile.h>
 #include <rest/server/json_rest_handler.h>
 #include <common/common_module.h>
@@ -26,11 +28,11 @@ protected:
         ASSERT_TRUE(m_testHttpServer.bindAndListen());
     }
 
-    void givenConnectedPeers(int count)
+    void givenConnectedPeers(size_t count)
     {
 
         const QnUuid systemId = QnUuid::createUuid();
-        for (int i = 0; i < count; ++i)
+        for (size_t i = 0; i < count; ++i)
         {
             m_peers.emplace_back(std::make_unique<MediaServerLauncher>(QString()));
 
@@ -39,9 +41,9 @@ protected:
             ASSERT_TRUE(m_peers.back()->startAsync());
         }
 
-        for (int i = 0; i < count; ++i)
+        for (size_t i = 0; i < count; ++i)
         {
-            m_peers[i]->waitForStarted();
+            ASSERT_TRUE(m_peers[i]->waitForStarted());
             m_peers[i]->commonModule()->globalSettings()->setLocalSystemId(systemId);
             m_peers[i]->commonModule()->globalSettings()->synchronizeNowSync();
         }
@@ -110,7 +112,7 @@ protected:
         issueInstallUpdateRequest(false, QnUuidList(), QnRestResult::MissingParameter);
     }
 
-    QnUuid peerId(int index)
+    QnUuid peerId(size_t index)
     {
         return m_peers[index]->commonModule()->moduleGUID();
     }
@@ -131,7 +133,9 @@ protected:
         for (const auto& peer: m_peers)
         {
             if (participants.contains(peer->commonModule()->moduleGUID()))
+            {
                 ASSERT_TRUE(peer->mediaServerProcess()->installUpdateRequestReceived());
+            }
         }
     }
 
@@ -171,21 +175,21 @@ protected:
 
     void thenFinishUpdateShouldSucceed()
     {
-        NX_TEST_API_POST(m_peers[0].get(), "/ec2/finishUpdate", "");
+        NX_TEST_API_POST(m_peers[0].get(), "/ec2/finishUpdate", QString());
 
         QnRestResult result;
         NX_TEST_API_GET(m_peers[0].get(), "/ec2/updateInformation", &result);
         ASSERT_NE(QnRestResult::NoError, result.error);
     }
 
-    void whenServerRestartedWithNewVersion(int peerIndex, const std::string& version = "4.0.0.1")
+    void whenServerRestartedWithNewVersion(size_t peerIndex, const std::string& version = "4.0.0.1")
     {
         m_peers[peerIndex]->stop();
         m_peers[peerIndex]->addCmdOption("--override-version=" + version);
         ASSERT_TRUE(m_peers[peerIndex]->start());
     }
 
-    void whenServerRestartedWithOldVersion(int peerIndex)
+    void whenServerRestartedWithOldVersion(size_t peerIndex)
     {
         m_peers[peerIndex]->stop();
         m_peers[peerIndex]->addCmdOption("--override-version=4.0.0.0");
@@ -207,9 +211,30 @@ protected:
         issueFinishUpdateRequestAndAssertResponse(true, QnRestResult::NoError);
     }
 
-    void whenPeerGoesOffline(int peerIndex)
+    void whenPeerGoesOffline(size_t peerIndex)
     {
         m_peers[peerIndex]->stop();
+    }
+
+    void whenPersistentUpdateStorageDataSet(const QString& version)
+    {
+        m_persistentServersData[version] =
+            update::PersistentUpdateStorage({m_peers[0]->commonModule()->moduleGUID()}, true);
+
+        const QString path = "/ec2/updatePersistenStorages?version=" + version;
+        NX_TEST_API_POST(m_peers[0].get(), path, m_persistentServersData[version].servers);
+    }
+
+    void thenPersistentUpdateStorageDataShouldBeRetrievalble(const QString& version)
+    {
+        const QString path = "/ec2/updatePersistenStorages?version=" + version;
+
+        QnJsonRestResult result;
+        NX_TEST_API_GET(m_peers[0].get(), path, &result);
+
+        update::PersistentUpdateStorage persistentStorageData =
+            result.deserialized<update::PersistentUpdateStorage>();
+        ASSERT_EQ(persistentStorageData, m_persistentServersData[version]);
     }
 
 private:
@@ -227,10 +252,11 @@ private:
     std::vector<std::unique_ptr<MediaServerLauncher>> m_peers;
     nx::update::Information m_updateInformation;
     nx::network::http::TestHttpServer m_testHttpServer;
+    std::map<QString, update::PersistentUpdateStorage> m_persistentServersData;
 
     void connectPeers()
     {
-        for (int i = 0; i < m_peers.size() - 1; ++i)
+        for (size_t i = 0; i < m_peers.size() - 1; ++i)
         {
             const auto& to = m_peers[i + 1];
             const auto toUrl = nx::utils::url::parseUrlFields(to->endpoint().toString(),
@@ -242,7 +268,7 @@ private:
 
         const auto firstPeerMessageBus = m_peers[0]->serverModule()->ec2Connection()->messageBus();
         int distance = std::numeric_limits<int>::max();
-        while (distance > m_peers.size())
+        while (distance > static_cast<int>(m_peers.size()))
         {
             distance = firstPeerMessageBus->distanceToPeer(
                 m_peers[m_peers.size() - 1]->commonModule()->moduleGUID());
@@ -299,11 +325,25 @@ private:
             }
         }
 
-        NX_TEST_API_POST(m_peers[0].get(), path, "", nullptr,
-            nx::network::http::StatusCode::ok, "admin", "admin", &responseBuffer);
-        QnRestResult installResponse;
-        QJson::deserialize(responseBuffer, &installResponse);
-        ASSERT_EQ(expectedRestResult, installResponse.error);
+        while (true)
+        {
+            NX_TEST_API_POST(m_peers[0].get(), path, QString(), nullptr,
+                nx::network::http::StatusCode::ok, "admin", "admin", &responseBuffer);
+
+            QnRestResult installResponse;
+            QJson::deserialize(responseBuffer, &installResponse);
+            if (expectedRestResult != installResponse.error)
+            {
+                NX_DEBUG(
+                    this, "Waiting for  install request to return expected result:",
+                    expectedRestResult);
+                std::this_thread::sleep_for(std::chrono::milliseconds(200));
+            }
+            else
+            {
+                break;
+            }
+        }
     }
 
     void issueFinishUpdateRequestAndAssertResponse(bool ignorePendingPeers,
@@ -314,7 +354,7 @@ private:
             path += "?ignorePendingPeers";
 
         QByteArray responseBuffer;
-        NX_TEST_API_POST(m_peers[0].get(), path, "", nullptr,
+        NX_TEST_API_POST(m_peers[0].get(), path, QString(), nullptr,
             nx::network::http::StatusCode::ok, "admin", "admin", &responseBuffer);
 
         QnRestResult installResponse;
@@ -333,15 +373,16 @@ private:
     update::Package preparePackage(const QString& dataDir)
     {
         update::Package result;
-        result.arch = QnAppInfo::applicationArch();
+
+        const auto& osInfo = nx::utils::OsInfo::current();
+
         result.component = "server";
 
         QString updateFileFullPath;
         result.file = createUpdateZip(dataDir, &result.md5, &result.size, &updateFileFullPath);
-        result.platform = QnAppInfo::applicationPlatform();
         result.url = serveUpdateFile(updateFileFullPath);
-        result.variant = QnAppInfo::applicationPlatformModification();
-        result.variantVersion = QnAppInfo::currentSystemInformation().runtimeOsVersion();
+        result.platform = osInfo.platform;
+        result.variants.append({osInfo.variant, osInfo.variantVersion});
 
         return result;
     }
@@ -358,27 +399,23 @@ private:
     {
         const auto updateFilesPath = dataDir + kUpdateFilesPathPostfix;
         QDir().mkpath(updateFilesPath);
-        const QByteArray updateJsonContent =
-            QString(
-R"JSON({
-    "version" : "4.0.0.1",
-    "platform" : "%1",
-    "arch" : "%2",
-    "modification" : "%3",
-    "cloudHost" : "%4",
-    "executable" : "install"
-}
-)JSON"
-            ).arg(QnAppInfo::applicationPlatform())
-                .arg(QnAppInfo::applicationArch())
-                .arg(QnAppInfo::applicationPlatformModification())
-                .arg(nx::network::SocketGlobals::cloud().cloudHost()).toLocal8Bit();
+
+        const auto& osInfo = nx::utils::OsInfo::current();
+
+        update::PackageInformation packageInfo;
+        packageInfo.version = "4.0.0.1";
+        packageInfo.component = "server";
+        packageInfo.cloudHost = nx::network::SocketGlobals::cloud().cloudHost();
+        packageInfo.platform = osInfo.platform;
+        packageInfo.variants.append({osInfo.variant, osInfo.variantVersion});
+        packageInfo.installScript = "install";
+        const QByteArray& packageInfoJsonContent = QJson::serialized(packageInfo);
 
         const QString zipFileName = "update.zip";
         const QString zipFilePath = updateFilesPath + zipFileName;
 
         QList<ZipContext> zipContextList = {
-            ZipContext("update.json", updateJsonContent),
+            ZipContext("package.json", packageInfoJsonContent),
             ZipContext("install", "hello")
         };
 
@@ -814,6 +851,16 @@ TEST_F(FtUpdates, finishUpdate_success_installedUpdateInformationSetCorrectly)
     thenInstalledtUpdateInformationShouldBeRetrievable(/*shouldBeEmpty*/ false);
     thenTargetUpdateInformationShouldBeRetrievable(/*shouldBeEmpty*/ true, QString());
     thenTargetUpdateInformationShouldBeRetrievable(/*shouldBeEmpty*/ true, "target");
+}
+
+TEST_F(FtUpdates, PersistentUpdateStorage_Properties_GetSet)
+{
+    givenConnectedPeers(1);
+    whenPersistentUpdateStorageDataSet(update::kTargetKey);
+    whenPersistentUpdateStorageDataSet(update::kInstalledKey);
+
+    thenPersistentUpdateStorageDataShouldBeRetrievalble(update::kTargetKey);
+    thenPersistentUpdateStorageDataShouldBeRetrievalble(update::kInstalledKey);
 }
 
 } // namespace nx::vms::server::test

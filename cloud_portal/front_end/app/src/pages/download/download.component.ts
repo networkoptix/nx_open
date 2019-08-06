@@ -7,6 +7,7 @@ import { Title }                             from '@angular/platform-browser';
 import { DOCUMENT, Location, TitleCasePipe } from '@angular/common';
 import { NgbTabChangeEvent, NgbTabset }      from '@ng-bootstrap/ng-bootstrap';
 import { DeviceDetectorService }             from 'ngx-device-detector';
+import { NxConfigService }                   from '../../services/nx-config';
 
 @Component({
     selector   : 'download-component',
@@ -23,11 +24,14 @@ export class DownloadComponent implements OnInit, OnDestroy {
     private routeData: any;
     private canViewDownloads: boolean;
 
+    config: any;
     installers: any;
     downloads: any;
     downloadsData: any;
     platformMatch: {};
     canSeeHistory: boolean;
+    tabsVisible: boolean;
+    foundPlatform: boolean;
 
     location: Location;
 
@@ -36,8 +40,12 @@ export class DownloadComponent implements OnInit, OnDestroy {
 
     private setupDefaults() {
 
+        this.config = this.configService.getConfig();
+
+        this.foundPlatform = false;
         this.canViewDownloads = false;
-        this.downloads = this.configService.config.downloads;
+        this.tabsVisible = false;
+        this.downloads = this.config.downloads;
 
         this.downloadsData = {
             version   : '',
@@ -57,11 +65,11 @@ export class DownloadComponent implements OnInit, OnDestroy {
 
     constructor(@Inject('languageService') private language: any,
                 @Inject('cloudApiService') private cloudApi: any,
-                @Inject('configService') private configService: any,
                 @Inject('account') private account: any,
                 @Inject('authorizationCheckService') private authorizationService: any,
                 @Inject('locationProxyService') private locationProxy: any,
                 @Inject(DOCUMENT) private document: any,
+                private configService: NxConfigService,
                 private deviceService: DeviceDetectorService,
                 private route: ActivatedRoute,
                 private router: Router,
@@ -123,54 +131,56 @@ export class DownloadComponent implements OnInit, OnDestroy {
                     break;
                 }
             }
-
-            let foundPlatform = false;
-            this.downloads.groups.forEach(platform => {
-                foundPlatform = ((platform.os || platform.name) === this.activeOs) || foundPlatform;
-            });
-
-            if (this.platform && !foundPlatform) {
-                this.location.go('404');
-
-                return;
-            }
-
-            if (!foundPlatform) {
-                this.downloads.groups[ 0 ].active = true;
-            }
         });
 
         this.cloudApi
             .getDownloads()
             .then(data => {
                 this.downloadsData = data.data;
+
+                this.downloads.groups = this.downloads.groups.filter(platform => {
+                    return !this.downloadsData.platforms.every(avail => {
+                        return avail.name !== platform.name;
+                    });
+                });
+
+                this.foundPlatform = this.downloads.groups.some(platform => {
+                    return ((platform.os || platform.name) === this.activeOs);
+                });
+
+                if (!this.foundPlatform) {
+                    this.downloads.groups[0].active = true;
+                    this.platform = this.downloads.groups[0].os;
+                }
+
+                this.titleService.setTitle(this.language.lang.pageTitles.downloadPlatform + this.platform);
+
+                setTimeout(() => {
+                    this.tabsVisible = true;
+                    if (this.tabs) {
+                        this.tabs.select(this.foundPlatform ? this.activeOs : this.downloads.groups[0].name);
+                    }
+                });
+
                 this.getDownloadsInfo();
             });
-
-        this.titleService.setTitle(this.language.lang.pageTitles.downloadPlatform + this.platform);
-
-        setTimeout(() => {
-            if (this.tabs) {
-                this.tabs.select(this.activeOs);
-            }
-        });
     }
 
     ngOnInit(): void {
         this.account
             .get()
             .then(result => {
-                this.canSeeHistory = (this.configService.config.publicReleases ||
+                this.canSeeHistory = (this.config.publicReleases ||
                     result.is_superuser ||
-                    result.permissions.indexOf(this.configService.config.permissions.canViewRelease) > -1);
+                    result.permissions.indexOf(this.config.permissions.canViewRelease) > -1);
             });
 
-        if (!this.configService.config.publicDownloads) {
+        if (!this.config.publicDownloads) {
             this.authorizationService
                 .requireLogin()
                 .then(result => {
                     if (!result) {
-                        this.document.location.href = this.configService.config.redirectUnauthorised;
+                        this.document.location.href = this.config.redirectUnauthorised;
                         return;
                     }
 

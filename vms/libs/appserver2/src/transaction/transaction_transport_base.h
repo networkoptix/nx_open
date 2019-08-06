@@ -9,7 +9,6 @@
 #include <QSet>
 
 #include <nx/utils/log/log.h>
-#include <nx/utils/object_destruction_flag.h>
 #include <nx/utils/uuid.h>
 #include <nx/network/abstract_socket.h>
 #include <nx/network/aio/basic_pollable.h>
@@ -122,6 +121,14 @@ public:
 
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
     virtual void stopWhileInAioThread() override;
+
+    /**
+     * @param value If true then it is expected that transactionProcessed() is called after
+     * processing each transactions received by this object.
+     * New transactions receival is suspended while there are >= 16 received transactions pending.
+     * true by default.
+     */
+    void setReceivedTransactionsQueueControlEnabled(bool value);
 
     void setLocalPeerProtocolVersion(int version);
 
@@ -279,7 +286,7 @@ private:
     QByteArray m_extraData;
     CredentialsSource m_credentialsSource;
     QElapsedTimer m_lastReceiveTimer;
-    int m_postedTranCount;
+    int m_postedTranCount = 0;
     bool m_asyncReadScheduled;
     qint64 m_remoteIdentityTime;
     nx::network::http::HttpStreamReader m_httpStreamReader;
@@ -309,11 +316,11 @@ private:
     int m_keepAliveProbeCount;
     std::chrono::milliseconds m_idleConnectionTimeout;
     QAuthenticator m_remotePeerCredentials;
-    nx::utils::ObjectDestructionFlag m_connectionFreedFlag;
     std::unique_ptr<nx::network::aio::Timer> m_timer;
     bool m_remotePeerSupportsKeepAlive;
     bool m_isKeepAliveEnabled;
     int m_remotePeerEcProtoVersion;
+    bool m_receivedTransactionsQueueControlEnabled = true;
     int m_localPeerProtocolVersion;
     std::multimap<QString, QString> m_httpQueryParams;
 

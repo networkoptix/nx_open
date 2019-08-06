@@ -11,6 +11,7 @@
 
 #include <client_core/client_core_module.h>
 
+#include <nx/network/cloud/tunnel/connector_factory.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/mobile_client_camera_factory.h>
 #include <api/session_manager.h>
@@ -42,8 +43,6 @@
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/cloud/tunnel/outgoing_tunnel_pool.h>
 #include <nx/network/socket_global.h>
-#include <nx/mobile_client/settings/migration_helper.h>
-#include <nx/mobile_client/settings/settings_migration.h>
 #include <nx/client/mobile/software_trigger/event_rules_watcher.h>
 #include <nx/client/core/watchers/known_server_connections.h>
 #include <nx/client/core/watchers/server_time_watcher.h>
@@ -59,9 +58,6 @@
 #include <plugins/resource/desktop_camera/desktop_resource_base.h>
 #include <client/client_resource_processor.h>
 #include <utils/media/voice_spectrum_analyzer.h>
-
-
-using namespace nx::mobile_client;
 
 static const QString kQmlRoot = "qrc:///qml";
 
@@ -92,12 +88,16 @@ QnMobileClientModule::QnMobileClientModule(
 
     /* Init singletons. */
     const auto settings = new QnMobileClientSettings();
-    settings::migrateSettings(); //< This must be done before QnClientCoreModule construction!
 
     m_clientCoreModule.reset(new QnClientCoreModule());
     auto commonModule = m_clientCoreModule->commonModule();
     commonModule->setModuleGUID(QnUuid::createUuid());
     nx::network::SocketGlobals::cloud().outgoingTunnelPool().assignOwnPeerId("mc", commonModule->moduleGUID());
+
+    // Work around crash on Android.
+    nx::network::cloud::ConnectorFactory::setEnabledCloudConnectMask(
+        nx::network::cloud::ConnectorFactory::getEnabledCloudConnectMask() &
+        (~(int)nx::network::cloud::ConnectType::udpHp));
 
     // TODO: #mshevchenko Remove when client_core_module is created.
     commonModule->store(translationManager);
@@ -154,7 +154,6 @@ QnMobileClientModule::QnMobileClientModule(
     commonModule->instance<QnSystemsFinder>();
     commonModule->store(new QnSystemsWeightsManager());
 
-    commonModule->store(new settings::SessionsMigrationHelper());
     commonModule->store(new QnVoiceSpectrumAnalyzer());
     commonModule->store(new nx::vms::client::core::ServerTimeWatcher());
 

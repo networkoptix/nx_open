@@ -38,12 +38,12 @@ public:
         m_asyncCaller.pleaseStopSync();
     }
 
-    virtual bool initialize(const Settings& /*settings*/) override
+    virtual bool initialize(const nx::analytics::db::Settings& /*settings*/) override
     {
         return true;
     }
 
-    virtual void save(nx::common::metadata::ConstDetectionMetadataPacketPtr /*packet*/) override
+    virtual void save(nx::common::metadata::ConstObjectMetadataPacketPtr /*packet*/) override
     {
     }
 
@@ -56,11 +56,6 @@ public:
             {
                 completionHandler(ResultCode::error, nullptr);
             });
-    }
-
-    virtual void closeCursor(const std::shared_ptr<AbstractCursor>& /*cursor*/) override
-    {
-
     }
 
     virtual void lookup(
@@ -95,8 +90,13 @@ public:
     }
 
     virtual void flush(StoreCompletionHandler /*completionHandler*/) override
-    { 
+    {
         FAIL();
+    }
+
+    virtual bool readMinimumEventTimestamp(std::chrono::milliseconds* outResult) override
+    {
+        return false;
     }
 
 private:
@@ -139,7 +139,7 @@ protected:
 
         m_filter = nx::analytics::db::test::generateRandomFilter();
 
-        m_mediaserverClient->ec2AnalyticsLookupDetectedObjects(
+        m_mediaserverClient->ec2AnalyticsLookupObjectTracks(
             m_filter,
             std::bind(&AnalyticsDbHttpApi::saveLookupResult, this, _1, _2));
     }
@@ -214,7 +214,7 @@ private:
     }
 };
 
-TEST_F(AnalyticsDbHttpApi, analyticsLookupDetectedObjects_correctly_returns_data)
+TEST_F(AnalyticsDbHttpApi, analyticsLookupObjectTracks_correctly_returns_data)
 {
     whenIssueLookup();
 

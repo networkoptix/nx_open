@@ -166,6 +166,8 @@ void QnFfmpegVideoDecoder::determineOptimalThreadType(const QnConstCompressedVid
     else
         m_context->thread_count = 1; //< Turn off multi thread decoding.
 
+    NX_DEBUG(this, "Initialize video decoder, codec id: %1, thread count: %2",
+        m_context->codec_id, m_context->thread_count);
 
     if (m_forceSliceDecoding == -1 && data && data->data() && m_context->codec_id == AV_CODEC_ID_H264)
     {
@@ -576,14 +578,6 @@ bool QnFfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSh
 
     if (got_picture)
     {
-        AVPixelFormat correctedPixelFormat = GetPixelFormat();
-        if (!outFrame->isExternalData() &&
-            (outFrame->width != m_context->width || outFrame->height != m_context->height ||
-            outFrame->format != correctedPixelFormat || outFrame->linesize[0] != copyFromFrame->linesize[0]))
-        {
-            outFrame->reallocate(m_context->width, m_context->height, correctedPixelFormat, copyFromFrame->linesize[0]);
-        }
-
 #if 0
         // todo: ffmpeg-test . implement me
         if (m_frame->interlaced_frame && m_context->thread_count > 1)
@@ -606,10 +600,9 @@ bool QnFfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSh
         }
         else
 #endif
-
         if (!outFrame->isExternalData())
         {
-            outFrame->copyDataFrom(copyFromFrame);
+            outFrame->copyDataOnlyFrom(copyFromFrame);
             // pkt_dts and pkt_pts are mixed up after decoding in ffmpeg. So, we have to use dts here instead of pts
             outFrame->pkt_dts = m_frame->pkt_dts != AV_NOPTS_VALUE ? m_frame->pkt_dts : m_frame->pkt_pts;
         }
@@ -642,7 +635,7 @@ bool QnFfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSh
             outFrame->linesize[2] = copyFromFrame->linesize[2];
             outFrame->pkt_dts = copyFromFrame->pkt_dts;
         }
-        outFrame->format = correctedPixelFormat;
+        outFrame->format = GetPixelFormat();
         outFrame->fillRightEdge();
         outFrame->sample_aspect_ratio = getSampleAspectRatio();
         return m_context->pix_fmt != AV_PIX_FMT_NONE;

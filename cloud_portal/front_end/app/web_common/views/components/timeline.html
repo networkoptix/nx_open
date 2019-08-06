@@ -16,12 +16,12 @@
             </div>
             <span ng-if="emptyArchive && !loading" class="no-archive-message">
                 No Archive
-            </span>  
+            </span>
         </div>
         <div class="text-right float-right d-none d-md-block" ng-class="{'no-volume':disableVolume, 'shadows-off': emptyArchive}">
             <span class="live-button inline-block float-left "
               ng-class="{ 'active' :positionProvider.liveMode && positionProvider.playing && canPlayLive,disabled:!canPlayLive}"
-              ng-click="goToLive()">
+              ng-click="goToLive(true)">
                 <div class="live-glyph"></div>LIVE
             </span>
             <span ng-if="!disableVolume" class="webclient-button volume inline-block float-right" ng-click="toggleActive()">
@@ -38,11 +38,11 @@
             </span>
             <div class="inline-block zoom-level float-right" ng-if="canViewArchive">
                 <span class="webclient-button glyphicon-pm zoomInButton"
-                      ng-class="{disabled:scaleManager.disableZoomIn || emptyArchive}">
+                      ng-class="{'disabled' : scaleManager.disableZoomIn || emptyArchive}">
                     <span class="glyphicon glyphicon-plus"></span>
                 </span>
                 <span class="webclient-button glyphicon-pm zoomOutButton"
-                      ng-class="{disabled:scaleManager.disableZoomOut || emptyArchive}">
+                      ng-class="{'disabled' : scaleManager.disableZoomOut || emptyArchive}">
                     <span class="glyphicon glyphicon-minus"></span>
                 </span>
             </div>
@@ -54,7 +54,7 @@
         <div class="text-right float-right" ng-class="{'no-volume':disableVolume}">
             <span class="live-button inline-block float-left "
                 ng-class="{active:positionProvider.liveMode && canPlayLive,disabled:!canPlayLive}"
-                  ng-click="goToLive()">
+                  ng-click="goToLive(true)">
                 <div class="live-glyph"></div>LIVE
             </span>
             <span ng-if="!disableVolume" class="webclient-button volume inline-block float-right" ng-click="toggleActive()">
@@ -71,11 +71,11 @@
             </span>
         </div>
         <span class="webclient-button glyphicon-pm zoomInButton inline-block" ng-if="canViewArchive"
-            ng-class="{disabled:scaleManager.disableZoomIn || emptyArchive}">
+            ng-class="{'disabled' : scaleManager.disableZoomIn || emptyArchive}">
             <span class="glyphicon glyphicon-plus"></span>
         </span>
         <span class="webclient-button glyphicon-pm zoomOutButton inline-block" ng-if="canViewArchive"
-            ng-class="{disabled:scaleManager.disableZoomOut || emptyArchive}">
+            ng-class="{'disabled' : disableZoomOut || emptyArchive}">
             <span class="glyphicon glyphicon-minus"></span>
         </span>
     </div>

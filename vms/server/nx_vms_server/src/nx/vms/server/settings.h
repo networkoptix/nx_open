@@ -1,13 +1,54 @@
 #pragma once
 
+#include <QtCore/QStandardPaths>
+
 #include <nx/utils/settings.h>
 #include <network/multicodec_rtp_reader.h>
+#include <decoders/video/abstract_video_decoder.h>
 #include <network/system_helpers.h>
 #include <utils/common/app_info.h>
 #include <utils/common/util.h>
 
-namespace nx {
-namespace vms::server {
+
+// Type specific parsers
+namespace nx::utils {
+
+template<>
+inline bool nx::utils::Settings::Option<MultiThreadDecodePolicy>::fromQVariant(
+    const QVariant& value, MultiThreadDecodePolicy* result)
+{
+    if (!value.isValid())
+        return false;
+
+    QString valueString = value.toString();
+    if (valueString == "auto")
+        *result = MultiThreadDecodePolicy::autoDetect;
+    else if (valueString == "disabled")
+        *result = MultiThreadDecodePolicy::disabled;
+    else if (valueString == "enabled")
+        *result = MultiThreadDecodePolicy::enabled;
+    else
+        return false;
+    return true;
+}
+
+template<>
+inline QVariant Settings::Option<MultiThreadDecodePolicy>::toQVariant(
+    const MultiThreadDecodePolicy& value)
+{
+    QVariant result;
+    if (value == MultiThreadDecodePolicy::autoDetect)
+        result.setValue(QString("auto"));
+    if (value == MultiThreadDecodePolicy::disabled)
+        result.setValue(QString("disabled"));
+    if (value == MultiThreadDecodePolicy::enabled)
+        result.setValue(QString("enabled"));
+    return result;
+}
+
+}
+
+namespace nx::vms::server {
 
 class Settings: public nx::utils::Settings
 {
@@ -119,8 +160,10 @@ public:
         "0 means no limit"
     };
     Option<bool> allowSslConnections{this, "allowSslConnections", true,
-        "Either enable or not receive  ssl connection on the same TCP port. It's enabled by "
-        "default."
+        "Recommended TCP transport to the media server. Default value is true."
+        "If change this parameter to the false, other media servers use HTTP "
+        "instead of HTTPS when open connection to the this server. "
+        "It allows to save CPU for the very slow ARM devices."
     };
     Option<bool> createFullCrashDump{this, "createFullCrashDump", false,
         "Configures the size of crash dumps:\n"
@@ -256,12 +299,18 @@ public:
     Option<bool> noInitStoragesOnStartup{this, "noInitStoragesOnStartup", false, ""};
     Option<bool> noPlugins{this, "noPlugins", false, "Turn off all plugins"};
     Option<QString> ipVersion{this, "ipVersion", "", ""};
-    Option<QString> rtspTransport{this, "rtspTransport", "tcp", ""};
+    Option<QString> rtspTransport{this, "rtspTransport", "automatic", ""};
     Option<bool> absoluteRtcpTimestamps{this, "absoluteRtcpTimestamps",
         true,
         "Enable absolute RTCP timestamps for archive data, RTCP NTP timestamps will corresond to "
         "media data absolute timestamps"
     };
+    Option<MultiThreadDecodePolicy> multiThreadDecodePolicy{this, "multiThreadDecodePolicy",
+        MultiThreadDecodePolicy::disabled,
+        "Multiple thread decoding policy {auto, disabled, enabled}, used for RTSP streaming with "
+        "transcoding and motion estimation"
+    };
+
     Option<bool> ignoreRootTool{this, "ignoreRootTool", false,
         "Ignore root tool executable presense (if set to true, media server will try to execute all "
         "commands that require root access directly)"};
@@ -369,6 +418,10 @@ public:
         }
     };
 
+    Option<int> retryCountToMakeCameraOffline{ this, "retryCountToMakeCameraOffline", 3,
+        "How many discovery loops should pass before mark missed camera offline"
+        };
+
 #if defined(__arm__)
     static constexpr qint64 kDefaultMinStorageSpace = 100 * 1024 * 1024; //< 100MB
     static constexpr unsigned int kDefaultHlsMaxChunkBufferSize = 2 * 1024 * 1024;
@@ -383,5 +436,4 @@ public:
     static constexpr std::chrono::seconds kDefaultVacuumIntervalSecacuumIntervalSec{3600 * 24};
 };
 
-} // namespace vms::server
-} // namespace nx
+} // namespace nx::vms::server

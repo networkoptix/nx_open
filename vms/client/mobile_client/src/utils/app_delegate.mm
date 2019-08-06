@@ -1,5 +1,6 @@
 #import <UiKit/UiKit.h>
 
+#import <QtCore/QDebug>
 #import <QtCore/QUrl>
 #import <QtGui/QDesktopServices>
 

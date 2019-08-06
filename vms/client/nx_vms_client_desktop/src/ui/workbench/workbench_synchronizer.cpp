@@ -1,5 +1,7 @@
 #include "workbench_synchronizer.h"
-#include <cassert>
+
+#include <QtCore/QScopedValueRollback>
+
 #include <utils/common/warnings.h>
 
 #include <core/resource/user_resource.h>

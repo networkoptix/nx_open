@@ -4,6 +4,35 @@ set(depends
     testcamera
 )
 
+set(deb_dependencies_list
+    "zlib1g (>= 1:1.1.4)"
+    "debconf (>= 0.5) | debconf-2.0"
+    "python"
+    "psmisc"
+    "systemd"
+    "cifs-utils"
+    "net-tools"
+    "libcap2-bin"
+    "libldap-2.4-2"
+)
+
+if(withDesktopClient)
+    # For platforms with Desktop Clients, Server uses the same Qt as Client. Because of this, on
+    # such platforms Server has these "strange" dependencies:
+    list(APPEND deb_dependencies_list
+        "libxrender1"
+        "libgl1-mesa-glx"
+        "libxfixes3"
+        "libfontconfig1"
+        "libsm6"
+        "libice6"
+        "libaudio2"
+        "libogg0"
+    )
+endif()
+
+list(JOIN deb_dependencies_list ", " deb_dependencies)
+
 if(withRootTool)
     list(APPEND depends root_tool)
 endif()
@@ -13,6 +42,17 @@ nx_configure_directory(
     ${CMAKE_CURRENT_BINARY_DIR}
     @ONLY
     OUTPUT_FILES_VARIABLE configured_files)
+
+set(variants "{ \"name\": \"ubuntu\", \"minimumVersion\": \"16.04\" }")
+if(targetDevice STREQUAL "linux_arm32")
+    string(PREPEND variants "{ \"name\": \"debian\", \"minimumVersion\": \"9\" }, ")
+    string(APPEND variants ", { \"name\": \"raspbian\", \"minimumVersion\": \"9\" }")
+endif()
+
+nx_generate_package_json(${CMAKE_CURRENT_BINARY_DIR}/package.json
+    VARIANTS ${variants}
+    INSTALL_SCRIPT install.sh)
+list(APPEND configured_files ${CMAKE_CURRENT_BINARY_DIR}/package.json)
 
 nx_configure_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/build_distribution.conf.in

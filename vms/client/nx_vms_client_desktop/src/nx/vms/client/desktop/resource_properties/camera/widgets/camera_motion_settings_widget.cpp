@@ -3,6 +3,7 @@
 #include "../redux/camera_settings_dialog_state.h"
 #include "../redux/camera_settings_dialog_store.h"
 
+#include <QtQml/QQmlContext>
 #include <QtQuick/QQuickItem>
 #include <QtQuick/QQuickView>
 #include <QtQuickWidgets/QQuickWidget>
@@ -106,10 +107,11 @@ CameraMotionSettingsWidget::CameraMotionSettingsWidget(
             motionItem->setProperty("cameraMotionHelper", QVariant::fromValue(m_motionHelper.data()));
             motionItem->setProperty("currentSensitivity", m_sensitivityButtons->checkedId());
             motionItem->setProperty("sensitivityColors", QVariant::fromValue(m_sensitivityColors));
-            motionItem->setProperty("maxTextureSize",
-                QnGlFunctions::estimatedInteger(GL_MAX_TEXTURE_SIZE));
             motionItem->setProperty("visible", QVariant::fromValue(false));
     });
+
+    m_motionView->rootContext()->setContextProperty("maxTextureSize",
+        QnGlFunctions::estimatedInteger(GL_MAX_TEXTURE_SIZE));
 
     m_motionView->setSource(lit("Nx/Motion/MotionSettingsItem.qml"));
     m_motionView->setResizeMode(QQuickView::SizeRootObjectToView);
@@ -142,7 +144,12 @@ void CameraMotionSettingsWidget::loadState(const CameraSettingsDialogState& stat
     m_cameraId = state.isSingleCamera() ? state.singleCameraProperties.id : QString();
     m_motionHelper->setMotionRegionList(state.singleCameraSettings.motionRegionList());
 
-    ui->motionDetectionCheckBox->setChecked(state.hasMotion());
+    const bool motionStreamEnabled = state.isMotionDetectionStreamEnabled();
+    ui->motionDetectionCheckBox->setChecked(state.isMotionDetectionEnabled());
+    ui->motionDetectionCheckBox->setEnabled(motionStreamEnabled);
+    ui->motionDetectionCheckBox->setToolTip(motionStreamEnabled
+        ? QString()
+        : tr("Motion detection stream is disabled"));
 
     ::setReadOnly(ui->motionDetectionCheckBox, state.readOnly);
     ::setReadOnly(ui->resetMotionRegionsButton, state.readOnly);
@@ -161,7 +168,7 @@ void CameraMotionSettingsWidget::loadState(const CameraSettingsDialogState& stat
 
 void CameraMotionSettingsWidget::loadAlerts(const CameraSettingsDialogState& state)
 {
-    ui->recordingAlertBar->setText(!state.hasMotion() || state.recording.enabled()
+    ui->recordingAlertBar->setText(!state.isMotionDetectionEnabled() || state.recording.enabled()
         ? QString()
         : tr("Motion detection will work only when camera is being viewed. "
             "Enable recording to make it work all the time."));

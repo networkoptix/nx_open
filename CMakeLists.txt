@@ -1,14 +1,17 @@
 cmake_minimum_required(VERSION 3.12.0 FATAL_ERROR)
 
+include(cmake/utils.cmake)
 include(cmake/option.cmake)
 include(cmake/default_target.cmake)
 
 set(customization "default" CACHE STRING "Product customization")
-nx_option(beta "Is this build is beta build" ON)
+nx_option(beta "Whether this build is a beta build" ON)
 set(buildNumber "0" CACHE STRING "Build number")
+set(eulaVersionOverride "" CACHE STRING "Overriden EULA version")
 
-# Remember to reset the in-version protocol number when updating the project version
-set(releaseVersion 4.0.0)
+# Remember to reset the in-version protocol number in (cmake/vms_protocol_version.cmake) when
+# updating the project version.
+set(releaseVersion 4.1.0)
 
 nx_option(developerBuild
     "Disable this option for production builds (Jenkins)"
@@ -36,6 +39,12 @@ if(targetDevice STREQUAL "none")
     set(targetDevice "")
 endif()
 
+if(beta)
+    set(beta_bool "true")
+else()
+    set(beta_bool "false")
+endif()
+
 if(NOT CMAKE_TOOLCHAIN_FILE AND targetDevice)
     set(CMAKE_TOOLCHAIN_FILE ${CMAKE_CURRENT_LIST_DIR}/cmake/toolchain/${targetDevice}.cmake)
     if(NOT EXISTS ${CMAKE_TOOLCHAIN_FILE})
@@ -51,15 +60,17 @@ nx_rdep_configure()
 include(cmake/vcs_helpers.cmake)
 nx_vcs_changeset(${CMAKE_CURRENT_LIST_DIR} changeSet)
 if(NOT changeSet AND NOT developerBuild)
-    message(FATAL_ERROR "Hg changeset cannot be calculated.")
+    message(FATAL_ERROR "VCS changeset cannot be calculated.")
 endif()
 
 nx_vcs_branch(${CMAKE_CURRENT_LIST_DIR} branch)
 if(NOT branch AND NOT developerBuild)
-    message(FATAL_ERROR "Hg branch cannot be calculated.")
+    message(FATAL_ERROR "VCS branch cannot be calculated.")
 endif()
 
 include(cmake/dependencies.cmake)
+# Load generated dependencies.cmake, containing packages path variables.
+load_generated_dependencies_file()
 
 project(vms VERSION ${releaseVersion})
 
@@ -70,7 +81,7 @@ endif()
 set(releaseVersion.short ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR})
 set(releaseVersion.full ${releaseVersion}.${buildNumber})
 
-set(mobileClientVersion 18.5)
+set(mobileClientVersion 19.2)
 set(mobileClientVersion.full ${mobileClientVersion}.${buildNumber})
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -86,9 +97,10 @@ include(CMakeDependentOption)
 include(ExternalProject)
 
 nx_option(codeSigning "Enable code signing" OFF)
+nx_option(notarization "Enable notarization" OFF)
 
 include(target_detection)
-include(utils)
+nx_init_known_files_list()
 include(find_sources)
 include(moc_utils)
 include(qrc_utils)
@@ -96,11 +108,15 @@ include(cpp_utils)
 include(precompiled_header)
 include(strip_target)
 include(vms_protocol_version)
-
-set(customization_dir "${PROJECT_SOURCE_DIR}/customization/${customization}")
+include(customization_package)
 
 include(customization/default-values.cmake)
 include(${customization_dir}/customization.cmake)
+
+if(useMetaVersion)
+    set(metaVersion R12)
+endif()
+
 include(properties)
 include(cloud_host)
 include(vms_parts)
@@ -181,7 +197,7 @@ endif()
 
 set(QML_IMPORT_PATH
     "${QT_DIR}/qml"
-    "${CMAKE_CURRENT_LIST_DIR}/vms/client/nx_vms_client_desktop/static-resources/qml"
+    "${CMAKE_CURRENT_LIST_DIR}/vms/client/nx_vms_client_desktop/qml"
     "${CMAKE_CURRENT_LIST_DIR}/vms/client/mobile_client/static-resources/qml"
     "${CMAKE_CURRENT_LIST_DIR}/nxtool/static-resources/src/qml"
     CACHE STRING "Extra QML import paths")
@@ -201,7 +217,21 @@ add_subdirectory(dependencies)
 
 if (withMediaServer OR withTestCamera OR withTrayTool OR withDesktopClient OR withMobileClient OR withClouds)
     add_subdirectory(libs)
+
+    if(withClouds AND LINUX)
+        add_subdirectory(cloud_portal)
+    endif()
+
     add_subdirectory(cloud)
+
+    if(withClouds)
+        add_custom_target(cloud DEPENDS cloud-backend)
+
+        if(LINUX)
+            add_custom_target(cloud-frontend DEPENDS cloud_portal)
+            add_dependencies(cloud cloud-frontend)
+        endif()
+    endif()
 endif()
 
 #add_subdirectory(_axis_controller)
@@ -215,22 +245,6 @@ if(withTests)
 endif()
 
 include(fix_qt_vars)
-
-if(beta)
-    set(beta_bool "true")
-else()
-    set(beta_bool "false")
-endif()
-
-if(withClouds)
-    add_custom_target(cloud DEPENDS cloud-backend)
-
-    if(LINUX)
-        add_subdirectory(cloud_portal)
-        add_custom_target(cloud-frontend DEPENDS cloud_portal)
-        add_dependencies(cloud cloud-frontend)
-    endif()
-endif()
 
 if(withDocumentation)
     add_subdirectory(doc)

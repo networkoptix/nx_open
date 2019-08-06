@@ -329,12 +329,8 @@ FboPtr AndroidVideoDecoderPrivate::renderFrameToFbo()
     if (blendEnabled)
         glEnable(GL_BLEND);
 
-    if (threadGlCtx)
-    {
-        // We used decoder thread to render. Flush everything to the texture.
-        glFlush();
-        glFinish();
-    }
+    glFlush();
+    glFinish();
 
     return fbo;
 }

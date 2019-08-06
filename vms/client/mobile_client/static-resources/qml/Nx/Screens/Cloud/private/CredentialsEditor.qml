@@ -138,7 +138,8 @@ Item
             LinkButton
             {
                 id: learnMoreLink
-                text: qsTr("Learn more about %1").arg(applicationInfo.cloudName())
+                text: qsTr("Learn more about %1", "%1 is the short cloud name (like 'Cloud')")
+                    .arg(applicationInfo.cloudName())
                 width: parent.width
                 onClicked: Qt.openUrlExternally(cloudUrlHelper.aboutUrl())
             }
@@ -197,7 +198,7 @@ Item
             return
 
         d.connecting = false
-        if (error == QnCloudStatusWatcher.InvalidUser)
+        if (error == QnCloudStatusWatcher.InvalidEmail)
         {
             d.invalidUser = true
             showAccountWarning(qsTr("Account not found"))
@@ -218,7 +219,8 @@ Item
         }
         else
         {
-            showBottomWarning(qsTr("Cannot connect to %1").arg(applicationInfo.cloudName()))
+            showBottomWarning(qsTr("Cannot connect to %1", "%1 is the short cloud name (like 'Cloud')")
+                .arg(applicationInfo.cloudName()))
         }
     }
 

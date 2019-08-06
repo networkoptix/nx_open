@@ -24,18 +24,9 @@ struct PluginsIniConfig: public nx::kit::IniConfig
         "this setting enables the plugins that are disabled by default, and the\n"
         "disabledNxPlugins setting disables the plugins that are enabled by default.");
 
-    NX_INI_STRING("", analyticsEngineSettingsPath,
-        "Path (absolute or relative to .ini dir) to {plugin_name}_engine_settings.json: array\n"
-        "of objects with name and value strings. Settings are passed to the Engine from the file\n"
-        "only if this value is not empty and the file is present in the filesystem. Otherwise\n"
-        "the setttings from the database are used.");
-
-    NX_INI_STRING("", analyticsDeviceAgentSettingsPath,
-        "Path (absolute or relative to .ini dir) to\n"
-        "{plugin_name}_device_{device_unique_id}_settings.json: array of objects with name and\n"
-        "value strings. Settings are passed to the DeviceAgent from the file only if this value\n"
-        "is not empty and the file is present in the filesystem. Otherwise the settings from the\n"
-        "database are used.");
+    NX_INI_FLAG(0, disablePluginLinkedDllLookup,
+        "In Windows, for Plugins residing in a dedicated plugin folder, do not set DLL search\n"
+        "path to that folder via SetDllDirectoryW().");
 
     NX_INI_STRING("", analyticsManifestSubstitutePath,
         "Path (absolute or relative to .ini dir) to dir with manifests that will be used instead\n"
@@ -46,13 +37,41 @@ struct PluginsIniConfig: public nx::kit::IniConfig
         "Path (absolute or relative to .ini dir) to existing dir for saving analytics plugin\n"
         "manifests.");
 
+    NX_INI_STRING("", analyticsSettingsSubstitutePath,
+        "Path (absolute or relative to .ini dir) to dir with settings for Engines and\n"
+        "DeviceAgents, that will be used instead of the values of settings from the Server\n"
+        "database, in case the properly named file is present in this directory. Such files\n"
+        "should be JSON with an array of objects with setting name and value strings.\n"
+        "File name format for Engine (all Engines of the plugin match):\n"
+        "    {plugin_name}_engine_settings.json\n"
+        "File name format for Engine (only the specified Engine matches):\n"
+        "    {plugin_name}_engine_{engine_id}_settings.json\n"
+        "File name format for DeviceAgent:\n"
+        "    {plugin_name}_device_{device_id}_settings.json\n"
+        "Here {plugin_name} is the library name without extension and \"lib\" prefix.");
+
     NX_INI_STRING("", analyticsSettingsOutputPath,
         "Path (absolute or relative to .ini dir) to existing dir for saving settings that the\n"
         "Server sends to an analytics plugin.");
 
-    NX_INI_FLAG(false, tryAllLibsInPluginDir,
+    NX_INI_FLAG(0, tryAllLibsInPluginDir,
         "Attempt to load each dynamic library from each plugin directory instead of only the one\n"
         "with the plugin_name equal to the directory name.");
+
+    NX_INI_FLAG(0, enableRefCountableRegistry,
+        "Turn on a debugging mechanism that tracks ref-countable object creation and deletion to\n"
+        "detect leaks and double-frees. An assertion will fail if a discrepancy is detected.\n"
+        "The Server and each Plugin have their own instance of such registry, tracking objects\n"
+        "created/destroyed in the respective module.");
+
+    NX_INI_FLAG(0, verboseRefCountableRegistry,
+        "Turn on verbose output of the ref-countable registry (if it is enabled): log each\n"
+        "ref-countable object creating and deleting.");
+
+    NX_INI_FLAG(0, useServerLogForRefCountableRegistry,
+        "Whether the ref-countable registry should write its logs to the regular Server log with\n"
+        "the level INFO, instead of stderr. Also the type of assertions used by the registry\n"
+        "depends on this value: NX_KIT_ASSERT() for stderr, NX_ASSERT() for the Server log.");
 };
 
 inline PluginsIniConfig& pluginsIni()

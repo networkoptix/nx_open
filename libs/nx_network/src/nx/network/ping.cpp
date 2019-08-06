@@ -20,13 +20,16 @@
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/system_error.h>
-#include <nx/utils/unused.h>
 
 CLPing::CLPing()
 {
 }
 
-bool CLPing::ping(const QString& ip, int retry, int /*timeoutPerRetry*/, int packetSize)
+bool CLPing::ping(
+    [[maybe_unused]] const QString& ip,
+    [[maybe_unused]] int retry,
+    int /*timeoutPerRetry*/,
+    [[maybe_unused]] int packetSize)
 {
 #if defined(Q_OS_WIN)
     QString cmd = QLatin1String("cmd /C ping %1 -n %2 -l %3");
@@ -35,7 +38,6 @@ bool CLPing::ping(const QString& ip, int retry, int /*timeoutPerRetry*/, int pac
     process.waitForFinished();
     return process.exitCode() == 0;
 #elif defined(Q_OS_ANDROID) || defined(Q_OS_IOS)
-    nx::utils::unused(ip, retry, packetSize);
     return false; // TODO: #android
 #else
     QString cmd = QLatin1String("/bin/ping %1 -c %2 -s %3 > /dev/null 2>&1");

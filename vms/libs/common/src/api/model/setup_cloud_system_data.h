@@ -9,9 +9,6 @@
 
 struct SetupCloudSystemData: public CloudCredentialsData
 {
-    SetupCloudSystemData();
-    SetupCloudSystemData(const QnRequestParams& params);
-
     QString systemName;
     QHash<QString, QString> systemSettings;
 };

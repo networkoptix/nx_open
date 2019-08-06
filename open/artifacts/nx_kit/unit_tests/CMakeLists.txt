@@ -1,3 +1,5 @@
+## Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+
 #--------------------------------------------------------------------------------------------------
 # Test for disabled (via -DNX_INI_CONFIG_DISABLED) ini_config.
 
@@ -12,8 +14,7 @@ set(disabled_ini_config_ut_files
     ../src/nx/kit/output_redirector.cpp
     src/ini_config_ut.cpp
     src/disabled_ini_config_ut.h
-    src/disabled_ini_config_ut.cpp
-)
+    src/disabled_ini_config_ut.cpp)
 
 if(APPLE)
     set(disabled_ini_config_ut_files ${disabled_ini_config_ut_files}

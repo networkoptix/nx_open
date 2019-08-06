@@ -1,32 +1,38 @@
+#include <algorithm>
+
 #include "synchronization_engine.h"
 
-#include <nx/network/url/url_parse_helper.h>
-
+#include "p2p_sync_settings.h"
 #include "statistics/provider.h"
-#include "transport/http_transport_paths.h"
+#include "transport/common_http/factory.h"
+#include "transport/p2p_http/factory.h"
+#include "transport/p2p_websocket/factory.h"
 
 namespace nx::clusterdb::engine {
 
-SyncronizationEngine::SyncronizationEngine(
+SynchronizationEngine::SynchronizationEngine(
     const std::string& /*applicationId*/, // TODO: #ak CLOUD-2249.
-    const QnUuid& peerId,
     const SynchronizationSettings& settings,
     const ProtocolVersionRange& supportedProtocolRange,
-    nx::sql::AsyncSqlQueryExecutor* const dbManager)
+    nx::sql::AbstractAsyncSqlQueryExecutor* const dbManager)
     :
-    m_peerId(peerId),
-    m_outgoingCommandFilter(peerId),
+    m_peerId(
+        !QnUuid::fromStringSafe(settings.nodeId).isNull()
+            ? QnUuid::fromStringSafe(settings.nodeId)
+            : QnUuid::fromArbitraryData(settings.nodeId)),
+    m_outgoingCommandFilter(m_peerId),
     m_supportedProtocolRange(supportedProtocolRange),
     m_outgoingTransactionDispatcher(m_outgoingCommandFilter),
     m_structureUpdater(dbManager),
     m_commandLog(
-        peerId,
+        settings,
+        m_peerId,
         m_supportedProtocolRange,
         dbManager,
         &m_outgoingTransactionDispatcher),
     m_incomingTransactionDispatcher(&m_commandLog),
     m_connectionManager(
-        peerId,
+        m_peerId.toSimpleByteArray().toStdString(),
         settings,
         m_supportedProtocolRange,
         &m_incomingTransactionDispatcher,
@@ -35,188 +41,158 @@ SyncronizationEngine::SyncronizationEngine(
         m_supportedProtocolRange,
         &m_commandLog,
         m_outgoingCommandFilter,
-        peerId.toSimpleByteArray().toStdString()),
+        &m_connectionManager,
+        m_peerId.toSimpleByteArray().toStdString()),
     m_connector(
+        m_peerId.toSimpleByteArray().toStdString(),
+        settings,
         &m_transportManager,
         &m_connectionManager),
-    m_httpTransportAcceptor(
-        peerId,
-        m_supportedProtocolRange,
-        &m_commandLog,
-        &m_connectionManager,
-        m_outgoingCommandFilter),
-    m_webSocketAcceptor(
-        peerId,
-        m_supportedProtocolRange,
-        &m_commandLog,
-        &m_connectionManager,
-        m_outgoingCommandFilter),
     m_statisticsProvider(
         m_connectionManager,
         &m_incomingTransactionDispatcher,
         &m_outgoingTransactionDispatcher),
     m_systemDeletedSubscriptionId(nx::utils::kInvalidSubscriptionId),
-    m_httpServer(peerId)
+    m_httpServer(m_peerId),
+    m_discoveryManager(settings.discovery, this)
 {
+    // NOTE: First type registered is used to construct connector by default.
+    m_transportManager.registerTransport(std::make_unique<transport::common_http::Factory>());
+    m_transportManager.registerTransport(std::make_unique<transport::p2p::websocket::Factory>());
+    m_transportManager.registerTransport(std::make_unique<transport::p2p::http::Factory>());
 }
 
-SyncronizationEngine::~SyncronizationEngine()
+SynchronizationEngine::~SynchronizationEngine()
+{
+    pleaseStopSync();
+}
+
+void SynchronizationEngine::pleaseStopSync()
 {
     m_startedAsyncCallsCounter.wait();
+    m_connector.pleaseStopSync();
+    m_connectionManager.pleaseStopSync();
+    m_commandLog.pleaseStopSync();
+    m_discoveryManager.pleaseStopSync();
 }
 
 OutgoingCommandDispatcher&
-    SyncronizationEngine::outgoingTransactionDispatcher()
+    SynchronizationEngine::outgoingTransactionDispatcher()
 {
     return m_outgoingTransactionDispatcher;
 }
 
 const OutgoingCommandDispatcher&
-    SyncronizationEngine::outgoingTransactionDispatcher() const
+    SynchronizationEngine::outgoingTransactionDispatcher() const
 {
     return m_outgoingTransactionDispatcher;
 }
 
-CommandLog& SyncronizationEngine::transactionLog()
+CommandLog& SynchronizationEngine::transactionLog()
 {
     return m_commandLog;
 }
 
-const CommandLog& SyncronizationEngine::transactionLog() const
+const CommandLog& SynchronizationEngine::transactionLog() const
 {
     return m_commandLog;
 }
 
 IncomingCommandDispatcher&
-    SyncronizationEngine::incomingCommandDispatcher()
+    SynchronizationEngine::incomingCommandDispatcher()
 {
     return m_incomingTransactionDispatcher;
 }
 
 const IncomingCommandDispatcher&
-    SyncronizationEngine::incomingCommandDispatcher() const
+    SynchronizationEngine::incomingCommandDispatcher() const
 {
     return m_incomingTransactionDispatcher;
 }
 
-ConnectionManager& SyncronizationEngine::connectionManager()
+ConnectionManager& SynchronizationEngine::connectionManager()
 {
     return m_connectionManager;
 }
 
-const ConnectionManager& SyncronizationEngine::connectionManager() const
+const ConnectionManager& SynchronizationEngine::connectionManager() const
 {
     return m_connectionManager;
 }
 
-Connector& SyncronizationEngine::connector()
+Connector& SynchronizationEngine::connector()
 {
     return m_connector;
 }
 
-const statistics::Provider& SyncronizationEngine::statisticsProvider() const
+transport::TransportManager& SynchronizationEngine::transportManager()
+{
+    return m_transportManager;
+}
+
+const statistics::Provider& SynchronizationEngine::statisticsProvider() const
 {
     return m_statisticsProvider;
 }
 
-void SyncronizationEngine::setOutgoingCommandFilter(
+void SynchronizationEngine::setOutgoingCommandFilter(
     const OutgoingCommandFilterConfiguration& configuration)
 {
     m_outgoingCommandFilter.configure(configuration);
 }
 
-void SyncronizationEngine::subscribeToSystemDeletedNotification(
+OutgoingCommandFilter& SynchronizationEngine::outgoingCommandFilter()
+{
+    return m_outgoingCommandFilter;
+}
+
+void SynchronizationEngine::subscribeToSystemDeletedNotification(
     nx::utils::Subscription<std::string>& subscription)
 {
     using namespace std::placeholders;
 
     subscription.subscribe(
-        std::bind(&SyncronizationEngine::onSystemDeleted, this, _1),
+        std::bind(&SynchronizationEngine::onSystemDeleted, this, _1),
         &m_systemDeletedSubscriptionId);
 }
 
-void SyncronizationEngine::unsubscribeFromSystemDeletedNotification(
+void SynchronizationEngine::unsubscribeFromSystemDeletedNotification(
     nx::utils::Subscription<std::string>& subscription)
 {
     subscription.removeSubscription(m_systemDeletedSubscriptionId);
 }
 
-QnUuid SyncronizationEngine::peerId() const
+QnUuid SynchronizationEngine::peerId() const
 {
     return m_peerId;
 }
 
-void SyncronizationEngine::registerHttpApi(
+void SynchronizationEngine::registerHttpApi(
     const std::string& pathPrefix,
     nx::network::http::server::rest::MessageDispatcher* dispatcher)
 {
     m_httpServer.registerHandlers(pathPrefix, dispatcher);
 
-    // TODO: #ak Move folowing to m_httpServer.registerHandlers.
-    registerHttpHandler(
-        nx::network::url::joinPath(pathPrefix, transport::kEstablishEc2TransactionConnectionPath),
-        &transport::CommonHttpAcceptor::createConnection,
-        &m_httpTransportAcceptor,
-        dispatcher);
+    auto transportAcceptors = m_transportManager.createAllAcceptors(m_peerId);
 
-    registerHttpHandler(
-        nx::network::url::joinPath(pathPrefix, transport::kPushEc2TransactionPath),
-        &transport::CommonHttpAcceptor::pushTransaction,
-        &m_httpTransportAcceptor,
-        dispatcher);
-
-    registerHttpHandler(
-        nx::network::http::Method::get,
-        nx::network::url::joinPath(pathPrefix, transport::kdeprecatedEstablishEc2P2pTransactionConnectionPath),
-        &transport::WebSocketTransportAcceptor::createConnection,
-        &m_webSocketAcceptor,
-        dispatcher);
-
-    registerHttpHandler(
-        nx::network::http::Method::get,
-        nx::network::url::joinPath(pathPrefix, transport::kEstablishEc2P2pTransactionConnectionPath),
-        &transport::WebSocketTransportAcceptor::createConnection,
-        &m_webSocketAcceptor,
-        dispatcher);
-}
-
-template<typename ManagerType>
-void SyncronizationEngine::registerHttpHandler(
-    const std::string& handlerPath,
-    typename SyncConnectionRequestHandler<ManagerType>::ManagerFuncType managerFuncPtr,
-    ManagerType* manager,
-    nx::network::http::server::rest::MessageDispatcher* dispatcher)
-{
-    typedef SyncConnectionRequestHandler<ManagerType> RequestHandlerType;
-
-    dispatcher->registerRequestProcessor<RequestHandlerType>(
-        handlerPath.c_str(),
-        [managerFuncPtr, manager]() -> std::unique_ptr<RequestHandlerType>
+    std::for_each(
+        transportAcceptors.begin(), transportAcceptors.end(),
+        [pathPrefix, dispatcher](auto& acceptor)
         {
-            return std::make_unique<RequestHandlerType>(manager, managerFuncPtr);
+            acceptor->registerHandlers(pathPrefix, dispatcher);
         });
+
+    std::move(
+        transportAcceptors.begin(), transportAcceptors.end(),
+        std::back_inserter(m_transportAcceptors));
 }
 
-template<typename ManagerType>
-void SyncronizationEngine::registerHttpHandler(
-    nx::network::http::Method::ValueType method,
-    const std::string& handlerPath,
-    typename SyncConnectionRequestHandler<ManagerType>::ManagerFuncType managerFuncPtr,
-    ManagerType* manager,
-    nx::network::http::server::rest::MessageDispatcher* dispatcher)
+DiscoveryManager& SynchronizationEngine::discoveryManager()
 {
-    typedef SyncConnectionRequestHandler<ManagerType> RequestHandlerType;
-
-    dispatcher->registerRequestProcessor<RequestHandlerType>(
-        handlerPath.c_str(),
-        [managerFuncPtr, manager]() -> std::unique_ptr<RequestHandlerType>
-        {
-            return std::make_unique<RequestHandlerType>(manager, managerFuncPtr);
-        },
-        method);
+    return m_discoveryManager;
 }
 
-void SyncronizationEngine::onSystemDeleted(const std::string& systemId)
+void SynchronizationEngine::onSystemDeleted(const std::string& systemId)
 {
     // New connections will not be authorized since system is deleted,
     // but existing ones have to be closed.

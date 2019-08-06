@@ -7,6 +7,7 @@ angular.module('cloudApp')
                   account, authorizationCheckService, $q, system, $poll, page, $timeout, systemsProvider) {
 
             var systemId = $routeParams.systemId;
+            $scope.currentlyMerging = false;
             $scope.debugMode = Config.allowDebugMode;
 
             authorizationCheckService.requireLogin().then(function (account) {
@@ -21,11 +22,14 @@ angular.module('cloudApp')
                 
                 $scope.$watch('system.mergeInfo', function(mergeInfo){
                     if (mergeInfo) {
-                        setMergeStatus(mergeInfo)
+                        setMergeStatus(mergeInfo);
                     } else{
+                        if($scope.currentlyMerging) {
+                            dialogs.notify(L.system.successMerge, 'success', true);
+                        }
                         $scope.currentlyMerging = false;
                     }
-                })
+                });
             });
 
             function getMergeTarget(targetSystemId) {
@@ -35,9 +39,12 @@ angular.module('cloudApp')
             }
 
             function setMergeStatus(mergeInfo) {
+                if (!mergeInfo || Object.keys(mergeInfo).length === 0) {
+                    return;
+                }
                 $scope.currentlyMerging = true;
                 $scope.isMaster = mergeInfo.role ? mergeInfo.role !== Config.systemStatuses.slave : mergeInfo.masterSystemId === $scope.system.id;
-                $scope.mergeTargetSystem = getMergeTarget(mergeInfo.anotherSystemId);
+                $scope.mergeTargetSystem = getMergeTarget(mergeInfo.anotherSystemId) || L.system.unknownName;
             }
 
             // Retrieve system info
@@ -58,7 +65,7 @@ angular.module('cloudApp')
                 },
                 errorPrefix: L.errorCodes.cantGetSystemInfoPrefix
             }).then(function () {
-                $scope.canMerge = $scope.system.canMerge && $scope.system.isOnline;
+                $scope.canMerge = $scope.system.isOnline;
                 if ($scope.system.mergeInfo) {
                     setMergeStatus($scope.system.mergeInfo);
                 }
@@ -125,8 +132,8 @@ angular.module('cloudApp')
                     .forceUpdateSystems()
                     .then(function () {
                         $timeout(function () {
-                            $location.path('/systems')
-                        })
+                            $location.path('/systems');
+                        });
                     });
             }
 
@@ -177,7 +184,7 @@ angular.module('cloudApp')
                     .merge($scope.system)
                     .then(function (mergeInfo) {
                         if (mergeInfo) {
-                           setMergeStatus(mergeInfo);
+                           $scope.system.mergeInfo = mergeInfo;
                         }
                     });
             };

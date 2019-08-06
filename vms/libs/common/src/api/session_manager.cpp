@@ -199,13 +199,7 @@ nx::utils::Url QnSessionManager::createApiUrl(const nx::utils::Url& baseUrl, con
         path = L'/' + path;
     url.setPath(path);
 
-    QUrlQuery urlQuery(url.query());
-    for (int i = 0; i < params.count(); i++)
-    {
-        QPair<QString, QString> param = params[i];
-        urlQuery.addQueryItem(param.first, param.second);
-    }
-    url.setQuery(urlQuery);
+    url.setQuery(params.toUrlQuery());
     return url;
 }
 

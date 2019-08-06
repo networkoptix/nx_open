@@ -1,0 +1,34 @@
+<div ng-controller="DisconnectCtrl">
+    <form name="disconnectForm" novalidate>
+        <div class="modal-body">
+            <p class="warning-label">
+                Všichni uživatelé cloudu budou smazáni.
+            </p>
+            <p>
+                Systém bude přístupný prostřednictvím místní sítě s účtem místního správce.
+            </p>
+            <p>
+                Zadejte heslo pro pokračování.
+            </p>
+
+            <div class="form-group" validate-field>
+                <label for="password">Heslo</label>
+                <input class="form-control" ng-model="model.password" id="password" autocomplete="new-password"
+                       name="password" type="password" required autofocus>
+                <p class="help-block" >
+                    <span class="input-error" ng-if="disconnectForm.password.$touched && disconnectForm.password.$error.required">
+                        Heslo je vyžadováno
+                    </span>
+                </p>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <process-button process="disconnecting"
+                            form="disconnectForm"
+                            action-type="'danger'"
+                            button-text="$root.L.system.confirmDisconnectAction"></process-button>
+
+            <button type="button" class="btn btn-default" ng-click="close()" > Zrušit </button>
+        </div>
+    </form>
+</div>

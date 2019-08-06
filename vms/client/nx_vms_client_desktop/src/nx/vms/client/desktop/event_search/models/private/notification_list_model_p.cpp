@@ -402,7 +402,7 @@ void NotificationListModel::Private::setupAcknowledgeAction(EventData& eventData
     eventData.removable = false;
     eventData.level = QnNotificationLevel::Value::CriticalNotification;
 
-    eventData.extraAction = CommandActionPtr(new CommandAction(this));
+    eventData.extraAction = CommandActionPtr(new CommandAction());
     eventData.extraAction->setIcon(qnSkin->icon("buttons/acknowledge.png"));
     eventData.extraAction->setText(tr("Acknowledge"));
 
@@ -420,7 +420,7 @@ void NotificationListModel::Private::setupAcknowledgeAction(EventData& eventData
         };
 
     connect(eventData.extraAction.data(), &QAction::triggered,
-        [this, actionHandler]() { executeDelayedParented(actionHandler, 0, this); });
+        [this, actionHandler]() { executeLater(actionHandler, this); });
 }
 
 QString NotificationListModel::Private::caption(const nx::vms::event::EventParameters& parameters,
@@ -440,9 +440,9 @@ QString NotificationListModel::Private::caption(const nx::vms::event::EventParam
                 ? tr("Generic Event")
                 : parameters.caption;
 
-        case EventType::pluginEvent:
+        case EventType::pluginDiagnosticEvent:
             return parameters.caption.isEmpty()
-                ? tr("Unknown Plugin Event")
+                ? tr("Unknown Plugin Diagnostic Event")
                 : parameters.caption;
 
         case EventType::analyticsSdkEvent:
@@ -467,7 +467,7 @@ QString NotificationListModel::Private::description(
     switch (parameters.eventType)
     {
         case EventType::userDefinedEvent:
-        case EventType::pluginEvent:
+        case EventType::pluginDiagnosticEvent:
         case EventType::analyticsSdkEvent:
             return parameters.description;
 
@@ -550,7 +550,7 @@ QPixmap NotificationListModel::Private::pixmapForAction(
         case EventType::licenseIssueEvent:
             return qnSkin->pixmap("events/license.png");
 
-        case EventType::pluginEvent:
+        case EventType::pluginDiagnosticEvent:
             return qnSkin->pixmap("events/alert.png");
 
         default:

@@ -5,9 +5,10 @@ from django.conf import settings
 from django.db.models import Q
 from rest_framework import serializers
 from cms.models import Customization
+from api.models import Account
 
-#When cloudportal is ran locally it uses amqp by default. BROKER_TRANSPORT_OPTIONS is related to sqs.
-#This allows cloud notifications to run locally without changing settings to use sqs.
+# When cloudportal is ran locally it uses amqp by default. BROKER_TRANSPORT_OPTIONS is related to sqs.
+# This allows cloud notifications to run locally without changing settings to use sqs.
 USE_SQS_FOR_CLOUD_NOTIFICATIONS = hasattr(settings, "BROKER_TRANSPORT_OPTIONS")
 
 
@@ -36,10 +37,12 @@ class Event(models.Model):
 
         subscriptions = subscriptions.filter(Q(enabled=True) | Q(enabled=1))
         # 2. For each subscription create a message and send it
-        for user in subscriptions.all():
+        for subscription in subscriptions.all():
+            user = Account.objects.get(email=subscription.user_email)
+            self.data['userFullName'] = user.get_full_name()
             message = Message(
                 message=self.data,
-                user_email=user.user_email,
+                user_email=user.email,
                 type=self.type,
                 event=self
             )
@@ -70,6 +73,7 @@ class Message(models.Model):
     REQUIRED_FIELDS = ['user_email', 'type', 'message']
 
     def send(self):
+        self.save()
         self.send_date = timezone.now()
 
         # TODO: initiate business-logic here
@@ -80,19 +84,13 @@ class Message(models.Model):
             if 'queue' in settings.NOTIFICATIONS_CONFIG[self.type]:
                 queue_name = settings.NOTIFICATIONS_CONFIG[self.type]['queue']
 
-            result = send_email.apply_async(args=[self.user_email,
-                                                  self.type,
-                                                  self.message,
-                                                  self.customization,
-                                                  queue_name],
-                                            queue=queue_name)
+            result = send_email.apply_async(args=[self.id, queue_name], queue=queue_name)
             self.task_id = result.task_id
         else:
-            send_email(self.user_email, self.type, self.message, self.customization)
+            send_email(self.id)
             self.task_id = 'sync'
 
         self.save()
-
 
     def delivery_time_interval(self):
         return (self.created_date - self.send_date).total_seconds()

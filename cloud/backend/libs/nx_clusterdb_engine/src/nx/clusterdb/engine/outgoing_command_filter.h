@@ -1,6 +1,7 @@
 #pragma once
 
 #include "command.h"
+#include "node_state.h"
 
 namespace nx::clusterdb::engine {
 
@@ -21,6 +22,8 @@ public:
     void configure(const OutgoingCommandFilterConfiguration& configuration);
 
     bool satisfies(const CommandHeader& commandHeader) const;
+
+    NodeState filter(const NodeState& value) const;
 
     void updateReadFilter(ReadCommandsFilter* readFilter) const;
 

@@ -13,6 +13,8 @@
 #include <nx/utils/datetime.h>
 #include <nx/fusion/model_functions_fwd.h>
 
+class QnCommonModule;
+
 struct QnChunksRequestData
 {
     enum class GroupBy
@@ -38,6 +40,12 @@ struct QnChunksRequestData
     QUrlQuery toUrlQuery() const;
     bool isValid() const;
 
+    /**
+     * Picks a proper requestVersion using version from ec2Connection.
+     * 28.06.2019: Mobile client still should support 2.6 version.
+     */
+    void pickRequestVersion(QnCommonModule* commonModule);
+
     RequestVersion requestVersion = RequestVersion::current;
 
     Qn::TimePeriodContent periodsType = Qn::RecordingContent;
@@ -46,15 +54,17 @@ struct QnChunksRequestData
     qint64 endTimeMs = DATETIME_NOW;
     std::chrono::milliseconds detailLevel{1};
     bool keepSmallChunks = false;
-    QString filter; //< TODO: This string is a json. Consider changing to QList<QRegion>.
+
+    // Serialized search filter. For motion requests it's a QList<QRegion> object, for analytics
+    // it's an nx::analytics::db::Filter object.
+    // TODO: unify filter object for all type of requests.
+    QString filter;
     bool isLocal = false;
     Qn::SerializationFormat format = Qn::JsonFormat;
     int limit = INT_MAX;
 
     GroupBy groupBy = GroupBy::serverId;
     Qt::SortOrder sortOrder = Qt::SortOrder::AscendingOrder;
-
-    boost::optional<nx::analytics::db::Filter> analyticsStorageFilter;
 };
 
 QN_FUSION_DECLARE_FUNCTIONS(QnChunksRequestData::GroupBy, (lexical))

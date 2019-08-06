@@ -15,7 +15,15 @@ ApplicationWindow
     property real bottomPadding: bottomCustomMargin
 
     readonly property bool hasNavigationBar: getNavigationBarHeight()
-    readonly property real keyboardHeight: Qt.inputMethod.visible
+
+    // Qt bug workaround. For some reason on the new devices with iOS 12+
+    // Qt.inputMethod.visible hangs with wrong value. It is "true" even if
+    // keyboard is hidden. But Qt.inputMethod.anchorRectangle always has corret value
+    // and is presented if keyboard is visible (otherwise it is empty).
+    // So we use it as workaround in the iOS and check with "visible" property together.
+    readonly property bool inputHasAnchorRectangle: Qt.platform.os === "ios"
+        && (Qt.inputMethod.anchorRectangle.width != 0 || Qt.inputMethod.anchorRectangle.height != 0)
+    readonly property real keyboardHeight: Qt.inputMethod.visible && inputHasAnchorRectangle
         ? Qt.inputMethod.keyboardRectangle.height
             / (Qt.platform.os !== "ios" ? Screen.devicePixelRatio : 1)
         : 0
@@ -86,6 +94,7 @@ ApplicationWindow
 
     Component.onCompleted:
     {
+        updateCustomMargins()
         androidBarPositionWorkaround.tryUpdateBarPosition()
 
         if (autoLoginEnabled)
@@ -221,7 +230,7 @@ ApplicationWindow
             if (d.reconnecting)
                 return qsTr("Server offline. Reconnecting...")
             return showCloudOfflineWarning
-                ? qsTr("Cannot connect to %1").arg(applicationInfo.cloudName())
+                ? qsTr("Cannot connect to %1", "%1 is the short cloud name (like 'Cloud')").arg(applicationInfo.cloudName())
                 : ""
         }
 

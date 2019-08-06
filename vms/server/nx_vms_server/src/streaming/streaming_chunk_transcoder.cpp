@@ -63,6 +63,11 @@ StreamingChunkTranscoder::StreamingChunkTranscoder(
 
 StreamingChunkTranscoder::~StreamingChunkTranscoder()
 {
+    stop();
+}
+
+void StreamingChunkTranscoder::stop()
+{
     directDisconnectAll();
 
     // Cancelling all scheduled transcodings.
@@ -79,6 +84,7 @@ StreamingChunkTranscoder::~StreamingChunkTranscoder()
         m_transcodeThreads.end(),
         std::default_delete<StreamingChunkTranscoderThread>());
     m_transcodeThreads.clear();
+    m_dataSourceCache.clear();
 }
 
 bool StreamingChunkTranscoder::transcodeAsync(
@@ -179,7 +185,7 @@ bool StreamingChunkTranscoder::transcodeAsync(
 
 DataSourceContextPtr StreamingChunkTranscoder::prepareDataSourceContext(
     QnSecurityCamResourcePtr cameraResource,
-    QnVideoCameraPtr camera,
+    nx::vms::server::VideoCameraPtr camera,
     const StreamingChunkCacheKey& transcodeParams)
 {
     DataSourceContextPtr dataSourceCtx = m_dataSourceCache.take(transcodeParams);
@@ -245,7 +251,7 @@ DataSourceContextPtr StreamingChunkTranscoder::prepareDataSourceContext(
 
 AbstractOnDemandDataProviderPtr StreamingChunkTranscoder::createLiveMediaDataProvider(
     const VideoCameraLocker& /*locker*/,
-    QnVideoCameraPtr camera,
+    nx::vms::server::VideoCameraPtr camera,
     const StreamingChunkCacheKey& transcodeParams)
 {
     using namespace std::chrono;

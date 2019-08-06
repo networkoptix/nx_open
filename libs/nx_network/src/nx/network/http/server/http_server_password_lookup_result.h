@@ -6,7 +6,7 @@
 
 namespace nx::network::http::server {
 
-struct PasswordLookupResult
+struct NX_NETWORK_API PasswordLookupResult
 {
     enum class Code
     {
@@ -19,14 +19,14 @@ struct PasswordLookupResult
     AuthToken authToken;
 };
 
-class PlainTextPasswordLookupResultBuilder
+class NX_NETWORK_API PlainTextPasswordLookupResultBuilder
 {
 public:
     static PasswordLookupResult build(nx::String password);
     static PasswordLookupResult build(PasswordLookupResult::Code errorCode);
 };
 
-class Ha1LookupResultBuilder
+class NX_NETWORK_API Ha1LookupResultBuilder
 {
 public:
     static PasswordLookupResult build(nx::String ha1);

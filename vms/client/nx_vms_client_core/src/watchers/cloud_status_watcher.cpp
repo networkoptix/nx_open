@@ -18,7 +18,7 @@
 
 #include <cloud/cloud_connection.h>
 #include <network/cloud_system_data.h>
-#include <utils/common/app_info.h>
+#include <network/connection_validator.h>
 #include <utils/common/delayed.h>
 #include <utils/common/id.h>
 
@@ -27,6 +27,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/math/fuzzy.h>
 #include <nx/utils/string.h>
+#include <nx/utils/app_info.h>
 #include <nx/vms/api/data/cloud_system_data.h>
 #include <helpers/system_helpers.h>
 
@@ -45,20 +46,9 @@ const auto kCloudSystemJsonHolderTag = lit("json");
 
 const int kUpdateIntervalMs = 5 * 1000;
 
-bool isCustomizationCompatible(const QString& customization, bool isMobile)
-{
-    const auto currentCustomization = QnAppInfo::customizationName();
-
-    if (customization.isEmpty() || currentCustomization.isEmpty())
-        return true;
-
-    return currentCustomization == customization
-        || (isMobile
-            && currentCustomization.section(L'_', 0, 0) == customization.section(L'_', 0, 0));
-}
-
 QnCloudSystemList getCloudSystemList(const api::SystemDataExList& systemsList, bool isMobile)
 {
+    const auto currentCustomization = nx::utils::AppInfo::customizationName();
     QnCloudSystemList result;
 
     for (const api::SystemDataEx &systemData : systemsList.systems)
@@ -68,7 +58,9 @@ QnCloudSystemList getCloudSystemList(const api::SystemDataExList& systemsList, b
 
         const auto customization = QString::fromStdString(systemData.customization);
 
-        if (!isCustomizationCompatible(customization, isMobile))
+        const bool compatibleCustomization = QnConnectionValidator::isCompatibleCustomization(
+            customization, currentCustomization, isMobile);
+        if (!compatibleCustomization)
             continue;
 
         auto data = QJson::deserialized<nx::vms::api::CloudSystemData>(
@@ -452,7 +444,7 @@ void QnCloudStatusWatcher::updateSystems()
                     d->updateStatusFromResultCode(result);
                 };
 
-            executeDelayed(handler, 0, guard->thread());
+            executeLaterInThread(handler, guard->thread());
         }
     );
 }
@@ -464,7 +456,7 @@ void QnCloudStatusWatcher::resendActivationEmail(const QString& email)
         d->resendActivationConnection = qnCloudConnectionProvider->createConnection();
 
     const auto callback =
-        [this](api::ResultCode result, api::AccountConfirmationCode code)
+        [this](api::ResultCode result, api::AccountConfirmationCode /*code*/)
         {
             const bool success =
                 result == api::ResultCode::ok || result == api::ResultCode::partialContent;
@@ -695,7 +687,7 @@ void QnCloudStatusWatcherPrivate::updateCurrentAccount()
                     if (guard)
                         callback(result, accountData);
                 };
-            executeDelayed(timerCallback, 0, thread);
+            executeLaterInThread(timerCallback, thread);
         };
 
     cloudConnection->accountManager()->getAccount(completionHandler);
@@ -744,7 +736,7 @@ void QnCloudStatusWatcherPrivate::createTemporaryCredentials()
                     if (guard)
                         callback(result, credentials);
                 };
-            executeDelayed(timerCallback, 0, thread);
+            executeLaterInThread(timerCallback, thread);
         };
 
     cloudConnection->accountManager()->createTemporaryCredentials(params, completionHandler);
@@ -800,7 +792,7 @@ void QnCloudStatusWatcherPrivate::prolongTemporaryCredentials()
                     if (guard)
                         callback(result);
                 };
-            executeDelayed(timerCallback, 0, thread);
+            executeLaterInThread(timerCallback, thread);
         };
 
     temporaryConnection->ping(completionHandler);

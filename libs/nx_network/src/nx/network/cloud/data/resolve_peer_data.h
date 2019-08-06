@@ -34,7 +34,7 @@ public:
     constexpr static const network::stun::extension::methods::Value kMethod =
         network::stun::extension::methods::resolvePeer;
 
-    std::list<network::SocketAddress> endpoints;
+    std::vector<network::SocketAddress> endpoints;
     ConnectionMethods connectionMethods;
 
     ResolvePeerResponse();

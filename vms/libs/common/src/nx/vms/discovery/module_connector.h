@@ -64,7 +64,7 @@ private:
         nx::Buffer m_buffer;
         std::unique_ptr<nx::network::AbstractStreamSocket> m_socket;
         std::function<void(boost::optional<api::ModuleInformation>, QString)> m_handler;
-        nx::utils::ObjectDestructionFlag m_destructionFlag;
+        nx::utils::InterruptionFlag m_destructionFlag;
     };
 
     class Module
@@ -94,7 +94,7 @@ private:
         ModuleConnector* const m_parent;
         const QnUuid m_id;
         Endpoints m_endpoints;
-        std::set<nx::network::SocketAddress> m_forbiddenEndpoints;
+        std::set<QString> m_forbiddenEndpoints;
         nx::network::RetryTimer m_reconnectTimer;
         std::list<std::unique_ptr<InformationReader>> m_attemptingReaders;
         std::unique_ptr<InformationReader> m_connectedReader;

@@ -9,7 +9,6 @@
 #include <nx/fusion/serialization/json.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/file_system.h>
-#include <utils/common/synctime.h>
 
 using namespace std::chrono;
 
@@ -93,7 +92,7 @@ FileInformation Storage::fileInformation(const QString& fileName) const
 ResultCode Storage::addFile(FileInformation fileInformation, bool updateTouchTime)
 {
     if (updateTouchTime)
-        fileInformation.touchTime = qnSyncTime->currentMSecsSinceEpoch();
+        fileInformation.touchTime = QDateTime::currentMSecsSinceEpoch();
 
     if (fileInformation.status == FileInformation::Status::downloaded)
         return addDownloadedFile(fileInformation);
@@ -145,7 +144,10 @@ ResultCode Storage::addDownloadedFile(const FileInformation& fileInformation)
     info.downloadedChunks.fill(true, chunkCount);
 
     if (!saveMetadata(info))
+    {
+        NX_ERROR(this, "Failed to save metadata for a file \"%1\"", fileInformation.name);
         return ResultCode::ioError;
+    }
 
     m_fileInformationByName.insert(fileInformation.name, info);
 
@@ -167,10 +169,11 @@ ResultCode Storage::addNewFile(const FileInformation& fileInformation)
         return ResultCode::fileAlreadyExists;
 
     FileMetadata info = FileMetadata::fromFileInformation(fileInformation, m_downloadsDirectory);
-    if (!QDir(info.absoluteDirectoryPath).exists())
+    if (!nx::utils::file_system::ensureDir(info.absoluteDirectoryPath))
     {
-        if (!QDir().mkpath(info.absoluteDirectoryPath))
-            return ResultCode::ioError;
+        NX_ERROR(this, "Failed to generate folder \"%1\" for a file \"%2\"",
+            info.absoluteDirectoryPath, info.name);
+        return ResultCode::ioError;
     }
 
     if (!info.md5.isEmpty() && calculateMd5(info.fullFilePath) == info.md5)
@@ -368,7 +371,7 @@ ResultCode Storage::writeFileChunk(const QString& fileName, int chunkIndex, cons
         return ResultCode::invalidChunkIndex;
 
     if (it->status == FileInformation::Status::downloaded)
-        return ResultCode::ioError;
+        return ResultCode::fileAlreadyDownloaded;
 
     QFile file(it->fullFilePath);
     if (!file.open(QFile::ReadWrite)) //< ReadWrite because WriteOnly implies Truncate.
@@ -401,7 +404,7 @@ ResultCode Storage::writeFileChunk(const QString& fileName, int chunkIndex, cons
         });
 
     it->downloadedChunks.setBit(chunkIndex);
-    it->touchTime = qnSyncTime->currentMSecsSinceEpoch();
+    it->touchTime = QDateTime::currentMSecsSinceEpoch();
     checkDownloadCompleted(it.value());
     saveMetadata(it.value());
 
@@ -465,6 +468,28 @@ ResultCode Storage::deleteFileInternal(const QString& fileName, bool deleteData)
     }
 
     m_fileInformationByName.erase(it);
+
+    return ResultCode::ok;
+}
+
+ResultCode Storage::clearFile(const QString& fileName, bool force)
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+
+    const auto it = m_fileInformationByName.find(fileName);
+    if (it == m_fileInformationByName.end())
+        return ResultCode::fileDoesNotExist;
+
+    if (!force && it->status == FileInformation::Status::downloaded)
+        return ResultCode::fileAlreadyDownloaded;
+
+    if (it->status != FileInformation::Status::uploading)
+        it->status = FileInformation::Status::downloading;
+    it->downloadedChunks.fill(false);
+
+    lock.unlock();
+    emit fileInformationChanged(*it);
+    emit fileStatusChanged(*it);
 
     return ResultCode::ok;
 }
@@ -534,7 +559,7 @@ void Storage::cleanupExpiredFiles()
 {
     QnMutexLocker lock(&m_mutex);
 
-    qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
+    qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
 
     QSet<QString> expiredFiles;
     for (const FileMetadata& data: m_fileInformationByName)
@@ -675,6 +700,9 @@ QVector<QByteArray> Storage::calculateChecksums(const QString& filePath, qint64 
 
 bool Storage::saveMetadata(const FileMetadata& fileInformation)
 {
+    if (!nx::utils::file_system::ensureDir(metadataDirectoryPath()))
+        return false;
+
     const auto fileName = metadataFileName(fileInformation.fullFilePath);
 
     QFile file(fileName);
@@ -818,7 +846,6 @@ qint64 Storage::calculateChunkSize(qint64 fileSize, int chunkIndex, qint64 chunk
         : fileSize - chunkSize * (chunkCount - 1);
 }
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(FileMetadata, (json), FileInformation_Fields \
-    (chunkChecksums)(fullFilePath))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(FileMetadata, (json), FileInformation_Fields (chunkChecksums))
 
 } // nx::vms::common::p2p::downloader

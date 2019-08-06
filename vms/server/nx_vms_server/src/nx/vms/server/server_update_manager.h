@@ -18,6 +18,7 @@ private:
     ServerUpdateInstaller m_installer;
     virtual vms::common::p2p::downloader::Downloader* downloader() override;
     virtual CommonUpdateInstaller* installer() override;
+    virtual QnStorageSpaceDataList availableStorages() const override;
 };
 
 } // namespace vms::server

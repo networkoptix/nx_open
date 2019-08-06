@@ -1,9 +1,9 @@
 #pragma once
 
-#include <condition_variable>
-#include <mutex>
 #include <atomic>
+#include <condition_variable>
 #include <deque>
+#include <mutex>
 
 #include "ffmpeg/packet.h"
 

@@ -5,7 +5,6 @@
 #include "p2p_fwd.h"
 #include <nx/network/websocket/websocket.h>
 #include <nx/network/deprecated/asynchttpclient.h>
-#include <nx_ec/ec_proto_version.h>
 #include <utils/common/from_this_to_shared.h>
 #include <core/resource/shared_resource_pointer.h>
 #include <core/resource_access/user_access_data.h>
@@ -104,7 +103,11 @@ public:
     void addAdditionalRequestHeaders(nx::network::http::HttpHeaders headers);
     void addRequestQueryParams(std::vector<std::pair<QString, QString>> queryParams);
 
+    const IP2PTransport& p2pTransport() const { return *m_p2pTransport; }
+    IP2PTransport& p2pTransport() { return *m_p2pTransport; }
+
     QString idForToStringFromPtr() const;
+
 signals:
     void gotMessage(QWeakPointer<ConnectionBase> connection, nx::p2p::MessageType messageType, const QByteArray& payload);
     void stateChanged(QWeakPointer<ConnectionBase> connection, ConnectionBase::State state);
@@ -113,7 +116,6 @@ signals:
 protected:
     virtual bool fillAuthInfo(nx::network::http::AsyncClient* httpClient, bool authByKey) = 0;
     void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread);
-    const P2pTransportPtr& p2pTransport() const { return m_p2pTransport; }
     virtual void setState(State state);
     void stopWhileInAioThread();
   private:

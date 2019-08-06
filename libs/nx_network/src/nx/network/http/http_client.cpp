@@ -261,6 +261,13 @@ void HttpClient::setAuthType(AuthType value)
         m_asyncHttpClient->setAuthType(value);
 }
 
+void HttpClient::setCredentials(const Credentials& credentials)
+{
+    m_credentials = credentials;
+    if (m_asyncHttpClient)
+        m_asyncHttpClient->setCredentials(credentials);
+}
+
 void HttpClient::setProxyVia(const SocketAddress& proxyEndpoint, bool isSecure)
 {
     m_proxyEndpoint = proxyEndpoint;
@@ -377,6 +384,8 @@ bool HttpClient::doRequest(AsyncClientFunc func)
             m_asyncHttpClient->setUserPassword(*m_userPassword);
         if (m_authType)
             m_asyncHttpClient->setAuthType(*m_authType);
+        if (m_credentials)
+            m_asyncHttpClient->setCredentials(*m_credentials);
         if (m_proxyEndpoint)
             m_asyncHttpClient->setProxyVia(*m_proxyEndpoint, m_isProxySecure);
 
@@ -397,6 +406,10 @@ bool HttpClient::doRequest(AsyncClientFunc func)
         (m_asyncHttpClient->state() <= AsyncClient::State::sResponseReceived) &&
         !m_lastResponse)
     {
+        // m_lastResponse is set in responseReceived hander. But, AsyncHttpClient first sets state 
+        // to AsyncClient::State::sResponseReceived, then emits responseReceived event.
+        // So, there is a period of time when the state is already 
+        // AsyncClient::State::sResponseReceived but m_lastResponse is still not set.
         m_cond.wait(lk.mutex());
     }
 

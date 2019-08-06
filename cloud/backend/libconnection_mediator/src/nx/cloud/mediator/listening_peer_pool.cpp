@@ -2,6 +2,8 @@
 
 #include <nx/utils/log/log.h>
 
+#include <nx/cloud/mediator/listening_peer_db.h>
+
 namespace nx {
 namespace hpm {
 
@@ -103,8 +105,12 @@ ListeningPeerData& ListeningPeerPool::DataLocker::value()
 //-------------------------------------------------------------------------------------------------
 // class ListeningPeerPool
 
-ListeningPeerPool::ListeningPeerPool(const conf::ListeningPeer& settings):
-    m_settings(settings)
+ListeningPeerPool::ListeningPeerPool(
+    const conf::ListeningPeer& settings,
+    ListeningPeerDb* listeningPeerDb)
+    :
+    m_settings(settings),
+    m_listeningPeerDb(listeningPeerDb)
 {
 }
 
@@ -135,6 +141,8 @@ ListeningPeerPool::DataLocker ListeningPeerPool::insertAndLockPeerData(
 {
     QnMutexLocker lock(&m_mutex);
 
+    NX_VERBOSE(this, "Saving new connection (%1) from peer %2", (void*) connection.get(), peerData);
+
     const auto peerIterAndInsertionFlag = m_peers.emplace(peerData, ListeningPeerData());
     const auto peerIter = peerIterAndInsertionFlag.first;
     if (peerIterAndInsertionFlag.second)
@@ -142,10 +150,22 @@ ListeningPeerPool::DataLocker ListeningPeerPool::insertAndLockPeerData(
         peerIter->second.isLocal = true;
         peerIter->second.isListening = false;
         peerIter->second.hostName = peerIter->first.hostName();
+        m_listeningPeerDb->addPeer(
+            peerData.hostName().toStdString(),
+            [hostName = peerData.hostName()](bool added)
+            {
+                // Can't use "this" because the life time of m_listeningPeerDb is longer than "this".
+                // this handler with "this" may happen after "this" has been destroyed.
+                NX_VERBOSE(typeid(ListeningPeerPool), "Peer %1 added to ListeningPeerDb: %2",
+                    hostName, added);
+            });
     }
 
     if (peerIter->second.peerConnection != connection)
     {
+        NX_VERBOSE(this, "Replacing old connection (%1) from peer %2 with a new one (%3)",
+            (void*) peerIter->second.peerConnection.get(), peerData, (void*) connection.get());
+
         if (peerIter->second.peerConnection)
             closeConnectionAsync(std::move(peerIter->second.peerConnection));
         // Binding to a new connection.
@@ -154,7 +174,8 @@ ListeningPeerPool::DataLocker ListeningPeerPool::insertAndLockPeerData(
             m_settings.connectionInactivityTimeout);
         connection->addOnConnectionCloseHandler(
             [this, peerData, connectionPtr = connection.get(),
-                guard = m_asyncOperationGuard.sharedGuard()]()
+                guard = m_asyncOperationGuard.sharedGuard()](
+                    SystemError::ErrorCode /*closeReason*/)
             {
                 // TODO: #ak Get rid of this guard after resolving
                 // dependency issue between Controller and STUN server.
@@ -217,7 +238,7 @@ std::vector<MediaserverData> ListeningPeerPool::findPeersBySystemId(
         foundPeers.push_back(it->first);
     }
 
-    return std::move(foundPeers);
+    return foundPeers;
 }
 
 api::ListeningPeersBySystem ListeningPeerPool::getListeningPeers() const
@@ -270,13 +291,27 @@ void ListeningPeerPool::onListeningPeerConnectionClosed(
 
     if (peerIter->second.peerConnection.get() != connection)
         return; //< Peer has been bound to another connection.
-    NX_DEBUG(this, lm("Peer %1 has disconnected").args(peerIter->first.hostName()));
+
+    NX_DEBUG(this, "Peer %1 has disconnected. Connection (%2)",
+        peerIter->first.hostName(), (void*) connection);
+
     m_peers.erase(peerIter);
+
+    m_listeningPeerDb->removePeer(peerData.hostName().toStdString(),
+        [hostName = peerData.hostName()](bool removed)
+        {
+            // Can't use "this" because the life time of m_listeningPeerDb is longer than "this".
+            // this handler with "this" may happen after "this" has been destroyed.
+            NX_DEBUG(typeid(ListeningPeerPool), "Peer %1 removed from ListeningPeerDb: %2",
+                hostName, removed);
+        });
 }
 
 void ListeningPeerPool::closeConnectionAsync(
     std::shared_ptr<nx::network::stun::ServerConnection> peerConnection)
 {
+    NX_VERBOSE(this, "Closing connection (%1)", (void*) peerConnection.get());
+
     auto peerConnectionPtr = peerConnection.get();
     peerConnectionPtr->pleaseStop(
         [peerConnection = std::move(peerConnection),

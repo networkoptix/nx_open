@@ -4,6 +4,7 @@
 
 #include <test_support/utils.h>
 #include <common/static_common_module.h>
+#include <iostream>
 
 namespace {
 

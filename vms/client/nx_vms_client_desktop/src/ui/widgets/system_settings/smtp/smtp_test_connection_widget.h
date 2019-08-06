@@ -35,7 +35,7 @@ private:
     QString errorString(const QnTestEmailSettingsReply& result) const;
 
 private slots:
-    void at_testEmailSettingsFinished(int status, const QnTestEmailSettingsReply& reply, int handle);
+    void at_testEmailSettingsFinished(bool success, int handle, const QnTestEmailSettingsReply& reply);
 
 private:
     QScopedPointer<Ui::SmtpTestConnectionWidget> ui;

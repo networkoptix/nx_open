@@ -21,9 +21,10 @@
 #include <nx/vms/api/analytics/descriptors.h>
 #include <nx/vms/client/desktop/common/widgets/selectable_text_button.h>
 #include <nx/vms/client/desktop/event_search/models/event_search_list_model.h>
-#include <nx/utils/string.h>
+#include <nx/vms/client/desktop/utils/widget_utils.h>
 #include <nx/vms/event/event_fwd.h>
 #include <nx/vms/event/strings_helper.h>
+#include <nx/utils/string.h>
 
 namespace nx::vms::client::desktop {
 
@@ -251,7 +252,8 @@ void EventSearchWidget::Private::updateAnalyticsMenu()
         nx::analytics::EngineDescriptorManager engineDescriptorManager(q->commonModule());
         const auto eventTypeDescriptors = eventTypeDescriptorManager.descriptors();
         const auto engineDescriptors = engineDescriptorManager.descriptors();
-        analyticsMenu->clear();
+
+        WidgetUtils::clearMenu(analyticsMenu);
 
         QSet<QnUuid> enabledEngines;
         const auto cameras = q->resourcePool()->getResources<QnVirtualCameraResource>();

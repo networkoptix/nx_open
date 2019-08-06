@@ -64,12 +64,12 @@ protected:
     {
         generateTemporaryCredentials();
 
-        std::promise<api::ResultCode> done;
+        std::promise<api::Result> done;
         m_tempPasswordManager->registerTemporaryCredentials(
             AuthorizationInfo(),
             m_credentials,
-            [&done](api::ResultCode resultCode) { done.set_value(resultCode); });
-        ASSERT_EQ(api::ResultCode::ok, done.get_future().get());
+            [&done](api::Result result) { done.set_value(result); });
+        ASSERT_EQ(api::ResultCode::ok, done.get_future().get().code);
     }
 
     void givenProlongatedCredentials()
@@ -165,14 +165,14 @@ private:
         nx::utils::stree::ResourceContainer authProperties;
         authProperties.put(attr::requestPath, "/any/request/path");
 
-        std::promise<api::ResultCode> done;
+        std::promise<api::Result> done;
         m_tempPasswordManager->authenticateByName(
             m_credentials.login.c_str(),
             [](auto...) { return true; }, //< Password check functor.
             &authProperties,
-            [&done](api::ResultCode result) { done.set_value(result); });
+            [&done](api::Result result) { done.set_value(result); });
 
-        auto resultCode = done.get_future().get();
+        const auto resultCode = done.get_future().get().code;
         if (resultCode != api::ResultCode::ok)
             return resultCode;
 

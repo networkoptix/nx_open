@@ -10,6 +10,8 @@
 #include <core/resource/webpage_resource.h>
 #include <core/resource/videowall_resource.h>
 
+#include <nx/vms/api/data/user_role_data.h>
+
 QString QnResourcePoolTestHelper::kTestUserName = "user";
 QString QnResourcePoolTestHelper::kTestUserName2 = "user_2";
 

@@ -10,7 +10,6 @@
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
-#include <nx/utils/unused.h>
 
 namespace nx {
 namespace network {
@@ -143,7 +142,7 @@ void SslStaticData::setAllowedServerVersions(const String& versions)
 {
     int disabledVersions = kDisableAllSslVerions;
     const auto versionList = versions.split('|');
-    NX_ALWAYS(typeid(SslStaticData), lm("Set server SSL versions: %1").container(versionList));
+    NX_INFO(typeid(SslStaticData), "Set server SSL versions: %1", containerString(versionList));
 
     for (const auto& version: versionList)
     {
@@ -163,7 +162,7 @@ void SslStaticData::setAllowedServerVersions(const String& versions)
         if (s == "tls1_2" || s == "tlsv1_2" || s == "tls1.2" || s == "tlsv1.2")
             disabledVersions ^= SSL_OP_NO_TLSv1_2;
         else
-            NX_ASSERT(false, lm("Unknown SSL version: %1").arg(s));
+            NX_ASSERT(false, "Unknown SSL version: %1", s);
     }
 
     if (disabledVersions == kDisableAllSslVerions)
@@ -176,7 +175,7 @@ void SslStaticData::setAllowedServerVersions(const String& versions)
 
 void SslStaticData::setAllowedServerCiphers(const String& ciphers)
 {
-    NX_ALWAYS(typeid(SslStaticData), lm("Set server SSL ciphers: %1").arg(ciphers));
+    NX_INFO(typeid(SslStaticData), "Set server SSL ciphers: %1", ciphers);
     s_allowedServerCiphers = ciphers;
     NX_ASSERT(!s_isInitialized, "SSL ciphers does not take effect after first SSL engine usage");
 }

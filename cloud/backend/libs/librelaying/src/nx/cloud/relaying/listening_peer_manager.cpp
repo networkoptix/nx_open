@@ -52,8 +52,7 @@ void ListeningPeerManager::beginListening(
 
     nx::network::http::ConnectionEvents connectionEvents;
     connectionEvents.onResponseHasBeenSent =
-        std::bind(&ListeningPeerManager::saveServerConnection, this,
-            request.peerName, _1);
+        std::bind(&ListeningPeerManager::saveServerConnection, this, request, _1);
 
     completionHandler(
         relay::api::ResultCode::ok,
@@ -62,11 +61,12 @@ void ListeningPeerManager::beginListening(
 }
 
 void ListeningPeerManager::saveServerConnection(
-    const std::string& peerName,
+    const relay::api::BeginListeningRequest& request,
     nx::network::http::HttpServerConnection* httpConnection)
 {
     m_listeningPeerPool->addConnection(
-        peerName,
+        request.peerName,
+        request.protocolVersion,
         httpConnection->takeSocket());
 }
 

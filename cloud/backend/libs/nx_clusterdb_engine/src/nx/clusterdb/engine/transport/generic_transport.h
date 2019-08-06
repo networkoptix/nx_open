@@ -1,15 +1,16 @@
 #pragma once
 
 #include <memory>
+#include <optional>
 #include <string>
 
 #include <nx/network/connection_server/fixed_size_message_pipeline.h>
 
-#include "../abstract_transaction_transport.h"
+#include "abstract_command_transport.h"
+#include "command_transport_header.h"
 #include "../compatible_ec2_protocol_version.h"
-#include "../transaction_processor.h"
-#include "../transaction_log_reader.h"
-#include "../transaction_transport_header.h"
+#include "../command_processor.h"
+#include "../command_log_reader.h"
 
 namespace nx::clusterdb::engine { class CommandLog; }
 
@@ -17,7 +18,7 @@ namespace nx::clusterdb::engine::transport {
 
 /**
  * Synchronizes two pees over command pipeline.
- * Serialization / deserialization and network transport details 
+ * Serialization / deserialization and network transport details
  * are out of scope of this class and encapsulated by commandPipeline.
  */
 class GenericTransport:
@@ -62,24 +63,27 @@ protected:
 
 private:
     const ProtocolVersionRange m_protocolVersionRange;
+    const OutgoingCommandFilter& m_outgoingCommandFilter;
     const std::string m_systemId;
     const vms::api::PeerData m_localPeer;
-    const vms::api::PeerData m_remotePeer;
+    vms::api::PeerData m_remotePeer;
     std::unique_ptr<AbstractCommandPipeline> m_commandPipeline;
     bool m_canSendCommands = false;
     /**
      * Transaction state, we need to synchronize remote side to, before we can mark it write sync.
      */
-    vms::api::TranState m_tranStateToSynchronizeTo;
+    NodeState m_tranStateToSynchronizeTo;
     /**
      * Transaction state of remote peer. Transactions before this state have been sent to the peer.
      */
-    vms::api::TranState m_remotePeerTranState;
+    NodeState m_remotePeerTranState;
+    std::optional<NodeState> m_prevReadResult;
     bool m_haveToSendSyncDone = false;
     std::unique_ptr<CommandLogReader> m_transactionLogReader;
     CommandTransportHeader m_commonTransportHeaderOfRemoteTransaction;
     ConnectionClosedSubscription m_connectionClosedSubscription;
     CommandHandler m_gotCommandHandler;
+    bool m_closed = false;
 
     void processConnectionClosedEvent(SystemError::ErrorCode closeReason);
 
@@ -87,6 +91,8 @@ private:
         Qn::SerializationFormat serializationFormat,
         const QByteArray& serializedCommand,
         CommandTransportHeader transportHeader);
+
+    bool peerAlreadyHasCommand(const CommandHeader& header) const;
 
     bool isHandshakeCommand(int commandType) const;
 
@@ -100,9 +106,14 @@ private:
     void onTransactionsReadFromLog(
         ResultCode resultCode,
         std::vector<dao::TransactionLogRecord> serializedTransaction,
-        vms::api::TranState readedUpTo);
+        NodeState readedUpTo);
+
+    void sendTransactions(std::vector<dao::TransactionLogRecord> serializedTransactions);
 
     void enableOutputChannel();
 };
+
+nx::vms::api::TranState toVmsTranState(const NodeState& nodeState);
+NodeState toNodeState(const nx::vms::api::TranState& tranState);
 
 } // namespace nx::clusterdb::engine::transport

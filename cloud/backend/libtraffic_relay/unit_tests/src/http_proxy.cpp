@@ -1,4 +1,5 @@
 #include <vector>
+#include <thread>
 
 #include <gtest/gtest.h>
 
@@ -135,7 +136,7 @@ protected:
         const Relay& relayInstance,
         const std::string& hostName)
     {
-        auto url = relayInstance.basicUrl();
+        auto url = relayInstance.httpUrl();
 
         auto host = lm("%1.%2").args(hostName, url.host()).toStdString();
         addLocalHostAlias(host);
@@ -217,7 +218,7 @@ protected:
         httpClient->setSendTimeout(network::kNoTimeout);
         httpClient->setResponseReadTimeout(network::kNoTimeout);
         httpClient->setMessageBodyReadTimeout(network::kNoTimeout);
-        
+
         httpClient->executeInAioThreadSync(
             [this, &httpClient, method, url]()
             {
@@ -286,7 +287,7 @@ protected:
     {
         using namespace std::placeholders;
 
-        auto url = relay().basicUrl();
+        auto url = relay().httpUrl();
         url.setUserName(listeningPeerHostName.c_str());
 
         auto acceptor = std::make_unique<RelayConnectionAcceptor>(url);
@@ -316,7 +317,7 @@ protected:
         peerServer->server().start();
 
         while (!peerInformationSynchronizedInCluster(listeningPeerHostName))
-            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
         return peerServer;
     }
@@ -600,6 +601,13 @@ class HttpProxyRedirectToRelayDnsName:
 {
     using base_type = HttpProxy;
 
+public:
+    ~HttpProxyRedirectToRelayDnsName()
+    {
+        for (const auto& name: m_relayNames)
+            nx::network::SocketGlobals::addressResolver().removeFixedAddress(name);
+    }
+
 protected:
     virtual void SetUp() override
     {
@@ -611,6 +619,9 @@ protected:
             auto relayNameArgument = lm("--server/name=%1")
                 .args(m_relayNames.back()).toStdString();
             addRelayInstance({ relayNameArgument.c_str() });
+
+            nx::network::SocketGlobals::addressResolver().addFixedAddress(
+                m_relayNames.back(), nx::network::SocketAddress(nx::network::HostAddress::localhost, relay(i).httpUrl().port()));
         }
 
         m_httpClient.setResponseReadTimeout(network::kNoTimeout);
@@ -627,7 +638,7 @@ protected:
     void thenRequestHasBeenRedirectedToProperEndpoint()
     {
         ASSERT_EQ(
-            network::http::StatusCode::found,
+            network::http::StatusCode::temporaryRedirect,
             m_httpClient.response()->statusLine.statusCode);
 
         const auto expectedLocationUrl = network::url::Builder()
@@ -812,9 +823,9 @@ private:
     int m_totalRequestCount = 0;
 };
 
-TEST_F(HttpProxyWithSslStress, DISABLED_stress_test)
+TEST_F(HttpProxyWithSslStress, stress_test)
 {
-    constexpr int kRequestCount = 101;
+    const auto kRequestCount = std::thread::hardware_concurrency() * 3;
 
     givenRegularRelay();
     startSendingConcurrentRequestsToUnknownPeer(kRequestCount);

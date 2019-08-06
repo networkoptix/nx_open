@@ -6,7 +6,7 @@
 #include <core/resource/resource.h>
 #include <core/resource/resource_display_info.h>
 
-#include <nx/vms/client/desktop/resource_views/data/node_type.h>
+#include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 
 #include <ui/style/resource_icon_cache.h>
 
@@ -249,8 +249,8 @@ QVariant QnResourceListModel::data(const QModelIndex &index, int role) const
             return static_cast<int>(resource->getStatus());
         case Qn::NodeTypeRole:
             return m_options.testFlag(ServerAsHealthMonitorOption)
-                ? qVariantFromValue(ResourceTreeNodeType::layoutItem)
-                : qVariantFromValue(ResourceTreeNodeType::resource);
+                ? qVariantFromValue(ResourceTree::NodeType::layoutItem)
+                : qVariantFromValue(ResourceTree::NodeType::resource);
 
         default:
             break;

@@ -39,7 +39,7 @@ void QnThumbnailRequestData::loadFromParams(QnResourcePool* resourcePool,
     request.camera = nx::camera_id_helper::findCameraByFlexibleIds(
         resourcePool,
         /*outNotFoundCameraId*/ nullptr,
-        params.toHash(),
+        params,
         {kCameraIdParam, kDeprecatedPhysicalIdParam, kDeprecatedMacParam})
         .dynamicCast<QnVirtualCameraResource>();
 
@@ -71,7 +71,7 @@ void QnThumbnailRequestData::loadFromParams(QnResourcePool* resourcePool,
     request.aspectRatio = QnLexical::deserialized<nx::api::ImageRequest::AspectRatio>(
         params.value(kAspectRatioParam), /*defaultValue*/ request.aspectRatio);
     request.streamSelectionMode =
-        QnLexical::deserialized<nx::api::CameraImageRequest::StreamSelectionMode>(
+        QnLexical::deserialized<nx::api::ImageRequest::StreamSelectionMode>(
             params.value(kStreamSelectionModeParam), /*defaultValue*/ request.streamSelectionMode);
 }
 

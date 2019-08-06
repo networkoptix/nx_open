@@ -25,7 +25,6 @@
 #include <api/model/rebuild_archive_reply.h>
 #include <api/model/test_email_settings_reply.h>
 #include <api/model/configure_reply.h>
-#include <api/model/upload_update_reply.h>
 #include <api/model/update_information_reply.h>
 #include <api/model/backup_status_reply.h>
 #include <api/model/getnonce_reply.h>
@@ -80,7 +79,7 @@
 #include <nx/vms/event/event_fwd.h>
 #include <nx/vms/event/events/abstract_event.h>
 #include <nx/vms/event/events/analytics_sdk_event.h>
-#include <nx/vms/event/events/plugin_event.h>
+#include <nx/vms/event/events/plugin_diagnostic_event.h>
 #include <nx/vms/event/rule.h>
 
 #include <licensing/license.h>
@@ -141,7 +140,7 @@ void QnCommonMetaTypes::initialize()
     qRegisterMetaType<Qn::ResourceStatus>();
     qRegisterMetaType<nx::vms::api::EventReason>();
     qRegisterMetaType<nx::vms::event::AnalyticsSdkEventPtr>();
-    qRegisterMetaType<nx::vms::event::PluginEventPtr>();
+    qRegisterMetaType<nx::vms::event::PluginDiagnosticEventPtr>();
 
     qRegisterMetaType<QnUserResourcePtr>();
     qRegisterMetaType<QnLayoutResourcePtr>();
@@ -190,10 +189,7 @@ void QnCommonMetaTypes::initialize()
     qRegisterMetaType<QnScheduleTask>();
     qRegisterMetaType<QnScheduleTaskList>();
 
-    qRegisterMetaType<QnRequestParamList>();
-    qRegisterMetaType<QnRequestHeaderList>("QnRequestHeaderList");
-    /* The underlying type is identical to QnRequestParamList. */
-    qRegisterMetaType<QnReplyHeaderList>();
+    qRegisterMetaType<nx::network::rest::Params>();
     qRegisterMetaType<QnHTTPRawResponse>();
 
     qRegisterMetaType<Qn::TimePeriodContent>();
@@ -269,7 +265,6 @@ void QnCommonMetaTypes::initialize()
     qRegisterMetaType<QnGetNonceReply>();
 
     qRegisterMetaType<QnConfigureReply>();
-    qRegisterMetaType<QnUploadUpdateReply>();
     qRegisterMetaType<QnUpdateFreeSpaceReply>();
     qRegisterMetaType<QnCloudHostCheckReply>();
 

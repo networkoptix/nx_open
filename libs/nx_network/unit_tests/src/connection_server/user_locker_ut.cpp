@@ -79,14 +79,19 @@ protected:
 
     void thenThereIsNoLockoutRecord()
     {
-        const auto userLockers = m_locker.userLockers();
-        ASSERT_TRUE(userLockers.find(m_userKey) == userLockers.end());
+        ASSERT_FALSE(m_locker.lockerExists(m_userKey));
+    }
+
+    void thenLockReasonIsProvided()
+    {
+        const auto reason = m_locker.getCurrentLockReason(m_userKey);
+        ASSERT_FALSE(reason.empty());
     }
 
 private:
-    const UserLockerPool::key_type m_userKey;
+    const UserLockerPool<>::key_type m_userKey;
     server::UserLockerSettings m_settings;
-    server::UserLockerPool m_locker;
+    server::UserLockerPool<> m_locker;
     nx::utils::test::ScopedTimeShift m_timeShift;
 };
 
@@ -136,6 +141,12 @@ TEST_F(UserLocker, unused_context_removed_by_timeout)
 
     thenThereIsNoLockoutRecord();
     thenUserIsNotLocked();
+}
+
+TEST_F(UserLocker, lockout_reason_is_provided)
+{
+    givenLockedUser();
+    thenLockReasonIsProvided();
 }
 
 } // namespace test

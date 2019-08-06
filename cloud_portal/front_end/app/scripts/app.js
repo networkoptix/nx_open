@@ -51,8 +51,8 @@ window.L = {};
             $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
             $httpProvider.interceptors.push('httpResponseInterceptor');
         }])
-        .config(['ngToastProvider', 'configServiceProvider', function (ngToastProvider, configServiceProvider) {
-            var CONFIG = configServiceProvider.$get().config;
+        .config(['ngToastProvider', 'nxConfigServiceProvider', function (ngToastProvider, nxConfigServiceProvider) {
+            var CONFIG = nxConfigServiceProvider.$get().getConfig();
 
             ngToastProvider.configure({
                 timeout: CONFIG.alertTimeout,
@@ -64,9 +64,9 @@ window.L = {};
             });
         }])
         .config(['$routeProvider', '$locationProvider', '$compileProvider',
-            'languageServiceProvider', 'configServiceProvider',
+            'languageServiceProvider', 'nxConfigServiceProvider',
             function ($routeProvider, $locationProvider, $compileProvider,
-                      languageServiceProvider, configServiceProvider) {
+                      languageServiceProvider, nxConfigServiceProvider) {
 
                 if (!PRODUCTION) {
                     $compileProvider.debugInfoEnabled(true);
@@ -74,7 +74,7 @@ window.L = {};
 
                 $locationProvider.html5Mode(true);
 
-                var CONFIG = configServiceProvider.$get().config;
+                var CONFIG = nxConfigServiceProvider.$get().getConfig();
 
                 var appState = {
                         viewsDir: 'static/views/', //'static/lang_' + lang + '/views/';
@@ -90,10 +90,23 @@ window.L = {};
                     async: false,
                     dataType: 'json'
                 }).done(function(response){
-                    appState.trafficRelayHost = response.trafficRelayHost;
+                    appState.companyLink = response.companyLink;
+                    appState.companyName = response.companyName;
+                    appState.copyrightYear = response.copyrightYear;
+                    appState.footerItems = response.footerItems ? JSON.parse(response.footerItems) : {};
                     appState.publicDownloads = response.publicDownloads;
                     appState.publicReleases = response.publicReleases;
+                    appState.trafficRelayHost = response.trafficRelayHost;
+                    appState.supportLink = response.supportLink;
+                    appState.productName = response.productName;
+                    appState.vmsName = response.vmsName;
+                    
                     angular.extend(CONFIG, appState);
+                    
+                    CONFIG.campage.sortSupportedDevices = response.sortSupportedDevices;
+                    CONFIG.campage.supportedResolutions = response.supportedResolutions;
+                    CONFIG.campage.supportedHardwareTypes = response.supportedHardwareTypes;
+                    CONFIG.campage.searchTags = response.searchTags;
                 });
 
                 $.ajax({
@@ -121,8 +134,11 @@ window.L = {};
 
                         // if request to api/utils/language fails then
                         // cloud_portal is under maintenance
-                        if (PRODUCTION) {
+                        // TODO: Causes IOS to not load sometimes but not sure why
+                        if (PRODUCTION && error.status > 500) {
                             window.location.href = '/static/503.html';
+                        } else if (PRODUCTION) {
+                            window.location.href = '/';
                         }
 
                         $.ajax({
@@ -308,15 +324,22 @@ window.L = {};
                                 controller: 'DebugCtrl'
                             })
                             .when('/login', {
-                                title: lang.pageTitles.login,
-                                templateUrl: CONFIG.viewsDir + 'startPage.html',
-                                controller: 'StartPageCtrl',
-                                resolve: {
-                                    test: ['$route', function ($route) {
-                                        $route.current.params.callLogin = true;
-                                    }]
-                                }
+                                template: '<landing-component></landing-component>'
+                                // title: lang.pageTitles.login,
+                                // templateUrl: CONFIG.viewsDir + 'startPage.html',
+                                // controller: 'StartPageCtrl',
+                                // resolve: {
+                                //     test: ['$route', function ($route) {
+                                //         $route.current.params.callLogin = true;
+                                //     }]
+                                // }
                             })
+                            .when('/admin', {
+                                resolve: {
+                                    test: function(){
+                                        window.location = '/admin/';
+                                    }
+                                }})
                             // for history purpose
                             .when('/downloads/history', {
                                 template: '<download-history></download-history>'
@@ -328,7 +351,7 @@ window.L = {};
                                 }],
                                 resolve: {
                                     getParam: [ '$route', function($route){
-                                        return $route.current.params.param
+                                        return $route.current.params.param;
                                     }]
                                 }
                             })
@@ -342,20 +365,38 @@ window.L = {};
                                 }],
                                 resolve: {
                                     getPlatform: [ '$route', function ($route) {
-                                        return $route.current.params.platform
+                                        return $route.current.params.platform;
                                     }]
                                 }
                             })
                             .when('/browser', {
                                 template: '<non-supported-browser></non-supported-browser>'
                             })
+                            .when('/campage', {
+                                template: ''
+                            })
                             .when('/sandbox', {
                                 template: ''
                             })
+                            .when('/integrations/:plugin?', {
+                                template: ''
+                            })
+                            .when('/new-content', {
+                                template: ''
+                            })
+                            .when('/right', {
+                                template: ''
+                            })
+                            // **** routes for detail views should state full path ****
+                            .when('/main/:route', {
+                                template: ''
+                            })
+                            // ********************************************************
+                            .when('/main', {
+                                template: ''
+                            })
                             .when('/', {
-                                title: ''/*lang.pageTitles.startPage*/,
-                                templateUrl: CONFIG.viewsDir + 'startPage.html',
-                                controller: 'StartPageCtrl'
+                                template: '<landing-component></landing-component>'
                             })
                             .otherwise({
                                 title: lang.pageTitles.pageNotFound,
@@ -365,8 +406,6 @@ window.L = {};
             }])
         .run(['nxLanguageService', 'languageService', function (nxLanguageService, languageService) {
             // make sure both language services are synchronized
-            // had problem downgrading A6 'nxLanguageService' service to AJS provider so
-            // it's set as regular service and running after 'config' phase --TT
-            nxLanguageService.translate.use(languageService.lang.language);
+            nxLanguageService.setLang(languageService.lang.language);
         }]);
 })();

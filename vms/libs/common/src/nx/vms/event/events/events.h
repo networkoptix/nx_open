@@ -18,4 +18,4 @@
 #include "software_trigger_event.h"
 #include "storage_failure_event.h"
 #include "analytics_sdk_event.h"
-#include "plugin_event.h"
+#include "plugin_diagnostic_event.h"

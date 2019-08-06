@@ -16,7 +16,7 @@ public:
     virtual void getSystemHealthHistory(
         const AuthorizationInfo& authzInfo,
         data::SystemId systemId,
-        std::function<void(api::ResultCode, api::SystemHealthHistory)> completionHandler) override;
+        std::function<void(api::Result, api::SystemHealthHistory)> completionHandler) override;
 
     void setSystemStatus(const std::string& id, bool online);
 

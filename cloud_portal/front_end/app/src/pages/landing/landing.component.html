@@ -1,0 +1,15 @@
+<div class="container auth-hidden">
+    <div class="jumbotron">
+        <landing-display-component></landing-display-component>
+
+        <p *ngIf="!userEmail" class="d-flex justify-content-center">
+            <a class="btn btn-lg btn-primary auth-hidden"
+               href="/register" role="button" translate>Create Account</a>
+        </p>
+        <p *ngIf="userEmail" class="d-flex justify-content-center">
+            <a class="btn btn-lg btn-primary auth-hidden"
+               href="/login"
+               role="button" translate>Log In</a>
+        </p>
+    </div>
+</div>

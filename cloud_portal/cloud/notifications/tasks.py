@@ -9,7 +9,8 @@ from celery.exceptions import Ignore
 from django.conf import settings
 
 from api.models import Account
-from notifications import api
+from notifications import notifications_api
+from notifications.models import Message
 from util.helpers import get_language_for_email
 
 import traceback
@@ -33,7 +34,7 @@ def log_error(error, user_email, type, message, lang, customization, queue, atte
                 customization,
                 queue,
                 attempt,
-                traceback.format_exc())
+                traceback.format_exc().replace("Traceback", ""))
 
     if isinstance(error, SMTPException) or isinstance(error, SMTPServerDisconnected):
         logger.warning(error_formatted)
@@ -41,33 +42,50 @@ def log_error(error, user_email, type, message, lang, customization, queue, atte
         logger.error(error_formatted)
 
 
+def send_email_log(_task):
+    def wrapper(*args, **kwargs):
+        logger.info("Start {} was run with args {}, kwargs: {}".format(_task.__name__, args, kwargs))
+        return _task(*args, **kwargs)
+    return wrapper
+
+
 @shared_task
-def send_email(user_email, type, message, customization, queue="", attempt=1):
-    lang = get_language_for_email(user_email, customization)
+@send_email_log
+def send_email(msg_id, queue="", attempt=1):
+    message = Message.objects.get(id=msg_id)
+    lang = get_language_for_email(message.user_email, message.customization)
     try:
-        email_engine.send(user_email, type, message, lang, customization)
+        email_engine.send(message.user_email, message.type, message.message, lang, message.customization)
     except Exception as error:
         if (isinstance(error, SMTPException) or isinstance(error, SSLError)) and attempt < settings.MAX_RETRIES:
-            send_email.apply_async(args=[user_email, type, message, customization, queue, attempt+1],
-                                   queue=queue)
+            send_email.apply_async(args=[message.id, queue, attempt+1], queue=queue)
         elif attempt >= settings.MAX_RETRIES:
             error = MaxResendException()
 
-        log_error(error, user_email, type, message, lang, customization, queue, attempt)
+        log_error(error, message.user_email, message.type, message, lang, message.customization, queue, attempt)
 
-        send_email.update_state(state="FAILURE", meta={'error': str(error),
-                                                       'user_email': user_email,
-                                                       'type': type,
-                                                       'message': message,
-                                                       'customization': customization,
-                                                       'language': lang,
-                                                       'queue': queue,
-                                                       'attempt': attempt,
+        send_email.update_state(state="FAILURE",
+                                meta={
+                                    'error': str(error),
+                                    'user_email': message.user_email,
+                                    'type': message.type,
+                                    'message': message.message,
+                                    'customization': message.customization,
+                                    'language': lang,
+                                    'queue': queue,
+                                    'attempt': attempt,
                                                        })
         raise Ignore()
     else:
-        return {'user_email': user_email, 'type': type, 'message': message, 'customization': customization,
-                'language': lang, 'queue': queue, 'attempt': attempt}
+        return {
+            'user_email': message.user_email,
+            'type': message.type,
+            'message': message.message,
+            'customization': message.customization,
+            'language': lang,
+            'queue': queue,
+            'attempt': attempt
+        }
 
 
 # For testing we dont want to send emails to everyone so we need to set
@@ -84,7 +102,7 @@ def send_to_all_users(notification_id, message, customizations, force=False):
 
     for user in users:
         message['userFullName'] = user.get_full_name()
-        api.send(user.email, 'cloud_notification', message, user.customization)
+        notifications_api.send(user.email, 'cloud_notification', message, user.customization)
 
     return {'notification_id': notification_id, 'subject': message['subject'], 'force': force}
 

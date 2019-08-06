@@ -23,7 +23,7 @@
                             return errorCodes[error.resultCode];
                         }
                     }
-                    return lang.errorCodes[error.resultCode] || lang.errorCodes.unknownError;
+                    return lang.errorCodes[error.resultCode] || error.errorText || lang.errorCodes.unknownError;
                 }
 
                 return {

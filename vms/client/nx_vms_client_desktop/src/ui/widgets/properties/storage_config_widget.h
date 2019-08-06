@@ -66,6 +66,8 @@ private:
     void updateRebuildUi(QnServerStoragesPool pool, const QnStorageScanData& reply);
     void updateBackupUi(const QnBackupStatusData& reply, int overallSelectedCameras);
 
+    void confirmNewMetadataStorage(const QnUuid& storageId);
+
     void updateWarnings();
 
     void updateIntervalLabels();
@@ -81,7 +83,7 @@ private:
 
     void invokeBackupSettings();
 
-    static QString backupPositionToString(qint64 backupTimeMs);
+    QString backupPositionToString(qint64 backupTimeMs);
     static QString intervalToString(qint64 backupTimeMs);
 
     quint64 nextScheduledBackupTimeMs() const;
@@ -104,6 +106,7 @@ private:
     QScopedPointer<Ui::StorageConfigWidget> ui;
     QnMediaServerResourcePtr m_server;
     QScopedPointer<QnStorageListModel> m_model;
+    QScopedPointer<QObject> m_columnResizer;
     QTimer* m_updateStatusTimer;
     QTimer* m_updateLabelsTimer;
     QMenu* m_storagePoolMenu;

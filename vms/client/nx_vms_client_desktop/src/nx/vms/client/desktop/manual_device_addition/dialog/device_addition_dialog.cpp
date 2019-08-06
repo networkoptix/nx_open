@@ -211,7 +211,7 @@ void DeviceAdditionDialog::initializeControls()
     setupPortStuff(ui->knownAddressAutoPortCheckBox, ui->knownAddressPortSpinWidget);
     setupPortStuff(ui->subnetScanAutoPortCheckBox, ui->subnetScanPortSpinWidget);
 
-    setSearchAccent(true);
+    setAddDevicesAccent(false);
 
     PasswordPreviewButton::createInline(ui->passwordEdit);
 
@@ -232,10 +232,10 @@ void DeviceAdditionDialog::initializeControls()
     setPaletteColor(ui->subnetScanPortPlaceholder, QPalette::Text, colorTheme()->color("dark14"));
 }
 
-void DeviceAdditionDialog::setSearchAccent(bool isEnabled)
+void DeviceAdditionDialog::setAddDevicesAccent(bool canAddDevices)
 {
-    const auto accentButton = isEnabled ? ui->searchButton : ui->addDevicesButton;
-    const auto regularButton = isEnabled ? ui->addDevicesButton : ui->searchButton;
+    const auto accentButton = canAddDevices ? ui->addDevicesButton : ui->searchButton;
+    const auto regularButton = accentButton == ui->addDevicesButton ? ui->searchButton : ui->addDevicesButton;
 
     regularButton->setDefault(false);
     resetButtonStyle(regularButton);
@@ -248,8 +248,9 @@ bool DeviceAdditionDialog::eventFilter(QObject *object, QEvent *event)
 {
     if (event->type() == QEvent::FocusIn)
     {
-        const bool isSearchAccent = object != ui->foundDevicesTable && object != ui->addDevicesButton;
-        setSearchAccent(isSearchAccent);
+        const bool addDevicesFocus = object == ui->foundDevicesTable || object == ui->addDevicesButton;
+        const bool newDevicesPresent = m_model && m_model->deviceCount(FoundDevicesModel::notPresentedState) > 0;
+        setAddDevicesAccent(addDevicesFocus && newDevicesPresent);
     }
     return base_type::eventFilter(object, event);
 }
@@ -696,9 +697,11 @@ void DeviceAdditionDialog::updateResultsWidgetState()
         const int current = status.total ? status.current : 0;
         ui->searchProgressBar->setMaximum(total);
         ui->searchProgressBar->setValue(current);
-        const auto text = m_currentSearch->searching()
+        const bool isSearching = m_currentSearch->searching();
+        const auto text = isSearching
             ? tr("Searching...")
             : tr("No devices found");
+        setAddDevicesAccent(isSearching);
         ui->placeholderLabel->setText(text.toUpper());
     }
 
@@ -768,7 +771,7 @@ void DeviceAdditionDialog::showAddDevicesPlaceholder(const QString& placeholderT
 {
     ui->addDevicesStackedWidget->setCurrentWidget(ui->addDevicesPlaceholderPage);
     ui->addDevicesPlaceholder->setText(placeholderText);
-    setSearchAccent(true);
+    setAddDevicesAccent(false);
 }
 
 } // namespace nx::vms::client::desktop

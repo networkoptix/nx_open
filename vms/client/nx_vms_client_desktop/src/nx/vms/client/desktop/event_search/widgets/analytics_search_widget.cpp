@@ -1,6 +1,7 @@
 #include "analytics_search_widget.h"
 
 #include <algorithm>
+#include <chrono>
 
 #include <QtCore/QJsonObject>
 #include <QtCore/QPointer>
@@ -32,12 +33,16 @@
 #include <nx/vms/client/desktop/common/dialogs/web_view_dialog.h>
 #include <nx/vms/client/desktop/common/widgets/selectable_text_button.h>
 #include <nx/vms/client/desktop/event_search/models/analytics_search_list_model.h>
+#include <nx/vms/client/desktop/utils/widget_utils.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/math/fuzzy.h>
+#include <nx/utils/pending_operation.h>
 #include <nx/utils/string.h>
 
 namespace nx::vms::client::desktop {
+
+using namespace std::chrono;
 
 // ------------------------------------------------------------------------------------------------
 // AnalyticsSearchWidget::Private
@@ -59,7 +64,7 @@ public:
     void executePluginAction(
         const QnUuid& engineId,
         const QString& actionTypeId,
-        const analytics::db::DetectedObject& object,
+        const analytics::db::ObjectTrack& object,
         const QnVirtualCameraResourcePtr& camera) const;
 
 private:
@@ -84,6 +89,7 @@ private:
     QMenu* const m_objectTypeMenu;
     QPointer<QAction> m_defaultAction;
     bool m_areaSelectionEnabled = false;
+    nx::utils::PendingOperation m_updateObjectTypesOperation;
 
     using ObjectTypeDescriptors = std::map<QString, nx::vms::api::analytics::ObjectTypeDescriptor>;
     struct EngineInfo
@@ -178,6 +184,15 @@ AnalyticsSearchWidget::Private::Private(AnalyticsSearchWidget* q):
 {
     NX_CRITICAL(m_model);
 
+    m_updateObjectTypesOperation.setFlags(nx::utils::PendingOperation::FireOnlyWhenIdle);
+    m_updateObjectTypesOperation.setInterval(1ms);
+    m_updateObjectTypesOperation.setCallback(
+        [this]()
+        {
+            this->q->updateAllowance();
+            updateTypeMenu();
+        });
+
     setupTypeSelection();
     setupAreaSelection();
 
@@ -246,8 +261,7 @@ void AnalyticsSearchWidget::Private::resetFilters()
 
 void AnalyticsSearchWidget::Private::updateAvailableObjectTypes()
 {
-    q->updateAllowance();
-    updateTypeMenu();
+    m_updateObjectTypesOperation.requestOperation();
 }
 
 void AnalyticsSearchWidget::Private::setupTypeSelection()
@@ -279,7 +293,9 @@ void AnalyticsSearchWidget::Private::updateTypeMenu()
     nx::analytics::EngineDescriptorManager engineDescriptorManager(q->commonModule());
     const auto objectTypeDescriptors = objectTypeDescriptorManager.descriptors();
     const auto engineDescriptors = engineDescriptorManager.descriptors();
-    m_objectTypeMenu->clear();
+
+    WidgetUtils::clearMenu(m_objectTypeMenu);
+
     m_defaultAction = addMenuAction(m_objectTypeMenu, tr("Any type"), {});
 
     const auto cameras = q->resourcePool()->getResources<QnVirtualCameraResource>();
@@ -425,7 +441,7 @@ QAction* AnalyticsSearchWidget::Private::addMenuAction(
 void AnalyticsSearchWidget::Private::executePluginAction(
     const QnUuid& engineId,
     const QString& actionTypeId,
-    const analytics::db::DetectedObject& object,
+    const analytics::db::ObjectTrack& track,
     const QnVirtualCameraResourcePtr& camera) const
 {
     const auto server = q->commonModule()->currentServer();
@@ -440,8 +456,8 @@ void AnalyticsSearchWidget::Private::executePluginAction(
     AnalyticsAction actionData;
     actionData.engineId = engineId;
     actionData.actionId = actionDescriptor->id;
-    actionData.objectId = object.objectAppearanceId;
-    actionData.timestampUs = object.firstAppearanceTimeUsec;
+    actionData.objectTrackId = track.id;
+    actionData.timestampUs = track.firstAppearanceTimeUs;
     actionData.deviceId = camera->getId();
 
     if (!actionDescriptor->parametersModel.isEmpty())

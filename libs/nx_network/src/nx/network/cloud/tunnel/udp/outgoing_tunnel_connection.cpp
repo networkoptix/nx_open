@@ -27,7 +27,7 @@ OutgoingTunnelConnection::OutgoingTunnelConnection(
     m_pleaseStopHasBeenCalled(false),
     m_pleaseStopCompleted(false)
 {
-    m_controlConnection->setOnConnectionClosed(
+    m_controlConnection->registerCloseHandler(
         [this](auto reason) { onConnectionClosed(reason); });
 
     m_controlConnection->bindToAioThread(getAioThread());

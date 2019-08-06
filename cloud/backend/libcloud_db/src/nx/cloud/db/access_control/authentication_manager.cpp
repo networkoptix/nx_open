@@ -59,6 +59,7 @@ void AuthenticationManager::authenticate(
     {
         return authenticatorHelper.reportFailure(
             AuthenticationType::other,
+            request,
             api::ResultCode::accountBlocked);
     }
 
@@ -70,6 +71,7 @@ void AuthenticationManager::authenticate(
     {
         return authenticatorHelper.reportFailure(
             AuthenticationType::other,
+            request,
             api::ResultCode::notAuthorized,
             prepareWwwAuthenticateHeader());
     }
@@ -89,6 +91,7 @@ void AuthenticationManager::authenticate(
     {
         return authenticatorHelper.reportFailure(
             AuthenticationType::credentials,
+            request,
             authResultCode);
     }
 }
@@ -190,12 +193,16 @@ void AuthenticationHelper::reportSuccess(
 
 void AuthenticationHelper::reportFailure(
     AuthenticationType authenticationType,
+    const nx::network::http::Request request,
     api::ResultCode resultCode,
     std::optional<nx::network::http::header::WWWAuthenticate> wwwAuthenticate)
 {
+    NX_VERBOSE(this, "Authentication failed (username %1). %2", m_username, toString(resultCode));
+
     m_transportSecurityManager->onAuthenticationFailure(
         authenticationType,
         m_connection,
+        request,
         m_username);
 
     nx::utils::swapAndCall(
@@ -377,9 +384,9 @@ api::ResultCode AuthenticationHelper::authenticateInDataManagers(
             m_username.c_str(),
             m_validateHa1Func,
             authProperties,
-            [&authPromise](api::ResultCode authResult)
+            [&authPromise](api::Result authResult)
             {
-                authPromise.set_value(authResult);
+                authPromise.set_value(authResult.code);
             });
         authFuture.wait();
         const auto result = authFuture.get();

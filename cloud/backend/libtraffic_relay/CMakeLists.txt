@@ -3,10 +3,11 @@ nx_configure_file(
     ${CMAKE_CURRENT_BINARY_DIR})
 
 nx_add_target(libtraffic_relay LIBRARY NO_MOC
+    WERROR_IF NOT WINDOWS
     ADDITIONAL_SOURCES
         "${CMAKE_CURRENT_BINARY_DIR}/libtraffic_relay_app_info_impl.cpp"
     PUBLIC_LIBS
-        cloud_db_client nx_network nx_utils nx_cassandra nx_relaying)
+        cloud_db_client nx_network nx_utils nx_relaying nx_clusterdb_map)
 
 set_target_properties(libtraffic_relay PROPERTIES PREFIX "")
 

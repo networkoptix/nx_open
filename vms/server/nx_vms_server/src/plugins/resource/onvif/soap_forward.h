@@ -221,14 +221,14 @@ typedef _onvifPtz__GetPresetsResponse GetPresetsResp;
 typedef _onvifPtz__RemovePreset RemovePresetReq;
 typedef _onvifPtz__RemovePresetResponse RemovePresetResp;
 //-------------------------------------------------------------------------------------------------
-class _oasisWsnB2__Subscribe;
-class _oasisWsnB2__SubscribeResponse;
-class _oasisWsnB2__CreatePullPoint;
-class _oasisWsnB2__CreatePullPointResponse;
-class _oasisWsnB2__Renew;
-class _oasisWsnB2__RenewResponse;
-class _oasisWsnB2__Unsubscribe;
-class _oasisWsnB2__UnsubscribeResponse;
+class _wsnt__Subscribe;
+class _wsnt__SubscribeResponse;
+class _wsnt__CreatePullPoint;
+class _wsnt__CreatePullPointResponse;
+class _wsnt__Renew;
+class _wsnt__RenewResponse;
+class _wsnt__Unsubscribe;
+class _wsnt__UnsubscribeResponse;
 //-------------------------------------------------------------------------------------------------
 class _onvifEvents__CreatePullPointSubscription;
 class _onvifEvents__CreatePullPointSubscriptionResponse;

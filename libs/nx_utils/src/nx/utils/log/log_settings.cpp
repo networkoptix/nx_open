@@ -13,8 +13,9 @@ namespace nx {
 namespace utils {
 namespace log {
 
-void LoggerSettings::parse(const QString& str)
+bool LoggerSettings::parse(const QString& str)
 {
+    bool parseSucceeded = true;
     const auto params = parseNameValuePairs<std::multimap>(
         str.toUtf8(),
         ',',
@@ -31,7 +32,7 @@ void LoggerSettings::parse(const QString& str)
         }
         else if (param.first == "level")
         {
-            level.parse(param.second);
+            parseSucceeded = parseSucceeded && level.parse(param.second);
         }
         else if (param.first == "dir")
         {
@@ -39,13 +40,19 @@ void LoggerSettings::parse(const QString& str)
         }
         else if (param.first == "maxBackupCount")
         {
-            maxBackupCount = param.second.toInt();
+            bool ok = false;
+            maxBackupCount = param.second.toInt(&ok);
+            parseSucceeded = parseSucceeded && ok;
         }
         else if (param.first == "maxFileSize")
         {
-            maxFileSize = stringToBytes(param.second);
+            bool ok = false;
+            maxFileSize = stringToBytes(param.second, &ok);
+            parseSucceeded = parseSucceeded && ok;
         }
     }
+
+    return parseSucceeded;
 }
 
 void LoggerSettings::updateDirectoryIfEmpty(const QString& dataDirectory)
@@ -83,14 +90,31 @@ Settings::Settings(QSettings* settings)
         logger.level.primary = Level::none;
 
         settings->beginGroup(group);
-        for (const auto& levelKey: settings->childKeys())
+        for (const QString& levelKey: settings->childKeys())
         {
-            const auto level = levelFromString(levelKey);
-            const auto value = settings->value(levelKey).toString();
-            if (value == '*')
-                logger.level.primary = level;
-            else
-                logger.level.filters[Filter(value)] = level;
+            const Level level = levelFromString(levelKey);
+            const QVariant& value = settings->value(levelKey);
+
+            switch (value.type())
+            {
+                case QVariant::String:
+                {
+                    const QString& valueString = value.toString().trimmed();
+                    if (valueString == L'*')
+                        logger.level.primary = level;
+                    else
+                        logger.level.filters[Filter(valueString)] = level;
+                    break;
+                }
+                case QVariant::StringList:
+                {
+                    for (const QString& valueString: value.toStringList())
+                        logger.level.filters[Filter(valueString.trimmed())] = level;
+                    break;
+                }
+                default:
+                    break;
+            }
         }
         settings->endGroup();
 
@@ -110,7 +134,7 @@ void Settings::load(const QnSettings& settings, const QString& prefix)
             continue;
         ++logSettingCount;
 
-        if (arg.first == lm("%1/logger").args(prefix).toQString())
+        if (arg.first.startsWith(lm("%1/logger").args(prefix).toQString()))
         {
             LoggerSettings loggerSettings;
             loggerSettings.parse(arg.second);

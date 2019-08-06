@@ -3,9 +3,9 @@
     'use strict';
 
     function NxHeader(NxDialogsService, cloudApi, account, $location, $route,
-                      systemsProvider, configService, $rootScope) {
+                      systemsProvider, nxConfigService, $rootScope) {
 
-        const CONFIG = configService.config;
+        const CONFIG = nxConfigService.getConfig();
     
         function isActive(val) {
             var currentPath = $location.path();
@@ -19,12 +19,16 @@
                 scope.config = CONFIG;
                 scope.inline = typeof($location.search().inline) !== 'undefined';
 
-                scope.viewHeader = CONFIG.showHeaderAndFooter;
+                scope.viewHeader = scope.config.showHeaderAndFooter;
                 
                 $rootScope.$on('nx.layout.header', function (event, opt) {
                     // An event to control visibility of the header
                     // ... i.e. when in view camera in embed
-                    scope.viewHeader = !opt.state;
+                    // ... and check if Config.showHeaderAndFooter is false
+                    // as view controller resets header and footer on destroy
+                    if (CONFIG.showHeaderAndFooter) {
+                        scope.viewHeader = !opt.state;
+                    }
                 });
 
                 if (scope.inline) {
@@ -43,6 +47,8 @@
                 // scope.activeSystem = {};
 
                 function updateActive() {
+                    scope.active.campage = isActive('/campage');
+                    scope.active.integrations = isActive('/integrations');
                     scope.active.register = isActive('/register');
                     scope.active.view = isActive('/view');
                     scope.active.settings = $route.current.params.systemId && !isActive('/view');
@@ -67,7 +73,7 @@
                     .get()
                     .then(function (account) {
                         scope.account = account;
-                    scope.downloadsHistory = scope.account.permissions.indexOf(CONFIG.permissions.canViewRelease) > -1;
+                        scope.downloadsHistory = scope.account.permissions.indexOf(CONFIG.permissions.canViewRelease) > -1;
 
                         $('body').removeClass('loading');
                         $('body').addClass('authorized');
@@ -98,7 +104,7 @@
     }
     
     NxHeader.$inject = ['NxDialogsService', 'cloudApi', 'account', '$location', '$route',
-        'systemsProvider', 'configService', '$rootScope'];
+        'systemsProvider', 'nxConfigService', '$rootScope'];
     
     angular
         .module('cloudApp')

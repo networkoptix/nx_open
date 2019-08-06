@@ -8,20 +8,20 @@ namespace nx::clusterdb::engine {
 Controller::Controller(
     const std::string& applicationId,
     const Settings& settings,
+    const ProtocolVersionRange& protocolVersionRange,
     Model* model)
     :
-    m_syncronizationEngine(
+    m_synchronizationEngine(
         applicationId,
-        QnUuid::createUuid(), //< moduleId. TODO.
         settings.synchronization(),
-        ProtocolVersionRange::any,
+        protocolVersionRange,
         &model->queryExecutor())
 {
 }
 
-SyncronizationEngine& Controller::syncronizationEngine()
+SynchronizationEngine& Controller::synchronizationEngine()
 {
-    return m_syncronizationEngine;
+    return m_synchronizationEngine;
 }
 
 } // namespace nx::clusterdb::engine

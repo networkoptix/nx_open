@@ -1,7 +1,5 @@
 #pragma once
 
-#include <functional>
-
 #include <nx/update/detail/zip_extractor.h>
 #include <nx/vms/api/data/system_information.h>
 #include <nx/utils/thread/mutex.h>
@@ -35,11 +33,16 @@ public:
     void prepareAsync(const QString& path);
     bool install(const QnAuthSession& authInfo);
     CommonUpdateInstaller(QObject* parent);
-    ~CommonUpdateInstaller();
-    void stopSync();
+    virtual ~CommonUpdateInstaller();
+    void stopSync(bool clearAndReset);
     State state() const;
 
+    bool checkFreeSpace(const QString& path, qint64 bytes) const;
+    bool checkFreeSpaceForInstallation() const;
+
     virtual QString dataDirectoryPath() const = 0;
+    virtual QString component() const = 0;
+    virtual int64_t freeSpace(const QString& path) const = 0;
 
 private:
     update::detail::ZipExtractor m_extractor;
@@ -47,6 +50,8 @@ private:
     QnWaitCondition m_condition;
     mutable QString m_version;
     mutable QString m_executable;
+    qint64 m_bytesExtracted = 0;
+    mutable qint64 m_freeSpaceRequiredToUpdate;
     mutable CommonUpdateInstaller::State m_state = CommonUpdateInstaller::State::idle;
 
     virtual bool initializeUpdateLog(const QString& targetVersion, QString* logFileName) const = 0;
@@ -54,8 +59,6 @@ private:
     void setState(CommonUpdateInstaller::State result);
     void setStateLocked(CommonUpdateInstaller::State result);
     bool cleanInstallerDirectory();
-    QVariantMap updateInformation(const QString& outputPath) const;
-    vms::api::SystemInformation systemInformation() const;
     bool checkExecutable(const QString& executableName) const;
     CommonUpdateInstaller::State checkContents(const QString& outputPath) const;
     QString workDir() const;

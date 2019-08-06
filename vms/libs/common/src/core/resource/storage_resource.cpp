@@ -10,7 +10,7 @@ const qint64 QnStorageResource::kThirdPartyStorageLimit = 10LL * 1024 * 1024 * 1
 
 QnStorageResource::QnStorageResource(QnCommonModule* commonModule):
     base_type(commonModule),
-    m_spaceLimit(0),
+    m_spaceLimit(-1),
     m_maxStoreTime(0),
     m_usedForWriting(false),
     m_storageBitrateCoeff(0.0),
@@ -46,6 +46,7 @@ void QnStorageResource::setStorageType(const QString& type)
 {
     QnMutexLocker lock(&m_mutex);
     m_storageType = type;
+    emit typeChanged(::toSharedPointer(this));
 }
 
 QString QnStorageResource::getStorageType() const

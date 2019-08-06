@@ -7,16 +7,16 @@
         .factory('account', AccountService);
 
     AccountService.$inject = ['cloudApi', '$q', '$location', '$localStorage', '$routeParams',
-        '$rootScope', '$base64', 'configService', 'dialogs', 'languageService'];
+        '$rootScope', '$base64', 'nxConfigService', 'dialogs', 'languageService'];
 
     function AccountService(cloudApi, $q, $location, $localStorage, $routeParams,
-                            $rootScope, $base64, configService, dialogs, languageService) {
+                            $rootScope, $base64, nxConfigService, dialogs, languageService) {
 
         $rootScope.session = $localStorage;
 
         let requestingLogin: any;
         let initialState = $rootScope.session.loginState;
-        const CONFIG = configService.config;
+        const CONFIG = nxConfigService.getConfig();
         const lang = languageService.lang;
 
         $rootScope.$watch('session.loginState', function (value) {  // Catch logout from other tabs
@@ -140,30 +140,6 @@
                 return true;
             }
         };
-
-        // Check auth parameter in url
-        let search = $location.search();
-        let auth: any;
-
-        if (search.auth) {
-            try {
-                auth = $base64.decode(search.auth);
-            } catch (exception) {
-                auth = false;
-                console.error(exception);
-            }
-            if (auth) {
-                let index = auth.indexOf(':');
-                let tempLogin = auth.substring(0, index);
-                let tempPassword = auth.substring(index + 1);
-
-                requestingLogin = service.login(tempLogin, tempPassword, false).then(function () {
-                    $location.search('auth', null);
-                }, function () {
-                    $location.search('auth', null);
-                });
-            }
-        }
 
         return service;
     }

@@ -34,7 +34,7 @@ public:
 
 protected:
     std::string m_username;
-    std::string m_password;
+    const std::string m_password;
     std::vector<std::string> m_domains = { "WORKGROUP", "" };
 
 private:
@@ -51,6 +51,11 @@ private:
         const std::string& domain,
         const std::string& ver,
         const std::string& credentialFile);
+    std::string makeCommandString(
+        const std::string& domain,
+        const std::string& ver,
+        const std::string& username,
+        const std::string& password);
     bool checkAndParseUsername();
 };
 

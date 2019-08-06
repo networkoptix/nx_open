@@ -23,7 +23,7 @@ public:
     int count() const;
 
 protected:
-    AVDictionary * m_options;
+    AVDictionary * m_options = nullptr;
 };
 
 

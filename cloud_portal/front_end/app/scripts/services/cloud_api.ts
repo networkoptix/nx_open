@@ -8,12 +8,13 @@ import * as angular from 'angular';
             .module('cloudApp.services')
             .factory('cloudApi', CloudApi);
 
-    CloudApi.$inject = ['$http', '$q', 'configService'];
+    CloudApi.$inject = ['$http', '$q', 'nxConfigService'];
 
-    function CloudApi($http, $q, configService) {
-        const CONFIG = configService.config;
+    function CloudApi($http, $q, nxConfigService) {
 
-        let apiBase = CONFIG.apiBase;
+        const CONFIG = nxConfigService.getConfig();
+
+        const apiBase = CONFIG.apiBase;
 
         let cachedResults = {};
         let cacheReceived = {};
@@ -205,11 +206,18 @@ import * as angular from 'angular';
                     name: name
                 });
             },
-            merge: function (masterSystemId, slaveSystemId) {
+            merge: function (masterSystemId, slaveSystemId, password) {
                 return $http.post(apiBase + '/systems/merge', {
                     master_system_id: masterSystemId,
-                    slave_system_id: slaveSystemId
+                    slave_system_id: slaveSystemId,
+                    password: password
                 });
+            },
+            sendMessage: function(type, productId, message, userName?, userEmail?, contact?) {
+                return $http.post(apiBase + '/feedback', {
+                    message, productId, type, userName, userEmail, contact
+                });
+
             },
             accessRoles: function (systemId) {
                 console.error('This method must not be used');
@@ -219,6 +227,6 @@ import * as angular from 'angular';
             visitedKey: function (key) {
                 return $http.get(apiBase + '/utils/visitedKey/?key=' + encodeURIComponent(key));
             }
-        }
+        };
     }
 })();

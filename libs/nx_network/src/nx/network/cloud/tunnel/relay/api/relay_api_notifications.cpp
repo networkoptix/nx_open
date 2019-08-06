@@ -6,6 +6,7 @@
 namespace nx::cloud::relay::api {
 
 static constexpr char kClientEndpoint[] = "X-Nx-Client-Endpoint";
+static constexpr char kOpenTunnel[] = "OPEN_TUNNEL";
 
 void OpenTunnelNotification::setClientPeerName(nx::String name)
 {
@@ -30,7 +31,7 @@ const network::SocketAddress& OpenTunnelNotification::clientEndpoint() const
 nx::network::http::Message OpenTunnelNotification::toHttpMessage() const
 {
     nx::network::http::Message message(nx::network::http::MessageType::request);
-    message.request->requestLine.method = kHttpMethod;
+    message.request->requestLine.method = kOpenTunnel;
     message.request->requestLine.version = {kRelayProtocolName, kRelayProtocolVersion};
     message.request->requestLine.url = nx::network::url::joinPath(
         nx::cloud::relay::api::kRelayClientPathPrefix,
@@ -45,7 +46,7 @@ bool OpenTunnelNotification::parse(const nx::network::http::Message& message)
     if (message.type != nx::network::http::MessageType::request)
         return false;
 
-    if (message.request->requestLine.method != kHttpMethod)
+    if (message.request->requestLine.method != kOpenTunnel)
         return false;
 
     auto path = message.request->requestLine.url.path().toUtf8();
@@ -64,12 +65,13 @@ bool OpenTunnelNotification::parse(const nx::network::http::Message& message)
 
 //-------------------------------------------------------------------------------------------------
 
+static constexpr char kKeepAlive[] = "KEEP_ALIVE";
 static constexpr char kConnectionPath[] = "connection";
 
 nx::network::http::Message KeepAliveNotification::toHttpMessage() const
 {
     nx::network::http::Message message(nx::network::http::MessageType::request);
-    message.request->requestLine.method = kHttpMethod;
+    message.request->requestLine.method = kKeepAlive;
     message.request->requestLine.version = {kRelayProtocolName, kRelayProtocolVersion};
     message.request->requestLine.url = nx::network::url::joinPath(
         nx::cloud::relay::api::kRelayClientPathPrefix,
@@ -82,7 +84,7 @@ bool KeepAliveNotification::parse(const nx::network::http::Message& message)
     if (message.type != nx::network::http::MessageType::request)
         return false;
 
-    if (message.request->requestLine.method != kHttpMethod)
+    if (message.request->requestLine.method != kKeepAlive)
         return false;
 
     if (message.request->requestLine.url.path().toStdString() !=

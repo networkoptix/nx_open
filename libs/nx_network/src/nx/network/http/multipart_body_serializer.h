@@ -19,16 +19,21 @@ public:
         std::shared_ptr<nx::utils::bstream::AbstractByteStreamFilter> outputStream);
     virtual ~MultipartBodySerializer() = default;
 
+    /**
+     * @return Multipart content type to be used in HTTP response.
+     * Each part can have its own content type.
+     */
     StringType contentType() const;
 
     /**
-     * Ends current part (if any).
+     * Starts new part and ends the current one (if any).
      * @param headers Should not contain Content-Type header since it is inserted with contentType value.
      */
     void beginPart(
         const StringType& contentType,
         const nx::network::http::HttpHeaders& headers,
         BufferType data);
+
     /**
      * Can be called only after MultipartMessageBodySource::beginPart.
      */
@@ -42,8 +47,10 @@ public:
         const StringType& contentType,
         const nx::network::http::HttpHeaders& headers,
         BufferType data);
+
     /** Signal end of multipart body. */
     void writeEpilogue();
+
     /**
      * @return True after MultipartBodySerializer::writeEpilogue has been called.
      */

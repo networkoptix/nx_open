@@ -7,10 +7,12 @@
 #include <api/session_manager.h>
 #include <api/app_server_connection.h>
 #include <api/global_settings.h>
+#include <api/media_server_connection.h>
 #include <api/model/ping_reply.h>
 #include <api/network_proxy_factory.h>
 #include <api/runtime_info_manager.h>
 #include <api/server_rest_connection.h>
+
 #include <common/common_module.h>
 #include <core/resource/storage_resource.h>
 #include <core/resource/security_cam_resource.h>
@@ -19,7 +21,7 @@
 #include <core/resource_management/server_additional_addresses_dictionary.h>
 #include <core/resource_management/resource_pool.h>
 #include <network/networkoptixmodulerevealcommon.h>
-#include <nx_ec/ec_proto_version.h>
+#include <nx/vms/api/protocol_version.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <rest/server/json_rest_result.h>
 #include <utils/common/app_info.h>
@@ -34,6 +36,7 @@
 #include <nx/network/socket_global.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/network/url/url_parse_helper.h>
+#include <nx/vms/api/data/media_server_data.h>
 
 using namespace nx;
 
@@ -43,6 +46,8 @@ const QString protoVersionPropertyName = lit("protoVersion");
 const QString safeModePropertyName = lit("ecDbReadOnly");
 
 } // namespace
+
+const QString QnMediaServerResource::kMetadataStorageIdKey = "metadataStorageId";
 
 QnMediaServerResource::QnMediaServerResource(QnCommonModule* commonModule):
     base_type(commonModule),
@@ -461,7 +466,6 @@ void QnMediaServerResource::updateInternal(const QnResourcePtr &other, Qn::Notif
         m_version = localOther->m_version;
         m_serverFlags = localOther->m_serverFlags;
         m_netAddrList = localOther->m_netAddrList;
-        m_systemInfo = localOther->m_systemInfo;
         m_authKey = localOther->m_authKey;
 
     }
@@ -497,14 +501,12 @@ QnMediaServerUserAttributesPtr QnMediaServerResource::userAttributes() const
 
 QnUuid QnMediaServerResource::metadataStorageId() const
 {
-    QnMediaServerUserAttributesPool::ScopedLock lk(commonModule()->mediaServerUserAttributesPool(), getId());
-    return (*lk)->metadataStorageId;
+    return QnUuid::fromStringSafe(getProperty(kMetadataStorageIdKey));
 }
 
 void QnMediaServerResource::setMetadataStorageId(const QnUuid& value)
 {
-    QnMediaServerUserAttributesPool::ScopedLock lk(commonModule()->mediaServerUserAttributesPool(), getId());
-    (*lk)->metadataStorageId = value;
+    setProperty(kMetadataStorageIdKey, value.toString());
 }
 
 QnServerBackupSchedule QnMediaServerResource::getBackupSchedule() const
@@ -540,6 +542,20 @@ bool QnMediaServerResource::isRedundancy() const
     return (*lk)->isRedundancyEnabled;
 }
 
+void QnMediaServerResource::setCompatible(bool value)
+{
+    if (m_isCompatible == value)
+        return;
+
+    m_isCompatible = value;
+    emit compatibilityChanged(::toSharedPointer(this));
+}
+
+bool QnMediaServerResource::isCompatible() const
+{
+    return m_isCompatible;
+}
+
 void QnMediaServerResource::setVersion(const nx::utils::SoftwareVersion& version)
 {
     {
@@ -551,16 +567,16 @@ void QnMediaServerResource::setVersion(const nx::utils::SoftwareVersion& version
     emit versionChanged(::toSharedPointer(this));
 }
 
-nx::vms::api::SystemInformation QnMediaServerResource::getSystemInfo() const
+utils::OsInfo QnMediaServerResource::getOsInfo() const
 {
-    QnMutexLocker lock(&m_mutex);
-    return m_systemInfo;
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    return m_osInfo;
 }
 
-void QnMediaServerResource::setSystemInfo(const nx::vms::api::SystemInformation& systemInfo)
+void QnMediaServerResource::setOsInfo(const utils::OsInfo& osInfo)
 {
-    QnMutexLocker lock(&m_mutex);
-    m_systemInfo = systemInfo;
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    m_osInfo = osInfo;
 }
 
 nx::vms::api::ModuleInformation QnMediaServerResource::getModuleInformation() const
@@ -582,7 +598,7 @@ nx::vms::api::ModuleInformation QnMediaServerResource::getModuleInformation() co
     moduleInformation.name = getName();
     moduleInformation.protoVersion = getProperty(protoVersionPropertyName).toInt();
     if (moduleInformation.protoVersion == 0)
-        moduleInformation.protoVersion = nx_ec::EC2_PROTO_VERSION;
+        moduleInformation.protoVersion = nx::vms::api::protocolVersion();
 
     if (hasProperty(safeModePropertyName))
     {
@@ -601,7 +617,7 @@ nx::vms::api::ModuleInformation QnMediaServerResource::getModuleInformation() co
     moduleInformation.id = getId();
     moduleInformation.port = getPort();
     moduleInformation.version = getVersion();
-    moduleInformation.systemInformation = getSystemInfo();
+    moduleInformation.osInfo = getOsInfo();
     moduleInformation.serverFlags = getServerFlags();
 
     return moduleInformation;

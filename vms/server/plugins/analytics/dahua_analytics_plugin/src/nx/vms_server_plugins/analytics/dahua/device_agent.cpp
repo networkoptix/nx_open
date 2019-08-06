@@ -6,6 +6,7 @@
 #include <nx/fusion/model_functions.h>
 
 #include <nx/sdk/helpers/string.h>
+#include <nx/sdk/helpers/error.h>
 
 #include "common.h"
 #include "device_agent.h"
@@ -33,35 +34,32 @@ DeviceAgent::~DeviceAgent()
     stopFetchingMetadata();
 }
 
-void DeviceAgent::setSettings(const IStringMap* /*settings*/)
+StringMapResult DeviceAgent::setSettings(const IStringMap* /*settings*/)
 {
     // This plugin doesn't use DeviceAgent setting, it just ignores them.
+    return nullptr;
 }
 
-IStringMap* DeviceAgent::pluginSideSettings() const
+SettingsResponseResult DeviceAgent::pluginSideSettings() const
 {
     return nullptr;
 }
 
-Error DeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
+void DeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
 {
     handler->addRef();
     m_handler.reset(handler);
-    return Error::noError;
 }
 
-Error DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes)
+Result<void> DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes)
 {
     if (metadataTypes->isEmpty())
-    {
         stopFetchingMetadata();
-        return Error::noError;
-    }
 
     return startFetchingMetadata(metadataTypes);
 }
 
-Error DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTypes)
+Result<void> DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTypes)
 {
     auto monitorHandler =
         [this](const EventList& events)
@@ -74,7 +72,7 @@ Error DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTypes)
                 if (dahuaEvent.channel.has_value() && dahuaEvent.channel != m_channelNumber)
                     return;
 
-                auto eventMetadata = makePtr<nx::sdk::analytics::EventMetadata>();
+                auto eventMetadata = makePtr<EventMetadata>();
                 NX_VERBOSE(this, "Got event: %1 %2 Channel %3",
                     dahuaEvent.caption, dahuaEvent.description, m_channelNumber);
 
@@ -83,7 +81,6 @@ Error DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTypes)
                 eventMetadata->setDescription(dahuaEvent.description.toStdString());
                 eventMetadata->setIsActive(dahuaEvent.isActive);
                 eventMetadata->setConfidence(1.0);
-                //eventMetadata->setAuxiliaryData(dahuaEvent.fullEventName.toStdString());
 
                 packet->setTimestampUs(
                     duration_cast<microseconds>(system_clock::now().time_since_epoch()).count());
@@ -98,10 +95,12 @@ Error DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTypes)
     NX_ASSERT(m_engine);
     std::vector<QString> eventTypes;
 
-
-    nx::sdk::Ptr<const nx::sdk::IStringList> eventTypeIds(metadataTypes->eventTypeIds());
-    if (!NX_ASSERT(eventTypeIds, "Event type id list is empty"))
-        return Error::unknownError;
+    const auto eventTypeIds = toPtr(metadataTypes->eventTypeIds());
+    if (const char* const kMessage = "Event type id list is empty";
+        !NX_ASSERT(eventTypeIds, kMessage))
+    {
+        return error(ErrorCode::internalError, kMessage);
+    }
 
     for (int i = 0; i < eventTypeIds->count(); ++i)
         eventTypes.push_back(eventTypeIds->at(i));
@@ -116,7 +115,7 @@ Error DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTypes)
     m_monitor->addHandler(m_uniqueId, monitorHandler);
     m_monitor->startMonitoring();
 
-    return Error::noError;
+    return {};
 }
 
 void DeviceAgent::stopFetchingMetadata()
@@ -129,15 +128,11 @@ void DeviceAgent::stopFetchingMetadata()
     m_monitor = nullptr;
 }
 
-const IString* DeviceAgent::manifest(Error* error) const
+StringResult DeviceAgent::manifest() const
 {
     if (m_jsonManifest.isEmpty())
-    {
-        *error = Error::unknownError;
-        return nullptr;
-    }
+        return error(ErrorCode::otherError, "DeviceAgent manifest is empty");
 
-    *error = Error::noError;
     return new nx::sdk::String(m_jsonManifest);
 }
 

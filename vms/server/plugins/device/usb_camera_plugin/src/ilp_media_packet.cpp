@@ -7,7 +7,7 @@
 
 #include <plugins/plugin_tools.h>
 #include <nx/kit/utils.h>
-#include <utils/memory/cyclic_allocator.h>
+#include <nx/utils/memory/cyclic_allocator.h>
 
 namespace nx {
 namespace usb_cam {

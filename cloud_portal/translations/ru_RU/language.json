@@ -10,7 +10,15 @@
     "loginButton": "Войти",
     "logoutAuthorisedTitle": "Вы уже выполнили вход",
     "logoutAuthorisedContinueButton": "Продолжить",
-    "logoutAuthorisedLogoutButton": "Выйти"
+    "logoutAuthorisedLogoutButton": "Выход",
+    "messageFailed": "Message has failed to send.",
+    "messageSent": "Message has been sent."
+  },
+  "messageType": {
+    "ipvd_feedback": "Feedback about {{product}}",
+    "sales_inquiry": "Inquiry for {{product}}",
+    "request_support": "Request Support for {{product}}",
+    "unknown": "Unknown Message Type"
   },
   "pageTitles": {
     "template": "{{title}} %PRODUCT_NAME%",
@@ -37,8 +45,9 @@
     "pageNotFound": "Страница не найдена"
   },
   "systemStatuses": {
-    "notActivated": "не активирован",
     "activated": "активирован",
+    "merging": "merging",
+    "notActivated": "не активирован",
     "online": "в сети",
     "offline": "не в сети",
     "unavailable": "недоступен"
@@ -137,13 +146,22 @@
     "cantOpenClient": "Приложение %VMS_NAME% не обнаружено. <a href=\"/download\">Скачать</a>",
     "lostConnection": "Подключение к {{systemName}} потеряно",
     "thisSystem": "система",
-    "oldSafariNotSupported": "Версии Safari старше 10 не поддерживаются"
+    "oldSafariNotSupported": "Версии Safari старше 10 не поддерживаются",
+    "DUPLICATE_MEDIASERVER_FOUND": "В одной из систем были обнаружены дубликаты серверов.<br>Удалите старые серверы из каждой системы, которую вы пытаетесь объединить, и повторите попытку.",
+    "mergedSystemIsOffline": "Одна из объединяемых систем находится в автономном режиме. Убедитесь, что они в сети, и попробуйте еще раз.",
+    "INCOMPATIBLE": "Versions for systems are incompatible. To fix this problem make sure the systems have the same version."
   },
   "passwordRequirements": {
+    "good": "хорошее",
+    "fair": "средний",
+    "minLength": "короткий",
     "minLengthMessage": "Пароль должен содержать не менее 8 символов",
+    "required": "некорректный",
     "requiredMessage": "Используйте только латинские буквы, цифры и символы клавиатуры, избегайте начальных и конечных пробелов",
+    "weak": "слабый",
     "weakMessage": "Для надежности пароля используйте цифры, буквы верхнего и нижнего регистра и специальные символы",
     "strongMessage": "Надежный пароль!",
+    "common": "часто встречающийся",
     "commonMessage": "Этот пароль входит в список самых популярных паролей в мире",
     "missingMessage": "Пароль обязателен для заполнения"
   },
@@ -177,8 +195,9 @@
     "confirmUnshareAction": "Удалить",
     "successDisconnected": "Система успешно отключена от %PRODUCT_NAME%",
     "successDeleted": "Система {{systemName}} успешно удалена из вашей учетной записи",
-    "successMerge": "Система {{systemName}} была объединена с {{systemName}}",
-    "permissionsRemoved": "{{email}} был лишен полномочий"
+    "successMerge": "Слияние системы завершено",
+    "permissionsRemoved": "{{email}} был лишен полномочий",
+    "unknownName": "Unknown Name for System (Caused by cloud merge)"
   },
   "account": {
     "accountSavedSuccess": "Ваша учетная запись успешно сохранена",

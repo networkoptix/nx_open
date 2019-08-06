@@ -3,7 +3,6 @@
 #include <gtest/gtest.h>
 
 #include <nx/network/cloud/tunnel/connector_factory.h>
-#include <nx/network/cloud/tunnel/relay/api/relay_api_client_factory.h>
 #include <nx/utils/std/future.h>
 
 #include <nx/cloud/relay/settings.h>
@@ -27,9 +26,7 @@ class RelayToRelayRedirect:
 
 public:
     RelayToRelayRedirect():
-        BasicTestFixture(3, std::chrono::seconds(1)),
-        m_removePeerFuture(m_removePeerPromise.get_future()),
-        m_addPeerFuture(m_addPeerPromise.get_future())
+        BasicTestFixture(3, std::chrono::seconds(1))
     {}
 
     virtual void SetUp() override
@@ -48,7 +45,7 @@ public:
     {
         using namespace nx::cloud::relay;
 
-        auto relayClient = api::ClientFactory::instance().create(relayUrl(2));
+        auto relayClient = std::make_unique<api::Client>(relayUrl(2));
 
         for (;;)
         {
@@ -59,7 +56,7 @@ public:
             relayClient->startSession(
                 "",
                 serverSocketCloudAddress(),
-                [this, &requestCompletion](
+                [&requestCompletion](
                     api::ResultCode resultCode,
                     api::CreateClientSessionResponse response)
                 {
@@ -84,14 +81,12 @@ public:
 
     virtual void peerAdded(const std::string& domainName) override
     {
-        m_addedPeer = domainName;
-        m_addPeerPromise.set_value();
+        m_peerAddedEvents.push(domainName);
     }
 
     virtual void peerRemoved(const std::string& domainName) override
     {
-        m_removedPeer = domainName;
-        m_removePeerPromise.set_value();
+        m_peerRemovedEvents.push(domainName);
     }
 
     void whenServerGoesOffline()
@@ -106,24 +101,20 @@ public:
 
     void waitForRemovePeerSignal()
     {
-        m_removePeerFuture.wait();
+        m_removedPeer = m_peerRemovedEvents.pop();
     }
 
     void waitForAddPeerSignal()
     {
-        m_addPeerFuture.wait();
+        m_addedPeer = m_peerAddedEvents.pop();
     }
-
 
 private:
     std::string m_addedPeer;
     std::string m_removedPeer;
 
-    nx::utils::promise<void> m_removePeerPromise;
-    nx::utils::future<void> m_removePeerFuture;
-
-    nx::utils::promise<void> m_addPeerPromise;
-    nx::utils::future<void> m_addPeerFuture;
+    nx::utils::SyncQueue<std::string> m_peerAddedEvents;
+    nx::utils::SyncQueue<std::string> m_peerRemovedEvents;
 
     int m_connectMethodMaskBak = 0;
 };

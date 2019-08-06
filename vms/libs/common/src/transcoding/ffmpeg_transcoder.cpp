@@ -155,9 +155,13 @@ int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const Q
 
         if (m_vTranscoder)
         {
-            m_vTranscoder->open(video);
-            if (!m_vTranscoder->getLastError().isEmpty())
-                qWarning() << "Can't open video transcoder for RTSP streaming: " << m_vTranscoder->getLastError();
+            if (!m_vTranscoder->open(video))
+            {
+                m_vTranscoder->getLastError().isEmpty();
+                NX_WARNING(this, "Can't open video transcoder for RTSP streaming: [%1]",
+                    m_vTranscoder->getLastError());
+                return -1;
+            }
 
             QnFfmpegVideoTranscoderPtr ffmpegVideoTranscoder = m_vTranscoder.dynamicCast<QnFfmpegVideoTranscoder>();
             if (ffmpegVideoTranscoder->getCodecContext()) {
@@ -298,8 +302,7 @@ int QnFfmpegTranscoder::muxPacket(const QnConstAbstractMediaDataPtr& mediaPacket
 
     AVStream* stream = m_formatCtx->streams[streamIndex];
     AVRational srcRate = {1, 1000000};
-    AVPacket packet;
-    av_init_packet(&packet);
+    QnFfmpegAvPacket packet;
 
     packet.pts = av_rescale_q(mediaPacket->timestamp - m_baseTime, srcRate, stream->time_base);
     packet.data = (uint8_t*)mediaPacket->data();

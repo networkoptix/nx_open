@@ -11,6 +11,7 @@
 #include <client/client_globals.h>
 #include <client/client_settings.h>
 
+#include <api/media_server_connection.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
@@ -19,7 +20,7 @@
 #include <nx/vms/client/desktop/ui/actions/action.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>
-#include <nx/vms/client/desktop/resource_views/data/node_type.h>
+#include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <ui/customization/customized.h>
 #include <ui/delegates/recording_stats_item_delegate.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
@@ -51,17 +52,11 @@ using std::chrono::seconds;
 using std::chrono::minutes;
 using std::chrono::hours;
 
-auto days(int count)
-{
-    return hours(count * 24);
-}
-
 const qint64 kDefaultBitrateAveragingPeriod = milliseconds(5min).count();
 
 // TODO: #GDM #vkutin #common Refactor all this to use HumanReadable helper class
 const qint64 kBytesInGB = 1024ll * 1024 * 1024;
 const qint64 kBytesInTB = 1024ll * kBytesInGB;
-const qint64 kFinalStepSeconds = 1000000000ll * 10;
 
 const int kTableRowHeight = 24;
 const int kMinimumColumnWidth = 110;
@@ -172,6 +167,13 @@ TableView* QnStorageAnalyticsWidget::currentTable() const
     return ui->tabWidget->currentWidget() == ui->statsTab
         ? ui->statsTable
         : ui->forecastTable;
+}
+
+TableView* QnStorageAnalyticsWidget::currentTotalsTable() const
+{
+    return ui->tabWidget->currentWidget() == ui->statsTab
+        ? ui->statsTotalsTable
+        : ui->forecastTotalsTable;
 }
 
 qint64 QnStorageAnalyticsWidget::currentForecastAveragingPeriod()
@@ -405,7 +407,7 @@ void QnStorageAnalyticsWidget::atEventsGrid_customContextMenuRequested(const QPo
     if (!selectedResources.empty())
     {
         action::Parameters parameters(selectedResources);
-        parameters.setArgument(Qn::NodeTypeRole, ResourceTreeNodeType::resource);
+        parameters.setArgument(Qn::NodeTypeRole, ResourceTree::NodeType::resource);
         auto manager = context()->menu();
         menu.reset(manager->newMenu(action::TreeScope, nullptr, parameters, 0,
             {action::IDType::CameraSettingsAction}));
@@ -429,12 +431,50 @@ void QnStorageAnalyticsWidget::atEventsGrid_customContextMenuRequested(const QPo
 
 void QnStorageAnalyticsWidget::atExportAction_triggered()
 {
-    QnTableExportHelper::exportToFile(currentTable(), true, this, tr("Export selected events to file"));
+    const auto model = currentTable()->model();
+    const auto totalsModel = currentTotalsTable()->model();
+    const auto selectionModel = currentTable()->selectionModel();
+    const bool isAllRowsSelected = selectionModel->selectedRows().size() == model->rowCount();
+
+    if (isAllRowsSelected)
+    {
+        QnTableExportCompositeModel compositeModel({model, totalsModel});
+        QnTableExportHelper::exportToFile(
+            &compositeModel,
+            QnTableExportHelper::getAllIndexes(&compositeModel),
+            this,
+            tr("Export selected events to file"));
+    }
+    else
+    {
+        QnTableExportHelper::exportToFile(
+            currentTable()->model(),
+            currentTable()->selectionModel()->selectedIndexes(),
+            this,
+            tr("Export selected events to file"));
+    }
 }
 
 void QnStorageAnalyticsWidget::atClipboardAction_triggered()
 {
-    QnTableExportHelper::copyToClipboard(currentTable());
+    const auto model = currentTable()->model();
+    const auto totalsModel = currentTotalsTable()->model();
+    const auto selectionModel = currentTable()->selectionModel();
+    const bool isAllRowsSelected = selectionModel->selectedRows().size() == model->rowCount();
+
+    if (isAllRowsSelected)
+    {
+        QnTableExportCompositeModel compositeModel({model, totalsModel});
+        QnTableExportHelper::copyToClipboard(
+            &compositeModel,
+            QnTableExportHelper::getAllIndexes(&compositeModel));
+    }
+    else
+    {
+        QnTableExportHelper::copyToClipboard(
+            currentTable()->model(),
+            currentTable()->selectionModel()->selectedIndexes());
+    }
 }
 
 void QnStorageAnalyticsWidget::atMouseButtonRelease(QObject*, QEvent* event)

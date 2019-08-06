@@ -9,7 +9,8 @@
             <button ng-disabled="currentlyMerging" class="btn btn-default" ng-if="canMerge || debugMode" ng-click="mergeSystems()">Unisci con un altro sistema</button>
         </p>
         <hr />
-        <button ng-disabled="currentlyMerging" class="btn btn-default" ng-click="disconnect()">Disconnettiti da <span class="product-name">&nbsp;%PRODUCT_NAME%</span></button>
+        <button ng-disabled="currentlyMerging" class="btn btn-default" ng-click="disconnect()">Disconnetti da
+            <span class="product-name">&nbsp;%PRODUCT_NAME%</span></button>
     </div>
 </div>
 <div class="card card-condensed" ng-if="!system.isMine">
@@ -23,9 +24,9 @@
         </p>
 
         <p ng-if="system.permissions.isAdmin">
-            <button class="btn btn-default" ng-click="rename()">Rinomina sistema</button>
+            <button class="btn btn-default" ng-click="rename()" ng-disabled="currentlyMerging && !isMaster">Rinomina sistema</button>
         </p>
-        <button class="btn btn-default" ng-click="delete()">Disconnettiti dal mio account</button>
+        <button class="btn btn-default" ng-click="delete()" ng-disabled="currentlyMerging">Disconnettiti dal mio account</button>
     </div>
 </div>
 <div class="mt-3 card card-default" ng-if="currentlyMerging">
@@ -48,7 +49,8 @@
         <div class="merge-info-text">
             <p>A seconda delle dimensioni del database possono essere necessarie diverse ore.</p>
             <p>Finché l'unione non è terminata, puoi accedere a questo sistema e guardare le immagini, ma non puoi modificare alcuna impostazione.</p>
-            <p>Una volta completata l'unione, tutti gli utenti e le telecamere di questo sistema diventeranno disponibili in <span class="merge-system-name">{{mergeTargetSystem.name}}</span>. Sistema, e questo sistema sarà cancellato.</p>
+            <p>Una volta completata l'unione, tutti gli utenti e le telecamere di questo sistema diventeranno disponibili
+                nel sistema "<span class="merge-system-name">{{mergeTargetSystem.name}}</span> "e questo sistema sarà cancellato.</p>
         </div>
     </div>
 </div>

@@ -41,7 +41,7 @@ protected:
     virtual rest::Handle requestPrefetch(const QnTimePeriod& period) override;
     virtual bool commitPrefetch(const QnTimePeriod& periodToCommit) override;
 
-    using GetCallback = std::function<void(bool, const QnCameraBookmarkList&, rest::Handle)>;
+    using GetCallback = std::function<void(bool, rest::Handle, const QnCameraBookmarkList&)>;
     rest::Handle getBookmarks(
         const QnTimePeriod& period, GetCallback callback, Qt::SortOrder order, int limit) const;
 
@@ -60,6 +60,7 @@ private:
     bool commitPrefetch(const QnTimePeriod& periodToCommit,
         Iter prefetchBegin, Iter prefetchEnd, int position);
 
+    static QString iconPath();
     static QPixmap pixmap();
     static QColor color();
 

@@ -86,6 +86,7 @@ public:
 
     void reportFailure(
         AuthenticationType authenticationType,
+        const nx::network::http::Request request,
         api::ResultCode resultCode,
         std::optional<nx::network::http::header::WWWAuthenticate> wwwAuthenticate = std::nullopt);
 

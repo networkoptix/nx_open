@@ -51,6 +51,9 @@ private:
     std::optional<KeepAliveOptions> m_keepAliveOptions;
     std::optional<std::chrono::milliseconds> m_postDelay;
     network::aio::Timer m_timer;
+    bool m_connectionClosed = false;
+
+    void reportConnectionClosure();
 };
 
 } // namespace test

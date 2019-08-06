@@ -48,14 +48,26 @@ struct Ini: nx::kit::IniConfig
         "from the nearest past. The metadata with timestamps that are older than the\n"
         "(currentTime - analyticsVideoBufferLengthMs) is ignored (not shown in the Client).");
     NX_INI_FLAG(0, hideEnhancedVideo, "Hides enhanced video from the scene.");
-    NX_INI_FLAG(1, enableDetectedObjectsInterpolation,
+    NX_INI_FLAG(1, enableObjectMetadataInterpolation,
         "Allows the interpolation of the trajectories of the Analytics Objects between frames.\n"
         "\n"
         "If enabled, bounding boxes around the Analytics Objects are moving more smoothly.");
-    NX_INI_FLAG(0, displayAnalyticsDelay,
-        "Whether to add a delay label to Analytics Object description.\n"
+    NX_INI_STRING("", displayAnalyticsObjectsDebugInfo,
+        "Whether to add a debug info label to Analytics Object description.\n"
         "\n"
-        "Allows to see the Analytics latency in the Desktop Client.");
+        "Allows to see the Analytics Objects details in the Desktop Client. Use \"all\" to\n"
+        "display all available metadata. More precise filtering is available by combining the\n"
+        "following options:\n"
+        " * \"id\" - Track id,\n"
+        " * \"delay\" - Delay between actual timestamp and object timestamp in milliseconds,\n"
+        " * \"actual_ts\" - Current timestamp,\n"
+        " * \"actual_rect\" - Interpolated rect if \"enableObjectMetadataInterpolation\" is on,\n"
+        " * \"object_ts\" - Original object timestamp,\n"
+        " * \"object_rect\" - Original object rect,\n"
+        " * \"future_ts\" - Future object timestamp,\n"
+        " * \"future_rect\" - Future object rect.\n"
+        "Fields can be combined using space, comma or any other separator."
+    );
     NX_INI_FLAG(0, displayAnalyticsEnginesInResourceTree,
         "Displays Analytics Engine items in the Resource tree.");
     NX_INI_FLAG(0, debugThumbnailProviders, "Enables debug mode for thumbnail providers.");
@@ -119,6 +131,8 @@ struct Ini: nx::kit::IniConfig
     NX_INI_FLAG(1, startPlaybackOnTileNavigation,
         "Whether to start the playback if the timeline navigation occured after Right Panel tile\n"
         "click or double click.");
+    NX_INI_FLAG(0, overrideDialogFramesWIN,
+        "Replace system dialog frames with application defined ones (Windows-only).");
     NX_INI_FLAG(0, systemUpdateProgressInformers,
         "Whether to show Right Panel progress informers during System Update (unfinished\n"
         "functionality).");
@@ -128,9 +142,9 @@ struct Ini: nx::kit::IniConfig
         "Background updates check will use this changeset instead of \"latest\".");
     NX_INI_INT(0, massSystemUpdateWaitForServerOnlineSecOverride,
         "Time to wait until Server goes online in seconds. Default value is used when set to 0.");
-    NX_INI_INT(0, tilePreviewLoadDelayOverrideMs,
+    NX_INI_INT(150, tilePreviewLoadDelayOverrideMs,
         "Tiles in the Right Panel will request previews only after this period (in milliseconds)\n"
-        "after appearing. 0 means default value (100 ms).");
+        "after appearing. Values <= 1 are treated as 1.");
     NX_INI_INT(750, tilePreviewLoadIntervalMs,
         "Right Panel tiles will not request previews more often than this period, milliseconds.");
     NX_INI_FLAG(0, enableSyncedChunksForExtraContent,
@@ -138,6 +152,8 @@ struct Ini: nx::kit::IniConfig
     NX_INI_INT(0, clientWebServerPort,
         "Enables web server to remotely control the Nx Client operation; port should be in range\n"
         "1..65535 (typically 7012) to enable; 0 means disabled.");
+    NX_INI_STRING("", clientWebServerHost,
+        "Listen address for local web server. It should contain a valid ip address.\n");
     NX_INI_INT(1000, storeFrameTimePoints,
         "Number of frame timestamps stored by the Client. Used in Functional Tests for fps\n"
         "measurement.");
@@ -155,10 +171,24 @@ struct Ini: nx::kit::IniConfig
         "Global live video cache length, in seconds. Set to zero to use built-in value.");
     NX_INI_INT(180000, connectTimeoutMs,
         "Timeout (in milliseconds) for waiting initial resources message from the server.\n"
-        "If exceeded then connections is dropped to avoid infinite UI \"Loading...\" state. 0 means disabled.");
-
+        "If exceeded then connections is dropped to avoid infinite UI \"Loading...\" state.\n"
+        "0 means disabled.");
     NX_INI_STRING("", dumpGeneratedIconsTo,
         "Dump icons, generated from svg, to a given folder.");
+    NX_INI_FLAG(0, enableVSyncWorkaround,
+        "Always limit frame rate to approximately 60 fps, even if VSync is disabled.");
+
+    NX_INI_FLAG(0, enableGdiTrace,
+        "Enable tracing of GDI object allocation.");
+    NX_INI_INT(5000, gdiTraceLimit,
+        "Number of GDI handles in use which triggers report creation.");
+
+    NX_INI_FLAG(0, alwaysShowGetUpdateFileButton, "Always show Get Update File button.");
+
+    NX_INI_STRING("", currentOsVariantOverride,
+        "Override detected OS variant value (e.g. \"ubuntu\").");
+    NX_INI_STRING("", currentOsVariantVersionOverride,
+        "Override detected OS variant version value (e.g. \"16.04\").");
 };
 
 inline Ini& ini()

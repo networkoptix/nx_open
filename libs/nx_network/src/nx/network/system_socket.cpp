@@ -8,7 +8,6 @@
 #include <nx/utils/system_error.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/platform/win32_syscall_resolver.h>
-#include <nx/utils/unused.h>
 
 #ifdef _WIN32
 #  include <iphlpapi.h>
@@ -23,6 +22,7 @@
 #include "aio/aio_service.h"
 #include "aio/async_socket_helper.h"
 #include "compat_poll.h"
+#include "common_socket_impl.h"
 #include "address_resolver.h"
 
 #ifdef _WIN32
@@ -215,45 +215,39 @@ bool Socket<SocketInterfaceToImplement>::getReuseAddrFlag(bool* val) const
 }
 
 template<typename SocketInterfaceToImplement>
-bool Socket<SocketInterfaceToImplement>::setReusePortFlag(bool value)
+bool Socket<SocketInterfaceToImplement>::setReusePortFlag(
+    bool value)
 {
-#if !defined(Q_OS_WIN) && defined(SO_REUSEPORT)
-    const int on = value ? 1 : 0;
-    if (::setsockopt(m_fd, SOL_SOCKET, SO_REUSEPORT, (const char*)&on, sizeof(on))
-        && errno != ENOPROTOOPT)
-    {
-        // TODO: #muskov: set lastError
-        return false;
-    }
-
-    errno = 0;
-
-    return true;
-#else
-    // TODO: is it misprint? If no, the comment should be added
+#if defined(_WIN32)
     return setReuseAddrFlag(value);
+#elif defined(SO_REUSEPORT)
+    const int on = value ? 1 : 0;
+    return ::setsockopt(m_fd, SOL_SOCKET, SO_REUSEPORT, (const char*) &on, sizeof(on)) == 0;
+#else
+    /*unused*/ (void) value;
+    SystemError::setLastErrorCode(SystemError::unknownProtocolOption);
+    return false;
 #endif
 }
 
 template<typename SocketInterfaceToImplement>
-bool Socket<SocketInterfaceToImplement>::getReusePortFlag(bool* value) const
+bool Socket<SocketInterfaceToImplement>::getReusePortFlag(
+    bool* value) const
 {
-#if !defined(Q_OS_WIN) && defined(SO_REUSEPORT)
+#if defined(_WIN32)
+    return getReuseAddrFlag(value);
+#elif defined(SO_REUSEPORT)
     int reuseAddrVal = 0;
     socklen_t optLen = sizeof(reuseAddrVal);
-
-    if (::getsockopt(m_fd, SOL_SOCKET, SO_REUSEPORT, (char*)&reuseAddrVal, &optLen)
-        && errno != ENOPROTOOPT)
-    {
-        // TODO: #muskov: set lastError
+    if (::getsockopt(m_fd, SOL_SOCKET, SO_REUSEPORT, (char*) &reuseAddrVal, &optLen))
         return false;
-    }
 
-    *value = (errno == ENOPROTOOPT) ? false : reuseAddrVal > 0;
-    errno = 0;
+    *value = reuseAddrVal > 0;
     return true;
 #else
-    return getReuseAddrFlag(value);
+    /*unused*/ (void) value;
+    SystemError::setLastErrorCode(SystemError::unknownProtocolOption);
+    return false;
 #endif
 }
 
@@ -629,9 +623,10 @@ template<typename SocketInterfaceToImplement>
 void CommunicatingSocket<SocketInterfaceToImplement>::bindToAioThread(
     nx::network::aio::AbstractAioThread* aioThread)
 {
-    base_type::bindToAioThread(aioThread);
-
+    // Calling m_aioHelper->bindToAioThread first so that it is able to detect aio thread change.
     m_aioHelper->bindToAioThread(aioThread);
+
+    base_type::bindToAioThread(aioThread);
 }
 
 template<typename SocketInterfaceToImplement>
@@ -1041,6 +1036,7 @@ TCPSocket::TCPSocket(int ipVersion):
 #endif
     )
 {
+    ++SocketGlobals::instance().debugCounters().tcpSocketCount;
 }
 
 TCPSocket::TCPSocket(int newConnSD, int ipVersion):
@@ -1052,10 +1048,12 @@ TCPSocket::TCPSocket(int newConnSD, int ipVersion):
 #endif
     )
 {
+    ++SocketGlobals::instance().debugCounters().tcpSocketCount;
 }
 
 TCPSocket::~TCPSocket()
 {
+    --SocketGlobals::instance().debugCounters().tcpSocketCount;
 }
 
 bool TCPSocket::getProtocol(int* protocol) const
@@ -1099,7 +1097,7 @@ bool TCPSocket::getNoDelay(bool* value) const
     return true;
 }
 
-bool TCPSocket::toggleStatisticsCollection(bool val)
+bool TCPSocket::toggleStatisticsCollection([[maybe_unused]] bool val)
 {
 #ifdef _WIN32
     //dynamically resolving functions that require win >= vista we want to use here
@@ -1145,15 +1143,13 @@ bool TCPSocket::toggleStatisticsCollection(bool val)
     }
     return true;
 #elif defined(__linux__)
-    nx::utils::unused(val);
     return true;
 #else
-    nx::utils::unused(val);
     return false;
 #endif
 }
 
-bool TCPSocket::getConnectionStatistics(StreamSocketInfo* info)
+bool TCPSocket::getConnectionStatistics([[maybe_unused]] StreamSocketInfo* info)
 {
 #ifdef _WIN32
     Win32TcpSocketImpl* d = static_cast<Win32TcpSocketImpl*>(impl());
@@ -1175,7 +1171,6 @@ bool TCPSocket::getConnectionStatistics(StreamSocketInfo* info)
     info->rttVar = tcpinfo.tcpi_rttvar / USEC_PER_MSEC;
     return true;
 #else
-    nx::utils::unused(info);
     return false;
 #endif
 }
@@ -1316,12 +1311,12 @@ static const int DEFAULT_ACCEPT_TIMEOUT_MSEC = 250;
  * @return fd (>=0) on success, <0 on error (-2 if timed out)
  */
 static int acceptWithTimeout(
-    int m_fd,
+    int fd,
     int timeoutMillis = DEFAULT_ACCEPT_TIMEOUT_MSEC,
     bool nonBlockingMode = false)
 {
     if (nonBlockingMode)
-        return ::accept(m_fd, NULL, NULL);
+        return ::accept(fd, NULL, NULL);
 
     int result = 0;
     if (timeoutMillis == 0)
@@ -1330,7 +1325,7 @@ static int acceptWithTimeout(
 #ifdef _WIN32
     struct pollfd fds[1];
     memset(fds, 0, sizeof(fds));
-    fds[0].fd = m_fd;
+    fds[0].fd = fd;
     fds[0].events |= POLLIN;
     result = poll(fds, sizeof(fds) / sizeof(*fds), timeoutMillis);
     if (result < 0)
@@ -1344,16 +1339,16 @@ static int acceptWithTimeout(
     {
         int errorCode = 0;
         int errorCodeLen = sizeof(errorCode);
-        if (getsockopt(m_fd, SOL_SOCKET, SO_ERROR, reinterpret_cast<char*>(&errorCode), &errorCodeLen) != 0)
+        if (getsockopt(fd, SOL_SOCKET, SO_ERROR, reinterpret_cast<char*>(&errorCode), &errorCodeLen) != 0)
             return -1;
         ::SetLastError(errorCode);
         return -1;
     }
-    return ::accept(m_fd, NULL, NULL);
+    return ::accept(fd, NULL, NULL);
 #else
     struct pollfd sockPollfd;
     memset(&sockPollfd, 0, sizeof(sockPollfd));
-    sockPollfd.fd = m_fd;
+    sockPollfd.fd = fd;
     sockPollfd.events = POLLIN;
 #ifdef _GNU_SOURCE
     sockPollfd.events |= POLLRDHUP;
@@ -1367,10 +1362,8 @@ static int acceptWithTimeout(
         return -1;
     }
     if (sockPollfd.revents & POLLIN)
-    {
-        auto fd = ::accept(m_fd, NULL, NULL);
-        return fd;
-    }
+        return ::accept(fd, NULL, NULL);
+
     if ((sockPollfd.revents & POLLHUP)
 #ifdef _GNU_SOURCE
         || (sockPollfd.revents & POLLRDHUP)
@@ -1384,7 +1377,7 @@ static int acceptWithTimeout(
     {
         int errorCode = 0;
         socklen_t errorCodeLen = sizeof(errorCode);
-        if (getsockopt(m_fd, SOL_SOCKET, SO_ERROR, &errorCode, &errorCodeLen) != 0)
+        if (getsockopt(fd, SOL_SOCKET, SO_ERROR, &errorCode, &errorCodeLen) != 0)
             return -1;
         errno = errorCode;
         return -1;
@@ -1459,6 +1452,16 @@ TCPServerSocket::~TCPServerSocket()
         .isSocketBeingMonitored(static_cast<Pollable*>(this)),
         "You MUST cancel running async socket operation before "
         "deleting socket if you delete socket from non-aio thread");
+}
+
+void TCPServerSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
+{
+    // Calling asyncServerSocketHelper.bindToAioThread first so that it is able to detect
+    // aio thread change.
+    static_cast<TCPServerSocketPrivate*>(impl())->
+        asyncServerSocketHelper.bindToAioThread(aioThread);
+
+    base_type::bindToAioThread(aioThread);
 }
 
 int TCPServerSocket::accept(int sockDesc)
@@ -1598,10 +1601,13 @@ UDPSocket::UDPSocket(int ipVersion):
     {
         // Ignoring for now.
     }
+
+    ++SocketGlobals::instance().debugCounters().udpSocketCount;
 }
 
 UDPSocket::~UDPSocket()
 {
+    --SocketGlobals::instance().debugCounters().udpSocketCount;
 }
 
 bool UDPSocket::getProtocol(int* protocol) const

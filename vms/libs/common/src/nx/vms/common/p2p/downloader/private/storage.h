@@ -28,7 +28,6 @@ struct FileMetadata: FileInformation
         const QDir& defaultDownloadsDirectory);
 
     QVector<QByteArray> chunkChecksums;
-    QString fullFilePath;
 };
 
 class Storage: public QObject
@@ -53,6 +52,7 @@ public:
     ResultCode writeFileChunk(const QString& fileName, int chunkIndex, const QByteArray& buffer);
 
     ResultCode deleteFile(const QString& fileName, bool deleteData = true);
+    ResultCode clearFile(const QString& fileName, bool force = false);
 
     QVector<QByteArray> getChunkChecksums(const QString& fileName);
     ResultCode setChunkChecksums(

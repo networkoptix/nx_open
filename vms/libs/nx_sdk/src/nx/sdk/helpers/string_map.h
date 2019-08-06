@@ -1,3 +1,5 @@
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+
 #pragma once
 
 #include <map>
@@ -15,7 +17,7 @@ class StringMap: public RefCountable<IStringMap>
     using Map = std::map<std::string, std::string>;
 
 public:
-    void addItem(const std::string& key, const std::string& value);
+    void setItem(const std::string& key, const std::string& value);
 
     void clear();
 

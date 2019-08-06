@@ -4,7 +4,7 @@
 #include <queue>
 #include <QtCore>
 #include <nx/utils/log/log.h>
-#include <nx/utils/object_destruction_flag.h>
+#include <nx/utils/interruption_flag.h>
 #include <nx/network/aio/abstract_async_channel.h>
 #include <nx/network/connection_server/base_server_connection.h>
 #include <nx/network/aio/timer.h>
@@ -18,9 +18,7 @@ namespace nx {
 namespace network {
 namespace websocket {
 
-class NX_NETWORK_API WebSocket :
-    public aio::AbstractAsyncChannel,
-    private websocket::ParserHandler
+class NX_NETWORK_API WebSocket : public aio::AbstractAsyncChannel
 {
 public:
     /**
@@ -29,14 +27,17 @@ public:
      */
     WebSocket(
         std::unique_ptr<AbstractStreamSocket> streamSocket,
-        SendMode sendMode = SendMode::singleMessage,
-        ReceiveMode receiveMode = ReceiveMode::message,
-        Role role = Role::undefined,
-        FrameType frameType= FrameType::binary);
+        SendMode sendMode,
+        ReceiveMode receiveMode,
+        Role role,
+        FrameType frameType,
+        network::websocket::CompressionType compressionType);
 
     WebSocket(
         std::unique_ptr<AbstractStreamSocket> streamSocket,
-        FrameType frameType);
+        Role role,
+        FrameType frameType,
+        network::websocket::CompressionType compressionType);
 
     ~WebSocket();
 
@@ -104,23 +105,19 @@ private:
     std::unique_ptr<nx::network::aio::Timer> m_pingTimer;
     std::unique_ptr<nx::network::aio::Timer> m_pongTimer;
     std::chrono::milliseconds m_aliveTimeout;
-    nx::utils::ObjectDestructionFlag m_destructionFlag;
+    nx::utils::InterruptionFlag m_destructionFlag;
     bool m_failed = false;
     FrameType m_frameType;
+    network::websocket::CompressionType m_compressionType;
     bool m_readingCeased = false;
     bool m_pingPongDisabled = false;
 
     virtual void stopWhileInAioThread() override;
 
     /** Parser handler implementation */
-    virtual void frameStarted(FrameType type, bool fin) override;
-    virtual void framePayload(const char* data, int len) override;
-    virtual void frameEnded() override;
-    virtual void messageEnded() override;
-    virtual void handleError(Error err) override;
+    void gotFrame(FrameType type, const nx::Buffer& data, bool fin);
 
     /** Own helper functions*/
-    bool isDataFrame() const;
     void sendMessage(const nx::Buffer& message, int writeSize, IoCompletionHandler handler);
     void sendControlResponse(FrameType type);
     void sendControlRequest(FrameType type);

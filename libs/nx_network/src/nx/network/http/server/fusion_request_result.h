@@ -42,11 +42,13 @@ public:
 
     /** Creates OK result */
     FusionRequestResult();
+    
     FusionRequestResult(
         FusionRequestErrorClass _errorClass,
         QString _resultCode,
         int _errorDetail,
         QString _errorText);
+    
     FusionRequestResult(
         FusionRequestErrorClass _errorClass,
         QString _resultCode,

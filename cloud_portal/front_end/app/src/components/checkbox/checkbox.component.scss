@@ -19,13 +19,26 @@ nx-checkbox {
         }
     }
 
-    & + label + div.input-error {
-        display : none;
+    & + label {
+        cursor : pointer;
+        
+        & + div.input-error {
+            display : none;
+        }
     }
 
     &.ng-invalid:not(.ng-untouched) {
         & + label + div.input-error {
             display : block;
+        }
+    
+        .nx-checkbox {
+            input ~ .tick {
+                svg polygon.box,
+                svg polyline.box {
+                    stroke : $error;
+                }
+            }
         }
     }
 
@@ -50,6 +63,28 @@ nx-checkbox {
             svg polygon.box,
             svg polyline.box {
                 stroke : $dark9 !important;
+            }
+        }
+
+        input:hover ~ .check {
+            svg polygon.box,
+            svg polyline.box {
+                stroke : $dark1;
+            }
+
+            & ~ .text {
+                color : $dark1;
+            }
+        }
+
+        input:active ~ .check {
+            svg polygon.box,
+            svg polyline.box {
+                stroke : $dark9 !important;
+            }
+
+            & ~ .text {
+                color : $dark9 !important;
             }
         }
     }

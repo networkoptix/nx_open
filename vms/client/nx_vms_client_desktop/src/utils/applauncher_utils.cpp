@@ -1,5 +1,8 @@
 #include "applauncher_utils.h"
 
+#include <thread>
+#include <chrono>
+
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QDesktopWidget>
 
@@ -87,7 +90,8 @@ ResultType installZipAsync(
     ResultType result = ResultType::otherError;
     static const int kMaxTries = 5;
 
-    for (int retries = 0; retries < kMaxTries; retries++)
+    int retries = 0;
+    for (; retries < kMaxTries; retries++)
     {
         result = sendCommandToApplauncher(request, &response);
         if (result == ResultType::ok)
@@ -113,14 +117,21 @@ ResultType installZipAsync(
         std::this_thread::sleep_for(std::chrono::seconds(1));
     }
 
+    if (retries == kMaxTries && result != ResultType::ok)
+        NX_ERROR(NX_SCOPE_TAG, "installZipAsync got error %1 after %2 retries", result, retries);
+
     return result;
 }
 
-ResultType checkInstallationProgress()
+ResultType checkInstallationProgress(const nx::utils::SoftwareVersion& version,
+    InstallationProgress& progress)
 {
     InstallZipCheckStatus request;
-    Response response;
+    request.version = version;
+    InstallZipCheckStatusResponse response;
     const auto result = sendCommandToApplauncher(request, &response);
+    progress.total = response.total;
+    progress.extracted = response.extracted;
     if (result != ResultType::ok)
         return result;
     if (response.result != ResultType::ok)
@@ -168,12 +179,32 @@ ResultType getInstalledVersions(QList<nx::utils::SoftwareVersion>* versions)
 bool checkOnline(bool runWhenOffline)
 {
     /* Try to run applauncher if it is not running. */
-    static const nx::utils::SoftwareVersion anyVersion(3, 0);
-    bool notUsed = false;
-    const auto result = isVersionInstalled(anyVersion, &notUsed);
+    // New online checks, for applauncher with PingRequest
+    static int lastPingRequest = 0;
+    PingRequest request;
+    request.pingId = lastPingRequest++;
+    auto start = std::chrono::system_clock::now().time_since_epoch();
+    request.pingStamp = std::chrono::duration_cast<std::chrono::milliseconds>(start).count();
 
+    PingResponse response;
+    ResultType result = sendCommandToApplauncher(request, &response);
     if (result == ResultType::ok)
+    {
+        auto finish = std::chrono::system_clock::now().time_since_epoch();
+        auto delta = std::chrono::duration_cast<std::chrono::milliseconds>(finish - start);
+        NX_VERBOSE(NX_SCOPE_TAG, "checkOnline(runWhenOffline=%1) checked online status in %d ms",
+            delta.count());
         return true;
+    }
+    else
+    {
+        // Legacy applauncher check, for the versions without PingRequest
+        static const nx::utils::SoftwareVersion anyVersion(3, 0);
+        bool notUsed = false;
+        result = isVersionInstalled(anyVersion, &notUsed);
+        if (result == ResultType::ok)
+            return true;
+    }
 
     return ((result == ResultType::connectError) && runWhenOffline
         && nx::vms::client::SelfUpdater::runMinilaucher());

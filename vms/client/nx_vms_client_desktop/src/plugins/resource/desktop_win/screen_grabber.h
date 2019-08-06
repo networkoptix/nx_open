@@ -3,15 +3,25 @@
 #include <memory>
 
 #include <QtCore/QObject>
+#include <QtCore/QElapsedTimer>
+#include <QtGui/QPixmap>
 
-// TODO: #Elric move system includes into implementation
 #include <windows.h>
 #include <shellapi.h>
 #include <commdlg.h>
 #include <d3d9.h>
 #include <d3dx9.h>
-#include <QtCore/QTime>
+
 #include "ui/screen_recording/video_recorder_settings.h"
+
+#include <nx/utils/thread/wait_condition.h>
+
+extern "C" {
+#include <libavformat/avformat.h>
+#include <libavcodec/avcodec.h>
+#include <libavutil/imgutils.h>
+#include <libswscale/swscale.h>
+}
 
 struct CaptureInfo
 {
@@ -50,7 +60,6 @@ public:
     //AVPixelFormat format() const { return AV_PIX_FMT_BGRA; }
     int width() const;
     int height() const;
-    qint64 currentTime() const;
     int refreshRate() const { return m_ddm.RefreshRate;}
     void restart();
     void setLogo(const QPixmap& logo);
@@ -58,6 +67,7 @@ public:
     int screenHeight() const;
     void pleaseStop();
     Qn::CaptureMode getMode() const { return m_mode; }
+    void setTimer(QElapsedTimer* timer) { m_timer = timer;  }
 private:
     HRESULT        InitD3D(HWND hWnd);
     bool dataToFrame(quint8* data, int dataStride, int width, int height, AVFrame* pFrame);
@@ -77,7 +87,7 @@ private:
     QVector<quint8*> m_openGLData;
     RECT m_rect{0, 0, 0, 0};
     D3DDISPLAYMODE m_ddm{};
-    QTime m_timer;
+    QElapsedTimer* m_timer = nullptr;
     unsigned m_frameNum = 0;
     int m_currentIndex = 0;
 

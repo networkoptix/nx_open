@@ -9,7 +9,7 @@
     </message>
     <message>
       <source>MMMM yyyy</source>
-      <translation>MMMM åååå</translation>
+      <translation>MMMM yyyy</translation>
     </message>
   </context>
   <context>
@@ -17,7 +17,7 @@
     <message>
       <source>Language Name</source>
       <extracomment>Language name that will be displayed to user. Must not be empty.</extracomment>
-      <translation type="unfinished">Language Name</translation>
+      <translation>Svenska</translation>
     </message>
   </context>
   <context>
@@ -839,9 +839,9 @@
     </message>
     <message numerus="yes">
       <source>%n cameras</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n kameror</numerusform>
-        <numerusform>%n cameras</numerusform>
+        <numerusform>%n kameror</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1550,14 +1550,6 @@
       <translation>Öppna layout</translation>
     </message>
     <message>
-      <source>Plugin Event</source>
-      <translation>Plugin Event</translation>
-    </message>
-    <message>
-      <source>Unknown plugin event</source>
-      <translation>Okänd plugin-händelse</translation>
-    </message>
-    <message>
       <source>Failed to force using camera time, it lags too much, system time will be used</source>
       <translation>Misslyckades med att använda kameratid, det ligger efter för mycket, systemtiden kommer att användas</translation>
     </message>
@@ -1571,19 +1563,31 @@
     </message>
     <message>
       <source>Multicast address conflict detected. Address %1 is already in use by %2 on %3 stream</source>
-      <translation type="unfinished">Multicast address conflict detected. Address %1 is already in use by %2 on %3 stream</translation>
+      <translation>Multicast adresskonflikt upptäckt. Adress %1 används redan av %2 på %3 ström</translation>
     </message>
     <message>
       <source>Network address %1 is not a multicast address</source>
-      <translation type="unfinished">Network address %1 is not a multicast address</translation>
+      <translation>Nätverksadress %1 är inte en multicast-adress</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; is offline.</source>
-      <translation type="unfinished">Analytics storage &quot;%1&quot; is offline.</translation>
+      <translation>Analytics-lagring &quot;%1&quot; är offline.</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; is almost full.</source>
-      <translation type="unfinished">Analytics storage &quot;%1&quot; is almost full.</translation>
+      <translation>Analytics-lagring &quot;%1&quot; är nästan full.</translation>
+    </message>
+    <message>
+      <source>Plugin Diagnostic Event</source>
+      <translation>Plugin Diagnostic Event</translation>
+    </message>
+    <message>
+      <source>Unknown Plugin Diagnostic Event</source>
+      <translation>Okänd Plugin Diagnostic Event</translation>
+    </message>
+    <message>
+      <source>RAID error. %1.</source>
+      <translation>RAID-fel. %1.</translation>
     </message>
   </context>
   <context>

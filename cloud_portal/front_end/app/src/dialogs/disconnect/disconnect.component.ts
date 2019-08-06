@@ -1,7 +1,9 @@
-import { Component, Inject, OnInit, Input, ViewEncapsulation, Renderer2, ViewChild } from '@angular/core';
-import { Location }                                                                  from '@angular/common';
-import { NgbModal, NgbActiveModal, NgbModalRef }                                     from '@ng-bootstrap/ng-bootstrap';
-import { EmailValidator }                                                            from '@angular/forms';
+import {
+    Component, Inject, OnInit, Input,
+    ViewEncapsulation, Renderer2, ViewChild }     from '@angular/core';
+import { Location }                               from '@angular/common';
+import { NgbModal, NgbActiveModal, NgbModalRef }  from '@ng-bootstrap/ng-bootstrap';
+import { EmailValidator }                         from '@angular/forms';
 
 @Component({
     selector: 'nx-modal-disconnect-content',
@@ -33,7 +35,7 @@ export class DisconnectModalContent {
         this.auth.password = '';
 
         this.disconnect = this.process.init(() => {
-            this.disconnectForm.controls['password'].setErrors(null);
+            this.disconnectForm.controls.password.setErrors(null);
             this.wrongPassword = false;
 
             return this.cloudApi.disconnect(this.systemId, this.auth.password);
@@ -42,7 +44,6 @@ export class DisconnectModalContent {
             errorCodes: {
                 wrongPassword: () => {
                     this.wrongPassword = true;
-                    this.disconnectForm.controls['password'].setErrors({'nx_wrong_password': true});
                     this.auth.password = '';
 
                     this.renderer.selectRootElement('#password').focus();
@@ -78,7 +79,13 @@ export class NxModalDisconnectComponent implements OnInit {
     }
 
     private dialog(systemId) {
-        this.modalRef = this.modalService.open(DisconnectModalContent, {backdrop: 'static', centered: true});
+        // TODO: Refactor dialog to use generic dialog
+        // TODO: retire loading ModalContent (CLOUD-2493)
+        this.modalRef = this.modalService.open(DisconnectModalContent,
+                {
+                            windowClass: 'modal-holder',
+                            backdrop: 'static'
+                        });
         this.modalRef.componentInstance.language = this.language.lang;
         this.modalRef.componentInstance.disconnect = this.disconnect;
         this.modalRef.componentInstance.systemId = systemId;

@@ -109,7 +109,7 @@ int QnJsonAggregatorRestHandler::executeGet(const QString &, const QnRequestPara
 
     for (auto itr = params.begin(); itr != params.end(); ++itr)
     {
-        if (itr->first == "exec_cmd")
+        if (itr.key() == "exec_cmd")
         {
             if (!cmdToExecute.isEmpty())
             {
@@ -117,11 +117,11 @@ int QnJsonAggregatorRestHandler::executeGet(const QString &, const QnRequestPara
                     return nx::network::http::StatusCode::ok;
             }
             outParams.clear();
-            cmdToExecute = itr->second;
+            cmdToExecute = itr.value();
         }
         else
         {
-            outParams.insert(itr->first, itr->second);
+            outParams.insert(itr.key(), itr.value());
         }
     }
     if (!cmdToExecute.isEmpty())

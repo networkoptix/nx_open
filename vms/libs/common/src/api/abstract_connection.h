@@ -104,7 +104,10 @@ private:
 };
 
 
-
+/**
+ * This one is needed for QnMediaServerConnection.
+ * It should be removed when all methods from QnMediaServerConnection are moved to rest::ServerConnection.
+ */
 class QnAbstractConnection: public Connective<QObject>, public /*mixin*/ QnCommonModuleAware
 {
     Q_OBJECT
@@ -200,7 +203,7 @@ protected:
     template<class T>
     int sendSyncGetRequest(int object, const QnRequestParamList &params, T *reply, std::optional<std::chrono::milliseconds> timeout = std::nullopt)
     {
-        return sendSyncGetRequest(object, QnRequestHeaderList(), params, reply, timeout);
+        return sendSyncGetRequest(object, {}, params, reply, timeout);
     }
 
     QnResourcePtr targetResource() const;

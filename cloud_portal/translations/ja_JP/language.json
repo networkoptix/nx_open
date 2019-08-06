@@ -1,5 +1,5 @@
 {
-  "language": "en_US",
+  "language": "ja_JP",
   "language_name": "日本語",
   "productName": "%PRODUCT_NAME%",
   "clientProtocol": "%CLIENT_PROTOCOL%:",
@@ -10,7 +10,15 @@
     "loginButton": "ログイン",
     "logoutAuthorisedTitle": "すでにログインしています",
     "logoutAuthorisedContinueButton": "続行",
-    "logoutAuthorisedLogoutButton": "ログアウト"
+    "logoutAuthorisedLogoutButton": "ログアウト",
+    "messageFailed": "Message has failed to send.",
+    "messageSent": "Message has been sent."
+  },
+  "messageType": {
+    "ipvd_feedback": "Feedback about {{product}}",
+    "sales_inquiry": "Inquiry for {{product}}",
+    "request_support": "Request Support for {{product}}",
+    "unknown": "Unknown Message Type"
   },
   "pageTitles": {
     "template": "{{title}} %PRODUCT_NAME%",
@@ -37,8 +45,9 @@
     "pageNotFound": "ページが見つかりません"
   },
   "systemStatuses": {
-    "notActivated": "アクティベートされていません",
     "activated": "アクティベート済",
+    "merging": "merging",
+    "notActivated": "アクティベートされていません",
     "online": "オンライン",
     "offline": "オフライン",
     "unavailable": "利用できません"
@@ -137,13 +146,22 @@
     "cantOpenClient": "%VMS_NAME% アプリケーションが検出されません<a href=\"/download\"> ダウンロード</a>",
     "lostConnection": "{{systemName}} への接続が失われました",
     "thisSystem": "システム",
-    "oldSafariNotSupported": "Safariのバージョン10以前はサポートされません"
+    "oldSafariNotSupported": "Safariのバージョン10以前はサポートされません",
+    "DUPLICATE_MEDIASERVER_FOUND": "重複するサーバーが見つかりました。<br>統合する各システムから古いサーバーを削除してからやり直してください",
+    "mergedSystemIsOffline": "統合されているシステムの1つがオフラインです　それらがオンラインであることを確認してからやり直してください",
+    "INCOMPATIBLE": "Versions for systems are incompatible. To fix this problem make sure the systems have the same version."
   },
   "passwordRequirements": {
+    "good": "良い",
+    "fair": "可",
+    "minLength": "短すぎ",
     "minLengthMessage": "パスワードは8文字以上必要です",
+    "required": "無効",
     "requiredMessage": "英数字とキーボードの記号のみを使用して、先頭と末尾の空白を避けます",
+    "weak": "弱",
     "weakMessage": "大文字と小文字の文字、特殊記号を使用して、強固なパスワードを作る",
     "strongMessage": "強力なパスワード!",
+    "common": "あまりにも一般的",
     "commonMessage": "このパスワードは、世界で最も人気のあるパスワード",
     "missingMessage": "パスワードが必要"
   },
@@ -177,8 +195,9 @@
     "confirmUnshareAction": "削除",
     "successDisconnected": "システムが正常に %PRODUCT_NAME% から切断されました",
     "successDeleted": "システム {{systemName}} はあなたのアカウントから正常に削除されました",
-    "successMerge": "システム {{systemName}} が {{systemName}} と統合されました",
-    "permissionsRemoved": "{{email}} からアクセス権限が削除されました"
+    "successMerge": "システムが統合されました",
+    "permissionsRemoved": "{{email}} からアクセス権限が削除されました",
+    "unknownName": "Unknown Name for System (Caused by cloud merge)"
   },
   "account": {
     "accountSavedSuccess": "あなたのアカウントは正常に保存されました",

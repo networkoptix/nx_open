@@ -13,6 +13,7 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/watchers/workbench_selection_watcher.h>
 #include <ui/common/read_only.h>
+#include <ui/style/custom_style.h>
 #include <utils/common/html.h>
 #include <utils/common/event_processors.h>
 #include <utils/license_usage_helper.h>
@@ -128,7 +129,7 @@ struct CameraSettingsDialog::Private: public QObject
                 CameraSettingsDialogStateConversionFunctions::applyStateToCameras(state, cameras);
                 if (advancedSettingsWidget->hasChanges())
                     advancedSettingsWidget->submitToResource();
-                store->loadCameras(cameras);
+                resetChanges();
             };
 
         const auto backout =
@@ -301,12 +302,15 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
         int(CameraSettingsTab::analytics),
         new CameraAnalyticsSettingsWidget(
             d->store, qnClientCoreModule->mainQmlEngine(), ui->tabWidget),
-        tr("Analytics"));
+        tr("Plugins"));
 
     addPage(
         int(CameraSettingsTab::expert),
         new CameraExpertSettingsWidget(d->store, ui->tabWidget),
         tr("Expert"));
+
+    autoResizePagesToContents(ui->tabWidget, QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred),
+        true);
 
     auto selectionWatcher = new QnWorkbenchSelectionWatcher(this);
     connect(
@@ -399,8 +403,7 @@ bool CameraSettingsDialog::setCameras(const QnVirtualCameraResourceList& cameras
         !force
         && isVisible()
         && d->cameras != cameras
-        && (d->hasChanges()
-            || d->store->state().analytics.loading);
+        && d->hasChanges();
 
     if (askConfirmation)
     {
@@ -428,6 +431,8 @@ bool CameraSettingsDialog::setCameras(const QnVirtualCameraResourceList& cameras
     d->previewManager->selectCamera(singleCamera);
     d->analyticsEnginesWatcher->setCamera(singleCamera);
 
+    d->previewManager->refreshSelectedCamera();
+
     d->handleCamerasWithDefaultPasswordChanged();
     d->handleCamerasChanged();
 
@@ -438,6 +443,12 @@ void CameraSettingsDialog::reject()
 {
     d->resetChanges();
     base_type::reject();
+}
+
+void CameraSettingsDialog::showEvent(QShowEvent* event)
+{
+    base_type::showEvent(event);
+    d->previewManager->refreshSelectedCamera();
 }
 
 void CameraSettingsDialog::buttonBoxClicked(QDialogButtonBox::StandardButton button)

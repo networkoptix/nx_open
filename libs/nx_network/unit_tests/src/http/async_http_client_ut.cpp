@@ -461,6 +461,12 @@ public:
         init();
     }
 
+    ~HttpClientAsyncMultiRequest()
+    {
+        if (m_client)
+            m_client->pleaseStopSync();
+    }
+
 protected:
     void doRequest(const nx::utils::Url& url, const QByteArray& message)
     {
@@ -997,6 +1003,21 @@ public:
     {
         m_httpClient->pleaseStopSync();
         m_testHttpServer.reset();
+
+        decltype(m_connectionToContext) connectionToContext;
+        {
+            QnMutexLocker lock(&m_mutex);
+            connectionToContext = std::exchange(m_connectionToContext, {});
+        }
+
+        for (auto& [connection, ctx]: connectionToContext)
+        {
+            connection->pleaseStopSync();
+            ctx->timer.pleaseStopSync();
+        }
+
+        // Locking mutex so that connections that are in the onConnectionClosed have exited.
+        QnMutexLocker lock(&m_mutex);
     }
 
 protected:
@@ -1102,7 +1123,11 @@ private:
             QnMutexLocker lock(&m_mutex);
             auto p = m_connectionToContext.emplace(requestContext.connection, nullptr);
             if (p.second)
+            {
                 p.first->second = std::make_unique<HttpConnectionContext>();
+                requestContext.connection->registerCloseHandler(
+                    std::bind(&HttpClientAsyncReusingConnection::onConnectionClosed, this, requestContext.connection));
+            }
             connectionContext = p.first->second.get();
         }
 
@@ -1110,8 +1135,6 @@ private:
 
         requestResult.connectionEvents.onResponseHasBeenSent =
             std::bind(&HttpClientAsyncReusingConnection::onResponseSent, this, requestContext.connection);
-        requestContext.connection->registerCloseHandler(
-            std::bind(&HttpClientAsyncReusingConnection::onConnectionClosed, this, requestContext.connection));
 
         completionHandler(std::move(requestResult));
     }

@@ -10,7 +10,15 @@
     "loginButton": "Bejelentkezés",
     "logoutAuthorisedTitle": "Már bejelentkezett",
     "logoutAuthorisedContinueButton": "Folyatatás",
-    "logoutAuthorisedLogoutButton": "Kijelentkezés"
+    "logoutAuthorisedLogoutButton": "Kijelentkezés",
+    "messageFailed": "Message has failed to send.",
+    "messageSent": "Message has been sent."
+  },
+  "messageType": {
+    "ipvd_feedback": "Feedback about {{product}}",
+    "sales_inquiry": "Inquiry for {{product}}",
+    "request_support": "Request Support for {{product}}",
+    "unknown": "Unknown Message Type"
   },
   "pageTitles": {
     "template": "{{title}} %PRODUCT_NAME%",
@@ -37,8 +45,9 @@
     "pageNotFound": "Az oldal nem található"
   },
   "systemStatuses": {
-    "notActivated": "nincs aktiválva",
     "activated": "aktiválva",
+    "merging": "merging",
+    "notActivated": "nincs aktiválva",
     "online": "online",
     "offline": "offline",
     "unavailable": "nem elérhető"
@@ -137,13 +146,22 @@
     "cantOpenClient": "%VMS_NAME% nincs törölve. <a href=\"/download\">Letöltés</a>",
     "lostConnection": "{{systemName}} kapcsolat megszakadt",
     "thisSystem": "a rendszer",
-    "oldSafariNotSupported": "A 10-es verziónál régebbi Safari böngésző nem támogatott"
+    "oldSafariNotSupported": "A 10-es verziónál régebbi Safari böngésző nem támogatott",
+    "DUPLICATE_MEDIASERVER_FOUND": "Duplicate servers were found on one of the systems.<br>Remove old servers from each system that you are trying to merge and try again.",
+    "mergedSystemIsOffline": "One of the systems being merged is offline. Make sure they are online and try again.",
+    "INCOMPATIBLE": "Versions for systems are incompatible. To fix this problem make sure the systems have the same version."
   },
   "passwordRequirements": {
+    "good": "jó",
+    "fair": "elegendő",
+    "minLength": "túl rövid",
     "minLengthMessage": "A jelszónak legalább 8 karakterből kell állnia",
+    "required": "nem megfelelő",
     "requiredMessage": "Csak latin betűket, számokat és billentyűzet szimbólumok használhatók, kerülje a szóközöket",
+    "weak": "gyenge",
     "weakMessage": "Használjon számokat, kis és nagybetűket és speciális karaktereket az erősebb jelszó érdekében",
     "strongMessage": "Erős jelszó!",
+    "common": "túl gyakori",
     "commonMessage": "Ez a jelszó a leggyakoribb jelszavak egyike",
     "missingMessage": "Jelszó megadása szükséges"
   },
@@ -177,8 +195,9 @@
     "confirmUnshareAction": "Törlés",
     "successDisconnected": "Rendszer sikeresen bontotta %PRODUCT_NAME% kapcsolatát",
     "successDeleted": "{{systemName}} rendszer sikeresen törölve a fiókból",
-    "successMerge": "A {{systemName}} rendszert egyesítjük az {{systemName}} verzióval",
-    "permissionsRemoved": "{{email}} engedélyei vissavonva"
+    "successMerge": "System merge completed",
+    "permissionsRemoved": "{{email}} engedélyei vissavonva",
+    "unknownName": "Unknown Name for System (Caused by cloud merge)"
   },
   "account": {
     "accountSavedSuccess": "A fiók mentése sikeres",

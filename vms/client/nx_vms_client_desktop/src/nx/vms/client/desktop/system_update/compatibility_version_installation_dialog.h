@@ -47,6 +47,7 @@ public:
 
     virtual void reject() override;
     virtual int exec() override;
+    QString errorString() const;
 
 protected:
     int startUpdate();
@@ -56,7 +57,7 @@ protected:
 protected:
     // Event handlers
     void atUpdateCurrentState();
-    void atUpdateStateChanged(int state, int progress);
+    void atUpdateStateChanged(int state, int progress, const QString& message);
     void atAutoRestartChanged(int state);
 
 protected:
@@ -69,6 +70,7 @@ protected:
     InstallResult m_installationResult = InstallResult::initial;
     bool m_autoInstall = true;
     const nx::vms::api::SoftwareVersion m_engineVersion;
+    QString m_errorMessage;
 
 private:
     struct Private;

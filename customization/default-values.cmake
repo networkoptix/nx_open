@@ -21,6 +21,11 @@ set(freeLicenseCount "4")
 set(freeLicenseIsTrial "true")
 set(eulaVersion 1)
 
+# Support section
+set(supportUrl "")
+set(supportEmail "")
+set(supportPhone "")
+
 # Update parameters
 set(update.generator.url "http://updates.hdw.mx/upcombiner/upcombine")
 set(updateFeedUrl "http://updates.vmsproxy.com/updates.json")
@@ -31,6 +36,7 @@ set(mac_certificate_file_password "qweasd123")
 # Additional Features
 set(vmax false)
 set(enable_hanwha false)
+set(useMetaVersion OFF)
 
 # if true, you can use --customization=<path> to specify customization
 set(dynamic.customization false)
@@ -62,6 +68,8 @@ set(translations
     uk_UA
     vi_VN
     th_TH
+    fi_FI
+    sv_SE
 )
 set(defaultTranslation en_US)
 

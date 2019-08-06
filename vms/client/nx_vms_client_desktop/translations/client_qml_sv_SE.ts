@@ -11,6 +11,10 @@
       <source>Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</source>
       <translation>Kameraanalys fungerar bara när kameran visas. Aktivera inspelning så att den fungerar hela tiden.</translation>
     </message>
+    <message>
+      <source>This is the built-in functionality</source>
+      <translation>Det här är den inbyggda funktionaliteten</translation>
+    </message>
   </context>
   <context>
     <name>EmptyTilesPlaceholder</name>
@@ -68,11 +72,11 @@
     <name>PluginsInformation</name>
     <message>
       <source>No plugins installed</source>
-      <translation type="unfinished">No plugins installed</translation>
+      <translation>Inga plugins installerade</translation>
     </message>
     <message>
       <source>Server is offline</source>
-      <translation type="unfinished">Server is offline</translation>
+      <translation>Servern är offline</translation>
     </message>
   </context>
   <context>

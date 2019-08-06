@@ -1,10 +1,13 @@
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+
 #pragma once
 
 #include <nx/sdk/interface.h>
-#include <nx/sdk/i_utility_provider.h>
 
 namespace nx {
 namespace sdk {
+
+class IUtilityProvider;
 
 /**
  * The main interface that any VMS Plugin implements. The plugin's dynamic library should export
@@ -13,6 +16,10 @@ namespace sdk {
  *
  * The only object of this class is created by a Server on its start, and is destroyed (via
  * releaseRef()) on the Server shutdown.
+ *
+ * All methods are guaranteed to be called without overlapping even if from different threads (i.e.
+ * with a guaranteed barrier between the calls), thus, no synchronization is required for the
+ * implementation.
  */
 class IPlugin: public Interface<IPlugin>
 {
@@ -24,9 +31,6 @@ public:
 
     /** Prototype of a plugin entry point function. */
     typedef IPlugin* (*EntryPointFunc)();
-
-    /** Name of the plugin, used for information purpose only. */
-    virtual const char* name() const = 0;
 
     /**
      * Provides an object which the plugin can use for calling back to access some data and

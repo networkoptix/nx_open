@@ -19,6 +19,7 @@
 #include <media_server/media_server_module.h>
 #include <nx/streaming/archive_stream_reader.h>
 #include <plugins/utils/multisensor_data_provider.h>
+#include <nx/vms/server/ptz/server_ptz_controller_pool.h>
 #include <nx/vms/server/resource/multicast_parameters.h>
 
 static const std::set<QString> kSupportedCodecs = {"MJPEG", "H264", "H265"};
@@ -42,6 +43,19 @@ Camera::Camera(QnMediaServerModule* serverModule):
     {
         QnMutexLocker lk(&m_initMutex);
         fixInputPortMonitoring();
+    });
+
+    connect(this, &Camera::propertyChanged,
+    [this](const QnResourcePtr& /*resource*/, const QString& key)
+    {
+        if (key == ResourcePropertyKey::kUserPreferredPtzPresetType
+            || key == ResourcePropertyKey::kDefaultPreferredPtzPresetType
+            || key == ResourcePropertyKey::kPtzCapabilitiesAddedByUser
+            || key == ResourcePropertyKey::kPtzCapabilitiesUserIsAllowedToModify)
+        {
+            handlePtzConfigurationChange(key);
+            return;
+        }
     });
 
     const auto updateIoCache =
@@ -429,7 +443,8 @@ void Camera::initializationDone()
     fixInputPortMonitoring();
 }
 
-StreamCapabilityMap Camera::getStreamCapabilityMapFromDriver(nx::vms::api::StreamIndex streamIndex)
+StreamCapabilityMap Camera::getStreamCapabilityMapFromDriver(
+    nx::vms::api::StreamIndex /*streamIndex*/)
 {
     // Implementation may be overloaded in a driver.
     return StreamCapabilityMap();
@@ -538,6 +553,9 @@ CameraDiagnostics::Result Camera::initializeAdvancedParametersProviders()
 
 StreamCapabilityMap Camera::getStreamCapabilityMap(nx::vms::api::StreamIndex streamIndex)
 {
+    if (getUrl().isEmpty())
+        return {};
+
     auto defaultStreamCapability = [this](const StreamCapabilityKey& key)
     {
         nx::media::CameraStreamCapability result;
@@ -742,6 +760,18 @@ void Camera::fixInputPortMonitoring()
             m_inputPortListeningInProgress = false;
         }
     }
+}
+
+void Camera::handlePtzConfigurationChange(const QString &key)
+{
+    // We don't need to restart if there is no PTZ.
+    if (this->serverModule()->ptzControllerPool()->controller(toSharedPointer()) == nullptr)
+        return;
+
+    if (!isInitialized() || isInitializationInProgress())
+        return;
+    NX_DEBUG(this, "PTZ property [%1] changed, starting reinitialization", key);
+    reinitAsync();
 }
 
 QnTimePeriodList Camera::getDtsTimePeriods(

@@ -4,6 +4,8 @@ ListView
 {
     id: control
 
+    readonly property bool denyFlickableVisibleAreaCorrection: true
+
     property int pressedStateFilterMs: 500
     property int emptyHeaderSize: 4
     readonly property alias scrollable: d.prefferToBeInteractive
@@ -94,10 +96,10 @@ ListView
         onButtonLongPressedChanged:
         {
             if (active)
-                control.longPressedChanged(index, buttonLongPressed, button.pressed)
+                control.longPressedChanged(index, buttonLongPressed, button.down)
         }
 
-        onPressedChanged: pressedSignalOrderTimer.restart()
+        onDownChanged: pressedSignalOrderTimer.restart()
         onEnabledChanged: control.enabledChanged(index, enabled)
 
         Connections
@@ -148,7 +150,7 @@ ListView
             onTriggered:
             {
                 if (button.active)
-                    control.buttonDownChanged(index, button.pressed)
+                    control.buttonDownChanged(index, button.down)
             }
         }
 

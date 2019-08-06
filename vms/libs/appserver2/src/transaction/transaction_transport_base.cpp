@@ -21,13 +21,13 @@
 
 #include <nx/cloud/db/api/ec2_request_paths.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
-#include <nx_ec/ec_proto_version.h>
 
 #include <transaction/json_transaction_serializer.h>
 #include <transaction/ubjson_transaction_serializer.h>
 #include <transaction/transaction_transport_header.h>
 
 #include <nx/vms/api/types/connection_types.h>
+#include <nx/vms/api/protocol_version.h>
 
 //#define USE_SINGLE_TWO_WAY_CONNECTION
 //!if not defined, ubjson is used
@@ -108,8 +108,8 @@ QnTransactionTransportBase::QnTransactionTransportBase(
     m_keepAliveProbeCount(keepAliveProbeCount),
     m_idleConnectionTimeout(tcpKeepAliveTimeout * keepAliveProbeCount),
     m_timer(std::make_unique<nx::network::aio::Timer>()),
-    m_remotePeerEcProtoVersion(nx_ec::INITIAL_EC2_PROTO_VERSION),
-    m_localPeerProtocolVersion(nx_ec::EC2_PROTO_VERSION)
+    m_remotePeerEcProtoVersion(nx::vms::api::kInitialProtocolVersion),
+    m_localPeerProtocolVersion(nx::vms::api::protocolVersion())
 {
     bindToAioThread(aioThread ? aioThread : getAioThread());
 
@@ -123,7 +123,6 @@ QnTransactionTransportBase::QnTransactionTransportBase(
     m_connected = false;
     m_prevGivenHandlerID = 0;
     m_credentialsSource = CredentialsSource::serverKey;
-    m_postedTranCount = 0;
     m_asyncReadScheduled = false;
     m_remoteIdentityTime = 0;
     m_connectionType = ConnectionType::none;
@@ -170,7 +169,7 @@ QnTransactionTransportBase::QnTransactionTransportBase(
 
     m_remotePeerEcProtoVersion =
         ec2ProtoVersionIter == request.headers.end()
-        ? nx_ec::INITIAL_EC2_PROTO_VERSION
+        ? nx::vms::api::kInitialProtocolVersion
         : ec2ProtoVersionIter->second.toInt();
 
     //TODO #ak use binary filter stream for serializing transactions
@@ -191,8 +190,6 @@ QnTransactionTransportBase::QnTransactionTransportBase(
     m_readBuffer.reserve( DEFAULT_READ_BUFFER_SIZE );
     m_lastReceiveTimer.invalidate();
 
-    NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lit("Constructor"));
-
     using namespace std::placeholders;
     if( m_contentEncoding == "gzip" )
         m_compressResponseMsgBody = true;
@@ -204,7 +201,7 @@ QnTransactionTransportBase::QnTransactionTransportBase(
         incomingTransactionsRequestsParserWeak(incomingTransactionsRequestsParser );
 
     // This filter receives single HTTP message.
-    auto extensionHeadersProcessor = nx::utils::bstream::makeFilterWithFunc( 
+    auto extensionHeadersProcessor = nx::utils::bstream::makeFilterWithFunc(
         [this, incomingTransactionsRequestsParserWeak]() {
             if (auto incomingTransactionsRequestsParserStrong = incomingTransactionsRequestsParserWeak.lock())
                 processChunkExtensions(incomingTransactionsRequestsParserStrong->currentMessage().headers());
@@ -323,6 +320,11 @@ void QnTransactionTransportBase::stopWhileInAioThread()
     m_incomingDataSocket.reset();
 }
 
+void QnTransactionTransportBase::setReceivedTransactionsQueueControlEnabled(bool value)
+{
+    m_receivedTransactionsQueueControlEnabled = value;
+}
+
 void QnTransactionTransportBase::setLocalPeerProtocolVersion(int version)
 {
     m_localPeerProtocolVersion = version;
@@ -339,7 +341,7 @@ void QnTransactionTransportBase::setOutgoingConnection(
             duration_cast<milliseconds>(kSocketSendTimeout).count()))
     {
         const auto osErrorCode = SystemError::getLastOSErrorCode();
-        NX_WARNING(QnLog::EC2_TRAN_LOG,
+        NX_WARNING(QnLog::EC2_TRAN_LOG.join(this),
             lm("Error setting socket write timeout for transaction connection %1 received from %2")
                 .args(m_connectionGuid,
                     m_outgoingDataSocket->getForeignAddress().toString(),
@@ -392,7 +394,7 @@ void QnTransactionTransportBase::addDataToTheSendQueue(QByteArray data)
         const uint32_t dataSize = htonl(data.size());
         QByteArray dataWithSize;
         dataWithSize.resize(sizeof(dataSize) + data.size());
-        // TODO #ak too many memcopy here. Should use stream base64 encoder to write directly 
+        // TODO #ak too many memcopy here. Should use stream base64 encoder to write directly
         // to the output buffer.
         memcpy(dataWithSize.data(), &dataSize, sizeof(dataSize));
         memcpy(
@@ -460,11 +462,7 @@ void QnTransactionTransportBase::setStateNoLock(State state)
         this->m_state = state;
 
         // TODO: #ak: if stateChanged handler frees this object then m_mutex is destroyed locked
-        nx::utils::ObjectDestructionFlag::Watcher watcher(
-            &m_connectionFreedFlag);
         emit stateChanged(state);
-        if (watcher.objectDestroyed())
-            return; //connection has been removed by handler
     }
     m_cond.wakeAll();
 }
@@ -713,22 +711,32 @@ void QnTransactionTransportBase::onSomeBytesRead(
     }
 
     if (m_state >= QnTransactionTransportBase::Closed)
+    {
+        NX_VERBOSE(QnLog::EC2_TRAN_LOG.join(this), lm("Connection to %1 is closed. Not reading anymore")
+            .args(m_remotePeer.id.toString()));
         return;
+    }
 
     NX_ASSERT(m_state == ReadyForStreaming);
 
     //parsing and processing input data
     if (!m_incomingTransactionStreamParser->processData(m_readBuffer))
     {
-        NX_WARNING(QnLog::EC2_TRAN_LOG, lit("Error parsing data from peer %1. Disconnecting...").
+        NX_WARNING(QnLog::EC2_TRAN_LOG.join(this), lit("Error parsing data from peer %1. Disconnecting...").
             arg(m_remotePeer.id.toString()));
         return setStateNoLock(State::Error);
     }
 
     m_readBuffer.resize(0);
 
-    if (m_postedTranCount >= MAX_TRANS_TO_POST_AT_A_TIME)
+    if (m_receivedTransactionsQueueControlEnabled &&
+        m_postedTranCount >= MAX_TRANS_TO_POST_AT_A_TIME)
+    {
+        NX_VERBOSE(this, lm("There are already %1 transactions posted. "
+            "Suspending receiving new transactions until pending transactions are processed")
+            .args(m_postedTranCount));
         return; //not reading futher while that much transactions are not processed yet
+    }
 
     m_readBuffer.reserve(m_readBuffer.size() + DEFAULT_READ_BUFFER_SIZE);
     scheduleAsyncRead();
@@ -755,7 +763,7 @@ void QnTransactionTransportBase::receivedTransactionNonSafe(
                     serializedTran))
             {
                 NX_ASSERT(false);
-                NX_WARNING(QnLog::EC2_TRAN_LOG, lit("Error deserializing JSON data from peer %1. Disconnecting...").
+                NX_WARNING(QnLog::EC2_TRAN_LOG.join(this), lit("Error deserializing JSON data from peer %1. Disconnecting...").
                     arg(m_remotePeer.id.toString()));
                 setStateNoLock(State::Error);
                 return;
@@ -770,7 +778,7 @@ void QnTransactionTransportBase::receivedTransactionNonSafe(
                     serializedTran))
             {
                 NX_ASSERT(false);
-                NX_WARNING(QnLog::EC2_TRAN_LOG, lit("Error deserializing Ubjson data from peer %1. Disconnecting...").
+                NX_WARNING(QnLog::EC2_TRAN_LOG.join(this), lit("Error deserializing Ubjson data from peer %1. Disconnecting...").
                     arg(m_remotePeer.id.toString()));
                 setStateNoLock(State::Error);
                 return;
@@ -778,7 +786,7 @@ void QnTransactionTransportBase::receivedTransactionNonSafe(
             break;
 
         default:
-            NX_WARNING(QnLog::EC2_TRAN_LOG, lit("Received unkown format from peer %1. Disconnecting...").
+            NX_WARNING(QnLog::EC2_TRAN_LOG.join(this), lit("Received unkown format from peer %1. Disconnecting...").
                 arg(m_remotePeer.id.toString()));
             setStateNoLock(State::Error);
             return;
@@ -792,16 +800,13 @@ void QnTransactionTransportBase::receivedTransactionNonSafe(
             arg(transportHeader.sequence).arg(m_remotePeer.id.toString()));
     }
 
-    nx::utils::ObjectDestructionFlag::Watcher watcher(
-        &m_connectionFreedFlag);
     emit gotTransaction(
         m_remotePeer.dataFormat,
         std::move(serializedTran),
         transportHeader);
-    if (watcher.objectDestroyed())
-        return; //connection has been removed by handler
 
-    ++m_postedTranCount;
+    if (m_receivedTransactionsQueueControlEnabled)
+        ++m_postedTranCount;
 }
 
 bool QnTransactionTransportBase::hasUnsendData() const
@@ -834,7 +839,7 @@ void QnTransactionTransportBase::receivedTransaction(
         }
         if (!m_sizedDecoder->processData(decodedTranData))
         {
-            NX_WARNING(QnLog::EC2_TRAN_LOG, lit("Error parsing data (2) from peer %1. Disconnecting...").
+            NX_WARNING(QnLog::EC2_TRAN_LOG.join(this), lit("Error parsing data (2) from peer %1. Disconnecting...").
                 arg(m_remotePeer.id.toString()));
             return setStateNoLock(State::Error);
         }
@@ -847,6 +852,9 @@ void QnTransactionTransportBase::receivedTransaction(
 
 void QnTransactionTransportBase::transactionProcessed()
 {
+    if (!m_receivedTransactionsQueueControlEnabled)
+        return;
+
     post(
         [this]()
         {
@@ -890,7 +898,7 @@ void QnTransactionTransportBase::setIncomingTransactionChannelSocket(
     //checking transactions format
     if (!m_incomingTransactionStreamParser->processData(requestBuf))
     {
-        NX_WARNING(QnLog::EC2_TRAN_LOG, lit("Error parsing incoming data (3) from peer %1. Disconnecting...").
+        NX_WARNING(QnLog::EC2_TRAN_LOG.join(this), lit("Error parsing incoming data (3) from peer %1. Disconnecting...").
             arg(m_remotePeer.id.toString()));
         return setStateNoLock(State::Error);
     }
@@ -915,12 +923,18 @@ void QnTransactionTransportBase::waitForNewTransactionsReady()
 {
     QnMutexLocker lk(&m_mutex);
 
-    if (m_postedTranCount < MAX_TRANS_TO_POST_AT_A_TIME && m_state >= ReadyForStreaming)
+    auto postedTranQueueIsReady =
+        [this]()
+        {
+            return !m_receivedTransactionsQueueControlEnabled ||
+                m_postedTranCount < MAX_TRANS_TO_POST_AT_A_TIME;
+        };
+
+    if (postedTranQueueIsReady() && m_state >= ReadyForStreaming)
         return;
 
     //waiting for some transactions to be processed
-    while ((m_postedTranCount >= MAX_TRANS_TO_POST_AT_A_TIME && m_state != Closed) ||
-        m_state < ReadyForStreaming)
+    while ((!postedTranQueueIsReady() && m_state != Closed) || m_state < ReadyForStreaming)
     {
         m_cond.wait(lk.mutex());
     }
@@ -928,7 +942,7 @@ void QnTransactionTransportBase::waitForNewTransactionsReady()
 
 void QnTransactionTransportBase::connectionFailure()
 {
-    NX_WARNING(QnLog::EC2_TRAN_LOG,
+    NX_WARNING(QnLog::EC2_TRAN_LOG.join(this),
         lm("Connection to peer %1 failure. Disconnecting...")
         .args(m_remotePeer.id.toString()));
     setState(Error);
@@ -982,7 +996,7 @@ void QnTransactionTransportBase::onMonitorConnectionForClosure(
 
     if (errorCode != SystemError::noError && errorCode != SystemError::timedOut)
     {
-        NX_WARNING(QnLog::EC2_TRAN_LOG,
+        NX_WARNING(QnLog::EC2_TRAN_LOG.join(this),
             lm("transaction connection %1 received from %2 failed: %3")
             .args(m_connectionGuid, m_outgoingDataSocket->getForeignAddress().toString(),
                 SystemError::toString(errorCode)));
@@ -991,7 +1005,7 @@ void QnTransactionTransportBase::onMonitorConnectionForClosure(
 
     if (bytesRead == 0)
     {
-        NX_WARNING(QnLog::EC2_TRAN_LOG,
+        NX_WARNING(QnLog::EC2_TRAN_LOG.join(this),
             lm("transaction connection %1 received from %2 has been closed by remote peer")
             .args(m_connectionGuid, m_outgoingDataSocket->getForeignAddress().toString()));
         return setStateNoLock(State::Error);
@@ -1100,7 +1114,7 @@ void QnTransactionTransportBase::serializeAndSendNextDataBuffer()
         }
     }
 
-    NX_VERBOSE(QnLog::EC2_TRAN_LOG, lit("Sending data buffer (%1 bytes) to the peer %2").
+    NX_VERBOSE(QnLog::EC2_TRAN_LOG.join(this), lit("Sending data buffer (%1 bytes) to the peer %2").
         arg(dataCtx.encodedSourceData.size()).arg(m_remotePeer.id.toString()));
 
     if (m_outgoingDataSocket)
@@ -1188,7 +1202,7 @@ void QnTransactionTransportBase::onDataSent(
 
     if (errorCode)
     {
-        NX_WARNING(QnLog::EC2_TRAN_LOG, lm("Failed to send %1 bytes to %2. %3")
+        NX_WARNING(QnLog::EC2_TRAN_LOG.join(this), lm("Failed to send %1 bytes to %2. %3")
             .args(m_dataToSend.front().encodedSourceData.size(),
                 m_remotePeer.id.toString(), SystemError::toString(errorCode)));
         m_dataToSend.pop_front();
@@ -1224,21 +1238,8 @@ void QnTransactionTransportBase::at_responseReceived(
             QnUuid guid(nx::network::http::getHeaderValue(client->response()->headers, Qn::EC2_SERVER_GUID_HEADER_NAME));
             if (!guid.isNull())
             {
-                {
-                    nx::utils::ObjectDestructionFlag::Watcher watcher(
-                        &m_connectionFreedFlag);
-                    emit peerIdDiscovered(remoteAddr(), guid);
-                    if (watcher.objectDestroyed())
-                        return; //connection has been removed by handler
-                }
-
-                {
-                    nx::utils::ObjectDestructionFlag::Watcher watcher(
-                        &m_connectionFreedFlag);
-                    emit remotePeerUnauthorized(guid);
-                    if (watcher.objectDestroyed())
-                        return; //connection has been removed by handler
-                }
+                emit peerIdDiscovered(remoteAddr(), guid);
+                emit remotePeerUnauthorized(guid);
             }
             cancelConnecting();
         }
@@ -1272,7 +1273,7 @@ void QnTransactionTransportBase::at_responseReceived(
 
     m_remotePeerEcProtoVersion =
         ec2ProtoVersionIter == client->response()->headers.end()
-        ? nx_ec::INITIAL_EC2_PROTO_VERSION
+        ? nx::vms::api::kInitialProtocolVersion
         : ec2ProtoVersionIter->second.toInt();
 
     if (!m_localPeer.isMobileClient())
@@ -1321,11 +1322,7 @@ void QnTransactionTransportBase::at_responseReceived(
         m_remotePeer.dataFormat = Qn::UbjsonFormat;
 #endif
 
-    nx::utils::ObjectDestructionFlag::Watcher watcher(
-        &m_connectionFreedFlag);
     emit peerIdDiscovered(remoteAddr(), m_remotePeer.id);
-    if (watcher.objectDestroyed())
-        return; //connection has been removed by handler
 
     if (!m_connectionLockGuard)
     {
@@ -1488,7 +1485,7 @@ void QnTransactionTransportBase::processTransactionData(const QByteArray& data)
     NX_ASSERT(m_peerRole == prOriginating);
     if (!m_incomingTransactionStreamParser->processData(data))
     {
-        NX_WARNING(QnLog::EC2_TRAN_LOG, lit("Error processing incoming data (4) from peer %1. Disconnecting...").
+        NX_WARNING(QnLog::EC2_TRAN_LOG.join(this), lit("Error processing incoming data (4) from peer %1. Disconnecting...").
             arg(m_remotePeer.id.toString()));
         return setStateNoLock(State::Error);
     }
@@ -1625,7 +1622,8 @@ void QnTransactionTransportBase::postTransactionDone(const nx::network::http::As
 
     if (client->failed() || !client->response())
     {
-        NX_WARNING(QnLog::EC2_TRAN_LOG, lit("Network error posting transaction to %1. system result code: %2")
+        NX_WARNING(QnLog::EC2_TRAN_LOG.join(this),
+            lit("Network error posting transaction to %1. system result code: %2")
             .arg(m_postTranBaseUrl.toString())
             .arg(SystemError::toString(client->lastSysErrorCode())));
         setStateNoLock(Error);
@@ -1637,7 +1635,8 @@ void QnTransactionTransportBase::postTransactionDone(const nx::network::http::As
     if (client->response()->statusLine.statusCode == nx::network::http::StatusCode::unauthorized &&
         m_authOutgoingConnectionByServerKey)
     {
-        NX_VERBOSE(QnLog::EC2_TRAN_LOG, lit("Failed to authenticate on peer %1 by key. Retrying using admin credentials...").arg(m_postTranBaseUrl.toString()));
+        NX_VERBOSE(QnLog::EC2_TRAN_LOG.join(this),
+            lit("Failed to authenticate on peer %1 by key. Retrying using admin credentials...").arg(m_postTranBaseUrl.toString()));
         m_authOutgoingConnectionByServerKey = false;
         fillAuthInfo(m_outgoingTranClient, m_authOutgoingConnectionByServerKey);
         m_outgoingTranClient->doPost(
@@ -1651,7 +1650,7 @@ void QnTransactionTransportBase::postTransactionDone(const nx::network::http::As
 
     if (client->response()->statusLine.statusCode != nx::network::http::StatusCode::ok)
     {
-        NX_WARNING(QnLog::EC2_TRAN_LOG, lit("Server %1 returned %2 (%3) response while posting transaction").
+        NX_WARNING(QnLog::EC2_TRAN_LOG.join(this), lit("Server %1 returned %2 (%3) response while posting transaction").
             arg(m_postTranBaseUrl.toString()).arg(client->response()->statusLine.statusCode).
             arg(QLatin1String(client->response()->statusLine.reasonPhrase)));
         setStateNoLock(Error);

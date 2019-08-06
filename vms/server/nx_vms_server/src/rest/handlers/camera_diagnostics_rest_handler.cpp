@@ -71,7 +71,7 @@ int QnCameraDiagnosticsRestHandler::executeGet(
         }
     }
 
-    QnVideoCameraPtr videoCamera = videoCameraPool()->getVideoCamera(camera);
+    nx::vms::server::VideoCameraPtr videoCamera = videoCameraPool()->getVideoCamera(camera);
     if (!videoCamera)
     {
         result.setError(QnJsonRestResult::CantProcessRequest,
@@ -130,7 +130,7 @@ CameraDiagnostics::Result QnCameraDiagnosticsRestHandler::checkCameraAvailabilit
 }
 
 CameraDiagnostics::Result QnCameraDiagnosticsRestHandler::tryAcquireCameraMediaStream(
-    const QnVideoCameraPtr& videoCamera)
+    const nx::vms::server::VideoCameraPtr& videoCamera)
 {
     QnAbstractMediaStreamDataProviderPtr streamReader =
         videoCamera->getLiveReader(QnServer::HiQualityCatalog);

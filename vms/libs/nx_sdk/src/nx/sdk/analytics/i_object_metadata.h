@@ -1,3 +1,5 @@
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+
 #pragma once
 
 #include <nx/sdk/interface.h>
@@ -12,7 +14,7 @@ namespace sdk {
 namespace analytics {
 
 /**
- * A single object detected on the scene.
+ * A single object detected on the scene on a particular video frame, defined as a bounding box.
  */
 class IObjectMetadata: public Interface<IObjectMetadata, IMetadata>
 {
@@ -20,34 +22,16 @@ public:
     static auto interfaceId() { return InterfaceId("nx::sdk::analytics::IObjectMetadata"); }
 
     /**
-     * Id of the object. If the object (e.g. a particular person) is detected on multiple frames,
-     * this parameter should be the same each time.
+     * @return Id of the object track. Object track is a sequence of object detections from its
+     *     first appearance on the scene till its disappearing. The same object can have multiple
+     *     tracks (e.g. the same person entered and exited a room several times).
      */
-    virtual Uuid id() const = 0;
+    virtual Uuid trackId() const = 0;
 
     /**
      * @return Subclass of the object (e.g. vehicle type: truck, car, etc.).
      */
     virtual const char* subtype() const = 0;
-
-    /**
-     * Provides values of so-called Object Attributes - typically, some object properties (e.g. age
-     * or color), represented as a name-value map.
-     * @param index 0-based index of the attribute.
-     * @return Item of an attribute array, or null if index is out of range.
-     */
-    virtual const IAttribute* attribute(int index) const = 0;
-
-    /**
-     * @return Number of items in the attribute array.
-     */
-    virtual int attributeCount() const = 0;
-
-    /**
-     * Arbitrary data (in json format) associated with the object.
-     * @return JSON string in UTF-8.
-     */
-    virtual const char* auxiliaryData() const = 0;
 
     /**
      * @return Bounding box of an object detected in a video frame.

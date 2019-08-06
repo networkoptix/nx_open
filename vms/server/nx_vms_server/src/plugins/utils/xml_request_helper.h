@@ -21,6 +21,11 @@ public:
         const QAuthenticator& authenticator,
         nx::network::http::AuthType authType = nx::network::http::AuthType::authDigest);
 
+    XmlRequestHelper(
+        const QString& url,
+        const QAuthenticator& authenticator,
+        nx::network::http::AuthType authType = nx::network::http::AuthType::authDigest);
+
     class Result
     {
     public:

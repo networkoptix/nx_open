@@ -14,6 +14,7 @@ def create_libs_debug_file(binaries_dir, output_filename):
         'nx_sql.pdb',
         'nx_kit.pdb',
         'nx_vms_api.pdb',
+        'nx_vms_rules.pdb',
         'nx_vms_utils.pdb',
         'vms_gateway_core.pdb',
         'nx_vms_applauncher_api.pdb',

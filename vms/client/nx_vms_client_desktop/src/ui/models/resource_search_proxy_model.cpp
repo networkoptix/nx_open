@@ -10,7 +10,7 @@
 
 #include <ui/models/resource/resource_tree_model.h>
 
-#include <nx/vms/client/desktop/resource_views/data/node_type.h>
+#include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/resources/search_helper.h>
 
 using namespace nx::vms::client::desktop;
@@ -43,11 +43,11 @@ QModelIndex QnResourceSearchProxyModel::setQuery(const QnResourceSearchQuery& qu
 
             const int count = rowCount();
 
-            if (count == 1 && m_query.allowedNode == ResourceTreeNodeType::localResources)
+            if (count == 1 && m_query.allowedNode == ResourceTree::NodeType::localResources)
             {
                 const auto nodeType =
-                    data(index(0, 0), Qn::NodeTypeRole).value<ResourceTreeNodeType>();
-                if (nodeType != ResourceTreeNodeType::localResources)
+                    data(index(0, 0), Qn::NodeTypeRole).value<ResourceTree::NodeType>();
+                if (nodeType != ResourceTree::NodeType::localResources)
                     return QModelIndex();
             }
 

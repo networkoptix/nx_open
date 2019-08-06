@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 #include "connection_method.h"
 #include "stun_message_data.h"
 #include "nx/network/cloud/cloud_connect_version.h"
@@ -20,8 +22,8 @@ public:
 
     nx::String connectSessionId;
     ConnectionMethods connectionMethods;
-    std::list<network::SocketAddress> forwardedTcpEndpointList;
-    std::list<network::SocketAddress> udpEndpointList;
+    std::vector<network::SocketAddress> forwardedTcpEndpointList;
+    std::vector<network::SocketAddress> udpEndpointList;
     CloudConnectVersion cloudConnectVersion;
 
     ConnectionAckRequest();

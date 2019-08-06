@@ -16,6 +16,8 @@
 #include <nx/sql/test_support/test_with_db_helper.h>
 #include <nx/sql/types.h>
 
+#include <nx/clusterdb/engine/command_data.h>
+
 #include "account_with_password.h"
 #include "../cloud_db_service_public.h"
 #include "../managers/email_manager.h"
@@ -174,11 +176,19 @@ public:
         const std::string& systemId,
         const std::string& authKey,
         api::NonceData* const nonceData);
+
     api::ResultCode getCdbNonce(
         const std::string& accountEmail,
         const std::string& accountPassword,
         const std::string& systemId,
         api::NonceData* const nonceData);
+
+    api::ResultCode getAuthenticationResponse(
+        const std::string& login,
+        const std::string& password,
+        const api::AuthRequest& authRequest,
+        api::AuthResponse* response);
+
     //calls on system's regard
     api::ResultCode ping(
         const std::string& systemId,
@@ -212,11 +222,13 @@ public:
         const std::string& systemId);
 
     api::ResultCode getVmsConnections(api::VmsConnectionDataList* const vmsConnections);
+    
     api::ResultCode getTransactionLog(
         const std::string& accountEmail,
         const std::string& accountPassword,
         const std::string& systemId,
-        ::ec2::ApiTransactionDataList* const transactions);
+        nx::clusterdb::engine::CommandDataList* const transactions);
+    
     api::ResultCode getStatistics(api::Statistics* const statistics);
 
     api::ResultCode mergeSystems(
@@ -271,6 +283,8 @@ private:
         const api::SystemData& what,
         const AccountWithPassword& whom,
         bool isEnabled);
+
+    std::unique_ptr<api::Connection> createConnection();
 };
 
 namespace api {

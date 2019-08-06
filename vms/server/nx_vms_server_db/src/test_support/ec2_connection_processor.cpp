@@ -6,12 +6,14 @@
 #include <network/tcp_connection_priv.h>
 #include <rest/server/rest_connection_processor.h>
 #include <nx/network/app_info.h>
-#include "appserver2_process.h"
 #include <common/common_module.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/network/http/custom_headers.h>
+
+#include "appserver2_process.h"
+#include "appserver2_http_server.h"
 
 Ec2ConnectionProcessor::Ec2ConnectionProcessor(
     std::unique_ptr<nx::network::AbstractStreamSocket> socket,

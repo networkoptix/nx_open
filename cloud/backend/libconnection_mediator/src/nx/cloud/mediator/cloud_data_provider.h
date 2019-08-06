@@ -1,8 +1,8 @@
 #pragma once
 
+#include <nx/network/aio/timer.h>
 #include <nx/network/buffer.h>
 #include <nx/utils/std/optional.h>
-#include <nx/utils/timer_manager.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/url.h>
 
@@ -98,11 +98,13 @@ private:
     mutable QnMutex m_mutex;
     std::map< String, System > m_systemCache;
 
-    bool m_isTerminated;
-    nx::utils::TimerManager::TimerGuard m_timerGuard;
+    bool m_terminated = false;
+    nx::network::aio::Timer m_timer;
 
     std::unique_ptr< nx::cloud::db::api::ConnectionFactory > m_connectionFactory;
     std::unique_ptr< nx::cloud::db::api::Connection > m_connection;
+
+    void saveSystems(nx::cloud::db::api::SystemDataExList systems);
 };
 
 } // namespace hpm

@@ -6,8 +6,8 @@ GenericValueControl
 {
     id: control
 
-    readonly property bool zoomInPressed: upButton.pressed
-    readonly property bool zoomOutPressed: downButton.pressed
+    readonly property bool zoomInPressed: upButton.down
+    readonly property bool zoomOutPressed: downButton.down
 
     centralAreaText: "ZOOM"
     upButton.icon.source: lp("/images/ptz/ptz_zoom_plus.png")

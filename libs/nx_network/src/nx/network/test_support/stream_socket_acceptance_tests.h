@@ -1205,6 +1205,11 @@ protected:
             return SocketAddress();
     }
 
+    std::unique_ptr<typename SocketTypeSet::ServerSocket> createServerSocket()
+    {
+        return std::make_unique<typename SocketTypeSet::ServerSocket>();
+    }
+
     typename SocketTypeSet::ClientSocket* connection()
     {
         return m_connection.get();
@@ -1474,12 +1479,15 @@ TYPED_TEST_P(StreamSocketAcceptance, recv_timeout_is_reported)
 
 TYPED_TEST_P(StreamSocketAcceptance, msg_dont_wait_flag_makes_recv_call_nonblocking)
 {
-    this->givenSilentServer();
+    this->givenPingPongServer();
     this->givenConnectedSocket();
 
     this->whenReadSocketInBlockingWayWithFlags(MSG_DONTWAIT);
-
     this->thenClientSocketReported(SystemError::wouldBlock);
+
+    this->whenClientSendsPing();
+    this->whenReadSocketInBlockingWay();
+    this->thenServerMessageIsReceived();
 }
 
 TYPED_TEST_P(StreamSocketAcceptance, concurrent_recv_send_in_blocking_mode)
@@ -1847,6 +1855,33 @@ TYPED_TEST_P(StreamSocketAcceptance, server_socket_can_be_freed_in_accept_handle
     this->thenAcceptReported(SystemError::timedOut);
 }
 
+TYPED_TEST_P(StreamSocketAcceptance, reuse_addr)
+{
+    auto server1 = this->createServerSocket();
+    ASSERT_TRUE(server1->setReuseAddrFlag(true));
+    ASSERT_TRUE(server1->bind(SocketAddress::anyAddress));
+
+    auto server2 = this->createServerSocket();
+    ASSERT_TRUE(server2->setReuseAddrFlag(true));
+    ASSERT_TRUE(server2->bind(SocketAddress(HostAddress::localhost, server1->getLocalAddress().port)));
+}
+
+TYPED_TEST_P(StreamSocketAcceptance, reuse_port)
+{
+    auto server1 = this->createServerSocket();
+    if (!server1->setReusePortFlag(true))
+    {
+        ASSERT_EQ(SystemError::unknownProtocolOption, SystemError::getLastOSErrorCode());
+        std::cout << "SO_REUSEPORT is unsupported. Skipping this test" << std::endl;
+        return;
+    }
+    ASSERT_TRUE(server1->bind(SocketAddress::anyPrivateAddress));
+
+    auto server2 = this->createServerSocket();
+    ASSERT_TRUE(server2->setReusePortFlag(true));
+    ASSERT_TRUE(server2->bind(server1->getLocalAddress()));
+}
+
 REGISTER_TYPED_TEST_CASE_P(StreamSocketAcceptance,
     DISABLED_receiveDelay,
     sendDelay,
@@ -1904,7 +1939,13 @@ REGISTER_TYPED_TEST_CASE_P(StreamSocketAcceptance,
     server_socket_accept_times_out,
     server_socket_accept_async_times_out,
     accept_async_on_blocking_socket_results_in_error,
-    server_socket_can_be_freed_in_accept_handler);
+    server_socket_can_be_freed_in_accept_handler,
+    
+    //---------------------------------------------------------------------------------------------
+    // Socket options.
+    reuse_addr,
+    reuse_port
+);
 
 } // namespace test
 } // namespace network

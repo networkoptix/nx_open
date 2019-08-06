@@ -17,6 +17,7 @@
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/log/log_initializer.h>
+#include <nx/utils/app_info.h>
 #include <api/app_server_connection.h>
 
 #include <common/common_module.h>
@@ -43,7 +44,7 @@
 #include <utils/intent_listener_android.h>
 #include <handlers/lite_client_handler.h>
 
-#include <nx/media/ios_device_info.h>
+#include <nx/utils/ios_device_info.h>
 #include <gl_context_synchronizer.h>
 #include <nx/utils/timer_manager.h>
 #include <nx/utils/std/cpp14.h>
@@ -69,6 +70,29 @@ extern "C"
 using namespace nx::mobile_client;
 using namespace std::chrono;
 using namespace nx::media;
+
+namespace {
+
+bool forceSoftwareDecoding()
+{
+    if (nx::utils::AppInfo::isIos())
+    {
+        using IosDeviceInformation = nx::utils::IosDeviceInformation;
+        using Type = IosDeviceInformation::Type;
+        using Version = IosDeviceInformation::Version;
+
+        static const QList<IosDeviceInformation> blacklist{
+            IosDeviceInformation{Type::iPhone, Version::iPhoneXs},
+            IosDeviceInformation{Type::iPad, Version::iPadProA12XBionic}
+        };
+
+        return blacklist.contains(IosDeviceInformation::currentInformation());
+    }
+
+    return false;
+}
+
+} // namespace
 
 int runUi(QtSingleGuiApplication* application)
 {
@@ -173,14 +197,7 @@ int runUi(QtSingleGuiApplication* application)
     QSize maxFfmpegResolution = qnSettings->maxFfmpegResolution();
     QSize maxFfmpegHevcResolution = maxFfmpegResolution;
 
-    const bool forceSoftwareOnlyDecoderForIPhone =
-        #if defined(Q_OS_IOS)
-            ini().forceSoftwareDecoderForIPhoneXs
-            && iosDeviceInformation().majorVersion == IosDeviceInformation::iPhoneXs
-            && iosDeviceInformation().type == IosDeviceInformation::Type::iPhone;
-        #else
-            false;
-        #endif
+    const bool forceSoftwareDecoding = ::forceSoftwareDecoding();
 
     if (maxFfmpegResolution.isEmpty())
     {
@@ -193,7 +210,7 @@ int runUi(QtSingleGuiApplication* application)
                 maxFfmpegResolution = QSize(1280, 720);
                 maxFfmpegHevcResolution = QSize(640, 480);
             }
-            else if (forceSoftwareOnlyDecoderForIPhone)
+            else if (forceSoftwareDecoding)
             {
                 static const QSize kDci4kResolution(4096, 2160);
                 maxFfmpegResolution = kDci4kResolution;
@@ -214,7 +231,7 @@ int runUi(QtSingleGuiApplication* application)
     nx::media::DecoderRegistrar::registerDecoders(
         maxFfmpegResolutions,
         /*isTranscodingEnabled*/ !context->liteMode(),
-        !forceSoftwareOnlyDecoderForIPhone);
+        !forceSoftwareDecoding);
 
     #if defined(Q_OS_ANDROID)
         QUrl initialIntentData = getInitialIntentData();

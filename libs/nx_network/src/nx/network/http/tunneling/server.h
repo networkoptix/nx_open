@@ -79,6 +79,8 @@ Server<ApplicationData...>::Server(
 {
     addTunnelServer<detail::GetPostTunnelServer>();
     addTunnelServer<detail::ConnectionUpgradeTunnelServer>();
+    addTunnelServer<detail::ConnectionUpgradeTunnelServer>()
+        .setUpgradeRequestMethod(network::http::Method::post);
     addTunnelServer<detail::ExperimentalTunnelServer>();
     addTunnelServer<detail::MultiMessageTunnelServer>();
 }

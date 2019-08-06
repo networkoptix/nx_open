@@ -1,0 +1,24 @@
+<div class="embed-responsive embed-responsive-16by9">
+    <div class="carousel slide embed-responsive-item">
+        <div class="carousel-inner h-100">
+            <div class="carousel-item"
+                 *ngFor="let screenshot of screenshots; let i = index"
+                 [ngClass]=" { 'active': i == currentIndex }"
+                 [@visibilityChange]="i == currentIndex ? 'enter' : 'leave'">
+                <div class="d-flex justify-content-center align-items-center h-100">
+                    <img class="img-fluid" [src]="screenshot">
+                </div>
+            </div>
+        </div>
+        <span *ngIf="imageCount > 1" class="carousel-control-prev" role="button"
+              (click)="previousElement()">
+            <span class="carousel-control-prev-icon" aria-hidden="true" ></span>
+            <span class="sr-only">Previous</span>
+        </span>
+        <span *ngIf="imageCount > 1" class="carousel-control-next" role="button"
+              (click)="nextElement()">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="sr-only">Next</span>
+        </span>
+    </div>
+</div>

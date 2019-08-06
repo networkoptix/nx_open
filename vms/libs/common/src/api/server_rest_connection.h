@@ -6,29 +6,34 @@
 
 #include <nx/network/http/http_types.h>
 #include <nx/utils/system_error.h>
-#include "utils/common/request_param.h"
-#include "nx_ec/data/api_fwd.h"
+#include <utils/camera/camera_diagnostics.h>
+#include <utils/common/request_param.h>
+#include <nx_ec/data/api_fwd.h>
 #include <api/helpers/request_helpers_fwd.h>
 #include <nx/api/mediaserver/requests_fwd.h>
 #include <nx/network/deprecated/asynchttpclient.h>
 
 #include <rest/server/json_rest_result.h>
 #include <nx/utils/safe_direct_connection.h>
-#include <api/http_client_pool.h>
 #include <nx/vms/event/event_fwd.h>
 #include <core/resource/resource_fwd.h>
 #include <common/common_module_aware.h>
-#include <api/model/time_reply.h>
 #include <analytics/db/abstract_storage.h>
+#include <api/http_client_pool.h>
 #include <api/model/analytics_actions.h>
-#include <api/model/wearable_prepare_data.h>
+#include <api/model/audit/audit_record.h>
+#include <api/model/camera_diagnostics_reply.h>
 #include <api/model/manual_camera_seach_reply.h>
+#include <api/model/test_email_settings_reply.h>
+#include <api/model/time_reply.h>
+#include <api/model/wearable_prepare_data.h>
+
 #include <nx/update/update_information.h>
 
 #include <nx/vms/api/analytics/settings_response.h>
-#include <nx/vms/event/event_fwd.h>
 #include <nx/vms/api/data/time_reply.h>
 #include <nx/vms/api/data/event_rule_data.h>
+
 
 namespace rest {
 
@@ -52,7 +57,7 @@ struct RestResultWithData: public RestResultWithDataBase
     RestResultWithData& operator=(const RestResultWithData&) = delete;
     RestResultWithData& operator=(RestResultWithData&&) = default;
 
-    QnRestResult::Error error;
+    QnRestResult::Error error = QnRestResult::NoError;
     QString errorString;
     T data;
 };
@@ -235,6 +240,7 @@ public:
         qint64 chunkSize,
         const QByteArray& md5,
         qint64 ttl,
+        bool recreateIfExists,
         AddUploadCallback callback,
         QThread* targetThread = nullptr);
 
@@ -381,7 +387,7 @@ public:
     /** Get statistics for server health monitor. */
     Handle getStatistics(GetCallback callback, QThread* targetThread = nullptr);
 
-    Handle lookupDetectedObjects(
+    Handle lookupObjectTracks(
         const nx::analytics::db::Filter& request,
         bool isLocal,
         Result<nx::analytics::db::LookupResult>::type callback,
@@ -432,6 +438,7 @@ public:
 
     Handle updateActionStart(
         const nx::update::Information& info,
+        std::function<void(Handle, bool)>&& callback,
         QThread* targetThread = nullptr);
 
     /** Get information for a current update. It requests /ec2/updateInformation. */
@@ -454,15 +461,19 @@ public:
         QThread* targetThread = nullptr);
 
     Handle updateActionStop(
-        std::function<void(Handle, bool)>&& callback,
+        std::function<void(bool, Handle)>&& callback,
         QThread* targetThread = nullptr);
 
     Handle updateActionFinish(bool skipActivePeers,
-        std::function<void(Handle, bool)>&& callback,
+        std::function<void(bool, Handle, const QnRestResult&)>&& callback,
         QThread* targetThread = nullptr);
 
     Handle updateActionInstall(const QSet<QnUuid>& participants,
-        std::function<void(Handle, bool)>&& callback,
+        std::function<void(bool, Handle, const QnRestResult&)>&& callback,
+        QThread* targetThread = nullptr);
+
+    Handle retryUpdate(
+        Result<UpdateStatusAllData>::type callback,
         QThread* targetThread = nullptr);
 
     Handle getUpdateStatus(
@@ -501,10 +512,85 @@ public:
         Result<nx::vms::api::analytics::SettingsResponse>::type&& callback,
         QThread* targetThread = nullptr);
 
+    Handle getPluginInformation(GetCallback callback, QThread* targetThread = nullptr);
+
+    Handle testEmailSettings(
+        const QnEmailSettings& settings,
+        Result<QnTestEmailSettingsReply>::type&& callback,
+        QThread* targetThread = nullptr);
+
+    Handle recordedTimePeriods(
+        const QnChunksRequestData& request,
+        Result<MultiServerPeriodDataList>::type&& callback,
+        QThread* targetThread = nullptr);
+
+    Handle getAuditLog(
+        qint64 startTimeMs,
+        qint64 endTimeMs,
+        Result<QnAuditRecordList>::type&& callback,
+        QThread* targetThread = nullptr);
+
+    /** Request the name of a system the mediaserver is currently connected to. */
+    Handle getSystemId(
+        Result<QString>::type&& callback,
+        QThread* targetThread = nullptr);
+
+    /**
+     * Request the server to run the camera diagnostics step following previousStep.
+     * @param slot Slot MUST have signature (int, QnCameraDiagnosticsReply, int).
+     * @return Request handle.
+     */
+    Handle doCameraDiagnosticsStep(
+        const QnUuid& cameraId, CameraDiagnostics::Step::Value previousStep,
+        Result<RestResultWithData<QnCameraDiagnosticsReply>>::type&& callback,
+        QThread* targetThread = nullptr);
+
     Handle debug(
         const QString& action,
         const QString& value,
         PostCallback callback,
+        QThread* targetThread = nullptr);
+
+    /** Sends POST request with a response to be a JSON */
+    Handle postJsonResult(
+        const QString& action,
+        const QnRequestParamList& params,
+        const nx::Buffer& body,
+        std::function<void(bool, Handle, const QnJsonRestResult& response)>&& callback,
+        QThread* targetThread = nullptr);
+
+    /** Sends POST request with a response to be an Ubjson. */
+    Handle postUbJsonResult(
+        const QString& action,
+        const QnRequestParamList& params,
+        const nx::Buffer& body,
+        std::function<void(bool, Handle, const QnUbjsonRestResult& response)>&& callback,
+        QThread* targetThread = nullptr);
+
+    /** Sends POST request with a response to be an EmptyResult. */
+    Handle postEmptyResult(
+        const QString& action,
+        const QnRequestParamList& params,
+        const nx::Buffer& body,
+        PostCallback&& callback,
+        QThread* targetThread = nullptr);
+
+    Handle getUbJsonResult(
+        const QString& action,
+        const QnRequestParamList& params,
+        std::function<void(bool, Handle, QnUbjsonRestResult response)>&& callback,
+        QThread* targetThread = nullptr);
+
+    Handle getJsonResult(
+        const QString& action,
+        const QnRequestParamList& params,
+        std::function<void(bool, Handle, QnJsonRestResult response)>&& callback,
+        QThread* targetThread = nullptr);
+
+    Handle getRawResult(
+        const QString& action,
+        const QnRequestParamList& params,
+        std::function<void(bool, Handle, QByteArray, nx::network::http::HttpHeaders)> callback,
         QThread* targetThread = nullptr);
 
     /**
@@ -575,8 +661,6 @@ private:
     QnMediaServerResourcePtr getServerWithInternetAccess() const;
 
     void trace(int handle, const QString& message) const;
-    std::pair<QString, QString> getRequestCredentials(
-        const QnMediaServerResourcePtr& targetServer) const;
 
 private:
     QnUuid m_serverId;
@@ -596,11 +680,25 @@ private:
     template <typename ResultType> Handle executePost(
         const QString& path,
         const QnRequestParamList& params,
+        Callback<ResultType> callback,
+        QThread* targetThread);
+
+    /**
+     * This overload thould only be used if API requires custum message body so paramiters can only
+     * be passed by URL.
+     */
+    template <typename ResultType> Handle executePost(
+        const QString& path,
+        const QnRequestParamList& params,
         const nx::network::http::StringType& contentType,
         const nx::network::http::StringType& messageBody,
         Callback<ResultType> callback,
         QThread* targetThread);
 
+    /**
+     * This overload thould only be used if API requires custum message body so paramiters can only
+     * be passed by URL.
+     */
     template <typename ResultType> Handle executePut(
         const QString& path,
         const QnRequestParamList& params,

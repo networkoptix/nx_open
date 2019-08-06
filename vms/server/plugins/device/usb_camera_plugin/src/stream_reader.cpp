@@ -155,12 +155,17 @@ void StreamReader::setBitrate(int bitrate)
 
 std::unique_ptr<ILPMediaPacket> StreamReader::toNxPacket(const ffmpeg::Packet *packet)
 {
+    uint64_t timestamp = packet->timestamp();
+#if defined(USE_MSEC)
+    timestamp *= kUsecInMsec;
+#endif
+ 
     std::unique_ptr<ILPMediaPacket> nxPacket(new ILPMediaPacket(
         &m_allocator,
         packet->mediaType() == AVMEDIA_TYPE_VIDEO ? 0 : 1,
         ffmpeg::utils::toNxDataPacketType(packet->mediaType()),
         ffmpeg::utils::toNxCompressionType(packet->codecId()),
-        packet->timestamp() * kUsecInMsec,
+        timestamp,
         packet->keyPacket() ? nxcip::MediaDataPacket::fKeyPacket : 0,
         0));
 

@@ -1,11 +1,10 @@
 #pragma once
 
-#include <rest/server/json_rest_handler.h>
+#include <nx/network/rest/handler.h>
 
-class QnCookieLoginRestHandler: public QnJsonRestHandler 
+class QnCookieLoginRestHandler: public nx::network::rest::Handler
 {
-    Q_OBJECT
-public:
-    virtual JsonRestResponse executePost(
-        const JsonRestRequest& request, const QByteArray& body) override;
+protected:
+    virtual nx::network::rest::Response executePost(
+        const nx::network::rest::Request& request) override;
 };

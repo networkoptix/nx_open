@@ -32,12 +32,11 @@ public:
     virtual Qn::ThumbnailStatus status() const override;
 
     nx::api::ResourceImageRequest requestData() const;
-    void setRequestData(const nx::api::ResourceImageRequest& data);
-
-    nx::api::CameraImageRequest::StreamSelectionMode streamSelectionMode() const;
-    void setStreamSelectionMode(nx::api::CameraImageRequest::StreamSelectionMode value);
+    void setRequestData(const nx::api::ResourceImageRequest& data, bool resetStatus = false);
 
     std::chrono::microseconds timestamp() const; //< For cameras returns precise frame timestamp.
+
+    virtual bool tryLoad() override;
 
 protected:
     virtual void doLoadAsync() override;

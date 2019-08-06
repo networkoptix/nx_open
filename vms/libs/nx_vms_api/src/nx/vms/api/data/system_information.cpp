@@ -3,6 +3,7 @@
 #include <QtCore/QRegExp>
 
 #include <nx/fusion/model_functions.h>
+#include <nx/utils/log/assert.h>
 
 namespace nx {
 namespace vms {
@@ -13,13 +14,15 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (eq)(hash)(ubjson)(json)(xml)(csv_record)(datastream),
     _Fields)
 
-SystemInformation::SystemInformation(const QString& platform, const QString& arch,
-    const QString& modification)
+SystemInformation::SystemInformation(
+    const QString& platform,
+    const QString& arch,
+    const QString& modification,
+    const QString& version)
     :
     arch(arch),
     platform(platform),
-    modification(modification),
-    version(runtimeOsVersion())
+    modification(modification)
 {
 }
 
@@ -31,7 +34,6 @@ SystemInformation::SystemInformation(const QString& infoString)
         platform = infoRegExp.cap(1);
         arch = infoRegExp.cap(2);
         modification = infoRegExp.cap(3);
-        version = runtimeOsVersion();
     }
 }
 
@@ -57,12 +59,6 @@ bool SystemInformation::isValid() const
 #include <sys/types.h>
 #include <sys/sysctl.h>
 
-QString nx::vms::api::SystemInformation::runtimeOsVersion()
-{
-    // #TODO #dkargin implement
-    return QString();
-}
-
 QString nx::vms::api::SystemInformation::currentSystemRuntime()
 {
     char osrelease[256];
@@ -71,20 +67,14 @@ QString nx::vms::api::SystemInformation::currentSystemRuntime()
     if (sysctl(mibMem, 2, osrelease, &size, NULL, 0) != -1)
         return QString::fromStdString(osrelease);
 
-    return QLatin1String("OSX without KERN_OSRELEASE");
+    return "OSX without KERN_OSRELEASE";
 }
 
 #elif !defined(Q_OS_LINUX) && !defined(Q_OS_WIN)
 
-QString nx::vms::api::SystemInformation::runtimeOsVersion()
-{
-    // #TODO #dkargin implement
-    return QString();
-}
-
 QString nx::vms::api::SystemInformation::currentSystemRuntime()
 {
-    return QLatin1String("Unknown");
+    return "Unknown";
 }
 
 #endif // defined(Q_OS_OSX)

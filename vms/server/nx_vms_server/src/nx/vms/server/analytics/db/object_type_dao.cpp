@@ -2,7 +2,7 @@
 
 namespace nx::analytics::db {
 
-long long ObjectTypeDao::objectTypeIdFromName(const QString& name) const
+int64_t ObjectTypeDao::objectTypeIdFromName(const QString& name) const
 {
     QnMutexLocker locker(&m_mutex);
 
@@ -10,7 +10,7 @@ long long ObjectTypeDao::objectTypeIdFromName(const QString& name) const
     return it != m_objectTypeToId.end() ? it->second : -1;
 }
 
-QString ObjectTypeDao::objectTypeFromId(long long id) const
+QString ObjectTypeDao::objectTypeFromId(int64_t id) const
 {
     QnMutexLocker locker(&m_mutex);
 
@@ -18,7 +18,7 @@ QString ObjectTypeDao::objectTypeFromId(long long id) const
     return it != m_idToObjectType.end() ? it->second : QString();
 }
 
-long long ObjectTypeDao::insertOrFetch(
+int64_t ObjectTypeDao::insertOrFetch(
     nx::sql::QueryContext* queryContext,
     const QString& objectTypeName)
 {
@@ -49,7 +49,7 @@ void ObjectTypeDao::loadObjectTypeDictionary(nx::sql::QueryContext* queryContext
 }
 
 void ObjectTypeDao::addObjectTypeToDictionary(
-    long long id, const QString& name)
+    int64_t id, const QString& name)
 {
     QnMutexLocker locker(&m_mutex);
 

@@ -59,20 +59,27 @@ RuleProcessor::RuleProcessor(QnMediaServerModule* serverModule):
 
     using namespace std::placeholders;
 
-    connect(resourcePool(), &QnResourcePool::resourceAdded,
+    connect(this->serverModule()->resourcePool(), &QnResourcePool::resourceAdded,
         this, std::bind(&RuleProcessor::toggleInputPortMonitoring, this, _1, true),
         Qt::QueuedConnection);
 
-    connect(resourcePool(), &QnResourcePool::resourceRemoved,
+    connect(this->serverModule()->resourcePool(), &QnResourcePool::resourceRemoved,
         this, std::bind(&RuleProcessor::toggleInputPortMonitoring, this, _1, false),
         Qt::QueuedConnection);
 
+    auto ruleModificationStarted = [this]() {++m_updatingRulesCnt; };
+
+    connect(eventRuleManager(), &vms::event::RuleManager::ruleAddedOrUpdated, ruleModificationStarted);
     connect(eventRuleManager(), &vms::event::RuleManager::ruleAddedOrUpdated,
-            this, &RuleProcessor::at_ruleAddedOrUpdated);
+            this, &RuleProcessor::at_ruleAddedOrUpdated); //< Queued connection.
+
+    connect(eventRuleManager(), &vms::event::RuleManager::ruleRemoved, ruleModificationStarted);
     connect(eventRuleManager(), &vms::event::RuleManager::ruleRemoved,
-            this, &RuleProcessor::at_ruleRemoved);
+            this, &RuleProcessor::at_ruleRemoved); //< Queued connection.
+
+    connect(eventRuleManager(), &vms::event::RuleManager::ruleRemoved, ruleModificationStarted);
     connect(eventRuleManager(), &vms::event::RuleManager::rulesReset,
-            this, &RuleProcessor::at_rulesReset);
+            this, &RuleProcessor::at_rulesReset); //< Queued connection.
 
     connect(&m_timer, &QTimer::timeout, this, &RuleProcessor::at_timer, Qt::QueuedConnection);
     m_timer.start(1000);
@@ -81,6 +88,8 @@ RuleProcessor::RuleProcessor(QnMediaServerModule* serverModule):
 
 RuleProcessor::~RuleProcessor()
 {
+    m_updatingRulesCnt = 0;
+    m_ruleUpdateCond.wakeAll();
 }
 
 QnMediaServerResourcePtr RuleProcessor::getDestinationServer(
@@ -91,12 +100,12 @@ QnMediaServerResourcePtr RuleProcessor::getDestinationServer(
         case vms::api::ActionType::sendMailAction:
         {
             // Look for server with public IP address.
-            const auto server = resourcePool()->getResourceById<QnMediaServerResource>(
-                moduleGUID());
+            const auto server =
+                serverModule()->resourcePool()->getResourceById<QnMediaServerResource>(moduleGUID());
             if (!server || server->getServerFlags().testFlag(vms::api::SF_HasPublicIP))
                 return QnMediaServerResourcePtr(); //< Do not proxy.
 
-            const auto onlineServers = resourcePool()->getAllServers(Qn::Online);
+            const auto onlineServers = serverModule()->resourcePool()->getAllServers(Qn::Online);
             for (const auto& server: onlineServers)
             {
                 if (server->getServerFlags().testFlag(vms::api::SF_HasPublicIP))
@@ -118,7 +127,8 @@ QnMediaServerResourcePtr RuleProcessor::getDestinationServer(
 
         default:
             return res
-                ? resourcePool()->getResourceById<QnMediaServerResource>(res->getParentId())
+                ? serverModule()->resourcePool()->getResourceById<QnMediaServerResource>(
+                    res->getParentId())
                 : QnMediaServerResourcePtr(); //< Can't find route to resource.
     }
 }
@@ -206,7 +216,8 @@ void RuleProcessor::executeAction(const vms::event::AbstractActionPtr& action)
 
     prepareAdditionActionParams(action);
 
-    auto resources = resourcePool()->getResourcesByIds<QnNetworkResource>(action->getResources());
+    auto resources =
+        serverModule()->resourcePool()->getResourcesByIds<QnNetworkResource>(action->getResources());
 
     switch (action->actionType())
     {
@@ -216,8 +227,8 @@ void RuleProcessor::executeAction(const vms::event::AbstractActionPtr& action)
         {
             if (action->getParams().useSource)
             {
-                resources << resourcePool()->getResourcesByIds<QnNetworkResource>(
-                    action->getSourceResources(resourcePool()));
+                resources << serverModule()->resourcePool()->getResourcesByIds<QnNetworkResource>(
+                    action->getSourceResources(serverModule()->resourcePool()));
             }
             break;
         }
@@ -266,7 +277,7 @@ void RuleProcessor::executeAction(const vms::event::AbstractActionPtr& action)
 bool RuleProcessor::executeActionInternal(const vms::event::AbstractActionPtr& action)
 {
     auto ruleId = action->getRuleId();
-    auto res = resourcePool()->getResourceById(action->getParams().actionResourceId);
+    auto res = serverModule()->resourcePool()->getResourceById(action->getParams().actionResourceId);
 
     if (action->isProlonged())
     {
@@ -406,6 +417,9 @@ void RuleProcessor::processEvent(const vms::event::AbstractEventPtr& event)
     NX_VERBOSE(this, "Processing event [%1]", event->getEventType());
 
     QnMutexLocker lock(&m_mutex);
+    while (m_updatingRulesCnt > 0)
+        m_ruleUpdateCond.wait(&m_mutex);
+
     // Get pairs of {rule, action} for event
     const auto actions = matchActions(event);
     for (const auto& action: actions)
@@ -693,6 +707,7 @@ void RuleProcessor::at_ruleAddedOrUpdated(const vms::event::RulePtr& rule)
 {
     QnMutexLocker lock(&m_mutex);
     at_ruleAddedOrUpdated_impl(rule);
+    ruleModificationFinishedUnsafe();
 }
 
 void RuleProcessor::at_rulesReset(const vms::event::RuleList& rules)
@@ -710,6 +725,8 @@ void RuleProcessor::at_rulesReset(const vms::event::RuleList& rules)
 
     for (const auto& rule: rules)
         at_ruleAddedOrUpdated_impl(rule);
+
+    ruleModificationFinishedUnsafe();
 }
 
 void RuleProcessor::toggleInputPortMonitoring(const QnResourcePtr& resource, bool on)
@@ -727,8 +744,8 @@ void RuleProcessor::toggleInputPortMonitoring(const QnResourcePtr& resource, boo
 
         if (rule->eventType() == vms::api::EventType::cameraInputEvent)
         {
-            auto resList = resourcePool()->getResourcesByIds<nx::vms::server::resource::Camera>(
-                rule->eventResources());
+            auto resList = serverModule()->resourcePool()
+                ->getResourcesByIds<nx::vms::server::resource::Camera>(rule->eventResources());
             if (resList.isEmpty() ||            //< Listening to all cameras.
                 resList.contains(camResource))
             {
@@ -796,6 +813,15 @@ void RuleProcessor::at_ruleRemoved(QnUuid id)
             break;
         }
     }
+
+    ruleModificationFinishedUnsafe();
+}
+
+void RuleProcessor::ruleModificationFinishedUnsafe()
+{
+    if (m_updatingRulesCnt > 0)
+        --m_updatingRulesCnt;
+    m_ruleUpdateCond.wakeAll();
 }
 
 void RuleProcessor::notifyResourcesAboutEventIfNeccessary(
@@ -805,13 +831,14 @@ void RuleProcessor::notifyResourcesAboutEventIfNeccessary(
     {
         if (businessRule->eventType() == vms::api::EventType::cameraInputEvent)
         {
-            auto camerasToMonitor = resourcePool()
+            auto camerasToMonitor = serverModule()->resourcePool()
                 ->getResourcesByIds<nx::vms::server::resource::Camera>(
                     businessRule->eventResources());
 
             if (camerasToMonitor.isEmpty())
             {
-                for (const auto camera: resourcePool()->getAllCameras(QnResourcePtr(), true))
+                for (const auto camera:
+                    serverModule()->resourcePool()->getAllCameras(QnResourcePtr(), true))
                 {
                     if (auto c = camera.dynamicCast<nx::vms::server::resource::Camera>())
                         camerasToMonitor.push_back(std::move(c));
@@ -834,8 +861,9 @@ void RuleProcessor::notifyResourcesAboutEventIfNeccessary(
     {
         if (businessRule->actionType() == vms::api::ActionType::cameraRecordingAction)
         {
-            auto resList = resourcePool()->getResourcesByIds<nx::vms::server::resource::Camera>(
-                businessRule->actionResources());
+            auto resList = serverModule()->resourcePool()
+                ->getResourcesByIds<nx::vms::server::resource::Camera>(
+                    businessRule->actionResources());
 
             for (const auto& camera: resList)
             {

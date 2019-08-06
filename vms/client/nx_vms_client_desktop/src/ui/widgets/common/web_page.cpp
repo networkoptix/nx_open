@@ -5,11 +5,36 @@
 
 #include <nx/utils/log/log.h>
 
+namespace {
 
-QnWebPage::QnWebPage(QObject* parent):
-    base_type(parent)
+class Http1NetworkAccessManager: public QNetworkAccessManager
 {
-    connect(this->networkAccessManager(), &QNetworkAccessManager::sslErrors, this,
+public:
+    using QNetworkAccessManager::QNetworkAccessManager;
+
+    static Http1NetworkAccessManager* instance()
+    {
+        static Http1NetworkAccessManager instance;
+        return &instance;
+    }
+
+protected:
+    virtual QNetworkReply* createRequest(Operation op, const QNetworkRequest& request,
+        QIODevice* outgoingData = nullptr)
+    {
+        QNetworkRequest copy(request);
+        copy.setAttribute(QNetworkRequest::HTTP2AllowedAttribute, false);
+        return QNetworkAccessManager::createRequest(op, copy, outgoingData);
+    }
+};
+
+} // namespace
+
+QnWebPage::QnWebPage(QObject* parent): base_type(parent)
+{
+    setNetworkAccessManager(Http1NetworkAccessManager::instance());
+
+    connect(networkAccessManager(), &QNetworkAccessManager::sslErrors, this,
         [this](QNetworkReply* reply, const QList<QSslError>& errors)
         {
             for (auto e: errors)
@@ -19,7 +44,8 @@ QnWebPage::QnWebPage(QObject* parent):
         });
 }
 
-void QnWebPage::javaScriptConsoleMessage(const QString& message, int lineNumber, const QString& sourceID)
+void QnWebPage::javaScriptConsoleMessage(
+    const QString& message, int lineNumber, const QString& sourceID)
 {
-      NX_DEBUG(this, "JS Console: %1:%2 %3", sourceID, lineNumber, message);
+    NX_DEBUG(this, "JS Console: %1:%2 %3", sourceID, lineNumber, message);
 }

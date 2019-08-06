@@ -1,25 +1,33 @@
 #include "pollable.h"
 
-#include <nx/network/aio/aio_service.h>
-#include <nx/network/socket_global.h>
 #include <nx/utils/system_error.h>
 
-namespace nx {
-namespace network {
+#include "aio_service.h"
+#include "../common_socket_impl.h"
+#include "../socket_global.h"
+
+namespace nx::network {
+
+Pollable::Pollable(AbstractSocket::SOCKET_HANDLE fd):
+    Pollable(fd, std::make_unique<CommonSocketImpl>())
+{
+}
 
 Pollable::Pollable(
     AbstractSocket::SOCKET_HANDLE fd,
     std::unique_ptr<CommonSocketImpl> impl)
     :
     m_fd(fd),
-    m_impl(std::move(impl)),
-    m_readTimeoutMS(0),
-    m_writeTimeoutMS(0)
+    m_impl(std::move(impl))
 {
     SocketGlobals::verifyInitialization();
+
     if (!m_impl)
-        m_impl.reset(new CommonSocketImpl());
+        m_impl = std::make_unique<CommonSocketImpl>();
 }
+
+// NOTE: The destructor is needed to hide CommonSocketImpl declaration.
+Pollable::~Pollable() = default;
 
 AbstractSocket::SOCKET_HANDLE Pollable::handle() const
 {
@@ -77,5 +85,4 @@ bool Pollable::isInSelfAioThread() const
     return m_impl->aioThread.load() == QThread::currentThread();
 }
 
-} // namespace network
-} // namespace nx
+} // namespace nx::network

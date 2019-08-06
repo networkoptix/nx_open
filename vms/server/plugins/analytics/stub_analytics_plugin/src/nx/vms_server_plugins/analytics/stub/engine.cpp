@@ -1,15 +1,19 @@
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+
 #include "engine.h"
 
 #define NX_PRINT_PREFIX (this->logUtils.printPrefix)
 #include <nx/kit/debug.h>
 
 #include <nx/sdk/i_device_info.h>
-#include <nx/sdk/analytics/helpers/plugin.h>
 #include <nx/sdk/helpers/uuid_helper.h>
-#include <nx/sdk/helpers/ref_countable.h>
+#include <nx/sdk/helpers/error.h>
 
+#include "utils.h"
 #include "device_agent.h"
 #include "stub_analytics_plugin_ini.h"
+#include "objects/vehicles.h"
+#include "objects/human_face.h"
 
 namespace nx {
 namespace vms_server_plugins {
@@ -19,61 +23,81 @@ namespace stub {
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 
-Engine::Engine(nx::sdk::analytics::IPlugin* plugin):
+using namespace std::chrono;
+using namespace std::literals::chrono_literals;
+
+Engine::Engine(nx::sdk::analytics::Plugin* plugin):
     nx::sdk::analytics::Engine(plugin, NX_DEBUG_ENABLE_OUTPUT)
 {
+    obtainPluginHomeDir();
     initCapabilities();
+
+    m_pluginDiagnosticEventThread =
+        std::make_unique<std::thread>([this]() { generatePluginDiagnosticEvents(); });
 }
 
 Engine::~Engine()
 {
     {
-        std::unique_lock<std::mutex> lock(m_pluginEventGenerationLoopMutex);
+        std::unique_lock<std::mutex> lock(m_pluginDiagnosticEventGenerationLoopMutex);
         m_terminated = true;
-        m_pluginEventGenerationLoopCondition.notify_all();
+        m_pluginDiagnosticEventGenerationLoopCondition.notify_all();
     }
-    if (m_thread)
-        m_thread->join();
+    if (m_pluginDiagnosticEventThread)
+        m_pluginDiagnosticEventThread->join();
 }
 
-void Engine::generatePluginEvents()
+void Engine::generatePluginDiagnosticEvents()
 {
     while (!m_terminated)
     {
-        using namespace std::chrono_literals;
+        if (m_needToThrowPluginDiagnosticEvents)
+        {
+            pushPluginDiagnosticEvent(
+                IPluginDiagnosticEvent::Level::info,
+                "Info message from Engine",
+                "Info message description");
 
-        pushPluginEvent(
-            IPluginEvent::Level::info,
-            "Info message from Engine",
-            "Info message description");
+            pushPluginDiagnosticEvent(
+                IPluginDiagnosticEvent::Level::warning,
+                "Warning message from Engine",
+                "Warning message description");
 
-        pushPluginEvent(
-            IPluginEvent::Level::warning,
-            "Warning message from Engine",
-            "Warning message description");
-
-        pushPluginEvent(
-            IPluginEvent::Level::error,
-            "Error message from Engine",
-            "Error message description");
-
+            pushPluginDiagnosticEvent(
+                IPluginDiagnosticEvent::Level::error,
+                "Error message from Engine",
+                "Error message description");
+        }
         // Sleep until the next event pack needs to be generated, or the thread is ordered to
         // terminate (hence condition variable instead of sleep()). Return value (whether the
         // timeout has occurred) and spurious wake-ups are ignored.
         {
-            std::unique_lock<std::mutex> lock(m_pluginEventGenerationLoopMutex);
+            std::unique_lock<std::mutex> lock(m_pluginDiagnosticEventGenerationLoopMutex);
             if (m_terminated)
                 break;
-            static const std::chrono::seconds kEventGenerationPeriod{7};
-            m_pluginEventGenerationLoopCondition.wait_for(lock, kEventGenerationPeriod);
+
+            static const seconds kEventGenerationPeriod{7};
+            m_pluginDiagnosticEventGenerationLoopCondition.wait_for(lock, kEventGenerationPeriod);
         }
     }
 }
 
-IDeviceAgent* Engine::obtainDeviceAgent(
-    const IDeviceInfo* deviceInfo, Error* /*outError*/)
+MutableDeviceAgentResult Engine::obtainDeviceAgent(const IDeviceInfo* deviceInfo)
 {
     return new DeviceAgent(this, deviceInfo);
+}
+
+void Engine::obtainPluginHomeDir()
+{
+    const auto utilityProvider = plugin()->utilityProvider();
+    NX_KIT_ASSERT(utilityProvider);
+
+    m_pluginHomeDir = toPtr(utilityProvider->homeDir())->str();
+
+    if (m_pluginHomeDir.empty())
+        NX_PRINT << "Plugin home dir: absent";
+    else
+        NX_PRINT << "Plugin home dir: " << nx::kit::utils::toString(m_pluginHomeDir);
 }
 
 void Engine::initCapabilities()
@@ -101,7 +125,7 @@ void Engine::initCapabilities()
         m_capabilities.erase(0, 1);
 }
 
-std::string Engine::manifest() const
+std::string Engine::manifestString() const
 {
     return /*suppress newline*/1 + R"json(
 {
@@ -210,20 +234,112 @@ std::string Engine::manifest() const
         "type": "Settings",
         "items": [
             {
-                "type": "TextField",
-                "name": "testTextField",
-                "caption": "Device Agent Text Field",
-                "description": "A text field",
-                "defaultValue": "a text"
+                "type": "GroupBox",
+                "caption": "Real Stub DeviceAgent settings",
+                "items": [
+                    {
+                        "type": "GroupBox",
+                        "caption": "Object generation settings",
+                        "items": [
+                            {
+                                "type": "CheckBox",
+                                "name": ")json" + kGenerateCarsSetting + R"json(",
+                                "caption": "Generate cars",
+                                "defaultValue": true,
+                                "value": true
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": ")json" + kGenerateTrucksSetting + R"json(",
+                                "caption": "Generate trucks",
+                                "defaultValue": true,
+                                "value": true
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": ")json" + kGeneratePedestriansSetting + R"json(",
+                                "caption": "Generate pedestrians",
+                                "defaultValue": true,
+                                "value": true
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": ")json" + kGenerateHumanFacesSetting + R"json(",
+                                "caption": "Generate human faces",
+                                "defaultValue": true,
+                                "value": true
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": ")json" + kGenerateBicyclesSetting + R"json(",
+                                "caption": "Generate bicycles",
+                                "defaultValue": true,
+                                "value": true
+                            },
+                            {
+                                "type": "SpinBox",
+                                "name": ")json" + kNumberOfObjectsToGenerateSetting + R"json(",
+                                "caption": "Number of objects to generate",
+                                "defaultValue": 1,
+                                "minValue": 1,
+                                "maxValue": 100000
+                            },
+                            {
+                                "type": "SpinBox",
+                                "name": ")json" + kGenerateObjectsEveryNFramesSetting + R"json(",
+                                "caption": "Generate objects every N frames",
+                                "defaultValue": 1,
+                                "minValue": 1,
+                                "maxValue": 100000
+                            },
+                            {
+                                "type": "CheckBox",
+                                "name": ")json" + kGeneratePreviewPacketSetting + R"json(",
+                                "caption": "Generate preview packet",
+                                "defaultValue": true,
+                                "value": true
+                            }
+                        ]
+                    },
+                    {
+                        "type": "CheckBox",
+                        "name": ")json" + kGenerateEventsSetting + R"json(",
+                        "caption": "Generate events",
+                        "defaultValue": true,
+                        "value": true
+                    },
+                    {
+                        "type": "CheckBox",
+                        "name": ")json"
+                        + kThrowPluginDiagnosticEventsFromDeviceAgentSetting + R"json(",
+                        "caption": "Throw plugin events from the DeviceAgent",
+                        "defaultValue": false,
+                        "value": false
+                    },
+                    {
+                        "type": "CheckBox",
+                        "name": ")json" + kLeakFrames + R"json(",
+                        "caption": "Force a memory leak when proccessing a video frame",
+                        "defaultValue": false,
+                        "value": false
+                    }
+                ]
             },
             {
                 "type": "GroupBox",
-                "caption": "Device Agent Group",
+                "caption": "Example Stub DeviceAgent settings",
                 "items": [
                     {
+                        "type": "TextField",
+                        "name": "testTextField",
+                        "caption": "Device Agent Text Field",
+                        "description": "A text field",
+                        "defaultValue": "a text"
+                    },
+                    {
                         "type": "SpinBox",
-                        "caption": "Device Agent SpinBox",
-                        "name": "testSpinBox",
+                        "caption": "Device Agent SpinBox (plugin side)",
+                        "name": "pluginSideTestSpinBox",
                         "defaultValue": 42,
                         "minValue": 0,
                         "maxValue": 100
@@ -258,18 +374,24 @@ std::string Engine::manifest() const
 )json";
 }
 
-void Engine::settingsReceived()
+StringMapResult Engine::settingsReceived()
 {
-    if (ini().throwPluginEventsFromEngine)
+    m_needToThrowPluginDiagnosticEvents = toBool(
+        settingValue(kThrowPluginDiagnosticEventsFromEngineSetting));
+
+    if (m_needToThrowPluginDiagnosticEvents && !m_pluginDiagnosticEventThread)
     {
-        NX_PRINT << __func__ << "(): Starting plugin event generation thread";
-        if (!m_thread)
-            m_thread.reset(new std::thread([this]() { generatePluginEvents(); }));
+        NX_PRINT << __func__ << "(): Starting plugin event generation";
+        m_needToThrowPluginDiagnosticEvents = true;
     }
-    else
+    else if (!m_needToThrowPluginDiagnosticEvents && m_pluginDiagnosticEventThread)
     {
-        NX_PRINT << __func__ << "()";
+        NX_PRINT << __func__ << "(): Stopping plugin event generation";
+        m_needToThrowPluginDiagnosticEvents = false;
+        m_pluginDiagnosticEventGenerationLoopCondition.notify_all();
     }
+
+    return nullptr;
 }
 
 static std::string timestampedObjectMetadataToString(const ITimestampedObjectMetadata* metadata)
@@ -278,12 +400,12 @@ static std::string timestampedObjectMetadataToString(const ITimestampedObjectMet
         return "null";
 
     return nx::kit::utils::format("timestamp: %lld, id: %s",
-        metadata->timestampUs(), UuidHelper::toStdString(metadata->id()).c_str());
+        metadata->timestampUs(), UuidHelper::toStdString(metadata->trackId()).c_str());
 }
 
 static std::string objectTrackToString(
     const IList<ITimestampedObjectMetadata>* track,
-    Uuid expectedObjectId)
+    Uuid expectedTrackId)
 {
     using nx::kit::utils::format;
 
@@ -295,30 +417,30 @@ static std::string objectTrackToString(
 
     std::string result = format("%d metadata items", track->count());
 
-    Uuid objectIdFromTrack;
+    Uuid trackld;
     for (int i = 0; i < track->count(); ++i)
     {
         const auto timestampedObjectMetadata = track->at(i);
-        objectIdFromTrack = timestampedObjectMetadata->id();
-        if (objectIdFromTrack != track->at(0)->id())
+        trackld = timestampedObjectMetadata->trackId();
+        if (trackld != toPtr(track->at(0))->trackId())
         {
             if (!result.empty())
                 result += "; ";
-            result += format("INTERNAL ERROR: Object id #%d %s does not equal object id #0 %s",
+            result += format("INTERNAL ERROR: Track id #%d %s does not equal track id #0 %s",
                 i,
-                UuidHelper::toStdString(objectIdFromTrack).c_str(),
-                UuidHelper::toStdString(track->at(0)->id()).c_str());
+                UuidHelper::toStdString(trackld).c_str(),
+                UuidHelper::toStdString(toPtr(track->at(0))->trackId()).c_str());
             break;
         }
     }
 
-    if (objectIdFromTrack != expectedObjectId)
+    if (trackld != expectedTrackId)
     {
         if (!result.empty())
             result += "; ";
-        result += format("INTERNAL ERROR: Object id in the track is %s, but in the action is %s",
-            UuidHelper::toStdString(objectIdFromTrack).c_str(),
-            UuidHelper::toStdString(expectedObjectId).c_str());
+        result += format("INTERNAL ERROR: Track id in the track is %s, but in the action is %s",
+            UuidHelper::toStdString(trackld).c_str(),
+            UuidHelper::toStdString(expectedTrackId).c_str());
     }
 
     return result;
@@ -333,21 +455,20 @@ static std::string uncompressedVideoFrameToString(const IUncompressedVideoFrame*
         frame->width(), frame->height(), pixelFormatToStdString(frame->pixelFormat()).c_str());
 }
 
-void Engine::executeAction(
+Result<void> Engine::executeAction(
     const std::string& actionId,
-    Uuid objectId,
+    Uuid trackId,
     Uuid /*deviceId*/,
     int64_t /*timestampUs*/,
     nx::sdk::Ptr<IObjectTrackInfo> objectTrackInfo,
     const std::map<std::string, std::string>& params,
     std::string* outActionUrl,
-    std::string* outMessageToUser,
-    Error* error)
+    std::string* outMessageToUser)
 {
     if (actionId == "nx.stub.addToList")
     {
         *outMessageToUser =
-            std::string("Object id: ") + UuidHelper::toStdString(objectId) + "\n\n";
+            std::string("Track id: ") + UuidHelper::toStdString(trackId) + "\n\n";
 
         if (!objectTrackInfo)
         {
@@ -356,7 +477,7 @@ void Engine::executeAction(
         else
         {
             *outMessageToUser += std::string("Object track info:\n")
-                + "    Track: " + objectTrackToString(objectTrackInfo->track(), objectId) + "\n"
+                + "    Track: " + objectTrackToString(objectTrackInfo->track(), trackId) + "\n"
                 + "    Best shot frame: "
                     + uncompressedVideoFrameToString(objectTrackInfo->bestShotVideoFrame()) + "\n"
                 + "    Best shot metadata: "
@@ -391,14 +512,16 @@ void Engine::executeAction(
     else if (actionId == "nx.stub.addPerson")
     {
         *outActionUrl =
-            "http://internal.server/addPerson?objectId=" + UuidHelper::toStdString(objectId);
+            "http://internal.server/addPerson?trackId=" + UuidHelper::toStdString(trackId);
         NX_PRINT << __func__ << "(): Returning URL: " << nx::kit::utils::toString(*outActionUrl);
     }
     else
     {
         NX_PRINT << __func__ << "(): ERROR: Unsupported actionId.";
-        *error = Error::unknownError;
+        return error(ErrorCode::invalidParams, "Unsupported actionId");
     }
+
+    return {};
 }
 
 } // namespace stub
@@ -408,27 +531,42 @@ void Engine::executeAction(
 
 namespace {
 
-static const std::string kLibName = "stub_analytics_plugin";
+using namespace nx::vms_server_plugins::analytics::stub;
 
 static const std::string kPluginManifest = R"json(
 {
     "id": "nx.stub",
     "name": "Stub analytics plugin",
+    "description": "A plugin for testing and debugging purposes",
     "version": "1.0.0",
+    "vendor": "Plugin vendor",
     "engineSettingsModel": {
         "type": "Settings",
         "items": [
             {
-                "type": "TextField",
-                "name": "text",
-                "caption": "Text Field",
-                "description": "A text field",
-                "defaultValue": "a text"
+                "type": "GroupBox",
+                "caption": "Real Stub Engine settings",
+                "items": [
+                    {
+                        "type": "CheckBox",
+                        "name": ")json" + kThrowPluginDiagnosticEventsFromEngineSetting + R"json(",
+                        "caption": "Throw plugin events from the Engine",
+                        "defaultValue": false,
+                        "value": false
+                    }
+                ]
             },
             {
                 "type": "GroupBox",
-                "caption": "Group",
+                "caption": "Example Stub Engine settings",
                 "items": [
+                    {
+                        "type": "TextField",
+                        "name": "text",
+                        "caption": "Text Field",
+                        "description": "A text field",
+                        "defaultValue": "a text"
+                    },
                     {
                         "type": "SpinBox",
                         "name": "testSpinBox",
@@ -470,9 +608,8 @@ static const std::string kPluginManifest = R"json(
 extern "C" NX_PLUGIN_API nx::sdk::IPlugin* createNxPlugin()
 {
     return new nx::sdk::analytics::Plugin(
-        kLibName,
         kPluginManifest,
-        [](nx::sdk::analytics::IPlugin* plugin)
+        [](nx::sdk::analytics::Plugin* plugin)
         {
             return new nx::vms_server_plugins::analytics::stub::Engine(plugin);
         });

@@ -3,6 +3,7 @@
 #include <chrono>
 
 #include <nx/utils/log/log.h>
+#include <nx/vms/api/protocol_version.h>
 
 #include <common/static_common_module.h>
 
@@ -84,7 +85,7 @@ void ConnectToCurrentSystemTool::start(const QnUuid& targetId, const QString& pa
     auto serverInformation = server->getModuleInformation();
     m_serverName = server->getName();
     m_serverVersion = serverInformation.version;
-    m_wasIncompatible = serverInformation.protoVersion != QnAppInfo::ec2ProtoVersion();
+    m_wasIncompatible = serverInformation.protoVersion != nx::vms::api::protocolVersion();
 
     NX_INFO(this, lm("Start connecting server %1 (id=%2, url=%3").args(
         m_serverName, m_originalTargetId, server->getApiUrl()));

@@ -176,7 +176,7 @@ void GetPostTunnelServer<ApplicationData...>::openUpTunnel(
 {
     auto httpPipe = std::make_unique<network::http::AsyncMessagePipeline>(
         connection->takeSocket());
-    httpPipe->setOnConnectionClosed(
+    httpPipe->registerCloseHandler(
         [this, connection = httpPipe.get()](auto closeReason)
         {
             this->closeConnection(closeReason, connection);
@@ -197,7 +197,8 @@ void GetPostTunnelServer<ApplicationData...>::openUpTunnel(
         {
             onMessage(httpPipePtr, std::forward<decltype(args)>(args)...);
         });
-    insertionResult.first->second.connection->startReadingConnection();
+    insertionResult.first->second.connection->startReadingConnection(
+        connection->inactivityTimeout());
 }
 
 template<typename ...ApplicationData>

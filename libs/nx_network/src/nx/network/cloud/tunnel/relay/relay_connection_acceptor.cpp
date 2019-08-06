@@ -4,7 +4,6 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
 
-#include "api/relay_api_client_factory.h"
 
 #include "../../protocol_type.h"
 
@@ -49,7 +48,7 @@ private:
 //-------------------------------------------------------------------------------------------------
 
 ReverseConnection::ReverseConnection(const nx::utils::Url& relayUrl):
-    m_relayClient(api::ClientFactory::instance().create(relayUrl)),
+    m_relayClient(std::make_unique<api::Client>(relayUrl)),
     m_peerName(relayUrl.userName().toStdString())
 {
     bindToAioThread(getAioThread());
@@ -141,7 +140,7 @@ void ReverseConnection::onConnectDone(
 
         m_httpPipeline = std::make_unique<nx::network::http::AsyncMessagePipeline>(
             std::move(streamSocket));
-        m_httpPipeline->setOnConnectionClosed(
+        m_httpPipeline->registerCloseHandler(
             [this](auto&&... args) { onConnectionClosed(std::move(args)...); });
         m_httpPipeline->setMessageHandler(
             [this](auto&&... args) { dispatchRelayNotificationReceived(std::move(args)...); });

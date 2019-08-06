@@ -11,6 +11,7 @@
 #include <nx/network/deprecated/simple_http_client.h>
 #include <nx/network/address_resolver.h>
 #include <nx/network/app_info.h>
+#include <nx/vms/api/protocol_version.h>
 
 #include <utils/common/app_info.h>
 #include <nx/utils/concurrent.h>
@@ -358,7 +359,7 @@ void RemoteConnectionFactory::remoteTestConnectionFinished(
 }
 
 ErrorCode RemoteConnectionFactory::fillConnectionInfo(
-    const nx::vms::api::ConnectionData& loginInfo,
+    [[maybe_unused]] const nx::vms::api::ConnectionData& loginInfo,
     QnConnectionInfo* const connectionInfo,
     nx::network::http::Response* response)
 {
@@ -373,7 +374,7 @@ ErrorCode RemoteConnectionFactory::fillConnectionInfo(
         connectionInfo->box = QnAppInfo::armBox();
     #endif
     connectionInfo->allowSslConnections = m_sslEnabled;
-    connectionInfo->nxClusterProtoVersion = nx_ec::EC2_PROTO_VERSION;
+    connectionInfo->nxClusterProtoVersion = nx::vms::api::protocolVersion();
     connectionInfo->newSystem = commonModule()->globalSettings()->isNewSystem();
     connectionInfo->p2pMode = m_p2pMode;
     if (response)
@@ -415,8 +416,6 @@ ErrorCode RemoteConnectionFactory::fillConnectionInfo(
                     }
                 });
         }
-    #else
-        nx::utils::unused(loginInfo);
     #endif
 
     return ErrorCode::ok;

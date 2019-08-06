@@ -24,9 +24,9 @@
         </p>
 
         <p ng-if="system.permissions.isAdmin">
-            <button class="btn btn-default" ng-click="rename()">システム名を変更</button>
+            <button class="btn btn-default" ng-click="rename()" ng-disabled="currentlyMerging && !isMaster">システム名を変更</button>
         </p>
-        <button class="btn btn-default" ng-click="delete()">自分のアカウントから切断</button>
+        <button class="btn btn-default" ng-click="delete()" ng-disabled="currentlyMerging">自分のアカウントから切断</button>
     </div>
 </div>
 <div class="mt-3 card card-default" ng-if="currentlyMerging">
@@ -51,8 +51,7 @@
         <div class="merge-info-text">
             <p>データベースのサイズに応じて、数時間かかる場合があります.</p>
             <p>システムにログインして映像を表示する事はできますが、統合が完了するまで設定を変更することはできません</p>
-            <p>統合が完了すると、すべてのユーザーとカメラが使用できるようになります
-                <span class="merge-system-name">に{{mergeTargetSystem.name}}</span> このシステムは削除されます。</p>
+            <p>統合が終了すると、すべてのユーザーおよびカメラ がシステム「<span class="merge-system-name">{{mergeTargetSystem.name}}</span>」で利用できるようになります</p>
         </div>
     </div>
 </div>

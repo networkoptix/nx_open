@@ -11,7 +11,6 @@
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QScrollBar>
-#include <QtWidgets/QTabWidget>
 #include <QtWidgets/QToolButton>
 #include <QtWidgets/QTreeView>
 #include <QtWidgets/QGraphicsLinearLayout>
@@ -32,7 +31,6 @@
 #include <core/resource/layout_item_index.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/resource_display_info.h>
-#include <core/resource/resource_property.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource/videowall_item_index.h>
@@ -86,7 +84,7 @@
 using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::ui;
 
-using NodeType = ResourceTreeNodeType;
+using NodeType = ResourceTree::NodeType;
 
 namespace {
 
@@ -101,6 +99,8 @@ const auto kHtmlLabelDefaultFormat = lit("<center><span style='font-weight: 500'
 const auto kHtmlLabelUserFormat = lit("<center><span style='font-weight: 500'>%1</span>, %2</center>");
 
 static const QSize kMaxThumbnailSize(224, 184);
+
+static constexpr int kMaxAutoExpandedServers = 2;
 
 static void updateTreeItem(QnResourceTreeWidget* tree, const QnWorkbenchItem* item)
 {
@@ -137,15 +137,15 @@ bool isOpenableInEntity(const QnResourcePtr& resource)
         || QnResourceAccessFilter::isDroppable(resource);
 }
 
-ResourceTreeNodeType getNodeType(const QModelIndex& index)
+ResourceTree::NodeType getNodeType(const QModelIndex& index)
 {
-    return index.data(Qn::NodeTypeRole).value<ResourceTreeNodeType>();;
+    return index.data(Qn::NodeTypeRole).value<ResourceTree::NodeType>();;
 }
 
 bool isLocalResourcesGroup(const QModelIndex& index)
 {
-    const auto nodeType = index.data(Qn::NodeTypeRole).value<ResourceTreeNodeType>();
-    return nodeType == ResourceTreeNodeType::localResources;
+    const auto nodeType = index.data(Qn::NodeTypeRole).value<ResourceTree::NodeType>();
+    return nodeType == ResourceTree::NodeType::localResources;
 }
 
 } // namespace
@@ -176,31 +176,17 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
     ui->resourceTreeWidget->setCheckboxesVisible(false);
     ui->resourceTreeWidget->setGraphicsTweaks(Qn::HideLastRow | Qn::BypassGraphicsProxy);
     ui->resourceTreeWidget->setEditingEnabled();
-    ui->resourceTreeWidget->setAutoExpandPolicy(
-        [](const QModelIndex& index)
-        {
-            switch (index.data(Qn::NodeTypeRole).value<NodeType>())
-            {
-                case NodeType::resource:
-                {
-                    const auto resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
-                    return resource && resource->hasFlags(Qn::server);
-                }
-                case NodeType::servers:
-                case NodeType::userResources:
+    setupAutoExpandPolicy();
 
-                case NodeType::filteredServers:
-                case NodeType::filteredCameras:
-                case NodeType::filteredLayouts:
-                case NodeType::filteredUsers:
-                case NodeType::filteredVideowalls:
-                    return true;
-                default:
-                    break;
-            }
-            return false;
-        }
-    );
+    m_connections << connect(ui->resourceTreeWidget->selectionModel(),
+        &QItemSelectionModel::currentChanged,
+        [this](const QModelIndex& current, const QModelIndex& /*previous*/)
+        {
+            const auto treeView = ui->resourceTreeWidget->treeView();
+            const auto itemRect = treeView->visualRect(current)
+                .translated(treeView->mapTo(ui->scrollArea->widget(), QPoint()));
+            ui->scrollArea->ensureVisible(0, itemRect.center().y() + 1, 0, itemRect.height() / 2);
+        });
 
     ui->shortcutHintWidget->setContentsMargins(6, 0, 0, 0);
     ui->shortcutHintWidget->setVisible(false);
@@ -218,17 +204,11 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
     m_connections << connect(ui->resourceTreeWidget, &QnResourceTreeWidget::activated,
         this, &QnResourceBrowserWidget::handleItemActivated);
 
-    m_connections << connect(ui->tabWidget, &QTabWidget::currentChanged,
-        this, &QnResourceBrowserWidget::at_tabWidget_currentChanged);
     m_connections << connect(ui->resourceTreeWidget->selectionModel(), &QItemSelectionModel::selectionChanged,
         this, &QnResourceBrowserWidget::selectionChanged);
 
     /* Connect to context. */
     ui->resourceTreeWidget->setWorkbench(workbench());
-
-    setTabShape(ui->tabWidget->tabBar(), style::TabShape::Compact);
-    ui->tabWidget->setProperty(style::Properties::kTabBarIndent, style::Metrics::kDefaultTopLevelMargin);
-    ui->tabWidget->tabBar()->setMaximumHeight(32);
 
     m_connections << connect(workbench(), &QnWorkbench::currentLayoutAboutToBeChanged,
         this, &QnResourceBrowserWidget::at_workbench_currentLayoutAboutToBeChanged);
@@ -243,9 +223,6 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
         &QnWorkbenchAccessController::globalPermissionsChanged,
         this,
         &QnResourceBrowserWidget::updateIcons);
-
-    m_connections << connect(this->context(), &QnWorkbenchContext::userChanged,
-        this, [this]() { ui->tabWidget->setCurrentWidget(ui->resourcesTab); });
 
     m_connections << connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
         [this](const QnResourcePtr& resource)
@@ -318,8 +295,6 @@ void QnResourceBrowserWidget::initInstantSearch()
 {
     const auto filterEdit = ui->instantFilterLineEdit;
 
-    ui->tabWidget->tabBar()->hide();
-
     setPaletteColor(ui->nothingFoundLabel, QPalette::WindowText, colorTheme()->color("dark14"));
     setPaletteColor(ui->nothingFoundDescriptionLabel, QPalette::WindowText, colorTheme()->color("dark14"));
 
@@ -358,7 +333,7 @@ void QnResourceBrowserWidget::initInstantSearch()
 
     auto filterMenuCreator = [this](QWidget* parent) { return createFilterMenu(parent); };
     auto filterNameProvider = [this](const QVariant& data)
-        { return getFilterName(data.value<ResourceTreeNodeType>()); };
+        { return getFilterName(data.value<ResourceTree::NodeType>()); };
     filterEdit->setTagOptionsSource(filterMenuCreator, filterNameProvider);
 
     updateSearchMode();
@@ -383,7 +358,7 @@ void QnResourceBrowserWidget::handleEnterPressed(bool withControlKey)
     const auto callback =
         [&](const QModelIndex& index, bool hasChildren)
         {
-            if (getNodeType(index) == ResourceTreeNodeType::layoutTour)
+            if (getNodeType(index) == ResourceTree::NodeType::layoutTour)
             {
                 showreels.insert(index.data(Qn::UuidRole).value<QnUuid>());
                 return;
@@ -500,6 +475,40 @@ void QnResourceBrowserWidget::restoreExpandedStates()
     m_expandedStatesList.clear();
 }
 
+void QnResourceBrowserWidget::setupAutoExpandPolicy()
+{
+    ui->resourceTreeWidget->setAutoExpandPolicy(
+        [this](const QModelIndex& index)
+        {
+            switch (index.data(Qn::NodeTypeRole).value<NodeType>())
+            {
+                case NodeType::resource:
+                {
+                    const auto resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
+                    if (resource && resource->hasFlags(Qn::server))
+                    {
+                        const auto serverCount =
+                            resourcePool()->getResources<QnMediaServerResource>().count();
+                        return serverCount <= kMaxAutoExpandedServers;
+                    }
+                    return false;
+                }
+                case NodeType::servers:
+                case NodeType::userResources:
+                case NodeType::filteredServers:
+                case NodeType::filteredCameras:
+                case NodeType::filteredLayouts:
+                case NodeType::filteredUsers:
+                case NodeType::filteredVideowalls:
+                    return true;
+                default:
+                    break;
+            }
+            return false;
+        }
+    );
+}
+
 void QnResourceBrowserWidget::updateInstantFilter()
 {
     const auto filterEdit = ui->instantFilterLineEdit;
@@ -516,7 +525,7 @@ void QnResourceBrowserWidget::updateInstantFilter()
         [this, localResourcesMode, filterEdit]()
         {
             if (!filterEdit->currentTagData().isNull())
-                return filterEdit->currentTagData().value<ResourceTreeNodeType>();
+                return filterEdit->currentTagData().value<ResourceTree::NodeType>();
 
             return localResourcesMode
                 ? QnResourceSearchQuery::NodeType::localResources
@@ -629,7 +638,7 @@ void QnResourceBrowserWidget::updateHintVisibilityByFilterState()
             (const QModelIndex& groupIndex)
         {
             const bool hasSingleOpenTypeItems =
-                getNodeType(groupIndex) != ResourceTreeNodeType::localResources;
+                getNodeType(groupIndex) != ResourceTree::NodeType::localResources;
 
             const int childrenCount = searchModel->rowCount(groupIndex);
             for (int childRow = 0; childRow != childrenCount; ++childRow)
@@ -648,10 +657,10 @@ void QnResourceBrowserWidget::updateHintVisibilityByFilterState()
                 {
                     switch(getNodeType(index))
                     {
-                        case ResourceTreeNodeType::layoutTour:
+                        case ResourceTree::NodeType::layoutTour:
                             hasOpenInEntityItems = true;
                             break;
-                        case ResourceTreeNodeType::recorder:
+                        case ResourceTree::NodeType::recorder:
                             hasOpenInLayoutItems |= searchModel->rowCount(index) > 0;
                             break;
                         default:
@@ -722,21 +731,21 @@ QMenu* QnResourceBrowserWidget::createFilterMenu(QWidget* parent) const
         };
 
     auto addMenuItem =
-        [this, result, escapeActionText](ResourceTreeNodeType filterNodeType)
+        [this, result, escapeActionText](ResourceTree::NodeType filterNodeType)
         {
             auto action = result->addAction(escapeActionText(getFilterName(filterNodeType)));
             action->setData(QVariant::fromValue(filterNodeType));
         };
 
-    const QList<ResourceTreeNodeType> filterNodeOptions = {
-        ResourceTreeNodeType::filteredServers,
-        ResourceTreeNodeType::filteredCameras,
-        ResourceTreeNodeType::filteredLayouts,
-        ResourceTreeNodeType::layoutTours,
-        ResourceTreeNodeType::filteredVideowalls,
-        ResourceTreeNodeType::webPages,
-        ResourceTreeNodeType::filteredUsers,
-        ResourceTreeNodeType::localResources};
+    const QList<ResourceTree::NodeType> filterNodeOptions = {
+        ResourceTree::NodeType::filteredServers,
+        ResourceTree::NodeType::filteredCameras,
+        ResourceTree::NodeType::filteredLayouts,
+        ResourceTree::NodeType::layoutTours,
+        ResourceTree::NodeType::filteredVideowalls,
+        ResourceTree::NodeType::webPages,
+        ResourceTree::NodeType::filteredUsers,
+        ResourceTree::NodeType::localResources};
 
     addMenuItem(QnResourceSearchQuery::kAllowAllNodeTypes);
     result->addSeparator();
@@ -749,27 +758,27 @@ QMenu* QnResourceBrowserWidget::createFilterMenu(QWidget* parent) const
     return result;
 }
 
-QString QnResourceBrowserWidget::getFilterName(ResourceTreeNodeType allowedNodeType) const
+QString QnResourceBrowserWidget::getFilterName(ResourceTree::NodeType allowedNodeType) const
 {
     switch (allowedNodeType)
     {
         case QnResourceSearchQuery::kAllowAllNodeTypes:
             return tr("All types");
-        case ResourceTreeNodeType::filteredServers:
+        case ResourceTree::NodeType::filteredServers:
             return tr("Servers");
-        case ResourceTreeNodeType::filteredCameras:
+        case ResourceTree::NodeType::filteredCameras:
             return tr("Cameras & Devices");
-        case ResourceTreeNodeType::filteredLayouts:
+        case ResourceTree::NodeType::filteredLayouts:
             return tr("Layouts");
-        case ResourceTreeNodeType::layoutTours:
+        case ResourceTree::NodeType::layoutTours:
             return tr("Showreels");
-        case ResourceTreeNodeType::filteredVideowalls:
+        case ResourceTree::NodeType::filteredVideowalls:
             return tr("Video Walls");
-        case ResourceTreeNodeType::webPages:
+        case ResourceTree::NodeType::webPages:
             return tr("Web Pages");
-        case ResourceTreeNodeType::filteredUsers:
+        case ResourceTree::NodeType::filteredUsers:
             return tr("Users");
-        case ResourceTreeNodeType::localResources:
+        case ResourceTree::NodeType::localResources:
             return tr("Local Files");
         default:
             NX_ASSERT(false);
@@ -1265,8 +1274,6 @@ void QnResourceBrowserWidget::at_workbench_currentLayoutChanged()
     if (auto synchronizer = layoutSynchronizer(layout, false))
         synchronizer->enableUpdates();
 
-    at_tabWidget_currentChanged(ui->tabWidget->currentIndex());
-
     /* Bold state has changed. */
     currentTreeWidget()->update();
 
@@ -1292,11 +1299,6 @@ void QnResourceBrowserWidget::at_layout_itemRemoved(QnWorkbenchItem* item)
 {
     /* Bold state has changed. */
     updateTreeItem(currentTreeWidget(), item);
-}
-
-void QnResourceBrowserWidget::at_tabWidget_currentChanged(int index)
-{
-    emit scrollBarVisibleChanged();
 }
 
 void QnResourceBrowserWidget::at_thumbnailClicked()

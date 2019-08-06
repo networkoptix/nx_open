@@ -28,7 +28,7 @@ namespace onvif {
         nullptr\
     },\
     {\
-        "onvifXsd",\
+        "tt",\
         "http://www.onvif.org/ver10/schema",\
         nullptr,\
         nullptr\

@@ -1,14 +1,14 @@
 <div class="card card-default" process-loading="gettingSystemUsers">
     <div class="card-body">
-        <h2 class="card-title">Users</h2>
+        <h2 class="card-title">Användare</h2>
 
         <div class="table-responsive">
             <table class="table table-hover" ng-if="system.users.length">
                 <thead>
                     <tr>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Permissions</th>
+                        <th>Namn</th>
+                        <th>E-post</th>
+                        <th>Behörigheter</th>
                         <th class="button-cell"></th>
                         <th class="button-cell"></th>
                     </tr>
@@ -27,10 +27,10 @@
                            class="hover-visible image-link"
                            ng-if="system.isAvailable && user.canBeEdited"
                            ng-class="{disabled:locked[user.email]}"
-                           title="Edit permissions"
+                           title="Redigera behörigheter"
                            ng-click="editShare(user)">
                             <span class="glyphicon glyphicon-pencil"></span>
-                            <span class="visible-lg-inline">Edit</span>
+                            <span class="visible-lg-inline">Redigera </span>
                         </a>
                     </td>
                     <td class="button-cell">
@@ -38,10 +38,10 @@
                            class="hover-visible image-link"
                            ng-if="system.isAvailable && user.canBeDeleted"
                            ng-class="{ 'disabled': locked[user.email]}"
-                           title="Delete"
+                           title="Radera"
                            ng-click="unshare(user)">
                             <span class="glyphicon glyphicon-remove"></span>
-                            <span class="visible-lg-inline">Delete</span>
+                            <span class="visible-lg-inline"> Ta bort </span>
                         </a>
                     </td>
                 </tr>

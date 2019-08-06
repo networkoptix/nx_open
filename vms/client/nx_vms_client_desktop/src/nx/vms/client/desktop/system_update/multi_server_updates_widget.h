@@ -87,6 +87,7 @@ public:
         };
 
         VersionMode versionMode = VersionMode::full;
+        bool notEnoughSpace = false;
         enum class HighlightMode
         {
             regular,
@@ -96,10 +97,16 @@ public:
 
         HighlightMode versionHighlight = HighlightMode::regular;
         HighlightMode statusHighlight = HighlightMode::regular;
+
+        bool isEqual(const VersionReport& another) const;
     };
 
     /** Generates update report for a picked update contents. */
-    static VersionReport calculateUpdateVersionReport(const nx::update::UpdateContents& contents, QnUuid clientId);
+    static VersionReport calculateUpdateVersionReport(
+        const nx::update::UpdateContents& contents,
+        QnUuid clientId);
+
+    bool checkSpaceRequirements(const nx::update::UpdateContents& contents) const;
 
 protected:
     /**
@@ -114,10 +121,15 @@ protected:
     void atStartUpdateAction();
     /** Called by clicking 'cancel' button. */
     bool atCancelCurrentAction();
-    /** Called when server responds to /ec2/cancelUpdate. Connected to ServerUpdateToool.*/
-    void atCancelUpdateComplete(bool success);
-    /** Called when server responds to /ec2/finishUpdate. Connected to ServerUpdateToool.*/
-    void atFinishUpdateComplete(bool success);
+
+    /** Called when server responds to /ec2/startUpdate. Connected to ServerUpdateToool. */
+    void atStartUpdateComplete(bool success, const QString& error);
+    /** Called when server responds to /ec2/cancelUpdate. Connected to ServerUpdateToool. */
+    void atCancelUpdateComplete(bool success, const QString& error);
+    /** Called when server responds to /ec2/finishUpdate. Connected to ServerUpdateToool. */
+    void atFinishUpdateComplete(bool success, const QString& error);
+    /** Called when server responds to /ec2/installUpdate. Connected to ServerUpdateToool. */
+    void atStartInstallComplete(bool success, const QString& error);
 
     /**
      * Called when ServerUpdateTool finishes downloading package for mediaserver without
@@ -125,6 +137,8 @@ protected:
      */
     void atServerPackageDownloaded(const nx::update::Package& package);
     void atServerPackageDownloadFailed(const nx::update::Package& package, const QString& error);
+
+    void atServerConfigurationChanged(std::shared_ptr<UpdateItem> item);
 
     void clearUpdateInfo();
     void pickLocalFile();
@@ -143,17 +157,19 @@ private:
          * We have obtained update info from the internet, but we need to
          * GET /ec2/updateInformation from the servers, to decide which state we should move to.
          */
-        checkingServers,
+        initialCheck,
         /**
          * We have obtained some state from the servers. We can do some actions now.
          * Next action depends on m_updateSourceMode, and whether the update
          * is available for picked update source.
          */
         ready,
-        /** We have issued a command to remote servers to start downloading the updates. */
+        /** We have sent /ec2/startUpdate and waiting for response. */
+        startingDownload,
+        /** Mediaservers have started downloading update packages. */
         downloading,
         /** Pushing local update package to the servers. */
-        pushing,
+        //pushing,
         /**
          * Waiting server to respond to /ec2/cancelUpdate from 'downloading' or 'pushing'
          * state.
@@ -161,7 +177,10 @@ private:
         cancelingDownload,
         /** Some servers have downloaded update data and ready to install it. */
         readyInstall,
+        /** Sent request /ec2/cancelUpdate and waiting for response. */
         cancelingReadyInstall,
+        /** Sent request /ec2/installUpdate and waiting for confirmation */
+        startingInstall,
         /** Some servers are installing an update. */
         installing,
         /** Some servers are installing an update, but it took too long. */
@@ -211,13 +230,15 @@ private:
 
     bool processRemoteChanges();
     /** Part of processRemoteChanges FSM processor. */
-    void processRemoteInitialState();
-    void processRemoteUpdateInformation();
-    void processRemoteDownloading();
-    void processRemoteInstalling();
+    void processInitialState();
+    void processInitialCheckState();
+    void processDownloadingState();
+    void processReadyInstallState();
+    void processInstallingState();
 
     bool isChecking() const;
     bool hasLatestVersion() const;
+    bool hasActiveUpdate() const;
 
     bool processUploaderChanges(bool force = false);
 
@@ -229,6 +250,13 @@ private:
     void completeInstallation(bool clientUpdated);
     static bool stateHasProgress(WidgetUpdateState state);
     void syncDebugInfoToUi();
+    /**
+     * Sets current update target.
+     * It changes m_updateInfo and updates UI states according to the report.
+     * @param contents - update contents.
+     * @param activeUpdate - true if mediaservers are already updating to this version.
+     */
+    void setUpdateTarget(const nx::update::UpdateContents& contents, bool activeUpdate);
 
 private:
     QScopedPointer<Ui::MultiServerUpdatesWidget> ui;
@@ -263,11 +291,16 @@ private:
 
     /** ServerUpdateTool promises this. */
     std::future<nx::update::UpdateContents> m_updateCheck;
-
     /** This promise is used to get update info from mediaservers. */
     std::future<nx::update::UpdateContents> m_serverUpdateCheck;
 
-    std::future<std::vector<nx::update::Status>> m_serverStatusCheck;
+    /**
+     * This promise is used to wait until ServerUpdateTool restores the state
+     * for offline update package.
+     */
+    std::future<nx::update::UpdateContents> m_offlineUpdateCheck;
+
+    std::future<ServerUpdateTool::RemoteStatus> m_serverStatusCheck;
 
     nx::update::UpdateContents m_updateInfo;
     VersionReport m_updateReport;

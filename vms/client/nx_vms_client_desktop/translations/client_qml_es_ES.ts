@@ -11,6 +11,10 @@
       <source>Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</source>
       <translation>La analítica de la cámara solo funcionará cuando se esté viendo la cámara. Habilita la grabación para que funcione todo el tiempo.</translation>
     </message>
+    <message>
+      <source>This is the built-in functionality</source>
+      <translation>Esta es la funcionalidad incorporada</translation>
+    </message>
   </context>
   <context>
     <name>EmptyTilesPlaceholder</name>
@@ -68,11 +72,11 @@
     <name>PluginsInformation</name>
     <message>
       <source>No plugins installed</source>
-      <translation type="unfinished">No plugins installed</translation>
+      <translation>No hay plugins instalados</translation>
     </message>
     <message>
       <source>Server is offline</source>
-      <translation type="unfinished">Server is offline</translation>
+      <translation>El servidor esta desconectado</translation>
     </message>
   </context>
   <context>

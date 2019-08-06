@@ -1,0 +1,47 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`NxVendorListComponent renders correctly 1`] = `
+<nx-vendor-list
+  CONFIG={[Function Object]}
+  filter={[Function Object]}
+  propagateChange={[Function Function]}
+  vendorGroups={[Function Number]}
+>
+  <nx-pre-loader>
+    <div
+      class="placeholder-wrapper"
+      ng-reflect-ng-class="[object Object]"
+    >
+      <div
+        class="placeholder"
+        ng-reflect-klass="placeholder"
+        ng-reflect-ng-class=""
+      >
+        <div
+          class="placeholder-content"
+        >
+          <div
+            class="placeholder-preloader"
+          >
+            <div
+              class="circleG circleG_1"
+            />
+            <div
+              class="circleG circleG_2"
+            />
+            <div
+              class="circleG circleG_3"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  </nx-pre-loader><div
+    class="row pl-3 pb-3 m-0 campage-info"
+  >
+    <h4>
+      
+    </h4>
+  </div>
+</nx-vendor-list>
+`;

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QtCore/QMetaType>
+#include <QtCore/QRect>
 
 #include <nx/utils/uuid.h>
 #include <nx/utils/url.h>
@@ -62,7 +63,7 @@ struct QnStartupParameters
     QnUuid videoWallGuid;
     QnUuid videoWallItemGuid;
     QString engineVersion;
-    QString dynamicCustomizationPath;
+    int vmsProtocolVersion = 0;
     QString ipVersion;
 
     /** Uri when the client was launched as uri handler. */
@@ -75,6 +76,8 @@ struct QnStartupParameters
 
     QString qmlRoot;
     QStringList qmlImportPaths;
+
+    QRect windowGeometry;
 };
 
 Q_DECLARE_METATYPE(QnStartupParameters)

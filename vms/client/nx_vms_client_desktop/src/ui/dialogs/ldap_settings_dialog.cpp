@@ -12,6 +12,7 @@
 #include <core/resource/user_resource.h>
 
 #include <api/app_server_connection.h>
+#include <api/media_server_connection.h>
 #include <api/global_settings.h>
 #include <common/common_module.h>
 #include <utils/common/ldap.h>

@@ -61,7 +61,7 @@ const std::unique_ptr<AbstractDatagramSocket>& DatagramPipeline::socket()
 
 std::unique_ptr<AbstractDatagramSocket> DatagramPipeline::takeSocket()
 {
-    m_terminationFlag.markAsDeleted();
+    m_terminationFlag.interrupt();
     m_socket->cancelIOSync(aio::etNone);
     return std::move(m_socket);
 }
@@ -104,9 +104,9 @@ void DatagramPipeline::onBytesRead(
         NX_DEBUG(this, lm("Error reading from socket. %1")
             .arg(SystemError::toString(errorCode)));
 
-        nx::utils::ObjectDestructionFlag::Watcher watcher(&m_terminationFlag);
+        nx::utils::InterruptionFlag::Watcher watcher(&m_terminationFlag);
         ioFailure(errorCode);
-        if (watcher.objectDestroyed())
+        if (watcher.interrupted())
             return; //this has been freed
         m_socket->registerTimer(
             kRetryReadAfterFailureTimeout,
@@ -116,9 +116,9 @@ void DatagramPipeline::onBytesRead(
 
     if (bytesRead > 0)  //zero-sized UDP datagramm is OK
     {
-        nx::utils::ObjectDestructionFlag::Watcher watcher(&m_terminationFlag);
+        nx::utils::InterruptionFlag::Watcher watcher(&m_terminationFlag);
         datagramReceived(sourceAddress, m_readBuffer);
-        if (watcher.objectDestroyed())
+        if (watcher.interrupted())
             return; //this has been freed
     }
 
@@ -156,11 +156,11 @@ void DatagramPipeline::messageSent(
     auto completionHandler = std::move(m_sendQueue.front().completionHandler);
     if (completionHandler)
     {
-        nx::utils::ObjectDestructionFlag::Watcher watcher(&m_terminationFlag);
+        nx::utils::InterruptionFlag::Watcher watcher(&m_terminationFlag);
         completionHandler(
             errorCode,
             std::move(resolvedTargetAddress));
-        if (watcher.objectDestroyed())
+        if (watcher.interrupted())
             return;
     }
     m_sendQueue.pop_front();

@@ -73,7 +73,6 @@
 #include <nx/vms/server/event/event_connector.h>
 #include <nx/vms/server/event/extended_rule_processor.h>
 #include <nx/vms/server/system/nx1/info.h>
-#include "server_update_tool.h"
 #include <motion/motion_helper.h>
 #include <audit/mserver_audit_manager.h>
 #include <database/server_db.h>
@@ -90,6 +89,9 @@
 #include <core/resource_management/mserver_resource_discovery_manager.h>
 #include "server_connector.h"
 #include "resource_status_watcher.h"
+#include <core/resource/media_server_resource.h>
+#include <nx/network/url/url_builder.h>
+#include <plugins/storage/dts/vmax480/vmax480_resource.h>
 
 using namespace nx;
 using namespace nx::vms::server;
@@ -215,19 +217,19 @@ QnMediaServerModule::QnMediaServerModule(
         m_resourceDataProviderFactory,
         commonModule()->resourcePool()));
 
-    auto streamingChunkTranscoder = store(
+    m_streamingChunkTranscoder = store(
         new StreamingChunkTranscoder(
             this,
             StreamingChunkTranscoder::fBeginOfRangeInclusive));
 
-    m_streamingChunkCache = store(new StreamingChunkCache(this, streamingChunkTranscoder));
+    m_streamingChunkCache = store(new StreamingChunkCache(this, m_streamingChunkTranscoder));
 
     // std::shared_pointer based singletones should be placed after InstanceStorage singletones
 
     m_context.reset(new UniquePtrContext());
 
     m_analyticsEventsStorage =
-        nx::analytics::db::EventsStorageFactory::instance().create();
+        nx::analytics::db::EventsStorageFactory::instance().create(this);
 
     m_context->normalStorageManager.reset(
         new QnStorageManager(
@@ -274,9 +276,8 @@ QnMediaServerModule::QnMediaServerModule(
     m_sharedContextPool = store(new nx::vms::server::resource::SharedContextPool(this));
     m_archiveIntegrityWatcher = store(new nx::vms::server::ServerArchiveIntegrityWatcher(this));
     m_updateManager = store(new nx::vms::server::ServerUpdateManager(this));
-    m_serverUpdateTool = store(new QnServerUpdateTool(this));
-    auto dataDir = settings().dataDir();
-    m_motionHelper = store(new QnMotionHelper(settings().dataDir(), this));
+    auto dataDir = closeDirPath(settings().dataDir()) + QString("record_catalog");
+    m_motionHelper = store(new QnMotionHelper(dataDir, this));
 
     m_resourceCommandProcessor.reset(new QnResourceCommandProcessor());
 
@@ -371,6 +372,12 @@ void QnMediaServerModule::stop()
 
     m_licenseWatcher->stop();
     m_resourceSearchers->clear();
+
+    #ifdef ENABLE_VMAX
+        QnPlVmax480Resource::stopChunkReaders();
+    #endif
+
+    m_streamingChunkTranscoder->stop();
 }
 
 void QnMediaServerModule::stopLongRunnables()
@@ -564,11 +571,6 @@ QnGlobalSettings* QnMediaServerModule::globalSettings() const
     return m_commonModule->globalSettings();
 }
 
-QnServerUpdateTool* QnMediaServerModule::serverUpdateTool() const
-{
-    return m_serverUpdateTool;
-}
-
 QnMotionHelper* QnMediaServerModule::motionHelper() const
 {
     return  m_motionHelper;
@@ -688,4 +690,16 @@ nx::vms::server::network::MulticastAddressRegistry*
 QnStoragePluginFactory* QnMediaServerModule::storagePluginFactory() const
 {
     return m_commonModule->storagePluginFactory();
+}
+
+QString QnMediaServerModule::metadataDatabaseDir() const
+{
+    auto server = resourcePool()->getResourceById<QnMediaServerResource>(commonModule()->moduleGUID());
+    const auto defaultDir = nx::network::url::normalizePath(settings().dataDir());
+    if (!server)
+        return defaultDir;
+    auto storageResource = resourcePool()->getResourceById<QnStorageResource>(
+        server->metadataStorageId());
+    const auto pathBase = storageResource ? storageResource->getPath() : defaultDir;
+    return closeDirPath(pathBase);
 }

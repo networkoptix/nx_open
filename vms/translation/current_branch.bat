@@ -1,3 +1,3 @@
 @echo off
-set CURRENT_BRANCH=vms_4.0
+set CURRENT_BRANCH=vms
 echo Current branch is %CURRENT_BRANCH%

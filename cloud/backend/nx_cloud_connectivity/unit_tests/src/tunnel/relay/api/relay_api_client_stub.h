@@ -17,9 +17,9 @@ enum class RequestProcessingBehavior
 };
 
 class ClientStub:
-    public api::Client
+    public api::AbstractClient
 {
-    using base_type = api::Client;
+    using base_type = api::AbstractClient;
 
 public:
     ClientStub(const nx::utils::Url& relayUrl = nx::utils::Url());

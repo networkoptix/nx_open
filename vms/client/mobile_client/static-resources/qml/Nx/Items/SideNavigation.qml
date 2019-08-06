@@ -14,7 +14,7 @@ Drawer
         Screen.orientation === Qt.LandscapeOrientation ? leftCustomMargin : 0
 
     position: 0
-    enabled: stackView.depth === 1
+    interactive: stackView.depth === 1
     width: offset + Math.min(
         ApplicationWindow.window.width - 56,
         ApplicationWindow.window.height - 56,

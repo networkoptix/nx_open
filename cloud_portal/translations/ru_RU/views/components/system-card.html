@@ -23,9 +23,9 @@
         </p>
 
         <p ng-if="system.permissions.isAdmin">
-            <button class="btn btn-default" ng-click="rename()">Переименовать систему</button>
+            <button class="btn btn-default" ng-click="rename()" ng-disabled="currentlyMerging && !isMaster">Переименовать систему</button>
         </p>
-        <button class="btn btn-default" ng-click="delete()">Отвязать от учетной записи</button>
+        <button class="btn btn-default" ng-click="delete()" ng-disabled="currentlyMerging">Отвязать от учетной записи</button>
     </div>
 </div>
 <div class="mt-3 card card-default" ng-if="currentlyMerging">
@@ -50,7 +50,7 @@
         <div class="merge-info-text">
             <p>В зависимости от размера базы данных может потребоваться до нескольких часов.</p>
             <p>До окончания объединения вы можете войти в эту систему и посмотреть видео, но не можете изменить какие-либо настройки.</p>
-            <p>После завершения объединения все пользователи и камеры из этой системы станут доступны в <span class="merge-system-name">{{mergeTargetSystem.name}}</span>. Система, и эта система будет удалены.</p>
+            <p>После завершения объединения все пользователи и камеры из этой системы станут доступны в <span class="merge-system-name">{{mergeTargetSystem.name}}</span>, а эта система будет удалена.</p>
         </div>
     </div>
 </div>

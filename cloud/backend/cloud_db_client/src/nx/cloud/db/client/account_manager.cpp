@@ -5,8 +5,10 @@
 
 namespace nx::cloud::db::client {
 
-AccountManager::AccountManager(network::cloud::CloudModuleUrlFetcher* const cloudModuleEndPointFetcher):
-    AsyncRequestsExecutor(cloudModuleEndPointFetcher)
+AccountManager::AccountManager(
+    network::cloud::CloudModuleUrlFetcher* cloudModuleUrlFetcher)
+    :
+    AsyncRequestsExecutor(cloudModuleUrlFetcher)
 {
 }
 

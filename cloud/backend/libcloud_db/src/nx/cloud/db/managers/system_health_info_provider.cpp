@@ -10,7 +10,7 @@ namespace nx::cloud::db {
 
 SystemHealthInfoProvider::SystemHealthInfoProvider(
     clusterdb::engine::ConnectionManager* ec2ConnectionManager,
-    nx::sql::AsyncSqlQueryExecutor* const dbManager)
+    nx::sql::AbstractAsyncSqlQueryExecutor* const dbManager)
     :
     m_ec2ConnectionManager(ec2ConnectionManager),
     m_dbManager(dbManager),
@@ -18,14 +18,14 @@ SystemHealthInfoProvider::SystemHealthInfoProvider(
 {
     using namespace std::placeholders;
 
-    m_ec2ConnectionManager->systemStatusChangedSubscription().subscribe(
+    m_ec2ConnectionManager->clusterStatusChangedSubscription().subscribe(
         std::bind(&SystemHealthInfoProvider::onSystemStatusChanged, this, _1, _2),
         &m_systemStatusChangedSubscriptionId);
 }
 
 SystemHealthInfoProvider::~SystemHealthInfoProvider()
 {
-    m_ec2ConnectionManager->systemStatusChangedSubscription().removeSubscription(
+    m_ec2ConnectionManager->clusterStatusChangedSubscription().removeSubscription(
         m_systemStatusChangedSubscriptionId);
 
     m_startedAsyncCallsCounter.wait();
@@ -40,7 +40,7 @@ bool SystemHealthInfoProvider::isSystemOnline(
 void SystemHealthInfoProvider::getSystemHealthHistory(
     const AuthorizationInfo& /*authzInfo*/,
     data::SystemId systemId,
-    std::function<void(api::ResultCode, api::SystemHealthHistory)> completionHandler)
+    std::function<void(api::Result, api::SystemHealthHistory)> completionHandler)
 {
     using namespace std::placeholders;
 
@@ -63,7 +63,7 @@ void SystemHealthInfoProvider::getSystemHealthHistory(
 
 void SystemHealthInfoProvider::onSystemStatusChanged(
     const std::string& systemId,
-    clusterdb::engine::SystemStatusDescriptor statusDescription)
+    clusterdb::engine::NodeStatusDescriptor statusDescription)
 {
     using namespace std::placeholders;
 
@@ -102,7 +102,7 @@ SystemHealthInfoProviderFactory& SystemHealthInfoProviderFactory::instance()
 
 std::unique_ptr<AbstractSystemHealthInfoProvider> SystemHealthInfoProviderFactory::defaultFactory(
     clusterdb::engine::ConnectionManager* ec2ConnectionManager,
-    nx::sql::AsyncSqlQueryExecutor* const dbManager)
+    nx::sql::AbstractAsyncSqlQueryExecutor* const dbManager)
 {
     return std::make_unique<SystemHealthInfoProvider>(
         ec2ConnectionManager,

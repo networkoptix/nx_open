@@ -49,6 +49,7 @@ void TrafficRelayStatisticsCollector::onSessionStarted(const std::string& id)
     ++m_currentSessionCount;
 
     m_maxSessionCountPerPeriodCalculator.add(currentSessionCount);
+    m_newSessionCounter.add(1);
 }
 
 void TrafficRelayStatisticsCollector::onSessionStopped(
@@ -85,6 +86,7 @@ RelaySessionStatistics TrafficRelayStatisticsCollector::statistics() const
     result.sessionDurationSecMaxPerLastHour = m_maxSessionDurationCalculator.top().count();
     result.sessionDurationSecAveragePerLastHour =
         m_averageSessionDurationCalculator.getAveragePerLastPeriod();
+    result.newSessionCountPerLastMinute = m_newSessionCounter.getSumPerLastPeriod();
 
     return result;
 }

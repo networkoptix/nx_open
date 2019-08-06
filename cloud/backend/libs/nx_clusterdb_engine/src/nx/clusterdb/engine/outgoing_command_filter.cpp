@@ -1,6 +1,6 @@
 #include "outgoing_command_filter.h"
 
-#include "transaction_log.h"
+#include "command_log.h"
 
 namespace nx::clusterdb::engine {
 
@@ -21,6 +21,20 @@ bool OutgoingCommandFilter::satisfies(const CommandHeader& commandHeader) const
         return false;
 
     return true;
+}
+
+NodeState OutgoingCommandFilter::filter(const NodeState& value) const
+{
+    NodeState result;
+    for (const auto& [node, sequence]: value.nodeSequence)
+    {
+        if (m_configuration.sendOnlyOwnCommands && node.nodeId != m_selfPeerId)
+            continue;
+
+        result.nodeSequence[node] = sequence;
+    }
+
+    return result;
 }
 
 void OutgoingCommandFilter::updateReadFilter(ReadCommandsFilter* readFilter) const

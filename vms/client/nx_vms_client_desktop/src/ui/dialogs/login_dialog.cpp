@@ -41,12 +41,12 @@
 #include <nx/streaming/abstract_archive_stream_reader.h>
 #include <core/resource/avi/filetypesupport.h>
 
+#include <nx/vms/client/desktop/system_logon/data/logon_parameters.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/dialogs/connection_name_dialog.h>
 #include <ui/dialogs/connection_testing_dialog.h>
-#include <ui/graphics/items/resource/decodedpicturetoopengluploadercontextpool.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/globals.h>
@@ -218,7 +218,6 @@ QnLoginDialog::QnLoginDialog(QWidget *parent):
     layout->setSpacing(0);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(m_renderingWidget);
-    DecodedPictureToOpenGLUploaderContextPool::instance()->ensureThereAreContextsSharedWith(m_renderingWidget);
 
     ui->connectionsComboBox->setModel(m_connectionsModel);
 
@@ -273,7 +272,7 @@ void QnLoginDialog::updateFocus()
 nx::utils::Url QnLoginDialog::currentUrl() const
 {
     nx::utils::Url url;
-    url.setScheme(lit("http"));
+    url.setScheme(nx::network::http::kSecureUrlSchemeName);
     url.setHost(ui->hostnameLineEdit->text().trimmed());
     url.setPort(ui->portSpinBox->value());
     url.setUserName(ui->loginLineEdit->text().trimmed());
@@ -323,7 +322,7 @@ void QnLoginDialog::accept()
             {
                 case Qn::SuccessConnectionResult:
                 {
-                    // In most cases we will connect succesfully by this url. Sow we can store it.
+                    // In most cases we will connect succesfully by this url. So we can store it.
 
                     const bool autoLogin = ui->autoLoginCheckBox->isChecked();
                     nx::utils::Url lastUrlForLoginDialog = url;
@@ -336,13 +335,13 @@ void QnLoginDialog::accept()
                     const bool storePasswordForTile =
                         haveToStorePassword(connectionInfo.localSystemId, url) || autoLogin;
 
-                    action::Parameters params;
-                    params.setArgument(Qn::UrlRole, url);
-                    params.setArgument(Qn::StoreSessionRole, true);
-                    params.setArgument(Qn::AutoLoginRole, autoLogin);
-                    params.setArgument(Qn::StorePasswordRole, storePasswordForTile);
-                    params.setArgument(Qn::ForceRole, true);
-                    menu()->trigger(action::ConnectAction, params);
+                    LogonParameters parameters(url);
+                    parameters.storePassword = storePasswordForTile;
+                    parameters.autoLogin = autoLogin;
+                    parameters.force = true;
+
+                    menu()->trigger(action::ConnectAction,
+                        action::Parameters().withArgument(Qn::LogonParametersRole, parameters));
 
                     break;
                 }
@@ -766,7 +765,7 @@ void QnLoginDialog::at_moduleChanged(nx::vms::discovery::ModuleEndpoint module)
 
     QnFoundSystemData data;
     data.info = module;
-    data.url.setScheme(lit("http"));
+    data.url.setScheme(nx::network::http::kSecureUrlSchemeName);
     data.url.setHost(module.endpoint.address.toString());
     data.url.setPort(module.endpoint.port);
 

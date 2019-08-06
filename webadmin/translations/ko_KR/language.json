@@ -8,7 +8,7 @@
     "setup": {
         "createAccount": "계정을 만듭니다",
         "errorNoHDD": "이 장치는 Hdd를 설치하여 사용하도록 설계 되었습니다. <br>장치 전원을 Off하고 Hdd를 설치하세요",
-        "errorNoNetwork": "이 장치에 네트워크 연결이 필요 합니다. <br>로컬 네트워크 or 인터넷에 연결하세요"
+        "errorNoNetwork": "이 장치에 네트워크 연결이 필요 합니다. <br>로컬 네트워크 또는 인터넷에 연결하세요"
     },
     "passwordRequirements": {
         "minLengthMessage": "비밀번호는 8자 이상이어야 합니다",
@@ -192,17 +192,17 @@
     },
     "common": {
         "voiceCommands": {
-            "search": "find + [text for searchbar]",
+            "search": "찾기 + [text for searchbar]",
             "pause": "일시정지",
-            "help": "help | show commands",
+            "help": "도움말 | 명령 표시",
             "collapse all servers": "모든 서버 축소",
-            "collapse server": "collapse server + [server name]",
+            "collapse server": "서버축소 + [server name]",
             "play": "재생",
             "clear search": "검색창 지우기",
             "live": "go to live | show me live",
             "expand all servers": "모든 서버 확장",
             "stop listening": "듣기 중지",
-            "expand server": "expand server + [server name]",
+            "expand server": "서버확장 + [server name]",
             "view": "view + [camera name]"
         },
         "systemOffline": "시스템 오프라인",

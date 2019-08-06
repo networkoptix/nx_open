@@ -19,7 +19,7 @@ bool deserialize(const QnRequestParamList& value, const QString& key, T* target)
     if (pos == value.end())
         return false;
     else
-        return QnLexical::deserialize(pos->second, target);
+        return QnLexical::deserialize(pos.value(), target);
 }
 
 template<class T>

@@ -1,6 +1,7 @@
 import QtQuick 2.6
 import QtGraphicalEffects 1.0
 import Nx.Core.Items 1.0
+import "utils.js" as Utils
 
 Item
 {
@@ -10,11 +11,12 @@ Item
     property point endPoint
     property bool drawing: false
 
-    property alias animationDuration: singleSelectionMarker.animationDuration
     property color roiColor
     property color shadowColor
     property int lineWidth: 1
     property bool singlePoint: true
+
+    property bool expandingFinished: false
 
     x: d.topLeftPoint.x
     y: d.topLeftPoint.y
@@ -58,6 +60,18 @@ Item
 
         centerPoint: d.endMarkerPoint
         visible: opacity > 0
+
+        onExpandingFinishedChanged:
+        {
+            // We use motion MotionRoi::expandingFinished to determine if drawing is in process.
+            // Since it's value depends on MotionRoi state, we have to use executeLater to
+            // break direct dependencies and avoid binding loop.
+            var value = singleSelectionMarker.expandingFinished
+            var updateExpandingFlag =
+                function() { item.expandingFinished = value }
+
+            Utils.executeLater(updateExpandingFlag, this)
+        }
     }
 
     Rectangle

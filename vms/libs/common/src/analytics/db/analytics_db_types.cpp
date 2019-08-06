@@ -15,35 +15,59 @@ namespace nx::analytics::db {
 bool ObjectPosition::operator==(const ObjectPosition& right) const
 {
     return deviceId == right.deviceId
-        && timestampUsec == right.timestampUsec
-        && durationUsec == right.durationUsec
+        && timestampUs == right.timestampUs
+        && durationUs == right.durationUs
         && equalWithPrecision(boundingBox, right.boundingBox, kCoordinateDecimalDigits)
         && attributes == right.attributes;
 }
 
 bool BestShot::operator==(const BestShot& right) const
 {
-    return timestampUsec == right.timestampUsec
+    return timestampUs == right.timestampUs
         && equalWithPrecision(rect, right.rect, kCoordinateDecimalDigits);
 }
 
-bool DetectedObject::operator==(const DetectedObject& right) const
+bool ObjectTrack::operator==(const ObjectTrack& right) const
 {
-    return objectAppearanceId == right.objectAppearanceId
+    return id == right.id
         && objectTypeId == right.objectTypeId
         //&& attributes == right.attributes
-        && firstAppearanceTimeUsec == right.firstAppearanceTimeUsec
-        && lastAppearanceTimeUsec == right.lastAppearanceTimeUsec
-        && track == right.track
+        && firstAppearanceTimeUs == right.firstAppearanceTimeUs
+        && lastAppearanceTimeUs == right.lastAppearanceTimeUs
+        && objectPositionSequence == right.objectPositionSequence
         && bestShot == right.bestShot;
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (BestShot)(DetectedObject)(ObjectPosition),
+    (BestShot)(ObjectTrack)(ObjectPosition),
     (json)(ubjson),
     _analytics_storage_Fields)
 
 //-------------------------------------------------------------------------------------------------
+
+template<typename T>
+bool isSameItems(const std::vector<T>& left, const std::vector<T>& right)
+{
+    for (const auto& item: left)
+    {
+        if (std::find(right.begin(), right.end(), item) == right.end())
+            return false;
+    }
+
+    for (const auto& item: right)
+    {
+        if (std::find(left.begin(), left.end(), item) == left.end())
+            return false;
+    }
+
+    return true;
+}
+
+Filter::Filter()
+{
+    // NOTE: The default time period constructor provides an empty time period.
+    timePeriod.setEndTimeMs(QnTimePeriod::kMaxTimeValue);
+}
 
 bool Filter::empty() const
 {
@@ -52,10 +76,19 @@ bool Filter::empty() const
 
 bool Filter::operator==(const Filter& right) const
 {
+    if (boundingBox.has_value() != right.boundingBox.has_value())
+        return false;
+
+    if (boundingBox.has_value() &&
+        !equalWithPrecision(*boundingBox, *right.boundingBox, kCoordinateDecimalDigits))
+    {
+        return false;
+    }
+
     return objectTypeId == right.objectTypeId
-        && objectAppearanceId == right.objectAppearanceId
+        && objectTrackId == right.objectTrackId
         && timePeriod == right.timePeriod
-        && equalWithPrecision(boundingBox, right.boundingBox, kCoordinateDecimalDigits)
+        && isSameItems(requiredAttributes, right.requiredAttributes)
         && freeText == right.freeText
         && sortOrder == right.sortOrder;
 }
@@ -73,18 +106,18 @@ void serializeToParams(const Filter& filter, QnRequestParamList* params)
     for (const auto& objectTypeId: filter.objectTypeId)
         params->insert(lit("objectTypeId"), objectTypeId);
 
-    if (!filter.objectAppearanceId.isNull())
-        params->insert(lit("objectAppearanceId"), filter.objectAppearanceId.toSimpleString());
+    if (!filter.objectTrackId.isNull())
+        params->insert(lit("objectTrackId"), filter.objectTrackId.toSimpleString());
 
     params->insert(lit("startTime"), QnLexical::serialized(filter.timePeriod.startTimeMs));
     params->insert(lit("endTime"), QnLexical::serialized(filter.timePeriod.endTimeMs()));
 
-    if (!filter.boundingBox.isNull())
+    if (filter.boundingBox)
     {
-        params->insert(lit("x1"), QString::number(filter.boundingBox.topLeft().x()));
-        params->insert(lit("y1"), QString::number(filter.boundingBox.topLeft().y()));
-        params->insert(lit("x2"), QString::number(filter.boundingBox.bottomRight().x()));
-        params->insert(lit("y2"), QString::number(filter.boundingBox.bottomRight().y()));
+        params->insert(lit("x1"), QString::number(filter.boundingBox->topLeft().x()));
+        params->insert(lit("y1"), QString::number(filter.boundingBox->topLeft().y()));
+        params->insert(lit("x2"), QString::number(filter.boundingBox->bottomRight().x()));
+        params->insert(lit("y2"), QString::number(filter.boundingBox->bottomRight().y()));
     }
 
     if (!filter.freeText.isEmpty())
@@ -94,25 +127,25 @@ void serializeToParams(const Filter& filter, QnRequestParamList* params)
             QString::fromUtf8(QUrl::toPercentEncoding(filter.freeText)));
     }
 
-    if (filter.maxObjectsToSelect > 0)
-        params->insert(lit("limit"), QString::number(filter.maxObjectsToSelect));
+    if (filter.maxObjectTracksToSelect > 0)
+        params->insert(lit("limit"), QString::number(filter.maxObjectTracksToSelect));
 
-    if (filter.maxTrackSize > 0)
-        params->insert(lit("maxTrackSize"), QString::number(filter.maxTrackSize));
+    if (filter.maxObjectTrackSize > 0)
+        params->insert(lit("maxObjectTrackSize"), QString::number(filter.maxObjectTrackSize));
 
     params->insert(lit("sortOrder"), QnLexical::serialized(filter.sortOrder));
 }
 
 bool deserializeFromParams(const QnRequestParamList& params, Filter* filter)
 {
-    for (const auto& deviceIdStr: params.allValues(lit("deviceId")))
+    for (const auto& deviceIdStr: params.values(lit("deviceId")))
         filter->deviceIds.push_back(QnUuid::fromStringSafe(deviceIdStr));
 
-    for (const auto& objectTypeId: params.allValues(lit("objectTypeId")))
+    for (const auto& objectTypeId: params.values(lit("objectTypeId")))
         filter->objectTypeId.push_back(objectTypeId);
 
-    if (params.contains(lit("objectAppearanceId")))
-        filter->objectAppearanceId = QnUuid::fromStringSafe(params.value(lit("objectAppearanceId")));
+    if (params.contains(lit("objectTrackId")))
+        filter->objectTrackId = QnUuid::fromStringSafe(params.value(lit("objectTrackId")));
 
     filter->timePeriod.setStartTime(
         std::chrono::milliseconds(params.value("startTime").toLongLong()));
@@ -131,13 +164,13 @@ bool deserializeFromParams(const QnRequestParamList& params, Filter* filter)
         if (!(params.contains(lit("y1")) && params.contains(lit("x2")) && params.contains(lit("y2"))))
             return false;
 
-        filter->boundingBox.setTopLeft(QPointF(
-            params.value(lit("x1")).toDouble(),
-            params.value(lit("y1")).toDouble()));
-
-        filter->boundingBox.setBottomRight(QPointF(
-            params.value(lit("x2")).toDouble(),
-            params.value(lit("y2")).toDouble()));
+        filter->boundingBox = QRectF(
+            QPointF(
+                params.value(lit("x1")).toDouble(),
+                params.value(lit("y1")).toDouble()),
+            QPointF(
+                params.value(lit("x2")).toDouble(),
+                params.value(lit("y2")).toDouble()));
     }
 
     if (params.contains(lit("freeText")))
@@ -147,13 +180,13 @@ bool deserializeFromParams(const QnRequestParamList& params, Filter* filter)
     }
 
     if (params.contains(lit("limit")))
-        filter->maxObjectsToSelect = params.value(lit("limit")).toInt();
+        filter->maxObjectTracksToSelect = params.value(lit("limit")).toInt();
 
     if (params.contains(lit("maxObjectsToSelect")))
-        filter->maxObjectsToSelect = params.value(lit("maxObjectsToSelect")).toInt();
+        filter->maxObjectTracksToSelect = params.value(lit("maxObjectsToSelect")).toInt();
 
-    if (params.contains(lit("maxTrackSize")))
-        filter->maxTrackSize = params.value(lit("maxTrackSize")).toInt();
+    if (params.contains(lit("maxObjectTrackSize")))
+        filter->maxObjectTrackSize = params.value(lit("maxObjectTrackSize")).toInt();
 
     return true;
 }
@@ -164,23 +197,23 @@ bool deserializeFromParams(const QnRequestParamList& params, Filter* filter)
         os << "deviceId " << deviceId.toSimpleString().toStdString() << "; ";
     if (!filter.objectTypeId.empty())
         os << "objectTypeId " << lm("%1").container(filter.objectTypeId).toStdString() << "; ";
-    if (!filter.objectAppearanceId.isNull())
-        os << "objectAppearanceId " << filter.objectAppearanceId.toSimpleString().toStdString() << "; ";
+    if (!filter.objectTrackId.isNull())
+        os << "objectTrackId " << filter.objectTrackId.toSimpleString().toStdString() << "; ";
     os << "timePeriod [" << filter.timePeriod.startTimeMs << ", " <<
         filter.timePeriod.durationMs << "]; ";
-    if (!filter.boundingBox.isNull())
+    if (filter.boundingBox)
     {
         os << "boundingBox [" <<
-            filter.boundingBox.topLeft().x() << ", " <<
-            filter.boundingBox.topLeft().y() << ", " <<
-            filter.boundingBox.bottomRight().x() << ", " <<
-            filter.boundingBox.bottomRight().y() << "]; ";
+            filter.boundingBox->topLeft().x() << ", " <<
+            filter.boundingBox->topLeft().y() << ", " <<
+            filter.boundingBox->bottomRight().x() << ", " <<
+            filter.boundingBox->bottomRight().y() << "]; ";
     }
     if (!filter.freeText.isEmpty())
         os << "freeText \"" << filter.freeText.toStdString() << "\"; ";
 
-    os << "maxObjectsToSelect " << filter.maxObjectsToSelect << "; ";
-    os << "maxTrackSize " << filter.maxTrackSize << "; ";
+    os << "maxObjectsToSelect " << filter.maxObjectTracksToSelect << "; ";
+    os << "maxObjectTrackSize " << filter.maxObjectTrackSize << "; ";
     os << "sortOrder " <<
         (filter.sortOrder == Qt::SortOrder::DescendingOrder ? "DESC" : "ASC");
 
@@ -196,7 +229,7 @@ QString toString(const Filter& filter)
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (Filter),
-    (json)(ubjson),
+    (json),
     _analytics_storage_Fields)
 
 //-------------------------------------------------------------------------------------------------

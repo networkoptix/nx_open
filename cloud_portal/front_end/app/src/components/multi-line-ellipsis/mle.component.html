@@ -1,0 +1,15 @@
+<div class="ellipsis"
+     [style.height]="ellipsis.viewHeight"
+     [style.line-height]="ellipsis.viewLineHeight + 'px'">
+
+    <div class="ellipsis-before" [style.height]="ellipsis.viewHeight"></div>
+    <div class="ellipsis-body">
+        <ng-content></ng-content>
+    </div>
+
+    <div class="ellipsis-after"
+         [style.top]="-ellipsis.viewLineHeight + 'px'"
+         (click)="ellipsis.viewMoreDescr()"
+         *ngIf="!ellipsis.viewMore"> ...
+    </div>
+</div>

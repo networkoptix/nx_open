@@ -74,8 +74,8 @@ int GetMergeStatusHandler::executeGet(
 
     nx::vms::api::MergeStatusReply reply;
     auto commonModule = owner->commonModule();
-    auto masterId = commonModule->globalSettings()->LastMergeMasterId();
-    auto slaveId = commonModule->globalSettings()->LastMergeSlaveId();
+    auto masterId = commonModule->globalSettings()->lastMergeMasterId();
+    auto slaveId = commonModule->globalSettings()->lastMergeSlaveId();
     reply.mergeId = masterId.isNull() ? slaveId : masterId;
     if (request.isLocal)
     {

@@ -15,9 +15,9 @@ class NX_NETWORK_API BindRequest:
 public:
     constexpr static const auto kMethod = network::stun::extension::methods::bind;
 
-    std::list<network::SocketAddress> publicEndpoints;
+    std::vector<network::SocketAddress> publicEndpoints;
 
-    BindRequest(std::list<network::SocketAddress> _publicEndpoints = {});
+    BindRequest(std::vector<network::SocketAddress> _publicEndpoints = {});
     virtual void serializeAttributes(nx::network::stun::Message* const message) override;
     virtual bool parseAttributes(const nx::network::stun::Message& message) override;
 };

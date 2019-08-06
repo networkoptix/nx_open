@@ -36,7 +36,7 @@ public:
     virtual void registerTemporaryCredentials(
         const AuthorizationInfo& authzInfo,
         data::TemporaryAccountCredentials tmpPasswordData,
-        std::function<void(api::ResultCode)> completionHandler) = 0;
+        std::function<void(api::Result)> completionHandler) = 0;
 
     virtual void addRandomCredentials(
         const std::string& accountEmail,
@@ -82,7 +82,7 @@ public:
     TemporaryAccountPasswordManager(
         const conf::AccountManager& settings,
         const nx::utils::stree::ResourceNameSet& attributeNameset,
-        nx::sql::AsyncSqlQueryExecutor* const dbManager,
+        nx::sql::AbstractAsyncSqlQueryExecutor* const dbManager,
         dao::AbstractTemporaryCredentialsDao* const dao) noexcept(false);
     virtual ~TemporaryAccountPasswordManager();
 
@@ -90,12 +90,12 @@ public:
         const nx::network::http::StringType& username,
         const std::function<bool(const nx::Buffer&)>& validateHa1Func,
         nx::utils::stree::ResourceContainer* const authProperties,
-        nx::utils::MoveOnlyFunc<void(api::ResultCode)> completionHandler) override;
+        nx::utils::MoveOnlyFunc<void(api::Result)> completionHandler) override;
 
     virtual void registerTemporaryCredentials(
         const AuthorizationInfo& authzInfo,
         data::TemporaryAccountCredentials tmpPasswordData,
-        std::function<void(api::ResultCode)> completionHandler) override;
+        std::function<void(api::Result)> completionHandler) override;
 
     /**
      * Adds password and password digest.
@@ -159,7 +159,7 @@ private:
 
     const conf::AccountManager m_settings;
     const nx::utils::stree::ResourceNameSet& m_attributeNameset;
-    nx::sql::AsyncSqlQueryExecutor* const m_dbManager;
+    nx::sql::AbstractAsyncSqlQueryExecutor* const m_dbManager;
     nx::utils::Counter m_startedAsyncCallsCounter;
     TemporaryCredentialsDictionary m_temporaryCredentials;
     mutable QnMutex m_mutex;
@@ -189,7 +189,7 @@ private:
         const QnMutexLockerBase& lk,
         const std::string& username,
         std::function<bool(const nx::Buffer&)> checkPasswordHash,
-        api::ResultCode* authResultCode);
+        api::Result* authResultCode);
 
     void runExpirationRulesOnSuccessfulLogin(
         const QnMutexLockerBase& lk,

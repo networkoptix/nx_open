@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../abstract_transaction_transport.h"
+#include "abstract_command_transport.h"
 
 namespace nx::clusterdb::engine::transport {
 

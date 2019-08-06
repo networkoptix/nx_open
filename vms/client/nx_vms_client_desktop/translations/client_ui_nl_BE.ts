@@ -1969,14 +1969,6 @@
     </message>
   </context>
   <context>
-    <name>MessageBox</name>
-    <message>
-      <location filename="../src/ui/dialogs/common/message_box.ui"/>
-      <source>Do not show this message again</source>
-      <translation>Toon dit bericht niet opnieuw</translation>
-    </message>
-  </context>
-  <context>
     <name>MultiServerUpdatesWidget</name>
     <message>
       <location filename="../src/nx/vms/client/desktop/system_update/multi_server_updates_widget.ui"/>
@@ -2059,11 +2051,6 @@
       <source>New Virtual Camera...</source>
       <translation>Nieuwe virtuele camera...</translation>
     </message>
-    <message>
-      <location/>
-      <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
-      <translation>&quot;Virtual Camera&quot; is een virtuele opslag voor videobestanden, die kunnen worden geüpload naar elke server op uw systeem en door elke gebruiker kunnen worden geopend.</translation>
-    </message>
   </context>
   <context>
     <name>OpenLayoutActionWidget</name>
@@ -2107,9 +2094,9 @@
     </message>
   </context>
   <context>
-    <name>PluginEventWidget</name>
+    <name>PluginDiagnosticEventWidget</name>
     <message>
-      <location filename="../src/nx/vms/client/desktop/ui/event_rules/widgets/plugin_event_widget.ui"/>
+      <location filename="../src/nx/vms/client/desktop/ui/event_rules/widgets/plugin_diagnostic_event_widget.ui"/>
       <source>Source:</source>
       <translation>Bron:</translation>
     </message>
@@ -2360,6 +2347,14 @@
       <location/>
       <source>The new System will have password and name from System:</source>
       <translation>Het nieuwe systeem heeft wachtwoord en naam van systeem:</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnMessageBox</name>
+    <message>
+      <location filename="../src/ui/dialogs/common/message_box.ui"/>
+      <source>Do not show this message again</source>
+      <translation>Toon dit bericht niet opnieuw</translation>
     </message>
   </context>
   <context>
@@ -2651,11 +2646,6 @@
     </message>
     <message>
       <location/>
-      <source>Filter TEST</source>
-      <translation>Filter TEST</translation>
-    </message>
-    <message>
-      <location/>
       <source>Nothing found</source>
       <translation>Niets gevonden</translation>
     </message>
@@ -2782,11 +2772,6 @@
       <location/>
       <source>Limit session duration</source>
       <translation>Beperk sessiegeduur</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
-      <translation>Watermerken worden alleen weergegeven voor live, gearchiveerde en geëxporteerde video's voor niet-beheerdersgebruikers. U en andere beheerders zullen ze niet zien.</translation>
     </message>
   </context>
   <context>
@@ -3078,23 +3063,23 @@
     </message>
     <message>
       <location/>
-      <source>Analytics data can occupy tens of gigabytes of storage space. We recommend to chose other location for it instead of the system partition.</source>
-      <translation type="unfinished">Analytics data can occupy tens of gigabytes of storage space. We recommend to chose other location for it instead of the system partition.</translation>
-    </message>
-    <message>
-      <location/>
       <source>Analytics data will continue to be stored on the disabled storage.</source>
-      <translation type="unfinished">Analytics data will continue to be stored on the disabled storage.</translation>
+      <translation>Analytics-gegevens worden nog steeds opgeslagen op de uitgeschakelde opslag.</translation>
     </message>
     <message>
       <location/>
       <source>Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</source>
-      <translation type="unfinished">Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</translation>
+      <translation>Opname van de uitgeschakelde opslag zal stoppen. Echter, het overschrijven dan de oudste beelden gaat gewoon door.</translation>
     </message>
     <message>
       <location/>
       <source>Recording was enabled on the USB storage</source>
-      <translation type="unfinished">Recording was enabled on the USB storage</translation>
+      <translation>Opname is ingeschakeld op de USB-opslag</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Analytics data can occupy tens of gigabytes of storage space. We recommend to choose other location for it instead of the system partition.</source>
+      <translation>Analytics-gegevens kunnen tientallen gigabytes aan opslagruimte innemen. We raden aan om een andere locatie te kiezen in plaats van de systeempartitie.</translation>
     </message>
   </context>
   <context>

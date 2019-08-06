@@ -207,8 +207,6 @@ TEST_F(OutgoingTunnelConnectionTest, timeout)
     const int connectionsToCreate = 100;
     const int minTimeoutMillis = 50;
     const int maxTimeoutMillis = 2000;
-    //TODO #ak fault is too large. Investigate!
-    const std::chrono::milliseconds acceptableTimeoutFault(500);
 
     ASSERT_TRUE(start()) << SystemError::getLastOSErrorText().toStdString();
 

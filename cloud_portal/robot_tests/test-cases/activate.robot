@@ -4,10 +4,13 @@ Test Setup        Restart
 Test Teardown     Run Keyword If Test Failed    Open New Browser On Failure
 Suite Setup       Open Browser and go to URL    ${url}
 Suite Teardown    Close All Browsers
+Force Tags        Threaded File
+
 *** Variables ***
 ${password}    ${BASE PASSWORD}
 ${url}         ${ENV}
 ${symbol password}    pass!@#$%^&*()_-+=;:'"`~,./\|?[]{}
+
 *** Keywords ***
 Restart
     Register Keyword To Run On Failure    NONE
@@ -77,7 +80,7 @@ allows register, activate, login with +!#$%'*-/=?^_`{|}~ in email field
     Validate Log In
 
 allows register, activate, login with with leading space in email
-    [tags]    C41557    C41864
+    [tags]    C41864
     ${email}    Get Random Email    ${BASE EMAIL}
     Go To    ${url}/register
     Register    mark    hamill    ${SPACE}${email}    ${password}
@@ -86,7 +89,7 @@ allows register, activate, login with with leading space in email
     Validate Log In
 
 allows register, activate, login with with trailing space in email
-    [tags]    C41557    C41864
+    [tags]    C41864
     ${email}    Get Random Email    ${BASE EMAIL}
     Go To    ${url}/register
     Register    mark    hamill    ${email}${SPACE}    ${password}

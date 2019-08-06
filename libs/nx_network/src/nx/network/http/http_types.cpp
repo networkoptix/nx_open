@@ -4,6 +4,7 @@
 #include <cstring>
 #include <memory>
 
+#include <QtCore/QLocale>
 #include <QtCore/QString>
 
 #include <nx/network/socket_common.h>
@@ -18,6 +19,36 @@ static int strncasecmp(const char * str1, const char * str2, size_t n) { return 
 namespace nx {
 namespace network {
 namespace http {
+
+namespace {
+
+// Sun, 06 Nov 1994 08:49:37 GMT (RFC 822, updated by RFC 1123)
+QDateTime parseRfc1123Date(const QByteArray& date)
+{
+    static constexpr char kRfc1123Template[] = "ddd, dd MMM yyyy hh:mm:ss";
+    return QLocale(QLocale::C).toDateTime(date, kRfc1123Template);
+}
+
+// Sunday, 06-Nov-94 08:49:37 GMT (RFC 850, obsoleted by RFC 1036)
+QDateTime parseRfc850Date(const QByteArray& date)
+{
+    static constexpr char kRfc850Template[] = "dddd, dd-MMM-yy hh:mm:ss";
+    return QLocale(QLocale::C).toDateTime(date, kRfc850Template);
+}
+
+// Sun Nov  6 08:49:37 1994  (ANSI C's asctime() format)
+QDateTime parseAnsiCDate(const QByteArray& date)
+{
+    // QDateTime::fromString() requires exact format match, so two templates are required:
+    // Non padded if the day of the month is >= 10, and padded if day of the month is < 10
+    static constexpr char kAnsiCTemplate[]       = "ddd MMM d hh:mm:ss yyyy";
+    static constexpr char kAnsiCTemplatePadded[] = "ddd MMM  d hh:mm:ss yyyy";
+    return QLocale(QLocale::C).toDateTime(
+        date,
+        date[8] == ' ' ? kAnsiCTemplatePadded : kAnsiCTemplate);
+}
+
+} //namespace
 
 const char* const kUrlSchemeName = "http";
 const char* const kSecureUrlSchemeName = "https";
@@ -265,6 +296,8 @@ StringType toString(Value val)
             return StringType("Service Unavailable");
         case requestTimeOut:
             return StringType("Request Timeout");
+        case unsupportedMediaType:
+            return StringType("Unsupported Media Type");
         default:
             return StringType("Unknown_") + StringType::number(val);
     }
@@ -436,7 +469,7 @@ StringType RequestLine::toString() const
 {
     BufferType buf;
     serialize(&buf);
-    return buf;
+    return buf.trimmed();
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -1887,20 +1920,25 @@ const StringType ContentType::NAME(kContentType);
 const StringType ContentType::kAny("*/*");
 const StringType ContentType::kDefaultCharset("utf-8");
 
-const ContentType ContentType::kPlain("text/plain");
-const ContentType ContentType::kHtml("text/html");
+// TODO: Apply default charset (UTF-8) to every text based content types when it's not specified.
+// Currenlt UTF-8 is explicitly specified for texts only because some browsers may fail otherwise.
+const ContentType ContentType::kPlain("text/plain; charset=utf-8");
+const ContentType ContentType::kHtml("text/html; charset=utf-8");
+const ContentType ContentType::kXml("application/xml");
+const ContentType ContentType::kForm("application/x-www-form-urlencoded");
 const ContentType ContentType::kJson("application/json");
+const ContentType ContentType::kUbjson("application/ubjson");
+const ContentType ContentType::kBinary("application/octet-stream");
 
 ContentType::ContentType(const StringType& headerValue)
 {
     const auto records = headerValue.split(';');
-    value = records[0];
-    charset = kDefaultCharset;
+    value = records[0].toLower();
     for (int i = 1; i < records.count(); ++i)
     {
         const auto parts = records[i].trimmed().split('=');
         if (parts[0] == "charset" && parts.size() == 2)
-            charset = parts[1];
+            charset = parts[1].toLower();
     }
 }
 
@@ -1912,6 +1950,18 @@ StringType ContentType::toString() const
 
     return result;
 }
+
+bool ContentType::operator==(const ContentType& rhs) const
+{
+    if (value != rhs.value)
+        return false;
+
+    if (charset.isEmpty() || rhs.charset.isEmpty())
+        return true;
+
+    return charset == rhs.charset;
+}
+
 
 } // namespace header
 
@@ -2074,36 +2124,67 @@ StringType serverString()
     return defaultServerString;
 }
 
-static const char* weekDaysStr[] = { "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun" };
-static const char* months[] = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
-
 QByteArray formatDateTime(const QDateTime& value)
 {
-    static const int SECONDS_PER_MINUTE = 60;
-    static const int SECONDS_PER_HOUR = 3600;
+    // Starts with Monday to correspond with QDate::dayOfWeek() return value: 1 for Monday, 7 for Sunday
+    static constexpr const char* kWeekDays[] = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
+    static constexpr const char* kMonths[] = {
+         "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
 
     if (value.isNull() || !value.isValid())
         return QByteArray();
 
-    const QDate& date = value.date();
-    const QTime& time = value.time();
-    const int offsetFromUtcSeconds = value.offsetFromUtc();
-    const int offsetFromUtcHHMM =
-        (offsetFromUtcSeconds / SECONDS_PER_HOUR) * 100 +
-        (offsetFromUtcSeconds % SECONDS_PER_HOUR) / SECONDS_PER_MINUTE;
+    QDateTime utc = value.toUTC();
+    const QDate& date = utc.date();
+    const QTime& time = utc.time();
 
     char strDateBuf[256];
-    sprintf(strDateBuf, "%s, %02d %s %d %02d:%02d:%02d %+05d",
-        weekDaysStr[date.dayOfWeek() - 1],
+    sprintf(strDateBuf, "%s, %02d %s %d %02d:%02d:%02d GMT",
+        kWeekDays[date.dayOfWeek() - 1],
         date.day(),
-        months[date.month() - 1],
+        kMonths[date.month() - 1],
         date.year(),
         time.hour(),
         time.minute(),
-        time.second(),
-        offsetFromUtcHHMM);
+        time.second());
 
     return QByteArray(strDateBuf);
+}
+
+QDateTime parseDate(QByteArray date)
+{
+    if (date.startsWith(' ') || date.endsWith(' '))
+        date = date.trimmed();
+
+    // Sanity check. parseAnsiCDate() has hard coded array access.
+    if (date.length() < 8)
+        return QDateTime();
+
+    // If the string ends with " GMT" it is either RFC 1123 or RFC 850
+    if (date.endsWith(" GMT"))
+    {
+        // QDateTime::fromString() fails if string contains " GMT"
+        // because "M" is used as a formatter.
+        date.truncate(date.length() - 4);
+        QDateTime parsedDate;
+
+        // RFC 1123 date: first three characters are abbreviated day of the week, like "Sun",
+        // followed by a comma
+        if (date[3] == ',')
+            parsedDate = parseRfc1123Date(date);
+
+        if (!parsedDate.isValid())
+            parsedDate = parseRfc850Date(date);
+
+        if (parsedDate.isValid())
+        {
+            parsedDate.setTimeSpec(Qt::UTC);
+            return parsedDate;
+        }
+    }
+
+    // Fall back to ANSI C date.
+    return parseAnsiCDate(date);
 }
 
 } // namespace nx

@@ -17,6 +17,8 @@
 
 namespace {
 
+static constexpr char kCdbGuid[] = "{674bafd7-4eec-4bba-84aa-a1baea7fc6db}";
+
 const QLatin1String kEndpointsToListen("listenOn");
 const QLatin1String kDefaultEndpointsToListen("0.0.0.0:3346");
 
@@ -110,6 +112,9 @@ const int kDefaultTcpBacklogSize = 1024;
 const QLatin1String kConnectionInactivityPeriod("http/connectionInactivityPeriod");
 const std::chrono::milliseconds kDefaultConnectionInactivityPeriod(0); //< disabled
 
+const QLatin1String kMaintenanceHtdigestPath("http/maintenanceHtdigestPath");
+const QLatin1String kDefaultMaintenanceHtdigestPath("");
+
 //-------------------------------------------------------------------------------------------------
 // VmsGateway
 const QLatin1String kVmsGatewayUrl("vmsGateway/url");
@@ -134,6 +139,12 @@ constexpr int kDefaultLoginLockoutAuthFailureCount =
 const QLatin1String kLoginLockoutLockPeriod("loginLockout/lockPeriod");
 constexpr std::chrono::milliseconds kDefaultLoginLockoutLockPeriod =
     nx::network::server::UserLockerSettings().lockPeriod;
+
+//-------------------------------------------------------------------------------------------------
+// HostLockout
+
+constexpr char kHostLockoutEnabled[] = "hostLockout/enabled";
+constexpr bool kDefaultHostLockoutEnabled = true;
 
 } // namespace
 
@@ -231,11 +242,6 @@ nx::utils::log::Settings Settings::logging() const
     return m_logging;
 }
 
-const nx::utils::log::Settings& Settings::vmsSynchronizationLogging() const
-{
-    return m_vmsSynchronizationLogging;
-}
-
 const nx::sql::ConnectionOptions& Settings::dbConnectionOptions() const
 {
     return m_dbConnectionOptions;
@@ -244,11 +250,6 @@ const nx::sql::ConnectionOptions& Settings::dbConnectionOptions() const
 const Auth& Settings::auth() const
 {
     return m_auth;
-}
-
-std::optional<network::server::UserLockerSettings> Settings::loginLockout() const
-{
-    return m_loginLockout;
 }
 
 const Notification& Settings::notification() const
@@ -296,9 +297,9 @@ const VmsGateway& Settings::vmsGateway() const
     return m_vmsGateway;
 }
 
-const LoginEnumerationProtectionSettings& Settings::loginEnumerationProtectionSettings() const
+const Security& Settings::security() const
 {
-    return m_loginEnumerationProtectionSettings;
+    return m_security;
 }
 
 void Settings::setDbConnectionOptions(
@@ -328,7 +329,6 @@ void Settings::loadSettings()
 
     //log
     m_logging.load(settings(), QLatin1String("log"));
-    m_vmsSynchronizationLogging.load(settings(), QLatin1String("syncroLog"));
 
     //DB
     m_dbConnectionOptions.loadFromSettings(settings());
@@ -381,7 +381,7 @@ void Settings::loadSettings()
 
     loadAuth();
 
-    loadLoginLockout();
+    loadSecurity();
 
     //event manager
     m_eventManager.mediaServerConnectionIdlePeriod = duration_cast<seconds>(
@@ -390,6 +390,8 @@ void Settings::loadSettings()
             kDefaultMediaServerConnectionIdlePeriod));
 
     m_p2pDb.load(settings());
+    // NOTE: Intentionally not allowing overriding this value.
+    m_p2pDb.nodeId = kCdbGuid;
 
     m_moduleFinder.cloudModulesXmlTemplatePath = settings().value(
         kCloudModuleXmlTemplatePath, kDefaultCloudModuleXmlTemplatePath).toString();
@@ -404,6 +406,9 @@ void Settings::loadSettings()
         nx::utils::parseTimerDuration(
             settings().value(kConnectionInactivityPeriod).toString(),
             kDefaultConnectionInactivityPeriod));
+
+    m_http.maintenanceHtdigestPath = settings().value(
+        kMaintenanceHtdigestPath, kDefaultMaintenanceHtdigestPath).toString().toStdString();
 
     //vmsGateway
     m_vmsGateway.url = settings().value(kVmsGatewayUrl).toString().toStdString();
@@ -447,6 +452,12 @@ void Settings::loadAuth()
         kMaxSystemsToUpdateAtATime, kDefaultMaxSystemsToUpdateAtATime).toInt();
 }
 
+void Settings::loadSecurity()
+{
+    loadLoginLockout();
+    loadHostLockout();
+}
+
 void Settings::loadLoginLockout()
 {
     const auto loginLockoutEnabled = settings().value(
@@ -456,19 +467,32 @@ void Settings::loadLoginLockout()
     if (!loginLockoutEnabled)
         return;
 
-    m_loginLockout.emplace(network::server::UserLockerSettings());
+    m_security.loginLockout.emplace(network::server::UserLockerSettings());
 
-    m_loginLockout->checkPeriod = nx::utils::parseTimerDuration(
+    m_security.loginLockout->checkPeriod = nx::utils::parseTimerDuration(
         settings().value(kLoginLockoutCheckPeriod).toString(),
         kDefaultLoginLockoutCheckPeriod);
 
-    m_loginLockout->authFailureCount = settings().value(
+    m_security.loginLockout->authFailureCount = settings().value(
         kLoginLockoutAuthFailureCount,
         kDefaultLoginLockoutAuthFailureCount).toInt();
 
-    m_loginLockout->lockPeriod = nx::utils::parseTimerDuration(
+    m_security.loginLockout->lockPeriod = nx::utils::parseTimerDuration(
         settings().value(kLoginLockoutLockPeriod).toString(),
         kDefaultLoginLockoutLockPeriod);
+}
+
+void Settings::loadHostLockout()
+{
+    const auto hostLockoutEnabled = settings().value(
+        kHostLockoutEnabled,
+        kDefaultHostLockoutEnabled ? "true" : "false").toString() == "true";
+
+    if (!hostLockoutEnabled)
+        return;
+
+    m_security.loginEnumerationProtectionSettings.emplace(
+        LoginEnumerationProtectionSettings());
 }
 
 } // namespace conf

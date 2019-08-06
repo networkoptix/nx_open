@@ -54,7 +54,11 @@ export class NxModalGenericComponent implements OnInit {
 
     private dialog(message, title, actionLabel, actionType?, cancelLabel?,
                    hasFooter?, cancellable?, closable?) {
-        this.modalRef = this.modalService.open(GenericModalContent, {backdrop: 'static', centered: true});
+        this.modalRef = this.modalService.open(GenericModalContent,
+                {
+                            windowClass: 'modal-holder',
+                            backdrop: 'static'
+                        });
         this.modalRef.componentInstance.language = this.language.lang;
 
         this.modalRef.componentInstance.message = message;

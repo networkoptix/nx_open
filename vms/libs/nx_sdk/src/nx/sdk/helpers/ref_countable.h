@@ -1,8 +1,11 @@
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+
 #pragma once
 
 #include <atomic>
 
-#include <nx/sdk/interface.h>
+#include <nx/sdk/i_ref_countable.h>
+#include <nx/sdk/helpers/lib_context.h>
 
 namespace nx {
 namespace sdk {
@@ -74,6 +77,8 @@ private:
 
 /**
  * Recommended base class for objects implementing an interface.
+ *
+ * Supports tracking the ref-countable objects via RefCountableRegistry.
  */
 template <class RefCountableInterface>
 class RefCountable: public RefCountableInterface
@@ -83,7 +88,12 @@ public:
     RefCountable& operator=(const RefCountable&) = delete;
     RefCountable(RefCountable&&) = delete;
     RefCountable& operator=(RefCountable&&) = delete;
-    virtual ~RefCountable() = default;
+
+    virtual ~RefCountable()
+    {
+        if (const auto refCountableRegistry = libContext().refCountableRegistry())
+            refCountableRegistry->notifyDestroyed(this, refCount());
+    }
 
     using IRefCountable::queryInterface; //< Enable const overload.
 
@@ -93,7 +103,11 @@ public:
     int refCount() const { return m_refCountableHolder.refCount(); }
 
 protected:
-    RefCountable(): m_refCountableHolder(static_cast<const RefCountableInterface*>(this)) {}
+    RefCountable(): m_refCountableHolder(static_cast<const RefCountableInterface*>(this))
+    {
+        if (const auto refCountableRegistry = libContext().refCountableRegistry())
+            refCountableRegistry->notifyCreated(this, refCount());
+    }
 
 private:
     const RefCountableHolder m_refCountableHolder;

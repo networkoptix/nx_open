@@ -14,7 +14,7 @@
         std::void_t< \
             std::enable_if_t< \
                 std::is_same_v< \
-                    typename nx::utils::meta::SignatureExtractor<decltype(&T::METHOD_NAME)>::type, \
+                    typename nx::utils::SignatureExtractor<decltype(&T::METHOD_NAME)>::type, \
                     SIGNATURE \
                 > \
             > \

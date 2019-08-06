@@ -5,6 +5,7 @@
 #include <nx/cloud/db/test_support/cdb_launcher.h>
 
 #include <nx/network/http/test_http_server.h>
+#include <nx/network/stream_proxy.h>
 
 #include <test_support/merge_test_fixture.h>
 
@@ -20,6 +21,10 @@ public:
 
     bool initialize();
 
+    void installProxyBeforeCdb(
+        std::unique_ptr<nx::network::StreamProxy> proxy,
+        const nx::network::SocketAddress& proxyEndpoint);
+
     nx::cloud::db::AccountWithPassword registerCloudAccount();
 
     bool connectToCloud(
@@ -28,6 +33,8 @@ public:
 
     nx::cloud::db::CdbLauncher& cdb();
     const nx::cloud::db::CdbLauncher& cdb() const;
+
+    nx::network::SocketAddress cdbEndpoint() const;
 
     bool isSystemRegistered(
         const nx::cloud::db::AccountWithPassword& account,
@@ -39,8 +46,10 @@ public:
 
 private:
     mutable nx::cloud::db::CdbLauncher m_cdb;
+    std::unique_ptr<nx::network::StreamProxy> m_cdbProxy;
     nx::network::http::TestHttpServer m_httpProxy;
     std::vector<std::string> m_customHostNames;
+    std::optional<nx::network::SocketAddress> m_proxyEndpoint;
 };
 
 //-------------------------------------------------------------------------------------------------

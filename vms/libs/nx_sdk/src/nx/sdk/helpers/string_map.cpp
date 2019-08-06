@@ -1,3 +1,5 @@
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+
 #include "string_map.h"
 
 #include <iterator>
@@ -7,7 +9,7 @@
 namespace nx {
 namespace sdk {
 
-void StringMap::addItem(const std::string& key, const std::string& value)
+void StringMap::setItem(const std::string& key, const std::string& value)
 {
     NX_KIT_ASSERT(!key.empty());
     m_map[key] = value;

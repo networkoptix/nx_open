@@ -139,6 +139,8 @@ public:
     // Holds QT property value.
     Player::State state;
 
+    Player::AutoJumpPolicy autoJumpPolicy = Player::AutoJumpPolicy::DisableAutoJumpOnPreviewing;
+
     // Holds QT property value.
     Player::MediaStatus mediaStatus;
 
@@ -456,7 +458,8 @@ void PlayerPrivate::at_gotVideoFrame()
     {
         videoFrameToRender.reset();
         log("at_gotVideoFrame(): EOF reached, jumping to LIVE.");
-        q->setPosition(kLivePosition);
+        if (q->playbackState() != Player::State::Previewing)
+            q->setPosition(kLivePosition);
         return;
     }
 
@@ -953,6 +956,22 @@ qint64 Player::position() const
     return qMax(d->lastSeekTimeMs, d->positionMs);
 }
 
+Player::AutoJumpPolicy Player::autoJumpPolicy() const
+{
+    Q_D(const Player);
+    return d->autoJumpPolicy;
+}
+
+void Player::setAutoJumpPolicy(AutoJumpPolicy policy)
+{
+    Q_D(Player);
+    if (policy == d->autoJumpPolicy)
+        return;
+
+    d->autoJumpPolicy = policy;
+    emit autoJumpPolicyChanged();
+}
+
 void Player::setPosition(qint64 value)
 {
     if (value > QDateTime::currentMSecsSinceEpoch())
@@ -962,11 +981,24 @@ void Player::setPosition(qint64 value)
     d->log(lm("setPosition(%1: %2)").args(value, QDateTime::fromMSecsSinceEpoch(value, Qt::UTC)));
 
     d->positionMs = d->lastSeekTimeMs = value;
+
     if (d->archiveReader)
     {
-        qint64 usecResult = 0;
-        d->archiveReader->jumpTo(msecToUsec(value), msecToUsec(value), &usecResult);
-        d->positionMs = d->lastSeekTimeMs = value = usecToMsec(usecResult);
+        const qint64 valueUsec = msecToUsec(value);
+        qint64 actualPositionUsec = valueUsec;
+        const bool allowCorrection =
+            d->autoJumpPolicy != Player::AutoJumpPolicy::DisableAutoJump
+            && playbackState() != State::Previewing;
+        d->archiveReader->jumpTo(valueUsec, valueUsec, allowCorrection, &actualPositionUsec);
+
+        const qint64 actualJumpPositionMsec = usecToMsec(actualPositionUsec);
+        if (actualJumpPositionMsec != value)
+        {
+            d->setLiveMode(value == kLivePosition);
+            emit positionChanged();
+
+            d->positionMs = d->lastSeekTimeMs = value = actualJumpPositionMsec;
+        }
     }
 
     d->setLiveMode(value == kLivePosition);
@@ -1461,8 +1493,12 @@ void Player::setPlaybackMask(const QnTimePeriodList& periods)
         return;
 
     d->periods = periods;
-    if (d->archiveReader)
-        d->archiveReader->setPlaybackMask(periods);
+    if (!d->archiveReader)
+        return;
+
+    const auto lastPosition = position();
+    d->archiveReader->setPlaybackMask(periods);
+    setPosition(lastPosition); //< Tries to update position according to the new playback mask.
 }
 
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Player, VideoQuality)

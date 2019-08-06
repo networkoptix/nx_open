@@ -131,7 +131,6 @@ hr {
     line-height   : 16px;
 
     label {
-        min-height    : 16px;
         padding-left  : 20px;
         margin-bottom : 0;
         font-weight   : 400;
@@ -234,12 +233,63 @@ select {
     }
 }
 
+#badge-large {
+    height    : 32px;
+    font-size : rem(13px);
+    padding   : 0 12px;
+}
+
 .badge {
-    border-radius : $border-radius-small;
-    font-weight   : normal;
+    
+    & {
+        background-color: $light4;
+        color: $light16;
+        height: 20px;
+        
+        &.large {
+            @extend #badge-large;
+        }
+    }
+    
+    &-brand {
+        @extend .badge;
+        background-color: $brand_core;
+        color: $light1;
+        height: 20px;
+        
+        &.large {
+            @extend #badge-large;
+        }
+    }
 
     &-default {
         background-color : $light8;
+        color: $light1;
+    }
+
+    &-primary {
+        background-color : $brand_core;
+        color            : $brand_contrast;
+    }
+
+    &-secondary {
+        background-color : $light6;
+        color            : $dark9;
+    }
+    
+    &-danger {
+        background-color : $red_l2;
+        color            : $light1;
+    }
+
+    &-warning {
+        background-color: $warning;
+        color           : $dark9;
+    }
+    
+    &-success {
+        background-color : $brand-success;
+        color            : $light1;
     }
 }
 

@@ -51,7 +51,7 @@ private:
 
     std::unique_ptr<AbstractCollector> createCollector(
         const conf::Statistics& settings,
-        nx::sql::AsyncSqlQueryExecutor* sqlQueryExecutor)
+        nx::sql::AbstractAsyncSqlQueryExecutor* sqlQueryExecutor)
     {
         m_collectorCreated = true;
         return (*m_factoryFuncBak)(settings, sqlQueryExecutor);
@@ -59,12 +59,6 @@ private:
 };
 
 //-------------------------------------------------------------------------------------------------
-
-TEST_F(SettingsConfiguration, statistics_enabled_by_default)
-{
-    whenStartedMediator();
-    thenStatisticsEnabled();
-}
 
 TEST_F(SettingsConfiguration, statistics_enabled_explicitly)
 {

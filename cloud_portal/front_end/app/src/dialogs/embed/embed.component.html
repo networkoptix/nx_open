@@ -23,7 +23,7 @@
                    id="login_email" name="login_email" #login_email="ngModel"
                    [(ngModel)]="auth.email"
                    [ngModelOptions]="{ updateOn: 'blur'}"
-                   pattern="{{ configService.config.emailRegex }}" maxlength="255"
+                   pattern="{{ config.emailRegex }}" maxlength="255"
                    required nxFocusMe>
         </div>
         <div class="form-group">
@@ -41,7 +41,7 @@
         <div class="form-group">
             <nx-checkbox
                     name="nocameras"
-                    compId="nocameras"
+                    componentId="nocameras"
                     [(ngModel)]="params.nocameras">
             </nx-checkbox>
             <label for="nocameras" translate>Cameras menu</label>
@@ -49,7 +49,7 @@
             <br/>
             <nx-checkbox
                     name="noheader"
-                    compId="noheader"
+                    componentId="noheader"
                     [(ngModel)]="params.noheader">
             </nx-checkbox>
             <label for="noheader" translate>Camera header</label>
@@ -57,7 +57,7 @@
             <br/>
             <nx-checkbox
                     name="nocontrols"
-                    compId="nocontrols"
+                    componentId="nocontrols"
                     [(ngModel)]="params.nocontrols">
             </nx-checkbox>
             <label for="nocontrols" translate>Camera controls</label>

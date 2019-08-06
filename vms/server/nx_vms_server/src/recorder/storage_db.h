@@ -29,7 +29,7 @@ class QnStorageDb: public QObject, public nx::vms::server::ServerModuleAware
 {
 public:
     typedef boost::bimap<QString, uint16_t> UuidToHash;
-    typedef std::set<DeviceFileCatalog::Chunk> ChunkSet;
+    typedef std::set<nx::vms::server::Chunk> ChunkSet;
     typedef std::array<ChunkSet, 2> LowHiChunksCatalogs;
     typedef std::unordered_map<QString, LowHiChunksCatalogs, QStringHasher> UuidToCatalogs;
 
@@ -50,13 +50,12 @@ public:
 
     void addRecord(const QString& cameraUniqueId,
                    QnServer::ChunksCatalog catalog,
-                   const DeviceFileCatalog::Chunk& chunk);
+                   const nx::vms::server::Chunk& chunk);
 
     QVector<DeviceFileCatalogPtr> loadFullFileCatalog();
 
-    void replaceChunks(const QString& cameraUniqueId,
-                       QnServer::ChunksCatalog catalog,
-                       const std::deque<DeviceFileCatalog::Chunk>& chunks);
+    void replaceChunks(
+        const QString& cameraUniqueId, QnServer::ChunksCatalog catalog, const ChunksDeque &chunks);
 
 private:
     using VacuumCompletionHandler = nx::utils::MoveOnlyFunc<void(bool)>;
@@ -70,16 +69,15 @@ private:
     std::chrono::seconds m_vacuumInterval;
     nx::utils::StandaloneTimerManager m_vacuumTimer;
 
-    bool createDatabase(const QString &fileName);
     QVector<DeviceFileCatalogPtr> loadChunksFileCatalog();
     void addCatalogFromMediaFolder(const QString& postfix,
         QnServer::ChunksCatalog catalog,
         QVector<DeviceFileCatalogPtr>& result);
-    bool resetIoDevice();
+    bool openDbFile();
     // returns cameraId (hash for cameraUniqueId)
     boost::optional<nx::media_db::CameraOperation> createCameraOperation(
         const QString& cameraUniqueId);
-    bool startDbFile();
+    bool startDbFile(const QString& basePath, bool incVersion);
     int getOrGenerateCameraIdHash(const QString &cameraUniqueId);
     bool writeVacuumedData(
         std::unique_ptr<nx::media_db::DbReader::Data> readData,
@@ -92,15 +90,18 @@ private:
         QVector<DeviceFileCatalogPtr>* deviceFileCatalog,
         int cameraId,
         int catalogIndex,
-        std::deque <DeviceFileCatalog::Chunk> chunks,
+        std::deque <nx::vms::server::Chunk> chunks,
         const UuidToHash& uuidToHash);
-    DeviceFileCatalog::Chunk toChunk(const nx::media_db::MediaFileOperation& mediaData) const;
+    nx::vms::server::Chunk toChunk(const nx::media_db::MediaFileOperation& mediaData) const;
     bool vacuum(QVector<DeviceFileCatalogPtr> *data = nullptr);
     QByteArray dbFileContent();
     void startVacuum(
         VacuumCompletionHandler completionHandler,
         QVector<DeviceFileCatalogPtr> *data = nullptr);
     void onVacuumFinished(bool success);
+    bool readDbHeader() const;
+    QStringList allDbFiles(const QString& basePath) const;
+    QString baseFileName(int64_t seqId);
 };
 
 typedef std::shared_ptr<QnStorageDb> QnStorageDbPtr;

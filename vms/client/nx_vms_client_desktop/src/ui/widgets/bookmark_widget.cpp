@@ -4,6 +4,8 @@
 #include <chrono>
 
 #include <QtCore/QDateTime>
+#include <QtWidgets/QTextEdit>
+#include <QKeyEvent>
 
 #include <core/resource/camera_bookmark.h>
 
@@ -56,6 +58,25 @@ QnBookmarkWidget::QnBookmarkWidget(QWidget *parent):
     // Then change defaultTimeoutIdx constant value to '3'.
     ui->timeoutComboBox->hide();
     ui->timeoutLabel->hide();
+
+    // Workaround for Shift+Tab to switch focus to previous widget.
+    ui->tagsListLabel->installEventFilter(this);
+}
+
+bool QnBookmarkWidget::eventFilter(QObject *obj, QEvent *event)
+{
+    if (event->type() == QEvent::KeyPress)
+    {
+        const auto key = static_cast<const QKeyEvent*>(event)->key();
+        if (key == Qt::Key_Backtab && obj == ui->tagsListLabel)
+        {
+            ui->tagsListLabel->previousInFocusChain()->setFocus();
+            event->accept();
+            return true;
+        }
+    }
+
+    return base_type::eventFilter(obj, event);
 }
 
 QnBookmarkWidget::~QnBookmarkWidget() {}
@@ -95,10 +116,8 @@ void QnBookmarkWidget::loadData(const QnCameraBookmark &bookmark)
 
     updateTagsList();
 
-    if (ui->nameInputField->text().isEmpty())
-        ui->nameInputField->setFocus();
-    else
-        ui->descriptionTextEdit->setFocus();
+    qobject_cast<QTextEdit*>(ui->descriptionTextEdit->input())->setTabChangesFocus(true);
+    ui->nameInputField->setFocus();
 }
 
 void QnBookmarkWidget::submitData(QnCameraBookmark &bookmark) const
@@ -128,7 +147,13 @@ void QnBookmarkWidget::updateTagsList() {
             tags << unusedTag.arg(tag.name.toHtmlEscaped());
     }
 
+    // Disable interaction when tag list is empty to avoid invisible tabstop.
+    Qt::TextInteractionFlags flags = m_allTags.isEmpty() ? Qt::NoTextInteraction :
+        (Qt::LinksAccessibleByKeyboard|Qt::LinksAccessibleByMouse);
+
+    ui->tagsListLabel->setTextInteractionFlags(flags);
     ui->tagsListLabel->setText(html.arg(tags.join(lit(", "))));
+
     update();
 }
 

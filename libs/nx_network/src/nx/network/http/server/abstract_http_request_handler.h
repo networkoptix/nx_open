@@ -42,7 +42,7 @@ struct RequestContext
     http::Request request;
     http::Response* response = nullptr;
     /**
-     * Parameters, taken from request path. 
+     * Parameters, taken from request path.
      * E.g., if handler was registered with path /object_type/{objectId}/sub_object_type/{subObjectId},
      * and request /object_type/id1/sub_object_type/id2 was received.
      * Then this would be (("objectId", "id1"), ("subObjectId", "id2")).

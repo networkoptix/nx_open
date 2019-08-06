@@ -69,16 +69,18 @@ public:
 class AuthProvider
 {
 public:
-    virtual ~AuthProvider() {}
+    virtual ~AuthProvider() = default;
 
     /**
      * @return nonce to be used by mediaserver.
      */
     virtual void getCdbNonce(
         std::function<void(api::ResultCode, api::NonceData)> completionHandler) = 0;
+
     virtual void getCdbNonce(
         const std::string& systemId,
         std::function<void(api::ResultCode, api::NonceData)> completionHandler) = 0;
+    
     /**
      * NOTE: If authRequest.realm value is unknown to CDB, request will fail.
      */

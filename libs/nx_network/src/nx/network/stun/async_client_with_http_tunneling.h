@@ -9,7 +9,7 @@
 #include <nx/network/http/http_async_client.h>
 #include <nx/network/http/tunneling/client.h>
 #include <nx/network/retry_timer.h>
-#include <nx/utils/object_destruction_flag.h>
+#include <nx/utils/interruption_flag.h>
 #include <nx/utils/thread/mutex.h>
 
 #include "async_client.h"
@@ -28,6 +28,10 @@ class NX_NETWORK_API AsyncClientWithHttpTunneling:
 
 public:
     AsyncClientWithHttpTunneling(Settings settings = Settings());
+    virtual ~AsyncClientWithHttpTunneling();
+
+    AsyncClientWithHttpTunneling(const AsyncClientWithHttpTunneling&) = delete;
+    AsyncClientWithHttpTunneling(AsyncClientWithHttpTunneling&&) = delete;
 
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
 
@@ -44,6 +48,7 @@ public:
     virtual void addOnReconnectedHandler(
         ReconnectHandler handler,
         void* client = nullptr) override;
+
     virtual void setOnConnectionClosedHandler(
         OnConnectionClosedHandler onConnectionClosedHandler) override;
 
@@ -76,14 +81,14 @@ private:
     struct HandlerContext
     {
         IndicationHandler handler;
-        void* client;
+        void* client = nullptr;
     };
 
     struct RequestContext
     {
         Message request;
         RequestHandler handler;
-        void* clientId = nullptr;
+        void* client = nullptr;
     };
 
     Settings m_settings;
@@ -96,7 +101,7 @@ private:
     nx::utils::Url m_url;
     std::map<void*, ReconnectHandler> m_reconnectHandlers;
     nx::network::RetryTimer m_reconnectTimer;
-    nx::utils::ObjectDestructionFlag m_destructionFlag;
+    nx::utils::InterruptionFlag m_destructionFlag;
     boost::optional<KeepAliveOptions> m_keepAliveOptions;
     int m_requestIdSequence = 0;
     /** map<request id, request context>. */
@@ -110,10 +115,13 @@ private:
     void connectInternal(
         const QnMutexLockerBase& /*lock*/,
         ConnectHandler handler);
+
     void applyConnectionSettings();
+
     void createStunClient(
         const QnMutexLockerBase& /*lock*/,
         std::unique_ptr<AbstractStreamSocket> connection);
+
     void dispatchIndication(nx::network::stun::Message indication);
     void sendPendingRequests();
 
@@ -129,6 +137,9 @@ private:
         SystemError::ErrorCode sysErrorCode,
         nx::network::stun::Message response,
         int requestId);
+
+    template<typename Dictionary> void cancelUserHandlers(
+        Dictionary& dictionary, void* client);
 
     void onStunConnectionClosed(SystemError::ErrorCode closeReason);
     void scheduleReconnect();

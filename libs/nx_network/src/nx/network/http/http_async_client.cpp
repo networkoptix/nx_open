@@ -83,6 +83,8 @@ AsyncClient::AsyncClient():
     m_precalculatedAuthorizationDisabled(false),
     m_numberOfRedirectsTried(0)
 {
+    ++SocketGlobals::instance().debugCounters().httpClientConnectionCount;
+
     m_responseBuffer.reserve(RESPONSE_BUFFER_SIZE);
 }
 
@@ -94,6 +96,7 @@ AsyncClient::AsyncClient(std::unique_ptr<AbstractStreamSocket> socket):
 
 AsyncClient::~AsyncClient()
 {
+    --SocketGlobals::instance().debugCounters().httpClientConnectionCount;
 }
 
 const std::unique_ptr<AbstractStreamSocket>& AsyncClient::socket()
@@ -347,8 +350,8 @@ void AsyncClient::doRequest(
         url.setPort(m_socket->getForeignAddress().port);
     }
 
-    NX_ASSERT(!url.host().isEmpty() || m_socket != nullptr);
-    NX_ASSERT(url.isValid());
+    NX_ASSERT(!url.host().isEmpty() || m_socket, url.toString());
+    NX_ASSERT(url.isValid(), url.toString());
 
     resetDataBeforeNewRequest();
     m_requestUrl = url;
@@ -1726,9 +1729,9 @@ AsyncClient::Result AsyncClient::invokeHandler(
     if (!handler)
         return Result::proceed;
 
-    nx::utils::ObjectDestructionFlag::Watcher objectDestructionWatcher(&m_objectDestructionFlag);
+    nx::utils::InterruptionFlag::Watcher objectDestructionWatcher(&m_objectDestructionFlag);
     handler(args...);
-    return objectDestructionWatcher.objectDestroyed()
+    return objectDestructionWatcher.interrupted()
         ? Result::thisDestroyed
         : Result::proceed;
 }

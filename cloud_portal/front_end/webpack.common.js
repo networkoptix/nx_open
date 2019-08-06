@@ -1,12 +1,10 @@
 const path = require('path');
-const minimist = require('minimist');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
-const ExtractTextPlugin = require("extract-text-webpack-plugin");
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 const webCommonPath = path.join(__dirname, './app/web_common');
-const ENV = process.env.ENV = process.env.NODE_ENV = 'dev';
 
 const babelLoader = {
     loader: 'babel-loader',
@@ -19,6 +17,7 @@ const babelLoader = {
 let isProd = false;
 
 let thingsToIgnore = [
+    'src/**/__snapshots__/**',
     'src/**/*.ts',
     'web_common/styles/**',
     'scripts/**',
@@ -67,11 +66,11 @@ module.exports = {
             template: 'index-template.html',
             filename: 'index.html',
             inject: false,
-            chunks: ['commons', 'app', 'webcommon', 'polyfills','vendor','appnew'],
+            chunks: ['commons', 'polyfills','vendor', 'app', 'webcommon', 'appnew'],
             chunksSortMode: 'manual'
         }),
 
-        new ExtractTextPlugin("styles/main.[chunkhash].css", { allChunks:true }),
+        new ExtractTextPlugin('styles/main.[chunkhash].css', { allChunks:true }),
 
         new CopyWebpackPlugin([
             {
@@ -92,8 +91,8 @@ module.exports = {
             'jquery-mousewheel': 'jquery-mousewheel'
         }),
         new webpack.optimize.CommonsChunkPlugin({
-            name: "commons",
-            filename: "scripts/commons.[hash].js",
+            name: 'commons',
+            filename: 'scripts/commons.[hash].js',
             minChunks: 2
         })
     ],

@@ -713,9 +713,6 @@ qint64 QnFileStorageResource::getFreeSpace()
 
 qint64 QnFileStorageResource::getTotalSpace() const
 {
-    if (!m_valid)
-        return QnStorageResource::kUnknownSize;
-
     QString path;
     {
         QnMutexLocker lock(&m_mutex);
@@ -853,9 +850,11 @@ QString QnFileStorageResource::removeProtocolPrefix(const QString& url)
 }
 
 QnStorageResource* QnFileStorageResource::instance(
-    QnMediaServerModule* serverModule, const QString&)
+    QnMediaServerModule* serverModule, const QString& path)
 {
-    return new QnFileStorageResource(serverModule);
+    auto result = new QnFileStorageResource(serverModule);
+    result->setUrl(path);
+    return result;
 }
 
 qint64 QnFileStorageResource::calcInitialSpaceLimit()

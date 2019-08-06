@@ -16,6 +16,7 @@ public:
 
     virtual void getConnectionsFromVms(
         std::function<void(api::ResultCode, api::VmsConnectionDataList)> completionHandler) override;
+
     virtual void getStatistics(
         std::function<void(api::ResultCode, api::Statistics)> completionHandler) override;
 };

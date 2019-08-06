@@ -140,7 +140,7 @@ QString QnTimelineZoomLevel::baseValue(qint64 tick) const {
     QDateTime dateTime = QDateTime::fromMSecsSinceEpoch(tick, Qt::UTC);
     switch (type) {
     case Milliseconds:
-        return dateTime.toString(QStringLiteral("z"));
+        return dateTime.toString(QStringLiteral("zzz"));
     case Seconds:
         return dateTime.toString(QStringLiteral("s"));
     case Minutes:

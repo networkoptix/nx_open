@@ -1550,14 +1550,6 @@
       <translation>Apri il layout</translation>
     </message>
     <message>
-      <source>Plugin Event</source>
-      <translation>Evento Plugin</translation>
-    </message>
-    <message>
-      <source>Unknown plugin event</source>
-      <translation>Evento plugin sconosciuto</translation>
-    </message>
-    <message>
       <source>Failed to force using camera time, it lags too much, system time will be used</source>
       <translation>Impossibile forzare l'uso dell'orario della telecamera, la differenza è troppa, l'orario di sistema verrà utilizzato</translation>
     </message>
@@ -1571,19 +1563,31 @@
     </message>
     <message>
       <source>Multicast address conflict detected. Address %1 is already in use by %2 on %3 stream</source>
-      <translation type="unfinished">Multicast address conflict detected. Address %1 is already in use by %2 on %3 stream</translation>
+      <translation>Rilevato conflitto di indirizzi multicast. L'indirizzo %1 è già in uso da %2 su %3 stream</translation>
     </message>
     <message>
       <source>Network address %1 is not a multicast address</source>
-      <translation type="unfinished">Network address %1 is not a multicast address</translation>
+      <translation>L'indirizzo di rete %1 non è un indirizzo multicast</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; is offline.</source>
-      <translation type="unfinished">Analytics storage &quot;%1&quot; is offline.</translation>
+      <translation>La memoriadi analisi&quot;%1&quot; non è in linea.</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; is almost full.</source>
-      <translation type="unfinished">Analytics storage &quot;%1&quot; is almost full.</translation>
+      <translation>La memoria di analisi&quot;%1&quot; è quasi piena.</translation>
+    </message>
+    <message>
+      <source>Plugin Diagnostic Event</source>
+      <translation>Evento diagnostico plug-in</translation>
+    </message>
+    <message>
+      <source>Unknown Plugin Diagnostic Event</source>
+      <translation>Evento diagnostico plugin sconosciuto</translation>
+    </message>
+    <message>
+      <source>RAID error. %1.</source>
+      <translation>Errore RAID. %1.</translation>
     </message>
   </context>
   <context>

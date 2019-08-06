@@ -10,7 +10,6 @@ namespace api {
 
 struct Data;
 class SoftwareVersion;
-class SystemInformation;
 
 struct ParentId;
 
@@ -145,7 +144,7 @@ DECLARE_STRUCT_EX(ModuleInformationWithAddresses, (eq)(ubjson)(json)(xml)(csv_re
 
 DECLARE_STRUCT_AND_LIST(AnalyticsPluginData)
 DECLARE_STRUCT_AND_LIST(AnalyticsEngineData)
-DECLARE_STRUCT_AND_LIST(PluginModuleData)
+DECLARE_STRUCT_AND_LIST(PluginInfo)
 
 #undef DECLARE_STRUCT
 #undef DECLARE_STRUCT_EX

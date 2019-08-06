@@ -1,0 +1,17 @@
+.carousel {
+    background-color: black;
+}
+.carousel-item {
+    display: block;
+    height : 0;
+    visibility: hidden;
+}
+
+.carousel-item.active {
+    height: 100%;
+    visibility: visible;
+}
+
+.img-fluid {
+    max-height: 100%;
+}

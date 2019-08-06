@@ -520,9 +520,9 @@
     </message>
     <message numerus="yes">
       <source>%n Time Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Licencias de Tiempo</numerusform>
+      <translation>
         <numerusform>%n Time Licenses</numerusform>
+        <numerusform>%n Licencias de Tiempo</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -555,9 +555,9 @@
     </message>
     <message numerus="yes">
       <source>%n Analog Encoder Licenses</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n Licencias de Codificador Analógico</numerusform>
-        <numerusform>%n Analog Encoder Licenses</numerusform>
+        <numerusform>%n Licencias de Codificador Analógico</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -601,9 +601,9 @@
     </message>
     <message numerus="yes">
       <source>%n Free Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Licencias Libres</numerusform>
-        <numerusform>%n Free Licenses</numerusform>
+      <translation>
+        <numerusform>%n Licencia Gratis</numerusform>
+        <numerusform>%n Licencias Gratis</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1550,14 +1550,6 @@
       <translation>Diseño abierto</translation>
     </message>
     <message>
-      <source>Plugin Event</source>
-      <translation>Evento de plugin</translation>
-    </message>
-    <message>
-      <source>Unknown plugin event</source>
-      <translation>Evento de plugin desconocido</translation>
-    </message>
-    <message>
       <source>Failed to force using camera time, it lags too much, system time will be used</source>
       <translation>No se pudo forzar el uso del tiempo de la cámara, se demora demasiado, se usará el tiempo del sistema</translation>
     </message>
@@ -1571,19 +1563,31 @@
     </message>
     <message>
       <source>Multicast address conflict detected. Address %1 is already in use by %2 on %3 stream</source>
-      <translation type="unfinished">Multicast address conflict detected. Address %1 is already in use by %2 on %3 stream</translation>
+      <translation>Se detectó un conflicto de direcciones de multidifusión. La dirección %1 ya está en uso por %2 en el flujo %3</translation>
     </message>
     <message>
       <source>Network address %1 is not a multicast address</source>
-      <translation type="unfinished">Network address %1 is not a multicast address</translation>
+      <translation>La dirección de red %1 no es una dirección de multidifusión</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; is offline.</source>
-      <translation type="unfinished">Analytics storage &quot;%1&quot; is offline.</translation>
+      <translation>Almacenamiento de análisis &quot;%1&quot; está desconectado.</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; is almost full.</source>
-      <translation type="unfinished">Analytics storage &quot;%1&quot; is almost full.</translation>
+      <translation>El almacenamiento de analiticas &quot;%1&quot; está casi lleno.</translation>
+    </message>
+    <message>
+      <source>Plugin Diagnostic Event</source>
+      <translation>Plugin de Diagnóstico de Evento</translation>
+    </message>
+    <message>
+      <source>Unknown Plugin Diagnostic Event</source>
+      <translation>Plugin de Diagnóstico de Evento desconocido</translation>
+    </message>
+    <message>
+      <source>RAID error. %1.</source>
+      <translation>Error RAID. %1.</translation>
     </message>
   </context>
   <context>

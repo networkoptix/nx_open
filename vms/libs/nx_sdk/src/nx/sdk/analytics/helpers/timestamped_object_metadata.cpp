@@ -1,3 +1,5 @@
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+
 #include "timestamped_object_metadata.h"
 
 namespace nx {
@@ -19,9 +21,9 @@ float TimestampedObjectMetadata::confidence() const
     return m_objectMetadata->confidence();
 }
 
-Uuid TimestampedObjectMetadata::id() const
+Uuid TimestampedObjectMetadata::trackId() const
 {
-    return m_objectMetadata->id();
+    return m_objectMetadata->trackId();
 }
 
 const char* TimestampedObjectMetadata::subtype() const
@@ -37,11 +39,6 @@ const IAttribute* TimestampedObjectMetadata::attribute(int index) const
 int TimestampedObjectMetadata::attributeCount() const
 {
     return m_objectMetadata->attributeCount();
-}
-
-const char* TimestampedObjectMetadata::auxiliaryData() const
-{
-    return m_objectMetadata->auxiliaryData();
 }
 
 Rect TimestampedObjectMetadata::boundingBox() const
@@ -64,9 +61,9 @@ void TimestampedObjectMetadata::setConfidence(float confidence)
     m_objectMetadata->setConfidence(confidence);
 }
 
-void TimestampedObjectMetadata::setId(const Uuid& value)
+void TimestampedObjectMetadata::setTrackId(const Uuid& value)
 {
-    m_objectMetadata->setId(std::move(value));
+    m_objectMetadata->setTrackId(std::move(value));
 }
 
 void TimestampedObjectMetadata::setSubtype(const std::string& value)
@@ -82,11 +79,6 @@ void TimestampedObjectMetadata::addAttribute(nx::sdk::Ptr<Attribute> attribute)
 void TimestampedObjectMetadata::addAttributes(const std::vector<nx::sdk::Ptr<Attribute>>& value)
 {
     m_objectMetadata->addAttributes(value);
-}
-
-void TimestampedObjectMetadata::setAuxiliaryData(std::string value)
-{
-    m_objectMetadata->setAuxiliaryData(std::move(value));
 }
 
 void TimestampedObjectMetadata::setBoundingBox(const Rect& rect)

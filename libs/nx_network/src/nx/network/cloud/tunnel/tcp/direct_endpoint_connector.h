@@ -62,14 +62,16 @@ private:
     static bool s_needVerification;
 
     void performEndpointVerification(
-        std::list<SocketAddress> endpoints,
+        std::vector<SocketAddress> endpoints,
         std::chrono::milliseconds timeout,
         ConnectCompletionHandler handler);
-    void removeInvalidEmptyAddresses(std::list<SocketAddress>* endpoints);
+    
+    void removeInvalidEmptyAddresses(std::vector<SocketAddress>* endpoints);
 
     void launchVerificators(
-        const std::list<SocketAddress>& endpoints,
+        const std::vector<SocketAddress>& endpoints,
         std::chrono::milliseconds timeout);
+
     void onVerificationDone(
         const SocketAddress& endpoint,
         Verificators::iterator verificatorIter,
@@ -78,6 +80,7 @@ private:
     void reportErrorOnEndpointVerificationFailure(
         nx::hpm::api::NatTraversalResultCode resultCode,
         SystemError::ErrorCode sysErrorCode);
+
     void reportSuccessfulVerificationResult(
         SocketAddress endpoint,
         std::unique_ptr<AbstractStreamSocket> streamSocket);

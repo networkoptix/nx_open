@@ -15,8 +15,6 @@ namespace nx::usb_cam {
 namespace {
 
 static constexpr const char kVendorName[] = "usb_cam";
-static constexpr const char kQtMacAddressDelimiter[] = ":";
-static constexpr const char kNxMacAddressDelimiter[] = "-";
 
 }
 
@@ -134,7 +132,7 @@ void DiscoveryManager::addOrUpdateCamera(const DeviceDataWithNxId& device)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     auto it = m_cameras.find(device.nxId);
-    NX_DEBUG(this, "addOrUpdateCamera");
+    NX_DEBUG(this, "addOrUpdateCamera attempting to add device: %1", device.toString());
     if (it == m_cameras.end())
     {
         NX_DEBUG(this, "Found new device: %1", device.toString());
@@ -161,8 +159,7 @@ void DiscoveryManager::addOrUpdateCamera(const DeviceDataWithNxId& device)
         {
             NX_DEBUG(
                 this,
-                "Device already found: %1",
-                device.toString());
+                "Device already found");
         }
     }
 }

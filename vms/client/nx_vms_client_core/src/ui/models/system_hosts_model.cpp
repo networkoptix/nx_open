@@ -158,9 +158,14 @@ QVariant QnSystemHostsModel::HostsModel::data(const QModelIndex& index, int role
     switch (role)
     {
         case Qt::DisplayRole:
-            return data.second.port() != helpers::kDefaultConnectionPort
-                ? data.second.displayAddress()
-                : data.second.host();
+        {
+            const auto port = data.second.port(helpers::kDefaultConnectionPort);
+            auto host = data.second.host();
+            if (host == "127.0.0.1")
+                host = "localhost";
+            return port == helpers::kDefaultConnectionPort
+                ? host : host + L':' + QString::number(port);
+        }
         case UrlRole:
             return qVariantFromValue(data.second);
         case UrlDisplayRole:

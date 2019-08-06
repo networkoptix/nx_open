@@ -8,7 +8,7 @@
     "setup": {
         "createAccount": "account aanmaken",
         "errorNoHDD": "Dit apparaat is bedoeld om te werken met een harde schijf. <br>Gelieve het apparaat uit te schakelen en een harde schijf te installeren.",
-        "errorNoNetwork": "Dit apparaat heeft een netwerkverbinding nodig om te functioneren.<br>\n                Sluit het apparaat aan op het  lokale netwerk of het internet"
+        "errorNoNetwork": "Dit apparaat heeft een netwerkverbinding nodig om te functioneren.<br>\n Sluit het apparaat aan op het lokale netwerk of het internet"
     },
     "passwordRequirements": {
         "minLengthMessage": "Het wachtwoord moet tenminste 8 karakters lang zijn",
@@ -118,7 +118,7 @@
         "updateNotificationsEnabled": "Update meldingen ingeschakeld",
         "upnpPortMappingEnabled": "UPNP-poorttoewijzing ingeschakeld",
         "useTextEmailFormat": "Verstuur e-mails met platte tekst",
-        "useWindowsEmailLineFeed": "Gebruik Windows line feed in e-mails",
+        "useWindowsEmailLineFeed": "Gebruik Windows-regelfeed in e-mails",
         "trafficEncryptionForced": "Forceer Dataverkeer Encryptie",
         "videoTrafficEncryptionForced": "Forceer Video Dataverkeer Encryptie",
         "updateStatus": "Status bijwerken",

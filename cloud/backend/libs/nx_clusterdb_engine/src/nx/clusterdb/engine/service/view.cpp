@@ -2,12 +2,12 @@
 
 #include "controller.h"
 #include "settings.h"
-#include "../http/http_paths.h"
 
 namespace nx::clusterdb::engine {
 
 View::View(
     const Settings& settings,
+    const std::string& baseRequestPath,
     Controller* controller)
     :
     m_httpServer(nx::network::http::server::Builder::build(
@@ -15,8 +15,8 @@ View::View(
         nullptr, //< TODO: Authentication.
         &m_httpMessageDispatcher))
 {
-    controller->syncronizationEngine().registerHttpApi(
-        kBaseSynchronizationPath,
+    controller->synchronizationEngine().registerHttpApi(
+        baseRequestPath,
         &m_httpMessageDispatcher);
 }
 

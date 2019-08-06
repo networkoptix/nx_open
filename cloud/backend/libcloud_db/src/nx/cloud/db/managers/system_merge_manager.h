@@ -33,11 +33,11 @@ public:
         const AuthorizationInfo& authzInfo,
         const std::string& idOfSystemToMergeTo,
         const std::string& idOfSystemToBeMerged,
-        std::function<void(api::ResultCode)> completionHandler) = 0;
+        std::function<void(api::Result)> completionHandler) = 0;
 
     virtual void processMergeHistoryRecord(
         const nx::vms::api::SystemMergeHistoryRecord& mergeHistoryRecord,
-        std::function<void(api::ResultCode)> completionHandler) = 0;
+        std::function<void(api::Result)> completionHandler) = 0;
 
     virtual void processMergeHistoryRecord(
         nx::sql::QueryContext* queryContext,
@@ -53,18 +53,18 @@ public:
         AbstractSystemManager* systemManager,
         const AbstractSystemHealthInfoProvider& systemHealthInfoProvider,
         AbstractVmsGateway* vmsGateway,
-        nx::sql::AsyncSqlQueryExecutor* queryExecutor);
+        nx::sql::AbstractAsyncSqlQueryExecutor* queryExecutor);
     virtual ~SystemMergeManager() override;
 
     virtual void startMergingSystems(
         const AuthorizationInfo& authzInfo,
         const std::string& idOfSystemToMergeTo,
         const std::string& idOfSystemToBeMerged,
-        std::function<void(api::ResultCode)> completionHandler) override;
+        std::function<void(api::Result)> completionHandler) override;
 
     virtual void processMergeHistoryRecord(
         const nx::vms::api::SystemMergeHistoryRecord& mergeHistoryRecord,
-        std::function<void(api::ResultCode)> completionHandler) override;
+        std::function<void(api::Result)> completionHandler) override;
 
     virtual void processMergeHistoryRecord(
         nx::sql::QueryContext* queryContext,
@@ -77,14 +77,14 @@ private:
     {
         std::string idOfSystemToMergeTo;
         std::string idOfSystemToBeMerged;
-        std::function<void(api::ResultCode)> completionHandler;
+        std::function<void(api::Result)> completionHandler;
         nx::utils::Counter::ScopedIncrement callLock;
     };
 
     AbstractSystemManager* m_systemManager = nullptr;
     const AbstractSystemHealthInfoProvider& m_systemHealthInfoProvider;
     AbstractVmsGateway* m_vmsGateway;
-    nx::sql::AsyncSqlQueryExecutor* m_queryExecutor = nullptr;
+    nx::sql::AbstractAsyncSqlQueryExecutor* m_queryExecutor = nullptr;
     QnMutex m_mutex;
     // TODO: #ak Replace with std::set when c++17 is supported.
     std::map<MergeRequestContext*, std::unique_ptr<MergeRequestContext>> m_currentRequests;
@@ -95,7 +95,7 @@ private:
 
     void loadSystemMergeInfo();
 
-    api::ResultCode validateRequestInput(
+    api::Result validateRequestInput(
         const std::string& idOfSystemToMergeTo,
         const std::string& idOfSystemToBeMerged);
 
@@ -131,7 +131,7 @@ private:
 
     void finishMerge(
         MergeRequestContext* mergeRequestContextPtr,
-        api::ResultCode resultCode);
+        api::Result result);
 };
 
 } // namespace nx::cloud::db

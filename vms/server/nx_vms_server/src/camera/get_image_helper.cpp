@@ -28,6 +28,14 @@ static constexpr int kMaxGopLen = 100;
 static constexpr int kRoundFactor = 4;
 static constexpr int kGetFrameExtraTriesPerChannel = 10;
 
+bool isSpecialArchiveTime(qint64 timestampUsec)
+{
+    static const qint64 kZeroPosition = 0;
+    return timestampUsec == DATETIME_NOW
+        || timestampUsec == nx::api::ImageRequest::kLatestThumbnail
+        || timestampUsec == kZeroPosition;
+}
+
 QnCompressedVideoDataPtr getNextArchiveVideoPacket(
     QnAbstractArchiveDelegate* archiveDelegate, qint64 ceilTimeUs)
 {
@@ -309,7 +317,7 @@ CLVideoDecoderOutputPtr QnGetImageHelper::readFrame(
 }
 
 CLVideoDecoderOutputPtr QnGetImageHelper::decodeFrameFromCaches(
-    QnVideoCameraPtr camera,
+    nx::vms::server::VideoCameraPtr camera,
     StreamIndex streamIndex,
     qint64 timestampUs,
     int preferredChannel,
@@ -341,7 +349,7 @@ CLVideoDecoderOutputPtr QnGetImageHelper::decodeFrameFromCaches(
 CLVideoDecoderOutputPtr QnGetImageHelper::decodeFrameFromLiveCache(
     StreamIndex streamIndex,
     qint64 timestampUs,
-    QnVideoCameraPtr camera,
+    nx::vms::server::VideoCameraPtr camera,
     int channelNumber) const
 {
     NX_VERBOSE(this, "%1()", __func__);
@@ -392,7 +400,7 @@ CLVideoDecoderOutputPtr QnGetImageHelper::getImage(const nx::api::CameraImageReq
 std::unique_ptr<QnConstDataPacketQueue> QnGetImageHelper::getLiveCacheGopTillTime(
     StreamIndex streamIndex,
     qint64 timestampUs,
-    QnVideoCameraPtr camera,
+    nx::vms::server::VideoCameraPtr camera,
     int channelNumber) const
 {
     const MediaQuality stream = (streamIndex == StreamIndex::primary)
@@ -531,7 +539,7 @@ StreamIndex QnGetImageHelper::determineStreamIndex(
 {
     NX_VERBOSE(this, "%1(%2)", __func__, request.streamSelectionMode);
 
-    using StreamSelectionMode = nx::api::CameraImageRequest::StreamSelectionMode;
+    using StreamSelectionMode = nx::api::ImageRequest::StreamSelectionMode;
     switch (request.streamSelectionMode)
     {
         case StreamSelectionMode::auto_:
@@ -593,6 +601,12 @@ CLVideoDecoderOutputPtr QnGetImageHelper::getImageWithCertainQuality(
     {
         // Did not get first frame, no need to try more, as it is more likely we would not success.
         NX_VERBOSE(this, "%1() END -> null: frame not found", __func__);
+        return nullptr;
+    }
+    else if (!isSpecialArchiveTime(request.usecSinceEpoch)
+        && frame->pkt_dts - request.usecSinceEpoch > std::chrono::microseconds(MAX_FRAME_DURATION).count())
+    {
+        NX_VERBOSE(this, "%1() frame for a requested archive position is not found", __func__);
         return nullptr;
     }
 

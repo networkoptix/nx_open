@@ -104,6 +104,8 @@ const QString kKeepAliveProbeCountKey(lit("ec2KeepAliveProbeCount"));
 
 static const QString kTargetUpdateInformationName = lit("targetUpdateInformation");
 static const QString kInstalledUpdateInformationName = lit("installedUpdateInformation");
+static const QString kTargetPersistentUpdateStorageName = lit("targetPersistentUpdateStorage");
+static const QString kInstalledPersistentUpdateStorageName = lit("installedPersistentUpdateStorage");
 static const QString kDownloaderPeersName = lit("downloaderPeers");
 
 const QString kWatermarkSettingsName(lit("watermarkSettings"));
@@ -238,10 +240,10 @@ public:
      *
      * Last merge operation id. It set same value for master and slave hosts during merge
      */
-    QnUuid LastMergeMasterId() const;
+    QnUuid lastMergeMasterId() const;
     void setLastMergeMasterId(const QnUuid& value);
 
-    QnUuid LastMergeSlaveId() const;
+    QnUuid lastMergeSlaveId() const;
     void setLastMergeSlaveId(const QnUuid& value);
 
     QString clientStatisticsSettingsUrl() const;
@@ -352,6 +354,12 @@ public:
     QByteArray targetUpdateInformation() const;
     void setTargetUpdateInformation(const QByteArray& updateInformation);
 
+    QByteArray targetPersistentUpdateStorage() const;
+    void setTargetPersistentUpdateStorage(const QByteArray& persistentUpdateStorageSerializedData);
+
+    QByteArray installedPersistentUpdateStorage() const;
+    void setInstalledPersistentUpdateStorage(const QByteArray& persistentUpdateStorageSerializedData);
+
     QByteArray installedUpdateInformation() const;
     void setInstalledUpdateInformation(const QByteArray& updateInformation);
 
@@ -381,6 +389,10 @@ public:
 
     nx::vms::api::MetadataStorageChangePolicy metadataStorageChangePolicy() const;
     void setMetadataStorageChangePolicy(nx::vms::api::MetadataStorageChangePolicy value);
+
+
+    QString licenseServerUrl() const;
+    void setLicenseServerUrl(const QString& value);
 
 signals:
     void initialized();
@@ -414,6 +426,8 @@ signals:
     void targetUpdateInformationChanged();
     void installedUpdateInformationChanged();
     void downloaderPeersChanged();
+    void targetPersistentUpdateStorageChanged();
+    void installedPersistentUpdateStorageChanged();
     void watermarkChanged();
     void sessionTimeoutChanged();
 
@@ -533,6 +547,8 @@ private:
 
     QnResourcePropertyAdaptor<QByteArray>* m_targetUpdateInformationAdaptor = nullptr;
     QnResourcePropertyAdaptor<QByteArray>* m_installedUpdateInformationAdaptor = nullptr;
+    QnResourcePropertyAdaptor<QByteArray>* m_targetPersistentUpdateStorageAdaptor = nullptr;
+    QnResourcePropertyAdaptor<QByteArray>* m_installedPersistentUpdateStorageAdaptor = nullptr;
     QnResourcePropertyAdaptor<FileToPeerList>* m_downloaderPeersAdaptor = nullptr;
     QnResourcePropertyAdaptor<QnWatermarkSettings>* m_watermarkSettingsAdaptor = nullptr;
 
@@ -542,6 +558,7 @@ private:
     QnResourcePropertyAdaptor<QString>* m_lowQualityScreenVideoCodecAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* m_forceLiveCacheForPrimaryStreamAdaptor = nullptr;
     QnResourcePropertyAdaptor<nx::vms::api::MetadataStorageChangePolicy>* m_metadataStorageChangePolicyAdaptor = nullptr;
+    QnResourcePropertyAdaptor<QString>* m_licenseServerUrlAdaptor = nullptr;
 
     AdaptorList m_allAdaptors;
 

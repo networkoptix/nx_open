@@ -1,16 +1,14 @@
 #include <gtest/gtest.h>
 
-#include <utils/common/synctime.h>
-
 #include <nx/utils/log/log.h>
 #include <nx/utils/test_support/test_options.h>
 #include <nx/utils/random_file.h>
-#include <nx/utils/std/future.h>
-#include <nx/utils/move_only_func.h>
 #include <nx/vms/common/p2p/downloader/private/storage.h>
 #include <nx/vms/common/p2p/downloader/private/worker.h>
 
 #include "test_peer_manager.h"
+
+using namespace std::chrono;
 
 namespace nx::vms::common::p2p::downloader::test {
 
@@ -25,7 +23,6 @@ static const int kChunkSize = 1;
 class TestWorker: public Worker
 {
 public:
-    using Worker::selectPeersForOperation;
     using Worker::increasePeerRank;
     using Worker::decreasePeerRank;
 
@@ -37,13 +34,13 @@ public:
     }
 
 private:
-    virtual qint64 delayMs() const override
+    virtual milliseconds delay() const override
     {
-        return 3 * 1000;
+        return 3s;
     }
 };
 
-class DistributedFileDownloaderWorkerTest: public ::testing::Test, public TestPeerManagerHandler
+class DistributedFileDownloaderWorkerTest: public ::testing::Test
 {
 protected:
     virtual void SetUp() override
@@ -55,12 +52,12 @@ protected:
         workingDirectory.removeRecursively();
         NX_ASSERT(QDir().mkpath(workingDirectory.absolutePath()));
 
-        commonPeerManager.reset(new TestPeerManager(this));
+        commonPeerManager.reset(new TestPeerManager());
 
         defaultPeer = createPeer("Default Peer");
         peerById[defaultPeer->id] = defaultPeer;
 
-        NX_INFO(this, lm("Default Peer worker: %1").arg(defaultPeer->worker));
+        NX_INFO(this, "Default Peer worker: %1", defaultPeer->worker);
 
         commonPeerManager->start();
     }
@@ -171,83 +168,16 @@ protected:
 
         ~Peer()
         {
-            worker->stop();
             worker.reset();
             delete storage;
             // peerManager is owned and deleted by worker.
         }
     };
 
-    void setOnRequestFileInfoCb(nx::utils::MoveOnlyFunc<void()> requestFileInfoCb)
-    {
-        m_onRequestFileInfoCb = std::move(requestFileInfoCb);
-    }
-
-    virtual void onRequestFileInfo() override
-    {
-        if (m_onRequestFileInfoCb)
-            m_onRequestFileInfoCb();
-    }
-
     QHash<QnUuid, Peer*> peerById;
     Peer* defaultPeer = nullptr;
     int step = 0;
-    nx::utils::MoveOnlyFunc<void()> m_onRequestFileInfoCb = nullptr;
-    QnSyncTime syncTime;
 };
-
-TEST_F(DistributedFileDownloaderWorkerTest, simplePeersSelection)
-{
-    const QList<QnUuid> peers{QnUuid::createUuid()};
-
-    commonPeerManager->addPeer(peers.first());
-    commonPeerManager->addPeer(QnUuid::createUuid());
-    commonPeerManager->addPeer(QnUuid::createUuid());
-    commonPeerManager->addPeer(QnUuid::createUuid());
-    commonPeerManager->addPeer(QnUuid::createUuid());
-    defaultPeer->peerManager->setPeerList(peers);
-
-    auto selectedPeers =
-        defaultPeer->worker->selectPeersForOperation(AbstractPeerManager::DownloadChunk);
-    ASSERT_EQ(selectedPeers.size(), peers.size());
-}
-
-TEST_F(DistributedFileDownloaderWorkerTest, closestIdPeersSelection)
-{
-    for (int i = 0; i < 100; ++i)
-        commonPeerManager->addPeer();
-
-    auto peers = defaultPeer->peerManager->getAllPeers();
-    defaultPeer->peerManager->setPeerList(peers);
-    std::sort(peers.begin(), peers.end());
-
-    const int selfPos = (int) std::distance(
-        peers.begin(),
-        std::lower_bound(peers.begin(), peers.end(), selfId));
-
-    const int maxDistance = (defaultPeer->worker->peersPerOperation() + 1) / 2;
-
-    auto distance =
-        [&peers, selfPos](const QnUuid& peerId)
-        {
-            const int pos = peers.indexOf(peerId);
-            const int dist = std::abs(selfPos - pos);
-            return std::min(dist, peers.size() - dist);
-        };
-
-    for (const auto& peer: peers)
-        defaultPeer->worker->increasePeerRank(Worker::Peer{peer, defaultPeer->peerManager});
-
-    const auto& selectedPeers = defaultPeer->worker->selectPeersForOperation(
-        AbstractPeerManager::DownloadChunk);
-    int closestIdPeersCount = 0;
-    for (const auto& peer: selectedPeers)
-    {
-        if (distance(peer.id) <= maxDistance)
-            ++closestIdPeersCount;
-    }
-    ASSERT_GE(closestIdPeersCount, selectedPeers.size() - 1);
-}
 
 TEST_F(DistributedFileDownloaderWorkerTest, requestingFileInfo)
 {
@@ -256,15 +186,22 @@ TEST_F(DistributedFileDownloaderWorkerTest, requestingFileInfo)
     const QnUuid& peerId = addPeerWithFile(fileInfo);
     defaultPeer->storage->addFile(fileInfo.name);
 
-    nx::utils::promise<void> readyPromise;
-    auto readyFuture = readyPromise.get_future();
-    setOnRequestFileInfoCb(
-        [readyPromise = std::move(readyPromise)]() mutable { readyPromise.set_value(); });
+    std::promise<void> readyPromise;
+
+    QObject::connect(defaultPeer->worker.get(), &Worker::stateChanged,
+        [&readyPromise, previousState = defaultPeer->worker->state()](
+            Worker::State state) mutable
+        {
+            if (previousState == Worker::State::requestingFileInformation)
+                readyPromise.set_value();
+
+            previousState = state;
+        });
 
     defaultPeer->peerManager->setPeerList({peerId});
     defaultPeer->worker->start();
 
-    readyFuture.wait();
+    readyPromise.get_future().wait();
 
     const auto& newFileInfo = defaultPeer->storage->fileInformation(fileInfo.name);
     ASSERT_TRUE(newFileInfo.isValid());
@@ -279,15 +216,14 @@ TEST_F(DistributedFileDownloaderWorkerTest, simpleDownload)
     fileInfo.downloadedChunks.fill(true);
     addPeerWithFile(fileInfo);
 
-    nx::utils::promise<bool> readyPromise;
-    auto readyFuture = readyPromise.get_future();
+    std::promise<void> readyPromise;
     QObject::connect(defaultPeer->worker.get(), &Worker::finished,
-        [&readyPromise]() mutable { readyPromise.set_value(true); });
+        [&readyPromise]() mutable { readyPromise.set_value(); });
 
     defaultPeer->peerManager->setPeerList(defaultPeer->peerManager->getAllPeers());
     defaultPeer->worker->start();
 
-    ASSERT_TRUE(readyFuture.get());
+    readyPromise.get_future().wait();
 
     const auto& newFileInfo = defaultPeer->storage->fileInformation(fileInfo.name);
     ASSERT_TRUE(newFileInfo.isValid());
@@ -303,21 +239,19 @@ TEST_F(DistributedFileDownloaderWorkerTest, chunkDownloadFailedAndRecovered)
     addPeerWithFile(fileInfo);
     commonPeerManager->setOneShotDownloadFail();
 
-    nx::utils::promise<bool> readyPromise;
-    auto readyFuture = readyPromise.get_future();
-    nx::utils::promise<bool> failPromise;
-    auto failFuture = failPromise.get_future();
-
+    std::promise<void> readyPromise;
     QObject::connect(defaultPeer->worker.get(), &Worker::finished,
-        [&readyPromise]() mutable { readyPromise.set_value(true); });
+        [&readyPromise]() mutable { readyPromise.set_value(); });
+
+    bool chunkFailed = false;
     QObject::connect(defaultPeer->worker.get(), &Worker::chunkDownloadFailed,
-        [&failPromise]() { failPromise.set_value(true); });
+        [&chunkFailed]() { chunkFailed = true; });
 
     defaultPeer->peerManager->setPeerList(defaultPeer->peerManager->getAllPeers());
     defaultPeer->worker->start();
 
-    ASSERT_TRUE(failFuture.get());
-    ASSERT_TRUE(readyFuture.get());
+    readyPromise.get_future().wait();
+    ASSERT_TRUE(chunkFailed);
 
     const auto& newFileInfo = defaultPeer->storage->fileInformation(fileInfo.name);
     ASSERT_TRUE(newFileInfo.isValid());
@@ -338,11 +272,10 @@ TEST_F(DistributedFileDownloaderWorkerTest, corruptedFile)
 
     bool wasCorrupted = false;
 
-    nx::utils::promise<bool> readyPromise;
-    auto readyFuture = readyPromise.get_future();
+    std::promise<void> readyPromise;
 
     QObject::connect(defaultPeer->worker.get(), &Worker::finished,
-        [&readyPromise] { readyPromise.set_value(true); });
+        [&readyPromise] { readyPromise.set_value(); });
     QObject::connect(defaultPeer->worker.get(), &Worker::stateChanged,
         [this, &wasCorrupted, &fileInfo]
         {
@@ -357,7 +290,7 @@ TEST_F(DistributedFileDownloaderWorkerTest, corruptedFile)
     defaultPeer->peerManager->setPeerList(defaultPeer->peerManager->getAllPeers());
     defaultPeer->worker->start();
 
-    ASSERT_TRUE(readyFuture.get());
+    readyPromise.get_future().wait();
     ASSERT_TRUE(wasCorrupted);
 
     const auto& newFileInfo = defaultPeer->storage->fileInformation(fileInfo.name);
@@ -376,15 +309,14 @@ TEST_F(DistributedFileDownloaderWorkerTest, simpleDownloadFromInternet)
     commonPeerManager->setIndirectInternetRequestsAllowed(true);
     commonPeerManager->addInternetFile(fileInfo.url, fileInfo.filePath);
 
-    nx::utils::promise<bool> readyPromise;
-    auto readyFuture = readyPromise.get_future();
+    std::promise<void> readyPromise;
     QObject::connect(defaultPeer->worker.get(), &Worker::finished,
-        [&readyPromise] { readyPromise.set_value(true); });
+        [&readyPromise] { readyPromise.set_value(); });
 
     defaultPeer->peerManager->setPeerList(defaultPeer->peerManager->getAllPeers());
     defaultPeer->worker->start();
 
-    ASSERT_TRUE(readyFuture.get());
+    readyPromise.get_future().wait();
 
     const auto& newFileInfo = defaultPeer->storage->fileInformation(fileInfo.name);
     ASSERT_TRUE(newFileInfo.isValid());
@@ -404,183 +336,19 @@ TEST_F(DistributedFileDownloaderWorkerTest, downloadFromInternetByProxyingReques
     commonPeerManager->setIndirectInternetRequestsAllowed(true);
     commonPeerManager->addInternetFile(fileInfo.url, fileInfo.filePath);
 
-    nx::utils::promise<bool> readyPromise;
-    auto readyFuture = readyPromise.get_future();
+    std::promise<void> readyPromise;
     QObject::connect(defaultPeer->worker.get(), &Worker::finished,
-        [&readyPromise] { readyPromise.set_value(true); });
+        [&readyPromise] { readyPromise.set_value(); });
 
     defaultPeer->peerManager->setPeerList(defaultPeer->peerManager->getAllPeers());
     defaultPeer->worker->start();
 
-    ASSERT_TRUE(readyFuture.get());
+    readyPromise.get_future().wait();
 
     const auto& newFileInfo = defaultPeer->storage->fileInformation(fileInfo.name);
     ASSERT_TRUE(newFileInfo.isValid());
     ASSERT_EQ(newFileInfo.size, fileInfo.size);
     ASSERT_EQ(newFileInfo.md5, fileInfo.md5);
 }
-
-// TODO: #dklychkov Reimplement these tests. The concept of peer managers was changed and now
-// current method of counting requests is not suitable, e.g. for fileInfo requests.
-#if 0
-TEST_F(DistributedFileDownloaderWorkerTest, multiDownloadFlatNetwork)
-{
-    auto fileInfo = createTestFile();
-    fileInfo.url = "http://test.org/testFile";
-    commonPeerManager->addInternetFile(fileInfo.url, fileInfo.filePath);
-
-    const QStringList groups{"default"};
-
-    QList<QnUuid> pendingPeers;
-    nx::utils::promise<void> readyPromise;
-    auto readyFuture = readyPromise.get_future();
-
-    NX_ASSERT(defaultPeer->storage->addFile(fileInfo) == ResultCode::ok);
-    commonPeerManager->setHasInternetConnection(defaultPeer->id);
-    commonPeerManager->setPeerGroups(defaultPeer->id, groups);
-    commonPeerManager->setPeerStorage(defaultPeer->id, defaultPeer->storage);
-    QObject::connect(defaultPeer->worker.get(), &Worker::finished,
-        [this, &pendingPeers, &readyPromise]
-        {
-            pendingPeers.removeOne(defaultPeer->id);
-            if (pendingPeers.isEmpty())
-                readyPromise.set_value();
-        });
-
-    const auto& baseId = QUuid::createUuid();
-
-    QList<Peer*> peers{defaultPeer};
-
-    for (uint i = 1; i <= 10; ++i)
-    {
-        auto peer = createPeer(lit("Peer %1").arg(i), QnUuid::createUuidFromPool(baseId, i));
-        peers.append(peer);
-        peerById[peer->id] = peer;
-        peer->storage->addFile(fileInfo);
-        commonPeerManager->setPeerGroups(peer->id, groups);
-        commonPeerManager->setPeerStorage(peer->id, peer->storage);
-
-        QObject::connect(peer->worker.get(), &Worker::finished,
-            [peer, &pendingPeers, &readyPromise]
-            {
-                pendingPeers.removeOne(peer->id);
-                if (pendingPeers.isEmpty())
-                    readyPromise.set_value();
-            });
-    }
-
-    pendingPeers = commonPeerManager->getAllPeers();
-
-    for (const auto& peer: peerById)
-    {
-        peer->peerManager->setPeerList(peer->peerManager->getAllPeers());
-        peer->peerManager->calculateDistances();
-    }
-
-    const int maxRequests = fileInfo.downloadedChunks.size() * pendingPeers.size() * 3;
-
-    for (auto& peer: peerById)
-        peer->worker->start();
-
-    readyFuture.wait();
-
-    for (auto& peer: peers)
-    {
-        peer->peerManager->requestCounter()->printCounters(
-            "Outgoing requests from " + commonPeerManager->peerString(peer->id),
-            commonPeerManager.data());
-    }
-
-    commonPeerManager->requestCounter()->printCounters(
-        "Incoming Requests:", commonPeerManager.data());
-
-    ASSERT_EQ(pendingPeers.size(), 0);
-    ASSERT_LE(commonPeerManager->requestCounter()->totalRequests(), maxRequests);
-}
-
-TEST_F(DistributedFileDownloaderWorkerTest, multiDownloadNonFlatNetwork)
-{
-    auto fileInfo = createTestFile();
-    fileInfo.url = "http://test.org/testFile";
-    commonPeerManager->addInternetFile(fileInfo.url, fileInfo.filePath);
-
-    const QStringList groups{"A", "B", "C", "D", "E"};
-
-    QList<QnUuid> pendingPeers;
-    nx::utils::promise<void> readyPromise;
-    auto readyFuture = readyPromise.get_future();
-
-    NX_ASSERT(defaultPeer->storage->addFile(fileInfo) == ResultCode::ok);
-    commonPeerManager->setHasInternetConnection(defaultPeer->id);
-    commonPeerManager->setPeerGroups(defaultPeer->id, {groups[0]});
-    commonPeerManager->setPeerStorage(defaultPeer->id, defaultPeer->storage);
-    QObject::connect(defaultPeer->worker.get(), &Worker::finished,
-        [this, &pendingPeers, &readyPromise]
-        {
-            pendingPeers.removeOne(defaultPeer->id);
-            if (pendingPeers.isEmpty())
-                readyPromise.set_value();
-        });
-
-    QList<Peer*> peers{defaultPeer};
-
-    constexpr int kPeersPerGroup = 3;
-
-    for (int groupIndex = 0; groupIndex < groups.size(); ++groupIndex)
-    {
-        const auto& group = groups[groupIndex];
-
-        for (int i = 1; i <= kPeersPerGroup; ++i)
-        {
-            auto peer = createPeer(lit("Peer %1%2").arg(group).arg(i));
-            peers.append(peer);
-            peerById[peer->id] = peer;
-            peer->storage->addFile(fileInfo);
-            commonPeerManager->setPeerStorage(peer->id, peer->storage);
-
-            QStringList peerGroups{groups[groupIndex]};
-            if (i == kPeersPerGroup && groupIndex < groups.size() - 1)
-                peerGroups.append(groups[groupIndex + 1]);
-            commonPeerManager->setPeerGroups(peer->id, peerGroups);
-
-            QObject::connect(peer->worker.get(), &Worker::finished,
-                [peer, &pendingPeers, &readyPromise]
-                {
-                    pendingPeers.removeOne(peer->id);
-                    if (pendingPeers.isEmpty())
-                        readyPromise.set_value();
-                });
-        }
-    }
-
-    pendingPeers = commonPeerManager->getAllPeers();
-
-    for (const auto& peer: peerById)
-    {
-        peer->peerManager->setPeerList(peer->peerManager->getAllPeers());
-        peer->peerManager->calculateDistances();
-    }
-
-    const int maxRequests = fileInfo.downloadedChunks.size() * pendingPeers.size() * 3;
-
-    for (auto& peer: peerById)
-        peer->worker->start();
-
-    readyFuture.wait();
-
-    for (auto& peer: peers)
-    {
-        peer->peerManager->requestCounter()->printCounters(
-            "Outgoing requests from " + commonPeerManager->peerString(peer->id),
-            commonPeerManager.data());
-    }
-
-    commonPeerManager->requestCounter()->printCounters(
-        "Incoming Requests:", commonPeerManager.data());
-
-    ASSERT_EQ(pendingPeers.size(), 0);
-    ASSERT_LE(commonPeerManager->requestCounter()->totalRequests(), maxRequests);
-}
-#endif
 
 } // namespace nx::vms::common::p2p::downloader::test

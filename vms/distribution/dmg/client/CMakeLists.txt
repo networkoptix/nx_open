@@ -10,6 +10,9 @@ nx_configure_directory(
     OUTPUT_FILES_VARIABLE configured_files
 )
 
+nx_generate_package_json(${CMAKE_CURRENT_BINARY_DIR}/package.json COMPONENT client)
+list(APPEND configured_files ${CMAKE_CURRENT_BINARY_DIR}/package.json)
+
 set(app_icon ${customization_dir}/icons/macosx/logo.icns)
 set(installer_icon ${customization_dir}/icons/macosx/installer_icon.icns)
 if(NOT EXISTS ${installer_icon})

@@ -2,7 +2,7 @@
 Resource          ../resource.robot
 Test Setup        Restart
 Test Teardown     Run Keyword If Test Failed    Reset DB and Open New Browser On Failure
-Suite Setup       Open Browser and go to URL    ${url}
+Suite Setup       Open browser and set user language to current
 Suite Teardown    Clean up
 
 *** Variables ***
@@ -13,6 +13,12 @@ ${email}               ${EMAIL VIEWER}
 ${url}                 ${ENV}
 
 *** Keywords ***
+Open browser and set user language to current
+    Open Browser and go to URL    ${url}
+    Log In    ${email}    ${password}
+    Validate Log In
+    Log Out
+
 Log In To Change Password Page
     Go To    ${url}/account/password
     Log In    ${email}    ${password}    None
@@ -56,7 +62,7 @@ Can be accessed via dropdown or direct link
     Wait Until Element Is Visible    ${AUTO TESTS TITLE}
     Wait Until Element Is Visible    ${ACCOUNT DROPDOWN}
     Click Button    ${ACCOUNT DROPDOWN}
-    Wait Until Element Is Visible    ${CHANGE PASSWORD BUTTON DROPDOWN}
+    Wait Until Elements Are Visible    ${CHANGE PASSWORD BUTTON DROPDOWN}    ${ACCOUNT SETTINGS BUTTON}    ${LOG OUT BUTTON}
     Click Link    ${CHANGE PASSWORD BUTTON DROPDOWN}
     Wait Until Elements Are Visible    ${CURRENT PASSWORD INPUT}    ${NEW PASSWORD INPUT}    ${CHANGE PASSWORD BUTTON}
     Location Should Be    ${url}/account/password
@@ -117,6 +123,7 @@ password with space in the middle is valid
     Reset user password to base    ${email}    ${space password}
 
 more than 255 symbols can be entered in new password field and then are cut to 255
+    [Tags]    Threaded
     Log In To Change Password Page
     Input Text    ${CURRENT PASSWORD INPUT}    ${300CHARS}
     Input Text    ${NEW PASSWORD INPUT}    ${300CHARS}

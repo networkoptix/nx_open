@@ -6,101 +6,57 @@
 
 #include <nx/cloud/relay/controller/relay_public_ip_discovery.h>
 #include <nx/cloud/relay/model/remote_relay_peer_pool.h>
+#include <nx/cloud/relaying/listening_peer_pool.h>
 
 namespace nx {
 namespace cloud {
 namespace relay {
 namespace test {
 
-Relay::Relay()
+BasicComponentTest::BasicComponentTest(Mode /*mode*/):
+    base_type("traffic_relay", QString())
 {
-    addArg("--http/listenOn=127.0.0.1:0");
-}
-
-Relay::~Relay()
-{
-    stop();
-}
-
-nx::utils::Url Relay::basicUrl() const
-{
-    return nx::network::url::Builder()
-        .setScheme("http").setHost("127.0.0.1")
-        .setPort(moduleInstance()->httpEndpoints()[0].port).toUrl();
-}
-
-//-------------------------------------------------------------------------------------------------
-
-BasicComponentTest::BasicComponentTest(Mode mode):
-    utils::test::TestWithTemporaryDirectory("traffic_relay", QString())
-{
-    using namespace std::placeholders;
-
-    controller::PublicIpDiscoveryService::setDiscoverFunc(
-        []() {return network::HostAddress("127.0.0.1"); });
-
-    if (mode == Mode::cluster)
-    {
-        m_factoryFunctionBak =
-            model::RemoteRelayPeerPoolFactory::instance().setCustomFunc(
-                std::bind(&BasicComponentTest::createRemoteRelayPeerPool, this, _1));
-    }
-}
-
-BasicComponentTest::~BasicComponentTest()
-{
-    if (m_factoryFunctionBak)
-    {
-        model::RemoteRelayPeerPoolFactory::instance().setCustomFunc(
-            std::move(*m_factoryFunctionBak));
-    }
+    NX_ASSERT(m_discoveryServer.bindAndListen());
+    m_relayCluster = std::make_unique<TrafficRelayCluster>(m_discoveryServer.url());
 }
 
 void BasicComponentTest::addRelayInstance(
     std::vector<const char*> args,
     bool waitUntilStarted)
 {
-    m_relays.push_back(std::make_unique<Relay>());
-    for (const auto& arg: args)
-        m_relays.back()->addArg(arg);
+    auto& relay = m_relayCluster->addRelay();
+    for (const auto& arg : args)
+        relay.addArg(arg);
 
     if (waitUntilStarted)
     {
-        ASSERT_TRUE(m_relays.back()->startAndWaitUntilStarted());
+        ASSERT_TRUE(relay.startAndWaitUntilStarted());
     }
     else
     {
-        m_relays.back()->start();
+        relay.start();
     }
 }
 
 Relay& BasicComponentTest::relay(int index)
 {
-    return *m_relays[index];
+    return m_relayCluster->relay(index);
 }
 
 const Relay& BasicComponentTest::relay(int index) const
 {
-    return *m_relays[index];
+    return m_relayCluster->relay(index);
 }
 
 void BasicComponentTest::stopAllInstances()
 {
-    for (auto& relay: m_relays)
-        relay->stop();
+    m_relayCluster->stopAllRelays();
 }
 
 bool BasicComponentTest::peerInformationSynchronizedInCluster(
     const std::string& hostname)
 {
-    return !m_listeningPeerPool.findRelay(hostname).empty();
-}
-
-std::unique_ptr<model::AbstractRemoteRelayPeerPool>
-    BasicComponentTest::createRemoteRelayPeerPool(
-        const conf::Settings& /*settings*/)
-{
-    return std::make_unique<RemoteRelayPeerPool>(&m_listeningPeerPool);
+    return m_relayCluster->peerInformationSynchronizedInCluster(hostname);
 }
 
 } // namespace test

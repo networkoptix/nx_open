@@ -26,13 +26,18 @@
 #include <nx/vms/server/analytics/debug_helpers.h>
 
 #include <nx/vms/server/sdk_support/loggers.h>
+#include <nx/vms/server/sdk_support/result_holder.h>
 
 #include <analytics/db/analytics_db_types.h>
 
 #include <nx/sdk/i_string_map.h>
-#include <nx/sdk/i_plugin_event.h>
+#include <nx/sdk/i_plugin_diagnostic_event.h>
+#include <nx/sdk/result.h>
+
 #include <nx/sdk/helpers/device_info.h>
 #include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/helpers/to_string.h>
+
 #include <plugins/settings.h>
 #include <plugins/vms_server_plugins_ini.h>
 
@@ -99,44 +104,45 @@ std::optional<Manifest> manifestFromSdkObject(
     const SdkObjectPtr& sdkObject,
     std::unique_ptr<AbstractManifestLogger> logger = nullptr)
 {
-    nx::sdk::Error error = nx::sdk::Error::noError;
-    const auto manifestStr = nx::sdk::toPtr(sdkObject->manifest(&error));
+    using namespace nx::sdk;
+    const ResultHolder<const IString*> result = sdkObject->manifest();
 
-    auto log =
-        [&logger](
-            const QString& manifestString,
-            nx::sdk::Error error,
-            const QString& customError = QString())
+    const auto logError =
+        [&logger](const sdk_support::Error& error, const QString& manifestString = QString())
         {
             if (logger)
-                logger->log(manifestString, error, customError);
+                logger->log(manifestString, error);
+            return std::nullopt; //< Allows to call as `return logError(...);` on error.
         };
 
-    if (error != nx::sdk::Error::noError)
-    {
-        log(QString(), error);
-        return std::nullopt;
-    }
+    const auto logInternalError =
+        [&logger, &logError](
+            const QString& errorMessage, const QString& manifestString = QString())
+        {
+            return logError({ErrorCode::internalError, errorMessage}, manifestString);
+        };
 
+    if (!result.isOk())
+        return logError(sdk_support::Error::fromResultHolder(result));
+
+    const auto manifestStr = result.value();
     if (!manifestStr)
-    {
-        log(QString(), nx::sdk::Error::unknownError, "No manifest string");
-        return std::nullopt;
-    }
+        return logInternalError("No manifest (null IString)");
 
-    const auto rawString = manifestStr->str();
-    if (!NX_ASSERT(rawString))
-        return std::nullopt;
+    const char* const rawString = manifestStr->str();
+
+    if (!rawString)
+        return logInternalError("No manifest (null IString::str())");
+
+    if (rawString[0] == '\0')
+        return logInternalError("No manifest (empty string)");
 
     bool success = false;
-    auto deserializedManifest = QJson::deserialized(rawString, Manifest(), &success);
+    const auto deserializedManifest = QJson::deserialized(rawString, Manifest(), &success);
     if (!success)
-    {
-        log(rawString, nx::sdk::Error::unknownError, "Can't deserialize manifest");
-        return std::nullopt;
-    }
+        return logInternalError("Unable to deserialize manifest", rawString);
 
-    log(rawString, nx::sdk::Error::noError);
+    logError(sdk_support::Error::fromResultHolder(result), rawString);
     return deserializedManifest;
 }
 
@@ -217,17 +223,31 @@ std::optional<nx::sdk::analytics::IUncompressedVideoFrame::PixelFormat>
         const nx::vms::api::analytics::EngineManifest& manifest,
         const QString& engineLogLabel);
 
-nx::vms::api::EventLevel fromSdkPluginEventLevel(nx::sdk::IPluginEvent::Level level);
+nx::vms::api::EventLevel fromPluginDiagnosticEventLevel(
+    nx::sdk::IPluginDiagnosticEvent::Level level);
 
 nx::sdk::Ptr<nx::sdk::analytics::ITimestampedObjectMetadata> createTimestampedObjectMetadata(
-    const nx::analytics::db::DetectedObject& detectedObject,
+    const nx::analytics::db::ObjectTrack& track,
     const nx::analytics::db::ObjectPosition& objectPosition);
 
 nx::sdk::Ptr<nx::sdk::IList<nx::sdk::analytics::ITimestampedObjectMetadata>> createObjectTrack(
-    const nx::analytics::db::DetectedObject& detectedObject);
+    const nx::analytics::db::ObjectTrack& track);
 
 nx::sdk::Ptr<nx::sdk::analytics::IUncompressedVideoFrame> createUncompressedVideoFrame(
     const CLVideoDecoderOutputPtr& frame,
     nx::vms::api::analytics::PixelFormat pixelFormat);
 
+std::map<QString, QString> attributesMap(
+    const nx::sdk::Ptr<const nx::sdk::analytics::IMetadata>& metadata);
+
+template<typename Value>
+QString toErrorString(const ResultHolder<Value>& result)
+{
+    const QString errorMessage = result.errorMessage();
+    return lm("[%1]: %2").args(
+        result.errorCode(),
+        errorMessage.isEmpty() ? errorMessage : QString("no error message"));
+}
+
 } // namespace nx::vms::server::sdk_support
+

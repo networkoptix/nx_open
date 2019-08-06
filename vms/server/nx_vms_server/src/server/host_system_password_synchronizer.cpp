@@ -10,7 +10,6 @@
 #endif
 
 #include <nx/utils/crypt/linux_passwd_crypt.h>
-#include <nx/utils/unused.h>
 
 #include <core/resource/resource.h>
 #include <core/resource/user_resource.h>
@@ -25,10 +24,10 @@ HostSystemPasswordSynchronizer::HostSystemPasswordSynchronizer(QnMediaServerModu
     nx::vms::server::ServerModuleAware(serverModule)
 {
     Qn::directConnect(
-        resourcePool(), &QnResourcePool::resourceAdded,
+        this->serverModule()->resourcePool(), &QnResourcePool::resourceAdded,
         this, &HostSystemPasswordSynchronizer::at_resourceFound);
 
-    if (QnUserResourcePtr admin = resourcePool()->getAdministrator())
+    if (QnUserResourcePtr admin = this->serverModule()->resourcePool()->getAdministrator())
         setAdmin(admin);
 }
 
@@ -38,7 +37,7 @@ HostSystemPasswordSynchronizer::~HostSystemPasswordSynchronizer()
 }
 
 void HostSystemPasswordSynchronizer::syncLocalHostRootPasswordWithAdminIfNeeded(
-    const QnUserResourcePtr& user)
+    [[maybe_unused]] const QnUserResourcePtr& user)
 {
 #ifdef __linux__
     QnMutexLocker lk(&m_mutex);
@@ -94,9 +93,7 @@ void HostSystemPasswordSynchronizer::syncLocalHostRootPasswordWithAdminIfNeeded(
             qWarning() << "Failed to set root password on current system";
         }
     }
-#else
-    nx::utils::unused(user);
-#endif
+#endif // __linux__
 }
 
 void HostSystemPasswordSynchronizer::setAdmin(QnUserResourcePtr admin)

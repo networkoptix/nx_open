@@ -2,11 +2,7 @@
 
 #include <atomic>
 #include <memory>
-#include <atomic>
-
-#ifndef Q_MOC_RUN
-#include <boost/optional.hpp>
-#endif
+#include <optional>
 
 #include <nx/utils/move_only_func.h>
 
@@ -57,8 +53,7 @@ public:
         Pollable* const sock,
         aio::EventType eventToWatch,
         AIOEventHandler* const eventHandler,
-        boost::optional<std::chrono::milliseconds> timeoutMillis
-            = boost::optional<std::chrono::milliseconds>(),
+        std::optional<std::chrono::milliseconds> timeoutMillis = std::nullopt,
         nx::utils::MoveOnlyFunc<void()> socketAddedToPollHandler = nx::utils::MoveOnlyFunc<void()>());
 
     /**
@@ -103,13 +98,13 @@ public:
      *   otherwise - queued like aio::AIOService::post does.
      */
     void dispatch(Pollable* sock, nx::utils::MoveOnlyFunc<void()> handler);
-    aio::AIOThread* getSocketAioThread(Pollable* sock);
+    aio::AioThread* getSocketAioThread(Pollable* sock);
     AbstractAioThread* getRandomAioThread() const;
     AbstractAioThread* getCurrentAioThread() const;
     bool isInAnyAioThread() const;
 
     void bindSocketToAioThread(Pollable* sock, AbstractAioThread* aioThread);
-    aio::AIOThread* bindSocketToAioThread(Pollable* const sock);
+    aio::AioThread* bindSocketToAioThread(Pollable* const sock);
 
     /**
      * NOTE: If called within sock's aio thread then is non-blocking.
@@ -118,11 +113,11 @@ public:
     void cancelPostedCalls(Pollable* const sock);
 
 private:
-    std::vector<std::unique_ptr<AIOThread>> m_aioThreadPool;
+    std::vector<std::unique_ptr<AioThread>> m_aioThreadPool;
 
     void initializeAioThreadPool(unsigned int threadCount);
 
-    AIOThread* findLeastUsedAioThread() const;
+    AioThread* findLeastUsedAioThread() const;
 };
 
 } // namespace aio

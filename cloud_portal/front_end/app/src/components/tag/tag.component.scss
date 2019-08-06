@@ -1,0 +1,93 @@
+@import '../../../styles/custom/custom_palette';
+@import '../../../styles/theme_palette';
+@import '../../../styles/theme_variables';
+
+#selected-tag {
+    color: $light1;
+    padding-left: 12px !important;
+    padding-right: 0px !important;
+}
+
+button {
+    font-family: $font-family-regular;
+    font-size: rem(13px);
+    font-weight: 400;
+    white-space: nowrap;
+}
+
+.close-button {
+    border-radius: 2px;
+    display: flex;
+    justify-content : center;
+    height          : 32px;
+    width           : 32px;
+}
+
+.tag-close-icon {
+    margin: auto !important;
+}
+
+@mixin badge-effects($default, $hover, $active) {
+    background-color: $default;
+    &:hover {
+        background-color : $hover;
+    }
+    
+    &:active {
+        background-color : $active;
+    }
+}
+
+@mixin badge-selected($default, $hover, $active) {
+    @extend #selected-tag;
+    background-color : $default;
+    
+    & > span.close-button:hover {
+        background-color : $hover;
+    }
+    
+    & > span.close-button:active {
+        background-color : $active;
+    }
+}
+
+.badge,
+.badge-brand {
+    color : $light16;
+    background-color: $light4;
+    line-height: 1rem;
+    
+    &:hover {
+        background-color : $light5;
+    }
+    
+    &:active {
+        background-color : $light6;
+    }
+}
+
+.badge-selected {
+    @include badge-selected($light16, $light17, $light18)
+}
+
+.badge-brand-selected {
+    @include badge-selected($brand_core, $brand_d1, $brand_d2)
+}
+
+$theme-colors : (
+    "success": $brand-success,
+    "info": $brand-info,
+    "warning": $brand-warning,
+    "danger": $brand-danger,
+);
+
+@each $color, $value in $theme-colors {
+    .badge-#{$color} {
+        @extend .badge;
+        padding: 0 12px !important;
+    }
+    .badge-#{$color}-selected {
+        color: $light1;
+        @include badge-selected($value, darken($value, 10%), darken($value, 15%))
+    }
+}

@@ -1,0 +1,16 @@
+<h1>Olá, {{message.userFullName}}</h1>
+
+{{#message.sharer_name}}
+<p><a href="mailto:{{message.sharer_email}}">{{message.sharer_name}}</a> tem acesso compartilhado ao sistema de gestão de vídeo "{{message.system_name}}" consigo.
+
+Para o ver e gerir, por favor crie uma conta em <a href="{{config.portal_url}}">%PRODUCT_NAME%</a> usando o seu endereço de e-mail atual e siga as instruções.</p>
+{{/message.sharer_name}}
+
+{{^message.sharer_name}}
+<p>Recebeu acesso ao sistema de gestão de vídeo "{{message.system_name}}".
+
+Para o ver e gerir, por favor crie uma conta em <a href="{{config.portal_url}}">%PRODUCT_NAME%</a> usando o seu endereço de e-mail atual e siga as instruções.</p>
+{{/message.sharer_name}}
+
+<a class="btn" href="{{config.portal_url}}/register/{{message.code}}">Criar Conta</a>
+

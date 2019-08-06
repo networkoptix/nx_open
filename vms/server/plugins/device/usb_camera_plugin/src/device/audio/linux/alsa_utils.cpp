@@ -167,7 +167,7 @@ void fillCameraAuxiliaryData(nxcip::CameraInfo* cameras, int cameraCount)
 
     for (int i = 0; i < (int)devices.size(); ++i)
     {
-        audioTaken.insert(std::pair<DeviceDescriptor*, bool>(&devices[i], false));
+        audioTaken.emplace(&devices[i], false);
 
         if ((devices[i].isDefault || devices[i].sysDefault) && devices[i].isInput())
             defaults.push_back(&devices[i]);
@@ -215,6 +215,11 @@ bool pluggedIn(const std::string& devicePath)
             return true;
     }
     return false;
+}
+
+void uninitialize()
+{
+    snd_config_update_free_global();
 }
 
 } // namespace nx::usb_cam::device::audio::detail

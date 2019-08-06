@@ -523,6 +523,8 @@ static QnPlatformMonitor::PartitionType fsNameToType( const QString& fsName )
         return QnPlatformMonitor::LocalDiskPartition;
     else if( fsName == "ext4" )
         return QnPlatformMonitor::LocalDiskPartition;
+    else if( fsName == "zfs" )
+        return QnPlatformMonitor::LocalDiskPartition;
     else if( fsName == "exfat" )
         return QnPlatformMonitor::LocalDiskPartition;
     else if( fsName == "hugetlbfs" )
@@ -553,6 +555,8 @@ static QnPlatformMonitor::PartitionType fsNameToType( const QString& fsName )
         return QnPlatformMonitor::NetworkPartition;
     else if( fsName == "cifs" )
         return QnPlatformMonitor::NetworkPartition;
+    else if( fsName == "fuse.osxfs" ) // Mounted volumes when Docker host is macOS.
+        return QnPlatformMonitor::LocalDiskPartition;
     else
         return QnPlatformMonitor::UnknownPartition;
 }
@@ -569,7 +573,10 @@ QList<QnPlatformMonitor::PartitionSpace> QnLinuxMonitor::totalPartitionSpaceInfo
         d_ptr->partitionsInfoProvider.get(),
         &partitions);
     if (errCode != SystemError::noError)
+    {
+        NX_WARNING(this, "Unable to read partitions: %1", SystemError::toString(errCode));
         return result;
+    }
 
     for (const auto& data: partitions)
     {

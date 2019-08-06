@@ -16,8 +16,8 @@ public:
     static State setOnline(State state, bool value);
 
     static State setPluginModules(
-        State state, const nx::vms::api::PluginModuleDataList& value);
-    static State selectCurrentPlugin(State state, const QString& libraryName);
+        State state, const nx::vms::api::PluginInfoList& value);
+    static State selectCurrentPlugin(State state, const QString& libraryFilename);
     static State setPluginsInformationLoading(State state, bool value);
 };
 

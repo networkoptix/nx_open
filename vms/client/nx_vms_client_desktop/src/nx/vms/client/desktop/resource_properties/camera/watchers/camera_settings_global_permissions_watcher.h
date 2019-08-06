@@ -16,12 +16,6 @@ class CameraSettingsGlobalPermissionsWatcher:
     Q_OBJECT
     using base_type = QObject;
 
-protected:
-    virtual void afterContextInitialized() override;
-
-signals:
-    void globalPermissionsChanged(GlobalPermissions value, QPrivateSignal);
-
 public:
     explicit CameraSettingsGlobalPermissionsWatcher(
         CameraSettingsDialogStore* store, QObject* parent = nullptr);

@@ -11,6 +11,8 @@
 #include <nx/network/socket_common.h>
 #include <nx/utils/algorithm/index_of.h>
 
+#include <ui/style/skin.h>
+
 namespace
 {
     // TODO: #GDM #vkutin #common Refactor all this to use HumanReadable helper class
@@ -98,6 +100,7 @@ void QnStorageListModel::setServer(const QnMediaServerResourcePtr& server)
 
     ScopedReset reset(this); // TODO: #common Do we need this reset?
     m_server = server;
+    m_metadataStorageId = server->metadataStorageId();
 }
 
 QnUuid QnStorageListModel::metadataStorageId() const
@@ -105,20 +108,17 @@ QnUuid QnStorageListModel::metadataStorageId() const
     return m_metadataStorageId;
 }
 
-void QnStorageListModel::setMetadataStorageId(const QnUuid &id, MetadataAction action)
+void QnStorageListModel::setMetadataStorageId(const QnUuid &id)
 {
-    m_keepMetadata = (action == KeepExistingMetadata);
-
     if (m_metadataStorageId == id)
         return;
 
-    ScopedReset reset(this); // TODO: #common Do we need this reset?
     m_metadataStorageId = id;
-}
 
-bool QnStorageListModel::keepMetadata() const
-{
-    return m_keepMetadata;
+    // We use ActionsColumn to show which storage is used for metadata.
+    emit dataChanged(
+        index(0, ActionsColumn),
+        index(rowCount() - 1, ActionsColumn));
 }
 
 void QnStorageListModel::updateRebuildInfo(QnServerStoragesPool pool, const QnStorageScanData& rebuildStatus)
@@ -244,7 +244,10 @@ QString QnStorageListModel::displayData(const QModelIndex& index, bool forcedTex
             if (canRemoveStorage(storageData))
                 return tr("Remove");
 
-            return tr("Use to store analytics data");
+            if (canStoreAnalytics(storageData))
+                return tr("Use to store analytics data");
+
+            return QString();
         }
 
         default:
@@ -287,6 +290,23 @@ QVariant QnStorageListModel::data(const QModelIndex& index, int role) const
     {
         case Qt::DisplayRole:
             return displayData(index, false);
+
+        case Qt::DecorationRole:
+            if (index.column() == ActionsColumn)
+            {
+                const auto& storage = m_storages.at(index.row());
+
+                if (storage.id == m_metadataStorageId)
+                    return qnSkin->pixmap("text_buttons/analytics.png");
+
+                if (canRemoveStorage(storage))
+                    return qnSkin->pixmap("text_buttons/trash.png");
+
+                if (canStoreAnalytics(storage))
+                    return qnSkin->pixmap("text_buttons/analytics.png");
+            }
+
+            return QVariant();
 
         case Qn::ItemMouseCursorRole:
             return mouseCursorData(index);
@@ -464,6 +484,12 @@ bool QnStorageListModel::canRemoveStorage(const QnStorageModelInfo& data) const
         return false;
 
     return data.isExternal || !data.isOnline;
+}
+
+bool QnStorageListModel::canStoreAnalytics(const QnStorageModelInfo& data) const
+{
+    //TODO: use PartitionType enum value here instead of the serialized literal
+    return data.isOnline && data.storageType == "local";
 }
 
 bool QnStorageListModel::storageIsActive(const QnStorageModelInfo& data) const

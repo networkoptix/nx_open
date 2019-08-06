@@ -4,12 +4,15 @@
 
 namespace nx::clusterdb::map {
 
+/**
+ * Settings used to configure clusterdb map.
+ */
 class NX_KEY_VALUE_DB_API Settings
 {
 public:
-    nx::clusterdb::engine::SynchronizationSettings dataSyncEngineSettings;
+    nx::clusterdb::engine::SynchronizationSettings synchronizationSettings;
 
-    void load(const QnSettings& settings);
+    void load(const QnSettings& settings, std::string groupName = "cluster");
 };
 
 } // namespace nx::clusterdb::map

@@ -25,6 +25,7 @@ CommonHttpConnection::CommonHttpConnection(
     m_connectionId(connectionId)
 {
     setLocalPeerProtocolVersion(protocolVersion);
+    setReceivedTransactionsQueueControlEnabled(false);
 }
 
 int CommonHttpConnection::connectionId() const

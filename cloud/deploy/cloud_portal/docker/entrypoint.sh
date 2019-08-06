@@ -1,4 +1,4 @@
-#!/usr/local/bin/dumb-init /bin/bash
+#!/bin/bash
 set -ex
 
 echo "Running with args: $@"
@@ -20,7 +20,7 @@ function instantiate_config()
 {
     export CUSTOMIZATION=$1
     export CLOUD_PORTAL_CONF_DIR=$CLOUD_PORTAL_BASE_CONF_DIR/$customization
-    mkdir --parents $CLOUD_PORTAL_CONF_DIR
+    mkdir -p $CLOUD_PORTAL_CONF_DIR
 
     local CLOUD_PORTAL_CONF_TEMPLATE=$CLOUD_PORTAL_BASE_CONF_DIR/_source/cloud_portal.yaml
     local CLOUD_PORTAL_CONF=$CLOUD_PORTAL_CONF_DIR/cloud_portal.yaml
@@ -31,7 +31,7 @@ function instantiate_config()
 
     (
         flock -n 9 || exit 1
-        tmp=$(tempfile)
+        tmp=$(mktemp)
 
         envsubst < $CLOUD_PORTAL_CONF_TEMPLATE > $tmp
         mv $tmp $CLOUD_PORTAL_CONF
@@ -90,6 +90,7 @@ do
             write_my_cnf
 
             python manage.py filldata
+            python manage.py filldata --preview=True &
 
             find /app/app/static | xargs touch
             exec gunicorn cloud.wsgi --capture-output --workers ${PORTAL_WORKERS} --bind :5000 --log-level=debug --timeout 300
@@ -99,7 +100,7 @@ do
             rm -f /tmp/*.pid
 
             echo $'\n'Notifications started: Version $VERSION$'\n'
-            exec celery worker -A notifications -l info --concurrency=1 --pidfile=/tmp/celery-w1.pid
+            exec celery worker -A notifications -l debug --concurrency=1 --pidfile=/tmp/celery-w1.pid
             ;;
         broadcast_notifications)
             write_my_cnf

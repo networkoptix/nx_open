@@ -22,6 +22,7 @@ Page
     [
         IconButton
         {
+            padding: 0
             icon.source: lp("/images/search.png")
             enabled: d.enabled
             opacity: !connectionManager.restoringConnection ? 1.0 : 0.2
@@ -203,7 +204,7 @@ Page
 
         onConnectionFailed:
         {
-            if (!resourcesScreen.activePage)
+            if (stackView.currentItem !== resourcesScreen)
                 return
 
             var systemName = title ? title : getLastUsedSystemName()

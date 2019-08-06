@@ -4,7 +4,9 @@
 @import '_theme_palette';
 @import 'custom/_custom_palette';
 @import '_theme_variables';
+
 @import '~bootstrap/scss/bootstrap';
+
 @import '_theme_override';
 // Components
 @import '_header';
@@ -108,6 +110,7 @@ nx-app {
             top       : 50%;
             left      : 50%;
             transform : translate(-50%, -50%);
+            z-index   : -1;
         }
     }
 }
@@ -398,13 +401,14 @@ a.disabled {
 .preloader{
     display: none;
 }
+
 .process-loading{
     position: relative;
 }
+
 .process-loading>*{
     visibility:hidden;
 }
-
 
 .process-loading>.preloader {
 
@@ -514,7 +518,6 @@ td{
     display: inline-block;
     height: 20px;
     margin-top: 12px;
-    line-height: 12px;
     border-radius: $border-radius-small;
     font-family: $font-family-medium;
     font-size: $font-size-sm;
@@ -688,10 +691,13 @@ td{
     align-items: center;
 
     h1{
-        font-size:40px;
+        font-size   : 40px;
+        line-height : 40px;
+        text-align  : center;
     }
     p{
-        font-size:24px;
+        font-size  : 24px;
+        text-align : center;
     }
     a{
         text-decoration: underline;
@@ -837,8 +843,10 @@ h1 .badge {
 }
 
 .disabled{
-    color: $light10;
+    color  : $light10;
+    cursor : default !important;
 }
+
 .input-overlay{
     input{
         padding-right:30px;
@@ -952,6 +960,10 @@ h1 .badge {
   @include icon;
   background-position: -32px 0;
 }
+.tag-close-icon {
+    @include icon;
+    background-position: -96px 0;
+}
 
 .wide-button{
   width: 102px;
@@ -966,3 +978,6 @@ h1 .badge {
   padding-left: 4px;
 }
 
+span.marked {
+    background-color: $light4;
+}

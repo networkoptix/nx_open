@@ -16,7 +16,7 @@
 #include <boost/multi_index/member.hpp>
 #include <boost/multi_index/ordered_index.hpp>
 
-#include <nx/clusterdb/engine/transaction_log.h>
+#include <nx/clusterdb/engine/command_log.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/timer_manager.h>
 #include <nx/utils/counter.h>
@@ -39,7 +39,7 @@
 #include "../data/data_filter.h"
 #include "../data/system_data.h"
 
-namespace nx::clusterdb::engine { class SyncronizationEngine; }
+namespace nx::clusterdb::engine { class SynchronizationEngine; }
 
 namespace nx::cloud::db {
 
@@ -116,26 +116,27 @@ public:
         nx::utils::StandaloneTimerManager* const timerManager,
         AbstractAccountManager* const accountManager,
         const AbstractSystemHealthInfoProvider& systemHealthInfoProvider,
-        nx::sql::AsyncSqlQueryExecutor* const dbManager,
+        nx::sql::AbstractAsyncSqlQueryExecutor* const dbManager,
         AbstractEmailManager* const emailManager,
-        clusterdb::engine::SyncronizationEngine* const ec2SyncronizationEngine) noexcept(false);
+        clusterdb::engine::SynchronizationEngine* const ec2SynchronizationEngine) noexcept(false);
     virtual ~SystemManager();
 
     virtual void authenticateByName(
         const nx::network::http::StringType& username,
         const std::function<bool(const nx::Buffer&)>& validateHa1Func,
         nx::utils::stree::ResourceContainer* const authProperties,
-        nx::utils::MoveOnlyFunc<void(api::ResultCode)> completionHandler) override;
+        nx::utils::MoveOnlyFunc<void(api::Result)> completionHandler) override;
 
     /** Binds system to an account associated with authzInfo. */
     void bindSystemToAccount(
         const AuthorizationInfo& authzInfo,
         data::SystemRegistrationData registrationData,
-        std::function<void(api::ResultCode, data::SystemData)> completionHandler);
+        std::function<void(api::Result, data::SystemData)> completionHandler);
+
     void unbindSystem(
         const AuthorizationInfo& authzInfo,
         data::SystemId systemId,
-        std::function<void(api::ResultCode)> completionHandler);
+        std::function<void(api::Result)> completionHandler);
     /**
      * Fetches systems satisfying specified filter.
      * @param eventReceiver Events related to returned data are reported to this functor
@@ -146,31 +147,33 @@ public:
     void getSystems(
         const AuthorizationInfo& authzInfo,
         data::DataFilter filter,
-        std::function<void(api::ResultCode, api::SystemDataExList)> completionHandler);
+        std::function<void(api::Result, api::SystemDataExList)> completionHandler);
+
     void shareSystem(
         const AuthorizationInfo& authzInfo,
         data::SystemSharing sharingData,
-        std::function<void(api::ResultCode)> completionHandler);
+        std::function<void(api::Result)> completionHandler);
+
     /** Provides list of cloud accounts who have access to this system. */
     void getCloudUsersOfSystem(
         const AuthorizationInfo& authzInfo,
         const data::DataFilter& filter,
-        std::function<void(api::ResultCode, api::SystemSharingExList)> completionHandler);
+        std::function<void(api::Result, api::SystemSharingExList)> completionHandler);
 
     void getAccessRoleList(
         const AuthorizationInfo& authzInfo,
         data::SystemId systemId,
-        std::function<void(api::ResultCode, api::SystemAccessRoleList)> completionHandler);
+        std::function<void(api::Result, api::SystemAccessRoleList)> completionHandler);
 
     void updateSystem(
         const AuthorizationInfo& authzInfo,
         data::SystemAttributesUpdate data,
-        std::function<void(api::ResultCode)> completionHandler);
+        std::function<void(api::Result)> completionHandler);
 
     void recordUserSessionStart(
         const AuthorizationInfo& authzInfo,
         data::UserSessionDescriptor userSessionDescriptor,
-        std::function<void(api::ResultCode)> completionHandler);
+        std::function<void(api::Result)> completionHandler);
 
     virtual boost::optional<api::SystemData> findSystemById(const std::string& id) const override;
 
@@ -285,9 +288,9 @@ private:
     nx::utils::StandaloneTimerManager* const m_timerManager;
     AbstractAccountManager* const m_accountManager;
     const AbstractSystemHealthInfoProvider& m_systemHealthInfoProvider;
-    nx::sql::AsyncSqlQueryExecutor* const m_dbManager;
+    nx::sql::AbstractAsyncSqlQueryExecutor* const m_dbManager;
     AbstractEmailManager* const m_emailManager;
-    clusterdb::engine::SyncronizationEngine* const m_ec2SyncronizationEngine;
+    clusterdb::engine::SynchronizationEngine* const m_ec2SynchronizationEngine;
     SystemsDict m_systems;
     mutable QnMutex m_mutex;
     AccountSystemAccessRoleDict m_accountAccessRoleForSystem;
@@ -325,7 +328,7 @@ private:
         nx::sql::DBResult dbResult,
         data::SystemRegistrationDataWithAccount systemRegistrationData,
         InsertNewSystemToDbResult systemData,
-        std::function<void(api::ResultCode, data::SystemData)> completionHandler);
+        std::function<void(api::Result, data::SystemData)> completionHandler);
 
     void markSystemForDeletionInCache(const std::string& systemId);
 
@@ -337,7 +340,7 @@ private:
         nx::utils::Counter::ScopedIncrement asyncCallLocker,
         nx::sql::DBResult dbResult,
         data::SystemId systemId,
-        std::function<void(api::ResultCode)> completionHandler);
+        std::function<void(api::Result)> completionHandler);
 
     //---------------------------------------------------------------------------------------------
     // System sharing methods. TODO: #ak: move to a separate class
@@ -469,7 +472,7 @@ private:
         nx::utils::Counter::ScopedIncrement asyncCallLocker,
         nx::sql::DBResult dbResult,
         data::SystemAttributesUpdate data,
-        std::function<void(api::ResultCode)> completionHandler);
+        std::function<void(api::Result)> completionHandler);
 
     template<typename SystemDictionary>
     void activateSystemIfNeeded(

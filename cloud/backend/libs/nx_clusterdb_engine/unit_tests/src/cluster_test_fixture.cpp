@@ -2,12 +2,19 @@
 
 #include <future>
 
+#include <nx/clusterdb/engine/command_log.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/string.h>
-
-#include <nx/clusterdb/engine/http/http_paths.h>
+#include <nx/utils/uuid.h>
 
 namespace nx::clusterdb::engine::test {
+
+Peer::Peer():
+    m_nodeId(QnUuid::createUuid().toSimpleString().toStdString())
+{
+    m_process.addArg("-p2pDb/nodeId", m_nodeId.c_str());
+    m_process.addArg("-p2pDb/nodeConnectRetryTimeout", "100ms");
+}
 
 nx::utils::test::ModuleLauncher<CustomerDbNode>& Peer::process()
 {
@@ -19,19 +26,16 @@ const nx::utils::test::ModuleLauncher<CustomerDbNode>& Peer::process() const
     return m_process;
 }
 
+std::string Peer::nodeId() const
+{
+    return m_nodeId;
+}
+
 nx::utils::Url Peer::baseApiUrl() const
 {
     return nx::network::url::Builder()
         .setScheme(nx::network::http::kUrlSchemeName)
         .setEndpoint(m_process.moduleInstance()->httpEndpoints().front());
-}
-
-nx::utils::Url Peer::syncronizationUrl() const
-{
-    return nx::network::url::Builder()
-        .setScheme(nx::network::http::kUrlSchemeName)
-        .setEndpoint(m_process.moduleInstance()->httpEndpoints().front())
-        .setPath(kBaseSynchronizationPath);
 }
 
 void Peer::connectTo(const Peer& other)
@@ -40,42 +44,157 @@ void Peer::connectTo(const Peer& other)
         .setScheme(network::http::kUrlSchemeName)
         .setEndpoint(other.process().moduleInstance()->httpEndpoints().front());
 
-    m_process.moduleInstance()->connectToNode(
-        /*systemId*/ "review_and_replace_this_value",
-        url);
+    m_process.moduleInstance()->connectToNode(url);
 }
 
-void Peer::addRandomData()
+bool Peer::isConnectedTo(const Peer& other) const
+{
+    const auto connections =
+        process().moduleInstance()->synchronizationEngine().connectionManager().getConnections();
+    const auto& otherEndpoints = other.process().moduleInstance()->httpEndpoints();
+    for (const auto& connection: connections)
+    {
+        auto endpointsEqual =
+            [&connection](const auto& endpoint)
+            {
+                return connection.peerEndpoint.toStdString() == endpoint.toStdString();
+            };
+
+        if (std::any_of(otherEndpoints.begin(), otherEndpoints.end(), endpointsEqual))
+            return true;
+    }
+
+    return false;
+}
+
+void Peer::disconnectFrom(const Peer& other)
+{
+    const auto url = network::url::Builder()
+        .setScheme(network::http::kUrlSchemeName)
+        .setEndpoint(other.process().moduleInstance()->httpEndpoints().front());
+
+    m_process.moduleInstance()->disconnectFromNode(url);
+}
+
+Customer Peer::addRandomData()
+{
+    std::promise<std::tuple<ResultCode, Customer>> done;
+    addRandomDataAsync(
+        [&done](ResultCode resultCode, Customer customer)
+        {
+            done.set_value(std::make_tuple(resultCode, std::move(customer)));
+        });
+
+    auto [resultCode, customer] = done.get_future().get();
+
+    if (resultCode != ResultCode::ok)
+        throw std::runtime_error(toString(resultCode));
+
+    return customer;
+}
+
+void Peer::addRandomDataAsync(
+    nx::utils::MoveOnlyFunc<void(ResultCode, Customer)> completionHandler)
 {
     Customer customer;
     customer.id = QnUuid::createUuid().toSimpleByteArray().toStdString();
     customer.fullName = nx::utils::generateRandomName(7).toStdString();
     customer.address = nx::utils::generateRandomName(7).toStdString();
 
-    std::promise<ResultCode> done;
     process().moduleInstance()->customerManager().saveCustomer(
         customer,
-        [&done](ResultCode resultCode) { done.set_value(resultCode); });
-    ASSERT_EQ(ResultCode::ok, done.get_future().get());
+        [customer, handler = std::move(completionHandler)](ResultCode resultCode)
+        {
+            handler(resultCode, customer);
+        });
+}
+
+bool Peer::hasData(const std::vector<Customer>& expected)
+{
+    std::promise<std::tuple<ResultCode, Customers>> done;
+    process().moduleInstance()->customerManager().getCustomers(
+        [&done](ResultCode resultCode, Customers customers)
+        {
+            done.set_value(std::make_tuple(resultCode, std::move(customers)));
+        });
+    auto [resultCode, customers] = done.get_future().get();
+    if (resultCode != ResultCode::ok)
+        return false;
+
+    for (const auto& customer: expected)
+    {
+        if (!std::any_of(customers.begin(), customers.end(),
+                [customer](const auto& value) { return value == customer; }))
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+Customer Peer::modifyRandomly(const Customer& data)
+{
+    Customer modified = data;
+    modified.fullName = nx::utils::generateRandomName(7).toStdString();
+    modified.address = nx::utils::generateRandomName(7).toStdString();
+
+    const auto resultCode =
+        process().moduleInstance()->customerManager().saveCustomer(modified);
+    if (resultCode != ResultCode::ok)
+        throw std::runtime_error(toString(resultCode));
+
+    return modified;
+}
+
+void Peer::setOutgoingCommandFilter(const OutgoingCommandFilterConfiguration& filter)
+{
+    process().moduleInstance()->synchronizationEngine().setOutgoingCommandFilter(filter);
 }
 
 //-------------------------------------------------------------------------------------------------
 
 ClusterTestFixture::ClusterTestFixture():
-    base_type("nx_data_sync_engine_ut", "")
+    base_type("nx_data_sync_engine_ut", ""),
+    m_clusterId("test_cluster_id")
 {
 }
 
-void ClusterTestFixture::addPeer()
+void ClusterTestFixture::setConnectorTypeKey(const std::string& key)
+{
+    m_connectorTypeKey = key;
+}
+
+std::string ClusterTestFixture::clusterId() const
+{
+    return m_clusterId;
+}
+
+Peer& ClusterTestFixture::addPeer(
+    std::vector<std::pair<const char*, const char*>> args)
 {
     const auto dbFileArg = lm("--db/name=%1/db_%2.sqlite")
         .args(testDataDir(), ++m_peerCounter).toStdString();
 
     auto peer = std::make_unique<Peer>();
     peer->process().addArg(dbFileArg.c_str());
+    peer->process().addArg("-p2pDb/clusterId", m_clusterId.c_str());
+    for (const auto& arg: args)
+        peer->process().addArg(arg.first, arg.second);
 
-    ASSERT_TRUE(peer->process().startAndWaitUntilStarted());
+    [&peer]() { ASSERT_TRUE(peer->process().startAndWaitUntilStarted()); }();
+
+    if (!m_connectorTypeKey.empty())
+    {
+        [this, &peer]()
+        {
+            ASSERT_TRUE(peer->process().moduleInstance()->synchronizationEngine()
+                .transportManager().setConnectorTypeKey(m_connectorTypeKey));
+        }();
+    }
+
     m_peers.push_back(std::move(peer));
+    return *m_peers.back();
 }
 
 Peer& ClusterTestFixture::peer(int index)
@@ -95,9 +214,37 @@ int ClusterTestFixture::peerCount() const
 
 bool ClusterTestFixture::allPeersAreSynchronized() const
 {
+    std::vector<int> ids(m_peers.size(), 0);
+    int lastId = 0;
+    for (auto& id: ids)
+        id = lastId++;
+
+    return peersAreSynchronized(ids);
+}
+
+bool ClusterTestFixture::peersAreSynchronized(std::vector<int> ids) const
+{
     std::optional<Customers> firstPeerCustomers;
-    for (const auto& peer: m_peers)
+    std::vector<std::vector<engine::dao::TransactionLogRecord>> commandLogs;
+
+    for (const auto& peerIndex: ids)
     {
+        const auto& peer = m_peers[peerIndex];
+
+        std::promise<void> commandLogRead;
+        peer->process().moduleInstance()->synchronizationEngine().transactionLog().readTransactions(
+            m_clusterId,
+            ReadCommandsFilter::kEmptyFilter,
+            [&commandLogs, &commandLogRead](
+                nx::clusterdb::engine::ResultCode /*resultCode*/,
+                std::vector<nx::clusterdb::engine::dao::TransactionLogRecord> serializedTransactions,
+                NodeState /*readedUpTo*/)
+            {
+                commandLogs.push_back(std::move(serializedTransactions));
+                commandLogRead.set_value();
+            });
+        commandLogRead.get_future().wait();
+
         std::promise<std::tuple<ResultCode, Customers>> done;
         peer->process().moduleInstance()->customerManager().getCustomers(
             [&done](ResultCode resultCode, Customers customers)

@@ -1,8 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <nx/network/url/url_builder.h>
-
-#include <nx_ec/ec_proto_version.h>
+#include <nx/vms/api/protocol_version.h>
 #include <nx/cloud/db/test_support/transaction_connection_helper.h>
 
 #include "ec2/cloud_vms_synchro_test_helper.h"
@@ -68,7 +67,7 @@ void Ec2MserverCloudSynchronizationKeepAlive::testTransactionConnectionKeepAlive
             registeredSystemData().id,
             registeredSystemData().authKey,
             keepAlivePolicy,
-            nx_ec::EC2_PROTO_VERSION);
+            nx::vms::api::protocolVersion());
 
     m_transactionConnectionHelper.getAccessToConnectionById(
         m_connectionId,

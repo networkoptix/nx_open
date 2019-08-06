@@ -11,8 +11,7 @@ def create_cloud_debug_file(binaries_dir, output_filename):
     pdb_filenames = [
         'cloud_connect_test_util.pdb',
         'cloud_db.pdb',
-        'connection_mediator.pdb',
-        'vms_gateway.pdb']
+        'connection_mediator.pdb']
     zip_files(pdb_filenames, binaries_dir, output_filename)
 
 

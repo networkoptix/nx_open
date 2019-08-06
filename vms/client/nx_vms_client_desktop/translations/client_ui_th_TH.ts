@@ -1969,14 +1969,6 @@
     </message>
   </context>
   <context>
-    <name>MessageBox</name>
-    <message>
-      <location filename="../src/ui/dialogs/common/message_box.ui"/>
-      <source>Do not show this message again</source>
-      <translation>อย่าแสดงข้อความนี้อีก</translation>
-    </message>
-  </context>
-  <context>
     <name>MultiServerUpdatesWidget</name>
     <message>
       <location filename="../src/nx/vms/client/desktop/system_update/multi_server_updates_widget.ui"/>
@@ -2011,7 +2003,7 @@
     <message>
       <location/>
       <source>Download &amp;&amp; Install</source>
-      <translation type="unfinished">Download &amp;&amp; Install</translation>
+      <translation>ดาวน์โหลด &amp;&amp; ติดตั้ง</translation>
     </message>
     <message>
       <location/>
@@ -2057,12 +2049,7 @@
     <message>
       <location/>
       <source>New Virtual Camera...</source>
-      <translation type="unfinished">New Virtual Camera...</translation>
-    </message>
-    <message>
-      <location/>
-      <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
-      <translation>&quot;Wearable Camera&quot; เป็นที่เก็บข้อมูลเสมือนจริงสำหรับไฟล์วิดีโอซึ่งสามารถอัพโหลดไปยังเซิร์ฟเวอร์ใดก็ได้ในระบบของคุณและเข้าถึงได้โดยผู้ใช้รายใด</translation>
+      <translation>ใหม่กล้องเสมือนจริง ...</translation>
     </message>
   </context>
   <context>
@@ -2107,9 +2094,9 @@
     </message>
   </context>
   <context>
-    <name>PluginEventWidget</name>
+    <name>PluginDiagnosticEventWidget</name>
     <message>
-      <location filename="../src/nx/vms/client/desktop/ui/event_rules/widgets/plugin_event_widget.ui"/>
+      <location filename="../src/nx/vms/client/desktop/ui/event_rules/widgets/plugin_diagnostic_event_widget.ui"/>
       <source>Source:</source>
       <translation>ทรัพยากร:</translation>
     </message>
@@ -2360,6 +2347,14 @@
       <location/>
       <source>The new System will have password and name from System:</source>
       <translation>ระบบใหม่จะมีรหัสผ่านและชื่อจากระบบ:</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnMessageBox</name>
+    <message>
+      <location filename="../src/ui/dialogs/common/message_box.ui"/>
+      <source>Do not show this message again</source>
+      <translation>อย่าแสดงข้อความนี้อีก</translation>
     </message>
   </context>
   <context>
@@ -2651,11 +2646,6 @@
     </message>
     <message>
       <location/>
-      <source>Filter TEST</source>
-      <translation>กรองการทดสอบ</translation>
-    </message>
-    <message>
-      <location/>
       <source>Nothing found</source>
       <translation>ไม่พบสิ่งใด</translation>
     </message>
@@ -2782,11 +2772,6 @@
       <location/>
       <source>Limit session duration</source>
       <translation>จำกัด ระยะเวลาเซสชัน</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
-      <translation>ลายน้ำจะปรากฏบนวิดีโอสดที่เก็บถาวรและส่งออกสำหรับผู้ใช้ที่ไม่ใช่ผู้ดูแลระบบเท่านั้น คุณและผู้ดูแลระบบคนอื่นจะไม่เห็นพวกเขา</translation>
     </message>
   </context>
   <context>
@@ -3078,11 +3063,6 @@
     </message>
     <message>
       <location/>
-      <source>Analytics data can occupy tens of gigabytes of storage space. We recommend to chose other location for it instead of the system partition.</source>
-      <translation type="unfinished">Analytics data can occupy tens of gigabytes of storage space. We recommend to chose other location for it instead of the system partition.</translation>
-    </message>
-    <message>
-      <location/>
       <source>Analytics data will continue to be stored on the disabled storage.</source>
       <translation type="unfinished">Analytics data will continue to be stored on the disabled storage.</translation>
     </message>
@@ -3094,7 +3074,12 @@
     <message>
       <location/>
       <source>Recording was enabled on the USB storage</source>
-      <translation type="unfinished">Recording was enabled on the USB storage</translation>
+      <translation>มีการเปิดใช้การบันทึกในที่จัดเก็บข้อมูล USB</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Analytics data can occupy tens of gigabytes of storage space. We recommend to choose other location for it instead of the system partition.</source>
+      <translation type="unfinished">Analytics data can occupy tens of gigabytes of storage space. We recommend to choose other location for it instead of the system partition.</translation>
     </message>
   </context>
   <context>

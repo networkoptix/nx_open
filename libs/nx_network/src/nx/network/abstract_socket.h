@@ -227,7 +227,7 @@ public:
     virtual nx::network::aio::AbstractAioThread* getAioThread() const = 0;
 
     /**
-     * Binds current socket to specified AIOThread.
+     * Binds current socket to specified AioThread.
      * NOTE: Internal NX_ASSERT(false) in case if socket can not be bound to
      *   specified tread (e.g. it's already bound to different thread or
      *   certaind thread type is not the same).

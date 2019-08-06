@@ -5,7 +5,6 @@ from __future__ import print_function
 import os
 import sys
 import argparse
-from rdep import Rdep
 from rdep_cmake import RdepSyncher
 
 
@@ -28,11 +27,13 @@ def determine_package_versions(
 ):
     v = {
         "gcc": "8.1",
+        "sdk-gcc": "5.4.0",
         "clang": "8.0.0",
         "qt": "5.11.3",
         "boost": "1.67.0",
+	"geolite": "2",
         "openssl": "1.0.2q",
-        "ffmpeg": "3.1.1",
+        "ffmpeg": "3.1.9-3",
         "sigar": "1.7",
         "sasl2": "2.1.26",
         "openal": "1.16",
@@ -44,32 +45,32 @@ def determine_package_versions(
         "doxygen": "1.8.14",
         "gstreamer": "1.0",
         "icu": "60.2",
-        "deepstream": "0.1",
+        "deepstream": "0.2",
         "android-sdk": "28",
         "android-ndk": "r17",
         "help": customization + "-4.0",
         "server-external": release_version,
         "certificates": customization,
+        "customization_pack": customization,
+        "detours": "4.0.1",
+        "stackwalker": "1.0"
     }
-
-    if platform == "windows":
-        v["ffmpeg"] = "3.1.9"
 
     if platform == "linux" and box == "none" and target not in ("linux_arm32", "linux_arm64"):
         v["festival"] = "2.4-1"
         v["festival-vox"] = "2.4"
         v["sysroot"] = "xenial-1"
-        v["ffmpeg"] = "3.1.9-2"
 
     if platform == "macosx":
-        v["ffmpeg"] = "3.1.9"
         v["festival"] = "2.1"
 
     if platform == "android":
         v["openal"] = "1.17.2"
+        v["ffmpeg"] = "3.1.1"
 
     if platform == "ios":
         v["libjpeg-turbo"] = "1.4.1"
+        v["ffmpeg"] = "3.1.1"
 
     if box == "bpi":
         v["festival"] = "2.4-1"
@@ -77,22 +78,26 @@ def determine_package_versions(
         v["sysroot"] = "wheezy"
         # Bpi original version is build with vdpau support which is no longer needed since lite
         # client is disasbled for bpi.
-        v["ffmpeg"] = "3.1.1-bananapi"
+        v["ffmpeg"] = "3.1.9-5"
 
     if target == "linux_arm32":
         v["festival"] = "2.4-1"
         v["festival-vox"] = "2.4"
         v["sysroot"] = "jessie"
-        v["ffmpeg-arm32"] = v["ffmpeg-rpi"] = "3.1.9"
+        v["ffmpeg"] = "3.1.9-5"
 
     if box == "edge1":
         v["sysroot"] = "jessie"
+        v["ffmpeg"] = "3.1.9-5"
 
     if target == "linux_arm64":
         v["festival"] = "2.4-1"
         v["festival-vox"] = "2.4"
         v["sysroot"] = "xenial"
-        v["ffmpeg"] = "3.1.9"
+        v["ffmpeg"] = "3.1.9-5"
+
+    if target in ("linux_arm32", "linux_arm64") or box in ("edge1", "bpi"):
+        v["openssl"] = "1.0.2q-2"
 
     if "festival-vox" not in v:
         v["festival-vox"] = v["festival"]
@@ -120,6 +125,17 @@ def sync_dependencies(syncher, platform, arch, box, release_version, options={})
         else:
             sync("linux-%s/gcc" % arch)
 
+        if box == "bpi":
+            sync("linux_arm32/sdk-gcc")
+        elif box == "edge1":
+            sync("linux_arm32/sdk-gcc")
+        elif arch == "arm":
+            sync("linux_arm32/sdk-gcc")
+        elif arch == "arm64":
+            sync("linux_arm64/sdk-gcc")
+        else:
+            sync("linux-x64/sdk-gcc")
+
         if options.get("clang"):
             sync("linux/clang")
     elif platform == "android":
@@ -128,38 +144,36 @@ def sync_dependencies(syncher, platform, arch, box, release_version, options={})
         if "ANDROID_NDK" not in os.environ:
             sync("android/android-ndk")
 
+    sync("any/cloud_hosts")
     sync("qt", path_variable="QT_DIR")
     sync("any/boost")
+    sync("any/geolite")
 
     sync("any/detection_plugin_interface")
 
-    if box in ("bpi", "edge1") or (platform == "linux" and arch in ("arm", "arm64")):
-        sync("linux-%s/openssl" % arch)
+    if box in ("bpi", "edge1"):
+        sync("linux_arm32/openssl")
     else:
         sync("openssl")
 
-    if (platform, arch) == ("linux", "arm") and box == "none":
-        sync("ffmpeg-arm32")
-        sync("ffmpeg-rpi")
+    if box in ("bpi", "edge1"):
+        sync("linux_arm32/ffmpeg")
     else:
         sync("ffmpeg")
+
+    if (platform, arch, box) == ("linux", "arm", "none"):
+        sync("rpi/ffmpeg", do_not_include=True)
 
     if platform == "linux":
         sync("sysroot", path_variable="sysroot_directory")
 
-    if box == "rpi":
-        sync("cifs-utils")
-
     if (platform, arch) == ("linux", "arm64"):
-        sync("tegra_video")
-        sync("jetpack")
+        sync("tegra_video", path_variable="tegra_video_directory")
+        sync("jetpack", path_variable="jetpack_directory")
         sync("deepstream")
 
     if platform in ("android", "windows") or box == "bpi":
         sync("openal")
-
-    if platform == "linux" and box != "edge1":
-        sync("cifs-utils")
 
     if platform == "windows":
         sync("icu", path_variable="icu_directory")
@@ -183,6 +197,9 @@ def sync_dependencies(syncher, platform, arch, box, release_version, options={})
     if have_desktop_client:
         sync("any/help", path_variable="help_directory")
 
+    if (platform == "windows") and have_desktop_client:
+        sync("detours")
+        sync("stackwalker")
     if have_desktop_client or have_mobile_client:
         sync("any/roboto-fonts")
 
@@ -213,6 +230,7 @@ def sync_dependencies(syncher, platform, arch, box, release_version, options={})
         sync("%s/doxygen" % platform, path_variable="doxygen_directory")
 
     sync("any/root-certificates", path_variable="root_certificates_path")
+    sync("any/customization_pack", path_variable="customization_package_directory")
 
 
 def parse_target(target):

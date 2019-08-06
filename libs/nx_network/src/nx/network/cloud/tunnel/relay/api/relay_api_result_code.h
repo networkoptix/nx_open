@@ -28,6 +28,7 @@ NX_NETWORK_API nx::network::http::StatusCode::Value toHttpStatusCode(ResultCode)
 NX_NETWORK_API ResultCode fromHttpStatusCode(nx::network::http::StatusCode::Value statusCode);
 NX_NETWORK_API SystemError::ErrorCode toSystemError(ResultCode resultCode);
 NX_NETWORK_API std::string toString(ResultCode resultCode);
+NX_NETWORK_API void PrintTo(ResultCode val, ::std::ostream* os);
 
 NX_NETWORK_API nx::network::http::FusionRequestResult resultCodeToFusionRequestResult(
     api::ResultCode resultCode);

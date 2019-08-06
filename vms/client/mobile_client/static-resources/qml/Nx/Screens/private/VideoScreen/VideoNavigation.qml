@@ -14,6 +14,7 @@ Item
 {
     id: videoNavigation
 
+    readonly property bool hasArchive: d.hasArchive && videoNavigation.canViewArchive
     property var videoScreenController
     property bool paused: true
     property bool ptzAvailable: false
@@ -26,7 +27,7 @@ Item
     property alias motionFilter: cameraChunkProvider.motionFilter
     property alias changingMotionRoi: timeline.changingMotionRoi
     property bool hasCustomRoi: false;
-
+    property bool drawingRoi: false
     property string warningText
 
     signal ptzButtonClicked()
@@ -37,8 +38,9 @@ Item
     implicitHeight: navigator.height + buttonsPanel.height
     anchors.bottom: parent ? parent.bottom : undefined
 
-    onHasCustomRoiChanged: d.updateWarningText()
-    onMotionSearchModeChanged: d.updateWarningText()
+    onDrawingRoiChanged: updateWarningTextTimer.restart()
+    onHasCustomRoiChanged: updateWarningTextTimer.restart()
+    onMotionSearchModeChanged: updateWarningTextTimer.restart()
 
     Connections
     {
@@ -48,6 +50,8 @@ Item
             actionButtonsPanelOpacityBehaviour.enabled = false
             actionButtonsPanel.opacity = 0
             actionButtonsPanelOpacityBehaviour.enabled = true
+            if (d.windowSize > 0)
+                timeline.windowSize = d.lastWindowSize
         }
     }
 
@@ -65,21 +69,19 @@ Item
         }
     }
 
-    QtObject
+    Object
     {
         id: d
 
         readonly property bool loadingChunks:
-            cameraChunkProvider.loading
-            || cameraChunkProvider.loadingMotion
+            cameraChunkProvider.loading || cameraChunkProvider.loadingMotion
         property bool loaded: videoScreenController.mediaPlayer.mediaStatus === MediaPlayer.Loaded
-        property bool playbackStarted: false
-        property bool controlsNeeded:
-            !cameraChunkProvider.loading || (playbackStarted && loaded)
+        property bool controlsNeeded: !cameraChunkProvider.loading || loaded
 
         property real controlsOpacity:
             Math.min(videoNavigation.controlsOpacity, controlsOpacityInternal)
 
+        property real lastWindowSize: -1
         property real controlsOpacityInternal: controlsNeeded ? 1.0 : 0.0
         Behavior on controlsOpacityInternal
         {
@@ -94,14 +96,52 @@ Item
             NumberAnimation { duration: d.timelineOpacity > 0 ? 0 : 200 }
         }
 
-        onLoadingChunksChanged: updateWarningText()
+        onLoadingChunksChanged: updateWarningTextTimer.restart()
+        onLoadedChanged: d.updateTimelinePosition()
+
+        Connections
+        {
+            target: videoScreenController.mediaPlayer
+            onPositionChanged: d.updateTimelinePosition()
+        }
+
+        function goToPosition(position, savePosition)
+        {
+            resumePosition = -1
+            timeline.timelineView.position = position
+            videoScreenController.setPosition(position, savePosition)
+        }
+
+        function updateTimelinePosition()
+        {
+            if (videoScreenController.mediaPlayer.mediaStatus !== MediaPlayer.Loaded)
+                return
+
+            if (!timeline.moving && !d.liveMode)
+            {
+                timeline.autoReturnToBounds = false
+                timeline.position = videoScreenController.mediaPlayer.position
+            }
+        }
+
+        Timer
+        {
+            // Updates warning message after some delay to prevent fast changes.
+            id: updateWarningTextTimer
+
+            interval: 10
+            repeat: false
+            onTriggered: d.updateWarningText()
+        }
 
         function updateWarningText()
         {
-            if (videoNavigation.loadingChunks)
+            if (loadingChunks)
                 return
 
-            if (!videoNavigation.motionSearchMode || cameraChunkProvider.hasMotionChunks())
+            var motionMode = videoNavigation.motionSearchMode
+            var hasMotionChunks = cameraChunkProvider.hasMotionChunks()
+            if (!motionMode || hasMotionChunks || videoNavigation.drawingRoi)
                 videoNavigation.warningText = ""
             else if (!cameraChunkProvider.hasChunks())
                 videoNavigation.warningText = qsTr("No motion data for this camera")
@@ -114,8 +154,8 @@ Item
         readonly property bool hasArchive: timeline.startBound > 0
         readonly property bool liveMode:
             videoScreenController
-                && videoScreenController.mediaPlayer.liveMode
-                && !playbackController.paused
+            && videoScreenController.mediaPlayer.liveMode
+            && !playbackController.paused
         property real resumePosition: -1
 
         function updateNavigatorPosition()
@@ -152,8 +192,10 @@ Item
             if (lastChunkEndMs <= 0)
                 lastChunkEndMs = liveMs
 
-            timeline.windowSize =
-                Math.max((liveMs - lastChunkEndMs) / 0.4, timeline.defaultWindowSize)
+            if (d.lastWindowSize > 0)
+                return
+
+            timeline.windowSize = Math.max((liveMs - lastChunkEndMs) / 0.4, timeline.defaultWindowSize)
         }
     }
 
@@ -317,6 +359,8 @@ Item
                 color: timeline.lineColor
             }
 
+            onWindowSizeChanged: d.lastWindowSize = windowSize
+
             onMovingChanged:
             {
                 if (!moving)
@@ -329,12 +373,9 @@ Item
                     timeline.autoReturnToBounds = true
                 }
             }
-            onPositionTapped:
-            {
-                d.resumePosition = -1
-                timeline.position = position
-                videoScreenController.setPosition(position, true)
-            }
+
+            onPositionTapped: d.goToPosition(position, true)
+
             onPositionChanged:
             {
                 if (!dragging)
@@ -350,22 +391,6 @@ Item
                     resumeWhenDragFinished = !videoNavigation.paused
                     videoScreenController.preview()
                     d.resumePosition = -1
-                }
-            }
-
-            Connections
-            {
-                target: videoScreenController.mediaPlayer
-                onPositionChanged:
-                {
-                    if (videoScreenController.mediaPlayer.mediaStatus !== MediaPlayer.Loaded)
-                        return
-
-                    if (!timeline.moving && !d.liveMode)
-                    {
-                        timeline.autoReturnToBounds = false
-                        timeline.position = videoScreenController.mediaPlayer.position
-                    }
                 }
             }
         }
@@ -458,6 +483,7 @@ Item
             {
                 id: calendarButton
 
+                padding: 0
                 visible: videoNavigation.canViewArchive
                 anchors.verticalCenter: parent.verticalCenter
                 icon.source: lp("/images/calendar.png")
@@ -474,15 +500,24 @@ Item
             {
                 id: motionSearchModeButton
 
-                width: 40
-                height: width
                 checked: false
                 checkable: true
                 anchors.left:  calendarButton.right
                 anchors.verticalCenter: parent.verticalCenter
                 icon.source: lp("/images/motion.svg")
+                icon.width: 24
+                icon.height: 24
+                padding: 0
+                checkedPadding: 4
                 normalIconColor: ColorTheme.contrast1
                 checkedIconColor: ColorTheme.base1
+                visible: videoNavigation.hasArchive
+                onCheckedChanged:
+                {
+                    videoScreenController.mediaPlayer.autoJumpPolicy = checked
+                        ? MediaPlayer.DisableAutoJump
+                        : MediaPlayer.DisableAutoJumpOnPreviewing
+                }
             }
 
             Row
@@ -497,6 +532,7 @@ Item
                 {
                     id: zoomOutButton
 
+                    padding: 0
                     icon.source: lp("/images/minus.png")
                     enabled: d.hasArchive
                     onClicked: timeline.zoomOut()
@@ -506,6 +542,7 @@ Item
                 {
                     id: zoomInButton
 
+                    padding: 0
                     icon.source: lp("/images/plus.png")
                     enabled: d.hasArchive
                     onClicked: timeline.zoomIn()
@@ -532,22 +569,22 @@ Item
                 visible: opacity > 0
                 opacity: 0
 
-                property bool invisible:
+                property bool shouldBeVisible:
                 {
                     var currentTime = (new Date()).getTime()
                     var futurePosition = position > currentTime
                     var canViewArchive = videoNavigation.canViewArchive
-                    return (d.liveMode || futurePosition) && canViewArchive
-                        || videoScreenController.resourceHelper.isWearableCamera;
+                    return canViewArchive && !d.liveMode && !futurePosition
+                        && !videoScreenController.resourceHelper.isWearableCamera
                 }
 
                 readonly property real position: videoScreenController.mediaPlayer.position
                 onPositionChanged: updateOpacity()
-                onInvisibleChanged: updateOpacity()
+                onShouldBeVisibleChanged: updateOpacity()
 
                 function updateOpacity()
                 {
-                    opacity = invisible ? 0 : 1
+                    opacity = shouldBeVisible ? 1 : 0
                 }
 
                 Behavior on opacity { NumberAnimation { duration: 200 } }
@@ -560,9 +597,16 @@ Item
                 visible: opacity > 0
 
                 resourceId: videoScreenController.resourceId
-                anchors.left: buttonsPanel.showZoomControls
-                    ? zoomButtonsRow.right
-                    : calendarButton.right
+                anchors.left:
+                {
+                    if (buttonsPanel.showZoomControls)
+                        return zoomButtonsRow.right
+
+                    return motionSearchModeButton.visible
+                        ? motionSearchModeButton.right
+                        : calendarButton.right
+                }
+
                 anchors.right: parent.right
                 anchors.rightMargin: -4
 
@@ -604,11 +648,11 @@ Item
             {
                 interval: 100
                 repeat: true
-                running: zoomInButton.pressed || zoomOutButton.pressed
+                running: zoomInButton.down || zoomOutButton.down
                 triggeredOnStart: true
                 onTriggered:
                 {
-                    if (zoomInButton.pressed)
+                    if (zoomInButton.down)
                         timeline.zoomIn()
                     else
                         timeline.zoomOut()
@@ -706,6 +750,40 @@ Item
 
             opacity: d.controlsOpacity
 
+            ChunkPositionWatcher
+            {
+                id: chunkPositionWatcher
+                motionSearchMode: videoNavigation.motionSearchMode
+                position: timeline.position
+                chunkProvider: timeline.chunkProvider
+            }
+
+            PlaybackJumpButton
+            {
+                forward: false
+                visible: d.hasArchive && videoNavigation.canViewArchive
+                anchors.right: parent.left
+                anchors.verticalCenter: parent.verticalCenter
+
+                onClicked: d.goToPosition(chunkPositionWatcher.prevChunkStartTimeMs(), false)
+            }
+
+            PlaybackJumpButton
+            {
+                enabled: !d.liveMode
+                visible: d.hasArchive && videoNavigation.canViewArchive
+                anchors.left: parent.right
+                anchors.verticalCenter: parent.verticalCenter
+
+                onClicked:
+                {
+                    var nextChunkStartTime = chunkPositionWatcher.nextChunkStartTimeMs();
+                    d.goToPosition(nextChunkStartTime, false)
+                    if (nextChunkStartTime == -1)
+                        videoScreenController.play()
+                }
+            }
+
             onClicked:
             {
                 if (paused)
@@ -757,7 +835,8 @@ Item
             d.resumePosition = -1
             // TODO: Make refactoring and get rid of serverTimeZoneShift (etc) properties.
             // Timeline and calendar should work in a same way.
-            var targetTime = date.getTime() - timeline.serverTimeZoneShift
+            var localZoneOffset = (new Date()).getTimezoneOffset() * 60 * 1000;
+            var targetTime = date.getTime() + localZoneOffset - timeline.serverTimeZoneShift
             timeline.jumpTo(targetTime)
             videoScreenController.setPosition(targetTime, true)
         }
@@ -775,7 +854,6 @@ Item
         {
             timeline.autoReturnToBounds = false
             timeline.jumpTo(position)
-            d.playbackStarted = true
         }
     }
 

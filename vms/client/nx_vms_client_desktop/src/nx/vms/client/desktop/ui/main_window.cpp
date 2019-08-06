@@ -6,9 +6,13 @@
 #include <QtQml/QQmlError>
 #include <QtQuickWidgets/QQuickWidget>
 
-#include <nx/utils/log/log.h>
+#include <ui/graphics/opengl/gl_functions.h>
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_context.h>
+
+#include <nx/utils/log/log.h>
+#include <nx/vms/client/desktop/ui/image_providers/resource_icon_provider.h>
+#include <nx/vms/client/desktop/ui/right_panel/models/right_panel_models_adapter.h>
 
 namespace nx::vms::client::desktop {
 namespace ui {
@@ -37,11 +41,18 @@ MainWindow::MainWindow(QQmlEngine* engine, QnWorkbenchContext* context, QWidget*
     QnWorkbenchContextAware(context),
     d(new Private(this))
 {
+    engine->addImageProvider("resource", new ResourceIconProvider());
+    engine->addImageProvider("right_panel", new RightPanelImageProvider());
+
     d->sceneWidget = new QQuickWidget(engine, this);
 
     d->sceneWidget->rootContext()->setContextProperty(lit("workbench"), workbench());
     d->sceneWidget->rootContext()->setContextProperty(
         QnWorkbenchContextAware::kQmlContextPropertyName, context);
+
+    // TODO: #vkutin Replace with a better calculation?
+    d->sceneWidget->rootContext()->setContextProperty("maxTextureSize",
+        QnGlFunctions::estimatedInteger(GL_MAX_TEXTURE_SIZE));
 
     d->sceneWidget->setSource(lit("main.qml"));
     d->sceneWidget->setResizeMode(QQuickWidget::SizeRootObjectToView);

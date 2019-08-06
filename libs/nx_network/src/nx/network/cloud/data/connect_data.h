@@ -1,7 +1,7 @@
 #pragma once
 
-#include <list>
 #include <optional>
+#include <vector>
 
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/network/cloud/cloud_connect_version.h>
@@ -32,7 +32,7 @@ public:
     nx::String connectSessionId;
     ConnectionMethods connectionMethods;
     /** If port is zero then mediator uses source port */
-    std::list<network::SocketAddress> udpEndpointList;
+    std::vector<network::SocketAddress> udpEndpointList;
     /** if true, mediator does not report Connect request source address to the server peer.
         Only addresses found in udpEndpointList are reported
     */
@@ -59,8 +59,8 @@ public:
     constexpr static const network::stun::extension::methods::Value kMethod =
         network::stun::extension::methods::connect;
 
-    std::list<network::SocketAddress> forwardedTcpEndpointList;
-    std::list<network::SocketAddress> udpEndpointList;
+    std::vector<network::SocketAddress> forwardedTcpEndpointList;
+    std::vector<network::SocketAddress> udpEndpointList;
     /** Optional for backward compatibility. */
     std::optional<nx::String> trafficRelayUrl;
     /**
@@ -70,6 +70,10 @@ public:
     nx::String destinationHostFullName;
     ConnectionParameters params;
     CloudConnectVersion cloudConnectVersion;
+    /**
+     * Set if connect request failed, but the server was found at another mediator address.
+     */
+    std::optional<network::SocketAddress> alternateMediatorEndpointStunUdp;
 
     ConnectResponse();
     virtual void serializeAttributes(nx::network::stun::Message* const message) override;
@@ -78,7 +82,7 @@ public:
 
 #define ConnectResponse_Fields \
     (forwardedTcpEndpointList)(udpEndpointList)(trafficRelayUrl) \
-    (destinationHostFullName)(params)(cloudConnectVersion)
+    (destinationHostFullName)(params)(cloudConnectVersion)(alternateMediatorEndpointStunUdp)
 
 QN_FUSION_DECLARE_FUNCTIONS(ConnectResponse, (json), NX_NETWORK_API)
 

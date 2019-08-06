@@ -71,17 +71,13 @@ void QnWorkbenchContextAware::init(QObject* parent)
                 : (contextAware->isContextInitialized() ? contextAware->context() : nullptr);
 
             if (context)
-            {
                 m_context = context;
-                afterContextInitialized();
-            }
             return;
         }
 
         if (const auto context = dynamic_cast<QnWorkbenchContext*>(parent))
         {
             m_context = context;
-            afterContextInitialized();
             return;
         }
 
@@ -109,7 +105,6 @@ void QnWorkbenchContextAware::init(QnWorkbenchContext* context)
     NX_ASSERT(context, "Invalid context.");
     NX_ASSERT(!m_context, "Double context initialization.");
     m_context = context;
-    afterContextInitialized();
 }
 
 void QnWorkbenchContextAware::initFromQmlContext()
@@ -133,10 +128,6 @@ void QnWorkbenchContextAware::initFromQmlContext()
 
     if (workbenchContext)
         init(workbenchContext);
-}
-
-void QnWorkbenchContextAware::afterContextInitialized()
-{
 }
 
 QAction* QnWorkbenchContextAware::action(const action::IDType id) const

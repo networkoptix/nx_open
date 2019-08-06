@@ -45,17 +45,6 @@ int CloudDbService::serviceMain(const utils::AbstractServiceSettings& abstractSe
 {
     const conf::Settings& settings = static_cast<const conf::Settings&>(abstractSettings);
 
-    auto logSettings = settings.vmsSynchronizationLogging();
-    for (auto& loggerSettings: logSettings.loggers)
-        loggerSettings.logBaseName = "sync_log";
-    logSettings.updateDirectoryIfEmpty(settings.dataDir());
-    nx::utils::log::addLogger(
-        nx::utils::log::buildLogger(
-            logSettings,
-            QnLibCloudDbAppInfo::applicationDisplayName(),
-            QString(),
-            {nx::utils::log::Filter(QnLog::EC2_TRAN_LOG)}));
-
     m_settings = &settings;
 
     auto model = ModelFactory::instance().create();
@@ -69,7 +58,8 @@ int CloudDbService::serviceMain(const utils::AbstractServiceSettings& abstractSe
 
     statistics::Provider statisticsProvider(
         view.httpServer(),
-        controller.ec2SyncronizationEngine().statisticsProvider());
+        controller.ec2SynchronizationEngine().statisticsProvider(),
+        controller.dbInstanceController().statisticsCollector());
     view.registerStatisticsApiHandlers(&statisticsProvider);
 
     // Process privilege reduction.
@@ -78,12 +68,12 @@ int CloudDbService::serviceMain(const utils::AbstractServiceSettings& abstractSe
     view.listen();
     NX_INFO(this, lm("Listening on %1").container(view.endpoints()));
 
-    NX_ALWAYS(this, lm("%1 has been started")
+    NX_INFO(this, lm("%1 has been started")
         .arg(QnLibCloudDbAppInfo::applicationDisplayName()));
 
     const auto result = runMainLoop();
 
-    NX_ALWAYS(this, lm("Stopping..."));
+    NX_INFO(this, lm("Stopping..."));
 
     return result;
 }

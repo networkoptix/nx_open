@@ -2,6 +2,7 @@
 #include "ui_time_synchronization_widget.h"
 
 #include <QtCore/QTimer>
+#include <QtCore/QSortFilterProxyModel>
 
 #include <api/global_settings.h>
 #include <common/common_module.h>

@@ -8,8 +8,6 @@
 #include <utils/common/byte_array.h>
 #include <utils/media/audioformat.h>
 #include <utils/media/sse_helper.h>
-#include <utils/memory/abstract_allocator.h>
-#include <utils/memory/system_allocator.h>
 #include <utils/math/math.h>
 
 #include <motion/motion_detection.h>
@@ -17,6 +15,8 @@
 #include <nx/streaming/aligned_allocator.h>
 #include <nx/streaming/abstract_data_packet.h>
 #include <nx/streaming/media_context.h>
+#include <nx/utils/memory/abstract_allocator.h>
+#include <nx/utils/memory/system_allocator.h>
 
 #include <nx/fusion/model_functions_fwd.h>
 #include <common/common_globals.h>
@@ -181,9 +181,9 @@ struct QnAbstractCompressedMetadata: public QnAbstractMediaData
 {
 
 public:
-    QnAbstractCompressedMetadata(MetadataType type);
+    QnAbstractCompressedMetadata(MetadataType type, int bufferSize);
 
-    QnAbstractCompressedMetadata(MetadataType type, QnAbstractAllocator* allocator);
+    QnAbstractCompressedMetadata(MetadataType type, int bufferSize, QnAbstractAllocator* allocator);
 
     virtual bool containTime(const qint64 timeUsec) const;
 
@@ -197,8 +197,8 @@ public:
 
 struct QnCompressedMetadata: public QnAbstractCompressedMetadata
 {
-    QnCompressedMetadata(MetadataType type);
-    QnCompressedMetadata(MetadataType type, QnAbstractAllocator* allocator);
+    QnCompressedMetadata(MetadataType type, int bufferSize = 0);
+    QnCompressedMetadata(MetadataType type, int bufferSize, QnAbstractAllocator* allocator);
 
     virtual QnAbstractMediaData* clone(
         QnAbstractAllocator* allocator = QnSystemAllocator::instance()) const override;
@@ -240,7 +240,7 @@ public:
     quint64 startTimeMs;
     quint32 durationMs;
     quint8 channel;
-    quint8 input;
+    quint8 reserved0;
     quint16 reserved;
     quint8 data[Qn::kMotionGridWidth*Qn::kMotionGridHeight/8];
 };
@@ -251,9 +251,10 @@ bool operator< (const quint64 timeMs, const QnMetaDataV1Light& data);
 
 struct QnMetaDataV1: public QnAbstractCompressedMetadata
 {
-
 public:
-    QnMetaDataV1(int initialValue = 0);
+    static const int kMotionDataBufferSize = Qn::kMotionGridWidth*Qn::kMotionGridHeight / 8;
+
+    QnMetaDataV1(int initialValue = 0, int extraBufferSize = 0);
     QnMetaDataV1(QnAbstractAllocator* allocator, int initialValue = 0);
 
     static QnMetaDataV1Ptr fromLightData(const QnMetaDataV1Light& lightData);
@@ -272,6 +273,10 @@ public:
     void addMotion(QnMetaDataV1Ptr data);
     void addMotion(QnConstMetaDataV1Ptr data);
 
+    static QRect rectFromNormalizedRect(const QRectF& rectF);
+    void addMotion(const QRectF& data);
+    void addMotion(const QRect& data);
+
     // Removes part of motion info by motion mask.
     void removeMotion(const simd128i* data);
 
@@ -282,7 +287,6 @@ public:
 
     bool mapMotion(const QRect& imageRect, const QRect& mRect);
 
-    bool isInput(int index) const;
     bool containTime(const qint64 timeUsec) const;
 
     // Returns true if no motion detected.
@@ -313,9 +317,6 @@ public:
         const simd128i* mask,
         int maskStart = 0,
         int maskEnd = Qn::kMotionGridWidth * Qn::kMotionGridHeight / 128 - 1);
-
-public:
-    quint8 m_input;
 
 protected:
     void assign(const QnMetaDataV1* other);

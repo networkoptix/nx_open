@@ -354,21 +354,18 @@ ec2::ErrorCode MediaServerClient::ec2GetSystemMergeHistory(
         result);
 }
 
-void MediaServerClient::ec2AnalyticsLookupDetectedObjects(
+void MediaServerClient::ec2AnalyticsLookupObjectTracks(
     const nx::analytics::db::Filter& request,
     std::function<void(ec2::ErrorCode, nx::analytics::db::LookupResult)> completionHandler)
 {
-    QString requestPath(lit("ec2/analyticsLookupDetectedObjects"));
+    QString requestPath(lit("ec2/analyticsLookupObjectTracks"));
 
     QnRequestParamList queryParams;
     nx::analytics::db::serializeToParams(request, &queryParams);
     if (!queryParams.isEmpty())
     {
-        QUrlQuery query;
-        for (const auto& param: queryParams)
-            query.addQueryItem(param.first, param.second);
         // We create request path here. Not an URL. So, no need to encode it.
-        requestPath += lit("?") + query.toString(QUrl::FullyDecoded);
+        requestPath += lit("?") + queryParams.toUrlQuery().toString(QUrl::FullyDecoded);
     }
 
     performAsyncEc2Call(
@@ -376,7 +373,7 @@ void MediaServerClient::ec2AnalyticsLookupDetectedObjects(
         std::move(completionHandler));
 }
 
-ec2::ErrorCode MediaServerClient::ec2AnalyticsLookupDetectedObjects(
+ec2::ErrorCode MediaServerClient::ec2AnalyticsLookupObjectTracks(
     const nx::analytics::db::Filter& request,
     nx::analytics::db::LookupResult* result)
 {
@@ -387,14 +384,19 @@ ec2::ErrorCode MediaServerClient::ec2AnalyticsLookupDetectedObjects(
 
     return syncCallWrapper(
         this,
-        static_cast<AsyncFuncPointer>(&MediaServerClient::ec2AnalyticsLookupDetectedObjects),
+        static_cast<AsyncFuncPointer>(&MediaServerClient::ec2AnalyticsLookupObjectTracks),
         request,
         result);
 }
 
-nx::network::http::StatusCode::Value MediaServerClient::lastResponseHttpStatusCode() const
+SystemError::ErrorCode MediaServerClient::prevRequestSysErrorCode() const
 {
-    return m_prevResponseHttpStatusCode;
+    return m_prevRequestSysErrorCode;
+}
+
+nx::network::http::StatusLine MediaServerClient::lastResponseHttpStatusLine() const
+{
+    return m_prevResponseHttpStatusLine;
 }
 
 void MediaServerClient::stopWhileInAioThread()

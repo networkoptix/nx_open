@@ -41,6 +41,8 @@ enum class RecordingType
     motionAndLow = 3,
 };
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(RecordingType)
+NX_VMS_API QString toString(RecordingType value);
+NX_VMS_API std::ostream& operator<<(std::ostream& os, RecordingType value);
 
 enum class StreamQuality
 {
@@ -50,9 +52,12 @@ enum class StreamQuality
     high = 3,
     highest = 4,
     preset = 5,
-    undefined = 6
+    undefined = 6,
+    rapidReview = 7, //< Used for rapid review only. The bitrate should be very high.
 };
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(StreamQuality)
+NX_VMS_API QString toString(StreamQuality value);
+NX_VMS_API std::ostream& operator<<(std::ostream& os, StreamQuality value);
 
 enum class FailoverPriority
 {

@@ -12,6 +12,10 @@ if(withMediaServer
     add_subdirectory(nx_update)
 endif()
 
+if (withMediaServer OR withDesktopClient OR withMobileClient)
+    add_subdirectory(nx_vms_rules)
+endif()
+
 if(withMediaServer OR withRootTool OR withClouds)
     add_subdirectory(nx_system_commands)
 endif()

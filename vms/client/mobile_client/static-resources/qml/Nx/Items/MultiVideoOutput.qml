@@ -19,6 +19,17 @@ Item
     implicitWidth: __sourceSize.width * layoutSize.width
     implicitHeight: __sourceSize.height * layoutSize.height
 
+    Connections
+    {
+        target: resourceHelper
+        onResourceIdChanged:
+        {
+            __sourceSize = Qt.size(0, 0)
+            for (var i = 0; i != repeater.count; ++i)
+                repeater.itemAt(i).updateSourceRect()
+        }
+    }
+
     function pointInVideo(position)
     {
         for (var i = 0; i != repeater.count; ++i)
@@ -88,16 +99,29 @@ Item
                 return result
             }
 
-            onSourceRectChanged:
-            {
-                if (index === 0 && __sourceSize.width <= 0.0)
-                    __sourceSize = Qt.size(sourceRect.width, sourceRect.height)
-            }
+            onSourceRectChanged: updateSourceRect()
 
             Connections
             {
                 target: multiVideoOutput
-                onMediaPlayerChanged: setPlayer(target.mediaPlayer, index)
+                onMediaPlayerChanged: updateMediaPlayer()
+            }
+
+            Component.onCompleted:
+            {
+                updateMediaPlayer()
+                updateSourceRect()
+            }
+
+            function updateMediaPlayer()
+            {
+                setPlayer(multiVideoOutput.mediaPlayer, index)
+            }
+
+            function updateSourceRect()
+            {
+                if (index === 0 && __sourceSize.width <= 0.0)
+                    __sourceSize = Qt.size(sourceRect.width, sourceRect.height)
             }
         }
     }

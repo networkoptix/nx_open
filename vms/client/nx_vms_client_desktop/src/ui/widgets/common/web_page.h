@@ -2,16 +2,19 @@
 
 #include <QtWebKitWidgets/QWebPage>
 
-/* Replacement common class */
-class QnWebPage : public QWebPage
+/**
+ * A replacement for standard QWebPage.
+ * It ignores SSL errors and disables HTTP/2.
+ */
+class QnWebPage: public QWebPage
 {
     Q_OBJECT
+    using base_type = QWebPage;
 
-    typedef QWebPage base_type;
 public:
-    QnWebPage(QObject* parent = 0);
+    QnWebPage(QObject* parent = nullptr);
 
 protected:
-    virtual void javaScriptConsoleMessage(const QString& message, int lineNumber, const QString& sourceID) override;
-
+    virtual void javaScriptConsoleMessage(
+        const QString& message, int lineNumber, const QString& sourceID) override;
 };

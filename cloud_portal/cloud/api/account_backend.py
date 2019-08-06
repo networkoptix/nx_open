@@ -16,6 +16,13 @@ from api.helpers.exceptions import APIRequestException, APIException, APILogicEx
 
 logger = logging.getLogger(__name__)
 
+IP_MAX_LENGTH = 255
+
+
+def get_ip(request):
+    ip = request.META.get('HTTP_X_FORWARDED_FOR')
+    return ip if len(ip) <= IP_MAX_LENGTH else ip[:IP_MAX_LENGTH]
+
 
 class AccountBackend(ModelBackend):
     @staticmethod
@@ -113,9 +120,26 @@ class AccountManager(db.models.Manager):
     def create_superuser(self, email, password, **extra_fields):
         return self._create_user(email, password, **extra_fields)
 
+    def register_cloud_invite_user(self, email, password, data):
+        ip = data.pop("IP", "")
+        first_name = data.pop("first_name")
+        last_name = data.pop("last_name")
 
-def get_ip(request):
-    return request.META.get('HTTP_X_FORWARDED_FOR')
+        Account.register(ip, email, password, first_name, last_name)
+        user = models.Account.objects.get(email=email)
+        """
+        When an account is created using cloud invites it is disabled because its registration
+        is different from regular users. Once the user has registered their account it is set to
+        active in this function.
+        """
+        user.is_active = True
+        user.first_name = first_name
+        user.last_name = last_name
+        user.save()
+
+        return user
+
+
 
 
 @receiver(user_logged_in)
@@ -128,7 +152,7 @@ def user_logged_in_callback(sender, request, user, **kwargs):
 @receiver(user_logged_out)
 def user_logged_out_callback(sender, request, user, **kwargs):
     ip = get_ip(request)
-    logger.info('User logged our: {}, IP: {}'.format(user.email, ip))
+    logger.info('User logged out: {}, IP: {}'.format(user.email, ip))
     models.AccountLoginHistory.objects.create(action='user_logged_out', ip=ip, email=user.email)
 
 

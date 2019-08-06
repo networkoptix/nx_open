@@ -8,7 +8,7 @@
 #include <QtCore/QMap>
 #include <QtCore/QJsonDocument>
 
-#include <nx_ec/ec_proto_version.h>
+#include <nx/vms/api/protocol_version.h>
 #include <nx/fusion/model_functions.h>
 #include "common/common_module.h"
 
@@ -61,7 +61,6 @@ QByteArray RevealResponse::serialize()
     map[lit("realm")] = realm;
     map[lit("systemName")] = systemName;
     map[lit("name")] = name;
-    map[lit("systemInformation")] = systemInformation.toString();
     map[lit("sslAllowed")] = sslAllowed;
     map[lit("port")] = port;
     map[lit("protoVersion")] = protoVersion;
@@ -84,7 +83,6 @@ bool RevealResponse::deserialize(const quint8 *bufStart, const quint8 *bufEnd)
     QVariantMap map = QJsonDocument::fromJson(data).toVariant().toMap();
     type = map.value(lit("application")).toString();
     version = nx::utils::SoftwareVersion(map.value(lit("version")).toString());
-    systemInformation = map.value(lit("systemInformation")).toString();
     customization = map.value(lit("customization")).toString();
     brand = map.value(lit("brand")).toString();
     realm = map.value(lit("realm")).toString();
@@ -93,7 +91,7 @@ bool RevealResponse::deserialize(const quint8 *bufStart, const quint8 *bufEnd)
     id = QnUuid::fromStringSafe(map.value(lit("seed")).toString());
     sslAllowed = map.value(lit("sslAllowed")).toBool();
     port = static_cast<quint16>(map.value(lit("port")).toUInt());
-    protoVersion = map.value(lit("protoVersion"), nx_ec::INITIAL_EC2_PROTO_VERSION).toInt();
+    protoVersion = map.value(lit("protoVersion"), nx::vms::api::kInitialProtocolVersion).toInt();
     runtimeId = QnUuid::fromStringSafe(map.value(lit("runtimeId")).toString());
     serverFlags = QnLexical::deserialized<nx::vms::api::ServerFlags>(
         map.value(lit("flags")).toString(), nx::vms::api::SF_None);

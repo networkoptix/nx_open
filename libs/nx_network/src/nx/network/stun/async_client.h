@@ -36,6 +36,7 @@ public:
     AsyncClient(
         std::unique_ptr<AbstractStreamSocket> tcpConnection,
         Settings timeouts = Settings());
+    virtual ~AsyncClient() override;
 
     AsyncClient(const AsyncClient&) = delete;
 

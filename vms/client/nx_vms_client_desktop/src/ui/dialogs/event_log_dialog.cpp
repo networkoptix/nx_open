@@ -29,7 +29,7 @@
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/common/utils/item_view_hover_tracker.h>
-#include <nx/vms/client/desktop/resource_views/data/node_type.h>
+#include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 
 #include <ui/utils/table_export_helper.h>
 #include <ui/help/help_topic_accessor.h>
@@ -655,7 +655,7 @@ void QnEventLogDialog::at_eventsGrid_customContextMenuRequested(const QPoint&)
         if (resource && accessController()->hasPermissions(resource, Qn::ViewContentPermission))
         {
             action::Parameters parameters(resource);
-            parameters.setArgument(Qn::NodeTypeRole, ResourceTreeNodeType::resource);
+            parameters.setArgument(Qn::NodeTypeRole, ResourceTree::NodeType::resource);
 
             menu.reset(manager->newMenu(action::TreeScope, nullptr, parameters));
             foreach(QAction* action, menu->actions())
@@ -685,13 +685,18 @@ void QnEventLogDialog::at_eventsGrid_customContextMenuRequested(const QPoint&)
 
 void QnEventLogDialog::at_exportAction_triggered()
 {
-    QnTableExportHelper::exportToFile(ui->gridEvents, true, this,
+    QnTableExportHelper::exportToFile(
+        ui->gridEvents->model(),
+        ui->gridEvents->selectionModel()->selectedIndexes(),
+        this,
         tr("Export selected events to file"));
 }
 
 void QnEventLogDialog::at_clipboardAction_triggered()
 {
-    QnTableExportHelper::copyToClipboard(ui->gridEvents);
+    QnTableExportHelper::copyToClipboard(
+        ui->gridEvents->model(),
+        ui->gridEvents->selectionModel()->selectedIndexes());
 }
 
 void QnEventLogDialog::at_mouseButtonRelease(QObject* sender, QEvent* event)

@@ -19,6 +19,7 @@ namespace utils {
 
 QString NX_UTILS_API timestampToRfc2822(qint64 timestampMs);
 QString NX_UTILS_API timestampToRfc2822(std::chrono::milliseconds timestamp);
+QString NX_UTILS_API timestampToRfc2822(std::chrono::system_clock::time_point timestamp);
 
 QString NX_UTILS_API timestampToDebugString(qint64 timestampMs);
 QString NX_UTILS_API timestampToDebugString(std::chrono::milliseconds timestamp);

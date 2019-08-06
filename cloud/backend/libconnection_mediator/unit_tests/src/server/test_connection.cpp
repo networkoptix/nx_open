@@ -11,7 +11,6 @@ static nx::network::stun::MessageDispatcher s_messageDispatcher;
 
 TestTcpConnection::TestTcpConnection():
     base_type(
-        nullptr,
         std::make_unique<nx::network::TCPSocket>(AF_INET),
         s_messageDispatcher)
 {

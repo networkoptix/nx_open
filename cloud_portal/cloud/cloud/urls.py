@@ -37,10 +37,11 @@ def redirect_login(request):
 
 urlpatterns = [
     url(r'^admin/login/', redirect_login),
-    url(r'^admin/cms/', include('cms.urls')),
+    url(r'^admin/cms/', include('cms.admin_urls')),
     url(r'^admin/notifications/', include('notifications.admin_urls')),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^api/', include('api.urls')),
+    url(r'^api/', include('cms.urls')),
     url(r'^notifications/', include('notifications.urls')),
     url(r'^admin_tools/', include('admin_tools.urls')),
     url(r'^zapier/', include('zapier.urls')),

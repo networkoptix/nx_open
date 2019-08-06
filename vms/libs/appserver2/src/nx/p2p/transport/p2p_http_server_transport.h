@@ -4,7 +4,7 @@
 #include <nx/network/websocket/websocket_common_types.h>
 #include <nx/network/http/http_parser.h>
 #include <nx/network/aio/timer.h>
-#include <nx/utils/object_destruction_flag.h>
+#include <nx/utils/interruption_flag.h>
 
 namespace nx::p2p {
 
@@ -70,7 +70,7 @@ private:
     utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_onGetRequestReceived =
         [](SystemError::ErrorCode) {};
     bool m_failed = false;
-    utils::ObjectDestructionFlag m_destructionFlag;
+    utils::InterruptionFlag m_destructionFlag;
     UserReadHandlerPair m_userReadHandlerPair;
 
     void onBytesRead(

@@ -813,16 +813,16 @@ public:
     {
     }
 
-    int subscribe(_oasisWsnB2__Subscribe* const request, _oasisWsnB2__SubscribeResponse* const response);
+    int subscribe(_wsnt__Subscribe* const request, _wsnt__SubscribeResponse* const response);
 
     // NotificationProducerBindingProxy also implements GetCurrentMessage,
     // but it is not currently used.
 };
 // ------------------------------------------------------------------------------------------------
-class SubscriptionManagerSoapWrapper : public SoapWrapper<SubscriptionManagerBindingProxy>
+class SubscriptionManagerSoapWrapper: public SoapWrapper<SubscriptionManagerBindingProxy>
 {
 public:
-    SubscriptionManagerSoapWrapper(SoapParams soapParams) :
+    SubscriptionManagerSoapWrapper(SoapParams soapParams):
         SoapWrapper<SubscriptionManagerBindingProxy>(std::move(soapParams))
     {
     }
@@ -836,8 +836,8 @@ public:
     {
     }
 
-    int renew(_oasisWsnB2__Renew& request, _oasisWsnB2__RenewResponse& response);
-    int unsubscribe(_oasisWsnB2__Unsubscribe& request, _oasisWsnB2__UnsubscribeResponse& response);
+    int renew(_wsnt__Renew& request, _wsnt__RenewResponse& response);
+    int unsubscribe(_wsnt__Unsubscribe& request, _wsnt__UnsubscribeResponse& response);
 };
 // ------------------------------------------------------------------------------------------------
 #if 0
@@ -863,7 +863,7 @@ public:
     }
 
     int createPullPoint(
-        _oasisWsnB2__CreatePullPoint& request, _oasisWsnB2__CreatePullPointResponse& response)
+        _wsnt__CreatePullPoint& request, _wsnt__CreatePullPointResponse& response)
     {
         return invokeMethod(&CreatePullPointBindingProxy::CreatePullPoint, &request, response);
     }

@@ -20,7 +20,8 @@ namespace event {
 EventConnector::EventConnector(QnMediaServerModule* serverModule):
     ServerModuleAware(serverModule)
 {
-    connect(resourcePool(), &QnResourcePool::resourceAdded, this, &EventConnector::onNewResource);
+    connect(this->serverModule()->resourcePool(),&QnResourcePool::resourceAdded,
+        this, &EventConnector::onNewResource);
 
     m_thread = new QThread(this);
     m_thread->setObjectName("EventConnectorThread");
@@ -96,6 +97,15 @@ void EventConnector::at_storageFailure(const QnResourcePtr& server, qint64 timeS
 
     vms::event::StorageFailureEventPtr event(new vms::event::StorageFailureEvent(
         server, timeStamp, reasonCode, url));
+
+    serverModule()->eventRuleProcessor()->processEvent(event);
+}
+
+void EventConnector::at_raidStorageFailure(const QnResourcePtr& server, qint64 timeStamp,
+    vms::event::EventReason reasonCode, const QString &eventDescription)
+{
+    vms::event::StorageFailureEventPtr event(new vms::event::StorageFailureEvent(
+        server, timeStamp, reasonCode, eventDescription));
 
     serverModule()->eventRuleProcessor()->processEvent(event);
 }
@@ -219,7 +229,7 @@ void EventConnector::at_analyticsSdkEvent(const nx::vms::event::AnalyticsSdkEven
     serverModule()->eventRuleProcessor()->processEvent(event);
 }
 
-void EventConnector::at_pluginEvent(const nx::vms::event::PluginEventPtr& event)
+void EventConnector::at_pluginDiagnosticEvent(const nx::vms::event::PluginDiagnosticEventPtr& event)
 {
     serverModule()->eventRuleProcessor()->processEvent(event);
 }
@@ -252,7 +262,11 @@ void EventConnector::at_serverConflict(const QnResourcePtr& resource, qint64 tim
     serverModule()->eventRuleProcessor()->processEvent(event);
 }
 
-void EventConnector::at_archiveBackupFinished(const QnResourcePtr& resource, qint64 timeStamp, vms::api::EventReason reasonCode, const QString& reasonText)
+void EventConnector::at_archiveBackupFinished(
+    const QnResourcePtr& resource,
+    qint64 timeStamp,
+    vms::api::EventReason reasonCode,
+    const QString& reasonText)
 {
     vms::event::BackupFinishedEventPtr event(new vms::event::BackupFinishedEvent(
         resource, timeStamp, reasonCode, reasonText));
@@ -394,7 +408,7 @@ bool EventConnector::createEventFromParams(const vms::event::EventParameters& pa
             return false;
         };
 
-    auto resource = resourcePool()->getResourceById(params.eventResourceId);
+    auto resource = serverModule()->resourcePool()->getResourceById(params.eventResourceId);
     const bool isOnState = eventState == vms::api::EventState::active;
 
     if (params.eventType >= vms::api::EventType::userDefinedEvent)
@@ -455,7 +469,7 @@ bool EventConnector::createEventFromParams(const vms::event::EventParameters& pa
         case vms::api::EventType::storageFailureEvent:
         {
             if (!resource)
-                resource = resourcePool()->getResourceById(params.sourceServerId);
+                resource = serverModule()->resourcePool()->getResourceById(params.sourceServerId);
 
             at_storageFailure(resource, params.eventTimestampUsec,
                 params.reasonCode, params.description);
@@ -475,7 +489,7 @@ bool EventConnector::createEventFromParams(const vms::event::EventParameters& pa
         case vms::api::EventType::cameraIpConflictEvent:
         {
             if (!resource)
-                resource = resourcePool()->getResourceById(params.sourceServerId);
+                resource = serverModule()->resourcePool()->getResourceById(params.sourceServerId);
 
             at_cameraIPConflict(resource, QHostAddress(params.caption),
                 params.description.split(nx::vms::event::IpConflictEvent::delimiter()),
@@ -486,7 +500,7 @@ bool EventConnector::createEventFromParams(const vms::event::EventParameters& pa
         case vms::api::EventType::serverFailureEvent:
         {
             if (!resource)
-                resource = resourcePool()->getResourceById(params.sourceServerId);
+                resource = serverModule()->resourcePool()->getResourceById(params.sourceServerId);
 
             at_serverFailure(resource, params.eventTimestampUsec,
                 params.reasonCode, params.description);
@@ -496,7 +510,7 @@ bool EventConnector::createEventFromParams(const vms::event::EventParameters& pa
         case vms::api::EventType::serverConflictEvent:
         {
             if (!resource)
-                resource = resourcePool()->getResourceById(params.sourceServerId);
+                resource = serverModule()->resourcePool()->getResourceById(params.sourceServerId);
 
             QnCameraConflictList conflicts;
             conflicts.decode(params.description);
@@ -508,7 +522,7 @@ bool EventConnector::createEventFromParams(const vms::event::EventParameters& pa
         case vms::api::EventType::serverStartEvent:
         {
             if (!resource)
-                resource = resourcePool()->getResourceById(params.sourceServerId);
+                resource = serverModule()->resourcePool()->getResourceById(params.sourceServerId);
 
             at_serverStarted(resource, params.eventTimestampUsec);
             return true;
@@ -517,7 +531,7 @@ bool EventConnector::createEventFromParams(const vms::event::EventParameters& pa
         case vms::api::EventType::licenseIssueEvent:
         {
             if (!resource)
-                resource = resourcePool()->getResourceById(params.sourceServerId);
+                resource = serverModule()->resourcePool()->getResourceById(params.sourceServerId);
 
             at_licenseIssueEvent(resource, params.eventTimestampUsec,
                 params.reasonCode, params.description);
@@ -527,7 +541,7 @@ bool EventConnector::createEventFromParams(const vms::event::EventParameters& pa
         case vms::api::EventType::backupFinishedEvent:
         {
             if (!resource)
-                resource = resourcePool()->getResourceById(params.sourceServerId);
+                resource = serverModule()->resourcePool()->getResourceById(params.sourceServerId);
 
             at_archiveBackupFinished(resource, params.eventTimestampUsec,
                 params.reasonCode, params.description);
@@ -546,7 +560,7 @@ bool EventConnector::createEventFromParams(const vms::event::EventParameters& pa
                 eventState,
                 params.caption,
                 params.description,
-                /*auxiliaryData*/ QString(),
+                /*attributes*/ std::map<QString, QString>(),
                 params.eventTimestampUsec));
 
             at_analyticsSdkEvent(event);

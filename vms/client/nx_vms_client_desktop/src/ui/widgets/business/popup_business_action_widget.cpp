@@ -1,6 +1,8 @@
 #include "popup_business_action_widget.h"
 #include "ui_popup_business_action_widget.h"
 
+#include <QtCore/QScopedValueRollback>
+
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 

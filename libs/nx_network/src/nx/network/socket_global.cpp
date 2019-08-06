@@ -144,6 +144,12 @@ SocketGlobals::~SocketGlobals()
 
     m_impl->debugIniReloadTimer->pleaseStopSync();
     m_impl->addressResolver->pleaseStopSync();
+
+    m_impl.reset();
+
+    NX_ASSERT(m_debugCounters.httpClientConnectionCount == 0);
+    NX_ASSERT(m_debugCounters.tcpSocketCount == 0);
+    NX_ASSERT(m_debugCounters.udpSocketCount == 0);
 }
 
 const Ini& SocketGlobals::ini()
@@ -282,6 +288,16 @@ bool SocketGlobals::isHostBlocked(const HostAddress& host) const
 SocketGlobals& SocketGlobals::instance()
 {
     return *s_instance;
+}
+
+const DebugCounters& SocketGlobals::debugCounters() const
+{
+    return m_debugCounters;
+}
+
+DebugCounters& SocketGlobals::debugCounters()
+{
+    return m_debugCounters;
 }
 
 void SocketGlobals::reloadIni()

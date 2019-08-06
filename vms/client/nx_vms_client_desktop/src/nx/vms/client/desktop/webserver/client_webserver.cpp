@@ -9,6 +9,7 @@
 
 #include <nx/vms/client/desktop/director/director_json_interface.h>
 #include <nx/utils/log/assert.h>
+#include <nx/utils/log/log.h>
 #include <nx/utils/app_info.h>
 
 namespace {
@@ -29,6 +30,12 @@ QJsonDocument convertHttpToJsonRequest(const QtHttpRequest& request)
     for (const auto& item: items)
         result.insert(item.first, item.second);
 
+    auto path = request.getUrl().path();
+    const auto pathCommand = path.remove('/'); //< Strip leading or trailing "/".
+    // We give priority to "command" parameter vs. URL path parameter.
+    if (!result.contains("command") && !pathCommand.isEmpty())
+        result.insert("command", pathCommand);
+
     return QJsonDocument(result);
 }
 } // namespace
@@ -46,7 +53,7 @@ DirectorWebserver::DirectorWebserver(QObject* parent):
     connect(m_server.data(), &QtHttpServer::stopped,
         this, [this] { m_active = false; });
     connect(m_server.data(), &QtHttpServer::requestNeedsReply,
-        this, &DirectorWebserver::makeReply);
+        this, &DirectorWebserver::processRequest);
 }
 
 DirectorWebserver::~DirectorWebserver()
@@ -54,23 +61,39 @@ DirectorWebserver::~DirectorWebserver()
     stop();
 }
 
-void DirectorWebserver::setPort(int port)
+bool DirectorWebserver::setListenAddress(const QString& address, int port)
 {
-    if (!NX_ASSERT(port > 0 && port < 65536, "Client webserver port number should be 1..65535"))
-        return;
-
+    if (address.isEmpty())
+        m_address = QHostAddress(kServerBinding);
+    else
+        m_address = address;
     m_port = port;
 
     if (m_active)
     {
+        NX_VERBOSE(this, "setListenAddress(%1) - restarting running server due to address change");
         stop();
         start();
     }
+
+    if (m_address.isNull())
+        return false;
+    return true;
 }
 
 bool DirectorWebserver::start()
 {
-    m_server->start(m_port, kServerBinding);
+    if (m_address.isNull())
+    {
+        NX_ERROR(this, "start() - got empty address. I will not start");
+        return false;
+    }
+
+    m_server->start(m_port, m_address);
+    if (!m_active)
+        NX_ERROR(this, "start() - failed to start director at a \"%1:%2\"", m_address, m_port);
+    else
+        NX_INFO(this, "start() - listening to \"%1:%2\"", m_address, m_port);
     return m_active;
 }
 
@@ -79,7 +102,22 @@ void DirectorWebserver::stop()
     m_server->stop();
 }
 
-void DirectorWebserver::makeReply(QtHttpRequest* request, QtHttpReply* reply)
+void DirectorWebserver::onClientConnected(const QString& guid)
+{
+    NX_VERBOSE(this, "onClientConnected(%1)", guid);
+}
+
+void DirectorWebserver::onClientDisconnected(const QString& guid)
+{
+    NX_VERBOSE(this, "onClientDisconnected(%1)", guid);
+}
+
+void DirectorWebserver::onServerError(const QString& errorMessage)
+{
+    NX_ERROR(this, "onServerError(): %1", errorMessage);
+}
+
+void DirectorWebserver::processRequest(QtHttpRequest* request, QtHttpReply* reply)
 {
     reply->setStatusCode(QtHttpReply::Ok); //< This line is actually extraneous.
     reply->addHeader("Content-Type", QByteArrayLiteral ("application/json"));

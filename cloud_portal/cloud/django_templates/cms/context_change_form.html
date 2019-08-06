@@ -1,0 +1,167 @@
+{% extends "admin/change_form.html" %}
+{% load i18n admin_urls static admin_modify %}
+{% load cms_filters %}
+
+{% block extrahead %}
+    {{ block.super }}
+    <script src="{% static 'tiny_mce/tiny_mce.js' %}"></script>
+{% endblock %}
+<{% block breadcrumbs %}
+    <div class="breadcrumbs">
+        <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+        &rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+        &rsaquo; <a href="{% url 'admin:cms_product_changelist' %}">{{ product_opts.verbose_name_plural|capfirst }}</a>
+        &rsaquo; <a href="{% url 'admin:cms_product_change' product.id %}"> {{ product.name }}</a>
+        &rsaquo; <a href="{% url 'admin:pages' product.id %}"> Pages </a>
+        &rsaquo; {% trans 'Edit'%} <span>{{ original.name }}</span>
+    </div>
+{% endblock %}
+{% block content %}
+<form id="context_form" class="aligned" action="" enctype="multipart/form-data" method="post" novalidate>
+    {% csrf_token %}
+    <input type="hidden" name="context_id" value="{{ original.id }}">
+    <input type="hidden" name="product_id" value="{{ product.id }}">
+    <input type="hidden" name="currentLanguage" value="{{ language_code }}">
+    <input type="hidden" id="languageChanged">
+    {% for field in custom_form %}
+    <div class="form-row{% if field.errors %} errors {% endif %}{% if field.field.disabled %} disabled-row{% endif %}">
+        <ul class="errorlist">
+            {% for error in field.errors %}
+                <li>{{ error }}</li>
+                {% endfor %}
+        </ul>
+        <div>
+            {% get_data_structure field.name original as data_structure %}
+            {% get_datastructure_type data_structure as data_structure_type %}
+            {% is_external_file_or_image field.name original as is_external %}
+            {% has_value field.name product original language as record_exists %}
+            <label {% if data_structure.advanced %} class="text-danger" {% endif %}
+                    for="id_{{ field.name }}">{{ field.label }}{% if not data_structure.optional %}*{% endif %}
+                <p class="help">{{ field.name }}</p>
+                {% if not data_structure.optional %} <p class="help">required</p> {% endif %}
+            </label>
+            <div id="{{ field.name }}" style="width: 100%">
+                {% if field|is_ImageField and field.value %}
+                    <div>
+                        {% if data_structure.optional and record_exists %}
+                            <label><input id="delete_{{ field.name }}" type="checkbox"
+                                          name="delete_{{ field.name }}" value="false"/>&nbsp;Clear Value</label>
+                            <br><br>
+                        {% endif %}
+                        <img class="preview-image context-preview {% if data_structure.optional and not record_exists %} optional-image {% endif %}"
+                             src="data:image/png;base64,{{ field.value }}">
+                    </div>
+
+                {% elif field|is_FileField and field.value %}
+                    <div>
+                        {% if data_structure.optional and record_exists %}
+                            <label><input id="delete_{{ field.name }}" type="checkbox" name="delete_{{ field.name }}"
+                                          value="false"/>&nbsp;Clear Value</label>
+                        {% endif %}
+                        {% if data_structure_type == EXTERNAL_IMAGE %}
+                            <img class="preview-image context-preview {% if data_structure.optional and not record_exists %} optional-image {% endif %}"
+                                 src="{{ field.value }}">
+                        {% else %}
+                        <a href={% if not is_external %}
+                                    "{% url 'download_file' field.name %}?lang={{ language_code }}&draft"
+                                {% else %}
+                                    "{{ field.value }}"
+                                {% endif %} download>
+                            {% if data_structure.optional and not record_exists %}
+                                Download Example
+                            {% else %}
+                                Download
+                            {% endif %}
+                        </a>
+                        {% endif %}
+                    </div>
+                {% endif %}
+                {% if not field.field.disabled %}
+                    {{ field }}
+                {% elif not field|is_FileField and not field|is_ImageField %}
+                    <div class="show-html">{{ field.value|safe }}</div>
+                {% endif %}
+
+                {% if field.help_text %}
+                    <p class="help">{{ field.help_text|safe }}</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+
+    {% if perms.cms.edit_content %}
+        <div class="submit-row">
+            {% if preview_link %}
+                <button class='btn btn-sm btn-default pull-left' onClick="openPreview();return false;">Open Preview</button>
+            {% endif %}
+            {% if user.is_superuser and context.file_path %}
+                <a class="btn btn-sm btn-default"
+                   href="{% url 'download_file' context.file_path %}?lang={{ language.code }}&draft"
+                   download>Download Draft</a>
+            {% endif %}
+            {% if context.product.product_type.can_preview %}
+                <button class="btn btn-sm btn-default" type="submit" name="Preview">Save and Preview</button>
+            {% endif %}
+            <button class="btn btn-sm btn-info" type="submit" name="SaveDraft">Save Draft</button>
+            <button class="btn btn-sm btn-success" type="submit" name="SendReview">Send for Review</button>
+            <button class="btn btn-sm btn-danger" type="reset" name="Reset">Reset</button>
+        </div>
+    {% endif %}
+</form>
+
+<script>
+    function openPreview() {
+        window.open("{{ preview_link }}");
+    }
+
+    function wasTouched() {
+        var inputs = document.getElementsByTagName('input');
+        var textareas = document.getElementsByTagName('textarea');
+        var htmlEditors = tinymce.editors;
+
+        for (var i = 0; i < inputs.length; ++i) {
+            if (inputs[i].defaultValue !== inputs[i].value) {
+                return true;
+            }
+        }
+
+        for (var i = 0; i < textareas.length; ++i) {
+            if (textareas[i].defaultValue !== textareas[i].value) {
+                return true;
+            }
+        }
+        if (htmlEditors.some(function (editor) {
+            return editor.isDirty()
+        })) {
+            return true;
+        }
+        return false;
+    }
+
+    function languageChanged() {
+        if (wasTouched() && confirm('Do you want to save changes?')) {
+            document.getElementById('languageChanged').name = "languageChanged";
+        }
+        document.getElementById('context_form').submit();
+    }
+
+
+    var langSelector = document.getElementById('id_language');
+    if (langSelector) {
+        langSelector.addEventListener('change', languageChanged, false);
+    }
+
+    tinymce.init({
+        selector: '.tinymce',
+        menubar: false,
+        resize: 'both',
+        theme: 'advanced',
+        plugins: 'preview,-visualblocks,-advcode,paste',
+        theme_advanced_buttons1: 'undo,redo,separator,formatselect,link,bold,italic,underline,separator,bullist,numlist,separator,outdent,indent,separator,code,removeformat,pasteword,preview',
+        theme_advanced_toolbar_location: 'top',
+        theme_advanced_toolbar_align: 'left',
+        theme_advanced_resizing: true
+    });
+</script>
+{% endblock %}

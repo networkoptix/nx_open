@@ -126,6 +126,7 @@ public:
     bool changingMotionRoi = false;
     bool loadingMotion = false;
     bool loadingState = false;
+    bool highlightArchiveChunks = false;
 
     QSGTexture* stripesDarkTexture = nullptr;
     QSGTexture* stripesLightTexture = nullptr;
@@ -544,6 +545,9 @@ void QnTimeline::setMotionSearchMode(bool value)
     d->motionSearchMode = value;
     emit motionSearchModeChanged();
 
+    if (d->motionSearchMode)
+        d->highlightArchiveChunks = true;
+
     d->updateLoadingState();
 }
 
@@ -815,6 +819,7 @@ void QnTimeline::setChunkProvider(QnCameraChunkProvider* chunkProvider)
                     periods = d->chunkProvider->timePeriods(contentType);
                     periods.detach();
                 }
+                d->highlightArchiveChunks = false;
                 update();
             };
 
@@ -1389,24 +1394,31 @@ QSGGeometryNode* QnTimeline::updateChunksNode(QSGGeometryNode* chunksNode)
     QnTimelineChunkPainter chunkPainter(geometry);
     auto colors = chunkPainter.colors();
 
-    const auto archiveContentColor = !d->motionSearchMode
-        ? d->chunkColor
-        : (d->loadingState ? d->loadingChunkColor : d->motionModeChunkColor);
-    colors[Qn::RecordingContent] = archiveContentColor;
+    colors[Qn::RecordingContent] =
+        [this]()
+        {
+            if (!d->motionSearchMode)
+                return d->chunkColor;
+
+            return d->loadingState && d->highlightArchiveChunks
+                ? d->loadingChunkColor
+                : d->motionModeChunkColor;
+        }();
 
     colors[Qn::MotionContent] =
-        [this, archiveContentColor]
+        [this]
         {
             if (d->motionSearchMode)
                 return d->loadingState ? d->motionLoadingColor : d->motionColor;
-            return archiveContentColor;
+
+            return d->chunkColor;
         }();
 
     colors[Qn::TimePeriodContentCount] = d->hasArchive() ? d->chunkBarColor : Qt::transparent;
 
     chunkPainter.setColors(colors);
     chunkPainter.start(
-        value, QRectF(0, y, liveX - 1, height() - y),
+        value, QRectF(0, y, std::max<qreal>(liveX - 1, 0), height() - y),
         chunkCount, minimumValue, std::min(liveMs, maximumValue));
 
     while (value < kRightChunksBound)
@@ -1536,10 +1548,10 @@ void QnTimelinePrivate::updateStripesTextures()
     const auto stripesDark = makeStripesImage(
         chunkBarHeight, inactiveLiveColorLight, inactiveLiveColorDark);
 
-    const auto activeLightColor = loadingState
+    const auto activeLightColor = loadingState && highlightArchiveChunks
         ? motionLoadingLiveColorLight
         : activeLiveColorLight;
-    const auto activeDarkColor = loadingState
+    const auto activeDarkColor = loadingState && highlightArchiveChunks
         ? motionLoadingLiveColorDark
         : activeLiveColorDark;
     const auto stripesLight = makeStripesImage(chunkBarHeight, activeLightColor, activeDarkColor);
@@ -1620,6 +1632,7 @@ void QnTimelinePrivate::animateProperties()
     if (zoomJustStopped)
         tryFitInBounds();
 
+    const auto oldWindowSize = windowEnd - windowStart;
     if (!zoomKineticHelper.isStopped())
     {
         qint64 maxSize = (liveTime - startBound) * 16;
@@ -1755,7 +1768,6 @@ void QnTimelinePrivate::animateProperties()
     }
 
     bool windowUpdateRequired = false;
-    const auto oldWindowSize = windowEnd - windowStart;
     if (originalWindowStart != windowStart)
     {
         emit parent->windowStartChanged();

@@ -1,9 +1,14 @@
 #include "cloud_system_fixture.h"
 
+#include <optional>
+
 #include <gtest/gtest.h>
 
 #include <nx/network/address_resolver.h>
 #include <nx/network/socket_global.h>
+#include <nx/utils/log/log.h>
+
+#include "util.h"
 
 namespace test {
 
@@ -24,6 +29,14 @@ bool Cloud::initialize()
             .arg(m_httpProxy.serverAddress()).toStdString().c_str());
 
     return m_cdb.startAndWaitUntilStarted();
+}
+
+void Cloud::installProxyBeforeCdb(
+    std::unique_ptr<nx::network::StreamProxy> proxy,
+    const nx::network::SocketAddress& proxyEndpoint)
+{
+    m_cdbProxy = std::move(proxy);
+    m_proxyEndpoint = proxyEndpoint;
 }
 
 nx::cloud::db::AccountWithPassword Cloud::registerCloudAccount()
@@ -67,6 +80,11 @@ nx::cloud::db::CdbLauncher& Cloud::cdb()
 const nx::cloud::db::CdbLauncher& Cloud::cdb() const
 {
     return m_cdb;
+}
+
+nx::network::SocketAddress Cloud::cdbEndpoint() const
+{
+    return m_proxyEndpoint ? *m_proxyEndpoint : m_cdb.endpoint();
 }
 
 bool Cloud::isSystemRegistered(
@@ -191,7 +209,7 @@ std::unique_ptr<VmsSystem> CloudSystemFixture::createVmsSystem(int serverCount)
     systemMergeFixture.addSetting(
         "-cloudIntegration/cloudDbUrl",
         nx::network::url::Builder().setScheme(nx::network::http::kUrlSchemeName)
-            .setEndpoint(m_cloud.cdb().endpoint()).toString().toStdString());
+            .setEndpoint(m_cloud.cdbEndpoint()).toString().toStdString());
 
     systemMergeFixture.addSetting(
         "-cloudIntegration/delayBeforeSettingMasterFlag",
@@ -226,15 +244,18 @@ void CloudSystemFixture::waitUntilVmsTransactionLogMatchesCloudOne(
             ::ec2::ErrorCode::ok,
             mediaServerClient->ec2GetTransactionLog(filter, &vmsTransactionLog));
 
-        ::ec2::ApiTransactionDataList cloudTransactionLog;
+        nx::clusterdb::engine::CommandDataList cloudCommandLog;
         m_cloud.cdb().getTransactionLog(
             account.email,
             account.password,
             cloudSystemId,
-            &cloudTransactionLog);
+            &cloudCommandLog);
 
-        if (vmsTransactionLog == cloudTransactionLog)
+        if (nx::test::compare(vmsTransactionLog, cloudCommandLog))
             break;
+
+        NX_VERBOSE(this, "VMS transaction log: %1", QJson::serialized(vmsTransactionLog));
+        NX_VERBOSE(this, "Cloud transaction log: %1", QJson::serialized(cloudCommandLog));
 
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }

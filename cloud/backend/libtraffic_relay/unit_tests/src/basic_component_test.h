@@ -3,9 +3,11 @@
 #include <nx/utils/std/optional.h>
 #include <nx/utils/url.h>
 #include <nx/utils/test_support/module_instance_launcher.h>
-#include <nx/utils/test_support/test_with_temporary_directory.h>
 
-#include <nx/cloud/relay/relay_service.h>
+#include <nx/sql/test_support/test_with_db_helper.h>
+#include <nx/cloud/discovery/test_support/discovery_server.h>
+
+#include <nx/cloud/relay/test_support/traffic_relay_cluster.h>
 
 #include "remote_relay_peer_pool.h"
 
@@ -14,21 +16,15 @@ namespace cloud {
 namespace relay {
 namespace test {
 
-class Relay:
-    public utils::test::ModuleLauncher<relay::RelayService>
-{
-public:
-    Relay();
-    ~Relay();
-
-    nx::utils::Url basicUrl() const;
-};
+using Relay = TrafficRelay;
 
 //-------------------------------------------------------------------------------------------------
 
 class BasicComponentTest:
-    public utils::test::TestWithTemporaryDirectory
+    public nx::sql::test::TestWithDbHelper
 {
+    using base_type = nx::sql::test::TestWithDbHelper;
+
 public:
     enum class Mode
     {
@@ -37,7 +33,6 @@ public:
     };
 
     BasicComponentTest(Mode mode = Mode::cluster);
-    ~BasicComponentTest();
 
     void addRelayInstance(
         std::vector<const char*> args = {},
@@ -54,12 +49,11 @@ public:
     bool peerInformationSynchronizedInCluster(const std::string& hostname);
 
 private:
+    nx::cloud::discovery::test::DiscoveryServer m_discoveryServer;
+    bool m_serverListening = false;
+    std::unique_ptr<TrafficRelayCluster> m_relayCluster;
     ListeningPeerPool m_listeningPeerPool;
-    std::vector<std::unique_ptr<Relay>> m_relays;
     std::optional<model::RemoteRelayPeerPoolFactory::Function> m_factoryFunctionBak;
-
-    std::unique_ptr<model::AbstractRemoteRelayPeerPool> createRemoteRelayPeerPool(
-        const conf::Settings& settings);
 };
 
 } // namespace test

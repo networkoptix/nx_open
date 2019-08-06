@@ -50,11 +50,12 @@
 #include <media_server/mserver_status_watcher.h>
 #include <media_server/resource_status_watcher.h>
 #include <media_server/server_connector.h>
-#include <media_server/server_update_tool.h>
 #include <streaming/audio_streamer_pool.h>
 #include <media_server_process_aux.h>
 #include <nx/vms/server/command_line_parameters.h>
 #include <nx/vms/server/discovery/discovery_monitor.h>
+#include <system_log/system_event_log_reader.h>
+#include <nx/vms/utils/metrics/controller.h>
 
 class QnAppserverResourceProcessor;
 class QNetworkReply;
@@ -121,6 +122,7 @@ public:
 
 signals:
     void started();
+    void startedWithSignalsProcessed();
 
 public slots:
     void stopAsync();
@@ -134,10 +136,11 @@ private slots:
     void at_storageManager_storagesAvailable();
     void at_storageManager_storageFailure(const QnResourcePtr& storage,
         nx::vms::api::EventReason reason);
+    void at_storageManager_raidStorageFailure(const QString& description,
+        nx::vms::api::EventReason reason);
     void at_storageManager_rebuildFinished(QnSystemHealth::MessageType msgType);
     void at_archiveBackupFinished(qint64 backedUpToMs, nx::vms::api::EventReason code);
     void at_timer();
-    void at_connectionOpened();
     void at_serverModuleConflict(nx::vms::discovery::ModuleEndpoint module);
 
     void at_appStarted();
@@ -147,9 +150,10 @@ private slots:
     void at_databaseDumped();
     void at_systemIdentityTimeChanged(qint64 value, const QnUuid& sender);
     void at_updatePublicAddress(const QHostAddress& publicIp);
-    void at_metadataStorageIdChanged(const QnResourcePtr& resource);
+    void at_serverPropertyChanged(const QnResourcePtr& resource, const QString& key);
 
 private:
+    void writeServerStartedEvent();
     void updateDisabledVendorsIfNeeded();
     void updateAllowCameraChangesIfNeeded();
     void moveHandlingCameras();
@@ -161,22 +165,20 @@ private:
         QnUniversalTcpListener* tcpListener,
         ec2::TransactionMessageBusAdapter* messageBus);
 
-    /**
-     * This weird name is an apidoctool requirement.
-     */
-    void reg(
+    void registerRestHandler(
         const QString& path,
-        QnRestRequestHandler* handler,
+        nx::network::rest::Handler* handler,
         GlobalPermission permission = GlobalPermission::none);
 
-    void reg(
+    void registerRestHandler(
         const nx::network::http::Method::ValueType& method,
         const QString& path,
-        QnRestRequestHandler* handler,
+        nx::network::rest::Handler* handler,
         GlobalPermission permission = GlobalPermission::none);
 
-    template<class TcpConnectionProcessor, typename... ExtraParam>
-    void regTcp(const QByteArray& protocol, const QString& path, ExtraParam... extraParam);
+    template<class TcpConnectionProcessor, typename... ExtraParams>
+    void registerTcpHandler(
+        const QByteArray& protocol, const QString& path, ExtraParams... extraParams);
 
     bool initTcpListener(
         TimeBasedNonceProvider* timeBasedNonceProvider,
@@ -252,6 +254,7 @@ private:
     void createResourceProcessor();
     void setRuntimeFlag(nx::vms::api::RuntimeFlag flag, bool isSet);
     void loadResourceParamsData();
+    void initMetricsController();
 private:
     int m_argc = 0;
     char** m_argv = nullptr;
@@ -297,8 +300,10 @@ private:
     std::unique_ptr<MediaServerStatusWatcher> m_mediaServerStatusWatcher;
     std::unique_ptr<QnAudioStreamerPool> m_audioStreamerPool;
     std::shared_ptr<TcpLogReceiver> m_logReceiver;
+    std::unique_ptr<RaidEventLogReader> m_raidEventLogReader;
     std::unique_ptr<nx::network::upnp::PortMapper> m_upnpPortMapper;
     std::function<void(QnMediaServerModule*)> m_setupModuleCallback;
+    std::unique_ptr<nx::vms::utils::metrics::Controller> m_metricsController;
 
     std::atomic<bool> m_installUpdateRequestReceived{false};
 };

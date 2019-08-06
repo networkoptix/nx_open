@@ -39,6 +39,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_discovery_manager.h>
 #include <core/resource_management/resource_pool.h>
+#include <network/http_connection_listener.h>
 #include <network/tcp_connection_priv.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <rest/server/json_rest_result.h>
@@ -51,6 +52,7 @@
 #include <transaction/message_bus_adapter.h>
 
 #include "appserver2_audit_manager.h"
+#include "appserver2_http_server.h"
 #include "appserver2_process_settings.h"
 #include "cloud_integration/cloud_connector.h"
 #include "ec2_connection_processor.h"

@@ -23,9 +23,7 @@ Controller::Controller(
             m_trafficRelay.get())),
     m_listeningPeerManager(
         relaying::ListeningPeerManagerFactory::instance().create(
-            settings.listeningPeer(), &model->listeningPeerPool())),
-    m_model(model),
-    m_settings(settings)
+            settings.listeningPeer(), &model->listeningPeerPool()))
 {
 }
 

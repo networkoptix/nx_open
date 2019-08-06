@@ -86,9 +86,13 @@ def rename(request, system_id):
 @permission_classes((IsAuthenticated, ))
 @handle_exceptions
 def merge(request):
-    require_params(request, ('master_system_id', 'slave_system_id',))
-    data = cloud_api.System.merge(request.session['login'], request.session['password'],
-                                  request.data['master_system_id'], request.data['slave_system_id'])
+    require_params(request, ('master_system_id', 'slave_system_id', 'password'))
+    try:
+        data = cloud_api.System.merge(request.session['login'], request.data['password'],
+                                      request.data['master_system_id'], request.data['slave_system_id'])
+    except APINotAuthorisedException:
+        raise APIRequestException('User action was not allowed.', ErrorCodes.wrong_password,
+                                  error_data={'password': ['Not recognized']})
     return api_success(data)
 
 
@@ -106,16 +110,17 @@ def access_roles(request, system_id):
 def disconnect(request):
     require_params(request, ('system_id', 'password'))
 
-    if request.user.is_authenticated():
-        try:
-            cloud_api.System.unbind(request.user.email, request.data['password'], request.data['system_id'])
-        except APINotAuthorisedException:
-            raise APIRequestException('User action was not allowed.', ErrorCodes.wrong_password,
-                                      error_data={'password': ['Not recognized.']})
-    else:
-        require_params(request, ('email', 'password'))
-        email = request.data['email'].lower()
+    try:
+        if request.user.is_authenticated():
+            email = request.user.email
+        else:
+            require_params(request, ('email',))
+            email = request.data['email'].lower()
+
         cloud_api.System.unbind(email, request.data['password'], request.data['system_id'])
+    except APINotAuthorisedException:
+        raise APIRequestException('User action was not allowed.', ErrorCodes.wrong_password,
+                                  error_data={'password': ['Not recognized.']})
 
     return api_success()
 

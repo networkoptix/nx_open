@@ -1,0 +1,85 @@
+#pragma once
+
+#include <optional>
+#include <memory>
+
+#include <nx/network/websocket/websocket.h>
+
+#include <nx/p2p/p2p_connection_base.h>
+#include <nx/p2p/connection_context.h>
+
+#include "../abstract_command_transport.h"
+#include "../../compatible_ec2_protocol_version.h"
+#include "../../dao/abstract_command_data_object.h"
+#include "../../command_log_reader.h"
+
+namespace nx::clusterdb::engine { class CommandLog; }
+
+namespace nx::clusterdb::engine::transport::p2p::websocket {
+
+class Connection:
+    public AbstractConnection,
+    public nx::p2p::ConnectionBase
+{
+public:
+    Connection(
+        const ProtocolVersionRange& protocolVersionRange,
+        CommandLog* const transactionLog,
+        const std::string& systemId,
+        const OutgoingCommandFilter& filter,
+        const std::string& connectionId,
+        nx::p2p::P2pTransportPtr p2pTransport,
+        vms::api::PeerDataEx localPeerData,
+        vms::api::PeerDataEx remotePeerData);
+    ~Connection();
+
+    virtual network::SocketAddress remotePeerEndpoint() const override;
+    virtual ConnectionClosedSubscription& connectionClosedSubscription() override;
+    virtual void setOnGotTransaction(CommandHandler handler) override;
+    virtual std::string connectionGuid() const override;
+    virtual const CommandTransportHeader& commonTransportHeaderOfRemoteTransaction() const override;
+    virtual void sendTransaction(
+        CommandTransportHeader transportHeader,
+        const std::shared_ptr<const SerializableAbstractCommand>& transactionSerializer) override;
+    virtual void start() override;
+
+    virtual bool fillAuthInfo(nx::network::http::AsyncClient* httpClient, bool authByKey) override;
+    virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
+
+protected:
+    virtual void setState(State state) override;
+    virtual void stopWhileInAioThread() override;
+
+private:
+    int highestProtocolVersionCompatibleWithRemotePeer() const;
+
+    void onGotMessage(
+        QWeakPointer<nx::p2p::ConnectionBase> connection,
+        nx::p2p::MessageType messageType,
+        const QByteArray& payload);
+
+    void reportCommandReceived(QByteArray commandBuffer);
+
+    void onTransactionsReadFromLog(
+        ResultCode resultCode,
+        std::vector<dao::TransactionLogRecord> serializedTransactions,
+        NodeState readedUpTo);
+
+    void readTransactions();
+
+private:
+    const ProtocolVersionRange m_protocolVersionRange;
+    CommandTransportHeader m_commonTransactionHeader;
+    ConnectionClosedSubscription m_connectionClosedSubscription;
+    CommandHandler m_gotTransactionEventHandler;
+    std::unique_ptr<CommandLogReader> m_transactionLogReader;
+    bool m_closed = false;
+
+    bool m_sendHandshakeDone = false;
+    bool m_tranLogRequestInProgress = false;
+    std::optional<NodeState> m_remoteSubscription; //< remote -> local subscription
+    const std::string m_systemId;
+    std::string m_connectionGuid;
+};
+
+} // namespace nx::clusterdb::engine::transport::p2p::websocket

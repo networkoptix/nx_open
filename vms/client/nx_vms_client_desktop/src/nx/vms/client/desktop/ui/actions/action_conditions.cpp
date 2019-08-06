@@ -66,7 +66,7 @@
 #include <client/client_module.h>
 #include <camera/camera_data_manager.h>
 #include <camera/loaders/caching_camera_data_loader.h>
-#include <nx/vms/client/desktop/resource_views/data/node_type.h>
+#include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/resources/layout_password_management.h>
 
 using boost::algorithm::any_of;
@@ -572,12 +572,12 @@ ActionVisibility ClearMotionSelectionCondition::check(const QnResourceWidgetList
 
 ActionVisibility ResourceRemovalCondition::check(const Parameters& parameters, QnWorkbenchContext* context)
 {
-    const auto nodeType = parameters.argument<ResourceTreeNodeType>(
+    const auto nodeType = parameters.argument<ResourceTree::NodeType>(
         Qn::NodeTypeRole,
-        ResourceTreeNodeType::resource);
+        ResourceTree::NodeType::resource);
 
-    if (nodeType == ResourceTreeNodeType::sharedLayout
-        || nodeType == ResourceTreeNodeType::sharedResource)
+    if (nodeType == ResourceTree::NodeType::sharedLayout
+        || nodeType == ResourceTree::NodeType::sharedResource)
     {
         return InvisibleAction;
     }
@@ -617,6 +617,15 @@ ActionVisibility ResourceRemovalCondition::check(const Parameters& parameters, Q
         if (resource.dynamicCast<QnFileLayoutResource>()) //< Cannot remove local layout from server.
             return false;
 
+        if (const auto camera = resource.dynamicCast<QnVirtualCameraResource>())
+        {
+            const bool isHiddenEdgeServer =
+                QnMediaServerResource::isHiddenServer(camera->getParentResource());
+            const bool isServerOnline = camera->getParentResource()->getStatus() == Qn::Online;
+            if (isHiddenEdgeServer && isServerOnline && !camera->hasFlags(Qn::wearable_camera))
+                return false;
+        }
+
         /* All other resources can be safely deleted if we have correct permissions. */
         return true;
     };
@@ -631,9 +640,9 @@ ActionVisibility StopSharingCondition::check(const Parameters& parameters, QnWor
     if (context->commonModule()->isReadOnly())
         return InvisibleAction;
 
-    const auto nodeType = parameters.argument<ResourceTreeNodeType>(Qn::NodeTypeRole,
-        ResourceTreeNodeType::resource);
-    if (nodeType != ResourceTreeNodeType::sharedLayout)
+    const auto nodeType = parameters.argument<ResourceTree::NodeType>(Qn::NodeTypeRole,
+        ResourceTree::NodeType::resource);
+    if (nodeType != ResourceTree::NodeType::sharedLayout)
         return InvisibleAction;
 
     auto user = parameters.argument<QnUserResourcePtr>(Qn::UserResourceRole);
@@ -659,14 +668,14 @@ ActionVisibility StopSharingCondition::check(const Parameters& parameters, QnWor
 
 ActionVisibility RenameResourceCondition::check(const Parameters& parameters, QnWorkbenchContext* /*context*/)
 {
-    const auto nodeType = parameters.argument<ResourceTreeNodeType>(Qn::NodeTypeRole,
-        ResourceTreeNodeType::resource);
+    const auto nodeType = parameters.argument<ResourceTree::NodeType>(Qn::NodeTypeRole,
+        ResourceTree::NodeType::resource);
 
     switch (nodeType)
     {
-        case ResourceTreeNodeType::resource:
-        case ResourceTreeNodeType::sharedLayout:
-        case ResourceTreeNodeType::sharedResource:
+        case ResourceTree::NodeType::resource:
+        case ResourceTree::NodeType::sharedLayout:
+        case ResourceTree::NodeType::sharedResource:
         {
             if (parameters.resources().size() != 1)
                 return InvisibleAction;
@@ -689,8 +698,8 @@ ActionVisibility RenameResourceCondition::check(const Parameters& parameters, Qn
 
             return EnabledAction;
         }
-        case ResourceTreeNodeType::edge:
-        case ResourceTreeNodeType::recorder:
+        case ResourceTree::NodeType::edge:
+        case ResourceTree::NodeType::recorder:
             return EnabledAction;
         default:
             break;
@@ -1077,13 +1086,13 @@ ActionVisibility NewUserLayoutCondition::check(const Parameters& parameters, QnW
     if (!parameters.hasArgument(Qn::NodeTypeRole))
         return InvisibleAction;
 
-    const auto nodeType = parameters.argument(Qn::NodeTypeRole).value<ResourceTreeNodeType>();
+    const auto nodeType = parameters.argument(Qn::NodeTypeRole).value<ResourceTree::NodeType>();
     const auto user = parameters.hasArgument(Qn::UserResourceRole)
         ? parameters.argument(Qn::UserResourceRole).value<QnUserResourcePtr>()
         : parameters.resource().dynamicCast<QnUserResource>();
 
     /* Create layout for self. */
-    if (nodeType == ResourceTreeNodeType::layouts)
+    if (nodeType == ResourceTree::NodeType::layouts)
         return EnabledAction;
 
     // No other nodes must provide a way to create own layout.
@@ -1091,11 +1100,11 @@ ActionVisibility NewUserLayoutCondition::check(const Parameters& parameters, QnW
         return InvisibleAction;
 
     // Create layout for the custom user, but not for role.
-    if (nodeType == ResourceTreeNodeType::sharedLayouts && user)
+    if (nodeType == ResourceTree::NodeType::sharedLayouts && user)
         return EnabledAction;
 
     // Create layout for other user is allowed on this user's node.
-    if (nodeType != ResourceTreeNodeType::resource)
+    if (nodeType != ResourceTree::NodeType::resource)
         return InvisibleAction;
 
     return context->accessController()->canCreateLayout(user->getId())
@@ -1767,14 +1776,14 @@ ConditionWrapper hasVideo(MatchMode matchMode, bool value)
         }, matchMode);
 }
 
-ConditionWrapper treeNodeType(QSet<ResourceTreeNodeType> types)
+ConditionWrapper treeNodeType(QSet<ResourceTree::NodeType> types)
 {
     return new CustomBoolCondition(
         [types](const Parameters& parameters, QnWorkbenchContext* /*context*/)
         {
             // Actions, triggered manually or from scene, must not check node type
             return !parameters.hasArgument(Qn::NodeTypeRole)
-                || types.contains(parameters.argument(Qn::NodeTypeRole).value<ResourceTreeNodeType>());
+                || types.contains(parameters.argument(Qn::NodeTypeRole).value<ResourceTree::NodeType>());
         });
 }
 

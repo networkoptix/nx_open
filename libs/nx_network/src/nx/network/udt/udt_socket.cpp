@@ -7,11 +7,6 @@
 #  include <netinet/tcp.h>
 #endif
 
-#include <mutex>
-#include <set>
-
-#include <boost/optional.hpp>
-
 #include <udt/udt.h>
 
 #include <nx/network/aio/aio_service.h>
@@ -90,7 +85,7 @@ UdtSocket<InterfaceToImplement>::UdtSocket(
 {
     NX_CRITICAL((SocketGlobals::initializationFlags() & InitializationFlags::disableUdt) == 0);
 
-    this->m_impl = static_cast<UdtSocketImpl*>(this->Pollable::m_impl.get());
+    this->m_impl = static_cast<UdtSocketImpl*>(this->Pollable::impl());
 }
 
 template<typename InterfaceToImplement>
@@ -534,9 +529,10 @@ bool UdtStreamSocket::setRendezvous(bool val)
 void UdtStreamSocket::bindToAioThread(
     nx::network::aio::AbstractAioThread* aioThread)
 {
-    base_type::bindToAioThread(aioThread);
-
+    // Calling m_aioHelper->bindToAioThread first so that it is able to detect aio thread change.
     m_aioHelper->bindToAioThread(aioThread);
+
+    base_type::bindToAioThread(aioThread);
 }
 
 bool UdtStreamSocket::connect(
@@ -576,7 +572,7 @@ int UdtStreamSocket::recv(void* buffer, unsigned int bufferLen, int flags)
 
     nx::utils::ScopeGuard<std::function<void()>> socketModeGuard;
 
-    boost::optional<bool> newRecvMode;
+    std::optional<bool> newRecvMode;
     if (!checkIfRecvModeSwitchIsRequired(flags, &newRecvMode))
         return -1;
 
@@ -779,9 +775,9 @@ bool UdtStreamSocket::connectToIp(
 
 bool UdtStreamSocket::checkIfRecvModeSwitchIsRequired(
     int flags,
-    boost::optional<bool>* requiredRecvMode)
+    std::optional<bool>* requiredRecvMode)
 {
-    *requiredRecvMode = boost::none;
+    *requiredRecvMode = std::nullopt;
 
     if ((flags & (MSG_DONTWAIT | MSG_WAITALL)) == 0)
         return true;
@@ -863,7 +859,7 @@ int UdtStreamSocket::handleRecvResult(int recvResult)
 
 UdtStreamServerSocket::UdtStreamServerSocket(int ipVersion):
     base_type(ipVersion),
-    m_aioHelper(new aio::AsyncServerSocketHelper<UdtStreamServerSocket>(this))
+    m_aioHelper(std::make_unique<aio::AsyncServerSocketHelper<UdtStreamServerSocket>>(this))
 {
     open();
 }
@@ -872,6 +868,13 @@ UdtStreamServerSocket::~UdtStreamServerSocket()
 {
     if (isInSelfAioThread())
         stopWhileInAioThread();
+}
+
+void UdtStreamServerSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
+{
+    m_aioHelper->bindToAioThread(aioThread);
+
+    base_type::bindToAioThread(aioThread);
 }
 
 bool UdtStreamServerSocket::listen(int backlog)

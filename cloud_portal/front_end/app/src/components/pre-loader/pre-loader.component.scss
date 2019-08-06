@@ -1,5 +1,12 @@
-.placeholder-content {
-    height    : 30px;
-    display   : flex;
-    transform : translateY(-50%);
+.placeholder {
+    &-wrapper {
+        height   : 200px;
+        position : relative;
+    }
+    
+    &-content {
+        height    : 30px;
+        display   : flex;
+        transform : translateY(-50%);
+    }
 }

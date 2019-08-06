@@ -21,12 +21,12 @@ Implementation decomposition:
     (done) 1.1. implement network::AbstractCommunicatingSocket, AbstractServerSocket using UDT
     (done) 1.2. add UDT support to aio
         (done) 1.2.1. implement PollSet via UDT
-        (done) 1.2.2. AIOThread: must be able to use different Pollset (for system sockets and UDT sockets)
+        (done) 1.2.2. AioThread: must be able to use different Pollset (for system sockets and UDT sockets)
         1.2.3. AIOService:
             (done) - must be able to use different aio threads for different socket types (system sockets and UDT sockets)
             - MUST be able to specify thread count for system sockets and for UDT sockets
             (done) - make AIOService non-public. Socket async API must be used instead. This will allow AIOService to accept specific socket type, 
-                not AbstratSocket and select AIOThread type on compile-time
+                not AbstratSocket and select AioThread type on compile-time
 
 2. mediator implementation
     - some authentication shoud be implied to allow only networkoptix modules to talk to the mediator

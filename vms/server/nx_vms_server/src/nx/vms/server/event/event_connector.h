@@ -56,6 +56,9 @@ public slots:
     void at_storageFailure(const QnResourcePtr& server, qint64 timeStamp,
         vms::api::EventReason reasonCode, const QString &storageUrl);
 
+    void at_raidStorageFailure(const QnResourcePtr& server, qint64 timeStamp,
+        vms::event::EventReason reasonCode, const QString &eventDescription);
+
     /*! Some problem with network
     */
     void at_networkIssue(const QnResourcePtr& resource, qint64 timeStamp,
@@ -127,7 +130,7 @@ public slots:
 
     void at_analyticsSdkEvent(const nx::vms::event::AnalyticsSdkEventPtr& event);
 
-    void at_pluginEvent(const nx::vms::event::PluginEventPtr& event);
+    void at_pluginDiagnosticEvent(const nx::vms::event::PluginDiagnosticEventPtr& event);
 
     void at_fileIntegrityCheckFailed(const QnResourcePtr& resource);
 

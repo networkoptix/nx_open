@@ -1,3 +1,5 @@
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+
 #include "object_metadata.h"
 
 #include <algorithm>
@@ -18,9 +20,9 @@ float ObjectMetadata::confidence() const
     return m_confidence;
 }
 
-Uuid ObjectMetadata::id() const
+Uuid ObjectMetadata::trackId() const
 {
-    return m_id;
+    return m_trackId;
 }
 
 const char* ObjectMetadata::subtype() const
@@ -47,11 +49,6 @@ Rect ObjectMetadata::boundingBox() const
     return m_rect;
 }
 
-const char* ObjectMetadata::auxiliaryData() const
-{
-    return m_auxiliaryData.c_str();
-}
-
 void ObjectMetadata::setTypeId(std::string typeId)
 {
     m_typeId = std::move(typeId);
@@ -62,9 +59,9 @@ void ObjectMetadata::setConfidence(float confidence)
     m_confidence = confidence;
 }
 
-void ObjectMetadata::setId(const Uuid& value)
+void ObjectMetadata::setTrackId(const Uuid& value)
 {
-    m_id = value;
+    m_trackId = value;
 }
 
 void ObjectMetadata::setSubtype(const std::string& value)
@@ -77,7 +74,7 @@ void ObjectMetadata::addAttribute(nx::sdk::Ptr<Attribute> attribute)
     if (!NX_KIT_ASSERT(attribute))
         return;
 
-    auto existingAttribute = std::find_if(m_attributes.begin(), m_attributes.end(),
+    const auto existingAttribute = std::find_if(m_attributes.begin(), m_attributes.end(),
         [attributeName = attribute->name()](const nx::sdk::Ptr<Attribute>& attribute)
         {
             return strcmp(attribute->name(), attributeName) == 0;
@@ -98,11 +95,6 @@ void ObjectMetadata::addAttributes(const std::vector<nx::sdk::Ptr<Attribute>>& v
 {
     for (const auto& newAttribute: value)
         addAttribute(newAttribute);
-}
-
-void ObjectMetadata::setAuxiliaryData(std::string auxiliaryData)
-{
-    m_auxiliaryData = std::move(auxiliaryData);
 }
 
 void ObjectMetadata::setBoundingBox(const Rect& rect)

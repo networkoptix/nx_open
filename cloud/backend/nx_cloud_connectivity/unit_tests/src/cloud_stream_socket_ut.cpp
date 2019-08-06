@@ -13,7 +13,7 @@
 #include <nx/network/test_support/stream_socket_acceptance_tests.h>
 #include <nx/network/test_support/test_outgoing_tunnel.h>
 #include <nx/network/url/url_builder.h>
-#include <nx/utils/object_destruction_flag.h>
+#include <nx/utils/interruption_flag.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/test_support/utils.h>
 
@@ -256,17 +256,6 @@ TEST_F(CloudStreamSocketTest, multiple_connections_random_data)
         serverAddress);
 }
 
-const auto createServerSocketFunc =
-    []() -> std::unique_ptr<AbstractStreamServerSocket>
-    {
-        return SocketFactory::createStreamServerSocket();
-    };
-const auto createClientSocketFunc =
-    []() -> std::unique_ptr<CloudStreamSocket>
-    {
-        return std::make_unique<CloudStreamSocket>(AF_INET);
-    };
-
 TEST_F(CloudStreamSocketTest, cancellation)
 {
     const char* tempHostName = "bla.bla";
@@ -455,7 +444,7 @@ public:
 
     virtual int recv(void* buffer, unsigned int bufferLen, int flags = 0) override
     {
-        nx::utils::ObjectDestructionFlag::Watcher objectDestructionFlag(&m_destructionFlag);
+        nx::utils::InterruptionFlag::Watcher objectDestructionFlag(&m_destructionFlag);
         m_socketInRecv->set_value();
         m_continueReadingSocket->get_future().wait();
 
@@ -469,12 +458,12 @@ public:
 private:
     nx::utils::promise<void>* m_socketInRecv;
     nx::utils::promise<bool>* m_continueReadingSocket;
-    nx::utils::ObjectDestructionFlag m_destructionFlag;
+    nx::utils::InterruptionFlag m_destructionFlag;
 
     void assertIfThisHasBeenDestroyed(
-        const nx::utils::ObjectDestructionFlag::Watcher& objectDestructionFlag)
+        const nx::utils::InterruptionFlag::Watcher& objectDestructionFlag)
     {
-        ASSERT_FALSE(objectDestructionFlag.objectDestroyed());
+        ASSERT_FALSE(objectDestructionFlag.interrupted());
     }
 };
 

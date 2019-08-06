@@ -71,6 +71,9 @@ QVariant BookmarkSearchListModel::Private::data(const QModelIndex& index, int ro
         case Qt::DisplayRole:
             return bookmark.name;
 
+        case Qn::DecorationPathRole:
+            return iconPath();
+
         case Qt::DecorationRole:
             return QVariant::fromValue(pixmap());
 
@@ -182,13 +185,13 @@ rest::Handle BookmarkSearchListModel::Private::getBookmarks(
         filter.limit);
 
     return qnCameraBookmarksManager->getBookmarksAsync(q->cameras(), filter,
-        BookmarksInternalCallbackType(nx::utils::guarded(this, callback)));
+        BookmarksCallbackType(nx::utils::guarded(this, callback)));
 }
 
 rest::Handle BookmarkSearchListModel::Private::requestPrefetch(const QnTimePeriod& period)
 {
     const auto callback =
-        [this](bool success, const QnCameraBookmarkList& bookmarks, rest::Handle requestId)
+        [this](bool success, rest::Handle requestId, const QnCameraBookmarkList& bookmarks)
         {
             if (!requestId || requestId != currentRequest().id)
                 return;
@@ -407,7 +410,7 @@ void BookmarkSearchListModel::Private::dynamicUpdate(const QnTimePeriod& period)
         return;
 
     const auto callback =
-        [this](bool success, const QnCameraBookmarkList& bookmarks, rest::Handle requestId)
+        [this](bool success, rest::Handle requestId, const QnCameraBookmarkList& bookmarks)
         {
             // It doesn't matter if we receive results limited by maximum count.
 
@@ -446,21 +449,14 @@ QnVirtualCameraResourcePtr BookmarkSearchListModel::Private::camera(
     return q->resourcePool()->getResourceById<QnVirtualCameraResource>(bookmark.cameraId);
 }
 
-// TODO: #vkutin Make color customized properly. Replace icon with pre-colorized one.
+QString BookmarkSearchListModel::Private::iconPath()
+{
+    return "soft_triggers/user_selectable/bookmark.png";
+}
+
 QPixmap BookmarkSearchListModel::Private::pixmap()
 {
-    static QColor bookmarkColor;
-    static QPixmap bookmarkPixmap;
-
-    const auto color = Private::color();
-    if (bookmarkColor != color)
-    {
-        bookmarkColor = color;
-        bookmarkPixmap = QnSkin::colorize(
-            qnSkin->pixmap("buttons/acknowledge.png"), bookmarkColor);
-    }
-
-    return bookmarkPixmap;
+    return QnSkin::colorize(qnSkin->pixmap(iconPath()), color());
 }
 
 QColor BookmarkSearchListModel::Private::color()

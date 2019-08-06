@@ -6,7 +6,7 @@
 
 #include <nx/network/async_stoppable.h>
 #include <nx/utils/log/log.h>
-#include <nx/utils/object_destruction_flag.h>
+#include <nx/utils/interruption_flag.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/system_error.h>
 
@@ -79,7 +79,7 @@ private:
     std::unique_ptr<AbstractDatagramSocket> m_socket;
     nx::Buffer m_readBuffer;
     std::deque<OutgoingMessageContext> m_sendQueue;
-    nx::utils::ObjectDestructionFlag m_terminationFlag;
+    nx::utils::InterruptionFlag m_terminationFlag;
 
     virtual void stopWhileInAioThread() override;
 

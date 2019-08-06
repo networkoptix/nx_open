@@ -7,7 +7,11 @@
 #include <nx/network/http/server/multi_endpoint_acceptor.h>
 #include <nx/network/http/server/abstract_fusion_request_handler.h>
 #include <nx/network/http/server/rest/http_server_rest_message_dispatcher.h>
+#include <nx/network/http/server/http_server_htdigest_authentication_provider.h>
+#include <nx/network/http/server/authentication_dispatcher.h>
+#include <nx/network/maintenance/server.h>
 
+#include "../listening_peer_db.h"
 #include "../discovery/discovery_http_server.h"
 #include "../server/hole_punching_processor.h"
 
@@ -28,6 +32,7 @@ public:
         const conf::Settings& settings,
         const PeerRegistrator& peerRegistrator,
         nx::cloud::discovery::RegisteredPeerPool* registeredPeerPool,
+        ListeningPeerDb* listeningPeerDb,
         HolePunchingProcessor* holePunchingProcessor);
 
     void listen();
@@ -41,12 +46,28 @@ public:
     void registerStatisticsApiHandlers(const stats::Provider&);
 
 private:
+    /** Provides htdigest authentication for maintenance server*/
+    struct HtdigestAuthenticator
+    {
+        nx::network::http::server::HtdigestAuthenticationProvider provider;
+        nx::network::http::server::BaseAuthenticationManager manager;
+
+        HtdigestAuthenticator(const std::string& htdigestPath):
+            provider(htdigestPath),
+            manager(&provider)
+        {
+        }
+    };
+
     const conf::Settings& m_settings;
     nx::network::http::server::rest::MessageDispatcher m_httpMessageDispatcher;
+    nx::network::http::server::AuthenticationDispatcher m_authenticationDispatcher;
     nx::network::http::server::MultiEndpointAcceptor m_multiAddressHttpServer;
     std::unique_ptr<nx::cloud::discovery::HttpServer> m_discoveryHttpServer;
-    nx::cloud::discovery::RegisteredPeerPool* m_registeredPeerPool = nullptr;
+    ListeningPeerDb* m_listeningPeerDb = nullptr;
     HolePunchingProcessor* m_holePunchingProcessor = nullptr;
+    std::unique_ptr<HtdigestAuthenticator> m_htdigestAuthenticator;
+    network::maintenance::Server m_maintenanceServer;
 
     void loadSslCertificate();
 
@@ -54,6 +75,9 @@ private:
         const conf::Settings& settings,
         const PeerRegistrator& peerRegistrator,
         nx::cloud::discovery::RegisteredPeerPool* registeredPeerPool);
+
+    void loadHtdigestAuthenticatorIfNeeded(const conf::Settings& settings);
+    void addPathToHtdigestAuthenticatorIfNeeded(const std::string& regex);
 
     void registerApiHandlers(const PeerRegistrator& peerRegistrator);
 
@@ -72,19 +96,41 @@ class InitiateConnectionRequestHandler:
 {
 public:
     InitiateConnectionRequestHandler(
-        HolePunchingProcessor* holePunchingProcessor);
+        HolePunchingProcessor* holePunchingProcessor,
+        ListeningPeerDb* listeningPeerDb);
 
 protected:
+    /** Used to cache needed info from nx::network::http::RequestContext*/
+    struct CachedRequestContext
+    {
+        nx::utils::Url requestUrl;
+        bool isSsl = false;
+        nx::network::http::Response* response = nullptr;
+    };
+
     virtual void processRequest(
         nx::network::http::RequestContext requestContext,
         api::ConnectRequest inputData) override;
 
-private:
-    HolePunchingProcessor* m_holePunchingProcessor = nullptr;
-
     void reportResult(
         api::ResultCode resultCode,
+        api::ConnectResponse response,
+        const std::optional<nx::network::http::StatusCode::Value>& httpStatusCode = std::nullopt);
+
+    void redirectToRemoteMediator(
+        CachedRequestContext requestContext,
+        const nx::String& targetServer,
         api::ConnectResponse response);
+
+    bool validateMediatorEndpoint(const MediatorEndpoint& endpoint, bool useHttpsPort) const;
+
+    nx::utils::Url buildMediatorUrl(
+        const MediatorEndpoint& endpoint,
+        const CachedRequestContext& requestContext);
+
+private:
+    HolePunchingProcessor* m_holePunchingProcessor = nullptr;
+    ListeningPeerDb* m_listeningPeerDb = nullptr;
 };
 
 } // namespace http

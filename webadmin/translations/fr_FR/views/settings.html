@@ -8,7 +8,8 @@
                 Ce périphérique sert à travailler avec le disque dur installé.<br> S.V.P éteindre l’appareil et installer un disque dur.
             </uib-alert>
             <uib-alert type="danger" ng-if="!settings.flags.noHDD && settings.flags.noNetwork">
-                Cet appareil a besoin de connexion réseau pour fonctionner.<br> S.V.P connecter au réseau local ou Internet
+                Cet appareil a besoin de connexion réseau pour fonctionner.<br>
+                S. V. P connecter au réseau local ou Internet
             </uib-alert>
             <uib-alert type="danger" ng-if="!settings.flags.noHDD && !settings.flags.noNetwork && settings.flags.wrongNetwork">
                 Ce périphérique à une configuration réseau incorrect.<br> S.V.P connecter au réseau ou définir une adresse IP correcte.
@@ -104,9 +105,9 @@
                                 <a ng-if="!mode.liteClient"
                                    ng-href="{{Config.cloud.portalUrl}}"
                                    target="_blank">En savoir plus</a></uib-alert>
-                            <uib-alert type="error" ng-if="!hasInternetOnServer">Connecter le serveur sur Internet pour exécuter l'installation {{Config.cloud.productName}}</uib-alert>
-                            <uib-alert type="error" ng-if="hasInternetOnServer && !hasInternetOnClient">Connexion Internet requise pour connecter le système à {{Config.cloud.productName}}</uib-alert>
-                            <p ng-if="canConnectToCloud"  ><button
+                            <uib-alert type="danger" ng-if="!hasInternetOnServer">Connecter le serveur sur Internet pour exécuter l'installation {{Config.cloud.productName}}</uib-alert>
+                            <uib-alert type="danger" ng-if="hasInternetOnServer && !hasInternetOnClient">Connexion Internet requise pour connecter le système à {{Config.cloud.productName}}</uib-alert>
+                            <p ng-if="canConnectToCloud"><button
                                     class="btn btn-default"
                                     ng-click="connectToCloud()" ng-disabled="!hasInternetOnServer || !hasInternetOnClient">Connecter à {{Config.cloud.productName}}</button>
                                 <a ng-if="!mode.liteClient"  class="btn btn-default"

@@ -5,7 +5,11 @@
 #include <nx/network/connection_server/multi_address_server.h>
 #include <nx/network/http/server/rest/http_server_rest_message_dispatcher.h>
 #include <nx/network/http/server/http_stream_socket_server.h>
+#include <nx/network/maintenance/server.h>
 #include <nx/network/socket_common.h>
+#include <nx/network/http/server/authentication_dispatcher.h>
+#include <nx/network/http/server/http_server_base_authentication_manager.h>
+#include <nx/network/http/server/http_server_htdigest_authentication_provider.h>
 
 #include <nx/cloud/db/api/result_code.h>
 
@@ -14,7 +18,7 @@
 #include "stree/cdb_ns.h"
 #include "statistics/provider.h"
 
-namespace nx::clusterdb::engine { class SyncronizationEngine; }
+namespace nx::clusterdb::engine { class SynchronizationEngine; }
 
 namespace nx::cloud::db {
 
@@ -52,10 +56,28 @@ public:
     void registerStatisticsApiHandlers(statistics::Provider* statisticsProvider);
 
 private:
+    /** Provides htdigest authentication for maintenance server*/
+    struct HtdigestAuthenticator
+    {
+        nx::network::http::server::HtdigestAuthenticationProvider provider;
+        nx::network::http::server::BaseAuthenticationManager manager;
+
+        HtdigestAuthenticator(const std::string& htdigestPath):
+            provider(htdigestPath),
+            manager(&provider)
+        {
+        }
+    };
+
     const conf::Settings& m_settings;
     Controller* m_controller;
     nx::network::http::server::rest::MessageDispatcher m_httpMessageDispatcher;
+    nx::network::http::server::AuthenticationDispatcher m_authenticationDispatcher;
     HttpServer m_multiAddressHttpServer;
+    std::unique_ptr<HtdigestAuthenticator> m_htdigestAuthenticator;
+    network::maintenance::Server m_maintenanceServer;
+
+    void registerAuthenticators();
 
     void registerApiHandlers(
         const SecurityManager& securityManager,
@@ -64,7 +86,7 @@ private:
         AbstractSystemHealthInfoProvider* const systemHealthInfoProvider,
         AuthenticationProvider* const authProvider,
         EventManager* const eventManager,
-        clusterdb::engine::SyncronizationEngine* const ec2SyncronizationEngine,
+        clusterdb::engine::SynchronizationEngine* const ec2SynchronizationEngine,
         MaintenanceManager* const maintenanceManager,
         const CloudModuleUrlProvider& cloudModuleUrlProviderDeprecated,
         const CloudModuleUrlProvider& cloudModuleUrlProvider);
@@ -76,7 +98,7 @@ private:
         void (ManagerType::*managerFunc)(
             const AuthorizationInfo& authzInfo,
             InputData inputData,
-            std::function<void(api::ResultCode, OutputData...)> completionHandler),
+            std::function<void(api::Result, OutputData...)> completionHandler),
         ManagerType* manager,
         EntityType entityType,
         DataActionType dataActionType);
@@ -87,7 +109,7 @@ private:
         const char* handlerPath,
         void (ManagerType::*managerFunc)(
             const AuthorizationInfo& authzInfo,
-            std::function<void(api::ResultCode, OutputData...)> completionHandler),
+            std::function<void(api::Result, OutputData...)> completionHandler),
         ManagerType* manager,
         EntityType entityType,
         DataActionType dataActionType);
@@ -97,7 +119,7 @@ private:
      * void(const AuthorizationInfo& authzInfo,
      *     const std::vector<nx::network::http::StringType>& restPathParams,
      *     InputData inputData,
-     *     std::function<void(api::ResultCode)> completionHandler);
+     *     std::function<void(api::Result)> completionHandler);
      */
     template<typename InputData, typename HandlerType>
     void registerWriteOnlyRestHandler(

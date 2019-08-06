@@ -16,6 +16,7 @@ class View
 public:
     View(
         const Settings& settings,
+        const std::string& baseRequestPath,
         Controller* controller);
 
     std::vector<nx::network::SocketAddress> httpEndpoints() const;

@@ -221,7 +221,6 @@ private:
     std::unique_ptr<relay::OutgoingTunnelConnection> m_tunnelConnection;
     nx::utils::SyncQueue<Result> m_connectResultQueue;
     std::atomic<int> m_clientToRelayConnectionCounter;
-    bool m_isRelayHappy;
     nx::utils::promise<SystemError::ErrorCode> m_tunnelClosed;
     bool m_destroyTunnelConnectionOnConnectFailure;
     RequestProcessingBehavior m_relayType = RequestProcessingBehavior::succeed;
@@ -247,8 +246,7 @@ private:
 
         const auto relayUrl = nx::utils::Url("http://127.0.0.1:12345");
 
-        auto clientToRelayConnection =
-            api::ClientFactory::instance().create(relayUrl);
+        auto clientToRelayConnection = std::make_unique<api::Client>(relayUrl);
 
         m_tunnelConnection = std::make_unique<relay::OutgoingTunnelConnection>(
             relayUrl,

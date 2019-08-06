@@ -26,15 +26,20 @@ const StunOverHttpServer::StunConnectionPool& StunOverHttpServer::stunConnection
     return m_stunConnectionPool;
 }
 
+void StunOverHttpServer::setInactivityTimeout(
+    std::optional<std::chrono::milliseconds> timeout)
+{
+    m_inactivityTimeout = timeout;
+}
+
 void StunOverHttpServer::createStunConnection(
     std::unique_ptr<AbstractStreamSocket> connection)
 {
     auto stunConnection = std::make_shared<nx::network::stun::ServerConnection>(
-        &m_stunConnectionPool,
         std::move(connection),
         *m_dispatcher);
     m_stunConnectionPool.saveConnection(stunConnection);
-    stunConnection->startReadingConnection();
+    stunConnection->startReadingConnection(m_inactivityTimeout);
 }
 
 } // namespace stun

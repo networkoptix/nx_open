@@ -22,7 +22,7 @@ HttpView::HttpView(
     m_settings(settings),
     m_controller(controller),
     m_multiAddressHttpServer(
-        &controller->securityManager().authenticator(),
+        &m_authenticationDispatcher,
         &m_httpMessageDispatcher,
         false,  //< TODO: #ak enable ssl when it works properly.
         nx::network::NatTraversalSupport::disabled)
@@ -34,7 +34,7 @@ HttpView::HttpView(
         &controller->systemHealthInfoProvider(),
         &controller->authProvider(),
         &controller->eventManager(),
-        &controller->ec2SyncronizationEngine(),
+        &controller->ec2SynchronizationEngine(),
         &controller->maintenanceManager(),
         controller->cloudModuleUrlProviderDeprecated(),
         controller->cloudModuleUrlProvider());
@@ -53,6 +53,10 @@ HttpView::HttpView(
                     settings.http().connectionInactivityPeriod);
             });
     }
+
+    m_maintenanceServer.registerRequestHandlers(kApiPrefix, &m_httpMessageDispatcher);
+
+    registerAuthenticators();
 }
 
 HttpView::~HttpView()
@@ -69,7 +73,7 @@ void HttpView::bind()
     const auto& httpAddrToListenList = m_settings.endpointsToListen();
     if (httpAddrToListenList.empty())
     {
-        NX_ALWAYS(this, "No HTTP address to listen");
+        NX_ERROR(this, "No HTTP address to listen");
         throw std::runtime_error("No HTTP address to listen");
     }
 
@@ -81,6 +85,9 @@ void HttpView::listen()
 {
     if (!m_multiAddressHttpServer.listen(m_settings.http().tcpBacklogSize))
         throw std::system_error(SystemError::getLastOSErrorCode(), std::system_category());
+
+    NX_INFO(this, "HTTP server is listening on %1",
+        containerString(m_multiAddressHttpServer.endpoints()));
 }
 
 std::vector<network::SocketAddress> HttpView::endpoints() const
@@ -103,6 +110,35 @@ void HttpView::registerStatisticsApiHandlers(
         network::http::Method::get);
 }
 
+void HttpView::registerAuthenticators()
+{
+    const auto addPathToHtDigestAuthenticator =
+        [this](const std::string& regex)
+        {
+            NX_INFO(this, "Adding api path regex: '%1' to htdigest authenticator", regex);
+            m_authenticationDispatcher.add(std::regex(regex), &m_htdigestAuthenticator->manager);
+        };
+
+    if (!m_settings.http().maintenanceHtdigestPath.empty())
+    {
+        NX_INFO(this,
+            "htdigest authentication for cloud db maintenance server enabled. File path: %1",
+            m_settings.http().maintenanceHtdigestPath);
+
+        m_htdigestAuthenticator = std::make_unique<HtdigestAuthenticator>(
+            m_settings.http().maintenanceHtdigestPath);
+
+        addPathToHtDigestAuthenticator(
+            network::url::joinPath(m_maintenanceServer.maintenancePath(), "/.*"));
+
+        addPathToHtDigestAuthenticator(network::url::joinPath(kStatisticsPath, "/.*"));
+    }
+
+    m_authenticationDispatcher.add(
+        std::regex(".*"),
+        &m_controller->securityManager().authenticator());
+}
+
 void HttpView::registerApiHandlers(
     const SecurityManager& securityManager,
     AccountManager* const accountManager,
@@ -110,7 +146,7 @@ void HttpView::registerApiHandlers(
     AbstractSystemHealthInfoProvider* const systemHealthInfoProvider,
     AuthenticationProvider* const authProvider,
     EventManager* const /*eventManager*/,
-    clusterdb::engine::SyncronizationEngine* const ec2SyncronizationEngine,
+    clusterdb::engine::SynchronizationEngine* const ec2SynchronizationEngine,
     MaintenanceManager* const maintenanceManager,
     const CloudModuleUrlProvider& cloudModuleUrlProviderDeprecated,
     const CloudModuleUrlProvider& cloudModuleUrlProvider)
@@ -222,7 +258,7 @@ void HttpView::registerApiHandlers(
             const AuthorizationInfo& authzInfo,
             const network::http::RequestPathParams& restPathParams,
             data::SystemId inputData,
-            std::function<void(api::ResultCode)> completionHandler)
+            std::function<void(api::Result)> completionHandler)
         {
             m_controller->systemMergeManager().startMergingSystems(
                 authzInfo,
@@ -244,10 +280,10 @@ void HttpView::registerApiHandlers(
         EntityType::account, DataActionType::fetch);
 
     //---------------------------------------------------------------------------------------------
-    ec2SyncronizationEngine->registerHttpApi(
+    ec2SynchronizationEngine->registerHttpApi(
         kEc2TransactionConnectionPathPrefix, &m_httpMessageDispatcher);
 
-    ec2SyncronizationEngine->registerHttpApi(
+    ec2SynchronizationEngine->registerHttpApi(
         kDeprecatedEc2TransactionConnectionPathPrefix, &m_httpMessageDispatcher);
 
     //---------------------------------------------------------------------------------------------
@@ -304,7 +340,7 @@ void HttpView::registerHttpHandler(
     void (ManagerType::*managerFunc)(
         const AuthorizationInfo& authzInfo,
         InputData inputData,
-        std::function<void(api::ResultCode, OutputData...)> completionHandler),
+        std::function<void(api::Result, OutputData...)> completionHandler),
     ManagerType* manager,
     EntityType entityType,
     DataActionType dataActionType)
@@ -333,12 +369,12 @@ void HttpView::registerHttpHandler(
     const char* handlerPath,
     void (ManagerType::*managerFunc)(
         const AuthorizationInfo& authzInfo,
-        std::function<void(api::ResultCode, OutputData...)> completionHandler),
+        std::function<void(api::Result, OutputData...)> completionHandler),
     ManagerType* manager,
     EntityType entityType,
     DataActionType dataActionType)
 {
-    using ActualOutputDataType = 
+    using ActualOutputDataType =
         typename nx::utils::tuple_first_element<void, std::tuple<OutputData...>>::type;
 
     using HttpHandlerType = FiniteMsgBodyHttpHandler<
@@ -375,7 +411,7 @@ public:
     //    void(const AuthorizationInfo& authzInfo,
     //        const std::vector<nx::network::http::StringType>& restPathParams,
     //        Input inputData,
-    //        std::function<void(api::ResultCode)> completionHandler);
+    //        std::function<void(api::Result)> completionHandler);
 
     WriteOnlyRestHandler(
         EntityType entityType,
@@ -392,7 +428,7 @@ protected:
     virtual void processRequest(
         nx::network::http::RequestContext requestContext,
         Input inputData,
-        std::function<void(api::ResultCode)> completionHandler) override
+        std::function<void(api::Result)> completionHandler) override
     {
         m_func(
             AuthorizationInfo(std::exchange(requestContext.authInfo, {})),

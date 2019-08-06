@@ -34,6 +34,11 @@ public:
     static bool isCompatibleToCurrentSystem(const nx::vms::api::ModuleInformation& info,
         const QnCommonModule* commonModule);
 
+    static bool isCompatibleCustomization(
+        const QString& serverCustomization,
+        const QString& clientCustomization,
+        bool isMobile);
+
 protected:
     static Qn::ConnectionResult validateConnectionInternal(
         const QString& brand,

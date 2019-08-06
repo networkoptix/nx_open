@@ -45,8 +45,6 @@ public:
 
     MediaServerClient(const MediaServerClient&) = delete;
     MediaServerClient& operator=(const MediaServerClient&) = delete;
-    MediaServerClient(MediaServerClient&&) = default;
-    MediaServerClient& operator=(MediaServerClient&&) = default;
 
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
 
@@ -139,18 +137,20 @@ public:
 
     ec2::ErrorCode ec2GetSystemMergeHistory(nx::vms::api::SystemMergeHistoryRecordList* result);
 
-    void ec2AnalyticsLookupDetectedObjects(
+    void ec2AnalyticsLookupObjectTracks(
         const nx::analytics::db::Filter& request,
         std::function<void(ec2::ErrorCode, nx::analytics::db::LookupResult)> completionHandler);
-    ec2::ErrorCode ec2AnalyticsLookupDetectedObjects(
+    ec2::ErrorCode ec2AnalyticsLookupObjectTracks(
         const nx::analytics::db::Filter& request,
         nx::analytics::db::LookupResult* result);
+
+    SystemError::ErrorCode prevRequestSysErrorCode() const;
 
     /**
      * NOTE: Can only be called within request completion handler.
      *   Otherwise, result is not defined.
      */
-    nx::network::http::StatusCode::Value lastResponseHttpStatusCode() const;
+    nx::network::http::StatusLine lastResponseHttpStatusLine() const;
 
 protected:
     virtual void stopWhileInAioThread() override;
@@ -260,14 +260,14 @@ protected:
                 auto client = std::move(*fusionClientIter);
                 m_activeClients.erase(fusionClientIter);
 
-                m_prevResponseHttpStatusCode =
-                    response
-                    ? (nx::network::http::StatusCode::Value)response->statusLine.statusCode
-                    : nx::network::http::StatusCode::undefined;
+                m_prevRequestSysErrorCode = errorCode;
+                m_prevResponseHttpStatusLine =
+                    response ? response->statusLine : nx::network::http::StatusLine();
 
                 return completionHandler(
                     errorCode,
-                    m_prevResponseHttpStatusCode,
+                    static_cast<nx::network::http::StatusCode::Value>(
+                        m_prevResponseHttpStatusLine.statusCode),
                     std::move(outData)...);
             });
     }
@@ -425,7 +425,7 @@ private:
     const nx::utils::Url m_baseRequestUrl;
     boost::optional<nx::network::http::Credentials> m_userCredentials;
     std::list<std::unique_ptr<nx::network::aio::BasicPollable>> m_activeClients;
-    nx::network::http::StatusCode::Value m_prevResponseHttpStatusCode =
-        nx::network::http::StatusCode::undefined;
+    SystemError::ErrorCode m_prevRequestSysErrorCode = SystemError::noError;
+    nx::network::http::StatusLine m_prevResponseHttpStatusLine;
     QString m_authenticationKey;
 };

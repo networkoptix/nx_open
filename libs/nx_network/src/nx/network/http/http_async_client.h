@@ -11,7 +11,7 @@
 #include <nx/network/aio/basic_pollable.h>
 #include <nx/network/aio/timer.h>
 #include <nx/utils/move_only_func.h>
-#include <nx/utils/object_destruction_flag.h>
+#include <nx/utils/interruption_flag.h>
 #include <nx/utils/url.h>
 
 #include "abstract_msg_body_source.h"
@@ -73,7 +73,7 @@ public:
         constexpr static const std::chrono::milliseconds kDefaultResponseReadTimeout =
             std::chrono::milliseconds(3002);
         constexpr static const std::chrono::milliseconds kDefaultMessageBodyReadTimeout =
-            std::chrono::milliseconds::zero();  //no timeout
+            std::chrono::milliseconds(10003);
 
         std::chrono::milliseconds sendTimeout;
         std::chrono::milliseconds responseReadTimeout;
@@ -96,7 +96,7 @@ public:
      */
     AsyncClient(std::unique_ptr<AbstractStreamSocket> socket);
 
-    virtual ~AsyncClient();
+    virtual ~AsyncClient() override;
 
     AsyncClient(const AsyncClient&) = delete;
     AsyncClient& operator=(const AsyncClient&) = delete;
@@ -382,7 +382,7 @@ private:
     bool m_forcedEof;
     bool m_precalculatedAuthorizationDisabled;
     int m_numberOfRedirectsTried;
-    nx::utils::ObjectDestructionFlag m_objectDestructionFlag;
+    nx::utils::InterruptionFlag m_objectDestructionFlag;
     std::unique_ptr<AbstractMsgBodySource> m_requestBody;
     bool m_expectOnlyBody = false;
     int m_maxNumberOfRedirects = 5;

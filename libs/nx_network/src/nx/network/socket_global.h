@@ -1,5 +1,6 @@
 #pragma once
 
+#include <atomic>
 #include <memory>
 
 #include <nx/kit/ini_config.h>
@@ -29,6 +30,19 @@ struct NX_NETWORK_API Ini:
     NX_INI_STRING("", disableHosts, "Comma-separated list of forbidden IPs and domains");
 };
 
+struct DebugCounters
+{
+    std::atomic<int> tcpSocketCount{0};
+    std::atomic<int> udpSocketCount{0};
+    std::atomic<int> sslSocketCount{0};
+    std::atomic<int> stunClientConnectionCount{0};
+    std::atomic<int> stunOverHttpClientConnectionCount{0};
+    std::atomic<int> stunServerConnectionCount{0};
+    std::atomic<int> httpClientConnectionCount{0};
+    std::atomic<int> httpServerConnectionCount{0};
+    std::atomic<int> websocketConnectionCount{0};
+};
+
 class NX_NETWORK_API SocketGlobals
 {
 public:
@@ -54,6 +68,9 @@ public:
     void unblockHost(const std::string& hostname);
     bool isHostBlocked(const HostAddress& address) const;
 
+    const DebugCounters& debugCounters() const;
+    DebugCounters& debugCounters();
+
     static SocketGlobals& instance();
 
     class InitGuard
@@ -70,6 +87,7 @@ public:
 
 private:
     std::unique_ptr<SocketGlobalsImpl> m_impl;
+    DebugCounters m_debugCounters;
 
     /**
      * @param initializationFlags Bitset of nx::network::InitializationFlags.

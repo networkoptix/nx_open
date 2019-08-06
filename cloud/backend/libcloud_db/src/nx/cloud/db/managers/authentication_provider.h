@@ -37,7 +37,7 @@ class AuthenticationProvider:
 public:
     AuthenticationProvider(
         const conf::Settings& settings,
-        nx::sql::AsyncSqlQueryExecutor* sqlQueryExecutor,
+        nx::sql::AbstractAsyncSqlQueryExecutor* sqlQueryExecutor,
         AbstractAccountManager* accountManager,
         AbstractSystemSharingManager* systemSharingManager,
         const AbstractTemporaryAccountPasswordManager& temporaryAccountCredentialsManager,
@@ -59,7 +59,8 @@ public:
     void getCdbNonce(
         const AuthorizationInfo& authzInfo,
         const data::DataFilter& filter,
-        std::function<void(api::ResultCode, api::NonceData)> completionHandler);
+        std::function<void(api::Result, api::NonceData)> completionHandler);
+
     /**
      * @return intermediate HTTP Digest response that can be used to calculate
      *   HTTP Digest response with only ha2 known.
@@ -68,7 +69,7 @@ public:
     void getAuthenticationResponse(
         const AuthorizationInfo& authzInfo,
         const data::AuthRequest& authRequest,
-        std::function<void(api::ResultCode, api::AuthResponse)> completionHandler);
+        std::function<void(api::Result, api::AuthResponse)> completionHandler);
 
 private:
     struct AccountWithEffectivePassword
@@ -78,7 +79,7 @@ private:
     };
 
     const conf::Settings& m_settings;
-    nx::sql::AsyncSqlQueryExecutor* m_sqlQueryExecutor;
+    nx::sql::AbstractAsyncSqlQueryExecutor* m_sqlQueryExecutor;
     AbstractAccountManager* m_accountManager;
     AbstractSystemSharingManager* m_systemSharingManager;
     const AbstractTemporaryAccountPasswordManager& m_temporaryAccountCredentialsManager;
@@ -91,15 +92,18 @@ private:
 
     boost::optional<AccountWithEffectivePassword>
         getAccountByLogin(const std::string& login) const;
+
     nx::sql::DBResult validateNonce(
         nx::sql::QueryContext* queryContext,
         const std::string& nonce,
         const std::string& systemId,
         std::shared_ptr<bool> isNonceValid);
-    std::tuple<api::ResultCode, api::AuthResponse>
+    
+    std::tuple<api::Result, api::AuthResponse>
         prepareAuthenticationResponse(
             const std::string& systemId,
             const data::AuthRequest& authRequest);
+    
     api::AuthResponse prepareResponse(
         std::string nonce,
         api::SystemSharingEx systemSharing,
@@ -108,15 +112,18 @@ private:
     std::string fetchOrCreateNonce(
         nx::sql::QueryContext* const queryContext,
         const std::string& systemId);
+
     void addUserAuthRecord(
         nx::sql::QueryContext* const queryContext,
         const std::string& systemId,
         const std::string& vmsUserId,
         const api::AccountData& account,
         const std::string& nonce);
+
     api::AuthInfoRecord generateAuthRecord(
         const api::AccountData& account,
         const std::string& nonce);
+
     void generateUpdateUserAuthInfoTransaction(
         nx::sql::QueryContext* const queryContext,
         const std::string& systemId,

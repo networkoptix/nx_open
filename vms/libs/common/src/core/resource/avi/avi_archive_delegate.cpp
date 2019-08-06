@@ -591,7 +591,7 @@ bool QnAviArchiveDelegate::findStreams()
             fixG726Bug();
             initLayoutStreams();
             if (m_firstVideoIndex >= 0)
-                m_firstDts = m_formatContext->streams[m_firstVideoIndex]->first_dts;
+                m_firstDts = m_formatContext->streams[m_firstVideoIndex]->start_time;
             if (m_firstDts == qint64(AV_NOPTS_VALUE))
                 m_firstDts = 0;
 
@@ -685,8 +685,11 @@ bool QnAviArchiveDelegate::initMetadata()
     }
 
     m_metadata = QnAviArchiveMetadata::loadFromFile(m_formatContext);
-    if (m_archiveIntegrityWatcher && !m_archiveIntegrityWatcher->fileRequested(m_metadata, m_resource->getUrl()))
+    if (m_archiveIntegrityWatcher
+        && !m_archiveIntegrityWatcher->fileRequested(m_metadata, m_resource->getUrl()))
+    {
         return false;
+    }
 
     if (aviRes)
     {

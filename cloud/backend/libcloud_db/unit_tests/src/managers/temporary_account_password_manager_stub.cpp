@@ -7,7 +7,7 @@ void TemporaryAccountPasswordManagerStub::authenticateByName(
     const nx::network::http::StringType& /*username*/,
     const std::function<bool(const nx::Buffer&)>& /*validateHa1Func*/,
     nx::utils::stree::ResourceContainer* const /*authProperties*/,
-    nx::utils::MoveOnlyFunc<void(api::ResultCode)> /*completionHandler*/)
+    nx::utils::MoveOnlyFunc<void(api::Result)> /*completionHandler*/)
 {
     // TODO
 }
@@ -15,7 +15,7 @@ void TemporaryAccountPasswordManagerStub::authenticateByName(
 void TemporaryAccountPasswordManagerStub::registerTemporaryCredentials(
     const AuthorizationInfo& /*authzInfo*/,
     data::TemporaryAccountCredentials /*tmpPasswordData*/,
-    std::function<void(api::ResultCode)> /*completionHandler*/)
+    std::function<void(api::Result)> /*completionHandler*/)
 {
 }
 

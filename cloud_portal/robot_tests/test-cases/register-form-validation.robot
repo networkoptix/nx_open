@@ -4,8 +4,7 @@ Suite Setup       Open Browser and go to URL    ${url}/register
 Suite Teardown    Close Browser
 Test Teardown     Run Keyword If Test Failed    Restart
 Test Template     Test Register Invalid
-
-Force Tags        form
+Force Tags        form    Threaded File
 
 *** Variables ***
 ${url}    ${ENV}
@@ -50,7 +49,6 @@ Invalid Email 14 myemail@gmail.com;       mark        hamill      myemail@gmail.
 Empty Email                               mark        hamill      ${EMPTY}                  ${BASE PASSWORD}            True
     [tags]    C41556
 Registered Email                          mark        hamill      ${existing email}         ${BASE PASSWORD}            True
-    [tags]    C41860
 Short Password asdfghj                    mark        hamill      ${valid email}            ${7char password}           True
     [tags]    C41860
 No Uppercase Password adrhartjad          mark        hamill      ${valid email}            ${no upper password}        True
@@ -98,13 +96,13 @@ Restart
 Test Register Invalid
     [Arguments]    ${first}    ${last}    ${email}    ${pass}    ${checked}
     Reload Page
-    Elements Should Not Be Visible    ${EMAIL INVALID}    ${EMAIL ALREADY REGISTERED}    ${EMAIL IS REQUIRED}    ${REGISTER EMAIL INPUT}/parent::div/parent::div[contains(@class,"has-error")]
-    ...                               ${PASSWORD BADGE}    ${PASSWORD IS REQUIRED}    ${PASSWORD TOO SHORT}    ${PASSWORD SPECIAL CHARS}    ${PASSWORD TOO COMMON}    ${PASSWORD IS WEAK}    ${REGISTER PASSWORD INPUT}/../input[contains(@class,'ng-invalid ')]
-    ...                               ${FIRST NAME IS REQUIRED}    ${REGISTER FIRST NAME INPUT}/parent::div/parent::div[contains(@class,"has-error")]    ${LAST NAME IS REQUIRED}    ${REGISTER LAST NAME INPUT}/parent::div/parent::div[contains(@class,"has-error")]    ${TERMS AND CONDITIONS ERROR}
     # These two lines are because Hebrew has double quotes in its text.
     # This makes for issues with strings in xpaths.  These lines convert to single quotes if the language is Hebrew
     Run Keyword If    "${LANGUAGE}"=="he_IL"    Set Suite Variable    ${EMAIL INVALID}    //span[@ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email" and contains(text(),'${EMAIL INVALID TEXT}')]
     Run Keyword If    "${LANGUAGE}"=="he_IL"    Set Suite Variable    ${EMAIL IS REQUIRED}    //span[@ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.required" and contains(text(),'${EMAIL IS REQUIRED TEXT}')]
+    Elements Should Not Be Visible    ${EMAIL INVALID}    ${EMAIL ALREADY REGISTERED}    ${EMAIL IS REQUIRED}    ${REGISTER EMAIL INPUT}/parent::div/parent::div[contains(@class,"has-error")]
+    ...                               ${PASSWORD BADGE}    ${PASSWORD IS REQUIRED}    ${PASSWORD TOO SHORT}    ${PASSWORD SPECIAL CHARS}    ${PASSWORD TOO COMMON}    ${PASSWORD IS WEAK}    ${REGISTER PASSWORD INPUT}/../input[contains(@class,'ng-invalid ')]
+    ...                               ${FIRST NAME IS REQUIRED}    ${REGISTER FIRST NAME INPUT}/parent::div/parent::div[contains(@class,"has-error")]    ${LAST NAME IS REQUIRED}    ${REGISTER LAST NAME INPUT}/parent::div/parent::div[contains(@class,"has-error")]    ${TERMS AND CONDITIONS ERROR}
     Wait Until Elements Are Visible    ${REGISTER FIRST NAME INPUT}    ${REGISTER LAST NAME INPUT}    ${REGISTER EMAIL INPUT}    ${REGISTER PASSWORD INPUT}    ${CREATE ACCOUNT BUTTON}
     Register Form Validation    ${first}    ${last}    ${email}    ${pass}    ${checked}
     Run Keyword Unless    '''${pass}'''=='''${BASE PASSWORD}''' or '''${pass}'''=='''${symbol password}'''    Check Password Outline    ${pass}
@@ -119,6 +117,7 @@ Register Form Validation
     Input Text    ${REGISTER LAST NAME INPUT}    ${last name}
     Input Text    ${REGISTER EMAIL INPUT}    ${email}
     Click Element    ${REGISTER PASSWORD INPUT}
+    sleep    .1
     Input Text    ${REGISTER PASSWORD INPUT}    ${password}
     Run Keyword If    '''${password}'''!='''${EMPTY}'''     Check Password Badge    ${password}
     Run Keyword If    "${checked}"=="True"    Click Element    ${TERMS AND CONDITIONS CHECKBOX REAL}

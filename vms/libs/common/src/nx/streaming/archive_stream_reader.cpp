@@ -184,13 +184,10 @@ void QnArchiveStreamReader::setCurrentTime(qint64 value)
     m_currentTime = value;
 }
 
-qint64 QnArchiveStreamReader::currentTime() const
+std::chrono::microseconds QnArchiveStreamReader::currentTime() const
 {
     QnMutexLocker mutex( &m_jumpMtx );
-    if (m_skipFramesToTime)
-        return m_skipFramesToTime;
-    else
-        return m_currentTime;
+    return std::chrono::microseconds(m_skipFramesToTime ? m_skipFramesToTime : m_currentTime);
 }
 
 QnConstResourceVideoLayoutPtr QnArchiveStreamReader::getDPVideoLayout() const
@@ -525,7 +522,7 @@ begin_label:
             str << "setMarker=" << m_newDataMarker
                 << " for Time=" << QDateTime::fromMSecsSinceEpoch(m_requiredJumpTime/1000).toString("hh:mm:ss.zzz");
             str.flush();
-            NX_ALWAYS(this, s);
+            NX_INFO(this, s);
         }
         */
         setSkipFramesToTime(tmpSkipFramesToTime, !exactJumpToSpecifiedFrame);
@@ -1213,10 +1210,14 @@ void QnArchiveStreamReader::setSkipFramesToTime(qint64 skipTime)
 
 bool QnArchiveStreamReader::jumpTo(qint64 mksec, qint64 skipTime)
 {
-    return jumpTo(mksec, skipTime, nullptr);
+    return jumpTo(mksec, skipTime, true, nullptr);
 }
 
-bool QnArchiveStreamReader::jumpTo(qint64 mksec, qint64 skipTime, qint64* outJumpTime)
+bool QnArchiveStreamReader::jumpTo(
+    qint64 mksec,
+    qint64 skipTime,
+    bool bindPositionToPlaybackMask,
+    qint64* outJumpTime)
 {
     if (m_navDelegate) {
         return m_navDelegate->jumpTo(mksec, skipTime);
@@ -1225,9 +1226,13 @@ bool QnArchiveStreamReader::jumpTo(qint64 mksec, qint64 skipTime, qint64* outJum
     if (m_resource)
         NX_VERBOSE(this, lm("Set position %1 for device %2").args(mksecToDateTime(mksec), m_resource->getUniqueId()));
 
-    m_playbackMaskSync.lock();
-    const qint64 newTime = m_playbackMaskHelper.findTimeAtPlaybackMask(mksec, m_speed >= 0);
-    m_playbackMaskSync.unlock();
+    qint64 newTime = mksec;
+    if (bindPositionToPlaybackMask)
+    {
+        m_playbackMaskSync.lock();
+        newTime = m_playbackMaskHelper.findTimeAtPlaybackMask(mksec, m_speed >= 0);
+        m_playbackMaskSync.unlock();
+    }
 
     if (outJumpTime)
         *outJumpTime = newTime;

@@ -11,6 +11,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/std/algorithm.h>
+#include <nx/vms/api/protocol_version.h>
 
 #include <api/global_settings.h>
 #include <api/mediaserver_client.h>
@@ -219,8 +220,8 @@ QnJsonRestResult SystemMergeProcessor::checkWhetherMergeIsPossible(
     if (connectionResult == Qn::IncompatibleProtocolConnectionResult
         && !data.ignoreIncompatible)
     {
-        NX_DEBUG(this, lm("Incompatible systems protocol. Local %1, remote %2")
-            .args(QnAppInfo::ec2ProtoVersion(), m_remoteModuleInformation.protoVersion));
+        NX_DEBUG(this, "Incompatible systems protocol. Local %1, remote %2",
+            nx::vms::api::protocolVersion(), m_remoteModuleInformation.protoVersion);
         setMergeError(&result, MergeStatus::incompatibleVersion);
         return result;
     }
@@ -634,7 +635,8 @@ QnJsonRestResult SystemMergeProcessor::applyRemoteSettings(
     if (m_dbBackupEnabled)
     {
         QnJsonRestResult backupDBRestResult;
-        if (!executeRequest(remoteUrl, getKey, backupDBRestResult, lit("/api/backupDatabase")))
+        if (!executeRequest(
+            remoteUrl, getKey, backupDBRestResult, "/api/backupDatabase", /*post*/ true))
         {
             setMergeError(&result, MergeStatus::configurationFailed);
             return result;
@@ -786,7 +788,7 @@ bool SystemMergeProcessor::fetchUserParams(
     std::vector<std::tuple<QnUuid, ec2::ErrorCode, nx::vms::api::ResourceParamDataList>>
         getUsersParamsResults;
 
-    nx::utils::Counter expectedResponseCount(users.size());
+    nx::utils::Counter expectedResponseCount((int) users.size());
 
     for (const auto& user: users)
     {
@@ -847,7 +849,8 @@ bool SystemMergeProcessor::executeRequest(
     const nx::utils::Url& remoteUrl,
     const QString& getKey,
     ResultDataType& result,
-    const QString& path)
+    const QString& path,
+    bool post)
 {
     nx::network::http::HttpClient client;
     client.setResponseReadTimeout(kRequestTimeout);
@@ -857,7 +860,8 @@ bool SystemMergeProcessor::executeRequest(
     nx::utils::Url requestUrl(remoteUrl);
     requestUrl.setPath(path);
     addAuthToRequest(requestUrl, getKey);
-    if (!client.doGet(requestUrl) || !isResponseOK(client))
+
+    if (!(post ? client.doPost(requestUrl) : client.doGet(requestUrl)) || !isResponseOK(client))
     {
         auto status = getClientResponse(client);
         NX_DEBUG(this, lit("applyRemoteSettings. Failed to invoke %1: %2")

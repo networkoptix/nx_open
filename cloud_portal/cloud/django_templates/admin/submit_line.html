@@ -1,5 +1,5 @@
 {% load i18n admin_urls %}
-
+{% if not READONLY %}
 <div class="submit-row">
 {% if show_delete_link %}
     {% url opts|admin_urlname:'delete' original.pk|admin_urlquote as delete_url %}
@@ -18,3 +18,4 @@
     <button type="submit" class="btn btn-primary" value="{% trans 'Save' %}" name="_save">Save</button>
     {% endif %}
 </div>
+{% endif %}

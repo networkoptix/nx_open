@@ -23,6 +23,7 @@ public:
     int exec();
 
     const MediatorProcess* impl() const;
+    MediatorProcess* impl();
 
 private:
     MediatorProcess* m_impl;

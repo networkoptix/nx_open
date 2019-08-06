@@ -24,8 +24,7 @@
     <div ng-if="reactivating" class="text-center">
         <div ng-if='data.email'>
             <h1>คุณได้ลงทะเบียนไว้ใน %PRODUCT_NAME%</h1>
-            <p>We've sent you a letter with activation link to {{data.email}}.<br>
-                Please activate your account by visiting this link.</p>
+            <p>เราได้ส่งจดหมายที่มีลิงก์การเปิดใช้งานถึงคุณ {{data.email}} <br> โปรดเปิดใช้งานบัญชีของคุณโดยไปที่ลิงก์นี้</p>
         </div>
         <h1 ng-if="!data.email">เปิดใช้งานบัญชีของคุณ</h1>
         <form name="reactivateAccount" class="form-horizontal" ng-if="!reactivate.success" novalidate>
@@ -43,9 +42,9 @@
                 </div>
                 <div class="col-sm-4">
                     <span class="help-block input-error"
-                          ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.required">Email is required</span>
+                          ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.required">ต้องระบุอีเมล</span>
                     <span class="help-block input-error"
-                          ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.email">Please enter a valid Email</span>
+                          ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.email">โปรดป้อนอีเมลที่ถูกต้อง</span>
                 </div>
             </div>
             <div class="form-group">
@@ -80,9 +79,9 @@
                 </div>
                 <div class="col-sm-4">
                     <span class="help-block input-error"
-                          ng-if="restorePassword.email.$touched && restorePassword.email.$error.required">Email is required</span>
+                          ng-if="restorePassword.email.$touched && restorePassword.email.$error.required">ต้องระบุอีเมล</span>
                     <span class="help-block input-error"
-                          ng-if="restorePassword.email.$touched && restorePassword.email.$error.email">Please enter a valid Email</span>
+                          ng-if="restorePassword.email.$touched && restorePassword.email.$error.email">โปรดป้อนอีเมลที่ถูกต้อง</span>
                 </div>
             </div>
             <div class="form-group">

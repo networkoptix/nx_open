@@ -90,36 +90,6 @@ QnVirtualCameraResource::QnVirtualCameraResource(QnCommonModule* commonModule):
     m_cachedSupportedObjectTypes(
         [this]() { return calculateSupportedObjectTypes(); }, &m_cacheMutex)
 {
-    connect(
-        this,
-        &QnResource::propertyChanged,
-        this,
-        [&](auto& resource, auto& key)
-        {
-            if (key == kUserEnabledAnalyticsEnginesProperty)
-            {
-                m_cachedUserEnabledAnalyticsEngines.reset();
-                m_cachedSupportedEventTypes.reset();
-                m_cachedSupportedObjectTypes.reset();
-                emit userEnabledAnalyticsEnginesChanged(toSharedPointer(this));
-            }
-
-            if (key == kCompatibleAnalyticsEnginesProperty)
-            {
-                m_cachedCompatibleAnalyticsEngines.reset();
-                m_cachedSupportedEventTypes.reset();
-                m_cachedSupportedObjectTypes.reset();
-                emit compatibleAnalyticsEnginesChanged(toSharedPointer(this));
-            }
-
-            if (key == kDeviceAgentManifestsProperty)
-            {
-                m_cachedDeviceAgentManifests.reset();
-                m_cachedSupportedEventTypes.reset();
-                m_cachedSupportedObjectTypes.reset();
-                emit deviceAgentManifestsChanged(toSharedPointer(this));
-            }
-        });
 }
 
 QString QnVirtualCameraResource::getUniqueId() const
@@ -181,11 +151,14 @@ void QnVirtualCameraResource::updateSourceUrl(const nx::utils::Url& tempUrl,
     if (!storeUrlForRole(role))
         return;
 
-    auto cachedUrl = m_cachedStreamUrls.find(role);
-    bool cachedUrlExists = cachedUrl != m_cachedStreamUrls.end();
+    {
+        QnMutexLocker lock(&m_mutex);
+        auto cachedUrl = m_cachedStreamUrls.find(role);
+        bool cachedUrlExists = cachedUrl != m_cachedStreamUrls.end();
 
-    if (cachedUrlExists && cachedUrl->second == url)
-        return;
+        if (cachedUrlExists && cachedUrl->second == url)
+            return;
+    }
 
     auto urlUpdater =
         [url, role](QString oldValue)
@@ -279,10 +252,8 @@ QnAspectRatio QnVirtualCameraResource::aspectRatio() const
 {
     using nx::vms::common::core::resource::SensorDescription;
 
-    const auto customAr = customAspectRatio();
-
-    if (customAr.isValid())
-        return customAr;
+    if (auto aspectRatio = customAspectRatio(); aspectRatio.isValid())
+        return aspectRatio;
 
     // The rest of the code deals with auto aspect ratio.
     // Aspect ration should be forced to AS of the first stream. Note: primary stream AR could be
@@ -499,6 +470,36 @@ void QnVirtualCameraResource::emitPropertyChanged(const QString& key)
 {
     if (key == ResourcePropertyKey::kPtzCapabilities)
         emit ptzCapabilitiesChanged(::toSharedPointer(this));
+
+    if (key == kUserEnabledAnalyticsEnginesProperty)
+    {
+        m_cachedUserEnabledAnalyticsEngines.reset();
+        m_cachedSupportedEventTypes.reset();
+        m_cachedSupportedObjectTypes.reset();
+        emit userEnabledAnalyticsEnginesChanged(toSharedPointer(this));
+    }
+
+    if (key == kCompatibleAnalyticsEnginesProperty)
+    {
+        m_cachedCompatibleAnalyticsEngines.reset();
+        m_cachedSupportedEventTypes.reset();
+        m_cachedSupportedObjectTypes.reset();
+        emit compatibleAnalyticsEnginesChanged(toSharedPointer(this));
+    }
+
+    if (key == kDeviceAgentManifestsProperty)
+    {
+        m_cachedDeviceAgentManifests.reset();
+        m_cachedSupportedEventTypes.reset();
+        m_cachedSupportedObjectTypes.reset();
+        emit deviceAgentManifestsChanged(toSharedPointer(this));
+    }    
+    
+    if (key == ResourcePropertyKey::kIoConfigCapability)
+    {
+        emit isIOModuleChanged(::toSharedPointer(this));
+    }
+
     base_type::emitPropertyChanged(key);
 }
 

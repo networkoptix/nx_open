@@ -18,6 +18,7 @@
 #include <ui/common/notification_levels.h>
 #include <ui/style/helper.h>
 
+#include <nx/utils/elapsed_timer.h>
 #include <nx/utils/interval.h>
 #include <nx/utils/pending_operation.h>
 #include <nx/utils/scoped_connections.h>
@@ -211,6 +212,7 @@ private:
     int m_bottomMargin = style::Metrics::kStandardPadding;
 
     nx::utils::ImplPtr<nx::utils::PendingOperation> m_previewLoad;
+    nx::utils::ElapsedTimer m_sinceLastPreviewRequest;
 };
 
 } // namespace nx::vms::client::desktop

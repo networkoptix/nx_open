@@ -43,14 +43,14 @@ api::AccountData DaoHelper::insertRandomAccount()
         std::bind(&AccountDataObject::insert, &m_accountDbController,
             _1, account));
     m_accounts.push_back(account);
-    return account;
+    return std::move(account);
 }
 
 api::SystemData DaoHelper::insertRandomSystem(const api::AccountData& account)
 {
     auto system = nx::cloud::db::test::BusinessDataGenerator::generateRandomSystem(account);
     insertSystem(account, system);
-    return system;
+    return std::move(system);
 }
 
 void DaoHelper::insertSystem(const api::AccountData& account, const data::SystemData& system)
@@ -131,7 +131,7 @@ void DaoHelper::setDbVersionToUpdateTo(unsigned int dbVersion)
     m_dbVersionToUpdateTo = dbVersion;
 }
 
-nx::sql::AsyncSqlQueryExecutor& DaoHelper::queryExecutor()
+nx::sql::AbstractAsyncSqlQueryExecutor& DaoHelper::queryExecutor()
 {
     return m_persistentDbManager->queryExecutor();
 }

@@ -42,7 +42,8 @@ $dark14: #445B67;
 $dark15: #49626F;
 $dark16: #4E6977;
 $dark17: #53707F;
-
+$dark18: #587785;
+$dark19: #5D7E8F;
 
 
 
@@ -63,6 +64,8 @@ $light14: #7D97A4;
 $light15: #738F9D;
 $light16: #698796;
 $light17: #5F7F8F;
+$light18: #557788;
+$light19: #4B6F81;
 
 
 $additional_light1: #FAFBFB;
@@ -138,6 +141,8 @@ $button_d3:   $dark8;
 .dark15	{background-color: $dark15	;}
 .dark16	{background-color: $dark16	;}
 .dark17	{background-color: $dark17	;}
+.dark18 {background-color: $dark18  ;}
+.dark19 {background-color : $dark19 ;}
 
 .light1	{background-color: $light1	;}
 .light2	{background-color: $light2	;}
@@ -156,5 +161,7 @@ $button_d3:   $dark8;
 .light15	{background-color: $light15	;}
 .light16	{background-color: $light16	;}
 .light17	{background-color: $light17	;}
+.light16    {background-color: $light16 ;}
+.light17    {background-color: $light17 ;}
 
 .dark1:after{content: $dark1;}
