@@ -145,7 +145,7 @@ namespace
             if (index.column() == QnStorageListModel::ActionsColumn)
             {
                 if (hasActiveAction && hovered)
-                    opt.palette.setColor(QPalette::Text, ColorTheme::instance()->color("light14"));
+                    opt.palette.setColor(QPalette::Text, colorTheme()->color("light14"));
                 else if (hasActiveAction)
                     opt.palette.setColor(QPalette::Text, opt.palette.color(QPalette::WindowText));
                 else // Either hidden (has no text) or selected, we can use 'Selected' style for both.
