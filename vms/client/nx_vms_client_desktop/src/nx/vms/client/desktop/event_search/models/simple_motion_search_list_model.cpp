@@ -313,6 +313,9 @@ void SimpleMotionSearchListModel::updateMotionPeriods(qint64 startTimeMs)
     static const auto ascendingLowerBoundPredicate =
         [](const QnTimePeriod& left, milliseconds right) { return left.startTime() < right; };
 
+    static const auto ascendingUpperBoundPredicate =
+        [](milliseconds left, const QnTimePeriod& right) { return left < right.startTime(); };
+
     // `m_data` is sorted by timestamp in descending order, `periods` is sorted in ascending order.
 
     // We iterate over relevant subparts of both collections in parallel,
@@ -321,8 +324,8 @@ void SimpleMotionSearchListModel::updateMotionPeriods(qint64 startTimeMs)
     const auto sourceBegin = std::lower_bound(periods.cbegin(), periods.cend(),
         periodToUpdate.startTime(), ascendingLowerBoundPredicate);
 
-    const auto sourceEnd = std::lower_bound(periods.cbegin(), periods.cend(),
-        periodToUpdate.endTime(), ascendingLowerBoundPredicate);
+    const auto sourceEnd = std::upper_bound(periods.cbegin(), periods.cend(),
+        periodToUpdate.endTime(), ascendingUpperBoundPredicate);
 
     const int updateSize = sourceEnd - sourceBegin;
     if ((updateSize - rowCount()) > maximumCount())
