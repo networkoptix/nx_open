@@ -31,8 +31,8 @@ public:
 signals:
     void engineAdded(const QnUuid& engineId, const AnalyticsEngineInfo& info);
     void engineRemoved(const QnUuid& engineId);
-    void engineNameChanged(const QnUuid& engineId, const QString& name);
-    void engineSettingsModelChanged(const QnUuid& engineId, const QJsonObject& settingsModel);
+    void engineUpdated(const QnUuid& engineId);
+    void engineSettingsModelChanged(const QnUuid& engineId);
 
 private:
     class Private;
