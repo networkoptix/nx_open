@@ -38,7 +38,7 @@ public:
         const nx::vms::api::analytics::DeviceAgentManifest& manifest);
 
 private:
-    GroupDescriptorContainer m_groupDescriptorContainer;
+    std::unique_ptr<GroupDescriptorContainer> m_groupDescriptorContainer;
 };
 
 } // namespace nx::analytics

@@ -32,7 +32,7 @@ public:
         const nx::vms::api::analytics::EngineManifest& manifest);
 
 private:
-    EngineDescriptorContainer m_engineDescriptorContainer;
+    std::unique_ptr<EngineDescriptorContainer> m_engineDescriptorContainer;
 };
 
 } // namespace nx::analytics

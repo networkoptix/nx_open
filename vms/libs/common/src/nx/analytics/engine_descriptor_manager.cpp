@@ -23,12 +23,15 @@ EngineDescriptorManager::EngineDescriptorManager(QObject* parent):
 
 std::optional<EngineDescriptor> EngineDescriptorManager::descriptor(const EngineId& engineId) const
 {
-    return fetchDescriptor(m_engineDescriptorContainer, engineId);
+    return fetchDescriptor(m_engineDescriptorContainer.get(), engineId);
 }
 
 EngineDescriptorMap EngineDescriptorManager::descriptors(const std::set<EngineId>& engineIds) const
 {
-    return fetchDescriptors(m_engineDescriptorContainer, engineIds, kEngineDescriptorTypeName);
+    return fetchDescriptors(
+        m_engineDescriptorContainer.get(),
+        engineIds,
+        kEngineDescriptorTypeName);
 }
 
 void EngineDescriptorManager::updateFromEngineManifest(
@@ -37,7 +40,7 @@ void EngineDescriptorManager::updateFromEngineManifest(
     const QString& engineName,
     const EngineManifest& manifest)
 {
-    m_engineDescriptorContainer.mergeWithDescriptors(
+    m_engineDescriptorContainer->mergeWithDescriptors(
         EngineDescriptor(engineId, engineName, pluginId, manifest),
         engineId);
 }

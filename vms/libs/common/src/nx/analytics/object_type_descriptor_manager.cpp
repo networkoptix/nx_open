@@ -71,14 +71,14 @@ ObjectTypeDescriptorManager::ObjectTypeDescriptorManager(QObject* parent) :
 std::optional<ObjectTypeDescriptor> ObjectTypeDescriptorManager::descriptor(
     const ObjectTypeId& id) const
 {
-    return fetchDescriptor(m_objectTypeDescriptorContainer, id);
+    return fetchDescriptor(m_objectTypeDescriptorContainer.get(), id);
 }
 
 ObjectTypeDescriptorMap ObjectTypeDescriptorManager::descriptors(
     const std::set<ObjectTypeId>& objectTypeIds) const
 {
     return fetchDescriptors(
-        m_objectTypeDescriptorContainer, objectTypeIds, kObjectTypeDescriptorTypeName);
+        m_objectTypeDescriptorContainer.get(), objectTypeIds, kObjectTypeDescriptorTypeName);
 }
 
 ScopedObjectTypeIds ObjectTypeDescriptorManager::supportedObjectTypeIds(
@@ -195,7 +195,7 @@ void ObjectTypeDescriptorManager::updateFromEngineManifest(
     const QString& engineName,
     const EngineManifest& manifest)
 {
-    m_objectTypeDescriptorContainer.mergeWithDescriptors(
+    m_objectTypeDescriptorContainer->mergeWithDescriptors(
         fromManifestItemListToDescriptorMap<ObjectTypeDescriptor>(engineId, manifest.objectTypes));
 }
 
@@ -204,7 +204,7 @@ void ObjectTypeDescriptorManager::updateFromDeviceAgentManifest(
     const EngineId& engineId,
     const DeviceAgentManifest& manifest)
 {
-    m_objectTypeDescriptorContainer.mergeWithDescriptors(
+    m_objectTypeDescriptorContainer->mergeWithDescriptors(
         fromManifestItemListToDescriptorMap<ObjectTypeDescriptor>(engineId, manifest.objectTypes));
 }
 
@@ -212,7 +212,7 @@ GroupId ObjectTypeDescriptorManager::objectTypeGroupForEngine(
     const EngineId& engineId,
     const ObjectTypeId& objectTypeId) const
 {
-    const auto descriptor = m_objectTypeDescriptorContainer.mergedDescriptors(objectTypeId);
+    const auto descriptor = m_objectTypeDescriptorContainer->mergedDescriptors(objectTypeId);
     if (!descriptor)
         return GroupId();
 

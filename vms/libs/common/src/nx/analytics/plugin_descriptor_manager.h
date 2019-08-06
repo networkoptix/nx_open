@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 #include <QtCore/QObject>
 
 #include <nx/analytics/types.h>
@@ -28,7 +30,7 @@ public:
     void updateFromPluginManifest(const nx::vms::api::analytics::PluginManifest& manifest);
 
 private:
-    PluginDescriptorContainer m_pluginDescriptorContainer;
+    std::unique_ptr<PluginDescriptorContainer> m_pluginDescriptorContainer;
 };
 
 } // namespace nx::analytics
