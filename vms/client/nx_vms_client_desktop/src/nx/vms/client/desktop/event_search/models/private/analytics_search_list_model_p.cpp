@@ -170,7 +170,7 @@ QVariant AnalyticsSearchListModel::Private::data(const QModelIndex& index, int r
         }
 
         case Qt::DecorationRole:
-            return QVariant::fromValue(qnSkin->pixmap("text_buttons/analytics.png"));
+            return QVariant::fromValue(qnSkin->pixmap("analytics/analytics.svg"));
 
         case Qn::DescriptionTextRole:
             return description(track);
