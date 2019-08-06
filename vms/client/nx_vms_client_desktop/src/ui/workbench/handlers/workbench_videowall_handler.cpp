@@ -1788,6 +1788,9 @@ void QnWorkbenchVideoWallHandler::at_identifyVideoWallAction_triggered()
 
 void QnWorkbenchVideoWallHandler::at_startVideoWallControlAction_triggered()
 {
+    if (!canStartControlMode())
+        return;
+
     const auto parameters = menu()->currentParameters(sender());
 
     QnWorkbenchLayout *layout = NULL;
