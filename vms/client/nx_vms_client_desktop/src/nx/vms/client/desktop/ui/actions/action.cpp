@@ -41,12 +41,13 @@ Action::Action(IDType id, QObject* parent) :
     m_toolTipMarker(lit("<b></b>"))
 {
     setToolTip(m_toolTipMarker);
-
+    setShortcutVisibleInContextMenu(true);
     connect(this, &QAction::changed, this, &Action::updateToolTipSilent);
 }
 
 Action::~Action()
-{}
+{
+}
 
 IDType Action::id() const
 {

@@ -4,31 +4,60 @@
 #include <rest/server/rest_connection_processor.h>
 #include <nx/utils/system_error.h>
 #include <nx/utils/log/log.h>
+#include <utils/common/synctime.h>
+
+using namespace nx::vms::server;
 
 namespace {
 
-bool allParticipantsAreReadyForInstall(
+struct Exception
+{
+    Exception(
+        const QString& message,
+        QnRestResult::Error restError = QnRestResult::CantProcessRequest)
+        :
+        message(message),
+        restError(restError)
+    {}
+
+    QString message;
+    QnRestResult::Error restError;
+};
+
+void makeSureParticipantsAreReadyForInstall(
     const detail::IfParticipantPredicate& ifParticipantPredicate,
     const QnRestConnectionProcessor* processor,
     QnMediaServerModule* serverModule)
 {
     auto request = QnMultiserverRequestData::fromParams<QnEmptyRequestData>(
-        processor->resourcePool(), QnRequestParamList());
-    request.isLocal = true;
+        processor->resourcePool(),
+        QnRequestParamList());
 
-    QnMultiserverRequestContext<QnEmptyRequestData> context(request,
+    request.isLocal = true;
+    QnMultiserverRequestContext<QnEmptyRequestData> context(
+        request,
         processor->owner()->getPort());
 
     QList<nx::update::Status> reply;
-    detail::checkUpdateStatusRemotely(ifParticipantPredicate, serverModule,
-        "/ec2/updateStatus", &reply, &context);
+    detail::checkUpdateStatusRemotely(
+        ifParticipantPredicate,
+        serverModule,
+        "/ec2/updateStatus",
+        &reply,
+        &context);
 
-    return !reply.isEmpty() && std::all_of(reply.cbegin(), reply.cend(),
-        [](const auto& status)
-        {
-            return status.code == nx::update::Status::Code::readyToInstall
-                || status.code == nx::update::Status::Code::latestUpdateInstalled;
-        });
+    if (reply.isEmpty()
+        || std::any_of(
+                reply.cbegin(),
+                reply.cend(),
+                [](const auto& status)
+                {
+                    return status.code != nx::update::Status::Code::readyToInstall
+                        && status.code != nx::update::Status::Code::latestUpdateInstalled;
+               }))
+    {
+        throw Exception("Not every participant is ready for update installation");
+    }
 }
 
 void sendInstallRequest(
@@ -39,7 +68,8 @@ void sendInstallRequest(
     QnMultiserverRequestContext<QnEmptyRequestData>* context)
 {
     auto allServers = detail::participantServers(ifParticipantPredicate, commonModule).toList();
-    std::sort(allServers.begin(), allServers.end(),
+    std::sort(
+        allServers.begin(), allServers.end(),
         [commonModule](const auto& server1, const auto& server2)
         {
             return commonModule->router()->routeTo(server1->getId()).distance
@@ -51,7 +81,8 @@ void sendInstallRequest(
         if (server->getId() == commonModule->moduleGUID())
             continue;
 
-        runMultiserverUploadRequest(commonModule->router(),
+        runMultiserverUploadRequest(
+            commonModule->router(),
             detail::getServerApiUrl(path, server, context),
             QByteArray(), contentType, QString(), QString(), server,
             [server, context](SystemError::ErrorCode errorCode, int httpStatusCode)
@@ -74,8 +105,51 @@ void sendInstallRequest(
                 context->executeGuarded([context]() { context->requestProcessed(); });
             },
             context);
-        context->waitForDone();
     }
+
+    context->waitForDone();
+}
+
+static QList<QnUuid> peersFromParams(const QnRequestParamList& params)
+{
+    if (!params.contains("peers"))
+        throw Exception("Missing required parameter \"peers\"", QnRestResult::MissingParameter);
+
+    QList<QnUuid> participants;
+    if (!params.value("peers").isEmpty())
+    {
+        for (const auto& idString: params.value("peers").split(','))
+            participants.append(QnUuid::fromStringSafe(idString));
+    }
+
+    return participants;
+}
+
+static int makeSuccessfulResponse(QByteArray& result, QByteArray& resultContentType)
+{
+    QnRestResult restResult;
+    restResult.setError(QnRestResult::Error::NoError);
+    QnFusionRestHandlerDetail::serialize(
+        restResult,
+        result,
+        resultContentType,
+        Qn::JsonFormat);
+
+    return nx::network::http::StatusCode::ok;
+}
+
+void updateAndSetUpdateInformation(
+    UpdateManager* updateManager,
+    const QList<QnUuid>& participants,
+    qint64 lastInstallationRequestTime)
+{
+    auto currentInfo = updateManager->updateInformation(
+        UpdateManager::InformationCategory::target);
+    currentInfo.participants = participants;
+    currentInfo.lastInstallationRequestTime = lastInstallationRequestTime;
+    updateManager->setUpdateInformation(
+        UpdateManager::InformationCategory::target,
+        currentInfo);
 }
 
 } // namespace
@@ -86,6 +160,57 @@ QnInstallUpdateRestHandler::QnInstallUpdateRestHandler(QnMediaServerModule* serv
     nx::vms::server::ServerModuleAware(serverModule),
     m_onTriggeredCallback(std::move(onTriggeredCallback))
 {
+}
+
+void QnInstallUpdateRestHandler::setNewUpdateState(const QList<QnUuid> &participants)
+{
+    try
+    {
+        updateAndSetUpdateInformation(
+            serverModule()->updateManager(),
+            participants,
+            qnSyncTime->currentMSecsSinceEpoch());
+    }
+    catch(const std::exception& e)
+    {
+        NX_DEBUG(this, e.what());
+        throw Exception("Failed to set new update participants state");
+    }
+}
+
+void QnInstallUpdateRestHandler::storeUpdateState()
+{
+    try
+    {
+        const auto updateInfo = serverModule()->updateManager()->updateInformation(
+            UpdateManager::InformationCategory::target);
+
+        m_participants = updateInfo.participants;
+        m_updateInstallTime = updateInfo.lastInstallationRequestTime;
+    }
+    catch (const std::exception& e)
+    {
+        NX_DEBUG(this, e.what());
+        throw Exception("Failed to store current update state");
+    }
+}
+
+void QnInstallUpdateRestHandler::restoreUpdateState()
+{
+    try
+    {
+        if (!m_participants || !m_updateInstallTime)
+            return;
+
+        updateAndSetUpdateInformation(
+            serverModule()->updateManager(),
+            *m_participants,
+            *m_updateInstallTime);
+    }
+    catch (const std::exception& e)
+    {
+        NX_DEBUG(this, e.what());
+    }
 }
 
 int QnInstallUpdateRestHandler::executePost(
@@ -106,64 +231,53 @@ int QnInstallUpdateRestHandler::executePost(
     if (request.isLocal)
         return nx::network::http::StatusCode::ok;
 
-    if (!params.contains("peers"))
+    try
     {
-        return QnFusionRestHandler::makeError(nx::network::http::StatusCode::ok,
-            "Missing required parameter 'peers'", &result, &resultContentType, Qn::JsonFormat,
-            request.extraFormatting, QnRestResult::MissingParameter);
-    }
+        const auto peers = peersFromParams(params);
+        storeUpdateState();
+        setNewUpdateState(peers);
 
-    QList<QnUuid> participants;
-    if (!params.value("peers").isEmpty())
+        const auto ifParticipantPredicate = detail::makeIfParticipantPredicate(
+            serverModule()->updateManager());
+
+        makeSureParticipantsAreReadyForInstall(ifParticipantPredicate, processor, serverModule());
+        QnMultiserverRequestContext<QnEmptyRequestData> context(
+            request,
+            processor->owner()->getPort());
+
+        sendInstallRequest(
+            ifParticipantPredicate,
+            serverModule()->commonModule(),
+            path,
+            srcBodyContentType,
+            &context);
+
+        return makeSuccessfulResponse(result, resultContentType);
+    }
+    catch (const Exception& e)
     {
-        for (const auto& idString : params.value("peers").split(','))
-            participants.append(QnUuid::fromStringSafe(idString));
+        restoreUpdateState();
+        return QnFusionRestHandler::makeError(
+            nx::network::http::StatusCode::ok,
+            e.message,
+            &result,
+            &resultContentType,
+            Qn::JsonFormat,
+            request.extraFormatting,
+            e.restError);
     }
-
-    if (!serverModule()->updateManager()->setParticipants(participants))
+    catch (...)
     {
-        return QnFusionRestHandler::makeError(nx::network::http::StatusCode::ok,
-            "Failed to set update participants list. Update information might not be valid",
-            &result, &resultContentType, Qn::JsonFormat, request.extraFormatting);
+        restoreUpdateState();
+        return QnFusionRestHandler::makeError(
+            nx::network::http::StatusCode::ok,
+            "Internal server error",
+            &result,
+            &resultContentType,
+            Qn::JsonFormat,
+            request.extraFormatting,
+            QnRestResult::Error::InternalServerError);
     }
-
-    if (!serverModule()->updateManager()->updateLastInstallationRequestTime())
-    {
-        return QnFusionRestHandler::makeError(nx::network::http::StatusCode::ok,
-            "Failed to set last installation request time. Update information might not be valid",
-            &result, &resultContentType, Qn::JsonFormat, request.extraFormatting);
-    }
-
-    const auto ifParticipantPredicate = detail::makeIfParticipantPredicate(
-        serverModule()->updateManager());
-
-    if (!ifParticipantPredicate)
-    {
-        return QnFusionRestHandler::makeError(nx::network::http::StatusCode::ok,
-            "Failed to determine update participants. Update information might not be valid",
-            &result, &resultContentType, Qn::JsonFormat, request.extraFormatting);
-    }
-
-    if (!allParticipantsAreReadyForInstall(ifParticipantPredicate, processor, serverModule()))
-    {
-        return QnFusionRestHandler::makeError(nx::network::http::StatusCode::ok,
-            "Not all servers in the system are ready for install",
-            &result, &resultContentType, Qn::JsonFormat);
-    }
-
-    QnMultiserverRequestContext<QnEmptyRequestData> context(request,
-        processor->owner()->getPort());
-
-    sendInstallRequest(ifParticipantPredicate, serverModule()->commonModule(), path,
-        srcBodyContentType, &context);
-
-    // Client expects json object in all cases or response is considered failed.
-    QnRestResult restResult;
-    restResult.setError(QnRestResult::Error::NoError);
-    QnFusionRestHandlerDetail::serialize(
-        restResult, result, resultContentType, Qn::JsonFormat);
-
-    return nx::network::http::StatusCode::ok;
 }
 
 void QnInstallUpdateRestHandler::afterExecute(

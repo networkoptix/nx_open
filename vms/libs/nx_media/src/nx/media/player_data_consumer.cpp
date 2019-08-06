@@ -192,10 +192,20 @@ bool PlayerDataConsumer::processData(const QnAbstractDataPacketPtr& data)
     return true; //< Just ignore unknown frame type.
 }
 
-bool PlayerDataConsumer::processEmptyFrame(const QnEmptyMediaDataPtr& data)
+bool PlayerDataConsumer::processEmptyFrame(const QnEmptyMediaDataPtr& constData)
 {
     if (m_awaitingJumpCounter > 0)
         return true; //< ignore EOF due to we are going set new position
+
+
+    QnEmptyMediaDataPtr data = constData;
+
+    // Check MediaFlags_BOF flag for compatibility with old media servers 3.2.
+    if (constData->flags.testFlag(QnAbstractMediaData::MediaFlags_BOF))
+    {
+        data.reset(constData->clone());
+        data->flags.setFlag(QnAbstractMediaData::MediaFlags_AfterEOF, true);
+    }
 
     if (data->flags.testFlag(QnAbstractMediaData::MediaFlags_AfterEOF))
     {

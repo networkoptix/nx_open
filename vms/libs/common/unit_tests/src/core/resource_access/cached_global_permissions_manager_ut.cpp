@@ -12,6 +12,7 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
 #include <test_support/resource/camera_resource_stub.h>
+#include <core/resource_access/resource_access_subject.h>
 
 class QnCachedGlobalPermissionsManagerTest: public testing::Test, protected QnResourcePoolTestHelper
 {

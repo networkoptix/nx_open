@@ -136,6 +136,16 @@ protected:
         }
     }
 
+    void thenSystemUpdateStateShouldNotBeAltered()
+    {
+        QnJsonRestResult result;
+        NX_TEST_API_GET(m_peers[0].get(), "/ec2/updateInformation", &result);
+
+        update::Information receivedUpdateInfo = result.deserialized<update::Information>();
+        ASSERT_EQ(-1, receivedUpdateInfo.lastInstallationRequestTime);
+        ASSERT_TRUE(receivedUpdateInfo.participants.isEmpty());
+    }
+
     void thenGlobalUpdateInformationShouldContainParticipants(const QList<QnUuid>& participants)
     {
         QnJsonRestResult result;
@@ -550,7 +560,7 @@ TEST_F(FtUpdates, installUpdate_failIfParticipantIsOffline)
 
     QList<QnUuid> participants{ peerId(0), peerId(1), peer2Id };
     thenInstallUpdateWithPeersParameterShouldFail(participants);
-    thenGlobalUpdateInformationShouldContainParticipants(participants);
+    thenSystemUpdateStateShouldNotBeAltered();
 }
 
 TEST_F(FtUpdates, installUpdate_fail_emptyUpdateInformation)

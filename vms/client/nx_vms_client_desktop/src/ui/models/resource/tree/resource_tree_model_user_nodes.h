@@ -49,7 +49,7 @@ private:
     QnResourceTreeModelNodePtr ensureSubjectNode(const QnResourceAccessSubject& subject);
 
     /** Get or create user role node. */
-    QnResourceTreeModelNodePtr ensureRoleNode(const nx::vms::api::UserRoleData& role);
+    QnResourceTreeModelNodePtr ensureRoleNode(const QnUuid& roleId);
 
     /** Get or create user node. */
     QnResourceTreeModelNodePtr ensureUserNode(const QnUserResourcePtr& user);

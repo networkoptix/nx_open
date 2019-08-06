@@ -9,7 +9,7 @@
     </message>
     <message>
       <source>MMMM yyyy</source>
-      <translation>MMMM åååå</translation>
+      <translation>MMMM yyyy</translation>
     </message>
   </context>
   <context>
@@ -17,7 +17,7 @@
     <message>
       <source>Language Name</source>
       <extracomment>Language name that will be displayed to user. Must not be empty.</extracomment>
-      <translation type="unfinished">Language Name</translation>
+      <translation>Svenska</translation>
     </message>
   </context>
   <context>

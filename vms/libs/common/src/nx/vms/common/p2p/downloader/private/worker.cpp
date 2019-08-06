@@ -48,7 +48,6 @@ struct RequestContext
 {
     AbstractPeerManager::RequestContextPtr<T> context;
     UserData data;
-    int chunkIndex = -1;
 
     RequestContext(const UserData& data, AbstractPeerManager::RequestContextPtr<T> context):
         context(std::move(context)),
@@ -67,7 +66,7 @@ struct RequestContext
             auto it = contexts.begin();
             while (it != contexts.end() && !worker->needToStop())
             {
-                if (it->context->future.wait_for(2s) == std::future_status::ready)
+                if (it->context->future.wait_for(30ms) == std::future_status::ready)
                     break;
                 ++it;
             }
@@ -606,7 +605,10 @@ void Worker::downloadChunks()
 
     while (chunksLeft > 0)
     {
-        for (int i = 0; i < kMaxSimultaneousDownloads && chunksLeft > 0; ++i)
+        for (int i = 0;
+            contexts.size() < kMaxSimultaneousDownloads && i < kMaxSimultaneousDownloads
+                && chunksLeft > 0;
+            ++i)
         {
             const int chunk = selectNextChunk(downloadingChunks);
             if (chunk < 0)
@@ -645,12 +647,20 @@ void Worker::downloadChunks()
         if (contexts.empty())
             break;
 
+        if (chunksLeft == 0 && !needToFindBetterPeersForDownload())
+        {
+            // We'll get here with no change in this case. But this way we'll not wait when the
+            // latest single chunk is downloaded. Instead we'll keep operating with maximum
+            // concurrent chunks.
+            chunksLeft = kSubsequentChunksToDownload;
+        }
+
         Context::processRequests(this, contexts,
             [&, this](const ContextData& ctx, const std::optional<QByteArray>& data)
             {
                 if (data)
                 {
-                    const bool lastChunk = ctx.chunkIndex < m_availableChunks.size() - 1;
+                    const bool lastChunk = ctx.chunkIndex == m_availableChunks.size() - 1;
                     if (!lastChunk)
                     {
                         // Last chunk is usually smaller than others, so skip it.
@@ -695,7 +705,11 @@ void Worker::handleDownloadChunkReply(
         decreasePeerRank(peer);
 
         if (auto& info = m_peerInfoByPeer[peer]; info.isBanned())
-            info.downloadedChunks.clear(); //< The peer probably lost the file. Need to re-check.
+        {
+            // The peer probably lost the file. Need to re-check.
+            info.isInternet = false;
+            info.downloadedChunks.clear();
+        }
 
         return;
     }
@@ -918,6 +932,8 @@ int Worker::selectNextChunk(const QSet<int>& ignoredChunks) const
 
 bool Worker::needToFindBetterPeersForDownload() const
 {
+    NX_VERBOSE(m_logTag, "Checking if need to find better peers...");
+
     constexpr int kGoodDownloadSpeed = 5; //< Megabytes per second.
     const milliseconds goodChunkDownloadTime{
         (int) (fileInformation().chunkSize / kGoodDownloadSpeed)}; //< Milliseconds.
@@ -934,14 +950,35 @@ bool Worker::needToFindBetterPeersForDownload() const
     }
 
     if (fastPeersCount > kMaxSimultaneousDownloads)
+    {
+        NX_VERBOSE(m_logTag, "Don't need to find better peers. Found %1 fast peers.",
+            fastPeersCount);
         return false;
+    }
 
     int peersCount = 0;
-
     for (AbstractPeerManager* peerManager: m_peerManagers)
         peersCount += peerManager->peers().size();
 
-    return m_peerInfoByPeer.size() < peersCount;
+    int checkedPeersCount = 0;
+    for (const PeerInformation& info: m_peerInfoByPeer)
+    {
+        if (!info.downloadedChunks.isEmpty() || info.isInternet)
+            ++checkedPeersCount;
+    }
+
+    const bool result = m_peerInfoByPeer.size() < peersCount;
+    if (result)
+    {
+        NX_VERBOSE(m_logTag, "Need to find better peers. Fast peers: %1, checked: %2, total: %3",
+            fastPeersCount, checkedPeersCount, peersCount);
+    }
+    else
+    {
+        NX_VERBOSE(m_logTag, "Don't need to find better peers. Checked all %1 peers.", peersCount);
+    }
+
+    return result;
 }
 
 void Worker::increasePeerRank(const Peer& peer, int value)

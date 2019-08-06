@@ -60,6 +60,7 @@
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
 #include <ui/workbench/workbench_access_controller.h>
 
+#include <nx/utils/debug_helpers/model_transaction_checker.h>
 #include <nx/vms/client/desktop/utils/mime_data.h>
 
 using namespace nx::vms::client::desktop;
@@ -131,6 +132,9 @@ QnResourceTreeModel::QnResourceTreeModel(
     m_nodeManager(new QnResourceTreeModelNodeManager(this)),
     m_layoutNodeManager(new QnResourceTreeModelLayoutNodeManager(this))
 {
+    if (ini().developerMode)
+        nx::utils::ModelTransactionChecker::install(this);
+
     /* Create top-level nodes. */
     for (NodeType nodeType: rootNodeTypes())
         m_rootNodes[nodeType] =
@@ -215,16 +219,24 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::node(const QModelIndex& index) c
     return static_cast<QnResourceTreeModelNode *>(index.internalPointer())->toSharedPointer();
 }
 
-QList<QnResourceTreeModelNodePtr> QnResourceTreeModel::children(const QnResourceTreeModelNodePtr& node) const
+QSet<QnResourceTreeModelNodePtr> QnResourceTreeModel::children(
+    const QnResourceTreeModelNodePtr& node) const
 {
-    /* Calculating children this way because bastard nodes are absent in node's childred() list. */
-    QList<QnResourceTreeModelNodePtr> result;
-    for (auto existing : m_allNodes)
-    {
-        if (existing->parent() == node)
-            result << existing;
-    }
-    return result;
+    // Calculating children this way because bastard nodes are absent in node's childred() list.
+    const auto calculateUsingCompatibilityMethod =
+        [this, node]()
+        {
+            QSet<QnResourceTreeModelNodePtr> result;
+            for (auto existing: m_allNodes)
+            {
+                if (existing->parent() == node)
+                    result.insert(existing);
+            }
+            return result;
+        };
+    NX_ASSERT_HEAVY_CONDITION(node->allChildren() == calculateUsingCompatibilityMethod());
+
+    return node->allChildren();
 }
 
 QnResourceTreeModelNodePtr QnResourceTreeModel::ensureResourceNode(const QnResourcePtr& resource)

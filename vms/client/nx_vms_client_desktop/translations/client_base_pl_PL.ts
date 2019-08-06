@@ -943,6 +943,14 @@ to view more bookmarks</source>
       <source>Objects Frames and Info...</source>
       <translation>Obiekty i informacje...</translation>
     </message>
+    <message>
+      <source>Pin Calendar</source>
+      <translation>Przypnij kalendarz</translation>
+    </message>
+    <message>
+      <source>Unpin Calendar</source>
+      <translation>Odepnij kalendarz</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -2082,8 +2090,8 @@ to view more bookmarks</source>
       <translation>Dowolna kamera</translation>
     </message>
     <message>
-      <source>Force Acknowledgement will only work for Generic Events if camera modifiers are used in the Generic Event URL</source>
-      <translation>Wymuszanie potwierdzenia działa dla zdarzeń generowanych tylko wtedy, gdy użyto modyfikatorów kamer w URL generującym zdarzenie</translation>
+      <source>Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</source>
+      <translation>Wymuszanie potwierdzenia działa dla zdarzeń generowanych tylko wtedy, gdy użyto identyfikatorów kamer w poleceniach URL generujących te zdarzenia</translation>
     </message>
   </context>
   <context>
@@ -4338,7 +4346,7 @@ to %1</source>
     </message>
     <message>
       <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
-      <translation type="unfinished">&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</translation>
+      <translation>&quot;Wirtualna Kamera&quot; to wirtualna przestrzeń dostępna dla plików wideo, które można przesłać na dowolny z serwerów w systemie i udostępnić je dowolnym użytkownikom.</translation>
     </message>
   </context>
   <context>
@@ -5710,11 +5718,6 @@ to %1</source>
       <translation>Co zrobić z aktualnymi danymi analitycznymi?</translation>
     </message>
     <message>
-      <source>Current analytics data will not be automatically moved to another location and will become unaccessible. You can keep it and manually move later, or delete permanently.
-If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
-      <translation>Aktualne dane analityczne nie zostaną automatycznie przeniesione do innej lokalizacji i staną się niedostępne. Możesz je zachować i ręcznie przenieść później lub usunąć na stałe. Jeśli chcesz przenieść dane analityczne do innej lokalizacji, skontaktuj się najpierw z pomocą techniczną.</translation>
-    </message>
-    <message>
       <source>Delete</source>
       <translation>Usuń</translation>
     </message>
@@ -5725,6 +5728,11 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Cancel</source>
       <translation>Anuluj</translation>
+    </message>
+    <message>
+      <source>Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
+If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
+      <translation>Aktualne dane analityczne nie zostaną automatycznie przeniesione do innej lokalizacji i staną się niedostępne. Możesz je zachować i ręcznie przenieść później lub usunąć na stałe. Jeśli chcesz przenieść dane analityczne do innej lokalizacji, skontaktuj się najpierw z pomocą techniczną.</translation>
     </message>
   </context>
   <context>
@@ -7546,7 +7554,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Unknown track</source>
-      <translation type="unfinished">Unknown track</translation>
+      <translation>Nieznana ścieżka</translation>
     </message>
   </context>
   <context>
@@ -7787,6 +7795,10 @@ If you intended to move analytics data to another storage location, please conta
       <source>This action cannot be undone.</source>
       <translation>Nie można cofnąć tej czynności.</translation>
     </message>
+    <message>
+      <source>Motion detection stream is disabled</source>
+      <translation>Strumień detekcji ruchu jest wyłączony</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraScheduleWidget</name>
@@ -7931,6 +7943,14 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Plugins</source>
       <translation>Wtyczki</translation>
+    </message>
+    <message>
+      <source>Motion detection is disabled, all schedule records &quot;Motion&quot; and &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
+      <translation>Detekcja ruchu jest wyłączona. Ustawienia harmonogramu nagrywania w trybie &quot;Ruch&quot; i &quot;Ruch + Niska rozdzielczość&quot; zostaną zamienione na tryb &quot;Zawsze&quot;</translation>
+    </message>
+    <message>
+      <source>Dual streaming is disabled, all schedule records &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
+      <translation>Podwójne strumieniowanie jest wyłączone. Ustawienia harmonogramu nagrywania w trybie &quot;Ruch + Niska rozdzielczość&quot; zostaną zamienione na tryb &quot;Zawsze&quot;</translation>
     </message>
   </context>
   <context>
@@ -8269,10 +8289,6 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>%n zdarzeń</numerusform>
         <numerusform>%n zdarzeń</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>unnamed analytics engine</source>
-      <translation>nieznany silnik analityczny</translation>
     </message>
     <message>
       <source>No events occurred</source>
@@ -8668,7 +8684,7 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Wprowadzony zakres adresów IP zawiera więcej niż 255 adresów.</translation>
     </message>
     <message>
-      <source>Can&apos;t start searching process</source>
+      <source>Can not start the search process</source>
       <translation>Nie można rozpocząć procesu wyszukiwania</translation>
     </message>
   </context>
@@ -8782,6 +8798,60 @@ If you intended to move analytics data to another storage location, please conta
       <source>Some servers are offline and will not be updated. Skip them?</source>
       <translation>Niektóre serwery są w trybie offline i nie zostaną zaktualizowane. Pominąć je?</translation>
     </message>
+    <message numerus="yes">
+      <source>Missing update package for the client and %n servers</source>
+      <translation>
+        <numerusform>Brakuje pakietu aktualizacji dla klienta i serwera</numerusform>
+        <numerusform>Brakuje pakietu aktualizacji dla klienta i %n serwerów</numerusform>
+        <numerusform>Brakuje pakietu aktualizacji dla klienta i %n serwerów</numerusform>
+        <numerusform>Brakuje pakietu aktualizacji dla klienta i %n serwerów</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Missing update package for the client</source>
+      <translation>Brakuje pakietu aktualizacji dla klienta</translation>
+    </message>
+    <message>
+      <source>There are no online servers to update.</source>
+      <translation>Brak dostępnych serwerów do aktualizacji.</translation>
+    </message>
+    <message>
+      <source>Cancel update and delete all downloaded data?</source>
+      <translation>Anulować aktualizację i usunąć wszystkie pobrane dane?</translation>
+    </message>
+    <message>
+      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
+      <translation>Wersje niektórych komponentów nie są już obsługiwane. Proszę je usunąć z systemu lub zaktualizować system operacyjny do obsługiwanej wersji.</translation>
+    </message>
+    <message>
+      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
+      <translation>Wersja systemu operacyjnego klienta nie jest już obsługiwana. Proszę zaktualizować jego system operacyjny do obsługiwanej wersji.</translation>
+    </message>
+    <message>
+      <source>Failed to start update</source>
+      <translation>Nie udało się rozpocząć aktualizacji</translation>
+    </message>
+    <message>
+      <source>Failed to cancel update</source>
+      <translation>Nie udało się anulować aktualizacji</translation>
+    </message>
+    <message>
+      <source>Failed to start installation</source>
+      <translation>Nie udało się uruchomić instalacji</translation>
+    </message>
+    <message>
+      <source>Some servers have not completed the update process. Finish it anyway?</source>
+      <translation>Niektóre serwery nie zakończyły jeszcze procesu aktualizacji, czy na pewno zamknąć?</translation>
+    </message>
+    <message>
+      <source>%1 will be restarted to the updated version.</source>
+      <comment>Application name will be substituted</comment>
+      <translation>%1 zostanie uruchomiony ponownie w zaktualizowanej wersji.</translation>
+    </message>
+    <message>
+      <source>Failed to download update packages to some components</source>
+      <translation>Nie udało się pobrać aktualizacji do niektórych komponentów</translation>
+    </message>
     <message>
       <source>If the problem persists, please contact Customer Support.</source>
       <translation>Jeśli problem nie ustąpi, skontaktuj się z działem obsługi klienta.</translation>
@@ -8799,16 +8869,48 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Aktualizacja zakończona</translation>
     </message>
     <message>
-      <source>Nx Witness Client will be restarted to the updated version.</source>
-      <translation>Klient Nx Witness zostanie ponownie uruchomiony do zaktualizowanej wersji.</translation>
+      <source>Update completed, but some components have failed an update</source>
+      <translation>Zakończono aktualizację, ale niektóre elementy nie zostały zaktualizowane.</translation>
+    </message>
+    <message>
+      <source>Please update %1 manually using an installation package.</source>
+      <translation>Proszę zaktualizować %1 ręcznie przy użyciu pakietu instalacyjnego.</translation>
+    </message>
+    <message>
+      <source>%1 will be restarted to the updated version.</source>
+      <translation>%1 zostanie uruchomiony ponownie w zaktualizowanej wersji.</translation>
     </message>
     <message>
       <source>OK</source>
       <translation>OK</translation>
     </message>
     <message>
+      <source>There was an error while installing updates:</source>
+      <translation>Wystąpił błąd podczas instalowania aktualizacji:</translation>
+    </message>
+    <message>
       <source>Downloading updates...</source>
       <translation>Pobieranie aktualizacji...</translation>
+    </message>
+    <message>
+      <source>Finish Update</source>
+      <translation>Zakończ aktualizację</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>Anuluj</translation>
+    </message>
+    <message>
+      <source>The latest version is already installed</source>
+      <translation>Najnowsza wersja jest już zainstalowana</translation>
+    </message>
+    <message>
+      <source>This version is already installed</source>
+      <translation>Ta wersja jest już zainstalowana</translation>
+    </message>
+    <message>
+      <source>Install update</source>
+      <translation>Zainstaluj aktualizację</translation>
     </message>
     <message>
       <source>Upload</source>
@@ -8827,12 +8929,12 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Pobierz i zainstaluj</translation>
     </message>
     <message>
-      <source>Select Another Build</source>
-      <translation>Wybierz inną kompilację</translation>
-    </message>
-    <message>
       <source>Browse for Another File...</source>
       <translation>Przeglądaj inne pliki...</translation>
+    </message>
+    <message>
+      <source>Select Another Build</source>
+      <translation>Wybierz inną kompilację</translation>
     </message>
     <message>
       <source>Update to Specific Build</source>
@@ -8855,6 +8957,10 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Instalowanie aktualizacji klienta...</translation>
     </message>
     <message>
+      <source>Starting update to ...</source>
+      <translation>Rozpoczynanie aktualizacji...</translation>
+    </message>
+    <message>
       <source>Updating to ...</source>
       <translation>Aktualizacja do...</translation>
     </message>
@@ -8863,12 +8969,24 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Gotowy do aktualizacji do</translation>
     </message>
     <message>
-      <source>Install update</source>
-      <translation>Zainstaluj aktualizację</translation>
-    </message>
-    <message>
       <source>System updated to</source>
       <translation>System zaktualizowany do</translation>
+    </message>
+    <message>
+      <source>Some servers have no update packages available.</source>
+      <translation>Niektóre serwery nie mają dostępnych pakietów aktualizacji.</translation>
+    </message>
+    <message>
+      <source>Some servers have encountered an internal error.</source>
+      <translation>Niektóre serwery napotkały błąd wewnętrzny.</translation>
+    </message>
+    <message>
+      <source>Please contact Customer Support.</source>
+      <translation>Skontaktuj się z działem obsługi klienta.</translation>
+    </message>
+    <message>
+      <source>Some servers have gone offline. Please wait until they become online to continue.</source>
+      <translation>Niektóre serwery zostały odłączone. Proszę zaczekać, aż będą dostępne.</translation>
     </message>
     <message>
       <source>System update in process</source>
@@ -8877,6 +8995,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Continue in Background</source>
       <translation>Kontynuuj w tle</translation>
+    </message>
+    <message>
+      <source>Latest Available Update</source>
+      <translation>Najnowsza dostępna aktualizacja</translation>
     </message>
     <message>
       <source>Specific Build</source>
@@ -8889,111 +9011,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Update from mediaservers</source>
       <translation>Aktualizacja z serwerów media</translation>
-    </message>
-    <message>
-      <source>Latest Available Update</source>
-      <translation>Najnowsza dostępna aktualizacja</translation>
-    </message>
-    <message numerus="yes">
-      <source>Missing update package for the client and %n servers</source>
-      <translation>
-        <numerusform>Brakuje pakietu aktualizacji dla klienta i serwera</numerusform>
-        <numerusform>Brakuje pakietu aktualizacji dla klienta i %n serwerów</numerusform>
-        <numerusform>Brakuje pakietu aktualizacji dla klienta i %n serwerów</numerusform>
-        <numerusform>Brakuje pakietu aktualizacji dla klienta i %n serwerów</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Missing update package for the client</source>
-      <translation>Brakuje pakietu aktualizacji dla klienta</translation>
-    </message>
-    <message>
-      <source>Finish Update</source>
-      <translation>Zakończ aktualizację</translation>
-    </message>
-    <message>
-      <source>Cancel</source>
-      <translation>Anuluj</translation>
-    </message>
-    <message>
-      <source>The latest version is already installed</source>
-      <translation>Najnowsza wersja jest już zainstalowana</translation>
-    </message>
-    <message>
-      <source>This version is already installed</source>
-      <translation>Ta wersja jest już zainstalowana</translation>
-    </message>
-    <message>
-      <source>There are no online servers to update.</source>
-      <translation>Brak dostępnych serwerów do aktualizacji.</translation>
-    </message>
-    <message>
-      <source>Some servers haven&apos;t completed update process. Finish it anyway?</source>
-      <translation>Niektóre serwery nie zakończyły jeszcze procesu aktualizacji, czy na pewno zamknąć?</translation>
-    </message>
-    <message>
-      <source>Cancel update and delete all downloaded data?</source>
-      <translation>Anulować aktualizację i usunąć wszystkie pobrane dane?</translation>
-    </message>
-    <message>
-      <source>There was an error while installing updates:</source>
-      <translation>Wystąpił błąd podczas instalowania aktualizacji:</translation>
-    </message>
-    <message>
-      <source>Some servers have gone offline. Please wait until they become online to continue.</source>
-      <translation>Niektóre serwery zostały odłączone. Proszę zaczekać, aż będą dostępne.</translation>
-    </message>
-    <message>
-      <source>Update completed, but some components have failed an update</source>
-      <translation>Zakończono aktualizację, ale niektóre elementy nie zostały zaktualizowane.</translation>
-    </message>
-    <message>
-      <source>Please update %1 manually using an installation package.</source>
-      <translation>Proszę zaktualizować %1 ręcznie przy użyciu pakietu instalacyjnego.</translation>
-    </message>
-    <message>
-      <source>%1 will be restarted to the updated version.</source>
-      <translation>%1 zostanie uruchomiony ponownie w zaktualizowanej wersji.</translation>
-    </message>
-    <message>
-      <source>Failed to download update packages to some components</source>
-      <translation>Nie udało się pobrać aktualizacji do niektórych komponentów</translation>
-    </message>
-    <message>
-      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
-      <translation>Wersje niektórych komponentów nie są już obsługiwane. Proszę je usunąć z systemu lub zaktualizować system operacyjny do obsługiwanej wersji.</translation>
-    </message>
-    <message>
-      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
-      <translation>Wersja systemu operacyjnego klienta nie jest już obsługiwana. Proszę zaktualizować jego system operacyjny do obsługiwanej wersji.</translation>
-    </message>
-    <message>
-      <source>Failed to start update</source>
-      <translation>Nie udało się rozpocząć aktualizacji</translation>
-    </message>
-    <message>
-      <source>Starting update to ...</source>
-      <translation>Rozpoczynanie aktualizacji...</translation>
-    </message>
-    <message>
-      <source>Failed to cancel update</source>
-      <translation>Nie udało się anulować aktualizacji</translation>
-    </message>
-    <message>
-      <source>Failed to start installation</source>
-      <translation>Nie udało się uruchomić instalacji</translation>
-    </message>
-    <message>
-      <source>Some servers have no update packages available.</source>
-      <translation type="unfinished">Some servers have no update packages available.</translation>
-    </message>
-    <message>
-      <source>Some servers have encountered an internal error.</source>
-      <translation type="unfinished">Some servers have encountered an internal error.</translation>
-    </message>
-    <message>
-      <source>Please please contact Customer Support.</source>
-      <translation type="unfinished">Please please contact Customer Support.</translation>
     </message>
   </context>
   <context>
@@ -9053,10 +9070,6 @@ If you intended to move analytics data to another storage location, please conta
   <context>
     <name>nx::vms::client::desktop::OpenLayoutActionWidget</name>
     <message>
-      <source>Some users don&apos;t have access to the selected layout. Action will not work for them.</source>
-      <translation>Niektórzy użytkownicy nie mają dostępu do wybranego układu. Akcja nie zadziała w ich przypadku.</translation>
-    </message>
-    <message>
       <source>None of selected users have access to the selected layout. Action will not work.</source>
       <translation>Żaden z wybranych użytkowników nie ma dostępu do wybranego układu. Akcja nie zadziała.</translation>
     </message>
@@ -9075,6 +9088,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>None of selected user roles contain users. Action will not work.</source>
       <translation>Żadna z wybranych grup uprawnień nie zawiera użytkowników. Akcja nie zadziała.</translation>
+    </message>
+    <message>
+      <source>Some users do not have access to the selected layout. Action will not work for them.</source>
+      <translation>Niektórzy użytkownicy nie mają dostępu do wybranego układu. Akcja nie zadziała w ich przypadku.</translation>
     </message>
   </context>
   <context>
@@ -9173,7 +9190,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>This OS version is no longer supported.</source>
-      <translation type="unfinished">This OS version is no longer supported.</translation>
+      <translation>Ta wersja systemu operacyjnego nie jest już obsługiwana.</translation>
     </message>
   </context>
   <context>
@@ -9282,28 +9299,12 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Więcej ustawień</translation>
     </message>
     <message>
-      <source>Dual-Streaming not supported for this camera</source>
-      <translation>Podwójne strumieniowanie nie jest obsługiwane przez tę kamerę</translation>
-    </message>
-    <message>
-      <source>Dual-Streaming and motion detection not supported for this camera</source>
-      <translation>Podwójne strumieniowanie i detekcja ruchu nie są obsługiwane przez tę kamerę</translation>
-    </message>
-    <message>
-      <source>Motion detection disabled</source>
-      <translation>Detekcja ruchu wyłączona</translation>
-    </message>
-    <message>
-      <source>To enable or adjust it, go to the &quot;Motion&quot; tab in Camera Settings</source>
-      <translation>Aby to włączyć lub skonfigurować, przejdź na kartę &quot;Ruch&quot; w ustawieniach kamery</translation>
-    </message>
-    <message>
-      <source>Motion detection disabled or not supported</source>
+      <source>Motion detection is disabled or not supported</source>
       <translation>Detekcja ruchu jest wyłączona lub nie jest obsługiwana</translation>
     </message>
     <message>
-      <source>To ensure it is supported and to enable it, go to the &quot;Motion&quot; tab in Camera Settings.</source>
-      <translation>Aby spróbować to włączyć, przejdź na kartę &quot;Ruch&quot; w ustawieniach kamery.</translation>
+      <source>Dual-streaming is disabled or not supported</source>
+      <translation>Podwójne strumieniowanie jest wyłączone lub nie jest obsługiwane</translation>
     </message>
   </context>
   <context>
@@ -9333,7 +9334,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
-      <translation type="unfinished">Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</translation>
+      <translation>Znaki wodne będą wyświetlane w obrazach na żywo, w archiwizowanych i eksportowanych nagraniach tylko dla użytkowników nie będących administratorami. Ty i inni administratorzy ich nie zobaczycie.</translation>
     </message>
   </context>
   <context>
@@ -9398,6 +9399,10 @@ If you intended to move analytics data to another storage location, please conta
       <source>plugin is optional and is not in the white list</source>
       <translation>wtyczka jest opcjonalna i nie znajduje się na białej liście</translation>
     </message>
+    <message>
+      <source>internal error</source>
+      <translation>błąd wewnętrzny</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerStatusItemDelegate</name>
@@ -9434,7 +9439,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Server error.</source>
-      <translation type="unfinished">Server error.</translation>
+      <translation>Błąd serwera.</translation>
     </message>
   </context>
   <context>
@@ -9659,6 +9664,14 @@ If you intended to move analytics data to another storage location, please conta
       <source>File was corrupted while being uploaded to the server</source>
       <translation>Plik został uszkodzony podczas przesyłania na serwer</translation>
     </message>
+    <message>
+      <source>Remote file &quot;%1&quot; is corrupted</source>
+      <translation>Plik zdalny &quot;%1&quot; jest uszkodzony</translation>
+    </message>
+    <message>
+      <source>Server already has this file &quot;%1&quot;</source>
+      <translation>Serwer ma już ten plik &quot;%1&quot;</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::WearableCameraMotionWidget</name>
@@ -9867,26 +9880,26 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::ui::PluginDiagnosticEventModel</name>
     <message>
       <source>Any Plugin</source>
-      <translation type="unfinished">Any Plugin</translation>
+      <translation>Dowolna wtyczka</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ui::PluginDiagnosticEventWidget</name>
     <message>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the caption with any of the entered keywords.</translation>
+      <translation>Zdarzenie uruchomi się tylko wtedy, gdy w polu nagłówka zdarzenia znajdują się dowolne z wprowadzonych słów kluczowych.</translation>
     </message>
     <message>
       <source>If the field is empty, event will always trigger.</source>
-      <translation type="unfinished">If the field is empty, event will always trigger.</translation>
+      <translation>Jeśli pole jest puste, zdarzenie zawsze będzie wyzwalane.</translation>
     </message>
     <message>
       <source>This field is case sensitive.</source>
-      <translation type="unfinished">This field is case sensitive.</translation>
+      <translation>W tym polu wielkość liter jest istotna.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the description field with any of the entered keywords.</translation>
+      <translation>Zdarzenie uruchomi się tylko wtedy, gdy w polu opisu zdarzenia znajdują się dowolne z wprowadzonych słów kluczowych.</translation>
     </message>
   </context>
   <context>
@@ -10206,17 +10219,21 @@ If you intended to move analytics data to another storage location, please conta
       <translation>OK</translation>
     </message>
     <message>
-      <source>Confirm storage location to store analytics data on &apos;%1&apos;</source>
-      <translation>Potwierdź przechowywanie archiwum danych analitycznych na &apos;%1&apos;</translation>
+      <source>Confirm storage location for the analytics data on &quot;%1&quot;</source>
+      <translation>Potwierdź przechowywanie archiwum danych analitycznych na &quot;%1&quot;</translation>
     </message>
     <message>
-      <source>Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
-Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
-By default analytics data will be stored in mediaserver&apos;s installation directory.
-You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</source>
+      <source>the largest available partition</source>
+      <translation>największa dostępna partycja</translation>
+    </message>
+    <message>
+      <source>The analytics database should only be stored on a local drive and can take up large amounts of space.
+Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
+By default analytics data will be stored on %1.
+You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</source>
       <translation>Baza danych analitycznych powinna być przechowywana w lokalnej pamięci masowej i może zajmować do stu gigabajtów.
 Po wybraniu lokalizacji do przechowywania danych analitycznych nie można jej łatwo zmienić bez utraty danych. Zalecamy ostrożne wybranie lokalizacji i nieużywanie partycji systemowej, aby uniknąć awarii systemu.
-Domyślnie dane analityczne będą przechowywane w katalogu instalacyjnym serwera.
+Domyślnie dane analityczne będą przechowywane w %1.
 Możesz zmienić lokalizację przechowywania danych w ustawieniach serwera.</translation>
     </message>
   </context>

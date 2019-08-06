@@ -83,11 +83,15 @@ void OpenLayoutActionWidget::displayWarning(LayoutWarning warning)
     {
         case LayoutWarning::MissingAccess:
             setWarningStyle(ui->warningForUsers);
-            ui->warningForLayouts->setText(tr("Some users don't have access to the selected layout. Action will not work for them."));
+            ui->warningForLayouts->setText(
+                tr("Some users do not have access to the selected layout. "
+                    "Action will not work for them."));
             break;
         case LayoutWarning::NobodyHasAccess:
             setWarningStyle(ui->warningForUsers);
-            ui->warningForLayouts->setText(tr("None of selected users have access to the selected layout. Action will not work."));
+            ui->warningForLayouts->setText(
+                tr("None of selected users have access to the selected layout. "
+                    "Action will not work."));
             break;
         case LayoutWarning::NoWarning:
             break;

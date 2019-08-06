@@ -2,12 +2,16 @@
 
 #include <nx/analytics/descriptor_container.h>
 #include <nx/analytics/property_descriptor_storage.h>
+#include <nx/analytics/multiresource_descriptor_container_helper.h>
+#include <core/resource_management/resource_pool.h>
 #include <utils/common/value_cache.h>
+#include <common/common_module_aware.h>
+#include <common/common_module.h>
 
 namespace nx::analytics {
 
 template<typename StorageFactoryType, typename MergeExecutorType>
-class MultiresourceDescriptorContainer
+class MultiresourceDescriptorContainer: public QnCommonModuleAware
 {
 public:
     using StorageFactory = StorageFactoryType;
@@ -23,29 +27,17 @@ public:
     using TopLevelMap = typename MapHelper::Wrapper<DescriptorMap>::template wrap<QnUuid>;
 
 public:
-    MultiresourceDescriptorContainer(
-        StorageFactory storageFactory,
-        const QnResourceList& resourceList,
-        QnResourcePtr ownResource)
-        :
+    MultiresourceDescriptorContainer(QnCommonModule* commonModule, StorageFactory storageFactory):
+        QnCommonModuleAware(commonModule),
+        m_storageFactory(std::move(storageFactory)),
+        m_helper(
+            commonModule->resourcePool(),
+            [this](QnMediaServerResourcePtr server) { addServerContainer(server); },
+            [this](QnMediaServerResourcePtr server) { removeServerContainer(server); }),
         m_cachedMergedDescriptors(
             [this]() { return mergedDescriptorsInternal(); },
             &m_mutex)
     {
-        const auto notifyWhenUpdated = [this]() { m_cachedMergedDescriptors.reset(); };
-        for (auto& resource: resourceList)
-        {
-            auto storage = storageFactory(resource, notifyWhenUpdated);
-            m_containers[resource->getId()] = std::make_unique<Container>(std::move(storage));
-        }
-
-        if (!ownResource)
-            return;
-
-        auto writableStorage = storageFactory(ownResource, notifyWhenUpdated);
-        m_ownResourceId = ownResource->getId();
-        m_containers[m_ownResourceId] =
-            std::make_unique<Container>(std::move(writableStorage));
     }
 
     /**
@@ -55,8 +47,18 @@ public:
     std::optional<TopLevelMap> descriptors() const
     {
         TopLevelMap result;
-        for (const auto&[resourceId, container]: m_containers)
+
+        std::map<QnUuid, std::shared_ptr<Container>> containers;
         {
+            QnMutexLocker lock(&m_mutex);
+            containers = m_containers;
+        }
+
+        for (const auto&[resourceId, container]: containers)
+        {
+            if (!NX_ASSERT(container))
+                continue;
+
             auto descriptors = container->descriptors();
             if (descriptors)
                 result[resourceId] = std::move(*descriptors);
@@ -75,11 +77,18 @@ public:
     auto descriptors(const QnUuid& resourceId, const Scopes&... scopes) const
         -> std::optional<MapHelper::MappedTypeOnLevel<DescriptorMap, sizeof...(Scopes)>>
     {
-        auto itr = m_containers.find(resourceId);
-        if (itr == m_containers.cend())
-            return std::nullopt;
+        std::shared_ptr<Container> container;
+        {
+            QnMutexLocker lock(&m_mutex);
+            auto itr = m_containers.find(resourceId);
+            if (itr == m_containers.cend())
+                return std::nullopt;
 
-        auto& container = itr->second;
+            container = itr->second;
+            if (!NX_ASSERT(container))
+                return std::nullopt;
+        }
+
         return container->descriptors(scopes...);
     }
 
@@ -102,9 +111,13 @@ public:
     template<typename... Scopes>
     void removeDescriptors(const Scopes&... scopes)
     {
-        auto container = ownResourceContainer();
-        if (!NX_ASSERT(container))
-            return;
+        std::shared_ptr<Container> container;
+        {
+            QnMutexLocker lock(&m_mutex);
+            container = ownResourceContainer();
+            if (!NX_ASSERT(container))
+                return;
+        }
 
         container->removeDescriptors(scopes...);
     }
@@ -117,9 +130,13 @@ public:
     template<typename Descriptors, typename... Scopes>
     void setDescriptors(Descriptors&& descriptors, const Scopes&... scopes)
     {
-        auto container = ownResourceContainer();
-        if (!NX_ASSERT(container))
-            return;
+        std::shared_ptr<Container> container;
+        {
+            QnMutexLocker lock(&m_mutex);
+            container = ownResourceContainer();
+            if (!NX_ASSERT(container))
+                return;
+        }
 
         container->setDescriptors(std::forward<Descriptors>(descriptors), scopes...);
     }
@@ -132,9 +149,13 @@ public:
     template<typename Descriptors, typename... Scopes>
     void mergeWithDescriptors(Descriptors&& descriptors, const Scopes&... scopes)
     {
-        auto container = ownResourceContainer();
-        if (!NX_ASSERT(container))
-            return;
+        std::shared_ptr<Container> container;
+        {
+            QnMutexLocker lock(&m_mutex);
+            container = ownResourceContainer();
+            if (!NX_ASSERT(container))
+                return;
+        }
 
         container->mergeWithDescriptors(std::forward<Descriptors>(descriptors), scopes...);
     }
@@ -144,7 +165,14 @@ private:
     {
         MergeExecutor mergeExecutor;
         DescriptorMap result;
-        for (const auto& [resourceId, container]: m_containers)
+
+        std::map<QnUuid, std::shared_ptr<Container>> containers;
+        {
+            QnMutexLocker lock(&m_mutex);
+            containers = m_containers;
+        }
+
+        for (const auto& [resourceId, container]: containers)
         {
             auto descriptors = container->descriptors();
             if (!descriptors)
@@ -156,18 +184,48 @@ private:
         return result;
     }
 
-    Container* ownResourceContainer()
+    std::shared_ptr<Container> ownResourceContainer()
     {
         auto itr = m_containers.find(m_ownResourceId);
         if (itr == m_containers.cend())
             return nullptr;
 
-        return itr->second.get();
+        return itr->second;
+    }
+
+    void addServerContainer(QnMediaServerResourcePtr server)
+    {
+        QnMutexLocker lock(&m_mutex);
+        const QnUuid serverId = server->getId();
+
+        if (serverId == commonModule()->moduleGUID())
+            m_ownResourceId = serverId;
+
+        const auto notifyWhenUpdated = [this]() { m_cachedMergedDescriptors.reset(); };
+        auto storage = m_storageFactory(server, notifyWhenUpdated);
+        m_containers[serverId] = std::make_shared<Container>(std::move(storage));
+        m_cachedMergedDescriptors.resetThreadUnsafe();
+    }
+
+    void removeServerContainer(QnMediaServerResourcePtr server)
+    {
+        QnMutexLocker lock(&m_mutex);
+        const QnUuid serverId = server->getId();
+
+        if (serverId == commonModule()->moduleGUID())
+            m_ownResourceId = QnUuid();
+
+        m_containers.erase(serverId);
+        m_cachedMergedDescriptors.resetThreadUnsafe();
     }
 
 private:
     QnUuid m_ownResourceId;
-    std::map<QnUuid, std::unique_ptr<Container>> m_containers;
+    std::map<QnUuid, std::shared_ptr<Container>> m_containers;
+
+
+    StorageFactory m_storageFactory;
+    MultiresourceDescriptorContainerHelper m_helper;
 
     mutable QnMutex m_mutex;
     CachedValue<DescriptorMap> m_cachedMergedDescriptors;

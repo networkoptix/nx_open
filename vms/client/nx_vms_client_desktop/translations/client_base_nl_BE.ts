@@ -943,6 +943,14 @@ to view more bookmarks</source>
       <source>Objects Frames and Info...</source>
       <translation>Objectframe en Info...</translation>
     </message>
+    <message>
+      <source>Pin Calendar</source>
+      <translation>Kalender vastzetten</translation>
+    </message>
+    <message>
+      <source>Unpin Calendar</source>
+      <translation>Kalender losmaken</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -2036,8 +2044,8 @@ to view more bookmarks</source>
       <translation>Elke Camera</translation>
     </message>
     <message>
-      <source>Force Acknowledgement will only work for Generic Events if camera modifiers are used in the Generic Event URL</source>
-      <translation>Forceer erkenning werkt alleen voor algemene gebeurtenissen als camera modifiers worden gebruikt in de Generieke Event URL</translation>
+      <source>Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</source>
+      <translation>Het forceren van een bevestiging werkt alleen als voor een Generic Event camera ID's zijn gebruikt in de Generic Event URL</translation>
     </message>
   </context>
   <context>
@@ -4242,7 +4250,7 @@ to %1</source>
     </message>
     <message>
       <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
-      <translation type="unfinished">&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</translation>
+      <translation>&quot;Virtual Camera&quot; is een virtuele opslag voor videobestanden, die kunnen worden geüpload naar elke server op uw systeem en door elke gebruiker kunnen worden geopend.</translation>
     </message>
   </context>
   <context>
@@ -5586,12 +5594,6 @@ to %1</source>
       <translation>Wat te doen met de huidige analysegegevens?</translation>
     </message>
     <message>
-      <source>Current analytics data will not be automatically moved to another location and will become unaccessible. You can keep it and manually move later, or delete permanently.
-If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
-      <translation>Huidige analysegegevens worden niet automatisch verplaatst naar een andere locatie en worden niet meer toegankelijk. U kunt het bewaren en later handmatig verplaatsen of permanent verwijderen.
-Als u analysegegevens naar een andere opslaglocatie wilt verplaatsen, neemt u contact op met de ondersteuning voordat u doorgaat.</translation>
-    </message>
-    <message>
       <source>Delete</source>
       <translation>Verwijder</translation>
     </message>
@@ -5602,6 +5604,12 @@ Als u analysegegevens naar een andere opslaglocatie wilt verplaatsen, neemt u co
     <message>
       <source>Cancel</source>
       <translation>Annuleren</translation>
+    </message>
+    <message>
+      <source>Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
+If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
+      <translation>Huidige analytics gegevens worden niet automatisch verplaatst naar een andere locatie en worden niet toegankelijk. U kunt het behouden en handmatig verplaatsen, of permanent verwijderen.
+Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem dan contact op met support voordat u verder gaat.</translation>
     </message>
   </context>
   <context>
@@ -7349,7 +7357,7 @@ Als u analysegegevens naar een andere opslaglocatie wilt verplaatsen, neemt u co
     </message>
     <message>
       <source>Unknown track</source>
-      <translation type="unfinished">Unknown track</translation>
+      <translation>Onbekend nummer</translation>
     </message>
   </context>
   <context>
@@ -7582,6 +7590,10 @@ Als u analysegegevens naar een andere opslaglocatie wilt verplaatsen, neemt u co
       <source>This action cannot be undone.</source>
       <translation>Deze actie kan niet ongedaan worden gemaakt.</translation>
     </message>
+    <message>
+      <source>Motion detection stream is disabled</source>
+      <translation>Bewegingsdetectie stream is uitgeschakeld</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraScheduleWidget</name>
@@ -7718,6 +7730,14 @@ Als u analysegegevens naar een andere opslaglocatie wilt verplaatsen, neemt u co
     <message>
       <source>Plugins</source>
       <translation>Plugins</translation>
+    </message>
+    <message>
+      <source>Motion detection is disabled, all schedule records &quot;Motion&quot; and &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
+      <translation>Bewegingsdetectie is uitgeschakeld, alle opnameschemas &quot;Beweging&quot; en &quot;Motion + Lo-Res&quot; worden gewijzigd in &quot;Altijd&quot;</translation>
+    </message>
+    <message>
+      <source>Dual streaming is disabled, all schedule records &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
+      <translation>Dual streaming is uitgeschakeld, alle opnameschemas &quot;Motion + Lo-Res&quot; zullen worden gewijzigd naar &quot;Altijd&quot;</translation>
     </message>
   </context>
   <context>
@@ -8044,10 +8064,6 @@ Als u analysegegevens naar een andere opslaglocatie wilt verplaatsen, neemt u co
         <numerusform>%n evenementen</numerusform>
         <numerusform>%n evenementen</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>unnamed analytics engine</source>
-      <translation>naamloze analytics engine</translation>
     </message>
     <message>
       <source>No events occurred</source>
@@ -8437,8 +8453,8 @@ Als u analysegegevens naar een andere opslaglocatie wilt verplaatsen, neemt u co
       <translation>Het opgegeven IP-adresbereik heeft meer dan 255 adressen.</translation>
     </message>
     <message>
-      <source>Can&apos;t start searching process</source>
-      <translation>&apos;t start zoekproces</translation>
+      <source>Can not start the search process</source>
+      <translation>Kan het zoekproces niet starten</translation>
     </message>
   </context>
   <context>
@@ -8551,6 +8567,58 @@ Als u analysegegevens naar een andere opslaglocatie wilt verplaatsen, neemt u co
       <source>Some servers are offline and will not be updated. Skip them?</source>
       <translation>Sommige servers zijn offline en zullen niet worden bijgewerkt. Deze overslaan?</translation>
     </message>
+    <message numerus="yes">
+      <source>Missing update package for the client and %n servers</source>
+      <translation>
+        <numerusform>Update pakket ontbreekt voor de client en %n servers</numerusform>
+        <numerusform>Update pakket ontbreekt voor de client en %n servers</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Missing update package for the client</source>
+      <translation>Update pakket voor de client ontbreekt</translation>
+    </message>
+    <message>
+      <source>There are no online servers to update.</source>
+      <translation>Er zijn geen online servers om bij te werken.</translation>
+    </message>
+    <message>
+      <source>Cancel update and delete all downloaded data?</source>
+      <translation>Update annuleren en alle gedownloade gegevens verwijderen?</translation>
+    </message>
+    <message>
+      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
+      <translation>OS-versies van sommige componenten worden niet langer ondersteund. Verwijder ze uit het systeem of werk hun besturingssysteem bij naar een ondersteunde versie.</translation>
+    </message>
+    <message>
+      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
+      <translation>OS-versie van de client wordt niet langer ondersteund. Werk zijn besturingssysteem bij tot een ondersteunde versie.</translation>
+    </message>
+    <message>
+      <source>Failed to start update</source>
+      <translation>Kan update niet starten</translation>
+    </message>
+    <message>
+      <source>Failed to cancel update</source>
+      <translation>Kan update niet annuleren</translation>
+    </message>
+    <message>
+      <source>Failed to start installation</source>
+      <translation>Kan de installatie niet starten</translation>
+    </message>
+    <message>
+      <source>Some servers have not completed the update process. Finish it anyway?</source>
+      <translation>Sommige servers hebben het update proces niet voltooid. Toch afronden?</translation>
+    </message>
+    <message>
+      <source>%1 will be restarted to the updated version.</source>
+      <comment>Application name will be substituted</comment>
+      <translation>%1 wordt opnieuw gestart naar de bijgewerkte versie.</translation>
+    </message>
+    <message>
+      <source>Failed to download update packages to some components</source>
+      <translation>Downloaden van updatepakketten naar bepaalde servers is mislukt</translation>
+    </message>
     <message>
       <source>If the problem persists, please contact Customer Support.</source>
       <translation>Als het probleem aanhoudt, neem contact op met customer support.</translation>
@@ -8568,16 +8636,48 @@ Als u analysegegevens naar een andere opslaglocatie wilt verplaatsen, neemt u co
       <translation>Update voltooid</translation>
     </message>
     <message>
-      <source>Nx Witness Client will be restarted to the updated version.</source>
-      <translation>Nx Witness Client zal opnieuw worden gestart naar de bijgewerkte versie.</translation>
+      <source>Update completed, but some components have failed an update</source>
+      <translation>Update voltooid, maar update van sommige componenten is mislukt</translation>
+    </message>
+    <message>
+      <source>Please update %1 manually using an installation package.</source>
+      <translation>Update alstublieft %1 handmatig met behulp van een installatiepakket.</translation>
+    </message>
+    <message>
+      <source>%1 will be restarted to the updated version.</source>
+      <translation>%1 wordt opnieuw gestart naar de bijgewerkte versie.</translation>
     </message>
     <message>
       <source>OK</source>
       <translation>Oké</translation>
     </message>
     <message>
+      <source>There was an error while installing updates:</source>
+      <translation>Er is een fout opgetreden bij het installeren van updates:</translation>
+    </message>
+    <message>
       <source>Downloading updates...</source>
       <translation>Updates aan het downloaden...</translation>
+    </message>
+    <message>
+      <source>Finish Update</source>
+      <translation>Update voltooien</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>Annuleren</translation>
+    </message>
+    <message>
+      <source>The latest version is already installed</source>
+      <translation>De nieuwste versie is al geïnstalleerd</translation>
+    </message>
+    <message>
+      <source>This version is already installed</source>
+      <translation>Deze versie is al geïnstalleerd</translation>
+    </message>
+    <message>
+      <source>Install update</source>
+      <translation>Installeer update</translation>
     </message>
     <message>
       <source>Upload</source>
@@ -8596,12 +8696,12 @@ Als u analysegegevens naar een andere opslaglocatie wilt verplaatsen, neemt u co
       <translation>Download &amp;&amp; Installeren</translation>
     </message>
     <message>
-      <source>Select Another Build</source>
-      <translation>Selecteer een andere Build</translation>
-    </message>
-    <message>
       <source>Browse for Another File...</source>
       <translation>Bladeren naar een ander bestand...</translation>
+    </message>
+    <message>
+      <source>Select Another Build</source>
+      <translation>Selecteer een andere Build</translation>
     </message>
     <message>
       <source>Update to Specific Build</source>
@@ -8624,6 +8724,10 @@ Als u analysegegevens naar een andere opslaglocatie wilt verplaatsen, neemt u co
       <translation>Installeren van client updates...</translation>
     </message>
     <message>
+      <source>Starting update to ...</source>
+      <translation>Update starten naar ...</translation>
+    </message>
+    <message>
       <source>Updating to ...</source>
       <translation>Bijwerken naar...</translation>
     </message>
@@ -8632,12 +8736,24 @@ Als u analysegegevens naar een andere opslaglocatie wilt verplaatsen, neemt u co
       <translation>Klaar om te updaten naar</translation>
     </message>
     <message>
-      <source>Install update</source>
-      <translation>Installeer update</translation>
-    </message>
-    <message>
       <source>System updated to</source>
       <translation>Systeem bijgewerkt naar</translation>
+    </message>
+    <message>
+      <source>Some servers have no update packages available.</source>
+      <translation>Sommige servers hebben geen update pakketten beschikbaar.</translation>
+    </message>
+    <message>
+      <source>Some servers have encountered an internal error.</source>
+      <translation>Sommige servers hebben een interne fout ondervonden.</translation>
+    </message>
+    <message>
+      <source>Please contact Customer Support.</source>
+      <translation>Neem contact op met Customer Support.</translation>
+    </message>
+    <message>
+      <source>Some servers have gone offline. Please wait until they become online to continue.</source>
+      <translation>Sommige servers zijn offline gegaan. Wacht tot ze online zijn om door te gaan.</translation>
     </message>
     <message>
       <source>System update in process</source>
@@ -8646,6 +8762,10 @@ Als u analysegegevens naar een andere opslaglocatie wilt verplaatsen, neemt u co
     <message>
       <source>Continue in Background</source>
       <translation>Doorgaan in de achtergrond</translation>
+    </message>
+    <message>
+      <source>Latest Available Update</source>
+      <translation>Laatste beschikbare update</translation>
     </message>
     <message>
       <source>Specific Build</source>
@@ -8658,109 +8778,6 @@ Als u analysegegevens naar een andere opslaglocatie wilt verplaatsen, neemt u co
     <message>
       <source>Update from mediaservers</source>
       <translation>Update van mediaservers</translation>
-    </message>
-    <message>
-      <source>Latest Available Update</source>
-      <translation>Laatste beschikbare update</translation>
-    </message>
-    <message numerus="yes">
-      <source>Missing update package for the client and %n servers</source>
-      <translation>
-        <numerusform>Update pakket ontbreekt voor de client en %n servers</numerusform>
-        <numerusform>Update pakket ontbreekt voor de client en %n servers</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Missing update package for the client</source>
-      <translation>Update pakket voor de client ontbreekt</translation>
-    </message>
-    <message>
-      <source>Finish Update</source>
-      <translation>Update voltooien</translation>
-    </message>
-    <message>
-      <source>Cancel</source>
-      <translation>Annuleren</translation>
-    </message>
-    <message>
-      <source>The latest version is already installed</source>
-      <translation>De nieuwste versie is al geïnstalleerd</translation>
-    </message>
-    <message>
-      <source>This version is already installed</source>
-      <translation>Deze versie is al geïnstalleerd</translation>
-    </message>
-    <message>
-      <source>There are no online servers to update.</source>
-      <translation>Er zijn geen online servers om bij te werken.</translation>
-    </message>
-    <message>
-      <source>Some servers haven&apos;t completed update process. Finish it anyway?</source>
-      <translation>Sommige servers hebben het updateproces nog niet voltooid. Toch afronden?</translation>
-    </message>
-    <message>
-      <source>Cancel update and delete all downloaded data?</source>
-      <translation>Update annuleren en alle gedownloade gegevens verwijderen?</translation>
-    </message>
-    <message>
-      <source>There was an error while installing updates:</source>
-      <translation>Er is een fout opgetreden bij het installeren van updates:</translation>
-    </message>
-    <message>
-      <source>Some servers have gone offline. Please wait until they become online to continue.</source>
-      <translation>Sommige servers zijn offline gegaan. Wacht tot ze online zijn om door te gaan.</translation>
-    </message>
-    <message>
-      <source>Update completed, but some components have failed an update</source>
-      <translation>Update voltooid, maar update van sommige componenten is mislukt</translation>
-    </message>
-    <message>
-      <source>Please update %1 manually using an installation package.</source>
-      <translation>Update alstublieft %1 handmatig met behulp van een installatiepakket.</translation>
-    </message>
-    <message>
-      <source>%1 will be restarted to the updated version.</source>
-      <translation>%1 wordt opnieuw gestart naar de bijgewerkte versie.</translation>
-    </message>
-    <message>
-      <source>Failed to download update packages to some components</source>
-      <translation>Downloaden van updatepakketten naar bepaalde servers is mislukt</translation>
-    </message>
-    <message>
-      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
-      <translation>OS-versies van sommige componenten worden niet langer ondersteund. Verwijder ze uit het systeem of werk hun besturingssysteem bij naar een ondersteunde versie.</translation>
-    </message>
-    <message>
-      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
-      <translation>OS-versie van de client wordt niet langer ondersteund. Werk zijn besturingssysteem bij tot een ondersteunde versie.</translation>
-    </message>
-    <message>
-      <source>Failed to start update</source>
-      <translation>Kan update niet starten</translation>
-    </message>
-    <message>
-      <source>Starting update to ...</source>
-      <translation>Update starten naar ...</translation>
-    </message>
-    <message>
-      <source>Failed to cancel update</source>
-      <translation>Kan update niet annuleren</translation>
-    </message>
-    <message>
-      <source>Failed to start installation</source>
-      <translation>Kan de installatie niet starten</translation>
-    </message>
-    <message>
-      <source>Some servers have no update packages available.</source>
-      <translation type="unfinished">Some servers have no update packages available.</translation>
-    </message>
-    <message>
-      <source>Some servers have encountered an internal error.</source>
-      <translation type="unfinished">Some servers have encountered an internal error.</translation>
-    </message>
-    <message>
-      <source>Please please contact Customer Support.</source>
-      <translation type="unfinished">Please please contact Customer Support.</translation>
     </message>
   </context>
   <context>
@@ -8818,10 +8835,6 @@ Als u analysegegevens naar een andere opslaglocatie wilt verplaatsen, neemt u co
   <context>
     <name>nx::vms::client::desktop::OpenLayoutActionWidget</name>
     <message>
-      <source>Some users don&apos;t have access to the selected layout. Action will not work for them.</source>
-      <translation>Sommige gebruikers don&apos;t hebben toegang tot de geselecteerde indeling. Actie zal niet werken voor hen.</translation>
-    </message>
-    <message>
       <source>None of selected users have access to the selected layout. Action will not work.</source>
       <translation>Geselecteerde gebruikers hebben geen toegang tot de geselecteerde indeling. Actie zal niet werken.</translation>
     </message>
@@ -8840,6 +8853,10 @@ Als u analysegegevens naar een andere opslaglocatie wilt verplaatsen, neemt u co
     <message>
       <source>None of selected user roles contain users. Action will not work.</source>
       <translation>Geen van de geselecteerde gebruikersrollen bevatten gebruikers. Actie zal niet werken.</translation>
+    </message>
+    <message>
+      <source>Some users do not have access to the selected layout. Action will not work for them.</source>
+      <translation>Sommige gebruikers hebben geen toegang tot de geselecteerde schermindeling. Actie werkt niet voor hen.</translation>
     </message>
   </context>
   <context>
@@ -8938,7 +8955,7 @@ Als u analysegegevens naar een andere opslaglocatie wilt verplaatsen, neemt u co
     </message>
     <message>
       <source>This OS version is no longer supported.</source>
-      <translation type="unfinished">This OS version is no longer supported.</translation>
+      <translation>Deze OS-versie wordt niet langer ondersteund.</translation>
     </message>
   </context>
   <context>
@@ -9045,28 +9062,12 @@ Als u analysegegevens naar een andere opslaglocatie wilt verplaatsen, neemt u co
       <translation>Meer instellingen</translation>
     </message>
     <message>
-      <source>Dual-Streaming not supported for this camera</source>
-      <translation>Dual-streaming wordt niet ondersteund door deze camera</translation>
-    </message>
-    <message>
-      <source>Dual-Streaming and motion detection not supported for this camera</source>
-      <translation>Dual-streaming en motion detectie worden niet ondersteund door deze camera</translation>
-    </message>
-    <message>
-      <source>Motion detection disabled</source>
-      <translation>Bewegingsdetectie uitgeschakeld</translation>
-    </message>
-    <message>
-      <source>To enable or adjust it, go to the &quot;Motion&quot; tab in Camera Settings</source>
-      <translation>Als u deze wilt inschakelen of aanpassen, gaat u naar het tabblad &quot;Motion&quot; in camera-instellingen</translation>
-    </message>
-    <message>
-      <source>Motion detection disabled or not supported</source>
+      <source>Motion detection is disabled or not supported</source>
       <translation>Bewegingsdetectie is uitgeschakeld of niet ondersteund</translation>
     </message>
     <message>
-      <source>To ensure it is supported and to enable it, go to the &quot;Motion&quot; tab in Camera Settings.</source>
-      <translation>Om ervoor te zorgen dat het wordt ondersteund en om het te activeren, gaat u naar het tabblad &quot;Motion&quot; in camera-instellingen.</translation>
+      <source>Dual-streaming is disabled or not supported</source>
+      <translation>Dual-streaming is uitgeschakeld of wordt niet ondersteund</translation>
     </message>
   </context>
   <context>
@@ -9096,7 +9097,7 @@ Als u analysegegevens naar een andere opslaglocatie wilt verplaatsen, neemt u co
     </message>
     <message>
       <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
-      <translation type="unfinished">Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</translation>
+      <translation>Watermerken worden alleen weergegeven voor live, gearchiveerde en geëxporteerde video's voor niet-beheerdersgebruikers. U en andere beheerders zullen ze niet zien.</translation>
     </message>
   </context>
   <context>
@@ -9161,6 +9162,10 @@ Als u analysegegevens naar een andere opslaglocatie wilt verplaatsen, neemt u co
       <source>plugin is optional and is not in the white list</source>
       <translation>plugin is optioneel en staat niet in de witte lijst</translation>
     </message>
+    <message>
+      <source>internal error</source>
+      <translation>interne fout</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerStatusItemDelegate</name>
@@ -9197,7 +9202,7 @@ Als u analysegegevens naar een andere opslaglocatie wilt verplaatsen, neemt u co
     </message>
     <message>
       <source>Server error.</source>
-      <translation type="unfinished">Server error.</translation>
+      <translation>Serverfout.</translation>
     </message>
   </context>
   <context>
@@ -9414,6 +9419,14 @@ Als u analysegegevens naar een andere opslaglocatie wilt verplaatsen, neemt u co
       <source>File was corrupted while being uploaded to the server</source>
       <translation>Bestand is beschadigd tijdens uploaden naar de server</translation>
     </message>
+    <message>
+      <source>Remote file &quot;%1&quot; is corrupted</source>
+      <translation>Extern bestand &quot;%1&quot; is beschadigd</translation>
+    </message>
+    <message>
+      <source>Server already has this file &quot;%1&quot;</source>
+      <translation>Server heeft dit bestand al &quot;%1&quot;</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::WearableCameraMotionWidget</name>
@@ -9620,26 +9633,26 @@ Als u analysegegevens naar een andere opslaglocatie wilt verplaatsen, neemt u co
     <name>nx::vms::client::desktop::ui::PluginDiagnosticEventModel</name>
     <message>
       <source>Any Plugin</source>
-      <translation type="unfinished">Any Plugin</translation>
+      <translation>Elke Plugin</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ui::PluginDiagnosticEventWidget</name>
     <message>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the caption with any of the entered keywords.</translation>
+      <translation>De gebeurtenis wordt alleen geactiveerd als er overeenkomsten zijn in de titel met één van de gekozen trefwoorden.</translation>
     </message>
     <message>
       <source>If the field is empty, event will always trigger.</source>
-      <translation type="unfinished">If the field is empty, event will always trigger.</translation>
+      <translation>Als het veld leeg is, wordt de gebeurtenis altijd geactiveerd.</translation>
     </message>
     <message>
       <source>This field is case sensitive.</source>
-      <translation type="unfinished">This field is case sensitive.</translation>
+      <translation>Dit veld is hoofdlettergevoelig.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the description field with any of the entered keywords.</translation>
+      <translation>De gebeurtenis wordt alleen geactiveerd als er overeenkomsten zijn in de Omschrijving met een van de gekozen trefwoorden.</translation>
     </message>
   </context>
   <context>
@@ -9943,18 +9956,22 @@ Als u analysegegevens naar een andere opslaglocatie wilt verplaatsen, neemt u co
       <translation>Oké</translation>
     </message>
     <message>
-      <source>Confirm storage location to store analytics data on &apos;%1&apos;</source>
-      <translation>Bevestig opslag locatie om analytics gegevens op te slaan naar &apos;%1&apos;</translation>
+      <source>Confirm storage location for the analytics data on &quot;%1&quot;</source>
+      <translation>Bevestig opslag locatie om de analytics data op te slaan op &quot;%1&quot;</translation>
     </message>
     <message>
-      <source>Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
-Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
-By default analytics data will be stored in mediaserver&apos;s installation directory.
-You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</source>
-      <translation>Analytics-database moet worden opgeslagen op een lokale opslag en kan maximaal honderd gigabytes beslaan.
-Nadat de locatie voor het opslaan van analysegegevens is geselecteerd, kan deze niet eenvoudig worden gewijzigd zonder verlies van gegevens. We raden aan om de locatie zorgvuldig te kiezen en de systeempartitie niet te gebruiken om ernstige systeemstoringen te voorkomen.
-Standaard worden analysegegevens opgeslagen in de installatiemap van mediaserver&apos;.
-U kunt de opslaglocatie wijzigen op het tabblad &quot;Storage Management&quot; in het dialoogvenster Serverinstellingen.</translation>
+      <source>the largest available partition</source>
+      <translation>de grootste beschikbare partitie</translation>
+    </message>
+    <message>
+      <source>The analytics database should only be stored on a local drive and can take up large amounts of space.
+Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
+By default analytics data will be stored on %1.
+You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</source>
+      <translation>De analytics database mag alleen op een lokale schijf worden opgeslagen en kan grote hoeveelheden ruimte gebruiken.
+Zodra een locatie om analytische gegevens op te slaan is geselecteerd, kan deze niet eenvoudig worden gewijzigd zonder bestaande gegevens te verliezen. We raden aan om de locatie zorgvuldig te kiezen en om te voorkomen dat de systeem partitie wordt gebruikt omdat het ernstige systeemstoringen kan veroorzaken.
+Standaard worden analytics gegevens opgeslagen op %1.
+U kunt een andere opslaglocatie selecteren in het tabblad &quot;Opslagbeheer&quot; van het Server Instellingen menu.</translation>
     </message>
   </context>
   <context>

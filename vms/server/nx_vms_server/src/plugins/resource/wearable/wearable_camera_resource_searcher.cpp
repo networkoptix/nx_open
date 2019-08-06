@@ -46,7 +46,7 @@ QnResourcePtr QnWearableCameraResourceSearcher::createResource(const QnUuid &res
 
     result.reset(new QnWearableCameraResource(serverModule()));
     result->setTypeId(resourceTypeId);
-    result->setId(params.resID);
+    result->setIdUnsafe(params.resID);
     result->setPhysicalId(physicalId);
     result->setUrl(params.url);
     result->setVendor(params.vendor);

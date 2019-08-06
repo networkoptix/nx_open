@@ -137,6 +137,8 @@ private:
     nx::vms::api::StreamDataFilters streamFilterFromHeaders(
         nx::vms::api::StreamDataFilters oldFilters) const;
     bool applyUrlParams();
+    void waitForResourceInitializing(const QnNetworkResourcePtr& resource);
+
 private:
     Q_DECLARE_PRIVATE(QnRtspConnectionProcessor);
     friend class QnRtspDataConsumer;

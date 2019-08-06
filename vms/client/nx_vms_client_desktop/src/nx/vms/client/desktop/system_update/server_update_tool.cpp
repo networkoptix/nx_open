@@ -112,10 +112,6 @@ ServerUpdateTool::ServerUpdateTool(QObject* parent):
     m_downloader.reset(new Downloader(
         m_outputDir, commonModule(), {new InternetOnlyPeerManager()}));
 
-    // This object is managed by shared_ptr. So we must sure there is no parent, or this instance
-    // can be deleted twice.
-    setParent(nullptr);
-
     connect(m_downloader.get(), &Downloader::fileStatusChanged,
         this, &ServerUpdateTool::atDownloaderStatusChanged);
 
@@ -243,7 +239,8 @@ std::future<nx::update::UpdateContents> ServerUpdateTool::checkMediaserverUpdate
                         if (tool)
                         {
                             tool->m_timeStartedInstall = contents.info.lastInstallationRequestTime;
-                            tool->m_serversAreInstalling = contents.info.participants.toSet();
+                            if (contents.info.lastInstallationRequestTime > 0)
+                                tool->m_serversAreInstalling = contents.info.participants.toSet();
                         }
                     }
                 }
@@ -498,9 +495,12 @@ int ServerUpdateTool::uploadPackage(
 
     UploadState config;
     config.source = storageDir.absoluteFilePath(localFile);
-    config.destination = package.file;
     // Updates should land to updates/publication_key/file_name.
-    config.ttl = -1; //< This should mean 'infinite time'
+    config.destination = package.file;
+    // This should mean 'infinite time'.
+    config.ttl = -1;
+    // Server should create file by itself.
+    config.allowFileCreation = false;
 
     for (const auto& serverId: targets)
     {
@@ -521,13 +521,15 @@ int ServerUpdateTool::uploadPackage(
 
         if (!id.isEmpty())
         {
+            NX_INFO(this, "uploadPackage(%1) - started uploading file to server %2",
+                package.file, serverId);
             m_uploadStateById[id] = config;
             m_activeUploads.insert(id);
             toUpload++;
         }
         else
         {
-            NX_VERBOSE(this, "uploadPackage(%1) - failed to start uploading file=%2 reason=%3",
+            NX_WARNING(this, "uploadPackage(%1) - failed to start uploading file=%2 reason=%3",
                 package.file, localFile, config.errorMessage);
             m_completedUploads.insert(id);
         }
@@ -552,10 +554,10 @@ void ServerUpdateTool::atUploadWorkerState(QnUuid serverId, const UploadState& s
             markUploadCompleted(state.id);
             break;
         case UploadState::Uploading:
-            NX_VERBOSE(this) << "atUploadWorkerState() uploading file="
-                << state.destination << "bytes"
-                << state.uploaded << "of" << state.size
-                << "server:" << serverId;
+            //NX_VERBOSE(this) << "atUploadWorkerState() uploading file="
+            //    << state.destination << "bytes"
+            //    << state.uploaded << "of" << state.size
+            //    << "server:" << serverId;
             break;
         case UploadState::Error:
             NX_VERBOSE(this) << "atUploadWorkerState() error with file="
@@ -650,7 +652,9 @@ bool ServerUpdateTool::verifyUpdateManifest(
 
     ClientVerificationData clientData;
     clientData.fillDefault();
-    clientData.clientId = checkClient ? m_stateTracker->getClientPeerId() : QnUuid();
+    clientData.clientId = checkClient
+        ? m_stateTracker->getClientPeerId(commonModule())
+        : QnUuid();
     clientData.installedVersions = clientVersions;
     VerificationOptions options;
     options.commonModule = commonModule();
@@ -894,6 +898,7 @@ bool ServerUpdateTool::requestInstallAction(
                 if (!success)
                 {
                     error = InternalError::networkError;
+                    tool->m_serversAreInstalling = {};
                 }
                 else if (result.error != QnRestResult::NoError)
                 {
@@ -1026,7 +1031,10 @@ void ServerUpdateTool::requestRemoteUpdateStateAsync()
                     if (tool->m_skippedRequests.contains((handle)))
                         return;
                     tool->m_remoteUpdateManifest = response.data;
-                    tool->m_serversAreInstalling = QSet<QnUuid>::fromList(response.data.participants);
+                    if (response.data.lastInstallationRequestTime > 0)
+                        tool->m_serversAreInstalling = QSet<QnUuid>::fromList(response.data.participants);
+                    else
+                        tool->m_serversAreInstalling = {};
                 }
             }, thread());
         m_activeRequests.insert(handle);

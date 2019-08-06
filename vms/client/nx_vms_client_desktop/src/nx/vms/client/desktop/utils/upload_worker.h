@@ -8,6 +8,8 @@
 #include <nx/vms/common/p2p/downloader/result_code.h>
 #include "upload_state.h"
 
+struct QnJsonRestResult;
+
 namespace nx::vms::client::desktop {
 
 class UploadWorker: public QObject
@@ -34,10 +36,12 @@ signals:
 private:
     // TODO: Move to PIMPL.
     void emitProgress();
+    void createUpload();
+    void checkRemoteFile();
     void handleStop();
     void handleError(const QString& message);
     void handleMd5Calculated();
-
+    void handleWaitForFileOnServer(bool success, int handle, const QnJsonRestResult& result);
     void handleUpload();
     void handleChunkUploaded(bool success, int chunkIndex);
     void handleAllUploaded();

@@ -5,27 +5,27 @@
     <name>BackupCamerasDialogDelegate</name>
     <message>
       <source>Backup newly added devices</source>
-      <translation>Створювати резервні копії з пристроїв, доданих пізніше</translation>
+      <translation>Створіть резервні копії нещодавно доданих пристроїв</translation>
     </message>
     <message>
       <source>Backup newly added cameras</source>
-      <translation>Створювати резервні копії з камер, доданих пізніше</translation>
+      <translation>Створіть резервні копії нещодавно доданих камер</translation>
     </message>
     <message>
       <source>Cannot add new devices while backup process is running.</source>
-      <translation>Неможливо додавати пристрої під час резервного копіювання.</translation>
+      <translation>Неможливо додати нові пристрої під час резервного копіювання.</translation>
     </message>
     <message>
       <source>Cannot add new cameras while backup process is running.</source>
-      <translation>Неможливо додавати камери під час резервного копіювання.</translation>
+      <translation>Неможливо додати нові камери під час резервного копіювання.</translation>
     </message>
     <message>
       <source>Cannot add new devices because they store archive on external storage.</source>
-      <translation>Неможливо додавати пристрої, оскільки вони записуються на зовнішнє сховище.</translation>
+      <translation>Неможливо додати нові пристрої, оскільки вони зберігають архів на зовнішньому сховищі.</translation>
     </message>
     <message>
       <source>Cannot add new cameras because they store archive on external storage.</source>
-      <translation>Неможливо додавати камери, оскільки вони записуються на зовнішнє сховище.</translation>
+      <translation>Неможливо додати нові камери, оскільки вони зберігають архів на зовнішньому сховищі.</translation>
     </message>
   </context>
   <context>
@@ -34,15 +34,15 @@
       <source>Zoom timeline
 to view more bookmarks</source>
       <comment>It is highly recommended to split message in two lines</comment>
-      <translation>Збільште масштаб шкали часу щоб переглянути більше закладок</translation>
+      <translation>Збільште масштаб шкали часу, архів, щоб переглянути більше закладок</translation>
     </message>
     <message>
       <source>Play bookmark from the beginning</source>
-      <translation>Відтворити закладку з самого початку</translation>
+      <translation>Відтворити закладку з початку</translation>
     </message>
     <message>
       <source>Edit bookmark</source>
-      <translation>Змінити закладку</translation>
+      <translation>Редагувати закладку</translation>
     </message>
     <message>
       <source>Delete bookmark</source>
@@ -83,15 +83,15 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Getting update information from the server</source>
-      <translation>Отримання оновленої інформації з сервера</translation>
+      <translation>Отримання інформації про оновлення з сервера</translation>
     </message>
     <message>
       <source>Downloading update package</source>
-      <translation>Завантаження пакета оновлення</translation>
+      <translation>Завантаження оновлення</translation>
     </message>
     <message>
       <source>Installing</source>
-      <translation>Встановлення</translation>
+      <translation>Інсталювання</translation>
     </message>
   </context>
   <context>
@@ -102,7 +102,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Connect to System</source>
-      <translation>Підключення до системи</translation>
+      <translation>Підключення до Системи</translation>
     </message>
     <message>
       <source>Help</source>
@@ -114,23 +114,23 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Cameras to Backup...</source>
-      <translation>Камери для резервного копіювання...</translation>
+      <translation>Виберіть камери для резервного копіювання...</translation>
     </message>
     <message>
       <source>Control Video Wall</source>
-      <translation>Управління відеостіною</translation>
+      <translation>Управління Відеостіною</translation>
     </message>
     <message>
       <source>Push my screen</source>
-      <translation>Передати мій екран</translation>
+      <translation>Push активація екрану</translation>
     </message>
     <message>
       <source>Select Time Server</source>
-      <translation>Виберіть сервер часу</translation>
+      <translation>Виберіть Сервер Часу</translation>
     </message>
     <message>
       <source>Fit in View</source>
-      <translation>Вписати в екран</translation>
+      <translation>Масштабуй формат розкладки згiдно параметрiв екрану</translation>
     </message>
     <message>
       <source>Main Menu</source>
@@ -146,23 +146,23 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Browse Local Files</source>
-      <translation>Переглянути локальні файли</translation>
+      <translation>Переглянути Локальні Файли</translation>
     </message>
     <message>
       <source>Show Welcome Screen</source>
-      <translation>Показати заставку</translation>
+      <translation>Показати Екран Вітання</translation>
     </message>
     <message>
       <source>New...</source>
-      <translation>Створити...</translation>
+      <translation>Новий...</translation>
     </message>
     <message>
       <source>Tab</source>
-      <translation>Вкладку</translation>
+      <translation>Вкладка</translation>
     </message>
     <message>
       <source>New Tab</source>
-      <translation>Нова вкладка</translation>
+      <translation>Нова Вкладка</translation>
     </message>
     <message>
       <source>Window</source>
@@ -170,7 +170,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>New Window</source>
-      <translation>Створити вікно</translation>
+      <translation>Нове Вікно</translation>
     </message>
     <message>
       <source>User...</source>
@@ -178,31 +178,31 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>New User...</source>
-      <translation>Створити користувача...</translation>
+      <translation>Новий користувач...</translation>
     </message>
     <message>
       <source>Video Wall...</source>
-      <translation>Відеостіну...</translation>
+      <translation>Відеостіна...</translation>
     </message>
     <message>
       <source>New Video Wall...</source>
-      <translation>Нова відеостіна...</translation>
+      <translation>Нова Відеостіна...</translation>
     </message>
     <message>
       <source>Web Page...</source>
-      <translation>Веб-сторінка...</translation>
+      <translation>Веб-Сторінка...</translation>
     </message>
     <message>
       <source>New Web Page...</source>
-      <translation>Нова веб-сторінка...</translation>
+      <translation>Нова Веб-Сторінка...</translation>
     </message>
     <message>
       <source>New Layout...</source>
-      <translation>Створити розкладку...</translation>
+      <translation>Нова Розкладка...</translation>
     </message>
     <message>
       <source>Open Layout...</source>
-      <translation>Відкрити розкладку...</translation>
+      <translation>Відкрити Розкладку...</translation>
     </message>
     <message>
       <source>Open...</source>
@@ -214,43 +214,43 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Web Client...</source>
-      <translation>Веб-клієнт...</translation>
+      <translation>Веб-Клієнт...</translation>
     </message>
     <message>
       <source>Open Web Client...</source>
-      <translation>Відкритий веб-клієнт...</translation>
+      <translation>Відкритий Веб-Клієнт...</translation>
     </message>
     <message>
       <source>Save Current Layout</source>
-      <translation>Зберегти розкладку</translation>
+      <translation>Зберегти Поточну Розкладку</translation>
     </message>
     <message>
       <source>Save Current Layout As...</source>
-      <translation>Зберегти розкладку як...</translation>
+      <translation>Зберегти Поточну Розкладку Як...</translation>
     </message>
     <message>
       <source>Save Video Wall View</source>
-      <translation>Зберегти розкладку відеостіни</translation>
+      <translation>Зберегти Налаштування Перегляду Відеостіни</translation>
     </message>
     <message>
       <source>Start Screen Recording</source>
-      <translation>Почати запис екрану</translation>
+      <translation>Почати Запис Екрану</translation>
     </message>
     <message>
       <source>Stop Screen Recording</source>
-      <translation>Зупинити запис екрану</translation>
+      <translation>Зупинити Запис Екрану</translation>
     </message>
     <message>
       <source>Stop current action</source>
-      <translation>Зупинити поточне завдання</translation>
+      <translation>Зупинити Поточне Завдання</translation>
     </message>
     <message>
       <source>Go to Fullscreen</source>
-      <translation>На повний екран</translation>
+      <translation>Перехiд в Повний Екран</translation>
     </message>
     <message>
       <source>Exit Fullscreen</source>
-      <translation>Вийти з повноекранного режиму</translation>
+      <translation>Вихiд з Повний Екран</translation>
     </message>
     <message>
       <source>Minimize</source>
@@ -262,74 +262,74 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Restore Down</source>
-      <translation>Зменшити у вікно</translation>
+      <translation>Відновлення Після Згортання</translation>
     </message>
     <message>
       <source>Open in Browser...</source>
-      <translation>Відкрити в браузері...</translation>
+      <translation>Відкрити в Браузері...</translation>
     </message>
     <message>
       <source>System Administration...</source>
-      <translation>Адміністрування системи...</translation>
+      <translation>Адміністрування Системи...</translation>
     </message>
     <message>
       <source>System Update...</source>
-      <translation>Оновлення системи...</translation>
+      <translation>Оновлення Системи...</translation>
     </message>
     <message>
       <source>User Management...</source>
-      <translation>Управління користувачами...</translation>
+      <translation>Управління Користувачами...</translation>
     </message>
     <message>
       <source>Local Settings...</source>
-      <translation>Локальні налаштування...</translation>
+      <translation>Локальні Налаштування...</translation>
     </message>
     <message>
       <source>Audit Trail...</source>
-      <translation>Аудит...</translation>
+      <translation>Audit Trail...</translation>
     </message>
     <message>
       <source>Log in to %1...</source>
       <comment>Log in to Nx Cloud</comment>
-      <translation>Увійти до %1...</translation>
+      <translation>Авторизуватись %1...</translation>
     </message>
     <message>
       <source>Log out from %1</source>
       <comment>Log out from Nx Cloud</comment>
-      <translation>Вийти з %1</translation>
+      <translation>Вихiд з системи %1</translation>
     </message>
     <message>
       <source>Open %1 Portal...</source>
       <comment>Open Nx Cloud Portal</comment>
-      <translation>Відкрити портал %1...</translation>
+      <translation>Відкрити %1 Портал ...</translation>
     </message>
     <message>
       <source>Account Settings...</source>
-      <translation>Параметри облікового запису...</translation>
+      <translation>Параметри Облікового Запису...</translation>
     </message>
     <message>
       <source>Create Account...</source>
-      <translation>Створити обліковий запис...</translation>
+      <translation>Створити Обліковий Запис...</translation>
     </message>
     <message>
       <source>Event Rules...</source>
-      <translation>Правила події...</translation>
+      <translation>Правила Подій...</translation>
     </message>
     <message>
       <source>Devices List</source>
-      <translation>Список пристроїв</translation>
+      <translation>Список Пристроїв</translation>
     </message>
     <message>
       <source>Cameras List</source>
-      <translation>Список камер</translation>
+      <translation>Список Камер</translation>
     </message>
     <message>
       <source>Merge Systems...</source>
-      <translation>Об'єднати системи...</translation>
+      <translation>Об'єднати Системи...</translation>
     </message>
     <message>
       <source>About...</source>
-      <translation>Про програму...</translation>
+      <translation>Про Програмне Забезпечення...</translation>
     </message>
     <message>
       <source>Exit</source>
@@ -337,39 +337,39 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Mark Selection Start</source>
-      <translation>Відмінити початок виділення</translation>
+      <translation>Позначити Вибір</translation>
     </message>
     <message>
       <source>Mark Selection End</source>
-      <translation>Відмінити кінець виділення</translation>
+      <translation>Відмінити Вибір</translation>
     </message>
     <message>
       <source>Clear Selection</source>
-      <translation>Очистити виділення</translation>
+      <translation>Очистити Вибір</translation>
     </message>
     <message>
       <source>Zoom to Selection</source>
-      <translation>Наблизити виділений фрагмент</translation>
+      <translation>Наблизити Виокремлений Фрагмент</translation>
     </message>
     <message>
       <source>Add Bookmark...</source>
-      <translation>Додати закладку...</translation>
+      <translation>Додати Закладку...</translation>
     </message>
     <message>
       <source>Edit Bookmark...</source>
-      <translation>Редагувати закладку...</translation>
+      <translation>Редагувати Закладку...</translation>
     </message>
     <message>
       <source>Remove Bookmark...</source>
-      <translation>Видалити закладку...</translation>
+      <translation>Видалити Закладку...</translation>
     </message>
     <message>
       <source>Remove Bookmarks...</source>
-      <translation>Видалити закладки...</translation>
+      <translation>Видалити Закладки...</translation>
     </message>
     <message>
       <source>Preview Search...</source>
-      <translation>Пошук по інтервалах...</translation>
+      <translation>Пошук за фрагментами по інтервалу часу...</translation>
     </message>
     <message>
       <source>Server...</source>
@@ -385,31 +385,31 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Open in New Tab</source>
-      <translation>Відкрити у новій вкладці</translation>
+      <translation>Відкрити у Новій Вкладці</translation>
     </message>
     <message>
       <source>Monitor in New Tab</source>
-      <translation>Відкрити моніторинг в новій вкладці</translation>
+      <translation>Моніторинг в Новій Вкладці</translation>
     </message>
     <message>
       <source>Open in Alarm Layout</source>
-      <translation>Відкрити на тривожної розкладці</translation>
+      <translation>Відкрити у Тривожну Розкладку</translation>
     </message>
     <message>
       <source>Open in New Window</source>
-      <translation>Відкрити у новому вікні</translation>
+      <translation>Відкрити у Новому Вікні</translation>
     </message>
     <message>
       <source>Monitor in New Window</source>
-      <translation>Відкрити моніторинг в новому вікні</translation>
+      <translation>Відкрити Моніторинг в Новому Вікні</translation>
     </message>
     <message>
       <source>Open Video Wall</source>
-      <translation>Відкрити відеостіну</translation>
+      <translation>Відкрити Відеостіну</translation>
     </message>
     <message>
       <source>Open Containing Folder</source>
-      <translation>Відкрити теку з файлом</translation>
+      <translation>Відкрити Відповідну Папку</translation>
     </message>
     <message>
       <source>Identify</source>
@@ -417,7 +417,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Attach to Video Wall...</source>
-      <translation>Приєднати до відеостіни...</translation>
+      <translation>Приєднати до Відеостіни...</translation>
     </message>
     <message>
       <source>Switch to Video Wall mode...</source>
@@ -425,15 +425,15 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Save Video Wall</source>
-      <translation>Зберегти відеостіну</translation>
+      <translation>Зберегти Відеостіну</translation>
     </message>
     <message>
       <source>Save Current Matrix</source>
-      <translation>Зберегти поточну матрицю</translation>
+      <translation>Зберегти Поточну Розкладку</translation>
     </message>
     <message>
       <source>Load Matrix</source>
-      <translation>Завантажити матрицю</translation>
+      <translation>Завантажити Розкладку</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -441,35 +441,35 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Stop Video Wall</source>
-      <translation>Зупинити відеостіну</translation>
+      <translation>Зупинити Відеостіну</translation>
     </message>
     <message>
       <source>Clear Screen</source>
-      <translation>Очистити екран</translation>
+      <translation>Очистити Екран</translation>
     </message>
     <message>
       <source>Save Layout</source>
-      <translation>Зберегти розкладку</translation>
+      <translation>Зберегти Розкладку</translation>
     </message>
     <message>
       <source>Save Layout As...</source>
-      <translation>Зберегти розкладку як...</translation>
+      <translation>Зберегти Розкладку Як...</translation>
     </message>
     <message>
       <source>Maximize Item</source>
-      <translation>Відео на повний екран</translation>
+      <translation>Максимізувати окремий Елемент</translation>
     </message>
     <message>
       <source>Restore Item</source>
-      <translation>Відео в режим сітки</translation>
+      <translation>Відновити Елемент</translation>
     </message>
     <message>
       <source>Show Info</source>
-      <translation>Показати інформацію</translation>
+      <translation>Показати Iнформацію</translation>
     </message>
     <message>
       <source>Hide Info</source>
-      <translation>Сховати інформацію</translation>
+      <translation>Сховати Iнформацію</translation>
     </message>
     <message>
       <source>PTZ...</source>
@@ -477,19 +477,19 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Save Current Position...</source>
-      <translation>Зберегти поточну позицію...</translation>
+      <translation>Зберегти Поточну Позицію...</translation>
     </message>
     <message>
       <source>Manage...</source>
-      <translation>Налаштувати...</translation>
+      <translation>Налаштування...</translation>
     </message>
     <message>
       <source>Show Motion/Smart Search</source>
-      <translation>Показати рух/пошук по руху</translation>
+      <translation>Показати Рух / Розумний Пошук</translation>
     </message>
     <message>
       <source>Show Motion</source>
-      <translation>Показати рух</translation>
+      <translation>Показати Рух</translation>
     </message>
     <message>
       <source>Hide Motion/Smart Search</source>
@@ -497,23 +497,23 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Hide Motion</source>
-      <translation>Сховати рух</translation>
+      <translation>Сховати Рух</translation>
     </message>
     <message>
       <source>Clear Motion Selection</source>
-      <translation>Очистити регіон пошуку руху</translation>
+      <translation>Очистити Область Пошуку Руху</translation>
     </message>
     <message>
       <source>Check File Watermark</source>
-      <translation>Перевірити цілісність файлу</translation>
+      <translation>Перевірити Цілісність Файлу</translation>
     </message>
     <message>
       <source>Image Enhancement...</source>
-      <translation>Корекція зображення...</translation>
+      <translation>Корекція Зображення...</translation>
     </message>
     <message>
       <source>Rotate to...</source>
-      <translation>Повернути на...</translation>
+      <translation>Обертати на...</translation>
     </message>
     <message>
       <source>0 degrees</source>
@@ -533,15 +533,15 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Remove from Layout</source>
-      <translation>Прибрати з розкладки</translation>
+      <translation>Видалити з Розкладки</translation>
     </message>
     <message>
       <source>Stop Sharing Layout</source>
-      <translation>Прибрати розкладку із загального</translation>
+      <translation>Прибрати Розкладку із Загального Доступу</translation>
     </message>
     <message>
       <source>Edit...</source>
-      <translation>Редагувати...</translation>
+      <translation>Редагування...</translation>
     </message>
     <message>
       <source>Rename</source>
@@ -549,139 +549,139 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Delete from Disk</source>
-      <translation>Видалити з диска</translation>
+      <translation>Видалити з Диску</translation>
     </message>
     <message>
       <source>Set as Layout Background</source>
-      <translation>Встановити як фон на розкладку</translation>
+      <translation>Встановити фон на Розкладку</translation>
     </message>
     <message>
       <source>User Settings...</source>
-      <translation>Налаштування користувача...</translation>
+      <translation>Налаштування Користувача...</translation>
     </message>
     <message>
       <source>User Roles...</source>
-      <translation>Ролі користувача...</translation>
+      <translation>Ролі Користувача...</translation>
     </message>
     <message>
       <source>Role Settings...</source>
-      <translation>Параметри ролі...</translation>
+      <translation>Налаштування Ролі...</translation>
     </message>
     <message>
       <source>Check Device Issues...</source>
-      <translation>Перевірити пристрій на помилки...</translation>
+      <translation>Перевірити Пристрій на Помилки...</translation>
     </message>
     <message>
       <source>Check Devices Issues...</source>
-      <translation>Перевірити пристрої на помилки...</translation>
+      <translation>Перевірити Пристрої на Помилки...</translation>
     </message>
     <message>
       <source>Check Camera Issues...</source>
-      <translation>Перевірити камеру на помилки...</translation>
+      <translation>Перевірити Камеру на Помилки...</translation>
     </message>
     <message>
       <source>Check Cameras Issues...</source>
-      <translation>Перевірити камери на помилки...</translation>
+      <translation>Перевірити Камери на Помилки...</translation>
     </message>
     <message>
       <source>Check I/O Module Issues...</source>
-      <translation>Перевірити модуль вводу-виводу на помилки...</translation>
+      <translation>Перевірити Модуль Вводу-Виводу на Помилки...</translation>
     </message>
     <message>
       <source>Check I/O Modules Issues...</source>
-      <translation>Перевірити модулі вводу-виводу на помилки...</translation>
+      <translation>Перевірити модулі Вводу-Виводу на Помилки...</translation>
     </message>
     <message>
       <source>Device Rules...</source>
-      <translation>Правила для пристрою...</translation>
+      <translation>Правила для Пристрою...</translation>
     </message>
     <message>
       <source>Devices Rules...</source>
-      <translation>Правила для пристроїв...</translation>
+      <translation>Правила для Пристроїв...</translation>
     </message>
     <message>
       <source>Camera Rules...</source>
-      <translation>Правила для камери...</translation>
+      <translation>Правила для Камери...</translation>
     </message>
     <message>
       <source>Cameras Rules...</source>
-      <translation>Правила для камер...</translation>
+      <translation>Правила для Камер...</translation>
     </message>
     <message>
       <source>I/O Module Rules...</source>
-      <translation>Правила модуль введення / виводу...</translation>
+      <translation>Правила Модуль Вводу-Виводу...</translation>
     </message>
     <message>
       <source>I/O Modules Rules...</source>
-      <translation>Правила введення / виводу модулів...</translation>
+      <translation>Правида Модулiв Вводу-Виводу...</translation>
     </message>
     <message>
       <source>Device Settings...</source>
-      <translation>Параметри пристрою...</translation>
+      <translation>Параметри Пристрою...</translation>
     </message>
     <message>
       <source>Devices Settings...</source>
-      <translation>Параметри пристроїв...</translation>
+      <translation>Параметри Пристроїв...</translation>
     </message>
     <message>
       <source>Camera Settings...</source>
-      <translation>Налаштування камери...</translation>
+      <translation>Налаштування Камери...</translation>
     </message>
     <message>
       <source>Cameras Settings...</source>
-      <translation>Налаштування камер...</translation>
+      <translation>Налаштування Камер...</translation>
     </message>
     <message>
       <source>I/O Module Settings...</source>
-      <translation>Налаштування модуля вводу-виводу...</translation>
+      <translation>Налаштування Модуля Вводу-Виводу...</translation>
     </message>
     <message>
       <source>I/O Modules Settings...</source>
-      <translation>Налаштування модулів вводу-виводу...</translation>
+      <translation>Налаштування Модулів Вводу-Виводу...</translation>
     </message>
     <message>
       <source>File Settings...</source>
-      <translation>Налаштування...</translation>
+      <translation>Налаштування Файлу...</translation>
     </message>
     <message>
       <source>Layout Settings...</source>
-      <translation>Налаштування розкладки...</translation>
+      <translation>Налаштування Розкладки...</translation>
     </message>
     <message>
       <source>Video Wall Settings...</source>
-      <translation>Налаштування відеостіни...</translation>
+      <translation>Налаштування Відеостіни...</translation>
     </message>
     <message>
       <source>Add Device...</source>
-      <translation>Додати пристрій...</translation>
+      <translation>Додати Пристрій...</translation>
     </message>
     <message>
       <source>Devices List by Server...</source>
-      <translation>Список пристроїв на сервері...</translation>
+      <translation>Список Пристроїв на Сервері...</translation>
     </message>
     <message>
       <source>Cameras List by Server...</source>
-      <translation>Список камер на сервері...</translation>
+      <translation>Список Камер на Сервері...</translation>
     </message>
     <message>
       <source>Server Logs...</source>
-      <translation>Журнал сервера...</translation>
+      <translation>Журнал Сервера...</translation>
     </message>
     <message>
       <source>Server Diagnostics...</source>
-      <translation>Діагностика сервера...</translation>
+      <translation>Діагностика Сервера...</translation>
     </message>
     <message>
       <source>Server Web Page...</source>
-      <translation>Веб-сторінка сервера...</translation>
+      <translation>Веб-Сторінка Сервера...</translation>
     </message>
     <message>
       <source>Server Settings...</source>
-      <translation>Налаштування сервера...</translation>
+      <translation>Налаштування Сервера...</translation>
     </message>
     <message>
       <source>Merge to Currently Connected System...</source>
-      <translation>Приєднати сервер до поточної системи...</translation>
+      <translation>Приєднати Сервер до Поточної Системи...</translation>
     </message>
     <message>
       <source>None</source>
@@ -709,31 +709,31 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Close All But This</source>
-      <translation>Закрити усі окрім цієї</translation>
+      <translation>Закрити Усі Окрім Цієї</translation>
     </message>
     <message>
       <source>Play</source>
-      <translation>Відтворення</translation>
+      <translation>Перегляд</translation>
     </message>
     <message>
       <source>Pause</source>
-      <translation>Пауза</translation>
+      <translation>Призупинити</translation>
     </message>
     <message>
       <source>Previous Frame</source>
-      <translation>Попередній кадр</translation>
+      <translation>Попередній Кадр</translation>
     </message>
     <message>
       <source>Next Frame</source>
-      <translation>Наступний кадр</translation>
+      <translation>Наступний Кадр</translation>
     </message>
     <message>
       <source>To Start</source>
-      <translation>На початок</translation>
+      <translation>На Початок</translation>
     </message>
     <message>
       <source>To End</source>
-      <translation>На кінець</translation>
+      <translation>Відстань до Кінцевої Точки</translation>
     </message>
     <message>
       <source>Volume Down</source>
@@ -749,39 +749,39 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Jump to Live</source>
-      <translation>Відео в реальному часі</translation>
+      <translation>Відео в Реальному Часі</translation>
     </message>
     <message>
       <source>Synchronize Streams</source>
-      <translation>Сонхронізація відео</translation>
+      <translation>Синхронізуйте Потоки</translation>
     </message>
     <message>
       <source>Disable Stream Synchronization</source>
-      <translation>Вимкнути синхронізацію відео</translation>
+      <translation>Вимкнути Синхронізацію Відео</translation>
     </message>
     <message>
       <source>Show Bookmarks</source>
-      <translation>Показати закладки</translation>
+      <translation>Показати Закладки</translation>
     </message>
     <message>
       <source>Hide Bookmarks</source>
-      <translation>Сховати закладки</translation>
+      <translation>Сховати Закладки</translation>
     </message>
     <message>
       <source>Show Calendar</source>
-      <translation>Показати календар</translation>
+      <translation>Показати Календар</translation>
     </message>
     <message>
       <source>Hide Calendar</source>
-      <translation>Сховати календар</translation>
+      <translation>Сховати Календар</translation>
     </message>
     <message>
       <source>Show Title Bar</source>
-      <translation>Показати заголовок</translation>
+      <translation>Показати Заголовок</translation>
     </message>
     <message>
       <source>Hide Title Bar</source>
-      <translation>Сховати заголовок</translation>
+      <translation>Сховати Заголовок</translation>
     </message>
     <message>
       <source>Pin Tree</source>
@@ -942,6 +942,14 @@ to view more bookmarks</source>
     <message>
       <source>Objects Frames and Info...</source>
       <translation>Кадри об'єктів та інформація...</translation>
+    </message>
+    <message>
+      <source>Pin Calendar</source>
+      <translation>Налаштувати календар</translation>
+    </message>
+    <message>
+      <source>Unpin Calendar</source>
+      <translation>Відкріпити календар</translation>
     </message>
   </context>
   <context>
@@ -2082,8 +2090,8 @@ to view more bookmarks</source>
       <translation>Будь-яка камера</translation>
     </message>
     <message>
-      <source>Force Acknowledgement will only work for Generic Events if camera modifiers are used in the Generic Event URL</source>
-      <translation>Функція підтвердження примусу буде працювати лише для загальних подій, якщо в загальній URL-адресі події використовуються модифікатори камери</translation>
+      <source>Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</source>
+      <translation>Примусове підтвердження працюватиме лише для Загальних подій, якщо в URL-адресі загальних подій використовуються ідентифікатори камери</translation>
     </message>
   </context>
   <context>
@@ -4342,7 +4350,7 @@ to %1</source>
     </message>
     <message>
       <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
-      <translation type="unfinished">&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</translation>
+      <translation>&quot;віртуальна камера&quot; - це віртуальне сховище для відеофайлів, яке може бути завантажене на будь-який сервер вашої системи і доступно будь-якому користувачеві.</translation>
     </message>
   </context>
   <context>
@@ -5714,12 +5722,6 @@ to %1</source>
       <translation>Що робити з поточними даними аналізу?</translation>
     </message>
     <message>
-      <source>Current analytics data will not be automatically moved to another location and will become unaccessible. You can keep it and manually move later, or delete permanently.
-If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
-      <translation>Поточні дані аналітики не будуть автоматично переміщені в інше місце і стануть недоступними. Ви можете зберегти його та перемістити вручну пізніше, або видалити назавжди.
-Якщо ви плануєте перенести аналітичні дані в інше місце зберігання, зверніться до служби підтримки, перш ніж продовжити.</translation>
-    </message>
-    <message>
       <source>Delete</source>
       <translation>Видалити</translation>
     </message>
@@ -5730,6 +5732,12 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Cancel</source>
       <translation>Відміна</translation>
+    </message>
+    <message>
+      <source>Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
+If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
+      <translation>Поточні дані аналітики не будуть автоматично переміщені до іншого місця та стануть недоступними. Ви можете зберегти його та перемістити вручну пізніше або назавжди видалити.
+Якщо ви планували перемістити аналітичні дані в інше місце зберігання, будь-ласка, зверніться до служби технічної підтримки, перш ніж продовжувати.</translation>
     </message>
   </context>
   <context>
@@ -7551,7 +7559,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Unknown track</source>
-      <translation type="unfinished">Unknown track</translation>
+      <translation>Невідомий трек</translation>
     </message>
   </context>
   <context>
@@ -7792,6 +7800,10 @@ If you intended to move analytics data to another storage location, please conta
       <source>This action cannot be undone.</source>
       <translation>Цю дію не можна відмінити.</translation>
     </message>
+    <message>
+      <source>Motion detection stream is disabled</source>
+      <translation>Виявлення руху вимкнено</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraScheduleWidget</name>
@@ -7936,6 +7948,14 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Plugins</source>
       <translation>Плагіни</translation>
+    </message>
+    <message>
+      <source>Motion detection is disabled, all schedule records &quot;Motion&quot; and &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
+      <translation>Виявлення руху відключено, всі записи розкладів &quot;Рух&quot; та &quot;Рух+Низька-якість&quot; буде змінено на &quot;Завжди&quot;</translation>
+    </message>
+    <message>
+      <source>Dual streaming is disabled, all schedule records &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
+      <translation>Подвійний потік вимкнено, всі записи розкладів &quot;Рух + Низька-якість&quot; буде змінено на &quot;Завжди&quot;</translation>
     </message>
   </context>
   <context>
@@ -8274,10 +8294,6 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>%n подій</numerusform>
         <numerusform>%n подій</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>unnamed analytics engine</source>
-      <translation>неназваний движок аналітики</translation>
     </message>
     <message>
       <source>No events occurred</source>
@@ -8673,8 +8689,8 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Обраний діапазон містить більше 255 ІР-адрес.</translation>
     </message>
     <message>
-      <source>Can&apos;t start searching process</source>
-      <translation>Не&apos;можливо почати процес пошуку</translation>
+      <source>Can not start the search process</source>
+      <translation>Неможливо почати процес пошуку</translation>
     </message>
   </context>
   <context>
@@ -8787,6 +8803,60 @@ If you intended to move analytics data to another storage location, please conta
       <source>Some servers are offline and will not be updated. Skip them?</source>
       <translation>Деякі сервери знаходяться поза мережею і не будуть оновлюватися. Пропустити їх?</translation>
     </message>
+    <message numerus="yes">
+      <source>Missing update package for the client and %n servers</source>
+      <translation>
+        <numerusform>Відсутній пакет оновлення для клієнта і %n серверів</numerusform>
+        <numerusform>Відсутній пакет оновлення для клієнта і %n серверів</numerusform>
+        <numerusform>Відсутній пакет оновлення для клієнта і %n серверів</numerusform>
+        <numerusform>Відсутній пакет оновлення для клієнта і %n серверів</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Missing update package for the client</source>
+      <translation>Відсутній пакет оновлення для клієнта</translation>
+    </message>
+    <message>
+      <source>There are no online servers to update.</source>
+      <translation>Немає серверів для оновлення, які знаходяться онлайн.</translation>
+    </message>
+    <message>
+      <source>Cancel update and delete all downloaded data?</source>
+      <translation>Скасувати оновлення та видалити всі завантажені дані?</translation>
+    </message>
+    <message>
+      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
+      <translation>Деякі версії компонентів ОС більше не підтримуються. Видаліть їх із системи або оновіть до підтримуваної версії.</translation>
+    </message>
+    <message>
+      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
+      <translation>Версія ОС клієнта більше не підтримується. Оновіть його ОС до підтримуваної версії.</translation>
+    </message>
+    <message>
+      <source>Failed to start update</source>
+      <translation>Не вдалося розпочати оновлення</translation>
+    </message>
+    <message>
+      <source>Failed to cancel update</source>
+      <translation>Не вдалося скасувати оновлення</translation>
+    </message>
+    <message>
+      <source>Failed to start installation</source>
+      <translation>Не вдалося розпочати встановлення</translation>
+    </message>
+    <message>
+      <source>Some servers have not completed the update process. Finish it anyway?</source>
+      <translation>Деякі сервери не завершили процес оновлення. Закінчити його все одно?</translation>
+    </message>
+    <message>
+      <source>%1 will be restarted to the updated version.</source>
+      <comment>Application name will be substituted</comment>
+      <translation>%1 буде перезапущено до оновленої версії.</translation>
+    </message>
+    <message>
+      <source>Failed to download update packages to some components</source>
+      <translation>Не вдалося завантажити пакети оновлення для деяких компонентів</translation>
+    </message>
     <message>
       <source>If the problem persists, please contact Customer Support.</source>
       <translation>Якщо проблема залишається невирішеною, зверніться в службу підтримки.</translation>
@@ -8804,16 +8874,48 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Оновлення завершено</translation>
     </message>
     <message>
-      <source>Nx Witness Client will be restarted to the updated version.</source>
-      <translation>Nx Witness Client буде перезапущено до оновленої версії.</translation>
+      <source>Update completed, but some components have failed an update</source>
+      <translation>Оновлення завершено, але деякі компоненти не вдалося оновити</translation>
+    </message>
+    <message>
+      <source>Please update %1 manually using an installation package.</source>
+      <translation>Будь ласка, оновіть %1 вручну за допомогою інсталятора.</translation>
+    </message>
+    <message>
+      <source>%1 will be restarted to the updated version.</source>
+      <translation>%1 буде перезапущено до оновленої версії.</translation>
     </message>
     <message>
       <source>OK</source>
       <translation>ОК</translation>
     </message>
     <message>
+      <source>There was an error while installing updates:</source>
+      <translation>Відбулася помилка при встановленні:</translation>
+    </message>
+    <message>
       <source>Downloading updates...</source>
       <translation>Завантаження оновлень...</translation>
+    </message>
+    <message>
+      <source>Finish Update</source>
+      <translation>Завершити оновлення</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>Відміна</translation>
+    </message>
+    <message>
+      <source>The latest version is already installed</source>
+      <translation>Встановлено найновішу версію</translation>
+    </message>
+    <message>
+      <source>This version is already installed</source>
+      <translation>Ця версія вже встановлена</translation>
+    </message>
+    <message>
+      <source>Install update</source>
+      <translation>Встановити оновлення</translation>
     </message>
     <message>
       <source>Upload</source>
@@ -8832,12 +8934,12 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Звантажити і Встановити</translation>
     </message>
     <message>
-      <source>Select Another Build</source>
-      <translation>Обрати інше місце</translation>
-    </message>
-    <message>
       <source>Browse for Another File...</source>
       <translation>Знайти файл оновлення...</translation>
+    </message>
+    <message>
+      <source>Select Another Build</source>
+      <translation>Обрати інше місце</translation>
     </message>
     <message>
       <source>Update to Specific Build</source>
@@ -8860,6 +8962,10 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Встановлення оновлення клієнта...</translation>
     </message>
     <message>
+      <source>Starting update to ...</source>
+      <translation>Починається оновлення до ...</translation>
+    </message>
+    <message>
       <source>Updating to ...</source>
       <translation>Оновлення до...</translation>
     </message>
@@ -8868,12 +8974,24 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Готовий оновитись до</translation>
     </message>
     <message>
-      <source>Install update</source>
-      <translation>Встановити оновлення</translation>
-    </message>
-    <message>
       <source>System updated to</source>
       <translation>Система оновлена до</translation>
+    </message>
+    <message>
+      <source>Some servers have no update packages available.</source>
+      <translation>Деякі сервери не мають доступних пакетів оновлень.</translation>
+    </message>
+    <message>
+      <source>Some servers have encountered an internal error.</source>
+      <translation>На деяких серверах виникла внутрішня помилка.</translation>
+    </message>
+    <message>
+      <source>Please contact Customer Support.</source>
+      <translation>Будь ласка, зверніться до команди підтримки.</translation>
+    </message>
+    <message>
+      <source>Some servers have gone offline. Please wait until they become online to continue.</source>
+      <translation>Деякі сервери перейшли в офлайн. Будь ласка, зачекайте, поки вони стануть онлайн, щоб продовжити.</translation>
     </message>
     <message>
       <source>System update in process</source>
@@ -8882,6 +9000,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Continue in Background</source>
       <translation>Продовжити у фоновому режимі</translation>
+    </message>
+    <message>
+      <source>Latest Available Update</source>
+      <translation>Останнє доступне оновлення</translation>
     </message>
     <message>
       <source>Specific Build</source>
@@ -8894,111 +9016,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Update from mediaservers</source>
       <translation>Оновлення від медіасерверів</translation>
-    </message>
-    <message>
-      <source>Latest Available Update</source>
-      <translation>Останнє доступне оновлення</translation>
-    </message>
-    <message numerus="yes">
-      <source>Missing update package for the client and %n servers</source>
-      <translation>
-        <numerusform>Відсутній пакет оновлення для клієнта і %n серверів</numerusform>
-        <numerusform>Відсутній пакет оновлення для клієнта і %n серверів</numerusform>
-        <numerusform>Відсутній пакет оновлення для клієнта і %n серверів</numerusform>
-        <numerusform>Відсутній пакет оновлення для клієнта і %n серверів</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Missing update package for the client</source>
-      <translation>Відсутній пакет оновлення для клієнта</translation>
-    </message>
-    <message>
-      <source>Finish Update</source>
-      <translation>Завершити оновлення</translation>
-    </message>
-    <message>
-      <source>Cancel</source>
-      <translation>Відміна</translation>
-    </message>
-    <message>
-      <source>The latest version is already installed</source>
-      <translation>Встановлено найновішу версію</translation>
-    </message>
-    <message>
-      <source>This version is already installed</source>
-      <translation>Ця версія вже встановлена</translation>
-    </message>
-    <message>
-      <source>There are no online servers to update.</source>
-      <translation>Немає серверів для оновлення, які знаходяться онлайн.</translation>
-    </message>
-    <message>
-      <source>Some servers haven&apos;t completed update process. Finish it anyway?</source>
-      <translation>Деякі сервери &apos;не завершили процес оновлення. Закінчити його все одно?</translation>
-    </message>
-    <message>
-      <source>Cancel update and delete all downloaded data?</source>
-      <translation>Скасувати оновлення та видалити всі завантажені дані?</translation>
-    </message>
-    <message>
-      <source>There was an error while installing updates:</source>
-      <translation>Відбулася помилка при встановленні:</translation>
-    </message>
-    <message>
-      <source>Some servers have gone offline. Please wait until they become online to continue.</source>
-      <translation>Деякі сервери перейшли в офлайн. Будь ласка, зачекайте, поки вони стануть онлайн, щоб продовжити.</translation>
-    </message>
-    <message>
-      <source>Update completed, but some components have failed an update</source>
-      <translation>Оновлення завершено, але деякі компоненти не вдалося оновити</translation>
-    </message>
-    <message>
-      <source>Please update %1 manually using an installation package.</source>
-      <translation>Будь ласка, оновіть %1 вручну за допомогою інсталятора.</translation>
-    </message>
-    <message>
-      <source>%1 will be restarted to the updated version.</source>
-      <translation>%1 буде перезапущено до оновленої версії.</translation>
-    </message>
-    <message>
-      <source>Failed to download update packages to some components</source>
-      <translation>Не вдалося завантажити пакети оновлення для деяких компонентів</translation>
-    </message>
-    <message>
-      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
-      <translation>Деякі версії компонентів ОС більше не підтримуються. Видаліть їх із системи або оновіть до підтримуваної версії.</translation>
-    </message>
-    <message>
-      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
-      <translation>Версія ОС клієнта більше не підтримується. Оновіть його ОС до підтримуваної версії.</translation>
-    </message>
-    <message>
-      <source>Failed to start update</source>
-      <translation>Не вдалося розпочати оновлення</translation>
-    </message>
-    <message>
-      <source>Starting update to ...</source>
-      <translation>Починається оновлення до ...</translation>
-    </message>
-    <message>
-      <source>Failed to cancel update</source>
-      <translation>Не вдалося скасувати оновлення</translation>
-    </message>
-    <message>
-      <source>Failed to start installation</source>
-      <translation>Не вдалося розпочати встановлення</translation>
-    </message>
-    <message>
-      <source>Some servers have no update packages available.</source>
-      <translation type="unfinished">Some servers have no update packages available.</translation>
-    </message>
-    <message>
-      <source>Some servers have encountered an internal error.</source>
-      <translation type="unfinished">Some servers have encountered an internal error.</translation>
-    </message>
-    <message>
-      <source>Please please contact Customer Support.</source>
-      <translation type="unfinished">Please please contact Customer Support.</translation>
     </message>
   </context>
   <context>
@@ -9058,10 +9075,6 @@ If you intended to move analytics data to another storage location, please conta
   <context>
     <name>nx::vms::client::desktop::OpenLayoutActionWidget</name>
     <message>
-      <source>Some users don&apos;t have access to the selected layout. Action will not work for them.</source>
-      <translation>Деякі користувачі н&apos;е мають доступ до вибраної розкладки. Дія для них не буде працювати.</translation>
-    </message>
-    <message>
       <source>None of selected users have access to the selected layout. Action will not work.</source>
       <translation>Жоден із вибраних користувачів не має доступу до обраної розкладки. Дія не буде працювати.</translation>
     </message>
@@ -9080,6 +9093,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>None of selected user roles contain users. Action will not work.</source>
       <translation>Жодна з вибраних ролей не містить користувачів. Дія не спрацює.</translation>
+    </message>
+    <message>
+      <source>Some users do not have access to the selected layout. Action will not work for them.</source>
+      <translation>Деякі користувачі не мають доступ до вибраної розкладки. Дія для них не буде працювати.</translation>
     </message>
   </context>
   <context>
@@ -9178,7 +9195,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>This OS version is no longer supported.</source>
-      <translation type="unfinished">This OS version is no longer supported.</translation>
+      <translation>Ця версія ОС більше не підтримується.</translation>
     </message>
   </context>
   <context>
@@ -9287,28 +9304,12 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Більше налаштувань</translation>
     </message>
     <message>
-      <source>Dual-Streaming not supported for this camera</source>
-      <translation>Подвійний потік не підтримується для цієї камери</translation>
-    </message>
-    <message>
-      <source>Dual-Streaming and motion detection not supported for this camera</source>
-      <translation>Подвійний потік та детектор руху не підтримуються для цієї камери</translation>
-    </message>
-    <message>
-      <source>Motion detection disabled</source>
-      <translation>Виявлення руху вимкнено</translation>
-    </message>
-    <message>
-      <source>To enable or adjust it, go to the &quot;Motion&quot; tab in Camera Settings</source>
-      <translation>Щоб увімкнути або налаштувати його, перейдіть на вкладку &quot;Рух&quot; в розділі Параметри камери</translation>
-    </message>
-    <message>
-      <source>Motion detection disabled or not supported</source>
+      <source>Motion detection is disabled or not supported</source>
       <translation>Виявлення руху вимкнено або не підтримується</translation>
     </message>
     <message>
-      <source>To ensure it is supported and to enable it, go to the &quot;Motion&quot; tab in Camera Settings.</source>
-      <translation>Щоб переконатися, що воно підтримується і включити його, перейдіть на вкладку &quot;Рух&quot; в налаштуваннях камери.</translation>
+      <source>Dual-streaming is disabled or not supported</source>
+      <translation>Подвійне потокове відключення або не підтримується</translation>
     </message>
   </context>
   <context>
@@ -9338,7 +9339,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
-      <translation type="unfinished">Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</translation>
+      <translation>Водяні знаки відображаються, архівуються та експортуються лише для неадміністраторів через відео в реальному часі. Ви та інші адміністратори не побачите їх.</translation>
     </message>
   </context>
   <context>
@@ -9403,6 +9404,10 @@ If you intended to move analytics data to another storage location, please conta
       <source>plugin is optional and is not in the white list</source>
       <translation>плагін є опціональним і не входить у білий список</translation>
     </message>
+    <message>
+      <source>internal error</source>
+      <translation>внутрішня помилка</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerStatusItemDelegate</name>
@@ -9439,7 +9444,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Server error.</source>
-      <translation type="unfinished">Server error.</translation>
+      <translation>Помилка сервера.</translation>
     </message>
   </context>
   <context>
@@ -9664,6 +9669,14 @@ If you intended to move analytics data to another storage location, please conta
       <source>File was corrupted while being uploaded to the server</source>
       <translation>Файл був пошкоджений при завантаженні на сервер</translation>
     </message>
+    <message>
+      <source>Remote file &quot;%1&quot; is corrupted</source>
+      <translation>Віддалений файл &quot;%1&quot; пошкоджений</translation>
+    </message>
+    <message>
+      <source>Server already has this file &quot;%1&quot;</source>
+      <translation>У цього сервера вже є файл &quot;%1&quot;</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::WearableCameraMotionWidget</name>
@@ -9872,26 +9885,26 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::ui::PluginDiagnosticEventModel</name>
     <message>
       <source>Any Plugin</source>
-      <translation type="unfinished">Any Plugin</translation>
+      <translation>Будь-який плагін</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ui::PluginDiagnosticEventWidget</name>
     <message>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the caption with any of the entered keywords.</translation>
+      <translation>Подія буде спрацьовувати тільки в тому випадку, якщо в заголовку є збіги з будь-яким з введених ключових слів.</translation>
     </message>
     <message>
       <source>If the field is empty, event will always trigger.</source>
-      <translation type="unfinished">If the field is empty, event will always trigger.</translation>
+      <translation>Якщо поле пусте, подія завжди буде викликатися.</translation>
     </message>
     <message>
       <source>This field is case sensitive.</source>
-      <translation type="unfinished">This field is case sensitive.</translation>
+      <translation>Цей поле чутливе до регістру.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the description field with any of the entered keywords.</translation>
+      <translation>Подія буде спрацьовувати тільки в тому випадку, якщо в описі є збіги з будь-яким з введених ключових слів.</translation>
     </message>
   </context>
   <context>
@@ -10211,16 +10224,22 @@ If you intended to move analytics data to another storage location, please conta
       <translation>ОК</translation>
     </message>
     <message>
-      <source>Confirm storage location to store analytics data on &apos;%1&apos;</source>
-      <translation>Підтвердьте місце зберігання, щоб зберігати дані аналітики на &apos;%1&apos;</translation>
+      <source>Confirm storage location for the analytics data on &quot;%1&quot;</source>
+      <translation>Підтвердіть місце зберігання для даних аналітики на &quot;%1&quot;</translation>
     </message>
     <message>
-      <source>Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
-Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
-By default analytics data will be stored in mediaserver&apos;s installation directory.
-You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</source>
-      <translation>База даних Analytics повинна зберігатися на локальному сховищі і може займати до ста гігабайт. Після вибору розташування для зберігання аналітичних даних його не можна змінити не втративши вихідні дані. Ми рекомендуємо ретельно вибирати місце розташування та не використовувати системний розділ, щоб уникнути серйозних несправностей системи. За замовчуванням лані аналітики зберігатимуться у каталозі установки &apos;
-Ви можете змінити місце зберігання на вкладці &quot;Управління зберіганнями&quot; у діалоговому вікні Параметри сервера.</translation>
+      <source>the largest available partition</source>
+      <translation>найбільший доступний розділ</translation>
+    </message>
+    <message>
+      <source>The analytics database should only be stored on a local drive and can take up large amounts of space.
+Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
+By default analytics data will be stored on %1.
+You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</source>
+      <translation>База даних аналітики повинна зберігатися лише на локальному диску та може займати велику кількість місця.
+Після вибору місця для зберігання аналітичних даних це неможливо легко змінити без втрати існуючих даних. Ми рекомендуємо вибирати місце розташування ретельно та уникати використання системного розділу, оскільки це може призвести до серйозних несправностей системи.
+За замовчуванням дані аналітики зберігатимуться на %1.
+Ви можете вибрати інше місце зберігання на вкладці &quot;Управління зберіганням&quot; в діалоговому вікні Налаштування сервера.</translation>
     </message>
   </context>
   <context>

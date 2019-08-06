@@ -944,6 +944,14 @@ to view more bookmarks</source>
       <source>Objects Frames and Info...</source>
       <translation>物件影像帧数和信息...</translation>
     </message>
+    <message>
+      <source>Pin Calendar</source>
+      <translation>隐藏日历</translation>
+    </message>
+    <message>
+      <source>Unpin Calendar</source>
+      <translation>显示日历</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -2014,8 +2022,8 @@ to view more bookmarks</source>
       <translation>所有摄像机</translation>
     </message>
     <message>
-      <source>Force Acknowledgement will only work for Generic Events if camera modifiers are used in the Generic Event URL</source>
-      <translation>如在通用事件URL中使用了摄像机修改器，则强制确认仅适用于通用事件</translation>
+      <source>Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</source>
+      <translation>如在通用事件URL中使用了摄像机识别码，则强制确认仅适用于通用事件</translation>
     </message>
   </context>
   <context>
@@ -4195,7 +4203,7 @@ to %1</source>
     </message>
     <message>
       <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
-      <translation type="unfinished">&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</translation>
+      <translation>&quot;虚拟摄像机&quot; 是一个视频资料专用的虚拟空间, 可上传到系统中的任一服务器并让所有用户存取.</translation>
     </message>
   </context>
   <context>
@@ -5525,12 +5533,6 @@ to %1</source>
       <translation>如何处理当前的分析数据？</translation>
     </message>
     <message>
-      <source>Current analytics data will not be automatically moved to another location and will become unaccessible. You can keep it and manually move later, or delete permanently.
-If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
-      <translation>当前的分析数据不会自动移动到其他位置，并且将无法读取。您可以保留它并稍后手动移动，或永久删除。
-如果您决定将其移至另一个存储位置，请在继续操作前与支援部门联系。</translation>
-    </message>
-    <message>
       <source>Delete</source>
       <translation>删除</translation>
     </message>
@@ -5541,6 +5543,12 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Cancel</source>
       <translation>取消</translation>
+    </message>
+    <message>
+      <source>Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
+If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
+      <translation>当前的分析数据不会自动移动到其他位置，并且将无法读取。您可以保留它并稍后手动移动，或永久删除。
+如果您决定将其移至另一个存储位置，请在继续操作前与支援部门联系。</translation>
     </message>
   </context>
   <context>
@@ -7251,7 +7259,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Unknown track</source>
-      <translation type="unfinished">Unknown track</translation>
+      <translation>不明音轨</translation>
     </message>
   </context>
   <context>
@@ -7480,6 +7488,10 @@ If you intended to move analytics data to another storage location, please conta
       <source>This action cannot be undone.</source>
       <translation>该操作无法撤消。</translation>
     </message>
+    <message>
+      <source>Motion detection stream is disabled</source>
+      <translation>移动检测流已禁用</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraScheduleWidget</name>
@@ -7612,6 +7624,14 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Plugins</source>
       <translation>插件</translation>
+    </message>
+    <message>
+      <source>Motion detection is disabled, all schedule records &quot;Motion&quot; and &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
+      <translation>位移侦测已停用，所有排程记录 &quot;位移&quot; 和&quot;位移 + 低解析度&quot; 将更改为 &quot;永远&quot;</translation>
+    </message>
+    <message>
+      <source>Dual streaming is disabled, all schedule records &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
+      <translation>双串流已停用，所有排程记录 &quot;位移 + 低解析度&quot; 将更改为 &quot;永远&quot;</translation>
     </message>
   </context>
   <context>
@@ -7932,10 +7952,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>
         <numerusform>%n 事件</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>unnamed analytics engine</source>
-      <translation>未命名的分析引擎</translation>
     </message>
     <message>
       <source>No events occurred</source>
@@ -8322,8 +8338,8 @@ If you intended to move analytics data to another storage location, please conta
       <translation>超出IP地址区间，最大允许255个地址.</translation>
     </message>
     <message>
-      <source>Can&apos;t start searching process</source>
-      <translation>可以&apos;t开始搜索过程</translation>
+      <source>Can not start the search process</source>
+      <translation>无法启动搜索功能</translation>
     </message>
   </context>
   <context>
@@ -8436,6 +8452,57 @@ If you intended to move analytics data to another storage location, please conta
       <source>Some servers are offline and will not be updated. Skip them?</source>
       <translation>某些服务器处于离线状态，不会更新。请问決定忽略？</translation>
     </message>
+    <message numerus="yes">
+      <source>Missing update package for the client and %n servers</source>
+      <translation>
+        <numerusform>缺少客户端和 %n 个伺服器的更新包</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Missing update package for the client</source>
+      <translation>缺少客户端的更新包</translation>
+    </message>
+    <message>
+      <source>There are no online servers to update.</source>
+      <translation>没有要更新的在线服务器。</translation>
+    </message>
+    <message>
+      <source>Cancel update and delete all downloaded data?</source>
+      <translation>取消更新并删除所有下载数据？</translation>
+    </message>
+    <message>
+      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
+      <translation>不再支持某些组件的操作系统版本。请从系统中删除或将其操作系统更新为支持的版本。</translation>
+    </message>
+    <message>
+      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
+      <translation>不再支持客户端的操作系统。请将操作系统更新为支持的版本。</translation>
+    </message>
+    <message>
+      <source>Failed to start update</source>
+      <translation>启动更新失败。</translation>
+    </message>
+    <message>
+      <source>Failed to cancel update</source>
+      <translation>无法取消更新</translation>
+    </message>
+    <message>
+      <source>Failed to start installation</source>
+      <translation>启动安装失败</translation>
+    </message>
+    <message>
+      <source>Some servers have not completed the update process. Finish it anyway?</source>
+      <translation>有些服务器未完成更新。继续完成？</translation>
+    </message>
+    <message>
+      <source>%1 will be restarted to the updated version.</source>
+      <comment>Application name will be substituted</comment>
+      <translation>%1 将重新启动到更新的版本。</translation>
+    </message>
+    <message>
+      <source>Failed to download update packages to some components</source>
+      <translation>无法将更新包下载到某些组件</translation>
+    </message>
     <message>
       <source>If the problem persists, please contact Customer Support.</source>
       <translation>如果问题仍然存在，请与客户支持联系。</translation>
@@ -8453,16 +8520,48 @@ If you intended to move analytics data to another storage location, please conta
       <translation>更新完成。</translation>
     </message>
     <message>
-      <source>Nx Witness Client will be restarted to the updated version.</source>
-      <translation>Nx Witness 客户端将重新启动到更新的版本.</translation>
+      <source>Update completed, but some components have failed an update</source>
+      <translation>更新完成，但有些组件没有更新</translation>
+    </message>
+    <message>
+      <source>Please update %1 manually using an installation package.</source>
+      <translation>请使用安装包手动更新 %1 。</translation>
+    </message>
+    <message>
+      <source>%1 will be restarted to the updated version.</source>
+      <translation>%1 将重新启动到更新的版本。</translation>
     </message>
     <message>
       <source>OK</source>
       <translation>确定</translation>
     </message>
     <message>
+      <source>There was an error while installing updates:</source>
+      <translation>安装更新时出错：</translation>
+    </message>
+    <message>
       <source>Downloading updates...</source>
       <translation>正在下载更新......</translation>
+    </message>
+    <message>
+      <source>Finish Update</source>
+      <translation>完成更新</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>取消</translation>
+    </message>
+    <message>
+      <source>The latest version is already installed</source>
+      <translation>已安装最新版本</translation>
+    </message>
+    <message>
+      <source>This version is already installed</source>
+      <translation>此版本已安装</translation>
+    </message>
+    <message>
+      <source>Install update</source>
+      <translation>安装更新</translation>
     </message>
     <message>
       <source>Upload</source>
@@ -8481,12 +8580,12 @@ If you intended to move analytics data to another storage location, please conta
       <translation>下载并安装</translation>
     </message>
     <message>
-      <source>Select Another Build</source>
-      <translation>选择其他版本</translation>
-    </message>
-    <message>
       <source>Browse for Another File...</source>
       <translation>浏览另一个文件...</translation>
+    </message>
+    <message>
+      <source>Select Another Build</source>
+      <translation>选择其他版本</translation>
     </message>
     <message>
       <source>Update to Specific Build</source>
@@ -8509,6 +8608,10 @@ If you intended to move analytics data to another storage location, please conta
       <translation>正在安装客户端更新...</translation>
     </message>
     <message>
+      <source>Starting update to ...</source>
+      <translation>开始更新到......</translation>
+    </message>
+    <message>
       <source>Updating to ...</source>
       <translation>正在更新到......</translation>
     </message>
@@ -8517,12 +8620,24 @@ If you intended to move analytics data to another storage location, please conta
       <translation>已准备好更新到设备</translation>
     </message>
     <message>
-      <source>Install update</source>
-      <translation>安装更新</translation>
-    </message>
-    <message>
       <source>System updated to</source>
       <translation>系统更新至</translation>
+    </message>
+    <message>
+      <source>Some servers have no update packages available.</source>
+      <translation>某些服务器没有可用的更新套件包.</translation>
+    </message>
+    <message>
+      <source>Some servers have encountered an internal error.</source>
+      <translation>某些服务器发生内部错误。</translation>
+    </message>
+    <message>
+      <source>Please contact Customer Support.</source>
+      <translation>请联系客服。</translation>
+    </message>
+    <message>
+      <source>Some servers have gone offline. Please wait until they become online to continue.</source>
+      <translation>有些服务器已离线。请等待连线后再继续。</translation>
     </message>
     <message>
       <source>System update in process</source>
@@ -8531,6 +8646,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Continue in Background</source>
       <translation>在后台继续</translation>
+    </message>
+    <message>
+      <source>Latest Available Update</source>
+      <translation>最新的可用版本</translation>
     </message>
     <message>
       <source>Specific Build</source>
@@ -8543,108 +8662,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Update from mediaservers</source>
       <translation>从媒体服务器更新</translation>
-    </message>
-    <message>
-      <source>Latest Available Update</source>
-      <translation>最新的可用版本</translation>
-    </message>
-    <message numerus="yes">
-      <source>Missing update package for the client and %n servers</source>
-      <translation>
-        <numerusform>缺少客户端和 %n 个伺服器的更新包</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Missing update package for the client</source>
-      <translation>缺少客户端的更新包</translation>
-    </message>
-    <message>
-      <source>Finish Update</source>
-      <translation>完成更新</translation>
-    </message>
-    <message>
-      <source>Cancel</source>
-      <translation>取消</translation>
-    </message>
-    <message>
-      <source>The latest version is already installed</source>
-      <translation>已安装最新版本</translation>
-    </message>
-    <message>
-      <source>This version is already installed</source>
-      <translation>此版本已安装</translation>
-    </message>
-    <message>
-      <source>There are no online servers to update.</source>
-      <translation>没有要更新的在线服务器。</translation>
-    </message>
-    <message>
-      <source>Some servers haven&apos;t completed update process. Finish it anyway?</source>
-      <translation>有些服务器&apos;未完成更新。继续完成？</translation>
-    </message>
-    <message>
-      <source>Cancel update and delete all downloaded data?</source>
-      <translation>取消更新并删除所有下载数据？</translation>
-    </message>
-    <message>
-      <source>There was an error while installing updates:</source>
-      <translation>安装更新时出错：</translation>
-    </message>
-    <message>
-      <source>Some servers have gone offline. Please wait until they become online to continue.</source>
-      <translation>有些服务器已离线。请等待连线后再继续。</translation>
-    </message>
-    <message>
-      <source>Update completed, but some components have failed an update</source>
-      <translation>更新完成，但有些组件没有更新</translation>
-    </message>
-    <message>
-      <source>Please update %1 manually using an installation package.</source>
-      <translation>请使用安装包手动更新 %1 。</translation>
-    </message>
-    <message>
-      <source>%1 will be restarted to the updated version.</source>
-      <translation>%1 将重新启动到更新的版本。</translation>
-    </message>
-    <message>
-      <source>Failed to download update packages to some components</source>
-      <translation>无法将更新包下载到某些组件</translation>
-    </message>
-    <message>
-      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
-      <translation>不再支持某些组件的操作系统版本。请从系统中删除或将其操作系统更新为支持的版本。</translation>
-    </message>
-    <message>
-      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
-      <translation>不再支持客户端的操作系统。请将操作系统更新为支持的版本。</translation>
-    </message>
-    <message>
-      <source>Failed to start update</source>
-      <translation>启动更新失败。</translation>
-    </message>
-    <message>
-      <source>Starting update to ...</source>
-      <translation>开始更新到......</translation>
-    </message>
-    <message>
-      <source>Failed to cancel update</source>
-      <translation>无法取消更新</translation>
-    </message>
-    <message>
-      <source>Failed to start installation</source>
-      <translation>启动安装失败</translation>
-    </message>
-    <message>
-      <source>Some servers have no update packages available.</source>
-      <translation type="unfinished">Some servers have no update packages available.</translation>
-    </message>
-    <message>
-      <source>Some servers have encountered an internal error.</source>
-      <translation type="unfinished">Some servers have encountered an internal error.</translation>
-    </message>
-    <message>
-      <source>Please please contact Customer Support.</source>
-      <translation type="unfinished">Please please contact Customer Support.</translation>
     </message>
   </context>
   <context>
@@ -8701,10 +8718,6 @@ If you intended to move analytics data to another storage location, please conta
   <context>
     <name>nx::vms::client::desktop::OpenLayoutActionWidget</name>
     <message>
-      <source>Some users don&apos;t have access to the selected layout. Action will not work for them.</source>
-      <translation>某些用户&apos;t 对所选布局不具有访问权限。指令將不起作用。</translation>
-    </message>
-    <message>
       <source>None of selected users have access to the selected layout. Action will not work.</source>
       <translation>所选用户无权访问所选布局。指令无效。</translation>
     </message>
@@ -8723,6 +8736,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>None of selected user roles contain users. Action will not work.</source>
       <translation>所选用户角色均不包含用户。操作不起作用。</translation>
+    </message>
+    <message>
+      <source>Some users do not have access to the selected layout. Action will not work for them.</source>
+      <translation>某些用户对所选布局不具有访问权限。指令將不起作用。</translation>
     </message>
   </context>
   <context>
@@ -8821,7 +8838,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>This OS version is no longer supported.</source>
-      <translation type="unfinished">This OS version is no longer supported.</translation>
+      <translation>不再支持此操作系统版本.</translation>
     </message>
   </context>
   <context>
@@ -8927,28 +8944,12 @@ If you intended to move analytics data to another storage location, please conta
       <translation>更多设置</translation>
     </message>
     <message>
-      <source>Dual-Streaming not supported for this camera</source>
-      <translation>设备不支持双码流.</translation>
+      <source>Motion detection is disabled or not supported</source>
+      <translation>移动侦测已禁用或不受支持</translation>
     </message>
     <message>
-      <source>Dual-Streaming and motion detection not supported for this camera</source>
-      <translation>设备不支持双码流和移动侦测.</translation>
-    </message>
-    <message>
-      <source>Motion detection disabled</source>
-      <translation>移动侦测禁用</translation>
-    </message>
-    <message>
-      <source>To enable or adjust it, go to the &quot;Motion&quot; tab in Camera Settings</source>
-      <translation>到摄像机设置中的&quot;移动侦测&quot;启用或設置移动侦测.</translation>
-    </message>
-    <message>
-      <source>Motion detection disabled or not supported</source>
-      <translation>移动侦测禁用或不受支持</translation>
-    </message>
-    <message>
-      <source>To ensure it is supported and to enable it, go to the &quot;Motion&quot; tab in Camera Settings.</source>
-      <translation>到摄像机设置中的&quot;移动侦测&quot;确保支持并启用移动侦测.</translation>
+      <source>Dual-streaming is disabled or not supported</source>
+      <translation>禁用或不支持双串流</translation>
     </message>
   </context>
   <context>
@@ -8978,7 +8979,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
-      <translation type="unfinished">Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</translation>
+      <translation>水印仅显示在非管理员用户的实时，存档和导出视频上。您和其他管理员并不会看到。</translation>
     </message>
   </context>
   <context>
@@ -9043,6 +9044,10 @@ If you intended to move analytics data to another storage location, please conta
       <source>plugin is optional and is not in the white list</source>
       <translation>插件是可选的且不在白名单中</translation>
     </message>
+    <message>
+      <source>internal error</source>
+      <translation>内部错误</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerStatusItemDelegate</name>
@@ -9079,7 +9084,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Server error.</source>
-      <translation type="unfinished">Server error.</translation>
+      <translation>服务器错误.</translation>
     </message>
   </context>
   <context>
@@ -9292,6 +9297,14 @@ If you intended to move analytics data to another storage location, please conta
       <source>File was corrupted while being uploaded to the server</source>
       <translation>文件在上传到服务器时被损坏</translation>
     </message>
+    <message>
+      <source>Remote file &quot;%1&quot; is corrupted</source>
+      <translation>远程文档&quot;%1&quot; 已损坏</translation>
+    </message>
+    <message>
+      <source>Server already has this file &quot;%1&quot;</source>
+      <translation>服务器已存在此文件&quot;%1&quot;</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::WearableCameraMotionWidget</name>
@@ -9497,26 +9510,26 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::ui::PluginDiagnosticEventModel</name>
     <message>
       <source>Any Plugin</source>
-      <translation type="unfinished">Any Plugin</translation>
+      <translation>任何插件</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ui::PluginDiagnosticEventWidget</name>
     <message>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the caption with any of the entered keywords.</translation>
+      <translation>只有当标题栏位中的文字与输入的任何关键字相符时，事件才会触发</translation>
     </message>
     <message>
       <source>If the field is empty, event will always trigger.</source>
-      <translation type="unfinished">If the field is empty, event will always trigger.</translation>
+      <translation>如果该栏位为空白，事件将维持在触发状态</translation>
     </message>
     <message>
       <source>This field is case sensitive.</source>
-      <translation type="unfinished">This field is case sensitive.</translation>
+      <translation>此栏位有大小写之区分</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the description field with any of the entered keywords.</translation>
+      <translation>如果该栏位为空白，事件将维持在触发状态。只有当叙述栏位中的文字与输入的任何关键字相符时，事件才会触发</translation>
     </message>
   </context>
   <context>
@@ -9812,18 +9825,22 @@ If you intended to move analytics data to another storage location, please conta
       <translation>确定</translation>
     </message>
     <message>
-      <source>Confirm storage location to store analytics data on &apos;%1&apos;</source>
-      <translation>请确认储存位置以将分析数据存于 &apos;%1&apos;</translation>
+      <source>Confirm storage location for the analytics data on &quot;%1&quot;</source>
+      <translation>请确认储存位置以将分析数据存于 &quot;%1&quot;</translation>
     </message>
     <message>
-      <source>Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
-Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
-By default analytics data will be stored in mediaserver&apos;s installation directory.
-You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</source>
-      <translation>建议将分析资料库储存于本地端，可占用多达数百GB。
-选择存储分析数据的位置后，如不删除现有资料，将无法轻易更改。我们建议仔细选择储存位置，请不要使用系统分区以避免发生严重的系统故障。
-在初始设定下，数据将存储在mediaserver&apos;的安装目录中。
-您可以在“服务器设定”对话框分页中的“ &quot;Storage Management&quot; 更改存储位置。</translation>
+      <source>the largest available partition</source>
+      <translation>最大的可用分区</translation>
+    </message>
+    <message>
+      <source>The analytics database should only be stored on a local drive and can take up large amounts of space.
+Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
+By default analytics data will be stored on %1.
+You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</source>
+      <translation>分析资料库应仅存储于本地端上，并且可能占用大量空间。
+一旦选择存储分析数据的位置后，如不删除现有资料，将无法轻易更改。建议您仔细选择储存位置并避免使用系统分区，以免发生严重的系统故障。
+在初始设定下，分析数据将存储在 %1。
+您可以在“服务器设定”对话框分页“中的 &quot;Storage Management&quot; 选择另一个存储位置。</translation>
     </message>
   </context>
   <context>

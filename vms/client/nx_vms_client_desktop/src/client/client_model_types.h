@@ -106,15 +106,15 @@ QN_FUSION_DECLARE_FUNCTIONS(QnLicenseWarningState, (datastream)(metatype));
  */
 struct QnBackgroundImage
 {
-    QnBackgroundImage();
-
-    bool enabled;
+    bool enabled = false;
     QString name;
     QString originalName;
-    Qn::ImageBehaviour mode;
-    qreal opacity;
+    Qn::ImageBehaviour mode = Qn::ImageBehaviour::Crop;
+    qreal opacity = 0.5;
 
     qreal actualImageOpacity() const;
+
+    static QnBackgroundImage defaultBackground();
 };
 #define QnBackgroundImage_Fields (enabled)(name)(originalName)(mode)(opacity)
 

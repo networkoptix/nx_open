@@ -809,12 +809,21 @@ CameraDiagnostics::Result QnPlOnvifResource::initOnvifCapabilitiesAndUrls(
     if (getMediaUrl().isEmpty())
         return CameraDiagnostics::CameraInvalidParams("ONVIF media URL is not filled by camera");
 
-    QString media2ServiceUrl;
-    fetchOnvifMedia2Url(&media2ServiceUrl); //< We ignore the result,
-    // because old devices may not support Device::getServices request.
+    const auto doIgnoreMedia2byPropertyKeyAsString = getProperty(
+        ResourcePropertyKey::kOnvifIgnoreMedia2);
+    const bool doIgnoreMedia2byPropertyKey = doIgnoreMedia2byPropertyKeyAsString.toInt() > 0;
 
-    setMedia2Url(media2ServiceUrl);
+    const auto doIgnoreMedia2byDataKey = resourceData().value<bool>(
+        ResourceDataKey::kOnvifIgnoreMedia2, false);
 
+    if (!(doIgnoreMedia2byPropertyKey || doIgnoreMedia2byDataKey))
+    {
+        QString media2ServiceUrl;
+        fetchOnvifMedia2Url(&media2ServiceUrl); //< We ignore the result,
+        // because old devices may not support Device::getServices request.
+
+        setMedia2Url(media2ServiceUrl);
+    }
     return result;
 }
 
@@ -3359,7 +3368,7 @@ bool QnPlOnvifResource::loadXmlParametersInternal(
     bool result = QnCameraAdvacedParamsXmlParser::readXml(&paramsTemplateFile, params);
 
     if (!result)
-        NX_DEBUG(this, "Error while parsing xml (onvif) %1", paramsTemplateFileName);
+        NX_WARNING(this, "Error while parsing xml (onvif) %1", paramsTemplateFileName);
 
     return result;
 }
@@ -3791,6 +3800,9 @@ void QnPlOnvifResource::stopInputPortStatesMonitoring()
             renewPullCycleFuture.wait();
         }
     }
+
+    if (serverModule()->isStopping())
+        return;
 
     if (QnSoapServer::instance() && QnSoapServer::instance()->getService())
         QnSoapServer::instance()->getService()->removeResourceRegistration(toSharedPointer(this));
@@ -4306,7 +4318,8 @@ bool QnPlOnvifResource::RenewSubscriptionAsOdmThreadSafe()
 
     _oasisWsnB2__Renew request;
 
-    auto interval = resourceData().value<QString>("renewIntervalForPullingAsOdm", "PT2M");
+    auto interval = resourceData().value<QString>(ResourceDataKey::kRenewIntervalForPullingAsOdm,
+        "PT2M");
     std::string odmRenewTerminationTime = interval.toStdString();
     request.TerminationTime = &odmRenewTerminationTime;
 

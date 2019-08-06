@@ -142,7 +142,12 @@ void CameraMotionSettingsWidget::loadState(const CameraSettingsDialogState& stat
     m_cameraId = state.isSingleCamera() ? state.singleCameraProperties.id : QString();
     m_motionHelper->setMotionRegionList(state.singleCameraSettings.motionRegionList());
 
-    ui->motionDetectionCheckBox->setChecked(state.hasMotion());
+    const bool motionStreamEnabled = state.isMotionDetectionStreamEnabled();
+    ui->motionDetectionCheckBox->setChecked(state.isMotionDetectionEnabled());
+    ui->motionDetectionCheckBox->setEnabled(motionStreamEnabled);
+    ui->motionDetectionCheckBox->setToolTip(motionStreamEnabled
+        ? QString()
+        : tr("Motion detection stream is disabled"));
 
     ::setReadOnly(ui->motionDetectionCheckBox, state.readOnly);
     ::setReadOnly(ui->resetMotionRegionsButton, state.readOnly);
@@ -161,7 +166,7 @@ void CameraMotionSettingsWidget::loadState(const CameraSettingsDialogState& stat
 
 void CameraMotionSettingsWidget::loadAlerts(const CameraSettingsDialogState& state)
 {
-    ui->recordingAlertBar->setText(!state.hasMotion() || state.recording.enabled()
+    ui->recordingAlertBar->setText(!state.isMotionDetectionEnabled() || state.recording.enabled()
         ? QString()
         : tr("Motion detection will work only when camera is being viewed. "
             "Enable recording to make it work all the time."));

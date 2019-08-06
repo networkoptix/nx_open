@@ -728,6 +728,7 @@ bool Camera::setOutputPortState(
 
 void Camera::fixInputPortMonitoring()
 {
+    NX_VERBOSE(this, "Input port listener count %1", m_inputPortListenerCount);
     if (isInitialized() && m_inputPortListenerCount)
     {
         if (!m_inputPortListeningInProgress && hasCameraCapabilities(Qn::InputPortCapability))

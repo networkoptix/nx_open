@@ -4,6 +4,7 @@
 #include <functional>
 #include <random>
 #include <nx/utils/thread/mutex.h>
+#include <nx/utils/random_qt_device.h>
 
 namespace nx {
 namespace recorder {
@@ -52,7 +53,7 @@ private:
 
 private:
     SpaceInfoVector m_storageSpaceInfo;
-    std::random_device m_rd;
+    nx::utils::random::QtDevice m_rd;
     mutable std::mt19937 m_gen;
     mutable QnMutex m_mutex;
 };

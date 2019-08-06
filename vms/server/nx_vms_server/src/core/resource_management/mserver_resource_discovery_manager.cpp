@@ -302,7 +302,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
                     NX_ASSERT(newNetRes->resourcePool() == nullptr);
                     newNetRes->setParentId(commonModule()->moduleGUID());
                     newNetRes->setFlags(existCamRes->flags() & ~Qn::foreigner);
-                    newNetRes->setId(existCamRes->getId());
+                    newNetRes->setIdUnsafe(existCamRes->getId());
                     newNetRes->addFlags(Qn::parent_change);
                     if (updateTypeId)
                         newNetRes->setTypeId(newTypeId);

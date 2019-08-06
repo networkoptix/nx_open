@@ -113,6 +113,7 @@ CalendarWorkbenchPanel::CalendarWorkbenchPanel(
     item->setProperty(Qn::NoHandScrollOver, true);
     item->setProperty(Qn::BlockMotionSelection, true);
     item->setZValue(ContentItemZOrder);
+    item->setFocusPolicy(Qt::ClickFocus);
     opacityAnimator(item)->setTimeLimit(kShowHideAnimationPeriodMs);
     m_widget->installEventFilter(item);
     connect(item, &QGraphicsWidget::geometryChanged, this,

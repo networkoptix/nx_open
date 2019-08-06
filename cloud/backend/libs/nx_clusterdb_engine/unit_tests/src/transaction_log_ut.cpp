@@ -23,6 +23,7 @@
 #include <nx/cloud/db/ec2/vms_command_descriptor.h>
 #include <nx/cloud/db/test_support/business_data_generator.h>
 #include <nx/cloud/db/test_support/base_persistent_data_test.h>
+#include <nx/utils/random_qt_device.h>
 
 #include "test_outgoing_transaction_dispatcher.h"
 
@@ -180,7 +181,7 @@ protected:
         if (!m_initialTransaction)
             m_initialTransaction = transaction;
 
-        const auto transactionHash = 
+        const auto transactionHash =
             nx::cloud::db::ec2::command::SaveUser::hash(transaction.params);
         auto transactionSerializer = std::make_unique<
             UbjsonSerializedTransaction<nx::cloud::db::ec2::command::SaveUser>>(
@@ -703,7 +704,7 @@ protected:
         for (int i = 0; i < transactionToAddCount; ++i)
             m_transactionOrder[i] = i;
 
-        std::random_device rd;
+        nx::utils::random::QtDevice rd;
         std::mt19937 g(rd());
         std::shuffle(m_transactionOrder.begin(), m_transactionOrder.end(), g);
 

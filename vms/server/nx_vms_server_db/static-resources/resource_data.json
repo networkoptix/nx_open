@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0.1.92",
+    "version": "1.0.1.96",
     "data": [
         {
             "keys": [
@@ -510,6 +510,12 @@
         },
         {
             "keys": [
+                "*Hikvision*|DS-7716NI-K4"
+            ],
+            "extractHikvisionChannelFromVideoSource": true
+        },
+        {
+            "keys": [
                 "Axis|*"
             ],
             "possibleDefaultCredentials": [
@@ -956,8 +962,12 @@
             "isRTSPSupported": false
         },
         {
-            "keys": ["ArecontVision|20185DN"],
+            "keys": ["ArecontVision|20185DN", "ArecontVision|AV20CPD-118"],
             "forceRtspSupport": true
+        },
+        {
+            "keys": ["ArecontVision|AV20CPD-118"],
+            "totalMdZones": 1024
         },
         {
             "keys": ["ArecontVision|*"],
@@ -3544,6 +3554,13 @@
                     }
                 }
             }
+        },
+        {
+            "_comment1": "Cameras that should not use Media2 (and should not try to detect Media2 support)",
+            "keys": [
+                "Geovision|GV-BX2700"
+            ],
+            "onvifIgnoreMedia2":  true
         }
     ]
 }

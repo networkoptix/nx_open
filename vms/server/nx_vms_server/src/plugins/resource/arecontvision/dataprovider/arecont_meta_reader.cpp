@@ -84,11 +84,14 @@ void ArecontMetaReader::requestIfReady(QnPlAreconVisionResource* resource)
         (!m_lastMetaRequest.isValid() || m_lastMetaRequest.elapsed() > m_minRepeatInterval);
     bool frameIntervalExceeded = m_framesSinceLastMetaData > m_minFrameInterval;
 
-    if (!m_metaDataClientBusy && (repeatIntervalExceeded || frameIntervalExceeded))
+    if (repeatIntervalExceeded || frameIntervalExceeded)
     {
-        m_framesSinceLastMetaData = 0;
-        m_lastMetaRequest.restart();
-        requestAsync(resource);
+        if (!m_metaDataClientBusy.exchange(true))
+        {
+            m_framesSinceLastMetaData = 0;
+            m_lastMetaRequest.restart();
+            requestAsync(resource);
+        }
     }
 }
 
@@ -113,13 +116,15 @@ void ArecontMetaReader::requestAsync(QnPlAreconVisionResource* resource)
         resource->getProperty(lit("MaxSensorWidth")).toInt(),
         resource->getProperty(lit("MaxSensorHeight")).toInt()
     };
-    m_metaDataClientBusy = true;
+
     m_metaDataClient->doGet(url,
         [this, info](nx::network::http::AsyncHttpClientPtr)
         {
             onMetaData(info);
             if (m_channelCount > 1)
                 m_currentChannel = (m_currentChannel + 1) % m_channelCount;
+
+            m_metaDataClient->takeSocket(); //< Close connection.
             m_metaDataClientBusy = false;
         }
     );
