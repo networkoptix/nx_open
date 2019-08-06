@@ -1,6 +1,7 @@
 #pragma once
 
 #include <core/resource/resource.h>
+#include <QtCore/QMetaObject>
 
 class QnCommonModule;
 
@@ -59,7 +60,7 @@ public:
         }
 
         for (const auto& changedProperty: changedProperties)
-            emit propertyChanged(toSharedPointer(this), changedProperty);
+            BaseResource::propertyChanged(toSharedPointer(this), changedProperty);
 
         return true;
     };
