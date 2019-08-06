@@ -30,12 +30,12 @@ static void testRange(
             QString result = "  Details:";
 
             QString expected;
-            for (int i = 0; i < expectedTimestampsMs.size(); ++i)
+            for (int i = 0; i < (int) expectedTimestampsMs.size(); ++i)
                 expected += ((i > 0) ? ", " : "") + QString::number(expectedTimestampsMs[i]);
             result += "\n    Expected packet timestamps: {" + expected + "}";
 
             QString actual;
-            for (int i = 0; i < packets.size(); ++i)
+            for (int i = 0; i < (int) packets.size(); ++i)
                 actual += ((i > 0) ? ", " : "") + QString::number(packets[i]->timestampMs);
             result += "\n    Actual packet timestamps: {" + actual + "}";
 

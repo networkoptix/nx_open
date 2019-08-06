@@ -47,7 +47,8 @@ private:
         const QString& additionalInfo);
 
 public: //< Intended for unit tests.
-    MetadataLogger(const QString& filename)
+    MetadataLogger(const QString& filename): m_isAlwaysEnabled(true)
+
     {
         NX_CRITICAL(!filename.isEmpty());
         m_outputFile.setFileName(filename);
@@ -56,6 +57,7 @@ public: //< Intended for unit tests.
     }
 
 private:
+    bool m_isAlwaysEnabled = false;
     QFile m_outputFile;
 
     bool m_isLoggingBestShot = false;

@@ -139,7 +139,7 @@ void MetadataLogger::pushData(
     const QnConstAbstractMediaDataPtr& data,
     const QString& additionalInfo)
 {
-    if (!data || !loggingIni().isLoggingEnabled())
+    if (!data || (!m_isAlwaysEnabled && !loggingIni().isLoggingEnabled()))
         return;
 
     if (data->dataType == QnAbstractMediaData::DataType::VIDEO)
@@ -161,7 +161,7 @@ void MetadataLogger::pushFrameInfo(
     const FrameInfo& frameInfo,
     const QString& additionalInfo)
 {
-    if (!loggingIni().isLoggingEnabled())
+    if (!m_isAlwaysEnabled && !loggingIni().isLoggingEnabled())
         return;
 
     logLine(buildFrameLogString(frameInfo, buildAdditionalInfoStr(__func__, additionalInfo)));
@@ -180,7 +180,7 @@ void MetadataLogger::doPushObjectMetadata(
     const ObjectMetadataPacket& metadataPacket,
     const QString& additionalInfo)
 {
-    if (!loggingIni().isLoggingEnabled())
+    if (!m_isAlwaysEnabled && !loggingIni().isLoggingEnabled())
         return;
 
     m_isLoggingBestShot = false;
