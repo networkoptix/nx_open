@@ -11,7 +11,7 @@ ListView
 
     property real scrollStepSize: 20 //< In pixels.
     property color hoverHighlightColor: "grey"
-    readonly property Item hoveredItem: d.hoveredItem
+    readonly property Item hoveredItem: mouseArea.hoveredItem
 
     boundsBehavior: Flickable.StopAtBounds
     interactive: false
@@ -24,20 +24,20 @@ ListView
         parent: listView.contentItem
         color: listView.hoverHighlightColor
 
-        visible: d.hoveredItem
-            && (!d.hoveredItem.hasOwnProperty("isSelectable") || d.hoveredItem.isSelectable)
+        visible: hoveredItem
+            && (!hoveredItem.hasOwnProperty("isSelectable") || hoveredItem.isSelectable)
 
         Connections
         {
-            target: d
+            target: listView
 
             onHoveredItemChanged:
             {
-                if (!d.hoveredItem)
+                if (!hoveredItem)
                     return
 
-                var rect = listView.contentItem.mapFromItem(d.hoveredItem,
-                    0, 0, d.hoveredItem.width, d.hoveredItem.height)
+                var rect = listView.contentItem.mapFromItem(listView.hoveredItem,
+                    0, 0, listView.hoveredItem.width, listView.hoveredItem.height)
 
                 hoverHighlight.x = rect.x
                 hoverHighlight.y = rect.y
@@ -50,15 +50,19 @@ ListView
     ScrollBar.vertical: ScrollBar
     {
         id: scrollBar
-        stepSize: scrollStepSize / listView.height
+        stepSize: scrollStepSize / listView.contentHeight
     }
 
     MouseArea
     {
+        id: mouseArea
+
+        property Item hoveredItem: null
+
         acceptedButtons: Qt.LeftButton
-        parent: listView.contentItem
         anchors.fill: parent
         hoverEnabled: true
+        z: -1
 
         onWheel:
         {
@@ -69,15 +73,9 @@ ListView
         }
 
         onPositionChanged:
-            d.hoveredItem = listView.itemAt(mouse.x, mouse.y)
+            hoveredItem = listView.itemAt(mouse.x, mouse.y)
 
         onExited:
-            d.hoveredItem = null
-    }
-
-    QtObject
-    {
-        id: d
-        property Item hoveredItem: null
+            hoveredItem = null
     }
 }

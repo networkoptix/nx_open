@@ -11,6 +11,9 @@ void registerQmlType()
         "RightPanel", "RightPanel is a namespace");
 
     qRegisterMetaType<Tab>();
+    qRegisterMetaType<FetchDirection>();
+    qRegisterMetaType<FetchResult>();
+    qRegisterMetaType<PreviewState>();
 }
 
 } // namespace RightPanel

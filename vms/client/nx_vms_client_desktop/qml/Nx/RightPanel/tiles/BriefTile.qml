@@ -10,7 +10,7 @@ TileBase
 
     contentItem: ColumnLayout
     {
-        spacing: 4
+        spacing: 6
 
         Layout.topMargin: 0
 
@@ -32,11 +32,23 @@ TileBase
                 Layout.alignment: Qt.AlignRight | Qt.AlignTop
 
                 color: tile.palette.windowText
-                visible: text.length && !tile.hovered
+                visible: text.length
                 font { pixelSize: 11; weight: Font.Normal }
 
                 text: (model && model.timestamp) || ""
             }
+        }
+
+        Preview
+        {
+            id: preview
+
+            Layout.fillWidth: true
+
+            previewId: (model && model.previewId) || ""
+            previewState: (model && model.previewState) || 0
+            previewAspectRatio: (model && model.previewAspectRatio) || 1
+            visible: (model && model.previewResource) || false
         }
     }
 }

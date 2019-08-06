@@ -41,6 +41,7 @@
 #include <nx/cloud/db/api/system_data.h>
 #include <api/server_rest_connection.h>
 
+#include <nx/vms/client/desktop/event_search/right_panel_globals.h>
 #include <nx/vms/client/desktop/resource_properties/camera/widgets/motion_regions_item.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
@@ -52,7 +53,6 @@
 #include <nx/vms/client/desktop/ui/common/recording_status_helper.h>
 #include <nx/vms/client/desktop/ui/scene/models/layout_model.h>
 #include <nx/vms/client/desktop/ui/scene/models/resource_tree_model_adapter.h>
-#include <nx/vms/client/desktop/ui/right_panel/right_panel_globals.h>
 #include <nx/vms/client/desktop/ui/right_panel/models/right_panel_models_adapter.h>
 #include <nx/vms/client/desktop/ui/scene/instruments/instrument.h>
 #include <nx/vms/client/desktop/ui/scene/item_model_utils.h>

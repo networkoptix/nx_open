@@ -8,6 +8,8 @@ TileBase
 {
     id: tile
 
+    readonly property bool isCloseable: (model && model.isCloseable) || false
+
     signal closeRequested()
 
     contentItem: RowLayout
@@ -21,12 +23,12 @@ TileBase
 
             width: 20
             height: 20
-            fillMode: Image.Pad
+            sourceSize: Qt.size(width, height)
             Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
 
             readonly property string decorationPath: (model && model.decorationPath) || ""
             source: decorationPath.length ? ("qrc:/skin/" + decorationPath) : ""
-            color: (model && model.foregroundColor) || tile.palette.light
+            color: caption.color
         }
 
         ColumnLayout
@@ -48,10 +50,10 @@ TileBase
                     Layout.alignment: Qt.AlignLeft | Qt.AlignTop
                     Layout.fillWidth: true
                     wrapMode: Text.Wrap
-                    color: icon.color
+                    color: (model && model.foregroundColor) || tile.palette.light
                     font { pixelSize: 13; weight: Font.Medium }
 
-                    rightPadding: (model.isCloseable && !timestamp.text.length)
+                    rightPadding: (isCloseable && !timestamp.text.length)
                         ? closeButton.width
                         : 0
 
@@ -67,7 +69,7 @@ TileBase
 
                     topPadding: 2
                     color: tile.palette.windowText
-                    visible: text.length && !tile.hovered
+                    visible: implicitWidth && implicitHeight && !closeButton.visible
                     font { pixelSize: 11; weight: Font.Normal }
 
                     text: (model && model.timestamp) || ""
@@ -79,6 +81,46 @@ TileBase
                 id: resourceList
                 resourceNames: model && model.resourceList
             }
+
+            Preview
+            {
+                id: preview
+
+                Layout.fillWidth: true
+
+                previewId: (model && model.previewId) || ""
+                previewState: (model && model.previewState) || 0
+                previewAspectRatio: (model && model.previewAspectRatio) || 1
+                visible: (model && model.previewResource) || false
+            }
+
+            Text
+            {
+                id: description
+
+                Layout.fillWidth: true
+                wrapMode: Text.Wrap
+                color: tile.palette.light
+                font { pixelSize: 11; weight: Font.Normal }
+                visible: implicitWidth && implicitHeight
+                textFormat: Text.RichText
+
+                text: (model && model.description) || ""
+            }
+
+            Text
+            {
+                id: footer
+
+                Layout.fillWidth: true
+                wrapMode: Text.Wrap
+                color: tile.palette.light
+                font { pixelSize: 11; weight: Font.Normal }
+                visible: implicitWidth && implicitHeight
+                textFormat: Text.RichText
+
+                text: (model && model.additionalText) || ""
+            }
         }
     }
 
@@ -86,7 +128,7 @@ TileBase
     {
         id: closeButton
 
-        visible: tile.hovered && model.isCloseable
+        visible: isCloseable && tile.hovered
 
         anchors.right: parent.right
         anchors.rightMargin: 2

@@ -3,6 +3,8 @@ import QtQuick.Controls 2.4
 
 import Nx.Controls 1.0
 
+import nx.vms.client.desktop 1.0
+
 ListView
 {
     id: view
@@ -13,8 +15,6 @@ ListView
     hoverHighlightColor: "transparent"
     spacing: 1
     clip: true
-
-    ScrollBar.vertical: ScrollBar {}
 
     delegate: Loader
     {
@@ -37,14 +37,9 @@ ListView
                 : "tiles/InfoTile.qml"
         }
 
-        function updateBeingRead()
-        {
-            if (visible)
-                view.model.setRead(index)
-        }
-
-        Component.onCompleted: updateBeingRead()
-        onVisibleChanged: updateBeingRead()
+        onVisibleChanged: model.visible = visible
+        Component.onCompleted: model.visible = visible
+        Component.onDestruction: model.visible = false
 
         Connections
         {
@@ -117,4 +112,35 @@ ListView
     // Paddings inside viewport.
     header: Item { height: 8; width: parent.width }
     footer: Item { height: 8; width: parent.width }
+
+    onContentYChanged: requestFetchIfNeeded()
+
+    onVisibleChanged:
+    {
+        requestFetchIfNeeded()
+
+        if (view.model)
+            view.model.setLivePaused(!visible)
+    }
+
+    Connections
+    {
+        target: view.model
+        onDataNeeded: view.requestFetchIfNeeded()
+    }
+
+    function requestFetchIfNeeded()
+    {
+        if (!view.model || !view.visible)
+            return
+
+        if (view.atYEnd || count === 0)
+            view.model.setFetchDirection(RightPanel.FetchDirection.earlier)
+        else if (view.atYBeginning)
+            view.model.setFetchDirection(RightPanel.FetchDirection.later)
+        else
+            return
+
+        view.model.requestFetch()
+    }
 }
