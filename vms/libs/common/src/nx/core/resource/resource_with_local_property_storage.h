@@ -34,6 +34,7 @@ public:
     {
         QnMutexLocker lock(&m_mutex);
         m_properties[key] = value;
+        m_changedProperties.insert(key);
         return true;
     }
 
@@ -44,11 +45,22 @@ public:
     {
         QnMutexLocker lock(&m_mutex);
         m_properties[key] = value.toString();
+        m_changedProperties.insert(key);
         return true;
     }
 
     virtual bool saveProperties() override
     {
+        std::set<QString> changedProperties;
+        {
+            QnMutexLocker lock(&m_mutex);
+            changedProperties = std::move(m_changedProperties);
+            m_changedProperties.clear();
+        }
+
+        for (const auto& changedProperty: changedProperties)
+            emit propertyChanged(toSharedPointer(this), changedProperty);
+
         return true;
     };
 
@@ -60,6 +72,7 @@ public:
 private:
     mutable QnMutex m_mutex;
     std::map<QString, QString> m_properties;
+    mutable std::set<QString> m_changedProperties;
 };
 
 } // namespace nx::core::resource
