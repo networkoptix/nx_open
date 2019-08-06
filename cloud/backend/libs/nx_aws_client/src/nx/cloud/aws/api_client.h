@@ -93,6 +93,11 @@ private:
         std::unique_ptr<nx::network::http::AbstractMsgBodySource> body = nullptr);
 
     ResultCode getResultCode(const nx::network::http::AsyncClient& httpClient) const;
+
+    void getBucketSizeInternal(
+        int runningTotalSize,
+        const std::string& continuationToken,
+        nx::utils::MoveOnlyFunc<void(Result, int/*bytes*/)> handler);
 };
 
 } // namespace nx::cloud::aws

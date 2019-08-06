@@ -117,41 +117,7 @@ void ApiClient::getLocation(
 void nx::cloud::aws::ApiClient::getBucketSize(
     nx::utils::MoveOnlyFunc<void(Result, int)> handler)
 {
-    QString prefix;
-    auto path = m_url.path();
-    if (!path.isEmpty())
-        prefix = QString("&prefix=") + (path[0] == '/' ? path.mid(1) : path);
-
-    auto url =
-        nx::network::url::Builder(m_url).setPath(http::kRootPath)
-            .setQuery("list_type=2" + prefix);
-
-    doAwsApiCall(
-        nx::network::http::Method::get,
-        url,
-        [this, handler = std::move(handler)](auto httpClient)
-        {
-            auto resultCode = getResultCode(*httpClient);
-            if (resultCode != ResultCode::ok)
-            {
-                return handler(
-                    Result(resultCode, httpClient->fetchMessageBodyBuffer().constData()),
-                    0);
-            }
-            api::ListBucketResult listBucketResult;
-            if (!api::xml::deserialize(httpClient->fetchMessageBodyBuffer(), &listBucketResult))
-            {
-                return handler(
-                    Result(ResultCode::error, "Failed to deserialize ListBucketResult"),
-                    0);
-            }
-
-            int size = 0;
-            for(const auto& object: listBucketResult.contents)
-                size += object.size;
-
-            handler(ResultCode::ok, size);
-        });
+    getBucketSizeInternal(0, {}, std::move(handler));
 }
 
 void ApiClient::stopWhileInAioThread()
@@ -264,6 +230,56 @@ ResultCode ApiClient::getResultCode(const nx::network::http::AsyncClient& httpCl
     }
 
     return ResultCode::ok;
+}
+
+void ApiClient::getBucketSizeInternal(
+    int runningTotalSize,
+    const std::string& continuationToken,
+    nx::utils::MoveOnlyFunc<void(Result, int)> handler)
+{
+    QString query = "list_type=2";
+    auto path = m_url.path();
+    if (!path.isEmpty())
+        query += QString("&prefix=") + (path[0] == '/' ? path.mid(1) : path);
+
+    if (!continuationToken.empty())
+        query += QString("&continuation-token=") + continuationToken.c_str();
+
+    auto url = nx::network::url::Builder(m_url).setPath(http::kRootPath).setQuery(query);
+
+    doAwsApiCall(
+        nx::network::http::Method::get,
+        url,
+        [this, handler = std::move(handler), runningTotalSize](auto httpClient) mutable
+    {
+        auto resultCode = getResultCode(*httpClient);
+        if (resultCode != ResultCode::ok)
+        {
+            return handler(
+                Result(resultCode, httpClient->fetchMessageBodyBuffer().constData()),
+                0);
+        }
+
+        api::ListBucketResult listBucketResult;
+        if (!api::xml::deserialize(httpClient->fetchMessageBodyBuffer(), &listBucketResult))
+        {
+            return handler(
+                Result(ResultCode::error, "Failed to deserialize ListBucketResult"),
+                0);
+        }
+
+        int size = runningTotalSize;
+        for(const auto& content: listBucketResult.contents)
+            size += content.size;
+
+        if (!listBucketResult.isTruncated)
+            return handler(ResultCode::ok, size);
+
+        if (listBucketResult.nextContinuationToken.empty())
+            return handler(Result(ResultCode::error, "Missing continuation token"), 0);
+
+        getBucketSizeInternal(size, listBucketResult.nextContinuationToken, std::move(handler));
+    });
 }
 
 } // namespace nx::cloud::aws
