@@ -6,6 +6,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <utils/common/value_cache.h>
 #include <common/common_module_aware.h>
+#include <common/common_module.h>
 
 namespace nx::analytics {
 
