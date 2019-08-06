@@ -249,7 +249,7 @@ int RootFileSystem::open(const QString& path, QIODevice::OpenMode mode)
 {
     int sysFlags = 0;
 
-    #if defined(Q_OS_LINUX)
+    #if defined(Q_OS_LINUX) || defined(Q_OS_MAC)
         sysFlags = makeUnixOpenFlags(mode);
     #endif
 
