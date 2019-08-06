@@ -30,7 +30,7 @@ public:
         Qn::ConnectionRole role);
 
 signals:
-    void dataDropped(QnArchiveStreamReader* reader);
+    void dataDropped();
 
 protected:
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
