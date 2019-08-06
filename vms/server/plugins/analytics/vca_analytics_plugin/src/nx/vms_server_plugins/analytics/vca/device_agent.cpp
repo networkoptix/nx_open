@@ -430,12 +430,13 @@ void DeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
 }
 
 
-Result<void> DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes)
+void DeviceAgent::doSetNeededMetadataTypes(
+    Result<void>* outResult, const IMetadataTypes* neededMetadataTypes)
 {
-    if (metadataTypes->isEmpty())
+    if (neededMetadataTypes->isEmpty())
         stopFetchingMetadata();
 
-    return startFetchingMetadata(metadataTypes);
+    *outResult = startFetchingMetadata(neededMetadataTypes);
 }
 
 Result<void> DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTypes)
@@ -446,7 +447,7 @@ Result<void> DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTy
     if (auto error = prepare(vcaCameraConrtoller))
         return std::move(error.value());
 
-    const auto eventTypeIds = toPtr(metadataTypes->eventTypeIds());
+    const auto eventTypeIds = metadataTypes->eventTypeIds();
     if (const char* const kMessage = "Event type id list is nullptr";
         !NX_ASSERT(eventTypeIds, kMessage))
     {
@@ -505,7 +506,7 @@ void DeviceAgent::stopFetchingMetadata()
     }
 }
 
-StringResult DeviceAgent::manifest() const
+void DeviceAgent::getManifest(Result<const IString*>* outResult) const
 {
     // If camera has no enabled events at the moment, return empty manifest.
     QString host = m_url.host();
@@ -516,21 +517,24 @@ StringResult DeviceAgent::manifest() const
     for (const auto& rule : vcaCameraConrtoller.suppotedRules())
     {
         if (rule.second.ruleEnabled) //< At least one enabled rule.
-            return new nx::sdk::String(m_cameraManifest);
+        {
+            *outResult = new nx::sdk::String(m_cameraManifest);
+            return;
+        }
     }
 
-    return error(ErrorCode::otherError, "No rules are enabled on the device");
+    *outResult = error(ErrorCode::otherError, "No rules are enabled on the device");
 }
 
-StringMapResult DeviceAgent::setSettings(const IStringMap* /*settings*/)
+void DeviceAgent::doSetSettings(
+    Result<const IStringMap*>* /*outResult*/, const IStringMap* /*settings*/)
 {
     // There are no DeviceAgent settings for this plugin.
-    return nullptr;
 }
 
-SettingsResponseResult DeviceAgent::pluginSideSettings() const
+void DeviceAgent::getPluginSideSettings(
+    Result<const ISettingsResponse*>* /*outResult*/) const
 {
-    return nullptr;
 }
 
 } // namespace vca

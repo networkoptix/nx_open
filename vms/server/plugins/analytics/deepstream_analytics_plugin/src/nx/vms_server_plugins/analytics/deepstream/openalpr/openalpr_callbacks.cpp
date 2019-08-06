@@ -16,7 +16,7 @@ extern "C" {
 #include <nx/vms_server_plugins/analytics/deepstream/openalpr/openalpr_pipeline.h>
 #include <nx/vms_server_plugins/analytics/deepstream/openalpr_common.h>
 #include <nx/sdk/helpers/uuid_helper.h>
-#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/ptr.h>
 
 #include <nx/sdk/analytics/helpers/object_metadata.h>
 #include <nx/sdk/analytics/helpers/object_metadata_packet.h>

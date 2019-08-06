@@ -1,5 +1,9 @@
 #pragma once
 
+#include <memory>
+
+#include <QtCore/QObject>
+
 #include <nx/analytics/types.h>
 
 #include <nx/vms/api/analytics/descriptors.h>
@@ -10,12 +14,13 @@
 
 namespace nx::analytics {
 
-class PluginDescriptorManager: public /*mixin*/ QnCommonModuleAware
+class PluginDescriptorManager: public QObject, public /*mixin*/ QnCommonModuleAware
 {
-    using base_type = QnCommonModuleAware;
+    using base_type = QObject;
+    Q_OBJECT
 
 public:
-    PluginDescriptorManager(QnCommonModule* commonModule);
+    explicit PluginDescriptorManager(QObject* parent = nullptr);
 
     std::optional<nx::vms::api::analytics::PluginDescriptor> descriptor(
         const PluginId& pluginId) const;
@@ -25,7 +30,7 @@ public:
     void updateFromPluginManifest(const nx::vms::api::analytics::PluginManifest& manifest);
 
 private:
-    PluginDescriptorContainer m_pluginDescriptorContainer;
+    std::unique_ptr<PluginDescriptorContainer> m_pluginDescriptorContainer;
 };
 
 } // namespace nx::analytics

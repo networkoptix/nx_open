@@ -8,7 +8,7 @@
 #include <nx/sdk/interface.h>
 #include <nx/sdk/helpers/ref_countable.h>
 #include <nx/sdk/helpers/to_string.h>
-#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/ptr.h>
 #include <nx/sdk/helpers/string_map.h>
 #include <nx/sdk/helpers/device_info.h>
 #include <nx/sdk/helpers/string.h>
@@ -38,11 +38,12 @@ template<typename Value>
 struct ResultHolder
 {
 public:
-    ResultHolder(Result<Value>&& result): result(std::move(result)) {};
+    ResultHolder(Result<Value>&& result): result(std::move(result)) {}
+
     ~ResultHolder()
     {
-        toPtr(result.value);
-        toPtr(result.error.errorMessage);
+        toPtr(result.value()); //< releaseRef
+        toPtr(result.error().errorMessage()); //< releaseRef
     }
 
     bool isOk() const { return result.isOk(); }
@@ -53,8 +54,9 @@ public:
 class VoidResultHolder
 {
 public:
-    VoidResultHolder(Result<void>&& result): result(std::move(result)) {};
-    ~VoidResultHolder() { toPtr(result.error.errorMessage); }
+    VoidResultHolder(Result<void>&& result): result(std::move(result)) {}
+
+    ~VoidResultHolder() { toPtr(result.error().errorMessage()); /*< releaseRef */ }
 
     bool isOk() const { return result.isOk(); }
 
@@ -76,10 +78,10 @@ static std::string trimString(const std::string& s)
 
 static void testEngineManifest(IEngine* engine)
 {
-    const ResultHolder<const IString*> result = engine->manifest();
+    const ResultHolder<const IString*> result{engine->manifest()};
 
     ASSERT_TRUE(result.isOk());
-    const auto manifest = result.result.value;
+    const auto manifest = result.result.value();
     ASSERT_TRUE(manifest);
 
     const char* const manifestStr = manifest->str();
@@ -97,10 +99,10 @@ static void testEngineManifest(IEngine* engine)
 
 static void testDeviceAgentManifest(IDeviceAgent* deviceAgent)
 {
-    const ResultHolder<const IString*> result = deviceAgent->manifest();
+    const ResultHolder<const IString*> result{deviceAgent->manifest()};
     ASSERT_TRUE(result.isOk());
 
-    const auto manifest = result.result.value;
+    const auto manifest = result.result.value();
     ASSERT_TRUE(manifest);
     const char* manifestStr = manifest->str();
     ASSERT_TRUE(manifestStr != nullptr);
@@ -120,15 +122,15 @@ static void testEngineSettings(IEngine* engine)
 
     {
         // Test assigning empty settings.
-        const ResultHolder<const IStringMap*> result =
-            engine->setSettings(makePtr<StringMap>().get());
+        const ResultHolder<const IStringMap*> result{
+            engine->setSettings(makePtr<StringMap>().get())};
         ASSERT_TRUE(result.isOk());
     }
 
     {
         // Test assigning some settings
-        const ResultHolder<const IStringMap*> result =
-            engine->setSettings(settings.get());
+        const ResultHolder<const IStringMap*> result{
+            engine->setSettings(settings.get())};
         ASSERT_TRUE(result.isOk());
     }
 }
@@ -141,15 +143,15 @@ static void testDeviceAgentSettings(IDeviceAgent* deviceAgent)
 
     {
         // Test assigning empty settings.
-        const ResultHolder<const IStringMap*> result =
-            deviceAgent->setSettings(makePtr<StringMap>().get());
+        const ResultHolder<const IStringMap*> result{
+            deviceAgent->setSettings(makePtr<StringMap>().get())};
         ASSERT_TRUE(result.isOk());
     }
 
     {
         // Test assigning some settings.
-        const ResultHolder<const IStringMap*> result =
-            deviceAgent->setSettings(settings.get());
+        const ResultHolder<const IStringMap*> result{
+            deviceAgent->setSettings(settings.get())};
         ASSERT_TRUE(result.isOk());
     }
     // TODO: Add test for assigning expected settings.
@@ -161,12 +163,10 @@ public:
     Action(): m_params(makePtr<StringMap>()) {}
 
     virtual const char* actionId() const override { return m_actionId.c_str(); }
-    virtual Uuid objectTrackId() const override { return m_objectTrackId; }
-    virtual Uuid deviceId() const override { return m_deviceId; }
-    virtual IObjectTrackInfo* objectTrackInfo() const override { return nullptr; }
+
     virtual int64_t timestampUs() const override { return m_timestampUs; }
 
-    virtual const IStringMap* params() const override
+    virtual const IStringMap* getParams() const override
     {
         if (!m_params)
             return nullptr;
@@ -202,7 +202,6 @@ public:
         }
     }
 
-public:
     void assertExpectedState() const
     {
         ASSERT_FALSE(
@@ -216,6 +215,11 @@ public:
         for (const auto& param: params)
             m_params->setItem(param.first, param.second);
     }
+
+protected:
+    virtual IObjectTrackInfo* getObjectTrackInfo() const override { return nullptr; }
+    virtual void getObjectTrackId(Uuid* outValue) const override { *outValue = m_objectTrackId; }
+    virtual void getDeviceId(Uuid* outValue) const override { *outValue = m_deviceId; }
 
 public:
     std::string m_actionId;
@@ -235,7 +239,7 @@ static void testExecuteActionNonExisting(IEngine* engine)
     auto action = makePtr<Action>();
     action->m_actionId = "non_existing_actionId";
 
-    const VoidResultHolder result = engine->executeAction(action.get());
+    const VoidResultHolder result{engine->executeAction(action.get())};
     ASSERT_TRUE(!result.isOk());
     action->assertExpectedState();
 }
@@ -253,7 +257,7 @@ static void testExecuteActionAddToList(IEngine* engine)
     });
     action->m_expectedNonNullMessageToUser = true;
 
-    const VoidResultHolder result = engine->executeAction(action.get());
+    const VoidResultHolder result{engine->executeAction(action.get())};
     ASSERT_TRUE(result.isOk());
     action->assertExpectedState();
 }
@@ -265,7 +269,7 @@ static void testExecuteActionAddPerson(IEngine* engine)
     action->m_objectTrackId = Uuid();
     action->m_expectedNonNullActionUrl = true;
 
-    const VoidResultHolder result = engine->executeAction(action.get());
+    const VoidResultHolder result{engine->executeAction(action.get())};
     ASSERT_TRUE(result.isOk());
     action->assertExpectedState();
 }
@@ -312,11 +316,13 @@ public:
     virtual const char* codec() const override { return "test_stub_codec"; }
     virtual const char* data() const override { return m_data.data(); }
     virtual int dataSize() const override { return (int) m_data.size(); }
-    virtual const IMediaContext* context() const override { return nullptr; }
     virtual MediaFlags flags() const override { return MediaFlags::none; }
 
     virtual int width() const override { return 256; }
     virtual int height() const override { return 128; }
+
+protected:
+    virtual const IMediaContext* getContext() const override { return nullptr; }
 
 private:
     const std::vector<char> m_data = std::vector<char>(width() * height(), /*dummy*/ 42);
@@ -326,7 +332,7 @@ class UtilityProvider: public RefCountable<IUtilityProvider>
 {
 public:
     virtual int64_t vmsSystemTimeSinceEpochMs() const override { return 0; }
-    virtual const nx::sdk::IString* homeDir() const override { return new nx::sdk::String(); }
+    virtual const nx::sdk::IString* getHomeDir() const override { return new nx::sdk::String(); }
 };
 
 class Handler: public nx::sdk::RefCountable<nx::sdk::analytics::IDeviceAgent::IHandler>
@@ -351,25 +357,22 @@ TEST(stub_analytics_plugin, test)
 
     const auto pluginObject = toPtr(createNxPlugin());
     ASSERT_TRUE(pluginObject);
-    ASSERT_TRUE(queryInterfacePtr<IRefCountable>(pluginObject));
-    ASSERT_TRUE(queryInterfacePtr<nx::sdk::IPlugin>(pluginObject));
-    const auto plugin = queryInterfacePtr<nx::sdk::analytics::IPlugin>(pluginObject);
+    ASSERT_TRUE(pluginObject->queryInterface<IRefCountable>());
+    ASSERT_TRUE(pluginObject->queryInterface<nx::sdk::IPlugin>());
+    const auto plugin = pluginObject->queryInterface<nx::sdk::analytics::IPlugin>();
     ASSERT_TRUE(plugin);
 
-    const auto utilityProvider = makePtr<UtilityProvider>();
-    plugin->setUtilityProvider(utilityProvider.get());
+    plugin->setUtilityProvider(makePtr<UtilityProvider>().get());
 
-    const ResultHolder<IEngine*> result = plugin->createEngine();
+    const ResultHolder<IEngine*> result{plugin->createEngine()};
     ASSERT_TRUE(result.isOk());
 
-    const auto engine = result.result.value;
+    const auto engine = result.result.value();
     ASSERT_TRUE(engine);
-    ASSERT_TRUE(queryInterfacePtr<IEngine>(engine));
-
-    ASSERT_EQ(plugin.get(), engine->plugin());
+    ASSERT_TRUE(engine->queryInterface<IEngine>());
 
     testEngineManifest(engine);
-    testEngineSettings(engine);
+ LL testEngineSettings(engine);
 
     testExecuteActionNonExisting(engine);
     testExecuteActionAddToList(engine);
@@ -377,13 +380,14 @@ TEST(stub_analytics_plugin, test)
 
     const auto deviceInfo = makePtr<DeviceInfo>();
     deviceInfo->setId("TEST");
-    const ResultHolder<IDeviceAgent*> deviceAgentResult = engine->obtainDeviceAgent(deviceInfo.get());
+    const ResultHolder<IDeviceAgent*> deviceAgentResult{
+        engine->obtainDeviceAgent(deviceInfo.get())};
     ASSERT_TRUE(deviceAgentResult.isOk());
 
-    const auto baseDeviceAgent = deviceAgentResult.result.value;
+    const auto baseDeviceAgent = deviceAgentResult.result.value();
     ASSERT_TRUE(baseDeviceAgent);
-    ASSERT_TRUE(queryInterfacePtr<IDeviceAgent>(baseDeviceAgent));
-    const auto deviceAgent = queryInterfacePtr<IConsumingDeviceAgent>(baseDeviceAgent);
+    ASSERT_TRUE(baseDeviceAgent->queryInterface<IDeviceAgent>());
+    const auto deviceAgent = baseDeviceAgent->queryInterface<IConsumingDeviceAgent>();
     ASSERT_TRUE(deviceAgent);
 
     deviceAgent->setHandler(makePtr<DeviceAgentHandler>().get());
@@ -394,13 +398,13 @@ TEST(stub_analytics_plugin, test)
     deviceAgent->setHandler(handler.get());
 
     const auto metadataTypes = makePtr<MetadataTypes>();
-    const VoidResultHolder setNeededMetadataTypesResult =
-        deviceAgent->setNeededMetadataTypes(metadataTypes.get());
+    const VoidResultHolder setNeededMetadataTypesResult{
+        deviceAgent->setNeededMetadataTypes(metadataTypes.get())};
     ASSERT_TRUE(setNeededMetadataTypesResult.isOk());
 
     const auto compressedVideoPacket = makePtr<CompressedVideoPacket>();
-    const VoidResultHolder pushDataPacketResult =
-        deviceAgent->pushDataPacket(compressedVideoPacket.get());
+    const VoidResultHolder pushDataPacketResult{
+        deviceAgent->pushDataPacket(compressedVideoPacket.get())};
     ASSERT_TRUE(pushDataPacketResult.isOk());
 }
 

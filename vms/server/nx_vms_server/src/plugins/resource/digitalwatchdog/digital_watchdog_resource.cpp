@@ -295,8 +295,7 @@ bool QnDigitalWatchdogResource::setAdvancedParametersUnderLock(
                 else
                     success = false;
             }
-            else if (const auto baseResult
-                = base_type::setAdvancedParameterUnderLock(parameter, value.value))
+            else if (base_type::setAdvancedParameterUnderLock(parameter, value.value))
             {
                 result << value;
             }

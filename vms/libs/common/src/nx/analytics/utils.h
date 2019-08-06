@@ -27,9 +27,9 @@ std::map<QString, Descriptor> fromManifestItemListToDescriptorMap(
 }
 
 template <typename Container, typename Key>
-auto fetchDescriptor(const Container& container, const Key& id)
+auto fetchDescriptor(const Container* container, const Key& id)
 {
-    return container.mergedDescriptors(id);
+    return container->mergedDescriptors(id);
 }
 
 template <typename Key, typename Value>
@@ -47,12 +47,12 @@ void filterByIds(std::map<Key, Value>* inOutMapToFilter, const std::set<Key>& ke
 
 template <typename Container, typename KeyType>
 auto fetchDescriptors(
-    const Container& container,
+    const Container* container,
     const std::set<KeyType>& ids,
     const QString& descriptorTypeName)
 {
-    using ReturnType = typename decltype(container.mergedDescriptors())::value_type;
-    auto typeDescriptors = container.mergedDescriptors();
+    using ReturnType = typename decltype(container->mergedDescriptors())::value_type;
+    auto typeDescriptors = container->mergedDescriptors();
     if (!typeDescriptors)
         return ReturnType();
 
@@ -65,16 +65,10 @@ auto fetchDescriptors(
 }
 
 template <typename Container>
-Container makeContainer(QnCommonModule* commonModule, QString propertyName)
+std::unique_ptr<Container> makeContainer(QnCommonModule* commonModule, QString propertyName)
 {
-    const auto resourcePool = commonModule->resourcePool();
-    auto servers = resourcePool->getAllServers(Qn::AnyStatus);
-
-    const auto moduleGuid = commonModule->moduleGUID();
-    auto ownResource = resourcePool->getResourceById<QnMediaServerResource>(moduleGuid);
-
     auto factory = typename Container::StorageFactory(std::move(propertyName));
-    return Container(std::move(factory), servers, ownResource);
+    return std::make_unique<Container>(commonModule, std::move(factory));
 }
 
 std::set<EventTypeId> supportedEventTypeIdsFromManifest(

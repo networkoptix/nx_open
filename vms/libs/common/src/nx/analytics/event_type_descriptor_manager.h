@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QtCore/QObject>
+
 #include <nx/analytics/types.h>
 
 #include <nx/vms/api/analytics/descriptors.h>
@@ -11,12 +13,13 @@
 
 namespace nx::analytics {
 
-class EventTypeDescriptorManager: public /*mixin*/ QnCommonModuleAware
+class EventTypeDescriptorManager: public QObject, public /*mixin*/ QnCommonModuleAware
 {
-    using base_type = QnCommonModuleAware;
+    using base_type = QObject;
+    Q_OBJECT
 
 public:
-    EventTypeDescriptorManager(QnCommonModule* commonModule);
+    explicit EventTypeDescriptorManager(QObject* parent = nullptr);
 
     std::optional<nx::vms::api::analytics::EventTypeDescriptor> descriptor(
         const EventTypeId& id) const;
@@ -72,9 +75,9 @@ private:
         const std::set<EventTypeId>& eventTypeIds) const;
 
 private:
-    EventTypeDescriptorContainer m_eventTypeDescriptorContainer;
-    EngineDescriptorContainer m_engineDescriptorContainer;
-    GroupDescriptorContainer m_groupDescriptorContainer;
+    std::unique_ptr<EventTypeDescriptorContainer> m_eventTypeDescriptorContainer;
+    std::unique_ptr<EngineDescriptorContainer> m_engineDescriptorContainer;
+    std::unique_ptr<GroupDescriptorContainer> m_groupDescriptorContainer;
 };
 
 } // namespace nx::analytics

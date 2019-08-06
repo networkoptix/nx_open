@@ -3,7 +3,7 @@
 #include <nx/kit/debug.h>
 #include <nx/utils/log/log.h>
 
-#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/ptr.h>
 #include <nx/vms_server_plugins/utils/uuid.h>
 
 #include <nx/vms/event/events/events.h>
@@ -56,27 +56,27 @@ std::optional<EventTypeDescriptor> MetadataHandler::eventTypeDescriptor(
 
 void MetadataHandler::handleMetadata(IMetadataPacket* metadataPacket)
 {
-    if (metadataPacket == nullptr)
+    if (!metadataPacket)
     {
         NX_VERBOSE(this, "%1(): Received null metadata packet; ignoring", __func__);
         return;
     }
 
     bool handled = false;
-    if (const auto eventsPacket = queryInterfacePtr<IEventMetadataPacket>(metadataPacket))
+    if (const auto eventsPacket = metadataPacket->queryInterface<IEventMetadataPacket>())
     {
         handleEventMetadataPacket(eventsPacket);
         handled = true;
     }
 
-    if (const auto objectsPacket = queryInterfacePtr<IObjectMetadataPacket>(metadataPacket))
+    if (const auto objectsPacket = metadataPacket->queryInterface<IObjectMetadataPacket>())
     {
         handleObjectMetadataPacket(objectsPacket);
         handled = true;
     }
 
     if (const auto objectTrackBestShotPacket =
-        queryInterfacePtr<IObjectTrackBestShotPacket>(metadataPacket))
+        metadataPacket->queryInterface<IObjectTrackBestShotPacket>())
     {
         handleObjectTrackBestShotPacket(objectTrackBestShotPacket);
         handled = true;
@@ -101,7 +101,7 @@ void MetadataHandler::handleEventMetadataPacket(
 
     for (int i = 0; i < eventMetadataPacket->count(); ++i)
     {
-        if (const auto eventMetadata = toPtr(eventMetadataPacket->at(i)))
+        if (const auto eventMetadata = eventMetadataPacket->at(i))
             handleEventMetadata(eventMetadata, eventMetadataPacket->timestampUs());
         else
             break;
@@ -114,7 +114,7 @@ void MetadataHandler::handleObjectMetadataPacket(
     nx::common::metadata::ObjectMetadataPacket data;
     for (int i = 0; i < objectMetadataPacket->count(); ++i)
     {
-        const auto item = toPtr(objectMetadataPacket->at(i));
+        const auto item = objectMetadataPacket->at(i);
         if (!item)
             break;
 
@@ -131,8 +131,8 @@ void MetadataHandler::handleObjectMetadataPacket(
         for (int j = 0; j < item->attributeCount(); ++j)
         {
             nx::common::metadata::Attribute attribute;
-            attribute.name = QString::fromStdString(toPtr(item->attribute(j))->name());
-            attribute.value = QString::fromStdString(toPtr(item->attribute(j))->value());
+            attribute.name = QString::fromStdString(item->attribute(j)->name());
+            attribute.value = QString::fromStdString(item->attribute(j)->value());
             objectMetadata.attributes.push_back(attribute);
 
             NX_VERBOSE(this, "%1(): Attribute: %2 %3", __func__, attribute.name, attribute.value);

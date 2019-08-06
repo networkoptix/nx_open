@@ -339,7 +339,6 @@ QnCameraAdvancedParams StreamCapabilityAdvancedParametersProvider::describeCapab
     QMap<QString, QMap<QString, nx::media::CameraStreamCapability>> codecResolutionCapabilities;
     const auto streamCapabilities = currentStreamCapabilities();
 
-    auto rpt = streamCapabilities.begin();
     for (auto it = streamCapabilities.begin(); it != streamCapabilities.end(); ++it)
         codecResolutionCapabilities[it.key().codec][sizeToString(it.key().resolution)] = it.value();
 

@@ -10,7 +10,7 @@ namespace sdk {
 class IAttribute: public Interface<IAttribute>
 {
 public:
-    enum class Type
+    enum class Type: int
     {
         undefined,
         number,

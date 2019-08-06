@@ -34,7 +34,8 @@ public:
      * @param index 0-based index of the attribute.
      * @return Item of an attribute array, or null if index is out of range.
      */
-    virtual const IAttribute* attribute(int index) const = 0;
+    protected: virtual const IAttribute* getAttribute(int index) const = 0;
+    public: Ptr<const IAttribute> attribute(int index) const { return toPtr(getAttribute(index)); }
 
     /**
      * @return Number of items in the attribute array.

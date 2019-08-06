@@ -241,6 +241,7 @@ vms::event::EventParameters convertOldEventParameters(
     return result;
 }
 
+// TODO: Investigate why getBookmarksQueryLimit() is unused.
 int getBookmarksQueryLimit(const QnCameraBookmarkSearchFilter& filter)
 {
     if (filter.sparsing.used)
@@ -1079,7 +1080,7 @@ bool QnServerDb::getBookmarks(
 
 bool QnServerDb::getMaxBookmarksMaxDurationMs(
     const QList<QnUuid>& cameraIds,
-    const QnCameraBookmarkSearchFilter& filter,
+    const QnCameraBookmarkSearchFilter& /*filter*/,
     qint64* outResult) const
 {
     *outResult = 0;
@@ -1140,6 +1141,7 @@ bool QnServerDb::getBookmarks(
             QnBookmarkSortOrder(Qn::BookmarkCameraThenStartTime, filter.orderBy.order));
 
         // Bookmarks between start end end time
+        // TODO: Investigate why needSecondRequest is unused.
         bool needSecondRequest = true;
         if (filter.limit > 0)
         {

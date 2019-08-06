@@ -2,9 +2,7 @@
 
 #include <plugins/plugin_tools.h>
 
-#include <memory>
-
-#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/ptr.h>
 #include <plugins/plugin_api.h>
 #include <plugins/plugin_container_api.h>
 
@@ -55,10 +53,9 @@ private:
     void cleanStreamCacheUp();
 
 private:
-    // TODO: Migrate to nx::sdk::Ptr.
     mutable QnMutex m_mutex;
     nxpt::CommonRefManager m_refManager;
-    std::unique_ptr<DiscoveryManager> m_discoveryManager;
+    nx::sdk::Ptr<DiscoveryManager> m_discoveryManager;
     nx::sdk::Ptr<nxpl::TimeProvider> m_timeProvider;
 
     nx::utils::ElapsedTimer m_streamStateCacheCleanupTimer;

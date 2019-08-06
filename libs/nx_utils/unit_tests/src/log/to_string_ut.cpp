@@ -103,14 +103,14 @@ struct CustomStringableType
     QString toString() const { return QLatin1String("CustomStringableType") + QString::number(i); }
 };
 
-struct CustomDebugableType
+struct CustomDebuggableType
 {
     int i = 0;
-    CustomDebugableType(int i = 0): i(i) {}
+    CustomDebuggableType(int i = 0): i(i) {}
 };
-static QDebug operator<<(QDebug debug, const CustomDebugableType& d)
+static QDebug operator<<(QDebug debug, const CustomDebuggableType& d)
 {
-    return debug << "CustomDebugableType" << d.i;
+    return debug << "CustomDebuggableType" << d.i;
 }
 
 TEST(ToString, Custom)
@@ -118,8 +118,8 @@ TEST(ToString, Custom)
     assertToString(CustomStringableType(), "CustomStringableType0");
     assertToString(CustomStringableType(555), "CustomStringableType555");
 
-    assertToString(CustomDebugableType(), "CustomDebugableType0");
-    assertToString(CustomDebugableType(77777), "CustomDebugableType77777");
+    assertToString(CustomDebuggableType(), "CustomDebuggableType0");
+    assertToString(CustomDebuggableType(77777), "CustomDebuggableType77777");
 }
 
 TEST(ToString, NxTypes)
@@ -127,7 +127,7 @@ TEST(ToString, NxTypes)
     const auto uuid = QnUuid::createUuid();
     assertToString(uuid, uuid.toStdString().c_str());
 
-    // TODO: Add some more NX types
+    // TODO: Add some more Nx types.
 }
 
 template<typename T>
@@ -171,8 +171,10 @@ TEST(ToString, Pointers)
     assertPtrToString<std::string>("std::*string*(0x*)");
     assertPtrToString<std::vector<int>>("std::*vector*<*>(0x*)");
     assertPtrToString<CustomStringableType>("nx::utils::test::CustomStringableType(0x*)");
-    assertPtrToString<CustomDebugableType>("nx::utils::test::CustomDebugableType(0x*)");
-    assertPtrToString<CustomDebugableType>("nx::utils::test::CustomDebugableType(0x*)");
+    assertPtrToString<CustomDebuggableType>("nx::utils::test::CustomDebuggableType(0x*)");
+    assertPtrToString<CustomDebuggableType>("nx::utils::test::CustomDebuggableType(0x*)");
+    assertPtrToString<std::optional<CustomDebuggableType>>(
+        "std::optional<nx::utils::test::CustomDebuggableType>(0x*)");
     assertPtrToString<QSize>("QSize(0x*)");
 
     std::unique_ptr<CustomBase> base(new CustomBase);
@@ -201,7 +203,7 @@ TEST(ToString, Containers)
     assertToString(boost::make_optional<int>(false, 1), "none");
 
     assertToString(std::make_pair(1, "hello"), "( 1: hello )");
-    assertToString(std::make_pair(2.5, CustomDebugableType()), "( 2.5: CustomDebugableType0 )");
+    assertToString(std::make_pair(2.5, CustomDebuggableType()), "( 2.5: CustomDebuggableType0 )");
 
     assertContainerToString(std::vector<int>{1, 2, 3}, "{ 1, 2, 3 }");
     assertContainerToString(std::vector<std::string>{"1st", "2nd", "3rd"}, "{ 1st, 2nd, 3rd }");

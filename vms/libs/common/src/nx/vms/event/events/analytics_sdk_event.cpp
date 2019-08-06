@@ -78,8 +78,8 @@ bool AnalyticsSdkEvent::checkEventParams(const EventParameters& params) const
     if (!getResource() || m_engineId != params.getAnalyticsEngineId())
         return false;
 
-    nx::analytics::EventTypeDescriptorManager descriptorManager(getResource()->commonModule());
-    const auto descriptor = descriptorManager.descriptor(m_eventTypeId);
+    const auto descriptor = getResource()->commonModule()->analyticsEventTypeDescriptorManager()
+        ->descriptor(m_eventTypeId);
 
     if (!descriptor)
         return false;

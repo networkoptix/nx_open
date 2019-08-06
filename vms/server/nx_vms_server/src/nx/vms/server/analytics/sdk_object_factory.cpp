@@ -5,7 +5,7 @@
 #include <nx/vms/api/analytics/descriptors.h>
 #include <nx_ec/data/api_conversion_functions.h>
 
-#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/ptr.h>
 #include <nx/vms/server/sdk_support/utils.h>
 #include <nx/vms/server/sdk_support/to_string.h>
 #include <nx/vms/server/analytics/debug_helpers.h>

@@ -10,7 +10,7 @@
 #include <nx/sdk/analytics/i_device_agent.h>
 
 #include <nx/utils/log/log.h>
-#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/ptr.h>
 
 namespace nx::vms::server::analytics::debug_helpers {
 

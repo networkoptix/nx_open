@@ -3,7 +3,7 @@
 #define NX_PRINT_PREFIX "deepstream::baseCallbacks::"
 #include <nx/kit/debug.h>
 
-#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/ptr.h>
 #include <nx/sdk/analytics/i_compressed_video_packet.h>
 
 #include "deepstream_analytics_plugin_ini.h"
@@ -16,17 +16,18 @@ namespace deepstream {
 
 void appSourceNeedData(GstElement* appSrc, guint /*unused*/, gpointer userData)
 {
+    using namespace nx::sdk;
+    
     NX_OUTPUT << __func__ << " Running need-data GstAppSrc callback";
     auto pipeline = (deepstream::BasePipeline*) userData;
-    const auto frame = nx::sdk::toPtr(pipeline->nextDataPacket());
+    const auto frame = toPtr(pipeline->nextDataPacket());
     if (!frame)
     {
         NX_OUTPUT << __func__ << " No data available in the frame queue";
         return;
     }
 
-    const auto video =
-        nx::sdk::queryInterfacePtr<nx::sdk::analytics::ICompressedVideoPacket>(frame);
+    const auto video = frame->queryInterface<nx::sdk::analytics::ICompressedVideoPacket>();
     if (!video)
     {
         NX_OUTPUT << __func__ << " Can not convert data packet to 'ICompressedVideoPacket'";

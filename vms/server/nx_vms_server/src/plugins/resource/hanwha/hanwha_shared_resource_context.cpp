@@ -23,7 +23,7 @@ static const std::chrono::seconds kCacheDataTimeout(30);
 static const QString kObsoleteInterfaceParameter = lit("Network1");
 static const std::chrono::milliseconds kPositionAggregationTimeout(1000);
 
-static const nx::utils::Url cleanUrl(nx::utils::Url url)
+static nx::utils::Url cleanUrl(nx::utils::Url url)
 {
     url.setPath(QString());
     url.setQuery(QString());
@@ -159,7 +159,7 @@ int HanwhaSharedResourceContext::totalAmountOfSessions(bool isLive) const
 SessionContextPtr HanwhaSharedResourceContext::session(
     HanwhaSessionType sessionType,
     const QnUuid& clientId,
-    bool generateNewOne)
+    bool /*generateNewOne*/)
 {
     if (m_sharedId.isEmpty())
         return SessionContextPtr();
@@ -250,9 +250,9 @@ HanwhaResult<HanwhaInformation> HanwhaSharedResourceContext::loadInformation()
     info.attributes = helper.fetchAttributes(lit("attributes"));
     if (!info.attributes.isValid())
     {
-        return {error(
+        return error(
             info.attributes,
-            CameraDiagnostics::CameraInvalidParams(lit("Camera attributes are invalid")))};
+            CameraDiagnostics::CameraInvalidParams(lit("Camera attributes are invalid")));
     }
 
     const auto maxArchiveSessionsAttribute = info.attributes.attribute<int>(
@@ -264,16 +264,16 @@ HanwhaResult<HanwhaInformation> HanwhaSharedResourceContext::loadInformation()
     info.cgiParameters = helper.fetchCgiParameters(lit("cgis"));
     if (!info.cgiParameters.isValid())
     {
-        return {error(
+        return error(
             info.cgiParameters,
-            CameraDiagnostics::CameraInvalidParams(lit("Camera CGI parameters are invalid")))};
+            CameraDiagnostics::CameraInvalidParams(lit("Camera CGI parameters are invalid")));
     }
 
     const auto deviceinfo = helper.view(lit("system/deviceinfo"));
     if (!deviceinfo.isSuccessful())
     {
-        return {error(deviceinfo,
-            CameraDiagnostics::CameraInvalidParams(lit("Can not fetch device information")))};
+        return error(deviceinfo,
+            CameraDiagnostics::CameraInvalidParams(lit("Can not fetch device information")));
     }
 
     HanwhaRequestHelper::Parameters networkRequestParameters;
@@ -308,8 +308,8 @@ HanwhaResult<HanwhaInformation> HanwhaSharedResourceContext::loadInformation()
 
     if (info.macAddress.isEmpty())
     {
-        return {error(deviceinfo,
-            CameraDiagnostics::CameraInvalidParams(lit("Can not fetch device MAC address")))};
+        return error(deviceinfo,
+            CameraDiagnostics::CameraInvalidParams(lit("Can not fetch device MAC address")));
     }
 
     if (const auto value = deviceinfo.parameter<QString>("Model"))
@@ -337,10 +337,10 @@ HanwhaResult<HanwhaResponse> HanwhaSharedResourceContext::loadEventStatuses()
     auto eventStatuses = helper.check(lit("eventstatus/eventstatus"));
     if (!eventStatuses.isSuccessful())
     {
-        return {error(
+        return error(
             eventStatuses,
             CameraDiagnostics::RequestFailedResult(
-                eventStatuses.requestUrl(), eventStatuses.errorString()))};
+                eventStatuses.requestUrl(), eventStatuses.errorString()));
     }
 
     return {CameraDiagnostics::NoErrorResult(), std::move(eventStatuses)};
@@ -352,11 +352,11 @@ HanwhaResult<HanwhaResponse> HanwhaSharedResourceContext::loadVideoSources()
     auto videoSources = helper.view(lit("media/videosource"));
     if (!videoSources.isSuccessful())
     {
-        return {error(
+        return error(
             videoSources,
             CameraDiagnostics::RequestFailedResult(
                 videoSources.requestUrl(),
-                videoSources.errorString()))};
+                videoSources.errorString()));
     }
 
     return {CameraDiagnostics::NoErrorResult(), std::move(videoSources)};

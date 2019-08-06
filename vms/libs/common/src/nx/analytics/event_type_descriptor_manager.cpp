@@ -58,28 +58,29 @@ std::optional<std::set<EventTypeId>> intersectEventTypeIds(
 
 } // namespace
 
-EventTypeDescriptorManager::EventTypeDescriptorManager(QnCommonModule* commonModule):
-    base_type(commonModule),
+EventTypeDescriptorManager::EventTypeDescriptorManager(QObject* parent):
+    base_type(parent),
+    QnCommonModuleAware(parent),
     m_eventTypeDescriptorContainer(
-        makeContainer<EventTypeDescriptorContainer>(commonModule, kEventTypeDescriptorsProperty)),
+        makeContainer<EventTypeDescriptorContainer>(commonModule(), kEventTypeDescriptorsProperty)),
     m_engineDescriptorContainer(
-        makeContainer<EngineDescriptorContainer>(commonModule, kEngineDescriptorsProperty)),
+        makeContainer<EngineDescriptorContainer>(commonModule(), kEngineDescriptorsProperty)),
     m_groupDescriptorContainer(
-        makeContainer<GroupDescriptorContainer>(commonModule, kGroupDescriptorsProperty))
+        makeContainer<GroupDescriptorContainer>(commonModule(), kGroupDescriptorsProperty))
 {
 }
 
 std::optional<EventTypeDescriptor> EventTypeDescriptorManager::descriptor(
     const EventTypeId& id) const
 {
-    return fetchDescriptor(m_eventTypeDescriptorContainer, id);
+    return fetchDescriptor(m_eventTypeDescriptorContainer.get(), id);
 }
 
 EventTypeDescriptorMap EventTypeDescriptorManager::descriptors(
     const std::set<EventTypeId>& eventTypeIds) const
 {
     return fetchDescriptors(
-        m_eventTypeDescriptorContainer,
+        m_eventTypeDescriptorContainer.get(),
         eventTypeIds,
         kEventTypeDescriptorTypeName);
 }
@@ -210,7 +211,7 @@ void EventTypeDescriptorManager::updateFromEngineManifest(
     const QString& engineName,
     const EngineManifest& manifest)
 {
-    m_eventTypeDescriptorContainer.mergeWithDescriptors(
+    m_eventTypeDescriptorContainer->mergeWithDescriptors(
         fromManifestItemListToDescriptorMap<EventTypeDescriptor>(engineId, manifest.eventTypes));
 }
 
@@ -219,7 +220,7 @@ void EventTypeDescriptorManager::updateFromDeviceAgentManifest(
     const EngineId& engineId,
     const DeviceAgentManifest& manifest)
 {
-    m_eventTypeDescriptorContainer.mergeWithDescriptors(
+    m_eventTypeDescriptorContainer->mergeWithDescriptors(
         fromManifestItemListToDescriptorMap<EventTypeDescriptor>(engineId, manifest.eventTypes));
 }
 

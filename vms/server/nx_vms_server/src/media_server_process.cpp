@@ -3578,7 +3578,7 @@ void MediaServerProcess::setSetupModuleCallback(std::function<void(QnMediaServer
 }
 
 bool MediaServerProcess::setUpMediaServerResource(
-    CloudIntegrationManager* cloudIntegrationManager,
+    CloudIntegrationManager* /*cloudIntegrationManager*/,
     QnMediaServerModule* serverModule,
     const ec2::AbstractECConnectionPtr& ec2Connection)
 {

@@ -12,7 +12,6 @@
 #include <nx/sdk/analytics/i_engine.h>
 #include <nx/sdk/analytics/i_device_agent.h>
 #include <nx/sdk/analytics/helpers/plugin.h>
-#include <nx/sdk/analytics/helpers/result_aliases.h>
 
 #include <nx/vms_server_plugins/analytics/deepstream/default/object_class_description.h>
 
@@ -27,20 +26,7 @@ public:
     Engine(nx::sdk::analytics::Plugin* plugin);
     virtual ~Engine() override;
 
-    virtual nx::sdk::analytics::Plugin* plugin() const override { return m_plugin; }
-    
     virtual void setEngineInfo(const nx::sdk::analytics::IEngineInfo* engineInfo) override;
-
-    virtual nx::sdk::StringMapResult setSettings(const nx::sdk::IStringMap* settings) override;
-
-    virtual nx::sdk::SettingsResponseResult pluginSideSettings() const override;
-
-    virtual nx::sdk::StringResult manifest() const override;
-
-    virtual nx::sdk::analytics::MutableDeviceAgentResult obtainDeviceAgent(
-        const nx::sdk::IDeviceInfo* deviceInfo) override;
-
-    virtual nx::sdk::Result<void> executeAction(nx::sdk::analytics::IAction*) override;
 
     std::vector<ObjectClassDescription> objectClassDescritions() const;
 
@@ -49,6 +35,19 @@ public:
     void setHandler(nx::sdk::analytics::IEngine::IHandler* handler);
 
     virtual bool isCompatible(const nx::sdk::IDeviceInfo* deviceInfo) const override;
+
+protected:
+    virtual void doSetSettings(
+        nx::sdk::Result<const nx::sdk::IStringMap*>* outResult,
+        const nx::sdk::IStringMap* settings) override;
+    virtual void getPluginSideSettings(
+        nx::sdk::Result<const nx::sdk::ISettingsResponse*>* outResult) const override;
+    virtual void getManifest(nx::sdk::Result<const nx::sdk::IString*>* outResult) const override;
+    virtual void doObtainDeviceAgent(
+        nx::sdk::Result<nx::sdk::analytics::IDeviceAgent*>* outResult,
+        const nx::sdk::IDeviceInfo* deviceInfo) override;
+    virtual void doExecuteAction(nx::sdk::Result<void>* outResult,
+        nx::sdk::analytics::IAction* action) override;
 
 private:
     std::vector<ObjectClassDescription> loadObjectClasses() const;
@@ -59,6 +58,7 @@ private:
 
 private:
     nx::sdk::analytics::Plugin* const m_plugin;
+    
     mutable std::vector<ObjectClassDescription> m_objectClassDescritions;
     mutable std::string m_manifest;
     nx::sdk::analytics::IDeviceAgent* m_deviceAgent = nullptr;

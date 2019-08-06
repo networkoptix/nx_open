@@ -2,7 +2,7 @@
 
 #include <QtCore/QString>
 
-#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/ptr.h>
 #include <nx/sdk/analytics/i_plugin.h>
 
 #include <core/resource/resource_fwd.h>

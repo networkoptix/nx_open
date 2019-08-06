@@ -16,7 +16,7 @@
 #include <plugins/plugin_api.h>
 #include <nx/sdk/helpers/lib_context.h>
 #include <nx/vms/server/sdk_support/ref_countable_registry.h>
-#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/ptr.h>
 #include <nx/sdk/analytics/i_plugin.h>
 #include <nx/vms/server/plugins/utility_provider.h>
 #include <nx/vms/server/sdk_support/utils.h>
@@ -141,9 +141,7 @@ static QFileInfoList pluginFileInfoList(const QDir& dirToSearch, bool searchInne
     if (searchInnerDirs)
         filters |= QDir::Dirs | QDir::NoDotAndDotDot;
 
-    const auto entries = dirToSearch.entryInfoList(/*nameFilters*/ QStringList(), filters);
-
-    for (const auto& entry: entries)
+    for (const auto& entry: dirToSearch.entryInfoList(/*nameFilters*/ QStringList(), filters))
     {
         if (entry.isDir())
         {
@@ -155,11 +153,9 @@ static QFileInfoList pluginFileInfoList(const QDir& dirToSearch, bool searchInne
             }
             else
             {
-                const QDir entryAsDir = entry.absoluteFilePath();
-                const auto pluginDirEntries = entryAsDir.entryInfoList(
-                    /*nameFilters*/ QStringList(), QDir::Files | QDir::Readable);
-
-                for (const auto& pluginDirEntry: pluginDirEntries)
+                const QDir entryAsDir(entry.absoluteFilePath());
+                for (const auto& pluginDirEntry: entryAsDir.entryInfoList(
+                    /*nameFilters*/ QStringList(), QDir::Files | QDir::Readable))
                 {
                     if (libNameFromFileInfo(pluginDirEntry) == entry.fileName())
                     {
@@ -338,12 +334,12 @@ bool PluginManager::processPluginEntryPointForNewSdk(
     if (!plugin)
         return error("Entry point function returned null");
 
-    if (!queryInterfacePtr<IPlugin>(plugin))
-        return error ("Interface nx::sdk::IPlugin is not supported");
+    if (!plugin->queryInterface<IPlugin>())
+        return error("Interface nx::sdk::IPlugin is not supported");
 
     pluginInfo->mainInterface = MainInterface::nx_sdk_IPlugin;
 
-    if (const auto analyticsPlugin = queryInterfacePtr<nx::sdk::analytics::IPlugin>(plugin))
+    if (const auto analyticsPlugin = plugin->queryInterface<nx::sdk::analytics::IPlugin>())
     {
         pluginInfo->mainInterface = MainInterface::nx_sdk_analytics_IPlugin;
 
@@ -384,7 +380,7 @@ bool PluginManager::processPluginEntryPointForOldSdk(
 
     pluginInfo->mainInterface = MainInterface::nxpl_PluginInterface;
 
-    if (const auto plugin1 = queryInterfacePtr<nxpl::Plugin>(plugin, nxpl::IID_Plugin))
+    if (const auto plugin1 = queryInterfaceOfOldSdk<nxpl::Plugin>(plugin, nxpl::IID_Plugin))
     {
         pluginInfo->mainInterface = MainInterface::nxpl_Plugin;
 
@@ -402,7 +398,7 @@ bool PluginManager::processPluginEntryPointForOldSdk(
             plugin1->setSettings(settingsHolder.array(), settingsHolder.size());
     }
 
-    if (const auto plugin2 = queryInterfacePtr<nxpl::Plugin2>(plugin, nxpl::IID_Plugin2))
+    if (const auto plugin2 = queryInterfaceOfOldSdk<nxpl::Plugin2>(plugin, nxpl::IID_Plugin2))
     {
         pluginInfo->mainInterface = MainInterface::nxpl_Plugin2;
 
@@ -437,18 +433,17 @@ bool PluginManager::processPluginLib(
         return processPluginEntryPointForOldSdk(
             oldEntryPointFunc, settingsHolder, pluginInfo);
     }
-    else if (const auto entryPointFunc = reinterpret_cast<IPlugin::EntryPointFunc>(
+
+    if (const auto entryPointFunc = reinterpret_cast<IPlugin::EntryPointFunc>(
         lib->resolve(IPlugin::kEntryPointFuncName)))
     {
         // New entry point found: currently, this is an Analytics plugin.
         return processPluginEntryPointForNewSdk(entryPointFunc, pluginInfo);
     }
-    else
-    {
-        return storeNotLoadedPluginInfo(pluginInfo, Status::notLoadedBecauseOfError,
-            Error::invalidLibrary, lm("No entry point function %1() or old SDK %2()").args(
-                IPlugin::kEntryPointFuncName, nxpl::Plugin::kEntryPointFuncName));
-    }
+
+    return storeNotLoadedPluginInfo(pluginInfo, Status::notLoadedBecauseOfError,
+        Error::invalidLibrary, lm("No entry point function %1() or old SDK %2()").args(
+            IPlugin::kEntryPointFuncName, nxpl::Plugin::kEntryPointFuncName));
 }
 
 void PluginManager::loadPlugin(

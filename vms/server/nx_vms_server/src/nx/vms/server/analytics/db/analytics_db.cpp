@@ -370,14 +370,14 @@ bool EventsStorage::readMinimumEventTimestamp(std::chrono::milliseconds* outResu
     {
         *outResult = m_dbController->queryExecutor().executeSelectQuerySync(
             [](nx::sql::QueryContext* queryContext)
-        {
-            auto query = queryContext->connection()->createQuery();
-            query->prepare("SELECT min(track_start_ms) FROM track");
-            query->exec();
-            if (query->next())
-                return std::chrono::milliseconds(query->value(0).toLongLong());
-            return std::chrono::milliseconds::zero();
-        });
+            {
+                auto query = queryContext->connection()->createQuery();
+                query->prepare("SELECT min(track_start_ms) FROM track");
+                query->exec();
+                if (query->next())
+                    return std::chrono::milliseconds(query->value(0).toLongLong());
+                return std::chrono::milliseconds::zero();
+            });
     }
     catch (const std::exception& e)
     {

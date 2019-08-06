@@ -6,7 +6,7 @@
 #include <vector>
 
 #include <nx/sdk/helpers/attribute.h>
-#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/ptr.h>
 
 #include "vector2d.h"
 
