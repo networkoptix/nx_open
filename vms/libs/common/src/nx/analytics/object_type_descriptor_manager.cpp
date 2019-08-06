@@ -56,14 +56,15 @@ std::optional<std::set<ObjectTypeId>> intersectObjectTypeIds(
 
 } // namespace
 
-ObjectTypeDescriptorManager::ObjectTypeDescriptorManager(QnCommonModule* commonModule)
-    : base_type(commonModule),
-      m_objectTypeDescriptorContainer(makeContainer<ObjectTypeDescriptorContainer>(
-          commonModule, kObjectTypeDescriptorsProperty)),
-      m_engineDescriptorContainer(
-          makeContainer<EngineDescriptorContainer>(commonModule, kEngineDescriptorsProperty)),
-      m_groupDescriptorContainer(
-          makeContainer<GroupDescriptorContainer>(commonModule, kGroupDescriptorsProperty))
+ObjectTypeDescriptorManager::ObjectTypeDescriptorManager(QObject* parent) :
+    base_type(parent),
+    QnCommonModuleAware(parent),
+    m_objectTypeDescriptorContainer(makeContainer<ObjectTypeDescriptorContainer>(
+        commonModule(), kObjectTypeDescriptorsProperty)),
+    m_engineDescriptorContainer(
+        makeContainer<EngineDescriptorContainer>(commonModule(), kEngineDescriptorsProperty)),
+    m_groupDescriptorContainer(
+        makeContainer<GroupDescriptorContainer>(commonModule(), kGroupDescriptorsProperty))
 {
 }
 

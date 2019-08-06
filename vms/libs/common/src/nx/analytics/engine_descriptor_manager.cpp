@@ -13,10 +13,11 @@ const QString kEngineDescriptorTypeName("Engine");
 
 } // namespace
 
-EngineDescriptorManager::EngineDescriptorManager(QnCommonModule* commonModule):
-    base_type(commonModule),
+EngineDescriptorManager::EngineDescriptorManager(QObject* parent):
+    base_type(parent),
+    QnCommonModuleAware(parent),
     m_engineDescriptorContainer(
-        makeContainer<EngineDescriptorContainer>(commonModule, kEngineDescriptorsProperty))
+        makeContainer<EngineDescriptorContainer>(commonModule(), kEngineDescriptorsProperty))
 {
 }
 

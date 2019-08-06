@@ -420,9 +420,8 @@ QString QnEventLogModel::textData(Column column, const vms::event::ActionData& a
                     action.eventParams.eventResourceId).
                     dynamicCast<QnVirtualCameraResource>();
 
-                nx::analytics::EventTypeDescriptorManager eventTypeDescriptorManager(commonModule());
-                const auto descriptor = eventTypeDescriptorManager.descriptor(
-                    action.eventParams.getAnalyticsEventTypeId());
+                const auto descriptor = commonModule()->analyticsEventTypeDescriptorManager()
+                    ->descriptor(action.eventParams.getAnalyticsEventTypeId());
                 QString eventName = descriptor ? descriptor->name : QString();
 
                 if (!eventName.isEmpty())

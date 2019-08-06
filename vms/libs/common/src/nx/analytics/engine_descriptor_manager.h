@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QtCore/QObject>
+
 #include <nx/analytics/types.h>
 
 #include <nx/vms/api/analytics/descriptors.h>
@@ -10,12 +12,13 @@
 
 namespace nx::analytics {
 
-class EngineDescriptorManager: public /*mixin*/ QnCommonModuleAware
+class EngineDescriptorManager: public QObject, public /*mixin*/ QnCommonModuleAware
 {
-    using base_type = QnCommonModuleAware;
+    using base_type = QObject;
+    Q_OBJECT
 
 public:
-    EngineDescriptorManager(QnCommonModule* commonModule);
+    explicit EngineDescriptorManager(QObject* parent = nullptr);
 
     std::optional<nx::vms::api::analytics::EngineDescriptor> descriptor(
         const EngineId& id) const;
