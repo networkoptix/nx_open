@@ -55,6 +55,9 @@ ArchivePlaylistManager::~ArchivePlaylistManager()
 bool ArchivePlaylistManager::initialize()
 {
     QnAbstractArchiveDelegatePtr archiveDelegate(m_camResource->createArchiveDelegate());
+    if (archiveDelegate)
+        archiveDelegate->setGroupId(QnUuid::createUuid().toByteArray());
+
     if (!archiveDelegate)
     {
         archiveDelegate = QnAbstractArchiveDelegatePtr(new QnServerArchiveDelegate(serverModule())); // default value

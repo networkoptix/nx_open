@@ -31,7 +31,6 @@ HanwhaArchiveDelegate::HanwhaArchiveDelegate(const HanwhaResourcePtr& hanwhaRes)
     m_streamReader.reset(new HanwhaStreamReader(hanwhaRes));
     m_streamReader->setRole(Qn::CR_Archive);
     m_streamReader->setSessionType(HanwhaSessionType::archive);
-    auto& rtspClient = m_streamReader->rtspClient();
 
     m_flags |= Flag_CanOfflineRange;
     m_flags |= Flag_CanProcessNegativeSpeed;
@@ -258,7 +257,7 @@ void HanwhaArchiveDelegate::setSpeed(qint64 displayTime, double value)
         open(m_streamReader->m_resource, /*archiveIntegrityWatcher*/ nullptr);
 }
 
-void HanwhaArchiveDelegate::setRange(qint64 startTimeUsec, qint64 endTimeUsec, qint64 frameStepUsec)
+void HanwhaArchiveDelegate::setRange(qint64 startTimeUsec, qint64 endTimeUsec, qint64 /*frameStepUsec*/)
 {
     if (m_playbackMode == PlaybackMode::Edge)
         startTimeUsec -= duration_cast<microseconds>(kEdgeStartTimeCorrection).count();
@@ -310,7 +309,7 @@ void HanwhaArchiveDelegate::setGroupId(const QByteArray& id)
     m_streamReader->setClientId(QnUuid(id));
 }
 
-void HanwhaArchiveDelegate::beforeSeek(qint64 time)
+void HanwhaArchiveDelegate::beforeSeek(qint64 /*time*/)
 {
     // TODO: implement me
 }

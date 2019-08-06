@@ -159,7 +159,7 @@ int HanwhaSharedResourceContext::totalAmountOfSessions(bool isLive) const
 SessionContextPtr HanwhaSharedResourceContext::session(
     HanwhaSessionType sessionType,
     const QnUuid& clientId,
-    bool generateNewOne)
+    bool /*generateNewOne*/)
 {
     if (m_sharedId.isEmpty())
         return SessionContextPtr();
