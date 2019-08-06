@@ -325,12 +325,14 @@ AnalyticsSettingsWidget::AnalyticsSettingsWidget(QWidget* parent):
     d(new Private(this))
 {
     anchorWidgetToParent(d->view);
+
+    connect(d.get(), &Private::analyticsEnginesChanged, this,
+        &AnalyticsSettingsWidget::visibilityUpdateRequested);
 }
 
 AnalyticsSettingsWidget::~AnalyticsSettingsWidget()
 {
 }
-
 
 void AnalyticsSettingsWidget::loadDataToUi()
 {
@@ -366,6 +368,12 @@ bool AnalyticsSettingsWidget::activate(const QUrl& url)
     return true;
 }
 
+bool AnalyticsSettingsWidget::shouldBeVisible() const
+{
+    return !d->engines.empty();
+}
+
 } // namespace nx::vms::client::desktop
 
+// Hack to make Q_OBJECT macro work in the cpp file.
 #include "analytics_settings_widget.moc"
