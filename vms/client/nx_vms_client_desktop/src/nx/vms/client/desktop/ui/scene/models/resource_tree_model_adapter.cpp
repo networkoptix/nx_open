@@ -45,7 +45,6 @@ void ResourceTreeModelAdapter::setContext(QnWorkbenchContext* context)
     {
         const auto model = new QnResourceTreeModel(
             QnResourceTreeModel::FullScope,
-            m_context->user(),
             m_context->accessController(),
             m_context->snapshotManager(),
             m_context);

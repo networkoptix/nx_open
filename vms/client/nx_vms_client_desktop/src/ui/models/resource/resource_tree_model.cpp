@@ -125,7 +125,6 @@ QList<ResourceTree::NodeType> rootNodeTypes()
 
 QnResourceTreeModel::QnResourceTreeModel(
     Scope scope,
-    QnUserResourcePtr user,
     QnWorkbenchAccessController* accessController,
     QnWorkbenchLayoutSnapshotManager* layoutSnapshotManager,
     QObject* parent)
@@ -133,7 +132,6 @@ QnResourceTreeModel::QnResourceTreeModel(
     base_type(parent),
     QnCommonModuleAware(parent),
     m_scope(scope),
-    m_user(user),
     m_accessController(accessController),
     m_layoutSnapshotManager(layoutSnapshotManager)
 {
@@ -145,7 +143,7 @@ QnResourceTreeModel::QnResourceTreeModel(
 
     if (ini().developerMode)
         nx::utils::ModelTransactionChecker::install(this);
-    
+
     /* Create top-level nodes. */
     for (NodeType nodeType: rootNodeTypes())
         m_rootNodes[nodeType] =
@@ -198,6 +196,14 @@ QnResourceTreeModel::QnResourceTreeModel(
         &QnResourceTreeModel::at_wearableManager_stateChanged);
 
     rebuildTree();
+
+    connect(accessController, &QnWorkbenchAccessController::userChanged, this,
+        [this](QnUserResourcePtr& user)
+        {
+            rebuildTree();
+            emit userChanged(user);
+        });
+
 
     /* It is important to connect before iterating as new resources may be added to the pool asynchronously. */
     for (const QnResourcePtr& resource: resourcePool()->getResources())
@@ -1414,14 +1420,5 @@ void QnResourceTreeModel::setActionManager(action::Manager* actionManager)
 
 QnUserResourcePtr QnResourceTreeModel::user() const
 {
-    return m_user;
-}
-
-void QnResourceTreeModel::setUser(const QnUserResourcePtr& user)
-{
-    if (m_user == user)
-        return;
-    m_user = user;
-    emit userChanged(m_user);
-    rebuildTree();
+    return m_accessController->user();
 }

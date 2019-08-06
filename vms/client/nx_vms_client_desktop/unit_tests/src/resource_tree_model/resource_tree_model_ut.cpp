@@ -32,7 +32,6 @@ protected:
         m_layoutSnapshotManager.reset(new QnWorkbenchLayoutSnapshotManager(commonModule()));
         m_resourceTreeModel.reset(new QnResourceTreeModel(
             QnResourceTreeModel::FullScope,
-            QnUserResourcePtr(),
             m_accessController.get(),
             m_layoutSnapshotManager.get(),
             commonModule()));
@@ -89,7 +88,6 @@ protected:
     void logout()
     {
         m_accessController->setUser(QnUserResourcePtr());
-        m_resourceTreeModel->setUser(QnUserResourcePtr());
         resourcePool()->removeResources(resourcePool()->getResourcesWithFlag(Qn::remote));
     }
 
@@ -98,7 +96,6 @@ protected:
         logout();
         auto user = addUser(name, GlobalPermission::adminPermissions);
         m_accessController->setUser(user);
-        m_resourceTreeModel->setUser(user);
     }
 
     void setSystemName(const QString& name)

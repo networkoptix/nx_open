@@ -44,7 +44,6 @@ public:
 
     explicit QnResourceTreeModel(
         Scope scope,
-        QnUserResourcePtr user,
         QnWorkbenchAccessController* accessController,
         QnWorkbenchLayoutSnapshotManager* layoutSnapshotManager,
         QObject* parent);
@@ -89,7 +88,6 @@ public:
     void setActionManager(nx::vms::client::desktop::ui::action::Manager* manager);
 
     QnUserResourcePtr user() const;
-    void setUser(const QnUserResourcePtr& user);
 
 signals:
     void userChanged(QnUserResourcePtr& user);
@@ -188,9 +186,6 @@ private:
 
     /** Narrowed scope for displaying the limited set of nodes. */
     const Scope m_scope;
-
-    /** User resource on which related aspects of model state are based. */
-    QnUserResourcePtr m_user;
 
     bool m_systemHasManyServers = false;
 
