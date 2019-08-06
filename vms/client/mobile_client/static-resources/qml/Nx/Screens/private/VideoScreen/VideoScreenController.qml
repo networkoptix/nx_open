@@ -120,6 +120,7 @@ Object
     MediaResourceHelper
     {
         id: resourceHelper
+        onResourceIdChanged: enabledAudioController.resourceId = resourceId
     }
 
     QnCameraAccessRightsHelper
@@ -131,6 +132,8 @@ Object
     MediaPlayer
     {
         id: mediaPlayer
+        audioEnabled: enabledAudioController.audioEnabled
+
         resourceId: resourceHelper.resourceId
         onPlayingChanged: setKeepScreenOn(playing)
         maxTextureSize: getMaxTextureSize()

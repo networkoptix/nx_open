@@ -250,6 +250,18 @@ PageBase
             checked: showCameraInfo
             onCheckedChanged: showCameraInfo = checked
         }
+        MenuItem
+        {
+            id: enableAudioMenuItem
+
+            text: qsTr("Audio")
+            checkable: true
+            checked: video.mediaPlayer.audioEnabled
+            visible: videoScreenController.resourceHelper.audioSupported
+            height: visible ? implicitHeight : 0
+
+            onTriggered: enabledAudioController.setAudioEnabled(checked)
+        }
     }
 
     MouseArea

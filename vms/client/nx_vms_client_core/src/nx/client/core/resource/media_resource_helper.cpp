@@ -47,6 +47,11 @@ bool MediaResourceHelper::isWearableCamera() const
     return d->camera && d->camera->flags().testFlag(Qn::wearable_camera);
 }
 
+bool MediaResourceHelper::audioSupported() const
+{
+    return d->camera && d->camera->isAudioSupported();
+}
+
 bool MediaResourceHelper::analogCameraWithoutLicense() const
 {
     return d->camera && d->camera->isDtsBased() && !d->camera->isLicenseUsed();
@@ -189,6 +194,7 @@ void MediaResourceHelper::Private::handleResourceChanged()
     emit q->fisheyeParamsChanged();
     emit q->analogCameraWithoutLicenseChanged();
     emit q->wearableCameraChanged();
+    emit q->audioSupportedChanged();
 }
 
 } // namespace nx::vms::client::core

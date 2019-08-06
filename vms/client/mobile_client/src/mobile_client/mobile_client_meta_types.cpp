@@ -32,6 +32,7 @@
 #include <nx/mobile_client/helpers/inter_client_message.h>
 #include <nx/mobile_client/controllers/resource_ptz_controller.h>
 #include <nx/mobile_client/models/ptz_preset_model.h>
+#include <nx/mobile_client/controllers/enabled_audio_controller.h>
 #include <nx/client/core/resource/layout_accessor.h>
 #include <nx/client/core/animation/kinetic_animation.h>
 #include <nx/client/mobile/resource/lite_client_layout_helper.h>
@@ -109,4 +110,5 @@ void QnMobileClientMetaTypes::registerQmlTypes() {
     nx::client::mobile::VoiceSpectrumItem::registerQmlType();
     nx::client::mobile::MotionPlaybackMaskWatcher::registerQmlType();
     nx::client::mobile::ChunkPositionWatcher::registerQmlType();
+    nx::client::mobile::EnabledAudioController::registerQmlType();
 }

@@ -25,6 +25,7 @@ class MediaResourceHelper: public ResourceHelper
     Q_PROPERTY(bool analogCameraWithoutLicense READ analogCameraWithoutLicense
         NOTIFY analogCameraWithoutLicenseChanged)
     Q_PROPERTY(bool isWearableCamera READ isWearableCamera NOTIFY wearableCameraChanged)
+    Q_PROPERTY(bool audioSupported READ audioSupported NOTIFY audioSupportedChanged)
 
     Q_ENUMS(Qn::ResourceStatus)
 
@@ -44,6 +45,7 @@ public:
     bool analogCameraWithoutLicense() const;
     Q_INVOKABLE QPoint channelPosition(int channel) const;
     bool isWearableCamera() const;
+    bool audioSupported() const;
 
 signals:
     void serverNameChanged();
@@ -54,6 +56,7 @@ signals:
     void fisheyeParamsChanged();
     void analogCameraWithoutLicenseChanged();
     void wearableCameraChanged();
+    void audioSupportedChanged();
 
 private:
     class Private;
