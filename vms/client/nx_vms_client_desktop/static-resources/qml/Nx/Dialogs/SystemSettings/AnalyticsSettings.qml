@@ -44,7 +44,16 @@ Item
 
         onAnalyticsEnginesChanged:
         {
-            activateEngine(null)
+            for (var i = 0; i < store.analyticsEngines.length; ++i)
+            {
+                if (store.analyticsEngines[i].id === currentEngineId)
+                    return
+            }
+
+            if (store.analyticsEngines.length > 0)
+                activateEngine(store.analyticsEngines[0].id)
+            else
+                activateEngine(firstEngineId)
         }
     }
 
