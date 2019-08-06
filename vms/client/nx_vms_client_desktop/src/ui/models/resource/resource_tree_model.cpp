@@ -122,16 +122,25 @@ QList<ResourceTree::NodeType> rootNodeTypes()
 // -------------------------------------------------------------------------- //
 // QnResourceTreeModel :: contructors, destructor and helpers.
 // -------------------------------------------------------------------------- //
+
 QnResourceTreeModel::QnResourceTreeModel(
     Scope scope,
+    QnWorkbenchAccessController* accessController,
+    QnWorkbenchLayoutSnapshotManager* layoutSnapshotManager,
     QObject* parent)
     :
     base_type(parent),
-    QnWorkbenchContextAware(parent),
+    QnCommonModuleAware(parent),
     m_scope(scope),
-    m_nodeManager(new QnResourceTreeModelNodeManager(this)),
-    m_layoutNodeManager(new QnResourceTreeModelLayoutNodeManager(this))
+    m_accessController(accessController),
+    m_layoutSnapshotManager(layoutSnapshotManager)
 {
+    NX_ASSERT(accessController != nullptr);
+    NX_ASSERT(layoutSnapshotManager != nullptr);
+
+    m_nodeManager = new QnResourceTreeModelNodeManager(this);
+    m_layoutNodeManager = new QnResourceTreeModelLayoutNodeManager(this);
+
     if (ini().developerMode)
         nx::utils::ModelTransactionChecker::install(this);
 
@@ -153,7 +162,7 @@ QnResourceTreeModel::QnResourceTreeModel(
     if (scope != CamerasScope)
     {
         auto userNodes = new QnResourceTreeModelUserNodes(this);
-        userNodes->initialize(this, m_rootNodes[NodeType::users]);
+        userNodes->initialize(m_rootNodes[NodeType::users]);
     }
 
     /* Connect to context. */
@@ -161,11 +170,11 @@ QnResourceTreeModel::QnResourceTreeModel(
         &QnResourceTreeModel::at_resPool_resourceAdded);
     connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
         &QnResourceTreeModel::at_resPool_resourceRemoved);
-    connect(snapshotManager(), &QnWorkbenchLayoutSnapshotManager::layoutFlagsChanged, this,
-        &QnResourceTreeModel::at_snapshotManager_flagsChanged);
-    connect(context(), &QnWorkbenchContext::userChanged, this,
-        &QnResourceTreeModel::rebuildTree);
-    connect(qnGlobalSettings, &QnGlobalSettings::systemNameChanged, this,
+
+    connect(layoutSnapshotManager, &QnWorkbenchLayoutSnapshotManager::layoutFlagsChanged,
+        this, &QnResourceTreeModel::at_snapshotManager_flagsChanged);
+
+    connect(globalSettings(), &QnGlobalSettings::systemNameChanged, this,
         &QnResourceTreeModel::at_systemNameChanged);
 
     connect(qnSettings->notifier(QnClientSettings::EXTRA_INFO_IN_TREE),
@@ -180,13 +189,21 @@ QnResourceTreeModel::QnResourceTreeModel(
                 root->updateRecursive();
         });
 
-    connect(accessController(), &QnWorkbenchAccessController::permissionsChanged, this,
+    connect(accessController, &QnWorkbenchAccessController::permissionsChanged, this,
         &QnResourceTreeModel::handlePermissionsChanged);
 
     connect(qnClientModule->wearableManager(), &WearableManager::stateChanged, this,
         &QnResourceTreeModel::at_wearableManager_stateChanged);
 
     rebuildTree();
+
+    connect(accessController, &QnWorkbenchAccessController::userChanged, this,
+        [this](QnUserResourcePtr& user)
+        {
+            rebuildTree();
+            emit userChanged(user);
+        });
+
 
     /* It is important to connect before iterating as new resources may be added to the pool asynchronously. */
     for (const QnResourcePtr& resource: resourcePool()->getResources())
@@ -341,8 +358,8 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParent(const QnResourceT
     * Also here we restructuring tree for admin and common users.
     */
 
-    bool isLoggedIn = !context()->user().isNull();
-    bool isAdmin = accessController()->hasGlobalPermission(GlobalPermission::admin);
+    const bool isLoggedIn = !user().isNull();
+    const bool isAdmin = accessController()->hasGlobalPermission(GlobalPermission::admin);
     auto bastardNode = m_rootNodes[NodeType::bastard];
     auto rootNode = m_rootNodes[NodeType::root];
 
@@ -433,10 +450,10 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParent(const QnResourceT
 
 QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParentForResourceNode(const QnResourceTreeModelNodePtr& node)
 {
-    bool isLoggedIn = !context()->user().isNull();
-    auto rootNode = m_rootNodes[NodeType::root];
-    auto bastardNode = m_rootNodes[NodeType::bastard];
-    bool isAdmin = accessController()->hasGlobalPermission(GlobalPermission::admin);
+    const bool isLoggedIn = !user().isNull();
+    const auto rootNode = m_rootNodes[NodeType::root];
+    const auto bastardNode = m_rootNodes[NodeType::bastard];
+    const bool isAdmin = accessController()->hasGlobalPermission(GlobalPermission::admin);
 
     if (!node->resource())
         return bastardNode;
@@ -487,7 +504,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParentForResourceNode(co
             return m_rootNodes[NodeType::layouts];
 
         QnUserResourcePtr owner = layout->getParentResource().dynamicCast<QnUserResource>();
-        if (!owner || owner == context()->user())
+        if (!owner || owner == user())
             return m_rootNodes[NodeType::layouts];
 
         return bastardNode;
@@ -863,7 +880,7 @@ bool QnResourceTreeModel::canDropMimeData(const QMimeData* mimeData, Qt::DropAct
     if (!node)
         return false;
 
-    // TODO: #vkutin #gdm Add actual check if supplied entites/resources can be dropped on the node.
+    // TODO: #vkutin #gdm Add actual check if supplied entities/resources can be dropped on the node.
 
     return true;
 }
@@ -891,6 +908,12 @@ bool QnResourceTreeModel::dropMimeData(const QMimeData* mimeData, Qt::DropAction
     MimeData data(mimeData, resourcePool());
     resourcePool()->addNewResources(data.resources());
 
+    if (!actionManager())
+    {
+        NX_ASSERT(false);
+        return false;
+    }
+
     // Drop on videowall is handled in videowall.
     if (node->type() == ResourceTree::NodeType::videoWallItem)
     {
@@ -906,7 +929,7 @@ bool QnResourceTreeModel::dropMimeData(const QMimeData* mimeData, Qt::DropAction
             parameters = data.resources();
         }
         parameters.setArgument(Qn::VideoWallItemGuidRole, node->uuid());
-        menu()->trigger(action::DropOnVideoWallItemAction, parameters);
+        actionManager()->trigger(action::DropOnVideoWallItemAction, parameters);
     }
     else if (node->type() == ResourceTree::NodeType::role)
     {
@@ -921,7 +944,7 @@ bool QnResourceTreeModel::dropMimeData(const QMimeData* mimeData, Qt::DropAction
             TRACE("Sharing layout " << layout->getName() << " with role "
                 << node->m_displayName);
 
-            menu()->trigger(action::ShareLayoutAction,
+            actionManager()->trigger(action::ShareLayoutAction,
                 action::Parameters(layout).withArgument(Qn::UuidRole, roleId));
         }
         auto camerasToShare = data.resources().filtered<QnVirtualCameraResource>();
@@ -930,7 +953,7 @@ bool QnResourceTreeModel::dropMimeData(const QMimeData* mimeData, Qt::DropAction
             TRACE("Sharing camera " << camera->getName() << " with role "
                 << node->m_displayName);
 
-            menu()->trigger(action::ShareCameraAction,
+            actionManager()->trigger(action::ShareCameraAction,
                 action::Parameters(camera).withArgument(Qn::UuidRole, roleId));
         }
     }
@@ -1110,7 +1133,7 @@ void QnResourceTreeModel::rebuildTree()
     // TODO: #vkutin #gdm Implement "model reset" logic for the tree.
     // Currently it's not handled, "rows inserted/removed" is handled instead.
 
-    m_rootNodes[ResourceTree::NodeType::currentUser]->setResource(context()->user());
+    m_rootNodes[ResourceTree::NodeType::currentUser]->setResource(user());
 
     // Force re-create camera nodes for edge servers.
     for (const auto& resource: commonModule()->resourcePool()->getAllServers(Qn::AnyStatus))
@@ -1144,6 +1167,12 @@ void QnResourceTreeModel::handleDrop(
     if (sourceResources.isEmpty() || !targetResource)
         return;
 
+    if (!actionManager())
+    {
+        NX_ASSERT(false);
+        return;
+    }
+
     /* We can add media resources to layout */
     if (const auto layout = targetResource.dynamicCast<QnLayoutResource>())
     {
@@ -1151,9 +1180,9 @@ void QnResourceTreeModel::handleDrop(
 
         if (!droppable.isEmpty())
         {
-            menu()->trigger(action::OpenInLayoutAction, action::Parameters(droppable)
+            actionManager()->trigger(action::OpenInLayoutAction, action::Parameters(droppable)
                 .withArgument(Qn::LayoutResourceRole, layout));
-            menu()->trigger(action::SaveLayoutAction, layout);
+            actionManager()->trigger(action::SaveLayoutAction, layout);
         }
     }
 
@@ -1170,8 +1199,9 @@ void QnResourceTreeModel::handleDrop(
             if (sourceLayout->isFile())
                 continue;
 
-            TRACE("Sharing layout " << sourceLayout->getName() << " with " << targetUser->getName())
-            menu()->trigger(action::ShareLayoutAction, action::Parameters(sourceLayout)
+            TRACE("Sharing layout " << sourceLayout->getName() << " with " << targetUser->getName());
+
+            actionManager()->trigger(action::ShareLayoutAction, action::Parameters(sourceLayout)
                 .withArgument(Qn::UserResourceRole, targetUser));
         }
 
@@ -1179,7 +1209,7 @@ void QnResourceTreeModel::handleDrop(
         {
             TRACE("Sharing camera " << sourceCamera->getName() << " with " << targetUser->getName());
 
-            menu()->trigger(action::ShareCameraAction, action::Parameters(sourceCamera)
+            actionManager()->trigger(action::ShareCameraAction, action::Parameters(sourceCamera)
                 .withArgument(Qn::UserResourceRole, targetUser));
         }
     }
@@ -1197,7 +1227,7 @@ void QnResourceTreeModel::handleDrop(
         const auto cameras = sourceResources.filtered<QnVirtualCameraResource>();
         if (!cameras.empty())
         {
-            menu()->trigger(action::MoveCameraAction, action::Parameters(cameras)
+            actionManager()->trigger(action::MoveCameraAction, action::Parameters(cameras)
                 .withArgument(Qn::MediaServerResourceRole, server));
         }
     }
@@ -1244,7 +1274,7 @@ void QnResourceTreeModel::at_snapshotManager_flagsChanged(const QnLayoutResource
 {
     if (auto videowall = layout->data().value(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>())
     {
-        bool modified = snapshotManager()->isModified(layout);
+        bool modified = layoutSnapshotManager()->isModified(layout);
         ensureResourceNode(videowall)->setModified(modified);
         return;
     }
@@ -1366,4 +1396,29 @@ QnResourceTreeModelNodeManager* QnResourceTreeModel::nodeManager() const
 QnResourceTreeModelLayoutNodeManager* QnResourceTreeModel::layoutNodeManager() const
 {
     return m_layoutNodeManager;
+}
+
+QnWorkbenchAccessController* QnResourceTreeModel::accessController() const
+{
+    return m_accessController;
+}
+
+QnWorkbenchLayoutSnapshotManager* QnResourceTreeModel::layoutSnapshotManager() const
+{
+    return m_layoutSnapshotManager;
+}
+
+action::Manager* QnResourceTreeModel::actionManager() const
+{
+    return m_actionManager;
+}
+
+void QnResourceTreeModel::setActionManager(action::Manager* actionManager)
+{
+    m_actionManager = actionManager;
+}
+
+QnUserResourcePtr QnResourceTreeModel::user() const
+{
+    return m_accessController->user();
 }

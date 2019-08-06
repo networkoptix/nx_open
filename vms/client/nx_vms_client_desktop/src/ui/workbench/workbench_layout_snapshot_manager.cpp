@@ -28,7 +28,7 @@
 // -------------------------------------------------------------------------- //
 QnWorkbenchLayoutSnapshotManager::QnWorkbenchLayoutSnapshotManager(QObject *parent):
     base_type(parent),
-    QnWorkbenchContextAware(parent),
+    QnCommonModuleAware(parent),
     m_storage(new QnWorkbenchLayoutSnapshotStorage(this))
 {
     /* Start listening to changes. */
@@ -80,10 +80,6 @@ void QnWorkbenchLayoutSnapshotManager::setFlags(const QnLayoutResourcePtr& layou
     if (!layout)
         return;
 
-    NX_ASSERT(!flags.testFlag(IsBeingSaved)
-        || accessController()->hasPermissions(layout, Qn::SavePermission),
-        "Saving unsaveable resource");
-
     base_type::setFlags(layout->getId(), flags);
 }
 
@@ -108,9 +104,6 @@ bool QnWorkbenchLayoutSnapshotManager::isModified(const QnLayoutResourcePtr &lay
 
 bool QnWorkbenchLayoutSnapshotManager::save(const QnLayoutResourcePtr &layout, SaveLayoutResultFunction callback)
 {
-    NX_ASSERT(accessController()->hasPermissions(layout, Qn::SavePermission),
-        "Saving unsaveable resource");
-
     if (commonModule()->isReadOnly())
         return false;
 
@@ -244,7 +237,7 @@ void QnWorkbenchLayoutSnapshotManager::connectTo(const QnLayoutResourcePtr &reso
     // This one is handled separately because it should not lead to marking layout as modified if
     // layout is not opened right now.
     connect(resource, &QnLayoutResource::itemChanged, this,
-        &QnWorkbenchLayoutSnapshotManager::at_layout_itemChanged);
+        &QnWorkbenchLayoutSnapshotManager::at_layout_changed);
 
     connect(resource, &QnLayoutResource::storeRequested, this,
         &QnWorkbenchLayoutSnapshotManager::store);
@@ -294,10 +287,4 @@ void QnWorkbenchLayoutSnapshotManager::at_resource_changed(const QnResourcePtr &
     NX_ASSERT(layoutResource);
     if (layoutResource)
         at_layout_changed(layoutResource);
-}
-
-void QnWorkbenchLayoutSnapshotManager::at_layout_itemChanged(const QnLayoutResourcePtr &resource)
-{
-    if (workbench()->currentLayout()->resource() == resource)
-        at_layout_changed(resource);
 }
