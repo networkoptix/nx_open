@@ -58,6 +58,11 @@ public:
      */
     void getLocation(nx::utils::MoveOnlyFunc<void(Result, std::string/*location*/)> handler);
 
+    /**
+     * Get the number of bytes being stored at https://BucketName.s3.amazonaws.com/{pathPrefix}.
+     */
+    void getBucketSize(nx::utils::MoveOnlyFunc<void(Result, int/*bytes*/)> handler);
+
 protected:
     virtual void stopWhileInAioThread() override;
 

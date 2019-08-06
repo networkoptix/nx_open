@@ -7,6 +7,7 @@
 #include "aws_signature_v4.h"
 #include "http_request_paths.h"
 #include "api/location_constraint.h"
+#include "api/list_bucket_result.h"
 
 namespace nx::cloud::aws {
 
@@ -110,6 +111,46 @@ void ApiClient::getLocation(
             }
 
             handler(ResultCode::ok, std::move(locationConstraint.region));
+        });
+}
+
+void nx::cloud::aws::ApiClient::getBucketSize(
+    nx::utils::MoveOnlyFunc<void(Result, int)> handler)
+{
+    QString prefix;
+    auto path = m_url.path();
+    if (!path.isEmpty())
+        prefix = QString("&prefix=") + (path[0] == '/' ? path.mid(1) : path);
+
+    auto url =
+        nx::network::url::Builder(m_url).setPath(http::kRootPath)
+            .setQuery("list_type=2" + prefix);
+
+    doAwsApiCall(
+        nx::network::http::Method::get,
+        url,
+        [this, handler = std::move(handler)](auto httpClient)
+        {
+            auto resultCode = getResultCode(*httpClient);
+            if (resultCode != ResultCode::ok)
+            {
+                return handler(
+                    Result(resultCode, httpClient->fetchMessageBodyBuffer().constData()),
+                    0);
+            }
+            api::ListBucketResult listBucketResult;
+            if (!api::xml::deserialize(httpClient->fetchMessageBodyBuffer(), &listBucketResult))
+            {
+                return handler(
+                    Result(ResultCode::error, "Failed to deserialize ListBucketResult"),
+                    0);
+            }
+
+            int size = 0;
+            for(const auto& object: listBucketResult.contents)
+                size += object.size;
+
+            handler(ResultCode::ok, size);
         });
 }
 
