@@ -509,7 +509,8 @@ void QnClientModule::initSingletons()
 
     commonModule->store(new QnQtbugWorkaround());
 
-    commonModule->store(new nx::cloud::gateway::VmsGatewayEmbeddable(true));
+    if (!isTestingEnvironment())
+        commonModule->store(new nx::cloud::gateway::VmsGatewayEmbeddable(true));
 
     m_cameraDataManager = commonModule->store(new QnCameraDataManager(commonModule));
 
@@ -700,7 +701,7 @@ void QnClientModule::initLocalResources()
     resourceDiscoveryManager->setReady(true);
     commonModule->store(new QnSystemsWeightsManager());
     commonModule->store(new QnLocalResourceStatusWatcher());
-    if (!m_startupParameters.skipMediaFolderScan && !m_startupParameters.acsMode 
+    if (!m_startupParameters.skipMediaFolderScan && !m_startupParameters.acsMode
         && !isTestingEnvironment())
     {
         auto localFilesSearcher = commonModule->store(new ResourceDirectoryBrowser());
