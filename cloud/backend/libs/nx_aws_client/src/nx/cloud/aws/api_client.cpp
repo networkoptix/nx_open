@@ -6,6 +6,7 @@
 
 #include "aws_signature_v4.h"
 #include "http_request_paths.h"
+#include "api/location_constraint.h"
 
 namespace nx::cloud::aws {
 
@@ -13,77 +14,7 @@ namespace {
 
 static constexpr char kAwsS3ServiceName[] = "s3";
 
-static std::string parseLocationConstraintResponse(const nx::Buffer& messageBody)
-{
-    /**
-     * Parses aws-region-x between tags <LocationConstraint>aws-region-x</LocationRestraint>
-     * if </LocationConstraint> end tag is missing, the region is assumed to be us-east-1 per
-     * AWS docs: https://docs.aws.amazon.com/AmazonS3/latest/API/RESTBucketGETlocation.html
-     */
-
-    static constexpr char kLocationConstraint[] = "LocationConstraint";
-    if (messageBody.indexOf(kLocationConstraint) == -1) //< Required xml tag is missing
-        return {};
-
-    static constexpr char kXmlEndTag[] = "</LocationConstraint>";
-    static constexpr char kUsEast1[] = "us-east-1";
-
-    int end = messageBody.indexOf(kXmlEndTag);
-    if (end == -1)
-        return kUsEast1;
-
-    for (int i = end - 1; i >= 0; --i)
-    {
-        if (messageBody.at(i) == '>')
-            return messageBody.mid(i + 1, end - i - 1).trimmed().toStdString();
-    }
-
-    return {};
-}
-
-static std::string parseWrongRegionResponse(const nx::Buffer& messageBody)
-{
-    // Parses 'aws-region-x' between tags: <Region>aws-region-x</Region>
-    static QString kRegionStartTag = "<Region>";
-    static QString kRegionEndTag = "</Region>";
-
-    int start = messageBody.indexOf(kRegionStartTag);
-    if (start == -1)
-        return {};
-    start += kRegionStartTag.size();
-
-    int end = messageBody.indexOf(kRegionEndTag, start);
-    if (end == -1)
-        return {};
-
-    if (end <= start)
-        return {};
-
-    return messageBody.mid(start, end - start).trimmed().toStdString();
-}
-
-static std::vector<std::function<std::string(const nx::Buffer&)>> kLocationXmlParsers = {
-    parseWrongRegionResponse,
-    parseLocationConstraintResponse
-};
-
-// TODO figure out xml deserialization AND how to deal with
-// aws authorization catch 22 for getLocation api call
-static std::string parseLocation(const nx::Buffer& messageBody)
-{
-    if (messageBody.isEmpty())
-        return {};
-
-    for (auto& func : kLocationXmlParsers)
-    {
-        auto region = func(messageBody);
-        if (!region.empty())
-            return region;
-    }
-    return {};
-}
-
-}
+} // namespace
 
 ApiClient::ApiClient(
     const std::string& /*storageClientId*/,
@@ -162,26 +93,23 @@ void ApiClient::deleteFile(
 void ApiClient::getLocation(
     nx::utils::MoveOnlyFunc<void(Result, std::string)> handler)
 {
-    // TODO fix this entire api call.
     auto url =
         nx::network::url::Builder(m_url).setPath(http::kRootPath).setQuery(http::kLocationQuery);
     doAwsApiCall(
         nx::network::http::Method::get,
         url,
-        [this, handler = std::move(handler)](auto httpClient) mutable
+        [this, handler = std::move(handler)](auto httpClient)
         {
+            api::LocationConstraint locationConstraint;
             auto messageBody = httpClient->fetchMessageBodyBuffer();
-            std::string location = parseLocation(messageBody);
-            if (!location.empty())
+            if (!api::xml::deserialize(messageBody, &locationConstraint))
             {
-                handler(ResultCode::ok, std::move(location));
-            }
-            else
-            {
-                handler(
+                return handler(
                     Result(getResultCode(*httpClient), messageBody.constData()),
                     std::string());
             }
+
+            handler(ResultCode::ok, std::move(locationConstraint.region));
         });
 }
 
