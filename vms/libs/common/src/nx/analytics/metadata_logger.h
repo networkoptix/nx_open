@@ -46,6 +46,15 @@ private:
         const nx::common::metadata::ObjectMetadataPacket& metadataPacket,
         const QString& additionalInfo);
 
+public: //< Intended for unit tests.
+    MetadataLogger(const QString& filename)
+    {
+        NX_CRITICAL(!filename.isEmpty());
+        m_outputFile.setFileName(filename);
+        const bool result = m_outputFile.open(QIODevice::WriteOnly);
+        NX_CRITICAL(result);
+    }
+
 private:
     QFile m_outputFile;
 

@@ -214,7 +214,11 @@ QString MetadataLogger::buildObjectMetadataLogString(
     const ObjectMetadataPacket& metadataPacket,
     const QString& additionalInfoStr) const
 {
-    const microseconds currentTime{qnSyncTime->currentUSecsSinceEpoch()};
+    const microseconds currentTime{
+        qnSyncTime //< Is null in unit tests.
+            ? qnSyncTime->currentUSecsSinceEpoch()
+            : duration_cast<microseconds>(system_clock::now().time_since_epoch()).count()
+    };
     const microseconds currentPacketTimestamp{metadataPacket.timestampUs};
     const microseconds diffFromPrev = currentPacketTimestamp - m_prevObjectMetadataPacketTimestamp;
 
