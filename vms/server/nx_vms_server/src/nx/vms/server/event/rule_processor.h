@@ -111,6 +111,8 @@ public:
      * Get pointer to rule, that catched provided action
      */
     vms::event::RulePtr getRuleForAction(const vms::event::AbstractActionPtr& action) const;
+    QList<vms::event::RulePtr> rules() const;
+
 public slots:
     /*
     * This function matches all business actions for specified business event and execute it.
