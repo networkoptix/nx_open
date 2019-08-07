@@ -529,8 +529,6 @@ QnVideoCamera::QnVideoCamera(
     m_settings(settings),
     m_dataProviderFactory(dataProviderFactory),
     m_resource(resource),
-    m_primaryGopKeeper(nullptr),
-    m_secondaryGopKeeper(nullptr),
     m_loStreamHlsInactivityPeriodMS(m_settings.hlsInactivityPeriod() * MSEC_PER_SEC),
     m_hiStreamHlsInactivityPeriodMS(m_settings.hlsInactivityPeriod() * MSEC_PER_SEC)
 {
@@ -549,9 +547,9 @@ QnVideoCameraGopKeeper* QnVideoCamera::getGopKeeper(StreamIndex streamIndex) con
     switch (streamIndex)
     {
         case StreamIndex::primary:
-            return m_primaryGopKeeper;
+            return m_primaryGopKeeper.get();
         case StreamIndex::secondary:
-            return m_secondaryGopKeeper;
+            return m_secondaryGopKeeper.get();
         default:
             break;
     }
@@ -574,14 +572,14 @@ void QnVideoCamera::beforeStop()
         m_secondaryGopKeeper->disconnectFromResource();
 
     if (m_primaryReader) {
-        m_primaryReader->removeDataProcessor(m_primaryGopKeeper);
+        m_primaryReader->removeDataProcessor(m_primaryGopKeeper.get());
         m_liveCacheValidityTimers[MEDIA_Quality_High].restart();
         m_primaryReader->removeDataProcessor(m_liveCache[MEDIA_Quality_High].get());
         m_primaryReader->pleaseStop();
     }
 
     if (m_secondaryReader) {
-        m_secondaryReader->removeDataProcessor(m_secondaryGopKeeper);
+        m_secondaryReader->removeDataProcessor(m_secondaryGopKeeper.get());
         m_liveCacheValidityTimers[MEDIA_Quality_Low].restart();
         m_secondaryReader->removeDataProcessor(m_liveCache[MEDIA_Quality_Low].get());
         m_secondaryReader->pleaseStop();
@@ -600,8 +598,6 @@ QnVideoCamera::~QnVideoCamera()
 {
     beforeStop();
     stop();
-    delete m_primaryGopKeeper;
-    delete m_secondaryGopKeeper;
 }
 
 void QnVideoCamera::at_camera_resourceChanged()
@@ -677,17 +673,19 @@ void QnVideoCamera::createReader(QnServer::ChunksCatalog catalog)
             Qt::DirectConnection);
     }
 
-    QnVideoCameraGopKeeper* gopKeeper =
-        new QnVideoCameraGopKeeper(this, m_resource, catalog);
+    auto gopKeeper = std::make_unique<QnVideoCameraGopKeeper>(this, m_resource, catalog);
+    reader->addDataProcessor(gopKeeper.get());
+
     if (streamIndex == StreamIndex::primary)
-        m_primaryGopKeeper = gopKeeper;
+        m_primaryGopKeeper = std::move(gopKeeper);
     else
-        m_secondaryGopKeeper = gopKeeper;
-    reader->addDataProcessor(gopKeeper);
+        m_secondaryGopKeeper = std::move(gopKeeper);
 
     connect(reader.get(), &QThread::started, this,
-        [gopKeeper]()
+        [this, streamIndex]()
         {
+            auto gopKeeper = getGopKeeper(streamIndex);
+            NX_CRITICAL(gopKeeper != nullptr);
             gopKeeper->clearVideoData();
         },
         Qt::DirectConnection);
