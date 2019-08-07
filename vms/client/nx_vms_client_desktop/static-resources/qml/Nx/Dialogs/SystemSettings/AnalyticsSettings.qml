@@ -44,10 +44,9 @@ Item
 
         onAnalyticsEnginesChanged:
         {
-            var selectedEngineId = currentEngineId
             for (var i = 0; i < store.analyticsEngines.length; ++i)
             {
-                if (store.analyticsEngines[i].id === selectedEngineId)
+                if (store.analyticsEngines[i].id === currentEngineId)
                     return
             }
 
