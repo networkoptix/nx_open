@@ -193,9 +193,9 @@ static Ptr<RefCountable> makePtr(Args&&... args)
  * @param refCountable Can be null, then null will be returned.
  */
 template</*explicit*/ class Interface, /*deduced*/ class RefCountablePtr,
-    /*deduced*/ typename InterfaceId>
+    /*deduced*/ typename OldInterfaceId>
 static Ptr<Interface> queryInterfaceOfOldSdk(
-    RefCountablePtr refCountable, const InterfaceId& interfaceId)
+    RefCountablePtr refCountable, const OldInterfaceId& interfaceId)
 {
     return refCountable
         ? toPtr(static_cast<Interface*>(refCountable->queryInterface(interfaceId)))

@@ -83,7 +83,6 @@ class Result<void>
 public:
     Result(): m_error(ErrorCode::noError, nullptr) {}
 
-    // TODO: #mshevchenko: REMOVE
     Result(Error&& error): m_error(std::move(error)) {}
 
     Result& operator=(Error&& error)

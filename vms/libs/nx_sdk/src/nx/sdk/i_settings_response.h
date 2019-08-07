@@ -12,7 +12,7 @@ namespace sdk {
 class ISettingsResponse: public Interface<ISettingsResponse>
 {
 public:
-    static auto interfaceId() { return InterfaceId("nx::sdk::ISettingsResponse"); }
+    static auto interfaceId() { return makeId("nx::sdk::ISettingsResponse"); }
 
     /**
      * @return Map of setting values, indexed by setting ids.

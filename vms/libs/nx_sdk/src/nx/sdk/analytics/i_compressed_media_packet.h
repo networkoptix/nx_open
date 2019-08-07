@@ -19,7 +19,7 @@ namespace analytics {
 class ICompressedMediaPacket: public Interface<ICompressedMediaPacket, IDataPacket>
 {
 public:
-    static auto interfaceId() { return InterfaceId("nx::sdk::analytics::ICompressedMediaPacket"); }
+    static auto interfaceId() { return makeId("nx::sdk::analytics::ICompressedMediaPacket"); }
 
     /**
      * @return Null-terminated ASCII string containing the MIME type corresponding to the packet

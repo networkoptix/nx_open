@@ -20,7 +20,7 @@ namespace analytics {
 class IAction: public Interface<IAction>
 {
 public:
-    static auto interfaceId() { return InterfaceId("nx::sdk::analytics::IAction"); }
+    static auto interfaceId() { return makeId("nx::sdk::analytics::IAction"); }
 
     /** Id of the action being triggered. */
     virtual const char* actionId() const = 0;
