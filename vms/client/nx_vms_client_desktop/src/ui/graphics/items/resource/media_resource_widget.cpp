@@ -1739,8 +1739,7 @@ void QnMediaResourceWidget::paintAnalyticsObjectsDebugOverlay(
     {
         const auto packets = d->analyticsMetadataLogParser->packetsBetweenTimestamps(
             prevRenderedFrameTimestamp.count(),
-            currentRenderedFrameTimestamp.count()
-        );
+            currentRenderedFrameTimestamp.count());
 
         const PainterTransformScaleStripper scaleStripper(painter);
         const auto widgetRect = scaleStripper.mapRect(rect);
