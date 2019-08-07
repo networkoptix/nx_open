@@ -48,32 +48,37 @@ void Engine::setEngineInfo(const nx::sdk::analytics::IEngineInfo* /*engineInfo*/
 {
 }
 
-StringMapResult Engine::setSettings(const IStringMap* /*settings*/)
+void Engine::doSetSettings(
+    Result<const IStringMap*>* /*outResult*/, const IStringMap* /*settings*/)
 {
     // There are no DeviceAgent settings for this plugin.
-    return nullptr;
 }
 
-SettingsResponseResult Engine::pluginSideSettings() const
+void Engine::getPluginSideSettings(Result<const ISettingsResponse*>* /*outResult*/) const
 {
-    return nullptr;
 }
 
-MutableDeviceAgentResult Engine::obtainDeviceAgent(const IDeviceInfo* deviceInfo)
+void Engine::doObtainDeviceAgent(Result<IDeviceAgent*>* outResult, const IDeviceInfo* deviceInfo)
 {
     if (!isCompatible(deviceInfo))
-        return error(ErrorCode::invalidParams, "Device is not compatible");
+    {
+        *outResult = error(ErrorCode::invalidParams, "Device is not compatible");
+        return;
+    }
 
     EngineManifest events = fetchSupportedEvents(deviceInfo);
     if (events.eventTypes.empty())
-        return error(ErrorCode::internalError, "Supported event list is empty");
+    {
+        *outResult = error(ErrorCode::internalError, "Supported event list is empty");
+        return;
+    }
 
-    return new DeviceAgent(this, deviceInfo, events);
+    *outResult = new DeviceAgent(this, deviceInfo, events);
 }
 
-StringResult Engine::manifest() const
+void Engine::getManifest(Result<const IString*>* outResult) const
 {
-    return new nx::sdk::String(m_jsonManifest);
+    *outResult = new nx::sdk::String(m_jsonManifest);
 }
 
 EngineManifest Engine::fetchSupportedEvents(const IDeviceInfo* deviceInfo)
@@ -110,9 +115,8 @@ EngineManifest Engine::fetchSupportedEvents(const IDeviceInfo* deviceInfo)
     return result;
 }
 
-Result<void> Engine::executeAction(IAction* /*action*/)
+void Engine::doExecuteAction(Result<void>* /*outResult*/, IAction* /*action*/)
 {
-    return {};
 }
 
 void Engine::setHandler(IHandler* /*handler*/)

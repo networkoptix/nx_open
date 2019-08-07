@@ -16,8 +16,13 @@ public:
     static auto interfaceId() { return InterfaceId("nx::sdk::analytics::IMetadataTypes"); }
 
     virtual ~IMetadataTypes() = default;
-    virtual const IStringList* eventTypeIds() const = 0;
-    virtual const IStringList* objectTypeIds() const = 0;
+
+    protected: virtual const IStringList* getEventTypeIds() const = 0;
+    public: Ptr<const IStringList> eventTypeIds() const { return toPtr(getEventTypeIds()); }
+
+    protected: virtual const IStringList* getObjectTypeIds() const = 0;
+    public: Ptr<const IStringList> objectTypeIds() const { return toPtr(getObjectTypeIds()); }
+
     virtual bool isEmpty() const = 0;
 };
 

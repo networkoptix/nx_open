@@ -4,6 +4,7 @@
 
 #include "discovery_manager.h"
 
+#include <nx/sdk/ptr.h>
 #include <nx/utils/log/log.h>
 
 using namespace std::chrono;
@@ -98,8 +99,8 @@ void HttpLinkPlugin::setSettings(const nxpl::Setting* /*settings*/, int /*count*
 
 void HttpLinkPlugin::setPluginContainer(nxpl::PluginInterface* pluginContainer)
 {
-    m_timeProvider.reset(
-        static_cast<nxpl::TimeProvider*>(pluginContainer->queryInterface(nxpl::IID_TimeProvider)));
+    m_timeProvider = nx::sdk::queryInterfaceOfOldSdk<nxpl::TimeProvider>(
+        pluginContainer, nxpl::IID_TimeProvider);
 }
 
 nxpt::CommonRefManager* HttpLinkPlugin::refManager()

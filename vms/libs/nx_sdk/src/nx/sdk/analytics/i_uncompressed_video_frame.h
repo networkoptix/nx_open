@@ -15,7 +15,7 @@ class IUncompressedVideoFrame: public Interface<IUncompressedVideoFrame, IUncomp
 public:
     static auto interfaceId() { return InterfaceId("nx::sdk::analytics::IUncompressedVideoFrame"); }
 
-    enum class PixelFormat
+    enum class PixelFormat: int
     {
         yuv420,
         argb,
@@ -46,7 +46,13 @@ public:
     /**
      * @return Aspect ratio of a frame pixel.
      */
-    virtual PixelAspectRatio pixelAspectRatio() const = 0;
+    protected: virtual void getPixelAspectRatio(PixelAspectRatio* outValue) const = 0;
+    public: PixelAspectRatio pixelAspectRatio() const
+    {
+        PixelAspectRatio value;
+        getPixelAspectRatio(&value);
+        return value;
+    }
 
     virtual PixelFormat pixelFormat() const = 0;
 

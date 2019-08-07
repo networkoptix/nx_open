@@ -9,8 +9,7 @@
 
 #include <nx/sdk/helpers/ref_countable.h>
 #include <nx/sdk/helpers/log_utils.h>
-#include <nx/sdk/helpers/ptr.h>
-#include <nx/sdk/helpers/result_aliases.h>
+#include <nx/sdk/ptr.h>
 
 #include <nx/sdk/analytics/i_engine.h>
 #include <nx/sdk/analytics/i_consuming_device_agent.h>
@@ -44,10 +43,9 @@ protected:
     /**
      * @param enableOutput Enables NX_OUTPUT. Typically, use NX_DEBUG_ENABLE_OUTPUT as a value.
      * @param printPrefix Prefix for NX_PRINT and NX_OUTPUT. If empty, will be made from Engine's
-     * libName().
+     *     libName().
      */
     VideoFrameProcessingDeviceAgent(
-        IEngine* engine,
         const IDeviceInfo* deviceInfo,
         bool enableOutput,
         const std::string& printPrefix = "");
@@ -57,9 +55,7 @@ protected:
     /**
      * Override to accept next compressed video frame for processing. Should not block the caller
      * thread for long.
-     * @param videoFrame Contains a pointer to the compressed video frame raw bytes. The lifetime
-     *     (validity) of this pointer is the same as of videoFrame. Thus, it can be extended by
-     *     addRef() or queryInterface() inside this method.
+     * @param videoFrame Contains a pointer to the compressed video frame raw bytes.
      */
     virtual bool pushCompressedVideoFrame(const ICompressedVideoPacket* /*videoFrame*/)
     {
@@ -68,9 +64,7 @@ protected:
 
     /**
      * Override to accept next uncompressed video frame for processing.
-     * @param videoFrame Contains a pointer to the compressed video frame raw bytes. The lifetime
-     *     (validity) of this pointer is the same as of videoFrame. Thus, it can be extended by
-     *     addRef() or queryInterface() inside this method.
+     * @param videoFrame Contains a pointer to the compressed video frame raw bytes.
      */
     virtual bool pushUncompressedVideoFrame(const IUncompressedVideoFrame* /*videoFrame*/)
     {
@@ -109,7 +103,7 @@ protected:
      * Should perform any required (re)initialization. Called even if the settings model is empty.
      * @return Error messages per setting (if any), as in IDeviceAgent::setSettings().
      */
-    virtual StringMapResult settingsReceived() { return nullptr; }
+    virtual nx::sdk::Result<const nx::sdk::IStringMap*> settingsReceived() { return nullptr; }
 
     /**
      * Provides access to the DeviceAgent settings stored by the Server for the particular Device.
@@ -125,32 +119,20 @@ protected:
 public:
     virtual ~VideoFrameProcessingDeviceAgent() override;
 
-    /**
-     * Intended to be called from a method of a derived class overriding engine().
-     * @return Parent Engine, casted to the specified type.
-     */
-    template<typename DerivedEngine>
-    DerivedEngine* engineCasted() const
-    {
-        const auto engine = dynamic_cast<DerivedEngine*>(m_engine);
-        assertEngineCasted(engine);
-        return engine;
-    }
-
-    virtual IEngine* engine() const override { return m_engine; }
-
 //-------------------------------------------------------------------------------------------------
 // Not intended to be used by the descendant.
 
 public:
-    virtual void setHandler(IDeviceAgent::IHandler* handler) override;
-    virtual Result<void> pushDataPacket(IDataPacket* dataPacket) override;
-    virtual StringResult manifest() const override;
-    virtual StringMapResult setSettings(const IStringMap* settings) override;
-    virtual SettingsResponseResult pluginSideSettings() const override;
+    virtual void setHandler(IHandler* handler) override;
+    
+protected:
+    virtual void doPushDataPacket(Result<void>* outResult, IDataPacket* dataPacket) override;
+    virtual void doSetSettings(
+        Result<const IStringMap*>* outResult, const IStringMap* settings) override;
+    virtual void getPluginSideSettings(Result<const ISettingsResponse*>* outResult) const override;
+    virtual void getManifest(Result<const IString*>* outResult) const override;
 
 private:
-    void assertEngineCasted(void* engine) const;
     void logMetadataPacketIfNeeded(
         const IMetadataPacket* metadataPacket,
         const std::string& packetIndexName) const;
@@ -159,7 +141,6 @@ private:
 
 private:
     mutable std::mutex m_mutex;
-    IEngine* const m_engine;
     Ptr<IDeviceAgent::IHandler> m_handler;
     std::map<std::string, std::string> m_settings;
 };

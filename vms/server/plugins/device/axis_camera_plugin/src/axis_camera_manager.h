@@ -8,7 +8,7 @@
 
 #include <camera/camera_plugin.h>
 #include <plugins/plugin_tools.h>
-#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/ptr.h>
 
 class AxisCameraPlugin;
 class AxisMediaEncoder;

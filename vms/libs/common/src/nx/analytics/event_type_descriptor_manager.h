@@ -75,9 +75,9 @@ private:
         const std::set<EventTypeId>& eventTypeIds) const;
 
 private:
-    EventTypeDescriptorContainer m_eventTypeDescriptorContainer;
-    EngineDescriptorContainer m_engineDescriptorContainer;
-    GroupDescriptorContainer m_groupDescriptorContainer;
+    std::unique_ptr<EventTypeDescriptorContainer> m_eventTypeDescriptorContainer;
+    std::unique_ptr<EngineDescriptorContainer> m_engineDescriptorContainer;
+    std::unique_ptr<GroupDescriptorContainer> m_groupDescriptorContainer;
 };
 
 } // namespace nx::analytics

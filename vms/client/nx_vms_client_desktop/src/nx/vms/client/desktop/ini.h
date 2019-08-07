@@ -160,8 +160,8 @@ struct Ini: nx::kit::IniConfig
     NX_INI_INT(0, globalLiveVideoCacheLength,
         "Global live video cache length, in seconds. Set to zero to use built-in value.");
     NX_INI_INT(180000, connectTimeoutMs,
-        "Timeout (in milliseconds) for waiting initial resources message from the server.\n"
-        "If exceeded then connections is dropped to avoid infinite UI \"Loading...\" state.\n"
+        "Timeout (in milliseconds) for waiting for the initial resource message from the Server.\n"
+        "If exceeded, then the connection is dropped to avoid infinite UI \"Loading...\" state.\n"
         "0 means disabled.");
     NX_INI_STRING("", dumpGeneratedIconsTo,
         "Dump icons, generated from svg, to a given folder.");

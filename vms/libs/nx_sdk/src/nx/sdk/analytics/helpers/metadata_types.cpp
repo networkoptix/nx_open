@@ -14,7 +14,7 @@ MetadataTypes::MetadataTypes():
 {
 }
 
-const IStringList* MetadataTypes::eventTypeIds() const
+const IStringList* MetadataTypes::getEventTypeIds() const
 {
     if (!NX_KIT_ASSERT(m_eventTypeIds))
         return nullptr;
@@ -23,7 +23,7 @@ const IStringList* MetadataTypes::eventTypeIds() const
     return m_eventTypeIds.get();
 }
 
-const IStringList* MetadataTypes::objectTypeIds() const
+const IStringList* MetadataTypes::getObjectTypeIds() const
 {
     if (!NX_KIT_ASSERT(m_objectTypeIds))
         return nullptr;

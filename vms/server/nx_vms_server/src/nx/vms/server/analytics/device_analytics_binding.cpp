@@ -17,7 +17,7 @@
 #include <nx/sdk/helpers/to_string.h>
 
 #include <nx/sdk/analytics/helpers/metadata_types.h>
-#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/ptr.h>
 
 #include <nx/analytics/descriptor_manager.h>
 #include <nx/analytics/utils.h>
@@ -227,7 +227,7 @@ QVariantMap DeviceAnalyticsBinding::getSettings() const
             return jsonEngine.values();
         }
 
-        const auto values = toPtr(settingsResponse->values());
+        const auto values = settingsResponse->values();
         if (!values)
         {
             NX_DEBUG(this,
@@ -378,7 +378,7 @@ Ptr<DeviceAnalyticsBinding::DeviceAgent> DeviceAnalyticsBinding::createDeviceAge
         return nullptr;
     }
 
-    const auto streamConsumer = queryInterfacePtr<IConsumingDeviceAgent>(deviceAgent);
+    const auto streamConsumer = deviceAgent->queryInterface<IConsumingDeviceAgent>();
 
     m_isStreamConsumer = streamConsumer != nullptr;
     return deviceAgent;
@@ -539,7 +539,7 @@ bool DeviceAnalyticsBinding::processData(const QnAbstractDataPacketPtr& data)
         return true;
     }
 
-    const auto consumingDeviceAgent = queryInterfacePtr<IConsumingDeviceAgent>(m_deviceAgent);
+    const auto consumingDeviceAgent = m_deviceAgent->queryInterface<IConsumingDeviceAgent>();
     if (!NX_ASSERT(consumingDeviceAgent))
         return true;
 

@@ -24,12 +24,12 @@ GroupDescriptorManager::GroupDescriptorManager(QObject* parent):
 std::optional<GroupDescriptor> GroupDescriptorManager::descriptor(
     const GroupId& groupId) const
 {
-    return fetchDescriptor(m_groupDescriptorContainer, groupId);
+    return fetchDescriptor(m_groupDescriptorContainer.get(), groupId);
 }
 
 GroupDescriptorMap GroupDescriptorManager::descriptors(const std::set<GroupId>& groupIds) const
 {
-    return fetchDescriptors(m_groupDescriptorContainer, groupIds, kGroupDescriptorTypeName);
+    return fetchDescriptors(m_groupDescriptorContainer.get(), groupIds, kGroupDescriptorTypeName);
 }
 
 void GroupDescriptorManager::updateFromEngineManifest(
@@ -38,7 +38,7 @@ void GroupDescriptorManager::updateFromEngineManifest(
     const QString& engineName,
     const EngineManifest& manifest)
 {
-    m_groupDescriptorContainer.mergeWithDescriptors(
+    m_groupDescriptorContainer->mergeWithDescriptors(
         fromManifestItemListToDescriptorMap<GroupDescriptor>(engineId, manifest.groups));
 }
 
@@ -47,7 +47,7 @@ void GroupDescriptorManager::updateFromDeviceAgentManifest(
     const EngineId& engineId,
     const DeviceAgentManifest& manifest)
 {
-    m_groupDescriptorContainer.mergeWithDescriptors(
+    m_groupDescriptorContainer->mergeWithDescriptors(
         fromManifestItemListToDescriptorMap<GroupDescriptor>(engineId, manifest.groups));
 }
 

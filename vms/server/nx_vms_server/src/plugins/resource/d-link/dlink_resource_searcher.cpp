@@ -86,7 +86,7 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
             continue;
 
         // Sending broadcast.
-        constexpr qint16 kPort = qint16(62976);
+        constexpr quint16 kPort = 62976;
         for (int r = 0; r < CL_BROAD_CAST_RETRY; ++r)
         {
             sock->sendTo(barequest.data(), barequest.size(), nx::network::BROADCAST_ADDRESS, kPort);
@@ -106,61 +106,62 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
             const int bytesRead = recvSocket->recvFrom(
                 datagram.data(), datagram.size(), &remoteEndpoint);
 
-            if (remoteEndpoint.port != kPort || bytesRead < 32) // minimum response size
+            if (remoteEndpoint.port != kPort || bytesRead < 32) //< minimum response size
                 continue;
 
             QString name  = QLatin1String("DCS-");
 
-            int iqpos = datagram.indexOf("DCS-");
+            int iqPos = datagram.indexOf("DCS-");
 
-            if (iqpos < 0)
+            if (iqPos < 0)
                 continue;
 
-            iqpos+=name.length();
+            iqPos += name.length();
 
-            while (iqpos < bytesRead && datagram[iqpos] != (char)0)
+            while (iqPos < bytesRead && datagram[iqPos] != (char)0)
             {
-                name += QLatin1Char(datagram[iqpos]);
-                ++iqpos;
+                name += QLatin1Char(datagram[iqPos]);
+                ++iqPos;
             }
 
             const unsigned char* data = (unsigned char*)(datagram.data());
             constexpr int kMacAddressOffset = 6;
-            const auto smac = nx::utils::MacAddress::fromRawData(data + kMacAddressOffset);
+            const auto mac = nx::utils::MacAddress::fromRawData(data + kMacAddressOffset);
 
             bool haveToContinue = false;
             for (const QnResourcePtr& res: result)
             {
-                QnNetworkResourcePtr net_res = res.dynamicCast<QnNetworkResource>();
+                const auto networkResource = res.dynamicCast<QnNetworkResource>();
+                if (!NX_ASSERT(networkResource))
+                    continue;
 
-                if (net_res->getMAC() == smac)
+                if (networkResource->getMAC() == mac)
                 {
                     haveToContinue = true;
-                    break; //< already found;
+                    break; //< already found
                 }
             }
 
             if (haveToContinue)
                 break;
 
-            QnPlDlinkResourcePtr resource (new QnPlDlinkResource(serverModule()));
+            const QnPlDlinkResourcePtr resource(new QnPlDlinkResource(serverModule()));
 
-            QnUuid rt = qnResTypePool->getLikeResourceTypeId(manufacturer(), name);
-            if (rt.isNull())
+            const QnUuid typeId = qnResTypePool->getLikeResourceTypeId(manufacturer(), name);
+            if (typeId.isNull())
                 continue;
 
-            QnResourceData resourceData = dataPool()->data(manufacturer(), name);
+            const QnResourceData resourceData = dataPool()->data(manufacturer(), name);
             if (resourceData.value<bool>(ResourceDataKey::kForceONVIF))
-                continue; // model forced by ONVIF
+                continue; //< model forced by ONVIF
 
-            resource->setTypeId(rt);
+            resource->setTypeId(typeId);
             resource->setName(name);
             resource->setModel(name);
-            resource->setMAC(smac);
+            resource->setMAC(mac);
             resource->setHostAddress(remoteEndpoint.address.toString());
 
             result.push_back(resource);
-
         }
 
     }

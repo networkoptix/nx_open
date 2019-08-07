@@ -8,13 +8,14 @@ set(copied_static_origin @copied_static_origin@)
 set(copied_static_files @copied_static_files@)
 set(copied_nx_kit_origin @copied_nx_kit_origin@)
 set(copied_nx_kit_files @copied_nx_kit_files@)
-set(copied_nx_sdk_files @copied_nx_sdk_files@)
 set(copied_nx_sdk_src_nx_origin @copied_nx_sdk_src_nx_origin@)
 set(copied_nx_sdk_src_nx_files @copied_nx_sdk_src_nx_files@)
+set(copied_nx_sdk_unit_tests_origin @copied_nx_sdk_unit_tests_origin@)
+set(copied_nx_sdk_unit_tests_files @copied_nx_sdk_unit_tests_files@)
 set(copied_sample_origin @copied_sample_origin@)
 set(copied_sample_files @copied_sample_files@)
-set(copied_sample_ut_origin @copied_sample_ut_origin@)
-set(copied_sample_ut_files @copied_sample_ut_files@)
+set(copied_sample_unit_tests_origin @copied_sample_unit_tests_origin@)
+set(copied_sample_unit_tests_files @copied_sample_unit_tests_files@)
 
 set(sdk_name @sdk_name@)
 
@@ -28,9 +29,11 @@ nx_copy_always(${copied_nx_kit_origin} "${copied_nx_kit_files}"
     ${target_dir}/nx_kit)
 nx_copy_always(${copied_nx_sdk_src_nx_origin} "${copied_nx_sdk_src_nx_files}"
     ${target_dir}/src/nx)
+nx_copy_always(${copied_nx_sdk_unit_tests_origin} "${copied_nx_sdk_unit_tests_files}"
+    ${target_dir}/unit_tests)
 nx_copy_always(${copied_sample_origin} "${copied_sample_files}"
     ${target_dir}/samples/stub_analytics_plugin/src)
-nx_copy_always(${copied_sample_ut_origin} "${copied_sample_ut_files}"
+nx_copy_always(${copied_sample_unit_tests_origin} "${copied_sample_unit_tests_files}"
     ${target_dir}/samples/stub_analytics_plugin/unit_tests/src)
 nx_copy_always(${CMAKE_SOURCE_DIR}/open "${CMAKE_SOURCE_DIR}/open/license_mpl2.md"
     ${target_dir})

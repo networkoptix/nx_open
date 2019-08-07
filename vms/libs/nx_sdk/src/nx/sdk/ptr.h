@@ -19,32 +19,32 @@ class Ptr final
 {
 public:
     /** Supports implicit conversion from nullptr. */
-    Ptr(std::nullptr_t = nullptr) {}
+    Ptr(std::nullptr_t = nullptr)
+    {
+        // This assertion needs to be placed in any method because it uses sizeof().
+        static_assert(sizeof(Ptr<RefCountable>) == sizeof(RefCountable*),
+            "Ptr layout should be the same as of a raw pointer.");
+    }
 
-    /** Sfinae: Compiles if OtherRefCountable* is convertible to RefCountable*. */
     template<class OtherRefCountable>
-    using IsConvertibleFrom =
-        std::enable_if_t<std::is_base_of<RefCountable, OtherRefCountable>::value, int /*dummy*/>;
-
-    template<class OtherRefCountable, IsConvertibleFrom<OtherRefCountable> = 0>
     Ptr(const Ptr<OtherRefCountable>& other): m_ptr(other.get()) { addRef(); }
 
     /** Defined because the template above does not suppress generation of such member. */
     Ptr(const Ptr& other): m_ptr(other.get()) { addRef(); }
 
-    template<class OtherRefCountable, IsConvertibleFrom<OtherRefCountable> = 0>
+    template<class OtherRefCountable>
     Ptr(Ptr<OtherRefCountable>&& other): m_ptr(other.releasePtr()) {}
 
     /** Defined because the template above does not suppress generation of such member. */
     Ptr(Ptr&& other): m_ptr(other.releasePtr()) {}
 
-    template<class OtherRefCountable, IsConvertibleFrom<OtherRefCountable> = 0>
+    template<class OtherRefCountable>
     Ptr& operator=(const Ptr<OtherRefCountable>& other) { return assignConst(other); }
 
     /** Defined because the template above does not work for same-type assignment. */
     Ptr& operator=(const Ptr& other) { return assignConst(other); }
 
-    template<class OtherRefCountable, IsConvertibleFrom<OtherRefCountable> = 0>
+    template<class OtherRefCountable>
     Ptr& operator=(Ptr<OtherRefCountable>&& other) { return assignRvalue(std::move(other)); }
 
     /** Defined because the template above does not work for same-type assignment. */
@@ -52,10 +52,10 @@ public:
 
     ~Ptr() { releaseRef(); }
 
-    template<class OtherRefCountable, IsConvertibleFrom<OtherRefCountable> = 0>
+    template<class OtherRefCountable>
     bool operator==(const Ptr<OtherRefCountable>& other) const { return m_ptr == other.get(); }
 
-    template<class OtherRefCountable, IsConvertibleFrom<OtherRefCountable> = 0>
+    template<class OtherRefCountable>
     bool operator!=(const Ptr<OtherRefCountable>& other) const { return !operator==(other); }
 
     /**
@@ -72,7 +72,7 @@ public:
      * Decrements the reference counter of the owned object (will be deleted if reaches 0), and
      * starts owning the specified object, leaving its reference counter intact.
      */
-    template<class OtherRefCountable, IsConvertibleFrom<OtherRefCountable> = 0>
+    template<class OtherRefCountable>
     void reset(OtherRefCountable* ptr)
     {
         releaseRef();
@@ -103,7 +103,7 @@ private:
 
     explicit Ptr(RefCountable* ptr): m_ptr(ptr) {}
 
-    template<class OtherRefCountable, IsConvertibleFrom<OtherRefCountable> = 0>
+    template<class OtherRefCountable>
     explicit Ptr(OtherRefCountable* ptr): m_ptr(ptr) {}
 
     void addRef()
@@ -143,11 +143,23 @@ private:
     RefCountable* m_ptr = nullptr;
 };
 
-template<class RefCountable>
-bool operator==(const Ptr<RefCountable>& ptr, std::nullptr_t) { return ! (bool) ptr; }
+template<class RefCountable, typename Object>
+bool operator==(const Ptr<RefCountable>& ptr, Object* p) { return ptr.get() == p; }
+
+template<typename Object, class RefCountable>
+bool operator==(Object* p, const Ptr<RefCountable>& ptr) { return p == ptr.get(); }
+
+template<class RefCountable, typename Object>
+bool operator!=(const Ptr<RefCountable>& ptr, Object* p) { return ptr.get() != p; }
+
+template<typename Object, class RefCountable>
+bool operator!=(Object* p, const Ptr<RefCountable>& ptr) { return p != ptr.get(); }
 
 template<class RefCountable>
-bool operator==(std::nullptr_t, const Ptr<RefCountable>& ptr) { return ! (bool) ptr; }
+bool operator==(const Ptr<RefCountable>& ptr, std::nullptr_t) { return !ptr; }
+
+template<class RefCountable>
+bool operator==(std::nullptr_t, const Ptr<RefCountable>& ptr) { return !ptr; }
 
 template<class RefCountable>
 bool operator!=(const Ptr<RefCountable>& ptr, std::nullptr_t) { return (bool) ptr; }
@@ -177,24 +189,12 @@ static Ptr<RefCountable> makePtr(Args&&... args)
 }
 
 /**
- * Calls queryInterface() and returns a smart pointer to its result, possibly null.
- * @param refCountable Can be null, then null will be returned.
- */
-template</*explicit*/ class Interface, /*deduced*/ class RefCountablePtr>
-static Ptr<Interface> queryInterfacePtr(RefCountablePtr refCountable)
-{
-    return refCountable
-        ? toPtr(static_cast<Interface*>(refCountable->queryInterface(Interface::interfaceId())))
-        : nullptr;
-}
-
-/**
  * Calls queryInterface() from old SDK and returns a smart pointer to its result, possibly null.
  * @param refCountable Can be null, then null will be returned.
  */
 template</*explicit*/ class Interface, /*deduced*/ class RefCountablePtr,
     /*deduced*/ typename InterfaceId>
-static Ptr<Interface> queryInterfacePtr(
+static Ptr<Interface> queryInterfaceOfOldSdk(
     RefCountablePtr refCountable, const InterfaceId& interfaceId)
 {
     return refCountable

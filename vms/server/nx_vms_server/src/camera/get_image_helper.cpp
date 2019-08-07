@@ -652,7 +652,7 @@ CLVideoDecoderOutputPtr QnGetImageHelper::getImageWithCertainQuality(
 }
 
 CLVideoDecoderOutputPtr QnGetImageHelper::decodeFrameSequence(
-    const QnResourcePtr& resource,
+    const QnResourcePtr& /*resource*/,
     std::unique_ptr<QnConstDataPacketQueue>& sequence, quint64 timestampUs) const
 {
     if (!sequence || sequence->isEmpty())

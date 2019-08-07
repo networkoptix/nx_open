@@ -55,13 +55,14 @@ static const std::map<AVCodecID, int> kHanwhaCodecCoefficients = {
     {AV_CODEC_ID_MJPEG, 1}
 };
 
-template<typename T>
+template<typename Response>
 CameraDiagnostics::Result error(
-    const T& response,
+    const Response& response,
     const CameraDiagnostics::Result& authorizedResult)
 {
-    auto statusCode = response.statusCode();
-    bool unauthorizedResponse = statusCode == nx::network::http::StatusCode::unauthorized
+    const auto statusCode = response.statusCode();
+    const bool unauthorizedResponse =
+        statusCode == nx::network::http::StatusCode::unauthorized
         || statusCode == nx::network::http::StatusCode::notAllowed
         || statusCode == kHanwhaBlockedHttpCode;
 

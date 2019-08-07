@@ -8,7 +8,7 @@ extern "C" {
 
 } // extern "C"
 
-#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/ptr.h>
 #include <nx/sdk/helpers/lib_context.h>
 
 #define NX_PRINT_PREFIX "deepstream::Engine::"
@@ -74,7 +74,8 @@ void Engine::setEngineInfo(const IEngineInfo* /*engineInfo*/)
 {
 }
 
-StringMapResult Engine::setSettings(const IStringMap* settings)
+void Engine::doSetSettings(
+    Result<const IStringMap*>* /*outResult*/, const IStringMap* settings)
 {
     NX_OUTPUT << __func__ << " Received " << libContext().name() << " settings:";
     NX_OUTPUT << "{";
@@ -87,18 +88,19 @@ StringMapResult Engine::setSettings(const IStringMap* settings)
             << ((i < count - 1) ? "," : "");
     }
     NX_OUTPUT << "}";
-    return nullptr;
 }
 
-SettingsResponseResult Engine::pluginSideSettings() const
+void Engine::getPluginSideSettings(Result<const ISettingsResponse*>* /*outResult*/) const
 {
-    return nullptr;
 }
 
-StringResult Engine::manifest() const
+void Engine::getManifest(Result<const IString*>* outResult) const
 {
     if (!m_manifest.empty())
-        return new nx::sdk::String(m_manifest);
+    {
+        *outResult = new nx::sdk::String(m_manifest);
+        return;
+    }
 
     std::string objectTypesManifest;
     if (ini().pipelineType == kOpenAlprPipeline)
@@ -135,10 +137,10 @@ StringResult Engine::manifest() const
 }
 )json";
 
-    return new nx::sdk::String(m_manifest);
+    *outResult = new nx::sdk::String(m_manifest);
 }
 
-MutableDeviceAgentResult Engine::obtainDeviceAgent(const IDeviceInfo* deviceInfo)
+void Engine::doObtainDeviceAgent(Result<IDeviceAgent*>* outResult, const IDeviceInfo* deviceInfo)
 {
     NX_OUTPUT
         << __func__
@@ -153,12 +155,11 @@ MutableDeviceAgentResult Engine::obtainDeviceAgent(const IDeviceInfo* deviceInfo
         m_deviceAgent = new DeviceAgent(this, deviceInfo->id());
 
     m_deviceAgent->addRef();
-    return m_deviceAgent;
+    *outResult = m_deviceAgent;
 }
 
-Result<void> Engine::executeAction(IAction* /*action*/)
+void Engine::doExecuteAction(Result<void>* /*outResult*/, IAction* /*action*/)
 {
-    return {};
 }
 
 std::vector<ObjectClassDescription> Engine::objectClassDescritions() const

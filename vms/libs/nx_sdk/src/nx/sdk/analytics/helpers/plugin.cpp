@@ -31,21 +31,22 @@ void Plugin::setUtilityProvider(IUtilityProvider* utilityProvider)
     m_utilityProvider.reset(utilityProvider);
 }
 
-StringResult Plugin::manifest() const
+void Plugin::getManifest(Result<const IString*>* outResult) const
 {
-    return new String(m_jsonManifest);
+    *outResult = new String(m_jsonManifest);
 }
 
-MutableEngineResult Plugin::createEngine()
+void Plugin::doCreateEngine(Result<IEngine*>* outResult)
 {
-    IEngine* engine = m_createEngine(this);
-    if (!engine)
+    if (IEngine* engine = m_createEngine(this))
     {
-        const std::string errorMessage = "Unable to create Engine";
-        NX_PRINT << "ERROR: " << libContext().name() << ": " << errorMessage;
-        return error(ErrorCode::otherError, errorMessage);
+        *outResult = engine;
+        return;
     }
-    return engine;
+
+    const std::string errorMessage = "Unable to create Engine";
+    NX_PRINT << "ERROR: " << libContext().name() << ": " << errorMessage;
+    *outResult = error(ErrorCode::otherError, errorMessage);
 }
 
 } // namespace analytics

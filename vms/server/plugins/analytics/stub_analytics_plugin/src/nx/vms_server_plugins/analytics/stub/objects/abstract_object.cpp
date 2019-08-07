@@ -5,7 +5,7 @@
 #include <string>
 
 #include <nx/sdk/helpers/attribute.h>
-#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/ptr.h>
 #include <nx/sdk/helpers/uuid_helper.h>
 
 #include "random_state_changer.h"

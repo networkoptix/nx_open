@@ -44,9 +44,6 @@ public:
         virtual void handlePluginDiagnosticEvent(IPluginDiagnosticEvent* event) = 0;
     };
 
-    /** @return Parent Engine. */
-    virtual IEngine* engine() const = 0;
-
     /**
      * Called before other methods. Server provides the set of settings stored in its database,
      * combined with the values received from the plugin via pluginSideSettings() (if any), for
@@ -61,7 +58,14 @@ public:
      *     of some general failure that affected the procedure of applying the settings. The result
      *     should contain null if no errors occurred.
      */
-    virtual Result<const IStringMap*> setSettings(const IStringMap* settings) = 0;
+    protected: virtual void doSetSettings(
+        Result<const IStringMap*>* outResult, const IStringMap* settings) = 0;
+    public: Result<const IStringMap*> setSettings(const IStringMap* settings)
+    {
+        Result<const IStringMap*> result;
+        doSetSettings(&result, settings);
+        return result;
+    }
 
     /**
      * In addition to the settings stored in a Server database, a DeviceAgent can have some
@@ -76,14 +80,27 @@ public:
      *     failure that affects the settings retrieval procedure. The result should contain null if
      *     the Engine has no plugin-side settings.
      */
-    virtual Result<const ISettingsResponse*> pluginSideSettings() const = 0;
+    protected: virtual void getPluginSideSettings(
+        Result<const ISettingsResponse*>* outResult) const = 0;
+    public: Result<const ISettingsResponse*> pluginSideSettings() const
+    {
+        Result<const ISettingsResponse*> result;
+        getPluginSideSettings(&result);
+        return result;
+    }
 
     /**
      * Provides DeviceAgent manifest in JSON format.
      *
      * @return JSON string in UTF-8.
      */
-    virtual Result<const IString*> manifest() const = 0;
+    protected: virtual void getManifest(Result<const IString*>* outResult) const = 0;
+    public: Result<const IString*> manifest() const
+    {
+        Result<const IString*> result;
+        getManifest(&result);
+        return result;
+    }
 
     /**
      * @param handler Processes event metadata and object metadata fetched by DeviceAgent.
@@ -99,7 +116,14 @@ public:
      *
      * @param neededMetadataTypes Lists of type ids of events and objects.
      */
-    virtual Result<void> setNeededMetadataTypes(const IMetadataTypes* neededMetadataTypes) = 0;
+    protected: virtual void doSetNeededMetadataTypes(
+        Result<void>* outResult, const IMetadataTypes* neededMetadataTypes) = 0;
+    public: Result<void> setNeededMetadataTypes(const IMetadataTypes* neededMetadataTypes)
+    {
+        Result<void> result;
+        doSetNeededMetadataTypes(&result, neededMetadataTypes);
+        return result;
+    }
 };
 
 } // namespace analytics
