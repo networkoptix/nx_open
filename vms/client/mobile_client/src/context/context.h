@@ -24,7 +24,7 @@ class OperationManager;
 namespace nx::client::mobile {
 class QmlSettingsAdaptor;
 class AudioController;
-} // nx::client::mobile
+} // namespace nx::client::mobile
 
 using nx::client::mobile::QmlSettingsAdaptor;
 using nx::client::mobile::AudioController;
