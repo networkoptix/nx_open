@@ -78,6 +78,7 @@ PageBase
             || videoScreenController.tooManyConnections
             || videoScreenController.ioModuleWarning
             || videoScreenController.ioModuleAudioPlaying
+            || videoScreenController.liveWearableCamera
             || showDefaultPasswordWarning
             || showNoLicensesWarning
 

@@ -30,6 +30,7 @@ Object
          noVideo && resourceHelper.isIoModule && !resourceHelper.audioSupported
     readonly property bool ioModuleAudioPlaying:
         noVideo && resourceHelper.isIoModule && resourceHelper.audioSupported
+    readonly property bool liveWearableCamera: resourceHelper.isWearableCamera && mediaPlayer.liveMode
 
     readonly property string dummyState:
     {
@@ -55,7 +56,8 @@ Object
             return "noLicenses";
         if (tooManyConnections)
             return "tooManyConnections"
-
+        if (liveWearableCamera)
+            return "noLiveStream"
         return ""
     }
 
