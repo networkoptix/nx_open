@@ -1,8 +1,11 @@
 #pragma once
 
+#include <istream>
+#include <list>
 #include <vector>
 #include <map>
 
+#include <QtCore/QString>
 #include <QtCore/QRectF>
 
 namespace nx::analytics {
