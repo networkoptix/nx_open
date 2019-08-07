@@ -199,6 +199,9 @@ private:
         QnMutexLocker lock(&m_mutex);
         const QnUuid serverId = server->getId();
 
+        if (m_containers.find(serverId) != m_containers.cend())
+            return;
+
         if (serverId == commonModule()->moduleGUID())
             m_ownResourceId = serverId;
 
