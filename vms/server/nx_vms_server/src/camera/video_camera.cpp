@@ -646,53 +646,51 @@ void QnVideoCamera::createReader(QnServer::ChunksCatalog catalog)
 
     QnLiveStreamProviderPtr &reader =
         (streamIndex == StreamIndex::primary) ? m_primaryReader : m_secondaryReader;
+    if (reader)
+        return;
+
+    QnAbstractStreamDataProvider* dataProvider = nullptr;
+    if (streamIndex == StreamIndex::primary
+        || (cameraResource && cameraResource->hasDualStreaming()))
+    {
+        dataProvider = m_dataProviderFactory->createDataProvider(m_resource, role);
+    }
+    if (!dataProvider)
+        return;
+
+    reader = QnLiveStreamProviderPtr(dynamic_cast<QnLiveStreamProvider*>(dataProvider));
     if (!reader)
     {
-        QnAbstractStreamDataProvider* dataProvider = nullptr;
-        if (streamIndex == StreamIndex::primary
-            || (cameraResource && cameraResource->hasDualStreaming()))
-        {
-            dataProvider = m_dataProviderFactory->createDataProvider(m_resource, role);
-        }
-
-        if (dataProvider)
-        {
-            reader = QnLiveStreamProviderPtr(dynamic_cast<QnLiveStreamProvider*>(dataProvider));
-            if (!reader)
-            {
-                delete dataProvider;
-            }
-            else
-            {
-                reader->setOwner(toSharedPointer());
-                // TODO: Make at_camera_resourceChanged async (queued connection, etc.).
-                if (role == Qn::CR_LiveVideo)
-                {
-                    connect(
-                        reader->getResource().data(),
-                        SIGNAL(resourceChanged(const QnResourcePtr&)),
-                        this,
-                        SLOT(at_camera_resourceChanged()),
-                        Qt::DirectConnection);
-                }
-
-                QnVideoCameraGopKeeper* gopKeeper =
-                    new QnVideoCameraGopKeeper(this, m_resource, catalog);
-                if (streamIndex == StreamIndex::primary)
-                    m_primaryGopKeeper = gopKeeper;
-                else
-                    m_secondaryGopKeeper = gopKeeper;
-                reader->addDataProcessor(gopKeeper);
-
-                connect(reader.get(), &QThread::started, this,
-                    [gopKeeper]()
-                    {
-                        gopKeeper->clearVideoData();
-                    },
-                    Qt::DirectConnection);
-            }
-        }
+        delete dataProvider;
+        return;
     }
+
+    reader->setOwner(toSharedPointer());
+    // TODO: Make at_camera_resourceChanged async (queued connection, etc.).
+    if (role == Qn::CR_LiveVideo)
+    {
+        connect(
+            reader->getResource().data(),
+            SIGNAL(resourceChanged(const QnResourcePtr&)),
+            this,
+            SLOT(at_camera_resourceChanged()),
+            Qt::DirectConnection);
+    }
+
+    QnVideoCameraGopKeeper* gopKeeper =
+        new QnVideoCameraGopKeeper(this, m_resource, catalog);
+    if (streamIndex == StreamIndex::primary)
+        m_primaryGopKeeper = gopKeeper;
+    else
+        m_secondaryGopKeeper = gopKeeper;
+    reader->addDataProcessor(gopKeeper);
+
+    connect(reader.get(), &QThread::started, this,
+        [gopKeeper]()
+        {
+            gopKeeper->clearVideoData();
+        },
+        Qt::DirectConnection);
 }
 
 QnLiveStreamProviderPtr QnVideoCamera::readerByQuality(MediaQuality streamQuality) const
