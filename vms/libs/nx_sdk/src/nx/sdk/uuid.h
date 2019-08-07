@@ -22,7 +22,7 @@ class Uuid: public UuidBase
 {
 public:
     static constexpr int kSize = (int) std::tuple_size<UuidBase>();
-    static constexpr int size() { return kSize; } //< Needed in C++14 to avoid kSize definition.
+    static constexpr int size() { return kSize; } //< For C++14, to avoid the definition.
 
     constexpr Uuid(
         uint8_t b0, uint8_t b1, uint8_t b2, uint8_t b3,

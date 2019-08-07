@@ -13,7 +13,7 @@ namespace analytics {
 class IUncompressedVideoFrame: public Interface<IUncompressedVideoFrame, IUncompressedMediaFrame>
 {
 public:
-    static auto interfaceId() { return InterfaceId("nx::sdk::analytics::IUncompressedVideoFrame"); }
+    static auto interfaceId() { return makeId("nx::sdk::analytics::IUncompressedVideoFrame"); }
 
     enum class PixelFormat: int
     {

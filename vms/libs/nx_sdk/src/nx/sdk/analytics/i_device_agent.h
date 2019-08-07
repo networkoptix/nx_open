@@ -29,15 +29,12 @@ class IEngine; //< Forward declaration for the parent object.
 class IDeviceAgent: public Interface<IDeviceAgent>
 {
 public:
-    static auto interfaceId() { return InterfaceId("nx::sdk::analytics::IDeviceAgent"); }
+    static auto interfaceId() { return makeId("nx::sdk::analytics::IDeviceAgent"); }
 
     class IHandler: public Interface<IHandler>
     {
     public:
-        static auto interfaceId()
-        {
-            return InterfaceId("nx::sdk::analytics::IDeviceAgent::IHandler");
-        }
+        static auto interfaceId() { return makeId("nx::sdk::analytics::IDeviceAgent::IHandler"); }
 
         virtual ~IHandler() = default;
         virtual void handleMetadata(IMetadataPacket* metadataPacket) = 0;

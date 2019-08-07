@@ -16,7 +16,7 @@ namespace analytics {
 class IMetadataPacket: public Interface<IMetadataPacket, IDataPacket>
 {
 public:
-    static auto interfaceId() { return InterfaceId("nx::sdk::analytics::IMetadataPacket"); }
+    static auto interfaceId() { return makeId("nx::sdk::analytics::IMetadataPacket"); }
 };
 
 } // namespace analytics

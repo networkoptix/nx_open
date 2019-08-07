@@ -37,12 +37,12 @@ class IPlugin; //< Forward declaration for the parent object.
 class IEngine: public Interface<IEngine>
 {
 public:
-    static auto interfaceId() { return InterfaceId("nx::sdk::analytics::IEngine"); }
+    static auto interfaceId() { return makeId("nx::sdk::analytics::IEngine"); }
 
     class IHandler: public Interface<IHandler>
     {
     public:
-        static auto interfaceId() { return InterfaceId("nx::sdk::analytics::IEngine::IHandler"); }
+        static auto interfaceId() { return makeId("nx::sdk::analytics::IEngine::IHandler"); }
 
         virtual ~IHandler() = default;
         virtual void handlePluginDiagnosticEvent(IPluginDiagnosticEvent* event) = 0;

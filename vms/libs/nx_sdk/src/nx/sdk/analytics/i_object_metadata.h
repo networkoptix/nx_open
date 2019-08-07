@@ -18,7 +18,7 @@ namespace analytics {
 class IObjectMetadata: public Interface<IObjectMetadata, IMetadata>
 {
 public:
-    static auto interfaceId() { return InterfaceId("nx::sdk::analytics::IObjectMetadata"); }
+    static auto interfaceId() { return makeId("nx::sdk::analytics::IObjectMetadata"); }
 
     /**
      * @return Id of the object track. Object track is a sequence of object detections from its

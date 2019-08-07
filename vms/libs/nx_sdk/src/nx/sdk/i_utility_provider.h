@@ -22,7 +22,7 @@ namespace sdk {
 class IUtilityProvider: public Interface<IUtilityProvider>
 {
 public:
-    static auto interfaceId() { return InterfaceId("nx::sdk::IUtilityProvider"); }
+    static auto interfaceId() { return makeId("nx::sdk::IUtilityProvider"); }
 
     /**
      * VMT #4.
