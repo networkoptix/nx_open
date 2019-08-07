@@ -14,6 +14,8 @@
 class QnSingleCamLicenseStatusHelper;
 class QnWorkbenchAccessController;
 
+namespace nx::analytics { class MetadataLogParser; }
+
 namespace nx::vms::client::desktop {
 
 class WidgetAnalyticsController;
@@ -45,6 +47,7 @@ public:
     nx::vms::client::core::AbstractAnalyticsMetadataProviderPtr analyticsMetadataProvider;
 
     QScopedPointer<WidgetAnalyticsController> analyticsController;
+    std::unique_ptr<nx::analytics::MetadataLogParser> analyticsMetadataLogParser;
 
 public:
     explicit MediaResourceWidgetPrivate(

@@ -60,6 +60,11 @@ struct Ini: nx::kit::IniConfig
         " * \"future_rect\" - Future object rect.\n"
         "Fields can be combined using space, comma or any other separator."
     );
+    NX_INI_STRING("", debugAnalyticsVideoOverlayFromLogFile,
+        "Display analytics debug overlay, based on the log file parsing.\n"
+        "\n"
+        "Full path to the log file must be used here.");
+
     NX_INI_FLAG(0, displayAnalyticsEnginesInResourceTree,
         "Displays Analytics Engine items in the Resource tree.");
     NX_INI_FLAG(0, debugThumbnailProviders, "Enables debug mode for thumbnail providers.");
