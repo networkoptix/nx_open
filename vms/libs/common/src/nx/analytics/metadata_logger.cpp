@@ -47,7 +47,7 @@ QString makeLogFileName(
     fileName.append(".log");
 
     const QString logDirectoryPath = nx::utils::debug_helpers::debugFilesDirectoryPath(
-        loggingIni().analyticsLogPath);
+        analyticsLoggingPath);
 
     if (logDirectoryPath.isEmpty())
         return QString();
@@ -128,7 +128,10 @@ MetadataLogger::MetadataLogger(
         streamIndex);
 
     if (logFileName.isEmpty())
+    {
+        NX_WARNING(this, "Unable to create output file %1 for logging", logFileName);
         return;
+    }
 
     m_outputFile.setFileName(logFileName);
     if (!m_outputFile.open(QIODevice::WriteOnly | QIODevice::Append))
@@ -236,7 +239,8 @@ void MetadataLogger::logLine(QString lineStr)
     if (!lineStr.isEmpty() && lineStr.back() != '\n')
         lineStr.append('\n');
 
-    m_outputFile.write(lineStr.toUtf8());
+    if (m_outputFile.isOpen())
+        m_outputFile.write(lineStr.toUtf8());
 }
 
 } // namespace nx::analytics
