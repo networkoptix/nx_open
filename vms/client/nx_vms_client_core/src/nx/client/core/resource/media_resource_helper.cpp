@@ -65,8 +65,7 @@ MediaPlayer::VideoQuality MediaResourceHelper::livePreviewVideoQuality() const
 
             static const QSize kMaximalSize(800, 600);
             const auto size = info.getResolution();
-            return size.isValid()
-                && !size.isNull()
+            return !size.isEmpty()
                 && size.width() <= kMaximalSize.width()
                 && size.height() < kMaximalSize.height();
         };
