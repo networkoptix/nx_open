@@ -244,15 +244,12 @@ void ApiClient::getBucketSizeInternal(
         query.append("&").append(
             formatQuery(http::kPrefix, path[0] == '/' && path.size() > 1 ? path.mid(1) : path));
     }
-
     if (!continuationToken.empty())
         query.append("&").append(formatQuery(http::kContinuationToken, continuationToken.c_str()));
 
-    auto url = nx::network::url::Builder(m_url).setPath(http::kRootPath).setQuery(query);
-
     doAwsApiCall(
         nx::network::http::Method::get,
-        url,
+        nx::network::url::Builder(m_url).setPath(http::kRootPath).setQuery(query),
         [this, handler = std::move(handler), runningTotalSize](auto httpClient) mutable
     {
         auto resultCode = getResultCode(*httpClient);
