@@ -29,7 +29,7 @@ NX_AWS_CLIENT_API std::optional<QString> parseNextElement(QXmlStreamReader* xml)
 template<typename ObjectType>
 bool parseNextField(
     QXmlStreamReader* xml,
-    typename const Field<ObjectType>::Assigners& fieldFuncs,
+    const typename Field<ObjectType>::Assigners& fieldFuncs,
     ObjectType* outObject)
 {
     if (xml->hasError())
@@ -59,7 +59,7 @@ bool parseNextField(
 template<typename ObjectType>
 bool deserialize(
     QXmlStreamReader* xml,
-    typename const Field<ObjectType>::Assigners& assigners,
+    const typename Field<ObjectType>::Assigners& assigners,
     const QString& xmlName,
     ObjectType* outObject)
 {
@@ -81,7 +81,7 @@ bool deserialize(
 template<typename ObjectType>
 bool deserialize(
     QXmlStreamReader* xml,
-    typename const xml::Field<ObjectType>::Assigners& assigners,
+    const typename xml::Field<ObjectType>::Assigners& assigners,
     const QString& xmlName,
     std::vector<ObjectType>* outVector)
 {
@@ -93,8 +93,9 @@ bool deserialize(
 }
 
 template<typename ObjectType>
-bool deserialize(QXmlStreamReader* xml, ObjectType* outObject)
+bool deserialize(QXmlStreamReader* /*xml*/, ObjectType* /*outObject*/)
 {
+    return false;
 }
 
 template<typename ObjectType>

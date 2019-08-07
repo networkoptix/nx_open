@@ -229,8 +229,6 @@ void AwsS3Emulator::dispatchRootPathGetRequest(
 api::ListBucketResult AwsS3Emulator::getListBucketResult(
     std::map<QString, QString> queries) const
 {
-    static constexpr int kDefaultMaxKeys = 1000;
-
     const auto prefix = queries[http::kPrefix].toStdString();
 
     api::ListBucketResult result;
