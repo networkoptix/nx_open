@@ -146,11 +146,7 @@ void MediaResourceHelper::Private::handlePropertyChanged(
     if (camera != resource)
         return;
 
-    if (key == ResourcePropertyKey::kMediaStreams)
-    {
-        emit q->livePreviewVideoQualityChanged();
-    }
-    else if (key == QnMediaResource::customAspectRatioKey())
+    if (key == QnMediaResource::customAspectRatioKey())
     {
         emit q->customAspectRatioChanged();
         emit q->aspectRatioChanged();
@@ -161,6 +157,7 @@ void MediaResourceHelper::Private::handlePropertyChanged(
     }
     else if (key == ResourcePropertyKey::kMediaStreams)
     {
+        emit q->livePreviewVideoQualityChanged();
         emit q->aspectRatioChanged();
     }
 }
