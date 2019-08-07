@@ -1016,10 +1016,8 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::createSession(
             if (!archivePlaylistManager->initialize())
             {
                 mediaStreamEvent = archivePlaylistManager->lastError().toMediaStreamEvent();
-                NX_DEBUG(this,
-                    lm("QnHttpLiveStreamingProcessor::getPlaylist. "
-                        "Failed to initialize archive playlist for camera %1")
-                    .args(camResource->getUniqueId(), toString(mediaStreamEvent)));
+                NX_DEBUG(this, "Failed to initialize archive playlist for camera: %1, error: %2",
+                    camResource->getUniqueId(), toString(mediaStreamEvent));
                 if (mediaStreamEvent)
                 {
                     error->errorString = toString(mediaStreamEvent);
