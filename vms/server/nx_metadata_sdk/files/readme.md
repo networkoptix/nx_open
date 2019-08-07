@@ -1,6 +1,6 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-# Analytics SDK
+# Metadata SDK
 
 ---------------------------------------------------------------------------------------------------
 ## License
@@ -109,16 +109,16 @@ build_sample_arm64.sh
 ```
 
 On Windows, after CMake generation phase, Visual Studio GUI can be used to compile the sample:
-open `../analytics_sdk-build/stub_analytics_plugin.sln` and build the `ALL_BUILD` project. Make
+open `../metadata_sdk-build/stub_analytics_plugin.sln` and build the `ALL_BUILD` project. Make
 sure that the platform combo-box is set to "x64".
 
 After successful building, locate the main built artifact:
 ```
 # Windows:
-..\analytics_sdk-build\Debug\stub_analytics_plugin.dll
+..\metadata_sdk-build\Debug\stub_analytics_plugin.dll
 
 # Linux:
-../analytics_sdk-build/libstub_analytics_plugin.so
+../metadata_sdk-build/libstub_analytics_plugin.so
 ```
 
 To install the plugin, just copy its library file to the dedicated folder in the VMS Server
