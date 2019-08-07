@@ -410,8 +410,6 @@ private:
     /** UI control flags. We run loadDataToUI periodically and check for this flags. */
     bool m_forceUiStateUpdate = true;
     bool m_updateRemoteStateChanged = true;
-    /** Flag shows that we have an update. */
-    bool m_haveValidUpdate = false;
     bool m_autoCheckUpdate = false;
     bool m_showStorageSettings = false;
 
