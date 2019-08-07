@@ -105,7 +105,6 @@ protected:
 
     QJsonDocument testSnapshot(ItemModelStateSnapshotHelper::SnapshotParams& params) const
     {
-        ItemModelStateSnapshotHelper::saveSnapshotToFile(m_resourceTreeProxyModel.get(), params, "C:/debug/wtf.json");
         return ItemModelStateSnapshotHelper::makeSnapshot(m_resourceTreeProxyModel.get(), params);
     }
 
