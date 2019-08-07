@@ -19,7 +19,7 @@ namespace analytics {
 class ICompoundMetadataPacket: public Interface<ICompoundMetadataPacket, IMetadataPacket>
 {
 public:
-    static auto interfaceId() { return InterfaceId("nx::sdk::analytics::ICompoundMetadataPacket"); }
+    static auto interfaceId() { return makeId("nx::sdk::analytics::ICompoundMetadataPacket"); }
 
     /**
      * @return Validity duration of the metadata in the packet, or 0 if irrelevant.

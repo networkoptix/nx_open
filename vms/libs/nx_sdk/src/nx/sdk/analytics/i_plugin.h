@@ -20,7 +20,7 @@ namespace analytics {
 class IPlugin: public Interface<IPlugin, nx::sdk::IPlugin>
 {
 public:
-    static auto interfaceId() { return InterfaceId("nx::sdk::analytics::IPlugin"); }
+    static auto interfaceId() { return makeId("nx::sdk::analytics::IPlugin"); }
 
     /**
      * Provides plugin manifest in JSON format.

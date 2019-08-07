@@ -8,20 +8,18 @@
 
 namespace nx {
 namespace sdk {
-namespace test {
-
-namespace {
+namespace ptr_ut {
 
 class IBase: public Interface<IBase, IRefCountable>
 {
 public:
-    static auto interfaceId() { return InterfaceId("nx::sdk::test::*::IBase"); }
+    static auto interfaceId() { return makeId("nx::sdk::test::IBase"); }
 };
 
 class IData: public Interface<IData, IBase>
 {
 public:
-    static auto interfaceId() { return InterfaceId("nx::sdk::test::*::IData"); }
+    static auto interfaceId() { return makeId("nx::sdk::test::IData"); }
 
     virtual int number() const = 0;
 };
@@ -77,8 +75,6 @@ void assertEq(
     ASSERT_EQ(increasedRefCount, actualRefCount + 1); //< Check test integrity.
     ASSERT_EQ(expectedRefCount, actualRefCount);
 }
-
-} // namespace
 
 //-------------------------------------------------------------------------------------------------
 
@@ -207,6 +203,6 @@ TEST(Ptr, releasePtrAndReset)
     ASSERT_EQ(nullptr, data2.get());
 }
 
-} // namespace test
+} // namespace ptr_ut
 } // namespace sdk
 } // namespace nx

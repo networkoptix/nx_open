@@ -16,7 +16,7 @@ namespace analytics {
 class IMetadata: public Interface<IMetadata>
 {
 public:
-    static auto interfaceId() { return InterfaceId("nx::sdk::analytics::IMetadata"); }
+    static auto interfaceId() { return makeId("nx::sdk::analytics::IMetadata"); }
 
     /**
      * Human-readable hierarchical type, e.g. "someCompany.someEngine.lineCrossing".

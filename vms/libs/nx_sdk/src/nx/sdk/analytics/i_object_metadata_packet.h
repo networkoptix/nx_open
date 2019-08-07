@@ -17,7 +17,7 @@ namespace analytics {
 class IObjectMetadataPacket: public Interface<IObjectMetadataPacket, ICompoundMetadataPacket>
 {
 public:
-    static auto interfaceId() { return InterfaceId("nx::sdk::analytics::IObjectMetadataPacket"); }
+    static auto interfaceId() { return makeId("nx::sdk::analytics::IObjectMetadataPacket"); }
 
     protected: virtual const IObjectMetadata* getAt(int index) const override = 0;
     public: Ptr<const IObjectMetadata> at(int index) const { return toPtr(getAt(index)); }
