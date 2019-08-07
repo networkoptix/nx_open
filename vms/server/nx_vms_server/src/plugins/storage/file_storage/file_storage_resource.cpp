@@ -932,10 +932,10 @@ float QnFileStorageResource::getAvarageWritingUsage() const
     return writer ? writer->getAvarageUsage() : 0;
 }
 
-#if defined(_WIN32) || defined(__APPLE__)
+#if defined(Q_OS_WIN) || defined(Q_OS_MAC)
 bool QnFileStorageResource::isStorageDirMounted() const
 {
-    return true;    //common check is enough on mswin
+    return true;    //common check is enough on Windows and macOS
 }
 
 #else
