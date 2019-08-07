@@ -4,6 +4,8 @@
 #include <QtCore/QJsonDocument>
 #include <QtCore/QAbstractItemModel>
 
+#include <ui/style/resource_icon_cache.h>
+
 using namespace nx::vms::client::desktop;
 
 QJsonDocument ItemModelStateSnapshotHelper::makeSnapshot(
@@ -44,7 +46,7 @@ QJsonObject ItemModelStateSnapshotHelper::createItemObject(
     {
         const auto data = model->data(index, role);
         if (!data.isNull())
-            variantMap.insert(getRoleName(model, role), data);
+            variantMap.insert(getRoleName(model, role), prepareRoleData(data, role));
     }
     if (!variantMap.empty())
         itemObject.insert(kItemDataObjectKey, QJsonObject::fromVariantMap(variantMap));
@@ -90,4 +92,14 @@ QString ItemModelStateSnapshotHelper::getRoleName(const QAbstractItemModel* mode
         return roleNames.value(role);
     NX_ASSERT(false);
     return QString::number(role);
+}
+
+QVariant ItemModelStateSnapshotHelper::prepareRoleData(const QVariant& rawData, int role)
+{
+    if (role == Qn::ResourceIconKeyRole)
+    {
+        const auto key = static_cast<QnResourceIconCache::Key>(rawData.toInt());
+        return QnResourceIconCache::keyToString(key);
+    }
+    return rawData;
 }

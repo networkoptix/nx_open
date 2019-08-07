@@ -105,6 +105,7 @@ protected:
 
     QJsonDocument testSnapshot(ItemModelStateSnapshotHelper::SnapshotParams& params) const
     {
+        ItemModelStateSnapshotHelper::saveSnapshotToFile(m_resourceTreeProxyModel.get(), params, "C:/debug/wtf.json");
         return ItemModelStateSnapshotHelper::makeSnapshot(m_resourceTreeProxyModel.get(), params);
     }
 
@@ -124,21 +125,27 @@ TEST_F(ResourceTreeModelTest, shouldShowPinnedNodesIfLoggedIn)
 
     // Define reference snapshot.
     ItemModelStateSnapshotHelper::SnapshotParams params;
+    params.roles = {Qt::DisplayRole, Qn::ResourceIconKeyRole};
     params.depth = 0;
     params.rowCount = 3;
     const auto referenceSnapshot = QJsonDocument::fromJson(QString(R"json(
         [
             {
                 "data": {
-                    "display": "%1"
+                    "display": "%1",
+                    "iconKey": "CurrentSystem"
                 }
             },
             {
                 "data": {
-                    "display": "%2"
+                    "display": "%2",
+                    "iconKey": "User"
                 }
             },
             {
+                "data": {
+                    "iconKey": "Unknown"
+                }
             }
         ])json")
         .arg(systemName)
@@ -161,6 +168,7 @@ TEST_F(ResourceTreeModelTest, singleServerShouldBeTopLevelNode)
 
     // Define reference snapshot.
     ItemModelStateSnapshotHelper::SnapshotParams params;
+    params.roles = {Qt::DisplayRole, Qn::ResourceIconKeyRole};
     params.depth = 1;
     params.startRow = 3;
     params.rowCount = 1;
@@ -168,7 +176,8 @@ TEST_F(ResourceTreeModelTest, singleServerShouldBeTopLevelNode)
         [
             {
                 "data": {
-                    "display": "%1"
+                    "display": "%1",
+                    "iconKey": "Server|Offline"
                 }
             }
         ])json")
@@ -192,6 +201,7 @@ TEST_F(ResourceTreeModelTest, shouldGroupServersIfNotSingle)
 
     // Define reference snapshot.
     ItemModelStateSnapshotHelper::SnapshotParams params;
+    params.roles = {Qt::DisplayRole, Qn::ResourceIconKeyRole};
     params.depth = 1;
     params.startRow = 3;
     params.rowCount = 1;
@@ -201,17 +211,20 @@ TEST_F(ResourceTreeModelTest, shouldGroupServersIfNotSingle)
                 "children": [
                     {
                         "data": {
-                            "display": "%1"
+                            "display": "%1",
+                            "iconKey": "Server|Offline"
                         }
                     },
                     {
                         "data": {
-                            "display": "%2"
+                            "display": "%2",
+                            "iconKey": "Server|Offline"
                         }
                     }
                 ],
                 "data": {
-                    "display": "Servers"
+                    "display": "Servers",
+                    "iconKey": "Servers"
                 }
             }
         ])json")

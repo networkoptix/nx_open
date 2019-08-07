@@ -43,6 +43,10 @@ private:
         const QAbstractItemModel* model,
         int role);
 
+    static QVariant prepareRoleData(
+        const QVariant& rawData,
+        int role);
+
 private:
     static constexpr auto kItemDataObjectKey = "data";
     static constexpr auto kChildrenArrayKey = "children";
