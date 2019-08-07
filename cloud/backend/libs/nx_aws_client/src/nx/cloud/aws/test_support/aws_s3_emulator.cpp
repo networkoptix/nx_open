@@ -239,9 +239,6 @@ api::ListBucketResult AwsS3Emulator::getListBucketResult(
     if (!prefix.empty())
         m_pathToFileContents.lower_bound(prefix);
 
-    if (itLow == m_pathToFileContents.end())
-        return result;
-
     auto itHigh = m_pathToFileContents.end();
     auto upper = calculateUpperBound(prefix);
     if (!upper.empty())
