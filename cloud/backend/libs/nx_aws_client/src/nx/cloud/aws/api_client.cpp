@@ -95,7 +95,7 @@ void ApiClient::getLocation(
     nx::utils::MoveOnlyFunc<void(Result, std::string)> handler)
 {
     auto url =
-        nx::network::url::Builder(m_url).setPath(http::kRootPath).setQuery(http::kLocationQuery);
+        nx::network::url::Builder(m_url).setPath(http::kRootPath).setQuery(http::kLocation);
     doAwsApiCall(
         nx::network::http::Method::get,
         url,
@@ -237,13 +237,16 @@ void ApiClient::getBucketSizeInternal(
     const std::string& continuationToken,
     nx::utils::MoveOnlyFunc<void(Result, int)> handler)
 {
-    QString query = "list_type=2";
+    QString query(http::kListTypeQuery);
     auto path = m_url.path();
     if (!path.isEmpty())
-        query += QString("&prefix=") + (path[0] == '/' ? path.mid(1) : path);
+    {
+        query.append("&").append(
+            formatQuery(http::kPrefix, path[0] == '/' && path.size() > 1 ? path.mid(1) : path));
+    }
 
     if (!continuationToken.empty())
-        query += QString("&continuation-token=") + continuationToken.c_str();
+        query.append("&").append(formatQuery(http::kContinuationToken, continuationToken.c_str()));
 
     auto url = nx::network::url::Builder(m_url).setPath(http::kRootPath).setQuery(query);
 
@@ -256,16 +259,14 @@ void ApiClient::getBucketSizeInternal(
         if (resultCode != ResultCode::ok)
         {
             return handler(
-                Result(resultCode, httpClient->fetchMessageBodyBuffer().constData()),
-                0);
+                Result(resultCode, httpClient->fetchMessageBodyBuffer().constData()), 0);
         }
 
         api::ListBucketResult listBucketResult;
         if (!api::xml::deserialize(httpClient->fetchMessageBodyBuffer(), &listBucketResult))
         {
             return handler(
-                Result(ResultCode::error, "Failed to deserialize ListBucketResult"),
-                0);
+                Result(ResultCode::error, "Failed to deserialize ListBucketResult"), 0);
         }
 
         int size = runningTotalSize;
@@ -275,11 +276,19 @@ void ApiClient::getBucketSizeInternal(
         if (!listBucketResult.isTruncated)
             return handler(ResultCode::ok, size);
 
+        // if isTruncated is true, then nextContinuationToken should not be empty
         if (listBucketResult.nextContinuationToken.empty())
             return handler(Result(ResultCode::error, "Missing continuation token"), 0);
 
         getBucketSizeInternal(size, listBucketResult.nextContinuationToken, std::move(handler));
     });
+}
+
+QString nx::cloud::aws::ApiClient::formatQuery(QString key, QString value)
+{
+    QString s;
+    s.reserve(key.size() + value.size() + 1);
+    return s.append(key).append("=").append(value);
 }
 
 } // namespace nx::cloud::aws

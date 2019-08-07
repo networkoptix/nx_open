@@ -98,6 +98,8 @@ private:
         int runningTotalSize,
         const std::string& continuationToken,
         nx::utils::MoveOnlyFunc<void(Result, int/*bytes*/)> handler);
+
+    QString formatQuery(QString key, QString value);
 };
 
 } // namespace nx::cloud::aws

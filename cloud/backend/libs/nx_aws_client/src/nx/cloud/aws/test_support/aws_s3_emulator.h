@@ -114,7 +114,9 @@ private:
         nx::network::http::RequestContext requestContext,
         nx::network::http::RequestProcessedHandler completionHandler);
 
-    std::optional<api::ListBucketResult> getListBucketResult(const std::string& prefix);
+    api::ListBucketResult getListBucketResult(std::map<QString, QString> queries) const;
+
+    std::map<QString, QString> parseQuery(const QString& query) const;
 };
 
 } // namespace nx::cloud::aws::test

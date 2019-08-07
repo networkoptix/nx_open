@@ -186,7 +186,7 @@ void AwsS3Emulator::getLocation(
     network::http::RequestContext requestContext,
     network::http::RequestProcessedHandler completionHandler)
 {
-    if (requestContext.request.requestLine.url.query() != http::kLocationQuery)
+    if (requestContext.request.requestLine.url.query() != http::kLocation)
         return completionHandler(network::http::StatusCode::badRequest);
 
     auto buffer = api::xml::serialized({this->location()});
@@ -204,17 +204,10 @@ void AwsS3Emulator::listBucket(
     nx::network::http::RequestContext requestContext,
     nx::network::http::RequestProcessedHandler completionHandler)
 {
-    auto query = requestContext.request.requestLine.url.query();
-    int prefixIndex = query.indexOf(http::kPrefixQuery);
-    QString prefix;
-    if (prefixIndex != -1)
-        prefix = query.mid(prefixIndex + (int) std::string_view(http::kPrefixQuery).length() + 1);
-
-    auto listBucketResult = getListBucketResult(prefix.toStdString());
-    if (!listBucketResult)
-        return completionHandler(network::http::StatusCode::badRequest);
-
-    auto buffer = api::xml::serialized(*listBucketResult);
+    auto buffer = api::xml::serialized(
+        getListBucketResult(
+            parseQuery(
+                requestContext.request.requestLine.url.query())));
 
     network::http::RequestResult result(network::http::StatusCode::ok);
     result.dataSource =
@@ -228,28 +221,33 @@ void AwsS3Emulator::dispatchRootPathGetRequest(
     nx::network::http::RequestContext requestContext,
     nx::network::http::RequestProcessedHandler completionHandler)
 {
-    if (requestContext.request.requestLine.url.query() == http::kLocationQuery)
+    if (requestContext.request.requestLine.url.query() == http::kLocation)
         return getLocation(std::move(requestContext), std::move(completionHandler));
     listBucket(std::move(requestContext), std::move(completionHandler));
 }
 
-std::optional<api::ListBucketResult> AwsS3Emulator::getListBucketResult(const std::string& prefix)
+api::ListBucketResult AwsS3Emulator::getListBucketResult(
+    std::map<QString, QString> queries) const
 {
+    static constexpr int kDefaultMaxKeys = 1000;
+
+    const auto prefix = queries[http::kPrefix].toStdString();
+
+    api::ListBucketResult result;
+    result.prefix = prefix;
+
     QnMutexLocker lock(&m_mutex);
     auto itLow = m_pathToFileContents.begin();
     if (!prefix.empty())
         m_pathToFileContents.lower_bound(prefix);
 
     if (itLow == m_pathToFileContents.end())
-        return std::nullopt;
+        return result;
 
     auto itHigh = m_pathToFileContents.end();
     auto upper = calculateUpperBound(prefix);
     if (!upper.empty())
         itHigh = m_pathToFileContents.upper_bound(upper);
-
-    api::ListBucketResult result;
-    result.prefix = prefix;
 
     for (auto it = itLow; it != itHigh; ++it)
     {
@@ -262,6 +260,19 @@ std::optional<api::ListBucketResult> AwsS3Emulator::getListBucketResult(const st
     result.keyCount = (int) result.contents.size();
     result.maxKeys = result.keyCount;
 
+    return result;
+}
+
+std::map<QString, QString> AwsS3Emulator::parseQuery(const QString& query) const
+{
+    std::map<QString, QString> result;
+    auto tokens = query.split("&");
+    for (const auto& token : tokens)
+    {
+        int index = token.indexOf("=");
+        if (index != -1)
+            result.emplace(token.left(index - 1), token.mid(index + 1));
+    }
     return result;
 }
 
