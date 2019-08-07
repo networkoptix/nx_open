@@ -2090,7 +2090,7 @@ to view more bookmarks</source>
       <translation>כל מצלמה</translation>
     </message>
     <message>
-      <source>Force Acknowledgement will only work for Generic Events if camera modifiers are used in the Generic Event URL</source>
+      <source>Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</source>
       <translation>כפיית אישור תעבוד רק לאירועים גנריים אם במשתני המצלמה נעשה שימוש ב-URL של האירוע הגנרי</translation>
     </message>
   </context>
@@ -5733,8 +5733,8 @@ to %1</source>
     <message>
       <source>Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
 If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
-      <translation type="unfinished">Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
-If you intended to move analytics data to another storage location, please contact support before proceeding.</translation>
+      <translation>נתוני האנליטיקה הנוכחיים לא יועברו אוטומטית למיקום אחר ויהפכו לבלתי ניתנים לגישה. אתה יכול להשאיר אותם ולהעביר אותם ידנית, או למחוק אותם לצמיתות.
+אם התכוונת להעביר נתוני האנליטיקה למיקום אחסון אחר, צור קשר עם התמיכה לפני שתמשיך.</translation>
     </message>
   </context>
   <context>
@@ -9668,11 +9668,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Remote file &quot;%1&quot; is corrupted</source>
-      <translation type="unfinished">Remote file &quot;%1&quot; is corrupted</translation>
+      <translation>הקובץ המרוחק &quot;%1&quot; פגום</translation>
     </message>
     <message>
       <source>Server already has this file &quot;%1&quot;</source>
-      <translation type="unfinished">Server already has this file &quot;%1&quot;</translation>
+      <translation>לשרת כבר יש קובץ זה &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
@@ -10222,21 +10222,21 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Confirm storage location for the analytics data on &quot;%1&quot;</source>
-      <translation type="unfinished">Confirm storage location for the analytics data on &quot;%1&quot;</translation>
+      <translation>אשר את מיקום האחסון כדי לאחסן נתוני אנליטיקה ב- %1</translation>
     </message>
     <message>
       <source>the largest available partition</source>
-      <translation type="unfinished">the largest available partition</translation>
+      <translation>המחיצה הזמינה הגדולה ביותר</translation>
     </message>
     <message>
       <source>The analytics database should only be stored on a local drive and can take up large amounts of space.
 Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
 By default analytics data will be stored on %1.
 You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</source>
-      <translation type="unfinished">The analytics database should only be stored on a local drive and can take up large amounts of space.
-Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
-By default analytics data will be stored on %1.
-You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</translation>
+      <translation>נתוני אנליטיקה אמורים להיות מאוחסנים מקומית ועשויים לצרוך מאות ג'יגבייטים.
+כשאשר מיקום האחסון נבחר, החלפת מיקום זה אינה פשוטה ותהיה כרוכה לרוב באיבוד הנתונים הקיימים. אנו ממליצים לבחור בקפידה את מקום האחסון ושיהיה במחיצה שונה משל מערכת ההפעלה על מנת להימנע מכשלי מערכת פוטנציאלים.
+כברירת מחדל, נתוני האנליטיקה מאוחסנים בתיקיית שרת המדיה.
+אתה יכול לשנות את זה דרך תווית "ניהול אחסון" תחת "הגדרות שרת".</translation>
     </message>
   </context>
   <context>

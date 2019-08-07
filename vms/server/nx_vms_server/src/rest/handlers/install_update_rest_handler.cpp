@@ -6,6 +6,8 @@
 #include <nx/utils/log/log.h>
 #include <utils/common/synctime.h>
 
+using namespace nx::vms::server;
+
 namespace {
 
 struct Exception
@@ -136,20 +138,6 @@ static int makeSuccessfulResponse(QByteArray& result, QByteArray& resultContentT
     return nx::network::http::StatusCode::ok;
 }
 
-void updateAndSetUpdateInformation(
-    nx::CommonUpdateManager* updateManager,
-    const QList<QnUuid>& participants,
-    qint64 lastInstallationRequestTime)
-{
-    auto currentInfo = updateManager->updateInformation(
-        nx::CommonUpdateManager::InformationCategory::target);
-    currentInfo.participants = participants;
-    currentInfo.lastInstallationRequestTime = lastInstallationRequestTime;
-    updateManager->setUpdateInformation(
-        nx::CommonUpdateManager::InformationCategory::target,
-        currentInfo);
-}
-
 } // namespace
 
 QnInstallUpdateRestHandler::QnInstallUpdateRestHandler(QnMediaServerModule* serverModule,
@@ -158,57 +146,6 @@ QnInstallUpdateRestHandler::QnInstallUpdateRestHandler(QnMediaServerModule* serv
     nx::vms::server::ServerModuleAware(serverModule),
     m_onTriggeredCallback(std::move(onTriggeredCallback))
 {
-}
-
-void QnInstallUpdateRestHandler::setNewUpdateState(const QList<QnUuid> &participants)
-{
-    try
-    {
-        updateAndSetUpdateInformation(
-            serverModule()->updateManager(),
-            participants,
-            qnSyncTime->currentMSecsSinceEpoch());
-    }
-    catch(const std::exception& e)
-    {
-        NX_DEBUG(this, e.what());
-        throw Exception("Failed to set new update participants state");
-    }
-}
-
-void QnInstallUpdateRestHandler::storeUpdateState()
-{
-    try
-    {
-        const auto updateInfo = serverModule()->updateManager()->updateInformation(
-            nx::CommonUpdateManager::InformationCategory::target);
-
-        m_participants = updateInfo.participants;
-        m_updateInstallTime = updateInfo.lastInstallationRequestTime;
-    }
-    catch (const std::exception& e)
-    {
-        NX_DEBUG(this, e.what());
-        throw Exception("Failed to store current update state");
-    }
-}
-
-void QnInstallUpdateRestHandler::restoreUpdateState()
-{
-    try
-    {
-        if (!m_participants || !m_updateInstallTime)
-            return;
-
-        updateAndSetUpdateInformation(
-            serverModule()->updateManager(),
-            *m_participants,
-            *m_updateInstallTime);
-    }
-    catch (const std::exception& e)
-    {
-        NX_DEBUG(this, e.what());
-    }
 }
 
 int QnInstallUpdateRestHandler::executePost(
@@ -232,16 +169,16 @@ int QnInstallUpdateRestHandler::executePost(
     try
     {
         const auto peers = peersFromParams(params);
-        storeUpdateState();
-        setNewUpdateState(peers);
-
         const auto ifParticipantPredicate = detail::makeIfParticipantPredicate(
-            serverModule()->updateManager());
+            serverModule()->updateManager(), peers);
 
         makeSureParticipantsAreReadyForInstall(ifParticipantPredicate, processor, serverModule());
         QnMultiserverRequestContext<QnEmptyRequestData> context(
             request,
             processor->owner()->getPort());
+
+        if (!serverModule()->updateManager()->startUpdateInstallation(peers))
+            throw Exception("Cannot start update installation");
 
         sendInstallRequest(
             ifParticipantPredicate,
@@ -254,7 +191,6 @@ int QnInstallUpdateRestHandler::executePost(
     }
     catch (const Exception& e)
     {
-        restoreUpdateState();
         return QnFusionRestHandler::makeError(
             nx::network::http::StatusCode::ok,
             e.message,
@@ -266,7 +202,6 @@ int QnInstallUpdateRestHandler::executePost(
     }
     catch (...)
     {
-        restoreUpdateState();
         return QnFusionRestHandler::makeError(
             nx::network::http::StatusCode::ok,
             "Internal server error",

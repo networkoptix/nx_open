@@ -525,7 +525,7 @@ QnAbstractCompressedMetadataPtr QnLiveStreamProvider::getMetadata()
         {
             m_metadataLogger->pushData(
                 metadata,
-                lm("Queue size: %1").args(m_metadataReceptor->metadataQueue.size()));
+                lm("Queue size %1").args(m_metadataReceptor->metadataQueue.size()));
         }
 
         return metadata;

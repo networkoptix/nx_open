@@ -2045,8 +2045,8 @@ pour afficher plus de signets</translation>
       <translation>N’importe quelle caméra</translation>
     </message>
     <message>
-      <source>Force Acknowledgement will only work for Generic Events if camera modifiers are used in the Generic Event URL</source>
-      <translation>Reconnaissance forcé ne fonctionnera que pour les événements génériques si les modificateurs de caméra sont utilisés dans l'URL de l'événement générique</translation>
+      <source>Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</source>
+      <translation type="unfinished">Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</translation>
     </message>
   </context>
   <context>

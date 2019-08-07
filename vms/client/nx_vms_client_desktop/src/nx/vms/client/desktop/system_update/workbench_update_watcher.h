@@ -31,7 +31,7 @@ public:
 
     /** Get cached update information. */
     const UpdateContents& getUpdateContents() const;
-    std::shared_ptr<ServerUpdateTool> getServerUpdateTool();
+    ServerUpdateTool* getServerUpdateTool();
     std::future<UpdateContents> takeUpdateCheck();
 
 private:

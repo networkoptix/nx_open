@@ -2045,8 +2045,8 @@ to view more bookmarks</source>
       <translation>Hvilket som helst kamera</translation>
     </message>
     <message>
-      <source>Force Acknowledgement will only work for Generic Events if camera modifiers are used in the Generic Event URL</source>
-      <translation>Krev godkjenning fungerer bare for generiske hendelser hvis kameramodifiserere brukes i URLen for generisk hendelse</translation>
+      <source>Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</source>
+      <translation>Krev godkjenning fungerer bare for generiske hendelser hvis kameraidentifikatorer brukes i URLen for generisk hendelse</translation>
     </message>
   </context>
   <context>

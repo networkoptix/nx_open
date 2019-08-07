@@ -17,7 +17,7 @@
 #include <nx/vms/server/sdk_support/utils.h>
 #include <plugins/plugin_manager.h>
 
-#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/ptr.h>
 
 namespace nx::vms::server::analytics::debug_helpers {
 

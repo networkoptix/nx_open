@@ -68,10 +68,8 @@ void ErrorProcessor::processStreamError(
     if (!videoCamera)
         return;
 
-    if (!ownerResource->getStatus() == Qn::Unauthorized)
+    if (ownerResource->getStatus() == Qn::Unauthorized)
         return; //< Avoid offline->unauthorized->offline loop.
-
-    auto mediaStreamProvider = dynamic_cast<QnAbstractMediaStreamProvider*>(streamReader);
 
     if (error.errorCode == CameraDiagnostics::ErrorCode::notAuthorised)
     {
@@ -83,7 +81,8 @@ void ErrorProcessor::processStreamError(
         return;
 
     const auto kMaxTimeFromPreviousFrameUs = 5 * 1000 * 1000;
-    auto hasGopData = [&](nx::vms::api::StreamIndex streamIndex)
+    const auto hasGopData =
+        [&](nx::vms::api::StreamIndex streamIndex)
         {
             const auto nowUs = qnSyncTime->currentUSecsSinceEpoch();
             for (int i = 0; i < ownerResource->getVideoLayout()->channelCount(); ++i)
@@ -94,7 +93,7 @@ void ErrorProcessor::processStreamError(
             }
             return false;
         };
-    bool gotVideoFrameRecently = hasGopData(nx::vms::api::StreamIndex::primary)
+    const bool gotVideoFrameRecently = hasGopData(nx::vms::api::StreamIndex::primary)
         || hasGopData(nx::vms::api::StreamIndex::secondary);
 
 

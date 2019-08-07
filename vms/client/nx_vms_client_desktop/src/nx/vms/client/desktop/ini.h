@@ -104,16 +104,8 @@ struct Ini: nx::kit::IniConfig
         "timeline.\n"
         "\n"
         "Is currently used for demo purposes only (does not work in some specific scenarios).");
-    NX_INI_FLAG(1, enableWatermark,
-        "Enables watermarks preview and setup.");
-    NX_INI_FLAG(1, enableCaseExport,
-        "Enables case export.");
-    NX_INI_FLAG(1, enableSessionTimeout,
-        "Enables admin-configurable absolute session timeout.");
     NX_INI_STRING("press", passwordPreviewActivationMode,
         "Specifies one of password preview activation modes: \"press\", \"hover\" or \"toggle\".");
-    NX_INI_FLAG(1, redesignedTimeSynchronization,
-        "Enables redesigned time synchronization widget in the System Adminstration dialog.");
     NX_INI_FLAG(1, automaticFilterByTimelineSelection,
         "Allows to automatically switch Right Panel time selection to \"Selected on Timeline\"\n"
         "mode when such selection exists.");
@@ -168,8 +160,8 @@ struct Ini: nx::kit::IniConfig
     NX_INI_INT(0, globalLiveVideoCacheLength,
         "Global live video cache length, in seconds. Set to zero to use built-in value.");
     NX_INI_INT(180000, connectTimeoutMs,
-        "Timeout (in milliseconds) for waiting initial resources message from the server.\n"
-        "If exceeded then connections is dropped to avoid infinite UI \"Loading...\" state.\n"
+        "Timeout (in milliseconds) for waiting for the initial resource message from the Server.\n"
+        "If exceeded, then the connection is dropped to avoid infinite UI \"Loading...\" state.\n"
         "0 means disabled.");
     NX_INI_STRING("", dumpGeneratedIconsTo,
         "Dump icons, generated from svg, to a given folder.");

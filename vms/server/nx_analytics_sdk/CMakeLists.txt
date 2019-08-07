@@ -24,17 +24,18 @@ file(GLOB_RECURSE copied_static_files ${copied_static_origin}/*)
 set(copied_nx_kit_origin ${CMAKE_SOURCE_DIR}/open/artifacts/nx_kit)
 file(GLOB_RECURSE copied_nx_kit_files ${copied_nx_kit_origin}/*)
 
-# Collect source files for Plugin SDK.
-set(copied_nx_sdk_src_dir ${CMAKE_SOURCE_DIR}/vms/libs/nx_sdk/src)
-set(copied_nx_sdk_src_nx_origin ${copied_nx_sdk_src_dir}/nx)
+# Collect source files for SDK.
+set(copied_nx_sdk_src_nx_origin ${CMAKE_SOURCE_DIR}/vms/libs/nx_sdk/src/nx)
 file(GLOB_RECURSE copied_nx_sdk_src_nx_files ${copied_nx_sdk_src_nx_origin}/*)
+set(copied_nx_sdk_unit_tests_origin ${CMAKE_SOURCE_DIR}/vms/libs/nx_sdk/unit_tests)
+file(GLOB_RECURSE copied_nx_sdk_unit_tests_files ${copied_nx_sdk_unit_tests_origin}/*)
 
 # Collect source files for the sample - Stub Analytics Plugin.
 set(copied_sample_dir ${CMAKE_SOURCE_DIR}/vms/server/plugins/analytics/stub_analytics_plugin)
 set(copied_sample_origin ${copied_sample_dir}/src)
 file(GLOB_RECURSE copied_sample_files ${copied_sample_origin}/*)
-set(copied_sample_ut_origin ${copied_sample_dir}/unit_tests/src)
-file(GLOB_RECURSE copied_sample_ut_files ${copied_sample_ut_origin}/*)
+set(copied_sample_unit_tests_origin ${copied_sample_dir}/unit_tests/src)
+file(GLOB_RECURSE copied_sample_unit_tests_files ${copied_sample_unit_tests_origin}/*)
 
 set(copy_sdk_files_script ${CMAKE_CURRENT_BINARY_DIR}/copy_sdk_files.cmake)
 
@@ -115,7 +116,7 @@ add_custom_command(OUTPUT ${zip_file}
         ${copied_nx_kit_files}
         ${copied_nx_sdk_src_nx_files}
         ${copied_sample_files}
-        ${copied_sample_ut_files}
+        ${copied_sample_unit_tests_files}
 )
 
 add_custom_target(nx_analytics_sdk ALL DEPENDS ${zip_file})

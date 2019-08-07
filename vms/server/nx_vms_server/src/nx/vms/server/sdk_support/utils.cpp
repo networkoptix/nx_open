@@ -11,7 +11,7 @@
 #include <nx/sdk/i_attribute.h>
 #include <nx/sdk/analytics/helpers/pixel_format.h>
 #include <nx/sdk/analytics/helpers/object_track_info.h>
-#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/ptr.h>
 #include <nx/sdk/helpers/string_map.h>
 #include <nx/sdk/helpers/to_string.h>
 #include <nx/vms/server/resource/resource_fwd.h>
@@ -373,7 +373,7 @@ nx::sdk::Ptr<IUncompressedVideoFrame> createUncompressedVideoFrame(
     if (!dataPacket)
         return nullptr;
 
-    return nx::sdk::queryInterfacePtr<IUncompressedVideoFrame>(dataPacket);
+    return dataPacket->queryInterface<IUncompressedVideoFrame>();
 }
 
 std::map<QString, QString> attributesMap(
@@ -385,7 +385,7 @@ std::map<QString, QString> attributesMap(
     std::map<QString, QString> result;
     for (int i = 0; i < metadata->attributeCount(); ++i)
     {
-        const auto attribute = toPtr(metadata->attribute(i));
+        const auto attribute = metadata->attribute(i);
         result.emplace(
             QString::fromStdString(attribute->name()),
             QString::fromStdString(attribute->value()));

@@ -19,9 +19,8 @@ class IEventMetadataPacket: public Interface<IEventMetadataPacket, ICompoundMeta
 public:
     static auto interfaceId() { return InterfaceId("nx::sdk::analytics::IEventMetadataPacket"); }
 
-    virtual int count() const override = 0;
-
-    virtual const IEventMetadata* at(int index) const override = 0;
+    protected: virtual const IEventMetadata* getAt(int index) const override = 0;
+    public: Ptr<const IEventMetadata> at(int index) const { return toPtr(getAt(index)); }
 };
 
 } // namespace analytics

@@ -2044,8 +2044,8 @@ to view more bookmarks</source>
       <translation>Elke Camera</translation>
     </message>
     <message>
-      <source>Force Acknowledgement will only work for Generic Events if camera modifiers are used in the Generic Event URL</source>
-      <translation>Forceer erkenning werkt alleen voor algemene gebeurtenissen als camera modifiers worden gebruikt in de Generieke Event URL</translation>
+      <source>Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</source>
+      <translation>Het forceren van een bevestiging werkt alleen als voor een Generic Event camera ID's zijn gebruikt in de Generic Event URL</translation>
     </message>
   </context>
   <context>

@@ -9,7 +9,7 @@
 #include <nx/streaming/abstract_data_packet.h>
 #include <nx/streaming/abstract_data_consumer.h>
 
-#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/ptr.h>
 #include <nx/sdk/analytics/i_engine.h>
 #include <nx/sdk/analytics/i_device_agent.h>
 #include <nx/sdk/analytics/helpers/metadata_types.h>

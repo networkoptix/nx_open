@@ -158,11 +158,8 @@ QVariant AnalyticsSearchListModel::Private::data(const QModelIndex& index, int r
             if (!objectCamera)
                 return fallbackTitle();
 
-            nx::analytics::ObjectTypeDescriptorManager objectTypeDescriptorManager(
-                objectCamera->commonModule());
-
-            const auto objectTypeDescriptor = objectTypeDescriptorManager.descriptor(
-                track.objectTypeId);
+            const auto objectTypeDescriptor = objectCamera->commonModule()
+                ->analyticsObjectTypeDescriptorManager()->descriptor(track.objectTypeId);
 
             if (!objectTypeDescriptor)
                 return fallbackTitle();
@@ -173,7 +170,7 @@ QVariant AnalyticsSearchListModel::Private::data(const QModelIndex& index, int r
         }
 
         case Qt::DecorationRole:
-            return QVariant::fromValue(qnSkin->pixmap("text_buttons/analytics.png"));
+            return QVariant::fromValue(qnSkin->pixmap("analytics/analytics.svg"));
 
         case Qn::DescriptionTextRole:
             return description(track);

@@ -38,11 +38,6 @@
       <source>Customer Support</source>
       <translation>Техническая поддержка</translation>
     </message>
-    <message>
-      <location/>
-      <source>ARM support policy</source>
-      <translation>Политика поддержки ARM</translation>
-    </message>
   </context>
   <context>
     <name>AccessibleResourcesWidget</name>

@@ -38,11 +38,6 @@
       <source>Customer Support</source>
       <translation>Kundestøtte</translation>
     </message>
-    <message>
-      <location/>
-      <source>ARM support policy</source>
-      <translation>ARM support policy</translation>
-    </message>
   </context>
   <context>
     <name>AccessibleResourcesWidget</name>

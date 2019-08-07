@@ -217,6 +217,7 @@ bool verifyUpdateContents(
         && clientData.installedVersions.count(targetVersion) == 0)
     {
         contents.alreadyInstalled = false;
+        contents.needClientUpdate = true;
 
         auto [result, package] = update::findPackageForVariant(info, true, clientData.osInfo);
         switch (result)

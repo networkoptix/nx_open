@@ -112,10 +112,6 @@ ServerUpdateTool::ServerUpdateTool(QObject* parent):
     m_downloader.reset(new Downloader(
         m_outputDir, commonModule(), {new InternetOnlyPeerManager()}));
 
-    // This object is managed by shared_ptr. So we must sure there is no parent, or this instance
-    // can be deleted twice.
-    setParent(nullptr);
-
     connect(m_downloader.get(), &Downloader::fileStatusChanged,
         this, &ServerUpdateTool::atDownloaderStatusChanged);
 
@@ -826,7 +822,6 @@ bool ServerUpdateTool::requestFinishUpdate(bool skipActivePeers)
 
                 emit finishUpdateComplete(success, toString(error));
             }), thread());
-        m_stateTracker->clearState();
         return true;
     }
 
@@ -884,6 +879,15 @@ bool ServerUpdateTool::requestInstallAction(
         auto item = m_stateTracker->findItemById(id);
         if (item->component == UpdateItem::Component::server)
             servers.insert(id);
+    }
+
+    if (servers.empty())
+    {
+        NX_VERBOSE(this, "requestInstallAction() it is client-only update");
+        // Seems like it is client-only update. There is no need to send
+        // POST ec2/installUpdate request.
+        emit startInstallComplete(true, toString(InternalError::noError));
+        return true;
     }
 
     m_remoteUpdateStatus = {};

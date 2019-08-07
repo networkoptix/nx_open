@@ -2,6 +2,10 @@
 
 #include "nx/vms/client/desktop/system_update/peer_state_tracker.h"
 
+namespace {
+    auto kDefaultServerVersion = nx::utils::SoftwareVersion("4.0.0.29067");
+}
+
 namespace nx::vms::client::desktop {
 
 using Status = nx::update::Status::Code;
@@ -46,8 +50,8 @@ public:
 TEST_F(UpdatePeerStateTrackerTest, testReadyInstallTracking)
 {
     ASSERT_TRUE(m_stateTracker->setResourceFeed(resourcePool()));
-    auto server1 = makeServer(nx::utils::SoftwareVersion("4.0.0.29067"));
-    auto server2 = makeServer(nx::utils::SoftwareVersion("4.0.0.29067"));
+    auto server1 = makeServer(kDefaultServerVersion);
+    auto server2 = makeServer(kDefaultServerVersion);
 
     setServerUpdateStatus(server1, Status::readyToInstall);
     setServerUpdateStatus(server2, Status::readyToInstall);

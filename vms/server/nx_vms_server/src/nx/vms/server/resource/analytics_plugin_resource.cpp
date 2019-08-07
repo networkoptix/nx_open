@@ -1,7 +1,7 @@
 #include "analytics_plugin_resource.h"
 
 #include <nx/sdk/analytics/i_plugin.h>
-#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/ptr.h>
 
 #include <media_server/media_server_module.h>
 
@@ -13,20 +13,6 @@
 #include <nx/analytics/descriptor_manager.h>
 
 namespace nx::vms::server::resource {
-
-namespace {
-
-nx::vms::api::analytics::PluginDescriptor descriptorFromManifest(
-    const nx::vms::api::analytics::PluginManifest& manifest)
-{
-    nx::vms::api::analytics::PluginDescriptor descriptor;
-    descriptor.id = manifest.id;
-    descriptor.name = manifest.name;
-
-    return descriptor;
-}
-
-} // namespace
 
 AnalyticsPluginResource::AnalyticsPluginResource(QnMediaServerModule* serverModule):
     base_type(),

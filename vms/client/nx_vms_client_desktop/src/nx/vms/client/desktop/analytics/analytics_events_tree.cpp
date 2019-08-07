@@ -1,5 +1,7 @@
 #include "analytics_events_tree.h"
 
+#include <common/common_module.h>
+
 #include <nx/analytics/descriptor_manager.h>
 
 #include <nx/utils/std/algorithm.h>
@@ -8,20 +10,15 @@ namespace nx::vms::client::desktop {
 
 using namespace nx::analytics;
 
-struct AnalyticsEventsTreeBuilder::Private
+struct AnalyticsEventsTreeBuilder::Private: public QnCommonModuleAware
 {
     Private(QnCommonModule* commonModule, Flags flags):
-        flags(flags),
-        eventTypeDescriptorManager(new EventTypeDescriptorManager(commonModule)),
-        engineDescriptorManager(new EngineDescriptorManager(commonModule)),
-        groupDescriptorManager(new GroupDescriptorManager(commonModule))
+        QnCommonModuleAware(commonModule),
+        flags(flags)
     {
     }
 
     Flags flags;
-    QScopedPointer<EventTypeDescriptorManager> eventTypeDescriptorManager;
-    QScopedPointer<EngineDescriptorManager> engineDescriptorManager;
-    QScopedPointer<GroupDescriptorManager> groupDescriptorManager;
 
     NodePtr makeNode(NodeType nodeType, const QString& text = QString())
     {
@@ -65,6 +62,10 @@ struct AnalyticsEventsTreeBuilder::Private
 
     NodePtr buildTree(ScopedEventTypeIds scopedEventTypeIds)
     {
+        const auto engineDescriptorManager = commonModule()->analyticsEngineDescriptorManager();
+        const auto groupDescriptorManager = commonModule()->analyticsGroupDescriptorManager();
+        const auto eventTypeDescriptorManager = commonModule()->analyticsEventTypeDescriptorManager();
+
         auto root = makeNode(NodeType::root);
 
         for (const auto& [engineId, eventTypeIdsByGroup]: scopedEventTypeIds)
@@ -127,13 +128,15 @@ AnalyticsEventsTreeBuilder::~AnalyticsEventsTreeBuilder()
 AnalyticsEventsTreeBuilder::NodePtr AnalyticsEventsTreeBuilder::compatibleTreeIntersection(
     const QnVirtualCameraResourceList& devices) const
 {
-    return d->buildTree(d->eventTypeDescriptorManager->compatibleEventTypeIdsIntersection(devices));
+    return d->buildTree(d->commonModule()->analyticsEventTypeDescriptorManager()
+        ->compatibleEventTypeIdsIntersection(devices));
 }
 
 AnalyticsEventsTreeBuilder::NodePtr AnalyticsEventsTreeBuilder::compatibleTreeUnion(
     const QnVirtualCameraResourceList& devices) const
 {
-    return d->buildTree(d->eventTypeDescriptorManager->compatibleEventTypeIdsUnion(devices));
+    return d->buildTree(d->commonModule()->analyticsEventTypeDescriptorManager()
+        ->compatibleEventTypeIdsUnion(devices));
 }
 
 } // namespace nx::vms::client::desktop

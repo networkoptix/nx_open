@@ -946,11 +946,11 @@ nähdäksesi lisää kirjanmerkkejä</translation>
     </message>
     <message>
       <source>Pin Calendar</source>
-      <translation type="unfinished">Pin Calendar</translation>
+      <translation>Kiinnitä kalenteri</translation>
     </message>
     <message>
       <source>Unpin Calendar</source>
-      <translation type="unfinished">Unpin Calendar</translation>
+      <translation>Poista kalenteri</translation>
     </message>
   </context>
   <context>
@@ -2045,8 +2045,8 @@ nähdäksesi lisää kirjanmerkkejä</translation>
       <translation>Mikä tahansa kamera</translation>
     </message>
     <message>
-      <source>Force Acknowledgement will only work for Generic Events if camera modifiers are used in the Generic Event URL</source>
-      <translation>Pakotettu kuittaus toimii vain yleisissä tapahtumissa, jos kameran modifikaattoreita käytetään yleisessä tapahtuman URL-osoitteessa</translation>
+      <source>Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</source>
+      <translation type="unfinished">Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</translation>
     </message>
   </context>
   <context>
@@ -5610,8 +5610,8 @@ to %1</source>
     <message>
       <source>Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
 If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
-      <translation type="unfinished">Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
-If you intended to move analytics data to another storage location, please contact support before proceeding.</translation>
+      <translation>Nykyisiä analyysitietoja ei siirretä automaattisesti toiseen paikkaan ja ne eivät ole käytettävissä. Voit säilyttää sen ja siirtää sen manuaalisesti myöhemmin tai poistaa pysyvästi.
+Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä tukeen ennen jatkamista.</translation>
     </message>
   </context>
   <context>
@@ -7359,7 +7359,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Unknown track</source>
-      <translation type="unfinished">Unknown track</translation>
+      <translation>Tuntematon jälki</translation>
     </message>
   </context>
   <context>
@@ -7594,7 +7594,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Motion detection stream is disabled</source>
-      <translation type="unfinished">Motion detection stream is disabled</translation>
+      <translation>Liikkeen tunnistusvirta on poistettu käytöstä</translation>
     </message>
   </context>
   <context>
@@ -7735,11 +7735,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Motion detection is disabled, all schedule records &quot;Motion&quot; and &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
-      <translation type="unfinished">Motion detection is disabled, all schedule records &quot;Motion&quot; and &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</translation>
+      <translation>Liiketunnistus on poistettu käytöstä, kaikki aikataulutietueet &quot;Motion&quot; ja &quot;Motion + Lo-Res&quot; vaihdetaan arvoon &quot;Always&quot;</translation>
     </message>
     <message>
       <source>Dual streaming is disabled, all schedule records &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
-      <translation type="unfinished">Dual streaming is disabled, all schedule records &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</translation>
+      <translation>Monisuoratoisto on poistettu käytöstä, kaikki aikataulutietueet &quot;Motion + Lo-Res&quot; vaihdetaan arvoon &quot;Always&quot;</translation>
     </message>
   </context>
   <context>
@@ -8456,7 +8456,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Can not start the search process</source>
-      <translation type="unfinished">Can not start the search process</translation>
+      <translation>Hakuprosessia ei voida käynnistää</translation>
     </message>
   </context>
   <context>
@@ -8610,7 +8610,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Some servers have not completed the update process. Finish it anyway?</source>
-      <translation type="unfinished">Some servers have not completed the update process. Finish it anyway?</translation>
+      <translation>Joidenkin palvelintent päivitykset eivät ole valmiit. Viimeistele ne joka tapauksessa?</translation>
     </message>
     <message>
       <source>%1 will be restarted to the updated version.</source>
@@ -8743,11 +8743,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Some servers have no update packages available.</source>
-      <translation type="unfinished">Some servers have no update packages available.</translation>
+      <translation>Joillakin palvelimilla ei ole saatavana päivityspaketteja.</translation>
     </message>
     <message>
       <source>Some servers have encountered an internal error.</source>
-      <translation type="unfinished">Some servers have encountered an internal error.</translation>
+      <translation>Jotkut palvelimet ovat havainneet sisäisen virheen.</translation>
     </message>
     <message>
       <source>Please contact Customer Support.</source>
@@ -8858,7 +8858,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Some users do not have access to the selected layout. Action will not work for them.</source>
-      <translation type="unfinished">Some users do not have access to the selected layout. Action will not work for them.</translation>
+      <translation>Joillakin käyttäjillä ei ole pääsyä valittuun asetteluun. Toiminto ei toimi heillä.</translation>
     </message>
   </context>
   <context>
@@ -9065,11 +9065,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Motion detection is disabled or not supported</source>
-      <translation type="unfinished">Motion detection is disabled or not supported</translation>
+      <translation>Liikkeentunnistus on poistettu käytöstä tai sitä ei tueta</translation>
     </message>
     <message>
       <source>Dual-streaming is disabled or not supported</source>
-      <translation type="unfinished">Dual-streaming is disabled or not supported</translation>
+      <translation>Monisuoratoisto on poistettu käytöstä tai sitä ei tueta</translation>
     </message>
   </context>
   <context>
@@ -9196,7 +9196,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::ServerUpdateTool</name>
     <message>
       <source>No connection to the server.</source>
-      <translation type="unfinished">No connection to the server.</translation>
+      <translation>Ei yhteyttä palvelimeen.</translation>
     </message>
     <message>
       <source>Network error.</source>
@@ -9204,7 +9204,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Server error.</source>
-      <translation type="unfinished">Server error.</translation>
+      <translation>Palvelinvirhe.</translation>
     </message>
   </context>
   <context>
@@ -9423,11 +9423,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Remote file &quot;%1&quot; is corrupted</source>
-      <translation type="unfinished">Remote file &quot;%1&quot; is corrupted</translation>
+      <translation>Etä tiedosto &quot;%1&quot; on vioittunut</translation>
     </message>
     <message>
       <source>Server already has this file &quot;%1&quot;</source>
-      <translation type="unfinished">Server already has this file &quot;%1&quot;</translation>
+      <translation>Palvelimella on jo tämä tiedosto &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
@@ -9836,7 +9836,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>All Supported</source>
-      <translation type="unfinished">All Supported</translation>
+      <translation>Kaikki tuettu</translation>
     </message>
     <message>
       <source>Select folder...</source>
@@ -9940,14 +9940,14 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>Failed to change password on %n cameras of %1</source>
       <comment>Total number of cameras will be substituted as %1</comment>
-      <translation type="unfinished">
-        <numerusform>Failed to change password on %n cameras of %1</numerusform>
-        <numerusform>Failed to change password on %n cameras of %1</numerusform>
+      <translation>
+        <numerusform>Salasanan vaihtaminen epäonnistui %n kamerassa, joissa on %1</numerusform>
+        <numerusform>Salasanan vaihtaminen epäonnistui %n kamerassa, joissa on %1</numerusform>
       </translation>
     </message>
     <message>
       <source>This build is for testing purposes only.</source>
-      <translation type="unfinished">This build is for testing purposes only.</translation>
+      <translation>Varoitus! Tämä versio on tarkoitettu vain testaustarkoituksiin.</translation>
     </message>
     <message>
       <source>Open Server Settings</source>

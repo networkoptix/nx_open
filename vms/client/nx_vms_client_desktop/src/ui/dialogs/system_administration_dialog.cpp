@@ -11,7 +11,6 @@
 
 #include <ui/widgets/system_settings/license_manager_widget.h>
 #include <ui/widgets/system_settings/database_management_widget.h>
-#include <ui/widgets/system_settings/time_server_selection_widget.h>
 #include <ui/widgets/system_settings/general_system_administration_widget.h>
 #include <ui/widgets/system_settings/user_management_widget.h>
 #include <ui/widgets/system_settings/cloud_management_widget.h>
@@ -58,25 +57,27 @@ QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget* parent):
 
     addPage(UserManagement,         new QnUserManagementWidget(this),       tr("Users"));
     addPage(RoutingManagement,      routingWidget,                          tr("Routing Management"));
-    if (ini().redesignedTimeSynchronization)
-    {
-        addPage(
-            TimeServerSelection,
-            new TimeSynchronizationWidget(this),
-            tr("Time Synchronization"));
-    }
-    else
-    {
-        addPage(
-            TimeServerSelection,
-            new QnTimeServerSelectionWidget(this),
-            tr("Time Synchronization"));
-    }
+    addPage(
+        TimeServerSelection,
+        new TimeSynchronizationWidget(this),
+        tr("Time Synchronization"));
 
     addPage(CloudManagement, new QnCloudManagementWidget(this), nx::network::AppInfo::cloudName());
-    addPage(Analytics, new AnalyticsSettingsWidget(this), tr("Plugins"));
+
+    const auto analyticsSettingsWidget = new AnalyticsSettingsWidget(this);
+    auto updateAnalyticsSettingsWidgetVisibility =
+        [this, analyticsSettingsWidget]
+        {
+            setPageVisible(Analytics, analyticsSettingsWidget->shouldBeVisible());
+        };
+
+    addPage(Analytics, analyticsSettingsWidget, tr("Plugins"));
+    connect(analyticsSettingsWidget, &AnalyticsSettingsWidget::visibilityUpdateRequested, this,
+        updateAnalyticsSettingsWidgetVisibility);
 
     loadDataToUi();
+    updateAnalyticsSettingsWidgetVisibility();
+
     autoResizePagesToContents(ui->tabWidget, {QSizePolicy::Preferred, QSizePolicy::Preferred}, true);
 
     /* Hiding Apply button, otherwise it will be enabled in the QnGenericTabbedDialog code */

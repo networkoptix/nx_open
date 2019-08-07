@@ -11,7 +11,6 @@
 #include <nx/sdk/uuid.h>
 #include <nx/sdk/analytics/helpers/plugin.h>
 #include <nx/sdk/analytics/helpers/engine.h>
-#include <nx/sdk/analytics/helpers/result_aliases.h>
 #include <nx/sdk/analytics/i_uncompressed_video_frame.h>
 
 namespace nx {
@@ -23,24 +22,24 @@ class Engine: public nx::sdk::analytics::Engine
 {
 public:
     using PixelFormat = nx::sdk::analytics::IUncompressedVideoFrame::PixelFormat;
-    using Plugin = nx::sdk::analytics::Plugin;
 
-    Engine(Plugin* plugin);
+    Engine(nx::sdk::analytics::Plugin* plugin);
+
     virtual ~Engine() override;
-
-    virtual nx::sdk::analytics::MutableDeviceAgentResult obtainDeviceAgent(
-        const nx::sdk::IDeviceInfo* deviceInfo) override;
 
     // Capabilities.
     bool needUncompressedVideoFrames() const { return m_needUncompressedVideoFrames; }
     PixelFormat pixelFormat() const { return m_pixelFormat; }
 
-    virtual Plugin* plugin() const override { return pluginCasted<Plugin>(); }
-
 protected:
     virtual std::string manifestString() const override;
 
-    virtual nx::sdk::StringMapResult settingsReceived() override;
+    virtual nx::sdk::Result<const nx::sdk::IStringMap*> settingsReceived() override;
+
+protected:
+    virtual void doObtainDeviceAgent(
+        nx::sdk::Result<nx::sdk::analytics::IDeviceAgent*>* outResult,
+        const nx::sdk::IDeviceInfo* deviceInfo) override;
 
     virtual nx::sdk::Result<void> executeAction(
         const std::string& actionId,
@@ -58,6 +57,8 @@ private:
     void generatePluginDiagnosticEvents();
 
 private:
+    nx::sdk::analytics::Plugin* const m_plugin;
+
     mutable std::mutex m_pluginDiagnosticEventGenerationLoopMutex;
     mutable std::condition_variable m_pluginDiagnosticEventGenerationLoopCondition;
     std::unique_ptr<std::thread> m_pluginDiagnosticEventThread;

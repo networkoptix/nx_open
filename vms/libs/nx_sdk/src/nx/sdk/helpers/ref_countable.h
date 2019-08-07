@@ -80,7 +80,7 @@ private:
  *
  * Supports tracking the ref-countable objects via RefCountableRegistry.
  */
-template <class RefCountableInterface>
+template<class RefCountableInterface>
 class RefCountable: public RefCountableInterface
 {
 public:
@@ -94,8 +94,6 @@ public:
         if (const auto refCountableRegistry = libContext().refCountableRegistry())
             refCountableRegistry->notifyDestroyed(this, refCount());
     }
-
-    using IRefCountable::queryInterface; //< Enable const overload.
 
     virtual int addRef() const override { return m_refCountableHolder.addRef(); }
     virtual int releaseRef() const override { return m_refCountableHolder.releaseRef(); }

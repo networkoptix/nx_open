@@ -31,9 +31,9 @@ public:
 
     /**
      * @return Element at the zero-based index, or null if the index is invalid.
-     * ATTENTION: The item's reference counter is incremented by this call.
      */
-    virtual const IMetadata* at(int index) const = 0;
+    protected: virtual const IMetadata* getAt(int index) const = 0;
+    public: Ptr<const IMetadata> at(int index) const { return toPtr(getAt(index)); }
 };
 
 } // namespace analytics

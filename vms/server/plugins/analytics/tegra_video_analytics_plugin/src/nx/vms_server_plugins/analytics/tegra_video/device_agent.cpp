@@ -22,7 +22,8 @@ using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 
 DeviceAgent::DeviceAgent(Engine* engine, const nx::sdk::IDeviceInfo* deviceInfo):
-    VideoFrameProcessingDeviceAgent(engine, deviceInfo, NX_DEBUG_ENABLE_OUTPUT)
+    VideoFrameProcessingDeviceAgent(deviceInfo, NX_DEBUG_ENABLE_OUTPUT),
+    m_engine(engine)
 {
     NX_PRINT << __func__ << "() BEGIN -> " << this;
 
@@ -70,10 +71,10 @@ DeviceAgent::~DeviceAgent()
     NX_OUTPUT << __func__ << "(" << this << ") END";
 }
 
-Result<void> DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* /*metadataTypes*/)
+void DeviceAgent::doSetNeededMetadataTypes(
+    Result<void>* /*outResult*/, const IMetadataTypes* /*neededMetadataTypes*/)
 {
     NX_OUTPUT << __func__ << "() has been called";
-    return {};
 }
 
 std::string DeviceAgent::manifestString() const

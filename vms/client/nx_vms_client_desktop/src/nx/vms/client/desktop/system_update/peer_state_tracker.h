@@ -4,14 +4,11 @@
 #include <memory>
 #include <chrono>
 
-#include <QtCore/QAbstractTableModel>
-
 #include <utils/common/connective.h>
 #include <core/resource/resource_fwd.h>
 #include <nx/vms/api/data/software_version.h>
-#include <ui/customization/customized.h>
-#include <ui/workbench/workbench_context_aware.h>
-#include <nx/update/common_update_manager.h>
+#include <nx/update/update_information.h>
+#include <common/common_module.h>
 
 struct QnUpdateFreeSpaceReply;
 
@@ -98,14 +95,15 @@ class NX_VMS_CLIENT_DESKTOP_API PeerStateTracker:
 public:
     PeerStateTracker(QObject* parent = nullptr);
 
+    using ServerFilter = std::function<bool (const QnMediaServerResourcePtr&)>;
+    void setServerFilter(ServerFilter filter);
+
     /**
      * Attaches state tracker to a resource pool. All previous attachments are discarded.
      * @param pool Pointer to the resource pool.
-     * @param filter Filter for mediaservers
      * @return False if got empty resource pool or systemId.
      */
-    bool setResourceFeed(QnResourcePool* pool,
-        std::function<bool (const QnMediaServerResourcePtr&)> filter = {});
+    bool setResourceFeed(QnResourcePool* pool);
 
     UpdateItemPtr findItemById(QnUuid id) const;
     UpdateItemPtr findItemByRow(int row) const;
@@ -224,7 +222,7 @@ public:
      * readyToInstall->installing or when we cancel current action.
      * It will reset all internal task sets.
      */
-    void setTask(const QSet<QnUuid>& targets);
+    void setTask(const QSet<QnUuid>& targets, bool reset = true);
     void setTaskError(const QSet<QnUuid>& targets, const QString& error);
     void addToTask(QnUuid id);
     void removeFromTask(QnUuid id);
@@ -304,7 +302,7 @@ private:
 
     QPointer<QnResourcePool> m_resourcePool;
 
-    std::function<bool (const QnMediaServerResourcePtr&)> m_serverFilter;
+    ServerFilter m_serverFilter;
 };
 
 } // namespace nx::vms::client::desktop

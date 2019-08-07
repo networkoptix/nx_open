@@ -2044,8 +2044,8 @@ to view more bookmarks</source>
       <translation>Cualquier cámara</translation>
     </message>
     <message>
-      <source>Force Acknowledgement will only work for Generic Events if camera modifiers are used in the Generic Event URL</source>
-      <translation>Forzar acuse de recibo solo funcionará para eventos genéricos si se usan modificadores de cámara en la URL de evento genérico</translation>
+      <source>Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</source>
+      <translation>Forzar el reconocimiento sólo funcionará para eventos genéricos si los identificadores de cámara se utilizan en la URL del evento genérico</translation>
     </message>
   </context>
   <context>
@@ -5610,8 +5610,8 @@ a %1</translation>
     <message>
       <source>Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
 If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
-      <translation type="unfinished">Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
-If you intended to move analytics data to another storage location, please contact support before proceeding.</translation>
+      <translation>Los datos analíticos actuales no se moverán automáticamente a otra ubicación y serán inaccesibles. Puede conservarlo y moverlo manualmente más tarde, o eliminarlo permanentemente.
+Si tenía la intención de mover los datos analíticos a otra ubicación de almacenamiento, póngase en contacto con el soporte antes de continuar.</translation>
     </message>
   </context>
   <context>
@@ -9423,11 +9423,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Remote file &quot;%1&quot; is corrupted</source>
-      <translation type="unfinished">Remote file &quot;%1&quot; is corrupted</translation>
+      <translation>El archivo remoto &quot;%1&quot; está dañado</translation>
     </message>
     <message>
       <source>Server already has this file &quot;%1&quot;</source>
-      <translation type="unfinished">Server already has this file &quot;%1&quot;</translation>
+      <translation>El servidor ya tiene este archivo &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
@@ -9959,21 +9959,21 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Confirm storage location for the analytics data on &quot;%1&quot;</source>
-      <translation type="unfinished">Confirm storage location for the analytics data on &quot;%1&quot;</translation>
+      <translation>Confirme la ubicación de almacenamiento para los datos analíticos en &quot;%1&quot;</translation>
     </message>
     <message>
       <source>the largest available partition</source>
-      <translation type="unfinished">the largest available partition</translation>
+      <translation>la partición más grande disponible</translation>
     </message>
     <message>
       <source>The analytics database should only be stored on a local drive and can take up large amounts of space.
 Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
 By default analytics data will be stored on %1.
 You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</source>
-      <translation type="unfinished">The analytics database should only be stored on a local drive and can take up large amounts of space.
-Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
-By default analytics data will be stored on %1.
-You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</translation>
+      <translation>La base de datos de analíticossólo debe almacenarse en una unidad local y puede tomar grandes cantidades de espacio.
+Una vez que se selecciona una ubicación para almacenar datos analíticos, no se puede cambiar fácilmente sin perder datos existentes. Recomendamos elegir la ubicación cuidadosamente y evitar usar la partición del sistema ya que puede causar una mala función del sistema.
+Por defecto los datos analíticos se almacenarán en %1.
+Puede seleccionar otra ubicación de almacenamiento en la pestaña &quot;Administración de Almacenamiento&quot; de la ventana de Configuración del servidor.</translation>
     </message>
   </context>
   <context>
