@@ -1,14 +1,10 @@
 #include "list_bucket_result.h"
 
-#include "xml_parse_helper.h"
-
 namespace nx::cloud::aws::api {
 
 namespace {
 
-static constexpr char kListBucketResult[] = "ListBucketResult";
-static constexpr char kContents[] = "Contents";
-static constexpr char kCommonPrefixes[] = "CommonPrefixes";
+static const QString kContents = "Contents";
 
 static const xml::Field<Contents>::Assigners kContentsAssigners = {
     {"Key", [](auto* obj, auto& value) { obj->key = value.toStdString(); }},
@@ -30,41 +26,53 @@ static const xml::Field<ListBucketResult>::Assigners kListBucketResultAssigners 
     {"IsTruncated", [](auto* obj, auto& value) { obj->isTruncated = xml::toBool(value); }}
 };
 
-static const xml::Field<CommonPrefixes>::Assigners kCommonPrefixesAssigners = {
-    {"Prefix", [](auto* obj, auto& value) { obj->prefix = value.toStdString(); }}
-};
-
 } // namespace
 
 namespace xml {
 
+template<>
 NX_AWS_CLIENT_API bool deserialize(
-    const nx::Buffer& data,
+    QXmlStreamReader* xml,
     ListBucketResult* outObject)
 {
-    QXmlStreamReader xml(data);
-
-    while (!xml.atEnd())
+    while (!xml->atEnd())
     {
-        if (xml.name() == kContents)
+        if (xml->name() == kContents)
         {
-            if (!deserialize(&xml, kContentsAssigners, kContents, &outObject->contents))
+            if (!deserialize(xml, kContentsAssigners, kContents, &outObject->contents))
                 return false;
             continue;
         }
 
-        if (xml.name() == kCommonPrefixes)
-        {
-            if (!deserialize(&xml, kCommonPrefixesAssigners, kCommonPrefixes, &outObject->commonPrefixes))
-                return false;
-            continue;
-        }
-
-        if (!parseNextField(&xml, kListBucketResultAssigners, outObject))
+        if (!parseNextField(xml, kListBucketResultAssigners, outObject))
             return false;
     }
 
     return true;
+}
+
+template<>
+void serialize(QXmlStreamWriter* xml, const ListBucketResult& object)
+{
+    writeElement(xml, "Name", object.name);
+    writeElement(xml, "Prefix", object.prefix);
+    if (!object.nextContinuationToken.empty())
+        writeElement(xml, "NextContinuationToken", object.nextContinuationToken);
+    writeElement(xml, "KeyCount", object.keyCount);
+    writeElement(xml, "MaxKeys", object.maxKeys);
+    if (!object.delimitter.empty())
+        writeElement(xml, "Delimitter", object.delimitter);
+    writeElement(xml, "IsTruncated", object.isTruncated);
+
+    for (const auto& content : object.contents)
+    {
+        ScopedElement element(xml, content);
+        writeElement(xml, "Key", content.key);
+        writeElement(xml, "LastModified", content.lastModified);
+        writeElement(xml, "ETag", content.etag);
+        writeElement(xml, "Size", content.size);
+        writeElement(xml, "StorageClass", content.storageClass);
+    }
 }
 
 } // namespace xml

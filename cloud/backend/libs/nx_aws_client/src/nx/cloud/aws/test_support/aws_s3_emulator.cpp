@@ -1,5 +1,7 @@
 #include "aws_s3_emulator.h"
 
+#include <QXmlStreamWriter>
+
 #include <nx/network/http/buffer_source.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/random.h>
@@ -7,18 +9,33 @@
 #include <nx/cloud/aws/aws_signature_v4.h>
 #include <nx/cloud/aws/http_request_paths.h>
 
+#include <nx/cloud/aws/api/list_bucket_result.h>
+#include <nx/cloud/aws/api/location_constraint.h>
+
 namespace nx::cloud::aws::test {
 
 namespace {
 
-static constexpr char kDefaultLocationTemplate[] = R"xml(
-    <LocationConstraint xmlns="http://s3.amazonaws.com/doc/2006-03-01/"/>
-)xml";
+std::string calculateUpperBound(const std::string& keyPrefix)
+{
+    if (!keyPrefix.empty())
+    {
+        std::string upperBound = keyPrefix;
+        for (auto rit = upperBound.rbegin(); rit != upperBound.rend(); ++rit)
+        {
+            if (++(*rit) != 0)
+                return upperBound;
+        }
+    }
+    return {};
+}
 
-static constexpr char kLocationTemplate[] = R"xml(
-    <?xml version = "1.0" encoding = "UTF-8"?>
-    <LocationConstraint xmlns="http://s3.amazonaws.com/doc/2006-03-01/">%1</LocationConstraint>
-)xml";
+std::string parseFileName(const std::string& path, const std::string& prefix)
+{
+    if (path.length() <= prefix.length())
+        return {};
+    return path.substr(prefix.length());
+}
 
 } // namespace
 
@@ -119,7 +136,10 @@ void AwsS3Emulator::registerHttpApi()
 
     m_httpServer.registerRequestProcessorFunc(
         aws::http::kRootPath,
-        [this](auto&& ... args) { getLocation(std::forward<decltype(args)>(args)...); },
+        [this](auto&& ... args)
+        {
+            dispatchRootPathGetRequest(std::forward<decltype(args)>(args)...);
+        },
         network::http::Method::get);
 }
 
@@ -169,12 +189,7 @@ void AwsS3Emulator::getLocation(
     if (requestContext.request.requestLine.url.query() != http::kLocationQuery)
         return completionHandler(network::http::StatusCode::badRequest);
 
-    auto location = this->location();
-
-    auto buffer =
-        location == kDefaultS3Location
-        ? nx::Buffer(kDefaultLocationTemplate)
-        : lm(kLocationTemplate).arg(location).toUtf8();
+    auto buffer = api::xml::serialized({this->location()});
 
     network::http::RequestResult result(network::http::StatusCode::ok);
     result.dataSource =
@@ -183,6 +198,71 @@ void AwsS3Emulator::getLocation(
             std::move(buffer));
     completionHandler(std::move(result));
 
+}
+
+void AwsS3Emulator::listBucket(
+    nx::network::http::RequestContext requestContext,
+    nx::network::http::RequestProcessedHandler completionHandler)
+{
+    auto query = requestContext.request.requestLine.url.query();
+    int prefixIndex = query.indexOf(http::kPrefixQuery);
+    QString prefix;
+    if (prefixIndex != -1)
+        prefix = query.mid(prefixIndex + (int) std::string_view(http::kPrefixQuery).length() + 1);
+
+    auto listBucketResult = getListBucketResult(prefix.toStdString());
+    if (!listBucketResult)
+        return completionHandler(network::http::StatusCode::badRequest);
+
+    auto buffer = api::xml::serialized(*listBucketResult);
+
+    network::http::RequestResult result(network::http::StatusCode::ok);
+    result.dataSource =
+        std::make_unique<network::http::BufferSource>(
+            "application/xml",
+            std::move(buffer));
+    completionHandler(std::move(result));
+}
+
+void AwsS3Emulator::dispatchRootPathGetRequest(
+    nx::network::http::RequestContext requestContext,
+    nx::network::http::RequestProcessedHandler completionHandler)
+{
+    if (requestContext.request.requestLine.url.query() == http::kLocationQuery)
+        return getLocation(std::move(requestContext), std::move(completionHandler));
+    listBucket(std::move(requestContext), std::move(completionHandler));
+}
+
+std::optional<api::ListBucketResult> AwsS3Emulator::getListBucketResult(const std::string& prefix)
+{
+    QnMutexLocker lock(&m_mutex);
+    auto itLow = m_pathToFileContents.begin();
+    if (!prefix.empty())
+        m_pathToFileContents.lower_bound(prefix);
+
+    if (itLow == m_pathToFileContents.end())
+        return std::nullopt;
+
+    auto itHigh = m_pathToFileContents.end();
+    auto upper = calculateUpperBound(prefix);
+    if (!upper.empty())
+        itHigh = m_pathToFileContents.upper_bound(upper);
+
+    api::ListBucketResult result;
+    result.prefix = prefix;
+
+    for (auto it = itLow; it != itHigh; ++it)
+    {
+        api::Contents contents;
+        contents.key = !prefix.empty() ? parseFileName(it->first, prefix) : it->first;
+        contents.size = it->second.size();
+        result.contents.emplace_back(std::move(contents));
+    }
+
+    result.keyCount = (int) result.contents.size();
+    result.maxKeys = result.keyCount;
+
+    return result;
 }
 
 //-------------------------------------------------------------------------------------------------

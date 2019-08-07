@@ -35,6 +35,8 @@ bool parseNextField(
     if (xml->hasError())
         return false;
 
+    auto name = xml->name().toString();
+
     auto it = fieldFuncs.find(xml->name().toString());
     if (it == fieldFuncs.end())
     {
@@ -57,8 +59,8 @@ bool parseNextField(
 template<typename ObjectType>
 bool deserialize(
     QXmlStreamReader* xml,
-    typename const xml::Field<ObjectType>::Assigners& assigners,
-    const char * xmlName,
+    typename const Field<ObjectType>::Assigners& assigners,
+    const QString& xmlName,
     ObjectType* outObject)
 {
     while (!(xml->isEndElement() && xml->name() == xmlName))
@@ -80,7 +82,7 @@ template<typename ObjectType>
 bool deserialize(
     QXmlStreamReader* xml,
     typename const xml::Field<ObjectType>::Assigners& assigners,
-    const char * xmlName,
+    const QString& xmlName,
     std::vector<ObjectType>* outVector)
 {
     ObjectType object;
@@ -88,6 +90,18 @@ bool deserialize(
         return false;
     outVector->emplace_back(std::move(object));
     return true;
+}
+
+template<typename ObjectType>
+bool deserialize(QXmlStreamReader* xml, ObjectType* outObject)
+{
+}
+
+template<typename ObjectType>
+bool deserialize(const QByteArray& data, ObjectType* outObject)
+{
+    QXmlStreamReader xml(data);
+    return deserialize(&xml, outObject);
 }
 
 } // namespace nx::cloud::aws::api::xml

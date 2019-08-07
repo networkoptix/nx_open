@@ -1,4 +1,4 @@
-#include "xml_parse_helper.h"
+#include "deserialize.h"
 
 namespace nx::cloud::aws::api::xml {
 
@@ -25,12 +25,13 @@ std::optional<QString> parseNextElement(QXmlStreamReader* xml)
         return std::nullopt;
 
     xml->readNext(); //< Advance to the contents of the element
-    if (!xml->isCharacters())
-        return std::nullopt;
 
     auto element = xml->text().toString();
 
     xml->readNext(); //< Advance to the end element
+    if (element.isEmpty()) //< Handles an empty element case like <Name/> with no value
+        return element;
+
     if (!detail::advancePastEndElement(xml))
         return std::nullopt;
 

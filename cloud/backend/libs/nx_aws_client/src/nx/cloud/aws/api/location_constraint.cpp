@@ -7,6 +7,17 @@ namespace nx::cloud::aws::api::xml {
 
 namespace {
 
+static constexpr char kDefaultRegion[] = "us-east-1";
+
+static constexpr char kDefaultLocationTemplate[] = R"xml(
+    <LocationConstraint xmlns="http://s3.amazonaws.com/doc/2006-03-01/"/>
+)xml";
+
+static constexpr char kLocationTemplate[] = R"xml(
+    <?xml version = "1.0" encoding = "UTF-8"?>
+    <LocationConstraint xmlns="http://s3.amazonaws.com/doc/2006-03-01/">%1</LocationConstraint>
+)xml";
+
 static std::string parseLocationConstraintResponse(const QByteArray& messageBody)
 {
     /**
@@ -20,11 +31,10 @@ static std::string parseLocationConstraintResponse(const QByteArray& messageBody
         return {};
 
     static constexpr char kXmlEndTag[] = "</LocationConstraint>";
-    static constexpr char kUsEast1[] = "us-east-1";
 
     int end = messageBody.indexOf(kXmlEndTag);
     if (end == -1)
-        return kUsEast1;
+        return kDefaultRegion;
 
     for (int i = end - 1; i >= 0; --i)
     {
@@ -86,6 +96,14 @@ bool deserialize(const QByteArray& data, LocationConstraint* outObject)
         return false;
     outObject->region = region;
     return true;
+}
+
+QByteArray serialized(const LocationConstraint& object)
+{
+    if (object.region == kDefaultRegion)
+        return kDefaultLocationTemplate;
+
+    return QString(kLocationTemplate).arg(object.region.c_str()).toUtf8();
 }
 
 } // namespace nx::cloud::aws::api::xml

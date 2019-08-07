@@ -7,6 +7,8 @@
 #include <nx/network/http/test_http_server.h>
 #include <nx/utils/thread/mutex.h>
 
+#include <nx/cloud/aws/api/list_bucket_result.h>
+
 namespace nx::cloud::aws::test {
 
 /**
@@ -103,6 +105,16 @@ private:
     void getLocation(
         nx::network::http::RequestContext requestContext,
         nx::network::http::RequestProcessedHandler completionHandler);
+
+    void listBucket(
+        nx::network::http::RequestContext requestContext,
+        nx::network::http::RequestProcessedHandler completionHandler);
+
+    void dispatchRootPathGetRequest(
+        nx::network::http::RequestContext requestContext,
+        nx::network::http::RequestProcessedHandler completionHandler);
+
+    std::optional<api::ListBucketResult> getListBucketResult(const std::string& prefix);
 };
 
 } // namespace nx::cloud::aws::test

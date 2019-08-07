@@ -4,6 +4,9 @@
 
 #include <vector>
 
+#include "xml/serialize.h"
+#include "xml/deserialize.h"
+
 namespace nx::cloud::aws::api {
 
 struct NX_AWS_CLIENT_API Contents
@@ -13,13 +16,6 @@ struct NX_AWS_CLIENT_API Contents
     std::string etag;
     int size = 0;
     std::string storageClass;
-};
-
-//-------------------------------------------------------------------------------------------------
-
-struct NX_AWS_CLIENT_API CommonPrefixes
-{
-    std::string prefix;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -34,12 +30,15 @@ struct NX_AWS_CLIENT_API ListBucketResult
     std::string delimitter;
     bool isTruncated = false;
     std::vector<Contents> contents;
-    std::vector<CommonPrefixes> commonPrefixes;
 };
 
 namespace xml {
 
-NX_AWS_CLIENT_API bool deserialize(const nx::Buffer& data, ListBucketResult* outObject);
+template<>
+NX_AWS_CLIENT_API bool deserialize(QXmlStreamReader* xml, ListBucketResult* outObject);
+
+template<>
+NX_AWS_CLIENT_API void serialize(QXmlStreamWriter* xml, const ListBucketResult& object);
 
 } // namespace xml
 
