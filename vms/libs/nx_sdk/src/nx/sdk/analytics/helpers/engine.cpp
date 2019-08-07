@@ -23,27 +23,14 @@ namespace nx {
 namespace sdk {
 namespace analytics {
 
-static std::string makePrintPrefix(
-    const std::string& overridingPrintPrefix,
-    const IEngineInfo* engineInfo = nullptr)
+static std::string makePrintPrefix(const IEngineInfo* engineInfo = nullptr)
 {
-    if (!overridingPrintPrefix.empty())
-        return overridingPrintPrefix;
-
-    std::string printPrefix = std::string("[") + libContext().name() + "_engine";
-    if (engineInfo)
-        printPrefix += std::string("_") + engineInfo->id();
-
-    printPrefix += "] ";
-    return printPrefix;
+    return "[" + libContext().name() + "_engine"
+        + (!engineInfo ? "" : (std::string("_") + engineInfo->id())) + "] ";
 }
 
-Engine::Engine(
-    bool enableOutput,
-    const std::string& printPrefix)
-    :
-    logUtils(enableOutput, makePrintPrefix(printPrefix)),
-    m_overridingPrintPrefix(printPrefix)
+Engine::Engine(bool enableOutput):
+    logUtils(enableOutput, makePrintPrefix())
 {
     NX_PRINT << "Created " << this << ": \"" << libContext().name() << "\"";
 }
@@ -78,7 +65,7 @@ Engine::~Engine()
 
 void Engine::setEngineInfo(const IEngineInfo* engineInfo)
 {
-    logUtils.setPrintPrefix(makePrintPrefix(m_overridingPrintPrefix, engineInfo));
+    logUtils.setPrintPrefix(makePrintPrefix(engineInfo));
 }
 
 void Engine::doSetSettings(Result<const IStringMap*>* outResult, const IStringMap* settings)

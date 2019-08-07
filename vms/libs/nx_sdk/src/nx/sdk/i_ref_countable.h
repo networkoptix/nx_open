@@ -72,14 +72,8 @@ public:
         bool operator!=(const InterfaceId& other) const { return !(*this == other); }
     };
 
-    /** Each derived interface is expected to implement such static method with its own string. */
-    static auto interfaceId() { return makeId("nx::sdk::IRefCountable"); }
-
-    /** VMT #0. */
-    virtual ~IRefCountable() = default;
-
 protected:
-    /** Enable calling with a character array only. */
+    /** Intended to be used in interface(). Can be called only with a string literal. */
     template<int len>
     static constexpr const InterfaceId* makeId(const char (&charArray)[len])
     {
@@ -89,6 +83,14 @@ protected:
         return reinterpret_cast<const InterfaceId*>(charArray);
     }
 
+public:
+    /** Each derived interface is expected to implement such static method with its own string. */
+    static auto interfaceId() { return makeId("nx::sdk::IRefCountable"); }
+
+    /** VMT #0. */
+    virtual ~IRefCountable() = default;
+
+protected:
     /**
      * Makes a compound interface id for interface templates like IList<IItem>. Usage:
      * ```
