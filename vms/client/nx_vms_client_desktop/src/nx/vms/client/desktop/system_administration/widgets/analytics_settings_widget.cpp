@@ -102,6 +102,8 @@ public slots:
     void onCurrentEngineIdChanged();
 
 private:
+    QnUuid selectedEngineId() const;
+
     void addEngine(
         const QnUuid& engineId, const AnalyticsEnginesWatcher::AnalyticsEngineInfo& engineInfo);
     void removeEngine(const QnUuid& engineId);
@@ -143,8 +145,15 @@ AnalyticsSettingsWidget::Private::Private(AnalyticsSettingsWidget* q):
 
     connect(enginesWatcher, &AnalyticsEnginesWatcher::engineAdded, this, &Private::addEngine);
     connect(enginesWatcher, &AnalyticsEnginesWatcher::engineRemoved, this, &Private::removeEngine);
-    connect(enginesWatcher, &AnalyticsEnginesWatcher::engineNameChanged,
+    connect(enginesWatcher, &AnalyticsEnginesWatcher::engineUpdated,
         this, &Private::updateEngine);
+
+    connect(enginesWatcher, &AnalyticsEnginesWatcher::engineSettingsModelChanged, this,
+        [this](const QnUuid& engineId)
+        {
+            if (engineId == selectedEngineId())
+                activateEngine(engineId);
+        });
 }
 
 void AnalyticsSettingsWidget::Private::updateEngines()
@@ -156,6 +165,11 @@ void AnalyticsSettingsWidget::Private::updateEngines()
 
     for (const auto& info: enginesWatcher->engineInfos())
         addEngine(info.id, info);
+}
+
+QnUuid AnalyticsSettingsWidget::Private::selectedEngineId() const
+{
+    return view->rootObject()->property(kCurrentEngineIdPropertyName).value<QnUuid>();
 }
 
 void AnalyticsSettingsWidget::Private::addEngine(
@@ -204,7 +218,12 @@ void AnalyticsSettingsWidget::Private::updateEngine(const QnUuid& engineId)
     if (it == engines.end())
         return;
 
-    *it = engineInfoToVariantMap(enginesWatcher->engineInfo(engineId));
+    const auto engineInfo = enginesWatcher->engineInfo(engineId);
+    // Hide device-dependent engines without settings on the model level.
+    if (!isEngineVisible(engineInfo))
+        engines.erase(it);
+    else
+        *it = engineInfoToVariantMap(engineInfo);
 
     emit analyticsEnginesChanged();
 }
@@ -316,8 +335,7 @@ void AnalyticsSettingsWidget::Private::applySettingsValues()
 
 void AnalyticsSettingsWidget::Private::onCurrentEngineIdChanged()
 {
-    refreshSettingsValues(
-        view->rootObject()->property(kCurrentEngineIdPropertyName).value<QnUuid>());
+    refreshSettingsValues(selectedEngineId());
 }
 
 AnalyticsSettingsWidget::AnalyticsSettingsWidget(QWidget* parent):
@@ -325,12 +343,14 @@ AnalyticsSettingsWidget::AnalyticsSettingsWidget(QWidget* parent):
     d(new Private(this))
 {
     anchorWidgetToParent(d->view);
+
+    connect(d.get(), &Private::analyticsEnginesChanged, this,
+        &AnalyticsSettingsWidget::visibilityUpdateRequested);
 }
 
 AnalyticsSettingsWidget::~AnalyticsSettingsWidget()
 {
 }
-
 
 void AnalyticsSettingsWidget::loadDataToUi()
 {
@@ -366,6 +386,12 @@ bool AnalyticsSettingsWidget::activate(const QUrl& url)
     return true;
 }
 
+bool AnalyticsSettingsWidget::shouldBeVisible() const
+{
+    return !d->engines.empty();
+}
+
 } // namespace nx::vms::client::desktop
 
+// Hack to make Q_OBJECT macro work in the cpp file.
 #include "analytics_settings_widget.moc"

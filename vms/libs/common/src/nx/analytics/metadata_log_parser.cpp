@@ -1,5 +1,6 @@
 #include "metadata_log_parser.h"
 
+#include <QtCore/QFile>
 #include <QtCore/QString>
 
 #include <nx/kit/debug.h>

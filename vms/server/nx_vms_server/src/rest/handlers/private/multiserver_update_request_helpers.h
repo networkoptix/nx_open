@@ -19,6 +19,7 @@ void checkUpdateStatusRemotely(
     QList<nx::update::Status>* reply,
     QnMultiserverRequestContext<QnEmptyRequestData>* context);
 
-IfParticipantPredicate makeIfParticipantPredicate(nx::vms::server::UpdateManager* updateManager);
+IfParticipantPredicate makeIfParticipantPredicate(
+    nx::vms::server::UpdateManager* updateManager, const QList<QnUuid>& forcedParticipants = {});
 
 } // namespace detail

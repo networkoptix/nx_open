@@ -1788,6 +1788,9 @@ void QnWorkbenchVideoWallHandler::at_identifyVideoWallAction_triggered()
 
 void QnWorkbenchVideoWallHandler::at_startVideoWallControlAction_triggered()
 {
+    if (!canStartControlMode())
+        return;
+
     const auto parameters = menu()->currentParameters(sender());
 
     QnWorkbenchLayout *layout = NULL;
@@ -2567,7 +2570,7 @@ void QnWorkbenchVideoWallHandler::at_widget_dewarpingParamsChanged()
     QnVideoWallControlMessage message(QnVideoWallControlMessage::MediaDewarpingParamsChanged);
     message[uuidKey] = widget->item()->uuid().toString();
     message[valueKey] = QString::fromUtf8(QJson::serialized(widget->dewarpingParams()));
-    sendMessage(message);
+    sendMessage(message, /*cached*/ true);
 }
 
 void QnWorkbenchVideoWallHandler::at_workbench_currentLayoutAboutToBeChanged()
@@ -2606,15 +2609,38 @@ void QnWorkbenchVideoWallHandler::at_workbenchLayout_itemAdded_controlMode(QnWor
     if (!m_controlMode.active)
         return;
 
-    QnVideoWallControlMessage message(QnVideoWallControlMessage::LayoutItemAdded);
-    message[uuidKey] = item->uuid().toString();
-    message[resourceKey] = item->resource()->getUniqueId();
-    message[geometryKey] = QString::fromUtf8(QJson::serialized(item->geometry()));
-    message[zoomRectKey] = QString::fromUtf8(QJson::serialized(item->zoomRect()));
-    message[rotationKey] = QString::fromUtf8(QJson::serialized(item->rotation()));
-    message[checkedButtonsKey] = QString::fromUtf8(QJson::serialized(
-        item->data(Qn::ItemCheckedButtonsRole).toInt()));
-    sendMessage(message);
+    const auto itemUuid = item->uuid().toString();
+
+    {
+        QnVideoWallControlMessage message(QnVideoWallControlMessage::LayoutItemAdded);
+        message[uuidKey] = itemUuid;
+        message[resourceKey] = item->resource()->getUniqueId();
+        message[geometryKey] = QString::fromUtf8(QJson::serialized(item->geometry()));
+        message[zoomRectKey] = QString::fromUtf8(QJson::serialized(item->zoomRect()));
+        message[rotationKey] = QString::fromUtf8(QJson::serialized(item->rotation()));
+        message[checkedButtonsKey] = QString::fromUtf8(QJson::serialized(
+            item->data(Qn::ItemCheckedButtonsRole).toInt()));
+        sendMessage(message);
+    }
+
+    if (const auto mediaResource = item->resource().dynamicCast<QnMediaResource>())
+    {
+        QnVideoWallControlMessage message(QnVideoWallControlMessage::MediaDewarpingParamsChanged);
+        message[uuidKey] = itemUuid;
+        message[valueKey] = QString::fromUtf8(QJson::serialized(mediaResource->getDewarpingParams()));
+        sendMessage(message, /*cached*/ true);
+    }
+
+    const auto itemDewarpingData = item->data(Qn::ItemImageDewarpingRole)
+        .value<nx::vms::api::DewarpingData>();
+    if (itemDewarpingData.enabled)
+    {
+        QnVideoWallControlMessage message(QnVideoWallControlMessage::LayoutItemDataChanged);
+        message[roleKey] = QString::number(Qn::ItemImageDewarpingRole);
+        message[uuidKey] = itemUuid;
+        message[valueKey] = QString::fromUtf8(QJson::serialized(itemDewarpingData));
+        sendMessage(message, /*cached*/ true);
+    }
 }
 
 void QnWorkbenchVideoWallHandler::at_workbenchLayout_itemRemoved_controlMode(QnWorkbenchItem* item)
