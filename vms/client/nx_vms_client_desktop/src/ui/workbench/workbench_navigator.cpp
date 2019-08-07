@@ -835,9 +835,8 @@ void QnWorkbenchNavigator::removeSyncedWidget(QnMediaResourceWidget *widget)
     m_motionIgnoreWidgets.remove(widget);
     m_updateHistoryQueue.remove(widget->resource().dynamicCast<QnSecurityCamResource>());
 
-    if(auto loader = m_cameraDataManager->loader(syncedResource, false))
+    if (auto loader = m_cameraDataManager->loader(syncedResource, false))
     {
-        loader->setMotionRegions(QList<QRegion>());
         if (noMoreWidgetsOfThisResource)
             loader->setEnabled(false);
     }
