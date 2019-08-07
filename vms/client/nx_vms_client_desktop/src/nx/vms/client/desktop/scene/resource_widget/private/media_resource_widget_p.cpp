@@ -11,8 +11,11 @@
 #include <nx/vms/client/desktop/ui/graphics/items/resource/widget_analytics_controller.h>
 #include <nx/vms/client/desktop/analytics/analytics_metadata_provider_factory.h>
 #include <ui/workbench/workbench_access_controller.h>
+#include <nx/vms/client/desktop/ini.h>
 
 #include <utils/license_usage_helper.h>
+
+#include <nx/analytics/metadata_log_parser.h>
 
 namespace nx::vms::client::desktop {
 
@@ -70,6 +73,14 @@ MediaResourceWidgetPrivate::MediaResourceWidgetPrivate(
 			&MediaResourceWidgetPrivate::updateIsAnalyticsSupported);
 
         updateIsAnalyticsSupported();
+
+        const QString debugAnalyticsLogFile = ini().debugAnalyticsVideoOverlayFromLogFile;
+        if (!debugAnalyticsLogFile.isEmpty())
+        {
+            auto metadataLogParser = std::make_unique<nx::analytics::MetadataLogParser>();
+            if (metadataLogParser->loadLogFile(debugAnalyticsLogFile))
+                std::swap(metadataLogParser, this->analyticsMetadataLogParser);
+        }
     }
 }
 

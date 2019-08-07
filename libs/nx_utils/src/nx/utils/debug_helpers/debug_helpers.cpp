@@ -7,7 +7,7 @@ namespace nx::utils::debug_helpers {
 
 static nx::utils::log::Tag kLogTag(QString("nx::utils::DebugHelpers"));
 
-QString debugFilesDirectoryPath(const QString& path)
+QString debugFilesDirectoryPath(const QString& path, bool canCreate)
 {
     if (QDir::isAbsolutePath(path))
         return QDir::cleanPath(path);
@@ -16,6 +16,9 @@ QString debugFilesDirectoryPath(const QString& path)
     const QString fullPath = basePath + path;
 
     const QDir directory(fullPath);
+    if (!directory.exists() && canCreate)
+        directory.mkpath(directory.absolutePath());
+
     if (!directory.exists())
     {
         NX_WARNING(kLogTag, "Directory doesn't exist: %1", directory.absolutePath());
