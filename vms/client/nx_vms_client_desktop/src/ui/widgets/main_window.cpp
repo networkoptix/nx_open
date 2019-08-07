@@ -352,6 +352,7 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
         addAction(screenRecordingAction);
     addAction(action(action::ShowFpsAction));
     addAction(action(action::OpenNewSceneAction));
+    addAction(action(action::CreateResourceTreeModelSnapshotAction));
 
     connect(action(action::MaximizeAction), &QAction::toggled, this,
         &MainWindow::setMaximized);
