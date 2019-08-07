@@ -29,7 +29,6 @@
 #include <client/client_globals.h>
 #include <client/client_runtime_settings.h>
 #include <client/client_module.h>
-#include <nx/vms/client/desktop/analytics/camera_metadata_analytics_controller.h>
 #include <nx/vms/client/desktop/ini.h>
 
 #include <client_core/client_core_module.h>
@@ -1583,14 +1582,6 @@ void QnMediaResourceWidget::paintChannelForeground(QPainter *painter, int channe
 
     if (isAnalyticsEnabled())
         d->analyticsController->updateAreas(timestamp, channel);
-
-    if (ini().enableOldAnalyticsController && d->analyticsMetadataProvider)
-    {
-        // TODO: Rewrite old-style analytics visualization (via zoom windows) with metadata
-        // providers.
-        if (const auto metadata = d->analyticsMetadataProvider->metadata(timestamp, channel))
-            qnMetadataAnalyticsController->gotMetadata(d->resource, metadata);
-    }
 
     if (m_entropixProgress >= 0)
         paintProgress(painter, rect, m_entropixProgress);
