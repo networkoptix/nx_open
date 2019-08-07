@@ -21,6 +21,8 @@
 #include <core/resource_management/resource_pool.h>
 
 #include <nx/vms/event/events/abstract_event.h>
+#include <nx/vms/event/rule_manager.h>
+#include <nx/vms/event/rule.h>
 #include <nx/vms/event/strings_helper.h>
 
 #include <client/client_globals.h>
@@ -263,7 +265,7 @@ void QnEventLogDialog::createAnalyticsEventTree(QStandardItem* rootItem)
         });
 
     AnalyticsEventsTreeBuilder eventsTreeBuilder(commonModule());
-    const auto root = eventsTreeBuilder.compatibleTreeUnion(
+    const auto root = eventsTreeBuilder.eventTypesForSearchPurposes(
         resourcePool()->getAllCameras({}, /*ignoreDesktopCameras*/ true));
     addItemRecursive(rootItem, root);
 }
@@ -358,6 +360,12 @@ void QnEventLogDialog::initEventsModel()
             resource->disconnect(this);
             updateAnalyticsEvents();
         });
+
+    using RuleManager = nx::vms::event::RuleManager;
+    const auto ruleManager = eventRuleManager();
+    connect(ruleManager, &RuleManager::rulesReset, this, &QnEventLogDialog::updateAnalyticsEvents);
+    connect(ruleManager, &RuleManager::ruleAddedOrUpdated, this, &QnEventLogDialog::updateAnalyticsEvents);
+    connect(ruleManager, &RuleManager::ruleRemoved, this, &QnEventLogDialog::updateAnalyticsEvents);
 }
 
 void QnEventLogDialog::reset()

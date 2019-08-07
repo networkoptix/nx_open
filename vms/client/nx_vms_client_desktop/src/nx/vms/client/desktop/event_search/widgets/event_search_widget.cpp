@@ -21,6 +21,8 @@
 #include <nx/vms/client/desktop/common/widgets/selectable_text_button.h>
 #include <nx/vms/client/desktop/event_search/models/event_search_list_model.h>
 #include <nx/vms/client/desktop/utils/widget_utils.h>
+#include <nx/vms/event/rule_manager.h>
+#include <nx/vms/event/rule.h>
 #include <nx/vms/event/event_fwd.h>
 #include <nx/vms/event/strings_helper.h>
 
@@ -106,6 +108,12 @@ EventSearchWidget::Private::Private(EventSearchWidget* q):
 
     if (m_eventModel->isOnline())
         updateAnalyticsMenu();
+
+    using RuleManager = nx::vms::event::RuleManager;
+    const auto ruleManager = q->eventRuleManager();
+    connect(ruleManager, &RuleManager::rulesReset, this, &Private::updateAnalyticsMenu);
+    connect(ruleManager, &RuleManager::ruleAddedOrUpdated, this, &Private::updateAnalyticsMenu);
+    connect(ruleManager, &RuleManager::ruleRemoved, this, &Private::updateAnalyticsMenu);
 
     // Disable server event selection when selected cameras differ from "Any camera".
     connect(q, &AbstractSearchWidget::cameraSetChanged, this,
@@ -289,7 +297,7 @@ void EventSearchWidget::Private::updateAnalyticsMenu()
         using namespace nx::analytics;
 
         AnalyticsEventsTreeBuilder eventsTreeBuilder(q->commonModule());
-        const auto root = eventsTreeBuilder.compatibleTreeUnion(
+        const auto root = eventsTreeBuilder.eventTypesForSearchPurposes(
             q->resourcePool()->getAllCameras({}, /*ignoreDesktopCameras*/ true));
 
         WidgetUtils::clearMenu(analyticsMenu);

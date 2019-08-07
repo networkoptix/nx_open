@@ -2,6 +2,9 @@
 
 #include <common/common_module.h>
 
+#include <nx/vms/event/rule_manager.h>
+#include <nx/vms/event/rule.h>
+
 #include <nx/analytics/descriptor_manager.h>
 
 #include <nx/utils/std/algorithm.h>
@@ -12,52 +15,41 @@ using namespace nx::analytics;
 
 struct AnalyticsEventsTreeBuilder::Private: public QnCommonModuleAware
 {
-    Private(QnCommonModule* commonModule, Flags flags):
-        QnCommonModuleAware(commonModule),
-        flags(flags)
+    Private(QnCommonModule* commonModule):
+        QnCommonModuleAware(commonModule)
     {
     }
-
-    Flags flags;
 
     NodePtr makeNode(NodeType nodeType, const QString& text = QString())
     {
         return NodePtr(new Node(nodeType, text));
     }
 
-    /**
-     * Remove hidden event types. Remove groups where no event types left (especially actual after
-     * intersection). Remove engines where no groups left. If there is only one engine left, make
-     * it the root.
-     */
-    NodePtr stripNodes(NodePtr tree)
+    static NodePtr filterEngine(NodePtr engine, NodeFilter excludeNodes)
     {
-        NX_ASSERT(tree->nodeType == NodeType::root);
+        NX_ASSERT(engine->nodeType == NodeType::engine);
 
-        auto& engines = tree->children;
-
-        // Cleanup empty groups inside each engine.
-        if (flags.testFlag(HideEmptyGroups))
+        // Remove immediate children if they should be filtered out.
+        if (excludeNodes)
         {
-            for (auto engine: engines)
+            nx::utils::remove_if(engine->children, excludeNodes);
+
+            // Remove event types in groups.
+            for (auto child: engine->children)
             {
-                NX_ASSERT(engine->nodeType == NodeType::engine);
-                nx::utils::remove_if(engine->children,
-                    [](const auto& node)
-                    {
-                        return node->nodeType == NodeType::group && node->children.empty();
-                    });
+                if (child->nodeType == NodeType::group)
+                    nx::utils::remove_if(child->children, excludeNodes);
             }
         }
 
-        // Cleanup empty engines.
-        nx::utils::remove_if(engines, [](const auto& engine) { return engine->children.empty(); });
+        // Cleanup empty groups.
+        nx::utils::remove_if(engine->children,
+            [](const auto& node)
+            {
+                return node->nodeType == NodeType::group && node->children.empty();
+            });
 
-        // Make the single engine the root if possible.
-        if (engines.size() == 1)
-            return engines[0];
-
-        return tree;
+        return engine;
     }
 
     NodePtr buildTree(ScopedEventTypeIds scopedEventTypeIds)
@@ -74,7 +66,6 @@ struct AnalyticsEventsTreeBuilder::Private: public QnCommonModuleAware
             if (!NX_ASSERT(engineDescriptor))
                 continue;
 
-            // TODO1: multipleEngines logic. Hide engine menu if it is the only one.
             auto engine = makeNode(NodeType::engine, engineDescriptor->name);
             engine->engineId = engineId;
             root->children.push_back(engine);
@@ -108,16 +99,12 @@ struct AnalyticsEventsTreeBuilder::Private: public QnCommonModuleAware
                 }
             }
         }
-        return stripNodes(root);
+        return AnalyticsEventsTreeBuilder::filterTree(root);
     }
-
 };
 
-AnalyticsEventsTreeBuilder::AnalyticsEventsTreeBuilder(
-    QnCommonModule* commonModule,
-    Flags flags)
-    :
-    d(new Private(commonModule, flags))
+AnalyticsEventsTreeBuilder::AnalyticsEventsTreeBuilder(QnCommonModule* commonModule):
+    d(new Private(commonModule))
 {
 }
 
@@ -125,18 +112,61 @@ AnalyticsEventsTreeBuilder::~AnalyticsEventsTreeBuilder()
 {
 }
 
-AnalyticsEventsTreeBuilder::NodePtr AnalyticsEventsTreeBuilder::compatibleTreeIntersection(
+AnalyticsEventsTreeBuilder::NodePtr AnalyticsEventsTreeBuilder::filterTree(
+    NodePtr root, NodeFilter excludeNodes)
+{
+    if (root->nodeType == NodeType::engine)
+        return Private::filterEngine(root, excludeNodes);
+
+    NX_ASSERT(root->nodeType == NodeType::root);
+    auto& engines = root->children;
+
+    for (auto engine: engines)
+        Private::filterEngine(engine, excludeNodes);
+
+    // Cleanup empty engines.
+    nx::utils::remove_if(engines, [](const auto& engine) { return engine->children.empty(); });
+
+    // Make the single engine the root if possible.
+    if (engines.size() == 1)
+        return engines[0];
+
+    return root;
+}
+
+AnalyticsEventsTreeBuilder::NodePtr AnalyticsEventsTreeBuilder::eventTypesForRulesPurposes(
     const QnVirtualCameraResourceList& devices) const
 {
     return d->buildTree(d->commonModule()->analyticsEventTypeDescriptorManager()
         ->compatibleEventTypeIdsIntersection(devices));
 }
 
-AnalyticsEventsTreeBuilder::NodePtr AnalyticsEventsTreeBuilder::compatibleTreeUnion(
+AnalyticsEventsTreeBuilder::NodePtr AnalyticsEventsTreeBuilder::eventTypesForSearchPurposes(
     const QnVirtualCameraResourceList& devices) const
 {
-    return d->buildTree(d->commonModule()->analyticsEventTypeDescriptorManager()
+    using namespace nx::vms::event;
+
+    QSet<EventTypeId> actuallyUsedEventTypes;
+    for (const auto& rule: d->commonModule()->eventRuleManager()->rules())
+    {
+        if (rule->eventType() == EventType::analyticsSdkEvent)
+            actuallyUsedEventTypes.insert(rule->eventParams().getAnalyticsEventTypeId());
+    }
+
+    // Early exit if no analytics rules are configured.
+    if (actuallyUsedEventTypes.isEmpty())
+        return NodePtr(new Node(NodeType::root));
+
+    // TODO: #GDM Shouldn't we filter out cameras here the same way?
+    auto unionTree = d->buildTree(d->commonModule()->analyticsEventTypeDescriptorManager()
         ->compatibleEventTypeIdsUnion(devices));
+
+    return filterTree(unionTree,
+        [actuallyUsedEventTypes](NodePtr node)
+        {
+            return node->nodeType == NodeType::eventType &&
+                !actuallyUsedEventTypes.contains(node->eventTypeId);
+        });
 }
 
 } // namespace nx::vms::client::desktop

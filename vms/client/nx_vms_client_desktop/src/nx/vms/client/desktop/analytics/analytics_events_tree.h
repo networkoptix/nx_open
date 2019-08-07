@@ -1,5 +1,7 @@
 #pragma once
 
+#include <functional>
+
 #include <QtCore/QScopedPointer>
 #include <QtCore/QSharedPointer>
 
@@ -11,18 +13,11 @@ class QnCommonModule;
 
 namespace nx::vms::client::desktop {
 
-class AnalyticsEventsTreeBuilder final
+class NX_VMS_CLIENT_DESKTOP_API AnalyticsEventsTreeBuilder final
 {
 public:
-    enum Flag {
-        NoFlags = 0,
-        HideEmptyGroups = 1 << 0
-    };
-    Q_DECLARE_FLAGS(Flags, Flag);
-
     explicit AnalyticsEventsTreeBuilder(
-        QnCommonModule* commonModule,
-        Flags flags = HideEmptyGroups);
+        QnCommonModule* commonModule);
     ~AnalyticsEventsTreeBuilder();
 
     struct Node;
@@ -42,28 +37,36 @@ public:
         nx::analytics::EventTypeId eventTypeId; //< GroupId can also be here.
         std::vector<NodePtr> children;
 
-        explicit Node(NodeType nodeType, const QString& text):
+        explicit Node(NodeType nodeType, const QString& text = QString()):
             nodeType(nodeType),
             text(text)
         {
         }
     };
 
-    /**
-     * Tree of the event type ids. Root nodes are engines, then groups and event types as leaves.
-     * Includes all event types, which can theoretically be available on these devices, so all
-     * compatible engines are used.
-     * Event types are intersected, empty groups and engines are removed from the output.
-     */
-    NodePtr compatibleTreeIntersection(const QnVirtualCameraResourceList& devices) const;
+    using NodeFilter = std::function<bool(NodePtr)>;
 
     /**
-     * Tree of the event type ids. Root nodes are engines, then groups and event types as leaves.
-     * Includes all event types, which can theoretically be available on these devices, so all
-     * compatible engines are used.
-     * Event types are united, empty groups and engines are removed from the output.
+     * Filter tree nodes, using the provided rule. Filter function must return true for nodes, which
+     * are to be filtered out from the tree. Empty Groups and Engines will be cleaned up.
      */
-    NodePtr compatibleTreeUnion(const QnVirtualCameraResourceList& devices) const;
+    static NodePtr filterTree(NodePtr root, NodeFilter excludeNodes = {});
+
+    /**
+     * Tree of the Event type ids. Root nodes are Engines, then Groups and Event types as leaves.
+     * Includes all Event types, which can theoretically be available on these Devices, so all
+     * compatible Engines are used.
+     * Event types are intersected, empty Groups and Engines are removed from the output.
+     */
+    NodePtr eventTypesForRulesPurposes(const QnVirtualCameraResourceList& devices) const;
+
+    /**
+     * Tree of the Event type ids. Root nodes are Engines, then Groups and Event types as leaves.
+     * Includes all Event types, which can theoretically be available on these Devices, so all
+     * compatible Engines are used. Includes only those Event types, which are actually used in the
+     * existing VMS Rules. Empty Groups and Engines are removed from the output.
+     */
+    NodePtr eventTypesForSearchPurposes(const QnVirtualCameraResourceList& devices) const;
 
 private:
     struct Private;
