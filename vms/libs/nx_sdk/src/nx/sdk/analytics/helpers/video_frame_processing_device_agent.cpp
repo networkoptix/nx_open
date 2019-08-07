@@ -22,37 +22,18 @@ namespace nx {
 namespace sdk {
 namespace analytics {
 
-class PrintPrefixMaker
+static std::string makePrintPrefix(const IDeviceInfo* deviceInfo)
 {
-public:
-    std::string makePrintPrefix(
-        const std::string& overridingPrintPrefix,
-        const IDeviceInfo* deviceInfo)
-    {
-        NX_KIT_ASSERT(deviceInfo);
-
-        if (!overridingPrintPrefix.empty())
-            return overridingPrintPrefix;
-
-        return std::string("[") + libContext().name() + "_device_" + deviceInfo->id() + "] ";
-    }
-
-private:
-    /** Used by the above NX_KIT_ASSERT (via NX_PRINT). */
-    struct
-    {
-        const std::string printPrefix =
-            "nx::sdk::analytics::VideoFrameProcessingDeviceAgent(): ";
-    } logUtils;
-};
+    return "[" + libContext().name() + "_device" +
+        (!deviceInfo ? "" : (std::string("_") + deviceInfo->id())) + "] ";
+}
 
 VideoFrameProcessingDeviceAgent::VideoFrameProcessingDeviceAgent(
-    const IDeviceInfo* deviceInfo,
-    bool enableOutput,
-    const std::string& printPrefix)
+    const IDeviceInfo* deviceInfo, bool enableOutput)
     :
-    logUtils(enableOutput, PrintPrefixMaker().makePrintPrefix(printPrefix, deviceInfo))
+    logUtils(enableOutput, makePrintPrefix(deviceInfo))
 {
+    NX_KIT_ASSERT(deviceInfo);
     NX_PRINT << "Created " << this;
 }
 

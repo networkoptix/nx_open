@@ -26,7 +26,7 @@ using namespace nx::sdk::analytics;
 using namespace std::chrono;
 using namespace std::literals::chrono_literals;
 
-Engine::Engine(nx::sdk::analytics::Plugin* plugin):
+Engine::Engine(Plugin* plugin):
     nx::sdk::analytics::Engine(NX_DEBUG_ENABLE_OUTPUT),
     m_plugin(plugin)
 {
