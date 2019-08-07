@@ -2,11 +2,13 @@
 
 #include <QtCore/QObject>
 
+#include <nx/utils/impl_ptr.h>
+
 class QnUuid;
 
 namespace nx::client::mobile {
 
-class EnabledAudioController: public QObject
+class AudioController: public QObject
 {
     Q_OBJECT
     using base_type = QObject;
@@ -17,8 +19,8 @@ class EnabledAudioController: public QObject
 public:
     static void registerQmlType();
 
-    EnabledAudioController(QObject* parent = nullptr);
-    virtual ~EnabledAudioController();
+    AudioController(QObject* parent = nullptr);
+    virtual ~AudioController();
 
     void setSessionParameters(const QnUuid& localSystemId, const QString& user);
 
@@ -34,7 +36,7 @@ signals:
 
 private:
     struct Private;
-    QScopedPointer<Private> d;
+    nx::utils::ImplPtr<Private> d;
 };
 
 } // nx::client::mobile

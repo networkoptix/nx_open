@@ -120,7 +120,7 @@ Object
     MediaResourceHelper
     {
         id: resourceHelper
-        onResourceIdChanged: enabledAudioController.resourceId = resourceId
+        onResourceIdChanged: audioController.resourceId = resourceId
     }
 
     QnCameraAccessRightsHelper
@@ -132,7 +132,7 @@ Object
     MediaPlayer
     {
         id: mediaPlayer
-        audioEnabled: enabledAudioController.audioEnabled
+        audioEnabled: audioController.audioEnabled
 
         resourceId: resourceHelper.resourceId
         onPlayingChanged: setKeepScreenOn(playing)

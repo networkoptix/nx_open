@@ -1,4 +1,4 @@
-#include "enabled_audio_controller.h"
+#include "audio_controller.h"
 
 #include <QtQml/QtQml>
 
@@ -6,13 +6,14 @@
 #include <nx/fusion/model_functions.h>
 #include <mobile_client/mobile_client_settings.h>
 
-using EnabledAudioHash = QHash<QString, bool>;
-using UserDataHash = QHash<QString, EnabledAudioHash>;
+using AudioEnabled = bool;
+using AudioDataHash = QHash<QString, AudioEnabled>;
+using UserDataHash = QHash<QString, AudioDataHash>;
 using SystemDataHash = QHash<QnUuid, UserDataHash>;
 
 namespace nx::client::mobile {
 
-struct EnabledAudioController::Private
+struct AudioController::Private
 {
     Private();
 
@@ -21,17 +22,17 @@ struct EnabledAudioController::Private
     QnUuid localSystemId;
     QString user;
 
-    bool enableAudioValue();
+    bool enableAudioValue() const;
     void loadAudioSettings();
-    void saveAudioSettings();
+    void saveAudioSettings() const;
 };
 
-EnabledAudioController::Private::Private()
+AudioController::Private::Private()
 {
     loadAudioSettings();
 }
 
-bool EnabledAudioController::Private::enableAudioValue()
+bool AudioController::Private::enableAudioValue() const
 {
     const auto itUserData = data.find(localSystemId);
     if (itUserData == data.end())
@@ -47,38 +48,37 @@ bool EnabledAudioController::Private::enableAudioValue()
     return itEnabled == audioData.end() || *itEnabled;
 }
 
-void EnabledAudioController::Private::loadAudioSettings()
+void AudioController::Private::loadAudioSettings()
 {
-    data = QJson::deserialized<SystemDataHash>(qnSettings->enabledAudioSettings());
+    data = QJson::deserialized<SystemDataHash>(qnSettings->audioSettings());
 }
 
-void EnabledAudioController::Private::saveAudioSettings()
+void AudioController::Private::saveAudioSettings() const
 {
     const auto settings = QJson::serialized(data);
-    qnSettings->setEnabledAudioSettings(settings);
+    qnSettings->setAudioSettings(settings);
 }
 
 //--------------------------------------------------------------------------------------------------
 
-void EnabledAudioController::registerQmlType()
+void AudioController::registerQmlType()
 {
-    qmlRegisterUncreatableType<EnabledAudioController>("Nx.Mobile", 1, 0,
-        "EnabledAudioController", "Cannot create an instance of EnabledAudioController.");
+    qmlRegisterUncreatableType<AudioController>("Nx.Mobile", 1, 0,
+        "AudioController", "Cannot create an instance of AudioController.");
 }
 
-EnabledAudioController::EnabledAudioController(QObject* parent):
+AudioController::AudioController(QObject* parent):
     base_type(parent),
     d(new Private())
 {
-    connect(this, &EnabledAudioController::resourceIdChanged,
-        this, &EnabledAudioController::audioEnabledChanged);
+    connect(this, &AudioController::resourceIdChanged, this, &AudioController::audioEnabledChanged);
 }
 
-EnabledAudioController::~EnabledAudioController()
+AudioController::~AudioController()
 {
 }
 
-void EnabledAudioController::setSessionParameters(const QnUuid& localSystemId, const QString& user)
+void AudioController::setSessionParameters(const QnUuid& localSystemId, const QString& user)
 {
     d->localSystemId = localSystemId;
     d->user = user;
@@ -86,7 +86,7 @@ void EnabledAudioController::setSessionParameters(const QnUuid& localSystemId, c
     emit audioEnabledChanged();
 }
 
-void EnabledAudioController::setResourceId(const QString& value)
+void AudioController::setResourceId(const QString& value)
 {
     if (d->resourceId == value)
         return;
@@ -95,12 +95,12 @@ void EnabledAudioController::setResourceId(const QString& value)
     emit resourceIdChanged();
 }
 
-QString EnabledAudioController::resourceId() const
+QString AudioController::resourceId() const
 {
     return d->resourceId;
 }
 
-void EnabledAudioController::setAudioEnabled(bool value)
+void AudioController::setAudioEnabled(bool value)
 {
     const bool enabled = d->enableAudioValue();
     if (enabled == value)
@@ -113,7 +113,7 @@ void EnabledAudioController::setAudioEnabled(bool value)
     emit audioEnabledChanged();
 }
 
-bool EnabledAudioController::audioEnabled() const
+bool AudioController::audioEnabled() const
 {
     return d->enableAudioValue();
 }

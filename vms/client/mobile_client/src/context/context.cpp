@@ -33,7 +33,7 @@
 #include <finders/systems_finder.h>
 #include <utils/common/delayed.h>
 #include <nx/utils/guarded_callback.h>
-#include <nx/mobile_client/controllers/enabled_audio_controller.h>
+#include <nx/mobile_client/controllers/audio_controller.h>
 
 using namespace nx::vms::utils;
 
@@ -45,7 +45,7 @@ static const nx::utils::SoftwareVersion kUserRightsRefactoredVersion(3, 0);
 
 QnContext::QnContext(QObject* parent) :
     base_type(parent),
-    m_enabledAudioController(new EnabledAudioController(this)),
+    m_audioController(new AudioController(this)),
     m_connectionManager(new QnConnectionManager(this)),
     m_settings(new QmlSettingsAdaptor(this)),
     m_appInfo(new QnMobileAppInfo(this)),

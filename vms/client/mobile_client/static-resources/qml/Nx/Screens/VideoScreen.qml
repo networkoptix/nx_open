@@ -260,7 +260,7 @@ PageBase
             visible: videoScreenController.resourceHelper.audioSupported
             height: visible ? implicitHeight : 0
 
-            onTriggered: enabledAudioController.setAudioEnabled(checked)
+            onTriggered: audioController.setAudioEnabled(checked)
         }
     }
 

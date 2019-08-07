@@ -23,12 +23,12 @@ class OperationManager;
 
 namespace nx::client::mobile
 {
-    class QmlSettingsAdaptor;
-    class EnabledAudioController;
+class QmlSettingsAdaptor;
+class AudioController;
 }
 
 using nx::client::mobile::QmlSettingsAdaptor;
-using nx::client::mobile::EnabledAudioController;
+using nx::client::mobile::AudioController;
 
 class QnContext: public QObject, public QnConnectionContextAware
 {
@@ -36,8 +36,8 @@ class QnContext: public QObject, public QnConnectionContextAware
     typedef QObject base_type;
 
     Q_PROPERTY(QnConnectionManager* connectionManager MEMBER m_connectionManager CONSTANT)
-    Q_PROPERTY(nx::client::mobile::EnabledAudioController* enabledAudioController
-        MEMBER m_enabledAudioController CONSTANT)
+    Q_PROPERTY(nx::client::mobile::AudioController* audioController
+        MEMBER m_audioController CONSTANT)
     Q_PROPERTY(nx::client::mobile::QmlSettingsAdaptor* settings MEMBER m_settings CONSTANT)
     Q_PROPERTY(QnMobileAppInfo* applicationInfo MEMBER m_appInfo CONSTANT)
     Q_PROPERTY(QnCloudStatusWatcher* cloudStatusWatcher READ cloudStatusWatcher CONSTANT)
@@ -143,7 +143,7 @@ signals:
     void customMarginsChanged();
 
 private:
-    EnabledAudioController* const m_enabledAudioController;
+    AudioController* const m_audioController;
     QnConnectionManager* const m_connectionManager;
     QmlSettingsAdaptor* const m_settings;
     QnMobileAppInfo* const m_appInfo;
