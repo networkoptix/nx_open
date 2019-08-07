@@ -13,10 +13,7 @@
   <property name="windowTitle">
    <string/>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_2">
-   <property name="spacing">
-    <number>0</number>
-   </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
    <property name="leftMargin">
     <number>0</number>
    </property>
@@ -30,57 +27,11 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="QStackedWidget" name="stackedWidget">
-     <widget class="QWidget" name="noSettingsPage">
-      <layout class="QVBoxLayout" name="verticalLayout_4">
-       <item>
-        <widget class="QLabel" name="noSettingsLabel">
-         <property name="text">
-          <string notr="true">&lt;This camera has no advanced settings&gt;</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignCenter</set>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="manualPage">
-      <attribute name="title">
-       <string/>
-      </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout" stretch="0">
-       <item>
-        <widget class="nx::vms::client::desktop::CameraAdvancedParamsWidget" name="cameraAdvancedParamsWidget" native="true"/>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="webPage">
-      <attribute name="title">
-       <string/>
-      </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_3">
-       <item>
-        <widget class="QWebView" name="webView" native="true">
-         <property name="url" stdset="0">
-          <url>
-           <string/>
-          </url>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-    </widget>
+    <widget class="nx::vms::client::desktop::CameraAdvancedParamsWidget" name="cameraAdvancedParamsWidget" native="true"/>
    </item>
   </layout>
  </widget>
  <customwidgets>
-  <customwidget>
-   <class>QWebView</class>
-   <extends>QWidget</extends>
-   <header>QtWebKitWidgets/QWebView</header>
-  </customwidget>
   <customwidget>
    <class>nx::vms::client::desktop::CameraAdvancedParamsWidget</class>
    <extends>QWidget</extends>

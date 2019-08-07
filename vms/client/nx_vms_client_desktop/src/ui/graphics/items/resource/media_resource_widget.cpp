@@ -29,7 +29,6 @@
 #include <client/client_globals.h>
 #include <client/client_runtime_settings.h>
 #include <client/client_module.h>
-#include <nx/vms/client/desktop/analytics/camera_metadata_analytics_controller.h>
 #include <nx/vms/client/desktop/ini.h>
 
 #include <client_core/client_core_module.h>
@@ -121,6 +120,8 @@
 #include <nx/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/system_health/default_password_cameras_watcher.h>
 #include <nx/vms/client/desktop/ini.h>
+
+#include <nx/analytics/metadata_log_parser.h>
 
 #include <nx/network/cloud/protocol_type.h>
 
@@ -1582,14 +1583,9 @@ void QnMediaResourceWidget::paintChannelForeground(QPainter *painter, int channe
     }
 
     if (isAnalyticsEnabled())
-        d->analyticsController->updateAreas(timestamp, channel);
-
-    if (ini().enableOldAnalyticsController && d->analyticsMetadataProvider)
     {
-        // TODO: Rewrite old-style analytics visualization (via zoom windows) with metadata
-        // providers.
-        if (const auto metadata = d->analyticsMetadataProvider->metadata(timestamp, channel))
-            qnMetadataAnalyticsController->gotMetadata(d->resource, metadata);
+        d->analyticsController->updateAreas(timestamp, channel);
+        paintAnalyticsObjectsDebugOverlay(duration_cast<milliseconds>(timestamp), painter, rect);
     }
 
     if (m_entropixProgress >= 0)
@@ -1719,6 +1715,45 @@ void QnMediaResourceWidget::paintProgress(QPainter* painter, const QRectF& rect,
     painter->fillRect(
         Geometry::subRect(progressBarRect, QRectF(0, 0, progress / 100.0, 1)),
         palette().highlight());
+}
+
+void QnMediaResourceWidget::paintAnalyticsObjectsDebugOverlay(
+    std::chrono::milliseconds timestamp,
+    QPainter* painter,
+    const QRectF& rect)
+{
+    if (!d->analyticsMetadataLogParser)
+        return;
+
+    static milliseconds prevRenderedFrameTimestamp = milliseconds::zero();
+    static milliseconds currentRenderedFrameTimestamp = milliseconds::zero();
+
+    if (currentRenderedFrameTimestamp != timestamp)
+    {
+        prevRenderedFrameTimestamp = currentRenderedFrameTimestamp;
+        currentRenderedFrameTimestamp = timestamp;
+    }
+
+    if (prevRenderedFrameTimestamp != milliseconds::zero()
+        && prevRenderedFrameTimestamp < currentRenderedFrameTimestamp)
+    {
+        const auto packets = d->analyticsMetadataLogParser->packetsBetweenTimestamps(
+            prevRenderedFrameTimestamp.count(),
+            currentRenderedFrameTimestamp.count());
+
+        const PainterTransformScaleStripper scaleStripper(painter);
+        const auto widgetRect = scaleStripper.mapRect(rect);
+
+        for (const auto& packet: packets)
+        {
+            for (const auto& rect: packet->rects)
+            {
+                const auto absoluteObjectRect = Geometry::subRect(widgetRect, rect);
+                QColor overlayColor = toTransparent(Qt::green, 0.3);
+                painter->fillRect(absoluteObjectRect, overlayColor);
+            }
+        }
+    }
 }
 
 void QnMediaResourceWidget::paintWatermark(QPainter* painter, const QRectF& rect)

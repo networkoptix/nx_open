@@ -111,6 +111,8 @@ public:
      * Get pointer to rule, that catched provided action
      */
     vms::event::RulePtr getRuleForAction(const vms::event::AbstractActionPtr& action) const;
+    QList<vms::event::RulePtr> rules() const;
+
 public slots:
     /*
     * This function matches all business actions for specified business event and execute it.
@@ -196,6 +198,7 @@ protected:
 private:
     QList<vms::event::RulePtr> m_rules;
     static RuleProcessor* m_instance;
+    QList<vms::event::AbstractEventPtr> m_delayedEvents;
 
     struct RunningRuleInfo
     {
@@ -216,6 +219,10 @@ private:
      * @return false if business rule isn't match to a source event
      */
     bool checkEventCondition(const vms::event::AbstractEventPtr& event, const vms::event::RulePtr& rule) const;
+    void processEventInternal(const vms::event::AbstractEventPtr& event);
+    void processDelayedEvents();
+    bool rulesHaveNotBeenLoadedYet() const;
+
 
     QMap<QString, ProcessorAggregationInfo> m_aggregateActions; // aggregation counter for instant actions
     QMap<QString, QSet<QnUuid>> m_actionInProgress;               // remove duplicates for long actions
@@ -227,9 +234,6 @@ private:
     void notifyResourcesAboutEventIfNeccessary(const vms::event::RulePtr& rule, bool isRuleAdded);
 
     QHash<QnUuid, qint64> m_runningBookmarkActions;
-
-    QnWaitCondition m_ruleUpdateCondition;
-    std::atomic<int> m_updatingRulesCount{0};
 
     std::map<nx::vms::server::resource::Camera*, QWeakPointer<nx::vms::server::resource::Camera>>
         m_knownCameras;
