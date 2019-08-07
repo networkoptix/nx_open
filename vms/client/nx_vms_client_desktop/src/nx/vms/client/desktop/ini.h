@@ -177,6 +177,8 @@ struct Ini: nx::kit::IniConfig
         " * 1 - Incompatible systems.\n"
         " * 2 - Not connectable cloud systems.\n"
         " * 4 - Compatible systems which require compatibility mode.\n");
+
+    NX_INI_FLAG(1, enableAnalyticsPlaybackMask, "Enable playback mode of analytics chunks only.");
 };
 
 inline Ini& ini()
