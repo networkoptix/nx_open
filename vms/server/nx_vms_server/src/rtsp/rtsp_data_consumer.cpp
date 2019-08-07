@@ -498,6 +498,7 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
     if (isVideo || isAudio)
     {
         const bool isKeyFrame = media->flags & AV_PKT_FLAG_KEY;
+        if (m_primaryLogger)
             m_primaryLogger->pushData(media);
         {
             QnMutexLocker lock( &m_qualityChangeMutex );
