@@ -94,12 +94,17 @@ StorageManager::StorageManager(
             });
 }
 
-StorageManager::~StorageManager() = default;
+StorageManager::~StorageManager()
+{
+    QnMutexLocker lock(&m_mutex);
+    for (auto& calculator: m_dataUsageCalculators)
+        calculator->pleaseStopSync();
+}
 
 void StorageManager::addStorage(
     const network::SocketAddress& clientEndpoint,
     const api::AddStorageRequest& request,
-    nx::utils::MoveOnlyFunc<void(api::Result, api::Storage)> handler)
+    GetStorageHandler handler)
 {
     if (request.totalSpace <= 0)
     {
@@ -146,9 +151,7 @@ void StorageManager::addStorage(
         });
 }
 
-void StorageManager::readStorage(
-    const std::string& storageId,
-    nx::utils::MoveOnlyFunc<void(api::Result, api::Storage)> handler)
+void StorageManager::readStorage(const std::string& storageId, GetStorageHandler handler)
 {
     if (storageId.empty())
         return handler(badRequest("Empty storageId"), api::Storage{});
@@ -180,7 +183,7 @@ void StorageManager::readStorage(
             for (auto& device: (*storage)->ioDevices)
                 device.type = kStorageType;
 
-            handler(api::Result(), std::move(**storage));
+            calculateDataUsage(std::move(**storage), std::move(handler));
         });
 }
 
@@ -350,6 +353,56 @@ void StorageManager::removeReceivedRecord(
     clusterdb::engine::Command<std::string> command)
 {
     m_storageDao->removeStorage(queryContext, command.params);
+}
+
+void StorageManager::calculateDataUsage(
+    api::Storage storage,
+    nx::utils::MoveOnlyFunc<void(api::Result, api::Storage)> handler)
+{
+    auto calculator = createDataUsageCalculator();
+
+    std::vector<s3::DataUsageCalculator::Bucket> buckets;
+    std::transform(
+        storage.ioDevices.begin(),
+        storage.ioDevices.end(),
+        std::back_inserter(buckets),
+        [](const auto& device)
+        {
+            return s3::DataUsageCalculator::Bucket{device.region, device.dataUrl};
+        });
+
+    calculator->calculate(
+        std::move(buckets),
+        [this, storage = std::move(storage), handler = std::move(handler), calculator](
+            auto result,
+            int bytesUsed) mutable
+        {
+            removeDataUsageCalculator(calculator);
+
+            if (result.resultCode != api::ResultCode::ok)
+                return handler(std::move(result), api::Storage{});
+
+            storage.freeSpace = std::max(0, storage.totalSpace - bytesUsed);
+
+            handler(api::Result(), std::move(storage));
+        });
+}
+
+std::shared_ptr<s3::DataUsageCalculator> StorageManager::createDataUsageCalculator()
+{
+    QnMutexLocker lock(&m_mutex);
+    auto usageCalculator =
+        std::make_shared<s3::DataUsageCalculator>(
+            m_settings.aws().credentials);
+    m_dataUsageCalculators.emplace(usageCalculator);
+    return usageCalculator;
+}
+
+void StorageManager::removeDataUsageCalculator(
+    const std::shared_ptr<s3::DataUsageCalculator>& calculator)
+{
+    QnMutexLocker lock(&m_mutex);
+    m_dataUsageCalculators.erase(calculator);
 }
 
 } // namespace nx::cloud::storage::service::controller

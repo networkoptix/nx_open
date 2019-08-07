@@ -1,5 +1,7 @@
 #include "bucket_api_ut.h"
 
+#include <nx/cloud/discovery/node.h>
+
 namespace nx::cloud::storage::service::api::test {
 
 BucketApi::~BucketApi()
@@ -26,8 +28,10 @@ void BucketApi::SetUp()
     m_credentials.authToken.setPassword(nx::utils::generateRandomName(7));
 
     m_cloudStorage = std::make_unique<service::test::CloudStorageLauncher>();
+
     m_cloudStorage->addArg("-aws/userName", m_credentials.username.toUtf8().constData());
     m_cloudStorage->addArg("-aws/authToken", m_credentials.authToken.value.constData());
+
     ASSERT_TRUE(m_cloudStorage->startAndWaitUntilStarted());
 
     m_cloudStorageClient = std::make_unique<Client>(m_cloudStorage->httpUrl());
@@ -43,6 +47,7 @@ service::test::S3Bucket* BucketApi::givenAddedBucket(std::string region)
 {
     auto bucket = createBucket(region);
     whenAddBucket(bucket->name());
+
     thenAddBucketResponseIs(ResultCode::ok);
     andAddedBucketMatchesExpectedBucket();
     return bucket;

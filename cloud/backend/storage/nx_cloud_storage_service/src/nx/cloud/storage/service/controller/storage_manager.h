@@ -11,6 +11,7 @@
 
 #include "bucket_manager.h"
 #include "geo_ip_resolver.h"
+#include "s3/data_usage_calculator.h"
 
 namespace nx {
 
@@ -30,6 +31,8 @@ class Model;
 
 namespace controller {
 
+using GetStorageHandler = nx::utils::MoveOnlyFunc<void(api::Result, api::Storage)>;
+
 class StorageManager
 {
 public:
@@ -42,11 +45,9 @@ public:
     void addStorage(
         const network::SocketAddress& clientEndpoint,
         const api::AddStorageRequest& request,
-        nx::utils::MoveOnlyFunc<void(api::Result, api::Storage)> handler);
+        GetStorageHandler handler);
 
-    void readStorage(
-        const std::string& storageId,
-        nx::utils::MoveOnlyFunc<void(api::Result, api::Storage)> handler);
+    void readStorage(const std::string& storageId, GetStorageHandler handler);
 
     void removeStorage(
         const std::string& storageId,
@@ -85,6 +86,13 @@ private:
         const std::string& /*clusterId*/,
         clusterdb::engine::Command<std::string> command);
 
+    void calculateDataUsage(
+        api::Storage storage,
+        nx::utils::MoveOnlyFunc<void(api::Result, api::Storage)> handler);
+
+    std::shared_ptr<s3::DataUsageCalculator> createDataUsageCalculator();
+    void removeDataUsageCalculator(const std::shared_ptr<s3::DataUsageCalculator>& calculator);
+
 private:
     struct AddStorageContext
     {
@@ -102,6 +110,8 @@ private:
     model::dao::AbstractStorageDao* m_storageDao = nullptr;
     BucketManager* m_bucketManager = nullptr;
     std::unique_ptr<nx::geo_ip::AbstractResolver> m_geoIpResolver;
+    QnMutex m_mutex;
+    std::set<std::shared_ptr<s3::DataUsageCalculator>> m_dataUsageCalculators;
 
 };
 

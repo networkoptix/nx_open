@@ -6,6 +6,8 @@ namespace nx::cloud::storage::service::api::test {
 
 namespace{
 
+static constexpr char kFileContents[] = "hello world";
+
 class CloudDBAuthenticationForwarderStub:
     public network::http::server::AbstractAuthenticationManager
 {
@@ -71,11 +73,17 @@ protected:
         thenRequestIsForwardedToCloudDb();
         thenAddStorageResponseIs(ResultCode::ok);
         andBucketHasCloudStorageCountUpdated(1);
+
+        const auto& prefix = m_lastStorageAdded.id;
+        m_lastBucketCreated->saveOrReplaceFile(prefix + "/f.txt", kFileContents);
     }
 
-    void whenAddStorageWithRegion()
+    void whenAddStorageWithRegion(std::string region = {})
     {
-        addStorage({1000, m_lastBucketCreated->location()});
+        if (region.empty())
+            region = m_lastBucketCreated->location();
+
+        addStorage({1000, region});
     }
 
     void whenAddMultipleStorages(int count = 2)
@@ -132,6 +140,13 @@ protected:
         m_lastStorageAdded = std::move(storage);
     }
 
+    void thenAllStoragesAreAdded(int count)
+    {
+        for(int i = 0; i < count; ++i)
+            thenAddStorageResponseIs(ResultCode::ok);
+    }
+
+
     void thenReadStorageSucceeds()
     {
         auto [result, storage] = m_readStorageResponse.pop();
@@ -160,6 +175,7 @@ protected:
 
     void andStorageServiceHasMultipleStorages()
     {
+        ASSERT_TRUE((int) m_addedStorages.size() > 1);
         for (const auto& storage : m_addedStorages)
         {
             readStorage(storage.id);
@@ -170,7 +186,9 @@ protected:
 
     void andReadStorageContainsAddedStorage()
     {
-        ASSERT_EQ(m_lastStorageAdded, m_lastStorageRead);
+        auto readStorage = m_lastStorageRead;
+        readStorage.freeSpace = m_lastStorageAdded.freeSpace;
+        ASSERT_EQ(m_lastStorageAdded, readStorage);
     }
 
     void andStorageIsNotInService()
@@ -252,7 +270,7 @@ TEST_F(StorageApi, add_multiple_storages_to_the_same_bucket)
     whenAddMultipleStorages(2);
 
     thenRequestIsForwardedToCloudDb();
-    thenAddStorageResponseIs(ResultCode::ok);
+    thenAllStoragesAreAdded(2);
 
     andBucketHasCloudStorageCountUpdated(2);
     andStorageServiceHasMultipleStorages();
