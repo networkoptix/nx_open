@@ -37,11 +37,13 @@ public:
     std::optional<sdk_support::SettingsResponse> pluginSideSettings(
         const SdkObject& sdkObject) const
     {
-        const ResultHolder<const ISettingsResponse*> result = sdkObject->pluginSideSettings();
+        const sdk_support::ResultHolder<const sdk::ISettingsResponse*> result =
+            sdkObject->pluginSideSettings();
+
         if (!result.isOk())
             m_errorHandler(sdk_support::Error::fromResultHolder(result));
 
-        const Ptr<const ISettingsResponse> sdkSettingsResponse = result.value();
+        const sdk::Ptr<const sdk::ISettingsResponse> sdkSettingsResponse = result.value();
         if (!sdkSettingsResponse)
         {
             NX_DEBUG(

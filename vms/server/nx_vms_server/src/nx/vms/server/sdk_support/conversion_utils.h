@@ -13,6 +13,7 @@
 #include <nx/sdk/ptr.h>
 #include <nx/sdk/helpers/string.h>
 #include <nx/sdk/helpers/string_list.h>
+#include <nx/sdk/helpers/string_map.h>
 
 #include <nx/vms/api/analytics/pixel_format.h>
 
@@ -55,7 +56,7 @@ Container fromSdkStringList(const sdk::Ptr<const sdk::IStringList> sdkStringList
         if (!cString)
             continue;
 
-        result.insert(result.end(), Container::value_type{cString});
+        result.insert(result.end(), typename Container::value_type{cString});
     }
 
     return result;

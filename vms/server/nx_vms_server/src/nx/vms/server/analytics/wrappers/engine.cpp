@@ -9,6 +9,7 @@
 #include <nx/vms/server/sdk_support/result_holder.h>
 #include <nx/vms/server/sdk_support/utils.h>
 
+#include <nx/vms/server/analytics/wrappers/fwd.h>
 #include <nx/vms/server/analytics/wrappers/device_agent.h>
 #include <nx/vms/server/analytics/wrappers/manifest_processor.h>
 #include <nx/vms/server/analytics/wrappers/settings_processor.h>
@@ -98,19 +99,10 @@ bool Engine::isCompatible(QnVirtualCameraResourcePtr device) const
     NX_DEBUG(this, lm("Device info for device %1 (%2): %3")
         .args(device->getUserDefinedName(), device->getId(), deviceInfo));
 
-    const ResultHolder<bool> result = engine->isCompatible(deviceInfo.get());
-    if (!result.isOk())
-    {
-        return handleError(
-            SdkMethod::isCompatible,
-            Error::fromResultHolder(result),
-            /*returnValue*/ false);
-    }
-
-    return result.value();
+    return engine->isCompatible(deviceInfo.get());
 }
 
-std::shared_ptr<DeviceAgent> Engine::obtainDeviceAgent(QnVirtualCameraResourcePtr device)
+wrappers::DeviceAgentPtr Engine::obtainDeviceAgent(QnVirtualCameraResourcePtr device)
 {
     const Ptr<IEngine> engine = sdkObject();
     if (!NX_ASSERT(engine))
@@ -180,7 +172,7 @@ resource::AnalyticsPluginResourcePtr Engine::pluginResource() const
 {
     const auto engineResource = this->engineResource();
     if (!NX_ASSERT(engineResource))
-        return nullptr;
+        return {};
 
     return engineResource->plugin().dynamicCast<resource::AnalyticsPluginResource>();
 }

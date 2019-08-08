@@ -32,28 +32,28 @@ public:
     std::optional<sdk_support::ErrorMap> setSettings(const sdk_support::SettingMap& settings)
     {
         SettingsProcessor settingsProcessor(
-            makeSettingsProcessorSettings(),
-            sdkObjectDescription(),
+            this->makeSettingsProcessorSettings(),
+            this->sdkObjectDescription(),
             [this](const sdk_support::Error& error)
             {
-                handleError(SdkMethod::setSettings, error, /*returnValue*/ nullptr);
+                this->handleError(SdkMethod::setSettings, error, /*returnValue*/ nullptr);
             });
 
-        return settingsProcessor.setSettings(sdkObject(), settings);
+        return settingsProcessor.setSettings(this->sdkObject(), settings);
     }
 
     std::optional<sdk_support::SettingsResponse> pluginSideSettings() const
     {
         DebugSettings settings = makeSettingsProcessorSettings();
         SettingsProcessor settingsProcessor(
-            makeSettingsProcessorSettings(),
-            sdkObjectDescription(),
+            this->makeSettingsProcessorSettings(),
+            this->sdkObjectDescription(),
             [this](const sdk_support::Error& error)
             {
-                handleError(SdkMethod::pluginSideSettings, error, /*returnValue*/ nullptr);
+                this->handleError(SdkMethod::pluginSideSettings, error, /*returnValue*/ nullptr);
             });
 
-        return settingsProcessor.pluginSideSettings(sdkObject());
+        return settingsProcessor.pluginSideSettings(this->sdkObject());
     }
 
 protected:

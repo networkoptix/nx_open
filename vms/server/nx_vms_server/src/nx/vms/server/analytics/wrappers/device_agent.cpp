@@ -137,7 +137,7 @@ resource::AnalyticsPluginResourcePtr DeviceAgent::pluginResource() const
 {
     const auto engineResource = this->engineResource();
     if (!NX_ASSERT(engineResource))
-        return nullptr;
+        return {};
 
     return engineResource->plugin().dynamicCast<resource::AnalyticsPluginResource>();
 }
