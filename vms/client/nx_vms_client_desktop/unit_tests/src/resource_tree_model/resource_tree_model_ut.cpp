@@ -114,9 +114,6 @@ protected:
 
     QJsonDocument testSnapshot(ItemModelStateSnapshotHelper::SnapshotParams& params) const
     {
-        ItemModelStateSnapshotHelper::SnapshotParams params2;
-        params2.roles = {Qt::DisplayRole, Qn::ResourceIconKeyRole};
-        ItemModelStateSnapshotHelper::saveSnapshotToFile(m_resourceTreeProxyModel.get(), params, "C:/debug/wtf.json");
         return ItemModelStateSnapshotHelper::makeSnapshot(m_resourceTreeProxyModel.get(), params);
     }
 
@@ -357,6 +354,93 @@ TEST_F(ResourceTreeModelTest, localFilesAreSortedAlphanumerically)
             {
                 "data": {
                     "display": "picture10.png",
+                    "iconKey": "Image|Online"
+                }
+            }
+        ])json")
+        .toUtf8());
+
+    // Check result.
+    ASSERT_TRUE(testSnapshot(params) == referenceSnapshot);
+}
+
+TEST_F(ResourceTreeModelTest, offlineLocalFileArentDisplayed)
+{
+    // Define string constants.
+    static constexpr auto userName = "test_user";
+    static constexpr auto filePath1 = "picture1.png";
+    static constexpr auto filePath2 = "picture2.png";
+
+    // Define node lookup data.
+    const KeyValueVector lookupData =
+    {{Qt::DisplayRole, "Local Files"},
+    {Qn::ResourceIconKeyRole, QnResourceIconCache::LocalResources}};
+
+    // Setup resources.
+    loginAsAdmin(userName);
+    addMediaResource(filePath1)->setStatus(Qn::Online);
+    addMediaResource(filePath2)->setStatus(Qn::Offline);
+
+    // Define reference snapshot.
+    ItemModelStateSnapshotHelper::SnapshotParams params;
+    params.parentIndex = getIndexByData(lookupData).first();
+    params.roles = {Qt::DisplayRole, Qn::ResourceIconKeyRole};
+    const auto referenceSnapshot = QJsonDocument::fromJson(QString(R"json(
+        [
+            {
+                "data": {
+                    "display": "picture1.png",
+                    "iconKey": "Image|Online"
+                }
+            }
+        ])json")
+        .toUtf8());
+
+    // Check result.
+    ASSERT_TRUE(testSnapshot(params) == referenceSnapshot);
+}
+
+// TODO: #vbreus To be extended and finalized
+TEST_F(ResourceTreeModelTest, localFilesIconsAndGrouping)
+{
+    // Define string constants.
+    static constexpr auto userName = "test_user";
+    static constexpr auto filePath1 = "1_picture.png";
+    static constexpr auto filePath2 = "2_video.avi";
+    static constexpr auto filePath3 = "3_layout.nov";
+
+    // Define node lookup data.
+    const KeyValueVector lookupData =
+    {{Qt::DisplayRole, "Local Files"},
+    {Qn::ResourceIconKeyRole, QnResourceIconCache::LocalResources}};
+
+    // Setup resources.
+    loginAsAdmin(userName);
+    addMediaResource(filePath1)->setStatus(Qn::Online);
+    addMediaResource(filePath2)->setStatus(Qn::Online);
+    addMediaResource(filePath3)->setStatus(Qn::Online);
+
+    // Define reference snapshot.
+    ItemModelStateSnapshotHelper::SnapshotParams params;
+    params.parentIndex = getIndexByData(lookupData).first();
+    params.roles = { Qt::DisplayRole, Qn::ResourceIconKeyRole };
+    const auto referenceSnapshot = QJsonDocument::fromJson(QString(R"json(
+        [
+            {
+                "data": {
+                    "display": "2_video.avi",
+                    "iconKey": "Media|Online"
+                }
+            },
+            {
+                "data": {
+                    "display": "3_layout.nov",
+                    "iconKey": "Media|Online"
+                }
+            },
+            {
+                "data": {
+                    "display": "1_picture.png",
                     "iconKey": "Image|Online"
                 }
             }
