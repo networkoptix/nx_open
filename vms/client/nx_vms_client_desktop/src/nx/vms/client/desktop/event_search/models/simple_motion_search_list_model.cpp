@@ -24,7 +24,6 @@
 #include <nx/vms/event/event_fwd.h>
 #include <nx/utils/datetime.h>
 #include <nx/utils/log/log.h>
-#include <nx/utils/model_iterators.h>
 
 #include <nx/vms/client/desktop/ini.h>
 
