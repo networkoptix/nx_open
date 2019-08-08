@@ -7,7 +7,7 @@
 #include <utils/common/util.h> /* For getUsecTimer. */
 #include <utils/media/frame_info.h>
 #include <utils/media/media_stream_cache.h>
-#include <utils/memory/cyclic_allocator.h>
+#include <nx/utils/memory/cyclic_allocator.h>
 
 #include <nx/network/hls/hls_types.h>
 #include <nx/streaming/abstract_media_stream_data_provider.h>
@@ -411,6 +411,21 @@ QnConstCompressedAudioDataPtr VideoCamera::getLastAudioFrame(StreamIndex streamI
 {
     if (auto gopKeeper = getGopKeeper(streamIndex))
         return gopKeeper->getLastAudioFrame();
+    return nullptr;
+}
+
+QnConstCompressedVideoDataPtr VideoCamera::getLastVideoFrameRtsp(
+    StreamIndex streamIndex, int channel) const
+{
+    if (auto gopKeeper = getGopKeeper(streamIndex))
+        return gopKeeper->getLastVideoFrameRtsp(channel);
+    return nullptr;
+}
+
+QnConstCompressedAudioDataPtr VideoCamera::getLastAudioFrameRtsp(StreamIndex streamIndex) const
+{
+    if (auto gopKeeper = getGopKeeper(streamIndex))
+        return gopKeeper->getLastAudioFrameRtsp();
     return nullptr;
 }
 

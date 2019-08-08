@@ -3,10 +3,13 @@
 #pragma once
 
 #include <nx/sdk/interface.h>
+#include <nx/sdk/result.h>
 
 #include <nx/sdk/i_device_info.h>
 #include <nx/sdk/i_string.h>
-#include <nx/sdk/i_plugin_event.h>
+#include <nx/sdk/i_plugin_diagnostic_event.h>
+
+#include <nx/sdk/i_settings_response.h>
 
 #include "i_device_agent.h"
 #include "i_engine_info.h"
@@ -27,8 +30,9 @@ class IPlugin; //< Forward declaration for the parent object.
  * For the VMS end user, each Engine instance is perceived as an independent Analytics Engine
  * which has its own set of values of settings stored in the Mediaserver database.
  *
- * All methods are guaranteed to be called without overlappings, even if from different threads,
- * thus, no synchronization is required for the implementation.
+ * All methods are guaranteed to be called without overlapping even if from different threads (i.e.
+ * with a guaranteed barrier between the calls), thus, no synchronization is required for the
+ * implementation.
  */
 class IEngine: public Interface<IEngine>
 {
@@ -41,7 +45,7 @@ public:
         static auto interfaceId() { return InterfaceId("nx::sdk::analytics::IEngine::IHandler"); }
 
         virtual ~IHandler() = default;
-        virtual void handlePluginEvent(IPluginEvent* event) = 0;
+        virtual void handlePluginDiagnosticEvent(IPluginDiagnosticEvent* event) = 0;
     };
 
     /** @return Parent Plugin. */
@@ -58,10 +62,16 @@ public:
      * settings stored in its database, combined with the values received from the plugin via
      * pluginSideSettings() (if any), for this Engine instance.
      *
-     * @param settings Values of settings declared in the manifest. Never null. Valid only during
-     *     the call.
+     * @param settings Values of settings declared in the manifest. Never null.
+     * @return Result containing a map of errors that occurred while applying each setting - the
+     *     keys are the setting ids, and the values are human readable error strings in English.
+     *     Even if some settings can't be applied or an error happens while applying them, this
+     *     method must return a successful result with a corresponding map of errors. A faulty
+     *     result containing error information instead of the map should be returned only in case
+     *     of some general failure that affected the procedure of applying the settings. The result
+     *     should contain null if no errors occurred.
      */
-    virtual void setSettings(const IStringMap* settings) = 0;
+    virtual Result<const IStringMap*> setSettings(const IStringMap* settings) = 0;
 
     /**
      * In addition to the settings stored in a Server database, an Engine can have some settings
@@ -70,10 +80,13 @@ public:
      * but every time the Server offers the user to edit the values, it calls this method and
      * merges the received values with the ones in its database.
      *
-     * @return Engine settings that are stored on the plugin side, or null if there are no such
-     *     settings.
+     * @return Result containing (in case of success) information about settings that are stored on
+     *     the plugin side. Errors corresponding to particular settings should be placed in the
+     *     ISettingsResponse object. A faulty result must be returned only in case of a general
+     *     failure that affects the settings retrieval procedure. The result should contain null if
+     *     the Engine has no plugin-side settings.
      */
-    virtual IStringMap* pluginSideSettings() const = 0;
+    virtual Result<const ISettingsResponse*> pluginSideSettings() const = 0;
 
     /**
      * Provides a JSON manifest for this Engine instance. See the example of such manifest in
@@ -82,10 +95,9 @@ public:
      * After creation of this Engine instance, this method is called after setSettings(), but can
      * be called again at any other moment to obtain the most actual manifest.
      *
-     * @param outError Status of the operation; is set to noError before this call.
      * @return JSON string in UTF-8.
      */
-    virtual const IString* manifest(Error* outError) const = 0;
+    virtual Result<const IString*> manifest() const = 0;
 
     /**
      * @return True if the Engine is able to create DeviceAgents for the provided device, false
@@ -98,11 +110,9 @@ public:
      * given device.
      *
      * @param deviceInfo Information about the device for which a DeviceAgent should be created.
-     * @param outError Status of the operation; is set to noError before this call.
-     * @return Pointer to an object that implements DeviceAgent interface, or null in case of
-     *     failure.
+     * @return Pointer to an object that implements IDeviceAgent interface.
      */
-    virtual IDeviceAgent* obtainDeviceAgent(const IDeviceInfo* deviceInfo, Error* outError) = 0;
+    virtual Result<IDeviceAgent*> obtainDeviceAgent(const IDeviceInfo* deviceInfo) = 0;
 
     /**
      * Action handler. Called when some action defined by this Engine is triggered by Server.
@@ -110,15 +120,14 @@ public:
      * @param action Provides data for the action such as metadata object for which the action has
      *     been triggered, and a means for reporting back action results to Server. This object
      *     should not be used after returning from this function.
-     * @param outError Status of the operation; is set to noError before this call.
      */
-    virtual void executeAction(IAction* action, Error* outError) = 0;
+    virtual Result<void> executeAction(IAction* action) = 0;
 
     /**
      * @param handler Generic Engine-related events (errors, warning, info messages)
      *     might be reported via this handler.
      */
-    virtual Error setHandler(IHandler* handler) = 0;
+    virtual void setHandler(IHandler* handler) = 0;
 };
 
 } // namespace analytics

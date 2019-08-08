@@ -22,10 +22,10 @@ public:
 
     /**
      * Supplies data to the engine. Called from a worker thread.
+     *
      * @param dataPacket Never null. Has a valid timestamp >= 0.
-     * @return noError in case of success, other value in case of failure.
      */
-    virtual Error pushDataPacket(IDataPacket* dataPacket) = 0;
+    virtual Result<void> pushDataPacket(IDataPacket* dataPacket) = 0;
 };
 
 } // namespace analytics

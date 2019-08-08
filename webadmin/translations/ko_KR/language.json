@@ -192,17 +192,17 @@
     },
     "common": {
         "voiceCommands": {
-            "search": "find + [text for searchbar]",
+            "search": "찾기 + [text for searchbar]",
             "pause": "일시정지",
-            "help": "help | show commands",
+            "help": "도움말 | 명령 표시",
             "collapse all servers": "모든 서버 축소",
-            "collapse server": "collapse server + [server name]",
+            "collapse server": "서버축소 + [server name]",
             "play": "재생",
             "clear search": "검색창 지우기",
             "live": "go to live | show me live",
             "expand all servers": "모든 서버 확장",
             "stop listening": "듣기 중지",
-            "expand server": "expand server + [server name]",
+            "expand server": "서버확장 + [server name]",
             "view": "view + [camera name]"
         },
         "systemOffline": "시스템 오프라인",

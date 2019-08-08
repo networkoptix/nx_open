@@ -10,7 +10,7 @@ class FakeVisualMetadataDebugger: public AbstractVisualMetadataDebugger
 public:
     virtual void push(const QnConstCompressedVideoDataPtr& video) override;
     virtual void push(
-        const nx::common::metadata::DetectionMetadataPacketPtr& detectionMetadata) override;
+        const nx::common::metadata::ObjectMetadataPacketPtr& metadataPacket) override;
     virtual void push(const CLConstVideoDecoderOutputPtr& frame) override;
     virtual void push(const QnConstCompressedMetadataPtr& metadata) override;
 };

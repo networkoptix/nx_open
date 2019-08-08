@@ -2,12 +2,16 @@
 
 #include <QtCore/QString>
 
+#include <nx/sdk/helpers/ptr.h>
 #include <nx/sdk/analytics/i_plugin.h>
 
 #include <core/resource/resource_fwd.h>
 #include <nx/vms/server/resource/resource_fwd.h>
+#include <nx/vms/server/sdk_support/error.h>
 
 #include <nx/utils/log/log.h>
+
+class PluginManager;
 
 namespace nx::vms::server::sdk_support {
 
@@ -18,8 +22,7 @@ public:
 
     virtual void log(
         const QString& manifestStr,
-        nx::sdk::Error error,
-        const QString& customError = QString()) = 0;
+        const sdk_support::Error& error) = 0;
 };
 
 /**
@@ -46,8 +49,7 @@ public:
 
     virtual void log(
         const QString& manifestStr,
-        nx::sdk::Error error,
-        const QString& customError) override;
+        const sdk_support::Error& error) override;
 
 private:
     nx::utils::log::Tag m_logTag;
@@ -65,16 +67,17 @@ class StartupPluginManifestLogger: public AbstractManifestLogger
 public:
     StartupPluginManifestLogger(
         nx::utils::log::Tag logTag,
-        const nx::sdk::analytics::IPlugin* plugin);
+        const nx::sdk::analytics::IPlugin* plugin,
+        const PluginManager* pluginManager);
 
     virtual void log(
         const QString& manifestStr,
-        nx::sdk::Error error,
-        const QString& customError) override;
+        const sdk_support::Error& error) override;
 
 private:
     nx::utils::log::Tag m_logTag;
     const nx::sdk::analytics::IPlugin* m_plugin = nullptr;
+    const PluginManager* const m_pluginManager;
 };
 
 } // namespace nx::vms::server::sdk_support

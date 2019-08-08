@@ -245,8 +245,6 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(
             if (!resource->readDeviceInformation())
                 return resList; // no answer from camera
         }
-        else if (rpResource->getStatus() == Qn::Offline)
-            return resList; // Do not add 1..N channels if resource is offline.
 
         resource->setPhysicalId(rpResource->getPhysicalId());
         resource->update(rpResource);

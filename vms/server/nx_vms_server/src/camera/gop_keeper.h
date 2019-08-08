@@ -37,6 +37,9 @@ public:
     QnConstCompressedVideoDataPtr getLastVideoFrame(int channel) const;
     QnConstCompressedAudioDataPtr getLastAudioFrame() const;
 
+    QnConstCompressedVideoDataPtr getLastVideoFrameRtsp(int channel) const;
+    QnConstCompressedAudioDataPtr getLastAudioFrameRtsp() const;
+
     void updateCameraActivity();
     virtual bool needConfigureProvider() const override { return false; }
     void clearVideoData();
@@ -59,6 +62,12 @@ private:
     QnConstCompressedAudioDataPtr m_lastAudioData;
     QnConstCompressedVideoDataPtr m_lastKeyFrame[CL_MAX_CHANNELS];
     std::deque<QnConstCompressedVideoDataPtr> m_lastKeyFrames[CL_MAX_CHANNELS];
+
+    // Workaround, should be fixed in 4.1, keep key frame to generate SDP for external
+    // RTSP clients(should not be cleared).
+    QnConstCompressedVideoDataPtr m_lastKeyFrameRtsp[CL_MAX_CHANNELS];
+    QnConstCompressedAudioDataPtr m_lastAudioDataRtsp;
+
     int m_gotIFramesMask;
     int m_allChannelsMask;
     bool m_isSecondaryStream;

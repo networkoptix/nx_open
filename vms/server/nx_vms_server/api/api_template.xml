@@ -285,18 +285,32 @@
             </functions>
         </group>
         <group>
-            <groupName>Authentication</groupName>
+            <groupName>Authentication &amp; Encryption</groupName>
             <urlPrefix/>
             <groupDescription>
-                Request authentication methods supported by server.
+                Authentication methods and encryption standards supported by the Server for HTTP and RTSP requests.
             </groupDescription>
             <functions>
+                <function>
+                    <name>Encryption</name>
+                    <description>
+                        The Server may process requests by <b>HTTP</b> and <b>RTSP</b> protocols as well as <b>HTTPS</b> and <b>RTSPS</b> protocols (HTTP and RTSP over encrypted connection).
+                        <ul>
+                            <li>Protocols supported by default: <b>TLS 1.1</b> and <b>TLS 1.2.</b></li>
+                            <li>Deprecated protocols (disabled by default): <i>SSL 3</i> and <i>TLS 1.0</i>.</li>
+                        </ul>
+                    </description>
+                    <method/>
+                    <params/>
+                    <result/>
+                </function>
                 <function>
                     <name>HTTP Basic/Digest authentication</name>
                     <description>
                         <b>This method is preferable for external applications, most of HTTP libraries support it.</b>
                         <br/>
-                        Server is fully conformant with the authentication defined in rfc2617 (https://tools.ietf.org/html/rfc2617).</description>
+                        Server is fully conformant with the authentication defined in rfc2617 (https://tools.ietf.org/html/rfc2617).
+                    </description>
                     <method/>
                     <params/>
                     <result/>

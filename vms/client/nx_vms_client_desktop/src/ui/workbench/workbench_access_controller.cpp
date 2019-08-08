@@ -89,6 +89,7 @@ void QnWorkbenchAccessController::setUser(const QnUserResourcePtr& user)
 
     m_user = user;
     recalculateAllPermissions();
+    emit userChanged(m_user);
 }
 
 Qn::Permissions QnWorkbenchAccessController::permissions(const QnResourcePtr& resource) const

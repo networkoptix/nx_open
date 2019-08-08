@@ -77,7 +77,7 @@
     </message>
     <message>
       <source>Server is offline</source>
-      <translation type="unfinished">Server is offline</translation>
+      <translation>서버는 오프 라인 입니다</translation>
     </message>
   </context>
   <context>

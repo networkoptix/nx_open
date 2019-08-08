@@ -5,10 +5,6 @@
 if [ -n "$DEBIAN_SCRIPT_DEBUG" ]; then set -v -x; DEBIAN_SCRIPT_TRACE=1; fi
 ${DEBIAN_SCRIPT_TRACE:+ echo "#42#DEBUG# RUNNING $0 $*" 1>&2 }
 
-is_systemd_used() {
-    [[ $(readlink -m /sbin/init) =~ .*systemd$ ]]
-}
-
 COMPANY_NAME="@deb.customization.company.name@"
 CLOUD_GROUP_SUFFIX="@cloud_group_suffix@"
 CLOUD_NAME="@cloudName@"
@@ -22,21 +18,49 @@ CFG_HELPER="$BIN_DIR/config_helper.py $CONFIG_FILE"
 
 WITH_ROOT_TOOL='@withRootTool@'
 
-service $COMPANY_NAME-mediaserver stop || true
+declare RUNTIME #< The assignment is placed hereinafter.
 
-if [[ $WITH_ROOT_TOOL == 'true' ]]
-then
-    service $COMPANY_NAME-root-tool stop || true
-fi
+# Acquire the runtime type (real, docker, chroot and so on) and store its name to the variable
+# named outputVariableName.
+getRuntimeType() #< outputVariableName
+{
+    local -r outputVariableName="$1"; shift
+    local -r runtime=$(systemd-detect-virt)
 
-if is_systemd_used
+    if [[ $runtime == "" ]]
+    then
+        echo "Error detecting type of runtime." >&2
+        return 1
+    fi
+
+    if [[ $runtime != "none" ]]
+    then
+        echo "Detected runtime type: $runtime." >&2
+        eval "${outputVariableName}=$runtime"
+    else
+        eval "${outputVariableName}=real"
+    fi
+
+    return 0
+}
+
+getRuntimeType RUNTIME
+
+if [[ $RUNTIME == "real" ]]
 then
-    systemctl disable $COMPANY_NAME-mediaserver
+    systemctl stop $COMPANY_NAME-mediaserver || true
 
     if [[ $WITH_ROOT_TOOL == 'true' ]]
     then
-        systemctl disable $COMPANY_NAME-root-tool
+        systemctl stop $COMPANY_NAME-root-tool || true
     fi
+fi
+
+systemctl disable $COMPANY_NAME-mediaserver
+
+if [[ $WITH_ROOT_TOOL == 'true' ]]
+then
+    systemctl disable $COMPANY_NAME-root-tool
 fi
 
 if [ "$1" = "remove" ]

@@ -71,6 +71,9 @@ QVariant BookmarkSearchListModel::Private::data(const QModelIndex& index, int ro
         case Qt::DisplayRole:
             return bookmark.name;
 
+        case Qn::DecorationPathRole:
+            return iconPath();
+
         case Qt::DecorationRole:
             return QVariant::fromValue(pixmap());
 
@@ -446,21 +449,14 @@ QnVirtualCameraResourcePtr BookmarkSearchListModel::Private::camera(
     return q->resourcePool()->getResourceById<QnVirtualCameraResource>(bookmark.cameraId);
 }
 
-// TODO: #vkutin Make color customized properly. Replace icon with pre-colorized one.
+QString BookmarkSearchListModel::Private::iconPath()
+{
+    return "soft_triggers/user_selectable/bookmark.png";
+}
+
 QPixmap BookmarkSearchListModel::Private::pixmap()
 {
-    static QColor bookmarkColor;
-    static QPixmap bookmarkPixmap;
-
-    const auto color = Private::color();
-    if (bookmarkColor != color)
-    {
-        bookmarkColor = color;
-        bookmarkPixmap = QnSkin::colorize(
-            qnSkin->pixmap("buttons/acknowledge.png"), bookmarkColor);
-    }
-
-    return bookmarkPixmap;
+    return QnSkin::colorize(qnSkin->pixmap(iconPath()), color());
 }
 
 QColor BookmarkSearchListModel::Private::color()

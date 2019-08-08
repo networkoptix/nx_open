@@ -58,7 +58,7 @@
             <p>現在のシステム<b>{{systems.systemName}}</b>に <b>{{systems.joinSystemName}}</b> が統合されます</p>
             <p>
                 新システムのパスワードおよび名前は次のシステムより引継ぎ:<br/>
-                <label><input type="radio" name="keepMySystem" ng-value="true" ng-disabled="systems.remoteSystemIsNew" ng-model="settings.keepMySystem" id="checkbox-current-system"/> {{systems.systemName}} (current)</label> <br/>
+                <label><input type="radio" name="keepMySystem" ng-value="true" ng-disabled="systems.remoteSystemIsNew" ng-model="settings.keepMySystem" id="checkbox-current-system"/> {{systems.systemName}} (現在)</label> <br/>
                 <label ng-if="!systems.remoteSystemIsNew"><input type="radio" name="keepMySystem" ng-value="false" ng-disabled="systems.remoteSystemIsNew" ng-model="settings.keepMySystem" id="checkbox-external-system"/> {{systems.joinSystemName}}</label>
             </p>
         </div>

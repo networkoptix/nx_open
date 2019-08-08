@@ -1,8 +1,10 @@
 #pragma once
 
 #include <QtCore/QIdentityProxyModel>
+#include <QtQuick/QQuickImageProvider>
 
-#include <nx/vms/client/desktop/ui/right_panel/right_panel_globals.h>
+#include <nx/utils/impl_ptr.h>
+#include <nx/vms/client/desktop/event_search/right_panel_globals.h>
 
 class QnWorkbenchContext;
 
@@ -19,31 +21,44 @@ class RightPanelModelsAdapter: public QIdentityProxyModel
 
 public:
     RightPanelModelsAdapter(QObject* parent = nullptr);
-    virtual ~RightPanelModelsAdapter() override = default;
+    virtual ~RightPanelModelsAdapter() override;
 
     QnWorkbenchContext* context() const;
-    void setContext(QnWorkbenchContext* context);
+    void setContext(QnWorkbenchContext* value);
 
     RightPanel::Tab type() const;
     void setType(RightPanel::Tab value);
 
     Q_INVOKABLE bool removeRow(int row);
 
+    Q_INVOKABLE void setAutoClosePaused(int row, bool value);
+
     virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
+    virtual bool setData(const QModelIndex& index, const QVariant& value, int role) override;
     virtual QHash<int, QByteArray> roleNames() const override;
+
+    Q_INVOKABLE void setFetchDirection(nx::vms::client::desktop::RightPanel::FetchDirection value);
+    Q_INVOKABLE void requestFetch();
+
+    Q_INVOKABLE void setLivePaused(bool value);
 
     static void registerQmlType();
 
 signals:
     void contextChanged();
     void typeChanged();
+    void dataNeeded();
 
 private:
-    void recreateSourceModel();
+    class Private;
+    nx::utils::ImplPtr<Private> d;
+};
 
-private:
-    QnWorkbenchContext* m_context = nullptr;
-    RightPanel::Tab m_type = RightPanel::Tab::invalid;
+class RightPanelImageProvider: public QQuickImageProvider
+{
+public:
+    RightPanelImageProvider(): QQuickImageProvider(Image) {}
+    virtual QImage requestImage(const QString& id, QSize* size, const QSize& /*requestedSize*/);
 };
 
 } // namespace nx::vms::client::desktop

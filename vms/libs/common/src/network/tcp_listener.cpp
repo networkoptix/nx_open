@@ -110,9 +110,7 @@ QnTcpListener::~QnTcpListener()
 {
     Q_D(QnTcpListener);
     stop();
-
-    NX_ASSERT(!d->serverSocket);
-
+    destroyServerSocket();
     delete d_ptr;
 }
 

@@ -257,7 +257,7 @@ namespace Qn
         DefaultNotificationRole,                    /**< Role to perform default item action (no data). */
         ActivateLinkRole,                           /**< Role to parse and follow hyperlink (QString). */
 
-        RoleCount
+        ItemDataRoleCount
     };
 
     /**

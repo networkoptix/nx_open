@@ -81,7 +81,7 @@ int OnvifNotificationConsumer::Notify( _wsnt__Notify* notificationRequest )
             {
                 auto resStrongRef = resToNotify.toStrongRef();
                 if( resStrongRef )
-                    resStrongRef->handleOneNotification( notification );
+                    resStrongRef->handleOneNotificationThreadUnsafe( notification );
             }
             lk.relock();
         }

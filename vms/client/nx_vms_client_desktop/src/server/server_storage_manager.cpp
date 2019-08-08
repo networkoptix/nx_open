@@ -337,9 +337,8 @@ bool QnServerStorageManager::sendArchiveRebuildRequest(
     if (!connection)
         return false;
 
-    auto handle = connection->postJsonResult(
-        "/api/rebuildArchive", {},
-        QJson::serialized(params.toJson()),
+    auto handle = connection->getJsonResult(
+        "/api/rebuildArchive", params,
         methodCallback(this, &QnServerStorageManager::at_archiveRebuildReply), thread());
 
     if (!handle)
@@ -358,6 +357,9 @@ void QnServerStorageManager::at_archiveRebuildReply(
     /* Requests were invalidated. */
     if (!m_requests.contains(handle))
         return;
+
+    if (!success)
+        NX_ERROR(this, "at_archiveRebuildReply() - request failed");
 
     const auto requestKey = m_requests.take(handle);
 
@@ -406,10 +408,11 @@ bool QnServerStorageManager::sendBackupRequest(
     auto connection = server->restConnection();
 
     QnRequestParamList params;
-    params.insert("action", QnLexical::serialized(action));
+    auto actionCode = QnLexical::serialized(action);
+    if (!actionCode.isEmpty())
+        params.insert("action", actionCode);
 
-    auto handle = connection->postJsonResult("/api/backupControl", {},
-        QJson::serialized(params.toJson()),
+    auto handle = connection->getJsonResult("/api/backupControl", params,
         methodCallback(this, &QnServerStorageManager::at_backupStatusReply), thread());
 
     if (!handle)
@@ -428,6 +431,9 @@ void QnServerStorageManager::at_backupStatusReply(
     /* Requests were invalidated. */
     if (!m_requests.contains(handle))
         return;
+
+    if (!success)
+        NX_ERROR(this, "at_backupStatusReply() - request failed");
 
     const auto requestKey = m_requests.take(handle);
 
@@ -472,7 +478,7 @@ int QnServerStorageManager::requestStorageSpace(
         params.insert("fast", QnLexical::serialized(true));
 
     int handle = connection->getJsonResult("/api/storageSpace", params,
-        methodCallback(this, &QnServerStorageManager::at_storageSpaceReply));
+        methodCallback(this, &QnServerStorageManager::at_storageSpaceReply), thread());
 
     if (!handle)
         return 0;
@@ -524,6 +530,9 @@ void QnServerStorageManager::at_storageSpaceReply(
     /* Requests were invalidated. */
     if (!m_requests.contains(handle))
         return;
+
+    if (!success)
+        NX_ERROR(this, "at_storageSpaceReply() - request failed");
 
     const auto requestKey = m_requests.take(handle);
 
