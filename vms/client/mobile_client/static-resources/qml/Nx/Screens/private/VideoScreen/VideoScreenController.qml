@@ -51,14 +51,14 @@ Object
             return "ioModuleWarning"
         if (ioModuleAudioPlaying)
             return "ioModuleAudioPlaying"
+        if (liveWearableCamera)
+            return "noLiveStream"
         if (failed)
             return "videoLoadingFailed"
         if (noLicenses)
             return "noLicenses";
         if (tooManyConnections)
             return "tooManyConnections"
-        if (liveWearableCamera)
-            return "noLiveStream"
         return ""
     }
 
