@@ -21,7 +21,7 @@
 #include <nx/vms/server/server_module_aware.h>
 #include <nx/vms/server/analytics/device_agent_handler.h>
 
-#include <nx/vms/server/analytics/wrappers/device_agent.h>
+#include <nx/vms/server/analytics/wrappers/fwd.h>
 #include <nx/analytics/metadata_logger.h>
 
 namespace nx::vms::server::analytics {
@@ -63,7 +63,7 @@ private:
     bool startAnalyticsUnsafe(const QVariantMap& settings);
     void stopAnalyticsUnsafe();
 
-    std::shared_ptr<wrappers::DeviceAgent> createDeviceAgent();
+    wrappers::DeviceAgentPtr createDeviceAgent();
     nx::sdk::Ptr<nx::vms::server::analytics::DeviceAgentHandler> createHandler();
 
     bool updateDeviceWithManifest(const nx::vms::api::analytics::DeviceAgentManifest& manifest);
@@ -83,7 +83,7 @@ private:
     QnVirtualCameraResourcePtr m_device;
     nx::vms::server::resource::AnalyticsEngineResourcePtr m_engine;
     nx::sdk::Ptr<nx::vms::server::analytics::DeviceAgentHandler> m_handler;
-    std::shared_ptr<wrappers::DeviceAgent> m_deviceAgent;
+    wrappers::DeviceAgentPtr m_deviceAgent;
     QnAbstractDataReceptorPtr m_metadataSink;
     std::atomic<bool> m_started{false};
     nx::analytics::MetadataLogger m_incomingFrameLogger;

@@ -91,13 +91,13 @@ bool Engine::isCompatible(QnVirtualCameraResourcePtr device) const
     const auto deviceInfo = sdk_support::deviceInfoFromResource(device);
     if (!deviceInfo)
     {
-        NX_WARNING(this, lm("Cannot create device info from device %1 (%2)")
-            .args(device->getUserDefinedName(), device->getId()));
+        NX_WARNING(this, "Cannot create device info from device %1 (%2)",
+            device->getUserDefinedName(), device->getId());
         return false;
     }
 
-    NX_DEBUG(this, lm("Device info for device %1 (%2): %3")
-        .args(device->getUserDefinedName(), device->getId(), deviceInfo));
+    NX_DEBUG(this, "Device info for device %1 (%2): %3",
+        device->getUserDefinedName(), device->getId(), deviceInfo);
 
     return engine->isCompatible(deviceInfo.get());
 }
@@ -111,13 +111,13 @@ wrappers::DeviceAgentPtr Engine::obtainDeviceAgent(QnVirtualCameraResourcePtr de
     const auto deviceInfo = sdk_support::deviceInfoFromResource(device);
     if (!deviceInfo)
     {
-        NX_WARNING(this, lm("Cannot create device info from device %1 (%2)")
-            .args(device->getUserDefinedName(), device->getId()));
+        NX_WARNING(this, "Cannot create device info from device %1 (%2)",
+            device->getUserDefinedName(), device->getId());
         return nullptr;
     }
 
-    NX_DEBUG(this, lm("Device info for device %1 (%2): %3")
-        .args(device->getUserDefinedName(), device->getId(), deviceInfo));
+    NX_DEBUG(this, "Device info for device %1 (%2): %3",
+        device->getUserDefinedName(), device->getId(), deviceInfo);
 
     const ResultHolder<IDeviceAgent*> result = engine->obtainDeviceAgent(deviceInfo.get());
     if (!result.isOk())

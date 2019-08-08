@@ -28,6 +28,7 @@
 #include <nx/vms/server/analytics/event_rule_watcher.h>
 #include <nx/vms/server/analytics/wrappers/plugin.h>
 #include <nx/vms/server/analytics/wrappers/engine.h>
+#include <nx/vms/server/analytics/wrappers/device_agent.h>
 #include <nx/vms/server/sdk_support/utils.h>
 #include <nx/vms/server/sdk_support/to_string.h>
 #include <nx/vms/server/sdk_support/result_holder.h>
@@ -261,7 +262,7 @@ std::optional<EngineManifest> DeviceAnalyticsBinding::engineManifest() const
     return m_engine->manifest();
 }
 
-std::shared_ptr<wrappers::DeviceAgent> DeviceAnalyticsBinding::createDeviceAgent()
+wrappers::DeviceAgentPtr DeviceAnalyticsBinding::createDeviceAgent()
 {
     if (!NX_ASSERT(m_device, "Device is empty"))
         return nullptr;
@@ -271,19 +272,8 @@ std::shared_ptr<wrappers::DeviceAgent> DeviceAnalyticsBinding::createDeviceAgent
 
     NX_DEBUG(
         this,
-        lm("Creating DeviceAgent for device %1 (%2).")
+        lm("Creating DeviceAgent for device %1 (%2)")
             .args(m_device->getUserDefinedName(), m_device->getId()));
-
-    const auto deviceInfo = sdk_support::deviceInfoFromResource(m_device);
-    if (!deviceInfo)
-    {
-        NX_WARNING(this, lm("Cannot create device info from device %1 (%2)")
-            .args(m_device->getUserDefinedName(), m_device->getId()));
-        return nullptr;
-    }
-
-    NX_DEBUG(this, lm("Device info for device %1 (%2): %3")
-        .args(m_device->getUserDefinedName(), m_device->getId(), deviceInfo));
 
     const auto sdkEngine = m_engine->sdkEngine();
     if (!sdkEngine)
@@ -342,7 +332,6 @@ bool DeviceAnalyticsBinding::updateDescriptorsWithManifest(
 sdk_support::MetadataTypes DeviceAnalyticsBinding::neededMetadataTypes() const
 {
     const auto deviceAgentManifest = m_deviceAgent->manifest();
-
     if (!NX_ASSERT(deviceAgentManifest, "Got invlaid device agent manifest"))
         return {};
 
