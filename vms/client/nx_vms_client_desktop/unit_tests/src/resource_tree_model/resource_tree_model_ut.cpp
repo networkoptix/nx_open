@@ -108,6 +108,47 @@ protected:
         return ItemModelStateSnapshotHelper::makeSnapshot(m_resourceTreeProxyModel.get(), params);
     }
 
+    QModelIndexList getAllIndexes() const
+    {
+        std::function<QModelIndexList(const QModelIndex&)> getChildren;
+        getChildren =
+            [this, &getChildren](const QModelIndex& parent)
+            {
+                QModelIndexList result;
+                for (int row = 0; row < m_resourceTreeProxyModel->rowCount(parent); ++row)
+                {
+                    const auto childIndex = m_resourceTreeProxyModel->index(row, 0, parent);
+                    result.append(childIndex);
+                    result.append(getChildren(childIndex));
+                }
+                return result;
+            };
+        return getChildren(QModelIndex());
+    }
+
+    using KeyValue = std::pair<int, QVariant>;
+    using KeyValueVector = std::vector<KeyValue>;
+    QModelIndexList getIndexByData(const KeyValueVector& lookupData) const
+    {
+        const auto dataMatch =
+            [lookupData](const QModelIndex& index) -> bool
+            {
+                for (const auto& keyValue: lookupData)
+                {
+                    const auto indexData = index.data(keyValue.first);
+                    if (indexData.isNull() || indexData != keyValue.second)
+                        return false;
+                }
+                return true;
+            };
+
+        QModelIndexList result;
+        const auto allIndexes = getAllIndexes();
+        std::copy_if(allIndexes.cbegin(), allIndexes.cend(), std::back_inserter(result), dataMatch);
+
+        return result;
+    }
+
 protected:
     QSharedPointer<QnClientModule> m_clientModule;
     QSharedPointer<QnWorkbenchAccessController> m_accessController;
