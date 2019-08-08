@@ -40,7 +40,7 @@ QString toString(const Attribute& attribute)
 
 bool operator==(const ObjectMetadata& left, const ObjectMetadata& right)
 {
-    return left.objectTypeId == right.objectTypeId
+    return left.typeId == right.typeId
         && left.trackId == right.trackId
         && equalWithPrecision(left.boundingBox, right.boundingBox, kCoordinateDecimalDigits)
         && left.attributes == right.attributes;
@@ -54,7 +54,7 @@ QString toString(const ObjectMetadata& objectMetadata)
         + ", width " + QString::number(objectMetadata.boundingBox.width())
         + ", height " + QString::number(objectMetadata.boundingBox.height())
         + ", trackId " + objectMetadata.trackId.toString()
-        + ", typeId " + objectMetadata.objectTypeId
+        + ", typeId " + objectMetadata.typeId
         + ", attributes {";
 
     const QRegularExpression kExpectedCharsOnlyRegex("\\A[A-Za-z_0-9.]+\\z");
