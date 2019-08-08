@@ -63,7 +63,8 @@ TileInteractionHandler::TileInteractionHandler(EventRibbon* parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
     m_ribbon(parent),
-    m_showPendingMessages(new nx::utils::PendingOperation())
+    m_showPendingMessages(new nx::utils::PendingOperation()),
+    m_navigateDelayed(new nx::utils::PendingOperation())
 {
     NX_ASSERT(m_ribbon);
     if (!m_ribbon)
@@ -79,6 +80,8 @@ TileInteractionHandler::TileInteractionHandler(EventRibbon* parent):
             m_pendingMessages.clear();
         });
 
+    m_navigateDelayed->setFlags(nx::utils::PendingOperation::FireOnlyWhenIdle);
+
     connect(m_ribbon.data(), &EventRibbon::linkActivated, this,
         [this](const QModelIndex& index, const QString& link)
         {
@@ -91,19 +94,35 @@ TileInteractionHandler::TileInteractionHandler(EventRibbon* parent):
             if (button == Qt::LeftButton && !modifiers.testFlag(Qt::ControlModifier))
             {
                 if (!m_ribbon->model()->setData(index, QVariant(), Qn::DefaultNotificationRole))
-                    navigateToSource(index);
+                {
+                    if (isSyncOn())
+                    {
+                        navigateToSource(index, false /*instantMessages*/);
+                    }
+                    else
+                    {
+                        m_navigateDelayed->setInterval(doubleClickInterval()); //< Restart timer.
+                        m_navigateDelayed->setCallback(
+                            [this, index = QPersistentModelIndex(index)]()
+                            {
+                                navigateToSource(index, true /*instantMessages*/);
+                            });
+
+                        m_navigateDelayed->requestOperation();
+                    }
+                }
             }
             else if ((button == Qt::LeftButton && modifiers.testFlag(Qt::ControlModifier))
                 || button == Qt::MiddleButton)
             {
-                openSource(index, true /*inNewTab*/);
+                openSource(index, true /*inNewTab*/, false /*fromDoubleClick*/);
             }
         });
 
     connect(m_ribbon.data(), &EventRibbon::doubleClicked, this,
         [this](const QModelIndex& index)
         {
-            openSource(index, false /*inNewTab*/);
+            openSource(index, false /*inNewTab*/, true /*fromDoubleClick*/);
         });
 
     connect(m_ribbon.data(), &EventRibbon::dragStarted,
@@ -129,7 +148,8 @@ TileInteractionHandler::TileInteractionHandler(EventRibbon* parent):
             }));
 }
 
-void TileInteractionHandler::navigateToSource(const QModelIndex& index)
+void TileInteractionHandler::navigateToSource(
+    const QPersistentModelIndex& index, bool instantMessages)
 {
     // Obtain requested time.
     const auto timestamp = index.data(Qn::TimestampRole);
@@ -139,6 +159,15 @@ void TileInteractionHandler::navigateToSource(const QModelIndex& index)
     // Obtain requested camera list.
     const auto resourceList = index.data(Qn::ResourceListRole).value<QnResourceList>()
         .filtered(&isMediaResource);
+
+    const auto showMessage =
+        [this](const QString& message, bool instant)
+        {
+            if (instant)
+                this->showMessage(message);
+            else
+                showMessageDelayed(message, doubleClickInterval());
+        };
 
     QnResourceList openResources;
 
@@ -158,7 +187,7 @@ void TileInteractionHandler::navigateToSource(const QModelIndex& index)
         const auto message = tr("Double click to add cameras to the current layout "
             "or ctrl+click to open in a new tab", "", resourceList.size());
 
-        showMessageDelayed(message, doubleClickInterval());
+        showMessage(message, instantMessages);
     }
 
     // Single-select first of opened requested cameras.
@@ -180,7 +209,7 @@ void TileInteractionHandler::navigateToSource(const QModelIndex& index)
     if (!navigator()->isTimelineRelevant()
         || !timelineRange.contains(duration_cast<milliseconds>(navigationTime)))
     {
-        showMessageDelayed(tr("No available archive"), doubleClickInterval());
+        showMessage(tr("No available archive"), instantMessages);
         return;
     }
 
@@ -200,13 +229,21 @@ void TileInteractionHandler::navigateToSource(const QModelIndex& index)
         Parameters().withArgument(Qn::TimestampRole, navigationTime));
 }
 
-void TileInteractionHandler::openSource(const QModelIndex& index, bool inNewTab)
+void TileInteractionHandler::openSource(
+    const QModelIndex& index, bool inNewTab, bool fromDoubleClick)
 {
     const auto resourceList = index.data(Qn::ResourceListRole).value<QnResourceList>()
         .filtered(&isMediaResource);
 
     if (resourceList.empty())
         return;
+
+    if (fromDoubleClick && NX_ASSERT(!inNewTab) && isSyncOn() && resourceList.size() == 1)
+    {
+        auto layout = workbench()->currentLayout();
+        if (layout && !layout->items(resourceList[0]).empty())
+            return;
+    }
 
     Parameters parameters(resourceList);
     parameters.setArgument(Qn::SelectOnOpeningRole, true);
@@ -219,6 +256,7 @@ void TileInteractionHandler::openSource(const QModelIndex& index, bool inNewTab)
     }
 
     hideMessages();
+    m_navigateDelayed->setCallback({});
 
     const auto playbackStarter = scopedPlaybackStarter(!inNewTab
         && ini().startPlaybackOnTileNavigation);
@@ -340,7 +378,7 @@ void TileInteractionHandler::showMessage(const QString& text)
 void TileInteractionHandler::showMessageDelayed(const QString& text, milliseconds delay)
 {
     m_pendingMessages.push_back(text);
-    m_showPendingMessages->setInterval(delay);
+    m_showPendingMessages->setInterval(delay); //< Restart timer.
     m_showPendingMessages->requestOperation();
 }
 
@@ -366,6 +404,11 @@ utils::Guard TileInteractionHandler::scopedPlaybackStarter(bool baseCondition)
             navigator()->setSpeed(1.0);
             navigator()->setPlaying(true);
         });
+}
+
+bool TileInteractionHandler::isSyncOn() const
+{
+    return navigator()->syncIsForced() || action(ui::action::ToggleSyncAction)->isChecked();
 }
 
 } // namespace nx::vms::client::desktop
