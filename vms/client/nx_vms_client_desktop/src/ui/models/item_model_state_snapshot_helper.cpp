@@ -5,6 +5,8 @@
 #include <QtCore/QAbstractItemModel>
 
 #include <ui/style/resource_icon_cache.h>
+#include <nx/utils/log/assert.h>
+#include <client/client_globals.h>
 
 using namespace nx::vms::client::desktop;
 

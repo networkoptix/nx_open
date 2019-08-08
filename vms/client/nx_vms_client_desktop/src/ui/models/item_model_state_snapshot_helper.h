@@ -4,6 +4,7 @@
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonDocument>
 #include <QtCore/QModelIndex>
+#include <QtCore/QSet>
 
 class QAbstractItemModel;
 
