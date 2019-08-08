@@ -106,13 +106,17 @@ build_sample.sh
 # Linux, 64-bit ARM cross-compiling (e.g. Nvidia Tegra):
 # NOTE: The file toolchain_arm64.cmake defines which cross-compiler will be used.
 build_sample_arm64.sh
+
+# Linux, 32-bit ARM cross-compiling (e.g. Raspberry Pi):
+# NOTE: The file toolchain_arm32.cmake defines which cross-compiler will be used.
+build_sample_arm32.sh
 ```
 
 On Windows, after CMake generation phase, Visual Studio GUI can be used to compile the sample:
 open `../metadata_sdk-build/stub_analytics_plugin.sln` and build the `ALL_BUILD` project. Make
 sure that the platform combo-box is set to "x64".
 
-After successful building, locate the main built artifact:
+After successful build, locate the main built artifact:
 ```
 # Windows:
 ..\metadata_sdk-build\Debug\stub_analytics_plugin.dll
