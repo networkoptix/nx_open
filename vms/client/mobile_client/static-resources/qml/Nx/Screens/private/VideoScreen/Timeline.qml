@@ -49,11 +49,6 @@ Item
         timelineView.clearCorrection()
     }
 
-    function jumpTo(position)
-    {
-        timeline.setPositionImmediately(position)
-    }
-
     QnTimelineView
     {
         id: timeline

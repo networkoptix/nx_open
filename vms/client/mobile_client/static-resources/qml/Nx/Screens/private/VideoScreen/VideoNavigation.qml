@@ -14,8 +14,10 @@ Item
 {
     id: videoNavigation
 
+    readonly property alias timeline: timeline
+    readonly property alias playback: playbackController
     readonly property bool hasArchive: d.hasArchive && videoNavigation.canViewArchive
-    property var videoScreenController
+    property var controller
     property bool paused: true
     property bool ptzAvailable: false
     property real controlsOpacity: 1.0
@@ -44,7 +46,7 @@ Item
 
     Connections
     {
-        target: videoScreenController
+        target: controller
         onResourceIdChanged:
         {
             actionButtonsPanelOpacityBehaviour.enabled = false
@@ -57,11 +59,11 @@ Item
 
     Connections
     {
-        target: videoScreenController.mediaPlayer
+        target: controller.mediaPlayer
 
         onPlaybackStateChanged:
         {
-            var state = videoScreenController.mediaPlayer.playbackState
+            var state = controller.mediaPlayer.playbackState
             if (state == MediaPlayer.Previewing)
                 return //< In case of previewing we do not change paused state.
 
@@ -75,7 +77,7 @@ Item
 
         readonly property bool loadingChunks:
             cameraChunkProvider.loading || cameraChunkProvider.loadingMotion
-        property bool loaded: videoScreenController.mediaPlayer.mediaStatus === MediaPlayer.Loaded
+        property bool loaded: controller.mediaPlayer.mediaStatus === MediaPlayer.Loaded
         property bool controlsNeeded: !cameraChunkProvider.loading || loaded
 
         property real controlsOpacity:
@@ -97,32 +99,6 @@ Item
         }
 
         onLoadingChunksChanged: updateWarningTextTimer.restart()
-        onLoadedChanged: d.updateTimelinePosition()
-
-        Connections
-        {
-            target: videoScreenController.mediaPlayer
-            onPositionChanged: d.updateTimelinePosition()
-        }
-
-        function goToPosition(position, savePosition)
-        {
-            resumePosition = -1
-            timeline.timelineView.position = position
-            videoScreenController.setPosition(position, savePosition)
-        }
-
-        function updateTimelinePosition()
-        {
-            if (videoScreenController.mediaPlayer.mediaStatus !== MediaPlayer.Loaded)
-                return
-
-            if (!timeline.moving && !d.liveMode)
-            {
-                timeline.autoReturnToBounds = false
-                timeline.position = videoScreenController.mediaPlayer.position
-            }
-        }
 
         Timer
         {
@@ -153,10 +129,9 @@ Item
 
         readonly property bool hasArchive: timeline.startBound > 0
         readonly property bool liveMode:
-            videoScreenController
-            && videoScreenController.mediaPlayer.liveMode
+            controller
+            && controller.mediaPlayer.liveMode
             && !playbackController.paused
-        property real resumePosition: -1
 
         function updateNavigatorPosition()
         {
@@ -179,7 +154,7 @@ Item
     {
         id: cameraChunkProvider
 
-        resourceId: videoScreenController.resourceId
+        resourceId: controller.resourceId
 
         onLoadingChanged:
         {
@@ -305,7 +280,7 @@ Item
         MotionPlaybackMaskWatcher
         {
             active: videoNavigation.motionSearchMode
-            mediaPlayer: videoScreenController.mediaPlayer
+            mediaPlayer: controller.mediaPlayer
             chunkProvider: cameraChunkProvider
         }
 
@@ -316,7 +291,7 @@ Item
             property bool resumeWhenDragFinished: false
 
             motionSearchMode: videoNavigation.motionSearchMode
-            serverTimeZoneShift: videoScreenController.resourceHelper.serverTimeOffset;
+            serverTimeZoneShift: controller.resourceHelper.serverTimeOffset;
             enabled: d.hasArchive
             visible: videoNavigation.canViewArchive
 
@@ -365,23 +340,21 @@ Item
             {
                 if (!moving)
                 {
-                    videoScreenController.setPosition(position, true)
+                    controller.setPosition(position, true)
                     if (resumeWhenDragFinished)
-                        videoScreenController.play()
+                        controller.play()
                     else
-                        videoScreenController.pause()
+                        controller.pause()
                     timeline.autoReturnToBounds = true
                 }
             }
 
-            onPositionTapped: d.goToPosition(position, true)
+            onPositionTapped: controller.forcePosition(position, true)
 
             onPositionChanged:
             {
-                if (!dragging)
-                    return
-
-                videoScreenController.setPosition(position)
+                if (dragging)
+                    controller.setPosition(position)
             }
 
             onDraggingChanged:
@@ -389,8 +362,7 @@ Item
                 if (dragging)
                 {
                     resumeWhenDragFinished = !videoNavigation.paused
-                    videoScreenController.preview()
-                    d.resumePosition = -1
+                    controller.preview()
                 }
             }
         }
@@ -514,7 +486,7 @@ Item
                 visible: videoNavigation.hasArchive
                 onCheckedChanged:
                 {
-                    videoScreenController.mediaPlayer.autoJumpPolicy = checked
+                    controller.mediaPlayer.autoJumpPolicy = checked
                         ? MediaPlayer.DisableAutoJump
                         : MediaPlayer.DisableAutoJumpOnPreviewing
                 }
@@ -563,7 +535,7 @@ Item
                 onClicked:
                 {
                     playbackController.checked = false
-                    videoScreenController.playLive()
+                    controller.playLive()
                 }
 
                 visible: opacity > 0
@@ -575,10 +547,10 @@ Item
                     var futurePosition = position > currentTime
                     var canViewArchive = videoNavigation.canViewArchive
                     return canViewArchive && !d.liveMode && !futurePosition
-                        && !videoScreenController.resourceHelper.isWearableCamera
+                        && !controller.resourceHelper.isWearableCamera
                 }
 
-                readonly property real position: videoScreenController.mediaPlayer.position
+                readonly property real position: controller.mediaPlayer.position
                 onPositionChanged: updateOpacity()
                 onShouldBeVisibleChanged: updateOpacity()
 
@@ -596,7 +568,7 @@ Item
 
                 visible: opacity > 0
 
-                resourceId: videoScreenController.resourceId
+                resourceId: controller.resourceId
                 anchors.left:
                 {
                     if (buttonsPanel.showZoomControls)
@@ -619,7 +591,7 @@ Item
                     value:
                     {
                         var futurePosition =
-                            videoScreenController.mediaPlayer.position > (new Date()).getTime()
+                            controller.mediaPlayer.position > (new Date()).getTime()
                         var live = d.liveMode || futurePosition
                         return live && buttonsPanel.showButtonsPanel ? 1 : 0
                     }
@@ -640,7 +612,7 @@ Item
                 {
                     target: twoWayAudioController
                     property: "resourceId"
-                    value: videoScreenController.resourceId
+                    value: controller.resourceId
                 }
             }
 
@@ -669,7 +641,7 @@ Item
             width: parent.width
             anchors.bottom: timeline.bottom
             anchors.bottomMargin: timeline.chunkBarHeight + 8
-            opacity: d.controlsOpacity
+            opacity: d.controlsOpacity * timelineOpactiyMask.opacity
 
             Text
             {
@@ -745,18 +717,10 @@ Item
             anchors.top: navigator.top
             anchors.horizontalCenter: parent.horizontalCenter
 
-            loading: videoScreenController.mediaPlayer.loading || timeline.dragging
+            loading: controller.mediaPlayer.loading || timeline.dragging
             paused: videoNavigation.paused
 
             opacity: d.controlsOpacity
-
-            ChunkPositionWatcher
-            {
-                id: chunkPositionWatcher
-                motionSearchMode: videoNavigation.motionSearchMode
-                position: timeline.position
-                chunkProvider: timeline.chunkProvider
-            }
 
             PlaybackJumpButton
             {
@@ -765,7 +729,7 @@ Item
                 anchors.right: parent.left
                 anchors.verticalCenter: parent.verticalCenter
 
-                onClicked: d.goToPosition(chunkPositionWatcher.prevChunkStartTimeMs(), false)
+                onClicked: controller.jumpBackward()
             }
 
             PlaybackJumpButton
@@ -775,32 +739,15 @@ Item
                 anchors.left: parent.right
                 anchors.verticalCenter: parent.verticalCenter
 
-                onClicked:
-                {
-                    var nextChunkStartTime = chunkPositionWatcher.nextChunkStartTimeMs();
-                    d.goToPosition(nextChunkStartTime, false)
-                    if (nextChunkStartTime == -1)
-                        videoScreenController.play()
-                }
+                onClicked: controller.jumpForward()
             }
 
             onClicked:
             {
                 if (paused)
-                {
-                    if (d.resumePosition > 0)
-                    {
-                        videoScreenController.setPosition(d.resumePosition)
-                        d.resumePosition = -1
-                    }
-                    videoScreenController.play()
-                }
+                    controller.play()
                 else
-                {
-                    if (d.liveMode)
-                        d.resumePosition = videoScreenController.mediaPlayer.position
-                    videoScreenController.pause()
-                }
+                    controller.pause()
             }
         }
 
@@ -832,28 +779,11 @@ Item
         onDatePicked:
         {
             close()
-            d.resumePosition = -1
             // TODO: Make refactoring and get rid of serverTimeZoneShift (etc) properties.
             // Timeline and calendar should work in a same way.
             var localZoneOffset = (new Date()).getTimezoneOffset() * 60 * 1000;
             var targetTime = date.getTime() + localZoneOffset - timeline.serverTimeZoneShift
-            timeline.jumpTo(targetTime)
-            videoScreenController.setPosition(targetTime, true)
-        }
-    }
-
-    Connections
-    {
-        target: videoScreenController
-        onPlayerJump:
-        {
-            timeline.autoReturnToBounds = false
-            timeline.jumpTo(position)
-        }
-        onGotFirstPosition:
-        {
-            timeline.autoReturnToBounds = false
-            timeline.jumpTo(position)
+            controller.forcePosition(targetTime, true)
         }
     }
 

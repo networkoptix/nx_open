@@ -118,7 +118,7 @@ function openVideoScreen(resourceId, screenshotUrl, xHint, yHint, timestamp)
     var targetTimestamp = timestamp > 0 ? timestamp : -1
     var properties =
         {
-            "resourceId": resourceId,
+            "initialResourceId": resourceId,
             "initialScreenshot": screenshotUrl,
             "targetTimestamp": targetTimestamp
         }
