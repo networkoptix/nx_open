@@ -450,3 +450,37 @@ TEST_F(ResourceTreeModelTest, localFilesIconsAndGrouping)
     // Check result.
     ASSERT_TRUE(testSnapshot(params) == referenceSnapshot);
 }
+
+TEST_F(ResourceTreeModelTest, onlyFilenameIsDisplayed)
+{
+    // Define string constants.
+    static constexpr auto userName = "test_user";
+    static constexpr auto filePath1 = "test_directory/picture.png";
+
+    // Define node lookup data.
+    const KeyValueVector lookupData =
+    {{Qt::DisplayRole, "Local Files"},
+    {Qn::ResourceIconKeyRole, QnResourceIconCache::LocalResources}};
+
+    // Setup resources.
+    loginAsAdmin(userName);
+    addMediaResource(filePath1)->setStatus(Qn::Online);
+
+    // Define reference snapshot.
+    ItemModelStateSnapshotHelper::SnapshotParams params;
+    params.parentIndex = getIndexByData(lookupData).first();
+    params.roles = { Qt::DisplayRole, Qn::ResourceIconKeyRole };
+    const auto referenceSnapshot = QJsonDocument::fromJson(QString(R"json(
+        [
+            {
+                "data": {
+                    "display": "picture.png",
+                    "iconKey": "Image|Online"
+                }
+            }
+        ])json")
+        .toUtf8());
+
+    // Check result.
+    ASSERT_TRUE(testSnapshot(params) == referenceSnapshot);
+}
