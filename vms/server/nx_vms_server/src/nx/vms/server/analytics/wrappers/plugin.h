@@ -1,5 +1,7 @@
 #pragma once
 
+#include <nx/sdk/analytics/i_plugin.h>
+#include <nx/vms/server/analytics/wrappers/fwd.h>
 #include <nx/vms/server/analytics/wrappers/sdk_object_with_manifest.h>
 
 #include <nx/vms/server/resource/resource_fwd.h>
@@ -10,7 +12,8 @@ class Engine;
 
 class Plugin: public SdkObjectWithManifest<sdk::analytics::IPlugin, api::analytics::PluginManifest>
 {
-    using base_type = SdkObjectWithManifest<sdk::analytics::IPlugin, api::analytics::PluginManifest>;
+    using base_type =
+        SdkObjectWithManifest<sdk::analytics::IPlugin, api::analytics::PluginManifest>;
 
 public:
     Plugin(
@@ -24,8 +27,7 @@ public:
         sdk::Ptr<sdk::analytics::IPlugin> sdkPlugin,
         QString libraryName);
 
-    std::shared_ptr<wrappers::Engine> createEngine(
-        const resource::AnalyticsEngineResourcePtr engineResource);
+    wrappers::EnginePtr createEngine(const resource::AnalyticsEngineResourcePtr engineResource);
 
 protected:
     virtual DebugSettings makeManifestProcessorSettings() const override;

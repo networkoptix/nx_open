@@ -1,10 +1,8 @@
 #pragma once
 
-#include <nx/vms/common/resource/analytics_plugin_resource.h>
 #include <nx/vms/server/server_module_aware.h>
-
-#include <nx/sdk/analytics/i_plugin.h>
-#include <nx/sdk/ptr.h>
+#include <nx/vms/server/analytics/wrappers/fwd.h>
+#include <nx/vms/common/resource/analytics_plugin_resource.h>
 
 namespace nx::vms::server {
 
@@ -21,9 +19,9 @@ class AnalyticsPluginResource:
 public:
     AnalyticsPluginResource(QnMediaServerModule* serverModule);
 
-    void setSdkPlugin(std::shared_ptr<analytics::wrappers::Plugin> sdkPlugin);
+    void setSdkPlugin(analytics::wrappers::PluginPtr sdkPlugin);
 
-    std::shared_ptr<analytics::wrappers::Plugin> sdkPlugin() const;
+    analytics::wrappers::PluginPtr sdkPlugin() const;
 
     QString libName() const;
 
@@ -31,7 +29,7 @@ protected:
     virtual CameraDiagnostics::Result initInternal() override;
 
 private:
-    std::shared_ptr<analytics::wrappers::Plugin> m_sdkPlugin;
+    analytics::wrappers::PluginPtr m_sdkPlugin;
 };
 
 } // namespace resource

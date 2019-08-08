@@ -316,8 +316,7 @@ bool PluginManager::processPluginEntryPointForNewSdk(
             pluginInfo->libName);
 
         pluginInfo->mainInterface = MainInterface::nx_sdk_analytics_IPlugin;
-        const auto manifest = plugin->manifest();
-        if (manifest)
+        if (const auto manifest = plugin->manifest())
         {
             pluginInfo->name = manifest->name;
             pluginInfo->description = manifest->description;

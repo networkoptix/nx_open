@@ -34,7 +34,7 @@ int QnGetAnalyticsActionsRestHandler::executeGet(
     for (const auto& engine: engineResources)
     {
         const auto sdkEngine = engine->sdkEngine();
-        if (!sdkEngine || !sdkEngine->isValid()) //< It is not a local engine.
+        if (!sdkEngine) //< It is not a local engine.
             continue;
 
         AvailableAnalyticsActionsOfEngine actionsOfEngine;

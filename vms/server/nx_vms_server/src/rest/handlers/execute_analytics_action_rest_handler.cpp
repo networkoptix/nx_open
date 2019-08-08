@@ -29,11 +29,12 @@
 
 #include <plugins/settings.h>
 
-using namespace nx::vms::server;
-using namespace nx::vms::server::analytics;
-using namespace nx::analytics::db;
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
+using namespace nx::analytics::db;
+using namespace nx::vms::server;
+using namespace nx::vms::server::analytics;
+using namespace nx::vms_server_plugins::utils;
 
 template<typename T>
 using ResultHolder = nx::vms::server::sdk_support::ResultHolder<T>;
@@ -89,12 +90,11 @@ class Action: public RefCountable<IAction>
 public:
     Action(const ExtendedAnalyticsActionData& actionData, AnalyticsActionResult* actionResult):
         m_actionId(actionData.action.actionId.toStdString()),
-        m_objectTrackId(
-            nx::vms_server_plugins::utils::fromQnUuidToSdkUuid(actionData.action.objectTrackId)),
-        m_deviceId(nx::vms_server_plugins::utils::fromQnUuidToSdkUuid(actionData.action.deviceId)),
+        m_objectTrackId(fromQnUuidToSdkUuid(actionData.action.objectTrackId)),
+        m_deviceId(fromQnUuidToSdkUuid(actionData.action.deviceId)),
         m_timestampUs(actionData.action.timestampUs),
         m_objectTrackInfo(makeObjectTrackInfo(actionData)),
-        m_params(nx::vms::server::sdk_support::toSdkStringMap(actionData.action.params)),
+        m_params(sdk_support::toSdkStringMap(actionData.action.params)),
         m_actionResult(actionResult)
     {
         NX_ASSERT(m_actionResult);
@@ -140,7 +140,7 @@ private:
     const int64_t m_timestampUs;
 
     const Ptr<IObjectTrackInfo> m_objectTrackInfo;
-    const nx::sdk::Ptr<const nx::sdk::IStringMap> m_params;
+    const Ptr<const IStringMap> m_params;
 
     AnalyticsActionResult* const m_actionResult = nullptr;
 };

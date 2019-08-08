@@ -4,6 +4,8 @@
 
 #include <core/resource/camera_resource.h>
 
+#include <nx/sdk/analytics/i_engine.h>
+
 #include <nx/vms/server/sdk_support/result_holder.h>
 #include <nx/vms/server/sdk_support/utils.h>
 

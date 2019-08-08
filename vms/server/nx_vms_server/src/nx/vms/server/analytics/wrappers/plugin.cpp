@@ -37,8 +37,7 @@ Plugin::Plugin(
 {
 }
 
-std::shared_ptr<wrappers::Engine> Plugin::createEngine(
-    const resource::AnalyticsEngineResourcePtr engineResource)
+wrappers::EnginePtr Plugin::createEngine(const resource::AnalyticsEngineResourcePtr engineResource)
 {
     const auto sdkPlugin = sdkObject();
     if (!NX_ASSERT(sdkPlugin))
