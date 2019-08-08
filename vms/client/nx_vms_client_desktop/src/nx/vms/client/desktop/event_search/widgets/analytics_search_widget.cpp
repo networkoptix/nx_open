@@ -61,6 +61,7 @@ public:
     void setFilterRect(const QRectF& value);
 
     bool areaSelectionEnabled() const;
+    QString selectedObjectType() const;
 
     void resetFilters();
 
@@ -84,6 +85,8 @@ private:
 
     bool requestPluginActionSettings(const QJsonObject& settingsModel,
         QMap<QString, QString>& settingsValues) const;
+
+    void setSelectedObjectType(const QString& value);
 
 private:
     AnalyticsSearchListModel* const m_model;
@@ -150,6 +153,11 @@ QRectF AnalyticsSearchWidget::filterRect() const
 bool AnalyticsSearchWidget::areaSelectionEnabled() const
 {
     return d->areaSelectionEnabled();
+}
+
+QString AnalyticsSearchWidget::selectedObjectType() const
+{
+    return d->selectedObjectType();
 }
 
 QString AnalyticsSearchWidget::placeholderText(bool constrained) const
@@ -241,6 +249,20 @@ bool AnalyticsSearchWidget::Private::areaSelectionEnabled() const
     return m_areaSelectionEnabled;
 }
 
+QString AnalyticsSearchWidget::Private::selectedObjectType() const
+{
+    return m_model->selectedObjectType();
+}
+
+void AnalyticsSearchWidget::Private::setSelectedObjectType(const QString& value)
+{
+    if (m_model->selectedObjectType() == value)
+        return;
+
+    m_model->setSelectedObjectType(value);
+    emit q->selectedObjectTypeChanged();
+}
+
 void AnalyticsSearchWidget::Private::resetFilters()
 {
     m_typeSelectionButton->deactivate();
@@ -308,7 +330,7 @@ void AnalyticsSearchWidget::Private::updateTypeMenu()
     addItemRecursive(m_objectTypeMenu, objectsTree);
 
     if (!currentSelectionStillAvailable)
-        m_model->setSelectedObjectType({});
+        setSelectedObjectType({});
 }
 
 void AnalyticsSearchWidget::Private::setupAreaSelection()
@@ -376,7 +398,7 @@ QAction* AnalyticsSearchWidget::Private::addMenuAction(
                 ? SelectableTextButton::State::deactivated
                 : SelectableTextButton::State::unselected);
 
-            m_model->setSelectedObjectType(objectType);
+            setSelectedObjectType(objectType);
         });
 
     return action;
