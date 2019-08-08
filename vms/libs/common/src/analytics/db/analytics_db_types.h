@@ -78,6 +78,8 @@ struct Filter
      * If empty than any device is matched.
      */
     std::vector<QnUuid> deviceIds;
+
+    // TODO: #mshevchenko Why 'Id' and not `Ids`? And why not `nx::analytics::ObjectTypeId`?
     std::vector<QString> objectTypeId;
     QnUuid objectTrackId;
     QnTimePeriod timePeriod;
