@@ -10,6 +10,7 @@
 #include <ui/models/resource/resource_tree_model.h>
 #include <ui/models/resource_tree_sort_proxy_model.h>
 #include <ui/models/item_model_state_snapshot_helper.h>
+#include <ui/style/resource_icon_cache.h>
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/user_resource.h>
@@ -279,4 +280,28 @@ TEST_F(ResourceTreeModelTest, shouldGroupServersIfNotSingle)
 
     // Check result.
     ASSERT_TRUE(testSnapshot(params) == referenceSnapshot);
+}
+
+TEST_F(ResourceTreeModelTest, localFilesNodeVisibility)
+{
+    // Define string constants.
+    static constexpr auto userName = "test_user";
+
+    // Define reference data.
+    const KeyValueVector lookupData =
+        {{Qt::DisplayRole, "Local Files"},
+        {Qn::ResourceIconKeyRole, QnResourceIconCache::LocalResources}};
+
+    // Perform actions.
+
+    // TODO: #vbreus On a first sight there should be a zero value, but actual representation of
+    // the resource tree depends not only model state, but also on the root node set to the view.
+    // Need to figure out how to achieve one to one correspondence of testing environment model and
+    // actually displayed hierarchy.
+    ASSERT_TRUE(getIndexByData(lookupData).size() == 1);
+    loginAsAdmin(userName);
+    ASSERT_TRUE(getIndexByData(lookupData).size() == 1);
+    logout();
+    // Same as above.
+    ASSERT_TRUE(getIndexByData(lookupData).size() == 1);
 }
