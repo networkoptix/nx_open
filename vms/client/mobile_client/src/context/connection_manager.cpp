@@ -521,9 +521,17 @@ bool QnConnectionManagerPrivate::doConnect(
             {
                 const auto localId = helpers::getLocalSystemId(connectionInfo);
                 using namespace nx::vms::client::core::helpers;
-                if (connectionTypeForUrl(url) != QnConnectionManager::CloudConnection)
+
+                const bool isCloudConnection =
+                    connectionTypeForUrl(url) == QnConnectionManager::CloudConnection;
+                const auto user = isCloudConnection
+                    ? qnCloudStatusWatcher->cloudLogin()
+                    : url.userName();
+                emit q->sessionParametersChanged(localId, user);
+
+                if (!isCloudConnection)
                 {
-                    nx::vms::common::Credentials credentials(url.userName(), {});
+                    nx::vms::common::Credentials credentials(user, {});
                     if (qnSettings->savePasswords())
                         credentials.password = url.password();
                     storeCredentials(localId, credentials);

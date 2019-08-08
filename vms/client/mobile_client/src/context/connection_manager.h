@@ -12,6 +12,7 @@
 #include <nx/utils/url.h>
 #include <nx/utils/software_version.h>
 
+class QnUuid;
 class QnConnectionManagerPrivate;
 class QnConnectionManager: public QObject, public QnConnectionContextAware
 {
@@ -85,6 +86,7 @@ signals:
 
     void connectionVersionChanged();
     void restoringConnectionChanged();
+    void sessionParametersChanged(const QnUuid& localSystemId, const QString& user);
 
 public slots:
     bool connectToServer(

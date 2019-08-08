@@ -57,6 +57,9 @@ QnContext::QnContext(QObject* parent) :
     m_localPrefix(lit("qrc:///")),
     m_customMargins()
 {
+    connect(m_connectionManager, &QnConnectionManager::sessionParametersChanged,
+        m_audioController, &AudioController::setSessionParameters);
+
     const auto screen = qApp->primaryScreen();
     screen->setOrientationUpdateMask(Qt::PortraitOrientation | Qt::InvertedPortraitOrientation
         | Qt::LandscapeOrientation | Qt::InvertedLandscapeOrientation);
