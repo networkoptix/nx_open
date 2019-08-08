@@ -62,7 +62,8 @@ private:
     QnMediaServerModule* m_serverModule = nullptr;
     QMap<QString, int> m_resourceDiscoveryCounter;
     //map<uniq id, > TODO #ak old values from this dictionary are not cleared
-    QMap<QString, int> m_disconnectSended;
+    QMap<QString, int> m_disconnectedSent;
+    QSet<QString> m_presenceOnline;
 
     using ResourceList = QMap<QString, QnSecurityCamResourcePtr>;
     QVector<ResourceList> m_tmpForeignResources;
