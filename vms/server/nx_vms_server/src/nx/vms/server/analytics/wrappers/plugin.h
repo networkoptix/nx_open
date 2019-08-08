@@ -1,6 +1,6 @@
 #pragma once
 
-#include <nx/vms/server/analytics/wrappers/base_plugin.h>
+#include <nx/vms/server/analytics/wrappers/sdk_object_with_manifest.h>
 
 #include <nx/vms/server/resource/resource_fwd.h>
 
@@ -8,9 +8,9 @@ namespace nx::vms::server::analytics::wrappers {
 
 class Engine;
 
-class Plugin: public BasePlugin<sdk::analytics::IPlugin, api::analytics::PluginManifest>
+class Plugin: public SdkObjectWithManifest<sdk::analytics::IPlugin, api::analytics::PluginManifest>
 {
-    using base_type = BasePlugin<sdk::analytics::IPlugin, api::analytics::PluginManifest>;
+    using base_type = SdkObjectWithManifest<sdk::analytics::IPlugin, api::analytics::PluginManifest>;
 
 public:
     Plugin(

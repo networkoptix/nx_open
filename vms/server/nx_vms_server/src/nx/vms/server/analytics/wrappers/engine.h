@@ -7,7 +7,7 @@
 #include <nx/vms/server/resource/analytics_engine_resource.h>
 #include <nx/vms/server/server_module_aware.h>
 #include <nx/vms/server/analytics/wrappers/types.h>
-#include <nx/vms/server/analytics/wrappers/base_engine.h>
+#include <nx/vms/server/analytics/wrappers/sdk_object_with_settings.h>
 #include <nx/vms/server/sdk_support/error.h>
 
 #include <nx/sdk/result.h>
@@ -25,9 +25,9 @@ namespace nx::vms::server::analytics::wrappers {
 
 class DeviceAgent;
 
-class Engine: public BaseEngine<sdk::analytics::IEngine, api::analytics::EngineManifest>
+class Engine: public SdkObjectWithSettings<sdk::analytics::IEngine, api::analytics::EngineManifest>
 {
-    using base_type = BaseEngine<sdk::analytics::IEngine, api::analytics::EngineManifest>;
+    using base_type = SdkObjectWithSettings<sdk::analytics::IEngine, api::analytics::EngineManifest>;
 public:
     Engine(
         QnMediaServerModule* serverModule,

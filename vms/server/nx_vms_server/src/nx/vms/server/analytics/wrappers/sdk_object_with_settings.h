@@ -5,7 +5,7 @@
 #include <nx/vms/event/events/events_fwd.h>
 #include <nx/vms/event/events/plugin_diagnostic_event.h>
 
-#include <nx/vms/server/analytics/wrappers/base_plugin.h>
+#include <nx/vms/server/analytics/wrappers/sdk_object_with_manifest.h>
 #include <nx/vms/server/analytics/wrappers/types.h>
 #include <nx/vms/server/server_module_aware.h>
 #include <nx/vms/server/sdk_support/error.h>
@@ -16,11 +16,11 @@
 namespace nx::vms::server::analytics::wrappers {
 
 template<typename MainSdkObject, typename ManifestType>
-class BaseEngine: public BasePlugin<MainSdkObject, ManifestType>
+class SdkObjectWithSettings: public SdkObjectWithManifest<MainSdkObject, ManifestType>
 {
-    using base_type = BasePlugin<MainSdkObject, ManifestType>;
+    using base_type = SdkObjectWithManifest<MainSdkObject, ManifestType>;
 public:
-    BaseEngine(
+    SdkObjectWithSettings(
         QnMediaServerModule* serverModule,
         sdk::Ptr<MainSdkObject> mainSdkObject,
         QString libName)
