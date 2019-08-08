@@ -13,7 +13,7 @@
 
 namespace nx {
 namespace sdk {
-namespace test {
+namespace ref_countable_ut {
 
 static constexpr int kOldInterfaceIdSize = 16;
 
@@ -25,7 +25,7 @@ static constexpr int kOldInterfaceIdSize = 16;
  * refCount is 1. The object should implement methods:
  * ```
  * int refCountForTest() const;
- * void* interfaceIdForTest() const; //< Should return object's immediate interface.
+ * const char* interfaceIdForTest() const; //< Should return object's immediate interface.
  * ```
  */
 #define TEST_QUERY_INTERFACE(EXPECTED_RESULT, OBJECT_PTR, INTERFACE) \
@@ -78,7 +78,7 @@ void testQueryInterface(
         {
             // Both old and new interface ids are supported: for new ids, print the first 16 chars.
             NX_PRINT_HEX_DUMP("Requested interfaceId",
-                Interface::interfaceId().value, kOldInterfaceIdSize);
+                Interface::interfaceId(), kOldInterfaceIdSize);
             NX_PRINT_HEX_DUMP("Object's interfaceId",
                 objectPtr->interfaceIdForTest(), kOldInterfaceIdSize);
         };
@@ -123,29 +123,20 @@ void testQueryInterface(
 } // namespace detail
 
 //-------------------------------------------------------------------------------------------------
-
-TEST(RefCountable, interfaceId)
-{
-    constexpr char kInterfaceIdStr[] = "arbitrary string not shorter than 15 chars";
-    const InterfaceId interfaceId(kInterfaceIdStr);
-    ASSERT_STREQ(kInterfaceIdStr, interfaceId.value);
-}
-
-//-------------------------------------------------------------------------------------------------
 // Test classes IRefCountable and RefCountable.
 
 class IBase: public Interface<IBase>
 {
 public:
-    static auto interfaceId() { return InterfaceId("nx::sdk::test::IBase"); }
-    virtual void* interfaceIdForTest() const = 0; //< VMT #4 - should match old SDK method.
+    static auto interfaceId() { return makeId("nx::sdk::test::IBase"); }
+    virtual const char* interfaceIdForTest() const = 0; //< VMT #4 - should match old SDK method.
     virtual int refCountForTest() const = 0; //< VMT #5 - should match old SDK method.
 };
 
 class IData: public Interface<IData, IBase>
 {
 public:
-    static auto interfaceId() { return InterfaceId("nx::sdk::test::IData"); }
+    static auto interfaceId() { return makeId("nx::sdk::test::IData"); }
 };
 
 class Data: public RefCountable<IData>
@@ -161,10 +152,15 @@ public:
         s_destructorCalled = true;
     }
 
-    virtual void* interfaceIdForTest() const override { return (void*) interfaceId().value; }
+    virtual const char* interfaceIdForTest() const override { return interfaceId()->value; }
     virtual int refCountForTest() const override { return refCount(); }
 };
 bool Data::s_destructorCalled = false;
+
+TEST(RefCountable, interfaceId)
+{
+    ASSERT_STREQ(reinterpret_cast<const char*>(IData::interfaceId()), IData::interfaceId()->value);
+}
 
 TEST(RefCountable, refCountableBasics)
 {
@@ -230,11 +226,8 @@ struct OldInterfaceId
         ASSERT_EQ(0, value[kOldInterfaceIdSize - 1]);
     }
 
-    InterfaceId asNew() const
-    {
-        ASSERT_EQ(0, value[kOldInterfaceIdSize - 1]);
-        return InterfaceId((const char (&)[kOldInterfaceIdSize]) value);
-    }
+    /** To enable passing to NX_PRINT_HEX_DUMP(). */
+    operator const char*() const { return reinterpret_cast<const char*>(value); }
 };
 static_assert(sizeof(OldInterfaceId) == kOldInterfaceIdSize,
     "Old SDK InterfaceId should have 16 bytes");
@@ -268,7 +261,7 @@ public:
     virtual unsigned int releaseRef() const = 0;
 
     /** VMT #4 - added for tests; couples with the same method of NewInterface. */
-    virtual void* interfaceIdForTest() { return (void*) interfaceId().value; }
+    virtual const char* interfaceIdForTest() { return (const char*) interfaceId().value; }
 
     /** VMT #5 - added for tests; couples with the same method of NewInterface. */
     virtual int refCountForTest() const = 0;
@@ -335,19 +328,19 @@ bool OldObject::s_destructorCalled = false;
 class NewInterface: public Interface<NewInterface>
 {
 public:
-    static auto interfaceId() { return InterfaceId(NEW_INTERFACE_ID); }
+    static auto interfaceId() { return makeId(NEW_INTERFACE_ID); }
 
     /** Support for old SDK interface id. */
-    virtual IRefCountable* queryInterface(InterfaceId id) override
+    virtual IRefCountable* queryInterface(const InterfaceId* id) override
     {
-        ASSERT_TRUE(id.value != nullptr);
-        ASSERT_TRUE(interfaceId().value != nullptr);
+        ASSERT_TRUE(id != nullptr);
+        ASSERT_TRUE(interfaceId()->value != nullptr);
 
         return queryInterfaceSupportingDeprecatedId(id, Uuid(OldInterface::interfaceId().value));
     }
 
     /** VMT #4 - added for tests; couples with the same method of OldInterface. */
-    virtual void* interfaceIdForTest() const { return (void*) interfaceId().value; }
+    virtual const char* interfaceIdForTest() const { return interfaceId()->value; }
 
     /** VMT #5 - added for tests; couples with the same method of OldInterface. */
     virtual int refCountForTest() const = 0;
@@ -372,18 +365,27 @@ bool NewObject::s_destructorCalled = false;
 class OtherNewInterface: public Interface<OtherNewInterface>
 {
 public:
-    static auto interfaceId() { return InterfaceId(NEW_INTERFACE_ID "_WITH_SUFFIX"); }
+    static auto interfaceId() { return makeId(NEW_INTERFACE_ID "_WITH_SUFFIX"); }
 };
 
 struct OtherOldInterface
 {
-    static auto interfaceId() { return OldInterfaceId("old2interfaceId"); } //< 15 chars, 16 bytes.
+    static const OldInterfaceId& interfaceId()
+    {
+        static OldInterfaceId id{"old2interfaceId"}; //< 15 chars, 16 bytes.
+        return id;
+    }
 };
 
 template<class OldInterface>
 struct OldInterfaceWithNewId
 {
-    static auto interfaceId() { return OldInterface::interfaceId().asNew(); }
+    static const IRefCountable::InterfaceId* interfaceId()
+    {
+        ASSERT_EQ(0, OldInterface::interfaceId().value[kOldInterfaceIdSize - 1]);
+        return reinterpret_cast<const IRefCountable::InterfaceId*>(
+            OldInterface::interfaceId().value);
+    }
 };
 
 /**
@@ -397,9 +399,6 @@ TEST(RefCountable, binaryCompatibilityWithOldSdk)
 
     // Test integrity of the test.
     ASSERT_EQ(kOldInterfaceIdSize, (int) sizeof(OldInterfaceId));
-
-    // Test that queryInterface() argument has the same size in the new and old SDK.
-    ASSERT_EQ(sizeof(InterfaceId), sizeof(const OldInterfaceId*));
 
     const auto newObject = new NewObject;
     ASSERT_EQ(1, newObject->refCountForTest());
@@ -434,6 +433,6 @@ TEST(RefCountable, binaryCompatibilityWithOldSdk)
     ASSERT_TRUE(NewObject::s_destructorCalled);
 }
 
-} // namespace test
+} // namespace ref_countable_ut
 } // namespace sdk
 } // namespace nx

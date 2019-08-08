@@ -7,6 +7,7 @@
 #include <media_server/media_server_module.h>
 #include <api/global_settings.h>
 #include <common/common_module.h>
+#include <utils/common/synctime.h>
 
 namespace nx::vms::server {
 
@@ -69,7 +70,7 @@ update::Status UpdateManager::status()
 
 void UpdateManager::cancel()
 {
-    startUpdate("");
+    setTargetUpdateInformation({});
 }
 
 void UpdateManager::retry(bool forceRedownload)
@@ -118,8 +119,25 @@ void UpdateManager::retry(bool forceRedownload)
 
 void UpdateManager::startUpdate(const QByteArray& content)
 {
-    globalSettings()->setTargetUpdateInformation(content);
-    globalSettings()->synchronizeNowSync();
+    const auto& info = QJson::deserialized<update::Information>(content);
+    setTargetUpdateInformation(info);
+}
+
+bool UpdateManager::startUpdateInstallation(const QList<QnUuid>& participants)
+{
+    try
+    {
+        update::Information info = updateInformation(InformationCategory::target);
+        info.participants = participants;
+        info.lastInstallationRequestTime = qnSyncTime->currentMSecsSinceEpoch();
+        setTargetUpdateInformation(info);
+    }
+    catch (...)
+    {
+        return false;
+    }
+
+    return true;
 }
 
 void UpdateManager::install(const QnAuthSession& authInfo)
@@ -162,73 +180,11 @@ update::Information UpdateManager::updateInformation(
     return information;
 }
 
-update::Information UpdateManager::updateInformation(
-    UpdateManager::InformationCategory category, bool* ok) const
-{
-    update::Information result;
-    try
-    {
-        result = updateInformation(category);
-        if (ok)
-            *ok = true;
-    }
-    catch (const std::exception& e)
-    {
-        NX_DEBUG(this, e.what());
-        if (ok)
-            *ok = false;
-    }
-
-    return result;
-}
-
-void UpdateManager::setUpdateInformation(
-    UpdateManager::InformationCategory category, const update::Information& information)
-{
-    QByteArray serializedUpdateInformation;
-    QJson::serialize(information, &serializedUpdateInformation);
-
-    switch (category)
-    {
-        case InformationCategory::target:
-            globalSettings()->setTargetUpdateInformation(serializedUpdateInformation);
-            break;
-        case InformationCategory::installed:
-            globalSettings()->setInstalledUpdateInformation(serializedUpdateInformation);
-            break;
-    }
-
-    if (!globalSettings()->synchronizeNowSync())
-    {
-        throw std::runtime_error(
-            "Failed to synchronize \"" + toString(category) + "\" update information");
-    }
-}
-
-void UpdateManager::setUpdateInformation(
-    UpdateManager::InformationCategory category,
-    const update::Information& information,
-    bool* ok)
-{
-    try
-    {
-        setUpdateInformation(category, information);
-        if (ok)
-            *ok = true;
-    }
-    catch (const std::exception& e)
-    {
-        NX_DEBUG(this, e.what());
-        if (ok)
-            *ok = false;
-    }
-}
-
 void UpdateManager::finish()
 {
     globalSettings()->setInstalledUpdateInformation(globalSettings()->targetUpdateInformation());
-    globalSettings()->synchronizeNowSync();
-    startUpdate("");
+    globalSettings()->setTargetUpdateInformation({});
+    globalSettings()->synchronizeNow();
 }
 
 void UpdateManager::onGlobalUpdateSettingChanged()
@@ -620,6 +576,16 @@ vms::common::p2p::downloader::Downloader* UpdateManager::downloader()
 int64_t UpdateManager::freeSpace(const QString& path) const
 {
     return serverModule()->rootFileSystem()->freeSpace(path);
+}
+
+void UpdateManager::setTargetUpdateInformation(const update::Information& information)
+{
+    QByteArray data;
+    if (information.isValid())
+        data = QJson::serialized(information);
+
+    globalSettings()->setTargetUpdateInformation(data);
+    globalSettings()->synchronizeNow();
 }
 
 } // namespace nx::vms::server

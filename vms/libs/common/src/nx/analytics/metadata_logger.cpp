@@ -47,7 +47,7 @@ QString makeLogFileName(
     fileName.append(".log");
 
     const QString logDirectoryPath = nx::utils::debug_helpers::debugFilesDirectoryPath(
-        loggingIni().analyticsLogPath);
+        analyticsLoggingPath);
 
     if (logDirectoryPath.isEmpty())
         return QString();
@@ -56,15 +56,15 @@ QString makeLogFileName(
     return dir.absoluteFilePath(fileName);
 }
 
-static QString makeObjectsLogLines(
-    const std::vector<nx::common::metadata::ObjectMetadata>& objectMetadataList)
+static QString makeObjectsLogLinesIfNeeded(
+    const std::vector<ObjectMetadata>& objectMetadataList)
 {
-    static const QString kIndent = "    ";
-
-    if (objectMetadataList.empty())
+    if (!loggingIni().logObjectMetadataDetails || objectMetadataList.empty())
         return "";
 
-    QString result = ":\n"; //< The previous line ends with object count.
+    static const QString kIndent = "    ";
+
+    QString result = ":\n"; //< The previous line ends with the object count.
 
     for (int i = 0; i < (int) objectMetadataList.size(); ++i)
     {
@@ -86,6 +86,29 @@ static QString toMsString(Time time)
     return QString::number(duration_cast<milliseconds>(time).count());
 }
 
+/**
+ * Before building the string, asserts that the input string does not contain `;` or non-printable
+ * chars.
+ */
+static QString buildAdditionalInfoStr(const char* const func, const QString& additionalInfo)
+{
+    if (additionalInfo.isEmpty())
+        return "";
+
+    for (int i = 0; i < additionalInfo.size(); ++i)
+    {
+        int c = additionalInfo[i].unicode();
+        NX_ASSERT(nx::kit::utils::isAsciiPrintable(c), nx::kit::utils::format(
+            "%s(): additionalInfo contains non-printable char U+%04X at position %d: ",
+            func, c, i, nx::kit::utils::toString(additionalInfo).c_str()));
+        NX_ASSERT(c != ';', nx::kit::utils::format(
+            "%s(): additionalInfo contains ';' at position %d: %s",
+            func, i, nx::kit::utils::toString(additionalInfo).c_str()));
+    }
+
+    return "; additionalInfo: " + additionalInfo;
+}
+
 } // namespace
 
 MetadataLogger::MetadataLogger(
@@ -93,8 +116,6 @@ MetadataLogger::MetadataLogger(
     QnUuid deviceId,
     QnUuid engineId,
     nx::vms::api::StreamIndex streamIndex)
-    :
-    m_streamIndex(streamIndex)
 {
     if (!loggingIni().isLoggingEnabled())
         return;
@@ -107,7 +128,10 @@ MetadataLogger::MetadataLogger(
         streamIndex);
 
     if (logFileName.isEmpty())
+    {
+        NX_WARNING(this, "Unable to create output file %1 for logging", logFileName);
         return;
+    }
 
     m_outputFile.setFileName(logFileName);
     if (!m_outputFile.open(QIODevice::WriteOnly | QIODevice::Append))
@@ -118,42 +142,48 @@ void MetadataLogger::pushData(
     const QnConstAbstractMediaDataPtr& data,
     const QString& additionalInfo)
 {
-    if (!data)
-        return;
-
-    if (!loggingIni().isLoggingEnabled())
+    if (!data || (!m_isAlwaysEnabled && !loggingIni().isLoggingEnabled()))
         return;
 
     if (data->dataType == QnAbstractMediaData::DataType::VIDEO)
     {
-        pushFrameInfo({microseconds(data->timestamp)}, additionalInfo);
+        pushFrameInfo(
+            {microseconds(data->timestamp)}, buildAdditionalInfoStr(__func__, additionalInfo));
     }
     else if (data->dataType == QnAbstractMediaData::DataType::GENERIC_METADATA)
     {
-        const ConstObjectMetadataPacketPtr objectMetadata =
-            fromCompressedMetadataPacket(std::dynamic_pointer_cast<const QnCompressedMetadata>(data));
-
-        if (objectMetadata)
-            pushObjectMetadata(*objectMetadata, additionalInfo);
+        if (const ConstObjectMetadataPacketPtr objectMetadata = fromCompressedMetadataPacket(
+            std::dynamic_pointer_cast<const QnCompressedMetadata>(data)))
+        {
+            doPushObjectMetadata(__func__, *objectMetadata, additionalInfo);
+        }
     }
 }
 
 void MetadataLogger::pushFrameInfo(
     const FrameInfo& frameInfo,
-    const QString& additionalFrameInfo)
+    const QString& additionalInfo)
 {
-    if (!loggingIni().isLoggingEnabled())
+    if (!m_isAlwaysEnabled && !loggingIni().isLoggingEnabled())
         return;
 
-    log(buildFrameLogString(frameInfo, additionalFrameInfo).toUtf8());
+    logLine(buildFrameLogString(frameInfo, buildAdditionalInfoStr(__func__, additionalInfo)));
     m_prevFrameTimestamp = frameInfo.timestamp;
 }
 
 void MetadataLogger::pushObjectMetadata(
     const ObjectMetadataPacket& metadataPacket,
-    const QString& additionalMetadataInfo)
+    const QString& additionalInfo)
 {
-    if (!loggingIni().isLoggingEnabled())
+    doPushObjectMetadata(__func__, metadataPacket, additionalInfo);
+}
+
+void MetadataLogger::doPushObjectMetadata(
+    const char* const func,
+    const ObjectMetadataPacket& metadataPacket,
+    const QString& additionalInfo)
+{
+    if (!m_isAlwaysEnabled && !loggingIni().isLoggingEnabled())
         return;
 
     m_isLoggingBestShot = false;
@@ -163,58 +193,54 @@ void MetadataLogger::pushObjectMetadata(
             m_isLoggingBestShot = true;
     }
 
-    log(buildObjectMetadataLogString(metadataPacket, additionalMetadataInfo).toUtf8());
+    logLine(buildObjectMetadataLogString(
+        metadataPacket, buildAdditionalInfoStr(func, additionalInfo)));
+
     if (!m_isLoggingBestShot)
         m_prevObjectMetadataPacketTimestamp = microseconds(metadataPacket.timestampUs);
 }
 
 QString MetadataLogger::buildFrameLogString(
     const FrameInfo& frameInfo,
-    const QString& additionalInfo)
+    const QString& additionalInfoStr) const
 {
     const microseconds currentTime{qnSyncTime->currentUSecsSinceEpoch()};
 
-    QString result = QString("frameTimestampMs ") + toMsString(frameInfo.timestamp) + ", "
+    return "frameTimestampMs " + toMsString(frameInfo.timestamp) + ", "
         + "currentTimeMs " + toMsString(currentTime) + ", "
         + "diffFromPrevMs " + toMsString(frameInfo.timestamp - m_prevFrameTimestamp) + ", "
-        + "diffFromCurrentTimeMs " + toMsString(frameInfo.timestamp - currentTime);
-
-    if (!additionalInfo.isEmpty())
-        result += ", additonalInfo: " + additionalInfo;
-
-    return result;
+        + "diffFromCurrentTimeMs " + toMsString(frameInfo.timestamp - currentTime)
+        + additionalInfoStr;
 }
 
 QString MetadataLogger::buildObjectMetadataLogString(
     const ObjectMetadataPacket& metadataPacket,
-    const QString& additionalInfo)
+    const QString& additionalInfoStr) const
 {
-    const microseconds currentTime{ qnSyncTime->currentUSecsSinceEpoch() };
-    const microseconds currentPacketTimestamp = microseconds(metadataPacket.timestampUs);
+    const microseconds currentTime{
+        qnSyncTime //< Is null in unit tests.
+            ? qnSyncTime->currentUSecsSinceEpoch()
+            : duration_cast<microseconds>(system_clock::now().time_since_epoch()).count()
+    };
+    const microseconds currentPacketTimestamp{metadataPacket.timestampUs};
     const microseconds diffFromPrev = currentPacketTimestamp - m_prevObjectMetadataPacketTimestamp;
 
-    QString result = QString("metadataTimestampMs ") + toMsString(currentPacketTimestamp) + ", "
+    return "metadataTimestampMs " + toMsString(currentPacketTimestamp) + ", "
         + "currentTimeMs " + toMsString(currentTime) + ", "
         + "diffFromPrevMs " + toMsString(diffFromPrev) + ", "
-        + "diffFromCurrentTimeMs " + toMsString(currentPacketTimestamp - currentTime);
-
-    if (!additionalInfo.isEmpty())
-        result += ", additonalInfo: " + additionalInfo;
-
-    result += ", objects: " + QString::number(metadataPacket.objectMetadataList.size());
-
-    if (!loggingIni().logObjectMetadataDetails)
-        result += makeObjectsLogLines(metadataPacket.objectMetadataList);
-
-    return result;
+        + "diffFromCurrentTimeMs " + toMsString(currentPacketTimestamp - currentTime)
+        + additionalInfoStr
+        + "; objects: " + QString::number(metadataPacket.objectMetadataList.size())
+        + makeObjectsLogLinesIfNeeded(metadataPacket.objectMetadataList);
 }
 
-void MetadataLogger::log(QString logLine)
+void MetadataLogger::logLine(QString lineStr)
 {
-    if (!logLine.isEmpty() && logLine.back() != '\n')
-        logLine.append('\n');
+    if (!lineStr.isEmpty() && lineStr.back() != '\n')
+        lineStr.append('\n');
 
-    m_outputFile.write(logLine.toUtf8());
+    if (m_outputFile.isOpen())
+        m_outputFile.write(lineStr.toUtf8());
 }
 
 } // namespace nx::analytics

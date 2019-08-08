@@ -16,7 +16,7 @@ namespace analytics {
 class IObjectTrackInfo: public Interface<IObjectTrackInfo>
 {
 public:
-    static auto interfaceId() { return InterfaceId("nx::sdk::analytics::IObjectTrackInfo"); }
+    static auto interfaceId() { return makeId("nx::sdk::analytics::IObjectTrackInfo"); }
 
     /** @return List of metadata that share the same trackId. */
     protected: virtual IList<ITimestampedObjectMetadata>* getTrack() const = 0;

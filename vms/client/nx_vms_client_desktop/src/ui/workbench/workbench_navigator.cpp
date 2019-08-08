@@ -835,9 +835,8 @@ void QnWorkbenchNavigator::removeSyncedWidget(QnMediaResourceWidget *widget)
     m_motionIgnoreWidgets.remove(widget);
     m_updateHistoryQueue.remove(widget->resource().dynamicCast<QnSecurityCamResource>());
 
-    if(auto loader = m_cameraDataManager->loader(syncedResource, false))
+    if (auto loader = m_cameraDataManager->loader(syncedResource, false))
     {
-        loader->setMotionRegions(QList<QRegion>());
         if (noMoreWidgetsOfThisResource)
             loader->setEnabled(false);
     }
@@ -2651,10 +2650,8 @@ void QnWorkbenchNavigator::updatePlaybackMask()
     const auto content = selectedExtraContent();
     QnTimePeriodList playbackMask;
 
-    // TODO: #dmishin setting of playback mask for analytics content makes it impossible.
-    // to play archive in some cases (if analytics periods are very small)
-    // Figure out how to properly fix it.
-    if (content != Qn::RecordingContent && content != Qn::AnalyticsContent)
+    if (content != Qn::RecordingContent
+        && (ini().enableAnalyticsPlaybackMask || content != Qn::AnalyticsContent))
     {
         if (ini().enableSyncedChunksForExtraContent)
         {

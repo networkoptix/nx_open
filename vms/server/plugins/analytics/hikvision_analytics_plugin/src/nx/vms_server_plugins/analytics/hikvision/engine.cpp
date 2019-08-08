@@ -73,7 +73,7 @@ void Engine::doSetSettings(
     // There are no DeviceAgent settings for this plugin.
 }
 
-void Engine::getPluginSideSettings(Result<const ISettingsResponse*>* outResult) const
+void Engine::getPluginSideSettings(Result<const ISettingsResponse*>* /*outResult*/) const
 {
 }
 

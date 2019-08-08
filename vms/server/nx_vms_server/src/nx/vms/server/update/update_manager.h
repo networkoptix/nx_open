@@ -32,19 +32,10 @@ public:
     void cancel();
     void retry(bool forceRedownload = false);
     void startUpdate(const QByteArray& content);
+    bool startUpdateInstallation(const QList<QnUuid>& participants);
     void install(const QnAuthSession& authInfo);
 
     update::Information updateInformation(InformationCategory category) const noexcept(false);
-    update::Information updateInformation(InformationCategory category, bool* ok) const;
-
-    void setUpdateInformation(
-        InformationCategory category,
-        const update::Information& information) noexcept(false);
-
-    void setUpdateInformation(
-        InformationCategory category,
-        const update::Information& information,
-        bool* ok);
 
     void finish();
 
@@ -66,6 +57,8 @@ private:
 
     common::p2p::downloader::Downloader* downloader();
     int64_t freeSpace(const QString& path) const;
+
+    void setTargetUpdateInformation(const update::Information& information);
 
 private:
     enum class DownloaderFailDetail

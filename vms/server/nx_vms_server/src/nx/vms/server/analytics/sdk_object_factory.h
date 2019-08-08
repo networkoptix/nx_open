@@ -28,6 +28,9 @@ private:
     bool initPluginResources();
     bool initEngineResources();
 
+    bool createEngine(
+        const resource::AnalyticsEngineResourcePtr& engineResource) const;
+
     void updateActiveEngines(QSet<QnUuid> activeEngines);
 
     nx::vms::api::AnalyticsEngineData createEngineData(

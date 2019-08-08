@@ -119,14 +119,14 @@ void MetadataHandler::handleObjectMetadataPacket(
             break;
 
         nx::common::metadata::ObjectMetadata objectMetadata;
-        objectMetadata.objectTypeId = item->typeId();
+        objectMetadata.typeId = item->typeId();
         objectMetadata.trackId = fromSdkUuidToQnUuid(item->trackId());
         const auto box = item->boundingBox();
         objectMetadata.boundingBox = QRectF(box.x, box.y, box.width, box.height);
 
         NX_VERBOSE(this, "%1(): x %2, y %3, width %4, height %5, typeId %6, id %7",
             __func__, box.x, box.y, box.width, box.height,
-            objectMetadata.objectTypeId, objectMetadata.trackId);
+            objectMetadata.typeId, objectMetadata.trackId);
 
         for (int j = 0; j < item->attributeCount(); ++j)
         {

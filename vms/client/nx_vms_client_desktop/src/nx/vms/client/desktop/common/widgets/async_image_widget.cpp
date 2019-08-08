@@ -241,12 +241,13 @@ void AsyncImageWidget::paintEvent(QPaintEvent* /*event*/)
 
     QRect targetImageRect; //< Image rectangle in target coordinates.
     QRect targetHighlightRect; //< Highlight rectangle in target coordinates.
+    const bool croppedMode = cropRequired();
 
     if (!m_preview.isNull() && !m_placeholder->isVisible())
     {
         QRectF sourceRect = m_preview.rect();
         const QRectF sourceHighlightRect = core::Geometry::subRect(sourceRect, m_highlightRect);
-        if (cropRequired())
+        if (croppedMode)
             sourceRect = sourceHighlightRect;
 
         QRectF targetRect = rect();
@@ -286,7 +287,7 @@ void AsyncImageWidget::paintEvent(QPaintEvent* /*event*/)
     }
 
     // Draw highlight
-    if (!targetHighlightRect.isEmpty())
+    if (!targetHighlightRect.isEmpty() && !croppedMode)
     {
         // Dim everything around highlighted area.
         if (targetImageRect != targetHighlightRect)

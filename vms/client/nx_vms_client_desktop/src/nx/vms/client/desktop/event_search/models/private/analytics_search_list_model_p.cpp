@@ -170,7 +170,7 @@ QVariant AnalyticsSearchListModel::Private::data(const QModelIndex& index, int r
         }
 
         case Qt::DecorationRole:
-            return QVariant::fromValue(qnSkin->pixmap("text_buttons/analytics.png"));
+            return QVariant::fromValue(qnSkin->pixmap("analytics/analytics.svg"));
 
         case Qn::DescriptionTextRole:
             return description(track);
@@ -593,7 +593,7 @@ void AnalyticsSearchListModel::Private::processMetadata()
                     continue;
                 }
 
-                if ((!m_selectedObjectType.isEmpty() && m_selectedObjectType != item.objectTypeId)
+                if ((!m_selectedObjectType.isEmpty() && m_selectedObjectType != item.typeId)
                     || (m_filterRect.isValid() && !m_filterRect.intersects(item.boundingBox))
                     || !acceptedByTextFilter(item, m_filterText))
                 {
@@ -602,7 +602,7 @@ void AnalyticsSearchListModel::Private::processMetadata()
 
                 ObjectTrack newTrack;
                 newTrack.id = item.trackId;
-                newTrack.objectTypeId = item.objectTypeId;
+                newTrack.objectTypeId = item.typeId;
                 newTrack.attributes = item.attributes;
                 newTrack.objectPositionSequence.push_back(pos);
                 newTrack.firstAppearanceTimeUs = pos.timestampUs;

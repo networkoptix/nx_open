@@ -4,6 +4,7 @@
 #include <nx/analytics/property_descriptor_storage.h>
 #include <nx/analytics/multiresource_descriptor_container_helper.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource/media_server_resource.h>
 #include <utils/common/value_cache.h>
 #include <common/common_module_aware.h>
 #include <common/common_module.h>
@@ -197,6 +198,9 @@ private:
     {
         QnMutexLocker lock(&m_mutex);
         const QnUuid serverId = server->getId();
+
+        if (m_containers.find(serverId) != m_containers.cend())
+            return;
 
         if (serverId == commonModule()->moduleGUID())
             m_ownResourceId = serverId;

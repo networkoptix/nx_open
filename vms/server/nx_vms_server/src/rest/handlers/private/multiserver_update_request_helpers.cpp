@@ -69,19 +69,23 @@ void checkUpdateStatusRemotely(
     }
 }
 
-IfParticipantPredicate makeIfParticipantPredicate(UpdateManager* updateManager)
+IfParticipantPredicate makeIfParticipantPredicate(
+    UpdateManager* updateManager, const QList<QnUuid>& forcedParticipants)
 {
     try
     {
         const auto updateInfo = updateManager->updateInformation(
             UpdateManager::InformationCategory::target);
 
+        const auto participants =
+            forcedParticipants.isEmpty() ? updateInfo.participants : forcedParticipants;
+
         return
-            [updateInfo](
+            [updateInfo, participants](
                 const QnUuid& id,
                 const nx::vms::api::SoftwareVersion& version)
             {
-                if (!updateInfo.participants.isEmpty() && !updateInfo.participants.contains(id))
+                if (!participants.isEmpty() && !participants.contains(id))
                     return ParticipationStatus::notInList;
 
                 return version <= nx::vms::api::SoftwareVersion(updateInfo.version)

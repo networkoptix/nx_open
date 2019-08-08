@@ -17,10 +17,7 @@ namespace analytics {
 class IObjectTrackBestShotPacket: public Interface<IObjectTrackBestShotPacket, IMetadataPacket>
 {
 public:
-    static auto interfaceId()
-    {
-        return InterfaceId("nx::sdk::analytics::IObjectTrackBestShotPacket");
-    }
+    static auto interfaceId() { return makeId("nx::sdk::analytics::IObjectTrackBestShotPacket"); }
 
     /**
      * Timestamp of the frame (in microseconds) the best shot belongs to. Should be a non-negative

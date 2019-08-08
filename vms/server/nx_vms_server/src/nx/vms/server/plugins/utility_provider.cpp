@@ -15,7 +15,7 @@ UtilityProvider::UtilityProvider(PluginManager* pluginManager, const sdk::IPlugi
     NX_ASSERT(pluginManager);
 }
 
-nx::sdk::IRefCountable* UtilityProvider::queryInterface(nx::sdk::InterfaceId id)
+nx::sdk::IRefCountable* UtilityProvider::queryInterface(const InterfaceId* id)
 {
     // TODO: When nxpl::TimeProvider is deleted, move the value of its IID here to preserve binary
     // compatibility with old SDK plugins.

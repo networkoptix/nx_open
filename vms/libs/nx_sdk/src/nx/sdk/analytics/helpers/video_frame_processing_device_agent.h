@@ -42,13 +42,8 @@ protected:
 protected:
     /**
      * @param enableOutput Enables NX_OUTPUT. Typically, use NX_DEBUG_ENABLE_OUTPUT as a value.
-     * @param printPrefix Prefix for NX_PRINT and NX_OUTPUT. If empty, will be made from Engine's
-     *     libName().
      */
-    VideoFrameProcessingDeviceAgent(
-        const IDeviceInfo* deviceInfo,
-        bool enableOutput,
-        const std::string& printPrefix = "");
+    VideoFrameProcessingDeviceAgent(const IDeviceInfo* deviceInfo, bool enableOutput);
 
     virtual std::string manifestString() const = 0;
 
@@ -124,7 +119,7 @@ public:
 
 public:
     virtual void setHandler(IHandler* handler) override;
-    
+
 protected:
     virtual void doPushDataPacket(Result<void>* outResult, IDataPacket* dataPacket) override;
     virtual void doSetSettings(
