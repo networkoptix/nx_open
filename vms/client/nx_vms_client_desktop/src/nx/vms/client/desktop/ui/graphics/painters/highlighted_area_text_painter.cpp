@@ -3,6 +3,8 @@
 #include <QtGui/QFontMetrics>
 #include <QtGui/QPainter>
 
+#include <QtWidgets/QApplication>
+
 namespace nx::vms::client::desktop {
 
 namespace {
@@ -92,13 +94,19 @@ QPixmap HighlightedAreaTextPainter::paintText(const QString& text) const
     const int lineSpacing =
         std::max(nameLineSpacing, valueLineSpacing);
 
-    QPixmap pixmap(
-        maxNameWidth + maxValueWidth + kSpacing,
-        lineSpacing * lines.size());
+    static const auto ratio = qApp->devicePixelRatio();
+    const auto width = maxNameWidth + maxValueWidth + kSpacing;
+    const auto height = lineSpacing * lines.size();
+    const auto baseSize = QSize(width, height);
+    const auto pixmapSize = baseSize * ratio;
+
+    QPixmap pixmap(pixmapSize);
+    pixmap.setDevicePixelRatio(ratio);
     pixmap.fill(Qt::transparent);
 
     QPainter painter(&pixmap);
     painter.setPen(m_color);
+    painter.setRenderHint(QPainter::TextAntialiasing);
 
     int nameYShift = 0;
     int valueYShift = (nameLineSpacing - valueLineSpacing) / 2;
