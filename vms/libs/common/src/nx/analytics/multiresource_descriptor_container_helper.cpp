@@ -31,14 +31,20 @@ MultiresourceDescriptorContainerHelper::MultiresourceDescriptorContainerHelper(
 
 void MultiresourceDescriptorContainerHelper::at_resourceAdded(QnResourcePtr resource)
 {
-    if (const auto server = resource.dynamicCast<QnMediaServerResource>())
+    if (const auto server = resource.dynamicCast<QnMediaServerResource>();
+        server && !server->hasFlags(Qn::fake))
+    {
         m_onServerAddedHandler(server);
+    }
 }
 
 void MultiresourceDescriptorContainerHelper::at_resourceRemoved(QnResourcePtr resource)
 {
-    if (const auto server = resource.dynamicCast<QnMediaServerResource>())
+    if (const auto server = resource.dynamicCast<QnMediaServerResource>();
+        server && !server->hasFlags(Qn::fake))
+    {
         m_onServerRemovedHandler(server);
+    }
 }
 
 
